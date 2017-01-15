@@ -2,7 +2,6 @@
   "name": "cardstack-server",
   "version": "0.0.0",
   "description": "Stock API server for the Cardstack tech stack.",
-  "main": "bin/server.js",
   "repository": "https://github.com/cardstack/cardstack-server",
   "author": "Edward Faulkner <edward@eaf4.com>",
   "license": "MIT",
