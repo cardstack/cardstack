@@ -22,6 +22,9 @@
                 "tests/prepare.js",
                 "tests/**/*-test.js",
                 "tests/*-test.js"
+            ],
+            "runtimeArgs": [
+                "--harmony"
             ]
         },
         {

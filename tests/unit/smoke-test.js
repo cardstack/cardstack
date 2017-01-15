@@ -1,7 +1,7 @@
 const example = require('../../src');
 
 describe("Unit | Smoke Test", function() {
-  it("hello world", function() {
-    expect(example.hello()).to.equal('world');
+  it("hello world", async function() {
+    expect(await example.hello()).to.equal('world');
   });
 });

@@ -14,6 +14,6 @@
     "supertest": "^2.0.1"
   },
   "scripts": {
-    "test": "mocha -r tests/prepare.js tests/**/*-test.js tests/*-test.js"
+    "test": "mocha --harmony -r tests/prepare.js tests/**/*-test.js tests/*-test.js"
   }
 }
