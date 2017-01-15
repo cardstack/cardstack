@@ -14,5 +14,8 @@
   },
   "scripts": {
     "test": "mocha --harmony -r tests/prepare.js tests/**/*-test.js tests/*-test.js"
+  },
+  "dependencies": {
+    "nodegit": "^0.16.0"
   }
 }
