@@ -9,6 +9,7 @@ module.exports = {
   },
   rules: {
     'no-constant-condition': ["error", { checkLoops: false }],
-    'require-yield': 0
+    'require-yield': 0,
+    'no-var': "error"
   }
 };
