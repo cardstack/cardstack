@@ -7,13 +7,16 @@
   "license": "MIT",
   "devDependencies": {
     "chai": "^3.5.0",
+    "denodeify": "^1.2.1",
     "glob": "^7.1.1",
     "mocha": "^3.2.0",
     "mocha-eslint": "^3.0.1",
-    "supertest": "^2.0.1"
+    "supertest": "^2.0.1",
+    "temp": "^0.8.3"
   },
   "scripts": {
-    "test": "mocha --harmony -r tests/prepare.js tests/**/*-test.js tests/*-test.js"
+    "test": "mocha --harmony -r tests/prepare.js tests/**/*-test.js tests/*-test.js",
+    "debug-test": "mocha --debug=0.0.0.0:5858 --harmony -r tests/prepare.js tests/**/*-test.js tests/*-test.js"
   },
   "dependencies": {
     "nodegit": "^0.16.0"
