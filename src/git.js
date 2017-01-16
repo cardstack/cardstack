@@ -58,6 +58,17 @@ exports.mergeCommit = async function(repo, parentId, targetBranch, updatedConten
   let baseOid = await Merge.base(repo, newCommit, headCommit);
   if (baseOid.equal(headCommit.id())) {
     await headRef.setTarget(newCommit.id(), 'fast forward');
-    return newCommit;
+    return { success: newCommit };
   }
+  let index = await Merge.commits(repo, newCommit, headCommit, null);
+  if (index.hasConflicts()) {
+    return { conflict: index };
+  }
+  let treeOid = await index.writeTreeTo(repo);
+  let tree = await Tree.lookup(repo, treeOid, null);
+  let sig = signature(commitOpts);
+  let mergeCommitOid = await Commit.create(repo, null, sig, sig, 'UTF-8', `Clean merge into ${targetBranch}`, tree, 2, [newCommit, headCommit]);
+  let mergeCommit = await Commit.lookup(repo, mergeCommitOid);
+  await headRef.setTarget(mergeCommit.id(), 'fast forward');
+  return { success: mergeCommit };
 };

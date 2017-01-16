@@ -53,7 +53,7 @@ describe('git', function() {
     let updatedContent = [
       { filename: 'hello-world.txt', filemode: ngit.TreeEntry.FILEMODE.BLOB, buffer: Buffer.from('This is a file', 'utf8') }
     ];
-    let id = (await git.mergeCommit(repo, parentRef.target(), 'master', updatedContent, commitOpts({ message: 'Second commit' }))).id().tostrS();
+    let id = (await git.mergeCommit(repo, parentRef.target(), 'master', updatedContent, commitOpts({ message: 'Second commit' }))).success.id().tostrS();
 
     let commit = await inRepo(path).getCommit(id);
     expect(commit.message).to.equal('Second commit');
@@ -66,6 +66,50 @@ describe('git', function() {
 
     expect(await inRepo(path).getContents(id, 'hello-world.txt')).to.equal('This is a file');
 
+  });
+
+
+  it('non-fast-forward merge some new content', async function() {
+    let path = `${root}/example`;
+    let repo = await git.createEmptyRepo(path, commitOpts({
+      message: 'First commit'
+    }));
+    let parentRef = await ngit.Branch.lookup(repo, 'master', ngit.Branch.BRANCH.LOCAL);
+
+    let updatedContent = [
+      { filename: 'hello-world.txt', filemode: ngit.TreeEntry.FILEMODE.BLOB, buffer: Buffer.from('This is a file', 'utf8') }
+    ];
+    await git.mergeCommit(repo, parentRef.target(), 'master', updatedContent, commitOpts({ message: 'Second commit' }));
+
+    updatedContent = [
+      { filename: 'other.txt', filemode: ngit.TreeEntry.FILEMODE.BLOB, buffer: Buffer.from('Non-conflicting content', 'utf8') }
+    ];
+    // This is based on the same parentRef as the second commit, so it's not a fast forward
+    await git.mergeCommit(repo, parentRef.target(), 'master', updatedContent, commitOpts({ message: 'Third commit' }));
+
+    expect((await inRepo(path).getCommit('master')).message).to.equal('Clean merge into master');
+    expect((await inRepo(path).getCommit('master^1')).message).to.equal('Third commit');
+    expect((await inRepo(path).getCommit('master^2')).message).to.equal('Second commit');
+  });
+
+  it('rejects conflicting merge', async function() {
+    let path = `${root}/example`;
+    let repo = await git.createEmptyRepo(path, commitOpts({
+      message: 'First commit'
+    }));
+    let parentRef = await ngit.Branch.lookup(repo, 'master', ngit.Branch.BRANCH.LOCAL);
+
+    let updatedContent = [
+      { filename: 'hello-world.txt', filemode: ngit.TreeEntry.FILEMODE.BLOB, buffer: Buffer.from('This is a file', 'utf8') }
+    ];
+    await git.mergeCommit(repo, parentRef.target(), 'master', updatedContent, commitOpts({ message: 'Second commit' }));
+
+    updatedContent = [
+      { filename: 'hello-world.txt', filemode: ngit.TreeEntry.FILEMODE.BLOB, buffer: Buffer.from('Conflicting content', 'utf8') }
+    ];
+    let result = await git.mergeCommit(repo, parentRef.target(), 'master', updatedContent, commitOpts({ message: 'Third commit' }));
+    expect(result.conflict).to.not.equal(undefined);
+    expect((await inRepo(path).getCommit('master')).message).to.equal('Second commit');
   });
 
 });
