@@ -41,21 +41,25 @@ describe('git', function() {
     expect(commit.authorDate).to.equal('2017-01-16T12:21:00+03:00');
   });
 
-  it('can build a commit with some content', async function() {
+  it('can fast-forward merge some new content', async function() {
     let path = `${root}/example`;
 
     let repo = await git.createEmptyRepo(path, commitOpts({
       message: 'First commit'
     }));
 
-    let ref = await ngit.Branch.lookup(repo, 'master', ngit.Branch.BRANCH.LOCAL);
+    let parentRef = await ngit.Branch.lookup(repo, 'master', ngit.Branch.BRANCH.LOCAL);
+
     let updatedContent = [
       { filename: 'hello-world.txt', filemode: ngit.TreeEntry.FILEMODE.BLOB, buffer: Buffer.from('This is a file', 'utf8') }
     ];
-    let id = (await git.makeCommit(repo, ref.target(), updatedContent, commitOpts({ message: 'Second commit' }))).id().tostrS();
+    let id = (await git.mergeCommit(repo, parentRef.target(), 'master', updatedContent, commitOpts({ message: 'Second commit' }))).id().tostrS();
 
     let commit = await inRepo(path).getCommit(id);
     expect(commit.message).to.equal('Second commit');
+
+    let head = await inRepo(path).getCommit('master');
+    expect(head.message).to.equal('Second commit');
 
     let parentCommit = await inRepo(path).getCommit(id + '^');
     expect(parentCommit.message).to.equal('First commit');
