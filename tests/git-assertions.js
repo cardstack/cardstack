@@ -20,13 +20,16 @@ class RepoExplorer {
   }
   async getCommit(which) {
     let props = Object.keys(formats);
-    let result = await this.runGit('show', which, `--format=format:${props.map(p => '%' + formats[p]).join('|')}`);
+    let result = await this.runGit('show', which, '-s', `--format=format:${props.map(p => '%' + formats[p]).join('|')}`);
     let values = result.stdout.split('|');
     let output = {};
     for (let i = 0; i < props.length; i++) {
       output[props[i]] = values[i];
     }
     return output;
+  }
+  async getContents(refSpec, path) {
+    return (await this.runGit('show', `${refSpec}:${path}`)).stdout;
   }
 }
 

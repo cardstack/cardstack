@@ -1,17 +1,47 @@
-const Git = require('nodegit');
+const {
+  Blob,
+  Branch,
+  Commit,
+  Repository,
+  Signature,
+  Tree,
+  Treebuilder
+} = require('nodegit');
 const moment = require('moment-timezone');
 
-exports.createEmptyRepo = async function(path, opts={}) {
-  let date = opts.authorDate || moment();
-  let sig = Git.Signature.create(opts.authorName, opts.authorEmail, date.unix(), date.utcOffset());
-  let repo = await Git.Repository.init(path, 1);
+function signature(commitOpts) {
+  let date = commitOpts.authorDate || moment();
+  return Signature.create(commitOpts.authorName, commitOpts.authorEmail, date.unix(), date.utcOffset());
+}
 
-  let builder = await Git.Treebuilder.create(repo, null);
+exports.createEmptyRepo = async function(path, commitOpts) {
+  let sig = signature(commitOpts);
+  let repo = await Repository.init(path, 1);
+
+  let builder = await Treebuilder.create(repo, null);
   let treeOid = builder.write();
 
-  let tree = await Git.Tree.lookup(repo, treeOid, null);
+  let tree = await Tree.lookup(repo, treeOid, null);
 
-  let commitOid = await Git.Commit.create(repo, null, sig, sig, 'UTF-8', opts.message, tree, 0, []);
-  let commit = await Git.Commit.lookup(repo, commitOid);
-  await Git.Branch.create(repo, 'master', commit, false);
+  let commitOid = await Commit.create(repo, null, sig, sig, 'UTF-8', commitOpts.message, tree, 0, []);
+  let commit = await Commit.lookup(repo, commitOid);
+  await Branch.create(repo, 'master', commit, false);
+  return repo;
+};
+
+exports.makeCommit = async function(repo, parentId, updatedContents, commitOpts) {
+  let parentCommit = await Commit.lookup(repo, parentId);
+  let parentTree = await parentCommit.getTree();
+  let builder = await Treebuilder.create(repo, parentTree);
+  for (let { filename, filemode, buffer } of updatedContents) {
+    let blobOid = Blob.createFromBuffer(repo, buffer, buffer.length);
+    await builder.insert(filename, blobOid, filemode);
+  }
+
+  let treeOid = builder.write();
+
+  let tree = await Tree.lookup(repo, treeOid, null);
+  let sig = signature(commitOpts);
+  let commitOid = await Commit.create(repo, null, sig, sig, 'UTF-8', commitOpts.message, tree, 1, [parentCommit]);
+  return Commit.lookup(repo, commitOid);
 };
