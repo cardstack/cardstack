@@ -1,3 +1,10 @@
+/*
+   This module is deliberately not implemented using nodegit. Instead,
+   it's implemented via regular shell git commands. That way, our test
+   suite's assertions would notice inconsistencies between what
+   nodegit sees and what stock git sees.
+*/
+
 const spawn = require('child_process').spawn;
 
 exports.inRepo = function(path) {

@@ -19,6 +19,7 @@ describe('git', function() {
 
   it('can make new empty repo', async function() {
     let path = `${root}/example`;
+
     await git.createEmptyRepo(path, {
       authorName: 'John Milton',
       authorEmail: 'john@paradiselost.com',
