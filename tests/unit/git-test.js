@@ -90,6 +90,8 @@ describe('git', function() {
     expect((await inRepo(path).getCommit('master')).message).to.equal('Clean merge into master');
     expect((await inRepo(path).getCommit('master^1')).message).to.equal('Third commit');
     expect((await inRepo(path).getCommit('master^2')).message).to.equal('Second commit');
+    expect(await inRepo(path).getContents('master', 'hello-world.txt')).to.equal('This is a file');
+    expect(await inRepo(path).getContents('master', 'other.txt')).to.equal('Non-conflicting content');
   });
 
   it('rejects conflicting merge', async function() {
@@ -110,6 +112,10 @@ describe('git', function() {
     let result = await git.mergeCommit(repo, parentRef.target(), 'master', updatedContent, commitOpts({ message: 'Third commit' }));
     expect(result.conflict).to.not.equal(undefined);
     expect((await inRepo(path).getCommit('master')).message).to.equal('Second commit');
+    expect(await inRepo(path).getContents('master', 'hello-world.txt')).to.equal('This is a file');
+    let listing = await inRepo(path).listTree('master', '');
+    expect(listing.length).to.equal(1);
+    expect(listing[0].name).to.equal('hello-world.txt');
   });
 
 });
