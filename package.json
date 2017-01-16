@@ -19,6 +19,7 @@
     "debug-test": "mocha --debug=0.0.0.0:5858 --harmony -r tests/prepare.js tests/**/*-test.js tests/*-test.js"
   },
   "dependencies": {
+    "moment-timezone": "^0.5.11",
     "nodegit": "^0.16.0"
   }
 }
