@@ -6,9 +6,14 @@ const {
   Repository,
   Signature,
   Tree,
-  Treebuilder
+  Treebuilder,
+  setThreadSafetyStatus
 } = require('nodegit');
 const moment = require('moment-timezone');
+
+// This is supposed to enable thread-safe locking around all async
+// operations.
+setThreadSafetyStatus(1);
 
 function signature(commitOpts) {
   let date = commitOpts.authorDate || moment();
