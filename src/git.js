@@ -21,22 +21,19 @@ function signature(commitOpts) {
 }
 
 exports.createEmptyRepo = async function(path, commitOpts) {
-  let sig = signature(commitOpts);
   let repo = await Repository.init(path, 1);
-
-  let builder = await Treebuilder.create(repo, null);
-  let treeOid = builder.write();
-
-  let tree = await Tree.lookup(repo, treeOid, null);
-
-  let commitOid = await Commit.create(repo, null, sig, sig, 'UTF-8', commitOpts.message, tree, 0, []);
-  let commit = await Commit.lookup(repo, commitOid);
+  let commit = await makeCommit(repo, null, [], commitOpts);
   await Branch.create(repo, 'master', commit, false);
   return repo;
 };
 
 async function makeCommit(repo, parentCommit, updatedContents, commitOpts) {
-  let parentTree = await parentCommit.getTree();
+  let parentTree;
+  let parents = [];
+  if (parentCommit) {
+    parentTree = await parentCommit.getTree();
+    parents.push(parentCommit);
+  }
   let builder = await Treebuilder.create(repo, parentTree);
   for (let { filename, filemode, buffer } of updatedContents) {
     let blobOid = Blob.createFromBuffer(repo, buffer, buffer.length);
@@ -47,7 +44,7 @@ async function makeCommit(repo, parentCommit, updatedContents, commitOpts) {
 
   let tree = await Tree.lookup(repo, treeOid, null);
   let sig = signature(commitOpts);
-  let commitOid = await Commit.create(repo, null, sig, sig, 'UTF-8', commitOpts.message, tree, 1, [parentCommit]);
+  let commitOid = await Commit.create(repo, null, sig, sig, 'UTF-8', commitOpts.message, tree, parents.length, parents);
   return Commit.lookup(repo, commitOid);
 }
 
