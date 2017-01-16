@@ -7,6 +7,7 @@ const {
   Signature,
   Tree,
   Treebuilder,
+  TreeEntry,
   setThreadSafetyStatus
 } = require('nodegit');
 const moment = require('moment-timezone');
@@ -27,6 +28,12 @@ exports.createEmptyRepo = async function(path, commitOpts) {
   return repo;
 };
 
+async function insertBlob(repo, builder, path, blobOid) {
+  if (path.length === 1) {
+    await builder.insert(path[0], blobOid, TreeEntry.FILEMODE.BLOB);
+  }
+}
+
 async function makeCommit(repo, parentCommit, updatedContents, commitOpts) {
   let parentTree;
   let parents = [];
@@ -35,9 +42,9 @@ async function makeCommit(repo, parentCommit, updatedContents, commitOpts) {
     parents.push(parentCommit);
   }
   let builder = await Treebuilder.create(repo, parentTree);
-  for (let { filename, filemode, buffer } of updatedContents) {
+  for (let { filename, buffer } of updatedContents) {
     let blobOid = Blob.createFromBuffer(repo, buffer, buffer.length);
-    await builder.insert(filename, blobOid, filemode);
+    await insertBlob(repo, builder, filename.split('/'), blobOid);
   }
 
   let treeOid = builder.write();
