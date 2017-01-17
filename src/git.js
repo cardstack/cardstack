@@ -1,15 +1,16 @@
 const {
-  Blob,
   Branch,
   Commit,
   Merge,
   Repository,
   Signature,
   Tree,
-  Treebuilder,
-  TreeEntry,
-  setThreadSafetyStatus
+  setThreadSafetyStatus,
+  TreeEntry: { FILEMODE }
 } = require('nodegit');
+const {
+  MutableTree
+} = require('./mutable-tree');
 const moment = require('moment-timezone');
 
 // This is supposed to enable thread-safe locking around all async
@@ -28,12 +29,6 @@ exports.createEmptyRepo = async function(path, commitOpts) {
   return repo;
 };
 
-async function insertBlob(repo, builder, path, blobOid) {
-  if (path.length === 1) {
-    await builder.insert(path[0], blobOid, TreeEntry.FILEMODE.BLOB);
-  }
-}
-
 async function makeCommit(repo, parentCommit, updatedContents, commitOpts) {
   let parentTree;
   let parents = [];
@@ -41,14 +36,11 @@ async function makeCommit(repo, parentCommit, updatedContents, commitOpts) {
     parentTree = await parentCommit.getTree();
     parents.push(parentCommit);
   }
-  let builder = await Treebuilder.create(repo, parentTree);
+  let newRoot = new MutableTree(repo, parentTree);
   for (let { filename, buffer } of updatedContents) {
-    let blobOid = Blob.createFromBuffer(repo, buffer, buffer.length);
-    await insertBlob(repo, builder, filename.split('/'), blobOid);
+    newRoot.insert(filename, buffer, FILEMODE.BLOB);
   }
-
-  let treeOid = builder.write();
-
+  let treeOid = await newRoot.write();
   let tree = await Tree.lookup(repo, treeOid, null);
   let sig = signature(commitOpts);
   let commitOid = await Commit.create(repo, null, sig, sig, 'UTF-8', commitOpts.message, tree, parents.length, parents);

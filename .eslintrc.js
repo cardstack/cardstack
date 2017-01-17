@@ -14,6 +14,7 @@ module.exports = {
     semi: ["error", "always"]
   },
   globals: {
-    Promise: false
+    Promise: false,
+    Map: false
   }
 };
