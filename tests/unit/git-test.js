@@ -118,7 +118,7 @@ describe('git', function() {
     expect(listing[0].name).to.equal('hello-world.txt');
   });
 
-  it.skip('can add new directories', async function() {
+  it('can add new directories', async function() {
     let path = `${root}/example`;
 
     let repo = await git.createEmptyRepo(path, commitOpts({

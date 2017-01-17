@@ -38,7 +38,7 @@ async function makeCommit(repo, parentCommit, updatedContents, commitOpts) {
   }
   let newRoot = new MutableTree(repo, parentTree);
   for (let { filename, buffer } of updatedContents) {
-    newRoot.insert(filename, buffer, FILEMODE.BLOB);
+    await newRoot.insertPath(filename, buffer, FILEMODE.BLOB);
   }
   let treeOid = await newRoot.write();
   let tree = await Tree.lookup(repo, treeOid, null);

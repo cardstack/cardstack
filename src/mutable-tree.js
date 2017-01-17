@@ -18,7 +18,7 @@ class MutableTree {
     let result;
     let entry;
     if (this.tree) {
-      entry = this.tree.entryByName(name);
+      entry = safeEntryByName(this.tree, name);
     }
     if (entry) {
       result = new MutableEntryWrapper(entry);
@@ -29,7 +29,22 @@ class MutableTree {
 
   // object is a Blob, MutableBlob, Tree, or MutableTree
   insert(filename, object, filemode) {
-    this.overlay.set(filename, new NewEntry(this.repo, object, filemode));
+    let entry = new NewEntry(this.repo, object, filemode);
+    this.overlay.set(filename, entry);
+    return entry;
+  }
+  async insertPath(path, object, filemode) {
+    let parts = path.split('/');
+    let here = this;
+    while (parts.length > 1) {
+      let dirName = parts.shift();
+      let entry = here.entryByName(dirName);
+      if (!entry || !entry.isTree()) {
+        entry = here.insert(dirName, new MutableTree(here.repo, null), FILEMODE.TREE);
+      }
+      here = await entry.getTree();
+    }
+    return this.insert(parts[0], object, filemode);
   }
   async write() {
     if (this.overlay.size === 0 && this.tree) {
@@ -127,3 +142,11 @@ class NewEntry {
 }
 
 module.exports = { MutableTree, MutableBlob };
+
+function safeEntryByName(tree, name) {
+  let entry = tree._entryByName(name);
+  if (entry) {
+    entry.parent = tree;
+  }
+  return entry;
+}
