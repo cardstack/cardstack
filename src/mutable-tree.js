@@ -44,7 +44,7 @@ class MutableTree {
       }
       here = await entry.getTree();
     }
-    return this.insert(parts[0], object, filemode);
+    return here.insert(parts[0], object, filemode);
   }
   async write() {
     if (this.overlay.size === 0 && this.tree) {
