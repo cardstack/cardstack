@@ -141,7 +141,7 @@ class NewEntry {
   }
 }
 
-module.exports = { MutableTree, MutableBlob };
+module.exports = { MutableTree, MutableBlob, safeEntryByName };
 
 function safeEntryByName(tree, name) {
   let entry = tree._entryByName(name);

@@ -71,3 +71,10 @@ function run(command, args, opts) {
     });
   });
 }
+
+exports.commitOpts = function commitOPts(opts) {
+  return Object.assign({}, {
+    authorName: 'John Milton',
+    authorEmail: 'john@paradiselost.com'
+  }, opts);
+};

@@ -19,6 +19,9 @@
     "debug-test": "mocha --debug=0.0.0.0:5858 --harmony -r tests/prepare.js tests/**/*-test.js tests/*-test.js"
   },
   "dependencies": {
+    "elasticsearch": "^12.1.3",
+    "heimdalljs-logger": "^0.1.7",
+    "lodash": "^4.17.4",
     "moment-timezone": "^0.5.11",
     "nodegit": "^0.16.0"
   }

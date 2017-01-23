@@ -15,7 +15,7 @@ I cloned and built nodegit in its own repo, and then used `yarn link`. This seem
 Notes on vagrant & debugging
 -----
 
-I created a vagrant config that runs everything under Linux. This is nice to containing the dependencies like elasticsearch.
+I created a vagrant config that runs everything under Linux. This is nice for containing the dependencies like elasticsearch.
 
 A downside of the Vagrant virtual machine is that it's not obvious how to debug using VSCode (which is the best node debugger by far, at the present).
 
@@ -23,6 +23,4 @@ To debug, add `--debug=0.0.0.0:5858` to a node command within the VM, and use th
 
 `--debug-brk` doesn't seem to work due to V8 Proxy bugs, so you may need to manually insert `debugger` statements to get the program to wait for you. 
 
-
-
-
+You can also just use the VM as a container for elasticsearch. It's configured to expose the elasticsearch post directly to the host machine.

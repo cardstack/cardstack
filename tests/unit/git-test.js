@@ -1,20 +1,11 @@
-const denodeify = require('denodeify');
 const git = require('../../src/git');
 const ngit = require('nodegit');
-const _temp = require('temp').track();
-const temp = {
-  mkdir: denodeify(_temp.mkdir),
-  cleanup: denodeify(_temp.cleanup)
-};
-const inRepo = require('../git-assertions').inRepo;
+const temp = require('../temp-helper');
+const {
+  inRepo,
+  commitOpts
+}= require('../git-assertions');
 const moment = require('moment-timezone');
-
-function commitOpts(opts) {
-  return Object.assign({}, {
-    authorName: 'John Milton',
-    authorEmail: 'john@paradiselost.com'
-  }, opts);
-}
 
 describe('git', function() {
   let root;
