@@ -28,6 +28,9 @@ describe('indexer', function() {
       message: 'First commit'
     }));
     await indexer.update();
-    expect(await inES(elasticsearch).indices()).to.deep.equal(['master']);
+    let aliases = await inES(elasticsearch).aliases();
+    expect([...aliases.keys()]).to.deep.equal(['master']);
+    let indices = await inES(elasticsearch).indices();
+    expect(indices).to.have.lengthOf(1);
   });
 });
