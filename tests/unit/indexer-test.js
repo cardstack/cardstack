@@ -88,7 +88,7 @@ describe('indexer', function() {
     let indexerState = await inES(elasticsearch).indexerState('master');
     expect(indexerState.commit).to.equal(head);
 
-    let contents = JSON.parse(await inES(elasticsearch).documentContents('master', 'articles', 'hello-world'));
+    let contents = await inES(elasticsearch).documentContents('master', 'articles', 'hello-world');
     expect(contents).to.deep.equal({ hello: 'world' });
   });
 
@@ -112,7 +112,7 @@ describe('indexer', function() {
     // Here we manually reach into elasticsearch to dirty a cached
     // document in order to see whether the indexer will leave it
     // alone
-    await inES(elasticsearch).putDocument('master', 'articles', 'hello-world', JSON.stringify({ original: true }));
+    await inES(elasticsearch).putDocument('master', 'articles', 'hello-world', { original: true });
 
     updatedContent = [
       {
@@ -126,7 +126,7 @@ describe('indexer', function() {
 
     await indexer.update();
 
-    let contents = JSON.parse(await inES(elasticsearch).documentContents('master', 'articles', 'hello-world'));
+    let contents = await inES(elasticsearch).documentContents('master', 'articles', 'hello-world');
     expect(contents).to.deep.equal({ original: true });
   });
 
