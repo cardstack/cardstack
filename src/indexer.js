@@ -36,14 +36,17 @@ module.exports = class Indexer {
     if (mapping.status === 404) {
       return null;
     } else {
-      return mapping;
+      let index = Object.keys(mapping)[0];
+      return mapping[index].mappings;
     }
   }
 
-  async _gitMapping(branchName) {
+  async _commitAtBranch(branchName) {
     let branch = await Branch.lookup(this.repo, branchName, Branch.BRANCH.LOCAL);
-    let commit = await Commit.lookup(this.repo, branch.target());
-    let tree = await commit.getTree();
+    return Commit.lookup(this.repo, branch.target());
+  }
+
+  async _gitMapping(tree) {
     let entry = await safeEntryByName(tree, 'mapping.json');
     if (entry && entry.isBlob()) {
       let buffer = (await entry.getBlob()).content();
@@ -54,17 +57,33 @@ module.exports = class Indexer {
     }
   }
 
+  _defaultMapping() {
+    return {
+      meta: {
+        properties: {
+          commit: {
+            type: "object",
+            enabled: false
+          }
+        }
+      }
+    };
+  }
+
   _tempIndexName(branch) {
     return `${branch}_${Date.now()}`;
   }
 
   async _updateBranch(branch) {
+    let commit = await this._commitAtBranch(branch);
+    let tree = await commit.getTree();
     let haveMapping = await this._esMapping(branch);
-    let wantMapping = await this._gitMapping(branch);
+    let wantMapping = Object.assign(this._defaultMapping(), await this._gitMapping(tree));
     if (isEqual(haveMapping, wantMapping)) {
       this.log.info(`${branch}: mapping already OK`);
     } else {
       this.log.info(`${branch}: mapping needs update`);
+      this.log.debug(JSON.stringify({ haveMapping, wantMapping }, null, 2));
       let tmpIndex = this._tempIndexName(branch);
       await this.es.indices.create({
         index: tmpIndex,
@@ -74,6 +93,20 @@ module.exports = class Indexer {
       });
       await this._reindex(tmpIndex, branch);
     }
+    await this._updateState(branch, commit);
+  }
+
+  async _updateState(branch, commit) {
+
+
+    await this.es.index({
+      index: branch,
+      type: 'meta',
+      id: 'indexer',
+      body: {
+        commit: commit.id().tostrS()
+      }
+    });
   }
 
   // 1. Index the branch into newIndex.

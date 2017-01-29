@@ -44,7 +44,7 @@ describe('git', function() {
     let updatedContent = [
       { filename: 'hello-world.txt', buffer: Buffer.from('This is a file', 'utf8') }
     ];
-    let id = (await git.mergeCommit(repo, parentRef.target(), 'master', updatedContent, commitOpts({ message: 'Second commit' }))).success.id().tostrS();
+    let id = (await git.mergeCommit(repo, parentRef.target(), 'master', updatedContent, commitOpts({ message: 'Second commit' })));
 
     let commit = await inRepo(path).getCommit(id);
     expect(commit.message).to.equal('Second commit');
@@ -100,8 +100,13 @@ describe('git', function() {
     updatedContent = [
       { filename: 'hello-world.txt', buffer: Buffer.from('Conflicting content', 'utf8') }
     ];
-    let result = await git.mergeCommit(repo, parentRef.target(), 'master', updatedContent, commitOpts({ message: 'Third commit' }));
-    expect(result.conflict).to.not.equal(undefined);
+    try {
+      await git.mergeCommit(repo, parentRef.target(), 'master', updatedContent, commitOpts({ message: 'Third commit' }));
+      throw new Error("merge was not supposed to succeed");
+    } catch(err) {
+      expect(err).instanceof(git.GitConflict);
+    }
+
     expect((await inRepo(path).getCommit('master')).message).to.equal('Second commit');
     expect(await inRepo(path).getContents('master', 'hello-world.txt')).to.equal('This is a file');
     let listing = await inRepo(path).listTree('master', '');
@@ -121,7 +126,7 @@ describe('git', function() {
     let updatedContent = [
       { filename: 'outer/inner/hello-world.txt', buffer: Buffer.from('This is a file', 'utf8') }
     ];
-    let id = (await git.mergeCommit(repo, parentRef.target(), 'master', updatedContent, commitOpts({ message: 'Second commit' }))).success.id().tostrS();
+    let id = await git.mergeCommit(repo, parentRef.target(), 'master', updatedContent, commitOpts({ message: 'Second commit' }));
 
     let commit = await inRepo(path).getCommit(id);
     expect(commit.message).to.equal('Second commit');

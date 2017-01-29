@@ -22,7 +22,14 @@ class ElasticAsserter {
     }
     return output;
   }
+  async indexerState(branch) {
+    return this.client.getSource({ index: branch, type: 'meta', id: 'indexer' });
+  }
   async deleteAllIndices() {
     return this.client.indices.delete({ index: '_all' });
   }
+  async documentContents(branch, type, id) {
+    return this.client.getSource({ index: branch, type, id });
+  }
+
 }
