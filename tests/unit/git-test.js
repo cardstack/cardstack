@@ -137,7 +137,29 @@ describe('git', function() {
     expect(await inRepo(path).getContents(id, 'outer/inner/hello-world.txt')).to.equal('This is a file');
   });
 
+  it('can add new file within directory', async function() {
+    let path = `${root}/example`;
 
+    let repo = await git.createEmptyRepo(path, commitOpts({
+      message: 'First commit'
+    }));
+
+    let parentRef = await ngit.Branch.lookup(repo, 'master', ngit.Branch.BRANCH.LOCAL);
+
+    let updatedContent = [
+      { filename: 'outer/inner/hello-world.txt', buffer: Buffer.from('This is a file', 'utf8') }
+    ];
+    let head = await git.mergeCommit(repo, parentRef.target(), 'master', updatedContent, commitOpts({ message: 'Second commit' }));
+
+    updatedContent = [
+      { filename: 'outer/inner/second.txt', buffer: Buffer.from('second file', 'utf8') }
+    ];
+
+    head = await git.mergeCommit(repo, head, 'master', updatedContent, commitOpts({ message: 'Third commit' }));
+
+    expect(await inRepo(path).getContents(head, 'outer/inner/second.txt')).to.equal('second file');
+    expect(await inRepo(path).getContents(head, 'outer/inner/hello-world.txt')).to.equal('This is a file');
+  });
 
 
 });

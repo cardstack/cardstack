@@ -21,7 +21,7 @@ class MutableTree {
       entry = safeEntryByName(this.tree, name);
     }
     if (entry) {
-      result = new MutableEntryWrapper(entry);
+      result = new MutableEntryWrapper(this.repo, entry);
     }
     this.overlay.set(name, result);
     return result;
