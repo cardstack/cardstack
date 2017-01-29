@@ -64,4 +64,42 @@ describe('indexer', function() {
     expect(contents).to.deep.equal({ hello: 'world' });
   });
 
+  it('does not reindex unchanged content', async function() {
+    let repo = await git.createEmptyRepo(root, commitOpts({
+      message: 'First commit'
+    }));
+    let parentRef = await Branch.lookup(repo, 'master', Branch.BRANCH.LOCAL);
+    let updatedContent = [
+      {
+        filename: 'contents/articles/hello-world.json',
+        buffer: Buffer.from(JSON.stringify({
+          hello: 'world'
+        }), 'utf8')
+      }
+    ];
+    let head = await git.mergeCommit(repo, parentRef.target(), 'master', updatedContent, commitOpts({ message: 'Second commit' }));
+
+    await indexer.update();
+
+    // Here we manually reach into elasticsearch to dirty a cached
+    // document in order to see whether the indexer will leave it
+    // alone
+    await inES(elasticsearch).putDocument('master', 'articles', 'hello-world', JSON.stringify({ original: true }));
+
+    updatedContent = [
+      {
+        filename: 'contents/articles/second.json',
+        buffer: Buffer.from(JSON.stringify({
+          second: 'document'
+        }), 'utf8')
+      }
+    ];
+    await git.mergeCommit(repo, head, 'master', updatedContent, commitOpts({ message: 'Third commit' }));
+
+    await indexer.update();
+
+    let contents = JSON.parse(await inES(elasticsearch).documentContents('master', 'articles', 'hello-world'));
+    expect(contents).to.deep.equal({ original: true });
+  });
+
 });

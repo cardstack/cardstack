@@ -31,5 +31,7 @@ class ElasticAsserter {
   async documentContents(branch, type, id) {
     return this.client.getSource({ index: branch, type, id });
   }
-
+  async putDocument(branch, type, id, body) {
+    return this.client.index({ index: branch, type, id, body });
+  }
 }
