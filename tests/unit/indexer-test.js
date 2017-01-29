@@ -37,6 +37,34 @@ describe('indexer', function() {
     expect(indexerState.commit).to.equal(head);
   });
 
+
+  it('does not reindex when mapping definition is stable', async function() {
+    let repo = await git.createEmptyRepo(root, commitOpts({
+      message: 'First commit'
+    }));
+
+    await indexer.update();
+
+    let originalIndexName = (await inES(elasticsearch).aliases()).get('master');
+
+    let parentRef = await Branch.lookup(repo, 'master', Branch.BRANCH.LOCAL);
+    let updatedContent = [
+      {
+        filename: 'contents/articles/hello-world.json',
+        buffer: Buffer.from(JSON.stringify({
+          hello: 'world'
+        }), 'utf8')
+      }
+    ];
+
+    await git.mergeCommit(repo, parentRef.target(), 'master', updatedContent, commitOpts({ message: 'Second commit' }));
+
+    await indexer.update();
+
+    expect((await inES(elasticsearch).aliases()).get('master')).to.equal(originalIndexName);
+  });
+
+
   it('indexes newly added document', async function() {
     let repo = await git.createEmptyRepo(root, commitOpts({
       message: 'First commit'

@@ -57,29 +57,24 @@ module.exports = class Indexer {
     }
   }
 
-  _defaultMapping() {
-    return {
-      meta: {
-        properties: {
-          commit: {
-            type: "object",
-            enabled: false
-          }
-        }
-      }
-    };
+  _tempIndexName(branch) {
+    return `${branch}_${Math.floor(Math.random() * Number.MAX_SAFE_INTEGER)}`;
   }
 
-  _tempIndexName(branch) {
-    return `${branch}_${Date.now()}`;
+  _stableMapping(have, want) {
+    if (!have) { return false; }
+    // We only check types in "want". Extraneous types in "have" are OK.
+    return Object.keys(want).every(
+      type => isEqual(have[type], want[type])
+    );
   }
 
   async _updateBranch(branch) {
     let commit = await this._commitAtBranch(branch);
     let tree = await commit.getTree();
     let haveMapping = await this._esMapping(branch);
-    let wantMapping = Object.assign(this._defaultMapping(), await this._gitMapping(tree));
-    if (isEqual(haveMapping, wantMapping)) {
+    let wantMapping = await this._gitMapping(tree);
+    if (this._stableMapping(haveMapping, wantMapping)) {
       this.log.info(`${branch}: mapping already OK`);
     } else {
       this.log.info(`${branch}: mapping needs update`);
@@ -118,15 +113,21 @@ module.exports = class Indexer {
       this.log.info(`${branch} is new, nothing to reindex`);
     } else {
       this.log.info(`reindexing ${branch}`);
-      await this.es.indices.reindex({
-        source: { index: branch },
-        dest: { index: newIndex }
+      await this.es.reindex({
+        body: {
+          source: { index: branch },
+          dest: { index: newIndex }
+        }
       });
 
     }
-    await this.es.indices.putAlias({
-      name: branch,
-      index: newIndex
+    await this.es.indices.updateAliases({
+      body: {
+        actions: [
+          { remove: { index: '_all', alias: branch } },
+          { add: { index: newIndex, alias: branch } }
+        ]
+      }
     });
 
   }
