@@ -144,6 +144,9 @@ class NewEntry {
 module.exports = { MutableTree, MutableBlob, safeEntryByName };
 
 function safeEntryByName(tree, name) {
+  // This is apparently private API. There's unfortunately no public
+  // API for gracefully attempting to retriee and entry that may be
+  // absent.
   let entry = tree._entryByName(name);
   if (entry) {
     entry.parent = tree;

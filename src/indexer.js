@@ -88,11 +88,18 @@ module.exports = class Indexer {
       });
       await this._reindex(tmpIndex, branch);
     }
-    await this._updateState(branch, commit);
+    await this._updateState(branch, tree, commit);
   }
 
-  async _updateState(branch, commit) {
+  async _updateState(branch, tree, commit) {
+    let originalTree;
+    let meta = await this.es.getSource({ index: branch, type: 'meta', id: 'indexer', ignore: [404] });
+    if (meta) {
+      let oldCommit = await Commit.lookup(this.repo, meta.commit);
+      originalTree = await oldCommit.getTree();
+    }
 
+    await this._indexTree(branch, originalTree, tree);
 
     await this.es.index({
       index: branch,
@@ -102,6 +109,58 @@ module.exports = class Indexer {
         commit: commit.id().tostrS()
       }
     });
+  }
+
+  async _indexTree(branch, oldTree, newTree) {
+    let seen = new Map();
+    if (newTree) {
+      for (let newEntry of newTree.entries()) {
+        let name = newEntry.name();
+        let oldEntry;
+        seen.set(name, true);
+        if (oldTree) {
+          oldEntry = safeEntryByName(oldTree, name);
+          if (oldEntry && oldEntry.id().equal(newEntry.id())) {
+            // We can prune whole subtrees when we find an identical
+            // entry. Which is kinda the point of Git's data
+            // structure in the first place.
+            continue;
+          }
+        }
+        if (newEntry.isTree()) {
+          await this._indexTree(
+            branch,
+            oldEntry && oldEntry.isTree() ? (await oldEntry.getTree()) : null,
+            await newEntry.getTree()
+          );
+        } else {
+          let { type, id } = identify(newEntry);
+          await this.es.index({
+            index: branch,
+            type,
+            id,
+            body: (await newEntry.getBlob()).content().toString('utf8')
+          });
+        }
+      }
+    }
+    if (oldTree) {
+      for (let oldEntry of oldTree.entries()) {
+        let name = oldEntry.name();
+        if (!seen.get(name)) {
+          if (oldEntry.isTree()) {
+            await this._indexTree(branch, oldEntry.getTree(), null);
+          } else {
+            let { type, id } = identify(oldEntry);
+            await this.es.delete({
+              index: branch,
+              type,
+              id
+            });
+          }
+        }
+      }
+    }
   }
 
   // 1. Index the branch into newIndex.
@@ -140,3 +199,11 @@ module.exports = class Indexer {
   }
 
 };
+
+function identify(entry) {
+  let parts = entry.path().split('/');
+  let type = parts[parts.length - 2] || 'tops';
+  let filename = parts[parts.length - 1];
+  let id = filename.replace(/\.json$/, '');
+  return { type, id };
+}
