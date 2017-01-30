@@ -1,9 +1,8 @@
 const git = require('../../src/git');
 const temp = require('../temp-helper');
 const Indexer = require('../../src/indexer');
-const { commitOpts } = require('../git-assertions');
+const { commitOpts, makeRepo } = require('../git-assertions');
 const { inES } = require('../elastic-assertions');
-const { Branch } = require('nodegit');
 
 const elasticsearch = 'http://10.0.15.2:9200';
 
@@ -24,10 +23,7 @@ describe('indexer', function() {
   });
 
   it('processes first empty branch', async function() {
-    let repo = await git.createEmptyRepo(root, commitOpts({
-      message: 'First commit'
-    }));
-    let head = (await Branch.lookup(repo, 'master', Branch.BRANCH.LOCAL)).target().tostrS();
+    let { head } = await makeRepo(root);
     await indexer.update();
     let aliases = await inES(elasticsearch).aliases();
     expect([...aliases.keys()]).to.deep.equal(['master']);
@@ -39,15 +35,12 @@ describe('indexer', function() {
 
 
   it('does not reindex when mapping definition is stable', async function() {
-    let repo = await git.createEmptyRepo(root, commitOpts({
-      message: 'First commit'
-    }));
+    let { repo, head } = await makeRepo(root);
 
     await indexer.update();
 
     let originalIndexName = (await inES(elasticsearch).aliases()).get('master');
 
-    let parentRef = await Branch.lookup(repo, 'master', Branch.BRANCH.LOCAL);
     let updatedContent = [
       {
         filename: 'contents/articles/hello-world.json',
@@ -57,7 +50,7 @@ describe('indexer', function() {
       }
     ];
 
-    await git.mergeCommit(repo, parentRef.target(), 'master', updatedContent, commitOpts({ message: 'Second commit' }));
+    await git.mergeCommit(repo, head, 'master', updatedContent, commitOpts({ message: 'Second commit' }));
 
     await indexer.update();
 
@@ -66,13 +59,10 @@ describe('indexer', function() {
 
 
   it('indexes newly added document', async function() {
-    let repo = await git.createEmptyRepo(root, commitOpts({
-      message: 'First commit'
-    }));
+    let { repo, head } = await makeRepo(root);
 
     await indexer.update();
 
-    let parentRef = await Branch.lookup(repo, 'master', Branch.BRANCH.LOCAL);
     let updatedContent = [
       {
         filename: 'contents/articles/hello-world.json',
@@ -81,7 +71,8 @@ describe('indexer', function() {
         }), 'utf8')
       }
     ];
-    let head = await git.mergeCommit(repo, parentRef.target(), 'master', updatedContent, commitOpts({ message: 'Second commit' }));
+
+    head = await git.mergeCommit(repo, head, 'master', updatedContent, commitOpts({ message: 'Second commit' }));
 
     await indexer.update();
 
@@ -93,19 +84,18 @@ describe('indexer', function() {
   });
 
   it('does not reindex unchanged content', async function() {
-    let repo = await git.createEmptyRepo(root, commitOpts({
-      message: 'First commit'
-    }));
-    let parentRef = await Branch.lookup(repo, 'master', Branch.BRANCH.LOCAL);
-    let updatedContent = [
+    let { repo, head } = await makeRepo(root, [
       {
-        filename: 'contents/articles/hello-world.json',
-        buffer: Buffer.from(JSON.stringify({
-          hello: 'world'
-        }), 'utf8')
+        changes: [
+          {
+            filename: 'contents/articles/hello-world.json',
+            buffer: Buffer.from(JSON.stringify({
+              hello: 'world'
+            }), 'utf8')
+          }
+        ]
       }
-    ];
-    let head = await git.mergeCommit(repo, parentRef.target(), 'master', updatedContent, commitOpts({ message: 'Second commit' }));
+    ]);
 
     await indexer.update();
 
@@ -114,7 +104,7 @@ describe('indexer', function() {
     // alone
     await inES(elasticsearch).putDocument('master', 'articles', 'hello-world', { original: true });
 
-    updatedContent = [
+    let updatedContent = [
       {
         filename: 'contents/articles/second.json',
         buffer: Buffer.from(JSON.stringify({

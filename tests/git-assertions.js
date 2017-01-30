@@ -6,6 +6,8 @@
 */
 
 const spawn = require('child_process').spawn;
+const git = require('../src/git');
+const { Branch } = require('nodegit');
 
 exports.inRepo = function(path) {
   return new RepoExplorer(path);
@@ -72,9 +74,25 @@ function run(command, args, opts) {
   });
 }
 
-exports.commitOpts = function commitOPts(opts) {
+function commitOpts(opts) {
   return Object.assign({}, {
     authorName: 'John Milton',
     authorEmail: 'john@paradiselost.com'
   }, opts);
+}
+
+exports.commitOpts = commitOpts;
+
+exports.makeRepo = async function makeRepo(path, steps=[]) {
+  let repo = await git.createEmptyRepo(path, commitOpts({
+    message: 'First commit'
+  }));
+
+  let head = (await Branch.lookup(repo, 'master', Branch.BRANCH.LOCAL)).target().tostrS();
+
+  for (let [index, { changes, message }] of steps.entries()) {
+    head = await git.mergeCommit(repo, head, 'master', changes, commitOpts({ message: message ||  `Commit ${index}` }));
+  }
+
+  return { repo, head };
 };
