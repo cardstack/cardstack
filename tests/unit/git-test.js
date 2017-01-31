@@ -3,22 +3,23 @@ const ngit = require('nodegit');
 const temp = require('../temp-helper');
 const {
   inRepo,
-  commitOpts
+  commitOpts,
+  makeRepo
 }= require('../git-assertions');
 const moment = require('moment-timezone');
 
 describe('git', function() {
-  let root;
+  let path;
 
   beforeEach(async function() {
-    root = await temp.mkdir('cardstack-server-test');
+    let root = await temp.mkdir('cardstack-server-test');
+    path = `${root}/example`;
   });
   afterEach(async function() {
     await temp.cleanup();
   });
 
   it('can make new empty repo', async function() {
-    let path = `${root}/example`;
 
     await git.createEmptyRepo(path, commitOpts({
       message: 'First commit',
@@ -33,8 +34,6 @@ describe('git', function() {
   });
 
   it('can fast-forward merge some new content', async function() {
-    let path = `${root}/example`;
-
     let repo = await git.createEmptyRepo(path, commitOpts({
       message: 'First commit'
     }));
@@ -61,7 +60,6 @@ describe('git', function() {
 
 
   it('non-fast-forward merge some new content', async function() {
-    let path = `${root}/example`;
     let repo = await git.createEmptyRepo(path, commitOpts({
       message: 'First commit'
     }));
@@ -86,7 +84,6 @@ describe('git', function() {
   });
 
   it('rejects conflicting merge', async function() {
-    let path = `${root}/example`;
     let repo = await git.createEmptyRepo(path, commitOpts({
       message: 'First commit'
     }));
@@ -115,8 +112,6 @@ describe('git', function() {
   });
 
   it('can add new directories', async function() {
-    let path = `${root}/example`;
-
     let repo = await git.createEmptyRepo(path, commitOpts({
       message: 'First commit'
     }));
@@ -138,8 +133,6 @@ describe('git', function() {
   });
 
   it('can add new file within directory', async function() {
-    let path = `${root}/example`;
-
     let repo = await git.createEmptyRepo(path, commitOpts({
       message: 'First commit'
     }));
