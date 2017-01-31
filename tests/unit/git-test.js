@@ -154,5 +154,34 @@ describe('git', function() {
     expect(await inRepo(path).getContents(head, 'outer/inner/hello-world.txt')).to.equal('This is a file');
   });
 
+  it('can delete a file at the top level', async function() {
+    let { repo, head } = await makeRepo(path, [
+      {
+        changes: [
+          {
+            filename: 'sample.txt',
+            buffer: Buffer.from('sample', 'utf8')
+          }
+        ]
+      }
+    ]);
+
+    let listing = await inRepo(path).listTree(head, '');
+    expect(listing).has.length(1);
+    expect(listing[0].name).to.equal('sample.txt');
+
+    let updates = [
+      {
+        filename: 'sample.txt'
+      }
+    ];
+
+    head = await git.mergeCommit(repo, head, 'master', updates, commitOpts({ message: 'Deleting' }));
+
+    listing = await inRepo(path).listTree(head, '');
+    expect(listing).has.length(0);
+
+  });
+
 
 });

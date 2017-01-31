@@ -4,6 +4,7 @@
 
 const { TreeEntry, Treebuilder, Blob } = require('nodegit');
 const { FILEMODE } = TreeEntry;
+const tombstone = {};
 
 class MutableTree {
   constructor(repo, tree) {
@@ -44,7 +45,11 @@ class MutableTree {
       }
       here = await entry.getTree();
     }
-    return here.insert(parts[0], object, filemode);
+    if (object) {
+      return here.insert(parts[0], object, filemode);
+    } else {
+      here.overlay.set(parts[0], tombstone);
+    }
   }
   async write() {
     if (this.overlay.size === 0 && this.tree) {
@@ -52,7 +57,11 @@ class MutableTree {
     }
     let builder = await Treebuilder.create(this.repo, this.tree);
     for (let [filename, entry] of this.overlay.entries()) {
-      await builder.insert(filename, await entry.write(), entry.filemode());
+      if (entry === tombstone) {
+        builder.remove(filename);
+      } else {
+        await builder.insert(filename, await entry.write(), entry.filemode());
+      }
     }
     return builder.write();
   }
