@@ -120,4 +120,38 @@ describe('indexer', function() {
     expect(contents).to.deep.equal({ original: true });
   });
 
+
+  it('deletes removed content', async function() {
+    let { repo, head } = await makeRepo(root, [
+      {
+        changes: [
+          {
+            filename: 'contents/articles/hello-world.json',
+            buffer: Buffer.from(JSON.stringify({
+              hello: 'world'
+            }), 'utf8')
+          }
+        ]
+      }
+    ]);
+
+    await indexer.update();
+
+    let updatedContent = [
+      {
+        filename: 'contents/articles/hello-world.json'
+      }
+    ];
+    await git.mergeCommit(repo, head, 'master', updatedContent, commitOpts({ message: 'deletion' }));
+
+    await indexer.update();
+
+    try {
+      await inES(elasticsearch).documentContents('master', 'articles', 'hello-world');
+      throw new Error("should never get here");
+    } catch(err) {
+      expect(err.message).to.match(/not found/i);
+    }
+  });
+
 });

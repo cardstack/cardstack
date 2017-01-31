@@ -149,7 +149,7 @@ module.exports = class Indexer {
         let name = oldEntry.name();
         if (!seen.get(name)) {
           if (oldEntry.isTree()) {
-            await this._indexTree(branch, oldEntry.getTree(), null);
+            await this._indexTree(branch, await oldEntry.getTree(), null);
           } else {
             let { type, id } = identify(oldEntry);
             await this.es.delete({
