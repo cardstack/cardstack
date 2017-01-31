@@ -51,7 +51,7 @@ class MutableTree {
       here.overlay.set(parts[0], tombstone);
     }
   }
-  async write() {
+  async write(allowEmpty=false) {
     if (this.overlay.size === 0 && this.tree) {
       return this.tree;
     }
@@ -60,10 +60,17 @@ class MutableTree {
       if (entry === tombstone) {
         builder.remove(filename);
       } else {
-        await builder.insert(filename, await entry.write(), entry.filemode());
+        let childId = await entry.write();
+        if (childId) {
+          await builder.insert(filename, childId, entry.filemode());
+        } else {
+          builder.remove(filename);
+        }
       }
     }
-    return builder.write();
+    if (builder.entrycount() > 0 || allowEmpty) {
+      return builder.write();
+    }
   }
 }
 

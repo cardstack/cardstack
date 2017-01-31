@@ -40,7 +40,7 @@ async function makeCommit(repo, parentCommit, updatedContents, commitOpts) {
   for (let { filename, buffer } of updatedContents) {
     await newRoot.insertPath(filename, buffer, FILEMODE.BLOB);
   }
-  let treeOid = await newRoot.write();
+  let treeOid = await newRoot.write(true);
   let tree = await Tree.lookup(repo, treeOid, null);
   let sig = signature(commitOpts);
   let commitOid = await Commit.create(repo, null, sig, sig, 'UTF-8', commitOpts.message, tree, parents.length, parents);

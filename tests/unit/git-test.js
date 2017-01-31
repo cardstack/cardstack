@@ -166,9 +166,8 @@ describe('git', function() {
       }
     ]);
 
-    let listing = await inRepo(path).listTree(head, '');
-    expect(listing).has.length(1);
-    expect(listing[0].name).to.equal('sample.txt');
+    let listing = (await inRepo(path).listTree(head, '')).map(e => e.name);
+    expect(listing).to.deep.equal(['sample.txt']);
 
     let updates = [
       {
@@ -178,9 +177,78 @@ describe('git', function() {
 
     head = await git.mergeCommit(repo, head, 'master', updates, commitOpts({ message: 'Deleting' }));
 
-    listing = await inRepo(path).listTree(head, '');
-    expect(listing).has.length(0);
+    listing = (await inRepo(path).listTree(head, '')).map(e => e.name);
+    expect(listing).to.deep.equal([]);
 
+  });
+
+  it('can delete a file at an inner level', async function() {
+    let { repo, head } = await makeRepo(path, [
+      {
+        changes: [
+          {
+            filename: 'outer/sample.txt',
+            buffer: Buffer.from('sample', 'utf8')
+          },
+          {
+            filename: 'outer/second.txt',
+            buffer: Buffer.from('second', 'utf8')
+          }
+        ]
+      }
+    ]);
+
+    let listing = (await inRepo(path).listTree(head, 'outer')).map(e => e.name);
+    expect(listing).to.contain('sample.txt');
+    expect(listing).to.contain('second.txt');
+
+    listing = (await inRepo(path).listTree(head, '')).map(e => e.name);
+    expect(listing).to.contain('outer');
+
+    let updates = [
+      {
+        filename: 'outer/sample.txt'
+      }
+    ];
+
+    head = await git.mergeCommit(repo, head, 'master', updates, commitOpts({ message: 'Deleting' }));
+
+    listing = (await inRepo(path).listTree(head, 'outer')).map(e => e.name);
+    expect(listing).to.deep.equal(['second.txt']);
+
+    listing = (await inRepo(path).listTree(head, '')).map(e => e.name);
+    expect(listing).to.contain('outer');
+
+  });
+
+  it('can delete a whole subtree', async function() {
+    let { repo, head } = await makeRepo(path, [
+      {
+        changes: [
+          {
+            filename: 'outer/sample.txt',
+            buffer: Buffer.from('sample', 'utf8')
+          }
+        ]
+      }
+    ]);
+
+    let listing = (await inRepo(path).listTree(head, 'outer')).map(e => e.name);
+    expect(listing).to.contain('sample.txt');
+
+    listing = (await inRepo(path).listTree(head, '')).map(e => e.name);
+    expect(listing).to.contain('outer');
+
+    let updates = [
+      {
+        filename: 'outer/sample.txt'
+      }
+    ];
+
+    head = await git.mergeCommit(repo, head, 'master', updates, commitOpts({ message: 'Deleting' }));
+
+    listing = (await inRepo(path).listTree(head, '')).map(e => e.name);
+    expect(listing).to.deep.equal([]);
   });
 
 
