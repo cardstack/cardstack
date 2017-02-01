@@ -7,6 +7,7 @@
   "license": "MIT",
   "devDependencies": {
     "chai": "^3.5.0",
+    "chai-things": "^0.2.0",
     "denodeify": "^1.2.1",
     "glob": "^7.1.1",
     "mocha": "^3.2.0",
@@ -16,11 +17,12 @@
   },
   "scripts": {
     "test": "mocha --harmony -r tests/prepare.js tests/**/*-test.js tests/*-test.js",
-    "debug-test": "mocha --debug=0.0.0.0:5858 --harmony -r tests/prepare.js tests/**/*-test.js tests/*-test.js"
+    "server": "node --harmony bin/server.js"
   },
   "dependencies": {
     "elasticsearch": "^12.1.3",
     "heimdalljs-logger": "^0.1.7",
+    "koa": "2",
     "lodash": "^4.17.4",
     "moment-timezone": "^0.5.11",
     "nodegit": "^0.16.0"
