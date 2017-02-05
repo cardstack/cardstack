@@ -160,6 +160,31 @@ describe('indexer', function() {
 describe('indexer search', function() {
 
   let root, indexer;
+  let fixtures = [
+    {
+      type: 'articles',
+      id: '1',
+      content: {
+        hello: 'magic words'
+      }
+    },
+    {
+      type: 'people',
+      id: '1',
+      content: {
+        firstName: 'Quint',
+        lastName: 'Faulkner'
+      }
+    },
+    {
+      type: 'people',
+      id: '2',
+      content: {
+        firstName: 'Arthur',
+        lastName: 'Faulkner'
+      }
+    }
+  ];
 
   before(async function() {
     root = await temp.mkdir('cardstack-server-test');
@@ -167,14 +192,13 @@ describe('indexer search', function() {
       elasticsearch,
       repoPath: root
     });
+
     await makeRepo(root, [
       {
-        changes: [{
-          filename: 'contents/articles/hello-world.json',
-          buffer: Buffer.from(JSON.stringify({
-            hello: 'magic words'
-          }), 'utf8')
-        }]
+        changes: fixtures.map(f => ({
+          filename: `contents/${f.type}/${f.id}.json`,
+          buffer: Buffer.from(JSON.stringify(f.content), 'utf8')
+        }))
       }
     ]);
     await indexer.update(REALTIME);
@@ -188,7 +212,7 @@ describe('indexer search', function() {
 
   it('can be searched for all content', async function() {
     let results = await indexer.search('master', {});
-    expect(results).to.have.length(1);
+    expect(results).to.have.length(fixtures.length);
   });
 
   it('can be searched via queryString', async function() {
@@ -204,4 +228,5 @@ describe('indexer search', function() {
     });
     expect(results).to.have.length(0);
   });
+
 });
