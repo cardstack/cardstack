@@ -75,10 +75,12 @@ module.exports = class Indexer {
     if (filter) {
       esBody.query.bool.must.push(this._filterToES(filter));
     }
+    this.log.debug('search %j', esBody);
     let result = await this.es.search({
       index: branch,
       body: esBody
     });
+    this.log.debug('searchResult %j', result);
     return result.hits.hits.map(entry => ({ type: entry._type, id: entry._id, document: entry._source}));
   }
 
@@ -148,10 +150,10 @@ module.exports = class Indexer {
     let haveMapping = await this._esMapping(branch);
     let wantMapping = await this._gitMapping(tree);
     if (this._stableMapping(haveMapping, wantMapping)) {
-      this.log.info(`${branch}: mapping already OK`);
+      this.log.info('%s: mapping already OK', branch);
     } else {
-      this.log.info(`${branch}: mapping needs update`);
-      this.log.debug(JSON.stringify({ haveMapping, wantMapping }, null, 2));
+      this.log.info('%s: mapping needs update', branch);
+      this.log.debug('%j', { haveMapping, wantMapping });
       let tmpIndex = this._tempIndexName(branch);
       await this.es.indices.create({
         index: tmpIndex,
@@ -243,9 +245,9 @@ module.exports = class Indexer {
   async _reindex(newIndex, branch) {
     let alias = await this.es.indices.getAlias({ name: branch, ignore: [404] });
     if (alias.status === 404) {
-      this.log.info(`${branch} is new, nothing to reindex`);
+      this.log.info('%s is new, nothing to reindex', branch);
     } else {
-      this.log.info(`reindexing ${branch}`);
+      this.log.info('reindexing %s', branch);
       await this.es.reindex({
         body: {
           source: { index: branch },
