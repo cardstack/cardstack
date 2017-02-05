@@ -154,7 +154,19 @@ describe('indexer', function() {
     }
   });
 
-  it('can be searched for all content', async function() {
+});
+
+
+describe('indexer search', function() {
+
+  let root, indexer;
+
+  before(async function() {
+    root = await temp.mkdir('cardstack-server-test');
+    indexer = new Indexer({
+      elasticsearch,
+      repoPath: root
+    });
     await makeRepo(root, [
       {
         changes: [{
@@ -165,54 +177,31 @@ describe('indexer', function() {
         }]
       }
     ]);
-
     await indexer.update(REALTIME);
+  });
 
+  after(async function() {
+    await temp.cleanup();
+    await inES(elasticsearch).deleteAllIndices();
+  });
+
+
+  it('can be searched for all content', async function() {
     let results = await indexer.search('master', {});
-
     expect(results).to.have.length(1);
   });
 
   it('can be searched via queryString', async function() {
-    await makeRepo(root, [
-      {
-        changes: [{
-          filename: 'contents/articles/hello-world.json',
-          buffer: Buffer.from(JSON.stringify({
-            hello: 'magic words'
-          }), 'utf8')
-        }]
-      }
-    ]);
-
-    await indexer.update(REALTIME);
-
     let results = await indexer.search('master', {
       queryString: 'magic'
     });
-
     expect(results).to.have.length(1);
   });
 
   it('can be searched via queryString, negative result', async function() {
-    await makeRepo(root, [
-      {
-        changes: [{
-          filename: 'contents/articles/hello-world.json',
-          buffer: Buffer.from(JSON.stringify({
-            hello: 'magic words'
-          }), 'utf8')
-        }]
-      }
-    ]);
-
-    await indexer.update(REALTIME);
-
     let results = await indexer.search('master', {
       queryString: 'this-is-an-unused-term'
     });
-
     expect(results).to.have.length(0);
   });
-
 });

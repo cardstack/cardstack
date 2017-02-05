@@ -1,3 +1,15 @@
+/*
+  Indexer deals with indexing documents. It's public API consists of:
+
+    update: indexings changes from a git repo
+    search: get documents back out of the index
+
+    When updating, it follows these general rules to map from git to
+    the search index:
+
+
+*/
+
 const {
   Repository,
   Reference,
@@ -19,15 +31,28 @@ module.exports = class Indexer {
     this.log = logger('indexer');
   }
 
-  // realTime updates are more expensive but they ensure your content
-  // is already searchable before this function returns.
+  /*
+    This indexes the content of the repo, based on the following general rules:
+    - each `.json` file in git is a document to be indexed.
+    - the id is the name of the file without the extension
+    - the type is the name of the directory in which the file appears
+      (just the final part of the path)
+    - a special mappings.json file at the top of the repo can make
+      declarations about the schema.
+
+    `realTime` determines whether this operation will block until
+    searches will reflect our changes. It's more expensive, but very
+    helpful particularly in automated test scenarios.
+
+  */
   async update(realTime=false) {
     await this._ensureRepo();
     let branches = await this._branches();
     await Promise.all(branches.map(branch => this._updateBranch(branch, realTime)));
   }
 
-  async search(branch, { queryString }) {
+
+  async search(branch, { queryString, filter }) {
     let esBody = {
       query: {
         bool: {
@@ -47,11 +72,30 @@ module.exports = class Indexer {
         }
       });
     }
+    if (filter) {
+      esBody.query.bool.must.push(this._filterToES(filter));
+    }
     let result = await this.es.search({
       index: branch,
       body: esBody
     });
-    return result.hits.hits;
+    return result.hits.hits.map(entry => ({ type: entry._type, id: entry._id, document: entry._source}));
+  }
+
+  _filterToES(rawFilter, isListContext) {
+    let filter = liftQuery(rawFilter, isListContext);
+    Object.keys(filter).forEach(key => {
+      let value = filter[key];
+      switch(key) {
+      case 'not':
+        return { bool: { must_not: this._filterToES(value, false) } };
+      case 'or':
+        return { bool: { should: this._filterToES(value, true) } };
+      case 'and':
+        return { bool: { must: this._filterToES(value, true) } };
+      default:
+      }
+    });
   }
 
   async _ensureRepo() {
@@ -236,4 +280,18 @@ function identify(entry) {
   let filename = parts[parts.length - 1];
   let id = filename.replace(/\.json$/, '');
   return { type, id };
+}
+
+function liftQuery(query, isListContext) {
+  // lift single value into single term query
+  if (typeof query === 'string') {
+    query = { terms: [query] };
+  }
+
+  // lift lists into multi term query
+  if (!isListContext && Array.isArray(query)) {
+    // default operator is "terms"
+    query = { terms: query };
+  }
+  return query;
 }

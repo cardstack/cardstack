@@ -4,6 +4,8 @@ module.exports = {
     it: false,
     beforeEach: false,
     afterEach: false,
+    before: false,
+    after: false,
     expect: false
   }
 };
