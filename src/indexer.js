@@ -22,6 +22,7 @@ const { safeEntryByName } = require('./mutable-tree');
 const logger = require('heimdalljs-logger');
 const makeClient = require('./elastic-client');
 const { isEqual } = require('lodash');
+const BulkOps = require('./bulk-ops');
 
 module.exports = class Indexer {
   constructor({ elasticsearch, repoPath }) {
@@ -174,20 +175,24 @@ module.exports = class Indexer {
       originalTree = await oldCommit.getTree();
     }
 
-    await this._indexTree(branch, originalTree, tree);
+    let bulkOps = new BulkOps(this.es, { realTime });
 
-    await this.es.index({
-      index: branch,
-      type: 'meta',
-      id: 'indexer',
-      body: {
-        commit: commit.id().tostrS()
-      },
-      refresh: realTime ? 'wait_for' : false
+    await this._indexTree(branch, originalTree, tree, bulkOps);
+
+    await bulkOps.add({
+      index: {
+        _index: branch,
+        _type: 'meta',
+        _id: 'indexer',
+      }
+    }, {
+      commit: commit.id().tostrS()
     });
+
+    await bulkOps.flush();
   }
 
-  async _indexTree(branch, oldTree, newTree) {
+  async _indexTree(branch, oldTree, newTree, bulkOps) {
     let seen = new Map();
     if (newTree) {
       for (let newEntry of newTree.entries()) {
@@ -207,16 +212,18 @@ module.exports = class Indexer {
           await this._indexTree(
             branch,
             oldEntry && oldEntry.isTree() ? (await oldEntry.getTree()) : null,
-            await newEntry.getTree()
+            await newEntry.getTree(),
+            bulkOps
           );
         } else {
           let { type, id } = identify(newEntry);
-          await this.es.index({
-            index: branch,
-            type,
-            id,
-            body: (await newEntry.getBlob()).content().toString('utf8')
-          });
+          await bulkOps.add({
+            index: {
+              _index: branch,
+              _type: type,
+              _id: id,
+            }
+          }, (await newEntry.getBlob()).content().toString('utf8'));
         }
       }
     }
@@ -225,13 +232,15 @@ module.exports = class Indexer {
         let name = oldEntry.name();
         if (!seen.get(name)) {
           if (oldEntry.isTree()) {
-            await this._indexTree(branch, await oldEntry.getTree(), null);
+            await this._indexTree(branch, await oldEntry.getTree(), null, bulkOps);
           } else {
             let { type, id } = identify(oldEntry);
-            await this.es.delete({
-              index: branch,
-              type,
-              id
+            await bulkOps.add({
+              delete: {
+                _index: branch,
+                _type: type,
+                _id: id
+              }
             });
           }
         }
