@@ -1,5 +1,9 @@
 const makeClient = require('../src/elastic-client');
 
+exports.host = function() {
+  return 'http://10.0.15.2:9200';
+};
+
 exports.inES = function(host) {
   return new ElasticAsserter(host);
 };

@@ -2,9 +2,9 @@ const git = require('../../src/git');
 const temp = require('../temp-helper');
 const Indexer = require('../../src/indexer');
 const { commitOpts, makeRepo } = require('../git-assertions');
-const { inES } = require('../elastic-assertions');
-
-const elasticsearch = 'http://10.0.15.2:9200';
+const { inES, host } = require('../elastic-assertions');
+const elasticsearch = host();
+const REALTIME = true;
 
 describe('indexer', function() {
   let root, indexer;
@@ -152,6 +152,67 @@ describe('indexer', function() {
     } catch(err) {
       expect(err.message).to.match(/not found/i);
     }
+  });
+
+  it('can be searched for all content', async function() {
+    await makeRepo(root, [
+      {
+        changes: [{
+          filename: 'contents/articles/hello-world.json',
+          buffer: Buffer.from(JSON.stringify({
+            hello: 'magic words'
+          }), 'utf8')
+        }]
+      }
+    ]);
+
+    await indexer.update(REALTIME);
+
+    let results = await indexer.search('master', {});
+
+    expect(results).to.have.length(1);
+  });
+
+  it('can be searched via queryString', async function() {
+    await makeRepo(root, [
+      {
+        changes: [{
+          filename: 'contents/articles/hello-world.json',
+          buffer: Buffer.from(JSON.stringify({
+            hello: 'magic words'
+          }), 'utf8')
+        }]
+      }
+    ]);
+
+    await indexer.update(REALTIME);
+
+    let results = await indexer.search('master', {
+      queryString: 'magic'
+    });
+
+    expect(results).to.have.length(1);
+  });
+
+  it('can be searched via queryString, negative result', async function() {
+    await makeRepo(root, [
+      {
+        changes: [{
+          filename: 'contents/articles/hello-world.json',
+          buffer: Buffer.from(JSON.stringify({
+            hello: 'magic words'
+          }), 'utf8')
+        }]
+      }
+    ]);
+
+    await indexer.update(REALTIME);
+
+    let results = await indexer.search('master', {
+      queryString: 'this-is-an-unused-term'
+    });
+
+    expect(results).to.have.length(0);
   });
 
 });

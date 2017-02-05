@@ -19,10 +19,39 @@ module.exports = class Indexer {
     this.log = logger('indexer');
   }
 
-  async update() {
+  // realTime updates are more expensive but they ensure your content
+  // is already searchable before this function returns.
+  async update(realTime=false) {
     await this._ensureRepo();
     let branches = await this._branches();
-    await Promise.all(branches.map(branch => this._updateBranch(branch)));
+    await Promise.all(branches.map(branch => this._updateBranch(branch, realTime)));
+  }
+
+  async search(branch, { queryString }) {
+    let esBody = {
+      query: {
+        bool: {
+          must: [],
+          must_not: [{
+            term: {
+              _type: 'meta'
+            }
+          }]
+        }
+      }
+    };
+    if (queryString) {
+      esBody.query.bool.must.push({
+        term: {
+          '_all': queryString
+        }
+      });
+    }
+    let result = await this.es.search({
+      index: branch,
+      body: esBody
+    });
+    return result.hits.hits;
   }
 
   async _ensureRepo() {
@@ -69,7 +98,7 @@ module.exports = class Indexer {
     );
   }
 
-  async _updateBranch(branch) {
+  async _updateBranch(branch, realTime) {
     let commit = await this._commitAtBranch(branch);
     let tree = await commit.getTree();
     let haveMapping = await this._esMapping(branch);
@@ -88,10 +117,10 @@ module.exports = class Indexer {
       });
       await this._reindex(tmpIndex, branch);
     }
-    await this._updateState(branch, tree, commit);
+    await this._updateState(branch, tree, commit, realTime);
   }
 
-  async _updateState(branch, tree, commit) {
+  async _updateState(branch, tree, commit, realTime) {
     let originalTree;
     let meta = await this.es.getSource({ index: branch, type: 'meta', id: 'indexer', ignore: [404] });
     if (meta) {
@@ -107,7 +136,8 @@ module.exports = class Indexer {
       id: 'indexer',
       body: {
         commit: commit.id().tostrS()
-      }
+      },
+      refresh: realTime ? 'wait_for' : false
     });
   }
 
