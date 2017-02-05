@@ -43,7 +43,7 @@ module.exports = class Indexer {
     if (queryString) {
       esBody.query.bool.must.push({
         term: {
-          '_all': queryString
+          _all: queryString
         }
       });
     }
