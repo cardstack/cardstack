@@ -220,6 +220,7 @@ describe('indexer search', function() {
       queryString: 'magic'
     });
     expect(results).to.have.length(1);
+    expect(results).includes.something.with.deep.property('document.hello', 'magic words');
   });
 
   it('can be searched via queryString, negative result', async function() {
@@ -227,6 +228,35 @@ describe('indexer search', function() {
       queryString: 'this-is-an-unused-term'
     });
     expect(results).to.have.length(0);
+  });
+
+  it('can filter by type', async function() {
+    let results = await indexer.search('master', {
+      filter: {
+        type: 'articles'
+      }
+    });
+    expect(results).to.have.length(1);
+    expect(results).includes.something.with.deep.property('document.hello', 'magic words');
+  });
+
+  it('can filter a field by one term', async function() {
+    let results = await indexer.search('master', {
+      filter: {
+        firstName: 'Quint'
+      }
+    });
+    expect(results).to.have.length(1);
+    expect(results).includes.something.with.deep.property('document.firstName', 'Quint');
+  });
+
+  it('can filter a field by multiple terms', async function() {
+    let results = await indexer.search('master', {
+      filter: {
+        firstName: ['Quint', 'Arthur']
+      }
+    });
+    expect(results).to.have.length(2);
   });
 
 });

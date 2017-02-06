@@ -74,7 +74,9 @@ module.exports = class Indexer {
       });
     }
     if (filter) {
-      esBody.query.bool.must.push(this._filterToES(filter));
+      for (let expression of this._filterToES(filter)) {
+        esBody.query.bool.must.push(expression);
+      }
     }
     this.log.debug('search %j', esBody);
     let result = await this.es.search({
@@ -85,20 +87,40 @@ module.exports = class Indexer {
     return result.hits.hits.map(entry => ({ type: entry._type, id: entry._id, document: entry._source}));
   }
 
-  _filterToES(rawFilter, isListContext) {
-    let filter = liftQuery(rawFilter, isListContext);
+  _filterToES(filter) {
+    let result = [];
     Object.keys(filter).forEach(key => {
       let value = filter[key];
       switch(key) {
       case 'not':
-        return { bool: { must_not: this._filterToES(value, false) } };
+        result.push({ bool: { must_not: this._filterToES(value) } });
+        break;
       case 'or':
-        return { bool: { should: this._filterToES(value, true) } };
+        result.push({ bool: { should: this._filterToES(value) } });
+        break;
       case 'and':
-        return { bool: { must: this._filterToES(value, true) } };
+        // 'and' is not strictly needed, since we already conjoin all
+        // top-level conditions. But for completeness, it works.
+        result.push({ bool: { must: this._filterToES(value) } });
+        break;
       default:
+        {
+          // Any keys that aren't one of the predefined operations are
+          // field names.
+          let field = fieldNameFromKey(key);
+          if (typeof value === 'string') {
+            // Bare strings are shorthand for a single term filter
+            result.push({ term: { [field] : value.toLowerCase() } });
+          } else if (Array.isArray(value)) {
+            // Bare arrays are shorthand for a multi term filter
+            result.push({ terms: { [field] : value.map(elt => elt.toLowerCase()) } });
+          } else {
+            throw new Error("Unimplemented");
+          }
+        }
       }
     });
+    return result;
   }
 
   async _ensureRepo() {
@@ -293,16 +315,14 @@ function identify(entry) {
   return { type, id };
 }
 
-function liftQuery(query, isListContext) {
-  // lift single value into single term query
-  if (typeof query === 'string') {
-    query = { terms: [query] };
+// We use elastic search's built-in _type and _id to storage JSONAPI's
+// type and id. We don't want clients to need to add the underscores.
+function fieldNameFromKey(key) {
+  if (key === 'type') {
+    return '_type';
   }
-
-  // lift lists into multi term query
-  if (!isListContext && Array.isArray(query)) {
-    // default operator is "terms"
-    query = { terms: query };
+  if (key === 'id') {
+    return '_id';
   }
-  return query;
+  return key;
 }
