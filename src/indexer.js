@@ -104,23 +104,54 @@ module.exports = class Indexer {
         result.push({ bool: { must: this._filterToES(value) } });
         break;
       default:
-        {
-          // Any keys that aren't one of the predefined operations are
-          // field names.
-          let field = fieldNameFromKey(key);
-          if (typeof value === 'string') {
-            // Bare strings are shorthand for a single term filter
-            result.push({ term: { [field] : value.toLowerCase() } });
-          } else if (Array.isArray(value)) {
-            // Bare arrays are shorthand for a multi term filter
-            result.push({ terms: { [field] : value.map(elt => elt.toLowerCase()) } });
-          } else {
-            throw new Error("Unimplemented");
-          }
-        }
+        // Any keys that aren't one of the predefined operations are
+        // field names.
+        result.push(this._fieldFilter(key, value));
       }
     });
     return result;
+  }
+
+  _fieldFilter(key, value) {
+    let field = fieldNameFromKey(key);
+
+    if (typeof value === 'string') {
+      // Bare strings are shorthand for a single term filter
+      return { term: { [field] : value.toLowerCase() } };
+    }
+
+    if (Array.isArray(value)) {
+      // Bare arrays are shorthand for a multi term filter
+      return { terms: { [field] : value.map(elt => elt.toLowerCase()) } };
+    }
+
+    if (value.range) {
+      let limits = {};
+      ['lte', 'gte', 'lt', 'gt'].forEach(limit => {
+        if (value.range[limit]) {
+          limits[limit] = value.range[limit];
+        }
+      });
+      return {
+        range: {
+          [field]: limits
+        }
+      };
+    }
+
+    if (value.exists != null) {
+      if (String(value.exists) === 'false') {
+        return {
+          bool: { must_not: { exists: { field } } }
+        };
+      } else {
+        return {
+          exists: { field }
+        };
+      }
+    }
+
+    throw new Error("Unimplemented");
   }
 
   async _ensureRepo() {

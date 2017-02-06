@@ -173,7 +173,8 @@ describe('indexer search', function() {
       id: '1',
       content: {
         firstName: 'Quint',
-        lastName: 'Faulkner'
+        lastName: 'Faulkner',
+        age: 5
       }
     },
     {
@@ -181,7 +182,8 @@ describe('indexer search', function() {
       id: '2',
       content: {
         firstName: 'Arthur',
-        lastName: 'Faulkner'
+        lastName: 'Faulkner',
+        age: 0.83
       }
     }
   ];
@@ -240,6 +242,17 @@ describe('indexer search', function() {
     expect(results).includes.something.with.deep.property('document.hello', 'magic words');
   });
 
+  it('can filter by id', async function() {
+    let results = await indexer.search('master', {
+      filter: {
+        id: '1'
+      }
+    });
+    expect(results).to.have.length(2);
+    expect(results).includes.something.with.property('type', 'articles');
+    expect(results).includes.something.with.property('type', 'people');
+  });
+
   it('can filter a field by one term', async function() {
     let results = await indexer.search('master', {
       filter: {
@@ -258,5 +271,64 @@ describe('indexer search', function() {
     });
     expect(results).to.have.length(2);
   });
+
+  it('can filter by range', async function() {
+    let results = await indexer.search('master', {
+      filter: {
+        age: {
+          range: {
+            lt: '1'
+          }
+        }
+      }
+    });
+    expect(results).to.have.length(1);
+    expect(results).includes.something.with.deep.property('document.firstName', 'Arthur');
+  });
+
+  it('can filter by field existence (string)', async function() {
+    let results = await indexer.search('master', {
+      filter: {
+        age: {
+          exists: 'true'
+        }
+      }
+    });
+    expect(results).to.have.length(2);
+  });
+
+  it('can filter by field nonexistence (string)', async function() {
+    let results = await indexer.search('master', {
+      filter: {
+        age: {
+          exists: 'false'
+        }
+      }
+    });
+    expect(results).to.have.length(fixtures.length - 2);
+  });
+
+  it('can filter by field existence (bool)', async function() {
+    let results = await indexer.search('master', {
+      filter: {
+        age: {
+          exists: true
+        }
+      }
+    });
+    expect(results).to.have.length(2);
+  });
+
+  it('can filter by field nonexistence (bool)', async function() {
+    let results = await indexer.search('master', {
+      filter: {
+        age: {
+          exists: false
+        }
+      }
+    });
+    expect(results).to.have.length(fixtures.length - 2);
+  });
+
 
 });
