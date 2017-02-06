@@ -2,11 +2,8 @@
   Indexer deals with indexing documents. It's public API consists of:
 
     update: indexings changes from a git repo
+
     search: get documents back out of the index
-
-    When updating, it follows these general rules to map from git to
-    the search index:
-
 
 */
 
@@ -58,6 +55,8 @@ module.exports = class Indexer {
       query: {
         bool: {
           must: [],
+          // All searches exclude `meta` documents, because those are
+          // internal to our system.
           must_not: [{
             term: {
               _type: 'meta'
@@ -68,7 +67,7 @@ module.exports = class Indexer {
     };
     if (queryString) {
       esBody.query.bool.must.push({
-        term: {
+        match: {
           _all: queryString
         }
       });
