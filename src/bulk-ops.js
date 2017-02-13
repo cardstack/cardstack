@@ -19,10 +19,17 @@ class BulkOps {
   async flush() {
     let body = this.queue;
     this.queue = [];
-    await this.es.bulk({
+    let response = await this.es.bulk({
       body,
       refresh: this.realTime ? 'wait_for' : false
     });
+    let failedOperations = response.items.filter(item => {
+      let op = Object.keys(item)[0];
+      return item[op].error;
+    });
+    if (failedOperations.length > 0) {
+      throw new Error(`Some bulk operations failed: ${JSON.stringify(failedOperations)}`);
+    }
   }
 }
 
