@@ -174,7 +174,7 @@ describe('indexer search', function() {
       content: {
         firstName: 'Quint',
         lastName: 'Faulkner',
-        age: 5
+        age: 5.0
       }
     },
     {
