@@ -58,6 +58,28 @@ describe('git', function() {
 
   });
 
+  it('automatically fast-forwards when no base version is provided', async function() {
+    let repo = await git.createEmptyRepo(path, commitOpts({
+      message: 'First commit'
+    }));
+
+    let updatedContent = [
+      { filename: 'hello-world.txt', buffer: Buffer.from('This is a file', 'utf8') }
+    ];
+    let id = (await git.mergeCommit(repo, null, 'master', updatedContent, commitOpts({ message: 'Second commit' })));
+
+    let commit = await inRepo(path).getCommit(id);
+    expect(commit.message).to.equal('Second commit');
+
+    let head = await inRepo(path).getCommit('master');
+    expect(head.message).to.equal('Second commit');
+
+    let parentCommit = await inRepo(path).getCommit(id + '^');
+    expect(parentCommit.message).to.equal('First commit');
+
+    expect(await inRepo(path).getContents(id, 'hello-world.txt')).to.equal('This is a file');
+
+  });
 
   it('non-fast-forward merge some new content', async function() {
     let repo = await git.createEmptyRepo(path, commitOpts({

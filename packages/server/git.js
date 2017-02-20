@@ -48,11 +48,17 @@ async function makeCommit(repo, parentCommit, updatedContents, commitOpts) {
 }
 
 exports.mergeCommit = async function(repo, parentId, targetBranch, updatedContents, commitOpts) {
-  let parentCommit = await Commit.lookup(repo, parentId);
-  let newCommit = await makeCommit(repo, parentCommit, updatedContents, commitOpts);
-
   let headRef = await Branch.lookup(repo, targetBranch, Branch.BRANCH.LOCAL);
   let headCommit = await Commit.lookup(repo, headRef.target());
+
+  let parentCommit;
+  if (parentId) {
+    parentCommit = await Commit.lookup(repo, parentId);
+  } else {
+    parentCommit = headCommit;
+  }
+  let newCommit = await makeCommit(repo, parentCommit, updatedContents, commitOpts);
+
 
   let baseOid = await Merge.base(repo, newCommit, headCommit);
   if (baseOid.equal(headCommit.id())) {
