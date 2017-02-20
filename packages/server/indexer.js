@@ -49,8 +49,6 @@ module.exports = class Indexer {
     await Promise.all(branches.map(branch => this._updateBranch(branch, realTime)));
   }
 
-
-
   async _ensureRepo() {
     if (!this.repo) {
       this.repo = await Repository.open(this.repoPath);
@@ -147,54 +145,62 @@ module.exports = class Indexer {
     if (newTree) {
       for (let newEntry of newTree.entries()) {
         let name = newEntry.name();
-        let oldEntry;
         seen.set(name, true);
-        if (oldTree) {
-          oldEntry = safeEntryByName(oldTree, name);
-          if (oldEntry && oldEntry.id().equal(newEntry.id())) {
-            // We can prune whole subtrees when we find an identical
-            // entry. Which is kinda the point of Git's data
-            // structure in the first place.
-            continue;
-          }
-        }
-        if (newEntry.isTree()) {
-          await this._indexTree(
-            branch,
-            oldEntry && oldEntry.isTree() ? (await oldEntry.getTree()) : null,
-            await newEntry.getTree(),
-            bulkOps
-          );
-        } else {
-          let { type, id } = identify(newEntry);
-          await bulkOps.add({
-            index: {
-              _index: branch,
-              _type: type,
-              _id: id,
-            }
-          }, (await newEntry.getBlob()).content().toString('utf8'));
-        }
+        await this._indexEntry(branch, name, oldTree, newEntry, bulkOps);
       }
     }
     if (oldTree) {
       for (let oldEntry of oldTree.entries()) {
         let name = oldEntry.name();
         if (!seen.get(name)) {
-          if (oldEntry.isTree()) {
-            await this._indexTree(branch, await oldEntry.getTree(), null, bulkOps);
-          } else {
-            let { type, id } = identify(oldEntry);
-            await bulkOps.add({
-              delete: {
-                _index: branch,
-                _type: type,
-                _id: id
-              }
-            });
-          }
+          await this._deleteEntry(branch, oldEntry, bulkOps);
         }
       }
+    }
+  }
+
+  async _indexEntry(branch, name, oldTree, newEntry, bulkOps) {
+    let oldEntry;
+    if (oldTree) {
+      oldEntry = safeEntryByName(oldTree, name);
+      if (oldEntry && oldEntry.id().equal(newEntry.id())) {
+        // We can prune whole subtrees when we find an identical
+        // entry. Which is kinda the point of Git's data
+        // structure in the first place.
+        return;
+      }
+    }
+    if (newEntry.isTree()) {
+      await this._indexTree(
+        branch,
+        oldEntry && oldEntry.isTree() ? (await oldEntry.getTree()) : null,
+        await newEntry.getTree(),
+        bulkOps
+      );
+    } else {
+      let { type, id } = identify(newEntry);
+      await bulkOps.add({
+        index: {
+          _index: branch,
+          _type: type,
+          _id: id,
+        }
+      }, (await newEntry.getBlob()).content().toString('utf8'));
+    }
+  }
+
+  async _deleteEntry(branch, oldEntry, bulkOps) {
+    if (oldEntry.isTree()) {
+      await this._indexTree(branch, await oldEntry.getTree(), null, bulkOps);
+    } else {
+      let { type, id } = identify(oldEntry);
+      await bulkOps.add({
+        delete: {
+          _index: branch,
+          _type: type,
+          _id: id
+        }
+      });
     }
   }
 
