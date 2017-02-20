@@ -59,7 +59,20 @@ describe('writer', function() {
     await temp.cleanup();
   });
 
-  it('creates a record', async function () {
+  it('saves attributes when creating a record', async function () {
+    let record = await writer.create('master', user, {
+      type: 'articles',
+      attributes: {
+        title: 'Second Article'
+      }
+    });
+    let saved = await inRepo(root).getJSONContents('master', `contents/articles/${record.id}.json`);
+    expect(saved).to.deep.equal({
+      title: 'Second Article'
+    });
+  });
+
+  it('returns correct document when creating a record', async function () {
     let record = await writer.create('master', user, {
       type: 'articles',
       attributes: {
@@ -67,12 +80,10 @@ describe('writer', function() {
       }
     });
     expect(record).has.property('id');
-    let saved = await inRepo(root).getJSONContents('master', `contents/articles/${record.id}.json`);
-    expect(saved).to.deep.equal({
-      title: 'Second Article'
-    });
-    expect(record.attributes).to.deep.equal(saved);
+    expect(record.attributes).to.deep.equal({ title: 'Second Article' });
     expect(record.type).to.equal('articles');
+    let head = await inRepo(root).getCommit('master');
+    expect(record).has.deep.property('meta.version', head.id);
   });
 
   it('retries on id collision', async function () {

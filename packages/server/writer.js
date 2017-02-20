@@ -47,7 +47,7 @@ module.exports = class Writer {
       message: `create ${document.type} ${id.slice(12)}`
     };
     await this._ensureRepo();
-    await git.mergeCommit(this.repo, null, branch, [
+    let commitId = await git.mergeCommit(this.repo, null, branch, [
       {
         operation: 'create',
         filename: `contents/${document.type}/${id}.json`,
@@ -58,7 +58,10 @@ module.exports = class Writer {
     return {
       id,
       type: document.type,
-      attributes: document.attributes
+      attributes: document.attributes,
+      meta: {
+        version: commitId
+      }
     };
   }
 
