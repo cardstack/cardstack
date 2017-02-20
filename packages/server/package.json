@@ -1,0 +1,10 @@
+{
+  "name": "@cardstack/server",
+  "version": "0.0.1",
+  "main": "index.js",
+  "repository": {},
+  "license": "MIT",
+  "peerDependencies": {
+    "@cardstack/eslint-config": "*"
+  }
+}

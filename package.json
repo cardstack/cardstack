@@ -16,7 +16,7 @@
     "temp": "^0.8.3"
   },
   "scripts": {
-    "test": "mocha --harmony -r tests/prepare.js tests/**/*-test.js tests/*-test.js",
+    "test": "mocha --harmony -r packages/test-support/prepare.js packages/*/tests/*-test.js",
     "server": "node --harmony bin/server.js"
   },
   "dependencies": {
