@@ -34,15 +34,16 @@ describe('git', function() {
   });
 
   it('can include separate committer info', async function() {
+    let { repo, head } = await makeRepo(path);
 
-    await git.createEmptyRepo(path, commitOpts({
-      message: 'First commit',
+    let id = await git.mergeCommit(repo, head, 'master', [], commitOpts({
+      message: 'Second commit',
       authorDate: moment.tz('2017-01-16 12:21', 'Africa/Addis_Ababa'),
       committerName: 'The Committer',
       committerEmail: 'committer@git.com'
     }));
 
-    let commit = await inRepo(path).getCommit('master');
+    let commit = await inRepo(path).getCommit(id);
     expect(commit.authorName).to.equal('John Milton');
     expect(commit.authorEmail).to.equal('john@paradiselost.com');
     expect(commit.committerName).to.equal('The Committer');
@@ -50,34 +51,27 @@ describe('git', function() {
   });
 
   it('can fast-forward merge some new content', async function() {
-    let repo = await git.createEmptyRepo(path, commitOpts({
-      message: 'First commit'
-    }));
-
-    let parentRef = await ngit.Branch.lookup(repo, 'master', ngit.Branch.BRANCH.LOCAL);
+    let { repo, head } = await makeRepo(path);
 
     let updatedContent = [
       { filename: 'hello-world.txt', buffer: Buffer.from('This is a file', 'utf8') }
     ];
-    let id = (await git.mergeCommit(repo, parentRef.target(), 'master', updatedContent, commitOpts({ message: 'Second commit' })));
+    let id = (await git.mergeCommit(repo, head, 'master', updatedContent, commitOpts({ message: 'Second commit' })));
 
     let commit = await inRepo(path).getCommit(id);
     expect(commit.message).to.equal('Second commit');
 
-    let head = await inRepo(path).getCommit('master');
-    expect(head.message).to.equal('Second commit');
+    let masterCommit = await inRepo(path).getCommit('master');
+    expect(masterCommit.id).to.equal(id);
 
     let parentCommit = await inRepo(path).getCommit(id + '^');
     expect(parentCommit.message).to.equal('First commit');
 
     expect(await inRepo(path).getContents(id, 'hello-world.txt')).to.equal('This is a file');
-
   });
 
   it('automatically fast-forwards when no base version is provided', async function() {
-    let repo = await git.createEmptyRepo(path, commitOpts({
-      message: 'First commit'
-    }));
+    let { repo } = await makeRepo(path);
 
     let updatedContent = [
       { filename: 'hello-world.txt', buffer: Buffer.from('This is a file', 'utf8') }
@@ -88,13 +82,12 @@ describe('git', function() {
     expect(commit.message).to.equal('Second commit');
 
     let head = await inRepo(path).getCommit('master');
-    expect(head.message).to.equal('Second commit');
+    expect(head.id).to.equal(id);
 
     let parentCommit = await inRepo(path).getCommit(id + '^');
     expect(parentCommit.message).to.equal('First commit');
 
     expect(await inRepo(path).getContents(id, 'hello-world.txt')).to.equal('This is a file');
-
   });
 
   it('can detect unintended filename collision', async function() {
