@@ -95,9 +95,9 @@ describe('git', function() {
       {
         changes: [
           {
+            operation: 'create',
             filename: 'sample.txt',
-            buffer: Buffer.from('sample', 'utf8'),
-            createOnly: true
+            buffer: Buffer.from('sample', 'utf8')
           }
         ]
       }
@@ -106,9 +106,9 @@ describe('git', function() {
 
     let updatedContent = [
       {
+        operation: 'create',
         filename: 'sample.txt',
-        buffer: Buffer.from('This is a file', 'utf8'),
-        createOnly: true
+        buffer: Buffer.from('This is a file', 'utf8')
       }
     ];
     try {

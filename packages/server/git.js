@@ -34,7 +34,7 @@ exports.createEmptyRepo = async function(path, commitOpts) {
   return repo;
 };
 
-async function makeCommit(repo, parentCommit, updatedContents, commitOpts) {
+async function makeCommit(repo, parentCommit, operations, commitOpts) {
   let parentTree;
   let parents = [];
   if (parentCommit) {
@@ -42,8 +42,17 @@ async function makeCommit(repo, parentCommit, updatedContents, commitOpts) {
     parents.push(parentCommit);
   }
   let newRoot = new MutableTree(repo, parentTree);
-  for (let { filename, buffer, createOnly } of updatedContents) {
-    await newRoot.insertPath(filename, buffer, FILEMODE.BLOB, createOnly);
+  for (let { operation, filename, buffer } of operations) {
+    switch (operation) {
+    case 'create':
+      await newRoot.insertPath(filename, buffer, FILEMODE.BLOB, true);
+      break;
+    case 'update':
+    case 'delete':
+    default:
+      await newRoot.insertPath(filename, buffer, FILEMODE.BLOB);
+      break;
+    }
   }
   let treeOid = await newRoot.write(true);
   let tree = await Tree.lookup(repo, treeOid, null);
@@ -52,7 +61,7 @@ async function makeCommit(repo, parentCommit, updatedContents, commitOpts) {
   return Commit.lookup(repo, commitOid);
 }
 
-exports.mergeCommit = async function(repo, parentId, targetBranch, updatedContents, commitOpts) {
+exports.mergeCommit = async function(repo, parentId, targetBranch, operations, commitOpts) {
   let headRef = await Branch.lookup(repo, targetBranch, Branch.BRANCH.LOCAL);
   let headCommit = await Commit.lookup(repo, headRef.target());
 
@@ -62,7 +71,7 @@ exports.mergeCommit = async function(repo, parentId, targetBranch, updatedConten
   } else {
     parentCommit = headCommit;
   }
-  let newCommit = await makeCommit(repo, parentCommit, updatedContents, commitOpts);
+  let newCommit = await makeCommit(repo, parentCommit, operations, commitOpts);
 
 
   let baseOid = await Merge.base(repo, newCommit, headCommit);
