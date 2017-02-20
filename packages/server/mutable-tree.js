@@ -44,9 +44,7 @@ class MutableTree {
       let entry = here.entryByName(dirName);
       if (!entry || !entry.isTree()) {
         if (!allowCreate) {
-          let err = new Error(`${path} does not exist`);
-          err.message = 'notFound';
-          throw err;
+          throw new NotFound(`${path} does not exist`);
         }
         entry = here.insert(dirName, new MutableTree(here.repo, null), FILEMODE.TREE);
       }
@@ -56,15 +54,11 @@ class MutableTree {
     let have = here.entryByName(parts[0]);
 
     if (!allowUpdate && have && have !== tombstone) {
-      let err = new Error(`Refusing to overwrite ${path}`);
-      err.message = 'overwriteRejected';
-      throw err;
+      throw new OverwriteRejected(`Refusing to overwrite ${path}`);
     }
 
     if (!allowCreate && (!have || have === tombstone)) {
-      let err = new Error(`${path} does not exist`);
-      err.message = 'notFound';
-      throw err;
+      throw new NotFound(`${path} does not exist`);
     }
 
     return here.insert(parts[0], object, filemode);
@@ -77,17 +71,13 @@ class MutableTree {
       let dirName = parts.shift();
       let entry = here.entryByName(dirName);
       if (!entry || !entry.isTree()) {
-        let err = new Error(`No such directory ${path}`);
-        err.message = `notFound`;
-        throw err;
+        throw new NotFound(`No such directory ${path}`);
       }
       here = await entry.getTree();
     }
     let have = here.entryByName(parts[0]);
     if (!have || have === tombstone) {
-      let err = new Error(`No such file ${path}`);
-      err.message = `notFound`;
-      throw err;
+      throw new NotFound(`No such file ${path}`);
     }
     here.overlay.set(parts[0], tombstone);
   }
@@ -197,7 +187,10 @@ class NewEntry {
   }
 }
 
-module.exports = { MutableTree, MutableBlob, safeEntryByName };
+class NotFound extends Error {}
+class OverwriteRejected extends Error {}
+
+module.exports = { MutableTree, MutableBlob, safeEntryByName, NotFound, OverwriteRejected };
 
 function safeEntryByName(tree, name) {
   // This is apparently private API. There's unfortunately no public

@@ -54,7 +54,7 @@ describe('git', function() {
     let { repo, head } = await makeRepo(path);
 
     let updatedContent = [
-      { filename: 'hello-world.txt', buffer: Buffer.from('This is a file', 'utf8') }
+      { operation: 'create', filename: 'hello-world.txt', buffer: Buffer.from('This is a file', 'utf8') }
     ];
     let id = (await git.mergeCommit(repo, head, 'master', updatedContent, commitOpts({ message: 'Second commit' })));
 
@@ -74,7 +74,7 @@ describe('git', function() {
     let { repo } = await makeRepo(path);
 
     let updatedContent = [
-      { filename: 'hello-world.txt', buffer: Buffer.from('This is a file', 'utf8') }
+      { operation: 'create', filename: 'hello-world.txt', buffer: Buffer.from('This is a file', 'utf8') }
     ];
     let id = (await git.mergeCommit(repo, null, 'master', updatedContent, commitOpts({ message: 'Second commit' })));
 
@@ -115,7 +115,7 @@ describe('git', function() {
       await git.mergeCommit(repo, head, 'master', updatedContent, commitOpts({ message: 'Second commit' }));
       throw new Error("should not get here");
     } catch (err) {
-      expect(err.message).to.equal('overwriteRejected');
+      expect(err).instanceof(git.OverwriteRejected);
     }
   });
 
@@ -127,12 +127,12 @@ describe('git', function() {
     let parentRef = await ngit.Branch.lookup(repo, 'master', ngit.Branch.BRANCH.LOCAL);
 
     let updatedContent = [
-      { filename: 'hello-world.txt', buffer: Buffer.from('This is a file', 'utf8') }
+      { operation: 'create', filename: 'hello-world.txt', buffer: Buffer.from('This is a file', 'utf8') }
     ];
     await git.mergeCommit(repo, parentRef.target(), 'master', updatedContent, commitOpts({ message: 'Second commit' }));
 
     updatedContent = [
-      { filename: 'other.txt', buffer: Buffer.from('Non-conflicting content', 'utf8') }
+      { operation: 'create', filename: 'other.txt', buffer: Buffer.from('Non-conflicting content', 'utf8') }
     ];
     // This is based on the same parentRef as the second commit, so it's not a fast forward
     await git.mergeCommit(repo, parentRef.target(), 'master', updatedContent, commitOpts({ message: 'Third commit' }));
@@ -151,12 +151,12 @@ describe('git', function() {
     let parentRef = await ngit.Branch.lookup(repo, 'master', ngit.Branch.BRANCH.LOCAL);
 
     let updatedContent = [
-      { filename: 'hello-world.txt', buffer: Buffer.from('This is a file', 'utf8') }
+      { operation: 'create', filename: 'hello-world.txt', buffer: Buffer.from('This is a file', 'utf8') }
     ];
     await git.mergeCommit(repo, parentRef.target(), 'master', updatedContent, commitOpts({ message: 'Second commit' }));
 
     updatedContent = [
-      { filename: 'hello-world.txt', buffer: Buffer.from('Conflicting content', 'utf8') }
+      { operation: 'create', filename: 'hello-world.txt', buffer: Buffer.from('Conflicting content', 'utf8') }
     ];
     try {
       await git.mergeCommit(repo, parentRef.target(), 'master', updatedContent, commitOpts({ message: 'Third commit' }));
@@ -180,7 +180,7 @@ describe('git', function() {
     let parentRef = await ngit.Branch.lookup(repo, 'master', ngit.Branch.BRANCH.LOCAL);
 
     let updatedContent = [
-      { filename: 'outer/inner/hello-world.txt', buffer: Buffer.from('This is a file', 'utf8') }
+      { operation: 'create', filename: 'outer/inner/hello-world.txt', buffer: Buffer.from('This is a file', 'utf8') }
     ];
     let id = await git.mergeCommit(repo, parentRef.target(), 'master', updatedContent, commitOpts({ message: 'Second commit' }));
 
@@ -201,12 +201,12 @@ describe('git', function() {
     let parentRef = await ngit.Branch.lookup(repo, 'master', ngit.Branch.BRANCH.LOCAL);
 
     let updatedContent = [
-      { filename: 'outer/inner/hello-world.txt', buffer: Buffer.from('This is a file', 'utf8') }
+      { operation: 'create', filename: 'outer/inner/hello-world.txt', buffer: Buffer.from('This is a file', 'utf8') }
     ];
     let head = await git.mergeCommit(repo, parentRef.target(), 'master', updatedContent, commitOpts({ message: 'Second commit' }));
 
     updatedContent = [
-      { filename: 'outer/inner/second.txt', buffer: Buffer.from('second file', 'utf8') }
+      { operation: 'create', filename: 'outer/inner/second.txt', buffer: Buffer.from('second file', 'utf8') }
     ];
 
     head = await git.mergeCommit(repo, head, 'master', updatedContent, commitOpts({ message: 'Third commit' }));
@@ -220,6 +220,7 @@ describe('git', function() {
       {
         changes: [
           {
+            operation: 'create',
             filename: 'sample.txt',
             buffer: Buffer.from('sample', 'utf8')
           }
@@ -249,10 +250,12 @@ describe('git', function() {
       {
         changes: [
           {
+            operation: 'create',
             filename: 'outer/sample.txt',
             buffer: Buffer.from('sample', 'utf8')
           },
           {
+            operation: 'create',
             filename: 'outer/second.txt',
             buffer: Buffer.from('second', 'utf8')
           }
@@ -289,6 +292,7 @@ describe('git', function() {
       {
         changes: [
           {
+            operation: 'create',
             filename: 'outer/sample.txt',
             buffer: Buffer.from('sample', 'utf8')
           }
@@ -328,7 +332,7 @@ describe('git', function() {
       await git.mergeCommit(repo, head, 'master', updates, commitOpts({ message: 'Deleting' }));
       throw new Error("should not get here");
     } catch (err) {
-      expect(err.message).to.equal('notFound');
+      expect(err).instanceOf(git.NotFound);
     }
 
   });
@@ -347,7 +351,7 @@ describe('git', function() {
       await git.mergeCommit(repo, head, 'master', updates, commitOpts({ message: 'Deleting' }));
       throw new Error("should not get here");
     } catch (err) {
-      expect(err.message).to.equal('notFound');
+      expect(err).instanceOf(git.NotFound);
     }
 
   });
@@ -357,6 +361,7 @@ describe('git', function() {
     let { repo, head } = await makeRepo(path, [{
       changes: [
         {
+          operation: 'create',
           filename: 'outer/sample.txt',
           buffer: Buffer.from('sample', 'utf8')
         }
@@ -377,7 +382,7 @@ describe('git', function() {
       await git.mergeCommit(repo, head, 'master', updates, commitOpts({ message: 'Deleting' }));
       throw new Error("should not get here");
     } catch (err) {
-      expect(err.message).to.equal('notFound');
+      expect(err).instanceOf(git.NotFound);
     }
 
   });
@@ -387,6 +392,7 @@ describe('git', function() {
     let { repo, head } = await makeRepo(path, [{
       changes: [
         {
+          operation: 'create',
           filename: 'outer/sample.txt',
           buffer: Buffer.from('sample', 'utf8')
         }
@@ -407,7 +413,7 @@ describe('git', function() {
       await git.mergeCommit(repo, head, 'master', updates, commitOpts({ message: 'Deleting' }));
       throw new Error("should not get here");
     } catch (err) {
-      expect(err.message).to.equal('notFound');
+      expect(err).instanceOf(git.NotFound);
     }
 
   });
@@ -426,7 +432,7 @@ describe('git', function() {
       await git.mergeCommit(repo, head, 'master', updates, commitOpts({ message: 'updating' }));
       throw new Error("should not get here");
     } catch (err) {
-      expect(err.message).to.equal('notFound');
+      expect(err).instanceOf(git.NotFound);
     }
   });
 
@@ -444,7 +450,7 @@ describe('git', function() {
       await git.mergeCommit(repo, head, 'master', updates, commitOpts({ message: 'updating' }));
       throw new Error("should not get here");
     } catch (err) {
-      expect(err.message).to.equal('notFound');
+      expect(err).instanceOf(git.NotFound);
     }
   });
 

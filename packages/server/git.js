@@ -9,7 +9,9 @@ const {
   TreeEntry: { FILEMODE }
 } = require('nodegit');
 const {
-  MutableTree
+  MutableTree,
+  NotFound,
+  OverwriteRejected
 } = require('./mutable-tree');
 const moment = require('moment-timezone');
 
@@ -57,8 +59,7 @@ async function makeCommit(repo, parentCommit, operations, commitOpts) {
       await newRoot.insertPath(filename, buffer, FILEMODE.BLOB, { allowUpdate: true, allowCreate: true } );
       break;
     default:
-      await newRoot.insertPath(filename, buffer, FILEMODE.BLOB, { allowUpdate: true, allowCreate: true } );
-      break;
+      throw new Error("no operation");
     }
   }
   let treeOid = await newRoot.write(true);
@@ -107,3 +108,5 @@ class GitConflict extends Error {
 }
 
 exports.GitConflict = GitConflict;
+exports.NotFound = NotFound;
+exports.OverwriteRejected = OverwriteRejected;
