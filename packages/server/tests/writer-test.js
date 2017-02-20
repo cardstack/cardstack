@@ -34,7 +34,7 @@ describe('writer', function() {
 
   let root, writer, user;
 
-  before(async function() {
+  beforeEach(async function() {
     root = await temp.mkdir('cardstack-server-test');
     writer = new Writer({
       repoPath: root
@@ -55,7 +55,7 @@ describe('writer', function() {
     ]);
   });
 
-  after(async function() {
+  afterEach(async function() {
     await temp.cleanup();
   });
 
@@ -73,6 +73,25 @@ describe('writer', function() {
     });
     expect(record.attributes).to.deep.equal(saved);
     expect(record.type).to.equal('articles');
+  });
+
+  it('retries on id collision', async function () {
+    let ids = ['1', '1', '2'];
+    let writer = new Writer({
+      repoPath: root,
+      idGenerator() {
+        return ids.shift();
+      }
+    });
+
+    let record = await writer.create('master', user, {
+      type: 'articles',
+      attributes: {
+        title: 'Second Article'
+      }
+    });
+    expect(ids).to.have.length(0);
+    expect(record).has.property('id', '2');
   });
 
 });

@@ -8,14 +8,15 @@ const git = require('./git');
 const os = require('os');
 const process = require('process');
 
-module.exports = class Indexer {
-  constructor({ repoPath }) {
+module.exports = class Writer {
+  constructor({ repoPath, idGenerator }) {
     this.repoPath = repoPath;
     this.repo = null;
     this.log = logger('writer');
     let hostname = os.hostname();
     this.myName = `PID${process.pid} on ${hostname}`;
     this.myEmail = `${os.userInfo().username}@${hostname}`;
+    this.idGenerator = idGenerator;
   }
 
   async create(branch, user, document) {
@@ -26,11 +27,11 @@ module.exports = class Indexer {
         // probability too, because we're allowed to retry if we know
         // the id is already in use (so we can really only collide
         // with things that have not yet merged into our branch).
-        let id = crypto.randomBytes(20).toString('hex');
+        let id = this._generateId();
         let doc = await this._create(branch, user, document, id);
         return doc;
       } catch(err) {
-        if (!(err instanceof DuplicateId)) {
+        if (!(err instanceof git.OverwriteRejected)) {
           throw err;
         }
       }
@@ -67,6 +68,12 @@ module.exports = class Indexer {
     }
   }
 
-};
+  _generateId() {
+    if (this.idGenerator) {
+      return this.idGenerator();
+    } else {
+      return crypto.randomBytes(20).toString('hex');
+    }
+  }
 
-class DuplicateId extends Error {}
+};
