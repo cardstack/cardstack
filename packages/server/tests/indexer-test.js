@@ -174,7 +174,7 @@ describe('indexer search', function() {
       content: {
         firstName: 'Quint',
         lastName: 'Faulkner',
-        age: 5.0
+        age: 6
       }
     },
     {
@@ -183,7 +183,7 @@ describe('indexer search', function() {
       content: {
         firstName: 'Arthur',
         lastName: 'Faulkner',
-        age: 0.83
+        age: 1
       }
     }
   ];
@@ -277,7 +277,7 @@ describe('indexer search', function() {
       filter: {
         age: {
           range: {
-            lt: '1'
+            lt: '2'
           }
         }
       }
