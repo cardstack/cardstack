@@ -1,4 +1,4 @@
-const makeClient = require('../src/elastic-client');
+const makeClient = require('@cardstack/server/elastic-client');
 
 exports.host = function() {
   return 'http://10.0.15.2:9200';

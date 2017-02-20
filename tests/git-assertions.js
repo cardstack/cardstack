@@ -6,7 +6,7 @@
 */
 
 const spawn = require('child_process').spawn;
-const git = require('../src/git');
+const git = require('@cardstack/server/git');
 const { Branch } = require('nodegit');
 
 exports.inRepo = function(path) {

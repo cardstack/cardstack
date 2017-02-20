@@ -1,4 +1,4 @@
-const jsonapi = require('../../src/jsonapi');
+const jsonapi = require('@cardstack/server/jsonapi');
 const supertest = require('supertest');
 
 describe('jsonapi', function() {

@@ -1,4 +1,4 @@
-const git = require('../../src/git');
+const git = require('@cardstack/server/git');
 const ngit = require('nodegit');
 const temp = require('../temp-helper');
 const {
