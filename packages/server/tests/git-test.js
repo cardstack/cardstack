@@ -33,6 +33,22 @@ describe('git', function() {
     expect(commit.authorDate).to.equal('2017-01-16T12:21:00+03:00');
   });
 
+  it('can include separate committer info', async function() {
+
+    await git.createEmptyRepo(path, commitOpts({
+      message: 'First commit',
+      authorDate: moment.tz('2017-01-16 12:21', 'Africa/Addis_Ababa'),
+      committerName: 'The Committer',
+      committerEmail: 'committer@git.com'
+    }));
+
+    let commit = await inRepo(path).getCommit('master');
+    expect(commit.authorName).to.equal('John Milton');
+    expect(commit.authorEmail).to.equal('john@paradiselost.com');
+    expect(commit.committerName).to.equal('The Committer');
+    expect(commit.committerEmail).to.equal('committer@git.com');
+  });
+
   it('can fast-forward merge some new content', async function() {
     let repo = await git.createEmptyRepo(path, commitOpts({
       message: 'First commit'

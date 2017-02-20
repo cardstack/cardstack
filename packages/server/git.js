@@ -19,7 +19,12 @@ setThreadSafetyStatus(1);
 
 function signature(commitOpts) {
   let date = commitOpts.authorDate || moment();
-  return Signature.create(commitOpts.authorName, commitOpts.authorEmail, date.unix(), date.utcOffset());
+  let author = Signature.create(commitOpts.authorName, commitOpts.authorEmail, date.unix(), date.utcOffset());
+  let committer = commitOpts.committerName ? Signature.create(commitOpts.committerName, commitOpts.committerEmail, date.unix(), date.utcOffset()) : author;
+  return {
+    author,
+    committer
+  };
 }
 
 exports.createEmptyRepo = async function(path, commitOpts) {
@@ -42,8 +47,8 @@ async function makeCommit(repo, parentCommit, updatedContents, commitOpts) {
   }
   let treeOid = await newRoot.write(true);
   let tree = await Tree.lookup(repo, treeOid, null);
-  let sig = signature(commitOpts);
-  let commitOid = await Commit.create(repo, null, sig, sig, 'UTF-8', commitOpts.message, tree, parents.length, parents);
+  let { author, committer } = signature(commitOpts);
+  let commitOid = await Commit.create(repo, null, author, committer, 'UTF-8', commitOpts.message, tree, parents.length, parents);
   return Commit.lookup(repo, commitOid);
 }
 
@@ -71,8 +76,8 @@ exports.mergeCommit = async function(repo, parentId, targetBranch, updatedConten
   }
   let treeOid = await index.writeTreeTo(repo);
   let tree = await Tree.lookup(repo, treeOid, null);
-  let sig = signature(commitOpts);
-  let mergeCommitOid = await Commit.create(repo, null, sig, sig, 'UTF-8', `Clean merge into ${targetBranch}`, tree, 2, [newCommit, headCommit]);
+  let { author, committer } = signature(commitOpts);
+  let mergeCommitOid = await Commit.create(repo, null, author, committer, 'UTF-8', `Clean merge into ${targetBranch}`, tree, 2, [newCommit, headCommit]);
   let mergeCommit = await Commit.lookup(repo, mergeCommitOid);
   await headRef.setTarget(mergeCommit.id(), 'fast forward');
   return mergeCommit.id().tostrS();
