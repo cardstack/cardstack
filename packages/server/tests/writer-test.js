@@ -67,9 +67,12 @@ describe('writer', function() {
       }
     });
     expect(record).has.property('id');
-    expect(await inRepo(root).getJSONContents('master', `contents/articles/${record.id}.json`)).to.deep.equal({
+    let saved = await inRepo(root).getJSONContents('master', `contents/articles/${record.id}.json`);
+    expect(saved).to.deep.equal({
       title: 'Second Article'
     });
+    expect(record.attributes).to.deep.equal(saved);
+    expect(record.type).to.equal('articles');
   });
 
 });

@@ -54,7 +54,11 @@ module.exports = class Indexer {
       }
     ], commitOpts);
 
-    return { id };
+    return {
+      id,
+      type: document.type,
+      attributes: document.attributes
+    };
   }
 
   async _ensureRepo() {
