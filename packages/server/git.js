@@ -45,14 +45,19 @@ async function makeCommit(repo, parentCommit, operations, commitOpts) {
   for (let { operation, filename, buffer } of operations) {
     switch (operation) {
     case 'create':
-      await newRoot.insertPath(filename, buffer, FILEMODE.BLOB, true);
+      await newRoot.insertPath(filename, buffer, FILEMODE.BLOB, { allowUpdate: false, allowCreate: true });
+      break;
+    case 'update':
+      await newRoot.insertPath(filename, buffer, FILEMODE.BLOB, { allowUpdate: true, allowCreate: false });
       break;
     case 'delete':
       await newRoot.deletePath(filename);
       break;
-    case 'update':
+    case 'createOrUpdate':
+      await newRoot.insertPath(filename, buffer, FILEMODE.BLOB, { allowUpdate: true, allowCreate: true } );
+      break;
     default:
-      await newRoot.insertPath(filename, buffer, FILEMODE.BLOB);
+      await newRoot.insertPath(filename, buffer, FILEMODE.BLOB, { allowUpdate: true, allowCreate: true } );
       break;
     }
   }

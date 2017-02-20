@@ -29,33 +29,47 @@ class MutableTree {
   }
 
   // object is a Blob, MutableBlob, Tree, or MutableTree
-  insert(filename, object, filemode, createOnly) {
-    if (createOnly && this.entryByName(filename)) {
-      let err = new Error(`Refusing to overwrite ${filename}`);
-      err.message = 'overwriteRejected';
-      throw err;
-    }
+  insert(filename, object, filemode) {
     let entry = new NewEntry(this.repo, object, filemode);
     this.overlay.set(filename, entry);
     return entry;
   }
-  async insertPath(path, object, filemode, createOnly) {
+
+  async insertPath(path, object, filemode, { allowCreate, allowUpdate }) {
     let parts = path.split('/');
     let here = this;
+
     while (parts.length > 1) {
       let dirName = parts.shift();
       let entry = here.entryByName(dirName);
       if (!entry || !entry.isTree()) {
+        if (!allowCreate) {
+          let err = new Error(`${path} does not exist`);
+          err.message = 'notFound';
+          throw err;
+        }
         entry = here.insert(dirName, new MutableTree(here.repo, null), FILEMODE.TREE);
       }
       here = await entry.getTree();
     }
-    if (object) {
-      return here.insert(parts[0], object, filemode, createOnly);
-    } else {
-      here.overlay.set(parts[0], tombstone);
+
+    let have = here.entryByName(parts[0]);
+
+    if (!allowUpdate && have && have !== tombstone) {
+      let err = new Error(`Refusing to overwrite ${path}`);
+      err.message = 'overwriteRejected';
+      throw err;
     }
+
+    if (!allowCreate && (!have || have === tombstone)) {
+      let err = new Error(`${path} does not exist`);
+      err.message = 'notFound';
+      throw err;
+    }
+
+    return here.insert(parts[0], object, filemode);
   }
+
   async deletePath(path) {
     let parts = path.split('/');
     let here = this;

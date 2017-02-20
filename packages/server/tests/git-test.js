@@ -382,4 +382,70 @@ describe('git', function() {
 
   });
 
+
+  it('rejects double deletion of directory', async function() {
+    let { repo, head } = await makeRepo(path, [{
+      changes: [
+        {
+          filename: 'outer/sample.txt',
+          buffer: Buffer.from('sample', 'utf8')
+        }
+      ]}
+    ]);
+    let updates = [
+      {
+        operation: 'delete',
+        filename: 'outer'
+      },
+      {
+        operation: 'delete',
+        filename: 'outer'
+      }
+    ];
+
+    try {
+      await git.mergeCommit(repo, head, 'master', updates, commitOpts({ message: 'Deleting' }));
+      throw new Error("should not get here");
+    } catch (err) {
+      expect(err.message).to.equal('notFound');
+    }
+
+  });
+
+  it('rejects update within missing directory', async function() {
+    let { repo, head } = await makeRepo(path);
+    let updates = [
+      {
+        operation: 'update',
+        filename: 'outer/sample.txt',
+        buffer: Buffer.from('sample', 'utf8')
+      }
+    ];
+
+    try {
+      await git.mergeCommit(repo, head, 'master', updates, commitOpts({ message: 'updating' }));
+      throw new Error("should not get here");
+    } catch (err) {
+      expect(err.message).to.equal('notFound');
+    }
+  });
+
+  it('rejects update of missing file', async function() {
+    let { repo, head } = await makeRepo(path);
+    let updates = [
+      {
+        operation: 'update',
+        filename: 'sample.txt',
+        buffer: Buffer.from('sample', 'utf8')
+      }
+    ];
+
+    try {
+      await git.mergeCommit(repo, head, 'master', updates, commitOpts({ message: 'updating' }));
+      throw new Error("should not get here");
+    } catch (err) {
+      expect(err.message).to.equal('notFound');
+    }
+  });
+
 });
