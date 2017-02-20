@@ -22,9 +22,8 @@
             "cwd": "${workspaceRoot}",
             "args": [
                 "-r",
-                "tests/prepare.js",
-                "tests/**/*-test.js",
-                "tests/*-test.js"
+                "packages/test-support/prepare.js",
+                "packages/*/tests/*-test.js"
             ],
             "runtimeArgs": [
                 "--harmony"
