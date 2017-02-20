@@ -33,6 +33,9 @@ class RepoExplorer {
   async getContents(refSpec, path) {
     return (await this.runGit('show', `${refSpec}:${path}`)).stdout;
   }
+  async getJSONContents(refSpec, path) {
+    return JSON.parse((await this.runGit('show', `${refSpec}:${path}`)).stdout);
+  }
   async listTree(refSpec, path) {
     let contents = (await this.runGit('ls-tree', `${refSpec}:${path}`)).stdout;
     return contents.split("\n").filter(line => line.length > 0).map(line => {
