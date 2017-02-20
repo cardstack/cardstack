@@ -47,8 +47,10 @@ async function makeCommit(repo, parentCommit, operations, commitOpts) {
     case 'create':
       await newRoot.insertPath(filename, buffer, FILEMODE.BLOB, true);
       break;
-    case 'update':
     case 'delete':
+      await newRoot.deletePath(filename);
+      break;
+    case 'update':
     default:
       await newRoot.insertPath(filename, buffer, FILEMODE.BLOB);
       break;

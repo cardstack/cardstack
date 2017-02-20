@@ -232,6 +232,7 @@ describe('git', function() {
 
     let updates = [
       {
+        operation: 'delete',
         filename: 'sample.txt'
       }
     ];
@@ -268,6 +269,7 @@ describe('git', function() {
 
     let updates = [
       {
+        operation: 'delete',
         filename: 'outer/sample.txt'
       }
     ];
@@ -302,6 +304,7 @@ describe('git', function() {
 
     let updates = [
       {
+        operation: 'delete',
         filename: 'outer/sample.txt'
       }
     ];
@@ -312,5 +315,71 @@ describe('git', function() {
     expect(listing).to.deep.equal([]);
   });
 
+  it('rejects deletion within missing directory', async function() {
+    let { repo, head } = await makeRepo(path);
+    let updates = [
+      {
+        operation: 'delete',
+        filename: 'outer/sample.txt'
+      }
+    ];
+
+    try {
+      await git.mergeCommit(repo, head, 'master', updates, commitOpts({ message: 'Deleting' }));
+      throw new Error("should not get here");
+    } catch (err) {
+      expect(err.message).to.equal('notFound');
+    }
+
+  });
+
+
+  it('rejects deletion of missing file', async function() {
+    let { repo, head } = await makeRepo(path);
+    let updates = [
+      {
+        operation: 'delete',
+        filename: 'sample.txt'
+      }
+    ];
+
+    try {
+      await git.mergeCommit(repo, head, 'master', updates, commitOpts({ message: 'Deleting' }));
+      throw new Error("should not get here");
+    } catch (err) {
+      expect(err.message).to.equal('notFound');
+    }
+
+  });
+
+
+  it('rejects double deletion file', async function() {
+    let { repo, head } = await makeRepo(path, [{
+      changes: [
+        {
+          filename: 'outer/sample.txt',
+          buffer: Buffer.from('sample', 'utf8')
+        }
+      ]}
+    ]);
+    let updates = [
+      {
+        operation: 'delete',
+        filename: 'outer/sample.txt'
+      },
+      {
+        operation: 'delete',
+        filename: 'outer/sample.txt'
+      }
+    ];
+
+    try {
+      await git.mergeCommit(repo, head, 'master', updates, commitOpts({ message: 'Deleting' }));
+      throw new Error("should not get here");
+    } catch (err) {
+      expect(err.message).to.equal('notFound');
+    }
+
+  });
 
 });

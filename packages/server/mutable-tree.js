@@ -56,6 +56,27 @@ class MutableTree {
       here.overlay.set(parts[0], tombstone);
     }
   }
+  async deletePath(path) {
+    let parts = path.split('/');
+    let here = this;
+    while (parts.length > 1) {
+      let dirName = parts.shift();
+      let entry = here.entryByName(dirName);
+      if (!entry || !entry.isTree()) {
+        let err = new Error(`No such directory ${path}`);
+        err.message = `notFound`;
+        throw err;
+      }
+      here = await entry.getTree();
+    }
+    let have = here.entryByName(parts[0]);
+    if (!have || have === tombstone) {
+      let err = new Error(`No such file ${path}`);
+      err.message = `notFound`;
+      throw err;
+    }
+    here.overlay.set(parts[0], tombstone);
+  }
   async write(allowEmpty=false) {
     if (this.overlay.size === 0 && this.tree) {
       return this.tree;
