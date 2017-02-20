@@ -97,6 +97,36 @@ describe('git', function() {
 
   });
 
+  it('can detect unintended filename collision', async function() {
+    let { repo, head } = await makeRepo(path, [
+      {
+        changes: [
+          {
+            filename: 'sample.txt',
+            buffer: Buffer.from('sample', 'utf8'),
+            createOnly: true
+          }
+        ]
+      }
+    ]);
+
+
+    let updatedContent = [
+      {
+        filename: 'sample.txt',
+        buffer: Buffer.from('This is a file', 'utf8'),
+        createOnly: true
+      }
+    ];
+    try {
+      await git.mergeCommit(repo, head, 'master', updatedContent, commitOpts({ message: 'Second commit' }));
+      throw new Error("should not get here");
+    } catch (err) {
+      expect(err.message).to.equal('overwriteRejected');
+    }
+  });
+
+
   it('non-fast-forward merge some new content', async function() {
     let repo = await git.createEmptyRepo(path, commitOpts({
       message: 'First commit'

@@ -29,12 +29,17 @@ class MutableTree {
   }
 
   // object is a Blob, MutableBlob, Tree, or MutableTree
-  insert(filename, object, filemode) {
+  insert(filename, object, filemode, createOnly) {
+    if (createOnly && this.entryByName(filename)) {
+      let err = new Error(`Refusing to overwrite ${filename}`);
+      err.message = 'overwriteRejected';
+      throw err;
+    }
     let entry = new NewEntry(this.repo, object, filemode);
     this.overlay.set(filename, entry);
     return entry;
   }
-  async insertPath(path, object, filemode) {
+  async insertPath(path, object, filemode, createOnly) {
     let parts = path.split('/');
     let here = this;
     while (parts.length > 1) {
@@ -46,7 +51,7 @@ class MutableTree {
       here = await entry.getTree();
     }
     if (object) {
-      return here.insert(parts[0], object, filemode);
+      return here.insert(parts[0], object, filemode, createOnly);
     } else {
       here.overlay.set(parts[0], tombstone);
     }
