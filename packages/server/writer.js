@@ -7,6 +7,7 @@ const crypto = require('crypto');
 const git = require('./git');
 const os = require('os');
 const process = require('process');
+const Error = require('./error');
 
 module.exports = class Writer {
   constructor({ repoPath, idGenerator }) {
@@ -35,6 +36,15 @@ module.exports = class Writer {
           throw err;
         }
       }
+    }
+  }
+
+  async update(branch, user, document) {
+    if (!document.meta || document.version.version == null) {
+      throw new Error('missing required information', {
+        status: 400,
+        source: { pointer: '/data/meta/version' }
+      });
     }
   }
 

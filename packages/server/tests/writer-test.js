@@ -105,4 +105,21 @@ describe('writer', function() {
     expect(record).has.property('id', '2');
   });
 
+  it('refuses to update without meta version', async function() {
+    try {
+      await writer.update('master', user, {
+        id: '1',
+        type: 'articles',
+        attributes: {
+          title: 'Updated title'
+        }
+      });
+      throw new Error("should not get here");
+    } catch (err) {
+      expect(err.status).to.equal(400);
+      expect(err.detail).to.match(/missing required information/);
+      expect(err.source).to.deep.equal({ pointer: '/data/meta/version' });
+    }
+  });
+
 });
