@@ -42,6 +42,7 @@ describe('indexer', function() {
 
     let updatedContent = [
       {
+        operation: 'create',
         filename: 'contents/articles/hello-world.json',
         buffer: Buffer.from(JSON.stringify({
           hello: 'world'
@@ -64,6 +65,7 @@ describe('indexer', function() {
 
     let updatedContent = [
       {
+        operation: 'create',
         filename: 'contents/articles/hello-world.json',
         buffer: Buffer.from(JSON.stringify({
           hello: 'world'
@@ -87,6 +89,7 @@ describe('indexer', function() {
       {
         changes: [
           {
+            operation: 'create',
             filename: 'contents/articles/hello-world.json',
             buffer: Buffer.from(JSON.stringify({
               hello: 'world'
@@ -105,6 +108,7 @@ describe('indexer', function() {
 
     let updatedContent = [
       {
+        operation: 'create',
         filename: 'contents/articles/second.json',
         buffer: Buffer.from(JSON.stringify({
           second: 'document'
@@ -125,6 +129,7 @@ describe('indexer', function() {
       {
         changes: [
           {
+            operation: 'create',
             filename: 'contents/articles/hello-world.json',
             buffer: Buffer.from(JSON.stringify({
               hello: 'world'
@@ -138,6 +143,7 @@ describe('indexer', function() {
 
     let updatedContent = [
       {
+        operation: 'delete',
         filename: 'contents/articles/hello-world.json'
       }
     ];

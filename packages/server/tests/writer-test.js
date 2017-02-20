@@ -47,6 +47,7 @@ describe('writer', function() {
     await makeRepo(root, [
       {
         changes: fixtures.map(f => ({
+          operation: 'create',
           filename: `contents/${f.type}/${f.id}.json`,
           buffer: Buffer.from(JSON.stringify(f.content), 'utf8')
         }))

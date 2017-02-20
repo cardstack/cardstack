@@ -48,6 +48,7 @@ module.exports = class Indexer {
     await this._ensureRepo();
     await git.mergeCommit(this.repo, null, branch, [
       {
+        operation: 'create',
         filename: `contents/${document.type}/${id}.json`,
         buffer: Buffer.from(JSON.stringify(document.attributes), 'utf8')
       }
