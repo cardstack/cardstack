@@ -4,7 +4,6 @@ const Searcher = require('@cardstack/server/searcher');
 const { inES, host } = require('./elastic-assertions');
 const elasticsearch = host();
 const { makeRepo } = require('./git-assertions');
-const REALTIME = true;
 
 describe('searcher', function() {
 
@@ -55,7 +54,7 @@ describe('searcher', function() {
         }))
       }
     ]);
-    await indexer.update(REALTIME);
+    await indexer.update({ realTime: true });
   });
 
   after(async function() {

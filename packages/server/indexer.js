@@ -1,9 +1,22 @@
 /*
-  Indexer deals with indexing documents. It's public API consists of:
+  Indexer deals with indexing documents. It's public API is just
+  `update`, which is responsible for getting any new upstream content
+  into the search index.
 
-    update: indexings changes from a git repo
+  update takes these optional arguments:
 
-    search: get documents back out of the index
+    - realTime: when true, update will block until the resulting
+      changes are visible in elasticsearch. This is somewhat
+      expensive, which is why we make it optional. Most of the time
+      non-realtime is good enough and much faster. Defaults to false.
+
+    - hints: can contain a list of `{ id, type }` references. This is
+      intended as an optimization hint when we know that certain
+      resources are the ones that likely need to be indexed right
+      away. Indexers are responsible for discovering and indexing
+      arbitrary upstream changes regardless of this hint, but the hint
+      can make it easier to keep the search index nearly real-time
+      fresh.
 
 */
 
@@ -43,7 +56,7 @@ module.exports = class Indexer {
     helpful particularly in automated test scenarios.
 
   */
-  async update(realTime=false) {
+  async update({ realTime /* , hints */ } = {}) {
     await this._ensureRepo();
     let branches = await this._branches();
     await Promise.all(branches.map(branch => this._updateBranch(branch, realTime)));
