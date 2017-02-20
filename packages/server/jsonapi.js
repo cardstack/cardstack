@@ -1,9 +1,5 @@
-const Koa = require('koa');
-
-module.exports = function makeApp() {
-  let app = new Koa();
-
-  app.use(async (ctx) => {
+module.exports = function() {
+  return async (ctx) => {
     ctx.body = {
       data: [
         {
@@ -15,7 +11,5 @@ module.exports = function makeApp() {
         }
       ]
     };
-  });
-
-  return app;
+  };
 };

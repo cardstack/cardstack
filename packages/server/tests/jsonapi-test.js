@@ -1,12 +1,14 @@
 const jsonapi = require('@cardstack/server/jsonapi');
 const supertest = require('supertest');
+const Koa = require('koa');
 
 describe('jsonapi', function() {
 
   let request;
 
-  beforeEach(function() {
-    let app = jsonapi();
+  beforeEach(async function() {
+    let app = new Koa();
+    app.use(jsonapi());
     request = supertest(app.callback());
   }),
 

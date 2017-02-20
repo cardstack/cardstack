@@ -17,7 +17,7 @@
   },
   "scripts": {
     "test": "mocha --harmony -r packages/test-support/prepare.js packages/*/tests/*-test.js",
-    "server": "node --harmony bin/server.js"
+    "server": "node --harmony packages/server/bin/server.js"
   },
   "dependencies": {
     "elasticsearch": "^12.1.3",
