@@ -20,8 +20,8 @@ module.exports = class Writer {
     this.idGenerator = idGenerator;
   }
 
-  async create(branch, user, document) {
-    this._requireType(document);
+  async create(branch, user, type, document) {
+    this._requireType(type, document);
     return this._withErrorHandling(document, async () => {
       while (true) {
         try {
@@ -49,8 +49,8 @@ module.exports = class Writer {
     });
   }
 
-  async update(branch, user, document) {
-    this._requireType(document);
+  async update(branch, user, type, id, document) {
+    this._requireType(type, document);
     this._requireId(document);
     this._requireVersion(document);
     await this._ensureRepo();
@@ -134,10 +134,16 @@ module.exports = class Writer {
     }
   }
 
-  _requireType(document) {
+  _requireType(type, document) {
     if (document.type == null) {
       throw new Error('missing required field', {
         status: 400,
+        source: { pointer: '/data/type' }
+      });
+    }
+    if (document.type !== type) {
+      throw new Error(`the type "${document.type}" is not allowed here`, {
+        status: 409,
         source: { pointer: '/data/type' }
       });
     }

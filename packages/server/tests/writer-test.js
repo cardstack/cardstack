@@ -61,7 +61,7 @@ describe('writer', function() {
   });
 
   it('saves attributes when creating a record', async function () {
-    let record = await writer.create('master', user, {
+    let record = await writer.create('master', user, 'articles', {
       type: 'articles',
       attributes: {
         title: 'Second Article'
@@ -74,7 +74,7 @@ describe('writer', function() {
   });
 
   it('returns correct document when creating a record', async function () {
-    let record = await writer.create('master', user, {
+    let record = await writer.create('master', user, 'articles', {
       type: 'articles',
       attributes: {
         title: 'Second Article'
@@ -96,7 +96,7 @@ describe('writer', function() {
       }
     });
 
-    let record = await writer.create('master', user, {
+    let record = await writer.create('master', user, 'articles', {
       type: 'articles',
       attributes: {
         title: 'Second Article'
@@ -107,7 +107,7 @@ describe('writer', function() {
   });
 
   it('allows optional clientside id', async function() {
-    let record = await writer.create('master', user, {
+    let record = await writer.create('master', user, 'articles', {
       id: 'special',
       type: 'articles',
       attributes: {
@@ -121,7 +121,7 @@ describe('writer', function() {
 
   it('rejects conflicting clientside id', async function() {
     try {
-      await writer.create('master', user, {
+      await writer.create('master', user, 'articles', {
         id: '1',
         type: 'articles',
         attributes: {
@@ -139,9 +139,9 @@ describe('writer', function() {
     }
   });
 
-  it('requires type during create', async function() {
+  it('requires type in body during create', async function() {
     try {
-      await writer.create('master', user, {
+      await writer.create('master', user, 'articles', {
         id: '1',
         attributes: {
           title: 'Second Article'
@@ -158,9 +158,29 @@ describe('writer', function() {
     }
   });
 
-  it('requires id on update documents', async function() {
+  it('rejects mismatched type during create', async function() {
     try {
-      await writer.update('master', user, {
+      await writer.create('master', user, 'articles', {
+        id: '1',
+        type: 'events',
+        attributes: {
+          title: 'Second Article'
+        }
+      });
+      throw new Error("should not get here");
+    } catch (err) {
+      if (!err.status) {
+        throw err;
+      }
+      expect(err.status).to.equal(409);
+      expect(err.detail).to.match(/the type "events" is not allowed here/);
+      expect(err.source).to.deep.equal({ pointer: '/data/type' });
+    }
+  });
+
+  it('requires id in body during update', async function() {
+    try {
+      await writer.update('master', user, 'articles', '1', {
         type: 'articles',
         attributes: {
           title: 'Updated title'
@@ -177,9 +197,9 @@ describe('writer', function() {
     }
   });
 
-  it('requires type during update', async function() {
+  it('requires type in body during update', async function() {
     try {
-      await writer.update('master', user, {
+      await writer.update('master', user, 'articles', '1', {
         id: '1',
         attributes: {
           title: 'Updated title'
@@ -199,9 +219,32 @@ describe('writer', function() {
     }
   });
 
+  it('rejects mismatched type during update', async function() {
+    try {
+      await writer.update('master', user, 'articles', '1', {
+        id: '1',
+        type: 'events',
+        attributes: {
+          title: 'Updated title'
+        },
+        meta: {
+          version: headId
+        }
+      });
+      throw new Error("should not get here");
+    } catch (err) {
+      if (!err.status) {
+        throw err;
+      }
+      expect(err.status).to.equal(409);
+      expect(err.detail).to.match(/the type "events" is not allowed here/);
+      expect(err.source).to.deep.equal({ pointer: '/data/type' });
+    }
+  });
+
   it('rejects update of missing document', async function() {
     try {
-      await writer.update('master', user, {
+      await writer.update('master', user, 'articles', '10', {
         id: '10',
         type: 'articles',
         attributes: {
@@ -238,7 +281,7 @@ describe('writer', function() {
         if (meta !== undefined) {
           doc.meta = meta;
         }
-        await writer.update('master', user, doc);
+        await writer.update('master', user, 'articles', '1', doc);
         throw new Error("should not get here");
       } catch (err) {
         expect(err.status).to.equal(400);
@@ -253,7 +296,7 @@ describe('writer', function() {
   for (let version of badVersions) {
     it(`rejects invalid version ${version}`, async function() {
       try {
-        await writer.update('master', user, {
+        await writer.update('master', user, 'articles', '1', {
           id: '1',
           type: 'articles',
           attributes: {
@@ -275,7 +318,7 @@ describe('writer', function() {
   }
 
   it('returns updated document', async function() {
-    let record = await writer.update('master', user, {
+    let record = await writer.update('master', user, 'articles', '1', {
       id: '1',
       type: 'articles',
       attributes: {
@@ -290,7 +333,7 @@ describe('writer', function() {
   });
 
   it('stores updated attribute', async function() {
-    await writer.update('master', user, {
+    await writer.update('master', user, 'articles', '1', {
       id: '1',
       type: 'articles',
       attributes: {
@@ -305,7 +348,7 @@ describe('writer', function() {
   });
 
   it('reports merge conflict during update', async function() {
-    await writer.update('master', user, {
+    await writer.update('master', user, 'articles', '1', {
       id: '1',
       type: 'articles',
       attributes: {
@@ -317,7 +360,7 @@ describe('writer', function() {
     });
 
     try {
-      await writer.update('master', user, {
+      await writer.update('master', user, 'articles', '1', {
         id: '1',
         type: 'articles',
         attributes: {
