@@ -1,8 +1,10 @@
 const temp = require('@cardstack/data-source/tests/temp-helper');
-const Indexer = require('@cardstack/git/indexer');
-const Searcher = require('@cardstack/server/searcher');
+const Searcher = require('@cardstack/elasticsearch/searcher');
 const { inES, host } = require('@cardstack/data-source/tests/elastic-assertions');
 const elasticsearch = host();
+
+// These are test-only dependencies.
+const Indexer = require('@cardstack/git/indexer');
 const { makeRepo } = require('@cardstack/git/tests/support');
 
 describe('searcher', function() {
