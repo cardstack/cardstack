@@ -400,6 +400,19 @@ describe('writer', function() {
       }
     });
 
+    it('requires version', async function() {
+      try {
+        await writer.delete('master', user, null, 'articles', '1');
+        throw new Error("should not get here");
+      } catch (err) {
+        if (!err.status) {
+          throw err;
+        }
+        expect(err.status).to.equal(400);
+        expect(err.detail).to.match(/version is required/);
+      }
+    });
+
     let badVersions = ["0", "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa", "not-a-version"];
     for (let version of badVersions) {
       it(`rejects invalid version ${version}`, async function() {

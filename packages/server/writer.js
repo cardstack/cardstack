@@ -51,8 +51,18 @@ module.exports = class Writer {
 
   async update(branch, user, type, id, document) {
     this._requireType(type, document);
-    this._requireId(document);
-    this._requireVersion(document);
+    if (document.id == null) {
+      throw new Error('missing required field', {
+        status: 400,
+        source: { pointer: '/data/id' }
+      });
+    }
+    if (!document.meta || !document.meta.version) {
+      throw new Error('missing required field', {
+        status: 400,
+        source: { pointer: '/data/meta/version' }
+      });
+    }
     await this._ensureRepo();
     return this._withErrorHandling(id, type, async () => {
       let commitId = await git.mergeCommit(this.repo, document.meta.version, branch, [
@@ -74,6 +84,16 @@ module.exports = class Writer {
   }
 
   async delete(branch, user, version, type, id) {
+    if (id == null) {
+      throw new Error('id is required', {
+        status: 400
+      });
+    }
+    if (!version) {
+      throw new Error('version is required', {
+        status: 400
+      });
+    }
     await this._ensureRepo();
     return this._withErrorHandling(id, type, async () => {
       await git.mergeCommit(this.repo, version, branch, [
@@ -125,24 +145,6 @@ module.exports = class Writer {
         });
       }
       throw err;
-    }
-  }
-
-  _requireVersion(document) {
-    if (!document.meta || !document.meta.version) {
-      throw new Error('missing required field', {
-        status: 400,
-        source: { pointer: '/data/meta/version' }
-      });
-    }
-  }
-
-  _requireId(document) {
-    if (document.id == null) {
-      throw new Error('missing required field', {
-        status: 400,
-        source: { pointer: '/data/id' }
-      });
     }
   }
 
