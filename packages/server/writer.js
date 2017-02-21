@@ -21,64 +21,45 @@ module.exports = class Writer {
   }
 
   async create(branch, user, document) {
-    while (true) {
-      try {
-        // 20 bytes is good enough for git, so it's good enough for
-        // me. In practice we probably have a lower collision
-        // probability too, because we're allowed to retry if we know
-        // the id is already in use (so we can really only collide
-        // with things that have not yet merged into our branch).
-        let id;
-        if (document.id == null) {
-          id = this._generateId();
-        } else {
-          id = document.id;
-        }
-        let doc = await this._create(branch, user, document, id);
-        return doc;
-      } catch(err) {
-        if (err instanceof git.OverwriteRejected) {
+    return this._withErrorHandling(document, async () => {
+      while (true) {
+        try {
+          // 20 bytes is good enough for git, so it's good enough for
+          // me. In practice we probably have a lower collision
+          // probability too, because we're allowed to retry if we know
+          // the id is already in use (so we can really only collide
+          // with things that have not yet merged into our branch).
+          let id;
           if (document.id == null) {
+            id = this._generateId();
+          } else {
+            id = document.id;
+          }
+          let doc = await this._create(branch, user, document, id);
+          return doc;
+        } catch(err) {
+          if (err instanceof git.OverwriteRejected && document.id == null) {
             // ignore so our loop can retry
           } else {
-            throw new Error(`id ${document.id} is already in use`, { status: 409, source: { pointer: '/data/id'}});
+            throw err;
           }
-        } else {
-          throw err;
         }
       }
-    }
+    });
   }
 
   async update(branch, user, document) {
-    if (!document.meta || !document.meta.version) {
-      throw new Error('missing required field', {
-        status: 400,
-        source: { pointer: '/data/meta/version' }
-      });
-    }
-    if (document.id == null) {
-      throw new Error('missing required field', {
-        status: 400,
-        source: { pointer: '/data/id' }
-      });
-    }
-    let commitOpts = {
-      authorName: user.fullName,
-      authorEmail: user.email,
-      committerName: this.myName,
-      committerEmail: this.myEmail,
-      message: `create ${document.type} ${document.id.slice(12)}`
-    };
+    this._requireVersion(document);
+    this._requireId(document);
     await this._ensureRepo();
-    try {
+    return this._withErrorHandling(document, async () => {
       let commitId = await git.mergeCommit(this.repo, document.meta.version, branch, [
         {
           operation: 'update',
           filename: `contents/${document.type}/${document.id}.json`,
           buffer: Buffer.from(JSON.stringify(document.attributes), 'utf8')
         }
-      ], commitOpts);
+      ], this._commitOptions(document, user, document.id));
       return {
         id: document.id,
         type: document.type,
@@ -87,25 +68,10 @@ module.exports = class Writer {
           version: commitId
         }
       };
-    } catch (err) {
-      if (/Unable to parse OID/.test(err.message) || /Object not found/.test(err.message)) {
-        throw new Error(err.message, { status: 400, source: { pointer: '/data/meta/version' }});
-      }
-      if (err instanceof git.GitConflict) {
-        throw new Error("Merge conflict", { status: 409 });
-      }
-      throw err;
-    }
+    });
   }
 
   async _create(branch, user, document, id) {
-    let commitOpts = {
-      authorName: user.fullName,
-      authorEmail: user.email,
-      committerName: this.myName,
-      committerEmail: this.myEmail,
-      message: `create ${document.type} ${id.slice(12)}`
-    };
     await this._ensureRepo();
     let commitId = await git.mergeCommit(this.repo, null, branch, [
       {
@@ -113,7 +79,7 @@ module.exports = class Writer {
         filename: `contents/${document.type}/${id}.json`,
         buffer: Buffer.from(JSON.stringify(document.attributes), 'utf8')
       }
-    ], commitOpts);
+    ], this._commitOptions(document, user, id));
 
     return {
       id,
@@ -122,6 +88,51 @@ module.exports = class Writer {
       meta: {
         version: commitId
       }
+    };
+  }
+
+  async _withErrorHandling(document, fn) {
+    try {
+      return await fn();
+    } catch (err) {
+      if (/Unable to parse OID/.test(err.message) || /Object not found/.test(err.message)) {
+        throw new Error(err.message, { status: 400, source: { pointer: '/data/meta/version' }});
+      }
+      if (err instanceof git.GitConflict) {
+        throw new Error("Merge conflict", { status: 409 });
+      }
+      if (err instanceof git.OverwriteRejected) {
+        throw new Error(`id ${document.id} is already in use`, { status: 409, source: { pointer: '/data/id'}});
+      }
+      throw err;
+    }
+  }
+
+  _requireVersion(document) {
+    if (!document.meta || !document.meta.version) {
+      throw new Error('missing required field', {
+        status: 400,
+        source: { pointer: '/data/meta/version' }
+      });
+    }
+  }
+
+  _requireId(document) {
+    if (document.id == null) {
+      throw new Error('missing required field', {
+        status: 400,
+        source: { pointer: '/data/id' }
+      });
+    }
+  }
+
+  _commitOptions(document, user, id) {
+    return {
+      authorName: user.fullName,
+      authorEmail: user.email,
+      committerName: this.myName,
+      committerEmail: this.myEmail,
+      message: `create ${document.type} ${id.slice(12)}`
     };
   }
 
