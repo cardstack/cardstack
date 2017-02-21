@@ -30,7 +30,7 @@ const {
 const { safeEntryByName } = require('./mutable-tree');
 
 const logger = require('heimdalljs-logger');
-const makeClient = require('./elastic-client');
+const makeClient = require('@cardstack/data-source/elastic-client');
 const { isEqual } = require('lodash');
 const BulkOps = require('./bulk-ops');
 

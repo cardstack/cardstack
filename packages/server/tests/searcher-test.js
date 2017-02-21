@@ -1,9 +1,9 @@
-const temp = require('./temp-helper');
-const Indexer = require('@cardstack/server/indexer');
+const temp = require('@cardstack/data-source/tests/temp-helper');
+const Indexer = require('@cardstack/git/indexer');
 const Searcher = require('@cardstack/server/searcher');
-const { inES, host } = require('./elastic-assertions');
+const { inES, host } = require('@cardstack/data-source/tests/elastic-assertions');
 const elasticsearch = host();
-const { makeRepo } = require('./git-assertions');
+const { makeRepo } = require('@cardstack/git/tests/support');
 
 describe('searcher', function() {
 

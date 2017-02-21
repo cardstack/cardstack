@@ -4,10 +4,10 @@ const {
 
 const logger = require('heimdalljs-logger');
 const crypto = require('crypto');
-const git = require('./git');
+const git = require('./merge');
 const os = require('os');
 const process = require('process');
-const Error = require('./error');
+const Error = require('@cardstack/data-source/error');
 
 module.exports = class Writer {
   constructor({ repoPath, idGenerator }) {

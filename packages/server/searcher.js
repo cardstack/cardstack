@@ -1,4 +1,4 @@
-const makeClient = require('./elastic-client');
+const makeClient = require('@cardstack/data-source/elastic-client');
 const logger = require('heimdalljs-logger');
 
 class Searcher {

@@ -1,6 +1,6 @@
-const temp = require('./temp-helper');
-const Writer = require('@cardstack/server/writer');
-const { makeRepo, inRepo } = require('./git-assertions');
+const temp = require('@cardstack/data-source/tests/temp-helper');
+const Writer = require('@cardstack/git/writer');
+const { makeRepo, inRepo } = require('./support');
 
 describe('writer', function() {
 

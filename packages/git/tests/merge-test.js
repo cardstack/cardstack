@@ -1,11 +1,11 @@
-const git = require('@cardstack/server/git');
+const git = require('@cardstack/git/merge');
 const ngit = require('nodegit');
-const temp = require('./temp-helper');
+const temp = require('@cardstack/data-source/tests/temp-helper');
 const {
   inRepo,
   commitOpts,
   makeRepo
-}= require('./git-assertions');
+}= require('./support');
 const moment = require('moment-timezone');
 
 describe('git', function() {
