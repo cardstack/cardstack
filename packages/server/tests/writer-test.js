@@ -239,5 +239,37 @@ describe('writer', function() {
       .property('title', 'Updated title');
   });
 
+  it('reports merge conflict during update', async function() {
+    await writer.update('master', user, {
+      id: '1',
+      type: 'articles',
+      attributes: {
+        title: 'Updated title'
+      },
+      meta: {
+        version: headId
+      }
+    });
+
+    try {
+      await writer.update('master', user, {
+        id: '1',
+        type: 'articles',
+        attributes: {
+          title: 'Conflicting title'
+        },
+        meta: {
+          version: headId
+        }
+      });
+      throw new Error("should not get here");
+    } catch (err) {
+      if (!err.status) {
+        throw err;
+      }
+      expect(err.status).to.equal(409);
+      expect(err.detail).to.match(/merge conflict/i);
+    }
+  });
 
 });

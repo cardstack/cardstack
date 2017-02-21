@@ -91,6 +91,9 @@ module.exports = class Writer {
       if (/Unable to parse OID/.test(err.message) || /Object not found/.test(err.message)) {
         throw new Error(err.message, { status: 400, source: { pointer: '/data/meta/version' }});
       }
+      if (err instanceof git.GitConflict) {
+        throw new Error("Merge conflict", { status: 409 });
+      }
       throw err;
     }
   }
