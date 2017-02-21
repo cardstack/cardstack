@@ -41,7 +41,7 @@ module.exports = class Writer {
 
   async update(branch, user, document) {
     if (!document.meta || document.version.version == null) {
-      throw new Error('missing required information', {
+      throw new Error('missing required field', {
         status: 400,
         source: { pointer: '/data/meta/version' }
       });

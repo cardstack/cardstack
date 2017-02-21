@@ -117,7 +117,7 @@ describe('writer', function() {
       throw new Error("should not get here");
     } catch (err) {
       expect(err.status).to.equal(400);
-      expect(err.detail).to.match(/missing required information/);
+      expect(err.detail).to.match(/missing required field/);
       expect(err.source).to.deep.equal({ pointer: '/data/meta/version' });
     }
   });
