@@ -21,6 +21,7 @@ module.exports = class Writer {
   }
 
   async create(branch, user, document) {
+    this._requireType(document);
     return this._withErrorHandling(document, async () => {
       while (true) {
         try {
@@ -49,8 +50,9 @@ module.exports = class Writer {
   }
 
   async update(branch, user, document) {
-    this._requireVersion(document);
+    this._requireType(document);
     this._requireId(document);
+    this._requireVersion(document);
     await this._ensureRepo();
     return this._withErrorHandling(document, async () => {
       let commitId = await git.mergeCommit(this.repo, document.meta.version, branch, [
@@ -104,6 +106,12 @@ module.exports = class Writer {
       if (err instanceof git.OverwriteRejected) {
         throw new Error(`id ${document.id} is already in use`, { status: 409, source: { pointer: '/data/id'}});
       }
+      if (err instanceof git.NotFound) {
+        throw new Error(`${document.type} with id ${document.id} does not exist`, {
+          status: 404,
+          source: { pointer: '/data/id' }
+        });
+      }
       throw err;
     }
   }
@@ -122,6 +130,15 @@ module.exports = class Writer {
       throw new Error('missing required field', {
         status: 400,
         source: { pointer: '/data/id' }
+      });
+    }
+  }
+
+  _requireType(document) {
+    if (document.type == null) {
+      throw new Error('missing required field', {
+        status: 400,
+        source: { pointer: '/data/type' }
       });
     }
   }

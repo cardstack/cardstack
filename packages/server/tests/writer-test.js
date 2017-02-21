@@ -139,6 +139,25 @@ describe('writer', function() {
     }
   });
 
+  it('requires type during create', async function() {
+    try {
+      await writer.create('master', user, {
+        id: '1',
+        attributes: {
+          title: 'Second Article'
+        }
+      });
+      throw new Error("should not get here");
+    } catch (err) {
+      if (!err.status) {
+        throw err;
+      }
+      expect(err.status).to.equal(400);
+      expect(err.detail).to.match(/missing required field/);
+      expect(err.source).to.deep.equal({ pointer: '/data/type' });
+    }
+  });
+
   it('requires id on update documents', async function() {
     try {
       await writer.update('master', user, {
@@ -157,6 +176,52 @@ describe('writer', function() {
       expect(err.source).to.deep.equal({ pointer: '/data/id' });
     }
   });
+
+  it('requires type during update', async function() {
+    try {
+      await writer.update('master', user, {
+        id: '1',
+        attributes: {
+          title: 'Updated title'
+        },
+        meta: {
+          version: headId
+        }
+      });
+      throw new Error("should not get here");
+    } catch (err) {
+      if (!err.status) {
+        throw err;
+      }
+      expect(err.status).to.equal(400);
+      expect(err.detail).to.match(/missing required field/);
+      expect(err.source).to.deep.equal({ pointer: '/data/type' });
+    }
+  });
+
+  it('rejects update of missing document', async function() {
+    try {
+      await writer.update('master', user, {
+        id: '10',
+        type: 'articles',
+        attributes: {
+          title: 'Updated title'
+        },
+        meta: {
+          version: headId
+        }
+      });
+      throw new Error("should not get here");
+    } catch (err) {
+      if (!err.status) {
+        throw err;
+      }
+      expect(err.status).to.equal(404);
+      expect(err.title).to.match(/not found/i);
+      expect(err.source).to.deep.equal({ pointer: '/data/id' });
+    }
+  });
+
 
   let badMetas = [undefined, null, 0, 1, {}, { version: null }, { version: 0 }, { version: "" }];
 
