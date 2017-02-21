@@ -7,12 +7,14 @@
 
 */
 
+const { STATUS_CODES } = require('http');
+
 class E extends Error {
   constructor(detail, { status, title, source} = {}) {
     super(detail);
     this.detail = detail;
-    this.status = status;
-    this.title = title;
+    this.status = status || 500;
+    this.title = title || STATUS_CODES[status];
     this.source = source;
   }
 }
