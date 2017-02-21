@@ -28,11 +28,22 @@ module.exports = class Writer {
         // probability too, because we're allowed to retry if we know
         // the id is already in use (so we can really only collide
         // with things that have not yet merged into our branch).
-        let id = this._generateId();
+        let id;
+        if (document.id == null) {
+          id = this._generateId();
+        } else {
+          id = document.id;
+        }
         let doc = await this._create(branch, user, document, id);
         return doc;
       } catch(err) {
-        if (!(err instanceof git.OverwriteRejected)) {
+        if (err instanceof git.OverwriteRejected) {
+          if (document.id == null) {
+            // ignore so our loop can retry
+          } else {
+            throw new Error(`id ${document.id} is already in use`, { status: 409, source: { pointer: '/data/id'}});
+          }
+        } else {
           throw err;
         }
       }

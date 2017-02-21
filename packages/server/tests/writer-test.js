@@ -106,6 +106,39 @@ describe('writer', function() {
     expect(record).has.property('id', '2');
   });
 
+  it('allows optional clientside id', async function() {
+    let record = await writer.create('master', user, {
+      id: 'special',
+      type: 'articles',
+      attributes: {
+        title: 'Second Article'
+      }
+    });
+    expect(record).has.property('id', 'special');
+    let articles = (await inRepo(root).listTree('master', 'contents/articles')).map(a => a.name);
+    expect(articles).to.contain('special.json');
+  });
+
+  it('rejects conflicting clientside id', async function() {
+    try {
+      await writer.create('master', user, {
+        id: '1',
+        type: 'articles',
+        attributes: {
+          title: 'Second Article'
+        }
+      });
+      throw new Error("should not get here");
+    } catch (err) {
+      if (!err.status) {
+        throw err;
+      }
+      expect(err.status).to.equal(409);
+      expect(err.detail).to.match(/id 1 is already in use/);
+      expect(err.source).to.deep.equal({ pointer: '/data/id' });
+    }
+  });
+
   it('requires id on update documents', async function() {
     try {
       await writer.update('master', user, {
@@ -125,7 +158,9 @@ describe('writer', function() {
     }
   });
 
-  for (let meta of [undefined, null, 0, 1, {}, { version: null }, { version: 0 }, { version: "" }]) {
+  let badMetas = [undefined, null, 0, 1, {}, { version: null }, { version: 0 }, { version: "" }];
+
+  for (let meta of badMetas) {
     it(`refuses to update without meta version (${JSON.stringify(meta)})`, async function() {
       try {
         let doc = {
@@ -148,7 +183,9 @@ describe('writer', function() {
     });
   }
 
-  for (let version of ["0", "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa", "not-a-version"]) {
+  let badVersions = ["0", "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa", "not-a-version"];
+
+  for (let version of badVersions) {
     it(`rejects invalid version ${version}`, async function() {
       try {
         await writer.update('master', user, {
