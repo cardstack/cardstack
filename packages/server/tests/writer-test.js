@@ -384,4 +384,66 @@ describe('writer', function() {
       }
     });
   });
+
+  describe('delete', function() {
+
+    it('rejects missing document', async function() {
+      try {
+        await writer.delete('master', user, headId, 'articles', '10');
+        throw new Error("should not get here");
+      } catch (err) {
+        if (!err.status) {
+          throw err;
+        }
+        expect(err.status).to.equal(404);
+        expect(err.title).to.match(/not found/i);
+      }
+    });
+
+    let badVersions = ["0", "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa", "not-a-version"];
+    for (let version of badVersions) {
+      it(`rejects invalid version ${version}`, async function() {
+        try {
+          await writer.delete('master', user, version, 'articles', '1');
+          throw new Error("should not get here");
+        } catch (err) {
+          if (err.status == null) {
+            throw err;
+          }
+          expect(err.status).to.equal(400);
+          expect(err.source).to.deep.equal({ pointer: '/data/meta/version' });
+        }
+      });
+    }
+
+    it('deletes document', async function() {
+      await writer.delete('master', user, headId, 'people', '1');
+      let articles = (await inRepo(root).listTree('master', 'contents/people')).map(a => a.name);
+      expect(articles).to.not.contain('1.json');
+    });
+
+    it('reports merge conflict', async function() {
+      await writer.update('master', user, 'articles', '1', {
+        id: '1',
+        type: 'articles',
+        attributes: {
+          title: 'Updated title'
+        },
+        meta: {
+          version: headId
+        }
+      });
+
+      try {
+        await writer.delete('master', user, headId, 'articles', '1');
+        throw new Error("should not get here");
+      } catch (err) {
+        if (!err.status) {
+          throw err;
+        }
+        expect(err.status).to.equal(409);
+        expect(err.detail).to.match(/merge conflict/i);
+      }
+    });
+  });
 });

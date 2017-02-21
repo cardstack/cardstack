@@ -22,7 +22,7 @@ module.exports = class Writer {
 
   async create(branch, user, type, document) {
     this._requireType(type, document);
-    return this._withErrorHandling(document, async () => {
+    return this._withErrorHandling(document.id, type, async () => {
       while (true) {
         try {
           // 20 bytes is good enough for git, so it's good enough for
@@ -54,14 +54,14 @@ module.exports = class Writer {
     this._requireId(document);
     this._requireVersion(document);
     await this._ensureRepo();
-    return this._withErrorHandling(document, async () => {
+    return this._withErrorHandling(id, type, async () => {
       let commitId = await git.mergeCommit(this.repo, document.meta.version, branch, [
         {
           operation: 'update',
           filename: `contents/${document.type}/${document.id}.json`,
           buffer: Buffer.from(JSON.stringify(document.attributes), 'utf8')
         }
-      ], this._commitOptions(document, user, document.id));
+      ], this._commitOptions('update', document.type, document.id, user));
       return {
         id: document.id,
         type: document.type,
@@ -73,6 +73,18 @@ module.exports = class Writer {
     });
   }
 
+  async delete(branch, user, version, type, id) {
+    await this._ensureRepo();
+    return this._withErrorHandling(id, type, async () => {
+      await git.mergeCommit(this.repo, version, branch, [
+        {
+          operation: 'delete',
+          filename: `contents/${type}/${id}.json`
+        }
+      ], this._commitOptions('delete', type, id, user));
+    });
+  }
+
   async _create(branch, user, document, id) {
     await this._ensureRepo();
     let commitId = await git.mergeCommit(this.repo, null, branch, [
@@ -81,7 +93,7 @@ module.exports = class Writer {
         filename: `contents/${document.type}/${id}.json`,
         buffer: Buffer.from(JSON.stringify(document.attributes), 'utf8')
       }
-    ], this._commitOptions(document, user, id));
+    ], this._commitOptions('create', document.type, id, user));
 
     return {
       id,
@@ -93,7 +105,7 @@ module.exports = class Writer {
     };
   }
 
-  async _withErrorHandling(document, fn) {
+  async _withErrorHandling(id, type, fn) {
     try {
       return await fn();
     } catch (err) {
@@ -104,10 +116,10 @@ module.exports = class Writer {
         throw new Error("Merge conflict", { status: 409 });
       }
       if (err instanceof git.OverwriteRejected) {
-        throw new Error(`id ${document.id} is already in use`, { status: 409, source: { pointer: '/data/id'}});
+        throw new Error(`id ${id} is already in use`, { status: 409, source: { pointer: '/data/id'}});
       }
       if (err instanceof git.NotFound) {
-        throw new Error(`${document.type} with id ${document.id} does not exist`, {
+        throw new Error(`${type} with id ${id} does not exist`, {
           status: 404,
           source: { pointer: '/data/id' }
         });
@@ -149,13 +161,13 @@ module.exports = class Writer {
     }
   }
 
-  _commitOptions(document, user, id) {
+  _commitOptions(operation, type, id, user) {
     return {
       authorName: user.fullName,
       authorEmail: user.email,
       committerName: this.myName,
       committerEmail: this.myEmail,
-      message: `create ${document.type} ${id.slice(12)}`
+      message: `${operation} ${type} ${id.slice(12)}`
     };
   }
 
