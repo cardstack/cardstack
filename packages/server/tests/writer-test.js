@@ -124,22 +124,53 @@ describe('writer', function() {
       expect(err.source).to.deep.equal({ pointer: '/data/id' });
     }
   });
-  it('refuses to update without meta version', async function() {
-    try {
-      await writer.update('master', user, {
-        id: '1',
-        type: 'articles',
-        attributes: {
-          title: 'Updated title'
+
+  for (let meta of [undefined, null, 0, 1, {}, { version: null }, { version: 0 }, { version: "" }]) {
+    it(`refuses to update without meta version (${JSON.stringify(meta)})`, async function() {
+      try {
+        let doc = {
+          id: '1',
+          type: 'articles',
+          attributes: {
+            title: 'Updated title'
+          }
+        };
+        if (meta !== undefined) {
+          doc.meta = meta;
         }
-      });
-      throw new Error("should not get here");
-    } catch (err) {
-      expect(err.status).to.equal(400);
-      expect(err.detail).to.match(/missing required field/);
-      expect(err.source).to.deep.equal({ pointer: '/data/meta/version' });
-    }
-  });
+        await writer.update('master', user, doc);
+        throw new Error("should not get here");
+      } catch (err) {
+        expect(err.status).to.equal(400);
+        expect(err.detail).to.match(/missing required field/);
+        expect(err.source).to.deep.equal({ pointer: '/data/meta/version' });
+      }
+    });
+  }
+
+  for (let version of ["0", "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa", "not-a-version"]) {
+    it(`rejects invalid version ${version}`, async function() {
+      try {
+        await writer.update('master', user, {
+          id: '1',
+          type: 'articles',
+          attributes: {
+            title: 'Updated title'
+          },
+          meta: {
+            version
+          }
+        });
+        throw new Error("should not get here");
+      } catch (err) {
+        if (err.status == null) {
+          throw err;
+        }
+        expect(err.status).to.equal(400);
+        expect(err.source).to.deep.equal({ pointer: '/data/meta/version' });
+      }
+    });
+  }
 
   it('returns updated document', async function() {
     let record = await writer.update('master', user, {
