@@ -40,12 +40,41 @@ module.exports = class Writer {
   }
 
   async update(branch, user, document) {
-    if (!document.meta || document.version.version == null) {
+    if (!document.meta || document.meta.version == null) {
       throw new Error('missing required field', {
         status: 400,
         source: { pointer: '/data/meta/version' }
       });
     }
+    if (document.id == null) {
+      throw new Error('missing required field', {
+        status: 400,
+        source: { pointer: '/data/id' }
+      });
+    }
+    let commitOpts = {
+      authorName: user.fullName,
+      authorEmail: user.email,
+      committerName: this.myName,
+      committerEmail: this.myEmail,
+      message: `create ${document.type} ${document.id.slice(12)}`
+    };
+    await this._ensureRepo();
+    let commitId = await git.mergeCommit(this.repo, document.meta.version, branch, [
+      {
+        operation: 'update',
+        filename: `contents/${document.type}/${document.id}.json`,
+        buffer: Buffer.from(JSON.stringify(document.attributes), 'utf8')
+      }
+    ], commitOpts);
+    return {
+      id: document.id,
+      type: document.type,
+      attributes: document.attributes,
+      meta: {
+        version: commitId
+      }
+    };
   }
 
   async _create(branch, user, document, id) {

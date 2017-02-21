@@ -32,7 +32,7 @@ describe('writer', function() {
     }
   ];
 
-  let root, writer, user;
+  let root, writer, user, headId;
 
   beforeEach(async function() {
     root = await temp.mkdir('cardstack-server-test');
@@ -44,7 +44,7 @@ describe('writer', function() {
       email: 'user@example.com'
     };
 
-    await makeRepo(root, [
+    let { head } = await makeRepo(root, [
       {
         changes: fixtures.map(f => ({
           operation: 'create',
@@ -53,6 +53,7 @@ describe('writer', function() {
         }))
       }
     ]);
+    headId = head;
   });
 
   afterEach(async function() {
@@ -105,6 +106,24 @@ describe('writer', function() {
     expect(record).has.property('id', '2');
   });
 
+  it('requires id on update documents', async function() {
+    try {
+      await writer.update('master', user, {
+        type: 'articles',
+        attributes: {
+          title: 'Updated title'
+        },
+        meta: {
+          version: headId
+        }
+      });
+      throw new Error("should not get here");
+    } catch (err) {
+      expect(err.status).to.equal(400);
+      expect(err.detail).to.match(/missing required field/);
+      expect(err.source).to.deep.equal({ pointer: '/data/id' });
+    }
+  });
   it('refuses to update without meta version', async function() {
     try {
       await writer.update('master', user, {
@@ -121,5 +140,36 @@ describe('writer', function() {
       expect(err.source).to.deep.equal({ pointer: '/data/meta/version' });
     }
   });
+
+  it('returns updated document', async function() {
+    let record = await writer.update('master', user, {
+      id: '1',
+      type: 'articles',
+      attributes: {
+        title: 'Updated title'
+      },
+      meta: {
+        version: headId
+      }
+    });
+    expect(record).has.deep.property('attributes.title', 'Updated title');
+    expect(record).has.deep.property('meta.version').not.equal(headId);
+  });
+
+  it('stores updated attribute', async function() {
+    await writer.update('master', user, {
+      id: '1',
+      type: 'articles',
+      attributes: {
+        title: 'Updated title'
+      },
+      meta: {
+        version: headId
+      }
+    });
+    expect(await inRepo(root).getJSONContents('master', 'contents/articles/1.json'))
+      .property('title', 'Updated title');
+  });
+
 
 });
