@@ -1,7 +1,6 @@
 const temp = require('@cardstack/data-source/tests/temp-helper');
 const Searcher = require('@cardstack/elasticsearch/searcher');
-const { inES, host } = require('@cardstack/data-source/tests/elastic-assertions');
-const elasticsearch = host();
+const { inES } = require('@cardstack/data-source/tests/elastic-assertions');
 
 // These are test-only dependencies.
 const Indexer = require('@cardstack/git/indexer');
@@ -41,12 +40,9 @@ describe('searcher', function() {
   before(async function() {
     root = await temp.mkdir('cardstack-server-test');
     let indexer = new Indexer({
-      elasticsearch,
       repoPath: root
     });
-    searcher = new Searcher({
-      elasticsearch
-    });
+    searcher = new Searcher();
 
     await makeRepo(root, [
       {
@@ -62,7 +58,7 @@ describe('searcher', function() {
 
   after(async function() {
     await temp.cleanup();
-    await inES(elasticsearch).deleteAllIndices();
+    await inES().deleteAllIndices();
   });
 
 

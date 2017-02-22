@@ -1,9 +1,13 @@
 const ES = require('elasticsearch');
 const logger = require('heimdalljs-logger');
 
-module.exports = function makeClient(host) {
+function host() {
+  return 'http://10.0.15.2:9200';
+}
+
+module.exports = function makeClient() {
   return new ES.Client({
-    host,
+    host: host(),
     log: LogBridge,
     apiVersion: '5.x'
   });

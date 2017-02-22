@@ -1,16 +1,12 @@
 const makeClient = require('@cardstack/data-source/elastic-client');
 
-exports.host = function() {
-  return 'http://10.0.15.2:9200';
-};
-
-exports.inES = function(host) {
-  return new ElasticAsserter(host);
+exports.inES = function() {
+  return new ElasticAsserter();
 };
 
 class ElasticAsserter {
-  constructor(host){
-    this.client = makeClient(host);
+  constructor(){
+    this.client = makeClient();
   }
   async indices() {
     let i = await this.client.indices.get({ index: '_all' });

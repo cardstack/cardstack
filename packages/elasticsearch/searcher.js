@@ -2,8 +2,8 @@ const makeClient = require('@cardstack/data-source/elastic-client');
 const logger = require('heimdalljs-logger');
 
 class Searcher {
-  constructor({ elasticsearch }) {
-    this.es = makeClient(elasticsearch);
+  constructor() {
+    this.es = makeClient();
     this.log = logger('searcher');
   }
 

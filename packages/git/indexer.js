@@ -35,8 +35,8 @@ const { isEqual } = require('lodash');
 const BulkOps = require('./bulk-ops');
 
 module.exports = class Indexer {
-  constructor({ elasticsearch, repoPath }) {
-    this.es = makeClient(elasticsearch);
+  constructor({ repoPath }) {
+    this.es = makeClient();
     this.repoPath = repoPath;
     this.repo = null;
     this.log = logger('indexer');
