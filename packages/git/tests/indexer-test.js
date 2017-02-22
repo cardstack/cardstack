@@ -2,12 +2,13 @@ const git = require('@cardstack/git/merge');
 const temp = require('@cardstack/data-source/tests/temp-helper');
 const Indexer = require('@cardstack/git/indexer');
 const { commitOpts, makeRepo } = require('./support');
-const { inES } = require('@cardstack/data-source/tests/elastic-assertions');
+const ElasticAssert = require('@cardstack/data-source/tests/elastic-assertions');
 
 describe('indexer', function() {
-  let root, indexer;
+  let root, indexer, ea;
 
   beforeEach(async function() {
+    ea = new ElasticAssert();
     root = await temp.mkdir('cardstack-server-test');
     indexer = new Indexer({
       repoPath: root
@@ -16,17 +17,17 @@ describe('indexer', function() {
 
   afterEach(async function() {
     await temp.cleanup();
-    await inES().deleteAllIndices();
+    await ea.deleteAllIndices();
   });
 
   it('processes first empty branch', async function() {
     let { head } = await makeRepo(root);
     await indexer.update();
-    let aliases = await inES().aliases();
+    let aliases = await ea.aliases();
     expect([...aliases.keys()]).to.deep.equal(['master']);
-    let indices = await inES().indices();
+    let indices = await ea.indices();
     expect(indices).to.have.lengthOf(1);
-    let indexerState = await inES().indexerState('master');
+    let indexerState = await ea.indexerState('master');
     expect(indexerState.commit).to.equal(head);
   });
 
@@ -36,7 +37,7 @@ describe('indexer', function() {
 
     await indexer.update();
 
-    let originalIndexName = (await inES().aliases()).get('master');
+    let originalIndexName = (await ea.aliases()).get('master');
 
     let updatedContent = [
       {
@@ -52,7 +53,7 @@ describe('indexer', function() {
 
     await indexer.update();
 
-    expect((await inES().aliases()).get('master')).to.equal(originalIndexName);
+    expect((await ea.aliases()).get('master')).to.equal(originalIndexName);
   });
 
 
@@ -75,10 +76,10 @@ describe('indexer', function() {
 
     await indexer.update();
 
-    let indexerState = await inES().indexerState('master');
+    let indexerState = await ea.indexerState('master');
     expect(indexerState.commit).to.equal(head);
 
-    let contents = await inES().documentContents('master', 'articles', 'hello-world');
+    let contents = await ea.documentContents('master', 'articles', 'hello-world');
     expect(contents).to.deep.equal({ hello: 'world' });
   });
 
@@ -102,7 +103,7 @@ describe('indexer', function() {
     // Here we manually reach into elasticsearch to dirty a cached
     // document in order to see whether the indexer will leave it
     // alone
-    await inES().putDocument('master', 'articles', 'hello-world', { original: true });
+    await ea.putDocument('master', 'articles', 'hello-world', { original: true });
 
     let updatedContent = [
       {
@@ -117,7 +118,7 @@ describe('indexer', function() {
 
     await indexer.update();
 
-    let contents = await inES().documentContents('master', 'articles', 'hello-world');
+    let contents = await ea.documentContents('master', 'articles', 'hello-world');
     expect(contents).to.deep.equal({ original: true });
   });
 
@@ -150,7 +151,7 @@ describe('indexer', function() {
     await indexer.update();
 
     try {
-      await inES().documentContents('master', 'articles', 'hello-world');
+      await ea.documentContents('master', 'articles', 'hello-world');
       throw new Error("should never get here");
     } catch(err) {
       expect(err.message).to.match(/not found/i);

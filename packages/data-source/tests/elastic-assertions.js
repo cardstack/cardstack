@@ -1,10 +1,6 @@
 const makeClient = require('@cardstack/data-source/elastic-client');
 
-exports.inES = function() {
-  return new ElasticAsserter();
-};
-
-class ElasticAsserter {
+module.exports = class ElasticAsserter {
   constructor(){
     this.client = makeClient();
   }
@@ -34,4 +30,4 @@ class ElasticAsserter {
   async putDocument(branch, type, id, body) {
     return this.client.index({ index: branch, type, id, body });
   }
-}
+};
