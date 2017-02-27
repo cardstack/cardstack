@@ -51,6 +51,20 @@ class GitUpdater {
     return this._gitMapping(this.rootTree);
   }
 
+  async run(meta, hints, ops) {
+    await this._loadCommit();
+    this.ops = ops;
+    let originalTree;
+    if (meta) {
+      let oldCommit = await Commit.lookup(this.repo, meta.commit);
+      originalTree = await oldCommit.getTree();
+    }
+    await this._indexTree(originalTree, this.rootTree);
+    return {
+      commit: this.commit.id().tostrS()
+    };
+  }
+
   async _loadCommit() {
     if (!this.commit) {
       this.commit = await this._commitAtBranch(this.branch);
@@ -74,20 +88,6 @@ class GitUpdater {
     } else {
       return {};
     }
-  }
-
-  async run(meta, hints, ops) {
-    await this._loadCommit();
-    this.ops = ops;
-    let originalTree;
-    if (meta) {
-      let oldCommit = await Commit.lookup(this.repo, meta.commit);
-      originalTree = await oldCommit.getTree();
-    }
-    await this._indexTree(originalTree, this.rootTree);
-    return {
-      commit: this.commit.id().tostrS()
-    };
   }
 
   async _indexTree(oldTree, newTree) {
@@ -139,34 +139,6 @@ class GitUpdater {
       let { type, id } = identify(oldEntry);
       await this.ops.delete(type, id);
     }
-  }
-
-  // 1. Index the branch into newIndex.
-  // 2. Update the canonical elasticsearch alias for the branch to point at newIndex
-  // 3. Delete any old index that we just replaced.
-  async _reindex(newIndex, branch) {
-    let alias = await this.es.indices.getAlias({ name: branch, ignore: [404] });
-    if (alias.status === 404) {
-      this.log.info('%s is new, nothing to reindex', branch);
-    } else {
-      this.log.info('reindexing %s', branch);
-      await this.es.reindex({
-        body: {
-          source: { index: branch },
-          dest: { index: newIndex }
-        }
-      });
-
-    }
-    await this.es.indices.updateAliases({
-      body: {
-        actions: [
-          { remove: { index: '_all', alias: branch } },
-          { add: { index: newIndex, alias: branch } }
-        ]
-      }
-    });
-
   }
 }
 
