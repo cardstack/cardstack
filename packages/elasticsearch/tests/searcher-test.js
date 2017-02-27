@@ -3,7 +3,8 @@ const Searcher = require('@cardstack/elasticsearch/searcher');
 const ElasticAssert = require('@cardstack/data-source/tests/elastic-assertions');
 
 // These are test-only dependencies.
-const Indexer = require('@cardstack/git/indexer');
+const Indexer = require('@cardstack/server/indexer-engine');
+const GitIndexer = require('@cardstack/git/indexer');
 const { makeRepo } = require('@cardstack/git/tests/support');
 
 describe('searcher', function() {
@@ -40,9 +41,11 @@ describe('searcher', function() {
   before(async function() {
     ea = new ElasticAssert();
     root = await temp.mkdir('cardstack-server-test');
-    let indexer = new Indexer({
-      repoPath: root
-    });
+    let indexer = new Indexer([
+      new GitIndexer({
+        repoPath: root
+      })
+    ]);
     searcher = new Searcher();
 
     await makeRepo(root, [

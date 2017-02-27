@@ -18,8 +18,8 @@ module.exports = class ElasticAsserter {
     }
     return output;
   }
-  async indexerState(branch) {
-    return this.client.getSource({ index: branch, type: 'meta', id: 'indexer' });
+  async indexerState(branch, id) {
+    return this.client.getSource({ index: branch, type: 'meta', id });
   }
   async deleteAllIndices() {
     return this.client.indices.delete({ index: '_all' });

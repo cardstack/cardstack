@@ -1,6 +1,7 @@
 const git = require('@cardstack/git/merge');
 const temp = require('@cardstack/data-source/tests/temp-helper');
-const Indexer = require('@cardstack/git/indexer');
+const GitIndexer = require('@cardstack/git/indexer');
+const IndexerEngine = require('@cardstack/server/indexer-engine');
 const { commitOpts, makeRepo } = require('./support');
 const ElasticAssert = require('@cardstack/data-source/tests/elastic-assertions');
 
@@ -10,9 +11,9 @@ describe('indexer', function() {
   beforeEach(async function() {
     ea = new ElasticAssert();
     root = await temp.mkdir('cardstack-server-test');
-    indexer = new Indexer({
+    indexer = new IndexerEngine([new GitIndexer({
       repoPath: root
-    });
+    })]);
   });
 
   afterEach(async function() {
@@ -27,7 +28,7 @@ describe('indexer', function() {
     expect([...aliases.keys()]).to.deep.equal(['master']);
     let indices = await ea.indices();
     expect(indices).to.have.lengthOf(1);
-    let indexerState = await ea.indexerState('master');
+    let indexerState = await ea.indexerState('master', 'git');
     expect(indexerState.commit).to.equal(head);
   });
 
@@ -76,7 +77,7 @@ describe('indexer', function() {
 
     await indexer.update();
 
-    let indexerState = await ea.indexerState('master');
+    let indexerState = await ea.indexerState('master', 'git');
     expect(indexerState.commit).to.equal(head);
 
     let contents = await ea.documentContents('master', 'articles', 'hello-world');

@@ -1,25 +1,3 @@
-/*
-  Indexer deals with indexing documents. It's public API is just
-  `update`, which is responsible for getting any new upstream content
-  into the search index.
-
-  update takes these optional arguments:
-
-    - realTime: when true, update will block until the resulting
-      changes are visible in elasticsearch. This is somewhat
-      expensive, which is why we make it optional. Most of the time
-      non-realtime is good enough and much faster. Defaults to false.
-
-    - hints: can contain a list of `{ id, type }` references. This is
-      intended as an optimization hint when we know that certain
-      resources are the ones that likely need to be indexed right
-      away. Indexers are responsible for discovering and indexing
-      arbitrary upstream changes regardless of this hint, but the hint
-      can make it easier to keep the search index nearly real-time
-      fresh.
-
-*/
-
 const {
   Repository,
   Reference,
@@ -30,36 +8,12 @@ const {
 const { safeEntryByName } = require('./mutable-tree');
 
 const logger = require('heimdalljs-logger');
-const makeClient = require('@cardstack/data-source/elastic-client');
-const { isEqual } = require('lodash');
-const BulkOps = require('./bulk-ops');
 
 module.exports = class Indexer {
   constructor({ repoPath }) {
-    this.es = makeClient();
     this.repoPath = repoPath;
     this.repo = null;
-    this.log = logger('indexer');
-  }
-
-  /*
-    This indexes the content of the repo, based on the following general rules:
-    - each `.json` file in git is a document to be indexed.
-    - the id is the name of the file without the extension
-    - the type is the name of the directory in which the file appears
-      (just the final part of the path)
-    - a special mappings.json file at the top of the repo can make
-      declarations about the schema.
-
-    `realTime` determines whether this operation will block until
-    searches will reflect our changes. It's more expensive, but very
-    helpful particularly in automated test scenarios.
-
-  */
-  async update({ realTime /* , hints */ } = {}) {
-    await this._ensureRepo();
-    let branches = await this._branches();
-    await Promise.all(branches.map(branch => this._updateBranch(branch, realTime)));
+    this.log = logger('git-indexer');
   }
 
   async _ensureRepo() {
@@ -68,13 +22,41 @@ module.exports = class Indexer {
     }
   }
 
-  async _esMapping(branch) {
-    let mapping = await this.es.indices.getMapping({ index: branch, ignore: [404] });
-    if (mapping.status === 404) {
-      return null;
-    } else {
-      let index = Object.keys(mapping)[0];
-      return mapping[index].mappings;
+  async branches() {
+    await this._ensureRepo();
+    // nodegit docs show a Branch.iteratorNew method that would be
+    // more appropriate than this, but as far as I can tell it is not
+    // fully implemented
+    return (await Reference.list(this.repo)).map(entry => entry.replace(/^refs\/heads\//, ''));
+  }
+
+  async beginUpdate(branch) {
+    await this._ensureRepo();
+    return new GitUpdater(this.repo, branch);
+  }
+};
+
+class GitUpdater {
+  constructor(repo, branch) {
+    this.repo = repo;
+    this.branch = branch;
+    this.commit = null;
+    this.rootTree = null;
+    this.name = 'git';
+    this.save = null;
+  }
+
+  async mappings() {
+    await this._loadCommit();
+    return this._gitMapping(this.rootTree);
+  }
+
+  async _loadCommit() {
+    if (!this.commit) {
+      this.commit = await this._commitAtBranch(this.branch);
+    }
+    if (!this.rootTree) {
+      this.rootTree = await this.commit.getTree();
     }
   }
 
@@ -94,85 +76,40 @@ module.exports = class Indexer {
     }
   }
 
-  _tempIndexName(branch) {
-    return `${branch}_${Math.floor(Math.random() * Number.MAX_SAFE_INTEGER)}`;
-  }
-
-  _stableMapping(have, want) {
-    if (!have) { return false; }
-    // We only check types in "want". Extraneous types in "have" are OK.
-    return Object.keys(want).every(
-      type => isEqual(have[type], want[type])
-    );
-  }
-
-  async _updateBranch(branch, realTime) {
-    let commit = await this._commitAtBranch(branch);
-    let tree = await commit.getTree();
-    let haveMapping = await this._esMapping(branch);
-    let wantMapping = await this._gitMapping(tree);
-    if (this._stableMapping(haveMapping, wantMapping)) {
-      this.log.info('%s: mapping already OK', branch);
-    } else {
-      this.log.info('%s: mapping needs update', branch);
-      this.log.debug('%j', { haveMapping, wantMapping });
-      let tmpIndex = this._tempIndexName(branch);
-      await this.es.indices.create({
-        index: tmpIndex,
-        body: {
-          mappings: wantMapping
-        }
-      });
-      await this._reindex(tmpIndex, branch);
-    }
-    await this._updateState(branch, tree, commit, realTime);
-  }
-
-  async _updateState(branch, tree, commit, realTime) {
+  async run(meta, hints, save) {
+    await this._loadCommit();
+    this.save = save;
     let originalTree;
-    let meta = await this.es.getSource({ index: branch, type: 'meta', id: 'indexer', ignore: [404] });
     if (meta) {
       let oldCommit = await Commit.lookup(this.repo, meta.commit);
       originalTree = await oldCommit.getTree();
     }
-
-    let bulkOps = new BulkOps(this.es, { realTime });
-
-    await this._indexTree(branch, originalTree, tree, bulkOps);
-
-    await bulkOps.add({
-      index: {
-        _index: branch,
-        _type: 'meta',
-        _id: 'indexer',
-      }
-    }, {
-      commit: commit.id().tostrS()
-    });
-
-    await bulkOps.flush();
+    await this._indexTree(originalTree, this.rootTree);
+    return {
+      commit: this.commit.id().tostrS()
+    };
   }
 
-  async _indexTree(branch, oldTree, newTree, bulkOps) {
+  async _indexTree(oldTree, newTree) {
     let seen = new Map();
     if (newTree) {
       for (let newEntry of newTree.entries()) {
         let name = newEntry.name();
         seen.set(name, true);
-        await this._indexEntry(branch, name, oldTree, newEntry, bulkOps);
+        await this._indexEntry(name, oldTree, newEntry);
       }
     }
     if (oldTree) {
       for (let oldEntry of oldTree.entries()) {
         let name = oldEntry.name();
         if (!seen.get(name)) {
-          await this._deleteEntry(branch, oldEntry, bulkOps);
+          await this._deleteEntry(oldEntry);
         }
       }
     }
   }
 
-  async _indexEntry(branch, name, oldTree, newEntry, bulkOps) {
+  async _indexEntry(name, oldTree, newEntry) {
     let oldEntry;
     if (oldTree) {
       oldEntry = safeEntryByName(oldTree, name);
@@ -185,35 +122,22 @@ module.exports = class Indexer {
     }
     if (newEntry.isTree()) {
       await this._indexTree(
-        branch,
         oldEntry && oldEntry.isTree() ? (await oldEntry.getTree()) : null,
-        await newEntry.getTree(),
-        bulkOps
+        await newEntry.getTree()
       );
     } else {
       let { type, id } = identify(newEntry);
-      await bulkOps.add({
-        index: {
-          _index: branch,
-          _type: type,
-          _id: id,
-        }
-      }, (await newEntry.getBlob()).content().toString('utf8'));
+      let doc = (await newEntry.getBlob()).content().toString('utf8');
+      await this.save(type, id, doc);
     }
   }
 
-  async _deleteEntry(branch, oldEntry, bulkOps) {
+  async _deleteEntry(oldEntry) {
     if (oldEntry.isTree()) {
-      await this._indexTree(branch, await oldEntry.getTree(), null, bulkOps);
+      await this._indexTree(await oldEntry.getTree(), null);
     } else {
       let { type, id } = identify(oldEntry);
-      await bulkOps.add({
-        delete: {
-          _index: branch,
-          _type: type,
-          _id: id
-        }
-      });
+      await this.save(type, id, null);
     }
   }
 
@@ -244,15 +168,8 @@ module.exports = class Indexer {
     });
 
   }
+}
 
-  async _branches() {
-    // nodegit docs show a Branch.iteratorNew method that would be
-    // more appropriate than this, but as far as I can tell it is not
-    // fully implemented
-    return (await Reference.list(this.repo)).map(entry => entry.replace(/^refs\/heads\//, ''));
-  }
-
-};
 
 function identify(entry) {
   let parts = entry.path().split('/');
