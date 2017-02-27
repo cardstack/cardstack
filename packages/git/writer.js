@@ -52,34 +52,50 @@ module.exports = class Writer {
   async update(branch, user, type, id, document) {
     this._requireType(type, document);
     if (document.id == null) {
-      throw new Error('missing required field', {
+      throw new Error('missing required field "id"', {
         status: 400,
         source: { pointer: '/data/id' }
       });
     }
     if (!document.meta || !document.meta.version) {
-      throw new Error('missing required field', {
+      throw new Error('missing required field "meta.version"', {
         status: 400,
         source: { pointer: '/data/meta/version' }
       });
     }
     await this._ensureRepo();
+
+    let gitDocument = {};
+    if (document.attributes) {
+      gitDocument.attributes = document.attributes;
+    }
+    if (document.relationships) {
+      gitDocument.relationships = document.relationships;
+    }
+
     return this._withErrorHandling(id, type, async () => {
       let commitId = await git.mergeCommit(this.repo, document.meta.version, branch, [
         {
           operation: 'update',
           filename: `contents/${document.type}/${document.id}.json`,
-          buffer: Buffer.from(JSON.stringify({ attributes: document.attributes }), 'utf8')
+          buffer: Buffer.from(JSON.stringify(gitDocument), 'utf8')
         }
       ], this._commitOptions('update', document.type, document.id, user));
-      return {
+
+      let responseDocument = {
         id: document.id,
         type: document.type,
-        attributes: document.attributes,
         meta: {
           version: commitId
         }
       };
+      if (gitDocument.attributes) {
+        responseDocument.attributes = gitDocument.attributes;
+      }
+      if (gitDocument.relationships) {
+        responseDocument.relationships = gitDocument.relationships;
+      }
+      return responseDocument;
     });
   }
 
@@ -107,22 +123,38 @@ module.exports = class Writer {
 
   async _create(branch, user, document, id) {
     await this._ensureRepo();
+
+    let gitDocument = {};
+    if (document.attributes) {
+      gitDocument.attributes = document.attributes;
+    }
+    if (document.relationships) {
+      gitDocument.relationships = document.relationships;
+    }
+
     let commitId = await git.mergeCommit(this.repo, null, branch, [
       {
         operation: 'create',
         filename: `contents/${document.type}/${id}.json`,
-        buffer: Buffer.from(JSON.stringify({ attributes: document.attributes }), 'utf8')
+        buffer: Buffer.from(JSON.stringify(gitDocument), 'utf8')
       }
     ], this._commitOptions('create', document.type, id, user));
 
-    return {
+    let responseDocument = {
       id,
       type: document.type,
-      attributes: document.attributes,
       meta: {
         version: commitId
       }
     };
+    if (gitDocument.attributes) {
+      responseDocument.attributes = gitDocument.attributes;
+    }
+    if (gitDocument.relationships) {
+      responseDocument.relationships = gitDocument.relationships;
+    }
+
+    return responseDocument;
   }
 
   async _withErrorHandling(id, type, fn) {
@@ -150,7 +182,7 @@ module.exports = class Writer {
 
   _requireType(type, document) {
     if (document.type == null) {
-      throw new Error('missing required field', {
+      throw new Error('missing required field "type"', {
         status: 400,
         source: { pointer: '/data/type' }
       });

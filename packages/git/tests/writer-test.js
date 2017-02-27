@@ -463,4 +463,100 @@ describe('git writer', function() {
       }
     });
   });
+
+  describe('belongsTo', function() {
+    it('saves at creation', async function() {
+      let record = await writer.create('master', user, 'articles', {
+        type: 'articles',
+        relationships: {
+          primaryImage: {
+            data: {
+              type: 'images',
+              id: '100'
+            }
+          }
+        },
+      });
+      let saved = await inRepo(root).getJSONContents('master', `contents/articles/${record.id}.json`);
+      expect(saved).to.deep.equal({
+        relationships: {
+          primaryImage: {
+            data: {
+              type: 'images',
+              id: '100'
+            }
+          }
+        }
+      });
+    });
+
+    it('echos at creation', async function() {
+      let record = await writer.create('master', user, 'articles', {
+        type: 'articles',
+        relationships: {
+          primaryImage: {
+            data: {
+              type: 'images',
+              id: '100'
+            }
+          }
+        },
+      });
+      expect(record).to.have.deep.property('relationships.primaryImage.data.id', '100');
+      expect(record).to.have.deep.property('relationships.primaryImage.data.type', 'images');
+    });
+
+    it('saves at update', async function() {
+      await writer.update('master', user, 'articles', '1', {
+        id: '1',
+        type: 'articles',
+        relationships: {
+          primaryImage: {
+            data: {
+              type: 'images',
+              id: '100'
+            }
+          }
+        },
+        meta: {
+          version: headId
+        }
+      });
+      let saved = await inRepo(root).getJSONContents('master', `contents/articles/1.json`);
+      expect(saved).to.deep.equal({
+        relationships: {
+          primaryImage: {
+            data: {
+              type: 'images',
+              id: '100'
+            }
+          }
+        }
+      });
+    });
+
+    it('echos at update', async function() {
+      let record = await writer.update('master', user, 'articles', '1', {
+        id: '1',
+        type: 'articles',
+        relationships: {
+          primaryImage: {
+            data: {
+              type: 'images',
+              id: '100'
+            }
+          }
+        },
+        meta: {
+          version: headId
+        }
+      });
+      expect(record).to.have.deep.property('relationships.primaryImage.data.id', '100');
+      expect(record).to.have.deep.property('relationships.primaryImage.data.type', 'images');
+    });
+
+  });
+
+
+
 });
