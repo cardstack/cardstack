@@ -5,7 +5,7 @@ const IndexerEngine = require('@cardstack/server/indexer-engine');
 const { commitOpts, makeRepo } = require('./support');
 const ElasticAssert = require('@cardstack/data-source/tests/elastic-assertions');
 
-describe('indexer', function() {
+describe('git indexer', function() {
   let root, indexer, ea;
 
   beforeEach(async function() {

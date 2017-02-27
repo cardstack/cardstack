@@ -2,7 +2,7 @@ const temp = require('@cardstack/data-source/tests/temp-helper');
 const Writer = require('@cardstack/git/writer');
 const { makeRepo, inRepo } = require('./support');
 
-describe('writer', function() {
+describe('git writer', function() {
 
   let fixtures = [
     {
