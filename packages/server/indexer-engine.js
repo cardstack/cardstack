@@ -109,40 +109,16 @@ module.exports = class Indexer {
 
   async _updateState(branch, updaters, realTime, hints) {
     for (let updater of updaters) {
-      let bulkOps = new BulkOps(this.es, { realTime });
+      let publicOps = new PublicOperations(this.es, branch, realTime);
       let meta = await this.es.getSource({
         index: branch,
         type: 'meta',
         id: updater.name,
         ignore: [404]
       });
-      let newMeta = await updater.run(meta, hints, async (type, id, doc) => {
-        if (doc) {
-          await bulkOps.add({
-            index: {
-              _index: branch,
-              _type: type,
-              _id: id,
-            }
-          }, doc);
-        } else {
-          await bulkOps.add({
-            delete: {
-              _index: branch,
-              _type: type,
-              _id: id
-            }
-          });
-        }
-      });
-      await bulkOps.add({
-        index: {
-          _index: branch,
-          _type: 'meta',
-          _id: updater.name,
-        }
-      }, newMeta);
-      await bulkOps.flush();
+      let newMeta = await updater.run(meta, hints, publicOps);
+      await publicOps.save('meta', updater.name, newMeta);
+      await opsPrivate.get(publicOps).bulkOps.flush();
     }
   }
 
@@ -175,3 +151,34 @@ module.exports = class Indexer {
   }
 
 };
+
+const opsPrivate = new WeakMap();
+
+class PublicOperations {
+  constructor(es, branch, realTime) {
+    opsPrivate.set(this, {
+      branch,
+      bulkOps: new BulkOps(es, { realTime })
+    });
+  }
+  async save(type, id, doc){
+    let { bulkOps, branch } = opsPrivate.get(this);
+    await bulkOps.add({
+      index: {
+        _index: branch,
+        _type: type,
+        _id: id,
+      }
+    }, doc);
+  }
+  async delete(type, id) {
+    let { bulkOps, branch } = opsPrivate.get(this);
+    await bulkOps.add({
+      delete: {
+        _index: branch,
+        _type: type,
+        _id: id
+      }
+    });
+  }
+}

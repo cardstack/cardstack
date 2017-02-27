@@ -43,7 +43,7 @@ class GitUpdater {
     this.commit = null;
     this.rootTree = null;
     this.name = 'git';
-    this.save = null;
+    this.ops = null;
   }
 
   async mappings() {
@@ -76,9 +76,9 @@ class GitUpdater {
     }
   }
 
-  async run(meta, hints, save) {
+  async run(meta, hints, ops) {
     await this._loadCommit();
-    this.save = save;
+    this.ops = ops;
     let originalTree;
     if (meta) {
       let oldCommit = await Commit.lookup(this.repo, meta.commit);
@@ -128,7 +128,7 @@ class GitUpdater {
     } else {
       let { type, id } = identify(newEntry);
       let doc = (await newEntry.getBlob()).content().toString('utf8');
-      await this.save(type, id, doc);
+      await this.ops.save(type, id, doc);
     }
   }
 
@@ -137,7 +137,7 @@ class GitUpdater {
       await this._indexTree(await oldEntry.getTree(), null);
     } else {
       let { type, id } = identify(oldEntry);
-      await this.save(type, id, null);
+      await this.ops.delete(type, id);
     }
   }
 
