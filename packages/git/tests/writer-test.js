@@ -8,14 +8,14 @@ describe('git writer', function() {
     {
       type: 'articles',
       id: '1',
-      content: {
+      attributes: {
         title: 'First Article'
       }
     },
     {
       type: 'people',
       id: '1',
-      content: {
+      attributes: {
         firstName: 'Quint',
         lastName: 'Faulkner',
         age: 6
@@ -24,7 +24,7 @@ describe('git writer', function() {
     {
       type: 'people',
       id: '2',
-      content: {
+      attributes: {
         firstName: 'Arthur',
         lastName: 'Faulkner',
         age: 1
@@ -49,7 +49,7 @@ describe('git writer', function() {
         changes: fixtures.map(f => ({
           operation: 'create',
           filename: `contents/${f.type}/${f.id}.json`,
-          buffer: Buffer.from(JSON.stringify(f.content), 'utf8')
+          buffer: Buffer.from(JSON.stringify({ attributes: f.attributes }), 'utf8')
         }))
       }
     ]);
@@ -70,7 +70,9 @@ describe('git writer', function() {
       });
       let saved = await inRepo(root).getJSONContents('master', `contents/articles/${record.id}.json`);
       expect(saved).to.deep.equal({
-        title: 'Second Article'
+        attributes: {
+          title: 'Second Article'
+        }
       });
     });
 
@@ -82,7 +84,9 @@ describe('git writer', function() {
         }
       });
       expect(record).has.property('id');
-      expect(record.attributes).to.deep.equal({ title: 'Second Article' });
+      expect(record.attributes).to.deep.equal({
+        title: 'Second Article'
+      });
       expect(record.type).to.equal('articles');
       let head = await inRepo(root).getCommit('master');
       expect(record).has.deep.property('meta.version', head.id);
@@ -348,7 +352,7 @@ describe('git writer', function() {
         }
       });
       expect(await inRepo(root).getJSONContents('master', 'contents/articles/1.json'))
-        .property('title', 'Updated title');
+        .deep.property('attributes.title', 'Updated title');
     });
 
     it('reports merge conflict', async function() {

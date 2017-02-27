@@ -69,7 +69,7 @@ module.exports = class Writer {
         {
           operation: 'update',
           filename: `contents/${document.type}/${document.id}.json`,
-          buffer: Buffer.from(JSON.stringify(document.attributes), 'utf8')
+          buffer: Buffer.from(JSON.stringify({ attributes: document.attributes }), 'utf8')
         }
       ], this._commitOptions('update', document.type, document.id, user));
       return {
@@ -111,7 +111,7 @@ module.exports = class Writer {
       {
         operation: 'create',
         filename: `contents/${document.type}/${id}.json`,
-        buffer: Buffer.from(JSON.stringify(document.attributes), 'utf8')
+        buffer: Buffer.from(JSON.stringify({ attributes: document.attributes }), 'utf8')
       }
     ], this._commitOptions('create', document.type, id, user));
 
