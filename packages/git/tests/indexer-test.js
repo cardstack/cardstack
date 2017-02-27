@@ -68,7 +68,7 @@ describe('git indexer', function() {
         operation: 'create',
         filename: 'contents/articles/hello-world.json',
         buffer: Buffer.from(JSON.stringify({
-          hello: 'world'
+          attributes: { hello: 'world' }
         }), 'utf8')
       }
     ];

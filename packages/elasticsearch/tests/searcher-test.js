@@ -14,14 +14,14 @@ describe('searcher', function() {
     {
       type: 'articles',
       id: '1',
-      content: {
+      attributes: {
         hello: 'magic words'
       }
     },
     {
       type: 'people',
       id: '1',
-      content: {
+      attributes: {
         firstName: 'Quint',
         lastName: 'Faulkner',
         age: 6
@@ -30,7 +30,7 @@ describe('searcher', function() {
     {
       type: 'people',
       id: '2',
-      content: {
+      attributes: {
         firstName: 'Arthur',
         lastName: 'Faulkner',
         age: 1
@@ -53,7 +53,7 @@ describe('searcher', function() {
         changes: fixtures.map(f => ({
           operation: 'create',
           filename: `contents/${f.type}/${f.id}.json`,
-          buffer: Buffer.from(JSON.stringify(f.content), 'utf8')
+          buffer: Buffer.from(JSON.stringify({ attributes: f.attributes}), 'utf8')
         }))
       }
     ]);

@@ -55,7 +55,7 @@ class GitUpdater {
     await this._loadCommit();
     this.ops = ops;
     let originalTree;
-    if (meta) {
+    if (meta && meta.commit) {
       let oldCommit = await Commit.lookup(this.repo, meta.commit);
       originalTree = await oldCommit.getTree();
     }
@@ -127,7 +127,7 @@ class GitUpdater {
       );
     } else {
       let { type, id } = identify(newEntry);
-      let doc = (await newEntry.getBlob()).content().toString('utf8');
+      let doc = JSON.parse((await newEntry.getBlob()).content().toString('utf8'));
       await this.ops.save(type, id, doc);
     }
   }

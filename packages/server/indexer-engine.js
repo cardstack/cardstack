@@ -117,8 +117,15 @@ module.exports = class Indexer {
         ignore: [404]
       });
       let newMeta = await updater.run(meta, hints, publicOps);
-      await publicOps.save('meta', updater.name, newMeta);
-      await opsPrivate.get(publicOps).bulkOps.flush();
+      let bulkOps = opsPrivate.get(publicOps).bulkOps;
+      await bulkOps.add({
+        index: {
+          _index: branch,
+          _type: 'meta',
+          _id: updater.name,
+        }
+      }, newMeta);
+      await bulkOps.flush();
     }
   }
 
@@ -163,13 +170,26 @@ class PublicOperations {
   }
   async save(type, id, doc){
     let { bulkOps, branch } = opsPrivate.get(this);
+    let searchDoc = {};
+    if (doc.attributes) {
+      for (let attribute of Object.keys(doc.attributes)) {
+        let value = doc.attributes[attribute];
+        searchDoc[attribute] = value;
+      }
+    }
+    if (doc.relationships) {
+      for (let attribute of Object.keys(doc.relationships)) {
+        let value = doc.relationships[attribute];
+        searchDoc[attribute] = value;
+      }
+    }
     await bulkOps.add({
       index: {
         _index: branch,
         _type: type,
         _id: id,
       }
-    }, doc);
+    }, searchDoc);
   }
   async delete(type, id) {
     let { bulkOps, branch } = opsPrivate.get(this);
