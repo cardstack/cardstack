@@ -13,8 +13,11 @@ module.exports = class ContentType {
     let errors = [];
     if (document.attributes) {
       for (let fieldName of Object.keys(document.attributes)) {
-        if (!this.fields.has(fieldName)) {
+        let field = this.fields.get(fieldName);
+        if (!field) {
           errors.push(new Error(`type "${this.id}" has no field named "${fieldName}"`));
+        } else {
+          errors = errors.concat(await field.validationErrors(document.attributes[fieldName], document));
         }
       }
     }

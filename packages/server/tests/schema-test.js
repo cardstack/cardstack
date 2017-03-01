@@ -15,7 +15,8 @@ describe('schema', function() {
         relationships: {
           fields: {
             data: [
-              { type: 'fields', id: 'title' }
+              { type: 'fields', id: 'title' },
+              { type: 'fields', id: 'published-date' }
             ]
           }
         }
@@ -23,7 +24,16 @@ describe('schema', function() {
       {
         type: 'fields',
         id: 'title',
-        attributes: {}
+        attributes: {
+          'field-type': 'string'
+        }
+      },
+      {
+        type: 'fields',
+        id: 'published-date',
+        attributes: {
+          'field-type': 'date'
+        }
       }
     ]);
 
@@ -63,14 +73,29 @@ describe('schema', function() {
     expect(errors).includes.something.with.property('detail', 'type "articles" has no field named "pomposity"');
   });
 
-  it("accepts known field", async function() {
+  it("accepts known fields", async function() {
     expect(await schema.validationErrors({
       type: 'articles',
       id: '1',
       attributes: {
-        title: "hello world"
+        title: "hello world",
+        "published-date": "2013-02-08 09:30:26.123+07:00"
       }
     })).deep.equals([]);
   });
+
+  it("rejects badly formatted fields", async function() {
+    let errors = await schema.validationErrors({
+      type: 'articles',
+      id: '1',
+      attributes: {
+        title: 21,
+        "published-date": "Not a date"
+      }
+    });
+    expect(errors).includes.something.with.property('detail', '21 is not a valid value for field "title"');
+    expect(errors).includes.something.with.property('detail', '"Not a date" is not a valid value for field "published-date"');
+  });
+
 
 });
