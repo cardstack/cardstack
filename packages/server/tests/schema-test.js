@@ -2,6 +2,7 @@ const Schema = require('@cardstack/server/schema');
 const Searcher = require('@cardstack/elasticsearch/searcher');
 const addRecords = require('@cardstack/server/tests/add-records');
 const ElasticAssert = require('@cardstack/data-source/tests/elastic-assertions');
+const Plugins = require('@cardstack/server/plugins');
 
 describe('schema', function() {
 
@@ -38,7 +39,8 @@ describe('schema', function() {
     ]);
 
     let searcher = new Searcher();
-    schema = await Schema.loadFrom(searcher, 'master');
+    let plugins = await Plugins.load();
+    schema = await Schema.loadFrom(searcher, 'master', plugins);
   });
 
   after(async function() {

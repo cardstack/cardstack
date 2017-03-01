@@ -3,7 +3,7 @@ const Field = require('@cardstack/server/field');
 const ContentType = require('@cardstack/server/content-type');
 
 module.exports = class Schema {
-  static async loadFrom(searcher, branch) {
+  static async loadFrom(searcher, branch, plugins) {
     let models = await searcher.search(branch, {
       type: ['content-types', 'fields']
     });
@@ -11,7 +11,7 @@ module.exports = class Schema {
     let fields = new Map();
     for (let model of models) {
       if (model.type === 'fields') {
-        fields.set(model.id, new Field(model));
+        fields.set(model.id, new Field(model, plugins));
       }
     }
 
