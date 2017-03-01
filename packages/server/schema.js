@@ -35,6 +35,7 @@ module.exports = class Schema {
 
   constructor(types) {
     this.types = types;
+    this._mapping = null;
   }
 
   async validationErrors(document) {
@@ -52,5 +53,15 @@ module.exports = class Schema {
     errors = errors.concat(await type.validationErrors(document));
 
     return errors;
+  }
+
+  mapping() {
+    if (!this._mapping) {
+      this._mapping = {};
+      for (let contentType of this.types.values()) {
+        this._mapping[contentType.id] = contentType.mapping();
+      }
+    }
+    return this._mapping;
   }
 };

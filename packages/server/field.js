@@ -13,4 +13,7 @@ module.exports = class Field {
     }
     return (await Promise.all(this.constraints.map(constraint => constraint.validationErrors(value)))).reduce((a,b) => a.concat(b), []).map(message => new Error(`the value of field "${this.id}" ${message}`));
   }
+  mapping() {
+    return this.plugin.defaultMapping();
+  }
 };

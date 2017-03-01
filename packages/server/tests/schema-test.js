@@ -66,6 +66,17 @@ describe('schema', function() {
         attributes: {
           'constraint-type': 'not-null'
         }
+      },
+      {
+        type: 'content-types',
+        id: 'events',
+        relationships: {
+          fields: {
+            data: [
+              { type: 'fields', id: 'title' },
+            ]
+          }
+        }
       }
     ]);
 
@@ -153,6 +164,12 @@ describe('schema', function() {
       }
     });
     expect(errors).includes.something.with.property('detail', 'the value of field "published-date" may not be null');
+  });
+
+  it("generates a mapping", async function() {
+    let mapping = schema.mapping();
+    expect(mapping).has.deep.property("articles.properties.published-date");
+    expect(mapping).has.deep.property("events.properties.title");
   });
 
 

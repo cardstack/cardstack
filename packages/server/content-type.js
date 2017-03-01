@@ -30,4 +30,11 @@ module.exports = class ContentType {
     }
     return errors;
   }
+  mapping() {
+    let properties = {};
+    for (let field of this.fields.values()) {
+      properties[field.id] = field.mapping();
+    }
+    return { properties };
+  }
 };
