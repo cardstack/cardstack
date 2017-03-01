@@ -133,7 +133,7 @@ describe('schema', function() {
     expect(errors).includes.something.with.property('detail', '"Not a date" is not a valid value for field "published-date"');
   });
 
-  it("applies constraints", async function() {
+  it("applies constraints to present fields", async function() {
     let errors = await schema.validationErrors({
       type: 'articles',
       id: '1',
@@ -142,6 +142,16 @@ describe('schema', function() {
       }
     });
     expect(errors).includes.something.with.property('detail', 'the value of field "title" may not exceed max length of 40 characters');
+  });
+
+  it("applies constraints to missing fields", async function() {
+    let errors = await schema.validationErrors({
+      type: 'articles',
+      id: '1',
+      attributes: {
+        title: "very long very long very long very long very long very long"
+      }
+    });
     expect(errors).includes.something.with.property('detail', 'the value of field "published-date" may not be null');
   });
 
