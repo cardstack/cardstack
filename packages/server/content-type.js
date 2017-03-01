@@ -11,6 +11,7 @@ module.exports = class ContentType {
   }
   async validationErrors(document) {
     let errors = [];
+    let seen = new Map();
     if (document.attributes) {
       for (let fieldName of Object.keys(document.attributes)) {
         let field = this.fields.get(fieldName);
@@ -18,7 +19,13 @@ module.exports = class ContentType {
           errors.push(new Error(`type "${this.id}" has no field named "${fieldName}"`));
         } else {
           errors = errors.concat(await field.validationErrors(document.attributes[fieldName], document));
+          seen.set(fieldName, true);
         }
+      }
+    }
+    for (let [fieldName, field] of this.fields.entries()) {
+      if (!seen.get(fieldName)) {
+        errors = errors.concat(await field.validationErrors(null, document));
       }
     }
     return errors;

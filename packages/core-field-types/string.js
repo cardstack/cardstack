@@ -1,5 +1,5 @@
 module.exports = {
   valid(value) {
-    return value == null || typeof value === 'string';
+    return typeof value === 'string';
   }
 };

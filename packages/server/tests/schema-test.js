@@ -27,6 +27,13 @@ describe('schema', function() {
         id: 'title',
         attributes: {
           'field-type': 'string'
+        },
+        relationships: {
+          constraints: {
+            data: [
+              { type: 'constraints', id: '0' }
+            ]
+          }
         }
       },
       {
@@ -34,6 +41,30 @@ describe('schema', function() {
         id: 'published-date',
         attributes: {
           'field-type': 'date'
+        },
+        relationships: {
+          constraints: {
+            data: [
+              { type: 'constraints', id: '1' }
+            ]
+          }
+        }
+      },
+      {
+        type: 'constraints',
+        id: '0',
+        attributes: {
+          'constraint-type': 'length',
+          parameters: {
+            max: 40
+          }
+        }
+      },
+      {
+        type: 'constraints',
+        id: '1',
+        attributes: {
+          'constraint-type': 'not-null'
         }
       }
     ]);
@@ -58,7 +89,10 @@ describe('schema', function() {
   it("accepts known types", async function() {
     expect(await schema.validationErrors({
       type: 'articles',
-      id: '1'
+      id: '1',
+      attributes: {
+        'published-date': "2013-02-08 09:30:26.123+07:00"
+      }
     })).to.deep.equal([]);
   });
 
@@ -97,6 +131,18 @@ describe('schema', function() {
     });
     expect(errors).includes.something.with.property('detail', '21 is not a valid value for field "title"');
     expect(errors).includes.something.with.property('detail', '"Not a date" is not a valid value for field "published-date"');
+  });
+
+  it("applies constraints", async function() {
+    let errors = await schema.validationErrors({
+      type: 'articles',
+      id: '1',
+      attributes: {
+        title: "very long very long very long very long very long very long"
+      }
+    });
+    expect(errors).includes.something.with.property('detail', 'the value of field "title" may not exceed max length of 40 characters');
+    expect(errors).includes.something.with.property('detail', 'the value of field "published-date" may not be null');
   });
 
 

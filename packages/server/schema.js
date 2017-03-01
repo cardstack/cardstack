@@ -1,17 +1,25 @@
 const Error = require('@cardstack/data-source/error');
 const Field = require('@cardstack/server/field');
+const Constraint = require('@cardstack/server/constraint');
 const ContentType = require('@cardstack/server/content-type');
 
 module.exports = class Schema {
   static async loadFrom(searcher, branch, plugins) {
     let models = await searcher.search(branch, {
-      type: ['content-types', 'fields']
+      type: ['content-types', 'fields', 'constraints']
     });
+
+    let constraints = new Map();
+    for (let model of models) {
+      if (model.type === 'constraints') {
+        constraints.set(model.id, new Constraint(model, plugins));
+      }
+    }
 
     let fields = new Map();
     for (let model of models) {
       if (model.type === 'fields') {
-        fields.set(model.id, new Field(model, plugins));
+        fields.set(model.id, new Field(model, plugins, constraints));
       }
     }
 
