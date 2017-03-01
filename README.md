@@ -1,6 +1,13 @@
 Work in progress
 ================
 
+Package symlink
+---------------
+
+You need this symlink for the present:
+
+    ln -s ../packages ./node_modules/@cardstack
+
 Building native nodegit dep on osx
 --------------------------------
 
