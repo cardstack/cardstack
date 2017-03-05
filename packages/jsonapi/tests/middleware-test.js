@@ -1,4 +1,4 @@
-const jsonapi = require('@cardstack/server/jsonapi');
+const jsonapi = require('@cardstack/jsonapi/middleware');
 const supertest = require('supertest');
 const Koa = require('koa');
 
