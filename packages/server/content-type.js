@@ -24,7 +24,7 @@ module.exports = class ContentType {
       }
     }
     for (let [fieldName, field] of this.fields.entries()) {
-      if (!seen.get(fieldName)) {
+      if (field && !seen.get(fieldName)) {
         errors = errors.concat(await field.validationErrors(null, document));
       }
     }
