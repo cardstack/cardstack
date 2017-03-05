@@ -92,7 +92,14 @@ describe('git indexer', function() {
       }
     ]);
 
-    // FIXME: realtime dependency should not be necessary
+    // FIXME: realtime should not be necessary here.
+    //
+    // Indexer should not depend on searcher.  Also, even the
+    // read-side is going to want schema caching to avoid adding extra
+    // ES searches to everything, and if we want to invalidate those
+    // caches we'll have a similar problem (invalidation message can't
+    // preceed index refresh).
+
     await indexer.update({ realTime: true });
     let originalIndexName = (await ea.aliases()).get('master');
 
