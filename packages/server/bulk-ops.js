@@ -6,10 +6,10 @@ class BulkOps {
     this.batchSize = batchSize || 1000;
   }
 
-  async add(operation, source) {
+  async add(operation, ...source) {
     this.queue.push(operation);
-    if (source) {
-      this.queue.push(source);
+    if (source.length > 0) {
+      this.queue.push(source[0] || {});
     }
     if (this.queue.length > this.batchSize) {
       await this.flush();
