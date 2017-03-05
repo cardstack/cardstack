@@ -26,7 +26,7 @@ const { isEqual } = require('lodash');
 const BulkOps = require('./bulk-ops');
 const Schema = require('./schema');
 
-module.exports = class Indexer {
+module.exports = class IndexerEngine {
   constructor(indexers, searcher, plugins) {
     this.indexers = indexers;
     this.es = makeClient();
