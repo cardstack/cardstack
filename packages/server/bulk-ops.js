@@ -21,7 +21,7 @@ class BulkOps {
     this.queue = [];
     let response = await this.es.bulk({
       body,
-      refresh: this.realTime ? 'wait_for' : false
+      refresh: this.realTime
     });
     let failedOperations = response.items.filter(item => {
       let op = Object.keys(item)[0];
