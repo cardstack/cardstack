@@ -4,6 +4,7 @@ module.exports = class Field {
   constructor(model, plugins, constraints) {
     this.id = model.id;
     this.fieldType = model.document['field-type'];
+    this.searchable = model.document.searchable;
     this.plugin = plugins.fieldType(this.fieldType);
     this.constraints = (model.document.constraints || { data:[] }).data.map(ref => constraints.get(ref.id)).filter(Boolean);
   }
@@ -14,6 +15,8 @@ module.exports = class Field {
     return (await Promise.all(this.constraints.map(constraint => constraint.validationErrors(value)))).reduce((a,b) => a.concat(b), []).map(message => new Error(`the value of field "${this.id}" ${message}`));
   }
   mapping() {
-    return this.plugin.defaultMapping();
+    return Object.assign({}, this.plugin.defaultMapping(), {
+      index: this.searchable
+    });
   }
 };

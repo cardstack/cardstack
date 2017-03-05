@@ -40,7 +40,8 @@ describe('schema', function() {
         type: 'fields',
         id: 'published-date',
         attributes: {
-          'field-type': 'date'
+          'field-type': 'date',
+          searchable: false
         },
         relationships: {
           constraints: {
@@ -171,7 +172,7 @@ describe('schema', function() {
 
   it("generates a mapping", async function() {
     let mapping = schema.mapping();
-    expect(mapping).has.deep.property("articles.properties.published-date");
+    expect(mapping).has.deep.property("articles.properties.published-date.index", false);
     expect(mapping).has.deep.property("events.properties.title");
   });
 
