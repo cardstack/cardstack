@@ -18,6 +18,7 @@ class BulkOps {
 
   async flush() {
     let body = this.queue;
+    if (body.length === 0){ return; }
     this.queue = [];
     let response = await this.es.bulk({
       body,
