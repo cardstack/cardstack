@@ -1,7 +1,7 @@
 module.exports = class Constraint {
   constructor(model, plugins) {
-    this.parameters = model.document.parameters;
-    this.plugin = plugins.constraintType(model.document['constraint-type']);
+    this.parameters = model.attributes.parameters;
+    this.plugin = plugins.constraintType(model.attributes['constraint-type']);
   }
   async validationErrors(value) {
     let errors = this.plugin.valid(value, this.parameters);

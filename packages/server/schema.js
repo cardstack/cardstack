@@ -2,6 +2,7 @@ const Error = require('@cardstack/data-source/error');
 const Field = require('@cardstack/server/field');
 const Constraint = require('@cardstack/server/constraint');
 const ContentType = require('@cardstack/server/content-type');
+const Plugins = require('@cardstack/server/plugins');
 
 module.exports = class Schema {
 
@@ -9,7 +10,8 @@ module.exports = class Schema {
     return ['content-types', 'fields', 'constraints'];
   }
 
-  static async loadFrom(models, plugins) {
+  static async loadFrom(models) {
+    let plugins = await Plugins.load();
     let constraints = new Map();
     for (let model of models) {
       if (model.type === 'constraints') {

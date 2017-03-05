@@ -3,10 +3,15 @@ const Error = require('@cardstack/data-source/error');
 module.exports = class Field {
   constructor(model, plugins, constraints) {
     this.id = model.id;
-    this.fieldType = model.document['field-type'];
-    this.searchable = model.document.searchable;
+    this.fieldType = model.attributes['field-type'];
+    this.searchable = model.attributes.searchable;
     this.plugin = plugins.fieldType(this.fieldType);
-    this.constraints = (model.document.constraints || { data:[] }).data.map(ref => constraints.get(ref.id)).filter(Boolean);
+
+    if (model.relationships && model.relationships.constraints && model.relationships.constraints.data) {
+      this.constraints = model.relationships.constraints.data.map(ref => constraints.get(ref.id)).filter(Boolean);
+    } else {
+      this.constraints = [];
+    }
   }
   async validationErrors(value) {
     if (value != null && !this.plugin.valid(value)) {

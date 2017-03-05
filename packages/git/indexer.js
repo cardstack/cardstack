@@ -43,28 +43,27 @@ class GitUpdater {
     this.commit = null;
     this.rootTree = null;
     this.name = 'git';
-    this.ops = null;
   }
 
-  async updateSchema(meta, hints, ops) {
-    await this._update(meta, hints, ops, { only: 'schema' });
+  async schema() {
+    let models = [];
+    let ops = new Gather(models);
+    await this._loadCommit();
+    await this._indexTree(ops, null, this.rootTree, { only: 'schema' });
+    return models;
   }
 
   async updateContent(meta, hints, ops) {
-    await this._update(meta, hints, ops, { only : 'contents' });
-    return {
-      commit: this.commit.id().tostrS()
-    };
-  }
-
-  async _update(meta, hints, ops, filter) {
     await this._loadCommit();
     let originalTree;
     if (meta && meta.commit) {
       let oldCommit = await Commit.lookup(this.repo, meta.commit);
       originalTree = await oldCommit.getTree();
     }
-    await this._indexTree(ops, originalTree, this.rootTree, filter);
+    await this._indexTree(ops, originalTree, this.rootTree);
+    return {
+      commit: this.commit.id().tostrS()
+    };
   }
 
   async _loadCommit() {
@@ -147,4 +146,15 @@ function identify(entry) {
   let filename = parts[parts.length - 1];
   let id = filename.replace(/\.json$/, '');
   return { type, id };
+}
+
+class Gather {
+  constructor(models) {
+    this.models = models;
+  }
+  save(type, id, document) {
+    document.type = type;
+    document.id = id;
+    this.models.push(document);
+  }
 }

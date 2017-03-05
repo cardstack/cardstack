@@ -3,7 +3,7 @@ const Error = require('@cardstack/data-source/error');
 module.exports = class ContentType {
   constructor(model, allFields) {
     let fields = new Map();
-    for (let fieldRef of model.document.fields.data) {
+    for (let fieldRef of model.relationships.fields.data) {
       fields.set(fieldRef.id, allFields.get(fieldRef.id));
     }
     this.fields = fields;

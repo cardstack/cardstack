@@ -4,8 +4,6 @@ const GitIndexer = require('@cardstack/git/indexer');
 const IndexerEngine = require('@cardstack/server/indexer-engine');
 const { commitOpts, makeRepo } = require('./support');
 const ElasticAssert = require('@cardstack/elasticsearch/tests/assertions');
-const Searcher = require('@cardstack/elasticsearch/searcher');
-const Plugins = require('@cardstack/server/plugins');
 
 describe('git indexer', function() {
   let root, indexer, ea;
@@ -15,7 +13,7 @@ describe('git indexer', function() {
     root = await temp.mkdir('cardstack-server-test');
     indexer = new IndexerEngine([new GitIndexer({
       repoPath: root
-    })], new Searcher(), await Plugins.load());
+    })]);
   });
 
   afterEach(async function() {
@@ -92,15 +90,7 @@ describe('git indexer', function() {
       }
     ]);
 
-    // FIXME: realtime should not be necessary here.
-    //
-    // Indexer should not depend on searcher.  Also, even the
-    // read-side is going to want schema caching to avoid adding extra
-    // ES searches to everything, and if we want to invalidate those
-    // caches we'll have a similar problem (invalidation message can't
-    // preceed index refresh).
-
-    await indexer.update({ realTime: true });
+    await indexer.update();
     let originalIndexName = (await ea.aliases()).get('master');
 
     let updatedContent = [

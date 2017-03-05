@@ -27,11 +27,9 @@ const BulkOps = require('./bulk-ops');
 const Schema = require('./schema');
 
 module.exports = class IndexerEngine {
-  constructor(indexers, searcher, plugins) {
+  constructor(indexers) {
     this.indexers = indexers;
     this.es = makeClient();
-    this.searcher = searcher;
-    this.plugins = plugins;
     this.log = logger('indexer-engine');
   }
 
@@ -44,8 +42,8 @@ module.exports = class IndexerEngine {
 
   async _updateBranch(branch, updaters, realTime, hints) {
     let haveMapping = await this._esMapping(branch);
-    let partialSchema = await this._updateSchema(branch, updaters, realTime, hints);
-    let wantMapping = partialSchema.schema.mapping();
+    let schema = await this._updateSchema(branch, updaters);
+    let wantMapping = schema.mapping();
     this.log.debug('%j', { haveMapping, wantMapping });
     if (this._stableMapping(haveMapping, wantMapping)) {
       this.log.info('%s: mapping already OK', branch);
@@ -60,7 +58,7 @@ module.exports = class IndexerEngine {
       });
       await this._reindex(tmpIndex, branch);
     }
-    await this._updateContent(branch, updaters, realTime, hints, partialSchema);
+    await this._updateContent(branch, updaters, realTime, hints);
   }
 
   async _branches() {
@@ -122,44 +120,16 @@ module.exports = class IndexerEngine {
     }, newMeta);
   }
 
-  async _updateSchema(branch, updaters, realTime, hints) {
-    let toSave = [];
-    let models;
-    try {
-      models = await this.searcher.search(branch, {
-        filter: {
-          type: Schema.ownTypes()
-        }
-      });
-    } catch (err) {
-      if (err.status !== 404) {
-        throw err;
-      }
-      models = [];
-    }
-
+  async _updateSchema(branch, updaters) {
+    let models = [];
     for (let updater of updaters) {
-      let { publicOps, privateOps } = SchemaOperations.create(this.es, branch, realTime);
-      let meta = await this._loadMeta(branch, updater);
-      await updater.updateSchema(meta, hints, publicOps);
-      models = privateOps.applyTo(models);
-      toSave.push(privateOps);
+      models = models.concat(await updater.schema());
     }
-
-    return {
-      schema: await Schema.loadFrom(models, this.plugins),
-      async save(publicOps, privateOps) {
-        for (let savee of toSave) {
-          await savee.writeOut(publicOps, privateOps);
-        }
-      }
-    };
+    return Schema.loadFrom(models);
   }
 
-  async _updateContent(branch, updaters, realTime, hints, partialSchema) {
-    let { publicOps, privateOps } = Operations.create(this.es, branch, realTime);
-
-    await partialSchema.save(publicOps, privateOps);
+  async _updateContent(branch, updaters, realTime, hints) {
+    let { publicOps, privateOps } = Operations.create(this.es, branch, realTime, this.log);
     for (let updater of updaters) {
       let meta = await this._loadMeta(branch, updater);
       let newMeta = await updater.updateContent(meta, hints, publicOps);
@@ -198,17 +168,17 @@ module.exports = class IndexerEngine {
 
 };
 
-function gitDocToSearchDoc(gitDoc) {
+function jsonapiDocToSearchDoc(jsonapiDoc) {
   let searchDoc = {};
-  if (gitDoc.attributes) {
-    for (let attribute of Object.keys(gitDoc.attributes)) {
-      let value = gitDoc.attributes[attribute];
+  if (jsonapiDoc.attributes) {
+    for (let attribute of Object.keys(jsonapiDoc.attributes)) {
+      let value = jsonapiDoc.attributes[attribute];
       searchDoc[attribute] = value;
     }
   }
-  if (gitDoc.relationships) {
-    for (let attribute of Object.keys(gitDoc.relationships)) {
-      let value = gitDoc.relationships[attribute];
+  if (jsonapiDoc.relationships) {
+    for (let attribute of Object.keys(jsonapiDoc.relationships)) {
+      let value = jsonapiDoc.relationships[attribute];
       searchDoc[attribute] = value;
     }
   }
@@ -218,14 +188,15 @@ function gitDocToSearchDoc(gitDoc) {
 const opsPrivate = new WeakMap();
 
 class Operations {
-  static create(es, branch, realTime) {
-    let publicOps = new this(es, branch, realTime);
+  static create(es, branch, realTime, log) {
+    let publicOps = new this(es, branch, realTime, log);
     let privateOps = opsPrivate.get(publicOps);
     return { publicOps, privateOps };
   }
 
-  constructor(es, branch, realTime) {
+  constructor(es, branch, realTime, log) {
     opsPrivate.set(this, {
+      log,
       branch,
       bulkOps: new BulkOps(es, { realTime }),
       flush() {
@@ -234,8 +205,8 @@ class Operations {
     });
   }
   async save(type, id, doc){
-    let { bulkOps, branch } = opsPrivate.get(this);
-    let searchDoc = gitDocToSearchDoc(doc);
+    let { bulkOps, branch, log } = opsPrivate.get(this);
+    let searchDoc = jsonapiDocToSearchDoc(doc);
     await bulkOps.add({
       index: {
         _index: branch,
@@ -243,9 +214,10 @@ class Operations {
         _id: id,
       }
     }, searchDoc);
+    log.debug("save %s %s", type, id);
   }
   async delete(type, id) {
-    let { bulkOps, branch } = opsPrivate.get(this);
+    let { bulkOps, branch, log } = opsPrivate.get(this);
     await bulkOps.add({
       delete: {
         _index: branch,
@@ -253,57 +225,6 @@ class Operations {
         _id: id
       }
     });
-  }
-}
-
-class SchemaOperations {
-  static create(es, branch, realTime) {
-    let publicOps = new this(es, branch, realTime);
-    let privateOps = opsPrivate.get(publicOps);
-    return { publicOps, privateOps };
-  }
-  constructor(es, branch, realTime) {
-    opsPrivate.set(this, {
-      es,
-      branch,
-      realTime,
-      changes: new Map(),
-      applyTo(models) {
-        let unchanged = models.filter(
-          model => !this.changes.has(`${model.type}/${model.id}`)
-        );
-        let changed = [];
-        for (let [key, gitDoc] of this.changes.entries()) {
-          if (gitDoc) {
-            let [type, id] = key.split('/');
-            changed.push({
-              type,
-              id,
-              document: gitDocToSearchDoc(gitDoc)
-            });
-          }
-        }
-        return unchanged.concat(changed);
-      },
-      async writeOut(publicOps, privateOps) {
-        for (let [key, document] of this.changes.entries()) {
-          let [type, id] = key.split('/');
-          if (document) {
-            await publicOps.save(type, id, document);
-          } else {
-            await publicOps.delete(type, id);
-          }
-        }
-        await privateOps.flush();
-      }
-    });
-  }
-  async save(type, id, document) {
-    let { changes } = opsPrivate.get(this);
-    changes.set(`${type}/${id}`, document);
-  }
-  async delete(type, id) {
-    let { changes } = opsPrivate.get(this);
-    changes.set(`${type}/${id}`, null);
+    log.debug("delete %s %s", type, id);
   }
 }

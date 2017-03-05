@@ -1,15 +1,12 @@
 const Schema = require('@cardstack/server/schema');
-const Searcher = require('@cardstack/elasticsearch/searcher');
-const addRecords = require('@cardstack/server/tests/add-records');
 const ElasticAssert = require('@cardstack/elasticsearch/tests/assertions');
-const Plugins = require('@cardstack/server/plugins');
 
 describe('schema', function() {
 
   let schema;
 
   before(async function() {
-    await addRecords([
+    let models = [
       {
         type: 'content-types',
         id: 'articles',
@@ -79,14 +76,8 @@ describe('schema', function() {
           }
         }
       }
-    ]);
-
-    let plugins = await Plugins.load();
-    let models = await (new Searcher()).search('master', {
-      type: Schema.ownTypes()
-    });
-
-    schema = await Schema.loadFrom(models, plugins);
+    ];
+    schema = await Schema.loadFrom(models);
   });
 
   after(async function() {
