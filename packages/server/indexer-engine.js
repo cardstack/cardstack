@@ -112,16 +112,14 @@ module.exports = class IndexerEngine {
     });
   }
 
-  async _saveMeta(branch, updater, newMeta, publicOps) {
-    let bulkOps = opsPrivate.get(publicOps).bulkOps;
-    await bulkOps.add({
+  async _saveMeta(branch, updater, newMeta, privateOps) {
+    await privateOps.bulkOps.add({
       index: {
         _index: branch,
         _type: 'meta',
         _id: updater.name,
       }
     }, newMeta);
-    await bulkOps.flush();
   }
 
   async _updateSchema(branch, updaters, realTime, hints) {
@@ -139,11 +137,9 @@ module.exports = class IndexerEngine {
       }
       models = [];
     }
-    this.log.debug("starting with %s schema models", models.length);
 
     for (let updater of updaters) {
-      let publicOps = new SchemaOperations(this.es, branch, realTime);
-      let privateOps = opsPrivate.get(publicOps);
+      let { publicOps, privateOps } = SchemaOperations.create(this.es, branch, realTime);
       let meta = await this._loadMeta(branch, updater);
       await updater.updateSchema(meta, hints, publicOps);
       models = privateOps.applyTo(models);
@@ -152,22 +148,24 @@ module.exports = class IndexerEngine {
 
     return {
       schema: await Schema.loadFrom(models, this.plugins),
-      async save() {
-        for (let privateOps of toSave) {
-          await privateOps.writeOut();
+      async save(publicOps, privateOps) {
+        for (let savee of toSave) {
+          await savee.writeOut(publicOps, privateOps);
         }
       }
     };
   }
 
   async _updateContent(branch, updaters, realTime, hints, partialSchema) {
-    await partialSchema.save();
+    let { publicOps, privateOps } = Operations.create(this.es, branch, realTime);
+
+    await partialSchema.save(publicOps, privateOps);
     for (let updater of updaters) {
-      let publicOps = new PublicOperations(this.es, branch, realTime);
       let meta = await this._loadMeta(branch, updater);
       let newMeta = await updater.updateContent(meta, hints, publicOps);
-      await this._saveMeta(branch, updater, newMeta, publicOps);
+      await this._saveMeta(branch, updater, newMeta, privateOps);
     }
+    await privateOps.flush();
   }
 
   // 1. Index the branch into newIndex.
@@ -219,11 +217,20 @@ function gitDocToSearchDoc(gitDoc) {
 
 const opsPrivate = new WeakMap();
 
-class PublicOperations {
+class Operations {
+  static create(es, branch, realTime) {
+    let publicOps = new this(es, branch, realTime);
+    let privateOps = opsPrivate.get(publicOps);
+    return { publicOps, privateOps };
+  }
+
   constructor(es, branch, realTime) {
     opsPrivate.set(this, {
       branch,
-      bulkOps: new BulkOps(es, { realTime })
+      bulkOps: new BulkOps(es, { realTime }),
+      flush() {
+        return this.bulkOps.flush();
+      }
     });
   }
   async save(type, id, doc){
@@ -250,6 +257,11 @@ class PublicOperations {
 }
 
 class SchemaOperations {
+  static create(es, branch, realTime) {
+    let publicOps = new this(es, branch, realTime);
+    let privateOps = opsPrivate.get(publicOps);
+    return { publicOps, privateOps };
+  }
   constructor(es, branch, realTime) {
     opsPrivate.set(this, {
       es,
@@ -273,9 +285,7 @@ class SchemaOperations {
         }
         return unchanged.concat(changed);
       },
-      async writeOut() {
-        let publicOps = new PublicOperations(this.es, this.branch, this.realTime);
-        let privateOps = opsPrivate.get(publicOps);
+      async writeOut(publicOps, privateOps) {
         for (let [key, document] of this.changes.entries()) {
           let [type, id] = key.split('/');
           if (document) {
@@ -284,7 +294,7 @@ class SchemaOperations {
             await publicOps.delete(type, id);
           }
         }
-        await privateOps.bulkOps.flush();
+        await privateOps.flush();
       }
     });
   }
