@@ -59,13 +59,12 @@ class GitUpdater {
 
   async _update(meta, hints, ops, filter) {
     await this._loadCommit();
-    this.ops = ops;
     let originalTree;
     if (meta && meta.commit) {
       let oldCommit = await Commit.lookup(this.repo, meta.commit);
       originalTree = await oldCommit.getTree();
     }
-    await this._indexTree(originalTree, this.rootTree, filter);
+    await this._indexTree(ops, originalTree, this.rootTree, filter);
   }
 
   async _loadCommit() {
@@ -82,7 +81,7 @@ class GitUpdater {
     return Commit.lookup(this.repo, branch.target());
   }
 
-  async _indexTree(oldTree, newTree, filter={}) {
+  async _indexTree(ops, oldTree, newTree, filter={}) {
     let seen = new Map();
     if (newTree) {
       for (let newEntry of newTree.entries()) {
@@ -91,7 +90,7 @@ class GitUpdater {
           continue;
         }
         seen.set(name, true);
-        await this._indexEntry(name, oldTree, newEntry);
+        await this._indexEntry(ops, name, oldTree, newEntry);
       }
     }
     if (oldTree) {
@@ -101,13 +100,13 @@ class GitUpdater {
           continue;
         }
         if (!seen.get(name)) {
-          await this._deleteEntry(oldEntry);
+          await this._deleteEntry(ops, oldEntry);
         }
       }
     }
   }
 
-  async _indexEntry(name, oldTree, newEntry) {
+  async _indexEntry(ops, name, oldTree, newEntry) {
     let oldEntry;
     if (oldTree) {
       oldEntry = safeEntryByName(oldTree, name);
@@ -120,22 +119,23 @@ class GitUpdater {
     }
     if (newEntry.isTree()) {
       await this._indexTree(
+        ops,
         oldEntry && oldEntry.isTree() ? (await oldEntry.getTree()) : null,
         await newEntry.getTree()
       );
     } else {
       let { type, id } = identify(newEntry);
       let doc = JSON.parse((await newEntry.getBlob()).content().toString('utf8'));
-      await this.ops.save(type, id, doc);
+      await ops.save(type, id, doc);
     }
   }
 
-  async _deleteEntry(oldEntry) {
+  async _deleteEntry(ops, oldEntry) {
     if (oldEntry.isTree()) {
-      await this._indexTree(await oldEntry.getTree(), null);
+      await this._indexTree(ops, await oldEntry.getTree(), null);
     } else {
       let { type, id } = identify(oldEntry);
-      await this.ops.delete(type, id);
+      await ops.delete(type, id);
     }
   }
 }
