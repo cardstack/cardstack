@@ -24,11 +24,14 @@ const logger = require('heimdalljs-logger');
 const makeClient = require('@cardstack/elasticsearch/client');
 const { isEqual } = require('lodash');
 const BulkOps = require('./bulk-ops');
+const Schema = require('./schema');
 
 module.exports = class Indexer {
-  constructor(indexers) {
+  constructor(indexers, searcher, plugins) {
     this.indexers = indexers;
     this.es = makeClient();
+    this.searcher = searcher;
+    this.plugins = plugins;
     this.log = logger('indexer-engine');
   }
 
@@ -40,16 +43,14 @@ module.exports = class Indexer {
   }
 
   async _updateBranch(branch, updaters, realTime, hints) {
-    let schema = await this._updateSchema(branch, updaters, realTime, hints);
-
-    let wantMapping = schema.mapping();
     let haveMapping = await this._esMapping(branch);
-
+    let partialSchema = await this._updateSchema(branch, updaters, realTime, hints);
+    let wantMapping = partialSchema.schema.mapping();
+    this.log.debug('%j', { haveMapping, wantMapping });
     if (this._stableMapping(haveMapping, wantMapping)) {
       this.log.info('%s: mapping already OK', branch);
     } else {
       this.log.info('%s: mapping needs update', branch);
-      this.log.debug('%j', { haveMapping, wantMapping });
       let tmpIndex = this._tempIndexName(branch);
       await this.es.indices.create({
         index: tmpIndex,
@@ -59,7 +60,7 @@ module.exports = class Indexer {
       });
       await this._reindex(tmpIndex, branch);
     }
-    await this._updateContent(branch, updaters, realTime, hints);
+    await this._updateContent(branch, updaters, realTime, hints, partialSchema);
   }
 
   async _branches() {
@@ -124,20 +125,43 @@ module.exports = class Indexer {
   }
 
   async _updateSchema(branch, updaters, realTime, hints) {
+    let toSave = [];
+    let models;
+    try {
+      models = await this.searcher.search(branch, {
+        filter: {
+          type: Schema.ownTypes()
+        }
+      });
+    } catch (err) {
+      if (err.status !== 404) {
+        throw err;
+      }
+      models = [];
+    }
+    this.log.debug("starting with %s schema models", models.length);
+
     for (let updater of updaters) {
-      let publicOps = new PublicOperations(this.es, branch, realTime);
+      let publicOps = new SchemaOperations(this.es, branch, realTime);
+      let privateOps = opsPrivate.get(publicOps);
       let meta = await this._loadMeta(branch, updater);
       await updater.updateSchema(meta, hints, publicOps);
-      await opsPrivate.get(publicOps).bulkOps.flush();
+      models = privateOps.applyTo(models);
+      toSave.push(privateOps);
     }
+
     return {
-      mapping() {
-        return {};
+      schema: await Schema.loadFrom(models, this.plugins),
+      async save() {
+        for (let privateOps of toSave) {
+          await privateOps.writeOut();
+        }
       }
     };
   }
 
-  async _updateContent(branch, updaters, realTime, hints) {
+  async _updateContent(branch, updaters, realTime, hints, partialSchema) {
+    await partialSchema.save();
     for (let updater of updaters) {
       let publicOps = new PublicOperations(this.es, branch, realTime);
       let meta = await this._loadMeta(branch, updater);
@@ -176,6 +200,23 @@ module.exports = class Indexer {
 
 };
 
+function gitDocToSearchDoc(gitDoc) {
+  let searchDoc = {};
+  if (gitDoc.attributes) {
+    for (let attribute of Object.keys(gitDoc.attributes)) {
+      let value = gitDoc.attributes[attribute];
+      searchDoc[attribute] = value;
+    }
+  }
+  if (gitDoc.relationships) {
+    for (let attribute of Object.keys(gitDoc.relationships)) {
+      let value = gitDoc.relationships[attribute];
+      searchDoc[attribute] = value;
+    }
+  }
+  return searchDoc;
+}
+
 const opsPrivate = new WeakMap();
 
 class PublicOperations {
@@ -187,19 +228,7 @@ class PublicOperations {
   }
   async save(type, id, doc){
     let { bulkOps, branch } = opsPrivate.get(this);
-    let searchDoc = {};
-    if (doc.attributes) {
-      for (let attribute of Object.keys(doc.attributes)) {
-        let value = doc.attributes[attribute];
-        searchDoc[attribute] = value;
-      }
-    }
-    if (doc.relationships) {
-      for (let attribute of Object.keys(doc.relationships)) {
-        let value = doc.relationships[attribute];
-        searchDoc[attribute] = value;
-      }
-    }
+    let searchDoc = gitDocToSearchDoc(doc);
     await bulkOps.add({
       index: {
         _index: branch,
@@ -217,5 +246,54 @@ class PublicOperations {
         _id: id
       }
     });
+  }
+}
+
+class SchemaOperations {
+  constructor(es, branch, realTime) {
+    opsPrivate.set(this, {
+      es,
+      branch,
+      realTime,
+      changes: new Map(),
+      applyTo(models) {
+        let unchanged = models.filter(
+          model => !this.changes.has(`${model.type}/${model.id}`)
+        );
+        let changed = [];
+        for (let [key, gitDoc] of this.changes.entries()) {
+          if (gitDoc) {
+            let [type, id] = key.split('/');
+            changed.push({
+              type,
+              id,
+              document: gitDocToSearchDoc(gitDoc)
+            });
+          }
+        }
+        return unchanged.concat(changed);
+      },
+      async writeOut() {
+        let publicOps = new PublicOperations(this.es, this.branch, this.realTime);
+        let privateOps = opsPrivate.get(publicOps);
+        for (let [key, document] of this.changes.entries()) {
+          let [type, id] = key.split('/');
+          if (document) {
+            await publicOps.save(type, id, document);
+          } else {
+            await publicOps.delete(type, id);
+          }
+        }
+        await privateOps.bulkOps.flush();
+      }
+    });
+  }
+  async save(type, id, document) {
+    let { changes } = opsPrivate.get(this);
+    changes.set(`${type}/${id}`, document);
+  }
+  async delete(type, id) {
+    let { changes } = opsPrivate.get(this);
+    changes.set(`${type}/${id}`, null);
   }
 }

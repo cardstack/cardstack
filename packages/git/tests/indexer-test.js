@@ -4,6 +4,8 @@ const GitIndexer = require('@cardstack/git/indexer');
 const IndexerEngine = require('@cardstack/server/indexer-engine');
 const { commitOpts, makeRepo } = require('./support');
 const ElasticAssert = require('@cardstack/elasticsearch/tests/assertions');
+const Searcher = require('@cardstack/elasticsearch/searcher');
+const Plugins = require('@cardstack/server/plugins');
 
 describe('git indexer', function() {
   let root, indexer, ea;
@@ -13,7 +15,7 @@ describe('git indexer', function() {
     root = await temp.mkdir('cardstack-server-test');
     indexer = new IndexerEngine([new GitIndexer({
       repoPath: root
-    })]);
+    })], new Searcher(), await Plugins.load());
   });
 
   afterEach(async function() {
@@ -35,11 +37,8 @@ describe('git indexer', function() {
 
   it('does not reindex when mapping definition is stable', async function() {
     let { repo, head } = await makeRepo(root);
-
     await indexer.update();
-
     let originalIndexName = (await ea.aliases()).get('master');
-
     let updatedContent = [
       {
         operation: 'create',
@@ -49,12 +48,69 @@ describe('git indexer', function() {
         }), 'utf8')
       }
     ];
-
     await git.mergeCommit(repo, head, 'master', updatedContent, commitOpts({ message: 'Second commit' }));
-
     await indexer.update();
-
     expect((await ea.aliases()).get('master')).to.equal(originalIndexName);
+  });
+
+  it('reindexes when mapping definition is changed', async function() {
+    let { repo, head } = await makeRepo(root, [
+      {
+        changes: [
+          {
+            operation: 'create',
+            filename: 'schema/content-types/articles.json',
+            buffer: Buffer.from(JSON.stringify({
+              relationships: {
+                fields: {
+                  data: [
+                    { type: 'fields', id: 'title' }
+                  ]
+                }
+              }
+            }), 'utf8')
+          },
+          {
+            operation: 'create',
+            filename: 'schema/fields/title.json',
+            buffer: Buffer.from(JSON.stringify({
+              attributes: {
+                'field-type': 'string'
+              }
+            }), 'utf8')
+          },
+          {
+            operation: 'create',
+            filename: 'contents/articles/hello-world.json',
+            buffer: Buffer.from(JSON.stringify({
+              attributes: {
+                title: 'Hello world'
+              }
+            }), 'utf8')
+          }
+        ]
+      }
+    ]);
+
+    // FIXME: realtime dependency should not be necessary
+    await indexer.update({ realTime: true });
+    let originalIndexName = (await ea.aliases()).get('master');
+
+    let updatedContent = [
+      {
+        operation: 'update',
+        filename: 'schema/fields/title.json',
+        buffer: Buffer.from(JSON.stringify({
+          attributes: {
+            'field-type': 'string',
+            'searchable': false
+          }
+        }), 'utf8')
+      }
+    ];
+    await git.mergeCommit(repo, head, 'master', updatedContent, commitOpts({ message: 'Second commit' }));
+    await indexer.update();
+    expect((await ea.aliases()).get('master')).to.not.equal(originalIndexName);
   });
 
 
