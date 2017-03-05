@@ -1,5 +1,5 @@
 const Searcher = require('@cardstack/elasticsearch/searcher');
-const ElasticAssert = require('@cardstack/data-source/tests/elastic-assertions');
+const ElasticAssert = require('@cardstack/elasticsearch/tests/assertions');
 const addRecords = require('@cardstack/server/tests/add-records');
 
 describe('searcher', function() {

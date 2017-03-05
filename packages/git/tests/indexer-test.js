@@ -3,7 +3,7 @@ const temp = require('@cardstack/data-source/tests/temp-helper');
 const GitIndexer = require('@cardstack/git/indexer');
 const IndexerEngine = require('@cardstack/server/indexer-engine');
 const { commitOpts, makeRepo } = require('./support');
-const ElasticAssert = require('@cardstack/data-source/tests/elastic-assertions');
+const ElasticAssert = require('@cardstack/elasticsearch/tests/assertions');
 
 describe('git indexer', function() {
   let root, indexer, ea;

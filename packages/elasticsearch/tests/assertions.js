@@ -1,4 +1,4 @@
-const makeClient = require('@cardstack/data-source/elastic-client');
+const makeClient = require('@cardstack/elasticsearch/client');
 
 module.exports = class ElasticAsserter {
   constructor(){

@@ -21,7 +21,7 @@
 */
 
 const logger = require('heimdalljs-logger');
-const makeClient = require('@cardstack/data-source/elastic-client');
+const makeClient = require('@cardstack/elasticsearch/client');
 const { isEqual } = require('lodash');
 const BulkOps = require('./bulk-ops');
 
