@@ -4,11 +4,12 @@ const Constraint = require('@cardstack/server/constraint');
 const ContentType = require('@cardstack/server/content-type');
 
 module.exports = class Schema {
-  static async loadFrom(searcher, branch, plugins) {
-    let models = await searcher.search(branch, {
-      type: ['content-types', 'fields', 'constraints']
-    });
 
+  static ownTypes() {
+    return ['content-types', 'fields', 'constraints'];
+  }
+
+  static async loadFrom(models, plugins) {
     let constraints = new Map();
     for (let model of models) {
       if (model.type === 'constraints') {

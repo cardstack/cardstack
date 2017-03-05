@@ -40,7 +40,9 @@ module.exports = class Indexer {
   }
 
   async _updateBranch(branch, updaters, realTime, hints) {
-    let wantMapping = await this._desiredMapping(updaters);
+    let schema = await this._updateSchema(branch, updaters, realTime, hints);
+
+    let wantMapping = schema.mapping();
     let haveMapping = await this._esMapping(branch);
 
     if (this._stableMapping(haveMapping, wantMapping)) {
@@ -57,7 +59,7 @@ module.exports = class Indexer {
       });
       await this._reindex(tmpIndex, branch);
     }
-    await this._updateState(branch, updaters, realTime, hints);
+    await this._updateContent(branch, updaters, realTime, hints);
   }
 
   async _branches() {
@@ -75,14 +77,6 @@ module.exports = class Indexer {
       }
     }));
     return branches;
-  }
-
-  async _desiredMapping(updaters) {
-    let combinedMapping = {};
-    await Promise.all(updaters.map(async updater => {
-      Object.assign(combinedMapping, await updater.mappings());
-    }));
-    return combinedMapping;
   }
 
   async _esMapping(branch) {
@@ -107,25 +101,48 @@ module.exports = class Indexer {
     );
   }
 
-  async _updateState(branch, updaters, realTime, hints) {
+
+  async _loadMeta(branch, updater) {
+    return this.es.getSource({
+      index: branch,
+      type: 'meta',
+      id: updater.name,
+      ignore: [404]
+    });
+  }
+
+  async _saveMeta(branch, updater, newMeta, publicOps) {
+    let bulkOps = opsPrivate.get(publicOps).bulkOps;
+    await bulkOps.add({
+      index: {
+        _index: branch,
+        _type: 'meta',
+        _id: updater.name,
+      }
+    }, newMeta);
+    await bulkOps.flush();
+  }
+
+  async _updateSchema(branch, updaters, realTime, hints) {
     for (let updater of updaters) {
       let publicOps = new PublicOperations(this.es, branch, realTime);
-      let meta = await this.es.getSource({
-        index: branch,
-        type: 'meta',
-        id: updater.name,
-        ignore: [404]
-      });
-      let newMeta = await updater.run(meta, hints, publicOps);
-      let bulkOps = opsPrivate.get(publicOps).bulkOps;
-      await bulkOps.add({
-        index: {
-          _index: branch,
-          _type: 'meta',
-          _id: updater.name,
-        }
-      }, newMeta);
-      await bulkOps.flush();
+      let meta = await this._loadMeta(branch, updater);
+      await updater.updateSchema(meta, hints, publicOps);
+      await opsPrivate.get(publicOps).bulkOps.flush();
+    }
+    return {
+      mapping() {
+        return {};
+      }
+    };
+  }
+
+  async _updateContent(branch, updaters, realTime, hints) {
+    for (let updater of updaters) {
+      let publicOps = new PublicOperations(this.es, branch, realTime);
+      let meta = await this._loadMeta(branch, updater);
+      let newMeta = await updater.updateContent(meta, hints, publicOps);
+      await this._saveMeta(branch, updater, newMeta, publicOps);
     }
   }
 

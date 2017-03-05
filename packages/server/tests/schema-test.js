@@ -80,9 +80,12 @@ describe('schema', function() {
       }
     ]);
 
-    let searcher = new Searcher();
     let plugins = await Plugins.load();
-    schema = await Schema.loadFrom(searcher, 'master', plugins);
+    let models = await (new Searcher()).search('master', {
+      type: Schema.ownTypes()
+    });
+
+    schema = await Schema.loadFrom(models, plugins);
   });
 
   after(async function() {

@@ -46,12 +46,18 @@ class GitUpdater {
     this.ops = null;
   }
 
-  async mappings() {
-    await this._loadCommit();
-    return this._gitMapping(this.rootTree);
+  async updateSchema(meta, hints, ops) {
+    await this._update(meta, hints, ops, { only: 'schema' });
   }
 
-  async run(meta, hints, ops) {
+  async updateContent(meta, hints, ops) {
+    await this._update(meta, hints, ops, { only : 'contents' });
+    return {
+      commit: this.commit.id().tostrS()
+    };
+  }
+
+  async _update(meta, hints, ops, filter) {
     await this._loadCommit();
     this.ops = ops;
     let originalTree;
@@ -59,10 +65,7 @@ class GitUpdater {
       let oldCommit = await Commit.lookup(this.repo, meta.commit);
       originalTree = await oldCommit.getTree();
     }
-    await this._indexTree(originalTree, this.rootTree);
-    return {
-      commit: this.commit.id().tostrS()
-    };
+    await this._indexTree(originalTree, this.rootTree, filter);
   }
 
   async _loadCommit() {
@@ -79,22 +82,14 @@ class GitUpdater {
     return Commit.lookup(this.repo, branch.target());
   }
 
-  async _gitMapping(tree) {
-    let entry = await safeEntryByName(tree, 'mapping.json');
-    if (entry && entry.isBlob()) {
-      let buffer = (await entry.getBlob()).content();
-      let mapping = JSON.parse(buffer);
-      return mapping;
-    } else {
-      return {};
-    }
-  }
-
-  async _indexTree(oldTree, newTree) {
+  async _indexTree(oldTree, newTree, filter={}) {
     let seen = new Map();
     if (newTree) {
       for (let newEntry of newTree.entries()) {
         let name = newEntry.name();
+        if (filter.only && name !== filter.only) {
+          continue;
+        }
         seen.set(name, true);
         await this._indexEntry(name, oldTree, newEntry);
       }
@@ -102,6 +97,9 @@ class GitUpdater {
     if (oldTree) {
       for (let oldEntry of oldTree.entries()) {
         let name = oldEntry.name();
+        if (filter.only && name !== filter.only) {
+          continue;
+        }
         if (!seen.get(name)) {
           await this._deleteEntry(oldEntry);
         }

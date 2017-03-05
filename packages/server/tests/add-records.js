@@ -27,7 +27,9 @@ class StubUpdater {
   async mappings() {
     return {};
   }
-  async run(meta, hints, ops) {
+  async updateSchema(/* meta, hints, ops */) {
+  }
+  async updateContent(meta, hints, ops) {
     for (let record of this.source.records) {
       await ops.save(record.type, record.id, record);
     }
