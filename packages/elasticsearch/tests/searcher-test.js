@@ -7,6 +7,40 @@ describe('searcher', function() {
   let searcher, ea;
   let fixtures = [
     {
+      type: 'content-types',
+      id: 'people',
+      relationships: {
+        fields: {
+          data: [
+            { type: 'fields', id: 'firstName' },
+            { type: 'fields', id: 'lastName' },
+            { type: 'fields', id: 'age' }
+          ]
+        }
+      }
+    },
+    {
+      type: 'fields',
+      id: 'firstName',
+      attributes: {
+        'field-type': 'string'
+      }
+    },
+    {
+      type: 'fields',
+      id: 'lastName',
+      attributes: {
+        'field-type': 'string'
+      }
+    },
+    {
+      type: 'fields',
+      id: 'age',
+      attributes: {
+        'field-type': 'integer'
+      }
+    },
+    {
       type: 'articles',
       id: '1',
       attributes: {
@@ -181,6 +215,52 @@ describe('searcher', function() {
       sort: '-age'
     });
     expect(results.map(r => r.document.firstName)).to.deep.equal(['Quint', 'Arthur']);
+  });
+
+  it.skip('can sort via field-specific mappings', async function() {
+    // string fields are only sortable because of the sortFieldName
+    // in @cardstack/core-field-types/string. So this is a test that
+    // we're using that capability.
+    let results = await searcher.search('master', {
+      filter: {
+        type: 'people'
+      },
+      sort: 'firstName'
+    });
+    expect(results.map(r => r.document.firstName)).to.deep.equal(['Arthur', 'Quint']);
+  });
+
+
+  it.skip('can sort reverse via field-specific mappings', async function() {
+    // string fields are only sortable because of the sortFieldName
+    // in @cardstack/core-field-types/string. So this is a test that
+    // we're using that capability.
+    let results = await searcher.search('master', {
+      filter: {
+        type: 'people'
+      },
+      sort: '-firstName'
+    });
+    expect(results.map(r => r.document.firstName)).to.deep.equal(['Quint', 'Arthur']);
+  });
+
+  it.skip('has helpful error when sorting by nonexistent field', async function() {
+    try {
+      await searcher.search('master', {
+        sort: 'something-that-does-not-exist'
+      });
+      throw new Error("should not get here");
+    } catch (err) {
+      if (!err.status) {
+        throw err;
+      }
+      expect(err.status).equals(400);
+      expect(err.detail).equals('cannot sort by nonexistent field "something-that-does-not-exist"');
+    }
+  });
+
+  it.skip('can paginate results', async function() {
+    expect('unimplemented').to.equal('implemented');
   });
 
 });
