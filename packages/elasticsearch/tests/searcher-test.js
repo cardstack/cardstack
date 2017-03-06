@@ -162,5 +162,25 @@ describe('searcher', function() {
     expect(results).to.have.length(fixtures.length - 2);
   });
 
+  it('can sort', async function() {
+    let results = await searcher.search('master', {
+      filter: {
+        type: 'people'
+      },
+      sort: 'age'
+    });
+    expect(results.map(r => r.document.firstName)).to.deep.equal(['Arthur', 'Quint']);
+  });
+
+
+  it('can sort reverse', async function() {
+    let results = await searcher.search('master', {
+      filter: {
+        type: 'people'
+      },
+      sort: '-age'
+    });
+    expect(results.map(r => r.document.firstName)).to.deep.equal(['Quint', 'Arthur']);
+  });
 
 });

@@ -7,7 +7,7 @@ class Searcher {
     this.log = logger('searcher');
   }
 
-  async search(branch, { queryString, filter }) {
+  async search(branch, { queryString, filter, sort }) {
     let esBody = {
       query: {
         bool: {
@@ -33,6 +33,18 @@ class Searcher {
       for (let expression of this._filterToES(filter)) {
         esBody.query.bool.must.push(expression);
       }
+    }
+    if (sort) {
+      if (!Array.isArray(sort)) {
+        sort = [sort];
+      }
+      esBody.sort = sort.map(name => {
+        if (name.indexOf('-') === 0) {
+          return { [name.slice(1)] : { order: 'desc' } };
+        } else {
+          return { [name]: { order: 'asc' } };
+        }
+      });
     }
     this.log.debug('search %j', esBody);
     let result = await this.es.search({
