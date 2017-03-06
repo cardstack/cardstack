@@ -6,7 +6,7 @@ module.exports = async function addRecords(records) {
   let engine = new IndexerEngine([stub]);
   let schemaTypes = Schema.ownTypes();
   for (let record of records) {
-    if (schemaTypes.indexOf(record.type)) {
+    if (schemaTypes.indexOf(record.type) >= 0) {
       stub.schemaRecords.push(record);
     }
     stub.records.push(record);
