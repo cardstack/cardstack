@@ -15,7 +15,20 @@ describe('searcher', function() {
           data: [
             { type: 'fields', id: 'firstName' },
             { type: 'fields', id: 'lastName' },
-            { type: 'fields', id: 'age' }
+            { type: 'fields', id: 'age' },
+            { type: 'fields', id: 'color' }
+          ]
+        }
+      }
+    },
+    {
+      type: 'content-types',
+      id: 'articles',
+      relationships: {
+        fields: {
+          data: [
+            { type: 'fields', id: 'title' },
+            { type: 'fields', id: 'color' }
           ]
         }
       }
@@ -23,6 +36,20 @@ describe('searcher', function() {
     {
       type: 'fields',
       id: 'firstName',
+      attributes: {
+        'field-type': 'string'
+      }
+    },
+    {
+      type: 'fields',
+      id: 'title',
+      attributes: {
+        'field-type': 'string'
+      }
+    },
+    {
+      type: 'fields',
+      id: 'color',
       attributes: {
         'field-type': 'string'
       }
@@ -45,7 +72,8 @@ describe('searcher', function() {
       type: 'articles',
       id: '1',
       attributes: {
-        hello: 'magic words'
+        hello: 'magic words',
+        color: 'red',
       }
     },
     {
@@ -63,7 +91,8 @@ describe('searcher', function() {
       attributes: {
         firstName: 'Arthur',
         lastName: 'Faulkner',
-        age: 1
+        age: 1,
+        color: 'red'
       }
     }
   ];
@@ -139,6 +168,34 @@ describe('searcher', function() {
     expect(results).to.have.length(2);
   });
 
+  it('can use OR expressions in filters', async function() {
+    let results = await searcher.search('master', {
+      filter: {
+        or: [
+          { firstName: ['Quint'], type: 'people' },
+          { type: 'articles', id: '1' }
+        ]
+      }
+    });
+    expect(results).to.have.length(2);
+    expect(results).includes.something.with.deep.property('attributes.firstName', 'Quint');
+    expect(results).includes.something.with.deep.property('type', 'articles');
+  });
+
+  it('can use AND expressions in filters', async function() {
+    let results = await searcher.search('master', {
+      filter: {
+        and: [
+          { color: 'red' },
+          { type: 'people' }
+        ]
+      }
+    });
+    expect(results).to.have.length(1);
+    expect(results).includes.something.with.deep.property('attributes.firstName', 'Arthur');
+  });
+
+
   it('can filter by range', async function() {
     let results = await searcher.search('master', {
       filter: {
@@ -195,6 +252,16 @@ describe('searcher', function() {
       }
     });
     expect(results).to.have.length(fixtures.length - 2);
+  });
+
+  it.skip('gives helpful error when filtering unknown field', async function() {
+    let results = await searcher.search('master', {
+      filter: {
+        flavor: 'chocolate'
+      }
+    });
+    expect(results).to.have.length(1);
+    expect(results).includes.something.with.deep.property('attributes.hello', 'magic words');
   });
 
   it('can sort', async function() {

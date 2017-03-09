@@ -34,7 +34,7 @@ class Searcher {
       });
     }
     if (filter) {
-      for (let expression of this._filterToES(filter)) {
+      for (let expression of this._filterToES(schema, filter)) {
         esBody.query.bool.must.push(expression);
       }
     }
@@ -66,21 +66,31 @@ class Searcher {
     });
   }
 
-  _filterToES(filter) {
+  _filterToES(schema, filter) {
     let result = [];
     Object.keys(filter).forEach(key => {
       let value = filter[key];
       switch(key) {
       case 'not':
-        result.push({ bool: { must_not: this._filterToES(value) } });
+        result.push({ bool: { must_not: this._filterToES(schema, value) } });
         break;
       case 'or':
-        result.push({ bool: { should: this._filterToES(value) } });
+        if (!Array.isArray(value)) {
+          throw new Error(`the "or" operator must receive an array of other filters`, { status: 400 });
+        }
+        result.push({ bool: { should: value.map(v => ({ bool: { must: this._filterToES(schema, v) } })) } });
         break;
       case 'and':
         // 'and' is not strictly needed, since we already conjoin all
         // top-level conditions. But for completeness, it works.
-        result.push({ bool: { must: this._filterToES(value) } });
+        if (!Array.isArray(value)) {
+          throw new Error(`the "and" operator must receive an array of other filters`, { status: 400 });
+        }
+        value.forEach(v => {
+          this._filterToES(schema, v).forEach(r => {
+            result.push(r);
+          });
+        });
         break;
       default:
         // Any keys that aren't one of the predefined operations are
@@ -130,7 +140,7 @@ class Searcher {
       }
     }
 
-    throw new Error("Unimplemented");
+    throw new Error(`Unimplemented filter ${key} ${value}`);
   }
 
   _buildSorts(schema, sort) {
