@@ -95,14 +95,14 @@ class Searcher {
       default:
         // Any keys that aren't one of the predefined operations are
         // field names.
-        result.push(this._fieldFilter(key, value));
+        result.push(this._fieldFilter(schema, key, value));
       }
     });
     return result;
   }
 
-  _fieldFilter(key, value) {
-    let field = fieldNameFromKey(key);
+  _fieldFilter(schema, key, value) {
+    let field = fieldNameFromKey(schema, key);
 
     if (typeof value === 'string') {
       // Bare strings are shorthand for a single term filter
@@ -186,12 +186,19 @@ class Searcher {
 
 // We use elastic search's built-in _type and _id to store JSONAPI's
 // type and id. We don't want clients to need to add the underscores.
-function fieldNameFromKey(key) {
+function fieldNameFromKey(schema, key) {
   if (key === 'type') {
     return '_type';
   }
   if (key === 'id') {
     return '_id';
+  }
+  let field = schema.fields.get(key);
+  if (!field) {
+    throw new Error(`Cannot filter by unknown field "${key}"`, {
+      status: 400,
+      title: "Unknown field in filter"
+    });
   }
   return key;
 }

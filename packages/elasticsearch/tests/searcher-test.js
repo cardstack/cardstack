@@ -254,14 +254,21 @@ describe('searcher', function() {
     expect(results).to.have.length(fixtures.length - 2);
   });
 
-  it.skip('gives helpful error when filtering unknown field', async function() {
-    let results = await searcher.search('master', {
-      filter: {
-        flavor: 'chocolate'
+  it('gives helpful error when filtering unknown field', async function() {
+    try {
+      await searcher.search('master', {
+        filter: {
+          flavor: 'chocolate'
+        }
+      });
+      throw new Error("should not get here");
+    } catch (err) {
+      if (!err.status) {
+        throw err;
       }
-    });
-    expect(results).to.have.length(1);
-    expect(results).includes.something.with.deep.property('attributes.hello', 'magic words');
+      expect(err.status).equals(400);
+      expect(err.detail).equals('Cannot filter by unknown field "flavor"');
+    }
   });
 
   it('can sort', async function() {
