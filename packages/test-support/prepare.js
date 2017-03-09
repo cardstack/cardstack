@@ -1,6 +1,7 @@
 let chai = require('chai');
 global.expect = chai.expect;
 chai.use(require('chai-things'));
+chai.use(require('./collection-contains'));
 
 // Without this, we can't see stack traces for certain failures within
 // promises during the test suite.

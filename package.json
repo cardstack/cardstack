@@ -25,6 +25,7 @@
     "koa": "2",
     "lodash": "^4.17.4",
     "moment-timezone": "^0.5.11",
-    "nodegit": "^0.16.0"
+    "nodegit": "^0.16.0",
+    "qs": "^6.4.0"
   }
 }

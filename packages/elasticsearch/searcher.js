@@ -32,7 +32,7 @@ class Searcher {
     }
 
     if (page && page.cursor) {
-      esBody.search_after = page.cursor;
+      esBody.search_after = JSON.parse(decodeURIComponent(page.cursor));
     }
 
     if (queryString) {
@@ -78,7 +78,7 @@ class Searcher {
     };
     if (result.hits.hits.length === esBody.size) {
       let last = result.hits.hits[result.hits.hits.length - 1];
-      pagination.cursor = last.sort;
+      pagination.cursor = encodeURIComponent(JSON.stringify(last.sort));
     }
     return {
       models,

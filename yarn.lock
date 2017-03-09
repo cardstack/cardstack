@@ -1375,6 +1375,10 @@ qs@^6.1.0, qs@~6.3.0:
   version "6.3.0"
   resolved "https://registry.yarnpkg.com/qs/-/qs-6.3.0.tgz#f403b264f23bc01228c74131b407f18d5ea5d442"
 
+qs@^6.4.0:
+  version "6.4.0"
+  resolved "https://registry.yarnpkg.com/qs/-/qs-6.4.0.tgz#13e26d28ad6b0ffaa91312cd3bf708ed351e7233"
+
 rc@~1.1.6:
   version "1.1.6"
   resolved "https://registry.yarnpkg.com/rc/-/rc-1.1.6.tgz#43651b76b6ae53b5c802f1151fa3fc3b059969c9"
