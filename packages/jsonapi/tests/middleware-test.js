@@ -62,8 +62,9 @@ describe('jsonapi', function() {
       }
     ]);
     let app = new Koa();
-    let searcher = new Searcher(new SchemaCache());
-    app.use(jsonapi(searcher));
+    let schemaCache = new SchemaCache();
+    let searcher = new Searcher(schemaCache);
+    app.use(jsonapi(searcher, schemaCache));
     request = supertest(app.callback());
   }),
 

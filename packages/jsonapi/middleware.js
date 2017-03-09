@@ -2,22 +2,25 @@ const Error = require('@cardstack/data-source/error');
 const qs = require('qs');
 const { merge } = require('lodash');
 
-module.exports = function(searcher, optionsArg) {
+module.exports = function(searcher, schemaCache, optionsArg) {
   let options = Object.assign({}, {
     defaultBranch: 'master'
   }, optionsArg);
 
   return async (ctxt) => {
-    let handler = new Handler(searcher, ctxt, options);
+    let branch = options.defaultBranch;
+    let schema = await schemaCache.schemaForBranch(branch);
+    let handler = new Handler(searcher, ctxt, schema, branch);
     return handler.run();
   };
 };
 
 class Handler {
-  constructor(searcher, ctxt, options) {
+  constructor(searcher, ctxt, schema, branch) {
     this.searcher = searcher;
     this.ctxt = ctxt;
-    this.options = options;
+    this.schema = schema;
+    this.branch = branch;
     this._query = null;
   }
 
