@@ -9,7 +9,7 @@ class Searcher {
     this.schemaCache = schemaCache;
   }
 
-  async search(branch, { queryString, filter, sort }) {
+  async search(branch, { queryString, filter, sort, page }) {
     let schema = await this.schemaCache.schemaForBranch(branch);
     let esBody = {
       query: {
@@ -26,6 +26,11 @@ class Searcher {
       },
       sort: this._buildSorts(schema, sort)
     };
+
+    if (page && /^\d+$/.test(page.size)) {
+      esBody.size = parseInt(page.size, 10);
+    }
+
     if (queryString) {
       esBody.query.bool.must.push({
         match: {
@@ -44,7 +49,7 @@ class Searcher {
       body: esBody
     });
     this.log.debug('searchResult %j', result);
-    return result.hits.hits.map(entry => {
+    let models = result.hits.hits.map(entry => {
       let relnames = entry._source.cardstack_rel_names;
       let attributes = {};
       let relationships = {};
@@ -64,6 +69,7 @@ class Searcher {
         relationships
       };
     });
+    return { models };
   }
 
   _filterToES(schema, filter) {

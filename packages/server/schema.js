@@ -20,6 +20,9 @@ module.exports = class Schema {
     let plugins = await Plugins.load();
     let constraints = new Map();
     for (let model of models) {
+      if (!this.ownTypes().includes(model.type)) {
+        throw new Error(`attempted to load schema including non-schema type "${model.type}"`);
+      }
       if (model.type === 'constraints') {
         constraints.set(model.id, new Constraint(model, plugins));
       }

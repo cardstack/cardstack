@@ -100,76 +100,87 @@ describe('searcher', function() {
   before(async function() {
     ea = new ElasticAssert();
     searcher = new Searcher(new SchemaCache());
-    await addRecords(fixtures);
+    let records = fixtures.slice();
+    for (let i = 10; i < 20; i++) {
+      records.push({
+        type: 'comments',
+        id: String(i),
+        attributes: {
+          body: `comment ${i}`
+        }
+      });
+    }
+    await addRecords(records);
   });
 
   after(async function() {
     await ea.deleteAllIndices();
   });
 
-
   it('can be searched for all content', async function() {
-    let results = await searcher.search('master', {});
-    expect(results).to.have.length(fixtures.length);
+    let { models } = await searcher.search('master', {
+      page: { size: 1000 }
+    });
+    expect(models).to.have.length(fixtures.length + 10);
   });
 
   it('can be searched via queryString', async function() {
-    let results = await searcher.search('master', {
+    let { models } = await searcher.search('master', {
       queryString: 'magic'
     });
-    expect(results).to.have.length(1);
-    expect(results).includes.something.with.deep.property('attributes.hello', 'magic words');
+    expect(models).to.have.length(1);
+    expect(models).includes.something.with.deep.property('attributes.hello', 'magic words');
   });
 
   it('can be searched via queryString, negative result', async function() {
-    let results = await searcher.search('master', {
+    let { models } = await searcher.search('master', {
       queryString: 'this-is-an-unused-term'
     });
-    expect(results).to.have.length(0);
+    expect(models).to.have.length(0);
   });
 
   it('can filter by type', async function() {
-    let results = await searcher.search('master', {
+    let { models } = await searcher.search('master', {
       filter: {
         type: 'articles'
       }
     });
-    expect(results).to.have.length(1);
-    expect(results).includes.something.with.deep.property('attributes.hello', 'magic words');
+    expect(models).to.have.length(1);
+    expect(models).includes.something.with.deep.property('attributes.hello', 'magic words');
   });
 
   it('can filter by id', async function() {
-    let results = await searcher.search('master', {
+    let { models } = await searcher.search('master', {
       filter: {
         id: '1'
       }
     });
-    expect(results).to.have.length(2);
-    expect(results).includes.something.with.property('type', 'articles');
-    expect(results).includes.something.with.property('type', 'people');
+    expect(models).to.have.length(2);
+    expect(models).includes.something.with.property('type', 'articles');
+    expect(models).includes.something.with.property('type', 'people');
   });
 
   it('can filter a field by one term', async function() {
-    let results = await searcher.search('master', {
+    let { models } = await searcher.search('master', {
       filter: {
         firstName: 'Quint'
       }
     });
-    expect(results).to.have.length(1);
-    expect(results).includes.something.with.deep.property('attributes.firstName', 'Quint');
+    expect(models).to.have.length(1);
+    expect(models).includes.something.with.deep.property('attributes.firstName', 'Quint');
   });
 
   it('can filter a field by multiple terms', async function() {
-    let results = await searcher.search('master', {
+    let { models } = await searcher.search('master', {
       filter: {
         firstName: ['Quint', 'Arthur']
       }
     });
-    expect(results).to.have.length(2);
+    expect(models).to.have.length(2);
   });
 
   it('can use OR expressions in filters', async function() {
-    let results = await searcher.search('master', {
+    let { models } = await searcher.search('master', {
       filter: {
         or: [
           { firstName: ['Quint'], type: 'people' },
@@ -177,13 +188,13 @@ describe('searcher', function() {
         ]
       }
     });
-    expect(results).to.have.length(2);
-    expect(results).includes.something.with.deep.property('attributes.firstName', 'Quint');
-    expect(results).includes.something.with.deep.property('type', 'articles');
+    expect(models).to.have.length(2);
+    expect(models).includes.something.with.deep.property('attributes.firstName', 'Quint');
+    expect(models).includes.something.with.deep.property('type', 'articles');
   });
 
   it('can use AND expressions in filters', async function() {
-    let results = await searcher.search('master', {
+    let { models } = await searcher.search('master', {
       filter: {
         and: [
           { color: 'red' },
@@ -191,13 +202,13 @@ describe('searcher', function() {
         ]
       }
     });
-    expect(results).to.have.length(1);
-    expect(results).includes.something.with.deep.property('attributes.firstName', 'Arthur');
+    expect(models).to.have.length(1);
+    expect(models).includes.something.with.deep.property('attributes.firstName', 'Arthur');
   });
 
 
   it('can filter by range', async function() {
-    let results = await searcher.search('master', {
+    let { models } = await searcher.search('master', {
       filter: {
         age: {
           range: {
@@ -206,52 +217,60 @@ describe('searcher', function() {
         }
       }
     });
-    expect(results).to.have.length(1);
-    expect(results).includes.something.with.deep.property('attributes.firstName', 'Arthur');
+    expect(models).to.have.length(1);
+    expect(models).includes.something.with.deep.property('attributes.firstName', 'Arthur');
   });
 
   it('can filter by field existence (string)', async function() {
-    let results = await searcher.search('master', {
+    let { models } = await searcher.search('master', {
       filter: {
-        age: {
+        color: {
           exists: 'true'
-        }
+        },
+        type: 'people'
       }
     });
-    expect(results).to.have.length(2);
+    expect(models).to.have.length(1);
+    expect(models).includes.something.with.deep.property('attributes.firstName', 'Arthur');
   });
 
   it('can filter by field nonexistence (string)', async function() {
-    let results = await searcher.search('master', {
+    let { models } = await searcher.search('master', {
       filter: {
-        age: {
+        color: {
           exists: 'false'
-        }
+        },
+        type: 'people'
       }
     });
-    expect(results).to.have.length(fixtures.length - 2);
+    expect(models).to.have.length(1);
+    expect(models).includes.something.with.deep.property('attributes.firstName', 'Quint' );
   });
 
   it('can filter by field existence (bool)', async function() {
-    let results = await searcher.search('master', {
+    let { models } = await searcher.search('master', {
       filter: {
-        age: {
+        color: {
           exists: true
-        }
+        },
+        type: 'people'
       }
     });
-    expect(results).to.have.length(2);
+    expect(models).to.have.length(1);
+    expect(models).includes.something.with.deep.property('attributes.firstName', 'Arthur');
   });
 
   it('can filter by field nonexistence (bool)', async function() {
-    let results = await searcher.search('master', {
+    let { models } = await searcher.search('master', {
       filter: {
-        age: {
+        color: {
           exists: false
-        }
+        },
+        type: 'people'
       }
     });
-    expect(results).to.have.length(fixtures.length - 2);
+    expect(models).to.have.length(1);
+    expect(models).includes.something.with.deep.property('attributes.firstName', 'Quint' );
   });
 
   it('gives helpful error when filtering unknown field', async function() {
@@ -272,37 +291,37 @@ describe('searcher', function() {
   });
 
   it('can sort', async function() {
-    let results = await searcher.search('master', {
+    let { models } = await searcher.search('master', {
       filter: {
         type: 'people'
       },
       sort: 'age'
     });
-    expect(results.map(r => r.attributes.firstName)).to.deep.equal(['Arthur', 'Quint']);
+    expect(models.map(r => r.attributes.firstName)).to.deep.equal(['Arthur', 'Quint']);
   });
 
 
   it('can sort reverse', async function() {
-    let results = await searcher.search('master', {
+    let { models } = await searcher.search('master', {
       filter: {
         type: 'people'
       },
       sort: '-age'
     });
-    expect(results.map(r => r.attributes.firstName)).to.deep.equal(['Quint', 'Arthur']);
+    expect(models.map(r => r.attributes.firstName)).to.deep.equal(['Quint', 'Arthur']);
   });
 
   it('can sort via field-specific mappings', async function() {
     // string fields are only sortable because of the sortFieldName
     // in @cardstack/core-field-types/string. So this is a test that
     // we're using that capability.
-    let results = await searcher.search('master', {
+    let { models } = await searcher.search('master', {
       filter: {
         type: 'people'
       },
       sort: 'firstName'
     });
-    expect(results.map(r => r.attributes.firstName)).to.deep.equal(['Arthur', 'Quint']);
+    expect(models.map(r => r.attributes.firstName)).to.deep.equal(['Arthur', 'Quint']);
   });
 
 
@@ -310,13 +329,13 @@ describe('searcher', function() {
     // string fields are only sortable because of the sortFieldName
     // in @cardstack/core-field-types/string. So this is a test that
     // we're using that capability.
-    let results = await searcher.search('master', {
+    let { models } = await searcher.search('master', {
       filter: {
         type: 'people'
       },
       sort: '-firstName'
     });
-    expect(results.map(r => r.attributes.firstName)).to.deep.equal(['Quint', 'Arthur']);
+    expect(models.map(r => r.attributes.firstName)).to.deep.equal(['Quint', 'Arthur']);
   });
 
   it('has helpful error when sorting by nonexistent field', async function() {
@@ -334,8 +353,15 @@ describe('searcher', function() {
     }
   });
 
-  it.skip('can paginate results', async function() {
-    expect('unimplemented').to.equal('implemented');
+
+  it('can limit models', async function() {
+    let { models } = await searcher.search('master', {
+      filter: { type: 'comments' },
+      page: {
+        size: 7
+      }
+    });
+    expect(models.length).to.equal(7);
   });
 
 });

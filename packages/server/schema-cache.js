@@ -23,8 +23,10 @@ module.exports = class SchemaCache {
     this.searcher = new Searcher(new BootstrapSchemaCache());
   }
   async schemaForBranch(branch) {
-    let models = await this.searcher.search(branch, {
-      type: Schema.ownTypes()
+    let { models } = await this.searcher.search(branch, {
+      filter: {
+        type: Schema.ownTypes()
+      }
     });
     return Schema.loadFrom(models);
   }
