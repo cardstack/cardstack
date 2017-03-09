@@ -24,4 +24,11 @@ module.exports = class Field {
       index: this.searchable
     });
   }
+  get sortFieldName() {
+    if (this.plugin.sortFieldName) {
+      return this.plugin.sortFieldName(this.id);
+    } else {
+      return this.id;
+    }
+  }
 };

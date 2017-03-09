@@ -3,8 +3,14 @@ const Field = require('@cardstack/server/field');
 const Constraint = require('@cardstack/server/constraint');
 const ContentType = require('@cardstack/server/content-type');
 const Plugins = require('@cardstack/server/plugins');
+const bootstrapSchema = require('./bootstrap-schema');
 
 module.exports = class Schema {
+
+  static async bootstrap() {
+    // Our schema itself has a schema. This meta-schema isn't editable.
+    return this.loadFrom(bootstrapSchema);
+  }
 
   static ownTypes() {
     return ['content-types', 'fields', 'constraints'];
@@ -33,11 +39,12 @@ module.exports = class Schema {
       }
     }
 
-    return new this(types);
+    return new this(types, fields);
   }
 
-  constructor(types) {
+  constructor(types, fields) {
     this.types = types;
+    this.fields = fields;
     this._mapping = null;
   }
 
@@ -67,4 +74,5 @@ module.exports = class Schema {
     }
     return this._mapping;
   }
+
 };

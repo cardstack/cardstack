@@ -1,6 +1,7 @@
 const Searcher = require('@cardstack/elasticsearch/searcher');
 const ElasticAssert = require('@cardstack/elasticsearch/tests/assertions');
 const addRecords = require('@cardstack/server/tests/add-records');
+const SchemaCache = require('@cardstack/server/schema-cache');
 
 describe('searcher', function() {
 
@@ -69,7 +70,7 @@ describe('searcher', function() {
 
   before(async function() {
     ea = new ElasticAssert();
-    searcher = new Searcher();
+    searcher = new Searcher(new SchemaCache());
     await addRecords(fixtures);
   });
 
@@ -217,7 +218,7 @@ describe('searcher', function() {
     expect(results.map(r => r.attributes.firstName)).to.deep.equal(['Quint', 'Arthur']);
   });
 
-  it.skip('can sort via field-specific mappings', async function() {
+  it('can sort via field-specific mappings', async function() {
     // string fields are only sortable because of the sortFieldName
     // in @cardstack/core-field-types/string. So this is a test that
     // we're using that capability.
@@ -231,7 +232,7 @@ describe('searcher', function() {
   });
 
 
-  it.skip('can sort reverse via field-specific mappings', async function() {
+  it('can sort reverse via field-specific mappings', async function() {
     // string fields are only sortable because of the sortFieldName
     // in @cardstack/core-field-types/string. So this is a test that
     // we're using that capability.
@@ -244,7 +245,7 @@ describe('searcher', function() {
     expect(results.map(r => r.attributes.firstName)).to.deep.equal(['Quint', 'Arthur']);
   });
 
-  it.skip('has helpful error when sorting by nonexistent field', async function() {
+  it('has helpful error when sorting by nonexistent field', async function() {
     try {
       await searcher.search('master', {
         sort: 'something-that-does-not-exist'
@@ -255,7 +256,7 @@ describe('searcher', function() {
         throw err;
       }
       expect(err.status).equals(400);
-      expect(err.detail).equals('cannot sort by nonexistent field "something-that-does-not-exist"');
+      expect(err.detail).equals('Cannot sort by unknown field "something-that-does-not-exist"');
     }
   });
 

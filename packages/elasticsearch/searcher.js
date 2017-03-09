@@ -1,13 +1,16 @@
 const makeClient = require('@cardstack/elasticsearch/client');
 const logger = require('heimdalljs-logger');
+const Error = require('@cardstack/data-source/error');
 
 class Searcher {
-  constructor() {
+  constructor(schemaCache) {
     this.es = makeClient();
     this.log = logger('searcher');
+    this.schemaCache = schemaCache;
   }
 
   async search(branch, { queryString, filter, sort }) {
+    let schema = await this.schemaCache.schemaForBranch(branch);
     let esBody = {
       query: {
         bool: {
@@ -20,7 +23,8 @@ class Searcher {
             }
           }]
         }
-      }
+      },
+      sort: this._buildSorts(schema, sort)
     };
     if (queryString) {
       esBody.query.bool.must.push({
@@ -33,18 +37,6 @@ class Searcher {
       for (let expression of this._filterToES(filter)) {
         esBody.query.bool.must.push(expression);
       }
-    }
-    if (sort) {
-      if (!Array.isArray(sort)) {
-        sort = [sort];
-      }
-      esBody.sort = sort.map(name => {
-        if (name.indexOf('-') === 0) {
-          return { [name.slice(1)] : { order: 'desc' } };
-        } else {
-          return { [name]: { order: 'asc' } };
-        }
-      });
     }
     this.log.debug('search %j', esBody);
     let result = await this.es.search({
@@ -140,6 +132,46 @@ class Searcher {
 
     throw new Error("Unimplemented");
   }
+
+  _buildSorts(schema, sort) {
+    let output = [];
+    if (sort) {
+      if (Array.isArray(sort)) {
+        sort.forEach(name => {
+          output.push(this._buildSort(schema, name));
+        });
+      } else {
+        output.push(this._buildSort(schema, sort));
+      }
+    }
+
+    // We always have a backstop sort so we guarantee a total
+    // order. This ensures pagination is correct.
+    output.push({ '_uid': 'asc' });
+    return output;
+  }
+
+  _buildSort(schema, name) {
+    let realName, order;
+    if (name.indexOf('-') === 0) {
+      realName = name.slice(1);
+      order = 'desc';
+    } else {
+      realName = name;
+      order = 'asc';
+    }
+    let field = schema.fields.get(realName);
+    if (!field) {
+      throw new Error(`Cannot sort by unknown field "${realName}"`, {
+        status: 400,
+        title: "Unknown sort field"
+      });
+    }
+    return {
+      [field.sortFieldName] : { order }
+    };
+  }
+
 }
 
 // We use elastic search's built-in _type and _id to store JSONAPI's
