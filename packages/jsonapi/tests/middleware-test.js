@@ -29,7 +29,7 @@ describe('jsonapi', function() {
     await deleteAllRecords();
   }),
 
-  it('can get a single resource', async function() {
+  it('can get an individual resource', async function() {
     let response = await request.get('/articles/0');
     expect(response).to.have.property('status', 200);
     expect(response.body).deep.property('data.id', '0');
@@ -40,6 +40,13 @@ describe('jsonapi', function() {
     let response = await request.get('/articles/98766');
     expect(response).to.have.property('status', 404);
     expect(response.body).to.have.deep.property('errors[0].detail', 'No such resource /articles/98766');
+  });
+
+  it('can get a collection resource', async function() {
+    let response = await request.get('/articles');
+    expect(response).to.have.property('status', 200);
+    expect(response.body).to.have.deep.property('data[0].attributes.title', 'Hello world');
+
   });
 
 });

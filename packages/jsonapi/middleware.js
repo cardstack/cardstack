@@ -17,12 +17,20 @@ class Handler {
     this.ctxt = ctxt;
     this.options = options;
   }
+
   async run() {
     this.ctxt.response.set('Content-Type', 'application/vnd.api+json');
     try {
       let segments = this.ctxt.request.url.split('/');
-      if (segments.length === 3) {
-        await this.handleIndividualResource(segments[1], segments[2]);
+      let kind;
+      if (segments.length == 2) {
+        kind = 'Collection';
+      } else if (segments.length === 3) {
+        kind = 'Individual';
+      }
+      let method = this[`handle${kind}${this.ctxt.request.method}`];
+      if (method) {
+        await method.apply(this, segments.slice(1));
       }
     } catch (err) {
       if (!err.status) { throw err; }
@@ -39,12 +47,8 @@ class Handler {
       };
     }
   }
-  async handleIndividualResource(type, id) {
-    if (this.ctxt.request.method === 'GET') {
-      return this.getIndividualResource(type, id);
-    }
-  }
-  async getIndividualResource(type, id) {
+
+  async handleIndividualGET(type, id) {
     let { models } = await this.searcher.search(this.branch, {
       filter: { type,  id }
     });
@@ -56,6 +60,15 @@ class Handler {
     }
     this.ctxt.body = {
       data: models[0]
+    };
+  }
+
+  async handleCollectionGET(type) {
+    let { models } = await this.searcher.search(this.branch, {
+      filter: { type }
+    });
+    this.ctxt.body = {
+      data: models
     };
   }
 }
