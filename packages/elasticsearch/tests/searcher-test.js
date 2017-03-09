@@ -2,6 +2,7 @@ const Searcher = require('@cardstack/elasticsearch/searcher');
 const ElasticAssert = require('@cardstack/elasticsearch/tests/assertions');
 const addRecords = require('@cardstack/server/tests/add-records');
 const SchemaCache = require('@cardstack/server/schema-cache');
+const { uniq } = require('lodash');
 
 describe('searcher', function() {
 
@@ -101,7 +102,7 @@ describe('searcher', function() {
     ea = new ElasticAssert();
     searcher = new Searcher(new SchemaCache());
     let records = fixtures.slice();
-    for (let i = 10; i < 20; i++) {
+    for (let i = 10; i < 30; i++) {
       records.push({
         type: 'comments',
         id: String(i),
@@ -121,7 +122,7 @@ describe('searcher', function() {
     let { models } = await searcher.search('master', {
       page: { size: 1000 }
     });
-    expect(models).to.have.length(fixtures.length + 10);
+    expect(models).to.have.length(fixtures.length + 20);
   });
 
   it('can be searched via queryString', async function() {
@@ -353,15 +354,48 @@ describe('searcher', function() {
     }
   });
 
-
-  it('can limit models', async function() {
-    let { models } = await searcher.search('master', {
+  it('can paginate', async function() {
+    let response = await searcher.search('master', {
       filter: { type: 'comments' },
       page: {
         size: 7
       }
     });
-    expect(models.length).to.equal(7);
+    expect(response.models).length(7);
+    expect(response.page).has.property('total', 20);
+    expect(response.page).has.property('cursor');
+
+    let allModels = response.models;
+
+    response = await searcher.search('master', {
+      filter: { type: 'comments' },
+      page: {
+        size: 7,
+        cursor: response.page.cursor
+      }
+    });
+
+    expect(response.models).length(7);
+    expect(response.page).has.property('total', 20);
+    expect(response.page).has.property('cursor');
+
+    allModels = allModels.concat(response.models);
+
+    response = await searcher.search('master', {
+      filter: { type: 'comments' },
+      page: {
+        size: 7,
+        cursor: response.page.cursor
+      }
+    });
+
+    expect(response.models).length(6);
+    expect(response.page).has.property('total', 20);
+    expect(response.page).not.has.property('cursor');
+
+    allModels = allModels.concat(response.models);
+
+    expect(uniq(allModels.map(m => m.id))).length(20);
   });
 
 });

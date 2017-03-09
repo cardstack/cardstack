@@ -31,6 +31,10 @@ class Searcher {
       esBody.size = parseInt(page.size, 10);
     }
 
+    if (page && page.cursor) {
+      esBody.search_after = page.cursor;
+    }
+
     if (queryString) {
       esBody.query.bool.must.push({
         match: {
@@ -69,7 +73,17 @@ class Searcher {
         relationships
       };
     });
-    return { models };
+    let pagination = {
+      total: result.hits.total
+    };
+    if (result.hits.hits.length === esBody.size) {
+      let last = result.hits.hits[result.hits.hits.length - 1];
+      pagination.cursor = last.sort;
+    }
+    return {
+      models,
+      page: pagination
+    };
   }
 
   _filterToES(schema, filter) {
