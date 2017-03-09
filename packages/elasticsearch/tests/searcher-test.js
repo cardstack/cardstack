@@ -88,7 +88,7 @@ describe('searcher', function() {
       queryString: 'magic'
     });
     expect(results).to.have.length(1);
-    expect(results).includes.something.with.deep.property('document.hello', 'magic words');
+    expect(results).includes.something.with.deep.property('attributes.hello', 'magic words');
   });
 
   it('can be searched via queryString, negative result', async function() {
@@ -105,7 +105,7 @@ describe('searcher', function() {
       }
     });
     expect(results).to.have.length(1);
-    expect(results).includes.something.with.deep.property('document.hello', 'magic words');
+    expect(results).includes.something.with.deep.property('attributes.hello', 'magic words');
   });
 
   it('can filter by id', async function() {
@@ -126,7 +126,7 @@ describe('searcher', function() {
       }
     });
     expect(results).to.have.length(1);
-    expect(results).includes.something.with.deep.property('document.firstName', 'Quint');
+    expect(results).includes.something.with.deep.property('attributes.firstName', 'Quint');
   });
 
   it('can filter a field by multiple terms', async function() {
@@ -149,7 +149,7 @@ describe('searcher', function() {
       }
     });
     expect(results).to.have.length(1);
-    expect(results).includes.something.with.deep.property('document.firstName', 'Arthur');
+    expect(results).includes.something.with.deep.property('attributes.firstName', 'Arthur');
   });
 
   it('can filter by field existence (string)', async function() {
@@ -203,7 +203,7 @@ describe('searcher', function() {
       },
       sort: 'age'
     });
-    expect(results.map(r => r.document.firstName)).to.deep.equal(['Arthur', 'Quint']);
+    expect(results.map(r => r.attributes.firstName)).to.deep.equal(['Arthur', 'Quint']);
   });
 
 
@@ -214,7 +214,7 @@ describe('searcher', function() {
       },
       sort: '-age'
     });
-    expect(results.map(r => r.document.firstName)).to.deep.equal(['Quint', 'Arthur']);
+    expect(results.map(r => r.attributes.firstName)).to.deep.equal(['Quint', 'Arthur']);
   });
 
   it.skip('can sort via field-specific mappings', async function() {
@@ -227,7 +227,7 @@ describe('searcher', function() {
       },
       sort: 'firstName'
     });
-    expect(results.map(r => r.document.firstName)).to.deep.equal(['Arthur', 'Quint']);
+    expect(results.map(r => r.attributes.firstName)).to.deep.equal(['Arthur', 'Quint']);
   });
 
 
@@ -241,7 +241,7 @@ describe('searcher', function() {
       },
       sort: '-firstName'
     });
-    expect(results.map(r => r.document.firstName)).to.deep.equal(['Quint', 'Arthur']);
+    expect(results.map(r => r.attributes.firstName)).to.deep.equal(['Quint', 'Arthur']);
   });
 
   it.skip('has helpful error when sorting by nonexistent field', async function() {

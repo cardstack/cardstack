@@ -52,7 +52,26 @@ class Searcher {
       body: esBody
     });
     this.log.debug('searchResult %j', result);
-    return result.hits.hits.map(entry => ({ type: entry._type, id: entry._id, document: entry._source}));
+    return result.hits.hits.map(entry => {
+      let relnames = entry._source.cardstack_rel_names;
+      let attributes = {};
+      let relationships = {};
+      Object.keys(entry._source).forEach(fieldName => {
+        if (fieldName === 'cardstack_rel_names') {
+          // pass
+        } else if (relnames.includes(fieldName)) {
+          relationships[fieldName] = entry._source[fieldName];
+        } else {
+          attributes[fieldName] = entry._source[fieldName];
+        }
+      });
+      return {
+        type: entry._type,
+        id: entry._id,
+        attributes,
+        relationships
+      };
+    });
   }
 
   _filterToES(filter) {

@@ -170,6 +170,7 @@ module.exports = class IndexerEngine {
 
 function jsonapiDocToSearchDoc(jsonapiDoc) {
   let searchDoc = {};
+  let relNames = [];
   if (jsonapiDoc.attributes) {
     for (let attribute of Object.keys(jsonapiDoc.attributes)) {
       let value = jsonapiDoc.attributes[attribute];
@@ -180,8 +181,10 @@ function jsonapiDocToSearchDoc(jsonapiDoc) {
     for (let attribute of Object.keys(jsonapiDoc.relationships)) {
       let value = jsonapiDoc.relationships[attribute];
       searchDoc[attribute] = value;
+      relNames.push(attribute);
     }
   }
+  searchDoc.cardstack_rel_names = relNames;
   return searchDoc;
 }
 
