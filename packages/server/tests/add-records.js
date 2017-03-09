@@ -1,7 +1,8 @@
+const ElasticAssert = require('@cardstack/elasticsearch/tests/assertions');
 const IndexerEngine = require('@cardstack/server/indexer-engine');
 const Schema = require('@cardstack/server/schema');
 
-module.exports = async function addRecords(records) {
+exports.addRecords = async function addRecords(records) {
   let stub = new StubIndexer();
   let engine = new IndexerEngine([stub]);
   let schemaTypes = Schema.ownTypes();
@@ -12,6 +13,11 @@ module.exports = async function addRecords(records) {
     stub.records.push(record);
   }
   await engine.update({ realTime: true });
+};
+
+exports.deleteAllRecords = async function deleteAllRecords() {
+  let ea = new ElasticAssert();
+  await ea.deleteAllIndices();
 };
 
 class StubIndexer {

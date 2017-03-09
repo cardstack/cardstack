@@ -1,12 +1,11 @@
 const Searcher = require('@cardstack/elasticsearch/searcher');
-const ElasticAssert = require('@cardstack/elasticsearch/tests/assertions');
-const addRecords = require('@cardstack/server/tests/add-records');
+const { addRecords, deleteAllRecords } = require('@cardstack/server/tests/add-records');
 const SchemaCache = require('@cardstack/server/schema-cache');
 const { uniq } = require('lodash');
 
 describe('searcher', function() {
 
-  let searcher, ea;
+  let searcher;
   let fixtures = [
     {
       type: 'content-types',
@@ -99,7 +98,6 @@ describe('searcher', function() {
   ];
 
   before(async function() {
-    ea = new ElasticAssert();
     searcher = new Searcher(new SchemaCache());
     let records = fixtures.slice();
     for (let i = 10; i < 30; i++) {
@@ -115,7 +113,7 @@ describe('searcher', function() {
   });
 
   after(async function() {
-    await ea.deleteAllIndices();
+    await deleteAllRecords();
   });
 
   it('can be searched for all content', async function() {
