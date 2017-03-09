@@ -7,9 +7,11 @@ const SchemaCache = require('@cardstack/server/schema-cache');
 
 describe('jsonapi', function() {
 
-  let request;
+  let request, repo;
 
   beforeEach(async function() {
+    repo = '/no-such';
+
     await addRecords([
       {
         type: 'content-types',
@@ -20,7 +22,18 @@ describe('jsonapi', function() {
               { type: 'fields', id: 'title' },
               { type: 'fields', id: 'body' }
             ]
+          },
+          'data-source': {
+            data: { type: 'data-sources', id: 'default-git' }
           }
+        }
+      },
+      {
+        type: 'data-sources',
+        id: 'default-git',
+        attributes: {
+          'source-type': 'git',
+          params: { repo }
         }
       },
       {
@@ -132,4 +145,50 @@ describe('jsonapi', function() {
     expect(response.body.data).length(1);
   });
 
+  it('gets 403 when creating unknown resource', async function() {
+    let response = await request.post('/bogus').send({
+      data: {
+        type: 'bogus',
+        attributes: {
+          title: 'I am new'
+        }
+      }
+    });
+    expect(response.status).to.equal(403);
+    expect(response.body).has.deep.property('errors[0].detail', '"bogus" is not a supported type');
+  });
+
+  it('gets 400 when creating a resource with no body', async function() {
+    let response = await request.post('/articles');
+    expect(response.status).to.equal(400);
+    expect(response.body).has.deep.property('errors[0].detail', 'A body with a top-level "data" property is required');
+  });
+
+  it('gets 400 when creating a resource with no data property', async function() {
+    let response = await request.post('/articles').send({datum: {}});
+    expect(response.status).to.equal(400);
+    expect(response.body).has.deep.property('errors[0].detail', 'A body with a top-level "data" property is required');
+  });
+
+
+  it.skip('can create a new resource', async function() {
+    let response = await request.post('/articles').send({
+      data: {
+        type: 'articles',
+        attributes: {
+          title: 'I am new'
+        }
+      }
+    });
+
+    expect(response).has.property('status', 201);
+    expect(response.headers).has.property('location');
+    expect(response.body).has.deep.property('data.id');
+    expect(response.body).has.deep.property('data.attributes.title', 'I am new');
+
+    response = await request.get(response.headers.location);
+    expect(response).has.property('status', 200);
+    expect(response.body).has.deep.property('data.attributes.title', 'I am new', 'second time');
+
+  });
 });

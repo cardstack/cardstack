@@ -1,13 +1,21 @@
 const Error = require('@cardstack/data-source/error');
 const qs = require('qs');
 const { merge } = require('lodash');
+const koaJSONBody = require('koa-json-body');
 
 module.exports = function(searcher, schemaCache, optionsArg) {
   let options = Object.assign({}, {
     defaultBranch: 'master'
   }, optionsArg);
 
+  let body = koaJSONBody({ limit: '1mb' });
+
   return async (ctxt) => {
+    await body(ctxt, err => {
+      if (err) {
+        throw err;
+      }
+    });
     let branch = options.defaultBranch;
     let schema = await schemaCache.schemaForBranch(branch);
     let handler = new Handler(searcher, ctxt, schema, branch);
@@ -106,6 +114,25 @@ class Handler {
       };
     }
     this.ctxt.body = body;
+  }
+
+  async handleCollectionPOST(type) {
+    let contentType = this.schema.types.get(type);
+    let writer;
+    if (!contentType || !contentType.dataSource || !(writer = contentType.dataSource.writer)) {
+      throw new Error(`"${type}" is not a supported type`, {
+        status: 403,
+        title: "Unsupported type"
+      });
+    }
+    let data;
+    if (!this.ctxt.request.body || !(data = this.ctxt.request.body.data)) {
+      throw new Error('A body with a top-level "data" property is required', {
+        status: 400
+      });
+    }
+    let record = await writer.create(this.branch, this.user, type, data);
+    this.ctxt.body = { data: record };
   }
 
   urlWithUpdatedParams(params) {
