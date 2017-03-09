@@ -44,6 +44,12 @@ module.exports = class Plugins {
   constraintType(name) {
     return this._lookup(name, this.constraintTypes);
   }
+  writer(name) {
+    // for now, only this one
+    if (name === 'git') {
+      return require('@cardstack/git/writer');
+    }
+  }
   _lookup(name, where) {
     let entry = where.get(name);
     if (!entry) {

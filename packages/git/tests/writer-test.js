@@ -37,7 +37,7 @@ describe('git writer', function() {
   beforeEach(async function() {
     root = await temp.mkdir('cardstack-server-test');
     writer = new Writer({
-      repoPath: root
+      repo: root
     });
     user = {
       fullName: 'Sample User',
@@ -95,7 +95,7 @@ describe('git writer', function() {
     it('retries on id collision', async function () {
       let ids = ['1', '1', '2'];
       let writer = new Writer({
-        repoPath: root,
+        repo: root,
         idGenerator() {
           return ids.shift();
         }

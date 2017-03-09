@@ -16,6 +16,9 @@ describe('schema', function() {
               { type: 'fields', id: 'title' },
               { type: 'fields', id: 'published-date' }
             ]
+          },
+          'data-source': {
+            data: { type: 'data-sources', id: '432' }
           }
         }
       },
@@ -73,6 +76,16 @@ describe('schema', function() {
             data: [
               { type: 'fields', id: 'title' },
             ]
+          }
+        }
+      },
+      {
+        type: 'data-sources',
+        id: '432',
+        attributes: {
+          'source-type': 'git',
+          params: {
+            repo: 'http://example.git/repo.git'
           }
         }
       }
@@ -167,5 +180,14 @@ describe('schema', function() {
     expect(mapping).has.deep.property("events.properties.title");
   });
 
+  it("can lookup up a writer for a content type", async function() {
+    expect(schema.types.get('articles').dataSource).is.ok;
+    expect(schema.types.get('articles').dataSource.writer).is.ok;
+
+    // this relies on knowing a tiny bit of writer's internals. When
+    // we have a more complete plugin system we should just inject a
+    // fake writer plugin for this test to avoid the coupling.
+    expect(schema.types.get('articles').dataSource.writer).has.property('repoPath', 'http://example.git/repo.git');
+  });
 
 });

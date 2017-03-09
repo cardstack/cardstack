@@ -1,13 +1,18 @@
 const Error = require('@cardstack/data-source/error');
 
 module.exports = class ContentType {
-  constructor(model, allFields) {
+  constructor(model, allFields, dataSources) {
     let fields = new Map();
     for (let fieldRef of model.relationships.fields.data) {
       fields.set(fieldRef.id, allFields.get(fieldRef.id));
     }
     this.fields = fields;
     this.id = model.id;
+    if (model.relationships['data-source']) {
+      this.dataSource = dataSources.get(model.relationships['data-source'].data.id);
+    } else {
+      this.dataSource = null;
+    }
   }
   async validationErrors(document) {
     let errors = [];

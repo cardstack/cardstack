@@ -2,6 +2,7 @@ const Error = require('@cardstack/data-source/error');
 const Field = require('@cardstack/server/field');
 const Constraint = require('@cardstack/server/constraint');
 const ContentType = require('@cardstack/server/content-type');
+const DataSource = require('@cardstack/server/data-source');
 const Plugins = require('@cardstack/server/plugins');
 const bootstrapSchema = require('./bootstrap-schema');
 
@@ -13,7 +14,7 @@ module.exports = class Schema {
   }
 
   static ownTypes() {
-    return ['content-types', 'fields', 'constraints'];
+    return ['content-types', 'fields', 'constraints', 'data-sources'];
   }
 
   static async loadFrom(models) {
@@ -35,10 +36,17 @@ module.exports = class Schema {
       }
     }
 
+    let dataSources = new Map();
+    for (let model of models) {
+      if (model.type === 'data-sources') {
+        dataSources.set(model.id, new DataSource(model, plugins));
+      }
+    }
+
     let types = new Map();
     for (let model of models) {
       if (model.type === 'content-types') {
-        types.set(model.id, new ContentType(model, fields));
+        types.set(model.id, new ContentType(model, fields, dataSources));
       }
     }
 

@@ -10,8 +10,8 @@ const process = require('process');
 const Error = require('@cardstack/data-source/error');
 
 module.exports = class Writer {
-  constructor({ repoPath, idGenerator }) {
-    this.repoPath = repoPath;
+  constructor({ repo, idGenerator }) {
+    this.repoPath = repo;
     this.repo = null;
     this.log = logger('writer');
     let hostname = os.hostname();
