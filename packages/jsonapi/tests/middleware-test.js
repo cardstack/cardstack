@@ -79,6 +79,7 @@ describe('jsonapi', function() {
     expect(response).to.have.property('status', 200);
     expect(response.body).deep.property('data.id', '0');
     expect(response.body).deep.property('data.attributes.title', 'Hello world');
+    expect(response.body).not.deep.property('data.relationships');
   });
 
   it('returns 404 for missing individual resource', async function() {

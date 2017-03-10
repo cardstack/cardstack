@@ -55,14 +55,20 @@ class Searcher {
     this.log.debug('searchResult %j', result);
     let models = result.hits.hits.map(entry => {
       let relnames = entry._source.cardstack_rel_names;
-      let attributes = {};
-      let relationships = {};
+      let attributes;
+      let relationships;
       Object.keys(entry._source).forEach(fieldName => {
         if (fieldName === 'cardstack_rel_names') {
           // pass
         } else if (relnames.includes(fieldName)) {
+          if (!relationships) {
+            relationships = {};
+          }
           relationships[fieldName] = entry._source[fieldName];
         } else {
+          if (!attributes) {
+            attributes = {};
+          }
           attributes[fieldName] = entry._source[fieldName];
         }
       });
