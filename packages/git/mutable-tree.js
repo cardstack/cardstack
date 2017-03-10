@@ -36,6 +36,28 @@ class MutableTree {
   }
 
   async insertPath(path, object, filemode, { allowCreate, allowUpdate }) {
+    let { tree, leaf, leafName } = await this.traverse(path, allowCreate);
+
+    if (!allowUpdate && leaf && leaf !== tombstone) {
+      throw new OverwriteRejected(`Refusing to overwrite ${path}`);
+    }
+
+    if (!allowCreate && (!leaf || leaf === tombstone)) {
+      throw new NotFound(`${path} does not exist`);
+    }
+
+    return tree.insert(leafName, object, filemode);
+  }
+
+  async deletePath(path) {
+    let { tree, leaf, leafName } = await this.traverse(path, false);
+    if (!leaf || leaf === tombstone) {
+      throw new NotFound(`No such file ${path}`);
+    }
+    tree.overlay.set(leafName, tombstone);
+  }
+
+  async traverse(path, allowCreate) {
     let parts = path.split('/');
     let here = this;
 
@@ -51,36 +73,13 @@ class MutableTree {
       here = await entry.getTree();
     }
 
-    let have = here.entryByName(parts[0]);
-
-    if (!allowUpdate && have && have !== tombstone) {
-      throw new OverwriteRejected(`Refusing to overwrite ${path}`);
-    }
-
-    if (!allowCreate && (!have || have === tombstone)) {
-      throw new NotFound(`${path} does not exist`);
-    }
-
-    return here.insert(parts[0], object, filemode);
+    return {
+      tree: here,
+      leaf: here.entryByName(parts[0]),
+      leafName: parts[0]
+    };
   }
 
-  async deletePath(path) {
-    let parts = path.split('/');
-    let here = this;
-    while (parts.length > 1) {
-      let dirName = parts.shift();
-      let entry = here.entryByName(dirName);
-      if (!entry || !entry.isTree()) {
-        throw new NotFound(`No such directory ${path}`);
-      }
-      here = await entry.getTree();
-    }
-    let have = here.entryByName(parts[0]);
-    if (!have || have === tombstone) {
-      throw new NotFound(`No such file ${path}`);
-    }
-    here.overlay.set(parts[0], tombstone);
-  }
   async write(allowEmpty=false) {
     if (this.overlay.size === 0 && this.tree) {
       return this.tree;
