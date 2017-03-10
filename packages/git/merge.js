@@ -30,54 +30,17 @@ function signature(commitOpts) {
 }
 
 exports.createEmptyRepo = async function(path, commitOpts) {
-  let repo = await Repository.init(path, 1);
-  let commit = await makeCommit(repo, null, [], commitOpts);
-  await Branch.create(repo, 'master', commit, false);
-  return repo;
+  let change = await Change.createInitial(path, 'master', commitOpts);
+  await change.finalize();
+  return change.repo;
 };
 
-async function makeCommit(repo, parentCommit, operations, commitOpts) {
-  let parentTree;
-  let parents = [];
-  if (parentCommit) {
-    parentTree = await parentCommit.getTree();
-    parents.push(parentCommit);
-  }
-  let newRoot = new MutableTree(repo, parentTree);
-  for (let { operation, filename, buffer, patcher, patcherThis } of operations) {
-    switch (operation) {
-    case 'create':
-      await newRoot.insertPath(filename, buffer, FILEMODE.BLOB, { allowUpdate: false, allowCreate: true });
-      break;
-    case 'update':
-      await newRoot.insertPath(filename, buffer, FILEMODE.BLOB, { allowUpdate: true, allowCreate: false });
-      break;
-    case 'patch':
-      await newRoot.patchPath(filename, patcher, patcherThis, { allowCreate: false });
-      break;
-    case 'delete':
-      await newRoot.deletePath(filename);
-      break;
-    case 'createOrUpdate':
-      await newRoot.insertPath(filename, buffer, FILEMODE.BLOB, { allowUpdate: true, allowCreate: true } );
-      break;
-    default:
-      throw new Error("no operation");
-    }
-  }
-  let treeOid = await newRoot.write(true);
-
-  if (treeOid && parentTree && treeOid.equal(parentTree.id())) {
-    return parentCommit;
-  }
-
-  let tree = await Tree.lookup(repo, treeOid, null);
-  let { author, committer } = signature(commitOpts);
-  let commitOid = await Commit.create(repo, null, author, committer, 'UTF-8', commitOpts.message, tree, parents.length, parents);
-  return Commit.lookup(repo, commitOid);
-}
-
 class Change {
+  static async createInitial(repoPath, targetBranch, commitOpts) {
+    let repo = await Repository.init(repoPath, 1);
+    return new this(repo, commitOpts, targetBranch, null, [], null, null, null);
+  }
+
   static async create(repo, parentId, targetBranch, commitOpts) {
     let headRef = await Branch.lookup(repo, targetBranch, Branch.BRANCH.LOCAL);
     let headCommit = await Commit.lookup(repo, headRef.target());
@@ -154,6 +117,9 @@ class Change {
   }
 
   async _mergeCommit(newCommit) {
+    if (!this.headCommit) {
+      return this._newBranch(newCommit);
+    }
     let baseOid = await Merge.base(this.repo, newCommit, this.headCommit);
     if (baseOid.equal(this.headCommit.id())) {
       await this.headRef.setTarget(newCommit.id(), 'fast forward');
@@ -169,7 +135,12 @@ class Change {
     let mergeCommitOid = await Commit.create(this.repo, null, author, committer, 'UTF-8', `Clean merge into ${this.targetBranch}`, tree, 2, [newCommit, this.headCommit]);
     let mergeCommit = await Commit.lookup(this.repo, mergeCommitOid);
     await this.headRef.setTarget(mergeCommit.id(), 'fast forward');
-    return mergeCommit;
+    return mergeCommit.id().tostrS();
+  }
+
+  async _newBranch(newCommit) {
+    await Branch.create(this.repo, 'master', newCommit, false);
+    return newCommit.id().tostrS();
   }
 }
 
