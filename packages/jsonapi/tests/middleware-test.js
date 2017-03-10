@@ -4,13 +4,22 @@ const Koa = require('koa');
 const { addRecords, deleteAllRecords } = require('@cardstack/server/tests/add-records');
 const Searcher = require('@cardstack/elasticsearch/searcher');
 const SchemaCache = require('@cardstack/server/schema-cache');
+const temp = require('@cardstack/data-source/tests/temp-helper');
+const { makeRepo } = require('@cardstack/git/tests/support');
+const GitIndexer = require('@cardstack/git/indexer');
+const IndexerEngine = require('@cardstack/server/indexer-engine');
 
 describe('jsonapi', function() {
 
-  let request, repo;
+  let request, repo, indexer;
 
   beforeEach(async function() {
-    repo = '/no-such';
+    repo = await temp.mkdir('cardstack-server-test');
+    await makeRepo(repo);
+
+    indexer = new IndexerEngine([new GitIndexer({
+      repoPath: repo
+    })]);
 
     await addRecords([
       {
@@ -83,6 +92,7 @@ describe('jsonapi', function() {
 
   afterEach(async function() {
     await deleteAllRecords();
+    await temp.cleanup();
   }),
 
   it('can get an individual resource', async function() {
@@ -171,7 +181,7 @@ describe('jsonapi', function() {
   });
 
 
-  it.skip('can create a new resource', async function() {
+  it('can create a new resource', async function() {
     let response = await request.post('/articles').send({
       data: {
         type: 'articles',
@@ -185,6 +195,8 @@ describe('jsonapi', function() {
     expect(response.headers).has.property('location');
     expect(response.body).has.deep.property('data.id');
     expect(response.body).has.deep.property('data.attributes.title', 'I am new');
+
+    await indexer.update({ realTime: true });
 
     response = await request.get(response.headers.location);
     expect(response).has.property('status', 200);

@@ -39,6 +39,13 @@ class Handler {
     return this._query;
   }
 
+  get user() {
+    return {
+      fullName: 'Anonymous Coward',
+      email: 'anon@example.com'
+    };
+  }
+
   filterExpression(type, id) {
     let filter = this.query.filter;
     if (!filter) {
@@ -133,6 +140,8 @@ class Handler {
     }
     let record = await writer.create(this.branch, this.user, type, data);
     this.ctxt.body = { data: record };
+    this.ctxt.status = 201;
+    this.ctxt.set('location', this.ctxt.request.path + '/' + record.id);
   }
 
   urlWithUpdatedParams(params) {
