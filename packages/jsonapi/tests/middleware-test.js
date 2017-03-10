@@ -185,7 +185,7 @@ describe('jsonapi', function() {
 
   });
 
-  it.skip('can update an existing resource', async function() {
+  it('can update an existing resource', async function() {
     let response = await request.get('/articles/0');
     expect(response).has.property('status', 200);
     expect(response).has.deep.property('body.data.meta.version');
