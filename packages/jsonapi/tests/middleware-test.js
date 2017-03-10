@@ -175,6 +175,7 @@ describe('jsonapi', function() {
     expect(response.headers).has.property('location');
     expect(response.body).has.deep.property('data.id');
     expect(response.body).has.deep.property('data.attributes.title', 'I am new');
+    expect(response.body).has.deep.property('data.meta.version');
 
     await env.indexer.update({ realTime: true });
 
