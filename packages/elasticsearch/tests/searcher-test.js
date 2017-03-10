@@ -428,5 +428,9 @@ describe('searcher', function() {
     expect(uniq(allModels.map(m => m.id))).length(20);
   });
 
+  it('can get an individual record', async function() {
+    let model = await searcher.get('master', 'articles', '1');
+    expect(model).has.deep.property('attributes.hello', 'magic words');
+  });
 
 });

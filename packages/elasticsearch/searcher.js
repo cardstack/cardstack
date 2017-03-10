@@ -9,6 +9,11 @@ class Searcher {
     this.schemaCache = schemaCache;
   }
 
+  async get(branch, type, id) {
+    let document = await this.es.getSource({ index: branch, type, id });
+    return this._searchDocToJSONAPI(type, id, document);
+  }
+
   async search(branch, { queryString, filter, sort, page }) {
     let schema = await this.schemaCache.schemaForBranch(branch);
     let esBody = {
@@ -73,36 +78,40 @@ class Searcher {
       pagination.cursor = encodeURIComponent(JSON.stringify(last.sort));
     }
 
-    let models = documents.map(entry => {
-      let relnames = entry._source.cardstack_rel_names;
-      let attributes;
-      let relationships;
-      Object.keys(entry._source).forEach(fieldName => {
-        if (fieldName === 'cardstack_rel_names' || fieldName === 'cardstack_meta') {
-          // pass
-        } else if (relnames.includes(fieldName)) {
-          if (!relationships) {
-            relationships = {};
-          }
-          relationships[fieldName] = entry._source[fieldName];
-        } else {
-          if (!attributes) {
-            attributes = {};
-          }
-          attributes[fieldName] = entry._source[fieldName];
-        }
-      });
-      return {
-        type: entry._type,
-        id: entry._id,
-        attributes,
-        relationships,
-        meta: entry._source.cardstack_meta
-      };
-    });
+    let models = documents.map(
+      document => this._searchDocToJSONAPI(document._type, document._id, document._source)
+    );
     return {
       models,
       page: pagination
+    };
+  }
+
+  _searchDocToJSONAPI(type, id, document) {
+    let relnames = document.cardstack_rel_names;
+    let attributes;
+    let relationships;
+    Object.keys(document).forEach(fieldName => {
+      if (fieldName === 'cardstack_rel_names' || fieldName === 'cardstack_meta') {
+        // pass
+      } else if (relnames.includes(fieldName)) {
+        if (!relationships) {
+          relationships = {};
+        }
+        relationships[fieldName] = document[fieldName];
+      } else {
+        if (!attributes) {
+          attributes = {};
+        }
+        attributes[fieldName] = document[fieldName];
+      }
+    });
+    return {
+      type,
+      id,
+      attributes,
+      relationships,
+      meta: document.cardstack_meta
     };
   }
 
