@@ -134,7 +134,11 @@ describe('git indexer', function() {
     expect(indexerState.commit).to.equal(head);
 
     let contents = await ea.documentContents('master', 'articles', 'hello-world');
-    expect(contents).to.deep.equal({ hello: 'world', cardstack_rel_names: [] });
+    expect(contents).to.deep.equal({
+      hello: 'world',
+      cardstack_rel_names: [],
+      meta: { version: head }
+    });
   });
 
   it('does not reindex unchanged content', async function() {

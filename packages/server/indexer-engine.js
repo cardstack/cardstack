@@ -184,6 +184,9 @@ function jsonapiDocToSearchDoc(jsonapiDoc) {
       relNames.push(attribute);
     }
   }
+  if (jsonapiDoc.meta) {
+    searchDoc.meta = jsonapiDoc.meta;
+  }
   searchDoc.cardstack_rel_names = relNames;
   return searchDoc;
 }

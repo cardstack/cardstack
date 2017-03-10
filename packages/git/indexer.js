@@ -41,6 +41,7 @@ class GitUpdater {
     this.repo = repo;
     this.branch = branch;
     this.commit = null;
+    this.commitId = null;
     this.rootTree = null;
     this.name = 'git';
   }
@@ -62,13 +63,14 @@ class GitUpdater {
     }
     await this._indexTree(ops, originalTree, this.rootTree);
     return {
-      commit: this.commit.id().tostrS()
+      commit: this.commitId
     };
   }
 
   async _loadCommit() {
     if (!this.commit) {
       this.commit = await this._commitAtBranch(this.branch);
+      this.commitId = this.commit.id().tostrS();
     }
     if (!this.rootTree) {
       this.rootTree = await this.commit.getTree();
@@ -125,6 +127,10 @@ class GitUpdater {
     } else {
       let { type, id } = identify(newEntry);
       let doc = JSON.parse((await newEntry.getBlob()).content().toString('utf8'));
+      if (!doc.meta) {
+        doc.meta = {};
+      }
+      doc.meta.version = this.commitId;
       await ops.save(type, id, doc);
     }
   }
