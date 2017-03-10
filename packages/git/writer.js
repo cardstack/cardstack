@@ -8,6 +8,7 @@ const git = require('./merge');
 const os = require('os');
 const process = require('process');
 const Error = require('@cardstack/data-source/error');
+const Schema = require('@cardstack/server/schema');
 
 module.exports = class Writer {
   constructor({ repo, idGenerator }) {
@@ -77,7 +78,7 @@ module.exports = class Writer {
       let commitId = await git.mergeCommit(this.repo, document.meta.version, branch, [
         {
           operation: 'update',
-          filename: `contents/${document.type}/${document.id}.json`,
+          filename: this._filenameFor(document.type, document.id),
           buffer: Buffer.from(JSON.stringify(gitDocument), 'utf8')
         }
       ], this._commitOptions('update', document.type, document.id, user));
@@ -115,7 +116,7 @@ module.exports = class Writer {
       await git.mergeCommit(this.repo, version, branch, [
         {
           operation: 'delete',
-          filename: `contents/${type}/${id}.json`
+          filename: this._filenameFor(type, id)
         }
       ], this._commitOptions('delete', type, id, user));
     });
@@ -135,7 +136,7 @@ module.exports = class Writer {
     let commitId = await git.mergeCommit(this.repo, null, branch, [
       {
         operation: 'create',
-        filename: `contents/${document.type}/${id}.json`,
+        filename: this._filenameFor(document.type, id),
         buffer: Buffer.from(JSON.stringify(gitDocument), 'utf8')
       }
     ], this._commitOptions('create', document.type, id, user));
@@ -203,6 +204,11 @@ module.exports = class Writer {
       committerEmail: this.myEmail,
       message: `${operation} ${type} ${id.slice(12)}`
     };
+  }
+
+  _filenameFor(type, id) {
+    let category = Schema.ownTypes().includes(type) ? 'schema' : 'contents';
+    return `${category}/${type}/${id}.json`;
   }
 
   async _ensureRepo() {
