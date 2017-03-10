@@ -124,8 +124,16 @@ describe('schema', function() {
         pomposity: 'high'
       }
     });
-    expect(errors).includes.something.with.property('detail', 'type "articles" has no field named "popularity"');
-    expect(errors).includes.something.with.property('detail', 'type "articles" has no field named "pomposity"');
+    expect(errors).collectionContains({
+      detail: 'type "articles" has no field named "popularity"',
+      source: { pointer: '/data/attributes/popularity' },
+      status: 400
+    });
+    expect(errors).collectionContains({
+      detail: 'type "articles" has no field named "pomposity"',
+      source: { pointer: '/data/attributes/pomposity' },
+      status: 400
+    });
   });
 
   it("accepts known fields", async function() {
@@ -148,8 +156,16 @@ describe('schema', function() {
         "published-date": "Not a date"
       }
     });
-    expect(errors).includes.something.with.property('detail', '21 is not a valid value for field "title"');
-    expect(errors).includes.something.with.property('detail', '"Not a date" is not a valid value for field "published-date"');
+    expect(errors).collectionContains({
+      detail: '21 is not a valid value for field "title"',
+      source: { pointer: '/data/attributes/title' },
+      status: 400
+    });
+    expect(errors).collectionContains({
+      detail: '"Not a date" is not a valid value for field "published-date"',
+      source: { pointer: '/data/attributes/published-date' },
+      status: 400
+    });
   });
 
   it("applies constraints to present fields", async function() {
@@ -160,7 +176,11 @@ describe('schema', function() {
         title: "very long very long very long very long very long very long"
       }
     });
-    expect(errors).includes.something.with.property('detail', 'the value of field "title" may not exceed max length of 40 characters');
+    expect(errors).collectionContains({
+      detail: 'the value of field "title" may not exceed max length of 40 characters',
+      status: 400,
+      source: { pointer: '/data/attributes/title' }
+    });
   });
 
   it("applies constraints to missing fields", async function() {

@@ -15,9 +15,19 @@ module.exports = class Field {
   }
   async validationErrors(value) {
     if (value != null && !this.plugin.valid(value)) {
-      return [new Error(`${JSON.stringify(value)} is not a valid value for field "${this.id}"`)];
+      return [new Error(`${JSON.stringify(value)} is not a valid value for field "${this.id}"`, {
+        status: 400,
+        title: "Validation error"
+      })];
     }
-    return (await Promise.all(this.constraints.map(constraint => constraint.validationErrors(value)))).reduce((a,b) => a.concat(b), []).map(message => new Error(`the value of field "${this.id}" ${message}`));
+    return (await Promise.all(this.constraints.map(constraint => constraint.validationErrors(value)))).reduce(
+      (a,b) => a.concat(b), []
+    ).map(
+      message => new Error(`the value of field "${this.id}" ${message}`, {
+        title: "Validation error",
+        status: 400
+      })
+    );
   }
   mapping() {
     return Object.assign({}, this.plugin.defaultMapping(), {

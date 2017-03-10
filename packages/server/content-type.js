@@ -21,16 +21,21 @@ module.exports = class ContentType {
       for (let fieldName of Object.keys(document.attributes)) {
         let field = this.fields.get(fieldName);
         if (!field) {
-          errors.push(new Error(`type "${this.id}" has no field named "${fieldName}"`));
+          errors.push(new Error(`type "${this.id}" has no field named "${fieldName}"`, {
+            status: 400,
+            title: 'Validation error',
+            source: { pointer: `/data/attributes/${fieldName}` }
+          }));
         } else {
-          errors = errors.concat(await field.validationErrors(document.attributes[fieldName], document));
+          let fieldErrors = await field.validationErrors(document.attributes[fieldName], document);
+          errors = errors.concat(tagFieldErrors(fieldName, fieldErrors));
           seen.set(fieldName, true);
         }
       }
     }
     for (let [fieldName, field] of this.fields.entries()) {
       if (field && !seen.get(fieldName)) {
-        errors = errors.concat(await field.validationErrors(null, document));
+        errors = errors.concat(tagFieldErrors(fieldName, await field.validationErrors(null, document)));
       }
     }
     return errors;
@@ -43,3 +48,12 @@ module.exports = class ContentType {
     return { properties };
   }
 };
+
+function tagFieldErrors(fieldName, errors) {
+  errors.forEach(fe => {
+    if (!fe.source) {
+      fe.source = { pointer: `/data/attributes/${fieldName}` };
+    }
+  });
+  return errors;
+}
