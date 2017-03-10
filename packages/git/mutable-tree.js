@@ -50,14 +50,26 @@ class MutableTree {
   }
 
   async deletePath(path) {
-    let { tree, leaf, leafName } = await this.traverse(path, false);
+    let { tree, leaf, leafName } = await this.traverse(path);
     if (!leaf || leaf === tombstone) {
       throw new NotFound(`No such file ${path}`);
     }
     tree.overlay.set(leafName, tombstone);
   }
 
-  async traverse(path, allowCreate) {
+  async patchPath(path, patcher, { allowCreate }) {
+    let { tree, leaf, leafName } = await this.traverse(path, allowCreate);
+    if (!leaf || leaf === tombstone || !leaf.isBlob()) {
+      throw new NotFound(`No such file ${path}`);
+    }
+    let originalBuffer = (await leaf.getBlob()).content();
+    let newBuffer = patcher(originalBuffer);
+    if (newBuffer) {
+      return tree.insert(leafName, newBuffer, leaf.filemode());
+    }
+  }
+
+  async traverse(path, allowCreate=false) {
     let parts = path.split('/');
     let here = this;
 
@@ -107,6 +119,9 @@ class MutableBlob {
   constructor(repo, buffer) {
     this.repo = repo;
     this.buffer = buffer;
+  }
+  content() {
+    return this.buffer;
   }
   async write() {
     return Blob.createFromBuffer(this.repo, this.buffer, this.buffer.length);

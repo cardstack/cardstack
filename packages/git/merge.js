@@ -44,13 +44,16 @@ async function makeCommit(repo, parentCommit, operations, commitOpts) {
     parents.push(parentCommit);
   }
   let newRoot = new MutableTree(repo, parentTree);
-  for (let { operation, filename, buffer } of operations) {
+  for (let { operation, filename, buffer, patcher } of operations) {
     switch (operation) {
     case 'create':
       await newRoot.insertPath(filename, buffer, FILEMODE.BLOB, { allowUpdate: false, allowCreate: true });
       break;
     case 'update':
       await newRoot.insertPath(filename, buffer, FILEMODE.BLOB, { allowUpdate: true, allowCreate: false });
+      break;
+    case 'patch':
+      await newRoot.patchPath(filename, patcher, { allowCreate: false });
       break;
     case 'delete':
       await newRoot.deletePath(filename);

@@ -480,7 +480,7 @@ describe('git merge', function() {
   });
 
 
-  it.skip('can patch a file', async function() {
+  it('can patch a file', async function() {
     let { repo, head } = await makeRepo(path, [
       {
         changes: [
