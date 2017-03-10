@@ -94,19 +94,8 @@ class Handler {
   }
 
   async handleIndividualGET(type, id) {
-    try {
-      let data = await this.searcher.get(this.branch, type, id);
-      this.ctxt.body = { data };
-    } catch (err) {
-      if (err.status === 404 && !err.isCardstackError) {
-        // Turn elasticsearch 404 into our nicely formatted 404
-        throw new Error(`No such resource ${this.ctxt.request.url}`, {
-          status: 404,
-          title: 'No such resource'
-        });
-      }
-      throw err;
-    }
+    let data = await this._lookupRecord(type, id);
+    this.ctxt.body = { data };
   }
 
   async handleCollectionGET(type) {
@@ -143,6 +132,22 @@ class Handler {
     this.ctxt.body = { data: record };
     this.ctxt.status = 201;
     this.ctxt.set('location', this.ctxt.request.path + '/' + record.id);
+  }
+
+  async _lookupRecord(type, id) {
+    try {
+      let record = await this.searcher.get(this.branch, type, id);
+      return record;
+    } catch (err) {
+      if (err.status === 404 && !err.isCardstackError) {
+        // Turn elasticsearch 404 into our nicely formatted 404
+        throw new Error(`No such resource ${this.ctxt.request.url}`, {
+          status: 404,
+          title: 'No such resource'
+        });
+      }
+      throw err;
+    }
   }
 
   urlWithUpdatedParams(params) {
