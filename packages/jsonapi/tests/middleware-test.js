@@ -300,8 +300,9 @@ describe('jsonapi', function() {
   });
 
   it.skip('validates schema during PATCH', async function() {
-    let response = await request.post('/articles').send({
+    let response = await request.patch('/articles/0').send({
       data: {
+        id: '0',
         type: 'articles',
         attributes: {
           title: 3

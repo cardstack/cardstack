@@ -79,17 +79,7 @@ class Handler {
       }
     } catch (err) {
       if (!err.isCardstackError) { throw err; }
-      this.ctxt.status = err.status;
-      this.ctxt.body = {
-        errors: [
-          {
-            title: err.title,
-            detail: err.detail,
-            code: err.status,
-            source: err.source
-          }
-        ]
-      };
+      this._errorResponse([err]);
     }
   }
 
@@ -99,8 +89,12 @@ class Handler {
   }
 
   async handleIndividualPATCH(type, id) {
-    let writer = this._writerForType(type);
     let data = this._mandatoryBodyData();
+    let errors = await this.schema.validationErrors(data);
+    if (errors.length > 0) {
+      return this._errorResponse(errors);
+    }
+    let writer = this._writerForType(type);
     let record = await writer.update(this.branch, this.user, type, id, data);
     this.ctxt.body = { data: record };
     this.ctxt.status = 200;
@@ -133,7 +127,7 @@ class Handler {
     let body = { data: models, meta: { total: page.total } };
     if (page.cursor) {
       body.links = {
-        next: this.urlWithUpdatedParams({ page: { cursor: page.cursor } })
+        next: this._urlWithUpdatedParams({ page: { cursor: page.cursor } })
       };
     }
     this.ctxt.body = body;
@@ -143,9 +137,7 @@ class Handler {
     let data = this._mandatoryBodyData();
     let errors = await this.schema.validationErrors(data);
     if (errors.length > 0) {
-      this.ctxt.body = { errors };
-      this.ctxt.status = errors[0].status;
-      return;
+      return this._errorResponse(errors);
     }
     let writer = this._writerForType(type);
     let record = await writer.create(this.branch, this.user, type, data);
@@ -192,7 +184,19 @@ class Handler {
     return data;
   }
 
-  urlWithUpdatedParams(params) {
+  _errorResponse(errors) {
+    this.ctxt.body = {
+      errors: errors.map(err => ({
+        title: err.title,
+        detail: err.detail,
+        code: err.status,
+        source: err.source
+      }))
+    };
+    this.ctxt.status = errors[0].status;
+  }
+
+  _urlWithUpdatedParams(params) {
     let p = merge({}, this.query, params);
     return this.ctxt.request.path + "?" + qs.stringify(p, { encode: false });
   }
