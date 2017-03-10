@@ -8,7 +8,7 @@ const {
 }= require('./support');
 const moment = require('moment-timezone');
 
-describe('git', function() {
+describe('git merge', function() {
   let path;
 
   beforeEach(async function() {
@@ -452,6 +452,87 @@ describe('git', function() {
     } catch (err) {
       expect(err).instanceOf(git.NotFound);
     }
+  });
+
+  it('can update a file', async function() {
+    let { repo, head } = await makeRepo(path, [
+      {
+        changes: [
+          {
+            operation: 'create',
+            filename: 'sample.txt',
+            buffer: Buffer.from('sample', 'utf8')
+          }
+        ]
+      }
+    ]);
+
+    let updates = [
+      {
+        operation: 'update',
+        filename: 'sample.txt',
+        buffer: Buffer.from('updated', 'utf8')
+      }
+    ];
+
+    head = await git.mergeCommit(repo, head, 'master', updates, commitOpts({ message: 'Updating' }));
+    expect(await inRepo(path).getContents(head, 'sample.txt')).to.equal('updated');
+  });
+
+
+  it.skip('can patch a file', async function() {
+    let { repo, head } = await makeRepo(path, [
+      {
+        changes: [
+          {
+            operation: 'create',
+            filename: 'sample.txt',
+            buffer: Buffer.from('sample', 'utf8')
+          }
+        ]
+      }
+    ]);
+
+    let updates = [
+      {
+        operation: 'patch',
+        filename: 'sample.txt',
+        patcher(originalBuffer) {
+          return Buffer.from('The original was: ' + originalBuffer.toString('utf8'), 'utf8');
+        }
+      }
+    ];
+
+    head = await git.mergeCommit(repo, head, 'master', updates, commitOpts({ message: 'Updating' }));
+    expect(await inRepo(path).getContents(head, 'sample.txt')).to.equal('The original was: sample');
+  });
+
+  it.skip('can abort a patch', async function() {
+    let { repo, head } = await makeRepo(path, [
+      {
+        changes: [
+          {
+            operation: 'create',
+            filename: 'sample.txt',
+            buffer: Buffer.from('sample', 'utf8')
+          }
+        ]
+      }
+    ]);
+
+    let updates = [
+      {
+        operation: 'patch',
+        filename: 'sample.txt',
+        patcher() {
+          return null;
+        }
+      }
+    ];
+
+    let newHead = await git.mergeCommit(repo, head, 'master', updates, commitOpts({ message: 'Updating' }));
+    expect(newHead).to.equal(head);
+    expect(await inRepo(path).getContents(head, 'sample.txt')).to.equal('sample');
   });
 
 });
