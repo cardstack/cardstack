@@ -508,7 +508,9 @@ describe('git merge', function() {
       {
         operation: 'patch',
         filename: 'sample.txt',
-        patcher(originalBuffer) {
+        patcherArg: 123,
+        patcher(originalBuffer, arg) {
+          expect(arg).to.equal(123);
           return Buffer.from('The original was: ' + originalBuffer.toString('utf8'), 'utf8');
         }
       }
