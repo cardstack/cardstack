@@ -340,6 +340,35 @@ describe('git writer', function() {
       expect(record).has.deep.property('meta.version').not.equal(headId);
     });
 
+    it.skip('returns unchanged field', async function() {
+      let record = await writer.update('master', user, 'people', '1', {
+        id: '1',
+        type: 'people',
+        attributes: {
+          age: 7
+        },
+        meta: {
+          version: headId
+        }
+      });
+      expect(record).has.deep.property('attributes.firstName').equal('Quint');
+    });
+
+    it.skip('stores unchanged field', async function() {
+      await writer.update('master', user, 'people', '1', {
+        id: '1',
+        type: 'people',
+        attributes: {
+          age: 7
+        },
+        meta: {
+          version: headId
+        }
+      });
+      expect(await inRepo(root).getJSONContents('master', 'contents/people/1.json'))
+        .deep.property('attributes.firstName', 'Quint');
+    });
+
     it('stores updated attribute', async function() {
       await writer.update('master', user, 'articles', '1', {
         id: '1',
