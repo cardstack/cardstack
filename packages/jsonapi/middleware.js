@@ -90,10 +90,6 @@ class Handler {
 
   async handleIndividualPATCH(type, id) {
     let data = this._mandatoryBodyData();
-    let errors = await this.schema.validationErrors(data);
-    if (errors.length > 0) {
-      return this._errorResponse(errors);
-    }
     let writer = this._writerForType(type);
     let record = await writer.update(this.branch, this.user, type, id, data);
     this.ctxt.body = { data: record };
