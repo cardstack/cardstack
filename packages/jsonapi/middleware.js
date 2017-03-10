@@ -114,20 +114,8 @@ class Handler {
   }
 
   async handleCollectionPOST(type) {
-    let contentType = this.schema.types.get(type);
-    let writer;
-    if (!contentType || !contentType.dataSource || !(writer = contentType.dataSource.writer)) {
-      throw new Error(`"${type}" is not a supported type`, {
-        status: 403,
-        title: "Unsupported type"
-      });
-    }
-    let data;
-    if (!this.ctxt.request.body || !(data = this.ctxt.request.body.data)) {
-      throw new Error('A body with a top-level "data" property is required', {
-        status: 400
-      });
-    }
+    let writer = this._writerForType(type);
+    let data = this._mandatoryBodyData();
     let record = await writer.create(this.branch, this.user, type, data);
     this.ctxt.body = { data: record };
     this.ctxt.status = 201;
@@ -148,6 +136,28 @@ class Handler {
       }
       throw err;
     }
+  }
+
+  _writerForType(type) {
+    let contentType = this.schema.types.get(type);
+    let writer;
+    if (!contentType || !contentType.dataSource || !(writer = contentType.dataSource.writer)) {
+      throw new Error(`"${type}" is not a writable type`, {
+        status: 403,
+        title: "Unsupported type"
+      });
+    }
+    return writer;
+  }
+
+  _mandatoryBodyData() {
+    let data;
+    if (!this.ctxt.request.body || !(data = this.ctxt.request.body.data)) {
+      throw new Error('A body with a top-level "data" property is required', {
+        status: 400
+      });
+    }
+    return data;
   }
 
   urlWithUpdatedParams(params) {

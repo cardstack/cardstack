@@ -145,7 +145,7 @@ describe('jsonapi', function() {
       }
     });
     expect(response.status).to.equal(403);
-    expect(response.body).has.deep.property('errors[0].detail', '"bogus" is not a supported type');
+    expect(response.body).has.deep.property('errors[0].detail', '"bogus" is not a writable type');
   });
 
   it('gets 400 when creating a resource with no body', async function() {
