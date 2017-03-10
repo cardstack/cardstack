@@ -184,8 +184,12 @@ function jsonapiDocToSearchDoc(jsonapiDoc) {
       relNames.push(attribute);
     }
   }
+
+  // The next two fields in the searchDoc get a "cardstack_" prefix so
+  // they aren't likely to collide with the user's attribute or
+  // relatioship names.
   if (jsonapiDoc.meta) {
-    searchDoc.meta = jsonapiDoc.meta;
+    searchDoc.cardstack_meta = jsonapiDoc.meta;
   }
   searchDoc.cardstack_rel_names = relNames;
   return searchDoc;

@@ -137,7 +137,7 @@ describe('git indexer', function() {
     expect(contents).to.deep.equal({
       hello: 'world',
       cardstack_rel_names: [],
-      meta: { version: head }
+      cardstack_meta: { version: head }
     });
   });
 

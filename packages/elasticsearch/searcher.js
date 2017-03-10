@@ -78,7 +78,7 @@ class Searcher {
       let attributes;
       let relationships;
       Object.keys(entry._source).forEach(fieldName => {
-        if (fieldName === 'cardstack_rel_names') {
+        if (fieldName === 'cardstack_rel_names' || fieldName === 'cardstack_meta') {
           // pass
         } else if (relnames.includes(fieldName)) {
           if (!relationships) {
@@ -96,7 +96,8 @@ class Searcher {
         type: entry._type,
         id: entry._id,
         attributes,
-        relationships
+        relationships,
+        meta: entry._source.cardstack_meta
       };
     });
     return {
