@@ -78,7 +78,7 @@ class Handler {
         await method.apply(this, segments.slice(1));
       }
     } catch (err) {
-      if (!err.status) { throw err; }
+      if (!err.isCardstackError) { throw err; }
       this.ctxt.status = err.status;
       this.ctxt.body = {
         errors: [

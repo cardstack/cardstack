@@ -16,6 +16,7 @@ class E extends Error {
     this.status = status || 500;
     this.title = title || STATUS_CODES[status];
     this.source = source;
+    this.isCardstackError = true;
   }
 }
 module.exports = E;
