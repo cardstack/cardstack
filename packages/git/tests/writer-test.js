@@ -340,7 +340,7 @@ describe('git writer', function() {
       expect(record).has.deep.property('meta.version').not.equal(headId);
     });
 
-    it.skip('returns unchanged field', async function() {
+    it('returns unchanged field', async function() {
       let record = await writer.update('master', user, 'people', '1', {
         id: '1',
         type: 'people',

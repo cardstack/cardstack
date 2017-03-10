@@ -66,15 +66,7 @@ module.exports = class Writer {
     }
     await this._ensureRepo();
 
-    let gitDocument = {};
-    if (document.attributes) {
-      gitDocument.attributes = document.attributes;
-    }
-    if (document.relationships) {
-      gitDocument.relationships = document.relationships;
-    }
-
-    let patcher = new Patcher(gitDocument);
+    let patcher = new Patcher(document);
 
     return this._withErrorHandling(id, type, async () => {
       let commitId = await git.mergeCommit(this.repo, document.meta.version, branch, [
@@ -93,11 +85,12 @@ module.exports = class Writer {
           version: commitId
         }
       };
-      if (gitDocument.attributes) {
-        responseDocument.attributes = gitDocument.attributes;
+      let finalDocument = patcher.finalDocument;
+      if (finalDocument.attributes) {
+        responseDocument.attributes = finalDocument.attributes;
       }
-      if (gitDocument.relationships) {
-        responseDocument.relationships = gitDocument.relationships;
+      if (finalDocument.relationships) {
+        responseDocument.relationships = finalDocument.relationships;
       }
       return responseDocument;
     });
@@ -245,6 +238,7 @@ class Patcher {
         );
       }
     }
+    this.finalDocument = document;
     return Buffer.from(JSON.stringify(document), 'utf8');
   }
 }
