@@ -94,18 +94,19 @@ class Handler {
   }
 
   async handleIndividualGET(type, id) {
-    let { models } = await this.searcher.search(this.branch, {
-      filter: { type,  id }
-    });
-    if (models.length === 0) {
-      throw new Error(`No such resource ${this.ctxt.request.url}`, {
-        status: 404,
-        title: 'No such resource'
-      });
+    try {
+      let data = await this.searcher.get(this.branch, type, id);
+      this.ctxt.body = { data };
+    } catch (err) {
+      if (err.status === 404 && !err.isCardstackError) {
+        // Turn elasticsearch 404 into our nicely formatted 404
+        throw new Error(`No such resource ${this.ctxt.request.url}`, {
+          status: 404,
+          title: 'No such resource'
+        });
+      }
+      throw err;
     }
-    this.ctxt.body = {
-      data: models[0]
-    };
   }
 
   async handleCollectionGET(type) {
