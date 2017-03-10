@@ -27,9 +27,14 @@ class Searcher {
       sort: this._buildSorts(schema, sort)
     };
 
+    let size = 10;
     if (page && /^\d+$/.test(page.size)) {
-      esBody.size = parseInt(page.size, 10);
+      size = parseInt(page.size, 10);
     }
+
+    // We always overfetch by one record. This allows us to know
+    // whether we should offer a next page link.
+    esBody.size = size + 1;
 
     if (page && page.cursor) {
       esBody.search_after = JSON.parse(decodeURIComponent(page.cursor));
@@ -53,7 +58,22 @@ class Searcher {
       body: esBody
     });
     this.log.debug('searchResult %j', result);
-    let models = result.hits.hits.map(entry => {
+    return this._assembleResponse(result, size);
+  }
+
+  _assembleResponse(result, requestedSize) {
+    let documents = result.hits.hits;
+    let pagination = {
+      total: result.hits.total
+    };
+
+    if (documents.length > requestedSize) {
+      documents = documents.slice(0, requestedSize);
+      let last = documents[documents.length - 1];
+      pagination.cursor = encodeURIComponent(JSON.stringify(last.sort));
+    }
+
+    let models = documents.map(entry => {
       let relnames = entry._source.cardstack_rel_names;
       let attributes;
       let relationships;
@@ -79,13 +99,6 @@ class Searcher {
         relationships
       };
     });
-    let pagination = {
-      total: result.hits.total
-    };
-    if (result.hits.hits.length === esBody.size) {
-      let last = result.hits.hits[result.hits.hits.length - 1];
-      pagination.cursor = encodeURIComponent(JSON.stringify(last.sort));
-    }
     return {
       models,
       page: pagination

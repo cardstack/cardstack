@@ -399,4 +399,34 @@ describe('searcher', function() {
     expect(uniq(allModels.map(m => m.id))).length(20);
   });
 
+  it('can paginate when results exactly fill final page', async function() {
+    let response = await searcher.search('master', {
+      filter: { type: 'comments' },
+      page: {
+        size: 10
+      }
+    });
+    expect(response.models).length(10);
+    expect(response.page).has.property('total', 20);
+    expect(response.page).has.property('cursor');
+
+    let allModels = response.models;
+
+    response = await searcher.search('master', {
+      filter: { type: 'comments' },
+      page: {
+        size: 10,
+        cursor: response.page.cursor
+      }
+    });
+
+    expect(response.models).length(10);
+    expect(response.page).has.property('total', 20);
+    expect(response.page).not.has.property('cursor');
+
+    allModels = allModels.concat(response.models);
+    expect(uniq(allModels.map(m => m.id))).length(20);
+  });
+
+
 });
