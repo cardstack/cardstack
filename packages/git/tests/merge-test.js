@@ -1,6 +1,5 @@
 const git = require('@cardstack/git/merge');
 const Change = require('@cardstack/git/change');
-const ngit = require('nodegit');
 const temp = require('@cardstack/data-source/tests/temp-helper');
 const {
   inRepo,
@@ -193,16 +192,12 @@ describe('git/change', function() {
   });
 
   it('can add new file within directory', async function() {
-    let repo = await git.createEmptyRepo(path, commitOpts({
-      message: 'First commit'
-    }));
-
-    let parentRef = await ngit.Branch.lookup(repo, 'master', ngit.Branch.BRANCH.LOCAL);
+    let { repo, head } = await makeRepo(path);
 
     let updatedContent = [
       { operation: 'create', filename: 'outer/inner/hello-world.txt', buffer: Buffer.from('This is a file', 'utf8') }
     ];
-    let head = await git.mergeCommit(repo, parentRef.target(), 'master', updatedContent, commitOpts({ message: 'Second commit' }));
+    head = await git.mergeCommit(repo, head, 'master', updatedContent, commitOpts({ message: 'Second commit' }));
 
     updatedContent = [
       { operation: 'create', filename: 'outer/inner/second.txt', buffer: Buffer.from('second file', 'utf8') }
