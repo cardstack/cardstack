@@ -74,12 +74,15 @@ module.exports = class Writer {
       gitDocument.relationships = document.relationships;
     }
 
+    let patcher = new Patcher(gitDocument);
+
     return this._withErrorHandling(id, type, async () => {
       let commitId = await git.mergeCommit(this.repo, document.meta.version, branch, [
         {
-          operation: 'update',
+          operation: 'patch',
           filename: this._filenameFor(document.type, document.id),
-          buffer: Buffer.from(JSON.stringify(gitDocument), 'utf8')
+          patcher: patcher.run,
+          patcherThis: patcher
         }
       ], this._commitOptions('update', document.type, document.id, user));
 
@@ -226,3 +229,22 @@ module.exports = class Writer {
   }
 
 };
+
+class Patcher {
+  constructor(newDocument) {
+    this.newDocument = newDocument;
+  }
+  run(originalBuffer) {
+    let document = JSON.parse(originalBuffer);
+    for (let section of ['attributes', 'relationships']) {
+      if (this.newDocument[section]) {
+        document[section] = Object.assign(
+          {},
+          document[section],
+          this.newDocument[section]
+        );
+      }
+    }
+    return Buffer.from(JSON.stringify(document), 'utf8');
+  }
+}

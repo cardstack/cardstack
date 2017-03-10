@@ -354,7 +354,7 @@ describe('git writer', function() {
       expect(record).has.deep.property('attributes.firstName').equal('Quint');
     });
 
-    it.skip('stores unchanged field', async function() {
+    it('stores unchanged field', async function() {
       await writer.update('master', user, 'people', '1', {
         id: '1',
         type: 'people',
@@ -553,6 +553,9 @@ describe('git writer', function() {
       });
       let saved = await inRepo(root).getJSONContents('master', `contents/articles/1.json`);
       expect(saved).to.deep.equal({
+        attributes: {
+          title: 'First Article'
+        },
         relationships: {
           primaryImage: {
             data: {
