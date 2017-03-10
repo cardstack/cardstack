@@ -110,7 +110,8 @@ module.exports = class Writer {
     }
     if (!version) {
       throw new Error('version is required', {
-        status: 400
+        status: 400,
+        source: { pointer: '/data/meta/version' }
       });
     }
     await this._ensureRepo();

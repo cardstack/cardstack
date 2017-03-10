@@ -106,6 +106,24 @@ class Handler {
     this.ctxt.status = 200;
   }
 
+  async handleIndividualDELETE(type, id) {
+    let writer = this._writerForType(type);
+    try {
+      let version = this.ctxt.header['if-match'];
+      await writer.delete(this.branch, this.user, version, type, id);
+      this.ctxt.status = 204;
+    } catch (err) {
+      // By convention, the writer always refers to the version as
+      // /data/meta/version, since that's where it would come from in
+      // a PATCH or POST. But in a DELETE it comes from a header, so
+      // we adjust any error message.
+      if (err.source && err.source.pointer === '/data/meta/version') {
+        err.source = { header: 'If-Match' };
+      }
+      throw err;
+    }
+  }
+
   async handleCollectionGET(type) {
     let { models, page } = await this.searcher.search(this.branch, {
       filter: this.filterExpression(type),

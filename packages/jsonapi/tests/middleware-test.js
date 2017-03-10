@@ -235,4 +235,32 @@ describe('jsonapi', function() {
     expect(response.body).has.deep.property('errors[0].detail', 'articles with id 100 does not exist');
   });
 
+  it('refuses to delete without version', async function() {
+    let response = await request.delete('/articles/0');
+    expect(response).has.property('status', 400);
+    expect(response.body).has.deep.property('errors[0].detail', "version is required");
+    expect(response.body).has.deep.property('errors[0].source.header', 'If-Match');
+  });
+
+  it('refuses to delete with invalid version', async function() {
+    let response = await request.delete('/articles/0').set('If-Match', 'xxx');
+    expect(response).has.property('status', 400);
+    expect(response.body).has.deep.property('errors[0].source.header', 'If-Match');
+  });
+
+  it('can delete a resource', async function() {
+    let response = await request.get('/articles/0');
+    expect(response).has.property('status', 200);
+    expect(response).has.deep.property('body.data.meta.version');
+    let { version } = response.body.data.meta;
+
+    response = await request.delete('/articles/0').set('If-Match', version);
+    expect(response).has.property('status', 204);
+
+    await env.indexer.update({ realTime: true });
+
+    response = await request.get('/articles/0');
+    expect(response).to.have.property('status', 404);
+  });
+
 });
