@@ -518,7 +518,7 @@ describe('git merge', function() {
     expect(await inRepo(path).getContents(head, 'sample.txt')).to.equal('The original was: sample');
   });
 
-  it.skip('can abort a patch', async function() {
+  it('can abort a patch', async function() {
     let { repo, head } = await makeRepo(path, [
       {
         changes: [
