@@ -215,4 +215,24 @@ describe('jsonapi', function() {
 
   });
 
+  it('gets 404 when patching a missing resource', async function() {
+    let response = await request.get('/articles/0');
+    expect(response).has.property('status', 200);
+    expect(response).has.deep.property('body.data.meta.version');
+    let { version } = response.body.data.meta;
+
+    response = await request.patch('/articles/100').send({
+      data: {
+        id: '100',
+        type: 'articles',
+        attributes: {
+          title: 'Updated title'
+        },
+        meta: { version }
+      }
+    });
+    expect(response.status).to.equal(404);
+    expect(response.body).has.deep.property('errors[0].detail', 'articles with id 100 does not exist');
+  });
+
 });

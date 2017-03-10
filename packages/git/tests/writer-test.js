@@ -587,6 +587,46 @@ describe('git writer', function() {
       expect(record).to.have.deep.property('relationships.primaryImage.data.type', 'images');
     });
 
+    it('refuses to update id', async function() {
+      try {
+        await writer.update('master', user, 'articles', '1', {
+          id: '12',
+          type: 'articles',
+          meta: {
+            version: headId
+          }
+        });
+        throw new Error("should not get here");
+      } catch(err) {
+        if (!err.status) {
+          throw err;
+        }
+        expect(err.status).to.equal(403);
+        expect(err.detail).to.equal('not allowed to change "id"');
+      }
+    });
+
+
+    it('refuses to update type', async function() {
+      try {
+        await writer.update('master', user, 'articles', '1', {
+          id: '1',
+          type: 'articles2',
+          meta: {
+            version: headId
+          }
+        });
+        throw new Error("should not get here");
+      } catch(err) {
+        if (!err.status) {
+          throw err;
+        }
+        expect(err.status).to.equal(409);
+        expect(err.detail).to.equal('the type "articles2" is not allowed here');
+      }
+    });
+
+
   });
 
 

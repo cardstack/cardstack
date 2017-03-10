@@ -58,6 +58,12 @@ module.exports = class Writer {
         source: { pointer: '/data/id' }
       });
     }
+    if (String(document.id) !== id) {
+      throw new Error('not allowed to change "id"', {
+        status: 403,
+        source: { pointer: '/data/id' }
+      });
+    }
     if (!document.meta || !document.meta.version) {
       throw new Error('missing required field "meta.version"', {
         status: 400,
@@ -72,15 +78,15 @@ module.exports = class Writer {
       let commitId = await git.mergeCommit(this.repo, document.meta.version, branch, [
         {
           operation: 'patch',
-          filename: this._filenameFor(document.type, document.id),
+          filename: this._filenameFor(type, id),
           patcher: patcher.run,
           patcherThis: patcher
         }
-      ], this._commitOptions('update', document.type, document.id, user));
+      ], this._commitOptions('update', type, id, user));
 
       let responseDocument = {
-        id: document.id,
-        type: document.type,
+        id,
+        type,
         meta: {
           version: commitId
         }
