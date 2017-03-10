@@ -6,8 +6,7 @@
 */
 
 const spawn = require('child_process').spawn;
-const git = require('@cardstack/git/merge');
-const { Branch } = require('nodegit');
+const Change = require('@cardstack/git/change');
 
 exports.inRepo = function(path) {
   return new RepoExplorer(path);
@@ -89,15 +88,19 @@ function commitOpts(opts) {
 exports.commitOpts = commitOpts;
 
 exports.makeRepo = async function makeRepo(path, steps=[]) {
-  let repo = await git.createEmptyRepo(path, commitOpts({
+  let change = await Change.createInitial(path, 'master', commitOpts({
     message: 'First commit'
   }));
-
-  let head = (await Branch.lookup(repo, 'master', Branch.BRANCH.LOCAL)).target().tostrS();
+  let head = await change.finalize();
+  let repo = change.repo;
 
   for (let [index, { changes, message }] of steps.entries()) {
-    head = await git.mergeCommit(repo, head, 'master', changes, commitOpts({ message: message ||  `Commit ${index}` }));
+    change = await Change.create(repo, head, 'master', commitOpts({
+      message: message ||  `Commit ${index}`
+    }));
+    change.applyOperations(changes);
+    head = await change.finalize();
   }
 
-  return { repo, head };
+  return { head, repo };
 };
