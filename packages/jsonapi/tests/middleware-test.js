@@ -1,27 +1,17 @@
 const jsonapi = require('@cardstack/jsonapi/middleware');
 const supertest = require('supertest');
 const Koa = require('koa');
-const { addRecords, deleteAllRecords } = require('@cardstack/server/tests/add-records');
-const Searcher = require('@cardstack/elasticsearch/searcher');
-const SchemaCache = require('@cardstack/server/schema-cache');
-const temp = require('@cardstack/data-source/tests/temp-helper');
-const { makeRepo } = require('@cardstack/git/tests/support');
-const GitIndexer = require('@cardstack/git/indexer');
-const IndexerEngine = require('@cardstack/server/indexer-engine');
+const {
+  createDefaultEnvironment,
+  destroyDefaultEnvironment
+} = require('@cardstack/server/tests/support');
 
 describe('jsonapi', function() {
 
-  let request, repo, indexer;
+  let request, env;
 
   beforeEach(async function() {
-    repo = await temp.mkdir('cardstack-server-test');
-    await makeRepo(repo);
-
-    indexer = new IndexerEngine([new GitIndexer({
-      repoPath: repo
-    })]);
-
-    await addRecords([
+    env = await createDefaultEnvironment([
       {
         type: 'content-types',
         id: 'articles',
@@ -35,14 +25,6 @@ describe('jsonapi', function() {
           'data-source': {
             data: { type: 'data-sources', id: 'default-git' }
           }
-        }
-      },
-      {
-        type: 'data-sources',
-        id: 'default-git',
-        attributes: {
-          'source-type': 'git',
-          params: { repo }
         }
       },
       {
@@ -84,15 +66,12 @@ describe('jsonapi', function() {
       }
     ]);
     let app = new Koa();
-    let schemaCache = new SchemaCache();
-    let searcher = new Searcher(schemaCache);
-    app.use(jsonapi(searcher, schemaCache));
+    app.use(jsonapi(env.searcher, env.schemaCache));
     request = supertest(app.callback());
   }),
 
   afterEach(async function() {
-    await deleteAllRecords();
-    await temp.cleanup();
+    await destroyDefaultEnvironment(env);
   }),
 
   it('can get an individual resource', async function() {
@@ -196,7 +175,7 @@ describe('jsonapi', function() {
     expect(response.body).has.deep.property('data.id');
     expect(response.body).has.deep.property('data.attributes.title', 'I am new');
 
-    await indexer.update({ realTime: true });
+    await env.indexer.update({ realTime: true });
 
     response = await request.get(response.headers.location);
     expect(response).has.property('status', 200);
