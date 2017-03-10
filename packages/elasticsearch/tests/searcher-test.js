@@ -1,5 +1,8 @@
+const {
+  indexRecords,
+  destroyIndices
+} = require('@cardstack/server/tests/support');
 const Searcher = require('@cardstack/elasticsearch/searcher');
-const { addRecords, deleteAllRecords } = require('@cardstack/server/tests/add-records');
 const SchemaCache = require('@cardstack/server/schema-cache');
 const { uniq } = require('lodash');
 
@@ -109,11 +112,11 @@ describe('searcher', function() {
         }
       });
     }
-    await addRecords(records);
+    await indexRecords(records);
   });
 
   after(async function() {
-    await deleteAllRecords();
+    await destroyIndices();
   });
 
   it('can be searched for all content', async function() {
