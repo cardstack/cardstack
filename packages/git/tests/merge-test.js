@@ -1,4 +1,5 @@
 const git = require('@cardstack/git/merge');
+const Change = require('@cardstack/git/change');
 const ngit = require('nodegit');
 const temp = require('@cardstack/data-source/tests/temp-helper');
 const {
@@ -8,7 +9,7 @@ const {
 }= require('./support');
 const moment = require('moment-timezone');
 
-describe('git merge', function() {
+describe('git/change', function() {
   let path;
 
   beforeEach(async function() {
@@ -20,11 +21,11 @@ describe('git merge', function() {
   });
 
   it('can make new empty repo', async function() {
-
-    await git.createEmptyRepo(path, commitOpts({
+    let change = await Change.createInitial(path, 'master', commitOpts({
       message: 'First commit',
       authorDate: moment.tz('2017-01-16 12:21', 'Africa/Addis_Ababa')
     }));
+    await change.finalize();
 
     let commit = await inRepo(path).getCommit('master');
     expect(commit.authorName).to.equal('John Milton');
@@ -127,22 +128,19 @@ describe('git merge', function() {
 
 
   it('non-fast-forward merge some new content', async function() {
-    let repo = await git.createEmptyRepo(path, commitOpts({
-      message: 'First commit'
-    }));
-    let parentRef = await ngit.Branch.lookup(repo, 'master', ngit.Branch.BRANCH.LOCAL);
+    let { repo, head } = await makeRepo(path);
 
     let updatedContent = [
       { operation: 'create', filename: 'hello-world.txt', buffer: Buffer.from('This is a file', 'utf8') }
     ];
-    let commitId = await git.mergeCommit(repo, parentRef.target(), 'master', updatedContent, commitOpts({ message: 'Second commit' }));
+    let commitId = await git.mergeCommit(repo, head, 'master', updatedContent, commitOpts({ message: 'Second commit' }));
     expect(commitId).is.a('string');
 
     updatedContent = [
       { operation: 'create', filename: 'other.txt', buffer: Buffer.from('Non-conflicting content', 'utf8') }
     ];
     // This is based on the same parentRef as the second commit, so it's not a fast forward
-    commitId = await git.mergeCommit(repo, parentRef.target(), 'master', updatedContent, commitOpts({ message: 'Third commit' }));
+    commitId = await git.mergeCommit(repo, head, 'master', updatedContent, commitOpts({ message: 'Third commit' }));
     expect(commitId).is.a('string');
 
     expect((await inRepo(path).getCommit('master')).message).to.equal('Clean merge into master');
@@ -153,21 +151,18 @@ describe('git merge', function() {
   });
 
   it('rejects conflicting merge', async function() {
-    let repo = await git.createEmptyRepo(path, commitOpts({
-      message: 'First commit'
-    }));
-    let parentRef = await ngit.Branch.lookup(repo, 'master', ngit.Branch.BRANCH.LOCAL);
+    let { repo, head } = await makeRepo(path);
 
     let updatedContent = [
       { operation: 'create', filename: 'hello-world.txt', buffer: Buffer.from('This is a file', 'utf8') }
     ];
-    await git.mergeCommit(repo, parentRef.target(), 'master', updatedContent, commitOpts({ message: 'Second commit' }));
+    await git.mergeCommit(repo, head, 'master', updatedContent, commitOpts({ message: 'Second commit' }));
 
     updatedContent = [
       { operation: 'create', filename: 'hello-world.txt', buffer: Buffer.from('Conflicting content', 'utf8') }
     ];
     try {
-      await git.mergeCommit(repo, parentRef.target(), 'master', updatedContent, commitOpts({ message: 'Third commit' }));
+      await git.mergeCommit(repo, head, 'master', updatedContent, commitOpts({ message: 'Third commit' }));
       throw new Error("merge was not supposed to succeed");
     } catch(err) {
       expect(err).instanceof(git.GitConflict);
@@ -181,22 +176,18 @@ describe('git merge', function() {
   });
 
   it('can add new directories', async function() {
-    let repo = await git.createEmptyRepo(path, commitOpts({
-      message: 'First commit'
-    }));
-
-    let parentRef = await ngit.Branch.lookup(repo, 'master', ngit.Branch.BRANCH.LOCAL);
+    let { repo, head } = await makeRepo(path);
 
     let updatedContent = [
       { operation: 'create', filename: 'outer/inner/hello-world.txt', buffer: Buffer.from('This is a file', 'utf8') }
     ];
-    let id = await git.mergeCommit(repo, parentRef.target(), 'master', updatedContent, commitOpts({ message: 'Second commit' }));
+    let id = await git.mergeCommit(repo, head, 'master', updatedContent, commitOpts({ message: 'Second commit' }));
 
     let commit = await inRepo(path).getCommit(id);
     expect(commit.message).to.equal('Second commit');
 
-    let head = await inRepo(path).getCommit('master');
-    expect(head.message).to.equal('Second commit');
+    let masterCommit = await inRepo(path).getCommit('master');
+    expect(masterCommit.message).to.equal('Second commit');
 
     expect(await inRepo(path).getContents(id, 'outer/inner/hello-world.txt')).to.equal('This is a file');
   });
