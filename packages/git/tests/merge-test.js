@@ -135,13 +135,15 @@ describe('git merge', function() {
     let updatedContent = [
       { operation: 'create', filename: 'hello-world.txt', buffer: Buffer.from('This is a file', 'utf8') }
     ];
-    await git.mergeCommit(repo, parentRef.target(), 'master', updatedContent, commitOpts({ message: 'Second commit' }));
+    let commitId = await git.mergeCommit(repo, parentRef.target(), 'master', updatedContent, commitOpts({ message: 'Second commit' }));
+    expect(commitId).is.a('string');
 
     updatedContent = [
       { operation: 'create', filename: 'other.txt', buffer: Buffer.from('Non-conflicting content', 'utf8') }
     ];
     // This is based on the same parentRef as the second commit, so it's not a fast forward
-    await git.mergeCommit(repo, parentRef.target(), 'master', updatedContent, commitOpts({ message: 'Third commit' }));
+    commitId = await git.mergeCommit(repo, parentRef.target(), 'master', updatedContent, commitOpts({ message: 'Third commit' }));
+    expect(commitId).is.a('string');
 
     expect((await inRepo(path).getCommit('master')).message).to.equal('Clean merge into master');
     expect((await inRepo(path).getCommit('master^1')).message).to.equal('Third commit');
