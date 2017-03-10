@@ -94,7 +94,7 @@ class MutableTree {
 
   async write(allowEmpty=false) {
     if (this.overlay.size === 0 && this.tree) {
-      return this.tree;
+      return this.tree.id();
     }
     let builder = await Treebuilder.create(this.repo, this.tree);
     for (let [filename, entry] of this.overlay.entries()) {

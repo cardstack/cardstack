@@ -66,6 +66,11 @@ async function makeCommit(repo, parentCommit, operations, commitOpts) {
     }
   }
   let treeOid = await newRoot.write(true);
+
+  if (treeOid && parentTree && treeOid.equal(parentTree.id())) {
+    return parentCommit;
+  }
+
   let tree = await Tree.lookup(repo, treeOid, null);
   let { author, committer } = signature(commitOpts);
   let commitOid = await Commit.create(repo, null, author, committer, 'UTF-8', commitOpts.message, tree, parents.length, parents);

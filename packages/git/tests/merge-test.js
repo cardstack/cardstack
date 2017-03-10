@@ -36,7 +36,13 @@ describe('git merge', function() {
   it('can include separate committer info', async function() {
     let { repo, head } = await makeRepo(path);
 
-    let id = await git.mergeCommit(repo, head, 'master', [], commitOpts({
+    let id = await git.mergeCommit(repo, head, 'master', [
+      {
+        operation: 'create',
+        filename: 'example.txt',
+        buffer: Buffer.from('something', 'utf8')
+      }
+    ], commitOpts({
       message: 'Second commit',
       authorDate: moment.tz('2017-01-16 12:21', 'Africa/Addis_Ababa'),
       committerName: 'The Committer',
@@ -479,6 +485,11 @@ describe('git merge', function() {
     expect(await inRepo(path).getContents(head, 'sample.txt')).to.equal('updated');
   });
 
+  it('gracefully handles a no-op', async function() {
+    let { repo, head } = await makeRepo(path);
+    let newHead = await git.mergeCommit(repo, head, 'master', [], commitOpts({ message: 'Unused' }));
+    expect(newHead).to.equal(head);
+  });
 
   it('can patch a file', async function() {
     let { repo, head } = await makeRepo(path, [
