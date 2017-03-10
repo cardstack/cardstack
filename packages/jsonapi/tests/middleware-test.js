@@ -28,6 +28,13 @@ describe('jsonapi', function() {
         }
       },
       {
+        type: 'constraints',
+        id: '0',
+        attributes: {
+          'constraint-type': 'not-null'
+        }
+      },
+      {
         type: 'fields',
         id: 'title',
         attributes: {
@@ -39,6 +46,11 @@ describe('jsonapi', function() {
         id: 'body',
         attributes: {
           'field-type': 'string'
+        },
+        relationships: {
+          constraints: {
+            data: [ { type: 'constraints', id: '0'} ]
+          }
         }
       },
       {
@@ -135,7 +147,7 @@ describe('jsonapi', function() {
     expect(response.body.data).length(1);
   });
 
-  it('gets 403 when creating unknown resource', async function() {
+  it('gets 400 when creating unknown resource', async function() {
     let response = await request.post('/bogus').send({
       data: {
         type: 'bogus',
@@ -144,8 +156,8 @@ describe('jsonapi', function() {
         }
       }
     });
-    expect(response.status).to.equal(403);
-    expect(response.body).has.deep.property('errors[0].detail', '"bogus" is not a writable type');
+    expect(response.status).to.equal(400);
+    expect(response.body).has.deep.property('errors[0].detail', '"bogus" is not a valid type');
   });
 
   it('gets 400 when creating a resource with no body', async function() {
@@ -166,7 +178,8 @@ describe('jsonapi', function() {
       data: {
         type: 'articles',
         attributes: {
-          title: 'I am new'
+          title: 'I am new',
+          body: 'xxx'
         }
       }
     });
@@ -261,6 +274,51 @@ describe('jsonapi', function() {
 
     response = await request.get('/articles/0');
     expect(response).to.have.property('status', 404);
+  });
+
+  it('validates schema during POST', async function() {
+    let response = await request.post('/articles').send({
+      data: {
+        type: 'articles',
+        attributes: {
+          title: 3
+        }
+      }
+    });
+    expect(response.status).to.equal(400);
+    expect(response.body.errors).length(2);
+    expect(response.body.errors).collectionContains({
+      title: 'Validation error',
+      detail: '3 is not a valid value for field "title"',
+      source: { pointer: '/data/attributes/title' }
+    });
+    expect(response.body.errors).collectionContains({
+      title: 'Validation error',
+      detail: 'the value of field "body" may not be null',
+      source: { pointer: '/data/attributes/body' }
+    });
+  });
+
+  it.skip('validates schema during PATCH', async function() {
+    let response = await request.post('/articles').send({
+      data: {
+        type: 'articles',
+        attributes: {
+          title: 3
+        }
+      }
+    });
+    expect(response.status).to.equal(400);
+
+    // we should not hit the body not-null constraint here, since
+    // we're leaving it unchanged
+    expect(response.body.errors).length(1);
+
+    expect(response.body.errors).collectionContains({
+      title: 'Validation error',
+      detail: '3 is not a valid value for field "title"',
+      source: { pointer: '/data/attributes/title' }
+    });
   });
 
 });

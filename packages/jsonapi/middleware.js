@@ -140,8 +140,14 @@ class Handler {
   }
 
   async handleCollectionPOST(type) {
-    let writer = this._writerForType(type);
     let data = this._mandatoryBodyData();
+    let errors = await this.schema.validationErrors(data);
+    if (errors.length > 0) {
+      this.ctxt.body = { errors };
+      this.ctxt.status = errors[0].status;
+      return;
+    }
+    let writer = this._writerForType(type);
     let record = await writer.create(this.branch, this.user, type, data);
     this.ctxt.body = { data: record };
     this.ctxt.status = 201;
