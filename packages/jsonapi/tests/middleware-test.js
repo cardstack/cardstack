@@ -184,4 +184,35 @@ describe('jsonapi', function() {
     expect(response.body).has.deep.property('data.attributes.title', 'I am new', 'second time');
 
   });
+
+  it.skip('can update an existing resource', async function() {
+    let response = await request.get('/articles/0');
+    expect(response).has.property('status', 200);
+    expect(response).has.deep.property('body.data.meta.version');
+    let { version } = response.body.data.meta;
+
+    response = await request.patch('/articles/0').send({
+      data: {
+        id: '0',
+        type: 'articles',
+        attributes: {
+          title: 'Updated title'
+        },
+        meta: { version }
+      }
+    });
+
+    expect(response).has.property('status', 200);
+    expect(response).has.deep.property('body.data.attributes.title', 'Updated title');
+    expect(response).has.deep.property('body.data.attributes.body', "This is the first article");
+
+    await env.indexer.update({ realTime: true });
+
+    response = await request.get('/articles/0');
+    expect(response).has.property('status', 200);
+    expect(response).has.deep.property('body.data.attributes.title', 'Updated title', 'second time');
+    expect(response).has.deep.property('body.data.attributes.body', "This is the first article", 'second time');
+
+  });
+
 });

@@ -98,6 +98,14 @@ class Handler {
     this.ctxt.body = { data };
   }
 
+  async handleIndividualPATCH(type, id) {
+    let writer = this._writerForType(type);
+    let data = this._mandatoryBodyData();
+    let record = await writer.update(this.branch, this.user, type, id, data);
+    this.ctxt.body = { data: record };
+    this.ctxt.status = 200;
+  }
+
   async handleCollectionGET(type) {
     let { models, page } = await this.searcher.search(this.branch, {
       filter: this.filterExpression(type),
