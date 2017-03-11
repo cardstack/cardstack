@@ -89,18 +89,18 @@ function commitOpts(opts) {
 exports.commitOpts = commitOpts;
 
 exports.makeRepo = async function makeRepo(path, steps=[]) {
-  let change = await Change.createInitial(path, 'master', commitOpts({
+  let change = await Change.createInitial(path, 'master');
+  let head = await change.finalize(commitOpts({
     message: 'First commit'
   }));
-  let head = await change.finalize();
   let repo = change.repo;
 
   for (let [index, { changes, message }] of steps.entries()) {
-    change = await Change.create(repo, head, 'master', commitOpts({
+    change = await Change.create(repo, head, 'master');
+    change.applyOperations(changes);
+    head = await change.finalize(commitOpts({
       message: message ||  `Commit ${index}`
     }));
-    change.applyOperations(changes);
-    head = await change.finalize();
   }
 
   return { head, repo };

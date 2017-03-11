@@ -19,11 +19,11 @@ describe('git/change', function() {
   });
 
   it('can make new empty repo', async function() {
-    let change = await Change.createInitial(path, 'master', commitOpts({
+    let change = await Change.createInitial(path, 'master');
+    await change.finalize(commitOpts({
       message: 'First commit',
       authorDate: moment.tz('2017-01-16 12:21', 'Africa/Addis_Ababa')
     }));
-    await change.finalize();
 
     let commit = await inRepo(path).getCommit('master');
     expect(commit.authorName).to.equal('John Milton');

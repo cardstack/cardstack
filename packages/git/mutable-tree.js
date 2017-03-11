@@ -28,7 +28,6 @@ class MutableTree {
     return result;
   }
 
-  // object is a Blob, MutableBlob, Tree, or MutableTree
   insert(filename, object, filemode) {
     let entry = new NewEntry(this.repo, object, filemode);
     this.overlay.set(filename, entry);
@@ -67,6 +66,17 @@ class MutableTree {
     if (newBuffer) {
       return tree.insert(leafName, newBuffer, leaf.filemode());
     }
+  }
+
+  async fileAtPath(path, allowCreate) {
+    let { tree, leaf, leafName } = await this.traverse(path, allowCreate);
+    if (!leaf || leaf === tombstone || !leaf.isBlob()) {
+      leaf = null;
+    }
+    if (!leaf && !allowCreate) {
+      throw new NotFound(`No such file ${path}`);
+    }
+    return { tree, leaf, leafName };
   }
 
   async traverse(path, allowCreate=false) {

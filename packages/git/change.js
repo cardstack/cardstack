@@ -21,12 +21,12 @@ setThreadSafetyStatus(1);
 
 
 class Change {
-  static async createInitial(repoPath, targetBranch, commitOpts) {
+  static async createInitial(repoPath, targetBranch) {
     let repo = await Repository.init(repoPath, 1);
-    return new this(repo, commitOpts, targetBranch, null, [], null, null, null);
+    return new this(repo, targetBranch, null, [], null, null, null);
   }
 
-  static async create(repo, parentId, targetBranch, commitOpts) {
+  static async create(repo, parentId, targetBranch) {
     let headRef = await Branch.lookup(repo, targetBranch, Branch.BRANCH.LOCAL);
     let headCommit = await Commit.lookup(repo, headRef.target());
 
@@ -43,16 +43,16 @@ class Change {
       parentTree = await parentCommit.getTree();
       parents.push(parentCommit);
     }
-    return new this(repo, commitOpts, targetBranch, parentTree, parents, parentCommit, headRef, headCommit);
+    return new this(repo, targetBranch, parentTree, parents, parentCommit, headRef, headCommit);
   }
 
   static async applyOperations(repo, parentId, targetBranch, operations, commitOpts){
-    let change = await this.create(repo, parentId, targetBranch, commitOpts);
+    let change = await this.create(repo, parentId, targetBranch);
     await change.applyOperations(operations);
-    return change.finalize();
+    return change.finalize(commitOpts);
   }
 
-  constructor(repo, commitOpts, targetBranch, parentTree, parents, parentCommit, headRef, headCommit) {
+  constructor(repo, targetBranch, parentTree, parents, parentCommit, headRef, headCommit) {
     this.repo = repo;
     this.parentTree = parentTree;
     this.root = new MutableTree(repo, parentTree);
@@ -60,8 +60,16 @@ class Change {
     this.parentCommit = parentCommit;
     this.headRef = headRef;
     this.headCommit = headCommit;
-    this.commitOpts = commitOpts;
     this.targetBranch = targetBranch;
+  }
+
+  async get(path, { allowCreate, allowUpdate }) {
+    let { tree, leaf, leafName } = await this.root.fileAtPath(path, allowCreate);
+    return new FileHandle(tree, leaf, leafName, allowUpdate, path);
+  }
+
+  async delete(path) {
+    return this.root.deletePath(path);
   }
 
   async applyOperations(operations) {
@@ -69,19 +77,19 @@ class Change {
     for (let { operation, filename, buffer, patcher, patcherThis } of operations) {
       switch (operation) {
       case 'create':
-        await newRoot.insertPath(filename, buffer, FILEMODE.BLOB, { allowUpdate: false, allowCreate: true });
+        (await this.get(filename, { allowCreate: true })).setBuffer(buffer);
         break;
       case 'update':
-        await newRoot.insertPath(filename, buffer, FILEMODE.BLOB, { allowUpdate: true, allowCreate: false });
+        (await this.get(filename, { allowUpdate: true })).setBuffer(buffer);
         break;
       case 'patch':
         await newRoot.patchPath(filename, patcher, patcherThis, { allowCreate: false });
         break;
       case 'delete':
-        await newRoot.deletePath(filename);
+        await this.delete(filename);
         break;
       case 'createOrUpdate':
-        await newRoot.insertPath(filename, buffer, FILEMODE.BLOB, { allowUpdate: true, allowCreate: true } );
+        (await this.get(filename, { allowUpdate: true, allowCreate: true } )).setBuffer(buffer);
         break;
       default:
         throw new Error("no operation");
@@ -89,12 +97,12 @@ class Change {
     }
   }
 
-  async finalize() {
-    let newCommit = await this._makeCommit();
-    return this._mergeCommit(newCommit);
+  async finalize(commitOpts) {
+    let newCommit = await this._makeCommit(commitOpts);
+    return this._mergeCommit(newCommit, commitOpts);
   }
 
-  async _makeCommit() {
+  async _makeCommit(commitOpts) {
     let treeOid = await this.root.write(true);
 
     if (treeOid && this.parentTree && treeOid.equal(this.parentTree.id())) {
@@ -102,12 +110,12 @@ class Change {
     }
 
     let tree = await Tree.lookup(this.repo, treeOid, null);
-    let { author, committer } = signature(this.commitOpts);
-    let commitOid = await Commit.create(this.repo, null, author, committer, 'UTF-8', this.commitOpts.message, tree, this.parents.length, this.parents);
+    let { author, committer } = signature(commitOpts);
+    let commitOid = await Commit.create(this.repo, null, author, committer, 'UTF-8', commitOpts.message, tree, this.parents.length, this.parents);
     return Commit.lookup(this.repo, commitOid);
   }
 
-  async _mergeCommit(newCommit) {
+  async _mergeCommit(newCommit, commitOpts) {
     if (!this.headCommit) {
       return this._newBranch(newCommit);
     }
@@ -122,7 +130,7 @@ class Change {
     }
     let treeOid = await index.writeTreeTo(this.repo);
     let tree = await Tree.lookup(this.repo, treeOid, null);
-    let { author, committer } = signature(this.commitOpts);
+    let { author, committer } = signature(commitOpts);
     let mergeCommitOid = await Commit.create(this.repo, null, author, committer, 'UTF-8', `Clean merge into ${this.targetBranch}`, tree, 2, [newCommit, this.headCommit]);
     let mergeCommit = await Commit.lookup(this.repo, mergeCommitOid);
     await this.headRef.setTarget(mergeCommit.id(), 'fast forward');
@@ -149,6 +157,32 @@ class GitConflict extends Error {
   constructor(index) {
     super();
     this.index = index;
+  }
+}
+
+class FileHandle {
+  constructor(tree, leaf, name, allowUpdate, path) {
+    this.tree = tree;
+    this.leaf = leaf;
+    this.name = name;
+    this.allowUpdate = allowUpdate;
+    this.path = path;
+    if (leaf) {
+      this.mode = leaf.filemode();
+    } else {
+      this.mode = FILEMODE.BLOB;
+    }
+  }
+  async getBuffer() {
+    if (this.leaf) {
+      return (await this.leaf.getBlob()).content();
+    }
+  }
+  setBuffer(buffer) {
+    if (!this.allowUpdate && this.leaf) {
+      throw new OverwriteRejected(`Refusing to overwrite ${this.path}`);
+    }
+    this.leaf = this.tree.insert(this.name, buffer, this.mode);
   }
 }
 
