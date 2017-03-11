@@ -4,7 +4,7 @@ const {
 
 const logger = require('heimdalljs-logger');
 const crypto = require('crypto');
-const git = require('./merge');
+const Change = require('./change');
 const os = require('os');
 const process = require('process');
 const Error = require('@cardstack/data-source/error');
@@ -40,7 +40,7 @@ module.exports = class Writer {
           let doc = await this._create(branch, user, document, id);
           return doc;
         } catch(err) {
-          if (err instanceof git.OverwriteRejected && document.id == null) {
+          if (err instanceof Change.OverwriteRejected && document.id == null) {
             // ignore so our loop can retry
           } else {
             throw err;
@@ -75,7 +75,7 @@ module.exports = class Writer {
     let patcher = new Patcher(document);
 
     return this._withErrorHandling(id, type, async () => {
-      let commitId = await git.mergeCommit(this.repo, document.meta.version, branch, [
+      let commitId = await Change.applyOperations(this.repo, document.meta.version, branch, [
         {
           operation: 'patch',
           filename: this._filenameFor(type, id),
@@ -116,7 +116,7 @@ module.exports = class Writer {
     }
     await this._ensureRepo();
     return this._withErrorHandling(id, type, async () => {
-      await git.mergeCommit(this.repo, version, branch, [
+      await Change.applyOperations(this.repo, version, branch, [
         {
           operation: 'delete',
           filename: this._filenameFor(type, id)
@@ -136,7 +136,7 @@ module.exports = class Writer {
       gitDocument.relationships = document.relationships;
     }
 
-    let commitId = await git.mergeCommit(this.repo, null, branch, [
+    let commitId = await Change.applyOperations(this.repo, null, branch, [
       {
         operation: 'create',
         filename: this._filenameFor(document.type, id),
@@ -168,13 +168,13 @@ module.exports = class Writer {
       if (/Unable to parse OID/.test(err.message) || /Object not found/.test(err.message)) {
         throw new Error(err.message, { status: 400, source: { pointer: '/data/meta/version' }});
       }
-      if (err instanceof git.GitConflict) {
+      if (err instanceof Change.GitConflict) {
         throw new Error("Merge conflict", { status: 409 });
       }
-      if (err instanceof git.OverwriteRejected) {
+      if (err instanceof Change.OverwriteRejected) {
         throw new Error(`id ${id} is already in use`, { status: 409, source: { pointer: '/data/id'}});
       }
-      if (err instanceof git.NotFound) {
+      if (err instanceof Change.NotFound) {
         throw new Error(`${type} with id ${id} does not exist`, {
           status: 404,
           source: { pointer: '/data/id' }
