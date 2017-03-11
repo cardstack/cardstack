@@ -46,6 +46,7 @@ class Change {
     return new this(repo, targetBranch, parentTree, parents, parentCommit, headRef, headCommit);
   }
 
+  // TODO: refactor away
   static async applyOperations(repo, parentId, targetBranch, operations, commitOpts){
     let change = await this.create(repo, parentId, targetBranch);
     await change.applyOperations(operations);
@@ -72,6 +73,7 @@ class Change {
     return this.root.deletePath(path);
   }
 
+  // TODO: refactor away
   async applyOperations(operations) {
     let newRoot = this.root;
     for (let { operation, filename, buffer, patcher, patcherThis } of operations) {

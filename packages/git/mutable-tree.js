@@ -34,20 +34,6 @@ class MutableTree {
     return entry;
   }
 
-  async insertPath(path, object, filemode, { allowCreate, allowUpdate }) {
-    let { tree, leaf, leafName } = await this.traverse(path, allowCreate);
-
-    if (!allowUpdate && leaf && leaf !== tombstone) {
-      throw new OverwriteRejected(`Refusing to overwrite ${path}`);
-    }
-
-    if (!allowCreate && (!leaf || leaf === tombstone)) {
-      throw new NotFound(`${path} does not exist`);
-    }
-
-    return tree.insert(leafName, object, filemode);
-  }
-
   async deletePath(path) {
     let { tree, leaf, leafName } = await this.traverse(path);
     if (!leaf || leaf === tombstone) {
@@ -56,6 +42,7 @@ class MutableTree {
     tree.overlay.set(leafName, tombstone);
   }
 
+  // TODO refactor away
   async patchPath(path, patcher, patcherThis, { allowCreate }) {
     let { tree, leaf, leafName } = await this.traverse(path, allowCreate);
     if (!leaf || leaf === tombstone || !leaf.isBlob()) {
