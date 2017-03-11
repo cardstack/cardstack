@@ -81,7 +81,8 @@ function run(command, args, opts) {
 function commitOpts(opts) {
   return Object.assign({}, {
     authorName: 'John Milton',
-    authorEmail: 'john@paradiselost.com'
+    authorEmail: 'john@paradiselost.com',
+    message: 'Default test message'
   }, opts);
 }
 

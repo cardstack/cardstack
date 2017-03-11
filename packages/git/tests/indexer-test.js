@@ -1,4 +1,4 @@
-const git = require('@cardstack/git/merge');
+const Change = require('@cardstack/git/change');
 const temp = require('@cardstack/data-source/tests/temp-helper');
 const GitIndexer = require('@cardstack/git/indexer');
 const IndexerEngine = require('@cardstack/server/indexer-engine');
@@ -46,7 +46,7 @@ describe('git indexer', function() {
         }), 'utf8')
       }
     ];
-    await git.mergeCommit(repo, head, 'master', updatedContent, commitOpts({ message: 'Second commit' }));
+    await Change.applyOperations(repo, head, 'master', updatedContent, commitOpts());
     await indexer.update();
     expect((await ea.aliases()).get('master')).to.equal(originalIndexName);
   });
@@ -105,7 +105,7 @@ describe('git indexer', function() {
         }), 'utf8')
       }
     ];
-    await git.mergeCommit(repo, head, 'master', updatedContent, commitOpts({ message: 'Second commit' }));
+    await Change.applyOperations(repo, head, 'master', updatedContent, commitOpts({ message: 'Second commit' }));
     await indexer.update();
     expect((await ea.aliases()).get('master')).to.not.equal(originalIndexName);
   });
@@ -126,7 +126,7 @@ describe('git indexer', function() {
       }
     ];
 
-    head = await git.mergeCommit(repo, head, 'master', updatedContent, commitOpts({ message: 'Second commit' }));
+    head = await Change.applyOperations(repo, head, 'master', updatedContent, commitOpts({ message: 'Second commit' }));
 
     await indexer.update();
 
@@ -172,7 +172,7 @@ describe('git indexer', function() {
         }), 'utf8')
       }
     ];
-    await git.mergeCommit(repo, head, 'master', updatedContent, commitOpts({ message: 'Third commit' }));
+    await Change.applyOperations(repo, head, 'master', updatedContent, commitOpts({ message: 'Third commit' }));
 
     await indexer.update();
 
@@ -204,7 +204,7 @@ describe('git indexer', function() {
         filename: 'contents/articles/hello-world.json'
       }
     ];
-    await git.mergeCommit(repo, head, 'master', updatedContent, commitOpts({ message: 'deletion' }));
+    await Change.applyOperations(repo, head, 'master', updatedContent, commitOpts({ message: 'deletion' }));
 
     await indexer.update();
 

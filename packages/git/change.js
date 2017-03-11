@@ -46,6 +46,12 @@ class Change {
     return new this(repo, commitOpts, targetBranch, parentTree, parents, parentCommit, headRef, headCommit);
   }
 
+  static async applyOperations(repo, parentId, targetBranch, operations, commitOpts){
+    let change = await this.create(repo, parentId, targetBranch, commitOpts);
+    await change.applyOperations(operations);
+    return change.finalize();
+  }
+
   constructor(repo, commitOpts, targetBranch, parentTree, parents, parentCommit, headRef, headCommit) {
     this.repo = repo;
     this.parentTree = parentTree;

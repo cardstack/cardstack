@@ -1,4 +1,3 @@
-const git = require('@cardstack/git/merge');
 const Change = require('@cardstack/git/change');
 const temp = require('@cardstack/data-source/tests/temp-helper');
 const {
@@ -36,7 +35,7 @@ describe('git/change', function() {
   it('can include separate committer info', async function() {
     let { repo, head } = await makeRepo(path);
 
-    let id = await git.mergeCommit(repo, head, 'master', [
+    let id = await Change.applyOperations(repo, head, 'master', [
       {
         operation: 'create',
         filename: 'example.txt',
@@ -62,7 +61,7 @@ describe('git/change', function() {
     let updatedContent = [
       { operation: 'create', filename: 'hello-world.txt', buffer: Buffer.from('This is a file', 'utf8') }
     ];
-    let id = (await git.mergeCommit(repo, head, 'master', updatedContent, commitOpts({ message: 'Second commit' })));
+    let id = (await Change.applyOperations(repo, head, 'master', updatedContent, commitOpts({ message: 'Second commit' })));
 
     let commit = await inRepo(path).getCommit(id);
     expect(commit.message).to.equal('Second commit');
@@ -82,7 +81,7 @@ describe('git/change', function() {
     let updatedContent = [
       { operation: 'create', filename: 'hello-world.txt', buffer: Buffer.from('This is a file', 'utf8') }
     ];
-    let id = (await git.mergeCommit(repo, null, 'master', updatedContent, commitOpts({ message: 'Second commit' })));
+    let id = (await Change.applyOperations(repo, null, 'master', updatedContent, commitOpts({ message: 'Second commit' })));
 
     let commit = await inRepo(path).getCommit(id);
     expect(commit.message).to.equal('Second commit');
@@ -118,10 +117,10 @@ describe('git/change', function() {
       }
     ];
     try {
-      await git.mergeCommit(repo, head, 'master', updatedContent, commitOpts({ message: 'Second commit' }));
+      await Change.applyOperations(repo, head, 'master', updatedContent, commitOpts({ message: 'Second commit' }));
       throw new Error("should not get here");
     } catch (err) {
-      expect(err).instanceof(git.OverwriteRejected);
+      expect(err).instanceof(Change.OverwriteRejected);
     }
   });
 
@@ -132,14 +131,14 @@ describe('git/change', function() {
     let updatedContent = [
       { operation: 'create', filename: 'hello-world.txt', buffer: Buffer.from('This is a file', 'utf8') }
     ];
-    let commitId = await git.mergeCommit(repo, head, 'master', updatedContent, commitOpts({ message: 'Second commit' }));
+    let commitId = await Change.applyOperations(repo, head, 'master', updatedContent, commitOpts({ message: 'Second commit' }));
     expect(commitId).is.a('string');
 
     updatedContent = [
       { operation: 'create', filename: 'other.txt', buffer: Buffer.from('Non-conflicting content', 'utf8') }
     ];
     // This is based on the same parentRef as the second commit, so it's not a fast forward
-    commitId = await git.mergeCommit(repo, head, 'master', updatedContent, commitOpts({ message: 'Third commit' }));
+    commitId = await Change.applyOperations(repo, head, 'master', updatedContent, commitOpts({ message: 'Third commit' }));
     expect(commitId).is.a('string');
 
     expect((await inRepo(path).getCommit('master')).message).to.equal('Clean merge into master');
@@ -155,16 +154,16 @@ describe('git/change', function() {
     let updatedContent = [
       { operation: 'create', filename: 'hello-world.txt', buffer: Buffer.from('This is a file', 'utf8') }
     ];
-    await git.mergeCommit(repo, head, 'master', updatedContent, commitOpts({ message: 'Second commit' }));
+    await Change.applyOperations(repo, head, 'master', updatedContent, commitOpts({ message: 'Second commit' }));
 
     updatedContent = [
       { operation: 'create', filename: 'hello-world.txt', buffer: Buffer.from('Conflicting content', 'utf8') }
     ];
     try {
-      await git.mergeCommit(repo, head, 'master', updatedContent, commitOpts({ message: 'Third commit' }));
+      await Change.applyOperations(repo, head, 'master', updatedContent, commitOpts({ message: 'Third commit' }));
       throw new Error("merge was not supposed to succeed");
     } catch(err) {
-      expect(err).instanceof(git.GitConflict);
+      expect(err).instanceof(Change.GitConflict);
     }
 
     expect((await inRepo(path).getCommit('master')).message).to.equal('Second commit');
@@ -180,7 +179,7 @@ describe('git/change', function() {
     let updatedContent = [
       { operation: 'create', filename: 'outer/inner/hello-world.txt', buffer: Buffer.from('This is a file', 'utf8') }
     ];
-    let id = await git.mergeCommit(repo, head, 'master', updatedContent, commitOpts({ message: 'Second commit' }));
+    let id = await Change.applyOperations(repo, head, 'master', updatedContent, commitOpts({ message: 'Second commit' }));
 
     let commit = await inRepo(path).getCommit(id);
     expect(commit.message).to.equal('Second commit');
@@ -197,13 +196,13 @@ describe('git/change', function() {
     let updatedContent = [
       { operation: 'create', filename: 'outer/inner/hello-world.txt', buffer: Buffer.from('This is a file', 'utf8') }
     ];
-    head = await git.mergeCommit(repo, head, 'master', updatedContent, commitOpts({ message: 'Second commit' }));
+    head = await Change.applyOperations(repo, head, 'master', updatedContent, commitOpts({ message: 'Second commit' }));
 
     updatedContent = [
       { operation: 'create', filename: 'outer/inner/second.txt', buffer: Buffer.from('second file', 'utf8') }
     ];
 
-    head = await git.mergeCommit(repo, head, 'master', updatedContent, commitOpts({ message: 'Third commit' }));
+    head = await Change.applyOperations(repo, head, 'master', updatedContent, commitOpts({ message: 'Third commit' }));
 
     expect(await inRepo(path).getContents(head, 'outer/inner/second.txt')).to.equal('second file');
     expect(await inRepo(path).getContents(head, 'outer/inner/hello-world.txt')).to.equal('This is a file');
@@ -232,7 +231,7 @@ describe('git/change', function() {
       }
     ];
 
-    head = await git.mergeCommit(repo, head, 'master', updates, commitOpts({ message: 'Deleting' }));
+    head = await Change.applyOperations(repo, head, 'master', updates, commitOpts({ message: 'Deleting' }));
 
     listing = (await inRepo(path).listTree(head, '')).map(e => e.name);
     expect(listing).to.deep.equal([]);
@@ -271,7 +270,7 @@ describe('git/change', function() {
       }
     ];
 
-    head = await git.mergeCommit(repo, head, 'master', updates, commitOpts({ message: 'Deleting' }));
+    head = await Change.applyOperations(repo, head, 'master', updates, commitOpts({ message: 'Deleting' }));
 
     listing = (await inRepo(path).listTree(head, 'outer')).map(e => e.name);
     expect(listing).to.deep.equal(['second.txt']);
@@ -307,7 +306,7 @@ describe('git/change', function() {
       }
     ];
 
-    head = await git.mergeCommit(repo, head, 'master', updates, commitOpts({ message: 'Deleting' }));
+    head = await Change.applyOperations(repo, head, 'master', updates, commitOpts({ message: 'Deleting' }));
 
     listing = (await inRepo(path).listTree(head, '')).map(e => e.name);
     expect(listing).to.deep.equal([]);
@@ -323,10 +322,10 @@ describe('git/change', function() {
     ];
 
     try {
-      await git.mergeCommit(repo, head, 'master', updates, commitOpts({ message: 'Deleting' }));
+      await Change.applyOperations(repo, head, 'master', updates, commitOpts({ message: 'Deleting' }));
       throw new Error("should not get here");
     } catch (err) {
-      expect(err).instanceOf(git.NotFound);
+      expect(err).instanceOf(Change.NotFound);
     }
 
   });
@@ -342,10 +341,10 @@ describe('git/change', function() {
     ];
 
     try {
-      await git.mergeCommit(repo, head, 'master', updates, commitOpts({ message: 'Deleting' }));
+      await Change.applyOperations(repo, head, 'master', updates, commitOpts({ message: 'Deleting' }));
       throw new Error("should not get here");
     } catch (err) {
-      expect(err).instanceOf(git.NotFound);
+      expect(err).instanceOf(Change.NotFound);
     }
 
   });
@@ -373,10 +372,10 @@ describe('git/change', function() {
     ];
 
     try {
-      await git.mergeCommit(repo, head, 'master', updates, commitOpts({ message: 'Deleting' }));
+      await Change.applyOperations(repo, head, 'master', updates, commitOpts({ message: 'Deleting' }));
       throw new Error("should not get here");
     } catch (err) {
-      expect(err).instanceOf(git.NotFound);
+      expect(err).instanceOf(Change.NotFound);
     }
 
   });
@@ -404,10 +403,10 @@ describe('git/change', function() {
     ];
 
     try {
-      await git.mergeCommit(repo, head, 'master', updates, commitOpts({ message: 'Deleting' }));
+      await Change.applyOperations(repo, head, 'master', updates, commitOpts({ message: 'Deleting' }));
       throw new Error("should not get here");
     } catch (err) {
-      expect(err).instanceOf(git.NotFound);
+      expect(err).instanceOf(Change.NotFound);
     }
 
   });
@@ -423,10 +422,10 @@ describe('git/change', function() {
     ];
 
     try {
-      await git.mergeCommit(repo, head, 'master', updates, commitOpts({ message: 'updating' }));
+      await Change.applyOperations(repo, head, 'master', updates, commitOpts({ message: 'updating' }));
       throw new Error("should not get here");
     } catch (err) {
-      expect(err).instanceOf(git.NotFound);
+      expect(err).instanceOf(Change.NotFound);
     }
   });
 
@@ -441,10 +440,10 @@ describe('git/change', function() {
     ];
 
     try {
-      await git.mergeCommit(repo, head, 'master', updates, commitOpts({ message: 'updating' }));
+      await Change.applyOperations(repo, head, 'master', updates, commitOpts({ message: 'updating' }));
       throw new Error("should not get here");
     } catch (err) {
-      expect(err).instanceOf(git.NotFound);
+      expect(err).instanceOf(Change.NotFound);
     }
   });
 
@@ -469,13 +468,13 @@ describe('git/change', function() {
       }
     ];
 
-    head = await git.mergeCommit(repo, head, 'master', updates, commitOpts({ message: 'Updating' }));
+    head = await Change.applyOperations(repo, head, 'master', updates, commitOpts({ message: 'Updating' }));
     expect(await inRepo(path).getContents(head, 'sample.txt')).to.equal('updated');
   });
 
   it('gracefully handles a no-op', async function() {
     let { repo, head } = await makeRepo(path);
-    let newHead = await git.mergeCommit(repo, head, 'master', [], commitOpts({ message: 'Unused' }));
+    let newHead = await Change.applyOperations(repo, head, 'master', [], commitOpts({ message: 'Unused' }));
     expect(newHead).to.equal(head);
   });
 
@@ -504,7 +503,7 @@ describe('git/change', function() {
       }
     ];
 
-    head = await git.mergeCommit(repo, head, 'master', updates, commitOpts({ message: 'Updating' }));
+    head = await Change.applyOperations(repo, head, 'master', updates, commitOpts({ message: 'Updating' }));
     expect(await inRepo(path).getContents(head, 'sample.txt')).to.equal('The original was: sample');
   });
 
@@ -531,7 +530,7 @@ describe('git/change', function() {
       }
     ];
 
-    let newHead = await git.mergeCommit(repo, head, 'master', updates, commitOpts({ message: 'Updating' }));
+    let newHead = await Change.applyOperations(repo, head, 'master', updates, commitOpts({ message: 'Updating' }));
     expect(newHead).to.equal(head);
     expect(await inRepo(path).getContents(head, 'sample.txt')).to.equal('sample');
   });
