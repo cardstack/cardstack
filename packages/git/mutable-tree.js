@@ -12,6 +12,7 @@ class MutableTree {
     this.tree = tree;
     this.overlay = new Map();
   }
+
   entryByName(name) {
     if (this.overlay.has(name)) {
       return this.overlay.get(name);
