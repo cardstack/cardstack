@@ -116,12 +116,10 @@ module.exports = class Writer {
     }
     await this._ensureRepo();
     return this._withErrorHandling(id, type, async () => {
-      await Change.applyOperations(this.repo, version, branch, [
-        {
-          operation: 'delete',
-          filename: this._filenameFor(type, id)
-        }
-      ], this._commitOptions('delete', type, id, user));
+      let change = await Change.create(this.repo, version, branch);
+      let file = await change.get(this._filenameFor(type, id));
+      file.delete();
+      await change.finalize(this._commitOptions('delete', type, id, user));
     });
   }
 

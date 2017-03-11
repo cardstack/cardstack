@@ -34,12 +34,8 @@ class MutableTree {
     return entry;
   }
 
-  async deletePath(path) {
-    let { tree, leaf, leafName } = await this.traverse(path);
-    if (!leaf || leaf === tombstone) {
-      throw new NotFound(`No such file ${path}`);
-    }
-    tree.overlay.set(leafName, tombstone);
+  delete(filename) {
+    this.overlay.set(filename, tombstone);
   }
 
   // TODO refactor away

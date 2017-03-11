@@ -64,13 +64,9 @@ class Change {
     this.targetBranch = targetBranch;
   }
 
-  async get(path, { allowCreate, allowUpdate }) {
+  async get(path, { allowCreate, allowUpdate } = {}) {
     let { tree, leaf, leafName } = await this.root.fileAtPath(path, allowCreate);
     return new FileHandle(tree, leaf, leafName, allowUpdate, path);
-  }
-
-  async delete(path) {
-    return this.root.deletePath(path);
   }
 
   // TODO: refactor away
@@ -88,7 +84,7 @@ class Change {
         await newRoot.patchPath(filename, patcher, patcherThis, { allowCreate: false });
         break;
       case 'delete':
-        await this.delete(filename);
+        (await this.get(filename)).delete();
         break;
       case 'createOrUpdate':
         (await this.get(filename, { allowUpdate: true, allowCreate: true } )).setBuffer(buffer);
@@ -185,6 +181,12 @@ class FileHandle {
       throw new OverwriteRejected(`Refusing to overwrite ${this.path}`);
     }
     this.leaf = this.tree.insert(this.name, buffer, this.mode);
+  }
+  delete() {
+    if (!this.leaf) {
+      throw new NotFound(`No such file ${this.path}`);
+    }
+    return this.tree.delete(this.name);
   }
 }
 
