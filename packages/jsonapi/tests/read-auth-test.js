@@ -87,12 +87,12 @@ describe('auth/read', function() {
 
   it.skip('protects individual resource from anonymous request', async function() {
     let response = await request.get('/articles/0');
-    expect(response).to.have.property('status', 401);
+    expect(response).hasStatus(401);
   });
 
   it.skip('filters resources from collection for anonymous request', async function() {
     let response = await request.get('/articles');
-    expect(response).to.have.property('status', 200);
+    expect(response).hasStatus(200);
     expect(response.body.data).length(0);
   });
 });

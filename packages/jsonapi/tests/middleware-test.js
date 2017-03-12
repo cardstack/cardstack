@@ -89,7 +89,7 @@ describe('jsonapi', function() {
 
   it('can get an individual resource', async function() {
     let response = await request.get('/articles/0');
-    expect(response).to.have.property('status', 200);
+    expect(response).hasStatus(200);
     expect(response.body).deep.property('data.id', '0');
     expect(response.body).deep.property('data.attributes.title', 'Hello world');
     expect(response.body).not.deep.property('data.relationships');
@@ -97,13 +97,13 @@ describe('jsonapi', function() {
 
   it('returns 404 for missing individual resource', async function() {
     let response = await request.get('/articles/98766');
-    expect(response).to.have.property('status', 404);
+    expect(response).hasStatus(404);
     expect(response.body).to.have.deep.property('errors[0].detail', 'No such resource /articles/98766');
   });
 
   it('can get a collection resource', async function() {
     let response = await request.get('/articles');
-    expect(response).to.have.property('status', 200);
+    expect(response).hasStatus(200);
     expect(response.body).to.have.property('data');
     expect(response.body).to.have.deep.property('meta.total', 2);
     expect(response.body.data).length(2);
@@ -113,7 +113,7 @@ describe('jsonapi', function() {
 
   it('can sort a collection resource', async function() {
     let response = await request.get('/articles?sort=title');
-    expect(response).to.have.property('status', 200);
+    expect(response).hasStatus(200);
     expect(response.body).to.have.property('data');
     expect(response.body).has.deep.property('data[0].attributes.title', 'Hello world');
     expect(response.body).has.deep.property('data[1].attributes.title', 'Second');
@@ -121,7 +121,7 @@ describe('jsonapi', function() {
 
   it('can reverse sort a collection resource', async function() {
     let response = await request.get('/articles?sort=-title');
-    expect(response).has.property('status', 200);
+    expect(response).hasStatus(200);
     expect(response.body).has.property('data');
     expect(response.body).has.deep.property('data[1].attributes.title', 'Hello world');
     expect(response.body).has.deep.property('data[0].attributes.title', 'Second');
@@ -129,7 +129,7 @@ describe('jsonapi', function() {
 
   it('can filter a collection resource', async function() {
     let response = await request.get('/articles?filter[title]=world');
-    expect(response).has.property('status', 200);
+    expect(response).hasStatus(200);
     expect(response.body).has.property('data');
     expect(response.body.data).length(1);
     expect(response.body).has.deep.property('data[0].attributes.title', 'Hello world');
@@ -137,13 +137,13 @@ describe('jsonapi', function() {
 
   it('can paginate a collection resource', async function() {
     let response = await request.get('/articles?page[size]=1&sort=title');
-    expect(response).has.property('status', 200, 'first request');
+    expect(response).hasStatus(200, 'first request');
     expect(response.body.data).length(1);
     expect(response.body).has.deep.property('data[0].attributes.title', 'Hello world');
     expect(response.body).has.deep.property('links.next');
 
     response = await request.get(response.body.links.next);
-    expect(response).has.property('status', 200, 'second request');
+    expect(response).hasStatus(200, 'second request');
     expect(response.body).has.deep.property('data[0].attributes.title', 'Second');
     expect(response.body.data).length(1);
   });
@@ -185,7 +185,7 @@ describe('jsonapi', function() {
       }
     });
 
-    expect(response).has.property('status', 201);
+    expect(response).hasStatus(201);
     expect(response.headers).has.property('location');
     expect(response.body).has.deep.property('data.id');
     expect(response.body).has.deep.property('data.attributes.title', 'I am new');
@@ -194,7 +194,7 @@ describe('jsonapi', function() {
     await env.indexer.update({ realTime: true });
 
     response = await request.get(response.headers.location);
-    expect(response).has.property('status', 200);
+    expect(response).hasStatus(200);
     expect(response.body).has.deep.property('data.attributes.title', 'I am new', 'second time');
 
   });
@@ -213,14 +213,14 @@ describe('jsonapi', function() {
       }
     });
 
-    expect(response).has.property('status', 200);
+    expect(response).hasStatus(200);
     expect(response).has.deep.property('body.data.attributes.title', 'Updated title');
     expect(response).has.deep.property('body.data.attributes.body', "This is the first article");
 
     await env.indexer.update({ realTime: true });
 
     response = await request.get('/articles/0');
-    expect(response).has.property('status', 200);
+    expect(response).hasStatus(200);
     expect(response).has.deep.property('body.data.attributes.title', 'Updated title', 'second time');
     expect(response).has.deep.property('body.data.attributes.body', "This is the first article", 'second time');
 
@@ -245,14 +245,14 @@ describe('jsonapi', function() {
 
   it('refuses to delete without version', async function() {
     let response = await request.delete('/articles/0');
-    expect(response).has.property('status', 400);
+    expect(response).hasStatus(400);
     expect(response.body).has.deep.property('errors[0].detail', "version is required");
     expect(response.body).has.deep.property('errors[0].source.header', 'If-Match');
   });
 
   it('refuses to delete with invalid version', async function() {
     let response = await request.delete('/articles/0').set('If-Match', 'xxx');
-    expect(response).has.property('status', 400);
+    expect(response).hasStatus(400);
     expect(response.body).has.deep.property('errors[0].source.header', 'If-Match');
   });
 
@@ -260,12 +260,12 @@ describe('jsonapi', function() {
     let version = await currentVersion(request, '/articles/0');
 
     let response = await request.delete('/articles/0').set('If-Match', version);
-    expect(response).has.property('status', 204);
+    expect(response).hasStatus(204);
 
     await env.indexer.update({ realTime: true });
 
     response = await request.get('/articles/0');
-    expect(response).to.have.property('status', 404);
+    expect(response).hasStatus(404);
   });
 
   it('validates schema during POST', async function() {
