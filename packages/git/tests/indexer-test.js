@@ -5,7 +5,7 @@ const IndexerEngine = require('@cardstack/server/indexer-engine');
 const { commitOpts, makeRepo } = require('./support');
 const ElasticAssert = require('@cardstack/elasticsearch/tests/assertions');
 
-describe('git indexer', function() {
+describe('git/indexer', function() {
   let root, indexer, ea;
 
   beforeEach(async function() {
@@ -37,16 +37,12 @@ describe('git indexer', function() {
     let { repo, head } = await makeRepo(root);
     await indexer.update();
     let originalIndexName = (await ea.aliases()).get('master');
-    let updatedContent = [
-      {
-        operation: 'create',
-        filename: 'contents/articles/hello-world.json',
-        buffer: Buffer.from(JSON.stringify({
-          hello: 'world'
-        }), 'utf8')
-      }
-    ];
-    await Change.applyOperations(repo, head, 'master', updatedContent, commitOpts());
+    let change = await Change.create(repo, head, 'master');
+    let file = await change.get('contents/articles/hello-world.json', { allowCreate: true });
+    file.setContent(JSON.stringify({
+      hello: 'world'
+    }));
+    await change.finalize(commitOpts());
     await indexer.update();
     expect((await ea.aliases()).get('master')).to.equal(originalIndexName);
   });
@@ -77,19 +73,15 @@ describe('git indexer', function() {
     await indexer.update();
     let originalIndexName = (await ea.aliases()).get('master');
 
-    let updatedContent = [
-      {
-        operation: 'update',
-        filename: 'schema/fields/title.json',
-        buffer: Buffer.from(JSON.stringify({
-          attributes: {
-            'field-type': 'string',
-            'searchable': false
-          }
-        }), 'utf8')
+    let change = await Change.create(repo, head, 'master');
+    let file = await change.get('schema/fields/title.json', { allowUpdate: true });
+    file.setContent(JSON.stringify({
+      attributes: {
+        'field-type': 'string',
+        'searchable': false
       }
-    ];
-    await Change.applyOperations(repo, head, 'master', updatedContent, commitOpts({ message: 'Second commit' }));
+    }));
+    await change.finalize(commitOpts());
     await indexer.update();
     expect((await ea.aliases()).get('master')).to.not.equal(originalIndexName);
   });
@@ -100,17 +92,12 @@ describe('git indexer', function() {
 
     await indexer.update();
 
-    let updatedContent = [
-      {
-        operation: 'create',
-        filename: 'contents/articles/hello-world.json',
-        buffer: Buffer.from(JSON.stringify({
-          attributes: { hello: 'world' }
-        }), 'utf8')
-      }
-    ];
-
-    head = await Change.applyOperations(repo, head, 'master', updatedContent, commitOpts({ message: 'Second commit' }));
+    let change = await Change.create(repo, head, 'master');
+    let file = await change.get('contents/articles/hello-world.json', { allowCreate: true });
+    file.setContent(JSON.stringify({
+      attributes: { hello: 'world' }
+    }));
+    head = await change.finalize(commitOpts());
 
     await indexer.update();
 
@@ -139,18 +126,17 @@ describe('git indexer', function() {
     // alone
     await ea.putDocument('master', 'articles', 'hello-world', { original: true });
 
-    let updatedContent = [
-      {
-        operation: 'create',
-        filename: 'contents/articles/second.json',
-        buffer: Buffer.from(JSON.stringify({
-          second: 'document'
-        }), 'utf8')
-      }
-    ];
-    await Change.applyOperations(repo, head, 'master', updatedContent, commitOpts({ message: 'Third commit' }));
+    let change = await Change.create(repo, head, 'master');
+    let file = await change.get('contents/articles/second.json', { allowCreate: true });
+    file.setContent(JSON.stringify({
+      attributes: { hello: 'world' }
+    }));
+    head = await change.finalize(commitOpts());
 
     await indexer.update();
+
+    let indexerState = await ea.indexerState('master', 'git');
+    expect(indexerState.commit).to.equal(head);
 
     let contents = await ea.documentContents('master', 'articles', 'hello-world');
     expect(contents).to.deep.equal({ original: true });
@@ -166,14 +152,10 @@ describe('git indexer', function() {
 
     await indexer.update();
 
-    let updatedContent = [
-      {
-        operation: 'delete',
-        filename: 'contents/articles/hello-world.json'
-      }
-    ];
-    await Change.applyOperations(repo, head, 'master', updatedContent, commitOpts({ message: 'deletion' }));
-
+    let change = await Change.create(repo, head, 'master');
+    let file = await change.get('contents/articles/hello-world.json');
+    file.delete();
+    await change.finalize(commitOpts());
     await indexer.update();
 
     try {
