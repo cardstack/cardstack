@@ -88,6 +88,7 @@ function commitOpts(opts) {
 
 exports.commitOpts = commitOpts;
 
+// TODO: change this to be pure file contents declaration (not arbitrary list of steps with arbitrary operations)
 exports.makeRepo = async function makeRepo(path, steps=[]) {
   let change = await Change.createInitial(path, 'master');
   let head = await change.finalize(commitOpts({

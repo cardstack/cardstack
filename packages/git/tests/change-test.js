@@ -7,7 +7,7 @@ const {
 }= require('./support');
 const moment = require('moment-timezone');
 
-describe('git/change', function() {
+describe.only('git/change', function() {
   let path;
 
   beforeEach(async function() {
@@ -35,13 +35,9 @@ describe('git/change', function() {
   it('can include separate committer info', async function() {
     let { repo, head } = await makeRepo(path);
 
-    let id = await Change.applyOperations(repo, head, 'master', [
-      {
-        operation: 'create',
-        filename: 'example.txt',
-        buffer: Buffer.from('something', 'utf8')
-      }
-    ], commitOpts({
+    let change = await Change.create(repo, head, 'master');
+    (await change.get('example.txt', { allowCreate: true })).setContent('something');
+    let id = await change.finalize(commitOpts({
       message: 'Second commit',
       authorDate: moment.tz('2017-01-16 12:21', 'Africa/Addis_Ababa'),
       committerName: 'The Committer',
@@ -58,10 +54,10 @@ describe('git/change', function() {
   it('can fast-forward merge some new content', async function() {
     let { repo, head } = await makeRepo(path);
 
-    let updatedContent = [
-      { operation: 'create', filename: 'hello-world.txt', buffer: Buffer.from('This is a file', 'utf8') }
-    ];
-    let id = (await Change.applyOperations(repo, head, 'master', updatedContent, commitOpts({ message: 'Second commit' })));
+    let change = await Change.create(repo, head, 'master');
+    let file = await change.get('hello-world.txt', { allowCreate: true });
+    file.setContent('This is a file');
+    let id = await change.finalize(commitOpts({ message: 'Second commit' }));
 
     let commit = await inRepo(path).getCommit(id);
     expect(commit.message).to.equal('Second commit');
@@ -78,10 +74,10 @@ describe('git/change', function() {
   it('automatically fast-forwards when no base version is provided', async function() {
     let { repo } = await makeRepo(path);
 
-    let updatedContent = [
-      { operation: 'create', filename: 'hello-world.txt', buffer: Buffer.from('This is a file', 'utf8') }
-    ];
-    let id = (await Change.applyOperations(repo, null, 'master', updatedContent, commitOpts({ message: 'Second commit' })));
+    let change = await Change.create(repo, null, 'master');
+    let file = await change.get('hello-world.txt', { allowCreate: true });
+    file.setContent('This is a file');
+    let id = await change.finalize(commitOpts({ message: 'Second commit' }));
 
     let commit = await inRepo(path).getCommit(id);
     expect(commit.message).to.equal('Second commit');
@@ -108,16 +104,11 @@ describe('git/change', function() {
       }
     ]);
 
+    let change = await Change.create(repo, head, 'master');
+    let file = await change.get('sample.txt', { allowCreate: true });
 
-    let updatedContent = [
-      {
-        operation: 'create',
-        filename: 'sample.txt',
-        buffer: Buffer.from('This is a file', 'utf8')
-      }
-    ];
     try {
-      await Change.applyOperations(repo, head, 'master', updatedContent, commitOpts({ message: 'Second commit' }));
+      file.setContent('something else');
       throw new Error("should not get here");
     } catch (err) {
       expect(err).instanceof(Change.OverwriteRejected);
@@ -128,17 +119,17 @@ describe('git/change', function() {
   it('non-fast-forward merge some new content', async function() {
     let { repo, head } = await makeRepo(path);
 
-    let updatedContent = [
-      { operation: 'create', filename: 'hello-world.txt', buffer: Buffer.from('This is a file', 'utf8') }
-    ];
-    let commitId = await Change.applyOperations(repo, head, 'master', updatedContent, commitOpts({ message: 'Second commit' }));
+    let change = await Change.create(repo, head, 'master');
+    let file = await change.get('hello-world.txt', { allowCreate: true });
+    file.setContent('This is a file');
+    let commitId = await change.finalize(commitOpts({ message: 'Second commit' }));
     expect(commitId).is.a('string');
 
-    updatedContent = [
-      { operation: 'create', filename: 'other.txt', buffer: Buffer.from('Non-conflicting content', 'utf8') }
-    ];
     // This is based on the same parentRef as the second commit, so it's not a fast forward
-    commitId = await Change.applyOperations(repo, head, 'master', updatedContent, commitOpts({ message: 'Third commit' }));
+    change = await Change.create(repo, head, 'master');
+    file = await change.get('other.txt', { allowCreate: true });
+    file.setContent('Non-conflicting content');
+    commitId = await change.finalize(commitOpts({ message: 'Third commit' }));
     expect(commitId).is.a('string');
 
     expect((await inRepo(path).getCommit('master')).message).to.equal('Clean merge into master');

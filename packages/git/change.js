@@ -75,10 +75,10 @@ class Change {
     for (let { operation, filename, buffer, patcher, patcherThis } of operations) {
       switch (operation) {
       case 'create':
-        (await this.get(filename, { allowCreate: true })).setBuffer(buffer);
+        (await this.get(filename, { allowCreate: true })).setContent(buffer);
         break;
       case 'update':
-        (await this.get(filename, { allowUpdate: true })).setBuffer(buffer);
+        (await this.get(filename, { allowUpdate: true })).setContent(buffer);
         break;
       case 'patch':
         await newRoot.patchPath(filename, patcher, patcherThis, { allowCreate: false });
@@ -87,7 +87,7 @@ class Change {
         (await this.get(filename)).delete();
         break;
       case 'createOrUpdate':
-        (await this.get(filename, { allowUpdate: true, allowCreate: true } )).setBuffer(buffer);
+        (await this.get(filename, { allowUpdate: true, allowCreate: true } )).setContent(buffer);
         break;
       default:
         throw new Error("no operation");
@@ -176,7 +176,13 @@ class FileHandle {
       return (await this.leaf.getBlob()).content();
     }
   }
-  setBuffer(buffer) {
+  setContent(buffer) {
+    if (typeof buffer === 'string') {
+      buffer = Buffer.from(buffer, 'utf8');
+    }
+    if (!(buffer instanceof Buffer)) {
+      throw new Error("setContent got something that was not a Buffer or String");
+    }
     if (!this.allowUpdate && this.leaf) {
       throw new OverwriteRejected(`Refusing to overwrite ${this.path}`);
     }
