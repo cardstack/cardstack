@@ -1,4 +1,4 @@
-module.exports = class Field {
+module.exports = class DataSource {
   constructor(model, plugins) {
     this.id = model.id;
     this.sourceType = model.attributes['source-type'];
