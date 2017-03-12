@@ -130,13 +130,10 @@ module.exports = class Writer {
       gitDocument.relationships = document.relationships;
     }
 
-    let commitId = await Change.applyOperations(this.repo, null, branch, [
-      {
-        operation: 'create',
-        filename: this._filenameFor(document.type, id),
-        buffer: Buffer.from(JSON.stringify(gitDocument), 'utf8')
-      }
-    ], this._commitOptions('create', document.type, id, user));
+    let change = await Change.create(this.repo, null, branch);
+    let file = await change.get(this._filenameFor(document.type, id), { allowCreate: true });
+    file.setContent(JSON.stringify(gitDocument));
+    let commitId = await change.finalize(this._commitOptions('create', document.type, id, user));
 
     let responseDocument = {
       id,
