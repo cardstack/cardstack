@@ -26,11 +26,11 @@ const { isEqual } = require('lodash');
 const BulkOps = require('./bulk-ops');
 const Schema = require('./schema');
 
-module.exports = class IndexerEngine {
+module.exports = class Indexers {
   constructor(indexers) {
     this.indexers = indexers;
     this.es = makeClient();
-    this.log = logger('indexer-engine');
+    this.log = logger('indexers');
   }
 
   async update({ realTime, hints} = {}) {

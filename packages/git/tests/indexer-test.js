@@ -1,7 +1,7 @@
 const Change = require('@cardstack/git/change');
 const temp = require('@cardstack/data-source/tests/temp-helper');
 const GitIndexer = require('@cardstack/git/indexer');
-const IndexerEngine = require('@cardstack/server/indexer-engine');
+const Indexers = require('@cardstack/server/indexers');
 const { commitOpts, makeRepo } = require('./support');
 const ElasticAssert = require('@cardstack/elasticsearch/tests/assertions');
 
@@ -11,7 +11,7 @@ describe('git/indexer', function() {
   beforeEach(async function() {
     ea = new ElasticAssert();
     root = await temp.mkdir('cardstack-server-test');
-    indexer = new IndexerEngine([new GitIndexer({
+    indexer = new Indexers([new GitIndexer({
       repoPath: root
     })]);
   });

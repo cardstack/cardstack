@@ -3,7 +3,7 @@ const SchemaCache = require('@cardstack/server/schema-cache');
 const temp = require('@cardstack/data-source/tests/temp-helper');
 const { makeRepo } = require('@cardstack/git/tests/support');
 const GitIndexer = require('@cardstack/git/indexer');
-const IndexerEngine = require('@cardstack/server/indexer-engine');
+const Indexers = require('@cardstack/server/indexers');
 const GitWriter = require('@cardstack/git/writer');
 const Schema = require('@cardstack/server/schema');
 const ElasticAssert = require('@cardstack/elasticsearch/tests/assertions');
@@ -22,7 +22,7 @@ exports.createDefaultEnvironment = async function(initialModels = []) {
   let schemaCache = new SchemaCache();
   let searcher = new Searcher(schemaCache);
 
-  let indexer = new IndexerEngine([new GitIndexer({
+  let indexer = new Indexers([new GitIndexer({
     repoPath: repo
   })]);
 
@@ -63,7 +63,7 @@ async function destroyIndices() {
 
 exports.indexRecords = async function(records) {
   let stub = new StubIndexer();
-  let engine = new IndexerEngine([stub]);
+  let indexers = new Indexers([stub]);
   let schemaTypes = Schema.ownTypes();
   for (let record of records) {
     if (schemaTypes.indexOf(record.type) >= 0) {
@@ -71,7 +71,7 @@ exports.indexRecords = async function(records) {
     }
     stub.records.push(record);
   }
-  await engine.update({ realTime: true });
+  await indexers.update({ realTime: true });
 };
 
 class StubIndexer {
