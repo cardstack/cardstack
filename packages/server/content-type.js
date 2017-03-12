@@ -4,7 +4,11 @@ module.exports = class ContentType {
   constructor(model, allFields, dataSources) {
     let fields = new Map();
     for (let fieldRef of model.relationships.fields.data) {
-      fields.set(fieldRef.id, allFields.get(fieldRef.id));
+      let field = allFields.get(fieldRef.id);
+      if (!field) {
+        throw new Error(`content type "${model.id}" refers to missing field "${fieldRef.id}"`);
+      }
+      fields.set(fieldRef.id, field);
     }
     this.fields = fields;
     this.id = model.id;

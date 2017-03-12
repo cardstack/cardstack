@@ -1,71 +1,124 @@
-const temp = require('@cardstack/data-source/tests/temp-helper');
+const Writers = require('@cardstack/server/writers');
 const Writer = require('@cardstack/git/writer');
-const { makeRepo, inRepo } = require('./support');
+const { inRepo } = require('./support');
+const {
+  createDefaultEnvironment,
+  destroyDefaultEnvironment
+} = require('@cardstack/server/tests/support');
 
-describe('git writer', function() {
+describe('git/writer', function() {
 
-  let fixtures = [
-    {
-      type: 'articles',
-      id: '1',
-      attributes: {
-        title: 'First Article'
-      }
-    },
-    {
-      type: 'people',
-      id: '1',
-      attributes: {
-        firstName: 'Quint',
-        lastName: 'Faulkner',
-        age: 6
-      }
-    },
-    {
-      type: 'people',
-      id: '2',
-      attributes: {
-        firstName: 'Arthur',
-        lastName: 'Faulkner',
-        age: 1
-      }
-    }
-  ];
-
-  let root, writer, user, headId;
+  let env, writers, user;
 
   beforeEach(async function() {
-    root = await temp.mkdir('cardstack-server-test');
-    writer = new Writer({
-      repo: root
-    });
+    env = await createDefaultEnvironment([
+      {
+        type: 'content-types',
+        id: 'articles',
+        relationships: {
+          fields: {
+            data: [
+              { type: 'fields', id: 'title' }
+            ]
+          },
+          'data-source': {
+            data: { type: 'data-sources', id: 'default-git' }
+          }
+        }
+      },
+      {
+        type: 'content-types',
+        id: 'people',
+        relationships: {
+          fields: {
+            data: [
+              { type: 'fields', id: 'firstName' },
+              { type: 'fields', id: 'lastName' },
+              { type: 'fields', id: 'age' }
+            ]
+          },
+          'data-source': {
+            data: { type: 'data-sources', id: 'default-git' }
+          }
+        }
+      },
+      {
+        type: 'fields',
+        id: 'title',
+        attributes: {
+          'field-type': 'string'
+        }
+      },
+      {
+        type: 'fields',
+        id: 'firstName',
+        attributes: {
+          'field-type': 'string'
+        }
+      },
+      {
+        type: 'fields',
+        id: 'lastName',
+        attributes: {
+          'field-type': 'string'
+        }
+      },
+      {
+        type: 'fields',
+        id: 'age',
+        attributes: {
+          'field-type': 'integer'
+        }
+      },
+      {
+        type: 'articles',
+        id: '1',
+        attributes: {
+          title: 'First Article'
+        }
+      },
+      {
+        type: 'people',
+        id: '1',
+        attributes: {
+          firstName: 'Quint',
+          lastName: 'Faulkner',
+          age: 6
+        }
+      },
+      {
+        type: 'people',
+        id: '2',
+        attributes: {
+          firstName: 'Arthur',
+          lastName: 'Faulkner',
+          age: 1
+        }
+      }
+    ]);
+
     user = {
       fullName: 'Sample User',
       email: 'user@example.com'
     };
 
-    let files = {};
-    fixtures.forEach(f => {
-      files[`contents/${f.type}/${f.id}.json`] = JSON.stringify({ attributes: f.attributes });
-    });
+    writers = new Writers(env.schemaCache);
 
-    let { head } = await makeRepo(root, files);
-    headId = head;
   });
 
   afterEach(async function() {
-    await temp.cleanup();
+    await destroyDefaultEnvironment(env);
   });
 
   describe('create', function() {
     it('saves attributes', async function () {
-      let record = await writer.create('master', user, 'articles', {
+      let record = await writers.create('master', user, 'articles', {
         type: 'articles',
         attributes: {
           title: 'Second Article'
         }
       });
-      let saved = await inRepo(root).getJSONContents('master', `contents/articles/${record.id}.json`);
+      let saved = await inRepo(env.repoPath).getJSONContents('master', `contents/articles/${record.id}.json`);
       expect(saved).to.deep.equal({
         attributes: {
           title: 'Second Article'
@@ -74,7 +127,7 @@ describe('git writer', function() {
     });
 
     it('returns correct document', async function () {
-      let record = await writer.create('master', user, 'articles', {
+      let record = await writers.create('master', user, 'articles', {
         type: 'articles',
         attributes: {
           title: 'Second Article'
@@ -85,14 +138,14 @@ describe('git writer', function() {
         title: 'Second Article'
       });
       expect(record.type).to.equal('articles');
-      let head = await inRepo(root).getCommit('master');
+      let head = await inRepo(env.repoPath).getCommit('master');
       expect(record).has.deep.property('meta.version', head.id);
     });
 
     it('retries on id collision', async function () {
       let ids = ['1', '1', '2'];
       let writer = new Writer({
-        repo: root,
+        repo: env.repoPath,
         idGenerator() {
           return ids.shift();
         }
@@ -109,7 +162,7 @@ describe('git writer', function() {
     });
 
     it('allows optional clientside id', async function() {
-      let record = await writer.create('master', user, 'articles', {
+      let record = await writers.create('master', user, 'articles', {
         id: 'special',
         type: 'articles',
         attributes: {
@@ -117,13 +170,13 @@ describe('git writer', function() {
         }
       });
       expect(record).has.property('id', 'special');
-      let articles = (await inRepo(root).listTree('master', 'contents/articles')).map(a => a.name);
+      let articles = (await inRepo(env.repoPath).listTree('master', 'contents/articles')).map(a => a.name);
       expect(articles).to.contain('special.json');
     });
 
     it('rejects conflicting clientside id', async function() {
       try {
-        await writer.create('master', user, 'articles', {
+        await writers.create('master', user, 'articles', {
           id: '1',
           type: 'articles',
           attributes: {
@@ -143,7 +196,7 @@ describe('git writer', function() {
 
     it('requires type in body', async function() {
       try {
-        await writer.create('master', user, 'articles', {
+        await writers.create('master', user, 'articles', {
           id: '1',
           attributes: {
             title: 'Second Article'
@@ -154,15 +207,16 @@ describe('git writer', function() {
         if (!err.status) {
           throw err;
         }
+
         expect(err.status).to.equal(400);
-        expect(err.detail).to.match(/missing required field/);
+        expect(err.detail).to.match(/missing required field "type"/);
         expect(err.source).to.deep.equal({ pointer: '/data/type' });
       }
     });
 
     it('rejects mismatched type', async function() {
       try {
-        await writer.create('master', user, 'articles', {
+        await writers.create('master', user, 'articles', {
           id: '1',
           type: 'events',
           attributes: {
@@ -185,13 +239,13 @@ describe('git writer', function() {
 
     it('requires id in body', async function() {
       try {
-        await writer.update('master', user, 'articles', '1', {
+        await writers.update('master', user, 'articles', '1', {
           type: 'articles',
           attributes: {
             title: 'Updated title'
           },
           meta: {
-            version: headId
+            version: env.head
           }
         });
         throw new Error("should not get here");
@@ -204,13 +258,13 @@ describe('git writer', function() {
 
     it('requires type in body', async function() {
       try {
-        await writer.update('master', user, 'articles', '1', {
+        await writers.update('master', user, 'articles', '1', {
           id: '1',
           attributes: {
             title: 'Updated title'
           },
           meta: {
-            version: headId
+            version: env.head
           }
         });
         throw new Error("should not get here");
@@ -226,14 +280,14 @@ describe('git writer', function() {
 
     it('rejects mismatched type', async function() {
       try {
-        await writer.update('master', user, 'articles', '1', {
+        await writers.update('master', user, 'articles', '1', {
           id: '1',
           type: 'events',
           attributes: {
             title: 'Updated title'
           },
           meta: {
-            version: headId
+            version: env.head
           }
         });
         throw new Error("should not get here");
@@ -249,14 +303,14 @@ describe('git writer', function() {
 
     it('rejects update of missing document', async function() {
       try {
-        await writer.update('master', user, 'articles', '10', {
+        await writers.update('master', user, 'articles', '10', {
           id: '10',
           type: 'articles',
           attributes: {
             title: 'Updated title'
           },
           meta: {
-            version: headId
+            version: env.head
           }
         });
         throw new Error("should not get here");
@@ -286,7 +340,7 @@ describe('git writer', function() {
           if (meta !== undefined) {
             doc.meta = meta;
           }
-          await writer.update('master', user, 'articles', '1', doc);
+          await writers.update('master', user, 'articles', '1', doc);
           throw new Error("should not get here");
         } catch (err) {
           expect(err.status).to.equal(400);
@@ -301,7 +355,7 @@ describe('git writer', function() {
     for (let version of badVersions) {
       it(`rejects invalid version ${version}`, async function() {
         try {
-          await writer.update('master', user, 'articles', '1', {
+          await writers.update('master', user, 'articles', '1', {
             id: '1',
             type: 'articles',
             attributes: {
@@ -323,85 +377,85 @@ describe('git writer', function() {
     }
 
     it('returns updated document', async function() {
-      let record = await writer.update('master', user, 'articles', '1', {
+      let record = await writers.update('master', user, 'articles', '1', {
         id: '1',
         type: 'articles',
         attributes: {
           title: 'Updated title'
         },
         meta: {
-          version: headId
+          version: env.head
         }
       });
       expect(record).has.deep.property('attributes.title', 'Updated title');
-      expect(record).has.deep.property('meta.version').not.equal(headId);
+      expect(record).has.deep.property('meta.version').not.equal(env.head);
     });
 
     it('returns unchanged field', async function() {
-      let record = await writer.update('master', user, 'people', '1', {
+      let record = await writers.update('master', user, 'people', '1', {
         id: '1',
         type: 'people',
         attributes: {
           age: 7
         },
         meta: {
-          version: headId
+          version: env.head
         }
       });
       expect(record).has.deep.property('attributes.firstName').equal('Quint');
     });
 
     it('stores unchanged field', async function() {
-      await writer.update('master', user, 'people', '1', {
+      await writers.update('master', user, 'people', '1', {
         id: '1',
         type: 'people',
         attributes: {
           age: 7
         },
         meta: {
-          version: headId
+          version: env.head
         }
       });
-      expect(await inRepo(root).getJSONContents('master', 'contents/people/1.json'))
+      expect(await inRepo(env.repoPath).getJSONContents('master', 'contents/people/1.json'))
         .deep.property('attributes.firstName', 'Quint');
     });
 
     it('stores updated attribute', async function() {
-      await writer.update('master', user, 'articles', '1', {
+      await writers.update('master', user, 'articles', '1', {
         id: '1',
         type: 'articles',
         attributes: {
           title: 'Updated title'
         },
         meta: {
-          version: headId
+          version: env.head
         }
       });
-      expect(await inRepo(root).getJSONContents('master', 'contents/articles/1.json'))
+      expect(await inRepo(env.repoPath).getJSONContents('master', 'contents/articles/1.json'))
         .deep.property('attributes.title', 'Updated title');
     });
 
     it('reports merge conflict', async function() {
-      await writer.update('master', user, 'articles', '1', {
+      await writers.update('master', user, 'articles', '1', {
         id: '1',
         type: 'articles',
         attributes: {
           title: 'Updated title'
         },
         meta: {
-          version: headId
+          version: env.head
         }
       });
 
       try {
-        await writer.update('master', user, 'articles', '1', {
+        await writers.update('master', user, 'articles', '1', {
           id: '1',
           type: 'articles',
           attributes: {
             title: 'Conflicting title'
           },
           meta: {
-            version: headId
+            version: env.head
           }
         });
         throw new Error("should not get here");
@@ -413,13 +467,54 @@ describe('git writer', function() {
         expect(err.detail).to.match(/merge conflict/i);
       }
     });
+
+    it('refuses to update id', async function() {
+      try {
+        await writers.update('master', user, 'articles', '1', {
+          id: '12',
+          type: 'articles',
+          meta: {
+            version: env.head
+          }
+        });
+        throw new Error("should not get here");
+      } catch(err) {
+        if (!err.status) {
+          throw err;
+        }
+        expect(err.status).to.equal(403);
+        expect(err.detail).to.equal('not allowed to change "id"');
+      }
+    });
+
+
+    it('refuses to update type', async function() {
+      try {
+        await writers.update('master', user, 'articles', '1', {
+          id: '1',
+          type: 'articles2',
+          meta: {
+            version: env.head
+          }
+        });
+        throw new Error("should not get here");
+      } catch(err) {
+        if (!err.status) {
+          throw err;
+        }
+        expect(err.status).to.equal(409);
+        expect(err.detail).to.equal('the type "articles2" is not allowed here');
+      }
+    });
+
+
   });
 
   describe('delete', function() {
 
     it('rejects missing document', async function() {
       try {
-        await writer.delete('master', user, headId, 'articles', '10');
+        await writers.delete('master', user, env.head, 'articles', '10');
         throw new Error("should not get here");
       } catch (err) {
         if (!err.status) {
@@ -432,7 +527,7 @@ describe('git writer', function() {
 
     it('requires version', async function() {
       try {
-        await writer.delete('master', user, null, 'articles', '1');
+        await writers.delete('master', user, null, 'articles', '1');
         throw new Error("should not get here");
       } catch (err) {
         if (!err.status) {
@@ -447,7 +542,7 @@ describe('git writer', function() {
     for (let version of badVersions) {
       it(`rejects invalid version ${version}`, async function() {
         try {
-          await writer.delete('master', user, version, 'articles', '1');
+          await writers.delete('master', user, version, 'articles', '1');
           throw new Error("should not get here");
         } catch (err) {
           if (err.status == null) {
@@ -460,25 +555,25 @@ describe('git writer', function() {
     }
 
     it('deletes document', async function() {
-      await writer.delete('master', user, headId, 'people', '1');
-      let articles = (await inRepo(root).listTree('master', 'contents/people')).map(a => a.name);
+      await writers.delete('master', user, env.head, 'people', '1');
+      let articles = (await inRepo(env.repoPath).listTree('master', 'contents/people')).map(a => a.name);
       expect(articles).to.not.contain('1.json');
     });
 
     it('reports merge conflict', async function() {
-      await writer.update('master', user, 'articles', '1', {
+      await writers.update('master', user, 'articles', '1', {
         id: '1',
         type: 'articles',
         attributes: {
           title: 'Updated title'
         },
         meta: {
-          version: headId
+          version: env.head
         }
       });
 
       try {
-        await writer.delete('master', user, headId, 'articles', '1');
+        await writers.delete('master', user, env.head, 'articles', '1');
         throw new Error("should not get here");
       } catch (err) {
         if (!err.status) {
@@ -492,7 +587,7 @@ describe('git writer', function() {
 
   describe('belongsTo', function() {
     it('saves at creation', async function() {
-      let record = await writer.create('master', user, 'articles', {
+      let record = await writers.create('master', user, 'articles', {
         type: 'articles',
         relationships: {
           primaryImage: {
@@ -503,7 +598,7 @@ describe('git writer', function() {
           }
         },
       });
-      let saved = await inRepo(root).getJSONContents('master', `contents/articles/${record.id}.json`);
+      let saved = await inRepo(env.repoPath).getJSONContents('master', `contents/articles/${record.id}.json`);
       expect(saved).to.deep.equal({
         relationships: {
           primaryImage: {
@@ -517,7 +612,7 @@ describe('git writer', function() {
     });
 
     it('echos at creation', async function() {
-      let record = await writer.create('master', user, 'articles', {
+      let record = await writers.create('master', user, 'articles', {
         type: 'articles',
         relationships: {
           primaryImage: {
@@ -533,7 +628,7 @@ describe('git writer', function() {
     });
 
     it('saves at update', async function() {
-      await writer.update('master', user, 'articles', '1', {
+      await writers.update('master', user, 'articles', '1', {
         id: '1',
         type: 'articles',
         relationships: {
@@ -545,10 +640,10 @@ describe('git writer', function() {
           }
         },
         meta: {
-          version: headId
+          version: env.head
         }
       });
-      let saved = await inRepo(root).getJSONContents('master', `contents/articles/1.json`);
+      let saved = await inRepo(env.repoPath).getJSONContents('master', `contents/articles/1.json`);
       expect(saved).to.deep.equal({
         attributes: {
           title: 'First Article'
@@ -565,7 +660,7 @@ describe('git writer', function() {
     });
 
     it('echos at update', async function() {
-      let record = await writer.update('master', user, 'articles', '1', {
+      let record = await writers.update('master', user, 'articles', '1', {
         id: '1',
         type: 'articles',
         relationships: {
@@ -577,50 +672,11 @@ describe('git writer', function() {
           }
         },
         meta: {
-          version: headId
+          version: env.head
         }
       });
       expect(record).to.have.deep.property('relationships.primaryImage.data.id', '100');
       expect(record).to.have.deep.property('relationships.primaryImage.data.type', 'images');
-    });
-
-    it('refuses to update id', async function() {
-      try {
-        await writer.update('master', user, 'articles', '1', {
-          id: '12',
-          type: 'articles',
-          meta: {
-            version: headId
-          }
-        });
-        throw new Error("should not get here");
-      } catch(err) {
-        if (!err.status) {
-          throw err;
-        }
-        expect(err.status).to.equal(403);
-        expect(err.detail).to.equal('not allowed to change "id"');
-      }
-    });
-
-
-    it('refuses to update type', async function() {
-      try {
-        await writer.update('master', user, 'articles', '1', {
-          id: '1',
-          type: 'articles2',
-          meta: {
-            version: headId
-          }
-        });
-        throw new Error("should not get here");
-      } catch(err) {
-        if (!err.status) {
-          throw err;
-        }
-        expect(err.status).to.equal(409);
-        expect(err.detail).to.equal('the type "articles2" is not allowed here');
-      }
     });
 
 

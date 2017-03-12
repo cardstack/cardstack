@@ -3,7 +3,7 @@ const qs = require('qs');
 const { merge } = require('lodash');
 const koaJSONBody = require('koa-json-body');
 
-module.exports = function(searcher, schemaCache, optionsArg) {
+module.exports = function(searcher, writers, optionsArg) {
   let options = Object.assign({}, {
     defaultBranch: 'master'
   }, optionsArg);
@@ -17,17 +17,16 @@ module.exports = function(searcher, schemaCache, optionsArg) {
       }
     });
     let branch = options.defaultBranch;
-    let schema = await schemaCache.schemaForBranch(branch);
-    let handler = new Handler(searcher, ctxt, schema, branch);
+    let handler = new Handler(searcher, writers, ctxt, branch);
     return handler.run();
   };
 };
 
 class Handler {
-  constructor(searcher, ctxt, schema, branch) {
+  constructor(searcher, writers, ctxt, branch) {
     this.searcher = searcher;
+    this.writers = writers;
     this.ctxt = ctxt;
-    this.schema = schema;
     this.branch = branch;
     this._query = null;
   }
@@ -79,7 +78,12 @@ class Handler {
       }
     } catch (err) {
       if (!err.isCardstackError) { throw err; }
-      this._errorResponse([err]);
+      let errors = [err];
+      if (err.additionalErrors) {
+        errors = errors.concat(err.additionalErrors);
+      }
+      this.ctxt.body = { errors };
+      this.ctxt.status = errors[0].status;
     }
   }
 
@@ -90,17 +94,15 @@ class Handler {
 
   async handleIndividualPATCH(type, id) {
     let data = this._mandatoryBodyData();
-    let writer = this._writerForType(type);
-    let record = await writer.update(this.branch, this.user, type, id, data);
+    let record = await this.writers.update(this.branch, this.user, type, id, data);
     this.ctxt.body = { data: record };
     this.ctxt.status = 200;
   }
 
   async handleIndividualDELETE(type, id) {
-    let writer = this._writerForType(type);
     try {
       let version = this.ctxt.header['if-match'];
-      await writer.delete(this.branch, this.user, version, type, id);
+      await this.writers.delete(this.branch, this.user, version, type, id);
       this.ctxt.status = 204;
     } catch (err) {
       // By convention, the writer always refers to the version as
@@ -131,12 +133,7 @@ class Handler {
 
   async handleCollectionPOST(type) {
     let data = this._mandatoryBodyData();
-    let errors = await this.schema.validationErrors(data);
-    if (errors.length > 0) {
-      return this._errorResponse(errors);
-    }
-    let writer = this._writerForType(type);
-    let record = await writer.create(this.branch, this.user, type, data);
+    let record = await this.writers.create(this.branch, this.user, type, data);
     this.ctxt.body = { data: record };
     this.ctxt.status = 201;
     this.ctxt.set('location', this.ctxt.request.path + '/' + record.id);
@@ -158,18 +155,6 @@ class Handler {
     }
   }
 
-  _writerForType(type) {
-    let contentType = this.schema.types.get(type);
-    let writer;
-    if (!contentType || !contentType.dataSource || !(writer = contentType.dataSource.writer)) {
-      throw new Error(`"${type}" is not a writable type`, {
-        status: 403,
-        title: "Unsupported type"
-      });
-    }
-    return writer;
-  }
-
   _mandatoryBodyData() {
     let data;
     if (!this.ctxt.request.body || !(data = this.ctxt.request.body.data)) {
@@ -178,18 +163,6 @@ class Handler {
       });
     }
     return data;
-  }
-
-  _errorResponse(errors) {
-    this.ctxt.body = {
-      errors: errors.map(err => ({
-        title: err.title,
-        detail: err.detail,
-        code: err.status,
-        source: err.source
-      }))
-    };
-    this.ctxt.status = errors[0].status;
   }
 
   _urlWithUpdatedParams(params) {

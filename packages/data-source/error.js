@@ -17,6 +17,15 @@ class E extends Error {
     this.title = title || STATUS_CODES[status];
     this.source = source;
     this.isCardstackError = true;
+    this.additionalErrors = null;
+  }
+  toJSON() {
+    return {
+      title: this.title,
+      detail: this.detail,
+      code: this.status,
+      source: this.source
+    };
   }
 }
 module.exports = E;

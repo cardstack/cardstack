@@ -22,7 +22,6 @@ module.exports = class Writer {
   }
 
   async create(branch, user, type, document) {
-    this._requireType(type, document);
     return this._withErrorHandling(document.id, type, async () => {
       while (true) {
         try {
@@ -51,19 +50,6 @@ module.exports = class Writer {
   }
 
   async update(branch, user, type, id, document) {
-    this._requireType(type, document);
-    if (document.id == null) {
-      throw new Error('missing required field "id"', {
-        status: 400,
-        source: { pointer: '/data/id' }
-      });
-    }
-    if (String(document.id) !== id) {
-      throw new Error('not allowed to change "id"', {
-        status: 403,
-        source: { pointer: '/data/id' }
-      });
-    }
     if (!document.meta || !document.meta.version) {
       throw new Error('missing required field "meta.version"', {
         status: 400,
@@ -99,11 +85,6 @@ module.exports = class Writer {
 
 
   async delete(branch, user, version, type, id) {
-    if (id == null) {
-      throw new Error('id is required', {
-        status: 400
-      });
-    }
     if (!version) {
       throw new Error('version is required', {
         status: 400,
@@ -172,21 +153,6 @@ module.exports = class Writer {
         });
       }
       throw err;
-    }
-  }
-
-  _requireType(type, document) {
-    if (document.type == null) {
-      throw new Error('missing required field "type"', {
-        status: 400,
-        source: { pointer: '/data/type' }
-      });
-    }
-    if (document.type !== type) {
-      throw new Error(`the type "${document.type}" is not allowed here`, {
-        status: 409,
-        source: { pointer: '/data/type' }
-      });
     }
   }
 

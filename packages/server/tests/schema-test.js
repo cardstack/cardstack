@@ -99,14 +99,21 @@ describe('schema', function() {
   });
 
   it("rejects unknown type", async function() {
-    expect(await schema.validationErrors({
+    expect(await schema.validationErrors('unicorns', {
       type: 'unicorns',
       id: '1'
     })).includes.something.with.property('detail', '"unicorns" is not a valid type');
   });
 
+  it("rejects mismatched type", async function() {
+    expect(await schema.validationErrors('unicorns', {
+      type: 'articles',
+      id: '1'
+    })).includes.something.with.property('detail', 'the type "articles" is not allowed here');
+  });
+
   it("accepts known types", async function() {
-    expect(await schema.validationErrors({
+    expect(await schema.validationErrors('articles', {
       type: 'articles',
       id: '1',
       attributes: {
@@ -116,7 +123,7 @@ describe('schema', function() {
   });
 
   it("rejects unknown fields", async function() {
-    let errors = await schema.validationErrors({
+    let errors = await schema.validationErrors('articles', {
       type: 'articles',
       id: '1',
       attributes: {
@@ -137,7 +144,7 @@ describe('schema', function() {
   });
 
   it("accepts known fields", async function() {
-    expect(await schema.validationErrors({
+    expect(await schema.validationErrors('articles', {
       type: 'articles',
       id: '1',
       attributes: {
@@ -148,7 +155,7 @@ describe('schema', function() {
   });
 
   it("rejects badly formatted fields", async function() {
-    let errors = await schema.validationErrors({
+    let errors = await schema.validationErrors('articles', {
       type: 'articles',
       id: '1',
       attributes: {
@@ -169,7 +176,7 @@ describe('schema', function() {
   });
 
   it("applies constraints to present fields", async function() {
-    let errors = await schema.validationErrors({
+    let errors = await schema.validationErrors('articles', {
       type: 'articles',
       id: '1',
       attributes: {
@@ -184,7 +191,7 @@ describe('schema', function() {
   });
 
   it("applies constraints to missing fields", async function() {
-    let errors = await schema.validationErrors({
+    let errors = await schema.validationErrors('articles', {
       type: 'articles',
       id: '1',
       attributes: {

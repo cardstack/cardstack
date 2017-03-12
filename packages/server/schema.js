@@ -59,19 +59,51 @@ module.exports = class Schema {
     this._mapping = null;
   }
 
-  async validationErrors(document) {
+  // id is optional. If you provide it, we ensure the document matches
+  // the expected id. Type and document are both mandatory.
+  async validationErrors(type, document, id) {
     let errors = [];
 
-    let type = this.types.get(document.type);
-    if (!type) {
-      errors.push(new Error(`"${document.type}" is not a valid type`, {
+    if (!document.type) {
+      errors.push(new Error(`missing required field "type"`, {
         status: 400,
         source: { pointer: '/data/type' }
       }));
       return errors;
     }
 
-    errors = errors.concat(await type.validationErrors(document));
+    if (document.type !== type) {
+      errors.push(new Error(`the type "${document.type}" is not allowed here`, {
+        status: 409,
+        source: { pointer: '/data/type' }
+      }));
+      return errors;
+    }
+
+    if (id != null && !document.id) {
+      throw new Error('missing required field "id"', {
+        status: 400,
+        source: { pointer: '/data/id' }
+      });
+    }
+
+    if (id != null && String(document.id) !== id) {
+      throw new Error('not allowed to change "id"', {
+        status: 403,
+        source: { pointer: '/data/id' }
+      });
+    }
+
+    let contentType = this.types.get(type);
+    if (!contentType) {
+      errors.push(new Error(`"${type}" is not a valid type`, {
+        status: 400,
+        source: { pointer: '/data/type' }
+      }));
+      return errors;
+    }
+
+    errors = errors.concat(await contentType.validationErrors(document));
 
     return errors;
   }

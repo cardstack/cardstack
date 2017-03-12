@@ -5,14 +5,15 @@ const { makeRepo } = require('@cardstack/git/tests/support');
 const GitIndexer = require('@cardstack/git/indexer');
 const Indexers = require('@cardstack/server/indexers');
 const GitWriter = require('@cardstack/git/writer');
+const Writers = require('@cardstack/server/writers');
 const Schema = require('@cardstack/server/schema');
 const ElasticAssert = require('@cardstack/elasticsearch/tests/assertions');
 
 exports.createDefaultEnvironment = async function(initialModels = []) {
-  let repo = await temp.mkdir('cardstack-server-test');
-  await makeRepo(repo);
+  let repoPath = await temp.mkdir('cardstack-server-test');
+  let { head, repo } = await makeRepo(repoPath);
 
-  let writer = new GitWriter({ repo });
+  let writer = new GitWriter({ repo: repoPath });
 
   let user = {
     fullName: 'Default Test Environment',
@@ -21,9 +22,10 @@ exports.createDefaultEnvironment = async function(initialModels = []) {
 
   let schemaCache = new SchemaCache();
   let searcher = new Searcher(schemaCache);
+  let writers = new Writers(schemaCache);
 
   let indexer = new Indexers([new GitIndexer({
-    repoPath: repo
+    repoPath
   })]);
 
   await writer.create('master', user, 'data-sources', {
@@ -31,12 +33,12 @@ exports.createDefaultEnvironment = async function(initialModels = []) {
     id: 'default-git',
     attributes: {
       'source-type': 'git',
-      params: { repo }
+      params: { repo: repoPath }
     }
   });
 
   for (let model of initialModels) {
-    await writer.create('master', user, model.type, model);
+    head = (await writer.create('master', user, model.type, model)).meta.version;
   }
 
   await indexer.update({ realTime: true });
@@ -44,9 +46,12 @@ exports.createDefaultEnvironment = async function(initialModels = []) {
   return {
     searcher,
     indexer,
-    writer,
+    writers,
     user,
-    schemaCache
+    schemaCache,
+    head,
+    repo,
+    repoPath
   };
 };
 
