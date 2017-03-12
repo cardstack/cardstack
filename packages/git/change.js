@@ -46,13 +46,6 @@ class Change {
     return new this(repo, targetBranch, parentTree, parents, parentCommit, headRef, headCommit);
   }
 
-  // TODO: refactor away
-  static async applyOperations(repo, parentId, targetBranch, operations, commitOpts){
-    let change = await this.create(repo, parentId, targetBranch);
-    await change.applyOperations(operations);
-    return change.finalize(commitOpts);
-  }
-
   constructor(repo, targetBranch, parentTree, parents, parentCommit, headRef, headCommit) {
     this.repo = repo;
     this.parentTree = parentTree;
@@ -67,32 +60,6 @@ class Change {
   async get(path, { allowCreate, allowUpdate } = {}) {
     let { tree, leaf, leafName } = await this.root.fileAtPath(path, allowCreate);
     return new FileHandle(tree, leaf, leafName, allowUpdate, path);
-  }
-
-  // TODO: refactor away
-  async applyOperations(operations) {
-    let newRoot = this.root;
-    for (let { operation, filename, buffer, patcher, patcherThis } of operations) {
-      switch (operation) {
-      case 'create':
-        (await this.get(filename, { allowCreate: true })).setContent(buffer);
-        break;
-      case 'update':
-        (await this.get(filename, { allowUpdate: true })).setContent(buffer);
-        break;
-      case 'patch':
-        await newRoot.patchPath(filename, patcher, patcherThis, { allowCreate: false });
-        break;
-      case 'delete':
-        (await this.get(filename)).delete();
-        break;
-      case 'createOrUpdate':
-        (await this.get(filename, { allowUpdate: true, allowCreate: true } )).setContent(buffer);
-        break;
-      default:
-        throw new Error("no operation");
-      }
-    }
   }
 
   async finalize(commitOpts) {

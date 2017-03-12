@@ -39,19 +39,6 @@ class MutableTree {
     this.overlay.set(filename, tombstone);
   }
 
-  // TODO refactor away
-  async patchPath(path, patcher, patcherThis, { allowCreate }) {
-    let { tree, leaf, leafName } = await this.traverse(path, allowCreate);
-    if (!leaf || leaf === tombstone || !leaf.isBlob()) {
-      throw new NotFound(`No such file ${path}`);
-    }
-    let originalBuffer = (await leaf.getBlob()).content();
-    let newBuffer = patcher.call(patcherThis, originalBuffer);
-    if (newBuffer) {
-      return tree.insert(leafName, newBuffer, leaf.filemode());
-    }
-  }
-
   async fileAtPath(path, allowCreate) {
     let { tree, leaf, leafName } = await this.traverse(path, allowCreate);
     if (!leaf || leaf === tombstone || !leaf.isBlob()) {
