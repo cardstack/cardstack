@@ -142,16 +142,17 @@ describe.only('git/change', function() {
   it('rejects conflicting merge', async function() {
     let { repo, head } = await makeRepo(path);
 
-    let updatedContent = [
-      { operation: 'create', filename: 'hello-world.txt', buffer: Buffer.from('This is a file', 'utf8') }
-    ];
-    await Change.applyOperations(repo, head, 'master', updatedContent, commitOpts({ message: 'Second commit' }));
+    let change = await Change.create(repo, head, 'master');
+    let file = await change.get('hello-world.txt', { allowCreate: true });
+    file.setContent('This is a file');
+    await change.finalize(commitOpts({ message: 'Second commit' }));
 
-    updatedContent = [
-      { operation: 'create', filename: 'hello-world.txt', buffer: Buffer.from('Conflicting content', 'utf8') }
-    ];
+    change = await Change.create(repo, head, 'master');
+    file = await change.get('hello-world.txt', { allowCreate: true });
+    file.setContent('Conflicting content');
+
     try {
-      await Change.applyOperations(repo, head, 'master', updatedContent, commitOpts({ message: 'Third commit' }));
+      await change.finalize(commitOpts({ message: 'Third commit' }));
       throw new Error("merge was not supposed to succeed");
     } catch(err) {
       expect(err).instanceof(Change.GitConflict);
@@ -167,10 +168,10 @@ describe.only('git/change', function() {
   it('can add new directories', async function() {
     let { repo, head } = await makeRepo(path);
 
-    let updatedContent = [
-      { operation: 'create', filename: 'outer/inner/hello-world.txt', buffer: Buffer.from('This is a file', 'utf8') }
-    ];
-    let id = await Change.applyOperations(repo, head, 'master', updatedContent, commitOpts({ message: 'Second commit' }));
+    let change = await Change.create(repo, head, 'master');
+    let file = await change.get('outer/inner/hello-world.txt', { allowCreate: true });
+    file.setContent('This is a file');
+    let id = await change.finalize(commitOpts({ message: 'Second commit' }));
 
     let commit = await inRepo(path).getCommit(id);
     expect(commit.message).to.equal('Second commit');
