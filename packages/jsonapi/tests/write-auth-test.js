@@ -6,7 +6,8 @@ const {
   destroyDefaultEnvironment
 } = require('@cardstack/server/tests/support');
 
-describe('auth/read', function() {
+describe('auth/write', function() {
+
   let request, env;
 
   beforeEach(async function() {
@@ -85,14 +86,16 @@ describe('auth/read', function() {
     await destroyDefaultEnvironment(env);
   }),
 
-  it.skip('protects individual resource from anonymous request', async function() {
-    let response = await request.get('/articles/0');
-    expect(response).to.have.property('status', 401);
+  it('protects creation', async function() {
+    let response = await request.post('/articles').send({
+      type: 'articles',
+      attributes: {
+        title: 'Uh oh',
+        body: 'nope'
+      }
+    });
+    expect(response).hasStatus(401);
   });
 
-  it.skip('filters resources from collection for anonymous request', async function() {
-    let response = await request.get('/articles');
-    expect(response).to.have.property('status', 200);
-    expect(response.body.data).length(0);
-  });
+
 });
