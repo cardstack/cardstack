@@ -192,7 +192,8 @@ class FileHandle {
     if (!this.leaf) {
       throw new NotFound(`No such file ${this.path}`);
     }
-    return this.tree.delete(this.name);
+    this.tree.delete(this.name);
+    this.leaf = null;
   }
 }
 

@@ -197,14 +197,10 @@ describe('git/change', function() {
     let listing = (await inRepo(path).listTree(head, '')).map(e => e.name);
     expect(listing).to.deep.equal(['sample.txt']);
 
-    let updates = [
-      {
-        operation: 'delete',
-        filename: 'sample.txt'
-      }
-    ];
-
-    head = await Change.applyOperations(repo, head, 'master', updates, commitOpts({ message: 'Deleting' }));
+    let change = await Change.create(repo, head, 'master');
+    let file = await change.get('sample.txt');
+    file.delete();
+    head = await change.finalize(commitOpts());
 
     listing = (await inRepo(path).listTree(head, '')).map(e => e.name);
     expect(listing).to.deep.equal([]);
@@ -224,14 +220,10 @@ describe('git/change', function() {
     listing = (await inRepo(path).listTree(head, '')).map(e => e.name);
     expect(listing).to.contain('outer');
 
-    let updates = [
-      {
-        operation: 'delete',
-        filename: 'outer/sample.txt'
-      }
-    ];
-
-    head = await Change.applyOperations(repo, head, 'master', updates, commitOpts({ message: 'Deleting' }));
+    let change = await Change.create(repo, head, 'master');
+    let file = await change.get('outer/sample.txt');
+    file.delete();
+    head = await change.finalize(commitOpts());
 
     listing = (await inRepo(path).listTree(head, 'outer')).map(e => e.name);
     expect(listing).to.deep.equal(['second.txt']);
@@ -252,14 +244,10 @@ describe('git/change', function() {
     listing = (await inRepo(path).listTree(head, '')).map(e => e.name);
     expect(listing).to.contain('outer');
 
-    let updates = [
-      {
-        operation: 'delete',
-        filename: 'outer/sample.txt'
-      }
-    ];
-
-    head = await Change.applyOperations(repo, head, 'master', updates, commitOpts({ message: 'Deleting' }));
+    let change = await Change.create(repo, head, 'master');
+    let file = await change.get('outer/sample.txt');
+    file.delete();
+    head = await change.finalize(commitOpts());
 
     listing = (await inRepo(path).listTree(head, '')).map(e => e.name);
     expect(listing).to.deep.equal([]);
@@ -267,39 +255,27 @@ describe('git/change', function() {
 
   it('rejects deletion within missing directory', async function() {
     let { repo, head } = await makeRepo(path);
-    let updates = [
-      {
-        operation: 'delete',
-        filename: 'outer/sample.txt'
-      }
-    ];
-
     try {
-      await Change.applyOperations(repo, head, 'master', updates, commitOpts({ message: 'Deleting' }));
+      let change = await Change.create(repo, head, 'master');
+      let file = await change.get('outer/sample.txt');
+      file.delete();
       throw new Error("should not get here");
     } catch (err) {
       expect(err).instanceOf(Change.NotFound);
     }
-
   });
 
 
   it('rejects deletion of missing file', async function() {
     let { repo, head } = await makeRepo(path);
-    let updates = [
-      {
-        operation: 'delete',
-        filename: 'sample.txt'
-      }
-    ];
-
     try {
-      await Change.applyOperations(repo, head, 'master', updates, commitOpts({ message: 'Deleting' }));
+      let change = await Change.create(repo, head, 'master');
+      let file = await change.get('sample.txt');
+      file.delete();
       throw new Error("should not get here");
     } catch (err) {
       expect(err).instanceOf(Change.NotFound);
     }
-
   });
 
 
@@ -308,44 +284,12 @@ describe('git/change', function() {
       'outer/sample.txt': 'sample'
     });
 
-    let updates = [
-      {
-        operation: 'delete',
-        filename: 'outer/sample.txt'
-      },
-      {
-        operation: 'delete',
-        filename: 'outer/sample.txt'
-      }
-    ];
+    let change = await Change.create(repo, head, 'master');
+    let file = await change.get('outer/sample.txt');
+    file.delete();
 
     try {
-      await Change.applyOperations(repo, head, 'master', updates, commitOpts({ message: 'Deleting' }));
-      throw new Error("should not get here");
-    } catch (err) {
-      expect(err).instanceOf(Change.NotFound);
-    }
-
-  });
-
-
-  it('rejects double deletion of directory', async function() {
-    let { repo, head } = await makeRepo(path, {
-      'outer/sample.txt': 'sample'
-    });
-    let updates = [
-      {
-        operation: 'delete',
-        filename: 'outer'
-      },
-      {
-        operation: 'delete',
-        filename: 'outer'
-      }
-    ];
-
-    try {
-      await Change.applyOperations(repo, head, 'master', updates, commitOpts({ message: 'Deleting' }));
+      file.delete();
       throw new Error("should not get here");
     } catch (err) {
       expect(err).instanceOf(Change.NotFound);
@@ -355,16 +299,11 @@ describe('git/change', function() {
 
   it('rejects update within missing directory', async function() {
     let { repo, head } = await makeRepo(path);
-    let updates = [
-      {
-        operation: 'update',
-        filename: 'outer/sample.txt',
-        buffer: Buffer.from('sample', 'utf8')
-      }
-    ];
+
+    let change = await Change.create(repo, head, 'master');
 
     try {
-      await Change.applyOperations(repo, head, 'master', updates, commitOpts({ message: 'updating' }));
+      await change.get('outer/sample.txt', { allowUpdate: true });
       throw new Error("should not get here");
     } catch (err) {
       expect(err).instanceOf(Change.NotFound);
@@ -373,16 +312,9 @@ describe('git/change', function() {
 
   it('rejects update of missing file', async function() {
     let { repo, head } = await makeRepo(path);
-    let updates = [
-      {
-        operation: 'update',
-        filename: 'sample.txt',
-        buffer: Buffer.from('sample', 'utf8')
-      }
-    ];
-
+    let change = await Change.create(repo, head, 'master');
     try {
-      await Change.applyOperations(repo, head, 'master', updates, commitOpts({ message: 'updating' }));
+      await change.get('sample.txt', { allowUpdate: true });
       throw new Error("should not get here");
     } catch (err) {
       expect(err).instanceOf(Change.NotFound);
@@ -393,22 +325,17 @@ describe('git/change', function() {
     let { repo, head } = await makeRepo(path, {
       'sample.txt': 'sample'
     });
-
-    let updates = [
-      {
-        operation: 'update',
-        filename: 'sample.txt',
-        buffer: Buffer.from('updated', 'utf8')
-      }
-    ];
-
-    head = await Change.applyOperations(repo, head, 'master', updates, commitOpts({ message: 'Updating' }));
+    let change = await Change.create(repo, head, 'master');
+    let file = await change.get('sample.txt', { allowUpdate: true });
+    file.setContent('updated');
+    head = await change.finalize(commitOpts());
     expect(await inRepo(path).getContents(head, 'sample.txt')).to.equal('updated');
   });
 
   it('gracefully handles a no-op', async function() {
     let { repo, head } = await makeRepo(path);
-    let newHead = await Change.applyOperations(repo, head, 'master', [], commitOpts({ message: 'Unused' }));
+    let change = await Change.create(repo, head, 'master');
+    let newHead = await change.finalize(commitOpts({ message: 'Unused' }));
     expect(newHead).to.equal(head);
   });
 
@@ -416,19 +343,11 @@ describe('git/change', function() {
     let { repo, head } = await makeRepo(path, {
       'sample.txt': 'sample'
     });
-    let updates = [
-      {
-        operation: 'patch',
-        filename: 'sample.txt',
-        patcherThis: { isCorrectContext: true },
-        patcher(originalBuffer) {
-          expect(this).has.property('isCorrectContext');
-          return Buffer.from('The original was: ' + originalBuffer.toString('utf8'), 'utf8');
-        }
-      }
-    ];
-
-    head = await Change.applyOperations(repo, head, 'master', updates, commitOpts({ message: 'Updating' }));
+    let change = await Change.create(repo, head, 'master');
+    let file = await change.get('sample.txt', { allowUpdate: true });
+    let originalBuffer = await file.getBuffer();
+    file.setContent('The original was: ' + originalBuffer.toString('utf8'));
+    head = await change.finalize(commitOpts());
     expect(await inRepo(path).getContents(head, 'sample.txt')).to.equal('The original was: sample');
   });
 
@@ -437,17 +356,10 @@ describe('git/change', function() {
       'sample.txt': 'sample'
     });
 
-    let updates = [
-      {
-        operation: 'patch',
-        filename: 'sample.txt',
-        patcher() {
-          return null;
-        }
-      }
-    ];
-
-    let newHead = await Change.applyOperations(repo, head, 'master', updates, commitOpts({ message: 'Updating' }));
+    let change = await Change.create(repo, head, 'master');
+    let file = await change.get('sample.txt', { allowUpdate: true });
+    await file.getBuffer();
+    let newHead = await change.finalize(commitOpts());
     expect(newHead).to.equal(head);
     expect(await inRepo(path).getContents(head, 'sample.txt')).to.equal('sample');
   });
