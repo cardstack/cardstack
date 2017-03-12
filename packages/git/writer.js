@@ -49,23 +49,6 @@ module.exports = class Writer {
     });
   }
 
-  async update(branch, user, type, id, document) {
-    let p = await this.prepareUpdate(branch, user, type, id, document);
-    let meta = await p.finalize();
-    let responseDocument = {
-      id,
-      type,
-      meta
-    };
-    if (p.document.attributes) {
-      responseDocument.attributes = p.document.attributes;
-    }
-    if (p.document.relationships) {
-      responseDocument.relationships = p.document.relationships;
-    }
-    return responseDocument;
-  }
-
   async prepareUpdate(branch, user, type, id, document) {
     if (!document.meta || !document.meta.version) {
       throw new Error('missing required field "meta.version"', {
@@ -80,11 +63,19 @@ module.exports = class Writer {
       let file = await change.get(this._filenameFor(type, id), { allowUpdate: true });
       let finalDocument = patch(await file.getBuffer(), document);
       file.setContent(JSON.stringify(finalDocument));
+
+      // we don't write id & type into the actual file (they're part
+      // of the filename). But we want them present on the
+      // PendingChange.document we're about to return, so that
+      // document is complete and can be validated.
+      finalDocument.id = document.id;
+      finalDocument.type = document.type;
+
       return new PendingChange(id, type, this._commitOptions('update', type, id, user), change, finalDocument);
     });
   }
 
-  async delete(branch, user, version, type, id) {
+  async prepareDelete(branch, user, version, type, id) {
     if (!version) {
       throw new Error('version is required', {
         status: 400,
@@ -96,7 +87,7 @@ module.exports = class Writer {
       let change = await Change.create(this.repo, version, branch);
       let file = await change.get(this._filenameFor(type, id));
       file.delete();
-      await change.finalize(this._commitOptions('delete', type, id, user));
+      return new PendingChange(id, type, this._commitOptions('delete', type, id, user), change);
     });
   }
 

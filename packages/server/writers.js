@@ -22,14 +22,28 @@ class Writers {
   async update(branch, user, type, id, document) {
     let schema = await this.schemaCache.schemaForBranch(branch);
     let writer = this._lookupWriter(schema, type);
-    await this._validate(schema, document, type, id);
-    return writer.update(branch, user, type, id, document);
+    let pending = await writer.prepareUpdate(branch, user, type, id, document);
+    await this._validate(schema, pending.document, type, id);
+    let meta = await pending.finalize();
+    let responseDocument = {
+      id,
+      type,
+      meta
+    };
+    if (pending.document.attributes) {
+      responseDocument.attributes = pending.document.attributes;
+    }
+    if (pending.document.relationships) {
+      responseDocument.relationships = pending.document.relationships;
+    }
+    return responseDocument;
   }
 
   async delete(branch, user, version, type, id) {
     let schema = await this.schemaCache.schemaForBranch(branch);
     let writer = this._lookupWriter(schema, type);
-    return writer.delete(branch, user, version, type, id);
+    let pending = await writer.prepareDelete(branch, user, version, type, id);
+    await pending.finalize();
   }
 
   async _validate(schema, document, type, id) {
