@@ -72,17 +72,12 @@ module.exports = class Writer {
     }
     await this._ensureRepo();
 
-    let patcher = new Patcher(document);
-
     return this._withErrorHandling(id, type, async () => {
-      let commitId = await Change.applyOperations(this.repo, document.meta.version, branch, [
-        {
-          operation: 'patch',
-          filename: this._filenameFor(type, id),
-          patcher: patcher.run,
-          patcherThis: patcher
-        }
-      ], this._commitOptions('update', type, id, user));
+      let change = await Change.create(this.repo, document.meta.version, branch);
+      let file = await change.get(this._filenameFor(type, id), { allowUpdate: true });
+      let finalDocument = patch(await file.getBuffer(), document);
+      file.setContent(JSON.stringify(finalDocument));
+      let commitId = await change.finalize(this._commitOptions('update', type, id, user));
 
       let responseDocument = {
         id,
@@ -91,7 +86,6 @@ module.exports = class Writer {
           version: commitId
         }
       };
-      let finalDocument = patcher.finalDocument;
       if (finalDocument.attributes) {
         responseDocument.attributes = finalDocument.attributes;
       }
@@ -101,6 +95,8 @@ module.exports = class Writer {
       return responseDocument;
     });
   }
+
+
 
   async delete(branch, user, version, type, id) {
     if (id == null) {
@@ -228,22 +224,16 @@ module.exports = class Writer {
 
 };
 
-class Patcher {
-  constructor(newDocument) {
-    this.newDocument = newDocument;
-  }
-  run(originalBuffer) {
-    let document = JSON.parse(originalBuffer);
-    for (let section of ['attributes', 'relationships']) {
-      if (this.newDocument[section]) {
-        document[section] = Object.assign(
-          {},
-          document[section],
-          this.newDocument[section]
-        );
-      }
+function patch(originalBuffer, newDocument) {
+  let document = JSON.parse(originalBuffer);
+  for (let section of ['attributes', 'relationships']) {
+    if (newDocument[section]) {
+      document[section] = Object.assign(
+        {},
+        document[section],
+        newDocument[section]
+      );
     }
-    this.finalDocument = document;
-    return Buffer.from(JSON.stringify(document), 'utf8');
   }
+  return document;
 }
