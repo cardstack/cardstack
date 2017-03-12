@@ -22,7 +22,7 @@ module.exports = class Writer {
   }
 
   async create(branch, user, type, document) {
-    return this._withErrorHandling(document.id, type, async () => {
+    return withErrorHandling(document.id, type, async () => {
       while (true) {
         try {
           // 20 bytes is good enough for git, so it's good enough for
@@ -50,39 +50,39 @@ module.exports = class Writer {
   }
 
   async update(branch, user, type, id, document) {
+    let p = await this.prepareUpdate(branch, user, type, id, document);
+    let meta = await p.finalize();
+    let responseDocument = {
+      id,
+      type,
+      meta
+    };
+    if (p.document.attributes) {
+      responseDocument.attributes = p.document.attributes;
+    }
+    if (p.document.relationships) {
+      responseDocument.relationships = p.document.relationships;
+    }
+    return responseDocument;
+  }
+
+  async prepareUpdate(branch, user, type, id, document) {
     if (!document.meta || !document.meta.version) {
       throw new Error('missing required field "meta.version"', {
         status: 400,
         source: { pointer: '/data/meta/version' }
       });
     }
-    await this._ensureRepo();
 
-    return this._withErrorHandling(id, type, async () => {
+    await this._ensureRepo();
+    return withErrorHandling(id, type, async () => {
       let change = await Change.create(this.repo, document.meta.version, branch);
       let file = await change.get(this._filenameFor(type, id), { allowUpdate: true });
       let finalDocument = patch(await file.getBuffer(), document);
       file.setContent(JSON.stringify(finalDocument));
-      let commitId = await change.finalize(this._commitOptions('update', type, id, user));
-
-      let responseDocument = {
-        id,
-        type,
-        meta: {
-          version: commitId
-        }
-      };
-      if (finalDocument.attributes) {
-        responseDocument.attributes = finalDocument.attributes;
-      }
-      if (finalDocument.relationships) {
-        responseDocument.relationships = finalDocument.relationships;
-      }
-      return responseDocument;
+      return new PendingChange(id, type, this._commitOptions('update', type, id, user), change, finalDocument);
     });
   }
-
-
 
   async delete(branch, user, version, type, id) {
     if (!version) {
@@ -92,7 +92,7 @@ module.exports = class Writer {
       });
     }
     await this._ensureRepo();
-    return this._withErrorHandling(id, type, async () => {
+    return withErrorHandling(id, type, async () => {
       let change = await Change.create(this.repo, version, branch);
       let file = await change.get(this._filenameFor(type, id));
       file.delete();
@@ -131,29 +131,6 @@ module.exports = class Writer {
     }
 
     return responseDocument;
-  }
-
-  async _withErrorHandling(id, type, fn) {
-    try {
-      return await fn();
-    } catch (err) {
-      if (/Unable to parse OID/.test(err.message) || /Object not found/.test(err.message)) {
-        throw new Error(err.message, { status: 400, source: { pointer: '/data/meta/version' }});
-      }
-      if (err instanceof Change.GitConflict) {
-        throw new Error("Merge conflict", { status: 409 });
-      }
-      if (err instanceof Change.OverwriteRejected) {
-        throw new Error(`id ${id} is already in use`, { status: 409, source: { pointer: '/data/id'}});
-      }
-      if (err instanceof Change.NotFound) {
-        throw new Error(`${type} with id ${id} does not exist`, {
-          status: 404,
-          source: { pointer: '/data/id' }
-        });
-      }
-      throw err;
-    }
   }
 
   _commitOptions(operation, type, id, user) {
@@ -199,4 +176,45 @@ function patch(originalBuffer, newDocument) {
     }
   }
   return document;
+}
+
+async function withErrorHandling(id, type, fn) {
+  try {
+    return await fn();
+  } catch (err) {
+    if (/Unable to parse OID/.test(err.message) || /Object not found/.test(err.message)) {
+      throw new Error(err.message, { status: 400, source: { pointer: '/data/meta/version' }});
+    }
+    if (err instanceof Change.GitConflict) {
+      throw new Error("Merge conflict", { status: 409 });
+    }
+    if (err instanceof Change.OverwriteRejected) {
+      throw new Error(`id ${id} is already in use`, { status: 409, source: { pointer: '/data/id'}});
+    }
+    if (err instanceof Change.NotFound) {
+      throw new Error(`${type} with id ${id} does not exist`, {
+        status: 404,
+        source: { pointer: '/data/id' }
+      });
+    }
+    throw err;
+  }
+}
+
+
+class PendingChange {
+  constructor(id, type, commitOpts, change, document) {
+    this.id = id;
+    this.type = type;
+    this.commitOpts = commitOpts;
+    this.change = change;
+    this.document = document;
+  }
+  async finalize() {
+    return withErrorHandling(this.id, this.type, async () => {
+      let version = await this.change.finalize(this.commitOpts);
+      return { version };
+    });
+  }
+
 }
