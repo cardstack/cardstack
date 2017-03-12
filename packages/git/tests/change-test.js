@@ -7,7 +7,7 @@ const {
 }= require('./support');
 const moment = require('moment-timezone');
 
-describe.only('git/change', function() {
+describe('git/change', function() {
   let path;
 
   beforeEach(async function() {
@@ -92,17 +92,9 @@ describe.only('git/change', function() {
   });
 
   it('can detect unintended filename collision', async function() {
-    let { repo, head } = await makeRepo(path, [
-      {
-        changes: [
-          {
-            operation: 'create',
-            filename: 'sample.txt',
-            buffer: Buffer.from('sample', 'utf8')
-          }
-        ]
-      }
-    ]);
+    let { repo, head } = await makeRepo(path, {
+      'sample.txt': 'sample'
+    });
 
     let change = await Change.create(repo, head, 'master');
     let file = await change.get('sample.txt', { allowCreate: true });
@@ -201,17 +193,9 @@ describe.only('git/change', function() {
   });
 
   it('can delete a file at the top level', async function() {
-    let { repo, head } = await makeRepo(path, [
-      {
-        changes: [
-          {
-            operation: 'create',
-            filename: 'sample.txt',
-            buffer: Buffer.from('sample', 'utf8')
-          }
-        ]
-      }
-    ]);
+    let { repo, head } = await makeRepo(path, {
+      'sample.txt': 'sample'
+    });
 
     let listing = (await inRepo(path).listTree(head, '')).map(e => e.name);
     expect(listing).to.deep.equal(['sample.txt']);
@@ -231,22 +215,10 @@ describe.only('git/change', function() {
   });
 
   it('can delete a file at an inner level', async function() {
-    let { repo, head } = await makeRepo(path, [
-      {
-        changes: [
-          {
-            operation: 'create',
-            filename: 'outer/sample.txt',
-            buffer: Buffer.from('sample', 'utf8')
-          },
-          {
-            operation: 'create',
-            filename: 'outer/second.txt',
-            buffer: Buffer.from('second', 'utf8')
-          }
-        ]
-      }
-    ]);
+    let { repo, head } = await makeRepo(path, {
+      'outer/sample.txt':'sample',
+      'outer/second.txt': 'second'
+    });
 
     let listing = (await inRepo(path).listTree(head, 'outer')).map(e => e.name);
     expect(listing).to.contain('sample.txt');
@@ -273,17 +245,9 @@ describe.only('git/change', function() {
   });
 
   it('can delete a whole subtree', async function() {
-    let { repo, head } = await makeRepo(path, [
-      {
-        changes: [
-          {
-            operation: 'create',
-            filename: 'outer/sample.txt',
-            buffer: Buffer.from('sample', 'utf8')
-          }
-        ]
-      }
-    ]);
+    let { repo, head } = await makeRepo(path, {
+      'outer/sample.txt': 'sample'
+    });
 
     let listing = (await inRepo(path).listTree(head, 'outer')).map(e => e.name);
     expect(listing).to.contain('sample.txt');
@@ -343,15 +307,10 @@ describe.only('git/change', function() {
 
 
   it('rejects double deletion file', async function() {
-    let { repo, head } = await makeRepo(path, [{
-      changes: [
-        {
-          operation: 'create',
-          filename: 'outer/sample.txt',
-          buffer: Buffer.from('sample', 'utf8')
-        }
-      ]}
-    ]);
+    let { repo, head } = await makeRepo(path, {
+      'outer/sample.txt': 'sample'
+    });
+
     let updates = [
       {
         operation: 'delete',
@@ -374,15 +333,9 @@ describe.only('git/change', function() {
 
 
   it('rejects double deletion of directory', async function() {
-    let { repo, head } = await makeRepo(path, [{
-      changes: [
-        {
-          operation: 'create',
-          filename: 'outer/sample.txt',
-          buffer: Buffer.from('sample', 'utf8')
-        }
-      ]}
-    ]);
+    let { repo, head } = await makeRepo(path, {
+      'outer/sample.txt': 'sample'
+    });
     let updates = [
       {
         operation: 'delete',
@@ -440,17 +393,9 @@ describe.only('git/change', function() {
   });
 
   it('can update a file', async function() {
-    let { repo, head } = await makeRepo(path, [
-      {
-        changes: [
-          {
-            operation: 'create',
-            filename: 'sample.txt',
-            buffer: Buffer.from('sample', 'utf8')
-          }
-        ]
-      }
-    ]);
+    let { repo, head } = await makeRepo(path, {
+      'sample.txt': 'sample'
+    });
 
     let updates = [
       {
@@ -471,18 +416,9 @@ describe.only('git/change', function() {
   });
 
   it('can patch a file', async function() {
-    let { repo, head } = await makeRepo(path, [
-      {
-        changes: [
-          {
-            operation: 'create',
-            filename: 'sample.txt',
-            buffer: Buffer.from('sample', 'utf8')
-          }
-        ]
-      }
-    ]);
-
+    let { repo, head } = await makeRepo(path, {
+      'sample.txt': 'sample'
+    });
     let updates = [
       {
         operation: 'patch',
@@ -500,17 +436,9 @@ describe.only('git/change', function() {
   });
 
   it('can abort a patch', async function() {
-    let { repo, head } = await makeRepo(path, [
-      {
-        changes: [
-          {
-            operation: 'create',
-            filename: 'sample.txt',
-            buffer: Buffer.from('sample', 'utf8')
-          }
-        ]
-      }
-    ]);
+    let { repo, head } = await makeRepo(path, {
+      'sample.txt': 'sample'
+    });
 
     let updates = [
       {

@@ -88,21 +88,20 @@ function commitOpts(opts) {
 
 exports.commitOpts = commitOpts;
 
-// TODO: change this to be pure file contents declaration (not arbitrary list of steps with arbitrary operations)
-exports.makeRepo = async function makeRepo(path, steps=[]) {
+exports.makeRepo = async function makeRepo(path, files) {
   let change = await Change.createInitial(path, 'master');
+  let repo = change.repo;
+
+  if (files) {
+    for (let [filename, content] of Object.entries(files)) {
+      let file = await change.get(filename, { allowCreate: true });
+      file.setContent(content);
+    }
+  }
+
   let head = await change.finalize(commitOpts({
     message: 'First commit'
   }));
-  let repo = change.repo;
-
-  for (let [index, { changes, message }] of steps.entries()) {
-    change = await Change.create(repo, head, 'master');
-    change.applyOperations(changes);
-    head = await change.finalize(commitOpts({
-      message: message ||  `Commit ${index}`
-    }));
-  }
 
   return { head, repo };
 };

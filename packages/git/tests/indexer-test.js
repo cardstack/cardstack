@@ -52,43 +52,27 @@ describe('git indexer', function() {
   });
 
   it('reindexes when mapping definition is changed', async function() {
-    let { repo, head } = await makeRepo(root, [
-      {
-        changes: [
-          {
-            operation: 'create',
-            filename: 'schema/content-types/articles.json',
-            buffer: Buffer.from(JSON.stringify({
-              relationships: {
-                fields: {
-                  data: [
-                    { type: 'fields', id: 'title' }
-                  ]
-                }
-              }
-            }), 'utf8')
-          },
-          {
-            operation: 'create',
-            filename: 'schema/fields/title.json',
-            buffer: Buffer.from(JSON.stringify({
-              attributes: {
-                'field-type': 'string'
-              }
-            }), 'utf8')
-          },
-          {
-            operation: 'create',
-            filename: 'contents/articles/hello-world.json',
-            buffer: Buffer.from(JSON.stringify({
-              attributes: {
-                title: 'Hello world'
-              }
-            }), 'utf8')
+    let { repo, head } = await makeRepo(root, {
+      'schema/content-types/articles.json': JSON.stringify({
+        relationships: {
+          fields: {
+            data: [
+              { type: 'fields', id: 'title' }
+            ]
           }
-        ]
-      }
-    ]);
+        }
+      }),
+      'schema/fields/title.json': JSON.stringify({
+        attributes: {
+          'field-type': 'string'
+        }
+      }),
+      'contents/articles/hello-world.json': JSON.stringify({
+        attributes: {
+          title: 'Hello world'
+        }
+      })
+    });
 
     await indexer.update();
     let originalIndexName = (await ea.aliases()).get('master');
@@ -142,19 +126,11 @@ describe('git indexer', function() {
   });
 
   it('does not reindex unchanged content', async function() {
-    let { repo, head } = await makeRepo(root, [
-      {
-        changes: [
-          {
-            operation: 'create',
-            filename: 'contents/articles/hello-world.json',
-            buffer: Buffer.from(JSON.stringify({
-              hello: 'world'
-            }), 'utf8')
-          }
-        ]
-      }
-    ]);
+    let { repo, head } = await makeRepo(root, {
+      'contents/articles/hello-world.json': JSON.stringify({
+        hello: 'world'
+      })
+    });
 
     await indexer.update();
 
@@ -182,19 +158,11 @@ describe('git indexer', function() {
 
 
   it('deletes removed content', async function() {
-    let { repo, head } = await makeRepo(root, [
-      {
-        changes: [
-          {
-            operation: 'create',
-            filename: 'contents/articles/hello-world.json',
-            buffer: Buffer.from(JSON.stringify({
-              hello: 'world'
-            }), 'utf8')
-          }
-        ]
-      }
-    ]);
+    let { repo, head } = await makeRepo(root, {
+      'contents/articles/hello-world.json': JSON.stringify({
+        hello: 'world'
+      })
+    });
 
     await indexer.update();
 

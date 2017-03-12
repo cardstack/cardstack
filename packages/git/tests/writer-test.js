@@ -44,15 +44,12 @@ describe('git writer', function() {
       email: 'user@example.com'
     };
 
-    let { head } = await makeRepo(root, [
-      {
-        changes: fixtures.map(f => ({
-          operation: 'create',
-          filename: `contents/${f.type}/${f.id}.json`,
-          buffer: Buffer.from(JSON.stringify({ attributes: f.attributes }), 'utf8')
-        }))
-      }
-    ]);
+    let files = {};
+    fixtures.forEach(f => {
+      files[`contents/${f.type}/${f.id}.json`] = JSON.stringify({ attributes: f.attributes });
+    });
+
+    let { head } = await makeRepo(root, files);
     headId = head;
   });
 
