@@ -198,13 +198,10 @@ describe('jsonapi', function() {
 
   });
 
-  it.skip('can update an existing resource', async function() {
-    let response = await request.get('/articles/0');
-    expect(response).has.property('status', 200);
-    expect(response).has.deep.property('body.data.meta.version');
-    let { version } = response.body.data.meta;
+  it('can update an existing resource', async function() {
+    let version = await currentVersion(request, '/articles/0');
 
-    response = await request.patch('/articles/0').send({
+    let response = await request.patch('/articles/0').send({
       data: {
         id: '0',
         type: 'articles',
@@ -228,13 +225,10 @@ describe('jsonapi', function() {
 
   });
 
-  it.skip('gets 404 when patching a missing resource', async function() {
-    let response = await request.get('/articles/0');
-    expect(response).has.property('status', 200);
-    expect(response).has.deep.property('body.data.meta.version');
-    let { version } = response.body.data.meta;
+  it('gets 404 when patching a missing resource', async function() {
+    let version = await currentVersion(request, '/articles/0');
 
-    response = await request.patch('/articles/100').send({
+    let response = await request.patch('/articles/100').send({
       data: {
         id: '100',
         type: 'articles',
@@ -262,12 +256,9 @@ describe('jsonapi', function() {
   });
 
   it('can delete a resource', async function() {
-    let response = await request.get('/articles/0');
-    expect(response).has.property('status', 200);
-    expect(response).has.deep.property('body.data.meta.version');
-    let { version } = response.body.data.meta;
+    let version = await currentVersion(request, '/articles/0');
 
-    response = await request.delete('/articles/0').set('If-Match', version);
+    let response = await request.delete('/articles/0').set('If-Match', version);
     expect(response).has.property('status', 204);
 
     await env.indexer.update({ realTime: true });
@@ -299,14 +290,16 @@ describe('jsonapi', function() {
     });
   });
 
-  it.skip('validates schema during PATCH', async function() {
+  it('validates schema during PATCH', async function() {
+    let version = await currentVersion(request, '/articles/0');
     let response = await request.patch('/articles/0').send({
       data: {
         id: '0',
         type: 'articles',
         attributes: {
           title: 3
-        }
+        },
+        meta: { version }
       }
     });
     expect(response.status).to.equal(400);
@@ -323,3 +316,11 @@ describe('jsonapi', function() {
   });
 
 });
+
+async function currentVersion(request, url) {
+  let response = await request.get(url);
+  expect(response).has.property('status', 200);
+  expect(response).has.deep.property('body.data.meta.version');
+  let { version } = response.body.data.meta;
+  return version;
+}
