@@ -175,18 +175,15 @@ describe('git/change', function() {
   });
 
   it('can add new file within directory', async function() {
-    let { repo, head } = await makeRepo(path);
+    let { repo, head } = await makeRepo(path, {
+      'outer/inner/hello-world.txt': 'This is a file'
+    });
 
-    let updatedContent = [
-      { operation: 'create', filename: 'outer/inner/hello-world.txt', buffer: Buffer.from('This is a file', 'utf8') }
-    ];
-    head = await Change.applyOperations(repo, head, 'master', updatedContent, commitOpts({ message: 'Second commit' }));
+    let change = await Change.create(repo, head, 'master');
+    let file = await change.get('outer/inner/second.txt', { allowCreate: true });
+    file.setContent('second file');
 
-    updatedContent = [
-      { operation: 'create', filename: 'outer/inner/second.txt', buffer: Buffer.from('second file', 'utf8') }
-    ];
-
-    head = await Change.applyOperations(repo, head, 'master', updatedContent, commitOpts({ message: 'Third commit' }));
+    head = await change.finalize(commitOpts());
 
     expect(await inRepo(path).getContents(head, 'outer/inner/second.txt')).to.equal('second file');
     expect(await inRepo(path).getContents(head, 'outer/inner/hello-world.txt')).to.equal('This is a file');
