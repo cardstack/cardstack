@@ -189,14 +189,8 @@ class PendingChange {
     this.type = type;
     this.commitOpts = commitOpts;
     this.change = change;
-    this._originalDocument = originalDocument;
-    this._finalDocument = finalDocument;
-  }
-  async originalDocument() {
-    return this._originalDocument;
-  }
-  async finalDocument() {
-    return this._finalDocument;
+    this.originalDocument = originalDocument;
+    this.finalDocument = finalDocument;
   }
   async finalize() {
     return withErrorHandling(this.id, this.type, async () => {

@@ -158,7 +158,7 @@ describe('git/writer', function() {
         }
       });
       expect(ids).to.have.length(0);
-      expect(await pending.finalDocument()).has.property('id', '2');
+      expect(pending.finalDocument).has.property('id', '2');
     });
 
     it('allows optional clientside id', async function() {

@@ -62,7 +62,14 @@ module.exports = class Schema {
   // id is optional. If you provide it, we ensure the document matches
   // the expected id. Type and document are both mandatory.
   async validationErrors(pendingChange, context={}) {
-    let document = await pendingChange.finalDocument();
+
+    let authErrors = await(this._authErrors(pendingChange, context));
+    if (authErrors.length > 0) {
+      return authErrors;
+    }
+
+    let document = pendingChange.finalDocument;
+
     if (!document) {
       // for the present, we have no validation to do in the case of
       // deletion.
@@ -119,6 +126,10 @@ module.exports = class Schema {
       }
     }
     return this._mapping;
+  }
+
+  async _authErrors(/* pendingChange, context */) {
+    return [];
   }
 
 };

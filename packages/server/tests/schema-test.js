@@ -239,11 +239,7 @@ describe('schema', function() {
 
 function create(document) {
   return {
-    async finalDocument() {
-      return document;
-    },
-    async originalDocument() {
-      return null;
-    }
+    finalDocument: document,
+    originalDocument: null
   };
 }

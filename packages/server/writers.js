@@ -31,7 +31,7 @@ class Writers {
 
   async _finalizeAndReply(pending) {
     let meta = await pending.finalize();
-    let finalDocument = await pending.finalDocument();
+    let finalDocument = pending.finalDocument;
     let responseDocument = {
       id: finalDocument.id,
       type: finalDocument.type,
