@@ -8,7 +8,7 @@ class Writers {
   async create(branch, user, type, document) {
     let schema = await this.schemaCache.schemaForBranch(branch);
     let writer = this._lookupWriter(schema, type);
-    await this._validate(schema, document, type);
+    await this._validate(schema, type, null, null, document);
     let errors = await schema.validationErrors(document, { type });
     if (errors.length > 1) {
       errors[0].additionalErrors = errors.slice(1);
@@ -23,18 +23,18 @@ class Writers {
     let schema = await this.schemaCache.schemaForBranch(branch);
     let writer = this._lookupWriter(schema, type);
     let pending = await writer.prepareUpdate(branch, user, type, id, document);
-    await this._validate(schema, pending.document, type, id);
+    await this._validate(schema, type, id, pending.beforeDocument, pending.afterDocument);
     let meta = await pending.finalize();
     let responseDocument = {
       id,
       type,
       meta
     };
-    if (pending.document.attributes) {
-      responseDocument.attributes = pending.document.attributes;
+    if (pending.afterDocument.attributes) {
+      responseDocument.attributes = pending.afterDocument.attributes;
     }
-    if (pending.document.relationships) {
-      responseDocument.relationships = pending.document.relationships;
+    if (pending.afterDocument.relationships) {
+      responseDocument.relationships = pending.afterDocument.relationships;
     }
     return responseDocument;
   }
@@ -46,8 +46,8 @@ class Writers {
     await pending.finalize();
   }
 
-  async _validate(schema, document, type, id) {
-    let errors = await schema.validationErrors(document, { type, id });
+  async _validate(schema, type, id, beforeDocument, afterDocument) {
+    let errors = await schema.validationErrors(afterDocument, { type, id });
     if (errors.length > 1) {
       errors[0].additionalErrors = errors.slice(1);
     }

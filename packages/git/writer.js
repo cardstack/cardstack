@@ -61,17 +61,23 @@ module.exports = class Writer {
     return withErrorHandling(id, type, async () => {
       let change = await Change.create(this.repo, document.meta.version, branch);
       let file = await change.get(this._filenameFor(type, id), { allowUpdate: true });
-      let finalDocument = patch(await file.getBuffer(), document);
-      file.setContent(JSON.stringify(finalDocument));
+      let before = JSON.parse(await file.getBuffer());
+      let after = patch(before, document);
+      file.setContent(JSON.stringify(after));
+      let signature = this._commitOptions('update', type, id, user);
 
-      // we don't write id & type into the actual file (they're part
-      // of the filename). But we want them present on the
-      // PendingChange.document we're about to return, so that
-      // document is complete and can be validated.
-      finalDocument.id = document.id;
-      finalDocument.type = document.type;
 
-      return new PendingChange(id, type, this._commitOptions('update', type, id, user), change, finalDocument);
+      // we don't write id & type into the actual file (they're part of
+      // the filename). But we want them present on the
+      // PendingChange.beforeDocument and PendingChange.afterDocument
+      // we're about to return, so those documents are complete and can
+      // be easily validated.
+      before.id = id;
+      before.type = type;
+      after.id = document.id;
+      after.type = document.type;
+
+      return new PendingChange(id, type, signature, change, before, after);
     });
   }
 
@@ -155,18 +161,18 @@ module.exports = class Writer {
 
 };
 
-function patch(originalBuffer, newDocument) {
-  let document = JSON.parse(originalBuffer);
+function patch(before, diffDocument) {
+  let after = Object.assign({}, before);
   for (let section of ['attributes', 'relationships']) {
-    if (newDocument[section]) {
-      document[section] = Object.assign(
+    if (diffDocument[section]) {
+      after[section] = Object.assign(
         {},
-        document[section],
-        newDocument[section]
+        before[section],
+        diffDocument[section]
       );
     }
   }
-  return document;
+  return after;
 }
 
 async function withErrorHandling(id, type, fn) {
@@ -194,12 +200,13 @@ async function withErrorHandling(id, type, fn) {
 
 
 class PendingChange {
-  constructor(id, type, commitOpts, change, document) {
+  constructor(id, type, commitOpts, change, beforeDocument, afterDocument) {
     this.id = id;
     this.type = type;
     this.commitOpts = commitOpts;
     this.change = change;
-    this.document = document;
+    this.beforeDocument = beforeDocument;
+    this.afterDocument = afterDocument;
   }
   async finalize() {
     return withErrorHandling(this.id, this.type, async () => {
