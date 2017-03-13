@@ -99,26 +99,26 @@ describe('schema', function() {
   });
 
   it("rejects unknown type", async function() {
-    expect(await schema.validationErrors({
+    expect(await schema.validationErrors(create({
       type: 'unicorns',
       id: '1'
-    })).includes.something.with.property('detail', '"unicorns" is not a valid type');
+    }))).includes.something.with.property('detail', '"unicorns" is not a valid type');
   });
 
   it("rejects mismatched type", async function() {
-    expect(await schema.validationErrors({
+    expect(await schema.validationErrors(create({
       type: 'articles',
       id: '1'
-    }, {
+    }), {
       type: 'unicorns'
     })).includes.something.with.property('detail', 'the type "articles" is not allowed here');
   });
 
   it("rejects mismatched id", async function() {
-    expect(await schema.validationErrors({
+    expect(await schema.validationErrors(create({
       type: 'articles',
       id: '1'
-    }, {
+    }), {
       type: 'articles',
       id: '2'
     })).collectionContains({
@@ -129,26 +129,26 @@ describe('schema', function() {
 
 
   it("accepts known types", async function() {
-    expect(await schema.validationErrors({
+    expect(await schema.validationErrors(create({
       type: 'articles',
       id: '1',
       attributes: {
         'published-date': "2013-02-08 09:30:26.123+07:00"
       }
-    }, {
+    }), {
       type: 'articles'
     } )).to.deep.equal([]);
   });
 
   it("rejects unknown fields", async function() {
-    let errors = await schema.validationErrors({
+    let errors = await schema.validationErrors(create({
       type: 'articles',
       id: '1',
       attributes: {
         popularity: 100,
         pomposity: 'high'
       }
-    });
+    }));
     expect(errors).collectionContains({
       detail: 'type "articles" has no field named "popularity"',
       source: { pointer: '/data/attributes/popularity' },
@@ -162,25 +162,25 @@ describe('schema', function() {
   });
 
   it("accepts known fields", async function() {
-    expect(await schema.validationErrors({
+    expect(await schema.validationErrors(create({
       type: 'articles',
       id: '1',
       attributes: {
         title: "hello world",
         "published-date": "2013-02-08 09:30:26.123+07:00"
       }
-    })).deep.equals([]);
+    }))).deep.equals([]);
   });
 
   it("rejects badly formatted fields", async function() {
-    let errors = await schema.validationErrors({
+    let errors = await schema.validationErrors(create({
       type: 'articles',
       id: '1',
       attributes: {
         title: 21,
         "published-date": "Not a date"
       }
-    });
+    }));
     expect(errors).collectionContains({
       detail: '21 is not a valid value for field "title"',
       source: { pointer: '/data/attributes/title' },
@@ -194,13 +194,13 @@ describe('schema', function() {
   });
 
   it("applies constraints to present fields", async function() {
-    let errors = await schema.validationErrors({
+    let errors = await schema.validationErrors(create({
       type: 'articles',
       id: '1',
       attributes: {
         title: "very long very long very long very long very long very long"
       }
-    });
+    }));
     expect(errors).collectionContains({
       detail: 'the value of field "title" may not exceed max length of 40 characters',
       status: 400,
@@ -209,13 +209,13 @@ describe('schema', function() {
   });
 
   it("applies constraints to missing fields", async function() {
-    let errors = await schema.validationErrors({
+    let errors = await schema.validationErrors(create({
       type: 'articles',
       id: '1',
       attributes: {
         title: "very long very long very long very long very long very long"
       }
-    });
+    }));
     expect(errors).includes.something.with.property('detail', 'the value of field "published-date" may not be null');
   });
 
@@ -236,3 +236,14 @@ describe('schema', function() {
   });
 
 });
+
+function create(document) {
+  return {
+    async finalDocument() {
+      return document;
+    },
+    async originalDocument() {
+      return null;
+    }
+  };
+}

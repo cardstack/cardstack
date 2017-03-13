@@ -61,8 +61,15 @@ module.exports = class Schema {
 
   // id is optional. If you provide it, we ensure the document matches
   // the expected id. Type and document are both mandatory.
-  async validationErrors(document, context={}) {
+  async validationErrors(pendingChange, context={}) {
     let errors = [];
+
+    let document = await pendingChange.finalDocument();
+    if (!document) {
+      // for the present, we have no validation to do in the case of
+      // deletion.
+      return [];
+    }
 
     if (!document.type) {
       errors.push(new Error(`missing required field "type"`, {

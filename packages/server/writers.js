@@ -9,7 +9,7 @@ class Writers {
     let schema = await this.schemaCache.schemaForBranch(branch);
     let writer = this._lookupWriter(schema, type);
     let pending = await writer.prepareCreate(branch, user, type, document);
-    await this._validate(schema, type, null, null, pending.afterDocument);
+    await this._validate(schema, pending, { type });
     return this._finalizeAndReply(pending);
   }
 
@@ -17,7 +17,7 @@ class Writers {
     let schema = await this.schemaCache.schemaForBranch(branch);
     let writer = this._lookupWriter(schema, type);
     let pending = await writer.prepareUpdate(branch, user, type, id, document);
-    await this._validate(schema, type, id, pending.beforeDocument, pending.afterDocument);
+    await this._validate(schema, pending, { type, id });
     return this._finalizeAndReply(pending);
   }
 
@@ -25,27 +25,29 @@ class Writers {
     let schema = await this.schemaCache.schemaForBranch(branch);
     let writer = this._lookupWriter(schema, type);
     let pending = await writer.prepareDelete(branch, user, version, type, id);
+    await this._validate(schema, pending, {});
     await pending.finalize();
   }
 
   async _finalizeAndReply(pending) {
     let meta = await pending.finalize();
+    let finalDocument = await pending.finalDocument();
     let responseDocument = {
-      id: pending.afterDocument.id,
-      type: pending.afterDocument.type,
+      id: finalDocument.id,
+      type: finalDocument.type,
       meta
     };
-    if (pending.afterDocument.attributes) {
-      responseDocument.attributes = pending.afterDocument.attributes;
+    if (finalDocument.attributes) {
+      responseDocument.attributes = finalDocument.attributes;
     }
-    if (pending.afterDocument.relationships) {
-      responseDocument.relationships = pending.afterDocument.relationships;
+    if (finalDocument.relationships) {
+      responseDocument.relationships = finalDocument.relationships;
     }
     return responseDocument;
   }
 
-  async _validate(schema, type, id, beforeDocument, afterDocument) {
-    let errors = await schema.validationErrors(afterDocument, { type, id });
+  async _validate(schema, pending, constraints) {
+    let errors = await schema.validationErrors(pending, constraints);
     if (errors.length > 1) {
       errors[0].additionalErrors = errors.slice(1);
     }

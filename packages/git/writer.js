@@ -67,11 +67,9 @@ module.exports = class Writer {
       let signature = this._commitOptions('update', type, id, user);
 
 
-      // we don't write id & type into the actual file (they're part of
-      // the filename). But we want them present on the
-      // PendingChange.beforeDocument and PendingChange.afterDocument
-      // we're about to return, so those documents are complete and can
-      // be easily validated.
+      // we don't write id & type into the actual file (they're part
+      // of the filename). But we want them present on the
+      // PendingChange as complete valid documents.
       before.id = id;
       before.type = type;
       after.id = document.id;
@@ -186,13 +184,19 @@ async function withErrorHandling(id, type, fn) {
 
 
 class PendingChange {
-  constructor(id, type, commitOpts, change, beforeDocument, afterDocument) {
+  constructor(id, type, commitOpts, change, originalDocument, finalDocument) {
     this.id = id;
     this.type = type;
     this.commitOpts = commitOpts;
     this.change = change;
-    this.beforeDocument = beforeDocument;
-    this.afterDocument = afterDocument;
+    this._originalDocument = originalDocument;
+    this._finalDocument = finalDocument;
+  }
+  async originalDocument() {
+    return this._originalDocument;
+  }
+  async finalDocument() {
+    return this._finalDocument;
   }
   async finalize() {
     return withErrorHandling(this.id, this.type, async () => {
