@@ -9,7 +9,7 @@ class Writers {
     let schema = await this.schemaCache.schemaForBranch(branch);
     let writer = this._lookupWriter(schema, type);
     await this._validate(schema, document, type);
-    let errors = await schema.validationErrors(type, document);
+    let errors = await schema.validationErrors(document, { type });
     if (errors.length > 1) {
       errors[0].additionalErrors = errors.slice(1);
     }
@@ -47,7 +47,7 @@ class Writers {
   }
 
   async _validate(schema, document, type, id) {
-    let errors = await schema.validationErrors(type, document, id);
+    let errors = await schema.validationErrors(document, { type, id });
     if (errors.length > 1) {
       errors[0].additionalErrors = errors.slice(1);
     }

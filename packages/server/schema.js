@@ -61,7 +61,7 @@ module.exports = class Schema {
 
   // id is optional. If you provide it, we ensure the document matches
   // the expected id. Type and document are both mandatory.
-  async validationErrors(type, document, id) {
+  async validationErrors(document, context={}) {
     let errors = [];
 
     if (!document.type) {
@@ -72,31 +72,36 @@ module.exports = class Schema {
       return errors;
     }
 
-    if (document.type !== type) {
-      errors.push(new Error(`the type "${document.type}" is not allowed here`, {
-        status: 409,
-        source: { pointer: '/data/type' }
-      }));
-      return errors;
+    if (context.type != null) {
+      if (document.type !== context.type) {
+        errors.push(new Error(`the type "${document.type}" is not allowed here`, {
+          status: 409,
+          source: { pointer: '/data/type' }
+        }));
+        return errors;
+      }
     }
 
-    if (id != null && !document.id) {
-      throw new Error('missing required field "id"', {
-        status: 400,
-        source: { pointer: '/data/id' }
-      });
+    if (context.id != null) {
+      if (!document.id) {
+        errors.push(new Error('missing required field "id"', {
+          status: 400,
+          source: { pointer: '/data/id' }
+        }));
+        return errors;
+      }
+      if (String(document.id) !== context.id) {
+        errors.push(new Error('not allowed to change "id"', {
+          status: 403,
+          source: { pointer: '/data/id' }
+        }));
+        return errors;
+      }
     }
 
-    if (id != null && String(document.id) !== id) {
-      throw new Error('not allowed to change "id"', {
-        status: 403,
-        source: { pointer: '/data/id' }
-      });
-    }
-
-    let contentType = this.types.get(type);
+    let contentType = this.types.get(document.type);
     if (!contentType) {
-      errors.push(new Error(`"${type}" is not a valid type`, {
+      errors.push(new Error(`"${document.type}" is not a valid type`, {
         status: 400,
         source: { pointer: '/data/type' }
       }));
