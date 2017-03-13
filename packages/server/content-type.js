@@ -1,7 +1,7 @@
 const Error = require('@cardstack/data-source/error');
 
 module.exports = class ContentType {
-  constructor(model, allFields, dataSources) {
+  constructor(model, allFields, dataSources, allGrants) {
     let fields = new Map();
     for (let fieldRef of model.relationships.fields.data) {
       let field = allFields.get(fieldRef.id);
@@ -17,8 +17,27 @@ module.exports = class ContentType {
     } else {
       this.dataSource = null;
     }
+    this.grants = allGrants.filter(g => g.types == null || g.types.includes(model.id));
   }
-  async validationErrors(document) {
+  async validationErrors(pendingChange, context) {
+    if (!pendingChange.finalDocument) {
+      if (this.grants.find(g => g.mayDeleteResource && g.matches(pendingChange.originalDocument, context))) {
+        return [];
+      }
+      return [new Error("You may not delete this resource", { status: 401 })];
+    }
+
+    if (pendingChange.originalDocument) {
+      if (!this.grants.find(g => g.mayUpdateResource && g.matches(document, context))) {
+        return [new Error("You may not update this resource", { status: 401 })];
+      }
+    } else {
+      if (!this.grants.find(g => g.mayCreateResource && g.matches(document, context))) {
+        return [new Error("You may not create this resource", { status: 401 })];
+      }
+    }
+
+    let document = pendingChange.finalDocument;
     let errors = [];
     let seen = new Map();
     if (document.attributes) {

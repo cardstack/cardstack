@@ -1,7 +1,7 @@
 const Schema = require('@cardstack/server/schema');
 const ElasticAssert = require('@cardstack/elasticsearch/tests/assertions');
 
-describe('schema', function() {
+describe('schema/validation', function() {
 
   let schema;
 

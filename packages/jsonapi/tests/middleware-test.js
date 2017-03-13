@@ -277,7 +277,7 @@ describe('jsonapi', function() {
         }
       }
     });
-    expect(response.status).to.equal(400);
+    expect(response).hasStatus(400);
     expect(response.body.errors).length(2);
     expect(response.body.errors).collectionContains({
       title: 'Validation error',

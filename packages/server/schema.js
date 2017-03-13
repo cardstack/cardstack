@@ -3,6 +3,7 @@ const Field = require('@cardstack/server/field');
 const Constraint = require('@cardstack/server/constraint');
 const ContentType = require('@cardstack/server/content-type');
 const DataSource = require('@cardstack/server/data-source');
+const Grant = require('@cardstack/server/grant');
 const Plugins = require('@cardstack/server/plugins');
 const bootstrapSchema = require('./bootstrap-schema');
 
@@ -43,10 +44,14 @@ module.exports = class Schema {
       }
     }
 
+    let grants = models
+        .filter(model => model.type === 'grants')
+        .map(model => new Grant(model));
+
     let types = new Map();
     for (let model of models) {
       if (model.type === 'content-types') {
-        types.set(model.id, new ContentType(model, fields, dataSources));
+        types.set(model.id, new ContentType(model, fields, dataSources, grants));
       }
     }
 
@@ -59,63 +64,62 @@ module.exports = class Schema {
     this._mapping = null;
   }
 
-  // id is optional. If you provide it, we ensure the document matches
-  // the expected id. Type and document are both mandatory.
   async validationErrors(pendingChange, context={}) {
-
-    let authErrors = await(this._authErrors(pendingChange, context));
-    if (authErrors.length > 0) {
-      return authErrors;
+    let type;
+    if (pendingChange.finalDocument) {
+      // Create or update: check basic request document structure.
+      let error = await this._documentStructureError(pendingChange.finalDocument, context);
+      if (error) {
+        return [error];
+      }
+      type = pendingChange.finalDocument.type;
+    } else {
+      // Deletion. There's no request document to check.
+      type = pendingChange.originalDocument.type;
     }
 
-    let document = pendingChange.finalDocument;
-
-    if (!document) {
-      // for the present, we have no validation to do in the case of
-      // deletion.
-      return [];
-    }
-
-    if (!document.type) {
-      return [new Error(`missing required field "type"`, {
+    let contentType = this.types.get(type);
+    if (!contentType) {
+      return [new Error(`"${type}" is not a valid type`, {
         status: 400,
         source: { pointer: '/data/type' }
       })];
     }
 
+    return contentType.validationErrors(pendingChange, context);
+  }
+
+  async _documentStructureError(document, context) {
+    if (!document.type) {
+      return new Error(`missing required field "type"`, {
+        status: 400,
+        source: { pointer: '/data/type' }
+      });
+    }
+
     if (context.type != null) {
       if (document.type !== context.type) {
-        return [new Error(`the type "${document.type}" is not allowed here`, {
+        return new Error(`the type "${document.type}" is not allowed here`, {
           status: 409,
           source: { pointer: '/data/type' }
-        })];
+        });
       }
     }
 
     if (context.id != null) {
       if (!document.id) {
-        return [new Error('missing required field "id"', {
+        return new Error('missing required field "id"', {
           status: 400,
           source: { pointer: '/data/id' }
-        })];
+        });
       }
       if (String(document.id) !== context.id) {
-        return [new Error('not allowed to change "id"', {
+        return new Error('not allowed to change "id"', {
           status: 403,
           source: { pointer: '/data/id' }
-        })];
+        });
       }
     }
-
-    let contentType = this.types.get(document.type);
-    if (!contentType) {
-      return [new Error(`"${document.type}" is not a valid type`, {
-        status: 400,
-        source: { pointer: '/data/type' }
-      })];
-    }
-
-    return contentType.validationErrors(document);
   }
 
   mapping() {
@@ -126,10 +130,6 @@ module.exports = class Schema {
       }
     }
     return this._mapping;
-  }
-
-  async _authErrors(/* pendingChange, context */) {
-    return [];
   }
 
 };
