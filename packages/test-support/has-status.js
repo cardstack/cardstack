@@ -7,8 +7,8 @@ module.exports = function(chai, utils) {
       response.status === code,
       `expected response status #{exp} but got #{act}.\n${utils.inspect(response.body)}`,
       `expected response status #{exp} to be different.\n${utils.inspect(response.body)}`,
-      response.status,  // expected
-      code   // actual
+      code,  // expected
+      response.status  // actual
     );
   });
 };
