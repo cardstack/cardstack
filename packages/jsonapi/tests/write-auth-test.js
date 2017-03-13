@@ -88,10 +88,12 @@ describe('auth/write', function() {
 
   it.skip('protects creation', async function() {
     let response = await request.post('/articles').send({
-      type: 'articles',
-      attributes: {
-        title: 'Uh oh',
-        body: 'nope'
+      data: {
+        type: 'articles',
+        attributes: {
+          title: 'Uh oh',
+          body: 'nope'
+        }
       }
     });
     expect(response).hasStatus(401);
