@@ -151,14 +151,14 @@ describe('git/writer', function() {
         }
       });
 
-      let record = await writer.create('master', user, 'articles', {
+      let pending = await writer.prepareCreate('master', user, 'articles', {
         type: 'articles',
         attributes: {
           title: 'Second Article'
         }
       });
       expect(ids).to.have.length(0);
-      expect(record).has.property('id', '2');
+      expect(pending.afterDocument).has.property('id', '2');
     });
 
     it('allows optional clientside id', async function() {

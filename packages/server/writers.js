@@ -8,15 +8,9 @@ class Writers {
   async create(branch, user, type, document) {
     let schema = await this.schemaCache.schemaForBranch(branch);
     let writer = this._lookupWriter(schema, type);
-    await this._validate(schema, type, null, null, document);
-    let errors = await schema.validationErrors(document, { type });
-    if (errors.length > 1) {
-      errors[0].additionalErrors = errors.slice(1);
-    }
-    if (errors.length > 0) {
-      throw errors[0];
-    }
-    return writer.create(branch, user, type, document);
+    let pending = await writer.prepareCreate(branch, user, type, document);
+    await this._validate(schema, type, null, null, pending.afterDocument);
+    return this._finalizeAndReply(pending);
   }
 
   async update(branch, user, type, id, document) {
@@ -24,10 +18,21 @@ class Writers {
     let writer = this._lookupWriter(schema, type);
     let pending = await writer.prepareUpdate(branch, user, type, id, document);
     await this._validate(schema, type, id, pending.beforeDocument, pending.afterDocument);
+    return this._finalizeAndReply(pending);
+  }
+
+  async delete(branch, user, version, type, id) {
+    let schema = await this.schemaCache.schemaForBranch(branch);
+    let writer = this._lookupWriter(schema, type);
+    let pending = await writer.prepareDelete(branch, user, version, type, id);
+    await pending.finalize();
+  }
+
+  async _finalizeAndReply(pending) {
     let meta = await pending.finalize();
     let responseDocument = {
-      id,
-      type,
+      id: pending.afterDocument.id,
+      type: pending.afterDocument.type,
       meta
     };
     if (pending.afterDocument.attributes) {
@@ -37,13 +42,6 @@ class Writers {
       responseDocument.relationships = pending.afterDocument.relationships;
     }
     return responseDocument;
-  }
-
-  async delete(branch, user, version, type, id) {
-    let schema = await this.schemaCache.schemaForBranch(branch);
-    let writer = this._lookupWriter(schema, type);
-    let pending = await writer.prepareDelete(branch, user, version, type, id);
-    await pending.finalize();
   }
 
   async _validate(schema, type, id, beforeDocument, afterDocument) {

@@ -21,7 +21,7 @@ module.exports = class Writer {
     this.idGenerator = idGenerator;
   }
 
-  async create(branch, user, type, document) {
+  async prepareCreate(branch, user, type, document) {
     return withErrorHandling(document.id, type, async () => {
       while (true) {
         try {
@@ -36,8 +36,8 @@ module.exports = class Writer {
           } else {
             id = document.id;
           }
-          let doc = await this._create(branch, user, document, id);
-          return doc;
+          let pending = await this._prepareCreate(branch, user, document, id);
+          return pending;
         } catch(err) {
           if (err instanceof Change.OverwriteRejected && document.id == null) {
             // ignore so our loop can retry
@@ -97,7 +97,7 @@ module.exports = class Writer {
     });
   }
 
-  async _create(branch, user, document, id) {
+  async _prepareCreate(branch, user, document, id) {
     await this._ensureRepo();
 
     let gitDocument = {};
@@ -111,23 +111,9 @@ module.exports = class Writer {
     let change = await Change.create(this.repo, null, branch);
     let file = await change.get(this._filenameFor(document.type, id), { allowCreate: true });
     file.setContent(JSON.stringify(gitDocument));
-    let commitId = await change.finalize(this._commitOptions('create', document.type, id, user));
-
-    let responseDocument = {
-      id,
-      type: document.type,
-      meta: {
-        version: commitId
-      }
-    };
-    if (gitDocument.attributes) {
-      responseDocument.attributes = gitDocument.attributes;
-    }
-    if (gitDocument.relationships) {
-      responseDocument.relationships = gitDocument.relationships;
-    }
-
-    return responseDocument;
+    gitDocument.id = id;
+    gitDocument.type = document.type;
+    return new PendingChange(id, document.type, this._commitOptions('create', document.type, id, user), change, null, gitDocument);
   }
 
   _commitOptions(operation, type, id, user) {

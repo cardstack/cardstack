@@ -28,7 +28,7 @@ exports.createDefaultEnvironment = async function(initialModels = []) {
     repoPath
   })]);
 
-  await writer.create('master', user, 'data-sources', {
+  let pending = await writer.prepareCreate('master', user, 'data-sources', {
     type: 'data-sources',
     id: 'default-git',
     attributes: {
@@ -36,9 +36,11 @@ exports.createDefaultEnvironment = async function(initialModels = []) {
       params: { repo: repoPath }
     }
   });
+  await pending.finalize();
 
   for (let model of initialModels) {
-    head = (await writer.create('master', user, model.type, model)).meta.version;
+    let pending = await writer.prepareCreate('master', user, model.type, model);
+    head = (await pending.finalize()).version;
   }
 
   await indexer.update({ realTime: true });
