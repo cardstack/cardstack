@@ -62,8 +62,6 @@ module.exports = class Schema {
   // id is optional. If you provide it, we ensure the document matches
   // the expected id. Type and document are both mandatory.
   async validationErrors(pendingChange, context={}) {
-    let errors = [];
-
     let document = await pendingChange.finalDocument();
     if (!document) {
       // for the present, we have no validation to do in the case of
@@ -72,52 +70,45 @@ module.exports = class Schema {
     }
 
     if (!document.type) {
-      errors.push(new Error(`missing required field "type"`, {
+      return [new Error(`missing required field "type"`, {
         status: 400,
         source: { pointer: '/data/type' }
-      }));
-      return errors;
+      })];
     }
 
     if (context.type != null) {
       if (document.type !== context.type) {
-        errors.push(new Error(`the type "${document.type}" is not allowed here`, {
+        return [new Error(`the type "${document.type}" is not allowed here`, {
           status: 409,
           source: { pointer: '/data/type' }
-        }));
-        return errors;
+        })];
       }
     }
 
     if (context.id != null) {
       if (!document.id) {
-        errors.push(new Error('missing required field "id"', {
+        return [new Error('missing required field "id"', {
           status: 400,
           source: { pointer: '/data/id' }
-        }));
-        return errors;
+        })];
       }
       if (String(document.id) !== context.id) {
-        errors.push(new Error('not allowed to change "id"', {
+        return [new Error('not allowed to change "id"', {
           status: 403,
           source: { pointer: '/data/id' }
-        }));
-        return errors;
+        })];
       }
     }
 
     let contentType = this.types.get(document.type);
     if (!contentType) {
-      errors.push(new Error(`"${document.type}" is not a valid type`, {
+      return [new Error(`"${document.type}" is not a valid type`, {
         status: 400,
         source: { pointer: '/data/type' }
-      }));
-      return errors;
+      })];
     }
 
-    errors = errors.concat(await contentType.validationErrors(document));
-
-    return errors;
+    return contentType.validationErrors(document);
   }
 
   mapping() {
