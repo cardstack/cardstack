@@ -57,7 +57,7 @@ describe('schema/auth', function() {
 
   it("user-specific grant allows creation", async function() {
     factory.addResource('grants').withAttributes({ mayCreateResource: true })
-      .withRelated('who', factory.addResource('groups', 0));
+      .withRelated('who', { types: 'groups', id: '0' });
     let schema = await Schema.loadFrom(factory.getModels());
     let action = create({
       type: 'articles',
@@ -69,7 +69,7 @@ describe('schema/auth', function() {
 
   it("user-specific grant doesn't match missing user", async function() {
     factory.addResource('grants').withAttributes({ mayCreateResource: true })
-      .withRelated('who', factory.addResource('groups', '0'));
+      .withRelated('who', { types: 'groups', id: '0' });
     let schema = await Schema.loadFrom(factory.getModels());
     let action = create({
       type: 'articles',
@@ -84,7 +84,7 @@ describe('schema/auth', function() {
 
   it("user-specific grant doesn't match wrong user", async function() {
     factory.addResource('grants').withAttributes({ mayCreateResource: true })
-      .withRelated('who', factory.addResource('groups', 0));
+      .withRelated('who', { types: 'groups', id: '0' });
     let schema = await Schema.loadFrom(factory.getModels());
     let action = create({
       type: 'articles',

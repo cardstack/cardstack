@@ -15,7 +15,7 @@ module.exports = class Schema {
   }
 
   static ownTypes() {
-    return ['content-types', 'fields', 'constraints', 'data-sources', 'grants', 'groups'];
+    return ['content-types', 'fields', 'constraints', 'data-sources', 'grants'];
   }
 
   static async loadFrom(models) {
