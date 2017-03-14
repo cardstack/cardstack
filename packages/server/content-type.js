@@ -20,17 +20,14 @@ module.exports = class ContentType {
     this.grants = allGrants.filter(g => g.types == null || g.types.includes(model.id));
   }
 
-  async validationErrors(pendingChange, context) {
-    let resourceAuthError = await this._resourceLevelAuthorizationError(pendingChange, context);
-    if (resourceAuthError) {
-      return [resourceAuthError];
-    }
+  async validate(pendingChange, context) {
+    await this._validateResourceLevelAuthorization(pendingChange, context);
 
     if (!pendingChange.finalDocument) {
       // when deleting, once we've found a valid resource-level
       // deletion grant we're done -- there's no field-level
       // validation.
-      return [];
+      return;
     }
 
     let errors = [];
@@ -73,7 +70,14 @@ module.exports = class ContentType {
       }
     }
 
-    return errors;
+    if (errors.length > 1) {
+      let err = errors[0];
+      err.additionalErrors = errors.slice(1);
+      throw err;
+    }
+    if (errors.length === 1) {
+      throw errors[0];
+    }
   }
 
   mapping() {
@@ -84,14 +88,14 @@ module.exports = class ContentType {
     return { properties };
   }
 
-  async _resourceLevelAuthorizationError(pendingChange, context) {
+  async _validateResourceLevelAuthorization(pendingChange, context) {
     if (!pendingChange.finalDocument) {
       if (!this.grants.find(g => g['may-delete-resource'] && g.matches(pendingChange.originalDocument, context))) {
-        return new Error("You may not delete this resource", { status: 401 });
+        throw new Error("You may not delete this resource", { status: 401 });
       }
     } else if (!pendingChange.originalDocument) {
       if (!this.grants.find(g => g['may-create-resource'] && g.matches(pendingChange.finalDocument, context))) {
-        return new Error("You may not create this resource", { status: 401 });
+        throw new Error("You may not create this resource", { status: 401 });
       }
     } else {
       if (!this.grants.find(
@@ -99,7 +103,7 @@ module.exports = class ContentType {
           g.matches(pendingChange.finalDocument, context) &&
           g.matches(pendingChange.originalDocument, context))
          ) {
-        return new Error("You may not update this resource", { status: 401 });
+        throw new Error("You may not update this resource", { status: 401 });
       }
     }
   }

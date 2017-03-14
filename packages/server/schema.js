@@ -66,13 +66,24 @@ module.exports = class Schema {
   }
 
   async validationErrors(pendingChange, context={}) {
+    try {
+      await this.validate(pendingChange, context);
+      return [];
+    } catch (err) {
+      if (!err.isCardstackError) { throw err; }
+      if (err.additionalErrors) {
+        return [err].concat(err.additionalErrors);
+      } else {
+        return [err];
+      }
+    }
+  }
+
+  async validate(pendingChange, context={}) {
     let type;
     if (pendingChange.finalDocument) {
       // Create or update: check basic request document structure.
-      let error = await this._documentStructureError(pendingChange.finalDocument, context);
-      if (error) {
-        return [error];
-      }
+      this._validateDocumentStructure(pendingChange.finalDocument, context);
       type = pendingChange.finalDocument.type;
     } else {
       // Deletion. There's no request document to check.
@@ -81,18 +92,17 @@ module.exports = class Schema {
 
     let contentType = this.types.get(type);
     if (!contentType) {
-      return [new Error(`"${type}" is not a valid type`, {
+      throw new Error(`"${type}" is not a valid type`, {
         status: 400,
         source: { pointer: '/data/type' }
-      })];
+      });
     }
-
-    return contentType.validationErrors(pendingChange, context);
+    await contentType.validate(pendingChange, context);
   }
 
-  async _documentStructureError(document, context) {
+  _validateDocumentStructure(document, context) {
     if (!document.type) {
-      return new Error(`missing required field "type"`, {
+      throw new Error(`missing required field "type"`, {
         status: 400,
         source: { pointer: '/data/type' }
       });
@@ -100,7 +110,7 @@ module.exports = class Schema {
 
     if (context.type != null) {
       if (document.type !== context.type) {
-        return new Error(`the type "${document.type}" is not allowed here`, {
+        throw new Error(`the type "${document.type}" is not allowed here`, {
           status: 409,
           source: { pointer: '/data/type' }
         });
@@ -109,13 +119,13 @@ module.exports = class Schema {
 
     if (context.id != null) {
       if (!document.id) {
-        return new Error('missing required field "id"', {
+        throw new Error('missing required field "id"', {
           status: 400,
           source: { pointer: '/data/id' }
         });
       }
       if (String(document.id) !== context.id) {
-        return new Error('not allowed to change "id"', {
+        throw new Error('not allowed to change "id"', {
           status: 403,
           source: { pointer: '/data/id' }
         });

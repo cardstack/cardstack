@@ -20,7 +20,8 @@ describe('git/writer', function() {
     factory.addResource('content-types', 'articles')
       .withRelated('data-source', { type: 'data-sources', id: 'default-git' })
       .withRelated('fields', [
-        factory.addResource('fields', 'title').withAttributes({ fieldType: 'string' })
+        factory.addResource('fields', 'title').withAttributes({ fieldType: 'string' }),
+        factory.addResource('fields', 'primary-image').withAttributes({ fieldType: 'belongs-to' })
       ]);
 
     factory.addResource('content-types', 'people')
@@ -546,7 +547,7 @@ describe('git/writer', function() {
       let record = await writers.create('master', user, 'articles', {
         type: 'articles',
         relationships: {
-          primaryImage: {
+          'primary-image': {
             data: {
               type: 'images',
               id: '100'
@@ -557,7 +558,7 @@ describe('git/writer', function() {
       let saved = await inRepo(env.repoPath).getJSONContents('master', `contents/articles/${record.id}.json`);
       expect(saved).to.deep.equal({
         relationships: {
-          primaryImage: {
+          'primary-image': {
             data: {
               type: 'images',
               id: '100'
@@ -571,7 +572,7 @@ describe('git/writer', function() {
       let record = await writers.create('master', user, 'articles', {
         type: 'articles',
         relationships: {
-          primaryImage: {
+          'primary-image': {
             data: {
               type: 'images',
               id: '100'
@@ -579,8 +580,8 @@ describe('git/writer', function() {
           }
         },
       });
-      expect(record).to.have.deep.property('relationships.primaryImage.data.id', '100');
-      expect(record).to.have.deep.property('relationships.primaryImage.data.type', 'images');
+      expect(record).to.have.deep.property('relationships.primary-image.data.id', '100');
+      expect(record).to.have.deep.property('relationships.primary-image.data.type', 'images');
     });
 
     it('saves at update', async function() {
@@ -588,7 +589,7 @@ describe('git/writer', function() {
         id: '1',
         type: 'articles',
         relationships: {
-          primaryImage: {
+          'primary-image': {
             data: {
               type: 'images',
               id: '100'
@@ -605,7 +606,7 @@ describe('git/writer', function() {
           title: 'First Article'
         },
         relationships: {
-          primaryImage: {
+          'primary-image': {
             data: {
               type: 'images',
               id: '100'
@@ -620,7 +621,7 @@ describe('git/writer', function() {
         id: '1',
         type: 'articles',
         relationships: {
-          primaryImage: {
+          'primary-image': {
             data: {
               type: 'images',
               id: '100'
@@ -631,8 +632,8 @@ describe('git/writer', function() {
           version: env.head
         }
       });
-      expect(record).to.have.deep.property('relationships.primaryImage.data.id', '100');
-      expect(record).to.have.deep.property('relationships.primaryImage.data.type', 'images');
+      expect(record).to.have.deep.property('relationships.primary-image.data.id', '100');
+      expect(record).to.have.deep.property('relationships.primary-image.data.type', 'images');
     });
 
 
