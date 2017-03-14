@@ -159,6 +159,43 @@ describe('schema/auth', function() {
     });
   });
 
+  it.skip("approves field write at creation via grant", async function () {
+
+  });
+
+  it.skip("approves field write at creation via default value", async function () {
+
+  });
+
+  it.skip("rejects field write at creation", async function () {
+    factory.addResource('grants').withAttributes({ mayCreateResource: true });
+    let schema = await Schema.loadFrom(factory.getModels());
+    let action = create({
+      type: 'articles',
+      id: '1',
+      attributes: {
+        title: "hello"
+      }
+    });
+    let errors = await schema.validationErrors(action);
+    expect(errors).collectionContains({
+      status: 401,
+      detail: 'You may not write field "title"'
+    });
+  });
+
+  it.skip("approves field write at update via grant", async function () {
+
+  });
+
+  it.skip("approves field write at update via unchanged value", async function () {
+
+  });
+
+  it.skip("rejects field write at update", async function () {
+
+  });
+
 });
 
 function create(document) {

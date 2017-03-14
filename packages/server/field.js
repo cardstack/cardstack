@@ -1,7 +1,7 @@
 const Error = require('@cardstack/data-source/error');
 
 module.exports = class Field {
-  constructor(model, plugins, constraints) {
+  constructor(model, plugins, constraints, allGrants) {
     this.id = model.id;
     this.fieldType = model.attributes['field-type'];
     this.searchable = model.attributes.searchable;
@@ -12,8 +12,10 @@ module.exports = class Field {
     } else {
       this.constraints = [];
     }
+
+    this.grants = allGrants.filter(g => g.fields == null || g.fields.includes(model.id));
   }
-  async validationErrors(value) {
+  async validationErrors(oldValue, value) {
     if (value != null && !this.plugin.valid(value)) {
       return [new Error(`${JSON.stringify(value)} is not a valid value for field "${this.id}"`, {
         status: 400,

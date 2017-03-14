@@ -20,6 +20,7 @@ module.exports = class Schema {
 
   static async loadFrom(models) {
     let plugins = await Plugins.load();
+
     let constraints = new Map();
     for (let model of models) {
       if (!this.ownTypes().includes(model.type)) {
@@ -30,10 +31,14 @@ module.exports = class Schema {
       }
     }
 
+    let grants = models
+        .filter(model => model.type === 'grants')
+        .map(model => new Grant(model));
+
     let fields = new Map();
     for (let model of models) {
       if (model.type === 'fields') {
-        fields.set(model.id, new Field(model, plugins, constraints));
+        fields.set(model.id, new Field(model, plugins, constraints, grants));
       }
     }
 
@@ -43,10 +48,6 @@ module.exports = class Schema {
         dataSources.set(model.id, new DataSource(model, plugins));
       }
     }
-
-    let grants = models
-        .filter(model => model.type === 'grants')
-        .map(model => new Grant(model));
 
     let types = new Map();
     for (let model of models) {

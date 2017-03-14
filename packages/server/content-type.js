@@ -19,54 +19,63 @@ module.exports = class ContentType {
     }
     this.grants = allGrants.filter(g => g.types == null || g.types.includes(model.id));
   }
+
   async validationErrors(pendingChange, context) {
+    let resourceAuthError = await this._resourceLevelAuthorizationError(pendingChange, context);
+    if (resourceAuthError) {
+      return [resourceAuthError];
+    }
+
     if (!pendingChange.finalDocument) {
-      if (this.grants.find(g => g['may-delete-resource'] && g.matches(pendingChange.originalDocument, context))) {
-        return [];
-      }
-      return [new Error("You may not delete this resource", { status: 401 })];
+      // when deleting, once we've found a valid resource-level
+      // deletion grant we're done -- there's no field-level
+      // validation.
+      return [];
     }
 
-    if (pendingChange.originalDocument) {
-      if (!this.grants.find(
-        g => g['may-update-resource'] &&
-          g.matches(pendingChange.finalDocument, context) &&
-          g.matches(pendingChange.originalDocument, context))
-         ) {
-        return [new Error("You may not update this resource", { status: 401 })];
-      }
-    } else {
-      if (!this.grants.find(g => g['may-create-resource'] && g.matches(pendingChange.finalDocument, context))) {
-        return [new Error("You may not create this resource", { status: 401 })];
-      }
-    }
-
-    let document = pendingChange.finalDocument;
     let errors = [];
     let seen = new Map();
-    if (document.attributes) {
-      for (let fieldName of Object.keys(document.attributes)) {
-        let field = this.fields.get(fieldName);
-        if (!field) {
-          errors.push(new Error(`type "${this.id}" has no field named "${fieldName}"`, {
-            status: 400,
-            title: 'Validation error',
-            source: { pointer: `/data/attributes/${fieldName}` }
-          }));
-        } else {
-          let fieldErrors = await field.validationErrors(document.attributes[fieldName], document);
-          errors = errors.concat(tagFieldErrors(fieldName, fieldErrors));
-          seen.set(fieldName, true);
-        }
-      }
-    }
+
+    let oldAttrs = (pendingChange.originalDocument ? pendingChange.originalDocument.attributes : null) || {};
+    let newAttrs = (pendingChange.finalDocument ? pendingChange.finalDocument.attributes : null) || {};
+    let oldRels = (pendingChange.originalDocument ? pendingChange.originalDocument.relationships : null) || {};
+    let newRels = (pendingChange.finalDocument ? pendingChange.finalDocument.relationships : null) || {};
+
+
     for (let [fieldName, field] of this.fields.entries()) {
-      if (field && !seen.get(fieldName)) {
-        errors = errors.concat(tagFieldErrors(fieldName, await field.validationErrors(null, document)));
+      seen.set(fieldName, true);
+      let fieldErrors;
+      if (field.isRelationship) {
+        fieldErrors = await field.validationErrors(oldRels[fieldName], newRels[fieldName]);
+      } else {
+        fieldErrors = await field.validationErrors(oldAttrs[fieldName], newAttrs[fieldName]);
+      }
+      errors = errors.concat(tagFieldErrors(fieldName, fieldErrors));
+    }
+
+    for (let fieldName of Object.keys(newAttrs)) {
+      if (!seen.has(fieldName)) {
+        errors.push(new Error(`type "${this.id}" has no field named "${fieldName}"`, {
+          status: 400,
+          title: 'Validation error',
+          source: { pointer: `/data/attributes/${fieldName}` }
+        }));
       }
     }
+
+    for (let fieldName of Object.keys(newRels)) {
+      if (!seen.has(fieldName)) {
+        errors.push(new Error(`type "${this.id}" has no field named "${fieldName}"`, {
+          status: 400,
+          title: 'Validation error',
+          source: { pointer: `/data/relationships/${fieldName}` }
+        }));
+      }
+    }
+
     return errors;
   }
+
   mapping() {
     let properties = {};
     for (let field of this.fields.values()) {
@@ -74,6 +83,29 @@ module.exports = class ContentType {
     }
     return { properties };
   }
+
+  async _resourceLevelAuthorizationError(pendingChange, context) {
+    if (!pendingChange.finalDocument) {
+      if (!this.grants.find(g => g['may-delete-resource'] && g.matches(pendingChange.originalDocument, context))) {
+        return new Error("You may not delete this resource", { status: 401 });
+      }
+    } else if (!pendingChange.originalDocument) {
+      if (!this.grants.find(g => g['may-create-resource'] && g.matches(pendingChange.finalDocument, context))) {
+        return new Error("You may not create this resource", { status: 401 });
+      }
+    } else {
+      if (!this.grants.find(
+        g => g['may-update-resource'] &&
+          g.matches(pendingChange.finalDocument, context) &&
+          g.matches(pendingChange.originalDocument, context))
+         ) {
+        return new Error("You may not update this resource", { status: 401 });
+      }
+    }
+  }
+
+
+
 };
 
 function tagFieldErrors(fieldName, errors) {
