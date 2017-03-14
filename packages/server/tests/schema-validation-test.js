@@ -148,7 +148,7 @@ describe('schema/validation', function() {
       }
     }));
     expect(errors).collectionContains({
-      detail: 'field "title" is an attribute, not a relationship',
+      detail: 'field "title" should be in attributes, not relationships',
       source: { pointer: '/data/relationships/title' },
       status: 400
     });
@@ -163,7 +163,7 @@ describe('schema/validation', function() {
       }
     }));
     expect(errors).collectionContains({
-      detail: 'field "primary-image" is a relationship, not an attribute',
+      detail: 'field "primary-image" should be in relationships, not attributes',
       source: { pointer: '/data/attributes/primary-image' },
       status: 400
     });

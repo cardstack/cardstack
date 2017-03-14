@@ -31,53 +31,13 @@ module.exports = class ContentType {
     }
 
     let errors = [];
-    let seen = new Map();
 
-    let newAttrs = (pendingChange.finalDocument ? pendingChange.finalDocument.attributes : null) || {};
-    let newRels = (pendingChange.finalDocument ? pendingChange.finalDocument.relationships : null) || {};
-
-    for (let [fieldName, field] of this.fields.entries()) {
-      seen.set(fieldName, true);
-      let fieldErrors;
-      if (field.isRelationship) {
-        if (newAttrs.hasOwnProperty(fieldName)) {
-          errors.push(new Error(`field "${fieldName}" is a relationship, not an attribute`, {
-            status: 400,
-            source: { pointer: `/data/attributes/${fieldName}` }
-          }));
-        }
-        fieldErrors = await field.validationErrors(pendingChange, context);
-      } else {
-        if (newRels.hasOwnProperty(fieldName)) {
-          errors.push(new Error(`field "${fieldName}" is an attribute, not a relationship`, {
-            status: 400,
-            source: { pointer: `/data/relationships/${fieldName}` }
-          }));
-        }
-        fieldErrors = await field.validationErrors(pendingChange, context);
-      }
+    for (let field of this.fields.values()) {
+      let fieldErrors = await field.validationErrors(pendingChange, context);
       errors = errors.concat(tagFieldErrors(field, fieldErrors));
     }
 
-    for (let fieldName of Object.keys(newAttrs)) {
-      if (!seen.has(fieldName)) {
-        errors.push(new Error(`type "${this.id}" has no field named "${fieldName}"`, {
-          status: 400,
-          title: 'Validation error',
-          source: { pointer: `/data/attributes/${fieldName}` }
-        }));
-      }
-    }
-
-    for (let fieldName of Object.keys(newRels)) {
-      if (!seen.has(fieldName)) {
-        errors.push(new Error(`type "${this.id}" has no field named "${fieldName}"`, {
-          status: 400,
-          title: 'Validation error',
-          source: { pointer: `/data/relationships/${fieldName}` }
-        }));
-      }
-    }
+    this._validateUnknownFields(pendingChange.finalDocument, errors);
 
     if (errors.length > 1) {
       let err = errors[0];
@@ -86,6 +46,31 @@ module.exports = class ContentType {
     }
     if (errors.length === 1) {
       throw errors[0];
+    }
+  }
+
+  _validateUnknownFields(document, errors) {
+    if (document.attributes) {
+      for (let fieldName of Object.keys(document.attributes)) {
+        if (!this.fields.has(fieldName)) {
+          errors.push(new Error(`type "${this.id}" has no field named "${fieldName}"`, {
+            status: 400,
+            title: 'Validation error',
+            source: { pointer: `/data/attributes/${fieldName}` }
+          }));
+        }
+      }
+    }
+    if (document.relationships) {
+      for (let fieldName of Object.keys(document.relationships)) {
+        if (!this.fields.has(fieldName)) {
+          errors.push(new Error(`type "${this.id}" has no field named "${fieldName}"`, {
+            status: 400,
+            title: 'Validation error',
+            source: { pointer: `/data/relationships/${fieldName}` }
+          }));
+        }
+      }
     }
   }
 

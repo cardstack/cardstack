@@ -29,12 +29,28 @@ module.exports = class Field {
     }
   }
 
-  async applyDefault(pendingChange) {
-    if (!pendingChange.finalDocument) {
-      // Deletions get no defaults
-      return;
+  _checkInWrongSection(pendingChange, errors) {
+    let sectionName = this.isRelationship ? 'attributes' : 'relationships';
+    let section = pendingChange.finalDocument[sectionName];
+    if (section && section[this.id]) {
+      let correctSectionName = this.isRelationship ? 'relationships' : 'attributes';
+      errors.push(new Error(`field "${this.id}" should be in ${correctSectionName}, not ${sectionName}`, {
+        status: 400,
+        source: { pointer: `/data/${sectionName}/${this.id}` }
+      }));
     }
+  }
 
+  _validateFormat(value, errors) {
+    if (value != null && !this.plugin.valid(value)) {
+      errors.push(new Error(`${JSON.stringify(value)} is not a valid value for field "${this.id}"`, {
+        status: 400,
+        title: "Validation error"
+      }));
+    }
+  }
+
+  async applyDefault(pendingChange) {
     let defaultInput;
     if (!pendingChange.originalDocument) {
       // Creation
@@ -92,12 +108,15 @@ module.exports = class Field {
       }
     }
 
-    if (value != null && !this.plugin.valid(value)) {
-      return [new Error(`${JSON.stringify(value)} is not a valid value for field "${this.id}"`, {
-        status: 400,
-        title: "Validation error"
-      })];
+    let errors = [];
+    this._checkInWrongSection(pendingChange, errors);
+    this._validateFormat(value, errors);
+    if (errors.length > 0) {
+      return errors;
     }
+
+    // We got through our own validations, so run all the constraints.
+
     return (await Promise.all(this.constraints.map(constraint => constraint.validationErrors(value)))).reduce(
       (a,b) => a.concat(b), []
     ).map(
