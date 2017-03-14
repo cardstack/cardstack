@@ -39,7 +39,11 @@ describe('schema/validation', function() {
         .withRelated('constraints', [
           factory.addResource('constraints')
             .withAttributes({ constraintType: 'not-null' })
-        ])
+        ]),
+      factory.addResource('fields', 'primary-image')
+        .withAttributes({
+          fieldType: 'belongs-to'
+        })
     ]);
 
     factory.addResource('content-types', 'events')
@@ -116,6 +120,36 @@ describe('schema/validation', function() {
     expect(errors).collectionContains({
       detail: 'type "articles" has no field named "pomposity"',
       source: { pointer: '/data/attributes/pomposity' },
+      status: 400
+    });
+  });
+
+  it("rejects attribute in relationships", async function() {
+    let errors = await schema.validationErrors(create({
+      type: 'articles',
+      id: '1',
+      relationships: {
+        title: "new title"
+      }
+    }));
+    expect(errors).collectionContains({
+      detail: 'field "title" is an attribute, not a relationship',
+      source: { pointer: '/data/relationships/title' },
+      status: 400
+    });
+  });
+
+  it("rejects relationship in attribute", async function() {
+    let errors = await schema.validationErrors(create({
+      type: 'articles',
+      id: '1',
+      attributes: {
+        'primary-image': { data: null }
+      }
+    }));
+    expect(errors).collectionContains({
+      detail: 'field "primary-image" is a relationship, not an attribute',
+      source: { pointer: '/data/attributes/primary-image' },
       status: 400
     });
   });

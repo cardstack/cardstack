@@ -43,11 +43,23 @@ module.exports = class ContentType {
       seen.set(fieldName, true);
       let fieldErrors;
       if (field.isRelationship) {
+        if (newAttrs.hasOwnProperty(fieldName)) {
+          errors.push(new Error(`field "${fieldName}" is a relationship, not an attribute`, {
+            status: 400,
+            source: { pointer: `/data/attributes/${fieldName}` }
+          }));
+        }
         fieldErrors = await field.validationErrors(oldRels[fieldName], newRels[fieldName]);
       } else {
+        if (newRels.hasOwnProperty(fieldName)) {
+          errors.push(new Error(`field "${fieldName}" is an attribute, not a relationship`, {
+            status: 400,
+            source: { pointer: `/data/relationships/${fieldName}` }
+          }));
+        }
         fieldErrors = await field.validationErrors(oldAttrs[fieldName], newAttrs[fieldName]);
       }
-      errors = errors.concat(tagFieldErrors(fieldName, fieldErrors));
+      errors = errors.concat(tagFieldErrors(field, fieldErrors));
     }
 
     for (let fieldName of Object.keys(newAttrs)) {
@@ -112,10 +124,11 @@ module.exports = class ContentType {
 
 };
 
-function tagFieldErrors(fieldName, errors) {
+function tagFieldErrors(field, errors) {
+  let section = field.isRelationship ? 'relationships' : 'attributes';
   errors.forEach(fe => {
     if (!fe.source) {
-      fe.source = { pointer: `/data/attributes/${fieldName}` };
+      fe.source = { pointer: `/data/${section}/${field.id}` };
     }
   });
   return errors;

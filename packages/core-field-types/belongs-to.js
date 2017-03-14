@@ -6,5 +6,6 @@ module.exports = {
     return {
       type: "nested"
     };
-  }
+  },
+  isRelationship: true
 };

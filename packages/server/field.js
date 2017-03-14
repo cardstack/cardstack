@@ -6,6 +6,7 @@ module.exports = class Field {
     this.fieldType = model.attributes['field-type'];
     this.searchable = model.attributes.searchable;
     this.plugin = plugins.fieldType(this.fieldType);
+    this.isRelationship = this.plugin.isRelationship;
 
     if (model.relationships && model.relationships.constraints && model.relationships.constraints.data) {
       this.constraints = model.relationships.constraints.data.map(ref => constraints.get(ref.id)).filter(Boolean);

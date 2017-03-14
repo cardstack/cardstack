@@ -218,17 +218,3 @@ function update(older, newer) {
     originalDocument: older
   };
 }
-
-async function validationErrors(change, context) {
-  try {
-    await this.validate(change, context);
-    return [];
-  } catch (err) {
-    if (!err.isCardstackError) { throw err; }
-    if (err.additionalErrors) {
-      return [err].concat(err.additionalErrors);
-    } else {
-      return [err];
-    }
-  }
-}
