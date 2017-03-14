@@ -9,6 +9,9 @@ const os = require('os');
 const process = require('process');
 const Error = require('@cardstack/data-source/error');
 const Schema = require('@cardstack/server/schema');
+const PendingChange = require('@cardstack/data-source/pending-change');
+
+const pendingChanges = new WeakMap();
 
 module.exports = class Writer {
   constructor({ repo, idGenerator }) {
@@ -66,7 +69,6 @@ module.exports = class Writer {
       file.setContent(JSON.stringify(after));
       let signature = this._commitOptions('update', type, id, user);
 
-
       // we don't write id & type into the actual file (they're part
       // of the filename). But we want them present on the
       // PendingChange as complete valid documents.
@@ -75,7 +77,9 @@ module.exports = class Writer {
       after.id = document.id;
       after.type = document.type;
 
-      return new PendingChange(id, type, signature, change, before, after);
+      let pending = new PendingChange(before, after, finalizer);
+      pendingChanges.set(pending, { type, id, signature, change });
+      return pending;
     });
   }
 
@@ -94,7 +98,10 @@ module.exports = class Writer {
       file.delete();
       before.id = id;
       before.type = type;
-      return new PendingChange(id, type, this._commitOptions('delete', type, id, user), change, before);
+      let pending = new PendingChange(before, null, finalizer);
+      let signature = this._commitOptions('delete', type, id, user);
+      pendingChanges.set(pending, { type, id, signature, change });
+      return pending;
     });
   }
 
@@ -114,7 +121,11 @@ module.exports = class Writer {
     file.setContent(JSON.stringify(gitDocument));
     gitDocument.id = id;
     gitDocument.type = document.type;
-    return new PendingChange(id, document.type, this._commitOptions('create', document.type, id, user), change, null, gitDocument);
+
+    let pending = new PendingChange(null, gitDocument, finalizer);
+    let signature = this._commitOptions('create', document.type, id, user);
+    pendingChanges.set(pending, { type: document.type, id, signature, change });
+    return pending;
   }
 
   _commitOptions(operation, type, id, user) {
@@ -186,20 +197,10 @@ async function withErrorHandling(id, type, fn) {
 }
 
 
-class PendingChange {
-  constructor(id, type, commitOpts, change, originalDocument, finalDocument) {
-    this.id = id;
-    this.type = type;
-    this.commitOpts = commitOpts;
-    this.change = change;
-    this.originalDocument = originalDocument;
-    this.finalDocument = finalDocument;
-  }
-  async finalize() {
-    return withErrorHandling(this.id, this.type, async () => {
-      let version = await this.change.finalize(this.commitOpts);
-      return { version };
-    });
-  }
-
+async function finalizer(pendingChange) {
+  let { id, type, change, signature } = pendingChanges.get(pendingChange);
+  return withErrorHandling(id, type, async () => {
+    let version = await change.finalize(signature);
+    return { version };
+  });
 }

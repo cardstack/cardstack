@@ -2,6 +2,7 @@ const Schema = require('@cardstack/server/schema');
 const ElasticAssert = require('@cardstack/elasticsearch/tests/assertions');
 const JSONAPIFactory = require('@cardstack/test-support/jsonapi-factory');
 const { grantAllPermissions } = require('@cardstack/test-support/permissions');
+const PendingChange = require('@cardstack/data-source/pending-change');
 
 describe('schema/validation', function() {
 
@@ -49,6 +50,20 @@ describe('schema/validation', function() {
     factory.addResource('content-types', 'events')
       .withRelated('fields', [
         factory.getResource('fields', 'title')
+      ]);
+
+    factory.addResource('content-types', 'things-with-defaults')
+      .withRelated('fields', [
+        factory.addResource('fields', 'timestamp')
+          .withAttributes({
+            fieldType: 'date',
+            defaultAtUpdate: 'now'
+          }),
+        factory.addResource('fields', 'karma')
+          .withAttributes({
+            fieldType: 'integer',
+            defaultAtCreate: 0
+          })
       ]);
 
     grantAllPermissions(factory);
@@ -228,11 +243,20 @@ describe('schema/validation', function() {
     expect(schema.types.get('articles').dataSource.writer).has.property('repoPath', 'http://example.git/repo.git');
   });
 
+  it.skip("applies defaults at creation", async function() {
+    let pending = create({
+      type: 'things-with-defaults'
+    });
+    await schema.validate(pending);
+    expect(pending).has.deep.property('serverProvidedValues.timestamp');
+    expect(pending).has.deep.property('serverProvidedValues.karma');
+    expect(pending.finalDocument.attributes).deep.equals({
+      karma: 0,
+      timestamp: pending.serverProvidedValues.timestamp
+    });
+  });
 });
 
 function create(document) {
-  return {
-    finalDocument: document,
-    originalDocument: null
-  };
+  return new PendingChange(null, document, null);
 }

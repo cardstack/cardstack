@@ -1,6 +1,7 @@
 const Schema = require('@cardstack/server/schema');
 const ElasticAssert = require('@cardstack/elasticsearch/tests/assertions');
 const JSONAPIFactory = require('@cardstack/test-support/jsonapi-factory');
+const PendingChange = require('@cardstack/data-source/pending-change');
 
 describe('schema/auth', function() {
 
@@ -214,22 +215,13 @@ describe('schema/auth', function() {
 });
 
 function create(document) {
-  return {
-    finalDocument: document,
-    originalDocument: null
-  };
+  return new PendingChange(null, document);
 }
 
 function deleteIt(document) {
-  return {
-    finalDocument: null,
-    originalDocument: document
-  };
+  return new PendingChange(document, null);
 }
 
 function update(older, newer) {
-  return {
-    finalDocument: newer,
-    originalDocument: older
-  };
+  return new PendingChange(older, newer);
 }

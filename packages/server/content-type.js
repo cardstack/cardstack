@@ -33,11 +33,8 @@ module.exports = class ContentType {
     let errors = [];
     let seen = new Map();
 
-    let oldAttrs = (pendingChange.originalDocument ? pendingChange.originalDocument.attributes : null) || {};
     let newAttrs = (pendingChange.finalDocument ? pendingChange.finalDocument.attributes : null) || {};
-    let oldRels = (pendingChange.originalDocument ? pendingChange.originalDocument.relationships : null) || {};
     let newRels = (pendingChange.finalDocument ? pendingChange.finalDocument.relationships : null) || {};
-
 
     for (let [fieldName, field] of this.fields.entries()) {
       seen.set(fieldName, true);
@@ -49,7 +46,7 @@ module.exports = class ContentType {
             source: { pointer: `/data/attributes/${fieldName}` }
           }));
         }
-        fieldErrors = await field.validationErrors(oldRels[fieldName], newRels[fieldName]);
+        fieldErrors = await field.validationErrors(pendingChange, context);
       } else {
         if (newRels.hasOwnProperty(fieldName)) {
           errors.push(new Error(`field "${fieldName}" is an attribute, not a relationship`, {
@@ -57,7 +54,7 @@ module.exports = class ContentType {
             source: { pointer: `/data/relationships/${fieldName}` }
           }));
         }
-        fieldErrors = await field.validationErrors(oldAttrs[fieldName], newAttrs[fieldName]);
+        fieldErrors = await field.validationErrors(pendingChange, context);
       }
       errors = errors.concat(tagFieldErrors(field, fieldErrors));
     }
