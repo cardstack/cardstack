@@ -7,6 +7,7 @@ const {
 } = require('@cardstack/server/tests/support');
 const { currentVersion } = require('./support');
 const JSONAPIFactory = require('@cardstack/test-support/jsonapi-factory');
+const { grantAllPermissions } = require('@cardstack/test-support/permissions');
 
 describe('jsonapi', function() {
 
@@ -37,12 +38,7 @@ describe('jsonapi', function() {
         factory.getResource('fields', 'title')
       ]);
 
-    factory.addResource('grants')
-      .withAttributes({
-        mayCreateResource: true,
-        mayUpdateResource: true,
-        mayDeleteResource: true
-      });
+    grantAllPermissions(factory);
 
     factory.addResource('articles', 0)
       .withAttributes({

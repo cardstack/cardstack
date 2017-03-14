@@ -6,6 +6,7 @@ const {
   destroyDefaultEnvironment
 } = require('@cardstack/server/tests/support');
 const JSONAPIFactory = require('@cardstack/test-support/jsonapi-factory');
+const { grantAllPermissions } = require('@cardstack/test-support/permissions');
 
 describe('git/writer', function() {
 
@@ -14,12 +15,7 @@ describe('git/writer', function() {
   beforeEach(async function() {
     let factory = new JSONAPIFactory();
 
-    factory.addResource('grants')
-      .withAttributes({
-        mayCreateResource: true,
-        mayUpdateResource: true,
-        mayDeleteResource: true
-      });
+    grantAllPermissions(factory);
 
     factory.addResource('content-types', 'articles')
       .withRelated('data-source', { type: 'data-sources', id: 'default-git' })
