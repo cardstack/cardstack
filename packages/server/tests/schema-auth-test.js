@@ -13,9 +13,10 @@ describe('schema/auth', function() {
       .withRelated('fields', [
         factory.addResource('fields', 'title')
           .withAttributes({ fieldType: 'string' }),
-        factory.addResource('fields', 'published-date')
+        factory.addResource('fields', 'coolness')
           .withAttributes({
-            fieldType: 'date'
+            fieldType: 'integer',
+            defaultValue: 0
           })
       ]);
 
@@ -164,10 +165,24 @@ describe('schema/auth', function() {
   });
 
   it.skip("approves field write at creation via default value", async function () {
-
+    factory.addResource('grants').withAttributes({ mayCreateResource: true });
+    let schema = await Schema.loadFrom(factory.getModels());
+    let action = create({
+      type: 'articles',
+      id: '1',
+      attributes: {
+        title: null
+      }
+    });
+    let errors = await schema.validationErrors(action);
+    expect(errors).deep.equal([]);
   });
 
-  it.skip("rejects field write at creation", async function () {
+  it.skip("approves field write at creation via user-provided default value", async function () {
+  });
+
+
+  it("rejects field write at creation", async function () {
     factory.addResource('grants').withAttributes({ mayCreateResource: true });
     let schema = await Schema.loadFrom(factory.getModels());
     let action = create({

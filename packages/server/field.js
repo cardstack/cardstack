@@ -16,7 +16,15 @@ module.exports = class Field {
 
     this.grants = allGrants.filter(g => g.fields == null || g.fields.includes(model.id));
   }
-  async validationErrors(oldValue, value) {
+  async validationErrors(oldValue, value, context) {
+    if (oldValue !== value) {
+      if (!this.grants.find(g => g['may-write-field'] && g.matches(null, context))) {
+        return [new Error(`You may not write field "${this.id}"`, {
+          status: 401
+        })];
+      }
+    }
+
     if (value != null && !this.plugin.valid(value)) {
       return [new Error(`${JSON.stringify(value)} is not a valid value for field "${this.id}"`, {
         status: 400,

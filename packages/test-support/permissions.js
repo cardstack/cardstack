@@ -3,6 +3,7 @@ exports.grantAllPermissions = function(factory) {
     .withAttributes({
       mayCreateResource: true,
       mayUpdateResource: true,
-      mayDeleteResource: true
+      mayDeleteResource: true,
+      mayWriteField: true
     });
 };
