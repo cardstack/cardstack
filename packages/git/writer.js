@@ -90,8 +90,11 @@ module.exports = class Writer {
     return withErrorHandling(id, type, async () => {
       let change = await Change.create(this.repo, version, branch);
       let file = await change.get(this._filenameFor(type, id));
+      let before = JSON.parse(await file.getBuffer());
       file.delete();
-      return new PendingChange(id, type, this._commitOptions('delete', type, id, user), change);
+      before.id = id;
+      before.type = type;
+      return new PendingChange(id, type, this._commitOptions('delete', type, id, user), change, before);
     });
   }
 

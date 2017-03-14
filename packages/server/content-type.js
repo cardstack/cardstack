@@ -21,18 +21,22 @@ module.exports = class ContentType {
   }
   async validationErrors(pendingChange, context) {
     if (!pendingChange.finalDocument) {
-      if (this.grants.find(g => g.mayDeleteResource && g.matches(pendingChange.originalDocument, context))) {
+      if (this.grants.find(g => g['may-delete-resource'] && g.matches(pendingChange.originalDocument, context))) {
         return [];
       }
       return [new Error("You may not delete this resource", { status: 401 })];
     }
 
     if (pendingChange.originalDocument) {
-      if (!this.grants.find(g => g.mayUpdateResource && g.matches(document, context))) {
+      if (!this.grants.find(
+        g => g['may-update-resource'] &&
+          g.matches(pendingChange.finalDocument, context) &&
+          g.matches(pendingChange.originalDocument, context))
+         ) {
         return [new Error("You may not update this resource", { status: 401 })];
       }
     } else {
-      if (!this.grants.find(g => g.mayCreateResource && g.matches(document, context))) {
+      if (!this.grants.find(g => g['may-create-resource'] && g.matches(pendingChange.finalDocument, context))) {
         return [new Error("You may not create this resource", { status: 401 })];
       }
     }

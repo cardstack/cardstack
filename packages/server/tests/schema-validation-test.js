@@ -46,6 +46,13 @@ describe('schema/validation', function() {
         factory.getResource('fields', 'title')
       ]);
 
+    factory.addResource('grants')
+      .withAttributes({
+        mayCreateResource: true,
+        mayUpdateResource: true,
+        mayDeleteResource: true
+      });
+
     schema = await Schema.loadFrom(factory.getModels());
   });
 

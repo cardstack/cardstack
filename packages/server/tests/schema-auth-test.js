@@ -6,41 +6,18 @@ describe('schema/auth', function() {
 
   let factory;
 
-  before(async function() {
-
+  beforeEach(async function() {
     factory = new JSONAPIFactory();
-    let articleType = factory.addResource('content-types', 'articles');
 
-    articleType.withRelated(
-      'data-source',
-      factory.addResource('data-sources')
-        .withAttributes({
-          sourceType: 'git',
-          params: {
-            repo: 'http://example.git/repo.git'
-          }
-        }));
-
-    articleType.withRelated('fields', [
-      factory.addResource('fields', 'title')
-        .withAttributes({ fieldType: 'string' })
-        .withRelated('constraints', [
-          factory.addResource('constraints')
-            .withAttributes({
-              constraintType: 'length',
-              parameters: { max: 40 }
-            })
-        ]),
-      factory.addResource('fields', 'published-data')
-        .withAttributes({
-          fieldType: 'date',
-          searchable: false
-        })
-        .withRelated('constraints', [
-          factory.addResource('constraints')
-            .withAttributes({ constraintType: 'not-null' })
-        ])
-    ]);
+    factory.addResource('content-types', 'articles')
+      .withRelated('fields', [
+        factory.addResource('fields', 'title')
+          .withAttributes({ fieldType: 'string' }),
+        factory.addResource('fields', 'published-date')
+          .withAttributes({
+            fieldType: 'date'
+          })
+      ]);
 
     factory.addResource('content-types', 'events')
       .withRelated('fields', [
@@ -49,7 +26,7 @@ describe('schema/auth', function() {
 
   });
 
-  after(async function() {
+  afterEach(async function() {
     let ea = new ElasticAssert();
     await ea.deleteAllIndices();
   });
@@ -58,6 +35,86 @@ describe('schema/auth', function() {
     let schema = await Schema.loadFrom(factory.getModels());
     let action = create({
       type: 'articles',
+      id: '1'
+    });
+    let errors = await schema.validationErrors(action);
+    expect(errors).collectionContains({
+      status: 401,
+      detail: 'You may not create this resource'
+    });
+  });
+
+  it("unrestricted grant allows creation", async function() {
+    factory.addResource('grants').withAttributes({ mayCreateResource: true });
+    let schema = await Schema.loadFrom(factory.getModels());
+    let action = create({
+      type: 'articles',
+      id: '1'
+    });
+    let errors = await schema.validationErrors(action);
+    expect(errors).deep.equal([]);
+  });
+
+  it("user-specific grant allows creation", async function() {
+    factory.addResource('grants').withAttributes({ mayCreateResource: true })
+      .withRelated('who', factory.addResource('groups', 0));
+    let schema = await Schema.loadFrom(factory.getModels());
+    let action = create({
+      type: 'articles',
+      id: '1'
+    });
+    let errors = await schema.validationErrors(action, { user: { id: 0 }});
+    expect(errors).deep.equal([]);
+  });
+
+  it("user-specific grant doesn't match missing user", async function() {
+    factory.addResource('grants').withAttributes({ mayCreateResource: true })
+      .withRelated('who', factory.addResource('groups', '0'));
+    let schema = await Schema.loadFrom(factory.getModels());
+    let action = create({
+      type: 'articles',
+      id: '1'
+    });
+    let errors = await schema.validationErrors(action);
+    expect(errors).collectionContains({
+      status: 401,
+      detail: 'You may not create this resource'
+    });
+  });
+
+  it("user-specific grant doesn't match wrong user", async function() {
+    factory.addResource('grants').withAttributes({ mayCreateResource: true })
+      .withRelated('who', factory.addResource('groups', 0));
+    let schema = await Schema.loadFrom(factory.getModels());
+    let action = create({
+      type: 'articles',
+      id: '1'
+    });
+    let errors = await schema.validationErrors(action, { user: { id: 1 }});
+    expect(errors).collectionContains({
+      status: 401,
+      detail: 'You may not create this resource'
+    });
+  });
+
+  it("allows by type", async function() {
+    factory.addResource('grants').withAttributes({ mayCreateResource: true })
+      .withRelated('types', [factory.getResource('content-types', 'articles')]);
+    let schema = await Schema.loadFrom(factory.getModels());
+    let action = create({
+      type: 'articles',
+      id: '1'
+    });
+    let errors = await schema.validationErrors(action);
+    expect(errors).deep.equal([]);
+  });
+
+  it("forbids by type", async function() {
+    factory.addResource('grants').withAttributes({ mayCreateResource: true })
+      .withRelated('types', [factory.getResource('content-types', 'articles')]);
+    let schema = await Schema.loadFrom(factory.getModels());
+    let action = create({
+      type: 'events',
       id: '1'
     });
     let errors = await schema.validationErrors(action);

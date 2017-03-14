@@ -6,78 +6,62 @@ const {
   destroyDefaultEnvironment
 } = require('@cardstack/server/tests/support');
 const { currentVersion } = require('./support');
+const JSONAPIFactory = require('@cardstack/test-support/jsonapi-factory');
 
 describe('jsonapi', function() {
 
   let request, env;
 
   beforeEach(async function() {
-    env = await createDefaultEnvironment([
-      {
-        type: 'content-types',
-        id: 'articles',
-        relationships: {
-          fields: {
-            data: [
-              { type: 'fields', id: 'title' },
-              { type: 'fields', id: 'body' }
-            ]
-          },
-          'data-source': {
-            data: { type: 'data-sources', id: 'default-git' }
-          }
-        }
-      },
-      {
-        type: 'constraints',
-        id: '0',
-        attributes: {
-          'constraint-type': 'not-null'
-        }
-      },
-      {
-        type: 'fields',
-        id: 'title',
-        attributes: {
-          'field-type': 'string'
-        }
-      },
-      {
-        type: 'fields',
-        id: 'body',
-        attributes: {
-          'field-type': 'string'
-        },
-        relationships: {
-          constraints: {
-            data: [ { type: 'constraints', id: '0'} ]
-          }
-        }
-      },
-      {
-        type: 'articles',
-        id: '0',
-        attributes: {
+    let factory = new JSONAPIFactory();
+    let articleType = factory.addResource('content-types', 'articles');
+
+    articleType.withRelated(
+      'data-source',
+      { type: 'data-sources', id: 'default-git' }
+    );
+
+    articleType.withRelated('fields', [
+      factory.addResource('fields', 'title')
+        .withAttributes({ fieldType: 'string' }),
+      factory.addResource('fields', 'body')
+        .withAttributes({ fieldType: 'string' })
+        .withRelated('constraints', [
+          factory.addResource('constraints')
+            .withAttributes({ constraintType: 'not-null' })
+        ])
+    ]);
+
+    factory.addResource('content-types', 'events')
+      .withRelated('fields', [
+        factory.getResource('fields', 'title')
+      ]);
+
+    factory.addResource('grants')
+      .withAttributes({
+        mayCreateResource: true,
+        mayUpdateResource: true,
+        mayDeleteResource: true
+      });
+
+    factory.addResource('articles', 0)
+      .withAttributes({
           title: "Hello world",
           body: "This is the first article"
-        }
-      },
-      {
-        type: 'articles',
-        id: '1',
-        attributes: {
-          title: "Second",
-          body: "This is the second article"
-        }
-      },
-      {
-        type: 'comments',
-        id: '0',
-        attributes: {
-          body: 'This is a comment'
-        }
-      }
-    ]);
+      });
+
+    factory.addResource('articles', 1)
+      .withAttributes({
+        title: "Second",
+        body: "This is the second article"
+      });
+
+    factory.addResource('comments', 0)
+      .withAttributes({
+        body: "This is s a comment"
+      });
+
+    env = await createDefaultEnvironment(factory.getModels());
     let app = new Koa();
     app.use(jsonapi(env.searcher, env.writers));
     request = supertest(app.callback());

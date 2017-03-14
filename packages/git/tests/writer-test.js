@@ -5,97 +5,56 @@ const {
   createDefaultEnvironment,
   destroyDefaultEnvironment
 } = require('@cardstack/server/tests/support');
+const JSONAPIFactory = require('@cardstack/test-support/jsonapi-factory');
 
 describe('git/writer', function() {
 
   let env, writers, user;
 
   beforeEach(async function() {
-    env = await createDefaultEnvironment([
-      {
-        type: 'content-types',
-        id: 'articles',
-        relationships: {
-          fields: {
-            data: [
-              { type: 'fields', id: 'title' }
-            ]
-          },
-          'data-source': {
-            data: { type: 'data-sources', id: 'default-git' }
-          }
-        }
-      },
-      {
-        type: 'content-types',
-        id: 'people',
-        relationships: {
-          fields: {
-            data: [
-              { type: 'fields', id: 'firstName' },
-              { type: 'fields', id: 'lastName' },
-              { type: 'fields', id: 'age' }
-            ]
-          },
-          'data-source': {
-            data: { type: 'data-sources', id: 'default-git' }
-          }
-        }
-      },
-      {
-        type: 'fields',
-        id: 'title',
-        attributes: {
-          'field-type': 'string'
-        }
-      },
-      {
-        type: 'fields',
-        id: 'firstName',
-        attributes: {
-          'field-type': 'string'
-        }
-      },
-      {
-        type: 'fields',
-        id: 'lastName',
-        attributes: {
-          'field-type': 'string'
-        }
-      },
-      {
-        type: 'fields',
-        id: 'age',
-        attributes: {
-          'field-type': 'integer'
-        }
-      },
-      {
-        type: 'articles',
-        id: '1',
-        attributes: {
+    let factory = new JSONAPIFactory();
+
+    factory.addResource('grants')
+      .withAttributes({
+        mayCreateResource: true,
+        mayUpdateResource: true,
+        mayDeleteResource: true
+      });
+
+    factory.addResource('content-types', 'articles')
+      .withRelated('data-source', { type: 'data-sources', id: 'default-git' })
+      .withRelated('fields', [
+        factory.addResource('fields', 'title').withAttributes({ fieldType: 'string' })
+      ]);
+
+    factory.addResource('content-types', 'people')
+      .withRelated('data-source', { type: 'data-sources', id: 'default-git' })
+      .withRelated('fields', [
+        factory.addResource('fields', 'first-name').withAttributes({ fieldType: 'string' }),
+        factory.addResource('fields', 'last-name').withAttributes({ fieldType: 'string' }),
+        factory.addResource('fields', 'age').withAttributes({ fieldType: 'integer' })
+      ]);
+
+    factory.addResource('articles', 1)
+      .withAttributes({
           title: 'First Article'
-        }
-      },
-      {
-        type: 'people',
-        id: '1',
-        attributes: {
-          firstName: 'Quint',
-          lastName: 'Faulkner',
-          age: 6
-        }
-      },
-      {
-        type: 'people',
-        id: '2',
-        attributes: {
-          firstName: 'Arthur',
-          lastName: 'Faulkner',
-          age: 1
-        }
-      }
-    ]);
+      });
+
+    factory.addResource('people', 1)
+      .withAttributes({
+        firstName: 'Quint',
+        lastName: 'Faulkner',
+        age: 6
+      });
+
+    factory.addResource('people', 2)
+      .withAttributes({
+        firstName: 'Arthur',
+        lastName: 'Faulkner',
+        age: 1
+      });
+
+    env = await createDefaultEnvironment(factory.getModels());
 
     user = {
       fullName: 'Sample User',
@@ -403,7 +362,7 @@ describe('git/writer', function() {
           version: env.head
         }
       });
-      expect(record).has.deep.property('attributes.firstName').equal('Quint');
+      expect(record).has.deep.property('attributes.first-name').equal('Quint');
     });
 
     it('stores unchanged field', async function() {
@@ -418,7 +377,7 @@ describe('git/writer', function() {
         }
       });
       expect(await inRepo(env.repoPath).getJSONContents('master', 'contents/people/1.json'))
-        .deep.property('attributes.firstName', 'Quint');
+        .deep.property('attributes.first-name', 'Quint');
     });
 
     it('stores updated attribute', async function() {

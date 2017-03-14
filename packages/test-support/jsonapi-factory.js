@@ -7,9 +7,9 @@ class JSONAPIFactory {
 
   addResource(type, id=null) {
     if (id == null) {
-      id = String(idGenerator++);
+      id = idGenerator++;
     }
-    let resource = { type, id };
+    let resource = { type, id: String(id) };
     this.data.push(resource);
     resource.type = type;
     return new ResourceFactory(resource);
