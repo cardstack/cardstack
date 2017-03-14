@@ -19,10 +19,14 @@ module.exports = class Field {
     this.grants = allGrants.filter(g => g.fields == null || g.fields.includes(model.id));
   }
 
+  _sectionName() {
+    return this.isRelationship ? 'relationships' : 'attributes';
+  }
+
   _valueFrom(pendingChange, side='finalDocument') {
     let document = pendingChange[side];
     if (document) {
-      let section = this.isRelationship ? 'relationships' : 'attributes';
+      let section = this._sectionName();
       if (document[section]) {
         return document[section][this.id];
       }
@@ -33,8 +37,7 @@ module.exports = class Field {
     let sectionName = this.isRelationship ? 'attributes' : 'relationships';
     let section = pendingChange.finalDocument[sectionName];
     if (section && section[this.id]) {
-      let correctSectionName = this.isRelationship ? 'relationships' : 'attributes';
-      errors.push(new Error(`field "${this.id}" should be in ${correctSectionName}, not ${sectionName}`, {
+      errors.push(new Error(`field "${this.id}" should be in ${this._sectionName()}, not ${sectionName}`, {
         status: 400,
         source: { pointer: `/data/${sectionName}/${this.id}` }
       }));
@@ -81,18 +84,18 @@ module.exports = class Field {
       // implementation, if there is one.
       let defaultValue;
       if (typeof this.plugin.generateDefault === 'function') {
-        defaultValue = this.plugin.generateDefault(defaultInput);
+        defaultValue = await this.plugin.generateDefault(defaultInput);
       } else {
         defaultValue = defaultInput;
       }
 
       // And then set it.
       pendingChange.serverProvidedValues[this.id] = defaultValue;
-      if (this.isRelationship) {
-        pendingChange.finalDocument.relationships[this.id] = defaultValue;
-      } else {
-        pendingChange.finalDocument.attributes[this.id] = defaultValue;
+      let section = this._sectionName();
+      if (!pendingChange.finalDocument[section]) {
+        pendingChange.finalDocument[section] = {};
       }
+      pendingChange.finalDocument[section][this.id] = defaultValue;
     }
   }
 

@@ -8,5 +8,10 @@ module.exports = {
     return {
       type: "date"
     };
+  },
+  generateDefault(input) {
+    if (input === 'now') {
+      return moment().toISOString();
+    }
   }
 };

@@ -243,7 +243,7 @@ describe('schema/validation', function() {
     expect(schema.types.get('articles').dataSource.writer).has.property('repoPath', 'http://example.git/repo.git');
   });
 
-  it.skip("applies defaults at creation", async function() {
+  it("applies defaults at creation", async function() {
     let pending = create({
       type: 'things-with-defaults'
     });

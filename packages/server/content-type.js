@@ -30,8 +30,11 @@ module.exports = class ContentType {
       return;
     }
 
-    let errors = [];
+    for (let field of this.fields.values()) {
+      await field.applyDefault(pendingChange, context);
+    }
 
+    let errors = [];
     for (let field of this.fields.values()) {
       let fieldErrors = await field.validationErrors(pendingChange, context);
       errors = errors.concat(tagFieldErrors(field, fieldErrors));
