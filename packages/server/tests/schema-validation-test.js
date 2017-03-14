@@ -243,18 +243,77 @@ describe('schema/validation', function() {
     expect(schema.types.get('articles').dataSource.writer).has.property('repoPath', 'http://example.git/repo.git');
   });
 
-  it("applies defaults at creation", async function() {
+  it("applies creation default", async function() {
+    let pending = create({
+      type: 'things-with-defaults'
+    });
+    await schema.validate(pending);
+    expect(pending).has.deep.property('serverProvidedValues.karma');
+    expect(pending.finalDocument).has.deep.property('attributes.karma', 0);
+  });
+
+  it("applies update default at creation", async function() {
     let pending = create({
       type: 'things-with-defaults'
     });
     await schema.validate(pending);
     expect(pending).has.deep.property('serverProvidedValues.timestamp');
-    expect(pending).has.deep.property('serverProvidedValues.karma');
-    expect(pending.finalDocument.attributes).deep.equals({
-      karma: 0,
-      timestamp: pending.serverProvidedValues.timestamp
-    });
+    expect(pending.finalDocument).has.deep.property('attributes.timestamp');
+    expect(pending.finalDocument.attributes.timestamp).equals(pending.serverProvidedValues.timestamp);
   });
+
+  it("applies update default at update", async function() {
+    let pending = new PendingChange({
+      type: 'things-with-defaults',
+      id: 1,
+      attributes: {
+        timestamp: '2017-03-14T13:49:30Z',
+        karma: 10
+      }
+    }, {
+      type: 'things-with-defaults',
+      id: 1,
+      attributes: {
+        timestamp: '2017-03-14T13:49:30Z',
+        karma: 10
+      }
+    });
+    await schema.validate(pending);
+    expect(pending).has.deep.property('serverProvidedValues.timestamp');
+    expect(pending.finalDocument).has.deep.property('attributes.timestamp');
+    expect(pending.finalDocument.attributes.timestamp).equals(pending.serverProvidedValues.timestamp);
+    expect(pending.originalDocument.attributes.timestamp).not.equals(pending.serverProvidedValues.timestamp);
+  });
+
+  it("does not apply creation default when user provides a value", async function() {
+    let pending = new PendingChange(null, {
+      type: 'things-with-defaults',
+      attributes: {
+        karma: 10
+      }
+    });
+    await schema.validate(pending);
+    expect(pending).not.has.deep.property('serverProvidedValues.karma');
+    expect(pending.finalDocument.attributes.karma).equals(10);
+  });
+
+  it("does not apply update default when user is altering value", async function() {
+    let pending = new PendingChange({
+      type: 'things-with-defaults',
+      attributes: {
+        timestamp: '2017-03-14T13:49:30Z'
+      }
+    }, {
+      type: 'things-with-defaults',
+      attributes: {
+        timestamp: '2017-03-14T14:50:00Z'
+      }
+    });
+    await schema.validate(pending);
+    expect(pending).not.has.deep.property('serverProvidedValues.timestamp');
+    expect(pending.finalDocument.attributes.timestamp).equals('2017-03-14T14:50:00Z');
+  });
+
 });
 
 function create(document) {
