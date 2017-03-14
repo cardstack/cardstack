@@ -1,96 +1,52 @@
 const Schema = require('@cardstack/server/schema');
 const ElasticAssert = require('@cardstack/elasticsearch/tests/assertions');
+const JSONAPIFactory = require('@cardstack/test-support/jsonapi-factory');
 
 describe('schema/validation', function() {
 
   let schema;
 
   before(async function() {
-    let models = [
-      {
-        type: 'content-types',
-        id: 'articles',
-        relationships: {
-          fields: {
-            data: [
-              { type: 'fields', id: 'title' },
-              { type: 'fields', id: 'published-date' }
-            ]
-          },
-          'data-source': {
-            data: { type: 'data-sources', id: '432' }
-          }
-        }
-      },
-      {
-        type: 'fields',
-        id: 'title',
-        attributes: {
-          'field-type': 'string'
-        },
-        relationships: {
-          constraints: {
-            data: [
-              { type: 'constraints', id: '0' }
-            ]
-          }
-        }
-      },
-      {
-        type: 'fields',
-        id: 'published-date',
-        attributes: {
-          'field-type': 'date',
-          searchable: false
-        },
-        relationships: {
-          constraints: {
-            data: [
-              { type: 'constraints', id: '1' }
-            ]
-          }
-        }
-      },
-      {
-        type: 'constraints',
-        id: '0',
-        attributes: {
-          'constraint-type': 'length',
-          parameters: {
-            max: 40
-          }
-        }
-      },
-      {
-        type: 'constraints',
-        id: '1',
-        attributes: {
-          'constraint-type': 'not-null'
-        }
-      },
-      {
-        type: 'content-types',
-        id: 'events',
-        relationships: {
-          fields: {
-            data: [
-              { type: 'fields', id: 'title' },
-            ]
-          }
-        }
-      },
-      {
-        type: 'data-sources',
-        id: '432',
-        attributes: {
-          'source-type': 'git',
+    let factory = new JSONAPIFactory();
+    let articleType = factory.addResource('content-types', 'articles');
+
+    articleType.withRelated(
+      'data-source',
+      factory.addResource('data-sources')
+        .withAttributes({
+          sourceType: 'git',
           params: {
             repo: 'http://example.git/repo.git'
           }
-        }
-      }
-    ];
-    schema = await Schema.loadFrom(models);
+        }));
+
+    articleType.withRelated('fields', [
+      factory.addResource('fields', 'title')
+        .withAttributes({ fieldType: 'string' })
+        .withRelated('constraints', [
+          factory.addResource('constraints')
+            .withAttributes({
+              constraintType: 'length',
+              parameters: { max: 40 }
+            })
+        ]),
+      factory.addResource('fields', 'published-date')
+        .withAttributes({
+          fieldType: 'date',
+          searchable: false
+        })
+        .withRelated('constraints', [
+          factory.addResource('constraints')
+            .withAttributes({ constraintType: 'not-null' })
+        ])
+    ]);
+
+    factory.addResource('content-types', 'events')
+      .withRelated('fields', [
+        factory.getResource('fields', 'title')
+      ]);
+
+    schema = await Schema.loadFrom(factory.getModels());
   });
 
   after(async function() {
