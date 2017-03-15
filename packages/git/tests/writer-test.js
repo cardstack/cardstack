@@ -51,6 +51,16 @@ describe('git/writer', function() {
         age: 1
       });
 
+    factory.addResource('content-types', 'things-with-defaults')
+      .withRelated('data-source', { type: 'data-sources', id: 'default-git' })
+      .withRelated('fields', [
+        factory.addResource('fields', 'coolness')
+          .withAttributes({
+            fieldType: 'integer',
+            defaultAtCreate: 42
+          })
+
+      ]);
     env = await createDefaultEnvironment(factory.getModels());
 
     user = {
@@ -81,6 +91,17 @@ describe('git/writer', function() {
         }
       });
     });
+
+
+    it.skip('saves default attribute', async function() {
+      await writers.create('master', user, 'things-with-defaults', {
+        id: '1',
+        type: 'things-with-defaults',
+      });
+      expect(await inRepo(env.repoPath).getJSONContents('master', 'contents/things-with-defaults/1.json'))
+        .deep.property('attributes.coolness', 42);
+    });
+
 
     it('returns correct document', async function () {
       let record = await writers.create('master', user, 'articles', {
@@ -464,7 +485,22 @@ describe('git/writer', function() {
       }
     });
 
-
+    it('can null out a field', async function() {
+      await writers.update('master', user, 'articles', '1', {
+        id: '1',
+        type: 'articles',
+        attributes: {
+          title: null
+        },
+        meta: {
+          version: env.head
+        }
+      });
+      let contents = await inRepo(env.repoPath).getJSONContents('master', 'contents/articles/1.json');
+      expect(contents.attributes).deep.equals({
+        title: null
+      });
+    });
   });
 
   describe('delete', function() {
