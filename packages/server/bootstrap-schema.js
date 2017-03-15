@@ -1,12 +1,2 @@
-const models = Object.freeze([
-  {
-    type: 'content-types',
-    id: 'content-types',
-    relationships: {
-      fields: {
-        data: []
-      }
-    }
-  }
-]);
+const models = Object.freeze([]);
 module.exports = models;
