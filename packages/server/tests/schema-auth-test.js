@@ -207,7 +207,7 @@ describe('schema/auth', function() {
   });
 
 
-  it("approves field write at creation when it matches default value", async function () {
+  it.skip("approves field write at creation when it matches default value", async function () {
     factory.addResource('grants').withAttributes({ mayCreateResource: true });
     let schema = await Schema.loadFrom(factory.getModels());
     let action = create({
