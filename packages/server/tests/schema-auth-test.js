@@ -17,7 +17,12 @@ describe('schema/auth', function() {
         factory.addResource('fields', 'coolness')
           .withAttributes({
             fieldType: 'integer',
-            defaultValue: 0
+            defaultAtCreate: 0
+          }),
+        factory.addResource('fields', 'reviewed')
+          .withAttributes({
+            fieldType: 'boolean',
+            defaultAtUpdate: false
           })
       ]);
 
@@ -161,7 +166,7 @@ describe('schema/auth', function() {
     });
   });
 
-  it.skip("approves field write at creation via grant", async function () {
+  it("approves field write at creation via grant", async function () {
     factory.addResource('grants').withAttributes({ mayCreateResource: true, mayWriteField: true });
     let schema = await Schema.loadFrom(factory.getModels());
     let action = create({
@@ -175,7 +180,7 @@ describe('schema/auth', function() {
     expect(errors).deep.equal([]);
   });
 
-  it.skip("approves null field write at creation when no default is set", async function () {
+  it("approves null field write at creation when no default is set", async function () {
     factory.addResource('grants').withAttributes({ mayCreateResource: true });
     let schema = await Schema.loadFrom(factory.getModels());
     let action = create({
@@ -189,7 +194,7 @@ describe('schema/auth', function() {
     expect(errors).deep.equal([]);
   });
 
-  it.skip("rejects null field write at creation when default is set", async function () {
+  it("rejects null field write at creation when default is set", async function () {
     factory.addResource('grants').withAttributes({ mayCreateResource: true });
     let schema = await Schema.loadFrom(factory.getModels());
     let action = create({
@@ -207,7 +212,7 @@ describe('schema/auth', function() {
   });
 
 
-  it.skip("approves field write at creation when it matches default value", async function () {
+  it("approves field write at creation when it matches default value", async function () {
     factory.addResource('grants').withAttributes({ mayCreateResource: true });
     let schema = await Schema.loadFrom(factory.getModels());
     let action = create({
@@ -239,11 +244,74 @@ describe('schema/auth', function() {
     });
   });
 
-  it.skip("approves field write at update via grant", async function () {
-
+  it("approves field write at update via grant", async function () {
+    factory.addResource('grants').withAttributes({ mayUpdateResource: true, mayWriteField: true });
+    let schema = await Schema.loadFrom(factory.getModels());
+    let action = update({
+      type: 'articles',
+      id: '1',
+      attributes: {
+        coolness: 6
+      }
+    },{
+      type: 'articles',
+      id: '1',
+      attributes: {
+        coolness: 7
+      }
+    });
+    let errors = await schema.validationErrors(action);
+    expect(errors).to.deep.equal([]);
   });
 
-  it.skip("approves field write at update via unchanged value", async function () {
+  it("approves via a field-specific grant", async function () {
+    factory.addResource('grants').withAttributes({ mayUpdateResource: true, mayWriteField: true })
+      .withRelated('fields', [
+        factory.getResource('fields', 'coolness')
+      ]);
+    let schema = await Schema.loadFrom(factory.getModels());
+    let action = update({
+      type: 'articles',
+      id: '1',
+      attributes: {
+        coolness: 6
+      }
+    },{
+      type: 'articles',
+      id: '1',
+      attributes: {
+        coolness: 7
+      }
+    });
+    let errors = await schema.validationErrors(action);
+    expect(errors).to.deep.equal([]);
+  });
+
+  it("rejects a non-matching field-specific grant", async function () {
+    factory.addResource('grants').withAttributes({ mayUpdateResource: true, mayWriteField: true })
+      .withRelated('fields', [
+        factory.getResource('fields', 'coolness')
+      ]);
+    let schema = await Schema.loadFrom(factory.getModels());
+    let action = update({
+      type: 'articles',
+      id: '1'
+    },{
+      type: 'articles',
+      id: '1',
+      attributes: {
+        title: 'b'
+      }
+    });
+    let errors = await schema.validationErrors(action);
+    expect(errors).collectionContains({
+      status: 401,
+      detail: 'You may not write field "title"'
+    });
+  });
+
+
+  it("approves field write at update via unchanged value", async function () {
     factory.addResource('grants').withAttributes({ mayUpdateResource: true });
     let schema = await Schema.loadFrom(factory.getModels());
     let action = update({
@@ -263,7 +331,71 @@ describe('schema/auth', function() {
     expect(errors).to.deep.equal([]);
   });
 
-  it.skip("rejects field write at update", async function () {
+  it("approves field write at update when it matches default", async function () {
+    factory.addResource('grants').withAttributes({ mayUpdateResource: true });
+    let schema = await Schema.loadFrom(factory.getModels());
+    let action = update({
+      type: 'articles',
+      id: '1',
+      attributes: {
+        reviewed: true
+      }
+    },{
+      type: 'articles',
+      id: '1',
+      attributes: {
+        reviewed: false
+      }
+    });
+    let errors = await schema.validationErrors(action);
+    expect(errors).to.deep.equal([]);
+  });
+
+  it("allows inclusion of non-changed field updateDefault will change it", async function () {
+    factory.addResource('grants').withAttributes({ mayUpdateResource: true });
+    let schema = await Schema.loadFrom(factory.getModels());
+    let action = update({
+      type: 'articles',
+      id: '1',
+      attributes: {
+        reviewed: true
+      }
+    },{
+      type: 'articles',
+      id: '1',
+      attributes: {
+        reviewed: true
+      }
+    });
+    let errors = await schema.validationErrors(action);
+    expect(errors).to.deep.equal([]);
+    expect(action.finalDocument.attributes.reviewed).to.equal(false);
+  });
+
+  it("rejects write of field that differs from updateDefault", async function () {
+    factory.addResource('grants').withAttributes({ mayUpdateResource: true });
+    let schema = await Schema.loadFrom(factory.getModels());
+    let action = update({
+      type: 'articles',
+      id: '1',
+      attributes: {
+        reviewed: true
+      }
+    },{
+      type: 'articles',
+      id: '1',
+      attributes: {
+        reviewed: null
+      }
+    });
+    let errors = await schema.validationErrors(action);
+    expect(errors).collectionContains({
+      status: 401,
+      detail: 'You may not write field "reviewed"'
+    });
+  });
+
+  it("rejects field write at update", async function () {
     factory.addResource('grants').withAttributes({ mayUpdateResource: true });
     let schema = await Schema.loadFrom(factory.getModels());
     let action = update({

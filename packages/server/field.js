@@ -1,12 +1,27 @@
 const Error = require('@cardstack/data-source/error');
 
 module.exports = class Field {
-  constructor(model, plugins, constraints, allGrants) {
+  constructor(model, plugins, constraints, allGrants, authLog) {
     this.id = model.id;
+    this.authLog = authLog;
     this.fieldType = model.attributes['field-type'];
     this.searchable = model.attributes.searchable;
-    this.defaultAtUpdate = model.attributes['default-at-update'];
-    this.defaultAtCreate = model.attributes['default-at-create'];
+
+    if (model.attributes.hasOwnProperty('default-at-update')) {
+      // The extra wrapper here allows us to distinguish whether the
+      // default value is null vs when the default value is not
+      // present.
+      this.defaultAtUpdate = { value: model.attributes['default-at-update'] };
+    } else {
+      this.defaultAtUpdate = null;
+    }
+
+    if (model.attributes.hasOwnProperty('default-at-create')) {
+      this.defaultAtCreate = { value: model.attributes['default-at-create'] };
+    } else {
+      this.defaultAtCreate = null;
+    }
+
     this.plugin = plugins.fieldType(this.fieldType);
     this.isRelationship = this.plugin.isRelationship;
 
@@ -45,6 +60,9 @@ module.exports = class Field {
   }
 
   _validateFormat(value, errors) {
+    // every field is allowed to be null -- validator plugins only run
+    // when a non-null value is present. If you don't want to allow
+    // null, you can do that via a constraint instead.
     if (value != null && !this.plugin.valid(value)) {
       errors.push(new Error(`${JSON.stringify(value)} is not a valid value for field "${this.id}"`, {
         status: 400,
@@ -53,62 +71,71 @@ module.exports = class Field {
     }
   }
 
-  async applyDefault(pendingChange) {
+  async _defaultValueFor(pendingChange /*, context */) {
     let defaultInput;
     if (!pendingChange.originalDocument) {
-      // Creation
-
-      if (this._valueFrom(pendingChange, 'finalDocument') != null) {
-        // The user provided a value at creation, so defaults do not
-        // apply.
-        return;
-      }
-
-      // if there's a creation default, use it. Otherwise an
-      // update default could apply here.
-      if (this.defaultAtCreate != null) {
-        defaultInput = this.defaultAtCreate;
-      } else {
-        defaultInput = this.defaultAtUpdate;
-      }
+      // We are creating. If there's a creation default, use
+      // it. Otherwise an update default could apply here. Otherwise,
+      // all fields default to null.
+      defaultInput = this.defaultAtCreate || this.defaultAtUpdate || { value: null };
     } else {
-      if (this._valueFrom(pendingChange, 'finalDocument') !== this._valueFrom(pendingChange, 'originalDocument')) {
-        // The user is altering this value, so defaults do not apply.
-        return;
-      }
       defaultInput = this.defaultAtUpdate;
     }
 
-    if (defaultInput != null) {
+    if (defaultInput) {
       // A default was set. Now we run it through the plugin
       // implementation, if there is one.
-      let defaultValue;
-      if (typeof this.plugin.generateDefault === 'function') {
-        defaultValue = await this.plugin.generateDefault(defaultInput);
+      if (defaultInput.value != null && typeof this.plugin.generateDefault === 'function') {
+        return { value: await this.plugin.generateDefault(defaultInput.value) };
       } else {
-        defaultValue = defaultInput;
+        return defaultInput;
+      }
+    }
+  }
+
+  async applyDefault(pendingChange,  context) {
+    let defaultValue = await this._defaultValueFor(pendingChange, context);
+    if (defaultValue) {
+      pendingChange.serverProvidedValues.set(this.id,defaultValue.value);
+      if (!pendingChange.originalDocument) {
+        if (this._valueFrom(pendingChange, 'finalDocument') !== undefined) {
+          // The user provided a value at creation, so defaults do not
+          // apply.
+          return;
+        }
+      } else {
+        let newValue = this._valueFrom(pendingChange, 'finalDocument');
+        let oldValue = this._valueFrom(pendingChange, 'originalDocument');
+        if (newValue !== oldValue) {
+          // The user is altering this value, so defaults do not apply.
+          return;
+        }
       }
 
-      // And then set it.
-      pendingChange.serverProvidedValues[this.id] = defaultValue;
       let section = this._sectionName();
       if (!pendingChange.finalDocument[section]) {
         pendingChange.finalDocument[section] = {};
       }
-      pendingChange.finalDocument[section][this.id] = defaultValue;
+      pendingChange.finalDocument[section][this.id] = defaultValue.value;
     }
   }
 
   async validationErrors(pendingChange, context) {
-    let oldValue = this._valueFrom(pendingChange, 'originalDocument');
     let value = this._valueFrom(pendingChange, 'finalDocument');
+    let grant;
 
-    if (oldValue !== value) {
-      if (!this.grants.find(g => g['may-write-field'] && g.matches(null, context))) {
-        return [new Error(`You may not write field "${this.id}"`, {
-          status: 401
-        })];
-      }
+    if (pendingChange.serverProvidedValues.has(this.id) && pendingChange.serverProvidedValues.get(this.id) === value) {
+      this.authLog.debug("approved field write for %s because it matches server provided default", this.id);
+    } else if (pendingChange.originalDocument && value === this._valueFrom(pendingChange, 'originalDocument')) {
+      this.authLog.debug("approved field write for %s because it was unchanged", this.id);
+    } else if ((grant = this.grants.find(g => g['may-write-field'] && g.matches(pendingChange, context)))) {
+      this.authLog.debug("approved field write for %s because of grant %s", this.id, grant.id);
+    } else {
+      // Denied
+      this.authLog.debug("denied field write for %s", this.id);
+      return [new Error(`You may not write field "${this.id}"`, {
+        status: 401
+      })];
     }
 
     let errors = [];

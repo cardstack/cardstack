@@ -248,7 +248,7 @@ describe('schema/validation', function() {
       type: 'things-with-defaults'
     });
     await schema.validate(pending);
-    expect(pending).has.deep.property('serverProvidedValues.karma');
+    expect(pending.serverProvidedValues.has('karma')).is.ok;
     expect(pending.finalDocument).has.deep.property('attributes.karma', 0);
   });
 
@@ -257,9 +257,9 @@ describe('schema/validation', function() {
       type: 'things-with-defaults'
     });
     await schema.validate(pending);
-    expect(pending).has.deep.property('serverProvidedValues.timestamp');
+    expect(pending.serverProvidedValues.has('timestamp')).is.ok;
     expect(pending.finalDocument).has.deep.property('attributes.timestamp');
-    expect(pending.finalDocument.attributes.timestamp).equals(pending.serverProvidedValues.timestamp);
+    expect(pending.finalDocument.attributes.timestamp).equals(pending.serverProvidedValues.get('timestamp'));
   });
 
   it("applies update default at update", async function() {
@@ -279,10 +279,10 @@ describe('schema/validation', function() {
       }
     });
     await schema.validate(pending);
-    expect(pending).has.deep.property('serverProvidedValues.timestamp');
+    expect(pending.serverProvidedValues.has('timestamp')).is.ok;
     expect(pending.finalDocument).has.deep.property('attributes.timestamp');
-    expect(pending.finalDocument.attributes.timestamp).equals(pending.serverProvidedValues.timestamp);
-    expect(pending.originalDocument.attributes.timestamp).not.equals(pending.serverProvidedValues.timestamp);
+    expect(pending.finalDocument.attributes.timestamp).equals(pending.serverProvidedValues.get('timestamp'));
+    expect(pending.originalDocument.attributes.timestamp).not.equals(pending.serverProvidedValues.get('timestamp'));
   });
 
   it("does not apply creation default when user provides a value", async function() {
@@ -293,7 +293,6 @@ describe('schema/validation', function() {
       }
     });
     await schema.validate(pending);
-    expect(pending).not.has.deep.property('serverProvidedValues.karma');
     expect(pending.finalDocument.attributes.karma).equals(10);
   });
 
@@ -310,7 +309,6 @@ describe('schema/validation', function() {
       }
     });
     await schema.validate(pending);
-    expect(pending).not.has.deep.property('serverProvidedValues.timestamp');
     expect(pending.finalDocument.attributes.timestamp).equals('2017-03-14T14:50:00Z');
   });
 

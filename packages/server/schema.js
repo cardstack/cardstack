@@ -6,6 +6,7 @@ const DataSource = require('@cardstack/server/data-source');
 const Grant = require('@cardstack/server/grant');
 const Plugins = require('@cardstack/server/plugins');
 const bootstrapSchema = require('./bootstrap-schema');
+const logger = require('heimdalljs-logger');
 
 module.exports = class Schema {
 
@@ -20,6 +21,8 @@ module.exports = class Schema {
 
   static async loadFrom(models) {
     let plugins = await Plugins.load();
+
+    let authLog = logger('auth');
 
     let constraints = new Map();
     for (let model of models) {
@@ -38,7 +41,7 @@ module.exports = class Schema {
     let fields = new Map();
     for (let model of models) {
       if (model.type === 'fields') {
-        fields.set(model.id, new Field(model, plugins, constraints, grants));
+        fields.set(model.id, new Field(model, plugins, constraints, grants, authLog));
       }
     }
 
