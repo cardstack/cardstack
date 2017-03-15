@@ -29,12 +29,15 @@ module.exports = class SchemaCache {
     return schema;
   }
   async _load(branch) {
-    let { models } = await this.searcher.search(branch, {
+    let { models, page } = await this.searcher.search(branch, {
       filter: {
         type: Schema.ownTypes()
-      }
+      },
+      page: { size: 100 }
     });
-    let schema = await Schema.loadFrom(models);
-    return schema;
+    if (page.cursor) {
+      throw new Error("query for schema models had insufficient page size");
+    }
+    return Schema.loadFrom(models);
   }
 };
