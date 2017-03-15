@@ -1,5 +1,5 @@
 const Change = require('@cardstack/git/change');
-const temp = require('@cardstack/data-source/tests/temp-helper');
+const temp = require('@cardstack/plugin-utils/tests/temp-helper');
 const GitIndexer = require('@cardstack/git/indexer');
 const Indexers = require('@cardstack/server/indexers');
 const { commitOpts, makeRepo } = require('./support');

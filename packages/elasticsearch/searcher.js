@@ -1,6 +1,6 @@
 const makeClient = require('@cardstack/elasticsearch/client');
 const logger = require('heimdalljs-logger');
-const Error = require('@cardstack/data-source/error');
+const Error = require('@cardstack/plugin-utils/error');
 
 class Searcher {
   static branchToIndexName(branch) {

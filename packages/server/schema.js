@@ -1,4 +1,4 @@
-const Error = require('@cardstack/data-source/error');
+const Error = require('@cardstack/plugin-utils/error');
 const Field = require('@cardstack/server/field');
 const Constraint = require('@cardstack/server/constraint');
 const ContentType = require('@cardstack/server/content-type');

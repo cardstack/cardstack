@@ -1,4 +1,4 @@
-const Error = require('@cardstack/data-source/error');
+const Error = require('@cardstack/plugin-utils/error');
 
 module.exports = class Field {
   constructor(model, plugins, constraints, allGrants, authLog) {

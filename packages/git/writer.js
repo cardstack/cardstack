@@ -7,9 +7,9 @@ const crypto = require('crypto');
 const Change = require('./change');
 const os = require('os');
 const process = require('process');
-const Error = require('@cardstack/data-source/error');
+const Error = require('@cardstack/plugin-utils/error');
 const Schema = require('@cardstack/server/schema');
-const PendingChange = require('@cardstack/data-source/pending-change');
+const PendingChange = require('@cardstack/plugin-utils/pending-change');
 
 const pendingChanges = new WeakMap();
 

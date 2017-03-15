@@ -1,4 +1,4 @@
-const Error = require('@cardstack/data-source/error');
+const Error = require('@cardstack/plugin-utils/error');
 const qs = require('qs');
 const { merge } = require('lodash');
 const koaJSONBody = require('koa-json-body');

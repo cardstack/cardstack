@@ -1,6 +1,6 @@
 const Searcher = require('@cardstack/elasticsearch/searcher');
 const SchemaCache = require('@cardstack/server/schema-cache');
-const temp = require('@cardstack/data-source/tests/temp-helper');
+const temp = require('@cardstack/plugin-utils/tests/temp-helper');
 const { makeRepo } = require('@cardstack/git/tests/support');
 const GitIndexer = require('@cardstack/git/indexer');
 const Indexers = require('@cardstack/server/indexers');
