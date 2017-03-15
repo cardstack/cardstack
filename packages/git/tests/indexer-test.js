@@ -24,9 +24,9 @@ describe('git/indexer', function() {
   it('processes first empty branch', async function() {
     let { head } = await makeRepo(root);
     await indexer.update();
-    let aliases = await ea.aliases();
+    let aliases = await ea.contentAliases();
     expect([...aliases.keys()]).to.deep.equal(['master']);
-    let indices = await ea.indices();
+    let indices = await ea.contentIndices();
     expect(indices).to.have.lengthOf(1);
     let indexerState = await ea.indexerState('master', 'git');
     expect(indexerState.commit).to.equal(head);
@@ -71,7 +71,7 @@ describe('git/indexer', function() {
     });
 
     await indexer.update();
-    let originalIndexName = (await ea.aliases()).get('master');
+    let originalIndexName = (await ea.contentAliases()).get('master');
 
     let change = await Change.create(repo, head, 'master');
     let file = await change.get('schema/fields/title.json', { allowUpdate: true });
@@ -83,7 +83,7 @@ describe('git/indexer', function() {
     }));
     await change.finalize(commitOpts());
     await indexer.update();
-    expect((await ea.aliases()).get('master')).to.not.equal(originalIndexName);
+    expect((await ea.contentAliases()).get('master')).to.not.equal(originalIndexName);
   });
 
 

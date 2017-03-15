@@ -22,6 +22,7 @@
 
 const logger = require('heimdalljs-logger');
 const makeClient = require('@cardstack/elasticsearch/client');
+const Searcher = require('@cardstack/elasticsearch/searcher');
 const { isEqual } = require('lodash');
 const BulkOps = require('./bulk-ops');
 const Schema = require('./schema');
@@ -79,7 +80,10 @@ module.exports = class Indexers {
   }
 
   async _esMapping(branch) {
-    let mapping = await this.es.indices.getMapping({ index: branch, ignore: [404] });
+    let mapping = await this.es.indices.getMapping({
+      index: Searcher.branchToIndexName(branch),
+      ignore: [404]
+    });
     if (mapping.status === 404) {
       return null;
     } else {
@@ -89,7 +93,7 @@ module.exports = class Indexers {
   }
 
   _tempIndexName(branch) {
-    return `${branch}_${Math.floor(Math.random() * Number.MAX_SAFE_INTEGER)}`;
+    return Searcher.branchToIndexName(`${branch}_${Math.floor(Math.random() * Number.MAX_SAFE_INTEGER)}`);
   }
 
   _stableMapping(have, want) {
@@ -103,7 +107,7 @@ module.exports = class Indexers {
 
   async _loadMeta(branch, updater) {
     return this.es.getSource({
-      index: branch,
+      index: Searcher.branchToIndexName(branch),
       type: 'meta',
       id: updater.name,
       ignore: [404]
@@ -113,7 +117,7 @@ module.exports = class Indexers {
   async _saveMeta(branch, updater, newMeta, privateOps) {
     await privateOps.bulkOps.add({
       index: {
-        _index: branch,
+        _index: Searcher.branchToIndexName(branch),
         _type: 'meta',
         _id: updater.name,
       }
@@ -142,14 +146,18 @@ module.exports = class Indexers {
   // 2. Update the canonical elasticsearch alias for the branch to point at newIndex
   // 3. Delete any old index that we just replaced.
   async _reindex(newIndex, branch) {
-    let alias = await this.es.indices.getAlias({ name: branch, ignore: [404] });
+    let branchIndex = Searcher.branchToIndexName(branch);
+    let alias = await this.es.indices.getAlias({
+      name: branchIndex,
+      ignore: [404]
+    });
     if (alias.status === 404) {
       this.log.info('%s is new, nothing to reindex', branch);
     } else {
       this.log.info('reindexing %s', branch);
       await this.es.reindex({
         body: {
-          source: { index: branch },
+          source: { index: branchIndex },
           dest: { index: newIndex }
         }
       });
@@ -158,8 +166,8 @@ module.exports = class Indexers {
     await this.es.indices.updateAliases({
       body: {
         actions: [
-          { remove: { index: '_all', alias: branch } },
-          { add: { index: newIndex, alias: branch } }
+          { remove: { index: '_all', alias: branchIndex } },
+          { add: { index: newIndex, alias: branchIndex } }
         ]
       }
     });
@@ -219,7 +227,7 @@ class Operations {
     let searchDoc = jsonapiDocToSearchDoc(doc);
     await bulkOps.add({
       index: {
-        _index: branch,
+        _index: Searcher.branchToIndexName(branch),
         _type: type,
         _id: id,
       }
@@ -230,7 +238,7 @@ class Operations {
     let { bulkOps, branch, log } = opsPrivate.get(this);
     await bulkOps.add({
       delete: {
-        _index: branch,
+        _index: Searcher.branchToIndexName(branch),
         _type: type,
         _id: id
       }
