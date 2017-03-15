@@ -22,7 +22,7 @@ module.exports = class SchemaCache {
     if (!this.cache.has(branch)) {
       // we synchronously place a Promise into the cache. This ensures
       // that a subsequent lookup that arrives while we are still
-      // working on this one will simple join it.
+      // working on this one will join it instead of racing it.
       this.cache.set(branch, this._load(branch));
     }
     let schema = await this.cache.get(branch);
