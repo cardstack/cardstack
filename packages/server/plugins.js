@@ -1,6 +1,38 @@
 /*
   This module is scaffolding until we have a safe and dynamic plugin
   loader.
+
+  Things a plugin will need to be able to provide:
+
+   - ember components, helpers, models, etc. Like any other ember-addon.
+
+   - Constraint implementations
+
+   - Field implementations
+
+   - base content (which necessarily includes both meta content (like
+     content-types, fields, grants, etc) and content (like a welcome
+     Post or default first User). These need to be layered beneath the
+     user's own content, so they're overridable.
+
+   - data-source implementations, which are compromised any of Writer,
+     Indexer, and Searcher.
+
+   - server endpoint implementations. These will have access to some
+     curated set of public API involving the configured searcher and
+     writers, etc.
+
+   - authentication providers, which is
+
+        - a function that maps from a token to { userRef, groupRefs
+        }. Where by ref I mean { type, id}.
+
+        - an ember service (API TBD) that exposes userRef to the app.
+
+     An authentication provider can also be packaged with things like
+     server endpoints (for issuing tokens) and content types (like a
+     base user model and its fields) for a more complete experience.
+
 */
 
 const denodeify = require('denodeify');
