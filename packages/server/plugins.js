@@ -41,7 +41,7 @@ const path = require('path');
 const readdir = denodeify(fs.readdir);
 
 module.exports = class Plugins {
-  static async load() {
+  static async load(/* configModels */) {
     return new this(await this._loadFieldTypes(), await this._loadConstraintTypes());
   }
   static async _loadFieldTypes() {

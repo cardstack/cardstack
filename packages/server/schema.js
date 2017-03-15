@@ -16,11 +16,11 @@ module.exports = class Schema {
   }
 
   static ownTypes() {
-    return ['content-types', 'fields', 'constraints', 'data-sources', 'grants'];
+    return ['content-types', 'fields', 'constraints', 'data-sources', 'grants', 'plugin-configs'];
   }
 
   static async loadFrom(models) {
-    let plugins = await Plugins.load();
+    let plugins = await Plugins.load(models.filter(model => model.type === 'plugin-configs'));
 
     let authLog = logger('auth');
 
