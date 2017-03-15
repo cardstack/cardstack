@@ -162,10 +162,20 @@ describe('schema/auth', function() {
   });
 
   it.skip("approves field write at creation via grant", async function () {
-
+    factory.addResource('grants').withAttributes({ mayCreateResource: true, mayWriteField: true });
+    let schema = await Schema.loadFrom(factory.getModels());
+    let action = create({
+      type: 'articles',
+      id: '1',
+      attributes: {
+        title: "hello"
+      }
+    });
+    let errors = await schema.validationErrors(action);
+    expect(errors).deep.equal([]);
   });
 
-  it.skip("approves field write at creation via default value", async function () {
+  it.skip("approves null field write at creation when no default is set", async function () {
     factory.addResource('grants').withAttributes({ mayCreateResource: true });
     let schema = await Schema.loadFrom(factory.getModels());
     let action = create({
@@ -179,7 +189,36 @@ describe('schema/auth', function() {
     expect(errors).deep.equal([]);
   });
 
-  it.skip("approves field write at creation via user-provided default value", async function () {
+  it.skip("rejects null field write at creation when default is set", async function () {
+    factory.addResource('grants').withAttributes({ mayCreateResource: true });
+    let schema = await Schema.loadFrom(factory.getModels());
+    let action = create({
+      type: 'articles',
+      id: '1',
+      attributes: {
+        coolness: null
+      }
+    });
+    let errors = await schema.validationErrors(action);
+    expect(errors).collectionContains({
+      status: 401,
+      detail: 'You may not write field "coolness"'
+    });
+  });
+
+
+  it("approves field write at creation when it matches default value", async function () {
+    factory.addResource('grants').withAttributes({ mayCreateResource: true });
+    let schema = await Schema.loadFrom(factory.getModels());
+    let action = create({
+      type: 'articles',
+      id: '1',
+      attributes: {
+        coolness: 0
+      }
+    });
+    let errors = await schema.validationErrors(action);
+    expect(errors).to.deep.equal([]);
   });
 
 
@@ -205,11 +244,46 @@ describe('schema/auth', function() {
   });
 
   it.skip("approves field write at update via unchanged value", async function () {
-
+    factory.addResource('grants').withAttributes({ mayUpdateResource: true });
+    let schema = await Schema.loadFrom(factory.getModels());
+    let action = update({
+      type: 'articles',
+      id: '1',
+      attributes: {
+        coolness: 6
+      }
+    },{
+      type: 'articles',
+      id: '1',
+      attributes: {
+        coolness: 6
+      }
+    });
+    let errors = await schema.validationErrors(action);
+    expect(errors).to.deep.equal([]);
   });
 
   it.skip("rejects field write at update", async function () {
-
+    factory.addResource('grants').withAttributes({ mayUpdateResource: true });
+    let schema = await Schema.loadFrom(factory.getModels());
+    let action = update({
+      type: 'articles',
+      id: '1',
+      attributes: {
+        coolness: 6
+      }
+    },{
+      type: 'articles',
+      id: '1',
+      attributes: {
+        coolness: 62
+      }
+    });
+    let errors = await schema.validationErrors(action);
+    expect(errors).collectionContains({
+      status: 401,
+      detail: 'You may not write field "coolness"'
+    });
   });
 
 });
