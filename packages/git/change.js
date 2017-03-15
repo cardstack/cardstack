@@ -143,6 +143,9 @@ class FileHandle {
       return (await this.leaf.getBlob()).content();
     }
   }
+  exists() {
+    return !!this.leaf;
+  }
   setContent(buffer) {
     if (typeof buffer === 'string') {
       buffer = Buffer.from(buffer, 'utf8');

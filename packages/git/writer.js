@@ -26,29 +26,36 @@ module.exports = class Writer {
 
   async prepareCreate(branch, user, type, document) {
     return withErrorHandling(document.id, type, async () => {
-      while (true) {
-        try {
-          // 20 bytes is good enough for git, so it's good enough for
-          // me. In practice we probably have a lower collision
-          // probability too, because we're allowed to retry if we know
-          // the id is already in use (so we can really only collide
-          // with things that have not yet merged into our branch).
-          let id;
-          if (document.id == null) {
-            id = this._generateId();
-          } else {
-            id = document.id;
-          }
-          let pending = await this._prepareCreate(branch, user, document, id);
-          return pending;
-        } catch(err) {
-          if (err instanceof Change.OverwriteRejected && document.id == null) {
-            // ignore so our loop can retry
-          } else {
-            throw err;
-          }
+      await this._ensureRepo();
+
+      let change = await Change.create(this.repo, null, branch);
+      let id = document.id;
+      let file;
+      while (id == null) {
+        let candidateId = this._generateId();
+        let candidateFile = await change.get(this._filenameFor(document.type, candidateId), { allowCreate: true });
+        if (!candidateFile.exists()) {
+          id = candidateId;
+          file = candidateFile;
         }
       }
+
+      if (!file) {
+        file = await change.get(this._filenameFor(document.type, id), { allowCreate: true });
+      }
+
+      let gitDocument = { id, type: document.type };
+      if (document.attributes) {
+        gitDocument.attributes = document.attributes;
+      }
+      if (document.relationships) {
+        gitDocument.relationships = document.relationships;
+      }
+
+      let pending = new PendingChange(null, gitDocument, finalizer);
+      let signature = this._commitOptions('create', document.type, id, user);
+      pendingChanges.set(pending, { type: document.type, id, signature, change, file });
+      return pending;
     });
   }
 
@@ -66,9 +73,6 @@ module.exports = class Writer {
       let file = await change.get(this._filenameFor(type, id), { allowUpdate: true });
       let before = JSON.parse(await file.getBuffer());
       let after = patch(before, document);
-      file.setContent(JSON.stringify(after));
-      let signature = this._commitOptions('update', type, id, user);
-
       // we don't write id & type into the actual file (they're part
       // of the filename). But we want them present on the
       // PendingChange as complete valid documents.
@@ -76,9 +80,9 @@ module.exports = class Writer {
       before.type = type;
       after.id = document.id;
       after.type = document.type;
-
+      let signature = this._commitOptions('update', type, id, user);
       let pending = new PendingChange(before, after, finalizer);
-      pendingChanges.set(pending, { type, id, signature, change });
+      pendingChanges.set(pending, { type, id, signature, change, file });
       return pending;
     });
   }
@@ -103,29 +107,6 @@ module.exports = class Writer {
       pendingChanges.set(pending, { type, id, signature, change });
       return pending;
     });
-  }
-
-  async _prepareCreate(branch, user, document, id) {
-    await this._ensureRepo();
-
-    let gitDocument = {};
-    if (document.attributes) {
-      gitDocument.attributes = document.attributes;
-    }
-    if (document.relationships) {
-      gitDocument.relationships = document.relationships;
-    }
-
-    let change = await Change.create(this.repo, null, branch);
-    let file = await change.get(this._filenameFor(document.type, id), { allowCreate: true });
-    file.setContent(JSON.stringify(gitDocument));
-    gitDocument.id = id;
-    gitDocument.type = document.type;
-
-    let pending = new PendingChange(null, gitDocument, finalizer);
-    let signature = this._commitOptions('create', document.type, id, user);
-    pendingChanges.set(pending, { type: document.type, id, signature, change });
-    return pending;
   }
 
   _commitOptions(operation, type, id, user) {
@@ -153,6 +134,11 @@ module.exports = class Writer {
     if (this.idGenerator) {
       return this.idGenerator();
     } else {
+      // 20 bytes is good enough for git, so it's good enough for
+      // me. In practice we probably have a lower collision
+      // probability too, because we're allowed to retry if we know
+      // the id is already in use (so we can really only collide
+      // with things that have not yet merged into our branch).
       return crypto.randomBytes(20).toString('hex');
     }
   }
@@ -198,8 +184,18 @@ async function withErrorHandling(id, type, fn) {
 
 
 async function finalizer(pendingChange) {
-  let { id, type, change, signature } = pendingChanges.get(pendingChange);
+  let { id, type, change, file, signature } = pendingChanges.get(pendingChange);
   return withErrorHandling(id, type, async () => {
+    if (file) {
+      if (pendingChange.finalDocument) {
+        file.setContent(JSON.stringify({
+          attributes: pendingChange.finalDocument.attributes,
+          relationships: pendingChange.finalDocument.relationships
+        }));
+      } else {
+        file.delete();
+      }
+    }
     let version = await change.finalize(signature);
     return { version };
   });

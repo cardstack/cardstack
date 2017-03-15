@@ -58,9 +58,20 @@ describe('git/writer', function() {
           .withAttributes({
             fieldType: 'integer',
             defaultAtCreate: 42
+          }),
+        factory.addResource('fields', 'karma')
+          .withAttributes({
+            fieldType: 'integer',
+            defaultAtUpdate: 0
           })
-
       ]);
+
+    factory.addResource('things-with-defaults', 4)
+      .withAttributes({
+        coolness: 100,
+        karma: 10
+      });
+
     env = await createDefaultEnvironment(factory.getModels());
 
     user = {
@@ -88,12 +99,15 @@ describe('git/writer', function() {
       expect(saved).to.deep.equal({
         attributes: {
           title: 'Second Article'
+        },
+        relationships: {
+          'primary-image': null
         }
       });
     });
 
 
-    it.skip('saves default attribute', async function() {
+    it('saves default attribute', async function() {
       await writers.create('master', user, 'things-with-defaults', {
         id: '1',
         type: 'things-with-defaults',
@@ -117,6 +131,17 @@ describe('git/writer', function() {
       expect(record.type).to.equal('articles');
       let head = await inRepo(env.repoPath).getCommit('master');
       expect(record).has.deep.property('meta.version', head.id);
+    });
+
+    it('returns default attribute', async function() {
+      let record = await writers.create('master', user, 'things-with-defaults', {
+        id: '1',
+        type: 'things-with-defaults',
+      });
+      expect(record.attributes).to.deep.equal({
+        coolness: 42,
+        karma: 0
+      });
     });
 
     it('retries on id collision', async function () {
@@ -383,6 +408,19 @@ describe('git/writer', function() {
       expect(record).has.deep.property('attributes.first-name').equal('Quint');
     });
 
+    it('returns default attribute value', async function() {
+      let record = await writers.update('master', user, 'things-with-defaults', '4', {
+        id: '4',
+        type: 'things-with-defaults',
+        meta: {
+          version: env.head
+        }
+      });
+
+      expect(record).has.deep.property('attributes.coolness').equal(100);
+      expect(record).has.deep.property('attributes.karma').equal(0);
+    });
+
     it('stores unchanged field', async function() {
       await writers.update('master', user, 'people', '1', {
         id: '1',
@@ -411,6 +449,20 @@ describe('git/writer', function() {
       });
       expect(await inRepo(env.repoPath).getJSONContents('master', 'contents/articles/1.json'))
         .deep.property('attributes.title', 'Updated title');
+    });
+
+    it('stores default attribute', async function() {
+      await writers.update('master', user, 'things-with-defaults', '4', {
+        id: '4',
+        type: 'things-with-defaults',
+        meta: {
+          version: env.head
+        }
+      });
+      expect(await inRepo(env.repoPath).getJSONContents('master', 'contents/things-with-defaults/4.json'))
+        .deep.property('attributes.coolness', 100);
+      expect(await inRepo(env.repoPath).getJSONContents('master', 'contents/things-with-defaults/4.json'))
+        .deep.property('attributes.karma', 0);
     });
 
     it('reports merge conflict', async function() {
@@ -593,6 +645,9 @@ describe('git/writer', function() {
       });
       let saved = await inRepo(env.repoPath).getJSONContents('master', `contents/articles/${record.id}.json`);
       expect(saved).to.deep.equal({
+        attributes: {
+          title: null
+        },
         relationships: {
           'primary-image': {
             data: {
