@@ -22,8 +22,7 @@
     "ember-cli-htmlbars": "^1.1.1",
     "ember-elsewhere": "^1.0.0",
     "ember-toolbars": "^0.2.2",
-    "liquid-fire": "^0.27.1",
-    "squishable-container": "^0.1.0"
+    "liquid-fire": "^0.27.1"
   },
   "devDependencies": {
     "broccoli-asset-rev": "^2.4.5",
@@ -42,7 +41,8 @@
     "ember-load-initializers": "^0.6.0",
     "ember-resolver": "^2.0.3",
     "ember-source": "~2.12.0",
-    "loader.js": "^4.2.3"
+    "loader.js": "^4.2.3",
+    "squishable-container": "^0.1.0"
   },
   "engines": {
     "node": ">= 4"
