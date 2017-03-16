@@ -10,8 +10,7 @@ module.exports = {
     'no-constant-condition': ["error", { checkLoops: false }],
     'require-yield': 0,
     'no-var': "error",
-    semi: ["error", "always"],
-    'no-warning-comments': 'error'
+    semi: ["error", "always"]
   },
   globals: {
     Promise: false,

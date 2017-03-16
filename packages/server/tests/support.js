@@ -11,8 +11,16 @@ const ElasticAssert = require('@cardstack/elasticsearch/tests/assertions');
 
 exports.createDefaultEnvironment = async function(initialModels = []) {
   let repoPath = await temp.mkdir('cardstack-server-test');
+
+  // TODO: The git writer should make its own local repo when it
+  // starts up the first time.
   let { head, repo } = await makeRepo(repoPath);
 
+
+  // TODO: Instead of making this one-off writer, make SchemaCache
+  // accept seed models so we can inject the first
+  // data-source. Everything else can then be done through the regular
+  // Writers.
   let writer = new GitWriter({ repo: repoPath });
 
   let user = {
@@ -21,9 +29,21 @@ exports.createDefaultEnvironment = async function(initialModels = []) {
   };
 
   let schemaCache = new SchemaCache();
+
+  // TODO: we need Searchers as to Searcher as Writers is to Writer,
+  // so we have a place to route special searches, and so we're not
+  // hard-coding the @cardsatck/elasticsearch/searcher module
+  // here. Should be data-driven instead.
   let searcher = new Searcher(schemaCache);
   let writers = new Writers(schemaCache);
 
+  // TODO: Indexers should just take schemaCache and figure out its
+  // own indexers list. Need to figure out how this plays with the
+  // branches. In some cases, a "branch" exists because of
+  // configuration on a data-source (like using different postgres
+  // databases to represent "master" vs "production"). But in the git
+  // case, the branches are discovered by the indexer and we have a
+  // circular dependency to break.
   let indexer = new Indexers([new GitIndexer({
     repoPath
   })]);
