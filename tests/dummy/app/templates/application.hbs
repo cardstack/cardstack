@@ -1,9 +1,3 @@
-{{outlet}}
-
-{{cardstack-tools-launcher}}
-
-{{#cardstack-tools-launcher as |launcher|}}
-  <div>tools are active: {{launcher.active}}</div>
-  <button {{action launcher.setActive true}}>Open them</button>
-  <button {{action launcher.toggleActive}}>Toggle them</button>
-{{/cardstack-tools-launcher}}
+{{#cardstack-tools}}
+  {{lorem-text}}
+{{/cardstack-tools}}

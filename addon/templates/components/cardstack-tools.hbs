@@ -1,0 +1,14 @@
+{{#toolbar-manager}}
+  {{#squishable-container}}
+    {{yield}}
+  {{/squishable-container}}
+
+  {{#fixed-within-toolbars top=0 right=0}}
+    {{cardstack-tools-launcher}}
+  {{/fixed-within-toolbars}}
+
+{{/toolbar-manager}}
+
+{{#if tools.active}}
+  {{in-right-toolbar show=(component "cardstack-toolbox") }}
+{{/if}}
