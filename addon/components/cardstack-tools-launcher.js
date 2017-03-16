@@ -3,14 +3,15 @@ import layout from '../templates/components/cardstack-tools-launcher';
 
 export default Ember.Component.extend({
   layout,
-  toolsAvailable: true,
-  active: false,
+  tools: Ember.inject.service('cardstack-tools'),
+  toolsAvailable: Ember.computed.alias('tools.available'),
+  active: Ember.computed.alias('tools.active'),
   actions: {
     setActive(isActive) {
-      this.set('active', isActive);
+      this.get('tools').setActive(isActive);
     },
     toggleActive() {
-      this.set('active', !this.get('active'));
+      this.get('tools').setActive(!this.get('active'));
     }
   }
 });
