@@ -5,7 +5,6 @@ const {
 const Searcher = require('@cardstack/elasticsearch/searcher');
 const SchemaCache = require('@cardstack/server/schema-cache');
 const { uniq } = require('lodash');
-const bootstrapSchema = require('@cardstack/server/bootstrap-schema');
 
 describe('searcher', function() {
 
@@ -113,7 +112,7 @@ describe('searcher', function() {
         }
       });
     }
-    await indexRecords(records.concat(bootstrapSchema));
+    await indexRecords(records);
   });
 
   after(async function() {
@@ -124,7 +123,7 @@ describe('searcher', function() {
     let { models } = await searcher.search('master', {
       page: { size: 1000 }
     });
-    expect(models).to.have.length(fixtures.length + bootstrapSchema.length + 20);
+    expect(models).to.have.length(fixtures.length + 20);
   });
 
   it('can be searched via queryString', async function() {
