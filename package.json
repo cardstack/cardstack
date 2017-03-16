@@ -21,7 +21,7 @@
     "ember-cli-babel": "^5.1.7",
     "ember-cli-htmlbars": "^1.1.1",
     "ember-elsewhere": "^1.0.0",
-    "ember-toolbars": "^0.2.2",
+    "ember-toolbars": "^0.2.3",
     "liquid-fire": "^0.27.1"
   },
   "devDependencies": {

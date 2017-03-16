@@ -1,11 +1,15 @@
 .cardstack-tools-launcher {
     background-color: green;
+    cursor: pointer;
 }
 
 .cardstack-toolbox {
     width: 41.0vw;
     height: 100vh;
     background-color: grey;
+
+    /* no margin collapse */
+    padding: 0.1px;
 }
 @media (min-width: 1000px) {
     .cardstack-toolbox {
@@ -28,6 +32,7 @@
     }
 }
 
-.cardstack-toolbox > div {
-    overflow: scroll;
+.cardstack-header {
+    min-height: 2.625em
+    background-color: grey;
 }
