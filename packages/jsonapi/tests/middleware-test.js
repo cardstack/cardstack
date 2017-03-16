@@ -24,12 +24,12 @@ describe('jsonapi', function() {
 
     articleType.withRelated('fields', [
       factory.addResource('fields', 'title')
-        .withAttributes({ fieldType: 'string' }),
+        .withAttributes({ fieldType: '@cardstack/core-types::string' }),
       factory.addResource('fields', 'body')
-        .withAttributes({ fieldType: 'string' })
+        .withAttributes({ fieldType: '@cardstack/core-types::string' })
         .withRelated('constraints', [
           factory.addResource('constraints')
-            .withAttributes({ constraintType: 'not-null' })
+            .withAttributes({ constraintType: '@cardstack/core-types::not-null' })
         ])
     ]);
 

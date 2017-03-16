@@ -5,6 +5,7 @@ const {
 const Searcher = require('@cardstack/elasticsearch/searcher');
 const SchemaCache = require('@cardstack/server/schema-cache');
 const { uniq } = require('lodash');
+const bootstrapSchema = require('@cardstack/server/bootstrap-schema');
 
 describe('searcher', function() {
 
@@ -40,35 +41,35 @@ describe('searcher', function() {
       type: 'fields',
       id: 'firstName',
       attributes: {
-        'field-type': 'string'
+        'field-type': '@cardstack/core-types::string'
       }
     },
     {
       type: 'fields',
       id: 'title',
       attributes: {
-        'field-type': 'string'
+        'field-type': '@cardstack/core-types::string'
       }
     },
     {
       type: 'fields',
       id: 'color',
       attributes: {
-        'field-type': 'string'
+        'field-type': '@cardstack/core-types::string'
       }
     },
     {
       type: 'fields',
       id: 'lastName',
       attributes: {
-        'field-type': 'string'
+        'field-type': '@cardstack/core-types::string'
       }
     },
     {
       type: 'fields',
       id: 'age',
       attributes: {
-        'field-type': 'integer'
+        'field-type': '@cardstack/core-types::integer'
       }
     },
     {
@@ -112,7 +113,7 @@ describe('searcher', function() {
         }
       });
     }
-    await indexRecords(records);
+    await indexRecords(records.concat(bootstrapSchema));
   });
 
   after(async function() {
@@ -123,7 +124,7 @@ describe('searcher', function() {
     let { models } = await searcher.search('master', {
       page: { size: 1000 }
     });
-    expect(models).to.have.length(fixtures.length + 20);
+    expect(models).to.have.length(fixtures.length + bootstrapSchema.length + 20);
   });
 
   it('can be searched via queryString', async function() {

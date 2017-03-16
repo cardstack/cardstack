@@ -3,13 +3,14 @@ module.exports = class DataSource {
     this.id = model.id;
     this.sourceType = model.attributes['source-type'];
     this._writer = null;
-    this.params = model.attributes.params;
-    this._Writer = plugins.writer(this.sourceType);
+    this._params = model.attributes.params;
+    this._Writer = plugins.lookup('writers', this.sourceType);
+    this._writer = null;
   }
   get writer() {
     if (!this._writer) {
       if (this._Writer) {
-        this._writer = new (this._Writer)(this.params);
+        this._writer = new (this._Writer)(this._params);
       }
     }
     return this._writer;

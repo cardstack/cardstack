@@ -13,15 +13,15 @@ describe('schema/auth', function() {
     factory.addResource('content-types', 'articles')
       .withRelated('fields', [
         factory.addResource('fields', 'title')
-          .withAttributes({ fieldType: 'string' }),
+          .withAttributes({ fieldType: '@cardstack/core-types::string' }),
         factory.addResource('fields', 'coolness')
           .withAttributes({
-            fieldType: 'integer',
+            fieldType: '@cardstack/core-types::integer',
             defaultAtCreate: 0
           }),
         factory.addResource('fields', 'reviewed')
           .withAttributes({
-            fieldType: 'boolean',
+            fieldType: '@cardstack/core-types::boolean',
             defaultAtUpdate: false
           })
       ]);
@@ -30,7 +30,6 @@ describe('schema/auth', function() {
       .withRelated('fields', [
         factory.getResource('fields', 'title')
       ]);
-
   });
 
   afterEach(async function() {

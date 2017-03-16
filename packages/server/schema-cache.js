@@ -7,7 +7,7 @@ class BootstrapSchemaCache {
   }
   async schemaForBranch() {
     if (!this.schema) {
-      this.schema = await Schema.bootstrap();
+      this.schema = await Schema.loadFrom([]);
     }
     return this.schema;
   }

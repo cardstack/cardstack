@@ -39,60 +39,107 @@ const denodeify = require('denodeify');
 const fs = require('fs');
 const path = require('path');
 const readdir = denodeify(fs.readdir);
+const log = require('heimdalljs-logger')('plugins');
+
+const featureTypes = [
+  'constraints',
+  'fields',
+  'writers'
+];
+const javascriptPattern = /(.*)\.js$/;
 
 module.exports = class Plugins {
-  static async load(/* configModels */) {
-    return new this(await this._loadFieldTypes(), await this._loadConstraintTypes());
+  static async load(configModels) {
+    let features = (await Promise.all(configModels.map(loadPlugin))).reduce((a,b) => a.concat(b), []);
+    return new this(features);
   }
-  static async _loadFieldTypes() {
-    let fieldTypes = new Map();
-    let files = await readdir(path.dirname(require.resolve('@cardstack/core-field-types')));
-    for (let file of files) {
-      let m = /(.*)\.js$/.exec(file);
-      if (m) {
-        fieldTypes.set(m[1], { __cardstack_plugin_load_path: `@cardstack/core-field-types/${m[1]}` });
+  constructor(features) {
+    for (let featureType of featureTypes) {
+      this[featureType] = new Map();
+    }
+    for (let feature of features) {
+      let qualifiedName;
+      if (feature.name) {
+        qualifiedName = `${feature.module}::${feature.name}`;
+      } else {
+        qualifiedName = feature.module;
       }
-    }
-    return fieldTypes;
-  }
-  static async _loadConstraintTypes() {
-    let constraintTypes = new Map();
-    let files = await readdir(path.dirname(require.resolve('@cardstack/core-constraint-types')));
-    for (let file of files) {
-      let m = /(.*)\.js$/.exec(file);
-      if (m) {
-        constraintTypes.set(m[1], { __cardstack_plugin_load_path: `@cardstack/core-constraint-types/${m[1]}` });
-      }
-    }
-    return constraintTypes;
-  }
-  constructor(fieldTypes, constraintTypes) {
-    this.fieldTypes = fieldTypes;
-    this.constraintTypes = constraintTypes;
-  }
-  fieldType(name) {
-    return this._lookup(name, this.fieldTypes);
-  }
-  constraintType(name) {
-    return this._lookup(name, this.constraintTypes);
-  }
-  writer(name) {
-    // for now, only this one
-    if (name === 'git') {
-      return require('@cardstack/git/writer');
+      this[feature.featureType].set(qualifiedName, feature);
     }
   }
-  _lookup(name, where) {
-    let entry = where.get(name);
-    if (!entry) {
-      throw new Error(`No such field type ${name}`);
+
+  lookup(featureType, fullyQualifiedName) {
+    if (!this[featureType]) {
+      throw new Error(`Don't understand featureType ${featureType}`);
     }
-    if (entry.__cardstack_plugin_load_path) {
-      let module = require(entry.__cardstack_plugin_load_path);
-      where.set(name, module);
-      return module;
-    } else {
-      return entry;
+    let feature = this[featureType].get(fullyQualifiedName);
+    if (!feature) {
+      throw new Error(`Unknown ${featureType} ${fullyQualifiedName}`);
     }
+    if (!feature.cached) {
+      feature.cached = require(feature.loadPath);
+    }
+    return feature.cached;
   }
 };
+
+async function loadPlugin(pluginConfig) {
+  let moduleName = pluginConfig.id;
+  let packageJSON = path.join(moduleName, 'package.json');
+  let moduleRoot = path.dirname(require.resolve(packageJSON));
+  let json = require(packageJSON);
+  if (!json.keywords || !json.keywords.includes('cardstack-plugin') || !json['cardstack-plugin']) {
+    log.warn(`${moduleName} does not appear to be a cardstack plugin`);
+    return [];
+  }
+  if (json['cardstack-plugin']['api-version'] !== 1) {
+    log.warn(`${moduleName} has some fancy cardstack-plugin.version I don't understand. Trying anyway.`);
+  }
+  let customSource = json['cardstack-plugin'].src;
+  if (customSource) {
+    moduleRoot = path.join(moduleRoot, customSource);
+  }
+  return discoverFeatures(moduleName, moduleRoot);
+}
+
+async function discoverFeatures(moduleName, moduleRoot) {
+  let features = [];
+  for (let featureType of featureTypes) {
+    try {
+      let files = await readdir(path.join(moduleRoot, featureType));
+      for (let file of files) {
+        let m = javascriptPattern.exec(file);
+        if (m) {
+          features.push({
+            module: moduleName,
+            featureType,
+            name: m[1],
+            loadPath: path.join(moduleRoot, featureType, file),
+            cached: null
+          });
+        }
+      }
+    } catch (err) {
+      if (err.code !== 'ENOENT' && err.code !== 'ENOTDIR') {
+        throw err;
+      }
+    }
+
+    let filename = path.join(moduleRoot, singularize(featureType) + '.js');
+    if (fs.existsSync(filename)) {
+      features.push({
+        module: moduleName,
+        featureType,
+        name: null,
+        loadPath: filename,
+        cached: null
+      });
+    }
+  }
+  return features;
+}
+
+
+function singularize(name) {
+  return name.replace(/s$/, '');
+}

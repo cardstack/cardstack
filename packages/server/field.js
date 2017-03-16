@@ -22,7 +22,7 @@ module.exports = class Field {
       this.defaultAtCreate = null;
     }
 
-    this.plugin = plugins.fieldType(this.fieldType);
+    this.plugin = plugins.lookup('fields', this.fieldType);
     this.isRelationship = this.plugin.isRelationship;
 
     if (model.relationships && model.relationships.constraints && model.relationships.constraints.data) {

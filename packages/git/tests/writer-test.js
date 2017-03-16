@@ -20,16 +20,16 @@ describe('git/writer', function() {
     factory.addResource('content-types', 'articles')
       .withRelated('data-source', { type: 'data-sources', id: 'default-git' })
       .withRelated('fields', [
-        factory.addResource('fields', 'title').withAttributes({ fieldType: 'string' }),
-        factory.addResource('fields', 'primary-image').withAttributes({ fieldType: 'belongs-to' })
+        factory.addResource('fields', 'title').withAttributes({ fieldType: '@cardstack/core-types::string' }),
+        factory.addResource('fields', 'primary-image').withAttributes({ fieldType: '@cardstack/core-types::belongs-to' })
       ]);
 
     factory.addResource('content-types', 'people')
       .withRelated('data-source', { type: 'data-sources', id: 'default-git' })
       .withRelated('fields', [
-        factory.addResource('fields', 'first-name').withAttributes({ fieldType: 'string' }),
-        factory.addResource('fields', 'last-name').withAttributes({ fieldType: 'string' }),
-        factory.addResource('fields', 'age').withAttributes({ fieldType: 'integer' })
+        factory.addResource('fields', 'first-name').withAttributes({ fieldType: '@cardstack/core-types::string' }),
+        factory.addResource('fields', 'last-name').withAttributes({ fieldType: '@cardstack/core-types::string' }),
+        factory.addResource('fields', 'age').withAttributes({ fieldType: '@cardstack/core-types::integer' })
       ]);
 
     factory.addResource('articles', 1)
@@ -56,12 +56,12 @@ describe('git/writer', function() {
       .withRelated('fields', [
         factory.addResource('fields', 'coolness')
           .withAttributes({
-            fieldType: 'integer',
+            fieldType: '@cardstack/core-types::integer',
             defaultAtCreate: 42
           }),
         factory.addResource('fields', 'karma')
           .withAttributes({
-            fieldType: 'integer',
+            fieldType: '@cardstack/core-types::integer',
             defaultAtUpdate: 0
           })
       ]);

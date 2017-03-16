@@ -32,7 +32,7 @@ exports.createDefaultEnvironment = async function(initialModels = []) {
     type: 'data-sources',
     id: 'default-git',
     attributes: {
-      'source-type': 'git',
+      'source-type': '@cardstack/git',
       params: { repo: repoPath }
     }
   });

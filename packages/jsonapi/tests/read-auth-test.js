@@ -49,7 +49,7 @@ describe('auth/read', function() {
         type: 'constraints',
         id: '0',
         attributes: {
-          'constraint-type': 'not-null'
+          'constraint-type': '@cardstack/core-types::not-null'
         }
       },
       {

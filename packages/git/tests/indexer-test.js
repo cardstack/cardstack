@@ -60,7 +60,7 @@ describe('git/indexer', function() {
       }),
       'schema/fields/title.json': JSON.stringify({
         attributes: {
-          'field-type': 'string'
+          'field-type': '@cardstack/core-types::string'
         }
       }),
       'contents/articles/hello-world.json': JSON.stringify({
@@ -77,7 +77,7 @@ describe('git/indexer', function() {
     let file = await change.get('schema/fields/title.json', { allowUpdate: true });
     file.setContent(JSON.stringify({
       attributes: {
-        'field-type': 'string',
+        'field-type': '@cardstack/core-types::string',
         'searchable': false
       }
     }));

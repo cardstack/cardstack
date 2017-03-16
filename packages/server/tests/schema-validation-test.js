@@ -16,7 +16,7 @@ describe('schema/validation', function() {
       'data-source',
       factory.addResource('data-sources')
         .withAttributes({
-          sourceType: 'git',
+          sourceType: '@cardstack/git',
           params: {
             repo: 'http://example.git/repo.git'
           }
@@ -24,26 +24,26 @@ describe('schema/validation', function() {
 
     articleType.withRelated('fields', [
       factory.addResource('fields', 'title')
-        .withAttributes({ fieldType: 'string' })
+        .withAttributes({ fieldType: '@cardstack/core-types::string' })
         .withRelated('constraints', [
           factory.addResource('constraints')
             .withAttributes({
-              constraintType: 'length',
+              constraintType: '@cardstack/core-types::length',
               parameters: { max: 40 }
             })
         ]),
       factory.addResource('fields', 'published-date')
         .withAttributes({
-          fieldType: 'date',
+          fieldType: '@cardstack/core-types::date',
           searchable: false
         })
         .withRelated('constraints', [
           factory.addResource('constraints')
-            .withAttributes({ constraintType: 'not-null' })
+            .withAttributes({ constraintType: '@cardstack/core-types::not-null' })
         ]),
       factory.addResource('fields', 'primary-image')
         .withAttributes({
-          fieldType: 'belongs-to'
+          fieldType: '@cardstack/core-types::belongs-to'
         })
     ]);
 
@@ -56,12 +56,12 @@ describe('schema/validation', function() {
       .withRelated('fields', [
         factory.addResource('fields', 'timestamp')
           .withAttributes({
-            fieldType: 'date',
+            fieldType: '@cardstack/core-types::date',
             defaultAtUpdate: 'now'
           }),
         factory.addResource('fields', 'karma')
           .withAttributes({
-            fieldType: 'integer',
+            fieldType: '@cardstack/core-types::integer',
             defaultAtCreate: 0
           })
       ]);

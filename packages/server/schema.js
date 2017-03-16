@@ -5,21 +5,16 @@ const ContentType = require('@cardstack/server/content-type');
 const DataSource = require('@cardstack/server/data-source');
 const Grant = require('@cardstack/server/grant');
 const Plugins = require('@cardstack/server/plugins');
-const bootstrapSchema = require('./bootstrap-schema');
 const logger = require('heimdalljs-logger');
+const bootstrapSchema = require('./bootstrap-schema');
 
 module.exports = class Schema {
-
-  static async bootstrap() {
-    // Our schema itself has a schema. This meta-schema isn't editable.
-    return this.loadFrom(bootstrapSchema);
-  }
-
   static ownTypes() {
     return ['content-types', 'fields', 'constraints', 'data-sources', 'grants', 'plugin-configs'];
   }
 
   static async loadFrom(models) {
+    models = bootstrapSchema.concat(models);
     let plugins = await Plugins.load(models.filter(model => model.type === 'plugin-configs'));
 
     let authLog = logger('auth');
