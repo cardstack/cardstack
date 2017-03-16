@@ -1,0 +1,7 @@
+.cardstack-tools-launcher {
+    background-color: blue;
+}
+
+.cardstack-tools-launcher.active {
+    border: 1px solid red;
+}
