@@ -1,3 +1,33 @@
 .cardstack-tools-launcher {
     background-color: green;
 }
+
+.cardstack-toolbox {
+    width: 41.0vw;
+    height: 100vh;
+    background-color: grey;
+}
+@media (min-width: 1000px) {
+    .cardstack-toolbox {
+        width: 34.0vw;
+    }
+}
+@media (min-width: 1250px) {
+    .cardstack-toolbox {
+        width: 25.0vw;
+    }
+}
+@media (min-width: 1563px) {
+    .cardstack-toolbox {
+        width: 16.0vw;
+    }
+}
+@media (min-width: 1923px) {
+    .cardstack-toolbox {
+        width: 7.0vw;
+    }
+}
+
+.cardstack-toolbox > div {
+    overflow: scroll;
+}
