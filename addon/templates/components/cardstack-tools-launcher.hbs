@@ -2,7 +2,7 @@
     {{#if hasBlock }}
       {{yield (hash active=active setActive=(action "setActive") toggleActive=(action "toggleActive") )}}
     {{else}}
-      <svg class="cardstack-tools-launcher {{if active 'active'}}" width="28px" height="28px" viewBox="0 0 28 28" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:sketch="http://www.bohemiancoding.com/sketch/ns">
+      <svg class="cardstack-tools-launcher {{if active 'active'}}" width="28px" height="28px" {{action (action "toggleActive") }} viewBox="0 0 28 28" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:sketch="http://www.bohemiancoding.com/sketch/ns">
     <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd" sketch:type="MSPage">
         <g id="AIA_article_editor_off" sketch:type="MSArtboardGroup" transform="translate(-1069.000000, -72.000000)" fill="#FFFFFF">
             <path d="M1069,72 L1097,72 L1097,100 L1069,100 L1069,72 Z M1094,86 L1083.58269,95 L1072,95 L1076.74721,90.9004494 L1083.68704,90.9004494 L1089.35924,86 L1094,86 Z M1094,81 L1083.58269,90 L1072,90 L1076.74721,85.9005871 L1083.68704,85.9005871 L1089.35924,81 L1094,81 Z M1094,76 L1083.58267,85 L1072,85 L1082.41942,76 L1094,76 Z" id="Rectangle-5-Copy-5" sketch:type="MSShapeGroup"></path>
