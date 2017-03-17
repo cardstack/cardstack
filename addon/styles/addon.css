@@ -1,3 +1,5 @@
+@import "base";
+@import "cardstack-header";
 @import "cs-toggle-switch";
 
 :root {
@@ -8,7 +10,11 @@
     --light-background: #737373;
 
     --bright-foreground: #fff;
-    --font-family: 'Avenir', 'helvetica', sans-serif;
+}
+
+@font-face {
+    font-family: 'Avenir';
+    src: url('../cardstack-suite/Avenir.ttc');
 }
 
 .cardstack-tools-launcher {
@@ -17,10 +23,6 @@
 }
 
 .cardstack-toolbox {
-    font-family: var(--font-family);
-    color: var(--bright-foreground);
-    background-color: var(--normal-background);
-
     width: 41.0vw;
     height: 100vh;
 
@@ -46,11 +48,4 @@
     .cardstack-toolbox {
         width: 7.0vw;
     }
-}
-
-.cardstack-header {
-    min-height: 2.625em;
-    font-family: var(--font-family);
-    color: var(--bright-foreground);
-    background-color: var(--normal-background);
 }

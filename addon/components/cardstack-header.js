@@ -3,5 +3,5 @@ import layout from '../templates/components/cardstack-header';
 
 export default Ember.Component.extend({
   layout,
-  classNames: ['cardstack-header']
+  classNames: ['cardstack-header', 'cardstack-tools']
 });

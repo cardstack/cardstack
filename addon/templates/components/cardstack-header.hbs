@@ -1,5 +1,10 @@
-{{#cs-toggle-switch value=chosen change=(action (mut chosen)) enabled=true}}
-Yes
-{{else}}
-  No
-{{/cs-toggle-switch}}
+<section>
+  <label>Editor</label>
+  {{#cs-toggle-switch value=chosen change=(action (mut chosen)) enabled=true}}
+    On
+  {{else}}
+    Off
+  {{/cs-toggle-switch}}
+</section>
+<section class="spacer">
+</section>
