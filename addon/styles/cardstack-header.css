@@ -7,23 +7,60 @@
     background-color: var(--deep-background);
     display: flex;
 }
-
 .cardstack-header > section {
     background-color: var(--normal-background);
-    line-height: calc(var(--cs-header-height) - 0.3em);
     margin-right: 1px;
-    padding: 0.3em 0.5em 0 0.5em;
-    min-width: 2em;
-    text-align: center;
 }
-
 .cardstack-header > section.spacer {
     flex: 1;
 }
 
-.cardstack-header > section > label {
+.cs-accounts-menu {
+    padding: 0.3em 0.5em 0 0.5em;
+    min-width: 2em;
+    text-align: center;
+    line-height: calc(var(--cs-header-height) - 0.3em);
+}
+
+.cs-editor-switch {
+    padding: 8px 0.5em 0 0.875em;
+    min-width: 104px;
+    line-height: calc(var(--cs-header-height) - 16px);
+}
+.cs-editor-switch > label {
+    font-size: 0.75em;
+    font-weight: 100;
+    float: left;
+    margin-right: 1em;
+    line-height: calc(var(--cs-header-height)/0.75 - 8px/0.75);
+}
+
+
+.cs-view-mode-icon {
+    float: left;
+    padding-top: 9px;
+    padding-left: 20px;
+    padding-right: 12px;
+    height: 24px;
+}
+.cs-view-mode-label {
+    display: inline-block;
+    font-size: 0.75em;
+    font-weight: 100;
+    margin-top: 8px;
+    margin-right: 27px;
+    line-height: calc(var(--cs-header-height)/0.75 - 8px/0.75);
+}
+
+
+.xcardstack-header > section > label {
     font-size: 12px;
     font-weight: 100;
     float: left;
     margin: 0 0.6em;
+}
+
+.cs-view-mode-button > svg {
+    float: left;
+    margin-top: 3px;
 }

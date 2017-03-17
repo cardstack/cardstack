@@ -3,5 +3,5 @@ import layout from '../templates/components/cs-accounts-menu';
 
 export default Ember.Component.extend({
   layout,
-  tagName: 'section'
+  classNames: ['cs-accounts-menu']
 });
