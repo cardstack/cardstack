@@ -1,3 +1,7 @@
+:root {
+    --cardstack-tools-bgcolor: grey;
+}
+
 .cardstack-tools-launcher {
     background-color: green;
     cursor: pointer;
@@ -6,7 +10,7 @@
 .cardstack-toolbox {
     width: 41.0vw;
     height: 100vh;
-    background-color: grey;
+    background-color: var(--cardstack-tools-bgcolor);
 
     /* no margin collapse */
     padding: 0.1px;
@@ -33,6 +37,6 @@
 }
 
 .cardstack-header {
-    min-height: 2.625em
-    background-color: grey;
+    min-height: 2.625em;
+    background-color: var(--cardstack-tools-bgcolor);
 }

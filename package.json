@@ -20,9 +20,12 @@
   "dependencies": {
     "ember-cli-babel": "^5.1.7",
     "ember-cli-htmlbars": "^1.1.1",
+    "ember-cli-postcss": "https://github.com/ef4/ember-cli-postcss#fdb9d27e47adb70376cc00451523ca353595ce36",
     "ember-elsewhere": "^1.0.0",
-    "ember-toolbars": "^0.2.3",
-    "liquid-fire": "^0.27.1"
+    "ember-toolbars": "^0.2.5",
+    "liquid-fire": "^0.27.1",
+    "postcss-cssnext": "^2.10.0",
+    "postcss-import": "^9.1.0"
   },
   "devDependencies": {
     "broccoli-asset-rev": "^2.4.5",
