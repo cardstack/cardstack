@@ -1,5 +1,14 @@
+@import "cs-toggle-switch";
+
 :root {
-    --cardstack-tools-bgcolor: grey;
+    --deep-background: #000;
+    --normal-background: #292A2C;
+    --activating-background: #404040;
+    --active-background: #545454;
+    --light-background: #737373;
+
+    --bright-foreground: #fff;
+    --font-family: 'Avenir', 'helvetica', sans-serif;
 }
 
 .cardstack-tools-launcher {
@@ -8,9 +17,12 @@
 }
 
 .cardstack-toolbox {
+    font-family: var(--font-family);
+    color: var(--bright-foreground);
+    background-color: var(--normal-background);
+
     width: 41.0vw;
     height: 100vh;
-    background-color: var(--cardstack-tools-bgcolor);
 
     /* no margin collapse */
     padding: 0.1px;
@@ -38,5 +50,7 @@
 
 .cardstack-header {
     min-height: 2.625em;
-    background-color: var(--cardstack-tools-bgcolor);
+    font-family: var(--font-family);
+    color: var(--bright-foreground);
+    background-color: var(--normal-background);
 }
