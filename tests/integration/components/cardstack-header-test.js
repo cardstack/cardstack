@@ -6,20 +6,6 @@ moduleForComponent('cardstack-header', 'Integration | Component | cardstack head
 });
 
 test('it renders', function(assert) {
-
-  // Set any properties with this.set('myProperty', 'value');
-  // Handle any actions with this.on('myAction', function(val) { ... });
-
   this.render(hbs`{{cardstack-header}}`);
-
-  assert.equal(this.$().text().trim(), '');
-
-  // Template block usage:
-  this.render(hbs`
-    {{#cardstack-header}}
-      template block text
-    {{/cardstack-header}}
-  `);
-
-  assert.equal(this.$().text().trim(), 'template block text');
+  assert.equal(this.$('label:contains(Editor)').length, 1, 'Found editor switch');
 });
