@@ -23,44 +23,31 @@
 }
 
 .cs-editor-switch {
-    padding: 8px 0.5em 0 0.875em;
-    min-width: 104px;
-    line-height: calc(var(--cs-header-height) - 16px);
+    padding: 0.5rem 0.5rem 0 0.875rem;
+    min-width: 6.5rem;
+    line-height: calc(var(--cs-header-height) - 1em);
 }
 .cs-editor-switch > label {
-    font-size: 0.75em;
+    font-size: 0.75rem;
     font-weight: 100;
     float: left;
-    margin-right: 1em;
-    line-height: calc(var(--cs-header-height)/0.75 - 8px/0.75);
+    margin-right: 1rem;
+    line-height: calc(var(--cs-header-height)/0.75 - 0.75em);
 }
 
 
 .cs-view-mode-icon {
     float: left;
-    padding-top: 9px;
-    padding-left: 20px;
-    padding-right: 12px;
-    height: 24px;
+    padding-top: 0.5625rem;
+    padding-left: 1.25rem;
+    padding-right: 0.75rem;
+    height: 1.5rem;
 }
 .cs-view-mode-label {
     display: inline-block;
     font-size: 0.75em;
     font-weight: 100;
-    margin-top: 8px;
-    margin-right: 27px;
-    line-height: calc(var(--cs-header-height)/0.75 - 8px/0.75);
-}
-
-
-.xcardstack-header > section > label {
-    font-size: 12px;
-    font-weight: 100;
-    float: left;
-    margin: 0 0.6em;
-}
-
-.cs-view-mode-button > svg {
-    float: left;
-    margin-top: 3px;
+    margin-top: 0.5rem;
+    margin-right: 1.6875rem;
+    line-height: calc(var(--cs-header-height)/0.75 - 0.5em/0.75);
 }
