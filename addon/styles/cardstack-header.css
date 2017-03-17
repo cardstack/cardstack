@@ -35,7 +35,16 @@
     line-height: calc(var(--cs-header-height)/0.75 - 0.75em);
 }
 
-
+.cs-view-mode-button {
+    cursor: pointer;
+    background-color: var(--normal-background);
+}
+.cs-view-mode-button:hover {
+    background-color: var(--activating-background);
+}
+.cs-view-mode-button.active {
+    background-color: var(--active-background);
+}
 .cs-view-mode-icon {
     float: left;
     padding-top: 0.5625rem;
@@ -44,6 +53,7 @@
     height: 1.5rem;
 }
 .cs-view-mode-label {
+    cursor: pointer;
     display: inline-block;
     font-size: 0.75em;
     font-weight: 100;

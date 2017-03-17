@@ -1,6 +1,6 @@
 <section>{{cs-accounts-menu}}</section>
 <section>{{cs-editor-switch}}</section>
-{{#cs-view-mode-buttons as |b|}}
-  <section>{{cs-view-mode-button button=b}}</section>
+{{#cs-view-mode-buttons as |mode currentMode setMode|}}
+  <section>{{cs-view-mode-button mode=mode currentMode=currentMode setMode=setMode}}</section>
 {{/cs-view-mode-buttons}}
 <section class="spacer"></section>
