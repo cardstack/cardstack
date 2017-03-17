@@ -1,3 +1,19 @@
 <svg style="position: absolute; width: 0; height: 0;" width="0" height="0" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
-<symbol id="cardstack-icon" viewBox="0 0 28 28"><path d="M0 0h28v28H0V0zm25 14l-10.417 9H3l4.747-4.1h6.94l5.672-4.9H25zm0-5l-10.417 9H3l4.747-4.1h6.94L20.359 9H25zm0-5l-10.417 9H3l10.42-9H25z" fill="#FFF" fill-rule="evenodd"/></symbol>
+  
+  <symbol id="cardstack-icon" viewBox="0 0 28 28"><path d="M0 0h28v28H0V0zm25 14l-10.417 9H3l4.747-4.1h6.94l5.672-4.9H25zm0-5l-10.417 9H3l4.747-4.1h6.94L20.359 9H25zm0-5l-10.417 9H3l10.42-9H25z" fill="#FFF" fill-rule="evenodd"/></symbol>
+
+  <symbol id="accounts" viewBox="0 0 18 15" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:sketch="http://www.bohemiancoding.com/sketch/ns">
+    <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd" sketch:type="MSPage">
+      <g id="AIA_select_type_tag" sketch:type="MSArtboardGroup" transform="translate(-10.000000, -13.000000)" fill="#FFFFFF">
+        <g id="Group" sketch:type="MSLayerGroup" transform="translate(10.000000, 13.000000)">
+          <rect id="line1" sketch:type="MSShapeGroup" x="11" y="3" width="7" height="2"></rect>
+          <rect id="cross1" sketch:type="MSShapeGroup" x="0" y="3" width="8" height="2"></rect>
+          <rect id="cross2" sketch:type="MSShapeGroup" transform="translate(4, 4) rotate(-90) translate(-4, -4) " x="0" y="3" width="8" height="2"></rect>
+          <rect id="line2" sketch:type="MSShapeGroup" x="8" y="8" width="10" height="2"></rect>
+          <rect id="line3" sketch:type="MSShapeGroup" x="3" y="13" width="15" height="2"></rect>
+        </g>
+      </g>
+    </g>
+  </symbol>
+  
 </svg>
