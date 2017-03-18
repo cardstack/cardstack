@@ -16,36 +16,36 @@
     display: flex;
 }
 
-.cs-toolbox-mode-button {
+.cs-mode-button {
     cursor: pointer;
     height: var(--cs-header-height);
 }
-.cs-toolbox-mode-button.icon-only {
+.cs-mode-button.icon-only {
     padding: .6em .5em;
     height: 1.375em;
     width: 1.5em;
     text-align: center;
 }
-.cs-toolbox-mode-button.icon-only .cs-toolbox-mode-icon {
+.cs-mode-button.icon-only .cs-mode-icon {
     float: none;
     padding: 0;
     height: auto;
 }
-.cs-toolbox-mode-button:hover {
+.cs-mode-button:hover {
     background-color: var(--activating-background);
 }
-.cs-toolbox-mode-button.active {
+.cs-mode-button.active {
     background-color: var(--active-background);
     border-color: red;
 }
-.cs-toolbox-mode-icon {
+.cs-mode-icon {
     float: left;
     padding-top: 0.5625rem;
     padding-left: 1.25rem;
     padding-right: 0.75rem;
     height: 1.5rem;
 }
-.cs-toolbox-mode-label {
+.cs-mode-label {
     cursor: pointer;
     display: inline-block;
     font-size: 0.75em;
