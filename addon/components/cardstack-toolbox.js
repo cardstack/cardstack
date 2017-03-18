@@ -3,5 +3,5 @@ import layout from '../templates/components/cardstack-toolbox';
 
 export default Ember.Component.extend({
   layout,
-  classNames: ['cardstack-toolbox', 'cardstack-tools']
+  classNames: ['cardstack-toolbox', 'cardstack-tools', 'cardstack-toolbox-width']
 });

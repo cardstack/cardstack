@@ -23,29 +23,32 @@
 }
 
 .cardstack-toolbox {
-    width: 41.0vw;
     height: 100vh;
 
     /* no margin collapse */
     padding: 0.1px;
 }
+
+.cardstack-toolbox-width {
+    width: 41.0vw;
+}
 @media (min-width: 1000px) {
-    .cardstack-toolbox {
+    .cardstack-toolbox-width {
         width: 34.0vw;
     }
 }
 @media (min-width: 1250px) {
-    .cardstack-toolbox {
+    .cardstack-toolbox-width {
         width: 25.0vw;
     }
 }
 @media (min-width: 1563px) {
-    .cardstack-toolbox {
+    .cardstack-toolbox-width {
         width: 16.0vw;
     }
 }
 @media (min-width: 1923px) {
-    .cardstack-toolbox {
+    .cardstack-toolbox-width {
         width: 7.0vw;
     }
 }

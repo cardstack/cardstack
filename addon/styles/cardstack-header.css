@@ -7,11 +7,33 @@
     background-color: var(--deep-background);
     display: flex;
 }
-.cardstack-header > section {
+.cardstack-header > section, .above-toolbox > section {
     background-color: var(--normal-background);
     margin-right: 1px;
 }
-.cardstack-header > section.spacer {
+
+.above-toolbox {
+    display: flex;
+}
+
+.cs-toolbox-mode-button {
+    padding: .6em .5em;
+    width: 1.5em;
+    height: 22px;
+    text-align: center;
+    border-bottom: 1px solid $black;
+    border-right: 1px solid $black;
+}
+.cs-toolbox-mode-button.active {
+    background-color: var(--active-background);
+    border-color: red;
+}
+.cs-toolbox-mode-button:hover {
+    background-color: var(--activating-background);
+}
+
+
+.cardstack-header > section.spacer, .above-toolbox > section.spacer {
     flex: 1;
 }
 
