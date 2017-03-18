@@ -1,5 +1,5 @@
 import Ember from 'ember';
-import layout from '../templates/components/cs-view-mode-buttons';
+import layout from '../templates/components/cs-view-modes';
 
 export default Ember.Component.extend({
   layout,
