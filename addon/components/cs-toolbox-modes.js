@@ -15,7 +15,6 @@ export default Ember.Component.extend({
 
   modes: [
     'cardstack-toolbox',
-    'cardstack-composer',
     'cardstack-library'
   ]
 });

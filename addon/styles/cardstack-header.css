@@ -17,6 +17,7 @@
 }
 
 .cs-toolbox-mode-button {
+    cursor: pointer;
     padding: .6em .5em;
     width: 1.5em;
     height: 22px;
