@@ -1,7 +1,7 @@
 {{#each (get tools optionsKey) key="id" as |mode|}}
   {{yield (hash id=mode.id
                 makeActive=(action "activate" mode.id)
-                active=(eq mode.id (get tools control))
+                active=(eq mode.id (get tools for))
                 icon=mode.icon
                 )
                 }}

@@ -11,11 +11,11 @@
 <section class="spacer"></section>
 
 <div class="above-toolbox cardstack-toolbox-width">
-  {{#cs-toolbox-modes as |mode|}}
+  {{#cs-mode-choices for="activePanel" as |choice|}}
     <section>
-      {{cs-toolbox-mode-button mode=mode}}
+      {{cs-toolbox-mode-button mode=choice}}
     </section>
-  {{/cs-toolbox-modes}}
+  {{/cs-mode-choices}}
 
   <section class="spacer"></section>
 </div>
