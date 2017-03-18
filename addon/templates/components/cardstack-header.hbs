@@ -1,12 +1,21 @@
 <section>{{cs-accounts-menu}}</section>
+
 <section>{{cs-editor-switch}}</section>
+
 {{#cs-view-modes as |mode currentMode setMode|}}
   <section>
     {{cs-view-mode-button mode=mode currentMode=currentMode setMode=setMode}}
   </section>
 {{/cs-view-modes}}
+
 <section class="spacer"></section>
+
 <div class="above-toolbox cardstack-toolbox-width">
-  <section><div class="cs-toolbox-mode-button">{{cs-svg "write" width="13px" height="18px"}}</div></section>
+  {{#cs-toolbox-modes as |mode currentMode setMode|}}
+    <section>
+      {{cs-toolbox-mode-button mode=mode currentMode=currentMode setMode=setMode}}
+    </section>
+  {{/cs-toolbox-modes}}
+
   <section class="spacer"></section>
 </div>

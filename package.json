@@ -20,6 +20,7 @@
   "dependencies": {
     "ember-cli-babel": "^5.1.7",
     "ember-cli-htmlbars": "^1.1.1",
+    "ember-cli-is-component": "https://github.com/ef4/ember-cli-is-component#544bf7a87689015c4f54c6697093d9f2b0d7b1ea",
     "ember-cli-postcss": "https://github.com/ef4/ember-cli-postcss#fdb9d27e47adb70376cc00451523ca353595ce36",
     "ember-elsewhere": "^1.0.0",
     "ember-toolbars": "0.2.7",

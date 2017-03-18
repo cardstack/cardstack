@@ -45,5 +45,10 @@ export default Ember.Service.extend({
 
   setActive(isActive) {
     this._updatePersistent('active', isActive);
+  },
+
+  setActivePanel(which) {
+    this._updatePersistent('activePanel', which);
   }
+
 });

@@ -1,0 +1,3 @@
+{{#each modes as |mode|}}
+  {{yield mode currentMode (action "setMode") }}
+{{/each}}
