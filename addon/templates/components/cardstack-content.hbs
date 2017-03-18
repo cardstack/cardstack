@@ -1,2 +1,5 @@
-<h1>{{content.title}}</h1>
-{{lorem-text}}
+{{#if (is-component specificComponent)}}
+  {{component specificComponent content=content format=format}}
+{{else}}
+  {{cs-assert "No such component" specificComponent}}
+{{/if}}

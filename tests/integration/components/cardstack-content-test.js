@@ -1,25 +1,24 @@
-import { moduleForComponent, skip } from 'ember-qunit';
+import { moduleForComponent, test } from 'ember-qunit';
 import hbs from 'htmlbars-inline-precompile';
 
+class Article {
+  constructor(title) {
+    this.title = title;
+  }
+}
+Article.modelName = 'article';
+
 moduleForComponent('cardstack-content', 'Integration | Component | cardstack content', {
-  integration: true
+  integration: true,
+  beforeEach() {
+    this.register('template:components/cardstack/article-page', hbs`
+      <h1>{{content.title}}</h1>
+    `);
+  }
 });
 
-skip('it renders', function(assert) {
-
-  // Set any properties with this.set('myProperty', 'value');
-  // Handle any actions with this.on('myAction', function(val) { ... });
-
-  this.render(hbs`{{cardstack-content}}`);
-
-  assert.equal(this.$().text().trim(), '');
-
-  // Template block usage:
-  this.render(hbs`
-    {{#cardstack-content}}
-      template block text
-    {{/cardstack-content}}
-  `);
-
-  assert.equal(this.$().text().trim(), 'template block text');
+test('it renders', function(assert) {
+  this.set('content', new Article('Hello world'));
+  this.render(hbs`{{cardstack-content content=content format="page"}}`);
+  assert.equal(this.$('h1').text(), 'Hello world');
 });
