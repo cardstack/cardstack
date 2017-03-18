@@ -2,11 +2,11 @@
 
 <section>{{cs-editor-switch}}</section>
 
-{{#cs-view-modes as |mode currentMode setMode|}}
+{{#cs-mode-choices for="viewMode" as |choice|}}
   <section>
-    {{cs-view-mode-button mode=mode currentMode=currentMode setMode=setMode}}
+    {{cs-toolbox-mode-button mode=choice}}
   </section>
-{{/cs-view-modes}}
+{{/cs-mode-choices}}
 
 <section class="spacer"></section>
 

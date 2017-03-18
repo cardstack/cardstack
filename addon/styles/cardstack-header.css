@@ -18,12 +18,18 @@
 
 .cs-toolbox-mode-button {
     cursor: pointer;
+    height: var(--cs-header-height);
+}
+.cs-toolbox-mode-button.icon-only {
     padding: .6em .5em;
+    height: 1.375em;
     width: 1.5em;
-    height: 22px;
     text-align: center;
-    border-bottom: 1px solid $black;
-    border-right: 1px solid $black;
+}
+.cs-toolbox-mode-button.icon-only .cs-toolbox-mode-icon {
+    float: none;
+    padding: 0;
+    height: auto;
 }
 .cs-toolbox-mode-button:hover {
     background-color: var(--activating-background);
@@ -31,6 +37,22 @@
 .cs-toolbox-mode-button.active {
     background-color: var(--active-background);
     border-color: red;
+}
+.cs-toolbox-mode-icon {
+    float: left;
+    padding-top: 0.5625rem;
+    padding-left: 1.25rem;
+    padding-right: 0.75rem;
+    height: 1.5rem;
+}
+.cs-toolbox-mode-label {
+    cursor: pointer;
+    display: inline-block;
+    font-size: 0.75em;
+    font-weight: 100;
+    margin-top: 0.5rem;
+    margin-right: 1.6875rem;
+    line-height: calc(var(--cs-header-height)/0.75 - 0.5em/0.75);
 }
 
 
@@ -56,31 +78,4 @@
     float: left;
     margin-right: 1rem;
     line-height: calc(var(--cs-header-height)/0.75 - 0.75em);
-}
-
-.cs-view-mode-button {
-    cursor: pointer;
-    background-color: var(--normal-background);
-}
-.cs-view-mode-button:hover {
-    background-color: var(--activating-background);
-}
-.cs-view-mode-button.active {
-    background-color: var(--active-background);
-}
-.cs-view-mode-icon {
-    float: left;
-    padding-top: 0.5625rem;
-    padding-left: 1.25rem;
-    padding-right: 0.75rem;
-    height: 1.5rem;
-}
-.cs-view-mode-label {
-    cursor: pointer;
-    display: inline-block;
-    font-size: 0.75em;
-    font-weight: 100;
-    margin-top: 0.5rem;
-    margin-right: 1.6875rem;
-    line-height: calc(var(--cs-header-height)/0.75 - 0.5em/0.75);
 }

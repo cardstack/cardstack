@@ -34,6 +34,26 @@ export default Ember.Service.extend({
   // Are we viewing the current URL as a normal page in its own right,
   // or in one of its other forms (like a preview card)?
   viewMode: 'page',
+  viewModeChoices: [
+    {
+      id: 'page',
+      description: 'Page',
+      icon: {
+        name: 'page',
+        width: 18,
+        height: 24
+      }
+    },
+    {
+      id: 'cards',
+      description: 'Tile',
+      icon: {
+        name: 'tiles',
+        width: 20,
+        height: 24
+      }
+    }
+  ],
 
   init() {
     this._super();
