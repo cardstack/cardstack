@@ -9,12 +9,11 @@ export default Ember.Service.extend({
   // revealed the toolbars.
   active: false,
 
-  // Which component are we showing in the sidebar area?
-  activePanel: 'cardstack-toolbox',
-
+  // Which tab are we showing in the toolbox?
+  activePanel: 'cs-composition-panel',
   activePanelChoices: [
     {
-      id: 'cardstack-toolbox',
+      id: 'cs-composition-panel',
       icon: {
         name: 'write',
         width: 13,

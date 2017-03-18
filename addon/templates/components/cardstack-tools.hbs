@@ -9,7 +9,5 @@
 
 {{#if tools.active}}
   {{in-top-toolbar show=(component "cardstack-header") }}
-  {{#if (is-component tools.activePanel)}}
-    {{in-right-toolbar show=(component tools.activePanel) }}
-  {{/if}}
+  {{in-right-toolbar show=(component "cardstack-toolbox") }}
 {{/if}}

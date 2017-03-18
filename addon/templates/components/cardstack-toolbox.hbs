@@ -1,1 +1,5 @@
-{{lorem-text}}
+{{#if (is-component tools.activePanel)}}
+  {{component tools.activePanel}}
+{{else}}
+  WAT is {{tools.activePanel}}
+{{/if}}
