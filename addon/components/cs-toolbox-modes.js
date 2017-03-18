@@ -6,15 +6,15 @@ export default Ember.Component.extend({
   tagName: '',
   tools: Ember.inject.service('cardstack-tools'),
   currentMode: Ember.computed.alias('tools.activePanel'),
+  options: Ember.computed.alias('tools.activePanelChoices'),
 
-  actions: {
-    setMode(which) {
-      this.get('tools').setActivePanel(which);
-    }
-  },
-
-  modes: [
-    'cardstack-toolbox',
-    'cardstack-library'
-  ]
+  modes: Ember.computed('currentMode', function() {
+    let current = this.get('currentMode');
+    return this.get('options').map(entry => ({
+      id: entry.id,
+      active: entry.id === current,
+      makeActive: () => this.get('tools').setActivePanel(entry.id),
+      icon: entry.icon
+    }));
+  })
 });

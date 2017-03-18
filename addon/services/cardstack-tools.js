@@ -12,6 +12,25 @@ export default Ember.Service.extend({
   // Which component are we showing in the sidebar area?
   activePanel: 'cardstack-toolbox',
 
+  activePanelChoices: [
+    {
+      id: 'cardstack-toolbox',
+      icon: {
+        name: 'write',
+        width: 13,
+        height: 18
+      },
+    },
+    {
+      id: 'cardstack-library',
+      icon: {
+        name: 'archive',
+        width: 22,
+        height: 24
+      }
+    }
+  ],
+
   // Are we viewing the current URL as a normal page in its own right,
   // or in one of its other forms (like a preview card)?
   viewMode: 'page',

@@ -11,9 +11,9 @@
 <section class="spacer"></section>
 
 <div class="above-toolbox cardstack-toolbox-width">
-  {{#cs-toolbox-modes as |mode currentMode setMode|}}
+  {{#cs-toolbox-modes as |mode|}}
     <section>
-      {{cs-toolbox-mode-button mode=mode currentMode=currentMode setMode=setMode}}
+      {{cs-toolbox-mode-button mode=mode}}
     </section>
   {{/cs-toolbox-modes}}
 

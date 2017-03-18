@@ -6,20 +6,11 @@ moduleForComponent('cs-toolbox-modes', 'Integration | Component | cs toolbox mod
 });
 
 test('it renders', function(assert) {
-
-  // Set any properties with this.set('myProperty', 'value');
-  // Handle any actions with this.on('myAction', function(val) { ... });
-
-  this.render(hbs`{{cs-toolbox-modes}}`);
-
-  assert.equal(this.$().text().trim(), '');
-
-  // Template block usage:
   this.render(hbs`
-    {{#cs-toolbox-modes}}
-      template block text
+    {{#cs-toolbox-modes as |mode|}}
+      {{cs-toolbox-mode-button mode=mode}}
     {{/cs-toolbox-modes}}
   `);
 
-  assert.equal(this.$().text().trim(), 'template block text');
+  assert.equal(this.$('.cs-toolbox-mode-button').length, 2);
 });

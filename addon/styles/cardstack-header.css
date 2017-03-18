@@ -25,12 +25,12 @@
     border-bottom: 1px solid $black;
     border-right: 1px solid $black;
 }
+.cs-toolbox-mode-button:hover {
+    background-color: var(--activating-background);
+}
 .cs-toolbox-mode-button.active {
     background-color: var(--active-background);
     border-color: red;
-}
-.cs-toolbox-mode-button:hover {
-    background-color: var(--activating-background);
 }
 
 
