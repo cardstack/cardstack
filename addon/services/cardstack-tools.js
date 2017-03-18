@@ -32,8 +32,8 @@ export default Ember.Service.extend({
 
   // Are we viewing the current URL as a normal page in its own right,
   // or in one of its other forms (like a preview card)?
-  viewMode: 'page',
-  viewModeChoices: [
+  previewFormat: 'page',
+  previewFormatChoices: [
     {
       id: 'page',
       description: 'Page',
@@ -77,8 +77,8 @@ export default Ember.Service.extend({
     this.set(key, value);
   },
 
-  setViewMode(mode) {
-    this._updatePersistent('viewMode', mode);
+  setPreviewFormat(mode) {
+    this._updatePersistent('previewFormat', mode);
   },
 
   setActive(isActive) {
