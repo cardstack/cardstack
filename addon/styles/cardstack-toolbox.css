@@ -1,0 +1,23 @@
+.cs-content-info {
+    padding: 0.75em 0.75em 10px;
+    background-color: var(--active-background);
+}
+.cs-content-info > svg {
+    float: left;
+    margin-right: 1em;
+}
+
+.cs-content-info > .content-type {
+    font-size: 10px;
+    line-height: 11px;
+    letter-spacing: .05em;
+    opacity: .6;
+    text-transform: uppercase;
+    margin: 0 0 2px;
+    font-weight: 100;
+}
+
+.cs-content-info > .content-title {
+    font-size: 12px;
+    margin: 0;
+}

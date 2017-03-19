@@ -8,6 +8,7 @@
 */
 .cardstack-tools {
     font-size: 16px;
+    line-height: 1.375em;
     font-family: 'Avenir', 'helvetica', sans-serif;
     color: var(--bright-foreground);
     background-color: var(--normal-background);
