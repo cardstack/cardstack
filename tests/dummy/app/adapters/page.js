@@ -8,6 +8,7 @@ export default DS.JSONAPIAdapter.extend({
         type: type.modelName,
         attributes: {
           title: "hello world",
+          created: "2017-02-18T13:52:58.723Z",
           body: {
             "version": "0.3.0",
             "atoms": [],

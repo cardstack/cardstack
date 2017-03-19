@@ -5,6 +5,7 @@ const { Model, attr } = DS;
 export default Model.extend({
   title: attr('string'),
   body: attr(),
+  created: attr('date'),
   type: Ember.computed(function() {
     // for some weird reason, you can't just say
     // `model.constructor.modelName` in a template to get this. It
