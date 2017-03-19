@@ -1,5 +1,5 @@
 {{#if (is-component specificComponent)}}
-  {{component specificComponent content=content format=format}}
+  {{component specificComponent content=content format=format tagName="" }}
 {{else}}
   {{cs-assert "No such component" specificComponent}}
 {{/if}}

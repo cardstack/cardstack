@@ -1,2 +1,3 @@
-<h1>{{content.title}}</h1>
-{{content.body}}
+{{#cs-field content "title" as |t|}}
+  <h1>{{t}}</h1>
+{{/cs-field}}
