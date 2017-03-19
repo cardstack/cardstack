@@ -19,11 +19,11 @@
 .cs-mode-button {
     cursor: pointer;
     height: var(--cs-header-height);
+    box-sizing: border-box;
 }
 .cs-mode-button.icon-only {
     padding: .6em .5em;
-    height: 1.375em;
-    width: 1.5em;
+    width: 2.5em;
     text-align: center;
 }
 .cs-mode-button.icon-only .cs-mode-icon {
@@ -36,7 +36,6 @@
 }
 .cs-mode-button.active {
     background-color: var(--active-background);
-    border-color: red;
 }
 .cs-mode-icon {
     float: left;
