@@ -1,0 +1,30 @@
+<section class="content-info">
+  {{cs-svg "article" width="22px" height="28px"}}
+  <p class="content-type">{{cs-humanize model.type}}</p>
+  <p class="content-title">
+    {{moment-format model.created "YYYY-MM-DD"}} {{model.title}}
+  </p>
+</section>
+
+<div> {{!- this one scrolls }}
+
+  {{!--
+
+  {{publication-control page=tools.primaryPage
+                        returnToHome=returnToHome
+                        enabled=tools.editing }}
+
+  {{editorial-control model=model
+                      enabled=tools.editing
+                      openedField=tools.openedField
+                      closeField=(action tools.openField null) }}
+
+  {{field-editors tools=tools}}
+
+  {{changelog-control model=model
+                      enabled=tools.editing
+                      openedField=tools.openedField
+                      closeField=(action tools.openField null) }}
+
+  --}}
+</div>

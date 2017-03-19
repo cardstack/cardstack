@@ -1,4 +1,5 @@
 import Ember from 'ember';
+const { scheduleOnce } = Ember.run;
 
 export default Ember.Service.extend({
   // Can tools be enabled at all? This affects whether we will offer a
@@ -69,6 +70,60 @@ export default Ember.Service.extend({
       // Ignored
     }
     this.persistentState = priorState || {};
+    this._fieldSources = Object.create(null);
+    this._highlightedFieldId = null;
+    this._contentSources = Object.create(null);
+  },
+
+
+  registerField(sourceId, field) {
+    this._fieldSources[sourceId] = field;
+    scheduleOnce('afterRender', this, this._handleFieldUpdates);
+  },
+
+  unregisterField(sourceId) {
+    this._fieldSources[sourceId] = null;
+    scheduleOnce('afterRender', this, this._handleFieldUpdates);
+  },
+
+  registerContent(sourceId, content) {
+    this._contentSources[sourceId] = content;
+    scheduleOnce('afterRender', this, this._handleFieldUpdates);
+  },
+
+  unregisterContent(sourceId) {
+    this._contentSources[sourceId] = null;
+    scheduleOnce('afterRender', this, this._handleFieldUpdates);
+  },
+
+  _handleFieldUpdates() {
+    let sources = this._fieldSources;
+    let fields = Object.create(null);
+    for (let sourceId in sources) {
+      let field = sources[sourceId];
+      if (field) {
+        fields[field.id] = field;
+        field.highlight = this._highlightedFieldId === field.id;
+      }
+    }
+
+    let contentSources = this._contentSources;
+    let contents = Object.create(null);
+    for (let sourceId in contentSources) {
+      let contentInfo = contentSources[sourceId];
+      if (contentInfo) {
+        contents[contentInfo.id] = contentInfo;
+      }
+    }
+    let contentItems = Object.keys(contents).map(id => contents[id]);
+
+    this.set('fields', Object.keys(fields).map(id => fields[id]));
+    this.set('contentItems', contentItems);
+
+    // for now, we just treat the first piece of content in page
+    // format as active. But we can extend this to make a particular
+    // card active instead.
+    this.set('activeContentItem', contentItems.find(item => item.format === 'page'));
   },
 
   _updatePersistent(key, value) {
