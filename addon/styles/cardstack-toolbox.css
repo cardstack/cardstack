@@ -21,3 +21,65 @@
     font-size: 12px;
     margin: 0;
 }
+
+.cs-toolbox-section {
+    margin: 0;
+}
+
+.cs-toolbox-section > header {
+    user-select: none;
+    margin: 0px;
+    padding: .75em .75em .5em;
+    background-color: var(--light-background);
+    border-top: 1px solid var(--normal-background);
+    overflow: hidden;
+    cursor: pointer;
+    color: white;
+    fill: rgba(204,204,204,1);
+}
+
+.cs-toolbox-section.closed > header {
+    background-color: var(--activating-background);
+    font-weight: bold;
+    border-top: 1px solid var(--deep-background);
+    color: rgba(250,250,250,.2);
+    fill: rgba(250,250,250,.2);
+}
+
+.cs-toolbox-section.closed > header:hover {
+    background-color: var(--active-background);
+    color: rgba(250,250,250,.5);
+    fill: rgba(250,250,250,.5);
+}
+
+.cs-toolbox-section > header > label {
+    float: left;
+    cursor: pointer;
+    font-size: .75em;
+}
+
+.cs-toolbox-section > header > button {
+    height: 16px;
+    width: 16px;
+    margin-top: 2px;
+    border-radius: 2px;
+    background-color: var(--normal-background);
+    float: right;
+    border: none;
+    padding: 0;
+    cursor: pointer;
+}
+
+.cs-toolbox-section > header > button:focus {
+    outline: none;
+}
+
+.cs-toolbox-section > header > button > svg {
+    width: 8px;
+    height: 10px;
+    transition: transform 250ms ease;
+}
+
+.cs-toolbox-section.closed > header > button > svg {
+    transform: rotate(-90deg);
+}

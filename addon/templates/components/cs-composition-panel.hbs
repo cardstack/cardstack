@@ -1,7 +1,9 @@
 {{#if tools.activeContentItem}}
   {{cs-active-composition-panel
     model=tools.activeContentItem.content
-    fields=fields }}
+    fields=fields
+    openField=(action "openField")
+    highlightField=(action "highlightField") }}
 {{else}}
   <section class="cs-content-info">
     <p class="content-title">

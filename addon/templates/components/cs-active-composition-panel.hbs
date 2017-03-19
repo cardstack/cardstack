@@ -8,23 +8,17 @@
 
 <div> {{!- this one scrolls }}
 
-  {{!--
+  {{#each fields key="id" as |fieldGroup|}}
+    {{#cs-collapsible-section class="cs-toolbox-section"
+                              title=(cs-humanize fieldGroup.name)
+                              opened=fieldGroup.opened
+                              open=(action openField fieldGroup)
+                              close=(action openField null)
+                              hovered=(perform highlightAndScrollToField fieldGroup)
+                              unhovered=(perform highlightAndScrollToField null) }}
 
-  {{publication-control page=tools.primaryPage
-                        returnToHome=returnToHome
-                        enabled=tools.editing }}
+      {{field.name}}
+    {{/cs-collapsible-section}}
+  {{/each}}
 
-  {{editorial-control model=model
-                      enabled=tools.editing
-                      openedField=tools.openedField
-                      closeField=(action tools.openField null) }}
-
-  {{field-editors tools=tools}}
-
-  {{changelog-control model=model
-                      enabled=tools.editing
-                      openedField=tools.openedField
-                      closeField=(action tools.openField null) }}
-
-  --}}
 </div>

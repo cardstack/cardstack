@@ -70,9 +70,20 @@ export default Ember.Service.extend({
       // Ignored
     }
     this.persistentState = priorState || {};
+
+
+    /* --  Ephermal state -- */
+
+
     this._fieldSources = Object.create(null);
-    this._highlightedFieldId = null;
     this._contentSources = Object.create(null);
+
+    // a field is highlighted when we're drawing a blue border around it
+    this._highlightedFieldId = null;
+
+    // a field is opened when the user is actively editing it
+    this._openedFieldId = null;
+
   },
 
 
@@ -102,8 +113,10 @@ export default Ember.Service.extend({
     for (let sourceId in sources) {
       let field = sources[sourceId];
       if (field) {
+        field = field.copy();
         fields[field.id] = field;
-        field.highlight = this._highlightedFieldId === field.id;
+        field.highlighted = this._highlightedFieldId === field.id;
+        field.opened = this._openedFieldId === field.id;
       }
     }
 
@@ -142,6 +155,25 @@ export default Ember.Service.extend({
 
   setActivePanel(which) {
     this._updatePersistent('activePanel', which);
+  },
+
+  openField(which) {
+    if (which) {
+      this._openedFieldId = which.id;
+    } else {
+      this._openedFieldId = null;
+    }
+    scheduleOnce('afterRender', this, this._handleFieldUpdates);
+  },
+
+  highlightField(which) {
+    if (which) {
+      this._highlightedFieldId = which.id;
+    } else {
+      this._highlightedFieldId = null;
+    }
+    scheduleOnce('afterRender', this, this._handleFieldUpdates);
   }
+
 
 });

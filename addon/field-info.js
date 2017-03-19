@@ -8,11 +8,29 @@ export default class FieldInfo {
     this.fields = fields;
     this.firstNode = firstNode;
     this.lastNode = lastNode;
-
-    // This gives us a stable key across rerenders.
-    this.id = `${name}/${guidFor(content)}`;
-
-    // this property is controlled by the cardstack-tools service
-    this.highlight = false;
+    this.highlighted = false;
+    this.opened = false;
   }
+
+  get id() {
+    if (!this._id) {
+      // This gives us a stable key across rerenders.
+      this._id = `${this.name}/${guidFor(this.content)}`;
+    }
+    return this._id;
+  }
+
+  copy() {
+    let copied = new (this.constructor)(this.content, this.name, this.fields, this.firstNode, this.lastNode);
+    copied._id = this._id;
+    return copied;
+  }
+
+  range() {
+    let r = new Range();
+    r.setStartBefore(this.firstNode);
+    r.setEndAfter(this.lastNode);
+    return r;
+  }
+
 }

@@ -14,5 +14,14 @@ export default Ember.Component.extend({
     } else {
       return [];
     }
-  })
+  }),
+
+  actions: {
+    openField(which) {
+      return this.get('tools').openField(which);
+    },
+    highlightField(which) {
+      return this.get('tools').highlightField(which);
+    }
+  }
 });
