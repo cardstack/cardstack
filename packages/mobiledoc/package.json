@@ -24,6 +24,7 @@
   },
   "dependencies": {
     "ember-cli-babel": "^5.1.7",
+    "ember-mobiledoc-dom-renderer": "^0.5.11",
     "mobiledoc-text-renderer": "^0.3.2"
   },
   "devDependencies": {

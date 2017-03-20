@@ -15,4 +15,8 @@
       {{address.country}}
     {{/cs-field-group}}
   </div>
+
+  {{#cs-field content "body" as |body|}}
+    {{render-mobiledoc mobiledoc=body}}
+  {{/cs-field}}
 </article>
