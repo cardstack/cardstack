@@ -108,6 +108,7 @@ describe('git/indexer', function() {
     expect(contents).to.deep.equal({
       hello: 'world',
       cardstack_rel_names: [],
+      cardstack_derived_names: [],
       cardstack_meta: { version: head }
     });
   });

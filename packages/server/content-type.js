@@ -80,7 +80,7 @@ module.exports = class ContentType {
   mapping() {
     let properties = {};
     for (let field of this.fields.values()) {
-      properties[field.id] = field.mapping();
+      Object.assign(properties, field.mapping());
     }
     return { properties };
   }

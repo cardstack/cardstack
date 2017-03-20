@@ -23,7 +23,8 @@
     "test": "ember try:each"
   },
   "dependencies": {
-    "ember-cli-babel": "^5.1.7"
+    "ember-cli-babel": "^5.1.7",
+    "mobiledoc-text-renderer": "^0.3.2"
   },
   "devDependencies": {
     "broccoli-asset-rev": "^2.4.5",

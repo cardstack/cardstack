@@ -97,16 +97,19 @@ class Searcher {
 
   _searchDocToJSONAPI(type, id, document) {
     let relnames = document.cardstack_rel_names;
+    let derivedNames = document.cardstack_derived_names;
     let attributes;
     let relationships;
     Object.keys(document).forEach(fieldName => {
-      if (fieldName === 'cardstack_rel_names' || fieldName === 'cardstack_meta') {
+      if (fieldName === 'cardstack_rel_names' || fieldName === 'cardstack_meta' || fieldName === 'cardstack_derived_names') {
         // pass
       } else if (relnames.includes(fieldName)) {
         if (!relationships) {
           relationships = {};
         }
         relationships[fieldName] = document[fieldName];
+      } else if (derivedNames.includes(fieldName)) {
+        // pass
       } else {
         if (!attributes) {
           attributes = {};
@@ -257,7 +260,7 @@ function fieldNameFromKey(schema, key) {
       title: "Unknown field in filter"
     });
   }
-  return key;
+  return field.queryFieldName;
 }
 
 module.exports = Searcher;

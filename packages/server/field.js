@@ -157,9 +157,16 @@ module.exports = class Field {
     );
   }
   mapping() {
-    return Object.assign({}, this.plugin.defaultMapping(), {
-      index: this.searchable
-    });
+    let m = {
+      [this.id]: Object.assign({}, this.plugin.defaultMapping(), {
+        index: this.searchable
+      })
+    };
+
+    if (this.plugin.derivedMappings) {
+      Object.assign(m, this.plugin.derivedMappings(this.id));
+    }
+    return m;
   }
   get sortFieldName() {
     if (this.plugin.sortFieldName) {
@@ -168,4 +175,18 @@ module.exports = class Field {
       return this.id;
     }
   }
+  get queryFieldName() {
+    if (this.plugin.queryFieldName) {
+      return this.plugin.queryFieldName(this.id);
+    } else {
+      return this.id;
+    }
+  }
+
+  derivedFields(value) {
+    if (this.plugin.derivedFields) {
+      return this.plugin.derivedFields(this.id, value);
+    }
+  }
+
 };

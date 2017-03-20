@@ -59,7 +59,7 @@ module.exports = class Indexers {
       });
       await this._reindex(tmpIndex, branch);
     }
-    await this._updateContent(branch, updaters, realTime, hints);
+    await this._updateContent(branch, updaters, schema, realTime, hints);
   }
 
   async _branches() {
@@ -132,8 +132,8 @@ module.exports = class Indexers {
     return Schema.loadFrom(models);
   }
 
-  async _updateContent(branch, updaters, realTime, hints) {
-    let { publicOps, privateOps } = Operations.create(this.es, branch, realTime, this.log);
+  async _updateContent(branch, updaters, schema, realTime, hints) {
+    let { publicOps, privateOps } = Operations.create(this.es, branch, schema, realTime, this.log);
     for (let updater of updaters) {
       let meta = await this._loadMeta(branch, updater);
       let newMeta = await updater.updateContent(meta, hints, publicOps);
@@ -176,12 +176,23 @@ module.exports = class Indexers {
 
 };
 
-function jsonapiDocToSearchDoc(jsonapiDoc) {
+function jsonapiDocToSearchDoc(jsonapiDoc, schema) {
   let searchDoc = {};
   let relNames = [];
+  let derivedNames = [];
   if (jsonapiDoc.attributes) {
     for (let attribute of Object.keys(jsonapiDoc.attributes)) {
       let value = jsonapiDoc.attributes[attribute];
+      let field = schema.fields.get(attribute);
+      if (field) {
+        let derivedFields = field.derivedFields(value);
+        if (derivedFields) {
+          for (let [derivedName, derivedValue] of Object.entries(derivedFields)) {
+            searchDoc[derivedName] = derivedValue;
+            derivedNames.push(derivedName);
+          }
+        }
+      }
       searchDoc[attribute] = value;
     }
   }
@@ -200,20 +211,22 @@ function jsonapiDocToSearchDoc(jsonapiDoc) {
     searchDoc.cardstack_meta = jsonapiDoc.meta;
   }
   searchDoc.cardstack_rel_names = relNames;
+  searchDoc.cardstack_derived_names = derivedNames;
   return searchDoc;
 }
 
 const opsPrivate = new WeakMap();
 
 class Operations {
-  static create(es, branch, realTime, log) {
-    let publicOps = new this(es, branch, realTime, log);
+  static create(es, branch, schema, realTime, log) {
+    let publicOps = new this(es, branch, schema, realTime, log);
     let privateOps = opsPrivate.get(publicOps);
     return { publicOps, privateOps };
   }
 
-  constructor(es, branch, realTime, log) {
+  constructor(es, branch, schema, realTime, log) {
     opsPrivate.set(this, {
+      schema,
       log,
       branch,
       bulkOps: new BulkOps(es, { realTime }),
@@ -223,8 +236,8 @@ class Operations {
     });
   }
   async save(type, id, doc){
-    let { bulkOps, branch, log } = opsPrivate.get(this);
-    let searchDoc = jsonapiDocToSearchDoc(doc);
+    let { bulkOps, branch, log, schema } = opsPrivate.get(this);
+    let searchDoc = jsonapiDocToSearchDoc(doc, schema);
     await bulkOps.add({
       index: {
         _index: Searcher.branchToIndexName(branch),

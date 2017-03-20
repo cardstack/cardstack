@@ -23,7 +23,7 @@
             "args": [
                 "-r",
                 "packages/test-support/prepare.js",
-                "packages/*/tests/*-test.js"
+                "packages/*/node-tests/*-test.js"
             ],
             "runtimeArgs": [
                 "--harmony"

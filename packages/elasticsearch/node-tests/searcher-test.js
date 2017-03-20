@@ -11,6 +11,10 @@ describe('searcher', function() {
   let searcher;
   let fixtures = [
     {
+      type: 'plugin-configs',
+      id: '@cardstack/mobiledoc'
+    },
+    {
       type: 'content-types',
       id: 'people',
       relationships: {
@@ -19,7 +23,8 @@ describe('searcher', function() {
             { type: 'fields', id: 'firstName' },
             { type: 'fields', id: 'lastName' },
             { type: 'fields', id: 'age' },
-            { type: 'fields', id: 'color' }
+            { type: 'fields', id: 'color' },
+            { type: 'fields', id: 'description' }
           ]
         }
       }
@@ -41,6 +46,13 @@ describe('searcher', function() {
       id: 'firstName',
       attributes: {
         'field-type': '@cardstack/core-types::string'
+      }
+    },
+    {
+      type: 'fields',
+      id: 'description',
+      attributes: {
+        'field-type': '@cardstack/mobiledoc'
       }
     },
     {
@@ -85,7 +97,18 @@ describe('searcher', function() {
       attributes: {
         firstName: 'Quint',
         lastName: 'Faulkner',
-        age: 6
+        age: 6,
+        description: {
+          version: "0.3.1",
+          markups: [],
+          atoms: [],
+          cards: [],
+          sections: [
+            [1, "p", [
+              [0, [], 0, "The quick brown fox jumps over the lazy dog."]
+            ]]
+          ]
+        }
       }
     },
     {
@@ -273,6 +296,20 @@ describe('searcher', function() {
     });
     expect(models).to.have.length(1);
     expect(models).includes.something.with.deep.property('attributes.firstName', 'Quint' );
+  });
+
+  it('can search within a field with custom indexing behavior', async function() {
+    let { models } = await searcher.search('master', {
+      filter: {
+        description: 'fox'
+      }
+    });
+    expect(models).to.have.length(1);
+    expect(models).has.deep.property('[0].attributes.firstName', 'Quint');
+
+    // These are the internally used fields that should not leak out
+    expect(models[0].attributes).has.not.property('cardstack_derived_names');
+    expect(models[0].attributes).has.not.property('description_as_text');
   });
 
   it('gives helpful error when filtering unknown field', async function() {
