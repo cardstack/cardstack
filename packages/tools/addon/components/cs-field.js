@@ -4,8 +4,10 @@ const { guidFor } = Ember;
 
 export default Ember.Component.extend({
   layout,
+  tagName: '',
+
   id: Ember.computed('content', 'fieldName', function() {
-    return `${guidFor(this.get('content'))}/${this.get('fieldName')}`;
+    return `${guidFor(this.get('content'))}/cs-field/${this.get('fieldName')}`;
   }),
   fieldInfo: Ember.computed('content', 'fieldName', function() {
     return {

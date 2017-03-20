@@ -2,4 +2,12 @@
 
 <article>
   <h1>{{cs-field content "title"}}</h1>
+
+  <div>
+    {{#cs-field-group content name="address" fields="street,city,state,country,zip" as |address|}}
+      {{address.street}}<br/>
+      {{address.city}}, {{address.state}} {{address.zip}}<br/>
+      {{address.country}}
+    {{/cs-field-group}}
+  </div>
 </article>

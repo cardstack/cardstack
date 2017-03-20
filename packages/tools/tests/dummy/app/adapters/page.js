@@ -9,6 +9,11 @@ export default DS.JSONAPIAdapter.extend({
         attributes: {
           title: "hello world",
           created: "2017-02-18T13:52:58.723Z",
+          street: '123 Main St',
+          city: 'Somerville',
+          state: 'MA',
+          country: 'USA',
+          zip: '02144',
           body: {
             "version": "0.3.0",
             "atoms": [],

@@ -7,6 +7,9 @@ var CssNext = require('postcss-cssnext');
 
 module.exports = {
   name: '@cardstack/tools',
+  isDevelopingAddon() {
+    return process.env.CARDSTACK_DEV;
+  },
   options: {
     postcssOptions: {
       compile: {
