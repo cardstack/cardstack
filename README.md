@@ -1,11 +1,11 @@
-# cardstack-suite
+# @cardstack/tools
 
 This README outlines the details of collaborating on this Ember addon.
 
 ## Installation
 
 * `git clone <repository-url>` this repository
-* `cd cardstack-suite`
+* `cd @cardstack/tools`
 * `npm install`
 * `bower install`
 

@@ -1,1 +1,1 @@
-export { default } from 'cardstack-suite/components/cs-editor-switch';
+export { default } from '@cardstack/tools/components/cs-editor-switch';

@@ -1,1 +1,1 @@
-export { default } from 'cardstack-suite/components/cs-mode-choices';
+export { default } from '@cardstack/tools/components/cs-mode-choices';

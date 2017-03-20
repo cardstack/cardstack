@@ -1,1 +1,1 @@
-export { default } from 'cardstack-suite/components/cs-collapsible-section';
+export { default } from '@cardstack/tools/components/cs-collapsible-section';

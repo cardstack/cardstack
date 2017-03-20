@@ -1,1 +1,1 @@
-export { default } from 'cardstack-suite/components/cs-field';
+export { default } from '@cardstack/tools/components/cs-field';

@@ -16,7 +16,7 @@
 
 @font-face {
     font-family: 'Avenir';
-    src: url('../cardstack-suite/Avenir.ttc');
+    src: url('../@cardstack/tools/Avenir.ttc');
 }
 
 .cardstack-tools-launcher {

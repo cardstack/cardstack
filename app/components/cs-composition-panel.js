@@ -1,1 +1,1 @@
-export { default } from 'cardstack-suite/components/cs-composition-panel';
+export { default } from '@cardstack/tools/components/cs-composition-panel';

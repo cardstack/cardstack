@@ -1,1 +1,1 @@
-export { default } from 'cardstack-suite/components/cs-toggle-switch';
+export { default } from '@cardstack/tools/components/cs-toggle-switch';

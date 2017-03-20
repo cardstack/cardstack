@@ -1,1 +1,1 @@
-export { default, csHumanize } from 'cardstack-suite/helpers/cs-humanize';
+export { default, csHumanize } from '@cardstack/tools/helpers/cs-humanize';

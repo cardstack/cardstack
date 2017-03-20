@@ -1,1 +1,1 @@
-export { default } from 'cardstack-suite/components/cs-field-overlays';
+export { default } from '@cardstack/tools/components/cs-field-overlays';

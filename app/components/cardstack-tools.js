@@ -1,1 +1,1 @@
-export { default } from 'cardstack-suite/components/cardstack-tools';
+export { default } from '@cardstack/tools/components/cardstack-tools';

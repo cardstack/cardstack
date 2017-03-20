@@ -6,7 +6,7 @@ var CssNext = require('postcss-cssnext');
 'use strict';
 
 module.exports = {
-  name: 'cardstack-suite',
+  name: '@cardstack/tools',
   options: {
     postcssOptions: {
       compile: {
@@ -22,7 +22,7 @@ module.exports = {
     if (type === 'body-footer') {
       return `<script>
   var ajax = new XMLHttpRequest();
-  ajax.open('GET', '/cardstack-suite/symbols.svg', true);
+  ajax.open('GET', '/@cardstack/tools/symbols.svg', true);
   ajax.send();
   ajax.onload = function(e) {
     var div = document.createElement('div');

@@ -1,1 +1,1 @@
-export { default, csAssert } from 'cardstack-suite/helpers/cs-assert';
+export { default, csAssert } from '@cardstack/tools/helpers/cs-assert';

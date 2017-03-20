@@ -1,1 +1,1 @@
-export { default } from 'cardstack-suite/components/cs-mode-button';
+export { default } from '@cardstack/tools/components/cs-mode-button';

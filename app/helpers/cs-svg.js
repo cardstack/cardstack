@@ -1,1 +1,1 @@
-export { default, csSvg } from 'cardstack-suite/helpers/cs-svg';
+export { default, csSvg } from '@cardstack/tools/helpers/cs-svg';
