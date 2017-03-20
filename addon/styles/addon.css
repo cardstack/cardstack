@@ -24,6 +24,13 @@
     cursor: pointer;
 }
 
+/* these classes comes from the ember-sidebars addon. We need to the
+   z-indices of the sidebars so they stay on top of the scrims
+   provided by ember-overlays. */
+.cst-right, .cst-top {
+    z-index: 10;
+}
+
 .cardstack-toolbox {
     height: 100vh;
 
