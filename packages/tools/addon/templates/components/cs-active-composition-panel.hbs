@@ -17,7 +17,12 @@
                               hovered=(perform highlightAndScrollToField fieldMark)
                               unhovered=(perform highlightAndScrollToField null) }}
 
-      Todo
+      {{#if fieldMark.model.grouped}}
+        {{cs-assert "field editors for group" fieldMark.model.name}}
+      {{else}}
+        {{cs-field-editor content=fieldMark.model.content field=fieldMark.model.name enabled=editingEnabled}}
+      {{/if}}
+
     {{/cs-collapsible-section}}
   {{/each}}
 

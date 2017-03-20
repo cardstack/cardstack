@@ -2,6 +2,11 @@
 
 <article>
   <h1>{{cs-field content "title"}}</h1>
+  <h2>
+    {{#cs-field content "created" as |date|}}
+      {{moment-format date "YYYY-MM-DD"}}
+    {{/cs-field}}
+  </h2>
 
   <div>
     {{#cs-field-group content name="address" fields="street,city,state,country,zip" as |address|}}
