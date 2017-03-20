@@ -92,5 +92,18 @@
       </g>
     </g>
   </symbol>
-  
+
+  <symbol id="item-grab" viewBox="0 0 2 10" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:sketch="http://www.bohemiancoding.com/sketch/ns">
+    <g id="Page-1" stroke="none" stroke-width="1" fill-rule="evenodd" sketch:type="MSPage">
+        <g id="AIA_text_formatting" sketch:type="MSArtboardGroup" transform="translate(-1410.000000, -745.000000)" >
+            <g id="Rectangle-55-Copy-10-+-Draft-Copy-+-Oval-45-Copy-2-Copy-Copy-+-Oval-10-+-Oval-10-Copy-+-Oval-10-Copy-2-Copy-Copy" sketch:type="MSLayerGroup" transform="translate(1147.000000, 735.000000)">
+                <g id="Oval-10-+-Oval-10-Copy-+-Oval-10-Copy-2-Copy-Copy" transform="translate(263.000000, 10.000000)" sketch:type="MSShapeGroup">
+                    <circle id="Oval-10" cx="1" cy="1" r="1"></circle>
+                    <circle id="Oval-10-Copy" cx="1" cy="5" r="1"></circle>
+                    <circle id="Oval-10-Copy-2" cx="1" cy="9" r="1"></circle>
+                </g>
+            </g>
+        </g>
+    </g>
+</symbol>
 </svg>
