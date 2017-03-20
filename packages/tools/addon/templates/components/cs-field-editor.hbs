@@ -1,5 +1,7 @@
-{{#if (is-component specificComponent)}}
-  {{component specificComponent content=content field=field tagName=""}}
-{{else}}
-  {{cs-assert "No such field editor" specificComponent}}
-{{/if}}
+{{#with (cs-field-editor-for content field) as |editorName|}}
+  {{#if (is-component editorName)}}
+    {{component editorName content=content field=field tagName=""}}
+  {{else}}
+    {{cs-assert "No such field editor" editorName}}
+  {{/if}}
+{{/with}}
