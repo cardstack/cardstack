@@ -1,0 +1,9 @@
+<header {{action "toggle" }}>
+  <label>{{title}}</label>
+  <button>
+    {{cs-svg "toggle-arrow"}}
+  </button>
+</header>
+{{#liquid-if opened}}
+  {{yield}}
+{{/liquid-if}}

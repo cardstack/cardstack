@@ -1,0 +1,24 @@
+<section class="cs-content-info">
+  {{cs-svg "article" width="22px" height="28px"}}
+  <p class="content-type">{{cs-humanize model.type}}</p>
+  <p class="content-title">
+    {{moment-format model.created "YYYY-MM-DD"}} {{model.title}}
+  </p>
+</section>
+
+<div> {{!- this one scrolls }}
+
+  {{#each fields key="id" as |fieldMark|}}
+    {{#cs-collapsible-section class="cs-toolbox-section"
+                              title=(cs-humanize fieldMark.model.name)
+                              opened=(eq fieldMark.id openedFieldId)
+                              open=(action openField fieldMark)
+                              close=(action openField null)
+                              hovered=(perform highlightAndScrollToField fieldMark)
+                              unhovered=(perform highlightAndScrollToField null) }}
+
+      Todo
+    {{/cs-collapsible-section}}
+  {{/each}}
+
+</div>

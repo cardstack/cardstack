@@ -1,0 +1,63 @@
+@import "base";
+@import "cardstack-header";
+@import "cardstack-toolbox";
+@import "cs-toggle-switch";
+@import "cs-field-overlays";
+
+:root {
+    --deep-background: #000;
+    --normal-background: #292A2C;
+    --activating-background: #404040;
+    --active-background: #545454;
+    --light-background: #737373;
+
+    --bright-foreground: #fff;
+}
+
+@font-face {
+    font-family: 'Avenir';
+    src: url('../@cardstack/tools/Avenir.ttc');
+}
+
+.cardstack-tools-launcher {
+    background-color: green;
+    cursor: pointer;
+}
+
+/* these classes comes from the ember-sidebars addon. We need to
+   increase the z-indices of the sidebars so they stay on top of the
+   scrims provided by ember-overlays. */
+.cst-right, .cst-top {
+    z-index: 10;
+}
+
+.cardstack-toolbox {
+    height: 100vh;
+
+    /* no margin collapse */
+    padding: 0.1px;
+}
+
+.cardstack-toolbox-width {
+    width: 41.0vw;
+}
+@media (min-width: 1000px) {
+    .cardstack-toolbox-width {
+        width: 34.0vw;
+    }
+}
+@media (min-width: 1250px) {
+    .cardstack-toolbox-width {
+        width: 25.0vw;
+    }
+}
+@media (min-width: 1563px) {
+    .cardstack-toolbox-width {
+        width: 16.0vw;
+    }
+}
+@media (min-width: 1923px) {
+    .cardstack-toolbox-width {
+        width: 7.0vw;
+    }
+}

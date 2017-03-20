@@ -1,0 +1,7 @@
+{{#mark-overlay id=id group="cardstack-content" model=content}}
+  {{#if (is-component specificComponent)}}
+    {{component specificComponent content=content format=format tagName="" }}
+  {{else}}
+    {{cs-assert "No such component" specificComponent}}
+  {{/if}}
+{{/mark-overlay}}

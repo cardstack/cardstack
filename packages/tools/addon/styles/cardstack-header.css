@@ -1,0 +1,80 @@
+:root {
+    --cs-header-height: 2.625em;
+}
+
+.cardstack-header {
+    min-height: var(--cs-header-height);
+    background-color: var(--deep-background);
+    display: flex;
+}
+.cardstack-header > section, .above-toolbox > section {
+    background-color: var(--normal-background);
+    margin-right: 1px;
+}
+
+.above-toolbox {
+    display: flex;
+}
+
+.cs-mode-button {
+    cursor: pointer;
+    height: var(--cs-header-height);
+    box-sizing: border-box;
+}
+.cs-mode-button.icon-only {
+    padding: .6em .5em;
+    width: 2.5em;
+    text-align: center;
+}
+.cs-mode-button.icon-only .cs-mode-icon {
+    float: none;
+    padding: 0;
+    height: auto;
+}
+.cs-mode-button:hover {
+    background-color: var(--activating-background);
+}
+.cs-mode-button.active {
+    background-color: var(--active-background);
+}
+.cs-mode-icon {
+    float: left;
+    padding-top: 0.5625rem;
+    padding-left: 1.25rem;
+    padding-right: 0.75rem;
+    height: 1.5rem;
+}
+.cs-mode-label {
+    cursor: pointer;
+    display: inline-block;
+    font-size: 0.75em;
+    font-weight: 100;
+    margin-top: 0.5rem;
+    margin-right: 1.6875rem;
+    line-height: calc(var(--cs-header-height)/0.75 - 0.5em/0.75);
+}
+
+
+.cardstack-header > section.spacer, .above-toolbox > section.spacer {
+    flex: 1;
+}
+
+.cs-accounts-menu {
+    padding: 0.3em 0.5em 0 0.5em;
+    min-width: 2em;
+    text-align: center;
+    line-height: calc(var(--cs-header-height) - 0.3em);
+}
+
+.cs-editor-switch {
+    padding: 0.5rem 0.5rem 0 0.875rem;
+    min-width: 6.5rem;
+    line-height: calc(var(--cs-header-height) - 1em);
+}
+.cs-editor-switch > label {
+    font-size: 0.75rem;
+    font-weight: 100;
+    float: left;
+    margin-right: 1rem;
+    line-height: calc(var(--cs-header-height)/0.75 - 0.75em);
+}

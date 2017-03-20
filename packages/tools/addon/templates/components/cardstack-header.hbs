@@ -1,0 +1,21 @@
+<section>{{cs-accounts-menu}}</section>
+
+<section>{{cs-editor-switch}}</section>
+
+{{#cs-mode-choices for="previewFormat" as |choice|}}
+  <section>
+    {{cs-mode-button mode=choice}}
+  </section>
+{{/cs-mode-choices}}
+
+<section class="spacer"></section>
+
+<div class="above-toolbox cardstack-toolbox-width">
+  {{#cs-mode-choices for="activePanel" as |choice|}}
+    <section>
+      {{cs-mode-button mode=choice}}
+    </section>
+  {{/cs-mode-choices}}
+
+  <section class="spacer"></section>
+</div>
