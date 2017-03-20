@@ -1,12 +1,14 @@
 Work in progress
 ================
 
-Package symlink
+Orientation
 ---------------
 
-You need this symlink for the present:
+This is a monorepo. Each directory under `packages` is intended to be distributed as a  functioning npm package under the `@cardstack` organization. For the present, in order for them to find each other you must create this symlink:
 
     ln -s ../packages ./node_modules/@cardstack
+    
+The top-level package.json is a superset of everything needed by all the packages, so in development you should only need to yarn install at the top level.
 
 Building native nodegit dep on osx
 --------------------------------
