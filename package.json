@@ -36,9 +36,9 @@
   },
   "scripts": {
     "test": "npm run node-tests && npm run ember-tests",
-    "node-tests": "mocha --harmony -r packages/test-support/prepare.js packages/*/tests/*-test.js",
-    "ember-tests": "node --harmony packages/test-support/ember-test-runner.js",
-    "server": "node --harmony packages/server/bin/server.js"
+    "node-tests": "mocha -r packages/test-support/prepare.js packages/*/tests/*-test.js",
+    "ember-tests": "node packages/test-support/ember-test-runner.js",
+    "server": "node packages/server/bin/server.js"
   },
   "dependencies": {
     "elasticsearch": "^12.1.3",
