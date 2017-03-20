@@ -2,7 +2,6 @@ import Ember from 'ember';
 import layout from '../templates/components/cs-active-composition-panel';
 import { task, timeout } from 'ember-concurrency';
 import scrollToBounds from '../scroll-to-bounds';
-import { boundingClientRect } from '../range-bounds';
 
 export default Ember.Component.extend({
   layout,
@@ -12,7 +11,7 @@ export default Ember.Component.extend({
     this.get('highlightField')(field);
     if (field) {
       yield timeout(500);
-      scrollToBounds(boundingClientRect(field.range()));
+      scrollToBounds(field.bounds());
     }
   }).restartable()
 });

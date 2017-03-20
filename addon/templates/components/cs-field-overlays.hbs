@@ -1,0 +1,11 @@
+{{#overlay-marks group="cardstack-fields" as |mark|}}
+  {{create-overlay at=mark
+                   label=(cs-humanize mark.model.name)
+                   highlighted=(eq mark.id tools.highlightedFieldId)
+                   hoverable=tools.editing
+                   focused=(eq mark.id tools.openedFieldId)
+                   onclick=(action "openField" mark)
+                   dismiss=(action "openField" null)
+                   }}
+
+{{/overlay-marks}}

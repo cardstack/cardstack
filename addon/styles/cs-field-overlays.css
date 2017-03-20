@@ -1,0 +1,5 @@
+/* this class comes from the ember-overlays addon */
+.overlay-label {
+    font-size: 10px;
+    text-transform: uppercase;
+}

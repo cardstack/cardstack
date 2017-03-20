@@ -1,5 +1,5 @@
 <label>Editor</label>
-{{#cs-toggle-switch value=chosen change=(action (mut chosen)) }}
+{{#cs-toggle-switch value=tools.editing change=(action "setEditing") }}
   On
 {{else}}
   Off

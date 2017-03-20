@@ -2,6 +2,7 @@
 @import "cardstack-header";
 @import "cardstack-toolbox";
 @import "cs-toggle-switch";
+@import "cs-field-overlays";
 
 :root {
     --deep-background: #000;

@@ -1,7 +1,9 @@
 {{#if tools.activeContentItem}}
   {{cs-active-composition-panel
-    model=tools.activeContentItem.content
-    fields=fields
+    model=tools.activeContentItem.model
+    fields=tools.activeFields
+    openedFieldId=tools.openedFieldId
+    highlightedFieldId=tool.highlightedFieldId
     openField=(action "openField")
     highlightField=(action "highlightField") }}
 {{else}}

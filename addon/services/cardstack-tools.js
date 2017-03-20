@@ -1,7 +1,30 @@
 import Ember from 'ember';
-const { scheduleOnce } = Ember.run;
 
 export default Ember.Service.extend({
+  overlays: Ember.inject.service('ember-overlays'),
+  marks: Ember.computed.alias('overlays.marks'),
+
+  fields: Ember.computed('marks', function() {
+    return this.get('marks').filter(m => m.group === 'cardstack-fields');
+  }),
+
+  contentItems: Ember.computed('marks', function() {
+    return this.get('marks').filter(m => m.group === 'cardstack-content');
+  }),
+
+  activeContentItem: Ember.computed('contentItems', function() {
+    return this.get('contentItems')[0];
+  }),
+
+  activeFields: Ember.computed('activeContentItem', 'fields', function() {
+    let item = this.get('activeContentItem');
+    if (item) {
+      return this.get('fields').filter(f => f.model.content === item.model);
+    } else {
+      return [];
+    }
+  }),
+
   // Can tools be enabled at all? This affects whether we will offer a
   // launcher button
   available: true,
@@ -55,6 +78,8 @@ export default Ember.Service.extend({
     }
   ],
 
+  editing: false,
+
   init() {
     this._super();
     let priorState;
@@ -74,69 +99,11 @@ export default Ember.Service.extend({
 
     /* --  Ephermal state -- */
 
-
-    this._fieldSources = Object.create(null);
-    this._contentSources = Object.create(null);
-
     // a field is highlighted when we're drawing a blue border around it
-    this._highlightedFieldId = null;
+    this.highlightedFieldId = null;
 
     // a field is opened when the user is actively editing it
-    this._openedFieldId = null;
-
-  },
-
-
-  registerField(sourceId, field) {
-    this._fieldSources[sourceId] = field;
-    scheduleOnce('afterRender', this, this._handleFieldUpdates);
-  },
-
-  unregisterField(sourceId) {
-    this._fieldSources[sourceId] = null;
-    scheduleOnce('afterRender', this, this._handleFieldUpdates);
-  },
-
-  registerContent(sourceId, content) {
-    this._contentSources[sourceId] = content;
-    scheduleOnce('afterRender', this, this._handleFieldUpdates);
-  },
-
-  unregisterContent(sourceId) {
-    this._contentSources[sourceId] = null;
-    scheduleOnce('afterRender', this, this._handleFieldUpdates);
-  },
-
-  _handleFieldUpdates() {
-    let sources = this._fieldSources;
-    let fields = Object.create(null);
-    for (let sourceId in sources) {
-      let field = sources[sourceId];
-      if (field) {
-        field = field.copy();
-        fields[field.id] = field;
-        field.highlighted = this._highlightedFieldId === field.id;
-        field.opened = this._openedFieldId === field.id;
-      }
-    }
-
-    let contentSources = this._contentSources;
-    let contents = Object.create(null);
-    for (let sourceId in contentSources) {
-      let contentInfo = contentSources[sourceId];
-      if (contentInfo) {
-        contents[contentInfo.id] = contentInfo;
-      }
-    }
-    let contentItems = Object.keys(contents).map(id => contents[id]);
-
-    this.set('fields', Object.keys(fields).map(id => fields[id]));
-    this.set('contentItems', contentItems);
-
-    // for now, we just treat the first piece of content in page
-    // format as active. But we can extend this to make a particular
-    // card active instead.
-    this.set('activeContentItem', contentItems.find(item => item.format === 'page'));
+    this.openedFieldId = null;
   },
 
   _updatePersistent(key, value) {
@@ -157,23 +124,16 @@ export default Ember.Service.extend({
     this._updatePersistent('activePanel', which);
   },
 
+  setEditing(which) {
+    this._updatePersistent('editing', which);
+  },
+
   openField(which) {
-    if (which) {
-      this._openedFieldId = which.id;
-    } else {
-      this._openedFieldId = null;
-    }
-    scheduleOnce('afterRender', this, this._handleFieldUpdates);
+    this.set('openedFieldId', which ? which.id : null);
   },
 
   highlightField(which) {
-    if (which) {
-      this._highlightedFieldId = which.id;
-    } else {
-      this._highlightedFieldId = null;
-    }
-    scheduleOnce('afterRender', this, this._handleFieldUpdates);
+    this.set('highlightedFieldId', which ? which.id : null);
   }
-
 
 });
