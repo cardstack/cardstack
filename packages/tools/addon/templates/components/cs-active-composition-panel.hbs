@@ -17,6 +17,7 @@
                               hovered=(perform highlightAndScrollToField fieldMark)
                               unhovered=(perform highlightAndScrollToField null) }}
 
+      <div class="cs-field-editor-section">
       {{#if fieldMark.model.grouped}}
         {{#each fieldMark.model.grouped as |fieldName|}}
           <label>{{cs-humanize fieldName}}</label>
@@ -25,7 +26,7 @@
       {{else}}
         {{cs-field-editor content=fieldMark.model.content field=fieldMark.model.name enabled=editingEnabled}}
       {{/if}}
-
+      </div>
     {{/cs-collapsible-section}}
   {{/each}}
 

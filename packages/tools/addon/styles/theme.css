@@ -1,0 +1,20 @@
+/*
+  We don't have proper theming, in the sense of letting things like
+  field plugins access the current theme and adopt it while under
+  their own control. This file contains the places where I'm currently
+  imposing styles down into pluggable components, which should get
+  replaced by a real theme protocol.
+*/
+
+.cs-field-editor-section input[type="text"] {
+    width: 100%;
+    box-sizing: border-box;
+    padding: 0.5em 1em;
+    line-height: 1.9em;
+    border-width: 2px;
+}
+
+.cs-field-editor-section input[type="text"]:focus {
+    border: 2px solid var(--tools-highlight);
+    outline: none;
+}

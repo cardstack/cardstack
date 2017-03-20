@@ -3,6 +3,7 @@
 @import "cardstack-toolbox";
 @import "cs-toggle-switch";
 @import "cs-field-overlays";
+@import "theme";
 
 :root {
     --deep-background: #000;
@@ -10,8 +11,8 @@
     --activating-background: #404040;
     --active-background: #545454;
     --light-background: #737373;
-
     --bright-foreground: #fff;
+    --tools-highlight: #63a9fa;
 }
 
 @font-face {

@@ -94,3 +94,10 @@
     flex: 1;
     overflow-y: scroll;
 }
+
+.cs-field-editor-section {
+    padding: 0.75em;
+    margin: 0;
+    background-color: var(--bright-foreground);
+    color: var(--normal-background);
+}
