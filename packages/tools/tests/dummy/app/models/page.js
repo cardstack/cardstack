@@ -4,7 +4,7 @@ const { Model, attr } = DS;
 
 export default Model.extend({
   title: attr('string'),
-  body: attr({ fieldType: 'mobiledoc' }),
+  body: attr({ fieldType: '@cardstack/mobiledoc' }),
   created: attr('date'),
   street: attr('string'),
   city: attr('string'),
