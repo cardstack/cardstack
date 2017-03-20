@@ -67,3 +67,11 @@
 .cs-mobiledoc-overview > ol > li.quotes-content:before {
     content: "\201C";
 }
+
+.cs-mobiledoc-inline-field-editor {
+    width: 100%;
+    height: 100%;
+    background-color: var(--bright-foreground);
+    color: var(--deep-background);
+    padding: 0.1em; /* needed to stop margin collapse */
+}

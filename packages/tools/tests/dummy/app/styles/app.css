@@ -3,6 +3,6 @@ body {
     margin: 0;
 }
 
-article {
+article.page {
     margin: 6em;
 }

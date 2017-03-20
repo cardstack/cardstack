@@ -11,7 +11,7 @@
     {{#if (and (eq mark.id tools.openedFieldId) (not mark.model.grouped)) }}
       {{#with (cs-field-editor-for mark.model.content mark.model.name variant="inline") as |editorName|}}
         {{#if (is-component editorName)}}
-          {{component editorName content=mark.model.content field=mark.model.name enabled=true}}
+          {{component editorName content=mark.model.content field=mark.model.name enabled=true tagName=""}}
         {{/if}}
       {{/with}}
     {{/if}}
