@@ -83,3 +83,14 @@
 .cs-toolbox-section.closed > header > button > svg {
     transform: rotate(-90deg);
 }
+
+.cs-active-composition-panel {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+}
+
+.cs-active-composition-panel > div {
+    flex: 1;
+    overflow-y: scroll;
+}

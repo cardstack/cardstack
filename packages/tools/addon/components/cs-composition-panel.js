@@ -3,6 +3,7 @@ import layout from '../templates/components/cs-composition-panel';
 
 export default Ember.Component.extend({
   layout,
+  tagName: '',
   actions: {
     openField(which) {
       return this.get('tools').openField(which);
