@@ -5,6 +5,7 @@ export default Ember.Component.extend({
   layout,
   tagName: 'section',
   classNameBindings: ['opened:opened:closed'],
+  animationRules,
 
   mouseEnter(event) {
     this.sendAction('hovered', event);
@@ -23,3 +24,12 @@ export default Ember.Component.extend({
     }
   }
 });
+
+function animationRules() {
+  this.transition(
+    this.fromValue(false),
+    this.toValue(true),
+    this.use('to-down', { duration: 250 }),
+    this.reverse('to-up', { duration: 250 })
+  );
+}

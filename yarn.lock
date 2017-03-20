@@ -2390,9 +2390,9 @@ ember-moment@^7.3.0:
     ember-cli-babel "^5.1.6"
     ember-macro-helpers "^0.4.0"
 
-ember-overlays@^0.1.0:
-  version "0.1.0"
-  resolved "https://registry.yarnpkg.com/ember-overlays/-/ember-overlays-0.1.0.tgz#139453a8767fa835f676756380916cc331a750ec"
+ember-overlays@^0.1.1:
+  version "0.1.1"
+  resolved "https://registry.yarnpkg.com/ember-overlays/-/ember-overlays-0.1.1.tgz#03683ff946e9af3c25d0acb5feaac54a50e4f1fe"
   dependencies:
     ember-cli-babel "^5.1.7"
     ember-cli-htmlbars "^1.1.1"
