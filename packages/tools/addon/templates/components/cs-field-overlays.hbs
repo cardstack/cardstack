@@ -1,5 +1,5 @@
 {{#overlay-marks group="cardstack-fields" as |mark|}}
-  {{create-overlay at=mark
+  {{#create-overlay at=mark
                    label=(cs-humanize mark.model.name)
                    highlighted=(eq mark.id tools.highlightedFieldId)
                    hoverable=tools.editing
@@ -8,5 +8,12 @@
                    onclick=(action "openField" mark)
                    dismiss=(action "openField" null)
                    }}
-
+    {{#if (and (eq mark.id tools.openedFieldId) (not mark.model.grouped)) }}
+      {{#with (cs-field-editor-for mark.model.content mark.model.name variant="inline") as |editorName|}}
+        {{#if (is-component editorName)}}
+          {{component editorName content=mark.model.content field=mark.model.name enabled=true}}
+        {{/if}}
+      {{/with}}
+    {{/if}}
+  {{/create-overlay}}
 {{/overlay-marks}}
