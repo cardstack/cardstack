@@ -18,7 +18,10 @@
                               unhovered=(perform highlightAndScrollToField null) }}
 
       {{#if fieldMark.model.grouped}}
-        {{cs-assert "field editors for group" fieldMark.model.name}}
+        {{#each fieldMark.model.grouped as |fieldName|}}
+          <label>{{cs-humanize fieldName}}</label>
+          {{cs-field-editor content=fieldMark.model.content field=fieldName enabled=editingEnabled}}
+        {{/each}}
       {{else}}
         {{cs-field-editor content=fieldMark.model.content field=fieldMark.model.name enabled=editingEnabled}}
       {{/if}}
