@@ -1,1 +1,1 @@
-export { default } from 'core-types/components/field-editors/string-editor';
+export { default } from '@cardstack/core-types/components/field-editors/string-editor';

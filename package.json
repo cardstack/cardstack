@@ -35,7 +35,9 @@
     "temp": "^0.8.3"
   },
   "scripts": {
-    "test": "mocha --harmony -r packages/test-support/prepare.js packages/*/tests/*-test.js",
+    "test": "npm run node-tests && npm run ember-tests",
+    "node-tests": "mocha --harmony -r packages/test-support/prepare.js packages/*/tests/*-test.js",
+    "ember-tests": "node --harmony packages/test-support/ember-test-runner.js",
     "server": "node --harmony packages/server/bin/server.js"
   },
   "dependencies": {
