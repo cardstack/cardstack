@@ -5,6 +5,9 @@
   "repository": "https://github.com/cardstack/cardstack-server",
   "author": "Edward Faulkner <edward@eaf4.com>",
   "license": "MIT",
+  "engines": {
+    "node": ">= 7.7"
+  },
   "devDependencies": {
     "broccoli-asset-rev": "^2.4.5",
     "chai": "^3.5.0",
