@@ -1,13 +1,13 @@
 const Searcher = require('@cardstack/elasticsearch/searcher');
 const SchemaCache = require('@cardstack/server/schema-cache');
-const temp = require('@cardstack/plugin-utils/tests/temp-helper');
-const { makeRepo } = require('@cardstack/git/tests/support');
+const temp = require('@cardstack/plugin-utils/node-tests/temp-helper');
+const { makeRepo } = require('@cardstack/git/node-tests/support');
 const GitIndexer = require('@cardstack/git/indexer');
 const Indexers = require('@cardstack/server/indexers');
 const GitWriter = require('@cardstack/git/writer');
 const Writers = require('@cardstack/server/writers');
 const Schema = require('@cardstack/server/schema');
-const ElasticAssert = require('@cardstack/elasticsearch/tests/assertions');
+const ElasticAssert = require('@cardstack/elasticsearch/node-tests/assertions');
 
 exports.createDefaultEnvironment = async function(initialModels = []) {
   let repoPath = await temp.mkdir('cardstack-server-test');

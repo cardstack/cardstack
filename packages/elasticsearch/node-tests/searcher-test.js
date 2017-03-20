@@ -1,7 +1,7 @@
 const {
   indexRecords,
   destroyIndices
-} = require('@cardstack/server/tests/support');
+} = require('@cardstack/server/node-tests/support');
 const Searcher = require('@cardstack/elasticsearch/searcher');
 const SchemaCache = require('@cardstack/server/schema-cache');
 const { uniq } = require('lodash');

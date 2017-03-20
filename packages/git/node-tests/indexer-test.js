@@ -1,9 +1,9 @@
 const Change = require('@cardstack/git/change');
-const temp = require('@cardstack/plugin-utils/tests/temp-helper');
+const temp = require('@cardstack/plugin-utils/node-tests/temp-helper');
 const GitIndexer = require('@cardstack/git/indexer');
 const Indexers = require('@cardstack/server/indexers');
 const { commitOpts, makeRepo } = require('./support');
-const ElasticAssert = require('@cardstack/elasticsearch/tests/assertions');
+const ElasticAssert = require('@cardstack/elasticsearch/node-tests/assertions');
 
 describe('git/indexer', function() {
   let root, indexer, ea;

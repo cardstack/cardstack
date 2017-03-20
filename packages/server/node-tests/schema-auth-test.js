@@ -1,5 +1,5 @@
 const Schema = require('@cardstack/server/schema');
-const ElasticAssert = require('@cardstack/elasticsearch/tests/assertions');
+const ElasticAssert = require('@cardstack/elasticsearch/node-tests/assertions');
 const JSONAPIFactory = require('@cardstack/test-support/jsonapi-factory');
 const PendingChange = require('@cardstack/plugin-utils/pending-change');
 

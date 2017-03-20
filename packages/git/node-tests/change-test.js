@@ -1,5 +1,5 @@
 const Change = require('@cardstack/git/change');
-const temp = require('@cardstack/plugin-utils/tests/temp-helper');
+const temp = require('@cardstack/plugin-utils/node-tests/temp-helper');
 const {
   inRepo,
   commitOpts,

@@ -4,7 +4,7 @@ const Koa = require('koa');
 const {
   createDefaultEnvironment,
   destroyDefaultEnvironment
-} = require('@cardstack/server/tests/support');
+} = require('@cardstack/server/node-tests/support');
 const { currentVersion } = require('./support');
 const JSONAPIFactory = require('@cardstack/test-support/jsonapi-factory');
 const { grantAllPermissions } = require('@cardstack/test-support/permissions');
