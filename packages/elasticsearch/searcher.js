@@ -77,7 +77,13 @@ class Searcher {
       // elasticsearch errors have their own status codes, and Koa
       // will treat them as valid responses if we let them through. We
       // don't want that -- we want to render proper JSONAPI errors.
-      if (err.body && err.body.error) {
+      if (err.message && err.body && err.body.error) {
+        if (err.message.indexOf('[index_not_found_exception]') === 0) {
+          throw new Error(`No such branch '${branch}' in our search index`, {
+            status: 404,
+            title: "No such branch"
+          });
+        }
         throw new Error(err.message, {
           status: 500,
           title: 'elasticsearch failure',
