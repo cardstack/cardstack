@@ -18,7 +18,7 @@ module.exports = function(searcher, writers, optionsArg) {
         throw err;
       }
     });
-p    let branch = options.defaultBranch;
+    let branch = options.defaultBranch;
     let handler = new Handler(searcher, writers, ctxt, branch, log);
     return handler.run();
   };
