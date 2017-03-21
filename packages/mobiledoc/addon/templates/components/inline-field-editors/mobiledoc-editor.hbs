@@ -1,3 +1,3 @@
 <div class="cs-mobiledoc-inline-field-editor">
-  {{mobiledoc-editor mobiledoc=(get content field)}}
+  {{cs-mobiledoc-editor mobiledoc=(get content field) on-change=(action (mut (get content field))) }}
 </div>
