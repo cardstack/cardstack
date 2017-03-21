@@ -69,7 +69,7 @@ export default Ember.Service.extend({
     },
     {
       id: 'cards',
-      description: 'Tile',
+      description: 'Card',
       icon: {
         name: 'tiles',
         width: 20,
