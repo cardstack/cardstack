@@ -28,7 +28,22 @@ exports.createDefaultEnvironment = async function(initialModels = []) {
     email: 'test@example.com'
   };
 
-  let schemaCache = new SchemaCache();
+  let schemaCache = new SchemaCache([
+    {
+      type: 'plugin-configs',
+      attributes: {
+        module: '@cardstack/git'
+      }
+    },
+    {
+      type: 'data-sources',
+      id: 'default-git',
+      attributes: {
+        'source-type': '@cardstack/git',
+        params: { repo: repoPath }
+      }
+    }
+  ]);
 
   // TODO: we need Searchers as to Searcher as Writers is to Writer,
   // so we have a place to route special searches, and so we're not
@@ -47,16 +62,6 @@ exports.createDefaultEnvironment = async function(initialModels = []) {
   let indexer = new Indexers([new GitIndexer({
     repoPath
   })]);
-
-  let pending = await writer.prepareCreate('master', user, 'data-sources', {
-    type: 'data-sources',
-    id: 'default-git',
-    attributes: {
-      'source-type': '@cardstack/git',
-      params: { repo: repoPath }
-    }
-  });
-  await pending.finalize();
 
   for (let model of initialModels) {
     let pending = await writer.prepareCreate('master', user, model.type, model);

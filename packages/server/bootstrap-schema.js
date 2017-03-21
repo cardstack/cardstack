@@ -1,11 +1,9 @@
 const models = Object.freeze([
   {
     type: 'plugin-configs',
-    id: '@cardstack/core-types'
-  },
-  {
-    type: 'plugin-configs',
-    id: '@cardstack/git'
+    attributes: {
+      module: '@cardstack/core-types'
+    }
   }
 ]);
 module.exports = models;

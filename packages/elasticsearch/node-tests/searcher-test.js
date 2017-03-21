@@ -12,7 +12,9 @@ describe('searcher', function() {
   let fixtures = [
     {
       type: 'plugin-configs',
-      id: '@cardstack/mobiledoc'
+      attributes: {
+        module: '@cardstack/mobiledoc'
+      }
     },
     {
       type: 'content-types',

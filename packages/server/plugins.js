@@ -84,7 +84,7 @@ module.exports = class Plugins {
 };
 
 async function loadPlugin(pluginConfig) {
-  let moduleName = pluginConfig.id;
+  let moduleName = pluginConfig.attributes.module;
   let packageJSON = path.join(moduleName, 'package.json');
   let moduleRoot = path.dirname(require.resolve(packageJSON));
   let json = require(packageJSON);

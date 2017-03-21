@@ -10,6 +10,9 @@ describe('schema/validation', function() {
 
   before(async function() {
     let factory = new JSONAPIFactory();
+
+    factory.addResource('plugin-configs').withAttributes({ module: '@cardstack/git' });
+
     let articleType = factory.addResource('content-types', 'articles');
 
     articleType.withRelated(

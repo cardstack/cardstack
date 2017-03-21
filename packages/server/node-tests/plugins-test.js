@@ -6,7 +6,10 @@ describe('plugins', function() {
 
   before(async function() {
     let factory = new JSONAPIFactory();
-    factory.addResource('plugin-configs', '@cardstack/core-types');
+    factory.addResource('plugin-configs')
+      .withAttributes({
+        module: '@cardstack/core-types'
+      });
     models = factory.getModels();
   });
 
