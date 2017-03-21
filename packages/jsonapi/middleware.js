@@ -2,6 +2,7 @@ const Error = require('@cardstack/plugin-utils/error');
 const qs = require('qs');
 const { merge } = require('lodash');
 const koaJSONBody = require('koa-json-body');
+const logger = require('heimdalljs-logger');
 
 module.exports = function(searcher, writers, optionsArg) {
   let options = Object.assign({}, {
@@ -9,6 +10,7 @@ module.exports = function(searcher, writers, optionsArg) {
   }, optionsArg);
 
   let body = koaJSONBody({ limit: '1mb' });
+  let log = logger('jsonapi');
 
   return async (ctxt) => {
     await body(ctxt, err => {
@@ -16,19 +18,20 @@ module.exports = function(searcher, writers, optionsArg) {
         throw err;
       }
     });
-    let branch = options.defaultBranch;
-    let handler = new Handler(searcher, writers, ctxt, branch);
+p    let branch = options.defaultBranch;
+    let handler = new Handler(searcher, writers, ctxt, branch, log);
     return handler.run();
   };
 };
 
 class Handler {
-  constructor(searcher, writers, ctxt, branch) {
+  constructor(searcher, writers, ctxt, branch, log) {
     this.searcher = searcher;
     this.writers = writers;
     this.ctxt = ctxt;
     this.branch = branch;
     this._query = null;
+    this.log = log;
   }
 
   get query() {
@@ -72,12 +75,17 @@ class Handler {
       } else if (segments.length === 3) {
         kind = 'Individual';
       }
-      let method = this[`handle${kind}${this.ctxt.request.method}`];
+      let methodName = `handle${kind}${this.ctxt.request.method}`;
+      this.log.debug("attempting to match method %s", methodName);
+      let method = this[methodName];
       if (method) {
         await method.apply(this, segments.slice(1));
       }
     } catch (err) {
-      if (!err.isCardstackError) { throw err; }
+      if (!err.isCardstackError) {
+        this.log.debug("passing error onward %s", err);
+        throw err;
+      }
       let errors = [err];
       if (err.additionalErrors) {
         errors = errors.concat(err.additionalErrors);

@@ -66,12 +66,25 @@ class Searcher {
       }
     }
     this.log.debug('search %j', esBody);
-    let result = await this.es.search({
-      index: this.constructor.branchToIndexName(branch),
-      body: esBody
-    });
-    this.log.debug('searchResult %j', result);
-    return this._assembleResponse(result, size);
+    try {
+      let result = await this.es.search({
+        index: this.constructor.branchToIndexName(branch),
+        body: esBody
+      });
+      this.log.debug('searchResult %j', result);
+      return this._assembleResponse(result, size);
+    } catch (err) {
+      // elasticsearch errors have their own status codes, and Koa
+      // will treat them as valid responses if we let them through. We
+      // don't want that -- we want to render proper JSONAPI errors.
+      if (err.body && err.body.error) {
+        throw new Error(err.message, {
+          status: 500,
+          title: 'elasticsearch failure',
+        });
+      }
+      throw err;
+    }
   }
 
   _assembleResponse(result, requestedSize) {
