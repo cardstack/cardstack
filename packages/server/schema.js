@@ -170,11 +170,11 @@ function findFields(models, plugins, constraints, grants, defaultValues, authLog
   return fields;
 }
 
-function findDataSources(models, plugins, defaultSearcher) {
+function findDataSources(models, plugins) {
   let dataSources = new Map();
   for (let model of models) {
     if (model.type === 'data-sources') {
-      dataSources.set(model.id, new DataSource(model, plugins, defaultSearcher));
+      dataSources.set(model.id, new DataSource(model, plugins));
     }
   }
   return dataSources;
