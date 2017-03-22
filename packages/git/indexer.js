@@ -27,7 +27,12 @@ module.exports = class Indexer {
     // nodegit docs show a Branch.iteratorNew method that would be
     // more appropriate than this, but as far as I can tell it is not
     // fully implemented
-    return (await Reference.list(this.repo)).map(entry => entry.replace(/^refs\/heads\//, ''));
+    return (await Reference.list(this.repo)).map(entry => {
+      let m = /^refs\/heads\/(.*)/.exec(entry);
+      if (m) {
+        return m[1];
+      }
+    }).filter(Boolean);
   }
 
   async beginUpdate(branch) {
