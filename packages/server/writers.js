@@ -11,7 +11,8 @@ class Writers {
     this.log.info("creating type=%s", type);
     let schema = await this.schemaCache.schemaForBranch(branch);
     let writer = this._lookupWriter(schema, type);
-    let pending = await writer.prepareCreate(branch, user, type, document);
+    let isSchema = schema.constructor.ownTypes().includes(type);
+    let pending = await writer.prepareCreate(branch, user, type, document, isSchema);
     await schema.validate(pending, { type });
     let response = await this._finalizeAndReply(pending);
     await this.schemaCache.notifyUpdated(branch, type, response.id, response);
@@ -22,7 +23,8 @@ class Writers {
     this.log.info("updating type=%s id=%s", type, id);
     let schema = await this.schemaCache.schemaForBranch(branch);
     let writer = this._lookupWriter(schema, type);
-    let pending = await writer.prepareUpdate(branch, user, type, id, document);
+    let isSchema = schema.constructor.ownTypes().includes(type);
+    let pending = await writer.prepareUpdate(branch, user, type, id, document, isSchema);
     await schema.validate(pending, { type, id });
     let response = await this._finalizeAndReply(pending);
     await this.schemaCache.notifyUpdated(branch, type, response.id, response);
@@ -33,7 +35,8 @@ class Writers {
     this.log.info("deleting type=%s id=%s", type, id);
     let schema = await this.schemaCache.schemaForBranch(branch);
     let writer = this._lookupWriter(schema, type);
-    let pending = await writer.prepareDelete(branch, user, version, type, id);
+    let isSchema = schema.constructor.ownTypes().includes(type);
+    let pending = await writer.prepareDelete(branch, user, version, type, id, isSchema);
     await schema.validate(pending, {});
     await pending.finalize();
     await this.schemaCache.notifyUpdated(branch, type, id, null);

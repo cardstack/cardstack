@@ -159,7 +159,7 @@ describe('git/writer', function() {
         attributes: {
           title: 'Second Article'
         }
-      });
+      }, false);
       expect(ids).to.have.length(0);
       expect(pending.finalDocument).has.property('id', '2');
     });

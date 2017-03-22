@@ -8,7 +8,6 @@ const Change = require('./change');
 const os = require('os');
 const process = require('process');
 const Error = require('@cardstack/plugin-utils/error');
-const Schema = require('@cardstack/server/schema');
 const PendingChange = require('@cardstack/plugin-utils/pending-change');
 
 const pendingChanges = new WeakMap();
@@ -24,7 +23,7 @@ module.exports = class Writer {
     this.idGenerator = idGenerator;
   }
 
-  async prepareCreate(branch, user, type, document) {
+  async prepareCreate(branch, user, type, document, isSchema) {
     return withErrorHandling(document.id, type, async () => {
       await this._ensureRepo();
 
@@ -33,7 +32,7 @@ module.exports = class Writer {
       let file;
       while (id == null) {
         let candidateId = this._generateId();
-        let candidateFile = await change.get(this._filenameFor(document.type, candidateId), { allowCreate: true });
+        let candidateFile = await change.get(this._filenameFor(document.type, candidateId, isSchema), { allowCreate: true });
         if (!candidateFile.exists()) {
           id = candidateId;
           file = candidateFile;
@@ -41,7 +40,7 @@ module.exports = class Writer {
       }
 
       if (!file) {
-        file = await change.get(this._filenameFor(document.type, id), { allowCreate: true });
+        file = await change.get(this._filenameFor(document.type, id, isSchema), { allowCreate: true });
       }
 
       let gitDocument = { id, type: document.type };
@@ -59,7 +58,7 @@ module.exports = class Writer {
     });
   }
 
-  async prepareUpdate(branch, user, type, id, document) {
+  async prepareUpdate(branch, user, type, id, document, isSchema) {
     if (!document.meta || !document.meta.version) {
       throw new Error('missing required field "meta.version"', {
         status: 400,
@@ -70,7 +69,7 @@ module.exports = class Writer {
     await this._ensureRepo();
     return withErrorHandling(id, type, async () => {
       let change = await Change.create(this.repo, document.meta.version, branch);
-      let file = await change.get(this._filenameFor(type, id), { allowUpdate: true });
+      let file = await change.get(this._filenameFor(type, id, isSchema), { allowUpdate: true });
       let before = JSON.parse(await file.getBuffer());
       let after = patch(before, document);
       // we don't write id & type into the actual file (they're part
@@ -87,7 +86,7 @@ module.exports = class Writer {
     });
   }
 
-  async prepareDelete(branch, user, version, type, id) {
+  async prepareDelete(branch, user, version, type, id, isSchema) {
     if (!version) {
       throw new Error('version is required', {
         status: 400,
@@ -97,7 +96,7 @@ module.exports = class Writer {
     await this._ensureRepo();
     return withErrorHandling(id, type, async () => {
       let change = await Change.create(this.repo, version, branch);
-      let file = await change.get(this._filenameFor(type, id));
+      let file = await change.get(this._filenameFor(type, id, isSchema));
       let before = JSON.parse(await file.getBuffer());
       file.delete();
       before.id = id;
@@ -119,8 +118,8 @@ module.exports = class Writer {
     };
   }
 
-  _filenameFor(type, id) {
-    let category = Schema.ownTypes().includes(type) ? 'schema' : 'contents';
+  _filenameFor(type, id, isSchema) {
+    let category = isSchema ? 'schema' : 'contents';
     return `${category}/${type}/${id}.json`;
   }
 
