@@ -2,12 +2,16 @@ const Searcher = require('@cardstack/elasticsearch/searcher');
 const SchemaCache = require('@cardstack/server/schema-cache');
 const temp = require('@cardstack/plugin-utils/node-tests/temp-helper');
 const { makeRepo } = require('@cardstack/git/node-tests/support');
-const GitIndexer = require('@cardstack/git/indexer');
 const Indexers = require('@cardstack/server/indexers');
 const Writers = require('@cardstack/server/writers');
-const Schema = require('@cardstack/server/schema');
 const ElasticAssert = require('@cardstack/elasticsearch/node-tests/assertions');
 const JSONAPIFactory = require('@cardstack/test-support/jsonapi-factory');
+
+let user = {
+  id: 'the-default-test-user',
+  fullName: 'Default Test Environment',
+  email: 'test@example.com'
+};
 
 exports.createDefaultEnvironment = async function(initialModels = []) {
   let repoPath = await temp.mkdir('cardstack-server-test');
@@ -15,12 +19,6 @@ exports.createDefaultEnvironment = async function(initialModels = []) {
   // TODO: The git writer should make its own local repo when it
   // starts up the first time.
   let { head, repo } = await makeRepo(repoPath);
-
-  let user = {
-    id: 'the-default-test-user',
-    fullName: 'Default Test Environment',
-    email: 'test@example.com'
-  };
 
   let factory = new JSONAPIFactory();
 
@@ -70,9 +68,7 @@ exports.createDefaultEnvironment = async function(initialModels = []) {
   // always controls which indexers to run. This would also work for
   // branch-level grants: to create a branch, you must have a grant on
   // this specially-privileged branch.
-  let indexer = new Indexers(schemaCache, [new GitIndexer({
-    repoPath
-  })]);
+  let indexer = new Indexers(schemaCache);
 
   // This creates the indices
   await indexer.update();
@@ -111,52 +107,9 @@ exports.destroyDefaultEnvironment = async function(/* env */) {
   await temp.cleanup();
 };
 
-exports.destroyIndices = destroyIndices;
 async function destroyIndices() {
   let ea = new ElasticAssert();
   await ea.deleteAllIndices();
-}
-
-exports.indexRecords = async function(records) {
-  let stub = new StubIndexer();
-  let schemaCache = new SchemaCache();
-  let indexers = new Indexers(schemaCache, [stub]);
-  let schemaTypes = Schema.ownTypes();
-  for (let record of records) {
-    if (schemaTypes.indexOf(record.type) >= 0) {
-      stub.schemaRecords.push(record);
-    }
-    stub.records.push(record);
-  }
-  await indexers.update({ realTime: true });
-};
-
-class StubIndexer {
-  constructor() {
-    this.records = [];
-    this.schemaRecords = [];
-  }
-  async branches() {
-    return ['master'];
-  }
-  async beginUpdate() {
-    return new StubUpdater(this);
-  }
-}
-
-class StubUpdater {
-  constructor(source) {
-    this.source = source;
-    this.name = 'stub';
-  }
-  async schema() {
-    return this.source.schemaRecords.slice();
-  }
-  async updateContent(meta, hints, ops) {
-    for (let record of this.source.records) {
-      await ops.save(record.type, record.id, record);
-    }
-  }
 }
 
 function inDependencyOrder(models) {

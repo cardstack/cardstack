@@ -10,8 +10,8 @@ const { safeEntryByName } = require('./mutable-tree');
 const logger = require('heimdalljs-logger');
 
 module.exports = class Indexer {
-  constructor({ repoPath }) {
-    this.repoPath = repoPath;
+  constructor({ repo }) {
+    this.repoPath = repo;
     this.repo = null;
     this.log = logger('git-indexer');
   }

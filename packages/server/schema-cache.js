@@ -24,7 +24,11 @@ module.exports = class SchemaCache {
     this.searcher = new Searcher(new BootstrapSchemaCache(seedModels));
     this.cache = new Map();
     this.log = logger('schema-cache');
+
+    // TODO move this value into plugins-configs for @cardstack/server.
+    this.controllingBranch = 'master';
   }
+
   async schemaForBranch(branch) {
     if (!this.cache.has(branch)) {
       // we synchronously place a Promise into the cache. This ensures
@@ -33,35 +37,42 @@ module.exports = class SchemaCache {
       this.cache.set(branch, this._load(branch));
     }
     let schema = await this.cache.get(branch);
-    this.log.debug("returning schema for branch %s", branch);
+    this.log.debug("returning schema for branch %s %s", branch);
     return schema;
   }
-  async _load(branch) {
-    this.log.debug("initiating schema load on branch %s", branch);
-    let { models, page } = await this.searcher.search(branch, {
-      filter: {
-        type: Schema.ownTypes()
-      },
-      page: { size: 100 }
-    });
-    if (page.cursor) {
-      throw new Error("query for schema models had insufficient page size");
-    }
-    return this.schemaFrom(models);
+
+  // The "controlling branch" is special because it's used for
+  // configuration that is not scoped to any particular branch.
+  //
+  // For one example: the set of data sources that we're indexing is
+  // not something that can vary by branch, since the set of branches
+  // itself is discovered by the indexers.
+  //
+  // For another example: a Grant for permission to create a new
+  // branch (which is not something that's actually implemented at
+  // this moment) is something that would need to be stored in the
+  // controlling branch.
+  async schemaForControllingBranch() {
+    return this.schemaForBranch(this.controllingBranch);
   }
 
+  // Instantiates a Schema, while respecting any seedModels. This
+  // method does not alter the schemaCache's own state.
   async schemaFrom(models) {
     return Schema.loadFrom(this.seedModels.concat(models));
   }
 
-  // When an indexer loads a branch, it necessarily reads the schema
+  // When Indexers reads a branch, it necessarily reads the schema
   // first. It then uses this method to update the our cache.
   notifyBranchUpdate(branch, schema) {
+    if (!(schema instanceof Schema)) {
+      throw new Error("Bug: notifyBranchUpdate got a non-schema");
+    }
     this.log.debug("full schema update on branch %s", branch);
     this.cache.set(branch, Promise.resolve(schema));
   }
 
-  // when a writer touches a model, it notifies us because there's a
+  // when Writers touches a model, it notifies us because there's a
   // chance the model was part of a schema.
   async notifyUpdated(branch, type, id, document) {
     if (this.cache.has(branch)) {
@@ -69,6 +80,34 @@ module.exports = class SchemaCache {
       let newSchema = schema.applyChange(type, id, document);
       if (newSchema !== schema) {
         this.cache.set(branch, Promise.resolve(newSchema));
+      }
+    }
+  }
+
+  async _load(branch) {
+    this.log.debug("initiating schema load on branch %s", branch);
+    try {
+      let { models, page } = await this.searcher.search(branch, {
+        filter: {
+          type: Schema.ownTypes()
+        },
+        page: { size: 100 }
+      });
+      if (page.cursor) {
+        throw new Error("query for schema models had insufficient page size");
+      }
+      this.log.debug("completed schema model loading on branch %s", branch);
+      let schema = this.schemaFrom(models);
+      this.log.debug("instantiated schema for branch %s", branch);
+      return schema;
+    } catch (err) {
+      if (err.status === 404 && err.title === 'No such branch') {
+        // our searcher can fail if no index exists yet. But that's OK
+        // -- in that case our schema is just our seed models.
+        this.log.debug("no search index exists for branch %s, using seeds only", branch);
+        return this.schemaFrom([]);
+      } else {
+        throw err;
       }
     }
   }

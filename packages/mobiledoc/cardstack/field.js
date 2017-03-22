@@ -23,7 +23,7 @@ module.exports = {
   // derive a text representation to store in elasticsearch
   derivedFields(fieldName, value) {
     return {
-      [this.queryFieldName(fieldName)]: renderer.render(value).result
+      [this.queryFieldName(fieldName)]: value ? renderer.render(value).result : null
     };
   },
 

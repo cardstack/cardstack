@@ -71,8 +71,26 @@ const models = [
     }
   },
   {
+    type: 'content-types',
+    id: 'plugin-configs',
+    relationships: {
+      fields: {
+        data: [
+          { type: 'fields', id: 'module' }
+        ]
+      }
+    }
+  },
+  {
     type: 'fields',
     id: 'group-id',
+    attributes: {
+      'field-type': '@cardstack/core-types::string'
+    }
+  },
+  {
+    type: 'fields',
+    id: 'module',
     attributes: {
       'field-type': '@cardstack/core-types::string'
     }

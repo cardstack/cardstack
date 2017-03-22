@@ -1,10 +1,10 @@
 const Change = require('@cardstack/git/change');
 const temp = require('@cardstack/plugin-utils/node-tests/temp-helper');
-const GitIndexer = require('@cardstack/git/indexer');
 const Indexers = require('@cardstack/server/indexers');
 const SchemaCache = require('@cardstack/server/schema-cache');
 const { commitOpts, makeRepo } = require('./support');
 const ElasticAssert = require('@cardstack/elasticsearch/node-tests/assertions');
+const JSONAPIFactory = require('@cardstack/test-support/jsonapi-factory');
 
 describe('git/indexer', function() {
   let root, indexer, ea;
@@ -12,10 +12,28 @@ describe('git/indexer', function() {
   beforeEach(async function() {
     ea = new ElasticAssert();
     root = await temp.mkdir('cardstack-server-test');
-    let schemaCache = new SchemaCache();
-    indexer = new Indexers(schemaCache, [new GitIndexer({
-      repoPath: root
-    })]);
+
+    let factory = new JSONAPIFactory();
+
+    factory.addResource('plugin-configs')
+      .withAttributes({
+        module: '@cardstack/git'
+      });
+
+    factory.addResource('plugin-configs')
+      .withAttributes({
+        module: '@cardstack/server',
+      }).withRelated(
+        'default-data-source',
+        factory.addResource('data-sources')
+          .withAttributes({
+            'source-type': '@cardstack/git',
+            params: { repo: root }
+          })
+      );
+
+    let schemaCache = new SchemaCache(factory.getModels());
+    indexer = new Indexers(schemaCache);
   });
 
   afterEach(async function() {

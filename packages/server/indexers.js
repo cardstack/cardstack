@@ -27,11 +27,12 @@ const { isEqual } = require('lodash');
 const BulkOps = require('./bulk-ops');
 
 module.exports = class Indexers {
-  constructor(schemaCache, indexers) {
+  constructor(schemaCache) {
     this.schemaCache = schemaCache;
-    this.indexers = indexers;
     this.es = makeClient();
     this.log = logger('indexers');
+    this._lastControllingSchema = null;
+    this._indexers = null;
   }
 
   async update({ realTime, hints} = {}) {
@@ -63,9 +64,21 @@ module.exports = class Indexers {
     this.schemaCache.notifyBranchUpdate(branch, schema);
   }
 
+  async _lookupIndexers() {
+    let schema = await this.schemaCache.schemaForControllingBranch();
+    if (schema !== this._lastControllingSchema) {
+      this._lastControllingSchema = schema;
+      this._indexers = [...schema.dataSources.values()].map(v => v.indexer).filter(Boolean);
+      this.log.debug('found %s indexers', this._indexers.length);
+
+    }
+    return this._indexers;
+  }
+
   async _branches() {
+    let indexers = await this._lookupIndexers();
     let branches = {};
-    await Promise.all(this.indexers.map(async indexer => {
+    await Promise.all(indexers.map(async indexer => {
       for (let branch of await indexer.branches()) {
         if (!branches[branch]) {
           branches[branch] = [];

@@ -255,6 +255,12 @@ describe('schema/validation', function() {
     expect(schema.types.get('articles').dataSource.writer).has.property('repoPath', 'http://example.git/repo.git');
   });
 
+  it("can lookup up an indexer on a data source", async function() {
+    let source = schema.dataSources.get(gitDataSource.id);
+    expect(source).ok;
+    expect(source.indexer).ok;
+  });
+
   it("uses default data source", async function() {
     expect(schema.types.get('things-with-defaults').dataSource).is.ok;
     expect(schema.types.get('things-with-defaults').dataSource).has.property('id', gitDataSource.id);

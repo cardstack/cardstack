@@ -1,14 +1,12 @@
 const {
-  indexRecords,
-  destroyIndices
+  createDefaultEnvironment,
+  destroyDefaultEnvironment
 } = require('@cardstack/server/node-tests/support');
-const Searcher = require('@cardstack/elasticsearch/searcher');
-const SchemaCache = require('@cardstack/server/schema-cache');
 const { uniq } = require('lodash');
 
-describe('searcher', function() {
+describe('elasticsearch/searcher', function() {
 
-  let searcher;
+  let searcher, env;
   let fixtures = [
     {
       type: 'plugin-configs',
@@ -33,12 +31,24 @@ describe('searcher', function() {
     },
     {
       type: 'content-types',
+      id: 'comments',
+      relationships: {
+        fields: {
+          data: [
+            { type: 'fields', id: 'body' }
+          ]
+        }
+      }
+    },
+    {
+      type: 'content-types',
       id: 'articles',
       relationships: {
         fields: {
           data: [
             { type: 'fields', id: 'title' },
-            { type: 'fields', id: 'color' }
+            { type: 'fields', id: 'color' },
+            { type: 'fields', id: 'hello' }
           ]
         }
       }
@@ -46,6 +56,20 @@ describe('searcher', function() {
     {
       type: 'fields',
       id: 'firstName',
+      attributes: {
+        'field-type': '@cardstack/core-types::string'
+      }
+    },
+    {
+      type: 'fields',
+      id: 'body',
+      attributes: {
+        'field-type': '@cardstack/core-types::string'
+      }
+    },
+    {
+      type: 'fields',
+      id: 'hello',
       attributes: {
         'field-type': '@cardstack/core-types::string'
       }
@@ -126,7 +150,6 @@ describe('searcher', function() {
   ];
 
   before(async function() {
-    searcher = new Searcher(new SchemaCache());
     let records = fixtures.slice();
     for (let i = 10; i < 30; i++) {
       records.push({
@@ -137,11 +160,12 @@ describe('searcher', function() {
         }
       });
     }
-    await indexRecords(records);
+    env = await createDefaultEnvironment(records);
+    searcher = env.searcher;
   });
 
   after(async function() {
-    await destroyIndices();
+    await destroyDefaultEnvironment();
   });
 
   it('can be searched for all content', async function() {

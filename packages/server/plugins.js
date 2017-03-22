@@ -45,7 +45,8 @@ const featureTypes = [
   'constraints',
   'fields',
   'writers',
-  'searchers'
+  'searchers',
+  'indexers'
 ];
 const javascriptPattern = /(.*)\.js$/;
 

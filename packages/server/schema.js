@@ -28,12 +28,13 @@ module.exports = class Schema {
     let defaultDataSource = findDefaultDataSource(plugins);
     schemaLog.debug('default data source %j', defaultDataSource);
     let types = findTypes(models, fields, dataSources, defaultDataSource, grants);
-    return new this(types, fields, inputModels);
+    return new this(types, fields, dataSources, inputModels);
   }
 
-  constructor(types, fields, originalModels) {
+  constructor(types, fields, dataSources, originalModels) {
     this.types = types;
     this.fields = fields;
+    this.dataSources = dataSources;
     this._mapping = null;
     this._originalModels = originalModels;
   }
