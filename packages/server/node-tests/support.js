@@ -78,7 +78,16 @@ exports.createDefaultEnvironment = async function(initialModels = []) {
   await indexer.update();
 
   for (let model of inDependencyOrder(initialModels)) {
-    // TODO: this one-by-one creation is still slower than is nice for tests.
+    // TODO: this one-by-one creation is still slower than is nice for
+    // tests -- each time we write a schema model it invalidates the
+    // schema cache, which needs to get rebuilt before we can write
+    // the next one. Which also requires us to use inDependencyOrder,
+    // which is kinda lame.
+    //
+    // On the other hand, this is a high-quality test of our ability
+    // to build up the entire state in the same way an end user would
+    // via JSONAPI requests. If we optimize this away, we should also
+    // add some tests like that that are similarly comprehensive.
     let response = await writers.create('master', user, model.type, model);
     head = response.meta.version;
   }
