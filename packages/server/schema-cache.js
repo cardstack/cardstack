@@ -16,12 +16,14 @@
 
 const Schema = require('./schema');
 const Searcher = require('@cardstack/elasticsearch/searcher');
+const logger = require('heimdalljs-logger');
 
 module.exports = class SchemaCache {
   constructor(seedModels=[]) {
     this.seedModels = seedModels;
     this.searcher = new Searcher(new BootstrapSchemaCache(seedModels));
     this.cache = new Map();
+    this.log = logger('schema-cache');
   }
   async schemaForBranch(branch) {
     if (!this.cache.has(branch)) {
@@ -31,9 +33,11 @@ module.exports = class SchemaCache {
       this.cache.set(branch, this._load(branch));
     }
     let schema = await this.cache.get(branch);
+    this.log.debug("returning schema for branch %s", branch);
     return schema;
   }
   async _load(branch) {
+    this.log.debug("initiating schema load on branch %s", branch);
     let { models, page } = await this.searcher.search(branch, {
       filter: {
         type: Schema.ownTypes()
@@ -43,7 +47,30 @@ module.exports = class SchemaCache {
     if (page.cursor) {
       throw new Error("query for schema models had insufficient page size");
     }
+    return this.schemaFrom(models);
+  }
+
+  async schemaFrom(models) {
     return Schema.loadFrom(this.seedModels.concat(models));
+  }
+
+  // When an indexer loads a branch, it necessarily reads the schema
+  // first. It then uses this method to update the our cache.
+  notifyBranchUpdate(branch, schema) {
+    this.log.debug("full schema update on branch %s", branch);
+    this.cache.set(branch, Promise.resolve(schema));
+  }
+
+  // when a writer touches a model, it notifies us because there's a
+  // chance the model was part of a schema.
+  async notifyUpdated(branch, type, id, document) {
+    if (this.cache.has(branch)) {
+      let schema = await this.cache.get(branch);
+      let newSchema = schema.applyChange(type, id, document);
+      if (newSchema !== schema) {
+        this.cache.set(branch, Promise.resolve(newSchema));
+      }
+    }
   }
 };
 

@@ -1,26 +1,18 @@
 const Error = require('@cardstack/plugin-utils/error');
 
 module.exports = class Field {
-  constructor(model, plugins, constraints, allGrants, authLog) {
+  constructor(model, plugins, constraints, allGrants, defaultValues, authLog) {
     this.id = model.id;
     this.authLog = authLog;
     this.fieldType = model.attributes['field-type'];
-    this.searchable = model.attributes.searchable;
+    this.searchable = model.attributes.searchable == null ? true : model.attributes.searchable;
 
-    if (model.attributes.hasOwnProperty('default-at-update')) {
-      // The extra wrapper here allows us to distinguish whether the
-      // default value is null vs when the default value is not
-      // present.
-      this.defaultAtUpdate = { value: model.attributes['default-at-update'] };
-    } else {
-      this.defaultAtUpdate = null;
-    }
+    // Default values are modeled as relationships to separate models
+    // so that we can distinguish a default value of null from not
+    // having a default value.
 
-    if (model.attributes.hasOwnProperty('default-at-create')) {
-      this.defaultAtCreate = { value: model.attributes['default-at-create'] };
-    } else {
-      this.defaultAtCreate = null;
-    }
+    this.defaultAtUpdate = this._lookupDefaultValue(model, 'default-at-update', defaultValues);
+    this.defaultAtCreate = this._lookupDefaultValue(model, 'default-at-create', defaultValues);
 
     this.plugin = plugins.lookup('fields', this.fieldType);
     this.isRelationship = this.plugin.isRelationship;
@@ -32,6 +24,19 @@ module.exports = class Field {
     }
 
     this.grants = allGrants.filter(g => g.fields == null || g.fields.includes(model.id));
+  }
+
+  _lookupDefaultValue(model, relationship, defaultValues) {
+    if (model.relationships &&
+        model.relationships[relationship] &&
+        model.relationships[relationship].data) {
+      let valueModelId = model.relationships[relationship].data.id;
+      let valueModel = defaultValues.get(valueModelId);
+      if (!valueModel) {
+        throw new Error(`field ${this.id} refers to missing default value ${valueModelId}`);
+      }
+      return valueModel;
+    }
   }
 
   _sectionName() {
@@ -158,10 +163,16 @@ module.exports = class Field {
   }
   mapping() {
     let m = {
-      [this.id]: Object.assign({}, this.plugin.defaultMapping(), {
-        index: this.searchable
-      })
+      [this.id]: Object.assign({}, this.plugin.defaultMapping())
     };
+
+    if (!this.searchable) {
+      if (m[this.id].type === 'object') {
+        m[this.id].enabled = false;
+      } else {
+        m[this.id].index = false;
+      }
+    }
 
     if (this.plugin.derivedMappings) {
       Object.assign(m, this.plugin.derivedMappings(this.id));

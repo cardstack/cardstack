@@ -16,14 +16,18 @@ describe('schema/auth', function() {
           .withAttributes({ fieldType: '@cardstack/core-types::string' }),
         factory.addResource('fields', 'coolness')
           .withAttributes({
-            fieldType: '@cardstack/core-types::integer',
-            defaultAtCreate: 0
-          }),
+            fieldType: '@cardstack/core-types::integer'
+          }).withRelated(
+            'defaultAtCreate',
+            factory.addResource('default-values').withAttributes({ value: 0 })
+          ),
         factory.addResource('fields', 'reviewed')
           .withAttributes({
-            fieldType: '@cardstack/core-types::boolean',
-            defaultAtUpdate: false
-          })
+            fieldType: '@cardstack/core-types::boolean'
+          }).withRelated(
+            'defaultAtUpdate',
+            factory.addResource('default-values').withAttributes({ value: false })
+          )
       ]);
 
     factory.addResource('content-types', 'events')

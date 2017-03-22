@@ -18,14 +18,12 @@ describe('git/writer', function() {
     grantAllPermissions(factory);
 
     factory.addResource('content-types', 'articles')
-      .withRelated('data-source', { type: 'data-sources', id: 'default-git' })
       .withRelated('fields', [
         factory.addResource('fields', 'title').withAttributes({ fieldType: '@cardstack/core-types::string' }),
         factory.addResource('fields', 'primary-image').withAttributes({ fieldType: '@cardstack/core-types::belongs-to' })
       ]);
 
     factory.addResource('content-types', 'people')
-      .withRelated('data-source', { type: 'data-sources', id: 'default-git' })
       .withRelated('fields', [
         factory.addResource('fields', 'first-name').withAttributes({ fieldType: '@cardstack/core-types::string' }),
         factory.addResource('fields', 'last-name').withAttributes({ fieldType: '@cardstack/core-types::string' }),
@@ -52,18 +50,21 @@ describe('git/writer', function() {
       });
 
     factory.addResource('content-types', 'things-with-defaults')
-      .withRelated('data-source', { type: 'data-sources', id: 'default-git' })
       .withRelated('fields', [
         factory.addResource('fields', 'coolness')
           .withAttributes({
-            fieldType: '@cardstack/core-types::integer',
-            defaultAtCreate: 42
-          }),
+            fieldType: '@cardstack/core-types::integer'
+          }).withRelated(
+            'defaultAtCreate',
+            factory.addResource('default-values').withAttributes({ value: 42 })
+          ),
         factory.addResource('fields', 'karma')
           .withAttributes({
-            fieldType: '@cardstack/core-types::integer',
-            defaultAtUpdate: 0
-          })
+            fieldType: '@cardstack/core-types::integer'
+          }).withRelated(
+            'defaultAtUpdate',
+            factory.addResource('default-values').withAttributes({ value: 0 })
+          )
       ]);
 
     factory.addResource('things-with-defaults', 4)
@@ -252,10 +253,10 @@ describe('git/writer', function() {
         });
         throw new Error("should not get here");
       } catch (err) {
-        if (!err.status) { throw err; }
-        expect(err.status).to.equal(400);
+        if (!err.isCardstackError) { throw err; }
         expect(err.detail).to.match(/missing required field/);
         expect(err.source).to.deep.equal({ pointer: '/data/id' });
+        expect(err).hasStatus(400);
       }
     });
 

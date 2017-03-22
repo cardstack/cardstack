@@ -4,7 +4,7 @@ module.exports = {
   },
   defaultMapping() {
     return {
-      type: "object"
+      type: "nested"
     };
   },
   isRelationship: true

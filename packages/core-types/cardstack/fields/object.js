@@ -1,11 +1,10 @@
 module.exports = {
-  valid(/* value */) {
-    return true;
+  valid(value) {
+    return typeof value === 'object';
   },
   defaultMapping() {
     return {
       type: "object"
     };
-  },
-  isRelationship: true
+  }
 };

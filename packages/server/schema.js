@@ -8,24 +8,35 @@ const Plugins = require('@cardstack/server/plugins');
 const logger = require('heimdalljs-logger');
 const bootstrapSchema = require('./bootstrap-schema');
 
+const ownTypes = Object.freeze(['content-types', 'fields', 'constraints', 'data-sources', 'grants', 'plugin-configs', 'default-values']);
+
 module.exports = class Schema {
   static ownTypes() {
-    return ['content-types', 'fields', 'constraints', 'data-sources', 'grants', 'plugin-configs'];
+    return ownTypes;
   }
 
-  static async loadFrom(models) {
-    models = bootstrapSchema.concat(models);
+  static async loadFrom(inputModels) {
+    let models = bootstrapSchema.concat(inputModels);
+
     let plugins = await Plugins.load(models.filter(model => model.type === 'plugin-configs'));
 
     let authLog = logger('auth');
+    let schemaLog = logger('schema');
 
     let constraints = new Map();
     for (let model of models) {
-      if (!this.ownTypes().includes(model.type)) {
+      if (!ownTypes.includes(model.type)) {
         throw new Error(`attempted to load schema including non-schema type "${model.type}"`);
       }
       if (model.type === 'constraints') {
         constraints.set(model.id, new Constraint(model, plugins));
+      }
+    }
+
+    let defaultValues = new Map();
+    for (let model of models) {
+      if (model.type === 'default-values') {
+        defaultValues.set(model.id, model.attributes);
       }
     }
 
@@ -36,7 +47,7 @@ module.exports = class Schema {
     let fields = new Map();
     for (let model of models) {
       if (model.type === 'fields') {
-        fields.set(model.id, new Field(model, plugins, constraints, grants, authLog));
+        fields.set(model.id, new Field(model, plugins, constraints, grants, defaultValues, authLog));
       }
     }
 
@@ -47,20 +58,43 @@ module.exports = class Schema {
       }
     }
 
+    let defaultDataSource;
+    let serverConfig = plugins.configFor('@cardstack/server');
+    if (serverConfig && serverConfig['default-data-source']) {
+      defaultDataSource = serverConfig['default-data-source'];
+    }
+
+    schemaLog.debug('default data source %j', defaultDataSource);
+
+
     let types = new Map();
     for (let model of models) {
       if (model.type === 'content-types') {
-        types.set(model.id, new ContentType(model, fields, dataSources, grants));
+        types.set(model.id, new ContentType(model, fields, dataSources, defaultDataSource, grants));
       }
     }
 
-    return new this(types, fields);
+    return new this(types, fields, inputModels);
   }
 
-  constructor(types, fields) {
+  constructor(types, fields, originalModels) {
     this.types = types;
     this.fields = fields;
     this._mapping = null;
+    this._originalModels = originalModels;
+  }
+
+  // derives a new schema by adding, updating, or removing one model.
+  applyChange(type, id, model) {
+    if (!ownTypes.includes(type)) {
+      // not a schema model, so we are unchanged.
+      return this;
+    }
+    let models = this._originalModels.filter(m => m.type !== type || m.id !== id);
+    if (model) {
+      models.push(model);
+    }
+    return this.constructor.loadFrom(models);
   }
 
   async validationErrors(pendingChange, context={}) {

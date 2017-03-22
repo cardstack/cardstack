@@ -6,24 +6,27 @@ const PendingChange = require('@cardstack/plugin-utils/pending-change');
 
 describe('schema/validation', function() {
 
-  let schema;
+  let schema, gitDataSource;
 
   before(async function() {
     let factory = new JSONAPIFactory();
 
     factory.addResource('plugin-configs').withAttributes({ module: '@cardstack/git' });
 
-    let articleType = factory.addResource('content-types', 'articles');
-
-    articleType.withRelated(
-      'data-source',
-      factory.addResource('data-sources')
+    gitDataSource = factory.addResource('data-sources')
         .withAttributes({
           sourceType: '@cardstack/git',
           params: {
             repo: 'http://example.git/repo.git'
           }
-        }));
+        });
+
+    factory.addResource('plugin-configs').withAttributes({
+      module: '@cardstack/server'
+    }).withRelated('defaultDataSource', gitDataSource);
+
+    let articleType = factory.addResource('content-types', 'articles')
+        .withRelated('data-source', gitDataSource);
 
     articleType.withRelated('fields', [
       factory.addResource('fields', 'title')
@@ -59,14 +62,19 @@ describe('schema/validation', function() {
       .withRelated('fields', [
         factory.addResource('fields', 'timestamp')
           .withAttributes({
-            fieldType: '@cardstack/core-types::date',
-            defaultAtUpdate: 'now'
-          }),
+            fieldType: '@cardstack/core-types::date'
+          }).withRelated(
+            'defaultAtUpdate',
+            factory.addResource('default-values')
+              .withAttributes({ value: 'now' })
+          ),
         factory.addResource('fields', 'karma')
           .withAttributes({
-            fieldType: '@cardstack/core-types::integer',
-            defaultAtCreate: 0
-          })
+            fieldType: '@cardstack/core-types::integer'
+          }).withRelated(
+            'defaultAtCreate',
+            factory.addResource('default-values').withAttributes({ value: 0 })
+          )
       ]);
 
     grantAllPermissions(factory);
@@ -240,10 +248,16 @@ describe('schema/validation', function() {
     expect(schema.types.get('articles').dataSource).is.ok;
     expect(schema.types.get('articles').dataSource.writer).is.ok;
 
+    expect(schema.types.get('articles').dataSource).has.property('id', gitDataSource.id);
     // this relies on knowing a tiny bit of writer's internals. When
     // we have a more complete plugin system we should just inject a
     // fake writer plugin for this test to avoid the coupling.
     expect(schema.types.get('articles').dataSource.writer).has.property('repoPath', 'http://example.git/repo.git');
+  });
+
+  it("uses default data source", async function() {
+    expect(schema.types.get('things-with-defaults').dataSource).is.ok;
+    expect(schema.types.get('things-with-defaults').dataSource).has.property('id', gitDataSource.id);
   });
 
   it("applies creation default", async function() {

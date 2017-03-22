@@ -25,10 +25,10 @@ const makeClient = require('@cardstack/elasticsearch/client');
 const Searcher = require('@cardstack/elasticsearch/searcher');
 const { isEqual } = require('lodash');
 const BulkOps = require('./bulk-ops');
-const Schema = require('./schema');
 
 module.exports = class Indexers {
-  constructor(indexers) {
+  constructor(schemaCache, indexers) {
+    this.schemaCache = schemaCache;
     this.indexers = indexers;
     this.es = makeClient();
     this.log = logger('indexers');
@@ -60,6 +60,7 @@ module.exports = class Indexers {
       await this._reindex(tmpIndex, branch);
     }
     await this._updateContent(branch, updaters, schema, realTime, hints);
+    this.schemaCache.notifyBranchUpdate(branch, schema);
   }
 
   async _branches() {
@@ -100,7 +101,15 @@ module.exports = class Indexers {
     if (!have) { return false; }
     // We only check types in "want". Extraneous types in "have" are OK.
     return Object.keys(want).every(
-      type => isEqual(have[type], want[type])
+      type => {
+        let h = have[type];
+        let w = want[type];
+        let val = isEqual(h, w);
+        if (!val) {
+          this.log.debug("mapping differs for %s. have=%j want=%j", type, h, w);
+        }
+        return val;
+      }
     );
   }
 
@@ -129,7 +138,7 @@ module.exports = class Indexers {
     for (let updater of updaters) {
       models = models.concat(await updater.schema());
     }
-    return Schema.loadFrom(models);
+    return this.schemaCache.schemaFrom(models);
   }
 
   async _updateContent(branch, updaters, schema, realTime, hints) {
@@ -154,7 +163,7 @@ module.exports = class Indexers {
     if (alias.status === 404) {
       this.log.info('%s is new, nothing to reindex', branch);
     } else {
-      this.log.info('reindexing %s', branch);
+      this.log.info('reindexing %s into %s', branch, newIndex);
       await this.es.reindex({
         body: {
           source: { index: branchIndex },
@@ -163,6 +172,7 @@ module.exports = class Indexers {
       });
 
     }
+    this.log.info('updating alias %s to %s', branchIndex, newIndex);
     await this.es.indices.updateAliases({
       body: {
         actions: [

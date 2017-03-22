@@ -2,6 +2,7 @@ const Change = require('@cardstack/git/change');
 const temp = require('@cardstack/plugin-utils/node-tests/temp-helper');
 const GitIndexer = require('@cardstack/git/indexer');
 const Indexers = require('@cardstack/server/indexers');
+const SchemaCache = require('@cardstack/server/schema-cache');
 const { commitOpts, makeRepo } = require('./support');
 const ElasticAssert = require('@cardstack/elasticsearch/node-tests/assertions');
 
@@ -11,7 +12,8 @@ describe('git/indexer', function() {
   beforeEach(async function() {
     ea = new ElasticAssert();
     root = await temp.mkdir('cardstack-server-test');
-    indexer = new Indexers([new GitIndexer({
+    let schemaCache = new SchemaCache();
+    indexer = new Indexers(schemaCache, [new GitIndexer({
       repoPath: root
     })]);
   });
@@ -36,7 +38,8 @@ describe('git/indexer', function() {
   it('does not reindex when mapping definition is stable', async function() {
     let { repo, head } = await makeRepo(root);
     await indexer.update();
-    let originalIndexName = (await ea.aliases()).get('master');
+    let originalIndexName = (await ea.contentAliases()).get('master');
+    expect(originalIndexName).ok;
     let change = await Change.create(repo, head, 'master');
     let file = await change.get('contents/articles/hello-world.json', { allowCreate: true });
     file.setContent(JSON.stringify({
@@ -44,7 +47,7 @@ describe('git/indexer', function() {
     }));
     await change.finalize(commitOpts());
     await indexer.update();
-    expect((await ea.aliases()).get('master')).to.equal(originalIndexName);
+    expect((await ea.contentAliases()).get('master')).to.equal(originalIndexName);
   });
 
   it('reindexes when mapping definition is changed', async function() {

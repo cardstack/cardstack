@@ -50,10 +50,18 @@ const javascriptPattern = /(.*)\.js$/;
 
 module.exports = class Plugins {
   static async load(configModels) {
+    let configs = new Map();
+    configModels.forEach(model => {
+      if (!model.attributes || !model.attributes.module) {
+        throw new Error(`plugin-configs must have a module attribute. Found: (${model})`);
+      }
+      configs.set(model.attributes.module, Object.assign({}, model.attributes, model.relationships));
+    });
     let features = (await Promise.all(configModels.map(loadPlugin))).reduce((a,b) => a.concat(b), []);
-    return new this(features);
+    return new this(configs, features);
   }
-  constructor(features) {
+  constructor(configs, features) {
+    this.configs = configs;
     for (let featureType of featureTypes) {
       this[featureType] = new Map();
     }
@@ -80,6 +88,10 @@ module.exports = class Plugins {
       feature.cached = require(feature.loadPath);
     }
     return feature.cached;
+  }
+
+  configFor(moduleName) {
+    return this.configs.get(moduleName);
   }
 };
 

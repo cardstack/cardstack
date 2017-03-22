@@ -17,11 +17,6 @@ describe('jsonapi', function() {
     let factory = new JSONAPIFactory();
     let articleType = factory.addResource('content-types', 'articles');
 
-    articleType.withRelated(
-      'data-source',
-      { type: 'data-sources', id: 'default-git' }
-    );
-
     articleType.withRelated('fields', [
       factory.addResource('fields', 'title')
         .withAttributes({ fieldType: '@cardstack/core-types::string' }),
@@ -50,11 +45,6 @@ describe('jsonapi', function() {
       .withAttributes({
         title: "Second",
         body: "This is the second article"
-      });
-
-    factory.addResource('comments', 0)
-      .withAttributes({
-        body: "This is s a comment"
       });
 
     env = await createDefaultEnvironment(factory.getModels());

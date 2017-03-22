@@ -20,9 +20,6 @@ describe('auth/read', function() {
               { type: 'fields', id: 'title' },
               { type: 'fields', id: 'body' }
             ]
-          },
-          'data-source': {
-            data: { type: 'data-sources', id: 'default-git' }
           }
         }
       },

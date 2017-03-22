@@ -1,7 +1,7 @@
 const Error = require('@cardstack/plugin-utils/error');
 
 module.exports = class ContentType {
-  constructor(model, allFields, dataSources, allGrants) {
+  constructor(model, allFields, dataSources, defaultDataSource, allGrants) {
     let fields = new Map();
     for (let fieldRef of model.relationships.fields.data) {
       let field = allFields.get(fieldRef.id);
@@ -14,6 +14,8 @@ module.exports = class ContentType {
     this.id = model.id;
     if (model.relationships['data-source']) {
       this.dataSource = dataSources.get(model.relationships['data-source'].data.id);
+    } else if (defaultDataSource) {
+      this.dataSource = dataSources.get(defaultDataSource.data.id);
     } else {
       this.dataSource = null;
     }
