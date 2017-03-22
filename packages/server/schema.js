@@ -17,63 +17,17 @@ module.exports = class Schema {
 
   static async loadFrom(inputModels) {
     let models = bootstrapSchema.concat(inputModels);
-
     let plugins = await Plugins.load(models.filter(model => model.type === 'plugin-configs'));
-
     let authLog = logger('auth');
     let schemaLog = logger('schema');
-
-    let constraints = new Map();
-    for (let model of models) {
-      if (!ownTypes.includes(model.type)) {
-        throw new Error(`attempted to load schema including non-schema type "${model.type}"`);
-      }
-      if (model.type === 'constraints') {
-        constraints.set(model.id, new Constraint(model, plugins));
-      }
-    }
-
-    let defaultValues = new Map();
-    for (let model of models) {
-      if (model.type === 'default-values') {
-        defaultValues.set(model.id, model.attributes);
-      }
-    }
-
-    let grants = models
-        .filter(model => model.type === 'grants')
-        .map(model => new Grant(model));
-
-    let fields = new Map();
-    for (let model of models) {
-      if (model.type === 'fields') {
-        fields.set(model.id, new Field(model, plugins, constraints, grants, defaultValues, authLog));
-      }
-    }
-
-    let dataSources = new Map();
-    for (let model of models) {
-      if (model.type === 'data-sources') {
-        dataSources.set(model.id, new DataSource(model, plugins));
-      }
-    }
-
-    let defaultDataSource;
-    let serverConfig = plugins.configFor('@cardstack/server');
-    if (serverConfig && serverConfig['default-data-source']) {
-      defaultDataSource = serverConfig['default-data-source'];
-    }
-
+    let constraints = findConstraints(models, plugins);
+    let defaultValues = findDefaultValues(models);
+    let grants = findGrants(models);
+    let fields = findFields(models, plugins, constraints, grants, defaultValues, authLog);
+    let dataSources = findDataSources(models, plugins);
+    let defaultDataSource = findDefaultDataSource(plugins);
     schemaLog.debug('default data source %j', defaultDataSource);
-
-
-    let types = new Map();
-    for (let model of models) {
-      if (model.type === 'content-types') {
-        types.set(model.id, new ContentType(model, fields, dataSources, defaultDataSource, grants));
-      }
-    }
-
+    let types = findTypes(models, fields, dataSources, defaultDataSource, grants);
     return new this(types, fields, inputModels);
   }
 
@@ -176,3 +130,69 @@ module.exports = class Schema {
   }
 
 };
+
+function findConstraints(models, plugins) {
+  let constraints = new Map();
+  for (let model of models) {
+    if (!ownTypes.includes(model.type)) {
+      throw new Error(`attempted to load schema including non-schema type "${model.type}"`);
+    }
+    if (model.type === 'constraints') {
+      constraints.set(model.id, new Constraint(model, plugins));
+    }
+  }
+  return constraints;
+}
+
+function findDefaultValues(models) {
+  let defaultValues = new Map();
+  for (let model of models) {
+    if (model.type === 'default-values') {
+      defaultValues.set(model.id, model.attributes);
+    }
+  }
+  return defaultValues;
+}
+
+function findGrants(models) {
+  return models
+    .filter(model => model.type === 'grants')
+    .map(model => new Grant(model));
+}
+
+function findFields(models, plugins, constraints, grants, defaultValues, authLog) {
+  let fields = new Map();
+  for (let model of models) {
+    if (model.type === 'fields') {
+      fields.set(model.id, new Field(model, plugins, constraints, grants, defaultValues, authLog));
+    }
+  }
+  return fields;
+}
+
+function findDataSources(models, plugins, defaultSearcher) {
+  let dataSources = new Map();
+  for (let model of models) {
+    if (model.type === 'data-sources') {
+      dataSources.set(model.id, new DataSource(model, plugins, defaultSearcher));
+    }
+  }
+  return dataSources;
+}
+
+function findDefaultDataSource(plugins) {
+  let serverConfig = plugins.configFor('@cardstack/server');
+  if (serverConfig && serverConfig['default-data-source']) {
+    return serverConfig['default-data-source'];
+  }
+}
+
+function findTypes(models, fields, dataSources, defaultDataSource, grants) {
+  let types = new Map();
+  for (let model of models) {
+    if (model.type === 'content-types') {
+      types.set(model.id, new ContentType(model, fields, dataSources, defaultDataSource, grants));
+    }
+  }
+  return types;
+}
