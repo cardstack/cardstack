@@ -11,6 +11,11 @@ describe('plugins', function() {
         module: '@cardstack/core-types',
         extraParam: 42
       });
+    factory.addResource('plugin-configs')
+      .withAttributes({
+        module: '@cardstack/elasticsearch'
+      });
+
     models = factory.getModels();
     plugins = await Plugins.load(models);
   });
@@ -30,5 +35,9 @@ describe('plugins', function() {
 
   it('can lookup plugin config', async function() {
     expect(plugins.configFor('@cardstack/core-types')).property('extra-param', 42);
+  });
+
+  it('finds a searcher', async function() {
+    expect(plugins.lookup('searchers', '@cardstack/elasticsearch')).is.a('function');
   });
 });

@@ -44,7 +44,8 @@ const log = require('heimdalljs-logger')('plugins');
 const featureTypes = [
   'constraints',
   'fields',
-  'writers'
+  'writers',
+  'searchers'
 ];
 const javascriptPattern = /(.*)\.js$/;
 
