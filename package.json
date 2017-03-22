@@ -44,6 +44,7 @@
     "server": "node packages/server/bin/server.js"
   },
   "dependencies": {
+    "commander": "^2.9.0",
     "elasticsearch": "^12.1.3",
     "ember-cli-babel": "^5.1.7",
     "ember-cli-htmlbars": "^1.1.1",
