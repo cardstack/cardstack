@@ -91,6 +91,13 @@ module.exports = class Plugins {
     return feature.cached;
   }
 
+  lookupAll(featureType) {
+    if (!this[featureType]) {
+      throw new Error(`Don't understand featureType ${featureType}`);
+    }
+    return [...this[featureType].values()];
+  }
+
   configFor(moduleName) {
     return this.configs.get(moduleName);
   }
