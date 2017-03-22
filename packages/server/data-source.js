@@ -8,10 +8,8 @@ module.exports = class DataSource {
     this._writer = null;
   }
   get writer() {
-    if (!this._writer) {
-      if (this._Writer) {
-        this._writer = new (this._Writer)(this._params);
-      }
+    if (!this._writer && this._Writer) {
+      this._writer = new (this._Writer)(this._params);
     }
     return this._writer;
   }
