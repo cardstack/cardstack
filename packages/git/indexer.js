@@ -37,18 +37,19 @@ module.exports = class Indexer {
 
   async beginUpdate(branch) {
     await this._ensureRepo();
-    return new GitUpdater(this.repo, branch);
+    return new GitUpdater(this.repo, branch, this.log);
   }
 };
 
 class GitUpdater {
-  constructor(repo, branch) {
+  constructor(repo, branch, log) {
     this.repo = repo;
     this.branch = branch;
     this.commit = null;
     this.commitId = null;
     this.rootTree = null;
     this.name = 'git';
+    this.log = log;
   }
 
   async schema() {
@@ -131,7 +132,14 @@ class GitUpdater {
       );
     } else {
       let { type, id } = identify(newEntry);
-      let doc = JSON.parse((await newEntry.getBlob()).content().toString('utf8'));
+      let contents = (await newEntry.getBlob()).content().toString('utf8');
+      let doc;
+      try {
+        doc = JSON.parse(contents);
+      } catch (err) {
+        this.log.warn("Ignoring record with invalid json at %s", newEntry.path());
+        return;
+      }
       if (!doc.meta) {
         doc.meta = {};
       }

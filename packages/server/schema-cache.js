@@ -96,7 +96,7 @@ module.exports = class SchemaCache {
       if (page.cursor) {
         throw new Error("query for schema models had insufficient page size");
       }
-      this.log.debug("completed schema model loading on branch %s", branch);
+      this.log.debug("completed schema model loading on branch %s, found %s models", branch, models.length);
       let schema = this.schemaFrom(models);
       this.log.debug("instantiated schema for branch %s", branch);
       return schema;
