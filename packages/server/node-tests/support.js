@@ -64,6 +64,12 @@ exports.createDefaultEnvironment = async function(initialModels = []) {
   // databases to represent "master" vs "production"). But in the git
   // case, the branches are discovered by the indexer and we have a
   // circular dependency to break.
+  //
+  // Solution: add some server-level config (probably in the
+  // plugin-config for @cardstack/server) for the branch name that
+  // always controls which indexers to run. This would also work for
+  // branch-level grants: to create a branch, you must have a grant on
+  // this specially-privileged branch.
   let indexer = new Indexers(schemaCache, [new GitIndexer({
     repoPath
   })]);
