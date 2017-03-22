@@ -130,7 +130,7 @@ class GitUpdater {
         oldEntry && oldEntry.isTree() ? (await oldEntry.getTree()) : null,
         await newEntry.getTree()
       );
-    } else {
+    } else if (/\.json$/i.test(newEntry.path())) {
       let { type, id } = identify(newEntry);
       let contents = (await newEntry.getBlob()).content().toString('utf8');
       let doc;

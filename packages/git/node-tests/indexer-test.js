@@ -134,6 +134,54 @@ describe('git/indexer', function() {
     });
   });
 
+  it('ignores newly added document that lacks json extension', async function() {
+    let { repo, head } = await makeRepo(root);
+
+    await indexer.update();
+
+    let change = await Change.create(repo, head, 'master');
+    let file = await change.get('contents/articles/hello-world', { allowCreate: true });
+    file.setContent(JSON.stringify({
+      attributes: { hello: 'world' }
+    }));
+    head = await change.finalize(commitOpts());
+
+    await indexer.update();
+
+    let indexerState = await ea.indexerState('master', 'git');
+    expect(indexerState.commit).to.equal(head);
+
+    try {
+      await ea.documentContents('master', 'articles', 'hello-world');
+      throw new Error("should not get here");
+    } catch (err) {
+      expect(err.message).to.match(/not found/i);
+    }
+  });
+
+  it('ignores newly added document with malformed json', async function() {
+    let { repo, head } = await makeRepo(root);
+
+    await indexer.update();
+
+    let change = await Change.create(repo, head, 'master');
+    let file = await change.get('contents/articles/hello-world.json', { allowCreate: true });
+    file.setContent('not json');
+    head = await change.finalize(commitOpts());
+
+    await indexer.update();
+
+    let indexerState = await ea.indexerState('master', 'git');
+    expect(indexerState.commit).to.equal(head);
+
+    try {
+      await ea.documentContents('master', 'articles', 'hello-world');
+      throw new Error("should not get here");
+    } catch (err) {
+      expect(err.message).to.match(/not found/i);
+    }
+  });
+
   it('does not reindex unchanged content', async function() {
     let { repo, head } = await makeRepo(root, {
       'contents/articles/hello-world.json': JSON.stringify({
