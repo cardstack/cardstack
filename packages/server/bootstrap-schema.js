@@ -83,6 +83,32 @@ const models = [
     }
   },
   {
+    type: 'content-types',
+    id: 'data-sources',
+    relationships: {
+      fields: {
+        data: [
+          { type: 'fields', id: 'source-type' },
+          { type: 'fields', id: 'params' }
+        ]
+      }
+    }
+  },
+  {
+    type: 'fields',
+    id: 'source-type',
+    attributes: {
+      'field-type': '@cardstack/core-types::string'
+    }
+  },
+  {
+    type: 'fields',
+    id: 'params',
+    attributes: {
+      'field-type': '@cardstack/core-types::object'
+    }
+  },
+  {
     type: 'fields',
     id: 'group-id',
     attributes: {
