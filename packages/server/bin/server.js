@@ -18,6 +18,10 @@ async function runServer(port, seedModels) {
   await indexers.update();
 
   let app = new Koa();
+  app.use(async function(ctxt, next) {
+    await next();
+    log.info('%s %s %s', ctxt.request.method, ctxt.request.url, ctxt.response.status);
+  });
   app.use(require('@cardstack/jsonapi/middleware')(new Searcher(schemaCache), new Writers(schemaCache)));
   app.listen(port);
   log.info("server listening on %s", port);
