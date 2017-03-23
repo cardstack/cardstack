@@ -4,6 +4,9 @@ module.exports = class Field {
   constructor(model, plugins, constraints, allGrants, defaultValues, authLog) {
     this.id = model.id;
     this.authLog = authLog;
+    if (!model.attributes || !model.attributes['field-type']) {
+      throw new Error(`field ${model.id} has no field-type attribute`);
+    }
     this.fieldType = model.attributes['field-type'];
     this.searchable = model.attributes.searchable == null ? true : model.attributes.searchable;
 
