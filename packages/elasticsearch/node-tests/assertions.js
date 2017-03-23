@@ -33,8 +33,8 @@ module.exports = class ElasticAsserter {
     }
     return output;
   }
-  async indexerState(branch, id) {
-    return this.client.getSource({ index: branchToIndexName(branch), type: 'meta', id });
+  async indexerState(branch, repoPath) {
+    return this.client.getSource({ index: branchToIndexName(branch), type: 'meta', id: `git/${repoPath}` });
   }
   async deleteAllIndices() {
     return this.client.indices.delete({ index: '_all' });

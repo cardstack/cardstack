@@ -48,7 +48,7 @@ describe('git/indexer', function() {
     expect([...aliases.keys()]).to.deep.equal(['master']);
     let indices = await ea.contentIndices();
     expect(indices).to.have.lengthOf(1);
-    let indexerState = await ea.indexerState('master', 'git');
+    let indexerState = await ea.indexerState('master', root);
     expect(indexerState.commit).to.equal(head);
   });
 
@@ -122,7 +122,7 @@ describe('git/indexer', function() {
 
     await indexer.update();
 
-    let indexerState = await ea.indexerState('master', 'git');
+    let indexerState = await ea.indexerState('master', root);
     expect(indexerState.commit).to.equal(head);
 
     let contents = await ea.documentContents('master', 'articles', 'hello-world');
@@ -148,7 +148,7 @@ describe('git/indexer', function() {
 
     await indexer.update();
 
-    let indexerState = await ea.indexerState('master', 'git');
+    let indexerState = await ea.indexerState('master', root);
     expect(indexerState.commit).to.equal(head);
 
     try {
@@ -171,7 +171,7 @@ describe('git/indexer', function() {
 
     await indexer.update();
 
-    let indexerState = await ea.indexerState('master', 'git');
+    let indexerState = await ea.indexerState('master', root);
     expect(indexerState.commit).to.equal(head);
 
     try {
@@ -205,7 +205,7 @@ describe('git/indexer', function() {
 
     await indexer.update();
 
-    let indexerState = await ea.indexerState('master', 'git');
+    let indexerState = await ea.indexerState('master', root);
     expect(indexerState.commit).to.equal(head);
 
     let contents = await ea.documentContents('master', 'articles', 'hello-world');
