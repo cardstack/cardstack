@@ -13,8 +13,9 @@ const PendingChange = require('@cardstack/plugin-utils/pending-change');
 const pendingChanges = new WeakMap();
 
 module.exports = class Writer {
-  constructor({ repo, idGenerator }) {
+  constructor({ repo, idGenerator, basePath }) {
     this.repoPath = repo;
+    this.basePath = basePath;
     this.repo = null;
     this.log = logger('writer');
     let hostname = os.hostname();
@@ -120,7 +121,8 @@ module.exports = class Writer {
 
   _filenameFor(type, id, isSchema) {
     let category = isSchema ? 'schema' : 'contents';
-    return `${category}/${type}/${id}.json`;
+    let base = this.basePath ? this.basePath + '/' : '';
+    return `${base}${category}/${type}/${id}.json`;
   }
 
   async _ensureRepo() {
