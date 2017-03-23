@@ -88,7 +88,7 @@ describe('git/config', function() {
     env = await createDefaultEnvironment(factory.getModels());
 
     let response = await env.searcher.search('master', { filter: { type: 'articles' } });
-    expect(response.models.map(m => m.id)).deep.equals(['1']);
+    expect(response.models.map(m => m.id)).deep.equals(['2']);
   });
 
 });

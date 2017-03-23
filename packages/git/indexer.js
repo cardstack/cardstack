@@ -10,8 +10,9 @@ const { safeEntryByName } = require('./mutable-tree');
 const logger = require('heimdalljs-logger');
 
 module.exports = class Indexer {
-  constructor({ repo }) {
+  constructor({ repo, basePath }) {
     this.repoPath = repo;
+    this.basePath = basePath ? basePath.split('/') : [];
     this.repo = null;
     this.log = logger('git-indexer');
   }
@@ -37,13 +38,14 @@ module.exports = class Indexer {
 
   async beginUpdate(branch) {
     await this._ensureRepo();
-    return new GitUpdater(this.repo, branch, this.log, this.repoPath);
+    return new GitUpdater(this.repo, branch, this.log, this.repoPath, this.basePath);
   }
 };
 
 class GitUpdater {
-  constructor(repo, branch, log, repoPath) {
+  constructor(repo, branch, log, repoPath, basePath) {
     this.repo = repo;
+    this.basePath = basePath;
     this.branch = branch;
     this.commit = null;
     this.commitId = null;
@@ -56,7 +58,9 @@ class GitUpdater {
     let models = [];
     let ops = new Gather(models);
     await this._loadCommit();
-    await this._indexTree(ops, null, this.rootTree, { only: 'schema' });
+    await this._indexTree(ops, null, this.rootTree, {
+      only: this.basePath.concat(['schema'])
+    });
     return models;
   }
 
@@ -67,7 +71,9 @@ class GitUpdater {
       let oldCommit = await Commit.lookup(this.repo, meta.commit);
       originalTree = await oldCommit.getTree();
     }
-    await this._indexTree(ops, originalTree, this.rootTree);
+    await this._indexTree(ops, originalTree, this.rootTree, {
+      only: this.basePath
+    });
     return {
       commit: this.commitId
     };
@@ -88,32 +94,32 @@ class GitUpdater {
     return Commit.lookup(this.repo, branch.target());
   }
 
-  async _indexTree(ops, oldTree, newTree, filter={}) {
+  async _indexTree(ops, oldTree, newTree, filter) {
     let seen = new Map();
     if (newTree) {
       for (let newEntry of newTree.entries()) {
         let name = newEntry.name();
-        if (filter.only && name !== filter.only) {
+        if (!filterAllows(filter, name)) {
           continue;
         }
         seen.set(name, true);
-        await this._indexEntry(ops, name, oldTree, newEntry);
+        await this._indexEntry(ops, name, oldTree, newEntry, filter);
       }
     }
     if (oldTree) {
       for (let oldEntry of oldTree.entries()) {
         let name = oldEntry.name();
-        if (filter.only && name !== filter.only) {
+        if (!filterAllows(filter, name)) {
           continue;
         }
         if (!seen.get(name)) {
-          await this._deleteEntry(ops, oldEntry);
+          await this._deleteEntry(ops, oldEntry, filter);
         }
       }
     }
   }
 
-  async _indexEntry(ops, name, oldTree, newEntry) {
+  async _indexEntry(ops, name, oldTree, newEntry, filter) {
     let oldEntry;
     if (oldTree) {
       oldEntry = safeEntryByName(oldTree, name);
@@ -128,7 +134,8 @@ class GitUpdater {
       await this._indexTree(
         ops,
         oldEntry && oldEntry.isTree() ? (await oldEntry.getTree()) : null,
-        await newEntry.getTree()
+        await newEntry.getTree(),
+        nextFilter(filter)
       );
     } else if (/\.json$/i.test(newEntry.path())) {
       let { type, id } = identify(newEntry);
@@ -148,9 +155,9 @@ class GitUpdater {
     }
   }
 
-  async _deleteEntry(ops, oldEntry) {
+  async _deleteEntry(ops, oldEntry, filter) {
     if (oldEntry.isTree()) {
-      await this._indexTree(ops, await oldEntry.getTree(), null);
+      await this._indexTree(ops, await oldEntry.getTree(), nextFilter(filter));
     } else {
       let { type, id } = identify(oldEntry);
       await ops.delete(type, id);
@@ -176,4 +183,15 @@ class Gather {
     document.id = id;
     this.models.push(document);
   }
+}
+
+function filterAllows(filter, name) {
+  return !filter || !filter.only || filter.only.length === 0 || name === filter.only[0];
+}
+
+function nextFilter(filter) {
+  if (!filter || !filter.only || filter.only.length < 2) {
+    return null;
+  }
+  return { only: filter.only.slice(1) };
 }
