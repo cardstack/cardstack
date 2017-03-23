@@ -63,25 +63,16 @@ module.exports = class SchemaCache {
   }
 
   // When Indexers reads a branch, it necessarily reads the schema
-  // first. It then uses this method to update the our cache.
+  // first. And when Writers make a change t as schema model, they
+  // need to derive the new schema to make sure it's safe. In either
+  // case, the new schema is already available, so this method allows
+  // us to push it into the cache.
   notifyBranchUpdate(branch, schema) {
     if (!(schema instanceof Schema)) {
       throw new Error("Bug: notifyBranchUpdate got a non-schema");
     }
     this.log.debug("full schema update on branch %s", branch);
     this.cache.set(branch, Promise.resolve(schema));
-  }
-
-  // when Writers touches a model, it notifies us because there's a
-  // chance the model was part of a schema.
-  async notifyUpdated(branch, type, id, document) {
-    if (this.cache.has(branch)) {
-      let schema = await this.cache.get(branch);
-      let newSchema = schema.applyChange(type, id, document);
-      if (newSchema !== schema) {
-        this.cache.set(branch, Promise.resolve(newSchema));
-      }
-    }
   }
 
   async _load(branch) {

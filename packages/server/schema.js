@@ -67,14 +67,16 @@ module.exports = class Schema {
   }
 
   async validate(pendingChange, context={}) {
-    let type;
+    let type, id;
     if (pendingChange.finalDocument) {
       // Create or update: check basic request document structure.
       this._validateDocumentStructure(pendingChange.finalDocument, context);
       type = pendingChange.finalDocument.type;
+      id = pendingChange.finalDocument.id;
     } else {
       // Deletion. There's no request document to check.
       type = pendingChange.originalDocument.type;
+      id = pendingChange.originalDocument.id;
     }
 
     let contentType = this.types.get(type);
@@ -85,6 +87,18 @@ module.exports = class Schema {
       });
     }
     await contentType.validate(pendingChange, context);
+
+    if (ownTypes.includes(type)) {
+      // Safety check: the change we're about to approve is a schema
+      // change. The following will deliberately blow up if the new
+      // schema hits a bug anywhere in schema instantiation. Better to
+      // serve a 500 here than accept the broken schema and serve 500s
+      // to everyone.
+      let newSchema = this.applyChange(type, id, pendingChange.finalDocument);
+      if (newSchema !== this) {
+        return newSchema;
+      }
+    }
   }
 
   _validateDocumentStructure(document, context) {

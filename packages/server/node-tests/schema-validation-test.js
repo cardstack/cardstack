@@ -319,6 +319,22 @@ describe('schema/validation', function() {
     expect(pending.finalDocument.attributes.karma).equals(10);
   });
 
+  it("will not accept a schema change that results in a dangling field reference", async function() {
+    let pending = new PendingChange({
+      type: 'fields',
+      id: 'primary-image',
+      attributes: {
+        fieldType: '@cardstack/core-types::belongs-to'
+      }
+    }, null, null);
+    let errors = await schema.validationErrors(pending);
+    expect(errors).collectionContains({
+      status: 400,
+      title: 'Broken field reference',
+      detail: 'content type "articles" refers to missing field "primary-image"'
+    });
+  });
+
   it("does not apply update default when user is altering value", async function() {
     let pending = new PendingChange({
       type: 'things-with-defaults',

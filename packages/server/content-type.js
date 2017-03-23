@@ -6,7 +6,10 @@ module.exports = class ContentType {
     for (let fieldRef of model.relationships.fields.data) {
       let field = allFields.get(fieldRef.id);
       if (!field) {
-        throw new Error(`content type "${model.id}" refers to missing field "${fieldRef.id}"`);
+        throw new Error(`content type "${model.id}" refers to missing field "${fieldRef.id}"`, {
+          status: 400,
+          title: 'Broken field reference'
+        });
       }
       fields.set(fieldRef.id, field);
     }

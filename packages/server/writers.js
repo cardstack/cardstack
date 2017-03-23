@@ -13,9 +13,11 @@ class Writers {
     let writer = this._lookupWriter(schema, type);
     let isSchema = schema.constructor.ownTypes().includes(type);
     let pending = await writer.prepareCreate(branch, user, type, document, isSchema);
-    await schema.validate(pending, { type });
+    let newSchema = await schema.validate(pending, { type });
     let response = await this._finalizeAndReply(pending);
-    await this.schemaCache.notifyUpdated(branch, type, response.id, response);
+    if (newSchema) {
+      this.schemaCache.notifyBranchUpdate(branch, newSchema);
+    }
     return response;
   }
 
@@ -25,9 +27,11 @@ class Writers {
     let writer = this._lookupWriter(schema, type);
     let isSchema = schema.constructor.ownTypes().includes(type);
     let pending = await writer.prepareUpdate(branch, user, type, id, document, isSchema);
-    await schema.validate(pending, { type, id });
+    let newSchema = await schema.validate(pending, { type, id });
     let response = await this._finalizeAndReply(pending);
-    await this.schemaCache.notifyUpdated(branch, type, response.id, response);
+    if (newSchema) {
+      this.schemaCache.notifyBranchUpdate(branch, newSchema);
+    }
     return response;
   }
 
@@ -37,9 +41,11 @@ class Writers {
     let writer = this._lookupWriter(schema, type);
     let isSchema = schema.constructor.ownTypes().includes(type);
     let pending = await writer.prepareDelete(branch, user, version, type, id, isSchema);
-    await schema.validate(pending, {});
+    let newSchema = await schema.validate(pending, {});
     await pending.finalize();
-    await this.schemaCache.notifyUpdated(branch, type, id, null);
+    if (newSchema) {
+      this.schemaCache.notifyBranchUpdate(branch, newSchema);
+    }
   }
 
   async _finalizeAndReply(pending) {
