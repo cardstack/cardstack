@@ -54,14 +54,38 @@ describe('git/indexer', function() {
 
 
   it('does not reindex when mapping definition is stable', async function() {
-    let { repo, head } = await makeRepo(root);
+    let { repo, head } = await makeRepo(root, {
+      'schema/content-types/articles.json': JSON.stringify({
+        relationships: {
+          fields: {
+            data: [
+              { type: 'fields', id: 'sample-string' },
+              { type: 'fields', id: 'sample-object' }
+            ]
+          }
+        }
+      }),
+      'schema/fields/sample-string.json': JSON.stringify({
+        attributes: {
+          'field-type': '@cardstack/core-types::string'
+        }
+      }),
+      'schema/fields/sample-object.json': JSON.stringify({
+        attributes: {
+          'field-type': '@cardstack/core-types::object'
+        }
+      })
+    });
     await indexer.update();
     let originalIndexName = (await ea.contentAliases()).get('master');
     expect(originalIndexName).ok;
     let change = await Change.create(repo, head, 'master');
     let file = await change.get('contents/articles/hello-world.json', { allowCreate: true });
     file.setContent(JSON.stringify({
-      hello: 'world'
+      attributes: {
+        'sample-string': 'world',
+        'sapmle-object': { bar: 'baz' }
+      }
     }));
     await change.finalize(commitOpts());
     await indexer.update();
