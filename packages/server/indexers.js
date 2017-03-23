@@ -39,12 +39,15 @@ module.exports = class Indexers {
   }
 
   async update({ realTime, hints } = {}) {
-    let resolve;
-    let promise = new Promise(r => resolve = r);
+    let resolve, reject;
+    let promise = new Promise((r,j) => {
+      resolve = r;
+      reject = j;
+    });
     if (realTime) {
-      this._realTimeQueue.push({ hints, resolve });
+      this._realTimeQueue.push({ hints, resolve, reject });
     } else {
-      this._queue.push({ hints, resolve });
+      this._queue.push({ hints, resolve, reject });
     }
     if (!this._running) {
       this._running = true;
@@ -62,10 +65,20 @@ module.exports = class Indexers {
     while (this._queue.length > 0 || this._realTimeQueue.length > 0) {
       let queue = this._queue;
       this._queue = [];
+      try {
+        await this._runBatch(queue, false);
+      } catch (err) {
+        queue.forEach(req => req.reject(err));
+        throw err;
+      }
       let realTimeQueue = this._realTimeQueue;
       this._realTimeQueue = [];
-      await this._runBatch(queue, false);
-      await this._runBatch(realTimeQueue, true);
+      try {
+        await this._runBatch(realTimeQueue, true);
+      } catch (err) {
+        realTimeQueue.forEach(req => req.reject(err));
+        throw err;
+      }
     }
   }
 
