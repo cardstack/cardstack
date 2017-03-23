@@ -3350,7 +3350,7 @@ heimdalljs-graph@^0.3.1:
   version "0.3.3"
   resolved "https://registry.yarnpkg.com/heimdalljs-graph/-/heimdalljs-graph-0.3.3.tgz#ea801dbba659c8d522fe1cb83b2d605726e4918f"
 
-heimdalljs-logger@^0.1.7:
+heimdalljs-logger@^0.1.7, heimdalljs-logger@^0.1.8:
   version "0.1.8"
   resolved "https://registry.yarnpkg.com/heimdalljs-logger/-/heimdalljs-logger-0.1.8.tgz#82abb55e53eefc0e5654ddf521b82926e50fcd95"
   dependencies:
@@ -3800,6 +3800,12 @@ json5@^0.4.0:
 json5@^0.5.0:
   version "0.5.1"
   resolved "https://registry.yarnpkg.com/json5/-/json5-0.5.1.tgz#1eade7acc012034ad84e2396767ead9fa5495821"
+
+jsondiffpatch@^0.2.4:
+  version "0.2.4"
+  resolved "https://registry.yarnpkg.com/jsondiffpatch/-/jsondiffpatch-0.2.4.tgz#d4b6c53b3fc7da1b4b91c1c2aec8b932b7511d5c"
+  dependencies:
+    chalk "^0.5.1"
 
 jsonfile@^2.1.0:
   version "2.4.0"

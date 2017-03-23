@@ -193,7 +193,9 @@ describe('git/indexer', function() {
     file.setContent('not json');
     head = await change.finalize(commitOpts());
 
-    await indexer.update();
+    await expectLogMessage(/Ignoring record with invalid json at contents\/articles\/hello-world.json/, async () => {
+      await indexer.update();
+    });
 
     let indexerState = await ea.indexerState('master', root);
     expect(indexerState.commit).to.equal(head);

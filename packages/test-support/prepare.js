@@ -1,4 +1,6 @@
-let chai = require('chai');
+const util = require('util');
+const chai = require('chai');
+
 global.expect = chai.expect;
 chai.use(require('chai-things'));
 chai.use(require('./collection-contains'));
@@ -12,11 +14,35 @@ process.on('warning', (warning) => {
   /* eslint-enable no-console */
 });
 
-// Within our test suite, we default to showing warnings and
-// higher for all loggers.
+// If the user isn't customizing anything about logging, we generate
+// log messages for warnings or higher, and we install a handler that
+// will cause any unexpected log message to fail the tests.
 if (!process.env['DEBUG']) {
-  process.env.DEBUG='*';
+  // these third-party deps have loud logging even at warn level
+  process.env.DEBUG='*,-eslint:*,-koa:*,-superagent';
+  if (!process.env['DEBUG_LEVEL']) {
+    process.env.DEBUG_LEVEL='warn';
+  }
+  let debug = require('debug');
+  debug.log = function(...args) {
+    let logLine = util.format(...args);
+    let match = [...expected.keys()].find(pattern => pattern.test(logLine));
+    if (match) {
+      expected.set(match, expected.get(match) + 1);
+    } else {
+      throw new Error("Unexpected log message during tests: " + logLine);
+    }
+  };
 }
-if (!process.env['DEBUG_LEVEL']) {
-  process.env.DEBUG_LEVEL='warn';
-}
+
+let expected = new Map();
+
+global.expectLogMessage = async function(pattern, fn) {
+  expected.set(pattern, 0);
+  await fn();
+  let count = expected.get(pattern);
+  expected.delete(pattern);
+  if (count !== 1) {
+    throw new Error(`Expected a log mesage to match ${pattern} but none did`);
+  }
+};

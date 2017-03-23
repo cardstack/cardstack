@@ -6,6 +6,7 @@ module.exports = {
     afterEach: false,
     before: false,
     after: false,
-    expect: false
+    expect: false,
+    expectLogMessage: false
   }
 };

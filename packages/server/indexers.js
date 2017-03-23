@@ -23,8 +23,9 @@
 const logger = require('heimdalljs-logger');
 const makeClient = require('@cardstack/elasticsearch/client');
 const Searcher = require('@cardstack/elasticsearch/searcher');
-const { isEqual } = require('lodash');
+const { isEqual, merge } = require('lodash');
 const BulkOps = require('./bulk-ops');
+require('./diff-log-formatter');
 
 module.exports = class Indexers {
   constructor(schemaCache) {
@@ -108,11 +109,10 @@ module.exports = class Indexers {
     let haveMapping = await this._esMapping(branch);
     let schema = await this._updateSchema(branch, updaters);
     let wantMapping = schema.mapping();
-    this.log.debug('%j', { haveMapping, wantMapping });
     if (this._stableMapping(haveMapping, wantMapping)) {
-      this.log.info('%s: mapping already OK', branch);
+      this.log.debug('%s: mapping already OK', branch);
     } else {
-      this.log.info('%s: mapping needs update', branch);
+      this.log.debug('%s: mapping needs update', branch);
       let tmpIndex = this._tempIndexName(branch);
       await this.es.indices.create({
         index: tmpIndex,
@@ -173,19 +173,25 @@ module.exports = class Indexers {
   }
 
   _stableMapping(have, want) {
-    if (!have) { return false; }
-    // We only check types in "want". Extraneous types in "have" are OK.
-    return Object.keys(want).every(
-      type => {
-        let h = have[type];
-        let w = want[type];
-        let val = isEqual(h, w);
-        if (!val) {
-          this.log.debug("mapping differs for %s. have=%j want=%j", type, h, w);
-        }
-        return val;
-      }
-    );
+    if (!have) {
+      this.log.info("mapping not stable because there's no existing index");
+      return false;
+    }
+
+    // Extra information in `have` is OK. There are several cases
+    // where elasticsearch fills in more detail than we
+    // provide. Missing or different information is not ok and means
+    // our mapping is not stable.
+    let combined = merge({}, have, want);
+    if (isEqual(combined, have)) {
+      return true;
+    }
+
+    // Not stable. Generate some useful debug info about why.  The %p
+    // formatter is custom and loads via side-effect from the
+    // diff-log-formatter module.
+    this.log.info("mapping diff: %p", { left: have, right: combined });
+    return false;
   }
 
 
