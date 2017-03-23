@@ -71,8 +71,12 @@ class GitUpdater {
     await this._loadCommit();
     let originalTree;
     if (meta && meta.commit) {
-      let oldCommit = await Commit.lookup(this.repo, meta.commit);
-      originalTree = await oldCommit.getTree();
+      try {
+        let oldCommit = await Commit.lookup(this.repo, meta.commit);
+        originalTree = await oldCommit.getTree();
+      } catch (err) {
+        this.log.warn(`Unable to load previously indexed commit ${meta.commit} due to ${err}. We will recover by reindexing all content.`);
+      }
     }
     await this._indexTree(ops, originalTree, this.rootTree, {
       only: this.basePath.concat([['schema', 'contents']])
