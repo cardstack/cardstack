@@ -27,7 +27,7 @@ module.exports = [
       'source-type': '@cardstack/git',
       params: {
         // Location of our git repository
-        repo: __dirname + '/../../../../..',
+        repo: __dirname + '/../../../../../..',
 
         // Path within git repository that's reserve for us to read
         // and write our content.
