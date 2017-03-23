@@ -11,3 +11,12 @@ process.on('warning', (warning) => {
   console.warn(warning.stack);
   /* eslint-enable no-console */
 });
+
+// Within our test suite, we default to showing warnings and
+// higher for all loggers.
+if (!process.env['DEBUG']) {
+  process.env.DEBUG='*';
+}
+if (!process.env['DEBUG_LEVEL']) {
+  process.env.DEBUG_LEVEL='warn';
+}
