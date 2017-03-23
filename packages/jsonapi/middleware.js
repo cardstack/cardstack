@@ -13,6 +13,14 @@ module.exports = function(searcher, writers, optionsArg) {
   let log = logger('jsonapi');
 
   return async (ctxt) => {
+    ctxt.response.set('Access-Control-Allow-Origin', '*');
+    if (ctxt.request.method === 'OPTIONS') {
+      ctxt.response.set('Access-Control-Allow-Methods', 'GET,POST,PATCH,DELETE,OPTIONS');
+      ctxt.response.set('Access-Control-Allow-Headers', 'Authorization, Content-Type');
+      ctxt.status = 200;
+      return;
+    }
+
     await body(ctxt, err => {
       if (err) {
         throw err;
