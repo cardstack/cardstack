@@ -1,6 +1,7 @@
 const models = [
   {
     type: 'plugin-configs',
+    id: 'core-types',
     attributes: {
       module: '@cardstack/core-types'
     }
