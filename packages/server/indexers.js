@@ -179,6 +179,12 @@ module.exports = class Indexers {
       return false;
     }
 
+    // the default type is "object", and elasticsearch doesn't echo it
+    // back to you even if you are setting it explicitly. So to
+    // maintain stability, we fill it in explicitly here before
+    // comparing.
+    addDefaultTypes(have);
+
     // Extra information in `have` is OK. There are several cases
     // where elasticsearch fills in more detail than we
     // provide. Missing or different information is not ok and means
@@ -353,5 +359,16 @@ class Operations {
       }
     });
     log.debug("delete %s %s", type, id);
+  }
+}
+
+function addDefaultTypes(mapping) {
+  for (let config of Object.values(mapping)) {
+    if (config && !config.type) {
+      config.type = 'object';
+    }
+    if (config.properties) {
+      addDefaultTypes(config.properties);
+    }
   }
 }
