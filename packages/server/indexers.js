@@ -33,9 +33,58 @@ module.exports = class Indexers {
     this.log = logger('indexers');
     this._lastControllingSchema = null;
     this._indexers = null;
+    this._running = false;
+    this._queue = [];
+    this._realTimeQueue = [];
   }
 
-  async update({ realTime, hints} = {}) {
+  async update({ realTime, hints } = {}) {
+    let resolve;
+    let promise = new Promise(r => resolve = r);
+    if (realTime) {
+      this._realTimeQueue.push({ hints, resolve });
+    } else {
+      this._queue.push({ hints, resolve });
+    }
+    if (!this._running) {
+      this._running = true;
+      this._updateLoop().then(() => {
+        this._running = false;
+      }, err => {
+        this.log.error("Unexpected error in _updateLoop %s", err);
+        this._running = false;
+      });
+    }
+    await promise;
+  }
+
+  async _updateLoop() {
+    while (this._queue.length > 0 || this._realTimeQueue.length > 0) {
+      let queue = this._queue;
+      this._queue = [];
+      let realTimeQueue = this._realTimeQueue;
+      this._realTimeQueue = [];
+      await this._runBatch(queue, false);
+      await this._runBatch(realTimeQueue, true);
+    }
+  }
+
+  async _runBatch(batch, realTime) {
+    if (batch.length > 0) {
+      let hints;
+      // hints only help if every request in the batch has hints. A
+      // request with no hints means "index everything" anyway.
+      if (batch.every(req => req.hints)) {
+        hints = batch.map(req => req.hints).reduce((a,b) => a.concat(b));
+      }
+      await this._doUpdate(realTime, hints);
+      for (let { resolve } of batch) {
+        resolve();
+      }
+    }
+  }
+
+  async _doUpdate(realTime, hints) {
     let branches = await this._branches(hints);
     await Promise.all(Object.keys(branches).map(
       branchName => this._updateBranch(branchName, branches[branchName], realTime, hints)
