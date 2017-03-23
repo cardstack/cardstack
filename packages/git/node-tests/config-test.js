@@ -64,7 +64,7 @@ describe('git/config', function() {
         }
       }));
 
-    (await change.get('my/base/content/articles/2.json', { allowCreate: true }))
+    (await change.get('my/base/contents/articles/2.json', { allowCreate: true }))
       .setContent(JSON.stringify({
         attributes: {
           title: 'hello'

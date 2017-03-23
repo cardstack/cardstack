@@ -72,7 +72,7 @@ class GitUpdater {
       originalTree = await oldCommit.getTree();
     }
     await this._indexTree(ops, originalTree, this.rootTree, {
-      only: this.basePath
+      only: this.basePath.concat([['schema', 'contents']])
     });
     return {
       commit: this.commitId
@@ -186,7 +186,9 @@ class Gather {
 }
 
 function filterAllows(filter, name) {
-  return !filter || !filter.only || filter.only.length === 0 || name === filter.only[0];
+  return !filter || !filter.only || filter.only.length === 0 ||
+    (Array.isArray(filter.only[0]) && filter.only[0].includes(name)) ||
+    name === filter.only[0];
 }
 
 function nextFilter(filter) {
