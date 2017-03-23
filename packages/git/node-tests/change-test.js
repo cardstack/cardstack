@@ -364,4 +364,11 @@ describe('git/change', function() {
     expect(await inRepo(path).getContents(head, 'sample.txt')).to.equal('sample');
   });
 
+  it('respect the branch argument to createInitial', async function() {
+    let change = await Change.createInitial(path, 'not-master');
+    let head = await change.finalize(commitOpts());
+    let notMaster = await inRepo(path).getCommit('not-master');
+    expect(notMaster.id).to.equal(head);
+  });
+
 });

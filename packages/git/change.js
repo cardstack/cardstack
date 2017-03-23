@@ -103,7 +103,7 @@ class Change {
   }
 
   async _newBranch(newCommit) {
-    await Branch.create(this.repo, 'master', newCommit, false);
+    await Branch.create(this.repo, this.targetBranch, newCommit, false);
     return newCommit.id().tostrS();
   }
 }
