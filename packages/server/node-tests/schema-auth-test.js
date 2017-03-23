@@ -2,6 +2,7 @@ const Schema = require('@cardstack/server/schema');
 const ElasticAssert = require('@cardstack/elasticsearch/node-tests/assertions');
 const JSONAPIFactory = require('@cardstack/test-support/jsonapi-factory');
 const PendingChange = require('@cardstack/plugin-utils/pending-change');
+const bootstrapSchema = require('@cardstack/server/bootstrap-schema');
 
 describe('schema/auth', function() {
 
@@ -9,6 +10,7 @@ describe('schema/auth', function() {
 
   beforeEach(async function() {
     factory = new JSONAPIFactory();
+    factory.importModels(bootstrapSchema);
 
     factory.addResource('content-types', 'articles')
       .withRelated('fields', [

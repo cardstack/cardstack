@@ -27,6 +27,10 @@ class JSONAPIFactory {
     return this.data.slice();
   }
 
+  importModels(models) {
+    this.data = this.data.concat(models);
+  }
+
 }
 
 class ResourceFactory {

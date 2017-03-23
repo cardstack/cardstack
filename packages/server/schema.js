@@ -6,7 +6,6 @@ const DataSource = require('@cardstack/server/data-source');
 const Grant = require('@cardstack/server/grant');
 const Plugins = require('@cardstack/server/plugins');
 const logger = require('heimdalljs-logger');
-const bootstrapSchema = require('./bootstrap-schema');
 
 const ownTypes = Object.freeze(['content-types', 'fields', 'constraints', 'data-sources', 'grants', 'plugin-configs', 'default-values']);
 
@@ -16,7 +15,7 @@ module.exports = class Schema {
   }
 
   static async loadFrom(inputModels) {
-    let models = bootstrapSchema.concat(inputModels);
+    let models = inputModels;
     let plugins = await Plugins.load(models.filter(model => model.type === 'plugin-configs'));
     let authLog = logger('auth');
     let schemaLog = logger('schema');

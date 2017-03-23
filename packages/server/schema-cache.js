@@ -17,10 +17,11 @@
 const Schema = require('./schema');
 const Searcher = require('@cardstack/elasticsearch/searcher');
 const logger = require('heimdalljs-logger');
+const bootstrapSchema = require('./bootstrap-schema');
 
 module.exports = class SchemaCache {
   constructor(seedModels=[]) {
-    this.seedModels = seedModels;
+    this.seedModels = bootstrapSchema.concat(seedModels);
     this.searcher = new Searcher(new BootstrapSchemaCache(seedModels));
     this.cache = new Map();
     this.log = logger('schema-cache');
@@ -73,6 +74,12 @@ module.exports = class SchemaCache {
     }
     this.log.debug("full schema update on branch %s", branch);
     this.cache.set(branch, Promise.resolve(schema));
+  }
+
+  async indexBaseContent(ops) {
+    for (let model of this.seedModels) {
+      await ops.save(model.type, model.id, model);
+    }
   }
 
   async _load(branch) {

@@ -33,6 +33,7 @@ module.exports = class Indexers {
     this.es = makeClient();
     this.log = logger('indexers');
     this._lastControllingSchema = null;
+    this._seenBranches = new Map();
     this._indexers = null;
     this._running = false;
     this._queue = [];
@@ -224,6 +225,10 @@ module.exports = class Indexers {
 
   async _updateContent(branch, updaters, schema, realTime, hints) {
     let { publicOps, privateOps } = Operations.create(this.es, branch, schema, realTime, this.log);
+    if (!this._seenBranches.has(branch)) {
+      await this.schemaCache.indexBaseContent(publicOps);
+      this._seenBranches.set(branch, true);
+    }
     for (let updater of updaters) {
       let meta = await this._loadMeta(branch, updater);
       let newMeta = await updater.updateContent(meta, hints, publicOps);
