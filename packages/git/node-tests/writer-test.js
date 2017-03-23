@@ -1,4 +1,3 @@
-const Writers = require('@cardstack/server/writers');
 const Writer = require('@cardstack/git/writer');
 const { inRepo } = require('./support');
 const {
@@ -6,7 +5,6 @@ const {
   destroyDefaultEnvironment
 } = require('@cardstack/server/node-tests/support');
 const JSONAPIFactory = require('@cardstack/test-support/jsonapi-factory');
-const { grantAllPermissions } = require('@cardstack/test-support/permissions');
 
 describe('git/writer', function() {
 
@@ -14,8 +12,6 @@ describe('git/writer', function() {
 
   beforeEach(async function() {
     let factory = new JSONAPIFactory();
-
-    grantAllPermissions(factory);
 
     factory.addResource('content-types', 'articles')
       .withRelated('fields', [
@@ -75,12 +71,8 @@ describe('git/writer', function() {
 
     env = await createDefaultEnvironment(factory.getModels());
 
-    user = {
-      fullName: 'Sample User',
-      email: 'user@example.com'
-    };
-
-    writers = new Writers(env.schemaCache);
+    writers = env.writers;
+    user = env.user;
 
   });
 

@@ -37,18 +37,18 @@ module.exports = class Indexer {
 
   async beginUpdate(branch) {
     await this._ensureRepo();
-    return new GitUpdater(this.repo, branch, this.log);
+    return new GitUpdater(this.repo, branch, this.log, this.repoPath);
   }
 };
 
 class GitUpdater {
-  constructor(repo, branch, log) {
+  constructor(repo, branch, log, repoPath) {
     this.repo = repo;
     this.branch = branch;
     this.commit = null;
     this.commitId = null;
     this.rootTree = null;
-    this.name = 'git';
+    this.name = `git/${repoPath}`;
     this.log = log;
   }
 
