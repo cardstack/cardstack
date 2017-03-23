@@ -1,8 +1,10 @@
 const Error = require('@cardstack/plugin-utils/error');
 const logger = require('heimdalljs-logger');
+const EventEmitter = require('events');
 
-class Writers {
+class Writers extends EventEmitter {
   constructor(schemaCache) {
+    super();
     this.schemaCache = schemaCache;
     this.log = logger('writers');
   }
@@ -18,6 +20,7 @@ class Writers {
     if (newSchema) {
       this.schemaCache.notifyBranchUpdate(branch, newSchema);
     }
+    this.emit('changed', { branch, type, id: response.id });
     return response;
   }
 
@@ -32,6 +35,7 @@ class Writers {
     if (newSchema) {
       this.schemaCache.notifyBranchUpdate(branch, newSchema);
     }
+    this.emit('changed', { branch, type, id });
     return response;
   }
 
@@ -46,6 +50,7 @@ class Writers {
     if (newSchema) {
       this.schemaCache.notifyBranchUpdate(branch, newSchema);
     }
+    this.emit('changed', { branch, type, id });
   }
 
   async _finalizeAndReply(pending) {

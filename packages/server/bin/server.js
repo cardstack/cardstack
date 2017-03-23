@@ -12,9 +12,10 @@ async function runServer(port, seedModels) {
   let schemaCache = new SchemaCache(seedModels);
 
   // TODO
-  // - add notification from writer
-  // - add periodic update
+  // - add periodic update of indexers
   let indexers = new Indexers(schemaCache);
+  let writers = new Writers(schemaCache);
+  writers.addListener('changed', what => indexers.update({ hints: [ what ] }));
   await indexers.update();
 
   let app = new Koa();
@@ -22,7 +23,7 @@ async function runServer(port, seedModels) {
     await next();
     log.info('%s %s %s', ctxt.request.method, ctxt.request.url, ctxt.response.status);
   });
-  app.use(require('@cardstack/jsonapi/middleware')(new Searcher(schemaCache), new Writers(schemaCache)));
+  app.use(require('@cardstack/jsonapi/middleware')(new Searcher(schemaCache), writers));
   app.listen(port);
   log.info("server listening on %s", port);
 }
