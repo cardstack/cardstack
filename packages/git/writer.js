@@ -193,7 +193,7 @@ async function finalizer(pendingChange) {
         file.setContent(JSON.stringify({
           attributes: pendingChange.finalDocument.attributes,
           relationships: pendingChange.finalDocument.relationships
-        }));
+        }, null, 2));
       } else {
         file.delete();
       }
