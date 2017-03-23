@@ -26,6 +26,21 @@ class Change {
     return new this(repo, targetBranch, null, [], null, null, null);
   }
 
+  static async createBranch(repo, parentId, targetBranch) {
+    let parentCommit;
+    if (parentId) {
+      parentCommit = await Commit.lookup(repo, parentId);
+    }
+
+    let parentTree;
+    let parents = [];
+    if (parentCommit) {
+      parentTree = await parentCommit.getTree();
+      parents.push(parentCommit);
+    }
+    return new this(repo, targetBranch, parentTree, parents, parentCommit, null, null);
+  }
+
   static async create(repo, parentId, targetBranch) {
     let headRef = await Branch.lookup(repo, targetBranch, Branch.BRANCH.LOCAL);
     let headCommit = await Commit.lookup(repo, headRef.target());

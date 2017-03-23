@@ -10,8 +10,9 @@ const { safeEntryByName } = require('./mutable-tree');
 const logger = require('heimdalljs-logger');
 
 module.exports = class Indexer {
-  constructor({ repo, basePath }) {
+  constructor({ repo, basePath, branchPrefix }) {
     this.repoPath = repo;
+    this.branchPrefix = branchPrefix || "";
     this.basePath = basePath ? basePath.split('/') : [];
     this.repo = null;
     this.log = logger('git-indexer');
@@ -28,8 +29,10 @@ module.exports = class Indexer {
     // nodegit docs show a Branch.iteratorNew method that would be
     // more appropriate than this, but as far as I can tell it is not
     // fully implemented
+
+    let pattern = new RegExp(`^refs\/heads\/${this.branchPrefix}(.*)`);
     return (await Reference.list(this.repo)).map(entry => {
-      let m = /^refs\/heads\/(.*)/.exec(entry);
+      let m = pattern.exec(entry);
       if (m) {
         return m[1];
       }
@@ -38,7 +41,7 @@ module.exports = class Indexer {
 
   async beginUpdate(branch) {
     await this._ensureRepo();
-    return new GitUpdater(this.repo, branch, this.log, this.repoPath, this.basePath);
+    return new GitUpdater(this.repo, this.branchPrefix + branch, this.log, this.repoPath, this.basePath);
   }
 };
 

@@ -13,9 +13,10 @@ const PendingChange = require('@cardstack/plugin-utils/pending-change');
 const pendingChanges = new WeakMap();
 
 module.exports = class Writer {
-  constructor({ repo, idGenerator, basePath }) {
+  constructor({ repo, idGenerator, basePath, branchPrefix }) {
     this.repoPath = repo;
     this.basePath = basePath;
+    this.branchPrefix = branchPrefix || "";
     this.repo = null;
     this.log = logger('writer');
     let hostname = os.hostname();
@@ -28,7 +29,7 @@ module.exports = class Writer {
     return withErrorHandling(document.id, type, async () => {
       await this._ensureRepo();
 
-      let change = await Change.create(this.repo, null, branch);
+      let change = await Change.create(this.repo, null, this.branchPrefix + branch);
       let id = document.id;
       let file;
       while (id == null) {
@@ -69,7 +70,7 @@ module.exports = class Writer {
 
     await this._ensureRepo();
     return withErrorHandling(id, type, async () => {
-      let change = await Change.create(this.repo, document.meta.version, branch);
+      let change = await Change.create(this.repo, document.meta.version, this.branchPrefix + branch);
       let file = await change.get(this._filenameFor(type, id, isSchema), { allowUpdate: true });
       let before = JSON.parse(await file.getBuffer());
       let after = patch(before, document);
@@ -96,7 +97,7 @@ module.exports = class Writer {
     }
     await this._ensureRepo();
     return withErrorHandling(id, type, async () => {
-      let change = await Change.create(this.repo, version, branch);
+      let change = await Change.create(this.repo, version, this.branchPrefix + branch);
       let file = await change.get(this._filenameFor(type, id, isSchema));
       let before = JSON.parse(await file.getBuffer());
       file.delete();
