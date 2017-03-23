@@ -8,24 +8,29 @@ const log = logger('server');
 const commander = require('commander');
 const path = require('path');
 
-async function runServer(port, seedModels) {
+async function wireItUp(seedModels) {
   let schemaCache = new SchemaCache(seedModels);
-
-  // TODO
-  // - add periodic update of indexers
   let indexers = new Indexers(schemaCache);
+  setInterval(() => indexers.update(), 1000);
   let writers = new Writers(schemaCache);
   writers.addListener('changed', what => indexers.update({ hints: [ what ] }));
   await indexers.update();
+  let searcher = new Searcher(schemaCache);
+  return { searcher, writers };
+}
 
+async function runServer(port, seedModels) {
+  let { searcher, writers } = await wireItUp(seedModels);
   let app = new Koa();
-  app.use(async function(ctxt, next) {
-    await next();
-    log.info('%s %s %s', ctxt.request.method, ctxt.request.url, ctxt.response.status);
-  });
-  app.use(require('@cardstack/jsonapi/middleware')(new Searcher(schemaCache), writers));
+  app.use(httpLogging);
+  app.use(require('@cardstack/jsonapi/middleware')(searcher, writers));
   app.listen(port);
   log.info("server listening on %s", port);
+}
+
+async function httpLogging(ctxt, next) {
+  await next();
+  log.info('%s %s %s', ctxt.request.method, ctxt.request.url, ctxt.response.status);
 }
 
 
@@ -53,8 +58,6 @@ function loadSeedModels(options) {
   }
 }
 
-// Without this, we can't see stack traces for certain failures within
-// promises during the test suite.
 process.on('warning', (warning) => {
   process.stderr.write(warning.stack);
 });
