@@ -157,7 +157,19 @@ class GitUpdater {
       if (!doc.meta) {
         doc.meta = {};
       }
+
+      // A note on the cardstack meta versioning protocol:
+      //
+      // meta.version is a point-in-time version indicator. If you
+      // change and then undo, you should end up at a different
+      // version than where you started. In the git data-source,
+      // meta.version is the ID of a commit.
+      //
+      // meta.hash is a content hash. If you change and then undo, you
+      // should end up back at the original meta.hash. In this git
+      // data-source, this is ID of a blob.
       doc.meta.version = this.commitId;
+      doc.meta.hash = newEntry.id().tostrS();
       await ops.save(type, id, doc);
     }
   }

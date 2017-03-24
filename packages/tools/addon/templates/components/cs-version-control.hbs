@@ -5,7 +5,10 @@
                           close=(action "close") }}
 
   <div class="cs-field-editor-section">
-    TODO
+    {{#with (meta-for-resource model) as |meta|}}
+      <div>{{meta.version}}</div>
+      <div>{{meta.hash}}</div>
+    {{/with}}
   </div>
 
   {{#liquid-if enabled}}
