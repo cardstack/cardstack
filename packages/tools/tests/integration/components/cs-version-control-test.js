@@ -1,13 +1,21 @@
 import { moduleForComponent, test } from 'ember-qunit';
 import hbs from 'htmlbars-inline-precompile';
 import Ember from 'ember';
+import DS from 'ember-data';
 
 let model;
 
 moduleForComponent('cs-version-control', 'Integration | Component | cs version control', {
   integration: true,
   beforeEach() {
-    model = Ember.Object.create();
+    // We need a valid model here because the component will go
+    // looking for its metadata, and ember-resource-metadata works
+    // through ember-data's identity map.
+    this.register('model:thing', DS.Model.extend());
+    model = Ember.Object.create({
+      id: 1,
+      type: 'thing'
+    });
     this.set('model', model);
   }
 
