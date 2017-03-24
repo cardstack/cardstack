@@ -41,29 +41,13 @@
     height: 100vh;
 
     /* no margin collapse */
-    padding: 0.1px;
+    padding-top: 0.1px;
+    padding-bottom: 0.1px;
+
+    padding-left: 1px;
+    background-color: var(--deep-background);
 }
 
 .cardstack-toolbox-width {
-    width: 41.0vw;
-}
-@media (min-width: 1000px) {
-    .cardstack-toolbox-width {
-        width: 34.0vw;
-    }
-}
-@media (min-width: 1250px) {
-    .cardstack-toolbox-width {
-        width: 25.0vw;
-    }
-}
-@media (min-width: 1563px) {
-    .cardstack-toolbox-width {
-        width: 16.0vw;
-    }
-}
-@media (min-width: 1923px) {
-    .cardstack-toolbox-width {
-        width: 7.0vw;
-    }
+    width: 20rem;
 }
