@@ -8,6 +8,10 @@
 
 <div> {{!- this one scrolls }}
 
+  {{cs-version-control model=model
+                       enabled=editingEnabled }}
+
+
   {{#each fields key="id" as |fieldMark|}}
     {{#cs-collapsible-section class="cs-toolbox-section"
                               title=(cs-humanize fieldMark.model.name)

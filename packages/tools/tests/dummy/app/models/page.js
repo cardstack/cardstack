@@ -1,8 +1,9 @@
 import DS from 'ember-data';
 import Ember from 'ember';
+import TrackRelationships from 'ember-data-relationship-tracker';
 const { Model, attr } = DS;
 
-export default Model.extend({
+export default Model.extend(TrackRelationships, {
   title: attr('string'),
   body: attr({ fieldType: '@cardstack/mobiledoc' }),
   created: attr('date'),

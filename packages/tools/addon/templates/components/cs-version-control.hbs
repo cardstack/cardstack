@@ -1,0 +1,20 @@
+{{#cs-collapsible-section class="cs-toolbox-section"
+                          title=title
+                          opened=opened
+                          open=(action "open")
+                          close=(action "close") }}
+
+  <div class="cs-field-editor-section">
+    TODO
+  </div>
+
+  {{#liquid-if enabled}}
+    <footer class="cs-version-control-footer cs-field-editor-section">
+      <a class="text-button" {{action "delete"}}>Delete</a>
+      <button disabled={{not anythingPending}} {{action "update"}}>
+        Update
+      </button>
+    </footer>
+  {{/liquid-if}}
+
+{{/cs-collapsible-section}}
