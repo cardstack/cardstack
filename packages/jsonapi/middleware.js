@@ -26,27 +26,19 @@ module.exports = function(searcher, writers, optionsArg) {
         throw err;
       }
     });
-    let branch = options.defaultBranch;
-    let handler = new Handler(searcher, writers, ctxt, branch, log);
+    let handler = new Handler(searcher, writers, ctxt, options.defaultBranch, log);
     return handler.run();
   };
 };
 
 class Handler {
-  constructor(searcher, writers, ctxt, branch, log) {
+  constructor(searcher, writers, ctxt, defaultBranch, log) {
     this.searcher = searcher;
     this.writers = writers;
     this.ctxt = ctxt;
-    this.branch = branch;
-    this._query = null;
+    this.query = qs.parse(this.ctxt.request.querystring, { plainObjects: true });
+    this.branch = this.query.branch || defaultBranch;
     this.log = log;
-  }
-
-  get query() {
-    if (!this._query) {
-      this._query = qs.parse(this.ctxt.request.querystring, { plainObjects: true });
-    }
-    return this._query;
   }
 
   get user() {
