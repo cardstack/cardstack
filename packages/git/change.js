@@ -180,6 +180,12 @@ class FileHandle {
     this.tree.delete(this.name);
     this.leaf = null;
   }
+  savedId() {
+    // this is available only after our change has been finalized
+    if (this.leaf.savedId) {
+      return this.leaf.savedId.tostrS();
+    }
+  }
 }
 
 Change.GitConflict = GitConflict;

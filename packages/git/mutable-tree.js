@@ -153,6 +153,7 @@ class NewEntry {
     } else {
       this._object = object;
     }
+    this.savedId = null;
   }
   filemode() {
     return this._filemode;
@@ -170,6 +171,9 @@ class NewEntry {
     return this._object;
   }
   async write() {
+    return this.savedId = await this._write();
+  }
+  async _write() {
     if (this.isBlob()) {
       if (this._object instanceof MutableBlob) {
         return this._object.write();
