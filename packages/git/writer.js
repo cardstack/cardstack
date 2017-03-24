@@ -199,6 +199,6 @@ async function finalizer(pendingChange) {
       }
     }
     let version = await change.finalize(signature);
-    return { version, hash: file.savedId() };
+    return { version, hash: (file ? file.savedId() : null) };
   });
 }
