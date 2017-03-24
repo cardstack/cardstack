@@ -150,12 +150,7 @@ describe('git/indexer', function() {
     expect(indexerState.commit).to.equal(head);
 
     let contents = await ea.documentContents('master', 'articles', 'hello-world');
-    expect(contents).to.deep.equal({
-      hello: 'world',
-      cardstack_rel_names: [],
-      cardstack_derived_names: [],
-      cardstack_meta: { version: head }
-    });
+    expect(contents).has.property('hello', 'world');
   });
 
   it('ignores newly added document that lacks json extension', async function() {
