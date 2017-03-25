@@ -10,6 +10,9 @@ export default Ember.Route.extend({
 
   model({ id }, transition) {
     let { branch } = transition.queryParams;
-    return this.get('store').findRecord('page', id, { adapterOptions: { branch } });
+    return this.get('store').queryRecord('page', {
+      branch,
+      filter: { id }
+    });
   }
 });

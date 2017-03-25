@@ -1,4 +1,5 @@
 import Ember from 'ember';
+import DS from 'ember-data';
 
 export default Ember.Mixin.create({
   resourceMetadata: Ember.inject.service(),
@@ -40,22 +41,23 @@ export default Ember.Mixin.create({
 
   queryRecord(store, type, query) {
     let branch = query.branch != null ? query.branch : this.get('_defaultBranch');
-    let id = query.id;
-    if (id == null) {
-      throw new Error('branch-adapter requires an id parameter in queryRecord queries');
-    }
-    let url = this.buildURL(type.modelName, query.id);
     let upstreamQuery = Object.assign({}, query);
-    delete upstreamQuery.id;
+    upstreamQuery.page = { size: 1 };
     delete upstreamQuery.isGeneric
     if (branch === this.get('_defaultBranch')) {
       delete upstreamQuery.branch;
     }
-    return this.ajax(url, 'GET', { data: upstreamQuery }).then(response => {
-      if (!query.isGeneric) {
-        this.get('resourceMetadata').write({ type: type.modelName, id }, { branch });
+    return this._super(store, type, upstreamQuery).then(response => {
+      if (!response.data || !Array.isArray(response.data) || response.data.length < 1) {
+        throw new DS.AdapterError([ { code: 404, title: 'Not Found', detail: 'branch-adapter queryRecord got less than one record back' } ]);
       }
-      return response;
+      if (!query.isGeneric) {
+        this.get('resourceMetadata').write({ type: type.modelName, id: response.data[0].id }, { branch });
+      }
+      return {
+        data: response.data[0],
+        meta: response.meta
+      }
     });
   },
 

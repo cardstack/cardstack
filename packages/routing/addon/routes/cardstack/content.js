@@ -1,8 +1,10 @@
 import Ember from 'ember';
 
 export default Ember.Route.extend({
-  model(params) {
-    let model = Object.assign({}, params, this.modelFor('cardstack'));
-    return model;
+  model({ type, slug }) {
+    return this.store.queryRecord(Ember.String.singularize(type), {
+      filter: { slug },
+      branch: this.modelFor('cardstack').branch
+    });
   }
 });

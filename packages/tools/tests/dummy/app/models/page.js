@@ -12,6 +12,7 @@ export default Model.extend(TrackRelationships, {
   state: attr('string'),
   country: attr('string'),
   zip: attr('string'),
+  slug: attr('string'),
 
   type: Ember.computed(function() {
     // for some weird reason, you can't just say
