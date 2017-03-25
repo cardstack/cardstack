@@ -1,9 +1,7 @@
 import Ember from 'ember';
 
 export default Ember.Mixin.create({
-  //branchModels: Ember.inject.service('-cs-branch-models'),
-
-
+  resourceMetadata: Ember.inject.service(),
   _defaultbranch: 'default',
 
   _branchFromSnapshot(snapshot) {
@@ -18,7 +16,7 @@ export default Ember.Mixin.create({
   findRecord(store, type, id, snapshot) {
     let branch = this._branchFromSnapshot(snapshot);
     return this._super(store, type, id, snapshot).then(response => {
-      console.log(`loaded ${type.modelName} ${id} from ${branch} via findRecord`);
+      this.get('resourceMetadata').write({ type: type.modelName, id }, { branch });
       return response;
     });
   },
@@ -34,10 +32,8 @@ export default Ember.Mixin.create({
     delete upstreamQuery.id;
     delete upstreamQuery.isGeneric
     return this.ajax(url, 'GET', { data: upstreamQuery }).then(response => {
-      if (query.isGeneric) {
-        console.log(`loaded ${type.modelName} ${id} from ${branch} via queryRecord as a cardstack-generic`);
-      } else {
-        console.log(`loaded ${type.modelName} ${id} from ${branch} via queryRecord`);
+      if (!query.isGeneric) {
+        this.get('resourceMetadata').write({ type: type.modelName, id }, { branch });
       }
       return response;
     });
