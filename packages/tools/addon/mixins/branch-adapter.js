@@ -2,7 +2,7 @@ import Ember from 'ember';
 
 export default Ember.Mixin.create({
   resourceMetadata: Ember.inject.service(),
-  _defaultbranch: 'master',
+  _defaultBranch: 'master',
 
   _branchFromSnapshot(snapshot) {
     let { adapterOptions } = snapshot;
@@ -31,6 +31,9 @@ export default Ember.Mixin.create({
     let upstreamQuery = Object.assign({}, query);
     delete upstreamQuery.id;
     delete upstreamQuery.isGeneric
+    if (branch === this._defaultBranch) {
+      delete upstreamQuery.branch;
+    }
     return this.ajax(url, 'GET', { data: upstreamQuery }).then(response => {
       if (!query.isGeneric) {
         this.get('resourceMetadata').write({ type: type.modelName, id }, { branch });
@@ -41,8 +44,12 @@ export default Ember.Mixin.create({
 
   buildQuery(snapshot) {
     let query = this._super(snapshot);
-    if (snapshot.adapterOptions && snapshot.adapterOptions.branch) {
-      query.branch = snapshot.adapterOptions.branch;
+    let { adapterOptions } = snapshot;
+    if (adapterOptions) {
+      let { branch } = adapterOptions;
+      if (branch != null && branch !== this._defaultBranch) {
+        query.branch = branch;
+      }
     }
     return query;
   }

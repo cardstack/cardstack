@@ -5,9 +5,9 @@
                           close=(action "close") }}
 
   <div class="cs-field-editor-section">
-    <div>{{modelMeta.version}}</div>
-    <div>{{modelMeta.hash}}</div>
-    <div>{{modelMeta.branch}}</div>
+    <div>Version: {{modelMeta.version}}</div>
+    <div>Hash: {{modelMeta.hash}}</div>
+    <div>Branch: {{modelMeta.branch}}</div>
 
     {{#unless fetchUpstreamModel.isRunning }}
       {{#if upstreamModel}}
