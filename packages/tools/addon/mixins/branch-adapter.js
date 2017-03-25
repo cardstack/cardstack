@@ -3,21 +3,30 @@ import Ember from 'ember';
 export default Ember.Mixin.create({
   //branchModels: Ember.inject.service('-cs-branch-models'),
 
-  findRecord(store, type, id, snapshot) {
-    let url = this.buildURL(type.modelName, id, snapshot, 'findRecord');
-    let query = this.buildQuery(snapshot);
+
+  _branchFromSnapshot(snapshot) {
     let { adapterOptions } = snapshot;
-    let branch;
-    if (adapterOptions && adapterOptions.branch) {
-      branch = adapterOptions.branch;
-      query.branch = branch;
+    if (adapterOptions && adapterOptions.branch != null) {
+      return adapterOptions.branch;
+    } else {
+      return 'default';
     }
-    return this.ajax(url, 'GET', { data: query }).then(response => {
-      if (branch) {
-        console.log(`loaded ${type.modelName} ${id} from ${branch}`);
-      }
+  },
+
+  findRecord(store, type, id, snapshot) {
+    let branch = this._branchFromSnapshot(snapshot);
+    return this._super(store, type, id, snapshot).then(response => {
+      console.log(`loaded ${type.modelName} ${id} from ${branch}`);
       return response;
     });
+  },
+
+  buildQuery(snapshot) {
+    let query = this._super(snapshot);
+    if (snapshot.adapterOptions && snapshot.adapterOptions.branch) {
+      query.branch = snapshot.adapterOptions.branch;
+    }
+    return query;
   }
 
 });
