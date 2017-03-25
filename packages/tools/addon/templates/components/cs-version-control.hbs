@@ -5,11 +5,18 @@
                           close=(action "close") }}
 
   <div class="cs-field-editor-section">
-    {{#with (meta-for-resource model) as |meta|}}
-      <div>{{meta.version}}</div>
-      <div>{{meta.hash}}</div>
-      <div>{{meta.branch}}</div>
-    {{/with}}
+    <div>{{modelMeta.version}}</div>
+    <div>{{modelMeta.hash}}</div>
+    <div>{{modelMeta.branch}}</div>
+
+    {{#unless fetchUpstreamModel.isRunning }}
+      {{#if upstreamModel}}
+        There's an upstream model.
+      {{else}}
+        There's no upstream model.
+      {{/if}}
+    {{/unless}}
+
   </div>
 
   {{#liquid-if enabled}}

@@ -2,7 +2,7 @@ import Ember from 'ember';
 
 export default Ember.Mixin.create({
   resourceMetadata: Ember.inject.service(),
-  _defaultbranch: 'default',
+  _defaultbranch: 'master',
 
   _branchFromSnapshot(snapshot) {
     let { adapterOptions } = snapshot;

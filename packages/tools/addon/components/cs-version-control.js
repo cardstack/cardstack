@@ -1,10 +1,42 @@
 import Ember from 'ember';
 import layout from '../templates/components/cs-version-control';
+import { task } from 'ember-concurrency';
 
 export default Ember.Component.extend({
   layout,
   tagName: '',
   opened: true,
+  resourceMetadata: Ember.inject.service(),
+  store: Ember.inject.service(),
+
+  modelMeta: Ember.computed('model', function() {
+    return this.get('resourceMetadata').read(this.get('model'));
+  }),
+
+  onMaster: Ember.computed('modelMeta', function() {
+    return this.get('modelMeta').branch === 'master';
+  }),
+
+  fetchUpstreamModel: task(function * () {
+    this.set('upstreamModel', null);
+    let meta = this.get('modelMeta');
+    if (meta.branch === 'master') {
+      // Nothing to do, we're already the master version
+      return;
+    }
+    let model = this.get('model');
+    let type = model.constructor.modelName;
+    let id = model.get('id');
+    if (id == null) {
+      // Nothing to do, we don't have an id yet. It's vanishingly
+      // unlikely that we're about to collide with something on
+      // upstream anyway.
+      return;
+    }
+    let upstreamModel = yield this.get('store').findRecord('cardstack-generic', `master/${type}/${id}`);
+    this.set('upstreamModel', upstreamModel);
+  }).observes('modelMeta.branch', 'model.id').on('init'),
+
   title: Ember.computed('model.isNew', 'model.hasDirtyFields', function() {
     if (this.get('model.isNew')) {
       return "Unsaved";
