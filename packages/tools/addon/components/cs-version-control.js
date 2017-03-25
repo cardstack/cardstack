@@ -33,8 +33,16 @@ export default Ember.Component.extend({
       // upstream anyway.
       return;
     }
-    let upstreamModel = yield this.get('store').findRecord('cardstack-generic', `master/${type}/${id}`);
-    this.set('upstreamModel', upstreamModel);
+    try {
+      let upstreamModel = yield this.get('store').findRecord('cardstack-generic', `master/${type}/${id}`);
+      this.set('upstreamModel', upstreamModel);
+    } catch (err) {
+      if (err.isAdapterError && err.errors && err.errors.length > 0 && err.errors[0].code === 404) {
+        // There's no upstream model, that's OK.
+        return;
+      }
+      throw err;
+    }
   }).observes('modelMeta.branch', 'model.id').on('init'),
 
   title: Ember.computed('model.isNew', 'model.hasDirtyFields', function() {
