@@ -18,8 +18,6 @@
     "test": "ember try:each"
   },
   "dependencies": {
-    "broccoli-funnel": "^1.1.0",
-    "broccoli-merge-trees": "^2.0.0",
     "ember-cli-babel": "^5.1.7",
     "ember-cli-htmlbars": "^1.1.1",
     "ember-cli-is-component": "https://github.com/ef4/ember-cli-is-component#544bf7a87689015c4f54c6697093d9f2b0d7b1ea",
@@ -32,7 +30,6 @@
     "ember-overlays": "^0.1.0",
     "ember-toolbars": "0.2.7",
     "ember-truth-helpers": "^1.3.0",
-    "js-polyfills": "^0.1.33",
     "liquid-fire": "^0.27.1",
     "postcss-cssnext": "^2.10.0",
     "postcss-import": "^9.1.0"
