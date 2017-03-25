@@ -13,6 +13,20 @@ export default Ember.Mixin.create({
     }
   },
 
+  updateRecord(store, type, snapshot) {
+    if (!snapshot.adapterOptions) {
+      snapshot.adapterOptions = {};
+    }
+    if (!snapshot.adapterOptions.branch) {
+      let meta = this.get('resourceMetadata').read(snapshot.record);
+      if (!meta.branch) {
+        throw new Error("tried to update a record but I don't know what branch it came from");
+      }
+      snapshot.adapterOptions.branch = meta.branch;
+    }
+    return this._super(store, type, snapshot);
+  },
+
   findRecord(store, type, id, snapshot) {
     let branch = this._branchFromSnapshot(snapshot);
     return this._super(store, type, id, snapshot).then(response => {
@@ -42,16 +56,19 @@ export default Ember.Mixin.create({
     });
   },
 
-  buildQuery(snapshot) {
-    let query = this._super(snapshot);
-    let { adapterOptions } = snapshot;
-    if (adapterOptions) {
-      let { branch } = adapterOptions;
+  // This will properly set the branch query param from the
+  // adapterOptions for everything *except* query and
+  // queryRecord. Those two don't pass a snapshot to buildURL and are
+  // handled separately above.
+  buildURL(modelName, id, snapshot, requestType, query) {
+    let url = this._super(modelName, id, snapshot, requestType, query);
+    if (snapshot && snapshot.adapterOptions) {
+      let { branch } = snapshot.adapterOptions;
       if (branch != null && branch !== this._defaultBranch) {
-        query.branch = branch;
+        url += '?branch=' + encodeURIComponent(branch);
       }
     }
-    return query;
+    return url;
   }
 
 });
