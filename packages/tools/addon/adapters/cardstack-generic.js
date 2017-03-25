@@ -18,10 +18,10 @@ export default DS.JSONAPIAdapter.extend({
             'real-type': realType,
             attributes: response.data.attributes,
             realtionships: response.data.relationships
-          }
+          },
+          meta: response.data.meta
         }
       }
     });
-  },
-
+  }
 });
