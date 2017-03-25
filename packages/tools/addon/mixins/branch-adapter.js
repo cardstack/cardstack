@@ -2,14 +2,17 @@ import Ember from 'ember';
 
 export default Ember.Mixin.create({
   resourceMetadata: Ember.inject.service(),
-  _defaultBranch: 'master',
+  _defaultBranch: Ember.computed(function() {
+    let config = Ember.getOwner(this).resolveRegistration('config:environment');
+    return config.cardstack.defaultBranch;
+  }),
 
   _branchFromSnapshot(snapshot) {
     let { adapterOptions } = snapshot;
     if (adapterOptions && adapterOptions.branch != null) {
       return adapterOptions.branch;
     } else {
-      return this._defaultBranch;
+      return this.get('_defaultBranch');
     }
   },
 
@@ -36,7 +39,7 @@ export default Ember.Mixin.create({
   },
 
   queryRecord(store, type, query) {
-    let branch = query.branch != null ? query.branch : this._defaultBranch;
+    let branch = query.branch != null ? query.branch : this.get('_defaultBranch');
     let id = query.id;
     if (id == null) {
       throw new Error('branch-adapter requires an id parameter in queryRecord queries');
@@ -45,7 +48,7 @@ export default Ember.Mixin.create({
     let upstreamQuery = Object.assign({}, query);
     delete upstreamQuery.id;
     delete upstreamQuery.isGeneric
-    if (branch === this._defaultBranch) {
+    if (branch === this.get('_defaultBranch')) {
       delete upstreamQuery.branch;
     }
     return this.ajax(url, 'GET', { data: upstreamQuery }).then(response => {
@@ -64,7 +67,7 @@ export default Ember.Mixin.create({
     let url = this._super(modelName, id, snapshot, requestType, query);
     if (snapshot && snapshot.adapterOptions) {
       let { branch } = snapshot.adapterOptions;
-      if (branch != null && branch !== this._defaultBranch) {
+      if (branch != null && branch !== this.get('_defaultBranch')) {
         url += '?branch=' + encodeURIComponent(branch);
       }
     }

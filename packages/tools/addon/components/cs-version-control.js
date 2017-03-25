@@ -9,18 +9,23 @@ export default Ember.Component.extend({
   resourceMetadata: Ember.inject.service(),
   store: Ember.inject.service(),
 
+  defaultBranch: Ember.computed(function() {
+    let config = Ember.getOwner(this).resolveRegistration('config:environment');
+    return config.cardstack.defaultBranch;
+  }),
+
   modelMeta: Ember.computed('model', function() {
     return this.get('resourceMetadata').read(this.get('model'));
   }),
 
   onMaster: Ember.computed('modelMeta', function() {
-    return this.get('modelMeta').branch === 'master';
+    return this.get('modelMeta').branch === this.get('defaultBranch');
   }),
 
   fetchUpstreamModel: task(function * () {
     this.set('upstreamModel', null);
     let meta = this.get('modelMeta');
-    if (meta.branch === 'master') {
+    if (meta.branch === this.get('defaultBranch')) {
       // Nothing to do, we're already the master version
       return;
     }
