@@ -497,4 +497,33 @@ describe('elasticsearch/searcher', function() {
     expect(model).has.deep.property('attributes.hello', 'magic words');
   });
 
+  it('can do analyzed term matching', async function() {
+    let response = await searcher.search('master', {
+      filter: {
+        hello: 'magic'
+      }
+    });
+    expect(response.models).length(1);
+    expect(response.models[0]).has.deep.property('attributes.hello', 'magic words');
+  });
+
+  it('the analyzed term does not match a phrase', async function() {
+    let response = await searcher.search('master', {
+      filter: {
+        hello: 'magic words'
+      }
+    });
+    expect(response.models).length(0);
+  });
+
+  it.skip('can do exact term matching with a phrase', async function() {
+    let response = await searcher.search('master', {
+      filter: {
+        hello: { exact: 'magic words' }
+      }
+    });
+    expect(response.models).length(1);
+    expect(response.models[0]).has.deep.property('attributes.hello', 'magic words');
+  });
+
 });
