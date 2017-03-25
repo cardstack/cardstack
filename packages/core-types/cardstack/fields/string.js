@@ -5,7 +5,7 @@ module.exports = {
   defaultMapping() {
     // we index this field twice. Once as "text", which is analyzed
     // for full-text search, and once as "keyword", which is better
-    // for sorting.
+    // for sorting and exact matches.
     return {
       type: "text",
       fields: {
@@ -15,7 +15,7 @@ module.exports = {
       }
     };
   },
-  // when sorting, use the "keyword" typed sub field
+  // when sorting or exact matching, use the "keyword" typed sub field
   sortFieldName(fieldName) {
     return `${fieldName}.raw`;
   }

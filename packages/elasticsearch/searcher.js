@@ -181,16 +181,16 @@ class Searcher {
   }
 
   _fieldFilter(schema, key, value) {
-    let field = fieldNameFromKey(schema, key);
+    let field = fieldFromKey(schema, key);
 
     if (typeof value === 'string') {
       // Bare strings are shorthand for a single term filter
-      return { term: { [field] : value.toLowerCase() } };
+      return { term: { [field.queryFieldName] : value.toLowerCase() } };
     }
 
     if (Array.isArray(value)) {
       // Bare arrays are shorthand for a multi term filter
-      return { terms: { [field] : value.map(elt => elt.toLowerCase()) } };
+      return { terms: { [field.queryFieldName] : value.map(elt => elt.toLowerCase()) } };
     }
 
     if (value.range) {
@@ -202,7 +202,7 @@ class Searcher {
       });
       return {
         range: {
-          [field]: limits
+          [field.queryFieldName]: limits
         }
       };
     }
@@ -210,12 +210,26 @@ class Searcher {
     if (value.exists != null) {
       if (String(value.exists) === 'false') {
         return {
-          bool: { must_not: { exists: { field } } }
+          bool: { must_not: { exists: { field: field.queryFieldName } } }
         };
       } else {
         return {
-          exists: { field }
+          exists: { field: field.queryFieldName }
         };
+      }
+    }
+
+    if (value.exact != null) {
+      let innerQuery = value.exact;
+      if (typeof innerQuery === 'string') {
+        // This is the sortFieldName because that one is designed for
+        // exact matching (in addition to sorting).
+        return { term: { [field.sortFieldName] : innerQuery.toLowerCase() } };
+      }
+      if (Array.isArray(innerQuery)) {
+        // This is the sortFieldName because that one is designed for
+        // exact matching (in addition to sorting).
+        return { terms: { [field.sortFieldName] : innerQuery.map(elt => elt.toLowerCase()) } };
       }
     }
 
@@ -265,12 +279,12 @@ class Searcher {
 
 // We use elastic search's built-in _type and _id to store JSONAPI's
 // type and id. We don't want clients to need to add the underscores.
-function fieldNameFromKey(schema, key) {
+function fieldFromKey(schema, key) {
   if (key === 'type') {
-    return '_type';
+    return { queryFieldName: '_type', exactFieldName: '_type' };
   }
   if (key === 'id') {
-    return '_id';
+    return { queryFieldName: '_id', exatlyFieldName: '_id' };
   }
   let field = schema.fields.get(key);
   if (!field) {
@@ -279,7 +293,7 @@ function fieldNameFromKey(schema, key) {
       title: "Unknown field in filter"
     });
   }
-  return field.queryFieldName;
+  return field;
 }
 
 module.exports = Searcher;
