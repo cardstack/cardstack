@@ -172,7 +172,7 @@ describe('elasticsearch/searcher', function() {
     let { models } = await searcher.search('master', {
       page: { size: 1000 }
     });
-    expect(models).to.have.length(fixtures.length + 20);
+    expect(models).to.have.length(fixtures.length + 20 + env.schemaCache.seedModels.length);
   });
 
   it('can be searched via queryString', async function() {
@@ -203,7 +203,8 @@ describe('elasticsearch/searcher', function() {
   it('can filter by id', async function() {
     let { models } = await searcher.search('master', {
       filter: {
-        id: '1'
+        id: '1',
+        type: ['articles', 'people']
       }
     });
     expect(models).to.have.length(2);
