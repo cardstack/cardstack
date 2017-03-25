@@ -17,6 +17,11 @@ moduleForComponent('cs-version-control', 'Integration | Component | cs version c
       type: 'thing'
     });
     this.set('model', model);
+    this.inject.service('resource-metadata', { as: 'meta' });
+    this.get('meta').write(model, { branch: 'master' });
+    this.register('config:enviroment', {
+      cardstack: { defaultBranch: 'master' }
+    });
   }
 
 });
