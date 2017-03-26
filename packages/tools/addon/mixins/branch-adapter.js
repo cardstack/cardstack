@@ -46,7 +46,7 @@ export default Ember.Mixin.create({
 
   queryRecord(store, type, query) {
     let branch = query.branch != null ? query.branch : this.get('_defaultBranch');
-    let upstreamQuery = Object.assign({}, query);
+    let upstreamQuery = Ember.assign({}, query);
     upstreamQuery.page = { size: 1 };
     delete upstreamQuery.isGeneric
     if (branch === this.get('_defaultBranch')) {
