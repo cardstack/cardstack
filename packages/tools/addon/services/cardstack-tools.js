@@ -1,7 +1,11 @@
 import Ember from 'ember';
+const { getOwner } = Ember;
+import { transitionTo } from '../private-api';
 
 export default Ember.Service.extend({
   overlays: Ember.inject.service('ember-overlays'),
+  resourceMetadata: Ember.inject.service(),
+  cardstackRouting: Ember.inject.service(),
   marks: Ember.computed.alias('overlays.marks'),
 
   fields: Ember.computed('marks', function() {
@@ -15,6 +19,15 @@ export default Ember.Service.extend({
   activeContentItem: Ember.computed('contentItems', function() {
     return this.get('contentItems')[0];
   }),
+
+  _activeItemMeta: Ember.computed('activeContentItem', function() {
+    let model = this.get('activeContentItem.model')
+    if (model) {
+      return this.get('resourceMetadata').read(model);
+    }
+  }),
+
+  branch: Ember.computed.alias('_activeItemMeta.branch'),
 
   activeFields: Ember.computed('activeContentItem', 'fields', function() {
     let item = this.get('activeContentItem');
@@ -126,6 +139,18 @@ export default Ember.Service.extend({
 
   setEditing(which) {
     this._updatePersistent('editing', which);
+  },
+
+  setBranch(which) {
+    let model = this.get('activeContentItem.model')
+    if (model) {
+      let {
+        name,
+        args,
+        queryParams
+      } = this.get('cardstackRouting').routeFor(model.get('type'), model.get('slug'), which);
+      transitionTo(getOwner(this), name, args, queryParams);
+    }
   },
 
   openField(which) {

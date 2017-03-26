@@ -8,24 +8,20 @@ export default Ember.Component.extend({
   opened: true,
   resourceMetadata: Ember.inject.service(),
   store: Ember.inject.service(),
-
-  defaultBranch: Ember.computed(function() {
-    let config = Ember.getOwner(this).resolveRegistration('config:environment');
-    return config.cardstack.defaultBranch;
-  }),
+  cardstackRouting: Ember.inject.service(),
 
   modelMeta: Ember.computed('model', function() {
     return this.get('resourceMetadata').read(this.get('model'));
   }),
 
   onMaster: Ember.computed('modelMeta', function() {
-    return this.get('modelMeta').branch === this.get('defaultBranch');
+    return this.get('modelMeta').branch === this.get('cardstackRouting.defaultBranch');
   }),
 
   fetchUpstreamModel: task(function * () {
     this.set('upstreamModel', null);
     let meta = this.get('modelMeta');
-    if (meta.branch === this.get('defaultBranch')) {
+    if (meta.branch === this.get('cardstackRouting.defaultBranch')) {
       // Nothing to do, we're already the master version
       return;
     }

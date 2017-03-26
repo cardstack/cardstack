@@ -3,10 +3,8 @@ import DS from 'ember-data';
 
 export default Ember.Mixin.create({
   resourceMetadata: Ember.inject.service(),
-  _defaultBranch: Ember.computed(function() {
-    let config = Ember.getOwner(this).resolveRegistration('config:environment');
-    return config.cardstack.defaultBranch;
-  }),
+  cardstackRouting: Ember.inject.service(),
+  _defaultBranch: Ember.computed.alias('cardstackRouting.defaultBranch'),
 
   _branchFromSnapshot(snapshot) {
     let { adapterOptions } = snapshot;

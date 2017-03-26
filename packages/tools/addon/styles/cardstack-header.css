@@ -90,3 +90,42 @@
     margin-right: 1rem;
     line-height: calc(var(--cs-header-height)/0.75 - 0.75em);
 }
+
+.cs-branch-control {
+    height: 100%;
+    display: flex;
+    align-items: center;
+    padding: 0 0.75em;
+}
+
+.cs-branch-control > button {
+    border-radius: 0px;
+    border: 1px solid var(--bright-foreground);
+    border-left-width: 0px;
+    font-size: 0.6rem;
+    line-height: 1.1em;
+    padding: 0.6em 0.75em 0.4em 0.75em;
+    background-color: var(--light-background);
+    color: var(--deep-background);
+    text-transform: uppercase;
+    letter-spacing: 0.2px;
+    transition: background-color 250ms ease;
+    cursor: pointer;
+    outline-width: 0;
+}
+
+.cs-branch-control > button.active {
+    background-color: var(--bright-foreground);
+    z-index: 1;
+}
+
+.cs-branch-control > button:first-child {
+    border-left-width: 1px;
+    border-top-left-radius: 10px;
+    border-bottom-left-radius: 10px;
+}
+
+.cs-branch-control > button:last-child {
+    border-top-right-radius: 10px;
+    border-bottom-right-radius: 10px;
+}

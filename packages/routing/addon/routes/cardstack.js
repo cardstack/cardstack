@@ -1,17 +1,18 @@
 import Ember from 'ember';
 
 export default Ember.Route.extend({
+  cardstackRouting: Ember.inject.service(),
+
   queryParams: {
     branch: {
-      refreshMode: true
+      refreshModel: true
     }
   },
 
   model(params, transition) {
-    let config = Ember.getOwner(this).resolveRegistration('config:environment');
     let { branch } = transition.queryParams;
     if (branch == null) {
-      branch = config.cardstack.defaultBranch;
+      branch = this.get('cardstackRouting.config.defaultBranch');
     }
     return { branch };
   }
