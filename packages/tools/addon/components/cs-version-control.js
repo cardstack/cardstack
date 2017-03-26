@@ -14,15 +14,22 @@ export default Ember.Component.extend({
     return this.get('resourceMetadata').read(this.get('model'));
   }),
 
-  onMaster: Ember.computed('modelMeta', function() {
+  onMaster: Ember.computed('modelMeta.branch', function() {
     return this.get('modelMeta').branch === this.get('cardstackRouting.defaultBranch');
+  }),
+
+  upstreamMeta: Ember.computed('upstreamModel', function() {
+    let upstream = this.get('upstreamModel');
+    if (upstream) {
+      return this.get('resourceMetadata').read(upstream);
+    }
   }),
 
   fetchUpstreamModel: task(function * () {
     this.set('upstreamModel', null);
-    let meta = this.get('modelMeta');
-    if (meta.branch === this.get('cardstackRouting.defaultBranch')) {
-      // Nothing to do, we're already the master version
+    if (this.get('onMaster')) {
+      // Nothing to do, we're already on the default branch, so there
+      // is no model more upstream than ours.
       return;
     }
     let model = this.get('model');
@@ -46,14 +53,60 @@ export default Ember.Component.extend({
     }
   }).observes('modelMeta.branch', 'model.id').on('init'),
 
-  title: Ember.computed('model.isNew', 'model.hasDirtyFields', function() {
+  // this describes the state of our model relative to its branch. So
+  // "saved" here means it has been saved to its branch, etc.
+  modificationState: Ember.computed('model.isNew', 'model.hasDirtyFields', function() {
     if (this.get('model.isNew')) {
-      return "Unsaved";
-    }
-    if (this.get('model.hasDirtyFields')) {
-      return "Changed";
+      return "new";
+    } else  if (this.get('model.hasDirtyFields')) {
+      return "changed";
     } else {
-      return "Saved";
+      return "saved";
+    }
+  }),
+
+  // this describes the state of our model relative to its value on
+  // the default branch.
+  upstreamState: Ember.computed('upstreamMeta.hash', 'modelMeta.hash', 'onMaster', 'fetchUpstreamModel.isRunning', function() {
+    if (this.get('onMaster')) {
+      return 'self';
+    }
+
+    if (this.get('fetchUpstreamModel.isRunning')) {
+      return 'pending';
+    }
+
+    let upstreamMeta = this.get('upstreamMeta');
+    if (!upstreamMeta) {
+      return 'created';
+    }
+
+    let meta = this.get('modelMeta');
+    if (meta.hash === upstreamMeta.hash) {
+      return 'same';
+    } else {
+      return 'different';
+    }
+
+  }),
+
+  title: Ember.computed('modificationState', 'upstreamState', function() {
+    switch(this.get('modificationState')) {
+    case 'new':
+      return 'Drafted'
+    case 'changed':
+      return 'Changed';
+    case 'saved':
+      switch(this.get('upstreamState')) {
+      case 'pending':
+        return '...';
+      case 'self':
+        return 'Live';
+      case 'created':
+      case 'different':
+      case 'same':
+        return 'Preview';
+      }
     }
   }),
 

@@ -91,7 +91,16 @@ export default Ember.Service.extend({
     }
   ],
 
-  editing: false,
+  requestedEditing: false,
+
+  // This is a placeholder until I integrate the auth system here.
+  mayEditLive: false,
+
+  editing: Ember.computed('requestedEditing', 'branch', function() {
+    return this.get('requestedEditing') &&
+      (this.get('mayEditLive') ||
+       this.get('branch') !== this.get('cardstackRouting.defaultBranch'));
+  }),
 
   init() {
     this._super();
@@ -138,7 +147,10 @@ export default Ember.Service.extend({
   },
 
   setEditing(which) {
-    this._updatePersistent('editing', which);
+    this._updatePersistent('requestedEditing', which);
+    if (!this.get('mayEditLive') && this.get('branch') === this.get('cardstackRouting.defaultBranch')) {
+      this.setBranch('draft');
+    }
   },
 
   setBranch(which) {

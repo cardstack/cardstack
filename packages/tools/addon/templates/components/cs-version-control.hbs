@@ -5,24 +5,23 @@
                           close=(action "close") }}
 
   <div class="cs-field-editor-section">
-    <div>Version: {{modelMeta.version}}</div>
-    <div>Hash: {{modelMeta.hash}}</div>
-    <div>Branch: {{modelMeta.branch}}</div>
-
-    {{#unless fetchUpstreamModel.isRunning }}
-      {{#if upstreamModel}}
-        There's an upstream model.
-      {{else}}
-        There's no upstream model.
+    {{#liquid-spacer}}
+      {{#if (eq upstreamState "same")}}
+        <div>Same as live version.</div>
       {{/if}}
-    {{/unless}}
+
+      {{#if (eq upstreamState "different")}}
+        <div>Differs from live version.</div>
+      {{/if}}
+
+    {{/liquid-spacer}}
 
   </div>
 
   {{#liquid-if enabled}}
     <footer class="cs-version-control-footer cs-field-editor-section">
       <a class="text-button" {{action "delete"}}>Delete</a>
-      <button disabled={{not anythingPending}} {{action "update"}}>
+      <button disabled={{eq modificationState "saved"}} {{action "update"}}>
         Update
       </button>
     </footer>
