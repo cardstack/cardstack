@@ -58,7 +58,7 @@
     "ember-mobiledoc-editor": "^0.5.10",
     "ember-moment": "^7.3.0",
     "ember-overlays": "^0.1.1",
-    "ember-resource-metadata": "^0.0.1",
+    "ember-resource-metadata": "^0.0.2",
     "ember-toolbars": "0.2.7",
     "ember-truth-helpers": "^1.3.0",
     "heimdalljs-logger": "^0.1.8",

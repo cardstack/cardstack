@@ -23,7 +23,7 @@
     "ember-cli-htmlbars": "^1.1.1",
     "ember-data": "^2.12.1",
     "ember-inflector": "^1.11.0",
-    "ember-resource-metadata": "^0.0.1"
+    "ember-resource-metadata": "^0.0.2"
   },
   "devDependencies": {
     "broccoli-asset-rev": "^2.4.5",
