@@ -5,7 +5,7 @@ export default DS.JSONAPIAdapter.extend({
     let [branch, realType, realId] = id.split('/');
     let adapter = store.adapterFor(realType);
     return adapter.queryRecord(store, store.modelFor(realType), {
-      id: realId,
+      filter: { id: realId },
       branch,
       isGeneric: true
     }).then(response => {
