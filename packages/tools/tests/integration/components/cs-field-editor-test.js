@@ -18,7 +18,7 @@ moduleForComponent('cs-field-editor', 'Integration | Component | cs field editor
       This is the custom score editor
     `);
     this.register('template:components/field-editors/echo-editor', hbs`
-      <div class="echo">{{get content field}}</div>
+      <div class="echo {{if enabled 'enabled'}}">{{get content field}}</div>
     `);
     this.inject.service('store');
   }
@@ -46,4 +46,15 @@ test('it passes content and field name to editor', function(assert) {
   });
   this.render(hbs`{{cs-field-editor content=model field="echo" }}`);
   assert.equal(this.$('.echo').text().trim(), 'woohoo');
+});
+
+test('it passes enabled state to editor', function(assert) {
+  Ember.run(() => {
+    this.set('model', this.get('store').createRecord('example', { echo: 'woohoo' }));
+  });
+  this.set('enabled', true);
+  this.render(hbs`{{cs-field-editor content=model field="echo" enabled=enabled}}`);
+  assert.equal(this.$('.echo.enabled').length, 1);
+  this.set('enabled', false);
+  assert.equal(this.$('.echo.enabled').length, 0);
 });

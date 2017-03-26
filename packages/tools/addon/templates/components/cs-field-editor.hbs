@@ -1,6 +1,6 @@
 {{#with (cs-field-editor-for content field) as |editorName|}}
   {{#if (is-component editorName)}}
-    {{component editorName content=content field=field tagName=""}}
+    {{component editorName content=content field=field tagName="" enabled=enabled}}
   {{else}}
     {{cs-assert "No such field editor" editorName}}
   {{/if}}
