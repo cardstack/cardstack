@@ -35,7 +35,7 @@ export default Ember.Service.extend({
     } else {
       return {
         name: 'cardstack.content',
-        args: [slug],
+        args: [type, slug],
         queryParams
       };
     }
