@@ -25,6 +25,7 @@ moduleForComponent('branch-adapter', 'Integration | Adapter | branch-adapter', {
     }));
     this.register('model:post', DS.Model.extend());
     this.inject.service('store');
+    this.inject.service('resource-metadata', { as: 'meta' });
   }
 });
 
@@ -182,4 +183,97 @@ test('queryRecord with explicit branch matching default', function(assert) {
           page: { size: 1 }
         } });
     });
+});
+
+test('createRecord with directly provided branch', function(assert) {
+  answers.push({
+    data: {
+      id: 1,
+      type: 'posts'
+    }
+  });
+  return RSVP.resolve()
+    .then(() => {
+      let model = this.get('store').createRecord('post');
+      return model.save({ adapterOptions: { branch: 'b' } });
+    }).then(() => {
+      assert.equal(requests.length, 1);
+      assert.equal(requests[0].url, '/posts?branch=b');
+      assert.equal(requests[0].type, 'POST');
+    });
+});
+
+test('createRecord with branch from resource meta', function(assert) {
+  answers.push({
+    data: {
+      id: 1,
+      type: 'posts'
+    }
+  });
+  return RSVP.resolve()
+    .then(() => {
+      let model = this.get('store').createRecord('post');
+      this.get('meta').write(model, { branch: 'b' });
+      return model.save();
+    }).then(() => {
+      assert.equal(requests.length, 1);
+      assert.equal(requests[0].url, '/posts?branch=b');
+      assert.equal(requests[0].type, 'POST');
+    });
+});
+
+test('updateRecord maintains branch', function(assert) {
+  answers.push({
+    data: {
+      id: 1,
+      type: 'posts'
+    }
+  });
+  return RSVP.resolve()
+    .then(() => {
+      return this.get('store').findRecord('post', 1, { adapterOptions: { branch: 'b' }});
+    }).then(record => record.save())
+    .then(() => {
+      assert.equal(requests.length, 2);
+      assert.equal(requests[1].url, '/posts/1?branch=b');
+      assert.equal(requests[1].type, 'PATCH');
+    })
+});
+
+test('deleteRecord maintains branch', function(assert) {
+  answers.push({
+    data: {
+      id: 1,
+      type: 'posts'
+    }
+  });
+  return RSVP.resolve()
+    .then(() => {
+      return this.get('store').findRecord('post', 1, { adapterOptions: { branch: 'b' }});
+    }).then(record => record.destroyRecord())
+    .then(() => {
+      assert.equal(requests.length, 2);
+      assert.equal(requests[1].url, '/posts/1?branch=b');
+      assert.equal(requests[1].type, 'DELETE');
+    })
+});
+
+
+test('deleteRecord provides if-match header', function(assert) {
+  answers.push({
+    data: {
+      id: 1,
+      type: 'posts',
+      meta: {
+        version: 'my-version'
+      }
+    }
+  });
+  return RSVP.resolve()
+    .then(() => {
+      return this.get('store').findRecord('post', 1, { adapterOptions: { branch: 'b' }});
+    }).then(record => record.destroyRecord())
+    .then(() => {
+      assert.deepEqual(requests[1].options, {headers: { 'if-match': 'my-version' } });
+    })
 });

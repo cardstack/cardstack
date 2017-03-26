@@ -22,7 +22,7 @@ export default Ember.Mixin.create({
     }
   },
 
-  updateRecord(store, type, snapshot) {
+  _setBranchFromMeta(snapshot) {
     if (!snapshot.adapterOptions) {
       snapshot.adapterOptions = {};
     }
@@ -33,7 +33,27 @@ export default Ember.Mixin.create({
       }
       snapshot.adapterOptions.branch = meta.branch;
     }
+  },
+
+  createRecord(store, type, snapshot) {
+    this._setBranchFromMeta(snapshot);
     return this._super(store, type, snapshot);
+  },
+
+  updateRecord(store, type, snapshot) {
+    this._setBranchFromMeta(snapshot);
+    return this._super(store, type, snapshot);
+  },
+
+  deleteRecord(store, type, snapshot) {
+    this._setBranchFromMeta(snapshot);
+    let id = snapshot.id;
+    let options = { headers: {}};
+    let meta = this.get('resourceMetadata').read(snapshot.record);
+    if (meta.get('version')) {
+      options.headers['if-match'] = meta.get('version');
+    }
+    return this.ajax(this.buildURL(type.modelName, id, snapshot, 'deleteRecord'), "DELETE", options);
   },
 
   findRecord(store, type, id, snapshot) {
