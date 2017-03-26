@@ -1,10 +1,7 @@
-import Ember from 'ember';
+import CommonBaseRoute from './common';
 
-export default Ember.Route.extend({
+export default CommonBaseRoute.extend({
   model({ type, slug }) {
-    return this.store.queryRecord(Ember.String.singularize(type), {
-      filter: { slug: { exact: slug } },
-      branch: this.modelFor('cardstack').branch
-    });
+    return this._commonModelHook(type, slug);
   }
 });

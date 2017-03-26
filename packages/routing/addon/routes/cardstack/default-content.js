@@ -1,7 +1,8 @@
-import Ember from 'ember';
+import CommonBaseRoute from './common';
 
-export default Ember.Route.extend({
-  model(params) {
-    return Ember.assign({}, params, this.modelFor('cardstack'));
+export default CommonBaseRoute.extend({
+  model({ slug }) {
+    let type = this.get('cardstackRouting.defaultContentType');
+    return this._commonModelHook(type, slug);
   }
 });

@@ -1,0 +1,5 @@
+<div class="meal-title">{{content.title}}</div>
+
+{{#with (meta-for-resource content) as |meta|}}
+   <div class="branch">{{meta.branch}}</div>
+{{/with}}

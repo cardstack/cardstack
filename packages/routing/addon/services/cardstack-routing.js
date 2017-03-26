@@ -14,7 +14,7 @@ export default Ember.Service.extend({
   routeFor(type, slug, branch) {
     let queryParams = this._qpsForBranch(branch);
     if (type === this.get('config.defaultContentType')) {
-      if (slug === '') {
+      if (slug === ' ') {
         return {
           name: 'cardstack.index',
           args: [],
@@ -58,6 +58,8 @@ export default Ember.Service.extend({
     let config = Ember.getOwner(this).resolveRegistration('config:environment');
     return config.cardstack;
   }),
+
+  defaultContentType: Ember.computed.alias('config.defaultContentType'),
 
   _qpsForBranch(branch) {
     let queryParams = {};
