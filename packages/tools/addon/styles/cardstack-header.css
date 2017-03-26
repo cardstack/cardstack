@@ -119,6 +119,11 @@
     z-index: 1;
 }
 
+.cs-branch-control > button.active.preview {
+    background-color: var(--tools-preview);
+    color: var(--bright-foreground);
+}
+
 .cs-branch-control > button:first-child {
     border-left-width: 1px;
     border-top-left-radius: 10px;

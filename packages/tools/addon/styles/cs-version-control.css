@@ -34,3 +34,15 @@
     color: var(--light-background);
     cursor: initial;
 }
+
+.cs-toolbox-section.cs-version-control-preview > header {
+    background-color: var(--tools-preview);
+}
+
+.cs-toolbox-section.cs-version-control-preview.closed > header {
+    background-color: var(--tools-preview);
+}
+
+.cs-toolbox-section.cs-version-control-preview.closed > header:hover {
+    background-color: var(--tools-preview);
+}

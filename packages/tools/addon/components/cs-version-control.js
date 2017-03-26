@@ -90,6 +90,13 @@ export default Ember.Component.extend({
 
   }),
 
+  titleClass: Ember.computed('upstreamState', function() {
+    let state = this.get('upstreamState');
+    if (state === 'created' || state === 'different') {
+      return 'cs-version-control-preview';
+    }
+  }),
+
   title: Ember.computed('modificationState', 'upstreamState', function() {
     switch(this.get('modificationState')) {
     case 'new':
