@@ -172,7 +172,9 @@ describe('elasticsearch/searcher', function() {
     let { models } = await searcher.search('master', {
       page: { size: 1000 }
     });
-    expect(models).to.have.length(fixtures.length + 20 + env.schemaCache.seedModels.length);
+    expect(models.filter(m => m.type === 'comments')).to.have.length(20);
+    expect(models.filter(m => m.type === 'people')).to.have.length(2);
+    expect(models.filter(m => m.type === 'articles')).to.have.length(1);
   });
 
   it('can be searched via queryString', async function() {
