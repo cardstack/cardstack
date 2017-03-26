@@ -16,7 +16,7 @@ module.exports = function(searcher, writers, optionsArg) {
     ctxt.response.set('Access-Control-Allow-Origin', '*');
     if (ctxt.request.method === 'OPTIONS') {
       ctxt.response.set('Access-Control-Allow-Methods', 'GET,POST,PATCH,DELETE,OPTIONS');
-      ctxt.response.set('Access-Control-Allow-Headers', 'Authorization, Content-Type');
+      ctxt.response.set('Access-Control-Allow-Headers', 'Authorization, Content-Type, If-Match');
       ctxt.status = 200;
       return;
     }
