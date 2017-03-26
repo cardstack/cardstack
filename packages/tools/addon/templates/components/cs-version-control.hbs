@@ -14,6 +14,10 @@
         <div>Differs from live version.</div>
       {{/if}}
 
+      {{#if (eq upstreamState "self")}}
+        <div>Published</div>
+      {{/if}}
+
     {{/liquid-spacer}}
 
   </div>
