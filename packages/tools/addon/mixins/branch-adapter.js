@@ -2,9 +2,16 @@ import Ember from 'ember';
 import DS from 'ember-data';
 
 export default Ember.Mixin.create({
+  defaultSerializer: 'cardstack-resource-metadata',
   resourceMetadata: Ember.inject.service(),
   cardstackRouting: Ember.inject.service(),
   _defaultBranch: Ember.computed.alias('cardstackRouting.defaultBranch'),
+
+  shouldReloadRecord(store, snapshot) {
+    let requestedBranch = this._branchFromSnapshot(snapshot);
+    let haveBranch = this.get('resourceMetadata').read(snapshot.record).get('branch');
+    return requestedBranch !== haveBranch;
+  },
 
   _branchFromSnapshot(snapshot) {
     let { adapterOptions } = snapshot;
@@ -52,10 +59,13 @@ export default Ember.Mixin.create({
       if (!query.isGeneric) {
         this.get('resourceMetadata').write({ type: type.modelName, id: response.data[0].id }, { branch });
       }
-      return {
+      let returnValue = {
         data: response.data[0],
-        meta: response.meta
+      };
+      if (response.meta){
+        returnValue.meta = response.meta;
       }
+      return returnValue;
     });
   },
 
