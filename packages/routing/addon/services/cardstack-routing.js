@@ -12,12 +12,7 @@ export default Ember.Service.extend({
   // === Begin Required API ===
 
   routeFor(type, slug, branch) {
-    let queryParams = {};
-    if (branch !== this.get('config.defaultBranch')) {
-      queryParams.branch = branch;
-    } else {
-      queryParams.branch = undefined;
-    }
+    let queryParams = this._qpsForBranch(branch);
     if (type === this.get('config.defaultContentType')) {
       if (slug === '') {
         return {
@@ -41,6 +36,15 @@ export default Ember.Service.extend({
     }
   },
 
+  routeForNew(type, branch) {
+    let queryParams = this._qpsForBranch(branch);
+    return {
+      name: 'cardstack.new-content',
+      args: [type],
+      queryParams
+    };
+  },
+
   defaultBranch: Ember.computed.alias('config.defaultBranch'),
 
   // === End Required API ===
@@ -53,6 +57,16 @@ export default Ember.Service.extend({
   config: Ember.computed(function() {
     let config = Ember.getOwner(this).resolveRegistration('config:environment');
     return config.cardstack;
-  })
+  }),
+
+  _qpsForBranch(branch) {
+    let queryParams = {};
+    if (branch !== this.get('config.defaultBranch')) {
+      queryParams.branch = branch;
+    } else {
+      queryParams.branch = undefined;
+    }
+    return queryParams;
+  }
 
 });
