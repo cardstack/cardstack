@@ -96,6 +96,11 @@
     display: flex;
     align-items: center;
     padding: 0 0.75em;
+    opacity: 0.6;
+}
+
+.cs-branch-control.enabled {
+    opacity: initial;
 }
 
 .cs-branch-control > button {

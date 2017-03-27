@@ -1,6 +1,6 @@
-<button class={{if live "active"}} {{action "goLive"}} >
+<button class={{unless previewing "active"}} {{action "goLive"}} >
   Live
 </button>
-<button class="preview {{unless live "active"}}" {{action "goPreview"}} >
+<button class="preview {{if previewing "active"}}" {{action "goPreview"}} >
   Preview
 </button>
