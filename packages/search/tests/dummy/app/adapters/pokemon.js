@@ -34,7 +34,6 @@ export default JSONAPIAdapter.extend({
     return new RSVP.Promise(resolve => {
       setTimeout(resolve, delay);
     }).then(() => {
-      console.log(`query ${JSON.stringify(query)} match ${data.length}`);
       return { data };
     });
   }
