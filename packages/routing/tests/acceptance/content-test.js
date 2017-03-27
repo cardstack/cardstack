@@ -53,3 +53,11 @@ test('maintains branch when redirecting', function(assert) {
     assert.equal(find('.branch').text(), 'draft');
   });
 });
+
+test('renders placeholder type when content is missing', function(assert) {
+  visit('/beverages/yak-milk');
+  andThen(function() {
+    assert.equal(currentURL(), '/beverages/yak-milk');
+    assert.equal(find('.missing-content').length, 1);
+  });
+});

@@ -13,22 +13,38 @@ export default Ember.Route.extend({
     } = this.get('cardstackRouting').routeFor(type, slug, branch);
     if (name !== this.routeName) {
       this.replaceWith(name, ...args, { queryParams });
-    } else {
-      let plural = pluralize(type);
-      if (type !== plural) {
-        // our urls are only supposed to work with plural names
-        let {
-          name,
-          args,
-          queryParams
-        } = this.get('cardstackRouting').routeFor(plural, slug, branch);
-        this.replaceWith(name, ...args, { queryParams });
-      } else {
-        return this.store.queryRecord(singularize(type), {
-          filter: { slug: { exact: slug } },
-          branch
-        });
-      }
+      return;
     }
+
+    let plural = pluralize(type);
+    if (type !== plural) {
+      // our urls are only supposed to work with plural names
+      let {
+        name,
+        args,
+        queryParams
+      } = this.get('cardstackRouting').routeFor(plural, slug, branch);
+      this.replaceWith(name, ...args, { queryParams });
+      return;
+    }
+
+    return this.store.queryRecord(singularize(type), {
+      filter: { slug: { exact: slug } },
+      branch
+    }).catch(err => {
+      if (!is404(err)) {
+        throw err;
+      }
+      return this.store.createRecord('cardstack-placeholder', {
+        branch,
+        type: singularize(type),
+        slug
+      });
+    });
   }
 });
+
+
+function is404(err) {
+  return err.isAdapterError && err.errors && err.errors.length > 0 && err.errors[0].code === 404;
+}

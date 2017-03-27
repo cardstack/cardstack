@@ -31,7 +31,7 @@ export default DS.JSONAPIAdapter.extend({
         }
       });
     } else {
-      throw new Error("No such test data");
+      return RSVP.reject(new DS.AdapterError([{code: 404}]));
     }
   }
 });
