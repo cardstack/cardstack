@@ -1,7 +1,6 @@
 import Ember from 'ember';
 import layout from '../templates/components/cs-version-control';
 import { task } from 'ember-concurrency';
-import { transitionTo } from '../private-api';
 
 export default Ember.Component.extend({
   layout,
@@ -124,13 +123,8 @@ export default Ember.Component.extend({
 
   update: task(function * () {
     let model = this.get('model');
-    let creating = model.get('isNew');
     yield model.save();
-    if (creating && model.get('slug')) {
-      let { name, args, queryParams } = this.get('cardstackRouting').routeFor(model.get('type'), model.get('slug'), this.get('modelMeta.branch'));
-      yield transitionTo(Ember.getOwner(this), name, args, queryParams);
-    }
-  }),
+  }).keepLatest(),
 
   actions: {
     open() {
