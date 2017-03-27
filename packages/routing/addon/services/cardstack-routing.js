@@ -9,6 +9,11 @@
 import Ember from 'ember';
 import { pluralize } from 'ember-inflector';
 
+const defaultConfig = {
+  defaultBranch: 'master',
+  defaultContentType: 'pages'
+};
+
 export default Ember.Service.extend({
   // === Begin Required API ===
 
@@ -59,7 +64,7 @@ export default Ember.Service.extend({
 
   config: Ember.computed(function() {
     let config = Ember.getOwner(this).resolveRegistration('config:environment');
-    return config.cardstack;
+    return Ember.assign({}, defaultConfig, config.cardstack);
   }),
 
   defaultContentType: Ember.computed.alias('config.defaultContentType'),

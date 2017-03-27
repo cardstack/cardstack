@@ -12,5 +12,6 @@ export default Ember.Service.extend({
   },
   get defaultBranch() {
     this._warn();
+    return 'master';
   }
 });
