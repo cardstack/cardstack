@@ -1,4 +1,3 @@
-// This is just a reexport from the ember-resource-metadata addon so
-// that we can target it via defaultSerializer in our branch-adapter
-// mixin.
-export { default } from 'ember-resource-metadata/serializer';
+import SerializerMixin from 'ember-resource-metadata/serializer-mixin';
+import DS from 'ember-data';
+export default DS.JSONAPISerializer.extend(SerializerMixin);

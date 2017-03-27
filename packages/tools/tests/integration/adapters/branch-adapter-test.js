@@ -1,7 +1,7 @@
 import { moduleForComponent, test } from 'ember-qunit';
 import DS from 'ember-data';
 import Branchable from '@cardstack/tools/mixins/branch-adapter';
-import Adapter from 'ember-resource-metadata/adapter';
+import AdapterMixin from 'ember-resource-metadata/adapter-mixin';
 import RSVP from 'rsvp';
 import Ember from 'ember';
 
@@ -15,7 +15,7 @@ moduleForComponent('branch-adapter', 'Integration | Adapter | branch-adapter', {
     this.register('service:cardstack-routing', Ember.Service.extend({
       defaultBranch: 'a'
     }));
-    this.register('adapter:post', Adapter.extend(Branchable, {
+    this.register('adapter:post', DS.JSONAPIAdapter.extend(Branchable, AdapterMixin, {
       shouldBackgroundReloadRecord() {
         return false;
       },
