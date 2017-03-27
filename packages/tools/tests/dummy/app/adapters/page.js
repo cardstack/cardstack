@@ -1,6 +1,6 @@
-import DS from 'ember-data';
+import Adapter from 'ember-resource-metadata/adapter';
 import Branchable from '@cardstack/tools/mixins/branch-adapter';
 
-export default DS.JSONAPIAdapter.extend(Branchable, {
+export default Adapter.extend(Branchable, {
   host: 'http://localhost:3000'
 });

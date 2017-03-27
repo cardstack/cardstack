@@ -1,6 +1,7 @@
 import { moduleForComponent, test } from 'ember-qunit';
 import DS from 'ember-data';
 import Branchable from '@cardstack/tools/mixins/branch-adapter';
+import Adapter from 'ember-resource-metadata/adapter';
 import RSVP from 'rsvp';
 import Ember from 'ember';
 
@@ -14,12 +15,15 @@ moduleForComponent('branch-adapter', 'Integration | Adapter | branch-adapter', {
     this.register('service:cardstack-routing', Ember.Service.extend({
       defaultBranch: 'a'
     }));
-    this.register('adapter:post', DS.JSONAPIAdapter.extend(Branchable, {
+    this.register('adapter:post', Adapter.extend(Branchable, {
       shouldBackgroundReloadRecord() {
         return false;
       },
       ajax(url, type, options) {
         requests.push({ url, type, options });
+        if (answers.length === 0) {
+          throw new Error("more requests than expected");
+        }
         return RSVP.resolve(answers.shift());
       }
     }));
@@ -229,6 +233,12 @@ test('updateRecord maintains branch', function(assert) {
       type: 'posts'
     }
   });
+  answers.push({
+    data: {
+      id: 1,
+      type: 'posts'
+    }
+  });
   return RSVP.resolve()
     .then(() => {
       return this.get('store').findRecord('post', 1, { adapterOptions: { branch: 'b' }});
@@ -241,6 +251,12 @@ test('updateRecord maintains branch', function(assert) {
 });
 
 test('deleteRecord maintains branch', function(assert) {
+  answers.push({
+    data: {
+      id: 1,
+      type: 'posts'
+    }
+  });
   answers.push({
     data: {
       id: 1,
@@ -269,6 +285,7 @@ test('deleteRecord provides if-match header', function(assert) {
       }
     }
   });
+  answers.push(null);
   return RSVP.resolve()
     .then(() => {
       return this.get('store').findRecord('post', 1, { adapterOptions: { branch: 'b' }});
