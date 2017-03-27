@@ -18,6 +18,7 @@
     "commander": "^2.9.0",
     "@cardstack/jsonapi":"*",
     "@cardstack/plugin-utils":"*",
+    "@cardstack/core-types":"*",
     "debug": "^2.6.3",
     "jsondiffpatch": "^0.2.4",
     "lodash": "^4.17.4",
