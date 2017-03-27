@@ -1,17 +1,17 @@
 {
   "name": "@cardstack/tools",
-  "version": "0.0.0",
+  "version": "0.0.2",
   "description": "The default blueprint for ember-cli addons.",
   "keywords": [
     "ember-addon"
   ],
   "license": "MIT",
-  "author": "",
+  "author": "Edward Faulkner <edward@eaf4.com>",
   "directories": {
     "doc": "doc",
     "test": "tests"
   },
-  "repository": "",
+  "repository": "https://github.com/cardstack/cardstack",
   "scripts": {
     "build": "ember build",
     "start": "ember server",
@@ -24,6 +24,7 @@
     "ember-cli-moment-shim": "^3.0.1",
     "ember-cli-postcss": "https://github.com/ef4/ember-cli-postcss#fdb9d27e47adb70376cc00451523ca353595ce36",
     "ember-concurrency": "^0.7.19",
+    "ember-data": "^2.12.1",
     "ember-data-relationship-tracker": "^0.1.0",
     "ember-elsewhere": "^1.0.0",
     "ember-moment": "^7.3.0",
@@ -64,8 +65,5 @@
   },
   "ember-addon": {
     "configPath": "tests/dummy/config"
-  },
-  "peerDependencies": {
-    "ember-data": "^2.12.1"
   }
 }
