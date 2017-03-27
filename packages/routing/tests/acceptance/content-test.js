@@ -21,6 +21,21 @@ test('redirects for default content type', function(assert) {
   });
 });
 
+test('redirects for singular content type', function(assert) {
+  visit('/beverage/soda');
+  andThen(function() {
+    assert.equal(currentURL(), '/beverages/soda');
+  });
+});
+
+test('redirects for singular default content type', function(assert) {
+  visit('/meal/burger');
+  andThen(function() {
+    assert.equal(currentURL(), '/burger');
+  });
+});
+
+
 test('renders own page content on alternate branch', function(assert) {
   visit('/beverages/soda?branch=draft');
   andThen(function() {
