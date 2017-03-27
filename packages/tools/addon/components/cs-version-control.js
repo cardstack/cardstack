@@ -128,12 +128,12 @@ export default Ember.Component.extend({
 
   delete: task(function * () {
     let model = this.get('model');
+    let placeholder = this.get('store').createRecord('cardstack-placeholder', { type: model.get('type'), slug: model.get('slug') });
     if (model.get('isNew')) {
       transitionTo(Ember.getOwner(this), 'cardstack.new-content', [placeholder]);
       return;
     }
     let branch = this.get('modelMeta.branch');
-    let placeholder = this.get('store').createRecord('cardstack-placeholder', { type: model.get('type'), slug: model.get('slug') });
     this.get('resourceMetadata').write(placeholder, { branch });
     let { name, queryParams } = this.get('cardstackRouting').routeFor(model.get('type'), model.get('slug'), branch);
     yield this.get('model').destroyRecord();
