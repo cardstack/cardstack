@@ -155,7 +155,7 @@ export default Ember.Service.extend({
 
   setBranch(which) {
     let model = this.get('activeContentItem.model')
-    if (model) {
+    if (model && model.get('slug')) {
       let {
         name,
         args,
