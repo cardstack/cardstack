@@ -33,7 +33,7 @@
 
   {{#liquid-if enabled}}
     <footer class="cs-version-control-footer cs-field-editor-section">
-      <a class="text-button" {{action "delete"}}>Delete</a>
+      <a class="text-button" {{action (perform delete) }}>Delete</a>
       <button disabled={{eq modificationState "saved"}} {{action (perform update) }}>
         Update
       </button>

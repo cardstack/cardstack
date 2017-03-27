@@ -1,6 +1,7 @@
 import Ember from 'ember';
 import layout from '../templates/components/cs-version-control';
 import { task } from 'ember-concurrency';
+import { transitionTo } from '../private-api';
 
 export default Ember.Component.extend({
   layout,
@@ -122,9 +123,21 @@ export default Ember.Component.extend({
   }),
 
   update: task(function * () {
-    let model = this.get('model');
-    yield model.save();
+    yield this.get('model').save();
   }).keepLatest(),
+
+  delete: task(function * () {
+    let model = this.get('model');
+    if (model.get('isNew')) {
+      transitionTo(Ember.getOwner(this), 'cardstack.new-content', [placeholder]);
+      return;
+    }
+    let branch = this.get('modelMeta.branch');
+    let placeholder = this.get('store').createRecord('cardstack-placeholder', { type: model.get('type'), slug: model.get('slug'), branch });
+    let { name, queryParams } = this.get('cardstackRouting').routeFor(model.get('type'), model.get('slug'), branch);
+    yield this.get('model').destroyRecord();
+    transitionTo(Ember.getOwner(this), name, [placeholder], queryParams);
+  }),
 
   actions: {
     open() {

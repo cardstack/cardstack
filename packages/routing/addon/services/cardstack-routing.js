@@ -7,12 +7,14 @@
 */
 
 import Ember from 'ember';
+import { pluralize } from 'ember-inflector';
 
 export default Ember.Service.extend({
   // === Begin Required API ===
 
   routeFor(type, slug, branch) {
     let queryParams = this._qpsForBranch(branch);
+    type = pluralize(type);
     if (type === this.get('config.defaultContentType')) {
       if (slug === ' ') {
         return {
@@ -38,6 +40,7 @@ export default Ember.Service.extend({
 
   routeForNew(type, branch) {
     let queryParams = this._qpsForBranch(branch);
+    type = pluralize(type);
     return {
       name: 'cardstack.new-content',
       args: [type],
