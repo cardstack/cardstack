@@ -1,6 +1,6 @@
 {
   "name": "@cardstack/core-types",
-  "version": "0.0.0",
+  "version": "0.0.1",
   "description": "The default blueprint for ember-cli addons.",
   "keywords": [
     "ember-addon",
@@ -11,12 +11,12 @@
     "src": "cardstack"
   },
   "license": "MIT",
-  "author": "",
+  "author": "Edward Faulkner <edward@eaf4.com>",
   "directories": {
     "doc": "doc",
     "test": "tests"
   },
-  "repository": "",
+  "repository": "https://github.com/cardstack/cardstack",
   "scripts": {
     "build": "ember build",
     "start": "ember server",
