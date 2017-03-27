@@ -59,7 +59,7 @@
     "ember-moment": "^7.3.0",
     "ember-overlays": "^0.1.1",
     "ember-resource-metadata": "^0.0.5",
-    "ember-toolbars": "0.2.7",
+    "ember-toolbars": "^0.3.0",
     "ember-truth-helpers": "^1.3.0",
     "heimdalljs-logger": "^0.1.8",
     "jsondiffpatch": "^0.2.4",

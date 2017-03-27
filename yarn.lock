@@ -2336,7 +2336,7 @@ ember-disable-prototype-extensions@^1.1.0:
   dependencies:
     ember-cli-babel "^5.1.5"
 
-ember-elsewhere@^1.0.0:
+ember-elsewhere@>=0.4.0, ember-elsewhere@^1.0.0:
   version "1.0.0"
   resolved "https://registry.yarnpkg.com/ember-elsewhere/-/ember-elsewhere-1.0.0.tgz#1674a67440608cd1ba09c862553457cdf342a000"
   dependencies:
@@ -2502,12 +2502,14 @@ ember-test-helpers@^0.6.0-beta.1:
   version "0.6.3"
   resolved "https://registry.yarnpkg.com/ember-test-helpers/-/ember-test-helpers-0.6.3.tgz#f864cdf6f4e75f3f8768d6537785b5ab6e82d907"
 
-ember-toolbars@0.2.7:
-  version "0.2.7"
-  resolved "https://registry.yarnpkg.com/ember-toolbars/-/ember-toolbars-0.2.7.tgz#fcda2896a00a93a39a622892f0c5b9f6e2eec555"
+ember-toolbars@^0.3.0:
+  version "0.3.0"
+  resolved "https://registry.yarnpkg.com/ember-toolbars/-/ember-toolbars-0.3.0.tgz#d2d9a7ebe06cf638a641a5c79e94f3b764944a30"
   dependencies:
     ember-cli-babel "^5.1.6"
     ember-cli-htmlbars "^1.1.1"
+    ember-elsewhere ">=0.4.0"
+    liquid-fire ">=0.24.1"
 
 ember-truth-helpers@^1.3.0:
   version "1.3.0"
@@ -3970,7 +3972,7 @@ linkify-it@~1.2.0:
   dependencies:
     uc.micro "^1.0.1"
 
-liquid-fire@^0.27.1:
+liquid-fire@>=0.24.1, liquid-fire@^0.27.1:
   version "0.27.1"
   resolved "https://registry.yarnpkg.com/liquid-fire/-/liquid-fire-0.27.1.tgz#bbcc1ac863a3dbdee1223b00c9457dbffb5d02b9"
   dependencies:

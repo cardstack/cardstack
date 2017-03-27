@@ -28,7 +28,7 @@
     "ember-elsewhere": "^1.0.0",
     "ember-moment": "^7.3.0",
     "ember-overlays": "^0.1.0",
-    "ember-toolbars": "0.2.7",
+    "ember-toolbars": "0.3.0",
     "ember-truth-helpers": "^1.3.0",
     "liquid-fire": "^0.27.1",
     "postcss-cssnext": "^2.10.0",
