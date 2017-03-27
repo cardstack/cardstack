@@ -21,8 +21,11 @@ export default Model.extend(TrackRelationships, {
     return this.constructor.modelName;
   }),
 
-  init() {
-    this._super.apply(this, arguments);
+  save(...args) {
+    if (this.get('isNew') && !this.get('slug') && this.get('title')) {
+      this.set('slug', deriveSlug(this.get('title')));
+    }
+    return this._super(...args);
   }
 });
 
@@ -38,4 +41,8 @@ function emptyMobiledoc() {
       ]]
     ]
   };
+}
+
+function deriveSlug(title) {
+  return title.toLowerCase().replace(/[ _]+/g, '-').replace(/[^a-z-]/g, '')
 }
