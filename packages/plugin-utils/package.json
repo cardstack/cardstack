@@ -1,0 +1,12 @@
+{
+  "name": "@cardstack/plugin-utils",
+  "version": "0.0.1",
+  "description": "Support library for authors of cardstack plugins.",
+  "main": "index.js",
+  "repository":"https://github.com/cardstack/cardstack",
+  "author": "Edward Faulkner <edward@eaf4.com>",
+  "license": "MIT",
+  "devDependencies": {
+    "denodeify": "^1.2.1"
+  }
+}
