@@ -144,6 +144,11 @@ export default Ember.Service.extend({
 
   setActivePanel(which) {
     this._updatePersistent('activePanel', which);
+    if (which === 'cs-create-menu') {
+      if (!this.get('mayEditLive') && this.get('branch') === this.get('cardstackRouting.defaultBranch')) {
+        this.setBranch('draft');
+      }
+    }
   },
 
   setEditing(which) {
