@@ -14,8 +14,17 @@
         <div>Differs from live version.</div>
       {{/if}}
 
+      {{#if (eq upstreamState "created")}}
+        <div>Unpublished</div>
+      {{/if}}
+
       {{#if (eq upstreamState "self")}}
         <div>Published</div>
+      {{/if}}
+
+      {{#if (eq upstreamState "pending")}}
+        {{!-- its nicer if there's no flicker of height change --}}
+        <div>&nbsp;</div>
       {{/if}}
 
     {{/liquid-spacer}}
