@@ -17,7 +17,7 @@ async function wireItUp(seedModels) {
   return { searcher, writers };
 }
 
-async function makeServer(port, seedModels) {
+async function makeServer(seedModels) {
   let { searcher, writers } = await wireItUp(seedModels);
   let app = new Koa();
   app.use(httpLogging);
