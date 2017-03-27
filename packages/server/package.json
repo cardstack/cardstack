@@ -1,14 +1,30 @@
 {
   "name": "@cardstack/server",
-  "version": "0.0.0",
+  "version": "0.0.1",
   "keywords": [
     "cardstack-plugin"
   ],
+  "author": "Edward Faulkner <edward@eaf4.com>",
+  "repository": "https://github.com/cardstack/cardstack",
   "cardstack-plugin":{
     "api-version": 1
   },
+  "description": "Stock API server for the Cardstack tech stack.",
   "dependencies": {
+    "koa": "2",
+    "@cardstack/elasticsearch":"*",
+    "heimdalljs-logger": "^0.1.8",
+    "commander": "^2.9.0",
+    "@cardstack/jsonapi":"*",
+    "@cardstack/plugin-utils":"*",
+    "debug": "^2.6.3",
+    "jsondiffpatch": "^0.2.4",
+    "lodash": "^4.17.4",
+    "denodeify": "^1.2.1",
   },
   "devDependencies": {
+    "@cardstack/eslint-config":"*",
+    "@cardstack/test-support":"*",
+    "@cardstack/git":"*"
   }
 }
