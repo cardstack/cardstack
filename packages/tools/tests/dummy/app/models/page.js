@@ -5,7 +5,7 @@ const { Model, attr } = DS;
 
 export default Model.extend(TrackRelationships, {
   title: attr('string'),
-  body: attr({ fieldType: '@cardstack/mobiledoc' }),
+  body: attr({ fieldType: '@cardstack/mobiledoc', defaultValue: emptyMobiledoc }),
   created: attr('date'),
   street: attr('string'),
   city: attr('string'),
@@ -19,5 +19,23 @@ export default Model.extend(TrackRelationships, {
     // `model.constructor.modelName` in a template to get this. It
     // works if you provide this computed property.
     return this.constructor.modelName;
-  })
+  }),
+
+  init() {
+    this._super.apply(this, arguments);
+  }
 });
+
+function emptyMobiledoc() {
+  return {
+    version: "0.3.1",
+    markups: [],
+    atoms: [],
+    cards: [],
+    sections: [
+      [1, "p", [
+        [0, [], 0, ""]
+      ]]
+    ]
+  };
+}
