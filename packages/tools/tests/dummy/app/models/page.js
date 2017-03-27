@@ -6,7 +6,7 @@ const { Model, attr } = DS;
 export default Model.extend(TrackRelationships, {
   title: attr('string'),
   body: attr({ fieldType: '@cardstack/mobiledoc', defaultValue: emptyMobiledoc }),
-  created: attr('date'),
+  created: attr('date', { defaultValue: () => new Date() }),
   street: attr('string'),
   city: attr('string'),
   state: attr('string'),
