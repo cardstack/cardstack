@@ -1,7 +1,7 @@
 {
   "name": "@cardstack/mobiledoc",
-  "version": "0.0.0",
-  "description": "The default blueprint for ember-cli addons.",
+  "version": "0.0.1",
+  "description": "Mobiledoc field plugin for cardstack",
   "keywords": [
     "ember-addon",
     "cardstack-plugin"
@@ -11,12 +11,12 @@
     "src": "cardstack"
   },
   "license": "MIT",
-  "author": "",
+  "author": "Edward Faulkner <edward@eaf4.com>",
   "directories": {
     "doc": "doc",
     "test": "tests"
   },
-  "repository": "",
+  "repository": "https://githbu.com/cardstack/cardstack",
   "scripts": {
     "build": "ember build",
     "start": "ember server",
