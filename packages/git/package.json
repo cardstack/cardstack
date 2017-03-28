@@ -21,9 +21,13 @@
     "heimdalljs-logger": "^0.1.8"
   },
   "keywords": [
-    "cardstack-plugin"
+    "cardstack-plugin",
+    "ember-addon"
   ],
   "cardstack-plugin": {
     "api-version": 1
+  },
+  "ember-addon": {
+    "defaultBlueprint": "cardstack-git-seeds"
   }
 }
