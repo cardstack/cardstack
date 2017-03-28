@@ -17,5 +17,11 @@ module.exports = {
     makeServer(seedModels).then(server => {
       app.use('/cardstack', server.callback());
     });
+
+    // Without this node 7 swallows stack traces within the native
+    // promises I'm using.
+    process.on('warning', (warning) => {
+      process.stderr.write(warning.stack);
+    });
   }
 };
