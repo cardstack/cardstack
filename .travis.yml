@@ -1,0 +1,27 @@
+---
+language: node_js
+node_js:
+  - "7"
+
+sudo: false
+
+services:
+  - elasticsearch
+
+cache:
+  directories:
+    - $HOME/.npm
+    - $HOME/.cache # includes bowers cache
+    - $HOME/.yarn-cache
+
+before_install:
+  - npm config set spin false
+  - npm install -g bower phantomjs-prebuilt yarn
+  - bower --version
+  - phantomjs --version
+
+install:
+  - yarn install
+
+script:
+  - ELASTICSEARCH=http://localhost:9200 npm test

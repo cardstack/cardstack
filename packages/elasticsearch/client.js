@@ -2,7 +2,7 @@ const ES = require('elasticsearch');
 const logger = require('heimdalljs-logger');
 
 function host() {
-  return 'http://10.0.15.2:9200';
+  return process.env.ELASTICSEARCH || 'http://10.0.15.2:9200';
 }
 
 module.exports = function makeClient() {
