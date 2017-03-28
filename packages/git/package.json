@@ -1,4 +1,25 @@
 {
+  "name": "@cardstack/git",
+  "version": "0.0.1",
+  "description": "Git data source plugin for @cardstack/server.",
+  "repository": "https://github.com/cardstack/cardstack",
+  "author": "Edward Faulkner <edward@eaf4.com>",
+  "license": "MIT",
+  "engines": {
+    "node": ">= 7.7"
+  },
+  "devDependencies": {
+    "@cardstack/eslint-config":"*",
+    "@cardstack/plugin-utils":"*",
+    "@cardstack/server":"*",
+    "@cardstack/test-support":"*",
+    "@cardstack/elasticsearch":"*"
+  },
+  "dependencies": {
+    "nodegit": "^0.16.0",
+    "moment-timezone": "^0.5.11",
+    "heimdalljs-logger": "^0.1.8"
+  },
   "keywords": [
     "cardstack-plugin"
   ],
