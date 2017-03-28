@@ -14,14 +14,15 @@ module.exports = {
     } catch (err) {
       project.ui.writeWarnLine(`Unable to load your seed models (looking for ${seedFile})`);
     }
-    makeServer(seedModels).then(server => {
-      app.use('/cardstack', server.callback());
-    });
 
     // Without this node 7 swallows stack traces within the native
     // promises I'm using.
     process.on('warning', (warning) => {
       process.stderr.write(warning.stack);
+    });
+
+    return makeServer(seedModels).then(server => {
+      app.use('/cardstack', server.callback());
     });
   }
 };
