@@ -22,6 +22,7 @@ export default Ember.Component.extend({
       let { name, args, queryParams } = this.get('cardstackRouting').routeForNew(which.id, this.get('tools.branch'));
       transitionTo(Ember.getOwner(this), name, args, queryParams);
       this.get('tools').setActivePanel('cs-composition-panel');
+      this.get('tools').setEditing(true);
     }
   }
 });
