@@ -8,7 +8,7 @@ export default DS.JSONAPIAdapter.extend({
     return adapter.queryRecord(store, store.modelFor(realType), {
       filter: { id: realId },
       branch,
-      isGeneric: true
+      disableResourceMetadata: true
     }).then(response => {
       return {
         data: {

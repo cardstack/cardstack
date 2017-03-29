@@ -68,7 +68,6 @@ export default Ember.Mixin.create({
     let branch = query.branch != null ? query.branch : this.get('_defaultBranch');
     let upstreamQuery = Ember.assign({}, query);
     upstreamQuery.page = { size: 1 };
-    delete upstreamQuery.isGeneric
     if (branch === this.get('_defaultBranch')) {
       delete upstreamQuery.branch;
     }
@@ -76,7 +75,7 @@ export default Ember.Mixin.create({
       if (!response.data || !Array.isArray(response.data) || response.data.length < 1) {
         throw new DS.AdapterError([ { code: 404, title: 'Not Found', detail: 'branch-adapter queryRecord got less than one record back' } ]);
       }
-      if (!query.isGeneric) {
+      if (!query.disableResourceMetadata) {
         this.get('resourceMetadata').write({ type: type.modelName, id: response.data[0].id }, { branch });
       }
       let returnValue = {
