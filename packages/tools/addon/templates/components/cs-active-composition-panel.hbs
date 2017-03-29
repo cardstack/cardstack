@@ -1,8 +1,11 @@
 <section class="cs-content-info">
   {{cs-svg "article" width="22px" height="28px"}}
-  <p class="content-type">{{cs-humanize model.type}}</p>
+  <p class="content-type">{{cs-humanize (cs-model-type model) }}</p>
   <p class="content-title">
-    {{moment-format model.created "YYYY-MM-DD"}} {{model.title}}
+    {{#if model.created}}
+      {{moment-format model.created "YYYY-MM-DD"}}
+    {{/if}}
+    {{cs-model-title model}}
   </p>
 </section>
 

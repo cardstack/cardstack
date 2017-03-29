@@ -7,6 +7,7 @@ export default Ember.Component.extend({
   layout,
   tagName: '',
   opened: true,
+  animationRules,
   resourceMetadata: Ember.inject.service(),
   store: Ember.inject.service(),
   cardstackRouting: Ember.inject.service(),
@@ -16,7 +17,8 @@ export default Ember.Component.extend({
   }),
 
   onMaster: Ember.computed('modelMeta.branch', function() {
-    return this.get('modelMeta').branch === this.get('cardstackRouting.defaultBranch');
+    let branch = this.get('modelMeta').branch;
+    return branch == null || branch === this.get('cardstackRouting.defaultBranch');
   }),
 
   upstreamMeta: Ember.computed('upstreamModel', function() {
@@ -56,10 +58,10 @@ export default Ember.Component.extend({
 
   // this describes the state of our model relative to its branch. So
   // "saved" here means it has been saved to its branch, etc.
-  modificationState: Ember.computed('model.isNew', 'model.hasDirtyFields', function() {
+  modificationState: Ember.computed('model.isNew', 'anythingDirty', function() {
     if (this.get('model.isNew')) {
       return "new";
-    } else  if (this.get('model.hasDirtyFields')) {
+    } else  if (this.get('anythingDirty')) {
       return "changed";
     } else {
       return "saved";
@@ -118,8 +120,16 @@ export default Ember.Component.extend({
     }
   }),
 
-  anythingPending: Ember.computed('model.isNew', 'model.hasDirtyFields', function() {
-    return this.get('model.isNew') || this.get('model.hasDirtyFields');
+  anythingDirty: Ember.computed('model.hasDirtyFields', 'model.hasDirtyAttributes', function() {
+    // hasDirtyFields comes from the ember-data-relationship-tracker
+    // addon, if it's available. It's fine if it's not since the value
+    // will default to false, you just don't get relationship dirty
+    // tracking
+    return this.get('model.hasDirtyFields') || this.get('model.hasDirtyAttributes');
+  }),
+
+  anythingPending: Ember.computed('model.isNew', 'anythingDirty', function() {
+    return this.get('model.isNew') || this.get('anythingDirty');
   }),
 
   update: task(function * () {
@@ -135,9 +145,11 @@ export default Ember.Component.extend({
     }
     let branch = this.get('modelMeta.branch');
     this.get('resourceMetadata').write(placeholder, { branch });
-    let { name, queryParams } = this.get('cardstackRouting').routeFor(model.get('type'), model.get('slug'), branch);
+    let route = this.get('cardstackRouting').routeFor(model.get('type'), model.get('slug'), branch);
     yield this.get('model').destroyRecord();
-    transitionTo(Ember.getOwner(this), name, [placeholder], queryParams);
+    if (route) {
+      transitionTo(Ember.getOwner(this), route.name, [placeholder], route.queryParams);
+    }
   }),
 
   actions: {
@@ -149,3 +161,12 @@ export default Ember.Component.extend({
     }
   }
 });
+
+function animationRules() {
+  this.transition(
+    this.fromValue(false),
+    this.toValue(true),
+    this.use('to-down', { duration: 250 }),
+    this.reverse('to-up', { duration: 250 })
+  );
+}

@@ -31,7 +31,7 @@
 
   </div>
 
-  {{#liquid-if enabled}}
+  {{#liquid-if enabled rules=animationRules growDuration=250 growPixelsPerSecond=1}}
     <footer class="cs-version-control-footer cs-field-editor-section">
       <a class="text-button" {{action (perform delete) }}>Delete</a>
       <button disabled={{eq modificationState "saved"}} {{action (perform update) }}>
