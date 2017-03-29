@@ -2,6 +2,10 @@
   {{#if hasBlock}}
     {{yield (get content fieldName) }}
   {{else}}
-    {{get content fieldName}}
+    {{#if (is-component defaultRenderer)}}
+      {{component defaultRenderer value=(get content fieldName) content=content fieldName=fieldName}}
+    {{else}}
+      {{get content fieldName}}
+    {{/if}}
   {{/if}}
 {{/mark-overlay}}

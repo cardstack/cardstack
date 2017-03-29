@@ -1,6 +1,6 @@
 import Ember from 'ember';
 
-export function csFieldEditorFor([content, fieldName], { variant }) {
+export function fieldType(content, fieldName) {
   if (!content) { return; }
   let meta;
 
@@ -21,11 +21,18 @@ export function csFieldEditorFor([content, fieldName], { variant }) {
     type = `@cardstack/core-types::${meta.type}`;
   }
 
+  if (type) {
+    type = stripNamespace(type);
+  }
+  return type;
+}
+
+export function csFieldEditorFor([content, fieldName], { variant }) {
+  let type = fieldType(content, fieldName);
+
   if (!type) {
     return;
   }
-
-  type = stripNamespace(type);
 
   let prefix = '';
   if (variant === 'inline') {

@@ -3,5 +3,5 @@ import Branchable from '@cardstack/tools/mixins/branch-adapter';
 import DS from 'ember-data';
 
 export default DS.JSONAPIAdapter.extend(AdapterMixin, Branchable, {
-  host: 'http://localhost:3000'
+  namespace: 'cardstack'
 });
