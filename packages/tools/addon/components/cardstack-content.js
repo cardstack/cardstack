@@ -4,6 +4,7 @@ import layout from '../templates/components/cardstack-content';
 export default Ember.Component.extend({
   layout,
   format: 'card',
+  tagName: '',
   id: Ember.computed('content', 'format', function() {
     return `${Ember.guidFor(this.get('content'))}/${this.get('format')}`;
   }),
