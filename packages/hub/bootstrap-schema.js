@@ -10,11 +10,15 @@ const models = [
     /* This is the content-type content-type. Mindblown. */
     type: 'content-types',
     id: 'content-types',
+    attributes: {
+      'is-built-in': true
+    },
     relationships: {
       fields: {
         data: [
           { type: 'fields', id: 'data-source' },
-          { type: 'fields', id: 'fields' }
+          { type: 'fields', id: 'fields' },
+          { type: 'fields', id: 'is-built-in' }
         ]
       }
     }
@@ -22,6 +26,9 @@ const models = [
   {
     type: 'content-types',
     id: 'fields',
+    attributes: {
+      'is-built-in': true
+    },
     relationships: {
       fields: {
         data: [
@@ -36,6 +43,9 @@ const models = [
   {
     type: 'content-types',
     id: 'constraints',
+    attributes: {
+      'is-built-in': true
+    },
     relationships: {
       fields: {
         data: [
@@ -48,6 +58,9 @@ const models = [
   {
     type: 'content-types',
     id: 'default-values',
+    attributes: {
+      'is-built-in': true
+    },
     relationships: {
       fields: {
         data: [
@@ -59,6 +72,9 @@ const models = [
   {
     type: 'content-types',
     id: 'grants',
+    attributes: {
+      'is-built-in': true
+    },
     relationships: {
       fields: {
         data: [
@@ -74,6 +90,9 @@ const models = [
   {
     type: 'content-types',
     id: 'plugin-configs',
+    attributes: {
+      'is-built-in': true
+    },
     relationships: {
       fields: {
         data: [
@@ -85,6 +104,9 @@ const models = [
   {
     type: 'content-types',
     id: 'data-sources',
+    attributes: {
+      'is-built-in': true
+    },
     relationships: {
       fields: {
         data: [
@@ -99,6 +121,13 @@ const models = [
     id: 'source-type',
     attributes: {
       'field-type': '@cardstack/core-types::string'
+    }
+  },
+  {
+    type: 'fields',
+    id: 'is-built-in',
+    attributes: {
+      'field-type': '@cardstack/core-types::boolean'
     }
   },
   {

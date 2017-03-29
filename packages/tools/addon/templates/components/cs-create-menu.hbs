@@ -2,6 +2,6 @@
 
 <ul>
   {{#each availableTypes as |type|}}
-    <li {{action "create" type}} >{{cs-humanize type}}<button>Add +</button></li>
+    <li {{action "create" type}} >{{cs-humanize type.id}}<button>Add +</button></li>
   {{/each}}
 </ul>
