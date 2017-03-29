@@ -1,7 +1,7 @@
 const Change = require('@cardstack/git/change');
 const temp = require('@cardstack/plugin-utils/node-tests/temp-helper');
-const Indexers = require('@cardstack/server/indexers');
-const SchemaCache = require('@cardstack/server/schema-cache');
+const Indexers = require('@cardstack/hub/indexers');
+const SchemaCache = require('@cardstack/hub/schema-cache');
 const { commitOpts, makeRepo } = require('./support');
 const ElasticAssert = require('@cardstack/elasticsearch/node-tests/assertions');
 const JSONAPIFactory = require('@cardstack/test-support/jsonapi-factory');
@@ -22,7 +22,7 @@ describe('git/indexer', function() {
 
     factory.addResource('plugin-configs')
       .withAttributes({
-        module: '@cardstack/server',
+        module: '@cardstack/hub',
       }).withRelated(
         'default-data-source',
         factory.addResource('data-sources')

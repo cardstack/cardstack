@@ -41,7 +41,7 @@
     "test": "npm run node-tests && npm run ember-tests",
     "node-tests": "mocha -r packages/test-support/prepare.js packages/*/node-tests/*-test.js",
     "ember-tests": "node packages/test-support/ember-test-runner.js",
-    "server": "node packages/server/bin/server.js"
+    "server": "node packages/hub/bin/server.js"
   },
   "dependencies": {
     "broccoli-merge-trees": "^2.0.0",

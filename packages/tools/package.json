@@ -42,7 +42,7 @@
     "@cardstack/core-types": "*",
     "@cardstack/mobiledoc": "*",
     "@cardstack/routing": "*",
-    "@cardstack/server": "*",
+    "@cardstack/hub": "*",
     "ember-cli": "2.12.0",
     "ember-cli-dependency-checker": "^1.3.0",
     "ember-cli-eslint": "^3.0.0",

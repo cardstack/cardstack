@@ -9,7 +9,7 @@
      constructor below. Note that only schema types are allowed in
      seedModels (not any of your other content).
 
-  3. Internally, we also always load @cardstack/server/bootstrap-schema,
+  3. Internally, we also always load @cardstack/hub/bootstrap-schema,
      which is enough to wire up some of our own modules for things
      like core field types.
 */
@@ -26,7 +26,7 @@ module.exports = class SchemaCache {
     this.cache = new Map();
     this.log = logger('schema-cache');
 
-    // TODO move this value into plugins-configs for @cardstack/server.
+    // TODO move this value into plugins-configs for @cardstack/hub.
     this.controllingBranch = 'master';
   }
 

@@ -3,7 +3,7 @@ const temp = require('@cardstack/plugin-utils/node-tests/temp-helper');
 const {
   createDefaultEnvironment,
   destroyDefaultEnvironment
-} = require('@cardstack/server/node-tests/support');
+} = require('@cardstack/hub/node-tests/support');
 const JSONAPIFactory = require('@cardstack/test-support/jsonapi-factory');
 const { makeRepo } = require('@cardstack/git/node-tests/support');
 const Change = require('../change');

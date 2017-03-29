@@ -1,4 +1,4 @@
-const Plugins = require('@cardstack/server/plugins');
+const Plugins = require('@cardstack/hub/plugins');
 const JSONAPIFactory = require('@cardstack/test-support/jsonapi-factory');
 
 describe('plugins', function() {

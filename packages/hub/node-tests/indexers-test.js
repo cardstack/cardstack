@@ -1,5 +1,5 @@
-const Indexers = require('@cardstack/server/indexers');
-const SchemaCache = require('@cardstack/server/schema-cache');
+const Indexers = require('@cardstack/hub/indexers');
+const SchemaCache = require('@cardstack/hub/schema-cache');
 const JSONAPIFactory = require('@cardstack/test-support/jsonapi-factory');
 const Searcher = require('@cardstack/elasticsearch/searcher');
 const { makeRepo } = require('@cardstack/git/node-tests/support');
@@ -15,7 +15,7 @@ describe('server/indexers', function() {
     let factory = new JSONAPIFactory();
     factory.addResource('plugin-configs')
       .withAttributes({
-        module: '@cardstack/server',
+        module: '@cardstack/hub',
       }).withRelated(
         'default-data-source',
         factory.addResource('data-sources')
@@ -43,7 +43,7 @@ describe('server/indexers', function() {
 
   it("indexes seed models", async function() {
     let response = await searcher.search('master', { filter: { type: 'plugin-configs' }});
-    expect(response.models.map(m => m.attributes.module)).includes('@cardstack/server');
+    expect(response.models.map(m => m.attributes.module)).includes('@cardstack/hub');
   });
 
   it("indexes bootstrap models", async function() {

@@ -1,9 +1,9 @@
 const Searcher = require('@cardstack/elasticsearch/searcher');
-const SchemaCache = require('@cardstack/server/schema-cache');
+const SchemaCache = require('@cardstack/hub/schema-cache');
 const temp = require('@cardstack/plugin-utils/node-tests/temp-helper');
 const { makeRepo } = require('@cardstack/git/node-tests/support');
-const Indexers = require('@cardstack/server/indexers');
-const Writers = require('@cardstack/server/writers');
+const Indexers = require('@cardstack/hub/indexers');
+const Writers = require('@cardstack/hub/writers');
 const ElasticAssert = require('@cardstack/elasticsearch/node-tests/assertions');
 const JSONAPIFactory = require('@cardstack/test-support/jsonapi-factory');
 
@@ -24,7 +24,7 @@ exports.createDefaultEnvironment = async function(initialModels = []) {
 
   factory.addResource('plugin-configs')
     .withAttributes({
-      module: '@cardstack/server',
+      module: '@cardstack/hub',
     }).withRelated(
       'default-data-source',
       factory.addResource('data-sources')
@@ -64,7 +64,7 @@ exports.createDefaultEnvironment = async function(initialModels = []) {
   // circular dependency to break.
   //
   // Solution: add some server-level config (probably in the
-  // plugin-config for @cardstack/server) for the branch name that
+  // plugin-config for @cardstack/hub) for the branch name that
   // always controls which indexers to run. This would also work for
   // branch-level grants: to create a branch, you must have a grant on
   // this specially-privileged branch.

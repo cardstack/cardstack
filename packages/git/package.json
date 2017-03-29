@@ -1,7 +1,7 @@
 {
   "name": "@cardstack/git",
   "version": "0.0.2",
-  "description": "Git data source plugin for @cardstack/server.",
+  "description": "Git data source plugin for @cardstack/hub.",
   "repository": "https://github.com/cardstack/cardstack",
   "author": "Edward Faulkner <edward@eaf4.com>",
   "license": "MIT",
@@ -11,7 +11,7 @@
   "devDependencies": {
     "@cardstack/eslint-config":"*",
     "@cardstack/plugin-utils":"*",
-    "@cardstack/server":"*",
+    "@cardstack/hub":"*",
     "@cardstack/test-support":"*",
     "@cardstack/elasticsearch":"*"
   },

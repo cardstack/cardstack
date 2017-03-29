@@ -1,10 +1,10 @@
 const Error = require('@cardstack/plugin-utils/error');
-const Field = require('@cardstack/server/field');
-const Constraint = require('@cardstack/server/constraint');
-const ContentType = require('@cardstack/server/content-type');
-const DataSource = require('@cardstack/server/data-source');
-const Grant = require('@cardstack/server/grant');
-const Plugins = require('@cardstack/server/plugins');
+const Field = require('@cardstack/hub/field');
+const Constraint = require('@cardstack/hub/constraint');
+const ContentType = require('@cardstack/hub/content-type');
+const DataSource = require('@cardstack/hub/data-source');
+const Grant = require('@cardstack/hub/grant');
+const Plugins = require('@cardstack/hub/plugins');
 const logger = require('heimdalljs-logger');
 
 const ownTypes = Object.freeze(['content-types', 'fields', 'constraints', 'data-sources', 'grants', 'plugin-configs', 'default-values']);
@@ -195,7 +195,7 @@ function findDataSources(models, plugins) {
 }
 
 function findDefaultDataSource(plugins) {
-  let serverConfig = plugins.configFor('@cardstack/server');
+  let serverConfig = plugins.configFor('@cardstack/hub');
   if (serverConfig && serverConfig['default-data-source']) {
     return serverConfig['default-data-source'];
   }

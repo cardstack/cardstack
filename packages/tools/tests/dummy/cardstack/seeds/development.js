@@ -5,7 +5,7 @@ module.exports = [
     type: 'plugin-configs',
     id: 0,
     attributes: {
-      module: '@cardstack/server'
+      module: '@cardstack/hub'
     },
     relationships: {
       'default-data-source': {

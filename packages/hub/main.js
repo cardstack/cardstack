@@ -1,8 +1,8 @@
 const Koa = require('koa');
 const Searcher = require('@cardstack/elasticsearch/searcher');
-const Writers = require('@cardstack/server/writers');
-const SchemaCache = require('@cardstack/server/schema-cache');
-const Indexers = require('@cardstack/server/indexers');
+const Writers = require('@cardstack/hub/writers');
+const SchemaCache = require('@cardstack/hub/schema-cache');
+const Indexers = require('@cardstack/hub/indexers');
 const logger = require('heimdalljs-logger');
 const log = logger('server');
 

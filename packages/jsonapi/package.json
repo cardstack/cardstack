@@ -1,7 +1,7 @@
 {
   "name": "@cardstack/jsonapi",
   "version": "0.0.1",
-  "description": "JSONAPI middleware for @cardstack/server",
+  "description": "JSONAPI middleware for @cardstack/hub",
   "repository": "https://github.com/cardstack/cardstack",
   "author": "Edward Faulkner <edward@eaf4.com>",
   "license": "MIT",
@@ -13,7 +13,7 @@
     "koa": "2",
     "heimdalljs-logger": "^0.1.8",
     "supertest": "^2.0.1",
-    "@cardstack/server":"*",
+    "@cardstack/hub":"*",
     "@cardstack/test-support":"*"
   },
   "dependencies": {

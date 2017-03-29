@@ -16,7 +16,7 @@
   },
   "devDependencies": {
     "@cardstack/eslint-config":"*",
-    "@cardstack/server":"*",
+    "@cardstack/hub":"*",
     "lodash": "^4.17.4"
   }
 }

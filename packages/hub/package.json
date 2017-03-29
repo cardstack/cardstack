@@ -1,5 +1,5 @@
 {
-  "name": "@cardstack/server",
+  "name": "@cardstack/hub",
   "version": "0.0.2",
   "keywords": [
     "cardstack-plugin",

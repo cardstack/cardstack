@@ -1,7 +1,7 @@
 const {
   createDefaultEnvironment,
   destroyDefaultEnvironment
-} = require('@cardstack/server/node-tests/support');
+} = require('@cardstack/hub/node-tests/support');
 const { uniq } = require('lodash');
 
 describe('elasticsearch/searcher', function() {

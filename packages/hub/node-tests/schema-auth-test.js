@@ -1,8 +1,8 @@
-const Schema = require('@cardstack/server/schema');
+const Schema = require('@cardstack/hub/schema');
 const ElasticAssert = require('@cardstack/elasticsearch/node-tests/assertions');
 const JSONAPIFactory = require('@cardstack/test-support/jsonapi-factory');
 const PendingChange = require('@cardstack/plugin-utils/pending-change');
-const bootstrapSchema = require('@cardstack/server/bootstrap-schema');
+const bootstrapSchema = require('@cardstack/hub/bootstrap-schema');
 
 describe('schema/auth', function() {
 

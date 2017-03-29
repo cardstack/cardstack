@@ -4,7 +4,7 @@ const Koa = require('koa');
 const {
   createDefaultEnvironment,
   destroyDefaultEnvironment
-} = require('@cardstack/server/node-tests/support');
+} = require('@cardstack/hub/node-tests/support');
 
 describe('auth/read', function() {
   let request, env;

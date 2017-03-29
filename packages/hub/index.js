@@ -2,7 +2,7 @@ const { makeServer } = require('./main');
 const path = require('path');
 
 module.exports = {
-  name: '@cardstack/server',
+  name: '@cardstack/hub',
 
   included(){
     this._super.apply(this, arguments);

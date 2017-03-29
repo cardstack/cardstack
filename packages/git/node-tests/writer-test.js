@@ -3,7 +3,7 @@ const { inRepo } = require('./support');
 const {
   createDefaultEnvironment,
   destroyDefaultEnvironment
-} = require('@cardstack/server/node-tests/support');
+} = require('@cardstack/hub/node-tests/support');
 const JSONAPIFactory = require('@cardstack/test-support/jsonapi-factory');
 
 describe('git/writer', function() {
