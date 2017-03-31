@@ -40,9 +40,9 @@ module.exports = class ElasticAsserter {
     return this.client.es.indices.delete({ index: '_all' });
   }
   async documentContents(branch, type, id) {
-    return this.client.es.getSource({ index: branchToIndexName(branch), type, id });
+    return this.client.es.getSource({ index: branchToIndexName(branch), type, id: `${branch}/${id}` });
   }
   async putDocument(branch, type, id, body) {
-    return this.client.es.index({ index: branchToIndexName(branch), type, id, body });
+    return this.client.es.index({ index: branchToIndexName(branch), type, id: `${branch}/${id}`, body });
   }
 };

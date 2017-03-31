@@ -183,8 +183,11 @@ module.exports = class Indexers {
 
 };
 
-async function jsonapiDocToSearchDoc(jsonapiDoc, schema, branch, client) {
-  let searchDoc = {};
+async function jsonapiDocToSearchDoc(id, jsonapiDoc, schema, branch, client) {
+  // id always come along automatically. type doesn't go inside
+  // here, because we're able to use elasticsearch's native _type
+  // metafield.
+  let searchDoc = { id };
   let rewrites = {};
   if (jsonapiDoc.attributes) {
     for (let attribute of Object.keys(jsonapiDoc.attributes)) {
@@ -261,12 +264,12 @@ class Operations {
   }
   async save(type, id, doc){
     let { bulkOps, branch, log, schema, client } = opsPrivate.get(this);
-    let searchDoc = await jsonapiDocToSearchDoc(doc, schema, branch, client);
+    let searchDoc = await jsonapiDocToSearchDoc(id, doc, schema, branch, client);
     await bulkOps.add({
       index: {
         _index: Client.branchToIndexName(branch),
         _type: type,
-        _id: id,
+        _id: `${branch}/${id}`,
       }
     }, searchDoc);
     log.debug("save %s %s", type, id);
@@ -277,7 +280,7 @@ class Operations {
       delete: {
         _index: Client.branchToIndexName(branch),
         _type: type,
-        _id: id
+        _id: `${branch}/${id}`
       }
     });
     log.debug("delete %s %s", type, id);

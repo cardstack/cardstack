@@ -13,9 +13,9 @@ class Searcher {
     let document = await this.client.es.getSource({
       index: Client.branchToIndexName(branch),
       type,
-      id
+      id: `${branch}/${id}`
     });
-    return this._searchDocToJSONAPI(type, id, document);
+    return this._searchDocToJSONAPI(type, document);
   }
 
   async search(branch, { queryString, filter, sort, page }) {
@@ -102,7 +102,7 @@ class Searcher {
     }
 
     let models = documents.map(
-      document => this._searchDocToJSONAPI(document._type, document._id, document._source)
+      document => this._searchDocToJSONAPI(document._type, document._source)
     );
     return {
       models,
@@ -110,7 +110,7 @@ class Searcher {
     };
   }
 
-  _searchDocToJSONAPI(type, id, document) {
+  _searchDocToJSONAPI(type, document) {
     let rewrites = document.cardstack_rewrites;
     let attributes;
     let relationships;
@@ -142,7 +142,7 @@ class Searcher {
     });
     return {
       type,
-      id,
+      id: document.id,
       attributes,
       relationships,
       meta: document.cardstack_meta
@@ -186,6 +186,12 @@ class Searcher {
 
   _fieldFilter(schema, key, value) {
     let field = fieldFromKey(schema, key);
+    if (!field) {
+      throw new Error(`Cannot filter by unknown field "${key}"`, {
+        status: 400,
+        title: "Unknown field in filter"
+      });
+    }
 
     if (typeof value === 'string') {
       // Bare strings are shorthand for a single term filter
@@ -267,7 +273,8 @@ class Searcher {
       realName = name;
       order = 'asc';
     }
-    let field = schema.fields.get(realName);
+
+    let field = fieldFromKey(schema, realName);
     if (!field) {
       throw new Error(`Cannot sort by unknown field "${realName}"`, {
         status: 400,
@@ -281,23 +288,17 @@ class Searcher {
 
 }
 
-// We use elastic search's built-in _type and _id to store JSONAPI's
-// type and id. We don't want clients to need to add the underscores.
+// We use elastic search's built-in _type to store JSONAPI's type. We
+// don't want clients to need to add the underscore. And the id field
+// is automatic on every type, so we synthesize it here.
 function fieldFromKey(schema, key) {
   if (key === 'type') {
-    return { queryFieldName: '_type', exactFieldName: '_type' };
+    return { queryFieldName: '_type', sortFieldName: '_type' };
   }
   if (key === 'id') {
-    return { queryFieldName: '_id', exatlyFieldName: '_id' };
+    return { queryFieldName: 'id', sortFieldName: 'id' };
   }
-  let field = schema.fields.get(key);
-  if (!field) {
-    throw new Error(`Cannot filter by unknown field "${key}"`, {
-      status: 400,
-      title: "Unknown field in filter"
-    });
-  }
-  return field;
+  return schema.fields.get(key);
 }
 
 module.exports = Searcher;

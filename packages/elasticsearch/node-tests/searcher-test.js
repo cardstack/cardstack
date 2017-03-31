@@ -202,6 +202,29 @@ describe('elasticsearch/searcher', function() {
     expect(models).includes.something.with.deep.property('attributes.hello', 'magic words');
   });
 
+  it('can sort by type', async function() {
+    let { models } = await searcher.search('master', {
+      filter: {
+        type: ['articles', 'people']
+      },
+      sort: 'type'
+    });
+    expect(models).to.have.length(3);
+    expect(models.map(m => m.type)).deep.equals(['articles', 'people', 'people']);
+  });
+
+  it('can sort by type in reverse', async function() {
+    let { models } = await searcher.search('master', {
+      filter: {
+        type: ['articles', 'people']
+      },
+      sort: '-type'
+    });
+    expect(models).to.have.length(3);
+    expect(models.map(m => m.type)).deep.equals(['people', 'people', 'articles']);
+  });
+
+
   it('can filter by id', async function() {
     let { models } = await searcher.search('master', {
       filter: {
@@ -213,6 +236,31 @@ describe('elasticsearch/searcher', function() {
     expect(models).includes.something.with.property('type', 'articles');
     expect(models).includes.something.with.property('type', 'people');
   });
+
+  it.skip('can sort by id', async function() {
+    let { models } = await searcher.search('master', {
+      filter: {
+        id: '1',
+        type: ['articles', 'people']
+      },
+      sort: 'id'
+    });
+    expect(models).to.have.length(2);
+    expect(models.map(m => m.id)).deep.equals(['1', '1', '2']);
+  });
+
+  it.skip('can sort by id in reverse', async function() {
+    let { models } = await searcher.search('master', {
+      filter: {
+        id: '1',
+        type: ['articles', 'people']
+      },
+      sort: '-id'
+    });
+    expect(models).to.have.length(2);
+    expect(models.map(m => m.id)).deep.equals(['2', '1', '1']);
+  });
+
 
   it('can filter a field by one term', async function() {
     let { models } = await searcher.search('master', {
