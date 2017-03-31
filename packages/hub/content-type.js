@@ -13,6 +13,11 @@ module.exports = class ContentType {
       }
       fields.set(fieldRef.id, field);
     }
+
+    // type and id fields are always implicitly present
+    fields.set('type', allFields.get('type'));
+    fields.set('id', allFields.get('id'));
+
     this.fields = fields;
     this.id = model.id;
     if (model.relationships['data-source']) {

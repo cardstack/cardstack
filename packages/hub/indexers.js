@@ -184,9 +184,12 @@ module.exports = class Indexers {
 };
 
 async function jsonapiDocToSearchDoc(id, jsonapiDoc, schema, branch, client) {
-  // id always come along automatically. type doesn't go inside
-  // here, because we're able to use elasticsearch's native _type
-  // metafield.
+  // we store the id as a regular field in elasticsearch here, because
+  // we use elasticsearch's own built-in _id for our own composite key
+  // that takes into account branches.
+  //
+  // we don't store the type as a regular field in elasticsearch,
+  // because we're keeping it in the built in _type field.
   let searchDoc = { id };
   let rewrites = {};
   if (jsonapiDoc.attributes) {

@@ -237,27 +237,23 @@ describe('elasticsearch/searcher', function() {
     expect(models).includes.something.with.property('type', 'people');
   });
 
-  it.skip('can sort by id', async function() {
+  it('can sort by id', async function() {
     let { models } = await searcher.search('master', {
       filter: {
-        id: '1',
         type: ['articles', 'people']
       },
       sort: 'id'
     });
-    expect(models).to.have.length(2);
     expect(models.map(m => m.id)).deep.equals(['1', '1', '2']);
   });
 
-  it.skip('can sort by id in reverse', async function() {
+  it('can sort by id in reverse', async function() {
     let { models } = await searcher.search('master', {
       filter: {
-        id: '1',
         type: ['articles', 'people']
       },
       sort: '-id'
     });
-    expect(models).to.have.length(2);
     expect(models.map(m => m.id)).deep.equals(['2', '1', '1']);
   });
 

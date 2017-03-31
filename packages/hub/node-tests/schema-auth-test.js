@@ -60,11 +60,40 @@ describe('schema/auth', function() {
     factory.addResource('grants').withAttributes({ mayCreateResource: true });
     let schema = await Schema.loadFrom(factory.getModels());
     let action = create({
+      type: 'articles'
+    });
+    let errors = await schema.validationErrors(action);
+    expect(errors).deep.equal([]);
+  });
+
+  it("user-provided id denied without a grant", async function() {
+    factory.addResource('grants').withAttributes({ mayCreateResource: true });
+    let schema = await Schema.loadFrom(factory.getModels());
+    let action = create({
       type: 'articles',
       id: '1'
     });
     let errors = await schema.validationErrors(action);
-    expect(errors).deep.equal([]);
+    expect(errors).collectionContains({
+      status: 401,
+      detail: 'You may not write field "id"'
+    });
+  });
+
+  it("user-provided id approved with a grant", async function() {
+    factory.addResource('grants').withAttributes({ mayCreateResource: true });
+    factory.addResource('grants').withAttributes({ mayWriteField: true })
+      .withRelated('fields', [
+        factory.getResource('fields', 'id')
+      ]);
+
+    let schema = await Schema.loadFrom(factory.getModels());
+    let action = create({
+      type: 'articles',
+      id: '1'
+    });
+    let errors = await schema.validationErrors(action);
+    expect(errors).deep.equals([]);
   });
 
   it("user-specific grant allows creation", async function() {
@@ -72,8 +101,7 @@ describe('schema/auth', function() {
       .withRelated('who', { types: 'groups', id: '0' });
     let schema = await Schema.loadFrom(factory.getModels());
     let action = create({
-      type: 'articles',
-      id: '1'
+      type: 'articles'
     });
     let errors = await schema.validationErrors(action, { user: { id: 0 }});
     expect(errors).deep.equal([]);
@@ -114,8 +142,7 @@ describe('schema/auth', function() {
       .withRelated('types', [factory.getResource('content-types', 'articles')]);
     let schema = await Schema.loadFrom(factory.getModels());
     let action = create({
-      type: 'articles',
-      id: '1'
+      type: 'articles'
     });
     let errors = await schema.validationErrors(action);
     expect(errors).deep.equal([]);
@@ -190,7 +217,6 @@ describe('schema/auth', function() {
     let schema = await Schema.loadFrom(factory.getModels());
     let action = create({
       type: 'articles',
-      id: '1',
       attributes: {
         title: null
       }
@@ -222,7 +248,6 @@ describe('schema/auth', function() {
     let schema = await Schema.loadFrom(factory.getModels());
     let action = create({
       type: 'articles',
-      id: '1',
       attributes: {
         coolness: 0
       }

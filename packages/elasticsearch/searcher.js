@@ -185,7 +185,7 @@ class Searcher {
   }
 
   _fieldFilter(schema, key, value) {
-    let field = fieldFromKey(schema, key);
+    let field = schema.fields.get(key);
     if (!field) {
       throw new Error(`Cannot filter by unknown field "${key}"`, {
         status: 400,
@@ -274,7 +274,7 @@ class Searcher {
       order = 'asc';
     }
 
-    let field = fieldFromKey(schema, realName);
+    let field = schema.fields.get(realName);
     if (!field) {
       throw new Error(`Cannot sort by unknown field "${realName}"`, {
         status: 400,
@@ -288,17 +288,5 @@ class Searcher {
 
 }
 
-// We use elastic search's built-in _type to store JSONAPI's type. We
-// don't want clients to need to add the underscore. And the id field
-// is automatic on every type, so we synthesize it here.
-function fieldFromKey(schema, key) {
-  if (key === 'type') {
-    return { queryFieldName: '_type', sortFieldName: '_type' };
-  }
-  if (key === 'id') {
-    return { queryFieldName: 'id', sortFieldName: 'id' };
-  }
-  return schema.fields.get(key);
-}
 
 module.exports = Searcher;

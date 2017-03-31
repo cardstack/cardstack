@@ -125,6 +125,20 @@ const models = [
   },
   {
     type: 'fields',
+    id: 'type',
+    attributes: {
+      'field-type': '@cardstack/core-types::type'
+    }
+  },
+  {
+    type: 'fields',
+    id: 'id',
+    attributes: {
+      'field-type': '@cardstack/core-types::string'
+    }
+  },
+  {
+    type: 'fields',
     id: 'is-built-in',
     attributes: {
       'field-type': '@cardstack/core-types::boolean'

@@ -43,6 +43,10 @@ module.exports = class Field {
   }
 
   _sectionName() {
+    // only these two fields are hard-coded to be allowed at the top level of the document
+    if (this.id === 'type' || this.id === 'id') {
+      return 'top';
+    }
     return this.isRelationship ? 'relationships' : 'attributes';
   }
 
@@ -50,7 +54,9 @@ module.exports = class Field {
     let document = pendingChange[side];
     if (document) {
       let section = this._sectionName();
-      if (document[section]) {
+      if (section === 'top') {
+        return document[this.id];
+      } else if (document[section]) {
         return document[section][this.id];
       }
     }
@@ -82,10 +88,20 @@ module.exports = class Field {
   async _defaultValueFor(pendingChange /*, context */) {
     let defaultInput;
     if (!pendingChange.originalDocument) {
-      // We are creating. If there's a creation default, use
-      // it. Otherwise an update default could apply here. Otherwise,
-      // all fields default to null.
-      defaultInput = this.defaultAtCreate || this.defaultAtUpdate || { value: null };
+      // We are creating.
+      //   - If there's a creation default, use it.
+      //
+      //   - Otherwise an update default could apply here.
+      //
+      //   - Otherwise, "type" is special because we always have an
+      //     implicit default type (if we didn't already know the
+      //     type, we wouldn't have even gotten to here). Without
+      //     this, anyone with a creation grant for a type would also
+      //     need a field write grant for "type", which would be
+      //     annoyingly redundant.
+      //
+      //   - Otherwise all fields default to null.
+      defaultInput = this.defaultAtCreate || this.defaultAtUpdate || { value: this.id === 'type' ? pendingChange.finalDocument.type : null };
     } else {
       defaultInput = this.defaultAtUpdate;
     }
@@ -121,10 +137,14 @@ module.exports = class Field {
       }
 
       let section = this._sectionName();
-      if (!pendingChange.finalDocument[section]) {
-        pendingChange.finalDocument[section] = {};
+      if (section === 'top') {
+        pendingChange.finalDocument[this.id] = defaultValue.value;
+      } else {
+        if (!pendingChange.finalDocument[section]) {
+          pendingChange.finalDocument[section] = {};
+        }
+        pendingChange.finalDocument[section][this.id] = defaultValue.value;
       }
-      pendingChange.finalDocument[section][this.id] = defaultValue.value;
     }
   }
 
