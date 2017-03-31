@@ -3,11 +3,6 @@ const logger = require('heimdalljs-logger');
 const Error = require('@cardstack/plugin-utils/error');
 
 class Searcher {
-  // TODO: delete me
-  static branchToIndexName(branch) {
-    return Client.branchToIndexName(branch);
-  }
-
   constructor(schemaCache) {
     this.client = new Client();
     this.log = logger('searcher');
@@ -16,7 +11,7 @@ class Searcher {
 
   async get(branch, type, id) {
     let document = await this.client.es.getSource({
-      index: this.constructor.branchToIndexName(branch),
+      index: Client.branchToIndexName(branch),
       type,
       id
     });
@@ -69,7 +64,7 @@ class Searcher {
     this.log.debug('search %j', esBody);
     try {
       let result = await this.client.es.search({
-        index: this.constructor.branchToIndexName(branch),
+        index: Client.branchToIndexName(branch),
         body: esBody
       });
       this.log.debug('searchResult %j', result);

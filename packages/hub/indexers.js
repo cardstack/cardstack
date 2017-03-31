@@ -22,7 +22,6 @@
 
 const logger = require('heimdalljs-logger');
 const Client = require('@cardstack/elasticsearch/client');
-const Searcher = require('@cardstack/elasticsearch/searcher');
 const BulkOps = require('./bulk-ops');
 require('./diff-log-formatter');
 
@@ -143,7 +142,7 @@ module.exports = class Indexers {
 
   async _loadMeta(branch, updater) {
     return this.client.es.getSource({
-      index: Searcher.branchToIndexName(branch),
+      index: Client.branchToIndexName(branch),
       type: 'meta',
       id: updater.name,
       ignore: [404]
@@ -153,7 +152,7 @@ module.exports = class Indexers {
   async _saveMeta(branch, updater, newMeta, privateOps) {
     await privateOps.bulkOps.add({
       index: {
-        _index: Searcher.branchToIndexName(branch),
+        _index: Client.branchToIndexName(branch),
         _type: 'meta',
         _id: updater.name,
       }
@@ -248,7 +247,7 @@ class Operations {
     let searchDoc = jsonapiDocToSearchDoc(doc, schema);
     await bulkOps.add({
       index: {
-        _index: Searcher.branchToIndexName(branch),
+        _index: Client.branchToIndexName(branch),
         _type: type,
         _id: id,
       }
@@ -259,7 +258,7 @@ class Operations {
     let { bulkOps, branch, log } = opsPrivate.get(this);
     await bulkOps.add({
       delete: {
-        _index: Searcher.branchToIndexName(branch),
+        _index: Client.branchToIndexName(branch),
         _type: type,
         _id: id
       }
