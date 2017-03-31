@@ -33,7 +33,7 @@ class Searcher {
           }]
         }
       },
-      sort: this._buildSorts(schema, sort)
+      sort: await this._buildSorts(branch, schema, sort)
     };
 
     let size = 10;
@@ -57,7 +57,7 @@ class Searcher {
       });
     }
     if (filter) {
-      for (let expression of this._filterToES(schema, filter)) {
+      for (let expression of await this._filterToES(branch, schema, filter)) {
         esBody.query.bool.must.push(expression);
       }
     }
@@ -149,19 +149,24 @@ class Searcher {
     };
   }
 
-  _filterToES(schema, filter) {
+  async _filterToES(branch, schema, filter) {
     let result = [];
-    Object.keys(filter).forEach(key => {
-      let value = filter[key];
+    for (let [key, value] of Object.entries(filter)) {
       switch(key) {
       case 'not':
-        result.push({ bool: { must_not: this._filterToES(schema, value) } });
+        result.push({ bool: { must_not: await this._filterToES(branch, schema, value) } });
         break;
       case 'or':
         if (!Array.isArray(value)) {
           throw new Error(`the "or" operator must receive an array of other filters`, { status: 400 });
         }
-        result.push({ bool: { should: value.map(v => ({ bool: { must: this._filterToES(schema, v) } })) } });
+        result.push({
+          bool: {
+            should: await Promise.all(value.map(
+              async v => ({ bool: { must: await this._filterToES(branch, schema, v) } })
+            ))
+          }
+        });
         break;
       case 'and':
         // 'and' is not strictly needed, since we already conjoin all
@@ -169,22 +174,22 @@ class Searcher {
         if (!Array.isArray(value)) {
           throw new Error(`the "and" operator must receive an array of other filters`, { status: 400 });
         }
-        value.forEach(v => {
-          this._filterToES(schema, v).forEach(r => {
+        for (let v of value) {
+          for (let r of await this._filterToES(branch, schema, v)) {
             result.push(r);
-          });
-        });
+          }
+        }
         break;
       default:
         // Any keys that aren't one of the predefined operations are
         // field names.
-        result.push(this._fieldFilter(schema, key, value));
+        result.push(await this._fieldFilter(branch, schema, key, value));
       }
-    });
+    }
     return result;
   }
 
-  _fieldFilter(schema, key, value) {
+  async _fieldFilter(branch, schema, key, value) {
     let field = schema.fields.get(key);
     if (!field) {
       throw new Error(`Cannot filter by unknown field "${key}"`, {
@@ -195,12 +200,14 @@ class Searcher {
 
     if (typeof value === 'string') {
       // Bare strings are shorthand for a single term filter
-      return { term: { [field.queryFieldName] : value.toLowerCase() } };
+      let esName = await this.client.logicalFieldToES(branch, field.queryFieldName);
+      return { term: { [esName] : value.toLowerCase() } };
     }
 
     if (Array.isArray(value)) {
       // Bare arrays are shorthand for a multi term filter
-      return { terms: { [field.queryFieldName] : value.map(elt => elt.toLowerCase()) } };
+      let esName = await this.client.logicalFieldToES(branch, field.queryFieldName);
+      return { terms: { [esName] : value.map(elt => elt.toLowerCase()) } };
     }
 
     if (value.range) {
@@ -210,51 +217,53 @@ class Searcher {
           limits[limit] = value.range[limit];
         }
       });
-      return {
+      let esName = await this.client.logicalFieldToES(branch, field.queryFieldName);            return {
         range: {
-          [field.queryFieldName]: limits
+          [esName]: limits
         }
       };
     }
 
     if (value.exists != null) {
+      let esName = await this.client.logicalFieldToES(branch, field.queryFieldName);
       if (String(value.exists) === 'false') {
         return {
-          bool: { must_not: { exists: { field: field.queryFieldName } } }
+          bool: { must_not: { exists: { field: esName } } }
         };
       } else {
         return {
-          exists: { field: field.queryFieldName }
+          exists: { field: esName }
         };
       }
     }
 
     if (value.exact != null) {
       let innerQuery = value.exact;
+      let esName = await this.client.logicalFieldToES(branch, field.sortFieldName);
       if (typeof innerQuery === 'string') {
         // This is the sortFieldName because that one is designed for
         // exact matching (in addition to sorting).
-        return { term: { [field.sortFieldName] : innerQuery.toLowerCase() } };
+        return { term: { [esName] : innerQuery.toLowerCase() } };
       }
       if (Array.isArray(innerQuery)) {
         // This is the sortFieldName because that one is designed for
         // exact matching (in addition to sorting).
-        return { terms: { [field.sortFieldName] : innerQuery.map(elt => elt.toLowerCase()) } };
+        return { terms: { [esName] : innerQuery.map(elt => elt.toLowerCase()) } };
       }
     }
 
     throw new Error(`Unimplemented filter ${key} ${value}`);
   }
 
-  _buildSorts(schema, sort) {
+  async _buildSorts(branch, schema, sort) {
     let output = [];
     if (sort) {
       if (Array.isArray(sort)) {
-        sort.forEach(name => {
-          output.push(this._buildSort(schema, name));
-        });
+        for (let name of sort) {
+          output.push(await this._buildSort(branch, schema, name));
+        }
       } else {
-        output.push(this._buildSort(schema, sort));
+        output.push(await this._buildSort(branch, schema, sort));
       }
     }
 
@@ -264,7 +273,7 @@ class Searcher {
     return output;
   }
 
-  _buildSort(schema, name) {
+  async _buildSort(branch, schema, name) {
     let realName, order;
     if (name.indexOf('-') === 0) {
       realName = name.slice(1);
@@ -281,8 +290,11 @@ class Searcher {
         title: "Unknown sort field"
       });
     }
+
+    let esName = await this.client.logicalFieldToES(branch, field.sortFieldName);
+
     return {
-      [field.sortFieldName] : { order }
+      [esName] : { order }
     };
   }
 

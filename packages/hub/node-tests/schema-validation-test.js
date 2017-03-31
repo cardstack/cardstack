@@ -290,14 +290,14 @@ describe('schema/validation', function() {
   it("applies update default at update", async function() {
     let pending = new PendingChange({
       type: 'things-with-defaults',
-      id: 1,
+      id: '1',
       attributes: {
         timestamp: '2017-03-14T13:49:30Z',
         karma: 10
       }
     }, {
       type: 'things-with-defaults',
-      id: 1,
+      id: '1',
       attributes: {
         timestamp: '2017-03-14T13:49:30Z',
         karma: 10
