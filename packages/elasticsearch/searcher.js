@@ -111,25 +111,33 @@ class Searcher {
   }
 
   _searchDocToJSONAPI(type, id, document) {
-    let relnames = document.cardstack_rel_names;
-    let derivedNames = document.cardstack_derived_names;
+    let rewrites = document.cardstack_rewrites;
     let attributes;
     let relationships;
     Object.keys(document).forEach(fieldName => {
-      if (fieldName === 'cardstack_rel_names' || fieldName === 'cardstack_meta' || fieldName === 'cardstack_derived_names') {
-        // pass
-      } else if (relnames.includes(fieldName)) {
+      if (fieldName === 'cardstack_rewrites') {
+        return;
+      }
+      let outputName = fieldName;
+      let rewrite = rewrites[fieldName];
+      if (rewrite) {
+        if (rewrite.delete) {
+          return;
+        }
+        if (rewrite.rename) {
+          outputName = rewrite.rename;
+        }
+      }
+      if (rewrite && rewrite.isRelationship) {
         if (!relationships) {
           relationships = {};
         }
-        relationships[fieldName] = document[fieldName];
-      } else if (derivedNames.includes(fieldName)) {
-        // pass
+        relationships[outputName] = document[fieldName];
       } else {
         if (!attributes) {
           attributes = {};
         }
-        attributes[fieldName] = document[fieldName];
+        attributes[outputName] = document[fieldName];
       }
     });
     return {

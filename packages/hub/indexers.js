@@ -185,8 +185,7 @@ module.exports = class Indexers {
 
 function jsonapiDocToSearchDoc(jsonapiDoc, schema) {
   let searchDoc = {};
-  let relNames = [];
-  let derivedNames = [];
+  let rewrites = {};
   if (jsonapiDoc.attributes) {
     for (let attribute of Object.keys(jsonapiDoc.attributes)) {
       let value = jsonapiDoc.attributes[attribute];
@@ -196,7 +195,11 @@ function jsonapiDocToSearchDoc(jsonapiDoc, schema) {
         if (derivedFields) {
           for (let [derivedName, derivedValue] of Object.entries(derivedFields)) {
             searchDoc[derivedName] = derivedValue;
-            derivedNames.push(derivedName);
+            rewrites[derivedName] = {
+              delete: true,
+              rename: null,
+              isRelationship: false
+            };
           }
         }
       }
@@ -207,18 +210,21 @@ function jsonapiDocToSearchDoc(jsonapiDoc, schema) {
     for (let attribute of Object.keys(jsonapiDoc.relationships)) {
       let value = jsonapiDoc.relationships[attribute];
       searchDoc[attribute] = value;
-      relNames.push(attribute);
+      rewrites[attribute] = {
+        delete: false,
+        rename: null,
+        isRelationship: true
+      };
     }
   }
 
-  // The next two fields in the searchDoc get a "cardstack_" prefix so
+  // The next fields in the searchDoc get a "cardstack_" prefix so
   // they aren't likely to collide with the user's attribute or
-  // relatioship names.
+  // relationship.
   if (jsonapiDoc.meta) {
     searchDoc.cardstack_meta = jsonapiDoc.meta;
   }
-  searchDoc.cardstack_rel_names = relNames;
-  searchDoc.cardstack_derived_names = derivedNames;
+  searchDoc.cardstack_rewrites = rewrites;
   return searchDoc;
 }
 
