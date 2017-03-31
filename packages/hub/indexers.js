@@ -21,16 +21,15 @@
 */
 
 const logger = require('heimdalljs-logger');
-const makeClient = require('@cardstack/elasticsearch/client');
+const Client = require('@cardstack/elasticsearch/client');
 const Searcher = require('@cardstack/elasticsearch/searcher');
-const { isEqual, merge } = require('lodash');
 const BulkOps = require('./bulk-ops');
 require('./diff-log-formatter');
 
 module.exports = class Indexers {
   constructor(schemaCache) {
     this.schemaCache = schemaCache;
-    this.es = makeClient();
+    this.client = new Client();
     this.log = logger('indexers');
     this._lastControllingSchema = null;
     this._seenBranches = new Map();
@@ -107,22 +106,8 @@ module.exports = class Indexers {
   }
 
   async _updateBranch(branch, updaters, realTime, hints) {
-    let haveMapping = await this._esMapping(branch);
     let schema = await this._updateSchema(branch, updaters);
-    let wantMapping = schema.mapping();
-    if (this._stableMapping(haveMapping, wantMapping)) {
-      this.log.debug('%s: mapping already OK', branch);
-    } else {
-      this.log.debug('%s: mapping needs update', branch);
-      let tmpIndex = this._tempIndexName(branch);
-      await this.es.indices.create({
-        index: tmpIndex,
-        body: {
-          mappings: wantMapping
-        }
-      });
-      await this._reindex(tmpIndex, branch);
-    }
+    await this.client.accomodateSchema(branch, schema);
     await this._updateContent(branch, updaters, schema, realTime, hints);
     this.schemaCache.notifyBranchUpdate(branch, schema);
   }
@@ -156,54 +141,8 @@ module.exports = class Indexers {
     return branches;
   }
 
-  async _esMapping(branch) {
-    let mapping = await this.es.indices.getMapping({
-      index: Searcher.branchToIndexName(branch),
-      ignore: [404]
-    });
-    if (mapping.status === 404) {
-      return null;
-    } else {
-      let index = Object.keys(mapping)[0];
-      return mapping[index].mappings;
-    }
-  }
-
-  _tempIndexName(branch) {
-    return Searcher.branchToIndexName(`${branch}_${Math.floor(Math.random() * Number.MAX_SAFE_INTEGER)}`);
-  }
-
-  _stableMapping(have, want) {
-    if (!have) {
-      this.log.info("mapping not stable because there's no existing index");
-      return false;
-    }
-
-    // the default type is "object", and elasticsearch doesn't echo it
-    // back to you even if you are setting it explicitly. So to
-    // maintain stability, we fill it in explicitly here before
-    // comparing.
-    addDefaultTypes(have);
-
-    // Extra information in `have` is OK. There are several cases
-    // where elasticsearch fills in more detail than we
-    // provide. Missing or different information is not ok and means
-    // our mapping is not stable.
-    let combined = merge({}, have, want);
-    if (isEqual(combined, have)) {
-      return true;
-    }
-
-    // Not stable. Generate some useful debug info about why.  The %p
-    // formatter is custom and loads via side-effect from the
-    // diff-log-formatter module.
-    this.log.info("mapping diff: %p", { left: have, right: combined });
-    return false;
-  }
-
-
   async _loadMeta(branch, updater) {
-    return this.es.getSource({
+    return this.client.es.getSource({
       index: Searcher.branchToIndexName(branch),
       type: 'meta',
       id: updater.name,
@@ -230,7 +169,7 @@ module.exports = class Indexers {
   }
 
   async _updateContent(branch, updaters, schema, realTime, hints) {
-    let { publicOps, privateOps } = Operations.create(this.es, branch, schema, realTime, this.log);
+    let { publicOps, privateOps } = Operations.create(this.client.es, branch, schema, realTime, this.log);
     if (!this._seenBranches.has(branch)) {
       await this.schemaCache.indexBaseContent(publicOps);
       this._seenBranches.set(branch, true);
@@ -241,39 +180,6 @@ module.exports = class Indexers {
       await this._saveMeta(branch, updater, newMeta, privateOps);
     }
     await privateOps.flush();
-  }
-
-  // 1. Index the branch into newIndex.
-  // 2. Update the canonical elasticsearch alias for the branch to point at newIndex
-  // 3. Delete any old index that we just replaced.
-  async _reindex(newIndex, branch) {
-    let branchIndex = Searcher.branchToIndexName(branch);
-    let alias = await this.es.indices.getAlias({
-      name: branchIndex,
-      ignore: [404]
-    });
-    if (alias.status === 404) {
-      this.log.info('%s is new, nothing to reindex', branch);
-    } else {
-      this.log.info('reindexing %s into %s', branch, newIndex);
-      await this.es.reindex({
-        body: {
-          source: { index: branchIndex },
-          dest: { index: newIndex }
-        }
-      });
-
-    }
-    this.log.info('updating alias %s to %s', branchIndex, newIndex);
-    await this.es.indices.updateAliases({
-      body: {
-        actions: [
-          { remove: { index: '_all', alias: branchIndex } },
-          { add: { index: newIndex, alias: branchIndex } }
-        ]
-      }
-    });
-
   }
 
 };
@@ -359,16 +265,5 @@ class Operations {
       }
     });
     log.debug("delete %s %s", type, id);
-  }
-}
-
-function addDefaultTypes(mapping) {
-  for (let config of Object.values(mapping)) {
-    if (config && !config.type) {
-      config.type = 'object';
-    }
-    if (config.properties) {
-      addDefaultTypes(config.properties);
-    }
   }
 }

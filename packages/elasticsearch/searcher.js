@@ -1,20 +1,21 @@
-const makeClient = require('@cardstack/elasticsearch/client');
+const Client = require('@cardstack/elasticsearch/client');
 const logger = require('heimdalljs-logger');
 const Error = require('@cardstack/plugin-utils/error');
 
 class Searcher {
+  // TODO: delete me
   static branchToIndexName(branch) {
-    return `content_${branch}`;
+    return Client.branchToIndexName(branch);
   }
 
   constructor(schemaCache) {
-    this.es = makeClient();
+    this.client = new Client();
     this.log = logger('searcher');
     this.schemaCache = schemaCache;
   }
 
   async get(branch, type, id) {
-    let document = await this.es.getSource({
+    let document = await this.client.es.getSource({
       index: this.constructor.branchToIndexName(branch),
       type,
       id
@@ -67,7 +68,7 @@ class Searcher {
     }
     this.log.debug('search %j', esBody);
     try {
-      let result = await this.es.search({
+      let result = await this.client.es.search({
         index: this.constructor.branchToIndexName(branch),
         body: esBody
       });
