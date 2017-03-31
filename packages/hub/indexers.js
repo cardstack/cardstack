@@ -168,7 +168,7 @@ module.exports = class Indexers {
   }
 
   async _updateContent(branch, updaters, schema, realTime, hints) {
-    let { publicOps, privateOps } = Operations.create(this.client.es, branch, schema, realTime, this.log);
+    let { publicOps, privateOps } = Operations.create(this.client, branch, schema, realTime, this.log);
     if (!this._seenBranches.has(branch)) {
       await this.schemaCache.indexBaseContent(publicOps);
       this._seenBranches.set(branch, true);
@@ -183,7 +183,7 @@ module.exports = class Indexers {
 
 };
 
-function jsonapiDocToSearchDoc(jsonapiDoc, schema) {
+async function jsonapiDocToSearchDoc(jsonapiDoc, schema, branch, client) {
   let searchDoc = {};
   let rewrites = {};
   if (jsonapiDoc.attributes) {
@@ -194,8 +194,9 @@ function jsonapiDocToSearchDoc(jsonapiDoc, schema) {
         let derivedFields = field.derivedFields(value);
         if (derivedFields) {
           for (let [derivedName, derivedValue] of Object.entries(derivedFields)) {
-            searchDoc[derivedName] = derivedValue;
-            rewrites[derivedName] = {
+            let esName = await client.logicalFieldToES(branch, derivedName);
+            searchDoc[esName] = derivedValue;
+            rewrites[esName] = {
               delete: true,
               rename: null,
               isRelationship: false
@@ -203,16 +204,25 @@ function jsonapiDocToSearchDoc(jsonapiDoc, schema) {
           }
         }
       }
-      searchDoc[attribute] = value;
+      let esName = await client.logicalFieldToES(branch, attribute);
+      searchDoc[esName] = value;
+      if (esName !== attribute) {
+        rewrites[esName] = {
+          delete: false,
+          rename: attribute,
+          isRelationship: false
+        };
+      }
     }
   }
   if (jsonapiDoc.relationships) {
     for (let attribute of Object.keys(jsonapiDoc.relationships)) {
       let value = jsonapiDoc.relationships[attribute];
-      searchDoc[attribute] = value;
-      rewrites[attribute] = {
+      let esName = await client.logicalFieldToES(branch, attribute);
+      searchDoc[esName] = value;
+      rewrites[esName] = {
         delete: false,
-        rename: null,
+        rename: esName === attribute ? null : attribute,
         isRelationship: true
       };
     }
@@ -231,26 +241,27 @@ function jsonapiDocToSearchDoc(jsonapiDoc, schema) {
 const opsPrivate = new WeakMap();
 
 class Operations {
-  static create(es, branch, schema, realTime, log) {
-    let publicOps = new this(es, branch, schema, realTime, log);
+  static create(client, branch, schema, realTime, log) {
+    let publicOps = new this(client, branch, schema, realTime, log);
     let privateOps = opsPrivate.get(publicOps);
     return { publicOps, privateOps };
   }
 
-  constructor(es, branch, schema, realTime, log) {
+  constructor(client, branch, schema, realTime, log) {
     opsPrivate.set(this, {
       schema,
       log,
       branch,
-      bulkOps: new BulkOps(es, { realTime }),
+      client,
+      bulkOps: new BulkOps(client.es, { realTime }),
       flush() {
         return this.bulkOps.flush();
       }
     });
   }
   async save(type, id, doc){
-    let { bulkOps, branch, log, schema } = opsPrivate.get(this);
-    let searchDoc = jsonapiDocToSearchDoc(doc, schema);
+    let { bulkOps, branch, log, schema, client } = opsPrivate.get(this);
+    let searchDoc = await jsonapiDocToSearchDoc(doc, schema, branch, client);
     await bulkOps.add({
       index: {
         _index: Client.branchToIndexName(branch),
