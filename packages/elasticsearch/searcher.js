@@ -1,6 +1,7 @@
 const Client = require('@cardstack/elasticsearch/client');
 const logger = require('heimdalljs-logger');
 const Error = require('@cardstack/plugin-utils/error');
+const toJSONAPI = require('./to-jsonapi');
 
 class Searcher {
   constructor(schemaCache) {
@@ -15,7 +16,7 @@ class Searcher {
       type,
       id: `${branch}/${id}`
     });
-    return this._searchDocToJSONAPI(type, document);
+    return toJSONAPI(type, document);
   }
 
   async search(branch, { queryString, filter, sort, page }) {
@@ -102,50 +103,11 @@ class Searcher {
     }
 
     let models = documents.map(
-      document => this._searchDocToJSONAPI(document._type, document._source)
+      document => toJSONAPI(document._type, document._source)
     );
     return {
       models,
       page: pagination
-    };
-  }
-
-  _searchDocToJSONAPI(type, document) {
-    let rewrites = document.cardstack_rewrites;
-    let attributes;
-    let relationships;
-    Object.keys(document).forEach(fieldName => {
-      if (fieldName === 'cardstack_rewrites') {
-        return;
-      }
-      let outputName = fieldName;
-      let rewrite = rewrites[fieldName];
-      if (rewrite) {
-        if (rewrite.delete) {
-          return;
-        }
-        if (rewrite.rename) {
-          outputName = rewrite.rename;
-        }
-      }
-      if (rewrite && rewrite.isRelationship) {
-        if (!relationships) {
-          relationships = {};
-        }
-        relationships[outputName] = document[fieldName];
-      } else {
-        if (!attributes) {
-          attributes = {};
-        }
-        attributes[outputName] = document[fieldName];
-      }
-    });
-    return {
-      type,
-      id: document.id,
-      attributes,
-      relationships,
-      meta: document.cardstack_meta
     };
   }
 

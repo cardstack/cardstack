@@ -4,6 +4,7 @@ const Indexers = require('@cardstack/hub/indexers');
 const SchemaCache = require('@cardstack/hub/schema-cache');
 const { commitOpts, makeRepo } = require('./support');
 const ElasticAssert = require('@cardstack/elasticsearch/node-tests/assertions');
+const toJSONAPI = require('@cardstack/elasticsearch/to-jsonapi');
 const JSONAPIFactory = require('@cardstack/test-support/jsonapi-factory');
 
 describe('git/indexer', function() {
@@ -150,7 +151,8 @@ describe('git/indexer', function() {
     expect(indexerState.commit).to.equal(head);
 
     let contents = await ea.documentContents('master', 'articles', 'hello-world');
-    expect(contents).has.property('hello', 'world');
+    let jsonapi = toJSONAPI('articles', contents);
+    expect(jsonapi).has.deep.property('attributes.hello', 'world');
   });
 
   it('ignores newly added document that lacks json extension', async function() {

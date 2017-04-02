@@ -190,8 +190,18 @@ async function jsonapiDocToSearchDoc(id, jsonapiDoc, schema, branch, client) {
   //
   // we don't store the type as a regular field in elasticsearch,
   // because we're keeping it in the built in _type field.
-  let searchDoc = { id };
+
   let rewrites = {};
+  let esId = await client.logicalFieldToES(branch, 'id');
+  let searchDoc = { [esId]: id };
+  if (esId !== 'id') {
+    rewrites[esId] = {
+      delete: false,
+      rename: 'id',
+      isRelationship: false
+    };
+  }
+
   if (jsonapiDoc.attributes) {
     for (let attribute of Object.keys(jsonapiDoc.attributes)) {
       let value = jsonapiDoc.attributes[attribute];

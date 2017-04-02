@@ -177,6 +177,34 @@ describe('elasticsearch/searcher', function() {
     expect(models.filter(m => m.type === 'articles')).to.have.length(1);
   });
 
+  it('returns properly formatted records', async function() {
+    let model = await searcher.get('master', 'people', '1');
+    let meta = model.meta;
+    expect(Object.keys(meta).sort()).deep.equals(['hash', 'version']);
+    delete model.meta;
+    expect(model).deep.equals({
+      type: 'people',
+      id: '1',
+      attributes: {
+        firstName: 'Quint',
+        lastName: 'Faulkner',
+        color: null,
+        age: 6,
+        description: {
+          version: "0.3.1",
+          markups: [],
+          atoms: [],
+          cards: [],
+          sections: [
+            [1, "p", [
+              [0, [], 0, "The quick brown fox jumps over the lazy dog."]
+            ]]
+          ]
+        }
+      }
+    });
+  });
+
   it('can be searched via queryString', async function() {
     let { models } = await searcher.search('master', {
       queryString: 'magic'
@@ -187,7 +215,7 @@ describe('elasticsearch/searcher', function() {
 
   it('can be searched via queryString, negative result', async function() {
     let { models } = await searcher.search('master', {
-      queryString: 'this-is-an-unused-term'
+      queryString: 'thisisanunusedterm'
     });
     expect(models).to.have.length(0);
   });

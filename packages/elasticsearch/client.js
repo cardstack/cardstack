@@ -6,6 +6,11 @@ function host() {
   return process.env.ELASTICSEARCH || 'http://10.0.15.2:9200';
 }
 
+// This is a temporary stop on the refactoring path toward fields that
+// have their names remapped on demand. Right now we're remapping
+// *every* field just to make sure we can.
+const fieldPrefix = 'trouble';
+
 /*
   the SearchClient holds a connection to elasticsearch plus additional
   information about how we're mapping our logical schema into
@@ -33,7 +38,7 @@ module.exports = class SearchClient {
     // 3. introduce new fields via putMappings.
     // 4. update the metadata for this branch with our mapping decisions.
 
-    let haveMapping = await this._esMapping(branch);
+    let haveMapping = await this._rewriteMapping(branch, await this._esMapping(branch), 'esFieldToLogical');
     let wantMapping = schema.mapping();
     if (this._stableMapping(haveMapping, wantMapping)) {
       this.log.debug('%s: mapping already OK', branch);
@@ -43,7 +48,7 @@ module.exports = class SearchClient {
       await this.es.indices.create({
         index: tmpIndex,
         body: {
-          mappings: wantMapping
+          mappings: await this._rewriteMapping(branch, wantMapping, 'logicalFieldToES')
         }
       });
       await this._reindex(tmpIndex, branch);
@@ -51,18 +56,42 @@ module.exports = class SearchClient {
 
   }
 
+  // this is async because we may not have loaded our mappings, but
+  // most of the time we'll have them in memory.
   async logicalFieldToES(branch, logicalFieldName) {
-    // this is async because we may not have loaded our mappings, but
-    // most of the time we'll have them in memory.
-    return logicalFieldName;
+    // _type is special because we always use the native ES _type
+    // field, and it never gets remapped.
+    if (logicalFieldName === '_type') {
+      return logicalFieldName;
+    } else {
+      return fieldPrefix + logicalFieldName;
+    }
   }
 
   async esFieldToLogical(branch, esFieldName) {
-    return esFieldName;
+    if (esFieldName === '_type') {
+      return esFieldName;
+    } else {
+      return esFieldName.slice(fieldPrefix.length);
+    }
   }
 
   static branchToIndexName(branch) {
     return `content_${branch}`;
+  }
+
+  async _rewriteMapping(branch, mapping, nameRewriter) {
+    if (!mapping) { return; }
+    let output = {};
+    for (let [typeName, typeMapping] of Object.entries(mapping)) {
+      let outputTypeMapping = {};
+      for (let [fieldName, fieldMapping] of Object.entries(typeMapping.properties)) {
+        let esName = await this[nameRewriter](branch, fieldName);
+        outputTypeMapping[esName] = fieldMapping;
+      }
+      output[typeName] = { properties: outputTypeMapping };
+    }
+    return output;
   }
 
   async _esMapping(branch) {
