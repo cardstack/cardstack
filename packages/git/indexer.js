@@ -1,3 +1,80 @@
+/*
+
+  Since this is the first Indexer, this seems like a reasonable place
+  to document the Indexer protocol:
+
+  - an indexer gets instantiated by the Hub for each configured data
+    source.
+
+  - the Indexer's constructor arguments come from the data-source's
+    `params` attribute. That is, a data source like a Git repository
+    is configured by creating a record of type "data-sources", with a
+    source-type attribute that points at a module like this one
+    ("@cardstack/git") and a params attribute that contains the
+    source-type-specific configuration (in this case, `repo`,
+    `basePath`, and `branchPrefix`).
+
+  - the indexer must implement `branches`, which returns a list of
+    branch names. In the case of Git, branch literally means
+    branch. But other indexers can also make use of the concept of
+    branches to support multiple environments (like produciton vs
+    staging databases). It's up to the indexer to discover branches
+    because they may be as dynamic as desired.
+
+  - branch names may span across data sources. For example, both Git
+    and Postgres may have "proudction" branches, and both may define
+    both schema and content.
+
+  - an indexer must implement beginUpdate(branch), which returns an
+    updater. The updater represents a running update action, and it's
+    appropriate that it can be more stateful than an indexer.
+
+  - an updater must implement schema(), which returns the list of
+    schema records the data source would like to define. It's not
+    mandatory for every data source to define schema -- it's OK to
+    only contain content and rely on schema that's stored in a
+    different data source. schema() is a separate method because we
+    need to know the schema up front, before we can index the rest of
+    the content.
+
+  - an updater must implement updateContent(meta, hints, ops), which
+    generates the actual update operations to add and remove records
+    from the search index.
+
+      - `meta` can store whatever you want, it's your place to keep
+        track of how far your indexer has progressed. The value that
+        you return from updateContent() will be passed into the next
+        call to updateContent() as `meta`.
+
+      - `hints` can contain a list of `{ branch, id, type }`
+        references. This is intended as an optimization hint when we
+        know that certain resources are the ones that likely need to
+        be indexed right away. Indexers are responsible for
+        discovering and indexing arbitrary upstream changes regardless
+        of this hint, but the hint can make it easier to keep the
+        search index nearly real-time fresh.
+
+      - `ops` has two methods you can call: `save(type, id, doc)` and
+        `delete(type, id)`. Both are async and you should await them
+        (you don't need to do batching, the Hub manages that for you,
+        but the methods are async because you can't necessarily
+        predict when it will decide to flush).
+
+    `updateContent` should call `ops.save` and/or `ops.delete` as many
+    times as necessary, then return a new `meta` state.
+
+  - the Hub ensures that only one indexer per data source is
+    instantiated and running at a given time. You don't need to
+    implement locking in the indexer.
+
+  - multiple updaters may run in parallel (one for each branch
+    name). The Hub guarantees it will call `beginUpdate` for every
+    branch before it calls `updateContent` on any of them -- this
+    allows you to implement your own coordination if there are
+    inter-branch ordering concerns.
+
+*/
+
 const {
   Repository,
   Reference,

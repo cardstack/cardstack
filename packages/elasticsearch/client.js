@@ -33,11 +33,6 @@ module.exports = class SearchClient {
   }
 
   async accomodateSchema(branch, schema) {
-    // 1. load our current mappings if we haven't already
-    // 2. see if schema is a subset of them, in which case we skip #3.
-    // 3. introduce new fields via putMappings.
-    // 4. update the metadata for this branch with our mapping decisions.
-
     let haveMapping = await this._rewriteMapping(branch, await this._esMapping(branch), 'esFieldToLogical');
     let wantMapping = schema.mapping();
     if (this._stableMapping(haveMapping, wantMapping)) {
@@ -53,7 +48,6 @@ module.exports = class SearchClient {
       });
       await this._reindex(tmpIndex, branch);
     }
-
   }
 
   // this is async because we may not have loaded our mappings, but
