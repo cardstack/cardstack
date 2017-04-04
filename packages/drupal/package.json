@@ -1,0 +1,22 @@
+{
+  "name": "@cardstack/drupal",
+  "version": "0.0.6",
+  "description": "Drupal data source plugin for @cardstack/hub.",
+  "repository": "https://github.com/cardstack/cardstack",
+  "author": "Edward Faulkner <edward@eaf4.com>",
+  "license": "MIT",
+  "engines": {
+    "node": ">= 7.7"
+  },
+  "devDependencies": {
+  },
+  "dependencies": {
+  },
+  "keywords": [
+    "cardstack-plugin",
+    "ember-addon"
+  ],
+  "cardstack-plugin": {
+    "api-version": 1
+  }
+}
