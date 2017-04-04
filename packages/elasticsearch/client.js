@@ -6,10 +6,7 @@ function host() {
   return process.env.ELASTICSEARCH || 'http://10.0.15.2:9200';
 }
 
-// This is a temporary stop on the refactoring path toward fields that
-// have their names remapped on demand. Right now we're remapping
-// *every* field just to make sure we can.
-const fieldPrefix = 'trouble';
+const fieldPrefix = '';
 
 /*
   the SearchClient holds a connection to elasticsearch plus additional
