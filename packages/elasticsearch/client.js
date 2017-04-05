@@ -14,10 +14,10 @@ const branchPrefix = process.env.ELASTICSEARCH_PREFIX || 'content';
   information about how we're mapping our logical schema into
   elasticsearch's mappings.
 
-  we use the _meta key in elasticsearch's mappings to give each ES
-  field a logical name. Logical names are allowed to collide, because
-  different branches can have different types for the same field name,
-  whereas real ES fields are not allowed to collide.
+  we will use the _meta key in elasticsearch's mappings to give each
+  ES field a logical name. Logical names are allowed to collide,
+  because different branches can have different types for the same
+  field name, whereas real ES fields are not allowed to collide.
 */
 module.exports = class SearchClient {
   constructor() {
