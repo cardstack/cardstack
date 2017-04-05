@@ -78,6 +78,14 @@ const formatters = {
     } catch (err) {
       return value;
     }
+  },
+  text_with_summary(value) {
+    if (!value) { return value; }
+    try {
+      return JSON.parse(value.value);
+    } catch (err) {
+      return value.value;
+    }
   }
 };
 
