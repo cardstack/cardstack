@@ -146,8 +146,10 @@ class Downloader {
 
   async saveRecord(record) {
     let { type, id } = record;
-    await mkdirp([this.outdir, type].join('/'));
-    await writeFile([this.outdir, type, id + '.json'].join('/'), JSON.stringify({
+    let section = ['content-types', 'fields'].includes(type) ? 'schema' : 'content';
+    let dir = [this.outdir, section, type].join('/');
+    await mkdirp(dir);
+    await writeFile([dir, id + '.json'].join('/'), JSON.stringify({
       attributes: record.attributes,
       relationships: record.relationships
     }, null, 2));
