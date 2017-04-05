@@ -64,6 +64,12 @@ const taxonomyFields = [
   'vid'
 ];
 
+// it's awkward having a field named "type" because our query APIs
+// can't readily distinguish it from the actual jsonapi type.
+const defaultFieldRemapping = [
+  [/./, /^type$/, 'drupal_type']
+];
+
 const formatters = {
   boolean(value) {
     return value === '1';
@@ -109,6 +115,7 @@ class Downloader {
     this.outdir = outdir;
     this.custom = custom;
     this.formatters = Object.assign({}, formatters, custom.formatters);
+    this.fieldRemapping = custom.fieldRemapping.concat(defaultFieldRemapping);
     this.fieldTypes = {};
   }
 
@@ -128,7 +135,7 @@ class Downloader {
   }
 
   rewriteFieldName(typeName, fieldName) {
-    for (let [typePattern, fieldPattern, replacement] of this.custom.fieldRemapping) {
+    for (let [typePattern, fieldPattern, replacement] of this.fieldRemapping) {
       if (typePattern.test(typeName) && fieldPattern.test(fieldName)) {
         return fieldName.replace(fieldPattern, replacement);
       }
