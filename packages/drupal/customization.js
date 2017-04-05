@@ -41,19 +41,19 @@ exports.fieldTypes = [
   ['sponsors', "@cardstack/mobiledoc"],
   ['staff', "@cardstack/mobiledoc"],
   ['summary', "@cardstack/mobiledoc"],
-  ['ad_links', "@cardstack/core-types::object"],
-  ['chapters', "@cardstack/core-types::object"],
-  ['crops', "@cardstack/core-types::object"],
-  ['image_captions', "@cardstack/core-types::object"],
-  ['image_titles', "@cardstack/core-types::object"],
-  ['page_references', "@cardstack/core-types::object"],
-  ['pick_lists', "@cardstack/core-types::object"],
-  ['product_reference', "@cardstack/core-types::object"],
-  ['showcase_image_captions', "@cardstack/core-types::object"],
-  ['tabs', "@cardstack/core-types::object"],
-  ['tile_labels', "@cardstack/core-types::object"],
-  ['tile_links', "@cardstack/core-types::object"],
-  ['updates', "@cardstack/core-types::object"],
+  ['ad_links', "@cardstack/core-types::any"],
+  ['chapters', "@cardstack/core-types::any"],
+  ['crops', "@cardstack/core-types::any"],
+  ['image_captions', "@cardstack/core-types::any"],
+  ['image_titles', "@cardstack/core-types::any"],
+  ['page_references', "@cardstack/core-types::any"],
+  ['pick_lists', "@cardstack/core-types::any"],
+  ['product_reference', "@cardstack/core-types::any"],
+  ['showcase_image_captions', "@cardstack/core-types::any"],
+  ['tabs', "@cardstack/core-types::any"],
+  ['tile_labels', "@cardstack/core-types::any"],
+  ['tile_links', "@cardstack/core-types::any"],
+  ['updates', "@cardstack/core-types::any"],
   [/_text_box/, "@cardstack/core-types::string"],
   [/_box$/, "@cardstack/mobiledoc"]
 ];
@@ -75,7 +75,7 @@ exports.formatters = {
       return value;
     }
   },
-  '@cardstack/core-types::object': function(value) {
+  '@cardstack/core-types::any': function(value) {
     if (value) {
       return JSON.parse(value);
     } else {
