@@ -37,7 +37,7 @@ describe('server/indexers', function() {
   after(async function() {
     await temp.cleanup();
     let ea = new ElasticAssert();
-    await ea.deleteAllIndices();
+    await ea.deleteContentIndices();
   });
 
 

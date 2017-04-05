@@ -7,6 +7,7 @@ function host() {
 }
 
 const fieldPrefix = '';
+const branchPrefix = process.env.ELASTICSEARCH_PREFIX || 'content';
 
 /*
   the SearchClient holds a connection to elasticsearch plus additional
@@ -68,7 +69,11 @@ module.exports = class SearchClient {
   }
 
   static branchToIndexName(branch) {
-    return `content_${branch}`;
+    return `${branchPrefix}_${branch}`;
+  }
+
+  static get branchPrefix() {
+    return branchPrefix;
   }
 
   async _rewriteMapping(branch, mapping, nameRewriter) {

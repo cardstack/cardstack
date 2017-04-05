@@ -39,7 +39,7 @@ describe('git/indexer', function() {
 
   afterEach(async function() {
     await temp.cleanup();
-    await ea.deleteAllIndices();
+    await ea.deleteContentIndices();
   });
 
   it('processes first empty branch', async function() {

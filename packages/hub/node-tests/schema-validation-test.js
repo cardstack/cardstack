@@ -86,7 +86,7 @@ describe('schema/validation', function() {
 
   after(async function() {
     let ea = new ElasticAssert();
-    await ea.deleteAllIndices();
+    await ea.deleteContentIndices();
   });
 
   it("rejects unknown type", async function() {

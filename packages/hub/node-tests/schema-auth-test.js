@@ -40,7 +40,7 @@ describe('schema/auth', function() {
 
   afterEach(async function() {
     let ea = new ElasticAssert();
-    await ea.deleteAllIndices();
+    await ea.deleteContentIndices();
   });
 
   it("forbids creation", async function() {

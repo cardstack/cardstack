@@ -105,6 +105,14 @@ describe('jsonapi', function() {
     expect(response.body).has.deep.property('data[0].attributes.title', 'Hello world');
   });
 
+  it('can use query string', async function() {
+    let response = await request.get('/articles?q=second');
+    expect(response).hasStatus(200);
+    expect(response.body).has.property('data');
+    expect(response.body.data).length(1);
+    expect(response.body).has.deep.property('data[0].attributes.title', 'Second');
+  });
+
   it('can paginate a collection resource', async function() {
     let response = await request.get('/articles?page[size]=1&sort=title');
     expect(response).hasStatus(200, 'first request');

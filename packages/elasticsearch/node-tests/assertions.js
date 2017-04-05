@@ -10,7 +10,7 @@ module.exports = class ElasticAsserter {
     return Object.keys(i);
   }
   async contentIndices() {
-    let i = await this.client.es.indices.get({ index: 'content_*' });
+    let i = await this.client.es.indices.get({ index: `${Client.branchPrefix}_*` });
     return Object.keys(i);
   }
   async aliases() {
@@ -25,10 +25,11 @@ module.exports = class ElasticAsserter {
   }
   async contentAliases() {
     let output = new Map();
-    let i = await this.client.es.indices.getAlias({ index: 'content_*' });
+    let i = await this.client.es.indices.getAlias({ index: `${Client.branchPrefix}_*` });
     for (let index of Object.keys(i)) {
       for (let alias of Object.keys(i[index].aliases)) {
-        output.set(alias.replace(/^content_/, ''), index.replace(/^content_/, ''));
+        let pattern = new RegExp('^' + Client.branchPrefix + '_');
+        output.set(alias.replace(pattern, ''), index.replace(pattern, ''));
       }
     }
     return output;
@@ -36,8 +37,8 @@ module.exports = class ElasticAsserter {
   async indexerState(branch, repoPath) {
     return this.client.es.getSource({ index: branchToIndexName(branch), type: 'meta', id: `git/${repoPath}` });
   }
-  async deleteAllIndices() {
-    return this.client.es.indices.delete({ index: '_all' });
+  async deleteContentIndices() {
+    return this.client.es.indices.delete({ index: `${Client.branchPrefix}_*` });
   }
   async documentContents(branch, type, id) {
     return this.client.es.getSource({ index: branchToIndexName(branch), type, id: `${branch}/${id}` });

@@ -109,7 +109,7 @@ exports.destroyDefaultEnvironment = async function(/* env */) {
 
 async function destroyIndices() {
   let ea = new ElasticAssert();
-  await ea.deleteAllIndices();
+  await ea.deleteContentIndices();
 }
 
 function inDependencyOrder(models) {

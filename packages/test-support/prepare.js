@@ -35,6 +35,12 @@ if (!process.env['DEBUG']) {
   };
 }
 
+if (!process.env['ELASTICSEARCH_PREFIX']) {
+  // Avoid stomping on any existing content in elasticsearch by
+  // namespacing the test indices differently.
+  process.env['ELASTICSEARCH_PREFIX'] = 'test';
+}
+
 let expected = new Map();
 
 global.expectLogMessage = async function(pattern, fn) {
