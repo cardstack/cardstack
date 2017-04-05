@@ -89,7 +89,7 @@ module.exports = class SchemaCache {
         filter: {
           type: Schema.ownTypes()
         },
-        page: { size: 100 }
+        page: { size: 1000 }
       });
       if (page.cursor) {
         throw new Error("query for schema models had insufficient page size");

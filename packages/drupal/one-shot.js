@@ -106,6 +106,7 @@ class Downloader {
     this.drupalURL = drupalURL;
     this.outdir = outdir;
     this.fields = {};
+    this.fieldTypeOverrides = {};
   }
   get(url) {
     let authorization = 'Basic ' + new Buffer(process.env.DRUPAL_USER + ':' + process.env.DRUPAL_PASS, 'utf8').toString('base64');
@@ -146,7 +147,7 @@ class Downloader {
 
   async saveRecord(record) {
     let { type, id } = record;
-    let section = ['content-types', 'fields'].includes(type) ? 'schema' : 'content';
+    let section = ['content-types', 'fields'].includes(type) ? 'schema' : 'contents';
     let dir = [this.outdir, section, type].join('/');
     await mkdirp(dir);
     await writeFile([dir, id + '.json'].join('/'), JSON.stringify({
@@ -187,6 +188,15 @@ class Downloader {
       if (formatters[fieldType]) {
         value = formatters[fieldType](value);
       }
+
+      if ((fieldType === 'string_long' || fieldType === 'string') && value && typeof value !== 'string') {
+        if (value.hasOwnProperty('atoms')) {
+          this.fieldTypeOverrides[k] = 'mobiledoc';
+        } else {
+          this.fieldTypeOverrides[k] = 'any';
+        }
+      }
+
       if (['entity_reference', 'file'].includes(fieldType)) {
         if (!output.relationships) {
           output.relationships = {};
@@ -204,18 +214,31 @@ class Downloader {
 
   rewriteFieldType(fieldType, sampleValue) {
     switch (fieldType) {
+    case 'mobiledoc':
+      return `@cardstack/mobiledoc`;
     case 'entity_reference':
+    case 'file':
       if (sampleValue && Array.isArray(sampleValue.data)) {
-        return `@cardstack/core_types::has-many`;
+        return `@cardstack/core-types::has-many`;
       } else {
-        return `@cardstack/core_types::belongs-to`;
+        return `@cardstack/core-types::belongs-to`;
       }
+    case 'decimal':
+    case 'text_with_summary':
+    case 'string_long':
+      return `@cardstack/core-types::string`;
+    case 'datetime':
+      return `@cardstack/core-types::date`;
     default:
-      return `@cardstack/core_types::${fieldType}`;
+      return `@cardstack/core-types::${fieldType}`;
     }
   }
 
   async createField(origFieldName, fieldType, sampleValue) {
+    if (this.fieldTypeOverrides[origFieldName]) {
+      fieldType = this.fieldTypeOverrides[origFieldName];
+    }
+
     let fieldName = this.rewriteFieldName(origFieldName);
     if (this.fields[fieldName]){
       if (!this.fields[fieldName] === fieldType) {
@@ -291,21 +314,20 @@ class Downloader {
 
   async run() {
     for (let type of (await this.getCollection('/taxonomy_vocabulary/taxonomy_vocabulary'))) {
-      await this.defineTaxonomyType(type);
       let records = await this.getCollection(`/taxonomy_term/${type.attributes.vid}`);
       for (let record of records) {
         await this.saveRecord(this.rewriteRecord(record, []));
       }
+      await this.defineTaxonomyType(type);
     }
     for (let type of (await this.getNodeTypes())) {
       let fields = await this.getFields(type);
       let records = await this.getCollection(`/node/${type.attributes.type}`);
-      if (records.length > 0) {
-        await this.defineContentType(type, fields, records[0]);
-      }
-
       for (let record of records) {
         await this.saveRecord(this.rewriteRecord(record, fields));
+      }
+      if (records.length > 0) {
+        await this.defineContentType(type, fields, records[0]);
       }
     }
   }
