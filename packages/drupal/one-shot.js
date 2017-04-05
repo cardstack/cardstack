@@ -250,7 +250,7 @@ class Downloader {
         try {
           value = this.formatters[cardstackType](value);
         } catch (err) {
-          console.log(`formatter failed for ${cardstackType} ${fieldName} ${value}`);
+          process.stderr.write(`formatter failed for ${cardstackType} ${fieldName} ${value}\n`);
           throw err;
         }
       }
