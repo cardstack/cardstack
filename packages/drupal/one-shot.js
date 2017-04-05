@@ -24,14 +24,45 @@ const baseFields = {
   type: 'entity_reference',
   uid: 'entity_reference',
   revision_uid: 'entity_reference',
-
-  // taxonomy specific
   tid: 'integer',
   name: 'string',
   description: 'string',
   weight: 'integer',
   parent: 'entity_reference'
 };
+
+const nodeBaseFields = [
+  'nid',
+  'uuid',
+  'vid',
+  'langcode',
+  'title',
+  'status',
+  'created',
+  'changed',
+  'promote',
+  'sticky',
+  'revision_timestamp',
+  'revision_log',
+  'revision_translation_affected',
+  'default_langcode',
+  'path',
+  'type',
+  'uid',
+  'revision_uid'
+];
+
+const taxonomyFields = [
+  'tid',
+  'langcode',
+  'name',
+  'description',
+  'weight',
+  'changed',
+  'default_langcode',
+  'path',
+  'vid'
+];
 
 
 const formatters = {
@@ -74,6 +105,7 @@ class Downloader {
   constructor({ drupalURL, outdir }) {
     this.drupalURL = drupalURL;
     this.outdir = outdir;
+    this.fields = {};
   }
   get(url) {
     let authorization = 'Basic ' + new Buffer(process.env.DRUPAL_USER + ':' + process.env.DRUPAL_PASS, 'utf8').toString('base64');
@@ -138,6 +170,9 @@ class Downloader {
       type: this.rewriteType(record.type)
     };
     for (let [k,value] of Object.entries(record.attributes).concat(Object.entries(record.relationships))) {
+      // uuid is always redundant because the drupal jsonapi module
+      // uses it as the jsonapi id.
+      if (k === 'uuid') { continue; }
       let fieldType;
       let field = fields.find(f => f.attributes.field_name === k);
       if (field) {
@@ -165,17 +200,108 @@ class Downloader {
     return output;
   }
 
+  rewriteFieldType(fieldType, sampleValue) {
+    switch (fieldType) {
+    case 'entity_reference':
+      if (sampleValue && Array.isArray(sampleValue.data)) {
+        return `@cardstack/core_types::has-many`;
+      } else {
+        return `@cardstack/core_types::belongs-to`;
+      }
+    default:
+      return `@cardstack/core_types::${fieldType}`;
+    }
+  }
+
+  async createField(origFieldName, fieldType, sampleValue) {
+    let fieldName = this.rewriteFieldName(origFieldName);
+    if (this.fields[fieldName]){
+      if (!this.fields[fieldName] === fieldType) {
+        throw new Error(`${fieldName} has conflicting types`);
+      }
+      return;
+    }
+
+    this.fields[fieldName] = fieldType;
+    await this.saveRecord({
+      type: 'fields',
+      id: fieldName,
+      attributes: {
+        'field-type': this.rewriteFieldType(fieldType, sampleValue)
+      }
+    });
+  }
+
+  async defineTaxonomyType(type) {
+    let contentType = {
+      type: 'content-types',
+      id: type.attributes.vid,
+      relationships: {
+        fields: {
+          data: taxonomyFields.map(t => ({ type: 'fields', id: t }))
+        }
+      }
+    };
+    await this.saveRecord(contentType);
+
+    // the only relationships (parent) is always plural
+    let sample = { data: [] };
+
+    for (let f of taxonomyFields) {
+      await this.createField(f, baseFields[f], sample);
+    }
+  }
+
+  async defineContentType(type, fields, sample) {
+    let contentType = {
+      type: 'content-types',
+      id: type.attributes.type,
+      relationships: {
+        fields: {
+          data: nodeBaseFields.map(t => ({ type: 'fields', id: t }))
+            .concat(fields.map(f => ({ type: 'fields', id: this.rewriteFieldName(f.attributes.field_name) })))
+        }
+      }
+    };
+    await this.saveRecord(contentType);
+    for (let f of nodeBaseFields) {
+      let fieldType = baseFields[f];
+      let sampleValue;
+      if (['entity_reference', 'file'].includes(fieldType)) {
+        sampleValue = sample.relationships[f];
+      } else {
+        sampleValue = sample.attributes[f];
+      }
+      await this.createField(f, fieldType, sampleValue);
+    }
+    for (let f of fields) {
+      let fieldType = f.attributes.field_type;
+      let fieldName = f.attributes.field_name;
+      let sampleValue;
+      if (['entity_reference', 'file'].includes(fieldType)) {
+        sampleValue = sample.relationships[fieldName];
+      } else {
+        sampleValue = sample.attributes[fieldName];
+      }
+      await this.createField(fieldName, fieldType, sampleValue);
+    }
+  }
+
   async run() {
     for (let type of (await this.getCollection('/taxonomy_vocabulary/taxonomy_vocabulary'))) {
+      await this.defineTaxonomyType(type);
       let records = await this.getCollection(`/taxonomy_term/${type.attributes.vid}`);
       for (let record of records) {
         await this.saveRecord(this.rewriteRecord(record, []));
       }
     }
-
     for (let type of (await this.getNodeTypes())) {
       let fields = await this.getFields(type);
       let records = await this.getCollection(`/node/${type.attributes.type}`);
+      if (records.length > 0) {
+        await this.defineContentType(type, fields, records[0]);
+      }
+
       for (let record of records) {
         await this.saveRecord(this.rewriteRecord(record, fields));
       }
