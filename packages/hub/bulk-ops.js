@@ -1,3 +1,5 @@
+const _ = require('lodash');
+
 class BulkOps {
   constructor(es, { realTime, batchSize }) {
     this.es = es;
@@ -29,7 +31,15 @@ class BulkOps {
       return item[op].error;
     });
     if (failedOperations.length > 0) {
-      throw new Error(`Some bulk operations failed: ${JSON.stringify(failedOperations)}`);
+      // to avoid massive log spam, we want to collate based on
+      // repeating error messages and only log a few examples of each
+      // problem if there are many instances.
+      let ops = failedOperations.map(op => op[Object.keys(op)[0]]);
+      let reasons = _.uniq(ops.map(op => op.error.reason)).map(reason => {
+        let locations = ops.filter(op => op.error.reason === reason).map(op => `${op._type}/${op._id}`);
+        return { reason, examples: locations.slice(0, 3) };
+      });
+      throw new Error(`Some bulk operations failed: ${JSON.stringify(reasons, null, 2)}`);
     }
   }
 }
