@@ -64,8 +64,8 @@ const taxonomyFields = [
   'vid'
 ];
 
-// it's awkward having a field named "type" because our query APIs
-// can't readily distinguish it from the actual jsonapi type.
+// The JSONAPI spec doesn't allow "type" as a field name. I filed a
+// bug upstream: https://www.drupal.org/node/2867462
 const defaultFieldRemapping = [
   [/./, /^type$/, 'drupal_type']
 ];
