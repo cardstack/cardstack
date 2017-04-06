@@ -38,7 +38,6 @@
   },
   "devDependencies": {
     "broccoli-asset-rev": "^2.4.5",
-    "broccoli-merge-trees": "^2.0.0",
     "@cardstack/core-types": "*",
     "@cardstack/mobiledoc": "*",
     "@cardstack/routing": "*",
@@ -66,6 +65,7 @@
     "node": ">= 4"
   },
   "ember-addon": {
-    "configPath": "tests/dummy/config"
+    "configPath": "tests/dummy/config",
+    "before": "@cardstack/routing"
   }
 }
