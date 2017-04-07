@@ -13,6 +13,7 @@
   "description": "Stock API server for the Cardstack tech stack.",
   "dependencies": {
     "koa": "2",
+    "koa-better-router": "^2.1.1",
     "@cardstack/elasticsearch":"*",
     "heimdalljs-logger": "^0.1.8",
     "commander": "^2.9.0",
