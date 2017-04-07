@@ -13,11 +13,11 @@
   "dependencies": {
     "@cardstack/plugin-utils":"*",
     "koa-better-router": "^2.1.1",
-    "koa-json-body": "^5.3.0",
-    "heimdalljs-logger": "^0.1.8"
+    "koa-json-body": "^5.3.0"
   },
   "devDependencies": {
     "koa": "2",
+    "koa-mount": "^3.0.0",
     "@cardstack/eslint-config":"*",
     "@cardstack/test-support":"*",
     "supertest": "^2.0.1"
