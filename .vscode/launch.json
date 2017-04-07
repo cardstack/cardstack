@@ -27,6 +27,16 @@
         {
             "type": "node",
             "request": "launch",
+            "name": "Launch Oauth2-client Program",
+            "program": "${workspaceRoot}/packages/oauth2-client/bin/server.js",
+            "cwd": "${workspaceRoot}",
+            "runtimeArgs": [
+                "--harmony"
+            ]
+        },
+        {
+            "type": "node",
+            "request": "launch",
             "name": "Launch Test Suite",
             "program": "${workspaceRoot}/node_modules/.bin/_mocha",
             "cwd": "${workspaceRoot}",

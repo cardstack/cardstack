@@ -19,14 +19,15 @@ module.exports = function() {
     koaJSONBody({ limit: '1mb' }),
     async function(ctxt) {
       ctxt.response.set('Access-Control-Allow-Origin', '*');
-      let body = ctxt.request.body;
 
+      let body = ctxt.request.body;
       if (!body.authorizationCode) {
         ctxt.response.set('Content-Type', 'application/json');
         ctxt.status = 400;
         ctxt.body = { errors: [ new Error("missing required field 'authorizationCode'", { status: 400 }) ] };
         return;
       }
+
       let payload = {
         client_id: '2680c97f309a904b41b0',
         client_secret: process.env.GITHUB_CLIENT_SECRET,
@@ -35,6 +36,7 @@ module.exports = function() {
       if (body.state) {
         payload.state = body.state;
       }
+
       let data = JSON.stringify(payload);
       let options = {
         hostname: 'github.com',
@@ -48,23 +50,63 @@ module.exports = function() {
           'User-Agent': '@cardstack/oauth2-client'
         }
       };
-      await forwardHttpsRequest(ctxt, options, data);
+      let { response, body: responseBody } = await httpsRequest(options, data);
+      if (response.statusCode !== 200) {
+        ctxt.status = response.statusCode;
+        ctxt.body = { errors: [ new Error(responseBody.error), {
+          status: response.statusCode,
+          upstream: responseBody
+        } ] };
+        return;
+      }
+
+      options = {
+        hostname: 'api.github.com',
+        port: 443,
+        path: '/user',
+        method: 'GET',
+        headers: {
+          'Accept': 'application/json',
+          'User-Agent': '@cardstack/oauth2-client',
+          Authorization: `token ${responseBody.access_token}`
+        }
+      };
+      let userResponse = await httpsRequest(options);
+      if (userResponse.response.statusCode !== 200) {
+        ctxt.status = response.statusCode;
+        ctxt.body = { errors: [ new Error(responseBody.error), {
+          status: response.statusCode,
+          upstream: responseBody
+        } ] };
+        return;
+      }
+      ctxt.status = 200;
+      ctxt.body = {
+        email: userResponse.body.email,
+        name: userResponse.body.name,
+        id: userResponse.body.id,
+        avatarURL: userResponse.body.avatar_url
+      };
     }
   ]);
 
   return router.middleware();
 };
 
-function forwardHttpsRequest(ctxt, options, data) {
+function httpsRequest(options, data) {
   return new Promise((resolve,reject) => {
     let ghReq = https.request(options, (ghRes) => {
-      ctxt.status = ghRes.statusCode;
-      ctxt.response.set('content-type', ghRes.headers['content-type']);
-      ctxt.body = ghRes;
-      resolve();
+      let body = '';
+      ghRes.setEncoding('utf8');
+      ghRes.on('data', chunk => body += chunk);
+      ghRes.on('end', () => {
+        resolve({ response: ghRes, body: JSON.parse(body) });
+      });
     });
     ghReq.on('error', reject);
-    ghReq.write(data);
+    if (data) {
+      ghReq.write(data);
+    }
     ghReq.end();
   });
 }
