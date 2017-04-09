@@ -19,6 +19,10 @@ module.exports = class Grant {
     this.groupId = null;
     this.types = null;
     this.fields = null;
+    this.id = document.id;
+    if (this.id == null) {
+      throw new Error(`grant must have an id: ${JSON.stringify(document)}`);
+    }
 
     if (rels.fields) {
       this.fields = rels.fields.data.map(ref => ref.id);

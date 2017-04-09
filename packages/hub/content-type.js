@@ -1,7 +1,7 @@
 const Error = require('@cardstack/plugin-utils/error');
 
 module.exports = class ContentType {
-  constructor(model, allFields, dataSources, defaultDataSource, allGrants) {
+  constructor(model, allFields, dataSources, defaultDataSource, allGrants, authLog) {
     let fields = new Map();
     for (let fieldRef of model.relationships.fields.data) {
       let field = allFields.get(fieldRef.id);
@@ -28,6 +28,7 @@ module.exports = class ContentType {
       this.dataSource = null;
     }
     this.grants = allGrants.filter(g => g.types == null || g.types.includes(model.id));
+    this.authLog = authLog;
   }
 
   async validate(pendingChange, context) {
@@ -96,20 +97,30 @@ module.exports = class ContentType {
   }
 
   async _validateResourceLevelAuthorization(pendingChange, context) {
-    if (!pendingChange.finalDocument) {
-      if (!this.grants.find(g => g['may-delete-resource'] && g.matches(pendingChange.originalDocument, context))) {
+    let { originalDocument, finalDocument } = pendingChange;
+    if (!finalDocument) {
+      let grant = this.grants.find(g => g['may-delete-resource'] && g.matches(originalDocument, context));
+      if (grant) {
+        this.authLog.debug("approved deletion of %s %s because of grant %s", originalDocument.type, originalDocument.id, grant.id);
+      } else {
         throw new Error("You may not delete this resource", { status: 401 });
       }
-    } else if (!pendingChange.originalDocument) {
-      if (!this.grants.find(g => g['may-create-resource'] && g.matches(pendingChange.finalDocument, context))) {
+    } else if (!originalDocument) {
+      let grant = this.grants.find(g => g['may-create-resource'] && g.matches(finalDocument, context));
+      if (grant) {
+        this.authLog.debug("approved creation of %s %s because of grant %s", finalDocument.type, finalDocument.id, grant.id);
+      } else {
         throw new Error("You may not create this resource", { status: 401 });
       }
     } else {
-      if (!this.grants.find(
+      let grant = this.grants.find(
         g => g['may-update-resource'] &&
-          g.matches(pendingChange.finalDocument, context) &&
-          g.matches(pendingChange.originalDocument, context))
-         ) {
+          g.matches(finalDocument, context) &&
+          g.matches(originalDocument, context)
+      );
+      if (grant) {
+        this.authLog.debug("approved update of %s %s because of grant %s", finalDocument.type, finalDocument.id, grant.id);
+      } else {
         throw new Error("You may not update this resource", { status: 401 });
       }
     }

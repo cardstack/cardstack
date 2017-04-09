@@ -26,7 +26,7 @@ module.exports = class Schema {
     let dataSources = findDataSources(models, plugins);
     let defaultDataSource = findDefaultDataSource(plugins);
     schemaLog.debug('default data source %j', defaultDataSource);
-    let types = findTypes(models, fields, dataSources, defaultDataSource, grants);
+    let types = findTypes(models, fields, dataSources, defaultDataSource, grants, authLog);
     return new this(types, fields, dataSources, inputModels);
   }
 
@@ -201,11 +201,11 @@ function findDefaultDataSource(plugins) {
   }
 }
 
-function findTypes(models, fields, dataSources, defaultDataSource, grants) {
+function findTypes(models, fields, dataSources, defaultDataSource, grants, authLog) {
   let types = new Map();
   for (let model of models) {
     if (model.type === 'content-types') {
-      types.set(model.id, new ContentType(model, fields, dataSources, defaultDataSource, grants));
+      types.set(model.id, new ContentType(model, fields, dataSources, defaultDataSource, grants, authLog));
     }
   }
   return types;
