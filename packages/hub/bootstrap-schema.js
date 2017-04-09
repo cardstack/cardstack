@@ -78,7 +78,7 @@ const models = [
     relationships: {
       fields: {
         data: [
-          { type: 'fields', id: 'group-id' },
+          { type: 'fields', id: 'who' },
           { type: 'fields', id: 'may-create-resource' },
           { type: 'fields', id: 'may-update-resource' },
           { type: 'fields', id: 'may-delete-resource' },
@@ -128,6 +128,13 @@ const models = [
     id: 'type',
     attributes: {
       'field-type': '@cardstack/core-types::type'
+    }
+  },
+  {
+    type: 'fields',
+    id: 'who',
+    attributes: {
+      'field-type': '@cardstack/core-types::belongs-to'
     }
   },
   {

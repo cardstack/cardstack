@@ -60,7 +60,8 @@ module.exports = class SchemaCache {
   // Instantiates a Schema, while respecting any seedModels. This
   // method does not alter the schemaCache's own state.
   async schemaFrom(models) {
-    return Schema.loadFrom(this.seedModels.concat(models));
+    let types = Schema.ownTypes();
+    return Schema.loadFrom(this.seedModels.concat(models).filter(s => types.includes(s.type)));
   }
 
   // When Indexers reads a branch, it necessarily reads the schema
@@ -118,7 +119,8 @@ class BootstrapSchemaCache {
   }
   async schemaForBranch() {
     if (!this.schema) {
-      this.schema = await Schema.loadFrom(this.seedModels);
+      let types = Schema.ownTypes();
+      this.schema = await Schema.loadFrom(this.seedModels.filter(s => types.includes(s.type)));
     }
     return this.schema;
   }

@@ -112,8 +112,8 @@ module.exports = class Writer {
 
   _commitOptions(operation, type, id, user) {
     return {
-      authorName: user.fullName,
-      authorEmail: user.email,
+      authorName: user ? user.fullName : 'Anonymous Coward',
+      authorEmail: user ? user.email : 'anon@example.com',
       committerName: this.myName,
       committerEmail: this.myEmail,
       message: `${operation} ${type} ${id.slice(12)}`

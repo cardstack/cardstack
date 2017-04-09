@@ -102,6 +102,7 @@ module.exports = class ContentType {
       let grant = this.grants.find(g => g['may-delete-resource'] && g.matches(originalDocument, context));
       if (grant) {
         this.authLog.debug("approved deletion of %s %s because of grant %s", originalDocument.type, originalDocument.id, grant.id);
+        this.authLog.trace("grant %s = %j", grant.id, grant);
       } else {
         throw new Error("You may not delete this resource", { status: 401 });
       }
@@ -109,6 +110,7 @@ module.exports = class ContentType {
       let grant = this.grants.find(g => g['may-create-resource'] && g.matches(finalDocument, context));
       if (grant) {
         this.authLog.debug("approved creation of %s %s because of grant %s", finalDocument.type, finalDocument.id, grant.id);
+        this.authLog.trace("grant %s = %j", grant.id, grant);
       } else {
         throw new Error("You may not create this resource", { status: 401 });
       }
@@ -120,6 +122,7 @@ module.exports = class ContentType {
       );
       if (grant) {
         this.authLog.debug("approved update of %s %s because of grant %s", finalDocument.type, finalDocument.id, grant.id);
+        this.authLog.trace("grant %s = %j", grant.id, grant);
       } else {
         throw new Error("You may not update this resource", { status: 401 });
       }

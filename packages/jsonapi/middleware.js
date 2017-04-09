@@ -42,10 +42,7 @@ class Handler {
   }
 
   get user() {
-    return {
-      fullName: 'Anonymous Coward',
-      email: 'anon@example.com'
-    };
+    return this.ctxt.state.cardstackUser;
   }
 
   filterExpression(type, id) {

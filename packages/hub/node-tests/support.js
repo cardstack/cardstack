@@ -39,12 +39,11 @@ exports.createDefaultEnvironment = async function(initialModels = []) {
 
   factory.addResource('grants')
     .withAttributes({
-      groupId: 'the-default-test-user',
       mayCreateResource: true,
       mayUpdateResource: true,
       mayDeleteResource: true,
       mayWriteField: true
-    });
+    }).withRelated('who', factory.addResource('groups', 'the-default-test-user'));
 
   let schemaCache = new SchemaCache(factory.getModels());
 
@@ -105,6 +104,18 @@ exports.createDefaultEnvironment = async function(initialModels = []) {
 exports.destroyDefaultEnvironment = async function(/* env */) {
   await destroyIndices();
   await temp.cleanup();
+};
+
+exports.TestAuthenticator = class {
+  constructor(initialUser) {
+    this.user = initialUser;
+  }
+  middleware() {
+    return async (ctxt, next) => {
+      ctxt.state.cardstackUser = this.user;
+      await next();
+    };
+  }
 };
 
 async function destroyIndices() {

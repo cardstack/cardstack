@@ -15,7 +15,7 @@ describe('oauth2-client', function() {
   afterEach(async function() {
   }),
 
-  it('can get an individual resource', async function() {
+  it.skip('can get an individual resource', async function() {
     let response = await request.post('/').send({
       data: {
         type: 'bogus',

@@ -3,15 +3,15 @@ const supertest = require('supertest');
 const Koa = require('koa');
 const {
   createDefaultEnvironment,
-  destroyDefaultEnvironment
+  destroyDefaultEnvironment,
+  TestAuthenticator
 } = require('@cardstack/hub/node-tests/support');
 const { currentVersion } = require('./support');
 const JSONAPIFactory = require('@cardstack/test-support/jsonapi-factory');
-const { grantAllPermissions } = require('@cardstack/test-support/permissions');
 
 describe('jsonapi/middleware', function() {
 
-  let request, env;
+  let request, env, authenticator;
 
   async function sharedSetup() {
     let factory = new JSONAPIFactory();
@@ -33,8 +33,6 @@ describe('jsonapi/middleware', function() {
         factory.getResource('fields', 'title')
       ]);
 
-    grantAllPermissions(factory);
-
     factory.addResource('articles', 0)
       .withAttributes({
         title: "Hello world",
@@ -47,8 +45,10 @@ describe('jsonapi/middleware', function() {
         body: "This is the second article"
       });
 
-    env = await createDefaultEnvironment(factory.getModels());
     let app = new Koa();
+    env = await createDefaultEnvironment(factory.getModels());
+    authenticator = new TestAuthenticator(env.user);
+    app.use(authenticator.middleware());
     app.use(jsonapi(env.searcher, env.writers));
     request = supertest(app.callback());
   }
@@ -308,6 +308,50 @@ describe('jsonapi/middleware', function() {
 
       response = await request.get('/articles/0');
       expect(response).hasStatus(404);
+    });
+
+
+  });
+
+  describe("auth tests", function() {
+    before(sharedSetup);
+    after(sharedTeardown);
+
+    it('applies authorization during create', async function() {
+      authenticator.user = null;
+      let response = await request.post('/articles').send({
+        data: {
+          type: 'articles',
+          attributes: {
+            title: 'I am new',
+            body: 'xxx'
+          }
+        }
+      });
+      expect(response.status).to.equal(401);
+    });
+
+    it('applies authorization during update', async function() {
+      authenticator.user = null;
+      let version = await currentVersion(request, '/articles/0');
+      let response = await request.patch('/articles/0').send({
+        data: {
+          id: '0',
+          type: 'articles',
+          attributes: {
+            title: 'Updated title'
+          },
+          meta: { version }
+        }
+      });
+      expect(response).hasStatus(401);
+    });
+
+    it('applies authorization during delete', async function() {
+      authenticator.user = null;
+      let version = await currentVersion(request, '/articles/0');
+      let response = await request.delete('/articles/0').set('If-Match', version);
+      expect(response).hasStatus(401);
     });
 
 

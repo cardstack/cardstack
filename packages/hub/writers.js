@@ -15,7 +15,7 @@ class Writers extends EventEmitter {
     let writer = this._lookupWriter(schema, type);
     let isSchema = schema.constructor.ownTypes().includes(type);
     let pending = await writer.prepareCreate(branch, user, type, document, isSchema);
-    let newSchema = await schema.validate(pending, { type });
+    let newSchema = await schema.validate(pending, { type, user });
     let response = await this._finalizeAndReply(pending);
     if (newSchema) {
       this.schemaCache.notifyBranchUpdate(branch, newSchema);
@@ -30,7 +30,7 @@ class Writers extends EventEmitter {
     let writer = this._lookupWriter(schema, type);
     let isSchema = schema.constructor.ownTypes().includes(type);
     let pending = await writer.prepareUpdate(branch, user, type, id, document, isSchema);
-    let newSchema = await schema.validate(pending, { type, id });
+    let newSchema = await schema.validate(pending, { type, id, user });
     let response = await this._finalizeAndReply(pending);
     if (newSchema) {
       this.schemaCache.notifyBranchUpdate(branch, newSchema);
@@ -45,7 +45,7 @@ class Writers extends EventEmitter {
     let writer = this._lookupWriter(schema, type);
     let isSchema = schema.constructor.ownTypes().includes(type);
     let pending = await writer.prepareDelete(branch, user, version, type, id, isSchema);
-    let newSchema = await schema.validate(pending, {});
+    let newSchema = await schema.validate(pending, { user });
     await pending.finalize();
     if (newSchema) {
       this.schemaCache.notifyBranchUpdate(branch, newSchema);
