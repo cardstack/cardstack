@@ -7,12 +7,6 @@ const Writers = require('@cardstack/hub/writers');
 const ElasticAssert = require('@cardstack/elasticsearch/node-tests/assertions');
 const JSONAPIFactory = require('@cardstack/test-support/jsonapi-factory');
 
-let user = {
-  id: 'the-default-test-user',
-  fullName: 'Default Test Environment',
-  email: 'test@example.com'
-};
-
 exports.createDefaultEnvironment = async function(initialModels = []) {
   let repoPath = await temp.mkdir('cardstack-server-test');
 
@@ -21,6 +15,11 @@ exports.createDefaultEnvironment = async function(initialModels = []) {
   let { head, repo } = await makeRepo(repoPath);
 
   let factory = new JSONAPIFactory();
+
+  let user = factory.addResource('users', 'the-default-test-user').withAttributes({
+    fullName: 'Default Test Environment',
+    email: 'test@example.com'
+  });
 
   factory.addResource('plugin-configs')
     .withAttributes({
@@ -43,7 +42,7 @@ exports.createDefaultEnvironment = async function(initialModels = []) {
       mayUpdateResource: true,
       mayDeleteResource: true,
       mayWriteField: true
-    }).withRelated('who', factory.addResource('groups', 'the-default-test-user'));
+    }).withRelated('who', factory.addResource('groups', user.id));
 
   let schemaCache = new SchemaCache(factory.getModels());
 
@@ -83,7 +82,7 @@ exports.createDefaultEnvironment = async function(initialModels = []) {
     // to build up the entire state in the same way an end user would
     // via JSONAPI requests. If we optimize this away, we should also
     // add some tests like that that are similarly comprehensive.
-    let response = await writers.create('master', user, model.type, model);
+    let response = await writers.create('master', user.data, model.type, model);
     head = response.meta.version;
   }
 
@@ -93,7 +92,7 @@ exports.createDefaultEnvironment = async function(initialModels = []) {
     searcher,
     indexer,
     writers,
-    user,
+    user: user.data,
     schemaCache,
     head,
     repo,
@@ -111,8 +110,14 @@ exports.TestAuthenticator = class {
     this.user = initialUser;
   }
   middleware() {
+    let self = this;
     return async (ctxt, next) => {
-      ctxt.state.cardstackUser = this.user;
+      ctxt.state.cardstackSession = {
+        userId: self.user ? self.user.id : null,
+        async loadUser() {
+          return self.user;
+        }
+      };
       await next();
     };
   }

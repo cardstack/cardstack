@@ -41,8 +41,11 @@ class Handler {
     this.log = log;
   }
 
-  get user() {
-    return this.ctxt.state.cardstackUser;
+  async loadUser() {
+    let session = this.ctxt.state.cardstackSession;
+    if (session) {
+      return session.loadUser();
+    }
   }
 
   filterExpression(type, id) {
@@ -99,7 +102,8 @@ class Handler {
 
   async handleIndividualPATCH(type, id) {
     let data = this._mandatoryBodyData();
-    let record = await this.writers.update(this.branch, this.user, type, id, data);
+    let user = await this.loadUser();
+    let record = await this.writers.update(this.branch, user, type, id, data);
     this.ctxt.body = { data: record };
     this.ctxt.status = 200;
   }
@@ -107,7 +111,8 @@ class Handler {
   async handleIndividualDELETE(type, id) {
     try {
       let version = this.ctxt.header['if-match'];
-      await this.writers.delete(this.branch, this.user, version, type, id);
+      let user = await this.loadUser();
+      await this.writers.delete(this.branch, user, version, type, id);
       this.ctxt.status = 204;
     } catch (err) {
       // By convention, the writer always refers to the version as
@@ -139,7 +144,8 @@ class Handler {
 
   async handleCollectionPOST(type) {
     let data = this._mandatoryBodyData();
-    let record = await this.writers.create(this.branch, this.user, type, data);
+    let user = await this.loadUser();
+    let record = await this.writers.create(this.branch, user, type, data);
     this.ctxt.body = { data: record };
     this.ctxt.status = 201;
     this.ctxt.set('location', this.ctxt.request.path + '/' + record.id);
