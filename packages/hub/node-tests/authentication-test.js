@@ -14,13 +14,20 @@ describe('hub/authentication', function() {
 
   before(async function() {
     let factory = new JSONAPIFactory();
+
+    factory.addResource('plugin-configs').withAttributes({
+      module: '@cardstack/hub/node-tests/stub-authenticators'
+    });
+
     env = await createDefaultEnvironment(factory.getModels());
     let key = crypto.randomBytes(32);
-    auth = new Authentication(key, env.searcher);
+    let schema = await env.schemaCache.schemaForControllingBranch();
+    auth = new Authentication(key, env.searcher, schema.plugins);
     let app = new Koa();
     app.use(auth.middleware());
     app.use(async function(ctxt) {
       ctxt.set('Content-Type', 'application/json');
+      console.log("nuking body");
       ctxt.body = {};
       let session = ctxt.state.cardstackSession;
       if (session) {
@@ -65,4 +72,39 @@ describe('hub/authentication', function() {
     expect(response.body.user).deep.equals(env.user);
   });
 
+  describe('token endpoints', async function() {
+
+    it('supports CORS preflight', async function() {
+      let response = await request.options('/auth/foo');
+      expect(response).hasStatus(200);
+      expect(response.headers['access-control-allow-methods']).matches(/POST/);
+    });
+
+    it('supports CORS', async function() {
+      await expectLogMessage(/No such authenticator foo/, async () => {
+        let response = await request.post('/auth/foo').send({});
+        expect(response.headers['access-control-allow-origin']).equals('*');
+      });
+    });
+
+    it('returns not found for missing module', async function() {
+      await expectLogMessage(/No such authenticator foo/, async () => {
+        let response = await request.post('/auth/foo').send({});
+        expect(response).hasStatus(404);
+      });
+    });
+
+    it('finds configured authenticator', async function() {
+      let response = await request.post(`/auth/${authenticatorName('stub')}`).send({});
+      expect(response).hasStatus(400);
+      expect(response.body.errors).collectionContains({
+        detail: "password is required"
+      });
+    });
+
+  });
 });
+
+function authenticatorName(shortName) {
+  return encodeURIComponent(`@cardstack/hub/node-tests/stub-authenticators::${shortName}`)  ;
+}
