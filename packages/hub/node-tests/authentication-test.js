@@ -168,27 +168,28 @@ describe('hub/authentication', function() {
     });
 
     it.skip('can create a new user', async function() {
-      let response = await request.post(`/auth/${authenticatorName('writes-user')}`).send({
-        id: 'x',
-        type: 'users',
-        attributes: {
-          'full-name': 'Somebody Created'
+      let response = await request.post(`/auth/${authenticatorName('echo')}`).send({
+        userId: '4321',
+        details: {
+          firstName: 'Arthur',
+          lastName: 'Faulkner'
         }
       });
       expect(response).hasStatus(200);
-      expect(response.body).has.property('userId', 'x');
-      expect(response.body.user).deep.equals({
-        id: 'x',
-        type: 'users',
-        attributes: {
-          'full-name': 'Somebody Created'
-        }
-      });
+      expect(response.body).has.property('token');
 
       await env.indexer.update({ realTime: true });
 
-      let record = await env.searcher.get('master', 'users', 'x');
-      expect(record).has.deep.property('attributes.full-name', 'Somebody Created');
+      response = await request.get('/').set('authorization', `Bearer ${response.body.token}`);
+      expect(response).hasStatus(200);
+      expect(response.body.userId).equals('my-prefix/4321');
+      expect(response.body.user).deep.equals({
+        id: 'my-prefix/4321',
+        type: 'users',
+        attributes: {
+          'full-name': 'Arthur Faulkner'
+        }
+      });
     });
 
     it.skip('can update a user', async function() {
