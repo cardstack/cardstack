@@ -10,13 +10,53 @@ const crypto = require('crypto');
 
 describe('hub/authentication', function() {
 
-  let request, env, auth;
+  let request, env, auth, quint, arthur;
 
   before(async function() {
     let factory = new JSONAPIFactory();
 
     factory.addResource('plugin-configs').withAttributes({
       module: '@cardstack/hub/node-tests/stub-authenticators'
+    });
+
+    quint = factory.addResource('users').withAttributes({
+      email: 'quint@example.com',
+      fullName: "Quint Faulkner"
+    });
+
+    arthur = factory.addResource('users').withAttributes({
+      email: 'arthur@example.com',
+      fullName: "Arthur Faulkner"
+    });
+
+    factory.addResource('authentication-sources', 'echo').withAttributes({
+      authenticatorType: '@cardstack/hub/node-tests/stub-authenticators::echo'
+    });
+
+    factory.addResource('authentication-sources', 'returns-nothing').withAttributes({
+      authenticatorType: '@cardstack/hub/node-tests/stub-authenticators::returns-nothing'
+    });
+
+    factory.addResource('authentication-sources', 'by-email').withAttributes({
+      authenticatorType: '@cardstack/hub/node-tests/stub-authenticators::by-email'
+    });
+
+    factory.addResource('authentication-sources', 'always-invalid').withAttributes({
+      authenticatorType: '@cardstack/hub/node-tests/stub-authenticators::always-invalid'
+    });
+
+    factory.addResource('authentication-sources', 'config-echo-quint').withAttributes({
+      authenticatorType: '@cardstack/hub/node-tests/stub-authenticators::config-echo',
+      params: {
+        userId: quint.id
+      }
+    });
+
+    factory.addResource('authentication-sources', 'config-echo-arthur').withAttributes({
+      authenticatorType: '@cardstack/hub/node-tests/stub-authenticators::config-echo',
+      params: {
+        userId: arthur.id
+      }
     });
 
     factory.addResource('content-types', 'users').withRelated('fields', [
@@ -28,10 +68,6 @@ describe('hub/authentication', function() {
       })
     ]);
 
-    factory.addResource('users', '58238').withAttributes({
-      email: 'nobody@nowhere.com',
-      fullName: "He's a real nowhere man"
-    });
 
     env = await createDefaultEnvironment(factory.getModels());
     let key = crypto.randomBytes(32);
@@ -83,10 +119,15 @@ describe('hub/authentication', function() {
     expect(response.body).has.property('userId', env.user.id);
   });
 
+
+  it('token comes with validity timestamp', async function() {
+    let { validUntil } = await auth.createToken({ userId: env.user.id }, 30);
+    expect(validUntil).is.a('number');
+  });
+
   it('offers full user load within session', async function() {
     let { token } = await auth.createToken({ userId: env.user.id }, 30);
     let response = await request.get('/').set('authorization', `Bearer ${token}`);
-    debugger;
     expect(response.body.user).deep.equals(env.user);
   });
 
@@ -99,30 +140,58 @@ describe('hub/authentication', function() {
     });
 
     it('supports CORS', async function() {
-      await expectLogMessage(/No such authenticator foo/, async () => {
-        let response = await request.post('/auth/foo').send({});
-        expect(response.headers['access-control-allow-origin']).equals('*');
-      });
+      let response = await request.post('/auth/foo').send({});
+      expect(response.headers['access-control-allow-origin']).equals('*');
     });
 
     it('returns not found for missing module', async function() {
-      await expectLogMessage(/No such authenticator foo/, async () => {
-        let response = await request.post('/auth/foo').send({});
-        expect(response).hasStatus(404);
-      });
+      let response = await request.post('/auth/foo').send({});
+      expect(response).hasStatus(404);
     });
 
     it('finds authenticator', async function() {
-      let response = await request.post(`/auth/${authenticatorName('unsafe')}`).send({ userId: env.user.id });
+      let response = await request.post(`/auth/echo`).send({ userId: env.user.id });
       expect(response).hasStatus(200);
+    });
+
+    it('responds with token', async function() {
+      let response = await request.post(`/auth/echo`).send({ userId: env.user.id });
+      expect(response).hasStatus(200);
+      expect(response.body.token).is.a('string');
+    });
+
+    it('responds with validity timestamp', async function() {
+      let response = await request.post(`/auth/echo`).send({ userId: env.user.id });
+      expect(response).hasStatus(200);
+      expect(response.body.validUntil).is.a('number');
+    });
+
+    it('responds with a copy of the user record', async function() {
+      let response = await request.post(`/auth/echo`).send({ userId: env.user.id });
+      expect(response).hasStatus(200);
+      expect(response.body.user).deep.equals(env.user);
     });
 
   });
 
-  describe('authenticator plugin', function() {
+  describe('token issuers', function() {
+
+    it('can run with multiple configs', async function() {
+      let response = await request.post(`/auth/config-echo-quint`).send({
+        userId: 'ignored'
+      });
+      expect(response).hasStatus(200);
+      expect(response.body).has.deep.property('user.id', quint.id);
+
+      response = await request.post(`/auth/config-echo-arthur`).send({
+        userId: 'ignored'
+      });
+      expect(response).hasStatus(200);
+      expect(response.body).has.deep.property('user.id', arthur.id);
+    });
 
     it('can approve via id', async function() {
-      let response = await request.post(`/auth/${authenticatorName('unsafe')}`).send({
+      let response = await request.post(`/auth/echo`).send({
         userId: env.user.id
       });
       expect(response).hasStatus(200);
@@ -135,7 +204,7 @@ describe('hub/authentication', function() {
     });
 
     it('can throw', async function() {
-      let response = await request.post(`/auth/${authenticatorName('always-invalid')}`).send({});
+      let response = await request.post(`/auth/always-invalid`).send({});
       expect(response).hasStatus(400);
       expect(response.body.errors).collectionContains({
         detail: "Your input is terrible and you should feel bad"
@@ -143,32 +212,33 @@ describe('hub/authentication', function() {
     });
 
     it('can reject by returning no id', async function() {
-      let response = await request.post(`/auth/${authenticatorName('returns-no-id')}`).send({
+      let response = await request.post(`/auth/echo`).send({
       });
       expect(response).hasStatus(401);
     });
 
     it('can reject by returning nothing', async function() {
-      let response = await request.post(`/auth/${authenticatorName('returns-nothing')}`).send({
+      let response = await request.post(`/auth/returns-nothing`).send({
       });
       expect(response).hasStatus(401);
     });
 
     it('can search for users', async function() {
-      let response = await request.post(`/auth/${authenticatorName('by-email')}`).send({
-        email: 'nobody@nowhere.com'
+      let response = await request.post(`/auth/by-email`).send({
+        email: 'quint@example.com'
       });
       expect(response).hasStatus(200);
       expect(response.body).has.property('token');
+      expect(response.body).has.deep.property('user.id', quint.id);
 
       response = await request.get('/').set('authorization', `Bearer ${response.body.token}`);
       expect(response).hasStatus(200);
-      expect(response.body).has.property('userId', '58238');
-      expect(response.body.user).has.deep.property('attributes.full-name', "He's a real nowhere man");
+      expect(response.body).has.property('userId', quint.id);
+      expect(response.body.user).has.deep.property('attributes.full-name', "Quint Faulkner");
     });
 
     it.skip('can create a new user', async function() {
-      let response = await request.post(`/auth/${authenticatorName('echo')}`).send({
+      let response = await request.post(`/auth/echo`).send({
         userId: '4321',
         details: {
           firstName: 'Arthur',
@@ -192,27 +262,71 @@ describe('hub/authentication', function() {
       });
     });
 
-    it.skip('can update a user', async function() {
-      let response = await request.post(`/auth/${authenticatorName('writes-user')}`).send({
-        id: env.user.id,
-        type: 'users',
-        attributes: {
-          email: 'updated.email@this-changed.com'
+    it.skip('ignores user create when not configured', async function() {
+      let response = await request.post(`/auth/echo`).send({
+        userId: '4321',
+        details: {
+          firstName: 'Arthur',
+          lastName: 'Faulkner'
         }
       });
       expect(response).hasStatus(200);
-      expect(response.body).has.property('userId', env.user.id);
+      expect(response.body).has.property('token');
+      expect(response.body).has.deep.property('user.id', 'my-prefix/4321');
 
       await env.indexer.update({ realTime: true });
-      let record = await env.searcher.get('master', 'users', env.user.id);
-      expect(record).has.deep.property('attributes.email', 'updated.email@this-changed.com');
-      expect(record).has.deep.property('attributes.full-name', env.user.attributes['full-name']);
+
+      response = await request.get('/').set('authorization', `Bearer ${response.body.token}`);
+      expect(response).hasStatus(200);
+      expect(response.body.user).has.property('error');
+      expect(response.body.userId).equals('my-prefix/4321');
     });
+
+    it.skip('can update a user', async function() {
+      let response = await request.post(`/auth/echo`).send({
+        userId: env.user.id,
+        details: {
+         email: 'updated.email@this-changed.com'
+        }
+      });
+      expect(response).hasStatus(200);
+      expect(response.body).has.property('token');
+
+      await env.indexer.update({ realTime: true });
+
+      response = await request.get('/').set('authorization', `Bearer ${response.body.token}`);
+      expect(response).hasStatus(200);
+      expect(response.body.userId).equals(env.user.id);
+      expect(response.body.user).deep.equals({
+        id: env.user.id,
+        type: 'users',
+        attributes: Object.assign({}, env.user.attributes, { email: 'updated.email@this-changed.com' })
+      });
+    });
+
+    it('ignores user update when not configured', async function() {
+      let response = await request.post(`/auth/echo`).send({
+        userId: env.user.id,
+        details: {
+         email: 'updated.email@this-changed.com'
+        }
+      });
+      expect(response).hasStatus(200);
+      expect(response.body).has.property('token');
+
+      await env.indexer.update({ realTime: true });
+
+      response = await request.get('/').set('authorization', `Bearer ${response.body.token}`);
+      expect(response).hasStatus(200);
+      expect(response.body.userId).equals(env.user.id);
+      expect(response.body.user).deep.equals({
+        id: env.user.id,
+        type: 'users',
+        attributes: Object.assign({}, env.user.attributes)
+      });
+    });
+
 
 
   });
 });
-
-function authenticatorName(shortName) {
-  return encodeURIComponent(`@cardstack/hub/node-tests/stub-authenticators::${shortName}`)  ;
-}

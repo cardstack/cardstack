@@ -1,5 +1,5 @@
 const Error = require('@cardstack/plugin-utils/error');
-exports.authenticate = async function({ email }, userSearcher) {
+exports.authenticate = async function({ email }, config, userSearcher) {
   if (email == null) {
     throw new Error("email is required", { status: 400 });
   }

@@ -30,6 +30,9 @@ class Authentication {
     };
 
     this.plugins = plugins;
+    this.searcher = searcher;
+    this.controllingBranch = controllingBranch;
+    this.userContentType = userContentType;
   }
 
   async createToken(sessionPayload, validSeconds) {
@@ -88,36 +91,23 @@ class Authentication {
     });
   }
 
-  _locateAuthenticatorPlugin(name) {
-    try {
-      return this.plugins.lookup('authenticators', name);
-    } catch(err) {
-      if (/Unknown authenticators/.test(err.message)) {
-        this.log.warn(`No such authenticator ${name}`);
-      } else {
-        throw err;
-      }
-    }
+  async _locateAuthenticationSource(name) {
+    let source = await this.searcher.get(this.controllingBranch, 'authentication-sources', name);
+    let plugin = this.plugins.lookup('authenticators', source.attributes['authenticator-type']);
+    return { plugin, params: source.attributes['params']};
   }
 
-  async _invokeAuthenticatorPlugin(ctxt, plugin) {
-    try {
-      let result = await plugin.authenticate(ctxt.request.body, this.userSearcher);
-      if (!result || result.userId == null) {
-        ctxt.status = 401;
-        return;
-      }
-      ctxt.body = await this.createToken({ userId: result.userId }, 86400);
-      ctxt.status = 200;
-    } catch (err) {
-      if (!err.isCardstackError) { throw err; }
-      let errors = [err];
-      if (err.additionalErrors) {
-        errors = errors.concat(err.additionalErrors);
-      }
-      ctxt.body = { errors };
-      ctxt.status = errors[0].status;
+  async _invokeAuthenticationSource(ctxt, source) {
+    let { plugin, params } = source;
+    let result = await plugin.authenticate(ctxt.request.body, params, this.userSearcher);
+    if (!result || result.userId == null) {
+      ctxt.status = 401;
+      return;
     }
+    let response = await this.createToken({ userId: result.userId }, 86400);
+    response.user = await this.userSearcher.get(result.userId);
+    ctxt.body = response;
+    ctxt.status = 200;
   }
 
   _tokenIssuer(prefix){
@@ -125,9 +115,19 @@ class Authentication {
       koaJSONBody({ limit: '1mb' }),
       async (ctxt) => {
         ctxt.response.set('Access-Control-Allow-Origin', '*');
-        let plugin = this._locateAuthenticatorPlugin(ctxt.routeParams.module);
-        if (plugin) {
-          await this._invokeAuthenticatorPlugin(ctxt, plugin);
+        try {
+          let source = await this._locateAuthenticationSource(ctxt.routeParams.module);
+          if (source) {
+            await this._invokeAuthenticationSource(ctxt, source);
+          }
+        } catch (err) {
+          if (!err.isCardstackError) { throw err; }
+          let errors = [err];
+          if (err.additionalErrors) {
+            errors = errors.concat(err.additionalErrors);
+          }
+          ctxt.body = { errors };
+          ctxt.status = errors[0].status;
         }
       }
     ]));

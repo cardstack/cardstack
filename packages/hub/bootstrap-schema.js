@@ -117,8 +117,30 @@ const models = [
     }
   },
   {
+    type: 'content-types',
+    id: 'authentication-sources',
+    attributes: {
+      'is-built-in': true
+    },
+    relationships: {
+      fields: {
+        data: [
+          { type: 'fields', id: 'authenticator-type' },
+          { type: 'fields', id: 'params' }
+        ]
+      }
+    }
+  },
+  {
     type: 'fields',
     id: 'source-type',
+    attributes: {
+      'field-type': '@cardstack/core-types::string'
+    }
+  },
+  {
+    type: 'fields',
+    id: 'authenticator-type',
     attributes: {
       'field-type': '@cardstack/core-types::string'
     }
