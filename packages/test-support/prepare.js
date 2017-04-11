@@ -33,6 +33,21 @@ if (!process.env['DEBUG']) {
       throw new Error("Unexpected log message during tests: " + logLine);
     }
   };
+  let expected = new Map();
+
+  global.expectLogMessage = async function(pattern, fn) {
+    expected.set(pattern, 0);
+    await fn();
+    let count = expected.get(pattern);
+    expected.delete(pattern);
+    if (count !== 1) {
+      throw new Error(`Expected a log mesage to match ${pattern} but none did`);
+    }
+  };
+} else {
+  global.expectLogMessage = async function(pattern, fn) {
+    await fn();
+  };
 }
 
 if (!process.env['ELASTICSEARCH_PREFIX']) {
@@ -40,15 +55,3 @@ if (!process.env['ELASTICSEARCH_PREFIX']) {
   // namespacing the test indices differently.
   process.env['ELASTICSEARCH_PREFIX'] = 'test';
 }
-
-let expected = new Map();
-
-global.expectLogMessage = async function(pattern, fn) {
-  expected.set(pattern, 0);
-  await fn();
-  let count = expected.get(pattern);
-  expected.delete(pattern);
-  if (count !== 1) {
-    throw new Error(`Expected a log mesage to match ${pattern} but none did`);
-  }
-};
