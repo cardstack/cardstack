@@ -15,8 +15,18 @@ class Authentication {
     let userContentType = 'users';
     let controllingBranch = 'master';
 
-    this.userLookup = async function(userId) {
-      return searcher.get(controllingBranch, userContentType, userId);
+    this.userSearcher = {
+      get(userId) {
+        return searcher.get(controllingBranch, userContentType, userId);
+      },
+      search(params) {
+        let { filter } = params;
+        if (!filter) {
+          filter = {};
+        }
+        filter.type = userContentType;
+        return searcher.search(controllingBranch, Object.assign({}, params, { filter }));
+      }
     };
 
     this.plugins = plugins;
@@ -24,7 +34,10 @@ class Authentication {
 
   async createToken(sessionPayload, validSeconds) {
     let validUntil = Math.floor(Date.now()/1000 + validSeconds);
-    return this.encryptor.encryptAndSign([sessionPayload, validUntil]);
+    return {
+      token: this.encryptor.encryptAndSign([sessionPayload, validUntil]),
+      validUntil
+    };
   }
 
   _tokenToSession(token) {
@@ -33,7 +46,7 @@ class Authentication {
       if (validUntil <= Date.now()/1000) {
         this.log.debug("Ignoring expired token");
       } else {
-        return new Session(sessionPayload, this.userLookup);
+        return new Session(sessionPayload, this.userSearcher);
       }
     } catch (err) {
       if (/unable to authenticate data|invalid key length/.test(err.message)) {
@@ -47,13 +60,13 @@ class Authentication {
   middleware() {
     const prefix = 'auth';
     return compose([
-      this.tokenVerifier(),
-      this.tokenIssuerPreflight(prefix),
-      this.tokenIssuer(prefix)
+      this._tokenVerifier(),
+      this._tokenIssuerPreflight(prefix),
+      this._tokenIssuer(prefix)
     ]);
   }
 
-  tokenVerifier() {
+  _tokenVerifier() {
     return async (ctxt, next) => {
       let m = bearerTokenPattern.exec(ctxt.header['authorization']);
       if (m) {
@@ -66,7 +79,7 @@ class Authentication {
     };
   }
 
-  tokenIssuerPreflight(prefix) {
+  _tokenIssuerPreflight(prefix) {
     return route.options(`/${prefix}/:module`,  async (ctxt) => {
       ctxt.response.set('Access-Control-Allow-Origin', '*');
       ctxt.response.set('Access-Control-Allow-Methods', 'POST,OPTIONS');
@@ -75,39 +88,46 @@ class Authentication {
     });
   }
 
-  tokenIssuer(prefix){
+  _locateAuthenticatorPlugin(name) {
+    try {
+      return this.plugins.lookup('authenticators', name);
+    } catch(err) {
+      if (/Unknown authenticators/.test(err.message)) {
+        this.log.warn(`No such authenticator ${name}`);
+      } else {
+        throw err;
+      }
+    }
+  }
+
+  async _invokeAuthenticatorPlugin(ctxt, plugin) {
+    try {
+      let result = await plugin.authenticate(ctxt.request.body, this.userSearcher);
+      if (!result || result.userId == null) {
+        ctxt.status = 401;
+        return;
+      }
+      ctxt.body = await this.createToken({ userId: result.userId }, 86400);
+      ctxt.status = 200;
+    } catch (err) {
+      if (!err.isCardstackError) { throw err; }
+      let errors = [err];
+      if (err.additionalErrors) {
+        errors = errors.concat(err.additionalErrors);
+      }
+      ctxt.body = { errors };
+      ctxt.status = errors[0].status;
+    }
+  }
+
+  _tokenIssuer(prefix){
     return route.post(`/${prefix}/:module`, compose([
       koaJSONBody({ limit: '1mb' }),
       async (ctxt) => {
         ctxt.response.set('Access-Control-Allow-Origin', '*');
-        let plugin;
-        try {
-          plugin = this.plugins.lookup('authenticators', ctxt.routeParams.module);
-        } catch(err) {
-          if (/Unknown authenticators/.test(err.message)) {
-            this.log.warn(`No such authenticator ${ctxt.routeParams.module}`);
-          } else {
-            throw err;
-          }
-        }
-        if (!plugin) {
-          ctxt.status = 404;
-          return;
-        }
-        try {
-          let result = await plugin.authenticate(ctxt.request.body);
-          if (!result || result.id == null) {
-            ctxt.status = 401;
-            return;
-          }
-        } catch (err) {
-          if (!err.isCardstackError) { throw err; }
-          let errors = [err];
-          if (err.additionalErrors) {
-            errors = errors.concat(err.additionalErrors);
-          }
-          ctxt.body = { errors };
-          ctxt.status = errors[0].status;
+        let plugin = this._locateAuthenticatorPlugin(ctxt.routeParams.module);
+        if (plugin) {
+          await this._invokeAuthenticatorPlugin(ctxt, plugin);
         }
       }
     ]));

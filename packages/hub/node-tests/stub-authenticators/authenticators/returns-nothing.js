@@ -1,0 +1,2 @@
+exports.authenticate = async function() {
+};

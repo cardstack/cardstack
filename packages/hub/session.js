@@ -1,7 +1,7 @@
 class Session {
-  constructor(payload, userLookup) {
+  constructor(payload, userSearcher) {
     this.payload = payload;
-    this.userLookup = userLookup;
+    this.userSearcher = userSearcher;
   }
   get userId() {
     return this.payload.userId;
@@ -9,7 +9,7 @@ class Session {
   async loadUser() {
     let id = this.userId;
     if (id != null) {
-      return this.userLookup(id);
+      return this.userSearcher.get(id);
     }
   }
 }

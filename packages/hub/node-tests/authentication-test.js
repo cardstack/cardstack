@@ -19,6 +19,20 @@ describe('hub/authentication', function() {
       module: '@cardstack/hub/node-tests/stub-authenticators'
     });
 
+    factory.addResource('content-types', 'users').withRelated('fields', [
+      factory.addResource('fields', 'full-name').withAttributes({
+        fieldType: '@cardstack/core-types::string'
+      }),
+      factory.addResource('fields', 'email').withAttributes({
+        fieldType: '@cardstack/core-types::string'
+      })
+    ]);
+
+    factory.addResource('users', '58238').withAttributes({
+      email: 'nobody@nowhere.com',
+      fullName: "He's a real nowhere man"
+    });
+
     env = await createDefaultEnvironment(factory.getModels());
     let key = crypto.randomBytes(32);
     let schema = await env.schemaCache.schemaForControllingBranch();
@@ -31,7 +45,11 @@ describe('hub/authentication', function() {
       let session = ctxt.state.cardstackSession;
       if (session) {
         ctxt.body.userId = session.userId;
-        ctxt.body.user = await session.loadUser();
+        try {
+          ctxt.body.user = await session.loadUser();
+        } catch (err) {
+          ctxt.body.user = { error: err };
+        }
       }
     });
     request = supertest(app.callback());
@@ -54,20 +72,21 @@ describe('hub/authentication', function() {
   });
 
   it('ignores expired token', async function() {
-    let token = await auth.createToken({ userId: 42 }, -30);
+    let { token } = await auth.createToken({ userId: 42 }, -30);
     let response = await request.get('/').set('authorization', `Bearer ${token}`);
     expect(response.body).deep.equals({});
   });
 
   it('issues a working token', async function() {
-    let token = await auth.createToken({ userId: env.user.id }, 30);
+    let { token } = await auth.createToken({ userId: env.user.id }, 30);
     let response = await request.get('/').set('authorization', `Bearer ${token}`);
     expect(response.body).has.property('userId', env.user.id);
   });
 
   it('offers full user load within session', async function() {
-    let token = await auth.createToken({ userId: env.user.id }, 30);
+    let { token } = await auth.createToken({ userId: env.user.id }, 30);
     let response = await request.get('/').set('authorization', `Bearer ${token}`);
+    debugger;
     expect(response.body.user).deep.equals(env.user);
   });
 
@@ -93,13 +112,107 @@ describe('hub/authentication', function() {
       });
     });
 
-    it('finds configured authenticator', async function() {
-      let response = await request.post(`/auth/${authenticatorName('stub')}`).send({});
+    it('finds authenticator', async function() {
+      let response = await request.post(`/auth/${authenticatorName('unsafe')}`).send({ userId: env.user.id });
+      expect(response).hasStatus(200);
+    });
+
+  });
+
+  describe('authenticator plugin', function() {
+
+    it('can approve via id', async function() {
+      let response = await request.post(`/auth/${authenticatorName('unsafe')}`).send({
+        userId: env.user.id
+      });
+      expect(response).hasStatus(200);
+      expect(response.body).has.property('token');
+      expect(response.body).has.property('validUntil');
+      response = await request.get('/').set('authorization', `Bearer ${response.body.token}`);
+      expect(response).hasStatus(200);
+      expect(response.body).has.property('userId', env.user.id);
+      expect(response.body.user).deep.equals(env.user);
+    });
+
+    it('can throw', async function() {
+      let response = await request.post(`/auth/${authenticatorName('always-invalid')}`).send({});
       expect(response).hasStatus(400);
       expect(response.body.errors).collectionContains({
-        detail: "password is required"
+        detail: "Your input is terrible and you should feel bad"
       });
     });
+
+    it('can reject by returning no id', async function() {
+      let response = await request.post(`/auth/${authenticatorName('returns-no-id')}`).send({
+      });
+      expect(response).hasStatus(401);
+    });
+
+    it('can reject by returning nothing', async function() {
+      let response = await request.post(`/auth/${authenticatorName('returns-nothing')}`).send({
+      });
+      expect(response).hasStatus(401);
+    });
+
+    it('can search for user resource and avoid reloading it in session', async function() {
+      let response = await request.post(`/auth/${authenticatorName('preload-user-by-email')}`).send({
+        email: 'nobody@nowhere.com'
+      });
+      expect(response).hasStatus(200);
+      expect(response.body.user).deep.equals({
+        id: '58238',
+        type: 'users',
+        attributes: {
+          email: 'nobody@nowhere.com',
+          'full-name': "He's a real nowhere man"
+        },
+        meta: {
+          preloadedByTheTestStub: true
+        }
+      });
+    });
+
+    it.skip('can create a new user', async function() {
+      let response = await request.post(`/auth/${authenticatorName('writes-user')}`).send({
+        id: 'x',
+        type: 'users',
+        attributes: {
+          'full-name': 'Somebody Created'
+        }
+      });
+      expect(response).hasStatus(200);
+      expect(response.body).has.property('userId', 'x');
+      expect(response.body.user).deep.equals({
+        id: 'x',
+        type: 'users',
+        attributes: {
+          'full-name': 'Somebody Created'
+        }
+      });
+
+      await env.indexer.update({ realTime: true });
+
+      let record = await env.searcher.get('master', 'users', 'x');
+      expect(record).has.deep.property('attributes.full-name', 'Somebody Created');
+    });
+
+    it.skip('can update a user', async function() {
+      let response = await request.post(`/auth/${authenticatorName('writes-user')}`).send({
+        id: env.user.id,
+        type: 'users',
+        attributes: {
+          email: 'updated.email@this-changed.com'
+        }
+      });
+      expect(response).hasStatus(200);
+      expect(response.body).has.property('userId', env.user.id);
+
+      await env.indexer.update({ realTime: true });
+      let record = await env.searcher.get('master', 'users', env.user.id);
+      expect(record).has.deep.property('attributes.email', 'updated.email@this-changed.com');
+      expect(record).has.deep.property('attributes.full-name', env.user.attributes['full-name']);
+    });
+
 
   });
 });
