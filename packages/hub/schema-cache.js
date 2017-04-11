@@ -65,7 +65,7 @@ module.exports = class SchemaCache {
   }
 
   // When Indexers reads a branch, it necessarily reads the schema
-  // first. And when Writers make a change t as schema model, they
+  // first. And when Writers make a change to a schema model, they
   // need to derive the new schema to make sure it's safe. In either
   // case, the new schema is already available, so this method allows
   // us to push it into the cache.
