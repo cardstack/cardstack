@@ -23,7 +23,8 @@
     "debug": "^2.6.3",
     "jsondiffpatch": "^0.2.4",
     "lodash": "^4.17.4",
-    "denodeify": "^1.2.1"
+    "denodeify": "^1.2.1",
+    "handlebars": "^4.0.6"
   },
   "devDependencies": {
     "@cardstack/eslint-config":"*",

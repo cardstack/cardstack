@@ -5,6 +5,7 @@ const bearerTokenPattern = /bearer +(.*)$/i;
 const compose = require('koa-compose');
 const route = require('koa-better-route');
 const koaJSONBody = require('koa-json-body');
+const Handlebars = require('handlebars');
 
 class Authentication {
   constructor(key, searcher, plugins) {
@@ -94,20 +95,32 @@ class Authentication {
   async _locateAuthenticationSource(name) {
     let source = await this.searcher.get(this.controllingBranch, 'authentication-sources', name);
     let plugin = this.plugins.lookup('authenticators', source.attributes['authenticator-type']);
-    return { plugin, params: source.attributes['params']};
+    return { plugin, source };
   }
 
-  async _invokeAuthenticationSource(ctxt, source) {
-    let { plugin, params } = source;
+  async _invokeAuthenticationSource(ctxt, sourceAndPlugin) {
+    let { source, plugin } = sourceAndPlugin;
+    let params = source.attributes.params;
     let result = await plugin.authenticate(ctxt.request.body, params, this.userSearcher);
     if (!result || result.userId == null) {
       ctxt.status = 401;
       return;
     }
-    let response = await this.createToken({ userId: result.userId }, 86400);
-    response.user = await this.userSearcher.get(result.userId);
+
+    let externalUser = this._rewriteExternalUser(result.userId, result.externalUser, source.attributes['user-template']);
+
+    let response = await this.createToken({ userId: externalUser.id }, 86400);
+    response.user = result.preloadedUser || await this.userSearcher.get(externalUser.id);
     ctxt.body = response;
     ctxt.status = 200;
+  }
+
+  _rewriteExternalUser(userId, externalUser, userTemplate) {
+    if (!userTemplate) {
+      return externalUser || { id: userId };
+    }
+    let compiled = Handlebars.compile(userTemplate);
+    return JSON.parse(compiled(Object.assign({ userId }, externalUser)));
   }
 
   _tokenIssuer(prefix){
@@ -116,9 +129,9 @@ class Authentication {
       async (ctxt) => {
         ctxt.response.set('Access-Control-Allow-Origin', '*');
         try {
-          let source = await this._locateAuthenticationSource(ctxt.routeParams.module);
-          if (source) {
-            await this._invokeAuthenticationSource(ctxt, source);
+          let sourceAndPlugin = await this._locateAuthenticationSource(ctxt.routeParams.module);
+          if (sourceAndPlugin) {
+            await this._invokeAuthenticationSource(ctxt, sourceAndPlugin);
           }
         } catch (err) {
           if (!err.isCardstackError) { throw err; }

@@ -24,7 +24,7 @@ describe('hub/authentication', function() {
       fullName: "Quint Faulkner"
     });
 
-    arthur = factory.addResource('users').withAttributes({
+    arthur = factory.addResource('users', 'a-1').withAttributes({
       email: 'arthur@example.com',
       fullName: "Arthur Faulkner"
     });
@@ -61,7 +61,7 @@ describe('hub/authentication', function() {
 
     factory.addResource('authentication-sources', 'id-rewriter').withAttributes({
       authenticatorType: '@cardstack/hub/node-tests/stub-authenticators::echo',
-      userTemplate: '{ "id": "my-prefix/{{userId}}" }'
+      userTemplate: '{ "id": "a-{{userId}}" }'
     });
 
     factory.addResource('content-types', 'users').withRelated('fields', [
@@ -235,11 +235,29 @@ describe('hub/authentication', function() {
       expect(response).hasStatus(200);
       expect(response.body).has.property('token');
       expect(response.body).has.deep.property('user.id', quint.id);
-
       response = await request.get('/').set('authorization', `Bearer ${response.body.token}`);
       expect(response).hasStatus(200);
       expect(response.body).has.property('userId', quint.id);
       expect(response.body.user).has.deep.property('attributes.full-name', "Quint Faulkner");
+    });
+
+    it('can provide preloaded user', async function() {
+      let response = await request.post(`/auth/echo`).send({
+        userId: 'x',
+        preloadedUser: {
+          id: 'x',
+          type: 'users',
+          attributes: {
+            'full-name': 'Mr X'
+          }
+        }
+      });
+      expect(response).hasStatus(200);
+
+      // this is exercising the preloadedUser API because this user
+      // doesn't exist in the search index, so if Authentication
+      // itself tries to do the load it will fail.
+      expect(response.body).has.deep.property('user.attributes.full-name', 'Mr X');
     });
 
     it.skip('can create a new user', async function() {
@@ -265,6 +283,24 @@ describe('hub/authentication', function() {
           'full-name': 'Arthur Faulkner'
         }
       });
+    });
+
+    it('applies userTemplate to rewrite ids', async function() {
+      let response = await request.post(`/auth/id-rewriter`).send({
+        userId: '1'
+      });
+      expect(response).hasStatus(200);
+      expect(response.body).has.deep.property('user.id', 'a-1');
+      expect(response.body).has.deep.property('user.attributes.full-name', 'Arthur Faulkner');
+    });
+
+    it('applies userTemplate to rewrite ids', async function() {
+      let response = await request.post(`/auth/id-rewriter`).send({
+        userId: '1'
+      });
+      expect(response).hasStatus(200);
+      expect(response.body).has.deep.property('user.id', 'a-1');
+      expect(response.body).has.deep.property('user.attributes.full-name', 'Arthur Faulkner');
     });
 
     it.skip('ignores user create when not configured', async function() {

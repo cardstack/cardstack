@@ -6,7 +6,8 @@ exports.authenticate = async function({ email }, config, userSearcher) {
   let { models } = await userSearcher.search({ filter: { email: { exact: email } } });
   if (models.length > 0) {
     return {
-      userId: models[0].id
+      userId: models[0].id,
+      preloadedUser: models[0]
     };
   }
 };
