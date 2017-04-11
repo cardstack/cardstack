@@ -68,9 +68,6 @@ exports.createDefaultEnvironment = async function(initialModels = []) {
   // this specially-privileged branch.
   let indexer = new Indexers(schemaCache);
 
-  // This creates the indices
-  await indexer.update();
-
   for (let model of inDependencyOrder(initialModels)) {
     // TODO: this one-by-one creation is still slower than is nice for
     // tests -- each time we write a schema model it invalidates the
