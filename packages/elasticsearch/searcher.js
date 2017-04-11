@@ -11,11 +11,20 @@ class Searcher {
   }
 
   async get(branch, type, id) {
-    let document = await this.client.es.getSource({
-      index: Client.branchToIndexName(branch),
-      type,
-      id: `${branch}/${id}`
-    });
+    let index = Client.branchToIndexName(branch);
+    let esId = `${branch}/${id}`;
+    this.log.debug('get %s', index, type, esId);
+    let document;
+    try {
+      document = await this.client.es.getSource({ index, type, id: esId });
+    } catch (err) {
+      if (err.hasOwnProperty('status') && !err.isCardstackError) {
+        throw new Error(err.message, {
+          status: err.status
+        });
+      }
+      throw err;
+    }
     return toJSONAPI(type, document);
   }
 
