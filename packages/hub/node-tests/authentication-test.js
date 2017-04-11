@@ -154,22 +154,17 @@ describe('hub/authentication', function() {
       expect(response).hasStatus(401);
     });
 
-    it('can search for user resource and avoid reloading it in session', async function() {
-      let response = await request.post(`/auth/${authenticatorName('preload-user-by-email')}`).send({
+    it('can search for users', async function() {
+      let response = await request.post(`/auth/${authenticatorName('by-email')}`).send({
         email: 'nobody@nowhere.com'
       });
       expect(response).hasStatus(200);
-      expect(response.body.user).deep.equals({
-        id: '58238',
-        type: 'users',
-        attributes: {
-          email: 'nobody@nowhere.com',
-          'full-name': "He's a real nowhere man"
-        },
-        meta: {
-          preloadedByTheTestStub: true
-        }
-      });
+      expect(response.body).has.property('token');
+
+      response = await request.get('/').set('authorization', `Bearer ${response.body.token}`);
+      expect(response).hasStatus(200);
+      expect(response.body).has.property('userId', '58238');
+      expect(response.body.user).has.deep.property('attributes.full-name', "He's a real nowhere man");
     });
 
     it.skip('can create a new user', async function() {

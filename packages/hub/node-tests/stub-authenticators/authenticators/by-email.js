@@ -6,13 +6,7 @@ exports.authenticate = async function({ email }, userSearcher) {
   let { models } = await userSearcher.search({ filter: { email: { exact: email } } });
   if (models.length > 0) {
     return {
-      // this is the minimum required output for a successful
-      // authentication
-      id: models[0].id,
-
-      // this is an optimization for when you already had to load the
-      // record anyway
-      loadedUser: models[0]
+      userId: models[0].id
     };
   }
 };
