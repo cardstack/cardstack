@@ -27,7 +27,6 @@ describe('hub/authentication', function() {
     app.use(auth.middleware());
     app.use(async function(ctxt) {
       ctxt.set('Content-Type', 'application/json');
-      console.log("nuking body");
       ctxt.body = {};
       let session = ctxt.state.cardstackSession;
       if (session) {

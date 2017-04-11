@@ -2,7 +2,8 @@ const Encryptor = require('./encryptor');
 const logger = require('heimdalljs-logger');
 const Session = require('./session');
 const bearerTokenPattern = /bearer +(.*)$/i;
-const Router = require('koa-better-router');
+const compose = require('koa-compose');
+const route = require('koa-better-route');
 const koaJSONBody = require('koa-json-body');
 
 class Authentication {
@@ -19,7 +20,6 @@ class Authentication {
     };
 
     this.plugins = plugins;
-    this.tokenMiddleware = this._setupTokenMiddleware();
   }
 
   async createToken(sessionPayload, validSeconds) {
@@ -45,6 +45,15 @@ class Authentication {
   }
 
   middleware() {
+    const prefix = 'auth';
+    return compose([
+      this.tokenVerifier(),
+      this.tokenIssuerPreflight(prefix),
+      this.tokenIssuer(prefix)
+    ]);
+  }
+
+  tokenVerifier() {
     return async (ctxt, next) => {
       let m = bearerTokenPattern.exec(ctxt.header['authorization']);
       if (m) {
@@ -53,32 +62,30 @@ class Authentication {
           ctxt.state.cardstackSession = session;
         }
       }
-      return this.tokenMiddleware(ctxt, next);
+      await next();
     };
   }
 
-  _setupTokenMiddleware() {
-    let router = new Router({ prefix: 'auth' });
+  tokenIssuerPreflight(prefix) {
+    return route.options(`/${prefix}/:module`,  async (ctxt) => {
+      ctxt.response.set('Access-Control-Allow-Origin', '*');
+      ctxt.response.set('Access-Control-Allow-Methods', 'POST,OPTIONS');
+      ctxt.response.set('Access-Control-Allow-Headers', 'Content-Type');
+      ctxt.status = 200;
+    });
+  }
 
-    router.addRoute('OPTIONS', '/:module',
-      async function(ctxt) {
-        ctxt.response.set('Access-Control-Allow-Origin', '*');
-        ctxt.response.set('Access-Control-Allow-Methods', 'POST,OPTIONS');
-        ctxt.response.set('Access-Control-Allow-Headers', 'Content-Type');
-        ctxt.status = 200;
-      }
-    );
-
-    router.addRoute('POST', '/:module', [
+  tokenIssuer(prefix){
+    return route.post(`/${prefix}/:module`, compose([
       koaJSONBody({ limit: '1mb' }),
       async (ctxt) => {
         ctxt.response.set('Access-Control-Allow-Origin', '*');
         let plugin;
         try {
-          plugin = this.plugins.lookup('authenticators', ctxt.params.module);
+          plugin = this.plugins.lookup('authenticators', ctxt.routeParams.module);
         } catch(err) {
           if (/Unknown authenticators/.test(err.message)) {
-            this.log.warn(`No such authenticator ${ctxt.params.module}`);
+            this.log.warn(`No such authenticator ${ctxt.routeParams.module}`);
           } else {
             throw err;
           }
@@ -100,15 +107,11 @@ class Authentication {
             errors = errors.concat(err.additionalErrors);
           }
           ctxt.body = { errors };
-          console.log("setting error body");
           ctxt.status = errors[0].status;
         }
       }
-    ]);
-
-    return router.middleware();
+    ]));
   }
-
 }
 
 

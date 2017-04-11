@@ -19,7 +19,7 @@ process.on('warning', (warning) => {
 // will cause any unexpected log message to fail the tests.
 if (!process.env['DEBUG']) {
   // these third-party deps have loud logging even at warn level
-  process.env.DEBUG='*,-eslint:*,-koa:*,-superagent';
+  process.env.DEBUG='*,-eslint:*,-koa:*,-koa-*,-superagent';
   if (!process.env['DEBUG_LEVEL']) {
     process.env.DEBUG_LEVEL='warn';
   }
