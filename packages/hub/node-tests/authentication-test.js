@@ -59,6 +59,11 @@ describe('hub/authentication', function() {
       }
     });
 
+    factory.addResource('authentication-sources', 'id-rewriter').withAttributes({
+      authenticatorType: '@cardstack/hub/node-tests/stub-authenticators::echo',
+      userTemplate: '{ "id": "my-prefix/{{userId}}" }'
+    });
+
     factory.addResource('content-types', 'users').withRelated('fields', [
       factory.addResource('fields', 'full-name').withAttributes({
         fieldType: '@cardstack/core-types::string'
@@ -263,11 +268,11 @@ describe('hub/authentication', function() {
     });
 
     it.skip('ignores user create when not configured', async function() {
-      let response = await request.post(`/auth/echo`).send({
+      let response = await request.post(`/auth/id-rewriter`).send({
         userId: '4321',
         details: {
-          firstName: 'Arthur',
-          lastName: 'Faulkner'
+          firstName: 'New',
+          lastName: 'Person'
         }
       });
       expect(response).hasStatus(200);

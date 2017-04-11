@@ -7,6 +7,13 @@ const models = [
     }
   },
   {
+    type: 'plugin-configs',
+    id: 'core-types',
+    attributes: {
+      module: '@cardstack/handlebars'
+    }
+  },
+  {
     /* This is the content-type content-type. Mindblown. */
     type: 'content-types',
     id: 'content-types',
@@ -126,7 +133,8 @@ const models = [
       fields: {
         data: [
           { type: 'fields', id: 'authenticator-type' },
-          { type: 'fields', id: 'params' }
+          { type: 'fields', id: 'params' },
+          { type: 'fields', id: 'user-template' }
         ]
       }
     }
@@ -136,6 +144,13 @@ const models = [
     id: 'source-type',
     attributes: {
       'field-type': '@cardstack/core-types::string'
+    }
+  },
+  {
+    type: 'fields',
+    id: 'user-template',
+    attributes: {
+      'field-type': '@cardstack/handlebars'
     }
   },
   {
