@@ -1,0 +1,11 @@
+{{#if session.isAuthenticated}}
+  Authenticated <button {{action "logout"}}>Logout</button>
+  {{#with session.data.authenticated.user as |user|}}
+    {{user.attributes.full-name}}
+    {{user.attributes.email}}
+    <img src={{user.attributes.avatar}} style="width: 60px">
+  {{/with}}
+
+{{else}}
+  Not Authenticated <button {{action "login"}}>Log in via github</button>
+{{/if}}

@@ -1,0 +1,55 @@
+{
+  "name": "@cardstack/auth",
+  "version": "0.0.7",
+  "description": "Clientside authentication for Cardstack.",
+  "keywords": [
+    "ember-addon",
+    "cardstack-plugin"
+  ],
+  "cardstack-plugin":{
+    "api-version": 1
+  },
+  "license": "MIT",
+  "author": "Edward Faulkner <edward@eaf4.com>",
+  "repository": "https://github.com/cardstack/cardstack",
+  "directories": {
+    "doc": "doc",
+    "test": "tests"
+  },
+  "scripts": {
+    "build": "ember build",
+    "start": "ember server",
+    "test": "ember try:each"
+  },
+  "dependencies": {
+    "ember-cli-babel": "^5.2.4",
+    "ember-cli-htmlbars": "^1.1.1",
+    "ember-fetch": "^1.4.0",
+    "ember-simple-auth": "^1.2.2",
+    "torii": "^0.8.2"
+  },
+  "devDependencies": {
+    "broccoli-asset-rev": "^2.4.5",
+    "ember-cli": "^2.12.0",
+    "ember-cli-dependency-checker": "^1.3.0",
+    "ember-cli-eslint": "^3.0.0",
+    "ember-cli-htmlbars-inline-precompile": "^0.3.6",
+    "ember-cli-inject-live-reload": "^1.4.1",
+    "ember-cli-qunit": "^3.1.2",
+    "ember-cli-shims": "^1.0.2",
+    "ember-cli-sri": "^2.1.0",
+    "ember-cli-uglify": "^1.2.0",
+    "ember-disable-prototype-extensions": "^1.1.0",
+    "ember-export-application-global": "^1.1.1",
+    "ember-load-initializers": "^0.6.3",
+    "ember-resolver": "^2.1.1",
+    "ember-source": "~2.12.0",
+    "loader.js": "^4.2.3"
+  },
+  "engines": {
+    "node": ">= 4"
+  },
+  "ember-addon": {
+    "configPath": "tests/dummy/config"
+  }
+}
