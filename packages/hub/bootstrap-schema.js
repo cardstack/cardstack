@@ -8,7 +8,7 @@ const models = [
   },
   {
     type: 'plugin-configs',
-    id: 'core-types',
+    id: 'handlebars',
     attributes: {
       module: '@cardstack/handlebars'
     }
