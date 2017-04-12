@@ -11,16 +11,9 @@
   },
   "description": "GitHub authentication plugin for Cardstack",
   "dependencies": {
-    "@cardstack/plugin-utils":"*",
-    "koa-compose": "^2.1.1",
-    "koa-better-route": "^2.1.1",
-    "koa-json-body": "^5.3.0"
+    "@cardstack/plugin-utils":"*"
   },
   "devDependencies": {
-    "koa": "2",
-    "koa-mount": "^3.0.0",
-    "@cardstack/eslint-config":"*",
-    "@cardstack/test-support":"*",
-    "supertest": "^2.0.1"
+    "@cardstack/eslint-config":"*"
   }
 }
