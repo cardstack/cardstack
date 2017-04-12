@@ -4,8 +4,8 @@ const path = require('path');
 const logger = require('heimdalljs-logger');
 const log = logger('server');
 
-async function runServer(port, seedModels) {
-  let app = await makeServer(seedModels);
+async function runServer(sessionsKey, port, seedModels) {
+  let app = await makeServer(sessionsKey, seedModels);
   app.listen(port);
   log.info("server listening on %s", port);
 }
@@ -22,6 +22,13 @@ function commandLineOptions() {
   }
 
   commander.seedConfigFile = path.resolve(commander.args[0]);
+
+  let base64Key = process.env.CARDSTACK_SESSIONS_KEY;
+  if (!base64Key) {
+    process.stderr.write("You must provide CARDSTACK_SESSIONS_KEY environment variable. You can generate one by running @cardstack/hub/bin/generate-key.js\n");
+    process.exit(-1);
+  }
+  commander.sessionsKey = new Buffer(base64Key, 'base64');
   return commander;
 }
 
@@ -40,4 +47,4 @@ process.on('warning', (warning) => {
 
 let options = commandLineOptions();
 let seedModels = loadSeedModels(options);
-runServer(options.port, seedModels);
+runServer(options.sessionsKey, options.port, seedModels);

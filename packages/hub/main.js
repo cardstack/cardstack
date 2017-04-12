@@ -3,10 +3,12 @@ const Searcher = require('@cardstack/elasticsearch/searcher');
 const Writers = require('@cardstack/hub/writers');
 const SchemaCache = require('@cardstack/hub/schema-cache');
 const Indexers = require('@cardstack/hub/indexers');
+const Authentication = require('@cardstack/hub/authentication');
+
 const logger = require('heimdalljs-logger');
 const log = logger('server');
 
-async function wireItUp(seedModels) {
+async function wireItUp(encryptionKeys, seedModels) {
   let schemaCache = new SchemaCache(seedModels);
   let indexers = new Indexers(schemaCache);
   setInterval(() => indexers.update(), 1000);
@@ -14,13 +16,16 @@ async function wireItUp(seedModels) {
   writers.addListener('changed', what => indexers.update({ hints: [ what ] }));
   await indexers.update();
   let searcher = new Searcher(schemaCache);
-  return { searcher, writers };
+  let controllingSchema = await schemaCache.schemaForControllingBranch();
+  let authentication = new Authentication(encryptionKeys, searcher, writers, controllingSchema.plugins);
+  return { searcher, writers, authentication };
 }
 
-async function makeServer(seedModels) {
-  let { searcher, writers } = await wireItUp(seedModels);
+async function makeServer(encryptionKeys, seedModels) {
+  let { searcher, writers, authentication } = await wireItUp(encryptionKeys, seedModels);
   let app = new Koa();
   app.use(httpLogging);
+  app.use(authentication.middleware());
   app.use(require('@cardstack/jsonapi/middleware')(searcher, writers));
   return app;
 }
