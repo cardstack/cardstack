@@ -1,5 +1,5 @@
 {
-  "name": "@cardstack/oath2-client",
+  "name": "@cardstack/github-auth",
   "version": "0.0.7",
   "keywords": [
     "cardstack-plugin"
@@ -9,10 +9,11 @@
   "cardstack-plugin":{
     "api-version": 1
   },
-  "description": "Oauth2 client for cardstack",
+  "description": "GitHub authentication plugin for Cardstack",
   "dependencies": {
     "@cardstack/plugin-utils":"*",
-    "koa-better-router": "^2.1.1",
+    "koa-compose": "^2.1.1",
+    "koa-better-route": "^2.1.1",
     "koa-json-body": "^5.3.0"
   },
   "devDependencies": {
