@@ -154,14 +154,22 @@ class Authentication {
   }
 
   _rewriteExternalUser(externalUser, userTemplate) {
+    this.log.debug("external user %j", externalUser);
     let rewritten;
     if (!userTemplate) {
-      rewritten = externalUser;
+      rewritten = Object.assign({}, externalUser);
     } else {
       let compiled = Handlebars.compile(userTemplate);
-      rewritten = JSON.parse(compiled(externalUser));
+      let stringRewritten = compiled(externalUser);
+      try {
+        rewritten = JSON.parse(stringRewritten);
+      } catch (err) {
+        this.log.error("user-template resulted in invalid json: %s", stringRewritten);
+        throw err;
+      }
     }
     rewritten.type = this.userContentType;
+    this.log.debug("rewritten user %j", rewritten);
     return rewritten;
   }
 
