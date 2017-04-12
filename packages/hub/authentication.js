@@ -122,6 +122,11 @@ class Authentication {
 
     let user = result.preloadedUser || await this._processExternalUser(result.user, source);
 
+    if (!user) {
+      ctxt.status = 401;
+      return;
+    }
+
     let response = await this.createToken({ userId: user.id }, 86400);
     response.user = user;
     ctxt.body = response;
@@ -142,19 +147,22 @@ class Authentication {
       return this.writer.create(this.controllingBranch, actingUser, this.userContentType, user);
     }
     if (have && source.attributes['may-update-user']) {
+      user.meta = have.meta;
       return this.writer.update(this.controllingBranch, actingUser, this.userContentType, have.id, user);
     }
     return have;
   }
 
   _rewriteExternalUser(externalUser, userTemplate) {
+    let rewritten;
     if (!userTemplate) {
-      return externalUser;
+      rewritten = externalUser;
+    } else {
+      let compiled = Handlebars.compile(userTemplate);
+      rewritten = JSON.parse(compiled(externalUser));
     }
-    let compiled = Handlebars.compile(userTemplate);
-    let result = JSON.parse(compiled(externalUser));
-    result.type = this.userContentType;
-    return result;
+    rewritten.type = this.userContentType;
+    return rewritten;
   }
 
   _tokenIssuer(prefix){
