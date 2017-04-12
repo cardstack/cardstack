@@ -55,12 +55,7 @@ exports.authenticate = async function(payload, params /*, userSearcher */) {
     throw new Error(responseBody.error, { status: response.statusCode });
   }
   return {
-    user: {
-      email: userResponse.body.email,
-      name: userResponse.body.name,
-      id: userResponse.body.id,
-      avatarURL: userResponse.body.avatar_url
-    }
+    user: userResponse.body
   };
 };
 
