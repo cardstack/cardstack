@@ -102,25 +102,24 @@ class Authentication {
     let { source, plugin } = sourceAndPlugin;
     let params = source.attributes.params;
     let result = await plugin.authenticate(ctxt.request.body, params, this.userSearcher);
-    if (!result || result.userId == null) {
+    if (!result || !(result.preloadedUser || result.user)) {
       ctxt.status = 401;
       return;
     }
 
-    let externalUser = this._rewriteExternalUser(result.userId, result.externalUser, source.attributes['user-template']);
-
-    let response = await this.createToken({ userId: externalUser.id }, 86400);
-    response.user = result.preloadedUser || await this.userSearcher.get(externalUser.id);
+    let user = result.preloadedUser || this._rewriteExternalUser(result.user, source.attributes['user-template']);
+    let response = await this.createToken({ userId: user.id }, 86400);
+    response.user = result.preloadedUser || await this.userSearcher.get(user.id);
     ctxt.body = response;
     ctxt.status = 200;
   }
 
-  _rewriteExternalUser(userId, externalUser, userTemplate) {
+  _rewriteExternalUser(externalUser, userTemplate) {
     if (!userTemplate) {
-      return externalUser || { id: userId };
+      return externalUser;
     }
     let compiled = Handlebars.compile(userTemplate);
-    return JSON.parse(compiled(Object.assign({ userId }, externalUser)));
+    return JSON.parse(compiled(externalUser));
   }
 
   _tokenIssuer(prefix){

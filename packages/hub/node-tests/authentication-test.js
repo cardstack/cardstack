@@ -48,20 +48,20 @@ describe('hub/authentication', function() {
     factory.addResource('authentication-sources', 'config-echo-quint').withAttributes({
       authenticatorType: '@cardstack/hub/node-tests/stub-authenticators::config-echo',
       params: {
-        userId: quint.id
+        user: { id: quint.id }
       }
     });
 
     factory.addResource('authentication-sources', 'config-echo-arthur').withAttributes({
       authenticatorType: '@cardstack/hub/node-tests/stub-authenticators::config-echo',
       params: {
-        userId: arthur.id
+        user: { id: arthur.id }
       }
     });
 
     factory.addResource('authentication-sources', 'id-rewriter').withAttributes({
       authenticatorType: '@cardstack/hub/node-tests/stub-authenticators::echo',
-      userTemplate: '{ "id": "a-{{userId}}" }'
+      userTemplate: '{ "id": "{{upstreamId}}" }'
     });
 
     factory.addResource('content-types', 'users').withRelated('fields', [
@@ -155,24 +155,24 @@ describe('hub/authentication', function() {
     });
 
     it('finds authenticator', async function() {
-      let response = await request.post(`/auth/echo`).send({ userId: env.user.id });
+      let response = await request.post(`/auth/echo`).send({ user: {id : env.user.id }});
       expect(response).hasStatus(200);
     });
 
     it('responds with token', async function() {
-      let response = await request.post(`/auth/echo`).send({ userId: env.user.id });
+      let response = await request.post(`/auth/echo`).send({ user: { id: env.user.id }});
       expect(response).hasStatus(200);
       expect(response.body.token).is.a('string');
     });
 
     it('responds with validity timestamp', async function() {
-      let response = await request.post(`/auth/echo`).send({ userId: env.user.id });
+      let response = await request.post(`/auth/echo`).send({ user: { id: env.user.id }});
       expect(response).hasStatus(200);
       expect(response.body.validUntil).is.a('number');
     });
 
     it('responds with a copy of the user record', async function() {
-      let response = await request.post(`/auth/echo`).send({ userId: env.user.id });
+      let response = await request.post(`/auth/echo`).send({ user: { id: env.user.id }});
       expect(response).hasStatus(200);
       expect(response.body.user).deep.equals(env.user);
     });
@@ -183,13 +183,13 @@ describe('hub/authentication', function() {
 
     it('can run with multiple configs', async function() {
       let response = await request.post(`/auth/config-echo-quint`).send({
-        userId: 'ignored'
+        user: 'ignored'
       });
       expect(response).hasStatus(200);
       expect(response.body).has.deep.property('user.id', quint.id);
 
       response = await request.post(`/auth/config-echo-arthur`).send({
-        userId: 'ignored'
+        user: 'ignored'
       });
       expect(response).hasStatus(200);
       expect(response.body).has.deep.property('user.id', arthur.id);
@@ -197,7 +197,7 @@ describe('hub/authentication', function() {
 
     it('can approve via id', async function() {
       let response = await request.post(`/auth/echo`).send({
-        userId: env.user.id
+        user: { id: env.user.id }
       });
       expect(response).hasStatus(200);
       expect(response.body).has.property('token');
@@ -243,7 +243,6 @@ describe('hub/authentication', function() {
 
     it('can provide preloaded user', async function() {
       let response = await request.post(`/auth/echo`).send({
-        userId: 'x',
         preloadedUser: {
           id: 'x',
           type: 'users',
@@ -261,11 +260,11 @@ describe('hub/authentication', function() {
     });
 
     it.skip('can create a new user', async function() {
-      let response = await request.post(`/auth/echo`).send({
-        userId: '4321',
-        details: {
-          firstName: 'Arthur',
-          lastName: 'Faulkner'
+      let response = await request.post(`/auth/create-via-template`).send({
+        user: {
+          id: '4321',
+          firstName: 'Newly',
+          lastName: 'Created'
         }
       });
       expect(response).hasStatus(200);
@@ -280,54 +279,27 @@ describe('hub/authentication', function() {
         id: 'my-prefix/4321',
         type: 'users',
         attributes: {
-          'full-name': 'Arthur Faulkner'
+          'full-name': 'Newly Created'
         }
       });
     });
 
     it('applies userTemplate to rewrite ids', async function() {
       let response = await request.post(`/auth/id-rewriter`).send({
-        userId: '1'
+        user: { upstreamId: arthur.id }
       });
       expect(response).hasStatus(200);
-      expect(response.body).has.deep.property('user.id', 'a-1');
+      expect(response.body).has.deep.property('user.id', arthur.id);
       expect(response.body).has.deep.property('user.attributes.full-name', 'Arthur Faulkner');
-    });
-
-    it('applies userTemplate to rewrite ids', async function() {
-      let response = await request.post(`/auth/id-rewriter`).send({
-        userId: '1'
-      });
-      expect(response).hasStatus(200);
-      expect(response.body).has.deep.property('user.id', 'a-1');
-      expect(response.body).has.deep.property('user.attributes.full-name', 'Arthur Faulkner');
-    });
-
-    it.skip('ignores user create when not configured', async function() {
-      let response = await request.post(`/auth/id-rewriter`).send({
-        userId: '4321',
-        details: {
-          firstName: 'New',
-          lastName: 'Person'
-        }
-      });
-      expect(response).hasStatus(200);
-      expect(response.body).has.property('token');
-      expect(response.body).has.deep.property('user.id', 'my-prefix/4321');
-
-      await env.indexer.update({ realTime: true });
-
-      response = await request.get('/').set('authorization', `Bearer ${response.body.token}`);
-      expect(response).hasStatus(200);
-      expect(response.body.user).has.property('error');
-      expect(response.body.userId).equals('my-prefix/4321');
     });
 
     it.skip('can update a user', async function() {
-      let response = await request.post(`/auth/echo`).send({
-        userId: env.user.id,
-        details: {
-         email: 'updated.email@this-changed.com'
+      let response = await request.post(`/auth/update-user`).send({
+        user: {
+          id: env.user.id,
+          attributes: {
+            email: 'updated.email@this-changed.com'
+          }
         }
       });
       expect(response).hasStatus(200);
@@ -344,30 +316,6 @@ describe('hub/authentication', function() {
         attributes: Object.assign({}, env.user.attributes, { email: 'updated.email@this-changed.com' })
       });
     });
-
-    it('ignores user update when not configured', async function() {
-      let response = await request.post(`/auth/echo`).send({
-        userId: env.user.id,
-        details: {
-         email: 'updated.email@this-changed.com'
-        }
-      });
-      expect(response).hasStatus(200);
-      expect(response.body).has.property('token');
-
-      await env.indexer.update({ realTime: true });
-
-      response = await request.get('/').set('authorization', `Bearer ${response.body.token}`);
-      expect(response).hasStatus(200);
-      expect(response.body.userId).equals(env.user.id);
-      expect(response.body.user).deep.equals({
-        id: env.user.id,
-        type: 'users',
-        attributes: Object.assign({}, env.user.attributes)
-      });
-    });
-
-
 
   });
 });
