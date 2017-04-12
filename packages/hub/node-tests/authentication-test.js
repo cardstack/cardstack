@@ -64,6 +64,18 @@ describe('hub/authentication', function() {
       userTemplate: '{ "id": "{{upstreamId}}" }'
     });
 
+    factory.addResource('authentication-sources', 'create-via-template').withAttributes({
+      authenticatorType: '@cardstack/hub/node-tests/stub-authenticators::echo',
+      userTemplate: `{
+        "id": "my-prefix-{{id}}",
+        "attributes": {
+          "full-name": "{{firstName}} {{lastName}}",
+          "email": "{{email}}"
+        }
+      }`,
+      mayCreateUser: true
+    });
+
     factory.addResource('content-types', 'users').withRelated('fields', [
       factory.addResource('fields', 'full-name').withAttributes({
         fieldType: '@cardstack/core-types::string'
@@ -77,7 +89,7 @@ describe('hub/authentication', function() {
     env = await createDefaultEnvironment(factory.getModels());
     let key = crypto.randomBytes(32);
     let schema = await env.schemaCache.schemaForControllingBranch();
-    auth = new Authentication(key, env.searcher, schema.plugins);
+    auth = new Authentication(key, env.searcher, env.writers, schema.plugins);
     let app = new Koa();
     app.use(auth.middleware());
     app.use(async function(ctxt) {
@@ -259,12 +271,13 @@ describe('hub/authentication', function() {
       expect(response.body).has.deep.property('user.attributes.full-name', 'Mr X');
     });
 
-    it.skip('can create a new user', async function() {
+    it('can create a new user', async function() {
       let response = await request.post(`/auth/create-via-template`).send({
         user: {
           id: '4321',
           firstName: 'Newly',
-          lastName: 'Created'
+          lastName: 'Created',
+          email: 'new@example.com'
         }
       });
       expect(response).hasStatus(200);
@@ -274,13 +287,12 @@ describe('hub/authentication', function() {
 
       response = await request.get('/').set('authorization', `Bearer ${response.body.token}`);
       expect(response).hasStatus(200);
-      expect(response.body.userId).equals('my-prefix/4321');
-      expect(response.body.user).deep.equals({
-        id: 'my-prefix/4321',
-        type: 'users',
-        attributes: {
-          'full-name': 'Newly Created'
-        }
+      expect(response.body.userId).equals('my-prefix-4321');
+      expect(response.body.user).has.property('id', 'my-prefix-4321');
+      expect(response.body.user).has.property('type', 'users');
+      expect(response.body.user.attributes).deep.equals({
+        email: 'new@example.com',
+        'full-name': 'Newly Created'
       });
     });
 

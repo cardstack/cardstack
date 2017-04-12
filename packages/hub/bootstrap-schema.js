@@ -134,9 +134,25 @@ const models = [
         data: [
           { type: 'fields', id: 'authenticator-type' },
           { type: 'fields', id: 'params' },
-          { type: 'fields', id: 'user-template' }
+          { type: 'fields', id: 'user-template' },
+          { type: 'fields', id: 'may-create-user' },
+          { type: 'fields', id: 'may-update-user' }
         ]
       }
+    }
+  },
+  {
+    type: 'fields',
+    id: 'may-create-user',
+    attributes: {
+      'field-type': '@cardstack/core-types::boolean'
+    }
+  },
+  {
+    type: 'fields',
+    id: 'may-update-user',
+    attributes: {
+      'field-type': '@cardstack/core-types::boolean'
     }
   },
   {
@@ -298,6 +314,21 @@ const models = [
     id: 'may-write-field',
     attributes: {
       'field-type': '@cardstack/core-types::boolean'
+    }
+  },
+  {
+    type: 'grants',
+    id: '0',
+    attributes: {
+      'may-write-field': true,
+      'may-create-resource': true,
+      'may-update-resource': true,
+      'may-delete-resource': true
+    },
+    relationships: {
+      who: {
+        data: { type: 'users', id: '@cardstack/hub' }
+      }
     }
   }
 

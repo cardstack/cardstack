@@ -7,8 +7,20 @@ const route = require('koa-better-route');
 const koaJSONBody = require('koa-json-body');
 const Handlebars = require('handlebars');
 
+// This is how this module's actions will appear in git history.
+// Also, the user id "@cardstack/hub" is special -- it has a grant to
+// do all the things (see bootstrap-schema.js)
+const actingUser = {
+  id: '@cardstack/hub',
+  type: 'users',
+  attributes: {
+    'full-name': '@cardstack/hub/authentication',
+    email: 'noreply@nowhere.com'
+  }
+};
+
 class Authentication {
-  constructor(key, searcher, plugins) {
+  constructor(key, searcher, writer, plugins) {
     this.encryptor = new Encryptor(key);
     this.log = logger('auth');
 
@@ -34,6 +46,7 @@ class Authentication {
     this.searcher = searcher;
     this.controllingBranch = controllingBranch;
     this.userContentType = userContentType;
+    this.writer = writer;
   }
 
   async createToken(sessionPayload, validSeconds) {
@@ -107,11 +120,31 @@ class Authentication {
       return;
     }
 
-    let user = result.preloadedUser || this._rewriteExternalUser(result.user, source.attributes['user-template']);
+    let user = result.preloadedUser || await this._processExternalUser(result.user, source);
+
     let response = await this.createToken({ userId: user.id }, 86400);
-    response.user = result.preloadedUser || await this.userSearcher.get(user.id);
+    response.user = user;
     ctxt.body = response;
     ctxt.status = 200;
+  }
+
+  async _processExternalUser(externalUser, source) {
+    let user = this._rewriteExternalUser(externalUser, source.attributes['user-template']);
+    let have;
+    try {
+      have = await this.userSearcher.get(user.id);
+    } catch (err) {
+      if (err.status !== 404) {
+        throw err;
+      }
+    }
+    if (!have && source.attributes['may-create-user']) {
+      return this.writer.create(this.controllingBranch, actingUser, this.userContentType, user);
+    }
+    if (have && source.attributes['may-update-user']) {
+      return this.writer.update(this.controllingBranch, actingUser, this.userContentType, have.id, user);
+    }
+    return have;
   }
 
   _rewriteExternalUser(externalUser, userTemplate) {
@@ -119,7 +152,9 @@ class Authentication {
       return externalUser;
     }
     let compiled = Handlebars.compile(userTemplate);
-    return JSON.parse(compiled(externalUser));
+    let result = JSON.parse(compiled(externalUser));
+    result.type = this.userContentType;
+    return result;
   }
 
   _tokenIssuer(prefix){
