@@ -76,7 +76,7 @@ describe('jsonapi/middleware', function() {
     it('returns 404 for missing individual resource', async function() {
       let response = await request.get('/articles/98766');
       expect(response).hasStatus(404);
-      expect(response.body).to.have.deep.property('errors[0].detail', 'No such resource /articles/98766');
+      expect(response.body).to.have.deep.property('errors[0].detail', 'Not Found');
     });
 
     it('can get a collection resource', async function() {

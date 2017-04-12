@@ -152,19 +152,8 @@ class Handler {
   }
 
   async _lookupRecord(type, id) {
-    try {
-      let record = await this.searcher.get(this.branch, type, id);
-      return record;
-    } catch (err) {
-      if (err.status === 404 && !err.isCardstackError) {
-        // Turn elasticsearch 404 into our nicely formatted 404
-        throw new Error(`No such resource ${this.ctxt.request.url}`, {
-          status: 404,
-          title: 'No such resource'
-        });
-      }
-      throw err;
-    }
+    let record = await this.searcher.get(this.branch, type, id);
+    return record;
   }
 
   _mandatoryBodyData() {
