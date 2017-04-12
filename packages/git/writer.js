@@ -116,7 +116,7 @@ module.exports = class Writer {
       authorEmail: user ? user.attributes.email : 'anon@example.com',
       committerName: this.myName,
       committerEmail: this.myEmail,
-      message: `${operation} ${type} ${id.slice(12)}`
+      message: `${operation} ${type} ${String(id).slice(12)}`
     };
   }
 
