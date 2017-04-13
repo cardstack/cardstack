@@ -1,15 +1,9 @@
-const Searcher = require('@cardstack/elasticsearch/searcher');
-const SchemaCache = require('@cardstack/hub/schema-cache');
 const temp = require('@cardstack/plugin-utils/node-tests/temp-helper');
 const { makeRepo } = require('@cardstack/git/node-tests/support');
-const Indexers = require('@cardstack/hub/indexers');
-const Writers = require('@cardstack/hub/writers');
 const ElasticAssert = require('@cardstack/elasticsearch/node-tests/assertions');
 const JSONAPIFactory = require('@cardstack/test-support/jsonapi-factory');
-const { Registry, Container } = require('@cardstack/di');
-const Encryptor = require('@cardstack/hub/encryptor');
-const Authentication = require('@cardstack/hub/authentication');
 const crypto = require('crypto');
+const { wireItUp } = require('@cardstack/hub/main');
 
 exports.createDefaultEnvironment = async function(initialModels = []) {
   let repoPath = await temp.mkdir('cardstack-server-test');
@@ -48,16 +42,7 @@ exports.createDefaultEnvironment = async function(initialModels = []) {
       mayWriteField: true
     }).withRelated('who', factory.addResource('groups', user.id));
 
-  let registry = new Registry();
-  registry.register('config:seed-models', factory.getModels(), { instantiate: false });
-  registry.register('schema-cache:main', SchemaCache);
-  registry.register('writers:main', Writers);
-  registry.register('searcher:main', Searcher);
-  registry.register('indexers:main', Indexers);
-  registry.register('encryptor:main', Encryptor);
-  registry.register('authentication:main', Authentication);
-  registry.register('config:encryption-key', crypto.randomBytes(32), { instantiate: false });
-  let container = new Container(registry);
+  let container = await wireItUp(crypto.randomBytes(32), factory.getModels(), false);
 
   let writers = container.lookup('writers:main');
 
