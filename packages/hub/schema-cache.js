@@ -18,8 +18,18 @@ const Schema = require('./schema');
 const Searcher = require('@cardstack/elasticsearch/searcher');
 const logger = require('heimdalljs-logger');
 const bootstrapSchema = require('./bootstrap-schema');
+const { declareInjections } = require('@cardstack/di');
 
-module.exports = class SchemaCache {
+module.exports = declareInjections({
+  seedModels: 'config:seed-models'
+},
+
+class SchemaCache {
+
+  static create({ seedModels }) {
+    return new this(seedModels);
+  }
+
   constructor(seedModels=[]) {
     this.seedModels = bootstrapSchema.concat(seedModels);
     this.searcher = new Searcher();
@@ -110,7 +120,7 @@ module.exports = class SchemaCache {
       }
     }
   }
-};
+});
 
 class BootstrapSchemaCache {
   constructor(seedModels) {

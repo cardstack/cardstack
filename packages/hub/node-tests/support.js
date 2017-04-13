@@ -48,36 +48,18 @@ exports.createDefaultEnvironment = async function(initialModels = []) {
       mayWriteField: true
     }).withRelated('who', factory.addResource('groups', user.id));
 
-  let schemaCache = new SchemaCache(factory.getModels());
-
   let registry = new Registry();
-  registry.register('schema-cache:main', schemaCache, { instantiate: false });
+  registry.register('config:seed-models', factory.getModels(), { instantiate: false });
+  registry.register('schema-cache:main', SchemaCache);
   registry.register('writers:main', Writers);
   registry.register('searcher:main', Searcher);
   registry.register('indexers:main', Indexers);
   registry.register('encryptor:main', Encryptor);
   registry.register('authentication:main', Authentication);
   registry.register('config:encryption-key', crypto.randomBytes(32), { instantiate: false });
-
   let container = new Container(registry);
 
-
   let writers = container.lookup('writers:main');
-
-  // TODO: Indexers should just take schemaCache and figure out its
-  // own indexers list. Need to figure out how this plays with the
-  // branches. In some cases, a "branch" exists because of
-  // configuration on a data-source (like using different postgres
-  // databases to represent "master" vs "production"). But in the git
-  // case, the branches are discovered by the indexer and we have a
-  // circular dependency to break.
-  //
-  // Solution: add some server-level config (probably in the
-  // plugin-config for @cardstack/hub) for the branch name that
-  // always controls which indexers to run. This would also work for
-  // branch-level grants: to create a branch, you must have a grant on
-  // this specially-privileged branch.
-  let indexer = container.lookup('indexers:main');
 
   for (let model of inDependencyOrder(initialModels)) {
     // TODO: this one-by-one creation is still slower than is nice for
@@ -94,13 +76,10 @@ exports.createDefaultEnvironment = async function(initialModels = []) {
     head = response.meta.version;
   }
 
-  await indexer.update({ realTime: true });
-
-
+  await container.lookup('indexers:main').update({ realTime: true });
 
   Object.assign(container, {
     user: user.data,
-    schemaCache,
     head,
     repo,
     repoPath
