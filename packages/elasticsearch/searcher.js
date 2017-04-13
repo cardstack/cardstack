@@ -2,12 +2,16 @@ const Client = require('@cardstack/elasticsearch/client');
 const logger = require('heimdalljs-logger');
 const Error = require('@cardstack/plugin-utils/error');
 const toJSONAPI = require('./to-jsonapi');
+const { declareInjections } = require('@cardstack/di');
+
+module.exports = declareInjections({
+  schemaCache: 'schema-cache:main'
+},
 
 class Searcher {
-  constructor(schemaCache) {
+  constructor() {
     this.client = new Client();
     this.log = logger('searcher');
-    this.schemaCache = schemaCache;
   }
 
   async get(branch, type, id) {
@@ -274,7 +278,4 @@ class Searcher {
     };
   }
 
-}
-
-
-module.exports = Searcher;
+});

@@ -22,7 +22,8 @@ const bootstrapSchema = require('./bootstrap-schema');
 module.exports = class SchemaCache {
   constructor(seedModels=[]) {
     this.seedModels = bootstrapSchema.concat(seedModels);
-    this.searcher = new Searcher(new BootstrapSchemaCache(this.seedModels));
+    this.searcher = new Searcher();
+    this.searcher.schemaCache = new BootstrapSchemaCache(this.seedModels);
     this.cache = new Map();
     this.log = logger('schema-cache');
 

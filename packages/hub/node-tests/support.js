@@ -50,15 +50,11 @@ exports.createDefaultEnvironment = async function(initialModels = []) {
   let registry = new Registry();
   registry.register('schema-cache:main', schemaCache, { instantiate: false });
   registry.register('writers:main', Writers);
+  registry.register('searcher:main', Searcher);
 
   let container = new Container(registry);
 
 
-  // TODO: we need Searchers as to Searcher as Writers is to Writer,
-  // so we have a place to route special searches, and so we're not
-  // hard-coding the @cardsatck/elasticsearch/searcher module
-  // here. Should be data-driven instead.
-  let searcher = new Searcher(schemaCache);
   let writers = container.lookup('writers:main');
 
   // TODO: Indexers should just take schemaCache and figure out its
@@ -93,16 +89,17 @@ exports.createDefaultEnvironment = async function(initialModels = []) {
 
   await indexer.update({ realTime: true });
 
-  return {
-    searcher,
+
+
+  Object.assign(container, {
     indexer,
-    writers,
     user: user.data,
     schemaCache,
     head,
     repo,
     repoPath
-  };
+  });
+  return container;
 };
 
 exports.destroyDefaultEnvironment = async function(/* env */) {

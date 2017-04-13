@@ -49,7 +49,7 @@ describe('jsonapi/middleware', function() {
     env = await createDefaultEnvironment(factory.getModels());
     authenticator = new TestAuthenticator(env.user);
     app.use(authenticator.middleware());
-    app.use(jsonapi(env.searcher, env.writers));
+    app.use(jsonapi(env.lookup('searcher:main'), env.lookup('writers:main')));
     request = supertest(app.callback());
   }
 

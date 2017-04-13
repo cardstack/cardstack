@@ -10,6 +10,7 @@
     "api-version": 1
   },
   "dependencies": {
+    "@cardstack/di":"*",
     "elasticsearch": "^12.1.3",
     "heimdalljs-logger": "^0.1.8",
     "@cardstack/plugin-utils":"*"

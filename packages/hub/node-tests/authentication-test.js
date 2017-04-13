@@ -94,7 +94,7 @@ describe('hub/authentication', function() {
     env = await createDefaultEnvironment(factory.getModels());
     let key = crypto.randomBytes(32);
     let schema = await env.schemaCache.schemaForControllingBranch();
-    auth = new Authentication(key, env.searcher, env.writers, schema.plugins);
+    auth = new Authentication(key, env.lookup('searcher:main'), env.lookup('writers:main'), schema.plugins);
     let app = new Koa();
     app.use(auth.middleware());
     app.use(async function(ctxt) {
