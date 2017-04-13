@@ -263,7 +263,7 @@ describe('jsonapi/middleware', function() {
       expect(response.body).has.deep.property('data.attributes.title', 'I am new');
       expect(response.body).has.deep.property('data.meta.version');
 
-      await env.indexer.update({ realTime: true });
+      await env.lookup('indexers:main').update({ realTime: true });
 
       response = await request.get(response.headers.location);
       expect(response).hasStatus(200);
@@ -289,7 +289,7 @@ describe('jsonapi/middleware', function() {
       expect(response).has.deep.property('body.data.attributes.title', 'Updated title');
       expect(response).has.deep.property('body.data.attributes.body', "This is the first article");
 
-      await env.indexer.update({ realTime: true });
+      await env.lookup('indexers:main').update({ realTime: true });
 
       response = await request.get('/articles/0');
       expect(response).hasStatus(200);
@@ -304,7 +304,7 @@ describe('jsonapi/middleware', function() {
       let response = await request.delete('/articles/0').set('If-Match', version);
       expect(response).hasStatus(204);
 
-      await env.indexer.update({ realTime: true });
+      await env.lookup('indexers:main').update({ realTime: true });
 
       response = await request.get('/articles/0');
       expect(response).hasStatus(404);

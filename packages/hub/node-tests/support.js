@@ -51,6 +51,7 @@ exports.createDefaultEnvironment = async function(initialModels = []) {
   registry.register('schema-cache:main', schemaCache, { instantiate: false });
   registry.register('writers:main', Writers);
   registry.register('searcher:main', Searcher);
+  registry.register('indexers:main', Indexers);
 
   let container = new Container(registry);
 
@@ -70,7 +71,7 @@ exports.createDefaultEnvironment = async function(initialModels = []) {
   // always controls which indexers to run. This would also work for
   // branch-level grants: to create a branch, you must have a grant on
   // this specially-privileged branch.
-  let indexer = new Indexers(schemaCache);
+  let indexer = container.lookup('indexers:main');
 
   for (let model of inDependencyOrder(initialModels)) {
     // TODO: this one-by-one creation is still slower than is nice for
@@ -92,7 +93,6 @@ exports.createDefaultEnvironment = async function(initialModels = []) {
 
 
   Object.assign(container, {
-    indexer,
     user: user.data,
     schemaCache,
     head,

@@ -6,6 +6,7 @@ const { commitOpts, makeRepo } = require('./support');
 const ElasticAssert = require('@cardstack/elasticsearch/node-tests/assertions');
 const toJSONAPI = require('@cardstack/elasticsearch/to-jsonapi');
 const JSONAPIFactory = require('@cardstack/test-support/jsonapi-factory');
+const { Registry, Container } = require('@cardstack/di');
 
 describe('git/indexer', function() {
   let root, indexer, ea;
@@ -33,8 +34,11 @@ describe('git/indexer', function() {
           })
       );
 
-    let schemaCache = new SchemaCache(factory.getModels());
-    indexer = new Indexers(schemaCache);
+    let registry = new Registry();
+    registry.register('schema-cache:main', new SchemaCache(factory.getModels()), { instantiate: false });
+    registry.register('indexers:main', Indexers);
+
+    indexer = new Container(registry).lookup('indexers:main');
   });
 
   afterEach(async function() {

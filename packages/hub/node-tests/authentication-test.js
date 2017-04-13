@@ -304,7 +304,7 @@ describe('hub/authentication', function() {
         expect(response.body).has.property('token');
         expect(response.body).has.deep.property('user.attributes.email', 'quint@example.com');
 
-        await env.indexer.update({ realTime: true });
+        await env.lookup('indexers:main').update({ realTime: true });
 
         response = await request.get('/').set('authorization', `Bearer ${response.body.token}`);
         expect(response).hasStatus(200);
@@ -351,7 +351,7 @@ describe('hub/authentication', function() {
         expect(response.body).has.property('token');
         expect(response.body).has.deep.property('user.attributes.email', 'updated.email@this-changed.com');
 
-        await env.indexer.update({ realTime: true });
+        await env.lookup('indexers:main').update({ realTime: true });
 
         response = await request.get('/').set('authorization', `Bearer ${response.body.token}`);
         expect(response).hasStatus(200);
@@ -376,7 +376,7 @@ describe('hub/authentication', function() {
         expect(response).hasStatus(200);
         expect(response.body).has.property('token');
 
-        await env.indexer.update({ realTime: true });
+        await env.lookup('indexers:main').update({ realTime: true });
 
         response = await request.get('/').set('authorization', `Bearer ${response.body.token}`);
         expect(response).hasStatus(200);

@@ -23,11 +23,16 @@
 const logger = require('heimdalljs-logger');
 const Client = require('@cardstack/elasticsearch/client');
 const BulkOps = require('./bulk-ops');
+const { declareInjections } = require('@cardstack/di');
+
 require('./diff-log-formatter');
 
-module.exports = class Indexers {
-  constructor(schemaCache) {
-    this.schemaCache = schemaCache;
+module.exports = declareInjections({
+  schemaCache: 'schema-cache:main'
+},
+
+class Indexers {
+  constructor() {
     this.client = new Client();
     this.log = logger('indexers');
     this._lastControllingSchema = null;
@@ -181,7 +186,7 @@ module.exports = class Indexers {
     await privateOps.flush();
   }
 
-};
+});
 
 async function jsonapiDocToSearchDoc(id, jsonapiDoc, schema, branch, client) {
   // we store the id as a regular field in elasticsearch here, because
