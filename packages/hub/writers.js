@@ -1,11 +1,15 @@
 const Error = require('@cardstack/plugin-utils/error');
 const logger = require('heimdalljs-logger');
 const EventEmitter = require('events');
+const { declareInjections } = require('@cardstack/di');
+
+module.exports = declareInjections({
+  schemaCache: 'schema-cache:main'
+},
 
 class Writers extends EventEmitter {
-  constructor(schemaCache) {
+  constructor() {
     super();
-    this.schemaCache = schemaCache;
     this.log = logger('writers');
   }
 
@@ -83,6 +87,4 @@ class Writers extends EventEmitter {
     }
     return writer;
   }
-}
-
-module.exports = Writers;
+});

@@ -6,6 +6,7 @@ const Indexers = require('@cardstack/hub/indexers');
 const Writers = require('@cardstack/hub/writers');
 const ElasticAssert = require('@cardstack/elasticsearch/node-tests/assertions');
 const JSONAPIFactory = require('@cardstack/test-support/jsonapi-factory');
+const { Registry, Container } = require('@cardstack/di');
 
 exports.createDefaultEnvironment = async function(initialModels = []) {
   let repoPath = await temp.mkdir('cardstack-server-test');
@@ -46,12 +47,19 @@ exports.createDefaultEnvironment = async function(initialModels = []) {
 
   let schemaCache = new SchemaCache(factory.getModels());
 
+  let registry = new Registry();
+  registry.register('schema-cache:main', schemaCache, { instantiate: false });
+  registry.register('writers:main', Writers);
+
+  let container = new Container(registry);
+
+
   // TODO: we need Searchers as to Searcher as Writers is to Writer,
   // so we have a place to route special searches, and so we're not
   // hard-coding the @cardsatck/elasticsearch/searcher module
   // here. Should be data-driven instead.
   let searcher = new Searcher(schemaCache);
-  let writers = new Writers(schemaCache);
+  let writers = container.lookup('writers:main');
 
   // TODO: Indexers should just take schemaCache and figure out its
   // own indexers list. Need to figure out how this plays with the

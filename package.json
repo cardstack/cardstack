@@ -44,6 +44,7 @@
     "server": "node packages/hub/bin/server.js"
   },
   "dependencies": {
+    "@glimmer/di": "^0.2.0",
     "broccoli-merge-trees": "^2.0.0",
     "commander": "^2.9.0",
     "elasticsearch": "^12.1.3",

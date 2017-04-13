@@ -15,6 +15,7 @@ module.exports = {
   globals: {
     Promise: false,
     Map: false,
-    WeakMap: false
+    WeakMap: false,
+    Symbol: false
   }
 };
