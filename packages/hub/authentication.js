@@ -1,4 +1,3 @@
-const Encryptor = require('./encryptor');
 const logger = require('heimdalljs-logger');
 const Session = require('./session');
 const bearerTokenPattern = /bearer +(.*)$/i;
@@ -6,6 +5,7 @@ const compose = require('koa-compose');
 const route = require('koa-better-route');
 const koaJSONBody = require('koa-json-body');
 const Handlebars = require('handlebars');
+const { declareInjections } = require('@cardstack/di');
 
 // This is how this module's actions will appear in git history.
 // Also, the user id "@cardstack/hub" is special -- it has a grant to
@@ -19,34 +19,37 @@ const actingUser = {
   }
 };
 
+module.exports = declareInjections({
+  encryptor: 'encryptor:main',
+  searcher: 'searcher:main',
+  writer: 'writers:main',
+  schemaCache: 'schema-cache:main'
+},
+
 class Authentication {
-  constructor(key, searcher, writer, plugins) {
-    this.encryptor = new Encryptor(key);
+
+  constructor() {
     this.log = logger('auth');
 
-    // TODO: these should move into config
-    let userContentType = 'users';
-    let controllingBranch = 'master';
+    // TODO: move these two settings into config
+    this.controllingBranch = 'master';
+    this.userContentType = 'users';
+  }
 
-    this.userSearcher = {
-      get(userId) {
-        return searcher.get(controllingBranch, userContentType, userId);
+  get userSearcher() {
+    return {
+      get: (userId) => {
+        return this.searcher.get(this.controllingBranch, this.userContentType, userId);
       },
-      search(params) {
+      search: (params) => {
         let { filter } = params;
         if (!filter) {
           filter = {};
         }
-        filter.type = userContentType;
-        return searcher.search(controllingBranch, Object.assign({}, params, { filter }));
+        filter.type = this.userContentType;
+        return this.searcher.search(this.controllingBranch, Object.assign({}, params, { filter }));
       }
     };
-
-    this.plugins = plugins;
-    this.searcher = searcher;
-    this.controllingBranch = controllingBranch;
-    this.userContentType = userContentType;
-    this.writer = writer;
   }
 
   async createToken(sessionPayload, validSeconds) {
@@ -107,7 +110,8 @@ class Authentication {
 
   async _locateAuthenticationSource(name) {
     let source = await this.searcher.get(this.controllingBranch, 'authentication-sources', name);
-    let plugin = this.plugins.lookup('authenticators', source.attributes['authenticator-type']);
+    let schema = await this.schemaCache.schemaForControllingBranch();
+    let plugin = schema.plugins.lookup('authenticators', source.attributes['authenticator-type']);
     return { plugin, source };
   }
 
@@ -195,7 +199,4 @@ class Authentication {
       }
     ]));
   }
-}
-
-
-module.exports = Authentication;
+});

@@ -7,6 +7,9 @@ const Writers = require('@cardstack/hub/writers');
 const ElasticAssert = require('@cardstack/elasticsearch/node-tests/assertions');
 const JSONAPIFactory = require('@cardstack/test-support/jsonapi-factory');
 const { Registry, Container } = require('@cardstack/di');
+const Encryptor = require('@cardstack/hub/encryptor');
+const Authentication = require('@cardstack/hub/authentication');
+const crypto = require('crypto');
 
 exports.createDefaultEnvironment = async function(initialModels = []) {
   let repoPath = await temp.mkdir('cardstack-server-test');
@@ -52,6 +55,9 @@ exports.createDefaultEnvironment = async function(initialModels = []) {
   registry.register('writers:main', Writers);
   registry.register('searcher:main', Searcher);
   registry.register('indexers:main', Indexers);
+  registry.register('encryptor:main', Encryptor);
+  registry.register('authentication:main', Authentication);
+  registry.register('config:encryption-key', crypto.randomBytes(32), { instantiate: false });
 
   let container = new Container(registry);
 

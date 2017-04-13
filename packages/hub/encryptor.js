@@ -1,6 +1,16 @@
 const crypto = require('crypto');
+const { declareInjections } = require('@cardstack/di');
+
+module.exports = declareInjections({
+  key: 'config:encryption-key'
+},
 
 class Encryptor {
+
+  static create({ key }) {
+    return new this(key);
+  }
+
   constructor(key) {
     if (!(key instanceof Buffer) || key.length < 32) {
       throw new Error("key must be a buffer of at least 32 bytes");
@@ -38,6 +48,4 @@ class Encryptor {
     return JSON.parse(decrypted);
   }
 
-}
-
-module.exports = Encryptor;
+});

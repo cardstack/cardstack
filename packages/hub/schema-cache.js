@@ -50,10 +50,9 @@ module.exports = class SchemaCache {
   // not something that can vary by branch, since the set of branches
   // itself is discovered by the indexers.
   //
-  // For another example: a Grant for permission to create a new
-  // branch (which is not something that's actually implemented at
-  // this moment) is something that would need to be stored in the
-  // controlling branch.
+  // For another example: grants only take effect when they are
+  // present on the controlling branch. This makes it easier to reason
+  // about who can do what.
   async schemaForControllingBranch() {
     return this.schemaForBranch(this.controllingBranch);
   }
