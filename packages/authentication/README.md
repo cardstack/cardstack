@@ -1,6 +1,7 @@
-# @cardstack/auth
+# @cardstack/authentication
 
-This README outlines the details of collaborating on this Ember addon.
+You almost certainly want this, unless you're integrated Cardstack into an existing app with it's own authentication.
+
 
 ## Installation
 

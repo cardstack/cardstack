@@ -1,7 +1,7 @@
 {
-  "name": "@cardstack/auth",
+  "name": "@cardstack/authhentication",
   "version": "0.0.7",
-  "description": "Clientside authentication for Cardstack.",
+  "description": "Authentication infrastructure for Cardstack.",
   "keywords": [
     "ember-addon",
     "cardstack-plugin"
