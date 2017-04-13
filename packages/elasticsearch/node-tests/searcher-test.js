@@ -165,7 +165,7 @@ describe('elasticsearch/searcher', function() {
   });
 
   after(async function() {
-    await destroyDefaultEnvironment();
+    await destroyDefaultEnvironment(env);
   });
 
   it('can be searched for all content', async function() {

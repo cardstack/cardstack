@@ -87,7 +87,8 @@ exports.createDefaultEnvironment = async function(initialModels = []) {
   return container;
 };
 
-exports.destroyDefaultEnvironment = async function(/* env */) {
+exports.destroyDefaultEnvironment = async function(env) {
+  await env.teardown();
   await destroyIndices();
   await temp.cleanup();
 };
