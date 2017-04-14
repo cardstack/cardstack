@@ -30,7 +30,6 @@ async function wireItUp(encryptionKeys, seedModels, withAsyncWatchers=true) {
     container.lookup('writers:main').addListener('changed', what => container.lookup('indexers:main').update({ hints: [ what ] }));
   }
 
-  await container.lookup('indexers:main').update();
   return container;
 }
 
