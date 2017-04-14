@@ -1,5 +1,5 @@
 {
-  "name": "@cardstack/authhentication",
+  "name": "@cardstack/authentication",
   "version": "0.0.7",
   "description": "Authentication infrastructure for Cardstack.",
   "keywords": [

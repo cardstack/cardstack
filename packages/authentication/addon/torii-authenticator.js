@@ -18,8 +18,10 @@ export default ToriiAuthenticator.extend({
           authorizationCode: data.authorizationCode
         })
       }).then(response => response.json()).then(response => {
-        response.provider = data.provider;
-        return response;
+        return {
+          userDocument: response,
+          provider: data.provider
+        };
       });
     });
   }

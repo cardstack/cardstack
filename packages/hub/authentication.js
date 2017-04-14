@@ -131,9 +131,10 @@ class Authentication {
       return;
     }
 
-    let response = await this.createToken({ userId: user.id }, 86400);
-    response.user = user;
-    ctxt.body = response;
+    ctxt.body = {
+      data: user,
+      meta: await this.createToken({ userId: user.id }, 86400)
+    };
     ctxt.status = 200;
   }
 

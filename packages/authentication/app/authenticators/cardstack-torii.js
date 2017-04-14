@@ -1,1 +1,1 @@
-export { default } from '@cardstack/auth/torii-authenticator';
+export { default } from '@cardstack/authentication/torii-authenticator';

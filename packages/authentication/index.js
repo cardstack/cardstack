@@ -2,7 +2,7 @@
 'use strict';
 
 module.exports = {
-  name: '@cardstack/auth',
+  name: '@cardstack/authentication',
   isDevelopingAddon() {
     return process.env.CARDSTACK_DEV;
   }
