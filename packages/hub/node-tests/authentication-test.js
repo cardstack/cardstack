@@ -180,19 +180,19 @@ describe('hub/authentication', function() {
       it('responds with token', async function() {
         let response = await request.post(`/auth/echo`).send({ user: { id: env.user.id }});
         expect(response).hasStatus(200);
-        expect(response.body.token).is.a('string');
+        expect(response.body.meta.token).is.a('string');
       });
 
       it('responds with validity timestamp', async function() {
         let response = await request.post(`/auth/echo`).send({ user: { id: env.user.id }});
         expect(response).hasStatus(200);
-        expect(response.body.validUntil).is.a('number');
+        expect(response.body.meta.validUntil).is.a('number');
       });
 
       it('responds with a copy of the user record', async function() {
         let response = await request.post(`/auth/echo`).send({ user: { id: env.user.id }});
         expect(response).hasStatus(200);
-        expect(response.body.user).deep.equals(env.user);
+        expect(response.body.data).deep.equals(env.user);
       });
 
     });
@@ -204,13 +204,13 @@ describe('hub/authentication', function() {
           user: 'ignored'
         });
         expect(response).hasStatus(200);
-        expect(response.body).has.deep.property('user.id', quint.id);
+        expect(response.body).has.deep.property('data.id', quint.id);
 
         response = await request.post(`/auth/config-echo-arthur`).send({
           user: 'ignored'
         });
         expect(response).hasStatus(200);
-        expect(response.body).has.deep.property('user.id', arthur.id);
+        expect(response.body).has.deep.property('data.id', arthur.id);
       });
 
       it('can approve via id', async function() {
@@ -218,9 +218,9 @@ describe('hub/authentication', function() {
           user: { id: env.user.id }
         });
         expect(response).hasStatus(200);
-        expect(response.body).has.property('token');
-        expect(response.body).has.property('validUntil');
-        response = await request.get('/').set('authorization', `Bearer ${response.body.token}`);
+        expect(response.body).has.deep.property('meta.token');
+        expect(response.body).has.deep.property('meta.validUntil');
+        response = await request.get('/').set('authorization', `Bearer ${response.body.meta.token}`);
         expect(response).hasStatus(200);
         expect(response.body).has.property('userId', env.user.id);
         expect(response.body.user).deep.equals(env.user);
@@ -251,9 +251,9 @@ describe('hub/authentication', function() {
           email: 'quint@example.com'
         });
         expect(response).hasStatus(200);
-        expect(response.body).has.property('token');
-        expect(response.body).has.deep.property('user.id', quint.id);
-        response = await request.get('/').set('authorization', `Bearer ${response.body.token}`);
+        expect(response.body).has.deep.property('meta.token');
+        expect(response.body).has.deep.property('data.id', quint.id);
+        response = await request.get('/').set('authorization', `Bearer ${response.body.meta.token}`);
         expect(response).hasStatus(200);
         expect(response.body).has.property('userId', quint.id);
         expect(response.body.user).has.deep.property('attributes.full-name', "Quint Faulkner");
@@ -274,7 +274,7 @@ describe('hub/authentication', function() {
         // this is exercising the preloadedUser API because this user
         // doesn't exist in the search index, so if Authentication
         // itself tries to do the load it will fail.
-        expect(response.body).has.deep.property('user.attributes.full-name', 'Mr X');
+        expect(response.body).has.deep.property('data.attributes.full-name', 'Mr X');
       });
 
       it('applies userTemplate to rewrite ids', async function() {
@@ -282,8 +282,8 @@ describe('hub/authentication', function() {
           user: { upstreamId: arthur.id }
         });
         expect(response).hasStatus(200);
-        expect(response.body).has.deep.property('user.id', arthur.id);
-        expect(response.body).has.deep.property('user.attributes.full-name', 'Arthur Faulkner');
+        expect(response.body).has.deep.property('data.id', arthur.id);
+        expect(response.body).has.deep.property('data.attributes.full-name', 'Arthur Faulkner');
       });
 
 
@@ -297,12 +297,12 @@ describe('hub/authentication', function() {
           }
         });
         expect(response).hasStatus(200);
-        expect(response.body).has.property('token');
-        expect(response.body).has.deep.property('user.attributes.email', 'quint@example.com');
+        expect(response.body).has.deep.property('meta.token');
+        expect(response.body).has.deep.property('data.attributes.email', 'quint@example.com');
 
         await env.lookup('indexers:main').update({ realTime: true });
 
-        response = await request.get('/').set('authorization', `Bearer ${response.body.token}`);
+        response = await request.get('/').set('authorization', `Bearer ${response.body.meta.token}`);
         expect(response).hasStatus(200);
         expect(response.body.userId).equals(quint.id);
         expect(response.body.user).has.property('id', quint.id);
@@ -344,12 +344,12 @@ describe('hub/authentication', function() {
           }
         });
         expect(response).hasStatus(200);
-        expect(response.body).has.property('token');
-        expect(response.body).has.deep.property('user.attributes.email', 'updated.email@this-changed.com');
+        expect(response.body).has.deep.property('meta.token');
+        expect(response.body).has.deep.property('data.attributes.email', 'updated.email@this-changed.com');
 
         await env.lookup('indexers:main').update({ realTime: true });
 
-        response = await request.get('/').set('authorization', `Bearer ${response.body.token}`);
+        response = await request.get('/').set('authorization', `Bearer ${response.body.meta.token}`);
         expect(response).hasStatus(200);
         expect(response.body.userId).equals(quint.id);
         expect(response.body.user).has.property('id', quint.id);
@@ -370,11 +370,11 @@ describe('hub/authentication', function() {
           }
         });
         expect(response).hasStatus(200);
-        expect(response.body).has.property('token');
+        expect(response.body).has.deep.property('meta.token');
 
         await env.lookup('indexers:main').update({ realTime: true });
 
-        response = await request.get('/').set('authorization', `Bearer ${response.body.token}`);
+        response = await request.get('/').set('authorization', `Bearer ${response.body.meta.token}`);
         expect(response).hasStatus(200);
         expect(response.body.userId).equals('my-prefix-4321');
         expect(response.body.user).has.property('id', 'my-prefix-4321');
