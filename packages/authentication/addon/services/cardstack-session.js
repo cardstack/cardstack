@@ -4,12 +4,6 @@ import { singularize } from 'ember-inflector';
 export default Ember.Service.extend({
   session: Ember.inject.service(),
   store: Ember.inject.service(),
-  init() {
-    this._super();
-    let session = this.get('session');
-    session.on('authenticationSucceeded', this.authenticationSucceeded.bind(this));
-    session.on('invalidationSucceeded', this.invalidationSucceeded.bind(this));
-  },
 
   isAuthenticated: Ember.computed.alias('session.isAuthenticated'),
 
@@ -24,14 +18,5 @@ export default Ember.Service.extend({
         return this.get('store').peekRecord(singularize(rawSession.userDocument.data.type), rawSession.userDocument.data.id);
       }
     }
-  }),
-
-  authenticationSucceeded() {
-    console.log("Now authenticated");
-  },
-
-  invalidationSucceeded() {
-    console.log("Now logged out");
-  }
-
+  })
 });
