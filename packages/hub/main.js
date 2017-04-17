@@ -1,10 +1,4 @@
 const Koa = require('koa');
-const Searcher = require('@cardstack/elasticsearch/searcher');
-const Writers = require('@cardstack/hub/writers');
-const SchemaCache = require('@cardstack/hub/schema-cache');
-const Indexers = require('@cardstack/hub/indexers');
-const Encryptor = require('@cardstack/hub/encryptor');
-const Authentication = require('@cardstack/hub/authentication');
 const { Registry, Container } = require('@cardstack/di');
 
 const logger = require('heimdalljs-logger');
@@ -15,13 +9,6 @@ async function wireItUp(encryptionKeys, seedModels, withAsyncWatchers=true) {
 
   registry.register('config:seed-models', seedModels, { instantiate: false });
   registry.register('config:encryption-key', encryptionKeys, { instantiate: false });
-
-  registry.register('schema-cache:main', SchemaCache);
-  registry.register('writers:main', Writers);
-  registry.register('searcher:main', Searcher);
-  registry.register('indexers:main', Indexers);
-  registry.register('encryptor:main', Encryptor);
-  registry.register('authentication:main', Authentication);
 
   let container = new Container(registry);
 

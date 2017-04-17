@@ -1,7 +1,5 @@
 const Change = require('@cardstack/git/change');
 const temp = require('@cardstack/plugin-utils/node-tests/temp-helper');
-const Indexers = require('@cardstack/hub/indexers');
-const SchemaCache = require('@cardstack/hub/schema-cache');
 const { commitOpts, makeRepo } = require('./support');
 const ElasticAssert = require('@cardstack/elasticsearch/node-tests/assertions');
 const toJSONAPI = require('@cardstack/elasticsearch/to-jsonapi');
@@ -35,9 +33,7 @@ describe('git/indexer', function() {
       );
 
     let registry = new Registry();
-    registry.register('schema-cache:main', new SchemaCache(factory.getModels()), { instantiate: false });
-    registry.register('indexers:main', Indexers);
-
+    registry.register('config:seed-models', factory.getModels(), { instantiate: false });
     indexer = new Container(registry).lookup('indexers:main');
   });
 
