@@ -28,7 +28,7 @@ const { declareInjections } = require('@cardstack/di');
 require('./diff-log-formatter');
 
 module.exports = declareInjections({
-  schemaCache: 'schema-cache:main'
+  schemaCache: 'hub:schema-cache'
 },
 
 class Indexers {

@@ -40,13 +40,9 @@ function registerDeclaredInjections(registry, identifier, factory) {
   }
 }
 
-const wellKnown = {
-  'schema-cache:main': '@cardstack/hub/schema-cache',
-  'writers:main': '@cardstack/hub/writers',
-  'searcher:main': '@cardstack/elasticsearch/searcher',
-  'indexers:main': '@cardstack/hub/indexers',
-  'encryptor:main': '@cardstack/hub/encryptor',
-  'authentication:main': '@cardstack/hub/authentication'
+// TODO: searchers should dynamically load like other feature plugins
+const exceptions = {
+  'hub:searchers': '@cardstack/elasticsearch/searcher'
 };
 
 class Resolver {
@@ -55,11 +51,21 @@ class Resolver {
     this.nextResolver = nextResolver;
   }
   retrieve(specifier) {
-    if (wellKnown[specifier]) {
-      let factory = require(wellKnown[specifier]);
+    let module = exceptions[specifier];
+
+    if (!module) {
+      let [type, name] = specifier.split(':');
+      if (type === 'hub') {
+        module = `@cardstack/hub/${name}`;
+      }
+    }
+
+    if (module) {
+      let factory = require(module);
       registerDeclaredInjections(this.registry, specifier, factory);
       return factory;
     }
+
     if (this.nextResolver) {
       return this.nextResolver.retrieve(specifier);
     }

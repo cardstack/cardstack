@@ -90,7 +90,7 @@ describe('hub/authentication', function() {
 
 
     env = await createDefaultEnvironment(factory.getModels());
-    auth = env.lookup('authentication:main');
+    auth = env.lookup('hub:authentication');
     let app = new Koa();
     app.use(auth.middleware());
     app.use(async function(ctxt) {
@@ -300,7 +300,7 @@ describe('hub/authentication', function() {
         expect(response.body).has.deep.property('meta.token');
         expect(response.body).has.deep.property('data.attributes.email', 'quint@example.com');
 
-        await env.lookup('indexers:main').update({ realTime: true });
+        await env.lookup('hub:indexers').update({ realTime: true });
 
         response = await request.get('/').set('authorization', `Bearer ${response.body.meta.token}`);
         expect(response).hasStatus(200);
@@ -347,7 +347,7 @@ describe('hub/authentication', function() {
         expect(response.body).has.deep.property('meta.token');
         expect(response.body).has.deep.property('data.attributes.email', 'updated.email@this-changed.com');
 
-        await env.lookup('indexers:main').update({ realTime: true });
+        await env.lookup('hub:indexers').update({ realTime: true });
 
         response = await request.get('/').set('authorization', `Bearer ${response.body.meta.token}`);
         expect(response).hasStatus(200);
@@ -372,7 +372,7 @@ describe('hub/authentication', function() {
         expect(response).hasStatus(200);
         expect(response.body).has.deep.property('meta.token');
 
-        await env.lookup('indexers:main').update({ realTime: true });
+        await env.lookup('hub:indexers').update({ realTime: true });
 
         response = await request.get('/').set('authorization', `Bearer ${response.body.meta.token}`);
         expect(response).hasStatus(200);

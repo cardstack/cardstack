@@ -15,8 +15,8 @@ async function wireItUp(encryptionKeys, seedModels, withAsyncWatchers=true) {
   // this is generally only false in the test suite, where we want
   // more deterministic control of when indexing happens.
   if (withAsyncWatchers) {
-    setInterval(() => container.lookup('indexers:main').update(), 1000);
-    container.lookup('writers:main').addListener('changed', what => container.lookup('indexers:main').update({ hints: [ what ] }));
+    setInterval(() => container.lookup('hub:indexers').update(), 1000);
+    container.lookup('hub:writers').addListener('changed', what => container.lookup('hub:indexers').update({ hints: [ what ] }));
   }
 
   return container;
@@ -26,8 +26,8 @@ async function makeServer(encryptionKeys, seedModels) {
   let container = await wireItUp(encryptionKeys, seedModels);
   let app = new Koa();
   app.use(httpLogging);
-  app.use(container.lookup('authentication:main').middleware());
-  app.use(require('@cardstack/jsonapi/middleware')(container.lookup('searcher:main'), container.lookup('writers:main')));
+  app.use(container.lookup('hub:authentication').middleware());
+  app.use(require('@cardstack/jsonapi/middleware')(container.lookup('hub:searchers'), container.lookup('hub:writers')));
   return app;
 }
 

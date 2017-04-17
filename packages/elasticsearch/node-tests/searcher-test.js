@@ -161,7 +161,7 @@ describe('elasticsearch/searcher', function() {
       });
     }
     env = await createDefaultEnvironment(records);
-    searcher = env.lookup('searcher:main');
+    searcher = env.lookup('hub:searchers');
   });
 
   after(async function() {

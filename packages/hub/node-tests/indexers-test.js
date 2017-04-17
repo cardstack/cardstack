@@ -16,12 +16,12 @@ describe('hub/indexers', function() {
 
 
   it("indexes seed models", async function() {
-    let response = await env.lookup('searcher:main').search('master', { filter: { type: 'plugin-configs' }});
+    let response = await env.lookup('hub:searchers').search('master', { filter: { type: 'plugin-configs' }});
     expect(response.models.map(m => m.attributes.module)).includes('@cardstack/hub');
   });
 
   it("indexes bootstrap models", async function() {
-    let response = await env.lookup('searcher:main').search('master', { filter: { type: 'plugin-configs' }});
+    let response = await env.lookup('hub:searchers').search('master', { filter: { type: 'plugin-configs' }});
     expect(response.models.map(m => m.attributes.module)).includes('@cardstack/core-types');
   });
 

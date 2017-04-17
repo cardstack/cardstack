@@ -5,7 +5,7 @@ const toJSONAPI = require('./to-jsonapi');
 const { declareInjections } = require('@cardstack/di');
 
 module.exports = declareInjections({
-  schemaCache: 'schema-cache:main'
+  schemaCache: 'hub:schema-cache'
 },
 
 class Searcher {

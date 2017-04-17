@@ -20,10 +20,10 @@ const actingUser = {
 };
 
 module.exports = declareInjections({
-  encryptor: 'encryptor:main',
-  searcher: 'searcher:main',
-  writer: 'writers:main',
-  schemaCache: 'schema-cache:main'
+  encryptor: 'hub:encryptor',
+  searcher: 'hub:searchers',
+  writer: 'hub:writers',
+  schemaCache: 'hub:schema-cache'
 },
 
 class Authentication {

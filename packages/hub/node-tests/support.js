@@ -44,7 +44,7 @@ exports.createDefaultEnvironment = async function(initialModels = []) {
 
   let container = await wireItUp(crypto.randomBytes(32), factory.getModels(), false);
 
-  let writers = container.lookup('writers:main');
+  let writers = container.lookup('hub:writers');
 
   for (let model of inDependencyOrder(initialModels)) {
     // TODO: this one-by-one creation is still slower than is nice for
@@ -61,7 +61,7 @@ exports.createDefaultEnvironment = async function(initialModels = []) {
     head = response.meta.version;
   }
 
-  await container.lookup('indexers:main').update({ realTime: true });
+  await container.lookup('hub:indexers').update({ realTime: true });
 
   Object.assign(container, {
     user: user.data,

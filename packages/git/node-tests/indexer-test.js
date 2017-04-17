@@ -34,7 +34,7 @@ describe('git/indexer', function() {
 
     let registry = new Registry();
     registry.register('config:seed-models', factory.getModels(), { instantiate: false });
-    indexer = new Container(registry).lookup('indexers:main');
+    indexer = new Container(registry).lookup('hub:indexers');
   });
 
   afterEach(async function() {

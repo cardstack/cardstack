@@ -71,7 +71,7 @@ describe('git/writer', function() {
 
     env = await createDefaultEnvironment(factory.getModels());
 
-    writers = env.lookup('writers:main');
+    writers = env.lookup('hub:writers');
     user = env.user;
 
   });
