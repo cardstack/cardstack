@@ -93,6 +93,17 @@ module.exports = class Plugins {
     return feature.cached;
   }
 
+  // returns a list of [name, loaderFunc] where you can call
+  // loaderFunc to get back the actual module.
+  lookupAll(featureType) {
+    if (!this[featureType]) {
+      throw new Error(`Don't understand featureType ${featureType}`);
+    }
+    return [...this[featureType].entries()].map(([name, feature]) => {
+      return [name, () => feature.cached ? feature.cached : require(feature.loadPath)];
+    });
+  }
+
   configFor(moduleName) {
     return this.configs.get(moduleName);
   }

@@ -40,4 +40,15 @@ describe('plugins', function() {
   it('finds a searcher', async function() {
     expect(plugins.lookup('searchers', '@cardstack/elasticsearch')).is.a('function');
   });
+
+  it('finds all of one type', async function() {
+    let fields = plugins.lookupAll('fields');
+    expect(fields).is.an('array');
+    expect(fields.map(f => f[0])).includes('@cardstack/core-types::string');
+    let [, loader] = fields.find(f => f[0] === '@cardstack/core-types::string');
+    expect(loader).is.a('function');
+    expect(loader()).has.property('valid');
+    expect(loader().valid).is.a('function');
+  });
+
 });
