@@ -25,6 +25,8 @@ async function wireItUp(encryptionKeys, seedModels, withAsyncWatchers=true) {
 
   let container = new Container(registry);
 
+  // this is generally only false in the test suite, where we want
+  // more deterministic control of when indexing happens.
   if (withAsyncWatchers) {
     setInterval(() => container.lookup('indexers:main').update(), 1000);
     container.lookup('writers:main').addListener('changed', what => container.lookup('indexers:main').update({ hints: [ what ] }));
