@@ -18,7 +18,7 @@ describe('authentication/middleware', function() {
     });
 
     factory.addResource('plugin-configs').withAttributes({
-      module: '@cardstack/hub/node-tests/stub-authenticators'
+      module: '@cardstack/authentication/node-tests/stub-authenticators'
     });
 
     quint = factory.addResource('users').withAttributes({
@@ -32,42 +32,42 @@ describe('authentication/middleware', function() {
     });
 
     factory.addResource('authentication-sources', 'echo').withAttributes({
-      authenticatorType: '@cardstack/hub/node-tests/stub-authenticators::echo'
+      authenticatorType: '@cardstack/authentication/node-tests/stub-authenticators::echo'
     });
 
     factory.addResource('authentication-sources', 'returns-nothing').withAttributes({
-      authenticatorType: '@cardstack/hub/node-tests/stub-authenticators::returns-nothing'
+      authenticatorType: '@cardstack/authentication/node-tests/stub-authenticators::returns-nothing'
     });
 
     factory.addResource('authentication-sources', 'by-email').withAttributes({
-      authenticatorType: '@cardstack/hub/node-tests/stub-authenticators::by-email'
+      authenticatorType: '@cardstack/authentication/node-tests/stub-authenticators::by-email'
     });
 
     factory.addResource('authentication-sources', 'always-invalid').withAttributes({
-      authenticatorType: '@cardstack/hub/node-tests/stub-authenticators::always-invalid'
+      authenticatorType: '@cardstack/authentication/node-tests/stub-authenticators::always-invalid'
     });
 
     factory.addResource('authentication-sources', 'config-echo-quint').withAttributes({
-      authenticatorType: '@cardstack/hub/node-tests/stub-authenticators::config-echo',
+      authenticatorType: '@cardstack/authentication/node-tests/stub-authenticators::config-echo',
       params: {
         user: { id: quint.id }
       }
     });
 
     factory.addResource('authentication-sources', 'config-echo-arthur').withAttributes({
-      authenticatorType: '@cardstack/hub/node-tests/stub-authenticators::config-echo',
+      authenticatorType: '@cardstack/authentication/node-tests/stub-authenticators::config-echo',
       params: {
         user: { id: arthur.id }
       }
     });
 
     factory.addResource('authentication-sources', 'id-rewriter').withAttributes({
-      authenticatorType: '@cardstack/hub/node-tests/stub-authenticators::echo',
+      authenticatorType: '@cardstack/authentication/node-tests/stub-authenticators::echo',
       userTemplate: '{ "id": "{{upstreamId}}" }'
     });
 
     factory.addResource('authentication-sources', 'create-via-template').withAttributes({
-      authenticatorType: '@cardstack/hub/node-tests/stub-authenticators::echo',
+      authenticatorType: '@cardstack/authentication/node-tests/stub-authenticators::echo',
       userTemplate: `{
         "id": "my-prefix-{{id}}",
         "attributes": {
@@ -79,7 +79,7 @@ describe('authentication/middleware', function() {
     });
 
     factory.addResource('authentication-sources', 'update-user').withAttributes({
-      authenticatorType: '@cardstack/hub/node-tests/stub-authenticators::echo',
+      authenticatorType: '@cardstack/authentication/node-tests/stub-authenticators::echo',
       mayUpdateUser: true
     });
 
