@@ -49,6 +49,10 @@ describe('jsonapi/middleware', function() {
         module: "@cardstack/jsonapi"
       });
 
+    factory.addResource('plugin-configs')
+      .withAttributes({
+        module: "@cardstack/hub/node-tests/test-authenticator"
+      });
 
     let app = new Koa();
     env = await createDefaultEnvironment(factory.getModels());

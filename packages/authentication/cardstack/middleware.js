@@ -77,6 +77,10 @@ class Authentication {
     }
   }
 
+  get category() {
+    return 'authentication';
+  }
+
   middleware() {
     const prefix = 'auth';
     return compose([

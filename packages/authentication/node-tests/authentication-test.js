@@ -6,12 +6,16 @@ const {
 } = require('@cardstack/hub/node-tests/support');
 const JSONAPIFactory = require('@cardstack/test-support/jsonapi-factory');
 
-describe('hub/authentication', function() {
+describe('authentication/middleware', function() {
 
   let request, env, auth, quint, arthur;
 
   async function setup() {
     let factory = new JSONAPIFactory();
+
+    factory.addResource('plugin-configs').withAttributes({
+      module: '@cardstack/authentication'
+    });
 
     factory.addResource('plugin-configs').withAttributes({
       module: '@cardstack/hub/node-tests/stub-authenticators'
@@ -90,9 +94,8 @@ describe('hub/authentication', function() {
 
 
     env = await createDefaultEnvironment(factory.getModels());
-    auth = env.lookup('hub:authentication');
     let app = new Koa();
-    app.use(auth.middleware());
+    app.use(env.lookup('hub:middleware-stack').middleware());
     app.use(async function(ctxt) {
       ctxt.set('Content-Type', 'application/json');
       ctxt.body = {};
@@ -107,6 +110,7 @@ describe('hub/authentication', function() {
       }
     });
     request = supertest(app.callback());
+    auth = env.lookup('middleware:' + require.resolve('@cardstack/authentication/cardstack/middleware'));
   }
 
   async function teardown() {

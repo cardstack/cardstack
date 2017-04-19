@@ -42,11 +42,6 @@ exports.createDefaultEnvironment = async function(initialModels = []) {
       mayWriteField: true
     }).withRelated('who', factory.addResource('groups', user.id));
 
-  factory.addResource('plugin-configs')
-    .withAttributes({
-      module: "@cardstack/hub/node-tests/test-authenticator"
-    });
-
   let container = await wireItUp(crypto.randomBytes(32), factory.getModels(), false);
 
   let writers = container.lookup('hub:writers');
