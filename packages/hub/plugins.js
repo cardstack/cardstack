@@ -47,7 +47,8 @@ const featureTypes = [
   'writers',
   'searchers',
   'indexers',
-  'authenticators'
+  'authenticators',
+  'middleware'
 ];
 const javascriptPattern = /(.*)\.js$/;
 
@@ -79,7 +80,7 @@ module.exports = class Plugins {
     }
   }
 
-  lookup(featureType, fullyQualifiedName) {
+  _lookup(featureType, fullyQualifiedName) {
     if (!this[featureType]) {
       throw new Error(`Don't understand featureType ${featureType}`);
     }
@@ -87,21 +88,29 @@ module.exports = class Plugins {
     if (!feature) {
       throw new Error(`Unknown ${featureType} ${fullyQualifiedName}`);
     }
+    return feature;
+  }
+
+  lookup(featureType, fullyQualifiedName) {
+    let feature = this._lookup(featureType, fullyQualifiedName);
     if (!feature.cached) {
       feature.cached = require(feature.loadPath);
     }
     return feature.cached;
   }
 
+  loadPathFor(featureType, fullyQualifiedName) {
+    let feature = this._lookup(featureType, fullyQualifiedName);
+    return feature.loadPath;
+  }
+
   // returns a list of [name, loaderFunc] where you can call
   // loaderFunc to get back the actual module.
-  lookupAll(featureType) {
+  listAll(featureType) {
     if (!this[featureType]) {
       throw new Error(`Don't understand featureType ${featureType}`);
     }
-    return [...this[featureType].entries()].map(([name, feature]) => {
-      return [name, () => feature.cached ? feature.cached : require(feature.loadPath)];
-    });
+    return [...this[featureType].entries()].map(([name]) => name);
   }
 
   configFor(moduleName) {

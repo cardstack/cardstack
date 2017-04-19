@@ -1,6 +1,8 @@
 const {
   Registry: GlimmerRegistry,
-  Container: GlimmerContainer
+  Container: GlimmerContainer,
+  setOwner,
+  getOwner
 } = require('@glimmer/di');
 
 const injectionSymbol = Symbol('@cardstack/di/injections');
@@ -28,6 +30,13 @@ exports.Registry = class Registry extends GlimmerRegistry {
 exports.Container = class Container extends GlimmerContainer {
   constructor(registry, nextResolver) {
     super(registry, new Resolver(registry, nextResolver));
+  }
+  lookup(...args) {
+    let result = super.lookup(...args);
+    if (result) {
+      setOwner(result, this);
+    }
+    return result;
   }
 };
 
@@ -57,6 +66,8 @@ class Resolver {
       let [type, name] = specifier.split(':');
       if (type === 'hub') {
         module = `@cardstack/hub/${name}`;
+      } else if (type === 'middleware') {
+        module = name;
       }
     }
 
@@ -71,3 +82,5 @@ class Resolver {
     }
   }
 }
+
+exports.getOwner = getOwner;
