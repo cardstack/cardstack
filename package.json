@@ -82,6 +82,6 @@
     "postcss-cssnext": "^2.10.0",
     "postcss-import": "^9.1.0",
     "qs": "^6.4.0",
-    "torii": "^0.8.2"
+    "torii": "https://github.com/ef4/torii#938786f7cc727a1b4d3ee2d4647b63eb8037d1e8"
   }
 }

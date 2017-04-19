@@ -26,7 +26,7 @@
     "@cardstack/authentication": "*",
     "ember-cli-babel": "^5.1.7",
     "ember-cli-htmlbars": "^1.1.1",
-    "torii": "^0.8.2"
+    "torii": "https://github.com/ef4/torii#938786f7cc727a1b4d3ee2d4647b63eb8037d1e8"
   },
   "devDependencies": {
     "broccoli-asset-rev": "^2.4.5",
