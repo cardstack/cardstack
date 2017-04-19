@@ -42,6 +42,11 @@ exports.createDefaultEnvironment = async function(initialModels = []) {
       mayWriteField: true
     }).withRelated('who', factory.addResource('groups', user.id));
 
+  factory.addResource('plugin-configs')
+    .withAttributes({
+      module: "@cardstack/hub/node-tests/test-authenticator"
+    });
+
   let container = await wireItUp(crypto.randomBytes(32), factory.getModels(), false);
 
   let writers = container.lookup('hub:writers');
@@ -67,7 +72,11 @@ exports.createDefaultEnvironment = async function(initialModels = []) {
     user: user.data,
     head,
     repo,
-    repoPath
+    repoPath,
+    setUserId(id) {
+      let m = this.lookup(`middleware:${require.resolve('@cardstack/hub/node-tests/test-authenticator/middleware')}`);
+      m.userId = id;
+    }
   });
   return container;
 };
@@ -76,24 +85,6 @@ exports.destroyDefaultEnvironment = async function(env) {
   await env.teardown();
   await destroyIndices();
   await temp.cleanup();
-};
-
-exports.TestAuthenticator = class {
-  constructor(initialUser) {
-    this.user = initialUser;
-  }
-  middleware() {
-    let self = this;
-    return async (ctxt, next) => {
-      ctxt.state.cardstackSession = {
-        userId: self.user ? self.user.id : null,
-        async loadUser() {
-          return self.user;
-        }
-      };
-      await next();
-    };
-  }
 };
 
 async function destroyIndices() {

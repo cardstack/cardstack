@@ -3,11 +3,27 @@ const qs = require('qs');
 const { merge } = require('lodash');
 const koaJSONBody = require('koa-json-body');
 const logger = require('heimdalljs-logger');
+const { declareInjections } = require('@cardstack/di');
 
-module.exports = function(searcher, writers, optionsArg) {
-  let options = Object.assign({}, {
+module.exports = declareInjections({
+  searcher: 'hub:searchers',
+  writers: 'hub:writers'
+}, {
+  create({ searcher, writers }) {
+    return {
+      after: 'authentication',
+      middleware() {
+        return jsonapiMiddleware(searcher, writers);
+      }
+    };
+  }
+});
+
+function jsonapiMiddleware(searcher, writers) {
+  // TODO move into config
+  let options = {
     defaultBranch: 'master'
-  }, optionsArg);
+  };
 
   let body = koaJSONBody({ limit: '1mb' });
   let log = logger('jsonapi');
@@ -29,7 +45,7 @@ module.exports = function(searcher, writers, optionsArg) {
     let handler = new Handler(searcher, writers, ctxt, options.defaultBranch, log);
     return handler.run();
   };
-};
+}
 
 class Handler {
   constructor(searcher, writers, ctxt, defaultBranch, log) {

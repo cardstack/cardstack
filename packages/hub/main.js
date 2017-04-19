@@ -26,8 +26,7 @@ async function makeServer(encryptionKeys, seedModels) {
   let container = await wireItUp(encryptionKeys, seedModels);
   let app = new Koa();
   app.use(httpLogging);
-  app.use(container.lookup('hub:authentication').middleware());
-  app.use(require('@cardstack/jsonapi/middleware')(container.lookup('hub:searchers'), container.lookup('hub:writers')));
+  app.use(container.lookup('hub:middleware-stack').middleware());
   return app;
 }
 

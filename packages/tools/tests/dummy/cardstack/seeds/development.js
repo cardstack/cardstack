@@ -21,6 +21,13 @@ module.exports = [
     }
   },
   {
+    type: 'plugin-configs',
+    id: 2,
+    attributes: {
+      module: '@cardstack/jsonapi'
+    }
+  },
+  {
     type: 'data-sources',
     id: 0,
     attributes: {

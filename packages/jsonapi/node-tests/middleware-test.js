@@ -1,17 +1,15 @@
-const jsonapi = require('@cardstack/jsonapi/middleware');
 const supertest = require('supertest');
 const Koa = require('koa');
 const {
   createDefaultEnvironment,
-  destroyDefaultEnvironment,
-  TestAuthenticator
+  destroyDefaultEnvironment
 } = require('@cardstack/hub/node-tests/support');
 const { currentVersion } = require('./support');
 const JSONAPIFactory = require('@cardstack/test-support/jsonapi-factory');
 
 describe('jsonapi/middleware', function() {
 
-  let request, env, authenticator;
+  let request, env;
 
   async function sharedSetup() {
     let factory = new JSONAPIFactory();
@@ -45,11 +43,16 @@ describe('jsonapi/middleware', function() {
         body: "This is the second article"
       });
 
+
+    factory.addResource('plugin-configs')
+      .withAttributes({
+        module: "@cardstack/jsonapi"
+      });
+
+
     let app = new Koa();
     env = await createDefaultEnvironment(factory.getModels());
-    authenticator = new TestAuthenticator(env.user);
-    app.use(authenticator.middleware());
-    app.use(jsonapi(env.lookup('hub:searchers'), env.lookup('hub:writers')));
+    app.use(env.lookup('hub:middleware-stack').middleware());
     request = supertest(app.callback());
   }
 
@@ -318,7 +321,7 @@ describe('jsonapi/middleware', function() {
     after(sharedTeardown);
 
     it('applies authorization during create', async function() {
-      authenticator.user = null;
+      env.setUserId(null);
       let response = await request.post('/articles').send({
         data: {
           type: 'articles',
@@ -332,7 +335,7 @@ describe('jsonapi/middleware', function() {
     });
 
     it('applies authorization during update', async function() {
-      authenticator.user = null;
+      env.setUserId(null);
       let version = await currentVersion(request, '/articles/0');
       let response = await request.patch('/articles/0').send({
         data: {
@@ -348,7 +351,7 @@ describe('jsonapi/middleware', function() {
     });
 
     it('applies authorization during delete', async function() {
-      authenticator.user = null;
+      env.setUserId(null);
       let version = await currentVersion(request, '/articles/0');
       let response = await request.delete('/articles/0').set('If-Match', version);
       expect(response).hasStatus(401);

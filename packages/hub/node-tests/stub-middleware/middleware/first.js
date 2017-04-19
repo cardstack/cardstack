@@ -4,6 +4,9 @@ module.exports = class FirstMiddleware {
   static create() {
     return new this();
   }
+  get category() {
+    return 'uno';
+  }
   middleware() {
     return route.get('/first', async function(ctxt) {
       ctxt.body = {

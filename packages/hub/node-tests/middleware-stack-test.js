@@ -45,13 +45,13 @@ describe('middleware-stack', function() {
     it('placed "wrap" before "first"', async function() {
       let response = await request.get('/first');
       expect(response).hasStatus(200);
-      expect(response.body.state).deep.equals({ wrapped: true });
+      expect(response.body.state).has.property('wrapped', true);
     });
 
     it('placed "wrap" after "second"', async function() {
       let response = await request.get('/second');
       expect(response).hasStatus(200);
-      expect(response.body.state).deep.equals({});
+      expect(response.body.state).not.has.property('wrapped');
     });
 
     it('does not mount unconfigured middleware', async function() {

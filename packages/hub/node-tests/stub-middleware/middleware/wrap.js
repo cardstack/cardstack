@@ -3,10 +3,10 @@ module.exports = class WrapMiddleware {
     return new this();
   }
   get before() {
-    return ['@cardstack/hub/node-tests/stub-middleware::first'];
+    return ['uno'];
   }
   get after() {
-    return ['@cardstack/hub/node-tests/stub-middleware::second'];
+    return ['dos', 'unused-tag'];
   }
   middleware() {
     return async function(ctxt, next) {
