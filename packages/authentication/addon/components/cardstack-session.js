@@ -7,9 +7,6 @@ export default Ember.Component.extend({
   cardstackSession: Ember.inject.service(),
 
   actions: {
-    login() {
-      this.get('session').authenticate('authenticator:cardstack-torii', 'github');
-    },
     logout() {
       this.get('session').invalidate();
     }

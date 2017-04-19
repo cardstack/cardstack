@@ -1,0 +1,5 @@
+{{#if hasBlock}}
+  {{yield (action "login") }}
+{{else}}
+  <button {{action "login"}}>Log in via GitHub</button>
+{{/if}}

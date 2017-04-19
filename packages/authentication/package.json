@@ -26,8 +26,7 @@
     "ember-cli-babel": "^5.2.4",
     "ember-cli-htmlbars": "^1.1.1",
     "ember-fetch": "^1.4.0",
-    "ember-simple-auth": "^1.2.2",
-    "torii": "^0.8.2"
+    "ember-simple-auth": "^1.2.2"
   },
   "devDependencies": {
     "broccoli-asset-rev": "^2.4.5",
