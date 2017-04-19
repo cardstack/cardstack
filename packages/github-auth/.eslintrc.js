@@ -1,4 +1,13 @@
 module.exports = {
   root: true,
-  "extends": require.resolve('@cardstack/eslint-config')
+  parserOptions: {
+    ecmaVersion: 6,
+    sourceType: 'module'
+  },
+  extends: 'eslint:recommended',
+  env: {
+    browser: true
+  },
+  rules: {
+  }
 };
