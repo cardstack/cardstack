@@ -16,6 +16,7 @@ addons:
       - g++-4.9-multilib
       - lcov
       - oracle-java8-installer
+      - oracle-java8-set-default
 
 compiler: clang
 
