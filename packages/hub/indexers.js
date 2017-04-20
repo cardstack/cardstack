@@ -24,6 +24,7 @@ const logger = require('heimdalljs-logger');
 const Client = require('@cardstack/elasticsearch/client');
 const BulkOps = require('./bulk-ops');
 const { declareInjections } = require('@cardstack/di');
+const owningDataSource = new WeakMap();
 
 require('./diff-log-formatter');
 
@@ -120,9 +121,13 @@ class Indexers {
     let schema = await this.schemaCache.schemaForControllingBranch();
     if (schema !== this._lastControllingSchema) {
       this._lastControllingSchema = schema;
-      this._indexers = [...schema.dataSources.values()].map(v => v.indexer).filter(Boolean);
+      this._indexers = [...schema.dataSources.values()].map(v => {
+        if (v.indexer) {
+          owningDataSource.set(v.indexer, v);
+          return v.indexer;
+        }
+      }).filter(Boolean);
       this.log.debug('found %s indexers', this._indexers.length);
-
     }
     return this._indexers;
   }
@@ -136,9 +141,7 @@ class Indexers {
           branches[branch] = [];
         }
         let updater = await indexer.beginUpdate(branch);
-        if (updater.name == null) {
-          throw new Error("index updaters must provide a name");
-        }
+        owningDataSource.set(updater, owningDataSource.get(indexer));
         branches[branch].push(updater);
       }
     }));
@@ -149,7 +152,7 @@ class Indexers {
     return this.client.es.getSource({
       index: Client.branchToIndexName(branch),
       type: 'meta',
-      id: updater.name,
+      id: owningDataSource.get(updater).id,
       ignore: [404]
     });
   }
@@ -159,7 +162,7 @@ class Indexers {
       index: {
         _index: Client.branchToIndexName(branch),
         _type: 'meta',
-        _id: updater.name,
+        _id: owningDataSource.get(updater).id,
       }
     }, newMeta);
   }

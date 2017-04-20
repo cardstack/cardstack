@@ -130,7 +130,6 @@ class GitUpdater {
     this.commit = null;
     this.commitId = null;
     this.rootTree = null;
-    this.name = `git/${repoPath}`;
     this.log = log;
   }
 

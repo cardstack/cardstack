@@ -7,7 +7,7 @@ const JSONAPIFactory = require('@cardstack/test-support/jsonapi-factory');
 const { Registry, Container } = require('@cardstack/di');
 
 describe('git/indexer', function() {
-  let root, indexer, ea;
+  let root, indexer, ea, dataSource;
 
   beforeEach(async function() {
     ea = new ElasticAssert();
@@ -20,16 +20,18 @@ describe('git/indexer', function() {
         module: '@cardstack/git'
       });
 
+    dataSource = factory.addResource('data-sources')
+        .withAttributes({
+          'source-type': '@cardstack/git',
+          params: { repo: root }
+        });
+
     factory.addResource('plugin-configs')
       .withAttributes({
         module: '@cardstack/hub',
       }).withRelated(
         'default-data-source',
-        factory.addResource('data-sources')
-          .withAttributes({
-            'source-type': '@cardstack/git',
-            params: { repo: root }
-          })
+        dataSource
       );
 
     let registry = new Registry();
@@ -49,7 +51,7 @@ describe('git/indexer', function() {
     expect([...aliases.keys()]).to.deep.equal(['master']);
     let indices = await ea.contentIndices();
     expect(indices).to.have.lengthOf(1);
-    let indexerState = await ea.indexerState('master', root);
+    let indexerState = await ea.indexerState('master', dataSource.id);
     expect(indexerState.commit).to.equal(head);
   });
 
@@ -147,7 +149,7 @@ describe('git/indexer', function() {
 
     await indexer.update();
 
-    let indexerState = await ea.indexerState('master', root);
+    let indexerState = await ea.indexerState('master', dataSource.id);
     expect(indexerState.commit).to.equal(head);
 
     let contents = await ea.documentContents('master', 'articles', 'hello-world');
@@ -169,7 +171,7 @@ describe('git/indexer', function() {
 
     await indexer.update();
 
-    let indexerState = await ea.indexerState('master', root);
+    let indexerState = await ea.indexerState('master', dataSource.id);
     expect(indexerState.commit).to.equal(head);
 
     try {
@@ -194,7 +196,7 @@ describe('git/indexer', function() {
       await indexer.update();
     });
 
-    let indexerState = await ea.indexerState('master', root);
+    let indexerState = await ea.indexerState('master', dataSource.id);
     expect(indexerState.commit).to.equal(head);
 
     try {
@@ -228,7 +230,7 @@ describe('git/indexer', function() {
 
     await indexer.update();
 
-    let indexerState = await ea.indexerState('master', root);
+    let indexerState = await ea.indexerState('master', dataSource.id);
     expect(indexerState.commit).to.equal(head);
 
     let contents = await ea.documentContents('master', 'articles', 'hello-world');
