@@ -45,7 +45,7 @@ before_install:
   - echo $JAVA_HOME
 
 install:
-  - yarn install
+  - yarn install --non-interactive
   - wget https://artifacts.elastic.co/downloads/elasticsearch/elasticsearch-${ES_VERSION}.tar.gz
   - tar -xzf elasticsearch-${ES_VERSION}.tar.gz
   - ./elasticsearch-${ES_VERSION}/bin/elasticsearch 2>&1 >> /dev/null &
