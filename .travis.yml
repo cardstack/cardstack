@@ -16,12 +16,8 @@ addons:
       - g++-4.9-multilib
       - lcov
       - oracle-java8-installer
-      - oracle-java8-set-default
 
 compiler: clang
-
-jdk:
-  - oraclejdk8
 
 env:
   global:
@@ -31,6 +27,7 @@ env:
     - GYP_DEFINES="use_obsolete_asm=true"
     - ES_VERSION=5.1.2
     - ELASTICSEARCH=http://127.0.0.1:9200 
+    - JAVA_HOME=/usr/lib/jvm/java-8-oracle
 
 cache:
   directories:
@@ -46,7 +43,6 @@ before_install:
   - java -version
   - which java
   - echo $JAVA_HOME
-  - false
 
 install:
   - yarn install
