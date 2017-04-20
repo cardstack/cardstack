@@ -19,6 +19,9 @@ addons:
 
 compiler: clang
 
+jdk:
+  - oraclejdk8
+
 env:
   global:
     - CC=clang
@@ -39,6 +42,7 @@ before_install:
   - npm install -g bower phantomjs-prebuilt yarn
   - bower --version
   - phantomjs --version
+  - java -version
 
 install:
   - yarn install
