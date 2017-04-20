@@ -8,7 +8,17 @@ sudo: false
 services:
   - elasticsearch
 
-compiler: clang
+addons:
+  apt:
+    sources:
+      - ubuntu-toolchain-r-test
+    packages:
+      - libssl-dev
+      - g++-4.8
+
+env:
+ - CXX=g++-4.8
+
 
 cache:
   directories:
