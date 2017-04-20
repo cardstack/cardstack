@@ -32,16 +32,16 @@ before_install:
   - npm install -g bower phantomjs-prebuilt yarn
   - bower --version
   - phantomjs --version
+  - export CC=clang
+  - export CXX=clang++
+  - export npm_config_clang=1
+  - export GYP_DEFINES="use_obsolete_asm=true"
 
 install:
   - yarn install
 
 before_script:
  - ln -s ../packages node_modules/@cardstack
- - export CC=clang
- - export CXX=clang++
- - export npm_config_clang=1
- - export GYP_DEFINES="use_obsolete_asm=true"
 
 script:
   - ELASTICSEARCH=http://localhost:9200 npm test
