@@ -11,13 +11,13 @@ module.exports = class DataSource {
   }
   get writer() {
     if (!this._writer && this._Writer) {
-      this._writer = new (this._Writer)(this._params);
+      this._writer = new (this._Writer)(this._params, this.id);
     }
     return this._writer;
   }
   get indexer() {
     if (!this._indexer && this._Indexer) {
-      this._indexer = new (this._Indexer)(this._params);
+      this._indexer = new (this._Indexer)(this._params, this.id);
     }
     return this._indexer;
   }
