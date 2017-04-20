@@ -3,7 +3,7 @@ const logger = require('heimdalljs-logger');
 const { isEqual, merge } = require('lodash');
 
 function host() {
-  return process.env.ELASTICSEARCH || 'http://10.0.15.2:9200';
+  return process.env.ELASTICSEARCH || 'http://localhost:9200';
 }
 
 const fieldPrefix = '';
