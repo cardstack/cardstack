@@ -1,5 +1,5 @@
 const Error = require('@cardstack/plugin-utils/error');
-const https = require('https');
+const request = require('./lib/request');
 
 exports.authenticate = async function(payload, params /*, userSearcher */) {
   if (!payload.authorizationCode) {
@@ -31,7 +31,7 @@ exports.authenticate = async function(payload, params /*, userSearcher */) {
     }
   };
 
-  let { response, body: responseBody } = await httpsRequest(options, data);
+  let { response, body: responseBody } = await request(options, data);
   if (response.statusCode !== 200) {
     throw new Error(responseBody.error, {
       status: response.statusCode
@@ -45,12 +45,12 @@ exports.authenticate = async function(payload, params /*, userSearcher */) {
     method: 'GET',
     headers: {
       'Accept': 'application/json',
-      'User-Agent': '@cardstack/oauth2-client',
+      'User-Agent': '@cardstack/github-auth',
       Authorization: `token ${responseBody.access_token}`
     }
   };
 
-  let userResponse = await httpsRequest(options);
+  let userResponse = await request(options);
   if (userResponse.response.statusCode !== 200) {
     throw new Error(responseBody.error, { status: response.statusCode });
   }
@@ -58,24 +58,6 @@ exports.authenticate = async function(payload, params /*, userSearcher */) {
     user: userResponse.body
   };
 };
-
-function httpsRequest(options, data) {
-  return new Promise((resolve,reject) => {
-    let ghReq = https.request(options, (ghRes) => {
-      let body = '';
-      ghRes.setEncoding('utf8');
-      ghRes.on('data', chunk => body += chunk);
-      ghRes.on('end', () => {
-        resolve({ response: ghRes, body: JSON.parse(body) });
-      });
-    });
-    ghReq.on('error', reject);
-    if (data) {
-      ghReq.write(data);
-    }
-    ghReq.end();
-  });
-}
 
 exports.exposeConfig = function(params) {
   return {
