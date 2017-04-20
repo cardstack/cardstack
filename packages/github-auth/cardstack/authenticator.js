@@ -76,3 +76,9 @@ function httpsRequest(options, data) {
     ghReq.end();
   });
 }
+
+exports.exposeConfig = function(params) {
+  return {
+    clientId: params['client-id']
+  };
+};

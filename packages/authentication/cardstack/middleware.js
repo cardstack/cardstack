@@ -86,7 +86,8 @@ class Authentication {
     return compose([
       this._tokenVerifier(),
       this._tokenIssuerPreflight(prefix),
-      this._tokenIssuer(prefix)
+      this._tokenIssuer(prefix),
+      this._exposeConfiguration(prefix)
     ]);
   }
 
@@ -203,5 +204,21 @@ class Authentication {
         }
       }
     ]));
+  }
+
+  _exposeConfiguration(prefix) {
+    return route.get(`/${prefix}/:module`, async (ctxt) => {
+      let sourceAndPlugin = await this._locateAuthenticationSource(ctxt.routeParams.module);
+      if (sourceAndPlugin) {
+        let { source, plugin } = sourceAndPlugin;
+        let result;
+        if (plugin.exposeConfig) {
+          result = plugin.exposeConfig(source.attributes.params);
+        } else {
+          result = {};
+        }
+        ctxt.body = result;
+      }
+    });
   }
 });

@@ -28,5 +28,11 @@ export default Base.extend({
       },
       body: JSON.stringify(payload)
     }).then(response => response.json());
+  },
+
+  fetchConfig(authenticationSource) {
+    let config = Ember.getOwner(this).resolveRegistration('config:environment');
+    let tokenExchangeUri = config.cardstack.apiURL + '/auth/' + authenticationSource;
+    return fetch(tokenExchangeUri).then(response => response.json());
   }
 });

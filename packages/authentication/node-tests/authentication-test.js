@@ -40,7 +40,10 @@ describe('authentication/middleware', function() {
     });
 
     factory.addResource('authentication-sources', 'by-email').withAttributes({
-      authenticatorType: '@cardstack/authentication/node-tests/stub-authenticators::by-email'
+      authenticatorType: '@cardstack/authentication/node-tests/stub-authenticators::by-email',
+      params: {
+        hidden: true
+      }
     });
 
     factory.addResource('authentication-sources', 'always-invalid').withAttributes({
@@ -328,6 +331,19 @@ describe('authentication/middleware', function() {
           }
         });
         expect(response).hasStatus(401);
+      });
+
+      it('can choose to expose some configuration', async function() {
+        let response = await request.get('/auth/config-echo-quint');
+        expect(response.body).deep.equals({
+          user: { id: quint.id }
+        });
+      });
+
+
+      it('does not expose config unless opted in', async function() {
+        let response = await request.get('/auth/by-email');
+        expect(response.body).deep.equals({});
       });
 
     });
