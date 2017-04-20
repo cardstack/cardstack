@@ -8,6 +8,8 @@ sudo: false
 services:
   - elasticsearch
 
+compiler: clang
+
 cache:
   directories:
     - $HOME/.npm
@@ -22,6 +24,9 @@ before_install:
 
 install:
   - yarn install
+
+before_script:
+ - ln -s ../packages node_modules/@cardstack
 
 script:
   - ELASTICSEARCH=http://localhost:9200 npm test
