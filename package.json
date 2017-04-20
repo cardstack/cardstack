@@ -30,6 +30,7 @@
     "ember-resolver": "^2.0.3",
     "ember-source": "~2.12.0",
     "glob": "^7.1.1",
+    "lerna": "^2.0.0-rc.3",
     "loader.js": "^4.2.3",
     "mocha": "^3.2.0",
     "mocha-eslint": "^3.0.1",
