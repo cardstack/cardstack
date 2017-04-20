@@ -48,7 +48,7 @@ install:
   - yarn install
   - wget https://artifacts.elastic.co/downloads/elasticsearch/elasticsearch-${ES_VERSION}.tar.gz
   - tar -xzf elasticsearch-${ES_VERSION}.tar.gz
-  - ./elasticsearch-${ES_VERSION}/bin/elasticsearch &
+  - ./elasticsearch-${ES_VERSION}/bin/elasticsearch 2>&1 >> /dev/null &
 
 before_script:
  - ln -s ../packages node_modules/@cardstack
