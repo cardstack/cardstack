@@ -29,7 +29,7 @@ describe('git/change', function() {
     expect(commit.authorName).to.equal('John Milton');
     expect(commit.authorEmail).to.equal('john@paradiselost.com');
     expect(commit.message).to.equal('First commit');
-    expect(commit.authorDate).to.equal('2017-01-16T12:21:00+03:00');
+    expect(commit.authorDate).to.equal('2017-01-16 12:21:00 +0300');
   });
 
   it('can include separate committer info', async function() {
@@ -124,7 +124,7 @@ describe('git/change', function() {
     commitId = await change.finalize(commitOpts({ message: 'Third commit' }));
     expect(commitId).is.a('string');
 
-    expect((await inRepo(path).getCommit('master')).message).to.equal('Clean merge into master');
+    expect((await inRepo(path).getCommit('master')).message).to.match(/Clean merge into master/);
     expect((await inRepo(path).getCommit('master^1')).message).to.equal('Third commit');
     expect((await inRepo(path).getCommit('master^2')).message).to.equal('Second commit');
     expect(await inRepo(path).getContents('master', 'hello-world.txt')).to.equal('This is a file');

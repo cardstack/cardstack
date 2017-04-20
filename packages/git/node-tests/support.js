@@ -48,7 +48,7 @@ const formats = {
   id: 'H',
   authorName: 'an',
   authorEmail: 'ae',
-  authorDate: 'aI',
+  authorDate: 'ai',
   committerName: 'cn',
   committerEmail: 'ce',
   message: 'B'
