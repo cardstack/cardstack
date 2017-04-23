@@ -4,9 +4,9 @@ module.exports = class DataSource {
     this.sourceType = model.attributes['source-type'];
     this._writer = null;
     this._params = model.attributes.params;
-    this._Writer = plugins.lookup('writers', this.sourceType);
+    this._Writer = plugins.lookupOptional('writers', this.sourceType);
     this._writer = null;
-    this._Indexer = plugins.lookup('indexers', this.sourceType);
+    this._Indexer = plugins.lookupOptional('indexers', this.sourceType);
     this._indexer = null;
   }
   get writer() {

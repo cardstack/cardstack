@@ -80,12 +80,12 @@ module.exports = class Plugins {
     }
   }
 
-  _lookup(featureType, fullyQualifiedName) {
+  _lookup(featureType, fullyQualifiedName, optional) {
     if (!this[featureType]) {
       throw new Error(`Don't understand featureType ${featureType}`);
     }
     let feature = this[featureType].get(fullyQualifiedName);
-    if (!feature) {
+    if (!feature && !optional) {
       throw new Error(`Unknown ${featureType} ${fullyQualifiedName}`);
     }
     return feature;
@@ -98,6 +98,17 @@ module.exports = class Plugins {
     }
     return feature.cached;
   }
+
+  lookupOptional(featureType, fullyQualifiedName) {
+    let feature = this._lookup(featureType, fullyQualifiedName, true);
+    if (feature){
+      if (!feature.cached) {
+        feature.cached = require(feature.loadPath);
+      }
+      return feature.cached;
+    }
+  }
+
 
   loadPathFor(featureType, fullyQualifiedName) {
     let feature = this._lookup(featureType, fullyQualifiedName);
