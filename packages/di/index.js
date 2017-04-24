@@ -49,26 +49,18 @@ function registerDeclaredInjections(registry, identifier, factory) {
   }
 }
 
-// TODO: searchers should dynamically load like other feature plugins
-const exceptions = {
-  'hub:searchers': '@cardstack/elasticsearch/searcher'
-};
-
 class Resolver {
   constructor(registry, nextResolver) {
     this.registry = registry;
     this.nextResolver = nextResolver;
   }
   retrieve(specifier) {
-    let module = exceptions[specifier];
-
-    if (!module) {
-      let [type, name] = specifier.split(':');
-      if (type === 'hub') {
-        module = `@cardstack/hub/${name}`;
-      } else if (type === 'middleware') {
-        module = name;
-      }
+    let module;
+    let [type, name] = specifier.split(':');
+    if (type === 'hub') {
+      module = `@cardstack/hub/${name}`;
+    } else if (type === 'middleware') {
+      module = name;
     }
 
     if (module) {
