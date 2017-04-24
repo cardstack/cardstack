@@ -38,16 +38,11 @@ class Authentication {
 
   get userSearcher() {
     return {
-      get: (userId) => {
-        return this.searcher.get(this.controllingBranch, this.userContentType, userId);
+      get: (type, userId) => {
+        return this.searcher.get(this.controllingBranch, type, userId);
       },
       search: (params) => {
-        let { filter } = params;
-        if (!filter) {
-          filter = {};
-        }
-        filter.type = this.userContentType;
-        return this.searcher.search(this.controllingBranch, Object.assign({}, params, { filter }));
+        return this.searcher.search(this.controllingBranch, params);
       }
     };
   }
@@ -138,7 +133,7 @@ class Authentication {
 
     ctxt.body = {
       data: user,
-      meta: await this.createToken({ userId: user.id }, 86400)
+      meta: await this.createToken({ id: user.id, type: user.type }, 86400)
     };
     ctxt.status = 200;
   }
@@ -147,7 +142,7 @@ class Authentication {
     let user = this._rewriteExternalUser(externalUser, source.attributes['user-template'] || plugin.defaultUserTemplate);
     let have;
     try {
-      have = await this.userSearcher.get(user.id);
+      have = await this.userSearcher.get(user.type, user.id);
     } catch (err) {
       if (err.status !== 404) {
         throw err;

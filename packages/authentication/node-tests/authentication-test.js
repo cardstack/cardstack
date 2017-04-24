@@ -66,7 +66,7 @@ describe('authentication/middleware', function() {
 
     factory.addResource('authentication-sources', 'id-rewriter').withAttributes({
       authenticatorType: '@cardstack/authentication/node-tests/stub-authenticators::echo',
-      userTemplate: '{ "id": "{{upstreamId}}" }'
+      userTemplate: '{ "id": "{{upstreamId}}", "type": "users" }'
     });
 
     factory.addResource('authentication-sources', 'has-default-template').withAttributes({
@@ -109,7 +109,7 @@ describe('authentication/middleware', function() {
       ctxt.body = {};
       let session = ctxt.state.cardstackSession;
       if (session) {
-        ctxt.body.userId = session.userId;
+        ctxt.body.userId = session.id;
         try {
           ctxt.body.user = await session.loadUser();
         } catch (err) {
@@ -143,25 +143,25 @@ describe('authentication/middleware', function() {
     });
 
     it('ignores expired token', async function() {
-      let { token } = await auth.createToken({ userId: 42 }, -30);
+      let { token } = await auth.createToken({ id: 42, type: 'users' }, -30);
       let response = await request.get('/').set('authorization', `Bearer ${token}`);
       expect(response.body).deep.equals({});
     });
 
     it('issues a working token', async function() {
-      let { token } = await auth.createToken({ userId: env.user.id }, 30);
+      let { token } = await auth.createToken({ id: env.user.id, type: 'users' }, 30);
       let response = await request.get('/').set('authorization', `Bearer ${token}`);
       expect(response.body).has.property('userId', env.user.id);
     });
 
 
     it('token comes with validity timestamp', async function() {
-      let { validUntil } = await auth.createToken({ userId: env.user.id }, 30);
+      let { validUntil } = await auth.createToken({ id: env.user.id, type: 'users' }, 30);
       expect(validUntil).is.a('number');
     });
 
     it('offers full user load within session', async function() {
-      let { token } = await auth.createToken({ userId: env.user.id }, 30);
+      let { token } = await auth.createToken({ id: env.user.id, type: 'users' }, 30);
       let response = await request.get('/').set('authorization', `Bearer ${token}`);
       expect(response.body.user).deep.equals(env.user);
     });

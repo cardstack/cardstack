@@ -3,13 +3,16 @@ class Session {
     this.payload = payload;
     this.userSearcher = userSearcher;
   }
-  get userId() {
-    return this.payload.userId;
+  get id() {
+    return this.payload.id;
   }
+  get type() {
+    return this.payload.type;
+  }
+
   async loadUser() {
-    let id = this.userId;
-    if (id != null) {
-      return this.userSearcher.get(id);
+    if (this.id != null && this.type != null) {
+      return this.userSearcher.get(this.type, this.id);
     }
   }
 }
