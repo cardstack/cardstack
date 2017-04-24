@@ -94,7 +94,7 @@ export default Ember.Service.extend({
   requestedEditing: false,
 
   // This is a placeholder until I integrate the auth system here.
-  mayEditLive: false,
+  mayEditLive: true,
 
   editing: Ember.computed('requestedEditing', 'branch', function() {
     return this.get('requestedEditing') &&
