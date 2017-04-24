@@ -24,9 +24,7 @@ class Searcher {
     } catch (err) {
       if (err.hasOwnProperty('status') && !err.isCardstackError) {
         if (err.status === 404) {
-          throw new Error(`No such resource ${branch}/${type}/${id}`, {
-            status: 404
-          });
+          return;
         }
         throw new Error(err.message, {
           status: err.status

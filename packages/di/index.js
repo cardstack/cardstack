@@ -61,6 +61,8 @@ class Resolver {
       module = `@cardstack/hub/${name}`;
     } else if (type === 'middleware') {
       module = name;
+    } else if (type === 'searcher') {
+      module = name;
     }
 
     if (module) {

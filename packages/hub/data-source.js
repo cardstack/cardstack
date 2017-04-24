@@ -8,6 +8,8 @@ module.exports = class DataSource {
     this._writer = null;
     this._Indexer = plugins.lookupOptional('indexers', this.sourceType);
     this._indexer = null;
+    this._Searcher = plugins.lookupOptional('searchers', this.sourceType);
+    this._searcher = null;
   }
   get writer() {
     if (!this._writer && this._Writer) {
@@ -21,4 +23,11 @@ module.exports = class DataSource {
     }
     return this._indexer;
   }
+  get searcher() {
+    if (!this._searcher && this._Searcher) {
+      this._searcher = new (this._Searcher)(this._params, this.id);
+    }
+    return this._searcher;
+  }
+
 };
