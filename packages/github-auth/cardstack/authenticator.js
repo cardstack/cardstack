@@ -64,3 +64,5 @@ exports.exposeConfig = function(params) {
     clientId: params['client-id']
   };
 };
+
+exports.defaultUserTemplate =  "{ \"id\": \"{{login}}\", \"attributes\": { \"name\": \"{{name}}\", \"email\":\"{{email}}\", \"avatar-url\":\"{{avatar_url}}\" }}";
