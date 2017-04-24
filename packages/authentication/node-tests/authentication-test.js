@@ -69,6 +69,11 @@ describe('authentication/middleware', function() {
       userTemplate: '{ "id": "{{upstreamId}}" }'
     });
 
+    factory.addResource('authentication-sources', 'has-default-template').withAttributes({
+      authenticatorType: '@cardstack/authentication/node-tests/stub-authenticators::has-default-template'
+    });
+
+
     factory.addResource('authentication-sources', 'create-via-template').withAttributes({
       authenticatorType: '@cardstack/authentication/node-tests/stub-authenticators::echo',
       userTemplate: `{
@@ -346,6 +351,14 @@ describe('authentication/middleware', function() {
         expect(response.body).deep.equals({});
       });
 
+      it(`applies plugin's default template to rewrite ids`, async function() {
+        let response = await request.post(`/auth/has-default-template`).send({
+          user: { upstreamId: arthur.id }
+        });
+        expect(response).hasStatus(200);
+        expect(response.body).has.deep.property('data.id', arthur.id);
+        expect(response.body).has.deep.property('data.attributes.full-name', 'Arthur Faulkner');
+      });
     });
   });
 

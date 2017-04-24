@@ -129,7 +129,7 @@ class Authentication {
       return;
     }
 
-    let user = result.preloadedUser || await this._processExternalUser(result.user, source);
+    let user = result.preloadedUser || await this._processExternalUser(result.user, source, plugin);
 
     if (!user) {
       ctxt.status = 401;
@@ -143,8 +143,8 @@ class Authentication {
     ctxt.status = 200;
   }
 
-  async _processExternalUser(externalUser, source) {
-    let user = this._rewriteExternalUser(externalUser, source.attributes['user-template']);
+  async _processExternalUser(externalUser, source, plugin) {
+    let user = this._rewriteExternalUser(externalUser, source.attributes['user-template'] || plugin.defaultUserTemplate);
     let have;
     try {
       have = await this.userSearcher.get(user.id);
