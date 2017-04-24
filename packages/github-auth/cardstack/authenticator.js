@@ -65,4 +65,4 @@ exports.exposeConfig = function(params) {
   };
 };
 
-exports.defaultUserTemplate =  "{ \"id\": \"{{login}}\", \"attributes\": { \"name\": \"{{name}}\", \"email\":\"{{email}}\", \"avatar-url\":\"{{avatar_url}}\" }}";
+exports.defaultUserTemplate =  "{ \"id\": \"{{login}}\", \"type\": \"github-users\", \"attributes\": { \"name\": \"{{name}}\", \"email\":\"{{email}}\", \"avatar-url\":\"{{avatar_url}}\" }}";
