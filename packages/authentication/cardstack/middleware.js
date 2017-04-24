@@ -33,7 +33,7 @@ class Authentication {
 
     // TODO: move these two settings into config
     this.controllingBranch = 'master';
-    this.userContentType = 'users';
+
   }
 
   get userSearcher() {
@@ -140,6 +140,7 @@ class Authentication {
 
   async _processExternalUser(externalUser, source, plugin) {
     let user = this._rewriteExternalUser(externalUser, source.attributes['user-template'] || plugin.defaultUserTemplate);
+    if (user.type == null || user.id == null) { return; }
     let have;
     try {
       have = await this.userSearcher.get(user.type, user.id);
@@ -149,11 +150,11 @@ class Authentication {
       }
     }
     if (!have && source.attributes['may-create-user']) {
-      return this.writer.create(this.controllingBranch, actingUser, this.userContentType, user);
+      return this.writer.create(this.controllingBranch, actingUser, user.type, user);
     }
     if (have && source.attributes['may-update-user']) {
       user.meta = have.meta;
-      return this.writer.update(this.controllingBranch, actingUser, this.userContentType, have.id, user);
+      return this.writer.update(this.controllingBranch, actingUser, user.type, have.id, user);
     }
     return have;
   }
@@ -173,7 +174,6 @@ class Authentication {
         throw err;
       }
     }
-    rewritten.type = this.userContentType;
     this.log.debug("rewritten user %j", rewritten);
     return rewritten;
   }

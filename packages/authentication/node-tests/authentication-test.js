@@ -53,14 +53,14 @@ describe('authentication/middleware', function() {
     factory.addResource('authentication-sources', 'config-echo-quint').withAttributes({
       authenticatorType: '@cardstack/authentication/node-tests/stub-authenticators::config-echo',
       params: {
-        user: { id: quint.id }
+        user: { id: quint.id, type: 'users' }
       }
     });
 
     factory.addResource('authentication-sources', 'config-echo-arthur').withAttributes({
       authenticatorType: '@cardstack/authentication/node-tests/stub-authenticators::config-echo',
       params: {
-        user: { id: arthur.id }
+        user: { id: arthur.id, type: 'users' }
       }
     });
 
@@ -78,6 +78,7 @@ describe('authentication/middleware', function() {
       authenticatorType: '@cardstack/authentication/node-tests/stub-authenticators::echo',
       userTemplate: `{
         "id": "my-prefix-{{id}}",
+        "type": "users",
         "attributes": {
           "full-name": "{{firstName}} {{lastName}}",
           "email": "{{email}}"
@@ -185,24 +186,24 @@ describe('authentication/middleware', function() {
       });
 
       it('finds authenticator', async function() {
-        let response = await request.post(`/auth/echo`).send({ user: {id : env.user.id }});
+        let response = await request.post(`/auth/echo`).send({ user: {id : env.user.id, type: 'users' }});
         expect(response).hasStatus(200);
       });
 
       it('responds with token', async function() {
-        let response = await request.post(`/auth/echo`).send({ user: { id: env.user.id }});
+        let response = await request.post(`/auth/echo`).send({ user: { id: env.user.id, type: 'users' }});
         expect(response).hasStatus(200);
         expect(response.body.meta.token).is.a('string');
       });
 
       it('responds with validity timestamp', async function() {
-        let response = await request.post(`/auth/echo`).send({ user: { id: env.user.id }});
+        let response = await request.post(`/auth/echo`).send({ user: { id: env.user.id, type: 'users' }});
         expect(response).hasStatus(200);
         expect(response.body.meta.validUntil).is.a('number');
       });
 
       it('responds with a copy of the user record', async function() {
-        let response = await request.post(`/auth/echo`).send({ user: { id: env.user.id }});
+        let response = await request.post(`/auth/echo`).send({ user: { id: env.user.id, type: 'users' }});
         expect(response).hasStatus(200);
         expect(response.body.data).deep.equals(env.user);
       });
@@ -227,7 +228,7 @@ describe('authentication/middleware', function() {
 
       it('can approve via id', async function() {
         let response = await request.post(`/auth/echo`).send({
-          user: { id: env.user.id }
+          user: { id: env.user.id, type: 'users' }
         });
         expect(response).hasStatus(200);
         expect(response.body).has.deep.property('meta.token');
@@ -303,6 +304,7 @@ describe('authentication/middleware', function() {
         let response = await request.post(`/auth/echo`).send({
           user: {
             id: quint.id,
+            type: 'users',
             attributes: {
               email: 'updated.email@this-changed.com'
             }
@@ -329,6 +331,20 @@ describe('authentication/middleware', function() {
         let response = await request.post(`/auth/echo`).send({
           user: {
             id: 'my-prefix-4321',
+            type: 'users',
+            attributes: {
+              'full-name': 'Newly Created',
+              email: 'new@example.com'
+            }
+          }
+        });
+        expect(response).hasStatus(401);
+      });
+
+      it('when plugin returns no type, returns 401', async function() {
+        let response = await request.post(`/auth/echo`).send({
+          user: {
+            id: 'my-prefix-4321',
             attributes: {
               'full-name': 'Newly Created',
               email: 'new@example.com'
@@ -341,7 +357,7 @@ describe('authentication/middleware', function() {
       it('can choose to expose some configuration', async function() {
         let response = await request.get('/auth/config-echo-quint');
         expect(response.body).deep.equals({
-          user: { id: quint.id }
+          user: { id: quint.id, type: 'users' }
         });
       });
 
@@ -371,6 +387,7 @@ describe('authentication/middleware', function() {
         let response = await request.post(`/auth/update-user`).send({
           user: {
             id: quint.id,
+            type: 'users',
             attributes: {
               email: 'updated.email@this-changed.com'
             }
