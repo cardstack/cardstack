@@ -14,13 +14,6 @@ export default Model.extend(TrackRelationships, {
   zip: attr('string'),
   slug: attr('string'),
 
-  type: Ember.computed(function() {
-    // for some weird reason, you can't just say
-    // `model.constructor.modelName` in a template to get this. It
-    // works if you provide this computed property.
-    return this.constructor.modelName;
-  }),
-
   save(...args) {
     if (this.get('isNew') && !this.get('slug') && this.get('title')) {
       this.set('slug', deriveSlug(this.get('title')));

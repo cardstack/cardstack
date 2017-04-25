@@ -1,5 +1,6 @@
 import Ember from 'ember';
 import layout from '../templates/components/cardstack-content';
+import { modelType } from '@cardstack/tools/helpers/cs-model-type';
 
 export default Ember.Component.extend({
   layout,
@@ -9,7 +10,7 @@ export default Ember.Component.extend({
     return `${Ember.guidFor(this.get('content'))}/${this.get('format')}`;
   }),
   specificComponent: Ember.computed('content', 'format', function() {
-    let type = this.get('content.constructor.modelName');
+    let type = modelType(this.get('content'));
     let format = this.get('format');
     return `cardstack/${type}-${format}`;
   })

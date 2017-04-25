@@ -1,6 +1,7 @@
 import Ember from 'ember';
 const { getOwner } = Ember;
 import { transitionTo } from '../private-api';
+import { modelType } from '@cardstack/tools/helpers/cs-model-type';
 
 export default Ember.Service.extend({
   overlays: Ember.inject.service('ember-overlays'),
@@ -165,7 +166,7 @@ export default Ember.Service.extend({
         name,
         args,
         queryParams
-      } = this.get('cardstackRouting').routeFor(model.get('type'), model.get('slug'), which);
+      } = this.get('cardstackRouting').routeFor(modelType(model), model.get('slug'), which);
       transitionTo(getOwner(this), name, args, queryParams);
     }
   },

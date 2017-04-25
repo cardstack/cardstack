@@ -2,6 +2,7 @@ import Ember from 'ember';
 import layout from '../templates/components/cs-version-control';
 import { task } from 'ember-concurrency';
 import { transitionTo } from '../private-api';
+import { modelType } from '@cardstack/tools/helpers/cs-model-type';
 
 export default Ember.Component.extend({
   layout,
@@ -36,7 +37,7 @@ export default Ember.Component.extend({
       return;
     }
     let model = this.get('model');
-    let type = model.constructor.modelName;
+    let type = modelType(model);
     let id = model.get('id');
     if (id == null) {
       // Nothing to do, we don't have an id yet. It's vanishingly
@@ -138,14 +139,14 @@ export default Ember.Component.extend({
 
   delete: task(function * () {
     let model = this.get('model');
-    let placeholder = this.get('store').createRecord('cardstack-placeholder', { type: model.get('type'), slug: model.get('slug') });
+    let placeholder = this.get('store').createRecord('cardstack-placeholder', { type: modelType(model), slug: model.get('slug') });
     if (model.get('isNew')) {
       transitionTo(Ember.getOwner(this), 'cardstack.new-content', [placeholder]);
       return;
     }
     let branch = this.get('modelMeta.branch');
     this.get('resourceMetadata').write(placeholder, { branch });
-    let route = this.get('cardstackRouting').routeFor(model.get('type'), model.get('slug'), branch);
+    let route = this.get('cardstackRouting').routeFor(modelType(model), model.get('slug'), branch);
     yield this.get('model').destroyRecord();
     if (route) {
       transitionTo(Ember.getOwner(this), route.name, [placeholder], route.queryParams);
