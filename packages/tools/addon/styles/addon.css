@@ -3,6 +3,7 @@
 @import "cardstack-toolbox";
 @import "cs-toggle-switch";
 @import "cs-field-overlays";
+@import "cs-account-icon";
 @import "theme";
 
 :root {
