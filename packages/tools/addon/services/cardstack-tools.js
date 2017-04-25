@@ -95,7 +95,14 @@ export default Ember.Service.extend({
   requestedEditing: false,
 
   // This is a placeholder until I integrate the auth system here.
-  mayEditLive: true,
+  mayEditLive: Ember.computed(function() {
+    let { cardstack } = Ember.getOwner(this).resolveRegistration('config:environment');
+    if (cardstack && typeof cardstack.mayEditLive === 'boolean') {
+      return cardstack.mayEditLive;
+    } else {
+      return true;
+    }
+  }),
 
   editing: Ember.computed('requestedEditing', 'branch', function() {
     return this.get('requestedEditing') &&
