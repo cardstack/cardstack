@@ -16,7 +16,7 @@
     "doc": "doc",
     "test": "tests"
   },
-  "repository": "https://githbu.com/cardstack/cardstack",
+  "repository": "https://github.com/cardstack/cardstack",
   "scripts": {
     "build": "ember build",
     "start": "ember server",
