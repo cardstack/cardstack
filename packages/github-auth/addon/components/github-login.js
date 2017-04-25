@@ -32,7 +32,7 @@ export default Ember.Component.extend({
     // blockers. So instead in our template we don't render ourself at
     // all until after fetchConfig finishes. Fixing this more nicely
     // would require changes to Torii.
-    let { authorizationCode } = yield this.get('torii').open('github');
+    let { authorizationCode } = yield this.get('torii').open('github-oauth2');
     yield this.get('session').authenticate('authenticator:cardstack', this.get('source'), { authorizationCode });
   }).drop()
 });
