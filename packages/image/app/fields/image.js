@@ -3,6 +3,6 @@ export function isEmpty(value) {
   return !hasImage;
 }
 
-export function placeholder(humanizedFieldName) {
+export function placeholder(/* humanizedFieldName */) {
   return {};
 }

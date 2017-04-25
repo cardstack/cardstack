@@ -1,5 +1,5 @@
 module.exports = {
-  valid(value) {
+  valid(/* value */) {
     return true;
   },
 
