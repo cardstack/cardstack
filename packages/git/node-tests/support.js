@@ -6,7 +6,7 @@
 */
 
 const spawn = require('child_process').spawn;
-const Change = require('@cardstack/git/change');
+const Change = require('../change');
 
 exports.inRepo = function(path) {
   return new RepoExplorer(path);

@@ -1,5 +1,5 @@
-const Client = require('@cardstack/elasticsearch/client');
-const { branchToIndexName } = require('@cardstack/elasticsearch/client');
+const Client = require('../client');
+const { branchToIndexName } = require('../client');
 
 module.exports = class ElasticAsserter {
   constructor(){

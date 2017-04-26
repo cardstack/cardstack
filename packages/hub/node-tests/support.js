@@ -3,7 +3,7 @@ const { makeRepo } = require('@cardstack/git/node-tests/support');
 const ElasticAssert = require('@cardstack/elasticsearch/node-tests/assertions');
 const JSONAPIFactory = require('@cardstack/test-support/jsonapi-factory');
 const crypto = require('crypto');
-const { wireItUp } = require('@cardstack/hub/main');
+const { wireItUp } = require('../main');
 
 exports.createDefaultEnvironment = async function(initialModels = []) {
   let repoPath = await temp.mkdir('cardstack-server-test');

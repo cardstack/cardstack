@@ -7,6 +7,11 @@
   "author": "Edward Faulkner <edward@eaf4.com>",
   "license": "MIT",
   "devDependencies": {
-    "denodeify": "^1.2.1"
+    "denodeify": "^1.2.1",
+    "chai": "^3.5.0",
+    "chai-things": "^0.2.0",
+    "mocha": "^3.2.0",
+    "mocha-eslint": "^3.0.1",
+    "temp": "^0.8.3"
   }
 }
