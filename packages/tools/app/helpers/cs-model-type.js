@@ -1,1 +1,1 @@
-export { default, csModelType } from '@cardstack/tools/helpers/cs-model-type';
+export { default } from '@cardstack/tools/helpers/cs-model-type';
