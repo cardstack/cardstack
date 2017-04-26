@@ -4,6 +4,7 @@
 @import "cs-toggle-switch";
 @import "cs-field-overlays";
 @import "cs-account-icon";
+@import "cs-admin-menu";
 @import "theme";
 
 :root {

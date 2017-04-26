@@ -104,4 +104,97 @@
       </g>
     </g>
   </symbol>
+
+  <symbol id="notifications" viewBox="0 0 20 21" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:sketch="http://www.bohemiancoding.com/sketch/ns">
+    <g id="Content-Editor" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd" sketch:type="MSPage">
+      <g id="AIA_menu_short" sketch:type="MSArtboardGroup" transform="translate(-20.000000, -302.000000)" stroke-linecap="round" stroke="#818181" stroke-linejoin="round">
+        <g id="Group" sketch:type="MSLayerGroup" transform="translate(0.000000, 42.000000)">
+          <g id="Notifications-+-Stroke-1310-+-Stroke-1311" transform="translate(20.000000, 261.000000)" sketch:type="MSShapeGroup">
+            <g id="Stroke-1310-+-Stroke-1311">
+              <path d="M17.0833333,13.75 L17.0833333,9.16666667 C17.0833333,6.12416667 15.1591667,3.53666667 12.4666667,2.53416667 C12.2816667,1.33583333 11.25,0.416666667 10,0.416666667 C8.75,0.416666667 7.715,1.33583333 7.53083333,2.53416667 C4.8375,3.53666667 2.91666667,6.12416667 2.91666667,9.16666667 L2.91666667,13.75 C2.91666667,15.1308333 1.79666667,16.25 0.416666667,16.25 L19.5833333,16.25 C18.2008333,16.25 17.0833333,15.1308333 17.0833333,13.75 L17.0833333,13.75 Z" id="Stroke-1310"></path>
+              <path d="M12.5,16.25 C12.5,17.6308333 11.38,18.75 10,18.75 C8.6175,18.75 7.5,17.6308333 7.5,16.25" id="Stroke-1311"></path>
+            </g>
+          </g>
+        </g>
+      </g>
+    </g>
+  </symbol>
+
+  <symbol id="settings" viewBox="0 0 22 22" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:sketch="http://www.bohemiancoding.com/sketch/ns">
+    <g id="Content-Editor" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd" sketch:type="MSPage">
+      <g id="AIA_menu_short" sketch:type="MSArtboardGroup" transform="translate(-19.000000, -351.000000)" stroke-linecap="round" stroke="#818181" stroke-linejoin="round">
+        <g id="Group" sketch:type="MSLayerGroup" transform="translate(0.000000, 42.000000)">
+          <g id="Settings-+-Stroke-814-+-Stroke-815" transform="translate(20.000000, 310.000000)" sketch:type="MSShapeGroup">
+            <g id="Stroke-814-+-Stroke-815">
+              <path d="M16.87825,11.25 L19.58325,11.25 L19.58325,8.75 L16.8774167,8.75 C16.70325,8.0275 16.41825,6.9325 16.0415833,6.315 L17.9549167,4.4025 L15.5974167,2.045 L13.68325,3.95833333 C13.0665833,3.58166667 11.9724167,3.2975 11.2499167,3.12333333 L11.2499167,0.416666667 L8.74991667,0.416666667 L8.74991667,3.12333333 C8.02741667,3.2975 6.93241667,3.58166667 6.31575,3.95833333 L4.40158333,2.045 L2.04408333,4.4025 L3.95825,6.31583333 C3.58158333,6.9325 3.29658333,8.0275 3.12158333,8.75 L0.416583333,8.75 L0.416583333,11.25 L3.12158333,11.25 C3.29658333,11.9725 3.58158333,13.0675 3.95825,13.6841667 L2.04408333,15.5983333 L4.40158333,17.955 L6.31491667,16.0408333 C6.93241667,16.4183333 8.02741667,16.7033333 8.74991667,16.8783333 L8.74991667,19.5833333 L11.2499167,19.5833333 L11.2499167,16.8783333 C11.9724167,16.7033333 13.0674167,16.4183333 13.68325,16.0416667 L15.59825,17.955 L17.9549167,15.5983333 L16.0415833,13.6841667 C16.41825,13.0675 16.70325,11.9725 16.87825,11.25 L16.87825,11.25 Z" id="Stroke-814"></path>
+              <path d="M13.75,10 C13.75,12.0716667 12.0708333,13.75 10,13.75 C7.92916667,13.75 6.25,12.0716667 6.25,10 C6.25,7.92916667 7.92916667,6.25 10,6.25 C12.0708333,6.25 13.75,7.92916667 13.75,10 L13.75,10 Z" id="Stroke-815"></path>
+            </g>
+          </g>
+        </g>
+      </g>
+    </g>
+  </symbol>
+
+  <symbol id="logout" viewBox="0 0 22 20" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:sketch="http://www.bohemiancoding.com/sketch/ns">
+    <g id="Content-Editor" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd" sketch:type="MSPage">
+      <g id="AIA_menu_short" sketch:type="MSArtboardGroup" transform="translate(-188.000000, -406.000000)" stroke-linecap="round" stroke="#818181" stroke-linejoin="round">
+        <g id="Group" sketch:type="MSLayerGroup" transform="translate(0.000000, 42.000000)">
+          <g id="Logout-+-Stroke-349-+-Stroke-350-+-Stroke-351" transform="translate(140.000000, 364.000000)" sketch:type="MSShapeGroup">
+            <g id="Stroke-349-+-Stroke-350-+-Stroke-351" transform="translate(49.000000, 0.666667)">
+              <path d="M11.25,14.5833333 L11.25,17.9166667 L0.416666667,17.9166667 L0.416666667,0.416666667 L11.25,0.416666667 L11.25,3.75" id="Stroke-349"></path>
+              <path d="M4.58333333,9.58333333 L19.5833333,9.58333333" id="Stroke-350"></path>
+              <path d="M15.4166667,5.41666667 L19.5833333,9.58333333 L15.4166667,13.75" id="Stroke-351"></path>
+            </g>
+          </g>
+        </g>
+      </g>
+    </g>
+  </symbol>
+
+
+  <symbol id="lightning" viewBox="0 0 16 22" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+      <g id="Menu-flyout-" transform="translate(-20.000000, -350.000000)" stroke="#818181">
+        <g id="Group-7" transform="translate(-40.000000, -26.000000)">
+          <g id="Group" transform="translate(40.000000, 0.000000)">
+            <g id="Group-8" transform="translate(0.000000, 267.000000)">
+              <path d="M22.3058573,122.125007 L26.3510969,122.125007 L26.3510969,129.406438 C26.3510969,129.773746 26.5970474,130.095747 26.9530285,130.187978 C27.3057734,130.281828 27.6795535,130.126491 27.8623984,129.807726 L34.3347817,118.481055 C34.4787922,118.231868 34.475556,117.921194 34.3315455,117.673625 C34.1859169,117.424439 33.9205491,117.27072 33.6325281,117.27072 L29.5872885,117.27072 L29.5872885,109.989288 C29.5872885,109.621981 29.3397198,109.299979 28.9837388,109.207748 C28.6309939,109.113898 28.2572137,109.269236 28.0743689,109.588001 L21.6019856,120.943797 C21.4757741,121.180039 21.4595932,121.471296 21.6052218,121.722101 C21.7508504,121.971288 22.0162181,122.125007 22.3058573,122.125007 Z" id="Fill-5023" transform="translate(27.971396, 119.697863) rotate(-345.000000) translate(-27.971396, -119.697863) "></path>
+            </g>
+          </g>
+        </g>
+      </g>
+    </g>
+  </symbol>
+
+
+  <symbol id="data-sources" viewBox="0 0 24 19" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+      <g id="Menu-flyout-" transform="translate(-17.000000, -401.000000)">
+        <g id="Group-7" transform="translate(-40.000000, -26.000000)">
+          <g id="Group" transform="translate(40.000000, 0.000000)">
+            <g id="Group-8" transform="translate(0.000000, 267.000000)">
+              <g id="Group-1345" transform="translate(17.000000, 160.000000)">
+                <polygon id="Stroke-4915" stroke="#818181" stroke-linecap="round" stroke-linejoin="round" points="0.5 6.5 23.5 6.5 23.5 0.5 0.5 0.5"></polygon>
+                <path d="M14.5,3.5 C14.5,3.776 14.276,4 14,4 C13.724,4 13.5,3.776 13.5,3.5 C13.5,3.224 13.724,3 14,3 C14.276,3 14.5,3.224 14.5,3.5 L14.5,3.5 Z" id="Stroke-4916" stroke="#818181" stroke-linecap="round" stroke-linejoin="round"></path>
+                <path d="M17.5,3.5 C17.5,3.776 17.276,4 17,4 C16.724,4 16.5,3.776 16.5,3.5 C16.5,3.224 16.724,3 17,3 C17.276,3 17.5,3.224 17.5,3.5 L17.5,3.5 Z" id="Stroke-4917" stroke="#818181" stroke-linecap="round" stroke-linejoin="round"></path>
+                <path d="M20.5,3.5 C20.5,3.776 20.276,4 20,4 C19.724,4 19.5,3.776 19.5,3.5 C19.5,3.224 19.724,3 20,3 C20.276,3 20.5,3.224 20.5,3.5 L20.5,3.5 Z" id="Stroke-4918" stroke="#818181" stroke-linecap="round" stroke-linejoin="round"></path>
+                <path d="M4.5,3.5 C4.5,4.053 4.052,4.5 3.5,4.5 C2.947,4.5 2.5,4.053 2.5,3.5 C2.5,2.948 2.947,2.5 3.5,2.5 C4.052,2.5 4.5,2.948 4.5,3.5 L4.5,3.5 Z" id="Stroke-4919" stroke="#818181" stroke-linecap="round" stroke-linejoin="round"></path>
+                <polyline id="Stroke-4920" stroke="#818181" stroke-linecap="round" stroke-linejoin="round" points="0.5 6.5 0.5 12.5 23.5 12.5 23.5 6.5"></polyline>
+                <path d="M14.5,9.5 C14.5,9.776 14.276,10 14,10 C13.724,10 13.5,9.776 13.5,9.5 C13.5,9.224 13.724,9 14,9 C14.276,9 14.5,9.224 14.5,9.5 L14.5,9.5 Z" id="Stroke-4921" stroke="#818181" stroke-linecap="round" stroke-linejoin="round"></path>
+                <path d="M17.5,9.5 C17.5,9.776 17.276,10 17,10 C16.724,10 16.5,9.776 16.5,9.5 C16.5,9.224 16.724,9 17,9 C17.276,9 17.5,9.224 17.5,9.5 L17.5,9.5 Z" id="Stroke-4922" stroke="#818181" stroke-linecap="round" stroke-linejoin="round"></path>
+                <path d="M20.5,9.5 C20.5,9.776 20.276,10 20,10 C19.724,10 19.5,9.776 19.5,9.5 C19.5,9.224 19.724,9 20,9 C20.276,9 20.5,9.224 20.5,9.5 L20.5,9.5 Z" id="Stroke-4923" stroke="#818181" stroke-linecap="round" stroke-linejoin="round"></path>
+                <path d="M4.5,9.5 C4.5,10.053 4.052,10.5 3.5,10.5 C2.947,10.5 2.5,10.053 2.5,9.5 C2.5,8.948 2.947,8.5 3.5,8.5 C4.052,8.5 4.5,8.948 4.5,9.5 L4.5,9.5 Z" id="Stroke-4924" stroke="#818181" stroke-linecap="round" stroke-linejoin="round"></path>
+                <path d="M5.5,18.5 L18.5,18.5" id="Stroke-4925" stroke="#818181" stroke-linecap="round" stroke-linejoin="round"></path>
+                <path d="M12.5,12.5 L12.5,18.5" id="Stroke-4926" stroke="#818181" stroke-linecap="round" stroke-linejoin="round"></path>
+                <path d="M1.5,18 C1.224,18 1,18.224 1,18.5 C1,18.776 1.224,19 1.5,19 C1.776,19 2,18.776 2,18.5 C2,18.224 1.776,18 1.5,18" id="Fill-4927" fill="#818181"></path>
+                <path d="M3.5,18 C3.224,18 3,18.224 3,18.5 C3,18.776 3.224,19 3.5,19 C3.776,19 4,18.776 4,18.5 C4,18.224 3.776,18 3.5,18" id="Fill-4928" fill="#818181"></path>
+                <path d="M20.5,18 C20.224,18 20,18.224 20,18.5 C20,18.776 20.224,19 20.5,19 C20.776,19 21,18.776 21,18.5 C21,18.224 20.776,18 20.5,18" id="Fill-4929" fill="#818181"></path>
+                <path d="M22.5,18 C22.224,18 22,18.224 22,18.5 C22,18.776 22.224,19 22.5,19 C22.776,19 23,18.776 23,18.5 C23,18.224 22.776,18 22.5,18" id="Fill-4930" fill="#818181"></path>
+              </g>
+            </g>
+          </g>
+        </g>
+      </g>
+    </g>
+  </symbol>  
 </svg>

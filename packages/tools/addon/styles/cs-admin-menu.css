@@ -1,0 +1,68 @@
+.cs-admin-menu {
+    min-width: 13.75rem;
+    height: 100vh;
+    background-color: var(--bright-foreground);
+    border-right: 1px solid var(--deep-background);
+}
+
+.cs-admin-menu .your-info {
+        text-align: center;
+        padding: 1em 1em 0;
+}
+
+.cs-admin-menu .your-photo {
+    background-size: cover;
+    border-radius: 50%;
+    width: 95px;
+    height: 95px;
+    margin: 0 auto 1em;
+}
+
+.cs-admin-menu .your-info p:first-of-type {
+    font-size: 16px;
+    font-weight: bold;
+    margin: 0 0 .25em;
+}
+.cs-admin-menu .your-info p:last-of-type {
+    font-size: 12px;
+    margin: 0;
+}
+
+.cs-admin-menu .account-options-list {
+    text-align: left;
+    margin: 1.5em 0 1em;
+    display: block;
+}
+.cs-admin-menu .account-options {
+    border-top: 1px solid #ececec;
+    padding: .75em .5em 0.75em;
+    display: flex;
+    align-items: center;
+    color: $tools-text;
+    font-size: 12px;
+    overflow: hidden;
+}
+.cs-admin-menu .account-options > div {
+    margin-right: 1em;
+    width: 2.5em;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.cs-admin-menu .account-options > span {
+    flex: 1;
+    transition: all .1s ease-in;
+}
+
+.cs-admin-menu .account-options:hover > span {
+    transform: translateX(5px);
+    transition: all .1s ease-in;
+}
+
+.cs-admin-menu .logout {
+    text-align: right;
+}
+
+.cs-admin-menu .logout svg {
+    margin: 0 0 0 1em;
+}
