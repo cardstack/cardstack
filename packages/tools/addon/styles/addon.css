@@ -5,6 +5,7 @@
 @import "cs-field-overlays";
 @import "cs-account-icon";
 @import "cs-admin-menu";
+@import "cs-plugins-panel";
 @import "theme";
 
 :root {
@@ -40,6 +41,15 @@
    scrims provided by ember-overlays. */
 .cst-right, .cst-top {
     z-index: 10;
+}
+
+/* the left sidebar sometimes expands into a full admin screen, so it
+   needs to be above all, and overflowable */
+.cst-left {
+    z-index: 11;
+}
+.cst-left > .liquid-child {
+    overflow: initial;
 }
 
 .cardstack-toolbox {

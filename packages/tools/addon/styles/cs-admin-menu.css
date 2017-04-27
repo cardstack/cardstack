@@ -3,6 +3,7 @@
     height: 100vh;
     background-color: var(--bright-foreground);
     border-right: 1px solid var(--deep-background);
+    color: var(--deep-background);
 }
 
 .cs-admin-menu .your-info {
@@ -40,7 +41,7 @@
     align-items: center;
     color: $tools-text;
     font-size: 12px;
-    overflow: hidden;
+    cursor: pointer;
 }
 .cs-admin-menu .account-options > div {
     margin-right: 1em;
@@ -65,4 +66,18 @@
 
 .cs-admin-menu .logout svg {
     margin: 0 0 0 1em;
+}
+
+.cs-admin-panel-container {
+    position: absolute;
+    top: 0;
+    left: 13.75rem;
+    z-index: -1;
+}
+
+.cs-admin-panel {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100vw;
 }
