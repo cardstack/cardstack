@@ -22,11 +22,6 @@ exports.declareInjections = function(injections, klass) {
 };
 
 exports.Registry = class Registry extends GlimmerRegistry {
-  constructor(options) {
-    super(options);
-
-    this.root = options.root;
-  }
   register(identifier, factory, options) {
     let result = super.register(identifier, factory, options);
     registerDeclaredInjections(this, identifier, factory);
@@ -72,9 +67,11 @@ class Resolver {
       module = name;
     }
 
+    let { path: root } = this.registry.registration('config:project');
+
     if (module) {
-      let factory = requireFrom(module, this.registry.root);
-      
+      let factory = requireFrom(module, root);
+
       registerDeclaredInjections(this.registry, specifier, factory);
       return factory;
     }
