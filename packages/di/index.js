@@ -7,6 +7,8 @@ const {
 
 const injectionSymbol = Symbol('@cardstack/di/injections');
 
+const resolve = require('resolve');
+
 exports.declareInjections = function(injections, klass) {
   klass[injectionSymbol] = injections;
 
@@ -20,6 +22,11 @@ exports.declareInjections = function(injections, klass) {
 };
 
 exports.Registry = class Registry extends GlimmerRegistry {
+  constructor(options) {
+    super(options);
+
+    this.root = options.root;
+  }
   register(identifier, factory, options) {
     let result = super.register(identifier, factory, options);
     registerDeclaredInjections(this, identifier, factory);
@@ -58,7 +65,7 @@ class Resolver {
     let module;
     let [type, name] = specifier.split(':');
     if (type === 'hub') {
-      module = `@cardstack/hub/${name}`;
+      module = `./${name}`;
     } else if (type === 'middleware') {
       module = name;
     } else if (type === 'searcher') {
@@ -66,7 +73,8 @@ class Resolver {
     }
 
     if (module) {
-      let factory = require(module);
+      let factory = requireFrom(module, this.registry.root);
+      
       registerDeclaredInjections(this.registry, specifier, factory);
       return factory;
     }
@@ -75,6 +83,13 @@ class Resolver {
       return this.nextResolver.retrieve(specifier);
     }
   }
+}
+
+function requireFrom(module, basedir) {
+  let path = resolve.sync(module, {
+    basedir
+  });
+  return require(path);
 }
 
 exports.getOwner = getOwner;
