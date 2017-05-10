@@ -1,6 +1,6 @@
 {
   "name": "@cardstack/git",
-  "version": "0.0.10",
+  "version": "0.0.11",
   "description": "Git data source plugin for @cardstack/hub.",
   "repository": "https://github.com/cardstack/cardstack",
   "author": "Edward Faulkner <edward@eaf4.com>",
