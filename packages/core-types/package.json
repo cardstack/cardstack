@@ -1,6 +1,6 @@
 {
   "name": "@cardstack/core-types",
-  "version": "0.0.9",
+  "version": "0.0.10",
   "description": "The default blueprint for ember-cli addons.",
   "keywords": [
     "ember-addon",
