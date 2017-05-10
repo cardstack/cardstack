@@ -82,6 +82,8 @@ const {
   Commit
 } = require('nodegit');
 
+const Change = require("./change");
+
 const { safeEntryByName } = require('./mutable-tree');
 
 const logger = require('heimdalljs-logger');
@@ -95,9 +97,25 @@ module.exports = class Indexer {
     this.log = logger('git-indexer');
   }
 
+
   async _ensureRepo() {
     if (!this.repo) {
-      this.repo = await Repository.open(this.repoPath);
+      try {
+        this.repo = await Repository.open(this.repoPath);
+      } catch (e) {
+        if (/Failed to resolve path/.test(e.message)) {
+          let change = await Change.createInitial(this.repoPath, 'master');
+          this.repo = change.repo;
+
+          await change.finalize({
+            message: 'First commit',
+            authorName: 'Cardstack Hub',
+            authorEmail: 'hub@cardstack.com',
+          });
+        } else {
+          throw e;
+        }
+      }
     }
   }
 
