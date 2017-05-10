@@ -10,8 +10,11 @@ export default Ember.Component.extend({
     return `${Ember.guidFor(this.get('content'))}/${this.get('format')}`;
   }),
   specificComponent: Ember.computed('content', 'format', function() {
-    let type = modelType(this.get('content'));
     let format = this.get('format');
+    if (this.get('content.isCardstackPlaceholder')) {
+      return `cardstack/cardstack-placeholder-${format}`;
+    }
+    let type = modelType(this.get('content'));
     return `cardstack/${type}-${format}`;
   })
 });
