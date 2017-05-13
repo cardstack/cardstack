@@ -11,6 +11,7 @@
   },
   "description": "Thin wrapper over @glimmer/di for use in @cardstack/hub",
   "dependencies": {
+    "@glimmer/di":"^0.2.0"
   },
   "devDependencies": {
   }
