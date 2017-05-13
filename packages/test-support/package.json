@@ -1,0 +1,23 @@
+{
+  "name": "@cardstack/test-support",
+  "version": "0.0.9",
+  "description": "test helpers for @cardstack/hub.",
+  "repository": "https://github.com/cardstack/cardstack",
+  "author": "Edward Faulkner <edward@eaf4.com>",
+  "license": "MIT",
+  "engines": {
+    "node": ">= 7.7"
+  },
+  "devDependencies": {
+    "chai": "^3.5.0",
+    "chai-things": "^0.2.0",
+    "mocha": "^3.2.0",
+    "mocha-eslint": "^3.0.1",
+    "temp": "^0.8.3"
+  },
+  "dependencies": {
+  },
+  "cardstack-plugin": {
+    "api-version": 1
+  }
+}

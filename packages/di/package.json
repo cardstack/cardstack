@@ -6,12 +6,13 @@
   ],
   "author": "Edward Faulkner <edward@eaf4.com>",
   "repository": "https://github.com/cardstack/cardstack",
-  "cardstack-plugin":{
+  "cardstack-plugin": {
     "api-version": 1
   },
   "description": "Thin wrapper over @glimmer/di for use in @cardstack/hub",
   "dependencies": {
+    "@glimmer/di": "^0.2.0",
+    "resolve": "^1.3.3"
   },
-  "devDependencies": {
-  }
+  "devDependencies": {}
 }

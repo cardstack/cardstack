@@ -6,7 +6,7 @@
     "ember-addon",
     "cardstack-plugin"
   ],
-  "cardstack-plugin":{
+  "cardstack-plugin": {
     "api-version": 1,
     "src": "cardstack"
   },
@@ -20,7 +20,8 @@
   "scripts": {
     "build": "ember build",
     "start": "ember server",
-    "test": "ember try:each"
+    "test": "ember try:each",
+    "node-tests": "mocha -r ../test-support/prepare.js node-tests/*-test.js"
   },
   "dependencies": {
     "ember-cli-babel": "^5.2.4",
@@ -45,8 +46,20 @@
     "ember-export-application-global": "^1.1.1",
     "ember-load-initializers": "^0.6.3",
     "ember-resolver": "^2.1.1",
-    "ember-source": "~2.12.0",
-    "loader.js": "^4.2.3"
+    "loader.js": "^4.2.3",
+    "chai": "^3.5.0",
+    "chai-things": "^0.2.0",
+    "mocha": "^3.2.0",
+    "mocha-eslint": "^3.0.1",
+    "supertest": "^2.0.1",
+    "koa": "2",
+    "koa-better-route": "^0.1.0",
+    "koa-compose": "^3.2.1",
+    "koa-json-body": "^5.3.0",
+    "koa-mount": "^3.0.0",
+    "@cardstack/hub": "*",
+    "@cardstack/test-support": "*",
+    "temp": "^0.8.3"
   },
   "engines": {
     "node": ">= 4"

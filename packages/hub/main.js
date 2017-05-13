@@ -7,6 +7,7 @@ const log = logger('server');
 async function wireItUp(encryptionKeys, seedModels, withAsyncWatchers=true) {
   let registry = new Registry();
 
+  registry.register('config:project', { path: __dirname }, { instantiate: false });
   registry.register('config:seed-models', seedModels, { instantiate: false });
   registry.register('config:encryption-key', encryptionKeys, { instantiate: false });
 

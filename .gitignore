@@ -1,2 +1,4 @@
 node_modules
 .vagrant
+*.ember-try
+yarn-error.log
