@@ -19,7 +19,8 @@
     "chai-things": "^0.2.0",
     "debug": "2.6.3",
     "glob": "^7.1.1",
-    "mocha-eslint": "^3.0.1"
+    "mocha-eslint": "^3.0.1",
+    "require-uncached": "^1.0.3"
   },
   "author": "Edward Faulkner <edward@eaf4.com>",
   "license": "MIT",

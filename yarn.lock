@@ -4064,21 +4064,7 @@ linkify-it@~1.2.0:
   dependencies:
     uc.micro "^1.0.1"
 
-liquid-fire@>=0.24.1, liquid-fire@^0.27.1:
-  version "0.27.1"
-  resolved "https://registry.yarnpkg.com/liquid-fire/-/liquid-fire-0.27.1.tgz#bbcc1ac863a3dbdee1223b00c9457dbffb5d02b9"
-  dependencies:
-    broccoli-funnel "^1.0.1"
-    broccoli-merge-trees "^1.0.0"
-    ember-cli-babel "^5.1.7"
-    ember-cli-htmlbars "^1.1.1"
-    ember-cli-version-checker "^1.1.6"
-    ember-getowner-polyfill "^1.1.1"
-    ember-hash-helper-polyfill "^0.1.2"
-    match-media "^0.2.0"
-    velocity-animate ">= 0.11.8"
-
-liquid-fire@^0.27.2:
+liquid-fire@>=0.24.1, liquid-fire@^0.27.1, liquid-fire@^0.27.2:
   version "0.27.2"
   resolved "https://registry.yarnpkg.com/liquid-fire/-/liquid-fire-0.27.2.tgz#a2cd4cf87e52d9faecd7f1c3f7d2f7b164e128a7"
   dependencies:
@@ -5626,7 +5612,7 @@ request@2, request@^2.79.0:
     tunnel-agent "^0.6.0"
     uuid "^3.0.0"
 
-require-uncached@^1.0.2:
+require-uncached@^1.0.2, require-uncached@^1.0.3:
   version "1.0.3"
   resolved "https://registry.yarnpkg.com/require-uncached/-/require-uncached-1.0.3.tgz#4e0d56d6c9662fd31e43011c4b95aa49955421d3"
   dependencies:
