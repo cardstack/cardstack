@@ -1,6 +1,6 @@
 {
   "name": "@cardstack/drupal",
-  "version": "0.0.13",
+  "version": "0.0.14",
   "description": "Drupal data source plugin for @cardstack/hub.",
   "repository": "https://github.com/cardstack/cardstack",
   "author": "Edward Faulkner <edward@eaf4.com>",

@@ -1,6 +1,6 @@
 {
   "name": "@cardstack/routing",
-  "version": "0.0.13",
+  "version": "0.0.14",
   "description": "The default blueprint for ember-cli addons.",
   "keywords": [
     "ember-addon"
