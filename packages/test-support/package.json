@@ -18,7 +18,8 @@
     "chai": "^3.5.0",
     "chai-things": "^0.2.0",
     "debug": "2.6.3",
-    "glob": "^7.1.1"
+    "glob": "^7.1.1",
+    "mocha-eslint": "^3.0.1"
   },
   "author": "Edward Faulkner <edward@eaf4.com>",
   "license": "MIT",
