@@ -1,0 +1,23 @@
+{
+  "name": "@cardstack/eslint-config",
+  "version": "0.0.11",
+  "description": "Shared eslint config for cardstack packages.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/cardstack/cardstack.git"
+  },
+  "keywords": [
+    "cardstack",
+    "eslint"
+  ],
+  "author": "Edward Faulkner <edward@eaf4.com>",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/cardstack/cardstack/issues"
+  },
+  "homepage": "https://github.com/cardstack/cardstack#readme"
+}

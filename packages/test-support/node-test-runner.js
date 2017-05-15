@@ -1,5 +1,9 @@
 const util = require('util');
 const chai = require('chai');
+const glob = require('glob');
+const path = require('path');
+const lint = require('mocha-eslint');
+
 
 global.expect = chai.expect;
 chai.use(require('chai-things'));
@@ -55,3 +59,15 @@ if (!process.env['ELASTICSEARCH_PREFIX']) {
   // namespacing the test indices differently.
   process.env['ELASTICSEARCH_PREFIX'] = 'test';
 }
+
+let patterns = [
+  'packages/*/node-tests/**/*-test.js',
+  'node-tests/**/*-test.js'
+];
+for (let pattern of patterns) {
+  for (let file of glob.sync(pattern)) {
+    require(process.cwd() + '/' + file);
+  }
+}
+
+lint([ path.join(process.cwd()) ], { timeout: 20000 });
