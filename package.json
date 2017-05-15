@@ -39,7 +39,7 @@
   },
   "scripts": {
     "test": "npm run node-tests && npm run ember-tests",
-    "node-tests": "mocha ./packages/test-support/node-test-runner.js --timeout 10000",
+    "node-tests": "mocha -r ./packages/test-support/prepare-node-tests.js ./packages/test-support/node-test-runner.js --timeout 10000",
     "ember-tests": "node packages/test-support/ember-test-runner.js",
     "server": "node packages/hub/bin/server.js"
   },
