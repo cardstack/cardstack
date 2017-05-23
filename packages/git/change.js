@@ -7,7 +7,7 @@ const {
   Tree,
   setThreadSafetyStatus,
   TreeEntry: { FILEMODE }
-} = require('nodegit');
+} = require('@cardstack/nodegit');
 const {
   MutableTree,
   NotFound,

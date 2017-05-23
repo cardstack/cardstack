@@ -1,6 +1,6 @@
 const {
   Repository
-} = require('nodegit');
+} = require('@cardstack/nodegit');
 
 const logger = require('heimdalljs-logger');
 const crypto = require('crypto');
@@ -165,7 +165,7 @@ async function withErrorHandling(id, type, fn) {
   try {
     return await fn();
   } catch (err) {
-    if (/Unable to parse OID/.test(err.message) || /Object not found/.test(err.message)) {
+    if (/Unable to parse OID/i.test(err.message) || /Object not found/i.test(err.message)) {
       throw new Error(err.message, { status: 400, source: { pointer: '/data/meta/version' }});
     }
     if (err instanceof Change.GitConflict) {

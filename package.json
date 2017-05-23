@@ -80,7 +80,7 @@
     "lodash": "^4.17.4",
     "mobiledoc-text-renderer": "^0.3.2",
     "moment-timezone": "^0.5.11",
-    "nodegit": "https://github.com/ef4/nodegit#3388d9903a53d09ef4f3a8b9aba2163f4a8d0afa",
+    "@cardstack/nodegit": "*",
     "postcss-cssnext": "^2.10.0",
     "postcss-import": "^9.1.0",
     "qs": "^6.4.0",
