@@ -16,7 +16,7 @@
     "@cardstack/elasticsearch":"*"
   },
   "dependencies": {
-    "nodegit": "^0.16.0",
+    "nodegit": "https://github.com/ef4/nodegit#3388d9903a53d09ef4f3a8b9aba2163f4a8d0afa",
     "moment-timezone": "^0.5.11",
     "heimdalljs-logger": "^0.1.8"
   },
