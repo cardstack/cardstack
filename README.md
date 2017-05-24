@@ -4,9 +4,9 @@ Work in progress
 Orientation
 ---------------
 
-This is a monorepo. Each directory under `packages` is intended to be distributed as a  functioning npm package under the `@cardstack` organization. For the present, in order for them to find each other you must create this symlink:
+This is a monorepo. Each directory under `packages` is intended to be distributed as a  functioning npm package under the `@cardstack` organization. For the present, in order for them to find each other you must create these symlinks:
 
-    ln -s ../packages ./node_modules/@cardstack
+    for p in `ls packages`; do ln -s ../../packages/$p node_modules/@cardstack/; done
     
 The top-level package.json is a superset of everything needed by all the packages, so in development you should only need to yarn install at the top level.
 
