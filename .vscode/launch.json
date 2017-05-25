@@ -17,11 +17,14 @@
         {
             "type": "node",
             "request": "launch",
-            "name": "Launch Program",
-            "program": "${workspaceRoot}/bin/server.js",
+            "name": "Launch Server",
+            "program": "${workspaceRoot}/packages/hub/bin/server.js",
             "cwd": "${workspaceRoot}",
             "runtimeArgs": [
                 "--harmony"
+            ],
+            "args":[
+
             ]
         },
         {
@@ -41,9 +44,7 @@
             "program": "${workspaceRoot}/node_modules/.bin/_mocha",
             "cwd": "${workspaceRoot}",
             "args": [
-                "-r",
-                "packages/test-support/prepare.js",
-                "packages/*/node-tests/*-test.js"
+                "packages/test-support/bin/run.js"
             ],
             "runtimeArgs": [
                 "--harmony"
