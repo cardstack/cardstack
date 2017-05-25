@@ -269,7 +269,7 @@ describe('git/indexer', function() {
 });
 
 describe('git/indexer failures', function() {
-  let root, indexer, ea, dataSource;
+  let root, indexer, ea;
 
   beforeEach(async function() {
     ea = new ElasticAssert();
@@ -282,7 +282,7 @@ describe('git/indexer failures', function() {
         module: '@cardstack/git'
       });
 
-    dataSource = factory.addResource('data-sources')
+    let dataSource = factory.addResource('data-sources')
         .withAttributes({
           'source-type': '@cardstack/git',
           params: { repo: root + '/repo-to-be-created' }
@@ -297,7 +297,11 @@ describe('git/indexer failures', function() {
       );
 
     let registry = new Registry();
-    registry.register('config:seed-models', factory.getModels(), { instantiate: false });
+    registry.register('config:seed-models', factory.getModels());
+    registry.register('config:project', {
+      path: `${__dirname}/..`,
+      isTesting: true
+    });
     indexer = new Container(registry).lookup('hub:indexers');
   });
 
