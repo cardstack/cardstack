@@ -3,7 +3,7 @@ const temp = require('@cardstack/plugin-utils/node-tests/temp-helper');
 const {
   createDefaultEnvironment,
   destroyDefaultEnvironment
-} = require('@cardstack/hub/node-tests/support');
+} = require('@cardstack/test-support/env');
 const JSONAPIFactory = require('@cardstack/test-support/jsonapi-factory');
 const { makeRepo } = require('@cardstack/git/node-tests/support');
 const Change = require('../change');
@@ -45,7 +45,7 @@ describe('git/config', function() {
         title: 'First Article'
       });
 
-    env = await createDefaultEnvironment(factory.getModels());
+    env = await createDefaultEnvironment(`${__dirname}/..`, factory.getModels());
     let contents = await inRepo(repoPath).getJSONContents('master', `my/base/contents/articles/1.json`);
     expect(contents).deep.equals({
       attributes: {
@@ -85,7 +85,7 @@ describe('git/config', function() {
       ]).withRelated('data-source', source);
 
 
-    env = await createDefaultEnvironment(factory.getModels());
+    env = await createDefaultEnvironment(`${__dirname}/..`, factory.getModels());
 
     let response = await env.lookup('hub:searchers').search('master', { filter: { type: 'articles' } });
     expect(response.models.map(m => m.id)).deep.equals(['2']);
@@ -111,7 +111,7 @@ describe('git/config', function() {
         title: 'First Article'
       });
 
-    env = await createDefaultEnvironment(factory.getModels());
+    env = await createDefaultEnvironment(`${__dirname}/..`, factory.getModels());
     let contents = await inRepo(repoPath).getJSONContents('cs-master', `contents/articles/1.json`);
     expect(contents).deep.equals({
       attributes: {
@@ -155,7 +155,7 @@ describe('git/config', function() {
       ]).withRelated('data-source', source);
 
 
-    env = await createDefaultEnvironment(factory.getModels());
+    env = await createDefaultEnvironment(`${__dirname}/..`, factory.getModels());
 
     let response = await env.lookup('hub:searchers').search('master', { filter: { type: 'articles' } });
     expect(response.models.map(m => m.id)).deep.equals(['2']);

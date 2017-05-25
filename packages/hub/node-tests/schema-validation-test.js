@@ -1,9 +1,9 @@
-const Schema = require('@cardstack/hub/schema');
 const ElasticAssert = require('@cardstack/elasticsearch/node-tests/assertions');
 const JSONAPIFactory = require('@cardstack/test-support/jsonapi-factory');
 const { grantAllPermissions } = require('@cardstack/test-support/permissions');
 const PendingChange = require('@cardstack/plugin-utils/pending-change');
 const bootstrapSchema = require('@cardstack/hub/bootstrap-schema');
+const { Registry, Container } = require('@cardstack/di');
 
 describe('schema/validation', function() {
 
@@ -81,7 +81,11 @@ describe('schema/validation', function() {
 
     grantAllPermissions(factory);
 
-    schema = await Schema.loadFrom(factory.getModels());
+    let registry = new Registry();
+    registry.register('config:project', { path: `${__dirname}/..`, isTesting: true });
+    let container = new Container(registry);
+    let loader = container.lookup('hub:schema-loader');
+    schema = await loader.loadFrom(factory.getModels());
   });
 
   after(async function() {

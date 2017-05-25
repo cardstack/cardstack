@@ -17,7 +17,7 @@ module.exports = class Field {
     this.defaultAtUpdate = this._lookupDefaultValue(model, 'default-at-update', defaultValues);
     this.defaultAtCreate = this._lookupDefaultValue(model, 'default-at-create', defaultValues);
 
-    this.plugin = plugins.lookup('fields', this.fieldType);
+    this.plugin = plugins.lookupFeatureAndAssert('fields', this.fieldType);
     this.isRelationship = this.plugin.isRelationship;
 
     if (model.relationships && model.relationships.constraints && model.relationships.constraints.data) {

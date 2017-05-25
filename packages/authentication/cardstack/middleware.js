@@ -111,7 +111,7 @@ class Authentication {
   async _locateAuthenticationSource(name) {
     let source = await this.searcher.get(this.controllingBranch, 'authentication-sources', name);
     let schema = await this.schemaCache.schemaForControllingBranch();
-    let plugin = schema.plugins.lookup('authenticators', source.attributes['authenticator-type']);
+    let plugin = schema.plugins.lookupFeature('authenticators', source.attributes['authenticator-type']);
     return { plugin, source };
   }
 

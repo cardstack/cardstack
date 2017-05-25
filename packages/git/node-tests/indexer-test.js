@@ -36,7 +36,11 @@ describe('git/indexer', function() {
       );
 
     let registry = new Registry();
-    registry.register('config:seed-models', factory.getModels(), { instantiate: false });
+    registry.register('config:seed-models', factory.getModels());
+    registry.register('config:project', {
+      path: `${__dirname}/..`,
+      isTesting: true
+    });
     indexer = new Container(registry).lookup('hub:indexers');
   });
 

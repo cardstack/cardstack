@@ -3,7 +3,7 @@ const Koa = require('koa');
 const {
   createDefaultEnvironment,
   destroyDefaultEnvironment
-} = require('@cardstack/hub/node-tests/support');
+} = require('@cardstack/test-support/env');
 const JSONAPIFactory = require('@cardstack/test-support/jsonapi-factory');
 
 describe('authentication/middleware', function() {
@@ -18,7 +18,7 @@ describe('authentication/middleware', function() {
     });
 
     factory.addResource('plugin-configs').withAttributes({
-      module: '@cardstack/authentication/node-tests/stub-authenticators'
+      module: 'stub-authenticators'
     });
 
     quint = factory.addResource('users').withAttributes({
@@ -32,50 +32,50 @@ describe('authentication/middleware', function() {
     });
 
     factory.addResource('authentication-sources', 'echo').withAttributes({
-      authenticatorType: '@cardstack/authentication/node-tests/stub-authenticators::echo'
+      authenticatorType: 'stub-authenticators::echo'
     });
 
     factory.addResource('authentication-sources', 'returns-nothing').withAttributes({
-      authenticatorType: '@cardstack/authentication/node-tests/stub-authenticators::returns-nothing'
+      authenticatorType: 'stub-authenticators::returns-nothing'
     });
 
     factory.addResource('authentication-sources', 'by-email').withAttributes({
-      authenticatorType: '@cardstack/authentication/node-tests/stub-authenticators::by-email',
+      authenticatorType: 'stub-authenticators::by-email',
       params: {
         hidden: true
       }
     });
 
     factory.addResource('authentication-sources', 'always-invalid').withAttributes({
-      authenticatorType: '@cardstack/authentication/node-tests/stub-authenticators::always-invalid'
+      authenticatorType: 'stub-authenticators::always-invalid'
     });
 
     factory.addResource('authentication-sources', 'config-echo-quint').withAttributes({
-      authenticatorType: '@cardstack/authentication/node-tests/stub-authenticators::config-echo',
+      authenticatorType: 'stub-authenticators::config-echo',
       params: {
         user: { id: quint.id, type: 'users' }
       }
     });
 
     factory.addResource('authentication-sources', 'config-echo-arthur').withAttributes({
-      authenticatorType: '@cardstack/authentication/node-tests/stub-authenticators::config-echo',
+      authenticatorType: 'stub-authenticators::config-echo',
       params: {
         user: { id: arthur.id, type: 'users' }
       }
     });
 
     factory.addResource('authentication-sources', 'id-rewriter').withAttributes({
-      authenticatorType: '@cardstack/authentication/node-tests/stub-authenticators::echo',
+      authenticatorType: 'stub-authenticators::echo',
       userTemplate: '{ "id": "{{upstreamId}}", "type": "users" }'
     });
 
     factory.addResource('authentication-sources', 'has-default-template').withAttributes({
-      authenticatorType: '@cardstack/authentication/node-tests/stub-authenticators::has-default-template'
+      authenticatorType: 'stub-authenticators::has-default-template'
     });
 
 
     factory.addResource('authentication-sources', 'create-via-template').withAttributes({
-      authenticatorType: '@cardstack/authentication/node-tests/stub-authenticators::echo',
+      authenticatorType: 'stub-authenticators::echo',
       userTemplate: `{
         "id": "my-prefix-{{id}}",
         "type": "users",
@@ -88,7 +88,7 @@ describe('authentication/middleware', function() {
     });
 
     factory.addResource('authentication-sources', 'update-user').withAttributes({
-      authenticatorType: '@cardstack/authentication/node-tests/stub-authenticators::echo',
+      authenticatorType: 'stub-authenticators::echo',
       mayUpdateUser: true
     });
 
@@ -102,7 +102,7 @@ describe('authentication/middleware', function() {
     ]);
 
 
-    env = await createDefaultEnvironment(factory.getModels());
+    env = await createDefaultEnvironment(`${__dirname}/stub-authenticators`, factory.getModels());
     let app = new Koa();
     app.use(env.lookup('hub:middleware-stack').middleware());
     app.use(async function(ctxt) {
@@ -119,7 +119,7 @@ describe('authentication/middleware', function() {
       }
     });
     request = supertest(app.callback());
-    auth = env.lookup('middleware:' + require.resolve('@cardstack/authentication/cardstack/middleware'));
+    auth = env.lookup('plugin-middleware:' + require.resolve('@cardstack/authentication/cardstack/middleware'));
   }
 
   async function teardown() {

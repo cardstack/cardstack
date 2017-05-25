@@ -1,0 +1,11 @@
+{
+  "dependencies": {
+    "sample-plugin-one": "*",
+    "sample-plugin-four": "*",
+    "sample-plugin-five": "*",
+    "sample-non-plugin": "*"
+  },
+  "devDependencies": {
+    "@cardstack/test-support": "*"
+  }
+}

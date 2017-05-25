@@ -20,6 +20,25 @@ exports.declareInjections = function(injections, klass) {
 };
 
 exports.Registry = class Registry extends GlimmerRegistry {
+  constructor(...args) {
+    super(...args);
+
+    this.registerOption('config', 'instantiate', false);
+
+    // These are the feature types that are not supposed to be
+    // instantiated. Possibly we should just make them all be
+    // instantiated anyway for consistency.
+    for (let type of [
+      'constraints',
+      'fields',
+      'writers',
+      'indexers',
+      'authenticators'
+    ]) {
+      this.registerOption(`plugin-${type}`, 'instantiate', false);
+    }
+  }
+
   register(identifier, factory, options) {
     let result = super.register(identifier, factory, options);
     registerDeclaredInjections(this, identifier, factory);
@@ -37,6 +56,20 @@ exports.Container = class Container extends GlimmerContainer {
       setOwner(result, this);
     }
     return result;
+  }
+  factoryFor(...args) {
+    let result = super.factoryFor(...args);
+    if (result) {
+      return {
+        class: result.class,
+        create: (options) => {
+          let instance = result.create(options);
+          setOwner(instance, this);
+          return instance;
+        },
+        teardown: result.teardown
+      };
+    }
   }
 };
 
@@ -59,9 +92,7 @@ class Resolver {
     let [type, name] = specifier.split(':');
     if (type === 'hub') {
       module = `@cardstack/hub/${name}`;
-    } else if (type === 'middleware') {
-      module = name;
-    } else if (type === 'searcher') {
+    } else if (/^plugin-/.test(type)) {
       module = name;
     }
 
@@ -78,3 +109,4 @@ class Resolver {
 }
 
 exports.getOwner = getOwner;
+exports.setOwner = setOwner;

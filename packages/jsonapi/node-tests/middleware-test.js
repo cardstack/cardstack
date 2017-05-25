@@ -3,7 +3,7 @@ const Koa = require('koa');
 const {
   createDefaultEnvironment,
   destroyDefaultEnvironment
-} = require('@cardstack/hub/node-tests/support');
+} = require('@cardstack/test-support/env');
 const { currentVersion } = require('./support');
 const JSONAPIFactory = require('@cardstack/test-support/jsonapi-factory');
 
@@ -51,11 +51,11 @@ describe('jsonapi/middleware', function() {
 
     factory.addResource('plugin-configs')
       .withAttributes({
-        module: "@cardstack/hub/node-tests/test-authenticator"
+        module: "@cardstack/test-support/authenticator"
       });
 
     let app = new Koa();
-    env = await createDefaultEnvironment(factory.getModels());
+    env = await createDefaultEnvironment(__dirname + '/../', factory.getModels());
     app.use(env.lookup('hub:middleware-stack').middleware());
     request = supertest(app.callback());
   }
@@ -325,7 +325,7 @@ describe('jsonapi/middleware', function() {
     after(sharedTeardown);
 
     it('applies authorization during create', async function() {
-      env.setUserId(null);
+      await env.setUserId(null);
       let response = await request.post('/articles').send({
         data: {
           type: 'articles',
@@ -339,7 +339,7 @@ describe('jsonapi/middleware', function() {
     });
 
     it('applies authorization during update', async function() {
-      env.setUserId(null);
+      await env.setUserId(null);
       let version = await currentVersion(request, '/articles/0');
       let response = await request.patch('/articles/0').send({
         data: {
@@ -355,7 +355,7 @@ describe('jsonapi/middleware', function() {
     });
 
     it('applies authorization during delete', async function() {
-      env.setUserId(null);
+      await env.setUserId(null);
       let version = await currentVersion(request, '/articles/0');
       let response = await request.delete('/articles/0').set('If-Match', version);
       expect(response).hasStatus(401);

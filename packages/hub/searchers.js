@@ -4,7 +4,7 @@ const Error = require('@cardstack/plugin-utils/error');
 
 module.exports = declareInjections({
   schemaCache: 'hub:schema-cache',
-  internalSearcher: 'searcher:@cardstack/elasticsearch/searcher'
+  internalSearcher: 'plugin-searchers:@cardstack/elasticsearch/searcher'
 },
 
 class Searchers {

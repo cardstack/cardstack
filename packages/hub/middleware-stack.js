@@ -1,4 +1,4 @@
-const { declareInjections, getOwner } = require('@cardstack/di');
+const { declareInjections } = require('@cardstack/di');
 const DAGMap = require('dag-map').default;
 const compose = require('koa-compose');
 const logger = require('heimdalljs-logger');
@@ -27,11 +27,8 @@ class MiddlewareStack {
       return this._lastStack;
     }
     let map = new DAGMap;
-    let owner = getOwner(this);
     for (let name of schema.plugins.listAll('middleware')) {
-      let loadPath = schema.plugins.loadPathFor('middleware', name);
-      this.log.debug(`loading ${name} from ${loadPath}`);
-      let module = owner.lookup(`middleware:${loadPath}`);
+      let module = schema.plugins.lookupFeatureAndAssert('middleware', name);
       let before = asArray(module.before).map(tag => `before:${tag}`).concat(
         asArray(module.category).map(tag => `after:${tag}`)
       );

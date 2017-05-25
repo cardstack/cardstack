@@ -11,16 +11,26 @@
     "url": "git+https://github.com/cardstack/cardstack.git"
   },
   "keywords": [
-    "cardstack",
+    "cardstack-plugin",
     "eslint"
   ],
+  "cardstack-plugin": {
+    "api-version": 1,
+    "in-repo-plugins": [
+      "authenticator"
+    ]
+  },
   "dependencies":{
     "chai": "^3.5.0",
     "chai-things": "^0.2.0",
     "debug": "2.6.3",
     "glob": "^7.1.1",
     "mocha-eslint": "^3.0.1",
-    "require-uncached": "^1.0.3"
+    "require-uncached": "^1.0.3",
+    "@cardstack/core-types":"*",
+    "@cardstack/git":"*",
+    "@cardstack/hub":"*",
+    "@cardstack/handlebars":"*"
   },
   "author": "Edward Faulkner <edward@eaf4.com>",
   "license": "MIT",

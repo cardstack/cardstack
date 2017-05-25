@@ -5,7 +5,7 @@ const logger = require('heimdalljs-logger');
 const log = logger('server');
 
 async function runServer(sessionsKey, port, seedModels) {
-  let app = await makeServer(sessionsKey, seedModels);
+  let app = await makeServer(process.cwd(), sessionsKey, seedModels);
   app.listen(port);
   log.info("server listening on %s", port);
 }

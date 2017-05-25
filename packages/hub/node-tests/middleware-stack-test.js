@@ -4,7 +4,7 @@ const Koa = require('koa');
 const {
   createDefaultEnvironment,
   destroyDefaultEnvironment
-} = require('./support');
+} = require('@cardstack/test-support/env');
 
 describe('middleware-stack', function() {
 
@@ -14,9 +14,9 @@ describe('middleware-stack', function() {
     let factory = new JSONAPIFactory();
     factory.addResource('plugin-configs')
         .withAttributes({
-          module: '@cardstack/hub/node-tests/stub-middleware'
+          module: 'stub-middleware'
         });
-    env = await createDefaultEnvironment(factory.getModels());
+    env = await createDefaultEnvironment(__dirname + '/stub-middleware', factory.getModels());
     let app = new Koa();
     app.use(env.lookup('hub:middleware-stack').middleware());
     request = supertest(app.callback());
@@ -69,7 +69,7 @@ describe('middleware-stack', function() {
       await env.lookup('hub:writers').create('master', env.user, 'plugin-configs', {
         type: 'plugin-configs',
         attributes: {
-          module: '@cardstack/hub/node-tests/stub-middleware-extra'
+          module: 'stub-middleware-extra'
         }
       });
       await env.lookup('hub:indexers').update({ realTime: true });
@@ -79,7 +79,7 @@ describe('middleware-stack', function() {
     });
 
     it('can dynamically remove middleware', async function() {
-      let configs = await env.lookup('hub:searchers').search('master', { filter: { module: { exact: '@cardstack/hub/node-tests/stub-middleware' } } });
+      let configs = await env.lookup('hub:searchers').search('master', { filter: { module: { exact: 'stub-middleware' } } });
       expect(configs.models).length(1);
       let config = configs.models[0];
       await env.lookup('hub:writers').delete('master', env.user, config.meta.version, config.type, config.id);

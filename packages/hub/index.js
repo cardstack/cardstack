@@ -58,7 +58,7 @@ module.exports = {
     // Randomized session encryption -- this means if you restart the
     // dev server your session gets invalidated.
     let sessionsKey = crypto.randomBytes(32);
-    return makeServer(sessionsKey, seedModels).then(server => {
+    return makeServer(this.project.root, sessionsKey, seedModels).then(server => {
       return server.callback();
     });
   }

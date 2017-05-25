@@ -3,7 +3,7 @@ const { inRepo } = require('./support');
 const {
   createDefaultEnvironment,
   destroyDefaultEnvironment
-} = require('@cardstack/hub/node-tests/support');
+} = require('@cardstack/test-support/env');
 const JSONAPIFactory = require('@cardstack/test-support/jsonapi-factory');
 
 describe('git/writer', function() {
@@ -69,7 +69,7 @@ describe('git/writer', function() {
         karma: 10
       });
 
-    env = await createDefaultEnvironment(factory.getModels());
+    env = await createDefaultEnvironment(`${__dirname}/..`, factory.getModels());
 
     writers = env.lookup('hub:writers');
     user = env.user;

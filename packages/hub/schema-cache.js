@@ -14,28 +14,30 @@
      like core field types.
 */
 
-const Schema = require('./schema');
 const Searcher = require('@cardstack/elasticsearch/searcher');
 const logger = require('heimdalljs-logger');
 const bootstrapSchema = require('./bootstrap-schema');
 const { declareInjections } = require('@cardstack/di');
+const Schema = require('./schema');
 
 module.exports = declareInjections({
-  seedModels: 'config:seed-models'
+  seedModels: 'config:seed-models',
+  schemaLoader: 'hub:schema-loader'
 },
 
 class SchemaCache {
 
-  static create({ seedModels }) {
-    return new this(seedModels);
+  static create(opts) {
+    return new this(opts);
   }
 
-  constructor(seedModels=[]) {
-    this.seedModels = bootstrapSchema.concat(seedModels);
+  constructor({ seedModels, schemaLoader }) {
+    this.seedModels = bootstrapSchema.concat(seedModels || []);
     this.searcher = new Searcher();
-    this.searcher.schemaCache = new BootstrapSchemaCache(this.seedModels);
+    this.searcher.schemaCache = new BootstrapSchemaCache(this.seedModels, this);
     this.cache = new Map();
     this.log = logger('schema-cache');
+    this.schemaLoader = schemaLoader;
 
     // TODO move this value into plugins-configs for @cardstack/hub.
     this.controllingBranch = 'master';
@@ -70,8 +72,8 @@ class SchemaCache {
   // Instantiates a Schema, while respecting any seedModels. This
   // method does not alter the schemaCache's own state.
   async schemaFrom(models) {
-    let types = Schema.ownTypes();
-    return Schema.loadFrom(this.seedModels.concat(models).filter(s => types.includes(s.type)));
+    let types = this.schemaLoader.ownTypes();
+    return this.schemaLoader.loadFrom(this.seedModels.concat(models).filter(s => types.includes(s.type)));
   }
 
   // When Indexers reads a branch, it necessarily reads the schema
@@ -98,7 +100,7 @@ class SchemaCache {
     try {
       let { models, page } = await this.searcher.search(branch, {
         filter: {
-          type: Schema.ownTypes()
+          type: this.schemaLoader.ownTypes()
         },
         page: { size: 1000 }
       });
@@ -123,14 +125,14 @@ class SchemaCache {
 });
 
 class BootstrapSchemaCache {
-  constructor(seedModels) {
+  constructor(seedModels, schemaCache) {
     this.seedModels = seedModels;
     this.schema = null;
+    this.schemaCache = schemaCache;
   }
   async schemaForBranch() {
     if (!this.schema) {
-      let types = Schema.ownTypes();
-      this.schema = await Schema.loadFrom(this.seedModels.filter(s => types.includes(s.type)));
+      this.schema = await this.schemaCache.schemaFrom(this.seedModels);
     }
     return this.schema;
   }

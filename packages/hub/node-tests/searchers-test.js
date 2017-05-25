@@ -2,7 +2,7 @@ const JSONAPIFactory = require('@cardstack/test-support/jsonapi-factory');
 const {
   createDefaultEnvironment,
   destroyDefaultEnvironment
-} = require('@cardstack/hub/node-tests/support');
+} = require('@cardstack/test-support/env');
 
 describe('hub/searchers', function() {
   let env, chocolate;
@@ -12,12 +12,12 @@ describe('hub/searchers', function() {
 
     factory.addResource('plugin-configs')
       .withAttributes({
-        module: '@cardstack/hub/node-tests/stub-searcher'
+        module: 'stub-searcher'
       });
 
     factory.addResource('data-sources').
       withAttributes({
-        sourceType: '@cardstack/hub/node-tests/stub-searcher',
+        sourceType: 'stub-searcher',
         params: stubParams
       });
 
@@ -35,7 +35,7 @@ describe('hub/searchers', function() {
       exampleSize: 'large'
     });
 
-    env = await createDefaultEnvironment(factory.getModels());
+    env = await createDefaultEnvironment(`${__dirname}/stub-searcher`, factory.getModels());
   }
 
   afterEach(async function() {

@@ -104,6 +104,7 @@ module.exports = class ContentType {
         this.authLog.debug("approved deletion of %s %s because of grant %s", originalDocument.type, originalDocument.id, grant.id);
         this.authLog.trace("grant %s = %j", grant.id, grant);
       } else {
+        this.authLog.trace("no matching deletion grant for %j in %j", context, this.grants);
         throw new Error("You may not delete this resource", { status: 401 });
       }
     } else if (!originalDocument) {
@@ -112,6 +113,7 @@ module.exports = class ContentType {
         this.authLog.debug("approved creation of %s %s because of grant %s", finalDocument.type, finalDocument.id, grant.id);
         this.authLog.trace("grant %s = %j", grant.id, grant);
       } else {
+        this.authLog.trace("no matching creation grant for %j in %j", context, this.grants);
         throw new Error("You may not create this resource", { status: 401 });
       }
     } else {
@@ -124,6 +126,7 @@ module.exports = class ContentType {
         this.authLog.debug("approved update of %s %s because of grant %s", finalDocument.type, finalDocument.id, grant.id);
         this.authLog.trace("grant %s = %j", grant.id, grant);
       } else {
+        this.authLog.trace("no matching update grant for %j in %j", context, this.grants);
         throw new Error("You may not update this resource", { status: 401 });
       }
     }

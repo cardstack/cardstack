@@ -4,11 +4,11 @@ module.exports = class DataSource {
     this.sourceType = model.attributes['source-type'];
     this._writer = null;
     this._params = model.attributes.params;
-    this._Writer = plugins.lookupOptional('writers', this.sourceType);
+    this._Writer = plugins.lookupFeature('writers', this.sourceType);
     this._writer = null;
-    this._Indexer = plugins.lookupOptional('indexers', this.sourceType);
+    this._Indexer = plugins.lookupFeature('indexers', this.sourceType);
     this._indexer = null;
-    this._Searcher = plugins.lookupOptional('searchers', this.sourceType);
+    this._Searcher = plugins.lookupFeatureFactory('searchers', this.sourceType);
     this._searcher = null;
   }
   get writer() {
@@ -25,7 +25,7 @@ module.exports = class DataSource {
   }
   get searcher() {
     if (!this._searcher && this._Searcher) {
-      this._searcher = new (this._Searcher)(this._params, this.id);
+      this._searcher = this._Searcher.create(Object.assign({dataSourceId: this.id}, this._params));
     }
     return this._searcher;
   }

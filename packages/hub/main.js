@@ -4,17 +4,22 @@ const { Registry, Container } = require('@cardstack/di');
 const logger = require('heimdalljs-logger');
 const log = logger('server');
 
-async function wireItUp(encryptionKeys, seedModels, withAsyncWatchers=true) {
+async function wireItUp(projectDir, encryptionKeys, seedModels, isTesting=false) {
   let registry = new Registry();
 
-  registry.register('config:seed-models', seedModels, { instantiate: false });
-  registry.register('config:encryption-key', encryptionKeys, { instantiate: false });
+  registry.register('config:project', {
+    path: projectDir,
+    isTesting
+  });
+  registry.register('config:seed-models', seedModels);
+  registry.register('config:encryption-key', encryptionKeys);
 
   let container = new Container(registry);
 
-  // this is generally only false in the test suite, where we want
-  // more deterministic control of when indexing happens.
-  if (withAsyncWatchers) {
+
+  // in the test suite we want more deterministic control of when
+  // indexing happens
+  if (!isTesting) {
     await container.lookup('hub:indexers').update();
     setInterval(() => container.lookup('hub:indexers').update(), 600000);
     container.lookup('hub:writers').addListener('changed', what => container.lookup('hub:indexers').update({ hints: [ what ] }));
@@ -23,8 +28,8 @@ async function wireItUp(encryptionKeys, seedModels, withAsyncWatchers=true) {
   return container;
 }
 
-async function makeServer(encryptionKeys, seedModels) {
-  let container = await wireItUp(encryptionKeys, seedModels);
+async function makeServer(projectDir, encryptionKeys, seedModels) {
+  let container = await wireItUp(projectDir, encryptionKeys, seedModels);
   let app = new Koa();
   app.use(httpLogging);
   app.use(container.lookup('hub:middleware-stack').middleware());

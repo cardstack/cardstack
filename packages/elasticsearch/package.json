@@ -17,7 +17,8 @@
   },
   "devDependencies": {
     "@cardstack/eslint-config":"*",
-    "@cardstack/hub":"*",
+    "@cardstack/test-support":"*",
+    "@cardstack/mobiledoc":"*",
     "lodash": "^4.17.4"
   }
 }

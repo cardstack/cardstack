@@ -4,7 +4,8 @@ const EventEmitter = require('events');
 const { declareInjections } = require('@cardstack/di');
 
 module.exports = declareInjections({
-  schemaCache: 'hub:schema-cache'
+  schemaCache: 'hub:schema-cache',
+  schemaLoader: 'hub:schema-loader'
 },
 
 class Writers extends EventEmitter {
@@ -13,11 +14,15 @@ class Writers extends EventEmitter {
     this.log = logger('writers');
   }
 
+  get schemaTypes() {
+    return this.schemaLoader.ownTypes();
+  }
+
   async create(branch, user, type, document) {
     this.log.info("creating type=%s", type);
     let schema = await this.schemaCache.schemaForBranch(branch);
     let writer = this._lookupWriter(schema, type);
-    let isSchema = schema.constructor.ownTypes().includes(type);
+    let isSchema = this.schemaTypes.includes(type);
     let pending = await writer.prepareCreate(branch, user, type, document, isSchema);
     let newSchema = await schema.validate(pending, { type, user });
     let response = await this._finalizeAndReply(pending);
@@ -32,7 +37,7 @@ class Writers extends EventEmitter {
     this.log.info("updating type=%s id=%s", type, id);
     let schema = await this.schemaCache.schemaForBranch(branch);
     let writer = this._lookupWriter(schema, type);
-    let isSchema = schema.constructor.ownTypes().includes(type);
+    let isSchema = this.schemaTypes.includes(type);
     let pending = await writer.prepareUpdate(branch, user, type, id, document, isSchema);
     let newSchema = await schema.validate(pending, { type, id, user });
     let response = await this._finalizeAndReply(pending);
@@ -47,7 +52,7 @@ class Writers extends EventEmitter {
     this.log.info("deleting type=%s id=%s", type, id);
     let schema = await this.schemaCache.schemaForBranch(branch);
     let writer = this._lookupWriter(schema, type);
-    let isSchema = schema.constructor.ownTypes().includes(type);
+    let isSchema = this.schemaTypes.includes(type);
     let pending = await writer.prepareDelete(branch, user, version, type, id, isSchema);
     let newSchema = await schema.validate(pending, { user });
     await pending.finalize();

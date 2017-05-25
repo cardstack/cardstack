@@ -1,13 +1,13 @@
 const {
   createDefaultEnvironment,
   destroyDefaultEnvironment
-} = require('@cardstack/hub/node-tests/support');
+} = require('@cardstack/test-support/env');
 
 describe('hub/indexers', function() {
   let env;
 
   before(async function () {
-    env = await createDefaultEnvironment();
+    env = await createDefaultEnvironment(`${__dirname}/..`);
   });
 
   after(async function() {

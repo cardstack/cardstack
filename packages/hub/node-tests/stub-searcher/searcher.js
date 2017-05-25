@@ -1,4 +1,8 @@
 module.exports = class StubSearcher {
+  static create(params) {
+    return new this(params);
+  }
+
   constructor(params) {
     this.params = params;
   }
