@@ -51,7 +51,7 @@ install:
   - ./elasticsearch-${ES_VERSION}/bin/elasticsearch 2>&1 >> /dev/null &
 
 before_script:
- - for p in `ls packages`; do ln -s ../../packages/$p node_modules/@cardstack/; done
+ - for p in `ls packages`; do ln -fs ../../packages/$p node_modules/@cardstack/; done
  - wget -q --waitretry=1 --retry-connrefused -T 1 -O - http://127.0.0.1:9200
 
 script:
