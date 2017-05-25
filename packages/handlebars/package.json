@@ -1,6 +1,6 @@
 {
   "name": "@cardstack/handlebars",
-  "version": "0.0.14",
+  "version": "0.0.15",
   "description": "Mobiledoc field plugin for plain handlebars templates",
   "keywords": [
     "cardstack-plugin"

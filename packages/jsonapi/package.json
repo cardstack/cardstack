@@ -1,6 +1,6 @@
 {
   "name": "@cardstack/jsonapi",
-  "version": "0.0.14",
+  "version": "0.0.15",
   "description": "JSONAPI middleware for @cardstack/hub",
   "repository": "https://github.com/cardstack/cardstack",
   "author": "Edward Faulkner <edward@eaf4.com>",

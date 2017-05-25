@@ -1,6 +1,6 @@
 {
   "name": "@cardstack/hub",
-  "version": "0.0.14",
+  "version": "0.0.15",
   "keywords": [
     "cardstack-plugin",
     "ember-addon"
