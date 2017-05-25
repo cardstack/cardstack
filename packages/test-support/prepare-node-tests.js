@@ -4,14 +4,29 @@ chai.use(require('chai-things'));
 chai.use(require('./collection-contains'));
 chai.use(require('./has-status'));
 
-// Without this, we can't see stack traces for certain failures within
-// promises during the test suite.
-process.on('warning', (warning) => {
-  /* eslint-disable no-console */
-  console.warn(warning.stack);
-  /* eslint-enable no-console */
-});
+const defaultDebugChannels = '*,-eslint:*,-koa:*,-koa-*,-superagent';
 
+if (!process.__didSetCardstackWarning) {
+  process.__didSetCardstackWarning = true;
+  // Without this, we can't see stack traces for certain failures within
+  // promises during the test suite.
+  process.on('warning', (warning) => {
+    /* eslint-disable no-console */
+    console.warn(warning.stack);
+    /* eslint-enable no-console */
+  });
+
+  // If the user isn't customizing anything about logging, we generate
+  // log messages for warnings or higher, and we install a handler that
+  // will cause any unexpected log message to fail the tests.
+  if (!process.env['DEBUG']) {
+    // these third-party deps have loud logging even at warn level
+    process.env.DEBUG=defaultDebugChannels;
+    if (!process.env['DEBUG_LEVEL']) {
+      process.env.DEBUG_LEVEL='warn';
+    }
+  }
+}
 
 if (!process.env['ELASTICSEARCH_PREFIX']) {
   // Avoid stomping on any existing content in elasticsearch by
@@ -23,15 +38,7 @@ module.exports = function() {
 
   global.expect = chai.expect;
 
-  // If the user isn't customizing anything about logging, we generate
-  // log messages for warnings or higher, and we install a handler that
-  // will cause any unexpected log message to fail the tests.
-  if (!process.env['DEBUG']) {
-    // these third-party deps have loud logging even at warn level
-    process.env.DEBUG='*,-eslint:*,-koa:*,-koa-*,-superagent';
-    if (!process.env['DEBUG_LEVEL']) {
-      process.env.DEBUG_LEVEL='warn';
-    }
+  if (process.env.DEBUG === defaultDebugChannels) {
     let debug = require('debug');
     debug.log = function(...args) {
       let logLine = util.format(...args);
