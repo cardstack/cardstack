@@ -103,7 +103,7 @@ module.exports = class Indexer {
       try {
         this.repo = await Repository.open(this.repoPath);
       } catch (e) {
-        if (/Failed to resolve path/.test(e.message)) {
+        if (/Failed to resolve path/i.test(e.message)) {
           let change = await Change.createInitial(this.repoPath, 'master');
           this.repo = change.repo;
 

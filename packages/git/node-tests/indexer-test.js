@@ -5,6 +5,7 @@ const ElasticAssert = require('@cardstack/elasticsearch/node-tests/assertions');
 const toJSONAPI = require('@cardstack/elasticsearch/to-jsonapi');
 const JSONAPIFactory = require('@cardstack/test-support/jsonapi-factory');
 const { Registry, Container } = require('@cardstack/di');
+const fs = require('fs');
 
 describe('git/indexer', function() {
   let root, indexer, ea, dataSource;
@@ -261,4 +262,48 @@ describe('git/indexer', function() {
     }
   });
 
+});
+
+describe('git/indexer failures', function() {
+  let root, indexer, ea, dataSource;
+
+  beforeEach(async function() {
+    ea = new ElasticAssert();
+    root = await temp.mkdir('cardstack-server-test');
+
+    let factory = new JSONAPIFactory();
+
+    factory.addResource('plugin-configs')
+      .withAttributes({
+        module: '@cardstack/git'
+      });
+
+    dataSource = factory.addResource('data-sources')
+        .withAttributes({
+          'source-type': '@cardstack/git',
+          params: { repo: root + '/repo-to-be-created' }
+        });
+
+    factory.addResource('plugin-configs')
+      .withAttributes({
+        module: '@cardstack/hub',
+      }).withRelated(
+        'default-data-source',
+        dataSource
+      );
+
+    let registry = new Registry();
+    registry.register('config:seed-models', factory.getModels(), { instantiate: false });
+    indexer = new Container(registry).lookup('hub:indexers');
+  });
+
+  afterEach(async function() {
+    await temp.cleanup();
+    await ea.deleteContentIndices();
+  });
+
+  it("makes a repo if one doesn't already exist", async function() {
+    await indexer.update();
+    expect(fs.existsSync(root + '/repo-to-be-created')).is.ok;
+  });
 });
