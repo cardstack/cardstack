@@ -30,10 +30,10 @@ env:
     - JAVA_HOME=/usr/lib/jvm/java-8-oracle
 
 cache:
+  yarn: true
   directories:
-    - $HOME/.npm
-    - $HOME/.cache # includes bowers cache
-    - $HOME/.yarn-cache
+    - node_modules
+
 
 before_install:
   - npm config set spin false
