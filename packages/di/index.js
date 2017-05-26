@@ -4,8 +4,10 @@ const {
   setOwner,
   getOwner
 } = require('@glimmer/di');
-
+const resolve = require('resolve');
 const injectionSymbol = Symbol('@cardstack/di/injections');
+const path = require('path');
+
 
 exports.declareInjections = function(injections, klass) {
   klass[injectionSymbol] = injections;
@@ -86,12 +88,50 @@ class Resolver {
   constructor(registry, nextResolver) {
     this.registry = registry;
     this.nextResolver = nextResolver;
+    this._hubPath = null;
+  }
+  get hubPath() {
+    if (!this._hubPath) {
+
+      /*
+         There are two ways to find @cardstack/hub. Either the
+         top-level project must directly depend on it (this is what
+         apps are supposed to do) or the top-level project may depend
+         on @cardstack/test-support which depends on @cardstack/hub
+         (this is what plugins can do).
+      */
+
+      let project = this.registry.registration('config:project');
+      if (!project) {
+        throw new Error(`Failed to locate hub because config:project is not registered`);
+      }
+      if (!project.path) {
+        throw new Error(`Failed to locate hub because config:project does not contain a "path"`);
+      }
+      try  {
+        this._hubPath = path.dirname(resolve.sync(`@cardstack/hub`, { basedir: project.path }));
+      } catch (err) {
+        if (!/Cannot find module/i.test(err)) {
+          throw err;
+        }
+        try {
+          let testSupport = path.dirname(resolve.sync(`@cardstack/test-support`, { basedir: project.path }));
+          this._hubPath = path.dirname(resolve.sync(`@cardstack/hub`, { basedir: testSupport }));
+        } catch (err) {
+          if (!/Cannot find module/.itest(err)) {
+            throw err;
+          }
+          throw new Error(`Failed to locate hub relative to ${project.path}`);
+        }
+      }
+    }
+    return this._hubPath;
   }
   retrieve(specifier) {
     let module;
     let [type, name] = specifier.split(':');
     if (type === 'hub') {
-      module = `@cardstack/hub/${name}`;
+      module = this.hubPath + '/' + name;
     } else if (/^plugin-/.test(type)) {
       module = name;
     }

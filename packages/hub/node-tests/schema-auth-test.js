@@ -1,7 +1,7 @@
 const ElasticAssert = require('@cardstack/elasticsearch/node-tests/assertions');
 const JSONAPIFactory = require('@cardstack/test-support/jsonapi-factory');
 const PendingChange = require('@cardstack/plugin-utils/pending-change');
-const bootstrapSchema = require('@cardstack/hub/bootstrap-schema');
+const bootstrapSchema = require('../bootstrap-schema');
 const { Registry, Container } = require('@cardstack/di');
 
 describe('schema/auth', function() {

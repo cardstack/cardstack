@@ -1,4 +1,4 @@
-const Error = require('@cardstack/plugin-utils/error');
+const Error = require('../error');
 
 describe("error helper", function() {
   it('supports default error titles', function() {

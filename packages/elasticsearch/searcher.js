@@ -1,4 +1,4 @@
-const Client = require('@cardstack/elasticsearch/client');
+const Client = require('./client');
 const logger = require('heimdalljs-logger');
 const Error = require('@cardstack/plugin-utils/error');
 const toJSONAPI = require('./to-jsonapi');

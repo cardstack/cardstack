@@ -12,6 +12,7 @@
     "@cardstack/eslint-config":"*",
     "@cardstack/plugin-utils":"*",
     "@cardstack/hub":"*",
+    "@cardstack/di":"*",
     "@cardstack/test-support":"*",
     "@cardstack/elasticsearch":"*"
   },

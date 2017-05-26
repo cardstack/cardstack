@@ -1,4 +1,4 @@
-const Encryptor = require('@cardstack/hub/encryptor');
+const Encryptor = require('../encryptor');
 const crypto = require('crypto');
 
 describe('hub/encryptor', function() {

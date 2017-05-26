@@ -1,17 +1,18 @@
 const path = require('path');
 const glob = require('glob');
 const spawn = require('child_process').spawn;
+const resolve = require('resolve');
 
 function testPackage(package) {
-  return new Promise((resolve, reject) => {
-    let emberBin = require.resolve('ember-cli/bin/ember');
+  return new Promise((res, reject) => {
+    let emberBin = resolve.sync('ember-cli/bin/ember', { basedir: package });
     let proc = spawn(process.execPath, [emberBin, 'test'], { stdio: ['ignore', process.stdout, process.stderr], cwd: package });
     proc.on('exit', function (code, signal) {
       if (signal) {
         process.kill(process.pid, signal);
       } else {
         if (code === 0) {
-          resolve();
+          res();
         } else {
           reject(new Error("child test suite exited with status " + code));
         }

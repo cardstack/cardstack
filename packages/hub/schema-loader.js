@@ -1,8 +1,8 @@
-const Field = require('@cardstack/hub/field');
-const Constraint = require('@cardstack/hub/constraint');
-const ContentType = require('@cardstack/hub/content-type');
-const DataSource = require('@cardstack/hub/data-source');
-const Grant = require('@cardstack/hub/grant');
+const Field = require('./field');
+const Constraint = require('./constraint');
+const ContentType = require('./content-type');
+const DataSource = require('./data-source');
+const Grant = require('./grant');
 const logger = require('heimdalljs-logger');
 const {
   declareInjections,

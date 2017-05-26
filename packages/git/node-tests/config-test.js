@@ -1,11 +1,11 @@
 const { inRepo, commitOpts } = require('./support');
-const temp = require('@cardstack/plugin-utils/node-tests/temp-helper');
+const temp = require('@cardstack/test-support/temp-helper');
 const {
   createDefaultEnvironment,
   destroyDefaultEnvironment
 } = require('@cardstack/test-support/env');
 const JSONAPIFactory = require('@cardstack/test-support/jsonapi-factory');
-const { makeRepo } = require('@cardstack/git/node-tests/support');
+const { makeRepo } = require('./support');
 const Change = require('../change');
 
 describe('git/config', function() {

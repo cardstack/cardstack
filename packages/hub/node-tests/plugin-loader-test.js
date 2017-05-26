@@ -32,7 +32,7 @@ describe('plugin-loader', function() {
   it('throws if project config is missing', function() {
     expect(() => {
       new Container(new Registry()).lookup('hub:plugin-loader');
-    }).to.throw("Missing configuration `config:project`");
+    }).to.throw("Failed to locate hub because config:project is not registered");
   });
 
   it('throws if project config has no path', function() {
@@ -40,7 +40,7 @@ describe('plugin-loader', function() {
     registry.register('config:project', {}, { instantiate: false });
     expect(() => {
       new Container(registry).lookup('hub:plugin-loader');
-    }).to.throw("`config:project` must have a `path`");
+    }).to.throw("Failed to locate hub because config:project does not contain a \"path\"");
   });
 
   it('locates top-level plugins', async function() {

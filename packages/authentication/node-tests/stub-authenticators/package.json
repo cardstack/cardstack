@@ -2,11 +2,12 @@
   "name": "stub-authenticators",
   "keywords": ["cardstack-plugin"],
   "cardstack-plugin": {
-    "api-version": 1
+    "api-version": 1,
+    "in-repo-plugins": [
+      "../.."
+    ]
   },
   "devDependencies": {
-    "@cardstack/hub": "*",
-    "@cardstack/test-support": "*",
-    "@cardstack/authentication": "../.."
+    "@cardstack/test-support": "*"
   }
 }

@@ -9,6 +9,7 @@
     "node": ">= 7.7"
   },
   "devDependencies": {
+    "@cardstack/eslint-config": "*"
   },
   "dependencies": {
   },

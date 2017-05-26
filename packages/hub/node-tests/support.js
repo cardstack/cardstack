@@ -1,4 +1,4 @@
-const temp = require('@cardstack/plugin-utils/node-tests/temp-helper');
+const temp = require('@cardstack/test-support/temp-helper');
 const { makeRepo } = require('@cardstack/git/node-tests/support');
 const ElasticAssert = require('@cardstack/elasticsearch/node-tests/assertions');
 const JSONAPIFactory = require('@cardstack/test-support/jsonapi-factory');

@@ -33,26 +33,23 @@ cache:
   yarn: true
   directories:
     - node_modules
-
+    - packages/*/node_modules
 
 before_install:
-  - npm config set spin false
-  - npm install -g bower phantomjs-prebuilt yarn
-  - bower --version
+  - curl -o- -L https://yarnpkg.com/install.sh | bash
+  - export PATH=$HOME/.yarn/bin:$PATH
+  - yarn global add phantomjs-prebuilt lerna
   - phantomjs --version
   - java -version
-  - which java
-  - echo $JAVA_HOME
 
 install:
-  - yarn install --non-interactive
+  - lerna bootstrap
   - wget https://artifacts.elastic.co/downloads/elasticsearch/elasticsearch-${ES_VERSION}.tar.gz
   - tar -xzf elasticsearch-${ES_VERSION}.tar.gz
   - ./elasticsearch-${ES_VERSION}/bin/elasticsearch 2>&1 >> /dev/null &
 
 before_script:
- - for p in `ls packages`; do ln -fs ../../packages/$p node_modules/@cardstack/; done
  - wget -q --waitretry=1 --retry-connrefused -T 1 -O - http://127.0.0.1:9200
 
 script:
-  - npm test
+  - yarn test

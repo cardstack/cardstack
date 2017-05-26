@@ -1,7 +1,7 @@
-const temp = require('@cardstack/plugin-utils/node-tests/temp-helper');
+const temp = require('./temp-helper');
 const { makeRepo } = require('@cardstack/git/node-tests/support');
 const ElasticAssert = require('@cardstack/elasticsearch/node-tests/assertions');
-const JSONAPIFactory = require('@cardstack/test-support/jsonapi-factory');
+const JSONAPIFactory = require('./jsonapi-factory');
 const crypto = require('crypto');
 const { wireItUp } = require('@cardstack/hub/main');
 
@@ -78,9 +78,11 @@ exports.createDefaultEnvironment = async function(projectDir, initialModels = []
 };
 
 exports.destroyDefaultEnvironment = async function(env) {
-  await env.teardown();
-  await destroyIndices();
-  await temp.cleanup();
+  if (env) {
+    await env.teardown();
+    await destroyIndices();
+    await temp.cleanup();
+  }
 };
 
 async function destroyIndices() {

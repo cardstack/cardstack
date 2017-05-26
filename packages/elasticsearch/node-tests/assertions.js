@@ -1,5 +1,4 @@
-const Client = require('@cardstack/elasticsearch/client');
-const { branchToIndexName } = require('@cardstack/elasticsearch/client');
+const Client = require('../client');
 
 module.exports = class ElasticAsserter {
   constructor(){
@@ -35,15 +34,15 @@ module.exports = class ElasticAsserter {
     return output;
   }
   async indexerState(branch, dataSourceId) {
-    return this.client.es.getSource({ index: branchToIndexName(branch), type: 'meta', id: dataSourceId });
+    return this.client.es.getSource({ index: Client.branchToIndexName(branch), type: 'meta', id: dataSourceId });
   }
   async deleteContentIndices() {
     return this.client.es.indices.delete({ index: `${Client.branchPrefix}_*` });
   }
   async documentContents(branch, type, id) {
-    return this.client.es.getSource({ index: branchToIndexName(branch), type, id: `${branch}/${id}` });
+    return this.client.es.getSource({ index: Client.branchToIndexName(branch), type, id: `${branch}/${id}` });
   }
   async putDocument(branch, type, id, body) {
-    return this.client.es.index({ index: branchToIndexName(branch), type, id: `${branch}/${id}`, body });
+    return this.client.es.index({ index: Client.branchToIndexName(branch), type, id: `${branch}/${id}`, body });
   }
 };

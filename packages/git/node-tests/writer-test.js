@@ -1,4 +1,4 @@
-const Writer = require('@cardstack/git/writer');
+const Writer = require('../writer');
 const { inRepo } = require('./support');
 const {
   createDefaultEnvironment,

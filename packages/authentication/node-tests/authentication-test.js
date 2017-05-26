@@ -119,7 +119,7 @@ describe('authentication/middleware', function() {
       }
     });
     request = supertest(app.callback());
-    auth = env.lookup('plugin-middleware:' + require.resolve('@cardstack/authentication/cardstack/middleware'));
+    auth = env.lookup('plugin-middleware:' + require.resolve('../cardstack/middleware'));
   }
 
   async function teardown() {
