@@ -1,4 +1,3 @@
-const util = require('util');
 const chai = require('chai');
 chai.use(require('chai-things'));
 chai.use(require('./collection-contains'));
@@ -39,9 +38,8 @@ module.exports = function() {
   global.expect = chai.expect;
 
   if (process.env.DEBUG === defaultDebugChannels) {
-    let debug = require('debug');
-    debug.log = function(...args) {
-      let logLine = util.format(...args);
+
+    process.stderr.write = function(logLine) {
       let match = [...expected.keys()].find(pattern => pattern.test(logLine));
       if (match) {
         expected.set(match, expected.get(match) + 1);
@@ -50,6 +48,10 @@ module.exports = function() {
       }
     };
     let expected = new Map();
+
+    // a successful test suite run still gets an empty write to stderr
+    // when it closes.
+    expected.set(/^\w*$/, 0);
 
     global.expectLogMessage = async function(pattern, fn) {
       expected.set(pattern, 0);

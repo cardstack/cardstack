@@ -23,7 +23,6 @@
   "dependencies":{
     "chai": "^3.5.0",
     "chai-things": "^0.2.0",
-    "debug": "^2.6.3",
     "denodeify": "^1.2.1",
     "glob": "^7.1.1",
     "mocha-eslint": "^3.0.1",
