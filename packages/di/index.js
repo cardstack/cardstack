@@ -118,7 +118,7 @@ class Resolver {
           let testSupport = path.dirname(resolve.sync(`@cardstack/test-support`, { basedir: project.path }));
           this._hubPath = path.dirname(resolve.sync(`@cardstack/hub`, { basedir: testSupport }));
         } catch (err) {
-          if (!/Cannot find module/.itest(err)) {
+          if (!/Cannot find module/i.test(err)) {
             throw err;
           }
           throw new Error(`Failed to locate hub relative to ${project.path}`);
