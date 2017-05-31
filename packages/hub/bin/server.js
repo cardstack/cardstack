@@ -3,6 +3,7 @@ const commander = require('commander');
 const path = require('path');
 const logger = require('heimdalljs-logger');
 const log = logger('server');
+const fs = require('fs');
 
 async function runServer(sessionsKey, port, seedModels) {
   let app = await makeServer(process.cwd(), sessionsKey, seedModels);
@@ -12,7 +13,7 @@ async function runServer(sessionsKey, port, seedModels) {
 
 function commandLineOptions() {
   commander
-    .usage('[options] <seed-config-file>')
+    .usage('[options] <seed-config-directory>')
     .option('-p --port <port>', 'Server listen port.', 3000)
     .parse(process.argv);
 
@@ -21,7 +22,7 @@ function commandLineOptions() {
     process.exit(-1);
   }
 
-  commander.seedConfigFile = path.resolve(commander.args[0]);
+  commander.seedConfigDirectory = path.resolve(commander.args[0]);
 
   let base64Key = process.env.CARDSTACK_SESSIONS_KEY;
   if (!base64Key) {
@@ -34,7 +35,7 @@ function commandLineOptions() {
 
 function loadSeedModels(options) {
   try {
-    return require(options.seedConfigFile);
+    return fs.readdirSync(options.seedConfigDirectory).map(filename => require(path.join(options.seedConfigDirectory, filename))).reduce((a,b) => a.concat(b), []);
   } catch (err) {
     process.stderr.write(`Unable to load models from your seed-config-file (${options.seedConfigFile}), ${err}\n`);
     process.exit(-1);
