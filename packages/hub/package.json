@@ -18,7 +18,6 @@
     "@cardstack/di":"*",
     "heimdalljs-logger": "^0.1.8",
     "commander": "^2.9.0",
-    "@cardstack/jsonapi":"*",
     "@cardstack/plugin-utils":"*",
     "@cardstack/core-types":"*",
     "dag-map": "^2.0.2",

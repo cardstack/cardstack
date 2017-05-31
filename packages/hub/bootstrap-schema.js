@@ -14,13 +14,6 @@ const models = [
     }
   },
   {
-    type: 'plugin-configs',
-    id: '@cardstack/jsonapi',
-    attributes: {
-      module: '@cardstack/jsonapi'
-    }
-  },
-  {
     /* This is the content-type content-type. Mindblown. */
     type: 'content-types',
     id: 'content-types',
