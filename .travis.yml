@@ -32,8 +32,25 @@ env:
 cache:
   yarn: true
   directories:
-    - node_modules
-    - packages/*/node_modules
+    - packages/authentication/node_modules
+    - packages/bundler/node_modules
+    - packages/core-types/node_modules
+    - packages/di/node_modules
+    - packages/drupal/node_modules
+    - packages/elasticsearch/node_modules
+    - packages/eslint-config/node_modules
+    - packages/git/node_modules
+    - packages/github-auth/node_modules
+    - packages/handlebars/node_modules
+    - packages/hub/node_modules
+    - packages/image/node_modules
+    - packages/jsonapi/node_modules
+    - packages/mobiledoc/node_modules
+    - packages/plugin-utils/node_modules
+    - packages/routing/node_modules
+    - packages/search/node_modules
+    - packages/test-support/node_modules
+    - packages/tools/node_modules
 
 before_install:
   - curl -o- -L https://yarnpkg.com/install.sh | bash
