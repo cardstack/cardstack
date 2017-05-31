@@ -23,7 +23,7 @@ module.exports = {
       ui.writeInfoLine("Not creating branch cs-master because it exists");
       return;
     } catch (err) {
-      if (!/Cannot locate local branch/.test(err.message)) {
+      if (!/Cannot locate local branch/i.test(err.message)) {
         throw err;
       }
       let oid = await Reference.nameToId(repo, 'HEAD');
