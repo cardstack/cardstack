@@ -3,35 +3,9 @@
 module.exports = [
   {
     type: 'plugin-configs',
-    id: 0,
-    attributes: {
-      module: '@cardstack/hub'
-    },
-    relationships: {
-      'default-data-source': {
-        data: { type: 'data-sources', id: 0 }
-      }
-    }
-  },
-  {
-    type: 'plugin-configs',
-    id: 1,
+    id: '@cardstack/git',
     attributes: {
       module: '@cardstack/git'
-    }
-  },
-  {
-    type: 'plugin-configs',
-    id: 2,
-    attributes: {
-      module: '@cardstack/authentication'
-    }
-  },
-  {
-    type: 'plugin-configs',
-    id: 3,
-    attributes: {
-      module: '@cardstack/jsonapi'
     }
   },
   {
@@ -41,9 +15,9 @@ module.exports = [
       'source-type': '@cardstack/git',
       params: {
         // Location of our git repository
-        repo: __dirname + '/../..',
+        repo: __dirname + '/../../..',
 
-        // Path within git repository that's reserve for us to read
+        // Path within git repository that's reserved for us to read
         // and write our content.
         basePath: 'cardstack',
 
@@ -57,16 +31,6 @@ module.exports = [
         // feature should not be needed.
         branchPrefix: 'cs-'
       }
-    }
-  },
-  {
-    type: 'grants',
-    id: 0,
-    attributes: {
-      'may-create-resource': true,
-      'may-update-resource': true,
-      'may-delete-resource': true,
-      'may-write-field': true
     }
   }
 ];

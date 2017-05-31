@@ -1,16 +1,23 @@
 const models = [
   {
     type: 'plugin-configs',
-    id: 'core-types',
+    id: '@cardstack/core-types',
     attributes: {
       module: '@cardstack/core-types'
     }
   },
   {
     type: 'plugin-configs',
-    id: 'handlebars',
+    id: '@cardstack/handlebars',
     attributes: {
       module: '@cardstack/handlebars'
+    }
+  },
+  {
+    type: 'plugin-configs',
+    id: '@cardstack/jsonapi',
+    attributes: {
+      module: '@cardstack/jsonapi'
     }
   },
   {

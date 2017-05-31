@@ -1,6 +1,7 @@
 const { makeServer } = require('./main');
 const path = require('path');
 const crypto = require('crypto');
+const fs = require('fs');
 
 module.exports = {
   name: '@cardstack/hub',
@@ -14,8 +15,8 @@ module.exports = {
   // resolve a promise before moving on.
   async serverMiddleware({ app, options }) {
     let { project, environment } = options;
-    let seedFile = path.join(this.seedPath, environment + '.js');
-    app.use('/cardstack', await this._middleware(seedFile, project.ui));
+    let seedDir = path.join(this.seedPath, environment);
+    app.use('/cardstack', await this._middleware(seedDir, project.ui));
   },
 
   // testemMiddleware will not wait for a promise, so we need to
@@ -23,9 +24,9 @@ module.exports = {
   // possible for early requests to fail -- if that turns out to have
   // a practical effect we will need to queue requests here instead.
   testemMiddleware(app) {
-    let seedFile = path.join(this.seedPath, 'test.js');
+    let seedDir = path.join(this.seedPath, 'test');
     let handler;
-    this._middleware(seedFile).then(h => handler = h);
+    this._middleware(seedDir).then(h => handler = h);
     app.use('/cardstack', (req, res) => {
       if (handler) {
         handler(req, res);
@@ -37,16 +38,17 @@ module.exports = {
     });
   },
 
-  _middleware(seedFile, ui) {
-    let seedModels = [];
+  _middleware(seedDir, ui) {
+    let seedModels;
     try {
-      seedModels = require(seedFile);
+      seedModels = fs.readdirSync(seedDir).map(filename => require(path.join(seedDir, filename))).reduce((a,b) => a.concat(b), []);
     } catch (err) {
       if (ui) {
-        ui.writeWarnLine(`Unable to load your seed models (looking for ${seedFile})`);
+        ui.writeWarnLine(`Unable to load your seed models (looking for ${seedDir})`);
       } else {
-        process.stderr.write(`Unable to load your seed models (looking for ${seedFile})\n`);
+        process.stderr.write(`Unable to load your seed models (looking for ${seedDir})\n`);
       }
+      seedModels = [];
     }
 
     // Without this node 7 swallows stack traces within the native
