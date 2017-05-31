@@ -60,6 +60,7 @@ before_install:
   - java -version
 
 install:
+  - yarn install
   - lerna bootstrap
   - wget https://artifacts.elastic.co/downloads/elasticsearch/elasticsearch-${ES_VERSION}.tar.gz
   - tar -xzf elasticsearch-${ES_VERSION}.tar.gz
