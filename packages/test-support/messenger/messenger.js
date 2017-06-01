@@ -1,3 +1,6 @@
+const logger = require('heimdalljs-logger')('messengers');
+
+
 module.exports = class TestMessenger {
   static create() {
     return new this();
@@ -7,6 +10,7 @@ module.exports = class TestMessenger {
   }
   send(message, params) {
     this.sentMessages.push({ message, params });
+    logger.info(JSON.stringify(message, null, 2));
   }
   static async sentMessages(env) {
     let schema = await env.lookup('hub:schema-cache').schemaForControllingBranch();
