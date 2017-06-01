@@ -22,7 +22,8 @@ const featureTypes = [
   'searchers',
   'indexers',
   'authenticators',
-  'middleware'
+  'middleware',
+  'messengers'
 ];
 const javascriptPattern = /(.*)\.js$/;
 const TOP_FEATURE = {};

@@ -142,6 +142,21 @@ const models = [
     }
   },
   {
+    type: 'content-types',
+    id: 'message-sinks',
+    attributes: {
+      'is-built-in': true
+    },
+    relationships: {
+      fields: {
+        data: [
+          { type: 'fields', id: 'messenger-type' },
+          { type: 'fields', id: 'params' }
+        ]
+      }
+    }
+  },
+  {
     type: 'fields',
     id: 'may-create-user',
     attributes: {
@@ -158,6 +173,13 @@ const models = [
   {
     type: 'fields',
     id: 'source-type',
+    attributes: {
+      'field-type': '@cardstack/core-types::string'
+    }
+  },
+  {
+    type: 'fields',
+    id: 'messenger-type',
     attributes: {
       'field-type': '@cardstack/core-types::string'
     }

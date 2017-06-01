@@ -17,7 +17,8 @@
   "cardstack-plugin": {
     "api-version": 1,
     "in-repo-plugins": [
-      "authenticator"
+      "authenticator",
+      "messenger"
     ]
   },
   "dependencies": {
