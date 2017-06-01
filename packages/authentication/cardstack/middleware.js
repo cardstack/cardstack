@@ -140,13 +140,17 @@ class Authentication {
 
   async _processExternalUser(externalUser, source, plugin) {
     let user = this._rewriteExternalUser(externalUser, source.attributes['user-template'] || plugin.defaultUserTemplate);
-    if (user.type == null || user.id == null) { return; }
+    if (user.type == null) { return; }
+
     let have;
-    try {
-      have = await this.userSearcher.get(user.type, user.id);
-    } catch (err) {
-      if (err.status !== 404) {
-        throw err;
+
+    if (user.id != null) {
+      try {
+        have = await this.userSearcher.get(user.type, user.id);
+      } catch (err) {
+        if (err.status !== 404) {
+          throw err;
+        }
       }
     }
     if (!have && source.attributes['may-create-user']) {

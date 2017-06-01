@@ -87,6 +87,19 @@ describe('authentication/middleware', function() {
       mayCreateUser: true
     });
 
+    factory.addResource('authentication-sources', 'create-via-template-no-id').withAttributes({
+      authenticatorType: 'stub-authenticators::echo',
+      userTemplate: `{
+        "type": "users",
+        "attributes": {
+          "full-name": "{{firstName}} {{lastName}}",
+          "email": "{{email}}"
+        }
+      }`,
+      mayCreateUser: true
+    });
+
+
     factory.addResource('authentication-sources', 'update-user').withAttributes({
       authenticatorType: 'stub-authenticators::echo',
       mayUpdateUser: true
@@ -434,6 +447,31 @@ describe('authentication/middleware', function() {
           'full-name': 'Newly Created'
         });
       });
+
+      it('can create a new user with automatic id', async function() {
+        let response = await request.post(`/auth/create-via-template-no-id`).send({
+          user: {
+            firstName: 'Newly',
+            lastName: 'Created',
+            email: 'new@example.com'
+          }
+        });
+        expect(response).hasStatus(200);
+        expect(response.body).has.deep.property('meta.token');
+        let autoId = response.body.data.id;
+
+        await env.lookup('hub:indexers').update({ realTime: true });
+
+        response = await request.get('/').set('authorization', `Bearer ${response.body.meta.token}`);
+        expect(response).hasStatus(200);
+        expect(response.body.user).has.property('id', autoId);
+        expect(response.body.user).has.property('type', 'users');
+        expect(response.body.user.attributes).deep.equals({
+          email: 'new@example.com',
+          'full-name': 'Newly Created'
+        });
+      });
+
     });
   });
 });
