@@ -191,6 +191,8 @@ class Authentication {
           let sourceAndPlugin = await this._locateAuthenticationSource(ctxt.routeParams.module);
           if (sourceAndPlugin) {
             await this._invokeAuthenticationSource(ctxt, sourceAndPlugin);
+          } else {
+            this.log.warn('Did not locate authentication source %s', ctxt.routeParams.module);
           }
         } catch (err) {
           if (!err.isCardstackError) { throw err; }
