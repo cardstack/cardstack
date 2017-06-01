@@ -1,6 +1,6 @@
 {
   "name": "@cardstack/test-support",
-  "version": "0.0.16",
+  "version": "0.0.17",
   "description": "Shared test support for cardstack packages.",
   "main": "index.js",
   "scripts": {
@@ -23,11 +23,11 @@
   },
   "dependencies": {
     "@cardstack/core-types": "^0.0.16",
-    "@cardstack/di": "^0.0.16",
-    "@cardstack/elasticsearch": "^0.0.16",
-    "@cardstack/git": "^0.0.16",
+    "@cardstack/di": "^0.0.17",
+    "@cardstack/elasticsearch": "^0.0.17",
+    "@cardstack/git": "^0.0.17",
     "@cardstack/handlebars": "^0.0.16",
-    "@cardstack/hub": "^0.0.16",
+    "@cardstack/hub": "^0.0.17",
     "chai": "^3.5.0",
     "chai-things": "^0.2.0",
     "denodeify": "^1.2.1",
