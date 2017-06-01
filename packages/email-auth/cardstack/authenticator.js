@@ -1,9 +1,13 @@
-module.exports = class {
-  static create() {
-    return new this();
-  }
+const Error = require('@cardstack/plugin-utils/error');
+const { declareInjections } = require('@cardstack/di');
 
-  async authenticate({ email }, sourceParams, userSearcher) {
+module.exports = declareInjections({
+  encryptor: 'hub:encryptor',
+  messengers: 'hub:messengers'
+},
+
+class {
+  async authenticate({ email, referer }, { messageSinkId }, userSearcher) {
     if (email) {
       let { models } = await userSearcher.search({
         filter: {
@@ -15,6 +19,17 @@ module.exports = class {
       });
 
       if (models.length > 0) {
+        if (!referer) {
+          throw new Error("referer is required", { status: 400 });
+        }
+        let validSeconds = 60*60;
+        let validUntil = Math.floor(Date.now()/1000 + validSeconds);
+        let token = this.encryptor.encryptAndSign([models[0].id, validUntil]);
+        await this.messengers.send(messageSinkId, {
+          to: email,
+          subject: 'Your Login Link',
+          body: `Here's your link: ${referer}/redirect.html?secret=${token}`
+        });
         return {
           partialSession: {
             attributes: {

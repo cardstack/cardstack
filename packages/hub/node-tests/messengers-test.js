@@ -2,10 +2,12 @@ const {
   createDefaultEnvironment,
   destroyDefaultEnvironment
 } = require('@cardstack/test-support/env');
+
 const JSONAPIFactory = require('@cardstack/test-support/jsonapi-factory');
+const TestMessenger = require('@cardstack/test-support/messenger/messenger');
 
 describe('hub/messengers', function() {
-  let env, messengers, testMessenger;
+  let env, messengers;
 
   beforeEach(async function () {
     let factory = new JSONAPIFactory();
@@ -18,8 +20,6 @@ describe('hub/messengers', function() {
     });
     env = await createDefaultEnvironment(`${__dirname}/..`, factory.getModels());
     messengers = env.lookup('hub:messengers');
-
-    testMessenger = (await env.lookup('hub:schema-cache').schemaForControllingBranch()).plugins.lookupFeatureAndAssert('messengers', '@cardstack/test-support/messenger');
   });
 
   afterEach(async function() {
@@ -37,8 +37,9 @@ describe('hub/messengers', function() {
 
   it('locates valid message sink', async function() {
     await messengers.send('the-sink', { subject: 'it works' });
-    expect(testMessenger.sentMessages).has.length(1);
-    expect(testMessenger.sentMessages[0]).deep.equals({
+    let sentMessages = await TestMessenger.sentMessages(env);
+    expect(sentMessages).has.length(1);
+    expect(sentMessages[0]).deep.equals({
       message: { subject: 'it works' },
       params: { theSecret: 42 }
     });

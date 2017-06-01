@@ -8,4 +8,9 @@ module.exports = class TestMessenger {
   send(message, params) {
     this.sentMessages.push({ message, params });
   }
+  static async sentMessages(env) {
+    let schema = await env.lookup('hub:schema-cache').schemaForControllingBranch();
+    let plugin = schema.plugins.lookupFeatureAndAssert('messengers', '@cardstack/test-support/messenger');
+    return plugin.sentMessages;
+  }
 };

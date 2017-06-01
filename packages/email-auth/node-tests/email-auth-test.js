@@ -5,6 +5,7 @@ const {
   destroyDefaultEnvironment
 } = require('@cardstack/test-support/env');
 const JSONAPIFactory = require('@cardstack/test-support/jsonapi-factory');
+const TestMessenger = require('@cardstack/test-support/messenger/messenger');
 
 describe('email-auth', function() {
 
@@ -21,14 +22,24 @@ describe('email-auth', function() {
       module: '@cardstack/email-auth'
     });
 
+    factory.addResource('plugin-configs').withAttributes({
+      module: '@cardstack/test-support/messenger'
+    });
+
     factory.addResource('users').withAttributes({
       email: 'quint@example.com',
+    });
+
+    factory.addResource('message-sinks', 'the-sink').withAttributes({
+      messengerType: '@cardstack/test-support/messenger'
     });
 
     factory.addResource('authentication-sources', 'email-auth').withAttributes({
       authenticatorType: '@cardstack/email-auth',
       mayCreateUser: true,
-      params: {}
+      params: {
+        messageSinkId: 'the-sink'
+      }
     });
 
     factory.addResource('content-types', 'users').withRelated('fields', [
@@ -81,9 +92,17 @@ describe('email-auth', function() {
     });
   });
 
-  it('challenges returning user', async function() {
+  it('requires referer', async function() {
     let response = await request.post(`/auth/email-auth`).send({
       email: 'quint@example.com'
+    });
+    expect(response).hasStatus(400);
+  });
+
+  it('challenges returning user', async function() {
+    let response = await request.post(`/auth/email-auth`).send({
+      email: 'quint@example.com',
+      referer: 'http://example.com'
     });
     expect(response).hasStatus(200);
     expect(response.body).not.has.deep.property('meta.token');
@@ -94,6 +113,10 @@ describe('email-auth', function() {
         state: 'pending-email'
       }
     });
+    let sentMessages = await TestMessenger.sentMessages(env);
+    expect(sentMessages).has.length(1);
+    expect(sentMessages[0]).has.deep.property('message.subject');
+    expect(sentMessages[0].message.body).to.match(/http:\/\/example\.com\/redirect.html\?secret=...../);
   });
 
 });
