@@ -1,7 +1,11 @@
-exports.authenticate = async function(payload, config /*, userSearcher */) {
-  return config;
-};
-
-exports.exposeConfig = function (params) {
-  return params;
+module.exports = class {
+  static create() {
+    return new this();
+  }
+  async authenticate(payload, config /*, userSearcher */) {
+    return config;
+  }
+  async exposeConfig(params) {
+    return params;
+  }
 };

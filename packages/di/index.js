@@ -34,8 +34,7 @@ exports.Registry = class Registry extends GlimmerRegistry {
       'constraints',
       'fields',
       'writers',
-      'indexers',
-      'authenticators'
+      'indexers'
     ]) {
       this.registerOption(`plugin-${type}`, 'instantiate', false);
     }

@@ -388,6 +388,27 @@ describe('authentication/middleware', function() {
         expect(response.body).has.deep.property('data.id', arthur.id);
         expect(response.body).has.deep.property('data.attributes.full-name', 'Arthur Faulkner');
       });
+
+      it('can return a partial session', async function() {
+        let response = await request.post(`/auth/echo`).send({
+          partialSession: {
+            attributes: {
+              state: 'i-am-partial',
+              message: "you're not done yet"
+            }
+          }
+        });
+        expect(response).hasStatus(200);
+        expect(response.body).not.has.deep.property('meta.token');
+        expect(response.body.data).deep.equals({
+          type: 'partial-sessions',
+          attributes: {
+            state: 'i-am-partial',
+            message: "you're not done yet"
+          }
+        });
+      });
+
     });
   });
 
@@ -471,7 +492,6 @@ describe('authentication/middleware', function() {
           'full-name': 'Newly Created'
         });
       });
-
     });
   });
 });

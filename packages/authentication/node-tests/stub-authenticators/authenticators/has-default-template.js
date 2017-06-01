@@ -1,5 +1,11 @@
-exports.authenticate = async function(payload /*, userSearcher */) {
-  return payload;
+module.exports = class HasDefaultTemplate {
+  static create() {
+    return new this();
+  }
+  constructor() {
+    this.defaultUserTemplate = '{ "id": "{{upstreamId}}", "type": "users" }';
+  }
+  async authenticate(payload /*, userSearcher */) {
+    return payload;
+  }
 };
-
-exports.defaultUserTemplate = '{ "id": "{{upstreamId}}", "type": "users" }';

@@ -119,6 +119,18 @@ class Authentication {
     let { source, plugin } = sourceAndPlugin;
     let params = source.attributes.params;
     let result = await plugin.authenticate(ctxt.request.body, params, this.userSearcher);
+
+    if (result && result.partialSession) {
+      if (result.partialSession.type == null) {
+        result.partialSession.type = 'partial-sessions';
+      }
+      ctxt.body = {
+        data: result.partialSession
+      };
+      ctxt.status = 200;
+      return;
+    }
+
     if (!result || !(result.preloadedUser || result.user)) {
       ctxt.status = 401;
       return;
@@ -214,7 +226,7 @@ class Authentication {
         let { source, plugin } = sourceAndPlugin;
         let result;
         if (plugin.exposeConfig) {
-          result = plugin.exposeConfig(source.attributes.params);
+          result = await plugin.exposeConfig(source.attributes.params);
         } else {
           result = {};
         }

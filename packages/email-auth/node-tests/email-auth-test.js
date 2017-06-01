@@ -81,12 +81,19 @@ describe('email-auth', function() {
     });
   });
 
-  it.skip('challenges returning user', async function() {
+  it('challenges returning user', async function() {
     let response = await request.post(`/auth/email-auth`).send({
       email: 'quint@example.com'
     });
     expect(response).hasStatus(200);
     expect(response.body).not.has.deep.property('meta.token');
+    expect(response.body.data).deep.equals({
+      type: 'partial-sessions',
+      attributes: {
+        message: 'Check your email',
+        state: 'pending-email'
+      }
+    });
   });
 
 });
