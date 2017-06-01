@@ -1,6 +1,6 @@
 {
   "name": "@cardstack/drupal",
-  "version": "0.0.15",
+  "version": "0.0.16",
   "description": "Drupal data source plugin for @cardstack/hub.",
   "repository": "https://github.com/cardstack/cardstack",
   "author": "Edward Faulkner <edward@eaf4.com>",
@@ -10,8 +10,6 @@
   },
   "devDependencies": {
     "@cardstack/eslint-config": "*"
-  },
-  "dependencies": {
   },
   "keywords": [
     "cardstack-plugin",

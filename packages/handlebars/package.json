@@ -1,6 +1,6 @@
 {
   "name": "@cardstack/handlebars",
-  "version": "0.0.15",
+  "version": "0.0.16",
   "description": "Mobiledoc field plugin for plain handlebars templates",
   "keywords": [
     "cardstack-plugin"
@@ -12,8 +12,7 @@
   "license": "MIT",
   "author": "Edward Faulkner <edward@eaf4.com>",
   "repository": "https://githbu.com/cardstack/cardstack",
-  "scripts": {
-  },
+  "scripts": {},
   "dependencies": {
     "handlebars": "^4.0.6"
   },

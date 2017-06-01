@@ -1,38 +1,38 @@
 {
   "name": "@cardstack/hub",
-  "version": "0.0.15",
+  "version": "0.0.16",
   "keywords": [
     "cardstack-plugin",
     "ember-addon"
   ],
   "author": "Edward Faulkner <edward@eaf4.com>",
   "repository": "https://github.com/cardstack/cardstack",
-  "cardstack-plugin":{
+  "cardstack-plugin": {
     "api-version": 1
   },
   "description": "Stock API server for the Cardstack tech stack.",
   "dependencies": {
-    "koa": "2",
-    "@cardstack/elasticsearch":"*",
-    "@cardstack/handlebars":"*",
-    "@cardstack/di":"*",
-    "heimdalljs-logger": "^0.1.8",
+    "@cardstack/core-types": "^0.0.16",
+    "@cardstack/di": "^0.0.16",
+    "@cardstack/elasticsearch": "^0.0.16",
+    "@cardstack/handlebars": "^0.0.16",
+    "@cardstack/plugin-utils": "^0.0.16",
     "commander": "^2.9.0",
-    "@cardstack/plugin-utils":"*",
-    "@cardstack/core-types":"*",
     "dag-map": "^2.0.2",
     "debug": "^2.6.3",
-    "jsondiffpatch": "^0.2.4",
-    "lodash": "^4.17.4",
     "denodeify": "^1.2.1",
-    "resolve": "^1.3.3",
-    "koa-compose": "^3.2.1"
+    "heimdalljs-logger": "^0.1.8",
+    "jsondiffpatch": "^0.2.4",
+    "koa": "2",
+    "koa-compose": "^3.2.1",
+    "lodash": "^4.17.4",
+    "resolve": "^1.3.3"
   },
   "devDependencies": {
-    "supertest": "^2.0.1",
-    "@cardstack/eslint-config":"*",
-    "@cardstack/test-support":"*",
-    "@cardstack/git":"*",
-    "koa-better-route": "^0.1.0"
+    "@cardstack/eslint-config": "*",
+    "@cardstack/git": "^0.0.16",
+    "@cardstack/test-support": "^0.0.16",
+    "koa-better-route": "^0.1.0",
+    "supertest": "^2.0.1"
   }
 }
