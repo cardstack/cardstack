@@ -26,7 +26,7 @@ describe('email-auth', function() {
       module: '@cardstack/test-support/messenger'
     });
 
-    factory.addResource('users').withAttributes({
+    factory.addResource('users', 'valid-quint-id').withAttributes({
       email: 'quint@example.com',
     });
 
@@ -117,6 +117,60 @@ describe('email-auth', function() {
     expect(sentMessages).has.length(1);
     expect(sentMessages[0]).has.deep.property('message.subject');
     expect(sentMessages[0].message.body).to.match(/http:\/\/example\.com\/redirect.html\?secret=...../);
+  });
+
+  it('allows returning user with valid token', async function() {
+    let response = await request.post(`/auth/email-auth`).send({
+      email: 'quint@example.com',
+      referer: 'http://example.com'
+    });
+    expect(response).hasStatus(200);
+    expect(response.body).has.deep.property('data.attributes.state', 'pending-email');
+    let sentMessages = await TestMessenger.sentMessages(env);
+    expect(sentMessages).has.length(1);
+    let m = /http:\/\/example\.com\/redirect.html\?secret=(.*) /.exec(sentMessages[0].message.body);
+    expect(m).is.ok;
+    let secret = m[1];
+    response = await request.post('/auth/email-auth').send({ secret });
+    expect(response).hasStatus(200);
+    expect(response.body.data).has.property('type', 'users');
+    expect(response.body.data.attributes).deep.equals({
+      email: 'quint@example.com',
+    });
+  });
+
+  it('rejects malformed token', async function() {
+    let response = await request.post(`/auth/email-auth`).send({
+      secret: 'not-a-thing',
+    });
+    expect(response).hasStatus(401);
+  });
+
+  it('rejects valid but expired token', async function() {
+    let token = env.lookup('hub:encryptor').encryptAndSign(['valid-quint-id', Math.floor(Date.now()/1000 - 60)]);
+    let response = await request.post(`/auth/email-auth`).send({
+      secret: token
+    });
+    expect(response).hasStatus(401);
+  });
+
+  it('rejects valid token for missing user', async function() {
+    let token = env.lookup('hub:encryptor').encryptAndSign(['not-valid-id', Math.floor(Date.now()/1000 + 60)]);
+    let response = await request.post(`/auth/email-auth`).send({
+      secret: token
+    });
+    expect(response).hasStatus(404);
+  });
+
+  it('matches the token format our tests expect', async function() {
+    let token = env.lookup('hub:encryptor').encryptAndSign(['valid-quint-id', Math.floor(Date.now()/1000 + 60)]);
+    let response = await request.post(`/auth/email-auth`).send({
+      secret: token
+    });
+    expect(response).hasStatus(200);
+    expect(response.body.data.attributes).deep.equals({
+      email: 'quint@example.com',
+    });
   });
 
 });

@@ -7,7 +7,7 @@ module.exports = declareInjections({
 },
 
 class {
-  async authenticate({ email, referer }, { messageSinkId }, userSearcher) {
+  async authenticate({ email, referer, secret }, { messageSinkId }, userSearcher) {
     if (email) {
       let { models } = await userSearcher.search({
         filter: {
@@ -28,7 +28,7 @@ class {
         await this.messengers.send(messageSinkId, {
           to: email,
           subject: 'Your Login Link',
-          body: `Here's your link: ${referer}/redirect.html?secret=${token}`
+          body: `Here's your link: ${referer}/redirect.html?secret=${token} `
         });
         return {
           partialSession: {
@@ -48,6 +48,21 @@ class {
           }
         };
       }
+    } else if (secret) {
+      let decrypted;
+      try {
+        decrypted = this.encryptor.verifyAndDecrypt(secret);
+      } catch (err) {
+        throw new Error('Unauthorized', { status : 401 });
+      }
+      let [userId, validUntil] = decrypted;
+      if (validUntil < (new Date()) / 1000) {
+        throw new Error("Unauthorized", { status: 401 });
+      }
+      let user = await userSearcher.get('users', userId);
+      if (user) {
+        return { preloadedUser: user };
+      }
     }
   }
-};
+});
