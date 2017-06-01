@@ -1,6 +1,6 @@
 {
   "name": "@cardstack/email-auth",
-  "version": "0.0.17",
+  "version": "0.0.18",
   "description": "The default blueprint for ember-cli addons.",
   "keywords": [
     "ember-addon",
