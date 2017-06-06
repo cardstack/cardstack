@@ -116,7 +116,7 @@ describe('email-auth', function() {
     let sentMessages = await TestMessenger.sentMessages(env);
     expect(sentMessages).has.length(1);
     expect(sentMessages[0]).has.deep.property('message.subject');
-    expect(sentMessages[0].message.body).to.match(/http:\/\/example\.com\/redirect.html\?secret=...../);
+    expect(sentMessages[0].message.body).to.match(/http:\/\/example\.com\/@cardstack\/email-auth\/redirect.html\?secret=...../);
   });
 
   it('allows returning user with valid token', async function() {
@@ -128,9 +128,9 @@ describe('email-auth', function() {
     expect(response.body).has.deep.property('data.attributes.state', 'pending-email');
     let sentMessages = await TestMessenger.sentMessages(env);
     expect(sentMessages).has.length(1);
-    let m = /http:\/\/example\.com\/redirect.html\?secret=(.*) /.exec(sentMessages[0].message.body);
+    let m = /http:\/\/example\.com\/@cardstack\/email-auth\/redirect.html\?secret=(.*) /.exec(sentMessages[0].message.body);
     expect(m).is.ok;
-    let secret = m[1];
+    let secret = decodeURIComponent(m[1]);
     response = await request.post('/auth/email-auth').send({ secret });
     expect(response).hasStatus(200);
     expect(response.body.data).has.property('type', 'users');

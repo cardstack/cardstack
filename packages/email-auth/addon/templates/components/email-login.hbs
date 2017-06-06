@@ -1,0 +1,8 @@
+{{#if cardstackSession.isAuthenticated}}
+  <p class='cardstack-already-authenticated-message'>You are logged in</p>
+{{else if cardstackSession.isPartiallyAuthenticated}}
+  <p class='cardstack-partial-authentication-message'>{{cardstackSession.message}}</p>
+{{else}}
+  {{input value=email type='email' placeholder="email@example.com"}}
+  <button onclick={{action login}}>Log in</button>
+{{/if}}

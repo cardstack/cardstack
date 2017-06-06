@@ -1,5 +1,5 @@
 // Builds on ember-simple-auth's session service by deriving a user
-// model from the session state.
+// model from the session state. Also handle partially authenticated sessions
 
 import Ember from 'ember';
 import { singularize } from 'ember-inflector';
@@ -8,7 +8,13 @@ export default Ember.Service.extend({
   session: Ember.inject.service(),
   store: Ember.inject.service(),
 
-  isAuthenticated: Ember.computed.alias('session.isAuthenticated'),
+  isAuthenticated: Ember.computed('session.isAuthenticated', 'isPartiallyAuthenticated', function() {
+    return this.get('session.isAuthenticated') && !this.get('isPartiallyAuthenticated');
+  }),
+
+  isPartiallyAuthenticated: Ember.computed.equal('_rawSession.data.type', 'partial-sessions'),
+
+  message: Ember.computed.reads('_rawSession.data.attributes.message'),
 
   _rawSession: Ember.computed.alias('session.data.authenticated'),
 

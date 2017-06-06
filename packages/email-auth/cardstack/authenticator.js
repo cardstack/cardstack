@@ -24,11 +24,12 @@ class {
         }
         let validSeconds = 60*60;
         let validUntil = Math.floor(Date.now()/1000 + validSeconds);
-        let token = this.encryptor.encryptAndSign([models[0].id, validUntil]);
+        let token = encodeURIComponent(this.encryptor.encryptAndSign([models[0].id, validUntil]));
+
         await this.messengers.send(messageSinkId, {
           to: email,
           subject: 'Your Login Link',
-          body: `Here's your link: ${referer}/redirect.html?secret=${token} `
+          body: `Here's your link: ${referer}/@cardstack/email-auth/redirect.html?secret=${token} `
         });
         return {
           partialSession: {
