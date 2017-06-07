@@ -1,10 +1,13 @@
 const EphemermalStorage = require('./storage');
+const { declareInjections } = require('@cardstack/di');
 
-module.exports = class Indexer {
+module.exports = declareInjections({
+  indexers: 'hub:indexers'
+}, class Indexer {
   static create(params) { return new this(params); }
 
-  constructor({ storageKey }) {
-    this.storage = EphemermalStorage.create(storageKey);
+  constructor({ indexers }) {
+    this.storage = EphemermalStorage.create(indexers);
   }
 
   async branches() {
@@ -14,7 +17,7 @@ module.exports = class Indexer {
   async beginUpdate(/* branch */) {
     return new Updater(this.storage);
   }
-};
+});
 
 class Updater {
   constructor(storage) {
@@ -33,7 +36,7 @@ class Updater {
     }
     for (let entry of this.storage.contentModelsNewerThan(generation)) {
       if (entry.model) {
-        await ops.save(entry.type, entry.id, entry.model);
+        await ops.save(entry.type, entry.id, Object.assign({}, entry.model, { meta: { version: String(entry.generation) } }));
       } else {
         await ops.delete(entry.type, entry.id);
       }

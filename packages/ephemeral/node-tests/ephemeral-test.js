@@ -33,8 +33,16 @@ describe('ephemeral-storage', function() {
     ).withRelated('fields', [
       factory.addResource('fields', 'title').withAttributes({
         fieldType: '@cardstack/core-types::string'
+      }),
+      factory.addResource('fields', 'body').withAttributes({
+        fieldType: '@cardstack/core-types::string'
       })
     ]);
+
+    factory.addResource('posts', 'first-post').withAttributes({
+      title: 'The First Post',
+      body: 'First post body'
+    });
 
     env = await createDefaultEnvironment(__dirname + '/..', factory.getModels());
 
@@ -57,7 +65,85 @@ describe('ephemeral-storage', function() {
       }
     });
     expect(response).hasStatus(201);
+    expect(response.body).has.deep.property('data.meta.version');
+    expect(response.body).has.deep.property('data.id');
+    expect(response.body.data.id).is.ok;
+
+    await env.lookup('hub:indexers').update({ realTime: true });
+
+    response = await request.get(`/posts/${response.body.data.id}`);
+    expect(response).hasStatus(200);
+    expect(response.body).has.deep.property('data.attributes.title', 'hello');
   });
 
+  it('can update a record', async function() {
+    let response = await request.get('/posts/first-post');
+    expect(response).hasStatus(200);
+    expect(response.body).has.deep.property('data.meta.version');
+    response = await request.patch('/posts/first-post').send({
+      data: {
+        attributes: {
+          body: 'Updated body'
+        },
+        meta: {
+          version: response.body.data.meta.version
+        }
+      }
+    });
+    expect(response).hasStatus(200);
+    expect(response.body.data.attributes).deep.equals({
+      body: 'Updated body',
+      title: 'The First Post'
+    });
+
+    await env.lookup('hub:indexers').update({ realTime: true });
+
+    response = await request.get('/posts/first-post');
+    expect(response).hasStatus(200);
+    expect(response.body.data.attributes).deep.equals({
+      body: 'Updated body',
+      title: 'The First Post'
+    });
+  });
+
+  it('enforces meta.version consistency during update', async function() {
+    let response = await request.get('/posts/first-post');
+    expect(response).hasStatus(200);
+    expect(response.body).has.deep.property('data.meta.version');
+    response = await request.patch('/posts/first-post').send({
+      data: {
+        attributes: {
+          body: 'Updated body'
+        },
+        meta: {
+          version: 'not valid'
+        }
+      }
+    });
+    expect(response).hasStatus(409);
+  });
+
+
+  it('can delete a record', async function() {
+    let response = await request.get('/posts/first-post');
+    expect(response).hasStatus(200);
+    expect(response.body).has.deep.property('data.meta.version');
+    response = await request.delete('/posts/first-post').set('If-Match', response.body.data.meta.version);
+    expect(response).hasStatus(204);
+
+    await env.lookup('hub:indexers').update({ realTime: true });
+
+    response = await request.get('/posts/first-post');
+    expect(response).hasStatus(404);
+  });
+
+
+  it('enforces meta.version consistency during delete', async function() {
+    let response = await request.get('/posts/first-post');
+    expect(response).hasStatus(200);
+    expect(response.body).has.deep.property('data.meta.version');
+    response = await request.delete('/posts/first-post').set('If-Match', 'not-valid');
+    expect(response).hasStatus(409);
+  });
 
 });

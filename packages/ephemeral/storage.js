@@ -1,4 +1,5 @@
-const pool = new Map();
+const Error = require('@cardstack/plugin-utils/error');
+const pool = new WeakMap();
 let generationCounter = 0;
 
 class EphemeralStorage {
@@ -37,7 +38,7 @@ class EphemeralStorage {
     let key = `${type}/${id}`;
     let entry = this.models.get(key);
 
-    if (entry && ifMatch != null && entry.generation !== ifMatch) {
+    if (entry && ifMatch != null && String(entry.generation) !== String(ifMatch)) {
       throw new Error("Merge conflict", { status: 409 });
     }
 

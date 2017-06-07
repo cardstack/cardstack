@@ -2,16 +2,17 @@ const EphemermalStorage = require('./storage');
 const crypto = require('crypto');
 const Error = require('@cardstack/plugin-utils/error');
 const PendingChange = require('@cardstack/plugin-utils/pending-change');
+const { declareInjections } = require('@cardstack/di');
 
 const pendingChanges = new WeakMap();
 
-module.exports = class Writer {
-  static create(params) {
-    return new this(params);
-  }
+module.exports = declareInjections({
+  indexers: 'hub:indexers'
+}, class Writer {
+  static create(params) { return new this(params);}
 
-  constructor({ storageKey }) {
-    this.storage = EphemermalStorage.create(storageKey);
+  constructor({ indexers }) {
+    this.storage = EphemermalStorage.create(indexers);
   }
 
   async prepareCreate(branch, user, type, document, isSchema) {
@@ -28,7 +29,16 @@ module.exports = class Writer {
       throw new Error(`id ${id} is already in use`, { status: 409, source: { pointer: '/data/id'}});
     }
 
-    let pending = new PendingChange(null, document, finalizer);
+
+    let storedDocument = { id, type: document.type };
+    if (document.attributes) {
+      storedDocument.attributes = document.attributes;
+    }
+    if (document.relationships) {
+      storedDocument.relationships = document.relationships;
+    }
+
+    let pending = new PendingChange(null, storedDocument, finalizer);
     pendingChanges.set(pending, { type, id, storage: this.storage, isSchema: isSchema });
     return pending;
   }
@@ -77,7 +87,7 @@ module.exports = class Writer {
     return crypto.randomBytes(20).toString('hex');
   }
 
-};
+});
 
 function patch(before, diffDocument) {
   let after = Object.assign({}, before);
