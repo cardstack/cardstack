@@ -8,7 +8,7 @@ module.exports = class DataSource {
     this._params = Object.assign({dataSourceId: model.id}, model.attributes.params);
     this._Writer = plugins.lookupFeatureFactory('writers', this.sourceType);
     this._writer = null;
-    this._Indexer = plugins.lookupFeature('indexers', this.sourceType);
+    this._Indexer = plugins.lookupFeatureFactory('indexers', this.sourceType);
     this._indexer = null;
     this._Searcher = plugins.lookupFeatureFactory('searchers', this.sourceType);
     this._searcher = null;
@@ -24,7 +24,7 @@ module.exports = class DataSource {
   }
   get indexer() {
     if (!this._indexer && this._Indexer) {
-      this._indexer = new (this._Indexer)(this._params);
+      this._indexer = this._Indexer.create(this._params);
     }
     return this._indexer;
   }

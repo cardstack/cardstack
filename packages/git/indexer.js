@@ -89,6 +89,8 @@ const { safeEntryByName } = require('./mutable-tree');
 const logger = require('heimdalljs-logger');
 
 module.exports = class Indexer {
+  static create(params) { return new this(params); }
+
   constructor({ repo, basePath, branchPrefix }) {
     this.repoPath = repo;
     this.branchPrefix = branchPrefix || "";
