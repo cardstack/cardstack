@@ -5,9 +5,13 @@ const {
   getOwner
 } = require('@glimmer/di');
 const resolve = require('resolve');
-const injectionSymbol = Symbol('@cardstack/di/injections');
 const path = require('path');
 
+// Tolerate multiple distinct copies of this module
+if (!global.__cardstack_injection_symbol__) {
+  global.__cardstack_injection_symbol__ = Symbol('@cardstack/di/injections');
+}
+const injectionSymbol = global.__cardstack_injection_symbol__;
 
 exports.declareInjections = function(injections, klass) {
   klass[injectionSymbol] = injections;
