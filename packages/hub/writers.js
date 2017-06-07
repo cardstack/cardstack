@@ -1,5 +1,5 @@
 const Error = require('@cardstack/plugin-utils/error');
-const logger = require('heimdalljs-logger');
+const logger = require('@cardstack/plugin-utils/logger');
 const EventEmitter = require('events');
 const { declareInjections } = require('@cardstack/di');
 

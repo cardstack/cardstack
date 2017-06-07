@@ -13,7 +13,6 @@
     "@cardstack/git": "^0.1.0",
     "@cardstack/hub": "^0.1.0",
     "@cardstack/test-support": "^0.1.0",
-    "heimdalljs-logger": "^0.1.8",
     "koa": "2",
     "supertest": "^2.0.1"
   },

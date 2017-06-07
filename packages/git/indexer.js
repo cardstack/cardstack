@@ -86,7 +86,7 @@ const Change = require("./change");
 
 const { safeEntryByName } = require('./mutable-tree');
 
-const logger = require('heimdalljs-logger');
+const logger = require('@cardstack/plugin-utils/logger');
 
 module.exports = class Indexer {
   static create(params) { return new this(params); }

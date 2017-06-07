@@ -5,26 +5,41 @@ const {
   destroyDefaultEnvironment
 } = require('@cardstack/test-support/env');
 const JSONAPIFactory = require('@cardstack/test-support/jsonapi-factory');
+const temp = require('@cardstack/test-support/temp-helper');
+const { makeRepo } = require('./support');
 
 describe('git/writer', function() {
 
-  let env, writers, user;
+  let env, writers, user, repoPath, head;
 
   beforeEach(async function() {
+    repoPath = await temp.mkdir('git-writer-test');
+    await makeRepo(repoPath);
+
     let factory = new JSONAPIFactory();
+
+    factory.addResource('plugin-configs').withAttributes({
+      module: '@cardstack/git'
+    });
+
+    let source = factory.addResource('data-sources')
+      .withAttributes({
+        'source-type': '@cardstack/git',
+        params: { repo: repoPath }
+      });
 
     factory.addResource('content-types', 'articles')
       .withRelated('fields', [
         factory.addResource('fields', 'title').withAttributes({ fieldType: '@cardstack/core-types::string' }),
         factory.addResource('fields', 'primary-image').withAttributes({ fieldType: '@cardstack/core-types::belongs-to' })
-      ]);
+      ]).withRelated('data-source', source);
 
     factory.addResource('content-types', 'people')
       .withRelated('fields', [
         factory.addResource('fields', 'first-name').withAttributes({ fieldType: '@cardstack/core-types::string' }),
         factory.addResource('fields', 'last-name').withAttributes({ fieldType: '@cardstack/core-types::string' }),
         factory.addResource('fields', 'age').withAttributes({ fieldType: '@cardstack/core-types::integer' })
-      ]);
+      ]).withRelated('data-source', source);
 
     factory.addResource('articles', 1)
       .withAttributes({
@@ -61,7 +76,7 @@ describe('git/writer', function() {
             'defaultAtUpdate',
             factory.addResource('default-values').withAttributes({ value: 0 })
           )
-      ]);
+      ]).withRelated('data-source', source);
 
     factory.addResource('things-with-defaults', 4)
       .withAttributes({
@@ -70,13 +85,14 @@ describe('git/writer', function() {
       });
 
     env = await createDefaultEnvironment(`${__dirname}/..`, factory.getModels());
-
+    head = (await inRepo(repoPath).getCommit('master')).id;
     writers = env.lookup('hub:writers');
     user = env.user;
 
   });
 
   afterEach(async function() {
+    await temp.cleanup();
     await destroyDefaultEnvironment(env);
   });
 
@@ -88,7 +104,7 @@ describe('git/writer', function() {
           title: 'Second Article'
         }
       });
-      let saved = await inRepo(env.repoPath).getJSONContents('master', `contents/articles/${record.id}.json`);
+      let saved = await inRepo(repoPath).getJSONContents('master', `contents/articles/${record.id}.json`);
       expect(saved).to.deep.equal({
         attributes: {
           title: 'Second Article'
@@ -117,7 +133,7 @@ describe('git/writer', function() {
         id: '1',
         type: 'things-with-defaults',
       });
-      expect(await inRepo(env.repoPath).getJSONContents('master', 'contents/things-with-defaults/1.json'))
+      expect(await inRepo(repoPath).getJSONContents('master', 'contents/things-with-defaults/1.json'))
         .deep.property('attributes.coolness', 42);
     });
 
@@ -134,7 +150,7 @@ describe('git/writer', function() {
         title: 'Second Article'
       });
       expect(record.type).to.equal('articles');
-      let head = await inRepo(env.repoPath).getCommit('master');
+      let head = await inRepo(repoPath).getCommit('master');
       expect(record).has.deep.property('meta.version', head.id);
     });
 
@@ -152,7 +168,7 @@ describe('git/writer', function() {
     it('retries on id collision', async function () {
       let ids = ['1', '1', '2'];
       let writer = new Writer({
-        repo: env.repoPath,
+        repo: repoPath,
         idGenerator() {
           return ids.shift();
         }
@@ -177,7 +193,7 @@ describe('git/writer', function() {
         }
       });
       expect(record).has.property('id', 'special');
-      let articles = (await inRepo(env.repoPath).listTree('master', 'contents/articles')).map(a => a.name);
+      let articles = (await inRepo(repoPath).listTree('master', 'contents/articles')).map(a => a.name);
       expect(articles).to.contain('special.json');
     });
 
@@ -252,7 +268,7 @@ describe('git/writer', function() {
             title: 'Updated title'
           },
           meta: {
-            version: env.head
+            version: head
           }
         });
         throw new Error("should not get here");
@@ -272,7 +288,7 @@ describe('git/writer', function() {
             title: 'Updated title'
           },
           meta: {
-            version: env.head
+            version: head
           }
         });
         throw new Error("should not get here");
@@ -295,7 +311,7 @@ describe('git/writer', function() {
             title: 'Updated title'
           },
           meta: {
-            version: env.head
+            version: head
           }
         });
         throw new Error("should not get here");
@@ -318,7 +334,7 @@ describe('git/writer', function() {
             title: 'Updated title'
           },
           meta: {
-            version: env.head
+            version: head
           }
         });
         throw new Error("should not get here");
@@ -392,11 +408,11 @@ describe('git/writer', function() {
           title: 'Updated title'
         },
         meta: {
-          version: env.head
+          version: head
         }
       });
       expect(record).has.deep.property('attributes.title', 'Updated title');
-      expect(record).has.deep.property('meta.version').not.equal(env.head);
+      expect(record).has.deep.property('meta.version').not.equal(head);
     });
 
 
@@ -410,7 +426,7 @@ describe('git/writer', function() {
           title: 'Updated title'
         },
         meta: {
-          version: env.head
+          version: head
         }
       });
       expect(log).length(1);
@@ -424,7 +440,7 @@ describe('git/writer', function() {
           age: 7
         },
         meta: {
-          version: env.head
+          version: head
         }
       });
       expect(record).has.deep.property('attributes.first-name').equal('Quint');
@@ -435,7 +451,7 @@ describe('git/writer', function() {
         id: '4',
         type: 'things-with-defaults',
         meta: {
-          version: env.head
+          version: head
         }
       });
 
@@ -451,10 +467,10 @@ describe('git/writer', function() {
           age: 7
         },
         meta: {
-          version: env.head
+          version: head
         }
       });
-      expect(await inRepo(env.repoPath).getJSONContents('master', 'contents/people/1.json'))
+      expect(await inRepo(repoPath).getJSONContents('master', 'contents/people/1.json'))
         .deep.property('attributes.first-name', 'Quint');
     });
 
@@ -466,10 +482,10 @@ describe('git/writer', function() {
           title: 'Updated title'
         },
         meta: {
-          version: env.head
+          version: head
         }
       });
-      expect(await inRepo(env.repoPath).getJSONContents('master', 'contents/articles/1.json'))
+      expect(await inRepo(repoPath).getJSONContents('master', 'contents/articles/1.json'))
         .deep.property('attributes.title', 'Updated title');
     });
 
@@ -478,12 +494,12 @@ describe('git/writer', function() {
         id: '4',
         type: 'things-with-defaults',
         meta: {
-          version: env.head
+          version: head
         }
       });
-      expect(await inRepo(env.repoPath).getJSONContents('master', 'contents/things-with-defaults/4.json'))
+      expect(await inRepo(repoPath).getJSONContents('master', 'contents/things-with-defaults/4.json'))
         .deep.property('attributes.coolness', 100);
-      expect(await inRepo(env.repoPath).getJSONContents('master', 'contents/things-with-defaults/4.json'))
+      expect(await inRepo(repoPath).getJSONContents('master', 'contents/things-with-defaults/4.json'))
         .deep.property('attributes.karma', 0);
     });
 
@@ -495,7 +511,7 @@ describe('git/writer', function() {
           title: 'Updated title'
         },
         meta: {
-          version: env.head
+          version: head
         }
       });
 
@@ -507,7 +523,7 @@ describe('git/writer', function() {
             title: 'Conflicting title'
           },
           meta: {
-            version: env.head
+            version: head
           }
         });
         throw new Error("should not get here");
@@ -526,7 +542,7 @@ describe('git/writer', function() {
           id: '12',
           type: 'articles',
           meta: {
-            version: env.head
+            version: head
           }
         });
         throw new Error("should not get here");
@@ -546,7 +562,7 @@ describe('git/writer', function() {
           id: '1',
           type: 'articles2',
           meta: {
-            version: env.head
+            version: head
           }
         });
         throw new Error("should not get here");
@@ -567,10 +583,10 @@ describe('git/writer', function() {
           title: null
         },
         meta: {
-          version: env.head
+          version: head
         }
       });
-      let contents = await inRepo(env.repoPath).getJSONContents('master', 'contents/articles/1.json');
+      let contents = await inRepo(repoPath).getJSONContents('master', 'contents/articles/1.json');
       expect(contents.attributes).deep.equals({
         title: null
       });
@@ -581,7 +597,7 @@ describe('git/writer', function() {
 
     it('rejects missing document', async function() {
       try {
-        await writers.delete('master', user, env.head, 'articles', '10');
+        await writers.delete('master', user, head, 'articles', '10');
         throw new Error("should not get here");
       } catch (err) {
         if (!err.status) {
@@ -622,15 +638,15 @@ describe('git/writer', function() {
     }
 
     it('deletes document', async function() {
-      await writers.delete('master', user, env.head, 'people', '1');
-      let articles = (await inRepo(env.repoPath).listTree('master', 'contents/people')).map(a => a.name);
+      await writers.delete('master', user, head, 'people', '1');
+      let articles = (await inRepo(repoPath).listTree('master', 'contents/people')).map(a => a.name);
       expect(articles).to.not.contain('1.json');
     });
 
     it('emits changed event', async function() {
       let log = [];
       writers.on('changed', message => log.push(message));
-      await writers.delete('master', user, env.head, 'people', '1');
+      await writers.delete('master', user, head, 'people', '1');
       expect(log).length(1);
     });
 
@@ -642,12 +658,12 @@ describe('git/writer', function() {
           title: 'Updated title'
         },
         meta: {
-          version: env.head
+          version: head
         }
       });
 
       try {
-        await writers.delete('master', user, env.head, 'articles', '1');
+        await writers.delete('master', user, head, 'articles', '1');
         throw new Error("should not get here");
       } catch (err) {
         if (!err.status) {
@@ -672,7 +688,7 @@ describe('git/writer', function() {
           }
         },
       });
-      let saved = await inRepo(env.repoPath).getJSONContents('master', `contents/articles/${record.id}.json`);
+      let saved = await inRepo(repoPath).getJSONContents('master', `contents/articles/${record.id}.json`);
       expect(saved).to.deep.equal({
         attributes: {
           title: null
@@ -717,10 +733,10 @@ describe('git/writer', function() {
           }
         },
         meta: {
-          version: env.head
+          version: head
         }
       });
-      let saved = await inRepo(env.repoPath).getJSONContents('master', `contents/articles/1.json`);
+      let saved = await inRepo(repoPath).getJSONContents('master', `contents/articles/1.json`);
       expect(saved).to.deep.equal({
         attributes: {
           title: 'First Article'
@@ -749,7 +765,7 @@ describe('git/writer', function() {
           }
         },
         meta: {
-          version: env.head
+          version: head
         }
       });
       expect(record).to.have.deep.property('relationships.primary-image.data.id', '100');

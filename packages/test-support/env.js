@@ -1,17 +1,10 @@
 const temp = require('./temp-helper');
-const { makeRepo } = require('@cardstack/git/node-tests/support');
 const ElasticAssert = require('@cardstack/elasticsearch/node-tests/assertions');
 const JSONAPIFactory = require('./jsonapi-factory');
 const crypto = require('crypto');
 const { wireItUp } = require('@cardstack/hub/main');
 
 exports.createDefaultEnvironment = async function(projectDir, initialModels = []) {
-  let repoPath = await temp.mkdir('cardstack-server-test');
-
-  // TODO: The git writer should make its own local repo when it
-  // starts up the first time. I think this is already fixed.
-  let { head, repo } = await makeRepo(repoPath);
-
   let factory = new JSONAPIFactory();
 
   let user = factory.addResource('users', 'the-default-test-user').withAttributes({
@@ -26,13 +19,12 @@ exports.createDefaultEnvironment = async function(projectDir, initialModels = []
       'default-data-source',
       factory.addResource('data-sources')
         .withAttributes({
-          'source-type': '@cardstack/git',
-          params: { repo: repoPath }
+          'source-type': '@cardstack/ephemeral'
         })
     );
 
   factory.addResource('plugin-configs')
-    .withAttributes({ module: '@cardstack/git' });
+    .withAttributes({ module: '@cardstack/ephemeral' });
 
   factory.addResource('grants')
     .withAttributes({
@@ -57,17 +49,13 @@ exports.createDefaultEnvironment = async function(projectDir, initialModels = []
     // to build up the entire state in the same way an end user would
     // via JSONAPI requests. If we optimize this away, we should also
     // add some tests like that that are similarly comprehensive.
-    let response = await writers.create('master', user.data, model.type, model);
-    head = response.meta.version;
+    await writers.create('master', user.data, model.type, model);
   }
 
   await container.lookup('hub:indexers').update({ realTime: true });
 
   Object.assign(container, {
     user: user.data,
-    head,
-    repo,
-    repoPath,
     async setUserId(id) {
       let schema = await this.lookup('hub:schema-cache').schemaForControllingBranch();
       let m = schema.plugins.lookupFeatureAndAssert('middleware', '@cardstack/test-support/authenticator');

@@ -1,7 +1,7 @@
 const Koa = require('koa');
 const { Registry, Container } = require('@cardstack/di');
 
-const logger = require('heimdalljs-logger');
+const logger = require('@cardstack/plugin-utils/logger');
 const log = logger('server');
 
 async function wireItUp(projectDir, encryptionKeys, seedModels, isTesting=false) {

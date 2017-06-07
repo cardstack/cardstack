@@ -3,7 +3,7 @@ const Constraint = require('./constraint');
 const ContentType = require('./content-type');
 const DataSource = require('./data-source');
 const Grant = require('./grant');
-const logger = require('heimdalljs-logger');
+const logger = require('@cardstack/plugin-utils/logger');
 const {
   declareInjections,
   getOwner

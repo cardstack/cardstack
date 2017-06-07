@@ -1,4 +1,4 @@
-const logger = require('heimdalljs-logger');
+const logger = require('@cardstack/plugin-utils/logger');
 const Session = require('./session');
 const bearerTokenPattern = /bearer +(.*)$/i;
 const compose = require('koa-compose');

@@ -1,5 +1,5 @@
 const ES = require('elasticsearch');
-const logger = require('heimdalljs-logger');
+const logger = require('@cardstack/plugin-utils/logger');
 const { isEqual, merge } = require('lodash');
 
 function host() {

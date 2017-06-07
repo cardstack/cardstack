@@ -127,7 +127,7 @@ export default Ember.Service.extend({
     this.persistentState = priorState || {};
 
 
-    /* --  Ephermal state -- */
+    /* --  Ephemermal state -- */
 
     // a field is highlighted when we're drawing a blue border around it
     this.highlightedFieldId = null;

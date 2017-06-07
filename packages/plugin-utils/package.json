@@ -9,5 +9,8 @@
   "devDependencies": {
     "@cardstack/eslint-config": "^0.1.0",
     "denodeify": "^1.2.1"
+  },
+  "dependencies": {
+    "debug": "^2.6.3"
   }
 }

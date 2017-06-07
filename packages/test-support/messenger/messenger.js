@@ -1,4 +1,4 @@
-const logger = require('heimdalljs-logger')('messengers');
+const logger = require('@cardstack/plugin-utils/logger')('messengers');
 
 
 module.exports = class TestMessenger {

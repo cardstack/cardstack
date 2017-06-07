@@ -14,6 +14,11 @@ describe('git/config', function() {
 
   beforeEach(async function() {
     factory = new JSONAPIFactory();
+
+    factory.addResource('plugin-configs').withAttributes({
+      module: '@cardstack/git'
+    });
+
     env = null;
     repoPath = await temp.mkdir('cardstack-server-test');
   });

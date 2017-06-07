@@ -3,7 +3,10 @@ chai.use(require('chai-things'));
 chai.use(require('./collection-contains'));
 chai.use(require('./has-status'));
 
-const defaultDebugChannels = '*,-eslint:*,-koa:*,-koa-*,-superagent';
+const defaultDebugChannels = 'cardstack/*';
+const defaultDebugLevel = 'warn';
+
+const { format } = require('util');
 
 if (!process.__didSetCardstackWarning) {
   process.__didSetCardstackWarning = true;
@@ -22,7 +25,7 @@ if (!process.__didSetCardstackWarning) {
     // these third-party deps have loud logging even at warn level
     process.env.DEBUG=defaultDebugChannels;
     if (!process.env['DEBUG_LEVEL']) {
-      process.env.DEBUG_LEVEL='warn';
+      process.env.DEBUG_LEVEL = defaultDebugLevel;
     }
   }
 }
@@ -37,34 +40,12 @@ module.exports = function() {
 
   global.expect = chai.expect;
 
-  if (process.env.DEBUG === defaultDebugChannels) {
-
-    process.stderr.write = function(logLine) {
-      let match = [...expected.keys()].find(pattern => pattern.test(logLine));
-      if (match) {
-        expected.set(match, expected.get(match) + 1);
-      } else {
-        throw new Error("Unexpected log message during tests: " + logLine);
-      }
-    };
-    let expected = new Map();
-
-    // a successful test suite run still gets an empty write to stderr
-    // when it closes.
-    expected.set(/^\w*$/, 0);
-
-    global.expectLogMessage = async function(pattern, fn) {
-      expected.set(pattern, 0);
-      await fn();
-      let count = expected.get(pattern);
-      expected.delete(pattern);
-      if (count !== 1) {
-        throw new Error(`Expected a log mesage to match ${pattern} but none did`);
-      }
-    };
-  } else {
-    global.expectLogMessage = async function(pattern, fn) {
-      await fn();
+  if (process.env.DEBUG === defaultDebugChannels && process.env.DEBUG_LEVEL === defaultDebugLevel) {
+    require('@cardstack/plugin-utils/logger');
+    global.__cardstack_global_logger.print = function(namespace, logLine) {
+      setTimeout(function() {
+        throw new Error("Unexpected log message during tests: " + format(...logLine));
+      }, 0);
     };
   }
 };

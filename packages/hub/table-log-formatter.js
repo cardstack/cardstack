@@ -1,11 +1,8 @@
-const createDebug = require('debug');
+const logger = require('@cardstack/plugin-utils/logger');
 
-if (createDebug.formatters.t && !createDebug.formatters.t.isTableLogFormatter) {
-  throw new Error("namespace collision in log formatters for %t");
-}
-createDebug.formatters.t = format;
+logger.registerFormatter('t', format);
 
-function format (v){
+function format(v){
   if (!v) {
     return 'none';
   }
@@ -32,5 +29,3 @@ function format (v){
   }
   return output;
 }
-
-format.isTableLogFormatter = true;

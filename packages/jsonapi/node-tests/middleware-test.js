@@ -192,7 +192,7 @@ describe('jsonapi/middleware', function() {
 
     it('refuses to delete with invalid version', async function() {
       let response = await request.delete('/articles/0').set('If-Match', 'xxx');
-      expect(response).hasStatus(400);
+      expect(response).hasStatus(409);
       expect(response.body).has.deep.property('errors[0].source.header', 'If-Match');
     });
 

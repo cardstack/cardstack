@@ -2,7 +2,7 @@ const {
   Repository
 } = require('@cardstack/nodegit');
 
-const logger = require('heimdalljs-logger');
+const logger = require('@cardstack/plugin-utils/logger');
 const crypto = require('crypto');
 const Change = require('./change');
 const os = require('os');
