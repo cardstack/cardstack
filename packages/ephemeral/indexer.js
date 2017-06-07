@@ -1,6 +1,8 @@
 const EphermalStorage = require('./storage');
 
 module.exports = class Indexer {
+  static create(params) { return new this(params); }
+
   constructor({ storageKey }) {
     this.storage = EphermalStorage.create(storageKey);
   }
