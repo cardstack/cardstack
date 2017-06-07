@@ -1,10 +1,10 @@
-const EphermalStorage = require('./storage');
+const EphemermalStorage = require('./storage');
 
 module.exports = class Indexer {
   static create(params) { return new this(params); }
 
   constructor({ storageKey }) {
-    this.storage = EphermalStorage.create(storageKey);
+    this.storage = EphemermalStorage.create(storageKey);
   }
 
   async branches() {

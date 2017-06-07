@@ -1,4 +1,4 @@
-const EphermalStorage = require('./storage');
+const EphemermalStorage = require('./storage');
 const crypto = require('crypto');
 const Error = require('@cardstack/plugin-utils/error');
 const PendingChange = require('@cardstack/plugin-utils/pending-change');
@@ -11,7 +11,7 @@ module.exports = class Writer {
   }
 
   constructor({ storageKey }) {
-    this.storage = EphermalStorage.create(storageKey);
+    this.storage = EphemermalStorage.create(storageKey);
   }
 
   async prepareCreate(branch, user, type, document, isSchema) {
