@@ -1,5 +1,6 @@
 {
   "name": "@cardstack/ephemeral",
+  "version": "0.1.0",
   "keywords": [
     "cardstack-plugin"
   ],

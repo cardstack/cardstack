@@ -180,7 +180,7 @@ describe('elasticsearch/searcher', function() {
   it('returns properly formatted records', async function() {
     let model = await searcher.get('master', 'people', '1');
     let meta = model.meta;
-    expect(Object.keys(meta).sort()).deep.equals(['hash', 'version']);
+    expect(Object.keys(meta).sort()).deep.equals(['version']);
     delete model.meta;
     expect(model).deep.equals({
       type: 'people',

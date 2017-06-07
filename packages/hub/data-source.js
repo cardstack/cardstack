@@ -13,7 +13,7 @@ module.exports = class DataSource {
     this._Searcher = plugins.lookupFeatureFactory('searchers', this.sourceType);
     this._searcher = null;
     if (!this._Writer && !this._Indexer && !this._Searcher) {
-      throw new Error(`${this.sourceType} does not appear to be a valid data source plugin, because it has no indexer, writer, or searcher`);
+      throw new Error(`${this.sourceType} is either missing or does not appear to be a valid data source plugin`);
     }
   }
   get writer() {

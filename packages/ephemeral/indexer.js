@@ -34,7 +34,8 @@ class Updater {
     if (meta) {
       generation = meta.generation;
     }
-    for (let entry of this.storage.contentModelsNewerThan(generation)) {
+
+    for (let entry of this.storage.modelsNewerThan(generation)) {
       if (entry.model) {
         await ops.save(entry.type, entry.id, Object.assign({}, entry.model, { meta: { version: String(entry.generation) } }));
       } else {

@@ -240,9 +240,12 @@ class ActivePlugins {
     if (this.configs.get(moduleName)) {
       let plugin = this.installedPlugins.find(p => p.name === moduleName);
       if (plugin) {
-        return this._findFeature(plugin.features, featureType, featureName);
+        let feature = this._findFeature(plugin.features, featureType, featureName);
+        log.trace('feature lookup %s %s %s', featureType, fullyQualifiedName, !!feature);
+        return feature;
       }
     }
+    log.trace('feature lookup %s %s %s', featureType, fullyQualifiedName, false);
   }
 
   _lookupFeatureAndAssert(featureType, fullyQualifiedName)  {

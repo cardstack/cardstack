@@ -25,7 +25,7 @@
     "@cardstack/core-types": "^0.1.0",
     "@cardstack/di": "^0.1.0",
     "@cardstack/elasticsearch": "^0.1.0",
-    "@cardstack/git": "^0.1.0",
+    "@cardstack/ephemeral": "^0.1.0",
     "@cardstack/handlebars": "^0.1.0",
     "@cardstack/hub": "^0.1.0",
     "@cardstack/plugin-utils": "^0.1.0",

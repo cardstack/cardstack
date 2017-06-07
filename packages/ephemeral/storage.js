@@ -16,14 +16,14 @@ class EphemeralStorage {
   }
 
   schemaModels() {
-    return [...this.models.values()].filter(entry => entry.isSchema).map(entry => entry.model);
+    return [...this.models.values()].filter(entry => entry.isSchema).map(entry => entry.model).filter(Boolean);
   }
 
-  contentModelsNewerThan(generation) {
+  modelsNewerThan(generation) {
     if (generation == null) {
       generation = -Infinity;
     }
-    return [...this.models.values()].filter(entry => !entry.isSchema && entry.generation > generation);
+    return [...this.models.values()].filter(entry => entry.generation > generation);
   }
 
   lookup(type, id) {
@@ -39,7 +39,10 @@ class EphemeralStorage {
     let entry = this.models.get(key);
 
     if (entry && ifMatch != null && String(entry.generation) !== String(ifMatch)) {
-      throw new Error("Merge conflict", { status: 409 });
+      throw new Error("Merge conflict", {
+        status: 409,
+        source: model ? { pointer: '/data/meta/version'} : { header: 'If-Match' }
+      });
     }
 
     this.models.set(key, {
