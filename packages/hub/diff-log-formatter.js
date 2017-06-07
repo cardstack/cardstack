@@ -1,5 +1,7 @@
-const createDebug = require('debug');
+const logger = require('@cardstack/plugin-utils/logger');
 const jsondiffpatch = require('jsondiffpatch').create();
+
+logger.registerFormatter('p', format);
 
 function format(v) {
   if (!v) {
@@ -7,9 +9,3 @@ function format(v) {
   }
   return JSON.stringify(jsondiffpatch.diff(v.left, v.right));
 }
-format.isDiffLogFormatter = true;
-
-if (createDebug.formatters.p && !createDebug.formatters.p.isDiffLogFormatter) {
-  throw new Error("namespace collision in log formatters for %p");
-}
-createDebug.formatters.p = format;

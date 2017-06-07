@@ -44,6 +44,12 @@ class GlobalLogger {
       throw new Error(`Expected one log mesage to match ${pattern} but ${entry.count} did`);
     }
   }
+  registerFormatter(letter, func) {
+    if (debug.formatters[letter] && debug.formatters[letter].toString() !== func.toString()) {
+      throw new Error("namespace collision in log formatters for %t");
+    }
+    debug.formatters[letter] = func;
+  }
 }
 
 if (!global.__cardstack_global_logger) {
@@ -68,6 +74,9 @@ function logger(channelName) {
   }
 }
 
+logger.registerFormatter = function(letter, func) {
+  global.__cardstack_global_logger.registerFormatter(letter, func);
+};
 
 for (let [index, level] of levels.entries()) {
 
