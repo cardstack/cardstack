@@ -1,7 +1,7 @@
 const { makeServer } = require('../main');
 const commander = require('commander');
 const path = require('path');
-const logger = require('heimdalljs-logger');
+const logger = require('@cardstack/plugin-utils/logger');
 const log = logger('server');
 const fs = require('fs');
 

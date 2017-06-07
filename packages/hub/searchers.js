@@ -1,5 +1,5 @@
 const { declareInjections } = require('@cardstack/di');
-const logger = require('heimdalljs-logger');
+const logger = require('@cardstack/plugin-utils/logger');
 const Error = require('@cardstack/plugin-utils/error');
 
 module.exports = declareInjections({

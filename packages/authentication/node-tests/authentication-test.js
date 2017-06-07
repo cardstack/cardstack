@@ -5,6 +5,7 @@ const {
   destroyDefaultEnvironment
 } = require('@cardstack/test-support/env');
 const JSONAPIFactory = require('@cardstack/test-support/jsonapi-factory');
+const logger = require('@cardstack/plugin-utils/logger');
 
 describe('authentication/middleware', function() {
 
@@ -150,7 +151,7 @@ describe('authentication/middleware', function() {
     });
 
     it('ignores a bogus token', async function() {
-      await expectLogMessage(/Ignoring invalid token/, async () => {
+      await logger.expectWarn(/Ignoring invalid token/, async () => {
         let response = await request.get('/').set('authorization', `Bearer xxx--yyy--zzz`);
         expect(response.body).deep.equals({});
       });

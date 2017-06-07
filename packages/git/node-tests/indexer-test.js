@@ -5,6 +5,7 @@ const ElasticAssert = require('@cardstack/elasticsearch/node-tests/assertions');
 const toJSONAPI = require('@cardstack/elasticsearch/to-jsonapi');
 const JSONAPIFactory = require('@cardstack/test-support/jsonapi-factory');
 const { Registry, Container } = require('@cardstack/di');
+const logger = require('@cardstack/plugin-utils/logger');
 const fs = require('fs');
 
 describe('git/indexer', function() {
@@ -197,7 +198,7 @@ describe('git/indexer', function() {
     file.setContent('not json');
     head = await change.finalize(commitOpts());
 
-    await expectLogMessage(/Ignoring record with invalid json at contents\/articles\/hello-world.json/, async () => {
+    await logger.expectWarn(/Ignoring record with invalid json at contents\/articles\/hello-world.json/, async () => {
       await indexer.update();
     });
 

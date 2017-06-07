@@ -1,7 +1,7 @@
 const { declareInjections } = require('@cardstack/di');
 const DAGMap = require('dag-map').default;
 const compose = require('koa-compose');
-const logger = require('heimdalljs-logger');
+const logger = require('@cardstack/plugin-utils/logger');
 
 module.exports = declareInjections({
   schemaCache: 'hub:schema-cache'

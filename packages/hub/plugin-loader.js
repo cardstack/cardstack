@@ -4,7 +4,7 @@ const {
   setOwner
 } = require('@cardstack/di');
 const path = require('path');
-const log = require('heimdalljs-logger')('plugin-loader');
+const log = require('@cardstack/plugin-utils/logger')('plugin-loader');
 const denodeify = require('denodeify');
 const resolve = denodeify(require('resolve'));
 const fs = require('fs');

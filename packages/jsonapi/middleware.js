@@ -2,7 +2,7 @@ const Error = require('@cardstack/plugin-utils/error');
 const qs = require('qs');
 const { merge } = require('lodash');
 const koaJSONBody = require('koa-json-body');
-const logger = require('heimdalljs-logger');
+const logger = require('@cardstack/plugin-utils/logger');
 const { declareInjections } = require('@cardstack/di');
 
 module.exports = declareInjections({

@@ -20,7 +20,7 @@
 
 */
 
-const logger = require('heimdalljs-logger');
+const logger = require('@cardstack/plugin-utils/logger');
 const Client = require('@cardstack/elasticsearch/client');
 const BulkOps = require('./bulk-ops');
 const { declareInjections } = require('@cardstack/di');

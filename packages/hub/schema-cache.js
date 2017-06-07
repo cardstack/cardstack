@@ -15,7 +15,7 @@
 */
 
 const Searcher = require('@cardstack/elasticsearch/searcher');
-const logger = require('heimdalljs-logger');
+const logger = require('@cardstack/plugin-utils/logger');
 const bootstrapSchema = require('./bootstrap-schema');
 const { declareInjections } = require('@cardstack/di');
 const Schema = require('./schema');
