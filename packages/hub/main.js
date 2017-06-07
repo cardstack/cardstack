@@ -28,8 +28,8 @@ async function wireItUp(projectDir, encryptionKeys, seedModels, isTesting=false)
   return container;
 }
 
-async function makeServer(projectDir, encryptionKeys, seedModels) {
-  let container = await wireItUp(projectDir, encryptionKeys, seedModels);
+async function makeServer(projectDir, encryptionKeys, seedModels, isTesting=false) {
+  let container = await wireItUp(projectDir, encryptionKeys, seedModels, isTesting);
   let app = new Koa();
   app.use(httpLogging);
   app.use(container.lookup('hub:middleware-stack').middleware());
