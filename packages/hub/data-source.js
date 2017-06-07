@@ -6,7 +6,7 @@ module.exports = class DataSource {
     this.sourceType = model.attributes['source-type'];
     this._writer = null;
     this._params = Object.assign({dataSourceId: model.id}, model.attributes.params);
-    this._Writer = plugins.lookupFeature('writers', this.sourceType);
+    this._Writer = plugins.lookupFeatureFactory('writers', this.sourceType);
     this._writer = null;
     this._Indexer = plugins.lookupFeature('indexers', this.sourceType);
     this._indexer = null;
@@ -18,7 +18,7 @@ module.exports = class DataSource {
   }
   get writer() {
     if (!this._writer && this._Writer) {
-      this._writer = new (this._Writer)(this._params);
+      this._writer = this._Writer.create(this._params);
     }
     return this._writer;
   }

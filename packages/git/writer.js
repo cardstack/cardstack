@@ -13,6 +13,9 @@ const PendingChange = require('@cardstack/plugin-utils/pending-change');
 const pendingChanges = new WeakMap();
 
 module.exports = class Writer {
+  static create(params) {
+    return new this(params);
+  }
   constructor({ repo, idGenerator, basePath, branchPrefix }) {
     this.repoPath = repo;
     this.basePath = basePath;
