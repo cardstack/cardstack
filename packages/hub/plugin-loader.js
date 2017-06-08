@@ -16,14 +16,15 @@ const Error = require('@cardstack/plugin-utils/error');
 require('./table-log-formatter');
 
 const featureTypes = [
-  'constraints',
-  'fields',
+  'constraints', // TODO: rename to constraint-types
+  'fields',      // TODO: rename to field-types
   'writers',
   'searchers',
   'indexers',
   'authenticators',
   'middleware',
-  'messengers'
+  'messengers',
+  'code-generators'
 ];
 const javascriptPattern = /(.*)\.js$/;
 const TOP_FEATURE = {};

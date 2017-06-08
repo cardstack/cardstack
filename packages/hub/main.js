@@ -12,9 +12,9 @@ async function wireItUp(projectDir, encryptionKeys, seedModels, opts = {}) {
   });
   registry.register('config:seed-models', seedModels);
   registry.register('config:encryption-key', encryptionKeys);
+  registry.register('config:code-gen', { directory: opts.codeGenDirectory });
 
   let container = new Container(registry);
-
 
   // in the test suite we want more deterministic control of when
   // indexing happens
@@ -22,6 +22,13 @@ async function wireItUp(projectDir, encryptionKeys, seedModels, opts = {}) {
     await container.lookup('hub:indexers').update();
     setInterval(() => container.lookup('hub:indexers').update(), 600000);
     container.lookup('hub:writers').addListener('changed', what => container.lookup('hub:indexers').update({ hints: [ what ] }));
+  }
+
+  if (opts.codeGenDirectory) {
+    let generators = container.lookup('hub:code-generators');
+    // TODO: wire this up to rerun automatically and be smarter about
+    // multiple branches
+    await generators.generateCode('master');
   }
 
   return container;
