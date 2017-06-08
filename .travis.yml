@@ -64,7 +64,7 @@ before_install:
 
 install:
   - yarn install
-  - lerna bootstrap
+  - travis_wait lerna bootstrap
   - wget https://artifacts.elastic.co/downloads/elasticsearch/elasticsearch-${ES_VERSION}.tar.gz
   - tar -xzf elasticsearch-${ES_VERSION}.tar.gz
   - ./elasticsearch-${ES_VERSION}/bin/elasticsearch 2>&1 >> /dev/null &
