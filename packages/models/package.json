@@ -24,7 +24,7 @@
   "devDependencies": {
     "broccoli-asset-rev": "^2.4.5",
     "@cardstack/eslint-config": "^0.1.0",
-    "@cardstack/git": "^0.1.0",
+    "@cardstack/ephemeral": "^0.1.0",
     "@cardstack/hub": "^0.1.0",
     "@cardstack/jsonapi": "^0.1.0",
     "ember-ajax": "^3.0.0",

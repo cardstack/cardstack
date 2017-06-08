@@ -8,5 +8,6 @@ test('visiting /show-post', function(assert) {
 
   andThen(function() {
     assert.equal(currentURL(), '/posts/1');
+    findWithAssert('h1:contains(hello world)');
   });
 });
