@@ -64,5 +64,8 @@
   },
   "ember-addon": {
     "configPath": "tests/dummy/config"
+  },
+  "ember-addon": {
+    "defaultBlueprint": "cardstack-models-seeds"
   }
 }

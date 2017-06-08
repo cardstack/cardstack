@@ -37,5 +37,8 @@
     "@cardstack/test-support": "^0.1.0",
     "koa-better-route": "^0.1.0",
     "supertest": "^2.0.1"
+  },
+  "ember-addon": {
+    "defaultBlueprint": "cardstack-hub-allow-all"
   }
 }
