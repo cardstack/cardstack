@@ -177,9 +177,9 @@ class Searcher {
     }
 
     if (typeof value === 'string') {
-      // Bare strings are shorthand for a single term filter
+      // Bare strings are shorthand for a match filter
       let esName = await this.client.logicalFieldToES(branch, field.queryFieldName);
-      return { term: { [esName] : value.toLowerCase() } };
+      return { match: { [esName] : value } };
     }
 
     if (Array.isArray(value)) {

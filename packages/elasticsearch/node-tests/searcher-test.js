@@ -581,14 +581,24 @@ describe('elasticsearch/searcher', function() {
     expect(response.models[0]).has.deep.property('attributes.hello', 'magic words');
   });
 
-  it('the analyzed term does not match a phrase', async function() {
+  it('matches reordered phrase when using analyzed field', async function() {
     let response = await searcher.search('master', {
       filter: {
-        hello: 'magic words'
+        hello: 'words magic'
+      }
+    });
+    expect(response.models).length(1);
+  });
+
+  it('does not match reordered phrase when using exact field', async function() {
+    let response = await searcher.search('master', {
+      filter: {
+        hello: { exact: 'words magic' }
       }
     });
     expect(response.models).length(0);
   });
+
 
   it('can do exact term matching with a phrase', async function() {
     let response = await searcher.search('master', {
@@ -599,6 +609,16 @@ describe('elasticsearch/searcher', function() {
     expect(response.models).length(1);
     expect(response.models[0]).has.deep.property('attributes.hello', 'magic words');
   });
+
+  it('incomplete phrase does not match', async function() {
+    let response = await searcher.search('master', {
+      filter: {
+        hello: { exact: 'magic words extra' }
+      }
+    });
+    expect(response.models).length(0);
+  });
+
 
   it('can do exact term matching with multiple phrases', async function() {
     let response = await searcher.search('master', {
