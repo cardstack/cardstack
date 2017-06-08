@@ -57,14 +57,6 @@ export default Ember.Service.extend({
         width: 13,
         height: 18
       },
-    },
-    {
-      id: 'cardstack-library',
-      icon: {
-        name: 'archive',
-        width: 22,
-        height: 24
-      }
     }
   ],
 
