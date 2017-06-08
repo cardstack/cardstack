@@ -1,4 +1,4 @@
-{{#mark-overlay id=id group="cardstack-content" model=content}}
+{{#mark-overlay id=id group=(if (eq format "page") "cardstack-pages" "cardstack-content") model=content}}
   {{#if (is-component specificComponent)}}
     {{component specificComponent content=content format=format tagName="" }}
   {{else}}

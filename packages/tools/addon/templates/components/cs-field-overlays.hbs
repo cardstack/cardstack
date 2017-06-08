@@ -17,3 +17,12 @@
     {{/if}}
   {{/create-overlay}}
 {{/overlay-marks}}
+
+{{#overlay-marks group="cardstack-content" as |mark|}}
+  {{create-overlay at=mark
+                   label=(cs-humanize (cs-model-type mark.model))
+                   highlighted=false
+                   hoverable=tools.editing
+                   class="cs-content-overlay"
+                   }}
+{{/overlay-marks}}

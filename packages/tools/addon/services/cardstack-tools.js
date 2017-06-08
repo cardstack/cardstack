@@ -13,12 +13,12 @@ export default Ember.Service.extend({
     return this.get('marks').filter(m => m.group === 'cardstack-fields');
   }),
 
-  contentItems: Ember.computed('marks', function() {
-    return this.get('marks').filter(m => m.group === 'cardstack-content');
+  contentPages: Ember.computed('marks', function() {
+    return this.get('marks').filter(m => m.group === 'cardstack-pages');
   }),
 
-  activeContentItem: Ember.computed('contentItems', function() {
-    return this.get('contentItems')[0];
+  activeContentItem: Ember.computed('contentPages', function() {
+    return this.get('contentPages')[0];
   }),
 
   _activeItemMeta: Ember.computed('activeContentItem', function() {
