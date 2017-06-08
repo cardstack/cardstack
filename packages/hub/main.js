@@ -4,12 +4,11 @@ const { Registry, Container } = require('@cardstack/di');
 const logger = require('@cardstack/plugin-utils/logger');
 const log = logger('server');
 
-async function wireItUp(projectDir, encryptionKeys, seedModels, isTesting=false) {
+async function wireItUp(projectDir, encryptionKeys, seedModels, opts = {}) {
   let registry = new Registry();
-
   registry.register('config:project', {
     path: projectDir,
-    isTesting
+    allowDevDependencies: opts.allowDevDependencies
   });
   registry.register('config:seed-models', seedModels);
   registry.register('config:encryption-key', encryptionKeys);
@@ -19,7 +18,7 @@ async function wireItUp(projectDir, encryptionKeys, seedModels, isTesting=false)
 
   // in the test suite we want more deterministic control of when
   // indexing happens
-  if (!isTesting) {
+  if (!opts.disableAutomaticIndexing) {
     await container.lookup('hub:indexers').update();
     setInterval(() => container.lookup('hub:indexers').update(), 600000);
     container.lookup('hub:writers').addListener('changed', what => container.lookup('hub:indexers').update({ hints: [ what ] }));
@@ -28,8 +27,8 @@ async function wireItUp(projectDir, encryptionKeys, seedModels, isTesting=false)
   return container;
 }
 
-async function makeServer(projectDir, encryptionKeys, seedModels, isTesting=false) {
-  let container = await wireItUp(projectDir, encryptionKeys, seedModels, isTesting);
+async function makeServer(projectDir, encryptionKeys, seedModels, opts = {}) {
+  let container = await wireItUp(projectDir, encryptionKeys, seedModels, opts);
   let app = new Koa();
   app.use(httpLogging);
   app.use(container.lookup('hub:middleware-stack').middleware());

@@ -34,7 +34,10 @@ exports.createDefaultEnvironment = async function(projectDir, initialModels = []
       mayWriteField: true
     }).withRelated('who', factory.addResource('groups', user.id));
 
-  let container = await wireItUp(projectDir, crypto.randomBytes(32), factory.getModels(), true);
+  let container = await wireItUp(projectDir, crypto.randomBytes(32), factory.getModels(), {
+    allowDevDependencies: true,
+    disableAutomaticIndexing: true
+  });
 
   let writers = container.lookup('hub:writers');
 

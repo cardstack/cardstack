@@ -59,9 +59,10 @@ class PluginLoader {
       let seen = Object.create(null);
 
       // during a test suite, we include devDependencies of the top-level project under test.
-      let includeDevDependencies = this.project.isTesting;
+      let includeDevDependencies = this.project.allowDevDependencies;
       let projectPath = path.resolve(this.project.path);
-      log.info("plugin loader starting from path %s", projectPath);
+      log.info("starting from path %s", projectPath);
+      log.info("allowed in devDependencies: %s", !!includeDevDependencies);
       await this._crawlPlugins(projectPath, output, seen, includeDevDependencies, 0);
       this._installedPlugins = output;
       log.info("=== found installed plugins===\n%t", () => summarize(output));

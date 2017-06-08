@@ -40,7 +40,7 @@ describe('git/indexer', function() {
     registry.register('config:seed-models', factory.getModels());
     registry.register('config:project', {
       path: `${__dirname}/..`,
-      isTesting: true
+      allowDevDependencies: true
     });
     indexer = new Container(registry).lookup('hub:indexers');
   });
@@ -301,7 +301,7 @@ describe('git/indexer failures', function() {
     registry.register('config:seed-models', factory.getModels());
     registry.register('config:project', {
       path: `${__dirname}/..`,
-      isTesting: true
+      allowDevDependencies: true
     });
     indexer = new Container(registry).lookup('hub:indexers');
   });

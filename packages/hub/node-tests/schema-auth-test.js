@@ -37,7 +37,7 @@ describe('schema/auth', function() {
         factory.getResource('fields', 'title')
       ]);
     let registry = new Registry();
-    registry.register('config:project', { path: `${__dirname}/..`, isTesting: true });
+    registry.register('config:project', { path: `${__dirname}/..`, allowDevDependencies: true });
     loader = new Container(registry).lookup('hub:schema-loader');
   });
 

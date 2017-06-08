@@ -16,13 +16,15 @@ module.exports = {
   async serverMiddleware({ app, options }) {
     let { pkg } = this.project;
 
-    // the hub should only boot up in development mode if its in
-    // `dependencies`, meaning it's a runtime dependency
-    if (pkg.dependencies && pkg.dependencies['@cardstack/hub']) {
-      let { project, environment } = options;
-      let seedDir = path.join(this.seedPath, environment);
-      app.use('/cardstack', await this._middleware(seedDir, project.ui));
-    }
+    // if the hub is a runtime dependency, it should only load other
+    // plugins that are also runtime dependencies. If it's a
+    // devDependency, it will also load other plugins that are
+    // devDependencies.
+    let useDevDeps = !(pkg.dependencies && pkg.dependencies['@cardstack/hub']);
+
+    let { project, environment } = options;
+    let seedDir = path.join(this.seedPath, environment);
+    app.use('/cardstack', await this._middleware(seedDir, project.ui, useDevDeps));
   },
 
   // testemMiddleware will not wait for a promise, so we need to
@@ -44,7 +46,7 @@ module.exports = {
     });
   },
 
-  _middleware(seedDir, ui, isTesting) {
+  _middleware(seedDir, ui, allowDevDependencies) {
     let seedModels;
     try {
       seedModels = fs.readdirSync(seedDir).map(filename => require(path.join(seedDir, filename))).reduce((a,b) => a.concat(b), []);
@@ -66,7 +68,9 @@ module.exports = {
     // Randomized session encryption -- this means if you restart the
     // dev server your session gets invalidated.
     let sessionsKey = crypto.randomBytes(32);
-    return makeServer(this.project.root, sessionsKey, seedModels, isTesting).then(server => {
+    return makeServer(this.project.root, sessionsKey, seedModels, {
+      allowDevDependencies
+    }).then(server => {
       return server.callback();
     });
   }
