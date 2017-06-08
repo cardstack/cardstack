@@ -1,6 +1,6 @@
 {
   "name": "@cardstack/hub",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "keywords": [
     "cardstack-plugin",
     "ember-addon"
@@ -12,9 +12,9 @@
   },
   "description": "Stock API server for the Cardstack tech stack.",
   "dependencies": {
-    "@cardstack/core-types": "^0.1.1",
+    "@cardstack/core-types": "^0.1.2",
     "@cardstack/di": "^0.1.1",
-    "@cardstack/elasticsearch": "^0.1.1",
+    "@cardstack/elasticsearch": "^0.1.2",
     "@cardstack/handlebars": "^0.1.1",
     "@cardstack/plugin-utils": "^0.1.1",
     "broccoli-funnel": "^1.2.0",
@@ -33,8 +33,8 @@
   },
   "devDependencies": {
     "@cardstack/eslint-config": "^0.1.1",
-    "@cardstack/git": "^0.1.1",
-    "@cardstack/test-support": "^0.1.1",
+    "@cardstack/git": "^0.1.2",
+    "@cardstack/test-support": "^0.1.2",
     "koa-better-route": "^0.1.0",
     "supertest": "^2.0.1"
   },
