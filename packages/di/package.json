@@ -2,13 +2,9 @@
   "name": "@cardstack/di",
   "version": "0.1.0",
   "keywords": [
-    "cardstack-plugin"
   ],
   "author": "Edward Faulkner <edward@eaf4.com>",
   "repository": "https://github.com/cardstack/cardstack",
-  "cardstack-plugin": {
-    "api-version": 1
-  },
   "description": "Thin wrapper over @glimmer/di for use in @cardstack/hub",
   "dependencies": {
     "@glimmer/di": "^0.2.0",
