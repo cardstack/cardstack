@@ -10,7 +10,7 @@ module.exports = [
   },
   {
     type: 'data-sources',
-    id: 0,
+    id: 'cardstack-git-default',
     attributes: {
       'source-type': '@cardstack/git',
       params: {
