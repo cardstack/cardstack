@@ -38,6 +38,8 @@ cache:
     - packages/di/node_modules
     - packages/drupal/node_modules
     - packages/elasticsearch/node_modules
+    - packages/email-auth/node_modules
+    - packages/ephemeral/node_modules
     - packages/eslint-config/node_modules
     - packages/git/node_modules
     - packages/github-auth/node_modules
@@ -46,6 +48,7 @@ cache:
     - packages/image/node_modules
     - packages/jsonapi/node_modules
     - packages/mobiledoc/node_modules
+    - packages/models/node_modules
     - packages/plugin-utils/node_modules
     - packages/routing/node_modules
     - packages/search/node_modules
