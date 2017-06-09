@@ -1,5 +1,5 @@
 const logger = require('@cardstack/plugin-utils/logger');
-const Session = require('./session');
+const Session = require('@cardstack/plugin-utils/session');
 const bearerTokenPattern = /bearer +(.*)$/i;
 const compose = require('koa-compose');
 const route = require('koa-better-route');
@@ -10,20 +10,18 @@ const { declareInjections } = require('@cardstack/di');
 // This is how this module's actions will appear in git history.
 // Also, the user id "@cardstack/hub" is special -- it has a grant to
 // do all the things (see bootstrap-schema.js)
-const actingSession = {
-  id: '@cardstack/hub',
-  type: 'users',
-  async loadUser() {
-    return {
-      id: '@cardstack/hub',
-      type: 'users',
-      attributes: {
-        'full-name': '@cardstack/hub/authentication',
-        email: 'noreply@nowhere.com'
-      }
-    };
+const actingSession = new Session(
+  { id: '@cardstack/hub', type: 'users' },
+  null,
+  {
+    id: '@cardstack/hub',
+    type: 'users',
+    attributes: {
+      'full-name': '@cardstack/hub/authentication',
+      email: 'noreply@nowhere.com'
+    }
   }
-};
+);
 
 module.exports = declareInjections({
   encryptor: 'hub:encryptor',

@@ -3,6 +3,7 @@ const ElasticAssert = require('@cardstack/elasticsearch/node-tests/assertions');
 const JSONAPIFactory = require('./jsonapi-factory');
 const crypto = require('crypto');
 const { wireItUp } = require('@cardstack/hub/main');
+const Session = require('@cardstack/plugin-utils/session');
 
 exports.createDefaultEnvironment = async function(projectDir, initialModels = []) {
   let factory = new JSONAPIFactory();
@@ -12,13 +13,11 @@ exports.createDefaultEnvironment = async function(projectDir, initialModels = []
     email: 'test@example.com'
   });
 
-  let session = {
-    id: 'the-default-test-user',
-    type: 'users',
-    async loadUser() {
-      return user;
-    }
-  };
+  let session = new Session(
+    { id: 'the-default-test-user', type: 'users'},
+    null,
+    user
+  );
 
   factory.addResource('plugin-configs')
     .withAttributes({

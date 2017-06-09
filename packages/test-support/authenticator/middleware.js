@@ -1,4 +1,5 @@
 const { declareInjections } = require('@cardstack/di');
+const Session = require('@cardstack/plugin-utils/session');
 
 module.exports = declareInjections({
   searcher: 'hub:searchers'
@@ -15,12 +16,10 @@ class TestAuthenticator {
     let self = this;
     return async (ctxt, next) => {
       if (self.userId != null) {
-        ctxt.state.cardstackSession = {
-          userId: self.userId,
-          async loadUser() {
-            return self.searcher.get('master', 'users', self.userId);
-          }
-        };
+        ctxt.state.cardstackSession = new Session(
+          { id: self.userId, type: 'users' },
+          (id) => self.searcher.get('master', 'users', id)
+        );
       }
       await next();
     };

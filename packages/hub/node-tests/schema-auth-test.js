@@ -3,6 +3,7 @@ const JSONAPIFactory = require('@cardstack/test-support/jsonapi-factory');
 const PendingChange = require('@cardstack/plugin-utils/pending-change');
 const bootstrapSchema = require('../bootstrap-schema');
 const { Registry, Container } = require('@cardstack/di');
+const Session = require('@cardstack/plugin-utils/session');
 
 describe('schema/auth', function() {
 
@@ -106,12 +107,7 @@ describe('schema/auth', function() {
     let action = create({
       type: 'articles'
     });
-    let session = {
-      id: 0,
-      async loadUser() {
-        return { id: 0 };
-      }
-    };
+    let session = new Session({ id: '0' }, null, { id: '0' });
     let errors = await schema.validationErrors(action, { session });
     expect(errors).deep.equal([]);
   });

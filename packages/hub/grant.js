@@ -40,11 +40,13 @@ module.exports = class Grant {
   }
 
   async matches(document, context) {
-    let user;
+    let groupIds;
     if (context.session) {
-      user = await context.session.loadUser();
+      groupIds = await context.session.loadGroupIds();
+    } else {
+      groupIds = [];
     }
-    let matches = this.groupId == null || (user && this._memberCheck(user, this.groupId));
+    let matches = this.groupId == null || groupIds.includes(this.groupId);
     authLog.trace('testing grant id=%s groupId=%s document=%j context=%j matches=%s', this.id, this.groupId, document, context, !!matches);
     return matches;
   }
