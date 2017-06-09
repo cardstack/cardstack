@@ -10,12 +10,18 @@ const { declareInjections } = require('@cardstack/di');
 // This is how this module's actions will appear in git history.
 // Also, the user id "@cardstack/hub" is special -- it has a grant to
 // do all the things (see bootstrap-schema.js)
-const actingUser = {
+const actingSession = {
   id: '@cardstack/hub',
   type: 'users',
-  attributes: {
-    'full-name': '@cardstack/hub/authentication',
-    email: 'noreply@nowhere.com'
+  async loadUser() {
+    return {
+      id: '@cardstack/hub',
+      type: 'users',
+      attributes: {
+        'full-name': '@cardstack/hub/authentication',
+        email: 'noreply@nowhere.com'
+      }
+    };
   }
 };
 
@@ -166,11 +172,11 @@ class Authentication {
       }
     }
     if (!have && source.attributes['may-create-user']) {
-      return this.writer.create(this.controllingBranch, actingUser, user.type, user);
+      return this.writer.create(this.controllingBranch, actingSession, user.type, user);
     }
     if (have && source.attributes['may-update-user']) {
       user.meta = have.meta;
-      return this.writer.update(this.controllingBranch, actingUser, user.type, have.id, user);
+      return this.writer.update(this.controllingBranch, actingSession, user.type, have.id, user);
     }
     return have;
   }

@@ -1,4 +1,5 @@
 const Error = require('@cardstack/plugin-utils/error');
+const find = require('./async-find');
 
 module.exports = class ContentType {
   constructor(model, allFields, dataSources, defaultDataSource, allGrants, authLog) {
@@ -99,7 +100,7 @@ module.exports = class ContentType {
   async _validateResourceLevelAuthorization(pendingChange, context) {
     let { originalDocument, finalDocument } = pendingChange;
     if (!finalDocument) {
-      let grant = this.grants.find(g => g['may-delete-resource'] && g.matches(originalDocument, context));
+      let grant = await find(this.grants, async g => g['may-delete-resource'] && await g.matches(originalDocument, context));
       if (grant) {
         this.authLog.debug("approved deletion of %s %s because of grant %s", originalDocument.type, originalDocument.id, grant.id);
         this.authLog.trace("grant %s = %j", grant.id, grant);
@@ -108,7 +109,7 @@ module.exports = class ContentType {
         throw new Error("You may not delete this resource", { status: 401 });
       }
     } else if (!originalDocument) {
-      let grant = this.grants.find(g => g['may-create-resource'] && g.matches(finalDocument, context));
+      let grant = await find(this.grants, async g => g['may-create-resource'] && await g.matches(originalDocument, context));
       if (grant) {
         this.authLog.debug("approved creation of %s %s because of grant %s", finalDocument.type, finalDocument.id, grant.id);
         this.authLog.trace("grant %s = %j", grant.id, grant);
@@ -117,10 +118,10 @@ module.exports = class ContentType {
         throw new Error("You may not create this resource", { status: 401 });
       }
     } else {
-      let grant = this.grants.find(
-        g => g['may-update-resource'] &&
-          g.matches(finalDocument, context) &&
-          g.matches(originalDocument, context)
+      let grant = await find(this.grants,
+        async g => g['may-update-resource'] &&
+          (await g.matches(finalDocument, context)) &&
+          (await g.matches(originalDocument, context))
       );
       if (grant) {
         this.authLog.debug("approved update of %s %s because of grant %s", finalDocument.type, finalDocument.id, grant.id);

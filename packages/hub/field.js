@@ -1,4 +1,5 @@
 const Error = require('@cardstack/plugin-utils/error');
+const find = require('./async-find');
 
 module.exports = class Field {
   constructor(model, plugins, constraints, allGrants, defaultValues, authLog) {
@@ -156,7 +157,7 @@ module.exports = class Field {
       this.authLog.debug("approved field write for %s because it matches server provided default", this.id);
     } else if (pendingChange.originalDocument && value === this._valueFrom(pendingChange, 'originalDocument')) {
       this.authLog.debug("approved field write for %s because it was unchanged", this.id);
-    } else if ((grant = this.grants.find(g => g['may-write-field'] && g.matches(pendingChange, context)))) {
+    } else if ((grant = await find(this.grants, async g => g['may-write-field'] && await g.matches(pendingChange, context)))) {
       this.authLog.debug("approved field write for %s because of grant %s", this.id, grant.id);
     } else {
       // Denied

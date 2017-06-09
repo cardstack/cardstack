@@ -6,6 +6,8 @@ const actions = [
   'may-read-field',
   'may-write-field'
 ];
+const logger = require('@cardstack/plugin-utils/logger');
+const authLog = logger('auth');
 
 module.exports = class Grant {
   constructor(document) {
@@ -37,8 +39,14 @@ module.exports = class Grant {
     }
   }
 
-  matches(document, context) {
-    return this.groupId == null || (context.user && this._memberCheck(context.user, this.groupId));
+  async matches(document, context) {
+    let user;
+    if (context.session) {
+      user = await context.session.loadUser();
+    }
+    let matches = this.groupId == null || (user && this._memberCheck(user, this.groupId));
+    authLog.trace('testing grant id=%s groupId=%s document=%j context=%j matches=%s', this.id, this.groupId, document, context, !!matches);
+    return matches;
   }
 
   _memberCheck(user, groupId) {

@@ -106,7 +106,13 @@ describe('schema/auth', function() {
     let action = create({
       type: 'articles'
     });
-    let errors = await schema.validationErrors(action, { user: { id: 0 }});
+    let session = {
+      id: 0,
+      async loadUser() {
+        return { id: 0 };
+      }
+    };
+    let errors = await schema.validationErrors(action, { session });
     expect(errors).deep.equal([]);
   });
 

@@ -15,7 +15,7 @@ module.exports = declareInjections({
     this.storage = EphemermalStorage.create(indexers);
   }
 
-  async prepareCreate(branch, user, type, document, isSchema) {
+  async prepareCreate(branch, session, type, document, isSchema) {
     if (branch !== 'master') {
       throw new Error("ephemeral storage only supports branch master");
     }
@@ -43,7 +43,7 @@ module.exports = declareInjections({
     return pending;
   }
 
-  async prepareUpdate(branch, user, type, id, document, isSchema) {
+  async prepareUpdate(branch, session, type, id, document, isSchema) {
     if (!document.meta || !document.meta.version) {
       throw new Error('missing required field "meta.version"', {
         status: 400,
@@ -64,7 +64,7 @@ module.exports = declareInjections({
     return pending;
   }
 
-  async prepareDelete(branch, user, version, type, id, isSchema) {
+  async prepareDelete(branch, session, version, type, id, isSchema) {
     if (!version) {
       throw new Error('version is required', {
         status: 400,

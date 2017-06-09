@@ -12,6 +12,14 @@ exports.createDefaultEnvironment = async function(projectDir, initialModels = []
     email: 'test@example.com'
   });
 
+  let session = {
+    id: 'the-default-test-user',
+    type: 'users',
+    async loadUser() {
+      return user;
+    }
+  };
+
   factory.addResource('plugin-configs')
     .withAttributes({
       module: '@cardstack/hub',
@@ -52,12 +60,13 @@ exports.createDefaultEnvironment = async function(projectDir, initialModels = []
     // to build up the entire state in the same way an end user would
     // via JSONAPI requests. If we optimize this away, we should also
     // add some tests like that that are similarly comprehensive.
-    await writers.create('master', user.data, model.type, model);
+    await writers.create('master', session, model.type, model);
   }
 
   await container.lookup('hub:indexers').update({ realTime: true });
 
   Object.assign(container, {
+    session,
     user: user.data,
     async setUserId(id) {
       let schema = await this.lookup('hub:schema-cache').schemaForControllingBranch();

@@ -18,13 +18,13 @@ class Writers extends EventEmitter {
     return this.schemaLoader.ownTypes();
   }
 
-  async create(branch, user, type, document) {
+  async create(branch, session, type, document) {
     this.log.info("creating type=%s", type);
     let schema = await this.schemaCache.schemaForBranch(branch);
     let writer = this._lookupWriter(schema, type);
     let isSchema = this.schemaTypes.includes(type);
-    let pending = await writer.prepareCreate(branch, user, type, document, isSchema);
-    let newSchema = await schema.validate(pending, { type, user });
+    let pending = await writer.prepareCreate(branch, session, type, document, isSchema);
+    let newSchema = await schema.validate(pending, { type, session });
     let response = await this._finalizeAndReply(pending);
     if (newSchema) {
       this.schemaCache.notifyBranchUpdate(branch, newSchema);
@@ -33,13 +33,13 @@ class Writers extends EventEmitter {
     return response;
   }
 
-  async update(branch, user, type, id, document) {
+  async update(branch, session, type, id, document) {
     this.log.info("updating type=%s id=%s", type, id);
     let schema = await this.schemaCache.schemaForBranch(branch);
     let writer = this._lookupWriter(schema, type);
     let isSchema = this.schemaTypes.includes(type);
-    let pending = await writer.prepareUpdate(branch, user, type, id, document, isSchema);
-    let newSchema = await schema.validate(pending, { type, id, user });
+    let pending = await writer.prepareUpdate(branch, session, type, id, document, isSchema);
+    let newSchema = await schema.validate(pending, { type, id, session });
     let response = await this._finalizeAndReply(pending);
     if (newSchema) {
       this.schemaCache.notifyBranchUpdate(branch, newSchema);
@@ -48,13 +48,13 @@ class Writers extends EventEmitter {
     return response;
   }
 
-  async delete(branch, user, version, type, id) {
+  async delete(branch, session, version, type, id) {
     this.log.info("deleting type=%s id=%s", type, id);
     let schema = await this.schemaCache.schemaForBranch(branch);
     let writer = this._lookupWriter(schema, type);
     let isSchema = this.schemaTypes.includes(type);
-    let pending = await writer.prepareDelete(branch, user, version, type, id, isSchema);
-    let newSchema = await schema.validate(pending, { user });
+    let pending = await writer.prepareDelete(branch, session, version, type, id, isSchema);
+    let newSchema = await schema.validate(pending, { session });
     await pending.finalize();
     if (newSchema) {
       this.schemaCache.notifyBranchUpdate(branch, newSchema);

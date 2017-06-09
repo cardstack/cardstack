@@ -66,7 +66,7 @@ describe('middleware-stack', function() {
     afterEach(teardown);
 
     it('can dynamically mount more middleware', async function() {
-      await env.lookup('hub:writers').create('master', env.user, 'plugin-configs', {
+      await env.lookup('hub:writers').create('master', env.session, 'plugin-configs', {
         type: 'plugin-configs',
         attributes: {
           module: 'stub-middleware-extra'
@@ -82,7 +82,7 @@ describe('middleware-stack', function() {
       let configs = await env.lookup('hub:searchers').search('master', { filter: { module: { exact: 'stub-middleware' } } });
       expect(configs.models).length(1);
       let config = configs.models[0];
-      await env.lookup('hub:writers').delete('master', env.user, config.meta.version, config.type, config.id);
+      await env.lookup('hub:writers').delete('master', env.session, config.meta.version, config.type, config.id);
       await env.lookup('hub:indexers').update({ realTime: true });
       let response = await request.get('/first');
       expect(response).hasStatus(404);

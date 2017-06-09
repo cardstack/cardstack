@@ -28,7 +28,7 @@ module.exports = class Writer {
     this.idGenerator = idGenerator;
   }
 
-  async prepareCreate(branch, user, type, document, isSchema) {
+  async prepareCreate(branch, session, type, document, isSchema) {
     return withErrorHandling(document.id, type, async () => {
       await this._ensureRepo();
 
@@ -57,13 +57,13 @@ module.exports = class Writer {
       }
 
       let pending = new PendingChange(null, gitDocument, finalizer);
-      let signature = this._commitOptions('create', document.type, id, user);
+      let signature = await this._commitOptions('create', document.type, id, session);
       pendingChanges.set(pending, { type: document.type, id, signature, change, file });
       return pending;
     });
   }
 
-  async prepareUpdate(branch, user, type, id, document, isSchema) {
+  async prepareUpdate(branch, session, type, id, document, isSchema) {
     if (!document.meta || !document.meta.version) {
       throw new Error('missing required field "meta.version"', {
         status: 400,
@@ -84,14 +84,14 @@ module.exports = class Writer {
       before.type = type;
       after.id = document.id;
       after.type = document.type;
-      let signature = this._commitOptions('update', type, id, user);
+      let signature = await this._commitOptions('update', type, id, session);
       let pending = new PendingChange(before, after, finalizer);
       pendingChanges.set(pending, { type, id, signature, change, file });
       return pending;
     });
   }
 
-  async prepareDelete(branch, user, version, type, id, isSchema) {
+  async prepareDelete(branch, session, version, type, id, isSchema) {
     if (!version) {
       throw new Error('version is required', {
         status: 400,
@@ -107,13 +107,14 @@ module.exports = class Writer {
       before.id = id;
       before.type = type;
       let pending = new PendingChange(before, null, finalizer);
-      let signature = this._commitOptions('delete', type, id, user);
+      let signature = await this._commitOptions('delete', type, id, session);
       pendingChanges.set(pending, { type, id, signature, change });
       return pending;
     });
   }
 
-  _commitOptions(operation, type, id, user) {
+  async _commitOptions(operation, type, id, session) {
+    let user = await session.loadUser();
     return {
       authorName: (user && user.attributes && user.attributes['full-name']) || 'Anonymous Coward',
       authorEmail: (user && user.attributes && user.attributes.email) || 'anon@example.com',
