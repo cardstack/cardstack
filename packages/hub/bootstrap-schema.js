@@ -89,7 +89,9 @@ const models = [
           { type: 'fields', id: 'may-create-resource' },
           { type: 'fields', id: 'may-update-resource' },
           { type: 'fields', id: 'may-delete-resource' },
-          { type: 'fields', id: 'may-write-field' }
+          { type: 'fields', id: 'may-write-field' },
+          { type: 'fields', id: 'types' },
+          { type: 'fields', id: 'fields' }
         ]
       }
     }
