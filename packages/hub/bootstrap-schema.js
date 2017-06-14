@@ -209,6 +209,13 @@ const models = [
   },
   {
     type: 'fields',
+    id: 'types',
+    attributes: {
+      'field-type': '@cardstack/core-types::has-many'
+    }
+  },
+  {
+    type: 'fields',
     id: 'who',
     attributes: {
       'field-type': '@cardstack/core-types::belongs-to'
