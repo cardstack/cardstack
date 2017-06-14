@@ -1,6 +1,6 @@
 {
   "name": "@cardstack/email",
-  "version": "0.0.17",
+  "version": "0.1.3-alpha.0",
   "keywords": [
     "cardstack-plugin"
   ],
