@@ -29,7 +29,7 @@ class {
         await this.messengers.send(messageSinkId, {
           to: email,
           subject: 'Your Login Link',
-          body: `Here's your link: ${referer}/@cardstack/email-auth/redirect.html?secret=${token} `
+          text: `Here's your link: ${referer}/@cardstack/email-auth/redirect.html?secret=${token} `
         });
         return {
           partialSession: {

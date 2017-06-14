@@ -13,7 +13,8 @@ class Messengers {
       throw new Error(`Tried to send a message to message sink ${sinkId} but it does not exist`, { status: 500 });
     }
     let schema = await this.schemaCache.schemaForControllingBranch();
-    let plugin = schema.plugins.lookupFeatureAndAssert('messengers', sink.attributes['messenger-type']);
-    return await plugin.send(message, sink.attributes.params);
+    let Plugin = schema.plugins.lookupFeatureFactoryAndAssert('messengers', sink.attributes['messenger-type']);
+    let plugin = Plugin.create(sink.attributes.params);
+    return await plugin.send(message);
   }
 });
