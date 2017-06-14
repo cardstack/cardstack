@@ -2,14 +2,15 @@ const logger = require('heimdalljs-logger')('messengers');
 
 
 module.exports = class TestMessenger {
-  static create() {
-    return new this();
+  static create(params) {
+    return new this(params);
   }
-  constructor() {
+  constructor(params) {
+    this.params = params;
     this.sentMessages = [];
   }
-  send(message, params) {
-    this.sentMessages.push({ message, params });
+  send(message) {
+    this.sentMessages.push({ message, params: this.params });
     logger.info(JSON.stringify(message, null, 2));
   }
   static async sentMessages(env) {
