@@ -1,0 +1,19 @@
+{
+  "name": "@cardstack/email",
+  "version": "0.0.17",
+  "keywords": [
+    "cardstack-plugin"
+  ],
+  "author": "Edward Faulkner <edward@eaf4.com>",
+  "repository": "https://github.com/cardstack/cardstack",
+  "cardstack-plugin": {
+    "api-version": 1
+  },
+  "description": "Email sending plugin for Cardstack",
+  "dependencies": {
+    "nodemailer": "^4.0.1"
+  },
+  "devDependencies": {
+    "@cardstack/eslint-config": "*"
+  }
+}

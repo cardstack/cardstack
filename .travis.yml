@@ -56,6 +56,7 @@ cache:
     - packages/test-support/node_modules
     - packages/tools/node_modules
     - packages/codegen/node_modules
+    - packages/email/node_modules
 
 before_install:
   - curl -o- -L https://yarnpkg.com/install.sh | bash
