@@ -1,6 +1,6 @@
 {
   "name": "@cardstack/search",
-  "version": "0.0.20-alpha.1",
+  "version": "0.0.20-alpha.2",
   "description": "The default blueprint for ember-cli addons.",
   "keywords": [
     "ember-addon"
