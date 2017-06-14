@@ -2,21 +2,28 @@ const logger = require('heimdalljs-logger')('email');
 const nodemailer = require('nodemailer');
 
 module.exports = class EmailMessenger {
-  static create() {
-    return new this();
+  static create(params) {
+    return new this(params);
   }
-  constructor() {
+  constructor(params) {
+    this.params = params;
+    ['smtpPasswordEnvVar', 'smtpHost', 'smtpUser', 'defaultFrom'].forEach( prop => {
+      if (!params[prop]) {
+        throw new Error(`Could not find ${prop} in message sink params`);
+      }
+    });
     this.transporter = nodemailer.createTransport({
-      host: 'smtp.mailgun.org',
+      host: params.smtpHost,
       auth: {
-        user: 'postmaster@sandbox04556bcaa9df4aaa8d710c5e788964c0.mailgun.org',
-        pass: '969f44a67f135c0ad4fd0c156731eec6'
+        user: params.smtpUser,
+        pass: process.env[params.smtpPasswordEnvVar]
       }
     }, {
-      from: 'edward@eaf4.com'
+      from: params.defaultFrom
     });
   }
-  async send(message, params) {
+  async send(message) {
+    logger.info(`Sending mail to ${message.to}: ${message.subject}`);
     return this.transporter.sendMail(message);
   }
 };
