@@ -1,6 +1,6 @@
 {
   "name": "@cardstack/git",
-  "version": "0.0.20-alpha.2",
+  "version": "0.0.20-alpha.3",
   "description": "Git data source plugin for @cardstack/hub.",
   "repository": "https://github.com/cardstack/cardstack",
   "author": "Edward Faulkner <edward@eaf4.com>",
@@ -9,12 +9,12 @@
     "node": ">= 7.7"
   },
   "devDependencies": {
-    "@cardstack/di": "^0.0.20-alpha.2",
-    "@cardstack/elasticsearch": "^0.0.20-alpha.2",
-    "@cardstack/eslint-config": "^0.0.20-alpha.2",
-    "@cardstack/hub": "^0.0.20-alpha.2",
-    "@cardstack/plugin-utils": "^0.0.20-alpha.2",
-    "@cardstack/test-support": "^0.0.20-alpha.2"
+    "@cardstack/di": "^0.0.20-alpha.3",
+    "@cardstack/elasticsearch": "^0.0.20-alpha.3",
+    "@cardstack/eslint-config": "^0.0.20-alpha.3",
+    "@cardstack/hub": "^0.0.20-alpha.3",
+    "@cardstack/plugin-utils": "^0.0.20-alpha.3",
+    "@cardstack/test-support": "^0.0.20-alpha.3"
   },
   "dependencies": {
     "@cardstack/nodegit": "0.19.0-cardstack.0",
