@@ -2,52 +2,59 @@ const { makeServer } = require('./main');
 const path = require('path');
 const crypto = require('crypto');
 const fs = require('fs');
-const quickTemp = require('quick-temp');
-const { WatchedDir } = require('broccoli-source');
 const Funnel = require('broccoli-funnel');
 const log = require('@cardstack/plugin-utils/logger')('hub/main');
+const BroccoliConnector = require('./broccoli-connector');
 
 module.exports = {
   name: '@cardstack/hub',
 
   init() {
     this._super.init && this._super.init.apply(this, arguments);
-    quickTemp.makeOrRemake(this, '_codeGenDir', 'cardstack-hub');
-    fs.mkdirSync(this._codeGenDir + '/app');
-    fs.mkdirSync(this._codeGenDir + '/addon');
-    this._sourceTree = new WatchedDir(this._codeGenDir, { annotation: '@cardstack/hub' });
+    this._broccoliConnector = new BroccoliConnector();
+  },
+
+  included({ env }){
+    this._super.apply(this, arguments);
+
+    if (!process.env.ELASTICSEARCH_PREFIX) {
+      process.env.ELASTICSEARCH_PREFIX = this.project.pkg.name.replace(/^[^a-zA-Z]*/, '').replace(/[^a-zA-Z0-9]/g, '_') + '_' + env;
+    }
+
+    // start spinning up the hub immediately, because our treeFor*
+    // hooks won't resolve until the hub does its first codegen build,
+    // and the middleware hooks won't run until after that.
+
+    let seedPath = path.join(path.dirname(this.project.configPath()), '..', 'cardstack', 'seeds', env);
+    let useDevDeps;
+    if (env === 'test') {
+      useDevDeps = true;
+    } else {
+      // if the hub is a runtime dependency, it should only load other
+      // plugins that are also runtime dependencies. If it's a
+      // devDependency, it will also load other plugins that are
+      // devDependencies.
+      let { pkg } = this.project;
+      useDevDeps = !(pkg.dependencies && pkg.dependencies['@cardstack/hub']);
+    }
+    this._hubMiddleware = this._makeServer(seedPath, this.project.ui, useDevDeps, env);
   },
 
   treeForAddon() {
     return this._super.treeForAddon.call(
       this,
-      new Funnel(this._sourceTree, { srcDir: 'addon' })
+      new Funnel(this._broccoliConnector.tree, { srcDir: 'addon' })
     );
   },
 
   treeForApp() {
-    return new Funnel(this._sourceTree, { srcDir: 'app' });
-  },
-
-  included(){
-    this._super.apply(this, arguments);
-    this.seedPath = path.join(path.dirname(this.project.configPath()), '..', 'cardstack', 'seeds');
+    return new Funnel(this._broccoliConnector.tree, { srcDir: 'app' });
   },
 
   // The serverMiddleware hook is well-behaved and will wait for us to
   // resolve a promise before moving on.
-  async serverMiddleware({ app, options }) {
-    let { pkg } = this.project;
-
-    // if the hub is a runtime dependency, it should only load other
-    // plugins that are also runtime dependencies. If it's a
-    // devDependency, it will also load other plugins that are
-    // devDependencies.
-    let useDevDeps = !(pkg.dependencies && pkg.dependencies['@cardstack/hub']);
-
-    let { project, environment } = options;
-    let seedDir = path.join(this.seedPath, environment);
-    app.use('/cardstack', await this._middleware(seedDir, project.ui, useDevDeps, environment));
+  async serverMiddleware({ app }) {
+    app.use('/cardstack', await this._hubMiddleware);
   },
 
   // testemMiddleware will not wait for a promise, so we need to
@@ -55,9 +62,8 @@ module.exports = {
   // possible for early requests to fail -- if that turns out to have
   // a practical effect we will need to queue requests here instead.
   testemMiddleware(app) {
-    let seedDir = path.join(this.seedPath, 'test');
     let handler;
-    this._middleware(seedDir, null, true, 'test').then(
+    this._hubMiddleware.then(
       h => { handler = h; },
       error => {
         log.error("Server failed to start. %s", error);
@@ -79,11 +85,7 @@ module.exports = {
     });
   },
 
-  _middleware(seedDir, ui, allowDevDependencies, environment) {
-    if (!process.env.ELASTICSEARCH_PREFIX) {
-      process.env.ELASTICSEARCH_PREFIX = this.project.pkg.name.replace(/^[^a-zA-Z]*/, '').replace(/[^a-zA-Z0-9]/g, '_') + '_' + environment;
-    }
-
+  async _makeServer(seedDir, ui, allowDevDependencies) {
     let seedModels;
     try {
       seedModels = fs.readdirSync(seedDir).map(filename => require(path.join(seedDir, filename))).reduce((a,b) => a.concat(b), []);
@@ -106,12 +108,11 @@ module.exports = {
     // dev server your session gets invalidated.
     let sessionsKey = crypto.randomBytes(32);
 
-    return makeServer(this.project.root, sessionsKey, seedModels, {
+    let koaApp = await makeServer(this.project.root, sessionsKey, seedModels, {
       allowDevDependencies,
-      codeGenDirectory: this._codeGenDir
-    }).then(server => {
-      return server.callback();
+      broccoliConnector: this._broccoliConnector
     });
+    return koaApp.callback();
   }
 
 };

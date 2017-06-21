@@ -12,7 +12,7 @@ async function wireItUp(projectDir, encryptionKeys, seedModels, opts = {}) {
   });
   registry.register('config:seed-models', seedModels);
   registry.register('config:encryption-key', encryptionKeys);
-  registry.register('config:code-gen', { directory: opts.codeGenDirectory });
+  registry.register('config:code-gen', { broccoliConnector: opts.broccoliConnector });
 
   let container = new Container(registry);
 
@@ -24,11 +24,10 @@ async function wireItUp(projectDir, encryptionKeys, seedModels, opts = {}) {
     container.lookup('hub:writers').addListener('changed', what => container.lookup('hub:indexers').update({ hints: [ what ] }));
   }
 
-  if (opts.codeGenDirectory) {
-    let generators = container.lookup('hub:code-generators');
-    // TODO: wire this up to rerun automatically and be smarter about
-    // multiple branches
-    await generators.generateCode('master');
+  // this registration pattern is how we make broccoli wait for our
+  // asynchronous startup stuff before running the first build.
+  if (opts.broccoliConnector) {
+    opts.broccoliConnector.setSource(container.lookup('hub:code-generators'));
   }
 
   return container;

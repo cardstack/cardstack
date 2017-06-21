@@ -7,9 +7,9 @@
         {
             "type": "node",
             "request": "launch",
-            "name": "Launch Tools Dummy App",
-            "cwd": "${workspaceRoot}/packages/tools",
-            "program": "${workspaceRoot}/node_modules/ember-cli/bin/ember",
+            "name": "Launch Models Dummy App",
+            "cwd": "${workspaceRoot}/packages/models",
+            "program": "${workspaceRoot}/packages/models/node_modules/ember-cli/bin/ember",
             "args": [
                 "s"
             ]
