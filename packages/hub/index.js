@@ -5,6 +5,7 @@ const fs = require('fs');
 const quickTemp = require('quick-temp');
 const { WatchedDir } = require('broccoli-source');
 const Funnel = require('broccoli-funnel');
+const log = require('@cardstack/plugin-utils/logger')('hub/main');
 
 module.exports = {
   name: '@cardstack/hub',
@@ -56,7 +57,17 @@ module.exports = {
   testemMiddleware(app) {
     let seedDir = path.join(this.seedPath, 'test');
     let handler;
-    this._middleware(seedDir, null, true, 'test').then(h => handler = h);
+    this._middleware(seedDir, null, true, 'test').then(
+      h => { handler = h; },
+      error => {
+        log.error("Server failed to start. %s", error);
+        handler = (req, res) => {
+          res.status = 500;
+          res.send("@cardstack/hub server failed to start due to exception: " + error);
+          res.end();
+        };
+      }
+    );
     app.use('/cardstack', (req, res) => {
       if (handler) {
         handler(req, res);
