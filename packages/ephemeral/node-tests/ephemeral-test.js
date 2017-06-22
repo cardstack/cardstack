@@ -56,7 +56,7 @@ describe('ephemeral-storage', function() {
   });
 
   it('can create a new record', async function() {
-    let response = await request.post('/posts').send({
+    let response = await request.post('/api/posts').send({
       data: {
         type: "posts",
         attributes: {
@@ -71,16 +71,16 @@ describe('ephemeral-storage', function() {
 
     await env.lookup('hub:indexers').update({ realTime: true });
 
-    response = await request.get(`/posts/${response.body.data.id}`);
+    response = await request.get(`/api/posts/${response.body.data.id}`);
     expect(response).hasStatus(200);
     expect(response.body).has.deep.property('data.attributes.title', 'hello');
   });
 
   it('can update a record', async function() {
-    let response = await request.get('/posts/first-post');
+    let response = await request.get('/api/posts/first-post');
     expect(response).hasStatus(200);
     expect(response.body).has.deep.property('data.meta.version');
-    response = await request.patch('/posts/first-post').send({
+    response = await request.patch('/api/posts/first-post').send({
       data: {
         attributes: {
           body: 'Updated body'
@@ -98,7 +98,7 @@ describe('ephemeral-storage', function() {
 
     await env.lookup('hub:indexers').update({ realTime: true });
 
-    response = await request.get('/posts/first-post');
+    response = await request.get('/api/posts/first-post');
     expect(response).hasStatus(200);
     expect(response.body.data.attributes).deep.equals({
       body: 'Updated body',
@@ -107,10 +107,10 @@ describe('ephemeral-storage', function() {
   });
 
   it('enforces meta.version consistency during update', async function() {
-    let response = await request.get('/posts/first-post');
+    let response = await request.get('/api/posts/first-post');
     expect(response).hasStatus(200);
     expect(response.body).has.deep.property('data.meta.version');
-    response = await request.patch('/posts/first-post').send({
+    response = await request.patch('/api/posts/first-post').send({
       data: {
         attributes: {
           body: 'Updated body'
@@ -125,24 +125,24 @@ describe('ephemeral-storage', function() {
 
 
   it('can delete a record', async function() {
-    let response = await request.get('/posts/first-post');
+    let response = await request.get('/api/posts/first-post');
     expect(response).hasStatus(200);
     expect(response.body).has.deep.property('data.meta.version');
-    response = await request.delete('/posts/first-post').set('If-Match', response.body.data.meta.version);
+    response = await request.delete('/api/posts/first-post').set('If-Match', response.body.data.meta.version);
     expect(response).hasStatus(204);
 
     await env.lookup('hub:indexers').update({ realTime: true });
 
-    response = await request.get('/posts/first-post');
+    response = await request.get('/api/posts/first-post');
     expect(response).hasStatus(404);
   });
 
 
   it('enforces meta.version consistency during delete', async function() {
-    let response = await request.get('/posts/first-post');
+    let response = await request.get('/api/posts/first-post');
     expect(response).hasStatus(200);
     expect(response.body).has.deep.property('data.meta.version');
-    response = await request.delete('/posts/first-post').set('If-Match', 'not-valid');
+    response = await request.delete('/api/posts/first-post').set('If-Match', 'not-valid');
     expect(response).hasStatus(409);
   });
 

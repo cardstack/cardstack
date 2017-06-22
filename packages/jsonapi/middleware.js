@@ -22,13 +22,27 @@ module.exports = declareInjections({
 function jsonapiMiddleware(searcher, writers) {
   // TODO move into config
   let options = {
-    defaultBranch: 'master'
+    defaultBranch: 'master',
+    prefix: 'api'
   };
 
+  let prefixPattern;
+  if (options.prefix) {
+    prefixPattern = new RegExp(`^/${options.prefix}(.*)`);
+  }
   let body = koaJSONBody({ limit: '1mb' });
   let log = logger('jsonapi');
 
-  return async (ctxt) => {
+  return async (ctxt, next) => {
+    if (prefixPattern) {
+      let m = prefixPattern.exec(ctxt.request.path);
+      if (m) {
+        ctxt.request.path = m[1];
+      } else {
+        return next();
+      }
+    }
+
     ctxt.response.set('Access-Control-Allow-Origin', '*');
     if (ctxt.request.method === 'OPTIONS') {
       ctxt.response.set('Access-Control-Allow-Methods', 'GET,POST,PATCH,DELETE,OPTIONS');
@@ -42,18 +56,19 @@ function jsonapiMiddleware(searcher, writers) {
         throw err;
       }
     });
-    let handler = new Handler(searcher, writers, ctxt, options.defaultBranch, log);
+    let handler = new Handler(searcher, writers, ctxt, options, log);
     return handler.run();
   };
 }
 
 class Handler {
-  constructor(searcher, writers, ctxt, defaultBranch, log) {
+  constructor(searcher, writers, ctxt, options, log) {
     this.searcher = searcher;
     this.writers = writers;
     this.ctxt = ctxt;
     this.query = qs.parse(this.ctxt.request.querystring, { plainObjects: true });
-    this.branch = this.query.branch || defaultBranch;
+    this.branch = this.query.branch || options.defaultBranch;
+    this.prefix = options.prefix || '';
     this.log = log;
   }
 
@@ -158,7 +173,11 @@ class Handler {
     let record = await this.writers.create(this.branch, this.session, type, data);
     this.ctxt.body = { data: record };
     this.ctxt.status = 201;
-    this.ctxt.set('location', this.ctxt.request.path + '/' + record.id);
+    let origin = this.ctxt.request.origin;
+    if (this.prefix) {
+      origin += '/' + this.prefix;
+    }
+    this.ctxt.set('location', origin + this.ctxt.request.path + '/' + record.id);
   }
 
   async _lookupRecord(type, id) {
@@ -178,6 +197,10 @@ class Handler {
 
   _urlWithUpdatedParams(params) {
     let p = merge({}, this.query, params);
-    return this.ctxt.request.path + "?" + qs.stringify(p, { encode: false });
+    let origin = this.ctxt.request.origin;
+    if (this.prefix) {
+      origin += '/' + this.prefix;
+    }
+    return origin + this.ctxt.request.path + "?" + qs.stringify(p, { encode: false });
   }
 }
