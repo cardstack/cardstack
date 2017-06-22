@@ -27,16 +27,33 @@ class MiddlewareStack {
       return this._lastStack;
     }
     let map = new DAGMap;
+
+
+    let tags = new Map();
     for (let name of schema.plugins.listAll('middleware')) {
       let module = schema.plugins.lookupFeatureAndAssert('middleware', name);
-      let before = asArray(module.before).map(tag => `before:${tag}`).concat(
-        asArray(module.category).map(tag => `after:${tag}`)
+
+      let beforeTags = asArray(module.before);
+      let afterTags = asArray(module.after);
+      let ownTags = asArray(module.category);
+
+      let before = beforeTags.map(tag => `before:${tag}`).concat(
+        ownTags.map(tag => `after:${tag}`)
       );
-      let after = asArray(module.after).map(tag => `after:${tag}`).concat(
-        asArray(module.category).map(tag => `before:${tag}`)
+      let after = afterTags.map(tag => `after:${tag}`).concat(
+        ownTags.map(tag => `before:${tag}`)
       );
       map.add(name, module, before, after);
+
+      for (let tag of beforeTags.concat(afterTags).concat(ownTags)) {
+        tags.set(tag, true);
+      }
     }
+
+    for (let tag of tags.keys()) {
+      map.add(`after:${tag}`, null, [], `before:${tag}`);
+    }
+
     let stack = [];
     this.log.info("Updated middleware plugins:");
     map.each((name, module) => {

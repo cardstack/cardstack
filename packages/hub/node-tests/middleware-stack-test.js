@@ -59,6 +59,17 @@ describe('middleware-stack', function() {
       expect(response).hasStatus(404);
     });
 
+    it('maintains order between middlewares even when the category they refer to is empty', async function() {
+      let response = await request.get('/fourth');
+      expect(response).hasStatus(200);
+
+      // This is testing that 'third' runs before 'fourth', which
+      // should be true because third is before:unused-tag and fourth
+      // is after:unused-tag, even though there is no middleware
+      // tagged with 'unused-tag'.
+      expect(response.body.state).has.property('thirdRan');
+    });
+
   });
 
   describe('(dynamic)', function() {
