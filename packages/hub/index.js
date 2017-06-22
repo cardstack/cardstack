@@ -11,11 +11,23 @@ module.exports = {
 
   init() {
     this._super.init && this._super.init.apply(this, arguments);
+
+    // We don't want to boot the hub multiple times, even if it gets
+    // included by multiple addons. So we do a bit of global
+    // coordination here and only the first instance takes effect.
+    if (global.__cardstack_hub_running_in_ember_cli) {
+      this._active = false;
+      return;
+    } else {
+      global.__cardstack_hub_running_in_ember_cli = true;
+      this._active = true;
+    }
     this._broccoliConnector = new BroccoliConnector();
   },
 
   included({ env }){
     this._super.apply(this, arguments);
+    if (!this._active){ return; }
 
     if (!process.env.ELASTICSEARCH_PREFIX) {
       process.env.ELASTICSEARCH_PREFIX = this.project.pkg.name.replace(/^[^a-zA-Z]*/, '').replace(/[^a-zA-Z0-9]/g, '_') + '_' + env;
@@ -41,6 +53,11 @@ module.exports = {
   },
 
   treeForAddon() {
+    if (!this._active){
+      this._super.apply(this, arguments);
+      return;
+    }
+
     return this._super.treeForAddon.call(
       this,
       new Funnel(this._broccoliConnector.tree, { srcDir: 'addon' })
@@ -48,12 +65,22 @@ module.exports = {
   },
 
   treeForApp() {
+    if (!this._active){
+      this._super.apply(this, arguments);
+      return;
+    }
+
     return new Funnel(this._broccoliConnector.tree, { srcDir: 'app' });
   },
 
   // The serverMiddleware hook is well-behaved and will wait for us to
   // resolve a promise before moving on.
   async serverMiddleware({ app }) {
+    if (!this._active){
+      this._super.apply(this, arguments);
+      return;
+    }
+
     app.use('/cardstack', await this._hubMiddleware);
   },
 
@@ -62,6 +89,11 @@ module.exports = {
   // possible for early requests to fail -- if that turns out to have
   // a practical effect we will need to queue requests here instead.
   testemMiddleware(app) {
+    if (!this._active){
+      this._super.apply(this, arguments);
+      return;
+    }
+
     let handler;
     this._hubMiddleware.then(
       h => { handler = h; },
