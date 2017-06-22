@@ -67,11 +67,11 @@ install:
   - travis_wait lerna bootstrap
   - wget https://artifacts.elastic.co/downloads/elasticsearch/elasticsearch-${ES_VERSION}.tar.gz
   - tar -xzf elasticsearch-${ES_VERSION}.tar.gz
-  - ./elasticsearch-${ES_VERSION}/bin/elasticsearch 2>&1 >> /dev/null &
+  - ./elasticsearch-${ES_VERSION}/bin/elasticsearch 2>&1 > /tmp/es.log &
 
 before_script:
  - export DISPLAY=:99; sh -e /etc/init.d/xvfb start; sleep 3
- - wget -q --waitretry=1 --retry-connrefused -T 1 -O - http://127.0.0.1:9200
+ - wget -q --waitretry=1 --retry-connrefused -T 1 -O - http://127.0.0.1:9200 || cat /tmp/es.log
 
 script:
   - yarn test
