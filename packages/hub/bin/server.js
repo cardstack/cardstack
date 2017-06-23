@@ -5,8 +5,15 @@ const logger = require('@cardstack/plugin-utils/logger');
 const log = logger('server');
 const fs = require('fs');
 
-async function runServer(sessionsKey, port, seedModels) {
-  let app = await makeServer(process.cwd(), sessionsKey, seedModels);
+async function runServer(options, seedModels) {
+  let {
+    sessionsKey,
+    port,
+    allowDevDependencies
+  } = options;
+  let app = await makeServer(process.cwd(), sessionsKey, seedModels, {
+    allowDevDependencies
+  });
   app.listen(port);
   log.info("server listening on %s", port);
 }
@@ -15,6 +22,7 @@ function commandLineOptions() {
   commander
     .usage('[options] <seed-config-directory>')
     .option('-p --port <port>', 'Server listen port.', 3000)
+    .option('-d --allow-dev-dependencies', 'Allow the hub to load devDependencies.', 3000)
     .parse(process.argv);
 
   if (commander.args.length < 1) {
@@ -48,4 +56,4 @@ process.on('warning', (warning) => {
 
 let options = commandLineOptions();
 let seedModels = loadSeedModels(options);
-runServer(options.sessionsKey, options.port, seedModels);
+runServer(options, seedModels);
