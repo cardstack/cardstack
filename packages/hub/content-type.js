@@ -4,15 +4,17 @@ const find = require('./async-find');
 module.exports = class ContentType {
   constructor(model, allFields, dataSources, defaultDataSource, allGrants, authLog) {
     let fields = new Map();
-    for (let fieldRef of model.relationships.fields.data) {
-      let field = allFields.get(fieldRef.id);
-      if (!field) {
-        throw new Error(`content type "${model.id}" refers to missing field "${fieldRef.id}"`, {
-          status: 400,
-          title: 'Broken field reference'
-        });
+    if (model.relationships && model.relationships.fields) {
+      for (let fieldRef of model.relationships.fields.data) {
+        let field = allFields.get(fieldRef.id);
+        if (!field) {
+          throw new Error(`content type "${model.id}" refers to missing field "${fieldRef.id}"`, {
+            status: 400,
+            title: 'Broken field reference'
+          });
+        }
+        fields.set(fieldRef.id, field);
       }
-      fields.set(fieldRef.id, field);
     }
 
     // type and id fields are always implicitly present
