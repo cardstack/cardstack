@@ -76,17 +76,31 @@ class SchemaCache {
     return this.schemaLoader.loadFrom(this.seedModels.concat(models).filter(s => types.includes(s.type)));
   }
 
+
+  prepareBranchUpdate(branch) {
+    return { key: this.cache.get(branch) };
+  }
+
   // When Indexers reads a branch, it necessarily reads the schema
   // first. And when Writers make a change to a schema model, they
   // need to derive the new schema to make sure it's safe. In either
   // case, the new schema is already available, so this method allows
   // us to push it into the cache.
-  notifyBranchUpdate(branch, schema) {
+  //
+  // We require a branchUpdateToken that was returned from
+  // prepareBranchUpdate. You should call prepareBrancUpdate *before*
+  // starting to compute the new schema. This helps us maintain causal
+  // order within the schema cache.
+  notifyBranchUpdate(branch, schema, branchUpdateToken) {
     if (!(schema instanceof Schema)) {
       throw new Error("Bug: notifyBranchUpdate got a non-schema");
     }
-    this.log.debug("full schema update on branch %s", branch);
-    this.cache.set(branch, Promise.resolve(schema));
+    if (this.cache.get(branch) === branchUpdateToken.key) {
+      this.log.debug("full schema update on branch %s", branch);
+      this.cache.set(branch, Promise.resolve(schema));
+    } else {
+      this.log.debug("branch update token is stale, ignoring");
+    }
   }
 
   async indexBaseContent(ops) {
