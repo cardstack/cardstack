@@ -39,7 +39,7 @@ class SchemaLoader {
     let fields = findFields(models, plugins, constraints, grants, defaultValues, authLog);
     let dataSources = findDataSources(models, plugins);
     let defaultDataSource = findDefaultDataSource(plugins);
-    schemaLog.debug('default data source %j', defaultDataSource);
+    schemaLog.trace('default data source %j', defaultDataSource);
     let types = findTypes(models, fields, dataSources, defaultDataSource, grants, authLog);
     return getOwner(this).factoryFor('hub:schema').create({ types, fields, dataSources, inputModels, plugins });
   }
