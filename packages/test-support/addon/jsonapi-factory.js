@@ -1,10 +1,10 @@
-// FIXME: this file is currently duplicated into a node version (this
-// one) and a browser version (see addon/jsonapi-factory.js). Need to
+// FIXME: this file is currently duplicated into a browser version
+// (this one) and a node version (see ../jsonapi-factory.js). Need to
 // do obnoxious build-time thing to make one thing work both ways.
 
 let idGenerator = 0;
 
-class JSONAPIFactory {
+export default class JSONAPIFactory {
   constructor() {
     this.data = [];
   }
@@ -73,5 +73,3 @@ class ResourceFactory {
 function dasherize(camelCase) {
   return camelCase.replace(/([a-z])([A-Z])/g, (a,b,c) => `${b}-${c.toLowerCase()}`);
 }
-
-module.exports = JSONAPIFactory;

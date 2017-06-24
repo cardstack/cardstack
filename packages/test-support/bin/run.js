@@ -1,1 +1,1 @@
-require('..')();
+require('../node-test-runner')();

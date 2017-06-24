@@ -33,7 +33,7 @@ if (!process.__didSetCardstackWarning) {
 if (!process.env['ELASTICSEARCH_PREFIX']) {
   // Avoid stomping on any existing content in elasticsearch by
   // namespacing the test indices differently.
-  process.env['ELASTICSEARCH_PREFIX'] = 'test';
+  process.env['ELASTICSEARCH_PREFIX'] = `test_${Date.now()}`;
 }
 
 module.exports = function() {

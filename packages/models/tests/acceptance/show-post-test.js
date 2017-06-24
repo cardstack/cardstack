@@ -1,12 +1,27 @@
 import { test } from 'qunit';
 import moduleForAcceptance from '../../tests/helpers/module-for-acceptance';
+import Fixtures from '@cardstack/test-support/fixtures';
 
 moduleForAcceptance('Acceptance | show post');
 
-test('visiting /show-post', function(assert) {
-  visit('/posts/1');
+let scenario = new Fixtures(factory => {
+  factory.addResource('content-types', 'posts')
+    .withRelated('fields', [
+      factory.addResource('fields', 'title').withAttributes({
+        fieldType: '@cardstack/core-types::string'
+      })
+    ]);
+  factory.addResource('posts', '1')
+    .withAttributes({
+      title: 'hello world'
+    });
+});
 
-  andThen(function() {
+test('visiting /show-post', async function(assert) {
+  await scenario.setup();
+
+  visit('/posts/1');
+  andThen(() => {
     assert.equal(currentURL(), '/posts/1');
     findWithAssert('h1:contains(hello world)');
   });
