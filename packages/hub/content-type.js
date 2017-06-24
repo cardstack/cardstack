@@ -25,6 +25,12 @@ module.exports = class ContentType {
     this.id = model.id;
     if (model.relationships['data-source']) {
       this.dataSource = dataSources.get(model.relationships['data-source'].data.id);
+      if (!this.dataSource) {
+        throw new Error(`content type "${model.id}" refers to missing data source id "${model.relationships['data-source'].data.id}"`, {
+          status: 400,
+          title: 'Broken field reference'
+        });
+      }
     } else if (defaultDataSource) {
       this.dataSource = dataSources.get(defaultDataSource.data.id);
     } else {
