@@ -25,7 +25,11 @@ module.exports = {
     this._broccoliConnector = new BroccoliConnector();
   },
 
-  included({ env }){
+  included(app){
+    while (app.app) {
+      app = app.app;
+    }
+    let env = app.env;
     this._super.apply(this, arguments);
     if (!this._active){ return; }
 
