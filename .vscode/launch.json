@@ -17,6 +17,16 @@
         {
             "type": "node",
             "request": "launch",
+            "name": "Launch Authentcation Test Suite",
+            "cwd": "${workspaceRoot}/packages/authentication",
+            "program": "${workspaceRoot}/packages/authentication/node_modules/ember-cli/bin/ember",
+            "args": [
+                "test"
+            ]
+        },
+        {
+            "type": "node",
+            "request": "launch",
             "name": "Launch Server",
             "program": "${workspaceRoot}/packages/hub/bin/server.js",
             "cwd": "${workspaceRoot}",
