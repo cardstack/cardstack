@@ -51,7 +51,7 @@ class SchemaCache {
       this.cache.set(branch, this._load(branch));
     }
     let schema = await this.cache.get(branch);
-    this.log.debug("returning schema for branch %s %s", branch);
+    this.log.debug("returning schema for branch %s", branch);
     return schema;
   }
 
