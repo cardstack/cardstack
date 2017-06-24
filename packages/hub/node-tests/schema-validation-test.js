@@ -330,7 +330,7 @@ describe('schema/validation', function() {
       type: 'fields',
       id: 'primary-image',
       attributes: {
-        fieldType: '@cardstack/core-types::belongs-to'
+        'field-type': '@cardstack/core-types::belongs-to'
       }
     }, null, null);
     let errors = await schema.validationErrors(pending);
@@ -355,6 +355,19 @@ describe('schema/validation', function() {
     });
     await schema.validate(pending);
     expect(pending.finalDocument.attributes.timestamp).equals('2017-03-14T14:50:00Z');
+  });
+
+  it("returns modified schema when validating a schema change", async function() {
+    let pending = new PendingChange(null, {
+      type: 'fields',
+      id: 'extra-field',
+      attributes: {
+        'field-type': '@cardstack/core-types::belongs-to'
+      }
+    }, null);
+    let newSchema = await schema.validate(pending);
+    expect(newSchema).is.ok;
+    expect([...newSchema.fields.keys()]).contains('extra-field');
   });
 
 });
