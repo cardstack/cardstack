@@ -42,8 +42,9 @@ async function makeServer(projectDir, encryptionKeys, seedModels, opts = {}) {
 }
 
 async function httpLogging(ctxt, next) {
+  log.info('start %s %s', ctxt.request.method, ctxt.request.originalUrl);
   await next();
-  log.info('%s %s %s', ctxt.request.method, ctxt.request.url, ctxt.response.status);
+  log.info('finish %s %s %s', ctxt.request.method, ctxt.request.originalUrl, ctxt.response.status);
 }
 
 exports.wireItUp = wireItUp;

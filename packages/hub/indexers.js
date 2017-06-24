@@ -111,10 +111,11 @@ class Indexers {
   }
 
   async _updateBranch(branch, updaters, realTime, hints) {
+    let token = this.schemaCache.prepareBranchUpdate(branch);
     let schema = await this._updateSchema(branch, updaters);
     await this.client.accomodateSchema(branch, schema);
     await this._updateContent(branch, updaters, schema, realTime, hints);
-    this.schemaCache.notifyBranchUpdate(branch, schema);
+    this.schemaCache.notifyBranchUpdate(branch, schema, token);
   }
 
   async _lookupIndexers() {
