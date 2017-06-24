@@ -69,16 +69,15 @@ class Schema {
     }
     await contentType.validate(pendingChange, context);
 
-    if (this.schemaLoader.ownTypes().includes(type)) {
-      // Safety check: the change we're about to approve is a schema
-      // change. The following will deliberately blow up if the new
-      // schema hits a bug anywhere in schema instantiation. Better to
-      // serve a 500 here than accept the broken schema and serve 500s
-      // to everyone.
-      let newSchema = this.applyChange(type, id, pendingChange.finalDocument);
-      if (newSchema !== this) {
-        return newSchema;
-      }
+
+    // Safety check: the change we're about to approve is a schema
+    // change. The following will deliberately blow up if the new
+    // schema hits a bug anywhere in schema instantiation. Better to
+    // serve a 500 here than accept the broken schema and serve 500s
+    // to everyone.
+    let newSchema = this.applyChange(type, id, pendingChange.finalDocument);
+    if (newSchema !== this) {
+      return newSchema;
     }
   }
 
