@@ -90,6 +90,6 @@ async function destroyIndices() {
 }
 
 function inDependencyOrder(models) {
-  let priority = ['default-values', 'plugin-configs', 'constraints', 'fields', 'content-types'];
+  let priority = ['default-values', 'plugin-configs', 'constraints', 'fields', 'data-sources', 'content-types'];
   return priority.map(type => models.filter(m => m.type === type)).reduce((a,b) => a.concat(b), []).concat(models.filter(m => !priority.includes(m.type)));
 }
