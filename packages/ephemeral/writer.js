@@ -1,4 +1,3 @@
-const EphemermalStorage = require('./storage');
 const crypto = require('crypto');
 const Error = require('@cardstack/plugin-utils/error');
 const PendingChange = require('@cardstack/plugin-utils/pending-change');
@@ -7,12 +6,15 @@ const { declareInjections } = require('@cardstack/di');
 const pendingChanges = new WeakMap();
 
 module.exports = declareInjections({
-  indexers: 'hub:indexers'
+  indexers: 'hub:indexers',
+  service: `plugin-services:${require.resolve('./service')}`
 }, class Writer {
-  static create(params) { return new this(params);}
 
-  constructor({ indexers }) {
-    this.storage = EphemermalStorage.create(indexers);
+  get storage() {
+    if (!this._storage) {
+      this._storage = this.service.storageForDataSource(this.dataSourceId);
+    }
+    return this._storage;
   }
 
   async prepareCreate(branch, session, type, document, isSchema) {
@@ -51,6 +53,10 @@ module.exports = declareInjections({
       });
     }
 
+    if (type === 'ephemeral-checkpoints' || type === 'ephemeral-restores') {
+      throw new Error(`${type} may not be patched`, { status: 400 });
+    }
+
     let before = this.storage.lookup(type, id);
     if (!before) {
       throw new Error(`${type} with id ${id} does not exist`, {
@@ -71,6 +77,12 @@ module.exports = declareInjections({
         source: { pointer: '/data/meta/version' }
       });
     }
+
+    if (type === 'ephemeral-checkpoints' || type === 'ephemeral-restores') {
+      throw new Error(`${type} may not be deleted`, { status: 400 });
+    }
+
+
     let before = this.storage.lookup(type, id);
     if (!before) {
       throw new Error(`${type} with id ${id} does not exist`, {
@@ -105,5 +117,12 @@ function patch(before, diffDocument) {
 
 async function finalizer(pendingChange) {
   let { storage, isSchema, ifMatch, type, id } = pendingChanges.get(pendingChange);
-  return { version: storage.store(type, id, pendingChange.finalDocument, isSchema, ifMatch) };
+
+  if (type === 'ephemeral-checkpoints') {
+    return { version: storage.makeCheckpoint(id) };
+  } else if (type === 'ephemeral-restores') {
+    return { version: await storage.restoreCheckpoint(pendingChange.finalDocument.relationships.checkpoint.data.id) };
+  } else {
+    return { version: storage.store(type, id, pendingChange.finalDocument, isSchema, ifMatch) };
+  }
 }
