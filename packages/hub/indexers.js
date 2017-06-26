@@ -192,7 +192,7 @@ class Indexers {
       let newMeta = await updater.updateContent(meta, hints, publicOps);
       await this._saveMeta(branch, updater, newMeta, privateOps);
     }
-    await privateOps.flush();
+    await privateOps.finalize();
   }
 
 });
@@ -284,8 +284,8 @@ class Operations {
       branch,
       client,
       bulkOps: client.bulkOps({ realTime }),
-      flush() {
-        return this.bulkOps.flush();
+      finalize() {
+        return this.bulkOps.finalize();
       }
     });
   }

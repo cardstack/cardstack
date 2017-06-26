@@ -22,10 +22,7 @@ class BulkOps {
     let body = this.queue;
     if (body.length === 0){ return; }
     this.queue = [];
-    let response = await this.es.bulk({
-      body,
-      refresh: this.realTime
-    });
+    let response = await this.es.bulk({ body });
     let failedOperations = response.items.filter(item => {
       let op = Object.keys(item)[0];
       return item[op].error;
@@ -40,6 +37,25 @@ class BulkOps {
         return { reason, examples: locations.slice(0, 3) };
       });
       throw new Error(`Some bulk operations failed: ${JSON.stringify(reasons, null, 2)}`);
+    }
+  }
+
+  async finalize() {
+    await this.flush();
+    if (this.realTime) {
+      // This forces all recent changes to be indexed
+      // immediately. Doing it too often is bad for performance.
+      //
+      // Prior to this implementation, I was using ?refresh=true on
+      // the es.bulk calls above, which may seem more elegant. But it
+      // doesn't allow us to reliably make all of our content visible
+      // in the search results because sometimes a regular
+      // non-realtime indexing operation may have already picked up
+      // your change, and then the realtime indexing operation finds
+      // nothing to do, and elasticsearch only promises that
+      // ?refresh=true works for content inside the given operation --
+      // not other content that may already be in flight.
+      await this.es.indices.refresh({ index: '_all' });
     }
   }
 }
