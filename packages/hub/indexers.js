@@ -56,13 +56,17 @@ class Indexers {
       this._queue.push({ hints, resolve, reject });
     }
     if (!this._running) {
+      this.log.debug("Starting new update loop");
       this._running = true;
       this._updateLoop().then(() => {
+        this.log.debug("Update loop finished");
         this._running = false;
       }, err => {
         this.log.error("Unexpected error in _updateLoop %s", err);
         this._running = false;
       });
+    } else {
+      this.log.debug("Joining update loop");
     }
     await promise;
   }
@@ -104,10 +108,12 @@ class Indexers {
   }
 
   async _doUpdate(realTime, hints) {
+    this.log.debug('begin update, realTime=%s', realTime);
     let branches = await this._branches(hints);
     await Promise.all(Object.keys(branches).map(
       branchName => this._updateBranch(branchName, branches[branchName], realTime, hints)
     ));
+    this.log.debug('end update, realTime=%s', realTime);
   }
 
   async _updateBranch(branch, updaters, realTime, hints) {
