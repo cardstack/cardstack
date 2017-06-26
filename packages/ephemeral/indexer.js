@@ -57,6 +57,7 @@ class Updater {
     if (meta) {
       generation = meta.generation;
     }
+    let newGeneration = this.storage.currentGeneration();
 
     for (let model of this._ownSchema()) {
       await ops.save(model.type, model.id, model);
@@ -70,7 +71,7 @@ class Updater {
       }
     }
     return {
-      generation: this.storage.currentGeneration()
+      generation: newGeneration
     };
   }
 }
