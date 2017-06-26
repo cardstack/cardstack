@@ -27,9 +27,9 @@ export default class Fixtures {
         }
       }
       this._id = await this._createCheckpoint();
-    } else {
-      await this._restoreCheckpoint(this._id);
     }
+    // this restores even on the first pass because it's a way to block until indexing happens
+    await this._restoreCheckpoint(this._id);
   }
 
   async _createCheckpoint() {
