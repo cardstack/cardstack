@@ -19,10 +19,7 @@ let scenario = new Fixtures(factory => {
 
 test('visiting /show-post', async function(assert) {
   await scenario.setup();
-
-  visit('/posts/1');
-  andThen(() => {
-    assert.equal(currentURL(), '/posts/1');
-    findWithAssert('h1:contains(hello world)');
-  });
+  await visit('/posts/1');
+  assert.equal(currentURL(), '/posts/1');
+  findWithAssert('h1:contains(hello world)');
 });
