@@ -22,7 +22,6 @@
 
 const logger = require('@cardstack/plugin-utils/logger');
 const Client = require('@cardstack/elasticsearch/client');
-const BulkOps = require('./bulk-ops');
 const { declareInjections } = require('@cardstack/di');
 const owningDataSource = new WeakMap();
 
@@ -284,7 +283,7 @@ class Operations {
       log,
       branch,
       client,
-      bulkOps: new BulkOps(client.es, { realTime }),
+      bulkOps: client.bulkOps({ realTime }),
       flush() {
         return this.bulkOps.flush();
       }

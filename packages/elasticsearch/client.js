@@ -1,6 +1,7 @@
 const ES = require('elasticsearch');
 const logger = require('@cardstack/plugin-utils/logger');
 const { isEqual, merge } = require('lodash');
+const BulkOps = require('./bulk-ops');
 
 function host() {
   return process.env.ELASTICSEARCH || 'http://localhost:9200';
@@ -28,6 +29,10 @@ module.exports = class SearchClient {
       apiVersion: '5.x'
     });
     this._mappings = null;
+  }
+
+  bulkOps({ realTime, batchSize }) {
+    return new BulkOps(this.es, { realTime, batchSize });
   }
 
   async accomodateSchema(branch, schema) {
