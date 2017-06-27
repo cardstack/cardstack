@@ -75,8 +75,6 @@ describe('ephemeral-storage', function() {
     expect(response.body).has.deep.property('data.id');
     expect(response.body.data.id).is.ok;
 
-    await env.lookup('hub:indexers').update({ realTime: true });
-
     response = await request.get(`/api/posts/${response.body.data.id}`);
     expect(response).hasStatus(200);
     expect(response.body).has.deep.property('data.attributes.title', 'hello');
@@ -101,8 +99,6 @@ describe('ephemeral-storage', function() {
       body: 'Updated body',
       title: 'The First Post'
     });
-
-    await env.lookup('hub:indexers').update({ realTime: true });
 
     response = await request.get('/api/posts/first-post');
     expect(response).hasStatus(200);
@@ -137,8 +133,6 @@ describe('ephemeral-storage', function() {
     response = await request.delete('/api/posts/first-post').set('If-Match', response.body.data.meta.version);
     expect(response).hasStatus(204);
 
-    await env.lookup('hub:indexers').update({ realTime: true });
-
     response = await request.get('/api/posts/first-post');
     expect(response).hasStatus(404);
   });
@@ -168,7 +162,6 @@ describe('ephemeral-storage', function() {
       }
     });
     expect(checkpoint).hasStatus(201);
-    await env.lookup('hub:indexers').update({ realTime: true });
     let response = await request.patch(`/api/ephemeral-checkpoints/${checkpoint.body.data.id}`).send(checkpoint.body);
     expect(response).hasStatus(400);
     expect(response.body.errors[0].detail).to.equal('ephemeral-checkpoints may not be patched');
@@ -181,7 +174,6 @@ describe('ephemeral-storage', function() {
       }
     });
     expect(checkpoint).hasStatus(201);
-    await env.lookup('hub:indexers').update({ realTime: true });
     let response = await request.delete(`/api/ephemeral-checkpoints/${checkpoint.body.data.id}`).set('If-Match', checkpoint.body.data.meta.version);
     expect(response).hasStatus(400);
     expect(response.body.errors[0].detail).to.equal('ephemeral-checkpoints may not be deleted');
@@ -229,9 +221,6 @@ describe('ephemeral-storage', function() {
     });
     expect(third).hasStatus(201);
 
-    // ensure that these changes are indexed
-    await env.lookup('hub:indexers').update({ realTime: true });
-
     // Restore the checkpoint
     response = await request.post(`/api/ephemeral-restores`).send({
       data: {
@@ -246,10 +235,6 @@ describe('ephemeral-storage', function() {
     expect(response).hasStatus(201);
 
     // and see that our delete, patch, and post are undone
-
-    // NOTE that we deliberately don't do a manual reindex here,
-    // because that is the job of the checkpoint restore
-
     response = await request.get('/api/posts/first-post');
     expect(response).hasStatus(200);
 

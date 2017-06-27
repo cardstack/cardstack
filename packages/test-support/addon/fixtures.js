@@ -10,8 +10,16 @@ export default class Fixtures {
   async setup() {
     if (this._id == null) {
       await this._restoreCheckpoint('empty');
-      for (let model of inDependencyOrder(this.factory.getModels())) {
-        let response = await fetch(`${hubURL}/api/${model.type}`, {
+      let models = inDependencyOrder(this.factory.getModels());
+      for (let [index, model] of models.entries()) {
+        let url = `${hubURL}/api/${model.type}`;
+        if (index < models.length - 1) {
+          // On all but the last api request, we opt in to not waiting
+          // for the content to be indexed. This lets us move faster
+          // and then wait for indexing to happen once at the end.
+          url += '?nowait';
+        }
+        let response = await fetch(url, {
           method: 'POST',
           body: JSON.stringify({
             data: {
@@ -27,9 +35,9 @@ export default class Fixtures {
         }
       }
       this._id = await this._createCheckpoint();
+    } else {
+      await this._restoreCheckpoint(this._id);
     }
-    // this restores even on the first pass because it's a way to block until indexing happens
-    await this._restoreCheckpoint(this._id);
   }
 
   async _createCheckpoint() {
@@ -60,7 +68,7 @@ export default class Fixtures {
       })
     });
     if (response.status !== 201) {
-      throw new Error(`Unexpected response ${response.status} while trying to restore cehckpoint: ${await response.text()}`);
+      throw new Error(`Unexpected response ${response.status} while trying to restore checkpoint: ${await response.text()}`);
     }
   }
 }

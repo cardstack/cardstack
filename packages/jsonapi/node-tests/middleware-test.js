@@ -277,12 +277,31 @@ describe('jsonapi/middleware', function() {
       expect(response.body).has.deep.property('data.attributes.title', 'I am new');
       expect(response.body).has.deep.property('data.meta.version');
 
-      await env.lookup('hub:indexers').update({ realTime: true });
-
       response = await request.get(makeRelativeLink(response, response.headers.location));
       expect(response).hasStatus(200);
       expect(response.body).has.deep.property('data.attributes.title', 'I am new', 'second time');
 
+    });
+
+    it('can create a new resource and not wait for indexing', async function() {
+      let response = await request.post('/api/articles?nowait').send({
+        data: {
+          type: 'articles',
+          attributes: {
+            title: 'I am new',
+            body: 'xxx'
+          }
+        }
+      });
+
+      expect(response).hasStatus(201);
+      expect(response.headers).has.property('location');
+      expect(response.body).has.deep.property('data.id');
+      expect(response.body).has.deep.property('data.attributes.title', 'I am new');
+      expect(response.body).has.deep.property('data.meta.version');
+
+      response = await request.get(makeRelativeLink(response, response.headers.location));
+      expect(response).hasStatus(404);
     });
 
     it('can update an existing resource', async function() {
@@ -303,8 +322,6 @@ describe('jsonapi/middleware', function() {
       expect(response).has.deep.property('body.data.attributes.title', 'Updated title');
       expect(response).has.deep.property('body.data.attributes.body', "This is the first article");
 
-      await env.lookup('hub:indexers').update({ realTime: true });
-
       response = await request.get('/api/articles/0');
       expect(response).hasStatus(200);
       expect(response).has.deep.property('body.data.attributes.title', 'Updated title', 'second time');
@@ -317,8 +334,6 @@ describe('jsonapi/middleware', function() {
 
       let response = await request.delete('/api/articles/0').set('If-Match', version);
       expect(response).hasStatus(204);
-
-      await env.lookup('hub:indexers').update({ realTime: true });
 
       response = await request.get('/api/articles/0');
       expect(response).hasStatus(404);

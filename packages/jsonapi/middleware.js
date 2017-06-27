@@ -7,19 +7,20 @@ const { declareInjections } = require('@cardstack/di');
 
 module.exports = declareInjections({
   searcher: 'hub:searchers',
-  writers: 'hub:writers'
+  writers: 'hub:writers',
+  indexers: 'hub:indexers'
 }, {
-  create({ searcher, writers }) {
+  create({ searcher, writers, indexers }) {
     return {
       after: 'authentication',
       middleware() {
-        return jsonapiMiddleware(searcher, writers);
+        return jsonapiMiddleware(searcher, writers, indexers);
       }
     };
   }
 });
 
-function jsonapiMiddleware(searcher, writers) {
+function jsonapiMiddleware(searcher, writers, indexers) {
   // TODO move into config
   let options = {
     defaultBranch: 'master',
@@ -56,15 +57,16 @@ function jsonapiMiddleware(searcher, writers) {
         throw err;
       }
     });
-    let handler = new Handler(searcher, writers, ctxt, options, log);
+    let handler = new Handler(searcher, writers, indexers, ctxt, options, log);
     return handler.run();
   };
 }
 
 class Handler {
-  constructor(searcher, writers, ctxt, options, log) {
+  constructor(searcher, writers, indexers, ctxt, options, log) {
     this.searcher = searcher;
     this.writers = writers;
+    this.indexers = indexers;
     this.ctxt = ctxt;
     this.query = qs.parse(this.ctxt.request.querystring, { plainObjects: true });
     this.branch = this.query.branch || options.defaultBranch;
@@ -133,6 +135,9 @@ class Handler {
     let record = await this.writers.update(this.branch, this.session, type, id, data);
     this.ctxt.body = { data: record };
     this.ctxt.status = 200;
+    if (this.query.nowait == null) {
+      await this.indexers.update({ realTime: true });
+    }
   }
 
   async handleIndividualDELETE(type, id) {
@@ -140,6 +145,9 @@ class Handler {
       let version = this.ctxt.header['if-match'];
       await this.writers.delete(this.branch, this.session, version, type, id);
       this.ctxt.status = 204;
+      if (this.query.nowait == null) {
+        await this.indexers.update({ realTime: true });
+      }
     } catch (err) {
       // By convention, the writer always refers to the version as
       // /data/meta/version, since that's where it would come from in
@@ -178,6 +186,9 @@ class Handler {
       origin += '/' + this.prefix;
     }
     this.ctxt.set('location', origin + this.ctxt.request.path + '/' + record.id);
+    if (this.query.nowait == null) {
+      await this.indexers.update({ realTime: true });
+    }
   }
 
   async _lookupRecord(type, id) {
