@@ -6,6 +6,9 @@ const Funnel = require('broccoli-funnel');
 const log = require('@cardstack/plugin-utils/logger')('hub/main');
 const BroccoliConnector = require('./broccoli-connector');
 
+// TODO: move into configuration
+const defaultBranch = 'master';
+
 module.exports = {
   name: '@cardstack/hub',
 
@@ -72,7 +75,7 @@ module.exports = {
 
     return this._super.treeForAddon.call(
       this,
-      new Funnel(this._broccoliConnector.tree, { srcDir: 'addon' })
+      new Funnel(this._broccoliConnector.tree, { srcDir: `${defaultBranch}/addon` })
     );
   },
 
@@ -82,7 +85,7 @@ module.exports = {
       return;
     }
 
-    return new Funnel(this._broccoliConnector.tree, { srcDir: 'app' });
+    return new Funnel(this._broccoliConnector.tree, { srcDir: `${defaultBranch}/app` });
   },
 
   treeForPublic() {

@@ -13,8 +13,6 @@ class CodeWriter extends Plugin {
     this.codeGenerators = codeGenerators;
   }
   async build() {
-    fs.mkdirSync(this.outputPath + '/app');
-    fs.mkdirSync(this.outputPath + '/addon');
     let generators = await this.codeGenerators;
     await generators.generateCode(this.outputPath);
     let cardstackBuild;
