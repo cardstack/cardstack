@@ -56,6 +56,14 @@ module.exports = {
     this._hubMiddleware = this._makeServer(seedPath, this.project.ui, useDevDeps, env);
   },
 
+  buildError: function(error) {
+    this._broccoliConnector.buildFailed(error);
+  },
+
+  postBuild: function(results) {
+    this._broccoliConnector.buildSucceeded(results);
+  },
+
   treeForAddon() {
     if (!this._active){
       this._super.apply(this, arguments);
@@ -75,6 +83,15 @@ module.exports = {
     }
 
     return new Funnel(this._broccoliConnector.tree, { srcDir: 'app' });
+  },
+
+  treeForPublic() {
+    if (!this._active){
+      this._super.apply(this, arguments);
+      return;
+    }
+
+    return new Funnel(this._broccoliConnector.tree, { include: ['.cardstack-build'] });
   },
 
   // The serverMiddleware hook is well-behaved and will wait for us to

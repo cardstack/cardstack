@@ -7,6 +7,10 @@ module.exports = declareInjections({
 },
 
 class CodeGenerators {
+  constructor() {
+    process.on('SIGUSR2', () => this.triggerRebuild());
+  }
+
   async generateCode(outDir) {
     let branch = 'master'; // TODO: multibranch here
     log.debug(`Running code generators on branch %s`, branch);
@@ -17,9 +21,12 @@ class CodeGenerators {
       await module.generateCode(branch, outDir);
     }
   }
-  triggerRebuild() {
+  async triggerRebuild() {
+    log.info("Triggered");
     if (this.config.broccoliConnector) {
-      this.config.broccoliConnector.triggerRebuild();
+      log.info("Running");
+      await this.config.broccoliConnector.triggerRebuild();
+      log.info("Finished");
     }
   }
 });

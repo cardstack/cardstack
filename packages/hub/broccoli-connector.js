@@ -2,6 +2,10 @@ const quickTemp = require('quick-temp');
 const { WatchedDir } = require('broccoli-source');
 const Plugin = require('broccoli-plugin');
 const fs = require('fs');
+const denodeify = require('denodeify');
+const path = require('path');
+const readFile = denodeify(fs.readFile);
+const writeFile = denodeify(fs.writeFile);
 
 class CodeWriter extends Plugin {
   constructor(trigger, codeGenerators) {
@@ -13,6 +17,15 @@ class CodeWriter extends Plugin {
     fs.mkdirSync(this.outputPath + '/addon');
     let generators = await this.codeGenerators;
     await generators.generateCode(this.outputPath);
+    let cardstackBuild;
+    try {
+      cardstackBuild = await readFile(path.join(this.inputPaths[0], 'cardstack-build'));
+    } catch (err) {
+      // it's ok if the cardstack-build file doesn't exist, that just
+      // means that we haven't triggered any builds yet
+      cardstackBuild = '-1';
+    }
+    await writeFile(this.outputPath + '/.cardstack-build', cardstackBuild);
   }
 }
 
@@ -22,8 +35,32 @@ module.exports = class BroccoliConnector {
     this._trigger = new WatchedDir(this._triggerDir, { annotation: '@cardstack/hub' });
     this._codeGenerators = new Promise(resolve => { this.setSource = resolve; });
     this.tree = new CodeWriter(this._trigger, this._codeGenerators);
+    this._pendingBuilds = [];
+    this._buildCounter = 0;
   }
   triggerRebuild() {
-    fs.writeFileSync(this._triggerDir + '/forceRebuild', Math.random().toString(), 'utf8');
+    return new Promise((resolve, reject) => {
+      let nonce = this._buildCounter++;
+      this._pendingBuilds.push({ nonce, resolve, reject });
+      writeFile(this._triggerDir + '/cardstack-build', String(nonce), 'utf8');
+    });
+  }
+  async buildSucceeded({ directory }) {
+    let nonce = parseInt(await readFile(path.join(directory, '.cardstack-build'), 'utf8'));
+    let remaining = [];
+    for (let build of this._pendingBuilds) {
+      if (build.nonce <= nonce) {
+        build.resolve();
+      } else {
+        remaining.push(build);
+      }
+    }
+    this._pendingBuilds = remaining;
+  }
+  buildFailed() {
+    for (let build of this._pendingBuilds) {
+      build.reject();
+    }
+    this._pendingBuilds = [];
   }
 };
