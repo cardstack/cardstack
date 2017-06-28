@@ -5,6 +5,7 @@ const writeFile = denodeify(fs.writeFile);
 const path = require('path');
 const mkdirp = denodeify(require('mkdirp'));
 const Handlebars = require('handlebars');
+const log = require('@cardstack/plugin-utils/logger')('code-gen');
 
 Handlebars.registerHelper('camelize', function(str) {
   return str.replace(/-(\w)/g, (m, d) => d.toUpperCase());
@@ -31,6 +32,7 @@ module.exports = declareInjections({
 
 class CodeGenerator {
   async generateCode(branch, outDirectory) {
+    log.debug(`writing models for branch ${branch} to ${outDirectory}`);
     let schema = await this.schemaCache.schemaForBranch(branch);
     await mkdirp(path.join(outDirectory, 'addon', 'models'));
     await mkdirp(path.join(outDirectory, 'app', 'models'));
@@ -38,9 +40,10 @@ class CodeGenerator {
     await mkdirp(path.join(outDirectory, 'app', 'serializers'));
 
     for (let type of schema.types.values()) {
-
       // TODO: real inflector
       let modelName = type.id.replace(/s$/, '');
+
+      log.debug(`writing model ${modelName}`);
 
       await writeFile(
         path.join(outDirectory, 'addon', 'models', `${modelName}.js`),

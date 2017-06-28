@@ -122,9 +122,15 @@ module.exports = {
   },
 
   async _makeServer(seedDir, ui, allowDevDependencies) {
+    log.debug("Looking for seed files in %s", seedDir);
     let seedModels;
     try {
-      seedModels = fs.readdirSync(seedDir).map(filename => require(path.join(seedDir, filename))).reduce((a,b) => a.concat(b), []);
+      seedModels = fs.readdirSync(seedDir).map(filename => {
+        if (/\.js/.test(filename)) {
+          log.debug("Found seed file %s", filename);
+          return require(path.join(seedDir, filename));
+        }
+      }).filter(Boolean).reduce((a,b) => a.concat(b), []);
     } catch (err) {
       if (ui) {
         ui.writeWarnLine(`Unable to load your seed models (looking for ${seedDir})`);
