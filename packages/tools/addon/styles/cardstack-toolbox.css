@@ -95,7 +95,7 @@
 
 .cs-active-composition-panel > div {
     flex: 1;
-    overflow-y: scroll;
+    overflow-y: auto;
 }
 
 .cs-field-editor-section {
