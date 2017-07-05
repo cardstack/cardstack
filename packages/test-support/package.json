@@ -1,6 +1,6 @@
 {
   "name": "@cardstack/test-support",
-  "version": "0.0.20-alpha.3",
+  "version": "0.0.20-alpha.4",
   "description": "Shared test support for cardstack packages.",
   "main": "index.js",
   "scripts": {
@@ -22,12 +22,12 @@
     ]
   },
   "dependencies": {
-    "@cardstack/core-types": "^0.0.20-alpha.3",
-    "@cardstack/di": "^0.0.20-alpha.3",
-    "@cardstack/elasticsearch": "^0.0.20-alpha.3",
-    "@cardstack/git": "^0.0.20-alpha.3",
-    "@cardstack/handlebars": "^0.0.20-alpha.3",
-    "@cardstack/hub": "^0.0.20-alpha.3",
+    "@cardstack/core-types": "^0.0.20-alpha.4",
+    "@cardstack/di": "^0.0.20-alpha.4",
+    "@cardstack/elasticsearch": "^0.0.20-alpha.4",
+    "@cardstack/git": "^0.0.20-alpha.4",
+    "@cardstack/handlebars": "^0.0.20-alpha.4",
+    "@cardstack/hub": "^0.0.20-alpha.4",
     "chai": "^3.5.0",
     "chai-things": "^0.2.0",
     "denodeify": "^1.2.1",
@@ -39,7 +39,7 @@
     "temp": "^0.8.3"
   },
   "devDependencies": {
-    "@cardstack/eslint-config": "^0.0.20-alpha.3"
+    "@cardstack/eslint-config": "^0.0.20-alpha.4"
   },
   "author": "Edward Faulkner <edward@eaf4.com>",
   "license": "MIT",
