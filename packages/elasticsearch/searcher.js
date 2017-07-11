@@ -10,11 +10,18 @@ module.exports = declareInjections({
 
 class Searcher {
   constructor() {
-    this.client = new Client();
+    this.client = null;
     this.log = logger('searcher');
   }
 
+  async _ensureClient() {
+    if (!this.client) {
+      this.client = await Client.create();
+    }
+  }
+
   async get(branch, type, id) {
+    await this._ensureClient();
     let index = Client.branchToIndexName(branch);
     let esId = `${branch}/${id}`;
     this.log.debug('get %s', index, type, esId);
@@ -36,6 +43,7 @@ class Searcher {
   }
 
   async search(branch, { queryString, filter, sort, page }) {
+    await this._ensureClient();
     let schema = await this.schemaCache.schemaForBranch(branch);
     let esBody = {
       query: {

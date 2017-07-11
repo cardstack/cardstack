@@ -2,7 +2,7 @@ const ES = require('elasticsearch');
 const logger = require('@cardstack/plugin-utils/logger');
 const { isEqual, merge } = require('lodash');
 
-function host() {
+function esURL() {
   return process.env.ELASTICSEARCH || 'http://localhost:9200';
 }
 
@@ -20,13 +20,58 @@ const branchPrefix = process.env.ELASTICSEARCH_PREFIX || 'content';
   field name, whereas real ES fields are not allowed to collide.
 */
 module.exports = class SearchClient {
-  constructor() {
-    this.log = logger('es-client');
-    this.es = new ES.Client({
-      host: host(),
+  static async create() {
+    let host = esURL();
+    let esParams = {
+      host,
       log: LogBridge,
       apiVersion: '5.x'
-    });
+    };
+
+    if (/^aws:/i.test(host)) {
+      /*
+        AWS's elasticsearch authentication does not compose nicely
+        with the regular `elasticsearch` package, so we need a bit of
+        special support here.
+
+        To opt into this:
+
+          1. Use "aws" as the protocol in the elasticsearch URL like
+             this:
+
+              ELASTICSEARCH=aws://your-domain-here.some-region.es.amazonaws.com
+
+          2. Set the environment variables AWS_SECRET_ACCESS_KEY_ID,
+             AWS_SECRET_ACCESS_KEY, and AWS_REGION.
+
+          3. Add the npm modules aws-sdk and http-aws-es to your
+             project. You may need to use my fork of http-aws-es
+             (git://github.com/ef4/http-aws-es#2dfd0067df5c9196488b5a78a706531ade8e3bba)
+             due to their issue #30.
+
+       */
+      let AWS = require('aws-sdk');
+      let region = process.env.AWS_REGION || 'us-east-1';
+      let credentials = new AWS.EnvironmentCredentials('AWS');
+      await new Promise((resolve, reject) => {
+        credentials.refresh(err => {
+          if (err) {
+            reject(err);
+          } else {
+            resolve();
+          }
+        });
+      });
+      esParams.host = host.replace(/^aws:/i, 'https:');
+      esParams.connectionClass = require('http-aws-es');
+      esParams.amazonES = { region, credentials };
+    }
+    return new this(esParams);
+  }
+
+  constructor(esParams) {
+    this.es = new ES.Client(esParams);
+    this.log = logger('es-client');
     this._mappings = null;
   }
 
