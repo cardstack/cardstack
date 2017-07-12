@@ -57,7 +57,12 @@ module.exports = class BroccoliConnector {
     });
   }
   async buildSucceeded({ directory }) {
-    let nonce = parseInt(await readFile(path.join(directory, '.cardstack-build'), 'utf8'));
+    let nonce;
+    try {
+      nonce = parseInt(await readFile(path.join(directory, '.cardstack-build'), 'utf8'));
+    } catch (err) {
+      nonce = -1;
+    }
     let remaining = [];
     for (let build of this._pendingBuilds) {
       if (build.nonce <= nonce) {
