@@ -179,13 +179,7 @@ describe('git/indexer', function() {
 
     let indexerState = await ea.indexerState('master', dataSource.id);
     expect(indexerState.commit).to.equal(head);
-
-    try {
-      await ea.documentContents('master', 'articles', 'hello-world');
-      throw new Error("should not get here");
-    } catch (err) {
-      expect(err.message).to.match(/not found/i);
-    }
+    await ea.assertNoDocument('master', 'articles', 'hello-world');
   });
 
   it('ignores newly added document with malformed json', async function() {
@@ -204,13 +198,7 @@ describe('git/indexer', function() {
 
     let indexerState = await ea.indexerState('master', dataSource.id);
     expect(indexerState.commit).to.equal(head);
-
-    try {
-      await ea.documentContents('master', 'articles', 'hello-world');
-      throw new Error("should not get here");
-    } catch (err) {
-      expect(err.message).to.match(/not found/i);
-    }
+    await ea.assertNoDocument('master', 'articles', 'hello-world');
   });
 
   it('does not reindex unchanged content', async function() {
@@ -258,12 +246,8 @@ describe('git/indexer', function() {
     file.delete();
     await change.finalize(commitOpts());
     await indexer.update();
+    await ea.assertNoDocument('master', 'articles', 'hello-world');
 
-    try {
-      await ea.documentContents('master', 'articles', 'hello-world');
-      throw new Error("should never get here");
-    } catch(err) {
-      expect(err.message).to.match(/not found/i);
     }
   });
 

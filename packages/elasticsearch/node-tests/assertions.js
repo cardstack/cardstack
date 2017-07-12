@@ -58,4 +58,13 @@ module.exports = class ElasticAsserter {
     await this._ensureClient();
     return this.client.es.index({ index: Client.branchToIndexName(branch), type, id: `${branch}/${id}`, body });
   }
+  async assertNoDocument(branch, type, id) {
+    try {
+      await this.documentContents(branch, type, id);
+    } catch(err) {
+      expect(err.message).to.match(/not found/i);
+      return;
+    }
+    throw new Error(`expected not to find document branch=${branch} type=${type} id=${id}`);
+  }
 };
