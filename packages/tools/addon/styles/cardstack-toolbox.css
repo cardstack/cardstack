@@ -45,13 +45,13 @@
     background-color: var(--activating-background);
     font-weight: bold;
     border-top: 1px solid var(--deep-background);
-    color: rgba(250,250,250,.2);
+    color: #989898;
     fill: rgba(250,250,250,.2);
 }
 
 .cs-toolbox-section.closed > header:hover {
     background-color: var(--active-background);
-    color: rgba(250,250,250,.5);
+    color: #d6d6d6;
     fill: rgba(250,250,250,.5);
 }
 
@@ -95,7 +95,7 @@
 
 .cs-active-composition-panel > div {
     flex: 1;
-    overflow-y: scroll;
+    overflow-y: auto;
 }
 
 .cs-field-editor-section {
