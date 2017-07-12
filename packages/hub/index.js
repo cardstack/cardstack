@@ -3,10 +3,8 @@ const path = require('path');
 const crypto = require('crypto');
 const fs = require('fs');
 const Funnel = require('broccoli-funnel');
-const mergeTrees = require('broccoli-merge-trees');
 const log = require('@cardstack/plugin-utils/logger')('hub/main');
 const BroccoliConnector = require('./broccoli-connector');
-const buildBranches = require('./branch-builder');
 
 // TODO: move into configuration
 const defaultBranch = 'master';
@@ -94,17 +92,6 @@ module.exports = {
       srcDir: `${defaultBranch}/app`,
       allowEmpty: true
     });
-  },
-
-  treeForPublic() {
-    if (!this._active){
-      this._super.apply(this, arguments);
-      return;
-    }
-
-    let nonce = new Funnel(this._broccoliConnector.tree, { include: ['.cardstack-build'] });
-    let branchBuilds = buildBranches(this._broccoliConnector.tree, { compiler: this.compileAddon.bind(this) });
-    return mergeTrees([ nonce, branchBuilds ], { annotation: 'cardstack-hub-public' });
   },
 
   // The serverMiddleware hook is well-behaved and will wait for us to
