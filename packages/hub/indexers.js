@@ -55,14 +55,10 @@ class Indexers {
       this._queue.push({ hints, resolve, reject });
     }
     if (!this._running) {
-      this.log.debug("Starting new update loop");
-      this._running = true;
       this._updateLoop().then(() => {
         this.log.debug("Update loop finished");
-        this._running = false;
       }, err => {
         this.log.error("Unexpected error in _updateLoop %s", err);
-        this._running = false;
       });
     } else {
       this.log.debug("Joining update loop");
@@ -71,23 +67,28 @@ class Indexers {
   }
 
   async _updateLoop() {
-    while (this._queue.length > 0 || this._realTimeQueue.length > 0) {
-      let queue = this._queue;
-      this._queue = [];
-      try {
-        await this._runBatch(queue, false);
-      } catch (err) {
-        queue.forEach(req => req.reject(err));
-        throw err;
+    this._running = true;
+    try {
+      while (this._queue.length > 0 || this._realTimeQueue.length > 0) {
+        let queue = this._queue;
+        this._queue = [];
+        try {
+          await this._runBatch(queue, false);
+        } catch (err) {
+          queue.forEach(req => req.reject(err));
+          throw err;
+        }
+        let realTimeQueue = this._realTimeQueue;
+        this._realTimeQueue = [];
+        try {
+          await this._runBatch(realTimeQueue, true);
+        } catch (err) {
+          realTimeQueue.forEach(req => req.reject(err));
+          throw err;
+        }
       }
-      let realTimeQueue = this._realTimeQueue;
-      this._realTimeQueue = [];
-      try {
-        await this._runBatch(realTimeQueue, true);
-      } catch (err) {
-        realTimeQueue.forEach(req => req.reject(err));
-        throw err;
-      }
+    } finally {
+      this._running = false;
     }
   }
 
