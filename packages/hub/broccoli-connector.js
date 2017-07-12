@@ -6,15 +6,18 @@ const denodeify = require('denodeify');
 const path = require('path');
 const readFile = denodeify(fs.readFile);
 const writeFile = denodeify(fs.writeFile);
+const mkdirp = denodeify(require('mkdirp'));
 
 class CodeWriter extends Plugin {
   constructor(trigger, codeGenerators) {
     super([trigger], { name: '@cardstack/hub', needsCache: false });
     this.codeGenerators = codeGenerators;
   }
+
   async build() {
     let generators = await this.codeGenerators;
-    await generators.generateCode(this.outputPath);
+    let modulesByBranch = await generators.generateCode();
+    await this._writeModules(modulesByBranch);
     let cardstackBuild;
     try {
       cardstackBuild = await readFile(path.join(this.inputPaths[0], 'cardstack-build'));
@@ -24,6 +27,16 @@ class CodeWriter extends Plugin {
       cardstackBuild = '-1';
     }
     await writeFile(this.outputPath + '/.cardstack-build', cardstackBuild);
+  }
+
+  async _writeModules(modulesByBranch) {
+    for (let [branch, modules] of modulesByBranch.entries()) {
+      for (let [modulePath, code] of modules.entries()) {
+        let diskPath = path.join(this.outputPath, branch, path.dirname(modulePath));
+        await mkdirp(diskPath);
+        await writeFile(path.join(diskPath, path.basename(modulePath) + '.js'), code);
+      }
+    }
   }
 }
 

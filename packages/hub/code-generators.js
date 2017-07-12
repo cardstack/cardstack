@@ -1,41 +1,29 @@
 const { declareInjections } = require('@cardstack/di');
 const log = require('@cardstack/plugin-utils/logger')('code-gen');
-const fs = require('fs');
-const denodeify = require('denodeify');
-const mkdir = denodeify(fs.mkdir);
 
 module.exports = declareInjections({
-  schemaCache: 'hub:schema-cache',
-  config: 'config:code-gen'
+  schemaCache: 'hub:schema-cache'
 },
 
 class CodeGenerators {
-  constructor() {
-    process.on('SIGUSR2', () => this.triggerRebuild());
+  async generateCode() {
+    let branch = 'master'; // TODO: multibranch here
+    let outputs = new Map();
+    outputs.set(branch, await this.generateCodeForBranch(branch));
+    return outputs;
   }
 
-  async generateCode(outDir) {
-    let branch = 'master'; // TODO: multibranch here
-
+  async generateCodeForBranch(branch) {
     log.debug(`Running code generators on branch %s`, branch);
     let schema = await this.schemaCache.schemaForBranch(branch);
-
-    await mkdir(`${outDir}/${branch}`);
-    await mkdir(`${outDir}/${branch}/app`);
-    await mkdir(`${outDir}/${branch}/addon`);
-
+    let modules = new Map();
     for (let name of schema.plugins.listAll('code-generators')) {
       log.debug(`Running code generator %s on branch %s`, name, branch);
-      let module = schema.plugins.lookupFeatureAndAssert('code-generators', name);
-      await module.generateCode(branch, outDir + '/' + branch);
+      let codeGenerator = schema.plugins.lookupFeatureAndAssert('code-generators', name);
+      for (let [path, code] of (await codeGenerator.generateCode(branch)).entries()) {
+        modules.set(path, code);
+      }
     }
-  }
-  async triggerRebuild() {
-    log.info("Triggered");
-    if (this.config.broccoliConnector) {
-      log.info("Running");
-      await this.config.broccoliConnector.triggerRebuild();
-      log.info("Finished");
-    }
+    return modules;
   }
 });
