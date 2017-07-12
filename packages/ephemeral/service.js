@@ -5,15 +5,16 @@ const { declareInjections } = require('@cardstack/di');
 let generationCounter = 0;
 
 module.exports = declareInjections({
-  indexers: 'hub:indexers'
+  indexers: 'hub:indexers',
+  schema: 'hub:schema-loader'
 }, class EphemeralStorageService {
   constructor() {
     this._dataSources = new Map();
   }
-  storageForDataSource(id) {
+  storageForDataSource(id, initialModels) {
     let storage = this._dataSources.get(id);
     if (!storage) {
-      storage = new EphemeralStorage(this.indexers);
+      storage = new EphemeralStorage(this.indexers, initialModels, this.schema.ownTypes());
       this._dataSources.set(id, storage);
     }
     return storage;
@@ -22,7 +23,7 @@ module.exports = declareInjections({
 
 
 class EphemeralStorage {
-  constructor(indexers) {
+  constructor(indexers, initialModels, schemaTypes) {
     // map from `${type}/${id}` to { model, isSchema, generation, type, id }
     // if model == null, that's a tombstone
     this.models = new Map();
@@ -30,6 +31,12 @@ class EphemeralStorage {
 
     // The special checkpoint "empty" is always available
     this.checkpoints = new Map([['empty', new Map()]]);
+
+    if (initialModels) {
+      for (let model of initialModels) {
+        this.store(model.type, model.id, model, schemaTypes.includes(model.type));
+      }
+    }
   }
 
   schemaModels() {

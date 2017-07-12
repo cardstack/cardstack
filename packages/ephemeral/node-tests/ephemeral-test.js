@@ -25,8 +25,19 @@ describe('ephemeral-storage', function() {
         module: "@cardstack/test-support/authenticator"
       });
 
+    let initial = new JSONAPIFactory();
+    initial.addResource('posts', 'initial').withAttributes({ title: 'initial post' });
+    initial.addResource('content-types', 'extra-things').withRelated('fields', [
+      initial.addResource('fields', 'extra-field').withAttributes({
+        fieldType: '@cardstack/core-types::string'
+      })
+    ]);
+
     let dataSource = factory.addResource('data-sources').withAttributes({
-      sourceType: '@cardstack/ephemeral'
+      sourceType: '@cardstack/ephemeral',
+      params: {
+        initialModels: initial.getModels()
+      }
     });
 
     factory.addResource('content-types', 'posts').withRelated(
@@ -59,6 +70,24 @@ describe('ephemeral-storage', function() {
 
   afterEach(async function() {
     await destroyDefaultEnvironment(env);
+  });
+
+  it('respects params.initialModels', async function() {
+    let response = await request.get(`/api/posts/initial`);
+    expect(response).hasStatus(200);
+    expect(response.body).has.deep.property('data.attributes.title', 'initial post');
+  });
+
+  it('respect schema in params.initialModels', async function() {
+    let response = await request.post(`/api/extra-things`).send({
+      data: {
+        type: 'extra-things',
+        attributes: {
+          'extra-field': 'x'
+        }
+      }
+    });
+    expect(response).hasStatus(201);
   });
 
   it('can create a new record', async function() {
