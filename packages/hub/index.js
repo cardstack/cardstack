@@ -77,7 +77,10 @@ module.exports = {
 
     return this._super.treeForAddon.call(
       this,
-      new Funnel(this._broccoliConnector.tree, { srcDir: `${defaultBranch}/addon` })
+      new Funnel(this._broccoliConnector.tree, {
+        srcDir: `${defaultBranch}/addon`,
+        allowEmpty: true
+      })
     );
   },
 
@@ -87,7 +90,10 @@ module.exports = {
       return;
     }
 
-    return new Funnel(this._broccoliConnector.tree, { srcDir: `${defaultBranch}/app` });
+    return new Funnel(this._broccoliConnector.tree, {
+      srcDir: `${defaultBranch}/app`,
+      allowEmpty: true
+    });
   },
 
   treeForPublic() {

@@ -5,7 +5,7 @@ module.exports = function buildBranches(inputTree, { compiler }) {
   // TODO: this only builds master, it should build every directory
   // that's present in the input to allow multi-branch
   let branch = 'master';
-  return concat(compiler(new Funnel(inputTree, { srcDir: branch })), {
+  return concat(compiler(new Funnel(inputTree, { srcDir: branch, allowEmpty: true })), {
     outputFile: `codegen/${branch}.js`,
     inputFiles: ['**/*.js'],
     allowNone: true
