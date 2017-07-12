@@ -1,9 +1,4 @@
 const { declareInjections } = require('@cardstack/di');
-const fs = require('fs');
-const denodeify = require('denodeify');
-const writeFile = denodeify(fs.writeFile);
-const path = require('path');
-const mkdirp = denodeify(require('mkdirp'));
 const Handlebars = require('handlebars');
 
 Handlebars.registerHelper('camelize', function(str) {
@@ -30,39 +25,32 @@ module.exports = declareInjections({
 },
 
 class CodeGenerator {
-  async generateCode(branch, outDirectory) {
+  async generateCode(branch) {
     let schema = await this.schemaCache.schemaForBranch(branch);
-    await mkdirp(path.join(outDirectory, 'addon', 'models'));
-    await mkdirp(path.join(outDirectory, 'app', 'models'));
-    await mkdirp(path.join(outDirectory, 'app', 'adapters'));
-    await mkdirp(path.join(outDirectory, 'app', 'serializers'));
+    let modules = new Map();
 
     for (let type of schema.types.values()) {
-
       // TODO: real inflector
       let modelName = type.id.replace(/s$/, '');
 
-      await writeFile(
-        path.join(outDirectory, 'addon', 'models', `${modelName}.js`),
-        this._generatedModel(type),
-        'utf8'
+      modules.set(`addon/models/${modelName}`, this._generatedModel(type));
+
+      modules.set(
+        `app/models/${modelName}`,
+        this._reexport(`@cardstack/hub/models/${modelName}`)
       );
-      await writeFile(
-        path.join(outDirectory, 'app', 'models', `${modelName}.js`),
-        this._reexport(`@cardstack/hub/models/${modelName}`),
-        'utf8'
+
+      modules.set(
+        `app/adapters/${modelName}`,
+        this._reexport(`@cardstack/models/adapter`)
       );
-      await writeFile(
-        path.join(outDirectory, 'app', 'adapters', `${modelName}.js`),
-        this._reexport(`@cardstack/models/adapter`),
-        'utf8'
-      );
-      await writeFile(
-        path.join(outDirectory, 'app', 'serializers', `${modelName}.js`),
-        this._reexport(`@cardstack/models/serializer`),
-        'utf8'
+
+      modules.set(
+        `app/serializers/${modelName}`,
+        this._reexport(`@cardstack/models/serializer`)
       );
     }
+    return modules;
   }
   _generatedModel(type) {
     return modelTemplate({

@@ -7,17 +7,23 @@ module.exports = declareInjections({
 },
 
 class CodeGenerators {
-  async generateCode(outDir) {
+  async generateCode() {
     let branch = 'master'; // TODO: multibranch here
+    await this.generateCodeForBranch(branch);
+  }
+
+  async generateCodeForBranch(branch) {
     log.debug(`Running code generators on branch %s`, branch);
     let schema = await this.schemaCache.schemaForBranch(branch);
     for (let name of schema.plugins.listAll('code-generators')) {
       log.debug(`Running code generator %s on branch %s`, name, branch);
       let module = schema.plugins.lookupFeatureAndAssert('code-generators', name);
-      await module.generateCode(branch, outDir);
+      let code = await module.generateCode(branch);
     }
   }
-  triggerRebuild() {
+
+  async triggerRebuild() {
+    log.info("Triggered");
     if (this.config.broccoliConnector) {
       this.config.broccoliConnector.triggerRebuild();
     }
