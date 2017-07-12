@@ -313,4 +313,8 @@ class Operations {
     });
     log.debug("delete %s %s", type, id);
   }
+  async beginReplaceAll() {
+  }
+  async finishReplaceAll() {
+  }
 }
