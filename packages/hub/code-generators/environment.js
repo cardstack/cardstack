@@ -10,7 +10,7 @@ module.exports = class {
   }
   async generateCode(/* branch */) {
     let modules = new Map();
-    modules.set('addon/environment.js', template(this._content()));
+    modules.set('addon/environment', template(this._content()));
     return modules;
   }
   _content() {
