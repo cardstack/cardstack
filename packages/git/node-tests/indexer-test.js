@@ -247,8 +247,6 @@ describe('git/indexer', function() {
     await change.finalize(commitOpts());
     await indexer.update();
     await ea.assertNoDocument('master', 'articles', 'hello-world');
-
-    }
   });
 
 });
