@@ -290,12 +290,16 @@ class Operations {
       branch,
       client,
       sourceId,
-      bulkOps
+      bulkOps,
+      nonce: null
     });
   }
   async save(type, id, doc){
-    let { bulkOps, branch, log, schema, client, sourceId } = opsPrivate.get(this);
+    let { bulkOps, branch, log, schema, client, sourceId, nonce } = opsPrivate.get(this);
     let searchDoc = await jsonapiDocToSearchDoc(id, doc, schema, branch, client, sourceId);
+    if (nonce) {
+      searchDoc.cardstack_generation = nonce;
+    }
     await bulkOps.add({
       index: {
         _index: Client.branchToIndexName(branch),
@@ -317,7 +321,29 @@ class Operations {
     log.debug("delete %s %s", type, id);
   }
   async beginReplaceAll() {
+    opsPrivate.get(this).nonce = Math.floor(Number.MAX_SAFE_INTEGER * Math.random());
   }
   async finishReplaceAll() {
+    let { bulkOps, branch, log, sourceId, nonce } = opsPrivate.get(this);
+    if (!nonce) {
+      throw new Error("tried to finishReplaceAll when there was no beginReplaceAll");
+    }
+    await bulkOps.add('deleteByQuery', {
+      index: Client.branchToIndexName(branch),
+      conflicts: 'proceed',
+      body: {
+        query: {
+          bool: {
+            must: [
+              { term: { cardstack_source: sourceId } },
+            ],
+            must_not: [
+              { term: { cardstack_generation: nonce } }
+            ]
+          }
+        }
+      }
+    });
+    log.debug("bulk delete older content for data source %s", sourceId);
   }
 }
