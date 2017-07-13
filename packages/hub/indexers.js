@@ -183,22 +183,26 @@ class Indexers {
   }
 
   async _updateContent(branch, updaters, schema, realTime, hints) {
-    let { publicOps, privateOps } = Operations.create(this.client, branch, schema, realTime, this.log);
+    let bulkOps = this.client.bulkOps({ realTime });
     if (!this._seenBranches.has(branch)) {
+
+      let { publicOps } = Operations.create(this.client, branch, schema, bulkOps, this.log, null);
       await this.schemaCache.indexBaseContent(publicOps);
       this._seenBranches.set(branch, true);
     }
     for (let updater of updaters) {
       let meta = await this._loadMeta(branch, updater);
+      let sourceId = owningDataSource.get(updater).id;
+      let { publicOps, privateOps } = Operations.create(this.client, branch, schema, bulkOps, this.log, sourceId);
       let newMeta = await updater.updateContent(meta, hints, publicOps);
       await this._saveMeta(branch, updater, newMeta, privateOps);
     }
-    await privateOps.finalize();
+    await bulkOps.finalize();
   }
 
 });
 
-async function jsonapiDocToSearchDoc(id, jsonapiDoc, schema, branch, client) {
+async function jsonapiDocToSearchDoc(id, jsonapiDoc, schema, branch, client, sourceId) {
   // we store the id as a regular field in elasticsearch here, because
   // we use elasticsearch's own built-in _id for our own composite key
   // that takes into account branches.
@@ -266,33 +270,32 @@ async function jsonapiDocToSearchDoc(id, jsonapiDoc, schema, branch, client) {
     searchDoc.cardstack_meta = jsonapiDoc.meta;
   }
   searchDoc.cardstack_rewrites = rewrites;
+  searchDoc.cardstack_source = sourceId;
   return searchDoc;
 }
 
 const opsPrivate = new WeakMap();
 
 class Operations {
-  static create(client, branch, schema, realTime, log) {
-    let publicOps = new this(client, branch, schema, realTime, log);
+  static create(client, branch, schema, bulkOps, log, sourceId) {
+    let publicOps = new this(client, branch, schema, bulkOps, log, sourceId);
     let privateOps = opsPrivate.get(publicOps);
     return { publicOps, privateOps };
   }
 
-  constructor(client, branch, schema, realTime, log) {
+  constructor(client, branch, schema, bulkOps, log, sourceId) {
     opsPrivate.set(this, {
       schema,
       log,
       branch,
       client,
-      bulkOps: client.bulkOps({ realTime }),
-      finalize() {
-        return this.bulkOps.finalize();
-      }
+      sourceId,
+      bulkOps
     });
   }
   async save(type, id, doc){
-    let { bulkOps, branch, log, schema, client } = opsPrivate.get(this);
-    let searchDoc = await jsonapiDocToSearchDoc(id, doc, schema, branch, client);
+    let { bulkOps, branch, log, schema, client, sourceId } = opsPrivate.get(this);
+    let searchDoc = await jsonapiDocToSearchDoc(id, doc, schema, branch, client, sourceId);
     await bulkOps.add({
       index: {
         _index: Client.branchToIndexName(branch),
