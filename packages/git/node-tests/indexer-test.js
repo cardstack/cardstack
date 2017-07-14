@@ -247,6 +247,102 @@ describe('git/indexer', function() {
     await change.finalize(commitOpts());
     await indexer.update();
     await ea.assertNoDocument('master', 'articles', 'hello-world');
+
+  });
+
+  it('replaces unrelated content it finds in the search index', async function() {
+    let repos = await temp.mkdir('extra-repos');
+
+    await makeRepo(repos + '/left', {
+      'contents/articles/left.json': JSON.stringify({
+        attributes: {
+          title: 'article from left repo'
+        }
+      }),
+      'contents/articles/both.json': JSON.stringify({
+        attributes: {
+          title: 'article from both repos, left version'
+        }
+      })
+    });
+
+    await makeRepo(repos + '/right', {
+      'contents/articles/right.json': JSON.stringify({
+        attributes: {
+          title: 'article from right repo'
+        }
+      }),
+      'contents/articles/both.json': JSON.stringify({
+        attributes: {
+          title: 'article from both repos, right version'
+        }
+      })
+    });
+
+    let { repo, head } = await makeRepo(root, {
+      'contents/articles/upstream.json': JSON.stringify({
+        attributes: {
+          title: 'article from upstream'
+        }
+      }),
+      'schema/data-sources/under-test.json': JSON.stringify({
+        attributes: {
+          'source-type': '@cardstack/git',
+          params: { repo: repos + '/left' }
+        }
+      })
+    });
+
+    // TODO: this should only require one update cycle.
+    await indexer.update();
+    await indexer.update();
+
+    {
+      let both = toJSONAPI('articles', await ea.documentContents('master', 'articles', 'both'));
+      expect(both).has.deep.property('attributes.title', 'article from both repos, left version');
+
+      let left = toJSONAPI('articles', await ea.documentContents('master', 'articles', 'left'));
+      expect(left).has.deep.property('attributes.title', 'article from left repo');
+
+      let upstream = toJSONAPI('articles', await ea.documentContents('master', 'articles', 'upstream'));
+      expect(upstream).has.deep.property('attributes.title', 'article from upstream');
+
+      await ea.assertNoDocument('master', 'articles', 'right');
+    }
+
+    let change = await Change.create(repo, head, 'master');
+    let file = await change.get('schema/data-sources/under-test.json', { allowUpdate: true });
+    file.setContent(JSON.stringify({
+      attributes: {
+        'source-type': '@cardstack/git',
+        params: { repo: repos + '/right' }
+      }
+    }));
+    await change.finalize(commitOpts());
+
+    await logger.expectWarn(/Unable to load previously indexed commit/, async () => {
+      // TODO: should only take one cycle
+      await indexer.update({ realTime: true });
+      await indexer.update({ realTime: true });
+    });
+
+
+    {
+      // Update
+      let both = toJSONAPI('articles', await ea.documentContents('master', 'articles', 'both'));
+      expect(both).has.deep.property('attributes.title', 'article from both repos, right version');
+
+      // Create
+      let right = toJSONAPI('articles', await ea.documentContents('master', 'articles', 'right'));
+      expect(right).has.deep.property('attributes.title', 'article from right repo');
+
+      // Leave other data sources alone
+      let upstream = toJSONAPI('articles', await ea.documentContents('master', 'articles', 'upstream'));
+      expect(upstream).has.deep.property('attributes.title', 'article from upstream');
+
+      // Delete
+      await ea.assertNoDocument('master', 'articles', 'left');
+    }
   });
 
 });

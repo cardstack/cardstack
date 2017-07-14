@@ -6,9 +6,14 @@ class BulkOps {
     this.queue = [];
     this.realTime = realTime;
     this.batchSize = batchSize || 1000;
+    this.queryDeletions = [];
   }
 
   async add(operation, ...source) {
+    if (operation === 'deleteByQuery') {
+      this.queryDeletions.push(source[0]);
+      return;
+    }
     this.queue.push(operation);
     if (source.length > 0) {
       this.queue.push(source[0] || {});
@@ -42,6 +47,7 @@ class BulkOps {
 
   async finalize() {
     await this.flush();
+    await this._runQueryDeletions();
     if (this.realTime) {
       // This forces all recent changes to be indexed
       // immediately. Doing it too often is bad for performance.
@@ -56,6 +62,12 @@ class BulkOps {
       // ?refresh=true works for content inside the given operation --
       // not other content that may already be in flight.
       await this.es.indices.refresh({ index: '_all' });
+    }
+  }
+
+  async _runQueryDeletions() {
+    for (let query of this.queryDeletions) {
+      await this.es.deleteByQuery(query);
     }
   }
 }

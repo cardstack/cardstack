@@ -22,7 +22,7 @@ module.exports = function searchDocToJSONAPI(type, document) {
   let relationships;
   let top = { type };
   Object.keys(document).forEach(fieldName => {
-    if (fieldName === 'cardstack_rewrites' || fieldName === 'cardstack_meta') {
+    if (fieldName === 'cardstack_rewrites' || fieldName === 'cardstack_meta' || fieldName === 'cardstack_source' || fieldName === 'cardstack_generation') {
       return;
     }
     let outputName = fieldName;

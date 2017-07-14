@@ -2,7 +2,14 @@ const Error = require('@cardstack/plugin-utils/error');
 const log = require('@cardstack/plugin-utils/logger')('ephemeral');
 const { declareInjections } = require('@cardstack/di');
 
+// When we first load, we establish an identity. This allows us to
+// distinguish any older content leftover in the search index from our
+// own content.
+const identity = Math.random();
+
+// Within our own identity, we track generations to know what to update.
 let generationCounter = 0;
+
 
 module.exports = declareInjections({
   indexers: 'hub:indexers',
@@ -37,6 +44,10 @@ class EphemeralStorage {
         this.store(model.type, model.id, model, schemaTypes.includes(model.type));
       }
     }
+  }
+
+  get identity() {
+    return identity;
   }
 
   schemaModels() {

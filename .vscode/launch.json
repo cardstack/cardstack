@@ -54,7 +54,11 @@
             "program": "${workspaceRoot}/node_modules/.bin/_mocha",
             "cwd": "${workspaceRoot}",
             "args": [
-                "packages/test-support/bin/run.js"
+                "packages/test-support/bin/run.js",
+                "--timeout",
+                "200000",
+                //"--grep",
+                //"git/indexer.*unrelated"
             ],
             "runtimeArgs": [
                 "--harmony"

@@ -119,6 +119,8 @@ class Schema {
       this._mapping = {};
       for (let contentType of this.types.values()) {
         this._mapping[contentType.id] = contentType.mapping();
+        this._mapping[contentType.id].properties.cardstack_source = { type: 'keyword' };
+        this._mapping[contentType.id].properties.cardstack_generation = { type: 'keyword' };
       }
     }
     return this._mapping;

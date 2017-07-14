@@ -174,9 +174,15 @@ class GitUpdater {
         this.log.warn(`Unable to load previously indexed commit ${meta.commit} due to ${err}. We will recover by reindexing all content.`);
       }
     }
+    if (!originalTree) {
+      await ops.beginReplaceAll();
+    }
     await this._indexTree(ops, originalTree, this.rootTree, {
       only: this.basePath.concat([['schema', 'contents']])
     });
+    if (!originalTree) {
+      await ops.finishReplaceAll();
+    }
     return {
       commit: this.commitId
     };
