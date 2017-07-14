@@ -53,11 +53,16 @@ class Updater {
   }
 
   async updateContent(meta, hints, ops) {
-    let generation;
+    let generation, identity;
     if (meta) {
       generation = meta.generation;
+      identity = meta.identity;
     }
     let newGeneration = this.storage.currentGeneration();
+
+    if (identity !== this.storage.identity) {
+      await ops.beginReplaceAll();
+    }
 
     for (let model of this._ownSchema()) {
       await ops.save(model.type, model.id, model);
@@ -70,8 +75,14 @@ class Updater {
         await ops.delete(entry.type, entry.id);
       }
     }
+
+    if (identity !== this.storage.identity) {
+      await ops.finishReplaceAll();
+    }
+
     return {
-      generation: newGeneration
+      generation: newGeneration,
+      identity: this.storage.identity
     };
   }
 }
