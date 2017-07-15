@@ -127,23 +127,23 @@ class PluginLoader {
       includedFrom: breadcrumbs
     });
 
-    let deps = json.dependencies ? Object.keys(json.dependencies) : [];
+    let deps = json.dependencies ? Object.keys(json.dependencies).map(dep => ({ dep, type: 'dependencies' })) : [];
     if (includeDevDependencies && json.devDependencies) {
-      deps = deps.concat(Object.keys(json.devDependencies));
+      deps = deps.concat(Object.keys(json.devDependencies).map(dep => ({ dep, type: 'devDependencies' })));
     }
 
     if (json['cardstack-plugin']) {
       let dirs = json['cardstack-plugin']['in-repo-plugins'];
       if (dirs) {
-        deps = deps.concat(dirs.map(dir => path.resolve(moduleRoot + '/' + dir)));
+        deps = deps.concat(dirs.map(dir => ({ dep: path.resolve(moduleRoot + '/' + dir), type: 'in-repo-plugins' })));
       }
     }
 
-    for (let dep of deps) {
+    for (let { dep, type } of deps) {
       let childDir = path.dirname(await resolve(dep + '/package.json', { basedir: dir }));
 
       // we never include devDependencies of second level dependencies
-      await this._crawlPlugins(childDir, output, seen, false, breadcrumbs.concat(json.name));
+      await this._crawlPlugins(childDir, output, seen, false, breadcrumbs.concat({ name: json.name, type }));
     }
   }
 });
@@ -338,15 +338,18 @@ function activateRecursively(installed, configs) {
   }
 }
 
+// This only includes "dependencies", not "devDependencies" or
+// "in-repo-plugins" (only "dependencies" are things that must always
+// be both installed and active when you are active).
 function dependencyGraph(installed) {
   let dependsOn = Object.create(null);
   for (let plugin of installed) {
     let parent = plugin.includedFrom[plugin.includedFrom.length - 1];
-    if (!parent) { continue; }
-    if (!dependsOn[parent]) {
-      dependsOn[parent] = [ plugin.name ];
+    if (!parent || parent.type !== 'dependencies') { continue; }
+    if (!dependsOn[parent.name]) {
+      dependsOn[parent.name] = [ plugin.name ];
     } else {
-      dependsOn[parent].push(plugin.name);
+      dependsOn[parent.name].push(plugin.name);
     }
   }
   log.debug('=== plugin dependency graph ===\n%t', () => Object.keys(dependsOn).map(k => dependsOn[k].map(v => [k,v])).reduce((a,b) => a.concat(b)));
