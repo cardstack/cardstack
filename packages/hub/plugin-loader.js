@@ -318,6 +318,12 @@ function publicNames(plugins) {
 }
 
 function activateRecursively(installed, configs) {
+  // The hub is always active, it doesn't really make sense to be here
+  // if it isn't.
+  if (!configs.get('@cardstack/hub')) {
+    configs.set('@cardstack/hub', { moduleName: '@cardstack/hub' });
+  }
+
   let dependsOn = dependencyGraph(installed);
   let queue = [...configs.keys()];
   let seen = Object.create(null);
