@@ -186,7 +186,7 @@ class Indexers {
     let bulkOps = this.client.bulkOps({ realTime });
     if (!this._seenBranches.has(branch)) {
 
-      let { publicOps } = Operations.create(this.client, branch, schema, bulkOps, this.log, null);
+      let { publicOps } = Operations.create(this.client, branch, schema, bulkOps, this.log, '__cardstack_seed_models__');
       await this.schemaCache.indexBaseContent(publicOps);
       this._seenBranches.set(branch, true);
     }

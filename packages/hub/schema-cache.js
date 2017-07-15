@@ -104,9 +104,11 @@ class SchemaCache {
   }
 
   async indexBaseContent(ops) {
+    await ops.beginReplaceAll();
     for (let model of this.seedModels) {
       await ops.save(model.type, model.id, model);
     }
+    await ops.finishReplaceAll();
   }
 
   async _load(branch) {
