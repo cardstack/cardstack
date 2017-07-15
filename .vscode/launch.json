@@ -13,6 +13,15 @@
             "args": [
                 "s"
             ]
+        },{
+            "type": "node",
+            "request": "launch",
+            "name": "Launch CodeGen Dummy App",
+            "cwd": "${workspaceRoot}/packages/codegen",
+            "program": "${workspaceRoot}/packages/codegen/node_modules/ember-cli/bin/ember",
+            "args": [
+                "s"
+            ]
         },
         {
             "type": "node",
