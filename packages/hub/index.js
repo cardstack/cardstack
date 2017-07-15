@@ -36,6 +36,8 @@ module.exports = {
     this._super.apply(this, arguments);
     if (!this._active){ return; }
 
+    app.import('vendor/cardstack/generated.js');
+
     if (!process.env.ELASTICSEARCH_PREFIX) {
       process.env.ELASTICSEARCH_PREFIX = this.project.pkg.name.replace(/^[^a-zA-Z]*/, '').replace(/[^a-zA-Z0-9]/g, '_') + '_' + env;
     }
@@ -67,30 +69,15 @@ module.exports = {
     this._broccoliConnector.buildSucceeded(results);
   },
 
-  treeForAddon() {
-    if (!this._active){
-      this._super.apply(this, arguments);
-      return;
-    }
-
-    return this._super.treeForAddon.call(
-      this,
-      new Funnel(this._broccoliConnector.tree, {
-        srcDir: `${defaultBranch}/addon`,
-        allowEmpty: true
-      })
-    );
-  },
-
-  treeForApp() {
+  treeForVendor() {
     if (!this._active){
       this._super.apply(this, arguments);
       return;
     }
 
     return new Funnel(this._broccoliConnector.tree, {
-      srcDir: `${defaultBranch}/app`,
-      allowEmpty: true
+      srcDir: defaultBranch,
+      destDir: 'cardstack'
     });
   },
 

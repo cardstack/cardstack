@@ -1,15 +1,23 @@
 const Handlebars = require('handlebars');
-const template = Handlebars.compile(`export const {{key}} = "{{value}}";`);
+const template = Handlebars.compile(`
+define("@cardstack/hub/environment", ["exports"], function (exports) {
+  "use strict";
+  Object.defineProperty(exports, "__esModule", {
+    value: true
+  });
+  {{#each properties as |property|}}
+    exports.{{property.name}} = "{{property.value}}";
+  {{/each}}
+});
+`);
 
 module.exports = class {
   static create() {
     return new this();
   }
   async generateCode(appModulePrefix, branch) {
-    let modules = new Map();
     let env = Object.assign(this._content(), { appModulePrefix, branch });
-    modules.set('addon/environment', Object.entries(env).map(([key, value]) => template({ key, value })).join("\n"));
-    return modules;
+    return template({ properties: Object.entries(env).map(([name, value]) => ({ name, value })) });
   }
   _content() {
     // TODO: make these dynamic

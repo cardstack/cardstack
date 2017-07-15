@@ -30,7 +30,7 @@ class CodeGenMiddleware {
   }
 
   _concatModules(modules) {
-    return modules.join(";\n");
+    return modules.join("");
   }
 
 });

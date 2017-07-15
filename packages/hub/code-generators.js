@@ -18,15 +18,13 @@ class CodeGenerators {
     log.debug(`Running code generators on branch %s`, branch);
     let schema = await this.schemaCache.schemaForBranch(branch);
     let modulePrefix = this.config.emberConfigEnv.modulePrefix;
-    let modules = new Map();
+    let results = [];
     for (let name of schema.plugins.listAll('code-generators')) {
       log.debug(`Running code generator %s on branch %s`, name, branch);
       let codeGenerator = schema.plugins.lookupFeatureAndAssert('code-generators', name);
-      for (let [path, code] of (await codeGenerator.generateCode(modulePrefix, branch)).entries()) {
-        modules.set(path, code);
-      }
+      results.push(await codeGenerator.generateCode(modulePrefix, branch));
     }
-    return modules;
+    return results.join("");
   }
 
 });

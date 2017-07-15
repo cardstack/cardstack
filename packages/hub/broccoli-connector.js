@@ -16,8 +16,8 @@ class CodeWriter extends Plugin {
 
   async build() {
     let generators = await this.codeGenerators;
-    let modulesByBranch = await generators.generateCode();
-    await this._writeModules(modulesByBranch);
+    let codeByBranch = await generators.generateCode();
+    await this._writeModules(codeByBranch);
     let cardstackBuild;
     try {
       cardstackBuild = await readFile(path.join(this.inputPaths[0], 'cardstack-build'));
@@ -29,13 +29,11 @@ class CodeWriter extends Plugin {
     await writeFile(this.outputPath + '/.cardstack-build', cardstackBuild);
   }
 
-  async _writeModules(modulesByBranch) {
-    for (let [branch, modules] of modulesByBranch.entries()) {
-      for (let [modulePath, code] of modules.entries()) {
-        let diskPath = path.join(this.outputPath, branch, path.dirname(modulePath));
-        await mkdirp(diskPath);
-        await writeFile(path.join(diskPath, path.basename(modulePath) + '.js'), code);
-      }
+  async _writeModules(codeByBranch) {
+    for (let [branch, code] of codeByBranch.entries()) {
+      let diskPath = path.join(this.outputPath, branch);
+      await mkdirp(diskPath);
+      await writeFile(path.join(diskPath, 'generated.js'), code);
     }
   }
 }
