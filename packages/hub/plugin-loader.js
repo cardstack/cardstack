@@ -64,7 +64,7 @@ class PluginLoader {
       let projectPath = path.resolve(this.project.path);
       log.info("starting from path %s", projectPath);
       log.info("allowed in devDependencies: %s", !!includeDevDependencies);
-      await this._crawlPlugins(projectPath, output, seen, includeDevDependencies, 0);
+      await this._crawlPlugins(projectPath, output, seen, includeDevDependencies, []);
       this._installedPlugins = output;
       log.info("=== found installed plugins===\n%t", () => summarize(output));
     }
@@ -91,8 +91,8 @@ class PluginLoader {
     return a;
   }
 
-  async _crawlPlugins(dir, output, seen, includeDevDependencies, depth) {
-    log.trace("plugin crawl dir=%s, includeDevDependencies=%s, depth=%s", dir, includeDevDependencies, depth);
+  async _crawlPlugins(dir, output, seen, includeDevDependencies, breadcrumbs) {
+    log.trace("plugin crawl dir=%s, includeDevDependencies=%s, breadcrumbs=%j", dir, includeDevDependencies, breadcrumbs);
     if (seen[dir]) {
       return;
     }
@@ -107,7 +107,7 @@ class PluginLoader {
       // top-level app doesn't need to be a cardstack-plugin, but when
       // crawling any deeper dependencies we only care about them if
       // they are cardstack-plugins.
-      if (depth > 0) {
+      if (breadcrumbs.length > 0) {
         log.trace(`${dir} does not appear to contain a cardstack plugin`);
         return;
       }
@@ -123,7 +123,8 @@ class PluginLoader {
     output.push({
       name: json.name,
       dir: moduleRoot,
-      features: await discoverFeatures(moduleRoot)
+      features: await discoverFeatures(moduleRoot),
+      includedFrom: breadcrumbs
     });
 
     let deps = json.dependencies ? Object.keys(json.dependencies) : [];
@@ -142,7 +143,7 @@ class PluginLoader {
       let childDir = path.dirname(await resolve(dep + '/package.json', { basedir: dir }));
 
       // we never include devDependencies of second level dependencies
-      await this._crawlPlugins(childDir, output, seen, false, depth + 1);
+      await this._crawlPlugins(childDir, output, seen, false, breadcrumbs.concat(json.name));
     }
   }
 });
@@ -187,6 +188,7 @@ function singularize(name) {
 
 class ActivePlugins {
   constructor(installedPlugins, configs) {
+    activateRecursively(installedPlugins, configs);
     this.installedPlugins = installedPlugins;
     this.configs = configs;
   }
@@ -313,4 +315,40 @@ function publicNames(plugins) {
       name: f.name === TOP_FEATURE ? p.name : `${p.name}::${f.name}`
     }))
   }));
+}
+
+function activateRecursively(installed, configs) {
+  let dependsOn = dependencyGraph(installed);
+  let queue = [...configs.keys()];
+  let seen = Object.create(null);
+  while (queue.length > 0) {
+    let pluginName = queue.shift();
+    if (seen[pluginName]) { continue; }
+    seen[pluginName] = true;
+    let deps = dependsOn[pluginName];
+    if (deps) {
+      for (let dep of deps) {
+        if (!configs.get(dep)) {
+          log.debug('Activating plugin %s because its used by %s', dep, pluginName);
+          configs.set(dep, { moduleName: dep });
+          queue.push(dep);
+        }
+      }
+    }
+  }
+}
+
+function dependencyGraph(installed) {
+  let dependsOn = Object.create(null);
+  for (let plugin of installed) {
+    let parent = plugin.includedFrom[plugin.includedFrom.length - 1];
+    if (!parent) { continue; }
+    if (!dependsOn[parent]) {
+      dependsOn[parent] = [ plugin.name ];
+    } else {
+      dependsOn[parent].push(plugin.name);
+    }
+  }
+  log.debug('=== plugin dependency graph ===\n%t', () => Object.keys(dependsOn).map(k => dependsOn[k].map(v => [k,v])).reduce((a,b) => a.concat(b)));
+  return dependsOn;
 }

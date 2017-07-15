@@ -1,7 +1,7 @@
 const { Registry, Container } = require('@cardstack/di');
 const JSONAPIFactory = require('@cardstack/test-support/jsonapi-factory');
 
-describe('plugin-loader', function() {
+describe('hub/plugin-loader', function() {
   let pluginLoader, activePlugins;
 
   before(async function() {
@@ -180,6 +180,18 @@ describe('plugin-loader', function() {
     expect(plugins).collectionContains({
       name: '@cardstack/test-support/authenticator'
     });
+  });
+
+  it('automatically activates dependencies of activated plugins', async function() {
+    let feature = activePlugins.lookupFeatureAndAssert('writers', 'sample-plugin-autoactivated');
+    expect(feature).is.ok;
+    expect(feature).has.property('isAutoactivatedWriter');
+  });
+
+  it('automatically activates dependencies of auto-activated dependencies', async function() {
+    let feature = activePlugins.lookupFeatureAndAssert('middleware', 'sample-plugin-deep-auto-activate');
+    expect(feature).is.ok;
+    expect(feature).has.property('isDeepMiddleware');
   });
 
 });

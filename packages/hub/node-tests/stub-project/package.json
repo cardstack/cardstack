@@ -1,4 +1,5 @@
 {
+  "name": "stub-project",
   "dependencies": {
     "sample-plugin-one": "*",
     "sample-plugin-four": "*",
