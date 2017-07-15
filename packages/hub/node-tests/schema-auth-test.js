@@ -13,6 +13,8 @@ describe('schema/auth', function() {
     factory = new JSONAPIFactory();
     factory.importModels(bootstrapSchema);
 
+    factory.addResource('plugin-configs').withAttributes({ module: '@cardstack/hub' });
+
     factory.addResource('content-types', 'articles')
       .withRelated('fields', [
         factory.addResource('fields', 'title')

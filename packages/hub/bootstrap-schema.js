@@ -1,19 +1,5 @@
 const models = [
   {
-    type: 'plugin-configs',
-    id: '@cardstack/core-types',
-    attributes: {
-      module: '@cardstack/core-types'
-    }
-  },
-  {
-    type: 'plugin-configs',
-    id: '@cardstack/handlebars',
-    attributes: {
-      module: '@cardstack/handlebars'
-    }
-  },
-  {
     /* This is the content-type content-type. Mindblown. */
     type: 'content-types',
     id: 'content-types',
