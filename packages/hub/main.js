@@ -12,7 +12,6 @@ async function wireItUp(projectDir, encryptionKeys, seedModels, opts = {}) {
   });
   registry.register('config:seed-models', seedModels);
   registry.register('config:encryption-key', encryptionKeys);
-  registry.register('config:code-gen', { broccoliConnector: opts.broccoliConnector });
 
   let container = new Container(registry);
 
