@@ -12,10 +12,9 @@ test('finds hub-generated environment', function(assert) {
 
 test('can refresh hub-generated environment', function(assert) {
   let env = window.require('@cardstack/hub/environment');
-  assert.ok(env.compiledAt, 'env should have compiledAt');
+  env.seenInCodeGenTest = true;
   return refreshCode('master').then(() => {
     let env2 = window.require('@cardstack/hub/environment');
-    assert.ok(env2.compiledAt, 'env2 should have compiledAt');
-    assert.ok(env.compiledAt !== env2.compiledAt, 'they should differ');
+    assert.ok(!env2.seenInCodeGenTest, 'should have a refresh version of the module');
   });
 });
