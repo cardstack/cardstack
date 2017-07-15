@@ -61,6 +61,7 @@ class Updater {
     let newGeneration = this.storage.currentGeneration();
 
     if (identity !== this.storage.identity) {
+      generation = null;
       await ops.beginReplaceAll();
     }
 
