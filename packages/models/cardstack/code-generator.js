@@ -25,7 +25,7 @@ module.exports = declareInjections({
 },
 
 class CodeGenerator {
-  async generateCode(branch) {
+  async generateCode(appModulePrefix, branch) {
     let schema = await this.schemaCache.schemaForBranch(branch);
     let modules = new Map();
 

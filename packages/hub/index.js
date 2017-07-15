@@ -138,7 +138,7 @@ module.exports = {
     });
   },
 
-  async _makeServer(seedDir, ui, allowDevDependencies) {
+  async _makeServer(seedDir, ui, allowDevDependencies, env) {
     log.debug("Looking for seed files in %s", seedDir);
     let seedModels;
     try {
@@ -169,7 +169,8 @@ module.exports = {
 
     let koaApp = await makeServer(this.project.root, sessionsKey, seedModels, {
       allowDevDependencies,
-      broccoliConnector: this._broccoliConnector
+      broccoliConnector: this._broccoliConnector,
+      emberConfigEnv: require(this.project.configPath())(env)
     });
     return koaApp.callback();
   }

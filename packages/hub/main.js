@@ -8,7 +8,8 @@ async function wireItUp(projectDir, encryptionKeys, seedModels, opts = {}) {
   let registry = new Registry();
   registry.register('config:project', {
     path: projectDir,
-    allowDevDependencies: opts.allowDevDependencies
+    allowDevDependencies: opts.allowDevDependencies,
+    emberConfigEnv: opts.emberConfigEnv
   });
   registry.register('config:seed-models', seedModels);
   registry.register('config:encryption-key', encryptionKeys);

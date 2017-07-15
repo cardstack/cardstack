@@ -1,23 +1,22 @@
 const Handlebars = require('handlebars');
-const template = Handlebars.compile(`
-export const defaultBranch = "{{defaultBranch}}";
-export const hubURL = "{{hubURL}}";
-`);
+const template = Handlebars.compile(`export const {{key}} = "{{value}}";`);
 
 module.exports = class {
   static create() {
     return new this();
   }
-  async generateCode(/* branch */) {
+  async generateCode(appModulePrefix, branch) {
     let modules = new Map();
-    modules.set('addon/environment', template(this._content()));
+    let env = Object.assign(this._content(), { appModulePrefix, branch });
+    modules.set('addon/environment', Object.entries(env).map(([key, value]) => template({ key, value })).join("\n"));
     return modules;
   }
   _content() {
     // TODO: make these dynamic
     return {
       defaultBranch: 'master',
-      hubURL: '/cardstack'
+      hubURL: '/cardstack',
+      compiledAt: new Date().toISOString()
     };
   }
 };
