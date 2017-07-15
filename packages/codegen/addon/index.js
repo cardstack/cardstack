@@ -10,7 +10,9 @@ export function refreshCode(branch) {
 function load(source) {
   /* eslint no-unused-vars: 0 */
   function define(moduleName) {
-    window.requirejs.unsee(moduleName);
+    if (window.requirejs.entries[moduleName]) {
+      window.requirejs.unsee(moduleName);
+    }
     window.define.apply(this, arguments);
   }
   eval(source);
