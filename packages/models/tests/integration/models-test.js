@@ -1,12 +1,14 @@
-import { moduleForComponent, test, skip } from 'ember-qunit';
+import { moduleForComponent, test } from 'ember-qunit';
 import Fixtures from '@cardstack/test-support/fixtures';
 import RSVP from 'rsvp';
+import { refreshCode } from '@cardstack/codegen';
 
 moduleForComponent('models', 'Integration | Models', {
   integration: true,
   beforeEach: async function() {
     this.inject.service('store');
     await scenario.setup();
+    await refreshCode('master');
   }
 });
 
@@ -82,9 +84,6 @@ test('it can update', async function(assert) {
   });
   assert.equal(models.get('length'), 1, "the newly updated model should be immediately visible in search results");
 });
-
-skip('delete the post model, adapter, and serializer and rely on auto generation instead');
-
 
 // Ember runloop.
 function run(fn) {

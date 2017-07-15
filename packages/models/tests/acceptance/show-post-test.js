@@ -1,6 +1,7 @@
 import { test } from 'qunit';
 import moduleForAcceptance from '../../tests/helpers/module-for-acceptance';
 import Fixtures from '@cardstack/test-support/fixtures';
+import { refreshCode } from '@cardstack/codegen';
 
 moduleForAcceptance('Acceptance | show post');
 
@@ -19,6 +20,7 @@ let scenario = new Fixtures(factory => {
 
 test('visiting /show-post', async function(assert) {
   await scenario.setup();
+  await refreshCode('master');
   await visit('/posts/1');
   assert.equal(currentURL(), '/posts/1');
   findWithAssert('h1:contains(hello world)');
