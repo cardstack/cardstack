@@ -1,7 +1,14 @@
+/*
+  Our npm package cannot depend on @cardstack/test-support
+  because @cardstack/test-support depends on us. Instead, for our
+  tests we have a separate "test-app" that holds our devDependencies.
+*/
+
 const {
   createDefaultEnvironment,
   destroyDefaultEnvironment
-} = require('@cardstack/test-support/env');
+} = require('./test-app/node_modules/@cardstack/test-support/env');
+
 const { uniq } = require('lodash');
 
 describe('elasticsearch/searcher', function() {
@@ -160,7 +167,7 @@ describe('elasticsearch/searcher', function() {
         }
       });
     }
-    env = await createDefaultEnvironment(`${__dirname}/..`, records);
+    env = await createDefaultEnvironment(`${__dirname}/test-app`, records);
     searcher = env.lookup('hub:searchers');
   });
 
