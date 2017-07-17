@@ -42,5 +42,8 @@
   },
   "ember-addon": {
     "defaultBlueprint": "cardstack-hub-allow-all"
+  },
+  "scripts": {
+    "test": "mocha ./node_modules/@cardstack/test-support/bin/run.js"
   }
 }
