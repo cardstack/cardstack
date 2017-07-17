@@ -77,3 +77,6 @@ before_script:
 
 script:
   - yarn test
+
+after_failure:
+  - cat /tmp/es.log
