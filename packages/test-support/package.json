@@ -22,11 +22,9 @@
     ]
   },
   "dependencies": {
-    "@cardstack/core-types": "^0.1.3",
     "@cardstack/di": "^0.1.1",
     "@cardstack/elasticsearch": "^0.1.3",
     "@cardstack/ephemeral": "^0.1.3",
-    "@cardstack/handlebars": "^0.1.1",
     "@cardstack/hub": "^0.1.3",
     "@cardstack/plugin-utils": "^0.1.3",
     "chai": "^3.5.0",
