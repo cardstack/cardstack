@@ -54,7 +54,15 @@ describe('schema/validation', function() {
       factory.addResource('fields', 'primary-image')
         .withAttributes({
           fieldType: '@cardstack/core-types::belongs-to'
-        })
+        }).withRelated('relatedTypes', [
+          factory.addResource('content-types', 'images')
+        ]),
+      factory.addResource('fields', 'detail-images')
+        .withAttributes({
+          fieldType: '@cardstack/core-types::has-many'
+        }).withRelated('relatedTypes', [
+          factory.addResource('content-types', 'images')
+        ])
     ]);
 
     factory.addResource('content-types', 'events')
@@ -371,6 +379,122 @@ describe('schema/validation', function() {
     let newSchema = await schema.validate(pending);
     expect(newSchema).is.ok;
     expect([...newSchema.fields.keys()]).contains('extra-field');
+  });
+
+  it("applies related-types validation in belongs-to", async function() {
+    let pending = create({
+      type: 'articles',
+      attributes: {
+        title: "hello world",
+        "published-date": "2013-02-08 09:30:26.123+07:00",
+      },
+      relationships: {
+        'primary-image': {
+          data: { type: 'not-an-image', id: '123' }
+        }
+      }
+    });
+    let errors = await schema.validationErrors(pending);
+    expect(errors).collectionContains({
+      status: 400,
+      title: 'Validation error',
+      detail: 'field "primary-image" refers to disallowed type "not-an-image"'
+    });
+  });
+
+  it("applies related-types validation in has-many", async function() {
+    let pending = create({
+      type: 'articles',
+      attributes: {
+        title: "hello world",
+        "published-date": "2013-02-08 09:30:26.123+07:00",
+      },
+      relationships: {
+        'detail-images': {
+          data: [{ type: 'not-an-image', id: '123' }]
+        }
+      }
+    });
+    let errors = await schema.validationErrors(pending);
+    expect(errors).collectionContains({
+      status: 400,
+      title: 'Validation error',
+      detail: 'field "detail-images" refers to disallowed type(s) "not-an-image"'
+    });
+  });
+
+  it("applies belongs-to arity validation (failure case)", async function() {
+    let pending = create({
+      type: 'articles',
+      attributes: {
+        title: "hello world",
+        "published-date": "2013-02-08 09:30:26.123+07:00",
+      },
+      relationships: {
+        'primary-image': {
+          data: [{ type: 'images', id: '123' }]
+        }
+      }
+    });
+    let errors = await schema.validationErrors(pending);
+    expect(errors).collectionContains({
+      status: 400,
+      title: 'Validation error',
+      detail: 'field "primary-image" accepts only a single resource, not a list of resources'
+    });
+  });
+
+  it("applies succeeding belongs-to arity validation (success case)", async function() {
+    let pending = create({
+      type: 'articles',
+      attributes: {
+        title: "hello world",
+        "published-date": "2013-02-08 09:30:26.123+07:00",
+      },
+      relationships: {
+        'primary-image': {
+          data: { type: 'images', id: '123' }
+        }
+      }
+    });
+    await schema.validate(pending);
+  });
+
+  it("applies has-many arity validation (failure case)", async function() {
+    let pending = create({
+      type: 'articles',
+      attributes: {
+        title: "hello world",
+        "published-date": "2013-02-08 09:30:26.123+07:00",
+      },
+      relationships: {
+        'detail-images': {
+          data: { type: 'images', id: '123' }
+        }
+      }
+    });
+    let errors = await schema.validationErrors(pending);
+    expect(errors).collectionContains({
+      status: 400,
+      title: 'Validation error',
+      detail: 'field \"detail-images\" accepts only a list of resources, not a single resource'
+    });
+  });
+
+  it("applies has-many arity validation (success case)", async function() {
+    let pending = create({
+      type: 'articles',
+      attributes: {
+        title: "hello world",
+        "published-date": "2013-02-08 09:30:26.123+07:00",
+      },
+      relationships: {
+        'detail-images': {
+          data: [{ type: 'images', id: '123' }]
+        }
+      }
+    });
+    await schema.validationErrors(pending);
   });
 
 });

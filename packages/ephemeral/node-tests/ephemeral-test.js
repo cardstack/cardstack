@@ -262,7 +262,7 @@ describe('ephemeral-storage', function() {
         type: 'ephemeral-restores',
         relationships: {
           checkpoint: {
-            data: { type: 'ephemeral-checkpoins', id: checkpoint.body.data.id }
+            data: { type: 'ephemeral-checkpoints', id: checkpoint.body.data.id }
           }
         }
       }
@@ -288,7 +288,7 @@ describe('ephemeral-storage', function() {
         type: 'ephemeral-restores',
         relationships: {
           checkpoint: {
-            data: { type: 'ephemeral-restores', id: 'empty' }
+            data: { type: 'ephemeral-checkpoints', id: 'empty' }
           }
         }
       }

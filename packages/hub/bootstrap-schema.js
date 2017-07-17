@@ -26,6 +26,7 @@ const models = [
       fields: {
         data: [
           { type: 'fields', id: 'field-type' },
+          { type: 'fields', id: 'related-types' },
           { type: 'fields', id: 'constraints' },
           { type: 'fields', id: 'default-at-create' },
           { type: 'fields', id: 'default-at-update' }
@@ -143,6 +144,13 @@ const models = [
     }
   },
   {
+    type: 'content-types',
+    id: 'groups',
+    attributes: {
+      'is-built-in': true
+    }
+  },
+  {
     type: 'fields',
     id: 'may-create-user',
     attributes: {
@@ -196,6 +204,11 @@ const models = [
     id: 'who',
     attributes: {
       'field-type': '@cardstack/core-types::belongs-to'
+    },
+    relationships: {
+      'related-types': {
+        data: [{ type: 'content-types', id: 'groups' }]
+      }
     }
   },
   {
@@ -252,6 +265,11 @@ const models = [
     id: 'default-at-create',
     attributes: {
       'field-type': '@cardstack/core-types::belongs-to'
+    },
+    relationships: {
+      'related-types': {
+        data: [{ type: 'content-types', id: 'default-values' }]
+      }
     }
   },
   {
@@ -259,6 +277,11 @@ const models = [
     id: 'default-at-update',
     attributes: {
       'field-type': '@cardstack/core-types::belongs-to'
+    },
+    relationships: {
+      'related-types': {
+        data: [{ type: 'content-types', id: 'default-values' }]
+      }
     }
   },
   {
@@ -266,6 +289,11 @@ const models = [
     id: 'constraints',
     attributes: {
       'field-type': '@cardstack/core-types::has-many'
+    },
+    relationships: {
+      'related-types': {
+        data: [{ type: 'content-types', id: 'constraints' }]
+      }
     }
   },
   {
@@ -280,6 +308,23 @@ const models = [
     id: 'fields',
     attributes: {
       'field-type': '@cardstack/core-types::has-many',
+    },
+    relationships: {
+      'related-types': {
+        data: [{ type: 'content-types', id: 'fields' }]
+      }
+    }
+  },
+  {
+    type: 'fields',
+    id: 'related-types',
+    attributes: {
+      'field-type': '@cardstack/core-types::has-many',
+    },
+    relationships: {
+      'related-types': {
+        data: [{ type: 'content-types', id: 'content-types' }]
+      }
     }
   },
   {
@@ -287,6 +332,11 @@ const models = [
     id: 'data-source',
     attributes: {
       'field-type': '@cardstack/core-types::belongs-to'
+    },
+    relationships: {
+      'related-types': {
+        data: [{ type: 'content-types', id: 'data-sources' }]
+      }
     }
   },
   {

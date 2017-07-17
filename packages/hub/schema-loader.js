@@ -1,3 +1,4 @@
+const Error = require('@cardstack/plugin-utils/error');
 const Field = require('./schema/field');
 const Constraint = require('./schema/constraint');
 const ContentType = require('./schema/content-type');
@@ -41,6 +42,7 @@ class SchemaLoader {
     let defaultDataSource = findDefaultDataSource(plugins);
     schemaLog.trace('default data source %j', defaultDataSource);
     let types = findTypes(models, fields, dataSources, defaultDataSource, grants, authLog);
+    validateRelatedTypes(types, fields);
     return getOwner(this).factoryFor('hub:schema').create({ types, fields, dataSources, inputModels, plugins });
   }
 });
@@ -74,11 +76,11 @@ function findGrants(models) {
     .map(model => new Grant(model));
 }
 
-function findFields(models, plugins, constraints, grants, defaultValues, authLog) {
+function findFields(models, plugins, types, constraints, grants, defaultValues, authLog) {
   let fields = new Map();
   for (let model of models) {
     if (model.type === 'fields') {
-      fields.set(model.id, new Field(model, plugins, constraints, grants, defaultValues, authLog));
+      fields.set(model.id, new Field(model, plugins, types, constraints, grants, defaultValues, authLog));
     }
   }
   return fields;
@@ -109,4 +111,16 @@ function findTypes(models, fields, dataSources, defaultDataSource, grants, authL
     }
   }
   return types;
+}
+
+function validateRelatedTypes(types, fields) {
+  for (let [fieldName, field] of fields.entries()) {
+    if (field.relatedTypes) {
+      for (let relatedTypeName of Object.keys(field.relatedTypes)) {
+        if (!types.get(relatedTypeName)) {
+          throw new Error(`field "${fieldName}" refers to missing related type "${relatedTypeName}"`);
+        }
+      }
+    }
+  }
 }

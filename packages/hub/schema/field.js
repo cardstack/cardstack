@@ -27,6 +27,21 @@ module.exports = class Field {
       this.constraints = [];
     }
 
+    if (model.relationships && model.relationships['related-types'] && model.relationships['related-types'].data) {
+      this.relatedTypes = Object.create(null);
+      for (let typeRef of model.relationships['related-types'].data) {
+        if (typeRef.type !== 'content-types') {
+          throw new Error(`field "${this.id}" has a related type that is not of type "content-types"`, {
+            status: 400,
+            title: "Non-type in related-types"
+          });
+        }
+        this.relatedTypes[typeRef.id] = true;
+      }
+    } else {
+      this.relatedTypes = null;
+    }
+
     this.grants = allGrants.filter(g => g.fields == null || g.fields.includes(model.id));
   }
 
@@ -78,8 +93,16 @@ module.exports = class Field {
     // every field is allowed to be null -- validator plugins only run
     // when a non-null value is present. If you don't want to allow
     // null, you can do that via a constraint instead.
-    if (value != null && !this.plugin.valid(value)) {
-      errors.push(new Error(`${JSON.stringify(value)} is not a valid value for field "${this.id}"`, {
+    if (value == null) { return; }
+
+    let result = this.plugin.valid(value, { relatedTypes: this.relatedTypes });
+    if (!result) {
+      result = `${JSON.stringify(value)} is not a valid value for field "${this.id}"`;
+    } else if (typeof result === 'string') {
+      result = `field "${this.id}" ${result}`;
+    }
+    if (typeof result === 'string') {
+      errors.push(new Error(result, {
         status: 400,
         title: "Validation error"
       }));

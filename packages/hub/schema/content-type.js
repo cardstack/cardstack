@@ -23,7 +23,7 @@ module.exports = class ContentType {
 
     this.fields = fields;
     this.id = model.id;
-    if (model.relationships['data-source']) {
+    if (model.relationships && model.relationships['data-source']) {
       this.dataSource = dataSources.get(model.relationships['data-source'].data.id);
       if (!this.dataSource) {
         throw new Error(`content type "${model.id}" refers to missing data source id "${model.relationships['data-source'].data.id}"`, {
