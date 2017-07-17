@@ -17,7 +17,7 @@ require('./table-log-formatter');
 
 const featureTypes = [
   'constraints', // TODO: rename to constraint-types
-  'fields',      // TODO: rename to field-types
+  'field-types',
   'writers',
   'searchers',
   'indexers',

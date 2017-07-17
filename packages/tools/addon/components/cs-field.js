@@ -15,7 +15,7 @@ export default Ember.Component.extend({
   fieldConfig: Ember.computed('fieldType', function() {
     let type = this.get('fieldType');
     if (type) {
-      return Ember.getOwner(this).resolveRegistration(`field:${type}`);
+      return Ember.getOwner(this).resolveRegistration(`field-type:${type}`);
     }
   }),
 

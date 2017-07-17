@@ -1,4 +1,4 @@
-const field = require('../cardstack/field');
+const field = require('../cardstack/field-type');
 
 describe("handlebars field type", function() {
 

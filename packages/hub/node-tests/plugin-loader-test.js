@@ -47,7 +47,7 @@ describe('hub/plugin-loader', function() {
     let plugins = await pluginLoader.installedPlugins();
     expect(plugins).collectionContains({
       name: 'sample-plugin-one',
-      features: [{ type: "fields", name: "sample-plugin-one::x" }]
+      features: [{ type: "field-types", name: "sample-plugin-one::x" }]
     });
     expect(plugins).collectionContains({
       name: 'sample-plugin-two',
@@ -83,18 +83,18 @@ describe('hub/plugin-loader', function() {
 
 
   it('identifies named features', function() {
-    let feature = activePlugins.lookupFeatureAndAssert('fields', 'sample-plugin-one::x');
+    let feature = activePlugins.lookupFeatureAndAssert('field-types', 'sample-plugin-one::x');
     expect(feature).is.ok;
     expect(feature).has.property('isPluginOneField', 'x');
   });
 
   it('returns nothing for missing plugin', async function() {
-    let feature = await activePlugins.lookupFeature('fields', 'no-such-plugin');
+    let feature = await activePlugins.lookupFeature('field-types', 'no-such-plugin');
     expect(feature).is.not.ok;
   });
 
   it('returns nothing for missing feature in existent plugin', async function() {
-    let feature = await activePlugins.lookupFeature('fields', 'sample-plugin-one::y');
+    let feature = await activePlugins.lookupFeature('field-types', 'sample-plugin-one::y');
     expect(feature).is.not.ok;
   });
 
@@ -109,20 +109,20 @@ describe('hub/plugin-loader', function() {
 
   it('can assert for missing feature', function() {
     try {
-      activePlugins.lookupFeatureAndAssert('fields', 'sample-plugin-one::y');
+      activePlugins.lookupFeatureAndAssert('field-types', 'sample-plugin-one::y');
       throw new Error("should not get here");
     } catch (err) {
-      expect(err.message).to.equal(`You're trying to use fields sample-plugin-one::y but no such feature exists in plugin sample-plugin-one`);
+      expect(err.message).to.equal(`You're trying to use field-types sample-plugin-one::y but no such feature exists in plugin sample-plugin-one`);
     }
   });
 
 
   it('can assert for missing module', function() {
     try {
-      activePlugins.lookupFeatureAndAssert('fields', 'sample-plugin-three::y');
+      activePlugins.lookupFeatureAndAssert('field-types', 'sample-plugin-three::y');
       throw new Error("should not get here");
     } catch (err) {
-      expect(err.message).to.equal(`You're trying to use fields sample-plugin-three::y but the plugin sample-plugin-three is not installed. Make sure it appears in the dependencies section of package.json`);
+      expect(err.message).to.equal(`You're trying to use field-types sample-plugin-three::y but the plugin sample-plugin-three is not installed. Make sure it appears in the dependencies section of package.json`);
     }
   });
 
@@ -143,7 +143,7 @@ describe('hub/plugin-loader', function() {
   });
 
   it('lists all features of a given type (non-top naming)', function() {
-    let features = activePlugins.listAll('fields');
+    let features = activePlugins.listAll('field-types');
     expect(features).to.include('sample-plugin-one::x');
   });
 
