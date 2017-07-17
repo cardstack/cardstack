@@ -43,7 +43,7 @@ const models = [
       fields: {
         data: [
           { type: 'fields', id: 'constraint-type' },
-          { type: 'fields', id: 'parameters' }
+          { type: 'fields', id: 'params' }
         ]
       }
     }
@@ -259,13 +259,6 @@ const models = [
     id: 'default-at-update',
     attributes: {
       'field-type': '@cardstack/core-types::belongs-to'
-    }
-  },
-  {
-    type: 'fields',
-    id: 'parameters',
-    attributes: {
-      'field-type': '@cardstack/core-types::object'
     }
   },
   {

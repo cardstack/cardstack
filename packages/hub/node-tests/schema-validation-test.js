@@ -39,7 +39,7 @@ describe('schema/validation', function() {
           factory.addResource('constraints')
             .withAttributes({
               constraintType: '@cardstack/core-types::length',
-              parameters: { max: 40 }
+              params: { max: 40 }
             })
         ]),
       factory.addResource('fields', 'published-date')

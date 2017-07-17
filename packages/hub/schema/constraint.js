@@ -5,7 +5,7 @@ module.exports = class Constraint {
   }
 
   constructor(model, plugin) {
-    this.parameters = model.attributes.parameters;
+    this.parameters = model.attributes.params;
     this.plugin = plugin;
   }
   async validationErrors(value) {
