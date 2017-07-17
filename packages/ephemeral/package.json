@@ -17,6 +17,6 @@
     "supertest": "^2.0.1"
   },
   "scripts": {
-    "test": "mocha ./node-tests/test-app/node_modules/@cardstack/test-support/bin/run.js"
+    "test": "mocha ../test-support/bin/run.js"
   }
 }

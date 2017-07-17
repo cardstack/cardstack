@@ -1,5 +1,5 @@
 {
-  "name": "test-app",
+  "name": "ephemeral-test-app",
   "dependencies": {
     "@cardstack/ephemeral": "*",
     "@cardstack/hub": "*",

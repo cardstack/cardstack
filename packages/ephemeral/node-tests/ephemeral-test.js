@@ -9,8 +9,8 @@ const Koa = require('koa');
 const {
   createDefaultEnvironment,
   destroyDefaultEnvironment
-} = require('./test-app/node_modules/@cardstack/test-support/env');
-const JSONAPIFactory = require('./test-app/node_modules/@cardstack/test-support/jsonapi-factory');
+} = require('../../../tests/ephemeral-test-app/node_modules/@cardstack/test-support/env');
+const JSONAPIFactory = require('../../../tests/ephemeral-test-app/node_modules/@cardstack/test-support/jsonapi-factory');
 
 describe('ephemeral-storage', function() {
   let env, request;
@@ -67,7 +67,7 @@ describe('ephemeral-storage', function() {
       body: 'Second post body'
     });
 
-    env = await createDefaultEnvironment(__dirname + '/test-app', factory.getModels());
+    env = await createDefaultEnvironment(__dirname + '/../../../tests/ephemeral-test-app', factory.getModels());
 
     let app = new Koa();
     app.use(env.lookup('hub:middleware-stack').middleware());
