@@ -36,7 +36,6 @@
   },
   "devDependencies": {
     "@cardstack/eslint-config": "^0.1.1",
-    "@cardstack/test-support": "^0.1.3",
     "koa-better-route": "^0.1.0",
     "supertest": "^2.0.1"
   },
@@ -44,6 +43,6 @@
     "defaultBlueprint": "cardstack-hub-allow-all"
   },
   "scripts": {
-    "test": "mocha ./node_modules/@cardstack/test-support/bin/run.js"
+    "test": "mocha ./node-tests/stub-project/node_modules/@cardstack/test-support/bin/run.js"
   }
 }

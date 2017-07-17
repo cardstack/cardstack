@@ -1,10 +1,10 @@
 const {
   createDefaultEnvironment,
   destroyDefaultEnvironment
-} = require('@cardstack/test-support/env');
+} = require('./stub-project/node_modules/@cardstack/test-support/env');
 
-const JSONAPIFactory = require('@cardstack/test-support/jsonapi-factory');
-const TestMessenger = require('@cardstack/test-support/messenger/messenger');
+const JSONAPIFactory = require('./stub-project/node_modules/@cardstack/test-support/jsonapi-factory');
+const TestMessenger = require('./stub-project/node_modules/@cardstack/test-support/messenger/messenger');
 
 describe('hub/messengers', function() {
   let env, messengers;
@@ -18,7 +18,7 @@ describe('hub/messengers', function() {
       messengerType: '@cardstack/test-support/messenger',
       params: { theSecret: 42 }
     });
-    env = await createDefaultEnvironment(`${__dirname}/..`, factory.getModels());
+    env = await createDefaultEnvironment(`${__dirname}/stub-project`, factory.getModels());
     messengers = env.lookup('hub:messengers');
   });
 

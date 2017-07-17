@@ -1,10 +1,10 @@
-const JSONAPIFactory = require('@cardstack/test-support/jsonapi-factory');
+const JSONAPIFactory = require('./stub-middleware/node_modules/@cardstack/test-support/jsonapi-factory');
 const supertest = require('supertest');
 const Koa = require('koa');
 const {
   createDefaultEnvironment,
   destroyDefaultEnvironment
-} = require('@cardstack/test-support/env');
+} = require('./stub-middleware/node_modules/@cardstack/test-support/env');
 
 describe('middleware-stack', function() {
 
