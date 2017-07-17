@@ -13,13 +13,15 @@ describe('schema/validation', function() {
     let factory = new JSONAPIFactory();
     factory.importModels(bootstrapSchema);
 
-    factory.addResource('plugin-configs').withAttributes({ module: '@cardstack/git' });
+    factory.addResource('plugin-configs').withAttributes({ module: '@cardstack/ephemeral' });
 
     gitDataSource = factory.addResource('data-sources')
         .withAttributes({
-          sourceType: '@cardstack/git',
+          sourceType: '@cardstack/ephemeral',
           params: {
-            repo: 'http://example.git/repo.git'
+            initialModels: [
+              { type: 'hello', id: 'world' }
+            ]
           }
         });
 
@@ -258,7 +260,8 @@ describe('schema/validation', function() {
     // this relies on knowing a tiny bit of writer's internals. When
     // we have a more complete plugin system we should just inject a
     // fake writer plugin for this test to avoid the coupling.
-    expect(schema.types.get('articles').dataSource.writer).has.property('repoPath', 'http://example.git/repo.git');
+    expect(schema.types.get('articles').dataSource.writer).has.property('initialModels');
+    expect(schema.types.get('articles').dataSource.writer.initialModels).deep.equals([{ type: 'hello', id: 'world' }]);
   });
 
   it("can lookup up an indexer on a data source", async function() {
