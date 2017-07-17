@@ -1,10 +1,16 @@
+/*
+   Because @cardstack/test-support depends on us, we can't depend
+   directly on @cardstack/test-support. Instead we have a test-app
+   that depends on it.
+*/
+
 const supertest = require('supertest');
 const Koa = require('koa');
 const {
   createDefaultEnvironment,
   destroyDefaultEnvironment
-} = require('@cardstack/test-support/env');
-const JSONAPIFactory = require('@cardstack/test-support/jsonapi-factory');
+} = require('./test-app/node_modules/@cardstack/test-support/env');
+const JSONAPIFactory = require('./test-app/node_modules/@cardstack/test-support/jsonapi-factory');
 
 describe('ephemeral-storage', function() {
   let env, request;
@@ -61,7 +67,7 @@ describe('ephemeral-storage', function() {
       body: 'Second post body'
     });
 
-    env = await createDefaultEnvironment(__dirname + '/..', factory.getModels());
+    env = await createDefaultEnvironment(__dirname + '/test-app', factory.getModels());
 
     let app = new Koa();
     app.use(env.lookup('hub:middleware-stack').middleware());
