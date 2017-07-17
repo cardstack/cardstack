@@ -35,7 +35,7 @@ exports.Registry = class Registry extends GlimmerRegistry {
     // instantiated. Possibly we should just make them all be
     // instantiated anyway for consistency.
     for (let type of [
-      'constraints',
+      'constraint-types',
       'field-types'
     ]) {
       this.registerOption(`plugin-${type}`, 'instantiate', false);

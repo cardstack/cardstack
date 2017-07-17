@@ -16,7 +16,7 @@ const Error = require('@cardstack/plugin-utils/error');
 require('./table-log-formatter');
 
 const featureTypes = [
-  'constraints', // TODO: rename to constraint-types
+  'constraint-types',
   'field-types',
   'writers',
   'searchers',

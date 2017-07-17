@@ -1,6 +1,6 @@
 module.exports = class Constraint {
   static async create(model, plugins) {
-    let plugin = await plugins.lookupFeatureAndAssert('constraints', model.attributes['constraint-type']);
+    let plugin = await plugins.lookupFeatureAndAssert('constraint-types', model.attributes['constraint-type']);
     return new this(model, plugin);
   }
 
