@@ -1,13 +1,13 @@
 {
   "name": "@cardstack/plugin-utils",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "description": "Support library for authors of cardstack plugins.",
   "main": "index.js",
   "repository": "https://github.com/cardstack/cardstack",
   "author": "Edward Faulkner <edward@eaf4.com>",
   "license": "MIT",
   "devDependencies": {
-    "@cardstack/eslint-config": "^0.1.1",
+    "@cardstack/eslint-config": "^0.2.1",
     "denodeify": "^1.2.1"
   },
   "dependencies": {
