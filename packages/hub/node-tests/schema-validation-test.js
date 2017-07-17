@@ -7,7 +7,7 @@ const { Registry, Container } = require('@cardstack/di');
 
 describe('schema/validation', function() {
 
-  let schema, gitDataSource;
+  let schema, ephemeralDataSource;
 
   before(async function() {
     let factory = new JSONAPIFactory();
@@ -15,7 +15,7 @@ describe('schema/validation', function() {
 
     factory.addResource('plugin-configs').withAttributes({ module: '@cardstack/ephemeral' });
 
-    gitDataSource = factory.addResource('data-sources')
+    ephemeralDataSource = factory.addResource('data-sources')
         .withAttributes({
           sourceType: '@cardstack/ephemeral',
           params: {
@@ -27,10 +27,10 @@ describe('schema/validation', function() {
 
     factory.addResource('plugin-configs').withAttributes({
       module: '@cardstack/hub'
-    }).withRelated('defaultDataSource', gitDataSource);
+    }).withRelated('defaultDataSource', ephemeralDataSource);
 
     let articleType = factory.addResource('content-types', 'articles')
-        .withRelated('data-source', gitDataSource);
+        .withRelated('data-source', ephemeralDataSource);
 
     articleType.withRelated('fields', [
       factory.addResource('fields', 'title')
@@ -256,7 +256,7 @@ describe('schema/validation', function() {
     expect(schema.types.get('articles').dataSource).is.ok;
     expect(schema.types.get('articles').dataSource.writer).is.ok;
 
-    expect(schema.types.get('articles').dataSource).has.property('id', gitDataSource.id);
+    expect(schema.types.get('articles').dataSource).has.property('id', ephemeralDataSource.id);
     // this relies on knowing a tiny bit of writer's internals. When
     // we have a more complete plugin system we should just inject a
     // fake writer plugin for this test to avoid the coupling.
@@ -265,14 +265,14 @@ describe('schema/validation', function() {
   });
 
   it("can lookup up an indexer on a data source", async function() {
-    let source = schema.dataSources.get(gitDataSource.id);
+    let source = schema.dataSources.get(ephemeralDataSource.id);
     expect(source).ok;
     expect(source.indexer).ok;
   });
 
   it("uses default data source", async function() {
     expect(schema.types.get('things-with-defaults').dataSource).is.ok;
-    expect(schema.types.get('things-with-defaults').dataSource).has.property('id', gitDataSource.id);
+    expect(schema.types.get('things-with-defaults').dataSource).has.property('id', ephemeralDataSource.id);
   });
 
   it("applies creation default", async function() {
