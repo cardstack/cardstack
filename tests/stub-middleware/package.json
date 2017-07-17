@@ -6,6 +6,8 @@
   },
   "devDependencies": {
     "@cardstack/test-support": "*",
-    "stub-middleware-extra": "*"
+    "stub-middleware-extra": "*",
+    "koa-better-route": "*",
+    "supertest": "*"
   }
 }

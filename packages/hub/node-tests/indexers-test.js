@@ -1,13 +1,13 @@
 const {
   createDefaultEnvironment,
   destroyDefaultEnvironment
-} = require('./stub-project/node_modules/@cardstack/test-support/env');
+} = require('../../../tests/stub-project/node_modules/@cardstack/test-support/env');
 
 describe('hub/indexers', function() {
   let env;
 
   before(async function () {
-    env = await createDefaultEnvironment(`${__dirname}/stub-project`);
+    env = await createDefaultEnvironment(`${__dirname}/../../../tests/stub-project`);
   });
 
   after(async function() {

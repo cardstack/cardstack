@@ -43,6 +43,6 @@
     "defaultBlueprint": "cardstack-hub-allow-all"
   },
   "scripts": {
-    "test": "mocha ./node-tests/stub-project/node_modules/@cardstack/test-support/bin/run.js"
+    "test": "mocha ../test-support/bin/run.js"
   }
 }

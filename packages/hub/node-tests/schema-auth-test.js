@@ -1,5 +1,5 @@
 const ElasticAssert = require('@cardstack/elasticsearch/node-tests/assertions');
-const JSONAPIFactory = require('./stub-project/node_modules/@cardstack/test-support/jsonapi-factory');
+const JSONAPIFactory = require('../../../tests/stub-project/node_modules/@cardstack/test-support/jsonapi-factory');
 const PendingChange = require('@cardstack/plugin-utils/pending-change');
 const bootstrapSchema = require('../bootstrap-schema');
 const { Registry, Container } = require('@cardstack/di');
@@ -40,7 +40,7 @@ describe('schema/auth', function() {
         factory.getResource('fields', 'title')
       ]);
     let registry = new Registry();
-    registry.register('config:project', { path: `${__dirname}/stub-project`, allowDevDependencies: true });
+    registry.register('config:project', { path: `${__dirname}/../../../tests/stub-project`, allowDevDependencies: true });
     loader = new Container(registry).lookup('hub:schema-loader');
   });
 

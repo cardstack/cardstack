@@ -1,8 +1,8 @@
-const JSONAPIFactory = require('./stub-searcher/node_modules/@cardstack/test-support/jsonapi-factory');
+const JSONAPIFactory = require('../../../tests/stub-searcher/node_modules/@cardstack/test-support/jsonapi-factory');
 const {
   createDefaultEnvironment,
   destroyDefaultEnvironment
-} = require('./stub-searcher/node_modules/@cardstack/test-support/env');
+} = require('../../../tests/stub-searcher/node_modules/@cardstack/test-support/env');
 
 describe('hub/searchers', function() {
   let env, chocolate;
@@ -35,7 +35,7 @@ describe('hub/searchers', function() {
       exampleSize: 'large'
     });
 
-    env = await createDefaultEnvironment(`${__dirname}/stub-searcher`, factory.getModels());
+    env = await createDefaultEnvironment(`${__dirname}/../../../tests/stub-searcher`, factory.getModels());
   }
 
   afterEach(async function() {

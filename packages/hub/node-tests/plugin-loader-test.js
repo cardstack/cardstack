@@ -1,5 +1,5 @@
 const { Registry, Container } = require('@cardstack/di');
-const JSONAPIFactory = require('./stub-project/node_modules/@cardstack/test-support/jsonapi-factory');
+const JSONAPIFactory = require('../../../tests/stub-project/node_modules/@cardstack/test-support/jsonapi-factory');
 
 describe('hub/plugin-loader', function() {
   let pluginLoader, activePlugins;
@@ -7,7 +7,7 @@ describe('hub/plugin-loader', function() {
   before(async function() {
     let registry = new Registry();
     registry.register('config:project', {
-      path: __dirname + '/stub-project',
+      path: __dirname + '/../../../tests/stub-project',
       allowDevDependencies: true
     }, { instantiate: false });
     pluginLoader = new Container(registry).lookup('hub:plugin-loader');

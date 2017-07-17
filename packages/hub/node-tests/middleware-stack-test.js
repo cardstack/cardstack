@@ -1,10 +1,10 @@
-const JSONAPIFactory = require('./stub-middleware/node_modules/@cardstack/test-support/jsonapi-factory');
+const JSONAPIFactory = require('../../../tests/stub-middleware/node_modules/@cardstack/test-support/jsonapi-factory');
 const supertest = require('supertest');
 const Koa = require('koa');
 const {
   createDefaultEnvironment,
   destroyDefaultEnvironment
-} = require('./stub-middleware/node_modules/@cardstack/test-support/env');
+} = require('../../../tests/stub-middleware/node_modules/@cardstack/test-support/env');
 
 describe('middleware-stack', function() {
 
@@ -16,7 +16,7 @@ describe('middleware-stack', function() {
         .withAttributes({
           module: 'stub-middleware'
         });
-    env = await createDefaultEnvironment(__dirname + '/stub-middleware', factory.getModels());
+    env = await createDefaultEnvironment(__dirname + '/../../../tests/stub-middleware', factory.getModels());
     let app = new Koa();
     app.use(env.lookup('hub:middleware-stack').middleware());
     request = supertest(app.callback());
