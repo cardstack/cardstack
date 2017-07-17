@@ -1,5 +1,5 @@
 const Error = require('@cardstack/plugin-utils/error');
-const find = require('./async-find');
+const find = require('../async-find');
 
 module.exports = class ContentType {
   constructor(model, allFields, dataSources, defaultDataSource, allGrants, authLog) {

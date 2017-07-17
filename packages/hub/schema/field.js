@@ -1,5 +1,5 @@
 const Error = require('@cardstack/plugin-utils/error');
-const find = require('./async-find');
+const find = require('../async-find');
 
 module.exports = class Field {
   constructor(model, plugins, constraints, allGrants, defaultValues, authLog) {

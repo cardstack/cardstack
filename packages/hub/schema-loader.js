@@ -1,8 +1,8 @@
-const Field = require('./field');
-const Constraint = require('./constraint');
-const ContentType = require('./content-type');
-const DataSource = require('./data-source');
-const Grant = require('./grant');
+const Field = require('./schema/field');
+const Constraint = require('./schema/constraint');
+const ContentType = require('./schema/content-type');
+const DataSource = require('./schema/data-source');
+const Grant = require('./schema/grant');
 const logger = require('@cardstack/plugin-utils/logger');
 const {
   declareInjections,
