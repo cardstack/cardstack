@@ -1,5 +1,5 @@
 {
-  "name": "test-app",
+  "name": "elasticsearch-test-app",
   "dependencies": {
     "@cardstack/hub": "*",
     "@cardstack/ephemeral": "*"

@@ -7,7 +7,7 @@
 const {
   createDefaultEnvironment,
   destroyDefaultEnvironment
-} = require('./test-app/node_modules/@cardstack/test-support/env');
+} = require('../../../tests/elasticsearch-test-app/node_modules/@cardstack/test-support/env');
 
 const { uniq } = require('lodash');
 
@@ -167,7 +167,7 @@ describe('elasticsearch/searcher', function() {
         }
       });
     }
-    env = await createDefaultEnvironment(`${__dirname}/test-app`, records);
+    env = await createDefaultEnvironment(`${__dirname}/../../../tests/elasticsearch-test-app`, records);
     searcher = env.lookup('hub:searchers');
   });
 
