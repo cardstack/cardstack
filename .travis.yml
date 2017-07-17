@@ -6,7 +6,7 @@ node_js:
 sudo: false
 
 addons:
-  firefox: latest
+  chrome: stable
   apt:
     sources:
       - ubuntu-toolchain-r-test
