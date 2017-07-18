@@ -33,7 +33,7 @@ module.exports = declareInjections({
 
 class Indexers {
   constructor() {
-    this.client = new Client();
+    this.client = null;
     this.log = logger('indexers');
     this._lastControllingSchema = null;
     this._seenBranches = new Map();
@@ -49,6 +49,7 @@ class Indexers {
       resolve = r;
       reject = j;
     });
+    await this._ensureClient();
     if (realTime) {
       this._realTimeQueue.push({ hints, resolve, reject });
     } else {
@@ -64,6 +65,12 @@ class Indexers {
       this.log.debug("Joining update loop");
     }
     await promise;
+  }
+
+  async _ensureClient() {
+    if (!this.client) {
+      this.client = await Client.create();
+    }
   }
 
   async _updateLoop() {
