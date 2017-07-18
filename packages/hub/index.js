@@ -1,4 +1,4 @@
-const { makeServer } = require('./main');
+ const { makeServer } = require('./main');
 const path = require('path');
 const crypto = require('crypto');
 const fs = require('fs');
@@ -123,6 +123,12 @@ module.exports = {
         res.end();
       }
     });
+  },
+
+  includedCommands() {
+    return {
+      'hub:build': require('./hub-build')
+    };
   },
 
   async _makeServer(seedDir, ui, allowDevDependencies, env) {

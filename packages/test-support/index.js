@@ -10,5 +10,9 @@ module.exports = {
   testemMiddleware(app) {
     let hub = this.addons.find(a => a.name === '@cardstack/hub');
     return hub.testemMiddleware(app);
+  },
+  includedCommands() {
+    let hub = this.addons.find(a => a.name === '@cardstack/hub');
+    return hub.includedCommands();
   }
 };

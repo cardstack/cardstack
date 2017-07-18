@@ -1,0 +1,39 @@
+version: '3'
+
+services:
+  hub:
+    image: models
+    ports:
+      - "3000:3000"
+    networks:
+      hub:
+    volumes:
+      - ".:/projects/models"
+      - models-node_modules:/projects/models/node_modules
+      - "../hub:/projects/hub"
+      - hub-node_modules:/projects/hub/node_modules
+    environment:
+      - "ELASTICSEARCH=http://elasticsearch:9200"
+      - "CARDSTACK_SESSIONS_KEY=dB7j07tjkvongwm7eq0tN/IV8GRqoTNnGLRsYLGNzw8="
+    command: node ./cardstack/bootstrap-docker.js
+
+  elasticsearch:
+    image: edward4/elasticsearch
+    ports:
+      - "9200:9200"
+    networks:
+      hub:
+    volumes:
+      - esdata:/usr/share/elasticsearch/data
+
+
+volumes:
+  models-node_modules:
+    driver: local
+  hub-node_modules:
+    driver: local
+  esdata:
+    driver: local
+
+networks:
+  hub:
