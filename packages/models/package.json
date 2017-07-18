@@ -26,7 +26,7 @@
     "@cardstack/codegen": "^0.2.1",
     "@cardstack/di": "^0.2.1",
     "@cardstack/tools": "^0.2.1",
-    "handlebars": "^4.0.6"
+    "handlebars": "^4.0.6",
     "ember-cli-babel": "^6.3.0"
   },
   "devDependencies": {
@@ -61,7 +61,7 @@
     "node": "^4.5 || 6.* || >= 7.*"
   },
   "ember-addon": {
-    "defaultBlueprint": "cardstack-models-seeds"
+    "defaultBlueprint": "cardstack-models-seeds",
     "configPath": "tests/dummy/config"
   }
 }
