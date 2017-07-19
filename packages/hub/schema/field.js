@@ -2,7 +2,7 @@ const Error = require('@cardstack/plugin-utils/error');
 const find = require('../async-find');
 
 module.exports = class Field {
-  constructor(model, plugins, constraints, allGrants, defaultValues, authLog) {
+  constructor(model, plugins, allGrants, defaultValues, authLog) {
     this.id = model.id;
     this.authLog = authLog;
     if (!model.attributes || !model.attributes['field-type']) {
@@ -20,12 +20,6 @@ module.exports = class Field {
 
     this.plugin = plugins.lookupFeatureAndAssert('field-types', this.fieldType);
     this.isRelationship = this.plugin.isRelationship;
-
-    if (model.relationships && model.relationships.constraints && model.relationships.constraints.data) {
-      this.constraints = model.relationships.constraints.data.map(ref => constraints.get(ref.id)).filter(Boolean);
-    } else {
-      this.constraints = [];
-    }
 
     if (model.relationships && model.relationships['related-types'] && model.relationships['related-types'].data) {
       this.relatedTypes = Object.create(null);
@@ -66,7 +60,7 @@ module.exports = class Field {
     return this.isRelationship ? 'relationships' : 'attributes';
   }
 
-  _valueFrom(pendingChange, side='finalDocument') {
+  valueFrom(pendingChange, side='finalDocument') {
     let document = pendingChange[side];
     if (document) {
       let section = this._sectionName();
@@ -75,6 +69,15 @@ module.exports = class Field {
       } else if (document[section]) {
         return document[section][this.id];
       }
+    }
+  }
+
+  pointer() {
+    let sectionName = this._sectionName();
+    if (sectionName === 'top') {
+      return `/data/${this.id}`;
+    } else {
+      return `/data/${sectionName}/${this.id}`;
     }
   }
 
@@ -146,14 +149,14 @@ module.exports = class Field {
     if (defaultValue) {
       pendingChange.serverProvidedValues.set(this.id,defaultValue.value);
       if (!pendingChange.originalDocument) {
-        if (this._valueFrom(pendingChange, 'finalDocument') !== undefined) {
+        if (this.valueFrom(pendingChange, 'finalDocument') !== undefined) {
           // The user provided a value at creation, so defaults do not
           // apply.
           return;
         }
       } else {
-        let newValue = this._valueFrom(pendingChange, 'finalDocument');
-        let oldValue = this._valueFrom(pendingChange, 'originalDocument');
+        let newValue = this.valueFrom(pendingChange, 'finalDocument');
+        let oldValue = this.valueFrom(pendingChange, 'originalDocument');
         if (newValue !== oldValue) {
           // The user is altering this value, so defaults do not apply.
           return;
@@ -173,12 +176,12 @@ module.exports = class Field {
   }
 
   async validationErrors(pendingChange, context) {
-    let value = this._valueFrom(pendingChange, 'finalDocument');
+    let value = this.valueFrom(pendingChange, 'finalDocument');
     let grant;
 
     if (pendingChange.serverProvidedValues.has(this.id) && pendingChange.serverProvidedValues.get(this.id) === value) {
       this.authLog.debug("approved field write for %s because it matches server provided default", this.id);
-    } else if (pendingChange.originalDocument && value === this._valueFrom(pendingChange, 'originalDocument')) {
+    } else if (pendingChange.originalDocument && value === this.valueFrom(pendingChange, 'originalDocument')) {
       this.authLog.debug("approved field write for %s because it was unchanged", this.id);
     } else if ((grant = await find(this.grants, async g => g['may-write-field'] && await g.matches(pendingChange, context)))) {
       this.authLog.debug("approved field write for %s because of grant %s", this.id, grant.id);
@@ -193,20 +196,7 @@ module.exports = class Field {
     let errors = [];
     this._checkInWrongSection(pendingChange, errors);
     this._validateFormat(value, errors);
-    if (errors.length > 0) {
-      return errors;
-    }
-
-    // We got through our own validations, so run all the constraints.
-
-    return (await Promise.all(this.constraints.map(constraint => constraint.validationErrors(value)))).reduce(
-      (a,b) => a.concat(b), []
-    ).map(
-      message => new Error(`the value of field "${this.id}" ${message}`, {
-        title: "Validation error",
-        status: 400
-      })
-    );
+    return errors;
   }
   mapping() {
     let m = {

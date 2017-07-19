@@ -32,25 +32,42 @@ describe('schema/validation', function() {
     let articleType = factory.addResource('content-types', 'articles')
         .withRelated('data-source', ephemeralDataSource);
 
+
+    let titleField = factory.addResource('fields', 'title')
+        .withAttributes({ fieldType: '@cardstack/core-types::string' });
+
+    factory.addResource('constraints')
+      .withAttributes({
+        constraintType: '@cardstack/core-types::max-length',
+        inputs: { limit: 40  }
+      })
+      .withRelated('input-assignments', [
+        factory.addResource('input-assignments')
+          .withAttributes({ inputName: 'target' })
+          .withRelated('field', titleField)
+      ])
+      .withRelated('required-content-types', [ articleType ]);
+
+    let publishedDateField = factory.addResource('fields', 'published-date')
+      .withAttributes({
+        fieldType: '@cardstack/core-types::date',
+        searchable: false
+      });
+
+    factory.addResource('constraints')
+      .withAttributes({
+        constraintType: '@cardstack/core-types::not-null'
+      })
+      .withRelated('input-assignments', [
+        factory.addResource('input-assignments')
+          .withAttributes({ inputName: 'target' })
+          .withRelated('field', publishedDateField)
+      ]);
+
+
     articleType.withRelated('fields', [
-      factory.addResource('fields', 'title')
-        .withAttributes({ fieldType: '@cardstack/core-types::string' })
-        .withRelated('constraints', [
-          factory.addResource('constraints')
-            .withAttributes({
-              constraintType: '@cardstack/core-types::length',
-              params: { max: 40 }
-            })
-        ]),
-      factory.addResource('fields', 'published-date')
-        .withAttributes({
-          fieldType: '@cardstack/core-types::date',
-          searchable: false
-        })
-        .withRelated('constraints', [
-          factory.addResource('constraints')
-            .withAttributes({ constraintType: '@cardstack/core-types::not-null' })
-        ]),
+      titleField,
+      publishedDateField,
       factory.addResource('fields', 'primary-image')
         .withAttributes({
           fieldType: '@cardstack/core-types::belongs-to'
@@ -237,7 +254,7 @@ describe('schema/validation', function() {
       }
     }));
     expect(errors).collectionContains({
-      detail: 'the value of field "title" may not exceed max length of 40 characters',
+      detail: 'title can be at most 40 characters long, it was 59',
       status: 400,
       source: { pointer: '/data/attributes/title' }
     });
@@ -251,7 +268,7 @@ describe('schema/validation', function() {
         title: "very long very long very long very long very long very long"
       }
     }));
-    expect(errors).includes.something.with.property('detail', 'the value of field "published-date" may not be null');
+    expect(errors).includes.something.with.property('detail', 'published-date must be present');
   });
 
   it("generates a mapping", async function() {

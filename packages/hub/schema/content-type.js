@@ -1,8 +1,9 @@
 const Error = require('@cardstack/plugin-utils/error');
 const find = require('../async-find');
+const { flatten } = require('lodash');
 
 module.exports = class ContentType {
-  constructor(model, allFields, dataSources, defaultDataSource, allGrants, authLog) {
+  constructor(model, allFields, allConstraints, dataSources, defaultDataSource, allGrants, authLog) {
     let fields = new Map();
     if (model.relationships && model.relationships.fields) {
       for (let fieldRef of model.relationships.fields.data) {
@@ -38,6 +39,9 @@ module.exports = class ContentType {
     }
     this.grants = allGrants.filter(g => g.types == null || g.types.includes(model.id));
     this.authLog = authLog;
+    this.constraints = allConstraints.filter(constraint => {
+      return Object.values(constraint.fieldInputs).some(field => this.fields.get(field.id));
+    });
   }
 
   async validate(pendingChange, context) {
@@ -60,6 +64,12 @@ module.exports = class ContentType {
       errors = errors.concat(tagFieldErrors(field, fieldErrors));
     }
 
+    // TODO: this skips all constraints when any field is
+    // invalid. Instead, skip only constraints with invalid inputs.
+    if (errors.length === 0) {
+      errors = errors.concat(await this._checkConstraints(pendingChange));
+    }
+
     this._validateUnknownFields(pendingChange.finalDocument, errors);
 
     if (errors.length > 1) {
@@ -70,6 +80,10 @@ module.exports = class ContentType {
     if (errors.length === 1) {
       throw errors[0];
     }
+  }
+
+  async _checkConstraints(pendingChange) {
+    return flatten(await Promise.all(this.constraints.map(constraint => constraint.validationErrors(pendingChange, this.fields))));
   }
 
   _validateUnknownFields(document, errors) {

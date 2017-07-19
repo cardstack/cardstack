@@ -27,7 +27,6 @@ const models = [
         data: [
           { type: 'fields', id: 'field-type' },
           { type: 'fields', id: 'related-types' },
-          { type: 'fields', id: 'constraints' },
           { type: 'fields', id: 'default-at-create' },
           { type: 'fields', id: 'default-at-update' }
         ]
@@ -44,7 +43,8 @@ const models = [
       fields: {
         data: [
           { type: 'fields', id: 'constraint-type' },
-          { type: 'fields', id: 'params' }
+          { type: 'fields', id: 'inputs' },
+          { type: 'fields', id: 'input-assignments' }
         ]
       }
     }
@@ -148,6 +148,28 @@ const models = [
     id: 'groups',
     attributes: {
       'is-built-in': true
+    }
+  },
+  {
+    type: 'content-types',
+    id: 'input-assignments',
+    attributes: {
+      'is-built-in': true
+    },
+    relationships: {
+      fields: {
+        data: [
+          { type: 'fields', id: 'input-name' },
+          { type: 'fields', id: 'field' }
+        ]
+      }
+    }
+  },
+  {
+    type: 'fields',
+    id: 'input-name',
+    attributes: {
+      'field-type': '@cardstack/core-types::string'
     }
   },
   {
@@ -286,18 +308,6 @@ const models = [
   },
   {
     type: 'fields',
-    id: 'constraints',
-    attributes: {
-      'field-type': '@cardstack/core-types::has-many'
-    },
-    relationships: {
-      'related-types': {
-        data: [{ type: 'content-types', id: 'constraints' }]
-      }
-    }
-  },
-  {
-    type: 'fields',
     id: 'field-type',
     attributes: {
       'field-type': '@cardstack/core-types::string'
@@ -312,6 +322,37 @@ const models = [
     relationships: {
       'related-types': {
         data: [{ type: 'content-types', id: 'fields' }]
+      }
+    }
+  },
+  {
+    type: 'fields',
+    id: 'field',
+    attributes: {
+      'field-type': '@cardstack/core-types::belongs-to',
+    },
+    relationships: {
+      'related-types': {
+        data: [{ type: 'content-types', id: 'fields' }]
+      }
+    }
+  },
+  {
+    type: 'fields',
+    id: 'inputs',
+    attributes: {
+      'field-type': '@cardstack/core-types::object',
+    }
+  },
+  {
+    type: 'fields',
+    id: 'input-assignments',
+    attributes: {
+      'field-type': '@cardstack/core-types::has-many',
+    },
+    relationships: {
+      'related-types': {
+        data: [{ type: 'content-types', id: 'input-assignments' }]
       }
     }
   },

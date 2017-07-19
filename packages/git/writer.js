@@ -151,6 +151,10 @@ module.exports = class Writer {
 
 };
 
+
+// TODO: we only need to do this here because the Hub has no generic
+// "read" hook to call on writers. We should use that instead and move
+// this into the generic hub:writers code.
 function patch(before, diffDocument) {
   let after = Object.assign({}, before);
   for (let section of ['attributes', 'relationships']) {

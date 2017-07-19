@@ -21,11 +21,15 @@ describe('jsonapi/middleware', function() {
         .withAttributes({ fieldType: '@cardstack/core-types::string' }),
       factory.addResource('fields', 'body')
         .withAttributes({ fieldType: '@cardstack/core-types::string' })
-        .withRelated('constraints', [
-          factory.addResource('constraints')
-            .withAttributes({ constraintType: '@cardstack/core-types::not-null' })
-        ])
     ]);
+
+    factory.addResource('constraints')
+      .withAttributes({ constraintType: '@cardstack/core-types::not-null' })
+      .withRelated('input-assignments', [
+        factory.addResource('input-assignments')
+          .withAttributes({ inputName: 'target'})
+          .withRelated('field', { type: 'fields', id: 'body' })
+      ]);
 
     factory.addResource('content-types', 'events')
       .withRelated('fields', [

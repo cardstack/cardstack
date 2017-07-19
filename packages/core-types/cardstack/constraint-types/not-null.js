@@ -1,7 +1,9 @@
 module.exports = {
-  valid(value /*, parameters */) {
-    if (value == null) {
-      return "may not be null";
-    }
+  inputs: {
+    target: []
+  },
+  description: `{{target.name}} must be present`,
+  valid({ target }) {
+    return target.value != null;
   }
 };

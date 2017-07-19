@@ -10,7 +10,7 @@ const {
   getOwner
 } = require('@cardstack/di');
 
-const ownTypes = Object.freeze(['content-types', 'fields', 'constraints', 'data-sources', 'grants', 'plugin-configs', 'default-values']);
+const ownTypes = Object.freeze(['content-types', 'fields', 'constraints', 'input-assignments', 'data-sources', 'grants', 'plugin-configs', 'default-values']);
 
 module.exports = declareInjections({
   pluginLoader: 'hub:plugin-loader'
@@ -34,27 +34,38 @@ class SchemaLoader {
     let plugins = await this.pluginLoader.activePlugins(models.filter(model => model.type === 'plugin-configs'));
     let authLog = logger('auth');
     let schemaLog = logger('schema');
-    let constraints = await findConstraints(models, plugins);
     let defaultValues = findDefaultValues(models);
     let grants = findGrants(models);
-    let fields = findFields(models, plugins, constraints, grants, defaultValues, authLog);
+    let fields = findFields(models, plugins, grants, defaultValues, authLog);
+    let constraints = await findConstraints(models, plugins, fields);
     let dataSources = findDataSources(models, plugins);
     let defaultDataSource = findDefaultDataSource(plugins);
     schemaLog.trace('default data source %j', defaultDataSource);
-    let types = findTypes(models, fields, dataSources, defaultDataSource, grants, authLog);
+    let types = findTypes(models, fields, constraints, dataSources, defaultDataSource, grants, authLog);
     validateRelatedTypes(types, fields);
     return getOwner(this).factoryFor('hub:schema').create({ types, fields, dataSources, inputModels, plugins });
   }
 });
 
-async function findConstraints(models, plugins) {
-  let constraints = new Map();
+function findInputAssignments(models) {
+  let inputAssignments = new Map();
+  for (let model of models) {
+    if (model.type === 'input-assignments') {
+      inputAssignments.set(model.id, model);
+    }
+  }
+  return inputAssignments;
+}
+
+async function findConstraints(models, plugins, fields) {
+  let inputAssignments = findInputAssignments(models);
+  let constraints = [];
   for (let model of models) {
     if (!ownTypes.includes(model.type)) {
       throw new Error(`attempted to load schema including non-schema type "${model.type}"`);
     }
     if (model.type === 'constraints') {
-      constraints.set(model.id, await Constraint.create(model, plugins));
+      constraints.push(await Constraint.create(model, plugins, inputAssignments, fields));
     }
   }
   return constraints;
@@ -76,11 +87,11 @@ function findGrants(models) {
     .map(model => new Grant(model));
 }
 
-function findFields(models, plugins, types, constraints, grants, defaultValues, authLog) {
+function findFields(models, plugins, types, grants, defaultValues, authLog) {
   let fields = new Map();
   for (let model of models) {
     if (model.type === 'fields') {
-      fields.set(model.id, new Field(model, plugins, types, constraints, grants, defaultValues, authLog));
+      fields.set(model.id, new Field(model, plugins, types, grants, defaultValues, authLog));
     }
   }
   return fields;
@@ -103,11 +114,11 @@ function findDefaultDataSource(plugins) {
   }
 }
 
-function findTypes(models, fields, dataSources, defaultDataSource, grants, authLog) {
+function findTypes(models, fields, constraints, dataSources, defaultDataSource, grants, authLog) {
   let types = new Map();
   for (let model of models) {
     if (model.type === 'content-types') {
-      types.set(model.id, new ContentType(model, fields, dataSources, defaultDataSource, grants, authLog));
+      types.set(model.id, new ContentType(model, fields, constraints, dataSources, defaultDataSource, grants, authLog));
     }
   }
   return types;
