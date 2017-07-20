@@ -271,6 +271,30 @@ describe('schema/validation', function() {
     expect(errors).includes.something.with.property('detail', 'published-date must be present');
   });
 
+  it("does not run a constraint whose input has already failed format validation", async function() {
+    let errors = await schema.validationErrors(create({
+      type: 'articles',
+      id: '1',
+      attributes: {
+        "published-date": "2013-02-08 09:30:26.123+07:00",
+        title: 4000 // we're not going to run the max-length constraint because this is nonsense input
+      }
+    }));
+    expect(errors).includes.something.with.property('detail', '4000 is not a valid value for field "title"');
+    expect(errors).has.length(1);
+  });
+
+  it("runs constraints with valid inputs even when unrelated fields are invalid", async function() {
+    let errors = await schema.validationErrors(create({
+      type: 'articles',
+      id: '1',
+      attributes: {
+        title: 4000 // we're not going to run the max-length constraint because this is nonsense input
+      }
+    }));
+    expect(errors).includes.something.with.property('detail', 'published-date must be present');
+  });
+
   it("generates a mapping", async function() {
     let mapping = schema.mapping();
     expect(mapping).has.deep.property("articles.properties.published-date.index", false);

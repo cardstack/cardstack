@@ -59,16 +59,16 @@ module.exports = class ContentType {
     }
 
     let errors = [];
+    let badFields = Object.create(null);
     for (let field of this.fields.values()) {
       let fieldErrors = await field.validationErrors(pendingChange, context);
+      if (fieldErrors.length > 0) {
+        badFields[field.id] = true;
+      }
       errors = errors.concat(tagFieldErrors(field, fieldErrors));
     }
 
-    // TODO: this skips all constraints when any field is
-    // invalid. Instead, skip only constraints with invalid inputs.
-    if (errors.length === 0) {
-      errors = errors.concat(await this._checkConstraints(pendingChange));
-    }
+    errors = errors.concat(await this._checkConstraints(pendingChange, badFields));
 
     this._validateUnknownFields(pendingChange.finalDocument, errors);
 
@@ -82,8 +82,9 @@ module.exports = class ContentType {
     }
   }
 
-  async _checkConstraints(pendingChange) {
-    return flatten(await Promise.all(this.constraints.map(constraint => constraint.validationErrors(pendingChange, this.fields))));
+  async _checkConstraints(pendingChange, badFields) {
+    let activeConstraints = this.constraints.filter(constraint => Object.values(constraint.fieldInputs).every(field => !badFields[field.id]));
+    return flatten(await Promise.all(activeConstraints.map(constraint => constraint.validationErrors(pendingChange, this.fields))));
   }
 
   _validateUnknownFields(document, errors) {
@@ -160,10 +161,10 @@ module.exports = class ContentType {
 };
 
 function tagFieldErrors(field, errors) {
-  let section = field.isRelationship ? 'relationships' : 'attributes';
+  let pointer = field.pointer();
   errors.forEach(fe => {
     if (!fe.source) {
-      fe.source = { pointer: `/data/${section}/${field.id}` };
+      fe.source = { pointer };
     }
   });
   return errors;

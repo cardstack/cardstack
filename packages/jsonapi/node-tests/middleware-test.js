@@ -225,7 +225,7 @@ describe('jsonapi/middleware', function() {
       });
       expect(response.body.errors).collectionContains({
         title: 'Validation error',
-        detail: 'the value of field "body" may not be null',
+        detail: 'body must be present',
         source: { pointer: '/data/attributes/body' }
       });
     });
