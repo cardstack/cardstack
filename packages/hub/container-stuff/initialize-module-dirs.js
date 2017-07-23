@@ -1,9 +1,7 @@
 const { spawn } = require('child_process');
 const path = require('path');
 
-const packagePath="/Users/aaron/dev/cardstack/packages/hub"
-
-function createInstalledVolumeFor(packagePath) {
+module.exports = function createInstalledVolumeFor(packagePath) {
 
   let absolute_path = path.resolve(packagePath);
   let module_name = path.basename(packagePath);
