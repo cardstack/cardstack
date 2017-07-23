@@ -1,5 +1,10 @@
 const fs = require('fs');
-const { partition }  = require('lodash');
+const _ = require('lodash');
+const {
+  flatten,
+  partition,
+  uniq
+} = _;
 
 const rootPackagePath = "/Users/aaron/dev/cardstack/packages/models";
 
@@ -20,11 +25,7 @@ const rootPackagePath = "/Users/aaron/dev/cardstack/packages/models";
 //   { name: "@cardstack/hub", path: "/Users/aaron/dev/cardstack/packages/hub" },
 //   { name: "@cardstack/hub2", path: "/Users/aaron/dev/cardstack/packages/hub" }
 // ]
-let packageLinks = {};
-
-enumeratePackageLinks(rootPackagePath);
-
-console.log(JSON.stringify(packageLinks, null, 2));
+let packageLinks = enumeratePackageLinks(rootPackagePath);
 
 // "@cardstack/models": {
 //     name: "@cardstack/models",
@@ -36,21 +37,51 @@ console.log(JSON.stringify(packageLinks, null, 2));
 // }
 // or, throw error:
 // We don't support linking to multiple versions of the same package
-//
-// let packages = normalizeModules(packageLinks);
 
+let packageMapping = normalizeModules(packageLinks);
+console.log(packageMapping);
 
-function enumeratePackageLinks(packagePath) {
-  console.log('enumerating', packagePath);
-  let links = symlinksFromModulesFolder(packagePath + '/node_modules');
-  packageLinks[packagePath] = links;
-  let alreadyEnumerated = Object.keys(packageLinks);
-  links.filter(l => !alreadyEnumerated.includes(l.path))
-    .forEach(l => enumeratePackageLinks(l.path));
+function normalizeModules(packageLinks) {
+  let allPaths = _(Array.from(packageLinks.values())).flatten().map(l => l.path).uniq().value();
+  let modules = allPaths.map(resolveModule);
+  let pathsForModuleName = _.groupBy(modules, 'name');
+
+  let result = new Map();
+  for (let name in pathsForModuleName) {
+    let paths = pathsForModuleName[name];
+    if (paths.length > 1) {
+      throw new Error(`Multiple different locally linked modules were found for the name ${name}. CardStack hub only supports linking to a single version of a given module.`);
+    }
+    result.set(name, paths[0]);
+  }
+  return result;
 }
 
+function resolveModule(path) {
+  return {
+    name: require(path + '/package.json').name,
+    path
+  }
+}
+
+
+function enumeratePackageLinks(packagePath, packageLinks = new Map()) {
+  let links = symlinksFromModulesFolder(packagePath + '/node_modules');
+
+  packageLinks.set(packagePath, links);
+
+  links.filter(l => !packageLinks.has(l.path))
+    .forEach(l => enumeratePackageLinks(l.path, packageLinks));
+
+  return packageLinks;
+}
+
+// [
+//   { name: "@cardstack/hub2", path: "/Users/aaron/dev/cardstack/packages/hub" }
+// ]
 function symlinksFromModulesFolder(moduleDir) {
   let output = [];
+  if (!fs.existsSync(moduleDir)) { return output; }
   for (let name of fs.readdirSync(moduleDir)) {
     let modulePath = moduleDir + '/' + name;
 
