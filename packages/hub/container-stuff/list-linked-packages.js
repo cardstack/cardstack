@@ -6,44 +6,62 @@ const {
   uniq
 } = _;
 
-const rootPackagePath = "/Users/aaron/dev/cardstack/packages/models";
+module.exports = getPackageList;
 
-// how do we uniquely id linked packages?
-// basically, path on the host filesystem.
-// But, we don't really want to put that whole path in /packages.
-// We could generate random ids?
-// But it's nicer to have the folder be the packgage name.
-// But then we could conflict.
-// We could use package name, but fix conflicts specifically?
-// What if our fix algo outputs something that conflicts?
-// Or, we could just error if there's a conflict, and ask them to file an issue.
+function getPackageList(rootPackagePath) {
 
-// Only support linking to package of same name?
-//
+  // Map {
+  //   "/Users/aaron/dev/cardstack/packages/models" => [
+  //     { name: "@cardstack/hub", path: "/Users/aaron/dev/cardstack/packages/hub" },
+  //     { name: "@cardstack/hub2", path: "/Users/aaron/dev/cardstack/packages/hub" }
+  //   ]
+  // }
+  let moduleLinkings = recursivelyFindLinkedModules(rootPackagePath);
 
-// "/Users/aaron/dev/cardstack/packages/models": [
-//   { name: "@cardstack/hub", path: "/Users/aaron/dev/cardstack/packages/hub" },
-//   { name: "@cardstack/hub2", path: "/Users/aaron/dev/cardstack/packages/hub" }
-// ]
-let packageLinks = enumeratePackageLinks(rootPackagePath);
+  // [
+  //   "/Users/aaron/dev/cardstack/packages/models",
+  //   "/Users/aaron/dev/cardstack/packages/hub"
+  // ]
+  let linkedPaths = _(Array.from(moduleLinkings.values())).flatten().map(l => l.path).uniq().value();
 
-// "@cardstack/models": {
-//     name: "@cardstack/models",
-//     path: "/Users/aaron/dev/cardstack/packages/models",
-//     links: [
-//       { name: "@cardstack/hub", package: "@cardstack/hub" },
-//       { name: "@cardstack/hub2", package: "@cardstack/hub" }
-//     ]
-// }
-// or, throw error:
-// We don't support linking to multiple versions of the same package
+  // [
+  //   { name: "@cardstack/models", path: "/Users/aaron/dev/cardstack/packages/models" },
+  //   { name: "@cardstack/hub", path: "/Users/aaron/dev/cardstack/packages/hub" }
+  // ]
+  // or, throw error:
+  // Multiple locally linked modules were found with the same name: "@cardstack/di".
+  // CardStack hub only supports linking to a single version of a given module.
+  let packageResolutions = resolvePackages(linkedPaths);
 
-let packageMapping = normalizeModules(packageLinks);
-console.log(packageMapping);
+  // [{
+  //     name: "@cardstack/models",
+  //     path: "/Users/aaron/dev/cardstack/packages/models",
+  //     links: [
+  //       { name: "@cardstack/hub", package: "@cardstack/hub" },
+  //       { name: "@cardstack/hub2", package: "@cardstack/hub" }
+  //     ]
+  // }]
+  return stitchPackages(moduleLinkings, packageResolutions);
+}
 
-function normalizeModules(packageLinks) {
-  let allPaths = _(Array.from(packageLinks.values())).flatten().map(l => l.path).uniq().value();
-  let modules = allPaths.map(resolveModule);
+// let packages = getPackageList("/Users/aaron/dev/cardstack/packages/models");
+// console.log(JSON.stringify(packages, null, 2));
+
+function stitchPackages(modules, pathResolver) {
+  let result = [];
+  for (let [path, links] of modules) {
+    result.push({
+      path,
+      name: pathResolver.get(path),
+      links: links.map(({name, path}) => { return { name, package: pathResolver.get(path) }; })
+    });
+  }
+  return result;
+}
+
+
+function resolvePackages(paths) {
+  let modules = paths.map(resolveModule);
   let pathsForModuleName = _.groupBy(modules, 'name');
 
   let result = new Map();
@@ -52,7 +70,7 @@ function normalizeModules(packageLinks) {
     if (paths.length > 1) {
       throw new Error(`Multiple different locally linked modules were found for the name ${name}. CardStack hub only supports linking to a single version of a given module.`);
     }
-    result.set(name, paths[0]);
+    result.set(paths[0].path, paths[0].name);
   }
   return result;
 }
@@ -65,13 +83,13 @@ function resolveModule(path) {
 }
 
 
-function enumeratePackageLinks(packagePath, packageLinks = new Map()) {
+function recursivelyFindLinkedModules(packagePath, packageLinks = new Map()) {
   let links = symlinksFromModulesFolder(packagePath + '/node_modules');
 
   packageLinks.set(packagePath, links);
 
   links.filter(l => !packageLinks.has(l.path))
-    .forEach(l => enumeratePackageLinks(l.path, packageLinks));
+    .forEach(l => recursivelyFindLinkedModules(l.path, packageLinks));
 
   return packageLinks;
 }
