@@ -5,14 +5,15 @@ const symlinkPackages = require ('./symlink-packages');
 const rootProjectPath = "/Users/aaron/dev/cardstack/packages/models";
 
 let packages = getPackageList(rootProjectPath);
-let p = volumeForPackageAtIndex(packages, 0);
-for (let i = 1; i < packages.length; i++) {
-  p = p.then(() => volumeForPackageAtIndex(packages, i));
-}
-
-p.then(function() {
-  symlinkPackages(packages);
-});
+// let p = volumeForPackageAtIndex(packages, 0);
+// for (let i = 1; i < packages.length; i++) {
+//   p = p.then(() => volumeForPackageAtIndex(packages, i));
+// }
+// 
+// p.then(function() {
+  let p = symlinkPackages(packages);
+//   return p;
+// })
 p.catch(function(code) {
   console.log('shit:', code);
 });

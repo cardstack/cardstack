@@ -4,27 +4,27 @@ const { flatten, flattenDeep } = require('lodash');
 
 module.exports = symlinkPackages;
 
-symlinkPackages([
-    {
-      name: "app",
-      volumeName: "app-modules",
-      links: [
-        { name: "dep", package: "dep" },
-        { name: "dep2", package: "dep" },
-        { name: "@cardstack/dep", package: "@cardstack/dep" }
-      ]
-    },
-    {
-      name: "dep",
-      volumeName: "dep-modules",
-      links: []
-    },
-    {
-      name: "@cardstack/dep",
-      volumeName: "cardstack-dep-modules",
-      links: []
-    }
-]);
+// symlinkPackages([
+//     {
+//       name: "app",
+//       volumeName: "app-modules",
+//       links: [
+//         { name: "dep", package: "dep" },
+//         { name: "dep2", package: "dep" },
+//         { name: "@cardstack/dep", package: "@cardstack/dep" }
+//       ]
+//     },
+//     {
+//       name: "dep",
+//       volumeName: "dep-modules",
+//       links: []
+//     },
+//     {
+//       name: "@cardstack/dep",
+//       volumeName: "cardstack-dep-modules",
+//       links: []
+//     }
+// ]);
 
 
 function symlinkPackages(packages) {
@@ -54,15 +54,22 @@ function symlinkPackages(packages) {
 
   let ln = spawn('docker', docker_command, { stdio: 'inherit' });
 
-  ln.on('exit', function(code) {
-    console.log('exit code:', code);
-    let inspect_command = [
-        'docker',
-        ...docker_setup,
-        '-it',
-        'cardstack/hub',
-        'sh'].join(' ');
-    console.log('inspect: ', inspect_command);
+  return new Promise(function(resolve, reject) {
+    ln.on('error', reject);
+    ln.on('exit', function(code) {
+      let inspect_command = [
+          'docker',
+          ...docker_setup,
+          '-it',
+          'cardstack/hub',
+          'sh'].join(' ');
+      console.log('inspect linking results:', inspect_command);
+      if (code === 0) {
+        resolve();
+      } else {
+        reject(code);
+      }
+    });
   });
 
   /*
