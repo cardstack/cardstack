@@ -26,7 +26,6 @@ module.exports = symlinkPackages;
 //     }
 // ]);
 
-
 function symlinkPackages(packages) {
   let volumes = flatten(packages.map(function(p) {
     return ['--mount', `type=volume,src=${p.volumeName},dst=/packages/${p.name}/node_modules`];
@@ -71,30 +70,4 @@ function symlinkPackages(packages) {
       }
     });
   });
-
-  /*
-  let absolute_path = path.resolve(packagePath);
-
-  let command_setup = ['run',
-      '--rm',
-      '--mount', `type=volume,src=cardstack-yarn-cache,dst=${getCacheDir()}`,
-      '--mount', `type=bind,src=${absolute_path},dst=/package`,
-      '--mount', `type=volume,src=${volumeName},dst=/package/node_modules`,
-      '--workdir', '/package',
-      'cardstack/hub'
-  ];
-
-  let install = spawn('docker', command_setup.concat('yarn', 'install', '--ignore-engines', '--pure-lockfile'), { stdio: 'inherit' });
-
-  return new Promise(function(resolve, reject) {
-    install.on('exit', function(code) {
-      console.log('exit code:', code);
-      if (code === 0) {
-        resolve();
-      } else {
-        reject(code);
-      }
-    });
-  });
-  */
 }
