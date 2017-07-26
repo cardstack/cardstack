@@ -8,6 +8,14 @@ const {
 
 module.exports = getPackageList;
 
+// [{
+//     name: "@cardstack/models",
+//     path: "/Users/aaron/dev/cardstack/packages/models",
+//     links: [
+//       { name: "@cardstack/hub", package: "@cardstack/hub" },
+//       { name: "@cardstack/hub2", package: "@cardstack/hub" }
+//     ]
+// }]
 function getPackageList(rootPackagePath) {
 
   // Map {
@@ -22,7 +30,7 @@ function getPackageList(rootPackagePath) {
   //   "/Users/aaron/dev/cardstack/packages/models",
   //   "/Users/aaron/dev/cardstack/packages/hub"
   // ]
-  let linkedPaths = _(Array.from(moduleLinkings.values())).flatten().map(l => l.path).uniq().value();
+  let linkedPaths = _(Array.from(moduleLinkings.values())).flatten().map(l => l.path).uniq().value().concat(rootPackagePath);
 
   // [
   //   { name: "@cardstack/models", path: "/Users/aaron/dev/cardstack/packages/models" },
@@ -36,6 +44,7 @@ function getPackageList(rootPackagePath) {
   // [{
   //     name: "@cardstack/models",
   //     path: "/Users/aaron/dev/cardstack/packages/models",
+  //     volumeName: "cardstack-models-node_modules",
   //     links: [
   //       { name: "@cardstack/hub", package: "@cardstack/hub" },
   //       { name: "@cardstack/hub2", package: "@cardstack/hub" }
@@ -50,9 +59,11 @@ function getPackageList(rootPackagePath) {
 function stitchPackages(modules, pathResolver) {
   let result = [];
   for (let [path, links] of modules) {
+    let name = pathResolver.get(path);
     result.push({
       path,
-      name: pathResolver.get(path),
+      name,
+      volumeName: name.replace('@', '').replace('/', '-') + "-node_modules",
       links: links.map(({name, path}) => { return { name, package: pathResolver.get(path) }; })
     });
   }
