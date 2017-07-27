@@ -33,11 +33,22 @@ function commandLineOptions() {
   commander.seedConfigDirectory = path.resolve(commander.args[0]);
 
   let base64Key = process.env.CARDSTACK_SESSIONS_KEY;
-  if (!base64Key) {
-    process.stderr.write("You must provide CARDSTACK_SESSIONS_KEY environment variable. You can generate one by running @cardstack/hub/bin/generate-key.js\n");
+  let base64KeyPath = process.env.CARDSTACK_SESSIONS_KEY_FILE;
+  if (base64Key) {
+    commander.sessionsKey = new Buffer(base64Key, 'base64');
+  } else if (base64KeyPath) {
+    try {
+      base64Key = fs.readFileSync(base64KeyPath, 'utf8');
+    } catch (e) {
+      process.stderr.write(`Could not read the file specified by CARDSTACK_SESSIONS_KEY_FILE (${base64KeyPath}).\n`);
+      process.exit(1);
+    }
+    commander.sessionsKey = new Buffer(base64Key, 'base64');
+  } else {
+    process.stderr.write("You must provide a CardStack session encryption secret, via the CARDSTACK_SESSIONS_KEY or CARDSTACK_SESSIONS_KEY_FILE environment variables. You can generate one by running @cardstack/hub/bin/generate-key.js\n");
     process.exit(-1);
   }
-  commander.sessionsKey = new Buffer(base64Key, 'base64');
+
   return commander;
 }
 
