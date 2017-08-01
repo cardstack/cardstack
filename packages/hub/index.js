@@ -127,7 +127,7 @@ module.exports = {
 
   includedCommands() {
     return {
-      'hub:build': require('./hub-build')
+      'hub:start': require('./hub-start')
     };
   },
 
