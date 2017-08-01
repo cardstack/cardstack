@@ -1,6 +1,6 @@
 {
   "name": "@cardstack/drupal",
-  "version": "0.2.2-alpha.0",
+  "version": "0.2.2-alpha.1",
   "description": "Drupal data source plugin for @cardstack/hub.",
   "repository": "https://github.com/cardstack/cardstack",
   "author": "Edward Faulkner <edward@eaf4.com>",
@@ -9,7 +9,7 @@
     "node": ">= 7.7"
   },
   "devDependencies": {
-    "@cardstack/eslint-config": "^0.2.2-alpha.0"
+    "@cardstack/eslint-config": "0.2.2-alpha.1"
   },
   "keywords": [
     "cardstack-plugin",
