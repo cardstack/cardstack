@@ -1,0 +1,28 @@
+{
+  "name": "@cardstack/postgresql",
+  "version": "0.2.2-alpha.1",
+  "description": "PostgreSQL data source plugin for @cardstack/hub.",
+  "repository": "https://github.com/cardstack/cardstack",
+  "author": "Edward Faulkner <edward@eaf4.com>",
+  "license": "MIT",
+  "engines": {
+    "node": ">= 7.7"
+  },
+  "devDependencies": {
+    "@cardstack/eslint-config": "0.2.2-alpha.1",
+    "@cardstack/test-support": "0.2.2-alpha.1"
+  },
+  "dependencies": {
+    "@cardstack/plugin-utils": "0.2.2-alpha.1",
+    "pg": "^7.0.2"
+  },
+  "keywords": [
+    "cardstack-plugin"
+  ],
+  "cardstack-plugin": {
+    "api-version": 1
+  },
+  "scripts": {
+    "test": "mocha ../test-support/bin/run.js"
+  }
+}
