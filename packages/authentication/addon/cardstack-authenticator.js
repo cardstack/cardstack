@@ -22,10 +22,9 @@ export default Base.extend({
         authenticationSource = localStorage.getItem('cardstack-authentication-source');
 
       if ( !validSession && secret && authenticationSource ) {
-        reject();
-        this.get('session').authenticate('authenticator:cardstack', authenticationSource, { secret });
         localStorage.removeItem('cardstack-secret-token'),
         localStorage.removeItem('cardstack-authentication-source');
+        this.authenticate( authenticationSource, { secret }).then(resolve, reject);
       } else if ( validSession || partialSession ) {
         resolve(rawSession);
       } else {

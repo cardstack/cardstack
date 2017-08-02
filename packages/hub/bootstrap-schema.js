@@ -76,7 +76,9 @@ const models = [
           { type: 'fields', id: 'may-create-resource' },
           { type: 'fields', id: 'may-update-resource' },
           { type: 'fields', id: 'may-delete-resource' },
-          { type: 'fields', id: 'may-write-field' }
+          { type: 'fields', id: 'may-write-field' },
+          { type: 'fields', id: 'types' },
+          { type: 'fields', id: 'fields' }
         ]
       }
     }
@@ -219,6 +221,13 @@ const models = [
     id: 'type',
     attributes: {
       'field-type': '@cardstack/core-types::type'
+    }
+  },
+  {
+    type: 'fields',
+    id: 'types',
+    attributes: {
+      'field-type': '@cardstack/core-types::has-many'
     }
   },
   {
