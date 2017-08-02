@@ -301,15 +301,23 @@ class Updater {
     // as a cardstack/core-types::string).
     case 'integer':
       return '@cardstack/core-types::integer';
+
+    case 'boolean':
+      return '@cardstack/core-types::boolean';
     }
   }
 
   _convertValue(pgValue, fieldType) {
     switch(fieldType) {
     case '@cardstack/core-types::string':
+    case '@cardstack/core-types::boolean':
       return pgValue;
     case '@cardstack/core-types::integer':
-      return parseInt(pgValue, 10);
+      if (pgValue == null) {
+        return null;
+      } else {
+        return parseInt(pgValue, 10);
+      }
     }
   }
 

@@ -15,8 +15,8 @@ describe('postgresql/indexer', function() {
 
     client = new Client({ database: 'test1' });
     await client.connect();
-    await client.query('create table articles (id varchar primary key, title varchar, length integer)');
-    await client.query('insert into articles values ($1, $2, $3)', ['0', 'hello world', 100]);
+    await client.query('create table articles (id varchar primary key, title varchar, length integer, published boolean)');
+    await client.query('insert into articles values ($1, $2, $3, $4)', ['0', 'hello world', 100, true]);
 
     let factory = new JSONAPIFactory();
 
@@ -132,6 +132,27 @@ describe('postgresql/indexer', function() {
   it('can read an integer column', async function() {
     let model = await env.lookup('hub:searchers').get('master', 'articles', '0');
     expect(model).has.deep.property('attributes.length', 100);
+  });
+
+  it('can read a boolean column', async function() {
+    await client.query('insert into articles (id, published) values ($1, $2)', ['1', false]);
+    await env.lookup('hub:indexers').update({ realTime: true });
+    let model = await env.lookup('hub:searchers').get('master', 'articles', '1');
+    expect(model).has.deep.property('attributes.published', false);
+  });
+
+  it('can read null string', async function() {
+    await client.query('insert into articles (id) values ($1)', ['1']);
+    await env.lookup('hub:indexers').update({ realTime: true });
+    let model = await env.lookup('hub:searchers').get('master', 'articles', '1');
+    expect(model).has.deep.property('attributes.title', null);
+  });
+
+  it('can read null integer', async function() {
+    await client.query('insert into articles (id) values ($1)', ['1']);
+    await env.lookup('hub:indexers').update({ realTime: true });
+    let model = await env.lookup('hub:searchers').get('master', 'articles', '1');
+    expect(model).has.deep.property('attributes.length', null);
   });
 
 
