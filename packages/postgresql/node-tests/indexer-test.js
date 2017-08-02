@@ -15,13 +15,13 @@ describe('postgresql/indexer', function() {
 
     client = new Client({ database: 'test1' });
     await client.connect();
-    await client.query('create table articles (id varchar, title varchar)');
+    await client.query('create table articles (id varchar primary key, title varchar)');
     await client.query('insert into articles values ($1, $2)', ['0', 'hello world']);
 
     let factory = new JSONAPIFactory();
 
     factory.addResource('plugin-configs').withAttributes({
-      module: '@cardstack/git'
+      module: '@cardstack/postgresql'
     });
 
     factory.addResource('data-sources')
@@ -37,7 +37,7 @@ describe('postgresql/indexer', function() {
       });
 
 
-    env = await createDefaultEnvironment(`${__dirname}/..`);
+    env = await createDefaultEnvironment(`${__dirname}/..`, factory.getModels());
 
     await env.lookup('hub:indexers').update({ realTime: true });
   });
@@ -45,6 +45,7 @@ describe('postgresql/indexer', function() {
   afterEach(async function() {
     await destroyDefaultEnvironment(env);
     await client.end();
+    await pgClient.query(`select pg_drop_replication_slot(slot_name) from pg_replication_slots;`);
     await pgClient.query(`drop database test1`);
     await pgClient.end();
   });
@@ -58,7 +59,43 @@ describe('postgresql/indexer', function() {
   it('discovers content types', async function() {
     let model = await env.lookup('hub:searchers').get('master', 'content-types', 'articles');
     expect(model).is.ok;
+    expect(model).has.deep.property('relationships.fields.data');
+    expect(model.relationships.fields.data).collectionContains({ id: 'title' });
+    expect(model.relationships.fields.data).not.collectionContains({ id: 'id' });
   });
 
+  it('discovers initial records', async function() {
+    let model = await env.lookup('hub:searchers').get('master', 'articles', '0');
+    expect(model).is.ok;
+    expect(model).has.deep.property('attributes.title', 'hello world');
+  });
+
+  it('discovers new records', async function() {
+    await client.query('insert into articles values ($1, $2)', ['1', 'second article']);
+    await env.lookup('hub:indexers').update({ realTime: true });
+    let model = await env.lookup('hub:searchers').get('master', 'articles', '1');
+    expect(model).is.ok;
+    expect(model).has.deep.property('attributes.title', 'second article');
+  });
+
+
+  it('updates records', async function() {
+    await client.query('update articles set title=$1 where id=$2', ['I was updated', '0']);
+    await env.lookup('hub:indexers').update({ realTime: true });
+    let model = await env.lookup('hub:searchers').get('master', 'articles', '0');
+    expect(model).is.ok;
+    expect(model).has.deep.property('attributes.title', 'I was updated');
+  });
+
+  it('deletes records', async function() {
+    await client.query('delete from articles where id=$1', ['0']);
+    await env.lookup('hub:indexers').update({ realTime: true });
+    try {
+      await env.lookup('hub:searchers').get('master', 'articles', '0');
+      throw new Error("should not get here");
+    } catch (err) {
+      expect(err.status).to.equal(404);
+    }
+  });
 
 });
