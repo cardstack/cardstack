@@ -307,17 +307,14 @@ class Updater {
     }
   }
 
+  // This doesn't need to do much yet because we only support the
+  // simplest types. But other types will need to do more here.
   _convertValue(pgValue, fieldType) {
     switch(fieldType) {
     case '@cardstack/core-types::string':
     case '@cardstack/core-types::boolean':
-      return pgValue;
     case '@cardstack/core-types::integer':
-      if (pgValue == null) {
-        return null;
-      } else {
-        return parseInt(pgValue, 10);
-      }
+      return pgValue;
     }
   }
 
