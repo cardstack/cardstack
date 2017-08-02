@@ -34,5 +34,15 @@ module.exports = class DataSource {
     }
     return this._searcher;
   }
-
+  async teardown() {
+    if (this._writer && typeof this._writer.teardown === 'function') {
+      await this._writer.teardown();
+    }
+    if (this._indexer && typeof this._indexer.teardown === 'function') {
+      await this._indexer.teardown();
+    }
+    if (this._searcher && typeof this._searcher.teardown === 'function') {
+      await this._searcher.teardown();
+    }
+  }
 };

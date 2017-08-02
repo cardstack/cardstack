@@ -20,6 +20,12 @@ class Schema {
     this.schemaLoader = schemaLoader;
   }
 
+  async teardown() {
+    for (let source of this.dataSources.values()) {
+      await source.teardown();
+    }
+  }
+
   // derives a new schema by adding, updating, or removing one model.
   applyChange(type, id, model) {
     if (!this.schemaLoader.ownTypes().includes(type)) {

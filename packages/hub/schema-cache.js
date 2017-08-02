@@ -31,6 +31,17 @@ class SchemaCache {
     return new this(opts);
   }
 
+  static teardown(instance) {
+    instance.teardown();
+  }
+
+  async teardown() {
+    for (let schemaPromise of this.cache.values()) {
+      let schema = await schemaPromise;
+      await schema.teardown();
+    }
+  }
+
   constructor({ seedModels, schemaLoader }) {
     this.seedModels = bootstrapSchema.concat(seedModels || []);
     this.searcher = new Searcher();
@@ -95,7 +106,9 @@ class SchemaCache {
     if (!(schema instanceof Schema)) {
       throw new Error("Bug: notifyBranchUpdate got a non-schema");
     }
-    if (this.cache.get(branch) === branchUpdateToken.key) {
+    let cached = this.cache.get(branch);
+    if (cached === branchUpdateToken.key) {
+      cached.then(schema => schema.teardown());
       this.log.debug("full schema update on branch %s", branch);
       this.cache.set(branch, Promise.resolve(schema));
     } else {
