@@ -7,6 +7,7 @@ This plugin allows you to use a PostgreSQL database as storage for your Cardstac
 There's not yet any configuration for choosing which tables & columns will be included or how to rename them for use within the Hub. Therefore:
  - every table must have an `id` column and that column must be marked in PostgreSQL as the primary key.
  - you may not have a `type` column (your JSONAPI type comes from the table name)
+ - your column names must be globally unique throughout the Hub (this is always a requirement for Fields in the hub, and your column names are mapping one-to-one with fields)
 
 # Required database configuration
 

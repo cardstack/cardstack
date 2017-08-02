@@ -189,7 +189,7 @@ class Updater {
         }
         let result = await this.query(`SELECT * from ${schema}.${table} where id = any($1)`, [ rest.map(({id}) => id) ]);
         for (let row of result.rows) {
-          await ops.save(type, row.id, this._toDocument(type, result.fields, row));
+          await ops.save(type, row.id, await this._toDocument(type, row));
         }
       }
     }
@@ -215,20 +215,21 @@ class Updater {
   async _fullUpdateType(type, ops) {
     let result = await this.query(`select * from ${type}`);
     for (let row of result.rows) {
-      await ops.save(type, row.id, this._toDocument(type, result.fields, row));
+      await ops.save(type, row.id, await this._toDocument(type, row));
     }
   }
 
-  _toDocument(type, fields, row) {
+  async _toDocument(type, row) {
+    let schema = await this.schema();
+    let contentType = schema.find(m => m.type === 'content-types' && m.id === type);
+    let fields = contentType.relationships.fields.data.map(ref => schema.find(m => m.type === ref.type && m.id === ref.id));
     let doc = {
       id: row.id,
       type,
       attributes: {}
     };
     for (let field of fields) {
-      if (field.name !== 'id' && field.name !== 'type') {
-        doc.attributes[field.name] = row[field.name];
-      }
+      doc.attributes[field.id] = this._convertValue(row[field.id], field.attributes['field-type']);
     }
     return doc;
   }
@@ -293,7 +294,24 @@ class Updater {
     switch(pgType) {
     case 'character varying':
       return '@cardstack/core-types::string';
+
+    // A postgres integer is 32 bits, which always fits into a safe
+    // javascript integer. The same cannot be said for bigint -- we
+    // will need to do something different for that (probably treat it
+    // as a cardstack/core-types::string).
+    case 'integer':
+      return '@cardstack/core-types::integer';
     }
   }
+
+  _convertValue(pgValue, fieldType) {
+    switch(fieldType) {
+    case '@cardstack/core-types::string':
+      return pgValue;
+    case '@cardstack/core-types::integer':
+      return parseInt(pgValue, 10);
+    }
+  }
+
 
 }

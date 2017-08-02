@@ -15,8 +15,8 @@ describe('postgresql/indexer', function() {
 
     client = new Client({ database: 'test1' });
     await client.connect();
-    await client.query('create table articles (id varchar primary key, title varchar)');
-    await client.query('insert into articles values ($1, $2)', ['0', 'hello world']);
+    await client.query('create table articles (id varchar primary key, title varchar, length integer)');
+    await client.query('insert into articles values ($1, $2, $3)', ['0', 'hello world', 100]);
 
     let factory = new JSONAPIFactory();
 
@@ -97,5 +97,42 @@ describe('postgresql/indexer', function() {
       expect(err.status).to.equal(404);
     }
   });
+
+  it('discovers newly added content type', async function() {
+    await client.query('create table humans (id varchar primary key, name varchar)');
+    await env.lookup('hub:indexers').update({ realTime: true });
+    let model = await env.lookup('hub:searchers').get('master', 'content-types', 'humans');
+    expect(model).is.ok;
+    expect(model).has.deep.property('relationships.fields.data');
+    expect(model.relationships.fields.data).collectionContains({ id: 'name' });
+  });
+
+  it('removes deleted content type', async function() {
+    await client.query('drop table articles');
+    await env.lookup('hub:indexers').update({ realTime: true });
+    try {
+      await env.lookup('hub:searchers').get('master', 'content-types', 'articles');
+      throw new Error("should not get here");
+    } catch (err) {
+      expect(err.status).to.equal(404);
+    }
+  });
+
+  it('discovers newly added column', async function() {
+    await client.query('alter table articles add column author varchar');
+    await client.query('update articles set author=$1 where id=$2', ['Arthur', '0']);
+    await env.lookup('hub:indexers').update({ realTime: true });
+    let model = await env.lookup('hub:searchers').get('master', 'content-types', 'articles');
+    expect(model).has.deep.property('relationships.fields.data');
+    expect(model.relationships.fields.data).collectionContains({ id: 'author' });
+    model = await env.lookup('hub:searchers').get('master', 'articles', '0');
+    expect(model).has.deep.property('attributes.author', 'Arthur');
+  });
+
+  it('can read an integer column', async function() {
+    let model = await env.lookup('hub:searchers').get('master', 'articles', '0');
+    expect(model).has.deep.property('attributes.length', 100);
+  });
+
 
 });
