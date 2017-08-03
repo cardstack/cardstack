@@ -1,44 +1,40 @@
 const getPackageList = require('./list-linked-packages');
-const { createInstalledVolumeFor, getCacheDir } = require('./initialize-module-dirs');
-const linkPackages = require ('./symlink-packages');
+const ensureVolumes = require('./ensure-volumes');
+const yarnInstall = require('./initialize-module-dirs');
+const { linkUpPackages } = require ('./yarn-link-packages');
 const runElasticsearch = require('./create-elasticsearch-service');
 const runHub = require('./create-hub-service');
 
 const DO_YARN_INSTALL = true;
-const DO_LINKING      = true;
+const DO_LINKING      = false;
 
-module.exports = function runHubForProject(rootProjectPath) {
+runHubForProject('/Users/aaron/dev/cardstack/packages/models');
+
+module.exports = runHubForProject;
+
+async function runHubForProject(rootProjectPath) {
   let packages = getPackageList(rootProjectPath);
 
-  let p = Promise.resolve();
+  try {
+    await ensureVolumes(packages);
 
-
-  if (DO_YARN_INSTALL) {
-    let p = volumeForPackageAtIndex(packages, 0);
-    for (let i = 1; i < packages.length; i++) {
-      p = p.then(() => volumeForPackageAtIndex(packages, i));
+    if (DO_LINKING) {
+      await linkUpPackages(packages);
     }
+
+    if (DO_YARN_INSTALL) {
+      for (let p of packages) {
+        let { path, volumeName } = p;
+        await yarnInstall(path, volumeName);
+      }
+    }
+
+    return;
+
+    await runElasticsearch();
+    await runHub(packages);
+    console.log("We're good :)");
+  } catch(err) {
+    console.error("Error starting hub & plugins", err);
   }
-
-  if (DO_LINKING) {
-    p = p.then(function() {
-      return linkPackages(packages);
-    });
-  }
-
-  return p.then(function() {
-    return runElasticsearch();
-  })
-  .then(function() {
-    return runHub(packages);
-  })
-  .catch(function(code) {
-    console.error("Error starting up the hub & plugins :(");
-  });
-}
-
-
-function volumeForPackageAtIndex(packages, index) {
-  let { path, volumeName } = packages[index];
-  return createInstalledVolumeFor(path, volumeName);
 }

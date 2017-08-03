@@ -1,19 +1,17 @@
 const { spawn, execSync } = require('child_process');
 const path = require('path');
 
-module.exports = {
-  createInstalledVolumeFor,
-  getCacheDir
-};
+const { CONTAINER_YARN_LINK_DIR } = require('./yarn-link-packages');
+
+module.exports = createInstalledVolumeFor;
 
 function createInstalledVolumeFor(packagePath, volumeName) {
-
-  let absolute_path = path.resolve(packagePath);
 
   let command_setup = ['run',
       '--rm',
       '--mount', `type=volume,src=cardstack-yarn-cache,dst=${getCacheDir()}`,
-      '--mount', `type=bind,src=${absolute_path},dst=/package`,
+      '--mount', `type=volume,src=cardstack-yarn-link-dir,dst=${CONTAINER_YARN_LINK_DIR}`,
+      '--mount', `type=bind,src=${packagePath},dst=/package`,
       '--mount', `type=volume,src=${volumeName},dst=/package/node_modules`,
       '--workdir', '/package',
       'cardstack/hub'
