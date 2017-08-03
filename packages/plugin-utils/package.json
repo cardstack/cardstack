@@ -11,6 +11,6 @@
     "denodeify": "^1.2.1"
   },
   "dependencies": {
-    "debug": "^2.6.3"
+    "ms": "2.0.0"
   }
 }
