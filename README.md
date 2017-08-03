@@ -9,11 +9,10 @@ This is a monorepo. Each directory under `packages` is intended to be distribute
 In development, we use `lerna` to manage their inter-dependencies. To get started:
 
  1. Install node >= 7.
- 2. Install yarn.
- 3. `yarn global add lerna`
+ 2. Install yarn >= 0.28 (earlier versions work but will not benefit from [Workspaces](https://yarnpkg.com/blog/2017/08/02/introducing-workspaces/).
+ 3. `yarn global add lerna` (use >= 2.0.0 for yarn workspaces integration)
  4. `lerna bootstrap` 
 
-You may be tempted to use `lerna bootstrap --hoist` to get a faster install. But this unfortunately causes lerna to ignore your yarn.lock files, and ember-cli doesn't like the resulting hoisted dependencies.
 
 Building native nodegit dep on osx
 --------------------------------

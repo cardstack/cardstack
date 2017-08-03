@@ -19,5 +19,7 @@
     "server": "node packages/hub/bin/server.js"
   },
   "dependencies": {
-  }
+  },
+  "workspaces": ["packages/*"],
+  "private": true
 }
