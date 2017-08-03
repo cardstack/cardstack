@@ -7,6 +7,7 @@ function createElasticsearchService() {
   let service = spawn('docker', [
       'service', 'create',
       '--detach=false',
+      '--label', 'io.cardstack.hub',
       '--name', 'elasticsearch',
       '--network', 'thing',
       'cardstack/elasticsearch'

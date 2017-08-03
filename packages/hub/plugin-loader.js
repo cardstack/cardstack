@@ -24,7 +24,8 @@ const featureTypes = [
   'authenticators',
   'middleware',
   'messengers',
-  'code-generators'
+  'code-generators',
+  'docker-services'
 ];
 const javascriptPattern = /(.*)\.js$/;
 const TOP_FEATURE = {};

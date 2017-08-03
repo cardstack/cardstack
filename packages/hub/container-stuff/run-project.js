@@ -1,11 +1,11 @@
 const getPackageList = require('./list-linked-packages');
 const { createInstalledVolumeFor, getCacheDir } = require('./initialize-module-dirs');
-const symlinkPackages = require ('./symlink-packages');
+const linkPackages = require ('./symlink-packages');
 const runElasticsearch = require('./create-elasticsearch-service');
 const runHub = require('./create-hub-service');
 
-const DO_YARN_INSTALL = false;
-const DO_LINKING      = false;
+const DO_YARN_INSTALL = true;
+const DO_LINKING      = true;
 
 module.exports = function runHubForProject(rootProjectPath) {
   let packages = getPackageList(rootProjectPath);
@@ -22,7 +22,7 @@ module.exports = function runHubForProject(rootProjectPath) {
 
   if (DO_LINKING) {
     p = p.then(function() {
-      return symlinkPackages(packages);
+      return linkPackages(packages);
     });
   }
 

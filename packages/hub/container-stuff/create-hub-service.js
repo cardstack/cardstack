@@ -20,6 +20,7 @@ function createService(packages) {
       '--env', 'CARDSTACK_SESSIONS_KEY_FILE=/run/secrets/cardstack-session-key',
       '--env', 'ELASTICSEARCH=http://elasticsearch:9200',
       '--name', 'cardstack-hub',
+      '--label', 'io.cardstack.hub',
       '--network', 'thing',
       '--publish', '3000:3000',
       '--workdir', '/packages/@cardstack/models/',

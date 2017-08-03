@@ -14,12 +14,13 @@ let loader = container.lookup('hub:plugin-loader');
 
 let pluginConfigs = loadSeedModels('/Users/aaron/dev/cardstack/packages/models/tests/dummy/cardstack/seeds/development').filter(model => model.type === 'plugin-configs');
 
-async function printWriters() {
+async function printThings() {
   let plugins = await loader.activePlugins(pluginConfigs);
-  console.log("writers:", plugins.listAll('writers'));
+  console.log("middleware:", plugins.listAll('middleware'));
+  console.log("docker services:", plugins.listAll('docker-services'));
 }
 
-printWriters();
+printThings();
 
 
 
