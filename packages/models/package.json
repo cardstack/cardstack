@@ -30,7 +30,7 @@
     "ember-cli-babel": "^6.3.0"
   },
   "devDependencies": {
-    "cardstack-nginx-stub": "*",
+    "cardstack-nginx-stub": "link:~/dev/cardstack-nginx-hub",
     "@cardstack/ephemeral": "^0.2.1",
     "@cardstack/eslint-config": "^0.2.1",
     "@cardstack/jsonapi": "^0.2.1",
