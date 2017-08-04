@@ -17,7 +17,7 @@ function createInstalledVolumeFor(packagePath, volumeName) {
       'cardstack/hub'
   ];
 
-  let install = spawn('docker', command_setup.concat('yarn', 'install', '--ignore-engines', '--pure-lockfile', '--prefer-offline'), { stdio: 'inherit' });
+  let install = spawn('docker', command_setup.concat('yarn', 'install', '--ignore-engines', '--pure-lockfile'), { stdio: 'inherit' });
 
   return new Promise(function(resolve, reject) {
     install.on('exit', function(code) {

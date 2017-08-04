@@ -25,7 +25,9 @@ function createService(packages) {
       '--publish', '3000:3000',
       '--workdir', '/packages/@cardstack/models/',
       'cardstack/hub',
-      'node', '/packages/@cardstack/hub/bin/server.js', '-d', '/packages/@cardstack/models/tests/dummy/cardstack/seeds/development'
+      'sleep', '3600'
+      //'node', '/packages/@cardstack/hub/bin/server.js', '-d', '/packages/@cardstack/models/tests/dummy/cardstack/seeds/development'
+      // 'node /packages/@cardstack/hub/bin/server.js -d /packages/@cardstack/models/tests/dummy/cardstack/seeds/development'
   ], { stdio: 'inherit' });
 
   return new Promise(function(resolve, reject) {
