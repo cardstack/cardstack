@@ -7,13 +7,33 @@ module.exports = declareInjections({
 },
 
 class Messengers {
+  constructor() {
+    this.messengerCache = {};
+  }
+
   async send(sinkId, message) {
-    let sink = await this.searchers.get(this.schemaCache.controllingBranch, 'message-sinks', sinkId);
-    if (!sink) {
-      throw new Error(`Tried to send a message to message sink ${sinkId} but it does not exist`, { status: 500 });
+    let messenger = await this.getMessenger(sinkId);
+
+    return await messenger.send(message);
+  }
+
+  async getMessenger(sinkId) {
+    if (this.messengerCache[sinkId]) {
+      return this.messengerCache[sinkId];
+    } else {
+      let sink = await this.searchers.get(this.schemaCache.controllingBranch, 'message-sinks', sinkId);
+
+      if (!sink) {
+        throw new Error(`Tried to send a message to message sink ${sinkId} but it does not exist`, { status: 500 });
+      }
+
+      let schema = await this.schemaCache.schemaForControllingBranch();
+      let Plugin = schema.plugins.lookupFeatureFactoryAndAssert('messengers', sink.attributes['messenger-type']);
+      let messenger = Plugin.create(Object.assign({ sinkId },  sink.attributes.params));
+
+      this.messengerCache[sinkId] = messenger;
+
+      return messenger;
     }
-    let schema = await this.schemaCache.schemaForControllingBranch();
-    let plugin = schema.plugins.lookupFeatureAndAssert('messengers', sink.attributes['messenger-type']);
-    return await plugin.send(message, sink.attributes.params);
   }
 });

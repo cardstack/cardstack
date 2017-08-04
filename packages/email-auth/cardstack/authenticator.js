@@ -1,5 +1,6 @@
 const Error = require('@cardstack/plugin-utils/error');
 const { declareInjections } = require('@cardstack/di');
+const Handlebars = require('handlebars');
 
 module.exports = declareInjections({
   encryptor: 'hub:encryptor',
@@ -7,7 +8,7 @@ module.exports = declareInjections({
 },
 
 class {
-  async authenticate({ email, referer, secret }, { messageSinkId }, userSearcher) {
+  async authenticate({ email, referer, secret }, { messageSinkId, subject, from, textTemplate, htmlTemplate }, userSearcher) {
     if (email) {
       let { models } = await userSearcher.search({
         filter: {
@@ -25,11 +26,26 @@ class {
         let validSeconds = 60*60;
         let validUntil = Math.floor(Date.now()/1000 + validSeconds);
         let token = encodeURIComponent(this.encryptor.encryptAndSign([models[0].id, validUntil]));
+        let linkHref = `${referer}/@cardstack/email-auth/redirect.html?secret=${token}`;
+
+        let text, html;
+
+        if (textTemplate) {
+          text = renderHbs(textTemplate, { linkHref });
+        } else {
+          text = `Here's your link: ${linkHref}`;
+        }
+
+        if (htmlTemplate) {
+          html = renderHbs(htmlTemplate, { linkHref });
+        }
 
         await this.messengers.send(messageSinkId, {
           to: email,
-          subject: 'Your Login Link',
-          body: `Here's your link: ${referer}/@cardstack/email-auth/redirect.html?secret=${token} `
+          subject,
+          from,
+          text,
+          html
         });
         return {
           partialSession: {
@@ -67,3 +83,8 @@ class {
     }
   }
 });
+
+function renderHbs(template, context) {
+  let compiled = Handlebars.compile(template);
+  return compiled(context);
+}

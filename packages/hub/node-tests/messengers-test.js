@@ -41,7 +41,7 @@ describe('hub/messengers', function() {
     expect(sentMessages).has.length(1);
     expect(sentMessages[0]).deep.equals({
       message: { subject: 'it works' },
-      params: { theSecret: 42 }
+      params: { theSecret: 42, sinkId: "the-sink" }
     });
   });
 

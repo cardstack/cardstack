@@ -1,6 +1,6 @@
 {
   "name": "@cardstack/routing",
-  "version": "0.2.1",
+  "version": "0.2.2-alpha.1",
   "description": "The default blueprint for ember-cli addons.",
   "keywords": [
     "ember-addon"
@@ -18,7 +18,7 @@
     "test": "ember try:each"
   },
   "dependencies": {
-    "@cardstack/tools": "^0.2.1",
+    "@cardstack/tools": "0.2.2-alpha.1",
     "ember-cli-babel": "^5.2.4",
     "ember-cli-htmlbars": "^1.1.1",
     "ember-data": "^2.12.1",
