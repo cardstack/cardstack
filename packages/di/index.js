@@ -110,18 +110,20 @@ class Resolver {
         throw new Error(`Failed to locate hub because config:project does not contain a "path"`);
       }
       try  {
-        this._hubPath = path.dirname(resolve.sync(`@cardstack/hub`, { basedir: project.path }));
+        let p = require(project.path + '/package.json');
+        let deps = Object.keys(p.dependencies || {}).concat(Object.keys(p.devDependencies || {}));
+        if (deps.includes('@cardstack/hub')) {
+          this._hubPath = path.dirname(resolve.sync(`@cardstack/hub`, { basedir: project.path }));
+        } else if (deps.includes('@cardstack/test-support')) {
+          let testSupport = path.dirname(resolve.sync(`@cardstack/test-support`, { basedir: project.path }));
+          this._hubPath = path.dirname(resolve.sync(`@cardstack/hub`, { basedir: testSupport }));
+        } else {
+          throw new Error(`${project.path} does not depend on the hub or test-support`);
+        }
       } catch (err) {
         if (!/Cannot find module/i.test(err)) {
           throw err;
-        }
-        try {
-          let testSupport = path.dirname(resolve.sync(`@cardstack/test-support`, { basedir: project.path }));
-          this._hubPath = path.dirname(resolve.sync(`@cardstack/hub`, { basedir: testSupport }));
-        } catch (err) {
-          if (!/Cannot find module/i.test(err)) {
-            throw err;
-          }
+        } else {
           throw new Error(`Failed to locate hub relative to ${project.path}`);
         }
       }
