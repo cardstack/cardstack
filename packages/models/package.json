@@ -31,6 +31,7 @@
   },
   "devDependencies": {
     "cardstack-nginx-stub": "link:~/dev/cardstack-nginx-hub",
+    "@cardstack/test-support": "0.2.2-alpha.1",
     "@cardstack/ephemeral": "0.2.2-alpha.1",
     "@cardstack/eslint-config": "0.2.2-alpha.1",
     "@cardstack/jsonapi": "0.2.2-alpha.1",

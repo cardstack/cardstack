@@ -254,7 +254,6 @@ class ActivePlugins {
   }
 
   _lookupFeatureAndAssert(featureType, fullyQualifiedName)  {
-    process.exit(2);
     if (fullyQualifiedName === "@cardstack/core-types::boolean") {
       console.log("HEY");
     }
