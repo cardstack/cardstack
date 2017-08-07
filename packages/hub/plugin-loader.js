@@ -254,9 +254,6 @@ class ActivePlugins {
   }
 
   _lookupFeatureAndAssert(featureType, fullyQualifiedName)  {
-    if (fullyQualifiedName === "@cardstack/core-types::boolean") {
-      console.log("HEY");
-    }
     let [moduleName, featureName] = fullyQualifiedName.split('::');
     let config = this.configs.get(moduleName);
     let plugin = this.installedPlugins.find(p => p.name === moduleName);

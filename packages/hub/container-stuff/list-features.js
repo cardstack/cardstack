@@ -16,8 +16,10 @@ let pluginConfigs = loadSeedModels('/Users/aaron/dev/cardstack/packages/models/t
 
 async function printThings() {
   let plugins = await loader.activePlugins(pluginConfigs);
-  console.log("middleware:", plugins.listAll('middleware'));
-  console.log("docker services:", plugins.listAll('docker-services'));
+  let services = plugins.listAll('docker-services');
+  console.log("docker services:", services);
+  let service_config = plugins.lookupFeature('docker-services', services[0]);
+  console.log('service', service_config);
 }
 
 printThings();

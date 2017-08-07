@@ -36,7 +36,8 @@ exports.Registry = class Registry extends GlimmerRegistry {
     // instantiated anyway for consistency.
     for (let type of [
       'constraint-types',
-      'field-types'
+      'field-types',
+      'docker-services'
     ]) {
       this.registerOption(`plugin-${type}`, 'instantiate', false);
     }
