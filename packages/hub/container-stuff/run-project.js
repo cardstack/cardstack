@@ -4,10 +4,11 @@ const yarnInstall = require('./initialize-module-dirs');
 const { linkUpPackages } = require ('./yarn-link-packages');
 const createService = require('./create-service');
 const runHub = require('./create-hub-service');
+const createPluginServices = require('./create-plugin-services');
 
-const DO_YARN_INSTALL    = false;
-const DO_LINKING         = false;
-const DO_CORE_SERVIES    = false;
+const DO_YARN_INSTALL    = true;
+const DO_LINKING         = true;
+const DO_CORE_SERVIES    = true;
 const DO_PLUGIN_SERVICES = true;
 
 runHubForProject('/Users/aaron/dev/cardstack/packages/models');
@@ -41,7 +42,7 @@ async function runHubForProject(rootProjectPath) {
     }
 
     if (DO_PLUGIN_SERVICES) {
-
+      await createPluginServices();
     }
 
     console.log("We're good :)");
