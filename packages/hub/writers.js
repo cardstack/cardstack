@@ -25,13 +25,19 @@ class Writers extends EventEmitter {
     let writer = this._lookupWriter(schema, type);
     let isSchema = this.schemaTypes.includes(type);
     let pending = await writer.prepareCreate(branch, session, type, document, isSchema);
-    let newSchema = await schema.validate(pending, { type, session });
-    let response = await this._finalizeAndReply(pending);
-    if (newSchema) {
-      this.schemaCache.notifyBranchUpdate(branch, newSchema, token);
+    try {
+      let newSchema = await schema.validate(pending, { type, session });
+      let response = await this._finalizeAndReply(pending);
+      if (newSchema) {
+        this.schemaCache.notifyBranchUpdate(branch, newSchema, token);
+      }
+      this.emit('changed', { branch, type, id: response.id });
+      return response;
+    } finally {
+      // this does nothing if the change was properly finalized
+      // already, and cleans up if it wasn't.
+      await pending.abort();
     }
-    this.emit('changed', { branch, type, id: response.id });
-    return response;
   }
 
   async update(branch, session, type, id, document) {
@@ -41,13 +47,17 @@ class Writers extends EventEmitter {
     let writer = this._lookupWriter(schema, type);
     let isSchema = this.schemaTypes.includes(type);
     let pending = await writer.prepareUpdate(branch, session, type, id, document, isSchema);
-    let newSchema = await schema.validate(pending, { type, id, session });
-    let response = await this._finalizeAndReply(pending);
-    if (newSchema) {
-      this.schemaCache.notifyBranchUpdate(branch, newSchema, token);
+    try {
+      let newSchema = await schema.validate(pending, { type, id, session });
+      let response = await this._finalizeAndReply(pending);
+      if (newSchema) {
+        this.schemaCache.notifyBranchUpdate(branch, newSchema, token);
+      }
+      this.emit('changed', { branch, type, id });
+      return response;
+    } finally {
+      await pending.abort();
     }
-    this.emit('changed', { branch, type, id });
-    return response;
   }
 
   async delete(branch, session, version, type, id) {
@@ -57,12 +67,16 @@ class Writers extends EventEmitter {
     let writer = this._lookupWriter(schema, type);
     let isSchema = this.schemaTypes.includes(type);
     let pending = await writer.prepareDelete(branch, session, version, type, id, isSchema);
-    let newSchema = await schema.validate(pending, { session });
-    await pending.finalize();
-    if (newSchema) {
-      this.schemaCache.notifyBranchUpdate(branch, newSchema, token);
+    try {
+      let newSchema = await schema.validate(pending, { session });
+      await pending.finalize();
+      if (newSchema) {
+        this.schemaCache.notifyBranchUpdate(branch, newSchema, token);
+      }
+      this.emit('changed', { branch, type, id });
+    } finally {
+      await pending.abort();
     }
-    this.emit('changed', { branch, type, id });
   }
 
   async _finalizeAndReply(pending) {
