@@ -51,7 +51,7 @@ module.exports = class Writer {
       await client.query('begin');
       let result = await client.query(`insert into ${tableName} (${columns.join(',')}) values (${placeholders}) returning id`, args);
       let finalDocument = {
-        id: String(result.rows[0].id),
+        id: result.rows[0].id,
         type,
         attributes: document.attributes
       };

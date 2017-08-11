@@ -15,7 +15,8 @@ describe('postgresql/writer', function() {
 
     client = new Client({ database: 'test1' });
     await client.connect();
-    await client.query('create table articles (id serial primary key, title varchar, length integer, published boolean)');
+    await client.query('create sequence article_id_seq');
+    await client.query(`create table articles (id varchar primary key DEFAULT cast(nextval('article_id_seq') as varchar), title varchar, length integer, published boolean)`);
     await client.query('insert into articles values ($1, $2, $3, $4)', ['0', 'hello world', 100, true]);
 
     let factory = new JSONAPIFactory();
