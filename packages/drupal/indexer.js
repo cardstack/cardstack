@@ -21,10 +21,25 @@ module.exports = class Indexer {
 };
 
 class Updater {
-  constructor({ url, authToken}, log) {
+  constructor(config, log) {
+    let {
+      url,
+      authToken,
+      nodeType,
+      fieldConfig,
+      fieldStorageConfig,
+      jsonapiExtrasEnabled,
+      jsonapiResourceConfig
+    } = config;
     this.url = url;
     this.authToken = authToken;
     this.log = log;
+    this.nodeType = nodeType || 'node_type--node_type';
+    this.fieldConfig = fieldConfig || 'field_config--field_config';
+    this.fieldStorageConfig = fieldStorageConfig || 'field_storage_config--field_storage_config';
+    if (jsonapiExtrasEnabled) {
+      this.jsonapiResourceConfig = jsonapiResourceConfig || 'jsonapi_resource_config--jsonapi_resource_config';
+    }
   }
 
   async schema() {
@@ -38,27 +53,34 @@ class Updater {
     let baseURL = this.url + '/api';
     let response = await this._get(baseURL);
     let links = response.body.links;
-    if (!links.contentTypes) {
-      throw new Error(`Found no contentTypes link at ${baseURL}`, {
-        source: { pointer: '/links/contentTypes' }
+    if (!links[this.nodeType]) {
+      throw new Error(`Found no ${this.nodeType} link at ${baseURL}`, {
+        source: { pointer: `/links/${this.nodeType}` }
       });
     }
-    if (!links.fields) {
-      throw new Error(`Found no fields link at ${baseURL}`, {
-        source: { pointer: '/links/fields' }
+    if (!links[this.fieldConfig]) {
+      throw new Error(`Found no ${this.fieldConfig} link at ${baseURL}`, {
+        source: { pointer: `/links/${this.fieldConfig}`}
       });
     }
-    if (!links.fieldStorageConfigs) {
-      throw new Error(`Found no fieldsStorageConfigs link at ${baseURL}`, {
-        source: { pointer: '/links/fieldStorageConfigs' }
+    if (!links[this.fieldStorageConfig]) {
+      throw new Error(`Found no ${this.fieldStorageConfig} link at ${baseURL}`, {
+        source: { pointer: `/links/${this.fieldStorageConfig}` }
       });
     }
-    let [contentTypes, fields, storageConfigs] = await Promise.all([
-      this._getCollection(links.contentTypes),
-      this._getCollection(links.fields),
-      this._getCollection(links.fieldStorageConfigs)
+    if (this.jsonapiResourceConfig && !links[this.jsonapiResourceConfig]) {
+      throw new Error(`Found no ${this.jsonapiResourceConfig} link at ${baseURL}`, {
+        source: { pointer: `/links/${this.jsonapiResourceConfig}` }
+      });
+    }
+
+    let [contentTypes, fields, storageConfigs, resourceConfigs] = await Promise.all([
+      this._getCollection(links[this.nodeType]),
+      this._getCollection(links[this.fieldConfig]),
+      this._getCollection(links[this.fieldStorageConfig]),
+      this.jsonapiResourceConfig ? this._getCollection(links[this.jsonapiResourceConfig]) : []
     ]);
-    return this._buildSchemaModels(contentTypes, fields, storageConfigs);
+    return this._buildSchemaModels(contentTypes, fields, storageConfigs, resourceConfigs);
   }
 
   async _getCollection(url) {
@@ -92,16 +114,19 @@ class Updater {
     return response;
   }
 
-  async _buildSchemaModels(drupalContentTypes, drupalFields, storageConfigs) {
-    this.log.debug('Found %s content types, %s field configs, and %s field storage configs', drupalContentTypes.length, drupalFields.length, storageConfigs.length);
+  async _buildSchemaModels(drupalContentTypes, drupalFields, storageConfigs, resourceConfigs) {
+    this.log.debug('Found %s content types, %s field configs, %s field storage configs, and %s resource configs',
+                   drupalContentTypes.length, drupalFields.length, storageConfigs.length, resourceConfigs.length);
 
     let types = [];
     let fields = Object.create(null);
 
     for (let drupalType of drupalContentTypes) {
+      let resourceConfig = resourceConfigs.find(r => r.attributes.id === `node--${drupalType.attributes.type}`);
+
       let type = {
         type: 'content-types',
-        id: drupalType.attributes.type,
+        id: resourceConfig ? resourceConfig.attributes.resourceType : drupalType.attributes.type,
         relationships: {
           fields: {
             data: []
