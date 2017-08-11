@@ -14,8 +14,9 @@ const idPattern = /id\[[^\]]+\]:'?([^\s']+)/;
 module.exports = class Indexer {
   static create(params) { return new this(params); }
 
-  constructor({ branches }) {
+  constructor({ branches, dataSourceId }) {
     this.branchConfig = branches;
+    this.dataSourceId = dataSourceId;
     this.log = logger('postgresql');
     this.pools = Object.create(null);
   }
@@ -38,7 +39,7 @@ module.exports = class Indexer {
     }
 
     let client = await this.pools[branch].connect();
-    return new Updater(client, this.log);
+    return new Updater(client, this.log, this.dataSourceId);
   }
 
   async teardown() {
@@ -49,9 +50,10 @@ module.exports = class Indexer {
 };
 
 class Updater {
-  constructor(client, log) {
+  constructor(client, log, dataSourceId) {
     this.client = client;
     this.log = log;
+    this.dataSourceId = dataSourceId;
   }
 
   destroy() {
@@ -275,6 +277,9 @@ class Updater {
       relationships: {
         fields: {
           data: []
+        },
+        'data-source': {
+          data: { type: 'data-sources', id: this.dataSourceId }
         }
       }
     };

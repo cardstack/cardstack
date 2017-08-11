@@ -6,7 +6,7 @@ const { Client } = require('pg');
 const JSONAPIFactory = require('@cardstack/test-support/jsonapi-factory');
 
 describe('postgresql/indexer', function() {
-  let pgClient, client, env;
+  let pgClient, client, env, dataSource;
 
   beforeEach(async function() {
     pgClient = new Client({ database: 'postgres' });
@@ -15,7 +15,7 @@ describe('postgresql/indexer', function() {
 
     client = new Client({ database: 'test1' });
     await client.connect();
-    await client.query('create table articles (id varchar primary key, title varchar, length integer, published boolean)');
+    await client.query('create table articles (id serial primary key, title varchar, length integer, published boolean)');
     await client.query('insert into articles values ($1, $2, $3, $4)', ['0', 'hello world', 100, true]);
 
     let factory = new JSONAPIFactory();
@@ -24,7 +24,7 @@ describe('postgresql/indexer', function() {
       module: '@cardstack/postgresql'
     });
 
-    factory.addResource('data-sources')
+    dataSource = factory.addResource('data-sources')
       .withAttributes({
         'source-type': '@cardstack/postgresql',
         params: {
@@ -62,6 +62,7 @@ describe('postgresql/indexer', function() {
     expect(model).has.deep.property('relationships.fields.data');
     expect(model.relationships.fields.data).collectionContains({ id: 'title' });
     expect(model.relationships.fields.data).not.collectionContains({ id: 'id' });
+    expect(model.relationships['data-source'].data).has.property('id', dataSource.id);
   });
 
   it('discovers initial records', async function() {
