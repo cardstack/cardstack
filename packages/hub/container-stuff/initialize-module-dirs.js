@@ -7,17 +7,19 @@ module.exports = createInstalledVolumeFor;
 
 function createInstalledVolumeFor(packagePath, volumeName) {
 
-  let command_setup = ['run',
+  let command = ['run',
       '--rm',
       '--mount', `type=volume,src=cardstack-yarn-cache,dst=${getCacheDir()}`,
       '--mount', `type=volume,src=cardstack-yarn-link-dir,dst=${CONTAINER_YARN_LINK_DIR}`,
       '--mount', `type=bind,src=${packagePath},dst=/package`,
       '--mount', `type=volume,src=${volumeName},dst=/package/node_modules`,
       '--workdir', '/package',
-      'cardstack/hub'
+      'cardstack/hub',
+      'yarn', 'install', '--ignore-engines', '--pure-lockfile'
   ];
 
-  let install = spawn('docker', command_setup.concat('yarn', 'install', '--ignore-engines', '--pure-lockfile'), { stdio: 'inherit' });
+  console.log('yarn installing:', ['docker', ...command].join(' '));
+  let install = spawn('docker', command, { stdio: 'inherit' });
 
   return new Promise(function(resolve, reject) {
     install.on('exit', function(code) {

@@ -45,6 +45,7 @@ function linkUpPackages(packages) {
       'sh', '-c', link_command
   ];
 
+  console.log('running yarn linking', ['docker', ...docker_command].join(' '));
   let ln = spawn('docker', docker_command, { stdio: 'inherit' });
 
   return new Promise(function(resolve, reject) {

@@ -32,6 +32,10 @@ async function runHubForProject(rootProjectPath) {
       await linkUpPackages(packages);
     }
 
+    if (DO_PLUGIN_SERVICES) {
+      await createPluginServices();
+    }
+
     if (DO_CORE_SERVIES) {
       await createService([
           '--name', 'elasticsearch',
@@ -39,10 +43,6 @@ async function runHubForProject(rootProjectPath) {
       ], {stdio: 'inherit'});
 
       await runHub(packages);
-    }
-
-    if (DO_PLUGIN_SERVICES) {
-      await createPluginServices();
     }
 
     console.log("We're good :)");
