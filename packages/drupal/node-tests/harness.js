@@ -4,11 +4,14 @@ const { createDefaultEnvironment } = require('@cardstack/test-support/env');
 const PendingChange = require('@cardstack/plugin-utils/pending-change');
 
 const openAPIPatch = [
+  // Workaround for https://www.drupal.org/node/2902117
   {
     op: "add",
     path: "/definitions/node:recipe/properties/attributes/properties/difficulty/enum",
     value: ["easy", "medium", "hard"]
   },
+
+  // Workaround for https://www.drupal.org/node/2902127
   {
     op: "add",
     path: "/definitions/node:recipe/properties/type/enum",
@@ -28,9 +31,14 @@ const openAPIPatch = [
     op: "add",
     path: "/definitions/node:tutorial/properties/type/enum",
     value: ["node--tutorial"]
+  },
+
+  // Workaround for https://www.drupal.org/node/2902112
+  {
+    op: "replace",
+    path: "/basePath",
+    value: "/"
   }
-
-
 ];
 
 async function go() {
@@ -50,7 +58,7 @@ async function go() {
   for (let model of require('./sample-model')) {
     let create = new PendingChange(null, model);
     let errors = await schema.validationErrors(create, { session: env.session });
-    console.log(`${model.type} ${model.id} ${errors.length}`);
+    //console.log(`${model.type} ${model.id} ${errors.length}`);
   }
 }
 

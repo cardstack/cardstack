@@ -1,7 +1,8 @@
 const logger = require('@cardstack/plugin-utils/logger');
 const request = require('superagent');
-const Error = require('@cardstack/plugin-utils/error');
 const { apply_patch } = require('jsonpatch');
+const { join: pathJoin } = require('path');
+
 require('es6-promise').polyfill();
 
 module.exports = class Indexer {
@@ -38,7 +39,7 @@ class Updater {
     if (!this._schema) {
       this._schema = await this._loadSchema();
     }
-    return this._schema;
+    return this._schema.models;
   }
 
   async _loadSchema() {
@@ -50,51 +51,24 @@ class Updater {
 
     let schemaModels = [];
     let fields = Object.create(null);
+    let endpoints = Object.create(null);
 
     for (let { name, definition, endpoint } of this._findResources(openAPI)) {
-      this.log.debug("%s %s", endpoint, name);
-
+      let id = definition.properties.type.enum[0];
+      this.log.debug("%s %s %s", endpoint, name, id);
       let fieldRefs = [];
 
       for (let [propName, propDef] of Object.entries(definition.properties.attributes.properties)) {
-        if (!fields[propName]) {
-          fields[propName] = {
-            type: 'fields',
-            id: propName,
-            attributes: {
-              'field-type': this._fieldTypeFor(propDef)
-            }
-          };
-        }
-        fieldRefs.push({ id: propName, type: 'fields' });
+        fieldRefs.push(this._makeField(propName, propDef, fields));
       }
 
       for (let [propName, propDef] of Object.entries(definition.properties.relationships.properties)) {
-        if (propName === 'type' || propName === 'id') {
-          // See https://www.drupal.org/node/2779963
-          propName = `_drupal_${propName}`;
-        }
-        if (!fields[propName]) {
-          let relationshipType;
-          if (propDef.properties.data.type === 'array') {
-            relationshipType = '@cardstack/core-types::has-many';
-          } else {
-            relationshipType = '@cardstack/core-types::belongs-to';
-          }
-          fields[propName] = {
-            type: 'fields',
-            id: propName,
-            attributes: {
-              'field-type': relationshipType
-            }
-          };
-        }
-        fieldRefs.push({ id: propName, type: 'fields' });
+        fieldRefs.push(this._makeRelationshipField(propName, propDef, fields));
       }
 
       schemaModels.push({
         type: 'content-types',
-        id: definition.properties.type.enum[0],
+        id,
         relationships: {
           fields: {
             data: fieldRefs
@@ -103,7 +77,46 @@ class Updater {
       });
     }
 
-    return schemaModels.concat(Object.values(fields));
+    return {
+      endpoints,
+      models: schemaModels.concat(Object.values(fields))
+    };
+  }
+
+  _makeField(propName, propDef, fields) {
+    if (!fields[propName]) {
+      fields[propName] = {
+        type: 'fields',
+        id: propName,
+        attributes: {
+          'field-type': this._fieldTypeFor(propDef)
+        }
+      };
+    }
+    return { id: propName, type: 'fields' };
+  }
+
+  _makeRelationshipField(propName, propDef, fields) {
+    if (propName === 'type' || propName === 'id') {
+      // See https://www.drupal.org/node/2779963
+      propName = `_drupal_${propName}`;
+    }
+    if (!fields[propName]) {
+      let relationshipType;
+      if (propDef.properties.data.type === 'array') {
+        relationshipType = '@cardstack/core-types::has-many';
+      } else {
+        relationshipType = '@cardstack/core-types::belongs-to';
+      }
+      fields[propName] = {
+        type: 'fields',
+        id: propName,
+        attributes: {
+          'field-type': relationshipType
+        }
+      };
+    }
+    return { id: propName, type: 'fields' };
   }
 
   _fieldTypeFor(fieldDef) {
@@ -137,7 +150,7 @@ class Updater {
         continue;
       }
       if (pathDef.post.parameters.find(p => p.name === 'body' && p.schema && p.schema['$ref'] === `#/definitions/${definitionName}`)) {
-        return path;
+        return pathJoin(openAPI.basePath || "/", path);
       }
     }
   }
@@ -162,54 +175,8 @@ class Updater {
     return response;
   }
 
-  async _buildSchemaModels(drupalContentTypes, drupalFields, storageConfigs) {
-    this.log.debug('Found %s content types, %s field configs, and %s field storage configs',
-                   drupalContentTypes.length, drupalFields.length, storageConfigs.length);
+  async updateContent(meta, hints, ops) {
 
-    let types = [];
-    let fields = Object.create(null);
-
-    for (let drupalType of drupalContentTypes) {
-
-      let type = {
-        type: 'content-types',
-        id: `node--${drupalType.attributes.type}`,
-        relationships: {
-          fields: {
-            data: []
-          }
-        }
-      };
-      for (let drupalField of drupalFields) {
-        if (`${drupalField.attributes.entity_type}--${drupalField.attributes.bundle}` === type.id) {
-          let field = fields[drupalField.attributes.field_name];
-          if (!field) {
-            let config = storageConfigs.find(c => c.attributes.field_name === drupalField.attributes.field_name);
-            if (!config) {
-              throw new Error(`missing storage config for field ${drupalField.attributes.field_name}`);
-            }
-            field = fields[drupalField.attributes.field_name] = {
-              type: 'fields',
-              id: drupalField.attributes.field_name,
-              attributes: {
-                'field-type': '@cardstack/core-types::any'
-              },
-              meta: {
-                'drupal-type': config.attributes.type,
-                'drupal-cardinality': config.attributes.cardinality,
-                'drupal-settings': config.attributes.settings
-              }
-            };
-          }
-          type.relationships.fields.data.push({ type: field.type, id: field.id });
-        }
-      }
-      types.push(type);
-    }
-    return types.concat(Object.values(fields));
-  }
-
-  async updateContent(/* meta, hints, ops */) {
     return {};
   }
 
