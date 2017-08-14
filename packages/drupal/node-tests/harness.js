@@ -3,12 +3,43 @@ const Indexer = require('../indexer');
 const { createDefaultEnvironment } = require('@cardstack/test-support/env');
 const PendingChange = require('@cardstack/plugin-utils/pending-change');
 
+const openAPIPatch = [
+  {
+    op: "add",
+    path: "/definitions/node:recipe/properties/attributes/properties/difficulty/enum",
+    value: ["easy", "medium", "hard"]
+  },
+  {
+    op: "add",
+    path: "/definitions/node:recipe/properties/type/enum",
+    value: ["recipes"]
+  },
+  {
+    op: "add",
+    path: "/definitions/node:article/properties/type/enum",
+    value: ["articles"]
+  },
+  {
+    op: "add",
+    path: "/definitions/node:page/properties/type/enum",
+    value: ["pages"]
+  },
+  {
+    op: "add",
+    path: "/definitions/node:tutorial/properties/type/enum",
+    value: ["node--tutorial"]
+  }
+
+
+];
+
 async function go() {
   let env = await createDefaultEnvironment(__dirname + '/../');
   let indexer = Indexer.create({
     url: 'http://localhost',
     dataSourceId: 'contenta',
-    authToken: process.env.DRUPAL_TOKEN
+    authToken: process.env.DRUPAL_TOKEN,
+    openAPIPatch
   });
   let updater = await indexer.beginUpdate('master');
   let schemaModels = await updater.schema();
@@ -26,8 +57,8 @@ async function login() {
   let response = await request.post('http://localhost/oauth/token')
       .type('form')
       .send({
-        client_id: '2fa12514-8ad3-43f3-ae67-9fe2967578b0',
-        client_secret: 'cardstackcontenta',
+        client_id: '3e1a2872-e329-47f4-8447-3b4589744de6',
+        client_secret: 'contenta',
         grant_type: 'password',
         username: 'edward',
         password: 'contenta'

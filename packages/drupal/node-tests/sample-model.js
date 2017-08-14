@@ -1,25 +1,17 @@
 module.exports = [
   {
-    "type": "node--recipe",
-    "id": "c5bed31d-d58d-4534-b7bd-4a0833bbf2ab",
+    "type": "recipes",
+    "id": "afeacdb6-5943-4e0b-8c63-417a5d0a9956",
     "attributes": {
-      "nid": 1,
-      "uuid": "c5bed31d-d58d-4534-b7bd-4a0833bbf2ab",
-      "vid": 1,
-      "langcode": "en",
-      "status": true,
+      "internalId": 1,
+      "isPublished": true,
       "title": "4 hour lamb stew",
-      "created": 1502415917,
-      "changed": 1502415917,
-      "promote": true,
-      "sticky": false,
-      "revision_timestamp": 1502415917,
-      "revision_log": null,
-      "revision_translation_affected": true,
-      "default_langcode": true,
+      "createdAt": "2017-08-14T18:39:33+0200",
+      "updatedAt": "2017-08-14T18:39:33+0200",
+      "isPromoted": true,
       "path": null,
-      "field_difficulty": "easy",
-      "field_ingredients": [
+      "difficulty": "easy",
+      "ingredients": [
         "1 leg of lamb - does not need to be massive",
         " with the potatoes and vegetables",
         " this recipe goes a long",
@@ -53,81 +45,67 @@ module.exports = [
         " depending upon the size of the joint. Sometimes half a bottle of water is enough.",
         "sea salt and freshly ground black pepper"
       ],
-      "field_number_of_services": null,
-      "field_preparation_time": 15,
-      "field_recipe_instruction": {
-        "value": "Preheat the oven to 160° C (325° F - gas 3 - Moderately slow/Warm),If you are using a glass casserole dish, do the frying in a separate pan, otherwise..,Add a few splashes of olive oil to a huge ovenproof pot or deep Roasting dish and brown the lamb all over,Remove the lamb for the next stage,Fry the onions, garlic and bacon and celery for 4 minutes,Add a splash of white wine and deglaze the pan,Add your lamb back (or move everything to your casserole dish),Add the remaining wine and an equal amount of water and all of the remaining ingredients,Cover, with tin-foil if you are using a roasting tray,Roast for 4 to 5 hours - I find 4 hours sufficient although we don't use a particularly large cut of meat,Season the gravy to taste with salt and black pepper",
-        "format": null,
-        "summary": null
-      },
-      "field_total_time": 15
+      "numberOfServices": null,
+      "preparationTime": 15,
+      "instructions": "Preheat the oven to 160° C (325° F - gas 3 - Moderately slow/Warm),If you are using a glass casserole dish, do the frying in a separate pan, otherwise..,Add a few splashes of olive oil to a huge ovenproof pot or deep Roasting dish and brown the lamb all over,Remove the lamb for the next stage,Fry the onions, garlic and bacon and celery for 4 minutes,Add a splash of white wine and deglaze the pan,Add your lamb back (or move everything to your casserole dish),Add the remaining wine and an equal amount of water and all of the remaining ingredients,Cover, with tin-foil if you are using a roasting tray,Roast for 4 to 5 hours - I find 4 hours sufficient although we don't use a particularly large cut of meat,Season the gravy to taste with salt and black pepper",
+      "totalTime": 15
     },
     "relationships": {
-      "type": {
+      "contentType": {
         "data": {
-          "type": "node_type--node_type",
-          "id": "192a2449-b61e-438b-a588-1a5435acbe41"
+          "type": "contentTypes",
+          "id": "32e511f7-16a9-457f-afe2-304f171b2dfe"
         },
         "links": {
-          "self": "http://localhost/jsonapi/node/recipe/c5bed31d-d58d-4534-b7bd-4a0833bbf2ab/relationships/type",
-          "related": "http://localhost/jsonapi/node/recipe/c5bed31d-d58d-4534-b7bd-4a0833bbf2ab/type"
+          "self": "http://localhost/api/recipes/afeacdb6-5943-4e0b-8c63-417a5d0a9956/relationships/contentType",
+          "related": "http://localhost/api/recipes/afeacdb6-5943-4e0b-8c63-417a5d0a9956/contentType"
         }
       },
-      "uid": {
+      "owner": {
         "data": {
-          "type": "user--user",
-          "id": "875ffae7-a4e2-4a67-a865-11a3274397b4"
+          "type": "users",
+          "id": "8c862bde-3afd-4355-a68f-dce84bcf32a6"
         },
         "links": {
-          "self": "http://localhost/jsonapi/node/recipe/c5bed31d-d58d-4534-b7bd-4a0833bbf2ab/relationships/uid",
-          "related": "http://localhost/jsonapi/node/recipe/c5bed31d-d58d-4534-b7bd-4a0833bbf2ab/uid"
+          "self": "http://localhost/api/recipes/afeacdb6-5943-4e0b-8c63-417a5d0a9956/relationships/owner",
+          "related": "http://localhost/api/recipes/afeacdb6-5943-4e0b-8c63-417a5d0a9956/owner"
         }
       },
-      "revision_uid": {
+      "category": {
         "data": {
-          "type": "user--user",
-          "id": "875ffae7-a4e2-4a67-a865-11a3274397b4"
+          "type": "categories",
+          "id": "c357aec0-f6d7-4bba-8af5-4b4aa4157259"
         },
         "links": {
-          "self": "http://localhost/jsonapi/node/recipe/c5bed31d-d58d-4534-b7bd-4a0833bbf2ab/relationships/revision_uid",
-          "related": "http://localhost/jsonapi/node/recipe/c5bed31d-d58d-4534-b7bd-4a0833bbf2ab/revision_uid"
+          "self": "http://localhost/api/recipes/afeacdb6-5943-4e0b-8c63-417a5d0a9956/relationships/category",
+          "related": "http://localhost/api/recipes/afeacdb6-5943-4e0b-8c63-417a5d0a9956/category"
         }
       },
-      "field_category": {
+      "image": {
         "data": {
-          "type": "taxonomy_term--category",
-          "id": "45adff89-fc83-43cf-908e-ce57b18f7d09"
+          "type": "images",
+          "id": "451c06f4-0a0a-400b-9958-22bb243cb894"
         },
         "links": {
-          "self": "http://localhost/jsonapi/node/recipe/c5bed31d-d58d-4534-b7bd-4a0833bbf2ab/relationships/field_category",
-          "related": "http://localhost/jsonapi/node/recipe/c5bed31d-d58d-4534-b7bd-4a0833bbf2ab/field_category"
+          "self": "http://localhost/api/recipes/afeacdb6-5943-4e0b-8c63-417a5d0a9956/relationships/image",
+          "related": "http://localhost/api/recipes/afeacdb6-5943-4e0b-8c63-417a5d0a9956/image"
         }
       },
-      "field_image": {
-        "data": {
-          "type": "media--image",
-          "id": "f724bd24-bc86-40a9-9e8f-8add1e9f2539"
-        },
-        "links": {
-          "self": "http://localhost/jsonapi/node/recipe/c5bed31d-d58d-4534-b7bd-4a0833bbf2ab/relationships/field_image",
-          "related": "http://localhost/jsonapi/node/recipe/c5bed31d-d58d-4534-b7bd-4a0833bbf2ab/field_image"
-        }
-      },
-      "field_tags": {
+      "tags": {
         "data": [
           {
-            "type": "taxonomy_term--tags",
-            "id": "85ed70a2-c7a0-4da9-996f-a0098ffb3120"
+            "type": "tags",
+            "id": "0303e164-9f4f-4066-9aeb-72dca3e4fdac"
           }
         ],
         "links": {
-          "self": "http://localhost/jsonapi/node/recipe/c5bed31d-d58d-4534-b7bd-4a0833bbf2ab/relationships/field_tags",
-          "related": "http://localhost/jsonapi/node/recipe/c5bed31d-d58d-4534-b7bd-4a0833bbf2ab/field_tags"
+          "self": "http://localhost/api/recipes/afeacdb6-5943-4e0b-8c63-417a5d0a9956/relationships/tags",
+          "related": "http://localhost/api/recipes/afeacdb6-5943-4e0b-8c63-417a5d0a9956/tags"
         }
       }
     },
     "links": {
-      "self": "http://localhost/jsonapi/node/recipe/c5bed31d-d58d-4534-b7bd-4a0833bbf2ab"
+      "self": "http://localhost/api/recipes/afeacdb6-5943-4e0b-8c63-417a5d0a9956"
     }
   }
 ];

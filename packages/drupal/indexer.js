@@ -1,6 +1,7 @@
 const logger = require('@cardstack/plugin-utils/logger');
 const request = require('superagent');
 const Error = require('@cardstack/plugin-utils/error');
+const { apply_patch } = require('jsonpatch');
 require('es6-promise').polyfill();
 
 module.exports = class Indexer {
@@ -24,14 +25,13 @@ class Updater {
   constructor(config, log) {
     let {
       url,
-      authToken
+      authToken,
+      openAPIPatch
     } = config;
     this.url = url;
     this.authToken = authToken;
+    this.openAPIPatch = openAPIPatch;
     this.log = log;
-    this.nodeType = 'node_type--node_type';
-    this.fieldConfig = 'field_config--field_config';
-    this.fieldStorageConfig = 'field_storage_config--field_storage_config';
   }
 
   async schema() {
@@ -42,41 +42,104 @@ class Updater {
   }
 
   async _loadSchema() {
-    let baseURL = this.url + '/jsonapi';
-    let response = await this._get(baseURL);
-    let links = response.body.links;
-    if (!links[this.nodeType]) {
-      throw new Error(`Found no ${this.nodeType} link at ${baseURL}`, {
-        source: { pointer: `/links/${this.nodeType}` }
-      });
+    let response = await this._get(`${this.url}/openapi/jsonapi?_format=json`);
+    let openAPI = response.body;
+    if (this.openAPIPatch) {
+      openAPI = apply_patch(openAPI, this.openAPIPatch);
     }
-    if (!links[this.fieldConfig]) {
-      throw new Error(`Found no ${this.fieldConfig} link at ${baseURL}`, {
-        source: { pointer: `/links/${this.fieldConfig}`}
-      });
-    }
-    if (!links[this.fieldStorageConfig]) {
-      throw new Error(`Found no ${this.fieldStorageConfig} link at ${baseURL}`, {
-        source: { pointer: `/links/${this.fieldStorageConfig}` }
+
+    let schemaModels = [];
+    let fields = Object.create(null);
+
+    for (let { name, definition, endpoint } of this._findResources(openAPI)) {
+      this.log.debug("%s %s", endpoint, name);
+
+      let fieldRefs = [];
+
+      for (let [propName, propDef] of Object.entries(definition.properties.attributes.properties)) {
+        if (!fields[propName]) {
+          fields[propName] = {
+            type: 'fields',
+            id: propName,
+            attributes: {
+              'field-type': this._fieldTypeFor(propDef)
+            }
+          };
+        }
+        fieldRefs.push({ id: propName, type: 'fields' });
+      }
+
+      for (let [propName, propDef] of Object.entries(definition.properties.relationships.properties)) {
+        if (propName === 'type' || propName === 'id') {
+          // See https://www.drupal.org/node/2779963
+          propName = `_drupal_${propName}`;
+        }
+        if (!fields[propName]) {
+          let relationshipType;
+          if (propDef.properties.data.type === 'array') {
+            relationshipType = '@cardstack/core-types::has-many';
+          } else {
+            relationshipType = '@cardstack/core-types::belongs-to';
+          }
+          fields[propName] = {
+            type: 'fields',
+            id: propName,
+            attributes: {
+              'field-type': relationshipType
+            }
+          };
+        }
+        fieldRefs.push({ id: propName, type: 'fields' });
+      }
+
+      schemaModels.push({
+        type: 'content-types',
+        id: definition.properties.type.enum[0],
+        relationships: {
+          fields: {
+            data: fieldRefs
+          }
+        }
       });
     }
 
-    let [contentTypes, fields, storageConfigs] = await Promise.all([
-      this._getCollection(links[this.nodeType]),
-      this._getCollection(links[this.fieldConfig]),
-      this._getCollection(links[this.fieldStorageConfig])
-    ]);
-    return this._buildSchemaModels(contentTypes, fields, storageConfigs);
+    return schemaModels.concat(Object.values(fields));
   }
 
-  async _getCollection(url) {
-    let records = [];
-    while (url) {
-      let response = await this._get(url);
-      records = records.concat(response.body.data);
-      url = response.body.links.next;
+  _fieldTypeFor(fieldDef) {
+    switch (fieldDef.type) {
+    case 'string':
+      return '@cardstack/core-types::string';
+    case 'integer':
+      return '@cardstack/core-types::integer';
+    case 'boolean':
+      return '@cardstack/core-types::boolean';
+    default:
+      return '@cardstack/core-types::any';
     }
-    return records;
+  }
+
+  *_findResources(openAPI) {
+    for (let [name, definition] of Object.entries(openAPI.definitions)) {
+      if (/^node:/.test(name)) {
+        let endpoint = this._findEndpoint(name, openAPI);
+        if (endpoint) {
+          yield { name, definition, endpoint };
+        }
+      }
+    }
+  }
+
+  _findEndpoint(definitionName, openAPI) {
+    // look for the jsonapi endpoint where you can post a new one of these
+    for (let [path, pathDef] of Object.entries(openAPI.paths)) {
+      if (!pathDef.post || !pathDef.post.parameters) {
+        continue;
+      }
+      if (pathDef.post.parameters.find(p => p.name === 'body' && p.schema && p.schema['$ref'] === `#/definitions/${definitionName}`)) {
+        return path;
+      }
+    }
   }
 
   async _get(url) {
@@ -96,7 +159,6 @@ class Updater {
         throw errors[0];
       }
     }
-
     return response;
   }
 
