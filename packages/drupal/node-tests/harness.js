@@ -54,7 +54,7 @@ async function go() {
   factory.addResource('plugin-configs').withAttributes({
     module: '@cardstack/drupal'
   });
-  let env = await createDefaultEnvironment(__dirname + '/../', factory.getModels());
+  await createDefaultEnvironment(__dirname + '/../', factory.getModels());
 }
 
 async function login() {
