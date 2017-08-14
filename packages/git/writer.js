@@ -114,7 +114,7 @@ module.exports = class Writer {
   }
 
   async _commitOptions(operation, type, id, session) {
-    let user = await session.loadUser();
+    let user = session && await session.loadUser();
     return {
       authorName: (user && user.attributes && user.attributes['full-name']) || 'Anonymous Coward',
       authorEmail: (user && user.attributes && user.attributes.email) || 'anon@example.com',
