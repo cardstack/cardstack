@@ -1,7 +1,7 @@
 const logger = require('@cardstack/plugin-utils/logger');
 const request = require('superagent');
 const { apply_patch } = require('jsonpatch');
-const { join: pathJoin } = require('path');
+const { URL } = require('url');
 
 require('es6-promise').polyfill();
 
@@ -35,11 +35,36 @@ class Updater {
     this.log = log;
   }
 
-  async schema() {
+  async _ensureSchema() {
     if (!this._schema) {
       this._schema = await this._loadSchema();
     }
+  }
+
+  async schema() {
+    await this._ensureSchema();
     return this._schema.models;
+  }
+
+  async updateContent(meta, hints, ops) {
+    await this._ensureSchema();
+    await ops.beginReplaceAll();
+    for (let model of this._schema.models) {
+      await ops.save(model.type, model.id, model);
+    }
+    for (let endpoint of Object.values(this._schema.endpoints)) {
+      let url = new URL(endpoint, this.url).href;
+      while (url) {
+        this.log.debug("Hitting %s", url);
+        let response = await this._get(url);
+        for (let model of response.body.data) {
+          await ops.save(model.type, model.id, this._convertDocument(model));
+        }
+        url = response.body.links.next;
+      }
+    }
+    await ops.finishReplaceAll();
+    return {};
   }
 
   async _loadSchema() {
@@ -53,9 +78,10 @@ class Updater {
     let fields = Object.create(null);
     let endpoints = Object.create(null);
 
-    for (let { name, definition, endpoint } of this._findResources(openAPI)) {
+    for (let { definition, endpoint } of this._findResources(openAPI)) {
       let id = definition.properties.type.enum[0];
-      this.log.debug("%s %s %s", endpoint, name, id);
+      endpoints[id] = endpoint;
+      this.log.debug("Discovered %s %s", id, endpoint);
       let fieldRefs = [];
 
       for (let [propName, propDef] of Object.entries(definition.properties.attributes.properties)) {
@@ -133,10 +159,12 @@ class Updater {
   }
 
   *_findResources(openAPI) {
+    let baseURL = new URL(openAPI.basePath, this.url).href;
     for (let [name, definition] of Object.entries(openAPI.definitions)) {
       if (/^node:/.test(name)) {
-        let endpoint = this._findEndpoint(name, openAPI);
-        if (endpoint) {
+        let path = this._findEndpoint(name, openAPI);
+        if (path) {
+          let endpoint = new URL(path, baseURL).href;
           yield { name, definition, endpoint };
         }
       }
@@ -150,7 +178,8 @@ class Updater {
         continue;
       }
       if (pathDef.post.parameters.find(p => p.name === 'body' && p.schema && p.schema['$ref'] === `#/definitions/${definitionName}`)) {
-        return pathJoin(openAPI.basePath || "/", path);
+
+        return path;
       }
     }
   }
@@ -175,9 +204,20 @@ class Updater {
     return response;
   }
 
-  async updateContent(meta, hints, ops) {
-
-    return {};
+  _convertDocument(doc) {
+    let newDoc = Object.assign({}, doc);
+    if (doc.relationships) {
+      // See https://www.drupal.org/node/2779963
+      if (doc.relationships.type) {
+        doc.relationships._drupal_type = doc.relationships.type;
+        delete doc.relationships.type;
+      }
+      if (doc.attributes.id) {
+        doc.attributes._drupal_id = doc.attributes.id;
+        delete doc.attributes.id;
+      }
+    }
+    return newDoc;
   }
 
 

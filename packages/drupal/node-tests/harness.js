@@ -1,7 +1,6 @@
 /* eslint-disable no-console */
-const Indexer = require('../indexer');
 const { createDefaultEnvironment } = require('@cardstack/test-support/env');
-const PendingChange = require('@cardstack/plugin-utils/pending-change');
+const JSONAPIFactory = require('@cardstack/test-support/jsonapi-factory');
 
 const openAPIPatch = [
   // Workaround for https://www.drupal.org/node/2902117
@@ -42,24 +41,20 @@ const openAPIPatch = [
 ];
 
 async function go() {
-  let env = await createDefaultEnvironment(__dirname + '/../');
-  let indexer = Indexer.create({
-    url: 'http://localhost',
-    dataSourceId: 'contenta',
-    authToken: process.env.DRUPAL_TOKEN,
-    openAPIPatch
+  let factory = new JSONAPIFactory();
+  factory.addResource('data-sources').withAttributes({
+    'source-type': '@cardstack/drupal',
+    params: {
+      url: 'http://localhost',
+      dataSourceId: 'contenta',
+      authToken: process.env.DRUPAL_TOKEN,
+      openAPIPatch
+    }
   });
-  let updater = await indexer.beginUpdate('master');
-  let schemaModels = await updater.schema();
-  //console.log(JSON.stringify(schemaModels, null, 2));
-  let oldSchema = await env.lookup('hub:schema-cache').schemaForBranch('master');
-  let schema = await oldSchema.applyChanges(schemaModels.map(m => ({ id: m.id, type: m.type, document: m })));
-
-  for (let model of require('./sample-model')) {
-    let create = new PendingChange(null, model);
-    let errors = await schema.validationErrors(create, { session: env.session });
-    //console.log(`${model.type} ${model.id} ${errors.length}`);
-  }
+  factory.addResource('plugin-configs').withAttributes({
+    module: '@cardstack/drupal'
+  });
+  let env = await createDefaultEnvironment(__dirname + '/../', factory.getModels());
 }
 
 async function login() {
