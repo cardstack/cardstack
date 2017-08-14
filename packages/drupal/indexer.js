@@ -24,22 +24,14 @@ class Updater {
   constructor(config, log) {
     let {
       url,
-      authToken,
-      nodeType,
-      fieldConfig,
-      fieldStorageConfig,
-      jsonapiExtrasEnabled,
-      jsonapiResourceConfig
+      authToken
     } = config;
     this.url = url;
     this.authToken = authToken;
     this.log = log;
-    this.nodeType = nodeType || 'node_type--node_type';
-    this.fieldConfig = fieldConfig || 'field_config--field_config';
-    this.fieldStorageConfig = fieldStorageConfig || 'field_storage_config--field_storage_config';
-    if (jsonapiExtrasEnabled) {
-      this.jsonapiResourceConfig = jsonapiResourceConfig || 'jsonapi_resource_config--jsonapi_resource_config';
-    }
+    this.nodeType = 'node_type--node_type';
+    this.fieldConfig = 'field_config--field_config';
+    this.fieldStorageConfig = 'field_storage_config--field_storage_config';
   }
 
   async schema() {
@@ -50,7 +42,7 @@ class Updater {
   }
 
   async _loadSchema() {
-    let baseURL = this.url + '/api';
+    let baseURL = this.url + '/jsonapi';
     let response = await this._get(baseURL);
     let links = response.body.links;
     if (!links[this.nodeType]) {
@@ -68,19 +60,13 @@ class Updater {
         source: { pointer: `/links/${this.fieldStorageConfig}` }
       });
     }
-    if (this.jsonapiResourceConfig && !links[this.jsonapiResourceConfig]) {
-      throw new Error(`Found no ${this.jsonapiResourceConfig} link at ${baseURL}`, {
-        source: { pointer: `/links/${this.jsonapiResourceConfig}` }
-      });
-    }
 
-    let [contentTypes, fields, storageConfigs, resourceConfigs] = await Promise.all([
+    let [contentTypes, fields, storageConfigs] = await Promise.all([
       this._getCollection(links[this.nodeType]),
       this._getCollection(links[this.fieldConfig]),
-      this._getCollection(links[this.fieldStorageConfig]),
-      this.jsonapiResourceConfig ? this._getCollection(links[this.jsonapiResourceConfig]) : []
+      this._getCollection(links[this.fieldStorageConfig])
     ]);
-    return this._buildSchemaModels(contentTypes, fields, storageConfigs, resourceConfigs);
+    return this._buildSchemaModels(contentTypes, fields, storageConfigs);
   }
 
   async _getCollection(url) {
@@ -114,19 +100,18 @@ class Updater {
     return response;
   }
 
-  async _buildSchemaModels(drupalContentTypes, drupalFields, storageConfigs, resourceConfigs) {
-    this.log.debug('Found %s content types, %s field configs, %s field storage configs, and %s resource configs',
-                   drupalContentTypes.length, drupalFields.length, storageConfigs.length, resourceConfigs.length);
+  async _buildSchemaModels(drupalContentTypes, drupalFields, storageConfigs) {
+    this.log.debug('Found %s content types, %s field configs, and %s field storage configs',
+                   drupalContentTypes.length, drupalFields.length, storageConfigs.length);
 
     let types = [];
     let fields = Object.create(null);
 
     for (let drupalType of drupalContentTypes) {
-      let resourceConfig = resourceConfigs.find(r => r.attributes.id === `node--${drupalType.attributes.type}`);
 
       let type = {
         type: 'content-types',
-        id: resourceConfig ? resourceConfig.attributes.resourceType : drupalType.attributes.type,
+        id: `node--${drupalType.attributes.type}`,
         relationships: {
           fields: {
             data: []
@@ -134,7 +119,7 @@ class Updater {
         }
       };
       for (let drupalField of drupalFields) {
-        if (drupalField.attributes.bundle === type.id) {
+        if (`${drupalField.attributes.entity_type}--${drupalField.attributes.bundle}` === type.id) {
           let field = fields[drupalField.attributes.field_name];
           if (!field) {
             let config = storageConfigs.find(c => c.attributes.field_name === drupalField.attributes.field_name);
