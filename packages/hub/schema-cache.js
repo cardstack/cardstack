@@ -148,7 +148,7 @@ class BootstrapSchemaCache {
   }
   async schemaForBranch() {
     if (!this.schema) {
-      this.schema = await this.schemaCache.schemaFrom(this.seedModels);
+      this.schema = await this.schemaCache.schemaFrom([]);
     }
     return this.schema;
   }
