@@ -1113,8 +1113,8 @@ better-assert@~1.0.0:
     callsite "1.0.0"
 
 binary-extensions@^1.0.0:
-  version "1.9.0"
-  resolved "https://registry.yarnpkg.com/binary-extensions/-/binary-extensions-1.9.0.tgz#66506c16ce6f4d6928a5b3cd6a33ca41e941e37b"
+  version "1.10.0"
+  resolved "https://registry.yarnpkg.com/binary-extensions/-/binary-extensions-1.10.0.tgz#9aeb9a6c5e88638aad171e167f5900abe24835d0"
 
 "binaryextensions@1 || 2":
   version "2.0.0"
@@ -3320,8 +3320,8 @@ ember-mobiledoc-dom-renderer@^0.5.11:
     mobiledoc-dom-renderer "^0.6.5"
 
 ember-mobiledoc-editor@^0.5.10:
-  version "0.5.11"
-  resolved "https://registry.yarnpkg.com/ember-mobiledoc-editor/-/ember-mobiledoc-editor-0.5.11.tgz#9cc895efc6b15efa8dfc1470ce6d27f0c96adaf6"
+  version "0.5.12"
+  resolved "https://registry.yarnpkg.com/ember-mobiledoc-editor/-/ember-mobiledoc-editor-0.5.12.tgz#b5e6c4c6d85adeacc4542119cbbfbd5f82cb2ff6"
   dependencies:
     broccoli-funnel "^1.1.0"
     broccoli-merge-trees "^2.0.0"
@@ -3329,7 +3329,7 @@ ember-mobiledoc-editor@^0.5.10:
     ember-cli-htmlbars "^2.0.3"
     ember-wormhole "^0.5.1"
     mobiledoc-dom-renderer "^0.6.5"
-    mobiledoc-kit "^0.10.15"
+    mobiledoc-kit "^0.10.17"
 
 ember-moment@^7.3.0:
   version "7.4.1"
@@ -5072,6 +5072,10 @@ jsonparse@^1.2.0:
   version "1.3.1"
   resolved "https://registry.yarnpkg.com/jsonparse/-/jsonparse-1.3.1.tgz#3f4dae4a91fac315f71062f8521cc239f1366280"
 
+jsonpatch@^3.0.1:
+  version "3.0.1"
+  resolved "https://registry.yarnpkg.com/jsonpatch/-/jsonpatch-3.0.1.tgz#97225367c1c3c5bf1641be59b2f73be19759f06f"
+
 jsonpointer@^4.0.0:
   version "4.0.1"
   resolved "https://registry.yarnpkg.com/jsonpointer/-/jsonpointer-4.0.1.tgz#4fd92cb34e0e9db3c89c8622ecf51f9b978c6cb9"
@@ -5814,9 +5818,9 @@ mobiledoc-dom-renderer@0.6.5, mobiledoc-dom-renderer@^0.6.5:
   version "0.6.5"
   resolved "https://registry.yarnpkg.com/mobiledoc-dom-renderer/-/mobiledoc-dom-renderer-0.6.5.tgz#56c0302c4f9c30840ab5b9b20dfe905aed1e437b"
 
-mobiledoc-kit@^0.10.15:
-  version "0.10.16"
-  resolved "https://registry.yarnpkg.com/mobiledoc-kit/-/mobiledoc-kit-0.10.16.tgz#09ed6f5a48dca497e265690a41be94a6baa3e24a"
+mobiledoc-kit@^0.10.17:
+  version "0.10.17"
+  resolved "https://registry.yarnpkg.com/mobiledoc-kit/-/mobiledoc-kit-0.10.17.tgz#1362b4b664eaaa2aae44778e03b23f8ed1248169"
   dependencies:
     mobiledoc-dom-renderer "0.6.5"
     mobiledoc-text-renderer "0.3.2"
@@ -7769,8 +7773,8 @@ testem@1.15.0:
     xmldom "^0.1.19"
 
 testem@^1.15.0:
-  version "1.18.2"
-  resolved "https://registry.yarnpkg.com/testem/-/testem-1.18.2.tgz#e91af73df7b01507ba81577a9041875314028130"
+  version "1.18.3"
+  resolved "https://registry.yarnpkg.com/testem/-/testem-1.18.3.tgz#8cc48c362f4612f6cca4648d590c9cffe6cd7768"
   dependencies:
     backbone "^1.1.2"
     bluebird "^3.4.6"

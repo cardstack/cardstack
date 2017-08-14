@@ -47,9 +47,11 @@ async function go() {
   let oldSchema = await env.lookup('hub:schema-cache').schemaForBranch('master');
   let schema = await oldSchema.applyChanges(schemaModels.map(m => ({ id: m.id, type: m.type, document: m })));
 
-  let create = new PendingChange(null, require('./sample-model')[0]);
-  let errors = await schema.validationErrors(create, { session: env.session });
-  console.log(errors);
+  for (let model of require('./sample-model')) {
+    let create = new PendingChange(null, model);
+    let errors = await schema.validationErrors(create, { session: env.session });
+    console.log(`${model.type} ${model.id} ${errors.length}`);
+  }
 }
 
 async function login() {
