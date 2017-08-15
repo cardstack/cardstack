@@ -35,7 +35,7 @@ Boundaries of the routing module:
     - you can duck-type the store if you don't want ember-data directly
  - expects you to have models 
     - named one-to-one with the logical routing names for your default branch
-    - named with a branch prefix for non-default branches ("draft-articles" vs "articles")
+    - named with a branch prefix for non-default branches ("draft--articles" vs "articles")
     - with an optional static property "routingField" that causes URLs
       to be structured around something other than id
  - exposes helpers for 
@@ -43,4 +43,7 @@ Boundaries of the routing module:
      - { logicalName, branch } -> modelName
  - provides a placeholder model that can be rendered for 404
    conditions, while maintaining enough state to shift branches
-
+ - provides a transitionTo(logicalName, id, branch) function
+ - provides a cardstack-href helper that maps { logicalType, id, branch } -> url. With a shorthand for also doing { model } -> url.
+ - provides a cardstack-new-href helper that maps { logicalType, branch } -> url
+ - has configurable defaultBranch and defaultContentType, but we can hard code those for the present
