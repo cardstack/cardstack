@@ -9,7 +9,7 @@ module.exports = declareInjections({
   }
 
   async beginUpdate(/* branch */) {
-    return new Updater(this.service.storageForDataSource(this.dataSourceId, this.initialModels), this.dataSourceId);
+    return new Updater(this.service.storageForDataSource(this.dataSource.id, this.initialModels), this.dataSource.id);
   }
 });
 

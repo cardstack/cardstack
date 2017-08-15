@@ -28,12 +28,12 @@ class Updater {
       url,
       authToken,
       openAPIPatch,
-      dataSourceId
+      dataSource
     } = config;
     this.url = url;
     this.authToken = authToken;
     this.openAPIPatch = openAPIPatch;
-    this.dataSourceId = dataSourceId;
+    this.dataSource = dataSource;
     this.log = log;
   }
 
@@ -102,7 +102,7 @@ class Updater {
             data: fieldRefs
           },
           'data-source': {
-            data: { type: 'data-sources', id: this.dataSourceId }
+            data: { type: 'data-sources', id: this.dataSource.id }
           }
         }
       });

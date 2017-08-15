@@ -117,9 +117,17 @@ class Indexers {
   async _doUpdate(realTime, hints) {
     this.log.debug('begin update, realTime=%s', realTime);
     let branches = await this._branches(hints);
-    await Promise.all(Object.keys(branches).map(
-      branchName => this._updateBranch(branchName, branches[branchName], realTime, hints)
-    ));
+    try {
+      await Promise.all(Object.keys(branches).map(
+        branchName => this._updateBranch(branchName, branches[branchName], realTime, hints)
+      ));
+    } finally {
+      Object.values(branches).map(updaters => updaters.forEach(updater => {
+        if (typeof updater.destroy === 'function') {
+          updater.destroy();
+        }
+      }));
+    }
     this.log.debug('end update, realTime=%s', realTime);
   }
 

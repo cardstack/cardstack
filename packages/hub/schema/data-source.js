@@ -5,7 +5,7 @@ module.exports = class DataSource {
     this.id = model.id;
     this.sourceType = model.attributes['source-type'];
     this._writer = null;
-    this._params = Object.assign({dataSourceId: model.id}, model.attributes.params);
+    this._params = Object.assign({ dataSource: this }, model.attributes.params);
     this._Writer = plugins.lookupFeatureFactory('writers', this.sourceType);
     this._writer = null;
     this._Indexer = plugins.lookupFeatureFactory('indexers', this.sourceType);
@@ -34,5 +34,15 @@ module.exports = class DataSource {
     }
     return this._searcher;
   }
-
+  async teardown() {
+    if (this._writer && typeof this._writer.teardown === 'function') {
+      await this._writer.teardown();
+    }
+    if (this._indexer && typeof this._indexer.teardown === 'function') {
+      await this._indexer.teardown();
+    }
+    if (this._searcher && typeof this._searcher.teardown === 'function') {
+      await this._searcher.teardown();
+    }
+  }
 };
