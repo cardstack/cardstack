@@ -5,11 +5,12 @@ moduleForComponent('cs-placeholder-composition-panel', 'Integration | Component 
   integration: true,
   beforeEach() {
     this.inject.service('store');
-    this.set('content', this.get('store').createRecord('cardstack-placeholder', {
+    this.set('content', {
+      isCardstackPlaceholder: true,
       type: 'page',
       slug: 'somewhere',
       branch: 'x'
-    }));
+    });
   }
 });
 

@@ -35,10 +35,11 @@ export default Ember.Route.extend({
       if (!is404(err)) {
         throw err;
       }
-      return this.store.createRecord('cardstack-placeholder', {
+      return {
+        isCardstackPlaceholder: true,
         type: singularize(type),
         slug
-      });
+      };
     });
   }
 });

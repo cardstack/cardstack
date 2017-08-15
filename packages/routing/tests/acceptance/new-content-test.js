@@ -8,6 +8,5 @@ test('renders', function(assert) {
   andThen(function() {
     assert.equal(currentURL(), '/beverages/new');
     assert.equal(find('.bubbles').length, 1);
-    assert.equal(find('.branch').text(), 'master');
   });
 });
