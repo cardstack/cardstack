@@ -4,7 +4,8 @@ export default Ember.Route.extend({
   model() {
     return this.store.createRecord('beverage', {
       flavor: 'tea',
-      sizeOz: 8
+      size: 1,
+      sizeUnits: 'cup'
     });
   }
 });

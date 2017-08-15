@@ -9,6 +9,6 @@ test('visiting /card', function(assert) {
   andThen(function() {
     assert.equal(currentURL(), '/card');
     assert.equal(find('.card-flavor').text(), 'tea');
-    assert.equal(find('.card-size').text(), '8 oz');
+    assert.equal(find('.card-size').text(), '1 cup');
   });
 });
