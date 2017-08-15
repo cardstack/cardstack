@@ -10,11 +10,11 @@ describe('postgresql/writer', function() {
   let pgClient, client, env, writer;
 
   beforeEach(async function() {
-    pgClient = new Client({ database: 'postgres', host: 'localhost', user: 'postgres' });
+    pgClient = new Client({ database: 'postgres', host: 'localhost', user: 'postgres', port: 5444 });
     await pgClient.connect();
     await pgClient.query(`create database test1`);
 
-    client = new Client({ database: 'test1', host: 'localhost', user: 'postgres' });
+    client = new Client({ database: 'test1', host: 'localhost', user: 'postgres', port: 5444 });
     await client.connect();
     await client.query('create sequence article_id_seq');
     await client.query(`create table articles (id varchar primary key DEFAULT cast(nextval('article_id_seq') as varchar), title varchar, length integer, published boolean)`);
@@ -34,7 +34,8 @@ describe('postgresql/writer', function() {
             master: {
               host: 'localhost',
               user: 'postgres',
-              database: 'test1'
+              database: 'test1',
+              port: 5444
             }
           }
         }

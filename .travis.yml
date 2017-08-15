@@ -77,7 +77,7 @@ install:
 before_script:
  - export DISPLAY=:99; sh -e /etc/init.d/xvfb start; sleep 3
  - wget -q --waitretry=1 --retry-connrefused -T 1 -O - http://127.0.0.1:9200 || cat /tmp/es.log
- - docker run --name cardstack-postgres -d --rm -p 5432:5432 cardstack/pg-test
+ - docker run --name cardstack-postgres -d --rm -p 5444:5432 cardstack/pg-test
  - node packages/postgresql/node-tests/pg-server/wait-for-db.js
 
 script:

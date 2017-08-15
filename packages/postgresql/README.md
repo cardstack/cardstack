@@ -21,3 +21,10 @@ To enable efficient incremental indexing of the database, we use [Logical Decodi
     wal_level = logical
     max_replication_slots = 1  # Any number greater than 0 will work
 
+The test suite is configured to talk to a PostgreSQL docker container. You can start it like:
+
+    docker run --name cardstack-postgres -d --rm -p 5444:5432 cardstack/pg-test
+
+And stop it like:
+
+    docker stop cardstack-postgres
