@@ -25,3 +25,22 @@ This README outlines the details of collaborating on this Ember addon.
 * `ember build`
 
 For more information on using ember-cli, visit [https://ember-cli.com/](https://ember-cli.com/).
+
+# Design notes
+
+Boundaries of the routing module:
+
+ - provides a router map function that has routes for all your content
+ - relies on store.{findRecord,query,createRecord}
+    - you can duck-type the store if you don't want ember-data directly
+ - expects you to have models 
+    - named one-to-one with the logical routing names for your default branch
+    - named with a branch prefix for non-default branches ("draft-articles" vs "articles")
+    - with an optional static property "routingField" that causes URLs
+      to be structured around something other than id
+ - exposes helpers for 
+     - modelName -> { logicalName, branch }
+     - { logicalName, branch } -> modelName
+ - provides a placeholder model that can be rendered for 404
+   conditions, while maintaining enough state to shift branches
+

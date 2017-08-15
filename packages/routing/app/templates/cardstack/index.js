@@ -1,1 +1,1 @@
-export { default } from '@cardstack/routing/templates/cardstack/index';
+export { default } from '@cardstack/routing/templates/common';
