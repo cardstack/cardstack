@@ -2,6 +2,7 @@ const logger = require('@cardstack/plugin-utils/logger');
 const { Pool } = require('pg');
 const { partition, isEqual } = require('lodash');
 const Error = require('@cardstack/plugin-utils/error');
+const rowToDocument = require('./row-to-doc');
 
 // Yes, this is slightly bananas. But it's easier to just read the
 // output of the "test_decoding" plugin that ships with postgres than
@@ -222,18 +223,7 @@ class Updater {
   }
 
   async _toDocument(type, row) {
-    let schema = await this.schema();
-    let contentType = schema.find(m => m.type === 'content-types' && m.id === type);
-    let fields = contentType.relationships.fields.data.map(ref => schema.find(m => m.type === ref.type && m.id === ref.id));
-    let doc = {
-      id: row.id,
-      type,
-      attributes: {}
-    };
-    for (let field of fields) {
-      doc.attributes[field.id] = this._convertValue(row[field.id], field.attributes['field-type']);
-    }
-    return doc;
+    return rowToDocument(await this.schema(), type, row);
   }
 
   _dirtyRecords(changeRows) {
@@ -309,17 +299,6 @@ class Updater {
 
     case 'boolean':
       return '@cardstack/core-types::boolean';
-    }
-  }
-
-  // This doesn't need to do much yet because we only support the
-  // simplest types. But other types will need to do more here.
-  _convertValue(pgValue, fieldType) {
-    switch(fieldType) {
-    case '@cardstack/core-types::string':
-    case '@cardstack/core-types::boolean':
-    case '@cardstack/core-types::integer':
-      return pgValue;
     }
   }
 

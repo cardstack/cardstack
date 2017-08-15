@@ -4,6 +4,7 @@ const {
 } = require('@cardstack/test-support/env');
 const { Client } = require('pg');
 const JSONAPIFactory = require('@cardstack/test-support/jsonapi-factory');
+const Session = require('@cardstack/plugin-utils/session');
 
 describe('postgresql/writer', function() {
   let pgClient, client, env, writer;
@@ -37,6 +38,37 @@ describe('postgresql/writer', function() {
         }
       });
 
+    // I'm creating some restrictive grants here to ensure that the
+    // operations we think we're getting are really the ones we're
+    // getting. (It's currently possible for a writer implementation
+    // to mess these up by constructing the PendingChange wrong --
+    // that needs to get fixed by refactoring, but for now we have
+    // coverage.)
+
+    factory.addResource('grants')
+      .withAttributes({
+        mayCreateResource: false,
+        mayUpdateResource: true,
+        mayDeleteResource: false,
+        mayWriteField: true
+      }).withRelated('who', factory.addResource('groups', 'update-only'));
+
+    factory.addResource('grants')
+      .withAttributes({
+        mayCreateResource: true,
+        mayUpdateResource: false,
+        mayDeleteResource: false,
+        mayWriteField: true
+      }).withRelated('who', factory.addResource('groups', 'create-only'));
+
+    factory.addResource('grants')
+      .withAttributes({
+        mayCreateResource: false,
+        mayUpdateResource: false,
+        mayDeleteResource: true,
+        mayWriteField: true
+      }).withRelated('who', factory.addResource('groups', 'delete-only'));
+
 
     env = await createDefaultEnvironment(`${__dirname}/..`, factory.getModels());
     await env.lookup('hub:indexers').update({ realTime: true });
@@ -52,7 +84,7 @@ describe('postgresql/writer', function() {
   });
 
   it('can create new record', async function() {
-    let created = await writer.create('master', env.session, 'articles', {
+    let created = await writer.create('master', new Session({ id: 'create-only', type: 'users'}), 'articles', {
       type: 'articles',
       attributes: {
         title: 'I was created',
@@ -68,7 +100,7 @@ describe('postgresql/writer', function() {
   });
 
   it('can create new record with user-provided id', async function() {
-    let created = await writer.create('master', env.session, 'articles', {
+    let created = await writer.create('master', new Session({ id: 'create-only', type: 'users'}), 'articles', {
       type: 'articles',
       id: '42',
       attributes: {
@@ -86,7 +118,7 @@ describe('postgresql/writer', function() {
   });
 
   it('can update a record', async function() {
-    await writer.update('master', env.session, 'articles', '0', {
+    await writer.update('master', new Session({ id: 'update-only', type: 'users'}), 'articles', '0', {
       type: 'articles',
       id: '0',
       attributes: {
@@ -100,7 +132,7 @@ describe('postgresql/writer', function() {
   });
 
   it('returns full record from update', async function() {
-    let updated = await writer.update('master', env.session, 'articles', '0', {
+    let updated = await writer.update('master', new Session({ id: 'update-only', type: 'users'}), 'articles', '0', {
       type: 'articles',
       id: '0',
       attributes: {
@@ -109,6 +141,12 @@ describe('postgresql/writer', function() {
     });
     expect(updated).has.deep.property('attributes.length', 101);
     expect(updated).has.deep.property('attributes.title', 'hello world');
+  });
+
+  it('can delete a record', async function() {
+    await writer.delete('master', new Session({ id: 'delete-only', type: 'users'}), null, 'articles', '0');
+    let result = await client.query('select 1 from articles where id=$1', ['0']);
+    expect(result.rows.length).to.equal(0);
   });
 
 });

@@ -34,9 +34,7 @@ class Writers extends EventEmitter {
       this.emit('changed', { branch, type, id: response.id });
       return response;
     } finally {
-      // this does nothing if the change was properly finalized
-      // already, and cleans up if it wasn't.
-      await pending.abort();
+      if (pending) { await pending.abort();  }
     }
   }
 
@@ -56,7 +54,7 @@ class Writers extends EventEmitter {
       this.emit('changed', { branch, type, id });
       return response;
     } finally {
-      await pending.abort();
+      if (pending) { await pending.abort();  }
     }
   }
 
@@ -75,7 +73,7 @@ class Writers extends EventEmitter {
       }
       this.emit('changed', { branch, type, id });
     } finally {
-      await pending.abort();
+      if (pending) { await pending.abort();  }
     }
   }
 

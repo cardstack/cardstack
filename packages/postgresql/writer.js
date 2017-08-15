@@ -2,6 +2,7 @@ const PendingChange = require('@cardstack/plugin-utils/pending-change');
 const Error = require('@cardstack/plugin-utils/error');
 const { Pool } = require('pg');
 const { range }  = require('lodash');
+const rowToDocument = require('./row-to-doc');
 
 const safeIdentifier = /^[a-zA-Z0-9._]+$/;
 const pendingChanges = new WeakMap();
@@ -14,9 +15,11 @@ module.exports = class Writer {
   static create(params) {
     return new this(params);
   }
-  constructor({ branches }) {
+  constructor({ branches, dataSource }) {
     this.branchConfig = branches;
     this.pools = Object.create(null);
+    this.schemas = Object.create(null);
+    this.dataSource = dataSource;
   }
 
   _getPool(branch) {
@@ -31,6 +34,18 @@ module.exports = class Writer {
       });
     }
     return this.pools[branch];
+  }
+
+  async _getSchema(branch) {
+    if (!this.schemas[branch]) {
+      let updater = await this.dataSource.indexer.beginUpdate(branch);
+      try {
+        this.schemas[branch] = await updater.schema();
+      } finally {
+        await updater.destroy();
+      }
+    }
+    return this.schemas[branch];
   }
 
   async teardown() {
@@ -49,12 +64,8 @@ module.exports = class Writer {
     let client = await this._getPool(branch).connect();
     try {
       await client.query('begin');
-      let result = await client.query(`insert into ${tableName} (${columns.join(',')}) values (${placeholders}) returning id`, args);
-      let finalDocument = {
-        id: result.rows[0].id,
-        type,
-        attributes: document.attributes
-      };
+      let result = await client.query(`insert into ${tableName} (${columns.join(',')}) values (${placeholders}) returning *`, args);
+      let finalDocument = rowToDocument(await this._getSchema(branch), type, result.rows[0]);
       let change = new PendingChange(null, finalDocument, finalize, abort);
       pendingChanges.set(change, { client });
       return change;
@@ -67,16 +78,30 @@ module.exports = class Writer {
   async prepareUpdate(branch, session, type, id, document, isSchema) {
     let { tableName, args, columns } = this._prepareQuery(isSchema, branch, type, document);
     let client = await this._getPool(branch).connect();
+    let schema = await this._getSchema(branch);
     args.push(id);
     try {
       await client.query('begin');
+      let initialDocument = rowToDocument(schema, type, await client.query(`select * from ${tableName} where id=$1`, [ id ]));
       let result = await client.query(`update ${tableName} set ${columns.map((name,index) => `${name}=$${index+1}`).join(',')} where id=$${args.length} returning *`, args);
-      let finalDocument = {
-        id: String(result.rows[0].id),
-        type,
-        attributes: document.attributes
-      };
-      let change = new PendingChange(null, finalDocument, finalize, abort);
+      let finalDocument = rowToDocument(schema, type, result.rows[0]);
+      let change = new PendingChange(initialDocument, finalDocument, finalize, abort);
+      pendingChanges.set(change, { client });
+      return change;
+    } catch (err) {
+      await client.release();
+      throw err;
+    }
+  }
+
+  async prepareDelete(branch, session, version, type, id, isSchema) {
+    let { tableName } = this._prepareQuery(isSchema, branch, type);
+    let client = await this._getPool(branch).connect();
+    try {
+      await client.query('begin');
+      let initialDocument = rowToDocument(await this._getSchema(branch), type, await client.query(`select * from ${tableName} where id=$1`, [ id ]));
+      await client.query(`delete from ${tableName} where id=$1`, [id]);
+      let change = new PendingChange(initialDocument, null, finalize, abort);
       pendingChanges.set(change, { client });
       return change;
     } catch (err) {
@@ -84,9 +109,6 @@ module.exports = class Writer {
       throw err;
     }
 
-  }
-
-  async prepareDelete(/* branch, session, version, type, id, isSchema */) {
   }
 
   _prepareQuery(isSchema, branch, type, document) {
@@ -102,7 +124,7 @@ module.exports = class Writer {
       throw new Error(`Disallowed table name ${tableName}`);
     }
     let args = [];
-    let columns = Object.entries(document.attributes).map(([key, value]) => {
+    let columns = (document ? Object.entries(document.attributes) : []).map(([key, value]) => {
       if (!safeIdentifier.test(key)) {
         throw new Error(`Disallowed column name ${key}`);
       }
