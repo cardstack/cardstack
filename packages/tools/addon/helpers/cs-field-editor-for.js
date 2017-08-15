@@ -1,5 +1,7 @@
 import Ember from 'ember';
 
+import { fieldType } from '@cardstack/rendering/helpers/cs-field-type';
+
 export function csFieldEditorFor([content, fieldName], { variant }) {
   let type = fieldType(content, fieldName);
 

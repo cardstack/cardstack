@@ -1,7 +1,7 @@
 import Ember from 'ember';
 const { getOwner } = Ember;
 import { transitionTo } from '../private-api';
-import { modelType } from '@cardstack/tools/helpers/cs-model-type';
+import { modelType } from '@cardstack/rendering/helpers/cs-model-type';
 
 export default Ember.Service.extend({
   overlays: Ember.inject.service('ember-overlays'),

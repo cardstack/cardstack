@@ -2,7 +2,7 @@ import Ember from 'ember';
 import layout from '../templates/components/cs-version-control';
 import { task } from 'ember-concurrency';
 import { transitionTo } from '../private-api';
-import { modelType } from '@cardstack/tools/helpers/cs-model-type';
+import { modelType } from '@cardstack/rendering/helpers/cs-model-type';
 
 export default Ember.Component.extend({
   layout,

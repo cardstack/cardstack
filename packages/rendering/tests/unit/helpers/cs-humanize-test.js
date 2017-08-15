@@ -1,5 +1,4 @@
-
-import { humanize } from '@cardstack/tools/helpers/cs-humanize';
+import { humanize } from '@cardstack/rendering/helpers/cs-humanize';
 import { module, test } from 'qunit';
 
 module('Unit | Helper | humanize');

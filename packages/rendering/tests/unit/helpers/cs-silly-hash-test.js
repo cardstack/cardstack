@@ -1,4 +1,3 @@
-
 import { csSillyHash } from 'dummy/helpers/cs-silly-hash';
 import { module, test } from 'qunit';
 
