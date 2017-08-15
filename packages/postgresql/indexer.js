@@ -14,9 +14,9 @@ const idPattern = /id\[[^\]]+\]:'?([^\s']+)/;
 module.exports = class Indexer {
   static create(params) { return new this(params); }
 
-  constructor({ branches, dataSourceId }) {
+  constructor({ branches, dataSource }) {
     this.branchConfig = branches;
-    this.dataSourceId = dataSourceId;
+    this.dataSourceId = dataSource.id;
     this.log = logger('postgresql');
     this.pools = Object.create(null);
   }

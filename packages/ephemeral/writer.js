@@ -12,7 +12,7 @@ module.exports = declareInjections({
 
   get storage() {
     if (!this._storage) {
-      this._storage = this.service.storageForDataSource(this.dataSourceId, this.initialModels);
+      this._storage = this.service.storageForDataSource(this.dataSource.id, this.initialModels);
     }
     return this._storage;
   }

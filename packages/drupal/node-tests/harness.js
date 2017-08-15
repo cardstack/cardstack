@@ -46,7 +46,7 @@ async function go() {
     'source-type': '@cardstack/drupal',
     params: {
       url: 'http://localhost',
-      dataSourceId: 'contenta',
+      dataSource: { id: 'contenta' },
       authToken: process.env.DRUPAL_TOKEN,
       openAPIPatch
     }
