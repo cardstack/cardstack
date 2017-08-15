@@ -2417,9 +2417,9 @@ ember-maybe-import-regenerator@^0.1.4:
     ember-cli-babel "^6.0.0-beta.4"
     regenerator-runtime "^0.9.5"
 
-ember-overlays@^0.1.2:
-  version "0.1.2"
-  resolved "https://registry.yarnpkg.com/ember-overlays/-/ember-overlays-0.1.2.tgz#74fd4409a689c6152054cb3f30a5e8ca612492f7"
+ember-overlays@^0.1.3:
+  version "0.1.3"
+  resolved "https://registry.yarnpkg.com/ember-overlays/-/ember-overlays-0.1.3.tgz#72a9d7850a9afd5e32b4992fdb44f9c074c71a00"
   dependencies:
     ember-cli-babel "^5.1.7"
     ember-cli-htmlbars "^1.1.1"

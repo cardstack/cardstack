@@ -1,12 +1,18 @@
 import Ember from 'ember';
 import layout from '../templates/components/cs-field';
 const { guidFor } = Ember;
-import { fieldType } from '../helpers/cs-field-editor-for';
+import { fieldType } from '../helpers/cs-field-type';
 
 export default Ember.Component.extend({
   layout,
   tagName: '',
-  tools: Ember.inject.service('cardstack-tools'),
+
+  // This is not a plain injection because it's optional -- if
+  // cardstack tools is present, we use it, otherwise we are never
+  // active and it doesn't matter.
+  tools: Ember.computed(function() {
+    return Ember.getOwner(this).lookup('service:cardstack-tools');
+  }),
 
   fieldType: Ember.computed('content', 'fieldName', function() {
     return fieldType(this.get('content'), this.get('fieldName'));

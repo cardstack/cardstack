@@ -1,2 +1,4 @@
-<div class="page-flavor">{{content.flavor}}</div>
-<div class="page-size">{{content.sizeOz}} oz</div>
+<div class="page-flavor">{{cs-field content "flavor"}}</div>
+{{#cs-field content "sizeOz" as |oz|}}
+  <div class="page-size">{{oz}} oz</div>
+{{/cs-field}}
