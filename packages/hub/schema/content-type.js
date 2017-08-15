@@ -38,6 +38,7 @@ module.exports = class ContentType {
       this.dataSource = null;
     }
     this.grants = allGrants.filter(g => g.types == null || g.types.includes(model.id));
+    authLog.trace(`while constructing content type %s, %s of %s grants apply`, this.id, this.grants.length, allGrants.length);
     this.authLog = authLog;
     this.constraints = allConstraints.filter(constraint => {
       return Object.values(constraint.fieldInputs).some(field => this.fields.get(field.id));

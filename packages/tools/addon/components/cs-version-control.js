@@ -2,7 +2,7 @@ import Ember from 'ember';
 import layout from '../templates/components/cs-version-control';
 import { task } from 'ember-concurrency';
 import { transitionTo } from '../private-api';
-import { modelType } from '@cardstack/tools/helpers/cs-model-type';
+import { modelType } from '@cardstack/rendering/helpers/cs-model-type';
 
 export default Ember.Component.extend({
   layout,
@@ -139,7 +139,7 @@ export default Ember.Component.extend({
 
   delete: task(function * () {
     let model = this.get('model');
-    let placeholder = this.get('store').createRecord('cardstack-placeholder', { type: modelType(model), slug: model.get('slug') });
+    let placeholder = { isCardstackPlaceholder: true, type: modelType(model), slug: model.get('slug') };
     if (model.get('isNew')) {
       transitionTo(Ember.getOwner(this), 'cardstack.new-content', [placeholder]);
       return;

@@ -19,5 +19,6 @@
     "server": "node packages/hub/bin/server.js"
   },
   "dependencies": {
-  }
+  },
+  "private": true
 }

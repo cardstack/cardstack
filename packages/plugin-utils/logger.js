@@ -1,4 +1,4 @@
-const debug = require('debug');
+const debug = require('./debug');
 const levels = ['trace', 'debug', 'info', 'warn', 'error'];
 const { format } = require('util');
 

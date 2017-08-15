@@ -26,17 +26,27 @@ class Schema {
     }
   }
 
-  // derives a new schema by adding, updating, or removing one model.
-  applyChange(type, id, model) {
-    if (!this.schemaLoader.ownTypes().includes(type)) {
-      // not a schema model, so we are unchanged.
+  // derives a new schema by adding, updating, or removing
+  // models. Takes a list of { type, id, document } objects. A null document
+  // means deletion.
+  applyChanges(changes) {
+    let models = this._originalModels;
+    for (let change of changes) {
+      let { type, id, document } = change;
+      if (!this.schemaLoader.ownTypes().includes(type)) {
+        // not a schema model, so we can ignore it
+        continue;
+      }
+      models = models.filter(m => m.type !== type || m.id !== id);
+      if (document) {
+        models.push(document);
+      }
+    }
+    if (models === this._originalModels) {
       return this;
+    } else {
+      return this.schemaLoader.loadFrom(models);
     }
-    let models = this._originalModels.filter(m => m.type !== type || m.id !== id);
-    if (model) {
-      models.push(model);
-    }
-    return this.schemaLoader.loadFrom(models);
   }
 
   async validationErrors(pendingChange, context={}) {
@@ -81,7 +91,7 @@ class Schema {
     // schema hits a bug anywhere in schema instantiation. Better to
     // serve a 500 here than accept the broken schema and serve 500s
     // to everyone.
-    let newSchema = this.applyChange(type, id, pendingChange.finalDocument);
+    let newSchema = this.applyChanges([{type, id, document: pendingChange.finalDocument}]);
     if (newSchema !== this) {
       return newSchema;
     }

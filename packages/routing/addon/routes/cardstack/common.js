@@ -3,7 +3,6 @@ import { singularize, pluralize } from 'ember-inflector';
 
 export default Ember.Route.extend({
   cardstackRouting: Ember.inject.service(),
-  resourceMetadata: Ember.inject.service(),
 
   _commonModelHook(type, slug) {
     let branch = this.modelFor('cardstack').branch;
@@ -36,12 +35,11 @@ export default Ember.Route.extend({
       if (!is404(err)) {
         throw err;
       }
-      let placeholder = this.store.createRecord('cardstack-placeholder', {
+      return {
+        isCardstackPlaceholder: true,
         type: singularize(type),
         slug
-      });
-      this.get('resourceMetadata').write(placeholder, { branch });
-      return placeholder;
+      };
     });
   }
 });
