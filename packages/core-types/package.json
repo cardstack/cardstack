@@ -25,7 +25,7 @@
   "dependencies": {
     "ember-cli-babel": "^5.2.4",
     "ember-cli-htmlbars": "^1.1.1",
-    "ember-cli-postcss": "https://github.com/ef4/ember-cli-postcss#fdb9d27e47adb70376cc00451523ca353595ce36",
+    "ember-cli-postcss": "https://github.com/ef4/ember-cli-postcss#0550adab2c0c0ab856efec6a4da8164eadd01e47",
     "moment-timezone": "^0.5.11",
     "postcss-cssnext": "^2.10.0",
     "postcss-import": "^9.1.0"
