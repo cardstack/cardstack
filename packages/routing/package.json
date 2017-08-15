@@ -25,6 +25,8 @@
     "ember-inflector": "^1.11.0"
   },
   "devDependencies": {
+    "@cardstack/eslint-config": "^0.2.2",
+    "@cardstack/jsonapi": "^0.2.2",
     "@cardstack/test-support": "^0.2.2",
     "broccoli-asset-rev": "^2.4.5",
     "ember-cli": "^2.12.0",

@@ -1,43 +1,39 @@
 import Ember from 'ember';
-import { singularize, pluralize } from 'ember-inflector';
+import { modelType, routeFor } from '@cardstack/routing';
 
 export default Ember.Route.extend({
-  cardstackRouting: Ember.inject.service(),
 
   _commonModelHook(type, slug) {
-    let branch = this.modelFor('cardstack').branch;
-    let {
-      name,
-      args,
-      queryParams
-    } = this.get('cardstackRouting').routeFor(type, slug, branch);
-    if (name !== this.routeName) {
+    let { branch } = this.modelFor('cardstack');
+    let mType = modelType(type, branch);
+    let { name, args, queryParams } = routeFor(type, slug, branch);
+
+    if (this.routeName !== name ||
+        args.type && args.type !== type) {
       this.replaceWith(name, ...args, { queryParams });
-      return;
     }
 
-    let plural = pluralize(type);
-    if (type !== plural) {
-      // our urls are only supposed to work with plural names
-      let {
-        name,
-        args,
-        queryParams
-      } = this.get('cardstackRouting').routeFor(plural, slug, branch);
-      this.replaceWith(name, ...args, { queryParams });
-      return;
+    let modelClass = Ember.getOwner(this).resolveRegistration(`model:${mType}`);
+    if (!modelClass) {
+      throw new Error(`@cardstack/routing tried to use model ${mType} but it does not exist`);
+    }
+    let promise;
+    if (modelClass.routingField) {
+      promise = this.store.queryRecord(mType, {
+        filter: { [modelClass.routingField]: { exact: slug } },
+        branch
+      });
+    } else {
+      promise = this.store.findRecord(mType, slug, { branch });
     }
 
-    return this.store.queryRecord(singularize(type), {
-      filter: { slug: { exact: slug } },
-      branch
-    }).catch(err => {
+    return promise.catch(err => {
       if (!is404(err)) {
         throw err;
       }
       return {
         isCardstackPlaceholder: true,
-        type: singularize(type),
+        type: mType,
         slug
       };
     });

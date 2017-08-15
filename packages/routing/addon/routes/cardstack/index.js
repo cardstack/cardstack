@@ -1,9 +1,9 @@
 import CommonBaseRoute from './common';
+import { defaultContentType } from '@cardstack/routing';
 
 export default CommonBaseRoute.extend({
   model() {
-    let type = this.get('cardstackRouting.defaultContentType');
     let slug = ' ';
-    return this._commonModelHook(type, slug);
+    return this._commonModelHook(defaultContentType, slug);
   }
 });
