@@ -1,6 +1,6 @@
 import Ember from 'ember';
 import layout from '../templates/components/cardstack-content';
-import { modelType } from '@cardstack/tools/helpers/cs-model-type';
+import { modelType } from '@cardstack/rendering/helpers/cs-model-type';
 
 export default Ember.Component.extend({
   layout,
