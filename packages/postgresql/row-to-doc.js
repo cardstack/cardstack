@@ -4,10 +4,20 @@ module.exports = function rowToDocument(schemaModels, type, row) {
   let doc = {
     id: row.id,
     type,
-    attributes: {}
+    attributes: {},
+    relationships: {}
   };
   for (let field of fields) {
-    doc.attributes[field.id] = convertValue(row[field.id], field.attributes['field-type']);
+    if(field.attributes['field-type'] === '@cardstack/core-types::belongs-to') {
+      doc.relationships[field.id] = {
+        data: {
+          id: row[field.id],
+          type: field.relationships['related-types'].data[0].id // TODO: This doesn't support polymorphic relationships
+        }
+      };
+    } else {
+      doc.attributes[field.id] = convertValue(row[field.id], field.attributes['field-type']);
+    }
   }
   return doc;
 };
