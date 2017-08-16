@@ -24,7 +24,7 @@ class Searcher {
     await this._ensureClient();
     let index = Client.branchToIndexName(branch);
     let esId = `${branch}/${id}`;
-    this.log.debug('get %s', index, type, esId);
+    this.log.debug('get %s %s %s', index, type, esId);
     let document;
     try {
       document = await this.client.es.getSource({ index, type, id: esId });
