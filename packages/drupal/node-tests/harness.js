@@ -31,6 +31,11 @@ const openAPIPatch = [
     path: "/definitions/node:tutorial/properties/type/enum",
     value: ["node--tutorial"]
   },
+  {
+    op: "add",
+    path: "/definitions/media:image/properties/type/enum",
+    value: ["images"]
+  },
 
   // Workaround for https://www.drupal.org/node/2902112
   {
@@ -46,7 +51,6 @@ async function go() {
     'source-type': '@cardstack/drupal',
     params: {
       url: 'http://localhost',
-      dataSource: { id: 'contenta' },
       authToken: process.env.DRUPAL_TOKEN,
       openAPIPatch
     }

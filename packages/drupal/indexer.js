@@ -2,6 +2,8 @@ const logger = require('@cardstack/plugin-utils/logger');
 const request = require('superagent');
 const { apply_patch } = require('jsonpatch');
 const { URL } = require('url');
+const Ember = require('ember-source/dist/ember.debug');
+const { dasherize } = Ember.String;
 
 require('es6-promise').polyfill();
 
@@ -80,7 +82,10 @@ class Updater {
     let fields = Object.create(null);
     let endpoints = Object.create(null);
 
-    for (let { definition, endpoint } of this._findResources(openAPI)) {
+    for (let { name, definition, endpoint } of this._findResources(openAPI)) {
+      if (!definition.properties.type.enum) {
+        throw new Error(`definition ${name} has no type constraint`);
+      }
       let id = definition.properties.type.enum[0];
       endpoints[id] = endpoint;
       this.log.debug("Discovered %s %s", id, endpoint);
@@ -104,8 +109,26 @@ class Updater {
           'data-source': {
             data: { type: 'data-sources', id: this.dataSource.id }
           }
+        },
+        meta: {
+          'drupal-name': name
         }
       });
+    }
+
+    // rewrite related-types from raw drupal entity names to the
+    // actual found content types we created
+    for (let field of Object.values(fields)) {
+      if (field.relationships && field.relationships['related-types']) {
+        field.relationships['related-types'].data = field.relationships['related-types'].data.map(entityName => {
+          let type = schemaModels.find(m => m.meta['drupal-name'] === entityName);
+          if (type) {
+            return { type: 'content-types', id: type.id };
+          } else {
+            this.log.info("field %s points at unknown type %s", field.id, entityName);
+          }
+        }).filter(Boolean);
+      }
     }
 
     return {
@@ -115,16 +138,18 @@ class Updater {
   }
 
   _makeField(propName, propDef, fields) {
-    if (!fields[propName]) {
-      fields[propName] = {
+    let canonicalName = dasherize(propName);
+    if (!fields[canonicalName]) {
+      fields[canonicalName] = {
         type: 'fields',
-        id: propName,
+        id: canonicalName,
         attributes: {
           'field-type': this._fieldTypeFor(propDef)
-        }
+        },
+        meta: { 'drupal-name': propName }
       };
     }
-    return { id: propName, type: 'fields' };
+    return { id: canonicalName, type: 'fields' };
   }
 
   _makeRelationshipField(propName, propDef, fields) {
@@ -132,22 +157,33 @@ class Updater {
       // See https://www.drupal.org/node/2779963
       propName = `_drupal_${propName}`;
     }
-    if (!fields[propName]) {
-      let relationshipType;
+    let canonicalName = dasherize(propName);
+    if (!fields[canonicalName]) {
+      let relationshipType, relatedTypes;
       if (propDef.properties.data.type === 'array') {
         relationshipType = '@cardstack/core-types::has-many';
+        relatedTypes = propDef.properties.data.items.properties.type.enum;
       } else {
         relationshipType = '@cardstack/core-types::belongs-to';
+        relatedTypes = propDef.properties.data.properties.type.enum;
       }
-      fields[propName] = {
+      fields[canonicalName] = {
         type: 'fields',
-        id: propName,
+        id: canonicalName,
         attributes: {
           'field-type': relationshipType
-        }
+        },
+        relationships: {
+          'related-types': {
+            // this will get rewritten on a second pass, after we have
+            // found and created all the content types
+            data: relatedTypes
+          }
+        },
+        meta: { 'drupal-name': propName }
       };
     }
-    return { id: propName, type: 'fields' };
+    return { id: canonicalName, type: 'fields' };
   }
 
   _fieldTypeFor(fieldDef) {
@@ -166,7 +202,7 @@ class Updater {
   *_findResources(openAPI) {
     let baseURL = new URL(openAPI.basePath, this.url).href;
     for (let [name, definition] of Object.entries(openAPI.definitions)) {
-      if (/^node:/.test(name)) {
+      if (/^node:/.test(name) || name === 'media:image') {
         let path = this._findEndpoint(name, openAPI);
         if (path) {
           let endpoint = new URL(path, baseURL).href;
@@ -210,18 +246,38 @@ class Updater {
   }
 
   _convertDocument(doc) {
-    let newDoc = Object.assign({}, doc);
+    let newDoc = {
+      id: doc.id,
+      type: doc.type
+    };
+
     if (doc.relationships) {
-      // See https://www.drupal.org/node/2779963
-      if (doc.relationships.type) {
-        doc.relationships._drupal_type = doc.relationships.type;
-        delete doc.relationships.type;
-      }
-      if (doc.attributes.id) {
-        doc.attributes._drupal_id = doc.attributes.id;
-        delete doc.attributes.id;
+      newDoc.relationships = {};
+
+      for (let [key, value] of Object.entries(doc.relationships)) {
+        if (['type', 'id'].includes(key)) {
+          // See https://www.drupal.org/node/2779963
+          key = `_drupal_${key}`;
+        }
+        newDoc.relationships[dasherize(key)] = value;
       }
     }
+    if (doc.attributes) {
+      newDoc.attributes = {};
+
+      for (let [key, value] of Object.entries(doc.attributes)) {
+        if (['type', 'id'].includes(key)) {
+          // See https://www.drupal.org/node/2779963
+          key = `_drupal_${key}`;
+        }
+        newDoc.attributes[dasherize(key)] = value;
+      }
+    }
+
+    if (doc.meta) {
+      newDoc.meta = doc.meta;
+    }
+
     return newDoc;
   }
 
