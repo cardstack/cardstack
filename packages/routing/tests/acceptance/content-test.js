@@ -1,61 +1,43 @@
-import { test, skip } from 'qunit';
+import { test } from 'qunit';
 import moduleForAcceptance from '../../tests/helpers/module-for-acceptance';
 
 moduleForAcceptance('Acceptance | content');
 
 test('renders own page content', function(assert) {
-  visit('/beverages/soda');
+  visit('/posts/1');
   andThen(function() {
-    assert.equal(currentURL(), '/beverages/soda');
-    assert.equal(find('.beverage-title').text(), 'Coca Cola');
+    assert.equal(currentURL(), '/posts/1');
+    assert.equal(find('.title').text(), 'hello world');
   });
 });
 
 test('redirects for default content type', function(assert) {
-  visit('/meals/burger');
+  visit('/pages/second');
   andThen(function() {
-    assert.equal(currentURL(), '/burger');
-    assert.equal(find('.meal-title').text(), 'Tasty Burger');
+    assert.equal(currentURL(), '/second');
+    assert.equal(find('.blurb').text(), 'I am the second page');
   });
 });
 
 test('redirects for singular content type', function(assert) {
-  visit('/beverage/soda');
+  visit('/post/1');
   andThen(function() {
-    assert.equal(currentURL(), '/beverages/soda');
+    assert.equal(currentURL(), '/posts/1');
   });
 });
 
 test('redirects for singular default content type', function(assert) {
-  visit('/meal/burger');
+  visit('/page/second');
   andThen(function() {
-    assert.equal(currentURL(), '/burger');
+    assert.equal(currentURL(), '/second');
   });
 });
 
-
-skip('renders own page content on alternate branch', function(assert) {
-  visit('/beverages/soda?branch=draft');
-  andThen(function() {
-    assert.equal(currentURL(), '/beverages/soda?branch=draft');
-    assert.equal(find('.beverage-title').text(), 'Coca Cola');
-    assert.equal(find('.branch').text(), 'draft');
-  });
-});
-
-skip('maintains branch when redirecting', function(assert) {
-  visit('/meals/burger?branch=draft');
-  andThen(function() {
-    assert.equal(currentURL(), '/burger?branch=draft');
-    assert.equal(find('.meal-title').text(), 'Tasty Burger');
-    assert.equal(find('.branch').text(), 'draft');
-  });
-});
 
 test('renders placeholder type when content is missing', function(assert) {
-  visit('/beverages/yak-milk');
+  visit('/posts/bogus');
   andThen(function() {
-    assert.equal(currentURL(), '/beverages/yak-milk');
+    assert.equal(currentURL(), '/posts/bogus');
     assert.equal(find('.missing-content').length, 1);
   });
 });

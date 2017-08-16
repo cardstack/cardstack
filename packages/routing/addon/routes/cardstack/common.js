@@ -6,11 +6,13 @@ export default Ember.Route.extend({
   _commonModelHook(type, slug) {
     let { branch } = this.modelFor('cardstack');
     let mType = modelType(type, branch);
-    let { name, args, queryParams } = routeFor(type, slug, branch);
+    let { name, params, queryParams } = routeFor(type, slug, branch);
+    let paramMap = Object.create(null);
+    params.forEach(([k,v]) => paramMap[k] = v);
 
     if (this.routeName !== name ||
-        args.type && args.type !== type) {
-      this.replaceWith(name, ...args, { queryParams });
+        (paramMap.type && paramMap.type !== type)) {
+      this.replaceWith(name, ...params.map(p => p[1]), { queryParams });
     }
 
     let modelClass = Ember.getOwner(this).resolveRegistration(`model:${mType}`);

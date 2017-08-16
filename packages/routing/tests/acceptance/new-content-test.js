@@ -1,12 +1,20 @@
 import { test } from 'qunit';
 import moduleForAcceptance from '../../tests/helpers/module-for-acceptance';
 
-moduleForAcceptance('Acceptance | content');
+moduleForAcceptance('Acceptance | new-content');
 
 test('renders', function(assert) {
-  visit('/beverages/new');
+  visit('/posts/new');
   andThen(function() {
-    assert.equal(currentURL(), '/beverages/new');
-    assert.equal(find('.bubbles').length, 1);
+    assert.equal(currentURL(), '/posts/new');
+    assert.equal(find('.title').length, 1);
+  });
+});
+
+test('renders default content type', function(assert) {
+  visit('/pages/new');
+  andThen(function() {
+    assert.equal(currentURL(), '/pages/new');
+    assert.equal(find('.blurb').length, 1);
   });
 });

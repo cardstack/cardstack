@@ -11,27 +11,27 @@ export function cardstackRoutes() {
 export const defaultBranch = 'master';
 export const defaultContentType = 'pages';
 
-export function routeFor(type, slug, branch) {
+export function routeFor(type, routingId, branch) {
   let queryParams = qpsForBranch(branch);
   type = pluralize(type);
   if (type === defaultContentType) {
-    if (slug === ' ') {
+    if (routingId === ' ') {
       return {
         name: 'cardstack.index',
-        args: [],
+        params: [],
         queryParams
       }
     } else {
       return {
         name: 'cardstack.default-content',
-        args: [slug],
+        params: [ ['routingId', routingId ] ],
         queryParams
       };
     }
   } else {
     return {
       name: 'cardstack.content',
-      args: [type, slug],
+      params: [ ['type', type], ['routingId', routingId] ],
       queryParams
     };
   }
