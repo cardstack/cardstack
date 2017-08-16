@@ -62,11 +62,15 @@ module.exports = {
   },
 
   buildError: function(error) {
-    this._broccoliConnector.buildFailed(error);
+    if (this._broccoliConnector) {
+      this._broccoliConnector.buildFailed(error);
+    }
   },
 
   postBuild: function(results) {
-    this._broccoliConnector.buildSucceeded(results);
+    if (this._broccoliConnector) {
+      this._broccoliConnector.buildSucceeded(results);
+    }
   },
 
   treeForVendor() {
