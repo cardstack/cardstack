@@ -38,6 +38,6 @@ test('renders placeholder type when content is missing', function(assert) {
   visit('/posts/bogus');
   andThen(function() {
     assert.equal(currentURL(), '/posts/bogus');
-    assert.equal(find('.missing-content').length, 1);
+    assert.equal(find('h1:contains(Not Found)').length, 1);
   });
 });
