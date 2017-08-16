@@ -119,17 +119,26 @@ module.exports = class Writer {
       throw new Error(`No such configured branch ${branch}`, { status: 400 });
     }
 
-    let tableName = type;
+    let tableName = underscore(type);
     if (!safeIdentifier.test(tableName)) {
       throw new Error(`Disallowed table name ${tableName}`);
     }
     let args = [];
     let columns = (document ? Object.entries(document.attributes) : []).map(([key, value]) => {
+      key = underscore(key);
       if (!safeIdentifier.test(key)) {
         throw new Error(`Disallowed column name ${key}`);
       }
       args.push(value);
       return key;
+    });
+
+    // Handle relationships - TODO: no handling of polymorphism here yet
+    (document ? Object.entries(document.relationships || {}) : []).map(([key, value]) => {
+      if (value && value.data && value.data.id) {
+        columns.push(key);
+        args.push(value.data.id);
+      }
     });
     return { tableName, args, columns };
   }
@@ -145,4 +154,8 @@ async function abort(pendingChange) {
   let { client } = pendingChanges.get(pendingChange);
   await client.query('rollback');
   await client.release();
+}
+
+function underscore(name) {
+  return name.replace(/-/g, '_');
 }
