@@ -98,7 +98,7 @@ class Handler {
   async run() {
     this.ctxt.response.set('Content-Type', 'application/vnd.api+json');
     try {
-      let segments = this.ctxt.request.path.split('/');
+      let segments = this.ctxt.request.path.split('/').map(decodeURIComponent);
       let kind;
       if (segments.length == 2) {
         kind = 'Collection';
