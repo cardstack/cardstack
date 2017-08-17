@@ -129,7 +129,7 @@ function validateRelatedTypes(types, fields) {
     if (field.relatedTypes) {
       for (let relatedTypeName of Object.keys(field.relatedTypes)) {
         if (!types.get(relatedTypeName)) {
-          throw new Error(`field "${fieldName}" refers to missing related type "${relatedTypeName}"`);
+          throw new Error(`field "${fieldName}" refers to missing related type "${relatedTypeName}"`, { status: 400 });
         }
       }
     }
