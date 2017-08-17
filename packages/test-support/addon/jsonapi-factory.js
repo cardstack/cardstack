@@ -42,6 +42,18 @@ export default class JSONAPIFactory {
           }
         });
       }
+      dependsOn.push(`content-types/${model.type}`);
+
+      // These are all boostrap schema and we need to not include them
+      // here to avoid circularity.
+      dependsOn = dependsOn.filter(dep => {
+        return ![
+          'content-types/content-types',
+          'content-types/fields',
+          'fields/fields'
+        ].includes(dep);
+      });
+
       dag.add(`${model.type}/${model.id}`, model, [], dependsOn);
     });
     let output = [];

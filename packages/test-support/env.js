@@ -48,12 +48,11 @@ exports.createDefaultEnvironment = async function(projectDir, initialModels = []
 
   let writers = container.lookup('hub:writers');
 
-  for (let model of inDependencyOrder(initialModels)) {
+  for (let model of initialModels) {
     // TODO: this one-by-one creation is still slower than is nice for
     // tests -- each time we write a schema model it invalidates the
     // schema cache, which needs to get rebuilt before we can write
-    // the next one. Which also requires us to use inDependencyOrder,
-    // which is kinda lame.
+    // the next one.
     //
     // On the other hand, this is a high-quality test of our ability
     // to build up the entire state in the same way an end user would
@@ -87,9 +86,4 @@ exports.destroyDefaultEnvironment = async function(env) {
 async function destroyIndices() {
   let ea = new ElasticAssert();
   await ea.deleteContentIndices();
-}
-
-function inDependencyOrder(models) {
-  let priority = ['default-values', 'plugin-configs', 'fields', 'input-assignments', 'constraints', 'data-sources', 'content-types'];
-  return priority.map(type => models.filter(m => m.type === type)).reduce((a,b) => a.concat(b), []).concat(models.filter(m => !priority.includes(m.type)));
 }

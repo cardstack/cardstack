@@ -3,6 +3,7 @@
 // do obnoxious build-time thing to make one thing work both ways.
 
 let idGenerator = 0;
+const DAGMap = require('dag-map').default;
 
 class JSONAPIFactory {
   constructor() {
@@ -28,7 +29,40 @@ class JSONAPIFactory {
   }
 
   getModels() {
-    return this.data.slice();
+    let dag = new DAGMap();
+    this.data.forEach(model => {
+      let dependsOn = [];
+      if (model.relationships) {
+        Object.keys(model.relationships).forEach(rel => {
+          let data = model.relationships[rel].data;
+          if (Array.isArray(data)) {
+            dependsOn = dependsOn.concat(data.map(ref => `${ref.type}/${ref.id}`));
+          } else {
+            dependsOn.push(`${data.type}/${data.id}`);
+          }
+        });
+      }
+      dependsOn.push(`content-types/${model.type}`);
+
+      // These are all boostrap schema and we need to not include them
+      // here to avoid circularity.
+      dependsOn = dependsOn.filter(dep => {
+        return ![
+          'content-types/content-types',
+          'content-types/fields',
+          'fields/fields'
+        ].includes(dep);
+      });
+
+      dag.add(`${model.type}/${model.id}`, model, [], dependsOn);
+    });
+    let output = [];
+    dag.each((key, value) => {
+      if (value) {
+        output.push(value);
+      }
+    });
+    return output;
   }
 
   importModels(models) {

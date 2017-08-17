@@ -9,165 +9,163 @@ const {
   destroyDefaultEnvironment
 } = require('../../../tests/elasticsearch-test-app/node_modules/@cardstack/test-support/env');
 
+const Factory = require('../../../tests/elasticsearch-test-app/node_modules/@cardstack/test-support/jsonapi-factory');
+
 const { uniq } = require('lodash');
 
 describe('elasticsearch/searcher', function() {
 
-  let searcher, env;
-  let fixtures = [
-    {
-      type: 'plugin-configs',
-      attributes: {
-        module: '@cardstack/mobiledoc'
-      }
-    },
-    {
-      type: 'content-types',
-      id: 'people',
-      relationships: {
-        fields: {
-          data: [
-            { type: 'fields', id: 'firstName' },
-            { type: 'fields', id: 'lastName' },
-            { type: 'fields', id: 'age' },
-            { type: 'fields', id: 'color' },
-            { type: 'fields', id: 'description' }
-          ]
-        }
-      }
-    },
-    {
-      type: 'content-types',
-      id: 'comments',
-      relationships: {
-        fields: {
-          data: [
-            { type: 'fields', id: 'body' }
-          ]
-        }
-      }
-    },
-    {
-      type: 'content-types',
-      id: 'articles',
-      relationships: {
-        fields: {
-          data: [
-            { type: 'fields', id: 'title' },
-            { type: 'fields', id: 'color' },
-            { type: 'fields', id: 'hello' }
-          ]
-        }
-      }
-    },
-    {
-      type: 'fields',
-      id: 'firstName',
-      attributes: {
-        'field-type': '@cardstack/core-types::string'
-      }
-    },
-    {
-      type: 'fields',
-      id: 'body',
-      attributes: {
-        'field-type': '@cardstack/core-types::string'
-      }
-    },
-    {
-      type: 'fields',
-      id: 'hello',
-      attributes: {
-        'field-type': '@cardstack/core-types::string'
-      }
-    },
-    {
-      type: 'fields',
-      id: 'description',
-      attributes: {
-        'field-type': '@cardstack/mobiledoc'
-      }
-    },
-    {
-      type: 'fields',
-      id: 'title',
-      attributes: {
-        'field-type': '@cardstack/core-types::string'
-      }
-    },
-    {
-      type: 'fields',
-      id: 'color',
-      attributes: {
-        'field-type': '@cardstack/core-types::string'
-      }
-    },
-    {
-      type: 'fields',
-      id: 'lastName',
-      attributes: {
-        'field-type': '@cardstack/core-types::string'
-      }
-    },
-    {
-      type: 'fields',
-      id: 'age',
-      attributes: {
-        'field-type': '@cardstack/core-types::integer'
-      }
-    },
-    {
-      type: 'articles',
-      id: '1',
-      attributes: {
-        hello: 'magic words',
-        color: 'red',
-      }
-    },
-    {
-      type: 'people',
-      id: '1',
-      attributes: {
-        firstName: 'Quint',
-        lastName: 'Faulkner',
-        age: 6,
-        description: {
-          version: "0.3.1",
-          markups: [],
-          atoms: [],
-          cards: [],
-          sections: [
-            [1, "p", [
-              [0, [], 0, "The quick brown fox jumps over the lazy dog."]
-            ]]
-          ]
-        }
-      }
-    },
-    {
-      type: 'people',
-      id: '2',
-      attributes: {
-        firstName: 'Arthur',
-        lastName: 'Faulkner',
-        age: 1,
-        color: 'red'
-      }
-    }
-  ];
+  let searcher, env, factory;
 
   before(async function() {
-    let records = fixtures.slice();
-    for (let i = 10; i < 30; i++) {
-      records.push({
-        type: 'comments',
-        id: String(i),
+    factory = new Factory();
+    factory.importModels([
+      {
+        type: 'plugin-configs',
         attributes: {
-          body: `comment ${i}`
+          module: '@cardstack/mobiledoc'
         }
+      },
+      {
+        type: 'content-types',
+        id: 'people',
+        relationships: {
+          fields: {
+            data: [
+              { type: 'fields', id: 'firstName' },
+              { type: 'fields', id: 'lastName' },
+              { type: 'fields', id: 'age' },
+              { type: 'fields', id: 'color' },
+              { type: 'fields', id: 'description' }
+            ]
+          }
+        }
+      },
+      {
+        type: 'content-types',
+        id: 'comments',
+        relationships: {
+          fields: {
+            data: [
+              { type: 'fields', id: 'body' }
+            ]
+          }
+        }
+      },
+      {
+        type: 'content-types',
+        id: 'articles',
+        relationships: {
+          fields: {
+            data: [
+              { type: 'fields', id: 'title' },
+              { type: 'fields', id: 'color' },
+              { type: 'fields', id: 'hello' }
+            ]
+          }
+        }
+      },
+      {
+        type: 'fields',
+        id: 'firstName',
+        attributes: {
+          'field-type': '@cardstack/core-types::string'
+        }
+      },
+      {
+        type: 'fields',
+        id: 'body',
+        attributes: {
+          'field-type': '@cardstack/core-types::string'
+        }
+      },
+      {
+        type: 'fields',
+        id: 'hello',
+        attributes: {
+          'field-type': '@cardstack/core-types::string'
+        }
+      },
+      {
+        type: 'fields',
+        id: 'description',
+        attributes: {
+          'field-type': '@cardstack/mobiledoc'
+        }
+      },
+      {
+        type: 'fields',
+        id: 'title',
+        attributes: {
+          'field-type': '@cardstack/core-types::string'
+        }
+      },
+      {
+        type: 'fields',
+        id: 'color',
+        attributes: {
+          'field-type': '@cardstack/core-types::string'
+        }
+      },
+      {
+        type: 'fields',
+        id: 'lastName',
+        attributes: {
+          'field-type': '@cardstack/core-types::string'
+        }
+      },
+      {
+        type: 'fields',
+        id: 'age',
+        attributes: {
+          'field-type': '@cardstack/core-types::integer'
+        }
+      },
+      {
+        type: 'articles',
+        id: '1',
+        attributes: {
+          hello: 'magic words',
+          color: 'red',
+        }
+      },
+      {
+        type: 'people',
+        id: '1',
+        attributes: {
+          firstName: 'Quint',
+          lastName: 'Faulkner',
+          age: 6,
+          description: {
+            version: "0.3.1",
+            markups: [],
+            atoms: [],
+            cards: [],
+            sections: [
+              [1, "p", [
+                [0, [], 0, "The quick brown fox jumps over the lazy dog."]
+              ]]
+            ]
+          }
+        }
+      },
+      {
+        type: 'people',
+        id: '2',
+        attributes: {
+          firstName: 'Arthur',
+          lastName: 'Faulkner',
+          age: 1,
+          color: 'red'
+        }
+      }
+    ]);
+    for (let i = 10; i < 30; i++) {
+      factory.addResource('comments', String(i)).withAttributes({
+        body: `comment ${i}`
       });
     }
-    env = await createDefaultEnvironment(`${__dirname}/../../../tests/elasticsearch-test-app`, records);
+    env = await createDefaultEnvironment(`${__dirname}/../../../tests/elasticsearch-test-app`, factory.getModels());
     searcher = env.lookup('hub:searchers');
   });
 
