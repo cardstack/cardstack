@@ -7,6 +7,9 @@ const Router = Ember.Router.extend({
   rootURL: config.rootURL
 });
 
-Router.map(cardstackRoutes);
+Router.map(function() {
+  this.route('c', cardstackRoutes);
+  this.route('links');
+});
 
 export default Router;

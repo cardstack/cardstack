@@ -2161,6 +2161,12 @@ ember-export-application-global@^1.1.1:
   dependencies:
     ember-cli-babel "^5.1.10"
 
+ember-href-to@^1.13.0:
+  version "1.13.0"
+  resolved "https://registry.yarnpkg.com/ember-href-to/-/ember-href-to-1.13.0.tgz#308ab4803d9d08e30a92af888cc67412a800468d"
+  dependencies:
+    ember-cli-babel "^5.1.6"
+
 ember-inflector@^1.11.0:
   version "1.12.1"
   resolved "https://registry.yarnpkg.com/ember-inflector/-/ember-inflector-1.12.1.tgz#d8bd2ca2f327b439720f89923fe614d46b5da1ca"
