@@ -17,7 +17,16 @@ let scenario = new Fixtures(factory => {
     .withRelated('fields', [
       factory.addResource('fields', 'title').withAttributes({
         fieldType: '@cardstack/core-types::string'
-      })
+      }),
+      factory.addResource('fields', 'author').withAttributes({
+        fieldType: '@cardstack/core-types::belongs-to'
+      }).withRelated('related-types', [
+        factory.addResource('content-types', 'authors').withRelated('fields', [
+          factory.addResource('fields', 'name').withAttributes({
+            fieldType: '@cardstack/core-types::string'
+          })
+        ])
+      ])
     ]);
   factory.addResource('posts', '1')
     .withAttributes({
@@ -26,7 +35,10 @@ let scenario = new Fixtures(factory => {
   factory.addResource('posts', '2')
     .withAttributes({
       title: 'second'
-    });
+    }).withRelated(
+      'author',
+      factory.addResource('authors').withAttributes({ name: 'Author of Second' })
+    );
 });
 
 test('it can findRecord', async function(assert) {
@@ -83,6 +95,12 @@ test('it can update', async function(assert) {
     return this.store.query('post', { filter: { title: 'Updated' }});
   });
   assert.equal(models.get('length'), 1, "the newly updated model should be immediately visible in search results");
+});
+
+test('it can get a belongs-to relationship', async function(assert) {
+  let post = await run(() => this.store.findRecord('post', '2'));
+  let author = await run(() => post.get('author'));
+  assert.equal(author.get('name'), 'Author of Second');
 });
 
 // Ember runloop.

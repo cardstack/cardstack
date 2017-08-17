@@ -5,6 +5,24 @@ Handlebars.registerHelper('camelize', function(str) {
   return str.replace(/-(\w)/g, (m, d) => d.toUpperCase());
 });
 
+Handlebars.registerHelper('relationship-method', function(field) {
+  if (field.fieldType === '@cardstack/core-types::has-many') {
+    return 'hasMany';
+  } else {
+    return 'belongsTo';
+  }
+});
+
+Handlebars.registerHelper('related-type', function(field) {
+  if (field.relatedTypes) {
+    let type = Object.keys(field.relatedTypes)[0];
+    if (type) {
+      // TODO: real inflector
+      return type.replace(/s$/, '');
+    }
+  }
+});
+
 const modelTemplate = Handlebars.compile(`
 define('@cardstack/models/generated/{{modelName}}', ['exports', '@cardstack/models/model', 'ember-data'], function (exports, _model, _emberData) {
   'use strict';
@@ -14,7 +32,9 @@ define('@cardstack/models/generated/{{modelName}}', ['exports', '@cardstack/mode
    exports.default = _model.default.extend({
      {{#each fields as |field|}}
        {{#if field.isRelationship}}
-         // relationship {{field.id}}
+         {{#with (related-type field) as |type|}}
+           {{camelize field.id}}:  _emberData.default.{{relationship-method field}}("{{type}}"),
+         {{/with}}
        {{else}}
         {{camelize field.id}}: _emberData.default.attr({ fieldType: "{{field.fieldType}}"}),
        {{/if}}
