@@ -1,6 +1,6 @@
 const Error = require('@cardstack/plugin-utils/error');
 const qs = require('qs');
-const { merge } = require('lodash');
+const { merge, flatten } = require('lodash');
 const koaJSONBody = require('koa-json-body');
 const logger = require('@cardstack/plugin-utils/logger');
 const { declareInjections } = require('@cardstack/di');
@@ -72,10 +72,23 @@ class Handler {
     this.branch = this.query.branch || options.defaultBranch;
     this.prefix = options.prefix || '';
     this.log = log;
+    this._includes = null;
+    this.includedSets = null;
   }
 
   get session() {
     return this.ctxt.state.cardstackSession;
+  }
+
+  get includes() {
+    if (!this._includes) {
+      if (this.query.include) {
+        this._includes = this.query.include.split(',').map(part => part.split('.'));
+      } else {
+        this._includes = [];
+      }
+    }
+    return this._includes;
   }
 
   filterExpression(type, id) {
@@ -128,6 +141,10 @@ class Handler {
   async handleIndividualGET(type, id) {
     let data = await this._lookupRecord(type, id);
     this.ctxt.body = { data };
+    if (this.includes.length === 0) {
+      return;
+    }
+    await this._loadAllIncluded([data]);
   }
 
   async handleIndividualPATCH(type, id) {
@@ -174,6 +191,7 @@ class Handler {
       };
     }
     this.ctxt.body = body;
+    await this._loadAllIncluded(models);
   }
 
   async handleCollectionPOST(type) {
@@ -213,5 +231,41 @@ class Handler {
       origin += '/' + this.prefix;
     }
     return origin + this.ctxt.request.path + "?" + qs.stringify(p, { encode: false });
+  }
+
+  async _loadAllIncluded(root) {
+    this.includedSets = Object.create(null);
+    this.includes.forEach(segments => this._loadIncluded(root, segments));
+    this.ctxt.body.included = flatten(await Promise.all(Object.values(this.includedSets)));
+  }
+
+  async _loadIncluded(root, segments) {
+    let name = segments.join('.');
+    if (this.includedSets[name]) {
+      return this.includedSets[name];
+    }
+
+    return this.includedSets[name] = (async () => {
+      let tail = segments[segments.length - 1];
+      let sourceSet;
+      if (segments.length === 1) {
+        sourceSet = root;
+      } else {
+        sourceSet = await this._loadIncluded(root, segments.slice(0, -1));
+      }
+      return flatten(await Promise.all(sourceSet.map(record => {
+        if (!record.relationships || !record.relationships[tail]) {
+          return [];
+        }
+        let data = record.relationships[tail].data;
+        if (Array.isArray(data)) {
+          return Promise.all(data.map(ref => this._lookupRecord(ref.type, ref.id)));
+        } else if (data) {
+          return this._lookupRecord(data.type, data.id).then(record => [record]);
+        } else {
+          return [];
+        }
+      })));
+    })();
   }
 }

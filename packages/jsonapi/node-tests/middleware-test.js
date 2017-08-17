@@ -20,7 +20,13 @@ describe('jsonapi/middleware', function() {
       factory.addResource('fields', 'title')
         .withAttributes({ fieldType: '@cardstack/core-types::string' }),
       factory.addResource('fields', 'body')
-        .withAttributes({ fieldType: '@cardstack/core-types::string' })
+        .withAttributes({ fieldType: '@cardstack/core-types::string' }),
+      factory.addResource('fields', 'author')
+        .withAttributes({ fieldType: '@cardstack/core-types::belongs-to' })
+        .withRelated('related-types', [{ type: 'content-types', id: 'authors' }]),
+      factory.addResource('fields', 'editor')
+        .withAttributes({ fieldType: '@cardstack/core-types::belongs-to' })
+        .withRelated('related-types', [{ type: 'content-types', id: 'authors' }])
     ]);
 
     factory.addResource('constraints')
@@ -46,7 +52,46 @@ describe('jsonapi/middleware', function() {
       .withAttributes({
         title: "Second",
         body: "This is the second article"
-      });
+      }).withRelated(
+        'author',
+        factory.addResource('authors').withAttributes({
+          name: 'Arthur'
+        }).withRelated(
+          'addresses',
+          [
+            factory.addResource('addresses').withAttributes({
+              street: 'Bay State Ave'
+            }),
+            factory.addResource('addresses').withAttributes({
+              street: 'Dexter Drive'
+            })
+          ]
+        )
+      ).withRelated(
+        'editor',
+        factory.addResource('authors').withAttributes({
+          name: 'Quint'
+        }).withRelated(
+          'addresses',
+          [
+            factory.addResource('addresses').withAttributes({
+              street: 'River Road'
+            })
+          ]
+        )
+      );
+
+
+    factory.addResource('authors').withAttributes({
+      name: 'Lycia'
+    }).withRelated(
+      'addresses',
+      [
+        factory.addResource('addresses').withAttributes({
+          street: 'Elsewhere'
+        })
+      ]
+    );
 
 
     factory.addResource('plugin-configs')
@@ -58,6 +103,23 @@ describe('jsonapi/middleware', function() {
       .withAttributes({
         module: "@cardstack/test-support/authenticator"
       });
+
+    factory.addResource('content-types', 'authors')
+      .withRelated('fields', [
+        factory.addResource('fields', 'name').withAttributes({
+          'field-type': '@cardstack/core-types::string'
+        }),
+        factory.addResource('fields', 'addresses').withAttributes({
+          'field-type': '@cardstack/core-types::has-many'
+        }).withRelated('related-types', [
+          factory.addResource('content-types', 'addresses')
+            .withRelated('fields', [
+              factory.addResource('fields', 'street').withAttributes({
+                'field-type': '@cardstack/core-types::string'
+              })
+            ])
+        ])
+      ]);
 
     let app = new Koa();
     env = await createDefaultEnvironment(__dirname + '/../', factory.getModels());
@@ -86,7 +148,7 @@ describe('jsonapi/middleware', function() {
       expect(response).hasStatus(200);
       expect(response.body).deep.property('data.id', '0');
       expect(response.body).deep.property('data.attributes.title', 'Hello world');
-      expect(response.body).not.deep.property('data.relationships');
+      expect(response.body).deep.property('data.relationships.author.data', null);
     });
 
     it('returns 404 for missing individual resource', async function() {
@@ -253,6 +315,68 @@ describe('jsonapi/middleware', function() {
         detail: '3 is not a valid value for field "title"',
         source: { pointer: '/data/attributes/title' }
       });
+    });
+
+    it.skip('rejects unknown includes on individual resource', async function() {
+      let response = await request.get('/api/articles/1?include=author.addresses,editor.bogus');
+      expect(response.status).to.equal(400);
+      expect(response.body.errors).length(1);
+      expect(response.body.errors).collectionContains({
+        title: 'Bad Request',
+        detail: 'The relationship "editor.bogus" is not valid',
+        source: { queryParameter: 'include' }
+      });
+    });
+
+    it.skip('rejects unknown includes on collection resource', async function() {
+      let response = await request.get('/api/articles?include=author.addresses,editor.bogus');
+      expect(response.status).to.equal(400);
+      expect(response.body.errors).length(1);
+      expect(response.body.errors).collectionContains({
+        title: 'Bad Request',
+        detail: 'The relationship "editor.bogus" is not valid',
+        source: { queryParameter: 'include' }
+      });
+    });
+
+    it('can get an individual resource with includes', async function() {
+      let response = await request.get('/api/articles/1?include=author.addresses,editor');
+      expect(response).hasStatus(200);
+      expect(response.body).deep.property('data.id', '1');
+      expect(response.body).deep.property('data.relationships.author.data.id');
+      expect(response.body).has.property('included');
+      let included = response.body.included;
+      expect(included).is.a('array');
+
+      let authorNames = included.filter(r => r.type === 'authors').map(r => r.attributes.name);
+      expect(authorNames).to.include('Arthur');
+      expect(authorNames).to.include('Quint');
+      expect(authorNames).not.to.include('Lycia');
+      expect(authorNames).length(2);
+
+      let streets = included.filter(r => r.type === 'addresses').map(r => r.attributes.street);
+      expect(streets).to.include('Bay State Ave');
+      expect(streets).to.include('Dexter Drive');
+      expect(streets).not.to.include('Elsewhere');
+      expect(authorNames).length(2);
+
+      expect(included).has.length(4);
+    });
+
+    it('can get a collection resource with includes', async function() {
+      let response = await request.get('/api/articles?include=editor.addresses');
+      expect(response).hasStatus(200);
+      expect(response.body.data).has.length(2);
+      expect(response.body).has.property('included');
+      let included = response.body.included;
+      expect(included).is.a('array');
+
+      let authorNames = included.filter(r => r.type === 'authors').map(r => r.attributes.name);
+      expect(authorNames).to.deep.equal(['Quint']);
+
+      let streets = included.filter(r => r.type === 'addresses').map(r => r.attributes.street);
+      expect(streets).to.deep.equal(['River Road']);
+      expect(included).has.length(2);
     });
 
   });
