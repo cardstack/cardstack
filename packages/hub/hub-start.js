@@ -1,6 +1,7 @@
 const path = require('path');
-const crawlLinkedModules = require('./container-stuff/list-linked-packages');
-const startHubService = require('./container-stuff/start-hub-service');
+const crawlLinkedModules = require('./v2-containers/crawl-linked-packages');
+const startHubContainer = require('./v2-containers/start-hub-container');
+const _ = require('lodash');
 
 module.exports = {
   name: 'hub:start',
@@ -13,18 +14,18 @@ module.exports = {
   async run(commandOptions, rawArgs) {
     this.ui.writeLine('running hub:start');
 
+    let projectName = this.project.pkg.name;
     let projectRoot = this.project.root;
     let seedDir = path.join(path.dirname(this.project.configPath()), '..', 'cardstack', 'seeds', 'development');
     let projectStructure = crawlLinkedModules(projectRoot);
 
-    startHubService({
+    return startHubContainer({
+      projectName,
       projectRoot,
       projectStructure,
       seedDir,
       useDevDependencies: true
     });
-    // let packages = crawlLinkedModules()
-    // await runProject(this.project.root);
   }
 
 };
