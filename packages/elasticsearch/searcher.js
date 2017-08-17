@@ -176,7 +176,18 @@ class Searcher {
   }
 
   async _fieldFilter(branch, schema, key, value) {
-    let field = schema.fields.get(key);
+    let field;
+
+    if (key === 'cardstack_source') {
+      // this is an internal field (meaning it's not visible in the
+      // jsonapi records themselves) that we make available for
+      // filtering. The schema-cache uses this to avoid shadowing seed
+      // models, for example.
+      field = { queryFieldName: 'cardstack_source', sortFieldName: 'cardstack_source' };
+    } else {
+      field = schema.fields.get(key);
+    }
+
     if (!field) {
       throw new Error(`Cannot filter by unknown field "${key}"`, {
         status: 400,

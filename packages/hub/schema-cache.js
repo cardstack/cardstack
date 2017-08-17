@@ -129,7 +129,10 @@ class SchemaCache {
     try {
       let { models, page } = await this.searcher.search(branch, {
         filter: {
-          type: this.schemaLoader.ownTypes()
+          type: this.schemaLoader.ownTypes(),
+          not: {
+            cardstack_source: { exact: '__cardstack_seed_models__' }
+          }
         },
         page: { size: 1000 }
       });
