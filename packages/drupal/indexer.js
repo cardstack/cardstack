@@ -121,7 +121,7 @@ class Updater {
     for (let field of Object.values(fields)) {
       if (field.relationships && field.relationships['related-types']) {
         field.relationships['related-types'].data = field.relationships['related-types'].data.map(entityName => {
-          let type = schemaModels.find(m => m.meta['drupal-name'] === entityName);
+          let type = schemaModels.find(m => m.id === entityName);
           if (type) {
             return { type: 'content-types', id: type.id };
           } else {
@@ -202,7 +202,7 @@ class Updater {
   *_findResources(openAPI) {
     let baseURL = new URL(openAPI.basePath, this.url).href;
     for (let [name, definition] of Object.entries(openAPI.definitions)) {
-      if (/^node:/.test(name) || name === 'media:image') {
+      if (/^node:/.test(name) || name === 'media:image' || name === 'file:file') {
         let path = this._findEndpoint(name, openAPI);
         if (path) {
           let endpoint = new URL(path, baseURL).href;
