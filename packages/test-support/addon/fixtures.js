@@ -10,7 +10,7 @@ export default class Fixtures {
   async setup() {
     if (this._id == null) {
       await this._restoreCheckpoint('empty');
-      let models = inDependencyOrder(this.factory.getModels());
+      let models = this.factory.getModels();
       for (let [index, model] of models.entries()) {
         let url = `${hubURL}/api/${model.type}`;
         if (index < models.length - 1) {
@@ -71,12 +71,4 @@ export default class Fixtures {
       throw new Error(`Unexpected response ${response.status} while trying to restore checkpoint: ${await response.text()}`);
     }
   }
-}
-
-// FIXME: this requires more understanding of the schema than is
-// appropriate in this module. Also, this is duplicated in
-// test-support/env
-function inDependencyOrder(models) {
-  let priority = ['default-values', 'plugin-configs', 'constraints', 'fields', 'data-sources', 'content-types'];
-  return priority.map(type => models.filter(m => m.type === type)).reduce((a,b) => a.concat(b), []).concat(models.filter(m => !priority.includes(m.type)));
 }

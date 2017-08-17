@@ -29,6 +29,7 @@
     "@cardstack/plugin-utils": "^0.2.2",
     "chai": "^3.5.0",
     "chai-things": "^0.2.0",
+    "dag-map": "^2.0.2",
     "denodeify": "^1.2.1",
     "ember-cli-babel": "^6.0.0",
     "glob": "^7.1.1",

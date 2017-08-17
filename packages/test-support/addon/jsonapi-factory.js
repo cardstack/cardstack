@@ -2,6 +2,7 @@
 // (this one) and a node version (see ../jsonapi-factory.js). Need to
 // do obnoxious build-time thing to make one thing work both ways.
 
+import DAGMap from 'dag-map';
 let idGenerator = 0;
 
 export default class JSONAPIFactory {
@@ -28,7 +29,24 @@ export default class JSONAPIFactory {
   }
 
   getModels() {
-    return this.data.slice();
+    let dag = new DAGMap();
+    this.data.forEach(model => {
+      let dependsOn = [];
+      if (model.relationships) {
+        Object.keys(model.relationships).forEach(rel => {
+          let data = model.relationships[rel].data;
+          if (Array.isArray(data)) {
+            dependsOn = dependsOn.concat(data.map(ref => `${ref.type}/${ref.id}`));
+          } else {
+            dependsOn.push(`${data.type}/${data.id}`);
+          }
+        });
+      }
+      dag.add(`${model.type}/${model.id}`, model, [], dependsOn);
+    });
+    let output = [];
+    dag.each((key, value) => output.push(value));
+    return output;
   }
 
   importModels(models) {
