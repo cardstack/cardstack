@@ -19,5 +19,6 @@ module.exports = {
       type: "nested"
     };
   },
+  default: { data: [] },
   isRelationship: true
 };

@@ -21,7 +21,7 @@ module.exports = class Field {
     this.plugin = plugins.lookupFeatureAndAssert('field-types', this.fieldType);
     this.isRelationship = this.plugin.isRelationship;
 
-    if (model.relationships && model.relationships['related-types'] && model.relationships['related-types'].data) {
+    if (model.relationships && model.relationships['related-types'] && model.relationships['related-types'].data.length > 0) {
       this.relatedTypes = Object.create(null);
       for (let typeRef of model.relationships['related-types'].data) {
         if (typeRef.type !== 'content-types') {
@@ -127,8 +127,10 @@ module.exports = class Field {
       //     need a field write grant for "type", which would be
       //     annoyingly redundant.
       //
+      //   - Otherwise ask the field-type plugin it is has a default.
+      //
       //   - Otherwise all fields default to null.
-      defaultInput = this.defaultAtCreate || this.defaultAtUpdate || { value: this.id === 'type' ? pendingChange.finalDocument.type : null };
+      defaultInput = this.defaultAtCreate || this.defaultAtUpdate || { value: this.id === 'type' ? pendingChange.finalDocument.type : (this.plugin.default || null) };
     } else {
       defaultInput = this.defaultAtUpdate;
     }

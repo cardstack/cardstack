@@ -6,7 +6,7 @@ module.exports = {
     if (Array.isArray(value.data)) {
       return 'accepts only a single resource, not a list of resources';
     }
-    if (relatedTypes && !relatedTypes[value.data.type] ) {
+    if (relatedTypes && value.data && !relatedTypes[value.data.type] ) {
       return `refers to disallowed type "${value.data.type}"`;
     }
     return true;
@@ -16,5 +16,6 @@ module.exports = {
       type: "object"
     };
   },
+  default: { data: null },
   isRelationship: true
 };

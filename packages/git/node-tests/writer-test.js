@@ -41,6 +41,8 @@ describe('git/writer', function() {
         factory.addResource('fields', 'age').withAttributes({ fieldType: '@cardstack/core-types::integer' })
       ]).withRelated('data-source', source);
 
+    factory.addResource('content-types', 'images');
+
     factory.addResource('articles', 1)
       .withAttributes({
           title: 'First Article'
@@ -108,7 +110,7 @@ describe('git/writer', function() {
           title: 'Second Article'
         },
         relationships: {
-          'primary-image': null
+          'primary-image': { data: null }
         }
       });
     });
