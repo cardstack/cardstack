@@ -1,0 +1,3 @@
+{{#unless fetchConfig.isRunning}}
+  {{yield (perform login) }}
+{{/unless}}
