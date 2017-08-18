@@ -266,6 +266,7 @@ class Searcher {
 
     // We always have a backstop sort so we guarantee a total
     // order. This ensures pagination is correct.
+    output.push({ '_score': 'desc' });
     output.push({ '_uid': 'asc' });
     return output;
   }
