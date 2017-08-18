@@ -4,6 +4,7 @@ const { merge, flatten } = require('lodash');
 const koaJSONBody = require('koa-json-body');
 const logger = require('@cardstack/plugin-utils/logger');
 const { declareInjections } = require('@cardstack/di');
+const { URL } = require('url');
 
 module.exports = declareInjections({
   searcher: 'hub:searchers',
@@ -228,9 +229,11 @@ class Handler {
     let p = merge({}, this.query, params);
     let origin = this.ctxt.request.origin;
     if (this.prefix) {
-      origin += '/' + this.prefix;
+      origin = origin + '/' + this.prefix;
     }
-    return origin + this.ctxt.request.path + "?" + qs.stringify(p, { encode: false });
+    let u = new URL(origin + (this.ctxt.req.originalUrl || this.ctxt.req.url));
+    u.search = "?" + qs.stringify(p, { encode: false });
+    return u.href;
   }
 
   async _loadAllIncluded(root) {
