@@ -68,7 +68,7 @@ class Authentication {
         return new Session(sessionPayload, this.userSearcher);
       }
     } catch (err) {
-      if (/unable to authenticate data|invalid key length/.test(err.message)) {
+      if (/unable to authenticate data|invalid key length|Not a valid signed message/.test(err.message)) {
         this.log.warn("Ignoring invalid token");
       } else {
         throw err;
@@ -137,6 +137,12 @@ class Authentication {
 
     if (!result || !(result.preloadedUser || result.user)) {
       ctxt.status = 401;
+      ctxt.body = {
+        errors: [{
+          title: "Not authorized",
+          detail: "The authentication plugin did not approve your request"
+        }]
+      };
       return;
     }
 
@@ -144,6 +150,13 @@ class Authentication {
 
     if (!user) {
       ctxt.status = 401;
+      ctxt.body = {
+        errors: [{
+          title: "Not authorized",
+          detail: "The authentication plugin attempted to approve you but we found no corresponding user record"
+        }]
+      };
+
       return;
     }
 

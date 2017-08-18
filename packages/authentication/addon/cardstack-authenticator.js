@@ -1,7 +1,7 @@
 import Ember from 'ember';
 import Base from 'ember-simple-auth/authenticators/base';
 import RSVP from 'rsvp';
-
+import { hubURL } from '@cardstack/hub/environment';
 
 export default Base.extend({
   cardstackSession: Ember.inject.service(),
@@ -34,20 +34,29 @@ export default Base.extend({
   },
 
   authenticate(authenticationSource, payload) {
-    let config = Ember.getOwner(this).resolveRegistration('config:environment');
-    let tokenExchangeUri = config.cardstack.apiURL + '/auth/' + authenticationSource;
+    let tokenExchangeUri = hubURL + '/auth/' + authenticationSource;
     return fetch(tokenExchangeUri, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify(payload)
-    }).then(response => response.json());
+    }).then(response => {
+      if (response.status !== 200) {
+        throw new Error("Authentication attempt failed");
+      }
+      if(response.headers.get("content-type") &&
+         response.headers.get("content-type").toLowerCase().indexOf("application/json") >= 0) {
+        return response.json()
+      } else {
+        Ember.warn(`Got a non-json response from ${hubURL}/auth/${authenticationSource}`, false, { id: 'cardstack-authentication-nonjson-response' });
+        return {};
+      }
+    });
   },
 
   fetchConfig(authenticationSource) {
-    let config = Ember.getOwner(this).resolveRegistration('config:environment');
-    let tokenExchangeUri = config.cardstack.apiURL + '/auth/' + authenticationSource;
+    let tokenExchangeUri = hubURL + '/auth/' + authenticationSource;
     return fetch(tokenExchangeUri).then(response => response.json());
   }
 });
