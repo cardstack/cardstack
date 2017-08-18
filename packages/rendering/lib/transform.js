@@ -25,7 +25,6 @@ function BindTransform({ moduleName }) {
 
 BindTransform.prototype.transform = function(ast) {
   if (/\btemplates\/components\/cardstack\//.test(this.moduleName)){
-    console.log("Rewriting inside " + this.moduleName);
     var b = this.syntax.builders;
 
     this.syntax.traverse(ast, {
@@ -35,8 +34,6 @@ BindTransform.prototype.transform = function(ast) {
         }
       }
     });
-  } else {
-    console.log("skipping " + this.moduleName);
   }
   return ast;
 };
