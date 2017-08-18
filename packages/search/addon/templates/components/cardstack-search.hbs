@@ -1,3 +1,6 @@
 {{#each items as |item|}}
   {{yield item}}
 {{/each}}
+{{#if cursor}}
+  <div {{action (perform search cursor) }}>More</div>
+{{/if}}
