@@ -60,11 +60,20 @@ class Updater {
       let url = new URL(endpoint, this.url).href;
       while (url) {
         this.log.debug("Hitting %s", url);
-        let response = await this._get(url);
-        for (let model of response.body.data) {
-          await ops.save(model.type, model.id, this._convertDocument(model));
+        try {
+          let response = await this._get(url);
+          for (let model of response.body.data) {
+            await ops.save(model.type, model.id, this._convertDocument(model));
+          }
+          url = response.body.links.next;
+        } catch (err) {
+          if (err.status) {
+            this.log.error("GET %s returned %s", url, err.status);
+          } else {
+            this.log.error("Error during GET %s: %s", url, err);
+          }
+          throw err;
         }
-        url = response.body.links.next;
       }
     }
     await ops.finishReplaceAll();
@@ -138,7 +147,7 @@ class Updater {
   }
 
   _makeField(propName, propDef, fields) {
-    let canonicalName = dasherize(propName);
+    let canonicalName = dasherize(this._safePropName(propName));
     if (!fields[canonicalName]) {
       fields[canonicalName] = {
         type: 'fields',
@@ -152,11 +161,23 @@ class Updater {
     return { id: canonicalName, type: 'fields' };
   }
 
-  _makeRelationshipField(propName, propDef, fields) {
-    if (propName === 'type' || propName === 'id') {
+  _safePropName(drupalName) {
+    if (drupalName === 'type' || drupalName === 'id') {
       // See https://www.drupal.org/node/2779963
-      propName = `_drupal_${propName}`;
+      return `_drupal_${drupalName}`;
     }
+    if (drupalName === 'init') {
+      // This is an ember-data limitation: it can't handle an
+      // attribute named "init" because that stomps on its own
+      // constructor.
+      return `_drupal_${drupalName}`;
+    }
+    return drupalName;
+  }
+
+  _makeRelationshipField(propName, propDef, fields) {
+    propName = this._safePropName(propName);
+
     let canonicalName = dasherize(propName);
     if (!fields[canonicalName]) {
       let relationshipType, relatedTypes;
@@ -202,7 +223,7 @@ class Updater {
   *_findResources(openAPI) {
     let baseURL = new URL(openAPI.basePath, this.url).href;
     for (let [name, definition] of Object.entries(openAPI.definitions)) {
-      if (/^node:/.test(name) || name === 'media:image' || name === 'file:file') {
+      if (/^node:/.test(name) || name === 'media:image' || name === 'file:file' || name === 'user:user') {
         let path = this._findEndpoint(name, openAPI);
         if (path) {
           let endpoint = new URL(path, baseURL).href;
@@ -227,12 +248,15 @@ class Updater {
 
   async _get(url) {
     let authorization = `Bearer ${this.authToken}`;
-    let response = await request.get(url).set('Authorization', authorization);
+    let response = await request.get(url)
+        .set('Authorization', authorization)
+        .set('Accept', 'application/vnd.api+json');
 
     // Drupal's JSONAPI module returns a 200 even when there are
-    // errors. So we need to check for them here.
+    // errors. So we need to check for them here. If there was at
+    // least some valid data, we don't consider it a failure
     let errors;
-    if (response.body.meta && (errors = response.body.meta.errors)) {
+    if (response.body.meta && (errors = response.body.meta.errors) && response.body.data.length === 0) {
       if (errors.length > 1) {
         let err = errors[0];
         err.additionalErrors = errors.slice(1);
@@ -255,10 +279,7 @@ class Updater {
       newDoc.relationships = {};
 
       for (let [key, value] of Object.entries(doc.relationships)) {
-        if (['type', 'id'].includes(key)) {
-          // See https://www.drupal.org/node/2779963
-          key = `_drupal_${key}`;
-        }
+        key = this._safePropName(key);
         newDoc.relationships[dasherize(key)] = value;
       }
     }
@@ -266,10 +287,7 @@ class Updater {
       newDoc.attributes = {};
 
       for (let [key, value] of Object.entries(doc.attributes)) {
-        if (['type', 'id'].includes(key)) {
-          // See https://www.drupal.org/node/2779963
-          key = `_drupal_${key}`;
-        }
+        key = this._safePropName(key);
         newDoc.attributes[dasherize(key)] = value;
       }
     }
