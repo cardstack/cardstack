@@ -41,7 +41,14 @@ export default Ember.Service.extend({
 
   // Can tools be enabled at all? This affects whether we will offer a
   // launcher button
-  available: true,
+  available: Ember.computed.alias('session.session.isAuthenticated'),
+
+  // This is not a plain injection because it's optional -- if
+  // cardstack tools is present, we use it, otherwise we are never
+  // active and it doesn't matter.
+  session: Ember.computed(function() {
+    return Ember.getOwner(this).lookup('service:cardstack-session');
+  }),
 
   // Tools are active when the user has hit the launcher button and
   // revealed the toolbars.
