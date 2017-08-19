@@ -51,36 +51,6 @@ class Updater {
     return this._schema.models;
   }
 
-  async updateContent(meta, hints, ops) {
-    await this._ensureSchema();
-    await ops.beginReplaceAll();
-    for (let model of this._schema.models) {
-      await ops.save(model.type, model.id, model);
-    }
-    for (let endpoint of Object.values(this._schema.endpoints)) {
-      let url = new URL(endpoint, this.url).href;
-      while (url) {
-        this.log.debug("Hitting %s", url);
-        try {
-          let response = await this._get(url);
-          for (let model of response.body.data) {
-            await ops.save(model.type, model.id, drupalToCardstackDoc(model, this._schema.models));
-          }
-          url = response.body.links.next;
-        } catch (err) {
-          if (err.status) {
-            this.log.error("GET %s returned %s", url, err.status);
-          } else {
-            this.log.error("Error during GET %s: %s", url, err);
-          }
-          throw err;
-        }
-      }
-    }
-    await ops.finishReplaceAll();
-    return {};
-  }
-
   async _loadSchema() {
     let response = await this._get(`${this.url}/openapi/jsonapi?_format=json`);
     let openAPI = response.body;
@@ -255,6 +225,59 @@ class Updater {
     return response;
   }
 
+  async updateContent(meta, hints, ops) {
+    await this._ensureSchema();
+    if (hints) {
+      await this._incrementalUpdate(meta, hints, ops);
+    } else {
+      await this._fullUpdate(meta, ops);
+    }
+  }
+
+  async _incrementalUpdate(meta, hints, ops) {
+    for (let {type, id} of hints) {
+      let url = new URL(this._schema.endpoints[type], this.url).href + '/' + id;
+      try {
+        let response = await this._get(url);
+        await ops.save(type, id, drupalToCardstackDoc(response.body.data, this._schema.models));
+      } catch (err) {
+        if (err.status === 404) {
+          await ops.delete(type, id);
+        } else {
+          this.log.warn("Got status %s from drupal for %s", err.status, url);
+        }
+      }
+    }
+  }
+
+  async _fullUpdate(meta, ops) {
+    await ops.beginReplaceAll();
+    for (let model of this._schema.models) {
+      await ops.save(model.type, model.id, model);
+    }
+    for (let endpoint of Object.values(this._schema.endpoints)) {
+      let url = new URL(endpoint, this.url).href;
+      while (url) {
+        this.log.debug("Hitting %s", url);
+        try {
+          let response = await this._get(url);
+          for (let model of response.body.data) {
+            await ops.save(model.type, model.id, drupalToCardstackDoc(model, this._schema.models));
+          }
+          url = response.body.links.next;
+        } catch (err) {
+          if (err.status) {
+            this.log.error("GET %s returned %s", url, err.status);
+          } else {
+            this.log.error("Error during GET %s: %s", url, err);
+          }
+          throw err;
+        }
+      }
+    }
+    await ops.finishReplaceAll();
+    return {};
+  }
 }
 
 module.exports = Indexer;
