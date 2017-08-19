@@ -1,3 +1,7 @@
 {{#unless fetchConfig.isRunning}}
-  {{yield (perform login) }}
+  {{#if hasBlock}}
+    {{yield (perform login) }}
+  {{else}}
+    <a href="#" {{action (perform login) preventDefault=true }}>Login</a>
+  {{/if}}
 {{/unless}}
