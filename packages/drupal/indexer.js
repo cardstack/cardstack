@@ -179,7 +179,7 @@ class Updater {
   *_findResources(openAPI) {
     let baseURL = new URL(openAPI.basePath, this.url).href;
     for (let [name, definition] of Object.entries(openAPI.definitions)) {
-      if (/^node:/.test(name) || name === 'media:image' || name === 'file:file' || name === 'user:user') {
+      if (/^node:/.test(name) || name === 'media:image' || name === 'file:file' || name === 'user:user' || /^taxonomy_term:/.test(name)) {
         let path = this._findEndpoint(name, openAPI);
         if (path) {
           let endpoint = new URL(path, baseURL).href;
