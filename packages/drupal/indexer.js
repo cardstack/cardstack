@@ -2,12 +2,11 @@ const logger = require('@cardstack/plugin-utils/logger');
 const request = require('superagent');
 const { apply_patch } = require('jsonpatch');
 const { URL } = require('url');
-const Ember = require('ember-source/dist/ember.debug');
-const { dasherize } = Ember.String;
+const { drupalToCardstackField, drupalToCardstackDoc } = require('./lib/document');
 
 require('es6-promise').polyfill();
 
-module.exports = class Indexer {
+class Indexer {
   static create(params) { return new this(params); }
 
   constructor(config) {
@@ -22,7 +21,9 @@ module.exports = class Indexer {
   async beginUpdate(/* branch */) {
     return new Updater(this.config, this.log);
   }
-};
+
+
+}
 
 class Updater {
   constructor(config, log) {
@@ -63,7 +64,7 @@ class Updater {
         try {
           let response = await this._get(url);
           for (let model of response.body.data) {
-            await ops.save(model.type, model.id, this._convertDocument(model));
+            await ops.save(model.type, model.id, drupalToCardstackDoc(model, this._schema.models));
           }
           url = response.body.links.next;
         } catch (err) {
@@ -147,7 +148,7 @@ class Updater {
   }
 
   _makeField(propName, propDef, fields) {
-    let canonicalName = dasherize(this._safePropName(propName));
+    let canonicalName = drupalToCardstackField(propName);
     if (!fields[canonicalName]) {
       fields[canonicalName] = {
         type: 'fields',
@@ -161,24 +162,9 @@ class Updater {
     return { id: canonicalName, type: 'fields' };
   }
 
-  _safePropName(drupalName) {
-    if (drupalName === 'type' || drupalName === 'id') {
-      // See https://www.drupal.org/node/2779963
-      return `_drupal_${drupalName}`;
-    }
-    if (drupalName === 'init') {
-      // This is an ember-data limitation: it can't handle an
-      // attribute named "init" because that stomps on its own
-      // constructor.
-      return `_drupal_${drupalName}`;
-    }
-    return drupalName;
-  }
 
   _makeRelationshipField(propName, propDef, fields) {
-    propName = this._safePropName(propName);
-
-    let canonicalName = dasherize(propName);
+    let canonicalName = drupalToCardstackField(propName);
     if (!fields[canonicalName]) {
       let relationshipType, relatedTypes;
       if (propDef.properties.data.type === 'array') {
@@ -269,35 +255,6 @@ class Updater {
     return response;
   }
 
-  _convertDocument(doc) {
-    let newDoc = {
-      id: doc.id,
-      type: doc.type
-    };
-
-    if (doc.relationships) {
-      newDoc.relationships = {};
-
-      for (let [key, value] of Object.entries(doc.relationships)) {
-        key = this._safePropName(key);
-        newDoc.relationships[dasherize(key)] = value;
-      }
-    }
-    if (doc.attributes) {
-      newDoc.attributes = {};
-
-      for (let [key, value] of Object.entries(doc.attributes)) {
-        key = this._safePropName(key);
-        newDoc.attributes[dasherize(key)] = value;
-      }
-    }
-
-    if (doc.meta) {
-      newDoc.meta = doc.meta;
-    }
-
-    return newDoc;
-  }
-
-
 }
+
+module.exports = Indexer;
