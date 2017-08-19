@@ -2,13 +2,17 @@ import Ember from 'ember';
 import layout from '../templates/components/cardstack-search';
 import { task } from 'ember-concurrency';
 import { singularize } from 'ember-inflector';
+import { timeout } from 'ember-concurrency';
 
 export default Ember.Component.extend({
   layout,
   tagName: '',
   store: Ember.inject.service(),
 
-  search: task(function * (cursor) {
+  search: task(function * (cursor, debounce) {
+    if (debounce) {
+      yield timeout(300);
+    }
     let query = this.get('query');
     if (!query) {
       this.set('items', []);
@@ -34,7 +38,11 @@ export default Ember.Component.extend({
       }
 
     }
-  }).observes('query').on('init').restartable(),
+  }).on('init').restartable(),
+
+  research: Ember.observer('query', function() {
+    this.get('search').perform(null, true);
+  }),
 
   cursor: Ember.computed('links', function() {
     let nextUrl = this.get('links.next');
