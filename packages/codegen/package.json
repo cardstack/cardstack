@@ -1,6 +1,6 @@
 {
   "name": "@cardstack/codegen",
-  "version": "0.2.3",
+  "version": "0.2.4",
   "description": "Dynamic code generation infrastructure for Cardstack",
   "keywords": [
     "ember-addon",
@@ -23,14 +23,14 @@
     "test": "ember try:each"
   },
   "dependencies": {
-    "@cardstack/di": "0.2.3",
+    "@cardstack/di": "^0.2.4",
     "ember-cli-babel": "^5.2.4",
     "ember-fetch": "^1.4.0",
     "koa-better-route": "^0.1.0"
   },
   "devDependencies": {
-    "@cardstack/eslint-config": "0.2.3",
-    "@cardstack/test-support": "0.2.3",
+    "@cardstack/eslint-config": "^0.2.4",
+    "@cardstack/test-support": "^0.2.4",
     "ember-cli": "^2.12.0",
     "ember-cli-dependency-checker": "^1.3.0",
     "ember-cli-eslint": "^3.0.0",
