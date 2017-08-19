@@ -54,7 +54,13 @@ function commandLineOptions() {
 
 function loadSeedModels(options) {
   try {
-    return fs.readdirSync(options.seedConfigDirectory).map(filename => require(path.join(options.seedConfigDirectory, filename))).reduce((a,b) => a.concat(b), []);
+    return fs.readdirSync(options.seedConfigDirectory).map(filename => {
+      if (/\.js$/.test(filename)) {
+        return require(path.join(options.seedConfigDirectory, filename));
+      } else {
+        return [];
+      }
+    }).reduce((a,b) => a.concat(b), []);
   } catch (err) {
     process.stderr.write(`Unable to load models from your seed-config-file (${options.seedConfigFile}), ${err}\n`);
     process.exit(-1);
