@@ -1,6 +1,6 @@
 {
   "name": "@cardstack/ephemeral",
-  "version": "0.2.3",
+  "version": "0.2.4-alpha.0",
   "keywords": [
     "cardstack-plugin"
   ],
@@ -8,11 +8,11 @@
     "api-version": 1
   },
   "dependencies": {
-    "@cardstack/di": "0.2.3",
-    "@cardstack/plugin-utils": "0.2.3"
+    "@cardstack/di": "0.2.4-alpha.0",
+    "@cardstack/plugin-utils": "0.2.4-alpha.0"
   },
   "devDependencies": {
-    "@cardstack/eslint-config": "0.2.3",
+    "@cardstack/eslint-config": "0.2.4-alpha.0",
     "koa": "2",
     "supertest": "^2.0.1"
   },
