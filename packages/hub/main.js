@@ -21,7 +21,6 @@ async function wireItUp(projectDir, encryptionKeys, seedModels, opts = {}) {
   if (!opts.disableAutomaticIndexing) {
     await container.lookup('hub:indexers').update();
     setInterval(() => container.lookup('hub:indexers').update(), 600000);
-    container.lookup('hub:writers').addListener('changed', what => container.lookup('hub:indexers').update({ hints: [ what ] }));
   }
 
   // this registration pattern is how we make broccoli wait for our

@@ -1,6 +1,5 @@
 const Error = require('@cardstack/plugin-utils/error');
 const logger = require('@cardstack/plugin-utils/logger');
-const EventEmitter = require('events');
 const { declareInjections } = require('@cardstack/di');
 
 module.exports = declareInjections({
@@ -8,9 +7,8 @@ module.exports = declareInjections({
   schemaLoader: 'hub:schema-loader'
 },
 
-class Writers extends EventEmitter {
+class Writers {
   constructor() {
-    super();
     this.log = logger('writers');
   }
 
@@ -31,7 +29,6 @@ class Writers extends EventEmitter {
       if (newSchema) {
         this.schemaCache.notifyBranchUpdate(branch, newSchema, token);
       }
-      this.emit('changed', { branch, type, id: response.id });
       return response;
     } finally {
       if (pending) { await pending.abort();  }
@@ -51,7 +48,6 @@ class Writers extends EventEmitter {
       if (newSchema) {
         this.schemaCache.notifyBranchUpdate(branch, newSchema, token);
       }
-      this.emit('changed', { branch, type, id });
       return response;
     } finally {
       if (pending) { await pending.abort();  }
@@ -71,7 +67,6 @@ class Writers extends EventEmitter {
       if (newSchema) {
         this.schemaCache.notifyBranchUpdate(branch, newSchema, token);
       }
-      this.emit('changed', { branch, type, id });
     } finally {
       if (pending) { await pending.abort();  }
     }
