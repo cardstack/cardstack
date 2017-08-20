@@ -11,12 +11,17 @@ module.exports = function rowToDocument(schemaModels, type, row) {
   };
   for (let field of fields) {
     if(field.attributes['field-type'] === '@cardstack/core-types::belongs-to') {
-      doc.relationships[field.id] = {
-        data: {
-          id: row[field.id],
-          type: field.relationships['related-types'].data[0].id // TODO: This doesn't support polymorphic relationships
-        }
-      };
+      let relatedId = row[field.id];
+
+      if (relatedId) {
+        doc.relationships[snakeCase(field.id)] = {
+          data: {
+            id: relatedId,
+            type: field.relationships['related-types'].data[0].id // TODO: This doesn't support polymorphic relationships
+          }
+        };
+      }
+
     } else {
       doc.attributes[field.id] = convertValue(row[snakeCase(field.id)], field.attributes['field-type']);
     }
