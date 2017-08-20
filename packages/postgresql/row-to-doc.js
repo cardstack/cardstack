@@ -30,7 +30,9 @@ module.exports = function rowToDocument(schemaModels, type, row) {
 function convertValue(pgValue, fieldType) {
   switch(fieldType) {
   case '@cardstack/core-types::string':
+  case '@cardstack/core-types::any':
   case '@cardstack/core-types::boolean':
+  case '@cardstack/core-types::date':
   case '@cardstack/core-types::integer':
     return pgValue;
   }

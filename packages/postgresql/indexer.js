@@ -348,7 +348,10 @@ class Updater {
     case 'boolean':
       return '@cardstack/core-types::boolean';
 
+    case 'timestamp':
     case 'timestamp without time zone':
+    case 'timestamp with time zone':
+    case 'date':
       return '@cardstack/core-types::date';
 
     case 'json':
