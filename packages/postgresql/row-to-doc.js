@@ -1,3 +1,5 @@
+const { snakeCase } = require('lodash');
+
 module.exports = function rowToDocument(schemaModels, type, row) {
   let contentType = schemaModels.find(m => m.type === 'content-types' && m.id === type);
   let fields = contentType.relationships.fields.data.map(ref => schemaModels.find(m => m.type === ref.type && m.id === ref.id));
@@ -16,7 +18,7 @@ module.exports = function rowToDocument(schemaModels, type, row) {
         }
       };
     } else {
-      doc.attributes[field.id] = convertValue(row[field.id], field.attributes['field-type']);
+      doc.attributes[field.id] = convertValue(row[snakeCase(field.id)], field.attributes['field-type']);
     }
   }
   return doc;
