@@ -1,6 +1,6 @@
 const logger = require('@cardstack/plugin-utils/logger');
 const { Pool } = require('pg');
-const { partition, isEqual } = require('lodash');
+const { partition, isEqual, kebabCase } = require('lodash');
 const Error = require('@cardstack/plugin-utils/error');
 const rowToDocument = require('./row-to-doc');
 
@@ -110,7 +110,7 @@ class Updater {
         continue;
       }
 
-      let internalName = dasherize(column_name);
+      let internalName = kebabCase(column_name);
 
       if (!fields[internalName]) {
         fields[internalName] = this._initializeField(internalName, fieldType);
@@ -298,7 +298,7 @@ class Updater {
     // more customizable via configuration.
 
     // json-api uses kebab case but database tables use underscores
-    let tableDasherized = dasherize(table);
+    let tableDasherized = kebabCase(table);
 
     if (schema !== 'public') {
       return `${schema}.${tableDasherized}`;
@@ -357,10 +357,6 @@ class Updater {
   }
 
 
-}
-
-function dasherize(name) {
-  return name.replace(/_/g, '-');
 }
 
 function underscore(name) {
