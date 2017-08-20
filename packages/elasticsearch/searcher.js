@@ -237,6 +237,17 @@ class Searcher {
     if (value.exact != null) {
       let innerQuery = value.exact;
       let esName = await this.client.logicalFieldToES(branch, field.sortFieldName);
+
+      if(field.isRelationship) {
+        if (typeof innerQuery === 'string') {
+          // TODO: this completely ignores the possibility of polymorphism
+          return { term: { [`${esName}.data.id`] : innerQuery } };
+        }
+        if (Array.isArray(innerQuery)) {
+          throw new Error("Array query not supported for filtering by relationship");
+        }
+      }
+
       if (typeof innerQuery === 'string') {
         // This is the sortFieldName because that one is designed for
         // exact matching (in addition to sorting).
