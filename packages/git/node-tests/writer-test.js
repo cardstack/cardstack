@@ -115,19 +115,6 @@ describe('git/writer', function() {
       });
     });
 
-    it('emits changed event', async function () {
-      let log = [];
-      writers.on('changed', message => log.push(message));
-      await writers.create('master', env.session, 'articles', {
-        type: 'articles',
-        attributes: {
-          title: 'Second Article'
-        }
-      });
-      expect(log).length(1);
-    });
-
-
     it('saves default attribute', async function() {
       await writers.create('master', env.session, 'things-with-defaults', {
         id: '1',
@@ -416,22 +403,6 @@ describe('git/writer', function() {
     });
 
 
-    it('emits changed event', async function() {
-      let log = [];
-      writers.on('changed', message => log.push(message));
-      await writers.update('master', env.session, 'articles', '1', {
-        id: '1',
-        type: 'articles',
-        attributes: {
-          title: 'Updated title'
-        },
-        meta: {
-          version: head
-        }
-      });
-      expect(log).length(1);
-    });
-
     it('returns unchanged field', async function() {
       let record = await writers.update('master', env.session, 'people', '1', {
         id: '1',
@@ -641,13 +612,6 @@ describe('git/writer', function() {
       await writers.delete('master', env.session, head, 'people', '1');
       let articles = (await inRepo(repoPath).listTree('master', 'contents/people')).map(a => a.name);
       expect(articles).to.not.contain('1.json');
-    });
-
-    it('emits changed event', async function() {
-      let log = [];
-      writers.on('changed', message => log.push(message));
-      await writers.delete('master', env.session, head, 'people', '1');
-      expect(log).length(1);
     });
 
     it('reports merge conflict', async function() {
