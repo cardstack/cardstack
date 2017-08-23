@@ -25,3 +25,11 @@ Merely upgrading Xcode will still leave you broken and frustrated.
 
 I cloned and built nodegit in its own repo, and then used `yarn link`. This seems to function as insurance against `yarn` deciding to rebuild it from scratch (which takes a long time).
 
+Test Suite Dependencies
+-----------------------
+
+There is work-in-progress to make Cardstack Hub automatically manage docker-based microservices, but for the present you need to start these things up manually to run the full test suite:
+
+    docker run -d -p 9200:9200 --rm cardstack/elasticsearch:dev
+    docker run -d -p 5444:5432 --rm cardstack/pg-test
+
