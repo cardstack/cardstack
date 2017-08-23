@@ -1,6 +1,5 @@
 import Ember from 'ember';
 import config from './config/environment';
-import { cardstackRoutes } from '@cardstack/routing';
 
 const Router = Ember.Router.extend({
   location: config.locationType,
@@ -8,9 +7,9 @@ const Router = Ember.Router.extend({
 });
 
 Router.map(function() {
-  this.route('example', { path: 'example/:id' });
-  this.route('compare');
-  this.route('cs', cardstackRoutes);
+  this.route('posts', { path: '/' }, function() {
+    this.route('show', { path: '/:id' });
+  });
 });
 
 export default Router;
