@@ -2,17 +2,16 @@ import Ember from 'ember';
 import layout from '../templates/components/cs-field';
 const { guidFor } = Ember;
 import { fieldType } from '../helpers/cs-field-type';
+import injectOptional from 'ember-inject-optional';
 
 export default Ember.Component.extend({
   layout,
   tagName: '',
 
-  // This is not a plain injection because it's optional -- if
-  // cardstack tools is present, we use it, otherwise we are never
-  // active and it doesn't matter.
-  tools: Ember.computed(function() {
-    return Ember.getOwner(this).lookup('service:cardstack-tools');
-  }),
+  // if cardstack tools is present, we use it to decide to be active,
+  // otherwise we are never active because no editing tools are
+  // present.
+  tools: injectOptional.service('cardstack-tools'),
 
   fieldType: Ember.computed('content', 'fieldName', function() {
     return fieldType(this.get('content'), this.get('fieldName'));
