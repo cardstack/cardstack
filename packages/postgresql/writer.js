@@ -1,7 +1,7 @@
 const PendingChange = require('@cardstack/plugin-utils/pending-change');
 const Error = require('@cardstack/plugin-utils/error');
 const { Pool } = require('pg');
-const { range }  = require('lodash');
+const { range, snakeCase }  = require('lodash');
 const rowToDocument = require('./row-to-doc');
 
 const safeIdentifier = /^[a-zA-Z0-9._]+$/;
@@ -119,21 +119,39 @@ module.exports = class Writer {
       throw new Error(`No such configured branch ${branch}`, { status: 400 });
     }
 
-    let tableName = type;
+    let tableName = snakeCase(type);
     if (!safeIdentifier.test(tableName)) {
       throw new Error(`Disallowed table name ${tableName}`);
     }
     let args = [];
-    let columns = (document ? Object.entries(document.attributes) : []).map(([key, value]) => {
+    let columns = (document ? Object.entries(document.attributes || {}) : []).map(([key, value]) => {
+      key = snakeCase(key);
       if (!safeIdentifier.test(key)) {
         throw new Error(`Disallowed column name ${key}`);
       }
+      if (value instanceof Array) {
+        // Arrays are a valid type of json to store in a json column, but they
+        // are not escaped well when used with the prepared statement
+        value = JSON.stringify(value);
+      }
       args.push(value);
-      return key;
+      return quoteKey(key);
+    });
+
+    // Handle relationships - TODO: no handling of polymorphism here yet
+    (document ? Object.entries(document.relationships || {}) : []).map(([key, value]) => {
+      if (value && value.data && value.data.id) {
+        columns.push(quoteKey(key));
+        args.push(value.data.id);
+      }
     });
     return { tableName, args, columns };
   }
 };
+
+function quoteKey(key) {
+  return `"${key}"`;
+}
 
 async function finalize(pendingChange) {
   let { client } = pendingChanges.get(pendingChange);

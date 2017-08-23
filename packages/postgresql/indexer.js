@@ -1,6 +1,6 @@
 const logger = require('@cardstack/plugin-utils/logger');
 const { Pool } = require('pg');
-const { partition, isEqual } = require('lodash');
+const { partition, isEqual, kebabCase } = require('lodash');
 const Error = require('@cardstack/plugin-utils/error');
 const rowToDocument = require('./row-to-doc');
 
@@ -104,22 +104,65 @@ class Updater {
         continue;
       }
 
-      if (fields[column_name]) {
-        this.log.warn('Ignoring duplicate column name "%s"', column_name);
-        continue;
-      }
-
       let fieldType = this._fieldTypeFor(data_type);
       if (!fieldType) {
         this.log.warn('Ignoring column "%s" because of unknown data type "%s"', column_name, data_type);
         continue;
       }
-      fields[column_name] = this._initializeField(column_name, fieldType);
+
+      let internalName = kebabCase(column_name);
+
+      if (!fields[internalName]) {
+        fields[internalName] = this._initializeField(internalName, fieldType);
+      }
+
       if (!types[scopedTableName]) {
         types[scopedTableName] = this._initializeContentType(scopedTableName);
       }
-      types[scopedTableName].relationships.fields.data.push({ type: 'fields', id: column_name });
+      types[scopedTableName].relationships.fields.data.push({ type: 'fields', id: internalName });
     }
+
+    let { rows: relationshipColumns } = await this.query(`
+      SELECT
+           KCU1.constraint_schema AS fk_constraint_schema
+          ,KCU1.CONSTRAINT_NAME AS fk_constraint_name
+          ,KCU1.TABLE_NAME AS fk_table_name
+          ,KCU1.COLUMN_NAME AS fk_column_name
+          ,KCU1.ORDINAL_POSITION AS fk_ordinal_position
+          ,KCU2.CONSTRAINT_NAME AS referenced_constraint_name
+          ,KCU2.TABLE_NAME AS referenced_table_name
+          ,KCU2.COLUMN_NAME AS referenced_column_name
+          ,KCU2.ORDINAL_POSITION AS referenced_ordinal_position
+      FROM INFORMATION_SCHEMA.REFERENTIAL_CONSTRAINTS AS RC
+
+      INNER JOIN INFORMATION_SCHEMA.KEY_COLUMN_USAGE AS KCU1
+          ON KCU1.CONSTRAINT_CATALOG = RC.CONSTRAINT_CATALOG
+          AND KCU1.CONSTRAINT_SCHEMA = RC.CONSTRAINT_SCHEMA
+          AND KCU1.CONSTRAINT_NAME = RC.CONSTRAINT_NAME
+
+      INNER JOIN INFORMATION_SCHEMA.KEY_COLUMN_USAGE AS KCU2
+          ON KCU2.CONSTRAINT_CATALOG = RC.UNIQUE_CONSTRAINT_CATALOG
+          AND KCU2.CONSTRAINT_SCHEMA = RC.UNIQUE_CONSTRAINT_SCHEMA
+          AND KCU2.CONSTRAINT_NAME = RC.UNIQUE_CONSTRAINT_NAME
+          AND KCU2.ORDINAL_POSITION = KCU1.ORDINAL_POSITION`);
+
+    for (let {fk_column_name, referenced_table_name, fk_constraint_schema} of relationshipColumns) {
+      let field = fields[fk_column_name];
+      if (!field) {
+        throw new Error(`There was a problem with the relationship field ${fk_column_name}, it could not be found to turn into a relationship`);
+      }
+
+      let tableName = this._typeNameFor(fk_constraint_schema, referenced_table_name);
+
+      if (!types[tableName]) {
+        throw new Error(`Could not find the content type ${tableName}`);
+      }
+
+      field.attributes['field-type'] = "@cardstack/core-types::belongs-to";
+
+      field.relationships = {'related-types':  { data: [ { type: 'content-types', id: tableName }]}};
+    }
+
     return Object.values(types).concat(Object.values(fields));
   }
 
@@ -190,7 +233,7 @@ class Updater {
         for (let { id } of deletes) {
           await ops.delete(type, id);
         }
-        let result = await this.query(`SELECT * from ${schema}.${table} where id = any($1)`, [ rest.map(({id}) => id) ]);
+        let result = await this.query(`SELECT * from ${schema}.${underscore(table)} where id = any($1)`, [ rest.map(({id}) => id) ]);
         for (let row of result.rows) {
           await ops.save(type, row.id, await this._toDocument(type, row));
         }
@@ -216,7 +259,7 @@ class Updater {
   }
 
   async _fullUpdateType(type, ops) {
-    let result = await this.query(`select * from ${type}`);
+    let result = await this.query(`select * from ${underscore(type)}`);
     for (let row of result.rows) {
       await ops.save(type, row.id, await this._toDocument(type, row));
     }
@@ -253,10 +296,14 @@ class Updater {
     // conventionally strip that off the type names, while keeping
     // it on for more exotic schemas. Ultimately this can become
     // more customizable via configuration.
+
+    // json-api uses kebab case but database tables use underscores
+    let tableDasherized = kebabCase(table);
+
     if (schema !== 'public') {
-      return `${schema}.${table}`;
+      return `${schema}.${tableDasherized}`;
     } else {
-      return table;
+      return tableDasherized;
     }
   }
 
@@ -288,6 +335,7 @@ class Updater {
   _fieldTypeFor(pgType) {
     switch(pgType) {
     case 'character varying':
+    case 'text':
       return '@cardstack/core-types::string';
 
     // A postgres integer is 32 bits, which always fits into a safe
@@ -299,8 +347,21 @@ class Updater {
 
     case 'boolean':
       return '@cardstack/core-types::boolean';
+
+    case 'timestamp':
+    case 'timestamp without time zone':
+    case 'timestamp with time zone':
+    case 'date':
+      return '@cardstack/core-types::date';
+
+    case 'json':
+      return '@cardstack/core-types::any';
     }
   }
 
 
+}
+
+function underscore(name) {
+  return name.replace(/-/g, '_');
 }
