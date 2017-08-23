@@ -2552,6 +2552,12 @@ ember-inflector@^2.0.0:
   dependencies:
     ember-cli-babel "^6.0.0"
 
+ember-inject-optional@^0.1.0:
+  version "0.1.0"
+  resolved "https://registry.yarnpkg.com/ember-inject-optional/-/ember-inject-optional-0.1.0.tgz#1a803eb6d6941219e78dcb4434a4b5434bc6bfbc"
+  dependencies:
+    ember-cli-babel "^6.3.0"
+
 ember-load-initializers@^0.6.3:
   version "0.6.3"
   resolved "https://registry.yarnpkg.com/ember-load-initializers/-/ember-load-initializers-0.6.3.tgz#f47396ad271ba77294068c98f992a5f19705441a"
