@@ -15,7 +15,7 @@
   "dependencies": {
     "@cardstack/plugin-utils": "^0.2.4",
     "lodash": "^4.17.4",
-    "pg": "^7.0.2"
+    "pg": "^7.0.3"
   },
   "keywords": [
     "cardstack-plugin"
