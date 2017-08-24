@@ -1,0 +1,14 @@
+<div class="cs-workflow-sidebar" {{action (action 'toggleDetails')}}>
+  <div class="cs-workflow-notification-count">
+    {{notificationCount}}
+  </div>
+</div>
+
+{{#if isOpen}}
+  <div class="cs-workflow-details">
+    <h4>Today</h4>
+    <section>Need Response</section>
+    <div>Ready to publish live</div>
+    <div>Ready to copyediting</div>
+  </div>
+{{/if}}
