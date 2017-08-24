@@ -1,12 +1,12 @@
 import Ember from 'ember';
-const { getOwner } = Ember;
 import { transitionTo } from '../private-api';
 import { modelType } from '@cardstack/rendering/helpers/cs-model-type';
+import injectOptional from 'ember-inject-optional';
 
 export default Ember.Service.extend({
   overlays: Ember.inject.service('ember-overlays'),
   resourceMetadata: Ember.inject.service(),
-  cardstackRouting: Ember.inject.service(),
+  cardstackRouting: injectOptional.service(),
   marks: Ember.computed.alias('overlays.marks'),
 
   fields: Ember.computed('marks', function() {
@@ -48,12 +48,7 @@ export default Ember.Service.extend({
     return !this.get('sessionService') || this.get('sessionService.session.isAuthenticated');
   }),
 
-  // This is not a plain injection because it's optional -- if
-  // cardstack-session is present, we use it, otherwise we are never
-  // active and it doesn't matter.
-  sessionService: Ember.computed(function() {
-    return Ember.getOwner(this).lookup('service:cardstack-session');
-  }),
+  sessionService: injectOptional.service('cardstack-session'),
 
   // Tools are active when the user has hit the launcher button and
   // revealed the toolbars.
@@ -178,7 +173,7 @@ export default Ember.Service.extend({
         args,
         queryParams
       } = this.get('cardstackRouting').routeFor(modelType(model), model.get('slug'), which);
-      transitionTo(getOwner(this), name, args, queryParams);
+      transitionTo(Ember.getOwner(this), name, args, queryParams);
     }
   },
 

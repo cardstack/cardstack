@@ -3,6 +3,11 @@ body {
     margin: 0;
 }
 
-article.page {
-    margin: 6em;
+.post-card {
+    margin: 4em;
+    display: block;
+}
+
+.post-page {
+    margin: 4em;
 }
