@@ -1,7 +1,7 @@
 CardStack Application Framework
 ===============================
 
-This is the main repo for [CardStack](https://www.cardstack.com/), and open source application architecture for building cohesive experiences on open, decentralized infrastructure.
+This is the main repo for [CardStack](https://www.cardstack.com/), an open source application architecture for building cohesive experiences on open, decentralized infrastructure.
 
 ## Orientation 
 
@@ -22,7 +22,7 @@ A CardStack Plugin is any npm package with "cardstack-plugin" in its `package.js
 | indexer                   | Indexes content from some arbitrary external data source into CardStack Hub's fast cache. Examples: @cardstack/git, @cardstack/postgresql, @cardstack/drupal |
 | messenger                 | Implements a way to send messages out to some arbitrary data sink. Example: @cardstack/email |
 | middleware                | Allows a plugin to install arbitrary server-side middleware. This is a fairly low-level feature -- often you can implement more specific feature types instead, relying on standard middleware like @cardstack/jsonapi. Examples: @cardstack/jsonapi, @cardstack/authentication |
-| searcher                  | Provides deep searches in some data source (as opposed to an indexer, which pre-indexes external data sources for fast local searches). An example is the @cardstack/elasticsearch searcher, which is the default searcher used interally by CardStack Hub.
+| searcher                  | Provides deep searches in some data source (as opposed to an indexer, which pre-indexes external data sources for fast local searches). An example is the @cardstack/elasticsearch searcher, which is the default searcher used internally by CardStack Hub.
 | writers                   | Writes content back out to some arbitrary external data source. Works in tandem with an indexer or searcher to provide full round-trip integration. Examples: @cardstack/git, @cardstack/postgresql. |
 
 
