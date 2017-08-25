@@ -1,0 +1,9 @@
+<div class="cardstack-workflow-sidebar" {{action (action 'toggleDetails')}}>
+  <div class="cardstack-workflow-notification-count">
+    {{notificationCount}}
+  </div>
+</div>
+
+{{#if isOpen}}
+  {{in-left-toolbar show=(component "cardstack-workflow")}}
+{{/if}}

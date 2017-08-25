@@ -1,0 +1,46 @@
+:root {
+  --normal-background: #292A2C;
+  --bright-foreground: #fff;
+  --light-background: #737373;
+  font-family: 'Avenir', 'helvetica', sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+
+.cardstack-workflow-launcher {
+  font-size: 16px;
+  position: absolute;
+  left: 0px;
+  top: 0px;
+  padding: 5px;
+}
+
+.cardstack-workflow-sidebar {
+  display: inline-block;
+  line-height: 1.375em;
+  margin-left: 0;
+  margin-right: 0;
+  color: var(--bright-foreground);
+  background-color: var(--normal-background);
+  cursor: pointer;
+  width: 4vw;
+  height: inherit;
+}
+
+.cardstack-workflow-notification-count {
+  width: 2vw;
+  height: 2vw;
+  line-height: 2vw;
+  background-color: red;
+  margin: 1vh auto 0 auto;
+  border-radius: 50%;
+  text-align: center;
+  font-weight: bold;
+}
+
+.cardstack-workflow {
+  display: inline-block;
+  width: 12vw;
+  height: inherit;
+  background-color: var(--light-background);
+  color: var(--bright-foreground);
+}
