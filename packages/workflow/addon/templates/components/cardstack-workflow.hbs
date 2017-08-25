@@ -1,4 +1,14 @@
-<h4>Today</h4>
-<section>Need Response</section>
-<div>Ready to publish live</div>
-<div>Ready to copyediting</div>
+<!-- <h4>Today</h4> -->
+<section>
+  <h4>Need Response</h4>
+  {{#each-in changesByCategory as |category count|}}
+    <div class="cardstack-workflow-category">
+      <span>{{category}}</span>
+      <span class="cardstack-workflow-category-count">{{count}}</span>
+    </div>
+  {{/each-in}}
+</section>
+<!--
+<section>Ready to publish live</div>
+<section>Ready to copyediting</div>
+-->
