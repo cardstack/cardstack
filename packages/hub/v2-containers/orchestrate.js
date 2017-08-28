@@ -24,9 +24,34 @@ async function go() {
   try {
     let packs = await withVolumes(packages);
     await installAndLink(packs);
+    await launchServer(packs);
   } catch (e) {
     console.error('ehhh');
   }
+}
+
+function launchServer(packages) {
+  let mounts = mountsForPackageList(packages);
+
+  let p = spawn('docker', [
+      'run',
+      ...mounts,
+      '--mount', `type=bind,src=${process.env.CARDSTACK_SEED_DIRECTORY},dst=/hub/seeds`,
+      '--env', `CARDSTACK_SESSIONS_KEY=${process.env.CARDSTACK_SESSIONS_KEY}`,
+      '--detach',
+      'cardstack/hub',
+      'node', '/hub/src/bin/server.js',
+      '/hub/seeds', '--allow-dev-dependencies'
+  ]);
+}
+
+function mountsForPackageList(packages) {
+  let mounts = [];
+  for (let p of packages) {
+    mounts.push('--mount', `type=bind,src=${p.path},dst=/packages/${p.name}`);
+    mounts.push('--mount', `type=volume,src=${p.volumeName},dst=/packages/${p.name}/node_modules`);
+  }
+  return mounts;
 }
 
 
@@ -35,11 +60,7 @@ async function go() {
  * packages.
  */
 function installAndLink(packages) {
-  let mounts = [];
-  for (let p of packages) {
-    mounts.push('--mount', `type=bind,src=${p.path},dst=/packages/${p.name}`);
-    mounts.push('--mount', `type=volume,src=${p.volumeName},dst=/packages/${p.name}/node_modules`);
-  }
+  let mounts = mountsForPackageList(packages);
 
   let p = spawn('docker', [
       'run',

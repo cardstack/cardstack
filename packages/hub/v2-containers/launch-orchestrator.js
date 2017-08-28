@@ -2,7 +2,7 @@ const fs = require('fs');
 const path = require('path');
 const {spawn} = require('child_process');
 
-module.exports = function startHubContainer({
+module.exports = function launchOrchestrator({
   projectName,
   projectRoot,
   projectStructure,

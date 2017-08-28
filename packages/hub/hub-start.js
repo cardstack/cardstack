@@ -19,7 +19,7 @@ module.exports = {
     let seedDir = path.join(path.dirname(this.project.configPath()), '..', 'cardstack', 'seeds', 'development');
     let projectStructure = crawlLinkedModules(projectRoot);
 
-    return startHubContainer({
+    return launchOrchestrator({
       projectName,
       projectRoot,
       projectStructure,
