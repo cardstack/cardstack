@@ -5,18 +5,18 @@ const {
 // const PROJECT_NAME = process.env.CARDSTACK_PROJECT_NAME;
 const PROJECT_NAME = "project-name";
 
-// let packages = JSON.parse(process.env.CARDSTACK_PROJECT_LINKAGES);
-let packages = [{
-  name: 'minimal-cardstack',
-  path: '/Users/aaron/dev/minimal-cardstack',
-  links: [
-    { name: '@cardstack/hub', package: '@cardstack/hub' }
-  ]
-},{
-  name: '@cardstack/hub',
-  path: '/Users/aaron/dev/cardstack/packages/hub',
-  links: []
-}]
+let packages = JSON.parse(process.env.CARDSTACK_PROJECT_LINKAGES);
+// let packages = [{
+//   name: 'minimal-cardstack',
+//   path: '/Users/aaron/dev/minimal-cardstack',
+//   links: [
+//     { name: '@cardstack/hub', package: '@cardstack/hub' }
+//   ]
+// },{
+//   name: '@cardstack/hub',
+//   path: '/Users/aaron/dev/cardstack/packages/hub',
+//   links: []
+// }]
 
 go();
 

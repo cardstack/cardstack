@@ -1,6 +1,6 @@
 const path = require('path');
 const crawlLinkedModules = require('./v2-containers/crawl-linked-packages');
-const startHubContainer = require('./v2-containers/start-hub-container');
+const launchOrchestrator = require('./v2-containers/launch-orchestrator');
 const _ = require('lodash');
 
 module.exports = {
