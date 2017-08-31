@@ -27,6 +27,7 @@
     "@cardstack/di": "^0.2.4",
     "@cardstack/tools": "^0.2.4",
     "ember-cli-babel": "^6.3.0",
+    "ember-resource-metadata": "^0.0.7",
     "handlebars": "^4.0.6"
   },
   "devDependencies": {
@@ -52,7 +53,6 @@
     "ember-export-application-global": "^2.0.0",
     "ember-load-initializers": "^1.0.0",
     "ember-resolver": "^4.0.0",
-    "ember-resource-metadata": "^0.0.7",
     "ember-source": "~2.14.0",
     "ember-welcome-page": "^3.0.0",
     "loader.js": "^4.2.3"
