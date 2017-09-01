@@ -5,7 +5,7 @@ const JSONAPIFactory = require('@cardstack/test-support/jsonapi-factory');
 function initialModels() {
   let initial = new JSONAPIFactory();
 
-  initial.addResource('content-types', 'changes')
+  initial.addResource('content-types', 'messages')
     .withRelated('fields', [
       initial.addResource('fields', 'status').withAttributes({
         fieldType: '@cardstack/core-types::string'
@@ -13,7 +13,7 @@ function initialModels() {
       initial.addResource('fields', 'priority').withAttributes({
         fieldType: '@cardstack/core-types::string'
       }),
-      initial.addResource('fields', 'category').withAttributes({
+      initial.addResource('fields', 'tag').withAttributes({
         fieldType: '@cardstack/core-types::string'
       }),
       initial.addResource('fields', 'is-handled').withAttributes({
@@ -21,32 +21,32 @@ function initialModels() {
       }),
     ]);
   //TODO: Can we get the exported priority names here?
-  initial.addResource('changes', '1')
+  initial.addResource('messages', '1')
     .withAttributes({
       status: 'pending',
       priority: 'Need Response',
-      category: 'Request to publish live',
+      tag: 'Request to publish live',
       isHandled: false,
     });
-  initial.addResource('changes', '2')
+  initial.addResource('messages', '2')
     .withAttributes({
       status: 'approved', // CueCard prop
       priority: 'Need Response',
-      category: 'Request to publish live',
+      tag: 'Request to publish live',
       isHandled: false,
     });
-  initial.addResource('changes', '3')
+  initial.addResource('messages', '3')
     .withAttributes({
       status: 'denied',
       priority: 'Need Response',
-      category: 'Ready for copyediting',
+      tag: 'Ready for copyediting',
       isHandled: false,
     });
-  initial.addResource('changes', '4')
+  initial.addResource('messages', '4')
     .withAttributes({
       status: 'approved',
       priority: 'Automatically processed',
-      category: 'Course information synced',
+      tag: 'Course information synced',
       isHandled: true,
     });
   return initial.getModels();

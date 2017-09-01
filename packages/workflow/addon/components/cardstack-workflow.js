@@ -8,5 +8,5 @@ export default Ember.Component.extend({
   classNames: ['cardstack-workflow'],
   workflow: inject.service('cardstack-workflow'),
 
-  changesByCategory: computed.readOnly('workflow.changesByCategory'),
+  messagesByTag: computed.readOnly('workflow.messagesByTag'),
 });

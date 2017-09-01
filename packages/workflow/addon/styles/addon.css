@@ -42,11 +42,11 @@
   color: var(--bright-foreground);
 }
 
-.cardstack-workflow-category {
+.cardstack-workflow-tag {
   margin: 2vh;
 }
 
-.cardstack-workflow-category-count {
+.cardstack-workflow-tag-count {
   width: 1vh;
   height: 1vh;
   background-color: red;

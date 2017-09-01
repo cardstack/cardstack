@@ -15,7 +15,7 @@ export const FYI = 'For Your Information';
 //   AUTO_PROCESSED,
 //   FYI
 // ]
-// const categories = [
+// const tags = [
 //   REQUEST_TO_PUBLISH_LIVE,
 //   READY_FOR_COPYEDITING,
 //   COURSE_INFORMATION_SYNCED
@@ -27,21 +27,21 @@ export default Ember.Service.extend({
   store: inject.service(),
 
   items: Ember.computed(function() {
-    return this.get('store').findAll('change');
+    return this.get('store').findAll('message');
   }),
 
   notificationCount: Ember.computed('items.@each.isHandled', function() {
     return this.get('items').filterBy('isHandled', false).length;
   }),
 
-  changesByCategory: Ember.computed('items.@each.{isHandled,category}', function() {
-    return this.get('items').reduce((changes, change) => {
-      let category = Ember.get(change, 'category');
-      if (!changes[category]) {
-        changes[category] = 0;
+  messagesByTag: Ember.computed('items.@each.{isHandled,tag}', function() {
+    return this.get('items').reduce((messages, message) => {
+      let tag = Ember.get(message, 'tag');
+      if (!messages[tag]) {
+        messages[tag] = 0;
       }
-      changes[category] += Ember.get(change, 'isHandled') ? 0 : 1;
-      return changes;
+      messages[tag] += Ember.get(message, 'isHandled') ? 0 : 1;
+      return messages;
     }, {});
   }),
 });

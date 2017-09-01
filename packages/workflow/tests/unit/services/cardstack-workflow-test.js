@@ -21,18 +21,18 @@ test('it gets notification count from unhandled items', function(assert) {
 
 test('it extracts categories from the items', function(assert) {
   let items = Ember.A([
-    { category: REQUEST_TO_PUBLISH_LIVE, isHandled: false },
-    { category: REQUEST_TO_PUBLISH_LIVE, isHandled: false },
-    { category: REQUEST_TO_PUBLISH_LIVE, isHandled: true },
-    { category: READY_FOR_COPYEDITING, isHandled: false },
-    { category: READY_FOR_COPYEDITING, isHandled: true },
-    { category: COURSE_INFORMATION_SYNCED, isHandled: true },
-    { category: COURSE_INFORMATION_SYNCED, isHandled: true },
+    { tag: REQUEST_TO_PUBLISH_LIVE, isHandled: false },
+    { tag: REQUEST_TO_PUBLISH_LIVE, isHandled: false },
+    { tag: REQUEST_TO_PUBLISH_LIVE, isHandled: true },
+    { tag: READY_FOR_COPYEDITING, isHandled: false },
+    { tag: READY_FOR_COPYEDITING, isHandled: true },
+    { tag: COURSE_INFORMATION_SYNCED, isHandled: true },
+    { tag: COURSE_INFORMATION_SYNCED, isHandled: true },
   ]);
   let service = this.subject({ items });
   let expected = {};
   expected[REQUEST_TO_PUBLISH_LIVE] = 2;
   expected[READY_FOR_COPYEDITING] = 1;
   expected[COURSE_INFORMATION_SYNCED] = 0;
-  assert.deepEqual(service.get('changesByCategory'), expected);
+  assert.deepEqual(service.get('messagesByTag'), expected);
 });
