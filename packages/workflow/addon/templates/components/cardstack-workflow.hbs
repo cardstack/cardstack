@@ -1,14 +1,22 @@
 <!-- <h4>Today</h4> -->
-<section>
+<section class="message-summary">
   <h4>Need Response</h4>
   {{#each-in messagesByTag as |tag count|}}
-    <div class="cardstack-workflow-tag-with-count">
+    <div class="cardstack-workflow-tag-with-count" onclick={{action (mut selectedTag) tag}}>
       <div class='name'>{{tag}}</div>
       <div class="count" data-test-tag-counter={{tag}}>{{count}}</div>
     </div>
   {{/each-in}}
+  <!--
+  <h4>Ready to publish live</h4>
+  <h4>Ready to copyediting</h4>
+  -->
 </section>
-<!--
-<section>Ready to publish live</div>
-<section>Ready to copyediting</div>
--->
+
+{{#if messagesWithSelectedTag.length}}
+  <section class="cue-cards">
+    {{#each messagesWithSelectedTag as |message|}}
+      <div class="message-card" data-test-cue-card>{{message.tag}}</div>
+    {{/each}}
+  </section>
+{{/if}}

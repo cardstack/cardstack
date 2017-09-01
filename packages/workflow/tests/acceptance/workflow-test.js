@@ -18,3 +18,13 @@ test('The first-level workflow sidebar', function(assert) {
     assertTrimmedText(assert, '[data-test-tag-counter="Course information synced"]', "0");
   });
 });
+
+test('Individual cue cards', function(assert) {
+  visit('/');
+
+  click('.cardstack-workflow-header');
+  click('[data-test-tag-counter="Request to publish live"]');
+  andThen(() => {
+    assert.equal(find('[data-test-cue-card]').length, 2);
+  });
+});

@@ -1,6 +1,6 @@
 import Ember from 'ember';
 
-const { inject } = Ember;
+const { inject, computed } = Ember;
 
 export const REQUEST_TO_PUBLISH_LIVE = 'Request to publish live';
 export const READY_FOR_COPYEDITING = 'Ready for copyediting';
@@ -26,15 +26,14 @@ export default Ember.Service.extend({
 
   store: inject.service(),
 
-  items: Ember.computed(function() {
+  items: computed(function() {
     return this.get('store').findAll('message');
   }),
 
-  notificationCount: Ember.computed('items.@each.isHandled', function() {
-    return this.get('items').filterBy('isHandled', false).length;
-  }),
+  unhandledItems:    computed.filterBy('items', 'isHandled', false),
+  notificationCount: computed.readOnly('unhandledItems.length'),
 
-  messagesByTag: Ember.computed('items.@each.{isHandled,tag}', function() {
+  messagesByTag: computed('items.@each.{isHandled,tag}', function() {
     return this.get('items').reduce((messages, message) => {
       let tag = Ember.get(message, 'tag');
       if (!messages[tag]) {
