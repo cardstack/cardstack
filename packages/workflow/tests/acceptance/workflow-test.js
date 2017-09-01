@@ -21,9 +21,9 @@ test('The workflow sidebar', function(assert) {
     // This is a hack to work around a probable timing issue in ember-toolbars
     .then(() => waitFor(2000))
     .then(function() {
-      assert.equal(find('[data-test-category-counter="Request to publish live"]').text().trim(), 2);
-      assert.equal(find('[data-test-category-counter="Ready for copyediting"]').text().trim(), 1);
-      assert.equal(find('[data-test-category-counter="Course information synced"]').text().trim(), 0);
+      assertTrimmedText(assert, '[data-test-tag-counter="Request to publish live"]', "2");
+      assertTrimmedText(assert, '[data-test-tag-counter="Ready for copyediting"]', "1");
+      assertTrimmedText(assert, '[data-test-tag-counter="Course information synced"]', "0");
     });
 
 });
