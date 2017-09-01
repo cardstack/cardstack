@@ -1,5 +1,5 @@
 <!-- <h4>Today</h4> -->
-<section class="message-summary">
+<section class="cardstack-message-summary">
   <h4>Need Response</h4>
   {{#each-in messagesByTag as |tag count|}}
     <div class="cardstack-workflow-tag-with-count" onclick={{action (mut selectedTag) tag}}>
@@ -14,9 +14,12 @@
 </section>
 
 {{#if messagesWithSelectedTag.length}}
-  <section class="cue-cards">
+  <section class="cardstack-cue-cards">
     {{#each messagesWithSelectedTag as |message|}}
-      <div class="message-card" data-test-cue-card>{{message.tag}}</div>
+      {{!-- <div class="message-card" data-test-cue-card>{{message.tag}}</div> --}}
+      <div class="message-card" data-test-message-card={{message.tag}}>
+        {{cardstack-content content=message format="card"}}
+      </div>
     {{/each}}
   </section>
 {{/if}}

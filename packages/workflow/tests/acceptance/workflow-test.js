@@ -19,12 +19,16 @@ test('The first-level workflow sidebar', function(assert) {
   });
 });
 
-test('Individual cue cards', function(assert) {
+test('List of message cards that match clicked tag', function(assert) {
   visit('/');
-
   click('.cardstack-workflow-header');
   click('[data-test-tag-counter="Request to publish live"]');
   andThen(() => {
-    assert.equal(find('[data-test-cue-card]').length, 2);
+    assert.equal(find('[data-test-message-card="Request to publish live"]').length, 2);
+  });
+
+  click('[data-test-tag-counter="Ready for copyediting"]');
+  andThen(() => {
+    assert.equal(find('[data-test-message-card="Ready for copyediting"]').length, 1);
   });
 });

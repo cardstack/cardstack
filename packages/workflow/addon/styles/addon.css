@@ -2,6 +2,7 @@
   --normal-background: #292A2C;
   --bright-foreground: #fff;
   --light-background: #737373;
+  --lighter-background: #a1a2a3;
   font-family: 'Avenir', 'helvetica', sans-serif;
   -webkit-font-smoothing: antialiased;
 }
@@ -28,21 +29,35 @@
 }
 
 .cardstack-workflow {
-  display: inline-block;
   min-width: 15vw;
-  height: inherit;
+  height: 100%;
+  display: flex;
+  flex-direction: row;
+}
+
+.cardstack-message-summary {
+  min-width: 15vw;
+  float: left;
   background-color: var(--light-background);
+  color: var(--bright-foreground);
+  padding: 0 5px;
+}
+
+.cardstack-cue-cards {
+  min-width: 15vw;
+  background-color: var(--lighter-background);
   color: var(--bright-foreground);
   padding: 0 5px;
 }
 
 .cardstack-workflow-tag-with-count {
   cursor: pointer;
-  margin: 2vh;
-  height: 4vh;
-  padding: 1vh 0;
+  margin: 10px;
+  height: 20px;
+  padding: 5px 0;
 }
 
+/* TODO: Flexbox this and the .count */
 .cardstack-workflow-tag-with-count > .name {
   float: left;
   max-width: 10vw;
@@ -67,4 +82,3 @@ count could be made to stay on the same line
   font-size: 0.8em;
   font-weight: bold;
 }
-
