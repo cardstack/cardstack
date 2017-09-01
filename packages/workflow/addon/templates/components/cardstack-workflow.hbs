@@ -2,9 +2,9 @@
 <section>
   <h4>Need Response</h4>
   {{#each-in messagesByTag as |tag count|}}
-    <div class="cardstack-workflow-tag">
-      <span>{{tag}}</span>
-      <span class="cardstack-workflow-tag-count" data-test-tag-counter={{tag}}>{{count}}</span>
+    <div class="cardstack-workflow-tag-with-count">
+      <div class='name'>{{tag}}</div>
+      <div class="count" data-test-tag-counter={{tag}}>{{count}}</div>
     </div>
   {{/each-in}}
 </section>

@@ -6,52 +6,65 @@
   -webkit-font-smoothing: antialiased;
 }
 
-.cardstack-workflow-launcher {
-  font-size: 16px;
-  padding: 5px;
-}
-
-.cardstack-workflow-sidebar {
-  display: inline-block;
-  line-height: 1.375em;
-  margin-left: 0;
-  margin-right: 0;
+.cardstack-workflow-header {
+  min-height: 50px;
+  width: 100vw;
   color: var(--bright-foreground);
   background-color: var(--normal-background);
-  cursor: pointer;
-  width: 4vw;
-  height: inherit;
+  display: inline-block;
+  /* line-height: 1.375em; */
 }
 
-.cardstack-workflow-notification-count {
-  width: 2vw;
-  height: 2vw;
-  line-height: 2vw;
+.cardstack-workflow-header > .notification-count {
+  width: 30px;
+  height: 30px;
+  line-height: 30px;
   background-color: red;
-  margin: 1vh auto 0 auto;
   border-radius: 50%;
   text-align: center;
   font-weight: bold;
+  cursor: pointer;
+  margin: 10px 5px;
 }
 
 .cardstack-workflow {
   display: inline-block;
-  width: 12vw;
+  min-width: 15vw;
   height: inherit;
   background-color: var(--light-background);
   color: var(--bright-foreground);
+  padding: 0 5px;
 }
 
-.cardstack-workflow-tag {
+.cardstack-workflow-tag-with-count {
+  cursor: pointer;
   margin: 2vh;
+  height: 4vh;
+  padding: 1vh 0;
 }
 
-.cardstack-workflow-tag-count {
-  width: 1vh;
-  height: 1vh;
+.cardstack-workflow-tag-with-count > .name {
+  float: left;
+  max-width: 10vw;
+  margin-right: 5px;
+  overflow: hidden;
+  white-space: nowrap;
+}
+/*
+TODO: Add a container to the counter so that the
+min-width of the container could be set separately from the
+circle that contains the number. This way, the name and
+count could be made to stay on the same line
+*/
+.cardstack-workflow-tag-with-count > .count {
+  float: right;
+  width: 20px;
+  height: 20px;
+  line-height: 20px;
   background-color: red;
   border-radius: 50%;
   text-align: center;
+  font-size: 0.8em;
   font-weight: bold;
 }
 
