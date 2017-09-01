@@ -10,20 +10,19 @@ function waitFor(time) {
 
 moduleForAcceptance('Acceptance | Workflow');
 
-test('The workflow sidebar', function(assert) {
+test('The first-level workflow sidebar', function(assert) {
   visit('/');
 
   andThen(function() {
-    assert.equal(find('[data-test-total-notification-count]').text().trim(), '3');
+    assertTrimmedText(assert, '[data-test-total-notification-count]', "3");
   });
 
   click('.cardstack-workflow-launcher')
     // This is a hack to work around a probable timing issue in ember-toolbars
     .then(() => waitFor(2000))
-    .then(function() {
+    .then(() => {
       assertTrimmedText(assert, '[data-test-tag-counter="Request to publish live"]', "2");
       assertTrimmedText(assert, '[data-test-tag-counter="Ready for copyediting"]', "1");
       assertTrimmedText(assert, '[data-test-tag-counter="Course information synced"]', "0");
-    });
-
+    })
 });
