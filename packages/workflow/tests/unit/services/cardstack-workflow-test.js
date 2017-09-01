@@ -15,9 +15,7 @@ test('it gets notification count from unhandled items', function(assert) {
     { status: 'approved', isHandled: true },
     { status: 'denied', isHandled: false },
   ]);
-  let service = this.subject({
-    items
-  });
+  let service = this.subject({ items });
   assert.equal(service.get('notificationCount'), 2);
 });
 
@@ -31,9 +29,7 @@ test('it extracts categories from the items', function(assert) {
     { category: COURSE_INFORMATION_SYNCED, isHandled: true },
     { category: COURSE_INFORMATION_SYNCED, isHandled: true },
   ]);
-  let service = this.subject({
-    items
-  });
+  let service = this.subject({ items });
   let expected = {};
   expected[REQUEST_TO_PUBLISH_LIVE] = 2;
   expected[READY_FOR_COPYEDITING] = 1;

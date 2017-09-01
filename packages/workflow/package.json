@@ -18,6 +18,7 @@
     "test": "ember try:each"
   },
   "dependencies": {
+    "@cardstack/codegen": "^0.2.4",
     "ember-cli-babel": "^6.3.0",
     "ember-data": "^2.12.1",
     "ember-cli-htmlbars": "^2.0.1"
@@ -25,6 +26,7 @@
   "devDependencies": {
     "broccoli-asset-rev": "^2.4.5",
     "@cardstack/jsonapi": "^0.2.4",
+    "@cardstack/models": "^0.2.4",
     "@cardstack/test-support": "^0.2.4",
     "@cardstack/ephemeral": "^0.2.4",
     "ember-ajax": "^3.0.0",

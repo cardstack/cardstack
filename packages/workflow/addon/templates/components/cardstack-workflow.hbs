@@ -4,7 +4,7 @@
   {{#each-in changesByCategory as |category count|}}
     <div class="cardstack-workflow-category">
       <span>{{category}}</span>
-      <span class="cardstack-workflow-category-count">{{count}}</span>
+      <span class="cardstack-workflow-category-count" data-test-category-counter={{category}}>{{count}}</span>
     </div>
   {{/each-in}}
 </section>

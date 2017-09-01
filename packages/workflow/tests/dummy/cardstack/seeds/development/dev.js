@@ -10,6 +10,9 @@ function initialModels() {
       initial.addResource('fields', 'status').withAttributes({
         fieldType: '@cardstack/core-types::string'
       }),
+      initial.addResource('fields', 'priority').withAttributes({
+        fieldType: '@cardstack/core-types::string'
+      }),
       initial.addResource('fields', 'category').withAttributes({
         fieldType: '@cardstack/core-types::string'
       }),
@@ -17,24 +20,34 @@ function initialModels() {
         fieldType: '@cardstack/core-types::boolean'
       }),
     ]);
-  //TODO: Can we get the exported category names here?
+  //TODO: Can we get the exported priority names here?
   initial.addResource('changes', '1')
     .withAttributes({
       status: 'pending',
+      priority: 'Need Response',
       category: 'Request to publish live',
       isHandled: false,
     });
   initial.addResource('changes', '2')
     .withAttributes({
-      status: 'approved',
+      status: 'approved', // CueCard prop
+      priority: 'Need Response',
       category: 'Request to publish live',
       isHandled: false,
     });
   initial.addResource('changes', '3')
     .withAttributes({
       status: 'denied',
+      priority: 'Need Response',
       category: 'Ready for copyediting',
       isHandled: false,
+    });
+  initial.addResource('changes', '4')
+    .withAttributes({
+      status: 'approved',
+      priority: 'Automatically processed',
+      category: 'Course information synced',
+      isHandled: true,
     });
   return initial.getModels();
 }
