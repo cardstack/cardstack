@@ -8,13 +8,13 @@ function waitFor(time) {
   });
 }
 
-moduleForAcceptance('Acceptance | workflow');
+moduleForAcceptance('Acceptance | Workflow');
 
 test('The workflow sidebar', function(assert) {
   visit('/');
 
   andThen(function() {
-    assert.equal(find('.cardstack-workflow-notification-count').text().trim(), 3);
+    assert.equal(find('[data-test-total-notification-count]').text().trim(), '3');
   });
 
   click('.cardstack-workflow-launcher')
