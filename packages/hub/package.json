@@ -1,6 +1,6 @@
 {
   "name": "@cardstack/hub",
-  "version": "0.2.4",
+  "version": "0.2.5",
   "keywords": [
     "cardstack-plugin",
     "ember-addon"
@@ -14,7 +14,7 @@
   "dependencies": {
     "@cardstack/core-types": "^0.2.4",
     "@cardstack/di": "^0.2.4",
-    "@cardstack/elasticsearch": "^0.2.4",
+    "@cardstack/elasticsearch": "^0.2.5",
     "@cardstack/handlebars": "^0.2.4",
     "@cardstack/plugin-utils": "^0.2.4",
     "broccoli-concat": "^3.2.2",
