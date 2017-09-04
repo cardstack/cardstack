@@ -17,10 +17,7 @@ describe('git/indexer', function() {
 
     let factory = new JSONAPIFactory();
 
-    factory.addResource('plugin-configs')
-      .withAttributes({
-        module: '@cardstack/git'
-      });
+    factory.addResource('plugin-configs', '@cardstack/git');
 
     dataSource = factory.addResource('data-sources')
         .withAttributes({
@@ -28,10 +25,8 @@ describe('git/indexer', function() {
           params: { repo: root }
         });
 
-    factory.addResource('plugin-configs')
-      .withAttributes({
-        module: '@cardstack/hub',
-      }).withRelated(
+    factory.addResource('plugin-configs', '@cardstack/hub')
+      .withRelated(
         'default-data-source',
         dataSource
       );
@@ -356,10 +351,7 @@ describe('git/indexer failures', function() {
 
     let factory = new JSONAPIFactory();
 
-    factory.addResource('plugin-configs')
-      .withAttributes({
-        module: '@cardstack/git'
-      });
+    factory.addResource('plugin-configs', '@cardstack/git');
 
     let dataSource = factory.addResource('data-sources')
         .withAttributes({
@@ -367,10 +359,8 @@ describe('git/indexer failures', function() {
           params: { repo: root + '/repo-to-be-created' }
         });
 
-    factory.addResource('plugin-configs')
-      .withAttributes({
-        module: '@cardstack/hub',
-      }).withRelated(
+    factory.addResource('plugin-configs', '@cardstack/hub')
+      .withRelated(
         'default-data-source',
         dataSource
       );

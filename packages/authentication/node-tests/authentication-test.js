@@ -14,13 +14,9 @@ describe('authentication/middleware', function() {
   async function setup() {
     let factory = new JSONAPIFactory();
 
-    factory.addResource('plugin-configs').withAttributes({
-      module: '@cardstack/authentication'
-    });
+    factory.addResource('plugin-configs', '@cardstack/authentication');
 
-    factory.addResource('plugin-configs').withAttributes({
-      module: 'stub-authenticators'
-    });
+    factory.addResource('plugin-configs', 'stub-authenticators');
 
     quint = factory.addResource('users').withAttributes({
       email: 'quint@example.com',

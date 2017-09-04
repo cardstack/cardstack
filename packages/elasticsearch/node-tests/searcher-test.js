@@ -22,9 +22,7 @@ describe('elasticsearch/searcher', function() {
     factory.importModels([
       {
         type: 'plugin-configs',
-        attributes: {
-          module: '@cardstack/mobiledoc'
-        }
+        id: '@cardstack/mobiledoc'
       },
       {
         type: 'content-types',

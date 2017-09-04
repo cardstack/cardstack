@@ -18,9 +18,7 @@ describe('git/writer', function() {
 
     let factory = new JSONAPIFactory();
 
-    factory.addResource('plugin-configs').withAttributes({
-      module: '@cardstack/git'
-    });
+    factory.addResource('plugin-configs', '@cardstack/git');
 
     let source = factory.addResource('data-sources')
       .withAttributes({

@@ -3,9 +3,6 @@
 module.exports = [
   {
     type: 'plugin-configs',
-    id: '@cardstack/jsonapi',
-    attributes: {
-      module: '@cardstack/jsonapi'
-    }
+    id: '@cardstack/jsonapi'
   }
 ];

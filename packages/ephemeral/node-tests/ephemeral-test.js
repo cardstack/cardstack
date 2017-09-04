@@ -18,18 +18,9 @@ describe('ephemeral-storage', function() {
   beforeEach(async function() {
     let factory = new JSONAPIFactory();
 
-    factory.addResource('plugin-configs').withAttributes({
-      module: '@cardstack/ephemeral'
-    });
-
-    factory.addResource('plugin-configs').withAttributes({
-      module: '@cardstack/jsonapi'
-    });
-
-    factory.addResource('plugin-configs')
-      .withAttributes({
-        module: "@cardstack/test-support/authenticator"
-      });
+    factory.addResource('plugin-configs', '@cardstack/ephemeral');
+    factory.addResource('plugin-configs', '@cardstack/jsonapi');
+    factory.addResource('plugin-configs', "@cardstack/test-support/authenticator");
 
     let initial = new JSONAPIFactory();
     initial.addResource('posts', 'initial').withAttributes({ title: 'initial post' });
