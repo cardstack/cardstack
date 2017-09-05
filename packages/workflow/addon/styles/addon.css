@@ -36,7 +36,7 @@
 }
 
 .cardstack-message-summary {
-  min-width: 15vw;
+  min-width: 25vw;
   float: left;
   background-color: var(--light-background);
   color: var(--bright-foreground);
@@ -44,7 +44,7 @@
 }
 
 .cardstack-cue-cards {
-  min-width: 15vw;
+  min-width: 25vw;
   background-color: var(--lighter-background);
   color: var(--bright-foreground);
   padding: 0 5px;
@@ -60,7 +60,7 @@
 /* TODO: Flexbox this and the .count */
 .cardstack-workflow-tag-with-count > .name {
   float: left;
-  max-width: 10vw;
+  /* max-width: 10vw; */
   margin-right: 5px;
   overflow: hidden;
   white-space: nowrap;
@@ -81,4 +81,12 @@ count could be made to stay on the same line
   text-align: center;
   font-size: 0.8em;
   font-weight: bold;
+}
+
+.message-card {
+  margin: 2vh;
+  background-color: var(--bright-foreground);
+  padding: 2vh 2vw;
+  color: var(--light-background);
+  border-radius: 5px;
 }

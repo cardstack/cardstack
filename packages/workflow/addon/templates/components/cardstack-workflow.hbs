@@ -17,7 +17,7 @@
   <section class="cardstack-cue-cards">
     {{#each messagesWithSelectedTag as |message|}}
       {{!-- <div class="message-card" data-test-cue-card>{{message.tag}}</div> --}}
-      <div class="message-card" data-test-message-card={{message.tag}}>
+      <div class="message-card" data-test-message-card-tag={{message.tag}}>
         {{cardstack-content content=message format="card"}}
       </div>
     {{/each}}

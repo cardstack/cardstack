@@ -7,6 +7,9 @@ function initialModels() {
 
   initial.addResource('content-types', 'messages')
     .withRelated('fields', [
+      initial.addResource('fields', 'text').withAttributes({
+        fieldType: '@cardstack/core-types::string'
+      }),
       initial.addResource('fields', 'status').withAttributes({
         fieldType: '@cardstack/core-types::string'
       }),
@@ -23,6 +26,7 @@ function initialModels() {
   //TODO: Can we get the exported priority names here?
   initial.addResource('messages', '1')
     .withAttributes({
+      text: "Matt, could you push live my cover of Pearl Jam's Daughter?",
       status: 'pending',
       priority: 'Need Response',
       tag: 'Request to publish live',
@@ -30,6 +34,7 @@ function initialModels() {
     });
   initial.addResource('messages', '2')
     .withAttributes({
+      text: "Needs to have the Home song approved by tomorrow.",
       status: 'approved', // CueCard prop
       priority: 'Need Response',
       tag: 'Request to publish live',
@@ -37,6 +42,7 @@ function initialModels() {
     });
   initial.addResource('messages', '3')
     .withAttributes({
+      text: "Tool's Forty Six & 2. Please approve.",
       status: 'denied',
       priority: 'Need Response',
       tag: 'Ready for copyediting',
@@ -44,6 +50,7 @@ function initialModels() {
     });
   initial.addResource('messages', '4')
     .withAttributes({
+      text: 'Artist verified creator identity.',
       status: 'approved',
       priority: 'Automatically processed',
       tag: 'Course information synced',

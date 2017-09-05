@@ -24,11 +24,8 @@ test('List of message cards that match clicked tag', function(assert) {
   click('.cardstack-workflow-header');
   click('[data-test-tag-counter="Request to publish live"]');
   andThen(() => {
-    assert.equal(find('[data-test-message-card="Request to publish live"]').length, 2);
-  });
-
-  click('[data-test-tag-counter="Ready for copyediting"]');
-  andThen(() => {
-    assert.equal(find('[data-test-message-card="Ready for copyediting"]').length, 1);
+    assert.equal(find('[data-test-message-card-tag="Request to publish live"]').length, 2);
+    assert.equal(find(".message-card:contains(Matt, could you push live my cover of Pearl Jam's Daughter?)").length, 1)
+    assert.equal(find(".message-card:contains(Needs to have the Home song approved by tomorrow.)").length, 1)
   });
 });
