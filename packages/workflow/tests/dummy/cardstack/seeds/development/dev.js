@@ -55,10 +55,7 @@ function initialModels() {
 module.exports = [
   {
     type: 'plugin-configs',
-    id: 0,
-    attributes: {
-      module: '@cardstack/hub'
-    },
+    id: '@cardstack/hub',
     relationships: {
       'default-data-source': {
         data: { type: 'data-sources', id: 0 }
@@ -67,17 +64,11 @@ module.exports = [
   },
   {
     type: 'plugin-configs',
-    id: 1,
-    attributes: {
-      module: '@cardstack/ephemeral'
-    }
+    id: '@cardstack/ephemeral',
   },
   {
     type: 'plugin-configs',
-    id: 2,
-    attributes: {
-      module: '@cardstack/jsonapi'
-    }
+    id: '@cardstack/jsonapi',
   },
   {
     type: 'data-sources',
