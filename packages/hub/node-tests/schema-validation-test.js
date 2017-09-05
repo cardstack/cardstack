@@ -13,7 +13,7 @@ describe('schema/validation', function() {
     let factory = new JSONAPIFactory();
     factory.importModels(bootstrapSchema);
 
-    factory.addResource('plugin-configs').withAttributes({ module: '@cardstack/ephemeral' });
+    factory.addResource('plugin-configs', '@cardstack/ephemeral');
 
     ephemeralDataSource = factory.addResource('data-sources')
         .withAttributes({
@@ -25,9 +25,8 @@ describe('schema/validation', function() {
           }
         });
 
-    factory.addResource('plugin-configs').withAttributes({
-      module: '@cardstack/hub'
-    }).withRelated('defaultDataSource', ephemeralDataSource);
+    factory.addResource('plugin-configs', '@cardstack/hub')
+      .withRelated('defaultDataSource', ephemeralDataSource);
 
     let articleType = factory.addResource('content-types', 'articles')
         .withRelated('data-source', ephemeralDataSource);

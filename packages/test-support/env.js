@@ -19,10 +19,8 @@ exports.createDefaultEnvironment = async function(projectDir, initialModels = []
     user
   );
 
-  factory.addResource('plugin-configs')
-    .withAttributes({
-      module: '@cardstack/hub',
-    }).withRelated(
+  factory.addResource('plugin-configs', '@cardstack/hub')
+    .withRelated(
       'default-data-source',
       factory.addResource('data-sources')
         .withAttributes({
@@ -30,8 +28,7 @@ exports.createDefaultEnvironment = async function(projectDir, initialModels = []
         })
     );
 
-  factory.addResource('plugin-configs')
-    .withAttributes({ module: '@cardstack/ephemeral' });
+  factory.addResource('plugin-configs', '@cardstack/ephemeral');
 
   factory.addResource('grants')
     .withAttributes({

@@ -22,9 +22,7 @@ describe('postgresql/writer', function() {
 
     let factory = new JSONAPIFactory();
 
-    factory.addResource('plugin-configs').withAttributes({
-      module: '@cardstack/postgresql'
-    });
+    factory.addResource('plugin-configs', '@cardstack/postgresql');
 
     factory.addResource('data-sources')
       .withAttributes({

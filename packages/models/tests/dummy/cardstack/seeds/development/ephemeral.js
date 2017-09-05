@@ -24,10 +24,7 @@ function initialModels() {
 module.exports = [
   {
     type: 'plugin-configs',
-    id: '@cardstack/ephemeral',
-    attributes: {
-      module: '@cardstack/ephemeral'
-    }
+    id: '@cardstack/ephemeral'
   },
   {
     type: 'data-sources',
@@ -42,9 +39,6 @@ module.exports = [
   {
     type: 'plugin-configs',
     id: '@cardstack/hub',
-    attributes: {
-      module: '@cardstack/hub'
-    },
     relationships: {
       'default-data-source': {
         data: { type: 'data-sources', id: 'default' }

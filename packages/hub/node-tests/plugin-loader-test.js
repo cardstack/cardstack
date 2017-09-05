@@ -13,18 +13,9 @@ describe('hub/plugin-loader', function() {
     pluginLoader = new Container(registry).lookup('hub:plugin-loader');
 
     let factory = new JSONAPIFactory();
-    factory.addResource('plugin-configs')
-      .withAttributes({
-        module: 'sample-plugin-one',
-      });
-    factory.addResource('plugin-configs')
-      .withAttributes({
-        module: 'sample-plugin-two',
-      });
-    factory.addResource('plugin-configs')
-      .withAttributes({
-        module: 'sample-plugin-five',
-      });
+    factory.addResource('plugin-configs', 'sample-plugin-one');
+    factory.addResource('plugin-configs', 'sample-plugin-two');
+    factory.addResource('plugin-configs', 'sample-plugin-five');
 
     activePlugins = await pluginLoader.activePlugins(factory.getModels());
   });

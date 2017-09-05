@@ -3,9 +3,6 @@
 module.exports = [
   {
     type: 'plugin-configs',
-    id: '@cardstack/models',
-    attributes: {
-      module: '@cardstack/models'
-    }
+    id: '@cardstack/models'
   }
 ];

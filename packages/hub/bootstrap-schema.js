@@ -88,13 +88,6 @@ const models = [
     id: 'plugin-configs',
     attributes: {
       'is-built-in': true
-    },
-    relationships: {
-      fields: {
-        data: [
-          { type: 'fields', id: 'module' }
-        ]
-      }
     }
   },
   {
@@ -266,13 +259,6 @@ const models = [
   {
     type: 'fields',
     id: 'group-id',
-    attributes: {
-      'field-type': '@cardstack/core-types::string'
-    }
-  },
-  {
-    type: 'fields',
-    id: 'module',
     attributes: {
       'field-type': '@cardstack/core-types::string'
     }

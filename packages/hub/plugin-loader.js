@@ -74,10 +74,7 @@ class PluginLoader {
   async activePlugins(configModels) {
     let configs = new Map();
     for (let model of configModels) {
-      if (!model.attributes || !model.attributes.module) {
-        throw new Error(`plugin-configs must have a module attribute. Found: (${model})`);
-      }
-      configs.set(model.attributes.module, Object.assign({}, model.attributes, model.relationships));
+      configs.set(model.id, Object.assign({}, model.attributes, model.relationships));
     }
     let installed = await this._findInstalledPlugins();
 

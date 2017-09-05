@@ -11,9 +11,7 @@ describe('hub/messengers', function() {
 
   beforeEach(async function () {
     let factory = new JSONAPIFactory();
-    factory.addResource('plugin-configs').withAttributes({
-      module: '@cardstack/test-support/messenger'
-    });
+    factory.addResource('plugin-configs', '@cardstack/test-support/messenger');
     factory.addResource('message-sinks', 'the-sink').withAttributes({
       messengerType: '@cardstack/test-support/messenger',
       params: { theSecret: 42 }
