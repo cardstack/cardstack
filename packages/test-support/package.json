@@ -31,7 +31,7 @@
     "chai-things": "^0.2.0",
     "dag-map": "^2.0.2",
     "denodeify": "^1.2.1",
-    "ember-cli-babel": "^6.0.0",
+    "ember-cli-babel": "^6.3.0",
     "glob": "^7.1.1",
     "koa-better-route": "^0.1.0",
     "koa-compose": "^3.2.1",
