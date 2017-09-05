@@ -79,6 +79,16 @@
             "name": "Attach to Process",
             "port": 5858,
             "address": "10.0.15.2"
+        },
+        {
+          "type": "node",
+          "request": "launch",
+          "name": "Launch Workflow Dummy App",
+          "cwd": "${workspaceRoot}/packages/workflow",
+          "program": "${workspaceRoot}/packages/workflow/node_modules/ember-cli/bin/ember",
+          "args": [
+            "s",
+          ]
         }
     ]
 }
