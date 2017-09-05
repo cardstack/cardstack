@@ -1,6 +1,6 @@
 import Ember from 'ember';
 
-const { inject, computed } = Ember;
+const { inject, computed, assert } = Ember;
 
 export const REQUEST_TO_PUBLISH_LIVE = 'Request to publish live';
 export const READY_FOR_COPYEDITING = 'Ready for copyediting';
@@ -9,6 +9,8 @@ export const COURSE_INFORMATION_SYNCED = 'Course information synced';
 export const NEED_RESPONSE = 'Need Response';
 export const AUTO_PROCESSED = 'Automatically Processed';
 export const FYI = 'For Your Information';
+
+const priorities = [NEED_RESPONSE, AUTO_PROCESSED, FYI];
 
 // const priorities = [
 //   NEED_RESPONSE,
@@ -33,14 +35,21 @@ export default Ember.Service.extend({
   unhandledItems:    computed.filterBy('items', 'isHandled', false),
   notificationCount: computed.readOnly('unhandledItems.length'),
 
-  messagesByTag: computed('items.@each.{isHandled,tag}', function() {
+  groupedMessages: computed('items.@each.{priority,tag}', function() {
+    let messagesByPriority = {};
+    messagesByPriority[NEED_RESPONSE] = [];
+    messagesByPriority[AUTO_PROCESSED] = [];
+    messagesByPriority[FYI] = [];
     return this.get('items').reduce((messages, message) => {
+      let priority = Ember.get(message, 'priority');
+      assert(`Unknown priority: ${priority}`, priorities.includes(priority));
+      let messagesByTag = messages[priority];
       let tag = Ember.get(message, 'tag');
-      if (!messages[tag]) {
-        messages[tag] = 0;
+      if (!messagesByTag[tag]) {
+        messagesByTag[tag] = [];
       }
-      messages[tag] += Ember.get(message, 'isHandled') ? 0 : 1;
+      messagesByTag[tag].push(message);
       return messages;
-    }, {});
-  }),
+    }, messagesByPriority);
+  })
 });

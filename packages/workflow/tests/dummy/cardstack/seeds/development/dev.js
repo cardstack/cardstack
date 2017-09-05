@@ -52,9 +52,17 @@ function initialModels() {
     .withAttributes({
       text: 'Artist verified creator identity.',
       status: 'approved',
-      priority: 'Automatically processed',
+      priority: 'Automatically Processed',
       tag: 'Course information synced',
-      isHandled: true,
+      isHandled: false,
+    });
+  initial.addResource('messages', '5')
+    .withAttributes({
+      text: 'All is quiet.',
+      status: 'approved',
+      priority: 'Automatically Processed',
+      tag: 'Course information synced',
+      isHandled: false,
     });
   return initial.getModels();
 }

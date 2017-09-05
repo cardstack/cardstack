@@ -13,6 +13,9 @@ test('The first-level workflow sidebar', function(assert) {
   click('.cardstack-workflow-header');
 
   andThen(function() {
+    assertTrimmedText(assert, '[data-test-priority-header="Need Response"]', "Need Response");
+    assertTrimmedText(assert, '[data-test-priority-header="Automatically Processed"]', "Automatically Processed");
+
     assertTrimmedText(assert, '[data-test-tag-counter="Request to publish live"]', "2");
     assertTrimmedText(assert, '[data-test-tag-counter="Ready for copyediting"]', "1");
     assertTrimmedText(assert, '[data-test-tag-counter="Course information synced"]', "0");

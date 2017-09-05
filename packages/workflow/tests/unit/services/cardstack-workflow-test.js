@@ -1,10 +1,15 @@
 import Ember from 'ember';
 import { moduleFor, test } from 'ember-qunit';
 import {
-  REQUEST_TO_PUBLISH_LIVE,
-  READY_FOR_COPYEDITING,
-  COURSE_INFORMATION_SYNCED
+  NEED_RESPONSE,
+  AUTO_PROCESSED,
+  FYI
 } from '@cardstack/workflow/services/cardstack-workflow';
+
+const REQUEST_TO_PUBLISH = 'Request to publish';
+const READY_FOR_EDITING = 'Ready for editing';
+const INFO_SYNCED = 'Info synced';
+const NEW_CONTENT_ADDED = 'New local content added';
 
 moduleFor('service:cardstack-workflow', 'Unit | Service | cardstack-workflow', {
 });
@@ -21,18 +26,29 @@ test('it gets notification count from unhandled items', function(assert) {
 
 test('it extracts categories from the items', function(assert) {
   let items = Ember.A([
-    { tag: REQUEST_TO_PUBLISH_LIVE, isHandled: false },
-    { tag: REQUEST_TO_PUBLISH_LIVE, isHandled: false },
-    { tag: REQUEST_TO_PUBLISH_LIVE, isHandled: true },
-    { tag: READY_FOR_COPYEDITING, isHandled: false },
-    { tag: READY_FOR_COPYEDITING, isHandled: true },
-    { tag: COURSE_INFORMATION_SYNCED, isHandled: true },
-    { tag: COURSE_INFORMATION_SYNCED, isHandled: true },
+    { priority: NEED_RESPONSE, tag: REQUEST_TO_PUBLISH, isHandled: false },
+    { priority: NEED_RESPONSE, tag: REQUEST_TO_PUBLISH, isHandled: false },
+    { priority: NEED_RESPONSE, tag: REQUEST_TO_PUBLISH, isHandled: true },
+    { priority: NEED_RESPONSE, tag: READY_FOR_EDITING, isHandled: false },
+    { priority: NEED_RESPONSE, tag: READY_FOR_EDITING, isHandled: true },
+    { priority: AUTO_PROCESSED, tag: INFO_SYNCED, isHandled: true },
+    { priority: AUTO_PROCESSED, tag: INFO_SYNCED, isHandled: true },
+    { priority: FYI, tag: NEW_CONTENT_ADDED, isHandled: false },
   ]);
   let service = this.subject({ items });
-  let expected = {};
-  expected[REQUEST_TO_PUBLISH_LIVE] = 2;
-  expected[READY_FOR_COPYEDITING] = 1;
-  expected[COURSE_INFORMATION_SYNCED] = 0;
-  assert.deepEqual(service.get('messagesByTag'), expected);
+  let groupedMessages = service.get('groupedMessages');
+  assert.deepEqual(Object.keys(groupedMessages[NEED_RESPONSE]), [REQUEST_TO_PUBLISH, READY_FOR_EDITING]);
+  assert.deepEqual(Object.keys(groupedMessages[AUTO_PROCESSED]), [INFO_SYNCED]);
+  assert.deepEqual(Object.keys(groupedMessages[FYI]), [NEW_CONTENT_ADDED]);
+  assert.equal(groupedMessages[NEED_RESPONSE][REQUEST_TO_PUBLISH].length, 3);
+  assert.equal(groupedMessages[NEED_RESPONSE][READY_FOR_EDITING].length, 2);
+  assert.equal(groupedMessages[AUTO_PROCESSED][INFO_SYNCED].length, 2);
+  assert.equal(groupedMessages[FYI][NEW_CONTENT_ADDED].length, 1);
+
+  //TODO: Shouldn't this invalidate and rerun the CP?
+  // Ember.run(() => {
+  //   Ember.set(items.get('firstObject'), 'tag', NEW_CONTENT_ADDED)
+  // });
+  // assert.equal(groupedMessages[NEED_RESPONSE][REQUEST_TO_PUBLISH].length, 2);
+  // assert.equal(groupedMessages[FYI][NEW_CONTENT_ADDED].length, 2);
 });

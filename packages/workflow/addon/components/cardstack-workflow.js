@@ -8,8 +8,8 @@ export default Ember.Component.extend({
   classNames:  ['cardstack-workflow'],
   workflow:    inject.service('cardstack-workflow'),
 
-  messagesByTag:  computed.readOnly('workflow.messagesByTag'),
-  unhandled:      computed.readOnly('workflow.unhandledItems'),
+  groupedMessages:  computed.readOnly('workflow.groupedMessages'),
+  unhandled:        computed.readOnly('workflow.unhandledItems'),
 
   selectedTag:    '',
   messagesWithSelectedTag: computed('unhandled.@each.tag', 'selectedTag', function() {
