@@ -1,5 +1,5 @@
 import Ember from 'ember';
-import { defaultBranch } from '..';
+import { defaultBranch } from '@cardstack/hub/environment';
 
 export default Ember.Route.extend({
   queryParams: {

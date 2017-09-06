@@ -1,4 +1,5 @@
 import { pluralize, singularize } from 'ember-inflector';
+import { defaultBranch } from '@cardstack/hub/environment';
 
 export function cardstackRoutes() {
   this.route('cardstack', { path: '/', resetNamespace: true }, function() {
@@ -8,7 +9,6 @@ export function cardstackRoutes() {
   })
 }
 
-export const defaultBranch = 'master';
 export const defaultContentType = 'pages';
 
 export function routeFor(type, routingId, branch) {
