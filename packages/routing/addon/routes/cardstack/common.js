@@ -1,12 +1,13 @@
 import Ember from 'ember';
-import { modelType, routeFor } from '@cardstack/routing';
 
 export default Ember.Route.extend({
 
+  service: Ember.inject.service('cardstack-routing'),
+
   _commonModelHook(type, slug) {
     let { branch } = this.modelFor('cardstack');
-    let mType = modelType(type, branch);
-    let { name, params, queryParams } = routeFor(type, slug, branch);
+    let mType = this.get('service').modelType(type, branch);
+    let { name, params, queryParams } = this.get('service').routeFor(type, slug, branch);
     let paramMap = Object.create(null);
     params.forEach(([k,v]) => paramMap[k] = v);
 
