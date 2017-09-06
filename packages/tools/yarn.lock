@@ -2660,11 +2660,11 @@ ember-test-helpers@^0.6.3:
   version "0.6.3"
   resolved "https://registry.yarnpkg.com/ember-test-helpers/-/ember-test-helpers-0.6.3.tgz#f864cdf6f4e75f3f8768d6537785b5ab6e82d907"
 
-ember-toolbars@0.3.0:
-  version "0.3.0"
-  resolved "https://registry.yarnpkg.com/ember-toolbars/-/ember-toolbars-0.3.0.tgz#d2d9a7ebe06cf638a641a5c79e94f3b764944a30"
+ember-toolbars@^0.4.0:
+  version "0.4.0"
+  resolved "https://registry.yarnpkg.com/ember-toolbars/-/ember-toolbars-0.4.0.tgz#88ba6cf162ef843dd5e747c2ece3e90c20c0e8cb"
   dependencies:
-    ember-cli-babel "^5.1.6"
+    ember-cli-babel "^5.1.7"
     ember-cli-htmlbars "^1.1.1"
     ember-elsewhere ">=0.4.0"
     liquid-fire ">=0.24.1"

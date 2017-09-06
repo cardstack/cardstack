@@ -1,3 +1,15 @@
+<div class="cs-toolbox-header">
+  {{#cs-mode-choices for="activePanel" as |choice|}}
+    <section>
+      {{cs-mode-button mode=choice}}
+    </section>
+  {{/cs-mode-choices}}
+
+  <section class="spacer">
+    {{cs-create-button}}
+  </section>
+</div>
+
 {{#if (is-component tools.activePanel)}}
   {{component tools.activePanel tools=tools}}
 {{else}}
