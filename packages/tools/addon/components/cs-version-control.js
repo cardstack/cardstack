@@ -3,6 +3,7 @@ import layout from '../templates/components/cs-version-control';
 import { task } from 'ember-concurrency';
 import { transitionTo } from '../private-api';
 import { modelType } from '@cardstack/rendering/helpers/cs-model-type';
+import { defaultBranch } from '@cardstack/hub/environment';
 
 export default Ember.Component.extend({
   layout,
@@ -11,7 +12,6 @@ export default Ember.Component.extend({
   animationRules,
   resourceMetadata: Ember.inject.service(),
   store: Ember.inject.service(),
-  cardstackRouting: Ember.inject.service(),
 
   modelMeta: Ember.computed('model', function() {
     return this.get('resourceMetadata').read(this.get('model'));
@@ -19,7 +19,7 @@ export default Ember.Component.extend({
 
   onMaster: Ember.computed('modelMeta.branch', function() {
     let branch = this.get('modelMeta').branch;
-    return branch == null || branch === this.get('cardstackRouting.defaultBranch');
+    return branch == null || branch === defaultBranch;
   }),
 
   upstreamMeta: Ember.computed('upstreamModel', function() {

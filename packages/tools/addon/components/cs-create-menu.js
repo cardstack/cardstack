@@ -6,7 +6,6 @@ import { task } from 'ember-concurrency';
 export default Ember.Component.extend({
   layout,
   classNames: ['cs-create-menu'],
-  cardstackRouting: Ember.inject.service(),
   tools: Ember.inject.service('cardstack-tools'),
   store: Ember.inject.service(),
 
