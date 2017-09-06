@@ -6,7 +6,9 @@
   {{/cs-mode-choices}}
 
   <section class="spacer">
-    {{cs-create-button}}
+    {{#if cardstackRouting}}
+      {{cs-create-button routing=cardstackRouting}}
+    {{/if}}
   </section>
 </div>
 

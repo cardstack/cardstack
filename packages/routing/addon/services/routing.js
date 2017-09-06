@@ -31,6 +31,16 @@ export default Ember.Service.extend({
     }
   },
 
+  routeForNew(type, branch) {
+    let queryParams = this._qpsForBranch(branch);
+    type = pluralize(type);
+    return {
+      name: 'cardstack.new-content',
+      params: [ ['type', type] ],
+      queryParams
+    }
+  },
+
   _qpsForBranch(branch) {
     let queryParams = {};
     if (branch !== defaultBranch) {
