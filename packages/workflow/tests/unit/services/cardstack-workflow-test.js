@@ -40,10 +40,14 @@ test('it extracts categories from the items', function(assert) {
   assert.deepEqual(Object.keys(groupedMessages[NEED_RESPONSE]), [REQUEST_TO_PUBLISH, READY_FOR_EDITING]);
   assert.deepEqual(Object.keys(groupedMessages[AUTO_PROCESSED]), [INFO_SYNCED]);
   assert.deepEqual(Object.keys(groupedMessages[FYI]), [NEW_CONTENT_ADDED]);
-  assert.equal(groupedMessages[NEED_RESPONSE][REQUEST_TO_PUBLISH].length, 3);
-  assert.equal(groupedMessages[NEED_RESPONSE][READY_FOR_EDITING].length, 2);
-  assert.equal(groupedMessages[AUTO_PROCESSED][INFO_SYNCED].length, 2);
-  assert.equal(groupedMessages[FYI][NEW_CONTENT_ADDED].length, 1);
+  let requestToPublish = groupedMessages[NEED_RESPONSE][REQUEST_TO_PUBLISH];
+  let readyForEditing = groupedMessages[NEED_RESPONSE][READY_FOR_EDITING];
+  let infoSynced = groupedMessages[AUTO_PROCESSED][INFO_SYNCED];
+  let newContentAdded = groupedMessages[FYI][NEW_CONTENT_ADDED];
+  assert.equal(requestToPublish.unhandledCount, 2);
+  assert.equal(readyForEditing.unhandledCount, 1);
+  assert.equal(infoSynced.unhandledCount, 0);
+  assert.equal(newContentAdded.unhandledCount, 1);
 
   //TODO: Shouldn't this invalidate and rerun the CP?
   // Ember.run(() => {
