@@ -1,6 +1,6 @@
 {
   "name": "@cardstack/mobiledoc",
-  "version": "0.2.4",
+  "version": "0.2.8",
   "description": "Mobiledoc field plugin for cardstack",
   "keywords": [
     "ember-addon",
