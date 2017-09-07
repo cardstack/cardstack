@@ -1,11 +1,11 @@
 <!-- <h4>Today</h4> -->
 <section class="cardstack-message-summary">
   {{#each-in groupedMessages as |priority messagesWithPriority|}}
-    <h4 data-test-priority-header>{{priority}}</h4>
-    {{#each-in messagesWithPriority as |tag messages|}}
+    <h4 data-test-priority-header={{priority}}>{{priority}}</h4>
+    {{#each-in messagesWithPriority as |tag messagesAndCount|}}
       <div class="cardstack-workflow-tag-with-count" onclick={{action (mut selectedTag) tag}}>
         <div class='name'>{{tag}}</div>
-        <div class="count" data-test-tag-counter={{tag}}>{{messages.length}}</div>
+        <div class="count" data-test-tag-counter={{tag}}>{{messagesAndCount.unhandledCount}}</div>
       </div>
     {{/each-in}}
   {{/each-in}}

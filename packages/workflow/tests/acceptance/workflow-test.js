@@ -7,7 +7,7 @@ test('The first-level workflow sidebar', function(assert) {
   visit('/');
 
   andThen(function() {
-    assertTrimmedText(assert, '[data-test-total-notification-count]', "3");
+    assertTrimmedText(assert, '[data-test-total-notification-count]', "5");
   });
 
   click('.cardstack-workflow-header');
@@ -15,10 +15,12 @@ test('The first-level workflow sidebar', function(assert) {
   andThen(function() {
     assertTrimmedText(assert, '[data-test-priority-header="Need Response"]', "Need Response");
     assertTrimmedText(assert, '[data-test-priority-header="Automatically Processed"]', "Automatically Processed");
+    assertTrimmedText(assert, '[data-test-priority-header="For Your Information"]', "For Your Information");
 
     assertTrimmedText(assert, '[data-test-tag-counter="Request to publish live"]', "2");
     assertTrimmedText(assert, '[data-test-tag-counter="Ready for copyediting"]', "1");
-    assertTrimmedText(assert, '[data-test-tag-counter="Course information synced"]', "0");
+    assertTrimmedText(assert, '[data-test-tag-counter="Course information synced"]', "1");
+    assertTrimmedText(assert, '[data-test-tag-counter="New local content added"]', "1");
   });
 });
 

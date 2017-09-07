@@ -50,7 +50,7 @@ function initialModels() {
     });
   initial.addResource('messages', '4')
     .withAttributes({
-      text: 'Artist verified creator identity.',
+      text: 'Eddie Vedder\' public key checks out.',
       status: 'approved',
       priority: 'Automatically Processed',
       tag: 'Course information synced',
@@ -58,10 +58,18 @@ function initialModels() {
     });
   initial.addResource('messages', '5')
     .withAttributes({
-      text: 'All is quiet.',
+      text: 'Verified song identity for Seven Nations Army.',
       status: 'approved',
       priority: 'Automatically Processed',
       tag: 'Course information synced',
+      isHandled: true,
+    });
+  initial.addResource('messages', '6')
+    .withAttributes({
+      text: 'All is quiet.',
+      status: 'approved',
+      priority: 'For Your Information',
+      tag: 'New local content added',
       isHandled: false,
     });
   return initial.getModels();

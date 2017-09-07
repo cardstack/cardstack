@@ -46,9 +46,15 @@ export default Ember.Service.extend({
       let messagesByTag = messages[priority];
       let tag = Ember.get(message, 'tag');
       if (!messagesByTag[tag]) {
-        messagesByTag[tag] = [];
+        messagesByTag[tag] = {
+          messages: [],
+          unhandledCount: 0,
+        };
       }
-      messagesByTag[tag].push(message);
+      messagesByTag[tag].messages.push(message);
+      if (!Ember.get(message, 'isHandled')) {
+        messagesByTag[tag].unhandledCount += 1;
+      }
       return messages;
     }, messagesByPriority);
   })
