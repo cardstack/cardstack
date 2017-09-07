@@ -515,6 +515,12 @@ babel-plugin-ember-modules-api-polyfill@^1.4.1:
   dependencies:
     ember-rfc176-data "^0.2.0"
 
+babel-plugin-ember-modules-api-polyfill@^2.0.1:
+  version "2.0.1"
+  resolved "https://registry.yarnpkg.com/babel-plugin-ember-modules-api-polyfill/-/babel-plugin-ember-modules-api-polyfill-2.0.1.tgz#baaf26dcebe2ed1de120021bc42be29f520497b3"
+  dependencies:
+    ember-rfc176-data "^0.2.7"
+
 babel-plugin-eval@^1.0.1:
   version "1.0.1"
   resolved "https://registry.yarnpkg.com/babel-plugin-eval/-/babel-plugin-eval-1.0.1.tgz#a2faed25ce6be69ade4bfec263f70169195950da"
@@ -2137,6 +2143,23 @@ ember-cli-babel@^6.3.0:
     clone "^2.0.0"
     ember-cli-version-checker "^2.0.0"
 
+ember-cli-babel@^6.8.2:
+  version "6.8.2"
+  resolved "https://registry.yarnpkg.com/ember-cli-babel/-/ember-cli-babel-6.8.2.tgz#eac2785964f4743f4c815cd53c6288f00cc087d7"
+  dependencies:
+    amd-name-resolver "0.0.7"
+    babel-plugin-debug-macros "^0.1.11"
+    babel-plugin-ember-modules-api-polyfill "^2.0.1"
+    babel-plugin-transform-es2015-modules-amd "^6.24.0"
+    babel-polyfill "^6.16.0"
+    babel-preset-env "^1.5.1"
+    broccoli-babel-transpiler "^6.1.2"
+    broccoli-debug "^0.6.2"
+    broccoli-funnel "^1.0.0"
+    broccoli-source "^1.1.0"
+    clone "^2.0.0"
+    ember-cli-version-checker "^2.0.0"
+
 ember-cli-broccoli-sane-watcher@^2.0.4:
   version "2.0.4"
   resolved "https://registry.yarnpkg.com/ember-cli-broccoli-sane-watcher/-/ember-cli-broccoli-sane-watcher-2.0.4.tgz#f43f42f75b7509c212fb926cd9aea86ae19264c6"
@@ -2172,13 +2195,14 @@ ember-cli-get-dependency-depth@^1.0.0:
   version "1.0.0"
   resolved "https://registry.yarnpkg.com/ember-cli-get-dependency-depth/-/ember-cli-get-dependency-depth-1.0.0.tgz#e0afecf82a2d52f00f28ab468295281aec368d11"
 
-ember-cli-htmlbars-inline-precompile@^0.4.0:
-  version "0.4.3"
-  resolved "https://registry.yarnpkg.com/ember-cli-htmlbars-inline-precompile/-/ember-cli-htmlbars-inline-precompile-0.4.3.tgz#4123f507fea6c59ba4c272ef7e713a6d55ba06c9"
+ember-cli-htmlbars-inline-precompile@^1.0.2:
+  version "1.0.2"
+  resolved "https://registry.yarnpkg.com/ember-cli-htmlbars-inline-precompile/-/ember-cli-htmlbars-inline-precompile-1.0.2.tgz#5b544f664d5d9911f08cd979c5f70d8cb0ca2add"
   dependencies:
     babel-plugin-htmlbars-inline-precompile "^0.2.3"
     ember-cli-version-checker "^2.0.0"
     hash-for-dep "^1.0.2"
+    heimdalljs-logger "^0.1.7"
     silent-error "^1.1.0"
 
 ember-cli-htmlbars@^1.0.1, ember-cli-htmlbars@^1.0.10, ember-cli-htmlbars@^1.1.0, ember-cli-htmlbars@^1.1.1:
@@ -2621,7 +2645,7 @@ ember-resource-metadata@^0.0.8:
     ember-data "^2.12.1"
     ember-inflector "^1.11.0"
 
-ember-rfc176-data@^0.2.0:
+ember-rfc176-data@^0.2.0, ember-rfc176-data@^0.2.7:
   version "0.2.7"
   resolved "https://registry.yarnpkg.com/ember-rfc176-data/-/ember-rfc176-data-0.2.7.tgz#bd355bc9b473e08096b518784170a23388bc973b"
 
