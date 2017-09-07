@@ -2359,7 +2359,7 @@ ember-data-relationship-tracker@^0.1.0:
     ember-lodash "^4.17.2"
     lodash "^4.17.4"
 
-ember-data@^2.12.1, ember-data@^2.13.1:
+ember-data@^2.13.1:
   version "2.14.5"
   resolved "https://registry.yarnpkg.com/ember-data/-/ember-data-2.14.5.tgz#6f09b117b92aa33f5d72e8cdb9bebd56a2aec4db"
   dependencies:
@@ -2448,12 +2448,11 @@ ember-resolver@^4.0.0:
     ember-cli-version-checker "1.3.1"
     resolve "^1.3.3"
 
-ember-resource-metadata@^0.0.8:
-  version "0.0.8"
-  resolved "https://registry.yarnpkg.com/ember-resource-metadata/-/ember-resource-metadata-0.0.8.tgz#78874e0fa177fbe3ed8e4d6dc4b8b84ff0a43f34"
+ember-resource-metadata@^0.1.0:
+  version "0.1.0"
+  resolved "https://registry.yarnpkg.com/ember-resource-metadata/-/ember-resource-metadata-0.1.0.tgz#054776ec4ac6f24f5b07d2453a4f043f15f506e4"
   dependencies:
     ember-cli-babel "^5.1.7"
-    ember-data "^2.12.1"
     ember-inflector "^1.11.0"
 
 ember-rfc176-data@^0.2.0:

@@ -2637,12 +2637,11 @@ ember-resolver@^2.1.1:
     ember-cli-babel "^5.1.6"
     ember-cli-version-checker "^1.1.6"
 
-ember-resource-metadata@^0.0.8:
-  version "0.0.8"
-  resolved "https://registry.yarnpkg.com/ember-resource-metadata/-/ember-resource-metadata-0.0.8.tgz#78874e0fa177fbe3ed8e4d6dc4b8b84ff0a43f34"
+ember-resource-metadata@^0.1.0:
+  version "0.1.0"
+  resolved "https://registry.yarnpkg.com/ember-resource-metadata/-/ember-resource-metadata-0.1.0.tgz#054776ec4ac6f24f5b07d2453a4f043f15f506e4"
   dependencies:
     ember-cli-babel "^5.1.7"
-    ember-data "^2.12.1"
     ember-inflector "^1.11.0"
 
 ember-rfc176-data@^0.2.0, ember-rfc176-data@^0.2.7:
