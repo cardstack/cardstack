@@ -3,7 +3,7 @@ import moduleForAcceptance from '../../tests/helpers/module-for-acceptance';
 
 moduleForAcceptance('Acceptance | Workflow');
 
-test('The first-level workflow sidebar', function(assert) {
+test('Show group counters', function(assert) {
   visit('/');
 
   andThen(function() {
@@ -25,7 +25,7 @@ test('The first-level workflow sidebar', function(assert) {
   });
 });
 
-test('List of message cards that match clicked tag', function(assert) {
+test('List message cards that match the clicked tag', function(assert) {
   visit('/');
   click('.cardstack-workflow-header');
   click('[data-test-tag-counter="Request to publish live"]');
@@ -36,7 +36,16 @@ test('List of message cards that match clicked tag', function(assert) {
   });
 });
 
-test('Switch between message list and individual message card', function(assert) {
+test('List message cards that match the Today date range', function(assert) {
+  visit('/');
+  click('.cardstack-workflow-header');
+  click('[data-test-date-range-counter="Today"]');
+  andThen(() => {
+    assert.equal(find('[data-test-message-list-card]').length, 2);
+  });
+});
+
+test('Switch between message lists and individual message card', function(assert) {
   visit('/');
   click('.cardstack-workflow-header');
   click('[data-test-tag-counter="Ready for copyediting"]');
@@ -53,6 +62,11 @@ test('Switch between message list and individual message card', function(assert)
   click('[data-test-message-list-card]:first');
   andThen(() => {
     assert.equal(find('[data-test-message-card]:contains("Matt, could you push live my cover of Pearl Jam\'s Daughter?")').length, 1);
+  });
+
+  click('[data-test-date-range-counter="Today"]');
+  andThen(() => {
+    assert.equal(find('[data-test-message-list-card]').length, 2);
   });
 });
 

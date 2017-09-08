@@ -57,7 +57,7 @@
   padding: 0 5px;
 }
 
-.cardstack-workflow-tag-with-count {
+.cardstack-workflow-label-with-count {
   cursor: pointer;
   margin: 10px;
   height: 20px;
@@ -65,7 +65,7 @@
 }
 
 /* TODO: Flexbox this and the .count */
-.cardstack-workflow-tag-with-count > .name {
+.cardstack-workflow-label-with-count > .name {
   float: left;
   /* max-width: 10vw; */
   margin-right: 5px;
@@ -78,7 +78,7 @@ min-width of the container could be set separately from the
 circle that contains the number. This way, the name and
 count could be made to stay on the same line
 */
-.cardstack-workflow-tag-with-count > .count {
+.cardstack-workflow-label-with-count > .count {
   float: right;
   width: 20px;
   height: 20px;

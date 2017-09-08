@@ -1,13 +1,13 @@
 <section class="cardstack-message-summary">
   <h4>Dashboards</h4>
-  <div class="cardstack-workflow-tag-with-count" onclick={{action (mut selectedTag) tag}}>
+  <div class="cardstack-workflow-label-with-count" onclick={{action 'selectDate' 'today'}}>
     <div class="name">Today</div>
     <div class="count" data-test-date-range-counter="Today">{{todaysMessageCount}}</div>
   </div>
   {{#each-in groupedMessages as |priority messagesWithPriority|}}
     <h4 data-test-priority-header={{priority}}>{{priority}}</h4>
     {{#each-in messagesWithPriority as |tag messagesAndCount|}}
-      <div class="cardstack-workflow-tag-with-count" onclick={{action 'selectTag' tag}}>
+      <div class="cardstack-workflow-label-with-count" onclick={{action 'selectTag' tag}}>
         <div class='name'>{{tag}}</div>
         <div class="count" data-test-tag-counter={{tag}}>{{messagesAndCount.unhandledCount}}</div>
       </div>
@@ -20,10 +20,9 @@
     {{cardstack-content content=selectedMessage format="card"}}
   </section>
 {{else}}
-  {{#if messagesWithSelectedTag.length}}
+  {{#if matchingMessages.length}}
     <section class="cardstack-cue-card-list">
-      {{#each messagesWithSelectedTag as |message|}}
-        {{!-- <div class="message-card" data-test-cue-card>{{message.tag}}</div> --}}
+      {{#each matchingMessages as |message|}}
         {{cardstack-content content=message format="list-card"}}
       {{/each}}
     </section>

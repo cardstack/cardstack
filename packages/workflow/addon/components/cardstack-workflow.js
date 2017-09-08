@@ -16,12 +16,41 @@ export default Ember.Component.extend({
     return this.get('unhandled').filterBy('tag', this.get('selectedTag'));
   }),
 
-  todaysMessageCount: computed.readOnly('workflow.todaysUnhandledMessages.length'),
+  selectedDate: '',
+  messagesWithSelectedDate: computed('selectedDate', function() {
+    if (this.get('selectedDate') === 'today') {
+      return this.get('todaysMessages');
+    }
+  }),
+
+  matchingMessages: computed('selectedTag', 'selectedDate', function() {
+    if (this.get('selectedTag')) {
+      return this.get('messagesWithSelectedTag');
+    }
+    if (this.get('selectedDate')) {
+      return this.get('messagesWithSelectedDate');
+    }
+  }),
+
+  todaysMessages:  computed.readOnly('workflow.todaysUnhandledMessages'),
+  todaysMessageCount: computed.readOnly('todaysMessages.length'),
+
   selectedMessage: computed.readOnly('workflow.selectedMessage'),
 
   actions: {
+    selectDate(date) {
+      this.setProperties({
+        selectedDate: date,
+        selectedTag: null
+      });
+      this.get('workflow').clearSelectedMessage();
+    },
+
     selectTag(tag) {
-      this.set('selectedTag', tag);
+      this.setProperties({
+        selectedDate: null,
+        selectedTag: tag
+      });
       this.get('workflow').clearSelectedMessage();
     }
   }
