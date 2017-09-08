@@ -7,7 +7,7 @@
   {{#each-in groupedMessages as |priority messagesWithPriority|}}
     <h4 data-test-priority-header={{priority}}>{{priority}}</h4>
     {{#each-in messagesWithPriority as |tag messagesAndCount|}}
-      <div class="cardstack-workflow-tag-with-count" onclick={{action (mut selectedTag) tag}}>
+      <div class="cardstack-workflow-tag-with-count" onclick={{action 'selectTag' tag}}>
         <div class='name'>{{tag}}</div>
         <div class="count" data-test-tag-counter={{tag}}>{{messagesAndCount.unhandledCount}}</div>
       </div>

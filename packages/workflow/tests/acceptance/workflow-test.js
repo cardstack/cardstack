@@ -45,6 +45,19 @@ test('Switch between message list and individual message card', function(assert)
     assert.equal(find('[data-test-message-card]:contains("Tool\'s Forty Six & 2. Please approve.")').length, 1);
   });
 
+  click('[data-test-tag-counter="Request to publish live"]');
+  andThen(() => {
+    assert.equal(find('[data-test-message-list-card]').length, 2);
+  });
+
+  click('[data-test-message-list-card]:first');
+  andThen(() => {
+    assert.equal(find('[data-test-message-card]:contains("Matt, could you push live my cover of Pearl Jam\'s Daughter?")').length, 1);
+  });
+});
+
+test('Take action on a cue card', function(assert) {
+  assert.expect(0);
   //TODO: Click approve and verify that the counter for this tag has been decremented by one
   // click('[data-test-approve-button]');
   // andThen(() => {
@@ -54,4 +67,4 @@ test('Switch between message list and individual message card', function(assert)
   //TODO: Click another card with a label that has >1 cards to take action on
   // When clicked, counter should be decreased by one, and the undhanled cards should be displayed
   // in a list
-})
+});

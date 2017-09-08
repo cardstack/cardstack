@@ -18,4 +18,11 @@ export default Ember.Component.extend({
 
   todaysMessageCount: computed.readOnly('workflow.todaysUnhandledMessages.length'),
   selectedMessage: computed.readOnly('workflow.selectedMessage'),
+
+  actions: {
+    selectTag(tag) {
+      this.set('selectedTag', tag);
+      this.get('workflow').clearSelectedMessage();
+    }
+  }
 });

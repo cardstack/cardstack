@@ -84,5 +84,9 @@ export default Ember.Service.extend({
 
   selectMessage(message) {
     this.set('selectedMessage', message);
+  },
+
+  clearSelectedMessage() {
+    this.set('selectedMessage', null);
   }
 });
