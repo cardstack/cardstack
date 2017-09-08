@@ -39,7 +39,7 @@ function initialModels() {
   initial.addResource('messages', '2')
     .withAttributes({
       text: "Needs to have the Home song approved by tomorrow.",
-      status: 'approved', // CueCard prop
+      status: 'pending', // CueCard prop
       priority: 'Need Response',
       tag: 'Request to publish live',
       isHandled: false,
@@ -48,7 +48,7 @@ function initialModels() {
   initial.addResource('messages', '3')
     .withAttributes({
       text: "Tool's Forty Six & 2. Please approve.",
-      status: 'denied',
+      status: 'pending',
       priority: 'Need Response',
       tag: 'Ready for copyediting',
       isHandled: false,

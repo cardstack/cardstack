@@ -17,4 +17,5 @@ export default Ember.Component.extend({
   }),
 
   todaysMessageCount: computed.readOnly('workflow.todaysUnhandledMessages.length'),
+  selectedMessage: computed.readOnly('workflow.selectedMessage'),
 });

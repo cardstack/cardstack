@@ -15,13 +15,17 @@
   {{/each-in}}
 </section>
 
-{{#if messagesWithSelectedTag.length}}
-  <section class="cardstack-cue-cards">
-    {{#each messagesWithSelectedTag as |message|}}
-      {{!-- <div class="message-card" data-test-cue-card>{{message.tag}}</div> --}}
-      <div class="message-card" data-test-message-card-tag={{message.tag}}>
-        {{cardstack-content content=message format="card"}}
-      </div>
-    {{/each}}
+{{#if selectedMessage}}
+  <section class="cardstack-cue-card">
+    {{cardstack-content content=selectedMessage format="card"}}
   </section>
+{{else}}
+  {{#if messagesWithSelectedTag.length}}
+    <section class="cardstack-cue-card-list">
+      {{#each messagesWithSelectedTag as |message|}}
+        {{!-- <div class="message-card" data-test-cue-card>{{message.tag}}</div> --}}
+        {{cardstack-content content=message format="list-card"}}
+      {{/each}}
+    </section>
+  {{/if}}
 {{/if}}

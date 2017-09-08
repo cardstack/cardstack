@@ -42,6 +42,7 @@ function messagesBetween(arrayKey, dateKey, { from, to }) {
 
 export default Ember.Service.extend({
   isOpen: false,
+  selectedMessage: null,
 
   store: inject.service(),
 
@@ -80,4 +81,8 @@ export default Ember.Service.extend({
   messagesForToday: messagesBetween('items', 'updatedAt', {
     from: moment().subtract(1, 'day')
   }),
+
+  selectMessage(message) {
+    this.set('selectedMessage', message);
+  }
 });

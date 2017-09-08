@@ -43,7 +43,7 @@
   padding: 0 5px;
 }
 
-.cardstack-cue-cards {
+.cardstack-cue-card-list {
   min-width: 25vw;
   background-color: var(--lighter-background);
   color: var(--bright-foreground);
@@ -90,7 +90,8 @@ count could be made to stay on the same line
   font-weight: bold;
 }
 
-.message-card {
+.message-card,
+.message-list-card {
   margin: 2vh;
   background-color: var(--bright-foreground);
   padding: 2vh 2vw;

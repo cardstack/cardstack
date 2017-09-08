@@ -30,8 +30,28 @@ test('List of message cards that match clicked tag', function(assert) {
   click('.cardstack-workflow-header');
   click('[data-test-tag-counter="Request to publish live"]');
   andThen(() => {
-    assert.equal(find('[data-test-message-card-tag="Request to publish live"]').length, 2);
-    assert.equal(find(".message-card:contains(Matt, could you push live my cover of Pearl Jam's Daughter?)").length, 1)
-    assert.equal(find(".message-card:contains(Needs to have the Home song approved by tomorrow.)").length, 1)
+    assert.equal(find('[data-test-message-list-card]').length, 2);
+    assert.equal(find(".message-list-card:contains(Matt, could you push live my cover of Pearl Jam's Daughter?)").length, 1)
+    assert.equal(find(".message-list-card:contains(Needs to have the Home song approved by tomorrow.)").length, 1)
   });
 });
+
+test('Switch between message list and individual message card', function(assert) {
+  visit('/');
+  click('.cardstack-workflow-header');
+  click('[data-test-tag-counter="Ready for copyediting"]');
+  click('[data-test-message-list-card]:first');
+  andThen(() => {
+    assert.equal(find('[data-test-message-card]:contains("Tool\'s Forty Six & 2. Please approve.")').length, 1);
+  });
+
+  //TODO: Click approve and verify that the counter for this tag has been decremented by one
+  // click('[data-test-approve-button]');
+  // andThen(() => {
+  //   assertTrimmedText(assert, '[data-test-tag-counter="Ready for copyediting"]', "0");
+  //   assert.equal(find('[data-test-empty-message-card-list]').length, 1);
+  // });
+  //TODO: Click another card with a label that has >1 cards to take action on
+  // When clicked, counter should be decreased by one, and the undhanled cards should be displayed
+  // in a list
+})
