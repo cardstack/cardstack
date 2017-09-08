@@ -12,6 +12,23 @@ export const FYI = 'For Your Information';
 
 const priorities = [NEED_RESPONSE, AUTO_PROCESSED, FYI];
 
+function messagesBetween(arrayKey, dateKey, { from, to }) {
+  return Ember.computed(`${arrayKey}.@each.${dateKey}`, function() {
+    return this.get(arrayKey).filter((item) => {
+      let date = moment(item.get(dateKey));
+      if (from && to) {
+        return date >= from && date <= to;
+      }
+      if (to) {
+        return date <= to;
+      }
+      if (from) {
+        return date >= from;
+      }
+    });
+  });
+}
+
 // const priorities = [
 //   NEED_RESPONSE,
 //   AUTO_PROCESSED,
@@ -32,8 +49,9 @@ export default Ember.Service.extend({
     return this.get('store').findAll('message');
   }),
 
-  unhandledItems:    computed.filterBy('items', 'isHandled', false),
-  notificationCount: computed.readOnly('unhandledItems.length'),
+  unhandledItems:           computed.filterBy('items', 'isHandled', false),
+  notificationCount:        computed.readOnly('unhandledItems.length'),
+  todaysUnhandledMessages:  computed.filterBy('messagesForToday', 'isHandled', false),
 
   groupedMessages: computed('items.@each.{priority,tag}', function() {
     let messagesByPriority = {};
@@ -57,5 +75,9 @@ export default Ember.Service.extend({
       }
       return messages;
     }, messagesByPriority);
-  })
+  }),
+
+  messagesForToday: messagesBetween('items', 'updatedAt', {
+    from: moment().subtract(1, 'day')
+  }),
 });

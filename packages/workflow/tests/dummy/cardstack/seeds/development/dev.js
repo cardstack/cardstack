@@ -1,5 +1,5 @@
 /* eslint-env node */
-
+const moment = require('moment-timezone');
 const JSONAPIFactory = require('@cardstack/test-support/jsonapi-factory');
 
 function initialModels() {
@@ -22,6 +22,9 @@ function initialModels() {
       initial.addResource('fields', 'is-handled').withAttributes({
         fieldType: '@cardstack/core-types::boolean'
       }),
+      initial.addResource('fields', 'updated-at').withAttributes({
+        fieldType: '@cardstack/core-types::date'
+      }),
     ]);
   //TODO: Can we get the exported priority names here?
   initial.addResource('messages', '1')
@@ -31,6 +34,7 @@ function initialModels() {
       priority: 'Need Response',
       tag: 'Request to publish live',
       isHandled: false,
+      updatedAt: moment(),
     });
   initial.addResource('messages', '2')
     .withAttributes({
@@ -39,6 +43,7 @@ function initialModels() {
       priority: 'Need Response',
       tag: 'Request to publish live',
       isHandled: false,
+      updatedAt: moment('2017-09-07')
     });
   initial.addResource('messages', '3')
     .withAttributes({
@@ -47,6 +52,7 @@ function initialModels() {
       priority: 'Need Response',
       tag: 'Ready for copyediting',
       isHandled: false,
+      updatedAt: moment()
     });
   initial.addResource('messages', '4')
     .withAttributes({
@@ -55,6 +61,7 @@ function initialModels() {
       priority: 'Automatically Processed',
       tag: 'Course information synced',
       isHandled: false,
+      updatedAt: moment('2017-09-04')
     });
   initial.addResource('messages', '5')
     .withAttributes({
@@ -63,6 +70,7 @@ function initialModels() {
       priority: 'Automatically Processed',
       tag: 'Course information synced',
       isHandled: true,
+      updatedAt: moment()
     });
   initial.addResource('messages', '6')
     .withAttributes({
@@ -71,6 +79,7 @@ function initialModels() {
       priority: 'For Your Information',
       tag: 'New local content added',
       isHandled: false,
+      updatedAt: moment('2017-08-31')
     });
   return initial.getModels();
 }

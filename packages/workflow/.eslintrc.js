@@ -8,6 +8,9 @@ module.exports = {
   env: {
     browser: true
   },
+  globals: {
+    moment: false,
+  },
   rules: {
   }
 };

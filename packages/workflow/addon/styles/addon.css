@@ -50,6 +50,13 @@
   padding: 0 5px;
 }
 
+.cardstack-cue-card {
+  min-width: 25vw;
+  background-color: var(--lighter-background);
+  color: var(--bright-foreground);
+  padding: 0 5px;
+}
+
 .cardstack-workflow-tag-with-count {
   cursor: pointer;
   margin: 10px;
@@ -89,4 +96,5 @@ count could be made to stay on the same line
   padding: 2vh 2vw;
   color: var(--light-background);
   border-radius: 5px;
+  cursor: pointer;
 }

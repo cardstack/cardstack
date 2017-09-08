@@ -11,6 +11,59 @@ const READY_FOR_EDITING = 'Ready for editing';
 const INFO_SYNCED = 'Info synced';
 const NEW_CONTENT_ADDED = 'New local content added';
 
+const create = Ember.Object.create.bind(Ember.Object);
+
+const items = Ember.A([
+  create({
+    priority: NEED_RESPONSE,
+    tag: REQUEST_TO_PUBLISH,
+    isHandled: false,
+    updatedAt: moment().toISOString()
+  }),
+  create({
+    priority: NEED_RESPONSE,
+    tag: REQUEST_TO_PUBLISH,
+    isHandled: false,
+    updatedAt: '2017-09-04',
+  }),
+  create({
+    priority: NEED_RESPONSE,
+    tag: REQUEST_TO_PUBLISH,
+    isHandled: true,
+    updatedAt: '2017-09-01',
+  }),
+  create({
+    priority: NEED_RESPONSE,
+    tag: READY_FOR_EDITING,
+    isHandled: false,
+    updatedAt: moment().toISOString()
+  }),
+  create({
+    priority: NEED_RESPONSE,
+    tag: READY_FOR_EDITING,
+    isHandled: true,
+    updatedAt: '2017-08-31',
+  }),
+  create({
+    priority: AUTO_PROCESSED,
+    tag: INFO_SYNCED,
+    isHandled: true,
+    updatedAt: '2017-08-08'
+  }),
+  create({
+    priority: AUTO_PROCESSED,
+    tag: INFO_SYNCED,
+    isHandled: true,
+    updatedAt: '2017-09-03'
+  }),
+  create({
+    priority: FYI,
+    tag: NEW_CONTENT_ADDED,
+    isHandled: false,
+    updatedAt: moment().toISOString()
+  }),
+]);
+
 moduleFor('service:cardstack-workflow', 'Unit | Service | cardstack-workflow', {
 });
 
@@ -24,17 +77,7 @@ test('it gets notification count from unhandled items', function(assert) {
   assert.equal(service.get('notificationCount'), 2);
 });
 
-test('it extracts categories from the items', function(assert) {
-  let items = Ember.A([
-    { priority: NEED_RESPONSE, tag: REQUEST_TO_PUBLISH, isHandled: false },
-    { priority: NEED_RESPONSE, tag: REQUEST_TO_PUBLISH, isHandled: false },
-    { priority: NEED_RESPONSE, tag: REQUEST_TO_PUBLISH, isHandled: true },
-    { priority: NEED_RESPONSE, tag: READY_FOR_EDITING, isHandled: false },
-    { priority: NEED_RESPONSE, tag: READY_FOR_EDITING, isHandled: true },
-    { priority: AUTO_PROCESSED, tag: INFO_SYNCED, isHandled: true },
-    { priority: AUTO_PROCESSED, tag: INFO_SYNCED, isHandled: true },
-    { priority: FYI, tag: NEW_CONTENT_ADDED, isHandled: false },
-  ]);
+test('it groups the items by priority and then tag', function(assert) {
   let service = this.subject({ items });
   let groupedMessages = service.get('groupedMessages');
   assert.deepEqual(Object.keys(groupedMessages[NEED_RESPONSE]), [REQUEST_TO_PUBLISH, READY_FOR_EDITING]);
@@ -55,4 +98,10 @@ test('it extracts categories from the items', function(assert) {
   // });
   // assert.equal(groupedMessages[NEED_RESPONSE][REQUEST_TO_PUBLISH].length, 2);
   // assert.equal(groupedMessages[FYI][NEW_CONTENT_ADDED].length, 2);
+});
+
+test('it groups the items by date range', function(assert) {
+  let service = this.subject({ items });
+  let messages = service.get('messagesForToday');
+  assert.equal(messages.length, 3);
 });

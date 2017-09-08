@@ -16,4 +16,5 @@ export default Ember.Component.extend({
     return this.get('unhandled').filterBy('tag', this.get('selectedTag'));
   }),
 
+  todaysMessageCount: computed.readOnly('workflow.todaysUnhandledMessages.length'),
 });

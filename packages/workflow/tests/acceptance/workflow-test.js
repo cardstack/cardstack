@@ -13,6 +13,7 @@ test('The first-level workflow sidebar', function(assert) {
   click('.cardstack-workflow-header');
 
   andThen(function() {
+    assertTrimmedText(assert, '[data-test-date-range-counter="Today"]', "2");
     assertTrimmedText(assert, '[data-test-priority-header="Need Response"]', "Need Response");
     assertTrimmedText(assert, '[data-test-priority-header="Automatically Processed"]', "Automatically Processed");
     assertTrimmedText(assert, '[data-test-priority-header="For Your Information"]', "For Your Information");

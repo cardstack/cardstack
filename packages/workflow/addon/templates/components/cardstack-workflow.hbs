@@ -1,5 +1,9 @@
-<!-- <h4>Today</h4> -->
 <section class="cardstack-message-summary">
+  <h4>Dashboards</h4>
+  <div class="cardstack-workflow-tag-with-count" onclick={{action (mut selectedTag) tag}}>
+    <div class="name">Today</div>
+    <div class="count" data-test-date-range-counter="Today">{{todaysMessageCount}}</div>
+  </div>
   {{#each-in groupedMessages as |priority messagesWithPriority|}}
     <h4 data-test-priority-header={{priority}}>{{priority}}</h4>
     {{#each-in messagesWithPriority as |tag messagesAndCount|}}

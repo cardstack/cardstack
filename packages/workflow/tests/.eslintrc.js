@@ -3,6 +3,7 @@ module.exports = {
     embertest: true
   },
   globals: {
+    moment: false,
     assertTrimmedText: false,
   }
 };
