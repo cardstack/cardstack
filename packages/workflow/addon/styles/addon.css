@@ -1,8 +1,10 @@
 :root {
-  --normal-background: #292A2C;
+  --normal-background: #404040;
   --bright-foreground: #fff;
   --light-background: #737373;
   --lighter-background: #a1a2a3;
+  --dark-background: #262626;
+  --very-dark-background: #0b0b0b;
   font-family: 'Avenir', 'helvetica', sans-serif;
   -webkit-font-smoothing: antialiased;
 }
@@ -38,9 +40,12 @@
 .cardstack-message-summary {
   min-width: 25vw;
   float: left;
-  background-color: var(--light-background);
+  background-color: var(--normal-background);
   color: var(--bright-foreground);
-  padding: 0 5px;
+}
+
+.cardstack-workflow-group-header {
+  margin-left: 10px;
 }
 
 .cardstack-cue-card-list {
@@ -57,11 +62,19 @@
   padding: 0 5px;
 }
 
+.cardstack-workflow-label-with-count-wrapper {
+  padding: 3px;
+}
+
+.cardstack-workflow-label-with-count-wrapper.active {
+  background-color: var(--very-dark-background);
+}
+
 .cardstack-workflow-label-with-count {
   cursor: pointer;
   margin: 10px;
   height: 20px;
-  padding: 5px 0;
+  padding: 5px;
 }
 
 /* TODO: Flexbox this and the .count */
