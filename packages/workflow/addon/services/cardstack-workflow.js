@@ -7,10 +7,10 @@ export const READY_FOR_COPYEDITING = 'Ready for copyediting';
 export const COURSE_INFORMATION_SYNCED = 'Course information synced';
 
 export const NEED_RESPONSE = 'Need Response';
-export const AUTO_PROCESSED = 'Automatically Processed';
+export const PROCESSED = 'Processed';
 export const FYI = 'For Your Information';
 
-const priorities = [NEED_RESPONSE, AUTO_PROCESSED, FYI];
+const priorities = [NEED_RESPONSE, PROCESSED, FYI];
 
 function messagesBetween(arrayKey, dateKey, { from, to }) {
   return Ember.computed(`${arrayKey}.@each.${dateKey}`, function() {
@@ -31,7 +31,7 @@ function messagesBetween(arrayKey, dateKey, { from, to }) {
 
 // const priorities = [
 //   NEED_RESPONSE,
-//   AUTO_PROCESSED,
+//   PROCESSED,
 //   FYI
 // ]
 // const tags = [
@@ -57,7 +57,7 @@ export default Ember.Service.extend({
   groupedMessages: computed('items.@each.{priority,tag}', function() {
     let messagesByPriority = {};
     messagesByPriority[NEED_RESPONSE] = [];
-    messagesByPriority[AUTO_PROCESSED] = [];
+    messagesByPriority[PROCESSED] = [];
     messagesByPriority[FYI] = [];
     return this.get('items').reduce((messages, message) => {
       let priority = Ember.get(message, 'priority');

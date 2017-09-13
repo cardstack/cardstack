@@ -63,7 +63,7 @@ function initialModels() {
     .withAttributes({
       text: 'Eddie Vedder\' public key checks out.',
       status: 'approved',
-      priority: 'Automatically Processed',
+      priority: 'Processed',
       tag: 'Course information synced',
       updatedAt: moment('2017-09-04')
     });
@@ -71,7 +71,7 @@ function initialModels() {
     .withAttributes({
       text: 'Verified song identity for Seven Nations Army.',
       status: 'approved',
-      priority: 'Automatically Processed',
+      priority: 'Processed',
       tag: 'Course information synced',
       updatedAt: moment()
     });

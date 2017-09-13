@@ -15,7 +15,7 @@ test('Show group counters', function(assert) {
   andThen(function() {
     assertTrimmedText(assert, '[data-test-date-range-counter="Today"]', "2");
     assertTrimmedText(assert, '[data-test-priority-header="Need Response"]', "Need Response");
-    assertTrimmedText(assert, '[data-test-priority-header="Automatically Processed"]', "Automatically Processed");
+    assertTrimmedText(assert, '[data-test-priority-header="Processed"]', "Processed");
     assertTrimmedText(assert, '[data-test-priority-header="For Your Information"]', "For Your Information");
 
     assertTrimmedText(assert, '[data-test-tag-counter="Request to publish live"]', "2");

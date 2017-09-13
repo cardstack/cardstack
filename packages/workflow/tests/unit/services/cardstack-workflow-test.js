@@ -2,7 +2,7 @@ import Ember from 'ember';
 import { moduleFor, test } from 'ember-qunit';
 import {
   NEED_RESPONSE,
-  AUTO_PROCESSED,
+  PROCESSED,
   FYI
 } from '@cardstack/workflow/services/cardstack-workflow';
 
@@ -45,13 +45,13 @@ const items = Ember.A([
     updatedAt: '2017-08-31',
   }),
   create({
-    priority: AUTO_PROCESSED,
+    priority: PROCESSED,
     tag: INFO_SYNCED,
     isHandled: true,
     updatedAt: '2017-08-08'
   }),
   create({
-    priority: AUTO_PROCESSED,
+    priority: PROCESSED,
     tag: INFO_SYNCED,
     isHandled: true,
     updatedAt: '2017-09-03'
@@ -81,11 +81,11 @@ test('it groups the items by priority and then tag', function(assert) {
   let service = this.subject({ items });
   let groupedMessages = service.get('groupedMessages');
   assert.deepEqual(Object.keys(groupedMessages[NEED_RESPONSE]), [REQUEST_TO_PUBLISH, READY_FOR_EDITING]);
-  assert.deepEqual(Object.keys(groupedMessages[AUTO_PROCESSED]), [INFO_SYNCED]);
+  assert.deepEqual(Object.keys(groupedMessages[PROCESSED]), [INFO_SYNCED]);
   assert.deepEqual(Object.keys(groupedMessages[FYI]), [NEW_CONTENT_ADDED]);
   let requestToPublish = groupedMessages[NEED_RESPONSE][REQUEST_TO_PUBLISH];
   let readyForEditing = groupedMessages[NEED_RESPONSE][READY_FOR_EDITING];
-  let infoSynced = groupedMessages[AUTO_PROCESSED][INFO_SYNCED];
+  let infoSynced = groupedMessages[PROCESSED][INFO_SYNCED];
   let newContentAdded = groupedMessages[FYI][NEW_CONTENT_ADDED];
   assert.equal(requestToPublish.unhandledCount, 2);
   assert.equal(readyForEditing.unhandledCount, 1);
