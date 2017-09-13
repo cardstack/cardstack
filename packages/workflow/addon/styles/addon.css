@@ -45,6 +45,7 @@
 }
 
 .cardstack-workflow-group-header {
+  text-transform: uppercase;
   margin-left: 10px;
 }
 
