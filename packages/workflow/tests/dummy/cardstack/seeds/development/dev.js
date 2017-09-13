@@ -33,7 +33,6 @@ function initialModels() {
       status: 'pending',
       priority: 'Need Response',
       tag: 'Request to publish live',
-      isHandled: false,
       updatedAt: moment(),
     });
   initial.addResource('messages', '2')
@@ -42,7 +41,6 @@ function initialModels() {
       status: 'pending',
       priority: 'Need Response',
       tag: 'Request to publish live',
-      isHandled: false,
       updatedAt: moment('2017-09-07')
     });
   initial.addResource('messages', '3')
@@ -51,7 +49,6 @@ function initialModels() {
       status: 'pending',
       priority: 'Need Response',
       tag: 'Ready for copyediting',
-      isHandled: false,
       updatedAt: moment()
     });
   initial.addResource('messages', '4')
@@ -60,7 +57,6 @@ function initialModels() {
       status: 'denied',
       priority: 'Need Response',
       tag: 'Ready for copyediting',
-      isHandled: true,
       updatedAt: moment()
     });
   initial.addResource('messages', '5')
@@ -69,7 +65,6 @@ function initialModels() {
       status: 'approved',
       priority: 'Automatically Processed',
       tag: 'Course information synced',
-      isHandled: true,
       updatedAt: moment('2017-09-04')
     });
   initial.addResource('messages', '6')
@@ -78,7 +73,6 @@ function initialModels() {
       status: 'approved',
       priority: 'Automatically Processed',
       tag: 'Course information synced',
-      isHandled: true,
       updatedAt: moment()
     });
   initial.addResource('messages', '7')
@@ -87,7 +81,6 @@ function initialModels() {
       status: 'approved',
       priority: 'For Your Information',
       tag: 'New local content added',
-      isHandled: true,
       updatedAt: moment('2017-08-31')
     });
   return initial.getModels();
