@@ -7,7 +7,7 @@ test('Show group counters', function(assert) {
   visit('/');
 
   andThen(function() {
-    assertTrimmedText(assert, '[data-test-total-notification-count]', "5");
+    assertTrimmedText(assert, '[data-test-total-notification-count]', "3");
   });
 
   click('.cardstack-workflow-header');
@@ -20,8 +20,8 @@ test('Show group counters', function(assert) {
 
     assertTrimmedText(assert, '[data-test-tag-counter="Request to publish live"]', "2");
     assertTrimmedText(assert, '[data-test-tag-counter="Ready for copyediting"]', "1");
-    assertTrimmedText(assert, '[data-test-tag-counter="Course information synced"]', "1");
-    assertTrimmedText(assert, '[data-test-tag-counter="New local content added"]', "1");
+    assertTrimmedText(assert, '[data-test-tag-counter="Course information synced"]', "0");
+    assertTrimmedText(assert, '[data-test-tag-counter="New local content added"]', "0");
   });
 });
 
@@ -51,7 +51,7 @@ test('Switch between message lists and individual message card', function(assert
   click('[data-test-tag-counter="Ready for copyediting"]');
   click('[data-test-message-list-card]:first');
   andThen(() => {
-    assert.equal(find('[data-test-message-card]:contains("Tool\'s Forty Six & 2. Please approve.")').length, 1);
+    assert.equal(find('[data-test-message-card]:contains("Updated lyrics for Hey, Joe.")').length, 1);
   });
 
   click('[data-test-tag-counter="Request to publish live"]');

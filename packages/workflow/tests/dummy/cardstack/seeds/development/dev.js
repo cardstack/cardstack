@@ -39,7 +39,7 @@ function initialModels() {
   initial.addResource('messages', '2')
     .withAttributes({
       text: "Needs to have the Home song approved by tomorrow.",
-      status: 'pending', // CueCard prop
+      status: 'pending',
       priority: 'Need Response',
       tag: 'Request to publish live',
       isHandled: false,
@@ -47,7 +47,7 @@ function initialModels() {
     });
   initial.addResource('messages', '3')
     .withAttributes({
-      text: "Tool's Forty Six & 2. Please approve.",
+      text: "Updated lyrics for Hey, Joe.",
       status: 'pending',
       priority: 'Need Response',
       tag: 'Ready for copyediting',
@@ -56,14 +56,23 @@ function initialModels() {
     });
   initial.addResource('messages', '4')
     .withAttributes({
+      text: "Tool's Forty Six & 2. Please approve.",
+      status: 'denied',
+      priority: 'Need Response',
+      tag: 'Ready for copyediting',
+      isHandled: true,
+      updatedAt: moment()
+    });
+  initial.addResource('messages', '5')
+    .withAttributes({
       text: 'Eddie Vedder\' public key checks out.',
       status: 'approved',
       priority: 'Automatically Processed',
       tag: 'Course information synced',
-      isHandled: false,
+      isHandled: true,
       updatedAt: moment('2017-09-04')
     });
-  initial.addResource('messages', '5')
+  initial.addResource('messages', '6')
     .withAttributes({
       text: 'Verified song identity for Seven Nations Army.',
       status: 'approved',
@@ -72,13 +81,13 @@ function initialModels() {
       isHandled: true,
       updatedAt: moment()
     });
-  initial.addResource('messages', '6')
+  initial.addResource('messages', '7')
     .withAttributes({
       text: 'All is quiet.',
       status: 'approved',
       priority: 'For Your Information',
       tag: 'New local content added',
-      isHandled: false,
+      isHandled: true,
       updatedAt: moment('2017-08-31')
     });
   return initial.getModels();
