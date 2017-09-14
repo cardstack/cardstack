@@ -10,8 +10,8 @@ export default Ember.Component.extend({
 
   groupedMessages:           computed.readOnly('workflow.groupedMessages'),
   unhandled:                 computed.readOnly('workflow.unhandledItems'),
-  selectedTag:               computed.readOnly('workflow.selectedTag'),
-  messagesWithSelectedTag:   computed.readOnly('workflow.messagesWithSelectedTag'),
+  selectedGroup:             computed.readOnly('workflow.selectedGroup'),
+  messagesInSelectedGroup:   computed.readOnly('workflow.messagesInSelectedGroup'),
   selectedDate:              computed.readOnly('workflow.selectedDate'),
   messagesWithSelectedDate:  computed.readOnly('workflow.messagesWithSelectedDate'),
   matchingMessages:          computed.readOnly('workflow.matchingMessages'),
@@ -25,8 +25,8 @@ export default Ember.Component.extend({
       this.get('workflow').selectDate(date);
     },
 
-    selectTag(tag) {
-      this.get('workflow').selectTag(tag);
+    selectGroup(groupId) {
+      this.get('workflow').selectGroup(groupId);
     },
   }
 });

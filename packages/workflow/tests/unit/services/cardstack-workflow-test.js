@@ -1,13 +1,17 @@
 import Ember from 'ember';
 import { moduleFor, test } from 'ember-qunit';
 import {
+  // Priorities
   NEED_RESPONSE,
   PROCESSED,
-  FYI
+  FYI,
+  // Tags
+  REQUEST_TO_PUBLISH_LIVE,
+  LICENSE_REQUEST,
+  READY_FOR_COPYEDITING
 } from '@cardstack/workflow/services/cardstack-workflow';
 
-const REQUEST_TO_PUBLISH = 'Request to publish';
-const READY_FOR_EDITING = 'Ready for editing';
+const SONG_SPLIT_PROPOSAL = 'Song Splits Proposal';
 const INFO_SYNCED = 'Info synced';
 const NEW_CONTENT_ADDED = 'New local content added';
 
@@ -16,31 +20,31 @@ const create = Ember.Object.create.bind(Ember.Object);
 const items = Ember.A([
   create({
     priority: NEED_RESPONSE,
-    tag: REQUEST_TO_PUBLISH,
+    tag: REQUEST_TO_PUBLISH_LIVE,
     isHandled: false,
     updatedAt: moment().toISOString()
   }),
   create({
     priority: NEED_RESPONSE,
-    tag: REQUEST_TO_PUBLISH,
+    tag: REQUEST_TO_PUBLISH_LIVE,
     isHandled: false,
     updatedAt: '2017-09-04',
   }),
   create({
     priority: NEED_RESPONSE,
-    tag: REQUEST_TO_PUBLISH,
+    tag: REQUEST_TO_PUBLISH_LIVE,
     isHandled: true,
     updatedAt: '2017-09-01',
   }),
   create({
     priority: NEED_RESPONSE,
-    tag: READY_FOR_EDITING,
+    tag: SONG_SPLIT_PROPOSAL,
     isHandled: false,
     updatedAt: moment().toISOString()
   }),
   create({
     priority: NEED_RESPONSE,
-    tag: READY_FOR_EDITING,
+    tag: SONG_SPLIT_PROPOSAL,
     isHandled: true,
     updatedAt: '2017-08-31',
   }),
@@ -80,15 +84,15 @@ test('it gets notification count from unhandled items', function(assert) {
 test('it groups the items by priority and then tag', function(assert) {
   let service = this.subject({ items });
   let groupedMessages = service.get('groupedMessages');
-  assert.deepEqual(Object.keys(groupedMessages[NEED_RESPONSE]), [REQUEST_TO_PUBLISH, READY_FOR_EDITING]);
+  assert.deepEqual(Object.keys(groupedMessages[NEED_RESPONSE]), [REQUEST_TO_PUBLISH_LIVE, LICENSE_REQUEST, READY_FOR_COPYEDITING, SONG_SPLIT_PROPOSAL]);
   assert.deepEqual(Object.keys(groupedMessages[PROCESSED]), [INFO_SYNCED]);
   assert.deepEqual(Object.keys(groupedMessages[FYI]), [NEW_CONTENT_ADDED]);
-  let requestToPublish = groupedMessages[NEED_RESPONSE][REQUEST_TO_PUBLISH];
-  let readyForEditing = groupedMessages[NEED_RESPONSE][READY_FOR_EDITING];
+  let requestToPublish = groupedMessages[NEED_RESPONSE][REQUEST_TO_PUBLISH_LIVE];
+  let songSplitProposal = groupedMessages[NEED_RESPONSE][SONG_SPLIT_PROPOSAL];
   let infoSynced = groupedMessages[PROCESSED][INFO_SYNCED];
   let newContentAdded = groupedMessages[FYI][NEW_CONTENT_ADDED];
   assert.equal(requestToPublish.unhandled.length, 2);
-  assert.equal(readyForEditing.unhandled.length, 1);
+  assert.equal(songSplitProposal.unhandled.length, 1);
   assert.equal(infoSynced.unhandled.length, 0);
   assert.equal(newContentAdded.unhandled.length, 1);
 
@@ -96,7 +100,7 @@ test('it groups the items by priority and then tag', function(assert) {
   // Ember.run(() => {
   //   Ember.set(items.get('firstObject'), 'tag', NEW_CONTENT_ADDED)
   // });
-  // assert.equal(groupedMessages[NEED_RESPONSE][REQUEST_TO_PUBLISH].length, 2);
+  // assert.equal(groupedMessages[NEED_RESPONSE][REQUEST_TO_PUBLISH_LIVE].length, 2);
   // assert.equal(groupedMessages[FYI][NEW_CONTENT_ADDED].length, 2);
 });
 

@@ -30,17 +30,17 @@ test('Show group counters', function(assert) {
     assertTrimmedText(assert, '[data-test-priority-header="Processed"]', "Processed");
     assertTrimmedText(assert, '[data-test-priority-header="For Your Information"]', "For Your Information");
 
-    assertGroupCount(assert, "Request to publish live", 2);
-    assertGroupCount(assert, "Ready for copyediting", 1);
-    assertGroupCount(assert, "Course information synced", 0);
-    assertGroupCount(assert, "New local content added", 0);
+    assertGroupCount(assert, "Need Response::Request to publish live", 2);
+    assertGroupCount(assert, "Need Response::Ready for copyediting", 1);
+    assertGroupCount(assert, "Processed::Course information synced", 0);
+    assertGroupCount(assert, "For Your Information::New local content added", 0);
   });
 });
 
 test('List message cards that match the clicked tag', function(assert) {
   visit('/');
   click('.cardstack-workflow-header');
-  click('[data-test-group-counter="Request to publish live"]');
+  click('[data-test-group-counter="Need Response::Request to publish live"]');
   andThen(() => {
     assertCardCountInMessageList(assert, 2);
     assert.equal(find(".cardstack-workflow-label-with-count-wrapper.active:contains(Request to publish live)").length, 1, "The selected group is marked as active");
@@ -62,13 +62,13 @@ test('List message cards that match the Today date range', function(assert) {
 test('Switch between message lists and individual message card', function(assert) {
   visit('/');
   click('.cardstack-workflow-header');
-  click('[data-test-group-counter="Ready for copyediting"]');
+  click('[data-test-group-counter="Need Response::Ready for copyediting"]');
   click('[data-test-message-list-card]:first');
   andThen(() => {
     assert.equal(find('[data-test-message-card]:contains("Updated lyrics for Hey, Joe.")').length, 1);
   });
 
-  click('[data-test-group-counter="Request to publish live"]');
+  click('[data-test-group-counter="Need Response::Request to publish live"]');
   andThen(() => {
     assertCardCountInMessageList(assert, 2);
   });
@@ -87,7 +87,7 @@ test('Switch between message lists and individual message card', function(assert
 test('No cards for the selected tag', function(assert) {
   visit('/');
   click('.cardstack-workflow-header');
-  click('[data-test-group-counter="Course information synced"]');
+  click('[data-test-group-counter="Processed::Course information synced"]');
 
   andThen(() => {
     assertCardCountInMessageList(assert, 0);
@@ -98,24 +98,26 @@ test('No cards for the selected tag', function(assert) {
 test('Take action on a cue card', function(assert) {
   visit('/');
   click('.cardstack-workflow-header');
-  click('[data-test-group-counter="Request to publish live"]');
+  click('[data-test-group-counter="Need Response::Request to publish live"]');
   click('[data-test-message-list-card]:first');
   click('[data-test-approve-button]');
 
   andThen(() => {
-    assertGroupCount(assert, "Request to publish live", "1", "Unhandled group count is decremented after approving a message");
+    assertGroupCount(assert, "Need Response::Request to publish live", "1", "Unhandled group count is decremented after approving a message");
     assertGroupCount(assert, 'Today', "1", "Unhandled group count is also decremented for date range group");
     //FIXME: This (assertCardCountInMessageList) should work but it doesn't, see workflow-service#messagesWithSelectedTag
     // assertCardCountInMessageList(assert, 1, "The handled card is taken out of the list");
+    //TODO: The Processed priority should display the number of *handled* messages
+    // assertGroupCount(assert, "Processed::Request to publish live", 1);
     assertUnhandledCount(assert, 2, "The total count is decremented");
   });
 
-  click('[data-test-group-counter="Request to publish live"]');
+  click('[data-test-group-counter="Need Response::Request to publish live"]');
   click('[data-test-message-list-card]:last');
   click('[data-test-deny-button]');
 
   andThen(() => {
-    assertGroupCount(assert, "Request to publish live", "0", "Unhandled group count is decremented after denying a message");
+    assertGroupCount(assert, "Need Response::Request to publish live", "0", "Unhandled group count is decremented after denying a message");
     assertUnhandledCount(assert, 1, "The total count is decremented");
   });
 });

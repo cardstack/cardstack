@@ -1,14 +1,22 @@
 import Ember from 'ember';
+import { workflowGroupId } from '@cardstack/workflow/helpers/workflow-group-id';
 
 const { inject, computed, assert } = Ember;
 
-export const REQUEST_TO_PUBLISH_LIVE = 'Request to publish live';
-export const READY_FOR_COPYEDITING = 'Ready for copyediting';
-export const COURSE_INFORMATION_SYNCED = 'Course information synced';
-
+// Priorities (fixed, provided by the Cardstack framework)
 export const NEED_RESPONSE = 'Need Response';
 export const PROCESSED = 'Processed';
 export const FYI = 'For Your Information';
+
+// Tags: that should be "dynamic", supplied by the user
+// or extracted from the messages themselves
+export const REQUEST_TO_PUBLISH_LIVE = 'Request to publish live';
+export const LICENSE_REQUEST = 'License Request';
+export const READY_FOR_COPYEDITING = 'Ready for copyediting';
+export const COURSE_INFORMATION_SYNCED = 'Course information synced';
+
+const staticGroups = {};
+staticGroups[NEED_RESPONSE] = [REQUEST_TO_PUBLISH_LIVE, LICENSE_REQUEST, READY_FOR_COPYEDITING];
 
 const priorities = [NEED_RESPONSE, PROCESSED, FYI];
 
@@ -29,17 +37,6 @@ function messagesBetween(arrayKey, dateKey, { from, to }) {
   });
 }
 
-// const priorities = [
-//   NEED_RESPONSE,
-//   PROCESSED,
-//   FYI
-// ]
-// const tags = [
-//   REQUEST_TO_PUBLISH_LIVE,
-//   READY_FOR_COPYEDITING,
-//   COURSE_INFORMATION_SYNCED
-// ];
-
 export default Ember.Service.extend({
   isOpen: false,
   selectedMessage: null,
@@ -55,20 +52,30 @@ export default Ember.Service.extend({
   todaysUnhandledMessages:  computed.filterBy('messagesForToday', 'isHandled', false),
 
   groupedMessages: computed('items.@each.{priority,tag,isHandled}', function() {
+    function emptyGroup() {
+      return {
+        all: [],
+        unhandled: []
+      }
+    }
     let messagesByPriority = {};
-    messagesByPriority[NEED_RESPONSE] = [];
-    messagesByPriority[PROCESSED] = [];
-    messagesByPriority[FYI] = [];
+    priorities.forEach((priority) => {
+      messagesByPriority[priority] = [];
+      let staticTagsForPriority = staticGroups[priority];
+      if (staticTagsForPriority) {
+        staticTagsForPriority.forEach((tag) => {
+          messagesByPriority[priority][tag] = emptyGroup();
+        });
+      }
+    });
+
     return this.get('items').reduce((messages, message) => {
       let priority = Ember.get(message, 'priority');
       assert(`Unknown priority: ${priority}`, priorities.includes(priority));
       let messagesByTag = messages[priority];
       let tag = Ember.get(message, 'tag');
       if (!messagesByTag[tag]) {
-        messagesByTag[tag] = {
-          all: [],
-          unhandled: [],
-        };
+        messagesByTag[tag] = emptyGroup();
       }
       let messagesWithTag = messagesByTag[tag];
       messagesWithTag.all.push(message);
@@ -83,12 +90,11 @@ export default Ember.Service.extend({
     from: moment().subtract(1, 'day')
   }),
 
-  selectedTag:    '',
+  selectedGroup:    '',
   //FIXME: This is not recomputed after handling a message, although unhandledItems is :o
-  messagesWithSelectedTag: computed('unhandledItems.@each.tag', 'selectedTag', function() {
-    let withSelectedTag = this.get('unhandledItems').filterBy('tag', this.get('selectedTag'));
-    // console.log('messagesWithSelectedTag #: ' + withSelectedTag.length);
-    return withSelectedTag;
+  messagesInSelectedGroup: computed('unhandledItems.@each.groupId', 'selectedGroup', function() {
+    let withSelectedGroup = this.get('unhandledItems').filterBy('groupId', this.get('selectedGroup'));
+    return withSelectedGroup;
   }),
 
   selectedDate: '',
@@ -99,11 +105,11 @@ export default Ember.Service.extend({
     return [];
   }),
 
-  shouldShowMessagesInGroup: computed.or('selectedTag', 'selectedDate'),
+  shouldShowMessagesInGroup: computed.or('selectedGroup', 'selectedDate'),
 
-  matchingMessages: computed('selectedTag', 'selectedDate', function() {
-    if (this.get('selectedTag')) {
-      return this.get('messagesWithSelectedTag');
+  matchingMessages: computed('selectedGroup', 'selectedDate', 'messagesInSelectedGroup', 'messagesWithSelectedDate', function() {
+    if (this.get('selectedGroup')) {
+      return this.get('messagesInSelectedGroup');
     }
     if (this.get('selectedDate')) {
       return this.get('messagesWithSelectedDate');
@@ -114,15 +120,15 @@ export default Ember.Service.extend({
   selectDate(date) {
     this.setProperties({
       selectedDate: date,
-      selectedTag: null
+      selectedGroup: null
     });
     this.clearSelectedMessage();
   },
 
-  selectTag(tag) {
+  selectGroup(groupId) {
     this.setProperties({
       selectedDate: null,
-      selectedTag: tag
+      selectedGroup: groupId
     });
     this.clearSelectedMessage();
   },
@@ -135,7 +141,7 @@ export default Ember.Service.extend({
   clearGroupSelection() {
     this.setProperties({
       selectedDate: null,
-      selectedTag: null
+      selectedGroup: null
     });
   },
 
@@ -144,12 +150,18 @@ export default Ember.Service.extend({
   },
 
   approveMessage(message) {
-    message.set('status', 'approved');
+    message.setProperties({
+      status: 'approved',
+      priority: PROCESSED
+    });
     this.clearSelectedMessage();
   },
 
   denyMessage(message) {
-    message.set('status', 'denied');
+    message.setProperties({
+      status: 'denied',
+      priority: PROCESSED
+    });
     this.clearSelectedMessage();
   }
 });
