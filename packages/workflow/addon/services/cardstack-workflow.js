@@ -99,6 +99,8 @@ export default Ember.Service.extend({
     return [];
   }),
 
+  shouldShowMessagesInGroup: computed.or('selectedTag', 'selectedDate'),
+
   matchingMessages: computed('selectedTag', 'selectedDate', function() {
     if (this.get('selectedTag')) {
       return this.get('messagesWithSelectedTag');

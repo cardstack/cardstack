@@ -9,10 +9,9 @@ function assertGroupCount(assert, groupName, value, assertionText) {
   assertTrimmedText(assert, `[data-test-group-counter="${groupName}"]`, value, assertionText);
 }
 
-// Don't remove: see failing but needed assertion that's now commented out
-// function assertCardCountInMessageList(assert, value, assertionText) {
-//   assert.equal(find('[data-test-message-list-card]').length, value, assertionText);
-// }
+function assertCardCountInMessageList(assert, value, assertionText) {
+  assert.equal(find('[data-test-message-list-card]').length, value, assertionText);
+}
 
 moduleForAcceptance('Acceptance | Workflow');
 
@@ -43,7 +42,7 @@ test('List message cards that match the clicked tag', function(assert) {
   click('.cardstack-workflow-header');
   click('[data-test-group-counter="Request to publish live"]');
   andThen(() => {
-    assert.equal(find('[data-test-message-list-card]').length, 2);
+    assertCardCountInMessageList(assert, 2);
     assert.equal(find(".cardstack-workflow-label-with-count-wrapper.active:contains(Request to publish live)").length, 1, "The selected group is marked as active");
     assert.equal(find("[data-test-message-list-card]:contains(Matt, could you push live my cover of Pearl Jam's Daughter?)").length, 1)
     assert.equal(find("[data-test-message-list-card]:contains(Needs to have the Home song approved by tomorrow.)").length, 1)
@@ -55,7 +54,7 @@ test('List message cards that match the Today date range', function(assert) {
   click('.cardstack-workflow-header');
   click('[data-test-group-counter="Today"]');
   andThen(() => {
-    assert.equal(find('[data-test-message-list-card]').length, 2);
+    assertCardCountInMessageList(assert, 2);
     assert.equal(find(".cardstack-workflow-label-with-count-wrapper.active:contains(Today)").length, 1, "The selected group is marked as active");
   });
 });
@@ -71,7 +70,7 @@ test('Switch between message lists and individual message card', function(assert
 
   click('[data-test-group-counter="Request to publish live"]');
   andThen(() => {
-    assert.equal(find('[data-test-message-list-card]').length, 2);
+    assertCardCountInMessageList(assert, 2);
   });
 
   click('[data-test-message-list-card]:first');
@@ -81,7 +80,18 @@ test('Switch between message lists and individual message card', function(assert
 
   click('[data-test-group-counter="Today"]');
   andThen(() => {
-    assert.equal(find('[data-test-message-list-card]').length, 2);
+    assertCardCountInMessageList(assert, 2);
+  });
+});
+
+test('No cards for the selected tag', function(assert) {
+  visit('/');
+  click('.cardstack-workflow-header');
+  click('[data-test-group-counter="Course information synced"]');
+
+  andThen(() => {
+    assertCardCountInMessageList(assert, 0);
+    assertTrimmedText(assert, '[data-test-empty-group-message]', 'There are no cards in this group.')
   });
 });
 

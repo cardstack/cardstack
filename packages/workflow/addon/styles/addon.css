@@ -54,11 +54,17 @@
   margin-left: 10px;
 }
 
-.cardstack-cue-card-list {
+.cardstack-cue-card-list,
+.cardstack-empty-cue-card-list {
   min-width: 25vw;
   background-color: var(--lighter-background);
   color: var(--bright-foreground);
   padding: 0 5px;
+}
+
+.cardstack-empty-cue-card-message {
+  margin-top: 10vh;
+  text-align: center;
 }
 
 .cardstack-cue-card {

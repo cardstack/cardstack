@@ -29,11 +29,20 @@
     {{cardstack-content content=selectedMessage format="card"}}
   </section>
 {{else}}
-  {{#if matchingMessages.length}}
-    <section class="cardstack-cue-card-list">
-      {{#each matchingMessages as |message|}}
-        {{cardstack-content content=message format="list-card"}}
-      {{/each}}
-    </section>
+  {{#if shouldShowMessagesInGroup}}
+    {{#if matchingMessages.length}}
+      <section class="cardstack-cue-card-list">
+        {{#each matchingMessages as |message|}}
+          {{cardstack-content content=message format="list-card"}}
+        {{/each}}
+      </section>
+    {{else}}
+      {{!-- cardstack-content content=message format="empty-list-card" --}}
+      <section class="cardstack-empty-cue-card-list">
+        <div class="cardstack-empty-cue-card-message" data-test-empty-group-message>
+          There are no cards in this group.
+        </div>
+      </section>
+    {{/if}}
   {{/if}}
 {{/if}}

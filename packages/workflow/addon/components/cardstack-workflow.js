@@ -18,6 +18,7 @@ export default Ember.Component.extend({
   todaysMessages:            computed.readOnly('workflow.todaysUnhandledMessages'),
   todaysMessageCount:        computed.readOnly('todaysMessages.length'),
   selectedMessage:           computed.readOnly('workflow.selectedMessage'),
+  shouldShowMessagesInGroup: computed.readOnly('workflow.shouldShowMessagesInGroup'),
 
   actions: {
     selectDate(date) {
