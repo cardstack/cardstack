@@ -1,3 +1,11 @@
 <div class="message-card" data-test-message-card>
-  {{content.text}}
+  <div class="main-content">{{content.text}}</div>
+  <div class="button-panel">
+    <button type="button" data-test-approve-button onclick={{action 'approve'}}>
+      Approve
+    </button>
+    <button type="button" data-test-deny-button onclick={{action 'deny'}}>
+      Deny
+    </button>
+  </div>
 </div>

@@ -87,10 +87,10 @@ test('it groups the items by priority and then tag', function(assert) {
   let readyForEditing = groupedMessages[NEED_RESPONSE][READY_FOR_EDITING];
   let infoSynced = groupedMessages[PROCESSED][INFO_SYNCED];
   let newContentAdded = groupedMessages[FYI][NEW_CONTENT_ADDED];
-  assert.equal(requestToPublish.unhandledCount, 2);
-  assert.equal(readyForEditing.unhandledCount, 1);
-  assert.equal(infoSynced.unhandledCount, 0);
-  assert.equal(newContentAdded.unhandledCount, 1);
+  assert.equal(requestToPublish.unhandled.length, 2);
+  assert.equal(readyForEditing.unhandled.length, 1);
+  assert.equal(infoSynced.unhandled.length, 0);
+  assert.equal(newContentAdded.unhandled.length, 1);
 
   //TODO: Shouldn't this invalidate and rerun the CP?
   // Ember.run(() => {

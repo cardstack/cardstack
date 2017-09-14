@@ -54,7 +54,7 @@ export default Ember.Service.extend({
   notificationCount:        computed.readOnly('unhandledItems.length'),
   todaysUnhandledMessages:  computed.filterBy('messagesForToday', 'isHandled', false),
 
-  groupedMessages: computed('items.@each.{priority,tag}', function() {
+  groupedMessages: computed('items.@each.{priority,tag,isHandled}', function() {
     let messagesByPriority = {};
     messagesByPriority[NEED_RESPONSE] = [];
     messagesByPriority[PROCESSED] = [];
@@ -66,13 +66,14 @@ export default Ember.Service.extend({
       let tag = Ember.get(message, 'tag');
       if (!messagesByTag[tag]) {
         messagesByTag[tag] = {
-          messages: [],
-          unhandledCount: 0,
+          all: [],
+          unhandled: [],
         };
       }
-      messagesByTag[tag].messages.push(message);
+      let messagesWithTag = messagesByTag[tag];
+      messagesWithTag.all.push(message);
       if (!Ember.get(message, 'isHandled')) {
-        messagesByTag[tag].unhandledCount += 1;
+        messagesWithTag.unhandled.push(message);
       }
       return messages;
     }, messagesByPriority);
@@ -82,11 +83,71 @@ export default Ember.Service.extend({
     from: moment().subtract(1, 'day')
   }),
 
+  selectedTag:    '',
+  //FIXME: This is not recomputed after handling a message, although unhandledItems is :o
+  messagesWithSelectedTag: computed('unhandledItems.@each.tag', 'selectedTag', function() {
+    let withSelectedTag = this.get('unhandledItems').filterBy('tag', this.get('selectedTag'));
+    // console.log('messagesWithSelectedTag #: ' + withSelectedTag.length);
+    return withSelectedTag;
+  }),
+
+  selectedDate: '',
+  messagesWithSelectedDate: computed('selectedDate', function() {
+    if (this.get('selectedDate') === 'today') {
+      return this.get('todaysUnhandledMessages');
+    }
+    return [];
+  }),
+
+  matchingMessages: computed('selectedTag', 'selectedDate', function() {
+    if (this.get('selectedTag')) {
+      return this.get('messagesWithSelectedTag');
+    }
+    if (this.get('selectedDate')) {
+      return this.get('messagesWithSelectedDate');
+    }
+    return [];
+  }),
+
+  selectDate(date) {
+    this.setProperties({
+      selectedDate: date,
+      selectedTag: null
+    });
+    this.clearSelectedMessage();
+  },
+
+  selectTag(tag) {
+    this.setProperties({
+      selectedDate: null,
+      selectedTag: tag
+    });
+    this.clearSelectedMessage();
+  },
+
   selectMessage(message) {
     this.set('selectedMessage', message);
+    // this.clearGroupSelection();
+  },
+
+  clearGroupSelection() {
+    this.setProperties({
+      selectedDate: null,
+      selectedTag: null
+    });
   },
 
   clearSelectedMessage() {
     this.set('selectedMessage', null);
+  },
+
+  approveMessage(message) {
+    message.set('status', 'approved');
+    this.clearSelectedMessage();
+  },
+
+  denyMessage(message) {
+    message.set('status', 'denied');
+    this.clearSelectedMessage();
   }
 });

@@ -1,3 +1,1 @@
-import Ember from 'ember';
-
-export default Ember.Component.extend();
+export { default } from '@cardstack/workflow/components/cardstack/message-card';

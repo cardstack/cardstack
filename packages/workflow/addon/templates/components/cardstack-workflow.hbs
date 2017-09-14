@@ -4,19 +4,19 @@
     <div class={{concat "cardstack-workflow-label-with-count-wrapper " (if (eq selectedDate 'today') "active")}}>
       <div class="cardstack-workflow-label-with-count" onclick={{action 'selectDate' 'today'}}>
         <div class="name">Today</div>
-        <div class="count" data-test-date-range-counter="Today">{{todaysMessageCount}}</div>
+        <div class="count" data-test-group-counter="Today">{{todaysMessageCount}}</div>
       </div>
     </div>
   </div>
   {{#each-in groupedMessages as |priority messagesWithPriority|}}
     <div class="cardstack-workflow-group">
       <h4 class="cardstack-workflow-group-header" data-test-priority-header={{priority}}>{{priority}}</h4>
-      {{#each-in messagesWithPriority as |tag messagesAndCount|}}
+      {{#each-in messagesWithPriority as |tag messagesWithTag|}}
         <div class={{concat "cardstack-workflow-label-with-count-wrapper " (if (eq selectedTag tag) "active")}}>
           <div class="cardstack-workflow-label-with-count"
               onclick={{action 'selectTag' tag}}>
             <div class='name'>{{tag}}</div>
-            <div class="count" data-test-tag-counter={{tag}}>{{messagesAndCount.unhandledCount}}</div>
+            <div class="count" data-test-group-counter={{tag}}>{{messagesWithTag.unhandled.length}}</div>
           </div>
         </div>
       {{/each-in}}
