@@ -7,6 +7,11 @@
   --very-dark-background: #0b0b0b;
   font-family: 'Avenir', 'helvetica', sans-serif;
   -webkit-font-smoothing: antialiased;
+  box-sizing: border-box;
+}
+
+*, *:before, *:after {
+  box-sizing: inherit;
 }
 
 .cardstack-workflow-header {
@@ -104,12 +109,46 @@ count could be made to stay on the same line
   font-weight: bold;
 }
 
-.message-card,
-.message-list-card {
+.cardstack-message-card,
+.cardstack-message-list-card {
+  display: flex;
+  flex-direction: column;
   margin: 2vh;
   background-color: var(--bright-foreground);
   padding: 2vh 2vw;
   color: var(--light-background);
   border-radius: 5px;
+}
+
+.cardstack-message-card {
+  min-height: 20vh;
+}
+
+.cardstack-message-list-card {
+  cursor: pointer;
+}
+
+.cardstack-message-card > .main-content {
+  align-self: flex-start;
+  flex: 1 0 auto;
+}
+
+.cardstack-message-card > .button-panel {
+  align-self: flex-end;
+  flex: 0 0 auto;
+  width: 100%;
+  display: flex;
+  align-content: flex-start;
+}
+
+.button-panel > .action-button {
+  padding: 10px;
+  margin-right: 10px;
+  width: 5vw;
+  font-size: 0.8em;
+  color: var(--normal-background);
+  background-color: var(--bright-foreground);
+  border: 1px solid var(--dark-background);
+  border-radius: 3px;
   cursor: pointer;
 }

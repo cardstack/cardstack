@@ -45,8 +45,8 @@ test('List message cards that match the clicked tag', function(assert) {
   andThen(() => {
     assert.equal(find('[data-test-message-list-card]').length, 2);
     assert.equal(find(".cardstack-workflow-label-with-count-wrapper.active:contains(Request to publish live)").length, 1, "The selected group is marked as active");
-    assert.equal(find(".message-list-card:contains(Matt, could you push live my cover of Pearl Jam's Daughter?)").length, 1)
-    assert.equal(find(".message-list-card:contains(Needs to have the Home song approved by tomorrow.)").length, 1)
+    assert.equal(find("[data-test-message-list-card]:contains(Matt, could you push live my cover of Pearl Jam's Daughter?)").length, 1)
+    assert.equal(find("[data-test-message-list-card]:contains(Needs to have the Home song approved by tomorrow.)").length, 1)
   });
 });
 
