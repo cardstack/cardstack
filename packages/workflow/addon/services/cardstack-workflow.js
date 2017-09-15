@@ -1,19 +1,16 @@
 import Ember from 'ember';
-import { workflowGroupId } from '@cardstack/workflow/helpers/workflow-group-id';
+import {
+  // Priorities
+  NEED_RESPONSE,
+  PROCESSED,
+  FYI,
+  // Tags
+  REQUEST_TO_PUBLISH_LIVE,
+  LICENSE_REQUEST,
+  READY_FOR_COPYEDITING,
+} from '@cardstack/workflow/models/message';
 
 const { inject, computed, assert } = Ember;
-
-// Priorities (fixed, provided by the Cardstack framework)
-export const NEED_RESPONSE = 'Need Response';
-export const PROCESSED = 'Processed';
-export const FYI = 'For Your Information';
-
-// Tags: that should be "dynamic", supplied by the user
-// or extracted from the messages themselves
-export const REQUEST_TO_PUBLISH_LIVE = 'Request to publish live';
-export const LICENSE_REQUEST = 'License Request';
-export const READY_FOR_COPYEDITING = 'Ready for copyediting';
-export const COURSE_INFORMATION_SYNCED = 'Course information synced';
 
 const staticGroups = {};
 staticGroups[NEED_RESPONSE] = [REQUEST_TO_PUBLISH_LIVE, LICENSE_REQUEST, READY_FOR_COPYEDITING];
@@ -51,11 +48,11 @@ export default Ember.Service.extend({
   notificationCount:        computed.readOnly('unhandledItems.length'),
   todaysUnhandledMessages:  computed.filterBy('messagesForToday', 'isHandled', false),
 
-  groupedMessages: computed('items.@each.{priority,tag,isHandled}', function() {
+  groupedMessages: computed('items.@each.{priority,tag,isImportant}', function() {
     function emptyGroup() {
       return {
         all: [],
-        unhandled: []
+        important: []
       }
     }
     let messagesByPriority = {};
@@ -79,8 +76,8 @@ export default Ember.Service.extend({
       }
       let messagesWithTag = messagesByTag[tag];
       messagesWithTag.all.push(message);
-      if (!Ember.get(message, 'isHandled')) {
-        messagesWithTag.unhandled.push(message);
+      if (message.get('isImportant')) {
+        messagesWithTag.important.push(message);
       }
       return messages;
     }, messagesByPriority);
@@ -91,9 +88,9 @@ export default Ember.Service.extend({
   }),
 
   selectedGroup:    '',
-  messagesInSelectedGroup: computed('unhandledItems.@each.groupId', 'selectedGroup', function() {
-    let withSelectedGroup = this.get('unhandledItems').filterBy('groupId', this.get('selectedGroup'));
-    return withSelectedGroup;
+  messagesInSelectedGroup: computed('items.@each.{groupId,isImportant}', 'selectedGroup', function() {
+    let inselectedGroup = this.get('items').filterBy('groupId', this.get('selectedGroup'));
+    return inselectedGroup.filter((message) => message.get('isImportant'));
   }),
 
   selectedDate: '',

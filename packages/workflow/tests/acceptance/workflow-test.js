@@ -32,8 +32,8 @@ test('Show group counters', function(assert) {
 
     assertGroupCount(assert, "Need Response::Request to publish live", 2);
     assertGroupCount(assert, "Need Response::Ready for copyediting", 1);
-    assertGroupCount(assert, "Processed::Course information synced", 0);
-    assertGroupCount(assert, "For Your Information::New local content added", 0);
+    assertGroupCount(assert, "Processed::Course information synced", 2);
+    assertGroupCount(assert, "For Your Information::New local content added", 1);
   });
 });
 
@@ -87,7 +87,7 @@ test('Switch between message lists and individual message card', function(assert
 test('No cards for the selected tag', function(assert) {
   visit('/');
   click('.cardstack-workflow-header');
-  click('[data-test-group-counter="Processed::Course information synced"]');
+  click('[data-test-group-counter="Need Response::License Request"]');
 
   andThen(() => {
     assertCardCountInMessageList(assert, 0);
@@ -106,8 +106,7 @@ test('Take action on a cue card', function(assert) {
     assertGroupCount(assert, "Need Response::Request to publish live", "1", "Unhandled group count is decremented after approving a message");
     assertGroupCount(assert, 'Today', "1", "Unhandled group count is also decremented for date range group");
     assertCardCountInMessageList(assert, 1, "The handled card is taken out of the list");
-    //TODO: The Processed priority should display the number of *handled* messages
-    // assertGroupCount(assert, "Processed::Request to publish live", 1);
+    assertGroupCount(assert, "Processed::Request to publish live", 1, "The handled card is counted in its new priority group");
     assertUnhandledCount(assert, 2, "The total count is decremented");
   });
 

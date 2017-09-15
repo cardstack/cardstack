@@ -9,7 +9,7 @@ import {
   REQUEST_TO_PUBLISH_LIVE,
   LICENSE_REQUEST,
   READY_FOR_COPYEDITING
-} from '@cardstack/workflow/services/cardstack-workflow';
+} from '@cardstack/workflow/models/message';
 
 const SONG_SPLIT_PROPOSAL = 'Song Splits Proposal';
 const INFO_SYNCED = 'Info synced';
