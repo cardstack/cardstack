@@ -3,6 +3,7 @@ import Message from '@cardstack/models/generated/message';
 import { workflowGroupId } from '@cardstack/workflow/helpers/workflow-group-id';
 
 // Priorities (fixed, provided by the Cardstack framework)
+export const DELEGATED = 'Delegated';
 export const NEED_RESPONSE = 'Need Response';
 export const PROCESSED = 'Processed';
 export const FYI = 'For Your Information';
@@ -28,7 +29,7 @@ export default Message.extend({
     let status = this.get('status');
     let priority = this.get('priority');
     if (status === 'pending') {
-      return [NEED_RESPONSE].includes(priority);
+      return [NEED_RESPONSE, DELEGATED].includes(priority);
     } else {
       return [PROCESSED, FYI].includes(priority);
     }

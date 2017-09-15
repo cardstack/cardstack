@@ -1,6 +1,7 @@
 import Ember from 'ember';
 import { moduleForModel, test } from 'ember-qunit';
 import {
+  DELEGATED,
   NEED_RESPONSE,
   PROCESSED,
   FYI,
@@ -12,10 +13,17 @@ moduleForModel('message', 'Unit | Model | message', {
 });
 
 test('isImportant', function(assert) {
-  //FIXME: Rewrite these so mutate the subject
   let message = this.subject({
-    priority: NEED_RESPONSE,
+    priority: DELEGATED,
     status: 'pending'
+  });
+  assert.ok(message.get('isImportant'));
+
+  Ember.run(() => {
+    message.setProperties({
+      priority: NEED_RESPONSE,
+      status: 'pending'
+    });
   });
   assert.ok(message.get('isImportant'));
 

@@ -1,6 +1,7 @@
 import Ember from 'ember';
 import {
   // Priorities
+  DELEGATED,
   NEED_RESPONSE,
   PROCESSED,
   FYI,
@@ -14,8 +15,10 @@ const { inject, computed, assert } = Ember;
 
 const staticGroups = {};
 staticGroups[NEED_RESPONSE] = [REQUEST_TO_PUBLISH_LIVE, LICENSE_REQUEST, READY_FOR_COPYEDITING];
+staticGroups[DELEGATED] = [LICENSE_REQUEST];
 
 const priorities = [
+  { name: DELEGATED, level: 'high' },
   { name: NEED_RESPONSE, level: 'high' },
   { name: PROCESSED, level: 'low' },
   { name: FYI, level: 'low' }

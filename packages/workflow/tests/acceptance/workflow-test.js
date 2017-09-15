@@ -19,13 +19,13 @@ test('Show group counters', function(assert) {
   visit('/');
 
   andThen(function() {
-    assertUnhandledCount(assert, 3);
+    assertUnhandledCount(assert, 4);
   });
 
   click('.cardstack-workflow-header');
 
   andThen(function() {
-    assertGroupCount(assert, 'Today', 2);
+    assertGroupCount(assert, 'Today', 3);
     assertTrimmedText(assert, '[data-test-priority-header="Need Response"]', "Need Response");
     assertTrimmedText(assert, '[data-test-priority-header="Processed"]', "Processed");
     assertTrimmedText(assert, '[data-test-priority-header="For Your Information"]', "For Your Information");
@@ -54,7 +54,7 @@ test('List message cards that match the Today date range', function(assert) {
   click('.cardstack-workflow-header');
   click('[data-test-group-counter="Today"]');
   andThen(() => {
-    assertCardCountInMessageList(assert, 2);
+    assertCardCountInMessageList(assert, 3);
     assert.equal(find(".cardstack-workflow-label-with-count-wrapper.active:contains(Today)").length, 1, "The selected group is marked as active");
   });
 });
@@ -80,7 +80,7 @@ test('Switch between message lists and individual message card', function(assert
 
   click('[data-test-group-counter="Today"]');
   andThen(() => {
-    assertCardCountInMessageList(assert, 2);
+    assertCardCountInMessageList(assert, 3);
   });
 });
 
@@ -103,11 +103,11 @@ test('Take action on a cue card', function(assert) {
   click('[data-test-approve-button]');
 
   andThen(() => {
-    assertGroupCount(assert, "Need Response::Request to publish live", "1", "Unhandled group count is decremented after approving a message");
-    assertGroupCount(assert, 'Today', "1", "Unhandled group count is also decremented for date range group");
+    assertGroupCount(assert, "Need Response::Request to publish live", 1, "Unhandled group count is decremented after approving a message");
+    assertGroupCount(assert, 'Today', 2, "Unhandled group count is also decremented for date range group");
     assertCardCountInMessageList(assert, 1, "The handled card is taken out of the list");
     assertGroupCount(assert, "Processed::Request to publish live", 1, "The handled card is counted in its new priority group");
-    assertUnhandledCount(assert, 2, "The total count is decremented");
+    assertUnhandledCount(assert, 3, "The total count is decremented");
   });
 
   click('[data-test-group-counter="Need Response::Request to publish live"]');
@@ -115,7 +115,7 @@ test('Take action on a cue card', function(assert) {
   click('[data-test-deny-button]');
 
   andThen(() => {
-    assertGroupCount(assert, "Need Response::Request to publish live", "0", "Unhandled group count is decremented after denying a message");
-    assertUnhandledCount(assert, 1, "The total count is decremented");
+    assertGroupCount(assert, "Need Response::Request to publish live", 0, "Unhandled group count is decremented after denying a message");
+    assertUnhandledCount(assert, 2, "The total count is decremented");
   });
 });

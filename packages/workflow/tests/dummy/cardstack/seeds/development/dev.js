@@ -83,6 +83,14 @@ function initialModels() {
       tag: 'New local content added',
       updatedAt: moment('2017-08-31')
     });
+  initial.addResource('messages', '8')
+    .withAttributes({
+      text: 'Song request for Chris Cornell\'s Seasons',
+      status: 'pending',
+      priority: 'Delegated',
+      tag: 'License Request',
+      updatedAt: moment()
+    });
   return initial.getModels();
 }
 
