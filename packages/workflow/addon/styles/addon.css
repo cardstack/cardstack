@@ -108,11 +108,18 @@ count could be made to stay on the same line
   width: 20px;
   height: 20px;
   line-height: 20px;
-  background-color: red;
   border-radius: 50%;
   text-align: center;
   font-size: 0.8em;
   font-weight: bold;
+}
+
+.cardstack-workflow-label-with-count.high-priority > .count {
+  background-color: #F70221;
+}
+
+.cardstack-workflow-label-with-count.low-priority > .count {
+  background-color: #26A3E9;
 }
 
 .cardstack-message-card,

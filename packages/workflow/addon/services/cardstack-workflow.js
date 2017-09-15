@@ -15,7 +15,11 @@ const { inject, computed, assert } = Ember;
 const staticGroups = {};
 staticGroups[NEED_RESPONSE] = [REQUEST_TO_PUBLISH_LIVE, LICENSE_REQUEST, READY_FOR_COPYEDITING];
 
-const priorities = [NEED_RESPONSE, PROCESSED, FYI];
+const priorities = [
+  { name: NEED_RESPONSE, level: 'high' },
+  { name: PROCESSED, level: 'low' },
+  { name: FYI, level: 'low' }
+];
 
 function messagesBetween(arrayKey, dateKey, { from, to }) {
   return Ember.computed(`${arrayKey}.@each.${dateKey}`, function() {
@@ -49,30 +53,37 @@ export default Ember.Service.extend({
   todaysUnhandledMessages:  computed.filterBy('messagesForToday', 'isHandled', false),
 
   groupedMessages: computed('items.@each.{priority,tag,isImportant}', function() {
-    function emptyGroup() {
+    let priorityNames = priorities.map((priority) => priority.name);
+    function emptyGroup(priority) {
       return {
         all: [],
-        important: []
+        important: [],
+        priorityLevel: findPriority(priority).level
       }
     }
+
+    function findPriority(name) {
+      return priorities.find((priority) => priority.name === name);
+    }
+
     let messagesByPriority = {};
-    priorities.forEach((priority) => {
+    priorityNames.forEach((priority) => {
       messagesByPriority[priority] = [];
       let staticTagsForPriority = staticGroups[priority];
       if (staticTagsForPriority) {
         staticTagsForPriority.forEach((tag) => {
-          messagesByPriority[priority][tag] = emptyGroup();
+          messagesByPriority[priority][tag] = emptyGroup(priority);
         });
       }
     });
 
     return this.get('items').reduce((messages, message) => {
       let priority = Ember.get(message, 'priority');
-      assert(`Unknown priority: ${priority}`, priorities.includes(priority));
+      assert(`Unknown priority: ${priority}`, priorityNames.includes(priority));
       let messagesByTag = messages[priority];
       let tag = Ember.get(message, 'tag');
       if (!messagesByTag[tag]) {
-        messagesByTag[tag] = emptyGroup();
+        messagesByTag[tag] = emptyGroup(priority);
       }
       let messagesWithTag = messagesByTag[tag];
       messagesWithTag.all.push(message);

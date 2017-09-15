@@ -2,7 +2,7 @@
 	<div class="cardstack-workflow-group">
 		<h4 class="cardstack-workflow-group-header">Dashboards</h4>
 		<div class={{concat "cardstack-workflow-label-with-count-wrapper " (if (eq selectedDate 'today') "active")}}>
-			<div class="cardstack-workflow-label-with-count" onclick={{action 'selectDate' 'today'}}>
+			<div class="cardstack-workflow-label-with-count high-priority" onclick={{action 'selectDate' 'today'}}>
 				<div class="name">Today</div>
 				<div class="count" data-test-group-counter="Today">{{todaysMessageCount}}</div>
 			</div>
@@ -14,7 +14,7 @@
 			{{#each-in messagesWithPriority as |tag messagesWithTag|}}
 				{{#with (workflow-group-id priority tag) as |groupId|}}
 					<div class={{concat "cardstack-workflow-label-with-count-wrapper " (if (eq selectedGroup groupId) "active")}}>
-						<div class="cardstack-workflow-label-with-count"
+						<div class={{concat "cardstack-workflow-label-with-count " messagesWithTag.priorityLevel "-priority"}}
 								onclick={{action 'selectGroup' groupId}}>
 							<div class='name'>{{tag}}</div>
 							<div class="count" data-test-group-counter={{groupId}}>{{messagesWithTag.important.length}}</div>
