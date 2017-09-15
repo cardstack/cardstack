@@ -105,8 +105,7 @@ test('Take action on a cue card', function(assert) {
   andThen(() => {
     assertGroupCount(assert, "Need Response::Request to publish live", "1", "Unhandled group count is decremented after approving a message");
     assertGroupCount(assert, 'Today', "1", "Unhandled group count is also decremented for date range group");
-    //FIXME: This (assertCardCountInMessageList) should work but it doesn't, see workflow-service#messagesWithSelectedTag
-    // assertCardCountInMessageList(assert, 1, "The handled card is taken out of the list");
+    assertCardCountInMessageList(assert, 1, "The handled card is taken out of the list");
     //TODO: The Processed priority should display the number of *handled* messages
     // assertGroupCount(assert, "Processed::Request to publish live", 1);
     assertUnhandledCount(assert, 2, "The total count is decremented");

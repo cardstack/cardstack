@@ -91,7 +91,6 @@ export default Ember.Service.extend({
   }),
 
   selectedGroup:    '',
-  //FIXME: This is not recomputed after handling a message, although unhandledItems is :o
   messagesInSelectedGroup: computed('unhandledItems.@each.groupId', 'selectedGroup', function() {
     let withSelectedGroup = this.get('unhandledItems').filterBy('groupId', this.get('selectedGroup'));
     return withSelectedGroup;
@@ -135,7 +134,6 @@ export default Ember.Service.extend({
 
   selectMessage(message) {
     this.set('selectedMessage', message);
-    // this.clearGroupSelection();
   },
 
   clearGroupSelection() {
