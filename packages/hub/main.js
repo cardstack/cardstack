@@ -1,5 +1,7 @@
 const Koa = require('koa');
 const { Registry, Container } = require('@cardstack/di');
+const orchestrator = require('./orchestrator');
+const EmberConnection = require('./ember-connection');
 
 const logger = require('@cardstack/plugin-utils/logger');
 const log = logger('server');
@@ -33,6 +35,13 @@ async function wireItUp(projectDir, encryptionKeys, seedModels, opts = {}) {
 }
 
 async function makeServer(projectDir, encryptionKeys, seedModels, opts = {}) {
+  if (opts.containerized) {
+    console.log('Running in container mode...');
+    let orchestration = orchestrator.start();
+    let connection = new EmberConnection(orchestration);
+    await orchestration;
+  }
+
   let container = await wireItUp(projectDir, encryptionKeys, seedModels, opts);
   let app = new Koa();
   app.use(httpLogging);
