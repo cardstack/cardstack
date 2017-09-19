@@ -38,7 +38,9 @@ async function makeServer(projectDir, encryptionKeys, seedModels, opts = {}) {
   if (opts.containerized) {
     log.debug('Running in container mode');
     let orchestration = orchestrator.start();
-    let connection = new EmberConnection(orchestration);
+    // Eventually we'll pass a connection instance into the hub, for triggering rebuilds.
+    // For now, it just has the side effect of shutting the hub down properly when it's time.
+    new EmberConnection(orchestration);
     await orchestration;
   }
 

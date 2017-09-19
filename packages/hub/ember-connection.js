@@ -35,4 +35,4 @@ module.exports = class EmberConnector {
     this._server.listen(6785);
     log.info('Listening for connections from ember-cli...');
   }
-}
+};
