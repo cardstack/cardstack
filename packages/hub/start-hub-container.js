@@ -19,7 +19,6 @@ module.exports = async function() {
     '--publish', '6785:6785',
     '--mount', 'type=bind,src=/var/run/docker.sock,dst=/var/run/docker.sock',
     '--mount', 'type=bind,src=/Users/aaron/dev/cardstack/packages/hub,dst=/hub/app/node_modules/@cardstack/hub',
-    '-e', 'ELASTICSEARCH=http://localhost:9200',
     '-e', `CARDSTACK_SESSIONS_KEY=${key}`,
     'cardstack-app'
   ], {

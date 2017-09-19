@@ -1179,6 +1179,10 @@ detect-indent@^4.0.0:
   dependencies:
     repeating "^2.0.0"
 
+docker-container-id@^1.0.1:
+  version "1.0.1"
+  resolved "https://registry.yarnpkg.com/docker-container-id/-/docker-container-id-1.0.1.tgz#851ca4b7d6390551252118fe0f31cb8276dea109"
+
 ecc-jsbn@~0.1.1:
   version "0.1.1"
   resolved "https://registry.yarnpkg.com/ecc-jsbn/-/ecc-jsbn-0.1.1.tgz#0fc73a9ed5f0d53c38193398523ef7e543777505"

@@ -44,10 +44,12 @@ async function makeServer(projectDir, encryptionKeys, seedModels, opts = {}) {
     await orchestration;
   }
 
+  log.info('Starting main hub server');
   let container = await wireItUp(projectDir, encryptionKeys, seedModels, opts);
   let app = new Koa();
   app.use(httpLogging);
   app.use(container.lookup('hub:middleware-stack').middleware());
+  log.info('Main hub initialized');
   return app;
 }
 
