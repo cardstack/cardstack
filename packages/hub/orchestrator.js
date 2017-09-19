@@ -1,11 +1,12 @@
+const log = require('@cardstack/plugin-utils/logger')('orchestrator');
 
 function start() {
-  console.log('totally starting everything up');
+  log.info('totally starting everything up');
   return Promise.resolve();
 }
 
 function stop() {
-  console.log('ok, everything totally shut down successfully');
+  log.info('ok, everything totally shut down successfully');
   process.exit();
 }
 

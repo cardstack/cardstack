@@ -36,7 +36,7 @@ async function wireItUp(projectDir, encryptionKeys, seedModels, opts = {}) {
 
 async function makeServer(projectDir, encryptionKeys, seedModels, opts = {}) {
   if (opts.containerized) {
-    console.log('Running in container mode...');
+    log.debug('Running in container mode');
     let orchestration = orchestrator.start();
     let connection = new EmberConnection(orchestration);
     await orchestration;
