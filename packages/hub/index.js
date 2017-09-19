@@ -2,7 +2,7 @@ const { makeServer } = require('./main');
 const path = require('path');
 const crypto = require('crypto');
 const fs = require('fs');
-const log = require('@cardstack/plugin-utils/logger')('hub/main');
+const log = require('@cardstack/plugin-utils/logger')('hub/ember-cli');
 // only sometimes load, because of feature flag
 let BroccoliConnector;
 let Funnel;

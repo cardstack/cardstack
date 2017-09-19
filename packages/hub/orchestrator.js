@@ -10,7 +10,6 @@ function stop() {
   process.exit();
 }
 
-
 module.exports = {
   start,
   stop

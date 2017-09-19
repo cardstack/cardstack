@@ -4,7 +4,7 @@ const _ = require('lodash');
 const orchestrator = require('./orchestrator');
 const log = require('@cardstack/plugin-utils/logger')('ember-connection');
 
-const HUB_HEARTBEAT_TIMEOUT = 1.5 * 1000; // longer than the heartbeat interval of 1 second
+const HUB_HEARTBEAT_TIMEOUT = 7.5 * 1000; // longer than the heartbeat interval of 1 second
 
 const stopLater = _.debounce(function() {
   log.info('No heartbeat from ember-cli! Shutting down.');
@@ -22,7 +22,10 @@ module.exports = class EmberConnector {
       // Or, if it crashes or is killed it will stop sending the heartbeat
       // and we can clean ourselves up.
       socket.data('shutdown', orchestrator.stop);
-      socket.data('heartbeat', stopLater);
+      socket.data('heartbeat', function(){
+        log.trace('Received a heartbeat from ember-cli');
+        stopLater();
+      });
 
       // Our listeners are set up, and whoever instantiated us said we're good,
       // so tell ember-cli everything is ready.
