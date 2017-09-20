@@ -19,7 +19,7 @@
   },
   "dependencies": {
     "@cardstack/codegen": "^0.2.6",
-    "ember-cli-babel": "^6.3.0",
+    "ember-cli-babel": "^6.8.2",
     "ember-cli-htmlbars": "^2.0.1",
     "ember-data": "^2.12.1"
   },
