@@ -39,6 +39,15 @@ let scenario = new Fixtures(factory => {
       'author',
       factory.addResource('authors').withAttributes({ name: 'Author of Second' })
     );
+  factory.addResource('content-types', 'pages')
+    .withAttributes({
+      routingField: 'permalink'
+    })
+    .withRelated('fields', [
+      factory.addResource('fields', 'permalink').withAttributes({
+        fieldType: '@cardstack/core-types::string'
+      })
+    ]);
 });
 
 test('it can findRecord', async function(assert) {
@@ -102,6 +111,17 @@ test('it can get a belongs-to relationship', async function(assert) {
   let author = await run(() => post.get('author'));
   assert.equal(author.get('name'), 'Author of Second');
 });
+
+test('it sets no routingField by default', async function(assert) {
+  let model = await run(() => this.store.createRecord('post'));
+  assert.ok(!model.constructor.routingField);
+});
+
+test('it sets routingField when configured', async function(assert) {
+  let model = await run(() => this.store.createRecord('page'));
+  assert.equal(model.constructor.routingField, 'permalink');
+});
+
 
 // Ember runloop.
 function run(fn) {

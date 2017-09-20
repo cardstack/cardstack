@@ -156,3 +156,87 @@
     border-color: #292A2C;
     color: #292A2C;
 }
+
+.cs-toolbox-header {
+    display: flex;
+}
+
+.cs-toolbox-header > section {
+    background-color: var(--normal-background);
+    margin-right: 1px;
+}
+
+.cs-toolbox-header > section.spacer {
+    flex: 1;
+}
+
+.cs-mode-button {
+    cursor: pointer;
+    height: var(--cs-header-height);
+    box-sizing: border-box;
+    color: var(--muted-foreground);
+    fill: var(--muted-foreground);
+}
+.cs-mode-button.icon-only {
+    padding: .6em .5em;
+    width: 2.5em;
+    text-align: center;
+    color: var(--bright-foreground);
+    fill: var(--bright-foreground);
+}
+.cs-mode-button.icon-only:hover {
+    color: var(--bright-foreground);
+    fill: var(--bright-foreground);
+}
+.cs-mode-button.icon-only .cs-mode-icon {
+    float: none;
+    padding: 0;
+    height: auto;
+}
+.cs-mode-button:hover {
+    background-color: var(--activating-background);
+    color: var(--rising-foreground);
+    fill: var(--rising-foreground);
+}
+.cs-mode-button.active {
+    background-color: var(--active-background);
+    color: var(--bright-foreground);
+    fill: var(--bright-foreground);
+}
+.cs-mode-icon {
+    float: left;
+    padding-top: 0.5625rem;
+    padding-left: 1.25rem;
+    padding-right: 0.75rem;
+    height: 1.5rem;
+}
+.cs-mode-label {
+    cursor: pointer;
+    display: inline-block;
+    font-size: 0.75em;
+    font-weight: 100;
+    margin-top: 0.5rem;
+    margin-right: 1.6875rem;
+    line-height: calc(var(--cs-header-height)/0.75 - 0.5em/0.75);
+}
+
+.cs-placeholder-create {
+    display: flex;
+    justify-content: flex-end;
+}
+
+.cs-placeholder-create > button {
+    line-height: 1.5em;
+    margin: 0.5em 0.3em;
+    padding: .4em 1.4em .4em;
+    border: none;
+    border-radius: 4px;
+    background-color: var(--bright-foreground);
+    font-size: .8em;
+    cursor: pointer;
+    outline-width: 0;
+}
+
+.cs-placeholder-create > button:hover {
+    background-color: var(--light-foreground);
+}

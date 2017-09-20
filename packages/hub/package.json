@@ -1,6 +1,6 @@
 {
   "name": "@cardstack/hub",
-  "version": "0.2.6",
+  "version": "0.2.8",
   "keywords": [
     "cardstack-plugin",
     "ember-addon"
@@ -12,7 +12,7 @@
   },
   "description": "Stock API server for the Cardstack tech stack.",
   "dependencies": {
-    "@cardstack/core-types": "^0.2.4",
+    "@cardstack/core-types": "^0.2.8",
     "@cardstack/di": "^0.2.4",
     "@cardstack/elasticsearch": "^0.2.6",
     "@cardstack/handlebars": "^0.2.4",
@@ -23,7 +23,7 @@
     "commander": "^2.9.0",
     "dag-map": "^2.0.2",
     "denodeify": "^1.2.1",
-    "ember-cli-babel": "^6.0.0",
+    "ember-cli-babel": "^6.8.2",
     "handlebars": "^4.0.6",
     "jsondiffpatch": "^0.2.4",
     "koa": "2",

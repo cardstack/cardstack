@@ -39,7 +39,7 @@ define('@cardstack/models/generated/{{modelName}}', ['exports', '@cardstack/mode
         {{camelize field.id}}: _emberData.default.attr({ fieldType: "{{field.fieldType}}"}),
        {{/if}}
      {{/each}}
-   });
+   }){{#if routingField}}.reopenClass({ routingField: "{{routingField}}" }){{/if}};
 });
 `);
 
@@ -91,7 +91,8 @@ class CodeGenerator {
   _generatedModel(modelName, type) {
     return modelTemplate({
       modelName,
-      fields: [...type.fields.values()].filter(f => f.id !== 'id' && f.id !== 'type')
+      fields: [...type.fields.values()].filter(f => f.id !== 'id' && f.id !== 'type'),
+      routingField: type.routingField
     });
   }
 });

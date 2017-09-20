@@ -158,12 +158,21 @@ module.exports = {
     // dev server your session gets invalidated.
     let sessionsKey = crypto.randomBytes(32);
 
-    let koaApp = await makeServer(this.project.root, sessionsKey, seedModels, {
-      allowDevDependencies,
-      broccoliConnector: this._broccoliConnector,
-      emberConfigEnv: require(this.project.configPath())(env)
-    });
-    return koaApp.callback();
+    try {
+      let koaApp = await makeServer(this.project.root, sessionsKey, seedModels, {
+        allowDevDependencies,
+        broccoliConnector: this._broccoliConnector,
+        emberConfigEnv: require(this.project.configPath())(env)
+      });
+      return koaApp.callback();
+    } catch (err) {
+      // we don't want to leave our broccoli build hanging forever,
+      // because ember-cli waits for it to exit before doing its own
+      // cleanup and exiting, meaning we could get an unkillable
+      // ember-cli.
+      this._broccoliConnector.setSource(Promise.reject(err));
+      throw err;
+    }
   }
 
 };

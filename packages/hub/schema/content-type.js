@@ -43,6 +43,7 @@ module.exports = class ContentType {
     this.constraints = allConstraints.filter(constraint => {
       return Object.values(constraint.fieldInputs).some(field => this.fields.get(field.id));
     });
+    this.routingField = model.attributes && model.attributes['routing-field'];
   }
 
   async validate(pendingChange, context) {

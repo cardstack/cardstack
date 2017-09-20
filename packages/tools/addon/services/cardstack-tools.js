@@ -2,11 +2,11 @@ import Ember from 'ember';
 import { transitionTo } from '../private-api';
 import { modelType } from '@cardstack/rendering/helpers/cs-model-type';
 import injectOptional from 'ember-inject-optional';
+import { defaultBranch } from '@cardstack/hub/environment';
 
 export default Ember.Service.extend({
   overlays: Ember.inject.service('ember-overlays'),
   resourceMetadata: Ember.inject.service(),
-  cardstackRouting: injectOptional.service(),
   marks: Ember.computed.alias('overlays.marks'),
 
   fields: Ember.computed('marks', function() {
@@ -106,7 +106,7 @@ export default Ember.Service.extend({
   editing: Ember.computed('requestedEditing', 'branch', function() {
     return this.get('requestedEditing') &&
       (this.get('mayEditLive') ||
-       this.get('branch') !== this.get('cardstackRouting.defaultBranch'));
+       this.get('branch') !== defaultBranch);
   }),
 
   init() {
@@ -152,7 +152,7 @@ export default Ember.Service.extend({
   setActivePanel(which) {
     this._updatePersistent('activePanel', which);
     if (which === 'cs-create-menu') {
-      if (!this.get('mayEditLive') && this.get('branch') === this.get('cardstackRouting.defaultBranch')) {
+      if (!this.get('mayEditLive') && this.get('branch') === defaultBranch) {
         this.setBranch('draft');
       }
     }
@@ -160,7 +160,7 @@ export default Ember.Service.extend({
 
   setEditing(which) {
     this._updatePersistent('requestedEditing', which);
-    if (!this.get('mayEditLive') && this.get('branch') === this.get('cardstackRouting.defaultBranch')) {
+    if (!this.get('mayEditLive') && this.get('branch') === defaultBranch) {
       this.setBranch('draft');
     }
   },

@@ -6,7 +6,7 @@ moduleForComponent('cs-branch-control', 'Integration | Component | cs branch con
   integration: true,
   beforeEach() {
     this.register('service:cardstack-tools', Ember.Service.extend({
-      branch: 'a',
+      branch: 'master',
       init() {
         this._super();
         this.branchSets = [];
@@ -15,9 +15,6 @@ moduleForComponent('cs-branch-control', 'Integration | Component | cs branch con
         this.branchSets.push(which);
         this.set('branch', which);
       }
-    }));
-    this.register('service:cardstack-routing', Ember.Service.extend({
-      defaultBranch: 'a',
     }));
     this.inject.service('cardstack-tools', { as: 'tools' });
   }
@@ -49,6 +46,6 @@ test('it enters live', function(assert) {
   Ember.run(() => {
     this.$('button:contains(Live)').click();
   });
-  assert.deepEqual(this.get('tools.branchSets'), ['a']);
+  assert.deepEqual(this.get('tools.branchSets'), ['master']);
   assert.equal(this.$('button.active').text().trim(), 'Live');
 });

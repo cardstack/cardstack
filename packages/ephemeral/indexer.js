@@ -39,12 +39,18 @@ class Updater {
       {
         type: 'content-types',
         id: 'ephemeral-checkpoints',
+        attributes: {
+          'is-built-in': true
+        },
         relationships: {
           'data-source': { data: { type: 'data-sources', id: this.dataSourceId } }
         }
       },
       { type: 'content-types',
         id: 'ephemeral-restores',
+        attributes: {
+          'is-built-in': true
+        },
         relationships: {
           'data-source': { data: { type: 'data-sources', id: this.dataSourceId } },
           fields: {
