@@ -90,6 +90,7 @@ let addon = {
     }
 
     if (CONTAINER_MODE) {
+      // FIXME: this prevents shutdown while it's pending, even in response to a user SIGINT
       app.use('/cardstack', await this._hubProxy);
     } else {
       app.use('/cardstack', await this._hubMiddleware);

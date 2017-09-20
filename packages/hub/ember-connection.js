@@ -29,7 +29,16 @@ module.exports = class EmberConnector {
 
       // Our listeners are set up, and whoever instantiated us said we're good,
       // so tell ember-cli everything is ready.
-      socket.send('ready');
+      try {
+        socket.send('ready');
+      } catch (err) {
+        // This happens if ember-cli stopped while we were awaiting readyPromise
+        if (/bad socket/.test(err)) {
+          log.warn('Ember-cli shut down while the hub was starting. *sigh*');
+        } else {
+          throw err;
+        }
+      }
 
       // If we never hear the initial heartbeat from ember-cli, we want to shut down
       stopLater();
