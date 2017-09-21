@@ -19,150 +19,81 @@ describe('elasticsearch/searcher', function() {
 
   before(async function() {
     factory = new Factory();
-    factory.importModels([
-      {
-        type: 'plugin-configs',
-        id: '@cardstack/mobiledoc'
-      },
-      {
-        type: 'content-types',
-        id: 'people',
-        relationships: {
-          fields: {
-            data: [
-              { type: 'fields', id: 'firstName' },
-              { type: 'fields', id: 'lastName' },
-              { type: 'fields', id: 'age' },
-              { type: 'fields', id: 'color' },
-              { type: 'fields', id: 'description' }
-            ]
-          }
-        }
-      },
-      {
-        type: 'content-types',
-        id: 'comments',
-        relationships: {
-          fields: {
-            data: [
-              { type: 'fields', id: 'body' }
-            ]
-          }
-        }
-      },
-      {
-        type: 'content-types',
-        id: 'articles',
-        relationships: {
-          fields: {
-            data: [
-              { type: 'fields', id: 'title' },
-              { type: 'fields', id: 'color' },
-              { type: 'fields', id: 'hello' }
-            ]
-          }
-        }
-      },
-      {
-        type: 'fields',
-        id: 'firstName',
-        attributes: {
-          'field-type': '@cardstack/core-types::string'
-        }
-      },
-      {
-        type: 'fields',
-        id: 'body',
-        attributes: {
-          'field-type': '@cardstack/core-types::string'
-        }
-      },
-      {
-        type: 'fields',
-        id: 'hello',
-        attributes: {
-          'field-type': '@cardstack/core-types::string'
-        }
-      },
-      {
-        type: 'fields',
-        id: 'description',
-        attributes: {
-          'field-type': '@cardstack/mobiledoc'
-        }
-      },
-      {
-        type: 'fields',
-        id: 'title',
-        attributes: {
-          'field-type': '@cardstack/core-types::string'
-        }
-      },
-      {
-        type: 'fields',
-        id: 'color',
-        attributes: {
-          'field-type': '@cardstack/core-types::string'
-        }
-      },
-      {
-        type: 'fields',
-        id: 'lastName',
-        attributes: {
-          'field-type': '@cardstack/core-types::string'
-        }
-      },
-      {
-        type: 'fields',
-        id: 'age',
-        attributes: {
-          'field-type': '@cardstack/core-types::integer'
-        }
-      },
-      {
-        type: 'articles',
-        id: '1',
-        attributes: {
-          hello: 'magic words',
-          color: 'red',
-        }
-      },
-      {
-        type: 'people',
-        id: '1',
-        attributes: {
-          firstName: 'Quint',
-          lastName: 'Faulkner',
-          age: 6,
-          description: {
-            version: "0.3.1",
-            markups: [],
-            atoms: [],
-            cards: [],
-            sections: [
-              [1, "p", [
-                [0, [], 0, "The quick brown fox jumps over the lazy dog."]
-              ]]
-            ]
-          }
-        }
-      },
-      {
-        type: 'people',
-        id: '2',
-        attributes: {
-          firstName: 'Arthur',
-          lastName: 'Faulkner',
-          age: 1,
-          color: 'red'
-        }
-      }
+
+    // Turning on mobiledoc so we can test searching of
+    // plugin-specific indexers
+    factory.addResource('plugin-configs', '@cardstack/mobiledoc');
+
+    factory.addResource('content-types', 'people').withRelated('fields', [
+      factory.addResource('fields', 'first-name').withAttributes({
+        fieldType: '@cardstack/core-types::string'
+      }),
+      factory.addResource('fields', 'last-name').withAttributes({
+        fieldType: '@cardstack/core-types::string'
+      }),
+      factory.addResource('fields', 'age').withAttributes({
+        fieldType: '@cardstack/core-types::integer'
+      }),
+      factory.addResource('fields', 'favorite-color').withAttributes({
+        fieldType: '@cardstack/core-types::string'
+      }),
+      factory.addResource('fields', 'description').withAttributes({
+        fieldType: '@cardstack/mobiledoc'
+      }),
     ]);
+
+
+    factory.addResource('content-types', 'comments').withRelated('fields', [
+      factory.addResource('fields', 'body').withAttributes({
+        fieldType: '@cardstack/core-types::string'
+      }),
+    ]);
+
+    factory.addResource('content-types', 'articles').withRelated('fields', [
+      factory.addResource('fields', 'title').withAttributes({
+        fieldType: '@cardstack/core-types::string'
+      }),
+      factory.getResource('fields', 'favorite-color'),
+      factory.addResource('fields', 'hello').withAttributes({
+        fieldType: '@cardstack/core-types::string'
+      })
+    ]);
+
+    factory.addResource('articles', '1').withAttributes({
+      hello: 'magic words',
+      favoriteColor: 'red'
+    });
+
+    factory.addResource('people', '1').withAttributes({
+      firstName: 'Quint',
+      lastName: 'Faulkner',
+      age: 6,
+      description: {
+        version: "0.3.1",
+        markups: [],
+        atoms: [],
+        cards: [],
+        sections: [
+          [1, "p", [
+            [0, [], 0, "The quick brown fox jumps over the lazy dog."]
+          ]]
+        ]
+      }
+    });
+
+    factory.addResource('people', '2').withAttributes({
+      firstName: 'Arthur',
+      lastName: 'Faulkner',
+      age: 1,
+      favoriteColor: 'red'
+    });
+
     for (let i = 10; i < 30; i++) {
       factory.addResource('comments', String(i)).withAttributes({
         body: `comment ${i}`
       });
     }
+
     env = await createDefaultEnvironment(`${__dirname}/../../../tests/elasticsearch-test-app`, factory.getModels());
     searcher = env.lookup('hub:searchers');
   });
@@ -189,9 +120,9 @@ describe('elasticsearch/searcher', function() {
       type: 'people',
       id: '1',
       attributes: {
-        firstName: 'Quint',
-        lastName: 'Faulkner',
-        color: null,
+        'first-name': 'Quint',
+        'last-name': 'Faulkner',
+        'favorite-color': null,
         age: 6,
         description: {
           version: "0.3.1",
@@ -292,17 +223,17 @@ describe('elasticsearch/searcher', function() {
   it('can filter a field by one term', async function() {
     let { models } = await searcher.search('master', {
       filter: {
-        firstName: 'Quint'
+        'first-name': 'Quint'
       }
     });
     expect(models).to.have.length(1);
-    expect(models).includes.something.with.deep.property('attributes.firstName', 'Quint');
+    expect(models).includes.something.with.deep.property('attributes.first-name', 'Quint');
   });
 
   it('can filter a field by multiple terms', async function() {
     let { models } = await searcher.search('master', {
       filter: {
-        firstName: ['Quint', 'Arthur']
+        'first-name': ['Quint', 'Arthur']
       }
     });
     expect(models).to.have.length(2);
@@ -312,13 +243,13 @@ describe('elasticsearch/searcher', function() {
     let { models } = await searcher.search('master', {
       filter: {
         or: [
-          { firstName: ['Quint'], type: 'people' },
+          { 'first-name': ['Quint'], type: 'people' },
           { type: 'articles', id: '1' }
         ]
       }
     });
     expect(models).to.have.length(2);
-    expect(models).includes.something.with.deep.property('attributes.firstName', 'Quint');
+    expect(models).includes.something.with.deep.property('attributes.first-name', 'Quint');
     expect(models).includes.something.with.deep.property('type', 'articles');
   });
 
@@ -326,13 +257,13 @@ describe('elasticsearch/searcher', function() {
     let { models } = await searcher.search('master', {
       filter: {
         and: [
-          { color: 'red' },
+          { 'favorite-color': 'red' },
           { type: 'people' }
         ]
       }
     });
     expect(models).to.have.length(1);
-    expect(models).includes.something.with.deep.property('attributes.firstName', 'Arthur');
+    expect(models).includes.something.with.deep.property('attributes.first-name', 'Arthur');
   });
 
 
@@ -347,59 +278,59 @@ describe('elasticsearch/searcher', function() {
       }
     });
     expect(models).to.have.length(1);
-    expect(models).includes.something.with.deep.property('attributes.firstName', 'Arthur');
+    expect(models).includes.something.with.deep.property('attributes.first-name', 'Arthur');
   });
 
   it('can filter by field existence (string)', async function() {
     let { models } = await searcher.search('master', {
       filter: {
-        color: {
+        'favorite-color': {
           exists: 'true'
         },
         type: 'people'
       }
     });
     expect(models).to.have.length(1);
-    expect(models).includes.something.with.deep.property('attributes.firstName', 'Arthur');
+    expect(models).includes.something.with.deep.property('attributes.first-name', 'Arthur');
   });
 
   it('can filter by field nonexistence (string)', async function() {
     let { models } = await searcher.search('master', {
       filter: {
-        color: {
+        'favorite-color': {
           exists: 'false'
         },
         type: 'people'
       }
     });
     expect(models).to.have.length(1);
-    expect(models).includes.something.with.deep.property('attributes.firstName', 'Quint' );
+    expect(models).includes.something.with.deep.property('attributes.first-name', 'Quint' );
   });
 
   it('can filter by field existence (bool)', async function() {
     let { models } = await searcher.search('master', {
       filter: {
-        color: {
+        'favorite-color': {
           exists: true
         },
         type: 'people'
       }
     });
     expect(models).to.have.length(1);
-    expect(models).includes.something.with.deep.property('attributes.firstName', 'Arthur');
+    expect(models).includes.something.with.deep.property('attributes.first-name', 'Arthur');
   });
 
   it('can filter by field nonexistence (bool)', async function() {
     let { models } = await searcher.search('master', {
       filter: {
-        color: {
+        'favorite-color': {
           exists: false
         },
         type: 'people'
       }
     });
     expect(models).to.have.length(1);
-    expect(models).includes.something.with.deep.property('attributes.firstName', 'Quint' );
+    expect(models).includes.something.with.deep.property('attributes.first-name', 'Quint' );
   });
 
   it('can search within a field with custom indexing behavior', async function() {
@@ -409,7 +340,7 @@ describe('elasticsearch/searcher', function() {
       }
     });
     expect(models).to.have.length(1);
-    expect(models).has.deep.property('[0].attributes.firstName', 'Quint');
+    expect(models).has.deep.property('[0].attributes.first-name', 'Quint');
 
     // These are the internally used fields that should not leak out
     expect(models[0].attributes).has.not.property('cardstack_derived_names');
@@ -440,7 +371,7 @@ describe('elasticsearch/searcher', function() {
       },
       sort: 'age'
     });
-    expect(models.map(r => r.attributes.firstName)).to.deep.equal(['Arthur', 'Quint']);
+    expect(models.map(r => r.attributes['first-name'])).to.deep.equal(['Arthur', 'Quint']);
   });
 
 
@@ -451,7 +382,7 @@ describe('elasticsearch/searcher', function() {
       },
       sort: '-age'
     });
-    expect(models.map(r => r.attributes.firstName)).to.deep.equal(['Quint', 'Arthur']);
+    expect(models.map(r => r.attributes['first-name'])).to.deep.equal(['Quint', 'Arthur']);
   });
 
   it('can sort via field-specific mappings', async function() {
@@ -462,9 +393,9 @@ describe('elasticsearch/searcher', function() {
       filter: {
         type: 'people'
       },
-      sort: 'firstName'
+      sort: 'first-name'
     });
-    expect(models.map(r => r.attributes.firstName)).to.deep.equal(['Arthur', 'Quint']);
+    expect(models.map(r => r.attributes['first-name'])).to.deep.equal(['Arthur', 'Quint']);
   });
 
 
@@ -476,9 +407,9 @@ describe('elasticsearch/searcher', function() {
       filter: {
         type: 'people'
       },
-      sort: '-firstName'
+      sort: '-first-name'
     });
-    expect(models.map(r => r.attributes.firstName)).to.deep.equal(['Quint', 'Arthur']);
+    expect(models.map(r => r.attributes['first-name'])).to.deep.equal(['Quint', 'Arthur']);
   });
 
   it('has helpful error when sorting by nonexistent field', async function() {
