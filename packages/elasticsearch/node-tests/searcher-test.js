@@ -43,12 +43,6 @@ describe('elasticsearch/searcher', function() {
     ]);
 
 
-    factory.addResource('content-types', 'comments').withRelated('fields', [
-      factory.addResource('fields', 'body').withAttributes({
-        fieldType: '@cardstack/core-types::string'
-      }),
-    ]);
-
     factory.addResource('content-types', 'articles').withRelated('fields', [
       factory.addResource('fields', 'title').withAttributes({
         fieldType: '@cardstack/core-types::string'
@@ -59,10 +53,24 @@ describe('elasticsearch/searcher', function() {
       })
     ]);
 
+    factory.addResource('content-types', 'comments').withRelated('fields', [
+      factory.addResource('fields', 'body').withAttributes({
+        fieldType: '@cardstack/core-types::string'
+      }),
+      factory.addResource('fields', 'article').withAttributes({
+        fieldType: '@cardstack/core-types::belongs-to'
+      }).withRelated('related-types', [ factory.getResource('content-types', 'articles') ])
+    ]);
+
     factory.addResource('articles', '1').withAttributes({
       hello: 'magic words',
       favoriteColor: 'red'
     });
+
+    factory.addResource('articles', '2').withAttributes({
+      hello: 'this is article two'
+    });
+
 
     factory.addResource('people', '1').withAttributes({
       firstName: 'Quint',
@@ -88,10 +96,17 @@ describe('elasticsearch/searcher', function() {
       favoriteColor: 'red'
     });
 
-    for (let i = 10; i < 30; i++) {
-      factory.addResource('comments', String(i)).withAttributes({
-        body: `comment ${i}`
+    for (let i = 0; i < 20; i++) {
+      let comment = factory.addResource('comments');
+      comment.withAttributes({
+        body: `comment ${comment.id}`
       });
+      if (i < 4) {
+        comment.withRelated('article', factory.getResource('articles', '1'));
+      }
+      if (i >=4 && i < 6) {
+        comment.withRelated('article', factory.getResource('articles', '2'));
+      }
     }
 
     env = await createDefaultEnvironment(`${__dirname}/../../../tests/elasticsearch-test-app`, factory.getModels());
@@ -108,7 +123,7 @@ describe('elasticsearch/searcher', function() {
     });
     expect(models.filter(m => m.type === 'comments')).to.have.length(20);
     expect(models.filter(m => m.type === 'people')).to.have.length(2);
-    expect(models.filter(m => m.type === 'articles')).to.have.length(1);
+    expect(models.filter(m => m.type === 'articles')).to.have.length(2);
   });
 
   it('returns properly formatted records', async function() {
@@ -160,7 +175,7 @@ describe('elasticsearch/searcher', function() {
         type: 'articles'
       }
     });
-    expect(models).to.have.length(1);
+    expect(models).to.have.length(2);
     expect(models).includes.something.with.deep.property('attributes.hello', 'magic words');
   });
 
@@ -171,8 +186,8 @@ describe('elasticsearch/searcher', function() {
       },
       sort: 'type'
     });
-    expect(models).to.have.length(3);
-    expect(models.map(m => m.type)).deep.equals(['articles', 'people', 'people']);
+    expect(models).to.have.length(4);
+    expect(models.map(m => m.type)).deep.equals(['articles', 'articles', 'people', 'people']);
   });
 
   it('can sort by type in reverse', async function() {
@@ -182,8 +197,8 @@ describe('elasticsearch/searcher', function() {
       },
       sort: '-type'
     });
-    expect(models).to.have.length(3);
-    expect(models.map(m => m.type)).deep.equals(['people', 'people', 'articles']);
+    expect(models).to.have.length(4);
+    expect(models.map(m => m.type)).deep.equals(['people', 'people', 'articles', 'articles']);
   });
 
 
@@ -206,7 +221,7 @@ describe('elasticsearch/searcher', function() {
       },
       sort: 'id'
     });
-    expect(models.map(m => m.id)).deep.equals(['1', '1', '2']);
+    expect(models.map(m => m.id)).deep.equals(['1', '1', '2', '2']);
   });
 
   it('can sort by id in reverse', async function() {
@@ -216,7 +231,7 @@ describe('elasticsearch/searcher', function() {
       },
       sort: '-id'
     });
-    expect(models.map(m => m.id)).deep.equals(['2', '1', '1']);
+    expect(models.map(m => m.id)).deep.equals(['2', '2', '1', '1']);
   });
 
 
@@ -562,6 +577,24 @@ describe('elasticsearch/searcher', function() {
     });
     expect(response.models).length(1);
     expect(response.models[0]).has.deep.property('attributes.hello', 'magic words');
+  });
+
+  it('can filter by belongsTo id', async function() {
+    let response = await searcher.search('master', {
+      filter: {
+        'article': { exact: '1' }
+      }
+    });
+    expect(response.models).length(4);
+  });
+
+  it('can filter by multiple belongsTo ids', async function() {
+    let response = await searcher.search('master', {
+      filter: {
+        'article': { exact: ['1', '2'] }
+      }
+    });
+    expect(response.models).length(6);
   });
 
 

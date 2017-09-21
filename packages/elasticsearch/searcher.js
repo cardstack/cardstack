@@ -244,7 +244,7 @@ class Searcher {
           return { term: { [`${esName}.data.id`] : innerQuery } };
         }
         if (Array.isArray(innerQuery)) {
-          throw new Error("Array query not supported for filtering by relationship");
+          return { terms: { [`${esName}.data.id`] : innerQuery } };
         }
       }
 
