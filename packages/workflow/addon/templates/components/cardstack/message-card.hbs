@@ -1,0 +1,13 @@
+<div class="cardstack-message-card" data-test-message-card>
+  <div class="main-content">{{content.text}}</div>
+  <div class="button-panel">
+    {{#unless content.isHandled}}
+      <button type="button" class="action-button" data-test-approve-button onclick={{action 'approve'}}>
+        Approve
+      </button>
+      <button type="button" class="action-button" data-test-deny-button onclick={{action 'deny'}}>
+        Deny
+      </button>
+    {{/unless}}
+  </div>
+</div>
