@@ -5,6 +5,7 @@ import {
   LICENSE_REQUEST,
   READY_FOR_COPYEDITING,
 } from '@cardstack/workflow/models/message';
+import { task } from 'ember-concurrency';
 
 const { inject, computed, assert } = Ember;
 
@@ -31,10 +32,15 @@ export default Ember.Service.extend({
 
   store: inject.service(),
 
-  items: computed(function() {
-    // Would be nice to be able to pass `include: 'messages'` to findAll
-    return this.get('store').findAll('thread');
-  }),
+  loadItems: task(function * () {
+    let threads = yield this.get('store').findAll('thread');
+    this.set('items', threads);
+  }).restartable().on('init'),
+
+  init() {
+    this._super();
+    this.items = [];
+  },
 
   unhandledItems:           computed.filterBy('items', 'isHandled', false),
   notificationCount:        computed.readOnly('unhandledItems.length'),
