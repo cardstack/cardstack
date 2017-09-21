@@ -109,6 +109,17 @@ describe('elasticsearch/searcher', function() {
       }
     }
 
+    factory.addResource('content-types', 'teams').withRelated('fields', [
+      factory.addResource('fields', 'members').withAttributes({
+        fieldType: '@cardstack/core-types::has-many'
+      }).withRelated('related-types', [factory.getResource('content-types', 'people')])
+    ]);
+
+    factory.addResource('teams').withRelated('members', [
+      factory.getResource('people', '1'),
+      factory.getResource('people', '2')
+    ]);
+
     env = await createDefaultEnvironment(`${__dirname}/../../../tests/elasticsearch-test-app`, factory.getModels());
     searcher = env.lookup('hub:searchers');
   });
@@ -579,7 +590,7 @@ describe('elasticsearch/searcher', function() {
     expect(response.models[0]).has.deep.property('attributes.hello', 'magic words');
   });
 
-  it('can filter by belongsTo id', async function() {
+  it('can filter belongsTo by id', async function() {
     let response = await searcher.search('master', {
       filter: {
         'article': { exact: '1' }
@@ -588,7 +599,7 @@ describe('elasticsearch/searcher', function() {
     expect(response.models).length(4);
   });
 
-  it('can filter by multiple belongsTo ids', async function() {
+  it('can filter belongsTo by multiple ids', async function() {
     let response = await searcher.search('master', {
       filter: {
         'article': { exact: ['1', '2'] }
@@ -597,5 +608,22 @@ describe('elasticsearch/searcher', function() {
     expect(response.models).length(6);
   });
 
+  it('can filter hasMany by id', async function() {
+    let response = await searcher.search('master', {
+      filter: {
+        'members': { exact: '1' }
+      }
+    });
+    expect(response.models).length(1);
+  });
+
+  it('can filter hasMany by multiple id', async function() {
+    let response = await searcher.search('master', {
+      filter: {
+        'members': { exact: ['1', 'bogus'] }
+      }
+    });
+    expect(response.models).length(1);
+  });
 
 });
