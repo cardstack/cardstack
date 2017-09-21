@@ -102,7 +102,7 @@
   dependencies:
     ms "2.0.0"
 
-"@cardstack/rendering@^0.2.8":
+"@cardstack/rendering@^0.2.6", "@cardstack/rendering@^0.2.8":
   version "0.2.8"
   resolved "https://registry.yarnpkg.com/@cardstack/rendering/-/rendering-0.2.8.tgz#02fecc811a4219f866ec1d4b50d1f9be0b832390"
   dependencies:

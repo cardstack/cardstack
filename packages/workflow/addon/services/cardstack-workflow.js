@@ -1,10 +1,5 @@
 import Ember from 'ember';
 import {
-  // Priorities
-  DELEGATED,
-  NEED_RESPONSE,
-  PROCESSED,
-  FYI,
   // Tags
   REQUEST_TO_PUBLISH_LIVE,
   LICENSE_REQUEST,
@@ -12,17 +7,6 @@ import {
 } from '@cardstack/workflow/models/message';
 
 const { inject, computed, assert } = Ember;
-
-const staticGroups = {};
-staticGroups[NEED_RESPONSE] = [REQUEST_TO_PUBLISH_LIVE, LICENSE_REQUEST, READY_FOR_COPYEDITING];
-staticGroups[DELEGATED] = [LICENSE_REQUEST];
-
-const priorities = [
-  { name: DELEGATED, level: 'high' },
-  { name: NEED_RESPONSE, level: 'high' },
-  { name: PROCESSED, level: 'low' },
-  { name: FYI, level: 'low' }
-];
 
 function messagesBetween(arrayKey, dateKey, { from, to }) {
   return Ember.computed(`${arrayKey}.@each.${dateKey}`, function() {
@@ -48,58 +32,43 @@ export default Ember.Service.extend({
   store: inject.service(),
 
   items: computed(function() {
-    return this.get('store').findAll('message');
+    // Would be nice to be able to pass `include: 'messages'` to findAll
+    return this.get('store').findAll('thread');
   }),
 
   unhandledItems:           computed.filterBy('items', 'isHandled', false),
   notificationCount:        computed.readOnly('unhandledItems.length'),
-  todaysUnhandledMessages:  computed.filterBy('messagesForToday', 'isHandled', false),
+  // todaysUnhandledMessages:  computed.filterBy('messagesForToday', 'isHandled', false),
 
-  groupedMessages: computed('items.@each.{priority,tag,isImportant}', function() {
-    let priorityNames = priorities.map((priority) => priority.name);
-    function emptyGroup(priority) {
+  /*
+  groupedThreads: computed('items.@each.{priority,tag,isImportant}', function() {
+    function emptyGroup() {
       return {
         all: [],
         important: [],
-        priorityLevel: findPriority(priority).level
       }
     }
 
-    function findPriority(name) {
-      return priorities.find((priority) => priority.name === name);
-    }
-
-    let messagesByPriority = {};
-    priorityNames.forEach((priority) => {
-      messagesByPriority[priority] = [];
-      let staticTagsForPriority = staticGroups[priority];
-      if (staticTagsForPriority) {
-        staticTagsForPriority.forEach((tag) => {
-          messagesByPriority[priority][tag] = emptyGroup(priority);
-        });
+    return this.get('items').reduce((threads, thread) => {
+      let priority = thread.get('priority');
+      let threadsByTag = threads[priority];
+      let tag = threads.get('tag');
+      if (!threadsByTag[tag]) {
+        threadsByTag[tag] = emptyGroup(priority);
       }
-    });
-
-    return this.get('items').reduce((messages, message) => {
-      let priority = Ember.get(message, 'priority');
-      assert(`Unknown priority: ${priority}`, priorityNames.includes(priority));
-      let messagesByTag = messages[priority];
-      let tag = Ember.get(message, 'tag');
-      if (!messagesByTag[tag]) {
-        messagesByTag[tag] = emptyGroup(priority);
+      let threadsWithTag = threadsByTag[tag];
+      threadsWithTag.all.push(thread);
+      if (thread.get('isImportant')) {
+        threadsWithTag.important.push(thread);
       }
-      let messagesWithTag = messagesByTag[tag];
-      messagesWithTag.all.push(message);
-      if (message.get('isImportant')) {
-        messagesWithTag.important.push(message);
-      }
-      return messages;
-    }, messagesByPriority);
+      return threads;
+    }, {});
   }),
+  */
 
-  messagesForToday: messagesBetween('items', 'updatedAt', {
-    from: moment().subtract(1, 'day')
-  }),
+  // messagesForToday: messagesBetween('items', 'updatedAt', {
+  //   from: moment().subtract(1, 'day')
+  // }),
 
   selectedGroup:    '',
   messagesInSelectedGroup: computed('items.@each.{groupId,isImportant}', 'selectedGroup', function() {

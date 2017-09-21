@@ -27,6 +27,7 @@
     "@cardstack/ephemeral": "^0.2.6",
     "@cardstack/jsonapi": "^0.2.6",
     "@cardstack/models": "^0.2.6",
+    "@cardstack/rendering": "^0.2.6",
     "@cardstack/test-support": "^0.2.6",
     "broccoli-asset-rev": "^2.4.5",
     "ember-ajax": "^3.0.0",
