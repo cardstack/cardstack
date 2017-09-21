@@ -1,5 +1,6 @@
 const { declareInjections } = require('@cardstack/di');
 const Handlebars = require('handlebars');
+const inflection = require('inflection');
 
 Handlebars.registerHelper('camelize', function(str) {
   return str.replace(/-(\w)/g, (m, d) => d.toUpperCase());
@@ -17,8 +18,7 @@ Handlebars.registerHelper('related-type', function(field) {
   if (field.relatedTypes) {
     let type = Object.keys(field.relatedTypes)[0];
     if (type) {
-      // TODO: real inflector
-      return type.replace(/s$/, '');
+      return inflection.singularize(type);
     }
   }
 });
@@ -69,8 +69,7 @@ class CodeGenerator {
     let modules = [];
 
     for (let type of schema.types.values()) {
-      // TODO: real inflector
-      let modelName = type.id.replace(/s$/, '');
+      let modelName = inflection.singularize(type.id);
 
       modules.push(this._generatedModel(modelName, type));
 
