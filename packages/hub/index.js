@@ -140,12 +140,17 @@ module.exports = {
         }
       }).filter(Boolean).reduce((a,b) => a.concat(b), []);
     } catch (err) {
-      if (ui) {
-        ui.writeWarnLine(`Unable to load your seed models (looking for ${seedDir})`);
+      if (err.code === 'ENOENT') {
+        let message = `@cardstack/hub found no seed model directory (looking for ${seedDir})`;
+        if (ui) {
+          ui.writeWarnLine(message);
+        } else {
+          process.stderr.write(message);
+        }
+        seedModels = [];
       } else {
-        process.stderr.write(`Unable to load your seed models (looking for ${seedDir})\n`);
+        throw err;
       }
-      seedModels = [];
     }
 
     // Without this node 7 swallows stack traces within the native
