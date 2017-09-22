@@ -2,13 +2,6 @@
 const moment = require('moment-timezone');
 const JSONAPIFactory = require('@cardstack/test-support/jsonapi-factory');
 
-function threadRelationship(id) {
-	return ['thread', {
-		id,
-		type: 'threads'
-	}];
-}
-
 function initialModels() {
 	let initial = new JSONAPIFactory();
 
@@ -113,9 +106,19 @@ function initialModels() {
     { id: '3', type: 'messages' },
   ]);
 
-	initial.addResource('threads', '2');
-	initial.addResource('threads', '3');
-	initial.addResource('threads', '4');
+	initial.addResource('threads', '2').withRelated('messages', [
+    { id: '4', type: 'messages' },
+    { id: '5', type: 'messages' },
+    { id: '6', type: 'messages' },
+  ]);
+
+	initial.addResource('threads', '3').withRelated('messages', [
+    { id: '7', type: 'messages' },
+  ]);
+
+	initial.addResource('threads', '4').withRelated('messages', [
+    { id: '8', type: 'messages' },
+  ]);
 
 	let delegated = initial.addResource('priorities')
 		.withAttributes({
@@ -129,7 +132,7 @@ function initialModels() {
 			name: 'Need Response'
 		});
 
-	let processed = initial.addResource('priorities')
+	initial.addResource('priorities')
 		.withAttributes({
 			value: 20,
 			name: 'Processed'
@@ -225,24 +228,21 @@ function initialModels() {
 			cardId: '1',
 			cardType: 'song-license-requests'
 		})
-		.withRelated('priority', needResponse)
-		.withRelated(...threadRelationship('2'));
+		.withRelated('priority', needResponse);
 
 	initial.addResource('messages', '5')
 		.withAttributes({
 			updatedAt: moment().subtract(moment.duration(4, 'days')),
 			cardId: '2',
 			cardType: 'songs',
-		})
-		.withRelated(...threadRelationship('2'));
+		});
 
 	initial.addResource('messages', '6')
 		.withAttributes({
 			updatedAt: moment().subtract(moment.duration(2, 'days')),
 			cardId: '2',
 			cardType: 'chat-messages'
-		})
-		.withRelated(...threadRelationship('2'));
+		});
 
 	initial.addResource('messages', '7')
 		.withAttributes({
@@ -252,8 +252,7 @@ function initialModels() {
 			cardId: '2',
 			cardType: 'song-license-requests'
 		})
-		.withRelated('priority', fyi)
-		.withRelated(...threadRelationship('3'));
+		.withRelated('priority', fyi);
 
 	initial.addResource('messages', '8')
 		.withAttributes({
@@ -263,8 +262,7 @@ function initialModels() {
 			cardId: '2',
 			cardType: 'song-change-requests'
 		})
-		.withRelated('priority', delegated)
-		.withRelated(...threadRelationship('4'));
+		.withRelated('priority', delegated);
 
 	return initial.getModels();
 }

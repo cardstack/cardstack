@@ -1,25 +1,21 @@
 import Ember from 'ember';
-import DS from 'ember-data';
 import Thread from '@cardstack/models/generated/thread';
+import { computed } from "@ember/object"
+import { readOnly } from "@ember/object/computed";
 import { task } from 'ember-concurrency';
 
-const { computed, isPresent } = Ember;
-
 export default Thread.extend({
+  priority: readOnly('_latestMessageWithPriority.priority'),
   //TODO: `status` should be the status of the latest message in the thread
-  //`priority` should be the priority of the latest message in the thread
-  priority: computed('_messagesInReverseChrono.[]', function() {
-    let firstWithPriority = this.get('_messagesInReverseChrono').find((message) => {
-      let priorityId = message.belongsTo('priority').id();
-      return isPresent(priorityId);
-    });
-    if (firstWithPriority) {
-      return firstWithPriority.get('priority');
-    }
-  }),
+  //TODO: `tag` should be the status of the latest message in the thread
 
-  isHandled: computed('priority', function() {
-    return this.get('priority.value') > 20;
+  isUnhandled: readOnly('priority.isUnhandled'),
+
+  _latestMessageWithPriority: computed('_messagesInReverseChrono.[]', function() {
+    return this.get('_messagesInReverseChrono').find((message) => {
+      let priorityId = message.belongsTo('priority').id();
+      return !!priorityId;
+    });
   }),
 
   _syncMessages: computed({

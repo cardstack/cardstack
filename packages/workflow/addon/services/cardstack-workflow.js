@@ -7,7 +7,7 @@ import {
 } from '@cardstack/workflow/models/message';
 import { task } from 'ember-concurrency';
 
-const { inject, computed, assert } = Ember;
+const { inject, computed } = Ember;
 
 function messagesBetween(arrayKey, dateKey, { from, to }) {
   return Ember.computed(`${arrayKey}.@each.${dateKey}`, function() {
@@ -42,7 +42,7 @@ export default Ember.Service.extend({
     this.items = [];
   },
 
-  unhandledItems:           computed.filterBy('items', 'isHandled', false),
+  unhandledItems:           computed.filterBy('items', 'isUnhandled'),
   notificationCount:        computed.readOnly('unhandledItems.length'),
   // todaysUnhandledMessages:  computed.filterBy('messagesForToday', 'isHandled', false),
 
