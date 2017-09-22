@@ -40,8 +40,7 @@ module.exports = async function(projectRoot) {
     'cardstack-app'
   ]);
 
-  let hub = new nssocket.NsSocket();
-  hub.connect(6785);
+  let hub = await socketToHub();
 
   await new Promise(function(resolve) {
     hub.data('ready', resolve);
@@ -74,4 +73,21 @@ async function linkedHubPath(projectRoot) {
   } else {
     return false;
   }
+}
+
+async function socketToHub() {
+  let hub = new nssocket.NsSocket();
+  hub.connect(6785);
+
+  return new Promise(function(resolve) {
+    hub.data('shake', function() {
+      resolve(hub);
+    });
+    hub.on('close', function() {
+      resolve(socketToHub());
+    });
+    hub.send('hand');
+  });
+
+
 }
