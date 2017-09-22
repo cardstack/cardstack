@@ -8,7 +8,7 @@ export default Ember.Component.extend({
   classNames:  ['cardstack-workflow'],
   workflow:    inject.service('cardstack-workflow'),
 
-  groupedMessages:           computed.readOnly('workflow.groupedMessages'),
+  groupedThreads:            computed.readOnly('workflow.groupedThreads'),
   unhandled:                 computed.readOnly('workflow.unhandledItems'),
   selectedGroup:             computed.readOnly('workflow.selectedGroup'),
   messagesInSelectedGroup:   computed.readOnly('workflow.messagesInSelectedGroup'),

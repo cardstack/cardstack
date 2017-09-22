@@ -42,31 +42,38 @@ export default Service.extend({
   unhandledForToday:        filterBy('threadsUpdatedToday', 'isUnhandled'),
   todaysNotificationCount:  readOnly('unhandledForToday.length'),
 
-  /*
-  groupedThreads: computed('items.@each.{priority,tag,isImportant}', function() {
-    function emptyGroup() {
-      return {
-        all: [],
-        important: [],
-      }
-    }
-
-    return this.get('items').reduce((threads, thread) => {
+  groupedThreads: computed('items.@each.{priority,loadedTags}', function() {
+    return this.get('items').reduce((groupedThreads, thread) => {
       let priority = thread.get('priority');
-      let threadsByTag = threads[priority];
-      let tag = threads.get('tag');
-      if (!threadsByTag[tag]) {
-        threadsByTag[tag] = emptyGroup(priority);
+      let priorityId = priority.get('id');
+      if (!groupedThreads[priorityId]) {
+        groupedThreads[priorityId] = {
+          name: priority.get('name'),
+          tagGroups: {}
+        };
       }
-      let threadsWithTag = threadsByTag[tag];
-      threadsWithTag.all.push(thread);
-      if (thread.get('isImportant')) {
-        threadsWithTag.important.push(thread);
+
+      let threadsForPriority = groupedThreads[priorityId];
+      let tags = thread.get('loadedTags');
+      for (let i=0; i<tags.length; i++) {
+        let tag = tags.objectAt(i);
+        let tagId = tag.get('id');
+        if (!threadsForPriority.tagGroups[tagId]) {
+          threadsForPriority.tagGroups[tagId] = {
+            name: tag.get('name'),
+            priorityLevel: thread.get('priorityLevel'),
+            all: []
+          }
+        }
+        let threadsForTag = threadsForPriority.tagGroups[tagId];
+        threadsForTag.all.push(thread);
+        // if (thread.get('isImportant')) {
+        //   threadsWithTag.important.push(thread);
+        // }
       }
-      return threads;
+      return groupedThreads;
     }, {});
   }),
-  */
 
   threadsUpdatedToday: threadsBetween('items', 'updatedAt', {
     from: moment().subtract(1, 'day')

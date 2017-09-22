@@ -30,6 +30,12 @@ function initialModels() {
 				.withRelated('related-types', [
 					{ type: 'content-types', id: 'messages' }
 				]),
+			initial.addResource('fields', 'tags').withAttributes({
+				fieldType: '@cardstack/core-types::has-many'
+			})
+				.withRelated('related-types', [
+					{ type: 'content-types', id: 'tags' }
+				]),
 		]);
 
 	initial.addResource('content-types', 'messages')
@@ -51,12 +57,6 @@ function initialModels() {
       })
         .withRelated('related-types', [
           { type: 'content-types', id: 'priorities' }
-        ]),
-      initial.addResource('fields', 'tags').withAttributes({
-        fieldType: '@cardstack/core-types::has-many'
-      })
-        .withRelated('related-types', [
-          { type: 'content-types', id: 'tags' }
         ]),
 			// Imitating a polymorphic relationship
 			initial.addResource('fields', 'card-id').withAttributes({
@@ -108,27 +108,50 @@ function initialModels() {
 			initial.addResource('fields', 'song').withAttributes({
 				fieldType: '@cardstack/core-types::belongs-to'
 			}),
-		]);
+    ]);
 
-	initial.addResource('threads', '1').withRelated('messages', [
-    { id: '1', type: 'messages' },
-    { id: '2', type: 'messages' },
-    { id: '3', type: 'messages' },
-  ]);
+  // Seed tags
+  let songChangeRequestTag = initial.addResource('tags')
+    .withAttributes({
+      name: 'Song Change Request'
+    });
+
+  let requestToPublishLiveTag = initial.addResource('tags')
+    .withAttributes({
+      name: 'Request to Publish Live'
+    });
+
+  let licenseRequestTag =  initial.addResource('tags')
+    .withAttributes({
+      name: 'License Request'
+    });
+
+  // Seed threads
+  initial.addResource('threads', '1')
+    .withRelated('messages', [
+      { id: '1', type: 'messages' },
+      { id: '2', type: 'messages' },
+      { id: '3', type: 'messages' },
+    ])
+    .withRelated('tags', [songChangeRequestTag, requestToPublishLiveTag]);
 
 	initial.addResource('threads', '2').withRelated('messages', [
     { id: '4', type: 'messages' },
     { id: '5', type: 'messages' },
     { id: '6', type: 'messages' },
-  ]);
+  ]).withRelated('tags', [licenseRequestTag]);
 
 	initial.addResource('threads', '3').withRelated('messages', [
     { id: '7', type: 'messages' },
-  ]);
+  ]).withRelated('tags', [licenseRequestTag]);
 
 	initial.addResource('threads', '4').withRelated('messages', [
     { id: '8', type: 'messages' },
-  ]);
+  ]).withRelated('tags', [songChangeRequestTag]);
+
+	initial.addResource('threads', '5').withRelated('messages', [
+    { id: '9', type: 'messages' },
+  ]).withRelated('tags', [licenseRequestTag]);
 
   // Seed priorities
 	let delegated = initial.addResource('priorities')
@@ -154,22 +177,6 @@ function initialModels() {
 			value: 30,
 			name: 'For Your Information'
 		});
-
-  // Seed tags
-  let songChangeRequestTag = initial.addResource('tags')
-    .withAttributes({
-      name: 'Song Change Request'
-    });
-
-  let requestToPublishLiveTag = initial.addResource('tags')
-    .withAttributes({
-      name: 'Request to Publish Live'
-    });
-
-  let licenseRequestTag =  initial.addResource('tags')
-    .withAttributes({
-      name: 'License Request'
-    });
 
   // Seed song change requests
 	initial.addResource('song-change-requests', '1')
@@ -219,6 +226,11 @@ function initialModels() {
 	initial.addResource('song-license-requests', '2')
 		.withAttributes({
 			comment: 'License request for Chris Cornell\'s Seasons approved',
+    });
+
+	initial.addResource('song-license-requests', '3')
+		.withAttributes({
+			comment: 'Would like to add more guitars to Caspian\'s Sycamore, please?',
 		});
 
 	// Seed messages
@@ -229,8 +241,7 @@ function initialModels() {
 			cardId: '1',
 			cardType: 'song-change-requests'
 		})
-    .withRelated('priority', needResponse)
-    .withRelated('tags', [songChangeRequestTag]);
+    .withRelated('priority', needResponse);
 
 	initial.addResource('messages', '2')
 		.withAttributes({
@@ -238,8 +249,7 @@ function initialModels() {
 			sentAt: moment().subtract(moment.duration(1, 'day')),
 			cardId: '1',
 			cardType: 'chat-messages'
-    })
-    .withRelated('tags', [requestToPublishLiveTag]);
+    });
 
 	initial.addResource('messages', '3')
 		.withAttributes({
@@ -251,13 +261,12 @@ function initialModels() {
 
 	initial.addResource('messages', '4')
 		.withAttributes({
-			status: 'pending',
+			// status: 'pending',
 			sentAt: moment().subtract(moment.duration(1, 'week')),
 			cardId: '1',
 			cardType: 'song-license-requests'
 		})
-		.withRelated('priority', needResponse)
-    .withRelated('tags', [licenseRequestTag]);
+		.withRelated('priority', needResponse);
 
 	initial.addResource('messages', '5')
 		.withAttributes({
@@ -275,23 +284,30 @@ function initialModels() {
 
 	initial.addResource('messages', '7')
 		.withAttributes({
-			status: 'approved',
+			// status: 'approved',
 			sentAt: moment(),
 			cardId: '2',
 			cardType: 'song-license-requests'
 		})
-    .withRelated('priority', fyi)
-    .withRelated('tags', [licenseRequestTag]);
+    .withRelated('priority', fyi);
 
 	initial.addResource('messages', '8')
 		.withAttributes({
-			status: 'pending',
+			// status: 'pending',
 			sentAt: moment().subtract(moment.duration(1, 'day')),
 			cardId: '2',
 			cardType: 'song-change-requests'
 		})
-    .withRelated('priority', delegated)
-    .withRelated('tags', [songChangeRequestTag]);
+    .withRelated('priority', delegated);
+
+	initial.addResource('messages', '9')
+		.withAttributes({
+			// status: 'pending',
+			sentAt: moment(),
+			cardId: '3',
+			cardType: 'song-license-requests'
+		})
+    .withRelated('priority', needResponse);
 
 	return initial.getModels();
 }
