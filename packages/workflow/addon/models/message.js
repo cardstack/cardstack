@@ -19,6 +19,7 @@ export default Message.extend({
     return this.get('status') !== 'pending';
   }),
 
+  /*
   isImportant: Ember.computed('status', 'priority', function() {
     let status = this.get('status');
     let priority = this.get('priority');
@@ -28,4 +29,5 @@ export default Message.extend({
       return [PROCESSED, FYI].includes(priority);
     }
   })
+  */
 })

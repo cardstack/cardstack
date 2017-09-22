@@ -1,16 +1,11 @@
-import Ember from 'ember';
-import {
-  // Tags
-  REQUEST_TO_PUBLISH_LIVE,
-  LICENSE_REQUEST,
-  READY_FOR_COPYEDITING,
-} from '@cardstack/workflow/models/message';
+import Service from "@ember/service"
 import { task } from 'ember-concurrency';
+import { inject } from "@ember/service";
+import { computed } from "@ember/object";
+import { readOnly, filterBy, or } from "@ember/object/computed";
 
-const { inject, computed } = Ember;
-
-function messagesBetween(arrayKey, dateKey, { from, to }) {
-  return Ember.computed(`${arrayKey}.@each.${dateKey}`, function() {
+function threadsBetween(arrayKey, dateKey, { from, to }) {
+  return computed(`${arrayKey}.@each.${dateKey}`, function() {
     return this.get(arrayKey).filter((item) => {
       let date = moment(item.get(dateKey));
       if (from && to) {
@@ -26,11 +21,11 @@ function messagesBetween(arrayKey, dateKey, { from, to }) {
   });
 }
 
-export default Ember.Service.extend({
+export default Service.extend({
   isOpen: false,
   selectedMessage: null,
 
-  store: inject.service(),
+  store: inject(),
 
   loadItems: task(function * () {
     let threads = yield this.get('store').findAll('thread');
@@ -42,9 +37,10 @@ export default Ember.Service.extend({
     this.items = [];
   },
 
-  unhandledItems:           computed.filterBy('items', 'isUnhandled'),
-  notificationCount:        computed.readOnly('unhandledItems.length'),
-  // todaysUnhandledMessages:  computed.filterBy('messagesForToday', 'isHandled', false),
+  unhandledItems:           filterBy('items', 'isUnhandled'),
+  notificationCount:        readOnly('unhandledItems.length'),
+  unhandledForToday:        filterBy('threadsUpdatedToday', 'isUnhandled'),
+  todaysNotificationCount:  readOnly('unhandledForToday.length'),
 
   /*
   groupedThreads: computed('items.@each.{priority,tag,isImportant}', function() {
@@ -72,9 +68,9 @@ export default Ember.Service.extend({
   }),
   */
 
-  // messagesForToday: messagesBetween('items', 'updatedAt', {
-  //   from: moment().subtract(1, 'day')
-  // }),
+  threadsUpdatedToday: threadsBetween('items', 'updatedAt', {
+    from: moment().subtract(1, 'day')
+  }),
 
   selectedGroup:    '',
   messagesInSelectedGroup: computed('items.@each.{groupId,isImportant}', 'selectedGroup', function() {
@@ -90,7 +86,7 @@ export default Ember.Service.extend({
     return [];
   }),
 
-  shouldShowMessagesInGroup: computed.or('selectedGroup', 'selectedDate'),
+  shouldShowMessagesInGroup: or('selectedGroup', 'selectedDate'),
 
   matchingMessages: computed('selectedGroup', 'selectedDate', 'messagesInSelectedGroup', 'messagesWithSelectedDate', function() {
     if (this.get('selectedGroup')) {
