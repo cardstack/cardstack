@@ -1,33 +1,44 @@
-const {spawn} = require('child_process');
 const crypto = require('crypto');
+const path = require('path');
+const {promisify} = require('util');
+const execFile = promisify(require('child_process').execFile);
+const realpath = promisify(require('fs').realpath);
+
 const Koa = require('koa');
 const proxy = require('koa-proxy');
 const nssocket = require('nssocket');
-
+const path_is_inside = require('path-is-inside');
+const resolve = promisify(require('resolve'));
 const log = require('@cardstack/plugin-utils/logger')('hub/spawn-hub');
 
 const HUB_HEARTBEAT_INTERVAL = 1 * 1000;
 
-module.exports = async function() {
+module.exports = async function(projectRoot) {
+  let hubPath = await linkedHubPath(projectRoot);
+
+  let hubBinding;
+  if (hubPath) {
+    log.info('Binding locally linked hub: '+hubPath);
+    hubBinding = [
+      '--mount', `type=bind,src=${hubPath},dst=/hub/app/node_modules/@cardstack/hub`
+    ];
+  } else {
+    hubBinding = [];
+  }
+
   let key = crypto.randomBytes(32).toString('base64');
 
-  let proc = spawn('docker', [
+  await execFile('docker', [
     'run',
     '-d',
     '--rm',
     '--publish', '3000:3000',
     '--publish', '6785:6785',
     '--mount', 'type=bind,src=/var/run/docker.sock,dst=/var/run/docker.sock',
-    '--mount', 'type=bind,src=/Users/aaron/dev/cardstack/packages/hub,dst=/hub/app/node_modules/@cardstack/hub',
+    ...hubBinding,
     '-e', `CARDSTACK_SESSIONS_KEY=${key}`,
     'cardstack-app'
-  ], {
-    stdio: 'inherit'
-  });
-
-  await new Promise(function(resolve) {
-    proc.on('exit', resolve);
-  });
+  ]);
 
   let hub = new nssocket.NsSocket();
   hub.connect(6785);
@@ -51,3 +62,16 @@ module.exports = async function() {
   }));
   return app.callback();
 };
+
+async function linkedHubPath(projectRoot) {
+  let hubPath = path.dirname(await resolve('@cardstack/hub/package.json', {basedir: projectRoot}));
+  hubPath = await realpath(hubPath);
+
+  // If hub is coming from outside our node_modules, we're linked to it,
+  // so we should bind it in the container as well
+  if (!path_is_inside(hubPath, projectRoot)) {
+    return hubPath;
+  } else {
+    return false;
+  }
+}

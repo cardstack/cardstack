@@ -62,7 +62,7 @@ let addon = {
     // and the middleware hooks won't run until after that.
 
     if (CONTAINER_MODE) {
-      this._hubProxy = startAndProxyToHubContainer();
+      this._hubProxy = startAndProxyToHubContainer(this.project.root);
     } else {
       let seedPath = path.join(path.dirname(this.project.configPath()), '..', 'cardstack', 'seeds', env);
       let useDevDeps;
