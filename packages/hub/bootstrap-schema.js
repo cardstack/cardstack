@@ -229,6 +229,11 @@ const models = [
     id: 'types',
     attributes: {
       'field-type': '@cardstack/core-types::has-many'
+    },
+    relationships: {
+      'related-types': {
+        data: [{ type: 'content-types', id: 'content-types' }]
+      }
     }
   },
   {
