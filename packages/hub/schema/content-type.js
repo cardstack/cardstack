@@ -44,6 +44,12 @@ module.exports = class ContentType {
       return Object.values(constraint.fieldInputs).some(field => this.fields.get(field.id));
     });
     this.routingField = model.attributes && model.attributes['routing-field'];
+
+    if (model.attributes && model.attributes['searchable-relationships']) {
+      this.searchTree = buildSearchTree(model.attributes['searchable-relationships']);
+    } else {
+      this.searchTree = Object.create(null);
+    }
     this.allFields = allFields;
   }
 
@@ -118,7 +124,7 @@ module.exports = class ContentType {
   mapping() {
     let properties = {};
     for (let field of this.fields.values()) {
-      Object.assign(properties, field.mapping(this.allFields));
+      Object.assign(properties, field.mapping(this.searchTree, this.allFields));
     }
     return { properties };
   }
@@ -171,4 +177,19 @@ function tagFieldErrors(field, errors) {
     }
   });
   return errors;
+}
+
+function buildSearchTree(searchableRelationships) {
+  let root = Object.create(null);
+  for (let path of searchableRelationships) {
+    let segments = path.split('.');
+    let pointer = root;
+    for (let segment of segments) {
+      if (!pointer[segment]) {
+        pointer[segment] = Object.create(null);
+      }
+      pointer = pointer[segment];
+    }
+  }
+  return root;
 }

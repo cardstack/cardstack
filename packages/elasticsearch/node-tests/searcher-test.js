@@ -59,8 +59,13 @@ describe('elasticsearch/searcher', function() {
       }),
       factory.addResource('fields', 'article').withAttributes({
         fieldType: '@cardstack/core-types::belongs-to'
+      }).withRelated('related-types', [ factory.getResource('content-types', 'articles') ]),
+      factory.addResource('fields', 'searchable-article').withAttributes({
+        fieldType: '@cardstack/core-types::belongs-to'
       }).withRelated('related-types', [ factory.getResource('content-types', 'articles') ])
-    ]);
+    ]).withAttributes({
+      searchableRelationships: ['searchable-article']
+    });
 
     factory.addResource('articles', '1').withAttributes({
       hello: 'magic words',
@@ -102,20 +107,32 @@ describe('elasticsearch/searcher', function() {
         body: `comment ${comment.id}`
       });
       if (i < 4) {
-        comment.withRelated('article', factory.getResource('articles', '1'));
+        comment
+          .withRelated('article', factory.getResource('articles', '1'))
+          .withRelated('searchable-article', factory.getResource('articles', '1'));
       }
       if (i >=4 && i < 6) {
-        comment.withRelated('article', factory.getResource('articles', '2'));
+        comment
+          .withRelated('article', factory.getResource('articles', '2'))
+          .withRelated('searchable-article', factory.getResource('articles', '2'));
       }
     }
 
     factory.addResource('content-types', 'teams').withRelated('fields', [
       factory.addResource('fields', 'members').withAttributes({
         fieldType: '@cardstack/core-types::has-many'
+      }).withRelated('related-types', [factory.getResource('content-types', 'people')]),
+      factory.addResource('fields', 'searchable-members').withAttributes({
+        fieldType: '@cardstack/core-types::has-many'
       }).withRelated('related-types', [factory.getResource('content-types', 'people')])
-    ]);
+    ]).withAttributes({
+      searchableRelationships: ['searchable-members']
+    });
 
     factory.addResource('teams').withRelated('members', [
+      factory.getResource('people', '1'),
+      factory.getResource('people', '2')
+    ]).withRelated('searchable-members', [
       factory.getResource('people', '1'),
       factory.getResource('people', '2')
     ]);
@@ -590,7 +607,7 @@ describe('elasticsearch/searcher', function() {
     expect(response.models[0]).has.deep.property('attributes.hello', 'magic words');
   });
 
-  it('can filter belongsTo by id', async function() {
+  it('can filter non-searchable belongsTo by id', async function() {
     let response = await searcher.search('master', {
       filter: {
         'article.id': { exact: '1' }
@@ -599,7 +616,16 @@ describe('elasticsearch/searcher', function() {
     expect(response.models).length(4);
   });
 
-  it('can filter belongsTo by multiple ids', async function() {
+  it('can filter searchable belongsTo by id', async function() {
+    let response = await searcher.search('master', {
+      filter: {
+        'searchable-article.id': { exact: '1' }
+      }
+    });
+    expect(response.models).length(4);
+  });
+
+  it('can filter non-searchable belongsTo by multiple ids', async function() {
     let response = await searcher.search('master', {
       filter: {
         'article.id': { exact: ['1', '2'] }
@@ -608,7 +634,16 @@ describe('elasticsearch/searcher', function() {
     expect(response.models).length(6);
   });
 
-  it('can filter hasMany by id', async function() {
+  it('can filter searchable belongsTo by multiple ids', async function() {
+    let response = await searcher.search('master', {
+      filter: {
+        'searchable-article.id': { exact: ['1', '2'] }
+      }
+    });
+    expect(response.models).length(6);
+  });
+
+  it('can filter non-searchable hasMany by id', async function() {
     let response = await searcher.search('master', {
       filter: {
         'members.id': { exact: '1' }
@@ -617,10 +652,64 @@ describe('elasticsearch/searcher', function() {
     expect(response.models).length(1);
   });
 
-  it('can filter hasMany by multiple id', async function() {
+  it('can filter searchable hasMany by id', async function() {
+    let response = await searcher.search('master', {
+      filter: {
+        'searchable-members.id': { exact: '1' }
+      }
+    });
+    expect(response.models).length(1);
+  });
+
+  it('can filter non-searchable hasMany by multiple id', async function() {
     let response = await searcher.search('master', {
       filter: {
         'members.id': { exact: ['1', 'bogus'] }
+      }
+    });
+    expect(response.models).length(1);
+  });
+
+  it('can filter searchable hasMany by multiple id', async function() {
+    let response = await searcher.search('master', {
+      filter: {
+        'searchable-members.id': { exact: ['1', 'bogus'] }
+      }
+    });
+    expect(response.models).length(1);
+  });
+
+  it('belongs-to attributes are not indexed by default', async function() {
+    let response = await searcher.search('master', {
+      filter: {
+        'article.hello': 'magic'
+      }
+    });
+    expect(response.models).length(0);
+  });
+
+  it('can filter searchable belongs-to by an attribute', async function() {
+    let response = await searcher.search('master', {
+      filter: {
+        'searchable-article.hello': 'magic'
+      }
+    });
+    expect(response.models).length(4);
+  });
+
+  it('hasMany attributes are not indexed by default', async function() {
+    let response = await searcher.search('master', {
+      filter: {
+        'members.first-name': 'Quint'
+      }
+    });
+    expect(response.models).length(0);
+  });
+
+  it('can filter searchable belongs-to by an attribute', async function() {
+    let response = await searcher.search('master', {
+      filter: {
+        'searchable-members.first-name': 'Quint'
       }
     });
     expect(response.models).length(1);

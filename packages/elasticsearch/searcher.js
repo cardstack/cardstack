@@ -189,7 +189,7 @@ class Searcher {
       }
       let here = aboveSegments.concat(field.queryFieldName);
 
-      if (field.mapping(schema.fields)[field.id].type === 'nested') {
+      if (field.fieldType === '@cardstack/core-types::has-many') {
         return {
           nested: {
             path: here.join('.'),
