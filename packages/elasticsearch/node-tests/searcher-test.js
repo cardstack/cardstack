@@ -593,7 +593,7 @@ describe('elasticsearch/searcher', function() {
   it('can filter belongsTo by id', async function() {
     let response = await searcher.search('master', {
       filter: {
-        'article': { exact: '1' }
+        'article.id': { exact: '1' }
       }
     });
     expect(response.models).length(4);
@@ -602,7 +602,7 @@ describe('elasticsearch/searcher', function() {
   it('can filter belongsTo by multiple ids', async function() {
     let response = await searcher.search('master', {
       filter: {
-        'article': { exact: ['1', '2'] }
+        'article.id': { exact: ['1', '2'] }
       }
     });
     expect(response.models).length(6);
@@ -611,7 +611,7 @@ describe('elasticsearch/searcher', function() {
   it('can filter hasMany by id', async function() {
     let response = await searcher.search('master', {
       filter: {
-        'members': { exact: '1' }
+        'members.id': { exact: '1' }
       }
     });
     expect(response.models).length(1);
@@ -620,7 +620,7 @@ describe('elasticsearch/searcher', function() {
   it('can filter hasMany by multiple id', async function() {
     let response = await searcher.search('master', {
       filter: {
-        'members': { exact: ['1', 'bogus'] }
+        'members.id': { exact: ['1', 'bogus'] }
       }
     });
     expect(response.models).length(1);

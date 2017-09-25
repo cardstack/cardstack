@@ -169,13 +169,44 @@ class Searcher {
       default:
         // Any keys that aren't one of the predefined operations are
         // field names.
-        result.push(await this._fieldFilter(branch, schema, key, value));
+        result.push(await this._pathFilter(branch, schema, [], key.split('.'), value));
       }
     }
     return result;
   }
 
-  async _fieldFilter(branch, schema, key, value) {
+  async _pathFilter(branch, schema, aboveSegments, belowSegments, value) {
+    if (belowSegments.length === 1) {
+      return this._fieldFilter(branch, schema, aboveSegments, belowSegments[0], value);
+    } else {
+      let key = belowSegments[0];
+      let field = schema.fields.get(key);
+      if (!field) {
+        throw new Error(`Cannot filter by unknown field "${key}" within "${aboveSegments.join('.')}"`, {
+          status: 400,
+          title: "Unknown field in filter"
+        });
+      }
+      let here = aboveSegments.concat(field.queryFieldName);
+
+      if (field.mapping(schema.fields)[field.id].type === 'nested') {
+        return {
+          nested: {
+            path: here.join('.'),
+            query: {
+              bool: {
+                must: await this._pathFilter(branch, schema, here, belowSegments.slice(1), value)
+              }
+            }
+          }
+        };
+      } else {
+        return this._pathFilter(branch, schema, here, belowSegments.slice(1), value);
+      }
+    }
+  }
+
+  async _fieldFilter(branch, schema, aboveSegments, key, value) {
     let field;
 
     if (key === 'cardstack_source') {
@@ -198,13 +229,15 @@ class Searcher {
     if (typeof value === 'string') {
       // Bare strings are shorthand for a match filter
       let esName = await this.client.logicalFieldToES(branch, field.queryFieldName);
-      return { match: { [esName] : value } };
+      let path = aboveSegments.concat(esName).join('.');
+      return { match: { [path] : value } };
     }
 
     if (Array.isArray(value)) {
       // Bare arrays are shorthand for a multi term filter
       let esName = await this.client.logicalFieldToES(branch, field.queryFieldName);
-      return { terms: { [esName] : value.map(elt => elt.toLowerCase()) } };
+      let path = aboveSegments.concat(esName).join('.');
+      return { terms: { [path] : value.map(elt => elt.toLowerCase()) } };
     }
 
     if (value.range) {
@@ -214,22 +247,25 @@ class Searcher {
           limits[limit] = value.range[limit];
         }
       });
-      let esName = await this.client.logicalFieldToES(branch, field.queryFieldName);            return {
+      let esName = await this.client.logicalFieldToES(branch, field.queryFieldName);
+      let path = aboveSegments.concat(esName).join('.');
+      return {
         range: {
-          [esName]: limits
+          [path]: limits
         }
       };
     }
 
     if (value.exists != null) {
       let esName = await this.client.logicalFieldToES(branch, field.queryFieldName);
+      let path = aboveSegments.concat(esName).join('.');
       if (String(value.exists) === 'false') {
         return {
-          bool: { must_not: { exists: { field: esName } } }
+          bool: { must_not: { exists: { field: path } } }
         };
       } else {
         return {
-          exists: { field: esName }
+          exists: { field: path }
         };
       }
     }
@@ -237,26 +273,27 @@ class Searcher {
     if (value.exact != null) {
       let innerQuery = value.exact;
       let esName = await this.client.logicalFieldToES(branch, field.sortFieldName);
+      let path = aboveSegments.concat(esName).join('.');
 
       if(field.isRelationship) {
         if (typeof innerQuery === 'string') {
           // TODO: this completely ignores the possibility of polymorphism
-          return { term: { [`${esName}.data.id`] : innerQuery } };
+          return { term: { [path] : innerQuery } };
         }
         if (Array.isArray(innerQuery)) {
-          return { terms: { [`${esName}.data.id`] : innerQuery } };
+          return { terms: { [path] : innerQuery } };
         }
       }
 
       if (typeof innerQuery === 'string') {
         // This is the sortFieldName because that one is designed for
         // exact matching (in addition to sorting).
-        return { term: { [esName] : innerQuery.toLowerCase() } };
+        return { term: { [path] : innerQuery.toLowerCase() } };
       }
       if (Array.isArray(innerQuery)) {
         // This is the sortFieldName because that one is designed for
         // exact matching (in addition to sorting).
-        return { terms: { [esName] : innerQuery.map(elt => elt.toLowerCase()) } };
+        return { terms: { [path] : innerQuery.map(elt => elt.toLowerCase()) } };
       }
     }
 
@@ -306,5 +343,6 @@ class Searcher {
       [esName] : { order }
     };
   }
+
 
 });

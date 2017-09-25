@@ -39,7 +39,7 @@ module.exports = function searchDocToJSONAPI(type, document) {
       if (!relationships) {
         relationships = {};
       }
-      relationships[outputName] = document[fieldName];
+      relationships[outputName] = { data: document[fieldName] };
     } else {
       if (outputName === 'id') {
         top.id = document[fieldName];
