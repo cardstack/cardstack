@@ -7,21 +7,6 @@ const koaJSONBody = require('koa-json-body');
 const Handlebars = require('handlebars');
 const { declareInjections } = require('@cardstack/di');
 
-// This is how this module's actions will appear in git history.
-// Also, the user id "@cardstack/hub" is special -- it has a grant to
-// do all the things (see bootstrap-schema.js)
-const actingSession = new Session(
-  { id: '@cardstack/hub', type: 'users' },
-  null,
-  {
-    id: '@cardstack/hub',
-    type: 'users',
-    attributes: {
-      'full-name': '@cardstack/hub/authentication',
-      email: 'noreply@nowhere.com'
-    }
-  }
-);
 
 module.exports = declareInjections({
   encryptor: 'hub:encryptor',
@@ -183,11 +168,11 @@ class Authentication {
       }
     }
     if (!have && source.attributes['may-create-user']) {
-      return this.writer.create(this.controllingBranch, actingSession, user.type, user);
+      return this.writer.create(this.controllingBranch, Session.INTERNAL_PRIVLEGED, user.type, user);
     }
     if (have && source.attributes['may-update-user']) {
       user.meta = have.meta;
-      return this.writer.update(this.controllingBranch, actingSession, user.type, have.id, user);
+      return this.writer.update(this.controllingBranch, Session.INTERNAL_PRIVLEGED, user.type, have.id, user);
     }
     return have;
   }
