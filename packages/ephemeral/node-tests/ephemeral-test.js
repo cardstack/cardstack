@@ -290,3 +290,30 @@ describe('ephemeral-storage', function() {
   });
 
 });
+
+describe('ephemeral-storage/invalid', function() {
+
+  it('rejects schema violations in initial models', async function() {
+    let initial = new JSONAPIFactory();
+    initial.addResource('no-such-types').withAttributes({ title: 'initial post' });
+
+    let factory = new JSONAPIFactory();
+
+    factory.addResource('plugin-configs', '@cardstack/ephemeral');
+    factory.addResource('data-sources').withAttributes({
+      sourceType: '@cardstack/ephemeral',
+      params: {
+        initialModels: initial.getModels()
+      }
+    });
+
+    try {
+      await createDefaultEnvironment(__dirname + '/../../../tests/ephemeral-test-app', factory.getModels());
+      throw new Error("should not get here");
+    } catch(err) {
+      expect(err.message).to.equal('"no-such-types" is not a writable type');
+    }
+  });
+
+
+});
