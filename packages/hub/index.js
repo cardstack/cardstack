@@ -13,8 +13,8 @@ const CONTAINER_MODE = process.env.CONTAINERIZED_HUB != null;
 if (CONTAINER_MODE) {
   startAndProxyToHubContainer = require('./start-hub-container');
 } else {
- BroccoliConnector = require('./broccoli-connector');
- Funnel = require('broccoli-funnel');
+  BroccoliConnector = require('./broccoli-connector');
+  Funnel = require('broccoli-funnel');
 }
 
 // TODO: move into configuration
