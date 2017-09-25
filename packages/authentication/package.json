@@ -20,7 +20,8 @@
   "scripts": {
     "build": "ember build",
     "start": "ember server",
-    "test": "ember try:each"
+    "test": "ember try:each",
+    "node-tests": "mocha ../test-support/bin/run.js"
   },
   "dependencies": {
     "@cardstack/di": "^0.2.4",
