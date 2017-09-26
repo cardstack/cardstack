@@ -133,19 +133,22 @@ module.exports = class SearchClient {
     //
     // we don't store the type as a regular field in elasticsearch,
     // because we're keeping it in the built in _type field.
-
-    let rewrites = {};
     let esId = await this.logicalFieldToES(branch, 'id');
     let searchDoc = { [esId]: id };
-    if (esId !== 'id') {
-      rewrites[esId] = {
-        delete: false,
-        rename: 'id',
-        isRelationship: false
-      };
-    }
+
+    // this is the copy of the document we will return to anybody who
+    // retrieves it. It's supposed to already be a correct jsonapi
+    // response, as opposed to the searchDoc itself which is mangled
+    // for searchability.
+    let pristine = {
+      data: {
+        id: jsonapiDoc.id,
+        type: jsonapiDoc.type
+      }
+    };
 
     if (jsonapiDoc.attributes) {
+      pristine.data.attributes = jsonapiDoc.attributes;
       for (let attribute of Object.keys(jsonapiDoc.attributes)) {
         let value = jsonapiDoc.attributes[attribute];
         let field = schema.fields.get(attribute);
@@ -155,37 +158,22 @@ module.exports = class SearchClient {
             for (let [derivedName, derivedValue] of Object.entries(derivedFields)) {
               let esName = await this.logicalFieldToES(branch, derivedName);
               searchDoc[esName] = derivedValue;
-              rewrites[esName] = {
-                delete: true,
-                rename: null,
-                isRelationship: false
-              };
             }
           }
         }
         let esName = await this.logicalFieldToES(branch, attribute);
         searchDoc[esName] = value;
-        if (esName !== attribute) {
-          rewrites[esName] = {
-            delete: false,
-            rename: attribute,
-            isRelationship: false
-          };
-        }
       }
     }
     if (jsonapiDoc.relationships) {
+      pristine.data.relationships = jsonapiDoc.relationships;
       for (let attribute of Object.keys(jsonapiDoc.relationships)) {
         let value = jsonapiDoc.relationships[attribute];
         let esName = await this.logicalFieldToES(branch, attribute);
         let field = schema.fields.get(attribute);
         if (field) {
-          searchDoc[esName] = (value || field.default()).data;
-          rewrites[esName] = {
-            delete: false,
-            rename: esName === attribute ? null : attribute,
-            isRelationship: true
-          };
+          let relatedReferences = (value || field.default()).data;
+          searchDoc[esName] = relatedReferences;
         }
       }
     }
@@ -195,9 +183,10 @@ module.exports = class SearchClient {
     // relationship.
     if (jsonapiDoc.meta) {
       searchDoc.cardstack_meta = jsonapiDoc.meta;
+      pristine.data.meta = jsonapiDoc.meta;
     }
-    searchDoc.cardstack_rewrites = rewrites;
     searchDoc.cardstack_source = sourceId;
+    searchDoc.cardstack_pristine = pristine;
     return searchDoc;
   }
 

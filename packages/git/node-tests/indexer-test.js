@@ -2,11 +2,15 @@ const Change = require('../change');
 const temp = require('@cardstack/test-support/temp-helper');
 const { commitOpts, makeRepo } = require('./support');
 const ElasticAssert = require('@cardstack/elasticsearch/node-tests/assertions');
-const toJSONAPI = require('@cardstack/elasticsearch/to-jsonapi');
+const _toJSONAPI = require('@cardstack/elasticsearch/to-jsonapi');
 const JSONAPIFactory = require('@cardstack/test-support/jsonapi-factory');
 const { Registry, Container } = require('@cardstack/di');
 const logger = require('@cardstack/plugin-utils/logger');
 const fs = require('fs');
+
+function toJSONAPI(type, doc) {
+  return _toJSONAPI(type, doc).data;
+}
 
 describe('git/indexer', function() {
   let root, indexer, ea, dataSource;

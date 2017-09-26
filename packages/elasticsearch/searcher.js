@@ -39,7 +39,7 @@ class Searcher {
       }
       throw err;
     }
-    return toJSONAPI(type, document);
+    return toJSONAPI(type, document).data;
   }
 
   async search(branch, { queryString, filter, sort, page }) {
@@ -127,7 +127,7 @@ class Searcher {
     }
 
     let models = documents.map(
-      document => toJSONAPI(document._type, document._source)
+      document => toJSONAPI(document._type, document._source).data
     );
     return {
       models,
