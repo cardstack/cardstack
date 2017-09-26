@@ -126,6 +126,81 @@ module.exports = class SearchClient {
     return branchPrefix;
   }
 
+  async jsonapiToSearchDoc(id, jsonapiDoc, schema, branch, sourceId) {
+    // we store the id as a regular field in elasticsearch here, because
+    // we use elasticsearch's own built-in _id for our own composite key
+    // that takes into account branches.
+    //
+    // we don't store the type as a regular field in elasticsearch,
+    // because we're keeping it in the built in _type field.
+
+    let rewrites = {};
+    let esId = await this.logicalFieldToES(branch, 'id');
+    let searchDoc = { [esId]: id };
+    if (esId !== 'id') {
+      rewrites[esId] = {
+        delete: false,
+        rename: 'id',
+        isRelationship: false
+      };
+    }
+
+    if (jsonapiDoc.attributes) {
+      for (let attribute of Object.keys(jsonapiDoc.attributes)) {
+        let value = jsonapiDoc.attributes[attribute];
+        let field = schema.fields.get(attribute);
+        if (field) {
+          let derivedFields = field.derivedFields(value);
+          if (derivedFields) {
+            for (let [derivedName, derivedValue] of Object.entries(derivedFields)) {
+              let esName = await this.logicalFieldToES(branch, derivedName);
+              searchDoc[esName] = derivedValue;
+              rewrites[esName] = {
+                delete: true,
+                rename: null,
+                isRelationship: false
+              };
+            }
+          }
+        }
+        let esName = await this.logicalFieldToES(branch, attribute);
+        searchDoc[esName] = value;
+        if (esName !== attribute) {
+          rewrites[esName] = {
+            delete: false,
+            rename: attribute,
+            isRelationship: false
+          };
+        }
+      }
+    }
+    if (jsonapiDoc.relationships) {
+      for (let attribute of Object.keys(jsonapiDoc.relationships)) {
+        let value = jsonapiDoc.relationships[attribute];
+        let esName = await this.logicalFieldToES(branch, attribute);
+        let field = schema.fields.get(attribute);
+        if (field) {
+          searchDoc[esName] = (value || field.default()).data;
+          rewrites[esName] = {
+            delete: false,
+            rename: esName === attribute ? null : attribute,
+            isRelationship: true
+          };
+        }
+      }
+    }
+
+    // The next fields in the searchDoc get a "cardstack_" prefix so
+    // they aren't likely to collide with the user's attribute or
+    // relationship.
+    if (jsonapiDoc.meta) {
+      searchDoc.cardstack_meta = jsonapiDoc.meta;
+    }
+    searchDoc.cardstack_rewrites = rewrites;
+    searchDoc.cardstack_source = sourceId;
+    return searchDoc;
+  }
+
   async _rewriteMapping(branch, mapping, nameRewriter) {
     if (!mapping) { return; }
     let output = {};

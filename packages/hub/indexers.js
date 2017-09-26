@@ -217,82 +217,9 @@ class Indexers {
 
 });
 
-async function jsonapiDocToSearchDoc(id, jsonapiDoc, schema, branch, client, sourceId) {
-  // we store the id as a regular field in elasticsearch here, because
-  // we use elasticsearch's own built-in _id for our own composite key
-  // that takes into account branches.
-  //
-  // we don't store the type as a regular field in elasticsearch,
-  // because we're keeping it in the built in _type field.
-
-  let rewrites = {};
-  let esId = await client.logicalFieldToES(branch, 'id');
-  let searchDoc = { [esId]: id };
-  if (esId !== 'id') {
-    rewrites[esId] = {
-      delete: false,
-      rename: 'id',
-      isRelationship: false
-    };
-  }
-
-  if (jsonapiDoc.attributes) {
-    for (let attribute of Object.keys(jsonapiDoc.attributes)) {
-      let value = jsonapiDoc.attributes[attribute];
-      let field = schema.fields.get(attribute);
-      if (field) {
-        let derivedFields = field.derivedFields(value);
-        if (derivedFields) {
-          for (let [derivedName, derivedValue] of Object.entries(derivedFields)) {
-            let esName = await client.logicalFieldToES(branch, derivedName);
-            searchDoc[esName] = derivedValue;
-            rewrites[esName] = {
-              delete: true,
-              rename: null,
-              isRelationship: false
-            };
-          }
-        }
-      }
-      let esName = await client.logicalFieldToES(branch, attribute);
-      searchDoc[esName] = value;
-      if (esName !== attribute) {
-        rewrites[esName] = {
-          delete: false,
-          rename: attribute,
-          isRelationship: false
-        };
-      }
-    }
-  }
-  if (jsonapiDoc.relationships) {
-    for (let attribute of Object.keys(jsonapiDoc.relationships)) {
-      let value = jsonapiDoc.relationships[attribute];
-      let esName = await client.logicalFieldToES(branch, attribute);
-      let field = schema.fields.get(attribute);
-      if (field) {
-        searchDoc[esName] = (value || field.default()).data;
-        rewrites[esName] = {
-          delete: false,
-          rename: esName === attribute ? null : attribute,
-          isRelationship: true
-        };
-      }
-    }
-  }
-
-  // The next fields in the searchDoc get a "cardstack_" prefix so
-  // they aren't likely to collide with the user's attribute or
-  // relationship.
-  if (jsonapiDoc.meta) {
-    searchDoc.cardstack_meta = jsonapiDoc.meta;
-  }
-  searchDoc.cardstack_rewrites = rewrites;
-  searchDoc.cardstack_source = sourceId;
-  return searchDoc;
-}
 
 const opsPrivate = new WeakMap();
+
 
 class Operations {
   static create(client, branch, schema, bulkOps, log, sourceId) {
@@ -314,7 +241,7 @@ class Operations {
   }
   async save(type, id, doc){
     let { bulkOps, branch, log, schema, client, sourceId, nonce } = opsPrivate.get(this);
-    let searchDoc = await jsonapiDocToSearchDoc(id, doc, schema, branch, client, sourceId);
+    let searchDoc = await client.jsonapiToSearchDoc(id, doc, schema, branch, sourceId);
     if (nonce) {
       searchDoc.cardstack_generation = nonce;
     }
