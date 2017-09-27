@@ -64,7 +64,7 @@ describe('elasticsearch/searcher', function() {
         fieldType: '@cardstack/core-types::belongs-to'
       }).withRelated('related-types', [ factory.getResource('content-types', 'articles') ])
     ]).withAttributes({
-      searchableRelationships: ['searchable-article']
+      defaultIncludes: ['searchable-article']
     });
 
     factory.addResource('articles', '1').withAttributes({
@@ -126,7 +126,7 @@ describe('elasticsearch/searcher', function() {
         fieldType: '@cardstack/core-types::has-many'
       }).withRelated('related-types', [factory.getResource('content-types', 'people')])
     ]).withAttributes({
-      searchableRelationships: ['searchable-members']
+      defaultIncludes: ['searchable-members']
     });
 
     factory.addResource('teams').withRelated('members', [

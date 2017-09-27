@@ -380,9 +380,9 @@ class BranchUpdate {
       pristine.data.relationships = jsonapiDoc.relationships;
 
       if (!searchTree) {
-        // we are the root document, so our own configured searchTree
-        // determines which relationships to recurse into
-        searchTree = this.schema.types.get(type).searchTree;
+        // we are the root document, so our own configured default
+        // includes determines which relationships to recurse into
+        searchTree = this.schema.types.get(type).includesTree;
       }
 
       let ourIncludes;

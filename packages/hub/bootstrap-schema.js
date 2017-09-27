@@ -13,7 +13,6 @@ const models = [
           { type: 'fields', id: 'fields' },
           { type: 'fields', id: 'is-built-in' },
           { type: 'fields', id: 'routing-field' },
-          { type: 'fields', id: 'searchable-relationships' },
           { type: 'fields', id: 'default-includes' }
         ]
       }

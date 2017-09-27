@@ -45,12 +45,6 @@ module.exports = class ContentType {
     });
     this.routingField = model.attributes && model.attributes['routing-field'];
 
-    if (model.attributes && model.attributes['searchable-relationships']) {
-      this.searchTree = buildSearchTree(model.attributes['searchable-relationships']);
-    } else {
-      this.searchTree = Object.create(null);
-    }
-
     if (model.attributes && model.attributes['default-includes']) {
       this.includesTree = buildSearchTree(model.attributes['default-includes']);
     } else {
@@ -131,7 +125,7 @@ module.exports = class ContentType {
   mapping() {
     let properties = {};
     for (let field of this.fields.values()) {
-      Object.assign(properties, field.mapping(this.searchTree, this.allFields));
+      Object.assign(properties, field.mapping(this.includesTree, this.allFields));
     }
     return { properties };
   }

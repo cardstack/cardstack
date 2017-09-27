@@ -39,8 +39,7 @@ describe('jsonapi/middleware', function() {
 
     factory.addResource('content-types', 'events')
       .withAttributes({
-        defaultIncludes: ['similar-articles.author', 'previous.previous'],
-        searchableRelationships: ['similar-articles.author', 'previous.previous']
+        defaultIncludes: ['similar-articles.author', 'previous.previous']
       })
       .withRelated('fields', [
         factory.getResource('fields', 'title'),
@@ -560,10 +559,6 @@ describe('jsonapi/middleware', function() {
       let response = await request.get('/api/events?include=next&filter[id][]=4&filter[id][]=5');
       expect(response).hasStatus(200);
       expect(response.body).not.has.property('included');
-    });
-
-    it('distinguishes default-includes vs searchable-relationships', function() {
-      expect(false).is.ok;
     });
 
   });
