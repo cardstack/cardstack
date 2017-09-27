@@ -132,11 +132,9 @@ class Indexers {
   }
 
   async _updateBranch(branch, updaters, realTime, hints) {
-    let token = this.schemaCache.prepareBranchUpdate(branch);
-    let schema = await this._updateSchema(branch, updaters);
-    await this.client.accomodateSchema(branch, schema);
-    await this._updateContent(branch, updaters, schema, realTime, hints);
-    this.schemaCache.notifyBranchUpdate(branch, schema, token);
+    let branchUpdater = new BranchUpdate(this, branch, updaters, realTime, hints, !this._seenBranches.has(branch));
+    await branchUpdater.run();
+    this._seenBranches.set(branch, true);
   }
 
   async _lookupIndexers() {
@@ -170,50 +168,6 @@ class Indexers {
     return branches;
   }
 
-  async _loadMeta(branch, updater) {
-    return this.client.es.getSource({
-      index: Client.branchToIndexName(branch),
-      type: 'meta',
-      id: owningDataSource.get(updater).id,
-      ignore: [404]
-    });
-  }
-
-  async _saveMeta(branch, updater, newMeta, privateOps) {
-    await privateOps.bulkOps.add({
-      index: {
-        _index: Client.branchToIndexName(branch),
-        _type: 'meta',
-        _id: owningDataSource.get(updater).id,
-      }
-    }, newMeta);
-  }
-
-  async _updateSchema(branch, updaters) {
-    let models = [];
-    for (let updater of updaters) {
-      models = models.concat(await updater.schema());
-    }
-    return this.schemaCache.schemaFrom(models);
-  }
-
-  async _updateContent(branch, updaters, schema, realTime, hints) {
-    let bulkOps = this.client.bulkOps({ realTime });
-    if (!this._seenBranches.has(branch)) {
-
-      let { publicOps } = Operations.create(this.client, branch, schema, bulkOps, this.log, '__cardstack_seed_models__');
-      await this.schemaCache.indexBaseContent(publicOps);
-      this._seenBranches.set(branch, true);
-    }
-    for (let updater of updaters) {
-      let meta = await this._loadMeta(branch, updater);
-      let sourceId = owningDataSource.get(updater).id;
-      let { publicOps, privateOps } = Operations.create(this.client, branch, schema, bulkOps, this.log, sourceId);
-      let newMeta = await updater.updateContent(meta, hints, publicOps);
-      await this._saveMeta(branch, updater, newMeta, privateOps);
-    }
-    await bulkOps.finalize();
-  }
 
 });
 
@@ -222,59 +176,53 @@ const opsPrivate = new WeakMap();
 
 
 class Operations {
-  static create(client, branch, schema, bulkOps, log, sourceId) {
-    let publicOps = new this(client, branch, schema, bulkOps, log, sourceId);
-    let privateOps = opsPrivate.get(publicOps);
-    return { publicOps, privateOps };
+  static create(branchUpdate, sourceId) {
+    return new this(branchUpdate, sourceId);
   }
 
-  constructor(client, branch, schema, bulkOps, log, sourceId) {
+  constructor(branchUpdate, sourceId) {
     opsPrivate.set(this, {
-      schema,
-      log,
-      branch,
-      client,
       sourceId,
-      bulkOps,
-      nonce: null
+      branchUpdate,
+      nonce: null,
     });
   }
   async save(type, id, doc){
-    let { bulkOps, branch, log, schema, client, sourceId, nonce } = opsPrivate.get(this);
-    let searchDoc = await client.jsonapiToSearchDoc(type, id, doc, schema, branch, sourceId);
+    let { sourceId, branchUpdate, nonce } = opsPrivate.get(this);
+    let searchDoc = await branchUpdate.indexers.client.jsonapiToSearchDoc(type, id, doc, branchUpdate.schema, branchUpdate.branch, sourceId);
     if (nonce) {
       searchDoc.cardstack_generation = nonce;
     }
-    await bulkOps.add({
+    await branchUpdate.bulkOps.add({
       index: {
-        _index: Client.branchToIndexName(branch),
+        _index: Client.branchToIndexName(branchUpdate.branch),
         _type: type,
-        _id: `${branch}/${id}`,
+        _id: `${branchUpdate.branch}/${id}`,
       }
     }, searchDoc);
-    log.debug("save %s %s", type, id);
+    branchUpdate.indexers.log.debug("save %s %s", type, id);
   }
   async delete(type, id) {
-    let { bulkOps, branch, log } = opsPrivate.get(this);
-    await bulkOps.add({
+    let { branchUpdate } = opsPrivate.get(this);
+    await branchUpdate.bulkOps.add({
       delete: {
-        _index: Client.branchToIndexName(branch),
+        _index: Client.branchToIndexName(branchUpdate.branch),
         _type: type,
-        _id: `${branch}/${id}`
+        _id: `${branchUpdate.branch}/${id}`
       }
     });
-    log.debug("delete %s %s", type, id);
+    branchUpdate.indexers.log.debug("delete %s %s", type, id);
   }
   async beginReplaceAll() {
     opsPrivate.get(this).nonce = Math.floor(Number.MAX_SAFE_INTEGER * Math.random());
   }
   async finishReplaceAll() {
-    let { bulkOps, branch, log, sourceId, nonce } = opsPrivate.get(this);
+    let { branchUpdate, sourceId, nonce } = opsPrivate.get(this);
     if (!nonce) {
       throw new Error("tried to finishReplaceAll when there was no beginReplaceAll");
     }
-    await bulkOps.add('deleteByQuery', {
-      index: Client.branchToIndexName(branch),
+    await branchUpdate.bulkOps.add('deleteByQuery', {
+      index: Client.branchToIndexName(branchUpdate.branch),
       conflicts: 'proceed',
       body: {
         query: {
@@ -289,6 +237,71 @@ class Operations {
         }
       }
     });
-    log.debug("bulk delete older content for data source %s", sourceId);
+    branchUpdate.indexers.log.debug("bulk delete older content for data source %s", sourceId);
   }
+}
+
+class BranchUpdate {
+  constructor(indexers, branch, updaters, realTime, hints, shouldIndexSeeds) {
+    this.indexers = indexers;
+    this.branch = branch;
+    this.updaters = updaters;
+    this.hints = hints;
+    this.schema = null;
+    this.bulkOps = indexers.client.bulkOps({ realTime });
+    this.shouldIndexSeeds = shouldIndexSeeds;
+  }
+
+  async run() {
+    let token = this.indexers.schemaCache.prepareBranchUpdate(this.branch);
+    this.schema = await this._updateSchema();
+    await this.indexers.client.accomodateSchema(this.branch, this.schema);
+    await this._updateContent();
+    this.indexers.schemaCache.notifyBranchUpdate(this.branch, this.schema, token);
+  }
+
+  async _updateSchema() {
+    let models = [];
+    for (let updater of this.updaters) {
+      models = models.concat(await updater.schema());
+    }
+    return this.indexers.schemaCache.schemaFrom(models);
+  }
+
+  async _updateContent() {
+    if (this.shouldIndexSeeds) {
+      let publicOps = Operations.create(this, '__cardstack_seed_models__');
+      await this.indexers.schemaCache.indexBaseContent(publicOps);
+    }
+    for (let updater of this.updaters) {
+      let meta = await this._loadMeta(updater);
+      let sourceId = owningDataSource.get(updater).id;
+      let publicOps = Operations.create(this, sourceId);
+      let newMeta = await updater.updateContent(meta, this.hints, publicOps);
+      await this._saveMeta(updater, newMeta);
+    }
+    await this.bulkOps.finalize();
+  }
+
+  async _loadMeta(updater) {
+    return this.indexers.client.es.getSource({
+      index: Client.branchToIndexName(this.branch),
+      type: 'meta',
+      id: owningDataSource.get(updater).id,
+      ignore: [404]
+    });
+  }
+
+  async _saveMeta(updater, newMeta) {
+    await this.bulkOps.add({
+      index: {
+        _index: Client.branchToIndexName(this.branch),
+        _type: 'meta',
+        _id: owningDataSource.get(updater).id,
+      }
+    }, newMeta);
+  }
+
+
+
 }
