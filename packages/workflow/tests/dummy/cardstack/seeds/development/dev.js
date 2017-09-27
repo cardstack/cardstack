@@ -253,7 +253,9 @@ function initialModels() {
 
   initial.addResource('messages', '3')
     .withAttributes({
-      status: 'unhandled',
+      // Does it make sense to have a status for a message
+      // that is related to a card which cannot be handled? (song, in this case)
+      status: 'handled',
       sentAt: moment(),
       cardId: '1',
       cardType: 'songs'
@@ -270,9 +272,7 @@ function initialModels() {
 
   initial.addResource('messages', '5')
     .withAttributes({
-      // Does it make sense to have a status for a message
-      // that is related to a card which cannot be handled? (song, in this case)
-      status: 'unhandled',
+      status: 'handled',
       sentAt: moment().subtract(moment.duration(4, 'days')),
       cardId: '2',
       cardType: 'songs',

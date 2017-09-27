@@ -7,10 +7,11 @@ import { readOnly } from "@ember/object/computed";
 export default Thread.extend({
   priority:       readOnly('_latestMessageWithPriority.priority'),
   priorityLevel:  readOnly('priority.level'),
-  isUnhandled:    readOnly('priority.isUnhandled'),
-  updatedAt:      readOnly('_latestMessage.sentAt'),
+  updatedAt:      readOnly('latestMessage.sentAt'),
 
-  //TODO: `status` should be the status of the latest message in the thread
+  isUnhandled: computed('_syncedMessages.@each.isUnhandled', function() {
+    return this.get('_syncedMessages').any((message) => message.get('isUnhandled'));
+  }),
 
   loadedTags: computed({
     get() {

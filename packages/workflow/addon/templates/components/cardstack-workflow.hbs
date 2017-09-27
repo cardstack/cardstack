@@ -18,7 +18,7 @@
             <div class={{concat "cardstack-workflow-label-with-count-wrapper " (if (eq selectedGroup groupId) "active")}}>
               <div class={{concat "cardstack-workflow-label-with-count " tagGroup.priorityLevel "-priority"}} onclick={{action 'selectTag' tagId}}>
                 <div class='name'>{{tagGroup.name}}</div>
-                <div class="count" data-test-group-counter={{groupId}}>{{tagGroup.all.length}}</div>
+                <div class="count" data-test-group-counter={{groupId}}>{{tagGroup.unhandled.length}}</div>
               </div>
             </div>
           {{/with}}

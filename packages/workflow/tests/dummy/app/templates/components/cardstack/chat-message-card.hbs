@@ -1,3 +1,12 @@
 <div class="cardstack-message-card">
-  {{content.text}}
+  <div class="main-content">{{content.text}}</div>
+  <div class="button-panel">
+    {{#if content.message.isUnhandled}}
+      <button type="button" class="action-button" onclick={{action 'read'}}>
+        Mark this as read
+      </button>
+    {{else}}
+      You read this message.
+    {{/if}}
+  </div>
 </div>

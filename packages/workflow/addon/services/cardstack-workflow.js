@@ -42,7 +42,7 @@ export default Service.extend({
   unhandledForToday:        filterBy('threadsUpdatedToday', 'isUnhandled'),
   todaysNotificationCount:  readOnly('unhandledForToday.length'),
 
-  groupedThreads: computed('items.@each.{priority,loadedTags}', function() {
+  groupedThreads: computed('items.@each.{priority,loadedTags,isUnhandled}', function() {
     return this.get('items').reduce((groupedThreads, thread) => {
       let priority = thread.get('priority');
       let priorityId = priority.get('id');
@@ -62,14 +62,15 @@ export default Service.extend({
           threadsForPriority.tagGroups[tagId] = {
             name: tag.get('name'),
             priorityLevel: thread.get('priorityLevel'),
-            all: []
+            all: [],
+            unhandled: [],
           }
         }
         let threadsForTag = threadsForPriority.tagGroups[tagId];
         threadsForTag.all.push(thread);
-        // if (thread.get('isImportant')) {
-        //   threadsWithTag.important.push(thread);
-        // }
+        if (thread.get('isUnhandled')) {
+          threadsForTag.unhandled.push(thread);
+        }
       }
       return groupedThreads;
     }, {});
