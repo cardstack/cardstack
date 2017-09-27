@@ -208,4 +208,41 @@ describe('elasticsearch/indexer', function() {
   });
 
 
+  it('can fix broken relationship when it is later fixed', async function() {
+    let article = await writer.create('master', env.session, 'articles', {
+      type: 'articles',
+      attributes: {
+        title: 'Hello World'
+      },
+      relationships: {
+        author: { data: { type: 'people', id: 'x' } }
+      }
+    });
+    expect(article).has.deep.property('id');
+    await indexer.update({ realTime: true });
+
+    let found = await searcher.get('master', 'articles', article.id);
+    expect(found).is.ok;
+    expect(found).has.deep.property('data.attributes.title', 'Hello World');
+    expect(found).has.deep.property('data.relationships.author.data', null);
+
+    await writer.create('master', env.session, 'people', {
+      id: 'x',
+      type: 'people',
+      attributes: {
+        name: 'Quint'
+      }
+    });
+
+    await indexer.update({ realTime: true });
+
+    found = await searcher.get('master', 'articles', article.id);
+    expect(found).is.ok;
+    debugger;
+    expect(found).has.deep.property('data.relationships.author.data.id', 'x');
+    expect(found).has.property('included');
+    expect(found.included).length(1);
+    expect(found.included[0].attributes.name).to.equal('Quint');
+  });
+
 });
