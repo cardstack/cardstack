@@ -80,10 +80,22 @@ export default Service.extend({
   }),
 
   selectedTag:    '',
-  messagesWithSelectedTag: computed('items.@each.loadedTagIds', 'selectedTag', function() {
+  messagesWithSelectedTag: computed('items.@each.{loadedTagIds,priority}', 'selectedTag', function() {
     let selectedTagId = this.get('selectedTag.id');
     let withSelectedTag = this.get('items').filter((thread) => thread.get('loadedTagIds').includes(selectedTagId));
-    return withSelectedTag;
+    return withSelectedTag.reduce((groups, thread) => {
+      let priority = thread.get('priority');
+      let priorityId = priority.get('id');
+      if (!groups[priorityId]) {
+        groups[priorityId] = {
+          name: priority.get('name'),
+          threads: []
+        }
+      }
+
+      groups[priorityId].threads.push(thread);
+      return groups;
+    }, {});
   }),
 
   selectedDate: '',

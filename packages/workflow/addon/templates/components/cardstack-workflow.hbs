@@ -34,19 +34,20 @@
   </section>
 {{else}}
   {{#if shouldShowMatchingThreads}}
-    {{#if matchingThreads.length}}
-      <section class="cardstack-cue-card-list">
-        {{#each matchingThreads as |thread|}}
-          {{cardstack/thread-list-card thread=thread}}
-        {{/each}}
-      </section>
-    {{else}}
-      {{!-- cardstack-content content=message format="empty-list-card" --}}
-      <section class="cardstack-empty-cue-card-list">
+    <section class="cardstack-cue-card-list">
+      {{#each-in matchingThreads as |priorityId priorityGroup|}}
+        {{#with priorityGroup.name as |name|}}
+          <h4 class="cardstack-workflow-group-header" data-test-priority-header={{name}}>{{name}}</h4>
+          {{#each priorityGroup.threads as |thread|}}
+            {{cardstack/thread-list-card thread=thread}}
+          {{/each}}
+        {{/with}}
+      {{else}}
+        {{!-- cardstack-content content=message format="empty-list-card" --}}
         <div class="cardstack-empty-cue-card-message" data-test-empty-group-message>
           There are no cards in this group.
         </div>
-      </section>
-    {{/if}}
+      {{/each-in}}
+    </section>
   {{/if}}
 {{/if}}

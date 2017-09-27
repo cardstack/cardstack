@@ -54,8 +54,7 @@
   margin-left: 10px;
 }
 
-.cardstack-cue-card-list,
-.cardstack-empty-cue-card-list {
+.cardstack-cue-card-list {
   min-width: 25vw;
   background-color: var(--lighter-background);
   color: var(--bright-foreground);
