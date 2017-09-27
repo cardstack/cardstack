@@ -80,7 +80,7 @@ export default Service.extend({
   }),
 
   selectedTag:    '',
-  messagesWithSelectedTag: computed('items.@each.{loadedTagIds,priority}', 'selectedTag', function() {
+  threadsWithSelectedTag: computed('items.@each.{loadedTagIds,priority}', 'selectedTag', function() {
     let selectedTagId = this.get('selectedTag.id');
     let withSelectedTag = this.get('items').filter((thread) => thread.get('loadedTagIds').includes(selectedTagId));
     return withSelectedTag.reduce((groups, thread) => {
@@ -99,21 +99,27 @@ export default Service.extend({
   }),
 
   selectedDate: '',
-  messagesWithSelectedDate: computed('selectedDate', function() {
+  threadsWithSelectedDate: computed('selectedDate', function() {
     if (this.get('selectedDate') === 'today') {
-      return this.get('todaysUnhandledMessages');
+      let threads = this.get('unhandledForToday');
+      return {
+        today: {
+          name: 'Today',
+          threads
+        }
+      };
     }
-    return [];
+    return {};
   }),
 
   shouldShowMatchingThreads: or('selectedTag', 'selectedDate'),
 
-  matchingThreads: computed('selectedTag', 'selectedDate', 'messagesWithSelectedTag', 'messagesWithSelectedDate', function() {
+  matchingThreads: computed('selectedTag', 'selectedDate', 'threadsWithSelectedTag', 'threadsWithSelectedDate', function() {
     if (this.get('selectedTag')) {
-      return this.get('messagesWithSelectedTag');
+      return this.get('threadsWithSelectedTag');
     }
     if (this.get('selectedDate')) {
-      return this.get('messagesWithSelectedDate');
+      return this.get('threadsWithSelectedDate');
     }
     return [];
   }),
