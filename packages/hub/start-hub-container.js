@@ -13,15 +13,27 @@ const nssocket = require('nssocket');
 const path_is_inside = require('path-is-inside');
 const Dockerfile = require('dockerfilejs').Dockerfile;
 const resolve = promisify(require('resolve'));
+const StdBuffer = require('./stdbuffer');
 const log = require('@cardstack/plugin-utils/logger')('hub/spawn-hub');
 
 const HUB_HEARTBEAT_INTERVAL = 1 * 1000;
 
 module.exports = async function(projectRoot) {
   await buildAppImage();
-  await spawnHubContainer(projectRoot);
+  let logs = await spawnHubContainer(projectRoot);
 
-  let hub = await socketToHub();
+  let hub;
+  try {
+    hub = await socketToHub();
+  } catch (e) {
+    if (e.code === "ECONNREFUSED") {
+      log.error("The hub container failed to start:");
+      log.error(logs.err);
+      throw new Error('Hub failed to start');
+    } else {
+      throw e;
+    }
+  }
 
   await new Promise(function(resolve) {
     hub.data('ready', resolve);
@@ -125,7 +137,7 @@ async function spawnHubContainer(projectRoot) {
   let key = crypto.randomBytes(32).toString('base64');
 
 
-  await execFile('docker', [
+  let {stdout} = await execFile('docker', [
     'run',
     '-d',
     '--rm',
@@ -136,6 +148,10 @@ async function spawnHubContainer(projectRoot) {
     '-e', `CARDSTACK_SESSIONS_KEY=${key}`,
     'cardstack-app'
   ]);
+
+  let container_id = stdout.trim();
+
+  return new StdBuffer(spawn('docker', ['logs', '-f', container_id]));
 }
 
 function startHeartbeat(hub) {
