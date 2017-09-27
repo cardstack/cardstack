@@ -401,11 +401,20 @@ class BranchUpdate {
             if (Array.isArray(value.data)) {
               related = await Promise.all(value.data.map(async ({ type, id }) => {
                 let resource = await this.read(type, id);
-                return this._prepareSearchDoc(type, id, resource, searchTree[attribute], ourIncludes);
+                if (resource) {
+                  return this._prepareSearchDoc(type, id, resource, searchTree[attribute], ourIncludes);
+                }
               }));
+              related = related.filter(Boolean);
+              pristine.data.relationships[attribute].data = related.map(r => ({ type: r.type, id: r.id }));
             } else {
               let resource = await this.read(value.data.type, value.data.id);
-              related = await this._prepareSearchDoc(resource.type, resource.id, resource, searchTree[attribute], ourIncludes);
+              if (resource) {
+                related = await this._prepareSearchDoc(resource.type, resource.id, resource, searchTree[attribute], ourIncludes);
+              } else {
+                pristine.data.relationships[attribute].data = null;
+              }
+
             }
           } else {
             related = value.data;

@@ -18,7 +18,7 @@ describe('elasticsearch/indexer', function() {
     factory = new Factory();
 
     factory.addResource('content-types', 'articles').withAttributes({
-      defaultIncludes: ['author']
+      defaultIncludes: ['author', 'reviewers']
     }).withRelated('fields', [
       factory.addResource('fields', 'title').withAttributes({
         fieldType: '@cardstack/core-types::string'
@@ -31,6 +31,11 @@ describe('elasticsearch/indexer', function() {
             fieldType: '@cardstack/core-types::string'
           })
         ])
+      ]),
+      factory.addResource('fields', 'reviewers').withAttributes({
+        fieldType: '@cardstack/core-types::has-many'
+      }).withRelated('related-types', [
+        factory.getResource('content-types', 'people')
       ])
     ]);
 
@@ -122,5 +127,50 @@ describe('elasticsearch/indexer', function() {
     expect(found.included).length(1);
     expect(found.included[0].attributes.name).to.equal('Edward V');
   });
+
+  it('ignores a broken belongs-to', async function() {
+    let article = await writer.create('master', env.session, 'articles', {
+      type: 'articles',
+      attributes: {
+        title: 'Hello World'
+      },
+      relationships: {
+        author: { data: { type: 'people', id: 'x' } },
+      }
+    });
+    expect(article).has.deep.property('id');
+    await indexer.update({ realTime: true });
+    let found = await searcher.get('master', 'articles', article.id);
+    expect(found).is.ok;
+    expect(found).has.deep.property('data.relationships.author.data', null);
+  });
+
+  it('ignores a broken has-many', async function() {
+    let person = await writer.create('master', env.session, 'people', {
+      type: 'people',
+      attributes: {
+        name: 'Quint'
+      }
+    });
+    expect(person).has.deep.property('id');
+
+    let article = await writer.create('master', env.session, 'articles', {
+      type: 'articles',
+      attributes: {
+        title: 'Hello World'
+      },
+      relationships: {
+        reviewers: { data: [{ type: 'people', id: person.id }, { type: "people", id: 'x'} ]}
+      }
+    });
+    expect(article).has.deep.property('id');
+    await indexer.update({ realTime: true });
+    let found = await searcher.get('master', 'articles', article.id);
+    expect(found).is.ok;
+    expect(found).has.deep.property('data.relationships.reviewers.data');
+    expect(found.data.relationships.reviewers.data).length(1);
+    expect(found.data.relationships.reviewers.data[0]).has.property('id', person.id);
+  });
+
 
 });
