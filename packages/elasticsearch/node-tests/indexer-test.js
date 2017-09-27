@@ -17,10 +17,9 @@ describe('elasticsearch/indexer', function() {
   before(async function() {
     factory = new Factory();
 
-    // Turning on mobiledoc so we can test indexing of plugin-customized content
-    factory.addResource('plugin-configs', '@cardstack/mobiledoc');
-
-    factory.addResource('content-types', 'articles').withRelated('fields', [
+    factory.addResource('content-types', 'articles').withAttributes({
+      defaultIncludes: ['author']
+    }).withRelated('fields', [
       factory.addResource('fields', 'title').withAttributes({
         fieldType: '@cardstack/core-types::string'
       }),
@@ -86,6 +85,42 @@ describe('elasticsearch/indexer', function() {
     expect(found).is.ok;
     expect(found).has.deep.property('data.attributes.title');
     expect(found).has.deep.property('data.relationships.author.data.id', person.id);
+    expect(found).has.property('included');
+    expect(found.included).length(1);
+    expect(found.included[0].attributes.name).to.equal('Quint');
+  });
+
+  it('reindexes included resources', async function() {
+    let person = await writer.create('master', env.session, 'people', {
+      type: 'people',
+      attributes: {
+        name: 'Quint'
+      }
+    });
+    expect(person).has.deep.property('id');
+    let article = await writer.create('master', env.session, 'articles', {
+      type: 'articles',
+      attributes: {
+        title: 'Hello World'
+      },
+      relationships: {
+        author: { data: { type: 'people', id: person.id } }
+      }
+    });
+    expect(article).has.deep.property('id');
+    await indexer.update({ realTime: true });
+
+    person.attributes.name = 'Edward V';
+    await writer.update('master', env.session, 'people', person.id, person);
+    await indexer.update({ realTime: true });
+
+    let found = await searcher.get('master', 'articles', article.id);
+    expect(found).is.ok;
+    expect(found).has.deep.property('data.attributes.title');
+    expect(found).has.deep.property('data.relationships.author.data.id', person.id);
+    expect(found).has.property('included');
+    expect(found.included).length(1);
+    expect(found.included[0].attributes.name).to.equal('Edward V');
   });
 
 });
