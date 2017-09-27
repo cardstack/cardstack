@@ -64,6 +64,12 @@ async function buildAppImage() {
 
   let file = new Dockerfile();
 
+  let flags = ['--allow-dev-dependencies', '--containerized'];
+  if (process.env.CARDSTACK_LEAVE_SERVICES) {
+    log.info('Will leave docker services running after exit');
+    flags.push('--leave-services-running');
+  }
+
   file.from('cardstack/hub')
     .workdir('/hub/app')
     .copy({src: ['package.json', 'yarn.lock'], dest: '/hub/app/'})
@@ -76,8 +82,7 @@ async function buildAppImage() {
     .cmd({command:'node', params: [
       '/hub/app/node_modules/@cardstack/hub/bin/server.js',
       '/hub/app/cardstack/seeds/development',
-      '-d',
-      '--containerized'
+      ...flags
     ]});
 
   proc.stdin.end(file.render());

@@ -10,18 +10,33 @@ const NETWORK_NAME = "cardstack-network";
 const ELASTICSEARCH_STARTUP_TIMEOUT = 60 * 1000; // 60 seconds
 
 
-module.exports = {
+module.exports = class Orchestrator {
+  constructor(leaveRunning) {
+    this.leaveRunning = leaveRunning;
+
+    this.ready = new Promise((resolve, reject) => {
+      this._resolveReady = resolve;
+      this._rejectReady = reject;
+    });
+  }
+
   async start() {
     await ensureNetwork();
     await ensureElasticsearch();
     log.info('Docker orchestration is finished, everything should be in order');
-  },
+    this._resolveReady();
+  }
 
   async stop() {
-    await destroyElasticsearch();
-    await destroyNetwork();
-    log.info('All other docker artifacts successfully removed. Shutting down...');
-    process.exit();
+    if (this.leaveRunning) {
+      log.info('Leaving other docker artifacts intact. Shutting down...');
+      process.exit();
+    } else {
+      await destroyElasticsearch();
+      await destroyNetwork();
+      log.info('All other docker artifacts successfully removed. Shutting down...');
+      process.exit();
+    }
   }
 };
 
@@ -30,13 +45,12 @@ module.exports = {
 async function ensureNetwork() {
   try {
     await execFile('docker', ['network', 'create', NETWORK_NAME]);
-  } catch (error) {
+  } catch (e) {
     // We probably just failed here because the network already exists
-    if (error.code === 1) {
-      log.warn('Error creating docker network:');
-      log.warn(error.stderr);
+    if (e.stderr.indexOf('already exists')) {
+      log.info('Docker network already exists, re-using it');
     } else {
-      throw error;
+      throw e;
     }
   }
 
@@ -54,6 +68,11 @@ async function destroyNetwork() {
 
 
 async function ensureElasticsearch() {
+  if (await isElasticsearchReady()) {
+    log.info('Found existing elasticsearch container, will try to re-use it');
+    return;
+  }
+
   await execFile('docker', [
       'run',
       '-d',

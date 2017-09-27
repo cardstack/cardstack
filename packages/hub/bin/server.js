@@ -21,6 +21,7 @@ function commandLineOptions() {
     .option('-p --port <port>', 'Server listen port', 3000)
     .option('-d --allow-dev-dependencies', 'Allow the hub to load devDependencies')
     .option('-c --containerized', 'Run the hub in container mode (temporary feature flag)')
+    .option('-l --leave-services-running', 'Leave dockerized services running, to improve future startup time')
     .parse(process.argv);
 
   if (commander.args.length < 1) {
