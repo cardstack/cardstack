@@ -166,11 +166,10 @@ module.exports = class SearchClient {
       pristine.data.relationships = jsonapiDoc.relationships;
       for (let attribute of Object.keys(jsonapiDoc.relationships)) {
         let value = jsonapiDoc.relationships[attribute];
-        let esName = await this.logicalFieldToES(branch, attribute);
         let field = schema.fields.get(attribute);
-        if (field) {
-          let relatedReferences = (value || field.default()).data;
-          searchDoc[esName] = relatedReferences;
+        if (field && value && value.hasOwnProperty('data')) {
+          let esName = await this.logicalFieldToES(branch, attribute);
+          searchDoc[esName] = value.data;
         }
       }
     }
