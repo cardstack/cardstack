@@ -1,19 +1,17 @@
 const nssocket = require('nssocket');
 const _ = require('lodash');
 
-const orchestrator = require('./orchestrator');
 const log = require('@cardstack/plugin-utils/logger')('ember-connection');
 
 const HUB_HEARTBEAT_TIMEOUT = 7.5 * 1000; // longer than the heartbeat interval of 1 second
 
-const stopLater = _.debounce(function() {
-  log.info('No heartbeat from ember-cli! Shutting down.');
-  orchestrator.stop();
-}, HUB_HEARTBEAT_TIMEOUT);
-
-
 module.exports = class EmberConnector {
-  constructor(readyPromise) {
+  constructor(orchestrator) {
+    let stopLater = _.debounce(function() {
+      log.info('No heartbeat from ember-cli! Shutting down.');
+      orchestrator.stop();
+    }, HUB_HEARTBEAT_TIMEOUT);
+
     this._server = nssocket.createServer(async function(socket) {
       log.info('connection established from ember-cli');
 
@@ -33,7 +31,7 @@ module.exports = class EmberConnector {
         stopLater();
       });
 
-      await readyPromise;
+      await orchestrator.ready;
 
       // Our listeners are set up, and whoever instantiated us said we're good,
       // so tell ember-cli everything is ready.
