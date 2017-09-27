@@ -344,6 +344,69 @@ describe('git/indexer', function() {
     }
   });
 
+  it('supports default-includes', async function() {
+    let { repo, head } = await makeRepo(root, {
+      'schema/content-types/articles.json': JSON.stringify({
+        attributes: {
+          'default-includes': ['author']
+        },
+        relationships: {
+          fields: {
+            data: [
+              { type: 'fields', id: 'title' },
+              { type: 'fields', id: 'author' }
+            ]
+          }
+        }
+      }),
+      'schema/content-types/people.json': JSON.stringify({
+        relationships: {
+          fields: {
+            data: [
+              { type: 'fields', id: 'name' }
+            ]
+          }
+        }
+      }),
+      'schema/fields/title.json': JSON.stringify({
+        attributes: {
+          'field-type': '@cardstack/core-types::string'
+        }
+      }),
+      'schema/fields/author.json': JSON.stringify({
+        attributes: {
+          'field-type': '@cardstack/core-types::belongs-to'
+        }
+      }),
+      'schema/fields/name.json': JSON.stringify({
+        attributes: {
+          'field-type': '@cardstack/core-types::string'
+        }
+      }),
+      'contents/articles/hello-world.json': JSON.stringify({
+        attributes: {
+          title: 'Hello world'
+        },
+        relationships: {
+          author: {
+            data: { type: 'people', id: 'person1' }
+          }
+        }
+      }),
+      'contents/people/person1.json': JSON.stringify({
+        attributes: {
+          name: 'Q'
+        }
+      })
+    });
+
+    await indexer.update();
+
+    let contents = await ea.documentContents('master', 'articles', 'hello-world');
+    throw new Error("Finish implementing me");
+  });
+
+
 });
 
 describe('git/indexer failures', function() {

@@ -177,5 +177,8 @@ describe('postgresql/indexer', function() {
     expect(model).has.deep.property('attributes.length', null);
   });
 
+  it('supports default includes', async function() {
+    throw new Error("Unimplemented");
+  });
 
 });
