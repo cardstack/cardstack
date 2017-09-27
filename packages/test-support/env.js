@@ -13,7 +13,7 @@ exports.createDefaultEnvironment = async function(projectDir, initialModels = []
     let user = factory.addResource('users', 'the-default-test-user').withAttributes({
       fullName: 'Default Test Environment',
       email: 'test@example.com'
-    });
+    }).asDocument();
 
     let session = new Session(
       { id: 'the-default-test-user', type: 'users'},
@@ -38,7 +38,7 @@ exports.createDefaultEnvironment = async function(projectDir, initialModels = []
         mayUpdateResource: true,
         mayDeleteResource: true,
         mayWriteField: true
-      }).withRelated('who', factory.addResource('groups', user.id));
+      }).withRelated('who', factory.addResource('groups', user.data.id));
 
     container = await wireItUp(projectDir, crypto.randomBytes(32), factory.getModels(), {
       allowDevDependencies: true,
@@ -64,7 +64,7 @@ exports.createDefaultEnvironment = async function(projectDir, initialModels = []
 
     Object.assign(container, {
       session,
-      user: user.data,
+      user,
       async setUserId(id) {
         let schema = await this.lookup('hub:schema-cache').schemaForControllingBranch();
         let m = schema.plugins.lookupFeatureAndAssert('middleware', '@cardstack/test-support/authenticator');

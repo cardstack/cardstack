@@ -126,7 +126,7 @@ module.exports = class SearchClient {
     return branchPrefix;
   }
 
-  async jsonapiToSearchDoc(id, jsonapiDoc, schema, branch, sourceId) {
+  async jsonapiToSearchDoc(type, id, jsonapiDoc, schema, branch, sourceId) {
     // we store the id as a regular field in elasticsearch here, because
     // we use elasticsearch's own built-in _id for our own composite key
     // that takes into account branches.
@@ -141,10 +141,7 @@ module.exports = class SearchClient {
     // response, as opposed to the searchDoc itself which is mangled
     // for searchability.
     let pristine = {
-      data: {
-        id: jsonapiDoc.id,
-        type: jsonapiDoc.type
-      }
+      data: { id, type }
     };
 
     if (jsonapiDoc.attributes) {

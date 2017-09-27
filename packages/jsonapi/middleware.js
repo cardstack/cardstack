@@ -75,6 +75,7 @@ class Handler {
     this.log = log;
     this._includes = null;
     this.includedSets = null;
+    this.includedResources = null;
   }
 
   get session() {
@@ -140,12 +141,12 @@ class Handler {
   }
 
   async handleIndividualGET(type, id) {
-    let data = await this._lookupRecord(type, id);
-    this.ctxt.body = { data };
+    let body = await this._lookupRecord(type, id);
+    this.ctxt.body = body;
     if (this.includes.length === 0) {
       return;
     }
-    await this._loadAllIncluded([data]);
+    await this._loadAllIncluded([body.data]);
   }
 
   async handleIndividualPATCH(type, id) {
@@ -211,6 +212,12 @@ class Handler {
   }
 
   async _lookupRecord(type, id) {
+    if (this.includedResources) {
+      let record = this.includedResources[`${type}/${id}`];
+      if (record) {
+        return record;
+      }
+    }
     let record = await this.searcher.get(this.branch, type, id);
     return record;
   }
@@ -237,9 +244,25 @@ class Handler {
   }
 
   async _loadAllIncluded(root) {
+    // this is a map from each requested include path to a promise
+    // that resolves with the list of resources in that set
     this.includedSets = Object.create(null);
+
+    // this is a map from type/id strings to each of the resources we
+    // have already loaded
+    this.includedResources = Object.create(null);
+
+    // some included models may have already come along with the
+    // document we got out of the searcher
+    if (this.ctxt.body.included) {
+      for (let resource of this.ctxt.body.included) {
+        this.includedResources[`${resource.type}/${resource.id}`] = resource;
+      }
+    }
+
     this.includes.forEach(segments => this._loadIncluded(root, segments));
-    this.ctxt.body.included = flatten(await Promise.all(Object.values(this.includedSets)));
+    await Promise.all(Object.values(this.includedSets));
+    this.ctxt.body.included = Object.keys(this.includedResources).map(k => this.includedResources[k].data);
   }
 
   async _loadIncluded(root, segments) {
@@ -256,7 +279,7 @@ class Handler {
       } else {
         sourceSet = await this._loadIncluded(root, segments.slice(0, -1));
       }
-      return flatten(await Promise.all(sourceSet.map(record => {
+      let resources = flatten(await Promise.all(sourceSet.map(record => {
         if (!record.relationships || !record.relationships[tail]) {
           return [];
         }
@@ -269,6 +292,15 @@ class Handler {
           return [];
         }
       })));
+      for (let resource of resources) {
+        this.includedResources[`${resource.data.type}/${resource.data.id}`] = resource;
+        if (resource.included) {
+          for (let inner of resource.included) {
+            this.includedResources[`${inner.data.type}/${inner.data.id}`] = { data: inner };
+          }
+        }
+      }
+      return resources.map(r => r.data);
     })();
   }
 }

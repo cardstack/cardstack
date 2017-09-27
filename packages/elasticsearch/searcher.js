@@ -39,7 +39,7 @@ class Searcher {
       }
       throw err;
     }
-    return toJSONAPI(type, document).data;
+    return toJSONAPI(type, document);
   }
 
   async search(branch, { queryString, filter, sort, page }) {

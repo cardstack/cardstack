@@ -55,19 +55,19 @@ describe('hub/searchers', function() {
   it("searchers#get finds record via internal searcher", async function() {
     await setup({});
     let response = await env.lookup('hub:searchers').get('master', 'examples', chocolate.id);
-    expect(response.attributes['example-flavor']).to.equal('chocolate');
+    expect(response.data.attributes['example-flavor']).to.equal('chocolate');
   });
 
   it("a plugin's searcher#get can run before the internal searcher", async function() {
     await setup({ injectFirst: 'vanilla' });
     let response = await env.lookup('hub:searchers').get('master', 'examples', chocolate.id);
-    expect(response.attributes['example-flavor']).to.equal('vanilla');
+    expect(response.data.attributes['example-flavor']).to.equal('vanilla');
   });
 
   it("a plugin's searcher#get can run after the internal searcher", async function() {
     await setup({ injectSecond: 'vanilla' });
     let response = await env.lookup('hub:searchers').get('master', 'examples', '10000');
-    expect(response.attributes['example-flavor']).to.equal('vanilla');
+    expect(response.data.attributes['example-flavor']).to.equal('vanilla');
   });
 
   it("searchers#search finds record via internal searcher", async function() {

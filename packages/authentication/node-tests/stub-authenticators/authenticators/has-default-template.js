@@ -3,7 +3,7 @@ module.exports = class HasDefaultTemplate {
     return new this();
   }
   constructor() {
-    this.defaultUserTemplate = '{ "id": "{{upstreamId}}", "type": "users" }';
+    this.defaultUserTemplate = '{ "data": { "id": "{{upstreamId}}", "type": "users" } }';
   }
   async authenticate(payload /*, userSearcher */) {
     return payload;

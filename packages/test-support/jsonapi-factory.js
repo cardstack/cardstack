@@ -117,6 +117,9 @@ class ResourceFactory {
     this.data.relationships[dasherize(fieldName)] = { data };
     return this;
   }
+  asDocument() {
+    return { data: this.data };
+  }
 }
 
 function dasherize(camelCase) {

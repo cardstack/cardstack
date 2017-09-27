@@ -50,20 +50,20 @@ describe('authentication/middleware', function() {
     factory.addResource('authentication-sources', 'config-echo-quint').withAttributes({
       authenticatorType: 'stub-authenticators::config-echo',
       params: {
-        user: { id: quint.id, type: 'users' }
+        data: { id: quint.id, type: 'users' }
       }
     });
 
     factory.addResource('authentication-sources', 'config-echo-arthur').withAttributes({
       authenticatorType: 'stub-authenticators::config-echo',
       params: {
-        user: { id: arthur.id, type: 'users' }
+        data: { id: arthur.id, type: 'users' }
       }
     });
 
     factory.addResource('authentication-sources', 'id-rewriter').withAttributes({
       authenticatorType: 'stub-authenticators::echo',
-      userTemplate: '{ "id": "{{upstreamId}}", "type": "users" }'
+      userTemplate: '{ "data": { "id": "{{upstreamId}}", "type": "users" }}'
     });
 
     factory.addResource('authentication-sources', 'has-default-template').withAttributes({
@@ -73,26 +73,26 @@ describe('authentication/middleware', function() {
 
     factory.addResource('authentication-sources', 'create-via-template').withAttributes({
       authenticatorType: 'stub-authenticators::echo',
-      userTemplate: `{
+      userTemplate: `{"data":{
         "id": "my-prefix-{{id}}",
         "type": "users",
         "attributes": {
           "full-name": "{{firstName}} {{lastName}}",
           "email": "{{email}}"
         }
-      }`,
+      }}`,
       mayCreateUser: true
     });
 
     factory.addResource('authentication-sources', 'create-via-template-no-id').withAttributes({
       authenticatorType: 'stub-authenticators::echo',
-      userTemplate: `{
+      userTemplate: `{"data":{
         "type": "users",
         "attributes": {
           "full-name": "{{firstName}} {{lastName}}",
           "email": "{{email}}"
         }
-      }`,
+      }}`,
       mayCreateUser: true
     });
 
@@ -160,19 +160,19 @@ describe('authentication/middleware', function() {
     });
 
     it('issues a working token', async function() {
-      let { token } = await auth.createToken({ id: env.user.id, type: 'users' }, 30);
+      let { token } = await auth.createToken({ id: env.user.data.id, type: 'users' }, 30);
       let response = await request.get('/').set('authorization', `Bearer ${token}`);
-      expect(response.body).has.property('userId', env.user.id);
+      expect(response.body).has.property('userId', env.user.data.id);
     });
 
 
     it('token comes with validity timestamp', async function() {
-      let { validUntil } = await auth.createToken({ id: env.user.id, type: 'users' }, 30);
+      let { validUntil } = await auth.createToken({ id: env.user.data.id, type: 'users' }, 30);
       expect(validUntil).is.a('number');
     });
 
     it('offers full user load within session', async function() {
-      let { token } = await auth.createToken({ id: env.user.id, type: 'users' }, 30);
+      let { token } = await auth.createToken({ id: env.user.data.id, type: 'users' }, 30);
       let response = await request.get('/').set('authorization', `Bearer ${token}`);
       expect(response.body.user).deep.equals(env.user);
     });
@@ -196,26 +196,28 @@ describe('authentication/middleware', function() {
       });
 
       it('finds authenticator', async function() {
-        let response = await request.post(`/auth/echo`).send({ user: {id : env.user.id, type: 'users' }});
+        let response = await request.post(`/auth/echo`).send({ data: {id : env.user.data.id, type: 'users' }});
         expect(response).hasStatus(200);
       });
 
       it('responds with token', async function() {
-        let response = await request.post(`/auth/echo`).send({ user: { id: env.user.id, type: 'users' }});
+        let response = await request.post(`/auth/echo`).send({ data: { id: env.user.data.id, type: 'users' }});
         expect(response).hasStatus(200);
-        expect(response.body.meta.token).is.a('string');
+        expect(response.body.data.meta.token).is.a('string');
       });
 
       it('responds with validity timestamp', async function() {
-        let response = await request.post(`/auth/echo`).send({ user: { id: env.user.id, type: 'users' }});
+        let response = await request.post(`/auth/echo`).send({ data: { id: env.user.data.id, type: 'users' }});
         expect(response).hasStatus(200);
-        expect(response.body.meta.validUntil).is.a('number');
+        expect(response.body.data.meta.validUntil).is.a('number');
       });
 
       it('responds with a copy of the user record', async function() {
-        let response = await request.post(`/auth/echo`).send({ user: { id: env.user.id, type: 'users' }});
+        let response = await request.post(`/auth/echo`).send({ data: { id: env.user.data.id, type: 'users' }});
         expect(response).hasStatus(200);
-        expect(response.body.data).deep.equals(env.user);
+        let responseWithoutMeta = Object.assign({}, response.body);
+        delete responseWithoutMeta.data.meta;
+        expect(responseWithoutMeta).deep.equals(env.user);
       });
 
     });
@@ -224,7 +226,7 @@ describe('authentication/middleware', function() {
 
       it('can run with multiple configs', async function() {
         let response = await request.post(`/auth/config-echo-quint`).send({
-          user: 'ignored'
+          data: 'ignored'
         });
         expect(response).hasStatus(200);
         expect(response.body).has.deep.property('data.id', quint.id);
@@ -238,14 +240,14 @@ describe('authentication/middleware', function() {
 
       it('can approve via id', async function() {
         let response = await request.post(`/auth/echo`).send({
-          user: { id: env.user.id, type: 'users' }
+          data: { id: env.user.data.id, type: 'users' }
         });
         expect(response).hasStatus(200);
-        expect(response.body).has.deep.property('meta.token');
-        expect(response.body).has.deep.property('meta.validUntil');
-        response = await request.get('/').set('authorization', `Bearer ${response.body.meta.token}`);
+        expect(response.body).has.deep.property('data.meta.token');
+        expect(response.body).has.deep.property('data.meta.validUntil');
+        response = await request.get('/').set('authorization', `Bearer ${response.body.data.meta.token}`);
         expect(response).hasStatus(200);
-        expect(response.body).has.property('userId', env.user.id);
+        expect(response.body).has.property('userId', env.user.data.id);
         expect(response.body.user).deep.equals(env.user);
       });
 
@@ -274,22 +276,25 @@ describe('authentication/middleware', function() {
           email: 'quint@example.com'
         });
         expect(response).hasStatus(200);
-        expect(response.body).has.deep.property('meta.token');
+        expect(response.body).has.deep.property('data.meta.token');
         expect(response.body).has.deep.property('data.id', quint.id);
-        response = await request.get('/').set('authorization', `Bearer ${response.body.meta.token}`);
+        response = await request.get('/').set('authorization', `Bearer ${response.body.data.meta.token}`);
         expect(response).hasStatus(200);
         expect(response.body).has.property('userId', quint.id);
-        expect(response.body.user).has.deep.property('attributes.full-name', "Quint Faulkner");
+        expect(response.body.user).has.deep.property('data.attributes.full-name', "Quint Faulkner");
       });
 
       it('can provide preloaded user', async function() {
         let response = await request.post(`/auth/echo`).send({
-          preloadedUser: {
+          data: {
             id: 'x',
             type: 'users',
             attributes: {
               'full-name': 'Mr X'
             }
+          },
+          meta: {
+            preloaded: true
           }
         });
         expect(response).hasStatus(200);
@@ -302,7 +307,7 @@ describe('authentication/middleware', function() {
 
       it('applies userTemplate to rewrite ids', async function() {
         let response = await request.post(`/auth/id-rewriter`).send({
-          user: { upstreamId: arthur.id }
+          upstreamId: arthur.id
         });
         expect(response).hasStatus(200);
         expect(response.body).has.deep.property('data.id', arthur.id);
@@ -312,7 +317,7 @@ describe('authentication/middleware', function() {
 
       it('ignores user update when not configured', async function() {
         let response = await request.post(`/auth/echo`).send({
-          user: {
+          data: {
             id: quint.id,
             type: 'users',
             attributes: {
@@ -321,17 +326,18 @@ describe('authentication/middleware', function() {
           }
         });
         expect(response).hasStatus(200);
-        expect(response.body).has.deep.property('meta.token');
+        expect(response.body).has.deep.property('data.meta.token');
         expect(response.body).has.deep.property('data.attributes.email', 'quint@example.com');
 
         await env.lookup('hub:indexers').update({ realTime: true });
 
-        response = await request.get('/').set('authorization', `Bearer ${response.body.meta.token}`);
+        response = await request.get('/').set('authorization', `Bearer ${response.body.data.meta.token}`);
         expect(response).hasStatus(200);
         expect(response.body.userId).equals(quint.id);
-        expect(response.body.user).has.property('id', quint.id);
-        expect(response.body.user).has.property('type', 'users');
-        expect(response.body.user.attributes).deep.equals({
+        expect(response.body.user).has.property('data');
+        expect(response.body.user.data).has.property('id', quint.id);
+        expect(response.body.user.data).has.property('type', 'users');
+        expect(response.body.user.data.attributes).deep.equals({
           'full-name': 'Quint Faulkner',
           email: 'quint@example.com'
         });
@@ -339,7 +345,7 @@ describe('authentication/middleware', function() {
 
       it('when create not configured, returns 401', async function() {
         let response = await request.post(`/auth/echo`).send({
-          user: {
+          data: {
             id: 'my-prefix-4321',
             type: 'users',
             attributes: {
@@ -353,7 +359,7 @@ describe('authentication/middleware', function() {
 
       it('when plugin returns no type, returns 401', async function() {
         let response = await request.post(`/auth/echo`).send({
-          user: {
+          data: {
             id: 'my-prefix-4321',
             attributes: {
               'full-name': 'Newly Created',
@@ -367,7 +373,7 @@ describe('authentication/middleware', function() {
       it('can choose to expose some configuration', async function() {
         let response = await request.get('/auth/config-echo-quint');
         expect(response.body).deep.equals({
-          user: { id: quint.id, type: 'users' }
+          data: { id: quint.id, type: 'users' }
         });
       });
 
@@ -379,7 +385,7 @@ describe('authentication/middleware', function() {
 
       it(`applies plugin's default template to rewrite ids`, async function() {
         let response = await request.post(`/auth/has-default-template`).send({
-          user: { upstreamId: arthur.id }
+          upstreamId: arthur.id
         });
         expect(response).hasStatus(200);
         expect(response.body).has.deep.property('data.id', arthur.id);
@@ -388,11 +394,14 @@ describe('authentication/middleware', function() {
 
       it('can return a partial session', async function() {
         let response = await request.post(`/auth/echo`).send({
-          partialSession: {
+          data: {
             attributes: {
               state: 'i-am-partial',
               message: "you're not done yet"
             }
+          },
+          meta: {
+            partialSession: true
           }
         });
         expect(response).hasStatus(200);
@@ -416,7 +425,7 @@ describe('authentication/middleware', function() {
 
       it('can update a user', async function() {
         let response = await request.post(`/auth/update-user`).send({
-          user: {
+          data: {
             id: quint.id,
             type: 'users',
             attributes: {
@@ -425,17 +434,18 @@ describe('authentication/middleware', function() {
           }
         });
         expect(response).hasStatus(200);
-        expect(response.body).has.deep.property('meta.token');
+        expect(response.body).has.deep.property('data.meta.token');
         expect(response.body).has.deep.property('data.attributes.email', 'updated.email@this-changed.com');
 
         await env.lookup('hub:indexers').update({ realTime: true });
 
-        response = await request.get('/').set('authorization', `Bearer ${response.body.meta.token}`);
+        response = await request.get('/').set('authorization', `Bearer ${response.body.data.meta.token}`);
         expect(response).hasStatus(200);
         expect(response.body.userId).equals(quint.id);
-        expect(response.body.user).has.property('id', quint.id);
-        expect(response.body.user).has.property('type', 'users');
-        expect(response.body.user.attributes).deep.equals({
+        expect(response.body.user).has.property('data');
+        expect(response.body.user.data).has.property('id', quint.id);
+        expect(response.body.user.data).has.property('type', 'users');
+        expect(response.body.user.data.attributes).deep.equals({
           'full-name': 'Quint Faulkner',
           email: 'updated.email@this-changed.com'
         });
@@ -443,24 +453,23 @@ describe('authentication/middleware', function() {
 
       it('can create a new user', async function() {
         let response = await request.post(`/auth/create-via-template`).send({
-          user: {
-            id: '4321',
-            firstName: 'Newly',
-            lastName: 'Created',
-            email: 'new@example.com'
-          }
+          id: '4321',
+          firstName: 'Newly',
+          lastName: 'Created',
+          email: 'new@example.com'
         });
         expect(response).hasStatus(200);
-        expect(response.body).has.deep.property('meta.token');
+        expect(response.body).has.deep.property('data.meta.token');
 
         await env.lookup('hub:indexers').update({ realTime: true });
 
-        response = await request.get('/').set('authorization', `Bearer ${response.body.meta.token}`);
+        response = await request.get('/').set('authorization', `Bearer ${response.body.data.meta.token}`);
         expect(response).hasStatus(200);
         expect(response.body.userId).equals('my-prefix-4321');
-        expect(response.body.user).has.property('id', 'my-prefix-4321');
-        expect(response.body.user).has.property('type', 'users');
-        expect(response.body.user.attributes).deep.equals({
+        expect(response.body.user).has.property('data');
+        expect(response.body.user.data).has.property('id', 'my-prefix-4321');
+        expect(response.body.user.data).has.property('type', 'users');
+        expect(response.body.user.data.attributes).deep.equals({
           email: 'new@example.com',
           'full-name': 'Newly Created'
         });
@@ -468,23 +477,22 @@ describe('authentication/middleware', function() {
 
       it('can create a new user with automatic id', async function() {
         let response = await request.post(`/auth/create-via-template-no-id`).send({
-          user: {
-            firstName: 'Newly',
-            lastName: 'Created',
-            email: 'new@example.com'
-          }
+          firstName: 'Newly',
+          lastName: 'Created',
+          email: 'new@example.com'
         });
         expect(response).hasStatus(200);
-        expect(response.body).has.deep.property('meta.token');
+        expect(response.body).has.deep.property('data.meta.token');
         let autoId = response.body.data.id;
 
         await env.lookup('hub:indexers').update({ realTime: true });
 
-        response = await request.get('/').set('authorization', `Bearer ${response.body.meta.token}`);
+        response = await request.get('/').set('authorization', `Bearer ${response.body.data.meta.token}`);
         expect(response).hasStatus(200);
-        expect(response.body.user).has.property('id', autoId);
-        expect(response.body.user).has.property('type', 'users');
-        expect(response.body.user.attributes).deep.equals({
+        expect(response.body).has.property('user');
+        expect(response.body.user.data).has.property('id', autoId);
+        expect(response.body.user.data).has.property('type', 'users');
+        expect(response.body.user.data.attributes).deep.equals({
           email: 'new@example.com',
           'full-name': 'Newly Created'
         });

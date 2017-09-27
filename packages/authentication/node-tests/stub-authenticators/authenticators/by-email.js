@@ -10,7 +10,10 @@ module.exports = class {
     let { models } = await userSearcher.search({ filter: { email: { exact: email } } });
     if (models.length > 0) {
       return {
-        preloadedUser: models[0]
+        data: models[0],
+        meta: {
+          preloaded: true
+        }
       };
     }
   }

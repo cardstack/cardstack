@@ -155,7 +155,7 @@ describe('elasticsearch/searcher', function() {
   });
 
   it('returns properly formatted records', async function() {
-    let model = await searcher.get('master', 'people', '1');
+    let model = (await searcher.get('master', 'people', '1')).data;
     let meta = model.meta;
     expect(Object.keys(meta).sort()).deep.equals(['version']);
     delete model.meta;
@@ -545,7 +545,7 @@ describe('elasticsearch/searcher', function() {
 
   it('can get an individual record', async function() {
     let model = await searcher.get('master', 'articles', '1');
-    expect(model).has.deep.property('attributes.hello', 'magic words');
+    expect(model).has.deep.property('data.attributes.hello', 'magic words');
   });
 
   it('can do analyzed term matching', async function() {

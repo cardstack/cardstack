@@ -58,7 +58,9 @@ describe('postgresql/indexer', function() {
   });
 
   it('discovers content types', async function() {
-    let model = await env.lookup('hub:searchers').get('master', 'content-types', 'articles');
+    let doc = await env.lookup('hub:searchers').get('master', 'content-types', 'articles');
+    expect(doc).is.ok;
+    let model = doc.data;
     expect(model).is.ok;
     expect(model).has.deep.property('relationships.fields.data');
     expect(model.relationships.fields.data).collectionContains({ id: 'title' });
@@ -67,7 +69,9 @@ describe('postgresql/indexer', function() {
   });
 
   it('discovers initial records', async function() {
-    let model = await env.lookup('hub:searchers').get('master', 'articles', '0');
+    let doc = await env.lookup('hub:searchers').get('master', 'articles', '0');
+    expect(doc).is.ok;
+    let model = doc.data;
     expect(model).is.ok;
     expect(model).has.deep.property('attributes.title', 'hello world');
   });
@@ -75,7 +79,9 @@ describe('postgresql/indexer', function() {
   it('discovers new records', async function() {
     await client.query('insert into articles values ($1, $2)', ['1', 'second article']);
     await env.lookup('hub:indexers').update({ realTime: true });
-    let model = await env.lookup('hub:searchers').get('master', 'articles', '1');
+    let doc = await env.lookup('hub:searchers').get('master', 'articles', '1');
+    expect(doc).is.ok;
+    let model = doc.data;
     expect(model).is.ok;
     expect(model).has.deep.property('attributes.title', 'second article');
   });
@@ -84,7 +90,9 @@ describe('postgresql/indexer', function() {
   it('updates records', async function() {
     await client.query('update articles set title=$1 where id=$2', ['I was updated', '0']);
     await env.lookup('hub:indexers').update({ realTime: true });
-    let model = await env.lookup('hub:searchers').get('master', 'articles', '0');
+    let doc = await env.lookup('hub:searchers').get('master', 'articles', '0');
+    expect(doc).is.ok;
+    let model = doc.data;
     expect(model).is.ok;
     expect(model).has.deep.property('attributes.title', 'I was updated');
   });
@@ -103,7 +111,9 @@ describe('postgresql/indexer', function() {
   it('discovers newly added content type', async function() {
     await client.query('create table humans (id varchar primary key, name varchar)');
     await env.lookup('hub:indexers').update({ realTime: true });
-    let model = await env.lookup('hub:searchers').get('master', 'content-types', 'humans');
+    let doc = await env.lookup('hub:searchers').get('master', 'content-types', 'humans');
+    expect(doc).is.ok;
+    let model = doc.data;
     expect(model).is.ok;
     expect(model).has.deep.property('relationships.fields.data');
     expect(model.relationships.fields.data).collectionContains({ id: 'name' });
@@ -124,36 +134,46 @@ describe('postgresql/indexer', function() {
     await client.query('alter table articles add column author varchar');
     await client.query('update articles set author=$1 where id=$2', ['Arthur', '0']);
     await env.lookup('hub:indexers').update({ realTime: true });
-    let model = await env.lookup('hub:searchers').get('master', 'content-types', 'articles');
+    let doc = await env.lookup('hub:searchers').get('master', 'content-types', 'articles');
+    expect(doc).is.ok;
+    let model = doc.data;
     expect(model).has.deep.property('relationships.fields.data');
     expect(model.relationships.fields.data).collectionContains({ id: 'author' });
-    model = await env.lookup('hub:searchers').get('master', 'articles', '0');
-    expect(model).has.deep.property('attributes.author', 'Arthur');
+    doc = await env.lookup('hub:searchers').get('master', 'articles', '0');
+    expect(doc).has.deep.property('data.attributes.author', 'Arthur');
   });
 
   it('can read an integer column', async function() {
-    let model = await env.lookup('hub:searchers').get('master', 'articles', '0');
+    let doc = await env.lookup('hub:searchers').get('master', 'articles', '0');
+    expect(doc).is.ok;
+    let model = doc.data;
     expect(model).has.deep.property('attributes.length', 100);
   });
 
   it('can read a boolean column', async function() {
     await client.query('insert into articles (id, published) values ($1, $2)', ['1', false]);
     await env.lookup('hub:indexers').update({ realTime: true });
-    let model = await env.lookup('hub:searchers').get('master', 'articles', '1');
+    let doc = await env.lookup('hub:searchers').get('master', 'articles', '1');
+    expect(doc).is.ok;
+    let model = doc.data;
     expect(model).has.deep.property('attributes.published', false);
   });
 
   it('can read null string', async function() {
     await client.query('insert into articles (id) values ($1)', ['1']);
     await env.lookup('hub:indexers').update({ realTime: true });
-    let model = await env.lookup('hub:searchers').get('master', 'articles', '1');
+    let doc = await env.lookup('hub:searchers').get('master', 'articles', '1');
+    expect(doc).is.ok;
+    let model = doc.data;
     expect(model).has.deep.property('attributes.title', null);
   });
 
   it('can read null integer', async function() {
     await client.query('insert into articles (id) values ($1)', ['1']);
     await env.lookup('hub:indexers').update({ realTime: true });
-    let model = await env.lookup('hub:searchers').get('master', 'articles', '1');
+    let doc = await env.lookup('hub:searchers').get('master', 'articles', '1');
+    expect(doc).is.ok;
+    let model = doc.data;
     expect(model).has.deep.property('attributes.length', null);
   });
 

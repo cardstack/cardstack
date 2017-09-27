@@ -100,27 +100,31 @@ class Authentication {
   async _locateAuthenticationSource(name) {
     let source = await this.searcher.get(this.controllingBranch, 'authentication-sources', name);
     let schema = await this.schemaCache.schemaForControllingBranch();
-    let plugin = schema.plugins.lookupFeature('authenticators', source.attributes['authenticator-type']);
+    let plugin = schema.plugins.lookupFeature('authenticators', source.data.attributes['authenticator-type']);
     return { plugin, source };
   }
 
   async _invokeAuthenticationSource(ctxt, sourceAndPlugin) {
     let { source, plugin } = sourceAndPlugin;
-    let params = source.attributes.params;
+    let params = source.data.attributes.params;
     let result = await plugin.authenticate(ctxt.request.body, params, this.userSearcher);
 
-    if (result && result.partialSession) {
-      if (result.partialSession.type == null) {
-        result.partialSession.type = 'partial-sessions';
+    if (result && result.meta && result.meta.partialSession) {
+      if (result.data.type == null) {
+        result.data.type = 'partial-sessions';
       }
-      ctxt.body = {
-        data: result.partialSession
-      };
+
+      // top-level meta is not passed through (it was for
+      // communicating from plugin to us). Plugins could use
+      // resource-level metadata instead if they want to.
+      delete result.meta;
+
+      ctxt.body = result;
       ctxt.status = 200;
       return;
     }
 
-    if (!result || !(result.preloadedUser || result.user)) {
+    if (!result) {
       ctxt.status = 401;
       ctxt.body = {
         errors: [{
@@ -131,9 +135,15 @@ class Authentication {
       return;
     }
 
-    let user = result.preloadedUser || await this._processExternalUser(result.user, source, plugin);
+    let user;
+    if (result.meta && result.meta.preloaded) {
+      delete result.meta;
+      user = result;
+    } else {
+      user = await this._processExternalUser(result, source, plugin);
+    }
 
-    if (!user) {
+    if (!user || !user.data) {
       ctxt.status = 401;
       ctxt.body = {
         errors: [{
@@ -145,34 +155,38 @@ class Authentication {
       return;
     }
 
-    ctxt.body = {
-      data: user,
-      meta: await this.createToken({ id: user.id, type: user.type }, 86400)
-    };
+    let tokenMeta = await this.createToken({ id: user.data.id, type: user.data.type }, 86400);
+    if (!user.data.meta) {
+      user.data.meta = tokenMeta;
+    } else {
+      Object.assign(user.data.meta, tokenMeta);
+    }
+    ctxt.body = user;
     ctxt.status = 200;
   }
 
   async _processExternalUser(externalUser, source, plugin) {
-    let user = this._rewriteExternalUser(externalUser, source.attributes['user-template'] || plugin.defaultUserTemplate);
-    if (user.type == null) { return; }
+    let user = this._rewriteExternalUser(externalUser, source.data.attributes['user-template'] || plugin.defaultUserTemplate);
+    if (!user.data || !user.data.type) { return; }
 
     let have;
 
-    if (user.id != null) {
+    if (user.data.id != null) {
       try {
-        have = await this.userSearcher.get(user.type, user.id);
+        have = await this.userSearcher.get(user.data.type, user.data.id);
       } catch (err) {
         if (err.status !== 404) {
           throw err;
         }
       }
     }
-    if (!have && source.attributes['may-create-user']) {
-      return this.writer.create(this.controllingBranch, Session.INTERNAL_PRIVLEGED, user.type, user);
+
+    if (!have && source.data.attributes['may-create-user']) {
+      return { data: await this.writer.create(this.controllingBranch, Session.INTERNAL_PRIVLEGED, user.data.type, user.data) };
     }
-    if (have && source.attributes['may-update-user']) {
-      user.meta = have.meta;
-      return this.writer.update(this.controllingBranch, Session.INTERNAL_PRIVLEGED, user.type, have.id, user);
+    if (have && source.data.attributes['may-update-user']) {
+      user.data.meta = have.data.meta;
+      return { data: await this.writer.update(this.controllingBranch, Session.INTERNAL_PRIVLEGED, user.data.type, have.data.id, user.data) };
     }
     return have;
   }
@@ -228,7 +242,7 @@ class Authentication {
         let { source, plugin } = sourceAndPlugin;
         let result;
         if (plugin.exposeConfig) {
-          result = await plugin.exposeConfig(source.attributes.params);
+          result = await plugin.exposeConfig(source.data.attributes.params);
         } else {
           result = {};
         }

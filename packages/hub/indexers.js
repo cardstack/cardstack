@@ -241,7 +241,7 @@ class Operations {
   }
   async save(type, id, doc){
     let { bulkOps, branch, log, schema, client, sourceId, nonce } = opsPrivate.get(this);
-    let searchDoc = await client.jsonapiToSearchDoc(id, doc, schema, branch, sourceId);
+    let searchDoc = await client.jsonapiToSearchDoc(type, id, doc, schema, branch, sourceId);
     if (nonce) {
       searchDoc.cardstack_generation = nonce;
     }
