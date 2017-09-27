@@ -421,7 +421,7 @@ class BranchUpdate {
       }
     }
     if (jsonapiDoc.relationships) {
-      pristine.data.relationships = jsonapiDoc.relationships;
+      let relationships = pristine.data.relationships = Object.assign({}, jsonapiDoc.relationships);
 
       if (!searchTree) {
         // we are the root document, so our own configured default
@@ -444,14 +444,14 @@ class BranchUpdate {
                 }
               }));
               related = related.filter(Boolean);
-              pristine.data.relationships[attribute].data = related.map(r => ({ type: r.type, id: r.id }));
+              relationships[attribute] = Object.assign({}, relationships[attribute], { data: related.map(r => ({ type: r.type, id: r.id })) });
             } else {
               ourReferences.push(`${value.data.type}/${value.data.id}`);
               let resource = await this.read(value.data.type, value.data.id);
               if (resource) {
                 related = await this._prepareSearchDoc(resource.type, resource.id, resource, searchTree[attribute], ourIncludes, ourReferences);
               } else {
-                pristine.data.relationships[attribute].data = null;
+                relationships[attribute] = Object.assign({}, relationships[attribute], { data: null });
               }
 
             }
