@@ -142,6 +142,7 @@ class Schema {
         this._mapping[contentType.id].properties.cardstack_source = { type: 'keyword' };
         this._mapping[contentType.id].properties.cardstack_generation = { type: 'keyword' };
         this._mapping[contentType.id].properties.cardstack_pristine = { type: 'object', enabled: false };
+        this._mapping[contentType.id].properties.cardstack_references = { type: 'keyword' };
       }
     }
     return this._mapping;

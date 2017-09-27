@@ -128,6 +128,41 @@ describe('elasticsearch/indexer', function() {
     expect(found.included[0].attributes.name).to.equal('Edward V');
   });
 
+  it('reindexes included resources when both docs are already changing', async function() {
+    let person = await writer.create('master', env.session, 'people', {
+      type: 'people',
+      attributes: {
+        name: 'Quint'
+      }
+    });
+    expect(person).has.deep.property('id');
+    let article = await writer.create('master', env.session, 'articles', {
+      type: 'articles',
+      attributes: {
+        title: 'Hello World'
+      },
+      relationships: {
+        author: { data: { type: 'people', id: person.id } }
+      }
+    });
+    expect(article).has.deep.property('id');
+    await indexer.update({ realTime: true });
+
+    person.attributes.name = 'Edward V';
+    article.attributes.title = 'A Better Title';
+    await writer.update('master', env.session, 'people', person.id, person);
+    await writer.update('master', env.session, 'articles', article.id, article);
+    await indexer.update({ realTime: true });
+
+    let found = await searcher.get('master', 'articles', article.id);
+    expect(found).is.ok;
+    expect(found).has.deep.property('data.attributes.title', 'A Better Title');
+    expect(found).has.deep.property('data.relationships.author.data.id', person.id);
+    expect(found).has.property('included');
+    expect(found.included).length(1);
+    expect(found.included[0].attributes.name).to.equal('Edward V');
+  });
+
   it('ignores a broken belongs-to', async function() {
     let article = await writer.create('master', env.session, 'articles', {
       type: 'articles',

@@ -29,7 +29,8 @@ const owningDataSource = new WeakMap();
 require('./diff-log-formatter');
 
 module.exports = declareInjections({
-  schemaCache: 'hub:schema-cache'
+  schemaCache: 'hub:schema-cache',
+  searchers: 'hub:searchers'
 },
 
 class Indexers {
@@ -133,7 +134,7 @@ class Indexers {
   }
 
   async _updateBranch(branch, updaters, realTime, hints) {
-    let branchUpdater = new BranchUpdate(branch, updaters, realTime, hints, !this._seenBranches.has(branch), this.log, this.client, this.schemaCache);
+    let branchUpdater = new BranchUpdate(branch, updaters, realTime, hints, !this._seenBranches.has(branch), this.log, this.client, this.schemaCache, this.searchers);
     let token = this.schemaCache.prepareBranchUpdate(branch);
     let schema = await branchUpdater.run();
     this._seenBranches.set(branch, true);
@@ -211,7 +212,7 @@ class Operations {
 }
 
 class BranchUpdate {
-  constructor(branch, updaters, realTime, hints, shouldIndexSeeds, log, client, schemaCache) {
+  constructor(branch, updaters, realTime, hints, shouldIndexSeeds, log, client, schemaCache, searchers) {
     this.branch = branch;
     this.updaters = updaters;
     this.hints = hints;
@@ -221,6 +222,8 @@ class BranchUpdate {
     this.log = log;
     this.client = client;
     this.schemaCache = schemaCache;
+    this.searchers = searchers;
+    this._touched = Object.create(null);
   }
 
   async run() {
@@ -250,6 +253,7 @@ class BranchUpdate {
       let newMeta = await updater.updateContent(meta, this.hints, publicOps);
       await this._saveMeta(updater, newMeta);
     }
+    await this._invalidations();
     await this.bulkOps.finalize();
   }
 
@@ -272,6 +276,32 @@ class BranchUpdate {
     }, newMeta);
   }
 
+  // This method does not need to recursively invalidate, because each
+  // document stores a complete, rolled-up picture of which other
+  // documents it references.
+  async _invalidations() {
+    let filter = {
+      cardstack_references: Object.keys(this._touched)
+    };
+    let result = await this.searchers.search(this.branch, { filter, page: { size: 100 } });
+    let pendingOps = [];
+    for (let { type, id } of result.data) {
+      let key = `${type}/${id}`;
+      if (!this._touched[key]) {
+        this._touched[key] = true;
+        pendingOps.push((async ()=> {
+          let resource = await this.read(type, id);
+          if (resource) {
+            let sourceId = this.schema.types.get(type).dataSource.id;
+            let nonce = 0;
+            await this.add(type, id, resource, sourceId, nonce);
+          }
+        })());
+      }
+    }
+    await Promise.all(pendingOps);
+  }
+
   async read(type, id) {
     let contentType = this.schema.types.get(type);
     if (!contentType) { return; }
@@ -286,6 +316,7 @@ class BranchUpdate {
   }
 
   async add(type, id, doc, sourceId, nonce) {
+    this._touched[`${type}/${id}`] = true;
     let searchDoc = await this._prepareSearchDoc(type, id, doc);
     searchDoc.cardstack_source = sourceId;
     if (nonce) {
@@ -302,6 +333,7 @@ class BranchUpdate {
   }
 
   async delete(type, id) {
+    this._touched[`${type}/${id}`] = true;
     await this.bulkOps.add({
       delete: {
         _index: Client.branchToIndexName(this.branch),
@@ -333,7 +365,7 @@ class BranchUpdate {
   }
 
 
-  async _prepareSearchDoc(type, id, jsonapiDoc, searchTree, parentsIncludes) {
+  async _prepareSearchDoc(type, id, jsonapiDoc, searchTree, parentsIncludes, parentsReferences) {
     // we store the id as a regular field in elasticsearch here, because
     // we use elasticsearch's own built-in _id for our own composite key
     // that takes into account branches.
@@ -356,6 +388,18 @@ class BranchUpdate {
     if (parentsIncludes) {
       let esType = await this.client.logicalFieldToES(this.branch, 'type');
       searchDoc[esType] = type;
+    }
+
+    // ourIncludes will track related resources that we successfully
+    // included. ourReferences also includes broken references. We
+    // track the references for our invalidation system.
+    let ourIncludes, ourReferences;
+    if (parentsIncludes) {
+      ourIncludes = parentsIncludes;
+      ourReferences = parentsReferences;
+    } else {
+      ourIncludes = [];
+      ourReferences = [];
     }
 
     if (jsonapiDoc.attributes) {
@@ -385,13 +429,6 @@ class BranchUpdate {
         searchTree = this.schema.types.get(type).includesTree;
       }
 
-      let ourIncludes;
-      if (parentsIncludes) {
-        ourIncludes = parentsIncludes;
-      } else {
-        ourIncludes = [];
-      }
-
       for (let attribute of Object.keys(jsonapiDoc.relationships)) {
         let value = jsonapiDoc.relationships[attribute];
         let field = this.schema.fields.get(attribute);
@@ -400,6 +437,7 @@ class BranchUpdate {
           if (value.data && searchTree[attribute]) {
             if (Array.isArray(value.data)) {
               related = await Promise.all(value.data.map(async ({ type, id }) => {
+                ourReferences.push(`${type}/${id}`);
                 let resource = await this.read(type, id);
                 if (resource) {
                   return this._prepareSearchDoc(type, id, resource, searchTree[attribute], ourIncludes);
@@ -408,6 +446,7 @@ class BranchUpdate {
               related = related.filter(Boolean);
               pristine.data.relationships[attribute].data = related.map(r => ({ type: r.type, id: r.id }));
             } else {
+              ourReferences.push(`${value.data.type}/${value.data.id}`);
               let resource = await this.read(value.data.type, value.data.id);
               if (resource) {
                 related = await this._prepareSearchDoc(resource.type, resource.id, resource, searchTree[attribute], ourIncludes);
@@ -440,6 +479,7 @@ class BranchUpdate {
       parentsIncludes.push(pristine.data);
     } else {
       searchDoc.cardstack_pristine = pristine;
+      searchDoc.cardstack_references = ourReferences;
     }
     return searchDoc;
   }

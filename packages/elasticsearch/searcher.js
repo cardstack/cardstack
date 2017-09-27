@@ -217,12 +217,12 @@ class Searcher {
   async _fieldFilter(branch, schema, aboveSegments, key, value) {
     let field;
 
-    if (key === 'cardstack_source') {
+    if (['cardstack_source', 'cardstack_references'].includes(key)) {
       // this is an internal field (meaning it's not visible in the
       // jsonapi records themselves) that we make available for
       // filtering. The schema-cache uses this to avoid shadowing seed
       // models, for example.
-      field = { queryFieldName: 'cardstack_source', sortFieldName: 'cardstack_source' };
+      field = { queryFieldName: key, sortFieldName: key };
     } else {
       field = schema.fields.get(key);
     }
