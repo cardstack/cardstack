@@ -1,4 +1,4 @@
-const logger = require('heimdalljs-logger')('email');
+const logger = require('@cardstack/plugin-utils/logger')('email');
 const nodemailer = require('nodemailer');
 
 module.exports = class EmailMessenger {

@@ -238,6 +238,10 @@ module.exports = class Field {
     }
   }
 
+  default() {
+    return this.plugin.default || null;
+  }
+
   derivedFields(value) {
     if (this.plugin.derivedFields) {
       return this.plugin.derivedFields(this.id, value);
