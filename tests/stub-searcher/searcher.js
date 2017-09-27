@@ -24,7 +24,10 @@ module.exports = class StubSearcher {
   async search(branch, query, next) {
     if (this.params.injectFirst) {
       return {
-        models: [ makeModel('examples', '2', this.params.injectFirst) ]
+        data: [ makeModel('examples', '2', this.params.injectFirst) ],
+        meta: {
+          page: {}
+        }
       };
     }
     return next();

@@ -146,7 +146,7 @@ describe('elasticsearch/searcher', function() {
   });
 
   it('can be searched for all content', async function() {
-    let { models } = await searcher.search('master', {
+    let { data: models } = await searcher.search('master', {
       page: { size: 1000 }
     });
     expect(models.filter(m => m.type === 'comments')).to.have.length(20);
@@ -183,7 +183,7 @@ describe('elasticsearch/searcher', function() {
   });
 
   it('can be searched via queryString', async function() {
-    let { models } = await searcher.search('master', {
+    let { data: models } = await searcher.search('master', {
       queryString: 'magic'
     });
     expect(models).to.have.length(1);
@@ -191,14 +191,14 @@ describe('elasticsearch/searcher', function() {
   });
 
   it('can be searched via queryString, negative result', async function() {
-    let { models } = await searcher.search('master', {
+    let { data: models } = await searcher.search('master', {
       queryString: 'thisisanunusedterm'
     });
     expect(models).to.have.length(0);
   });
 
   it('can filter by type', async function() {
-    let { models } = await searcher.search('master', {
+    let { data: models } = await searcher.search('master', {
       filter: {
         type: 'articles'
       }
@@ -208,7 +208,7 @@ describe('elasticsearch/searcher', function() {
   });
 
   it('can sort by type', async function() {
-    let { models } = await searcher.search('master', {
+    let { data: models } = await searcher.search('master', {
       filter: {
         type: ['articles', 'people']
       },
@@ -219,7 +219,7 @@ describe('elasticsearch/searcher', function() {
   });
 
   it('can sort by type in reverse', async function() {
-    let { models } = await searcher.search('master', {
+    let { data: models } = await searcher.search('master', {
       filter: {
         type: ['articles', 'people']
       },
@@ -231,7 +231,7 @@ describe('elasticsearch/searcher', function() {
 
 
   it('can filter by id', async function() {
-    let { models } = await searcher.search('master', {
+    let { data: models } = await searcher.search('master', {
       filter: {
         id: '1',
         type: ['articles', 'people']
@@ -243,7 +243,7 @@ describe('elasticsearch/searcher', function() {
   });
 
   it('can sort by id', async function() {
-    let { models } = await searcher.search('master', {
+    let { data: models } = await searcher.search('master', {
       filter: {
         type: ['articles', 'people']
       },
@@ -253,7 +253,7 @@ describe('elasticsearch/searcher', function() {
   });
 
   it('can sort by id in reverse', async function() {
-    let { models } = await searcher.search('master', {
+    let { data: models } = await searcher.search('master', {
       filter: {
         type: ['articles', 'people']
       },
@@ -264,7 +264,7 @@ describe('elasticsearch/searcher', function() {
 
 
   it('can filter a field by one term', async function() {
-    let { models } = await searcher.search('master', {
+    let { data: models } = await searcher.search('master', {
       filter: {
         'first-name': 'Quint'
       }
@@ -274,7 +274,7 @@ describe('elasticsearch/searcher', function() {
   });
 
   it('can filter a field by multiple terms', async function() {
-    let { models } = await searcher.search('master', {
+    let { data: models } = await searcher.search('master', {
       filter: {
         'first-name': ['Quint', 'Arthur']
       }
@@ -283,7 +283,7 @@ describe('elasticsearch/searcher', function() {
   });
 
   it('can use OR expressions in filters', async function() {
-    let { models } = await searcher.search('master', {
+    let { data: models } = await searcher.search('master', {
       filter: {
         or: [
           { 'first-name': ['Quint'], type: 'people' },
@@ -297,7 +297,7 @@ describe('elasticsearch/searcher', function() {
   });
 
   it('can use AND expressions in filters', async function() {
-    let { models } = await searcher.search('master', {
+    let { data: models } = await searcher.search('master', {
       filter: {
         and: [
           { 'favorite-color': 'red' },
@@ -311,7 +311,7 @@ describe('elasticsearch/searcher', function() {
 
 
   it('can filter by range', async function() {
-    let { models } = await searcher.search('master', {
+    let { data: models } = await searcher.search('master', {
       filter: {
         age: {
           range: {
@@ -325,7 +325,7 @@ describe('elasticsearch/searcher', function() {
   });
 
   it('can filter by field existence (string)', async function() {
-    let { models } = await searcher.search('master', {
+    let { data: models } = await searcher.search('master', {
       filter: {
         'favorite-color': {
           exists: 'true'
@@ -338,7 +338,7 @@ describe('elasticsearch/searcher', function() {
   });
 
   it('can filter by field nonexistence (string)', async function() {
-    let { models } = await searcher.search('master', {
+    let { data: models } = await searcher.search('master', {
       filter: {
         'favorite-color': {
           exists: 'false'
@@ -351,7 +351,7 @@ describe('elasticsearch/searcher', function() {
   });
 
   it('can filter by field existence (bool)', async function() {
-    let { models } = await searcher.search('master', {
+    let { data: models } = await searcher.search('master', {
       filter: {
         'favorite-color': {
           exists: true
@@ -364,7 +364,7 @@ describe('elasticsearch/searcher', function() {
   });
 
   it('can filter by field nonexistence (bool)', async function() {
-    let { models } = await searcher.search('master', {
+    let { data: models } = await searcher.search('master', {
       filter: {
         'favorite-color': {
           exists: false
@@ -377,7 +377,7 @@ describe('elasticsearch/searcher', function() {
   });
 
   it('can search within a field with custom indexing behavior', async function() {
-    let { models } = await searcher.search('master', {
+    let { data: models } = await searcher.search('master', {
       filter: {
         description: 'fox'
       }
@@ -408,7 +408,7 @@ describe('elasticsearch/searcher', function() {
   });
 
   it('can sort', async function() {
-    let { models } = await searcher.search('master', {
+    let { data: models } = await searcher.search('master', {
       filter: {
         type: 'people'
       },
@@ -419,7 +419,7 @@ describe('elasticsearch/searcher', function() {
 
 
   it('can sort reverse', async function() {
-    let { models } = await searcher.search('master', {
+    let { data: models } = await searcher.search('master', {
       filter: {
         type: 'people'
       },
@@ -432,7 +432,7 @@ describe('elasticsearch/searcher', function() {
     // string fields are only sortable because of the sortFieldName
     // in @cardstack/core-field-types/string. So this is a test that
     // we're using that capability.
-    let { models } = await searcher.search('master', {
+    let { data: models } = await searcher.search('master', {
       filter: {
         type: 'people'
       },
@@ -446,7 +446,7 @@ describe('elasticsearch/searcher', function() {
     // string fields are only sortable because of the sortFieldName
     // in @cardstack/core-field-types/string. So this is a test that
     // we're using that capability.
-    let { models } = await searcher.search('master', {
+    let { data: models } = await searcher.search('master', {
       filter: {
         type: 'people'
       },
@@ -477,39 +477,39 @@ describe('elasticsearch/searcher', function() {
         size: 7
       }
     });
-    expect(response.models).length(7);
-    expect(response.page).has.property('total', 20);
-    expect(response.page).has.property('cursor');
+    expect(response.data).length(7);
+    expect(response.meta.page).has.property('total', 20);
+    expect(response.meta.page).has.property('cursor');
 
-    let allModels = response.models;
-
-    response = await searcher.search('master', {
-      filter: { type: 'comments' },
-      page: {
-        size: 7,
-        cursor: response.page.cursor
-      }
-    });
-
-    expect(response.models).length(7);
-    expect(response.page).has.property('total', 20);
-    expect(response.page).has.property('cursor');
-
-    allModels = allModels.concat(response.models);
+    let allModels = response.data;
 
     response = await searcher.search('master', {
       filter: { type: 'comments' },
       page: {
         size: 7,
-        cursor: response.page.cursor
+        cursor: response.meta.page.cursor
       }
     });
 
-    expect(response.models).length(6);
-    expect(response.page).has.property('total', 20);
-    expect(response.page).not.has.property('cursor');
+    expect(response.data).length(7);
+    expect(response.meta.page).has.property('total', 20);
+    expect(response.meta.page).has.property('cursor');
 
-    allModels = allModels.concat(response.models);
+    allModels = allModels.concat(response.data);
+
+    response = await searcher.search('master', {
+      filter: { type: 'comments' },
+      page: {
+        size: 7,
+        cursor: response.meta.page.cursor
+      }
+    });
+
+    expect(response.data).length(6);
+    expect(response.meta.page).has.property('total', 20);
+    expect(response.meta.page).not.has.property('cursor');
+
+    allModels = allModels.concat(response.data);
 
     expect(uniq(allModels.map(m => m.id))).length(20);
   });
@@ -521,25 +521,25 @@ describe('elasticsearch/searcher', function() {
         size: 10
       }
     });
-    expect(response.models).length(10);
-    expect(response.page).has.property('total', 20);
-    expect(response.page).has.property('cursor');
+    expect(response.data).length(10);
+    expect(response.meta.page).has.property('total', 20);
+    expect(response.meta.page).has.property('cursor');
 
-    let allModels = response.models;
+    let allModels = response.data;
 
     response = await searcher.search('master', {
       filter: { type: 'comments' },
       page: {
         size: 10,
-        cursor: response.page.cursor
+        cursor: response.meta.page.cursor
       }
     });
 
-    expect(response.models).length(10);
-    expect(response.page).has.property('total', 20);
-    expect(response.page).not.has.property('cursor');
+    expect(response.data).length(10);
+    expect(response.meta.page).has.property('total', 20);
+    expect(response.meta.page).not.has.property('cursor');
 
-    allModels = allModels.concat(response.models);
+    allModels = allModels.concat(response.data);
     expect(uniq(allModels.map(m => m.id))).length(20);
   });
 
@@ -554,8 +554,8 @@ describe('elasticsearch/searcher', function() {
         hello: 'magic'
       }
     });
-    expect(response.models).length(1);
-    expect(response.models[0]).has.deep.property('attributes.hello', 'magic words');
+    expect(response.data).length(1);
+    expect(response.data[0]).has.deep.property('attributes.hello', 'magic words');
   });
 
   it('matches reordered phrase when using analyzed field', async function() {
@@ -564,7 +564,7 @@ describe('elasticsearch/searcher', function() {
         hello: 'words magic'
       }
     });
-    expect(response.models).length(1);
+    expect(response.data).length(1);
   });
 
   it('does not match reordered phrase when using exact field', async function() {
@@ -573,7 +573,7 @@ describe('elasticsearch/searcher', function() {
         hello: { exact: 'words magic' }
       }
     });
-    expect(response.models).length(0);
+    expect(response.data).length(0);
   });
 
 
@@ -583,8 +583,8 @@ describe('elasticsearch/searcher', function() {
         hello: { exact: 'magic words' }
       }
     });
-    expect(response.models).length(1);
-    expect(response.models[0]).has.deep.property('attributes.hello', 'magic words');
+    expect(response.data).length(1);
+    expect(response.data[0]).has.deep.property('attributes.hello', 'magic words');
   });
 
   it('incomplete phrase does not match', async function() {
@@ -593,7 +593,7 @@ describe('elasticsearch/searcher', function() {
         hello: { exact: 'magic words extra' }
       }
     });
-    expect(response.models).length(0);
+    expect(response.data).length(0);
   });
 
 
@@ -603,8 +603,8 @@ describe('elasticsearch/searcher', function() {
         hello: { exact: ['something else', 'magic words'] }
       }
     });
-    expect(response.models).length(1);
-    expect(response.models[0]).has.deep.property('attributes.hello', 'magic words');
+    expect(response.data).length(1);
+    expect(response.data[0]).has.deep.property('attributes.hello', 'magic words');
   });
 
   it('can filter non-searchable belongsTo by id', async function() {
@@ -613,7 +613,7 @@ describe('elasticsearch/searcher', function() {
         'article.id': { exact: '1' }
       }
     });
-    expect(response.models).length(4);
+    expect(response.data).length(4);
   });
 
   it('can filter searchable belongsTo by id', async function() {
@@ -622,7 +622,7 @@ describe('elasticsearch/searcher', function() {
         'searchable-article.id': { exact: '1' }
       }
     });
-    expect(response.models).length(4);
+    expect(response.data).length(4);
   });
 
   it('can filter non-searchable belongsTo by multiple ids', async function() {
@@ -631,7 +631,7 @@ describe('elasticsearch/searcher', function() {
         'article.id': { exact: ['1', '2'] }
       }
     });
-    expect(response.models).length(6);
+    expect(response.data).length(6);
   });
 
   it('can filter searchable belongsTo by multiple ids', async function() {
@@ -640,7 +640,7 @@ describe('elasticsearch/searcher', function() {
         'searchable-article.id': { exact: ['1', '2'] }
       }
     });
-    expect(response.models).length(6);
+    expect(response.data).length(6);
   });
 
   it('can filter non-searchable hasMany by id', async function() {
@@ -649,7 +649,7 @@ describe('elasticsearch/searcher', function() {
         'members.id': { exact: '1' }
       }
     });
-    expect(response.models).length(1);
+    expect(response.data).length(1);
   });
 
   it('can filter searchable hasMany by id', async function() {
@@ -658,7 +658,7 @@ describe('elasticsearch/searcher', function() {
         'searchable-members.id': { exact: '1' }
       }
     });
-    expect(response.models).length(1);
+    expect(response.data).length(1);
   });
 
   it('can filter non-searchable hasMany by multiple id', async function() {
@@ -667,7 +667,7 @@ describe('elasticsearch/searcher', function() {
         'members.id': { exact: ['1', 'bogus'] }
       }
     });
-    expect(response.models).length(1);
+    expect(response.data).length(1);
   });
 
   it('can filter searchable hasMany by multiple id', async function() {
@@ -676,7 +676,7 @@ describe('elasticsearch/searcher', function() {
         'searchable-members.id': { exact: ['1', 'bogus'] }
       }
     });
-    expect(response.models).length(1);
+    expect(response.data).length(1);
   });
 
   it('belongs-to attributes are not indexed by default', async function() {
@@ -685,7 +685,7 @@ describe('elasticsearch/searcher', function() {
         'article.hello': 'magic'
       }
     });
-    expect(response.models).length(0);
+    expect(response.data).length(0);
   });
 
   it('can filter searchable belongs-to by an attribute', async function() {
@@ -694,7 +694,7 @@ describe('elasticsearch/searcher', function() {
         'searchable-article.hello': 'magic'
       }
     });
-    expect(response.models).length(4);
+    expect(response.data).length(4);
   });
 
   it('hasMany attributes are not indexed by default', async function() {
@@ -703,7 +703,7 @@ describe('elasticsearch/searcher', function() {
         'members.first-name': 'Quint'
       }
     });
-    expect(response.models).length(0);
+    expect(response.data).length(0);
   });
 
   it('can filter searchable belongs-to by an attribute', async function() {
@@ -712,7 +712,7 @@ describe('elasticsearch/searcher', function() {
         'searchable-members.first-name': 'Quint'
       }
     });
-    expect(response.models).length(1);
+    expect(response.data).length(1);
   });
 
 });

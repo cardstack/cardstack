@@ -7,10 +7,13 @@ module.exports = class {
     if (email == null) {
       throw new Error("email is required", { status: 400 });
     }
-    let { models } = await userSearcher.search({ filter: { email: { exact: email } } });
-    if (models.length > 0) {
+    let { data } = await userSearcher.search({
+      filter: { email: { exact: email } },
+      page: { size: 1 }
+    });
+    if (data.length > 0) {
       return {
-        data: models[0],
+        data: data[0],
         meta: {
           preloaded: true
         }

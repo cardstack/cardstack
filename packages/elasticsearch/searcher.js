@@ -116,22 +116,22 @@ class Searcher {
 
   _assembleResponse(result, requestedSize) {
     let documents = result.hits.hits;
-    let pagination = {
+    let page = {
       total: result.hits.total
     };
 
     if (documents.length > requestedSize) {
       documents = documents.slice(0, requestedSize);
       let last = documents[documents.length - 1];
-      pagination.cursor = encodeURIComponent(JSON.stringify(last.sort));
+      page.cursor = encodeURIComponent(JSON.stringify(last.sort));
     }
 
-    let models = documents.map(
+    let data = documents.map(
       document => toJSONAPI(document._type, document._source).data
     );
     return {
-      models,
-      page: pagination
+      data,
+      meta: { page },
     };
   }
 

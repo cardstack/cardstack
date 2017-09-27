@@ -91,7 +91,7 @@ describe('git/config', function() {
     env = await createDefaultEnvironment(`${__dirname}/..`, factory.getModels());
 
     let response = await env.lookup('hub:searchers').search('master', { filter: { type: 'articles' } });
-    expect(response.models.map(m => m.id)).deep.equals(['2']);
+    expect(response.data.map(m => m.id)).deep.equals(['2']);
   });
 
   it('respects branchPrefix when creating', async function () {
@@ -161,7 +161,7 @@ describe('git/config', function() {
     env = await createDefaultEnvironment(`${__dirname}/..`, factory.getModels());
 
     let response = await env.lookup('hub:searchers').search('master', { filter: { type: 'articles' } });
-    expect(response.models.map(m => m.id)).deep.equals(['2']);
+    expect(response.data.map(m => m.id)).deep.equals(['2']);
   });
 
 

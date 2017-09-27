@@ -180,7 +180,7 @@ class Handler {
   }
 
   async handleCollectionGET(type) {
-    let { models, page } = await this.searcher.search(this.branch, {
+    let { data: models, meta: { page } } = await this.searcher.search(this.branch, {
       filter: this.filterExpression(type),
       sort: this.query.sort,
       page: this.query.page,
