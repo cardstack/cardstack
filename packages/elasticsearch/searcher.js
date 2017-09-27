@@ -126,11 +126,19 @@ class Searcher {
       page.cursor = encodeURIComponent(JSON.stringify(last.sort));
     }
 
+    let includes = [];
     let data = documents.map(
-      document => toJSONAPI(document._type, document._source).data
+      document => {
+        let jsonapi = toJSONAPI(document._type, document._source);
+        if (jsonapi.includes) {
+          includes = includes.concat(jsonapi.includes);
+        }
+        return jsonapi.data;
+      }
     );
     return {
       data,
+      includes,
       meta: { page },
     };
   }
