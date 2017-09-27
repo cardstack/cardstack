@@ -8,7 +8,7 @@ export default Thread.extend({
   priority:       readOnly('_latestMessageWithPriority.priority'),
   priorityLevel:  readOnly('priority.level'),
   isUnhandled:    readOnly('priority.isUnhandled'),
-  updatedAt:      readOnly('latestMessage.sentAt'),
+  updatedAt:      readOnly('_latestMessage.sentAt'),
 
   //TODO: `status` should be the status of the latest message in the thread
 
@@ -26,10 +26,15 @@ export default Thread.extend({
     return this.get('loadedTags').map((tag) => tag.get('id'));
   }),
 
-  latestMessage: readOnly('_messagesInReverseChrono.firstObject'),
+  messagesInReverseChrono: computed('_syncedMessages.[]', function() {
+    let sorted = this.get('_syncedMessages').sortBy('sentAt');
+    return Ember.A([...sorted].reverse());
+  }),
 
-  _latestMessageWithPriority: computed('_messagesInReverseChrono.[]', function() {
-    return this.get('_messagesInReverseChrono').find((message) => {
+  latestMessage: readOnly('messagesInReverseChrono.firstObject'),
+
+  _latestMessageWithPriority: computed('messagesInReverseChrono.[]', function() {
+    return this.get('messagesInReverseChrono').find((message) => {
       let priorityId = message.belongsTo('priority').id();
       return !!priorityId;
     });
@@ -50,10 +55,6 @@ export default Thread.extend({
     this.set('_syncedMessages', messages);
   }).restartable(),
 
-  _messagesInReverseChrono: computed('_syncedMessages.[]', function() {
-    let sorted = this.get('_syncedMessages').sortBy('sentAt');
-    return Ember.A([...sorted].reverse());
-  }),
 
   _loadTags: task(function * () {
     let tags = yield this.get('tags');

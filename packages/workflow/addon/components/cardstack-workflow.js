@@ -1,24 +1,24 @@
-import Ember from 'ember';
 import layout from '../templates/components/cardstack-workflow';
+import Component from "@ember/component";
+import { inject } from "@ember/service";
+import { readOnly } from "@ember/object/computed";
 
-const { inject, computed } = Ember;
-
-export default Ember.Component.extend({
+export default Component.extend({
   layout,
   classNames:  ['cardstack-workflow'],
-  workflow:    inject.service('cardstack-workflow'),
+  workflow:    inject('cardstack-workflow'),
 
-  groupedThreads:             computed.readOnly('workflow.groupedThreads'),
-  unhandled:                  computed.readOnly('workflow.unhandledItems'),
-  selectedGroup:              computed.readOnly('workflow.selectedGroup'),
-  threadsWithSelectedTag:     computed.readOnly('workflow.threadsWithSelectedTag'),
-  selectedDate:               computed.readOnly('workflow.selectedDate'),
-  threadsWithSelectedDate:    computed.readOnly('workflow.threadsWithSelectedDate'),
-  matchingThreads:            computed.readOnly('workflow.matchingThreads'),
-  unhandledForToday:          computed.readOnly('workflow.unhandledForToday'),
-  todaysNotificationCount:    computed.readOnly('unhandledForToday.length'),
-  selectedMessage:            computed.readOnly('workflow.selectedMessage'),
-  shouldShowMatchingThreads:  computed.readOnly('workflow.shouldShowMatchingThreads'),
+  groupedThreads:             readOnly('workflow.groupedThreads'),
+  unhandled:                  readOnly('workflow.unhandledItems'),
+  selectedThread:             readOnly('workflow.selectedThread'),
+  threadsWithSelectedTag:     readOnly('workflow.threadsWithSelectedTag'),
+  selectedDate:               readOnly('workflow.selectedDate'),
+  threadsWithSelectedDate:    readOnly('workflow.threadsWithSelectedDate'),
+  matchingThreads:            readOnly('workflow.matchingThreads'),
+  unhandledForToday:          readOnly('workflow.unhandledForToday'),
+  todaysNotificationCount:    readOnly('unhandledForToday.length'),
+  selectedMessage:            readOnly('workflow.selectedMessage'),
+  shouldShowMatchingThreads:  readOnly('workflow.shouldShowMatchingThreads'),
 
   actions: {
     selectDate(date) {

@@ -28,9 +28,10 @@
   {{/each-in}}
 </section>
 
-{{#if selectedMessage}}
+{{#if selectedThread}}
+  <!-- TODO: Rename this to cardstack-thread-view -->
   <section class="cardstack-cue-card">
-    {{cardstack-content content=selectedMessage format="card"}}
+    {{cardstack/thread-container thread=selectedThread}}
   </section>
 {{else}}
   {{#if shouldShowMatchingThreads}}
