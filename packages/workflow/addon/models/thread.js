@@ -8,7 +8,7 @@ export default Thread.extend({
   priority:       readOnly('_latestMessageWithPriority.priority'),
   priorityLevel:  readOnly('priority.level'),
   isUnhandled:    readOnly('priority.isUnhandled'),
-  updatedAt:      readOnly('_latestMessage.sentAt'),
+  updatedAt:      readOnly('latestMessage.sentAt'),
 
   //TODO: `status` should be the status of the latest message in the thread
 
@@ -22,7 +22,11 @@ export default Thread.extend({
     }
   }),
 
-  _latestMessage: readOnly('_messagesInReverseChrono.firstObject'),
+  loadedTagIds: computed(function() {
+    return this.get('loadedTags').map((tag) => tag.get('id'));
+  }),
+
+  latestMessage: readOnly('_messagesInReverseChrono.firstObject'),
 
   _latestMessageWithPriority: computed('_messagesInReverseChrono.[]', function() {
     return this.get('_messagesInReverseChrono').find((message) => {

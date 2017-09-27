@@ -23,7 +23,7 @@ function threadsBetween(arrayKey, dateKey, { from, to }) {
 
 export default Service.extend({
   isOpen: false,
-  selectedMessage: null,
+  selectedThread: null,
 
   store: inject(),
 
@@ -79,10 +79,11 @@ export default Service.extend({
     from: moment().subtract(1, 'day')
   }),
 
-  selectedGroup:    '',
-  messagesInSelectedGroup: computed('items.@each.{groupId,isImportant}', 'selectedGroup', function() {
-    let inselectedGroup = this.get('items').filterBy('groupId', this.get('selectedGroup'));
-    return inselectedGroup.filter((message) => message.get('isImportant'));
+  selectedTag:    '',
+  messagesWithSelectedTag: computed('items.@each.loadedTagIds', 'selectedTag', function() {
+    let selectedTagId = this.get('selectedTag.id');
+    let withSelectedTag = this.get('items').filter((thread) => thread.get('loadedTagIds').includes(selectedTagId));
+    return withSelectedTag;
   }),
 
   selectedDate: '',
@@ -93,11 +94,11 @@ export default Service.extend({
     return [];
   }),
 
-  shouldShowMessagesInGroup: or('selectedGroup', 'selectedDate'),
+  shouldShowMatchingThreads: or('selectedTag', 'selectedDate'),
 
-  matchingMessages: computed('selectedGroup', 'selectedDate', 'messagesInSelectedGroup', 'messagesWithSelectedDate', function() {
-    if (this.get('selectedGroup')) {
-      return this.get('messagesInSelectedGroup');
+  matchingThreads: computed('selectedTag', 'selectedDate', 'messagesWithSelectedTag', 'messagesWithSelectedDate', function() {
+    if (this.get('selectedTag')) {
+      return this.get('messagesWithSelectedTag');
     }
     if (this.get('selectedDate')) {
       return this.get('messagesWithSelectedDate');
@@ -108,32 +109,33 @@ export default Service.extend({
   selectDate(date) {
     this.setProperties({
       selectedDate: date,
-      selectedGroup: null
+      selectedTag: null
     });
     this.clearSelectedMessage();
   },
 
-  selectGroup(groupId) {
+  selectTag(tagId) {
+    let selectedTag = this.get('store').peekRecord('tag', tagId);
     this.setProperties({
       selectedDate: null,
-      selectedGroup: groupId
+      selectedTag
     });
     this.clearSelectedMessage();
   },
 
-  selectMessage(message) {
-    this.set('selectedMessage', message);
+  selectThread(thread) {
+    this.set('selectedThread', thread);
   },
 
   clearGroupSelection() {
     this.setProperties({
       selectedDate: null,
-      selectedGroup: null
+      selectedTag: null
     });
   },
 
   clearSelectedMessage() {
-    this.set('selectedMessage', null);
+    this.set('selectedThread', null);
   },
 
   approveMessage(message) {

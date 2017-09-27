@@ -11,22 +11,22 @@ export default Ember.Component.extend({
   groupedThreads:            computed.readOnly('workflow.groupedThreads'),
   unhandled:                 computed.readOnly('workflow.unhandledItems'),
   selectedGroup:             computed.readOnly('workflow.selectedGroup'),
-  messagesInSelectedGroup:   computed.readOnly('workflow.messagesInSelectedGroup'),
+  messagesWithSelectedTag:   computed.readOnly('workflow.messagesWithSelectedTag'),
   selectedDate:              computed.readOnly('workflow.selectedDate'),
   messagesWithSelectedDate:  computed.readOnly('workflow.messagesWithSelectedDate'),
-  matchingMessages:          computed.readOnly('workflow.matchingMessages'),
+  matchingThreads:          computed.readOnly('workflow.matchingThreads'),
   unhandledForToday:         computed.readOnly('workflow.unhandledForToday'),
   todaysNotificationCount:   computed.readOnly('unhandledForToday.length'),
   selectedMessage:           computed.readOnly('workflow.selectedMessage'),
-  shouldShowMessagesInGroup: computed.readOnly('workflow.shouldShowMessagesInGroup'),
+  shouldShowMatchingThreads: computed.readOnly('workflow.shouldShowMatchingThreads'),
 
   actions: {
     selectDate(date) {
       this.get('workflow').selectDate(date);
     },
 
-    selectGroup(groupId) {
-      this.get('workflow').selectGroup(groupId);
+    selectTag(tagId) {
+      this.get('workflow').selectTag(tagId);
     },
   }
 });

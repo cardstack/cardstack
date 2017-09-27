@@ -16,7 +16,7 @@
         {{#each-in priorityGroup.tagGroups as |tagId tagGroup|}}
           {{#with "fixme-group-id" as |groupId|}}
             <div class={{concat "cardstack-workflow-label-with-count-wrapper " (if (eq selectedGroup groupId) "active")}}>
-              <div class={{concat "cardstack-workflow-label-with-count " tagGroup.priorityLevel "-priority"}} onclick={{action 'selectGroup' tagId}}>
+              <div class={{concat "cardstack-workflow-label-with-count " tagGroup.priorityLevel "-priority"}} onclick={{action 'selectTag' tagId}}>
                 <div class='name'>{{tagGroup.name}}</div>
                 <div class="count" data-test-group-counter={{groupId}}>{{tagGroup.all.length}}</div>
               </div>
@@ -29,17 +29,24 @@
 </section>
 
 {{#if selectedMessage}}
-<section class="cardstack-cue-card">
-  {{cardstack-content content=selectedMessage format="card"}}
-</section>
-{{else}} {{#if shouldShowMessagesInGroup}} {{#if matchingMessages.length}}
-<section class="cardstack-cue-card-list">
-  {{#each matchingMessages as |message|}} {{cardstack-content content=message format="list-card"}} {{/each}}
-</section>
-{{else}} {{!-- cardstack-content content=message format="empty-list-card" --}}
-<section class="cardstack-empty-cue-card-list">
-  <div class="cardstack-empty-cue-card-message" data-test-empty-group-message>
-    There are no cards in this group.
-  </div>
-</section>
-{{/if}} {{/if}} {{/if}}
+  <section class="cardstack-cue-card">
+    {{cardstack-content content=selectedMessage format="card"}}
+  </section>
+{{else}}
+  {{#if shouldShowMatchingThreads}}
+    {{#if matchingThreads.length}}
+      <section class="cardstack-cue-card-list">
+        {{#each matchingThreads as |thread|}}
+          {{cardstack/thread-list-card thread=thread}}
+        {{/each}}
+      </section>
+    {{else}}
+      {{!-- cardstack-content content=message format="empty-list-card" --}}
+      <section class="cardstack-empty-cue-card-list">
+        <div class="cardstack-empty-cue-card-message" data-test-empty-group-message>
+          There are no cards in this group.
+        </div>
+      </section>
+    {{/if}}
+  {{/if}}
+{{/if}}

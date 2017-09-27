@@ -5,7 +5,7 @@ export default Ember.Component.extend({
 
   actions: {
     select() {
-      this.get('workflow').selectMessage(this.get('content'));
+      this.get('workflow').selectThread(this.get('content'));
     }
   }
 });
