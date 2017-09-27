@@ -124,6 +124,10 @@ export default Service.extend({
     return [];
   }),
 
+  process(message) {
+    message.handle();
+  },
+
   selectDate(date) {
     this.setProperties({
       selectedDate: date,

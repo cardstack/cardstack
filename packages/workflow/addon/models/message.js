@@ -1,5 +1,6 @@
 import { assert } from "@ember/debug"
 import Message from '@cardstack/models/generated/message';
+import { equal } from '@ember/object/computed';
 // import { workflowGroupId } from '@cardstack/workflow/helpers/workflow-group-id';
 
 import { task } from 'ember-concurrency';
@@ -14,7 +15,13 @@ export default Message.extend({
 		set(k, v) {
 			return v;
 		}
-	}),
+  }),
+
+  handle() {
+    this.set('status', 'handled');
+  },
+
+  isUnhandled: equal('status', 'unhandled'),
 
 	_loadCard: task(function * () {
 		let cardType = this.get('_cardTypeInStore');

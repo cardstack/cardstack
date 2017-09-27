@@ -206,7 +206,7 @@ function initialModels() {
       artist: "Pearl Jam",
       title: "Daughter - Live",
       comment: "Totally. This live version is amazing.",
-      url: 'https://youtu.be/pearl-jam/daughter'
+      url: 'https://www.youtube.com/watch?v=IbhsAhSsMxM',
     });
 
   initial.addResource('songs', '2')
@@ -214,7 +214,7 @@ function initialModels() {
       artist: "Tool",
       title: "46 & 2",
       comment: "That's the album version.",
-      url: 'https://youtu.be/tool/46-and-2'
+      url: 'https://www.youtube.com/watch?v=NH0qYhAvtXk',
     });
 
   // Seed song license requests
@@ -236,7 +236,7 @@ function initialModels() {
   // Seed messages
   initial.addResource('messages', '1')
     .withAttributes({
-      // status: 'pending',
+      status: 'unhandled',
       sentAt: moment().subtract(moment.duration(2, 'days')),
       cardId: '1',
       cardType: 'song-change-requests'
@@ -245,7 +245,7 @@ function initialModels() {
 
   initial.addResource('messages', '2')
     .withAttributes({
-      // status: 'pending',
+      status: 'unhandled',
       sentAt: moment().subtract(moment.duration(1, 'day')),
       cardId: '1',
       cardType: 'chat-messages'
@@ -253,7 +253,7 @@ function initialModels() {
 
   initial.addResource('messages', '3')
     .withAttributes({
-      // status: 'pending',
+      status: 'unhandled',
       sentAt: moment(),
       cardId: '1',
       cardType: 'songs'
@@ -261,7 +261,7 @@ function initialModels() {
 
   initial.addResource('messages', '4')
     .withAttributes({
-      // status: 'pending',
+      status: 'unhandled',
       sentAt: moment().subtract(moment.duration(1, 'week')),
       cardId: '1',
       cardType: 'song-license-requests'
@@ -270,6 +270,9 @@ function initialModels() {
 
   initial.addResource('messages', '5')
     .withAttributes({
+      // Does it make sense to have a status for a message
+      // that is related to a card which cannot be handled? (song, in this case)
+      status: 'unhandled',
       sentAt: moment().subtract(moment.duration(4, 'days')),
       cardId: '2',
       cardType: 'songs',
@@ -277,6 +280,7 @@ function initialModels() {
 
   initial.addResource('messages', '6')
     .withAttributes({
+      status: 'unhandled',
       sentAt: moment().subtract(moment.duration(2, 'days')),
       cardId: '2',
       cardType: 'chat-messages'
@@ -284,7 +288,7 @@ function initialModels() {
 
   initial.addResource('messages', '7')
     .withAttributes({
-      // status: 'approved',
+      status: 'unhandled',
       sentAt: moment(),
       cardId: '2',
       cardType: 'song-license-requests'
@@ -293,7 +297,7 @@ function initialModels() {
 
   initial.addResource('messages', '8')
     .withAttributes({
-      // status: 'pending',
+      status: 'unhandled',
       sentAt: moment().subtract(moment.duration(1, 'day')),
       cardId: '2',
       cardType: 'song-change-requests'
@@ -302,7 +306,7 @@ function initialModels() {
 
   initial.addResource('messages', '9')
     .withAttributes({
-      // status: 'pending',
+      status: 'unhandled',
       sentAt: moment(),
       cardId: '3',
       cardType: 'song-license-requests'

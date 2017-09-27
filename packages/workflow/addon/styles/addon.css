@@ -151,12 +151,12 @@ count could be made to stay on the same line
   width: 100%;
   display: flex;
   align-content: flex-start;
+  margin-top: 25px;
 }
 
 .button-panel > .action-button {
   padding: 10px;
   margin-right: 10px;
-  width: 5vw;
   font-size: 0.8em;
   color: var(--normal-background);
   background-color: var(--bright-foreground);
