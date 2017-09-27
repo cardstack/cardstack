@@ -132,9 +132,11 @@ class Indexers {
   }
 
   async _updateBranch(branch, updaters, realTime, hints) {
-    let branchUpdater = new BranchUpdate(this, branch, updaters, realTime, hints, !this._seenBranches.has(branch));
-    await branchUpdater.run();
+    let branchUpdater = new BranchUpdate(branch, updaters, realTime, hints, !this._seenBranches.has(branch), this.log, this.client, this.schemaCache);
+    let token = this.schemaCache.prepareBranchUpdate(branch);
+    let schema = await branchUpdater.run();
     this._seenBranches.set(branch, true);
+    this.schemaCache.notifyBranchUpdate(branch, schema, token);
   }
 
   async _lookupIndexers() {
@@ -189,29 +191,11 @@ class Operations {
   }
   async save(type, id, doc){
     let { sourceId, branchUpdate, nonce } = opsPrivate.get(this);
-    let searchDoc = await branchUpdate.indexers.client.jsonapiToSearchDoc(type, id, doc, branchUpdate.schema, branchUpdate.branch, sourceId);
-    if (nonce) {
-      searchDoc.cardstack_generation = nonce;
-    }
-    await branchUpdate.bulkOps.add({
-      index: {
-        _index: Client.branchToIndexName(branchUpdate.branch),
-        _type: type,
-        _id: `${branchUpdate.branch}/${id}`,
-      }
-    }, searchDoc);
-    branchUpdate.indexers.log.debug("save %s %s", type, id);
+    await branchUpdate.add(type, id, doc, sourceId, nonce);
   }
   async delete(type, id) {
     let { branchUpdate } = opsPrivate.get(this);
-    await branchUpdate.bulkOps.add({
-      delete: {
-        _index: Client.branchToIndexName(branchUpdate.branch),
-        _type: type,
-        _id: `${branchUpdate.branch}/${id}`
-      }
-    });
-    branchUpdate.indexers.log.debug("delete %s %s", type, id);
+    await branchUpdate.delete(type, id);
   }
   async beginReplaceAll() {
     opsPrivate.get(this).nonce = Math.floor(Number.MAX_SAFE_INTEGER * Math.random());
@@ -221,43 +205,28 @@ class Operations {
     if (!nonce) {
       throw new Error("tried to finishReplaceAll when there was no beginReplaceAll");
     }
-    await branchUpdate.bulkOps.add('deleteByQuery', {
-      index: Client.branchToIndexName(branchUpdate.branch),
-      conflicts: 'proceed',
-      body: {
-        query: {
-          bool: {
-            must: [
-              { term: { cardstack_source: sourceId } },
-            ],
-            must_not: [
-              { term: { cardstack_generation: nonce } }
-            ]
-          }
-        }
-      }
-    });
-    branchUpdate.indexers.log.debug("bulk delete older content for data source %s", sourceId);
+    await branchUpdate.deleteAllWithoutNonce(sourceId, nonce);
   }
 }
 
 class BranchUpdate {
-  constructor(indexers, branch, updaters, realTime, hints, shouldIndexSeeds) {
-    this.indexers = indexers;
+  constructor(branch, updaters, realTime, hints, shouldIndexSeeds, log, client, schemaCache) {
     this.branch = branch;
     this.updaters = updaters;
     this.hints = hints;
     this.schema = null;
-    this.bulkOps = indexers.client.bulkOps({ realTime });
+    this.bulkOps = client.bulkOps({ realTime });
     this.shouldIndexSeeds = shouldIndexSeeds;
+    this.log = log;
+    this.client = client;
+    this.schemaCache = schemaCache;
   }
 
   async run() {
-    let token = this.indexers.schemaCache.prepareBranchUpdate(this.branch);
     this.schema = await this._updateSchema();
-    await this.indexers.client.accomodateSchema(this.branch, this.schema);
+    await this.client.accomodateSchema(this.branch, this.schema);
     await this._updateContent();
-    this.indexers.schemaCache.notifyBranchUpdate(this.branch, this.schema, token);
+    return this.schema;
   }
 
   async _updateSchema() {
@@ -265,13 +234,13 @@ class BranchUpdate {
     for (let updater of this.updaters) {
       models = models.concat(await updater.schema());
     }
-    return this.indexers.schemaCache.schemaFrom(models);
+    return this.schemaCache.schemaFrom(models);
   }
 
   async _updateContent() {
     if (this.shouldIndexSeeds) {
       let publicOps = Operations.create(this, '__cardstack_seed_models__');
-      await this.indexers.schemaCache.indexBaseContent(publicOps);
+      await this.schemaCache.indexBaseContent(publicOps);
     }
     for (let updater of this.updaters) {
       let meta = await this._loadMeta(updater);
@@ -284,7 +253,7 @@ class BranchUpdate {
   }
 
   async _loadMeta(updater) {
-    return this.indexers.client.es.getSource({
+    return this.client.es.getSource({
       index: Client.branchToIndexName(this.branch),
       type: 'meta',
       id: owningDataSource.get(updater).id,
@@ -302,6 +271,50 @@ class BranchUpdate {
     }, newMeta);
   }
 
+  async add(type, id, doc, sourceId, nonce) {
+    let searchDoc = await this.client.jsonapiToSearchDoc(type, id, doc, this.schema, this.branch, sourceId);
+    if (nonce) {
+      searchDoc.cardstack_generation = nonce;
+    }
+    await this.bulkOps.add({
+      index: {
+        _index: Client.branchToIndexName(this.branch),
+        _type: type,
+        _id: `${this.branch}/${id}`,
+      }
+    }, searchDoc);
+    this.log.debug("save %s %s", type, id);
+  }
 
+  async delete(type, id) {
+    await this.bulkOps.add({
+      delete: {
+        _index: Client.branchToIndexName(this.branch),
+        _type: type,
+        _id: `${this.branch}/${id}`
+      }
+    });
+    this.log.debug("delete %s %s", type, id);
+  }
+
+  async deleteAllWithoutNonce(sourceId, nonce) {
+    await this.bulkOps.add('deleteByQuery', {
+      index: Client.branchToIndexName(this.branch),
+      conflicts: 'proceed',
+      body: {
+        query: {
+          bool: {
+            must: [
+              { term: { cardstack_source: sourceId } },
+            ],
+            must_not: [
+              { term: { cardstack_generation: nonce } }
+            ]
+          }
+        }
+      }
+    });
+    this.log.debug("bulk delete older content for data source %s", sourceId);
+  }
 
 }
