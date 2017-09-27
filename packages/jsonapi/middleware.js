@@ -13,6 +13,7 @@ module.exports = declareInjections({
 }, {
   create({ searcher, writers, indexers }) {
     return {
+      category: 'api',
       after: 'authentication',
       middleware() {
         return jsonapiMiddleware(searcher, writers, indexers);
@@ -53,11 +54,14 @@ function jsonapiMiddleware(searcher, writers, indexers) {
       return;
     }
 
-    await body(ctxt, err => {
-      if (err) {
-        throw err;
-      }
-    });
+    // body may have already been parsed 
+    if (!ctxt.state.bodyAlreadyParsed) {
+      await body(ctxt, err => {
+        if (err) {
+          throw err;
+        }
+      });
+    }
     let handler = new Handler(searcher, writers, indexers, ctxt, options, log);
     return handler.run();
   };
