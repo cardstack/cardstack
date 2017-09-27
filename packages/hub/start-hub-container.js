@@ -102,18 +102,22 @@ async function linkedHubPath(projectRoot) {
 }
 
 async function socketToHub() {
+  let hub = new nssocket.NsSocket();
+  hub.connect(6785);
+
   return new Promise(function(resolve, reject) {
     log.trace("Attempting to connect to the hub's heartbeat port");
-    let hub = new nssocket.NsSocket();
-    hub.connect(6785);
 
-    hub.data('shake', function() {
-      log.trace("Hub heartbeat connection established");
-      resolve(hub);
-    });
-    hub.on('close', async function() {
+    async function onClose() {
       await timeout(50);
       resolve(socketToHub());
+    }
+
+    hub.on('close', onClose);
+    hub.data('shake', function() {
+      log.trace("Hub heartbeat connection established");
+      hub.removeListener('close', onClose);
+      resolve(hub);
     });
     hub.on('error', reject);
     hub.send('hand');
