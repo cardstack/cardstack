@@ -5,6 +5,7 @@ const child_process = require('child_process');
 const {spawn} = child_process;
 const execFile = promisify(child_process.execFile);
 const realpath = promisify(require('fs').realpath);
+const timeout = promisify(setTimeout);
 
 const Koa = require('koa');
 const proxy = require('koa-proxy');
@@ -17,33 +18,8 @@ const log = require('@cardstack/plugin-utils/logger')('hub/spawn-hub');
 const HUB_HEARTBEAT_INTERVAL = 1 * 1000;
 
 module.exports = async function(projectRoot) {
-  let hubPath = await linkedHubPath(projectRoot);
-
-  let hubBinding;
-  if (hubPath) {
-    log.info('Binding locally linked hub: '+hubPath);
-    hubBinding = [
-      '--mount', `type=bind,src=${hubPath},dst=/hub/app/node_modules/@cardstack/hub`
-    ];
-  } else {
-    hubBinding = [];
-  }
-
-  let key = crypto.randomBytes(32).toString('base64');
-
   await buildAppImage();
-
-  await execFile('docker', [
-    'run',
-    '-d',
-    '--rm',
-    '--publish', '3000:3000',
-    '--publish', '6785:6785',
-    '--mount', 'type=bind,src=/var/run/docker.sock,dst=/var/run/docker.sock',
-    ...hubBinding,
-    '-e', `CARDSTACK_SESSIONS_KEY=${key}`,
-    'cardstack-app'
-  ]);
+  await spawnHubContainer(projectRoot);
 
   let hub = await socketToHub();
 
@@ -53,12 +29,7 @@ module.exports = async function(projectRoot) {
 
   log.info('Ready message received from hub container');
 
-  let beat = function() {
-    log.trace('Sending heartbeat to hub container');
-    hub.send('heartbeat');
-  };
-  beat();
-  setInterval(beat, HUB_HEARTBEAT_INTERVAL);
+  startHeartbeat(hub);
 
   let app = new Koa();
   app.use(proxy({
@@ -119,18 +90,59 @@ async function linkedHubPath(projectRoot) {
 }
 
 async function socketToHub() {
-  let hub = new nssocket.NsSocket();
-  hub.connect(6785);
+  return new Promise(function(resolve, reject) {
+    log.trace("Attempting to connect to the hub's heartbeat port");
+    let hub = new nssocket.NsSocket();
+    hub.connect(6785);
 
-  return new Promise(function(resolve) {
     hub.data('shake', function() {
+      log.trace("Hub heartbeat connection established");
       resolve(hub);
     });
-    hub.on('close', function() {
+    hub.on('close', async function() {
+      await timeout(50);
       resolve(socketToHub());
     });
+    hub.on('error', reject);
     hub.send('hand');
   });
+}
+
+// Spawns the hub container, and returns an object for getting it stdio
+async function spawnHubContainer(projectRoot) {
+  let hubPath = await linkedHubPath(projectRoot);
+
+  let hubBinding;
+  if (hubPath) {
+    log.info('Binding locally linked hub: '+hubPath);
+    hubBinding = [
+      '--mount', `type=bind,src=${hubPath},dst=/hub/app/node_modules/@cardstack/hub`
+    ];
+  } else {
+    hubBinding = [];
+  }
+
+  let key = crypto.randomBytes(32).toString('base64');
 
 
+  await execFile('docker', [
+    'run',
+    '-d',
+    '--rm',
+    '--publish', '3000:3000',
+    '--publish', '6785:6785',
+    '--mount', 'type=bind,src=/var/run/docker.sock,dst=/var/run/docker.sock',
+    ...hubBinding,
+    '-e', `CARDSTACK_SESSIONS_KEY=${key}`,
+    'cardstack-app'
+  ]);
+}
+
+function startHeartbeat(hub) {
+  let beat = function() {
+    log.trace('Sending heartbeat to hub container');
+    hub.send('heartbeat');
+  };
+  beat();
+  setInterval(beat, HUB_HEARTBEAT_INTERVAL);
 }
