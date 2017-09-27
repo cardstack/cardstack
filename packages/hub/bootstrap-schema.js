@@ -13,7 +13,8 @@ const models = [
           { type: 'fields', id: 'fields' },
           { type: 'fields', id: 'is-built-in' },
           { type: 'fields', id: 'routing-field' },
-          { type: 'fields', id: 'searchable-relationships' }
+          { type: 'fields', id: 'searchable-relationships' },
+          { type: 'fields', id: 'default-includes' }
         ]
       }
     }
@@ -179,6 +180,13 @@ const models = [
   {
     type: 'fields',
     id: 'searchable-relationships',
+    attributes: {
+      'field-type': '@cardstack/core-types::string-array'
+    }
+  },
+  {
+    type: 'fields',
+    id: 'default-includes',
     attributes: {
       'field-type': '@cardstack/core-types::string-array'
     }

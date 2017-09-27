@@ -50,6 +50,13 @@ module.exports = class ContentType {
     } else {
       this.searchTree = Object.create(null);
     }
+
+    if (model.attributes && model.attributes['default-includes']) {
+      this.includesTree = buildSearchTree(model.attributes['default-includes']);
+    } else {
+      this.includesTree = Object.create(null);
+    }
+
     this.allFields = allFields;
   }
 

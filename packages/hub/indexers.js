@@ -23,6 +23,7 @@
 const logger = require('@cardstack/plugin-utils/logger');
 const Client = require('@cardstack/elasticsearch/client');
 const { declareInjections } = require('@cardstack/di');
+const { uniqBy } = require('lodash');
 const owningDataSource = new WeakMap();
 
 require('./diff-log-formatter');
@@ -186,7 +187,7 @@ class Operations {
     opsPrivate.set(this, {
       sourceId,
       branchUpdate,
-      nonce: null,
+      nonce: null
     });
   }
   async save(type, id, doc){
@@ -271,8 +272,22 @@ class BranchUpdate {
     }, newMeta);
   }
 
+  async read(type, id) {
+    let contentType = this.schema.types.get(type);
+    if (!contentType) { return; }
+    let source = contentType.dataSource;
+    if (!source) { return; }
+    let updater = this.updaters.find(u => {
+      let s = owningDataSource.get(u);
+      return s && s.id === source.id;
+    });
+    if (!updater) { return; }
+    return updater.read(type, id, this.schema.isSchemaType(type));
+  }
+
   async add(type, id, doc, sourceId, nonce) {
-    let searchDoc = await this.client.jsonapiToSearchDoc(type, id, doc, this.schema, this.branch, sourceId);
+    let searchDoc = await this._prepareSearchDoc(type, id, doc);
+    searchDoc.cardstack_source = sourceId;
     if (nonce) {
       searchDoc.cardstack_generation = nonce;
     }
@@ -316,5 +331,109 @@ class BranchUpdate {
     });
     this.log.debug("bulk delete older content for data source %s", sourceId);
   }
+
+
+  async _prepareSearchDoc(type, id, jsonapiDoc, searchTree, parentsIncludes) {
+    // we store the id as a regular field in elasticsearch here, because
+    // we use elasticsearch's own built-in _id for our own composite key
+    // that takes into account branches.
+    //
+    // we don't store the type as a regular field in elasticsearch,
+    // because we're keeping it in the built in _type field.
+    let esId = await this.client.logicalFieldToES(this.branch, 'id');
+    let searchDoc = { [esId]: id };
+
+    // this is the copy of the document we will return to anybody who
+    // retrieves it. It's supposed to already be a correct jsonapi
+    // response, as opposed to the searchDoc itself which is mangled
+    // for searchability.
+    let pristine = {
+      data: { id, type }
+    };
+
+    // we are going inside a parent document's includes, so we need
+    // our own type here.
+    if (parentsIncludes) {
+      let esType = await this.client.logicalFieldToES(this.branch, 'type');
+      searchDoc[esType] = type;
+    }
+
+    if (jsonapiDoc.attributes) {
+      pristine.data.attributes = jsonapiDoc.attributes;
+      for (let attribute of Object.keys(jsonapiDoc.attributes)) {
+        let value = jsonapiDoc.attributes[attribute];
+        let field = this.schema.fields.get(attribute);
+        if (field) {
+          let derivedFields = field.derivedFields(value);
+          if (derivedFields) {
+            for (let [derivedName, derivedValue] of Object.entries(derivedFields)) {
+              let esName = await this.client.logicalFieldToES(this.branch, derivedName);
+              searchDoc[esName] = derivedValue;
+            }
+          }
+        }
+        let esName = await this.client.logicalFieldToES(this.branch, attribute);
+        searchDoc[esName] = value;
+      }
+    }
+    if (jsonapiDoc.relationships) {
+      pristine.data.relationships = jsonapiDoc.relationships;
+
+      if (!searchTree) {
+        // we are the root document, so our own configured searchTree
+        // determines which relationships to recurse into
+        searchTree = this.schema.types.get(type).searchTree;
+      }
+
+      let ourIncludes;
+      if (parentsIncludes) {
+        ourIncludes = parentsIncludes;
+      } else {
+        ourIncludes = [];
+      }
+
+      for (let attribute of Object.keys(jsonapiDoc.relationships)) {
+        let value = jsonapiDoc.relationships[attribute];
+        let field = this.schema.fields.get(attribute);
+        if (field && value && value.hasOwnProperty('data')) {
+          let related;
+          if (value.data && searchTree[attribute]) {
+            if (Array.isArray(value.data)) {
+              related = await Promise.all(value.data.map(async ({ type, id }) => {
+                let resource = await this.read(type, id);
+                return this._prepareSearchDoc(type, id, resource, searchTree[attribute], ourIncludes);
+              }));
+            } else {
+              let resource = await this.read(value.data.type, value.data.id);
+              related = await this._prepareSearchDoc(resource.type, resource.id, resource, searchTree[attribute], ourIncludes);
+            }
+          } else {
+            related = value.data;
+          }
+          let esName = await this.client.logicalFieldToES(this.branch, attribute);
+          searchDoc[esName] = related;
+        }
+      }
+
+      if (ourIncludes.length > 0 && !parentsIncludes) {
+        pristine.included = uniqBy([pristine].concat(ourIncludes), r => `${r.type}/${r.id}`).slice(1);
+      }
+    }
+
+    // The next fields in the searchDoc get a "cardstack_" prefix so
+    // they aren't likely to collide with the user's attribute or
+    // relationship.
+    if (jsonapiDoc.meta) {
+      searchDoc.cardstack_meta = jsonapiDoc.meta;
+      pristine.data.meta = jsonapiDoc.meta;
+    }
+    if (parentsIncludes) {
+      parentsIncludes.push(pristine.data);
+    } else {
+      searchDoc.cardstack_pristine = pristine;
+    }
+    return searchDoc;
+  }
+
 
 }

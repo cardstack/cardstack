@@ -186,8 +186,9 @@ describe('elasticsearch/searcher', function() {
     let { data: models } = await searcher.search('master', {
       queryString: 'magic'
     });
-    expect(models).to.have.length(1);
+    expect(models.filter(m => m.type === 'articles')).to.have.length(1);
     expect(models).includes.something.with.deep.property('attributes.hello', 'magic words');
+    expect(models.filter(m => m.type === 'comments')).to.have.length(4);
   });
 
   it('can be searched via queryString, negative result', async function() {
@@ -706,7 +707,7 @@ describe('elasticsearch/searcher', function() {
     expect(response.data).length(0);
   });
 
-  it('can filter searchable belongs-to by an attribute', async function() {
+  it('can filter searchable has-many by an attribute', async function() {
     let response = await searcher.search('master', {
       filter: {
         'searchable-members.first-name': 'Quint'

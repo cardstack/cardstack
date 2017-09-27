@@ -1,10 +1,11 @@
 const Error = require('@cardstack/plugin-utils/error');
 const qs = require('qs');
-const { merge, flatten } = require('lodash');
+const { merge, flatten, uniq, uniqBy } = require('lodash');
 const koaJSONBody = require('koa-json-body');
 const logger = require('@cardstack/plugin-utils/logger');
 const { declareInjections } = require('@cardstack/di');
 const { URL } = require('url');
+const defaultIncludes = {};
 
 module.exports = declareInjections({
   searcher: 'hub:searchers',
@@ -74,8 +75,6 @@ class Handler {
     this.prefix = options.prefix || '';
     this.log = log;
     this._includes = null;
-    this.includedSets = null;
-    this.includedResources = null;
   }
 
   get session() {
@@ -84,10 +83,14 @@ class Handler {
 
   get includes() {
     if (!this._includes) {
-      if (this.query.include) {
-        this._includes = this.query.include.split(',').map(part => part.split('.'));
+      if (this.query.include != null) {
+        if (this.query.include) {
+          this._includes = this.query.include.split(',').map(part => part.split('.'));
+        } else {
+          this._includes = [];
+        }
       } else {
-        this._includes = [];
+        this._includes = defaultIncludes;
       }
     }
     return this._includes;
@@ -143,7 +146,9 @@ class Handler {
   async handleIndividualGET(type, id) {
     let body = await this._lookupRecord(type, id);
     this.ctxt.body = body;
-    if (this.includes.length === 0) {
+    if (this.includes === defaultIncludes) {
+      // leave alone whatever includes were already on the document we
+      // got out of the search index.
       return;
     }
     await this._loadAllIncluded([body.data]);
@@ -180,7 +185,7 @@ class Handler {
   }
 
   async handleCollectionGET(type) {
-    let { data: models, meta: { page } } = await this.searcher.search(this.branch, {
+    let { data: models, meta: { page }, included } = await this.searcher.search(this.branch, {
       filter: this.filterExpression(type),
       sort: this.query.sort,
       page: this.query.page,
@@ -193,7 +198,20 @@ class Handler {
       };
     }
     this.ctxt.body = body;
-    await this._loadAllIncluded(models);
+    if (this.includes === defaultIncludes) {
+      if (included) {
+        // the default includes out of the searcher are not guaranteed
+        // to be deduplicated
+        body.included = uniqBy(models.concat(included), r => `${r.type}/${r.id}`).slice(models.length);
+      }
+    } else {
+      if (included && included.length > 0) {
+        // we don't need to do any deduplication here because
+        // loadAllIncluded is going to take over.
+        body.included = included;
+      }
+      await this._loadAllIncluded(models);
+    }
   }
 
   async handleCollectionPOST(type) {
@@ -212,14 +230,33 @@ class Handler {
   }
 
   async _lookupRecord(type, id) {
-    if (this.includedResources) {
-      let record = this.includedResources[`${type}/${id}`];
-      if (record) {
-        return record;
-      }
-    }
     let record = await this.searcher.get(this.branch, type, id);
     return record;
+  }
+
+  async _cachedLookupRecord(type, id, cache) {
+    let key = `${type}/${id}`;
+    {
+      let cached = cache[key];
+      if (cached) {
+        return cached;
+      }
+    }
+    let resource = await this._lookupRecord(type, id);
+    if (resource) {
+      if (!cache[key]) {
+        cache[key] = resource.data;
+      }
+      if (resource.included) {
+        for (let inner of resource.included) {
+          let innerKey = `${inner.type}/${inner.id}`;
+          if (!cache[innerKey]) {
+            cache[innerKey] = inner;
+          }
+        }
+      }
+      return cache[key];
+    }
   }
 
   _mandatoryBodyData() {
@@ -246,61 +283,68 @@ class Handler {
   async _loadAllIncluded(root) {
     // this is a map from each requested include path to a promise
     // that resolves with the list of resources in that set
-    this.includedSets = Object.create(null);
+    let sets = Object.create(null);
 
     // this is a map from type/id strings to each of the resources we
-    // have already loaded
-    this.includedResources = Object.create(null);
+    // have already loaded.
+    let cache = Object.create(null);
+    for (let resource of root) {
+      cache[`${resource.type}/${resource.id}`] = resource;
+    }
 
     // some included models may have already come along with the
     // document we got out of the searcher
     if (this.ctxt.body.included) {
       for (let resource of this.ctxt.body.included) {
-        this.includedResources[`${resource.type}/${resource.id}`] = resource;
+        cache[`${resource.type}/${resource.id}`] = resource;
       }
     }
 
-    this.includes.forEach(segments => this._loadIncluded(root, segments));
-    await Promise.all(Object.values(this.includedSets));
-    this.ctxt.body.included = Object.keys(this.includedResources).map(k => this.includedResources[k].data);
+    this.includes.forEach(segments => this._loadIncluded(root, segments, cache, sets));
+
+    // this uniq works because our cache works as an identity map
+    let included = uniq(root.concat(flatten(await Promise.all(Object.values(sets)))));
+
+    if (included.length > root.length) {
+      this.ctxt.body.included = included.slice(root.length);
+    } else {
+      delete this.ctxt.body.included;
+    }
   }
 
-  async _loadIncluded(root, segments) {
+  async _loadIncluded(root, segments, cache, sets) {
     let name = segments.join('.');
-    if (this.includedSets[name]) {
-      return this.includedSets[name];
+    if (sets[name]) {
+      return sets[name];
     }
 
-    return this.includedSets[name] = (async () => {
+    return sets[name] = (async () => {
       let tail = segments[segments.length - 1];
       let sourceSet;
       if (segments.length === 1) {
         sourceSet = root;
       } else {
-        sourceSet = await this._loadIncluded(root, segments.slice(0, -1));
+        sourceSet = await this._loadIncluded(root, segments.slice(0, -1), cache, sets);
       }
-      let resources = flatten(await Promise.all(sourceSet.map(record => {
+
+      // TODO: we could correlate all the things that need to be
+      // fetched at this level into a single query, or at least a
+      // single query per type.
+      let lists = await Promise.all(sourceSet.map(async record => {
         if (!record.relationships || !record.relationships[tail]) {
           return [];
         }
         let data = record.relationships[tail].data;
         if (Array.isArray(data)) {
-          return Promise.all(data.map(ref => this._lookupRecord(ref.type, ref.id)));
+          return Promise.all(data.map(ref => this._cachedLookupRecord(ref.type, ref.id, cache)));
         } else if (data) {
-          return this._lookupRecord(data.type, data.id).then(record => [record]);
+          let resource = await this._cachedLookupRecord(data.type, data.id, cache);
+          return [resource];
         } else {
           return [];
         }
-      })));
-      for (let resource of resources) {
-        this.includedResources[`${resource.data.type}/${resource.data.id}`] = resource;
-        if (resource.included) {
-          for (let inner of resource.included) {
-            this.includedResources[`${inner.data.type}/${inner.data.id}`] = { data: inner };
-          }
-        }
-      }
-      return resources.map(r => r.data);
+      }));
+      return flatten(lists);
     })();
   }
 }

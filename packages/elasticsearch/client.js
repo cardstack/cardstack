@@ -126,66 +126,6 @@ module.exports = class SearchClient {
     return branchPrefix;
   }
 
-  async jsonapiToSearchDoc(type, id, jsonapiDoc, schema, branch, sourceId) {
-    // we store the id as a regular field in elasticsearch here, because
-    // we use elasticsearch's own built-in _id for our own composite key
-    // that takes into account branches.
-    //
-    // we don't store the type as a regular field in elasticsearch,
-    // because we're keeping it in the built in _type field.
-    let esId = await this.logicalFieldToES(branch, 'id');
-    let searchDoc = { [esId]: id };
-
-    // this is the copy of the document we will return to anybody who
-    // retrieves it. It's supposed to already be a correct jsonapi
-    // response, as opposed to the searchDoc itself which is mangled
-    // for searchability.
-    let pristine = {
-      data: { id, type }
-    };
-
-    if (jsonapiDoc.attributes) {
-      pristine.data.attributes = jsonapiDoc.attributes;
-      for (let attribute of Object.keys(jsonapiDoc.attributes)) {
-        let value = jsonapiDoc.attributes[attribute];
-        let field = schema.fields.get(attribute);
-        if (field) {
-          let derivedFields = field.derivedFields(value);
-          if (derivedFields) {
-            for (let [derivedName, derivedValue] of Object.entries(derivedFields)) {
-              let esName = await this.logicalFieldToES(branch, derivedName);
-              searchDoc[esName] = derivedValue;
-            }
-          }
-        }
-        let esName = await this.logicalFieldToES(branch, attribute);
-        searchDoc[esName] = value;
-      }
-    }
-    if (jsonapiDoc.relationships) {
-      pristine.data.relationships = jsonapiDoc.relationships;
-      for (let attribute of Object.keys(jsonapiDoc.relationships)) {
-        let value = jsonapiDoc.relationships[attribute];
-        let field = schema.fields.get(attribute);
-        if (field && value && value.hasOwnProperty('data')) {
-          let esName = await this.logicalFieldToES(branch, attribute);
-          searchDoc[esName] = value.data;
-        }
-      }
-    }
-
-    // The next fields in the searchDoc get a "cardstack_" prefix so
-    // they aren't likely to collide with the user's attribute or
-    // relationship.
-    if (jsonapiDoc.meta) {
-      searchDoc.cardstack_meta = jsonapiDoc.meta;
-      pristine.data.meta = jsonapiDoc.meta;
-    }
-    searchDoc.cardstack_source = sourceId;
-    searchDoc.cardstack_pristine = pristine;
-    return searchDoc;
-  }
-
   async _rewriteMapping(branch, mapping, nameRewriter) {
     if (!mapping) { return; }
     let output = {};

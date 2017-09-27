@@ -38,8 +38,21 @@ describe('jsonapi/middleware', function() {
       ]);
 
     factory.addResource('content-types', 'events')
+      .withAttributes({
+        defaultIncludes: ['similar-articles.author', 'previous.previous'],
+        searchableRelationships: ['similar-articles.author', 'previous.previous']
+      })
       .withRelated('fields', [
-        factory.getResource('fields', 'title')
+        factory.getResource('fields', 'title'),
+        factory.addResource('fields', 'similar-articles').withAttributes({
+          fieldType: '@cardstack/core-types::has-many'
+        }).withRelated('related-types', [{ type: 'content-types', id: 'articles' }]),
+        factory.addResource('fields', 'previous').withAttributes({
+          fieldType: '@cardstack/core-types::has-many'
+        }),
+        factory.addResource('fields', 'next').withAttributes({
+          fieldType: '@cardstack/core-types::belongs-to'
+        })
       ]);
 
     factory.addResource('articles', 0)
@@ -69,7 +82,7 @@ describe('jsonapi/middleware', function() {
         )
       ).withRelated(
         'editor',
-        factory.addResource('authors').withAttributes({
+        factory.addResource('authors', 'q').withAttributes({
           name: 'Quint'
         }).withRelated(
           'addresses',
@@ -81,6 +94,14 @@ describe('jsonapi/middleware', function() {
         )
       );
 
+    factory.addResource('articles', 3)
+      .withAttributes({
+        title: "third",
+        body: "This is the third article"
+      }).withRelated(
+        'author',
+        factory.getResource('authors', 'q')
+      );
 
     factory.addResource('authors').withAttributes({
       name: 'Lycia'
@@ -93,6 +114,27 @@ describe('jsonapi/middleware', function() {
       ]
     );
 
+    factory.addResource('events', '1')
+      .withAttributes({ title: 'First Event' })
+      .withRelated('similar-articles', [
+        factory.getResource('articles', '0'),
+        factory.getResource('articles', '1')
+      ]);
+
+    factory.addResource('events', '2')
+      .withAttributes({ title: 'Second Event' })
+      .withRelated('previous', [factory.getResource('events', '1')]);
+
+    factory.addResource('events', '3')
+      .withAttributes({ title: 'Third Event' })
+      .withRelated('previous', [factory.getResource('events', '2'), factory.getResource('events', '1')]);
+
+    factory.addResource('events', '4')
+      .withAttributes({ title: 'Fourth Event' });
+
+    factory.addResource('events', '5')
+      .withAttributes({ title: 'Fifth Event' })
+      .withRelated('next', factory.getResource('events', '4'));
 
     factory.addResource('plugin-configs', "@cardstack/jsonapi");
 
@@ -155,10 +197,11 @@ describe('jsonapi/middleware', function() {
       let response = await request.get('/api/articles');
       expect(response).hasStatus(200);
       expect(response.body).to.have.property('data');
-      expect(response.body).to.have.deep.property('meta.total', 2);
-      expect(response.body.data).length(2);
+      expect(response.body).to.have.deep.property('meta.total', 3);
+      expect(response.body.data).length(3);
       expect(response.body.data).collectionContains({ type: 'articles', id: '0' });
       expect(response.body.data).collectionContains({ type: 'articles', id: '1' });
+      expect(response.body.data).collectionContains({ type: 'articles', id: '3' });
     });
 
     it('can sort a collection resource', async function() {
@@ -170,7 +213,7 @@ describe('jsonapi/middleware', function() {
     });
 
     it('can reverse sort a collection resource', async function() {
-      let response = await request.get('/api/articles?sort=-title');
+      let response = await request.get('/api/articles?sort=-title&filter[id][]=0&filter[id][]=1');
       expect(response).hasStatus(200);
       expect(response.body).has.property('data');
       expect(response.body).has.deep.property('data[1].attributes.title', 'Hello world');
@@ -352,13 +395,13 @@ describe('jsonapi/middleware', function() {
       expect(streets).to.include('Bay State Ave');
       expect(streets).to.include('Dexter Drive');
       expect(streets).not.to.include('Elsewhere');
-      expect(authorNames).length(2);
+      expect(streets).length(2);
 
       expect(included).has.length(4);
     });
 
     it('can get a collection resource with includes', async function() {
-      let response = await request.get('/api/articles?include=editor.addresses');
+      let response = await request.get('/api/articles?include=editor.addresses&filter[id][]=0&filter[id][]=1');
       expect(response).hasStatus(200);
       expect(response.body.data).has.length(2);
       expect(response.body).has.property('included');
@@ -371,6 +414,156 @@ describe('jsonapi/middleware', function() {
       let streets = included.filter(r => r.type === 'addresses').map(r => r.attributes.street);
       expect(streets).to.deep.equal(['River Road']);
       expect(included).has.length(2);
+    });
+
+    it('can get an individual resource with default includes', async function() {
+      let response = await request.get('/api/events/1');
+      expect(response).hasStatus(200);
+      expect(response.body).deep.property('data.id', '1');
+      expect(response.body).deep.property('data.relationships.similar-articles.data');
+      expect(response.body.data.relationships['similar-articles'].data).length(2);
+      expect(response.body).has.property('included');
+      let included = response.body.included;
+      expect(included).is.a('array');
+
+      let authorNames = included.filter(r => r.type === 'authors').map(r => r.attributes.name);
+      expect(authorNames).length(1);
+      expect(authorNames).to.include('Arthur');
+
+      let articleIds = included.filter(r => r.type === 'articles').map(r => r.id);
+      expect(articleIds).length(2);
+      expect(articleIds).to.include('0');
+      expect(articleIds).to.include('1');
+    });
+
+    it('can override default includes with no includes', async function() {
+      let response = await request.get('/api/events/1?include=');
+      expect(response).hasStatus(200);
+      expect(response.body).deep.property('data.id', '1');
+      expect(response.body).deep.property('data.relationships.similar-articles.data');
+      expect(response.body.data.relationships['similar-articles'].data).length(2);
+      expect(response.body).not.has.property('included');
+    });
+
+    it('can override default includes with less includes', async function() {
+      let response = await request.get('/api/events/1?include=similar-articles');
+      expect(response).hasStatus(200);
+      expect(response.body).deep.property('data.id', '1');
+      expect(response.body).deep.property('data.relationships.similar-articles.data');
+      expect(response.body.data.relationships['similar-articles'].data).length(2);
+      expect(response.body).has.property('included');
+
+      let included = response.body.included;
+      expect(included).is.a('array');
+      expect(included).length(2);
+      expect(included.filter(r => r.type === 'articles')).length(2);
+    });
+
+    it('can override default includes with more includes', async function() {
+      let response = await request.get('/api/events/1?include=similar-articles.author.addresses');
+      expect(response).hasStatus(200);
+      expect(response.body).deep.property('data.id', '1');
+      expect(response.body).deep.property('data.relationships.similar-articles.data');
+      expect(response.body.data.relationships['similar-articles'].data).length(2);
+      expect(response.body).has.property('included');
+      let included = response.body.included;
+      expect(included).is.a('array');
+
+      let authorNames = included.filter(r => r.type === 'authors').map(r => r.attributes.name);
+      expect(authorNames).length(1);
+      expect(authorNames).to.include('Arthur');
+
+      let articleIds = included.filter(r => r.type === 'articles').map(r => r.id);
+      expect(articleIds).length(2);
+      expect(articleIds).to.include('0');
+      expect(articleIds).to.include('1');
+
+      let streets = included.filter(r => r.type === 'addresses').map(r => r.attributes.street);
+      expect(streets).to.include('Bay State Ave');
+      expect(streets).to.include('Dexter Drive');
+      expect(streets).length(2);
+    });
+
+    it('can get a collection resource with default includes', async function() {
+      let response = await request.get('/api/events?filter[id]=1');
+      expect(response).hasStatus(200);
+      expect(response.body).has.property('included');
+      let included = response.body.included;
+      expect(included).is.a('array');
+
+      let authorNames = included.filter(r => r.type === 'authors').map(r => r.attributes.name);
+      expect(authorNames).length(1);
+      expect(authorNames).to.include('Arthur');
+
+      let articleIds = included.filter(r => r.type === 'articles').map(r => r.id);
+      expect(articleIds).length(2);
+      expect(articleIds).to.include('0');
+      expect(articleIds).to.include('1');
+    });
+
+    it('can override default includes of a collection resource with no includes', async function() {
+      let response = await request.get('/api/events?filter[id]=1&include=');
+      expect(response).hasStatus(200);
+      expect(response.body).not.has.property('included');
+    });
+
+
+    it('de-duplicates when there are multiple paths to an included resource (with default includes, single endpoint)', async function() {
+      let response = await request.get('/api/events/3');
+      expect(response).hasStatus(200);
+      expect(response.body).has.property('included');
+      let included = response.body.included;
+      expect(included).is.a('array');
+      expect(included).length(2);
+    });
+
+    it('de-duplicates when there are multiple paths to an included resource (with default includes, collection endpoint)', async function() {
+      let response = await request.get('/api/events?filter[id]=3');
+      expect(response).hasStatus(200);
+      expect(response.body).has.property('included');
+      let included = response.body.included;
+      expect(included).is.a('array');
+      expect(included).length(2);
+    });
+
+    it('de-duplicates when there are multiple paths to an included resource (without default includes)', async function() {
+      let response = await request.get('/api/articles?include=author.addresses,editor.addresses');
+      expect(response).hasStatus(200);
+      expect(response.body).has.property('included');
+      let included = response.body.included;
+      expect(included).is.a('array');
+
+      let authorNames = included.filter(r => r.type === 'authors').map(r => r.attributes.name);
+      expect(authorNames).to.include('Arthur');
+      expect(authorNames).to.include('Quint');
+      expect(authorNames).length(2);
+
+      let streets = included.filter(r => r.type === 'addresses').map(r => r.attributes.street);
+      expect(streets).to.include('Bay State Ave');
+      expect(streets).to.include('Dexter Drive');
+      expect(streets).to.include('River Road');
+      expect(streets).length(3);
+    });
+
+    it('de-duplicates when a root resource is also an included resource (with default includes)', async function() {
+      let response = await request.get('/api/events');
+      expect(response).hasStatus(200);
+      expect(response.body).has.property('included');
+      let included = response.body.included;
+      expect(included).is.a('array');
+      let otherEvents = included.filter(e => e.type === 'events');
+      expect(otherEvents).length(0);
+      expect(response.body.data).length(5);
+    });
+
+    it('de-duplicates when a root resource is also an included resource (without default includes)', async function() {
+      let response = await request.get('/api/events?include=next&filter[id][]=4&filter[id][]=5');
+      expect(response).hasStatus(200);
+      expect(response.body).not.has.property('included');
+    });
+
+    it('distinguishes default-includes vs searchable-relationships', function() {
+      expect(false).is.ok;
     });
 
   });
