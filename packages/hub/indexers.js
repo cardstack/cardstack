@@ -440,7 +440,7 @@ class BranchUpdate {
                 ourReferences.push(`${type}/${id}`);
                 let resource = await this.read(type, id);
                 if (resource) {
-                  return this._prepareSearchDoc(type, id, resource, searchTree[attribute], ourIncludes);
+                  return this._prepareSearchDoc(type, id, resource, searchTree[attribute], ourIncludes, ourReferences);
                 }
               }));
               related = related.filter(Boolean);
@@ -449,7 +449,7 @@ class BranchUpdate {
               ourReferences.push(`${value.data.type}/${value.data.id}`);
               let resource = await this.read(value.data.type, value.data.id);
               if (resource) {
-                related = await this._prepareSearchDoc(resource.type, resource.id, resource, searchTree[attribute], ourIncludes);
+                related = await this._prepareSearchDoc(resource.type, resource.id, resource, searchTree[attribute], ourIncludes, ourReferences);
               } else {
                 pristine.data.relationships[attribute].data = null;
               }
