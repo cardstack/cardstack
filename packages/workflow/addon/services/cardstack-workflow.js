@@ -102,7 +102,7 @@ export default Service.extend({
   selectedDate: '',
   threadsWithSelectedDate: computed('selectedDate', function() {
     if (this.get('selectedDate') === 'today') {
-      let threads = this.get('unhandledForToday');
+      let threads = this.get('threadsUpdatedToday');
       return {
         today: {
           name: 'Today',
