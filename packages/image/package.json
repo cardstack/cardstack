@@ -1,6 +1,6 @@
 {
   "name": "@cardstack/image",
-  "version": "0.2.8",
+  "version": "0.2.10",
   "description": "Image field plugin for cardstack",
   "keywords": [
     "ember-addon",
