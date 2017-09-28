@@ -158,7 +158,7 @@ export default Service.extend({
       selectedDate: date,
       selectedTag: null
     });
-    this.clearSelectedMessage();
+    this.clearSelectedThread();
   },
 
   selectTag(tagId) {
@@ -167,7 +167,7 @@ export default Service.extend({
       selectedDate: null,
       selectedTag
     });
-    this.clearSelectedMessage();
+    this.clearSelectedThread();
   },
 
   selectThread(thread) {
@@ -181,23 +181,7 @@ export default Service.extend({
     });
   },
 
-  clearSelectedMessage() {
+  clearSelectedThread() {
     this.set('selectedThread', null);
-  },
-
-  approveMessage(message) {
-    message.setProperties({
-      status: 'approved',
-      priority: PROCESSED
-    });
-    this.clearSelectedMessage();
-  },
-
-  denyMessage(message) {
-    message.setProperties({
-      status: 'denied',
-      priority: PROCESSED
-    });
-    this.clearSelectedMessage();
   }
 });
