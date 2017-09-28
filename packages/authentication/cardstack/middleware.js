@@ -78,6 +78,12 @@ class Authentication {
   _tokenVerifier() {
     return async (ctxt, next) => {
       let m = bearerTokenPattern.exec(ctxt.header['authorization']);
+
+      // Allow auth from query params if not in header
+      if (!m && ctxt.request.query['cardstackAuthToken']) {
+        m = [null, ctxt.request.query['cardstackAuthToken']];
+      }
+
       if (m) {
         let session = this._tokenToSession(m[1]);
         if (session) {
@@ -147,7 +153,7 @@ class Authentication {
 
     ctxt.body = {
       data: user,
-      meta: await this.createToken({ id: user.id, type: user.type }, 86400)
+      meta: await this.createToken({ id: user.id, type: user.type }, source.attributes['token-expiry'] || 86400)
     };
     ctxt.status = 200;
   }
