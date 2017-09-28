@@ -1,5 +1,7 @@
 <div class="cardstack-thread-container" data-test-thread-container>
   <h4 class="header">Single Thread View</h4>
+  {{cardstack/thread-summary-card thread=thread}}
+  <hr>
   {{#each thread.messagesInReverseChrono as |message|}}
     {{cardstack-content content=message.loadedCard format="card"}}
   {{/each}}
