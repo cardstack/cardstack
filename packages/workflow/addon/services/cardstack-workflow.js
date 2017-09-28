@@ -24,6 +24,9 @@ function threadsBetween(arrayKey, dateKey, { from, to }) {
 export default Service.extend({
   isOpen: false,
   selectedThread: null,
+  selectedTag: null,
+  selectedDate: null,
+  selectedPriority: '',
 
   store: inject(),
 
@@ -161,7 +164,8 @@ export default Service.extend({
     this.clearSelectedThread();
   },
 
-  selectTag(tagId) {
+  selectTag({ priority, tagId }) {
+    this.set('selectedPriority', priority);
     let selectedTag = this.get('store').peekRecord('tag', tagId);
     this.setProperties({
       selectedDate: null,

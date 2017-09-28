@@ -12,13 +12,14 @@
   </div>
 
   {{#each-in groupedThreads as |priorityId priorityGroup|}}
-    {{#with priorityGroup.name as |name|}}
-      <div class="cardstack-workflow-group" data-test-workflow-group={{name}}>
-        <h4 class="cardstack-workflow-group-header" data-test-priority-header={{name}}>{{name}}</h4>
+    {{#with priorityGroup.name as |priority|}}
+      <div class="cardstack-workflow-group" data-test-workflow-group={{priority}}>
+        <h4 class="cardstack-workflow-group-header" data-test-priority-header={{priority}}>{{priority}}</h4>
         {{#each-in priorityGroup.tagGroups as |tagId tagGroup|}}
-          {{#with "fixme-group-id" as |groupId|}}
+          {{#with (workflow-group-id priority tagGroup.name) as |groupId|}}
             <div class={{concat "cardstack-workflow-label-with-count-wrapper " (if (eq selectedGroup groupId) "active")}}>
-              <div class={{concat "cardstack-workflow-label-with-count " tagGroup.priorityLevel "-priority"}} onclick={{action 'selectTag' tagId}}>
+              <div class={{concat "cardstack-workflow-label-with-count " tagGroup.priorityLevel "-priority"}}
+                   onclick={{action 'selectTag' (hash priority=priority tagId=tagId)}}>
                 <div class='name'>{{tagGroup.name}}</div>
                 {{#if tagGroup.unhandled.length}}
                   <div class="count" data-test-group-counter={{groupId}}>{{tagGroup.unhandled.length}}</div>
