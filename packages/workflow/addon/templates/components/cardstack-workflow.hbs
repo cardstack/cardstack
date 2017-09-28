@@ -4,7 +4,9 @@
     <div class={{concat "cardstack-workflow-label-with-count-wrapper " (if (eq selectedDate 'today') "active")}}>
       <div class="cardstack-workflow-label-with-count high-priority" onclick={{action 'selectDate' 'today'}}>
         <div class="name">Today</div>
-        <div class="count" data-test-group-counter="Today">{{todaysNotificationCount}}</div>
+        {{#if todaysNotificationCount}}
+          <div class="count" data-test-group-counter="Today">{{todaysNotificationCount}}</div>
+        {{/if}}
       </div>
     </div>
   </div>
