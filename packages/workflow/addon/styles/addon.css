@@ -66,11 +66,15 @@
   text-align: center;
 }
 
-.cardstack-cue-card {
+.cardstack-thread-view {
   min-width: 25vw;
   background-color: var(--lighter-background);
   color: var(--bright-foreground);
   padding: 0 5px;
+}
+
+.cardstack-thread-container {
+  margin: 0 10px;
 }
 
 .cardstack-workflow-label-with-count-wrapper {
@@ -125,7 +129,7 @@ count could be made to stay on the same line
 .cardstack-message-list-card {
   display: flex;
   flex-direction: column;
-  margin: 2vh;
+  margin: 10px;
   background-color: var(--bright-foreground);
   padding: 10px;
   color: var(--light-background);
@@ -167,5 +171,33 @@ count could be made to stay on the same line
 
 .cardstack-thread-container > .header {
   text-transform: uppercase;
-  margin-left: 10px;
+}
+
+.cardstack-thread-container > .chat-message-pane {
+  margin: 0 10px;
+  height: 50px;
+}
+
+.cardstack-chat-message-input {
+  width: 80%;
+  padding: 10px;
+  height: 100%;
+  border-radius: 5px;
+  font-size: 1.1em;
+}
+
+.cardstack-action-button {
+  padding: 10px;
+  margin-right: 10px;
+  font-size: 0.8em;
+  color: var(--normal-background);
+  background-color: var(--bright-foreground);
+  border: 1px solid var(--dark-background);
+  border-radius: 3px;
+  cursor: pointer;
+}
+
+.chat-message-pane > .cardstack-action-button {
+  height: 100%;
+  border: 1px solid var(--lighter-background);
 }

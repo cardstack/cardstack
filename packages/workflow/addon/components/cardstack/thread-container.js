@@ -6,9 +6,16 @@ export default Component.extend({
 
   thread: null,
 
+  newMessageText: '',
+
   actions: {
-    select() {
-      this.get('workflow').selectThread(this.get('thread'));
+    sendMessage() {
+      this.get('workflow').createMessage({
+        text: this.get('newMessageText'),
+        thread: this.get('thread')
+      }).then(() => {
+        this.set('newMessageText', '');
+      });
     }
   }
 });

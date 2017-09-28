@@ -129,6 +129,30 @@ export default Service.extend({
     message.handle();
   },
 
+  createMessage({ thread, text }) {
+    let chatMessage = this.get('store').createRecord('chat-message', {
+      text
+    });
+    let message = this.get('store').createRecord('message', {
+      sentAt: moment(),
+      status: 'unhandled'
+    });
+    return chatMessage.save()
+      .then((chatMessage) => {
+        message.setProperties({
+          cardId: chatMessage.get('id'),
+          cardType: 'chat-messages'
+        });
+        return message.save();
+      })
+      .then((message) => {
+        thread.addMessage(message);
+      })
+      .catch((error) => {
+        console.error("Something went wrong", error);
+      });
+  },
+
   selectDate(date) {
     this.setProperties({
       selectedDate: date,

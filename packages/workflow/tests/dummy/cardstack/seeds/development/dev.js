@@ -40,12 +40,14 @@ function initialModels() {
 
   initial.addResource('content-types', 'messages')
     .withRelated('fields', [
+      //TODO: `text` field should be removed
       initial.addResource('fields', 'text').withAttributes({
         fieldType: '@cardstack/core-types::string'
       }),
       initial.addResource('fields', 'status').withAttributes({
         fieldType: '@cardstack/core-types::string'
       }),
+      //TODO: `is-handled` field should be removed
       initial.addResource('fields', 'is-handled').withAttributes({
         fieldType: '@cardstack/core-types::boolean'
       }),

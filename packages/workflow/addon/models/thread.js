@@ -34,6 +34,10 @@ export default Thread.extend({
 
   latestMessage: readOnly('messagesInReverseChrono.firstObject'),
 
+  addMessage(message) {
+    this.get('_syncedMessages').addObject(message);
+  },
+
   _latestMessageWithPriority: computed('messagesInReverseChrono.[]', function() {
     return this.get('messagesInReverseChrono').find((message) => {
       let priorityId = message.belongsTo('priority').id();

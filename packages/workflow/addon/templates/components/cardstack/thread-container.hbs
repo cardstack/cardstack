@@ -1,8 +1,17 @@
-<div class="cardstack-thread-container" data-test-thread-container>
+<div class="cardstack-thread-container">
   <h4 class="header">Single Thread View</h4>
   {{cardstack/thread-summary-card thread=thread}}
   <hr>
   {{#each thread.messagesInReverseChrono as |message|}}
     {{cardstack-content content=message.loadedCard format="card"}}
   {{/each}}
+  <hr>
+  <div class="chat-message-pane">
+    {{input
+        type="text"
+        value=newMessageText
+        class="cardstack-chat-message-input"
+        placeholder="If you see something, say something."}}
+    <button type="button" class="cardstack-action-button" onclick={{action "sendMessage"}}>Send it!</button>
+  </div>
 </div>
