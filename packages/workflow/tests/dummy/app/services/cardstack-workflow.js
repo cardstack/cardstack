@@ -4,28 +4,28 @@ export default workflowService.extend({
   // Song Change Requests actions
   approveSongChangeRequest(request) {
     this.process(request.get('message'));
-    request.set('status', 'approved');
+    request.approve();
   },
 
   denySongChangeRequest(request) {
     this.process(request.get('message'));
-    request.set('status', 'denied');
+    request.deny();
   },
 
   // Song License Request actions
   approveSongLicenseRequest(request) {
     this.process(request.get('message'));
-    request.set('status', 'approved');
+    request.approve();
   },
 
   denySongLicenseRequest(request) {
     this.process(request.get('message'));
-    request.set('status', 'denied');
+    request.deny();
   },
 
   // Chat Message actions
   readChatMessage(chatMessage) {
     this.process(chatMessage.get('message'));
-    chatMessage.set('status', 'read');
+    chatMessage.read();
   }
 });

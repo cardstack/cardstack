@@ -3,4 +3,12 @@ import hasMessage from 'dummy/utils/has-message';
 
 export default SongLicenseRequest.extend({
   message: hasMessage('song-license-requests'),
+
+  approve() {
+    this.set('status', 'approved');
+  },
+
+  deny() {
+    this.set('status', 'denied');
+  }
 });
