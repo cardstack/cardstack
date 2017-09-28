@@ -1,8 +1,10 @@
 import Component from "@ember/component";
 import { computed } from '@ember/object';
 import { readOnly } from "@ember/object/computed";
+// import layout from '../../templates/components/cardstack/thread-summary-card';
 
 export default Component.extend({
+//  layout,
   classNames: ['cardstack-thread-summary-card'],
   thread: null,
   messages: readOnly('thread.messagesInReverseChrono'),
