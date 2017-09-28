@@ -230,7 +230,7 @@ function initialModels() {
 
   initial.addResource('song-license-requests', '3')
     .withAttributes({
-      comment: 'Would like to add more guitars to Caspian\'s Sycamore, please?',
+      comment: 'License request for Caspian\'s Sycamore, please?',
     });
 
   // Seed messages
