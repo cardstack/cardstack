@@ -61,7 +61,7 @@
   padding: 0 5px;
 }
 
-.cardstack-empty-cue-card-message {
+.cardstack-no-threads-message {
   margin-top: 10vh;
   text-align: center;
 }
@@ -126,7 +126,7 @@ count could be made to stay on the same line
 }
 
 .cardstack-message-card,
-.cardstack-message-list-card {
+.cardstack-thread-list-card {
   display: flex;
   flex-direction: column;
   margin: 10px;
@@ -140,7 +140,7 @@ count could be made to stay on the same line
   min-height: 25px;
 }
 
-.cardstack-message-list-card {
+.cardstack-thread-list-card {
   cursor: pointer;
 }
 
@@ -179,6 +179,7 @@ count could be made to stay on the same line
   padding: 10px;
   margin-right: 10px;
   font-size: 0.8em;
+  height: 40px;
   color: var(--normal-background);
   background-color: var(--bright-foreground);
   border: 1px solid var(--dark-background);
@@ -186,14 +187,12 @@ count could be made to stay on the same line
   cursor: pointer;
 }
 
+.chat-message-pane > .cardstack-action-button {
+  height: 100%;
+}
+
 .cardstack-action-button[disabled] {
   border: 1px solid var(--lighter-background);
   color: var(--light-background);
   cursor: default;
 }
-
-.chat-message-pane > .cardstack-action-button {
-  height: 100%;
-  border: 1px solid var(--dark-background);
-}
-
