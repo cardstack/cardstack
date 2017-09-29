@@ -52,23 +52,4 @@ export default Message.extend({
     this.set('loadedTags', tags);
     return tags;
   }),
-	/*
-	groupId: Ember.computed('priority.id', 'tag', function() {
-		return workflowGroupId([this.get('priority.id'), this.get('tag')]);
-	}),
-
-	isHandled: Ember.computed('status', function() {
-		return this.get('status') !== 'pending';
-	}),
-
-	isImportant: Ember.computed('status', 'priority', function() {
-		let status = this.get('status');
-		let priority = this.get('priority');
-		if (status === 'pending') {
-			return [NEED_RESPONSE, DELEGATED].includes(priority);
-		} else {
-			return [PROCESSED, FYI].includes(priority);
-		}
-	})
-	*/
 })

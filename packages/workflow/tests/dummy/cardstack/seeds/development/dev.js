@@ -226,7 +226,7 @@ function initialModels() {
 
   initial.addResource('song-license-requests', '2')
     .withAttributes({
-      comment: 'License request for Chris Cornell\'s Seasons approved',
+      comment: 'License request for Chris Cornell\'s Seasons',
   });
 
   initial.addResource('song-license-requests', '3')

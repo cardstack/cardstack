@@ -3,7 +3,9 @@
   {{cardstack/thread-summary-card thread=thread}}
   <hr>
   {{#each thread.messagesInReverseChrono as |message|}}
-    {{cardstack-content content=message.loadedCard format="card"}}
+    {{#if message.loadedCard}}
+      {{cardstack-content content=message.loadedCard format="card"}}
+    {{/if}}
   {{/each}}
   <hr>
   <div class="chat-message-pane">
