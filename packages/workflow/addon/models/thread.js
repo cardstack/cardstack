@@ -3,6 +3,7 @@ import Thread from '@cardstack/models/generated/thread';
 import { task } from 'ember-concurrency';
 import { computed } from "@ember/object"
 import { readOnly } from "@ember/object/computed";
+import RSVP from 'rsvp';
 
 export default Thread.extend({
   priority:       readOnly('_latestMessageWithPriority.priority'),
@@ -13,9 +14,9 @@ export default Thread.extend({
     return this.get('_syncedMessages').any((message) => message.get('isUnhandled'));
   }),
 
-  loadedTags: computed({
+  tags: computed('_syncedMessages.[]', {
     get() {
-      this.get('_loadTags').perform();
+      this.get('loadTags').perform();
       return Ember.A();
     },
     set(k, v) {
@@ -23,8 +24,22 @@ export default Thread.extend({
     }
   }),
 
-  loadedTagIds: computed(function() {
-    return this.get('loadedTags').map((tag) => tag.get('id'));
+  loadTags: task(function * () {
+    let tagLoadingTasks = this.get('_syncedMessages').map((message) => {
+      //  _loadTags has a side-effect as it also sets its `loadedTags`
+      // this might cause problems, so we can split the task that also mutates
+      // into a "pure" task and a setter.
+      return message.get('_loadTags').perform();
+    });
+    let tags = yield RSVP.all(tagLoadingTasks);
+    let flattenedTags = tags.reduce((flattenedTags, tagsForMessage) => {
+      return flattenedTags.concat(tagsForMessage.toArray());
+    }, []);
+    this.set('tags', flattenedTags);
+  }),
+
+  tagIds: computed(function() {
+    return this.get('tags').map((tag) => tag.get('id'));
   }),
 
   messagesInReverseChrono: computed('_syncedMessages.[]', function() {
@@ -59,10 +74,4 @@ export default Thread.extend({
     let messages = yield this.get("messages");
     this.set('_syncedMessages', messages);
   }).restartable(),
-
-
-  _loadTags: task(function * () {
-    let tags = yield this.get('tags');
-    this.set('loadedTags', tags);
-  }),
 });
