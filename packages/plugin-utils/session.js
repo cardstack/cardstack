@@ -30,3 +30,27 @@ class Session {
 }
 
 module.exports = Session;
+
+// This is the session that Hub uses when taking its own actions in
+// the system.  The user id "@cardstack/hub" is special -- it has a
+// grant to do all the things (see bootstrap-schema.js)
+let privlegedSession;
+Object.defineProperty(Session, 'INTERNAL_PRIVLEGED', {
+  get() {
+    if (!privlegedSession) {
+      privlegedSession = new Session(
+        { id: '@cardstack/hub', type: 'users' },
+        null,
+        {
+          id: '@cardstack/hub',
+          type: 'users',
+          attributes: {
+            'full-name': '@cardstack/hub/authentication',
+            email: 'noreply@nowhere.com'
+          }
+        }
+      );
+    }
+    return privlegedSession;
+  }
+});

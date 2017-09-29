@@ -268,13 +268,16 @@ async function jsonapiDocToSearchDoc(id, jsonapiDoc, schema, branch, client, sou
   if (jsonapiDoc.relationships) {
     for (let attribute of Object.keys(jsonapiDoc.relationships)) {
       let value = jsonapiDoc.relationships[attribute];
-      let esName = await client.logicalFieldToES(branch, attribute);
-      searchDoc[esName] = value;
-      rewrites[esName] = {
-        delete: false,
-        rename: esName === attribute ? null : attribute,
-        isRelationship: true
-      };
+      let field = schema.fields.get(attribute);
+      if (field && value && value.hasOwnProperty('data')) {
+        let esName = await client.logicalFieldToES(branch, attribute);
+        searchDoc[esName] = value.data;
+        rewrites[esName] = {
+          delete: false,
+          rename: esName === attribute ? null : attribute,
+          isRelationship: true
+        };
+      }
     }
   }
 

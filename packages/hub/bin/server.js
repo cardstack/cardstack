@@ -9,11 +9,8 @@ async function runServer(options, seedModels) {
   let {
     sessionsKey,
     port,
-    allowDevDependencies
   } = options;
-  let app = await makeServer(process.cwd(), sessionsKey, seedModels, {
-    allowDevDependencies
-  });
+  let app = await makeServer(process.cwd(), sessionsKey, seedModels, options);
   app.listen(port);
   log.info("server listening on %s", port);
 }
@@ -21,8 +18,10 @@ async function runServer(options, seedModels) {
 function commandLineOptions() {
   commander
     .usage('[options] <seed-config-directory>')
-    .option('-p --port <port>', 'Server listen port.', 3000)
-    .option('-d --allow-dev-dependencies', 'Allow the hub to load devDependencies.', 3000)
+    .option('-p --port <port>', 'Server listen port', 3000)
+    .option('-d --allow-dev-dependencies', 'Allow the hub to load devDependencies')
+    .option('-c --containerized', 'Run the hub in container mode (temporary feature flag)')
+    .option('-l --leave-services-running', 'Leave dockerized services running, to improve future startup time')
     .parse(process.argv);
 
   if (commander.args.length < 1) {

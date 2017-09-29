@@ -1,4 +1,5 @@
 const Error = require('@cardstack/plugin-utils/error');
+const { INTERNAL_PRIVLEGED } = require('@cardstack/plugin-utils/session');
 const log = require('@cardstack/plugin-utils/logger')('ephemeral');
 const { declareInjections } = require('@cardstack/di');
 
@@ -13,16 +14,25 @@ let generationCounter = 0;
 
 module.exports = declareInjections({
   indexers: 'hub:indexers',
-  schema: 'hub:schema-loader'
+  writers: 'hub:writers'
 }, class EphemeralStorageService {
   constructor() {
     this._dataSources = new Map();
   }
-  storageForDataSource(id, initialModels) {
+  async storageForDataSource(id, initialModels) {
     let storage = this._dataSources.get(id);
     if (!storage) {
-      storage = new EphemeralStorage(this.indexers, initialModels, this.schema.ownTypes());
+      storage = new EphemeralStorage(this.indexers);
       this._dataSources.set(id, storage);
+
+      if (initialModels) {
+        for (let model of initialModels) {
+          // recursion notice: these writes will be coming back to us,
+          // meaning they will also call storageForDataSource.
+          await this.writers.create('master', INTERNAL_PRIVLEGED, model.type, model);
+        }
+      }
+
     }
     return storage;
   }
@@ -30,7 +40,7 @@ module.exports = declareInjections({
 
 
 class EphemeralStorage {
-  constructor(indexers, initialModels, schemaTypes) {
+  constructor(indexers) {
     // map from `${type}/${id}` to { model, isSchema, generation, type, id }
     // if model == null, that's a tombstone
     this.models = new Map();
@@ -38,12 +48,6 @@ class EphemeralStorage {
 
     // The special checkpoint "empty" is always available
     this.checkpoints = new Map([['empty', new Map()]]);
-
-    if (initialModels) {
-      for (let model of initialModels) {
-        this.store(model.type, model.id, model, schemaTypes.includes(model.type));
-      }
-    }
   }
 
   get identity() {

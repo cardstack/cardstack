@@ -37,6 +37,7 @@ module.exports = class Field {
     }
 
     this.grants = allGrants.filter(g => g.fields == null || g.fields.includes(model.id));
+    this._mapping = null;
   }
 
   _lookupDefaultValue(model, relationship, defaultValues) {
@@ -200,9 +201,12 @@ module.exports = class Field {
     this._validateFormat(value, errors);
     return errors;
   }
-  mapping() {
+  mapping(allFields) {
+    if (this._mapping) {
+      return this._mapping;
+    }
     let m = {
-      [this.id]: Object.assign({}, this.plugin.defaultMapping())
+      [this.id]: Object.assign({}, this.plugin.defaultMapping(allFields))
     };
 
     if (!this.searchable) {
@@ -214,8 +218,9 @@ module.exports = class Field {
     }
 
     if (this.plugin.derivedMappings) {
-      Object.assign(m, this.plugin.derivedMappings(this.id));
+      Object.assign(m, this.plugin.derivedMappings(this.id, allFields));
     }
+    this._mapping = m;
     return m;
   }
   get sortFieldName() {
