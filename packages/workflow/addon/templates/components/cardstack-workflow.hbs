@@ -40,18 +40,9 @@
 {{else}}
   {{#if shouldShowMatchingThreads}}
     <section class="cardstack-cue-card-list">
-      {{#each-in matchingThreads as |priorityId priorityGroup|}}
-        {{#with priorityGroup.name as |name|}}
-          <h4 class="cardstack-workflow-group-header" data-test-priority-header={{name}}>{{name}}</h4>
-          {{#each priorityGroup.threads as |thread|}}
-            {{cardstack/thread-list-card thread=thread onSelect=(action "selectThread" thread)}}
-          {{/each}}
-        {{/with}}
-      {{else}}
-        <div class="cardstack-empty-cue-card-message" data-test-empty-group-message>
-          There are no cards to show.
-        </div>
-      {{/each-in}}
+      {{cardstack/thread-list
+          threads=matchingThreads
+          onSelect=(action "selectThread")}}
     </section>
   {{/if}}
 {{/if}}
