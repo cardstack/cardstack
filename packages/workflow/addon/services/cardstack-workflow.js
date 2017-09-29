@@ -2,7 +2,7 @@ import Service from "@ember/service"
 import { task } from 'ember-concurrency';
 import { inject } from "@ember/service";
 import { computed } from "@ember/object";
-import { readOnly, filterBy, or } from "@ember/object/computed";
+import { readOnly, filterBy } from "@ember/object/computed";
 
 function threadsBetween(arrayKey, dateKey, { from, to }) {
   return computed(`${arrayKey}.@each.${dateKey}`, function() {
@@ -23,10 +23,6 @@ function threadsBetween(arrayKey, dateKey, { from, to }) {
 
 export default Service.extend({
   isOpen: false,
-  selectedThread: null,
-  selectedTag: null,
-  selectedDate: null,
-  selectedPriority: '',
 
   store: inject(),
 
@@ -45,7 +41,7 @@ export default Service.extend({
   unhandledForToday:        filterBy('threadsUpdatedToday', 'isUnhandled'),
   todaysNotificationCount:  readOnly('unhandledForToday.length'),
 
-  groupedThreads: computed('items.@each.{priority,loadedTags,isUnhandled}', function() {
+  groupedThreads: computed('items.@each.{priority,tags,isUnhandled}', function() {
     return this.get('items').reduce((groupedThreads, thread) => {
       let priority = thread.get('priority');
       let priorityId = priority.get('id');
@@ -57,9 +53,9 @@ export default Service.extend({
       }
 
       let threadsForPriority = groupedThreads[priorityId];
-      let tags = thread.get('loadedTags');
+      let tags = thread.get('tags');
       for (let i=0; i<tags.length; i++) {
-        let tag = tags.objectAt(i);
+        let tag = tags[i];
         let tagId = tag.get('id');
         if (!threadsForPriority.tagGroups[tagId]) {
           threadsForPriority.tagGroups[tagId] = {
@@ -81,51 +77,6 @@ export default Service.extend({
 
   threadsUpdatedToday: threadsBetween('items', 'updatedAt', {
     from: moment().subtract(1, 'day')
-  }),
-
-  selectedTag:    '',
-  threadsWithSelectedTag: computed('items.@each.{loadedTagIds,priority}', 'selectedTag', function() {
-    let selectedTagId = this.get('selectedTag.id');
-    let withSelectedTag = this.get('items').filter((thread) => thread.get('loadedTagIds').includes(selectedTagId));
-    return withSelectedTag.reduce((groups, thread) => {
-      let priority = thread.get('priority');
-      let priorityId = priority.get('id');
-      if (!groups[priorityId]) {
-        groups[priorityId] = {
-          name: priority.get('name'),
-          threads: []
-        }
-      }
-
-      groups[priorityId].threads.push(thread);
-      return groups;
-    }, {});
-  }),
-
-  selectedDate: '',
-  threadsWithSelectedDate: computed('selectedDate', function() {
-    if (this.get('selectedDate') === 'today') {
-      let threads = this.get('threadsUpdatedToday');
-      return {
-        today: {
-          name: 'Today',
-          threads
-        }
-      };
-    }
-    return {};
-  }),
-
-  shouldShowMatchingThreads: or('selectedTag', 'selectedDate'),
-
-  matchingThreads: computed('selectedTag', 'selectedDate', 'threadsWithSelectedTag', 'threadsWithSelectedDate', function() {
-    if (this.get('selectedTag')) {
-      return this.get('threadsWithSelectedTag');
-    }
-    if (this.get('selectedDate')) {
-      return this.get('threadsWithSelectedDate');
-    }
-    return [];
   }),
 
   process(message) {
@@ -155,37 +106,4 @@ export default Service.extend({
         console.error("Something went wrong", error);
       });
   },
-
-  selectDate(date) {
-    this.setProperties({
-      selectedDate: date,
-      selectedTag: null
-    });
-    this.clearSelectedThread();
-  },
-
-  selectTag({ priority, tagId }) {
-    this.set('selectedPriority', priority);
-    let selectedTag = this.get('store').peekRecord('tag', tagId);
-    this.setProperties({
-      selectedDate: null,
-      selectedTag
-    });
-    this.clearSelectedThread();
-  },
-
-  selectThread(thread) {
-    this.set('selectedThread', thread);
-  },
-
-  clearGroupSelection() {
-    this.setProperties({
-      selectedDate: null,
-      selectedTag: null
-    });
-  },
-
-  clearSelectedThread() {
-    this.set('selectedThread', null);
-  }
 });
