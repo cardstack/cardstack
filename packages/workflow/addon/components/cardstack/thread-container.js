@@ -1,5 +1,6 @@
 import Component from "@ember/component";
 import { inject } from "@ember/service";
+import { empty } from "@ember/object/computed";
 
 export default Component.extend({
   workflow: inject('cardstack-workflow'),
@@ -7,6 +8,8 @@ export default Component.extend({
   thread: null,
 
   newMessageText: '',
+
+  isEmptyNewMessage: empty('newMessageText'),
 
   actions: {
     sendMessage() {

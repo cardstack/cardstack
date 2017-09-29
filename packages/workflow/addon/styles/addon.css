@@ -158,17 +158,6 @@ count could be made to stay on the same line
   margin-top: 25px;
 }
 
-.button-panel > .action-button {
-  padding: 10px;
-  margin-right: 10px;
-  font-size: 0.8em;
-  color: var(--normal-background);
-  background-color: var(--bright-foreground);
-  border: 1px solid var(--dark-background);
-  border-radius: 3px;
-  cursor: pointer;
-}
-
 .cardstack-thread-container > .header {
   text-transform: uppercase;
 }
@@ -197,7 +186,14 @@ count could be made to stay on the same line
   cursor: pointer;
 }
 
+.cardstack-action-button[disabled] {
+  border: 1px solid var(--lighter-background);
+  color: var(--light-background);
+  cursor: default;
+}
+
 .chat-message-pane > .cardstack-action-button {
   height: 100%;
-  border: 1px solid var(--lighter-background);
+  border: 1px solid var(--dark-background);
 }
+
