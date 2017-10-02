@@ -1,8 +1,10 @@
 const logger = require('@cardstack/plugin-utils/logger');
 const { Pool } = require('pg');
-const { partition, isEqual, kebabCase } = require('lodash');
+const { partition, isEqual } = require('lodash');
 const Error = require('@cardstack/plugin-utils/error');
 const rowToDocument = require('./row-to-doc');
+const { apply_patch } = require('jsonpatch');
+const NameMapper = require('./name-mapper');
 
 // Yes, this is slightly bananas. But it's easier to just read the
 // output of the "test_decoding" plugin that ships with postgres than
@@ -15,11 +17,13 @@ const idPattern = /id\[[^\]]+\]:'?([^\s']+)/;
 module.exports = class Indexer {
   static create(params) { return new this(params); }
 
-  constructor({ branches, dataSource }) {
+  constructor({ branches, dataSource, renameTables, renameColumns, patch }) {
     this.branchConfig = branches;
     this.dataSourceId = dataSource.id;
     this.log = logger('postgresql');
     this.pools = Object.create(null);
+    this.mapper = new NameMapper(renameTables, renameColumns);
+    this.patch = patch || Object.create(null);
   }
 
   async branches() {
@@ -40,7 +44,7 @@ module.exports = class Indexer {
     }
 
     let client = await this.pools[branch].connect();
-    return new Updater(client, this.log, this.dataSourceId);
+    return new Updater(client, this.log, this.dataSourceId, this.mapper, this.patch);
   }
 
   async teardown() {
@@ -51,10 +55,12 @@ module.exports = class Indexer {
 };
 
 class Updater {
-  constructor(client, log, dataSourceId) {
+  constructor(client, log, dataSourceId, mapper, patch) {
     this.client = client;
     this.log = log;
     this.dataSourceId = dataSourceId;
+    this.mapper = mapper;
+    this.patch = patch;
   }
 
   destroy() {
@@ -76,6 +82,18 @@ class Updater {
     return this._schema;
   }
 
+  async read(type, id, isSchema) {
+    if (isSchema) {
+      let schema = await this.schema();
+      return schema.find(model => model.type === type && model.id === id);
+    }
+    let { schema, table } = this.mapper.tableForType(type);
+    let result = await this.query(`select * from ${schema}.${table} where id=$1`, [id]);
+    if (result.rows.length > 0) {
+      return await this._toDocument(type, result.rows[0]);
+    }
+  }
+
   async _loadSchema() {
     // This is an inner join, so it will "miss" any table that has no
     // columns. But that's a silly case I don't want to support
@@ -91,35 +109,34 @@ class Updater {
     let fields = Object.create(null);
 
     for (let { table_schema, table_name, column_name, data_type } of columns) {
-      let scopedTableName = this._typeNameFor(table_schema, table_name);
+      let contentTypeName = this.mapper.typeNameFor(table_schema, table_name);
+      let fieldName = this.mapper.fieldNameFor(table_schema, table_name, column_name);
 
       // Every content type always has an ID field implicitly, it
       // doesn't need to be created.
-      if (column_name === 'id') {
+      if (fieldName === 'id') {
         continue;
       }
 
-      if (column_name === 'type') {
-        this.log.warn('Ignoring a column named "type" on table %s because its not a legal JSONAPI field name', scopedTableName);
+      if (fieldName === 'type') {
+        this.log.warn('Ignoring a column named "type" on table %s because its not a legal JSONAPI field name', contentTypeName);
         continue;
       }
 
       let fieldType = this._fieldTypeFor(data_type);
       if (!fieldType) {
-        this.log.warn('Ignoring column "%s" because of unknown data type "%s"', column_name, data_type);
+        this.log.warn('Ignoring column "%s" because of unknown data type "%s"', fieldName, data_type);
         continue;
       }
 
-      let internalName = kebabCase(column_name);
-
-      if (!fields[internalName]) {
-        fields[internalName] = this._initializeField(internalName, fieldType);
+      if (!fields[fieldName]) {
+        fields[fieldName] = this._initializeField(fieldName, fieldType);
       }
 
-      if (!types[scopedTableName]) {
-        types[scopedTableName] = this._initializeContentType(scopedTableName);
+      if (!types[contentTypeName]) {
+        types[contentTypeName] = this._initializeContentType(contentTypeName);
       }
-      types[scopedTableName].relationships.fields.data.push({ type: 'fields', id: internalName });
+      types[contentTypeName].relationships.fields.data.push({ type: 'fields', id: fieldName });
     }
 
     let { rows: relationshipColumns } = await this.query(`
@@ -152,7 +169,7 @@ class Updater {
         throw new Error(`There was a problem with the relationship field ${fk_column_name}, it could not be found to turn into a relationship`);
       }
 
-      let tableName = this._typeNameFor(fk_constraint_schema, referenced_table_name);
+      let tableName = this.mapper.typeNameFor(fk_constraint_schema, referenced_table_name);
 
       if (!types[tableName]) {
         throw new Error(`Could not find the content type ${tableName}`);
@@ -160,10 +177,10 @@ class Updater {
 
       field.attributes['field-type'] = "@cardstack/core-types::belongs-to";
 
-      field.relationships = {'related-types':  { data: [ { type: 'content-types', id: tableName }]}};
+      field.relationships['related-types'] =  { data: [ { type: 'content-types', id: tableName }]};
     }
 
-    return Object.values(types).concat(Object.values(fields));
+    return Object.values(types).concat(Object.values(fields)).map(doc => this._maybePatch(doc));
   }
 
   async updateContent(meta, hints, ops) {
@@ -233,7 +250,7 @@ class Updater {
         for (let { id } of deletes) {
           await ops.delete(type, id);
         }
-        let result = await this.query(`SELECT * from ${schema}.${underscore(table)} where id = any($1)`, [ rest.map(({id}) => id) ]);
+        let result = await this.query(`SELECT * from ${schema}.${table} where id = any($1)`, [ rest.map(({id}) => id) ]);
         for (let row of result.rows) {
           await ops.save(type, row.id, await this._toDocument(type, row));
         }
@@ -259,14 +276,27 @@ class Updater {
   }
 
   async _fullUpdateType(type, ops) {
-    let result = await this.query(`select * from ${underscore(type)}`);
+    let { schema, table } = this.mapper.tableForType(type);
+    let result = await this.query(`select * from ${schema}.${table}`);
     for (let row of result.rows) {
       await ops.save(type, row.id, await this._toDocument(type, row));
     }
   }
 
   async _toDocument(type, row) {
-    return rowToDocument(await this.schema(), type, row);
+    let doc = rowToDocument(await this.schema(), type, row);
+    return this._maybePatch(doc);
+  }
+
+  _maybePatch(doc) {
+    let typePatches = this.patch[doc.type];
+    if (typePatches) {
+      let modelPatches = typePatches[doc.id];
+      if (modelPatches) {
+        doc = apply_patch(doc, modelPatches);
+      }
+    }
+    return doc;
   }
 
   _dirtyRecords(changeRows) {
@@ -275,7 +305,7 @@ class Updater {
       let m = changePattern.exec(data);
       if (m) {
         let [, schema, table, command, values] = m;
-        let type = this._typeNameFor(schema, table);
+        let type = this.mapper.typeNameFor(schema, table);
         let id = idPattern.exec(values);
         if (!id) {
           this.log.warn("Found no id in change log entry: %s. Perhaps you need to set the primary key?", data);
@@ -291,26 +321,12 @@ class Updater {
     return dirty;
   }
 
-  _typeNameFor(schema, table) {
-    // The default schema in postgres is called 'public'. We can
-    // conventionally strip that off the type names, while keeping
-    // it on for more exotic schemas. Ultimately this can become
-    // more customizable via configuration.
-
-    // json-api uses kebab case but database tables use underscores
-    let tableDasherized = kebabCase(table);
-
-    if (schema !== 'public') {
-      return `${schema}.${tableDasherized}`;
-    } else {
-      return tableDasherized;
-    }
-  }
 
   _initializeContentType(id) {
     return {
       type: 'content-types',
       id,
+      attributes: {},
       relationships: {
         fields: {
           data: []
@@ -328,7 +344,8 @@ class Updater {
       id,
       attributes: {
         'field-type': fieldType
-      }
+      },
+      relationships: {}
     };
   }
 
@@ -360,8 +377,4 @@ class Updater {
   }
 
 
-}
-
-function underscore(name) {
-  return name.replace(/-/g, '_');
 }

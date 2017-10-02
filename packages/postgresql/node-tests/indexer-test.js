@@ -16,8 +16,9 @@ describe('postgresql/indexer', function() {
     client = new Client({ database: 'test1', host: 'localhost', user: 'postgres', port: 5444 });
     await client.connect();
     await client.query('create table editors (id varchar primary key, name varchar)');
+    await client.query('insert into editors values ($1, $2)', ['0', 'Some Editor']);
     await client.query('create table articles (id varchar primary key, title varchar, length integer, published boolean, topic varchar, editor varchar references editors(id))');
-    await client.query('insert into articles values ($1, $2, $3, $4)', ['0', 'hello world', 100, true]);
+    await client.query('insert into articles values ($1, $2, $3, $4, $5, $6)', ['0', 'hello world', 100, true, null, '0']);
     await client.query('insert into articles values ($1, $2, $3, $4)', ['1', null, null, false]);
 
     let factory = new JSONAPIFactory();
@@ -34,6 +35,21 @@ describe('postgresql/indexer', function() {
               user: 'postgres',
               database: 'test1',
               port: 5444
+            }
+          },
+          renameTables: {
+            editors: 'real-editors',
+          },
+          renameColumns: {
+            articles: {
+              topic: 'real-topic'
+            }
+          },
+          patch: {
+            'content-types': {
+              'articles': [
+                { op: "add", "path": "/attributes/default-includes", value: ["editor"] }
+              ]
             }
           }
         }
@@ -125,11 +141,14 @@ describe('postgresql/indexer', function() {
     it('can customize discovered schema', async function() {
       let doc = await env.lookup('hub:searchers').get('master', 'content-types', 'articles');
       expect(doc.data.attributes).has.property('default-includes');
-      expect(doc.data.attributes['default-includes']).deep.equals(['editors']);
+      expect(doc.data.attributes['default-includes']).deep.equals(['editor']);
     });
 
     it('supports default includes', async function() {
-      throw new Error("Unimplemented");
+      let doc = await env.lookup('hub:searchers').get('master', 'articles', '0');
+      expect(doc).has.property('included');
+      expect(doc.included).has.length(1);
+      expect(doc.included[0]).has.deep.property('attributes.name', 'Some Editor');
     });
 
   });
