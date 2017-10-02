@@ -14,6 +14,7 @@ module.exports = declareInjections({
 }, {
   create({ searcher, writers, indexers }) {
     return {
+      category: 'api',
       after: 'authentication',
       middleware() {
         return jsonapiMiddleware(searcher, writers, indexers);
@@ -54,11 +55,20 @@ function jsonapiMiddleware(searcher, writers, indexers) {
       return;
     }
 
-    await body(ctxt, err => {
-      if (err) {
-        throw err;
-      }
-    });
+    // This is here in case an earlier middleware needs to parse the
+    // body before us. That's OK as long as they also set this flag to
+    // warn us.
+    //
+    // TODO: a better solution would be to split the body parsing step
+    // out as a separate stage in our middleware stack, so that this
+    // plugin (and others) can just list themselves as { after: 'body-parsing' }
+    if (!ctxt.state.bodyAlreadyParsed) {
+      await body(ctxt, err => {
+        if (err) {
+          throw err;
+        }
+      });
+    }
     let handler = new Handler(searcher, writers, indexers, ctxt, options, log);
     return handler.run();
   };

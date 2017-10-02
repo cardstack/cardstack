@@ -1,5 +1,8 @@
 const Koa = require('koa');
 const { Registry, Container } = require('@cardstack/di');
+// lazy load only in container mode, since they uses node 8 features
+let EmberConnection;
+let Orchestrator;
 
 const logger = require('@cardstack/plugin-utils/logger');
 const log = logger('server');
@@ -33,10 +36,27 @@ async function wireItUp(projectDir, encryptionKeys, seedModels, opts = {}) {
 }
 
 async function makeServer(projectDir, encryptionKeys, seedModels, opts = {}) {
+  if (opts.containerized) {
+    log.debug('Running in container mode');
+    // lazy loading
+    Orchestrator = Orchestrator || require('./orchestrator');
+    EmberConnection = EmberConnection || require('./ember-connection');
+
+    let orchestrator = new Orchestrator(opts.leaveServicesRunning);
+    orchestrator.start();
+
+    // Eventually we'll pass a connection instance into the hub, for triggering rebuilds.
+    // For now, it just has the side effect of shutting the hub down properly when it's time.
+    new EmberConnection(orchestrator);
+    await orchestrator.ready;
+  }
+
+  log.info('Starting main hub server');
   let container = await wireItUp(projectDir, encryptionKeys, seedModels, opts);
   let app = new Koa();
   app.use(httpLogging);
   app.use(container.lookup('hub:middleware-stack').middleware());
+  log.info('Main hub initialized');
   return app;
 }
 

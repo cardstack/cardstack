@@ -2,14 +2,25 @@ const { makeServer } = require('./main');
 const path = require('path');
 const crypto = require('crypto');
 const fs = require('fs');
-const Funnel = require('broccoli-funnel');
-const log = require('@cardstack/plugin-utils/logger')('hub/main');
-const BroccoliConnector = require('./broccoli-connector');
+const log = require('@cardstack/plugin-utils/logger')('hub/ember-cli');
+// only sometimes load, because of feature flag
+let BroccoliConnector;
+let Funnel;
+let startAndProxyToHubContainer;
+
+const CONTAINER_MODE = process.env.CONTAINERIZED_HUB != null;
+
+if (CONTAINER_MODE) {
+  startAndProxyToHubContainer = require('./start-hub-container');
+} else {
+  BroccoliConnector = require('./broccoli-connector');
+  Funnel = require('broccoli-funnel');
+}
 
 // TODO: move into configuration
 const defaultBranch = 'master';
 
-module.exports = {
+let addon = {
   name: '@cardstack/hub',
 
   init() {
@@ -25,7 +36,9 @@ module.exports = {
       global.__cardstack_hub_running_in_ember_cli = true;
       this._active = true;
     }
-    this._broccoliConnector = new BroccoliConnector();
+    if (!CONTAINER_MODE) {
+      this._broccoliConnector = new BroccoliConnector();
+    }
   },
 
   included(app){
@@ -36,7 +49,9 @@ module.exports = {
     this._super.apply(this, arguments);
     if (!this._active){ return; }
 
-    app.import('vendor/cardstack/generated.js');
+    if (!CONTAINER_MODE) {
+      app.import('vendor/cardstack/generated.js');
+    }
 
     if (!process.env.ELASTICSEARCH_PREFIX) {
       process.env.ELASTICSEARCH_PREFIX = this.project.pkg.name.replace(/^[^a-zA-Z]*/, '').replace(/[^a-zA-Z0-9]/g, '_') + '_' + env;
@@ -46,43 +61,24 @@ module.exports = {
     // hooks won't resolve until the hub does its first codegen build,
     // and the middleware hooks won't run until after that.
 
-    let seedPath = path.join(path.dirname(this.project.configPath()), '..', 'cardstack', 'seeds', env);
-    let useDevDeps;
-    if (env === 'test') {
-      useDevDeps = true;
+    if (CONTAINER_MODE) {
+      this._hubProxy = startAndProxyToHubContainer(this.project.root);
     } else {
-      // if the hub is a runtime dependency, it should only load other
-      // plugins that are also runtime dependencies. If it's a
-      // devDependency, it will also load other plugins that are
-      // devDependencies.
-      let { pkg } = this.project;
-      useDevDeps = !(pkg.dependencies && pkg.dependencies['@cardstack/hub']);
-    }
-    this._hubMiddleware = this._makeServer(seedPath, this.project.ui, useDevDeps, env);
-  },
+      let seedPath = path.join(path.dirname(this.project.configPath()), '..', 'cardstack', 'seeds', env);
+      let useDevDeps;
+      if (env === 'test') {
+        useDevDeps = true;
+      } else {
+        // if the hub is a runtime dependency, it should only load other
+        // plugins that are also runtime dependencies. If it's a
+        // devDependency, it will also load other plugins that are
+        // devDependencies.
+        let { pkg } = this.project;
+        useDevDeps = !(pkg.dependencies && pkg.dependencies['@cardstack/hub']);
+      }
 
-  buildError: function(error) {
-    if (this._broccoliConnector) {
-      this._broccoliConnector.buildFailed(error);
+      this._hubMiddleware = this._makeServer(seedPath, this.project.ui, useDevDeps, env);
     }
-  },
-
-  postBuild: function(results) {
-    if (this._broccoliConnector) {
-      this._broccoliConnector.buildSucceeded(results);
-    }
-  },
-
-  treeForVendor() {
-    if (!this._active){
-      this._super.apply(this, arguments);
-      return;
-    }
-
-    return new Funnel(this._broccoliConnector.tree, {
-      srcDir: defaultBranch,
-      destDir: 'cardstack'
-    });
   },
 
   // The serverMiddleware hook is well-behaved and will wait for us to
@@ -93,7 +89,12 @@ module.exports = {
       return;
     }
 
-    app.use('/cardstack', await this._hubMiddleware);
+    if (CONTAINER_MODE) {
+      // FIXME: this prevents shutdown while it's pending, even in response to a user SIGINT
+      app.use('/cardstack', await this._hubProxy);
+    } else {
+      app.use('/cardstack', await this._hubMiddleware);
+    }
   },
 
   // testemMiddleware will not wait for a promise, so we need to
@@ -127,9 +128,35 @@ module.exports = {
         res.end();
       }
     });
-  },
+  }
+};
 
-  async _makeServer(seedDir, ui, allowDevDependencies, env) {
+if (!CONTAINER_MODE) {
+  addon.buildError = function(error) {
+    if (this._broccoliConnector) {
+      this._broccoliConnector.buildFailed(error);
+    }
+  };
+
+  addon.postBuild = function(results) {
+    if (this._broccoliConnector) {
+      this._broccoliConnector.buildSucceeded(results);
+    }
+  };
+
+  addon.treeForVendor = function() {
+    if (!this._active){
+      this._super.apply(this, arguments);
+      return;
+    }
+
+    return new Funnel(this._broccoliConnector.tree, {
+      srcDir: defaultBranch,
+      destDir: 'cardstack'
+    });
+  };
+
+  addon._makeServer = async function(seedDir, ui, allowDevDependencies, env) {
     log.debug("Looking for seed files in %s", seedDir);
     let seedModels;
     try {
@@ -178,6 +205,7 @@ module.exports = {
       this._broccoliConnector.setSource(Promise.reject(err));
       throw err;
     }
-  }
+  };
+}
 
-};
+module.exports = addon;
