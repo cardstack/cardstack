@@ -403,7 +403,7 @@ describe('git/indexer', function() {
     await indexer.update();
 
     let contents = await ea.documentContents('master', 'articles', 'hello-world');
-    throw new Error("Finish implementing me");
+    expect(contents).has.deep.property('author.name', 'Q');
   });
 
 
