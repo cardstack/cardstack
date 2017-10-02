@@ -345,7 +345,7 @@ describe('git/indexer', function() {
   });
 
   it('supports default-includes', async function() {
-    let { repo, head } = await makeRepo(root, {
+    await makeRepo(root, {
       'schema/content-types/articles.json': JSON.stringify({
         attributes: {
           'default-includes': ['author']
