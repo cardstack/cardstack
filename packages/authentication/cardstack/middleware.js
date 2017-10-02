@@ -147,7 +147,7 @@ class Authentication {
 
     ctxt.body = {
       data: user,
-      meta: await this.createToken({ id: user.id, type: user.type }, 86400)
+      meta: await this.createToken({ id: user.id, type: user.type }, source.attributes['token-expiry'] || 86400)
     };
     ctxt.status = 200;
   }
