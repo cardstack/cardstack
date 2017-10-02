@@ -238,7 +238,6 @@ describe('elasticsearch/indexer', function() {
 
     found = await searcher.get('master', 'articles', article.id);
     expect(found).is.ok;
-    debugger;
     expect(found).has.deep.property('data.relationships.author.data.id', 'x');
     expect(found).has.property('included');
     expect(found.included).length(1);
