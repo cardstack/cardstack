@@ -155,7 +155,7 @@ class Authentication {
       return;
     }
 
-    let tokenMeta = await this.createToken({ id: user.data.id, type: user.data.type }, 86400);
+    let tokenMeta = await this.createToken({ id: user.data.id, type: user.data.type }, source.attributes['token-expiry'] || 86400);
     if (!user.data.meta) {
       user.data.meta = tokenMeta;
     } else {
