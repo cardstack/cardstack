@@ -2,20 +2,19 @@ import { assert } from "@ember/debug"
 import Message from '@cardstack/models/generated/message';
 import { equal } from '@ember/object/computed';
 import { A } from "@ember/array";
-// import { workflowGroupId } from '@cardstack/workflow/helpers/workflow-group-id';
 
 import { task } from 'ember-concurrency';
-import { computed } from "@ember/object"
+import { computed } from "@ember/object";
 
 export default Message.extend({
-	loadedCard: computed({
-		get() {
-			this.get('_loadCard').perform();
-			return null;
-		},
-		set(k, v) {
-			return v;
-		}
+  loadedCard: computed({
+    get() {
+      this.get('_loadCard').perform();
+      return null;
+    },
+    set(k, v) {
+      return v;
+    }
   }),
 
   handle() {
@@ -24,17 +23,17 @@ export default Message.extend({
 
   isUnhandled: equal('status', 'unhandled'),
 
-	_loadCard: task(function * () {
-		let cardType = this.get('_cardTypeInStore');
-		let card = yield this.get('store').findRecord(cardType, this.get('cardId'));
-		this.set('loadedCard', card);
-	}),
+  _loadCard: task(function * () {
+    let cardType = this.get('_cardTypeInStore');
+    let card = yield this.get('store').findRecord(cardType, this.get('cardId'));
+    this.set('loadedCard', card);
+  }),
 
-	_cardTypeInStore: computed('cardType', function() {
-		let cardType = this.get('cardType');
-		assert(`${cardType} doesn't seem to be a plural noun`, cardType.charAt(cardType.length - 1) === 's');
-	  //TODO: Replace this make-shift singularization
-		return this.get('cardType').replace(/s$/, '');
+  _cardTypeInStore: computed('cardType', function() {
+    let cardType = this.get('cardType');
+    assert(`${cardType} doesn't seem to be a plural noun`, cardType.charAt(cardType.length - 1) === 's');
+    //TODO: Replace this make-shift singularization
+    return this.get('cardType').replace(/s$/, '');
   }),
 
   loadedTags: computed({
