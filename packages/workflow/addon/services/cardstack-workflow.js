@@ -101,9 +101,6 @@ export default Service.extend({
       })
       .then((message) => {
         thread.addMessage(message);
-      })
-      .catch((error) => {
-        console.error("Something went wrong", error);
       });
   },
 });
