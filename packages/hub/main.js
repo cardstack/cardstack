@@ -39,8 +39,8 @@ async function makeServer(projectDir, encryptionKeys, seedModels, opts = {}) {
   if (opts.containerized) {
     log.debug('Running in container mode');
     // lazy loading
-    Orchestrator = Orchestrator || require('./orchestrator');
-    EmberConnection = EmberConnection || require('./ember-connection');
+    Orchestrator = Orchestrator || require('./docker-container/orchestrator');
+    EmberConnection = EmberConnection || require('./docker-container/ember-connection');
 
     let orchestrator = new Orchestrator(opts.leaveServicesRunning);
     orchestrator.start();
