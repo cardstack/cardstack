@@ -2,6 +2,9 @@ const Error = require('@cardstack/plugin-utils/error');
 const request = require('./lib/request');
 
 module.exports = class {
+  static create(...args) {
+    return new this(...args);
+  }
   async authenticate(payload, params /*, userSearcher */) {
     if (!payload.authorizationCode) {
       throw new Error("missing required field 'authorizationCode'", {
@@ -55,9 +58,7 @@ module.exports = class {
     if (userResponse.response.statusCode !== 200) {
       throw new Error(responseBody.error, { status: response.statusCode });
     }
-    return {
-      user: userResponse.body
-    };
+    return userResponse.body;
   }
 
   exposeConfig(params) {

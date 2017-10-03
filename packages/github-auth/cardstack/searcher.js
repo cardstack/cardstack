@@ -8,7 +8,7 @@ module.exports = class GitHubSearcher {
 
   async get(branch, type, id, next) {
     if (type === 'github-users') {
-      return this._getUser(id);
+      return { data: this._getUser(id) };
     }
     return next();
   }
