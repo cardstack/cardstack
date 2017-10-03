@@ -100,4 +100,8 @@ class Updater {
       identity: this.storage.identity
     };
   }
+
+  async read(type, id /*, isSchema */) {
+    return this.storage.lookup(type, id);
+  }
 }

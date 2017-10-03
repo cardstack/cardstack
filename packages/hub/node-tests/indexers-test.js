@@ -18,12 +18,12 @@ describe('hub/indexers', function() {
   it("indexes seed models", async function() {
     // this seed model comes from createDefaultEnvironment
     let response = await env.lookup('hub:searchers').search('master', { filter: { type: 'plugin-configs' }});
-    expect(response.models.map(m => m.id)).includes('@cardstack/hub');
+    expect(response.data.map(m => m.id)).includes('@cardstack/hub');
   });
 
   it("indexes bootstrap models", async function() {
     let response = await env.lookup('hub:searchers').search('master', { filter: { type: 'content-types' }});
-    expect(response.models.map(m => m.id)).includes('content-types');
+    expect(response.data.map(m => m.id)).includes('content-types');
   });
 
 });

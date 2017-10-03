@@ -43,7 +43,7 @@ module.exports = class {
 
       if (params.userIdField) {
         log.debug("Searching for %s=%s", params.userIdField, response.body.id);
-        let { models } = await userSearcher.search({
+        let { data: models } = await userSearcher.search({
           filter: {
             type,
             [params.userIdField]: { exact: response.body.id }

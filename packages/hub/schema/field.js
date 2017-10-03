@@ -37,7 +37,6 @@ module.exports = class Field {
     }
 
     this.grants = allGrants.filter(g => g.fields == null || g.fields.includes(model.id));
-    this._mapping = null;
   }
 
   _lookupDefaultValue(model, relationship, defaultValues) {
@@ -201,26 +200,25 @@ module.exports = class Field {
     this._validateFormat(value, errors);
     return errors;
   }
-  mapping(allFields) {
-    if (this._mapping) {
-      return this._mapping;
-    }
+  mapping(searchTree, allFields) {
     let m = {
       [this.id]: Object.assign({}, this.plugin.defaultMapping(allFields))
     };
 
-    if (!this.searchable) {
+    if (this.searchable) {
+      if (this.plugin.derivedMappings) {
+        Object.assign(m, this.plugin.derivedMappings(this.id));
+      }
+      if (this.isRelationship) {
+        m[this.id].properties = recursiveMappings(searchTree && searchTree[this.id], allFields);
+      }
+    } else {
       if (m[this.id].type === 'object') {
         m[this.id].enabled = false;
       } else {
         m[this.id].index = false;
       }
     }
-
-    if (this.plugin.derivedMappings) {
-      Object.assign(m, this.plugin.derivedMappings(this.id, allFields));
-    }
-    this._mapping = m;
     return m;
   }
   get sortFieldName() {
@@ -245,3 +243,21 @@ module.exports = class Field {
   }
 
 };
+
+function recursiveMappings(searchTree, allFields) {
+  let outputList = [];
+  if (searchTree) {
+    // we are a deep-searchable relationship, so we need to
+    // include all the other potential fields underneath
+    // ourselves
+    for (let field of allFields.values()) {
+      outputList.push(field.mapping(searchTree[field.id], allFields));
+    }
+  } else {
+    // we are a leaf relationship. We still always include type and id
+    // mappings
+    outputList.push(allFields.get('id').mapping(searchTree, allFields));
+    outputList.push(allFields.get('type').mapping(searchTree, allFields));
+  }
+  return Object.assign({}, ...outputList);
+}

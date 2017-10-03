@@ -1,4 +1,10 @@
 class Session {
+
+  // payload must have at least `id` and `type` (which together are
+  // the jsonapi reference to the current user's resource.
+  //
+  // optionalUser can be a jsonapi document representing that user (a
+  // full document, including the top-level `data` property)
   constructor(payload, userSearcher, optionalUser, optionalGroupIds) {
     this.payload = payload;
     this.userSearcher = userSearcher;

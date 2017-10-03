@@ -26,6 +26,10 @@ class Schema {
     }
   }
 
+  isSchemaType(type) {
+    return this.schemaLoader.ownTypes().includes(type);
+  }
+
   // derives a new schema by adding, updating, or removing
   // models. Takes a list of { type, id, document } objects. A null document
   // means deletion.
@@ -33,7 +37,7 @@ class Schema {
     let models = this._originalModels;
     for (let change of changes) {
       let { type, id, document } = change;
-      if (!this.schemaLoader.ownTypes().includes(type)) {
+      if (!this.isSchemaType(type)) {
         // not a schema model, so we can ignore it
         continue;
       }
@@ -137,6 +141,8 @@ class Schema {
         this._mapping[contentType.id] = contentType.mapping();
         this._mapping[contentType.id].properties.cardstack_source = { type: 'keyword' };
         this._mapping[contentType.id].properties.cardstack_generation = { type: 'keyword' };
+        this._mapping[contentType.id].properties.cardstack_pristine = { type: 'object', enabled: false };
+        this._mapping[contentType.id].properties.cardstack_references = { type: 'keyword' };
       }
     }
     return this._mapping;

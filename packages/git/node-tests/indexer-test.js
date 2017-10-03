@@ -2,11 +2,15 @@ const Change = require('../change');
 const temp = require('@cardstack/test-support/temp-helper');
 const { commitOpts, makeRepo } = require('./support');
 const ElasticAssert = require('@cardstack/elasticsearch/node-tests/assertions');
-const toJSONAPI = require('@cardstack/elasticsearch/to-jsonapi');
+const _toJSONAPI = require('@cardstack/elasticsearch/to-jsonapi');
 const JSONAPIFactory = require('@cardstack/test-support/jsonapi-factory');
 const { Registry, Container } = require('@cardstack/di');
 const logger = require('@cardstack/plugin-utils/logger');
 const fs = require('fs');
+
+function toJSONAPI(type, doc) {
+  return _toJSONAPI(type, doc).data;
+}
 
 describe('git/indexer', function() {
   let root, indexer, ea, dataSource;
@@ -339,6 +343,69 @@ describe('git/indexer', function() {
       await ea.assertNoDocument('master', 'articles', 'left');
     }
   });
+
+  it('supports default-includes', async function() {
+    await makeRepo(root, {
+      'schema/content-types/articles.json': JSON.stringify({
+        attributes: {
+          'default-includes': ['author']
+        },
+        relationships: {
+          fields: {
+            data: [
+              { type: 'fields', id: 'title' },
+              { type: 'fields', id: 'author' }
+            ]
+          }
+        }
+      }),
+      'schema/content-types/people.json': JSON.stringify({
+        relationships: {
+          fields: {
+            data: [
+              { type: 'fields', id: 'name' }
+            ]
+          }
+        }
+      }),
+      'schema/fields/title.json': JSON.stringify({
+        attributes: {
+          'field-type': '@cardstack/core-types::string'
+        }
+      }),
+      'schema/fields/author.json': JSON.stringify({
+        attributes: {
+          'field-type': '@cardstack/core-types::belongs-to'
+        }
+      }),
+      'schema/fields/name.json': JSON.stringify({
+        attributes: {
+          'field-type': '@cardstack/core-types::string'
+        }
+      }),
+      'contents/articles/hello-world.json': JSON.stringify({
+        attributes: {
+          title: 'Hello world'
+        },
+        relationships: {
+          author: {
+            data: { type: 'people', id: 'person1' }
+          }
+        }
+      }),
+      'contents/people/person1.json': JSON.stringify({
+        attributes: {
+          name: 'Q'
+        }
+      })
+    });
+
+    await indexer.update();
+
+    let contents = await ea.documentContents('master', 'articles', 'hello-world');
+    expect(contents).has.deep.property('author.name', 'Q');
+  });
+
 
 });
 

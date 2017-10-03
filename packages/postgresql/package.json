@@ -14,6 +14,7 @@
   },
   "dependencies": {
     "@cardstack/plugin-utils": "^0.2.10",
+    "jsonpatch": "^3.0.1",
     "lodash": "^4.17.4",
     "pg": "^7.0.3"
   },

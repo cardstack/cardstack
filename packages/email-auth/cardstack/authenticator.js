@@ -10,7 +10,7 @@ module.exports = declareInjections({
 class {
   async authenticate({ email, referer, secret }, { messageSinkId, subject, from, textTemplate, htmlTemplate }, userSearcher) {
     if (email) {
-      let { models } = await userSearcher.search({
+      let { data: models } = await userSearcher.search({
         filter: {
           email: {
             exact: email
@@ -48,16 +48,19 @@ class {
           html
         });
         return {
-          partialSession: {
+          data: {
             attributes: {
               message: 'Check your email',
               state: 'pending-email'
             }
+          },
+          meta: {
+            partialSession: true
           }
         };
       } else {
         return {
-          user: {
+          data: {
             type: 'users',
             attributes: {
               email
@@ -78,7 +81,8 @@ class {
       }
       let user = await userSearcher.get('users', userId);
       if (user) {
-        return { preloadedUser: user };
+        user.meta = { preloaded: true };
+        return user;
       }
     }
   }
