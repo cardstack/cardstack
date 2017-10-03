@@ -1,50 +1,40 @@
 <section class="cardstack-message-summary">
-	<div class="cardstack-workflow-group">
-		<h4 class="cardstack-workflow-group-header">Dashboards</h4>
-		<div class={{concat "cardstack-workflow-label-with-count-wrapper " (if (eq selectedDate 'today') "active")}}>
-			<div class="cardstack-workflow-label-with-count high-priority" onclick={{action 'selectDate' 'today'}}>
-				<div class="name">Today</div>
-				<div class="count" data-test-group-counter="Today">{{todaysMessageCount}}</div>
-			</div>
-		</div>
-	</div>
-	{{#each-in groupedMessages as |priority messagesWithPriority|}}
-		<div class="cardstack-workflow-group" data-test-workflow-group={{priority}}>
-			<h4 class="cardstack-workflow-group-header" data-test-priority-header={{priority}}>{{priority}}</h4>
-			{{#each-in messagesWithPriority as |tag messagesWithTag|}}
-				{{#with (workflow-group-id priority tag) as |groupId|}}
-					<div class={{concat "cardstack-workflow-label-with-count-wrapper " (if (eq selectedGroup groupId) "active")}}>
-						<div class={{concat "cardstack-workflow-label-with-count " messagesWithTag.priorityLevel "-priority"}}
-								onclick={{action 'selectGroup' groupId}}>
-							<div class='name'>{{tag}}</div>
-							<div class="count" data-test-group-counter={{groupId}}>{{messagesWithTag.important.length}}</div>
-						</div>
-					</div>
-				{{/with}}
-			{{/each-in}}
-		</div>
-	{{/each-in}}
+  <div class="cardstack-workflow-group">
+    <h4 class="cardstack-workflow-group-header">Dashboards</h4>
+    <div class={{concat "cardstack-workflow-label-with-count-wrapper " (if (eq selectedDate 'today') "active")}}>
+      <div class="cardstack-workflow-label-with-count high-priority" onclick={{action 'selectDate' 'today'}}>
+        <div class="name">Today</div>
+        {{#if todaysNotificationCount}}
+          <div class="count" data-test-group-counter="Today">{{todaysNotificationCount}}</div>
+        {{/if}}
+      </div>
+    </div>
+  </div>
+
+  {{#each-in groupedThreads as |priorityId priorityGroup|}}
+    {{#with priorityGroup.name as |priority|}}
+      <div class="cardstack-workflow-group" data-test-workflow-group={{priority}}>
+        <h4 class="cardstack-workflow-group-header" data-test-priority-header={{priority}}>{{priority}}</h4>
+        {{cardstack/priority-tag-groups
+            groups=priorityGroup.tagGroups
+            selectedGroup=selectedGroup
+            priority=priority
+            onSelect=(action 'selectTag')}}
+      </div>
+    {{/with}}
+  {{/each-in}}
 </section>
 
-{{#if selectedMessage}}
-	<section class="cardstack-cue-card">
-		{{cardstack-content content=selectedMessage format="card"}}
-	</section>
+{{#if selectedThread}}
+  <section class="cardstack-thread-view">
+    {{cardstack/thread-container thread=selectedThread}}
+  </section>
 {{else}}
-	{{#if shouldShowMessagesInGroup}}
-		{{#if matchingMessages.length}}
-			<section class="cardstack-cue-card-list">
-				{{#each matchingMessages as |message|}}
-					{{cardstack-content content=message format="list-card"}}
-				{{/each}}
-			</section>
-		{{else}}
-			{{!-- cardstack-content content=message format="empty-list-card" --}}
-			<section class="cardstack-empty-cue-card-list">
-				<div class="cardstack-empty-cue-card-message" data-test-empty-group-message>
-					There are no cards in this group.
-				</div>
-			</section>
-		{{/if}}
-	{{/if}}
+  {{#if shouldShowMatchingThreads}}
+    <section class="cardstack-cue-card-list">
+      {{cardstack/thread-list
+          threads=matchingThreads
+          onSelect=(action "selectThread")}}
+    </section>
+  {{/if}}
 {{/if}}

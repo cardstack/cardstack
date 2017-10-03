@@ -1,37 +1,54 @@
-import Ember from 'ember';
+import { assert } from "@ember/debug"
 import Message from '@cardstack/models/generated/message';
-import { workflowGroupId } from '@cardstack/workflow/helpers/workflow-group-id';
+import { equal } from '@ember/object/computed';
+import { A } from "@ember/array";
 
-// Priorities (fixed, provided by the Cardstack framework)
-export const DELEGATED = 'Delegated';
-export const NEED_RESPONSE = 'Need Response';
-export const PROCESSED = 'Processed';
-export const FYI = 'For Your Information';
-
-// Tags: that should be "dynamic", supplied by the user
-// or extracted from the messages themselves
-export const REQUEST_TO_PUBLISH_LIVE = 'Request to publish live';
-export const LICENSE_REQUEST = 'License Request';
-export const READY_FOR_COPYEDITING = 'Ready for copyediting';
-export const COURSE_INFORMATION_SYNCED = 'Course information synced';
-
+import { task } from 'ember-concurrency';
+import { computed } from "@ember/object";
 
 export default Message.extend({
-  groupId: Ember.computed('priority', 'tag', function() {
-    return workflowGroupId([this.get('priority'), this.get('tag')]);
-  }),
-
-  isHandled: Ember.computed('status', function() {
-    return this.get('status') !== 'pending';
-  }),
-
-  isImportant: Ember.computed('status', 'priority', function() {
-    let status = this.get('status');
-    let priority = this.get('priority');
-    if (status === 'pending') {
-      return [NEED_RESPONSE, DELEGATED].includes(priority);
-    } else {
-      return [PROCESSED, FYI].includes(priority);
+  loadedCard: computed({
+    get() {
+      this.get('_loadCard').perform();
+      return null;
+    },
+    set(k, v) {
+      return v;
     }
-  })
+  }),
+
+  handle() {
+    this.set('status', 'handled');
+  },
+
+  isUnhandled: equal('status', 'unhandled'),
+
+  _loadCard: task(function * () {
+    let cardType = this.get('_cardTypeInStore');
+    let card = yield this.get('store').findRecord(cardType, this.get('cardId'));
+    this.set('loadedCard', card);
+  }),
+
+  _cardTypeInStore: computed('cardType', function() {
+    let cardType = this.get('cardType');
+    assert(`${cardType} doesn't seem to be a plural noun`, cardType.charAt(cardType.length - 1) === 's');
+    //TODO: Replace this make-shift singularization
+    return this.get('cardType').replace(/s$/, '');
+  }),
+
+  loadedTags: computed({
+    get() {
+      this.get('_loadTags').perform();
+      return A();
+    },
+    set(k, v) {
+      return v;
+    }
+  }),
+
+  _loadTags: task(function * () {
+    let tags = yield this.get('tags');
+    this.set('loadedTags', tags);
+    return tags;
+  }),
 })

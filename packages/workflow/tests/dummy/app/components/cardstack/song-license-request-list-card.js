@@ -1,7 +1,8 @@
-import Ember from 'ember';
+import Component from "@ember/component";
+import { inject } from "@ember/service";
 
-export default Ember.Component.extend({
-  workflow: Ember.inject.service('cardstack-workflow'),
+export default Component.extend({
+  workflow: inject('cardstack-workflow'),
 
   actions: {
     approve() {
@@ -12,3 +13,4 @@ export default Ember.Component.extend({
     }
   }
 });
+

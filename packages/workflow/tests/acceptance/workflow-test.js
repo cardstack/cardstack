@@ -2,120 +2,116 @@ import { test } from 'qunit';
 import moduleForAcceptance from '../../tests/helpers/module-for-acceptance';
 
 function assertUnhandledCount(assert, value, assertionText) {
-  assertTrimmedText(assert, '[data-test-total-notification-count]', value, assertionText);
+	assertTrimmedText(assert, '[data-test-total-notification-count]', value, assertionText);
 }
 
 function assertGroupCount(assert, groupName, value, assertionText) {
-  assertTrimmedText(assert, `[data-test-group-counter="${groupName}"]`, value, assertionText);
+	assertTrimmedText(assert, `[data-test-group-counter="${groupName}"]`, value, assertionText);
 }
 
-function assertCardCountInMessageList(assert, value, assertionText) {
-  assert.equal(find('[data-test-message-list-card]').length, value, assertionText);
+function assertNoGroupCount(assert, groupName, assertionText) {
+	assert.equal(find(`[data-test-group-counter="${groupName}"]`).length, 0, assertionText);
+}
+
+function assertCardCountInThreadList(assert, value, assertionText) {
+	assert.equal(find('[data-test-thread-list-card]').length, value, assertionText);
 }
 
 moduleForAcceptance('Acceptance | Workflow');
 
 test('Show group counters', function(assert) {
-  visit('/');
+	visit('/');
 
-  andThen(function() {
-    assertUnhandledCount(assert, 4);
-  });
+	andThen(function() {
+		assertUnhandledCount(assert, 5);
+	});
 
-  click('.cardstack-workflow-header');
+	click('.cardstack-workflow-header');
 
-  andThen(function() {
-    assertGroupCount(assert, 'Today', 3);
-    assertTrimmedText(assert, '[data-test-priority-header="Need Response"]', "Need Response");
-    assertTrimmedText(assert, '[data-test-priority-header="Processed"]', "Processed");
-    assertTrimmedText(assert, '[data-test-priority-header="For Your Information"]', "For Your Information");
+	andThen(function() {
+		assertGroupCount(assert, 'Today', 3);
+		assertTrimmedText(assert, '[data-test-priority-header="Delegated"]', "Delegated");
+		assertTrimmedText(assert, '[data-test-priority-header="Need Response"]', "Need Response");
+		assertTrimmedText(assert, '[data-test-priority-header="For Your Information"]', "For Your Information");
 
-    assertGroupCount(assert, "Need Response::Request to publish live", 2);
-    assertGroupCount(assert, "Need Response::Ready for copyediting", 1);
-    assertGroupCount(assert, "Processed::Course information synced", 2);
-    assertGroupCount(assert, "For Your Information::New local content added", 1);
-  });
+		assertGroupCount(assert, "Delegated::Song Change Request", 1);
+		assertGroupCount(assert, "Need Response::Song Change Request", 1);
+		assertGroupCount(assert, "Need Response::Request to Publish Live", 1);
+		assertGroupCount(assert, "Need Response::License Request", 2);
+		assertGroupCount(assert, "For Your Information::License Request", 1);
+	});
 });
 
-test('List message cards that match the clicked tag', function(assert) {
-  visit('/');
-  click('.cardstack-workflow-header');
-  click('[data-test-group-counter="Need Response::Request to publish live"]');
-  andThen(() => {
-    assertCardCountInMessageList(assert, 2);
-    assert.equal(find(".cardstack-workflow-label-with-count-wrapper.active:contains(Request to publish live)").length, 1, "The selected group is marked as active");
-    assert.equal(find("[data-test-message-list-card]:contains(Matt, could you push live my cover of Pearl Jam's Daughter?)").length, 1)
-    assert.equal(find("[data-test-message-list-card]:contains(Needs to have the Home song approved by tomorrow.)").length, 1)
-  });
+test('List threads that match the clicked tag', function(assert) {
+	visit('/');
+	click('.cardstack-workflow-header');
+	click('[data-test-group-counter="Need Response::License Request"]');
+	andThen(() => {
+		assertCardCountInThreadList(assert, 3, "All threads having the clicked tag are shown");
+		assert.equal(find(".cardstack-workflow-label-with-count-wrapper.active:contains(License Request)").length, 1, "The selected group is marked as active");
+		assert.equal(find("[data-test-thread-list-card]:contains(This is going to be tough, my friend.)").length, 1)
+		assert.equal(find("[data-test-thread-list-card]:contains(License request for Caspian\'s Sycamore, please?)").length, 1)
+		assert.equal(find("[data-test-thread-list-card]:contains(License request for Chris Cornell\'s Seasons)").length, 1)
+
+	});
 });
 
-test('List message cards that match the Today date range', function(assert) {
-  visit('/');
-  click('.cardstack-workflow-header');
-  click('[data-test-group-counter="Today"]');
-  andThen(() => {
-    assertCardCountInMessageList(assert, 3);
-    assert.equal(find(".cardstack-workflow-label-with-count-wrapper.active:contains(Today)").length, 1, "The selected group is marked as active");
-  });
+test('List threads that match the Today date range', function(assert) {
+	visit('/');
+	click('.cardstack-workflow-header');
+	click('[data-test-group-counter="Today"]');
+	andThen(() => {
+		assertCardCountInThreadList(assert, 3);
+		assert.equal(find(".cardstack-workflow-label-with-count-wrapper.active:contains(Today)").length, 1, "The selected group is marked as active");
+	});
 });
 
-test('Switch between message lists and individual message card', function(assert) {
-  visit('/');
-  click('.cardstack-workflow-header');
-  click('[data-test-group-counter="Need Response::Ready for copyediting"]');
-  click('[data-test-message-list-card]:first');
-  andThen(() => {
-    assert.equal(find('[data-test-message-card]:contains("Updated lyrics for Hey, Joe.")').length, 1);
-  });
+test('Switch between thread lists and an individual thread view', function(assert) {
+	visit('/');
+	click('.cardstack-workflow-header');
+	click('[data-test-group-counter="Delegated::Song Change Request"]');
+	click('[data-test-thread-list-card]:first');
+	andThen(() => {
+		// There is the summary card on top and the "normal" card in the thread
+		assert.equal(find('[data-test-message-card]:contains("Could we add yet more guitars to this Caspian song?")').length, 2);
+	});
 
-  click('[data-test-group-counter="Need Response::Request to publish live"]');
-  andThen(() => {
-    assertCardCountInMessageList(assert, 2);
-  });
+	click('[data-test-group-counter="Need Response::Request to Publish Live"]');
+	andThen(() => {
+		assertCardCountInThreadList(assert, 1);
+	});
 
-  click('[data-test-message-list-card]:first');
-  andThen(() => {
-    assert.equal(find('[data-test-message-card]:contains("Matt, could you push live my cover of Pearl Jam\'s Daughter?")').length, 1);
-  });
+	click('[data-test-thread-list-card]:first');
+	andThen(() => {
+		assert.equal(find('[data-test-message-card]:contains("Could we change our previous cover of Pearl Jam\'s Daughter?")').length, 2);
+	});
 
-  click('[data-test-group-counter="Today"]');
-  andThen(() => {
-    assertCardCountInMessageList(assert, 3);
-  });
-});
-
-test('No cards for the selected tag', function(assert) {
-  visit('/');
-  click('.cardstack-workflow-header');
-  click('[data-test-group-counter="Need Response::License Request"]');
-
-  andThen(() => {
-    assertCardCountInMessageList(assert, 0);
-    assertTrimmedText(assert, '[data-test-empty-group-message]', 'There are no cards in this group.')
-  });
+	click('[data-test-group-counter="Today"]');
+	andThen(() => {
+		assertCardCountInThreadList(assert, 3);
+	});
 });
 
 test('Take action on a cue card', function(assert) {
-  visit('/');
-  click('.cardstack-workflow-header');
-  click('[data-test-group-counter="Need Response::Request to publish live"]');
-  click('[data-test-message-list-card]:first');
-  click('[data-test-approve-button]');
+	visit('/');
+	click('.cardstack-workflow-header');
+	click('[data-test-group-counter="Need Response::License Request"]');
+	click('[data-test-thread-list-card]:contains("License request for Caspian\'s Sycamore, please?")');
+	click('[data-test-approve-button]');
 
-  andThen(() => {
-    assertGroupCount(assert, "Need Response::Request to publish live", 1, "Unhandled group count is decremented after approving a message");
-    assertGroupCount(assert, 'Today', 2, "Unhandled group count is also decremented for date range group");
-    assertCardCountInMessageList(assert, 1, "The handled card is taken out of the list");
-    assertGroupCount(assert, "Processed::Request to publish live", 1, "The handled card is counted in its new priority group");
-    assertUnhandledCount(assert, 3, "The total count is decremented");
-  });
+	andThen(() => {
+		assertGroupCount(assert, "Need Response::License Request", 1, "Unhandled group count is decremented after approving a message");
+		assertGroupCount(assert, 'Today', 2, "Unhandled group count is also decremented for date range group");
+		assertUnhandledCount(assert, 4, "The total count is decremented");
+	});
 
-  click('[data-test-group-counter="Need Response::Request to publish live"]');
-  click('[data-test-message-list-card]:last');
-  click('[data-test-deny-button]');
+	click('[data-test-group-counter="Need Response::Request to Publish Live"]');
+	click('[data-test-thread-list-card]:last');
+	click('[data-test-deny-button]');
+	click('[data-test-read-button]'); // a chat message needs to be explicitly read - for now
 
-  andThen(() => {
-    assertGroupCount(assert, "Need Response::Request to publish live", 0, "Unhandled group count is decremented after denying a message");
-    assertUnhandledCount(assert, 2, "The total count is decremented");
-  });
+	andThen(() => {
+		assertNoGroupCount(assert, "Need Response::Request to Publish Live", "Unhandled group count becomes zero and disappears");
+		assertUnhandledCount(assert, 3, "The total count is decremented");
+	});
 });

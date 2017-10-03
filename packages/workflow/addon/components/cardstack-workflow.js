@@ -1,32 +1,110 @@
-import Ember from 'ember';
 import layout from '../templates/components/cardstack-workflow';
+import Component from "@ember/component";
+import { inject } from "@ember/service";
+import { computed } from "@ember/object"
+import { readOnly, or } from "@ember/object/computed";
+import { workflowGroupId } from "@cardstack/workflow/helpers/workflow-group-id";
 
-const { inject, computed } = Ember;
-
-export default Ember.Component.extend({
+export default Component.extend({
   layout,
   classNames:  ['cardstack-workflow'],
-  workflow:    inject.service('cardstack-workflow'),
 
-  groupedMessages:           computed.readOnly('workflow.groupedMessages'),
-  unhandled:                 computed.readOnly('workflow.unhandledItems'),
-  selectedGroup:             computed.readOnly('workflow.selectedGroup'),
-  messagesInSelectedGroup:   computed.readOnly('workflow.messagesInSelectedGroup'),
-  selectedDate:              computed.readOnly('workflow.selectedDate'),
-  messagesWithSelectedDate:  computed.readOnly('workflow.messagesWithSelectedDate'),
-  matchingMessages:          computed.readOnly('workflow.matchingMessages'),
-  todaysMessages:            computed.readOnly('workflow.todaysUnhandledMessages'),
-  todaysMessageCount:        computed.readOnly('todaysMessages.length'),
-  selectedMessage:           computed.readOnly('workflow.selectedMessage'),
-  shouldShowMessagesInGroup: computed.readOnly('workflow.shouldShowMessagesInGroup'),
+  workflow:    inject('cardstack-workflow'),
+  store:       inject(),
+
+  threads:                    readOnly('workflow.items'),
+  groupedThreads:             readOnly('workflow.groupedThreads'),
+  unhandled:                  readOnly('workflow.unhandledItems'),
+  unhandledForToday:          readOnly('workflow.unhandledForToday'),
+  todaysNotificationCount:    readOnly('unhandledForToday.length'),
+  threadsUpdatedToday:        readOnly('workflow.threadsUpdatedToday'),
+
+  selectedDate:      '',
+  selectedPriority:  '',
+  selectedTag:       null,
+
+  selectedGroup: computed('selectedDate', 'selectedTag', 'selectedPriority', function() {
+    let priority = this.get('selectedPriority');
+    let date = this.get('selectedDate');
+    let tag = this.get('selectedTag');
+    if (date) {
+      return workflowGroupId([ priority, date ]);
+    }
+    if (tag) {
+      return workflowGroupId([ priority, tag.get('name') ]);
+    }
+  }),
+
+  threadsWithSelectedDate: computed('selectedDate', function() {
+    if (this.get('selectedDate') === 'today') {
+      let threads = this.get('threadsUpdatedToday');
+      return {
+        today: {
+          name: 'Today',
+          threads
+        }
+      };
+    }
+    return {};
+  }),
+
+  shouldShowMatchingThreads: or('selectedTag', 'selectedDate'),
+
+  matchingThreads: computed('selectedTag', 'selectedDate', 'threadsWithSelectedTag', 'threadsWithSelectedDate', function() {
+    if (this.get('selectedTag')) {
+      return this.get('threadsWithSelectedTag');
+    }
+    if (this.get('selectedDate')) {
+      return this.get('threadsWithSelectedDate');
+    }
+    return [];
+  }),
+
+
+  threadsWithSelectedTag: computed('threads.@each.{tagIds,priority}', 'selectedTag', function() {
+    let selectedTagId = this.get('selectedTag.id');
+    let withSelectedTag = this.get('threads').filter((thread) => thread.get('tagIds').includes(selectedTagId));
+    return withSelectedTag.reduce((groups, thread) => {
+      let priority = thread.get('priority');
+      let priorityId = priority.get('id');
+      if (!groups[priorityId]) {
+        groups[priorityId] = {
+          name: priority.get('name'),
+          threads: []
+        }
+      }
+
+      groups[priorityId].threads.push(thread);
+      return groups;
+    }, {});
+  }),
+
+
+  clearSelectedThread() {
+    this.set('selectedThread', null);
+  },
 
   actions: {
-    selectDate(date) {
-      this.get('workflow').selectDate(date);
+    selectThread(thread) {
+      this.set('selectedThread', thread);
     },
 
-    selectGroup(groupId) {
-      this.get('workflow').selectGroup(groupId);
+    selectDate(date) {
+      this.setProperties({
+        selectedDate: date,
+        selectedTag: null
+      });
+      this.clearSelectedThread();
+    },
+
+    selectTag({ priority, tagId }) {
+      this.set('selectedPriority', priority);
+      let selectedTag = this.get('store').peekRecord('tag', tagId);
+      this.setProperties({
+        selectedDate: null,
+        selectedTag
+      });
+      this.clearSelectedThread();
     },
   }
 });

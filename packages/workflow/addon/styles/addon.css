@@ -54,24 +54,27 @@
   margin-left: 10px;
 }
 
-.cardstack-cue-card-list,
-.cardstack-empty-cue-card-list {
+.cardstack-cue-card-list {
   min-width: 25vw;
   background-color: var(--lighter-background);
   color: var(--bright-foreground);
   padding: 0 5px;
 }
 
-.cardstack-empty-cue-card-message {
+.cardstack-no-threads-message {
   margin-top: 10vh;
   text-align: center;
 }
 
-.cardstack-cue-card {
+.cardstack-thread-view {
   min-width: 25vw;
   background-color: var(--lighter-background);
   color: var(--bright-foreground);
   padding: 0 5px;
+}
+
+.cardstack-thread-container {
+  margin: 0 10px;
 }
 
 .cardstack-workflow-label-with-count-wrapper {
@@ -123,21 +126,21 @@ count could be made to stay on the same line
 }
 
 .cardstack-message-card,
-.cardstack-message-list-card {
+.cardstack-thread-list-card {
   display: flex;
   flex-direction: column;
-  margin: 2vh;
+  margin: 10px;
   background-color: var(--bright-foreground);
-  padding: 2vh 2vw;
+  padding: 10px;
   color: var(--light-background);
   border-radius: 5px;
 }
 
 .cardstack-message-card {
-  min-height: 20vh;
+  min-height: 25px;
 }
 
-.cardstack-message-list-card {
+.cardstack-thread-list-card {
   cursor: pointer;
 }
 
@@ -152,16 +155,44 @@ count could be made to stay on the same line
   width: 100%;
   display: flex;
   align-content: flex-start;
+  margin-top: 25px;
 }
 
-.button-panel > .action-button {
+.cardstack-thread-container > .header {
+  text-transform: uppercase;
+}
+
+.cardstack-thread-container > .chat-message-pane {
+  margin: 0 10px;
+  height: 50px;
+}
+
+.cardstack-chat-message-input {
+  width: 80%;
+  padding: 10px;
+  height: 100%;
+  border-radius: 5px;
+  font-size: 1.1em;
+}
+
+.cardstack-action-button {
   padding: 10px;
   margin-right: 10px;
-  width: 5vw;
   font-size: 0.8em;
+  height: 40px;
   color: var(--normal-background);
   background-color: var(--bright-foreground);
   border: 1px solid var(--dark-background);
   border-radius: 3px;
   cursor: pointer;
+}
+
+.chat-message-pane > .cardstack-action-button {
+  height: 100%;
+}
+
+.cardstack-action-button[disabled] {
+  border: 1px solid var(--lighter-background);
+  color: var(--light-background);
+  cursor: default;
 }

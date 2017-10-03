@@ -1,31 +1,11 @@
-import Ember from 'ember';
-import {
-  // Priorities
-  DELEGATED,
-  NEED_RESPONSE,
-  PROCESSED,
-  FYI,
-  // Tags
-  REQUEST_TO_PUBLISH_LIVE,
-  LICENSE_REQUEST,
-  READY_FOR_COPYEDITING,
-} from '@cardstack/workflow/models/message';
+import Service from "@ember/service"
+import { task } from 'ember-concurrency';
+import { inject } from "@ember/service";
+import { computed } from "@ember/object";
+import { readOnly, filterBy } from "@ember/object/computed";
 
-const { inject, computed, assert } = Ember;
-
-const staticGroups = {};
-staticGroups[NEED_RESPONSE] = [REQUEST_TO_PUBLISH_LIVE, LICENSE_REQUEST, READY_FOR_COPYEDITING];
-staticGroups[DELEGATED] = [LICENSE_REQUEST];
-
-const priorities = [
-  { name: DELEGATED, level: 'high' },
-  { name: NEED_RESPONSE, level: 'high' },
-  { name: PROCESSED, level: 'low' },
-  { name: FYI, level: 'low' }
-];
-
-function messagesBetween(arrayKey, dateKey, { from, to }) {
-  return Ember.computed(`${arrayKey}.@each.${dateKey}`, function() {
+function threadsBetween(arrayKey, dateKey, { from, to }) {
+  return computed(`${arrayKey}.@each.${dateKey}`, function() {
     return this.get(arrayKey).filter((item) => {
       let date = moment(item.get(dateKey));
       if (from && to) {
@@ -41,136 +21,86 @@ function messagesBetween(arrayKey, dateKey, { from, to }) {
   });
 }
 
-export default Ember.Service.extend({
+export default Service.extend({
   isOpen: false,
-  selectedMessage: null,
 
-  store: inject.service(),
+  store: inject(),
 
-  items: computed(function() {
-    return this.get('store').findAll('message');
+  loadItems: task(function * () {
+    let threads = yield this.get('store').findAll('thread');
+    this.set('items', threads);
+  }).restartable().on('init'),
+
+  init() {
+    this._super();
+    this.items = [];
+  },
+
+  unhandledItems:           filterBy('items', 'isUnhandled'),
+  notificationCount:        readOnly('unhandledItems.length'),
+  unhandledForToday:        filterBy('threadsUpdatedToday', 'isUnhandled'),
+  todaysNotificationCount:  readOnly('unhandledForToday.length'),
+
+  groupedThreads: computed('items.@each.{priority,tags,isUnhandled}', function() {
+    return this.get('items').reduce((groupedThreads, thread) => {
+      let priority = thread.get('priority');
+      let priorityId = priority.get('id');
+      if (!groupedThreads[priorityId]) {
+        groupedThreads[priorityId] = {
+          name: priority.get('name'),
+          tagGroups: {}
+        };
+      }
+
+      let threadsForPriority = groupedThreads[priorityId];
+      let tags = thread.get('tags');
+      for (let i=0; i<tags.length; i++) {
+        let tag = tags[i];
+        let tagId = tag.get('id');
+        if (!threadsForPriority.tagGroups[tagId]) {
+          threadsForPriority.tagGroups[tagId] = {
+            name: tag.get('name'),
+            priorityLevel: thread.get('priorityLevel'),
+            all: [],
+            unhandled: [],
+          }
+        }
+        let threadsForTag = threadsForPriority.tagGroups[tagId];
+        threadsForTag.all.push(thread);
+        if (thread.get('isUnhandled')) {
+          threadsForTag.unhandled.push(thread);
+        }
+      }
+      return groupedThreads;
+    }, {});
   }),
 
-  unhandledItems:           computed.filterBy('items', 'isHandled', false),
-  notificationCount:        computed.readOnly('unhandledItems.length'),
-  todaysUnhandledMessages:  computed.filterBy('messagesForToday', 'isHandled', false),
-
-  groupedMessages: computed('items.@each.{priority,tag,isImportant}', function() {
-    let priorityNames = priorities.map((priority) => priority.name);
-    function emptyGroup(priority) {
-      return {
-        all: [],
-        important: [],
-        priorityLevel: findPriority(priority).level
-      }
-    }
-
-    function findPriority(name) {
-      return priorities.find((priority) => priority.name === name);
-    }
-
-    let messagesByPriority = {};
-    priorityNames.forEach((priority) => {
-      messagesByPriority[priority] = [];
-      let staticTagsForPriority = staticGroups[priority];
-      if (staticTagsForPriority) {
-        staticTagsForPriority.forEach((tag) => {
-          messagesByPriority[priority][tag] = emptyGroup(priority);
-        });
-      }
-    });
-
-    return this.get('items').reduce((messages, message) => {
-      let priority = Ember.get(message, 'priority');
-      assert(`Unknown priority: ${priority}`, priorityNames.includes(priority));
-      let messagesByTag = messages[priority];
-      let tag = Ember.get(message, 'tag');
-      if (!messagesByTag[tag]) {
-        messagesByTag[tag] = emptyGroup(priority);
-      }
-      let messagesWithTag = messagesByTag[tag];
-      messagesWithTag.all.push(message);
-      if (message.get('isImportant')) {
-        messagesWithTag.important.push(message);
-      }
-      return messages;
-    }, messagesByPriority);
-  }),
-
-  messagesForToday: messagesBetween('items', 'updatedAt', {
+  threadsUpdatedToday: threadsBetween('items', 'updatedAt', {
     from: moment().subtract(1, 'day')
   }),
 
-  selectedGroup:    '',
-  messagesInSelectedGroup: computed('items.@each.{groupId,isImportant}', 'selectedGroup', function() {
-    let inselectedGroup = this.get('items').filterBy('groupId', this.get('selectedGroup'));
-    return inselectedGroup.filter((message) => message.get('isImportant'));
-  }),
+  process(message) {
+    message.handle();
+  },
 
-  selectedDate: '',
-  messagesWithSelectedDate: computed('selectedDate', function() {
-    if (this.get('selectedDate') === 'today') {
-      return this.get('todaysUnhandledMessages');
-    }
-    return [];
-  }),
-
-  shouldShowMessagesInGroup: computed.or('selectedGroup', 'selectedDate'),
-
-  matchingMessages: computed('selectedGroup', 'selectedDate', 'messagesInSelectedGroup', 'messagesWithSelectedDate', function() {
-    if (this.get('selectedGroup')) {
-      return this.get('messagesInSelectedGroup');
-    }
-    if (this.get('selectedDate')) {
-      return this.get('messagesWithSelectedDate');
-    }
-    return [];
-  }),
-
-  selectDate(date) {
-    this.setProperties({
-      selectedDate: date,
-      selectedGroup: null
+  createMessage({ thread, text }) {
+    let chatMessage = this.get('store').createRecord('chat-message', {
+      text
     });
-    this.clearSelectedMessage();
-  },
-
-  selectGroup(groupId) {
-    this.setProperties({
-      selectedDate: null,
-      selectedGroup: groupId
+    let message = this.get('store').createRecord('message', {
+      sentAt: moment(),
+      status: 'unhandled'
     });
-    this.clearSelectedMessage();
+    return chatMessage.save()
+      .then((chatMessage) => {
+        message.setProperties({
+          cardId: chatMessage.get('id'),
+          cardType: 'chat-messages'
+        });
+        return message.save();
+      })
+      .then((message) => {
+        thread.addMessage(message);
+      });
   },
-
-  selectMessage(message) {
-    this.set('selectedMessage', message);
-  },
-
-  clearGroupSelection() {
-    this.setProperties({
-      selectedDate: null,
-      selectedGroup: null
-    });
-  },
-
-  clearSelectedMessage() {
-    this.set('selectedMessage', null);
-  },
-
-  approveMessage(message) {
-    message.setProperties({
-      status: 'approved',
-      priority: PROCESSED
-    });
-    this.clearSelectedMessage();
-  },
-
-  denyMessage(message) {
-    message.setProperties({
-      status: 'denied',
-      priority: PROCESSED
-    });
-    this.clearSelectedMessage();
-  }
 });

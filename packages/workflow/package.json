@@ -21,12 +21,14 @@
     "@cardstack/codegen": "^0.2.10",
     "ember-cli-babel": "^6.8.2",
     "ember-cli-htmlbars": "^2.0.1",
+    "ember-concurrency": "^0.7.19",
     "ember-data": "^2.12.1"
   },
   "devDependencies": {
     "@cardstack/ephemeral": "^0.2.10",
     "@cardstack/jsonapi": "^0.2.10",
     "@cardstack/models": "^0.2.10",
+    "@cardstack/rendering": "^0.2.10",
     "@cardstack/test-support": "^0.2.10",
     "broccoli-asset-rev": "^2.4.5",
     "ember-ajax": "^3.0.0",
@@ -48,7 +50,8 @@
     "ember-toolbars": "0.3.0",
     "ember-truth-helpers": "^1.3.0",
     "liquid-fire": "^0.28.0",
-    "loader.js": "4.2.3"
+    "loader.js": "4.2.3",
+    "moment-timezone": "^0.5.11"
   },
   "engines": {
     "node": "^4.5 || 6.* || >= 7.*"
