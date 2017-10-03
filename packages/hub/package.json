@@ -13,6 +13,7 @@
   "description": "Stock API server for the Cardstack tech stack.",
   "dependencies": {
     "@cardstack/core-types": "^0.2.10",
+    "@cardstack/codegen": "^0.2.10",
     "@cardstack/di": "^0.2.4",
     "@cardstack/elasticsearch": "^0.2.10",
     "@cardstack/handlebars": "^0.2.4",
