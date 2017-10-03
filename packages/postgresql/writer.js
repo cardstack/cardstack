@@ -1,8 +1,9 @@
 const PendingChange = require('@cardstack/plugin-utils/pending-change');
 const Error = require('@cardstack/plugin-utils/error');
 const { Pool } = require('pg');
-const { range, snakeCase }  = require('lodash');
+const { range }  = require('lodash');
 const rowToDocument = require('./row-to-doc');
+const NameMapper = require('./name-mapper');
 
 const safeIdentifier = /^[a-zA-Z0-9._]+$/;
 const pendingChanges = new WeakMap();
@@ -15,11 +16,12 @@ module.exports = class Writer {
   static create(params) {
     return new this(params);
   }
-  constructor({ branches, dataSource }) {
+  constructor({ branches, dataSource, renameColumns, renameTables }) {
     this.branchConfig = branches;
     this.pools = Object.create(null);
     this.schemas = Object.create(null);
     this.dataSource = dataSource;
+    this.mapper = new NameMapper(renameTables, renameColumns);
   }
 
   _getPool(branch) {
@@ -55,7 +57,7 @@ module.exports = class Writer {
   }
 
   async prepareCreate(branch, session, type, document, isSchema) {
-    let { tableName, args, columns } = this._prepareQuery(isSchema, branch, type, document);
+    let { schema, table, args, columns } = this._prepareQuery(isSchema, branch, type, document);
     if (document.id != null) {
       args.push(document.id);
       columns.push('id');
@@ -64,7 +66,7 @@ module.exports = class Writer {
     let client = await this._getPool(branch).connect();
     try {
       await client.query('begin');
-      let result = await client.query(`insert into ${tableName} (${columns.join(',')}) values (${placeholders}) returning *`, args);
+      let result = await client.query(`insert into ${schema}.${table} (${columns.join(',')}) values (${placeholders}) returning *`, args);
       let finalDocument = rowToDocument(await this._getSchema(branch), type, result.rows[0]);
       let change = new PendingChange(null, finalDocument, finalize, abort);
       pendingChanges.set(change, { client });
@@ -76,14 +78,14 @@ module.exports = class Writer {
   }
 
   async prepareUpdate(branch, session, type, id, document, isSchema) {
-    let { tableName, args, columns } = this._prepareQuery(isSchema, branch, type, document);
+    let { schema: dbschema, table, args, columns } = this._prepareQuery(isSchema, branch, type, document);
     let client = await this._getPool(branch).connect();
     let schema = await this._getSchema(branch);
     args.push(id);
     try {
       await client.query('begin');
-      let initialDocument = rowToDocument(schema, type, await client.query(`select * from ${tableName} where id=$1`, [ id ]));
-      let result = await client.query(`update ${tableName} set ${columns.map((name,index) => `${name}=$${index+1}`).join(',')} where id=$${args.length} returning *`, args);
+      let initialDocument = rowToDocument(schema, type, await client.query(`select * from ${dbschema}.${table} where id=$1`, [ id ]));
+      let result = await client.query(`update ${dbschema}.${table} set ${columns.map((name,index) => `${name}=$${index+1}`).join(',')} where id=$${args.length} returning *`, args);
       let finalDocument = rowToDocument(schema, type, result.rows[0]);
       let change = new PendingChange(initialDocument, finalDocument, finalize, abort);
       pendingChanges.set(change, { client });
@@ -95,12 +97,12 @@ module.exports = class Writer {
   }
 
   async prepareDelete(branch, session, version, type, id, isSchema) {
-    let { tableName } = this._prepareQuery(isSchema, branch, type);
+    let { schema, table } = this._prepareQuery(isSchema, branch, type);
     let client = await this._getPool(branch).connect();
     try {
       await client.query('begin');
-      let initialDocument = rowToDocument(await this._getSchema(branch), type, await client.query(`select * from ${tableName} where id=$1`, [ id ]));
-      await client.query(`delete from ${tableName} where id=$1`, [id]);
+      let initialDocument = rowToDocument(await this._getSchema(branch), type, await client.query(`select * from ${schema}.${table} where id=$1`, [ id ]));
+      await client.query(`delete from ${schema}.${table} where id=$1`, [id]);
       let change = new PendingChange(initialDocument, null, finalize, abort);
       pendingChanges.set(change, { client });
       return change;
@@ -119,13 +121,17 @@ module.exports = class Writer {
       throw new Error(`No such configured branch ${branch}`, { status: 400 });
     }
 
-    let tableName = snakeCase(type);
-    if (!safeIdentifier.test(tableName)) {
-      throw new Error(`Disallowed table name ${tableName}`);
+    let { schema, table } = this.mapper.tableForType(type);
+    if (!safeIdentifier.test(table)) {
+      throw new Error(`Disallowed table name ${table}`);
     }
+    if (!safeIdentifier.test(schema)) {
+      throw new Error(`Disallowed schema name ${schema}`);
+    }
+
     let args = [];
     let columns = (document ? Object.entries(document.attributes || {}) : []).map(([key, value]) => {
-      key = snakeCase(key);
+      key = this.mapper.columnNameFor(schema, table, key);
       if (!safeIdentifier.test(key)) {
         throw new Error(`Disallowed column name ${key}`);
       }
@@ -145,7 +151,7 @@ module.exports = class Writer {
         args.push(value.data.id);
       }
     });
-    return { tableName, args, columns };
+    return { table, schema, args, columns };
   }
 };
 

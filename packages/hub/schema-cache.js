@@ -127,7 +127,7 @@ class SchemaCache {
   async _load(branch) {
     this.log.debug("initiating schema load on branch %s", branch);
     try {
-      let { models, page } = await this.searcher.search(branch, {
+      let { data: models, meta: { page } } = await this.searcher.search(branch, {
         filter: {
           type: this.schemaLoader.ownTypes(),
           not: {

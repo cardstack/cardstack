@@ -11,14 +11,9 @@ module.exports = {
     }
     return true;
   },
-  defaultMapping(allFields) {
+  defaultMapping() {
     return {
-      type: "object",
-      properties: Object.assign(
-        {},
-        allFields.get('id').mapping(allFields),
-        allFields.get('type').mapping(allFields)
-      )
+      type: "object"
     };
   },
   default: { data: null },

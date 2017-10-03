@@ -86,7 +86,7 @@ describe('middleware-stack', function() {
 
     it('can dynamically remove middleware', async function() {
       let config = await env.lookup('hub:searchers').get('master', 'plugin-configs', 'stub-middleware');
-      await env.lookup('hub:writers').delete('master', env.session, config.meta.version, config.type, config.id);
+      await env.lookup('hub:writers').delete('master', env.session, config.data.meta.version, config.data.type, config.data.id);
       await env.lookup('hub:indexers').update({ realTime: true });
       let response = await request.get('/first');
       expect(response).hasStatus(404);

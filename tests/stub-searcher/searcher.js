@@ -9,7 +9,7 @@ module.exports = class StubSearcher {
 
   async get(branch, type, id, next) {
     if (this.params.injectFirst) {
-      return makeModel(type, id, this.params.injectFirst);
+      return { data: makeModel(type, id, this.params.injectFirst) };
     }
 
     let result = await next();
@@ -17,14 +17,17 @@ module.exports = class StubSearcher {
       return result;
     }
     if (this.params.injectSecond) {
-      return makeModel(type, id, this.params.injectSecond);
+      return { data: makeModel(type, id, this.params.injectSecond) };
     }
   }
 
   async search(branch, query, next) {
     if (this.params.injectFirst) {
       return {
-        models: [ makeModel('examples', '2', this.params.injectFirst) ]
+        data: [ makeModel('examples', '2', this.params.injectFirst) ],
+        meta: {
+          page: {}
+        }
       };
     }
     return next();

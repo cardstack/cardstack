@@ -17,7 +17,7 @@ describe('postgresql/writer', function() {
     client = new Client({ database: 'test1', host: 'localhost', user: 'postgres', port: 5444 });
     await client.connect();
     await client.query('create sequence article_id_seq');
-    await client.query(`create table articles (id varchar primary key DEFAULT cast(nextval('article_id_seq') as varchar), title varchar, length integer, published boolean)`);
+    await client.query(`create table articles (id varchar primary key DEFAULT cast(nextval('article_id_seq') as varchar), title varchar, length integer, published boolean, alt_topic varchar)`);
     await client.query('insert into articles values ($1, $2, $3, $4)', ['0', 'hello world', 100, true]);
 
     let factory = new JSONAPIFactory();
@@ -34,6 +34,11 @@ describe('postgresql/writer', function() {
               user: 'postgres',
               database: 'test1',
               port: 5444
+            }
+          },
+          renameColumns: {
+            articles: {
+              alt_topic: 'topic'
             }
           }
         }
@@ -90,13 +95,15 @@ describe('postgresql/writer', function() {
       attributes: {
         title: 'I was created',
         length: 200,
-        published: false
+        published: false,
+        topic: 'x'
       }
     });
-    let result = await client.query('select title, length, published from articles where id=$1', [created.id]);
+    let result = await client.query('select title, length, published, alt_topic from articles where id=$1', [created.id]);
     expect(result.rows).has.length(1);
     expect(result.rows[0].title).to.equal('I was created');
     expect(result.rows[0].length).to.equal(200);
+    expect(result.rows[0].alt_topic).to.equal('x');
     expect(result.rows[0].published).to.equal(false);
   });
 
@@ -123,13 +130,15 @@ describe('postgresql/writer', function() {
       type: 'articles',
       id: '0',
       attributes: {
-        length: 101
+        length: 101,
+        topic: 'y'
       }
     });
-    let result = await client.query('select title, length, published from articles where id=$1', ['0']);
+    let result = await client.query('select title, length, published, alt_topic from articles where id=$1', ['0']);
     expect(result.rows).has.length(1);
     expect(result.rows[0].title).to.equal('hello world');
     expect(result.rows[0].length).to.equal(101);
+    expect(result.rows[0].alt_topic).to.equal('y');
   });
 
   it('returns full record from update', async function() {

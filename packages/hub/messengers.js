@@ -28,8 +28,8 @@ class Messengers {
       }
 
       let schema = await this.schemaCache.schemaForControllingBranch();
-      let Plugin = schema.plugins.lookupFeatureFactoryAndAssert('messengers', sink.attributes['messenger-type']);
-      let messenger = Plugin.create(Object.assign({ sinkId },  sink.attributes.params));
+      let Plugin = schema.plugins.lookupFeatureFactoryAndAssert('messengers', sink.data.attributes['messenger-type']);
+      let messenger = Plugin.create(Object.assign({ sinkId },  sink.data.attributes.params));
 
       this.messengerCache[sinkId] = messenger;
 

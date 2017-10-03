@@ -116,22 +116,30 @@ class Searcher {
 
   _assembleResponse(result, requestedSize) {
     let documents = result.hits.hits;
-    let pagination = {
+    let page = {
       total: result.hits.total
     };
 
     if (documents.length > requestedSize) {
       documents = documents.slice(0, requestedSize);
       let last = documents[documents.length - 1];
-      pagination.cursor = encodeURIComponent(JSON.stringify(last.sort));
+      page.cursor = encodeURIComponent(JSON.stringify(last.sort));
     }
 
-    let models = documents.map(
-      document => toJSONAPI(document._type, document._source)
+    let included = [];
+    let data = documents.map(
+      document => {
+        let jsonapi = toJSONAPI(document._type, document._source);
+        if (jsonapi.included) {
+          included = included.concat(jsonapi.included);
+        }
+        return jsonapi.data;
+      }
     );
     return {
-      models,
-      page: pagination
+      data,
+      included,
+      meta: { page },
     };
   }
 
@@ -189,7 +197,7 @@ class Searcher {
       }
       let here = aboveSegments.concat(field.queryFieldName);
 
-      if (field.mapping(schema.fields)[field.id].type === 'nested') {
+      if (field.fieldType === '@cardstack/core-types::has-many') {
         return {
           nested: {
             path: here.join('.'),
@@ -209,12 +217,12 @@ class Searcher {
   async _fieldFilter(branch, schema, aboveSegments, key, value) {
     let field;
 
-    if (key === 'cardstack_source') {
+    if (['cardstack_source', 'cardstack_references'].includes(key)) {
       // this is an internal field (meaning it's not visible in the
       // jsonapi records themselves) that we make available for
       // filtering. The schema-cache uses this to avoid shadowing seed
       // models, for example.
-      field = { queryFieldName: 'cardstack_source', sortFieldName: 'cardstack_source' };
+      field = { queryFieldName: key, sortFieldName: key };
     } else {
       field = schema.fields.get(key);
     }
