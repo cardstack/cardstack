@@ -29,12 +29,13 @@ module.exports = [
 
 function initialModels() {
   let factory = new JSONAPIFactory();
-  factory.addResource('authentication-sources', 'github')
+  factory.addResource('data-sources', 'github')
     .withAttributes({
-      authenticatorType: '@cardstack/github-auth',
+      sourceType: '@cardstack/github-auth',
       params: {
         'client-id': process.env.GITHUB_CLIENT_ID,
-        'client-secret': process.env.GITHUB_CLIENT_SECRET
+        'client-secret': process.env.GITHUB_CLIENT_SECRET,
+        token: process.env.GITHUB_TOKEN
       }
     })
   return factory.getModels()

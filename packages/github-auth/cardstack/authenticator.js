@@ -5,7 +5,12 @@ module.exports = class {
   static create(...args) {
     return new this(...args);
   }
-  async authenticate(payload, params /*, userSearcher */) {
+  constructor(params) {
+    this.clientId = params['client-id'];
+    this.clientSecret = params['client-secret'];
+    this.defaultUserTemplate =  "{ \"data\": { \"id\": \"{{login}}\", \"type\": \"github-users\", \"attributes\": { \"name\": \"{{name}}\", \"email\":\"{{email}}\", \"avatar-url\":\"{{avatar_url}}\" }}}";
+  }
+  async authenticate(payload /*, userSearcher */) {
     if (!payload.authorizationCode) {
       throw new Error("missing required field 'authorizationCode'", {
         status: 400
@@ -13,8 +18,8 @@ module.exports = class {
     }
 
     let payloadToGitHub = {
-      client_id: params['client-id'],
-      client_secret: params['client-secret'],
+      client_id: this.clientId,
+      client_secret: this.clientSecret,
       code: payload.authorizationCode
     };
     if (payload.state) {
@@ -61,13 +66,10 @@ module.exports = class {
     return userResponse.body;
   }
 
-  exposeConfig(params) {
+  exposeConfig() {
     return {
-      clientId: params['client-id']
+      clientId: this.clientId
     };
   }
 
-  constructor() {
-    this.defaultUserTemplate =  "{ \"id\": \"{{login}}\", \"type\": \"github-users\", \"attributes\": { \"name\": \"{{name}}\", \"email\":\"{{email}}\", \"avatar-url\":\"{{avatar_url}}\" }}";
-  }
 };

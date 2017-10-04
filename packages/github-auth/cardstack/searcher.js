@@ -1,14 +1,17 @@
 const request = require('./lib/request');
 
 module.exports = class GitHubSearcher {
-  constructor({ ownToken, permissionRepos }) {
-    this.ownToken = ownToken;
-    this.permissionRepos = permissionRepos;
+  static create(...args) {
+    return new this(...args);
+  }
+  constructor({ token, dataSource }) {
+    this.token = token;
+    this.dataSource = dataSource;
   }
 
   async get(branch, type, id, next) {
     if (type === 'github-users') {
-      return { data: this._getUser(id) };
+      return { data: await this._getUser(id) };
     }
     return next();
   }
@@ -26,7 +29,7 @@ module.exports = class GitHubSearcher {
       headers: {
         'Accept': 'application/json',
         'User-Agent': '@cardstack/github-auth',
-        Authorization: `token ${this.ownToken}`
+        Authorization: `token ${this.token}`
       }
     };
     let response = await request(options);
