@@ -28,8 +28,8 @@ describe('email-auth', function() {
       messengerType: '@cardstack/test-support/messenger'
     });
 
-    factory.addResource('authentication-sources', 'email-auth').withAttributes({
-      authenticatorType: '@cardstack/email-auth',
+    factory.addResource('data-sources', 'email-auth').withAttributes({
+      sourceType: '@cardstack/email-auth',
       mayCreateUser: true,
       params: {
         messageSinkId: 'the-sink'
