@@ -3,7 +3,7 @@ module.exports = class {
   static create() {
     return new this();
   }
-  async authenticate({ email }, config, userSearcher) {
+  async authenticate({ email }, userSearcher) {
     if (email == null) {
       throw new Error("email is required", { status: 400 });
     }

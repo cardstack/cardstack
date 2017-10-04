@@ -27,5 +27,21 @@ class E extends Error {
       source: this.source
     };
   }
+
+  static async withJsonErrorHandling(ctxt, fn) {
+    try {
+      return await fn();
+    } catch (err) {
+      if (!err.isCardstackError) {
+        throw err;
+      }
+      let errors = [err];
+      if (err.additionalErrors) {
+        errors = errors.concat(err.additionalErrors);
+      }
+      ctxt.body = { errors };
+      ctxt.status = errors[0].status;
+    }
+  }
 }
 module.exports = E;
