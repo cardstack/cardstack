@@ -14,6 +14,7 @@ const path_is_inside = require('path-is-inside');
 const Dockerfile = require('dockerfilejs').Dockerfile;
 const resolve = promisify(require('resolve'));
 const StdBuffer = require('./stdbuffer');
+const buildAppImage = require('./build-image');
 const log = require('@cardstack/plugin-utils/logger')('hub/spawn-hub');
 
 const HUB_HEARTBEAT_INTERVAL = 1 * 1000;
@@ -50,48 +51,6 @@ module.exports = async function(projectRoot) {
   return app.callback();
 };
 
-async function buildAppImage() {
-  let proc = spawn('docker', [
-      'build',
-      '-t', 'cardstack-app',
-      '-f', '-',
-      '.'
-  ],{
-    cwd: '/Users/aaron/dev/basic-cardstack',
-    stdio: 'pipe'
-  });
-
-
-  let file = new Dockerfile();
-
-  let flags = ['--allow-dev-dependencies', '--containerized'];
-  if (process.env.CARDSTACK_LEAVE_SERVICES) {
-    log.info('Will leave docker services running after exit');
-    flags.push('--leave-services-running');
-  }
-
-  file.from('cardstack/hub')
-    .workdir('/hub/app')
-    .copy({src: ['package.json', 'yarn.lock'], dest: '/hub/app/'})
-    .run('yarn install --frozen-lockfile')
-    .copy({src: '.', dest: '/hub/app'})
-    .env({
-      ELASTICSEARCH: 'http://elasticsearch:9200',
-      DEBUG: 'cardstack/*'
-    })
-    .cmd({command:'node', params: [
-      '/hub/app/node_modules/@cardstack/hub/bin/server.js',
-      '/hub/app/cardstack/seeds/development',
-      ...flags
-    ]});
-
-  proc.stdin.end(file.render());
-
-  await new Promise(function(resolve, reject) {
-    proc.on('error', reject);
-    proc.on('exit', resolve);
-  });
-}
 
 async function linkedHubPath(projectRoot) {
   let hubPath = path.dirname(await resolve('@cardstack/hub/package.json', {basedir: projectRoot}));
