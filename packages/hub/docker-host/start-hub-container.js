@@ -16,11 +16,12 @@ const resolve = promisify(require('resolve'));
 const StdBuffer = require('./stdbuffer');
 const buildAppImage = require('./build-image');
 const log = require('@cardstack/plugin-utils/logger')('hub/spawn-hub');
+const {waitForExit} = require('../util/process');
 
 const HUB_HEARTBEAT_INTERVAL = 1 * 1000;
 
 module.exports = async function(projectRoot) {
-  await buildAppImage();
+  await waitForExit(buildAppImage());
   let logs = await spawnHubContainer(projectRoot);
 
   let hub;

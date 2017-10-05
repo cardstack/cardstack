@@ -1,9 +1,11 @@
 const child_process = require('child_process');
 const {spawn} = child_process;
 
-const Dockerfile = require('dockerfile').Dockerfile;
+const Dockerfile = require('dockerfilejs').Dockerfile;
 
-module.exports = async function buildAppImage() {
+const log = require('@cardstack/plugin-utils/logger')('hub/build-image');
+
+module.exports = function buildAppImage() {
   let proc = spawn('docker', [
       'build',
       '-t', 'cardstack-app',
@@ -40,8 +42,5 @@ module.exports = async function buildAppImage() {
 
   proc.stdin.end(file.render());
 
-  await new Promise(function(resolve, reject) {
-    proc.on('error', reject);
-    proc.on('exit', resolve);
-  });
+  return proc;
 }

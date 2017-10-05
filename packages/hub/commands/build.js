@@ -1,3 +1,7 @@
+const stream = require('stream');
+
+const {waitForExit} = require('../util/process');
+const buildAppImage = require('../docker-host/build-image');
 
 module.exports = {
   name: 'hub:build',
@@ -14,7 +18,10 @@ module.exports = {
     }
   ],
 
-  run(args) {
-    this.ui.writeLine(`hub:build heyy ${JSON.stringify(args, null, 2)}`);
+  async run(args) {
+    let proc = buildAppImage();
+    this.ui.writeLine("Building your docker image...");
+    proc.stdout.pipe(this.ui.outputStream);
+    await waitForExit(proc);
   }
 }
