@@ -86,7 +86,17 @@ export default Component.extend({
 
   actions: {
     selectThread(thread) {
-      this.set('selectedThread', thread);
+      //TODO: Close the notification panel, or at least the CCLV
+      let selectThread = this.get('workflow').selectThread;
+      if (typeof selectThread === 'function') {
+        this.get('workflow').selectThread(thread);
+      } else {
+        this.set('selectedThread', thread);
+      }
+      this.setProperties({
+        selectedDate: null,
+        selectedTag: null
+      });
     },
 
     selectDate(date) {
