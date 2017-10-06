@@ -118,7 +118,16 @@ class Resolver {
           let testSupport = path.dirname(resolve.sync(`@cardstack/test-support`, { basedir: project.path }));
           this._hubPath = path.dirname(resolve.sync(`@cardstack/hub`, { basedir: testSupport }));
         } else {
-          throw new Error(`${project.path} does not depend on the hub or test-support`);
+          if (p['cardstack-plugin'] && p['cardstack-plugin']['in-repo-plugins']) {
+            for (let directory of p['cardstack-plugin']['in-repo-plugins']) {
+              if (require(path.join(project.path, directory, 'package.json')).name === '@cardstack/hub') {
+                this._hubPath = path.join(project.path, directory);
+              }
+            }
+          }
+          if (!this._hubPath) {
+            throw new Error(`${project.path} does not depend on the hub or test-support`);
+          }
         }
       } catch (err) {
         if (!/Cannot find module/i.test(err)) {
