@@ -1,4 +1,5 @@
 const request = require('./lib/request');
+const { rewriteExternalUser } = require('@cardstack/authentication');
 
 module.exports = class GitHubSearcher {
   static create(...args) {
@@ -11,7 +12,7 @@ module.exports = class GitHubSearcher {
 
   async get(branch, type, id, next) {
     if (type === 'github-users') {
-      return { data: await this._getUser(id) };
+      return this._getUser(id);
     }
     return next();
   }
@@ -33,19 +34,8 @@ module.exports = class GitHubSearcher {
       }
     };
     let response = await request(options);
-    return this._rewriteUser(response.body);
+    return rewriteExternalUser(response.body, this.dataSource);
   }
 
-  _rewriteUser(ghUser) {
-    return {
-      id: ghUser.login,
-      type: 'github-users',
-      attributes: {
-        name: ghUser.name,
-        'avatar-url': ghUser.avatar_url,
-        email: ghUser.email
-      }
-    };
-  }
 
 };

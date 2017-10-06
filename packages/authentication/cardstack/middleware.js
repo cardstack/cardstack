@@ -1,13 +1,14 @@
-const logger = require('@cardstack/plugin-utils/logger');
+const log = require('@cardstack/plugin-utils/logger')('auth');
 const Error = require('@cardstack/plugin-utils/error');
 const Session = require('@cardstack/plugin-utils/session');
 const bearerTokenPattern = /bearer +(.*)$/i;
 const compose = require('koa-compose');
 const route = require('koa-better-route');
 const koaJSONBody = require('koa-json-body');
-const Handlebars = require('handlebars');
+
 const { declareInjections } = require('@cardstack/di');
 const { withJsonErrorHandling } = Error;
+const { rewriteExternalUser } = require('..');
 
 module.exports = declareInjections({
   encryptor: 'hub:encryptor',
@@ -19,7 +20,6 @@ module.exports = declareInjections({
 class Authentication {
 
   constructor() {
-    this.log = logger('auth');
 
     // TODO: move these two settings into config
     this.controllingBranch = 'master';
@@ -49,13 +49,13 @@ class Authentication {
     try {
       let [sessionPayload, validUntil] = this.encryptor.verifyAndDecrypt(token);
       if (validUntil <= Date.now()/1000) {
-        this.log.debug("Ignoring expired token");
+        log.debug("Ignoring expired token");
       } else {
         return new Session(sessionPayload, this.userSearcher);
       }
     } catch (err) {
       if (/unable to authenticate data|invalid key length|Not a valid signed message/.test(err.message)) {
-        this.log.warn("Ignoring invalid token");
+        log.warn("Ignoring invalid token");
       } else {
         throw err;
       }
@@ -104,7 +104,7 @@ class Authentication {
     if (source && source.authenticator) {
       return source;
     }
-    this.log.warn('Did not locate authentication source "%s"', name);
+    log.warn('Did not locate authentication source "%s"', name);
     throw new Error(`No such authentication source "${name}"`, { status: 404 });
   }
 
@@ -168,7 +168,7 @@ class Authentication {
   }
 
   async _processExternalUser(externalUser, source) {
-    let user = this._rewriteExternalUser(externalUser, source.userTemplate || source.authenticator.defaultUserTemplate);
+    let user = rewriteExternalUser(externalUser, source);
     if (!user.data || !user.data.type) { return; }
 
     let have;
@@ -191,25 +191,6 @@ class Authentication {
       return { data: await this.writer.update(this.controllingBranch, Session.INTERNAL_PRIVLEGED, user.data.type, have.data.id, user.data) };
     }
     return have;
-  }
-
-  _rewriteExternalUser(externalUser, userTemplate) {
-    this.log.debug("external user %j", externalUser);
-    let rewritten;
-    if (!userTemplate) {
-      rewritten = Object.assign({}, externalUser);
-    } else {
-      let compiled = Handlebars.compile(userTemplate);
-      let stringRewritten = compiled(externalUser);
-      try {
-        rewritten = JSON.parse(stringRewritten);
-      } catch (err) {
-        this.log.error("user-template resulted in invalid json: %s", stringRewritten);
-        throw err;
-      }
-    }
-    this.log.debug("rewritten user %j", rewritten);
-    return rewritten;
   }
 
   _tokenIssuer(prefix){
