@@ -1,5 +1,8 @@
-const fs = require('fs');
-const resolve = require('resolve');
+const {promisify} = require('util');
+const realpath = promisify(require('fs').realpath);
+const path = require('path');
+const resolve = promisify(require('resolve'));
+const path_is_inside = require('path-is-inside');
 const _ = require('lodash');
 const {
   flatten,
@@ -7,132 +10,137 @@ const {
   uniq
 } = _;
 
-console.log(JSON.stringify(getPackageList('/Users/aaron/dev/basic-cardstack'), null, 2))
 
 module.exports = getPackageList;
 
 // [{
-//     name: "@cardstack/models",
-//     path: "/Users/aaron/dev/cardstack/packages/models",
-//     links: [
-//       { name: "@cardstack/hub", package: "@cardstack/hub" },
-//       { name: "@cardstack/hub2", package: "@cardstack/hub" }
-//     ]
+//     name: "basic-cardstack",
+//     path: "/Users/aaron/dev/basic-cardstack",
+//     volumeName: "basic-cardstack-node_modules,
+//     links: [ "@cardstack/hub", "@cardstack/models" ]
 // }]
-function getPackageList(rootPackagePath) {
+async function getPackageList(rootPackagePath) {
 
   // Map {
-  //   "/Users/aaron/dev/cardstack/packages/models" => [
-  //     { name: "@cardstack/hub", path: "/Users/aaron/dev/cardstack/packages/hub" },
-  //     { name: "@cardstack/hub2", path: "/Users/aaron/dev/cardstack/packages/hub" }
+  //   "/Users/aaron/dev/basic-cardstack" => [
+  //     {
+  //       name: "@cardstack/hub",
+  //       path: "/Users/aaron/dev/cardstack/packages/hub",
+  //       from: "/Users/dev/basic-cardstack"
+  //     }
   //   ]
   // }
-  let moduleLinkings = recursivelyFindLinkedModules(rootPackagePath);
+  let moduleLinkings = await recursivelyFindLinkedModules(rootPackagePath);
 
-  // [
-  //   "/Users/aaron/dev/cardstack/packages/models",
-  //   "/Users/aaron/dev/cardstack/packages/hub"
-  // ]
-  let linkedPaths = _(Array.from(moduleLinkings.values())).flatten().map(l => l.path).uniq().value().concat(rootPackagePath);
 
-  // [
-  //   { name: "@cardstack/models", path: "/Users/aaron/dev/cardstack/packages/models" },
-  //   { name: "@cardstack/hub", path: "/Users/aaron/dev/cardstack/packages/hub" }
-  // ]
-  // or, throw error:
-  // Multiple locally linked modules were found with the same name: "@cardstack/di".
-  // CardStack hub only supports linking to a single version of a given module.
-  let packageResolutions = resolvePackages(linkedPaths);
+  // Map {
+  //   "/Users/aaron/dev/cardstack/packages/hub" => "@cardstack/hub"
+  // }
+  // or, throw an error:
+  //     Multiple different linked versions of "somedep" were found:
+  //       "/Users/dev/cardstack/packages/hub" links to "/Users/aaron/work/somedep"
+  //       "/Users/dev/cardstack/packages/di" links to "/Users/aaron/hacking/somedep"
+  //     Cardstack hub only supports linking to a single version of a given module
+  let packageMap = allPathMappings(moduleLinkings);
 
+  let packageName = getPackageName(rootPackagePath);
+  packageMap.set(rootPackagePath, packageName);
+
+  // Final result:
   // [{
   //     name: "@cardstack/models",
   //     path: "/Users/aaron/dev/cardstack/packages/models",
   //     volumeName: "cardstack-models-node_modules",
-  //     links: [
-  //       { name: "@cardstack/hub", package: "@cardstack/hub" },
-  //       { name: "@cardstack/hub2", package: "@cardstack/hub" }
-  //     ]
+  //     links: [ "@cardstack/hub", "@cardstack/models" ]
   // }]
-  return stitchPackages(moduleLinkings, packageResolutions);
+  return stitchPackages(moduleLinkings, packageMap);
 }
 
-// let packages = getPackageList("/Users/aaron/dev/cardstack/packages/models");
-// console.log(JSON.stringify(packages, null, 2));
+function getPackageName(packagePath) {
+  return require(path.join(packagePath, 'package.json')).name;
+}
 
 function stitchPackages(modules, pathResolver) {
   let result = [];
   for (let [path, links] of modules) {
     let name = pathResolver.get(path);
     result.push({
-      path,
       name,
+      path,
       volumeName: name.replace('@', '').replace('/', '-') + "-node_modules",
-      links: links.map(({name, path}) => { return { name, package: pathResolver.get(path) }; })
+      links: links.map(x=>x.name)
     });
   }
+  console.log(result);
   return result;
 }
 
-
-function resolvePackages(paths) {
-  let modules = paths.map(resolveModule);
-  let pathsForModuleName = _.groupBy(modules, 'name');
+function allPathMappings(moduleLinkings) {
+  let allLinks = Array.from(moduleLinkings.values()).reduce((a,b)=>a.concat(b), []);
 
   let result = new Map();
-  for (let name in pathsForModuleName) {
-    let paths = pathsForModuleName[name];
-    if (paths.length > 1) {
-      throw new Error(`Multiple different locally linked modules were found for the name ${name}. CardStack hub only supports linking to a single version of a given module.`);
+
+  let linksByModule = _.groupBy(allLinks, 'name');
+
+  for (let moduleName in linksByModule) {
+    let links = linksByModule[moduleName];
+    let paths = links.map(x=>x.path)
+    if (_.uniq(paths).length > 1) {
+      let linksMsg = links.map(l => {
+        return `"${l.from}" links to "${l.path}"`;
+      }).join('\n')
+      let msg =
+`Multiple different linked versions of "${moduleName}" were found:
+${linksMsg}
+Cardstack hub only supports linking to a single version of a given module`;
+      throw new Error(msg);
+    } else {
+      result.set(paths[0], moduleName);
     }
-    result.set(paths[0].path, paths[0].name);
   }
+
   return result;
 }
 
-function resolveModule(path) {
-  return {
-    name: require(path + '/package.json').name,
-    path
+async function recursivelyFindLinkedModules(packageDir, packageLinks = new Map()) {
+  if (packageLinks.has(packageDir)) {
+    return;
+  } else {
+    packageLinks.set(packageDir, null);
   }
-}
+  let deps = allDeps(packageDir);
 
+  let depResolutions = await Promise.all(deps.map(async function(depName) {
+    // resolving the package.json instead of the module name lets us find the root
+    // directory. Otherwise, we get different results depending on package.json's "main" key
+    let depPackagePath = await resolve(depName + '/package.json', {basedir: packageDir});
+    depPackagePath = await realpath(depPackagePath);
+    let depDir = depPackagePath.replace(/\/package\.json$/, '')
+    return {
+      name: depName,
+      path: depDir,
+      from: packageDir
+    };
+  }));
 
-function recursivelyFindLinkedModules(packagePath, packageLinks = new Map()) {
-  let links = symlinksFromModulesFolder(packagePath + '/node_modules');
+  let links = depResolutions.filter(function(dep) {
+    return !path_is_inside(dep.path, packageDir);
+  });
 
-  packageLinks.set(packagePath, links);
+  packageLinks.set(packageDir, links);
 
-  links.filter(l => !packageLinks.has(l.path))
-    .forEach(l => recursivelyFindLinkedModules(l.path, packageLinks));
+  // ah this is async so we need some sort of work queue of directories to do.
+  let newPackages = links.filter(l => !packageLinks.has(l.path));
+
+  await Promise.all(newPackages.map(l => recursivelyFindLinkedModules(l.path, packageLinks)));
 
   return packageLinks;
 }
 
-// [
-//   { name: "@cardstack/hub2", path: "/Users/aaron/dev/cardstack/packages/hub" }
-// ]
-function symlinksFromModulesFolder(moduleDir) {
-  let output = [];
-  if (!fs.existsSync(moduleDir)) { return output; }
-  for (let name of fs.readdirSync(moduleDir)) {
-    let modulePath = moduleDir + '/' + name;
-
-    if (/^@/.test(name)) {
-      for (let scopedName of fs.readdirSync(modulePath)) {
-        let stat = fs.lstatSync(modulePath + '/' + scopedName);
-        if (stat.isSymbolicLink()) {
-          output.push({
-            name: name + '/' + scopedName,
-            path: fs.realpathSync(modulePath + '/' + scopedName)
-          });
-        }
-      }
-    } else {
-      let stat = fs.lstatSync(modulePath);
-      if (stat.isSymbolicLink()) {
-        output.push({ name, path: fs.realpathSync(modulePath) });
-      }
-    }
-  }
-  return output;
+function allDeps(packageDir) {
+  let packageJSON = require(packageDir + '/package.json');
+  let deps = packageJSON.dependencies || {};
+  let devDeps = packageJSON.devDependencies || {};
+  return Object.keys(deps).concat(Object.keys(devDeps));
 }
+
