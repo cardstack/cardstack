@@ -43,6 +43,10 @@ export default Service.extend({
 
   groupedThreads: computed('items.@each.{priority,tags,isUnhandled}', function() {
     return this.get('items').reduce((groupedThreads, thread) => {
+      if (thread.get('isNew')) {
+        return groupedThreads;
+      }
+
       let priority = thread.get('priority');
       let priorityId = priority.get('id');
       if (!groupedThreads[priorityId]) {
