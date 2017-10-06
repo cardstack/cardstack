@@ -102,25 +102,11 @@ const models = [
       fields: {
         data: [
           { type: 'fields', id: 'source-type' },
-          { type: 'fields', id: 'params' }
-        ]
-      }
-    }
-  },
-  {
-    type: 'content-types',
-    id: 'authentication-sources',
-    attributes: {
-      'is-built-in': true
-    },
-    relationships: {
-      fields: {
-        data: [
-          { type: 'fields', id: 'authenticator-type' },
           { type: 'fields', id: 'params' },
           { type: 'fields', id: 'user-template' },
           { type: 'fields', id: 'may-create-user' },
-          { type: 'fields', id: 'may-update-user' }
+          { type: 'fields', id: 'may-update-user' },
+          { type: 'fields', id: 'token-expiry-seconds' }
         ]
       }
     }
@@ -206,6 +192,13 @@ const models = [
   },
   {
     type: 'fields',
+    id: 'token-expiry-seconds',
+    attributes: {
+      'field-type': '@cardstack/core-types::integer'
+    }
+  },
+  {
+    type: 'fields',
     id: 'source-type',
     attributes: {
       'field-type': '@cardstack/core-types::string'
@@ -223,13 +216,6 @@ const models = [
     id: 'user-template',
     attributes: {
       'field-type': '@cardstack/handlebars'
-    }
-  },
-  {
-    type: 'fields',
-    id: 'authenticator-type',
-    attributes: {
-      'field-type': '@cardstack/core-types::string'
     }
   },
   {

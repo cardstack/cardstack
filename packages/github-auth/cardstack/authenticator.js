@@ -2,7 +2,15 @@ const Error = require('@cardstack/plugin-utils/error');
 const request = require('./lib/request');
 
 module.exports = class {
-  async authenticate(payload, params /*, userSearcher */) {
+  static create(...args) {
+    return new this(...args);
+  }
+  constructor(params) {
+    this.clientId = params['client-id'];
+    this.clientSecret = params['client-secret'];
+    this.defaultUserTemplate =  "{ \"data\": { \"id\": \"{{login}}\", \"type\": \"github-users\", \"attributes\": { \"name\": \"{{name}}\", \"email\":\"{{email}}\", \"avatar-url\":\"{{avatar_url}}\" }}}";
+  }
+  async authenticate(payload /*, userSearcher */) {
     if (!payload.authorizationCode) {
       throw new Error("missing required field 'authorizationCode'", {
         status: 400
@@ -10,8 +18,8 @@ module.exports = class {
     }
 
     let payloadToGitHub = {
-      client_id: params['client-id'],
-      client_secret: params['client-secret'],
+      client_id: this.clientId,
+      client_secret: this.clientSecret,
       code: payload.authorizationCode
     };
     if (payload.state) {
@@ -55,18 +63,13 @@ module.exports = class {
     if (userResponse.response.statusCode !== 200) {
       throw new Error(responseBody.error, { status: response.statusCode });
     }
+    return userResponse.body;
+  }
+
+  exposeConfig() {
     return {
-      user: userResponse.body
+      clientId: this.clientId
     };
   }
 
-  exposeConfig(params) {
-    return {
-      clientId: params['client-id']
-    };
-  }
-
-  constructor() {
-    this.defaultUserTemplate =  "{ \"id\": \"{{login}}\", \"type\": \"github-users\", \"attributes\": { \"name\": \"{{name}}\", \"email\":\"{{email}}\", \"avatar-url\":\"{{avatar_url}}\" }}";
-  }
 };

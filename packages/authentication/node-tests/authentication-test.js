@@ -28,51 +28,51 @@ describe('authentication/middleware', function() {
       fullName: "Arthur Faulkner"
     });
 
-    factory.addResource('authentication-sources', 'echo').withAttributes({
-      authenticatorType: 'stub-authenticators::echo'
+    factory.addResource('data-sources', 'echo').withAttributes({
+      sourceType: 'stub-authenticators::echo'
     });
 
-    factory.addResource('authentication-sources', 'returns-nothing').withAttributes({
-      authenticatorType: 'stub-authenticators::returns-nothing'
+    factory.addResource('data-sources', 'returns-nothing').withAttributes({
+      sourceType: 'stub-authenticators::returns-nothing'
     });
 
-    factory.addResource('authentication-sources', 'by-email').withAttributes({
-      authenticatorType: 'stub-authenticators::by-email',
+    factory.addResource('data-sources', 'by-email').withAttributes({
+      sourceType: 'stub-authenticators::by-email',
       params: {
         hidden: true
       }
     });
 
-    factory.addResource('authentication-sources', 'always-invalid').withAttributes({
-      authenticatorType: 'stub-authenticators::always-invalid'
+    factory.addResource('data-sources', 'always-invalid').withAttributes({
+      sourceType: 'stub-authenticators::always-invalid'
     });
 
-    factory.addResource('authentication-sources', 'config-echo-quint').withAttributes({
-      authenticatorType: 'stub-authenticators::config-echo',
+    factory.addResource('data-sources', 'config-echo-quint').withAttributes({
+      sourceType: 'stub-authenticators::config-echo',
       params: {
         data: { id: quint.id, type: 'users' }
       }
     });
 
-    factory.addResource('authentication-sources', 'config-echo-arthur').withAttributes({
-      authenticatorType: 'stub-authenticators::config-echo',
+    factory.addResource('data-sources', 'config-echo-arthur').withAttributes({
+      sourceType: 'stub-authenticators::config-echo',
       params: {
         data: { id: arthur.id, type: 'users' }
       }
     });
 
-    factory.addResource('authentication-sources', 'id-rewriter').withAttributes({
-      authenticatorType: 'stub-authenticators::echo',
+    factory.addResource('data-sources', 'id-rewriter').withAttributes({
+      sourceType: 'stub-authenticators::echo',
       userTemplate: '{ "data": { "id": "{{upstreamId}}", "type": "users" }}'
     });
 
-    factory.addResource('authentication-sources', 'has-default-template').withAttributes({
-      authenticatorType: 'stub-authenticators::has-default-template'
+    factory.addResource('data-sources', 'has-default-template').withAttributes({
+      sourceType: 'stub-authenticators::has-default-template'
     });
 
 
-    factory.addResource('authentication-sources', 'create-via-template').withAttributes({
-      authenticatorType: 'stub-authenticators::echo',
+    factory.addResource('data-sources', 'create-via-template').withAttributes({
+      sourceType: 'stub-authenticators::echo',
       userTemplate: `{"data":{
         "id": "my-prefix-{{id}}",
         "type": "users",
@@ -84,8 +84,8 @@ describe('authentication/middleware', function() {
       mayCreateUser: true
     });
 
-    factory.addResource('authentication-sources', 'create-via-template-no-id').withAttributes({
-      authenticatorType: 'stub-authenticators::echo',
+    factory.addResource('data-sources', 'create-via-template-no-id').withAttributes({
+      sourceType: 'stub-authenticators::echo',
       userTemplate: `{"data":{
         "type": "users",
         "attributes": {
@@ -97,8 +97,8 @@ describe('authentication/middleware', function() {
     });
 
 
-    factory.addResource('authentication-sources', 'update-user').withAttributes({
-      authenticatorType: 'stub-authenticators::echo',
+    factory.addResource('data-sources', 'update-user').withAttributes({
+      sourceType: 'stub-authenticators::echo',
       mayUpdateUser: true
     });
 
@@ -180,19 +180,21 @@ describe('authentication/middleware', function() {
     describe('token endpoints', async function() {
 
       it('supports CORS preflight', async function() {
-        let response = await request.options('/auth/foo');
+        let response = await request.options('/auth/echo');
         expect(response).hasStatus(200);
         expect(response.headers['access-control-allow-methods']).matches(/POST/);
       });
 
       it('supports CORS', async function() {
-        let response = await request.post('/auth/foo').send({});
+        let response = await request.post('/auth/echo').send({});
         expect(response.headers['access-control-allow-origin']).equals('*');
       });
 
       it('returns not found for missing module', async function() {
-        let response = await request.post('/auth/foo').send({});
-        expect(response).hasStatus(404);
+        await logger.expectWarn(/Did not locate authentication source "foo"/, async () => {
+          let response = await request.post('/auth/foo').send({});
+          expect(response).hasStatus(404);
+        });
       });
 
       it('finds authenticator', async function() {

@@ -1,12 +1,14 @@
-const logger = require('@cardstack/plugin-utils/logger');
+const log = require('@cardstack/plugin-utils/logger')('auth');
+const Error = require('@cardstack/plugin-utils/error');
 const Session = require('@cardstack/plugin-utils/session');
 const bearerTokenPattern = /bearer +(.*)$/i;
 const compose = require('koa-compose');
 const route = require('koa-better-route');
 const koaJSONBody = require('koa-json-body');
-const Handlebars = require('handlebars');
-const { declareInjections } = require('@cardstack/di');
 
+const { declareInjections } = require('@cardstack/di');
+const { withJsonErrorHandling } = Error;
+const { rewriteExternalUser } = require('..');
 
 module.exports = declareInjections({
   encryptor: 'hub:encryptor',
@@ -18,7 +20,6 @@ module.exports = declareInjections({
 class Authentication {
 
   constructor() {
-    this.log = logger('auth');
 
     // TODO: move these two settings into config
     this.controllingBranch = 'master';
@@ -48,13 +49,13 @@ class Authentication {
     try {
       let [sessionPayload, validUntil] = this.encryptor.verifyAndDecrypt(token);
       if (validUntil <= Date.now()/1000) {
-        this.log.debug("Ignoring expired token");
+        log.debug("Ignoring expired token");
       } else {
         return new Session(sessionPayload, this.userSearcher);
       }
     } catch (err) {
       if (/unable to authenticate data|invalid key length|Not a valid signed message/.test(err.message)) {
-        this.log.warn("Ignoring invalid token");
+        log.warn("Ignoring invalid token");
       } else {
         throw err;
       }
@@ -98,16 +99,17 @@ class Authentication {
   }
 
   async _locateAuthenticationSource(name) {
-    let source = await this.searcher.get(this.controllingBranch, 'authentication-sources', name);
     let schema = await this.schemaCache.schemaForControllingBranch();
-    let plugin = schema.plugins.lookupFeature('authenticators', source.data.attributes['authenticator-type']);
-    return { plugin, source };
+    let source = schema.dataSources.get(name);
+    if (source && source.authenticator) {
+      return source;
+    }
+    log.warn('Did not locate authentication source "%s"', name);
+    throw new Error(`No such authentication source "${name}"`, { status: 404 });
   }
 
-  async _invokeAuthenticationSource(ctxt, sourceAndPlugin) {
-    let { source, plugin } = sourceAndPlugin;
-    let params = source.data.attributes.params;
-    let result = await plugin.authenticate(ctxt.request.body, params, this.userSearcher);
+  async _invokeAuthenticationSource(ctxt, source) {
+    let result = await source.authenticator.authenticate(ctxt.request.body, this.userSearcher);
 
     if (result && result.meta && result.meta.partialSession) {
       if (result.data.type == null) {
@@ -140,7 +142,7 @@ class Authentication {
       delete result.meta;
       user = result;
     } else {
-      user = await this._processExternalUser(result, source, plugin);
+      user = await this._processExternalUser(result, source);
     }
 
     if (!user || !user.data) {
@@ -155,11 +157,7 @@ class Authentication {
       return;
     }
 
-    let expiry = 86400;
-    if (source.attributes && source.attributes['token-expiry'] != null) {
-      expiry = source.attributes['token-expiry'];
-    }
-    let tokenMeta = await this.createToken({ id: user.data.id, type: user.data.type }, expiry);
+    let tokenMeta = await this.createToken({ id: user.data.id, type: user.data.type }, source.tokenExpirySeconds);
     if (!user.data.meta) {
       user.data.meta = tokenMeta;
     } else {
@@ -169,8 +167,8 @@ class Authentication {
     ctxt.status = 200;
   }
 
-  async _processExternalUser(externalUser, source, plugin) {
-    let user = this._rewriteExternalUser(externalUser, source.data.attributes['user-template'] || plugin.defaultUserTemplate);
+  async _processExternalUser(externalUser, source) {
+    let user = rewriteExternalUser(externalUser, source);
     if (!user.data || !user.data.type) { return; }
 
     let have;
@@ -185,33 +183,14 @@ class Authentication {
       }
     }
 
-    if (!have && source.data.attributes['may-create-user']) {
+    if (!have && source.mayCreateUser) {
       return { data: await this.writer.create(this.controllingBranch, Session.INTERNAL_PRIVLEGED, user.data.type, user.data) };
     }
-    if (have && source.data.attributes['may-update-user']) {
+    if (have && source.mayUpdateUser) {
       user.data.meta = have.data.meta;
       return { data: await this.writer.update(this.controllingBranch, Session.INTERNAL_PRIVLEGED, user.data.type, have.data.id, user.data) };
     }
     return have;
-  }
-
-  _rewriteExternalUser(externalUser, userTemplate) {
-    this.log.debug("external user %j", externalUser);
-    let rewritten;
-    if (!userTemplate) {
-      rewritten = Object.assign({}, externalUser);
-    } else {
-      let compiled = Handlebars.compile(userTemplate);
-      let stringRewritten = compiled(externalUser);
-      try {
-        rewritten = JSON.parse(stringRewritten);
-      } catch (err) {
-        this.log.error("user-template resulted in invalid json: %s", stringRewritten);
-        throw err;
-      }
-    }
-    this.log.debug("rewritten user %j", rewritten);
-    return rewritten;
   }
 
   _tokenIssuer(prefix){
@@ -219,39 +198,24 @@ class Authentication {
       koaJSONBody({ limit: '1mb' }),
       async (ctxt) => {
         ctxt.response.set('Access-Control-Allow-Origin', '*');
-        try {
-          let sourceAndPlugin = await this._locateAuthenticationSource(ctxt.routeParams.module);
-          if (sourceAndPlugin) {
-            await this._invokeAuthenticationSource(ctxt, sourceAndPlugin);
-          } else {
-            this.log.warn('Did not locate authentication source %s', ctxt.routeParams.module);
-          }
-        } catch (err) {
-          if (!err.isCardstackError) { throw err; }
-          let errors = [err];
-          if (err.additionalErrors) {
-            errors = errors.concat(err.additionalErrors);
-          }
-          ctxt.body = { errors };
-          ctxt.status = errors[0].status;
-        }
+        await withJsonErrorHandling(ctxt, async () => {
+          let source = await this._locateAuthenticationSource(ctxt.routeParams.module);
+          await this._invokeAuthenticationSource(ctxt, source);
+        });
       }
     ]));
   }
 
   _exposeConfiguration(prefix) {
     return route.get(`/${prefix}/:module`, async (ctxt) => {
-      let sourceAndPlugin = await this._locateAuthenticationSource(ctxt.routeParams.module);
-      if (sourceAndPlugin) {
-        let { source, plugin } = sourceAndPlugin;
-        let result;
-        if (plugin.exposeConfig) {
-          result = await plugin.exposeConfig(source.data.attributes.params);
+      await withJsonErrorHandling(ctxt, async () => {
+        let source = await this._locateAuthenticationSource(ctxt.routeParams.module);
+        if (source.authenticator.exposeConfig) {
+          ctxt.body = await source.authenticator.exposeConfig();
         } else {
-          result = {};
+          ctxt.body = {};
         }
-        ctxt.body = result;
-      }
+      });
     });
   }
 });

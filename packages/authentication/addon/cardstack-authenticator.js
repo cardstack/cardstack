@@ -10,9 +10,9 @@ export default Base.extend({
   restore(rawSession) {
     return new RSVP.Promise((resolve, reject) => {
       let validSession =
-        rawSession && rawSession.meta &&
-        rawSession.meta.validUntil &&
-        rawSession.meta.validUntil > Date.now() / 1000;
+        rawSession && rawSession.data && rawSession.data.meta &&
+        rawSession.data.meta.validUntil &&
+        rawSession.data.meta.validUntil > Date.now() / 1000;
 
       let partialSession =
         rawSession.data &&
