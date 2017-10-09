@@ -24,7 +24,7 @@ export default Message.extend({
   isUnhandled: equal('status', 'unhandled'),
 
   _loadCard: task(function * () {
-    let cardType = this.get('_cardTypeInStore');
+    let cardType = this.get('cardType');
     let card = yield this.get('store').findRecord(cardType, this.get('cardId'));
     this.set('loadedCard', card);
   }),
