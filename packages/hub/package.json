@@ -25,7 +25,6 @@
     "dag-map": "^2.0.2",
     "denodeify": "^1.2.1",
     "docker-container-id": "^1.0.1",
-    "dockerfilejs": "^1.0.6",
     "ember-cli-babel": "^6.8.2",
     "handlebars": "^4.0.6",
     "jsondiffpatch": "^0.2.4",

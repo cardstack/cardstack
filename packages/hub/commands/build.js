@@ -24,6 +24,7 @@ module.exports = {
     let proc = buildAppImage(packages);
     this.ui.writeLine("Building your docker image...");
     proc.stdout.pipe(process.stdout);
+    proc.stderr.pipe(process.stderr);
     await waitForExit(proc);
   }
 }

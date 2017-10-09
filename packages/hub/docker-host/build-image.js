@@ -2,67 +2,68 @@ const child_process = require('child_process');
 const {spawn} = child_process;
 const path = require('path');
 
-const Dockerfile = require('dockerfilejs').Dockerfile;
 const tar = require('tar-stream');
 const tarfs = require('tar-fs');
 
 const log = require('@cardstack/plugin-utils/logger')('hub/build-image');
 
 module.exports = function buildAppImage(packages) {
-  let tarlist = spawn('tar', ['-t']);
   let context = buildContext(packages);
-  context.pipe(tarlist.stdin);
-  // let tarpack = spawn('tar', ['-c', 'package.json']);
-  // tarpack.stdout.pipe(tarlist.stdin);
-
-  return tarlist;
 
   let proc = spawn('docker', [
       'build',
       '-t', 'cardstack-app',
-      '-f', '-',
-      '.'
+      '-'
   ],{
     cwd: '/Users/aaron/dev/basic-cardstack',
     stdio: 'pipe'
   });
 
-
-  let file = new Dockerfile();
-
-  let flags = ['--allow-dev-dependencies', '--containerized'];
-  if (process.env.CARDSTACK_LEAVE_SERVICES) {
-    log.info('Will leave docker services running after exit');
-    flags.push('--leave-services-running');
-  }
-
-  file.from('cardstack/hub')
-    .workdir('/hub/app')
-    .copy({src: ['package.json', 'yarn.lock'], dest: '/hub/app/'})
-    .run('yarn install --frozen-lockfile')
-    .copy({src: '.', dest: '/hub/app'})
-    .env({
-      ELASTICSEARCH: 'http://elasticsearch:9200',
-      DEBUG: 'cardstack/*'
-    })
-    .cmd({command:'node', params: [
-      '/hub/app/node_modules/@cardstack/hub/bin/server.js',
-      '/hub/app/cardstack/seeds/development',
-      ...flags
-    ]});
-
-  proc.stdin.end(file.render());
+  context.pipe(proc.stdin);
 
   return proc;
 }
 
-// create the Dockerfile
-// create the context
-// run the docker build
-// return process for the 
-
 function dockerfile(packages) {
-  let file = new Dockerfile();
+  let file = [];
+
+  file.push('FROM cardstack/hub');
+  file.push('WORKDIR /hub');
+
+  for (let pack of packages) {
+    let dir = `packages/${pack.name}/`; // Don't use path.join, in case host is Windows
+    let json = dir+'package.json';
+    let yarn = dir+'yarn.lock?';        // Docker copy errors if a specific file exists, but is ok with a pattern matching 0 files
+    let files = JSON.stringify([json, yarn, dir]);
+    file.push(`COPY ${files}`);
+  }
+
+  for (let pack of packages) {
+    let dir = `packages/${pack.name}`;
+    file.push(`WORKDIR /hub/${dir}`);
+    file.push('RUN yarn install');
+    file.push('RUN yarn link');
+  }
+
+  for (let pack of packages) {
+    let dir = `packages/${pack.name}`;
+    let cmd = JSON.stringify(['yarn', 'link', ...pack.links]);
+    file.push(`WORKDIR /hub/${dir}`);
+    file.push(`RUN ${cmd}`);
+  }
+
+
+  file.push('WORKDIR /hub');
+  file.push('RUN ln -s packages/basic-cardstack app');
+
+  for (let pack of packages) {
+    let dir = `packages/${pack.name}/`;
+    file.push(`COPY ${dir} ${dir}`);
+  }
+
+  file.push('WORKDIR /hub/app');
+
+  file.push('ENV ELASTICSEARCH=http://elasticsearch:9200 DEBUG=cardstack/*');
 
   let flags = ['--allow-dev-dependencies', '--containerized'];
   if (true /*process.env.CARDSTACK_LEAVE_SERVICES*/) {
@@ -70,12 +71,17 @@ function dockerfile(packages) {
     flags.push('--leave-services-running');
   }
 
-  file.from('cardstack/hub')
-    .workdir('/hub')
-    .copy({src: ['app', 'packages'], dest: '.'})
-    .cmd({command:'sh'});
+  let entry = JSON.stringify([
+    'node',
+    '/hub/app/node_modules/@cardstack/hub/bin/server.js',
+    '/hub/app/cardstack/seeds/development'
+  ]);
+  let cmd = JSON.stringify(flags);
 
-  return file.render();
+  file.push(`ENTRYPOINT ${entry}`);
+  file.push(`CMD ${cmd}`);
+
+  return file.join('\n');
 }
 
 function buildContext(packages) {

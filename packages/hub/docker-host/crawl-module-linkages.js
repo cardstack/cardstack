@@ -71,7 +71,6 @@ function stitchPackages(modules, pathResolver) {
       links: links.map(x=>x.name)
     });
   }
-  console.log(result);
   return result;
 }
 
