@@ -1,6 +1,7 @@
 const stream = require('stream');
 
 const {waitForExit} = require('../util/process');
+const crawlPackages = require('../docker-host/crawl-module-linkages');
 const buildAppImage = require('../docker-host/build-image');
 
 module.exports = {
@@ -10,18 +11,19 @@ module.exports = {
   works: 'insideProject',
 
   availableOptions: [
-    {
+    /* {
       name: 'tag',
       aliases: ['t'],
       type: String,
       default: 'cardstack-app:latest',
-    }
+    } */
   ],
 
   async run(args) {
-    let proc = buildAppImage();
+    let packages = await crawlPackages(this.project.root);
+    let proc = buildAppImage(packages);
     this.ui.writeLine("Building your docker image...");
-    proc.stdout.pipe(this.ui.outputStream);
+    proc.stdout.pipe(process.stdout);
     await waitForExit(proc);
   }
 }
