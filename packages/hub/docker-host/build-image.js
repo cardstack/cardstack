@@ -46,10 +46,12 @@ function dockerfile(packages) {
   }
 
   for (let pack of packages) {
-    let dir = `packages/${pack.name}`;
-    let cmd = JSON.stringify(['yarn', 'link', ...pack.links]);
-    file.push(`WORKDIR /hub/${dir}`);
-    file.push(`RUN ${cmd}`);
+    if (pack.links.length) {
+      let dir = `packages/${pack.name}`;
+      let cmd = JSON.stringify(['yarn', 'link', ...pack.links]);
+      file.push(`WORKDIR /hub/${dir}`);
+      file.push(`RUN ${cmd}`);
+    }
   }
 
 
