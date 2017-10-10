@@ -1,17 +1,13 @@
 const crypto = require('crypto');
-const path = require('path');
 const {promisify} = require('util');
 const child_process = require('child_process');
 const {spawn} = child_process;
 const execFile = promisify(child_process.execFile);
-const realpath = promisify(require('fs').realpath);
 const timeout = promisify(setTimeout);
 
 const Koa = require('koa');
 const proxy = require('koa-proxy');
 const nssocket = require('nssocket');
-const path_is_inside = require('path-is-inside');
-const resolve = promisify(require('resolve'));
 const StdBuffer = require('./stdbuffer');
 const buildAppImage = require('./build-image');
 const log = require('@cardstack/plugin-utils/logger')('hub/spawn-hub');
@@ -80,7 +76,7 @@ async function socketToHub() {
 
 // Spawns the hub container, and returns an object for getting its stdio
 // We should, later, live bind code in as well.
-async function spawnHubContainer(projectRoot) {
+async function spawnHubContainer(/*projectRoot*/) {
   let key = crypto.randomBytes(32).toString('base64');
 
 

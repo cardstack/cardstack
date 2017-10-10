@@ -22,7 +22,7 @@ module.exports = function buildAppImage(packages) {
   context.pipe(proc.stdin);
 
   return proc;
-}
+};
 
 function dockerfile(packages) {
   let file = [];
@@ -68,7 +68,7 @@ function dockerfile(packages) {
   file.push('ENV ELASTICSEARCH=http://elasticsearch:9200 DEBUG=cardstack/*');
 
   let flags = ['--allow-dev-dependencies', '--containerized'];
-  if (true /*process.env.CARDSTACK_LEAVE_SERVICES*/) {
+  if (process.env.CARDSTACK_LEAVE_SERVICES) {
     log.info('Will leave docker services running after exit');
     flags.push('--leave-services-running');
   }
@@ -112,7 +112,7 @@ async function packPackage(pack, package) {
         header.name = path.normalize(path.join('packages', package.name, header.name));
       },
       finish: resolve
-    })
+    });
     pack.on('error', reject);
   });
 }
@@ -121,5 +121,5 @@ function dirs() {
   let directories = [].slice.call(arguments);
   return function(x) {
     return directories.some(dir=>x.endsWith('/'+dir));
-  }
+  };
 }

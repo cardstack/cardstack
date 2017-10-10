@@ -6,4 +6,4 @@ module.exports = {
       child_proc.on('exit', resolve);
     });
   }
-}
+};

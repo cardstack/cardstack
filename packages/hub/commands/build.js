@@ -1,5 +1,3 @@
-const stream = require('stream');
-
 const {waitForExit} = require('../util/process');
 const crawlPackages = require('../docker-host/crawl-module-linkages');
 const buildAppImage = require('../docker-host/build-image');
@@ -19,7 +17,7 @@ module.exports = {
     } */
   ],
 
-  async run(args) {
+  async run() {
     let packages = await crawlPackages(this.project.root);
     let proc = buildAppImage(packages);
     this.ui.writeLine("Building your docker image...");
@@ -27,4 +25,4 @@ module.exports = {
     proc.stderr.pipe(process.stderr);
     await waitForExit(proc);
   }
-}
+};

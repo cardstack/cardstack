@@ -4,11 +4,6 @@ const path = require('path');
 const resolve = promisify(require('resolve'));
 const path_is_inside = require('path-is-inside');
 const _ = require('lodash');
-const {
-  flatten,
-  partition,
-  uniq
-} = _;
 
 
 module.exports = getPackageList;
@@ -83,11 +78,11 @@ function allPathMappings(moduleLinkings) {
 
   for (let moduleName in linksByModule) {
     let links = linksByModule[moduleName];
-    let paths = links.map(x=>x.path)
+    let paths = links.map(x=>x.path);
     if (_.uniq(paths).length > 1) {
       let linksMsg = links.map(l => {
         return `"${l.from}" links to "${l.path}"`;
-      }).join('\n')
+      }).join('\n');
       let msg =
 `Multiple different linked versions of "${moduleName}" were found:
 ${linksMsg}
@@ -114,7 +109,7 @@ async function recursivelyFindLinkedModules(packageDir, packageLinks = new Map()
     // directory. Otherwise, we get different results depending on package.json's "main" key
     let depPackagePath = await resolve(depName + '/package.json', {basedir: packageDir});
     depPackagePath = await realpath(depPackagePath);
-    let depDir = depPackagePath.replace(/\/package\.json$/, '')
+    let depDir = depPackagePath.replace(/\/package\.json$/, '');
     return {
       name: depName,
       path: depDir,
