@@ -19,7 +19,7 @@ module.exports = {
 
   async run() {
     let packages = await crawlPackages(this.project.root);
-    let proc = buildAppImage(packages);
+    let proc = buildAppImage(packages, this.project.pkg.name);
     this.ui.writeLine("Building your docker image...");
     proc.stdout.pipe(process.stdout);
     proc.stderr.pipe(process.stderr);

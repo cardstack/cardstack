@@ -7,8 +7,8 @@ const tarfs = require('tar-fs');
 
 const log = require('@cardstack/plugin-utils/logger')('hub/build-image');
 
-module.exports = function buildAppImage(packages) {
-  let context = buildContext(packages);
+module.exports = function buildAppImage(packages, appName) {
+  let context = buildContext(packages, appName);
 
   let proc = spawn('docker', [
       'build',
@@ -24,20 +24,80 @@ module.exports = function buildAppImage(packages) {
   return proc;
 };
 
-function dockerfile(packages) {
+// Creates the context for the docker build.
+// It contains the Dockerfile, and a folder for each linked module:
+//
+// - Dockerfile
+// - packages
+//   - basic-cardstack
+//     - package.json
+//     - ...
+//   - @cardstack
+//     - hub
+//       - package.json
+//       - ...
+//     - codgen
+//       - ...
+
+function buildContext(packages, appName) {
+  let archive = tar.pack();
+  archive.entry({name: 'Dockerfile'}, dockerfile(packages, appName));
+
+  async function archivePackages() {
+    for (let package of packages) {
+      await archivePackage(archive, package);
+    }
+    archive.finalize();
+  }
+  archivePackages();
+
+  return archive;
+}
+
+
+async function archivePackage(archive, package) {
+  return new Promise(function(resolve, reject) {
+    tarfs.pack(package.path, {
+      pack: archive,
+      finalize: false,
+      ignore: dirs('node_modules', 'tmp', '.git'),
+      map(header) {
+        header.name = path.normalize(path.join('packages', package.name, header.name));
+      },
+      finish: resolve
+    });
+    archive.on('error', reject);
+  });
+}
+
+function dirs() {
+  let directories = [].slice.call(arguments);
+  return function(x) {
+    return directories.some(dir=>x.endsWith('/'+dir));
+  };
+}
+
+
+function dockerfile(packages, appName) {
   let file = [];
 
   file.push('FROM cardstack/hub');
   file.push('WORKDIR /hub');
 
+  file.push(`RUN ln -s ${appName} app`);
+
+  // copy in only package.json/yarn.lock at first.
+  // This means normal code changes won't invalidate the long
+  // yarn install step in the docker build cache
   for (let pack of packages) {
     let dir = `packages/${pack.name}/`; // Don't use path.join, in case host is Windows
     let json = dir+'package.json';
-    let yarn = dir+'yarn.lock?';        // Docker copy errors if a specific file exists, but is ok with a pattern matching 0 files
+    let yarn = dir+'yarn.lock?';        // COPY errors out if a directly specified file is missing, but is ok with a pattern matching 0 files
     let files = JSON.stringify([json, yarn, dir]);
     file.push(`COPY ${files}`);
   }
 
+  // install all dependencies
   for (let pack of packages) {
     let dir = `packages/${pack.name}`;
     file.push(`WORKDIR /hub/${dir}`);
@@ -45,6 +105,7 @@ function dockerfile(packages) {
     file.push('RUN yarn link');
   }
 
+  // link modules together as they are on the host
   for (let pack of packages) {
     if (pack.links.length) {
       let dir = `packages/${pack.name}`;
@@ -56,7 +117,6 @@ function dockerfile(packages) {
 
 
   file.push('WORKDIR /hub');
-  file.push('RUN ln -s packages/basic-cardstack app');
 
   for (let pack of packages) {
     let dir = `packages/${pack.name}/`;
@@ -86,40 +146,3 @@ function dockerfile(packages) {
   return file.join('\n');
 }
 
-function buildContext(packages) {
-  let pack = tar.pack();
-  pack.entry({name: 'Dockerfile'}, dockerfile(packages));
-
-  async function packPackages() {
-    for (let package of packages) {
-      await packPackage(pack, package);
-    }
-    pack.finalize();
-  }
-  packPackages();
-
-  return pack;
-}
-
-
-async function packPackage(pack, package) {
-  return new Promise(function(resolve, reject) {
-    tarfs.pack(package.path, {
-      pack,
-      finalize: false,
-      ignore: dirs('node_modules', 'tmp', '.git'),
-      map(header) {
-        header.name = path.normalize(path.join('packages', package.name, header.name));
-      },
-      finish: resolve
-    });
-    pack.on('error', reject);
-  });
-}
-
-function dirs() {
-  let directories = [].slice.call(arguments);
-  return function(x) {
-    return directories.some(dir=>x.endsWith('/'+dir));
-  };
-}
