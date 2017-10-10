@@ -34,9 +34,14 @@
   {{#liquid-if enabled rules=animationRules growDuration=250 growPixelsPerSecond=1}}
     <footer class="cs-version-control-footer cs-field-editor-section">
       <a class="text-button" {{action (perform delete) }}>Delete</a>
-      <button disabled={{eq modificationState "saved"}} {{action (perform update) }}>
+      <button class="cs-version-control-footer--button" disabled={{eq modificationState "saved"}} {{action (perform update) }}>
         Update
       </button>
+      {{#if (is-component (concat modelType '-action-buttons'))}}
+        {{#with (concat modelType '-action-buttons') as |buttonsComponent|}}
+          {{component buttonsComponent model=model modificationState=modificationState}}
+        {{/with}}
+      {{/if}}
     </footer>
   {{/liquid-if}}
 

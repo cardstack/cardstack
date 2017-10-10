@@ -17,6 +17,10 @@ export default Ember.Component.extend({
     return this.get('resourceMetadata').read(this.get('model'));
   }),
 
+  modelType: computed('model', function() {
+    return modelType(this.get('model'));
+  }),
+
   onMaster: Ember.computed('modelMeta.branch', function() {
     let branch = this.get('modelMeta').branch;
     return branch == null || branch === defaultBranch;
