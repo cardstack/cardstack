@@ -11,17 +11,19 @@ const Koa = require('koa');
 const proxy = require('koa-proxy');
 const nssocket = require('nssocket');
 const path_is_inside = require('path-is-inside');
-const Dockerfile = require('dockerfilejs').Dockerfile;
 const resolve = promisify(require('resolve'));
 const StdBuffer = require('./stdbuffer');
 const buildAppImage = require('./build-image');
 const log = require('@cardstack/plugin-utils/logger')('hub/spawn-hub');
 const {waitForExit} = require('../util/process');
+const crawlPackages = require('./crawl-module-linkages');
 
 const HUB_HEARTBEAT_INTERVAL = 1 * 1000;
 
 module.exports = async function(projectRoot) {
-  await waitForExit(buildAppImage());
+  let packages = await crawlPackages(projectRoot);
+  await waitForExit(buildAppImage(packages));
+
   let logs = await spawnHubContainer(projectRoot);
 
   let hub;
@@ -53,19 +55,6 @@ module.exports = async function(projectRoot) {
 };
 
 
-async function linkedHubPath(projectRoot) {
-  let hubPath = path.dirname(await resolve('@cardstack/hub/package.json', {basedir: projectRoot}));
-  hubPath = await realpath(hubPath);
-
-  // If hub is coming from outside our node_modules, we're linked to it,
-  // so we should bind it in the container as well
-  if (!path_is_inside(hubPath, projectRoot)) {
-    return hubPath;
-  } else {
-    return false;
-  }
-}
-
 async function socketToHub() {
   let hub = new nssocket.NsSocket();
   hub.connect(6785);
@@ -89,20 +78,9 @@ async function socketToHub() {
   });
 }
 
-// Spawns the hub container, and returns an object for getting it stdio
+// Spawns the hub container, and returns an object for getting its stdio
+// We should, later, live bind code in as well.
 async function spawnHubContainer(projectRoot) {
-  let hubPath = await linkedHubPath(projectRoot);
-
-  let hubBinding;
-  if (hubPath) {
-    log.info('Binding locally linked hub: '+hubPath);
-    hubBinding = [
-      '--mount', `type=bind,src=${hubPath},dst=/hub/app/node_modules/@cardstack/hub`
-    ];
-  } else {
-    hubBinding = [];
-  }
-
   let key = crypto.randomBytes(32).toString('base64');
 
 
@@ -113,7 +91,6 @@ async function spawnHubContainer(projectRoot) {
     '--publish', '3000:3000',
     '--publish', '6785:6785',
     '--mount', 'type=bind,src=/var/run/docker.sock,dst=/var/run/docker.sock',
-    ...hubBinding,
     '-e', `CARDSTACK_SESSIONS_KEY=${key}`,
     'cardstack-app'
   ]);
