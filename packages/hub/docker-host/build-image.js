@@ -78,7 +78,7 @@ function dirs() {
 function dockerfile(packages, appName) {
   let file = [];
 
-  file.push('FROM cardstack/hub');
+  file.push('FROM cardstack/hub:alpha');
   file.push('WORKDIR /hub');
 
   file.push(`RUN ln -s packages/${appName} app`);
