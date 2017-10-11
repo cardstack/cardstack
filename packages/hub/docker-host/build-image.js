@@ -14,10 +14,7 @@ module.exports = function buildAppImage(packages, appName) {
       'build',
       '-t', 'cardstack-app',
       '-'
-  ],{
-    cwd: '/Users/aaron/dev/basic-cardstack',
-    stdio: 'pipe'
-  });
+  ]);
 
   context.pipe(proc.stdin);
 
@@ -84,7 +81,7 @@ function dockerfile(packages, appName) {
   file.push('FROM cardstack/hub');
   file.push('WORKDIR /hub');
 
-  file.push(`RUN ln -s ${appName} app`);
+  file.push(`RUN ln -s packages/${appName} app`);
 
   // copy in only package.json/yarn.lock at first.
   // This means normal code changes won't invalidate the long
@@ -134,8 +131,9 @@ function dockerfile(packages, appName) {
   }
 
   let entry = JSON.stringify([
-    'node',
-    '/hub/app/node_modules/@cardstack/hub/bin/server.js',
+    'npx',
+    '--no-install',
+    'cardstack-hub',
     '/hub/app/cardstack/seeds/development'
   ]);
   let cmd = JSON.stringify(flags);

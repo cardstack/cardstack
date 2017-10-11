@@ -1,3 +1,5 @@
+#!/usr/bin/env node
+
 const { makeServer } = require('../main');
 const commander = require('commander');
 const path = require('path');

@@ -1,6 +1,9 @@
 {
   "name": "@cardstack/hub",
   "version": "0.2.11",
+  "bin": {
+    "cardstack-hub": "./bin/cardstack-hub.js"
+  },
   "keywords": [
     "cardstack-plugin",
     "ember-addon"

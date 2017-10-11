@@ -16,11 +16,11 @@ const crawlPackages = require('./crawl-module-linkages');
 
 const HUB_HEARTBEAT_INTERVAL = 1 * 1000;
 
-module.exports = async function(projectRoot) {
-  let packages = await crawlPackages(projectRoot);
-  await waitForExit(buildAppImage(packages));
+module.exports = async function(project) {
+  let packages = await crawlPackages(project.root);
+  await waitForExit(buildAppImage(packages, project.pkg.name));
 
-  let logs = await spawnHubContainer(projectRoot);
+  let logs = await spawnHubContainer(project.root);
 
   let hub;
   try {
