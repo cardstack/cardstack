@@ -28,7 +28,8 @@ let addon = {
   includedCommands() {
     if (CONTAINER_MODE) {
       return {
-        'hub:build': require('./commands/build')
+        'hub:build': require('./commands/build'),
+        'hub:start': require('./commands/start')
       };
     } else {
       return {};
