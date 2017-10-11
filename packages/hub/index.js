@@ -6,12 +6,14 @@ const log = require('@cardstack/plugin-utils/logger')('hub/ember-cli');
 // only sometimes load, because of feature flag
 let BroccoliConnector;
 let Funnel;
-let startAndProxyToHubContainer;
+let startHubContainer;
+let proxyToHub;
 
 const CONTAINER_MODE = process.env.CONTAINERIZED_HUB != null;
 
 if (CONTAINER_MODE) {
-  startAndProxyToHubContainer = require('./docker-host/start-hub-container');
+  startHubContainer = require('./docker-host/start-hub-container');
+  proxyToHub = require('./docker-host/proxy-to-hub');
 } else {
   BroccoliConnector = require('./broccoli-connector');
   Funnel = require('broccoli-funnel');
@@ -72,7 +74,7 @@ let addon = {
     // and the middleware hooks won't run until after that.
 
     if (CONTAINER_MODE) {
-      this._hubProxy = startAndProxyToHubContainer(this.project);
+      this._hubReady = startHubContainer(this.project);
     } else {
       let seedPath = path.join(path.dirname(this.project.configPath()), '..', 'cardstack', 'seeds', env);
       let useDevDeps;
@@ -101,7 +103,8 @@ let addon = {
 
     if (CONTAINER_MODE) {
       // FIXME: this prevents shutdown while it's pending, even in response to a user SIGINT
-      app.use('/cardstack', await this._hubProxy);
+      await this._hubReady;
+      app.use('/cardstack', proxyToHub());
     } else {
       app.use('/cardstack', await this._hubMiddleware);
     }

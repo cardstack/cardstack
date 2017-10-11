@@ -42,12 +42,6 @@ module.exports = async function(project) {
   log.info('Ready message received from hub container');
 
   startHeartbeat(hub);
-
-  let app = new Koa();
-  app.use(proxy({
-    host: 'http://localhost:3000'
-  }));
-  return app.callback();
 };
 
 
