@@ -3,7 +3,6 @@ const path = require('path');
 const crypto = require('crypto');
 const fs = require('fs');
 const log = require('@cardstack/plugin-utils/logger')('hub/ember-cli');
-const buildCommand = require('./commands/build');
 // only sometimes load, because of feature flag
 let BroccoliConnector;
 let Funnel;
@@ -25,9 +24,13 @@ let addon = {
   name: '@cardstack/hub',
 
   includedCommands() {
-    return {
-      'hub:build': buildCommand
-    };
+    if (CONTAINER_MODE) {
+      return {
+        'hub:build': require('./commands/build')
+      };
+    } else {
+      return {};
+    }
   },
 
   init() {
