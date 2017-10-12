@@ -277,6 +277,10 @@ class ActivePlugins {
       f => f.type === featureType && f.name === (featureName || TOP_FEATURE)
     );
     if (feature) {
+      // On Windows, the "Cannot find module 'C'" issue originates here.
+      // loadPath may contain a ':' (eg. c:\path\to\module.js) so using
+      // a ':' as a delimeter may not be the best choice. Changing it now
+      // may break things elsewhere though.
       return `plugin-${featureType}:${feature.loadPath}`;
     }
   }

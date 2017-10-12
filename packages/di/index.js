@@ -132,11 +132,14 @@ class Resolver {
   }
   retrieve(specifier) {
     let module;
-    let [type, name] = specifier.split(':');
+    let [type, name, rest] = specifier.split(':');
     if (type === 'hub') {
       module = this.hubPath + '/' + name;
     } else if (/^plugin-/.test(type)) {
       module = name;
+      if (rest) {
+        module = `${module}:${rest}`;
+      }
     }
 
     if (module) {
