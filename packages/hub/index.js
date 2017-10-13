@@ -11,7 +11,7 @@ let startAndProxyToHubContainer;
 const CONTAINER_MODE = process.env.CONTAINERIZED_HUB != null;
 
 if (CONTAINER_MODE) {
-  startAndProxyToHubContainer = require('./start-hub-container');
+  startAndProxyToHubContainer = require('./docker-host/start-hub-container');
 } else {
   BroccoliConnector = require('./broccoli-connector');
   Funnel = require('broccoli-funnel');
@@ -22,6 +22,16 @@ const defaultBranch = 'master';
 
 let addon = {
   name: '@cardstack/hub',
+
+  includedCommands() {
+    if (CONTAINER_MODE) {
+      return {
+        'hub:build': require('./commands/build')
+      };
+    } else {
+      return {};
+    }
+  },
 
   init() {
     this._super.init && this._super.init.apply(this, arguments);
@@ -62,7 +72,7 @@ let addon = {
     // and the middleware hooks won't run until after that.
 
     if (CONTAINER_MODE) {
-      this._hubProxy = startAndProxyToHubContainer(this.project.root);
+      this._hubProxy = startAndProxyToHubContainer(this.project);
     } else {
       let seedPath = path.join(path.dirname(this.project.configPath()), '..', 'cardstack', 'seeds', env);
       let useDevDeps;
