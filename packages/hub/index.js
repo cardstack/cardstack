@@ -31,7 +31,7 @@ let addon = {
         'hub:build': require('./commands/build'),
         'hub:start': require('./commands/start'),
         'hub:stop': require('./commands/stop'),
-        'hub:clean': require('./commands/clean')
+        'hub:prune': require('./commands/prune')
       };
     } else {
       return {};

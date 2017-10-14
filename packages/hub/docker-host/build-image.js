@@ -12,6 +12,7 @@ module.exports = function buildAppImage(packages, appName) {
 
   let proc = spawn('docker', [
       'build',
+      '--label', 'com.cardstack',
       '-t', 'cardstack-app',
       '-'
   ]);
