@@ -37,11 +37,11 @@
       <button class="cs-version-control-footer--button" disabled={{eq modificationState "saved"}} {{action (perform update) }}>
         Update
       </button>
-      {{#if (is-component (concat modelType '-action-buttons'))}}
-        {{#with (concat modelType '-action-buttons') as |buttonsComponent|}}
+      {{#with (concat modelType '-action-buttons') as |buttonsComponent|}}
+        {{#if (is-component buttonsComponent)}}
           {{component buttonsComponent model=model modificationState=modificationState}}
-        {{/with}}
-      {{/if}}
+        {{/if}}
+      {{/with}}
     </footer>
   {{/liquid-if}}
 
