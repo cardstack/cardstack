@@ -1,3 +1,4 @@
+const path = require('path');
 const Koa = require('koa');
 const { Registry, Container } = require('@cardstack/di');
 // lazy load only in container mode, since they uses node 8 features
@@ -11,9 +12,9 @@ async function wireItUp(projectDir, encryptionKeys, seedModels, opts = {}) {
   let registry = new Registry();
   registry.register('config:project', {
     path: projectDir,
-    allowDevDependencies: opts.allowDevDependencies,
-    emberConfigEnv: opts.emberConfigEnv
+    allowDevDependencies: opts.allowDevDependencies
   });
+  registry.register('config:ember', loadAppConfig(projectDir));
   registry.register('config:seed-models', seedModels);
   registry.register('config:encryption-key', encryptionKeys);
 
@@ -33,6 +34,11 @@ async function wireItUp(projectDir, encryptionKeys, seedModels, opts = {}) {
   }
 
   return container;
+}
+
+function loadAppConfig(projectDir) {
+  let env = process.env.EMBER_ENV || 'development';
+  return require(path.join(projectDir, 'config', 'environment'))(env);
 }
 
 async function makeServer(projectDir, encryptionKeys, seedModels, opts = {}) {
