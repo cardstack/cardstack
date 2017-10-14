@@ -29,7 +29,9 @@ let addon = {
     if (CONTAINER_MODE) {
       return {
         'hub:build': require('./commands/build'),
-        'hub:start': require('./commands/start')
+        'hub:start': require('./commands/start'),
+        'hub:stop': require('./commands/stop'),
+        'hub:clean': require('./commands/clean')
       };
     } else {
       return {};
@@ -104,8 +106,7 @@ let addon = {
       try {
         await connect();
       } catch (e) {
-        this.ui.writeError(new Error('Could not connect to cardstack/hub. Please use "ember hub:start" to start the hub'));
-        throw e;
+        throw new Error('Could not connect to cardstack/hub. Please use "ember hub:start" to start the hub');
       }
       app.use('/cardstack', proxyToHub());
     } else {

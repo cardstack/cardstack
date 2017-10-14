@@ -26,7 +26,10 @@ module.exports = class EmberConnector {
       });
 
       // Ember-cli may shut us down manually.
-      socket.data('shutdown', ()=>orchestrator.stop());
+      socket.data('shutdown', function() {
+        console.log('Received shutdown message from ember-cli');
+        orchestrator.stop()
+      });
 
       if (heartbeat) {
         // Or, if it crashes or is killed it will stop sending the heartbeat

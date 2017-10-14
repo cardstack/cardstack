@@ -32,6 +32,10 @@ class HubConnection {
       this.connection.send('subscribeReady');
     });
   }
+
+  shutdown() {
+    this.connection.send('shutdown');
+  }
 }
 
 async function connect() {

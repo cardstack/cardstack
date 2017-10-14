@@ -12,6 +12,8 @@ module.exports = async function spawnHubContainer(/*projectRoot*/) {
   let {stdout} = await execFile('docker', [
     'run',
     '-d',
+    '--label', 'com.cardstack',
+    '--label', 'com.cardstack.service=hub',
     '--publish', '3000:3000',
     '--publish', '6785:6785',
     '--mount', 'type=bind,src=/var/run/docker.sock,dst=/var/run/docker.sock',
