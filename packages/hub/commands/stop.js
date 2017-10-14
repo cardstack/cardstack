@@ -1,9 +1,3 @@
-const {spawn} = require('child_process');
-
-const {waitForExit} = require('../util/process');
-const crawlPackages = require('../docker-host/crawl-module-linkages');
-const buildAppImage = require('../docker-host/build-image');
-const startHubContainer = require('../docker-host/start-hub-container');
 const {connect} = require('../docker-host/hub-connection');
 
 module.exports = {
@@ -14,7 +8,7 @@ module.exports = {
 
   availableOptions: [],
 
-  async run(args) {
+  async run() {
     let hub;
     try {
       hub = await connect();
