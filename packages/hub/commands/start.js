@@ -39,19 +39,22 @@ module.exports = {
       logs.stderr.pipe(this.ui.errorStream, {end: false});
       return waitForExit(logs);
     } else {
-      this.ui.writeLine(`The hub container has been started. Use "docker logs -f ${container_id}" to see its output`);
-      this.ui.writeLine("Waiting for the hub to fully boot...");
+      this.ui.writeLine("Waiting for the hub to fully boot:");
+      let logs = spawn('docker', ['logs', '-f', container_id]);
+      logs.stdout.pipe(this.ui.outputStream, {end: false});
+      logs.stderr.pipe(this.ui.errorStream, {end: false});
       let connection;
       try {
         connection = await connect();
       } catch (e) {
-        this.ui.writeLine("The hub seems to have crashed while starting up:");
-        let logs = spawn('docker', ['logs', container_id]);
-        logs.stderr.pipe(this.ui.errorStream, {end: false});
-        return waitForExit(logs);
+        logs.stdout.unpipe();
+        logs.stderr.unpipe();
+        return Promise.reject("The hub seems to have crashed while starting up");
       }
       await connection.ready;
-      this.ui.writeLine("The hub is now handling requests");
+      logs.stdout.unpipe();
+      logs.stderr.unpipe();
+      this.ui.writeLine(`The hub is now handling requests. Use "docker logs -f ${container_id}" to see the rest of its output`);
     }
   }
 };
