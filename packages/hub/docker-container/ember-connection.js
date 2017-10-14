@@ -13,7 +13,7 @@ module.exports = class EmberConnector {
       this.stopLater = _.debounce(this._stop.bind(this), HUB_HEARTBEAT_TIMEOUT);
     }
 
-    var that = this;
+    let that = this;
 
     this._server = nssocket.createServer(async function(socket) {
       log.info('Connection established from ember-cli');

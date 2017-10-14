@@ -20,4 +20,4 @@ module.exports = async function spawnHubContainer(/*projectRoot*/) {
   ]);
 
   return stdout.trim();
-}
+};

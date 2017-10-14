@@ -6,14 +6,12 @@ const log = require('@cardstack/plugin-utils/logger')('hub/ember-cli');
 // only sometimes load, because of feature flag
 let BroccoliConnector;
 let Funnel;
-let startHubContainer;
 let proxyToHub;
 let connect;
 
 const CONTAINER_MODE = process.env.CONTAINERIZED_HUB != null;
 
 if (CONTAINER_MODE) {
-  startHubContainer = require('./docker-host/start-hub-container');
   proxyToHub = require('./docker-host/proxy-to-hub');
   connect = require('./docker-host/hub-connection').connect;
 } else {
@@ -28,7 +26,7 @@ let addon = {
   name: '@cardstack/hub',
 
   includedCommands() {
-    if (true) {
+    if (CONTAINER_MODE) {
       return {
         'hub:build': require('./commands/build'),
         'hub:start': require('./commands/start')

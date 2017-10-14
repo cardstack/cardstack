@@ -7,4 +7,4 @@ module.exports = function() {
     host: 'http://localhost:3000'
   }));
   return app.callback();
-}
+};

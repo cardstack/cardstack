@@ -41,11 +41,11 @@ module.exports = {
     } else {
       this.ui.writeLine(`The hub container has been started. Use "docker logs -f ${container_id}" to see its output`);
       this.ui.writeLine("Waiting for the hub to fully boot...");
+      let connection;
       try {
-        var connection = await connect();
+        connection = await connect();
       } catch (e) {
         this.ui.writeLine("The hub seems to have crashed while starting up:");
-        console.log(e);
         let logs = spawn('docker', ['logs', container_id]);
         logs.stderr.pipe(this.ui.errorStream, {end: false});
         return waitForExit(logs);

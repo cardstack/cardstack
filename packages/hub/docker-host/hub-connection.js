@@ -17,7 +17,7 @@ class HubConnection {
     let beat = () => {
       log.trace('Sending heartbeat to hub');
       this.connection.send('heartbeat');
-    }
+    };
     beat();
     setInterval(beat, HUB_HEARTBEAT_INTERVAL);
   }
@@ -73,4 +73,4 @@ async function _connect() {
 module.exports = {
   HubConnection,
   connect
-}
+};
