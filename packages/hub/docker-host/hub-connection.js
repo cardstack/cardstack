@@ -9,45 +9,64 @@ const HUB_HEARTBEAT_INTERVAL = 1 * 1000;
 class HubConnection {
   constructor(connection) {
     this.connection = connection;
-    this.ready = new Promise(function(resolve, reject) {
-      this.connection.data('ready', function() {
-        log.info('Ready message received from hub container');
-        resolve();
-      });
-      this.connection.on('close', reject);
-    });
+    this.startHeartbeat();
+    this.ready = this.awaitReady();
   }
 
   startHeartbeat(){
-    let beat = function() {
+    let beat = () => {
       log.trace('Sending heartbeat to hub');
       this.connection.send('heartbeat');
     }
     beat();
     setInterval(beat, HUB_HEARTBEAT_INTERVAL);
   }
+
+  awaitReady() {
+    return new Promise((resolve, reject) => {
+      this.connection.data('ready', function() {
+        log.info('Ready message received from hub container');
+        resolve();
+      });
+      this.connection.on('close', reject);
+      this.connection.send('subscribeReady');
+    });
+  }
 }
 
 async function connect() {
-  let connection = new nssocket.NsSocket();
-  connection.connect(6785);
+  try {
+    let connection = await _connect();
+    return new HubConnection(connection);
+  } catch (e) {
+    if (e.code === "ECONNREFUSED") {
+      throw new Error('The hub is not accepting connections on port 6785');
+    } else {
+      throw e;
+    }
+  }
+}
+
+async function _connect() {
+  let socket = new nssocket.NsSocket();
+  socket.connect(6785);
 
   return new Promise(function(resolve, reject) {
     log.trace("Attempting to connect to the hub's heartbeat port");
 
     async function onClose() {
       await timeout(50);
-      resolve(connect());
+      resolve(_connect());
     }
 
-    connection.on('close', onClose);
-    connection.data('shake', function() {
+    socket.on('close', onClose);
+    socket.data('shake', function() {
       log.trace("Hub heartbeat connection established");
-      connection.removeListener('close', onClose);
-      resolve(connection);
+      socket.removeListener('close', onClose);
+      resolve(socket);
     });
-    connection.on('error', reject);
-    connection.send('hand');
+    socket.on('error', reject);
+    socket.send('hand');
   });
 }
 

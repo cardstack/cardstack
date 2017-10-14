@@ -6,14 +6,17 @@ const log = require('@cardstack/plugin-utils/logger')('ember-connection');
 const HUB_HEARTBEAT_TIMEOUT = 7.5 * 1000; // longer than the heartbeat interval of 1 second
 
 module.exports = class EmberConnector {
-  constructor(orchestrator) {
-    let stopLater = _.debounce(function() {
-      log.info('No heartbeat from ember-cli! Shutting down.');
-      orchestrator.stop();
-    }, HUB_HEARTBEAT_TIMEOUT);
+  constructor({orchestrator, heartbeat}) {
+    this.orchestrator = orchestrator;
+
+    if (heartbeat) {
+      this.stopLater = _.debounce(this._stop.bind(this), HUB_HEARTBEAT_TIMEOUT);
+    }
+
+    var that = this;
 
     this._server = nssocket.createServer(async function(socket) {
-      log.info('connection established from ember-cli');
+      log.info('Connection established from ember-cli');
 
       // Docker does some weird stuff for containers with published ports
       // before they start actually listening on the port. Long story short,
@@ -23,36 +26,34 @@ module.exports = class EmberConnector {
       });
 
       // Ember-cli may shut us down manually.
-      // Or, if it crashes or is killed it will stop sending the heartbeat
-      // and we can clean ourselves up.
-      socket.data('shutdown', orchestrator.stop);
-      socket.data('heartbeat', function(){
-        log.trace('Received a heartbeat from ember-cli');
-        stopLater();
-      });
+      socket.data('shutdown', ()=>orchestrator.stop());
 
-      await orchestrator.ready;
-
-      // Our listeners are set up, and whoever instantiated us said we're good,
-      // so tell ember-cli everything is ready.
-      try {
-        socket.send('ready');
-      } catch (err) {
-        // This happens if ember-cli stopped while we were awaiting readyPromise
-        if (/bad socket/.test(err)) {
-          log.warn('Ember-cli shut down while the hub was starting. *sigh*');
-          orchestrator.stop();
-          return;
-        } else {
-          throw err;
-        }
+      if (heartbeat) {
+        // Or, if it crashes or is killed it will stop sending the heartbeat
+        // and we can clean ourselves up.
+        socket.data('heartbeat', function(){
+          log.trace('Received a heartbeat from ember-cli');
+          that.stopLater();
+        });
       }
 
-      // We want to time out even if we never hear the initial heartbeat
-      stopLater();
+      socket.data('subscribeReady', async function() {
+        await orchestrator.ready;
+        socket.send('ready');
+      });
+
+      if (heartbeat) {
+        // We want to time out even if we never hear the initial heartbeat
+        that.stopLater();
+      }
     });
 
     this._server.listen(6785);
     log.info('Listening for connections from ember-cli...');
+  }
+
+  _stop() {
+    log.info('No heartbeat from ember-cli! Shutting down.');
+    this.orchestrator.stop();
   }
 };

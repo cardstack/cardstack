@@ -1,3 +1,5 @@
+const {spawn} = require('child_process');
+
 const {waitForExit} = require('../util/process');
 const crawlPackages = require('../docker-host/crawl-module-linkages');
 const buildAppImage = require('../docker-host/build-image');
@@ -11,29 +13,45 @@ module.exports = {
   works: 'insideProject',
 
   availableOptions: [
-    /*{
+    {
       name: 'follow',
       aliases: ['f'],
-      type: Boolean
+      type: Boolean,
       default: false
-    }*/
+    }
   ],
 
   async run(args) {
     let packages = await crawlPackages(this.project.root);
     let proc = buildAppImage(packages, this.project.pkg.name);
     this.ui.writeLine("Building your docker image...");
-    proc.stdout.pipe(process.stdout);
-    proc.stderr.pipe(process.stderr);
+    proc.stdout.pipe(this.ui.outputStream, {end: false});
+    proc.stderr.pipe(this.ui.errorStream, {end: false});
     await waitForExit(proc);
 
     this.ui.writeLine("Starting hub container...");
     let container_id = await startHubContainer();
 
     if (args.follow) {
-      this.ui.writeLine('not yet implemented');
+      this.ui.writeLine('The hub container has been started. Now tailing the logs:');
+      let logs = spawn('docker', ['logs', '-f', container_id]);
+      logs.stdout.pipe(this.ui.outputStream, {end: false});
+      logs.stderr.pipe(this.ui.errorStream, {end: false});
+      return waitForExit(logs);
     } else {
-      this.ui.writeLine(`The hub has started. Use "docker logs -f ${container_id}" to see its output`);
+      this.ui.writeLine(`The hub container has been started. Use "docker logs -f ${container_id}" to see its output`);
+      this.ui.writeLine("Waiting for the hub to fully boot...");
+      try {
+        var connection = await connect();
+      } catch (e) {
+        this.ui.writeLine("The hub seems to have crashed while starting up:");
+        console.log(e);
+        let logs = spawn('docker', ['logs', container_id]);
+        logs.stderr.pipe(this.ui.errorStream, {end: false});
+        return waitForExit(logs);
+      }
+      await connection.ready;
+      this.ui.writeLine("The hub is now handling requests");
     }
   }
 };
