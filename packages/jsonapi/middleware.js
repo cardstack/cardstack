@@ -51,7 +51,7 @@ function jsonapiMiddleware(searcher, writers, indexers) {
     ctxt.response.set('Access-Control-Allow-Origin', '*');
     if (ctxt.request.method === 'OPTIONS') {
       ctxt.response.set('Access-Control-Allow-Methods', 'GET,POST,PATCH,DELETE,OPTIONS');
-      ctxt.response.set('Access-Control-Allow-Headers', 'Authorization, Content-Type, If-Match');
+      ctxt.response.set('Access-Control-Allow-Headers', 'Authorization, Content-Type, If-Match, X-Requested-With');
       ctxt.status = 200;
       return;
     }
