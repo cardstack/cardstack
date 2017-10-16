@@ -39,15 +39,18 @@ async function makeServer(projectDir, encryptionKeys, seedModels, opts = {}) {
   if (opts.containerized) {
     log.debug('Running in container mode');
     // lazy loading
-    Orchestrator = Orchestrator || require('./orchestrator');
-    EmberConnection = EmberConnection || require('./ember-connection');
+    Orchestrator = Orchestrator || require('./docker-container/orchestrator');
+    EmberConnection = EmberConnection || require('./docker-container/ember-connection');
 
     let orchestrator = new Orchestrator(opts.leaveServicesRunning);
     orchestrator.start();
 
     // Eventually we'll pass a connection instance into the hub, for triggering rebuilds.
     // For now, it just has the side effect of shutting the hub down properly when it's time.
-    new EmberConnection(orchestrator);
+    new EmberConnection({
+      orchestrator,
+      heartbeat: opts.heartbeat
+    });
     await orchestrator.ready;
   }
 

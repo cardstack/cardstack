@@ -6,6 +6,7 @@ const {
 } = require('@glimmer/di');
 const resolve = require('resolve');
 const path = require('path');
+const specifierPattern = /([^:]+):(.*)/;
 
 // Tolerate multiple distinct copies of this module
 if (!global.__cardstack_injection_symbol__) {
@@ -141,17 +142,19 @@ class Resolver {
   }
   retrieve(specifier) {
     let module;
-    let [type, name] = specifier.split(':');
-    if (type === 'hub') {
-      module = this.hubPath + '/' + name;
-    } else if (/^plugin-/.test(type)) {
-      module = name;
-    }
-
-    if (module) {
-      let factory = require(module);
-      registerDeclaredInjections(this.registry, specifier, factory);
-      return factory;
+    let m = specifierPattern.exec(specifier);
+    if (m) {
+      let [, type, name] = m;
+      if (type === 'hub') {
+        module = this.hubPath + '/' + name;
+      } else if (/^plugin-/.test(type)) {
+        module = name;
+      }
+      if (module) {
+        let factory = require(module);
+        registerDeclaredInjections(this.registry, specifier, factory);
+        return factory;
+      }
     }
 
     if (this.nextResolver) {

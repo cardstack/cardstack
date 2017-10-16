@@ -4,7 +4,8 @@ module.exports = {
   },
   defaultMapping() {
     return {
-      type: "object"
+      type: "object",
+      enabled: false
     };
   }
 };

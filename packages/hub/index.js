@@ -6,12 +6,14 @@ const log = require('@cardstack/plugin-utils/logger')('hub/ember-cli');
 // only sometimes load, because of feature flag
 let BroccoliConnector;
 let Funnel;
-let startAndProxyToHubContainer;
+let proxyToHub;
+let connect;
 
 const CONTAINER_MODE = process.env.CONTAINERIZED_HUB != null;
 
 if (CONTAINER_MODE) {
-  startAndProxyToHubContainer = require('./start-hub-container');
+  proxyToHub = require('./docker-host/proxy-to-hub');
+  connect = require('./docker-host/hub-connection').connect;
 } else {
   BroccoliConnector = require('./broccoli-connector');
   Funnel = require('broccoli-funnel');
@@ -22,6 +24,19 @@ const defaultBranch = 'master';
 
 let addon = {
   name: '@cardstack/hub',
+
+  includedCommands() {
+    if (CONTAINER_MODE) {
+      return {
+        'hub:build': require('./commands/build'),
+        'hub:start': require('./commands/start'),
+        'hub:stop': require('./commands/stop'),
+        'hub:prune': require('./commands/prune')
+      };
+    } else {
+      return {};
+    }
+  },
 
   init() {
     this._super.init && this._super.init.apply(this, arguments);
@@ -61,9 +76,7 @@ let addon = {
     // hooks won't resolve until the hub does its first codegen build,
     // and the middleware hooks won't run until after that.
 
-    if (CONTAINER_MODE) {
-      this._hubProxy = startAndProxyToHubContainer(this.project.root);
-    } else {
+    if (!CONTAINER_MODE) {
       let seedPath = path.join(path.dirname(this.project.configPath()), '..', 'cardstack', 'seeds', env);
       let useDevDeps;
       if (env === 'test') {
@@ -90,8 +103,12 @@ let addon = {
     }
 
     if (CONTAINER_MODE) {
-      // FIXME: this prevents shutdown while it's pending, even in response to a user SIGINT
-      app.use('/cardstack', await this._hubProxy);
+      try {
+        await connect();
+      } catch (e) {
+        throw new Error('Could not connect to cardstack/hub. Please use "ember hub:start" to start the hub');
+      }
+      app.use('/cardstack', proxyToHub());
     } else {
       app.use('/cardstack', await this._hubMiddleware);
     }

@@ -6,6 +6,7 @@ const logger = require('@cardstack/plugin-utils/logger');
 const { declareInjections } = require('@cardstack/di');
 const { URL } = require('url');
 const defaultIncludes = {};
+const { withJsonErrorHandling } = Error;
 
 module.exports = declareInjections({
   searcher: 'hub:searchers',
@@ -50,7 +51,7 @@ function jsonapiMiddleware(searcher, writers, indexers) {
     ctxt.response.set('Access-Control-Allow-Origin', '*');
     if (ctxt.request.method === 'OPTIONS') {
       ctxt.response.set('Access-Control-Allow-Methods', 'GET,POST,PATCH,DELETE,OPTIONS');
-      ctxt.response.set('Access-Control-Allow-Headers', 'Authorization, Content-Type, If-Match');
+      ctxt.response.set('Access-Control-Allow-Headers', 'Authorization, Content-Type, If-Match, X-Requested-With');
       ctxt.status = 200;
       return;
     }
@@ -125,7 +126,7 @@ class Handler {
 
   async run() {
     this.ctxt.response.set('Content-Type', 'application/vnd.api+json');
-    try {
+    await withJsonErrorHandling(this.ctxt, async () => {
       let segments = this.ctxt.request.path.split('/').map(decodeURIComponent);
       let kind;
       if (segments.length == 2) {
@@ -139,18 +140,7 @@ class Handler {
       if (method) {
         await method.apply(this, segments.slice(1));
       }
-    } catch (err) {
-      if (!err.isCardstackError) {
-        this.log.debug("passing error onward %s", err);
-        throw err;
-      }
-      let errors = [err];
-      if (err.additionalErrors) {
-        errors = errors.concat(err.additionalErrors);
-      }
-      this.ctxt.body = { errors };
-      this.ctxt.status = errors[0].status;
-    }
+    });
   }
 
   async handleIndividualGET(type, id) {

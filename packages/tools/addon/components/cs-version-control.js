@@ -4,6 +4,7 @@ import { task } from 'ember-concurrency';
 import { transitionTo } from '../private-api';
 import { modelType } from '@cardstack/rendering/helpers/cs-model-type';
 import { defaultBranch } from '@cardstack/hub/environment';
+import { computed } from "@ember/object";
 
 export default Ember.Component.extend({
   layout,
@@ -13,16 +14,20 @@ export default Ember.Component.extend({
   resourceMetadata: Ember.inject.service(),
   store: Ember.inject.service(),
 
-  modelMeta: Ember.computed('model', function() {
+  modelMeta: computed('model', function() {
     return this.get('resourceMetadata').read(this.get('model'));
   }),
 
-  onMaster: Ember.computed('modelMeta.branch', function() {
+  modelType: computed('model', function() {
+    return modelType(this.get('model'));
+  }),
+
+  onMaster: computed('modelMeta.branch', function() {
     let branch = this.get('modelMeta').branch;
     return branch == null || branch === defaultBranch;
   }),
 
-  upstreamMeta: Ember.computed('upstreamModel', function() {
+  upstreamMeta: computed('upstreamModel', function() {
     let upstream = this.get('upstreamModel');
     if (upstream) {
       return this.get('resourceMetadata').read(upstream);
@@ -59,7 +64,7 @@ export default Ember.Component.extend({
 
   // this describes the state of our model relative to its branch. So
   // "saved" here means it has been saved to its branch, etc.
-  modificationState: Ember.computed('model.isNew', 'anythingDirty', function() {
+  modificationState: computed('model.isNew', 'anythingDirty', function() {
     if (this.get('model.isNew')) {
       return "new";
     } else  if (this.get('anythingDirty')) {
@@ -71,7 +76,7 @@ export default Ember.Component.extend({
 
   // this describes the state of our model relative to its value on
   // the default branch.
-  upstreamState: Ember.computed('upstreamMeta.hash', 'modelMeta.hash', 'onMaster', 'fetchUpstreamModel.isRunning', function() {
+  upstreamState: computed('upstreamMeta.hash', 'modelMeta.hash', 'onMaster', 'fetchUpstreamModel.isRunning', function() {
     if (this.get('onMaster')) {
       return 'self';
     }
@@ -94,14 +99,14 @@ export default Ember.Component.extend({
 
   }),
 
-  titleClass: Ember.computed('upstreamState', function() {
+  titleClass: computed('upstreamState', function() {
     let state = this.get('upstreamState');
     if (state === 'created' || state === 'different') {
       return 'cs-version-control-preview';
     }
   }),
 
-  title: Ember.computed('modificationState', 'upstreamState', function() {
+  title: computed('modificationState', 'upstreamState', function() {
     switch(this.get('modificationState')) {
     case 'new':
       return 'Drafted'
@@ -121,7 +126,7 @@ export default Ember.Component.extend({
     }
   }),
 
-  anythingDirty: Ember.computed('model.hasDirtyFields', 'model.hasDirtyAttributes', function() {
+  anythingDirty: computed('model.hasDirtyFields', 'model.hasDirtyAttributes', function() {
     // hasDirtyFields comes from the ember-data-relationship-tracker
     // addon, if it's available. It's fine if it's not since the value
     // will default to false, you just don't get relationship dirty
@@ -129,7 +134,7 @@ export default Ember.Component.extend({
     return this.get('model.hasDirtyFields') || this.get('model.hasDirtyAttributes');
   }),
 
-  anythingPending: Ember.computed('model.isNew', 'anythingDirty', function() {
+  anythingPending: computed('model.isNew', 'anythingDirty', function() {
     return this.get('model.isNew') || this.get('anythingDirty');
   }),
 

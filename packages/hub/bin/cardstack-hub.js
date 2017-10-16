@@ -1,3 +1,5 @@
+#!/usr/bin/env node
+
 const { makeServer } = require('../main');
 const commander = require('commander');
 const path = require('path');
@@ -22,6 +24,7 @@ function commandLineOptions() {
     .option('-d --allow-dev-dependencies', 'Allow the hub to load devDependencies')
     .option('-c --containerized', 'Run the hub in container mode (temporary feature flag)')
     .option('-l --leave-services-running', 'Leave dockerized services running, to improve future startup time')
+    .option('--heartbeat', 'Shut down after not receiving a heartbeat from ember-cli')
     .parse(process.argv);
 
   if (commander.args.length < 1) {

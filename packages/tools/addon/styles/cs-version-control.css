@@ -17,7 +17,7 @@
     color: var(--deep-background);
 }
 
-.cs-version-control-footer > button {
+.cs-version-control-footer--button {
     float: right;
     background-color: var(--tools-highlight);
     border: 1px solid var(--deep-tools-highlight);
@@ -28,11 +28,15 @@
     font-size: 0.75rem;
 }
 
-.cs-version-control-footer > button[disabled] {
+.cs-version-control-footer--button[disabled] {
     background-color: var(--light-foreground);
     border-color: #cacaca;
     color: var(--light-background);
     cursor: initial;
+}
+
+.cs-version-control-footer--button + .cs-version-control-footer--button {
+  margin-right: 10px;
 }
 
 .cs-toolbox-section.cs-version-control-preview > header {

@@ -12,9 +12,15 @@ module.exports = class DataSource {
     this._indexer = null;
     this._Searcher = plugins.lookupFeatureFactory('searchers', this.sourceType);
     this._searcher = null;
-    if (!this._Writer && !this._Indexer && !this._Searcher) {
+    this._Authenticator = plugins.lookupFeatureFactory('authenticators', this.sourceType);
+    this._authenticator = null;
+    if (!this._Writer && !this._Indexer && !this._Searcher && !this._Authenticator) {
       throw new Error(`${this.sourceType} is either missing or does not appear to be a valid data source plugin`);
     }
+    this.mayCreateUser = !!model.attributes['may-create-user'];
+    this.mayUpdateUser = !!model.attributes['may-update-user'];
+    this.userTemplate = model.attributes['user-template'];
+    this.tokenExpirySeconds = model.attributes['token-expiry-seconds'] || 86400;
   }
   get writer() {
     if (!this._writer && this._Writer) {
@@ -34,6 +40,12 @@ module.exports = class DataSource {
     }
     return this._searcher;
   }
+  get authenticator() {
+    if (!this._authenticator && this._Authenticator) {
+      this._authenticator = this._Authenticator.create(this._params);
+    }
+    return this._authenticator;
+  }
   async teardown() {
     if (this._writer && typeof this._writer.teardown === 'function') {
       await this._writer.teardown();
@@ -44,5 +56,9 @@ module.exports = class DataSource {
     if (this._searcher && typeof this._searcher.teardown === 'function') {
       await this._searcher.teardown();
     }
+    if (this._authenticator && typeof this._authenticator.teardown === 'function') {
+      await this._authenticator.teardown();
+    }
+
   }
 };

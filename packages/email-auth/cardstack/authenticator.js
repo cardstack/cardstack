@@ -8,7 +8,8 @@ module.exports = declareInjections({
 },
 
 class {
-  async authenticate({ email, referer, secret }, { messageSinkId, subject, from, textTemplate, htmlTemplate }, userSearcher) {
+  async authenticate({ email, referer, secret }, userSearcher) {
+    let { messageSinkId, subject, from, textTemplate, htmlTemplate } = this;
     if (email) {
       let { data: models } = await userSearcher.search({
         filter: {
