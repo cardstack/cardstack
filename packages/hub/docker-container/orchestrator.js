@@ -76,9 +76,9 @@ async function ensureElasticsearch() {
   await execFile('docker', [
       'run',
       '-d',
-      '--rm',
       '--network', NETWORK_NAME,
       '--network-alias', 'elasticsearch',
+      '--label', 'com.cardstack',
       '--label', 'com.cardstack.service=elasticsearch',
       '--publish', '9200:9200',
       'cardstack/elasticsearch:dev'

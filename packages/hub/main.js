@@ -47,7 +47,10 @@ async function makeServer(projectDir, encryptionKeys, seedModels, opts = {}) {
 
     // Eventually we'll pass a connection instance into the hub, for triggering rebuilds.
     // For now, it just has the side effect of shutting the hub down properly when it's time.
-    new EmberConnection(orchestrator);
+    new EmberConnection({
+      orchestrator,
+      heartbeat: opts.heartbeat
+    });
     await orchestrator.ready;
   }
 
