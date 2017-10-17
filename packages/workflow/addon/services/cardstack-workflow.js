@@ -115,7 +115,7 @@ export default Service.extend({
         return message.save();
       })
       .then((message) => {
-        thread.addMessage(message);
+        thread.addMessages([message]);
       });
   },
 });

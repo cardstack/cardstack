@@ -48,8 +48,8 @@ export default Thread.extend({
 
   latestMessage: readOnly('sortedMessages.firstObject'),
 
-  addMessage(message) {
-    this.get('_syncedMessages').addObject(message);
+  addMessages(messages) {
+    this.get('_syncedMessages').addObjects(messages);
   },
 
   _latestMessageWithPriority: computed('sortedMessages.[]', function() {
