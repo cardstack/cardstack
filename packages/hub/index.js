@@ -69,7 +69,12 @@ let addon = {
       this._broccoliConnector = new OldBroccoliConnector();
     }
 
-    app.import('vendor/cardstack-generated.js');
+
+    if (CONTAINER_MODE) {
+      app.import('vendor/cardstack-generated.js');
+    } else {
+      app.import('vendor/cardstack/generated.js');
+    }
 
     if (!process.env.ELASTICSEARCH_PREFIX) {
       process.env.ELASTICSEARCH_PREFIX = this.project.pkg.name.replace(/^[^a-zA-Z]*/, '').replace(/[^a-zA-Z0-9]/g, '_') + '_' + env;
