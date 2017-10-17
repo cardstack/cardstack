@@ -42,6 +42,7 @@ function loadAppConfig(projectDir) {
 }
 
 async function makeServer(projectDir, encryptionKeys, seedModels, opts = {}) {
+  let readyResolver;
   if (opts.containerized) {
     log.debug('Running in container mode');
     // lazy loading
@@ -51,10 +52,13 @@ async function makeServer(projectDir, encryptionKeys, seedModels, opts = {}) {
     let orchestrator = new Orchestrator(opts.leaveServicesRunning);
     orchestrator.start();
 
+    let readyPromise = new Promise(function(r) { readyResolver = r; });
+
     // Eventually we'll pass a connection instance into the hub, for triggering rebuilds.
     // For now, it just has the side effect of shutting the hub down properly when it's time.
     new EmberConnection({
       orchestrator,
+      ready: readyPromise,
       heartbeat: opts.heartbeat
     });
     await orchestrator.ready;
@@ -66,6 +70,7 @@ async function makeServer(projectDir, encryptionKeys, seedModels, opts = {}) {
   app.use(httpLogging);
   app.use(container.lookup('hub:middleware-stack').middleware());
   log.info('Main hub initialized');
+  if (opts.containerized) { readyResolver(); }
   return app;
 }
 
