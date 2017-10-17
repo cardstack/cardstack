@@ -7,7 +7,7 @@ export default Component.extend({
 //  layout,
   classNames: ['cardstack-thread-summary-card'],
   thread: null,
-  messages: readOnly('thread.messagesInReverseChrono'),
+  messages: readOnly('thread.sortedMessages'),
 
   latestCard: computed('messages.@each.{isUnhandled,loadedCard}', function() {
     let latestUnhandled = this.get('messages').find((message) => {
