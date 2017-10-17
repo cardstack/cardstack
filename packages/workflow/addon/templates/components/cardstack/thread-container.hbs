@@ -2,7 +2,7 @@
   <h4 class="header">Single Thread View</h4>
   {{cardstack/thread-summary-card thread=thread}}
   <hr>
-  {{#each thread.messagesInReverseChrono as |message|}}
+  {{#each thread.sortedMessages as |message|}}
     {{#if message.loadedCard}}
       {{cardstack-content content=message.loadedCard format="card"}}
     {{/if}}

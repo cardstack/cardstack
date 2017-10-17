@@ -42,19 +42,18 @@ export default Thread.extend({
     return this.get('tags').map((tag) => tag.get('id'));
   }),
 
-  messagesInReverseChrono: computed('_syncedMessages.[]', function() {
-    let sorted = this.get('_syncedMessages').sortBy('sentAt');
-    return Ember.A([...sorted].reverse());
+  sortedMessages: computed('_syncedMessages.[]', function() {
+    return this.get('_syncedMessages').sortBy('sentAt');
   }),
 
-  latestMessage: readOnly('messagesInReverseChrono.firstObject'),
+  latestMessage: readOnly('sortedMessages.firstObject'),
 
   addMessage(message) {
     this.get('_syncedMessages').addObject(message);
   },
 
-  _latestMessageWithPriority: computed('messagesInReverseChrono.[]', function() {
-    return this.get('messagesInReverseChrono').find((message) => {
+  _latestMessageWithPriority: computed('sortedMessages.[]', function() {
+    return this.get('sortedMessages').find((message) => {
       let priorityId = message.belongsTo('priority').id();
       return !!priorityId;
     });

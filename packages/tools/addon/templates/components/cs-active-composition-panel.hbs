@@ -17,7 +17,7 @@
 
   {{#each fields key="id" as |fieldMark|}}
     {{#cs-collapsible-section class="cs-toolbox-section"
-                              title=(cs-humanize fieldMark.model.name)
+                              title=fieldMark.model.caption
                               opened=(eq fieldMark.id openedFieldId)
                               open=(action openField fieldMark)
                               close=(action openField null)
