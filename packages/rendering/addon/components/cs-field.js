@@ -2,6 +2,7 @@ import Ember from 'ember';
 import layout from '../templates/components/cs-field';
 const { guidFor } = Ember;
 import { fieldType } from '../helpers/cs-field-type';
+import { fieldCaption } from '../helpers/cs-field-caption';
 import injectOptional from 'ember-inject-optional';
 
 export default Ember.Component.extend({
@@ -15,6 +16,10 @@ export default Ember.Component.extend({
 
   fieldType: Ember.computed('content', 'fieldName', function() {
     return fieldType(this.get('content'), this.get('fieldName'));
+  }),
+
+  fieldCaption: Ember.computed('content', 'fieldName', function() {
+    return fieldCaption(this.get('content'), this.get('fieldName'));
   }),
 
   fieldConfig: Ember.computed('fieldType', function() {
@@ -32,10 +37,11 @@ export default Ember.Component.extend({
     return `field-renderers/${this.get('fieldType')}-renderer`;
   }),
 
-  fieldInfo: Ember.computed('content', 'fieldName', function() {
+  fieldInfo: Ember.computed('content', 'fieldName', 'fieldCaption', function() {
     return {
       name: this.get('fieldName'),
-      content: this.get('content')
+      content: this.get('content'),
+      caption: this.get('fieldCaption')
     };
   }),
 }).reopenClass({

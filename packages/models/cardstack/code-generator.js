@@ -36,7 +36,7 @@ define('@cardstack/models/generated/{{modelName}}', ['exports', '@cardstack/mode
            {{camelize field.id}}:  _emberData.default.{{relationship-method field}}("{{type}}"),
          {{/with}}
        {{else}}
-        {{camelize field.id}}: _emberData.default.attr({ fieldType: "{{field.fieldType}}"}),
+        {{camelize field.id}}: _emberData.default.attr({ fieldType: "{{field.fieldType}}", caption: "{{field.caption}}" }),
        {{/if}}
      {{/each}}
    }){{#if routingField}}.reopenClass({ routingField: "{{routingField}}" }){{/if}};
