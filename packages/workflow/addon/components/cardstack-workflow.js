@@ -12,6 +12,8 @@ export default Component.extend({
   workflow:    inject('cardstack-workflow'),
   store:       inject(),
 
+  isOpen:      false,
+
   threads:                    readOnly('workflow.items'),
   groupedThreads:             readOnly('workflow.groupedThreads'),
   unhandled:                  readOnly('workflow.unhandledItems'),
@@ -85,6 +87,10 @@ export default Component.extend({
   },
 
   actions: {
+    toggleOpen() {
+      this.toggleProperty('isOpen');
+    },
+
     selectThread(thread) {
       //TODO: Close the notification panel, or at least the CCLV
       let selectThread = this.get('workflow').selectThread;

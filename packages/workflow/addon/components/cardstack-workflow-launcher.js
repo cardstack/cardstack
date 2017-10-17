@@ -9,11 +9,4 @@ export default Component.extend({
   workflow: inject.service('cardstack-workflow'),
   notificationCount: computed.readOnly('workflow.notificationCount'),
 
-  isOpen: false,
-
-  actions: {
-    toggleDetails() {
-      this.toggleProperty('isOpen');
-    }
-  }
 });

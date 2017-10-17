@@ -1,9 +1,6 @@
-<div class="cardstack-workflow-header" {{action (action 'toggleDetails')}}>
+<div class="cardstack-workflow-header" {{action onClick}}>
   <div class="notification-count" data-test-total-notification-count>
     {{notificationCount}}
   </div>
 </div>
 
-{{#if isOpen}}
-  {{in-left-toolbar show=(component "cardstack-workflow")}}
-{{/if}}
