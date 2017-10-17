@@ -50,6 +50,10 @@ export default Service.extend({
       }
 
       let priority = thread.get('priority');
+      if (!priority) {
+        return groupedThreads;
+      }
+
       let priorityId = priority.get('id');
       if (!groupedThreads[priorityId]) {
         groupedThreads[priorityId] = {
