@@ -10,11 +10,19 @@ const log = logger('server');
 
 async function wireItUp(projectDir, encryptionKeys, seedModels, opts = {}) {
   let registry = new Registry();
-  registry.register('config:project', {
-    path: projectDir,
-    allowDevDependencies: opts.allowDevDependencies
-  });
-  registry.register('config:ember', loadAppConfig(projectDir));
+  if (opts.containerized) {
+    registry.register('config:project', {
+      path: projectDir,
+      allowDevDependencies: opts.allowDevDependencies
+    });
+    registry.register('config:ember', opts.emberConfigEnv);
+  } else {
+    registry.register('config:project', {
+      path: projectDir,
+      allowDevDependencies: opts.allowDevDependencies,
+      emberConfigEnv: opts.emberConfigEnv
+    });
+  }
   registry.register('config:seed-models', seedModels);
   registry.register('config:encryption-key', encryptionKeys);
 
@@ -61,6 +69,9 @@ async function makeServer(projectDir, encryptionKeys, seedModels, opts = {}) {
       ready: readyPromise,
       heartbeat: opts.heartbeat
     });
+
+    opts.emberConfigEnv = loadAppConfig(projectDir);
+
     await orchestrator.ready;
   }
 
