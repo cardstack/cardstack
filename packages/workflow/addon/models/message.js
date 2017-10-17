@@ -29,13 +29,6 @@ export default Message.extend({
     this.set('loadedCard', card);
   }),
 
-  _cardTypeInStore: computed('cardType', function() {
-    let cardType = this.get('cardType');
-    assert(`${cardType} doesn't seem to be a plural noun`, cardType.charAt(cardType.length - 1) === 's');
-    //TODO: Replace this make-shift singularization
-    return this.get('cardType').replace(/s$/, '');
-  }),
-
   loadedTags: computed({
     get() {
       this.get('_loadTags').perform();
