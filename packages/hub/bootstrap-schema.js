@@ -30,7 +30,8 @@ const models = [
           { type: 'fields', id: 'field-type' },
           { type: 'fields', id: 'related-types' },
           { type: 'fields', id: 'default-at-create' },
-          { type: 'fields', id: 'default-at-update' }
+          { type: 'fields', id: 'default-at-update' },
+          { type: 'fields', id: 'caption' }
         ]
       }
     }
@@ -332,6 +333,13 @@ const models = [
   {
     type: 'fields',
     id: 'field-type',
+    attributes: {
+      'field-type': '@cardstack/core-types::string'
+    }
+  },
+  {
+    type: 'fields',
+    id: 'caption',
     attributes: {
       'field-type': '@cardstack/core-types::string'
     }

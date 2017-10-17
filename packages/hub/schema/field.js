@@ -9,6 +9,7 @@ module.exports = class Field {
       throw new Error(`field ${model.id} has no field-type attribute`);
     }
     this.fieldType = model.attributes['field-type'];
+    this.caption = model.attributes.caption || humanize(model.id);
     this.searchable = model.attributes.searchable == null ? true : model.attributes.searchable;
 
     // Default values are modeled as relationships to separate models
@@ -260,4 +261,17 @@ function recursiveMappings(searchTree, allFields) {
     outputList.push(allFields.get('type').mapping(searchTree, allFields));
   }
   return Object.assign({}, ...outputList);
+}
+
+function humanize(string) {
+  // First regex taken from Ember.String.capitalize
+  // Would be great to "merge" this with the cs-humanize helper
+  // in the rendering package
+  return string.replace(/(^|\/)([a-z])/g, function(match) {
+    return match.toUpperCase();
+  }).replace(/([a-z])([A-Z])/g, function(all, low, upper) {
+    return `${low} ${upper}`;
+  }).replace(/-([a-zA-Z])/g, function(all, follower){
+    return ` ${follower.toUpperCase()}`;
+  });
 }
