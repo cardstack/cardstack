@@ -17,6 +17,8 @@ module.exports = async function spawnHubContainer({env}) {
     '--publish', '3000:3000',
     '--publish', '6785:6785',
     '--mount', 'type=bind,src=/var/run/docker.sock,dst=/var/run/docker.sock',
+    '-e', `DEBUG=cardstack/*`,
+    '-e', `DEBUG_LEVEL=debug`,
     '-e', `CARDSTACK_SESSIONS_KEY=${key}`,
     '-e', `EMBER_ENV=${env}`,
     'cardstack-app'
