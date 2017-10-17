@@ -53,11 +53,6 @@ let addon = {
       global.__cardstack_hub_running_in_ember_cli = true;
       this._active = true;
     }
-    if (CONTAINER_MODE) {
-      this._broccoliContainerConnector = new NewBroccoliConnector(defaultBranch);
-    } else {
-      this._broccoliConnector = new OldBroccoliConnector();
-    }
   },
 
   included(app){
@@ -67,6 +62,12 @@ let addon = {
     let env = app.env;
     this._super.apply(this, arguments);
     if (!this._active){ return; }
+
+    if (CONTAINER_MODE) {
+      this._broccoliContainerConnector = new NewBroccoliConnector(defaultBranch);
+    } else {
+      this._broccoliConnector = new OldBroccoliConnector();
+    }
 
     app.import('vendor/cardstack-generated.js');
 
