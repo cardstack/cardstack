@@ -9,15 +9,31 @@ function initialModels() {
     .withRelated('fields', [
       initial.addResource('fields', 'title').withAttributes({
         fieldType: '@cardstack/core-types::string'
-      })
+      }),
+      initial.addResource('fields', 'published-at').withAttributes({
+        caption: 'Publish Date',
+        fieldType: '@cardstack/core-types::date'
+      }),
+      initial.addResource('fields', 'reading-time-value').withAttributes({
+        fieldType: '@cardstack/core-types::integer'
+      }),
+      initial.addResource('fields', 'reading-time-units').withAttributes({
+        fieldType: '@cardstack/core-types::string'
+      }),
     ]);
   initial.addResource('posts', '1')
     .withAttributes({
-      title: 'hello world'
+      title: 'hello world',
+      publishedAt: new Date(2017, 3, 24),
+      readingTimeValue: 8,
+      readingTimeUnits: 'minutes',
     });
   initial.addResource('posts', '2')
     .withAttributes({
-      title: 'second'
+      title: 'second',
+      publishedAt: new Date(2017, 9, 20),
+      readingTimeValue: 2,
+      readingTimeUnits: 'hours',
     });
   return initial.getModels();
 }

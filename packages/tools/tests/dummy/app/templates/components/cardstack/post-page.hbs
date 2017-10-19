@@ -1,4 +1,9 @@
 <div class="post-page">
   <div>{{#link-to "posts"}}Back to posts{{/link-to}}</div>
-  <h1>{{content.title}}</h1>
+  <h1>
+    {{cs-field content 'title'}}
+  </h1>
+  <p>
+    {{cs-field content 'publishedAt'}}
+  </p>
 </div>
