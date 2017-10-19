@@ -1,6 +1,6 @@
 {{#overlay-marks group="cardstack-fields" as |mark|}}
   {{#create-overlay at=mark
-                   label=(cs-humanize mark.model.name)
+                   label=mark.model.caption
                    highlighted=(eq mark.id tools.highlightedFieldId)
                    hoverable=tools.editing
                    class="cs-field-overlay"
