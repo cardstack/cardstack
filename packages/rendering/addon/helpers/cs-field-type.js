@@ -1,8 +1,11 @@
+import { camelize } from '@ember/string';
 import Ember from 'ember';
 
 export function fieldType(content, fieldName) {
   if (!content) { return; }
   let meta;
+
+  fieldName = camelize(fieldName);
 
   try {
     meta = content.constructor.metaForProperty(fieldName);
