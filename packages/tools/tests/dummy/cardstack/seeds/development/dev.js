@@ -15,9 +15,11 @@ function initialModels() {
         fieldType: '@cardstack/core-types::date'
       }),
       initial.addResource('fields', 'reading-time-value').withAttributes({
+        caption: 'Value',
         fieldType: '@cardstack/core-types::integer'
       }),
       initial.addResource('fields', 'reading-time-units').withAttributes({
+        caption: 'Units',
         fieldType: '@cardstack/core-types::string'
       }),
     ]);
