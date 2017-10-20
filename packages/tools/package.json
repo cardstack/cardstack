@@ -38,6 +38,7 @@
   "devDependencies": {
     "@cardstack/ephemeral": "^0.2.11",
     "@cardstack/jsonapi": "^0.2.11",
+    "@cardstack/models": "^0.2.11",
     "@cardstack/test-support": "^0.2.11",
     "broccoli-asset-rev": "^2.4.5",
     "ember-cli": "^2.12.0",
