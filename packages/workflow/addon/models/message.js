@@ -1,4 +1,3 @@
-import { assert } from "@ember/debug"
 import Message from '@cardstack/models/generated/message';
 import { equal } from '@ember/object/computed';
 import { A } from "@ember/array";
