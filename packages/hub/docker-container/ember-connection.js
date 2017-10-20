@@ -6,7 +6,7 @@ const log = require('@cardstack/plugin-utils/logger')('ember-connection');
 const HUB_HEARTBEAT_TIMEOUT = 7.5 * 1000; // longer than the heartbeat interval of 1 second
 
 module.exports = class EmberConnector {
-  constructor({orchestrator, heartbeat}) {
+  constructor({orchestrator, heartbeat, ready}) {
     this.orchestrator = orchestrator;
 
     if (heartbeat) {
@@ -41,7 +41,7 @@ module.exports = class EmberConnector {
       }
 
       socket.data('subscribeReady', async function() {
-        await orchestrator.ready;
+        await ready;
         socket.send('ready');
       });
 

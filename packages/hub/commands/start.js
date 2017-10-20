@@ -18,6 +18,13 @@ module.exports = {
       aliases: ['f'],
       type: Boolean,
       default: false
+    },
+    {
+      name: 'environment',
+      aliases: ['e', { 'dev': 'development' }, { 'prod': 'production' }],
+      description: 'Possible values are "development", "production", and "test".',
+      type: String,
+      default: 'development'
     }
   ],
 
@@ -30,7 +37,9 @@ module.exports = {
     await waitForExit(proc);
 
     this.ui.writeLine("Starting hub container...");
-    let container_id = await startHubContainer();
+    let container_id = await startHubContainer({
+      env: args.environment
+    });
 
     if (args.follow) {
       this.ui.writeLine('The hub container has been started. Now tailing the logs:');

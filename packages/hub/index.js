@@ -4,7 +4,8 @@ const crypto = require('crypto');
 const fs = require('fs');
 const log = require('@cardstack/plugin-utils/logger')('hub/ember-cli');
 // only sometimes load, because of feature flag
-let BroccoliConnector;
+let OldBroccoliConnector;
+let NewBroccoliConnector;
 let Funnel;
 let proxyToHub;
 let connect;
@@ -14,8 +15,9 @@ const CONTAINER_MODE = process.env.CONTAINERIZED_HUB != null;
 if (CONTAINER_MODE) {
   proxyToHub = require('./docker-host/proxy-to-hub');
   connect = require('./docker-host/hub-connection').connect;
+  NewBroccoliConnector = require('./docker-host/broccoli-connector');
 } else {
-  BroccoliConnector = require('./broccoli-connector');
+  OldBroccoliConnector = require('./broccoli-connector');
   Funnel = require('broccoli-funnel');
 }
 
@@ -51,9 +53,6 @@ let addon = {
       global.__cardstack_hub_running_in_ember_cli = true;
       this._active = true;
     }
-    if (!CONTAINER_MODE) {
-      this._broccoliConnector = new BroccoliConnector();
-    }
   },
 
   included(app){
@@ -64,7 +63,16 @@ let addon = {
     this._super.apply(this, arguments);
     if (!this._active){ return; }
 
-    if (!CONTAINER_MODE) {
+    if (CONTAINER_MODE) {
+      this._broccoliContainerConnector = new NewBroccoliConnector(defaultBranch);
+    } else {
+      this._broccoliConnector = new OldBroccoliConnector();
+    }
+
+
+    if (CONTAINER_MODE) {
+      app.import('vendor/cardstack-generated.js');
+    } else {
       app.import('vendor/cardstack/generated.js');
     }
 
@@ -145,6 +153,23 @@ let addon = {
         res.end();
       }
     });
+  },
+
+
+  treeForVendor() {
+    if (!this._active){
+      this._super.apply(this, arguments);
+      return;
+    }
+
+    if (CONTAINER_MODE) {
+      return this._broccoliContainerConnector.tree;
+    } else {
+      return new Funnel(this._broccoliConnector.tree, {
+        srcDir: defaultBranch,
+        destDir: 'cardstack'
+      });
+    }
   }
 };
 
@@ -159,18 +184,6 @@ if (!CONTAINER_MODE) {
     if (this._broccoliConnector) {
       this._broccoliConnector.buildSucceeded(results);
     }
-  };
-
-  addon.treeForVendor = function() {
-    if (!this._active){
-      this._super.apply(this, arguments);
-      return;
-    }
-
-    return new Funnel(this._broccoliConnector.tree, {
-      srcDir: defaultBranch,
-      destDir: 'cardstack'
-    });
   };
 
   addon._makeServer = async function(seedDir, ui, allowDevDependencies, env) {
