@@ -90,7 +90,7 @@ function dockerfile(packages, appName) {
   for (let pack of packages) {
     let dir = `packages/${pack.name}/`; // Don't use path.join, in case host is Windows
     let json = dir+'package.json';
-    let yarn = dir+'yarn.lock?';        // COPY errors out if a directly specified file is missing, but is ok with a pattern matching 0 files
+    let yarn = dir+'yarn.loc[k]';        // COPY errors out if a directly specified file is missing, but is ok with a pattern matching 0 files
     let files = JSON.stringify([json, yarn, dir]);
     file.push(`COPY ${files}`);
   }
