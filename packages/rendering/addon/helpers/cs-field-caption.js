@@ -1,6 +1,10 @@
-import Ember from 'ember';
+import { helper } from 'ember-helper';
 import metaForField from '../-private/meta-for-field';
 import stripNamespace from '../-private/strip-namespace';
+
+export default helper(function([content, fieldName]) {
+  return fieldCaption(content, fieldName);
+});
 
 export function fieldCaption(content, fieldName) {
   let meta = metaForField(content, fieldName);
@@ -15,5 +19,3 @@ export function fieldCaption(content, fieldName) {
 
   return caption;
 }
-
-export default Ember.Helper.helper(fieldCaption);

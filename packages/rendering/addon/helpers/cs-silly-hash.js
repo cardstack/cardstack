@@ -1,6 +1,9 @@
-import Ember from 'ember';
+import { helper } from 'ember-helper';
 
 export function csSillyHash(unused, hash) {
+  // Implements a limited version of the (missing) handlebars splat operator
+  // Input:  { key0=readingTimeValue value0=5 key1=readingTimeUnits value1='minutes', ...}
+  // Output: { readingTimeValue: 5, readingTimeUnits: 'minutes', ... }
   let output = {};
   Object.keys(hash).forEach(key => {
     let m = /^key(\d+)/.exec(key);
@@ -11,4 +14,4 @@ export function csSillyHash(unused, hash) {
   return output;
 }
 
-export default Ember.Helper.helper(csSillyHash);
+export default helper(csSillyHash);

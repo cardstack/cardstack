@@ -1,18 +1,24 @@
-import Ember from 'ember';
 import layout from '../templates/components/cs-field-group';
-const { guidFor } = Ember;
+import { humanize } from '../helpers/cs-humanize';
+import Component from '@ember/component';
+import { computed } from '@ember/object';
+import { guidFor } from "@ember/object/internals"
 
 const limit = 7;
 
-export default Ember.Component.extend({
+export default Component.extend({
   layout,
   tagName: '',
 
-  id: Ember.computed('content', 'name', function() {
+  id: computed('content', 'name', function() {
     return `${guidFor(this.get('content'))}/cs-field-group/${this.get('name')}`;
   }),
 
-  fieldNames: Ember.computed('fields', function() {
+  groupCaption: computed('caption', 'name', function() {
+    return this.get('caption') || humanize(this.get('name'));
+  }),
+
+  fieldNames: computed('fields', function() {
     let fields = this.get('fields');
     if (!Array.isArray(fields)) {
       fields = fields.split(/\s*,\s*/g);
@@ -23,11 +29,12 @@ export default Ember.Component.extend({
     return fields;
   }),
 
-  fieldInfo: Ember.computed('content', 'fieldName', function() {
+  fieldInfo: computed('content', 'fieldName', function() {
     return {
       name: this.get('name'),
       content: this.get('content'),
-      grouped: this.get('fieldNames')
+      grouped: this.get('fieldNames'),
+      caption: this.get('groupCaption')
     };
   })
 

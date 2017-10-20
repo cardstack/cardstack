@@ -1,4 +1,4 @@
-import { camelize } from "@ember/string";
+import { camelize } from '@ember/string';
 
 export default function metaForField(content, fieldName) {
   if (!content) { return; }
@@ -11,4 +11,3 @@ export default function metaForField(content, fieldName) {
   }
 
 }
-

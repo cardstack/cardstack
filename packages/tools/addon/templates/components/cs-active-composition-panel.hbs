@@ -27,8 +27,10 @@
       <div class="cs-field-editor-section">
       {{#if fieldMark.model.grouped}}
         {{#each fieldMark.model.grouped as |fieldName|}}
-          <label>{{cs-humanize fieldName}}</label>
-          {{cs-field-editor content=fieldMark.model.content field=fieldName enabled=editingEnabled}}
+          {{#with fieldMark.model.content as |content|}}
+            <label>{{cs-field-caption content fieldName}}</label>
+            {{cs-field-editor content=content field=fieldName enabled=editingEnabled}}
+          {{/with}}
         {{/each}}
       {{else}}
         {{cs-field-editor content=fieldMark.model.content field=fieldMark.model.name enabled=editingEnabled}}
