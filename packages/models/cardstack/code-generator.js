@@ -33,7 +33,7 @@ define('@cardstack/models/generated/{{modelName}}', ['exports', '@cardstack/mode
      {{#each fields as |field|}}
        {{#if field.isRelationship}}
          {{#with (related-type field) as |type|}}
-           {{camelize field.id}}:  _emberData.default.{{relationship-method field}}("{{type}}"),
+           {{camelize field.id}}:  _emberData.default.{{relationship-method field}}("{{type}}", { caption: "{{field.caption}}" }),
          {{/with}}
        {{else}}
         {{camelize field.id}}: _emberData.default.attr({ fieldType: "{{field.fieldType}}", caption: "{{field.caption}}" }),
