@@ -16,7 +16,8 @@ let scenario = new Fixtures(factory => {
   factory.addResource('content-types', 'posts')
     .withRelated('fields', [
       factory.addResource('fields', 'title').withAttributes({
-        fieldType: '@cardstack/core-types::string'
+        fieldType: '@cardstack/core-types::string',
+        caption: 'Fancy Title'
       }),
       factory.addResource('fields', 'author').withAttributes({
         fieldType: '@cardstack/core-types::belongs-to'
@@ -120,6 +121,16 @@ test('it sets no routingField by default', async function(assert) {
 test('it sets routingField when configured', async function(assert) {
   let model = await run(() => this.store.createRecord('page'));
   assert.equal(model.constructor.routingField, 'permalink');
+});
+
+test('it reflects configured field caption', async function(assert) {
+  let model = await run(() => this.store.createRecord('post'));
+  assert.equal(model.constructor.metaForProperty('title').options.caption, 'Fancy Title');
+});
+
+test('it reflects default field caption', async function(assert) {
+  let model = await run(() => this.store.createRecord('post'));
+  assert.equal(model.constructor.metaForProperty('author').options.caption, 'Author');
 });
 
 
