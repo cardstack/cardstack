@@ -13,7 +13,7 @@ module.exports = function buildAppImage(packages, appName) {
   let proc = spawn('docker', [
       'build',
       '--label', 'com.cardstack',
-      '-t', 'cardstack-app',
+      '-t', appName,
       '-'
   ]);
 
@@ -144,4 +144,3 @@ function dockerfile(packages, appName) {
 
   return file.join('\n');
 }
-
