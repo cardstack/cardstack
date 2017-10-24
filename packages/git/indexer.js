@@ -127,7 +127,7 @@ module.exports = class Indexer {
     // more appropriate than this, but as far as I can tell it is not
     // fully implemented
 
-    let pattern = new RegExp(`^refs\/heads\/${this.branchPrefix}(.*)`);
+    let pattern = new RegExp(`^refs/heads/${this.branchPrefix}(.*)`);
     return (await Reference.list(this.repo)).map(entry => {
       let m = pattern.exec(entry);
       if (m) {
