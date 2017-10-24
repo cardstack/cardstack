@@ -38,6 +38,7 @@ module.exports = {
 
     this.ui.writeLine("Starting hub container...");
     let container_id = await startHubContainer({
+      appName: this.project.pkg.name,
       env: args.environment
     });
 

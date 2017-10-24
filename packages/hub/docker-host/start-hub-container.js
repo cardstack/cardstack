@@ -6,7 +6,7 @@ const execFile = promisify(child_process.execFile);
 
 // Spawns the hub container, and returns an object for getting its stdio
 // We should, later, live bind code in as well.
-module.exports = async function spawnHubContainer({env}) {
+module.exports = async function spawnHubContainer({ appName, env }) {
   let key = crypto.randomBytes(32).toString('base64');
 
   let {stdout} = await execFile('docker', [
@@ -21,7 +21,7 @@ module.exports = async function spawnHubContainer({env}) {
     '-e', `DEBUG_LEVEL=debug`,
     '-e', `CARDSTACK_SESSIONS_KEY=${key}`,
     '-e', `EMBER_ENV=${env}`,
-    'cardstack-app'
+    appName
   ]);
 
   return stdout.trim();

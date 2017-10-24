@@ -517,7 +517,7 @@ describe('schema/validation', function() {
     expect(errors).collectionContains({
       status: 400,
       title: 'Validation error',
-      detail: 'field \"detail-images\" accepts only a list of resources, not a single resource'
+      detail: 'field "detail-images" accepts only a list of resources, not a single resource'
     });
   });
 

@@ -1,10 +1,12 @@
 /* eslint-env node */
+'use strict';
+
 const EmberAddon = require('ember-cli/lib/broccoli/ember-addon');
 var CssImport = require('postcss-import');
 var CssNext = require('postcss-cssnext');
 
 module.exports = function(defaults) {
-  var app = new EmberAddon(defaults, {
+  let app = new EmberAddon(defaults, {
     postcssOptions: {
       compile: {
         enabled: true,
