@@ -63,7 +63,7 @@ While third-party Cardstack plugins are heartily encouraged, the plugins in this
 
 In development, we use `lerna` to manage the inter-dependencies of all the packages. To get started:
 
- 1. Install node >= 7.
+ 1. Install node >= 8.
  2. Install yarn >= 0.28 (earlier versions work but will not benefit from [Workspaces](https://yarnpkg.com/blog/2017/08/02/introducing-workspaces/).
  3. `yarn global add lerna` (use >= 2.0.0 for yarn workspaces integration)
  4. `lerna bootstrap` 
