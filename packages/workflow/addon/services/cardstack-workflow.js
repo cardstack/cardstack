@@ -3,6 +3,7 @@ import { task } from 'ember-concurrency';
 import { inject } from "@ember/service";
 import { computed } from "@ember/object";
 import { readOnly, filterBy } from "@ember/object/computed";
+import moment from 'moment';
 
 function threadsBetween(arrayKey, dateKey, { from, to }) {
   return computed(`${arrayKey}.@each.${dateKey}`, function() {
