@@ -93,6 +93,11 @@ export default Service.extend({
     message.handle();
   },
 
+  createThread(...messages) {
+    let thread = this.get('store').createRecord('thread', { messages });
+    return thread.save();
+  },
+
   createMessage(properties={}) {
     let messageProperties = assign({
       sentAt: moment(),
