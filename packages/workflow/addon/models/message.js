@@ -1,9 +1,11 @@
 import Message from '@cardstack/models/generated/message';
 import { equal } from '@ember/object/computed';
-import { A } from "@ember/array";
+import { A } from '@ember/array';
 
 import { task } from 'ember-concurrency';
 import { computed } from "@ember/object";
+
+import { singularize } from 'ember-inflector';
 
 export default Message.extend({
   loadedCard: computed({
@@ -23,7 +25,7 @@ export default Message.extend({
   isUnhandled: equal('status', 'unhandled'),
 
   _loadCard: task(function * () {
-    let cardType = this.get('cardType');
+    let cardType = singularize(this.get('cardType'));
     let card = yield this.get('store').findRecord(cardType, this.get('cardId'));
     this.set('loadedCard', card);
   }),

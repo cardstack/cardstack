@@ -46,7 +46,7 @@ export default Thread.extend({
     return this.get('_syncedMessages').sortBy('sentAt');
   }),
 
-  latestMessage: readOnly('sortedMessages.firstObject'),
+  latestMessage: readOnly('sortedMessages.lastObject'),
 
   addMessages(messages) {
     this.get('_syncedMessages').addObjects(messages);
