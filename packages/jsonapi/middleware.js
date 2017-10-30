@@ -33,7 +33,7 @@ function jsonapiMiddleware(searcher, writers, indexers) {
 
   let prefixPattern;
   if (options.prefix) {
-    prefixPattern = new RegExp(`^/${options.prefix}(.*)`);
+    prefixPattern = new RegExp(`^/${options.prefix}/?(.*)`);
   }
   let body = koaJSONBody({ limit: '1mb' });
   let log = logger('jsonapi');
@@ -42,7 +42,7 @@ function jsonapiMiddleware(searcher, writers, indexers) {
     if (prefixPattern) {
       let m = prefixPattern.exec(ctxt.request.path);
       if (m) {
-        ctxt.request.path = m[1];
+        ctxt.request.path = '/'+m[1];
       } else {
         return next();
       }
