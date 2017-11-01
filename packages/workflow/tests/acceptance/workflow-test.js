@@ -49,10 +49,9 @@ test('List threads that match the clicked tag', function(assert) {
   andThen(() => {
     assertCardCountInThreadList(assert, 3, "All threads having the clicked tag are shown");
     assert.equal(find(".cardstack-workflow-label-with-count-wrapper.active:contains(License Request)").length, 1, "The selected group is marked as active");
-    assert.equal(find("[data-test-thread-list-card]:contains(This is going to be tough, my friend.)").length, 1)
-    assert.equal(find("[data-test-thread-list-card]:contains(License request for Caspian's Sycamore, please?)").length, 1)
-    assert.equal(find("[data-test-thread-list-card]:contains(License request for Chris Cornell's Seasons)").length, 1)
-
+    assert.equal(find("[data-test-thread-list-card]:contains(We'd like to ask for a license for our cover of Tool's 46 & 2.)").length, 1);
+    assert.equal(find("[data-test-thread-list-card]:contains(License request for Caspian's Sycamore, please?)").length, 1);
+    assert.equal(find("[data-test-thread-list-card]:contains(License request for Chris Cornell's Seasons)").length, 1);
   });
 });
 

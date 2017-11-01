@@ -74,6 +74,9 @@ function initialModels() {
       initial.addResource('fields', 'text').withAttributes({
         fieldType: '@cardstack/core-types::string'
       }),
+      initial.addResource('fields', 'is-cue-card').withAttributes({
+        fieldType: '@cardstack/core-types::boolean'
+      })
     ]);
 
   initial.addResource('content-types', 'songs')
@@ -90,10 +93,16 @@ function initialModels() {
       initial.addResource('fields', 'url').withAttributes({
         fieldType: '@cardstack/core-types::string'
       }),
+      initial.addResource('fields', 'is-cue-card').withAttributes({
+        fieldType: '@cardstack/core-types::boolean'
+      })
     ]);
 
   initial.addResource('content-types', 'song-change-requests')
     .withRelated('fields', [
+      initial.addResource('fields', 'is-cue-card').withAttributes({
+        fieldType: '@cardstack/core-types::boolean'
+      }),
       initial.addResource('fields', 'comment').withAttributes({
         fieldType: '@cardstack/core-types::string'
       }),
@@ -104,6 +113,9 @@ function initialModels() {
 
   initial.addResource('content-types', 'song-license-requests')
     .withRelated('fields', [
+      initial.addResource('fields', 'is-cue-card').withAttributes({
+        fieldType: '@cardstack/core-types::boolean'
+      }),
       initial.addResource('fields', 'comment').withAttributes({
         fieldType: '@cardstack/core-types::string'
       }),
@@ -183,11 +195,13 @@ function initialModels() {
   initial.addResource('song-change-requests', '1')
     .withAttributes({
       comment: "Could we change our previous cover of Pearl Jam's Daughter?",
+      isCueCard: true,
     });
 
   initial.addResource('song-change-requests', '2')
     .withAttributes({
       comment: 'Could we add yet more guitars to this Caspian song?',
+      isCueCard: true,
     });
 
   // Seed chat messages
@@ -221,16 +235,19 @@ function initialModels() {
   // Seed song license requests
   initial.addResource('song-license-requests', '1')
     .withAttributes({
+      isCueCard: true,
       comment: "We'd like to ask for a license for our cover of Tool's 46 & 2.",
     });
 
   initial.addResource('song-license-requests', '2')
     .withAttributes({
+      isCueCard: true,
       comment: 'License request for Chris Cornell\'s Seasons',
   });
 
   initial.addResource('song-license-requests', '3')
     .withAttributes({
+      isCueCard: true,
       comment: 'License request for Caspian\'s Sycamore, please?',
     });
 
