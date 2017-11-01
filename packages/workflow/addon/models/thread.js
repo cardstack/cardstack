@@ -53,7 +53,7 @@ export default Thread.extend({
   },
 
   cueCard: computed('sortedMessages.@each.loadedCard', function() {
-    let sortedMessages = this.get('sortedMessages').reverse();
+    let sortedMessages = [...this.get('sortedMessages')].reverse();
     let messageWithCueCard = sortedMessages.find((message) => {
       return message.get('loadedCard.isCueCard');
     });
