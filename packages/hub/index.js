@@ -8,13 +8,11 @@ let OldBroccoliConnector;
 let NewBroccoliConnector;
 let Funnel;
 let proxyToHub;
-let connect;
 
 const CONTAINER_MODE = process.env.CONTAINERIZED_HUB != null;
 
 if (CONTAINER_MODE) {
   proxyToHub = require('./docker-host/proxy-to-hub');
-  connect = require('./docker-host/hub-connection').connect;
   NewBroccoliConnector = require('./docker-host/broccoli-connector');
 } else {
   OldBroccoliConnector = require('./broccoli-connector');
@@ -63,9 +61,7 @@ let addon = {
     this._super.apply(this, arguments);
     if (!this._active){ return; }
 
-    if (CONTAINER_MODE) {
-      this._broccoliContainerConnector = new NewBroccoliConnector(defaultBranch);
-    } else {
+    if (!CONTAINER_MODE) {
       this._broccoliConnector = new OldBroccoliConnector();
     }
 
@@ -111,11 +107,6 @@ let addon = {
     }
 
     if (CONTAINER_MODE) {
-      try {
-        await connect();
-      } catch (e) {
-        throw new Error('Could not connect to cardstack/hub. Please use "ember hub:start" to start the hub');
-      }
       app.use('/cardstack', proxyToHub());
     } else {
       app.use('/cardstack', await this._hubMiddleware);
@@ -163,7 +154,7 @@ let addon = {
     }
 
     if (CONTAINER_MODE) {
-      return this._broccoliContainerConnector.tree;
+      return new NewBroccoliConnector(defaultBranch).tree;
     } else {
       return new Funnel(this._broccoliConnector.tree, {
         srcDir: defaultBranch,

@@ -58,9 +58,15 @@ async function _connect() {
   return new Promise(function(resolve, reject) {
     log.trace("Attempting to connect to the hub's heartbeat port");
 
-    async function onClose() {
-      await timeout(50);
-      resolve(_connect());
+    async function onClose(err) {
+      // When a container is starting up and hasn't yet internally
+      // started listening on a port, Docker trolls us by accepting the
+      // connection, but then immediately closing the connection.
+      // So, if it was closed with no error, just try again.
+      if (!err) {
+        await timeout(50);
+        resolve(_connect());
+      }
     }
 
     socket.on('close', onClose);

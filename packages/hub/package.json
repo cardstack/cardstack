@@ -24,6 +24,7 @@
     "broccoli-concat": "^3.2.2",
     "broccoli-funnel": "^1.2.0",
     "broccoli-source": "^1.1.0",
+    "chalk": "^2.3.0",
     "commander": "^2.9.0",
     "dag-map": "^2.0.2",
     "denodeify": "^1.2.1",
