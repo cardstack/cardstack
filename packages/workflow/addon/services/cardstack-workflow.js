@@ -3,6 +3,8 @@ import { task } from 'ember-concurrency';
 import { inject } from "@ember/service";
 import { computed } from "@ember/object";
 import { readOnly, filterBy } from "@ember/object/computed";
+import { modelType } from '@cardstack/rendering/helpers/cs-model-type';
+import { assign } from "@ember/polyfills";
 
 function threadsBetween(arrayKey, dateKey, { from, to }) {
   return computed(`${arrayKey}.@each.${dateKey}`, function() {
@@ -43,7 +45,15 @@ export default Service.extend({
 
   groupedThreads: computed('items.@each.{priority,tags,isUnhandled}', function() {
     return this.get('items').reduce((groupedThreads, thread) => {
+      if (thread.get('isNew')) {
+        return groupedThreads;
+      }
+
       let priority = thread.get('priority');
+      if (!priority) {
+        return groupedThreads;
+      }
+
       let priorityId = priority.get('id');
       if (!groupedThreads[priorityId]) {
         groupedThreads[priorityId] = {
@@ -83,24 +93,38 @@ export default Service.extend({
     message.handle();
   },
 
-  createMessage({ thread, text }) {
-    let chatMessage = this.get('store').createRecord('chat-message', {
-      text
-    });
-    let message = this.get('store').createRecord('message', {
+  createThread(...messages) {
+    let thread = this.get('store').createRecord('thread', { messages });
+    return thread.save();
+  },
+
+  createMessage(properties={}) {
+    let messageProperties = assign({
       sentAt: moment(),
-      status: 'unhandled'
-    });
+      status: 'unhandled',
+    }, properties);
+    return this.get('store').createRecord('message', messageProperties);
+  },
+
+  createMessageFor(model, properties={}) {
+    let messageProperties = assign({
+      sentAt: moment(),
+      status: 'unhandled',
+      cardId: model.get('id'),
+      cardType: modelType(model)
+    }, properties);
+    return this.get('store').createRecord('message', messageProperties);
+  },
+
+  createChatMessage({ thread, text }) {
+    let chatMessage = this.get('store').createRecord('chat-message', { text });
     return chatMessage.save()
       .then((chatMessage) => {
-        message.setProperties({
-          cardId: chatMessage.get('id'),
-          cardType: 'chat-messages'
-        });
+        let message = this.createMessageFor(chatMessage);
         return message.save();
       })
       .then((message) => {
-        thread.addMessage(message);
+        thread.addMessages([message]);
       });
   },
 });

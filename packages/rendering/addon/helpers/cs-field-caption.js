@@ -19,4 +19,3 @@ export function fieldCaption(content, fieldName) {
 
   return caption;
 }
-

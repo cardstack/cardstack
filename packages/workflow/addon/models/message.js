@@ -1,10 +1,11 @@
-import { assert } from "@ember/debug"
 import Message from '@cardstack/models/generated/message';
 import { equal } from '@ember/object/computed';
-import { A } from "@ember/array";
+import { A } from '@ember/array';
 
 import { task } from 'ember-concurrency';
 import { computed } from "@ember/object";
+
+import { singularize } from 'ember-inflector';
 
 export default Message.extend({
   loadedCard: computed({
@@ -24,16 +25,9 @@ export default Message.extend({
   isUnhandled: equal('status', 'unhandled'),
 
   _loadCard: task(function * () {
-    let cardType = this.get('_cardTypeInStore');
+    let cardType = singularize(this.get('cardType'));
     let card = yield this.get('store').findRecord(cardType, this.get('cardId'));
     this.set('loadedCard', card);
-  }),
-
-  _cardTypeInStore: computed('cardType', function() {
-    let cardType = this.get('cardType');
-    assert(`${cardType} doesn't seem to be a plural noun`, cardType.charAt(cardType.length - 1) === 's');
-    //TODO: Replace this make-shift singularization
-    return this.get('cardType').replace(/s$/, '');
   }),
 
   loadedTags: computed({

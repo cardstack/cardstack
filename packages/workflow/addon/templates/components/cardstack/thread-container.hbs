@@ -2,10 +2,12 @@
   <h4 class="header">Single Thread View</h4>
   {{cardstack/thread-summary-card thread=thread}}
   <hr>
-  {{#each thread.messagesInReverseChrono as |message|}}
-    {{#if message.loadedCard}}
-      {{cardstack-content content=message.loadedCard format="card"}}
-    {{/if}}
+  {{#each thread.sortedMessages as |message|}}
+    {{#with message.loadedCard as |card|}}
+      {{#with (or message.cardFormat 'card') as |cardFormat|}}
+        {{cardstack-content content=card format=cardFormat}}
+      {{/with}}
+    {{/with}}
   {{/each}}
   <hr>
   <div class="chat-message-pane">

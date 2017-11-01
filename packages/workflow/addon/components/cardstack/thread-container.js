@@ -13,7 +13,7 @@ export default Component.extend({
 
   actions: {
     sendMessage() {
-      this.get('workflow').createMessage({
+      this.get('workflow').createChatMessage({
         text: this.get('newMessageText'),
         thread: this.get('thread')
       }).then(() => {

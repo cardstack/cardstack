@@ -18,7 +18,6 @@
   min-height: 50px;
   width: 100vw;
   color: var(--bright-foreground);
-  background-color: var(--normal-background);
   display: inline-block;
   /* line-height: 1.375em; */
 }
@@ -36,10 +35,14 @@
 }
 
 .cardstack-workflow {
-  min-width: 15vw;
   height: 100%;
   display: flex;
   flex-direction: row;
+}
+
+.cardstack-workflow-network-selector {
+  background-color: #361B74;
+  width: 50px;
 }
 
 .cardstack-message-summary {
@@ -196,3 +199,4 @@ count could be made to stay on the same line
   color: var(--light-background);
   cursor: default;
 }
+

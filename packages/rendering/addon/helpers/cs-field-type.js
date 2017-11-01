@@ -8,7 +8,9 @@ export function fieldType(content, fieldName) {
     return;
   }
 
-  // meta.options.fieldType is our convention for annotating models.
+  // meta.options.fieldType is our convention for annotating
+  // models. meta.type is the name of the transform that ember-data
+  // is using, which we keep as a fallback.
   let type = meta.options && meta.options.fieldType;
   // meta.type is the name of the transform that ember-data
   // is using, which we keep as a fallback.
