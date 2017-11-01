@@ -52,14 +52,6 @@ export default Thread.extend({
     this.get('_syncedMessages').addObjects(messages);
   },
 
-  cueCard: computed('sortedMessages.@each.loadedCard', function() {
-    let sortedMessages = [...this.get('sortedMessages')].reverse();
-    let messageWithCueCard = sortedMessages.find((message) => {
-      return message.get('loadedCard.isCueCard');
-    });
-    return messageWithCueCard && messageWithCueCard.get('loadedCard');
-  }),
-
   _latestMessageWithPriority: computed('sortedMessages.[]', function() {
     return this.get('sortedMessages').find((message) => {
       let priorityId = message.belongsTo('priority').id();

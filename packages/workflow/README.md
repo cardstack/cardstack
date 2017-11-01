@@ -7,7 +7,7 @@ It displays a notification counter and, when opened, a couple of panels to see
 the workflows grouped by priority and by tag. It allows to see at a glance
 which workflows need to be acted on, and then act on them.
 
-## The cardstack-workflow service and component
+## Public API
 
 Host apps need to render the `{{cardstack-workflow}}` component where they want
 the workflow panels to appear (preferably in the left edge of the screen).
@@ -52,19 +52,6 @@ In your app you define your models and then use the above methods to create a
 workflow around them.
 
 For a detailed example, see the dummy app in this package.
-
-## Card models in the host app
-
-We've already seen an example of a card model, `rental-card` in the previous example.
-
-Card models should be domain-specific and need only to have one single property to interface
-with the workflow package. The property is named `is-cue-card` and only card types that need
-to appear in the workflow list view need to have it and need to set it to a truthy value.
-
-The latest card model with a truthy `isCueCard` property in a thread will
-represent it by having its list-card format rendered. So if your model is called
-`rental-card`, then a `cardstack/rental-card-list-card` component will be
-rendered in the list view.
 
 ## Installation
 
