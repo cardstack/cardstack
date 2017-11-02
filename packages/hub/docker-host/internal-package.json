@@ -1,0 +1,7 @@
+{
+  "name": "cardstack",
+  "version": "0.0.0",
+  "description": "Cardstack suite for ambitious applications.",
+  "private": true,
+  "workspaces": ["packages/*", "packages/*/*"]
+}

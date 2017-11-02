@@ -1,6 +1,6 @@
 const {waitForExit} = require('../util/process');
 const crawlPackages = require('../docker-host/crawl-module-linkages');
-const buildAppImage = require('../docker-host/build-image');
+const { buildAppImage } = require('../docker-host/build-image');
 
 module.exports = {
   name: 'hub:build',
