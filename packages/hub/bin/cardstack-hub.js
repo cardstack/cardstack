@@ -51,8 +51,16 @@ function commandLineOptions() {
     process.exit(-1);
   }
 
+  commander.emberConfigEnv = loadAppConfig();
+
   return commander;
 }
+
+function loadAppConfig() {
+  let env = process.env.EMBER_ENV || 'development';
+  return require(path.join(process.cwd(), 'config', 'environment'))(env);
+}
+
 
 function loadSeedModels(options) {
   try {

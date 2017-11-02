@@ -38,11 +38,6 @@ async function wireItUp(projectDir, encryptionKeys, seedModels, opts = {}) {
   return container;
 }
 
-function loadAppConfig(projectDir) {
-  let env = process.env.EMBER_ENV || 'development';
-  return require(path.join(projectDir, 'config', 'environment'))(env);
-}
-
 async function makeServer(projectDir, encryptionKeys, seedModels, opts = {}) {
   let readyResolver;
   if (opts.containerized) {
@@ -63,8 +58,6 @@ async function makeServer(projectDir, encryptionKeys, seedModels, opts = {}) {
       ready: readyPromise,
       heartbeat: opts.heartbeat
     });
-
-    opts.emberConfigEnv = loadAppConfig(projectDir);
 
     await orchestrator.ready;
   }
