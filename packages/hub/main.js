@@ -1,4 +1,3 @@
-const path = require('path');
 const Koa = require('koa');
 const { Registry, Container } = require('@cardstack/di');
 // lazy load only in container mode, since they uses node 8 features
