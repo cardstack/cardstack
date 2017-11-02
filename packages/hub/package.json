@@ -1,6 +1,6 @@
 {
   "name": "@cardstack/hub",
-  "version": "0.2.12",
+  "version": "0.3.0",
   "bin": {
     "cardstack-hub": "./bin/cardstack-hub.js"
   },
@@ -15,12 +15,12 @@
   },
   "description": "Stock API server for the Cardstack tech stack.",
   "dependencies": {
-    "@cardstack/codegen": "^0.2.12",
-    "@cardstack/core-types": "^0.2.12",
-    "@cardstack/di": "^0.2.12",
-    "@cardstack/elasticsearch": "^0.2.12",
-    "@cardstack/handlebars": "^0.2.12",
-    "@cardstack/plugin-utils": "^0.2.11",
+    "@cardstack/codegen": "0.3.0",
+    "@cardstack/core-types": "0.3.0",
+    "@cardstack/di": "0.3.0",
+    "@cardstack/elasticsearch": "0.3.0",
+    "@cardstack/handlebars": "0.3.0",
+    "@cardstack/plugin-utils": "0.3.0",
     "broccoli-concat": "^3.2.2",
     "broccoli-funnel": "^1.2.0",
     "broccoli-source": "^1.1.0",
@@ -46,7 +46,7 @@
     "tar-stream": "^1.5.4"
   },
   "devDependencies": {
-    "@cardstack/eslint-config": "^0.2.4",
+    "@cardstack/eslint-config": "0.3.0",
     "koa-better-route": "^0.1.0",
     "supertest": "^2.0.1"
   },
