@@ -2,7 +2,8 @@
   "name": "@cardstack/hub",
   "version": "0.3.0",
   "bin": {
-    "cardstack-hub": "./bin/cardstack-hub.js"
+    "cardstack-hub": "./bin/cardstack-hub.js",
+    "cardstack-generate-key": "./bin/generate-key.js"
   },
   "keywords": [
     "cardstack-plugin",
