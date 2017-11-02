@@ -5,6 +5,7 @@ import { computed } from "@ember/object";
 import { readOnly, filterBy } from "@ember/object/computed";
 import { modelType } from '@cardstack/rendering/helpers/cs-model-type';
 import { assign } from "@ember/polyfills";
+import moment from 'moment';
 
 function threadsBetween(arrayKey, dateKey, { from, to }) {
   return computed(`${arrayKey}.@each.${dateKey}`, function() {
