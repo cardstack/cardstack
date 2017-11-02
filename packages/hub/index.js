@@ -3,21 +3,10 @@ const path = require('path');
 const crypto = require('crypto');
 const fs = require('fs');
 const log = require('@cardstack/plugin-utils/logger')('hub/ember-cli');
-// only sometimes load, because of feature flag
-let OldBroccoliConnector;
-let NewBroccoliConnector;
-let Funnel;
-let proxyToHub;
-
+const Funnel = require('broccoli-funnel');
 const CONTAINER_MODE = process.env.CONTAINERIZED_HUB != null;
-
-if (CONTAINER_MODE) {
-  proxyToHub = require('./docker-host/proxy-to-hub');
-  NewBroccoliConnector = require('./docker-host/broccoli-connector');
-} else {
-  OldBroccoliConnector = require('./broccoli-connector');
-  Funnel = require('broccoli-funnel');
-}
+const NewBroccoliConnector = require('./docker-host/broccoli-connector');
+const proxyToHub = require('./docker-host/proxy-to-hub');
 
 // TODO: move into configuration
 const defaultBranch = 'master';
@@ -34,7 +23,9 @@ let addon = {
         'hub:prune': require('./commands/prune')
       };
     } else {
-      return {};
+      return {
+        'hub:start': require('./commands/start-native')
+      };
     }
   },
 
@@ -57,19 +48,16 @@ let addon = {
     while (app.app) {
       app = app.app;
     }
-    let env = app.env;
+    let env = this.env = app.env;
     this._super.apply(this, arguments);
     if (!this._active){ return; }
 
-    if (!CONTAINER_MODE) {
+    if (env === 'test') {
+      let OldBroccoliConnector = require('./broccoli-connector');
       this._broccoliConnector = new OldBroccoliConnector();
-    }
-
-
-    if (CONTAINER_MODE) {
-      app.import('vendor/cardstack-generated.js');
-    } else {
       app.import('vendor/cardstack/generated.js');
+    } else {
+      app.import('vendor/cardstack-generated.js');
     }
 
     if (!process.env.ELASTICSEARCH_PREFIX) {
@@ -80,20 +68,9 @@ let addon = {
     // hooks won't resolve until the hub does its first codegen build,
     // and the middleware hooks won't run until after that.
 
-    if (!CONTAINER_MODE) {
+    if (env === 'test') {
       let seedPath = path.join(path.dirname(this.project.configPath()), '..', 'cardstack', 'seeds', env);
-      let useDevDeps;
-      if (env === 'test') {
-        useDevDeps = true;
-      } else {
-        // if the hub is a runtime dependency, it should only load other
-        // plugins that are also runtime dependencies. If it's a
-        // devDependency, it will also load other plugins that are
-        // devDependencies.
-        let { pkg } = this.project;
-        useDevDeps = !(pkg.dependencies && pkg.dependencies['@cardstack/hub']);
-      }
-
+      let useDevDeps = true;
       this._hubMiddleware = this._makeServer(seedPath, this.project.ui, useDevDeps, env);
     }
   },
@@ -105,12 +82,7 @@ let addon = {
       this._super.apply(this, arguments);
       return;
     }
-
-    if (CONTAINER_MODE) {
-      app.use('/cardstack', proxyToHub());
-    } else {
-      app.use('/cardstack', await this._hubMiddleware);
-    }
+    app.use('/cardstack', proxyToHub());
   },
 
   // testemMiddleware will not wait for a promise, so we need to
@@ -152,8 +124,7 @@ let addon = {
       this._super.apply(this, arguments);
       return;
     }
-
-    if (CONTAINER_MODE) {
+    if (this.env !== 'test') {
       return new NewBroccoliConnector(defaultBranch).tree;
     } else {
       return new Funnel(this._broccoliConnector.tree, {
@@ -161,23 +132,21 @@ let addon = {
         destDir: 'cardstack'
       });
     }
-  }
-};
+  },
 
-if (!CONTAINER_MODE) {
-  addon.buildError = function(error) {
+  buildError(error) {
     if (this._broccoliConnector) {
       this._broccoliConnector.buildFailed(error);
     }
-  };
+  },
 
-  addon.postBuild = function(results) {
+  postBuild(results) {
     if (this._broccoliConnector) {
       this._broccoliConnector.buildSucceeded(results);
     }
-  };
+  },
 
-  addon._makeServer = async function(seedDir, ui, allowDevDependencies, env) {
+  async _makeServer(seedDir, ui, allowDevDependencies, env) {
     log.debug("Looking for seed files in %s", seedDir);
     let seedModels;
     try {
@@ -226,7 +195,6 @@ if (!CONTAINER_MODE) {
       this._broccoliConnector.setSource(Promise.reject(err));
       throw err;
     }
-  };
-}
-
+  }
+};
 module.exports = addon;
