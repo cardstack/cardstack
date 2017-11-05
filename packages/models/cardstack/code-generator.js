@@ -33,10 +33,19 @@ define('@cardstack/models/generated/{{modelName}}', ['exports', '@cardstack/mode
      {{#each fields as |field|}}
        {{#if field.isRelationship}}
          {{#with (related-type field) as |type|}}
-           {{camelize field.id}}:  _emberData.default.{{relationship-method field}}("{{type}}", { caption: "{{field.caption}}" }),
+           {{camelize field.id}}:  _emberData.default.{{relationship-method field}}("{{type}}", {
+             caption: "{{field.caption}}",
+             editor: "{{field.editor}}",
+             inlineEditor: "{{field.inlineEditor}}"
+            }),
          {{/with}}
        {{else}}
-        {{camelize field.id}}: _emberData.default.attr({ fieldType: "{{field.fieldType}}", caption: "{{field.caption}}" }),
+        {{camelize field.id}}: _emberData.default.attr({
+          fieldType: "{{field.fieldType}}",
+          caption: "{{field.caption}}",
+          editor: "{{field.editor}}",
+          inlineEditor: "{{field.inlineEditor}}"
+        }),
        {{/if}}
      {{/each}}
    }){{#if routingField}}.reopenClass({ routingField: "{{routingField}}" }){{/if}};

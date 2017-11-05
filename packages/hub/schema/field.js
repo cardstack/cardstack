@@ -10,6 +10,8 @@ module.exports = class Field {
     }
     this.fieldType = model.attributes['field-type'];
     this.caption = model.attributes.caption || humanize(model.id);
+    this.editor = model.attributes['editor'];
+    this.inlineEditor = model.attributes['inline-editor'];
     this.searchable = model.attributes.searchable == null ? true : model.attributes.searchable;
 
     // Default values are modeled as relationships to separate models

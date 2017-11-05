@@ -10,6 +10,10 @@ TestModel.metaForProperty = function(which) {
     return {
       options: { fieldType: 'test-field-type' }
     };
+  } else if (which == 'theFieldWithCustomEditor') {
+    return {
+      options: { fieldType: 'test-field-type', editor: 'my-custom-editor', inlineEditor: 'my-custom-inline-editor' }
+    };
   } else {
     throw new Error("no such field");
   }
@@ -20,9 +24,19 @@ test('it maps to a field editor component', function(assert) {
   assert.equal(result, 'field-editors/test-field-type-editor');
 });
 
+test('it can do a custom field editor', function(assert) {
+  let result = csFieldEditorFor([new TestModel(), 'theFieldWithCustomEditor'], {});
+  assert.equal(result, 'my-custom-editor');
+});
+
 test('it can do inline variant', function(assert) {
   let result = csFieldEditorFor([new TestModel(), 'theField'], { variant: 'inline' });
   assert.equal(result, 'inline-field-editors/test-field-type-editor');
+});
+
+test('it can do a custom inline editor', function(assert) {
+  let result = csFieldEditorFor([new TestModel(), 'theFieldWithCustomEditor'], {variant: 'inline'});
+  assert.equal(result, 'my-custom-inline-editor');
 });
 
 test('it returns undefined on bad field', function(assert) {
