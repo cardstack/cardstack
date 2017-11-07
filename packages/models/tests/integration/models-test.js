@@ -18,8 +18,8 @@ let scenario = new Fixtures(factory => {
       factory.addResource('fields', 'title').withAttributes({
         fieldType: '@cardstack/core-types::string',
         caption: 'Fancy Title',
-        editor: 'fancy-title-editor',
-        inlineEditor: 'fancy-title-inline-editor'
+        editorComponent: 'fancy-title-editor',
+        inlineEditorComponent: 'fancy-title-inline-editor'
       }),
       factory.addResource('fields', 'author').withAttributes({
         fieldType: '@cardstack/core-types::belongs-to'
@@ -137,12 +137,12 @@ test('it reflects default field caption', async function(assert) {
 
 test('it reflects configured editor', async function(assert) {
   let model = await run(() => this.store.createRecord('post'));
-  assert.equal(model.constructor.metaForProperty('title').options.editor, 'fancy-title-editor');
+  assert.equal(model.constructor.metaForProperty('title').options.editorComponent, 'fancy-title-editor');
 });
 
 test('it reflects configured inline editor', async function(assert) {
   let model = await run(() => this.store.createRecord('post'));
-  assert.equal(model.constructor.metaForProperty('title').options.inlineEditor, 'fancy-title-inline-editor');
+  assert.equal(model.constructor.metaForProperty('title').options.inlineEditorComponent, 'fancy-title-inline-editor');
 });
 
 // Ember runloop.

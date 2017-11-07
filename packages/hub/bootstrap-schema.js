@@ -32,8 +32,8 @@ const models = [
           { type: 'fields', id: 'default-at-create' },
           { type: 'fields', id: 'default-at-update' },
           { type: 'fields', id: 'caption' },
-          { type: 'fields', id: 'editor'},
-          { type: 'fields', id: 'inline-editor'}
+          { type: 'fields', id: 'editor-component'},
+          { type: 'fields', id: 'inline-editor-component'}
         ]
       }
     }
@@ -334,14 +334,14 @@ const models = [
   },
   {
     type: 'fields',
-    id: 'editor',
+    id: 'editor-component',
     attributes: {
       'field-type': '@cardstack/core-types::string'
     }
   },
   {
     type: 'fields',
-    id: 'inline-editor',
+    id: 'inline-editor-component',
     attributes: {
       'field-type': '@cardstack/core-types::string'
     }

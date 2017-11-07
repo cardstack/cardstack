@@ -6,12 +6,12 @@ import metaForField from '@cardstack/rendering/-private/meta-for-field';
 export function csFieldEditorFor([content, fieldName], { variant }) {
   let type = fieldType(content, fieldName);
   let options = fieldOptions(content, fieldName);
-  
-  if (options.editor && !variant) {
-    return options.editor;
+
+  if (options.editorComponent && !variant) {
+    return options.editorComponent;
   }
-  else if (options.inlineEditor && variant == 'inline') {
-    return options.inlineEditor
+  else if (options.inlineEditorComponent && variant == 'inline') {
+    return options.inlineEditorComponent
   }
 
   if (!type) {

@@ -12,7 +12,7 @@ TestModel.metaForProperty = function(which) {
     };
   } else if (which == 'theFieldWithCustomEditor') {
     return {
-      options: { fieldType: 'test-field-type', editor: 'my-custom-editor', inlineEditor: 'my-custom-inline-editor' }
+      options: { fieldType: 'test-field-type', editorComponent: 'my-custom-editor', inlineEditorComponent: 'my-custom-inline-editor' }
     };
   } else {
     throw new Error("no such field");

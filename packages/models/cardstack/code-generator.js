@@ -35,16 +35,16 @@ define('@cardstack/models/generated/{{modelName}}', ['exports', '@cardstack/mode
          {{#with (related-type field) as |type|}}
            {{camelize field.id}}:  _emberData.default.{{relationship-method field}}("{{type}}", {
              caption: "{{field.caption}}",
-             editor: "{{field.editor}}",
-             inlineEditor: "{{field.inlineEditor}}"
+             editorComponent: "{{field.editorComponent}}",
+             inlineEditorComponent: "{{field.inlineEditorComponent}}"
             }),
          {{/with}}
        {{else}}
         {{camelize field.id}}: _emberData.default.attr({
           fieldType: "{{field.fieldType}}",
           caption: "{{field.caption}}",
-          editor: "{{field.editor}}",
-          inlineEditor: "{{field.inlineEditor}}"
+          editorComponent: "{{field.editorComponent}}",
+          inlineEditorComponent: "{{field.inlineEditorComponent}}"
         }),
        {{/if}}
      {{/each}}
