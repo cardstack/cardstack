@@ -5,7 +5,6 @@ const path = require('path');
 module.exports = {
   name: 'hub:start',
   description: "Starts the Cardstack hub",
-
   works: 'insideProject',
 
   availableOptions: [
@@ -30,9 +29,22 @@ module.exports = {
     if (!process.env.DEBUG_COLORS) {
       process.env.DEBUG_COLORS='yes';
     }
-    let proc = spawn('npx', ['cardstack-hub', path.join(this.project.root, 'cardstack', 'seeds', args.environment)]);
+
+    // I think this flag needs to get refactored away, it's always the
+    // right behavior to have it turned on, there's no time that your
+    // app will be installed without the devDeps present. So the
+    // distinction really only matters for addons. And even when
+    // inside an addon running the dummy app, devDeps should always be
+    // included.
+    let flags = ['--allow-dev-dependencies'];
+
+    let seedDir = path.join(path.dirname(this.project.configPath()),
+                            '..', 'cardstack', 'seeds', args.environment);
+
+    let proc = spawn('npx', ['cardstack-hub', ...flags, seedDir]);
     proc.stdout.pipe(this.ui.outputStream, {end: false});
     proc.stderr.pipe(this.ui.errorStream, {end: false});
     await waitForExit(proc);
   }
+
 };
