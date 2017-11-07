@@ -29,6 +29,9 @@ module.exports = {
     if (!process.env.DEBUG_COLORS) {
       process.env.DEBUG_COLORS='yes';
     }
+    if (!process.env.ELASTICSEARCH_PREFIX) {
+      process.env.ELASTICSEARCH_PREFIX = this.project.pkg.name.replace(/^[^a-zA-Z]*/, '').replace(/[^a-zA-Z0-9]/g, '_') + '_' + args.environment;
+    }
 
     // I think this flag needs to get refactored away, it's always the
     // right behavior to have it turned on, there's no time that your
