@@ -15,8 +15,8 @@ class CodeGenMiddleware {
   }
 
   middleware() {
-    return route.get('/codegen/:branch', async (ctxt) => {
-      ctxt.body = await this.service.generateCodeForBranch(ctxt.routeParams.branch);
+    return route.get('/codegen/:branch/:module_prefix', async (ctxt) => {
+      ctxt.body = await this.service.generateCodeForBranch(ctxt.routeParams.branch, ctxt.routeParams.module_prefix);
       ctxt.response.set('Access-Control-Allow-Origin', '*');
       ctxt.response.set('Content-Type', 'application/javascript');
       ctxt.status = 200;
