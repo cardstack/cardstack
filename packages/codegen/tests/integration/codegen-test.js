@@ -1,20 +1,20 @@
-import { moduleForComponent, test } from 'ember-qunit';
-import { refreshCode } from '@cardstack/codegen';
+import { module, test } from 'qunit';
+import { setupTest } from 'ember-qunit';
 
-moduleForComponent('models', 'Integration | CodeGen', {
-  integration: true
-});
+module('Integration | CodeGen', function(hooks) {
+  setupTest(hooks);
 
-test('finds hub-generated environment', function(assert) {
-  let env = window.require('@cardstack/hub/environment');
-  assert.ok(!!env, 'found hub environment');
-});
+  test('finds hub-generated environment', function(assert) {
+    let env = window.require('@cardstack/hub/environment');
+    assert.ok(!!env, 'found hub environment');
+  });
 
-test('can refresh hub-generated environment', function(assert) {
-  let env = window.require('@cardstack/hub/environment');
-  env.seenInCodeGenTest = true;
-  return refreshCode('master').then(() => {
+  test('can refresh hub-generated environment', async function(assert) {
+    let env = window.require('@cardstack/hub/environment');
+    env.seenInCodeGenTest = true;
+    await this.owner.lookup('service:cardstack-codegen').refreshCode();
     let env2 = window.require('@cardstack/hub/environment');
     assert.ok(!env2.seenInCodeGenTest, 'should have a refresh version of the module');
   });
+
 });

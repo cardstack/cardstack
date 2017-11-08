@@ -1,14 +1,14 @@
 import { moduleForComponent, test } from 'ember-qunit';
 import Fixtures from '@cardstack/test-support/fixtures';
 import RSVP from 'rsvp';
-import { refreshCode } from '@cardstack/codegen';
+import { getOwner } from '@ember/application';
 
 moduleForComponent('models', 'Integration | Models', {
   integration: true,
   beforeEach: async function() {
     this.inject.service('store');
     await scenario.setup();
-    await refreshCode('master');
+    await getOwner(this).lookup('service:cardstack-codegen').refreshCode();
   }
 });
 
