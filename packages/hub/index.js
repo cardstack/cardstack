@@ -2,6 +2,8 @@ const log = require('@cardstack/plugin-utils/logger')('hub/ember-cli');
 const CONTAINER_MODE = process.env.CONTAINERIZED_HUB != null;
 const NewBroccoliConnector = require('./docker-host/broccoli-connector');
 const proxyToHub = require('./docker-host/proxy-to-hub');
+const path = require('path');
+const fs = require('fs');
 
 // TODO: move into configuration
 const defaultBranch = 'master';
@@ -44,7 +46,11 @@ let addon = {
     if (!this._active){ return; }
     this.import('vendor/cardstack-generated.js');
     this._env = process.env.EMBER_ENV || 'development';
-    this._hub = this._startHub();
+    if (fs.existsSync(path.join(path.dirname(this.project.configPath()), '..', 'cardstack', 'seeds', this._env))) {
+      this._hub = this._startHub();
+    } else {
+      this._hub = Promise.resolve(null);
+    }
     this._modulePrefix = require(this.project.configPath())(this._env).modulePrefix;
   },
 
@@ -73,7 +79,9 @@ let addon = {
     }
 
     let url = await this._hub;
-    app.use('/cardstack', proxyToHub(url));
+    if (url) {
+      app.use('/cardstack', proxyToHub(url));
+    }
   },
 
   // testemMiddleware will not wait for a promise, so we need to
@@ -90,7 +98,15 @@ let addon = {
     let queue = [];
     this._hub.then(
       url => {
-        handler = proxyToHub(url);
+        if (url) {
+          handler = proxyToHub(url);
+        } else {
+          handler = (req, res) => {
+            res.status = 404;
+            res.send('@cardstack/hub is not enabled');
+            res.end();
+          };
+        }
         for (let { req, res } of queue) {
           handler(req, res);
         }
@@ -118,7 +134,12 @@ let addon = {
       this._super.apply(this, arguments);
       return;
     }
-    return new NewBroccoliConnector(`http://localhost:3000/codegen/${defaultBranch}/${this._modulePrefix}`).tree;
+    let codeGenUrlPromise = this._hub.then(url => {
+      if (url) {
+        return `${url}/codegen/${defaultBranch}/${this._modulePrefix}`;
+      }
+    });
+    return new NewBroccoliConnector(codeGenUrlPromise).tree;
   }
 
 };

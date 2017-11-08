@@ -10,15 +10,19 @@ const Plugin = require('broccoli-plugin');
 const {WatchedDir} = require('broccoli-source');
 
 class CodeWriter extends Plugin {
-  constructor(codeGenUrl, trigger) {
+  constructor(codeGenUrlPromise, trigger) {
     super([trigger], { name: '@cardstack/hub', needsCache: false });
 
-    this.codeGenUrl = codeGenUrl;
+    this.codeGenUrlPromise = codeGenUrlPromise;
   }
 
   async build() {
     let filePath = path.join(this.outputPath, 'cardstack-generated.js');
-    let url = this.codeGenUrl;
+    let url = await this.codeGenUrlPromise;
+    if (!url) {
+      fs.writeFileSync(filePath, '', 'utf8');
+      return;
+    }
 
     return new Promise(function(resolve, reject) {
 
