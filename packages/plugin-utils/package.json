@@ -8,6 +8,7 @@
   "license": "MIT",
   "devDependencies": {
     "@cardstack/eslint-config": "0.3.0",
+    "eslint": "4.9.0",
     "eslint-plugin-ember": "^4.6.1",
     "denodeify": "^1.2.1"
   },

@@ -17,6 +17,7 @@
   "devDependencies": {
     "@cardstack/eslint-config": "0.3.0",
     "eslint-plugin-ember": "^4.6.1",
+    "eslint": "4.9.0",
     "lodash": "^4.17.4"
   },
   "scripts": {
