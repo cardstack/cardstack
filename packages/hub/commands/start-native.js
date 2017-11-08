@@ -1,5 +1,4 @@
 const { spawnHub } = require('../main');
-const { waitForExit } = require('../util/process');
 
 module.exports = {
   name: 'hub:start',
@@ -17,8 +16,8 @@ module.exports = {
   ],
 
   async run(args) {
-    let proc = spawnHub(this.project.pkg.name, this.project.configPath(), args.environment);
-    await waitForExit(proc);
+    await spawnHub(this.project.pkg.name, this.project.configPath(), args.environment);
+    await new Promise(() => {});
   }
 
 };
