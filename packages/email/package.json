@@ -15,6 +15,7 @@
     "nodemailer": "^4.0.1"
   },
   "devDependencies": {
-    "@cardstack/eslint-config": "0.3.0"
+    "@cardstack/eslint-config": "0.3.0",
+    "eslint-plugin-ember": "^4.6.1"
   }
 }

@@ -19,5 +19,9 @@
   "bugs": {
     "url": "https://github.com/cardstack/cardstack/issues"
   },
-  "homepage": "https://github.com/cardstack/cardstack#readme"
+  "homepage": "https://github.com/cardstack/cardstack#readme",
+  "peerDependencies": {
+    "eslint-plugin-ember": "^4.6.1",
+    "eslint": ">= 4"
+  }
 }
