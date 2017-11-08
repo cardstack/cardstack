@@ -15,6 +15,9 @@ async function runServer(options, seedModels) {
   let app = await makeServer(process.cwd(), sessionsKey, seedModels, options);
   app.listen(port);
   log.info("server listening on %s", port);
+  if (process.connected) {
+    process.send('hub hello');
+  }
 }
 
 function commandLineOptions() {
@@ -72,6 +75,22 @@ function loadSeedModels(options) {
 process.on('warning', (warning) => {
   process.stderr.write(warning.stack);
 });
+
+
+if (process.connected === false) {
+  // This happens if we were started by another node process with IPC
+  // and that parent has already died by the time we got here.
+  //
+  // (If we weren't started under IPC, `process.connected` is
+  // undefined, so this never happens.)
+  process.stdout.write(`Shutting down because connected parent process has already exited.`);
+  process.exit(0);
+}
+process.on('disconnect', () => {
+  process.stdout.write(`Hub shutting down because connected parent process exited.\n`);
+  process.exit(0);
+});
+
 
 let options = commandLineOptions();
 let seedModels = loadSeedModels(options);

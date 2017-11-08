@@ -1,9 +1,4 @@
-const { makeServer } = require('./main');
-const path = require('path');
-const crypto = require('crypto');
-const fs = require('fs');
 const log = require('@cardstack/plugin-utils/logger')('hub/ember-cli');
-const Funnel = require('broccoli-funnel');
 const CONTAINER_MODE = process.env.CONTAINERIZED_HUB != null;
 const NewBroccoliConnector = require('./docker-host/broccoli-connector');
 const proxyToHub = require('./docker-host/proxy-to-hub');
@@ -44,34 +39,28 @@ let addon = {
     }
   },
 
-  included(app){
-    while (app.app) {
-      app = app.app;
-    }
-    let env = this.env = app.env;
+  included(){
     this._super.apply(this, arguments);
     if (!this._active){ return; }
+    this.import('vendor/cardstack-generated.js');
+    this._env = process.env.EMBER_ENV || 'development';
+    this._hub = this._startHub();
+    this._modulePrefix = require(this.project.configPath())(this._env).modulePrefix;
+  },
 
-    if (env === 'test') {
-      let OldBroccoliConnector = require('./broccoli-connector');
-      this._broccoliConnector = new OldBroccoliConnector();
-      app.import('vendor/cardstack/generated.js');
+  async _startHub() {
+    if (process.env.HUB_URL) {
+      // we were given an existing hub url to talk to, so don't start a hub
+      return process.env.HUB_URL;
+    }
+    if (CONTAINER_MODE) {
+      throw new Error("TODO: automatically start containerized hub here. This code should block until the hub is actually listening, and it should return the URL at which the hub is listening.");
     } else {
-      app.import('vendor/cardstack-generated.js');
-    }
-
-    if (!process.env.ELASTICSEARCH_PREFIX) {
-      process.env.ELASTICSEARCH_PREFIX = this.project.pkg.name.replace(/^[^a-zA-Z]*/, '').replace(/[^a-zA-Z0-9]/g, '_') + '_' + env;
-    }
-
-    // start spinning up the hub immediately, because our treeFor*
-    // hooks won't resolve until the hub does its first codegen build,
-    // and the middleware hooks won't run until after that.
-
-    if (env === 'test') {
-      let seedPath = path.join(path.dirname(this.project.configPath()), '..', 'cardstack', 'seeds', env);
-      let useDevDeps = true;
-      this._hubMiddleware = this._makeServer(seedPath, this.project.ui, useDevDeps, env);
+      // we wait until here to require this because in the
+      // containerized case, "main" and its recursive dependencies
+      // never need to load on the host environment.
+      let { spawnHub } = require('./main');
+      return spawnHub(this.project.pkg.name, this.project.configPath(), this._env);
     }
   },
 
@@ -82,7 +71,9 @@ let addon = {
       this._super.apply(this, arguments);
       return;
     }
-    app.use('/cardstack', proxyToHub());
+
+    let url = await this._hub;
+    app.use('/cardstack', proxyToHub(url));
   },
 
   // testemMiddleware will not wait for a promise, so we need to
@@ -96,8 +87,14 @@ let addon = {
     }
 
     let handler;
-    this._hubMiddleware.then(
-      h => { handler = h; },
+    let queue = [];
+    this._hub.then(
+      url => {
+        handler = proxyToHub(url);
+        for (let { req, res } of queue) {
+          handler(req, res);
+        }
+      },
       error => {
         log.error("Server failed to start. %s", error);
         handler = (req, res) => {
@@ -111,90 +108,18 @@ let addon = {
       if (handler) {
         handler(req, res);
       } else {
-        res.status = 500;
-        res.send("Server not ready yet");
-        res.end();
+        queue.push({ req, res });
       }
     });
   },
-
 
   treeForVendor() {
     if (!this._active){
       this._super.apply(this, arguments);
       return;
     }
-    if (this.env !== 'test') {
-      return new NewBroccoliConnector(defaultBranch).tree;
-    } else {
-      return new Funnel(this._broccoliConnector.tree, {
-        srcDir: defaultBranch,
-        destDir: 'cardstack'
-      });
-    }
-  },
-
-  buildError(error) {
-    if (this._broccoliConnector) {
-      this._broccoliConnector.buildFailed(error);
-    }
-  },
-
-  postBuild(results) {
-    if (this._broccoliConnector) {
-      this._broccoliConnector.buildSucceeded(results);
-    }
-  },
-
-  async _makeServer(seedDir, ui, allowDevDependencies, env) {
-    log.debug("Looking for seed files in %s", seedDir);
-    let seedModels;
-    try {
-      seedModels = fs.readdirSync(seedDir).map(filename => {
-        if (/\.js/.test(filename)) {
-          log.debug("Found seed file %s", filename);
-          return require(path.join(seedDir, filename));
-        }
-      }).filter(Boolean).reduce((a,b) => a.concat(b), []);
-    } catch (err) {
-      if (err.code === 'ENOENT') {
-        let message = `@cardstack/hub found no seed model directory (looking for ${seedDir})`;
-        if (ui) {
-          ui.writeWarnLine(message);
-        } else {
-          process.stderr.write(message);
-        }
-        seedModels = [];
-      } else {
-        throw err;
-      }
-    }
-
-    // Without this node 7 swallows stack traces within the native
-    // promises I'm using.
-    process.on('warning', (warning) => {
-      process.stderr.write(warning.stack);
-    });
-
-    // Randomized session encryption -- this means if you restart the
-    // dev server your session gets invalidated.
-    let sessionsKey = crypto.randomBytes(32);
-
-    try {
-      let koaApp = await makeServer(this.project.root, sessionsKey, seedModels, {
-        allowDevDependencies,
-        broccoliConnector: this._broccoliConnector,
-        emberConfigEnv: require(this.project.configPath())(env)
-      });
-      return koaApp.callback();
-    } catch (err) {
-      // we don't want to leave our broccoli build hanging forever,
-      // because ember-cli waits for it to exit before doing its own
-      // cleanup and exiting, meaning we could get an unkillable
-      // ember-cli.
-      this._broccoliConnector.setSource(Promise.reject(err));
-      throw err;
-    }
+    return new NewBroccoliConnector(`http://localhost:3000/codegen/${defaultBranch}/${this._modulePrefix}`).tree;
   }
+
 };
 module.exports = addon;
