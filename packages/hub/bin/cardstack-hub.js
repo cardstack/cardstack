@@ -83,11 +83,11 @@ if (process.connected === false) {
   //
   // (If we weren't started under IPC, `process.connected` is
   // undefined, so this never happens.)
-  process.stdout.write(`Shutting down because connected parent process has already exited.`);
+  log.info(`Shutting down because connected parent process has already exited.`);
   process.exit(0);
 }
 process.on('disconnect', () => {
-  process.stdout.write(`Hub shutting down because connected parent process exited.\n`);
+  log.info(`Hub shutting down because connected parent process exited.`);
   process.exit(0);
 });
 

@@ -83,7 +83,7 @@ async function spawnHub(packageName, configPath, environment) {
     let key = crypto.randomBytes(32);
     process.env.CARDSTACK_SESSIONS_KEY = key.toString('base64');
   }
-  if (!process.env.DEBUG) {
+  if (!process.env.DEBUG && environment === 'development') {
     process.env.DEBUG = 'cardstack/*';
   }
   if (!process.env.DEBUG_COLORS) {
