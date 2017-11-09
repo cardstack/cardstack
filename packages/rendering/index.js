@@ -5,6 +5,7 @@ module.exports = {
   name: '@cardstack/rendering',
 
   included(app){
+    this._super.included.apply(this, arguments);
     while (app.app) {
       app = app.app;
     }
