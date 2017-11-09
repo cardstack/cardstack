@@ -104,7 +104,7 @@ async function spawnHub(packageName, configPath, environment) {
   let seedDir = path.join(path.dirname(configPath),
                           '..', 'cardstack', 'seeds', environment);
 
-  let proc = spawn('npx', ['cardstack-hub', ...flags, seedDir], { stdio: [0, 1, 2, 'ipc']  });
+  let proc = spawn(path.join(__dirname, 'bin', 'cardstack-hub.js'), [...flags, seedDir], { stdio: [0, 1, 2, 'ipc']  });
   await new Promise((resolve, reject) => {
     // by convention the hub will send a hello message if it sees we
     // are supervising it over IPC. If we get an error or exit before
