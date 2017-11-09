@@ -18,6 +18,7 @@
     "test": "ember try:each"
   },
   "dependencies": {
+    "@cardstack/hub": "^0.3.1",
     "@cardstack/rendering": "0.3.0",
     "ember-cli-babel": "^6.8.2",
     "ember-cli-htmlbars": "^2.0.1",
