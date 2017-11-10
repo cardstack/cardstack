@@ -1,0 +1,7 @@
+#!/bin/bash
+
+for path in $( find . \( -path "./node_modules" -o -path "./packages/*/node_modules" \) -prune -print ); do
+    target="ci-cache/"$(dirname $path)
+    mkdir -p $target
+    mv $path $target
+done

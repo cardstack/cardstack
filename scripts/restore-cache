@@ -1,0 +1,14 @@
+#!/bin/bash
+
+if [ -d ci-cache ]; then
+    echo "Restoring cache";
+    cd ci-cache;
+    for path in $( find . \( -path "./node_modules" -o -path "./packages/*/node_modules" \) -prune -print ); do
+        target="../"$(dirname $path)
+        mkdir -p $target
+        mv $path $target
+    done
+    cd ..;
+    rm -rf ci-cache
+fi
+
