@@ -1,0 +1,77 @@
+:root {
+  --normal-background: #404040;
+  --bright-foreground: #fff;
+  --light-background: #737373;
+  --lighter-background: #a1a2a3;
+  --dark-background: #262626;
+  --very-dark-background: #0b0b0b;
+  --transition-time: 250ms;
+  font-family: 'Avenir', 'helvetica', sans-serif;
+  -webkit-font-smoothing: antialiased;
+  box-sizing: border-box;
+}
+
+*, *:before, *:after {
+  box-sizing: inherit;
+}
+
+.cardstack-authentication {
+  position: relative;
+  height: 100%;
+  min-width: 68px;
+  background-color: var(--normal-background);
+  transition: min-width var(--transition-time);
+}
+.cardstack-authentication.open {
+  min-width: 300px;
+}
+
+.cardstack-rail-item {
+  float: left;
+  clear: left;
+  min-width: 68px;
+  min-height: 68px;
+}
+
+.cardstack-rail-item.active,
+.cardstack-rail-item:hover {
+  background-color: var(--dark-background);
+}
+
+.cardstack-authentication-avatar {
+  height: 40px;
+  width: 40px;
+  margin: 14px auto 0;
+  border-radius: 100%;
+  background-size: contain;
+  background-position: center;
+  background-repeat: no-repeat;
+}
+
+.cardstack-authentication-logout {
+  position: absolute;
+  display: block;
+  width: 68px;
+  cursor: pointer;
+  bottom: 0;
+  left: 0;
+  text-transform: uppercase;
+  font-size: 16px;
+  padding: 20px 10px;
+  text-align: center;
+  line-height: 21px;
+  opacity: 0.35;
+}
+.cardstack-authentication-logout:hover {
+  opacity: 1;
+  background-color: var(--dark-background);
+}
+.cardstack-authentication-logout-icon {
+  background-image: url("../@cardstack/authentication/icon-exit-white.svg");
+  display: block;
+  height: 36px;
+  width: 35px;
+  background-size: contain;
+  background-repeat: no-repeat;
+  margin: 0 auto 10px;
+}

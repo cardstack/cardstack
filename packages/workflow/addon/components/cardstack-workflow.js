@@ -7,6 +7,7 @@ import { workflowGroupId } from "@cardstack/workflow/helpers/workflow-group-id";
 
 export default Component.extend({
   layout,
+  tagName: "",
   classNames:  ['cardstack-workflow'],
 
   workflow:    inject('cardstack-workflow'),
@@ -89,6 +90,11 @@ export default Component.extend({
   actions: {
     toggleOpen() {
       this.toggleProperty('isOpen');
+
+      let toggleOpen = this.get("toggleOpen");
+      if (typeof toggleOpen === "function") {
+        toggleOpen();
+      }
     },
 
     selectThread(thread) {

@@ -1,8 +1,8 @@
 import { test } from 'qunit';
 import moduleForAcceptance from '../../tests/helpers/module-for-acceptance';
 
-function assertUnhandledCount(assert, value, assertionText) {
-  assertTrimmedText(assert, '[data-test-total-notification-count]', value, assertionText);
+function assertUnhandledAlert(assert) {
+  assert.equal(find("[data-test-alert-notification]").length, 1, "The unhandled alert notification appears");
 }
 
 function assertGroupCount(assert, groupName, value, assertionText) {
@@ -23,7 +23,7 @@ test('Show group counters', function(assert) {
   visit('/');
 
   andThen(function() {
-    assertUnhandledCount(assert, 5);
+    assertUnhandledAlert(assert);
   });
 
   click('.cardstack-workflow-header');
@@ -102,7 +102,7 @@ test('Take action on a cue card', function(assert) {
   andThen(() => {
     assertGroupCount(assert, "Need Response::License Request", 1, "Unhandled group count is decremented after approving a message");
     assertGroupCount(assert, 'Today', 2, "Unhandled group count is also decremented for date range group");
-    assertUnhandledCount(assert, 4, "The total count is decremented");
+    assertUnhandledAlert(assert);
   });
 
   click('[data-test-group-counter="Need Response::Request to Publish Live"]');
@@ -112,6 +112,6 @@ test('Take action on a cue card', function(assert) {
 
   andThen(() => {
     assertNoGroupCount(assert, "Need Response::Request to Publish Live", "Unhandled group count becomes zero and disappears");
-    assertUnhandledCount(assert, 3, "The total count is decremented");
+    assertUnhandledAlert(assert);
   });
 });
