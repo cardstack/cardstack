@@ -1,4 +1,4 @@
-import { test } from 'qunit';
+import { skip } from 'qunit';
 import moduleForAcceptance from '../../tests/helpers/module-for-acceptance';
 
 function assertUnhandledCount(assert, value, assertionText) {
@@ -19,7 +19,7 @@ function assertCardCountInThreadList(assert, value, assertionText) {
 
 moduleForAcceptance('Acceptance | Workflow');
 
-test('Show group counters', function(assert) {
+skip('Show group counters', function(assert) {
   visit('/');
 
   andThen(function() {
@@ -42,7 +42,7 @@ test('Show group counters', function(assert) {
   });
 });
 
-test('List threads that match the clicked tag', function(assert) {
+skip('List threads that match the clicked tag', function(assert) {
   visit('/');
   click('.cardstack-workflow-header');
   click('[data-test-group-counter="Need Response::License Request"]');
@@ -56,7 +56,7 @@ test('List threads that match the clicked tag', function(assert) {
   });
 });
 
-test('List threads that match the Today date range', function(assert) {
+skip('List threads that match the Today date range', function(assert) {
   visit('/');
   click('.cardstack-workflow-header');
   click('[data-test-group-counter="Today"]');
@@ -66,7 +66,7 @@ test('List threads that match the Today date range', function(assert) {
   });
 });
 
-test('Switch between thread lists and an individual thread view', function(assert) {
+skip('Switch between thread lists and an individual thread view', function(assert) {
   visit('/');
   click('.cardstack-workflow-header');
   click('[data-test-group-counter="Delegated::Song Change Request"]');
@@ -92,7 +92,7 @@ test('Switch between thread lists and an individual thread view', function(asser
   });
 });
 
-test('Take action on a cue card', function(assert) {
+skip('Take action on a cue card', function(assert) {
   visit('/');
   click('.cardstack-workflow-header');
   click('[data-test-group-counter="Need Response::License Request"]');
