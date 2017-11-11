@@ -17,6 +17,7 @@ env:
 cache:
   directories:
     - ci-cache
+  timeout: 600
 
 before_install:
   - docker run -d --rm -p 9200:9200 --name elasticsearch cardstack/elasticsearch:dev
