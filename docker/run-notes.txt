@@ -1,0 +1,3 @@
+docker run -d --rm -p 9200:9200 --network cardstack --name elasticsearch      cardstack/elasticsearch:dev
+docker run -d --rm -p 5444:5432 --network cardstack --name postgres           cardstack/pg-test
+docker run --rm -it --network cardstack --env ELASTICSEARCH=http://elasticsearch:9200 --env PGHOST=postgres --env PGUSER=postgres framework-wip
