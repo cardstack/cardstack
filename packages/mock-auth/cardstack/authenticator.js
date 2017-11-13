@@ -1,11 +1,18 @@
 const Error = require('@cardstack/plugin-utils/error');
+const { declareInjections } = require('@cardstack/di');
 
-module.exports = class {
+module.exports = declareInjections({
+  messengers: 'hub:messengers'
+},
+
+class Authenticator {
   static create(...args) {
     return new this(...args);
   }
   constructor(params) {
-    this.users = params["users"];
+    let { messengers, users } = params;
+    this.messengers = messengers;
+    this.users = users;
 
     this.defaultUserTemplate =  "{ \"data\": { \"id\": \"{{id}}\", \"type\": \"mock-users\", \"attributes\": { \"name\": \"{{name}}\", \"email\":\"{{email}}\", \"avatar-url\":\"{{picture}}\" }}}";
   }
@@ -18,9 +25,22 @@ module.exports = class {
     }
 
     let mockUser = this.users[payload.authorizationCode];
-    mockUser.id = payload.authorizationCode;
 
     if (mockUser) {
+      mockUser.id = payload.authorizationCode;
+
+      // TODO also remove di in package.json & cleanup yarn.lock when you remove this silly test
+      // silly test
+      setTimeout(() => {
+        this.messengers.send('user-notification', {
+          userId: mockUser.id,
+          body: 'yo matey'
+        });
+        // let messenger = await this.messengers.getMessenger('user-notification');
+        // let sentMessages = await messenger.getSentMessages();
+        // console.log("=============> SENT MESSAGES", JSON.stringify(sentMessages, null, 2));
+      }, 5000);
+
       return mockUser;
     }
 
@@ -34,4 +54,4 @@ module.exports = class {
     return { mockEnabled: true };
   }
 
-};
+});
