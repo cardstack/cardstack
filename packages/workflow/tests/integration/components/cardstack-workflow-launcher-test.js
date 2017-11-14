@@ -15,5 +15,5 @@ moduleForComponent('cardstack-workflow-launcher', 'Integration | Component | car
 test('it renders with default implementation', function(assert) {
   this.on('toggleOpen', () => { this.toggleProperty('isOpen'); });
   this.render(hbs`{{cardstack-workflow-launcher onClick=(action 'toggleOpen')}}`);
-  assert.equal(this.$().text().trim(), '3');
+  assert.equal(this.$(".cardstack-workflow-alert").hasClass("show-alert"), true);
 });

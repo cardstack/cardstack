@@ -15,23 +15,23 @@
 }
 
 .cardstack-workflow-header {
-  min-height: 50px;
-  width: 100vw;
+  min-height: 68px;
+  cursor: pointer;
   color: var(--bright-foreground);
   display: inline-block;
-  /* line-height: 1.375em; */
 }
 
-.cardstack-workflow-header > .notification-count {
-  width: 30px;
-  height: 30px;
-  line-height: 30px;
+.cardstack-workflow-alert.show-alert:after {
+  content: " ";
+  display: block;
+  width: 10px;
+  height: 10px;
+  position: absolute;
   background-color: red;
-  border-radius: 50%;
-  text-align: center;
-  font-weight: bold;
+  border-radius: 100%;
   cursor: pointer;
-  margin: 10px 5px;
+  top: 28px;
+  left: 48px;
 }
 
 .cardstack-workflow {
@@ -45,11 +45,43 @@
   width: 50px;
 }
 
-.cardstack-message-summary {
-  min-width: 25vw;
-  float: left;
-  background-color: var(--normal-background);
+.cardstack-workflow-rail-wrapper {
+  position: absolute;
+  top: 0;
+  left: 0;
+
+  margin-left: 68px;
+  padding-left: 10px;
+  min-width: 232px;
+  height: 100%;
+  background-color: var(--dark-background);
   color: var(--bright-foreground);
+}
+.cardstack-message-summary {
+}
+
+.cardstack-workflow-alert {
+  position: relative;
+  display: block;
+  margin: 0 auto;
+  height: 68px;
+  width: 68px;
+}
+.cardstack-workflow-bell-icon {
+  display: inline-block;
+  height: 68px;
+  width: 68px;
+  background-image: url("../@cardstack/workflow/icon-bell.svg");
+  background-size: 27px;
+  background-position: center;
+  background-repeat: no-repeat;
+  opacity: .35;
+}
+
+
+.active .cardstack-workflow-bell-icon,
+.cardstack-rail-item:hover .cardstack-workflow-bell-icon {
+  opacity: 1;
 }
 
 .cardstack-workflow-group-header {
@@ -59,8 +91,6 @@
 
 .cardstack-cue-card-list {
   min-width: 25vw;
-  background-color: var(--lighter-background);
-  color: var(--bright-foreground);
   padding: 0 5px;
 }
 
@@ -71,8 +101,6 @@
 
 .cardstack-thread-view {
   min-width: 25vw;
-  background-color: var(--lighter-background);
-  color: var(--bright-foreground);
   padding: 0 5px;
 }
 
@@ -85,7 +113,7 @@
 }
 
 .cardstack-workflow-label-with-count-wrapper.active {
-  background-color: var(--very-dark-background);
+  background-color: var(--dark-background);
 }
 
 .cardstack-workflow-label-with-count {
@@ -133,9 +161,7 @@ count could be made to stay on the same line
   display: flex;
   flex-direction: column;
   margin: 10px;
-  background-color: var(--bright-foreground);
   padding: 10px;
-  color: var(--light-background);
   border-radius: 5px;
 }
 
