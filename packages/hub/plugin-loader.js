@@ -91,11 +91,17 @@ class PluginLoader {
   async _crawlPlugins(dir, output, seen, includeDevDependencies, breadcrumbs) {
     log.trace("plugin crawl dir=%s, includeDevDependencies=%s, breadcrumbs=%j", dir, includeDevDependencies, breadcrumbs);
     if (seen[dir]) {
+      if (seen[dir].includedFrom) {
+        // if we've seen this dir before *and* it's a cardstack
+        // plugin, we should update its includedFrom to include the
+        // new path that we arrived by
+        seen[dir].includedFrom.push(breadcrumbs);
+      }
       return;
     }
     seen[dir] = true;
-    dir = await realpath(dir);
-    let packageJSON = path.join(dir, 'package.json');
+    let realdir = await realpath(dir);
+    let packageJSON = path.join(realdir, 'package.json');
     let moduleRoot = path.dirname(await resolve(packageJSON, { basedir: this.project.path }));
 
     let json = require(packageJSON);
@@ -105,24 +111,27 @@ class PluginLoader {
       // crawling any deeper dependencies we only care about them if
       // they are cardstack-plugins.
       if (breadcrumbs.length > 0) {
-        log.trace(`${dir} does not appear to contain a cardstack plugin`);
+        log.trace(`%s does not appear to contain a cardstack plugin`, realdir);
         return;
       }
     } else {
       if (json['cardstack-plugin']['api-version'] !== 1) {
-        log.warn(`${dir} has some fancy cardstack-plugin.version I don't understand. Trying anyway.`);
+        log.warn(`%s has some fancy cardstack-plugin.version I don't understand. Trying anyway.`, realdir);
       }
       let customSource = json['cardstack-plugin'].src;
       if (customSource) {
         moduleRoot = path.join(moduleRoot, customSource);
       }
     }
-    output.push({
+
+    seen[dir] = {
       name: json.name,
       dir: moduleRoot,
       features: await discoverFeatures(moduleRoot),
-      includedFrom: breadcrumbs
-    });
+      includedFrom: [breadcrumbs]
+    };
+
+    output.push(seen[dir]);
 
     let deps = json.dependencies ? Object.keys(json.dependencies).map(dep => ({ dep, type: 'dependencies' })) : [];
     if (includeDevDependencies && json.devDependencies) {
@@ -137,7 +146,7 @@ class PluginLoader {
     }
 
     for (let { dep, type } of deps) {
-      let childDir = path.dirname(await resolve(dep + '/package.json', { basedir: dir }));
+      let childDir = path.dirname(await resolve(dep + '/package.json', { basedir: realdir }));
 
       // we never include devDependencies of second level dependencies
       await this._crawlPlugins(childDir, output, seen, false, breadcrumbs.concat({ name: json.name, type }));
@@ -347,12 +356,14 @@ function activateRecursively(installed, configs) {
 function dependencyGraph(installed) {
   let dependsOn = Object.create(null);
   for (let plugin of installed) {
-    let parent = plugin.includedFrom[plugin.includedFrom.length - 1];
-    if (!parent || parent.type !== 'dependencies') { continue; }
-    if (!dependsOn[parent.name]) {
-      dependsOn[parent.name] = [ plugin.name ];
-    } else {
-      dependsOn[parent.name].push(plugin.name);
+    for (let breadcrumbs of plugin.includedFrom) {
+      let parent = breadcrumbs[breadcrumbs.length - 1];
+      if (!parent || parent.type !== 'dependencies') { continue; }
+      if (!dependsOn[parent.name]) {
+        dependsOn[parent.name] = [ plugin.name ];
+      } else {
+        dependsOn[parent.name].push(plugin.name);
+      }
     }
   }
   log.debug('=== plugin dependency graph ===\n%t', () => Object.keys(dependsOn).map(k => dependsOn[k].map(v => [k,v])).reduce((a,b) => a.concat(b)));
