@@ -20,5 +20,6 @@
   },
   "dependencies": {
   },
+  "workspaces": ["packages/*"],
   "private": true
 }

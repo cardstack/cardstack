@@ -7,5 +7,6 @@
   "npmClient": "yarn",
   "npmClientArgs": [
     "--ignore-engines"
-  ]
+  ],
+  "useWorkspaces": true
 }
