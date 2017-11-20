@@ -27,7 +27,6 @@ const featureTypes = [
   'code-generators'
 ];
 const javascriptPattern = /(.*)\.js$/;
-const TOP_FEATURE = {};
 
 module.exports = declareInjections({
   project: 'config:project'
@@ -51,10 +50,6 @@ class PluginLoader {
   }
 
   async installedPlugins() {
-    return publicNames(await this._findInstalledPlugins());
-  }
-
-  async _findInstalledPlugins() {
     if (!this._installedPlugins) {
       let output = [];
       let seen = Object.create(null);
@@ -76,7 +71,7 @@ class PluginLoader {
     for (let model of configModels) {
       configs.set(model.id, Object.assign({}, model.attributes, model.relationships));
     }
-    let installed = await this._findInstalledPlugins();
+    let installed = await this.installedPlugins();
 
     let missing = missingPlugins(installed, configs);
     if (missing.length > 0) {
@@ -127,7 +122,7 @@ class PluginLoader {
     seen[dir] = {
       name: json.name,
       dir: moduleRoot,
-      features: await discoverFeatures(moduleRoot),
+      features: await discoverFeatures(moduleRoot, json.name),
       includedFrom: [breadcrumbs]
     };
 
@@ -154,7 +149,7 @@ class PluginLoader {
   }
 });
 
-async function discoverFeatures(moduleRoot) {
+async function discoverFeatures(moduleRoot, pluginName) {
   let features = [];
   for (let featureType of featureTypes) {
     try {
@@ -164,7 +159,7 @@ async function discoverFeatures(moduleRoot) {
         if (m) {
           features.push({
             type: featureType,
-            name: m[1],
+            name: `${pluginName}::${m[1]}`,
             loadPath: path.join(moduleRoot, featureType, file)
           });
         }
@@ -179,7 +174,7 @@ async function discoverFeatures(moduleRoot) {
     if (fs.existsSync(filename)) {
       features.push({
         type: featureType,
-        name: TOP_FEATURE,
+        name: pluginName,
         loadPath: filename
       });
     }
@@ -223,13 +218,7 @@ class ActivePlugins {
     return this.installedPlugins.map(p => {
       return p.features.filter(
         f => f.type === featureType && this.configFor(p.name)
-      ).map(f => {
-          if (f.name === TOP_FEATURE) {
-            return p.name;
-          } else {
-            return `${p.name}::${f.name}`;
-          }
-        });
+      ).map(f => f.name);
     }).reduce((a,b) => a.concat(b), []);
   }
 
@@ -246,11 +235,11 @@ class ActivePlugins {
   }
 
   _lookupFeature(featureType, fullyQualifiedName)  {
-    let [moduleName, featureName] = fullyQualifiedName.split('::');
+    let [moduleName] = fullyQualifiedName.split('::');
     if (this.configs.get(moduleName)) {
       let plugin = this.installedPlugins.find(p => p.name === moduleName);
       if (plugin) {
-        let feature = this._findFeature(plugin.features, featureType, featureName);
+        let feature = this._findFeature(plugin.features, featureType, fullyQualifiedName);
         log.trace('feature lookup %s %s %s', featureType, fullyQualifiedName, !!feature);
         return feature;
       }
@@ -259,12 +248,12 @@ class ActivePlugins {
   }
 
   _lookupFeatureAndAssert(featureType, fullyQualifiedName)  {
-    let [moduleName, featureName] = fullyQualifiedName.split('::');
+    let [moduleName] = fullyQualifiedName.split('::');
     let config = this.configs.get(moduleName);
     let plugin = this.installedPlugins.find(p => p.name === moduleName);
     let feature;
     if (plugin) {
-      feature = this._findFeature(plugin.features, featureType, featureName);
+      feature = this._findFeature(plugin.features, featureType, fullyQualifiedName);
     }
     if (!plugin) {
       throw new Error(`You're trying to use ${featureType} ${fullyQualifiedName} but the plugin ${moduleName} is not installed. Make sure it appears in the dependencies section of package.json`);
@@ -283,7 +272,7 @@ class ActivePlugins {
       throw new Error(`No such feature type "${featureType}"`);
     }
     let feature = features.find(
-      f => f.type === featureType && f.name === (featureName || TOP_FEATURE)
+      f => f.type === featureType && f.name === featureName
     );
     if (feature) {
       return `plugin-${featureType}:${feature.loadPath}`;
@@ -303,25 +292,16 @@ function missingPlugins(installed, configs) {
 }
 
 function summarize(plugins) {
-  return publicNames(plugins).map(p => {
-    if (p.features.length > 0){
-      return p.features.map(f => [p.name, f.type, f.name]);
+  return plugins.map(p => {
+    let features = p.relationships.features.data;
+    if (features.length > 0){
+      return features.map(f => [p.id, f.attributes['feature-type'], f.id]);
     } else {
-      return [[p.name, '']];
+      return [[p.id, '']];
     }
   }).reduce((a,b) => a.concat(b), []);
 }
 
-
-function publicNames(plugins) {
-  return plugins.map(p => ({
-    name: p.name,
-    features: p.features.map(f => ({
-      type: f.type,
-      name: f.name === TOP_FEATURE ? p.name : `${p.name}::${f.name}`
-    }))
-  }));
-}
 
 function activateRecursively(installed, configs) {
   // The hub is always active, it doesn't really make sense to be here

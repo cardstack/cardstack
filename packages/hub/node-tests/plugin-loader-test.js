@@ -36,14 +36,11 @@ describe('hub/plugin-loader', function() {
 
   it('locates top-level plugins', async function() {
     let plugins = await pluginLoader.installedPlugins();
-    expect(plugins).collectionContains({
-      name: 'sample-plugin-one',
-      features: [{ type: "field-types", name: "sample-plugin-one::x" }]
-    });
-    expect(plugins).collectionContains({
-      name: 'sample-plugin-two',
-      features: [{ type: "writers", name: "sample-plugin-two" }]
-    });
+    let one = plugins.find(p => p.name === 'sample-plugin-one');
+    expect(one).is.ok;
+    expect(one.features.find(f => f.name === 'sample-plugin-one::x')).is.ok;
+    let two = plugins.find(p => p.name === 'sample-plugin-two');
+    expect(two.features.find(f => f.name === 'sample-plugin-two' && f.type === 'writers')).is.ok;
   });
 
   it('skips non-plugin dependencies', async function() {
