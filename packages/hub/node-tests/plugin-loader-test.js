@@ -36,24 +36,24 @@ describe('hub/plugin-loader', function() {
 
   it('locates top-level plugins', async function() {
     let plugins = await pluginLoader.installedPlugins();
-    let one = plugins.find(p => p.name === 'sample-plugin-one');
+    let one = plugins.find(p => p.id === 'sample-plugin-one');
     expect(one).is.ok;
-    expect(one.features.find(f => f.name === 'sample-plugin-one::x')).is.ok;
-    let two = plugins.find(p => p.name === 'sample-plugin-two');
-    expect(two.features.find(f => f.name === 'sample-plugin-two' && f.type === 'writers')).is.ok;
+    expect(one.features.find(f => f.id === 'sample-plugin-one::x')).is.ok;
+    let two = plugins.find(p => p.id === 'sample-plugin-two');
+    expect(two.features.find(f => f.id === 'sample-plugin-two' && f.type === 'writers')).is.ok;
   });
 
   it('skips non-plugin dependencies', async function() {
     let plugins = await pluginLoader.installedPlugins();
     expect(plugins).not.collectionContains({
-      name: 'sample-non-plugin'
+      id: 'sample-non-plugin'
     });
   });
 
   it('locates second-level plugins', async function() {
     let plugins = await pluginLoader.installedPlugins();
     expect(plugins).collectionContains({
-      name: 'sample-plugin-two'
+      id: 'sample-plugin-two'
     });
   });
 
@@ -166,7 +166,7 @@ describe('hub/plugin-loader', function() {
     // contains this in-repo plugin
     let plugins = await pluginLoader.installedPlugins();
     expect(plugins).collectionContains({
-      name: '@cardstack/test-support/authenticator'
+      id: '@cardstack/test-support/authenticator'
     });
   });
 
