@@ -86,11 +86,11 @@ class PluginLoader {
   async _crawlPlugins(dir, output, seen, includeDevDependencies, breadcrumbs) {
     log.trace("plugin crawl dir=%s, includeDevDependencies=%s, breadcrumbs=%j", dir, includeDevDependencies, breadcrumbs);
     if (seen[dir]) {
-      if (seen[dir].includedFrom) {
+      if (seen[dir].attributes && seen[dir].attributes.includedFrom) {
         // if we've seen this dir before *and* it's a cardstack
         // plugin, we should update its includedFrom to include the
         // new path that we arrived by
-        seen[dir].includedFrom.push(breadcrumbs);
+        seen[dir].attributes.includedFrom.push(breadcrumbs);
       }
       return;
     }
@@ -121,9 +121,12 @@ class PluginLoader {
 
     seen[dir] = {
       id: json.name,
-      dir: moduleRoot,
-      features: await discoverFeatures(moduleRoot, json.name),
-      includedFrom: [breadcrumbs]
+      type: 'plugins',
+      attributes: {
+        dir: moduleRoot,
+        features: await discoverFeatures(moduleRoot, json.name),
+        includedFrom: [breadcrumbs]
+      }
     };
 
     output.push(seen[dir]);
@@ -216,7 +219,7 @@ class ActivePlugins {
 
   listAll(featureType) {
     return this.installedPlugins.map(p => {
-      return p.features.filter(
+      return p.attributes.features.filter(
         f => f.type === featureType && this.configFor(p.id)
       ).map(f => f.id);
     }).reduce((a,b) => a.concat(b), []);
@@ -239,7 +242,7 @@ class ActivePlugins {
     if (this.configs.get(moduleName)) {
       let plugin = this.installedPlugins.find(p => p.id === moduleName);
       if (plugin) {
-        let feature = this._findFeature(plugin.features, featureType, fullyQualifiedName);
+        let feature = this._findFeature(plugin.attributes.features, featureType, fullyQualifiedName);
         log.trace('feature lookup %s %s %s', featureType, fullyQualifiedName, !!feature);
         return feature;
       }
@@ -253,7 +256,7 @@ class ActivePlugins {
     let plugin = this.installedPlugins.find(p => p.id === moduleName);
     let feature;
     if (plugin) {
-      feature = this._findFeature(plugin.features, featureType, fullyQualifiedName);
+      feature = this._findFeature(plugin.attributes.features, featureType, fullyQualifiedName);
     }
     if (!plugin) {
       throw new Error(`You're trying to use ${featureType} ${fullyQualifiedName} but the plugin ${moduleName} is not installed. Make sure it appears in the dependencies section of package.json`);
@@ -293,7 +296,7 @@ function missingPlugins(installed, configs) {
 
 function summarize(plugins) {
   return plugins.map(p => {
-    let features = p.relationships.features.data;
+    let features = p.attributes.features;
     if (features.length > 0){
       return features.map(f => [p.id, f.attributes['feature-type'], f.id]);
     } else {
@@ -336,7 +339,7 @@ function activateRecursively(installed, configs) {
 function dependencyGraph(installed) {
   let dependsOn = Object.create(null);
   for (let plugin of installed) {
-    for (let breadcrumbs of plugin.includedFrom) {
+    for (let breadcrumbs of plugin.attributes.includedFrom) {
       let parent = breadcrumbs[breadcrumbs.length - 1];
       if (!parent || parent.type !== 'dependencies') { continue; }
       if (!dependsOn[parent.id]) {
