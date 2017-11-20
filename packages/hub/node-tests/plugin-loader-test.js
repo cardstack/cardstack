@@ -40,7 +40,7 @@ describe('hub/plugin-loader', function() {
     expect(one).is.ok;
     expect(one.attributes.features.find(f => f.id === 'sample-plugin-one::x')).is.ok;
     let two = plugins.find(p => p.id === 'sample-plugin-two');
-    expect(two.attributes.features.find(f => f.id === 'sample-plugin-two' && f.type === 'writers')).is.ok;
+    expect(two.attributes.features.find(f => f.id === 'sample-plugin-two' && f.attributes['feature-type'] === 'writers')).is.ok;
   });
 
   it('skips non-plugin dependencies', async function() {

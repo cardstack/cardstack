@@ -161,9 +161,12 @@ async function discoverFeatures(moduleRoot, pluginName) {
         let m = javascriptPattern.exec(file);
         if (m) {
           features.push({
-            type: featureType,
             id: `${pluginName}::${m[1]}`,
-            loadPath: path.join(moduleRoot, featureType, file)
+            type: 'plugin-features',
+            attributes: {
+              'feature-type': featureType,
+              'load-path': path.join(moduleRoot, featureType, file)
+            }
           });
         }
       }
@@ -176,9 +179,12 @@ async function discoverFeatures(moduleRoot, pluginName) {
     let filename = path.join(moduleRoot, singularize(featureType) + '.js');
     if (fs.existsSync(filename)) {
       features.push({
-        type: featureType,
         id: pluginName,
-        loadPath: filename
+        type: 'plugin-features',
+        attributes: {
+          'feature-type': featureType,
+          'load-path': filename
+        }
       });
     }
   }
@@ -220,7 +226,7 @@ class ActivePlugins {
   listAll(featureType) {
     return this.installedPlugins.map(p => {
       return p.attributes.features.filter(
-        f => f.type === featureType && this.configFor(p.id)
+        f => f.attributes['feature-type'] === featureType && this.configFor(p.id)
       ).map(f => f.id);
     }).reduce((a,b) => a.concat(b), []);
   }
@@ -275,10 +281,10 @@ class ActivePlugins {
       throw new Error(`No such feature type "${featureType}"`);
     }
     let feature = features.find(
-      f => f.type === featureType && f.id === featureName
+      f => f.attributes['feature-type'] === featureType && f.id === featureName
     );
     if (feature) {
-      return `plugin-${featureType}:${feature.loadPath}`;
+      return `plugin-${featureType}:${feature.attributes['load-path']}`;
     }
   }
 
