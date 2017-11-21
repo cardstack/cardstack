@@ -90,6 +90,36 @@ const models = [
   },
   {
     type: 'content-types',
+    id: 'plugins',
+    attributes: {
+      'is-built-in': true
+    },
+    relationships: {
+      fields: {
+        data: []
+      },
+      'data-source': {
+        data: { type: 'data-sources', id: 'plugins' }
+      }
+    }
+  },
+  {
+    type: 'content-types',
+    id: 'plugin-features',
+    attributes: {
+      'is-built-in': true
+    },
+    relationships: {
+      fields: {
+        data: []
+      },
+      'data-source': {
+        data: { type: 'data-sources', id: 'plugins' }
+      }
+    }
+  },
+  {
+    type: 'content-types',
     id: 'plugin-configs',
     attributes: {
       'is-built-in': true
@@ -454,6 +484,13 @@ const models = [
       who: {
         data: { type: 'users', id: '@cardstack/hub' }
       }
+    }
+  },
+  {
+    type: 'data-sources',
+    id: 'plugins',
+    attributes: {
+      'source-type': '@cardstack/hub::plugins'
     }
   }
 
