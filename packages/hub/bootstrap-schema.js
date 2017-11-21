@@ -1,3 +1,5 @@
+const featureTypes = require('./plugin-loader').types();
+
 const models = [
   {
     /* This is the content-type content-type. Mindblown. */
@@ -91,21 +93,6 @@ const models = [
   {
     type: 'content-types',
     id: 'plugins',
-    attributes: {
-      'is-built-in': true
-    },
-    relationships: {
-      fields: {
-        data: []
-      },
-      'data-source': {
-        data: { type: 'data-sources', id: 'plugins' }
-      }
-    }
-  },
-  {
-    type: 'content-types',
-    id: 'plugin-features',
     attributes: {
       'is-built-in': true
     },
@@ -472,6 +459,25 @@ const models = [
     }
   },
   {
+    type: 'fields',
+    id: 'plugin',
+    attributes: {
+      'field-type': '@cardstack/core-types::belongs-to'
+    },
+    relationships: {
+      'related-types': {
+        data: [{ type: 'content-types', id: 'plugins' }]
+      }
+    }
+  },
+  {
+    type: 'fields',
+    id: 'load-path',
+    attributes: {
+      'field-type': '@cardstack/core-types::string'
+    }
+  },
+  {
     type: 'grants',
     id: '0',
     attributes: {
@@ -495,4 +501,19 @@ const models = [
   }
 
 ];
-module.exports = models;
+
+module.exports = models.concat(featureTypes.map(type => ({
+  type: 'content-types',
+  id: type,
+  attributes: {
+    'is-built-in': true
+  },
+  relationships: {
+    fields: {
+      data: [
+        { type: 'fields', id: 'load-path' },
+        { type: 'fields', id: 'plugin' }
+      ]
+    }
+  }
+})));

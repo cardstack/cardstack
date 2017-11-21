@@ -30,8 +30,8 @@ class MiddlewareStack {
 
 
     let tags = new Map();
-    for (let name of schema.plugins.listAll('middleware')) {
-      let module = schema.plugins.lookupFeatureAndAssert('middleware', name);
+    for (let feature of schema.plugins.featuresOfType('middleware')) {
+      let module = schema.plugins.lookupFeatureAndAssert('middleware', feature.id);
 
       let beforeTags = asArray(module.before);
       let afterTags = asArray(module.after);
@@ -43,7 +43,7 @@ class MiddlewareStack {
       let after = afterTags.map(tag => `after:${tag}`).concat(
         ownTags.map(tag => `before:${tag}`)
       );
-      map.add(name, module, before, after);
+      map.add(feature.id, module, before, after);
 
       for (let tag of beforeTags.concat(afterTags).concat(ownTags)) {
         tags.set(tag, true);

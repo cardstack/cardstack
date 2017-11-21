@@ -13,7 +13,10 @@ describe('hub/plugin-loader', function() {
     pluginLoader = new Container(registry).lookup('hub:plugin-loader');
 
     let factory = new JSONAPIFactory();
-    factory.addResource('plugin-configs', 'sample-plugin-one');
+    factory.addResource('plugin-configs', 'sample-plugin-one')
+      .withAttributes({
+        params: { awesomeness: 11 }
+      });
     factory.addResource('plugin-configs', 'sample-plugin-two');
     factory.addResource('plugin-configs', 'sample-plugin-five');
 
@@ -54,6 +57,25 @@ describe('hub/plugin-loader', function() {
     expect(plugins).collectionContains({
       id: 'sample-plugin-two'
     });
+  });
+
+  it('activePlugins lists configured plugins', function() {
+    let one = activePlugins.all().find(p => p.id === 'sample-plugin-one');
+    expect(one).is.ok;
+  });
+
+  it('activePlugins does not list de-configured plugins', function() {
+    let four = activePlugins.all().find(p => p.id === 'sample-plugin-four');
+    expect(four).is.not.ok;
+  });
+
+  it('marks active plugins as enabled', function() {
+    expect(activePlugins.all()[0].attributes.enabled).is.ok;
+  });
+
+  it('augments active plugins with their config', function() {
+    let one = activePlugins.all().find(p => p.id === 'sample-plugin-one');
+    expect(one.attributes).has.deep.property('params.awesomeness', 11);
   });
 
   it('identifies singular features (mandatory mode)', function() {
@@ -130,18 +152,18 @@ describe('hub/plugin-loader', function() {
   });
 
   it('lists all features of a given type (non-top naming)', function() {
-    let features = activePlugins.listAll('field-types');
-    expect(features).to.include('sample-plugin-one::x');
+    let features = activePlugins.featuresOfType('field-types');
+    expect(features.map(f => f.id)).to.include('sample-plugin-one::x');
   });
 
   it('lists all features of a given type (top naming)', function() {
-    let features = activePlugins.listAll('searchers');
-    expect(features).to.include('sample-plugin-five');
+    let features = activePlugins.featuresOfType('searchers');
+    expect(features.map(f => f.id)).to.include('sample-plugin-five');
   });
 
   it('only includes active plugins when listing all by type', function() {
-    let features = activePlugins.listAll('searchers');
-    expect(features).not.to.include('sample-plugin-four');
+    let features = activePlugins.featuresOfType('searchers');
+    expect(features.map(f => f.id)).not.to.include('sample-plugin-four');
   });
 
   it('can return factory for instantiated features', function() {
@@ -166,6 +188,26 @@ describe('hub/plugin-loader', function() {
     let plugins = await pluginLoader.installedPlugins();
     expect(plugins).collectionContains({
       id: '@cardstack/test-support/authenticator'
+    });
+  });
+
+  it('links from plugin to its features', async function() {
+    let plugins = await pluginLoader.installedPlugins();
+    let one = plugins.find(p => p.id === 'sample-plugin-one');
+    expect(one).has.deep.property('relationships.features.data');
+    expect(one.relationships.features.data).collectionContains({
+      type: 'field-types',
+      id: 'sample-plugin-one::x'
+    });
+  });
+
+  it('links from feature to its plugin', async function() {
+    let features = await pluginLoader.installedFeatures();
+    let x = features.find(f => f.id === 'sample-plugin-one::x');
+    expect(x).has.deep.property('relationships.plugin.data');
+    expect(x.relationships.plugin.data).deep.equals({
+      type: 'plugins',
+      id: 'sample-plugin-one'
     });
   });
 

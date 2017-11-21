@@ -62,19 +62,25 @@ class PluginLoader {
       log.info("allowed in devDependencies: %s", !!includeDevDependencies);
       await this._crawlPlugins(projectPath, output, seen, includeDevDependencies, []);
       this._installedPlugins = output;
+
+      let features = [];
+      for (let plugin of output) {
+        features = features.concat(await discoverFeatures(plugin.attributes.dir, plugin.id));
+        plugin.relationships = {
+          features: {
+            data: features.map(({ type, id }) => ({ type, id }))
+          }
+        };
+      }
+      this._installedFeatures = features;
+      log.info("=== found installed plugins===\n%t", () => summarize(output, features));
     }
     return this._installedPlugins;
   }
 
   async installedFeatures() {
     if (!this._installedFeatures) {
-      let plugins = await this.installedPlugins();
-      let features = [];
-      for (let plugin of plugins) {
-        features = features.concat(await discoverFeatures(plugin.attributes.dir, plugin.id));
-      }
-      this._installedFeatures = features;
-      log.info("=== found installed plugins===\n%t", () => summarize(plugins, features));
+      await this.installedPlugins();
     }
     return this._installedFeatures;
   }
@@ -82,7 +88,7 @@ class PluginLoader {
   async activePlugins(configModels) {
     let configs = new Map();
     for (let model of configModels) {
-      configs.set(model.id, Object.assign({}, model.attributes, model.relationships));
+      configs.set(model.id, model);
     }
     let installed = await this.installedPlugins();
 
@@ -162,6 +168,11 @@ class PluginLoader {
       await this._crawlPlugins(childDir, outputPlugins, seen, false, breadcrumbs.concat({ id: json.name, type }));
     }
   }
+
+  static types() {
+    return featureTypes;
+  }
+
 });
 
 async function discoverFeatures(moduleRoot, pluginName) {
@@ -174,9 +185,8 @@ async function discoverFeatures(moduleRoot, pluginName) {
         if (m) {
           features.push({
             id: `${pluginName}::${m[1]}`,
-            type: 'plugin-features',
+            type: featureType,
             attributes: {
-              'feature-type': featureType,
               'load-path': path.join(moduleRoot, featureType, file)
             },
             relationships: {
@@ -197,9 +207,8 @@ async function discoverFeatures(moduleRoot, pluginName) {
     if (fs.existsSync(filename)) {
       features.push({
         id: pluginName,
-        type: 'plugin-features',
+        type: featureType,
         attributes: {
-          'feature-type': featureType,
           'load-path': filename
         },
         relationships: {
@@ -220,9 +229,40 @@ function singularize(name) {
 
 class ActivePlugins {
   constructor(installedPlugins, installedFeatures, configs) {
-    this.installedPlugins = installedPlugins;
-    this.installedFeatures = installedFeatures;
-    this.configs = configs;
+    this._installedPlugins = installedPlugins;
+    this._installedFeatures = installedFeatures;
+    this._configs = configs;
+    this._plugins = null;
+    this._features = null;
+  }
+
+  all() {
+    if (!this._plugins) {
+      this._plugins = this._installedPlugins.map(plugin => {
+        let config = this._configs.get(plugin.id);
+        if (config) {
+          let copied = Object.assign({}, plugin);
+          copied.attributes = Object.assign({}, plugin.attributes, config.attributes);
+          copied.attributes.enabled = true;
+          copied.relationships = Object.assign({}, plugin.relationships, config.relationships);
+          return copied;
+        }
+      }).filter(Boolean);
+    }
+    return this._plugins;
+  }
+
+  features() {
+    if (!this._features) {
+      this._features = this._installedFeatures.filter(feature => {
+        return this._configs.get(feature.relationships.plugin.data.id);
+      });
+    }
+    return this._features;
+  }
+
+  lookup(pluginName) {
+    return this.all().find(p => p.id === pluginName);
   }
 
   lookupFeature(featureType, fullyQualifiedName)  {
@@ -241,14 +281,8 @@ class ActivePlugins {
     return this._factory(this._lookupFeatureAndAssert(featureType, fullyQualifiedName));
   }
 
-  configFor(moduleName) {
-    return this.configs.get(moduleName);
-  }
-
-  listAll(featureType) {
-    return this.installedFeatures.filter(
-      f => f.attributes['feature-type'] === featureType && this.configFor(f.relationships.plugin.data.id)
-    ).map(f => f.id);
+  featuresOfType(featureType) {
+    return this.features().filter(f => f.type === featureType);
   }
 
   _instance(resolverName) {
@@ -266,7 +300,7 @@ class ActivePlugins {
   _lookupFeature(featureType, fullyQualifiedName)  {
     let feature = this._findFeature(featureType, fullyQualifiedName);
     if (feature) {
-      if (this.configs.get(feature.relationships.plugin.data.id)) {
+      if (this._configs.get(feature.relationships.plugin.data.id)) {
         return resolverName(feature);
       }
     }
@@ -275,13 +309,13 @@ class ActivePlugins {
   _lookupFeatureAndAssert(featureType, fullyQualifiedName)  {
     let feature = this._findFeature(featureType, fullyQualifiedName);
     if (feature) {
-      if (this.configs.get(feature.relationships.plugin.data.id)) {
+      if (this._configs.get(feature.relationships.plugin.data.id)) {
         return resolverName(feature);
       }
       throw new Error(`You're trying to use ${featureType} ${fullyQualifiedName} but the plugin ${feature.relationships.plugin.data.id} is not activated`);
     }
     let [moduleName] = fullyQualifiedName.split('::');
-    let plugin = this.installedPlugins.find(p => p.id === moduleName);
+    let plugin = this._installedPlugins.find(p => p.id === moduleName);
     if (plugin) {
       throw new Error(`You're trying to use ${featureType} ${fullyQualifiedName} but no such feature exists in plugin ${moduleName}`);
     } else {
@@ -293,8 +327,8 @@ class ActivePlugins {
     if (!featureTypes.includes(type)) {
       throw new Error(`No such feature type "${type}"`);
     }
-    return this.installedFeatures.find(
-      f => f.attributes['feature-type'] === type && f.id === id
+    return this._installedFeatures.find(
+      f => f.type === type && f.id === id
     );
   }
 
@@ -302,7 +336,7 @@ class ActivePlugins {
 
 function resolverName(feature) {
   let attrs = feature.attributes;
-  return `plugin-${attrs['feature-type']}:${attrs['load-path']}`;
+  return `plugin-${feature.type}:${attrs['load-path']}`;
 }
 
 
@@ -320,7 +354,7 @@ function summarize(plugins, features) {
   return plugins.map(p => {
     let pluginFeatures = features.filter(f => f.relationships.plugin.data.id === p.id);
     if (pluginFeatures.length > 0){
-      return pluginFeatures.map(f => [p.id, f.attributes['feature-type'], f.id]);
+      return pluginFeatures.map(f => [p.id, f.type, f.id]);
     } else {
       return [[p.id, '']];
     }
