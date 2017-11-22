@@ -7,6 +7,9 @@
   "cardstack-plugin": {
     "api-version": 1
   },
+  "ember-addon": {
+    "defaultBlueprint": "cardstack-ephemeral-seeds",
+  },
   "dependencies": {
     "@cardstack/di": "^0.3.2",
     "@cardstack/plugin-utils": "^0.3.2"
