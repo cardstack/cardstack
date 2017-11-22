@@ -31,7 +31,7 @@ class SchemaLoader {
 
   async loadFrom(inputModels) {
     let models = inputModels;
-    let plugins = await this.pluginLoader.activePlugins(models.filter(model => model.type === 'plugin-configs'));
+    let plugins = await this.pluginLoader.configuredPlugins(models.filter(model => model.type === 'plugin-configs'));
     let authLog = logger('auth');
     let schemaLog = logger('schema');
     let defaultValues = findDefaultValues(models);

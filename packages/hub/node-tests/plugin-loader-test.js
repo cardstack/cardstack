@@ -2,7 +2,7 @@ const { Registry, Container } = require('@cardstack/di');
 const JSONAPIFactory = require('../../../tests/stub-project/node_modules/@cardstack/test-support/jsonapi-factory');
 
 describe('hub/plugin-loader', function() {
-  let pluginLoader, activePlugins;
+  let pluginLoader, configuredPlugins;
 
   before(async function() {
     let registry = new Registry();
@@ -20,7 +20,7 @@ describe('hub/plugin-loader', function() {
     factory.addResource('plugin-configs', 'sample-plugin-two');
     factory.addResource('plugin-configs', 'sample-plugin-five');
 
-    activePlugins = await pluginLoader.activePlugins(factory.getModels());
+    configuredPlugins = await pluginLoader.configuredPlugins(factory.getModels());
   });
 
   it('throws if project config is missing', function() {
@@ -59,57 +59,55 @@ describe('hub/plugin-loader', function() {
     });
   });
 
-  it('activePlugins lists configured plugins', function() {
-    let one = activePlugins.all().find(p => p.id === 'sample-plugin-one');
-    expect(one).is.ok;
-  });
-
-  it('activePlugins does not list de-configured plugins', function() {
-    let four = activePlugins.all().find(p => p.id === 'sample-plugin-four');
-    expect(four).is.not.ok;
-  });
-
   it('marks active plugins as enabled', function() {
-    expect(activePlugins.all()[0].attributes.enabled).is.ok;
+    let one = configuredPlugins.lookup('sample-plugin-one');
+    expect(one).is.ok;
+    expect(one.attributes.enabled).to.equal(true);
+  });
+
+  it('marks inactive plugins as not enabled', function() {
+    let four = configuredPlugins.lookup('sample-plugin-four');
+    expect(four).is.ok;
+    expect(four.attributes.enabled).to.equal(false);
   });
 
   it('augments active plugins with their config', function() {
-    let one = activePlugins.all().find(p => p.id === 'sample-plugin-one');
+    let one = configuredPlugins.lookup('sample-plugin-one');
     expect(one.attributes).has.deep.property('params.awesomeness', 11);
   });
 
   it('identifies singular features (mandatory mode)', function() {
-    let feature = activePlugins.lookupFeatureAndAssert('writers', 'sample-plugin-two');
+    let feature = configuredPlugins.lookupFeatureAndAssert('writers', 'sample-plugin-two');
     expect(feature).is.ok;
     expect(feature).has.property('isPluginTwoWriter');
   });
 
   it('identifies singular features (optional mode)', function() {
-    let feature = activePlugins.lookupFeature('writers', 'sample-plugin-two');
+    let feature = configuredPlugins.lookupFeature('writers', 'sample-plugin-two');
     expect(feature).is.ok;
     expect(feature).has.property('isPluginTwoWriter');
   });
 
 
   it('identifies named features', function() {
-    let feature = activePlugins.lookupFeatureAndAssert('field-types', 'sample-plugin-one::x');
+    let feature = configuredPlugins.lookupFeatureAndAssert('field-types', 'sample-plugin-one::x');
     expect(feature).is.ok;
     expect(feature).has.property('isPluginOneField', 'x');
   });
 
   it('returns nothing for missing plugin', async function() {
-    let feature = await activePlugins.lookupFeature('field-types', 'no-such-plugin');
+    let feature = await configuredPlugins.lookupFeature('field-types', 'no-such-plugin');
     expect(feature).is.not.ok;
   });
 
   it('returns nothing for missing feature in existent plugin', async function() {
-    let feature = await activePlugins.lookupFeature('field-types', 'sample-plugin-one::y');
+    let feature = await configuredPlugins.lookupFeature('field-types', 'sample-plugin-one::y');
     expect(feature).is.not.ok;
   });
 
   it('complains about unknown feature type', function() {
     try {
-      activePlugins.lookupFeature('coffee-makers', 'sample-plugin-one::x');
+      configuredPlugins.lookupFeatureAndAssert('coffee-makers', 'sample-plugin-one::x');
       throw new Error("should not get here");
     } catch (err) {
       expect(err.message).to.equal(`No such feature type "coffee-makers"`);
@@ -118,7 +116,7 @@ describe('hub/plugin-loader', function() {
 
   it('can assert for missing feature', function() {
     try {
-      activePlugins.lookupFeatureAndAssert('field-types', 'sample-plugin-one::y');
+      configuredPlugins.lookupFeatureAndAssert('field-types', 'sample-plugin-one::y');
       throw new Error("should not get here");
     } catch (err) {
       expect(err.message).to.equal(`You're trying to use field-types sample-plugin-one::y but no such feature exists in plugin sample-plugin-one`);
@@ -128,7 +126,7 @@ describe('hub/plugin-loader', function() {
 
   it('can assert for missing module', function() {
     try {
-      activePlugins.lookupFeatureAndAssert('field-types', 'sample-plugin-three::y');
+      configuredPlugins.lookupFeatureAndAssert('field-types', 'sample-plugin-three::y');
       throw new Error("should not get here");
     } catch (err) {
       expect(err.message).to.equal(`You're trying to use field-types sample-plugin-three::y but the plugin sample-plugin-three is not installed. Make sure it appears in the dependencies section of package.json`);
@@ -137,7 +135,7 @@ describe('hub/plugin-loader', function() {
 
   it('can assert for unactivated module', function() {
     try {
-      activePlugins.lookupFeatureAndAssert('searchers', 'sample-plugin-four');
+      configuredPlugins.lookupFeatureAndAssert('searchers', 'sample-plugin-four');
       throw new Error("should not get here");
     } catch (err) {
       expect(err.message).to.equal(`You're trying to use searchers sample-plugin-four but the plugin sample-plugin-four is not activated`);
@@ -145,36 +143,36 @@ describe('hub/plugin-loader', function() {
   });
 
   it('respects custom cardstack src paths', function() {
-    let feature = activePlugins.lookupFeatureAndAssert('searchers', 'sample-plugin-five');
+    let feature = configuredPlugins.lookupFeatureAndAssert('searchers', 'sample-plugin-five');
     expect(feature).is.ok;
     expect(feature).has.property('isPluginFiveSearcher');
 
   });
 
   it('lists all features of a given type (non-top naming)', function() {
-    let features = activePlugins.featuresOfType('field-types');
+    let features = configuredPlugins.featuresOfType('field-types');
     expect(features.map(f => f.id)).to.include('sample-plugin-one::x');
   });
 
   it('lists all features of a given type (top naming)', function() {
-    let features = activePlugins.featuresOfType('searchers');
+    let features = configuredPlugins.featuresOfType('searchers');
     expect(features.map(f => f.id)).to.include('sample-plugin-five');
   });
 
   it('only includes active plugins when listing all by type', function() {
-    let features = activePlugins.featuresOfType('searchers');
+    let features = configuredPlugins.featuresOfType('searchers');
     expect(features.map(f => f.id)).not.to.include('sample-plugin-four');
   });
 
   it('can return factory for instantiated features', function() {
-    let factory = activePlugins.lookupFeatureFactory('searchers', 'sample-plugin-five');
+    let factory = configuredPlugins.lookupFeatureFactory('searchers', 'sample-plugin-five');
     expect(factory).is.ok;
     expect(factory.methodOnFiveClass).is.a.function;
   });
 
   it('can assert for unactivated factory', function() {
     try {
-      activePlugins.lookupFeatureFactoryAndAssert('searchers', 'sample-plugin-four');
+      configuredPlugins.lookupFeatureFactoryAndAssert('searchers', 'sample-plugin-four');
       throw new Error("should not get here");
     } catch (err) {
       expect(err.message).to.equal(`You're trying to use searchers sample-plugin-four but the plugin sample-plugin-four is not activated`);
@@ -212,13 +210,13 @@ describe('hub/plugin-loader', function() {
   });
 
   it('automatically activates dependencies of activated plugins', async function() {
-    let feature = activePlugins.lookupFeatureAndAssert('writers', 'sample-plugin-autoactivated');
+    let feature = configuredPlugins.lookupFeatureAndAssert('writers', 'sample-plugin-autoactivated');
     expect(feature).is.ok;
     expect(feature).has.property('isAutoactivatedWriter');
   });
 
   it('automatically activates dependencies of auto-activated dependencies', async function() {
-    let feature = activePlugins.lookupFeatureAndAssert('middleware', 'sample-plugin-deep-auto-activate');
+    let feature = configuredPlugins.lookupFeatureAndAssert('middleware', 'sample-plugin-deep-auto-activate');
     expect(feature).is.ok;
     expect(feature).has.property('isDeepMiddleware');
   });

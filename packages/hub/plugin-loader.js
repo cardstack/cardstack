@@ -85,7 +85,7 @@ class PluginLoader {
     return this._installedFeatures;
   }
 
-  async activePlugins(configModels) {
+  async configuredPlugins(configModels) {
     let configs = new Map();
     for (let model of configModels) {
       configs.set(model.id, model);
@@ -97,7 +97,7 @@ class PluginLoader {
       log.warn("Plugins are configured but not installed: %j", missing);
     }
     activateRecursively(installed, configs);
-    let a = new ActivePlugins(installed, await this.installedFeatures(), configs);
+    let a = new ConfiguredPlugins(installed, await this.installedFeatures(), configs);
     setOwner(a, getOwner(this));
     return a;
   }
@@ -227,42 +227,34 @@ function singularize(name) {
 }
 
 
-class ActivePlugins {
+class ConfiguredPlugins {
   constructor(installedPlugins, installedFeatures, configs) {
-    this._installedPlugins = installedPlugins;
-    this._installedFeatures = installedFeatures;
-    this._configs = configs;
-    this._plugins = null;
-    this._features = null;
-  }
+    this._plugins = Object.create(null);
+    this._features = Object.create(null);
 
-  all() {
-    if (!this._plugins) {
-      this._plugins = this._installedPlugins.map(plugin => {
-        let config = this._configs.get(plugin.id);
-        if (config) {
-          let copied = Object.assign({}, plugin);
-          copied.attributes = Object.assign({}, plugin.attributes, config.attributes);
-          copied.attributes.enabled = true;
-          copied.relationships = Object.assign({}, plugin.relationships, config.relationships);
-          return copied;
-        }
-      }).filter(Boolean);
-    }
-    return this._plugins;
-  }
+    installedPlugins.forEach(plugin => {
+      let copied = Object.assign({}, plugin);
+      let config = configs.get(plugin.id);
+      if (config) {
+        copied.attributes = Object.assign({}, plugin.attributes, config.attributes);
+        copied.attributes.enabled = true;
+        copied.relationships = Object.assign({}, plugin.relationships, config.relationships);
+      } else {
+        copied.attributes = Object.assign({}, plugin.attributes);
+        copied.attributes.enabled = false;
+      }
+      this._plugins[copied.id] = copied;
+    });
 
-  features() {
-    if (!this._features) {
-      this._features = this._installedFeatures.filter(feature => {
-        return this._configs.get(feature.relationships.plugin.data.id);
-      });
-    }
-    return this._features;
+    featureTypes.forEach(type => this._features[type] = Object.create(null));
+
+    installedFeatures.forEach(feature => {
+      this._features[feature.type][feature.id] = feature;
+    });
   }
 
   lookup(pluginName) {
-    return this.all().find(p => p.id === pluginName);
+    return this._plugins[pluginName];
   }
 
   lookupFeature(featureType, fullyQualifiedName)  {
@@ -282,7 +274,12 @@ class ActivePlugins {
   }
 
   featuresOfType(featureType) {
-    return this.features().filter(f => f.type === featureType);
+    let typeSet = this._features[featureType];
+    if (!typeSet) {
+      throw new Error(`No such feature type "${featureType}"`);
+    } else {
+      return Object.values(typeSet).filter(feature => this._plugins[feature.relationships.plugin.data.id].attributes.enabled);
+    }
   }
 
   _instance(resolverName) {
@@ -298,38 +295,38 @@ class ActivePlugins {
   }
 
   _lookupFeature(featureType, fullyQualifiedName)  {
-    let feature = this._findFeature(featureType, fullyQualifiedName);
-    if (feature) {
-      if (this._configs.get(feature.relationships.plugin.data.id)) {
-        return resolverName(feature);
+    let typeSet = this._features[featureType];
+    if (typeSet) {
+      let feature = typeSet[fullyQualifiedName];
+      if (feature) {
+        if (this._plugins[feature.relationships.plugin.data.id].attributes.enabled) {
+          return resolverName(feature);
+        }
       }
     }
   }
 
   _lookupFeatureAndAssert(featureType, fullyQualifiedName)  {
-    let feature = this._findFeature(featureType, fullyQualifiedName);
-    if (feature) {
-      if (this._configs.get(feature.relationships.plugin.data.id)) {
-        return resolverName(feature);
+    let typeSet = this._features[featureType];
+    if (typeSet) {
+      let feature = typeSet[fullyQualifiedName];
+      if (feature) {
+        if (this._plugins[feature.relationships.plugin.data.id].attributes.enabled) {
+          return resolverName(feature);
+        } else {
+          throw new Error(`You're trying to use ${featureType} ${fullyQualifiedName} but the plugin ${feature.relationships.plugin.data.id} is not activated`);
+        }
+      } else {
+        let [moduleName] = fullyQualifiedName.split('::');
+        if (this._plugins[moduleName]) {
+          throw new Error(`You're trying to use ${featureType} ${fullyQualifiedName} but no such feature exists in plugin ${moduleName}`);
+        } else {
+          throw new Error(`You're trying to use ${featureType} ${fullyQualifiedName} but the plugin ${moduleName} is not installed. Make sure it appears in the dependencies section of package.json`);
+        }
       }
-      throw new Error(`You're trying to use ${featureType} ${fullyQualifiedName} but the plugin ${feature.relationships.plugin.data.id} is not activated`);
-    }
-    let [moduleName] = fullyQualifiedName.split('::');
-    let plugin = this._installedPlugins.find(p => p.id === moduleName);
-    if (plugin) {
-      throw new Error(`You're trying to use ${featureType} ${fullyQualifiedName} but no such feature exists in plugin ${moduleName}`);
     } else {
-      throw new Error(`You're trying to use ${featureType} ${fullyQualifiedName} but the plugin ${moduleName} is not installed. Make sure it appears in the dependencies section of package.json`);
+      throw new Error(`No such feature type "${featureType}"`);
     }
-  }
-
-  _findFeature(type, id) {
-    if (!featureTypes.includes(type)) {
-      throw new Error(`No such feature type "${type}"`);
-    }
-    return this._installedFeatures.find(
-      f => f.type === type && f.id === id
-    );
   }
 
 }
