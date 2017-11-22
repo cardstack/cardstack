@@ -108,7 +108,7 @@ function findDataSources(models, plugins) {
 }
 
 function findDefaultDataSource(plugins) {
-  let hubPlugin = plugins.lookup('@cardstack/hub');
+  let hubPlugin = plugins.describe('@cardstack/hub');
   if (hubPlugin && hubPlugin.relationships) {
     return hubPlugin.relationships['default-data-source'];
   }

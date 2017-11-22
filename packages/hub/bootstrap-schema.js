@@ -94,11 +94,15 @@ const models = [
     type: 'content-types',
     id: 'plugins',
     attributes: {
-      'is-built-in': true
+      'is-built-in': true,
+      'default-includes': ['features']
     },
     relationships: {
       fields: {
-        data: []
+        data: [
+          { type: 'fields', id: 'features' },
+          { type: 'fields', id: 'enabled' }
+        ]
       },
       'data-source': {
         data: { type: 'data-sources', id: 'plugins' }
@@ -478,6 +482,20 @@ const models = [
     }
   },
   {
+    type: 'fields',
+    id: 'features',
+    attributes: {
+      'field-type': '@cardstack/core-types::has-many'
+    }
+  },
+  {
+    type: 'fields',
+    id: 'enabled',
+    attributes: {
+      'field-type': '@cardstack/core-types::boolean'
+    }
+  },
+  {
     type: 'grants',
     id: '0',
     attributes: {
@@ -514,6 +532,9 @@ module.exports = models.concat(featureTypes.map(type => ({
         { type: 'fields', id: 'load-path' },
         { type: 'fields', id: 'plugin' }
       ]
+    },
+    'data-source': {
+      data: { type: 'data-sources', id: 'plugins' }
     }
   }
 })));

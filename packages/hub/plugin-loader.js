@@ -63,17 +63,18 @@ class PluginLoader {
       await this._crawlPlugins(projectPath, output, seen, includeDevDependencies, []);
       this._installedPlugins = output;
 
-      let features = [];
+      let allFeatures = [];
       for (let plugin of output) {
-        features = features.concat(await discoverFeatures(plugin.attributes.dir, plugin.id));
+        let features = await discoverFeatures(plugin.attributes.dir, plugin.id);
         plugin.relationships = {
           features: {
             data: features.map(({ type, id }) => ({ type, id }))
           }
         };
+        allFeatures = allFeatures.concat(features);
       }
-      this._installedFeatures = features;
-      log.info("=== found installed plugins===\n%t", () => summarize(output, features));
+      this._installedFeatures = allFeatures;
+      log.info("=== found installed plugins===\n%t", () => summarize(output, allFeatures));
     }
     return this._installedPlugins;
   }
@@ -253,8 +254,20 @@ class ConfiguredPlugins {
     });
   }
 
-  lookup(pluginName) {
+  describeAll() {
+    return Object.values(this._plugins);
+  }
+
+  describe(pluginName) {
     return this._plugins[pluginName];
+  }
+
+  describeFeature(featureType, featureName) {
+    let typeSet = this._features[featureType];
+    if (!typeSet) {
+      throw new Error(`No such feature type "${featureType}"`);
+    }
+    return typeSet[featureName];
   }
 
   lookupFeature(featureType, fullyQualifiedName)  {

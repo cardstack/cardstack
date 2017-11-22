@@ -60,19 +60,19 @@ describe('hub/plugin-loader', function() {
   });
 
   it('marks active plugins as enabled', function() {
-    let one = configuredPlugins.lookup('sample-plugin-one');
+    let one = configuredPlugins.describe('sample-plugin-one');
     expect(one).is.ok;
     expect(one.attributes.enabled).to.equal(true);
   });
 
   it('marks inactive plugins as not enabled', function() {
-    let four = configuredPlugins.lookup('sample-plugin-four');
+    let four = configuredPlugins.describe('sample-plugin-four');
     expect(four).is.ok;
     expect(four.attributes.enabled).to.equal(false);
   });
 
   it('augments active plugins with their config', function() {
-    let one = configuredPlugins.lookup('sample-plugin-one');
+    let one = configuredPlugins.describe('sample-plugin-one');
     expect(one.attributes).has.deep.property('params.awesomeness', 11);
   });
 
