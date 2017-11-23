@@ -17,8 +17,9 @@ describe('hub/plugin-loader', function() {
       .withAttributes({
         params: { awesomeness: 11 }
       });
-    factory.addResource('plugin-configs', 'sample-plugin-two');
-    factory.addResource('plugin-configs', 'sample-plugin-five');
+    factory.addResource('plugin-configs', 'sample-plugin-four').withAttributes({
+      enabled: false
+    });
 
     configuredPlugins = await pluginLoader.configuredPlugins(factory.getModels());
   });
@@ -185,7 +186,7 @@ describe('hub/plugin-loader', function() {
     // contains this in-repo plugin
     let plugins = await pluginLoader.installedPlugins();
     expect(plugins).collectionContains({
-      id: '@cardstack/test-support/authenticator'
+      id: 'inner-plugin'
     });
   });
 

@@ -238,11 +238,13 @@ class ConfiguredPlugins {
       let config = configs.get(plugin.id);
       if (config) {
         copied.attributes = Object.assign({}, plugin.attributes, config.attributes);
-        copied.attributes.enabled = true;
+        if (copied.attributes.enabled !== false) {
+          copied.attributes.enabled = true;
+        }
         copied.relationships = Object.assign({}, plugin.relationships, config.relationships);
       } else {
         copied.attributes = Object.assign({}, plugin.attributes);
-        copied.attributes.enabled = false;
+        copied.attributes.enabled = true;
       }
       this._plugins[copied.id] = copied;
     });

@@ -114,6 +114,13 @@ const models = [
     id: 'plugin-configs',
     attributes: {
       'is-built-in': true
+    },
+    relationships: {
+      fields: {
+        data: [
+          { type: 'fields', id: 'enabled' }
+        ]
+      }
     }
   },
   {

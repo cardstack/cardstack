@@ -1,0 +1,28 @@
+{
+  "name": "@cardstack/test-support-messenger",
+  "keywords": [
+    "cardstack-plugin"
+  ],
+  "cardstack-plugin": {
+    "api-version": 1
+  },
+  "version": "0.3.2",
+  "dependencies": {
+    "@cardstack/plugin-utils": "^0.3.2"
+  },
+  "devDependencies": {
+    "@cardstack/eslint-config": "^0.3.2",
+    "eslint": "4.9.0",
+    "eslint-plugin-ember": "^4.6.1"
+  },
+  "author": "Edward Faulkner <edward@eaf4.com>",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/cardstack/cardstack/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/cardstack/cardstack.git"
+  },
+  "homepage": "https://github.com/cardstack/cardstack#readme"
+}

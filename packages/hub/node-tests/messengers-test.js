@@ -4,16 +4,15 @@ const {
 } = require('../../../tests/stub-project/node_modules/@cardstack/test-support/env');
 
 const JSONAPIFactory = require('../../../tests/stub-project/node_modules/@cardstack/test-support/jsonapi-factory');
-const TestMessenger = require('../../../tests/stub-project/node_modules/@cardstack/test-support/messenger/messenger');
+const TestMessenger = require('../../../tests/stub-project/node_modules/@cardstack/test-support-messenger/messenger');
 
 describe('hub/messengers', function() {
   let env, messengers;
 
   beforeEach(async function () {
     let factory = new JSONAPIFactory();
-    factory.addResource('plugin-configs', '@cardstack/test-support/messenger');
     factory.addResource('message-sinks', 'the-sink').withAttributes({
-      messengerType: '@cardstack/test-support/messenger',
+      messengerType: '@cardstack/test-support-messenger',
       params: { theSecret: 42 }
     });
     env = await createDefaultEnvironment(`${__dirname}/../../../tests/stub-project`, factory.getModels());

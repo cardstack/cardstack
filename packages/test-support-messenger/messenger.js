@@ -1,6 +1,5 @@
 const logger = require('@cardstack/plugin-utils/logger')('messengers');
 
-
 module.exports = class TestMessenger {
   static create(params) {
     logger.debug("Created test messenger with params", params);

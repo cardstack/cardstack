@@ -15,11 +15,7 @@
     "ember-addon"
   ],
   "cardstack-plugin": {
-    "api-version": 1,
-    "in-repo-plugins": [
-      "authenticator",
-      "messenger"
-    ]
+    "api-version": 1
   },
   "dependencies": {
     "@cardstack/di": "^0.3.2",
