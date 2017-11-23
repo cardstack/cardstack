@@ -18,17 +18,19 @@ describe('schema/auth', function() {
     factory.addResource('content-types', 'articles')
       .withRelated('fields', [
         factory.addResource('fields', 'title')
-          .withAttributes({ fieldType: '@cardstack/core-types::string' }),
+          .withRelated('fieldType', { type: 'field-types', id: '@cardstack/core-types::string' }),
         factory.addResource('fields', 'coolness')
-          .withAttributes({
-            fieldType: '@cardstack/core-types::integer'
+          .withRelated('fieldType', {
+            type: 'field-types',
+            id: '@cardstack/core-types::integer'
           }).withRelated(
             'defaultAtCreate',
             factory.addResource('default-values').withAttributes({ value: 0 })
           ),
         factory.addResource('fields', 'reviewed')
-          .withAttributes({
-            fieldType: '@cardstack/core-types::boolean'
+          .withRelated('fieldType', {
+            type: 'field-types',
+            id: '@cardstack/core-types::boolean'
           }).withRelated(
             'defaultAtUpdate',
             factory.addResource('default-values').withAttributes({ value: false })

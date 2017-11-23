@@ -5,14 +5,16 @@ module.exports = class Field {
   constructor(model, plugins, allGrants, defaultValues, authLog) {
     this.id = model.id;
     this.authLog = authLog;
-    if (!model.attributes || !model.attributes['field-type']) {
-      throw new Error(`field ${model.id} has no field-type attribute`);
+    if (!model.relationships || !model.relationships['field-type'] || !model.relationships['field-type'].data) {
+      throw new Error(`field ${model.id} has no field-type relationship`);
     }
-    this.fieldType = model.attributes['field-type'];
-    this.caption = model.attributes.caption || humanize(model.id);
-    this.editorComponent = model.attributes['editor-component'];
-    this.inlineEditorComponent = model.attributes['inline-editor-component'];
-    this.searchable = model.attributes.searchable == null ? true : model.attributes.searchable;
+    this.fieldType = model.relationships['field-type'].data.id;
+
+    let attributes = model.attributes || Object.create(null);
+    this.caption = attributes.caption || humanize(model.id);
+    this.editorComponent = attributes['editor-component'];
+    this.inlineEditorComponent = attributes['inline-editor-component'];
+    this.searchable = attributes.searchable == null ? true : attributes.searchable;
 
     // Default values are modeled as relationships to separate models
     // so that we can distinguish a default value of null from not

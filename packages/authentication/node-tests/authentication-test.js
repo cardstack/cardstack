@@ -103,11 +103,13 @@ describe('authentication/middleware', function() {
     });
 
     factory.addResource('content-types', 'users').withRelated('fields', [
-      factory.addResource('fields', 'full-name').withAttributes({
-        fieldType: '@cardstack/core-types::string'
+      factory.addResource('fields', 'full-name').withRelated('fieldType', {
+        type: 'field-types',
+        id: '@cardstack/core-types::string'
       }),
-      factory.addResource('fields', 'email').withAttributes({
-        fieldType: '@cardstack/core-types::string'
+      factory.addResource('fields', 'email').withRelated('fieldType', {
+        type: 'field-types',
+        id: '@cardstack/core-types::string'
       })
     ]);
 

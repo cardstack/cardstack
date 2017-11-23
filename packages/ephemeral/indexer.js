@@ -26,10 +26,10 @@ class Updater {
       {
         type: 'fields',
         id: 'checkpoint',
-        attributes: {
-          'field-type': '@cardstack/core-types::belongs-to'
-        },
         relationships: {
+          'field-type': {
+            data: { type: 'field-types', id: '@cardstack/core-types::belongs-to' }
+          },
           'related-types': {
             data: [
               { type: 'content-types', id: 'ephemeral-checkpoints' }

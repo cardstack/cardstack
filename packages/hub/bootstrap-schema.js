@@ -182,87 +182,109 @@ const models = [
   {
     type: 'fields',
     id: 'input-name',
-    attributes: {
-      'field-type': '@cardstack/core-types::string'
+    relationships: {
+      'field-type': {
+        data: { type: 'field-types', id: '@cardstack/core-types::string' }
+      }
     }
   },
   {
     type: 'fields',
     id: 'routing-field',
-    attributes: {
-      'field-type': '@cardstack/core-types::string'
+    relationships: {
+      'field-type': {
+        data: { type: 'field-types', id: '@cardstack/core-types::string' }
+      }
     }
   },
   {
     type: 'fields',
     id: 'searchable-relationships',
-    attributes: {
-      'field-type': '@cardstack/core-types::string-array'
+    relationships: {
+      'field-type': {
+        data: { type: 'field-types', id: '@cardstack/core-types::string-array' }
+      }
     }
   },
   {
     type: 'fields',
     id: 'default-includes',
-    attributes: {
-      'field-type': '@cardstack/core-types::string-array'
+    relationships: {
+      'field-type': {
+        data: { type: 'field-types', id: '@cardstack/core-types::string-array' }
+      }
     }
   },
   {
     type: 'fields',
     id: 'may-create-user',
-    attributes: {
-      'field-type': '@cardstack/core-types::boolean'
+    relationships: {
+      'field-type': {
+        data: { type: 'field-types', id: '@cardstack/core-types::boolean' }
+      }
     }
   },
   {
     type: 'fields',
     id: 'may-update-user',
-    attributes: {
-      'field-type': '@cardstack/core-types::boolean'
+    relationships: {
+      'field-type': {
+        data: { type: 'field-types', id: '@cardstack/core-types::boolean' }
+      }
     }
   },
   {
     type: 'fields',
     id: 'token-expiry-seconds',
-    attributes: {
-      'field-type': '@cardstack/core-types::integer'
+    relationships: {
+      'field-type': {
+        data: { type: 'field-types', id: '@cardstack/core-types::integer' }
+      }
     }
   },
   {
     type: 'fields',
     id: 'source-type',
-    attributes: {
-      'field-type': '@cardstack/core-types::string'
+    relationships: {
+      'field-type': {
+        data: { type: 'field-types', id: '@cardstack/core-types::string' }
+      }
     }
   },
   {
     type: 'fields',
     id: 'messenger-type',
-    attributes: {
-      'field-type': '@cardstack/core-types::string'
+    relationships: {
+      'field-type': {
+        data: { type: 'field-types', id: '@cardstack/core-types::string' }
+      }
     }
   },
   {
     type: 'fields',
     id: 'user-template',
-    attributes: {
-      'field-type': '@cardstack/handlebars'
+    relationships: {
+      'field-type': {
+        data: { type: 'field-types', id: '@cardstack/handlebars' }
+      }
     }
   },
   {
     type: 'fields',
     id: 'type',
-    attributes: {
-      'field-type': '@cardstack/core-types::type'
+    relationships: {
+      'field-type': {
+        data: { type: 'field-types', id: '@cardstack/core-types::type' }
+      }
     }
   },
   {
     type: 'fields',
     id: 'types',
-    attributes: {
-      'field-type': '@cardstack/core-types::has-many'
-    },
     relationships: {
+      'field-type': {
+        data: { type: 'field-types', id: '@cardstack/core-types::has-many' }
+      },
       'related-types': {
         data: [{ type: 'content-types', id: 'content-types' }]
       }
@@ -271,10 +293,10 @@ const models = [
   {
     type: 'fields',
     id: 'who',
-    attributes: {
-      'field-type': '@cardstack/core-types::belongs-to'
-    },
     relationships: {
+      'field-type': {
+        data: { type: 'field-types', id: '@cardstack/core-types::belongs-to' }
+      },
       'related-types': {
         data: [{ type: 'content-types', id: 'groups' }]
       }
@@ -283,52 +305,64 @@ const models = [
   {
     type: 'fields',
     id: 'id',
-    attributes: {
-      'field-type': '@cardstack/core-types::string'
+    relationships: {
+      'field-type': {
+        data: { type: 'field-types', id: '@cardstack/core-types::string' }
+      }
     }
   },
   {
     type: 'fields',
     id: 'is-built-in',
-    attributes: {
-      'field-type': '@cardstack/core-types::boolean'
+    relationships: {
+      'field-type': {
+        data: { type: 'field-types', id: '@cardstack/core-types::boolean' }
+      }
     }
   },
   {
     type: 'fields',
     id: 'params',
-    attributes: {
-      'field-type': '@cardstack/core-types::object'
+    relationships: {
+      'field-type': {
+        data: { type: 'field-types', id: '@cardstack/core-types::object' }
+      }
     }
   },
   {
     type: 'fields',
     id: 'group-id',
-    attributes: {
-      'field-type': '@cardstack/core-types::string'
+    relationships: {
+      'field-type': {
+        data: { type: 'field-types', id: '@cardstack/core-types::string' }
+      }
     }
   },
   {
     type: 'fields',
     id: 'value',
-    attributes: {
-      'field-type': '@cardstack/core-types::any'
+    relationships: {
+      'field-type': {
+        data: { type: 'field-types', id: '@cardstack/core-types::any' }
+      }
     }
   },
   {
     type: 'fields',
     id: 'constraint-type',
-    attributes: {
-      'field-type': '@cardstack/core-types::string'
+    relationships: {
+      'field-type': {
+        data: { type: 'field-types', id: '@cardstack/core-types::string' }
+      }
     }
   },
   {
     type: 'fields',
     id: 'default-at-create',
-    attributes: {
-      'field-type': '@cardstack/core-types::belongs-to'
-    },
     relationships: {
+      'field-type': {
+        data: { type: 'field-types', id: '@cardstack/core-types::boolean' }
+      },
       'related-types': {
         data: [{ type: 'content-types', id: 'default-values' }]
       }
@@ -337,10 +371,10 @@ const models = [
   {
     type: 'fields',
     id: 'default-at-update',
-    attributes: {
-      'field-type': '@cardstack/core-types::belongs-to'
-    },
     relationships: {
+      'field-type': {
+        data: { type: 'field-types', id: '@cardstack/core-types::belongs-to' }
+      },
       'related-types': {
         data: [{ type: 'content-types', id: 'default-values' }]
       }
@@ -349,38 +383,49 @@ const models = [
   {
     type: 'fields',
     id: 'field-type',
-    attributes: {
-      'field-type': '@cardstack/core-types::string'
+    relationships: {
+      'field-type': {
+        data: { type: 'field-types', id: '@cardstack/core-types::belongs-to' }
+      },
+      'related-types': {
+        data: [{ type: 'content-types', id: 'field-types' }]
+      }
     }
   },
   {
     type: 'fields',
     id: 'caption',
-    attributes: {
-      'field-type': '@cardstack/core-types::string'
+    relationships: {
+      'field-type': {
+        data: { type: 'field-types', id: '@cardstack/core-types::string' }
+      }
     }
   },
   {
     type: 'fields',
     id: 'editor-component',
-    attributes: {
-      'field-type': '@cardstack/core-types::string'
+    relationships: {
+      'field-type': {
+        data: { type: 'field-types', id: '@cardstack/core-types::string' }
+      }
     }
   },
   {
     type: 'fields',
     id: 'inline-editor-component',
-    attributes: {
-      'field-type': '@cardstack/core-types::string'
+    relationships: {
+      'field-type': {
+        data: { type: 'field-types', id: '@cardstack/core-types::string' }
+      }
     }
   },
   {
     type: 'fields',
     id: 'fields',
-    attributes: {
-      'field-type': '@cardstack/core-types::has-many',
-    },
     relationships: {
+      'field-type': {
+        data: { type: 'field-types', id: '@cardstack/core-types::has-many' }
+      },
       'related-types': {
         data: [{ type: 'content-types', id: 'fields' }]
       }
@@ -389,10 +434,10 @@ const models = [
   {
     type: 'fields',
     id: 'field',
-    attributes: {
-      'field-type': '@cardstack/core-types::belongs-to',
-    },
     relationships: {
+      'field-type': {
+        data: { type: 'field-types', id: '@cardstack/core-types::belongs-to' }
+      },
       'related-types': {
         data: [{ type: 'content-types', id: 'fields' }]
       }
@@ -401,17 +446,19 @@ const models = [
   {
     type: 'fields',
     id: 'inputs',
-    attributes: {
-      'field-type': '@cardstack/core-types::object',
+    relationships: {
+      'field-type': {
+        data: { type: 'field-types', id: '@cardstack/core-types::object' }
+      }
     }
   },
   {
     type: 'fields',
     id: 'input-assignments',
-    attributes: {
-      'field-type': '@cardstack/core-types::has-many',
-    },
     relationships: {
+      'field-type': {
+        data: { type: 'field-types', id: '@cardstack/core-types::has-many' }
+      },
       'related-types': {
         data: [{ type: 'content-types', id: 'input-assignments' }]
       }
@@ -420,10 +467,10 @@ const models = [
   {
     type: 'fields',
     id: 'related-types',
-    attributes: {
-      'field-type': '@cardstack/core-types::has-many',
-    },
     relationships: {
+      'field-type': {
+        data: { type: 'field-types', id: '@cardstack/core-types::has-many' }
+      },
       'related-types': {
         data: [{ type: 'content-types', id: 'content-types' }]
       }
@@ -432,10 +479,10 @@ const models = [
   {
     type: 'fields',
     id: 'data-source',
-    attributes: {
-      'field-type': '@cardstack/core-types::belongs-to'
-    },
     relationships: {
+      'field-type': {
+        data: { type: 'field-types', id: '@cardstack/core-types::belongs-to' }
+      },
       'related-types': {
         data: [{ type: 'content-types', id: 'data-sources' }]
       }
@@ -444,38 +491,46 @@ const models = [
   {
     type: 'fields',
     id: 'may-create-resource',
-    attributes: {
-      'field-type': '@cardstack/core-types::boolean'
+    relationships: {
+      'field-type': {
+        data: { type: 'field-types', id: '@cardstack/core-types::boolean' }
+      }
     }
   },
   {
     type: 'fields',
     id: 'may-update-resource',
-    attributes: {
-      'field-type': '@cardstack/core-types::boolean'
+    relationships: {
+      'field-type': {
+        data: { type: 'field-types', id: '@cardstack/core-types::boolean' }
+      }
     }
   },
   {
     type: 'fields',
     id: 'may-delete-resource',
-    attributes: {
-      'field-type': '@cardstack/core-types::boolean'
+    relationships: {
+      'field-type': {
+        data: { type: 'field-types', id: '@cardstack/core-types::boolean' }
+      }
     }
   },
   {
     type: 'fields',
     id: 'may-write-field',
-    attributes: {
-      'field-type': '@cardstack/core-types::boolean'
+    relationships: {
+      'field-type': {
+        data: { type: 'field-types', id: '@cardstack/core-types::boolean' }
+      }
     }
   },
   {
     type: 'fields',
     id: 'plugin',
-    attributes: {
-      'field-type': '@cardstack/core-types::belongs-to'
-    },
     relationships: {
+      'field-type': {
+        data: { type: 'field-types', id: '@cardstack/core-types::belongs-to' }
+      },
       'related-types': {
         data: [{ type: 'content-types', id: 'plugins' }]
       }
@@ -484,22 +539,28 @@ const models = [
   {
     type: 'fields',
     id: 'load-path',
-    attributes: {
-      'field-type': '@cardstack/core-types::string'
+    relationships: {
+      'field-type': {
+        data: { type: 'field-types', id: '@cardstack/core-types::string' }
+      }
     }
   },
   {
     type: 'fields',
     id: 'features',
-    attributes: {
-      'field-type': '@cardstack/core-types::has-many'
+    relationships: {
+      'field-type': {
+        data: { type: 'field-types', id: '@cardstack/core-types::has-many' }
+      }
     }
   },
   {
     type: 'fields',
     id: 'enabled',
-    attributes: {
-      'field-type': '@cardstack/core-types::boolean'
+    relationships: {
+      'field-type': {
+        data: { type: 'field-types', id: '@cardstack/core-types::boolean' }
+      }
     }
   },
   {
