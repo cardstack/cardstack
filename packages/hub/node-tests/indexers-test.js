@@ -26,4 +26,20 @@ describe('hub/indexers', function() {
     expect(response.data.map(m => m.id)).includes('content-types');
   });
 
+  it("indexes plugins", async function() {
+    let doc = await env.lookup('hub:searchers').get('master', 'plugins', 'sample-plugin-one');
+    expect(doc).is.ok;
+  });
+
+  it("includes features within plugins", async function() {
+    let doc = await env.lookup('hub:searchers').get('master', 'plugins', 'sample-plugin-one');
+    expect(doc).has.property('included');
+    expect(doc.included.map(r => r.id)).deep.equals(['sample-plugin-one::x']);
+  });
+
+  it("indexes plugin features", async function() {
+    let doc = await env.lookup('hub:searchers').get('master', 'field-types', 'sample-plugin-one::x');
+    expect(doc).is.ok;
+  });
+
 });

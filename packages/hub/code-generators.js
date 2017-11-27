@@ -10,9 +10,9 @@ class CodeGenerators {
     log.debug(`Running code generators on branch %s`, branch);
     let schema = await this.schemaCache.schemaForBranch(branch);
     let results = [];
-    for (let name of schema.plugins.listAll('code-generators')) {
-      log.debug(`Running code generator %s on branch %s`, name, branch);
-      let codeGenerator = schema.plugins.lookupFeatureAndAssert('code-generators', name);
+    for (let feature of schema.plugins.featuresOfType('code-generators')) {
+      log.debug(`Running code generator %s on branch %s`, feature.id, branch);
+      let codeGenerator = schema.plugins.lookupFeatureAndAssert('code-generators', feature.id);
       results.push(await codeGenerator.generateCode(modulePrefix, branch));
     }
     return results.join("");

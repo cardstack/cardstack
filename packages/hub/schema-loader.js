@@ -31,7 +31,7 @@ class SchemaLoader {
 
   async loadFrom(inputModels) {
     let models = inputModels;
-    let plugins = await this.pluginLoader.activePlugins(models.filter(model => model.type === 'plugin-configs'));
+    let plugins = await this.pluginLoader.configuredPlugins(models.filter(model => model.type === 'plugin-configs'));
     let authLog = logger('auth');
     let schemaLog = logger('schema');
     let defaultValues = findDefaultValues(models);
@@ -108,9 +108,9 @@ function findDataSources(models, plugins) {
 }
 
 function findDefaultDataSource(plugins) {
-  let serverConfig = plugins.configFor('@cardstack/hub');
-  if (serverConfig && serverConfig['default-data-source']) {
-    return serverConfig['default-data-source'];
+  let hubPlugin = plugins.describe('@cardstack/hub');
+  if (hubPlugin && hubPlugin.relationships) {
+    return hubPlugin.relationships['default-data-source'];
   }
 }
 

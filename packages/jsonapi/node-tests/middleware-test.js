@@ -137,7 +137,7 @@ describe('jsonapi/middleware', function() {
 
     factory.addResource('plugin-configs', "@cardstack/jsonapi");
 
-    factory.addResource('plugin-configs', "@cardstack/test-support/authenticator");
+    factory.addResource('plugin-configs', "@cardstack/test-support-authenticator");
 
     factory.addResource('content-types', 'authors')
       .withRelated('fields', [

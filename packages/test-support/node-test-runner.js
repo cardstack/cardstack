@@ -18,6 +18,12 @@ module.exports = function() {
 
   for (let pattern of patterns) {
     for (let file of glob.sync(pattern)) {
+      if (process.platform === 'darwin' && /\bpackages\/git\b/.test(file)) {
+        describe(`git ${file}`, function() {
+          it.skip("These tests are skipped until I can fix nodegit on OSX High Sierra");
+        });
+        continue;
+      }
       prepare();
       requireUncached(process.cwd() + '/' + file);
     }
