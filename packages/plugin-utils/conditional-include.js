@@ -5,7 +5,7 @@ const fs = require('fs');
 
 module.exports = class ConditionalInclude extends Plugin {
   constructor(inputTree, { name, predicate }) {
-    super([inputTree], { name: `conditional-include/${name}`, persistentOutput: true, needsCache: false });
+    super([inputTree], { name: `conditional-include/${name}`, persistentOutput: false, needsCache: false });
     this.predicate = predicate;
   }
 
