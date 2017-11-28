@@ -1,6 +1,6 @@
 {
   "name": "@cardstack/ephemeral",
-  "version": "0.4.0",
+  "version": "0.4.1",
   "keywords": [
     "cardstack-plugin"
   ],
@@ -9,7 +9,7 @@
   },
   "dependencies": {
     "@cardstack/di": "^0.3.4",
-    "@cardstack/plugin-utils": "^0.4.0"
+    "@cardstack/plugin-utils": "^0.4.1"
   },
   "devDependencies": {
     "@cardstack/eslint-config": "^0.3.4",
