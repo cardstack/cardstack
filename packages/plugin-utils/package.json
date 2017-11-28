@@ -1,6 +1,6 @@
 {
   "name": "@cardstack/plugin-utils",
-  "version": "0.3.4",
+  "version": "0.4.0",
   "description": "Support library for authors of cardstack plugins.",
   "main": "index.js",
   "repository": "https://github.com/cardstack/cardstack",
@@ -17,7 +17,7 @@
     "walk-sync": "^0.3.2"
   },
   "dependencies": {
-    "@cardstack/jsonapi": "^0.3.4",
+    "@cardstack/jsonapi": "^0.4.0",
     "broccoli-plugin": "^1.3.0",
     "ms": "2.0.0",
     "superagent": "^3.8.1",
