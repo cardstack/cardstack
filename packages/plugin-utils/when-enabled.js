@@ -35,6 +35,9 @@ module.exports = function whenEnabled(plugin) {
     let url = `${baseURL}/api/plugins/${encodeURIComponent(plugin.name)}`;
     let response;
     try {
+      // The next line is why @cardstack/plugin-utils depends
+      // on @cardstack/jsonapi. We're hitting the JSON:API endpoint
+      // that decribes the given plugin.
       response = await request.get(url);
     } catch (err) {
       throw new Error(`Unable to check whether plugin ${plugin.name} is enabled: got exception ${err.message} from ${url}`);
