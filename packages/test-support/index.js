@@ -1,6 +1,6 @@
 const hub = require('@cardstack/plugin-utils/locate-hub');
-
-module.exports = {
+const whenEnabled = require('@cardstack/plugin-utils/when-enabled');
+module.exports = whenEnabled({
   name: '@cardstack/test-support',
   isDevelopingAddon() {
     return process.env.CARDSTACK_DEV;
@@ -18,4 +18,4 @@ module.exports = {
   testemMiddleware(app) {
     return hub().testemMiddleware(app);
   }
-};
+});

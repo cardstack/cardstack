@@ -1,11 +1,11 @@
 /* eslint-env node */
-
-var CssImport = require('postcss-import');
-var CssNext = require('postcss-cssnext');
-
 'use strict';
 
-module.exports = {
+const whenEnabled = require('@cardstack/plugin-utils/when-enabled');
+const CssImport = require('postcss-import');
+const CssNext = require('postcss-cssnext');
+
+module.exports = whenEnabled({
   name: '@cardstack/tools',
   isDevelopingAddon() {
     return process.env.CARDSTACK_DEV;
@@ -37,4 +37,4 @@ module.exports = {
 
     }
   }
-};
+});
