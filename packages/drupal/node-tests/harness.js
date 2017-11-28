@@ -55,7 +55,6 @@ async function go() {
       openAPIPatch
     }
   });
-  factory.addResource('plugin-configs', '@cardstack/drupal');
   await createDefaultEnvironment(__dirname + '/../', factory.getModels());
 }
 

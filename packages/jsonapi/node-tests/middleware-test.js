@@ -135,10 +135,6 @@ describe('jsonapi/middleware', function() {
       .withAttributes({ title: 'Fifth Event' })
       .withRelated('next', factory.getResource('events', '4'));
 
-    factory.addResource('plugin-configs', "@cardstack/jsonapi");
-
-    factory.addResource('plugin-configs', "@cardstack/test-support-authenticator");
-
     factory.addResource('content-types', 'authors')
       .withRelated('fields', [
         factory.addResource('fields', 'name').withAttributes({

@@ -30,8 +30,6 @@ exports.createDefaultEnvironment = async function(projectDir, initialModels = []
           })
       );
 
-    factory.addResource('plugin-configs', '@cardstack/ephemeral');
-
     factory.addResource('grants')
       .withAttributes({
         mayCreateResource: true,

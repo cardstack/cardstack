@@ -21,8 +21,6 @@ describe('git/indexer', function() {
 
     let factory = new JSONAPIFactory();
 
-    factory.addResource('plugin-configs', '@cardstack/git');
-
     dataSource = factory.addResource('data-sources')
         .withAttributes({
           'source-type': '@cardstack/git',
@@ -417,8 +415,6 @@ describe('git/indexer failures', function() {
     root = await temp.mkdir('cardstack-server-test');
 
     let factory = new JSONAPIFactory();
-
-    factory.addResource('plugin-configs', '@cardstack/git');
 
     let dataSource = factory.addResource('data-sources')
         .withAttributes({
