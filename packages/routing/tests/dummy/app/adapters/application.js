@@ -1,8 +1,10 @@
 import DS from 'ember-data';
 import Ember from 'ember';
+import { hubURL } from '@cardstack/hub/environment';
 
 export default DS.JSONAPIAdapter.extend({
-  namespace: '/cardstack/api',
+  host: hubURL,
+  namespace: 'api',
 
   async queryRecord(store, type, query) {
     let upstreamQuery = Ember.assign({}, query);

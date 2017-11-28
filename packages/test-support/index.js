@@ -11,11 +11,5 @@ module.exports = whenEnabled({
   },
   includedCommands() {
     return hub().includedCommands();
-  },
-  serverMiddleware({ app }) {
-    return hub().serverMiddleware({ app });
-  },
-  testemMiddleware(app) {
-    return hub().testemMiddleware(app);
   }
 });

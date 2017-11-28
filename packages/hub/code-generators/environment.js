@@ -23,7 +23,7 @@ module.exports = class {
     // TODO: make these dynamic
     return {
       defaultBranch: 'master',
-      hubURL: '/cardstack',
+      hubURL: 'http://localhost:3000',
       compiledAt: new Date().toISOString()
     };
   }
