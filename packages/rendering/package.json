@@ -3,7 +3,8 @@
   "version": "0.3.4",
   "description": "Basic front-end rendering support for Cardstack",
   "keywords": [
-    "ember-addon"
+    "ember-addon",
+    "cardstack-plugin"
   ],
   "license": "MIT",
   "author": "Edward Faulkner <edward@eaf4.com>",
@@ -52,5 +53,8 @@
   },
   "ember-addon": {
     "configPath": "tests/dummy/config"
+  },
+  "cardstack-plugin": {
+    "api-version": 1
   }
 }

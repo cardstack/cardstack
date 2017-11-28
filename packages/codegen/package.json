@@ -24,6 +24,7 @@
   },
   "dependencies": {
     "@cardstack/di": "^0.3.4",
+    "@cardstack/plugin-utils": "^0.3.4",
     "ember-cli-babel": "^6.8.2",
     "ember-fetch": "^1.4.0",
     "koa-better-route": "^0.1.0"

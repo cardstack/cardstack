@@ -3,7 +3,8 @@
   "version": "0.3.4",
   "description": "The default blueprint for ember-cli addons.",
   "keywords": [
-    "ember-addon"
+    "ember-addon",
+    "cardstack-plugin"
   ],
   "license": "MIT",
   "author": "Edward Faulkner <edward@eaf4.com>",
@@ -70,5 +71,8 @@
   "ember-addon": {
     "configPath": "tests/dummy/config",
     "before": "@cardstack/routing"
+  },
+  "cardstack-plugin": {
+    "api-version": 1
   }
 }

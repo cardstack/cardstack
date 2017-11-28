@@ -33,24 +33,35 @@ let addon = {
     // included by multiple addons. So we do a bit of global
     // coordination here and only the first instance takes effect.
     if (global.__cardstack_hub_running_in_ember_cli) {
+      if (global.__cardstack_hub_running_in_ember_cli.isLocatorDummy) {
+        throw new Error(`A plugin tried to use @cardstack/plugin-utils/locate-hub too early. It's only allowed after ember addon's have finished 'init'`);
+      }
       this._active = false;
       return;
     } else {
-      global.__cardstack_hub_running_in_ember_cli = true;
+      global.__cardstack_hub_running_in_ember_cli = this;
       this._active = true;
     }
+  },
+
+  async url() {
+    if (!this._hub) {
+      this._env = process.env.EMBER_ENV || 'development';
+      if (fs.existsSync(path.join(path.dirname(this.project.configPath()), '..', 'cardstack', 'seeds', this._env))) {
+        this._hub = this._startHub();
+      } else {
+        this._hub = Promise.resolve(null);
+      }
+    }
+    let url = await this._hub;
+    return url;
   },
 
   included(){
     this._super.apply(this, arguments);
     if (!this._active){ return; }
     this.import('vendor/cardstack-generated.js');
-    this._env = process.env.EMBER_ENV || 'development';
-    if (fs.existsSync(path.join(path.dirname(this.project.configPath()), '..', 'cardstack', 'seeds', this._env))) {
-      this._hub = this._startHub();
-    } else {
-      this._hub = Promise.resolve(null);
-    }
+    this.url(); // kicks off the actual hub as needed
     this._modulePrefix = require(this.project.configPath())(this._env).modulePrefix;
   },
 
