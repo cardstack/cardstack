@@ -1,7 +1,5 @@
-const log = require('@cardstack/plugin-utils/logger')('hub/ember-cli');
 const CONTAINER_MODE = process.env.CONTAINERIZED_HUB != null;
 const NewBroccoliConnector = require('./docker-host/broccoli-connector');
-const proxyToHub = require('./docker-host/proxy-to-hub');
 const path = require('path');
 const fs = require('fs');
 
@@ -79,65 +77,6 @@ let addon = {
       let { spawnHub } = require('./main');
       return spawnHub(this.project.pkg.name, this.project.configPath(), this._env);
     }
-  },
-
-  // The serverMiddleware hook is well-behaved and will wait for us to
-  // resolve a promise before moving on.
-  async serverMiddleware({ app }) {
-    if (!this._active){
-      this._super.apply(this, arguments);
-      return;
-    }
-
-    let url = await this._hub;
-    if (url) {
-      app.use('/cardstack', proxyToHub(url));
-    }
-  },
-
-  // testemMiddleware will not wait for a promise, so we need to
-  // register something immediately. This is racy and makes it
-  // possible for early requests to fail -- if that turns out to have
-  // a practical effect we will need to queue requests here instead.
-  testemMiddleware(app) {
-    if (!this._active){
-      this._super.apply(this, arguments);
-      return;
-    }
-
-    let handler;
-    let queue = [];
-    this._hub.then(
-      url => {
-        if (url) {
-          handler = proxyToHub(url);
-        } else {
-          handler = (req, res) => {
-            res.status = 404;
-            res.send('@cardstack/hub is not enabled');
-            res.end();
-          };
-        }
-        for (let { req, res } of queue) {
-          handler(req, res);
-        }
-      },
-      error => {
-        log.error("Server failed to start. %s", error);
-        handler = (req, res) => {
-          res.status = 500;
-          res.send("@cardstack/hub server failed to start due to exception: " + error);
-          res.end();
-        };
-      }
-    );
-    app.use('/cardstack', (req, res) => {
-      if (handler) {
-        handler(req, res);
-      } else {
-        queue.push({ req, res });
-      }
-    });
   },
 
   treeForVendor() {

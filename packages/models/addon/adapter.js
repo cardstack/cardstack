@@ -1,9 +1,11 @@
 import DS from 'ember-data';
 import AdapterMixin from 'ember-resource-metadata/adapter-mixin';
 import Ember from 'ember';
+import { hubURL } from '@cardstack/hub/environment';
 
 export default DS.JSONAPIAdapter.extend(AdapterMixin, {
-  namespace: 'cardstack/api',
+  host: hubURL,
+  namespace: 'api',
 
   // queryRecord can use the hub's page.size control to just do a
   // query of with a limit of 1.
