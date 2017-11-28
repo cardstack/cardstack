@@ -33,6 +33,9 @@ let addon = {
     // included by multiple addons. So we do a bit of global
     // coordination here and only the first instance takes effect.
     if (global.__cardstack_hub_running_in_ember_cli) {
+      if (global.__cardstack_hub_running_in_ember_cli.isLocatorDummy) {
+        throw new Error(`A plugin tried to use @cardstack/plugin-utils/locate-hub too early. It's only allowed after ember addon's have finished 'init'`);
+      }
       this._active = false;
       return;
     } else {

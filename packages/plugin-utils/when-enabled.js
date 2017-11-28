@@ -3,7 +3,7 @@
   whether the addon is enabled in cardstack hub.
 */
 const ConditionalInclude = require('./conditional-include');
-const hub = require('@cardstack/plugin-utils/locate-hub');
+const locateHub = require('@cardstack/plugin-utils/locate-hub');
 const request = require('superagent');
 
 const treeMethods = [
@@ -20,7 +20,13 @@ const treeMethods = [
 
 module.exports = function whenEnabled(plugin) {
   async function enabled() {
-    let baseURL = await hub().url();
+    let baseURL;
+    {
+      let hub = await locateHub();
+      if (hub) {
+        baseURL = await hub.url();
+      }
+    }
     if (!baseURL) {
       // no hub is configured. so there can't be any config in that
       // hub disabling any plugins, so we default to enabled.

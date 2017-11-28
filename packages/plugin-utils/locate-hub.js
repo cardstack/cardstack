@@ -12,7 +12,13 @@
 module.exports = function() {
   let hub = global.__cardstack_hub_running_in_ember_cli;
   if (!hub) {
-    throw new Error("Unable to locate @cardstack/hub addon.");
+    // We want to catch the error case where somebody checked earlier
+    // than they were supposed to and found no hub, only to miss it
+    // later. By leaving this in place, if the hub tries to start up
+    // after this point it will throw a helpful error.
+    global.__cardstack_hub_running_in_ember_cli = { isLocatorDummy: true };
   }
-  return hub;
+  if (hub && !hub.isLocatorDummy) {
+    return hub;
+  }
 };
