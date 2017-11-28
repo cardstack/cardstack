@@ -21,6 +21,11 @@ const treeMethods = [
 module.exports = function whenEnabled(plugin) {
   async function enabled() {
     let baseURL = await hub().url();
+    if (!baseURL) {
+      // no hub is configured. so there can't be any config in that
+      // hub disabling any plugins, so we default to enabled.
+      return true;
+    }
     let url = `${baseURL}/api/plugins/${encodeURIComponent(plugin.name)}`;
     let response;
     try {
