@@ -8614,7 +8614,7 @@ sum-up@^1.0.1:
   dependencies:
     chalk "^1.0.0"
 
-superagent@^2.0.0, superagent@^2.3.0:
+superagent@^2.0.0:
   version "2.3.0"
   resolved "https://registry.yarnpkg.com/superagent/-/superagent-2.3.0.tgz#703529a0714e57e123959ddefbce193b2e50d115"
   dependencies:
@@ -8629,7 +8629,7 @@ superagent@^2.0.0, superagent@^2.3.0:
     qs "^6.1.0"
     readable-stream "^2.0.5"
 
-superagent@^3.5.2:
+superagent@^3.5.2, superagent@^3.8.1:
   version "3.8.1"
   resolved "https://registry.yarnpkg.com/superagent/-/superagent-3.8.1.tgz#2571fd921f3fcdba43ac68c3b35c91951532701f"
   dependencies:

@@ -1,3 +1,5 @@
+const hub = require('@cardstack/plugin-utils/locate-hub');
+
 module.exports = {
   name: '@cardstack/test-support',
   isDevelopingAddon() {
@@ -8,15 +10,12 @@ module.exports = {
     this.import('vendor/dag-map-shim.js');
   },
   includedCommands() {
-    let hub = this.addons.find(a => a.name === '@cardstack/hub');
-    return hub.includedCommands();
+    return hub().includedCommands();
   },
   serverMiddleware({ app }) {
-    let hub = this.addons.find(a => a.name === '@cardstack/hub');
-    return hub.serverMiddleware({ app });
+    return hub().serverMiddleware({ app });
   },
   testemMiddleware(app) {
-    let hub = this.addons.find(a => a.name === '@cardstack/hub');
-    return hub.testemMiddleware(app);
+    return hub().testemMiddleware(app);
   }
 };

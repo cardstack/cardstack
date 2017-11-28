@@ -36,21 +36,29 @@ let addon = {
       this._active = false;
       return;
     } else {
-      global.__cardstack_hub_running_in_ember_cli = true;
+      global.__cardstack_hub_running_in_ember_cli = this;
       this._active = true;
     }
+  },
+
+  async url() {
+    if (!this._hub) {
+      this._env = process.env.EMBER_ENV || 'development';
+      if (fs.existsSync(path.join(path.dirname(this.project.configPath()), '..', 'cardstack', 'seeds', this._env))) {
+        this._hub = this._startHub();
+      } else {
+        this._hub = Promise.resolve(null);
+      }
+    }
+    let url = await this._hub;
+    return url;
   },
 
   included(){
     this._super.apply(this, arguments);
     if (!this._active){ return; }
     this.import('vendor/cardstack-generated.js');
-    this._env = process.env.EMBER_ENV || 'development';
-    if (fs.existsSync(path.join(path.dirname(this.project.configPath()), '..', 'cardstack', 'seeds', this._env))) {
-      this._hub = this._startHub();
-    } else {
-      this._hub = Promise.resolve(null);
-    }
+    this.url(); // kicks off the actual hub as needed
     this._modulePrefix = require(this.project.configPath())(this._env).modulePrefix;
   },
 
