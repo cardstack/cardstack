@@ -1,4 +1,5 @@
 const { declareInjections } = require('@cardstack/di');
+const { isEqual } = require('lodash');
 
 module.exports = declareInjections({
   schemaCache: 'hub:schema-cache',
@@ -25,12 +26,19 @@ class Updater {
   }
 
   async updateContent(meta, hints, ops) {
-    for (let plugin of this.plugins.describeAll()) {
+    let plugins = this.plugins.describeAll();
+    if (meta && isEqual(meta.plugins, plugins)) {
+      return { plugins };
+    }
+    await ops.beginReplaceAll();
+    for (let plugin of plugins) {
       await ops.save('plugins', plugin.id, plugin);
       for (let { type, id } of plugin.relationships.features.data) {
         await ops.save(type, id, this.plugins.describeFeature(type, id));
       }
     }
+    await ops.finishReplaceAll();
+    return { plugins };
   }
 
   async read(type, id /*, isSchema */) {
