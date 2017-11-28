@@ -10,8 +10,6 @@ describe('hub/searchers', function() {
   async function setup(stubParams) {
     let factory = new JSONAPIFactory();
 
-    factory.addResource('plugin-configs', 'stub-searcher');
-
     factory.addResource('data-sources').
       withAttributes({
         sourceType: 'stub-searcher',

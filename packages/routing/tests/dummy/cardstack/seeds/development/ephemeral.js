@@ -5,10 +5,6 @@ const { initialModels } = require('../test/ephemeral');
 
 module.exports = [
   {
-    type: 'plugin-configs',
-    id: '@cardstack/ephemeral'
-  },
-  {
     type: 'data-sources',
     id: 'default',
     attributes: {

@@ -30,8 +30,5 @@
   ],
   "cardstack-plugin": {
     "api-version": 1
-  },
-  "ember-addon": {
-    "defaultBlueprint": "cardstack-jsonapi-seeds"
   }
 }

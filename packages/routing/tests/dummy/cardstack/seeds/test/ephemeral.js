@@ -45,10 +45,6 @@ function initialModels() {
 
 module.exports = [
   {
-    type: 'plugin-configs',
-    id: '@cardstack/ephemeral'
-  },
-  {
     type: 'data-sources',
     id: 'default',
     attributes: {

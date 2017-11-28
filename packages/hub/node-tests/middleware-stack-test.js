@@ -12,7 +12,6 @@ describe('middleware-stack', function() {
 
   async function setup() {
     let factory = new JSONAPIFactory();
-    factory.addResource('plugin-configs', 'stub-middleware');
     factory.addResource('plugin-configs', 'stub-middleware-extra').withAttributes({
       enabled: false
     });
@@ -87,9 +86,13 @@ describe('middleware-stack', function() {
     });
 
     it('can dynamically remove middleware', async function() {
-      let config = await env.lookup('hub:searchers').get('master', 'plugin-configs', 'stub-middleware');
-      config.data.attributes.enabled = false;
-      await env.lookup('hub:writers').update('master', env.session, config.data.type, config.data.id, config.data);
+      await env.lookup('hub:writers').create('master', env.session, 'plugin-configs', {
+        id: 'stub-middleware',
+        type: 'plugin-configs',
+        attributes: {
+          enabled: false
+        }
+      });
       await env.lookup('hub:indexers').update({ realTime: true });
       let response = await request.get('/first');
       expect(response).hasStatus(404);

@@ -14,10 +14,6 @@ describe('email-auth', function() {
   async function setup() {
     let factory = new JSONAPIFactory();
 
-    factory.addResource('plugin-configs', '@cardstack/authentication');
-
-    factory.addResource('plugin-configs', '@cardstack/email-auth');
-
     factory.addResource('users', 'valid-quint-id').withAttributes({
       email: 'quint@example.com',
     });

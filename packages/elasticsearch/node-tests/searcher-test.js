@@ -20,10 +20,6 @@ describe('elasticsearch/searcher', function() {
   before(async function() {
     factory = new Factory();
 
-    // Turning on mobiledoc so we can test searching of
-    // plugin-specific indexers
-    factory.addResource('plugin-configs', '@cardstack/mobiledoc');
-
     factory.addResource('content-types', 'people').withRelated('fields', [
       factory.addResource('fields', 'first-name').withAttributes({
         fieldType: '@cardstack/core-types::string'

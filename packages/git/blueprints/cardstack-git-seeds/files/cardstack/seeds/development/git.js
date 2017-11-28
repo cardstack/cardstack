@@ -2,10 +2,6 @@
 
 module.exports = [
   {
-    type: 'plugin-configs',
-    id: '@cardstack/git',
-  },
-  {
     type: 'data-sources',
     id: 'cardstack-git-default',
     attributes: {

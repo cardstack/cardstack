@@ -13,8 +13,6 @@ describe('schema/validation', function() {
     let factory = new JSONAPIFactory();
     factory.importModels(bootstrapSchema);
 
-    factory.addResource('plugin-configs', '@cardstack/ephemeral');
-
     ephemeralDataSource = factory.addResource('data-sources')
         .withAttributes({
           sourceType: '@cardstack/ephemeral',

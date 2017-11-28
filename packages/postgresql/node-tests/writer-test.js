@@ -22,8 +22,6 @@ describe('postgresql/writer', function() {
 
     let factory = new JSONAPIFactory();
 
-    factory.addResource('plugin-configs', '@cardstack/postgresql');
-
     factory.addResource('data-sources')
       .withAttributes({
         'source-type': '@cardstack/postgresql',

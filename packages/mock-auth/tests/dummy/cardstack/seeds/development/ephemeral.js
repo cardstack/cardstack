@@ -3,10 +3,6 @@ const JSONAPIFactory = require('@cardstack/test-support/jsonapi-factory');
 
 module.exports = [
   {
-    type: 'plugin-configs',
-    id: '@cardstack/ephemeral'
-  },
-  {
     type: 'data-sources',
     id: 'default',
     attributes: {
