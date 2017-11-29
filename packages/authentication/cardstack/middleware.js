@@ -14,25 +14,19 @@ module.exports = declareInjections({
   encryptor: 'hub:encryptor',
   searcher: 'hub:searchers',
   writer: 'hub:writers',
-  schemaCache: 'hub:schema-cache'
+  sources: 'hub:data-sources',
+  controllingBranch: 'hub:controlling-branch'
 },
 
 class Authentication {
 
-  constructor() {
-
-    // TODO: move these two settings into config
-    this.controllingBranch = 'master';
-
-  }
-
   get userSearcher() {
     return {
       get: (type, userId) => {
-        return this.searcher.get(this.controllingBranch, type, userId);
+        return this.searcher.get(this.controllingBranch.name, type, userId);
       },
       search: (params) => {
-        return this.searcher.search(this.controllingBranch, params);
+        return this.searcher.search(this.controllingBranch.name, params);
       }
     };
   }
@@ -99,8 +93,8 @@ class Authentication {
   }
 
   async _locateAuthenticationSource(name) {
-    let schema = await this.schemaCache.schemaForControllingBranch();
-    let source = schema.dataSources.get(name);
+    let activeSources = await this.sources.active();
+    let source = activeSources.get(name);
     if (source && source.authenticator) {
       return source;
     }
@@ -184,11 +178,11 @@ class Authentication {
     }
 
     if (!have && source.mayCreateUser) {
-      return { data: await this.writer.create(this.controllingBranch, Session.INTERNAL_PRIVLEGED, user.data.type, user.data) };
+      return { data: await this.writer.create(this.controllingBranch.name, Session.INTERNAL_PRIVLEGED, user.data.type, user.data) };
     }
     if (have && source.mayUpdateUser) {
       user.data.meta = have.data.meta;
-      return { data: await this.writer.update(this.controllingBranch, Session.INTERNAL_PRIVLEGED, user.data.type, have.data.id, user.data) };
+      return { data: await this.writer.update(this.controllingBranch.name, Session.INTERNAL_PRIVLEGED, user.data.type, have.data.id, user.data) };
     }
     return have;
   }

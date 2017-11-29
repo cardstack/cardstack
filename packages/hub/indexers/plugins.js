@@ -2,8 +2,7 @@ const { declareInjections } = require('@cardstack/di');
 const { isEqual } = require('lodash');
 
 module.exports = declareInjections({
-  schemaCache: 'hub:schema-cache',
-  pluginLoader: 'hub:plugin-loader'
+  plugins: 'hub:plugins'
 },
 
 class PluginIndexer {
@@ -11,8 +10,7 @@ class PluginIndexer {
     return ['master'];
   }
   async beginUpdate(/* branch */) {
-    let schema = await this.schemaCache.schemaForControllingBranch();
-    return new Updater(schema.plugins);
+    return new Updater(await this.plugins.active());
   }
 });
 

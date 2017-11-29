@@ -22,7 +22,8 @@ const Schema = require('./schema');
 
 module.exports = declareInjections({
   seedModels: 'config:seed-models',
-  schemaLoader: 'hub:schema-loader'
+  schemaLoader: 'hub:schema-loader',
+  controllingBranch: 'hub:controlling-branch'
 },
 
 class SchemaCache {
@@ -42,16 +43,14 @@ class SchemaCache {
     }
   }
 
-  constructor({ seedModels, schemaLoader }) {
+  constructor({ seedModels, schemaLoader, controllingBranch }) {
     this.seedModels = bootstrapSchema.concat(seedModels || []);
     this.searcher = new Searcher();
-    this.searcher.schemaCache = new BootstrapSchemaCache(this.seedModels, this);
+    this.searcher.schema = new BootstrapSchemaCache(this.seedModels, this);
     this.cache = new Map();
     this.log = logger('schema-cache');
     this.schemaLoader = schemaLoader;
-
-    // TODO move this value into plugins-configs for @cardstack/hub.
-    this.controllingBranch = 'master';
+    this.controllingBranch = controllingBranch;
   }
 
   async schemaForBranch(branch) {
@@ -77,7 +76,7 @@ class SchemaCache {
   // present on the controlling branch. This makes it easier to reason
   // about who can do what.
   async schemaForControllingBranch() {
-    return this.schemaForBranch(this.controllingBranch);
+    return this.schemaForBranch(this.controllingBranch.name);
   }
 
   // Instantiates a Schema, while respecting any seedModels. This
@@ -162,7 +161,7 @@ class BootstrapSchemaCache {
     this.schema = null;
     this.schemaCache = schemaCache;
   }
-  async schemaForBranch() {
+  async forBranch() {
     if (!this.schema) {
       this.schema = await this.schemaCache.schemaFrom([]);
     }

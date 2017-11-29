@@ -64,8 +64,8 @@ exports.createDefaultEnvironment = async function(projectDir, initialModels = []
       session,
       user,
       async setUserId(id) {
-        let schema = await this.lookup('hub:schema-cache').schemaForControllingBranch();
-        let m = schema.plugins.lookupFeatureAndAssert('middleware', '@cardstack/test-support-authenticator');
+        let plugins = await this.lookup('hub:plugins').active();
+        let m = plugins.lookupFeatureAndAssert('middleware', '@cardstack/test-support-authenticator');
         m.userId = id;
       }
     });

@@ -3,22 +3,22 @@ const logger = require('@cardstack/plugin-utils/logger');
 const Error = require('@cardstack/plugin-utils/error');
 
 module.exports = declareInjections({
-  schemaCache: 'hub:schema-cache',
+  sources: 'hub:data-sources',
   internalSearcher: `plugin-searchers:${require.resolve('@cardstack/elasticsearch/searcher')}`
 },
 
 class Searchers {
   constructor() {
-    this._lastControllingSchema = null;
+    this._lastActiveSources = null;
     this._searchers = null;
     this.log = logger('searchers');
   }
 
   async _lookupSearchers() {
-    let schema = await this.schemaCache.schemaForControllingBranch();
-    if (schema !== this._lastControllingSchema) {
-      this._lastControllingSchema = schema;
-      this._searchers = [...schema.dataSources.values()].map(v => v.searcher).filter(Boolean);
+    let activeSources = await this.sources.active();
+    if (activeSources !== this._lastActiveSources) {
+      this._lastActiveSources = activeSources;
+      this._searchers = [...activeSources.values()].map(v => v.searcher).filter(Boolean);
       this._searchers.push(this.internalSearcher);
       this.log.debug('found %s searchers', this._searchers.length);
     }

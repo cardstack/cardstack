@@ -5,7 +5,7 @@ const toJSONAPI = require('./to-jsonapi');
 const { declareInjections } = require('@cardstack/di');
 
 module.exports = declareInjections({
-  schemaCache: 'hub:schema-cache'
+  schema: 'hub:current-schema'
 },
 
 class Searcher {
@@ -44,7 +44,7 @@ class Searcher {
 
   async search(branch, { queryString, filter, sort, page }) {
     await this._ensureClient();
-    let schema = await this.schemaCache.schemaForBranch(branch);
+    let schema = await this.schema.forBranch(branch);
     let esBody = {
       query: {
         bool: {
