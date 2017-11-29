@@ -523,6 +523,13 @@ const models = [
     attributes: {
       'source-type': '@cardstack/hub::plugins'
     }
+  },
+  {
+    type: 'data-sources',
+    id: 'seeds',
+    attributes: {
+      'source-type': '@cardstack/hub::seeds'
+    }
   }
 
 ];

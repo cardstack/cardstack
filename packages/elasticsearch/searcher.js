@@ -217,6 +217,7 @@ class Searcher {
   async _fieldFilter(branch, schema, aboveSegments, key, value) {
     let field;
 
+    // TODO: verify if we are still using these
     if (['cardstack_source', 'cardstack_references'].includes(key)) {
       // this is an internal field (meaning it's not visible in the
       // jsonapi records themselves) that we make available for

@@ -53,7 +53,7 @@ describe('hub/indexers', function() {
 
     it.skip("indexes plugin-config changes", async function() {
       // this test is deliberately writing directly to the ephemeral
-      // backend instead of going through hub:writeres. That ensures
+      // backend instead of going through hub:writers. That ensures
       // we aren't relying on side-effects from the writers.
       let doc = await env.lookup('hub:searchers').get('master', 'plugins', 'sample-plugin-one');
       expect(doc).has.deep.property('data.attributes.enabled', true);

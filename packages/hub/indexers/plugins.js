@@ -2,21 +2,32 @@ const { declareInjections } = require('@cardstack/di');
 const { isEqual } = require('lodash');
 
 module.exports = declareInjections({
-  plugins: 'hub:plugins'
+  pluginLoader: 'hub:plugin-loader'
 },
 
 class PluginIndexer {
   async branches() {
     return ['master'];
   }
-  async beginUpdate(/* branch */) {
-    return new Updater(await this.plugins.active());
+  async beginUpdate(branch, readOtherIndexers) {
+    return new Updater(this.pluginLoader, readOtherIndexers);
   }
 });
 
 class Updater {
-  constructor(plugins) {
-    this.plugins = plugins;
+  constructor(pluginLoader, readOtherIndexers) {
+    this.pluginLoader = pluginLoader;
+    this.readOtherIndexers = readOtherIndexers;
+    this._plugins = null;
+  }
+
+  async plugins() {
+    if (!this._plugins) {
+      let installedPlugins = await this.pluginLoader.installedPlugins();
+      let pluginConfigs = (await Promise.all(installedPlugins.map(plugin => this.readOtherIndexers('plugin-configs', plugin.id)))).filter(Boolean);
+      this._plugins = await this.pluginLoader.configuredPlugins(pluginConfigs);
+    }
+    return this._plugins;
   }
 
   async schema() {
@@ -24,7 +35,8 @@ class Updater {
   }
 
   async updateContent(meta, hints, ops) {
-    let plugins = this.plugins.describeAll();
+    let activePlugins = await this.plugins();
+    let plugins = activePlugins.describeAll();
     if (meta && isEqual(meta.plugins, plugins)) {
       return { plugins };
     }
@@ -32,7 +44,7 @@ class Updater {
     for (let plugin of plugins) {
       await ops.save('plugins', plugin.id, plugin);
       for (let { type, id } of plugin.relationships.features.data) {
-        await ops.save(type, id, this.plugins.describeFeature(type, id));
+        await ops.save(type, id, activePlugins.describeFeature(type, id));
       }
     }
     await ops.finishReplaceAll();
@@ -41,9 +53,9 @@ class Updater {
 
   async read(type, id /*, isSchema */) {
     if (type === 'plugins') {
-      return this.plugins.describe(id);
+      return (await this.plugins()).describe(id);
     } else {
-      return this.plugins.describeFeature(type, id);
+      return (await this.plugins()).describeFeature(type, id);
     }
   }
 }

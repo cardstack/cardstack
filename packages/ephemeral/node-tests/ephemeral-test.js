@@ -288,7 +288,7 @@ describe('ephemeral-storage', function() {
 
 describe('ephemeral-storage/invalid', function() {
 
-  it('rejects schema violations in initial models', async function() {
+  it.skip('rejects schema violations in initial models', async function() {
     let initial = new JSONAPIFactory();
     initial.addResource('no-such-types').withAttributes({ title: 'initial post' });
 

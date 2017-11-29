@@ -22,26 +22,60 @@
 
 const log = require('@cardstack/plugin-utils/logger')('indexers');
 const Client = require('@cardstack/elasticsearch/client');
+const toJSONAPI = require('@cardstack/elasticsearch/to-jsonapi');
 const { declareInjections } = require('@cardstack/di');
 const { uniqBy } = require('lodash');
 const owningDataSource = new WeakMap();
+const bootstrapSchema = require('./bootstrap-schema');
+const { flatten } = require('lodash');
 
 require('./diff-log-formatter');
 
 module.exports = declareInjections({
-  schemaCache: 'hub:schema-cache',
-  searchers: 'hub:searchers'
+  schemaLoader: 'hub:schema-loader',
+  seedModels: 'config:seed-models'
 },
 
 class Indexers {
   constructor() {
-    this.client = null;
-    this._lastControllingSchema = null;
-    this._seenBranches = new Map();
-    this._indexers = null;
+    this._clientMemo = null;
     this._running = false;
     this._queue = [];
     this._realTimeQueue = [];
+    this._seedSchemaMemo = null;
+    this._schemaCache = null;
+  }
+
+  async schemaForBranch(branch) {
+    if (!this._schemaCache) {
+      this._schemaCache = (async () => {
+        let running = new RunningIndexers(await this._seedSchema(), await this._client());
+        try {
+          return await running.schemas();
+        } finally {
+          running.destroy();
+        }
+      })();
+    }
+    return (await this._schemaCache)[branch];
+  }
+
+  invalidateSchemaCache() {
+    if (this._schemaCache) {
+      this._schemaCache.then(cache => {
+        for (let schema of Object.values(cache)) {
+          schema.teardown();
+        }
+      });
+    }
+    this._schemaCache = null;
+  }
+
+  static teardown(instance) {
+    instance.invalidateSchemaCache();
+    if (instance._seedSchemaMemo) {
+      instance._seedSchemaMemo.teardown();
+    }
   }
 
   async update({ realTime, hints } = {}) {
@@ -50,7 +84,6 @@ class Indexers {
       resolve = r;
       reject = j;
     });
-    await this._ensureClient();
     if (realTime) {
       this._realTimeQueue.push({ hints, resolve, reject });
     } else {
@@ -68,10 +101,19 @@ class Indexers {
     await promise;
   }
 
-  async _ensureClient() {
-    if (!this.client) {
-      this.client = await Client.create();
+  async _client() {
+    if (!this._clientMemo) {
+      this._clientMemo = await Client.create();
     }
+    return this._clientMemo;
+  }
+
+  async _seedSchema() {
+    if (!this._seedSchemaMemo) {
+      let types = this.schemaLoader.ownTypes();
+      this._seedSchemaMemo = await this.schemaLoader.loadFrom(bootstrapSchema.concat(this.seedModels.filter(model => types.includes(model.type))));
+    }
+    return this._seedSchemaMemo;
   }
 
   async _updateLoop() {
@@ -117,60 +159,18 @@ class Indexers {
 
   async _doUpdate(realTime, hints) {
     log.debug('begin update, realTime=%s', realTime);
-    let branches = await this._branches(hints);
+    let priorCache = this._schemaCache;
+    let running = new RunningIndexers(await this._seedSchema(), await this._client());
     try {
-      await Promise.all(Object.keys(branches).map(
-        branchName => this._updateBranch(branchName, branches[branchName], realTime, hints)
-      ));
+      let schemas = await running.update(realTime, hints);
+      if (this._schemaCache === priorCache) {
+        this._schemaCache = Promise.resolve(schemas);
+      }
     } finally {
-      Object.values(branches).map(updaters => updaters.forEach(updater => {
-        if (typeof updater.destroy === 'function') {
-          updater.destroy();
-        }
-      }));
+      running.destroy();
     }
     log.debug('end update, realTime=%s', realTime);
   }
-
-  async _updateBranch(branch, updaters, realTime, hints) {
-    let branchUpdater = new BranchUpdate(branch, updaters, realTime, hints, !this._seenBranches.has(branch), this.client, this.schemaCache, this.searchers);
-    let token = this.schemaCache.prepareBranchUpdate(branch);
-    let schema = await branchUpdater.run();
-    this._seenBranches.set(branch, true);
-    this.schemaCache.notifyBranchUpdate(branch, schema, token);
-  }
-
-  async _lookupIndexers() {
-    let schema = await this.schemaCache.schemaForControllingBranch();
-    if (schema !== this._lastControllingSchema) {
-      this._lastControllingSchema = schema;
-      this._indexers = [...schema.dataSources.values()].map(v => {
-        if (v.indexer) {
-          owningDataSource.set(v.indexer, v);
-          return v.indexer;
-        }
-      }).filter(Boolean);
-      log.debug('found %s indexers', this._indexers.length);
-    }
-    return this._indexers;
-  }
-
-  async _branches() {
-    let indexers = await this._lookupIndexers();
-    let branches = {};
-    await Promise.all(indexers.map(async indexer => {
-      for (let branch of await indexer.branches()) {
-        if (!branches[branch]) {
-          branches[branch] = [];
-        }
-        let updater = await indexer.beginUpdate(branch);
-        owningDataSource.set(updater, owningDataSource.get(indexer));
-        branches[branch].push(updater);
-      }
-    }));
-    return branches;
-  }
-
 
 });
 
@@ -210,45 +210,136 @@ class Operations {
   }
 }
 
-class BranchUpdate {
-  constructor(branch, updaters, realTime, hints, shouldIndexSeeds, client, schemaCache, searchers) {
-    this.branch = branch;
-    this.updaters = updaters;
-    this.hints = hints;
-    this.schema = null;
-    this.bulkOps = client.bulkOps({ realTime });
-    this.shouldIndexSeeds = shouldIndexSeeds;
+class RunningIndexers {
+  constructor(seedSchema, client) {
+    this.seedSchema = seedSchema;
     this.client = client;
-    this.schemaCache = schemaCache;
-    this.searchers = searchers;
+    this.seenDataSources = {};
+    this.branches = {};
+  }
+
+  destroy() {
+    for (let branchUpdate of Object.values(this.branches)) {
+      branchUpdate.destroy();
+    }
+  }
+
+  _findIndexer(dataSource) {
+    if (dataSource.indexer) {
+      owningDataSource.set(dataSource.indexer, dataSource);
+      this.seenDataSources[dataSource.id] = true;
+      return dataSource.indexer;
+    }
+  }
+
+  async _loadSchemas() {
+    let newIndexers = [...this.seedSchema.dataSources.values()]
+        .map(this._findIndexer.bind(this))
+        .filter(Boolean);
+    while (newIndexers.length > 0) {
+      let dirtyBranches = await this._activateIndexers(newIndexers);
+      newIndexers = [];
+      await Promise.all(dirtyBranches.map(async branch => {
+        let schema = await this.branches[branch].schema();
+        for (let dataSource of schema.dataSources.values()) {
+          if (!this.seenDataSources[dataSource.id]) {
+            let indexer = this._findIndexer(dataSource);
+            if (indexer) {
+              newIndexers.push(dataSource.indexer);
+            }
+          }
+        }
+      }));
+    }
+  }
+
+  async _activateIndexers(indexers) {
+    let dirtyBranches = {};
+    await Promise.all(indexers.map(async indexer => {
+      for (let branch of await indexer.branches()) {
+        dirtyBranches[branch] = true;
+        if (!this.branches[branch]) {
+          this.branches[branch] = new BranchUpdate(branch, this.seedSchema, this.client);
+        }
+        await this.branches[branch].addIndexer(indexer);
+      }
+    }));
+    return Object.keys(dirtyBranches);
+  }
+
+  async update(realTime, hints) {
+    await this._loadSchemas();
+    await Promise.all(Object.values(this.branches).map(branch => branch.update(realTime, hints)));
+    return await this._schemas();
+  }
+
+  async schemas() {
+    await this._loadSchemas();
+    return await this._schemas();
+  }
+
+  async _schemas() {
+    let schemas = Object.create(null);
+    for (let [branch, branchUpdate] of Object.entries(this.branches)) {
+      schemas[branch] = await branchUpdate.schema();
+    }
+    return schemas;
+  }
+}
+
+class BranchUpdate {
+  constructor(branch, seedSchema, client) {
+    this.branch = branch;
+    this.seedSchema = seedSchema;
+    this.client = client;
+    this.updaters = [];
+    this.schemaModels = [];
+    this._schema = null;
+    this.bulkOps = null;
     this._touched = Object.create(null);
   }
 
-  async run() {
-    this.schema = await this._updateSchema();
-    await this.client.accomodateSchema(this.branch, this.schema);
-    await this._updateContent();
-    return this.schema;
+  async addIndexer(indexer) {
+    let updater = await indexer.beginUpdate(this.branch, this.read.bind(this));
+    owningDataSource.set(updater, owningDataSource.get(indexer));
+    this.schemaModels.push(await updater.schema());
+    if (this._schema) {
+      this._schema.teardown();
+      this._schema = null;
+    }
+    this.updaters.push(updater);
   }
 
-  async _updateSchema() {
-    let models = [];
+  async schema() {
+    if (!this._schema) {
+      this._schema = await this.seedSchema.applyChanges(flatten(this.schemaModels).map(model => ({ type: model.type, id: model.id, document: model })));
+    }
+    return this._schema;
+  }
+
+  destroy() {
+    if (this._schema) {
+      this._schema.teardown();
+    }
     for (let updater of this.updaters) {
-      models = models.concat(await updater.schema());
+      if (typeof updater.destroy === 'function') {
+        updater.destroy();
+      }
     }
-    return this.schemaCache.schemaFrom(models);
   }
 
-  async _updateContent() {
-    if (this.shouldIndexSeeds) {
-      let publicOps = Operations.create(this, '__cardstack_seed_models__');
-      await this.schemaCache.indexBaseContent(publicOps);
-    }
+  async update(realTime, hints) {
+    this.bulkOps = this.client.bulkOps({ realTime });
+    await this.client.accomodateSchema(this.branch, await this.schema());
+    await this._updateContent(hints);
+  }
+
+  async _updateContent(hints) {
     for (let updater of this.updaters) {
       let meta = await this._loadMeta(updater);
       let sourceId = owningDataSource.get(updater).id;
       let publicOps = Operations.create(this, sourceId);
-      let newMeta = await updater.updateContent(meta, this.hints, publicOps);
+      let newMeta = await updater.updateContent(meta, hints, publicOps);
       await this._saveMeta(updater, newMeta);
     }
     await this._invalidations();
@@ -274,23 +365,46 @@ class BranchUpdate {
     }, newMeta);
   }
 
+  async _findTouchedReferences() {
+    let size = 100;
+    let esBody = {
+      query: {
+        bool: {
+          must: [
+            { terms: { cardstack_references : Object.keys(this._touched) } }
+          ],
+        }
+      },
+      size
+    };
+
+    let result = await this.client.es.search({
+      index: Client.branchToIndexName(this.branch),
+      body: esBody
+    });
+
+    let docs = result.hits.hits;
+    if (docs.length === size) {
+      throw new Error("Bug in hub:indexers: need to process larger invalidation sets");
+    }
+    return docs.map(doc => toJSONAPI(doc._type, doc._source).data);
+  }
+
   // This method does not need to recursively invalidate, because each
   // document stores a complete, rolled-up picture of which other
   // documents it references.
   async _invalidations() {
-    let filter = {
-      cardstack_references: Object.keys(this._touched)
-    };
-    let result = await this.searchers.search(this.branch, { filter, page: { size: 100 } });
+    let schema = await this.schema();
     let pendingOps = [];
-    for (let { type, id } of result.data) {
+    let references = await this._findTouchedReferences();
+    for (let { type, id } of references) {
       let key = `${type}/${id}`;
       if (!this._touched[key]) {
         this._touched[key] = true;
         pendingOps.push((async ()=> {
           let resource = await this.read(type, id);
           if (resource) {
-            let sourceId = this.schema.types.get(type).dataSource.id;
+            let sourceId = schema.types.get(type).dataSource.id;
             let nonce = 0;
             await this.add(type, id, resource, sourceId, nonce);
           }
@@ -301,7 +415,8 @@ class BranchUpdate {
   }
 
   async read(type, id) {
-    let contentType = this.schema.types.get(type);
+    let schema = await this.schema();
+    let contentType = schema.types.get(type);
     if (!contentType) { return; }
     let source = contentType.dataSource;
     if (!source) { return; }
@@ -310,7 +425,7 @@ class BranchUpdate {
       return s && s.id === source.id;
     });
     if (!updater) { return; }
-    return updater.read(type, id, this.schema.isSchemaType(type));
+    return updater.read(type, id, schema.isSchemaType(type));
   }
 
   async add(type, id, doc, sourceId, nonce) {
@@ -364,6 +479,8 @@ class BranchUpdate {
 
 
   async _prepareSearchDoc(type, id, jsonapiDoc, searchTree, parentsIncludes, parentsReferences) {
+    let schema = await this.schema();
+
     // we store the id as a regular field in elasticsearch here, because
     // we use elasticsearch's own built-in _id for our own composite key
     // that takes into account branches.
@@ -404,7 +521,7 @@ class BranchUpdate {
       pristine.data.attributes = jsonapiDoc.attributes;
       for (let attribute of Object.keys(jsonapiDoc.attributes)) {
         let value = jsonapiDoc.attributes[attribute];
-        let field = this.schema.fields.get(attribute);
+        let field = schema.fields.get(attribute);
         if (field) {
           let derivedFields = field.derivedFields(value);
           if (derivedFields) {
@@ -424,12 +541,12 @@ class BranchUpdate {
       if (!searchTree) {
         // we are the root document, so our own configured default
         // includes determines which relationships to recurse into
-        searchTree = this.schema.types.get(type).includesTree;
+        searchTree = schema.types.get(type).includesTree;
       }
 
       for (let attribute of Object.keys(jsonapiDoc.relationships)) {
         let value = jsonapiDoc.relationships[attribute];
-        let field = this.schema.fields.get(attribute);
+        let field = schema.fields.get(attribute);
         if (field && value && value.hasOwnProperty('data')) {
           let related;
           if (value.data && searchTree[attribute]) {
