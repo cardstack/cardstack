@@ -16,7 +16,8 @@
   "scripts": {
     "build": "ember build",
     "start": "ember serve",
-    "test": "ember try:each"
+    "test": "ember try:each",
+    "node-tests": "mocha ../test-support/bin/run.js"
   },
   "dependencies": {
     "ember-cli-babel": "^6.8.2",
@@ -28,6 +29,7 @@
   },
   "devDependencies": {
     "@cardstack/eslint-config": "^0.3.4",
+    "@glimmer/syntax": "^0.25.6",
     "broccoli-asset-rev": "^2.4.5",
     "ember-cli": "https://github.com/ember-cli/ember-cli#a4734540b3889c7f6ef304fe6a81dd356f77bfe4",
     "ember-cli-dependency-checker": "^2.1.0",
