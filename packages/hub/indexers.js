@@ -20,7 +20,7 @@
 
 */
 
-const logger = require('@cardstack/plugin-utils/logger');
+const log = require('@cardstack/plugin-utils/logger')('indexers');
 const Client = require('@cardstack/elasticsearch/client');
 const { declareInjections } = require('@cardstack/di');
 const { uniqBy } = require('lodash');
@@ -36,7 +36,6 @@ module.exports = declareInjections({
 class Indexers {
   constructor() {
     this.client = null;
-    this.log = logger('indexers');
     this._lastControllingSchema = null;
     this._seenBranches = new Map();
     this._indexers = null;
@@ -59,12 +58,12 @@ class Indexers {
     }
     if (!this._running) {
       this._updateLoop().then(() => {
-        this.log.debug("Update loop finished");
+        log.debug("Update loop finished");
       }, err => {
-        this.log.error("Unexpected error in _updateLoop %s", err);
+        log.error("Unexpected error in _updateLoop %s", err);
       });
     } else {
-      this.log.debug("Joining update loop");
+      log.debug("Joining update loop");
     }
     await promise;
   }
@@ -117,7 +116,7 @@ class Indexers {
   }
 
   async _doUpdate(realTime, hints) {
-    this.log.debug('begin update, realTime=%s', realTime);
+    log.debug('begin update, realTime=%s', realTime);
     let branches = await this._branches(hints);
     try {
       await Promise.all(Object.keys(branches).map(
@@ -130,11 +129,11 @@ class Indexers {
         }
       }));
     }
-    this.log.debug('end update, realTime=%s', realTime);
+    log.debug('end update, realTime=%s', realTime);
   }
 
   async _updateBranch(branch, updaters, realTime, hints) {
-    let branchUpdater = new BranchUpdate(branch, updaters, realTime, hints, !this._seenBranches.has(branch), this.log, this.client, this.schemaCache, this.searchers);
+    let branchUpdater = new BranchUpdate(branch, updaters, realTime, hints, !this._seenBranches.has(branch), this.client, this.schemaCache, this.searchers);
     let token = this.schemaCache.prepareBranchUpdate(branch);
     let schema = await branchUpdater.run();
     this._seenBranches.set(branch, true);
@@ -151,7 +150,7 @@ class Indexers {
           return v.indexer;
         }
       }).filter(Boolean);
-      this.log.debug('found %s indexers', this._indexers.length);
+      log.debug('found %s indexers', this._indexers.length);
     }
     return this._indexers;
   }
@@ -212,14 +211,13 @@ class Operations {
 }
 
 class BranchUpdate {
-  constructor(branch, updaters, realTime, hints, shouldIndexSeeds, log, client, schemaCache, searchers) {
+  constructor(branch, updaters, realTime, hints, shouldIndexSeeds, client, schemaCache, searchers) {
     this.branch = branch;
     this.updaters = updaters;
     this.hints = hints;
     this.schema = null;
     this.bulkOps = client.bulkOps({ realTime });
     this.shouldIndexSeeds = shouldIndexSeeds;
-    this.log = log;
     this.client = client;
     this.schemaCache = schemaCache;
     this.searchers = searchers;
@@ -329,7 +327,7 @@ class BranchUpdate {
         _id: `${this.branch}/${id}`,
       }
     }, searchDoc);
-    this.log.debug("save %s %s", type, id);
+    log.debug("save %s %s", type, id);
   }
 
   async delete(type, id) {
@@ -341,7 +339,7 @@ class BranchUpdate {
         _id: `${this.branch}/${id}`
       }
     });
-    this.log.debug("delete %s %s", type, id);
+    log.debug("delete %s %s", type, id);
   }
 
   async deleteAllWithoutNonce(sourceId, nonce) {
@@ -361,7 +359,7 @@ class BranchUpdate {
         }
       }
     });
-    this.log.debug("bulk delete older content for data source %s", sourceId);
+    log.debug("bulk delete older content for data source %s", sourceId);
   }
 
 
