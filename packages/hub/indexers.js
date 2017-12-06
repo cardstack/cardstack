@@ -1,22 +1,38 @@
 /*
-  Indexer deals with indexing documents. It's public API is just
-  `update`, which is responsible for getting any new upstream content
-  into the search index.
+  Indexer deals with indexing documents. Its public API is
 
-  update takes these optional arguments:
+    `update`: responsible for getting any new upstream content into
+      the search index. update takes these optional arguments:
 
-    - realTime: when true, update will block until the resulting
-      changes are visible in elasticsearch. This is somewhat
-      expensive, which is why we make it optional. Most of the time
-      non-realtime is good enough and much faster. Defaults to false.
+      - realTime: when true, update will block until the resulting
+        changes are visible in elasticsearch. This is somewhat
+        expensive, which is why we make it optional. Most of the time
+        non-realtime is good enough and much faster. Defaults to false.
 
-    - hints: can contain a list of `{ branch, id, type }`
-      references. This is intended as an optimization hint when we
-      know that certain resources are the ones that likely need to be
-      indexed right away. Indexers are responsible for discovering and
-      indexing arbitrary upstream changes regardless of this hint, but
-      the hint can make it easier to keep the search index nearly
-      real-time fresh.
+      - hints: can contain a list of `{ branch, id, type }`
+        references. This is intended as an optimization hint when we
+        know that certain resources are the ones that likely need to be
+        indexed right away. Indexers are responsible for discovering and
+        indexing arbitrary upstream changes regardless of this hint, but
+        the hint can make it easier to keep the search index nearly
+        real-time fresh.
+
+    `schemaForBranch(branch)`: retrieves the Schema for a given
+      branch. A Schema instance is computed from all the schema models
+      that are discovered on a branch. Schema models are things like
+      `content-types`, `fields`, `data-sources`, `plugin-configs`,
+      etc. They are pieces of content, but special pieces of content
+      that can alter how other content gets indexed.
+
+      This method does it own caching, since schemas get computed as
+      part of indexing anyway. You can also directly invalidate the
+      cache, see next method.
+
+    `invalidateSchemaCache()`: does what it says on the
+      tin. This is a lighter-weight operation than `update`. It allows
+      us to decouple the question of when and how to index content
+      from the issue of maintaining schema correctness during
+      sequences of writes.
 
 */
 
