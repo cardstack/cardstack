@@ -25,7 +25,6 @@
   "dependencies": {
     "@cardstack/authentication": "^0.4.1",
     "@cardstack/plugin-utils": "^0.4.1",
-    "@cardstack/di": "^0.3.2",
     "@cardstack/hub": "^0.4.1",
     "ember-cli-babel": "^6.8.2",
     "ember-cli-htmlbars": "^2.0.1",

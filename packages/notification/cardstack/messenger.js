@@ -7,10 +7,10 @@ module.exports = declareInjections({
 },
 
 class NotificationMessenger {
-  send({userId, body}) {
-    assert(userId, "A user-notification` message must have a userId property");
-    logger.info(`send message to room user:${userId}: ${JSON.stringify(body, null, 2)}`);
-    this.service.server.to(`user:${userId}`).emit("notification", body);
+  send({type, id, body}) {
+    assert(type && id, "A socket-notification` message must have a 'type' and an 'id' property");
+    logger.info(`send message to room ${type}:${id}: ${JSON.stringify(body, null, 2)}`);
+    this.service.server.to(`${type}:${id}`).emit("notification", body);
   }
 });
 

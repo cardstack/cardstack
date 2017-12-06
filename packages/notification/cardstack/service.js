@@ -1,7 +1,9 @@
 const log = require('@cardstack/plugin-utils/logger')('cardstack/notification');
 const Session = require('@cardstack/plugin-utils/session');
 const { declareInjections } = require('@cardstack/di');
-const messengerName = 'user-notification';
+const messengerName = 'socket-notification';
+
+const DEFAULT_SOCKET_IO_PORT = 3100;
 
 module.exports = declareInjections({
   encryptor: 'hub:encryptor',
@@ -44,56 +46,79 @@ class NotificationService {
     };
   }
 
+  // TODO is this the right place for this?
+  // The goal of this method is to provide type specific socket validation,
+  // as some notification types will require authorization in order to connect (like users)
+  get socketSubscriber() {
+    return {
+      users: (socket, id, token) => {
+        let session = this._tokenToSession(token);
+
+        if (!session || !session.payload || session.payload.id !== id) {
+          socket.emit("invalid-session", { error: `Cannot subscribe to user '${id}' with token '${token}', invalid token supplied` });
+          return;
+        }
+        log.info(`Socket id '${socket.id}' identified as user '${id}'`);
+        socket.join(`users:${id}`);
+        log.debug(`joined '${socket.id}' to room 'user:${id}'`);
+      }
+    };
+  }
+
   async start() {
     if (this.hasStarted) { return; }
 
     this.hasStarted = true;
 
-    await this.messengers.getMessenger(messengerName).then(({ socketIoUrl }) => {
-      if (!socketIoUrl) {
-        log.error(`Cannot start socket.io server, no 'socketIoUrl' defined for the '${messengerName}' resouce`);
-        return;
-      }
+    await this.messengers.getMessenger(messengerName).then(({
+      internalSocketIoPort,
+      internalSocketIoPath,
+      notificationTest
+    }) => {
+      internalSocketIoPath = internalSocketIoPath || '/';
+      internalSocketIoPort = internalSocketIoPort || DEFAULT_SOCKET_IO_PORT;
 
-      //TODO how do we know this server is actually the host referenced in the scocket.io URL?
-      let [ /*url*/, protocol, /*host*/, port, path ] = socketIoUrl.match(/^(http[s]?):\/\/([^:\/]+)(:[\d]+)?(\/.*)?$/);
-      path = path || '/';
-
-      if (protocol === "http") {
-        port = (port || "80").replace(':', '');
-      } else if (protocol === "https") {
-        port = (port || "443").replace(':', '');
-      }
-      if (!port || !path) {
-        log.error(`Cannot start socket.io server, cannot derive the server port and path from the 'socketIoUrl' ${socketIoUrl} for the '${messengerName}' resource`);
-        return;
-      }
-
-      log.info(`starting socket.io on port ${port} at path ${path}`);
-      this.server = require('socket.io')(port, {
-        path,
+      log.info(`starting socket.io on port ${internalSocketIoPort} at path ${internalSocketIoPath}`);
+      this.server = require('socket.io')(internalSocketIoPort, {
+        internalSocketIoPath,
         serveClient: false,
       });
 
       this.server.on("connection", socket => {
         log.debug(`Received a connection, socket id '${socket.id}'`);
 
-        socket.on('user', ({ userId, token }) => {
-          let session = this._tokenToSession(token);
-
-          if (!session || !session.payload || session.payload.id !== userId) {
-            socket.emit("invalid-session");
-            return;
+        socket.on('subscribe', ({ type, id, token }) => {
+          if (typeof this.socketSubscriber[type] === "function") {
+            this.socketSubscriber[type](socket, id, token);
+          } else {
+            socket.join(`${type}:${id}`);
+            log.debug(`joined '${socket.id}' to room '${type}:${id}'`);
           }
-
-          log.info(`Socket id '${socket.id}' identified as user '${userId}'`);
-          socket.join(`user:${userId}`);
-          log.debug(`joined '${socket.id}' to room 'user:${userId}'`);
         });
+
+        socket.on('unsubscribe', ({ type, id }) => {
+          socket.leave(`${type}:${id}`);
+        });
+
         socket.on('disconnect', () => {
-          log.debug(`user disconnected, socket id '${socket.id}'`);
+          log.debug(`socket disconnected, socket id '${socket.id}'`);
         });
       });
+
+      // TODO move this into a seperate place--how about the dummy app?
+      if (notificationTest) {
+        let { userType, userId, messageType, intervalSec } = notificationTest;
+        setInterval(async () => {
+          let user = await this.userSearcher.get(userType, 'user1');
+          console.log("GOT USER", user);
+
+          this.messengers.send(messengerName, {
+            type: messageType,
+            id: notificationTest.id,
+            body: `The time is now ${new Date()}`
+          });
+        }, notificationTest.intervalSec * 1000);
+      }
     });
 
   }

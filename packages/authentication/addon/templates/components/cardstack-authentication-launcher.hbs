@@ -18,10 +18,3 @@
     Log out
   </a>
 {{/if}}
-
-{{!-- make sure to render this component outside of the
-     `isAuthenticated` block so that it can disconnect
-     when users logs out --}}
-{{#if (is-component "cardstack-notification")}}
-  {{cardstack-notification}}
-{{/if}}

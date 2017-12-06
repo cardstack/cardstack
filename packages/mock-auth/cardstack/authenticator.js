@@ -1,9 +1,4 @@
 const Error = require('@cardstack/plugin-utils/error');
-const { declareInjections } = require('@cardstack/di');
-
-module.exports = declareInjections({
-  messengers: 'hub:messengers'
-},
 
 class Authenticator {
   static create(...args) {
@@ -28,19 +23,6 @@ class Authenticator {
 
     if (mockUser) {
       mockUser.id = payload.authorizationCode;
-
-      // TODO also remove di in package.json & cleanup yarn.lock when you remove this silly test
-      // silly test
-      setTimeout(() => {
-        this.messengers.send('user-notification', {
-          userId: mockUser.id,
-          body: 'yo matey'
-        });
-        // let messenger = await this.messengers.getMessenger('user-notification');
-        // let sentMessages = await messenger.getSentMessages();
-        // console.log("=============> SENT MESSAGES", JSON.stringify(sentMessages, null, 2));
-      }, 5000);
-
       return mockUser;
     }
 
@@ -54,4 +36,6 @@ class Authenticator {
     return { mockEnabled: true };
   }
 
-});
+}
+
+module.exports = Authenticator;
