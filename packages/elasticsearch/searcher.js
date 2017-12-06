@@ -5,7 +5,7 @@ const toJSONAPI = require('./to-jsonapi');
 const { declareInjections } = require('@cardstack/di');
 
 module.exports = declareInjections({
-  schemaCache: 'hub:schema-cache'
+  schema: 'hub:current-schema'
 },
 
 class Searcher {
@@ -44,7 +44,7 @@ class Searcher {
 
   async search(branch, { queryString, filter, sort, page }) {
     await this._ensureClient();
-    let schema = await this.schemaCache.schemaForBranch(branch);
+    let schema = await this.schema.forBranch(branch);
     let esBody = {
       query: {
         bool: {
@@ -217,7 +217,7 @@ class Searcher {
   async _fieldFilter(branch, schema, aboveSegments, key, value) {
     let field;
 
-    if (['cardstack_source', 'cardstack_references'].includes(key)) {
+    if (['cardstack_source'].includes(key)) {
       // this is an internal field (meaning it's not visible in the
       // jsonapi records themselves) that we make available for
       // filtering. The schema-cache uses this to avoid shadowing seed

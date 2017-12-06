@@ -10,9 +10,9 @@ module.exports = declareInjections({
   service: `plugin-services:${require.resolve('./service')}`
 }, class Writer {
 
-  async storage() {
+  get storage() {
     if (!this._storage) {
-      this._storage = await this.service.storageForDataSource(this.dataSource.id, this.initialModels);
+      this._storage = this.service.findStorage(this.dataSource.id);
     }
     return this._storage;
   }
@@ -27,9 +27,8 @@ module.exports = declareInjections({
       id = this._generateId();
     }
 
-    let storage = await this.storage();
 
-    if (storage.lookup(type, id)) {
+    if (this.storage.lookup(type, id)) {
       throw new Error(`id ${id} is already in use`, { status: 409, source: { pointer: '/data/id'}});
     }
 
@@ -43,7 +42,7 @@ module.exports = declareInjections({
     }
 
     let pending = new PendingChange(null, storedDocument, finalizer);
-    pendingChanges.set(pending, { type, id, storage, isSchema: isSchema });
+    pendingChanges.set(pending, { type, id, storage: this.storage, isSchema: isSchema });
     return pending;
   }
 
@@ -59,8 +58,7 @@ module.exports = declareInjections({
       throw new Error(`${type} may not be patched`, { status: 400 });
     }
 
-    let storage = await this.storage();
-    let before = storage.lookup(type, id);
+    let before = this.storage.lookup(type, id);
     if (!before) {
       throw new Error(`${type} with id ${id} does not exist`, {
         status: 404,
@@ -69,7 +67,7 @@ module.exports = declareInjections({
     }
     let after = patch(before, document);
     let pending = new PendingChange(before, after, finalizer);
-    pendingChanges.set(pending, { type, id, storage, isSchema, ifMatch: document.meta.version });
+    pendingChanges.set(pending, { type, id, storage: this.storage, isSchema, ifMatch: document.meta.version });
     return pending;
   }
 
@@ -85,8 +83,7 @@ module.exports = declareInjections({
       throw new Error(`${type} may not be deleted`, { status: 400 });
     }
 
-    let storage = await this.storage();
-    let before = storage.lookup(type, id);
+    let before = this.storage.lookup(type, id);
     if (!before) {
       throw new Error(`${type} with id ${id} does not exist`, {
         status: 404,
@@ -94,7 +91,7 @@ module.exports = declareInjections({
       });
     }
     let pending = new PendingChange(before, null, finalizer);
-    pendingChanges.set(pending, { type, id, storage, isSchema, ifMatch: version });
+    pendingChanges.set(pending, { type, id, storage: this.storage, isSchema, ifMatch: version });
     return pending;
   }
 

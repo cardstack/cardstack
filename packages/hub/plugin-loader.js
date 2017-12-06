@@ -257,7 +257,10 @@ class ConfiguredPlugins {
   }
 
   describeAll() {
-    return Object.values(this._plugins);
+    if (!this._describeAllCache) {
+      this._describeAllCache = Object.values(this._plugins);
+    }
+    return this._describeAllCache;
   }
 
   describe(pluginName) {

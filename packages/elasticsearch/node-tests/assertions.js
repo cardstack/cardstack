@@ -44,7 +44,10 @@ module.exports = class ElasticAsserter {
   }
   async indexerState(branch, dataSourceId) {
     await this._ensureClient();
-    return this.client.es.getSource({ index: Client.branchToIndexName(branch), type: 'meta', id: dataSourceId });
+    let doc = await this.client.es.getSource({ index: Client.branchToIndexName(branch), type: 'meta', id: dataSourceId });
+    if (doc) {
+      return doc.params;
+    }
   }
   async deleteContentIndices() {
     await this._ensureClient();

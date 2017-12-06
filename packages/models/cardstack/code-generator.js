@@ -69,12 +69,12 @@ define('{{target}}', ['exports', '{{source}}'], function (exports, _source) {
 `);
 
 module.exports = declareInjections({
-  schemaCache: 'hub:schema-cache'
+  schema: 'hub:current-schema'
 },
 
 class CodeGenerator {
   async generateCode(appModulePrefix, branch) {
-    let schema = await this.schemaCache.schemaForBranch(branch);
+    let schema = await this.schema.forBranch(branch);
     let modules = [];
 
     for (let type of schema.types.values()) {
