@@ -51,7 +51,7 @@ describe('hub/indexers', function() {
     beforeEach(setup);
     afterEach(teardown);
 
-    it.skip("indexes plugin-config changes", async function() {
+    it("indexes plugin-config changes", async function() {
       // this test is deliberately writing directly to the ephemeral
       // backend instead of going through hub:writers. That ensures
       // we aren't relying on side-effects from the writers.
@@ -66,7 +66,7 @@ describe('hub/indexers', function() {
       };
       let activeSources = await env.lookup('hub:data-sources').active();
       let source = [...activeSources.values()].find(s => s.sourceType === '@cardstack/ephemeral');
-      let storage = await source.writer.storage();
+      let storage = await source.writer.storage;
       storage.store(config.type, config.id, config, false, null);
       await env.lookup('hub:indexers').update({ realTime: true });
       doc = await env.lookup('hub:searchers').get('master', 'plugins', 'sample-plugin-one');
