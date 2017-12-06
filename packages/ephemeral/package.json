@@ -9,7 +9,8 @@
   },
   "dependencies": {
     "@cardstack/di": "^0.3.4",
-    "@cardstack/plugin-utils": "^0.4.1"
+    "@cardstack/plugin-utils": "^0.4.1",
+    "lodash": "^4.17.4"
   },
   "devDependencies": {
     "@cardstack/eslint-config": "^0.3.4",

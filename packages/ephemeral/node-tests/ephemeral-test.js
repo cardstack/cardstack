@@ -298,7 +298,7 @@ describe('ephemeral-storage', function() {
 
   describe('invalid', function() {
 
-    it('rejects schema violations in initial models', async function() {
+    it('rejects an initial data model that violates schema', async function() {
       let initial = new JSONAPIFactory();
       initial.addResource('no-such-types').withAttributes({ title: 'initial post' });
 
@@ -315,9 +315,33 @@ describe('ephemeral-storage', function() {
         await createDefaultEnvironment(__dirname + '/../../../tests/ephemeral-test-app', factory.getModels());
         throw new Error("should not get here");
       } catch(err) {
-        expect(err.message).to.equal('"no-such-types" is not a writable type');
+        expect(err.message).to.equal('"no-such-types" is not a valid type');
       }
     });
+
+    it('rejects an initial schema model that violates bootstrap schema', async function() {
+      let initial = new JSONAPIFactory();
+      initial.addResource('content-types', 'animals').withRelated('fields', [
+        { type: 'fields', id: 'not-a-real-field' }
+      ]);
+
+      let factory = new JSONAPIFactory();
+
+      factory.addResource('data-sources').withAttributes({
+        sourceType: '@cardstack/ephemeral',
+        params: {
+          initialModels: initial.getModels()
+        }
+      });
+
+      try {
+        await createDefaultEnvironment(__dirname + '/../../../tests/ephemeral-test-app', factory.getModels());
+        throw new Error("should not get here");
+      } catch(err) {
+        expect(err.message).to.equal('content type "animals" refers to missing field "not-a-real-field"');
+      }
+    });
+
   });
 
 

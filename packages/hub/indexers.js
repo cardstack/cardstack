@@ -308,7 +308,7 @@ class BranchUpdate {
     this.branch = branch;
     this.seedSchema = seedSchema;
     this.client = client;
-    this.updaters = [];
+    this.updaters = Object.create(null);
     this.schemaModels = [];
     this._schema = null;
     this.bulkOps = null;
@@ -316,14 +316,22 @@ class BranchUpdate {
   }
 
   async addIndexer(indexer) {
-    let updater = await indexer.beginUpdate(this.branch, this.read.bind(this));
-    owningDataSource.set(updater, owningDataSource.get(indexer));
-    this.schemaModels.push(await updater.schema());
     if (this._schema) {
       this._schema.teardown();
       this._schema = null;
     }
-    this.updaters.push(updater);
+    let updater = await indexer.beginUpdate(this.branch, this._readOtherIndexers.bind(this));
+    let dataSource = owningDataSource.get(indexer);
+    owningDataSource.set(updater, dataSource);
+    this.schemaModels.push(await updater.schema());
+    this.updaters[dataSource.id] = updater;
+  }
+
+  async _readOtherIndexers(type, id) {
+    if (!this._schema) {
+      throw new Error("Not allowed to readOtherIndexers until your own updateContent() hook. You're trying to use it before all the other indexers have had a chance to activate.");
+    }
+    return this.read(type, id);
   }
 
   async schema() {
@@ -337,7 +345,7 @@ class BranchUpdate {
     if (this._schema) {
       this._schema.teardown();
     }
-    for (let updater of this.updaters) {
+    for (let updater of Object.values(this.updaters)) {
       if (typeof updater.destroy === 'function') {
         updater.destroy();
       }
@@ -351,9 +359,8 @@ class BranchUpdate {
   }
 
   async _updateContent(hints) {
-    for (let updater of this.updaters) {
+    for (let [sourceId, updater] of Object.entries(this.updaters)) {
       let meta = await this._loadMeta(updater);
-      let sourceId = owningDataSource.get(updater).id;
       let publicOps = Operations.create(this, sourceId);
       let newMeta = await updater.updateContent(meta, hints, publicOps);
       await this._saveMeta(updater, newMeta);
@@ -436,12 +443,20 @@ class BranchUpdate {
     if (!contentType) { return; }
     let source = contentType.dataSource;
     if (!source) { return; }
-    let updater = this.updaters.find(u => {
-      let s = owningDataSource.get(u);
-      return s && s.id === source.id;
-    });
+    let updater = this.updaters[source.id];
     if (!updater) { return; }
-    return updater.read(type, id, schema.isSchemaType(type));
+    let isSchemaType = schema.isSchemaType(type);
+    let model = await updater.read(type, id, isSchemaType);
+    if (!model) {
+      // The seeds can provide any type of model, so if we're not
+      // finding something, we should also fallback to checking in
+      // seeds.
+      let seedUpdater = this.updaters['seeds'];
+      if (seedUpdater) {
+        model = await seedUpdater.read(type, id, isSchemaType);
+      }
+    }
+    return model;
   }
 
   async add(type, id, doc, sourceId, nonce) {
