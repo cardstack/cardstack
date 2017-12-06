@@ -370,22 +370,29 @@ class BranchUpdate {
   }
 
   async _loadMeta(updater) {
-    return this.client.es.getSource({
+    let doc = await this.client.es.getSource({
       index: Client.branchToIndexName(this.branch),
       type: 'meta',
       id: owningDataSource.get(updater).id,
       ignore: [404]
     });
+    if (doc) {
+      return doc.params;
+    }
   }
 
   async _saveMeta(updater, newMeta) {
+    // the plugin-specific metadata is wrapped inside a "params"
+    // property so that we can tell elasticsearch not to index any of
+    // it. We don't want inconsistent types across plugins to cause
+    // mapping errors.
     await this.bulkOps.add({
       index: {
         _index: Client.branchToIndexName(this.branch),
         _type: 'meta',
         _id: owningDataSource.get(updater).id,
       }
-    }, newMeta);
+    }, { params: newMeta });
   }
 
   async _findTouchedReferences() {

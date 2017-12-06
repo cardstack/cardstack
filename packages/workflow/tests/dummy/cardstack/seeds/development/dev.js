@@ -329,13 +329,13 @@ module.exports = [
     id: '@cardstack/hub',
     relationships: {
       'default-data-source': {
-        data: { type: 'data-sources', id: '0' }
+        data: { type: 'data-sources', id: 0 }
       }
     }
   },
   {
     type: 'data-sources',
-    id: '0',
+    id: 0,
     attributes: {
       'source-type': '@cardstack/ephemeral',
       params: {
@@ -345,7 +345,7 @@ module.exports = [
   },
   {
     type: 'grants',
-    id: '0',
+    id: 0,
     attributes: {
       'may-create-resource': true,
       'may-update-resource': true,
