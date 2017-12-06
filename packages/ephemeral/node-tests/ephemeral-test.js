@@ -25,6 +25,17 @@ describe('ephemeral-storage', function() {
       })
     ]);
 
+    initial.addResource('posts', 'first-post').withAttributes({
+      title: 'The First Post',
+      body: 'First post body'
+    });
+
+    initial.addResource('posts', 'second-post').withAttributes({
+      title: 'The Second Post',
+      body: 'Second post body'
+    });
+
+
     let dataSource = factory.addResource('data-sources').withAttributes({
       sourceType: '@cardstack/ephemeral',
       params: {
@@ -42,16 +53,6 @@ describe('ephemeral-storage', function() {
         fieldType: '@cardstack/core-types::string'
       })
     ]);
-
-    factory.addResource('posts', 'first-post').withAttributes({
-      title: 'The First Post',
-      body: 'First post body'
-    });
-
-    factory.addResource('posts', 'second-post').withAttributes({
-      title: 'The Second Post',
-      body: 'Second post body'
-    });
 
     env = await createDefaultEnvironment(__dirname + '/../../../tests/ephemeral-test-app', factory.getModels());
 
