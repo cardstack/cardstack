@@ -3,6 +3,7 @@ const logger = require('@cardstack/plugin-utils/logger');
 const Error = require('@cardstack/plugin-utils/error');
 
 module.exports = declareInjections({
+  controllingBranch: 'hub:controlling-branch',
   sources: 'hub:data-sources',
   internalSearcher: `plugin-searchers:${require.resolve('@cardstack/elasticsearch/searcher')}`
 },
@@ -43,6 +44,10 @@ class Searchers {
     return result;
   }
 
+  async getFromControllingBranch(type, id) {
+    return this.get(this.controllingBranch.name, type, id);
+  }
+
   async search(branch, query) {
     let searchers = await this._lookupSearchers();
     let index = 0;
@@ -53,6 +58,10 @@ class Searchers {
       }
     };
     return next();
+  }
+
+  async searchInControllingBranch(query) {
+    return this.search(this.controllingBranch.name, query);
   }
 
 
