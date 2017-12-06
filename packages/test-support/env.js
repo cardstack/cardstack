@@ -26,7 +26,8 @@ exports.createDefaultEnvironment = async function(projectDir, initialModels = []
         'default-data-source',
         factory.addResource('data-sources')
           .withAttributes({
-            'source-type': '@cardstack/ephemeral'
+            'source-type': '@cardstack/ephemeral',
+            params: { initialModels }
           })
       );
 
@@ -42,21 +43,6 @@ exports.createDefaultEnvironment = async function(projectDir, initialModels = []
       allowDevDependencies: true,
       disableAutomaticIndexing: true
     });
-
-    let writers = container.lookup('hub:writers');
-
-    for (let model of initialModels) {
-      // TODO: this one-by-one creation is still slower than is nice for
-      // tests -- each time we write a schema model it invalidates the
-      // schema cache, which needs to get rebuilt before we can write
-      // the next one.
-      //
-      // On the other hand, this is a high-quality test of our ability
-      // to build up the entire state in the same way an end user would
-      // via JSONAPI requests. If we optimize this away, we should also
-      // add some tests like that that are similarly comprehensive.
-      await writers.create('master', session, model.type, model);
-    }
 
     await container.lookup('hub:indexers').update({ realTime: true });
 
