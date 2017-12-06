@@ -6,7 +6,8 @@ export default Ember.Service.extend({
 
   subscribe(query) {
     let { type, filter, token } = query;
-    let { id } = filter;
+    let id = filter.user_id; // dont  do this for real!!
+
 
     let socket = this.get("socket");
     if (!socket) {
