@@ -12,7 +12,7 @@ export default Component.extend({
 
   logMessages: liveQuery('userId', 'token', function(userId, token) {
     return {
-      type: "messages",
+      type: "users",
       filter: { user_id: userId },
       token
     };

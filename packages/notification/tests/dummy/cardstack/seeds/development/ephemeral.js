@@ -39,8 +39,9 @@ function initialModels() {
 
       // This sends a user notification event every 10 seconds to test the notification plugin
       notificationTest: {
-        type: "mock-users",
-        id: "user1",
+        userType: "mock-users",
+        userId: "user1",
+        messageType: "message",
         intervalSec: 10
       }
     }

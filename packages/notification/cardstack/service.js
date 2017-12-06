@@ -109,12 +109,12 @@ class NotificationService {
       if (notificationTest) {
         let { userType, userId, messageType, intervalSec } = notificationTest;
         setInterval(async () => {
-          let user = await this.userSearcher.get(userType, 'user1');
-          console.log("GOT USER", user);
+          // let user = await this.userSearcher.get(userType, 'user1');
+          // console.log("GOT USER", user);
 
           this.messengers.send(messengerName, {
-            type: messageType,
-            id: notificationTest.id,
+            type: "users",
+            id: "user1",
             body: `The time is now ${new Date()}`
           });
         }, notificationTest.intervalSec * 1000);
