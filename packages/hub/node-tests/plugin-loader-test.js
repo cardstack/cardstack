@@ -7,8 +7,7 @@ describe('hub/plugin-loader', function() {
   before(async function() {
     let registry = new Registry();
     registry.register('config:project', {
-      path: __dirname + '/../../../tests/stub-project',
-      allowDevDependencies: true
+      path: __dirname + '/../../../tests/stub-project'
     }, { instantiate: false });
     pluginLoader = new Container(registry).lookup('hub:plugin-loader');
 

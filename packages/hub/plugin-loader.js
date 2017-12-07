@@ -55,11 +55,14 @@ class PluginLoader {
       let output = [];
       let seen = Object.create(null);
 
-      // during a test suite, we include devDependencies of the top-level project under test.
-      let includeDevDependencies = this.project.allowDevDependencies;
       let projectPath = path.resolve(this.project.path);
       log.info("starting from path %s", projectPath);
-      log.info("allowed in devDependencies: %s", !!includeDevDependencies);
+
+      // at the top-level (the project itself) we always include dev
+      // deps. Not doing so under some conditions would be too big a
+      // troll.
+      let includeDevDependencies = true;
+
       await this._crawlPlugins(projectPath, output, seen, includeDevDependencies, []);
       this._installedPlugins = output;
 
@@ -165,8 +168,9 @@ class PluginLoader {
     for (let { dep, type } of deps) {
       let childDir = path.dirname(await resolve(dep + '/package.json', { basedir: realdir }));
 
-      // we never include devDependencies of second level dependencies
-      await this._crawlPlugins(childDir, outputPlugins, seen, false, breadcrumbs.concat({ id: json.name, type }));
+      // we never include devDependencies of second level (or deeper) dependencies
+      let includeDevDependencies = false;
+      await this._crawlPlugins(childDir, outputPlugins, seen, includeDevDependencies, breadcrumbs.concat({ id: json.name, type }));
     }
   }
 
