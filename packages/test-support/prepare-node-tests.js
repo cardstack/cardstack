@@ -21,6 +21,9 @@ if (!process.env['ELASTICSEARCH_PREFIX']) {
 }
 
 // TODO - add back throwing an exception for unexpected logging of warns and errors
+require('@cardstack/logger').configure({
+  defaultLevel: 'warn'
+});
 
 module.exports = function() {
   global.expect = chai.expect;
