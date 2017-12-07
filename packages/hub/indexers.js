@@ -36,7 +36,7 @@
 
 */
 
-const log = require('@cardstack/plugin-utils/logger')('indexers');
+const log = require('@cardstack/logger')('cardstack/indexers');
 const Client = require('@cardstack/elasticsearch/client');
 const toJSONAPI = require('@cardstack/elasticsearch/to-jsonapi');
 const { declareInjections } = require('@cardstack/di');
@@ -44,8 +44,6 @@ const { uniqBy } = require('lodash');
 const owningDataSource = new WeakMap();
 const bootstrapSchema = require('./bootstrap-schema');
 const { flatten } = require('lodash');
-
-require('./diff-log-formatter');
 
 module.exports = declareInjections({
   schemaLoader: 'hub:schema-loader',

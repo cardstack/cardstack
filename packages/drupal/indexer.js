@@ -1,4 +1,4 @@
-const logger = require('@cardstack/plugin-utils/logger');
+const log = require('@cardstack/logger')('cardstack/drupal');
 const request = require('superagent');
 const { apply_patch } = require('jsonpatch');
 const { URL } = require('url');
@@ -11,7 +11,6 @@ class Indexer {
 
   constructor(config) {
     this.config = config;
-    this.log = logger('drupal');
   }
 
   async branches() {
@@ -19,14 +18,14 @@ class Indexer {
   }
 
   async beginUpdate(/* branch */) {
-    return new Updater(this.config, this.log);
+    return new Updater(this.config);
   }
 
 
 }
 
 class Updater {
-  constructor(config, log) {
+  constructor(config) {
     let {
       url,
       authToken,
@@ -37,7 +36,6 @@ class Updater {
     this.authToken = authToken;
     this.openAPIPatch = openAPIPatch;
     this.dataSource = dataSource;
-    this.log = log;
   }
 
   async _ensureSchema() {
@@ -68,7 +66,7 @@ class Updater {
       }
       let id = definition.properties.type.enum[0];
       endpoints[id] = endpoint;
-      this.log.debug("Discovered %s %s", id, endpoint);
+      log.debug("Discovered %s %s", id, endpoint);
       let fieldRefs = [];
 
       for (let [propName, propDef] of Object.entries(definition.properties.attributes.properties)) {
@@ -105,7 +103,7 @@ class Updater {
           if (type) {
             return { type: 'content-types', id: type.id };
           } else {
-            this.log.info("field %s points at unknown type %s", field.id, entityName);
+            log.info("field %s points at unknown type %s", field.id, entityName);
           }
         }).filter(Boolean);
       }
@@ -248,7 +246,7 @@ class Updater {
         if (err.status === 404) {
           await ops.delete(type, id);
         } else {
-          this.log.warn("Got status %s from drupal for %s", err.status, url);
+          log.warn("Got status %s from drupal for %s", err.status, url);
         }
       }
     }
@@ -262,7 +260,7 @@ class Updater {
     for (let endpoint of Object.values(this._schema.endpoints)) {
       let url = new URL(endpoint, this.url).href;
       while (url) {
-        this.log.debug("Hitting %s", url);
+        log.debug("Hitting %s", url);
         try {
           let response = await this._get(url);
           for (let model of response.body.data) {
@@ -271,9 +269,9 @@ class Updater {
           url = response.body.links.next;
         } catch (err) {
           if (err.status) {
-            this.log.error("GET %s returned %s", url, err.status);
+            log.error("GET %s returned %s", url, err.status);
           } else {
-            this.log.error("Error during GET %s: %s", url, err);
+            log.error("Error during GET %s: %s", url, err);
           }
           throw err;
         }

@@ -2,7 +2,7 @@
 'use strict';
 const whenEnabled = require('@cardstack/plugin-utils/when-enabled');
 const Handlebars = require('handlebars');
-const log = require('@cardstack/plugin-utils/logger')('auth');
+const log = require('@cardstack/logger')('cardstack/auth');
 
 module.exports = whenEnabled({
   name: '@cardstack/authentication',

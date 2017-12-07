@@ -8,10 +8,6 @@ const NameMapper = require('./name-mapper');
 const safeIdentifier = /^[a-zA-Z0-9._]+$/;
 const pendingChanges = new WeakMap();
 
-/*
-const logger = require('@cardstack/plugin-utils/logger');
-*/
-
 module.exports = class Writer {
   static create(params) {
     return new this(params);

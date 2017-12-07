@@ -1,5 +1,5 @@
 const { declareInjections } = require('@cardstack/di');
-const logger = require('@cardstack/plugin-utils/logger');
+const log = require('@cardstack/logger')('cardstack/searchers');
 const Error = require('@cardstack/plugin-utils/error');
 
 module.exports = declareInjections({
@@ -12,7 +12,6 @@ class Searchers {
   constructor() {
     this._lastActiveSources = null;
     this._searchers = null;
-    this.log = logger('searchers');
   }
 
   async _lookupSearchers() {
@@ -21,7 +20,7 @@ class Searchers {
       this._lastActiveSources = activeSources;
       this._searchers = [...activeSources.values()].map(v => v.searcher).filter(Boolean);
       this._searchers.push(this.internalSearcher);
-      this.log.debug('found %s searchers', this._searchers.length);
+      log.debug('found %s searchers', this._searchers.length);
     }
     return this._searchers;
   }

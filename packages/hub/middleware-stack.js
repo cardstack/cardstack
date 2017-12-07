@@ -1,7 +1,7 @@
 const { declareInjections } = require('@cardstack/di');
 const DAGMap = require('dag-map').default;
 const compose = require('koa-compose');
-const logger = require('@cardstack/plugin-utils/logger');
+const log = require('@cardstack/logger')('cardstack/middleware-stack');
 
 module.exports = declareInjections({
   plugins: 'hub:plugins'
@@ -11,7 +11,6 @@ class MiddlewareStack {
   constructor() {
     this._lastStack = null;
     this._lastActivePlugins = null;
-    this.log = logger('middleware-stack');
   }
 
   middleware() {
@@ -55,13 +54,13 @@ class MiddlewareStack {
     }
 
     let stack = [];
-    this.log.info("Updated middleware plugins:");
+    log.info("Updated middleware plugins:");
     map.each((name, module) => {
       if (module) {
-        this.log.info(name);
+        log.info(name);
         stack.push(module);
       } else {
-        this.log.info(` --- ${name} ---`);
+        log.info(` --- ${name} ---`);
       }
     });
     stack = compose(stack.map(module => module.middleware()));

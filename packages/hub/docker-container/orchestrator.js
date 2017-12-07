@@ -2,7 +2,7 @@ const util = require('util');
 const child_process = require('child_process');
 const getContainerId = require('docker-container-id');
 const request = require('superagent');
-const log = require('@cardstack/plugin-utils/logger')('orchestrator');
+const log = require('@cardstack/logger')('cardstack/orchestrator');
 const timeout = require('util').promisify(setTimeout);
 const execFile = util.promisify(child_process.execFile);
 

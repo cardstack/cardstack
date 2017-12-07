@@ -3,8 +3,7 @@
 const { makeServer } = require('../main');
 const commander = require('commander');
 const path = require('path');
-const logger = require('@cardstack/plugin-utils/logger');
-const log = logger('server');
+const log = require('@cardstack/logger')('cardstack/server');
 const fs = require('fs');
 
 async function runServer(options, seedModels) {

@@ -4,8 +4,7 @@ const { Registry, Container } = require('@cardstack/di');
 let EmberConnection;
 let Orchestrator;
 
-const logger = require('@cardstack/plugin-utils/logger');
-const log = logger('server');
+const log = require('@cardstack/logger')('cardstack/server');
 const path = require('path');
 const { spawn } = require('child_process');
 
