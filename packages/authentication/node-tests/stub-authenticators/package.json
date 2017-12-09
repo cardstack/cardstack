@@ -8,6 +8,7 @@
     ]
   },
   "devDependencies": {
-    "@cardstack/test-support": "*"
+    "@cardstack/test-support": "*",
+    "@cardstack/plugin-utils": "*"
   }
 }
