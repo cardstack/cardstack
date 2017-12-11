@@ -2,5 +2,8 @@
   "keywords": ["cardstack-plugin"],
   "cardstack-plugin": {
     "api-version": 1
+  },
+  "dependencies": {
+    "koa-better-route": "*"
   }
 }

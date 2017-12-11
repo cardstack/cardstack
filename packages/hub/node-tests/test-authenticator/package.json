@@ -4,5 +4,9 @@
   ],
   "cardstack-plugin": {
     "api-version": 1
+  },
+  "dependencies": {
+    "@cardstack/di": "*",
+    "@cardstack/plugin-utils": "*"
   }
 }
