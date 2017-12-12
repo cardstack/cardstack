@@ -1,8 +1,4 @@
-const logger = require('@cardstack/plugin-utils/logger');
-
-logger.registerFormatter('t', format);
-
-function format(v){
+module.exports = function format(v){
   if (!v) {
     return 'none';
   }
@@ -28,4 +24,4 @@ function format(v){
     output += "\n";
   }
   return output;
-}
+};

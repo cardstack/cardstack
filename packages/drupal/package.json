@@ -24,6 +24,7 @@
   },
   "dependencies": {
     "@cardstack/plugin-utils": "^0.4.1",
+    "@cardstack/logger": "^0.1.0",
     "ember-source": "~2.17.0-beta.1",
     "es6-promise": "^4.1.1",
     "jsonpatch": "^3.0.1",

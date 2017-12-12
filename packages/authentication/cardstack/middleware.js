@@ -1,4 +1,4 @@
-const log = require('@cardstack/plugin-utils/logger')('auth');
+const log = require('@cardstack/logger')('cardstack/auth');
 const Error = require('@cardstack/plugin-utils/error');
 const Session = require('@cardstack/plugin-utils/session');
 const bearerTokenPattern = /bearer +(.*)$/i;

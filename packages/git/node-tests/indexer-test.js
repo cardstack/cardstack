@@ -5,7 +5,7 @@ const ElasticAssert = require('@cardstack/elasticsearch/node-tests/assertions');
 const _toJSONAPI = require('@cardstack/elasticsearch/to-jsonapi');
 const JSONAPIFactory = require('@cardstack/test-support/jsonapi-factory');
 const { Registry, Container } = require('@cardstack/di');
-const logger = require('@cardstack/plugin-utils/logger');
+const logger = require('@cardstack/logger');
 const fs = require('fs');
 
 function toJSONAPI(type, doc) {

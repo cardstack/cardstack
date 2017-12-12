@@ -1,4 +1,4 @@
-const logger = require('@cardstack/plugin-utils/logger');
+const log = require('@cardstack/logger')('cardstack/postgresql');
 const { Pool } = require('pg');
 const { partition, isEqual } = require('lodash');
 const Error = require('@cardstack/plugin-utils/error');
@@ -20,7 +20,6 @@ module.exports = class Indexer {
   constructor({ branches, dataSource, renameTables, renameColumns, patch }) {
     this.branchConfig = branches;
     this.dataSourceId = dataSource.id;
-    this.log = logger('postgresql');
     this.pools = Object.create(null);
     this.mapper = new NameMapper(renameTables, renameColumns);
     this.patch = patch || Object.create(null);
@@ -44,7 +43,7 @@ module.exports = class Indexer {
     }
 
     let client = await this.pools[branch].connect();
-    return new Updater(client, this.log, this.dataSourceId, this.mapper, this.patch);
+    return new Updater(client, this.dataSourceId, this.mapper, this.patch);
   }
 
   async teardown() {
@@ -55,9 +54,8 @@ module.exports = class Indexer {
 };
 
 class Updater {
-  constructor(client, log, dataSourceId, mapper, patch) {
+  constructor(client, dataSourceId, mapper, patch) {
     this.client = client;
-    this.log = log;
     this.dataSourceId = dataSourceId;
     this.mapper = mapper;
     this.patch = patch;
@@ -119,13 +117,13 @@ class Updater {
       }
 
       if (fieldName === 'type') {
-        this.log.warn('Ignoring a column named "type" on table %s because its not a legal JSONAPI field name', contentTypeName);
+        log.warn('Ignoring a column named "type" on table %s because its not a legal JSONAPI field name', contentTypeName);
         continue;
       }
 
       let fieldType = this._fieldTypeFor(data_type);
       if (!fieldType) {
-        this.log.warn('Ignoring column "%s" because of unknown data type "%s"', fieldName, data_type);
+        log.warn('Ignoring column "%s" because of unknown data type "%s"', fieldName, data_type);
         continue;
       }
 
@@ -207,7 +205,7 @@ class Updater {
   }
 
   async _incrementalUpdate(replicationSlot, ops, lastSchema) {
-    this.log.debug("Using existing replication slot %s", replicationSlot);
+    log.debug("Using existing replication slot %s", replicationSlot);
 
     let oldSchema = Object.create(null);
     if (lastSchema) {
@@ -261,7 +259,7 @@ class Updater {
   async _fullUpdate(replicationSlot, ops) {
     await ops.beginReplaceAll();
     await this.query(`SELECT * FROM pg_create_logical_replication_slot($1, 'test_decoding')`, [replicationSlot]);
-    this.log.debug("Created new replication slot %s", replicationSlot);
+    log.debug("Created new replication slot %s", replicationSlot);
     for (let model of await this.schema()) {
       ops.save(model.type, model.id, model);
       if (model.type === 'content-types') {
@@ -308,7 +306,7 @@ class Updater {
         let type = this.mapper.typeNameFor(schema, table);
         let id = idPattern.exec(values);
         if (!id) {
-          this.log.warn("Found no id in change log entry: %s. Perhaps you need to set the primary key?", data);
+          log.warn("Found no id in change log entry: %s. Perhaps you need to set the primary key?", data);
           continue;
         } else {
           if (!dirty[type]) {

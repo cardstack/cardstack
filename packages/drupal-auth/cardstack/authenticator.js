@@ -1,6 +1,6 @@
 const Error = require('@cardstack/plugin-utils/error');
 const request = require('superagent');
-const log = require('@cardstack/plugin-utils/logger')('drupal-auth');
+const log = require('@cardstack/logger')('cardstack/drupal-auth');
 
 module.exports = class {
   static create() {

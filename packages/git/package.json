@@ -12,6 +12,7 @@
     "@cardstack/di": "^0.3.4",
     "@cardstack/elasticsearch": "^0.4.1",
     "@cardstack/eslint-config": "^0.3.4",
+    "@cardstack/logger": "^0.1.0",
     "@cardstack/test-support": "^0.4.1",
     "eslint": "4.9.0",
     "eslint-plugin-ember": "^4.6.1",

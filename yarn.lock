@@ -2,6 +2,12 @@
 # yarn lockfile v1
 
 
+"@cardstack/logger@^0.1.0":
+  version "0.1.0"
+  resolved "https://registry.yarnpkg.com/@cardstack/logger/-/logger-0.1.0.tgz#50107d5738079f10913158f86bdcec7c7242c784"
+  dependencies:
+    ms "2.0.0"
+
 "@cardstack/nodegit@0.19.0-cardstack.0":
   version "0.19.0-cardstack.0"
   resolved "https://registry.yarnpkg.com/@cardstack/nodegit/-/nodegit-0.19.0-cardstack.0.tgz#c106bb3733ff3d4f7ce39a62e369c8d42476ac08"
@@ -5287,7 +5293,7 @@ json5@^0.5.1:
   version "0.5.1"
   resolved "https://registry.yarnpkg.com/json5/-/json5-0.5.1.tgz#1eade7acc012034ad84e2396767ead9fa5495821"
 
-jsondiffpatch@^0.2.4:
+jsondiffpatch@^0.2.5:
   version "0.2.5"
   resolved "https://registry.yarnpkg.com/jsondiffpatch/-/jsondiffpatch-0.2.5.tgz#50361d995cf8c86137e8d5589f20fa5220db3511"
   dependencies:

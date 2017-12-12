@@ -1,7 +1,7 @@
 const nssocket = require('nssocket');
 const _ = require('lodash');
 
-const log = require('@cardstack/plugin-utils/logger')('ember-connection');
+const log = require('@cardstack/logger')('cardstack/ember-connection');
 
 const HUB_HEARTBEAT_TIMEOUT = 7.5 * 1000; // longer than the heartbeat interval of 1 second
 

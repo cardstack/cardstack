@@ -20,6 +20,7 @@
   },
   "dependencies": {
     "@cardstack/di": "^0.3.4",
+    "@cardstack/logger": "^0.1.0",
     "@cardstack/plugin-utils": "^0.4.1",
     "koa-json-body": "^5.3.0",
     "lodash": "^4.17.4",
