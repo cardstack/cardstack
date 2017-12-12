@@ -34,4 +34,9 @@ export default Ember.Component.extend({
     this._super();
   },
 
+  actions: {
+    cursorChanged(cursorUpdate) {
+      this.set('cursorState', cursorUpdate);
+    }
+  }
 });
