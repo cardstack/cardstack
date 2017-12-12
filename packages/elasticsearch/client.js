@@ -52,7 +52,7 @@ module.exports = class SearchClient {
              due to their issue #30.
 
        */
-      let AWS = require('aws-sdk');
+      let AWS = require('aws-sdk'); // eslint-disable-line node/no-missing-require
       let region = process.env.AWS_REGION || 'us-east-1';
       let credentials = new AWS.EnvironmentCredentials('AWS');
       await new Promise((resolve, reject) => {
@@ -65,7 +65,7 @@ module.exports = class SearchClient {
         });
       });
       esParams.host = host.replace(/^aws:/i, 'https:');
-      esParams.connectionClass = require('http-aws-es');
+      esParams.connectionClass = require('http-aws-es');  // eslint-disable-line node/no-missing-require
       esParams.amazonES = { region, credentials };
     }
     return new this(esParams);

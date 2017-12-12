@@ -13,7 +13,9 @@ module.exports = {
     semi: ["error", "always"],
     'node/no-extraneous-require': ['error', {
       'allowModules': []
-    }]
+    }],
+    'node/no-missing-require': ['error']
+
   },
   plugins: ['node'],
   globals: {
