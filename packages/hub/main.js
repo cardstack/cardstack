@@ -4,8 +4,7 @@ const { Registry, Container } = require('@cardstack/di');
 let EmberConnection;
 let Orchestrator;
 
-const logger = require('@cardstack/plugin-utils/logger');
-const log = logger('server');
+const log = require('@cardstack/logger')('cardstack/server');
 const path = require('path');
 const { spawn } = require('child_process');
 
@@ -13,8 +12,7 @@ const { spawn } = require('child_process');
 async function wireItUp(projectDir, encryptionKeys, seedModels, opts = {}) {
   let registry = new Registry();
   registry.register('config:project', {
-    path: projectDir,
-    allowDevDependencies: opts.allowDevDependencies
+    path: projectDir
   });
   registry.register('config:seed-models', seedModels);
   registry.register('config:encryption-key', encryptionKeys);
@@ -93,18 +91,10 @@ async function spawnHub(packageName, configPath, environment) {
     process.env.ELASTICSEARCH_PREFIX = packageName.replace(/^[^a-zA-Z]*/, '').replace(/[^a-zA-Z0-9]/g, '_') + '_' + environment;
   }
 
-  // I think this flag needs to get refactored away, it's always the
-  // right behavior to have it turned on, there's no time that your
-  // app will be installed without the devDeps present. So the
-  // distinction really only matters for addons. And even when
-  // inside an addon running the dummy app, devDeps should always be
-  // included.
-  let flags = ['--allow-dev-dependencies'];
-
   let seedDir = path.join(path.dirname(configPath),
                           '..', 'cardstack', 'seeds', environment);
 
-  let proc = spawn(path.join(__dirname, 'bin', 'cardstack-hub.js'), [...flags, seedDir], { stdio: [0, 1, 2, 'ipc']  });
+  let proc = spawn(path.join(__dirname, 'bin', 'cardstack-hub.js'), [seedDir], { stdio: [0, 1, 2, 'ipc']  });
   await new Promise((resolve, reject) => {
     // by convention the hub will send a hello message if it sees we
     // are supervising it over IPC. If we get an error or exit before

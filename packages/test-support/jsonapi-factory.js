@@ -44,21 +44,6 @@ class JSONAPIFactory {
       }
       dependsOn.push(`content-types/${model.type}`);
 
-      // These are not currently relationships, so we need to
-      // explicitly add dependencies for them. Perhaps they should be,
-      // but they would need to be relationships to "features", which
-      // is not really first-class type at present.
-      if (model.attributes) {
-        if (model.attributes.module) {
-          let pluginId = model.attributes.module.split("::")[0];
-          dependsOn.push(`plugin-configs/${pluginId}`);
-        }
-        if (model.attributes['source-type']) {
-          let pluginId = model.attributes['source-type'].split("::")[0];
-          dependsOn.push(`plugin-configs/${pluginId}`);
-        }
-      }
-
       // These are all boostrap schema and we need to not include them
       // here to avoid circularity.
       dependsOn = dependsOn.filter(dep => {

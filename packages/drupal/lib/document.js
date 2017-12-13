@@ -1,6 +1,6 @@
 const Ember = require('ember-source/dist/ember.debug');
 const { dasherize } = Ember.String;
-const log = require('@cardstack/plugin-utils/logger')('drupal');
+const log = require('@cardstack/logger')('cardstack/drupal');
 
 exports.cardstackToDrupalDoc = cardstackToDrupalDoc;
 function cardstackToDrupalDoc(doc, schemaModels) {

@@ -6,7 +6,7 @@ const {
 } = require('@cardstack/test-support/env');
 const { currentVersion } = require('./support');
 const JSONAPIFactory = require('@cardstack/test-support/jsonapi-factory');
-const log = require('@cardstack/plugin-utils/logger')('jsonapi-test');
+const log = require('@cardstack/logger')('jsonapi-test');
 
 describe('jsonapi/middleware', function() {
 

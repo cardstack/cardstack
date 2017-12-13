@@ -11,13 +11,16 @@
   },
   "dependencies": {
     "@cardstack/di": "^0.3.4",
+    "@cardstack/logger": "^0.1.0",
     "@cardstack/plugin-utils": "^0.4.1",
-    "elasticsearch": "^12.1.3"
+    "elasticsearch": "^12.1.3",
+    "jsondiffpatch": "^0.2.5"
   },
   "devDependencies": {
     "@cardstack/eslint-config": "^0.3.4",
     "eslint": "4.9.0",
     "eslint-plugin-ember": "^4.6.1",
+    "eslint-plugin-node": "^5.2.1",
     "lodash": "^4.17.4"
   },
   "scripts": {

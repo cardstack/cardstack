@@ -3,7 +3,7 @@
   whether the addon is enabled in cardstack hub.
 */
 const ConditionalInclude = require('./conditional-include');
-const locateHub = require('@cardstack/plugin-utils/locate-hub');
+const locateHub = require('./locate-hub');
 const request = require('superagent');
 
 const treeMethods = [

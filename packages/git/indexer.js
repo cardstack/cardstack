@@ -86,7 +86,7 @@ const Change = require("./change");
 
 const { safeEntryByName } = require('./mutable-tree');
 
-const logger = require('@cardstack/plugin-utils/logger');
+const log = require('@cardstack/logger')('cardstack/git-indexer');
 
 module.exports = class Indexer {
   static create(params) { return new this(params); }
@@ -96,7 +96,6 @@ module.exports = class Indexer {
     this.branchPrefix = branchPrefix || "";
     this.basePath = basePath ? basePath.split('/') : [];
     this.repo = null;
-    this.log = logger('git-indexer');
   }
 
 
@@ -138,19 +137,18 @@ module.exports = class Indexer {
 
   async beginUpdate(branch) {
     await this._ensureRepo();
-    return new GitUpdater(this.repo, this.branchPrefix + branch, this.log, this.repoPath, this.basePath);
+    return new GitUpdater(this.repo, this.branchPrefix + branch, this.repoPath, this.basePath);
   }
 };
 
 class GitUpdater {
-  constructor(repo, branch, log, repoPath, basePath) {
+  constructor(repo, branch, repoPath, basePath) {
     this.repo = repo;
     this.basePath = basePath;
     this.branch = branch;
     this.commit = null;
     this.commitId = null;
     this.rootTree = null;
-    this.log = log;
   }
 
   async schema() {
@@ -171,7 +169,7 @@ class GitUpdater {
         let oldCommit = await Commit.lookup(this.repo, meta.commit);
         originalTree = await oldCommit.getTree();
       } catch (err) {
-        this.log.warn(`Unable to load previously indexed commit ${meta.commit} due to ${err}. We will recover by reindexing all content.`);
+        log.warn(`Unable to load previously indexed commit ${meta.commit} due to ${err}. We will recover by reindexing all content.`);
       }
     }
     if (!originalTree) {
@@ -190,9 +188,17 @@ class GitUpdater {
 
   async read(type, id, isSchema) {
     await this._loadCommit();
-    let entry = await this.rootTree.getEntry(`${ isSchema ? 'schema' : 'contents' }/${type}/${id}.json`);
-    let doc = await this._entryToDoc(type, id, entry);
-    return doc;
+    let entry;
+    try {
+      entry = await this.rootTree.getEntry(`${ isSchema ? 'schema' : 'contents' }/${type}/${id}.json`);
+    } catch(err) {
+      // unfortunately nodegit doesn't seem to have a non-throwing way
+      // to test for the existence of a complete path
+    }
+    if (entry) {
+      let doc = await this._entryToDoc(type, id, entry);
+      return doc;
+    }
   }
 
   async _loadCommit() {
@@ -278,7 +284,7 @@ class GitUpdater {
     try {
       doc = JSON.parse(contents);
     } catch (err) {
-      this.log.warn("Ignoring record with invalid json at %s", entry.path());
+      log.warn("Ignoring record with invalid json at %s", entry.path());
       return;
     }
     doc.type = type;

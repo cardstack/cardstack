@@ -106,7 +106,7 @@ describe('schema/validation', function() {
     grantAllPermissions(factory);
 
     let registry = new Registry();
-    registry.register('config:project', { path: `${__dirname}/../../../tests/stub-project`, allowDevDependencies: true });
+    registry.register('config:project', { path: `${__dirname}/../../../tests/stub-project` });
     let container = new Container(registry);
     let loader = container.lookup('hub:schema-loader');
     schema = await loader.loadFrom(factory.getModels());

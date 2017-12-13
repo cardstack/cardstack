@@ -1,25 +1,20 @@
 const Error = require('@cardstack/plugin-utils/error');
-const logger = require('@cardstack/plugin-utils/logger');
+const log = require('@cardstack/logger')('cardstack/writers');
 const { declareInjections } = require('@cardstack/di');
 
 module.exports = declareInjections({
-  schemaCache: 'hub:schema-cache',
+  schema: 'hub:current-schema',
   schemaLoader: 'hub:schema-loader'
 },
 
 class Writers {
-  constructor() {
-    this.log = logger('writers');
-  }
-
   get schemaTypes() {
     return this.schemaLoader.ownTypes();
   }
 
   async create(branch, session, type, document) {
-    this.log.info("creating type=%s", type);
-    let schema = await this.schemaCache.schemaForBranch(branch);
-    let token = this.schemaCache.prepareBranchUpdate(branch);
+    log.info("creating type=%s", type);
+    let schema = await this.schema.forBranch(branch);
     let writer = this._lookupWriter(schema, type);
     let isSchema = this.schemaTypes.includes(type);
     let pending = await writer.prepareCreate(branch, session, type, document, isSchema);
@@ -27,7 +22,7 @@ class Writers {
       let newSchema = await schema.validate(pending, { type, session });
       let response = await this._finalizeAndReply(pending);
       if (newSchema) {
-        this.schemaCache.notifyBranchUpdate(branch, newSchema, token);
+        this.schema.invalidateCache();
       }
       return response;
     } finally {
@@ -36,9 +31,8 @@ class Writers {
   }
 
   async update(branch, session, type, id, document) {
-    this.log.info("updating type=%s id=%s", type, id);
-    let schema = await this.schemaCache.schemaForBranch(branch);
-    let token = this.schemaCache.prepareBranchUpdate(branch);
+    log.info("updating type=%s id=%s", type, id);
+    let schema = await this.schema.forBranch(branch);
     let writer = this._lookupWriter(schema, type);
     let isSchema = this.schemaTypes.includes(type);
     let pending = await writer.prepareUpdate(branch, session, type, id, document, isSchema);
@@ -46,7 +40,7 @@ class Writers {
       let newSchema = await schema.validate(pending, { type, id, session });
       let response = await this._finalizeAndReply(pending);
       if (newSchema) {
-        this.schemaCache.notifyBranchUpdate(branch, newSchema, token);
+        this.schema.invalidateCache();
       }
       return response;
     } finally {
@@ -55,9 +49,8 @@ class Writers {
   }
 
   async delete(branch, session, version, type, id) {
-    this.log.info("deleting type=%s id=%s", type, id);
-    let schema = await this.schemaCache.schemaForBranch(branch);
-    let token = this.schemaCache.prepareBranchUpdate(branch);
+    log.info("deleting type=%s id=%s", type, id);
+    let schema = await this.schema.forBranch(branch);
     let writer = this._lookupWriter(schema, type);
     let isSchema = this.schemaTypes.includes(type);
     let pending = await writer.prepareDelete(branch, session, version, type, id, isSchema);
@@ -65,7 +58,7 @@ class Writers {
       let newSchema = await schema.validate(pending, { session });
       await pending.finalize();
       if (newSchema) {
-        this.schemaCache.notifyBranchUpdate(branch, newSchema, token);
+        this.indexers.invalidateSchemaCache();
       }
     } finally {
       if (pending) { await pending.abort();  }
@@ -93,7 +86,7 @@ class Writers {
     let contentType = schema.types.get(type);
     let writer;
     if (!contentType || !contentType.dataSource || !(writer = contentType.dataSource.writer)) {
-      this.log.debug('non-writeable type %s: exists=%s hasDataSource=%s hasWriter=%s', type, !!contentType, !!(contentType && contentType.dataSource), !!writer);
+      log.debug('non-writeable type %s: exists=%s hasDataSource=%s hasWriter=%s', type, !!contentType, !!(contentType && contentType.dataSource), !!writer);
 
       throw new Error(`"${type}" is not a writable type`, {
         status: 403,

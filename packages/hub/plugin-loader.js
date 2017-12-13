@@ -4,7 +4,7 @@ const {
   setOwner
 } = require('@cardstack/di');
 const path = require('path');
-const log = require('@cardstack/plugin-utils/logger')('plugin-loader');
+const log = require('@cardstack/logger')('cardstack/plugin-loader');
 const denodeify = require('denodeify');
 const resolve = denodeify(require('resolve'));
 const fs = require('fs');
@@ -12,8 +12,7 @@ const realpath = denodeify(fs.realpath);
 const readdir = denodeify(fs.readdir);
 const Error = require('@cardstack/plugin-utils/error');
 
-// provides "%t" in debug logger
-require('./table-log-formatter');
+log.registerFormatter('t', require('./table-log-formatter'));
 
 const featureTypes = [
   'constraint-types',
@@ -55,11 +54,14 @@ class PluginLoader {
       let output = [];
       let seen = Object.create(null);
 
-      // during a test suite, we include devDependencies of the top-level project under test.
-      let includeDevDependencies = this.project.allowDevDependencies;
       let projectPath = path.resolve(this.project.path);
       log.info("starting from path %s", projectPath);
-      log.info("allowed in devDependencies: %s", !!includeDevDependencies);
+
+      // at the top-level (the project itself) we always include dev
+      // deps. Not doing so under some conditions would be too big a
+      // troll.
+      let includeDevDependencies = true;
+
       await this._crawlPlugins(projectPath, output, seen, includeDevDependencies, []);
       this._installedPlugins = output;
 
@@ -165,8 +167,9 @@ class PluginLoader {
     for (let { dep, type } of deps) {
       let childDir = path.dirname(await resolve(dep + '/package.json', { basedir: realdir }));
 
-      // we never include devDependencies of second level dependencies
-      await this._crawlPlugins(childDir, outputPlugins, seen, false, breadcrumbs.concat({ id: json.name, type }));
+      // we never include devDependencies of second level (or deeper) dependencies
+      let includeDevDependencies = false;
+      await this._crawlPlugins(childDir, outputPlugins, seen, includeDevDependencies, breadcrumbs.concat({ id: json.name, type }));
     }
   }
 
@@ -257,7 +260,10 @@ class ConfiguredPlugins {
   }
 
   describeAll() {
-    return Object.values(this._plugins);
+    if (!this._describeAllCache) {
+      this._describeAllCache = Object.values(this._plugins);
+    }
+    return this._describeAllCache;
   }
 
   describe(pluginName) {

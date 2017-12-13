@@ -1,17 +1,16 @@
 const { declareInjections } = require('@cardstack/di');
 const DAGMap = require('dag-map').default;
 const compose = require('koa-compose');
-const logger = require('@cardstack/plugin-utils/logger');
+const log = require('@cardstack/logger')('cardstack/middleware-stack');
 
 module.exports = declareInjections({
-  schemaCache: 'hub:schema-cache'
+  plugins: 'hub:plugins'
 },
 
 class MiddlewareStack {
   constructor() {
     this._lastStack = null;
-    this._lastSchema = null;
-    this.log = logger('middleware-stack');
+    this._lastActivePlugins = null;
   }
 
   middleware() {
@@ -22,16 +21,16 @@ class MiddlewareStack {
   }
 
   async _middlewarePlugins() {
-    let schema = await this.schemaCache.schemaForControllingBranch();
-    if (schema === this._lastSchema) {
+    let activePlugins = await this.plugins.active();
+    if (activePlugins === this._lastActivePlugins) {
       return this._lastStack;
     }
     let map = new DAGMap;
 
 
     let tags = new Map();
-    for (let feature of schema.plugins.featuresOfType('middleware')) {
-      let module = schema.plugins.lookupFeatureAndAssert('middleware', feature.id);
+    for (let feature of activePlugins.featuresOfType('middleware')) {
+      let module = activePlugins.lookupFeatureAndAssert('middleware', feature.id);
 
       let beforeTags = asArray(module.before);
       let afterTags = asArray(module.after);
@@ -55,18 +54,18 @@ class MiddlewareStack {
     }
 
     let stack = [];
-    this.log.info("Updated middleware plugins:");
+    log.info("Updated middleware plugins:");
     map.each((name, module) => {
       if (module) {
-        this.log.info(name);
+        log.info(name);
         stack.push(module);
       } else {
-        this.log.info(` --- ${name} ---`);
+        log.info(` --- ${name} ---`);
       }
     });
     stack = compose(stack.map(module => module.middleware()));
     this._lastStack = stack;
-    this._lastSchema = schema;
+    this._lastActivePlugins = activePlugins;
     return stack;
   }
 
