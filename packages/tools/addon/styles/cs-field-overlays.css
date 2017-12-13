@@ -18,3 +18,10 @@
     border-color: var(--deep-tools-highlight);
     background-color: var(--faded-tools-highlight);
 }
+
+.block-control {
+    z-index: 1;
+    top: 0;
+    left: 0;
+    position: absolute;
+}
