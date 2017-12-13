@@ -1,6 +1,6 @@
 const assert = require('assert');
 const { declareInjections } = require('@cardstack/di');
-const logger = require('@cardstack/plugin-utils/logger')('cardstack/notification');
+const logger = require('@cardstack/logger')('cardstack/notification');
 
 module.exports = declareInjections({
   service: `plugin-services:${require.resolve('./service')}`

@@ -1,4 +1,4 @@
-const log = require('@cardstack/plugin-utils/logger')('cardstack/notification');
+const log = require('@cardstack/logger')('cardstack/notification');
 const Session = require('@cardstack/plugin-utils/session');
 const { declareInjections } = require('@cardstack/di');
 const messengerName = 'socket-notification';
