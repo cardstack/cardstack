@@ -25,4 +25,18 @@ describe('rendering/transform', function() {
     let result = processTemplate(template, { moduleName });
     expect(result).to.equal(outputTemplate);
   });
+
+  it('it prevents naming collisions for introduced block params', function() {
+    let template = '{{#image-wrapper as |param1|}}<img class={{param1}} data-test-image="book-image" src={{content.imageUrl}} />{{/image-wrapper}}';
+    let outputTemplate= '{{#image-wrapper as |param1|}}{{#cs-field content "imageUrl" as |param2|}}<img class={{param1}} data-test-image="book-image" src={{param2}}></img>{{/cs-field}}{{/image-wrapper}}';
+    let result = processTemplate(template, { moduleName });
+    expect(result).to.equal(outputTemplate);
+  });
+
+  it('it transforms >2 level trees with block params', function() {
+    let template = '{{#cs-toolbox as |param1|}}{{#image-wrapper as |param2|}}<img class={{param2}} data-test-image="book-image" src={{content.imageUrl}} />{{/image-wrapper}}{{/cs-toolbox}}';
+    let outputTemplate= '{{#cs-toolbox as |param1|}}{{#image-wrapper as |param2|}}{{#cs-field content "imageUrl" as |param3|}}<img class={{param2}} data-test-image="book-image" src={{param3}}></img>{{/cs-field}}{{/image-wrapper}}{{/cs-toolbox}}';
+    let result = processTemplate(template, { moduleName });
+    expect(result).to.equal(outputTemplate);
+  });
 });

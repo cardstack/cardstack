@@ -34,10 +34,12 @@ function BindTransform({ moduleName }) {
 BindTransform.prototype.transform = function(ast) {
   if (/\btemplates\/components\/cardstack\//.test(this.moduleName)){
     var b = this.syntax.builders;
+    var foundBlockParams = collectBlockParams(ast);
 
     this.syntax.traverse(ast, {
       ElementNode(node) {
         var contentProperty,
+            unusedBlockParam,
             foundDynamicContent = false,
             newAttributes = [];
 
@@ -57,8 +59,11 @@ BindTransform.prototype.transform = function(ast) {
               foundDynamicContent = true;
               // contentProperty is the property that is looked up on content
               // (e.g `imageUrl` in the case of `content.imageUrl`)
+              unusedBlockParam = getUnusedBlockParam(foundBlockParams);
               contentProperty = parts[1];
-              newAttributes.push(b.attr(name, b.mustache(b.path('param1'))));
+              newAttributes.push(b.attr(name, b.mustache(b.path(unusedBlockParam))));
+            } else {
+              newAttributes.push(b.attr(name, value));
             }
           } else if (nodeAttributes.type === 'AttrNode') {
             newAttributes.push(b.attr(name, value));
@@ -69,7 +74,7 @@ BindTransform.prototype.transform = function(ast) {
 
         if (foundDynamicContent) {
           var newTag = b.element(tag, newAttributes, []);
-          var blockWithParam = b.program([newTag], ['param1']);
+          var blockWithParam = b.program([newTag], [unusedBlockParam]);
           let block = b.block(b.path('cs-field'), [
             b.path("content"), b.string(contentProperty)
           ], b.hash(), blockWithParam);
@@ -88,5 +93,40 @@ BindTransform.prototype.transform = function(ast) {
   }
   return ast;
 };
+
+function getUnusedBlockParam(foundNames) {
+  var foundName = false;
+  var i = 0;
+  var paramName;
+
+  do {
+    i++;
+    paramName = 'param' + i;
+    if (foundNames.indexOf(paramName) === -1) {
+      foundName = true;
+    }
+  } while (!foundName);
+
+  return paramName;
+}
+
+
+
+function collectBlockParams(ast, foundBlockParams) {
+  if (!foundBlockParams) {
+    foundBlockParams = [];
+  }
+
+  for (var i=0; i<ast.body.length; i++) {
+    var tree = ast.body[i];
+    var program = tree.program;
+    if (program) {
+      foundBlockParams = foundBlockParams.concat(program.blockParams);
+      return collectBlockParams(program, foundBlockParams);
+    }
+  }
+
+  return foundBlockParams;
+}
 
 module.exports = BindTransform;
