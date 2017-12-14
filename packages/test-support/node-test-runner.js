@@ -1,13 +1,7 @@
-// nothing else should come before this lines, because we're mangling
-// environment variable that must be mangled before anything else
-// causes require('debug').
-const prepare = require('./prepare-node-tests');
-
-
-const lint = require('mocha-eslint');
 const glob = require('glob');
-const path = require('path');
 const requireUncached = require('require-uncached');
+const prepare = require('./prepare-node-tests');
+const lint = require('./node-lint-runner');
 
 
 module.exports = function() {
@@ -29,5 +23,5 @@ module.exports = function() {
     }
   }
 
-  lint([ path.join(process.cwd()) ], { timeout: 20000 });
+  lint();
 };

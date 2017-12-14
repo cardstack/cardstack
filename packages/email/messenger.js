@@ -1,4 +1,4 @@
-const logger = require('@cardstack/plugin-utils/logger')('email');
+const log = require('@cardstack/logger')('cardstack/email');
 const nodemailer = require('nodemailer');
 
 module.exports = class EmailMessenger {
@@ -23,7 +23,7 @@ module.exports = class EmailMessenger {
     });
   }
   async send(message) {
-    logger.info(`Sending mail to ${message.to}: ${message.subject}`);
+    log.info(`Sending mail to ${message.to}: ${message.subject}`);
     return this.transporter.sendMail(message);
   }
 };

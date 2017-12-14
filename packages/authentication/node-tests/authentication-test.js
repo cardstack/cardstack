@@ -5,7 +5,7 @@ const {
   destroyDefaultEnvironment
 } = require('@cardstack/test-support/env');
 const JSONAPIFactory = require('@cardstack/test-support/jsonapi-factory');
-const logger = require('@cardstack/plugin-utils/logger');
+const logger = require('@cardstack/logger');
 
 describe('authentication/middleware', function() {
 

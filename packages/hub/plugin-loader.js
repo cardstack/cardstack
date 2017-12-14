@@ -4,7 +4,7 @@ const {
   setOwner
 } = require('@cardstack/di');
 const path = require('path');
-const log = require('@cardstack/plugin-utils/logger')('plugin-loader');
+const log = require('@cardstack/logger')('cardstack/plugin-loader');
 const denodeify = require('denodeify');
 const resolve = denodeify(require('resolve'));
 const fs = require('fs');
@@ -12,8 +12,7 @@ const realpath = denodeify(fs.realpath);
 const readdir = denodeify(fs.readdir);
 const Error = require('@cardstack/plugin-utils/error');
 
-// provides "%t" in debug logger
-require('./table-log-formatter');
+log.registerFormatter('t', require('./table-log-formatter'));
 
 const featureTypes = [
   'constraint-types',

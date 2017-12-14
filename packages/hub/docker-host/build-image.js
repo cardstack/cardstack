@@ -5,7 +5,7 @@ const path = require('path');
 const tar = require('tar-stream');
 const tarfs = require('tar-fs');
 
-const log = require('@cardstack/plugin-utils/logger')('hub/build-image');
+const log = require('@cardstack/logger')('cardstack/hub/build-image');
 
 module.exports = function buildAppImage(packages, appName) {
   let context = buildContext(packages, appName);

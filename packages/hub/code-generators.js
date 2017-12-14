@@ -1,5 +1,5 @@
 const { declareInjections } = require('@cardstack/di');
-const log = require('@cardstack/plugin-utils/logger')('code-gen');
+const log = require('@cardstack/logger')('cardstack/code-gen');
 
 module.exports = declareInjections({
   plugins: 'hub:plugins'

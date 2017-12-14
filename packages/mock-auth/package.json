@@ -24,6 +24,7 @@
   },
   "dependencies": {
     "@cardstack/authentication": "^0.4.1",
+    "@cardstack/logger": "^0.1.0",
     "@cardstack/plugin-utils": "^0.4.1",
     "ember-cli-babel": "^6.8.2",
     "ember-cli-htmlbars": "^2.0.1",
@@ -55,6 +56,7 @@
     "ember-source": "~2.17.0-beta.1",
     "eslint": "4.9.0",
     "eslint-plugin-ember": "^4.6.1",
+    "eslint-plugin-node": "^5.2.1",
     "loader.js": "^4.2.3"
   },
   "engines": {

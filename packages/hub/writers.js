@@ -1,5 +1,5 @@
 const Error = require('@cardstack/plugin-utils/error');
-const logger = require('@cardstack/plugin-utils/logger');
+const log = require('@cardstack/logger')('cardstack/writers');
 const { declareInjections } = require('@cardstack/di');
 
 module.exports = declareInjections({
@@ -8,16 +8,12 @@ module.exports = declareInjections({
 },
 
 class Writers {
-  constructor() {
-    this.log = logger('writers');
-  }
-
   get schemaTypes() {
     return this.schemaLoader.ownTypes();
   }
 
   async create(branch, session, type, document) {
-    this.log.info("creating type=%s", type);
+    log.info("creating type=%s", type);
     let schema = await this.schema.forBranch(branch);
     let writer = this._lookupWriter(schema, type);
     let isSchema = this.schemaTypes.includes(type);
@@ -35,7 +31,7 @@ class Writers {
   }
 
   async update(branch, session, type, id, document) {
-    this.log.info("updating type=%s id=%s", type, id);
+    log.info("updating type=%s id=%s", type, id);
     let schema = await this.schema.forBranch(branch);
     let writer = this._lookupWriter(schema, type);
     let isSchema = this.schemaTypes.includes(type);
@@ -53,7 +49,7 @@ class Writers {
   }
 
   async delete(branch, session, version, type, id) {
-    this.log.info("deleting type=%s id=%s", type, id);
+    log.info("deleting type=%s id=%s", type, id);
     let schema = await this.schema.forBranch(branch);
     let writer = this._lookupWriter(schema, type);
     let isSchema = this.schemaTypes.includes(type);
@@ -90,7 +86,7 @@ class Writers {
     let contentType = schema.types.get(type);
     let writer;
     if (!contentType || !contentType.dataSource || !(writer = contentType.dataSource.writer)) {
-      this.log.debug('non-writeable type %s: exists=%s hasDataSource=%s hasWriter=%s', type, !!contentType, !!(contentType && contentType.dataSource), !!writer);
+      log.debug('non-writeable type %s: exists=%s hasDataSource=%s hasWriter=%s', type, !!contentType, !!(contentType && contentType.dataSource), !!writer);
 
       throw new Error(`"${type}" is not a writable type`, {
         status: 403,

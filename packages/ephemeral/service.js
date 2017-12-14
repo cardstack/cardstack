@@ -1,5 +1,5 @@
 const Error = require('@cardstack/plugin-utils/error');
-const log = require('@cardstack/plugin-utils/logger')('ephemeral');
+const log = require('@cardstack/logger')('cardstack/ephemeral');
 const { declareInjections } = require('@cardstack/di');
 const { partition } = require('lodash');
 const PendingChange = require('@cardstack/plugin-utils/pending-change');

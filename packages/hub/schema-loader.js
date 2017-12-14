@@ -4,7 +4,7 @@ const Constraint = require('./schema/constraint');
 const ContentType = require('./schema/content-type');
 const DataSource = require('./schema/data-source');
 const Grant = require('./schema/grant');
-const logger = require('@cardstack/plugin-utils/logger');
+const logger = require('@cardstack/logger');
 const {
   declareInjections,
   getOwner
@@ -32,8 +32,8 @@ class SchemaLoader {
   async loadFrom(inputModels) {
     let models = inputModels;
     let plugins = await this.pluginLoader.configuredPlugins(models.filter(model => model.type === 'plugin-configs'));
-    let authLog = logger('auth');
-    let schemaLog = logger('schema');
+    let authLog = logger('cardstack/auth');
+    let schemaLog = logger('cardstack/schema');
     let defaultValues = findDefaultValues(models);
     let grants = findGrants(models);
     let fields = findFields(models, plugins, grants, defaultValues, authLog);

@@ -3,9 +3,20 @@
 const { makeServer } = require('../main');
 const commander = require('commander');
 const path = require('path');
-const logger = require('@cardstack/plugin-utils/logger');
-const log = logger('server');
 const fs = require('fs');
+const logger = require('@cardstack/logger');
+const log = logger('cardstack/server');
+
+if (process.env.EMBER_ENV === 'test') {
+  logger.configure({
+    defaultLevel: 'warn'
+  });
+} else {
+  logger.configure({
+    defaultLevel: 'warn',
+    logLevels: [['cardstack/*', 'info']]
+  });
+}
 
 async function runServer(options, seedModels) {
   let {

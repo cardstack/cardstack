@@ -1,5 +1,5 @@
 const Client = require('./client');
-const logger = require('@cardstack/plugin-utils/logger');
+const log = require('@cardstack/logger')('cardstack/searcher');
 const Error = require('@cardstack/plugin-utils/error');
 const toJSONAPI = require('./to-jsonapi');
 const { declareInjections } = require('@cardstack/di');
@@ -11,7 +11,6 @@ module.exports = declareInjections({
 class Searcher {
   constructor() {
     this.client = null;
-    this.log = logger('searcher');
   }
 
   async _ensureClient() {
@@ -24,7 +23,7 @@ class Searcher {
     await this._ensureClient();
     let index = Client.branchToIndexName(branch);
     let esId = `${branch}/${id}`;
-    this.log.debug('get %s %s %s', index, type, esId);
+    log.debug('get %s %s %s', index, type, esId);
     let document;
     try {
       document = await this.client.es.getSource({ index, type, id: esId });
@@ -86,13 +85,13 @@ class Searcher {
         esBody.query.bool.must.push(expression);
       }
     }
-    this.log.debug('search %j', esBody);
+    log.debug('search %j', esBody);
     try {
       let result = await this.client.es.search({
         index: Client.branchToIndexName(branch),
         body: esBody
       });
-      this.log.debug('searchResult %j', result);
+      log.debug('searchResult %j', result);
       return this._assembleResponse(result, size);
     } catch (err) {
       // elasticsearch errors have their own status codes, and Koa
