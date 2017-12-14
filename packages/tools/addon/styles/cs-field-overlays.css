@@ -24,4 +24,65 @@
     top: 0;
     left: 0;
     position: absolute;
+    transition: transform 250ms ease;
+}
+
+.block-control .current-block {
+    box-sizing: border-box;
+    background-color: white;
+    font-size: 16px;
+    line-height: 11px;
+    border: 1px solid #b4b4b4;
+    text-align: left;
+    border-radius: 3px;
+    float: left;
+    width: 30px;
+    height: 30px;
+    margin: 0 6px 6px 0;
+    padding: 7px 7px;
+    cursor: pointer;
+}
+
+.block-options button, .paragraph-options button, .current-block {
+    box-sizing: border-box;
+    background-color: white;
+    font-size: 16px;
+    line-height: 11px;
+    border: 1px solid #b4b4b4;
+    text-align: left;
+    border-radius: 3px;
+    float: left;
+    width: 30px;
+    height: 30px;
+    margin: 0 6px 6px 0;
+    padding: 7px 7px;
+    cursor: pointer;
+}
+
+.block-options button:nth-child(4n), .paragraph-options button:nth-child(4n) {
+    margin-right: 0;
+}
+
+.block-options button svg, .paragraph-options button svg, .current-block svg {
+    width: 15px;
+    height: 13px;
+}
+
+.block-options button.active, .paragraph-options button.active,
+.block-options button.active:hover, .paragraph-options button.active:hover {
+    background-color: #63A9FA;
+    border-color: darken(#63A9FA, 10%);
+}
+
+.block-options button.active svg, .paragraph-options button.active svg,
+.block-options button.active:hover svg, .paragraph-options button.active:hover svg,
+.block-options button.active svg g, .paragraph-options button.active svg g,
+.block-options button.active:hover svg g, .paragraph-options button.active:hover svg g {
+    fill: #FFFFFF;
+}
+
+.block-options button:hover, .paragraph-options button:hover,
+.block-options button:hover svg, .paragraph-options button:hover svg,
+.block-options button:hover svg g, .paragraph-options button:hover svg g {
+    border-color: #63A9FA;
 }

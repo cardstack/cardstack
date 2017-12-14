@@ -50,7 +50,19 @@
 
   {{#if currentIcon}}
   <div class="current-block" {{action "toggleMenu"}}>
-    {{cs-icon name=currentIcon}}
+    {{#if (eq 'p' _lastActiveSection.tagName)}}
+      {{cs-icon name="EditorP"}}
+    {{else if (eq 'h2' _lastActiveSection.tagName)}}
+      {{cs-icon name="EditorH2"}}
+    {{else if (eq 'h3' _lastActiveSection.tagName)}}
+      {{cs-icon name="EditorH3"}}
+    {{else if (eq 'ul' _lastActiveSection.tagName)}}
+      {{cs-icon name="EditorList"}}
+    {{else if (eq 'ol' _lastActiveSection.tagName)}}
+      {{cs-icon name="EditorNumberList"}}
+    {{else if (eq 'blockquote' _lastActiveSection.tagName)}}
+      {{cs-icon name="EditorQuote"}}
+    {{/if}}
   </div>
   {{/if}}
 
