@@ -9,6 +9,9 @@
     "node": ">= 7.7"
   },
   "devDependencies": {
+    "eslint": "4.9.0",
+    "eslint-plugin-ember": "^4.6.1",
+    "@cardstack/eslint-config": "0.3.4",
     "lerna": "^2.0.0-rc.5",
     "mocha": "^3.2.0"
   },
