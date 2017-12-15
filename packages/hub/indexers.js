@@ -284,6 +284,7 @@ class RunningIndexers {
   async update(realTime, hints) {
     await this._loadSchemas();
     await Promise.all(Object.values(this.branches).map(branch => branch.update(realTime, hints)));
+    log.log('updated all the branches');
     return await this._schemas();
   }
 
@@ -354,6 +355,7 @@ class BranchUpdate {
     this.bulkOps = this.client.bulkOps({ realTime });
     await this.client.accomodateSchema(this.branch, await this.schema());
     await this._updateContent(hints);
+    log.log('branch update %s', this.branch);
   }
 
   async _updateContent(hints) {

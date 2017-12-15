@@ -8,6 +8,22 @@ module.exports = [
   },
   {
     type: 'data-sources',
+    id: 'mock-auth',
+    attributes: {
+      'source-type': '@cardstack/mock-auth',
+      params: {
+        users: {
+          user1:{
+            name: "Hassan Abdel-Rahman",
+            email: "hassan.abdelrahman@gmail.com",
+            picture: "https://lh3.googleusercontent.com/-U2m6pPQ7vKY/AAAAAAAAAAI/AAAAAAAAAc0/z6Y4IOekEcU/photo.jpg",
+          }
+        }
+      }
+    }
+  },
+  {
+    type: 'data-sources',
     id: 'default',
     attributes: {
       'source-type': '@cardstack/ephemeral',
@@ -24,7 +40,41 @@ module.exports = [
         data: { type: 'data-sources', id: 'default' }
       }
     }
-  }
+  },
+      {
+        type: 'content-types',
+        id: 'mock-users',
+        attributes: {
+        },
+        relationships: {
+          'fields': { data: [
+            { type: 'fields', id: 'name' },
+            { type: 'fields', id: 'email' },
+            { type: 'fields', id: 'avatar-url' }
+          ] }
+        }
+      },
+      {
+        type: 'fields',
+        id: 'name',
+        attributes: {
+          'field-type': '@cardstack/core-types::string'
+        }
+      },
+      {
+        type: 'fields',
+        id: 'email',
+        attributes: {
+          'field-type': '@cardstack/core-types::string'
+        }
+      },
+      {
+        type: 'fields',
+        id: 'avatar-url',
+        attributes: {
+          'field-type': '@cardstack/core-types::string'
+        }
+      },
 ];
 
 function initialModels() {
@@ -46,19 +96,6 @@ function initialModels() {
       }
     }
   });
-  factory.addResource('data-sources', 'mock-auth')
-    .withAttributes({
-      sourceType: '@cardstack/mock-auth',
-      params: {
-        users: {
-          user1:{
-            name: "Hassan Abdel-Rahman",
-            email: "hassan.abdelrahman@gmail.com",
-            picture: "https://lh3.googleusercontent.com/-U2m6pPQ7vKY/AAAAAAAAAAI/AAAAAAAAAc0/z6Y4IOekEcU/photo.jpg",
-          }
-        }
-      }
-    });
   factory.addResource('content-types', 'messages')
     .withRelated('fields', [
       factory.addResource('fields', 'message').withAttributes({
