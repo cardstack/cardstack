@@ -63,6 +63,9 @@
     `updateContent` should call `ops.save` and/or `ops.delete` as many
     times as necessary, then return a new `meta` state.
 
+    `read` should return an up-to-date json-api document directly from
+    the data source. It will sometimes be used to update caches.
+
   - the Hub ensures that only one indexer per data source is
     instantiated and running at a given time. You don't need to
     implement locking in the indexer.
