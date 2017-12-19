@@ -5,6 +5,7 @@ import Range from 'mobiledoc-kit/utils/cursor/range';
 import { containsNode } from 'mobiledoc-kit/utils/dom-utils';
 import layout from '../templates/components/paragraph-options';
 import inject from 'ember-service/inject';
+import { NEW_LINE_HREF } from './-priv-mobiledoc-editor';
 
 export default Component.extend({
   layout,
@@ -77,6 +78,31 @@ export default Component.extend({
     }
   },
 
+  updateLinkMarkup() {
+    let editor = this.get('editor.editor');
+    let range = this.get('linking');
+    if (!range) { return; }
+    editor.run(postEditor => {
+
+      let existingMarkup = editor.detectMarkupInRange(range, 'a');
+      let isNewline = existingMarkup && existingMarkup.attributes && existingMarkup.attributes.href === NEW_LINE_HREF;
+      if (existingMarkup && !isNewline) {
+        postEditor.removeMarkupFromRange(range, existingMarkup);
+      }
+
+      let url = this.get('linkUrl');
+      if (url && url.length > 0) {
+        let attrs = { href: this.get('linkUrl') };
+        if (this.get('isExternalLink')) {
+          attrs.target = "_new";
+        }
+
+        let markup = postEditor.builder.createMarkup('a', attrs);
+        postEditor.addMarkupToRange(range, markup);
+      }
+    });
+  },
+
   actions: {
     toggleMenu() {
       this.set('blockMenu', !this.get('blockMenu'));
@@ -107,6 +133,18 @@ export default Component.extend({
       }
       this._ignoreCursorDidChange = true;
       this.set('linking', range);
+    },
+    setLinkExternal(isExternal) {
+      if (this.get('isExternalLink') !== isExternal) {
+        this.set('isExternalLink', isExternal);
+        this.updateLinkMarkup();
+      }
+    },
+    setLinkUrl(link) {
+      if (this.get('linkUrl') !== link) {
+        this.set('linkUrl', link);
+        this.updateLinkMarkup();
+      }
     }
   }
 });

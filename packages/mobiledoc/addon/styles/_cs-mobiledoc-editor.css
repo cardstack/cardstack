@@ -1,0 +1,125 @@
+.block-control {
+  z-index: 1;
+  top: 0;
+  left: 0;
+  position: absolute;
+  transition: transform 250ms ease;
+}
+
+.block-options, .paragraph-options {
+  position: absolute;
+  top: 46px;
+  left: -34px;
+  background-color: #fff;
+  border-radius: 3px;
+  padding: 12px 12px 6px;
+  display: inline-block;
+  width: 165px;
+  border: 1px solid #e9e9e9;
+  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.2);
+}
+
+.block-options:after, .paragraph-options:after, .block-options:before, .paragraph-options:before {
+  bottom: 100%;
+  left: 25%;
+  border: solid transparent;
+  content: " ";
+  height: 0;
+  width: 0;
+  position: absolute;
+  pointer-events: none;
+}
+
+.block-options:after, .paragraph-options:after {
+  border-color: rgba(255, 255, 255, 0);
+  border-bottom-color: #ffffff;
+  border-width: 14px;
+  margin-left: -14px;
+}
+
+.block-options:before, .paragraph-options:before {
+  border-color: rgba(233, 233, 233, 0);
+  border-bottom-color: #e9e9e9;
+  border-width: 15px;
+  margin-left: -15px;
+}
+
+.block-options button, .paragraph-options button, .current-block {
+  box-sizing: border-box;
+  background-color: white;
+  font-size: 16px;
+  line-height: 11px;
+  border: 1px solid #b4b4b4;
+  text-align: left;
+  border-radius: 3px;
+  float: left;
+  width: 30px;
+  height: 30px;
+  margin: 0 6px 6px 0;
+  padding: 7px 7px;
+  cursor: pointer;
+}
+
+.block-options button:nth-child(4n), .paragraph-options button:nth-child(4n) {
+  margin-right: 0;
+}
+
+.block-options button svg, .paragraph-options button svg, .current-block svg {
+  width: 15px;
+  height: 13px;
+}
+
+.block-options button.active, .paragraph-options button.active,
+.block-options button.active:hover, .paragraph-options button.active:hover {
+  background-color: #63A9FA;
+  border-color: darken(#63A9FA, 10%);
+}
+
+.block-options button.active svg, .paragraph-options button.active svg,
+.block-options button.active:hover svg, .paragraph-options button.active:hover svg,
+.block-options button.active svg g, .paragraph-options button.active svg g,
+.block-options button.active:hover svg g, .paragraph-options button.active:hover svg g {
+  fill: #FFFFFF;
+}
+
+.block-options button:hover, .paragraph-options button:hover,
+.block-options button:hover svg, .paragraph-options button:hover svg,
+.block-options button:hover svg g, .paragraph-options button:hover svg g {
+  border-color: #63A9FA;
+}
+
+.paragraph-options {
+  top: 0;
+  left: 0;
+  position: absolute;
+  box-shadow: 0 -3px 10px rgba(0,0,0,.2);
+  z-index: 1;
+  width: auto;
+}
+.paragraph-options:after, .paragraph-options:before {
+  top: 100%;
+  left: 50%;
+}
+.paragraph-options:after {
+  border-top-color: #ffffff;
+  border-bottom: none;
+}
+.paragraph-options:before {
+  border-top-color: #e9e9e9;
+  border-bottom: none;
+}
+
+.paragraph-options input[type="text"] {
+  padding: .1em .5em;
+}
+
+.paragraph-options .checkbox {
+  font-size: 11px;
+  display: inline-block;
+  margin-left: .5em;
+  color: #9b9b9b;
+}
+
+.__mobiledoc-tooltip {
+  z-index: 10;
+}

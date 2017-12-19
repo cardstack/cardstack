@@ -2,9 +2,9 @@
   <div class="paragraph-options">
     {{#if linking}}
       <span class="block-option active">{{cs-icon name="EditorLink"}}</span>
-      {{#auto-focus}}
-        {{one-way-input value=linkUrl update=(action "setLinkUrl") placeholder="http://" }}
-      {{/auto-focus}}
+      {{cs-one-way-input value=linkUrl
+                         update=(action "setLinkUrl")
+                         placeholder="http://" }}
       <div class="checkbox">
         <label>
           <input type="checkbox" checked={{isExternalLink}} onchange={{action "setLinkExternal" value="target.checked"}} />
