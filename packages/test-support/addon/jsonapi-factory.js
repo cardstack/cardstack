@@ -42,7 +42,13 @@ export default class JSONAPIFactory {
           }
         });
       }
-      dependsOn.push(`content-types/${model.type}`);
+      // A model implicitly depends on its type, so include it if it was defined
+      // by this factory.
+      // But in acceptance tests this factory may be combined with other data sources,
+      // and the type may be defined there instead.
+      if (this.data.some(r => r.type === 'content-types' && r.id === model.type)) {
+        dependsOn.push(`content-types/${model.type}`);
+      }
 
       // These are all boostrap schema and we need to not include them
       // here to avoid circularity.
