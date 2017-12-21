@@ -78,7 +78,6 @@ describe('hub/indexers', function() {
     });
   });
 
-
   describe("nested data sources", function() {
     afterEach(teardown);
 
@@ -129,4 +128,21 @@ describe('hub/indexers', function() {
     });
   });
 
+  describe('events', function() {
+    beforeEach(setup);
+    afterEach(teardown);
+
+    it("triggers an event after each indexing", async function() {
+      let indexers = await env.lookup('hub:indexers');
+
+      let resolve;
+      let done = new Promise(r => resolve = r);
+      indexers.events.on('index_update', resolve);
+
+      indexers.update();
+
+      return done;
+    });
+  });
+  
 });
