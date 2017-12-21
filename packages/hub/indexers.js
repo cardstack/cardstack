@@ -37,11 +37,15 @@
 
 */
 
+const EventEmitter = require('events');
+const { flatten, uniqBy } = require('lodash');
 const log = require('@cardstack/logger')('cardstack/indexers');
 const Client = require('@cardstack/elasticsearch/client');
 const { declareInjections } = require('@cardstack/di');
+const toJSONAPI = require('@cardstack/elasticsearch/to-jsonapi');
 const bootstrapSchema = require('./bootstrap-schema');
-const RunningIndexers = require('./indexing/running-indexers');
+
+const owningDataSource = new WeakMap();
 
 module.exports = declareInjections({
   schemaLoader: 'hub:schema-loader',
@@ -56,6 +60,7 @@ class Indexers {
     this._forceRefreshQueue = [];
     this._seedSchemaMemo = null;
     this._schemaCache = null;
+    this.events = new EventEmitter();
   }
 
   async schemaForBranch(branch) {
@@ -181,6 +186,7 @@ class Indexers {
     } finally {
       running.destroy();
     }
+    this.events.emit('index_update');
     log.debug('end update, forceRefresh=%s', forceRefresh);
   }
 
