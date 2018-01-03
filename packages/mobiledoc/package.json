@@ -33,6 +33,8 @@
   },
   "devDependencies": {
     "@cardstack/eslint-config": "^0.3.4",
+    "@cardstack/hub": "^0.4.1",
+    "@cardstack/tools": "^0.4.1",
     "broccoli-asset-rev": "^2.4.5",
     "ember-cli": "https://github.com/ember-cli/ember-cli#a4734540b3889c7f6ef304fe6a81dd356f77bfe4",
     "ember-cli-dependency-checker": "^2.1.0",
@@ -48,6 +50,7 @@
     "ember-load-initializers": "^1.0.0",
     "ember-resolver": "^4.0.0",
     "ember-source": "~2.17.0-beta.1",
+    "ember-truth-helpers": "^1.3.0",
     "eslint": "4.9.0",
     "eslint-plugin-ember": "^4.6.1",
     "eslint-plugin-node": "^5.2.1",
