@@ -1,6 +1,6 @@
 {
   "name": "@cardstack/image",
-  "version": "0.4.0",
+  "version": "0.4.4",
   "description": "Image field plugin for cardstack",
   "keywords": [
     "ember-addon",
@@ -27,7 +27,7 @@
     "ember-cli-htmlbars": "^2.0.1"
   },
   "devDependencies": {
-    "@cardstack/eslint-config": "^0.3.4",
+    "@cardstack/eslint-config": "^0.4.4",
     "broccoli-asset-rev": "^2.4.5",
     "ember-cli": "https://github.com/ember-cli/ember-cli#a4734540b3889c7f6ef304fe6a81dd356f77bfe4",
     "ember-cli-dependency-checker": "^2.1.0",
