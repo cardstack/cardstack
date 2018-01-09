@@ -1,6 +1,6 @@
 const Handlebars = require('handlebars');
 const template = Handlebars.compile(`
-define("@cardstack/hub/environment", ["exports"], function (exports) {
+define("@cardstack/plugin-utils/environment", ["exports"], function (exports) {
   "use strict";
   Object.defineProperty(exports, "__esModule", {
     value: true
@@ -20,7 +20,6 @@ module.exports = class {
     return template({ properties: Object.entries(env).map(([name, value]) => ({ name, value })) });
   }
   _content() {
-    // TODO: make these dynamic
     return {
       defaultBranch: 'master',
       hubURL: 'http://localhost:3000',

@@ -1,4 +1,4 @@
-import { hubURL, defaultBranch } from '@cardstack/hub/environment';
+import { hubURL, defaultBranch } from '@cardstack/plugin-utils/environment';
 import fetch from 'fetch';
 import Service from '@ember/service';
 import { computed } from '@ember/object';

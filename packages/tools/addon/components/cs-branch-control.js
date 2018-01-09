@@ -1,6 +1,6 @@
 import Ember from 'ember';
 import layout from '../templates/components/cs-branch-control';
-import { defaultBranch } from '@cardstack/hub/environment';
+import { defaultBranch } from '@cardstack/plugin-utils/environment';
 
 export default Ember.Component.extend({
   layout,

@@ -1,7 +1,7 @@
 import Ember from 'ember';
 import Base from 'ember-simple-auth/authenticators/base';
 import RSVP from 'rsvp';
-import { hubURL } from '@cardstack/hub/environment';
+import { hubURL } from '@cardstack/plugin-utils/environment';
 
 export default Base.extend({
   cardstackSession: Ember.inject.service(),

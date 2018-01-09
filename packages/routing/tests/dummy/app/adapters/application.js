@@ -1,6 +1,6 @@
 import DS from 'ember-data';
 import Ember from 'ember';
-import { hubURL } from '@cardstack/hub/environment';
+import { hubURL } from '@cardstack/plugin-utils/environment';
 
 export default DS.JSONAPIAdapter.extend({
   host: hubURL,
