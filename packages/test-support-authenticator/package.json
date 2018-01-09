@@ -6,13 +6,13 @@
   "cardstack-plugin": {
     "api-version": 1
   },
-  "version": "0.4.1",
+  "version": "0.4.4",
   "dependencies": {
-    "@cardstack/di": "^0.3.4",
-    "@cardstack/plugin-utils": "^0.4.1"
+    "@cardstack/di": "^0.4.4",
+    "@cardstack/plugin-utils": "^0.4.4"
   },
   "devDependencies": {
-    "@cardstack/eslint-config": "^0.3.4",
+    "@cardstack/eslint-config": "^0.4.4",
     "eslint": "4.9.0",
     "eslint-plugin-ember": "^4.6.1",
     "eslint-plugin-node": "^5.2.1"
