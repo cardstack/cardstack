@@ -1,6 +1,6 @@
 import Ember from 'ember';
 import { pluralize, singularize } from 'ember-inflector';
-import { defaultBranch } from '@cardstack/hub/environment';
+import { defaultBranch } from '@cardstack/plugin-utils/environment';
 
 export default Ember.Service.extend({
   defaultContentType: 'pages',

@@ -20,6 +20,7 @@
   },
   "dependencies": {
     "@cardstack/rendering": "^0.4.4",
+    "@cardstack/plugin-utils": "^0.4.4",
     "ember-cli-babel": "^6.8.2",
     "ember-cli-htmlbars": "^2.0.1",
     "ember-cli-is-component": "^0.5.0",

@@ -10,7 +10,7 @@
   },
   "devDependencies": {
     "lerna": "^2.0.0-rc.5",
-    "mocha": "^3.2.0"
+    "mocha": "^4.0.1"
   },
   "scripts": {
     "test": "npm run node-tests && npm run ember-tests",
