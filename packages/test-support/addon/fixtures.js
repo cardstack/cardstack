@@ -1,5 +1,5 @@
 import Factory from './jsonapi-factory';
-import { hubURL } from '@cardstack/hub/environment';
+import { hubURL } from '@cardstack/plugin-utils/environment';
 
 export default class Fixtures {
   constructor(fn) {

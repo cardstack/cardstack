@@ -2,7 +2,7 @@ import Ember from 'ember';
 import { transitionTo } from '../private-api';
 import { modelType } from '@cardstack/rendering/helpers/cs-model-type';
 import injectOptional from 'ember-inject-optional';
-import { defaultBranch } from '@cardstack/hub/environment';
+import { defaultBranch } from '@cardstack/plugin-utils/environment';
 
 export default Ember.Service.extend({
   overlays: Ember.inject.service('ember-overlays'),

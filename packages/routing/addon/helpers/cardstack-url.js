@@ -1,6 +1,6 @@
 import Ember from 'ember';
 import { modelType } from '@cardstack/rendering/helpers/cs-model-type';
-import { defaultBranch } from '@cardstack/hub/environment';
+import { defaultBranch } from '@cardstack/plugin-utils/environment';
 import { pluralize } from 'ember-inflector';
 import { hrefTo } from 'ember-href-to/helpers/href-to';
 

@@ -3,7 +3,7 @@ import layout from '../templates/components/cs-version-control';
 import { task } from 'ember-concurrency';
 import { transitionTo } from '../private-api';
 import { modelType } from '@cardstack/rendering/helpers/cs-model-type';
-import { defaultBranch } from '@cardstack/hub/environment';
+import { defaultBranch } from '@cardstack/plugin-utils/environment';
 import { computed } from "@ember/object";
 
 export default Ember.Component.extend({
