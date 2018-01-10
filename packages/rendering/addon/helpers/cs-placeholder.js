@@ -1,8 +1,7 @@
 import Ember from 'ember';
-import { humanize } from './cs-humanize';
 
 export default Ember.Helper.helper(function(params, options={}) {
-  let { fieldConfig, fieldCaption, value, active, fieldName } = options;
+  let { fieldConfig, fieldCaption, value, active } = options;
 
   if (!active) {
     return value;
@@ -14,7 +13,7 @@ export default Ember.Helper.helper(function(params, options={}) {
   }
   if (isEmpty) {
     if (fieldConfig && fieldConfig.placeholder) {
-      return fieldConfig.placeholder(humanize(fieldName));
+      return fieldConfig.placeholder(fieldCaption);
     } else {
       return `Enter ${fieldCaption}`;
     }
