@@ -29,6 +29,7 @@
     "ember-elsewhere": "^1.0.3",
     "ember-mobiledoc-dom-renderer": "^0.6.0",
     "ember-mobiledoc-editor": "^0.5.10",
+    "ember-svg-jar": "https://github.com/ef4/ember-svg-jar#5725b763ecfdf261335130f50cb2c51122fe0c0d",
     "mobiledoc-text-renderer": "^0.3.2"
   },
   "devDependencies": {
