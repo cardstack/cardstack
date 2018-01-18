@@ -304,6 +304,12 @@ class Searcher {
       }
     }
 
+    if (value.prefix != null) {
+      let esName = await this.client.logicalFieldToES(branch, field.queryFieldName);
+      let path = aboveSegments.concat(esName).join('.');
+      return { match_phrase_prefix: { [path] : value.prefix } };
+    }
+
     throw new Error(`Unimplemented filter ${key} ${value}`);
   }
 

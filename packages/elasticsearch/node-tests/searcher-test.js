@@ -712,4 +712,16 @@ describe('elasticsearch/searcher', function() {
     expect(response.data).length(1);
   });
 
+  it('can do prefix matching', async function() {
+    let { data: models } = await searcher.search('master', {
+      filter: {
+        'last-name': {
+          prefix: 'Faulk'
+        }
+      }
+    });
+    expect(models).length(2);
+    expect(models).includes.something.with.deep.property('attributes.first-name', 'Quint' );
+    expect(models).includes.something.with.deep.property('attributes.first-name', 'Arthur' );
+  });
 });
