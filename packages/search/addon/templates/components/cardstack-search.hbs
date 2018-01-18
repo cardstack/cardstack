@@ -1,5 +1,7 @@
 {{#each items as |item|}}
   {{yield item}}
+{{else}}
+  {{yield to="inverse"}}
 {{/each}}
 {{#if cursor}}
   <div {{action (perform search cursor) }}>More</div>
