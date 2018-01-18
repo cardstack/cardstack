@@ -15,6 +15,7 @@ describe('elasticsearch/indexer', function() {
   let env, factory, writer, indexer, searcher;
 
   before(async function() {
+    this.timeout(2500);
     factory = new Factory();
 
     factory.addResource('content-types', 'articles').withAttributes({

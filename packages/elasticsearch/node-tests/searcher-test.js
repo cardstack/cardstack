@@ -18,6 +18,7 @@ describe('elasticsearch/searcher', function() {
   let searcher, env, factory;
 
   before(async function() {
+    this.timeout(2500);
     factory = new Factory();
 
     factory.addResource('content-types', 'people').withRelated('fields', [
