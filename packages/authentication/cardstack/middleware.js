@@ -10,6 +10,12 @@ const { declareInjections } = require('@cardstack/di');
 const { withJsonErrorHandling } = Error;
 const { rewriteExternalUser } = require('..');
 
+function addCorsHeaders(response) {
+  response.set('Access-Control-Allow-Origin', '*');
+  response.set('Access-Control-Allow-Methods', 'GET,POST,OPTIONS');
+  response.set('Access-Control-Allow-Headers', 'Content-Type');
+}
+
 module.exports = declareInjections({
   encryptor: 'hub:encryptor',
   searcher: 'hub:searchers',
@@ -85,9 +91,7 @@ class Authentication {
 
   _tokenIssuerPreflight(prefix) {
     return route.options(`/${prefix}/:module`,  async (ctxt) => {
-      ctxt.response.set('Access-Control-Allow-Origin', '*');
-      ctxt.response.set('Access-Control-Allow-Methods', 'POST,OPTIONS');
-      ctxt.response.set('Access-Control-Allow-Headers', 'Content-Type');
+      addCorsHeaders(ctxt.response);
       ctxt.status = 200;
     });
   }
@@ -191,7 +195,7 @@ class Authentication {
     return route.post(`/${prefix}/:module`, compose([
       koaJSONBody({ limit: '1mb' }),
       async (ctxt) => {
-        ctxt.response.set('Access-Control-Allow-Origin', '*');
+        addCorsHeaders(ctxt.response);
         await withJsonErrorHandling(ctxt, async () => {
           let source = await this._locateAuthenticationSource(ctxt.routeParams.module);
           await this._invokeAuthenticationSource(ctxt, source);
@@ -202,6 +206,7 @@ class Authentication {
 
   _exposeConfiguration(prefix) {
     return route.get(`/${prefix}/:module`, async (ctxt) => {
+      addCorsHeaders(ctxt.response);
       await withJsonErrorHandling(ctxt, async () => {
         let source = await this._locateAuthenticationSource(ctxt.routeParams.module);
         if (source.authenticator.exposeConfig) {
