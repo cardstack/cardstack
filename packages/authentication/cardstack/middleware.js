@@ -85,7 +85,6 @@ class Authentication {
           ctxt.state.cardstackSession = session;
         }
       }
-      addCorsHeaders(ctxt.response);
       await next();
     };
   }
@@ -196,7 +195,7 @@ class Authentication {
     return route.post(`/${prefix}/:module`, compose([
       koaJSONBody({ limit: '1mb' }),
       async (ctxt) => {
-        ctxt.response.set('Access-Control-Allow-Origin', '*');
+        addCorsHeaders(ctxt.response);
         await withJsonErrorHandling(ctxt, async () => {
           let source = await this._locateAuthenticationSource(ctxt.routeParams.module);
           await this._invokeAuthenticationSource(ctxt, source);
@@ -207,6 +206,7 @@ class Authentication {
 
   _exposeConfiguration(prefix) {
     return route.get(`/${prefix}/:module`, async (ctxt) => {
+      addCorsHeaders(ctxt.response);
       await withJsonErrorHandling(ctxt, async () => {
         let source = await this._locateAuthenticationSource(ctxt.routeParams.module);
         if (source.authenticator.exposeConfig) {
