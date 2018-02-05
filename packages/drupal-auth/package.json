@@ -1,6 +1,6 @@
 {
   "name": "@cardstack/drupal-auth",
-  "version": "0.4.6",
+  "version": "0.4.7",
   "description": "Drupal authentication plugin for Cardstack",
   "keywords": [
     "ember-addon",
@@ -23,7 +23,7 @@
     "test": "ember try:each"
   },
   "dependencies": {
-    "@cardstack/authentication": "^0.4.6",
+    "@cardstack/authentication": "^0.4.7",
     "@cardstack/logger": "^0.1.0",
     "@cardstack/plugin-utils": "^0.4.5",
     "ember-cli-babel": "^6.8.2",
