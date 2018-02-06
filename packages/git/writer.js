@@ -2,7 +2,6 @@ const {
   Repository
 } = require('@cardstack/nodegit');
 
-const logger = require('@cardstack/plugin-utils/logger');
 const crypto = require('crypto');
 const Change = require('./change');
 const os = require('os');
@@ -21,7 +20,6 @@ module.exports = class Writer {
     this.basePath = basePath;
     this.branchPrefix = branchPrefix || "";
     this.repo = null;
-    this.log = logger('writer');
     let hostname = os.hostname();
     this.myName = `PID${process.pid} on ${hostname}`;
     this.myEmail = `${os.userInfo().username}@${hostname}`;

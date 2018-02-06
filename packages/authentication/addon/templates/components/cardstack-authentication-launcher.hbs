@@ -1,0 +1,20 @@
+{{#if session.isAuthenticated}}
+
+  {{#if session.user.avatarUrl}}
+    <div class="cardstack-rail-item">
+      <div class="cardstack-authentication-avatar"
+           style="background-image: url('{{session.user.avatarUrl}}')"></div>
+    </div>
+  {{/if}}
+
+  {{#if (is-component "cardstack-workflow")}}
+    <div class="cardstack-rail-item {{if isOpen 'active'}}">
+      {{cardstack-workflow toggleOpen=(action toggleOpen)}}
+    </div>
+  {{/if}}
+
+  <a class="cardstack-authentication-logout" {{action session.logout}}>
+    <span class="cardstack-authentication-logout-icon"></span>
+    Log out
+  </a>
+{{/if}}

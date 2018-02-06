@@ -2,7 +2,7 @@ const {promisify} = require('util');
 const timeout = promisify(setTimeout);
 
 const nssocket = require('nssocket');
-const log = require('@cardstack/plugin-utils/logger')('hub/hub-connection');
+const log = require('@cardstack/logger')('cardstack/hub/hub-connection');
 
 const HUB_HEARTBEAT_INTERVAL = 1 * 1000;
 

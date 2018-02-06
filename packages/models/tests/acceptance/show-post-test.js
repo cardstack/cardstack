@@ -1,9 +1,13 @@
 import { test } from 'qunit';
 import moduleForAcceptance from '../../tests/helpers/module-for-acceptance';
 import Fixtures from '@cardstack/test-support/fixtures';
-import { refreshCode } from '@cardstack/codegen';
 
-moduleForAcceptance('Acceptance | show post');
+moduleForAcceptance('Acceptance | show post', {
+  async beforeEach(){
+    await scenario.setup();
+    await this.application.__container__.lookup('service:cardstack-codegen').refreshCode();
+  }
+});
 
 let scenario = new Fixtures(factory => {
   factory.addResource('content-types', 'posts')
@@ -19,8 +23,6 @@ let scenario = new Fixtures(factory => {
 });
 
 test('visiting /show-post', async function(assert) {
-  await scenario.setup();
-  await refreshCode('master');
   await visit('/posts/1');
   assert.equal(currentURL(), '/posts/1');
   findWithAssert('h1:contains(hello world)');

@@ -1,22 +1,19 @@
-const path = require('path');
 const Koa = require('koa');
 const { Registry, Container } = require('@cardstack/di');
 // lazy load only in container mode, since they uses node 8 features
 let EmberConnection;
 let Orchestrator;
 
-const logger = require('@cardstack/plugin-utils/logger');
-const log = logger('server');
+const log = require('@cardstack/logger')('cardstack/server');
+const path = require('path');
+const { spawn } = require('child_process');
+
 
 async function wireItUp(projectDir, encryptionKeys, seedModels, opts = {}) {
   let registry = new Registry();
   registry.register('config:project', {
-    path: projectDir,
-    allowDevDependencies: opts.allowDevDependencies
+    path: projectDir
   });
-  if (opts.emberConfigEnv) {
-    registry.register('config:ember', opts.emberConfigEnv);
-  }
   registry.register('config:seed-models', seedModels);
   registry.register('config:encryption-key', encryptionKeys);
 
@@ -36,11 +33,6 @@ async function wireItUp(projectDir, encryptionKeys, seedModels, opts = {}) {
   }
 
   return container;
-}
-
-function loadAppConfig(projectDir) {
-  let env = process.env.EMBER_ENV || 'development';
-  return require(path.join(projectDir, 'config', 'environment'))(env);
 }
 
 async function makeServer(projectDir, encryptionKeys, seedModels, opts = {}) {
@@ -64,8 +56,6 @@ async function makeServer(projectDir, encryptionKeys, seedModels, opts = {}) {
       heartbeat: opts.heartbeat
     });
 
-    opts.emberConfigEnv = loadAppConfig(projectDir);
-
     await orchestrator.ready;
   }
 
@@ -85,5 +75,41 @@ async function httpLogging(ctxt, next) {
   log.info('finish %s %s %s', ctxt.request.method, ctxt.request.originalUrl, ctxt.response.status);
 }
 
+async function spawnHub(packageName, configPath, environment) {
+  if (!process.env.CARDSTACK_SESSIONS_KEY) {
+    const crypto = require('crypto');
+    let key = crypto.randomBytes(32);
+    process.env.CARDSTACK_SESSIONS_KEY = key.toString('base64');
+  }
+  if (!process.env.DEBUG && environment === 'development') {
+    process.env.DEBUG = 'cardstack/*';
+  }
+  if (!process.env.DEBUG_COLORS) {
+    process.env.DEBUG_COLORS='yes';
+  }
+  if (!process.env.ELASTICSEARCH_PREFIX) {
+    process.env.ELASTICSEARCH_PREFIX = packageName.replace(/^[^a-zA-Z]*/, '').replace(/[^a-zA-Z0-9]/g, '_') + '_' + environment;
+  }
+
+  let seedDir = path.join(path.dirname(configPath),
+                          '..', 'cardstack', 'seeds', environment);
+
+  let proc = spawn(path.join(__dirname, 'bin', 'cardstack-hub.js'), [seedDir], { stdio: [0, 1, 2, 'ipc']  });
+  await new Promise((resolve, reject) => {
+    // by convention the hub will send a hello message if it sees we
+    // are supervising it over IPC. If we get an error or exit before
+    // that, it's a failure to spawn the hub.
+    proc.on('message', message => {
+      if (message === 'hub hello') {
+        resolve();
+      }
+    });
+    proc.on('error', reject);
+    proc.on('exit', reject);
+  });
+  return 'http://localhost:3000';
+}
+
 exports.wireItUp = wireItUp;
 exports.makeServer = makeServer;
+exports.spawnHub = spawnHub;

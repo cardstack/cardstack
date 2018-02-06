@@ -1,4 +1,6 @@
-module.exports = {
+const hub = require('@cardstack/plugin-utils/locate-hub');
+const whenEnabled = require('@cardstack/plugin-utils/when-enabled');
+module.exports = whenEnabled({
   name: '@cardstack/test-support',
   isDevelopingAddon() {
     return process.env.CARDSTACK_DEV;
@@ -7,12 +9,7 @@ module.exports = {
     this._super.included.apply(this, arguments);
     this.import('vendor/dag-map-shim.js');
   },
-  serverMiddleware({ app }) {
-    let hub = this.addons.find(a => a.name === '@cardstack/hub');
-    return hub.serverMiddleware({ app });
-  },
-  testemMiddleware(app) {
-    let hub = this.addons.find(a => a.name === '@cardstack/hub');
-    return hub.testemMiddleware(app);
+  includedCommands() {
+    return hub().includedCommands();
   }
-};
+});

@@ -1,9 +1,10 @@
 {
   "name": "@cardstack/workflow",
-  "version": "0.3.0",
+  "version": "0.4.6",
   "description": "The default blueprint for ember-cli addons.",
   "keywords": [
-    "ember-addon"
+    "ember-addon",
+    "cardstack-plugin"
   ],
   "license": "MIT",
   "author": "Balint Erdi <balint@balinterdi.com>",
@@ -18,27 +19,29 @@
     "test": "ember try:each"
   },
   "dependencies": {
-    "@cardstack/codegen": "0.3.0",
+    "@cardstack/plugin-utils": "^0.4.5",
     "ember-cli-babel": "^6.8.2",
     "ember-cli-htmlbars": "^2.0.1",
     "ember-concurrency": "^0.7.19",
     "ember-data": "^2.12.1",
-    "ember-inflector": "^2.0.1"
+    "ember-inflector": "^2.0.1",
+    "ember-moment": "^7.4.1"
   },
   "devDependencies": {
-    "@cardstack/ephemeral": "0.3.0",
-    "@cardstack/jsonapi": "0.3.0",
-    "@cardstack/models": "0.3.0",
-    "@cardstack/rendering": "0.3.0",
-    "@cardstack/test-support": "0.3.0",
+    "@cardstack/ephemeral": "^0.4.5",
+    "@cardstack/eslint-config": "^0.4.4",
+    "@cardstack/jsonapi": "^0.4.6",
+    "@cardstack/models": "^0.4.6",
+    "@cardstack/rendering": "^0.4.4",
+    "@cardstack/test-support": "^0.4.6",
     "broccoli-asset-rev": "^2.4.5",
-    "ember-cli": "~2.17.0-beta.1",
-    "ember-cli-dependency-checker": "^2.0.0",
+    "ember-cli": "https://github.com/ember-cli/ember-cli#a4734540b3889c7f6ef304fe6a81dd356f77bfe4",
+    "ember-cli-dependency-checker": "^2.1.0",
     "ember-cli-eslint": "^4.2.1",
     "ember-cli-htmlbars-inline-precompile": "^1.0.2",
     "ember-cli-inject-live-reload": "^1.4.1",
     "ember-cli-qunit": "^4.1.0-beta.2",
-    "ember-cli-shims": "^1.1.0",
+    "ember-cli-shims": "1.2.0-beta.2",
     "ember-cli-sri": "^2.1.0",
     "ember-cli-uglify": "^2.0.0",
     "ember-disable-prototype-extensions": "^1.1.2",
@@ -49,6 +52,9 @@
     "ember-test-selectors": "^0.3.7",
     "ember-toolbars": "^0.4.1",
     "ember-truth-helpers": "^1.3.0",
+    "eslint": "4.9.0",
+    "eslint-plugin-ember": "^4.6.1",
+    "eslint-plugin-node": "^5.2.1",
     "liquid-fire": "^0.29.0",
     "loader.js": "4.2.3",
     "moment-timezone": "^0.5.11"
@@ -58,5 +64,8 @@
   },
   "ember-addon": {
     "configPath": "tests/dummy/config"
+  },
+  "cardstack-plugin": {
+    "api-version": 1
   }
 }

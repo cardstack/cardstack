@@ -6,7 +6,7 @@ const {
 } = require('@cardstack/test-support/env');
 const { currentVersion } = require('./support');
 const JSONAPIFactory = require('@cardstack/test-support/jsonapi-factory');
-const log = require('@cardstack/plugin-utils/logger')('jsonapi-test');
+const log = require('@cardstack/logger')('jsonapi-test');
 
 describe('jsonapi/middleware', function() {
 
@@ -134,10 +134,6 @@ describe('jsonapi/middleware', function() {
     factory.addResource('events', '5')
       .withAttributes({ title: 'Fifth Event' })
       .withRelated('next', factory.getResource('events', '4'));
-
-    factory.addResource('plugin-configs', "@cardstack/jsonapi");
-
-    factory.addResource('plugin-configs', "@cardstack/test-support/authenticator");
 
     factory.addResource('content-types', 'authors')
       .withRelated('fields', [

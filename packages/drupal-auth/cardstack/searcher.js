@@ -1,4 +1,4 @@
-const request = require('./lib/request');
+const request = require('./request');
 
 module.exports = class DrupalSearcher {
   constructor({ ownToken, permissionRepos }) {

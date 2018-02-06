@@ -18,11 +18,8 @@ describe('elasticsearch/searcher', function() {
   let searcher, env, factory;
 
   before(async function() {
+    this.timeout(2500);
     factory = new Factory();
-
-    // Turning on mobiledoc so we can test searching of
-    // plugin-specific indexers
-    factory.addResource('plugin-configs', '@cardstack/mobiledoc');
 
     factory.addResource('content-types', 'people').withRelated('fields', [
       factory.addResource('fields', 'first-name').withAttributes({
@@ -716,4 +713,16 @@ describe('elasticsearch/searcher', function() {
     expect(response.data).length(1);
   });
 
+  it('can do prefix matching', async function() {
+    let { data: models } = await searcher.search('master', {
+      filter: {
+        'last-name': {
+          prefix: 'Faulk'
+        }
+      }
+    });
+    expect(models).length(2);
+    expect(models).includes.something.with.deep.property('attributes.first-name', 'Quint' );
+    expect(models).includes.something.with.deep.property('attributes.first-name', 'Arthur' );
+  });
 });

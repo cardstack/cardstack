@@ -1,4 +1,4 @@
-import { helper } from 'ember-helper';
+import { helper } from '@ember/component/helper';
 import metaForField from '../-private/meta-for-field';
 import stripNamespace from '../-private/strip-namespace';
 
@@ -11,7 +11,7 @@ export function fieldCaption(content, fieldName) {
   if (!meta) {
     return;
   }
-
+  
   let caption = meta.options && meta.options.caption;
   if (caption) {
     caption = stripNamespace(caption);

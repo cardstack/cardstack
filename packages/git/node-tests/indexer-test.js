@@ -5,7 +5,7 @@ const ElasticAssert = require('@cardstack/elasticsearch/node-tests/assertions');
 const _toJSONAPI = require('@cardstack/elasticsearch/to-jsonapi');
 const JSONAPIFactory = require('@cardstack/test-support/jsonapi-factory');
 const { Registry, Container } = require('@cardstack/di');
-const logger = require('@cardstack/plugin-utils/logger');
+const logger = require('@cardstack/logger');
 const fs = require('fs');
 
 function toJSONAPI(type, doc) {
@@ -20,8 +20,6 @@ describe('git/indexer', function() {
     root = await temp.mkdir('cardstack-server-test');
 
     let factory = new JSONAPIFactory();
-
-    factory.addResource('plugin-configs', '@cardstack/git');
 
     dataSource = factory.addResource('data-sources')
         .withAttributes({
@@ -38,8 +36,7 @@ describe('git/indexer', function() {
     let registry = new Registry();
     registry.register('config:seed-models', factory.getModels());
     registry.register('config:project', {
-      path: `${__dirname}/..`,
-      allowDevDependencies: true
+      path: `${__dirname}/..`
     });
     indexer = new Container(registry).lookup('hub:indexers');
   });
@@ -418,8 +415,6 @@ describe('git/indexer failures', function() {
 
     let factory = new JSONAPIFactory();
 
-    factory.addResource('plugin-configs', '@cardstack/git');
-
     let dataSource = factory.addResource('data-sources')
         .withAttributes({
           'source-type': '@cardstack/git',
@@ -435,8 +430,7 @@ describe('git/indexer failures', function() {
     let registry = new Registry();
     registry.register('config:seed-models', factory.getModels());
     registry.register('config:project', {
-      path: `${__dirname}/..`,
-      allowDevDependencies: true
+      path: `${__dirname}/..`
     });
     indexer = new Container(registry).lookup('hub:indexers');
   });

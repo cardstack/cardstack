@@ -1,5 +1,6 @@
 const ES = require('elasticsearch');
-const logger = require('@cardstack/plugin-utils/logger');
+const logger = require('@cardstack/logger');
+const formatDiff = require('./json-diff');
 const { isEqual, merge } = require('lodash');
 const BulkOps = require('./bulk-ops');
 
@@ -51,7 +52,7 @@ module.exports = class SearchClient {
              due to their issue #30.
 
        */
-      let AWS = require('aws-sdk');
+      let AWS = require('aws-sdk'); // eslint-disable-line node/no-missing-require
       let region = process.env.AWS_REGION || 'us-east-1';
       let credentials = new AWS.EnvironmentCredentials('AWS');
       await new Promise((resolve, reject) => {
@@ -64,7 +65,7 @@ module.exports = class SearchClient {
         });
       });
       esParams.host = host.replace(/^aws:/i, 'https:');
-      esParams.connectionClass = require('http-aws-es');
+      esParams.connectionClass = require('http-aws-es');  // eslint-disable-line node/no-missing-require
       esParams.amazonES = { region, credentials };
     }
     return new this(esParams);
@@ -72,7 +73,8 @@ module.exports = class SearchClient {
 
   constructor(esParams) {
     this.es = new ES.Client(esParams);
-    this.log = logger('es-client');
+    this.log = logger('cardstack/es-client');
+    this.log.registerFormatter('p', formatDiff);
     this._mappings = null;
   }
 
@@ -174,9 +176,7 @@ module.exports = class SearchClient {
       return true;
     }
 
-    // Not stable. Generate some useful debug info about why.  The %p
-    // formatter is custom and loads via side-effect from the
-    // diff-log-formatter module.
+    // Not stable. Generate some useful debug info about why.
     this.log.info("mapping diff: %p", { left: have, right: combined });
     return false;
   }
@@ -221,24 +221,26 @@ module.exports = class SearchClient {
 
 };
 
+// The interface to get log events from the official elasticsearch client
+// https://www.elastic.co/guide/en/elasticsearch/client/javascript-api/current/logging.html
 class LogBridge {
   constructor(/* config */) {
     this.log = logger('elasticsearch');
   }
+
+  // called after every http request the client makes
   trace(method, requestUrl, body, responseBody, responseStatus) {
     this.log.trace(`${method} ${requestUrl.path} ${responseStatus}`);
   }
+  // map 1-to-1 with out log levels, but our 'warn' is their 'warning'
+  debug(message) { this.log.debug(message); }
+  info(message) { this.log.info(message); }
+  warning(message) { this.log.warn(message); }
+  error(message) { this.log.error(message); }
+
   close() {}
 }
-for (let level of ['error', 'warning', 'info', 'debug']) {
-  LogBridge.prototype[level] = function() {
-    let ourLevel = level;
-    if (level === 'warning') {
-      ourLevel = 'warn';
-    }
-    this.log[ourLevel].apply(this.log, arguments);
-  };
-}
+
 
 function addDefaultTypes(mapping) {
   for (let config of Object.values(mapping)) {

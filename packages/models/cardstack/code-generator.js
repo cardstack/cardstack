@@ -33,10 +33,19 @@ define('@cardstack/models/generated/{{modelName}}', ['exports', '@cardstack/mode
      {{#each fields as |field|}}
        {{#if field.isRelationship}}
          {{#with (related-type field) as |type|}}
-           {{camelize field.id}}:  _emberData.default.{{relationship-method field}}("{{type}}", { caption: "{{field.caption}}" }),
+           {{camelize field.id}}:  _emberData.default.{{relationship-method field}}("{{type}}", {
+             caption: "{{field.caption}}",
+             editorComponent: "{{field.editorComponent}}",
+             inlineEditorComponent: "{{field.inlineEditorComponent}}"
+            }),
          {{/with}}
        {{else}}
-        {{camelize field.id}}: _emberData.default.attr({ fieldType: "{{field.fieldType}}", caption: "{{field.caption}}" }),
+        {{camelize field.id}}: _emberData.default.attr({
+          fieldType: "{{field.fieldType}}",
+          caption: "{{field.caption}}",
+          editorComponent: "{{field.editorComponent}}",
+          inlineEditorComponent: "{{field.inlineEditorComponent}}"
+        }),
        {{/if}}
      {{/each}}
    }){{#if routingField}}.reopenClass({ routingField: "{{routingField}}" }){{/if}};
@@ -60,12 +69,12 @@ define('{{target}}', ['exports', '{{source}}'], function (exports, _source) {
 `);
 
 module.exports = declareInjections({
-  schemaCache: 'hub:schema-cache'
+  schema: 'hub:current-schema'
 },
 
 class CodeGenerator {
   async generateCode(appModulePrefix, branch) {
-    let schema = await this.schemaCache.schemaForBranch(branch);
+    let schema = await this.schema.forBranch(branch);
     let modules = [];
 
     for (let type of schema.types.values()) {

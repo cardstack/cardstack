@@ -1,4 +1,4 @@
 module.exports = {
   root: true,
-  "extends": require.resolve('@cardstack/eslint-config')
+  "extends": '@cardstack/eslint-config'
 };

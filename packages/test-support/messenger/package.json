@@ -1,9 +1,0 @@
-{
-  "name": "@cardstack/test-support/messenger",
-  "keywords": [
-    "cardstack-plugin"
-  ],
-  "cardstack-plugin": {
-    "api-version": 1
-  }
-}

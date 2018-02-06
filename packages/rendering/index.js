@@ -1,10 +1,11 @@
 /* eslint-env node */
 'use strict';
-
-module.exports = {
+const whenEnabled = require('@cardstack/plugin-utils/when-enabled');
+module.exports = whenEnabled({
   name: '@cardstack/rendering',
 
   included(app){
+    this._super.included.apply(this, arguments);
     while (app.app) {
       app = app.app;
     }
@@ -14,4 +15,4 @@ module.exports = {
       baseDir() { return __dirname; }
     });
   }
-};
+});

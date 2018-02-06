@@ -1,17 +1,16 @@
 const Client = require('./client');
-const logger = require('@cardstack/plugin-utils/logger');
+const log = require('@cardstack/logger')('cardstack/searcher');
 const Error = require('@cardstack/plugin-utils/error');
 const toJSONAPI = require('./to-jsonapi');
 const { declareInjections } = require('@cardstack/di');
 
 module.exports = declareInjections({
-  schemaCache: 'hub:schema-cache'
+  schema: 'hub:current-schema'
 },
 
 class Searcher {
   constructor() {
     this.client = null;
-    this.log = logger('searcher');
   }
 
   async _ensureClient() {
@@ -24,7 +23,7 @@ class Searcher {
     await this._ensureClient();
     let index = Client.branchToIndexName(branch);
     let esId = `${branch}/${id}`;
-    this.log.debug('get %s %s %s', index, type, esId);
+    log.debug('get %s %s %s', index, type, esId);
     let document;
     try {
       document = await this.client.es.getSource({ index, type, id: esId });
@@ -44,7 +43,7 @@ class Searcher {
 
   async search(branch, { queryString, filter, sort, page }) {
     await this._ensureClient();
-    let schema = await this.schemaCache.schemaForBranch(branch);
+    let schema = await this.schema.forBranch(branch);
     let esBody = {
       query: {
         bool: {
@@ -86,13 +85,13 @@ class Searcher {
         esBody.query.bool.must.push(expression);
       }
     }
-    this.log.debug('search %j', esBody);
+    log.debug('search %j', esBody);
     try {
       let result = await this.client.es.search({
         index: Client.branchToIndexName(branch),
         body: esBody
       });
-      this.log.debug('searchResult %j', result);
+      log.debug('searchResult %j', result);
       return this._assembleResponse(result, size);
     } catch (err) {
       // elasticsearch errors have their own status codes, and Koa
@@ -217,7 +216,7 @@ class Searcher {
   async _fieldFilter(branch, schema, aboveSegments, key, value) {
     let field;
 
-    if (['cardstack_source', 'cardstack_references'].includes(key)) {
+    if (['cardstack_source'].includes(key)) {
       // this is an internal field (meaning it's not visible in the
       // jsonapi records themselves) that we make available for
       // filtering. The schema-cache uses this to avoid shadowing seed
@@ -303,6 +302,12 @@ class Searcher {
         // exact matching (in addition to sorting).
         return { terms: { [path] : innerQuery.map(elt => elt.toLowerCase()) } };
       }
+    }
+
+    if (value.prefix != null) {
+      let esName = await this.client.logicalFieldToES(branch, field.queryFieldName);
+      let path = aboveSegments.concat(esName).join('.');
+      return { match_phrase_prefix: { [path] : value.prefix } };
     }
 
     throw new Error(`Unimplemented filter ${key} ${value}`);

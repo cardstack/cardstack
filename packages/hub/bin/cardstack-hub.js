@@ -3,9 +3,20 @@
 const { makeServer } = require('../main');
 const commander = require('commander');
 const path = require('path');
-const logger = require('@cardstack/plugin-utils/logger');
-const log = logger('server');
 const fs = require('fs');
+const logger = require('@cardstack/logger');
+const log = logger('cardstack/server');
+
+if (process.env.EMBER_ENV === 'test') {
+  logger.configure({
+    defaultLevel: 'warn'
+  });
+} else {
+  logger.configure({
+    defaultLevel: 'warn',
+    logLevels: [['cardstack/*', 'info']]
+  });
+}
 
 async function runServer(options, seedModels) {
   let {
@@ -15,13 +26,15 @@ async function runServer(options, seedModels) {
   let app = await makeServer(process.cwd(), sessionsKey, seedModels, options);
   app.listen(port);
   log.info("server listening on %s", port);
+  if (process.connected) {
+    process.send('hub hello');
+  }
 }
 
 function commandLineOptions() {
   commander
     .usage('[options] <seed-config-directory>')
     .option('-p --port <port>', 'Server listen port', 3000)
-    .option('-d --allow-dev-dependencies', 'Allow the hub to load devDependencies')
     .option('-c --containerized', 'Run the hub in container mode (temporary feature flag)')
     .option('-l --leave-services-running', 'Leave dockerized services running, to improve future startup time')
     .option('--heartbeat', 'Shut down after not receiving a heartbeat from ember-cli')
@@ -72,6 +85,22 @@ function loadSeedModels(options) {
 process.on('warning', (warning) => {
   process.stderr.write(warning.stack);
 });
+
+
+if (process.connected === false) {
+  // This happens if we were started by another node process with IPC
+  // and that parent has already died by the time we got here.
+  //
+  // (If we weren't started under IPC, `process.connected` is
+  // undefined, so this never happens.)
+  log.info(`Shutting down because connected parent process has already exited.`);
+  process.exit(0);
+}
+process.on('disconnect', () => {
+  log.info(`Hub shutting down because connected parent process exited.`);
+  process.exit(0);
+});
+
 
 let options = commandLineOptions();
 let seedModels = loadSeedModels(options);

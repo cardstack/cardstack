@@ -1,4 +1,4 @@
-const log = require('@cardstack/plugin-utils/logger')('auth');
+const log = require('@cardstack/logger')('cardstack/auth');
 const Error = require('@cardstack/plugin-utils/error');
 const Session = require('@cardstack/plugin-utils/session');
 const bearerTokenPattern = /bearer +(.*)$/i;
@@ -10,29 +10,29 @@ const { declareInjections } = require('@cardstack/di');
 const { withJsonErrorHandling } = Error;
 const { rewriteExternalUser } = require('..');
 
+function addCorsHeaders(response) {
+  response.set('Access-Control-Allow-Origin', '*');
+  response.set('Access-Control-Allow-Methods', 'GET,POST,OPTIONS');
+  response.set('Access-Control-Allow-Headers', 'Content-Type');
+}
+
 module.exports = declareInjections({
   encryptor: 'hub:encryptor',
   searcher: 'hub:searchers',
   writer: 'hub:writers',
-  schemaCache: 'hub:schema-cache'
+  sources: 'hub:data-sources',
+  controllingBranch: 'hub:controlling-branch'
 },
 
 class Authentication {
 
-  constructor() {
-
-    // TODO: move these two settings into config
-    this.controllingBranch = 'master';
-
-  }
-
   get userSearcher() {
     return {
       get: (type, userId) => {
-        return this.searcher.get(this.controllingBranch, type, userId);
+        return this.searcher.get(this.controllingBranch.name, type, userId);
       },
       search: (params) => {
-        return this.searcher.search(this.controllingBranch, params);
+        return this.searcher.search(this.controllingBranch.name, params);
       }
     };
   }
@@ -91,16 +91,14 @@ class Authentication {
 
   _tokenIssuerPreflight(prefix) {
     return route.options(`/${prefix}/:module`,  async (ctxt) => {
-      ctxt.response.set('Access-Control-Allow-Origin', '*');
-      ctxt.response.set('Access-Control-Allow-Methods', 'POST,OPTIONS');
-      ctxt.response.set('Access-Control-Allow-Headers', 'Content-Type');
+      addCorsHeaders(ctxt.response);
       ctxt.status = 200;
     });
   }
 
   async _locateAuthenticationSource(name) {
-    let schema = await this.schemaCache.schemaForControllingBranch();
-    let source = schema.dataSources.get(name);
+    let activeSources = await this.sources.active();
+    let source = activeSources.get(name);
     if (source && source.authenticator) {
       return source;
     }
@@ -184,11 +182,11 @@ class Authentication {
     }
 
     if (!have && source.mayCreateUser) {
-      return { data: await this.writer.create(this.controllingBranch, Session.INTERNAL_PRIVLEGED, user.data.type, user.data) };
+      return { data: await this.writer.create(this.controllingBranch.name, Session.INTERNAL_PRIVLEGED, user.data.type, user.data) };
     }
     if (have && source.mayUpdateUser) {
       user.data.meta = have.data.meta;
-      return { data: await this.writer.update(this.controllingBranch, Session.INTERNAL_PRIVLEGED, user.data.type, have.data.id, user.data) };
+      return { data: await this.writer.update(this.controllingBranch.name, Session.INTERNAL_PRIVLEGED, user.data.type, have.data.id, user.data) };
     }
     return have;
   }
@@ -197,7 +195,7 @@ class Authentication {
     return route.post(`/${prefix}/:module`, compose([
       koaJSONBody({ limit: '1mb' }),
       async (ctxt) => {
-        ctxt.response.set('Access-Control-Allow-Origin', '*');
+        addCorsHeaders(ctxt.response);
         await withJsonErrorHandling(ctxt, async () => {
           let source = await this._locateAuthenticationSource(ctxt.routeParams.module);
           await this._invokeAuthenticationSource(ctxt, source);
@@ -208,6 +206,7 @@ class Authentication {
 
   _exposeConfiguration(prefix) {
     return route.get(`/${prefix}/:module`, async (ctxt) => {
+      addCorsHeaders(ctxt.response);
       await withJsonErrorHandling(ctxt, async () => {
         let source = await this._locateAuthenticationSource(ctxt.routeParams.module);
         if (source.authenticator.exposeConfig) {

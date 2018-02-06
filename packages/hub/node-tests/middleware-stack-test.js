@@ -12,7 +12,9 @@ describe('middleware-stack', function() {
 
   async function setup() {
     let factory = new JSONAPIFactory();
-    factory.addResource('plugin-configs', 'stub-middleware');
+    factory.addResource('plugin-configs', 'stub-middleware-extra').withAttributes({
+      enabled: false
+    });
     env = await createDefaultEnvironment(__dirname + '/../../../tests/stub-middleware', factory.getModels());
     let app = new Koa();
     app.use(env.lookup('hub:middleware-stack').middleware());
@@ -74,10 +76,9 @@ describe('middleware-stack', function() {
     afterEach(teardown);
 
     it('can dynamically mount more middleware', async function() {
-      await env.lookup('hub:writers').create('master', env.session, 'plugin-configs', {
-        type: 'plugin-configs',
-        id: 'stub-middleware-extra'
-      });
+      let config = await env.lookup('hub:searchers').get('master', 'plugin-configs', 'stub-middleware-extra');
+      config.data.attributes.enabled = true;
+      await env.lookup('hub:writers').update('master', env.session, config.data.type, config.data.id, config.data);
       await env.lookup('hub:indexers').update({ realTime: true });
       let response = await request.get('/extra');
       expect(response).hasStatus(200);
@@ -85,8 +86,13 @@ describe('middleware-stack', function() {
     });
 
     it('can dynamically remove middleware', async function() {
-      let config = await env.lookup('hub:searchers').get('master', 'plugin-configs', 'stub-middleware');
-      await env.lookup('hub:writers').delete('master', env.session, config.data.meta.version, config.data.type, config.data.id);
+      await env.lookup('hub:writers').create('master', env.session, 'plugin-configs', {
+        id: 'stub-middleware',
+        type: 'plugin-configs',
+        attributes: {
+          enabled: false
+        }
+      });
       await env.lookup('hub:indexers').update({ realTime: true });
       let response = await request.get('/first');
       expect(response).hasStatus(404);

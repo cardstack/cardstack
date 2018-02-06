@@ -5,7 +5,7 @@ const {
   destroyDefaultEnvironment
 } = require('@cardstack/test-support/env');
 const JSONAPIFactory = require('@cardstack/test-support/jsonapi-factory');
-const TestMessenger = require('@cardstack/test-support/messenger/messenger');
+const TestMessenger = require('@cardstack/test-support-messenger/messenger');
 
 describe('email-auth', function() {
 
@@ -14,18 +14,12 @@ describe('email-auth', function() {
   async function setup() {
     let factory = new JSONAPIFactory();
 
-    factory.addResource('plugin-configs', '@cardstack/authentication');
-
-    factory.addResource('plugin-configs', '@cardstack/email-auth');
-
-    factory.addResource('plugin-configs', '@cardstack/test-support/messenger');
-
     factory.addResource('users', 'valid-quint-id').withAttributes({
       email: 'quint@example.com',
     });
 
     factory.addResource('message-sinks', 'the-sink').withAttributes({
-      messengerType: '@cardstack/test-support/messenger'
+      messengerType: '@cardstack/test-support-messenger'
     });
 
     factory.addResource('data-sources', 'email-auth').withAttributes({

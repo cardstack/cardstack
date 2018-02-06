@@ -2,7 +2,7 @@ const Error = require('@cardstack/plugin-utils/error');
 const qs = require('qs');
 const { merge, flatten, uniq, uniqBy } = require('lodash');
 const koaJSONBody = require('koa-json-body');
-const logger = require('@cardstack/plugin-utils/logger');
+const log = require('@cardstack/logger')('cardstack/jsonapi');
 const { declareInjections } = require('@cardstack/di');
 const { URL } = require('url');
 const defaultIncludes = {};
@@ -33,16 +33,15 @@ function jsonapiMiddleware(searcher, writers, indexers) {
 
   let prefixPattern;
   if (options.prefix) {
-    prefixPattern = new RegExp(`^/${options.prefix}(.*)`);
+    prefixPattern = new RegExp(`^/${options.prefix}/?(.*)`);
   }
   let body = koaJSONBody({ limit: '1mb' });
-  let log = logger('jsonapi');
 
   return async (ctxt, next) => {
     if (prefixPattern) {
       let m = prefixPattern.exec(ctxt.request.path);
       if (m) {
-        ctxt.request.path = m[1];
+        ctxt.request.path = '/'+m[1];
       } else {
         return next();
       }
@@ -70,13 +69,13 @@ function jsonapiMiddleware(searcher, writers, indexers) {
         }
       });
     }
-    let handler = new Handler(searcher, writers, indexers, ctxt, options, log);
+    let handler = new Handler(searcher, writers, indexers, ctxt, options);
     return handler.run();
   };
 }
 
 class Handler {
-  constructor(searcher, writers, indexers, ctxt, options, log) {
+  constructor(searcher, writers, indexers, ctxt, options) {
     this.searcher = searcher;
     this.writers = writers;
     this.indexers = indexers;
@@ -84,7 +83,6 @@ class Handler {
     this.query = qs.parse(this.ctxt.request.querystring, { plainObjects: true });
     this.branch = this.query.branch || options.defaultBranch;
     this.prefix = options.prefix || '';
-    this.log = log;
     this._includes = null;
   }
 
@@ -135,7 +133,7 @@ class Handler {
         kind = 'Individual';
       }
       let methodName = `handle${kind}${this.ctxt.request.method}`;
-      this.log.debug("attempting to match method %s", methodName);
+      log.debug("attempting to match method %s", methodName);
       let method = this[methodName];
       if (method) {
         await method.apply(this, segments.slice(1));

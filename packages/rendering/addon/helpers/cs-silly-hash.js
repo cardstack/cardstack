@@ -1,4 +1,4 @@
-import { helper } from 'ember-helper';
+import { helper } from '@ember/component/helper';
 
 export function csSillyHash(unused, hash) {
   // Implements a limited version of the (missing) handlebars splat operator

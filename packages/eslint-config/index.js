@@ -10,8 +10,14 @@ module.exports = {
     'no-constant-condition': ["error", { checkLoops: false }],
     'require-yield': 0,
     'no-var': "error",
-    semi: ["error", "always"]
+    semi: ["error", "always"],
+    'node/no-extraneous-require': ['error', {
+      'allowModules': []
+    }],
+    'node/no-missing-require': ['error']
+
   },
+  plugins: ['node'],
   globals: {
     Promise: false,
     Map: false,

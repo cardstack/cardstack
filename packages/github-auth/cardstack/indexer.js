@@ -1,5 +1,5 @@
 const { isEqual } = require('lodash');
-const log = require('@cardstack/plugin-utils/logger')('github-auth/indexer');
+const log = require('@cardstack/logger')('cardstack/github-auth/indexer');
 
 module.exports = class Indexer {
 

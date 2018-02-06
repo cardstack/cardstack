@@ -5,7 +5,7 @@ const request = require('superagent');
 const { isEqual } = require('lodash');
 const { drupalToCardstackDoc, cardstackToDrupalDoc } = require('./lib/document');
 const pendingChanges = new WeakMap();
-const log = require('@cardstack/plugin-utils/logger')('drupal');
+const log = require('@cardstack/logger')('cardstack/drupal');
 
 module.exports = class Writer {
   static create(params) {

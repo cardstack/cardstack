@@ -8,8 +8,8 @@ module.exports = declareInjections({
     return ['master'];
   }
 
-  async beginUpdate(/* branch */) {
-    let storage = await this.service.storageForDataSource(this.dataSource.id, this.initialModels);
+  async beginUpdate(branch, readOtherIndexers) {
+    let storage = await this.service.findOrCreateStorage(this.dataSource.id, this.initialModels, readOtherIndexers);
     return new Updater(storage, this.dataSource.id);
   }
 });
@@ -67,6 +67,7 @@ class Updater {
   }
 
   async updateContent(meta, hints, ops) {
+    await this.storage.maybeTriggerDelayedValidation();
     let generation, identity;
     if (meta) {
       generation = meta.generation;

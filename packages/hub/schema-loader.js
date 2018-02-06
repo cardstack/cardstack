@@ -4,7 +4,7 @@ const Constraint = require('./schema/constraint');
 const ContentType = require('./schema/content-type');
 const DataSource = require('./schema/data-source');
 const Grant = require('./schema/grant');
-const logger = require('@cardstack/plugin-utils/logger');
+const logger = require('@cardstack/logger');
 const {
   declareInjections,
   getOwner
@@ -31,9 +31,9 @@ class SchemaLoader {
 
   async loadFrom(inputModels) {
     let models = inputModels;
-    let plugins = await this.pluginLoader.activePlugins(models.filter(model => model.type === 'plugin-configs'));
-    let authLog = logger('auth');
-    let schemaLog = logger('schema');
+    let plugins = await this.pluginLoader.configuredPlugins(models.filter(model => model.type === 'plugin-configs'));
+    let authLog = logger('cardstack/auth');
+    let schemaLog = logger('cardstack/schema');
     let defaultValues = findDefaultValues(models);
     let grants = findGrants(models);
     let fields = findFields(models, plugins, grants, defaultValues, authLog);
@@ -108,9 +108,9 @@ function findDataSources(models, plugins) {
 }
 
 function findDefaultDataSource(plugins) {
-  let serverConfig = plugins.configFor('@cardstack/hub');
-  if (serverConfig && serverConfig['default-data-source']) {
-    return serverConfig['default-data-source'];
+  let hubPlugin = plugins.describe('@cardstack/hub');
+  if (hubPlugin && hubPlugin.relationships) {
+    return hubPlugin.relationships['default-data-source'];
   }
 }
 

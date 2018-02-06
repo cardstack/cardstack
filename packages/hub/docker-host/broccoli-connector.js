@@ -10,17 +10,21 @@ const Plugin = require('broccoli-plugin');
 const {WatchedDir} = require('broccoli-source');
 
 class CodeWriter extends Plugin {
-  constructor(branch, trigger) {
+  constructor(codeGenUrlPromise, trigger) {
     super([trigger], { name: '@cardstack/hub', needsCache: false });
 
-    this.branch = branch;
+    this.codeGenUrlPromise = codeGenUrlPromise;
   }
 
   async build() {
     let filePath = path.join(this.outputPath, 'cardstack-generated.js');
+    let url = await this.codeGenUrlPromise;
+    if (!url) {
+      fs.writeFileSync(filePath, '', 'utf8');
+      return;
+    }
 
     return new Promise(function(resolve, reject) {
-      let url = 'http://localhost:3000/codegen/master';
 
       let request = http.get(url, function(response) {
           if (response.statusCode < 300) { // good response
@@ -64,10 +68,10 @@ chalk`
 }
 
 module.exports = class BroccoliConnector {
-  constructor(branch) {
+  constructor(codeGenUrl) {
     quickTemp.makeOrRemake(this, '_triggerDir', 'cardstack-hub');
     this._trigger = new WatchedDir(this._triggerDir, { annotation: '@cardstack/hub' });
-    this.tree = new CodeWriter(branch, this._trigger);
+    this.tree = new CodeWriter(codeGenUrl, this._trigger);
     this._buildCounter = 0;
   }
   triggerRebuild() {
