@@ -1,9 +1,21 @@
 {{#if session.isAuthenticated}}
-
-  {{#if session.user.avatarUrl}}
-    <div class="cardstack-rail-item">
+  {{#if network.iconUrl}}
+    <div class="cardstack-rail-item cardstack-non-interactive">
+      <div class="cardstack-network-icon"
+           style="background-image: url('{{network.iconUrl}}')">{{network.name}}</div>
+    </div>
+  {{/if}}
+  {{#if session.user}}
+    <div class="cardstack-rail-item"
+         onmouseenter={{action (mut selectedRailItem) 'user'}}
+         onmouseleave={{action (mut selectedRailItem) ''}}>
       <div class="cardstack-authentication-avatar"
-           style="background-image: url('{{session.user.avatarUrl}}')"></div>
+           style="background-image: url('{{if session.user.avatarUrl session.user.avatarUrl}}')"></div>
+      <ul class="cardstack-rail-menu">
+        <li class="cardstack-rail-menu-item cardstack-emphasize cardstack-non-interactive">{{session.user.name}}</li>
+        <li class="cardstack-rail-menu-item cardstack-deemphasize cardstack-non-interactive">{{session.user.email}}</li>
+        <li class="cardstack-rail-menu-item cardstack-hardrule"><a class="cardstack-logout-link" {{action session.logout}}>Logout</a></li>
+      </ul>
     </div>
   {{/if}}
 
@@ -12,9 +24,4 @@
       {{cardstack-workflow toggleOpen=(action toggleOpen)}}
     </div>
   {{/if}}
-
-  <a class="cardstack-authentication-logout" {{action session.logout}}>
-    <span class="cardstack-authentication-logout-icon"></span>
-    Log out
-  </a>
 {{/if}}
