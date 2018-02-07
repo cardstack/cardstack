@@ -7,7 +7,7 @@ module.exports = class {
   constructor(params) {
     this.users = params["users"];
 
-    this.defaultUserTemplate =  "{ \"data\": { \"id\": \"{{id}}\", \"type\": \"mock-users\", \"attributes\": { \"name\": \"{{name}}\", \"email\":\"{{email}}\", \"avatar-url\":\"{{picture}}\" }}}";
+    this.defaultUserTemplate =  `{ "data": { "id": "{{id}}", "type": "mock-users", "attributes": { "name": "{{name}}", "email":"{{email}}", "avatar-url":"{{{picture}}}" }}}`;
   }
 
   async authenticate(payload /*, userSearcher */) {
