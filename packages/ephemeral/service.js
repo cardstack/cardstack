@@ -112,7 +112,7 @@ function references(model) {
     // and I'm including the root privileged grant (from bootstrap
     // schema) so that we can validate using INTERNAL_PRIVLEGED
     // session and expect it to work
-    { type: 'grants', id: '0' }
+    { type: 'grants', id: 'hub-internal-grant' }
   ];
 
   if (model.relationships) {
