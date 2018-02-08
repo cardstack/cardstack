@@ -109,21 +109,6 @@ class Authentication {
   async _invokeAuthenticationSource(ctxt, source) {
     let result = await source.authenticator.authenticate(ctxt.request.body, this.userSearcher);
 
-    if (result && result.meta && result.meta.partialSession) {
-      if (result.data.type == null) {
-        result.data.type = 'partial-sessions';
-      }
-
-      // top-level meta is not passed through (it was for
-      // communicating from plugin to us). Plugins could use
-      // resource-level metadata instead if they want to.
-      delete result.meta;
-
-      ctxt.body = result;
-      ctxt.status = 200;
-      return;
-    }
-
     if (!result) {
       ctxt.status = 401;
       ctxt.body = {
@@ -141,6 +126,24 @@ class Authentication {
       user = result;
     } else {
       user = await this._processExternalUser(result, source);
+    }
+
+    if (result && result.meta && result.meta.partialSession) {
+      if (!user) {
+        // top-level meta is not passed through (it was for
+        // communicating from plugin to us). Plugins could use
+        // resource-level metadata instead if they want to.
+        delete result.meta;
+        user = result;
+      }
+
+      if (user.data.type !== 'partial-sessions') {
+        user.data.type = 'partial-sessions';
+      }
+
+      ctxt.body = user;
+      ctxt.status = 200;
+      return;
     }
 
     if (!user || !user.data) {
