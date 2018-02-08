@@ -1,5 +1,6 @@
 const Client = require('./client');
 const log = require('@cardstack/logger')('cardstack/searcher');
+const authLog = require('@cardstack/logger')('cardstack/auth');
 const Error = require('@cardstack/plugin-utils/error');
 const toJSONAPI = require('./to-jsonapi');
 const { declareInjections } = require('@cardstack/di');
@@ -19,7 +20,7 @@ class Searcher {
     }
   }
 
-  async get(branch, type, id) {
+  async get(session, branch, type, id) {
     await this._ensureClient();
     let index = Client.branchToIndexName(branch);
     let esId = `${branch}/${id}`;
@@ -38,16 +39,37 @@ class Searcher {
       }
       throw err;
     }
-    return toJSONAPI(type, document);
+
+    // Auth check
+    let userRealms;
+    if (document.cardstack_realms && document.cardstack_realms.length > 0) {
+      userRealms = await session.realms();
+      if (userRealms.find(realm => document.cardstack_realms.includes(realm))) {
+        return toJSONAPI(type, document);
+      }
+    }
+    authLog.info("elasticsearch rejected searcher.get, documentRealms=%j, userRealms=%j", document.cardstack_realms, userRealms);
+    // Failed auth check is a 404. We don't want to leak the existence
+    // of resources that people don't have permission to access. We
+    // return undefined for a missing document.
   }
 
-  async search(branch, { queryString, filter, sort, page }) {
-    await this._ensureClient();
-    let schema = await this.schema.forBranch(branch);
+  async search(session, branch, { queryString, filter, sort, page }) {
+    let [schema, realms] = await Promise.all([
+      this.schema.forBranch(branch),
+      session.realms(),
+      this._ensureClient()
+    ]);
+
     let esBody = {
       query: {
         bool: {
-          must: [],
+          must: [{
+            terms: {
+              // This is our resource-level read security
+              cardstack_realms: realms
+            }
+          }],
           // All searches exclude `meta` documents, because those are
           // internal to our system.
           must_not: [{

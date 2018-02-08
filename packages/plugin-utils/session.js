@@ -9,7 +9,7 @@ class Session {
     this.payload = payload;
     this.userSearcher = userSearcher;
     this._user = optionalUser;
-    this._groupIds = optionalGroupIds;
+    this._realms = optionalGroupIds;
   }
   get id() {
     return this.payload.id;
@@ -27,12 +27,22 @@ class Session {
     return this._user;
   }
 
-  async loadGroupIds() {
-    if (!this._groupIds) {
-      this._groupIds = [this.id];
+  // right now, realms are equal to group ids. But we have the
+  // flexibility in the future to do more optimization, such that we
+  // can reduce the set of realms down to something smaller than the
+  // set of groups (since many groups may have overlapping areas of
+  // access)
+  async realms() {
+    if (!this._realms) {
+      if (this.id === 'everyone') {
+        this._realms = ['everyone'];
+      } else {
+        this._realms = [this.id, 'everyone'];
+      }
     }
-    return this._groupIds;
+    return this._realms;
   }
+
 }
 
 module.exports = Session;
@@ -58,5 +68,27 @@ Object.defineProperty(Session, 'INTERNAL_PRIVLEGED', {
       );
     }
     return privlegedSession;
+  }
+});
+
+// This is the default lowest-privileged session
+let everyoneSession;
+Object.defineProperty(Session, 'EVERYONE', {
+  get() {
+    if (!everyoneSession) {
+      everyoneSession = new Session(
+        { id: 'everyone', type: 'users' },
+        null,
+        {
+          id: 'everyone',
+          type: 'users',
+          attributes: {
+            'full-name': 'Anonymous',
+            email: 'noreply@nowhere.com'
+          }
+        }
+      );
+    }
+    return everyoneSession;
   }
 });

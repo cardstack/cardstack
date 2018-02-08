@@ -651,6 +651,9 @@ describe('jsonapi/middleware', function() {
   describe("auth tests", function() {
     before(sharedSetup);
     after(sharedTeardown);
+    beforeEach(function() {
+      env.setUserId('the-default-test-user');
+    });
 
     it('applies authorization during create', async function() {
       await env.setUserId(null);
@@ -667,8 +670,8 @@ describe('jsonapi/middleware', function() {
     });
 
     it('applies authorization during update', async function() {
-      await env.setUserId(null);
       let version = await currentVersion(request, '/api/articles/0');
+      await env.setUserId(null);
       let response = await request.patch('/api/articles/0').send({
         data: {
           id: '0',
@@ -683,12 +686,27 @@ describe('jsonapi/middleware', function() {
     });
 
     it('applies authorization during delete', async function() {
-      await env.setUserId(null);
       let version = await currentVersion(request, '/api/articles/0');
+      await env.setUserId(null);
       let response = await request.delete('/api/articles/0').set('If-Match', version);
       expect(response).hasStatus(401);
     });
 
+    it('applies authorization during individual get', async function() {
+      await env.setUserId(null);
+      let response = await request.get('/api/articles/0');
+      expect(response).hasStatus(404);
+      expect(response.body).to.have.deep.property('errors[0].detail', 'No such resource master/articles/0');
+    });
+
+    it('applies authorization during collection get', async function() {
+      await env.setUserId(null);
+      let response = await request.get('/api/articles');
+      expect(response).hasStatus(200);
+      expect(response.body).to.have.property('data');
+      expect(response.body).to.have.deep.property('meta.total', 0);
+      expect(response.body.data).length(0);
+    });
 
   });
 });

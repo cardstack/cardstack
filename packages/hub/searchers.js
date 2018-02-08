@@ -1,6 +1,7 @@
 const { declareInjections } = require('@cardstack/di');
 const log = require('@cardstack/logger')('cardstack/searchers');
 const Error = require('@cardstack/plugin-utils/error');
+const Session = require('@cardstack/plugin-utils/session');
 
 module.exports = declareInjections({
   controllingBranch: 'hub:controlling-branch',
@@ -25,13 +26,17 @@ class Searchers {
     return this._searchers;
   }
 
-  async get(branch, type, id) {
+  async get(session, branch, type, id) {
+    if (arguments.length < 4) {
+      throw new Error(`session is now a required argument to searchers.get`);
+    }
     let searchers = await this._lookupSearchers();
     let index = 0;
+    let sessionOrEveryone = session || Session.EVERYONE;
     let next = async () => {
       let searcher = searchers[index++];
       if (searcher) {
-        return searcher.get(branch, type, id, next);
+        return searcher.get(sessionOrEveryone, branch, type, id, next);
       }
     };
     let result = await next();
@@ -43,24 +48,35 @@ class Searchers {
     return result;
   }
 
-  async getFromControllingBranch(type, id) {
-    return this.get(this.controllingBranch.name, type, id);
+  async getFromControllingBranch(session, type, id) {
+    if (arguments.length < 3) {
+      throw new Error(`session is now a required argument to searchers.getFromControllingBranch`);
+    }
+    return this.get(session, this.controllingBranch.name, type, id);
   }
 
-  async search(branch, query) {
+  async search(session, branch, query) {
+    if (arguments.length < 3) {
+      throw new Error(`session is now a required argument to searchers.search`);
+    }
+
     let searchers = await this._lookupSearchers();
     let index = 0;
+    let sessionOrEveryone = session || Session.EVERYONE;
     let next = async () => {
       let searcher = searchers[index++];
       if (searcher) {
-        return searcher.search(branch, query, next);
+        return searcher.search(sessionOrEveryone, branch, query, next);
       }
     };
     return next();
   }
 
-  async searchInControllingBranch(query) {
-    return this.search(this.controllingBranch.name, query);
+  async searchInControllingBranch(session, query) {
+    if (arguments.length < 2) {
+      throw new Error(`session is now a required argument to searchers.searchInControllingBranch`);
+    }
+    return this.search(session, this.controllingBranch.name, query);
   }
 
 

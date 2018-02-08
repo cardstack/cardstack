@@ -64,6 +64,7 @@ exports.createDefaultEnvironment = async function(projectDir, initialModels = []
 
     factory.addResource('grants')
       .withAttributes({
+        mayReadResource: true,
         mayCreateResource: true,
         mayUpdateResource: true,
         mayDeleteResource: true,

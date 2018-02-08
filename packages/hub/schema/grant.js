@@ -7,6 +7,7 @@ const actions = [
   'may-write-field'
 ];
 const log = require('@cardstack/logger')('cardstack/auth');
+const Session = require('@cardstack/plugin-utils/session');
 
 module.exports = class Grant {
   constructor(document) {
@@ -17,7 +18,6 @@ module.exports = class Grant {
       this[action] = !!attrs[action];
     }
 
-    this.groupId = null;
     this.types = null;
     this.fields = null;
     this.id = document.id;
@@ -34,23 +34,20 @@ module.exports = class Grant {
     }
 
     if (rels.who && rels.who.data) {
+      if (rels.who.data.type !== 'groups') {
+        throw new Error(`grant's "who" field must refer to a group: ${JSON.stringify(document)}`);
+      }
       this.groupId = rels.who.data.id;
+    } else {
+      throw new Error(`grant must have a "who" field: ${JSON.stringify(document)}`);
     }
   }
 
   async matches(document, context) {
-    let groupIds;
-    if (context.session) {
-      groupIds = await context.session.loadGroupIds();
-    } else {
-      groupIds = [];
-    }
+    let groupIds = await (context.session || Session.EVERYONE).realms();
     let matches = this.groupId == null || groupIds.includes(this.groupId);
     log.trace('testing grant id=%s groupId=%s document=%j context=%j matches=%s', this.id, this.groupId, document, context, !!matches);
     return matches;
   }
 
-  _memberCheck(user, groupId) {
-    return String(user.id) === String(groupId);
-  }
 };

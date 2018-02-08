@@ -622,10 +622,14 @@ class BranchUpdate {
     // The next fields in the searchDoc get a "cardstack_" prefix so
     // they aren't likely to collide with the user's attribute or
     // relationship.
+
     if (jsonapiDoc.meta) {
       searchDoc.cardstack_meta = jsonapiDoc.meta;
       pristine.data.meta = jsonapiDoc.meta;
     }
+
+    searchDoc.cardstack_realms = [...schema.realms(type, jsonapiDoc)];
+
     if (parentsIncludes) {
       parentsIncludes.push(pristine.data);
     } else {
@@ -634,6 +638,5 @@ class BranchUpdate {
     }
     return searchDoc;
   }
-
 
 }
