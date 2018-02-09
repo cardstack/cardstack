@@ -99,7 +99,7 @@ describe('schema/auth', function() {
 
   it("user-provided id approved with a grant", async function() {
     factory.addResource('grants').withAttributes({ mayCreateResource: true }).withRelated('who', everyone);
-    factory.addResource('grants').withAttributes({ mayWriteField: true }).withRelated('who', everyone)
+    factory.addResource('grants').withAttributes({ mayWriteFields: true }).withRelated('who', everyone)
       .withRelated('fields', [
         factory.getResource('fields', 'id')
       ]);
@@ -219,7 +219,7 @@ describe('schema/auth', function() {
   });
 
   it("approves field write at creation via grant", async function () {
-    factory.addResource('grants').withAttributes({ mayCreateResource: true, mayWriteField: true }).withRelated('who', everyone);
+    factory.addResource('grants').withAttributes({ mayCreateResource: true, mayWriteFields: true }).withRelated('who', everyone);
     let schema = await loader.loadFrom(factory.getModels());
     let action = create({
       type: 'articles',
@@ -295,7 +295,7 @@ describe('schema/auth', function() {
   });
 
   it("approves field write at update via grant", async function () {
-    factory.addResource('grants').withAttributes({ mayUpdateResource: true, mayWriteField: true }).withRelated('who', everyone);
+    factory.addResource('grants').withAttributes({ mayUpdateResource: true, mayWriteFields: true }).withRelated('who', everyone);
     let schema = await loader.loadFrom(factory.getModels());
     let action = update({
       type: 'articles',
@@ -315,7 +315,7 @@ describe('schema/auth', function() {
   });
 
   it("approves via a field-specific grant", async function () {
-    factory.addResource('grants').withAttributes({ mayUpdateResource: true, mayWriteField: true })
+    factory.addResource('grants').withAttributes({ mayUpdateResource: true, mayWriteFields: true })
       .withRelated('who', everyone)
       .withRelated('fields', [
         factory.getResource('fields', 'coolness')
@@ -339,7 +339,7 @@ describe('schema/auth', function() {
   });
 
   it("rejects a non-matching field-specific grant", async function () {
-    factory.addResource('grants').withAttributes({ mayUpdateResource: true, mayWriteField: true })
+    factory.addResource('grants').withAttributes({ mayUpdateResource: true, mayWriteFields: true })
       .withRelated('who', everyone)
       .withRelated('fields', [
         factory.getResource('fields', 'coolness')

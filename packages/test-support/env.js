@@ -68,7 +68,8 @@ exports.createDefaultEnvironment = async function(projectDir, initialModels = []
         mayCreateResource: true,
         mayUpdateResource: true,
         mayDeleteResource: true,
-        mayWriteField: true
+        mayReadFields: true,
+        mayWriteFields: true
       }).withRelated('who', factory.addResource('groups', user.data.id));
 
     container = await wireItUp(projectDir, crypto.randomBytes(32), factory.getModels(), {

@@ -67,7 +67,8 @@ module.exports = [
       'may-create-resource': true,
       'may-update-resource': true,
       'may-delete-resource': true,
-      'may-write-field': true
+      'may-write-fields': true,
+      'may-read-fields': true
     }
   }
 ];

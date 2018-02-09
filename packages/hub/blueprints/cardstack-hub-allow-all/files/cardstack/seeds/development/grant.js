@@ -2,15 +2,20 @@
 
 module.exports = [
 
-  // This grant doesn't have a user attached, so it applies to _everyone_.
   {
     type: 'grants',
-    id: '0',
+    id: 'wide-open',
     attributes: {
-      'may-write-field': true,
+      'may-read-fields': true,
+      'may-write-fields': true,
       'may-create-resource': true,
       'may-update-resource': true,
       'may-delete-resource': true
+    },
+    relationships: {
+      who: {
+        data: { type: 'groups', id: 'everyone' }
+      }
     }
   }
 ];

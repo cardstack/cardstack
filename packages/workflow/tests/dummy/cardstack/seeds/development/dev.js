@@ -350,6 +350,7 @@ module.exports = [
       'may-create-resource': true,
       'may-update-resource': true,
       'may-delete-resource': true,
+      'may-read-fields': true,
       'may-write-field': true
     }
   }
