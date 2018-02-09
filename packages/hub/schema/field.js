@@ -1,8 +1,17 @@
 const Error = require('@cardstack/plugin-utils/error');
 const find = require('../async-find');
 
+const legalFieldName = /^[a-zA-Z0-9](?:[-_a-zA-Z0-9]*[a-zA-Z0-9])?$/;
+
 module.exports = class Field {
+  static isValidName(name) {
+    return legalFieldName.test(name);
+  }
+
   constructor(model, plugins, allGrants, defaultValues, authLog) {
+    if (!Field.isValidName(model.id)) {
+      throw new Error(`${model.id} is not a valid field name. We follow JSON:API spec for valid member names, see http://jsonapi.org/format/#document-member-names`);
+    }
     this.id = model.id;
     this.authLog = authLog;
     if (!model.attributes || !model.attributes['field-type']) {
