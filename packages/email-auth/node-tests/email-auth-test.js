@@ -96,11 +96,14 @@ describe('email-auth', function() {
     expect(response).hasStatus(200);
     expect(response.body).not.has.deep.property('meta.token');
     expect(response.body.data).deep.equals({
-      type: 'partial-sessions',
+      type: 'users',
       attributes: {
         message: 'Check your email',
         state: 'pending-email'
       }
+    });
+    expect(response.body.meta).deep.equals({
+      'partial-session': true
     });
     let sentMessages = await TestMessenger.sentMessages(env);
     expect(sentMessages).has.length(1, 'sent messages has the wrong length');

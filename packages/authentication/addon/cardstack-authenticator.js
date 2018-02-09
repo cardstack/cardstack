@@ -15,8 +15,8 @@ export default Base.extend({
         rawSession.data.meta.validUntil > Date.now() / 1000;
 
       let partialSession =
-        rawSession.data &&
-        rawSession.data.type === 'partial-sessions';
+        rawSession.meta &&
+        rawSession.meta['partial-session'];
 
       let secret             = localStorage.getItem('cardstack-secret-token'),
         authenticationSource = localStorage.getItem('cardstack-authentication-source');

@@ -393,23 +393,27 @@ describe('authentication/middleware', function() {
       it('can return a partial session', async function() {
         let response = await request.post(`/auth/echo`).send({
           data: {
+            type: 'users',
             attributes: {
               state: 'i-am-partial',
               message: "you're not done yet"
             }
           },
           meta: {
-            partialSession: true
+            'partial-session': true
           }
         });
         expect(response).hasStatus(200);
         expect(response.body).not.has.deep.property('meta.token');
         expect(response.body.data).deep.equals({
-          type: 'partial-sessions',
+          type: 'users',
           attributes: {
             state: 'i-am-partial',
             message: "you're not done yet"
           }
+        });
+        expect(response.body.meta).deep.equals({
+          'partial-session': true
         });
       });
 

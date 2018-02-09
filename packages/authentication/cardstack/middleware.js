@@ -16,6 +16,10 @@ function addCorsHeaders(response) {
   response.set('Access-Control-Allow-Headers', 'Content-Type');
 }
 
+function isPartialSession(doc) {
+  return doc.meta && doc.meta['partial-session'];
+}
+
 module.exports = declareInjections({
   encryptor: 'hub:encryptor',
   searcher: 'hub:searchers',
@@ -109,21 +113,6 @@ class Authentication {
   async _invokeAuthenticationSource(ctxt, source) {
     let result = await source.authenticator.authenticate(ctxt.request.body, this.userSearcher);
 
-    if (result && result.meta && result.meta.partialSession) {
-      if (result.data.type == null) {
-        result.data.type = 'partial-sessions';
-      }
-
-      // top-level meta is not passed through (it was for
-      // communicating from plugin to us). Plugins could use
-      // resource-level metadata instead if they want to.
-      delete result.meta;
-
-      ctxt.body = result;
-      ctxt.status = 200;
-      return;
-    }
-
     if (!result) {
       ctxt.status = 401;
       ctxt.body = {
@@ -140,7 +129,13 @@ class Authentication {
       delete result.meta;
       user = result;
     } else {
-      user = await this._processExternalUser(result, source);
+      let rewritten = rewriteExternalUser(result, source);
+      if (isPartialSession(rewritten)) {
+        ctxt.body = rewritten;
+        ctxt.status = 200;
+        return;
+      }
+      user = await this._processExternalUser(rewritten, source);
     }
 
     if (!user || !user.data) {
@@ -165,8 +160,7 @@ class Authentication {
     ctxt.status = 200;
   }
 
-  async _processExternalUser(externalUser, source) {
-    let user = rewriteExternalUser(externalUser, source);
+  async _processExternalUser(user, source) {
     if (!user.data || !user.data.type) { return; }
 
     let have;
