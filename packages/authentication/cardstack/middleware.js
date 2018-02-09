@@ -128,19 +128,7 @@ class Authentication {
       user = await this._processExternalUser(result, source);
     }
 
-    if (result && result.meta && result.meta.partialSession) {
-      if (!user) {
-        // top-level meta is not passed through (it was for
-        // communicating from plugin to us). Plugins could use
-        // resource-level metadata instead if they want to.
-        delete result.meta;
-        user = result;
-      }
-
-      if (user.data.type !== 'partial-sessions') {
-        user.data.type = 'partial-sessions';
-      }
-
+    if (user && user.data && user.data.type === 'partial-sessions') {
       ctxt.body = user;
       ctxt.status = 200;
       return;
@@ -171,6 +159,10 @@ class Authentication {
   async _processExternalUser(externalUser, source) {
     let user = rewriteExternalUser(externalUser, source);
     if (!user.data || !user.data.type) { return; }
+
+    if (user.data.type === 'partial-sessions') {
+      return user;
+    }
 
     let have;
 

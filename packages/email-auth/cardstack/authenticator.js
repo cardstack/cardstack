@@ -50,13 +50,11 @@ class {
         });
         return {
           data: {
+            type: 'partial-sessions',
             attributes: {
               message: 'Check your email',
               state: 'pending-email'
             }
-          },
-          meta: {
-            partialSession: true
           }
         };
       } else {

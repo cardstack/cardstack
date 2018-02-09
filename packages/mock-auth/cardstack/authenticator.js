@@ -7,7 +7,7 @@ module.exports = class {
   constructor(params) {
     this.users = params["users"];
 
-    this.defaultUserTemplate =  `{ "data": { "id": "{{id}}", "type": "mock-users", "attributes": { "name": "{{name}}", "email":"{{email}}", "avatar-url":"{{{picture}}}", "email-verified":{{verified}}{{#unless verified}}, "message": { "state": "verifiy-email", "id": "{{id}}"} {{/unless}} }}}`;
+    this.defaultUserTemplate =  `{ "data": { "id": "{{id}}", "type": {{#if verified}}"mock-users"{{else}}"partial-sessions"{{/if}}, "attributes": { "name": "{{name}}", "email":"{{email}}", "avatar-url":"{{{picture}}}", "email-verified":{{verified}}{{#unless verified}}, "message": { "state": "verifiy-email", "id": "{{id}}"} {{/unless}} }}}`;
   }
 
   async authenticate(payload /*, userSearcher */) {
@@ -21,9 +21,6 @@ module.exports = class {
     if (mockUser) {
       mockUser.id = payload.authorizationCode;
 
-      if (!mockUser.verified) {
-        mockUser.meta = { partialSession: true };
-      }
       return mockUser;
     }
 
