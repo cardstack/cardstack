@@ -406,11 +406,14 @@ describe('authentication/middleware', function() {
         expect(response).hasStatus(200);
         expect(response.body).not.has.deep.property('meta.token');
         expect(response.body.data).deep.equals({
-          type: 'partial-sessions',
+          type: 'users',
           attributes: {
             state: 'i-am-partial',
             message: "you're not done yet"
           }
+        });
+        expect(response.body.meta).deep.equals({
+          'partial-session': true
         });
       });
 
