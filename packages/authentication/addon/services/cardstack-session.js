@@ -12,9 +12,13 @@ export default Ember.Service.extend({
     return this.get('session.isAuthenticated') && !this.get('isPartiallyAuthenticated');
   }),
 
-  isPartiallyAuthenticated: Ember.computed.equal('_rawSession.data.type', 'partial-sessions'),
+  isPartiallyAuthenticated: Ember.computed.alias('_rawSession.meta.partial-session'),
 
-  message: Ember.computed.reads('_rawSession.data.attributes.message'),
+  partialSession: Ember.computed('isPartiallyAuthenticated', '_rawSession', function() {
+    if (this.get('isPartiallyAuthenticated')) {
+      return this.get('_rawSession');
+    }
+  }),
 
   _rawSession: Ember.computed.alias('session.data.authenticated'),
 

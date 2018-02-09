@@ -16,6 +16,10 @@ function addCorsHeaders(response) {
   response.set('Access-Control-Allow-Headers', 'Content-Type');
 }
 
+function isPartialSession(doc) {
+  return doc.meta && doc.meta['partial-session'];
+}
+
 module.exports = declareInjections({
   encryptor: 'hub:encryptor',
   searcher: 'hub:searchers',
@@ -125,13 +129,13 @@ class Authentication {
       delete result.meta;
       user = result;
     } else {
-      user = await this._processExternalUser(result, source);
-    }
-
-    if (user && user.data && user.data.type === 'partial-sessions') {
-      ctxt.body = user;
-      ctxt.status = 200;
-      return;
+      let rewritten = rewriteExternalUser(result, source);
+      if (isPartialSession(rewritten)) {
+        ctxt.body = rewritten;
+        ctxt.status = 200;
+        return;
+      }
+      user = await this._processExternalUser(rewritten, source);
     }
 
     if (!user || !user.data) {
@@ -156,13 +160,8 @@ class Authentication {
     ctxt.status = 200;
   }
 
-  async _processExternalUser(externalUser, source) {
-    let user = rewriteExternalUser(externalUser, source);
+  async _processExternalUser(user, source) {
     if (!user.data || !user.data.type) { return; }
-
-    if (user.data.type === 'partial-sessions') {
-      return user;
-    }
 
     let have;
 
