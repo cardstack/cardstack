@@ -393,11 +393,14 @@ describe('authentication/middleware', function() {
       it('can return a partial session', async function() {
         let response = await request.post(`/auth/echo`).send({
           data: {
-            type: 'partial-sessions',
+            type: 'users',
             attributes: {
               state: 'i-am-partial',
               message: "you're not done yet"
             }
+          },
+          meta: {
+            'partial-session': true
           }
         });
         expect(response).hasStatus(200);
