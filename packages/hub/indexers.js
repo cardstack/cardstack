@@ -628,7 +628,12 @@ class BranchUpdate {
       pristine.data.meta = jsonapiDoc.meta;
     }
 
-    searchDoc.cardstack_realms = [...schema.realms(type, jsonapiDoc)];
+    let contentType = schema.types.get(type);
+    if (contentType) {
+      searchDoc.cardstack_resource_realms = contentType.realms.resourceReaders(jsonapiDoc);
+    } else {
+      searchDoc.cardstack_resource_realms = [];
+    }
 
     if (parentsIncludes) {
       parentsIncludes.push(pristine.data);

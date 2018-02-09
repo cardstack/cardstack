@@ -1,6 +1,7 @@
 const Error = require('@cardstack/plugin-utils/error');
 const find = require('../async-find');
 const { flatten } = require('lodash');
+const Realms = require('./realms');
 
 module.exports = class ContentType {
   constructor(model, allFields, allConstraints, dataSources, defaultDataSource, allGrants, authLog) {
@@ -38,6 +39,7 @@ module.exports = class ContentType {
       this.dataSource = null;
     }
     this.grants = allGrants.filter(g => g.types == null || g.types.includes(model.id));
+    this._realms = null;
     authLog.trace(`while constructing content type %s, %s of %s grants apply`, this.id, this.grants.length, allGrants.length);
     this.authLog = authLog;
     this.constraints = allConstraints.filter(constraint => {
@@ -166,7 +168,12 @@ module.exports = class ContentType {
     }
   }
 
-
+  get realms() {
+    if (!this._realms) {
+      this._realms = new Realms(this.grants);
+    }
+    return this._realms;
+  }
 
 };
 

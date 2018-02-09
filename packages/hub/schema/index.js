@@ -101,18 +101,6 @@ class Schema {
     }
   }
 
-  realms(type, doc, outputSet=new Set()) {
-    let contentType = this.types.get(type);
-    if (contentType) {
-      for (let grant of contentType.grants) {
-        if (grant['may-read-resource']) {
-          outputSet.add(grant.groupId);
-        }
-      }
-    }
-    return outputSet;
-  }
-
   _validateDocumentStructure(document, context) {
     if (!document.type) {
       throw new Error(`missing required field "type"`, {
@@ -161,7 +149,8 @@ class Schema {
         this._mapping[contentType.id].properties.cardstack_generation = { type: 'keyword' };
         this._mapping[contentType.id].properties.cardstack_pristine = { type: 'object', enabled: false };
         this._mapping[contentType.id].properties.cardstack_references = { type: 'keyword' };
-        this._mapping[contentType.id].properties.cardstack_realms = { type: 'keyword' };
+        this._mapping[contentType.id].properties.cardstack_resource_realms = { type: 'keyword' };
+        this._mapping[contentType.id].properties.cardstack_realm_detail = { type: 'object', enabled: false };
       }
 
     }

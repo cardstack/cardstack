@@ -40,18 +40,9 @@ class Searcher {
       throw err;
     }
 
-    // Auth check
-    let userRealms;
-    if (document.cardstack_realms && document.cardstack_realms.length > 0) {
-      userRealms = await session.realms();
-      if (userRealms.find(realm => document.cardstack_realms.includes(realm))) {
-        return toJSONAPI(type, document);
-      }
+    if (await matchingResourceRealms(document, session)) {
+      return toJSONAPI(type, document);
     }
-    authLog.info("elasticsearch rejected searcher.get, documentRealms=%j, userRealms=%j", document.cardstack_realms, userRealms);
-    // Failed auth check is a 404. We don't want to leak the existence
-    // of resources that people don't have permission to access. We
-    // return undefined for a missing document.
   }
 
   async search(session, branch, { queryString, filter, sort, page }) {
@@ -67,7 +58,7 @@ class Searcher {
           must: [{
             terms: {
               // This is our resource-level read security
-              cardstack_realms: realms
+              cardstack_resource_realms: realms
             }
           }],
           // All searches exclude `meta` documents, because those are
@@ -381,3 +372,17 @@ class Searcher {
 
 
 });
+
+async function matchingResourceRealms(document, session) {
+    let userRealms;
+    if (document.cardstack_resource_realms && document.cardstack_resource_realms.length > 0) {
+      userRealms = await session.realms();
+      if (userRealms.find(realm => document.cardstack_resource_realms.includes(realm))) {
+        return true;
+      }
+    }
+    authLog.info("elasticsearch rejected searcher.get, documentRealms=%j, userRealms=%j", document.cardstack_resource_realms, userRealms);
+    // Failed auth check is a 404. We don't want to leak the existence
+    // of resources that people don't have permission to access. We
+    // return undefined for a missing document.
+}
