@@ -20,7 +20,7 @@ export default Ember.Component.extend({
   },
 
   login: task(function * (mockUserId) {
-    mockUserId = mockUserId || this.get('mockUserId');
+    mockUserId = this.get('mockUserId') || mockUserId;
     if (mockUserId ) {
       yield this.get('session').authenticate('authenticator:cardstack', this.get('source'), { authorizationCode: mockUserId });
     }
