@@ -20,6 +20,8 @@ export default Ember.Service.extend({
     }
   }),
 
+  partialAuthenticationMessage: Ember.computed.alias('partialSession.data.attributes.message'),
+
   _rawSession: Ember.computed.alias('session.data.authenticated'),
 
   user: Ember.computed('isAuthenticated', '_rawSession', function() {
