@@ -1,6 +1,6 @@
 {
   "name": "@cardstack/mock-auth",
-  "version": "0.4.10",
+  "version": "0.4.11",
   "description": "mock user authentication plugin for Cardstack",
   "keywords": [
     "ember-addon",
