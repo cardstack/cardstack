@@ -75,26 +75,38 @@ async function httpLogging(ctxt, next) {
   log.info('finish %s %s %s', ctxt.request.method, ctxt.request.originalUrl, ctxt.response.status);
 }
 
-async function spawnHub(packageName, configPath, environment) {
+function prepareSpawnHub(packageName, configPath, environment) {
+  let setEnvVars = Object.create(null);
   if (!process.env.CARDSTACK_SESSIONS_KEY) {
     const crypto = require('crypto');
     let key = crypto.randomBytes(32);
-    process.env.CARDSTACK_SESSIONS_KEY = key.toString('base64');
+    setEnvVars.CARDSTACK_SESSIONS_KEY = key.toString('base64');
   }
   if (!process.env.DEBUG && environment === 'development') {
-    process.env.DEBUG = 'cardstack/*';
+    setEnvVars.DEBUG = 'cardstack/*';
   }
   if (!process.env.DEBUG_COLORS) {
-    process.env.DEBUG_COLORS='yes';
+    setEnvVars.DEBUG_COLORS='yes';
   }
   if (!process.env.ELASTICSEARCH_PREFIX) {
-    process.env.ELASTICSEARCH_PREFIX = packageName.replace(/^[^a-zA-Z]*/, '').replace(/[^a-zA-Z0-9]/g, '_') + '_' + environment;
+    setEnvVars.ELASTICSEARCH_PREFIX = packageName.replace(/^[^a-zA-Z]*/, '').replace(/[^a-zA-Z0-9]/g, '_') + '_' + environment;
   }
 
   let seedDir = path.join(path.dirname(configPath),
                           '..', 'cardstack', 'seeds', environment);
 
-  let proc = spawn(path.join(__dirname, 'bin', 'cardstack-hub.js'), [seedDir], { stdio: [0, 1, 2, 'ipc']  });
+  let bin = path.join(__dirname, 'bin', 'cardstack-hub.js');
+  return { setEnvVars, bin, args: [seedDir] };
+}
+
+async function spawnHub(packageName, configPath, environment) {
+  let { setEnvVars, bin, args } = prepareSpawnHub(packageName, configPath, environment);
+
+  for (let [key, value] of Object.entries(setEnvVars)) {
+    process.env[key] = value;
+  }
+
+  let proc = spawn(bin, args, { stdio: [0, 1, 2, 'ipc']  });
   await new Promise((resolve, reject) => {
     // by convention the hub will send a hello message if it sees we
     // are supervising it over IPC. If we get an error or exit before
@@ -113,3 +125,4 @@ async function spawnHub(packageName, configPath, environment) {
 exports.wireItUp = wireItUp;
 exports.makeServer = makeServer;
 exports.spawnHub = spawnHub;
+exports.prepareSpawnHub = prepareSpawnHub;
