@@ -514,13 +514,30 @@ class BranchUpdate {
   }
 
 
+
+  async _prepareSearchDoc(type, id, doc) {
+    let schema = await this.schema();
+    let context = new DocumentContext(this.branch, this.client, schema, type, id, doc);
+    return context.searchDoc;
+  }
+
+}
+
+class DocumentContext {
+
+  constructor(branchUpdate, schema, type, id, doc) {
+    this.branchUpdate = branchUpdate;
+
+    let searchTree = this.schema.types.get(type).includesTree;
+
+    this.searchDoc = this._prepareSearchDoc(type, id, doc, searchTree);
+  }
+
   async _logicalFieldToES(fieldName) {
-    return this.client.logicalFieldToES(this.branch, fieldName);
+    return this.branchUpdate.client.logicalFieldToES(this.branchUpdate.branch, fieldName);
   }
 
   async _prepareSearchDoc(type, id, jsonapiDoc, searchTree, parentsIncludes, parentsReferences) {
-    let schema = await this.schema();
-
     // we store the id as a regular field in elasticsearch here, because
     // we use elasticsearch's own built-in _id for our own composite key
     // that takes into account branches.
@@ -561,7 +578,7 @@ class BranchUpdate {
       pristine.data.attributes = jsonapiDoc.attributes;
       for (let attribute of Object.keys(jsonapiDoc.attributes)) {
         let value = jsonapiDoc.attributes[attribute];
-        let field = schema.fields.get(attribute);
+        let field = this.schema.fields.get(attribute);
         if (field) {
           let derivedFields = field.derivedFields(value);
           if (derivedFields) {
@@ -578,22 +595,17 @@ class BranchUpdate {
     if (jsonapiDoc.relationships) {
       let relationships = pristine.data.relationships = Object.assign({}, jsonapiDoc.relationships);
 
-      if (!searchTree) {
-        // we are the root document, so our own configured default
-        // includes determines which relationships to recurse into
-        searchTree = schema.types.get(type).includesTree;
-      }
 
       for (let attribute of Object.keys(jsonapiDoc.relationships)) {
         let value = jsonapiDoc.relationships[attribute];
-        let field = schema.fields.get(attribute);
+        let field = this.schema.fields.get(attribute);
         if (field && value && value.hasOwnProperty('data')) {
           let related;
           if (value.data && searchTree[attribute]) {
             if (Array.isArray(value.data)) {
               related = await Promise.all(value.data.map(async ({ type, id }) => {
                 ourReferences.push(`${type}/${id}`);
-                let resource = await this.read(type, id);
+                let resource = await this.branchUpdate.read(type, id);
                 if (resource) {
                   return this._prepareSearchDoc(type, id, resource, searchTree[attribute], ourIncludes, ourReferences);
                 }
@@ -602,7 +614,7 @@ class BranchUpdate {
               relationships[attribute] = Object.assign({}, relationships[attribute], { data: related.map(r => ({ type: r.type, id: r.id })) });
             } else {
               ourReferences.push(`${value.data.type}/${value.data.id}`);
-              let resource = await this.read(value.data.type, value.data.id);
+              let resource = await this.branchUpdate.read(value.data.type, value.data.id);
               if (resource) {
                 related = await this._prepareSearchDoc(resource.type, resource.id, resource, searchTree[attribute], ourIncludes, ourReferences);
               } else {
@@ -632,7 +644,7 @@ class BranchUpdate {
       pristine.data.meta = jsonapiDoc.meta;
     }
 
-    let contentType = schema.types.get(type);
+    let contentType = this.schema.types.get(type);
     if (contentType) {
       searchDoc.cardstack_resource_realms = contentType.realms.resourceReaders(jsonapiDoc);
     } else {
@@ -647,5 +659,4 @@ class BranchUpdate {
     }
     return searchDoc;
   }
-
 }
