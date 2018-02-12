@@ -1,5 +1,6 @@
 const { declareInjections } = require('@cardstack/di');
 const Error = require('@cardstack/plugin-utils/error');
+const Session = require('@cardstack/plugin-utils/session');
 
 module.exports = declareInjections({
   plugins: 'hub:plugins',
@@ -21,7 +22,7 @@ class Messengers {
     if (this.messengerCache[sinkId]) {
       return this.messengerCache[sinkId];
     } else {
-      let sink = await this.searchers.getFromControllingBranch('message-sinks', sinkId);
+      let sink = await this.searchers.getFromControllingBranch(Session.INTERNAL_PRIVLEGED, 'message-sinks', sinkId);
 
       if (!sink) {
         throw new Error(`Tried to send a message to message sink ${sinkId} but it does not exist`, { status: 500 });

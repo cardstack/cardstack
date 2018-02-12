@@ -37,6 +37,7 @@
 */
 
 const log = require('@cardstack/logger')('cardstack/indexers');
+const authLog = require('@cardstack/logger')('cardstack/auth');
 const Client = require('@cardstack/elasticsearch/client');
 const toJSONAPI = require('@cardstack/elasticsearch/to-jsonapi');
 const { declareInjections } = require('@cardstack/di');
@@ -655,6 +656,7 @@ class DocumentContext {
     } else {
       searchDoc.cardstack_resource_realms = [];
     }
+    authLog.trace("setting resource_realms for %s %s: %j", type, id, searchDoc.cardstack_resource_realms);
 
     if (depth > 0) {
       this.pristineIncludes.push(pristine.data);

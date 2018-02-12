@@ -18,7 +18,7 @@ class TestAuthenticator {
       if (self.userId != null) {
         ctxt.state.cardstackSession = new Session(
           { id: self.userId, type: 'users' },
-          (id) => self.searcher.get('master', 'users', id)
+          (type, id) => self.searcher.get(Session.INTERNAL_PRIVILEGED, 'master', type, id)
         );
       }
       await next();

@@ -76,7 +76,7 @@ describe('middleware-stack', function() {
     afterEach(teardown);
 
     it('can dynamically mount more middleware', async function() {
-      let config = await env.lookup('hub:searchers').get('master', 'plugin-configs', 'stub-middleware-extra');
+      let config = await env.lookup('hub:searchers').get(env.session, 'master', 'plugin-configs', 'stub-middleware-extra');
       config.data.attributes.enabled = true;
       await env.lookup('hub:writers').update('master', env.session, config.data.type, config.data.id, config.data);
       await env.lookup('hub:indexers').update({ realTime: true });

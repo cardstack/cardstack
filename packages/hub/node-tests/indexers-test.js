@@ -31,18 +31,18 @@ describe('hub/indexers', function() {
     });
 
     it("indexes plugins", async function() {
-      let doc = await env.lookup('hub:searchers').get('master', 'plugins', 'sample-plugin-one');
+      let doc = await env.lookup('hub:searchers').get(env.session, 'master', 'plugins', 'sample-plugin-one');
       expect(doc).is.ok;
     });
 
     it("includes features within plugins", async function() {
-      let doc = await env.lookup('hub:searchers').get('master', 'plugins', 'sample-plugin-one');
+      let doc = await env.lookup('hub:searchers').get(env.session, 'master', 'plugins', 'sample-plugin-one');
       expect(doc).has.property('included');
       expect(doc.included.map(r => r.id)).deep.equals(['sample-plugin-one::x']);
     });
 
     it("indexes plugin features", async function() {
-      let doc = await env.lookup('hub:searchers').get('master', 'field-types', 'sample-plugin-one::x');
+      let doc = await env.lookup('hub:searchers').get(env.session, 'master', 'field-types', 'sample-plugin-one::x');
       expect(doc).is.ok;
     });
   });
@@ -55,7 +55,7 @@ describe('hub/indexers', function() {
       // this test is deliberately writing directly to the ephemeral
       // backend instead of going through hub:writers. That ensures
       // we aren't relying on side-effects from the writers.
-      let doc = await env.lookup('hub:searchers').get('master', 'plugins', 'sample-plugin-one');
+      let doc = await env.lookup('hub:searchers').get(env.session, 'master', 'plugins', 'sample-plugin-one');
       expect(doc).has.deep.property('data.attributes.enabled', true);
       let config = {
         id: 'sample-plugin-one',
@@ -69,7 +69,7 @@ describe('hub/indexers', function() {
       let storage = await source.writer.storage;
       storage.store(config.type, config.id, config, false, null);
       await env.lookup('hub:indexers').update({ realTime: true });
-      doc = await env.lookup('hub:searchers').get('master', 'plugins', 'sample-plugin-one');
+      doc = await env.lookup('hub:searchers').get(env.session, 'master', 'plugins', 'sample-plugin-one');
       expect(doc).has.deep.property('data.attributes.enabled', false);
     });
   });
