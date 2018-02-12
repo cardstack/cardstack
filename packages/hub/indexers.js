@@ -518,7 +518,7 @@ class BranchUpdate {
   async _prepareSearchDoc(type, id, doc) {
     let schema = await this.schema();
     let context = new DocumentContext(this, schema, type, id, doc);
-    return context.searchDoc;
+    return context.searchDoc();
   }
 
 }
@@ -528,9 +528,10 @@ class DocumentContext {
   constructor(branchUpdate, schema, type, id, doc) {
     this.branchUpdate = branchUpdate;
     this.schema = schema;
+    this.type = type;
+    this.id = id;
+    this.doc = doc;
 
-    let contentType = schema.types.get(type);
-    let searchTree = contentType ? contentType.includesTree : null;
 
     // included resources that we actually found
     this.pristineIncludes = [];
@@ -539,9 +540,12 @@ class DocumentContext {
     // missing. We track the missing ones so that if they later appear
     // in the data we can invalidate to pick them up.
     this.references = [];
+  }
 
-
-    this.searchDoc = this._prepareSearchDoc(type, id, doc, searchTree, 0);
+  async searchDoc() {
+    let contentType = this.schema.types.get(this.type);
+    let searchTree = contentType ? contentType.includesTree : null;
+    return this._prepareSearchDoc(this.type, this.id, this.doc, searchTree, 0);
   }
 
   async _logicalFieldToES(fieldName) {
@@ -606,7 +610,7 @@ class DocumentContext {
                 this.references.push(`${type}/${id}`);
                 let resource = await this.branchUpdate.read(type, id);
                 if (resource) {
-                  return this._prepareSearchDoc(type, id, resource, searchTree[attribute]);
+                  return this._prepareSearchDoc(type, id, resource, searchTree[attribute], depth + 1);
                 }
               }));
               related = related.filter(Boolean);
@@ -615,7 +619,7 @@ class DocumentContext {
               this.references.push(`${value.data.type}/${value.data.id}`);
               let resource = await this.branchUpdate.read(value.data.type, value.data.id);
               if (resource) {
-                related = await this._prepareSearchDoc(resource.type, resource.id, resource, searchTree[attribute]);
+                related = await this._prepareSearchDoc(resource.type, resource.id, resource, searchTree[attribute], depth + 1);
               } else {
                 relationships[attribute] = Object.assign({}, relationships[attribute], { data: null });
               }
@@ -629,10 +633,11 @@ class DocumentContext {
         }
       }
 
-      // top level document embeds all the other pristine includes
-      if (this.pristineIncludes.length > 0 && depth === 0) {
-        pristine.included = uniqBy([pristine].concat(this.pristineIncludes), r => `${r.type}/${r.id}`).slice(1);
-      }
+    }
+
+    // top level document embeds all the other pristine includes
+    if (this.pristineIncludes.length > 0 && depth === 0) {
+      pristine.included = uniqBy([pristine].concat(this.pristineIncludes), r => `${r.type}/${r.id}`).slice(1);
     }
 
     // The next fields in the searchDoc get a "cardstack_" prefix so
