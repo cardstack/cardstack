@@ -517,7 +517,7 @@ class BranchUpdate {
 
   async _prepareSearchDoc(type, id, doc) {
     let schema = await this.schema();
-    let context = new DocumentContext(this.branch, this.client, schema, type, id, doc);
+    let context = new DocumentContext(this, schema, type, id, doc);
     return context.searchDoc;
   }
 
@@ -527,17 +527,28 @@ class DocumentContext {
 
   constructor(branchUpdate, schema, type, id, doc) {
     this.branchUpdate = branchUpdate;
+    this.schema = schema;
 
-    let searchTree = this.schema.types.get(type).includesTree;
+    let contentType = schema.types.get(type);
+    let searchTree = contentType ? contentType.includesTree : null;
 
-    this.searchDoc = this._prepareSearchDoc(type, id, doc, searchTree);
+    // included resources that we actually found
+    this.pristineIncludes = [];
+
+    // references to included resource that were both found or
+    // missing. We track the missing ones so that if they later appear
+    // in the data we can invalidate to pick them up.
+    this.references = [];
+
+
+    this.searchDoc = this._prepareSearchDoc(type, id, doc, searchTree, 0);
   }
 
   async _logicalFieldToES(fieldName) {
     return this.branchUpdate.client.logicalFieldToES(this.branchUpdate.branch, fieldName);
   }
 
-  async _prepareSearchDoc(type, id, jsonapiDoc, searchTree, parentsIncludes, parentsReferences) {
+  async _prepareSearchDoc(type, id, jsonapiDoc, searchTree, depth) {
     // we store the id as a regular field in elasticsearch here, because
     // we use elasticsearch's own built-in _id for our own composite key
     // that takes into account branches.
@@ -557,21 +568,9 @@ class DocumentContext {
 
     // we are going inside a parent document's includes, so we need
     // our own type here.
-    if (parentsIncludes) {
+    if (depth > 0) {
       let esType = await this._logicalFieldToES('type');
       searchDoc[esType] = type;
-    }
-
-    // ourIncludes will track related resources that we successfully
-    // included. ourReferences also includes broken references. We
-    // track the references for our invalidation system.
-    let ourIncludes, ourReferences;
-    if (parentsIncludes) {
-      ourIncludes = parentsIncludes;
-      ourReferences = parentsReferences;
-    } else {
-      ourIncludes = [];
-      ourReferences = [];
     }
 
     if (jsonapiDoc.attributes) {
@@ -604,19 +603,19 @@ class DocumentContext {
           if (value.data && searchTree[attribute]) {
             if (Array.isArray(value.data)) {
               related = await Promise.all(value.data.map(async ({ type, id }) => {
-                ourReferences.push(`${type}/${id}`);
+                this.references.push(`${type}/${id}`);
                 let resource = await this.branchUpdate.read(type, id);
                 if (resource) {
-                  return this._prepareSearchDoc(type, id, resource, searchTree[attribute], ourIncludes, ourReferences);
+                  return this._prepareSearchDoc(type, id, resource, searchTree[attribute]);
                 }
               }));
               related = related.filter(Boolean);
               relationships[attribute] = Object.assign({}, relationships[attribute], { data: related.map(r => ({ type: r.type, id: r.id })) });
             } else {
-              ourReferences.push(`${value.data.type}/${value.data.id}`);
+              this.references.push(`${value.data.type}/${value.data.id}`);
               let resource = await this.branchUpdate.read(value.data.type, value.data.id);
               if (resource) {
-                related = await this._prepareSearchDoc(resource.type, resource.id, resource, searchTree[attribute], ourIncludes, ourReferences);
+                related = await this._prepareSearchDoc(resource.type, resource.id, resource, searchTree[attribute]);
               } else {
                 relationships[attribute] = Object.assign({}, relationships[attribute], { data: null });
               }
@@ -630,8 +629,9 @@ class DocumentContext {
         }
       }
 
-      if (ourIncludes.length > 0 && !parentsIncludes) {
-        pristine.included = uniqBy([pristine].concat(ourIncludes), r => `${r.type}/${r.id}`).slice(1);
+      // top level document embeds all the other pristine includes
+      if (this.pristineIncludes.length > 0 && depth === 0) {
+        pristine.included = uniqBy([pristine].concat(this.pristineIncludes), r => `${r.type}/${r.id}`).slice(1);
       }
     }
 
@@ -651,11 +651,11 @@ class DocumentContext {
       searchDoc.cardstack_resource_realms = [];
     }
 
-    if (parentsIncludes) {
-      parentsIncludes.push(pristine.data);
+    if (depth > 0) {
+      this.pristineIncludes.push(pristine.data);
     } else {
       searchDoc.cardstack_pristine = pristine;
-      searchDoc.cardstack_references = ourReferences;
+      searchDoc.cardstack_references = this.references;
     }
     return searchDoc;
   }
