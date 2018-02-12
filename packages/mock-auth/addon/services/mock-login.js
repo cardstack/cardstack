@@ -6,18 +6,6 @@ export default Ember.Service.extend({
 
   source: 'mock-auth',
 
-  init() {
-    this._super();
-
-    if (window && window.location && window.location.search) {
-      let urlParams = new URLSearchParams(window.location.search);
-      let mockUserId = urlParams.get("mock-user");
-      if (mockUserId) {
-        this.set('mockUserId', mockUserId);
-      }
-    }
-  },
-
   login: task(function * (mockUserId) {
     mockUserId = this.get('mockUserId') || mockUserId;
     if (mockUserId ) {
