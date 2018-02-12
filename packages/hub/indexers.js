@@ -514,6 +514,10 @@ class BranchUpdate {
   }
 
 
+  async _logicalFieldToES(fieldName) {
+    return this.client.logicalFieldToES(this.branch, fieldName);
+  }
+
   async _prepareSearchDoc(type, id, jsonapiDoc, searchTree, parentsIncludes, parentsReferences) {
     let schema = await this.schema();
 
@@ -523,7 +527,7 @@ class BranchUpdate {
     //
     // we don't store the type as a regular field in elasticsearch,
     // because we're keeping it in the built in _type field.
-    let esId = await this.client.logicalFieldToES(this.branch, 'id');
+    let esId = await this._logicalFieldToES('id');
     let searchDoc = { [esId]: id };
 
     // this is the copy of the document we will return to anybody who
@@ -537,7 +541,7 @@ class BranchUpdate {
     // we are going inside a parent document's includes, so we need
     // our own type here.
     if (parentsIncludes) {
-      let esType = await this.client.logicalFieldToES(this.branch, 'type');
+      let esType = await this._logicalFieldToES('type');
       searchDoc[esType] = type;
     }
 
@@ -562,12 +566,12 @@ class BranchUpdate {
           let derivedFields = field.derivedFields(value);
           if (derivedFields) {
             for (let [derivedName, derivedValue] of Object.entries(derivedFields)) {
-              let esName = await this.client.logicalFieldToES(this.branch, derivedName);
+              let esName = await this._logicalFieldToES(derivedName);
               searchDoc[esName] = derivedValue;
             }
           }
         }
-        let esName = await this.client.logicalFieldToES(this.branch, attribute);
+        let esName = await this._logicalFieldToES(attribute);
         searchDoc[esName] = value;
       }
     }
@@ -609,7 +613,7 @@ class BranchUpdate {
           } else {
             related = value.data;
           }
-          let esName = await this.client.logicalFieldToES(this.branch, attribute);
+          let esName = await this._logicalFieldToES(attribute);
           searchDoc[esName] = related;
         }
       }
