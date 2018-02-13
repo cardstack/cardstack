@@ -1,12 +1,6 @@
 :root {
   --normal-background: #404040;
-  --bright-foreground: #fff;
-  --light-background: #737373;
-  --lighter-background: #a1a2a3;
   --dark-background: #262626;
-  --very-dark-background: #0b0b0b;
-  --deemphasized-text-color: #9B9B9B;
-  --blue-background: #0069F9;
   --transition-time: 250ms;
   font-family: 'Avenir', 'helvetica', sans-serif;
   -webkit-font-smoothing: antialiased;
@@ -40,15 +34,18 @@
   min-height: 68px;
   cursor: pointer;
 }
+
+.cardstack-rail-item.active,
+.cardstack-rail-item:hover {
+  opacity: 1;
+  pointer-events: auto;
+  background-color: var(--dark-background);
+}
+
 .cardstack-rail-item.cardstack-non-interactive,
 .cardstack-rail-item.cardstack-non-interactive:hover {
   cursor: default;
   background-color: transparent;
-}
-
-.cardstack-rail-item.active,
-.cardstack-rail-item:hover {
-  background-color: var(--dark-background);
 }
 
 .cardstack-network-icon {
@@ -60,109 +57,4 @@
   background-position: center;
   background-repeat: no-repeat;
   color: transparent;
-}
-.cardstack-authentication-avatar {
-  height: 40px;
-  width: 40px;
-  opacity: .35;
-  margin: 14px auto 0;
-  border-radius: 100%;
-  background-size: contain;
-  background-position: center;
-  background-repeat: no-repeat;
-  background-image: url('../@cardstack/authentication/default-avatar.svg');
-}
-.cardstack-rail-item.active .cardstack-authentication-avatar,
-.cardstack-rail-item:hover .cardstack-authentication-avatar {
-  opacity: 1;
-}
-
-.cardstack-logout-link {
-  width: 100%;
-  display: inline-block;
-  color: black;
-  text-decoration: none;
-}
-
-.cardstack-rail-menu {
-  position: absolute;
-  min-width: 200px;
-  top: -15px;
-  left: 80px;
-  background-color: white;
-  color: black;
-  list-style-type: none;
-  padding: 20px 0 6px;
-  border-radius: 6px;
-  box-shadow: 0 2px 40px 0 rgba(0,0,0,.35);
-  opacity: 0;
-  pointer-events: none;
-  transition: opacity var(--transition-time);
-}
-.cardstack-rail-item:hover .cardstack-rail-menu {
-  opacity: 1;
-  pointer-events: auto;
-}
-
-.cardstack-rail-menu:before {
-  content: " ";
-  display: block;
-  position: absolute;
-  top: 0;
-  left: -10px;
-  width: 10px;
-  height: 68px;
-  background-color: transparent;
-  cursor: default;
-}
-
-.cardstack-rail-menu:after {
-  content: " ";
-  display: block;
-  position: absolute;
-  top: 24px;
-  left: -10px;
-  width: 0;
-  height: 0;
-  border-right: 10px solid white;
-  border-top: 10px solid transparent;
-  border-bottom: 10px solid transparent;
-}
-
-.cardstack-rail-menu-item {
-  font-size: 14px;
-  line-height: 40px;
-  letter-spacing: 0.11px;
-  font-weight: bold;
-  padding: 0 20px;
-  cursor: pointer;
-}
-.cardstack-rail-menu-item:hover {
-  color: white;
-  background-color: var(--blue-background);
-}
-.cardstack-rail-menu-item:hover a {
-  color: white;
-}
-
-.cardstack-rail-menu-item.cardstack-emphasize {
-  font-size: 16px;
-  line-height: 16px;
-}
-.cardstack-rail-menu-item.cardstack-deemphasize {
-  font-size: 12px;
-  line-height: 16px;
-  color: var(--deemphasized-text-color);
-}
-.cardstack-rail-menu-item.cardstack-non-interactive {
-  background-color: white;
-  color: black;
-  cursor: default;
-}
-.cardstack-rail-menu-item.cardstack-deemphasize.cardstack-non-interactive {
-  color: var(--deemphasized-text-color);
-}
-.cardstack-rail-menu-item.cardstack-hardrule {
-  margin-top: 15px;
-  border-top: 1px solid rgba(0,0,0,.1);
 }
