@@ -3,7 +3,7 @@ const log = require('@cardstack/logger')('cardstack/ephemeral');
 const { declareInjections } = require('@cardstack/di');
 const { partition } = require('lodash');
 const PendingChange = require('@cardstack/plugin-utils/pending-change');
-const { INTERNAL_PRIVLEGED } = require('@cardstack/plugin-utils/session');
+const { INTERNAL_PRIVILEGED } = require('@cardstack/plugin-utils/session');
 
 // When we first load, we establish an identity. This allows us to
 // distinguish any older content leftover in the search index from our
@@ -69,7 +69,7 @@ module.exports = declareInjections({
     let [schemaModels, dataModels] = partition(models, model => schemaTypes.includes(model.type));
     let schema = await this.schemaLoader.loadFrom(schemaModels);
     for (let model of dataModels) {
-      await schema.validate(new PendingChange(null, model, () => {}), { session: INTERNAL_PRIVLEGED });
+      await schema.validate(new PendingChange(null, model, () => {}), { session: INTERNAL_PRIVILEGED });
     }
   }
 });
@@ -110,7 +110,7 @@ function references(model) {
     { type: 'fields', id: 'type', },
 
     // and I'm including the root privileged grant (from bootstrap
-    // schema) so that we can validate using INTERNAL_PRIVLEGED
+    // schema) so that we can validate using INTERNAL_PRIVILEGED
     // session and expect it to work
     { type: 'grants', id: 'hub-internal-grant' }
   ];

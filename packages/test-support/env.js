@@ -13,13 +13,24 @@ exports.createDefaultEnvironment = async function(projectDir, initialModels = []
   try {
     let factory = new JSONAPIFactory();
 
-    let user = factory.addResource('users', 'the-default-test-user').withAttributes({
+
+    factory.addResource('content-types', 'test-users').withRelated('fields', [
+      factory.addResource('fields', 'full-name').withAttributes({
+        fieldType: '@cardstack/core-types::string'
+      }),
+      factory.addResource('fields', 'email').withAttributes({
+        fieldType: '@cardstack/core-types::string'
+      })
+
+    ]);
+
+    let user = factory.addResource('test-users', 'the-default-test-user').withAttributes({
       fullName: 'Default Test Environment',
       email: 'test@example.com'
     }).asDocument();
 
     let session = new Session(
-      { id: 'the-default-test-user', type: 'users'},
+      { id: 'the-default-test-user', type: 'test-users'},
       null,
       user
     );

@@ -14,12 +14,12 @@ describe('authentication/middleware', function() {
   async function setup() {
     let factory = new JSONAPIFactory();
 
-    quint = factory.addResource('users').withAttributes({
+    quint = factory.addResource('test-users').withAttributes({
       email: 'quint@example.com',
       fullName: "Quint Faulkner"
     });
 
-    arthur = factory.addResource('users', 'a-1').withAttributes({
+    arthur = factory.addResource('test-users', 'a-1').withAttributes({
       email: 'arthur@example.com',
       fullName: "Arthur Faulkner"
     });
@@ -52,20 +52,20 @@ describe('authentication/middleware', function() {
     factory.addResource('data-sources', 'config-echo-quint').withAttributes({
       sourceType: 'stub-authenticators::config-echo',
       params: {
-        data: { id: quint.id, type: 'users' }
+        data: { id: quint.id, type: 'test-users' }
       }
     });
 
     factory.addResource('data-sources', 'config-echo-arthur').withAttributes({
       sourceType: 'stub-authenticators::config-echo',
       params: {
-        data: { id: arthur.id, type: 'users' }
+        data: { id: arthur.id, type: 'test-users' }
       }
     });
 
     factory.addResource('data-sources', 'id-rewriter').withAttributes({
       sourceType: 'stub-authenticators::echo',
-      userTemplate: '{ "data": { "id": "{{upstreamId}}", "type": "users" }}'
+      userTemplate: '{ "data": { "id": "{{upstreamId}}", "type": "test-users" }}'
     });
 
     factory.addResource('data-sources', 'has-default-template').withAttributes({
@@ -77,7 +77,7 @@ describe('authentication/middleware', function() {
       sourceType: 'stub-authenticators::echo',
       userTemplate: `{"data":{
         "id": "my-prefix-{{id}}",
-        "type": "users",
+        "type": "test-users",
         "attributes": {
           "full-name": "{{firstName}} {{lastName}}",
           "email": "{{email}}"
@@ -89,7 +89,7 @@ describe('authentication/middleware', function() {
     factory.addResource('data-sources', 'create-via-template-no-id').withAttributes({
       sourceType: 'stub-authenticators::echo',
       userTemplate: `{"data":{
-        "type": "users",
+        "type": "test-users",
         "attributes": {
           "full-name": "{{firstName}} {{lastName}}",
           "email": "{{email}}"
@@ -121,7 +121,7 @@ describe('authentication/middleware', function() {
       mayCreateUser: true
     });
 
-    factory.addResource('content-types', 'users').withRelated('fields', [
+    factory.addResource('content-types', 'test-users').withRelated('fields', [
       factory.addResource('fields', 'full-name').withAttributes({
         fieldType: '@cardstack/core-types::string'
       }),
@@ -184,25 +184,25 @@ describe('authentication/middleware', function() {
     });
 
     it('ignores expired token', async function() {
-      let { token } = await auth.createToken({ id: 42, type: 'users' }, -30);
+      let { token } = await auth.createToken({ id: 42, type: 'test-users' }, -30);
       let response = await request.get('/').set('authorization', `Bearer ${token}`);
       expect(response.body).deep.equals({});
     });
 
     it('issues a working token', async function() {
-      let { token } = await auth.createToken({ id: env.user.data.id, type: 'users' }, 30);
+      let { token } = await auth.createToken({ id: env.user.data.id, type: 'test-users' }, 30);
       let response = await request.get('/').set('authorization', `Bearer ${token}`);
       expect(response.body).has.property('userId', env.user.data.id);
     });
 
 
     it('token comes with validity timestamp', async function() {
-      let { validUntil } = await auth.createToken({ id: env.user.data.id, type: 'users' }, 30);
+      let { validUntil } = await auth.createToken({ id: env.user.data.id, type: 'test-users' }, 30);
       expect(validUntil).is.a('number');
     });
 
     it('offers full user load within session', async function() {
-      let { token } = await auth.createToken({ id: env.user.data.id, type: 'users' }, 30);
+      let { token } = await auth.createToken({ id: env.user.data.id, type: env.user.data.type }, 30);
       let response = await request.get('/').set('authorization', `Bearer ${token}`);
       expect(response.body.user).deep.equals(env.user);
     });
@@ -228,24 +228,24 @@ describe('authentication/middleware', function() {
       });
 
       it('finds authenticator', async function() {
-        let response = await request.post(`/auth/echo`).send({ data: {id : env.user.data.id, type: 'users' }});
+        let response = await request.post(`/auth/echo`).send({ data: {id : env.user.data.id, type: 'test-users' }});
         expect(response).hasStatus(200);
       });
 
       it('responds with token', async function() {
-        let response = await request.post(`/auth/echo`).send({ data: { id: env.user.data.id, type: 'users' }});
+        let response = await request.post(`/auth/echo`).send({ data: { id: env.user.data.id, type: 'test-users' }});
         expect(response).hasStatus(200);
         expect(response.body.data.meta.token).is.a('string');
       });
 
       it('responds with validity timestamp', async function() {
-        let response = await request.post(`/auth/echo`).send({ data: { id: env.user.data.id, type: 'users' }});
+        let response = await request.post(`/auth/echo`).send({ data: { id: env.user.data.id, type: 'test-users' }});
         expect(response).hasStatus(200);
         expect(response.body.data.meta.validUntil).is.a('number');
       });
 
       it('responds with a copy of the user record', async function() {
-        let response = await request.post(`/auth/echo`).send({ data: { id: env.user.data.id, type: 'users' }});
+        let response = await request.post(`/auth/echo`).send({ data: { id: env.user.data.id, type: 'test-users' }});
         expect(response).hasStatus(200);
         let responseWithoutMeta = Object.assign({}, response.body);
         delete responseWithoutMeta.data.meta;
@@ -272,7 +272,7 @@ describe('authentication/middleware', function() {
 
       it('can approve via id', async function() {
         let response = await request.post(`/auth/echo`).send({
-          data: { id: env.user.data.id, type: 'users' }
+          data: { id: env.user.data.id, type: 'test-users' }
         });
         expect(response).hasStatus(200);
         expect(response.body).has.deep.property('data.meta.token');
@@ -320,7 +320,7 @@ describe('authentication/middleware', function() {
         let response = await request.post(`/auth/echo`).send({
           data: {
             id: 'x',
-            type: 'users',
+            type: 'test-users',
             attributes: {
               'full-name': 'Mr X'
             }
@@ -351,7 +351,7 @@ describe('authentication/middleware', function() {
         let response = await request.post(`/auth/echo`).send({
           data: {
             id: quint.id,
-            type: 'users',
+            type: 'test-users',
             attributes: {
               email: 'updated.email@this-changed.com'
             }
@@ -368,7 +368,7 @@ describe('authentication/middleware', function() {
         expect(response.body.userId).equals(quint.id);
         expect(response.body.user).has.property('data');
         expect(response.body.user.data).has.property('id', quint.id);
-        expect(response.body.user.data).has.property('type', 'users');
+        expect(response.body.user.data).has.property('type', 'test-users');
         expect(response.body.user.data.attributes).deep.equals({
           'full-name': 'Quint Faulkner',
           email: 'quint@example.com'
@@ -379,7 +379,7 @@ describe('authentication/middleware', function() {
         let response = await request.post(`/auth/echo`).send({
           data: {
             id: 'my-prefix-4321',
-            type: 'users',
+            type: 'test-users',
             attributes: {
               'full-name': 'Newly Created',
               email: 'new@example.com'
@@ -405,7 +405,7 @@ describe('authentication/middleware', function() {
       it('can choose to expose some configuration', async function() {
         let response = await request.get('/auth/config-echo-quint');
         expect(response.body).deep.equals({
-          data: { id: quint.id, type: 'users' }
+          data: { id: quint.id, type: 'test-users' }
         });
       });
 
@@ -427,7 +427,7 @@ describe('authentication/middleware', function() {
       it('can return a partial session', async function() {
         let response = await request.post(`/auth/echo`).send({
           data: {
-            type: 'users',
+            type: 'test-users',
             attributes: {
               state: 'i-am-partial',
               message: "you're not done yet"
@@ -440,7 +440,7 @@ describe('authentication/middleware', function() {
         expect(response).hasStatus(200);
         expect(response.body).not.has.deep.property('meta.token');
         expect(response.body.data).deep.equals({
-          type: 'users',
+          type: 'test-users',
           attributes: {
             state: 'i-am-partial',
             message: "you're not done yet"
@@ -463,7 +463,7 @@ describe('authentication/middleware', function() {
         let response = await request.post(`/auth/update-user`).send({
           data: {
             id: quint.id,
-            type: 'users',
+            type: 'test-users',
             attributes: {
               email: 'updated.email@this-changed.com'
             }
@@ -480,7 +480,7 @@ describe('authentication/middleware', function() {
         expect(response.body.userId).equals(quint.id);
         expect(response.body.user).has.property('data');
         expect(response.body.user.data).has.property('id', quint.id);
-        expect(response.body.user.data).has.property('type', 'users');
+        expect(response.body.user.data).has.property('type', 'test-users');
         expect(response.body.user.data.attributes).deep.equals({
           'full-name': 'Quint Faulkner',
           email: 'updated.email@this-changed.com'
@@ -536,7 +536,7 @@ describe('authentication/middleware', function() {
         expect(response.body.userId).equals('my-prefix-4321');
         expect(response.body.user).has.property('data');
         expect(response.body.user.data).has.property('id', 'my-prefix-4321');
-        expect(response.body.user.data).has.property('type', 'users');
+        expect(response.body.user.data).has.property('type', 'test-users');
         expect(response.body.user.data.attributes).deep.equals({
           email: 'new@example.com',
           'full-name': 'Newly Created'
@@ -559,7 +559,7 @@ describe('authentication/middleware', function() {
         expect(response).hasStatus(200);
         expect(response.body).has.property('user');
         expect(response.body.user.data).has.property('id', autoId);
-        expect(response.body.user.data).has.property('type', 'users');
+        expect(response.body.user.data).has.property('type', 'test-users');
         expect(response.body.user.data.attributes).deep.equals({
           email: 'new@example.com',
           'full-name': 'Newly Created'
