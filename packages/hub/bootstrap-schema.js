@@ -135,6 +135,7 @@ const models = [
           { type: 'fields', id: 'source-type' },
           { type: 'fields', id: 'params' },
           { type: 'fields', id: 'user-template' },
+          { type: 'fields', id: 'user-correlation-query' },
           { type: 'fields', id: 'may-create-user' },
           { type: 'fields', id: 'may-update-user' },
           { type: 'fields', id: 'token-expiry-seconds' }
@@ -245,6 +246,13 @@ const models = [
   {
     type: 'fields',
     id: 'user-template',
+    attributes: {
+      'field-type': '@cardstack/handlebars'
+    }
+  },
+  {
+    type: 'fields',
+    id: 'user-correlation-query',
     attributes: {
       'field-type': '@cardstack/handlebars'
     }

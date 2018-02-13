@@ -20,6 +20,7 @@ module.exports = class DataSource {
     this.mayCreateUser = !!model.attributes['may-create-user'];
     this.mayUpdateUser = !!model.attributes['may-update-user'];
     this.userTemplate = model.attributes['user-template'];
+    this.userCorrelationQuery = model.attributes['user-correlation-query'];
     this.tokenExpirySeconds = model.attributes['token-expiry-seconds'] || 86400;
   }
   get writer() {
