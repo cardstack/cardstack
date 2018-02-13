@@ -9,7 +9,7 @@ const logger = require('@cardstack/logger');
 
 describe('authentication/middleware', function() {
 
-  let request, env, auth, quint, arthur;
+  let request, env, auth, quint, arthur, vanGogh;
 
   async function setup() {
     let factory = new JSONAPIFactory();
@@ -22,6 +22,11 @@ describe('authentication/middleware', function() {
     arthur = factory.addResource('users', 'a-1').withAttributes({
       email: 'arthur@example.com',
       fullName: "Arthur Faulkner"
+    });
+
+    vanGogh = factory.addResource('doggies').withAttributes({
+      email: 'vanny@example.com',
+      favoriteToy: 'squeaky snake'
     });
 
     factory.addResource('data-sources', 'echo').withAttributes({
@@ -98,6 +103,23 @@ describe('authentication/middleware', function() {
       mayUpdateUser: true
     });
 
+    factory.addResource('data-sources', 'correlate-doggies').withAttributes({
+      sourceType: 'stub-authenticators::echo',
+      userTemplate: `{"data":{
+        "type": "doggies",
+        "attributes": {
+          "full-name": "{{data.attributes.fullName}}",
+          "email": "{{data.attributes.email}}"
+        }
+      }}`,
+      userCorrelationQuery: `{
+        "filter": { "email": { "exact": "{{data.attributes.email}}" } },
+        "page": { "size": 1 }
+      }`,
+      mayUpdateUser: true,
+      mayCreateUser: true
+    });
+
     factory.addResource('content-types', 'users').withRelated('fields', [
       factory.addResource('fields', 'full-name').withAttributes({
         fieldType: '@cardstack/core-types::string'
@@ -107,6 +129,17 @@ describe('authentication/middleware', function() {
       })
     ]);
 
+    factory.addResource('content-types', 'doggies').withRelated('fields', [
+      factory.addResource('fields', 'full-name').withAttributes({
+        fieldType: '@cardstack/core-types::string'
+      }),
+      factory.addResource('fields', 'email').withAttributes({
+        fieldType: '@cardstack/core-types::string'
+      }),
+      factory.addResource('fields', 'favorite-toy').withAttributes({
+        fieldType: '@cardstack/core-types::string'
+      })
+    ]);
 
     env = await createDefaultEnvironment(`${__dirname}/stub-authenticators`, factory.getModels());
     let app = new Koa();
@@ -453,6 +486,38 @@ describe('authentication/middleware', function() {
         });
       });
 
+      it('can update a user when user-correlation-query returns a user', async function() {
+        let response = await request.post(`/auth/correlate-doggies`).send({
+          data: {
+            id: 'w00fw00f',
+            type: 'doggies',
+            attributes: {
+              fullName: 'Van Gogh Abdel-Rahman',
+              email: 'vanny@example.com'
+            }
+          }
+        });
+        expect(response).hasStatus(200);
+        expect(response.body).has.deep.property('data.meta.token');
+        expect(response.body).has.deep.property('data.attributes.email', 'vanny@example.com');
+        expect(response.body).has.deep.property('data.attributes.full-name', 'Van Gogh Abdel-Rahman');
+        expect(response.body).has.deep.property('data.attributes.favorite-toy', 'squeaky snake');
+
+        await env.lookup('hub:indexers').update({ realTime: true });
+
+        response = await request.get('/').set('authorization', `Bearer ${response.body.data.meta.token}`);
+        expect(response).hasStatus(200);
+        expect(response.body.userId).equals(vanGogh.id);
+        expect(response.body.user).has.property('data');
+        expect(response.body.user.data).has.property('id', vanGogh.id);
+        expect(response.body.user.data).has.property('type', 'doggies');
+        expect(response.body.user.data.attributes).deep.equals({
+          'full-name': 'Van Gogh Abdel-Rahman',
+          email: 'vanny@example.com',
+          'favorite-toy': 'squeaky snake'
+        });
+      });
+
       it('can create a new user', async function() {
         let response = await request.post(`/auth/create-via-template`).send({
           id: '4321',
@@ -499,6 +564,41 @@ describe('authentication/middleware', function() {
           'full-name': 'Newly Created'
         });
       });
+
+      it('can create a user when user-correlation-query returns no users', async function() {
+        let response = await request.post(`/auth/correlate-doggies`).send({
+          data: {
+            id: 'w00fw00f',
+            type: 'doggies',
+            attributes: {
+              fullName: 'Ringo Abdel-Rahman',
+              email: 'ringo@example.com'
+            }
+          }
+        });
+        expect(response).hasStatus(200);
+        expect(response.body).has.deep.property('data.id');
+        expect(response.body).to.not.have.deep.property('data.id', vanGogh.id);
+        expect(response.body).has.deep.property('data.meta.token');
+        expect(response.body).has.deep.property('data.attributes.email', 'ringo@example.com');
+        expect(response.body).has.deep.property('data.attributes.full-name', 'Ringo Abdel-Rahman');
+        expect(response.body).has.deep.property('data.attributes.favorite-toy', null);
+
+        await env.lookup('hub:indexers').update({ realTime: true });
+
+        response = await request.get('/').set('authorization', `Bearer ${response.body.data.meta.token}`);
+        expect(response).hasStatus(200);
+        expect(response.body.userId).to.not.equal(vanGogh.id);
+        expect(response.body.user).has.property('data');
+        expect(response.body.user.data).to.not.have.property('id', vanGogh.id);
+        expect(response.body.user.data).has.property('type', 'doggies');
+        expect(response.body.user.data.attributes).deep.equals({
+          'full-name': 'Ringo Abdel-Rahman',
+          email: 'ringo@example.com',
+          'favorite-toy': null
+        });
+      });
+
     });
   });
 });

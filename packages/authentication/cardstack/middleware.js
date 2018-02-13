@@ -5,6 +5,8 @@ const bearerTokenPattern = /bearer +(.*)$/i;
 const compose = require('koa-compose');
 const route = require('koa-better-route');
 const koaJSONBody = require('koa-json-body');
+const Handlebars = require('handlebars');
+const _ = require('lodash');
 
 const { declareInjections } = require('@cardstack/di');
 const { withJsonErrorHandling } = Error;
@@ -164,15 +166,23 @@ class Authentication {
     if (!user.data || !user.data.type) { return; }
 
     let have;
+    let query = source['userCorrelationQuery'];
 
-    if (user.data.id != null) {
-      try {
+    try {
+      if (user.data.id != null) {
         have = await this.userSearcher.get(user.data.type, user.data.id);
-      } catch (err) {
-        if (err.status !== 404) {
-          throw err;
-        }
+      } else if (query) {
+        let compiled = Handlebars.compile(query);
+        have = await this.userSearcher.search(JSON.parse(compiled(user)));
       }
+    } catch (err) {
+      if (err.status !== 404) {
+        throw err;
+      }
+    }
+
+    if (have && have.data && _.isArray(have.data)) {
+      have = have.data.length ? _.merge({ data: have.data[0] }, user) : null; // deep merge
     }
 
     if (!have && source.mayCreateUser) {
