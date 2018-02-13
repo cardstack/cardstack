@@ -4,7 +4,6 @@ const {
 } = require('@cardstack/test-support/env');
 const { Client } = require('pg');
 const JSONAPIFactory = require('@cardstack/test-support/jsonapi-factory');
-const Session = require('@cardstack/plugin-utils/session');
 
 describe('postgresql/indexer', function() {
   let pgClient, client, env, dataSource;

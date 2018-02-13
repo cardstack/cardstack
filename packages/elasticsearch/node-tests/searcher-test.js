@@ -143,7 +143,7 @@ describe('elasticsearch/searcher', function() {
   });
 
   it('can be searched for all content', async function() {
-    let { data: models } = await searcher.search('master', {
+    let { data: models } = await searcher.search(env.session, 'master', {
       page: { size: 1000 }
     });
     expect(models.filter(m => m.type === 'comments')).to.have.length(20);
@@ -152,7 +152,7 @@ describe('elasticsearch/searcher', function() {
   });
 
   it('returns properly formatted records', async function() {
-    let model = (await searcher.get('master', 'people', '1')).data;
+    let model = (await searcher.get(env.session, 'master', 'people', '1')).data;
     let meta = model.meta;
     expect(Object.keys(meta).sort()).deep.equals(['version']);
     delete model.meta;
@@ -180,7 +180,7 @@ describe('elasticsearch/searcher', function() {
   });
 
   it('can be searched via queryString', async function() {
-    let { data: models } = await searcher.search('master', {
+    let { data: models } = await searcher.search(env.session, 'master', {
       queryString: 'magic'
     });
     expect(models.filter(m => m.type === 'articles')).to.have.length(1);
@@ -189,14 +189,14 @@ describe('elasticsearch/searcher', function() {
   });
 
   it('can be searched via queryString, negative result', async function() {
-    let { data: models } = await searcher.search('master', {
+    let { data: models } = await searcher.search(env.session, 'master', {
       queryString: 'thisisanunusedterm'
     });
     expect(models).to.have.length(0);
   });
 
   it('can filter by type', async function() {
-    let { data: models } = await searcher.search('master', {
+    let { data: models } = await searcher.search(env.session, 'master', {
       filter: {
         type: 'articles'
       }
@@ -206,7 +206,7 @@ describe('elasticsearch/searcher', function() {
   });
 
   it('can sort by type', async function() {
-    let { data: models } = await searcher.search('master', {
+    let { data: models } = await searcher.search(env.session, 'master', {
       filter: {
         type: ['articles', 'people']
       },
@@ -217,7 +217,7 @@ describe('elasticsearch/searcher', function() {
   });
 
   it('can sort by type in reverse', async function() {
-    let { data: models } = await searcher.search('master', {
+    let { data: models } = await searcher.search(env.session, 'master', {
       filter: {
         type: ['articles', 'people']
       },
@@ -229,7 +229,7 @@ describe('elasticsearch/searcher', function() {
 
 
   it('can filter by id', async function() {
-    let { data: models } = await searcher.search('master', {
+    let { data: models } = await searcher.search(env.session, 'master', {
       filter: {
         id: '1',
         type: ['articles', 'people']
@@ -241,7 +241,7 @@ describe('elasticsearch/searcher', function() {
   });
 
   it('can sort by id', async function() {
-    let { data: models } = await searcher.search('master', {
+    let { data: models } = await searcher.search(env.session, 'master', {
       filter: {
         type: ['articles', 'people']
       },
@@ -251,7 +251,7 @@ describe('elasticsearch/searcher', function() {
   });
 
   it('can sort by id in reverse', async function() {
-    let { data: models } = await searcher.search('master', {
+    let { data: models } = await searcher.search(env.session, 'master', {
       filter: {
         type: ['articles', 'people']
       },
@@ -262,7 +262,7 @@ describe('elasticsearch/searcher', function() {
 
 
   it('can filter a field by one term', async function() {
-    let { data: models } = await searcher.search('master', {
+    let { data: models } = await searcher.search(env.session, 'master', {
       filter: {
         'first-name': 'Quint'
       }
@@ -272,7 +272,7 @@ describe('elasticsearch/searcher', function() {
   });
 
   it('can filter a field by multiple terms', async function() {
-    let { data: models } = await searcher.search('master', {
+    let { data: models } = await searcher.search(env.session, 'master', {
       filter: {
         'first-name': ['Quint', 'Arthur']
       }
@@ -281,7 +281,7 @@ describe('elasticsearch/searcher', function() {
   });
 
   it('can use OR expressions in filters', async function() {
-    let { data: models } = await searcher.search('master', {
+    let { data: models } = await searcher.search(env.session, 'master', {
       filter: {
         or: [
           { 'first-name': ['Quint'], type: 'people' },
@@ -295,7 +295,7 @@ describe('elasticsearch/searcher', function() {
   });
 
   it('can use AND expressions in filters', async function() {
-    let { data: models } = await searcher.search('master', {
+    let { data: models } = await searcher.search(env.session, 'master', {
       filter: {
         and: [
           { 'favorite-color': 'red' },
@@ -309,7 +309,7 @@ describe('elasticsearch/searcher', function() {
 
 
   it('can filter by range', async function() {
-    let { data: models } = await searcher.search('master', {
+    let { data: models } = await searcher.search(env.session, 'master', {
       filter: {
         age: {
           range: {
@@ -323,7 +323,7 @@ describe('elasticsearch/searcher', function() {
   });
 
   it('can filter by field existence (string)', async function() {
-    let { data: models } = await searcher.search('master', {
+    let { data: models } = await searcher.search(env.session, 'master', {
       filter: {
         'favorite-color': {
           exists: 'true'
@@ -336,7 +336,7 @@ describe('elasticsearch/searcher', function() {
   });
 
   it('can filter by field nonexistence (string)', async function() {
-    let { data: models } = await searcher.search('master', {
+    let { data: models } = await searcher.search(env.session, 'master', {
       filter: {
         'favorite-color': {
           exists: 'false'
@@ -349,7 +349,7 @@ describe('elasticsearch/searcher', function() {
   });
 
   it('can filter by field existence (bool)', async function() {
-    let { data: models } = await searcher.search('master', {
+    let { data: models } = await searcher.search(env.session, 'master', {
       filter: {
         'favorite-color': {
           exists: true
@@ -362,7 +362,7 @@ describe('elasticsearch/searcher', function() {
   });
 
   it('can filter by field nonexistence (bool)', async function() {
-    let { data: models } = await searcher.search('master', {
+    let { data: models } = await searcher.search(env.session, 'master', {
       filter: {
         'favorite-color': {
           exists: false
@@ -375,7 +375,7 @@ describe('elasticsearch/searcher', function() {
   });
 
   it('can search within a field with custom indexing behavior', async function() {
-    let { data: models } = await searcher.search('master', {
+    let { data: models } = await searcher.search(env.session, 'master', {
       filter: {
         description: 'fox'
       }
@@ -390,7 +390,7 @@ describe('elasticsearch/searcher', function() {
 
   it('gives helpful error when filtering unknown field', async function() {
     try {
-      await searcher.search('master', {
+      await searcher.search(env.session, 'master', {
         filter: {
           flavor: 'chocolate'
         }
@@ -406,7 +406,7 @@ describe('elasticsearch/searcher', function() {
   });
 
   it('can sort', async function() {
-    let { data: models } = await searcher.search('master', {
+    let { data: models } = await searcher.search(env.session, 'master', {
       filter: {
         type: 'people'
       },
@@ -417,7 +417,7 @@ describe('elasticsearch/searcher', function() {
 
 
   it('can sort reverse', async function() {
-    let { data: models } = await searcher.search('master', {
+    let { data: models } = await searcher.search(env.session, 'master', {
       filter: {
         type: 'people'
       },
@@ -430,7 +430,7 @@ describe('elasticsearch/searcher', function() {
     // string fields are only sortable because of the sortFieldName
     // in @cardstack/core-field-types/string. So this is a test that
     // we're using that capability.
-    let { data: models } = await searcher.search('master', {
+    let { data: models } = await searcher.search(env.session, 'master', {
       filter: {
         type: 'people'
       },
@@ -444,7 +444,7 @@ describe('elasticsearch/searcher', function() {
     // string fields are only sortable because of the sortFieldName
     // in @cardstack/core-field-types/string. So this is a test that
     // we're using that capability.
-    let { data: models } = await searcher.search('master', {
+    let { data: models } = await searcher.search(env.session, 'master', {
       filter: {
         type: 'people'
       },
@@ -455,7 +455,7 @@ describe('elasticsearch/searcher', function() {
 
   it('has helpful error when sorting by nonexistent field', async function() {
     try {
-      await searcher.search('master', {
+      await searcher.search(env.session, 'master', {
         sort: 'something-that-does-not-exist'
       });
       throw new Error("should not get here");
@@ -469,7 +469,7 @@ describe('elasticsearch/searcher', function() {
   });
 
   it('can paginate', async function() {
-    let response = await searcher.search('master', {
+    let response = await searcher.search(env.session, 'master', {
       filter: { type: 'comments' },
       page: {
         size: 7
@@ -481,7 +481,7 @@ describe('elasticsearch/searcher', function() {
 
     let allModels = response.data;
 
-    response = await searcher.search('master', {
+    response = await searcher.search(env.session, 'master', {
       filter: { type: 'comments' },
       page: {
         size: 7,
@@ -495,7 +495,7 @@ describe('elasticsearch/searcher', function() {
 
     allModels = allModels.concat(response.data);
 
-    response = await searcher.search('master', {
+    response = await searcher.search(env.session, 'master', {
       filter: { type: 'comments' },
       page: {
         size: 7,
@@ -513,7 +513,7 @@ describe('elasticsearch/searcher', function() {
   });
 
   it('can paginate when results exactly fill final page', async function() {
-    let response = await searcher.search('master', {
+    let response = await searcher.search(env.session, 'master', {
       filter: { type: 'comments' },
       page: {
         size: 10
@@ -525,7 +525,7 @@ describe('elasticsearch/searcher', function() {
 
     let allModels = response.data;
 
-    response = await searcher.search('master', {
+    response = await searcher.search(env.session, 'master', {
       filter: { type: 'comments' },
       page: {
         size: 10,
@@ -542,12 +542,12 @@ describe('elasticsearch/searcher', function() {
   });
 
   it('can get an individual record', async function() {
-    let model = await searcher.get('master', 'articles', '1');
+    let model = await searcher.get(env.session, 'master', 'articles', '1');
     expect(model).has.deep.property('data.attributes.hello', 'magic words');
   });
 
   it('can do analyzed term matching', async function() {
-    let response = await searcher.search('master', {
+    let response = await searcher.search(env.session, 'master', {
       filter: {
         hello: 'magic'
       }
@@ -557,7 +557,7 @@ describe('elasticsearch/searcher', function() {
   });
 
   it('matches reordered phrase when using analyzed field', async function() {
-    let response = await searcher.search('master', {
+    let response = await searcher.search(env.session, 'master', {
       filter: {
         hello: 'words magic'
       }
@@ -566,7 +566,7 @@ describe('elasticsearch/searcher', function() {
   });
 
   it('does not match reordered phrase when using exact field', async function() {
-    let response = await searcher.search('master', {
+    let response = await searcher.search(env.session, 'master', {
       filter: {
         hello: { exact: 'words magic' }
       }
@@ -576,7 +576,7 @@ describe('elasticsearch/searcher', function() {
 
 
   it('can do exact term matching with a phrase', async function() {
-    let response = await searcher.search('master', {
+    let response = await searcher.search(env.session, 'master', {
       filter: {
         hello: { exact: 'magic words' }
       }
@@ -586,7 +586,7 @@ describe('elasticsearch/searcher', function() {
   });
 
   it('incomplete phrase does not match', async function() {
-    let response = await searcher.search('master', {
+    let response = await searcher.search(env.session, 'master', {
       filter: {
         hello: { exact: 'magic words extra' }
       }
@@ -596,7 +596,7 @@ describe('elasticsearch/searcher', function() {
 
 
   it('can do exact term matching with multiple phrases', async function() {
-    let response = await searcher.search('master', {
+    let response = await searcher.search(env.session, 'master', {
       filter: {
         hello: { exact: ['something else', 'magic words'] }
       }
@@ -606,7 +606,7 @@ describe('elasticsearch/searcher', function() {
   });
 
   it('can filter non-searchable belongsTo by id', async function() {
-    let response = await searcher.search('master', {
+    let response = await searcher.search(env.session, 'master', {
       filter: {
         'article.id': { exact: '1' }
       }
@@ -615,7 +615,7 @@ describe('elasticsearch/searcher', function() {
   });
 
   it('can filter searchable belongsTo by id', async function() {
-    let response = await searcher.search('master', {
+    let response = await searcher.search(env.session, 'master', {
       filter: {
         'searchable-article.id': { exact: '1' }
       }
@@ -624,7 +624,7 @@ describe('elasticsearch/searcher', function() {
   });
 
   it('can filter non-searchable belongsTo by multiple ids', async function() {
-    let response = await searcher.search('master', {
+    let response = await searcher.search(env.session, 'master', {
       filter: {
         'article.id': { exact: ['1', '2'] }
       }
@@ -633,7 +633,7 @@ describe('elasticsearch/searcher', function() {
   });
 
   it('can filter searchable belongsTo by multiple ids', async function() {
-    let response = await searcher.search('master', {
+    let response = await searcher.search(env.session, 'master', {
       filter: {
         'searchable-article.id': { exact: ['1', '2'] }
       }
@@ -642,7 +642,7 @@ describe('elasticsearch/searcher', function() {
   });
 
   it('can filter non-searchable hasMany by id', async function() {
-    let response = await searcher.search('master', {
+    let response = await searcher.search(env.session, 'master', {
       filter: {
         'members.id': { exact: '1' }
       }
@@ -651,7 +651,7 @@ describe('elasticsearch/searcher', function() {
   });
 
   it('can filter searchable hasMany by id', async function() {
-    let response = await searcher.search('master', {
+    let response = await searcher.search(env.session, 'master', {
       filter: {
         'searchable-members.id': { exact: '1' }
       }
@@ -660,7 +660,7 @@ describe('elasticsearch/searcher', function() {
   });
 
   it('can filter non-searchable hasMany by multiple id', async function() {
-    let response = await searcher.search('master', {
+    let response = await searcher.search(env.session, 'master', {
       filter: {
         'members.id': { exact: ['1', 'bogus'] }
       }
@@ -669,7 +669,7 @@ describe('elasticsearch/searcher', function() {
   });
 
   it('can filter searchable hasMany by multiple id', async function() {
-    let response = await searcher.search('master', {
+    let response = await searcher.search(env.session, 'master', {
       filter: {
         'searchable-members.id': { exact: ['1', 'bogus'] }
       }
@@ -678,7 +678,7 @@ describe('elasticsearch/searcher', function() {
   });
 
   it('belongs-to attributes are not indexed by default', async function() {
-    let response = await searcher.search('master', {
+    let response = await searcher.search(env.session, 'master', {
       filter: {
         'article.hello': 'magic'
       }
@@ -687,7 +687,7 @@ describe('elasticsearch/searcher', function() {
   });
 
   it('can filter searchable belongs-to by an attribute', async function() {
-    let response = await searcher.search('master', {
+    let response = await searcher.search(env.session, 'master', {
       filter: {
         'searchable-article.hello': 'magic'
       }
@@ -696,7 +696,7 @@ describe('elasticsearch/searcher', function() {
   });
 
   it('hasMany attributes are not indexed by default', async function() {
-    let response = await searcher.search('master', {
+    let response = await searcher.search(env.session, 'master', {
       filter: {
         'members.first-name': 'Quint'
       }
@@ -705,7 +705,7 @@ describe('elasticsearch/searcher', function() {
   });
 
   it('can filter searchable has-many by an attribute', async function() {
-    let response = await searcher.search('master', {
+    let response = await searcher.search(env.session, 'master', {
       filter: {
         'searchable-members.first-name': 'Quint'
       }
@@ -714,7 +714,7 @@ describe('elasticsearch/searcher', function() {
   });
 
   it('can do prefix matching', async function() {
-    let { data: models } = await searcher.search('master', {
+    let { data: models } = await searcher.search(env.session, 'master', {
       filter: {
         'last-name': {
           prefix: 'Faulk'

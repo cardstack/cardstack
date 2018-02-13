@@ -70,14 +70,14 @@ describe('hub/searchers', function() {
 
   it("searchers#search finds record via internal searcher", async function() {
     await setup({});
-    let response = await env.lookup('hub:searchers').search('master', { filter: { 'example-flavor': { exact: 'chocolate' } } });
+    let response = await env.lookup('hub:searchers').search(env.session, 'master', { filter: { 'example-flavor': { exact: 'chocolate' } } });
     expect(response.data).length(1);
     expect(response.data[0].attributes['example-flavor']).to.equal('chocolate');
   });
 
   it("a plugin's searchers#search can run before the internal searcher", async function() {
     await setup({ injectFirst: 'vanilla' });
-    let response = await env.lookup('hub:searchers').search('master', { filter: { 'example-flavor': { exact: 'chocolate' } } });
+    let response = await env.lookup('hub:searchers').search(env.session, 'master', { filter: { 'example-flavor': { exact: 'chocolate' } } });
     expect(response.data).length(1);
     expect(response.data[0].attributes['example-flavor']).to.equal('vanilla');
   });

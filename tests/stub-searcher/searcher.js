@@ -7,7 +7,7 @@ module.exports = class StubSearcher {
     this.params = params;
   }
 
-  async get(branch, type, id, next) {
+  async get(session, branch, type, id, next) {
     if (this.params.injectFirst) {
       return { data: makeModel(type, id, this.params.injectFirst) };
     }
@@ -21,7 +21,7 @@ module.exports = class StubSearcher {
     }
   }
 
-  async search(branch, query, next) {
+  async search(session, branch, query, next) {
     if (this.params.injectFirst) {
       return {
         data: [ makeModel('examples', '2', this.params.injectFirst) ],

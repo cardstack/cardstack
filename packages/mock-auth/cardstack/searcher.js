@@ -10,7 +10,7 @@ module.exports = class MockSearcher {
     this.dataSource = dataSource;
   }
 
-  async get(branch, type, id, next) {
+  async get(session, branch, type, id, next) {
     if (type === 'mock-users') {
       return this._getUser(id);
     }
