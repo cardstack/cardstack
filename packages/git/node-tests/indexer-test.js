@@ -2,14 +2,13 @@ const Change = require('../change');
 const temp = require('@cardstack/test-support/temp-helper');
 const { commitOpts, makeRepo } = require('./support');
 const ElasticAssert = require('@cardstack/elasticsearch/node-tests/assertions');
-const _toJSONAPI = require('@cardstack/elasticsearch/to-jsonapi');
 const JSONAPIFactory = require('@cardstack/test-support/jsonapi-factory');
 const { Registry, Container } = require('@cardstack/di');
 const logger = require('@cardstack/logger');
 const fs = require('fs');
 
-function toJSONAPI(type, doc) {
-  return _toJSONAPI(type, doc).data;
+function toJSONAPI(doc) {
+  return doc.cardstack_pristine.data;
 }
 
 describe('git/indexer', function() {
@@ -155,7 +154,7 @@ describe('git/indexer', function() {
     expect(indexerState.commit).to.equal(head);
 
     let contents = await ea.documentContents('master', 'articles', 'hello-world');
-    let jsonapi = toJSONAPI('articles', contents);
+    let jsonapi = toJSONAPI(contents);
     expect(jsonapi).has.deep.property('attributes.hello', 'world');
   });
 
@@ -294,13 +293,13 @@ describe('git/indexer', function() {
     await indexer.update();
 
     {
-      let both = toJSONAPI('articles', await ea.documentContents('master', 'articles', 'both'));
+      let both = toJSONAPI(await ea.documentContents('master', 'articles', 'both'));
       expect(both).has.deep.property('attributes.title', 'article from both repos, left version');
 
-      let left = toJSONAPI('articles', await ea.documentContents('master', 'articles', 'left'));
+      let left = toJSONAPI(await ea.documentContents('master', 'articles', 'left'));
       expect(left).has.deep.property('attributes.title', 'article from left repo');
 
-      let upstream = toJSONAPI('articles', await ea.documentContents('master', 'articles', 'upstream'));
+      let upstream = toJSONAPI(await ea.documentContents('master', 'articles', 'upstream'));
       expect(upstream).has.deep.property('attributes.title', 'article from upstream');
 
       await ea.assertNoDocument('master', 'articles', 'right');
@@ -325,15 +324,15 @@ describe('git/indexer', function() {
 
     {
       // Update
-      let both = toJSONAPI('articles', await ea.documentContents('master', 'articles', 'both'));
+      let both = toJSONAPI(await ea.documentContents('master', 'articles', 'both'));
       expect(both).has.deep.property('attributes.title', 'article from both repos, right version');
 
       // Create
-      let right = toJSONAPI('articles', await ea.documentContents('master', 'articles', 'right'));
+      let right = toJSONAPI(await ea.documentContents('master', 'articles', 'right'));
       expect(right).has.deep.property('attributes.title', 'article from right repo');
 
       // Leave other data sources alone
-      let upstream = toJSONAPI('articles', await ea.documentContents('master', 'articles', 'upstream'));
+      let upstream = toJSONAPI(await ea.documentContents('master', 'articles', 'upstream'));
       expect(upstream).has.deep.property('attributes.title', 'article from upstream');
 
       // Delete

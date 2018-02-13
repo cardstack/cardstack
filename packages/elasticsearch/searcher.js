@@ -2,7 +2,6 @@ const Client = require('./client');
 const log = require('@cardstack/logger')('cardstack/searcher');
 const authLog = require('@cardstack/logger')('cardstack/auth');
 const Error = require('@cardstack/plugin-utils/error');
-const toJSONAPI = require('./to-jsonapi');
 const { declareInjections } = require('@cardstack/di');
 
 module.exports = declareInjections({
@@ -40,8 +39,9 @@ class Searcher {
       throw err;
     }
 
-    if (await matchingResourceRealms(document, session)) {
-      return toJSONAPI(type, document);
+    let userRealms = await session.realms();
+    if (matchingResourceRealms(document, userRealms)) {
+      return toJSONAPI(document, userRealms);
     }
   }
 
@@ -105,7 +105,8 @@ class Searcher {
         body: esBody
       });
       log.debug('searchResult %j', result);
-      return this._assembleResponse(result, size);
+      let userRealms = await session.realms();
+      return this._assembleResponse(result, size, userRealms);
     } catch (err) {
       // elasticsearch errors have their own status codes, and Koa
       // will treat them as valid responses if we let them through. We
@@ -126,7 +127,7 @@ class Searcher {
     }
   }
 
-  _assembleResponse(result, requestedSize) {
+  _assembleResponse(result, requestedSize, userRealms) {
     let documents = result.hits.hits;
     let page = {
       total: result.hits.total
@@ -141,7 +142,7 @@ class Searcher {
     let included = [];
     let data = documents.map(
       document => {
-        let jsonapi = toJSONAPI(document._type, document._source);
+        let jsonapi = toJSONAPI(document._source, userRealms);
         if (jsonapi.included) {
           included = included.concat(jsonapi.included);
         }
@@ -373,10 +374,8 @@ class Searcher {
 
 });
 
-async function matchingResourceRealms(document, session) {
-  let userRealms;
+function matchingResourceRealms(document, userRealms) {
   if (document.cardstack_resource_realms && document.cardstack_resource_realms.length > 0) {
-    userRealms = await session.realms();
     if (userRealms.find(realm => document.cardstack_resource_realms.includes(realm))) {
       return true;
     }
@@ -385,4 +384,11 @@ async function matchingResourceRealms(document, session) {
   // Failed auth check is a 404. We don't want to leak the existence
   // of resources that people don't have permission to access. We
   // return undefined for a missing document.
+}
+
+function toJSONAPI(document /*, userRealms */) {
+  //let realmDetails = document.cardstack_realm_details;
+  //console.log('realmDetails', JSON.stringify(realmDetails, null, 2));
+  let pristine = document.cardstack_pristine;
+  return pristine;
 }

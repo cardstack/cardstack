@@ -134,7 +134,7 @@ describe('hub/searchers/auth', function() {
       factory.addResource('grants')
         .withAttributes({ mayReadResource: true, mayReadFields: true })
         .withRelated('who', everyone)
-        .withRelated('fields', ['title']);
+        .withRelated('fields', [{ type: 'fields', id: 'title' }]);
     });
     let doc = await searchers.get(Session.EVERYONE, 'master', 'posts', '1');
     expect(doc).not.has.deep.property('data.attributes.subtitle');
@@ -145,7 +145,7 @@ describe('hub/searchers/auth', function() {
       factory.addResource('grants')
         .withAttributes({ mayReadResource: true, mayReadFields: true })
         .withRelated('who', everyone)
-        .withRelated('fields', ['title']);
+        .withRelated('fields', [{ type: 'fields', id: 'title' }]);
     });
     let doc = await searchers.get(Session.EVERYONE, 'master', 'posts', '1');
     expect(doc).has.deep.property('data.attributes.title');

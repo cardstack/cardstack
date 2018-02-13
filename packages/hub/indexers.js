@@ -39,7 +39,6 @@
 const log = require('@cardstack/logger')('cardstack/indexers');
 const authLog = require('@cardstack/logger')('cardstack/auth');
 const Client = require('@cardstack/elasticsearch/client');
-const toJSONAPI = require('@cardstack/elasticsearch/to-jsonapi');
 const { declareInjections } = require('@cardstack/di');
 const { uniqBy } = require('lodash');
 const owningDataSource = new WeakMap();
@@ -416,7 +415,7 @@ class BranchUpdate {
     if (docs.length === size) {
       throw new Error("Bug in hub:indexers: need to process larger invalidation sets");
     }
-    return docs.map(doc => toJSONAPI(doc._type, doc._source).data);
+    return docs.map(doc => doc._source.cardstack_pristine.data);
   }
 
   // This method does not need to recursively invalidate, because each
@@ -541,19 +540,21 @@ class DocumentContext {
     // missing. We track the missing ones so that if they later appear
     // in the data we can invalidate to pick them up.
     this.references = [];
+
+    this.realmDetails = [];
   }
 
   async searchDoc() {
     let contentType = this.schema.types.get(this.type);
     let searchTree = contentType ? contentType.includesTree : null;
-    return this._prepareSearchDoc(this.type, this.id, this.doc, searchTree, 0);
+    return this._build(this.type, this.id, this.doc, searchTree, 0);
   }
 
   async _logicalFieldToES(fieldName) {
     return this.branchUpdate.client.logicalFieldToES(this.branchUpdate.branch, fieldName);
   }
 
-  async _prepareSearchDoc(type, id, jsonapiDoc, searchTree, depth) {
+  async _build(type, id, jsonapiDoc, searchTree, depth) {
     // we store the id as a regular field in elasticsearch here, because
     // we use elasticsearch's own built-in _id for our own composite key
     // that takes into account branches.
@@ -611,7 +612,7 @@ class DocumentContext {
                 this.references.push(`${type}/${id}`);
                 let resource = await this.branchUpdate.read(type, id);
                 if (resource) {
-                  return this._prepareSearchDoc(type, id, resource, searchTree[attribute], depth + 1);
+                  return this._build(type, id, resource, searchTree[attribute], depth + 1);
                 }
               }));
               related = related.filter(Boolean);
@@ -620,7 +621,7 @@ class DocumentContext {
               this.references.push(`${value.data.type}/${value.data.id}`);
               let resource = await this.branchUpdate.read(value.data.type, value.data.id);
               if (resource) {
-                related = await this._prepareSearchDoc(resource.type, resource.id, resource, searchTree[attribute], depth + 1);
+                related = await this._build(resource.type, resource.id, resource, searchTree[attribute], depth + 1);
               } else {
                 relationships[attribute] = Object.assign({}, relationships[attribute], { data: null });
               }
@@ -650,20 +651,37 @@ class DocumentContext {
       pristine.data.meta = jsonapiDoc.meta;
     }
 
-    let contentType = this.schema.types.get(type);
-    if (contentType) {
-      searchDoc.cardstack_resource_realms = contentType.realms.resourceReaders(jsonapiDoc);
-    } else {
-      searchDoc.cardstack_resource_realms = [];
-    }
-    authLog.trace("setting resource_realms for %s %s: %j", type, id, searchDoc.cardstack_resource_realms);
+    let realms = this._realms(type, id, jsonapiDoc);
+    this.realmDetails.push(realms);
 
     if (depth > 0) {
       this.pristineIncludes.push(pristine.data);
     } else {
       searchDoc.cardstack_pristine = pristine;
       searchDoc.cardstack_references = this.references;
+      searchDoc.cardstack_resource_realms = realms.resourceReaders;
+      searchDoc.cardstack_realm_details = this.realmDetails;
+      authLog.trace("setting resource_realms for %s %s: %j", type, id, realms.resourceReaders);
     }
     return searchDoc;
+  }
+
+  _realms(type, id, doc) {
+    let contentType = this.schema.types.get(type);
+    if (contentType) {
+      return {
+        type,
+        id,
+        resourceReaders: contentType.realms.resourceReaders(doc),
+        fieldReaders: contentType.realms.fieldReaders(doc),
+      };
+    } else {
+      return {
+        type,
+        id,
+        resourceReaders: [],
+        fieldReaders: []
+      };
+    }
   }
 }
