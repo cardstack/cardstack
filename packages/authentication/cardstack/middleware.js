@@ -6,7 +6,6 @@ const compose = require('koa-compose');
 const route = require('koa-better-route');
 const koaJSONBody = require('koa-json-body');
 const Handlebars = require('handlebars');
-const _ = require('lodash');
 
 const { declareInjections } = require('@cardstack/di');
 const { withJsonErrorHandling } = Error;
@@ -166,23 +165,28 @@ class Authentication {
     if (!user.data || !user.data.type) { return; }
 
     let have;
-    let query = source['userCorrelationQuery'];
+    let query = source['userCorrelationQuery'] || (
+     user.data.id ? `{
+        "filter": {
+          "type": "{{data.type}}",
+          "id": { "exact": "{{data.id}}" }
+        },
+        "page": { "size": 1 }
+      }` : null);
 
-    try {
-      if (user.data.id != null) {
-        have = await this.userSearcher.get(user.data.type, user.data.id);
-      } else if (query) {
+    if (query) {
+      try {
         let compiled = Handlebars.compile(query);
         have = await this.userSearcher.search(JSON.parse(compiled(user)));
-      }
-    } catch (err) {
-      if (err.status !== 404) {
-        throw err;
+      } catch (err) {
+        if (err.status !== 404) {
+          throw err;
+        }
       }
     }
 
-    if (have && have.data && _.isArray(have.data)) {
-      have = have.data.length ? _.merge({ data: have.data[0] }, user) : null; // deep merge
+    if (have && have.data && Array.isArray(have.data)) {
+      have = have.data.length ? { data: have.data[0] } : null;
     }
 
     if (!have && source.mayCreateUser) {

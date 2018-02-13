@@ -26,6 +26,7 @@ describe('authentication/middleware', function() {
 
     vanGogh = factory.addResource('doggies').withAttributes({
       email: 'vanny@example.com',
+      fullName: 'Van Gogh Abdel-Rahman',
       favoriteToy: 'squeaky snake'
     });
 
