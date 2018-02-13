@@ -187,7 +187,7 @@ class Schema {
     }
     let session = context.session || Session.EVERYONE;
     let userRealms = await session.realms();
-    debugger;
+
     let authorizedResource = primaryType.applyReadAuthorization(document.data, userRealms);
     if (authorizedResource) {
       let output = document;
