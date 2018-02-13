@@ -7,7 +7,7 @@ const Session = require('@cardstack/plugin-utils/session');
 
 const everyone = { type: 'groups', id: 'everyone' };
 
-describe('schema/auth', function() {
+describe('schema/auth/write', function() {
 
   let factory, loader;
 

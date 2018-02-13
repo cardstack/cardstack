@@ -1,4 +1,5 @@
 const Error = require('@cardstack/plugin-utils/error');
+const Session = require('@cardstack/plugin-utils/session');
 const { declareInjections } = require('@cardstack/di');
 
 module.exports = declareInjections({
@@ -33,7 +34,7 @@ class Schema {
   // derives a new schema by adding, updating, or removing
   // models. Takes a list of { type, id, document } objects. A null document
   // means deletion.
-  applyChanges(changes) {
+  async applyChanges(changes) {
     let models = this._originalModels;
     for (let change of changes) {
       let { type, id, document } = change;
@@ -95,7 +96,7 @@ class Schema {
     // schema hits a bug anywhere in schema instantiation. Better to
     // serve a 500 here than accept the broken schema and serve 500s
     // to everyone.
-    let newSchema = this.applyChanges([{type, id, document: pendingChange.finalDocument}]);
+    let newSchema = await this.applyChanges([{type, id, document: pendingChange.finalDocument}]);
     if (newSchema !== this) {
       return newSchema;
     }
@@ -157,5 +158,66 @@ class Schema {
     return this._mapping;
   }
 
+  _readAuthIncluded(included, userRealms) {
+    let modified = false;
+    let safeIncluded = included.map(resource => {
+      let contentType = this.types.get(resource.type);
+      if (contentType) {
+        let authorized = contentType.applyReadAuthorization(resource, userRealms);
+        if (authorized !== resource) {
+          modified = true;
+        }
+        return authorized;
+      }
+    });
+    if (modified) {
+      return safeIncluded.filter(Boolean);
+    } else {
+      return included;
+    }
+  }
+
+  async applyReadAuthorization(document, context={}) {
+    if (!document.data || document.data.id == null || document.data.type == null) {
+      return;
+    }
+    let primaryType = this.types.get(document.data.type);
+    if (!primaryType) {
+      return;
+    }
+    let session = context.session || Session.EVERYONE;
+    let userRealms = await session.realms();
+    debugger;
+    let authorizedResource = primaryType.applyReadAuthorization(document.data, userRealms);
+    if (authorizedResource) {
+      let output = document;
+
+      if (document.data !== authorizedResource) {
+        output = {
+          data: authorizedResource
+        };
+        if (document.meta) {
+          output.meta = document.meta;
+        }
+      }
+
+      if (document.included) {
+        let safeIncluded = this._readAuthIncluded(document.included, userRealms);
+        if (safeIncluded !== document.included) {
+          // we want to modify included. First copy the output
+          // document if we didn't already.
+          if (output === document) {
+            output = { data: document.data };
+            if (document.meta) {
+              output.meta = document.meta;
+            }
+          }
+          output.included = safeIncluded;
+        }
+      }
+
+      return output;
+    }
+  }
 
 });

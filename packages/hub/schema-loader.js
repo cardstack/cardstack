@@ -41,7 +41,7 @@ class SchemaLoader {
     let dataSources = findDataSources(models, plugins);
     let defaultDataSource = findDefaultDataSource(plugins);
     schemaLog.trace('default data source %j', defaultDataSource);
-    let types = findTypes(models, fields, constraints, dataSources, defaultDataSource, grants, authLog);
+    let types = findTypes(models, fields, constraints, dataSources, defaultDataSource, grants);
     validateRelatedTypes(types, fields);
     return getOwner(this).factoryFor('hub:schema').create({ types, fields, dataSources, inputModels, plugins });
   }
@@ -114,11 +114,11 @@ function findDefaultDataSource(plugins) {
   }
 }
 
-function findTypes(models, fields, constraints, dataSources, defaultDataSource, grants, authLog) {
+function findTypes(models, fields, constraints, dataSources, defaultDataSource, grants) {
   let types = new Map();
   for (let model of models) {
     if (model.type === 'content-types') {
-      types.set(model.id, new ContentType(model, fields, constraints, dataSources, defaultDataSource, grants, authLog));
+      types.set(model.id, new ContentType(model, fields, constraints, dataSources, defaultDataSource, grants));
     }
   }
   return types;
