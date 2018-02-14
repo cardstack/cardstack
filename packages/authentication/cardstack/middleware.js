@@ -25,6 +25,7 @@ module.exports = declareInjections({
   encryptor: 'hub:encryptor',
   searcher: 'hub:searchers',
   writer: 'hub:writers',
+  indexers: 'hub:indexers',
   sources: 'hub:data-sources',
   controllingBranch: 'hub:controlling-branch'
 },
@@ -189,13 +190,21 @@ class Authentication {
       have = have.data.length ? { data: have.data[0] } : null;
     }
 
+    let madeIndexUpdate = false;
     if (!have && source.mayCreateUser) {
-      return { data: await this.writer.create(this.controllingBranch.name, Session.INTERNAL_PRIVLEGED, user.data.type, user.data) };
+      have = { data: await this.writer.create(this.controllingBranch.name, Session.INTERNAL_PRIVLEGED, user.data.type, user.data) };
+      madeIndexUpdate = true;
     }
     if (have && source.mayUpdateUser) {
       user.data.meta = have.data.meta;
-      return { data: await this.writer.update(this.controllingBranch.name, Session.INTERNAL_PRIVLEGED, user.data.type, have.data.id, user.data) };
+      have = { data: await this.writer.update(this.controllingBranch.name, Session.INTERNAL_PRIVLEGED, user.data.type, have.data.id, user.data) };
+      madeIndexUpdate = true;
     }
+
+    if (madeIndexUpdate) {
+      this.indexers.update({ hints: [{ type: have.data.type, id: have.data.id, branch: this.controllingBranch.name }] });
+    }
+
     return have;
   }
 
