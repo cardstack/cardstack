@@ -221,7 +221,7 @@ class Authentication {
     }
 
     if (madeIndexUpdate) {
-      this.indexers.update({ hints: [{ type: have.data.type, id: have.data.id, branch: this.controllingBranch.name }] });
+      await this.indexers.update({ hints: [{ type: have.data.type, id: have.data.id, branch: this.controllingBranch.name }] });
     }
 
     return have;
