@@ -35,6 +35,7 @@ function commandLineOptions() {
   commander
     .usage('[options] <seed-config-directory>')
     .option('-p --port <port>', 'Server listen port', 3000)
+    .option('-u --url <url>', "Server's public base URL. Defaults to http://localhost:$PORT.")
     .option('-c --containerized', 'Run the hub in container mode (temporary feature flag)')
     .option('-l --leave-services-running', 'Leave dockerized services running, to improve future startup time')
     .option('--heartbeat', 'Shut down after not receiving a heartbeat from ember-cli')

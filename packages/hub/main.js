@@ -16,6 +16,7 @@ async function wireItUp(projectDir, encryptionKeys, seedModels, opts = {}) {
   });
   registry.register('config:seed-models', seedModels);
   registry.register('config:encryption-key', encryptionKeys);
+  registry.register('config:public-url', { url: opts.url });
 
   let container = new Container(registry);
 
@@ -75,7 +76,7 @@ async function httpLogging(ctxt, next) {
   log.info('finish %s %s %s', ctxt.request.method, ctxt.request.originalUrl, ctxt.response.status);
 }
 
-function prepareSpawnHub(packageName, configPath, environment) {
+function prepareSpawnHub(packageName, configPath, environment, port, explicitURL) {
   let setEnvVars = Object.create(null);
   if (!process.env.CARDSTACK_SESSIONS_KEY) {
     const crypto = require('crypto');
@@ -96,11 +97,12 @@ function prepareSpawnHub(packageName, configPath, environment) {
                           '..', 'cardstack', 'seeds', environment);
 
   let bin = path.join(__dirname, 'bin', 'cardstack-hub.js');
-  return { setEnvVars, bin, args: [seedDir] };
+  let url = explicitURL || `http://localhost:${port}`;
+  return { setEnvVars, bin, args: [seedDir, '--port', port, '--url', url] };
 }
 
-async function spawnHub(packageName, configPath, environment) {
-  let { setEnvVars, bin, args } = prepareSpawnHub(packageName, configPath, environment);
+async function spawnHub(packageName, configPath, environment, port, url) {
+  let { setEnvVars, bin, args } = prepareSpawnHub(packageName, configPath, environment, port, url);
 
   for (let [key, value] of Object.entries(setEnvVars)) {
     process.env[key] = value;
@@ -119,7 +121,7 @@ async function spawnHub(packageName, configPath, environment) {
     proc.on('error', reject);
     proc.on('exit', reject);
   });
-  return 'http://localhost:3000';
+  return `http://localhost:${port}`;
 }
 
 exports.wireItUp = wireItUp;

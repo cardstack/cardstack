@@ -75,7 +75,7 @@ let addon = {
       // containerized case, "main" and its recursive dependencies
       // never need to load on the host environment.
       let { spawnHub } = require('./main');
-      return spawnHub(this.project.pkg.name, this.project.configPath(), this._env);
+      return spawnHub(this.project.pkg.name, this.project.configPath(), this._env, process.env.HUB_PORT || 3000);
     }
   },
 
