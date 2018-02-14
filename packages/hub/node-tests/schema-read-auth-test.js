@@ -275,20 +275,84 @@ describe('schema/auth/read', function() {
     expect(approved).has.deep.property('data.attributes.title', 'First Post');
   });
 
-  it("removes unauthorized attributes from compound document", async function() {
-    let model = await find('posts', '1');
+  it("removes unauthorized attributes from collection document", async function() {
+    let model = await findAll('posts', '1');
     let { schema, session } = await withGrants(factory => {
       factory.addResource('grants')
         .withRelated('types', [
           { type: 'content-types', id: 'posts' },
         ])
+        .withRelated('fields', [
+          { type: 'fields', id: 'title' }
+        ])
         .withAttributes({
-          mayReadResource: true
+          mayReadResource: true,
+          mayReadFields: true
         });
     });
     let approved = await schema.applyReadAuthorization(model, { session });
-    expect(approved).not.has.deep.property('data.attributes.title');
+    expect(approved.data[0]).not.has.deep.property('attributes.subtitle');
   });
+
+
+  it("keeps authorized attributes in collection document", async function() {
+    let model = await findAll('posts', '1');
+    let { schema, session } = await withGrants(factory => {
+      factory.addResource('grants')
+        .withRelated('types', [
+          { type: 'content-types', id: 'posts' },
+        ])
+        .withRelated('fields', [
+          { type: 'fields', id: 'title' }
+        ])
+        .withAttributes({
+          mayReadResource: true,
+          mayReadFields: true
+        });
+    });
+    let approved = await schema.applyReadAuthorization(model, { session });
+    expect(approved.data[0]).has.deep.property('attributes.title');
+  });
+
+  it("keeps linked includes in collection document", async function() {
+    let model = await findAll('posts', '1');
+    let { schema, session } = await withGrants(factory => {
+      factory.addResource('grants')
+        .withRelated('types', [
+          { type: 'content-types', id: 'posts' },
+          { type: 'content-types', id: 'authors' },
+        ])
+        .withRelated('fields', [
+          { type: 'fields', id: 'author' }
+        ])
+        .withAttributes({
+          mayReadResource: true,
+          mayReadFields: true
+        });
+    });
+    let approved = await schema.applyReadAuthorization(model, { session });
+    expect(approved.included).collectionContains({ type: 'authors' });
+  });
+
+  it("removes unlinked includes in collection document", async function() {
+    let model = await findAll('posts', '1');
+    let { schema, session } = await withGrants(factory => {
+      factory.addResource('grants')
+        .withRelated('types', [
+          { type: 'content-types', id: 'posts' }
+        ])
+        .withRelated('fields', [
+          { type: 'fields', id: 'author' }
+        ])
+        .withAttributes({
+          mayReadResource: true,
+          mayReadFields: true
+        });
+    });
+    let approved = await schema.applyReadAuthorization(model, { session });
+    expect(approved.included).not.collectionContains({ type: 'authors' });
+  });
+
 
   it("removes unauthorized relationships when no field grant", async function() {
     let model = await find('posts', '1');

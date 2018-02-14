@@ -69,6 +69,7 @@ class Searchers {
     }
 
     let searchers = await this._lookupSearchers();
+    let schemaPromise = this.currentSchema.forBranch(branch);
     let index = 0;
     let sessionOrEveryone = session || Session.EVERYONE;
     let next = async () => {
@@ -77,7 +78,19 @@ class Searchers {
         return searcher.search(sessionOrEveryone, branch, query, next);
       }
     };
-    return next();
+    let result = await next();
+    if (result) {
+      let schema = await schemaPromise;
+      let authorizedResult = await schema.applyReadAuthorization(result, { session });
+      if (authorizedResult.data.length !== result.data.length) {
+        // We can eventually make this more of just a warning, but for
+        // now it's cleaner to just force the searchers to implement
+        // grants correctly. Otherwise we will need to be able to
+        // adjust pagination and meta stats.
+        throw new Error(`A searcher tried to include resources that are outside the allowed session scope`);
+      }
+      return authorizedResult;
+    }
   }
 
   async searchInControllingBranch(session, query) {

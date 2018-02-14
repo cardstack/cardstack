@@ -540,8 +540,6 @@ class DocumentContext {
     // missing. We track the missing ones so that if they later appear
     // in the data we can invalidate to pick them up.
     this.references = [];
-
-    this.realmDetails = [];
   }
 
   async searchDoc() {
@@ -651,37 +649,15 @@ class DocumentContext {
       pristine.data.meta = jsonapiDoc.meta;
     }
 
-    let realms = this._realms(type, id, jsonapiDoc);
-    this.realmDetails.push(realms);
-
     if (depth > 0) {
       this.pristineIncludes.push(pristine.data);
     } else {
       searchDoc.cardstack_pristine = pristine;
       searchDoc.cardstack_references = this.references;
-      searchDoc.cardstack_resource_realms = realms.resourceReaders;
-      searchDoc.cardstack_realm_details = this.realmDetails;
-      authLog.trace("setting resource_realms for %s %s: %j", type, id, realms.resourceReaders);
+      searchDoc.cardstack_realms = this.schema.authorizedReadRealms(type, jsonapiDoc);
+      authLog.trace("setting resource_realms for %s %s: %j", type, id, searchDoc.cardstack_realms);
     }
     return searchDoc;
   }
 
-  _realms(type, id, doc) {
-    let contentType = this.schema.types.get(type);
-    if (contentType) {
-      return {
-        type,
-        id,
-        resourceReaders: contentType.realms.resourceReaders(doc),
-        fieldReaders: contentType.realms.fieldReaders(doc),
-      };
-    } else {
-      return {
-        type,
-        id,
-        resourceReaders: [],
-        fieldReaders: []
-      };
-    }
-  }
 }

@@ -150,8 +150,7 @@ class Schema {
         this._mapping[contentType.id].properties.cardstack_generation = { type: 'keyword' };
         this._mapping[contentType.id].properties.cardstack_pristine = { type: 'object', enabled: false };
         this._mapping[contentType.id].properties.cardstack_references = { type: 'keyword' };
-        this._mapping[contentType.id].properties.cardstack_resource_realms = { type: 'keyword' };
-        this._mapping[contentType.id].properties.cardstack_realm_detail = { type: 'object', enabled: false };
+        this._mapping[contentType.id].properties.cardstack_realms = { type: 'keyword' };
       }
 
     }
@@ -178,19 +177,40 @@ class Schema {
   }
 
   async applyReadAuthorization(document, context={}) {
-    if (!document.data || document.data.id == null || document.data.type == null) {
+    if (!document.data) {
       return;
     }
-    let primaryType = this.types.get(document.data.type);
-    if (!primaryType) {
-      return;
-    }
+
     let session = context.session || Session.EVERYONE;
     let userRealms = await session.realms();
 
-    let authorizedResource = primaryType.applyReadAuthorization(document.data, userRealms);
-    if (!authorizedResource) {
-      return;
+    let authorizedResource;
+    if (Array.isArray(document.data)) {
+      authorizedResource = document.data.map(resource => {
+        if (resource.id == null || resource.type == null) {
+          return;
+        }
+
+        let type = this.types.get(resource.type);
+        if (!type) {
+          return;
+        }
+        return type.applyReadAuthorization(resource, userRealms);
+      }).filter(Boolean);
+    } else {
+      if (document.data.id == null || document.data.type == null) {
+        return;
+      }
+
+      let primaryType = this.types.get(document.data.type);
+      if (!primaryType) {
+        return;
+      }
+
+      authorizedResource = primaryType.applyReadAuthorization(document.data, userRealms);
+      if (!authorizedResource) {
+        return;
+      }
     }
 
     let output = document;
@@ -227,14 +247,21 @@ class Schema {
       }
     }
 
-    if (output !== document) {
+    if (output !== document && output.included) {
       // we altered something, so lets verify "full linkage" as
       // required by the spec
       // http://jsonapi.org/format/#document-compound-documents
 
 
       let allResources = new Map();
-      allResources.set(`${output.data.type}/${output.data.id}`, output.data);
+      if (Array.isArray(output.data)) {
+        for (let resource of output.data) {
+          allResources.set(`${resource.type}/${resource.id}`, resource);
+        }
+      } else {
+        allResources.set(`${output.data.type}/${output.data.id}`, output.data);
+      }
+
       if (output.included) {
         for (let resource of output.included) {
           allResources.set(`${resource.type}/${resource.id}`, resource);
@@ -242,7 +269,7 @@ class Schema {
       }
 
       let reachable = new Set();
-      let pending = [output.data];
+      let pending = Array.isArray(output.data) ? output.data.slice() : [output.data];
 
       while (pending.length > 0) {
         let resource = pending.pop();
@@ -281,6 +308,15 @@ class Schema {
     }
 
     return output;
+  }
+
+  authorizedReadRealms(type, resource) {
+    let contentType = this.types.get(type);
+    if (contentType) {
+      return contentType.authorizedReadRealms(resource);
+    } else {
+      return [];
+    }
   }
 
 });

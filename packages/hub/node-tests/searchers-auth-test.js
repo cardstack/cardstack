@@ -151,8 +151,27 @@ describe('hub/searchers/auth', function() {
     expect(doc).has.deep.property('data.attributes.title');
   });
 
-  it("removes unauthorized attributes from collection search");
-  it("keeps authorized attributes in collection search");
+  it("removes unauthorized attributes from collection search", async function() {
+    await setup(factory => {
+      factory.addResource('grants')
+        .withAttributes({ mayReadResource: true, mayReadFields: true })
+        .withRelated('who', everyone)
+        .withRelated('fields', [{ type: 'fields', id: 'title' }]);
+    });
+    let doc = await searchers.search(Session.EVERYONE, 'master', { filter: { type: 'posts' } });
+    expect(doc.data[0]).not.has.deep.property('attributes.subtitle');
+  });
+
+  it("keeps authorized attributes in collection search", async function() {
+    await setup(factory => {
+      factory.addResource('grants')
+        .withAttributes({ mayReadResource: true, mayReadFields: true })
+        .withRelated('who', everyone)
+        .withRelated('fields', [{ type: 'fields', id: 'title' }]);
+    });
+    let doc = await searchers.search(Session.EVERYONE, 'master', { filter: { type: 'posts' } });
+    expect(doc.data[0]).has.deep.property('attributes.title');
+  });
 
   it("removes unauthorized relationships", async function() {
     await setup(factory => {
@@ -178,13 +197,6 @@ describe('hub/searchers/auth', function() {
     let doc = await searchers.get(Session.EVERYONE, 'master', 'posts', '1');
     expect(doc).has.deep.property('data.relationships.author');
   });
-
-  it("removes unauthorized default includes");
-  it("keeps authorized default includes");
-  it("removes unauthorized non-default includes");
-  it("keeps authorized non-default includes");
-
-  it("removes unauthorized attributes from includes");
 
   it("reacts when a grant is created");
   it("reacts when a grant is updated");

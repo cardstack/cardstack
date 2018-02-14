@@ -53,8 +53,11 @@ class Searcher {
         bool: {
           must: [{
             terms: {
-              // This is our resource-level read security
-              cardstack_resource_realms: realms
+              // This is our resource-level read security. The hub's
+              // top-level searchers module will also check auth, but
+              // by checking it down here we are keeping our
+              // pagination all nice.
+              cardstack_realms: realms
             }
           }],
           // All searches exclude `meta` documents, because those are

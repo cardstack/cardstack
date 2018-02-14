@@ -55,11 +55,8 @@ module.exports = class Realms {
     }
   }
 
-  resourceReaders(/* resource */) {
+  authorizedReadRealms(/* resource */) {
     return [...this._resourceReaders];
   }
 
-  fieldReaders(/*, resource */) {
-    return [];
-  }
 };
