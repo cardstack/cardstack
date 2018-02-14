@@ -144,7 +144,7 @@ module.exports = class ContentType {
         throw new Error("You may not delete this resource", { status: 401 });
       }
     } else if (!originalDocument) {
-      let grant = await find(this.grants, async g => g['may-create-resource'] && await g.matches(originalDocument, context));
+      let grant = await find(this.grants, async g => g['may-create-resource'] && await g.matches(finalDocument, context));
       if (grant) {
         authLog.debug("approved creation of %s %s because of grant %s", finalDocument.type, finalDocument.id, grant.id);
         authLog.trace("grant %s = %j", grant.id, grant);

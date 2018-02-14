@@ -198,6 +198,18 @@ describe('hub/searchers/auth', function() {
     expect(doc).has.deep.property('data.relationships.author');
   });
 
+  it("matches attribute-dependent grant", async function() {
+    await setup(factory => {
+      factory.addResource('grants')
+        .withAttributes({ mayReadResource: true, mayReadFields: true })
+        .withRelated('who', { type: 'fields', id: 'subtitle' });
+    });
+    let doc = await searchers.search(new Session({ type: 'test-users', id: 'It is the best' }), 'master', { filter: { type: 'posts' } });
+    expect(doc.data).has.length(1);
+    expect(doc.data[0]).has.deep.property('attributes.title', 'First Post');
+    expect(doc.meta).has.deep.property('page.total', 1);
+  });
+
   it("reacts when a grant is created");
   it("reacts when a grant is updated");
   it("reacts when a grant is deleted");

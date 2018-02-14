@@ -143,6 +143,8 @@ module.exports = class Grant {
 
     this.types = null;
     this.fields = null;
+    this.groupId = null;
+    this.groupField = null;
     this.id = document.id;
     if (this.id == null) {
       throw new Error(`grant must have an id: ${JSON.stringify(document)}`);
@@ -157,20 +159,42 @@ module.exports = class Grant {
     }
 
     if (rels.who && rels.who.data) {
-      if (rels.who.data.type !== 'groups') {
-        throw new Error(`grant's "who" field must refer to a group: ${JSON.stringify(document)}`);
+      if (rels.who.data.type === 'groups') {
+        this.groupId = rels.who.data.id;
+      } else if (rels.who.data.type === 'fields') {
+        this.groupField = rels.who.data.id;
+      } else {
+        throw new Error(`grant's "who" field must refer to a group or a field: ${JSON.stringify(document)}`);
       }
-      this.groupId = rels.who.data.id;
     } else {
       throw new Error(`grant must have a "who" field: ${JSON.stringify(document)}`);
     }
   }
 
-  async matches(document, context) {
+  async matches(resource, context) {
     let groupIds = await (context.session || Session.EVERYONE).realms();
-    let matches = this.groupId == null || groupIds.includes(this.groupId);
-    log.trace('testing grant id=%s groupId=%s document=%j context=%j matches=%s', this.id, this.groupId, document, context, !!matches);
+
+    let effectiveGroupId;
+    if (this.groupField != null) {
+      effectiveGroupId = Grant.readField(resource, this.groupField);
+    } else {
+      effectiveGroupId = this.groupId;
+    }
+
+    let matches = (effectiveGroupId != null) && groupIds.includes(effectiveGroupId);
+    log.trace('testing grant id=%s effectiveGroupId=%s resource=%j context=%j matches=%s', this.id, effectiveGroupId, resource, context, !!matches);
     return matches;
   }
 
+  static readField(resource, fieldName) {
+    if (fieldName === 'id') {
+      return resource.id;
+    }
+    if (fieldName === 'type') {
+      return resource.type;
+    }
+    if (resource.attributes && resource.attributes.hasOwnProperty(fieldName)) {
+      return resource.attributes[fieldName];
+    }
+  }
 };
