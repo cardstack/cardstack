@@ -17,7 +17,7 @@ module.exports = class MockSearcher {
     return next();
   }
 
-  async search(branch, query, next) {
+  async search(session, branch, query, next) {
     return next();
   }
 
