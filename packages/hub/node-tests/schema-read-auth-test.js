@@ -35,7 +35,7 @@ describe('schema/auth/read', function() {
 
     factory.addResource('content-types', 'posts', '1')
       .withAttributes({
-        defaultIncludes: ['tags', 'author']
+        defaultIncludes: ['tags', 'author', 'author.flavor']
       })
       .withRelated('fields', [
         factory.addResource('fields', 'title').withAttributes({
@@ -50,7 +50,12 @@ describe('schema/auth/read', function() {
           factory.addResource('content-types', 'authors').withRelated('fields', [
             factory.addResource('fields', 'name').withAttributes({
               fieldType: '@cardstack/core-types::string'
-            })
+            }),
+            factory.addResource('fields', 'flavor').withAttributes({
+              fieldType: '@cardstack/core-types::belongs-to'
+            }).withRelated('related-types', [
+              factory.addResource('content-types', 'flavors')
+            ])
           ])
         ]),
         factory.addResource('fields', 'tags').withAttributes({
@@ -64,12 +69,16 @@ describe('schema/auth/read', function() {
     factory.addResource('posts', '1').withAttributes({
       title: 'First Post',
       subtitle: 'It is the best'
-    }).withRelated('author', factory.addResource('authors', '1').withAttributes({
-      name: 'Arthur Faulkner'
-    })).withRelated('tags', [
-      factory.addResource('tags', 'one'),
-      factory.addResource('tags', 'two')
-    ]);
+    }).withRelated('author',
+                   factory.addResource('authors', '1').withAttributes({
+                     name: 'Arthur Faulkner'
+                   }).withRelated('flavor',
+                                  factory.addResource('flavors', 'vanilla'))
+                  )
+      .withRelated('tags', [
+        factory.addResource('tags', 'one'),
+        factory.addResource('tags', 'two')
+      ]);
     let sessions = {};
 
     {
@@ -330,7 +339,7 @@ describe('schema/auth/read', function() {
     expect(approved).has.deep.property('data.relationships.author.data.id', '1');
   });
 
-  it.skip("removes authorized includes when their relationship field is unauthorized", async function(){
+  it("removes authorized includes when their relationship field is unauthorized", async function(){
     let model = await find('posts', '1');
     let { schema, session } = await withGrants(factory => {
       factory.addResource('grants')
@@ -350,6 +359,50 @@ describe('schema/auth/read', function() {
     let approved = await schema.applyReadAuthorization(model, { session });
     expect(approved.included).not.collectionContains({ type: 'tags' });
   });
+
+  it("when adjusting includes, keeps valid belongs-to relationships", async function(){
+    let model = await find('posts', '1');
+    let { schema, session } = await withGrants(factory => {
+      factory.addResource('grants')
+        .withRelated('types', [
+          { type: 'content-types', id: 'posts' },
+          { type: 'content-types', id: 'tags' },
+          { type: 'content-types', id: 'authors' }
+        ])
+        .withRelated('fields', [
+          { type: 'fields', id: 'author' }
+        ])
+        .withAttributes({
+
+          mayReadResource: true,
+          mayReadFields: true
+        });
+    });
+    let approved = await schema.applyReadAuthorization(model, { session });
+    expect(approved.included).collectionContains({ type: 'authors' });
+  });
+
+  it("when adjusting includes, keeps valid has-many relationships", async function(){
+    let model = await find('posts', '1');
+    let { schema, session } = await withGrants(factory => {
+      factory.addResource('grants')
+        .withRelated('types', [
+          { type: 'content-types', id: 'posts' },
+          { type: 'content-types', id: 'tags' },
+          { type: 'content-types', id: 'authors' }
+        ])
+        .withRelated('fields', [
+          { type: 'fields', id: 'tags' }
+        ])
+        .withAttributes({
+          mayReadResource: true,
+          mayReadFields: true
+        });
+    });
+    let approved = await schema.applyReadAuthorization(model, { session });
+    expect(approved.included).collectionContains({ type: 'tags' });
+  });
+
 
   it("keeps authorized includes when their relationship field is authorized by an unlimited field grant", async function(){
     let model = await find('posts', '1');
@@ -446,8 +499,95 @@ describe('schema/auth/read', function() {
     expect(approved.included).not.collectionContains({ type: 'tags' });
   });
 
+  it("keeps linked second-level authorized includes", async function() {
+    let model = await find('posts', '1');
+    let { schema, session } = await withGrants(factory => {
+      factory.addResource('grants')
+        .withRelated('types', [
+          { type: 'content-types', id: 'posts' },
+          { type: 'content-types', id: 'authors' },
+          { type: 'content-types', id: 'flavors' },
+          { type: 'content-types', id: 'tags' }
+        ])
+        .withRelated('fields', [
+          { type: 'fields', id: 'author' },
+          { type: 'fields', id: 'flavor' }
+        ])
+        .withAttributes({
+          mayReadResource: true,
+          mayReadFields: true
+        });
+    });
+    let approved = await schema.applyReadAuthorization(model, { session });
+    expect(approved.included).collectionContains({ type: 'flavors' });
+  });
 
-  it("removes unauthorized attributes from includes");
+  it("removes unlinked second-level authorized includes", async function() {
+    let model = await find('posts', '1');
+    let { schema, session } = await withGrants(factory => {
+      factory.addResource('grants')
+        .withRelated('types', [
+          { type: 'content-types', id: 'posts' },
+          { type: 'content-types', id: 'authors' },
+          { type: 'content-types', id: 'flavors' },
+          { type: 'content-types', id: 'tags' }
+        ])
+        .withRelated('fields', [
+          { type: 'fields', id: 'flavor' }
+        ])
+        .withAttributes({
+          mayReadResource: true,
+          mayReadFields: true
+        });
+    });
+    let approved = await schema.applyReadAuthorization(model, { session });
+    expect(approved.included).not.collectionContains({ type: 'flavors' });
+  });
+
+  it("removes unauthorized attributes from includes", async function(){
+    let model = await find('posts', '1');
+    let { schema, session } = await withGrants(factory => {
+      factory.addResource('grants')
+        .withRelated('types', [
+          { type: 'content-types', id: 'posts' },
+          { type: 'content-types', id: 'authors' }
+        ])
+        .withRelated('fields', [
+          { type: 'fields', id: 'author' }
+        ])
+        .withAttributes({
+          mayReadResource: true,
+          mayReadFields: true
+        });
+    });
+    let approved = await schema.applyReadAuthorization(model, { session });
+    expect(approved.included).has.length(1);
+    expect(approved.included[0]).has.deep.property('type', 'authors');
+    expect(approved.included[0]).not.has.deep.property('attributes.name');
+  });
+
+  it("keeps unauthorized attributes in includes", async function(){
+    let model = await find('posts', '1');
+    let { schema, session } = await withGrants(factory => {
+      factory.addResource('grants')
+        .withRelated('types', [
+          { type: 'content-types', id: 'posts' },
+          { type: 'content-types', id: 'authors' }
+        ])
+        .withRelated('fields', [
+          { type: 'fields', id: 'author' },
+          { type: 'fields', id: 'name' }
+        ])
+        .withAttributes({
+          mayReadResource: true,
+          mayReadFields: true
+        });
+    });
+    let approved = await schema.applyReadAuthorization(model, { session });
+    expect(approved.included).has.length(1);
+    expect(approved.included[0]).has.deep.property('type', 'authors');
+    expect(approved.included[0]).has.deep.property('attributes.name');
+  });
 
   it("approves conditional grant for top-level resource");
   it("rejects conditional grant for top-level resource");

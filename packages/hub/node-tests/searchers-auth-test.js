@@ -156,8 +156,10 @@ describe('hub/searchers/auth', function() {
 
   it("removes unauthorized relationships");
   it("keeps authorized relationships");
-  it("removes unauthorized includes");
-  it("keeps authorized includes");
+  it("removes unauthorized default includes");
+  it("keeps authorized default includes");
+  it("removes unauthorized non-default includes");
+  it("keeps authorized non-default includes");
   it("removes unauthorized attributes from includes");
   it("reacts when a grant is created");
   it("reacts when a grant is updated");

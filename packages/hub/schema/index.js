@@ -189,35 +189,98 @@ class Schema {
     let userRealms = await session.realms();
 
     let authorizedResource = primaryType.applyReadAuthorization(document.data, userRealms);
-    if (authorizedResource) {
-      let output = document;
+    if (!authorizedResource) {
+      return;
+    }
 
-      if (document.data !== authorizedResource) {
-        output = {
-          data: authorizedResource
-        };
-        if (document.meta) {
-          output.meta = document.meta;
+    let output = document;
+
+    if (document.data !== authorizedResource) {
+      output = {
+        data: authorizedResource
+      };
+      if (document.meta) {
+        output.meta = document.meta;
+      }
+    }
+
+    if (document.included) {
+      let safeIncluded = this._readAuthIncluded(document.included, userRealms);
+      if (safeIncluded === document.included) {
+        // the include list didn't need to be modified. If our output
+        // is a modified copy, we need to bring the original included
+        // list along. If our document is not a copy, it already has
+        // the original included list.
+        if (output !== document) {
+          output.included = document.included;
+        }
+      } else {
+        // we need to modify included. First copy the output document
+        // if we didn't already.
+        if (output === document) {
+          output = { data: document.data };
+          if (document.meta) {
+            output.meta = document.meta;
+          }
+        }
+        output.included = safeIncluded;
+      }
+    }
+
+    if (output !== document) {
+      // we altered something, so lets verify "full linkage" as
+      // required by the spec
+      // http://jsonapi.org/format/#document-compound-documents
+
+
+      let allResources = new Map();
+      allResources.set(`${output.data.type}/${output.data.id}`, output.data);
+      if (output.included) {
+        for (let resource of output.included) {
+          allResources.set(`${resource.type}/${resource.id}`, resource);
         }
       }
 
-      if (document.included) {
-        let safeIncluded = this._readAuthIncluded(document.included, userRealms);
-        if (safeIncluded !== document.included) {
-          // we want to modify included. First copy the output
-          // document if we didn't already.
-          if (output === document) {
-            output = { data: document.data };
-            if (document.meta) {
-              output.meta = document.meta;
+      let reachable = new Set();
+      let pending = [output.data];
+
+      while (pending.length > 0) {
+        let resource = pending.pop();
+        if (!resource.relationships) {
+          continue;
+        }
+
+        for (let value of Object.values(resource.relationships)) {
+          if (value && value.data) {
+            let references;
+            if (Array.isArray(value.data)) {
+              references = value.data;
+            } else {
+              references = [value.data];
+            }
+            for (let { type, id } of references) {
+              let key = `${type}/${id}`;
+              if (!reachable.has(key)) {
+                reachable.add(key);
+                let resource = allResources.get(key);
+                if (resource) {
+                  pending.push(resource);
+                }
+              }
             }
           }
-          output.included = safeIncluded;
         }
       }
-
-      return output;
+      let linkedIncluded = output.included.filter(resource => reachable.has(`${resource.type}/${resource.id}`));
+      if (linkedIncluded.length < output.included.length) {
+        // must replace output.included. output is necessarily already
+        // copied (or we wouldn't be checking linkage in the first
+        // place)
+        output.included = linkedIncluded;
+      }
     }
+
+    return output;
   }
 
 });
