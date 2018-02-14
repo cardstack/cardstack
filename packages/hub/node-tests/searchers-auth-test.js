@@ -78,7 +78,7 @@ describe('hub/searchers/auth', function() {
   it("returns resource when user has a grant with unrestricted type", async function() {
     await setup(factory => {
       factory.addResource('grants')
-        .withAttributes({ mayReadResource: true })
+        .withAttributes({ mayReadResource: true, mayReadFields: true })
         .withRelated('who', everyone);
     });
     let doc = await searchers.get(Session.EVERYONE, 'master', 'posts', '1');
@@ -88,7 +88,7 @@ describe('hub/searchers/auth', function() {
   it("returns resource when user has a grant with matching type", async function() {
     await setup(factory => {
       factory.addResource('grants')
-        .withAttributes({ mayReadResource: true })
+        .withAttributes({ mayReadResource: true, mayReadFields: true })
         .withRelated('who', everyone)
         .withRelated('types', [{ type: 'content-types', id: 'posts' }]);
     });
@@ -129,7 +129,7 @@ describe('hub/searchers/auth', function() {
     expect(response.data).has.length(1);
   });
 
-  it.skip("removes unauthorized attributes from individual get", async function() {
+  it("removes unauthorized attributes from individual get", async function() {
     await setup(factory => {
       factory.addResource('grants')
         .withAttributes({ mayReadResource: true, mayReadFields: true })
@@ -154,13 +154,38 @@ describe('hub/searchers/auth', function() {
   it("removes unauthorized attributes from collection search");
   it("keeps authorized attributes in collection search");
 
-  it("removes unauthorized relationships");
-  it("keeps authorized relationships");
+  it("removes unauthorized relationships", async function() {
+    await setup(factory => {
+      factory.addResource('grants')
+        .withAttributes({ mayReadResource: true, mayReadFields: true })
+        .withRelated('who', everyone)
+        .withRelated('fields', [{ type: 'fields', id: 'title' }]);
+    });
+    let doc = await searchers.get(Session.EVERYONE, 'master', 'posts', '1');
+    expect(doc).not.has.deep.property('data.relationships.author');
+  });
+
+  it("keeps authorized relationships", async function() {
+    await setup(factory => {
+      factory.addResource('grants')
+        .withAttributes({ mayReadResource: true, mayReadFields: true })
+        .withRelated('who', everyone)
+        .withRelated('fields', [
+          { type: 'fields', id: 'title' },
+          { type: 'fields', id: 'author' }
+        ]);
+    });
+    let doc = await searchers.get(Session.EVERYONE, 'master', 'posts', '1');
+    expect(doc).has.deep.property('data.relationships.author');
+  });
+
   it("removes unauthorized default includes");
   it("keeps authorized default includes");
   it("removes unauthorized non-default includes");
   it("keeps authorized non-default includes");
+
   it("removes unauthorized attributes from includes");
+
   it("reacts when a grant is created");
   it("reacts when a grant is updated");
   it("reacts when a grant is deleted");

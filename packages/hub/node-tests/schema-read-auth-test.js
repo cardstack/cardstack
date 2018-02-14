@@ -13,6 +13,11 @@ describe('schema/auth/read', function() {
     return searchers.get(Session.INTERNAL_PRIVILEGED, 'master', type, id);
   }
 
+  async function findAll(type) {
+    return searchers.search(Session.INTERNAL_PRIVILEGED, 'master', { filter: { type } });
+  }
+
+
   async function withGrants(fn) {
     let factory = new JSONAPIFactory();
 
@@ -268,6 +273,21 @@ describe('schema/auth/read', function() {
     });
     let approved = await schema.applyReadAuthorization(model, { session });
     expect(approved).has.deep.property('data.attributes.title', 'First Post');
+  });
+
+  it("removes unauthorized attributes from compound document", async function() {
+    let model = await find('posts', '1');
+    let { schema, session } = await withGrants(factory => {
+      factory.addResource('grants')
+        .withRelated('types', [
+          { type: 'content-types', id: 'posts' },
+        ])
+        .withAttributes({
+          mayReadResource: true
+        });
+    });
+    let approved = await schema.applyReadAuthorization(model, { session });
+    expect(approved).not.has.deep.property('data.attributes.title');
   });
 
   it("removes unauthorized relationships when no field grant", async function() {

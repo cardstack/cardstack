@@ -6,7 +6,8 @@ const Session = require('@cardstack/plugin-utils/session');
 module.exports = declareInjections({
   controllingBranch: 'hub:controlling-branch',
   sources: 'hub:data-sources',
-  internalSearcher: `plugin-searchers:${require.resolve('@cardstack/elasticsearch/searcher')}`
+  internalSearcher: `plugin-searchers:${require.resolve('@cardstack/elasticsearch/searcher')}`,
+  currentSchema: 'hub:current-schema'
 },
 
 class Searchers {
@@ -33,6 +34,7 @@ class Searchers {
     let searchers = await this._lookupSearchers();
     let index = 0;
     let sessionOrEveryone = session || Session.EVERYONE;
+    let schemaPromise = this.currentSchema.forBranch(branch);
     let next = async () => {
       let searcher = searchers[index++];
       if (searcher) {
@@ -40,6 +42,12 @@ class Searchers {
       }
     };
     let result = await next();
+
+    if (result) {
+      let schema = await schemaPromise;
+      result = await schema.applyReadAuthorization(result, { session, type, id });
+    }
+
     if (!result) {
       throw new Error(`No such resource ${branch}/${type}/${id}`, {
         status: 404
