@@ -62,13 +62,22 @@ module.exports = [
   },
   {
     type: 'grants',
-    id: 0,
+    id: 'wide-open',
     attributes: {
       'may-create-resource': true,
+      'may-read-resource': true,
       'may-update-resource': true,
       'may-delete-resource': true,
       'may-write-fields': true,
       'may-read-fields': true
+    },
+    relationships: {
+      who: {
+        data: {
+          type: 'groups',
+          id: 'everyone'
+        }
+      }
     }
   }
 ];
