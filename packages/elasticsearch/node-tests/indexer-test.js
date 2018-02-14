@@ -63,7 +63,7 @@ describe('elasticsearch/indexer', function() {
     });
     expect(article).has.deep.property('id');
     await indexer.update({ realTime: true });
-    let found = await searcher.get('master', 'articles', article.id);
+    let found = await searcher.get(env.session, 'master', 'articles', article.id);
     expect(found).is.ok;
     expect(found).has.deep.property('data.attributes.title');
   });
@@ -87,7 +87,7 @@ describe('elasticsearch/indexer', function() {
     });
     expect(article).has.deep.property('id');
     await indexer.update({ realTime: true });
-    let found = await searcher.get('master', 'articles', article.id);
+    let found = await searcher.get(env.session, 'master', 'articles', article.id);
     expect(found).is.ok;
     expect(found).has.deep.property('data.attributes.title');
     expect(found).has.deep.property('data.relationships.author.data.id', person.id);
@@ -120,7 +120,7 @@ describe('elasticsearch/indexer', function() {
     await writer.update('master', env.session, 'people', person.id, person);
     await indexer.update({ realTime: true });
 
-    let found = await searcher.get('master', 'articles', article.id);
+    let found = await searcher.get(env.session, 'master', 'articles', article.id);
     expect(found).is.ok;
     expect(found).has.deep.property('data.attributes.title');
     expect(found).has.deep.property('data.relationships.author.data.id', person.id);
@@ -155,7 +155,7 @@ describe('elasticsearch/indexer', function() {
     await writer.update('master', env.session, 'articles', article.id, article);
     await indexer.update({ realTime: true });
 
-    let found = await searcher.get('master', 'articles', article.id);
+    let found = await searcher.get(env.session, 'master', 'articles', article.id);
     expect(found).is.ok;
     expect(found).has.deep.property('data.attributes.title', 'A Better Title');
     expect(found).has.deep.property('data.relationships.author.data.id', person.id);
@@ -176,7 +176,7 @@ describe('elasticsearch/indexer', function() {
     });
     expect(article).has.deep.property('id');
     await indexer.update({ realTime: true });
-    let found = await searcher.get('master', 'articles', article.id);
+    let found = await searcher.get(env.session, 'master', 'articles', article.id);
     expect(found).is.ok;
     expect(found).has.deep.property('data.relationships.author.data', null);
   });
@@ -201,7 +201,7 @@ describe('elasticsearch/indexer', function() {
     });
     expect(article).has.deep.property('id');
     await indexer.update({ realTime: true });
-    let found = await searcher.get('master', 'articles', article.id);
+    let found = await searcher.get(env.session, 'master', 'articles', article.id);
     expect(found).is.ok;
     expect(found).has.deep.property('data.relationships.reviewers.data');
     expect(found.data.relationships.reviewers.data).length(1);
@@ -222,7 +222,7 @@ describe('elasticsearch/indexer', function() {
     expect(article).has.deep.property('id');
     await indexer.update({ realTime: true });
 
-    let found = await searcher.get('master', 'articles', article.id);
+    let found = await searcher.get(env.session, 'master', 'articles', article.id);
     expect(found).is.ok;
     expect(found).has.deep.property('data.attributes.title', 'Hello World');
     expect(found).has.deep.property('data.relationships.author.data', null);
@@ -237,7 +237,7 @@ describe('elasticsearch/indexer', function() {
 
     await indexer.update({ realTime: true });
 
-    found = await searcher.get('master', 'articles', article.id);
+    found = await searcher.get(env.session, 'master', 'articles', article.id);
     expect(found).is.ok;
     expect(found).has.deep.property('data.relationships.author.data.id', 'x');
     expect(found).has.property('included');

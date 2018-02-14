@@ -1,7 +1,6 @@
 const Client = require('./client');
 const log = require('@cardstack/logger')('cardstack/searcher');
 const Error = require('@cardstack/plugin-utils/error');
-const toJSONAPI = require('./to-jsonapi');
 const { declareInjections } = require('@cardstack/di');
 
 module.exports = declareInjections({
@@ -19,7 +18,7 @@ class Searcher {
     }
   }
 
-  async get(branch, type, id) {
+  async get(session, branch, type, id) {
     await this._ensureClient();
     let index = Client.branchToIndexName(branch);
     let esId = `${branch}/${id}`;
@@ -38,16 +37,29 @@ class Searcher {
       }
       throw err;
     }
-    return toJSONAPI(type, document);
+
+    return document.cardstack_pristine;
   }
 
-  async search(branch, { queryString, filter, sort, page }) {
-    await this._ensureClient();
-    let schema = await this.schema.forBranch(branch);
+  async search(session, branch, { queryString, filter, sort, page }) {
+    let [schema, realms] = await Promise.all([
+      this.schema.forBranch(branch),
+      session.realms(),
+      this._ensureClient()
+    ]);
+
     let esBody = {
       query: {
         bool: {
-          must: [],
+          must: [{
+            terms: {
+              // This is our resource-level read security. The hub's
+              // top-level searchers module will also check auth, but
+              // by checking it down here we are keeping our
+              // pagination all nice.
+              cardstack_realms: realms
+            }
+          }],
           // All searches exclude `meta` documents, because those are
           // internal to our system.
           must_not: [{
@@ -128,7 +140,7 @@ class Searcher {
     let included = [];
     let data = documents.map(
       document => {
-        let jsonapi = toJSONAPI(document._type, document._source);
+        let jsonapi = document._source.cardstack_pristine;
         if (jsonapi.included) {
           included = included.concat(jsonapi.included);
         }

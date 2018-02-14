@@ -35,10 +35,10 @@ class Authentication {
   get userSearcher() {
     return {
       get: (type, userId) => {
-        return this.searcher.get(this.controllingBranch.name, type, userId);
+        return this.searcher.get(Session.INTERNAL_PRIVILEGED, this.controllingBranch.name, type, userId);
       },
       search: (params) => {
-        return this.searcher.search(this.controllingBranch.name, params);
+        return this.searcher.search(Session.INTERNAL_PRIVILEGED, this.controllingBranch.name, params);
       }
     };
   }
@@ -192,12 +192,12 @@ class Authentication {
 
     let madeIndexUpdate = false;
     if (!have && source.mayCreateUser) {
-      have = { data: await this.writer.create(this.controllingBranch.name, Session.INTERNAL_PRIVLEGED, user.data.type, user.data) };
+      have = { data: await this.writer.create(this.controllingBranch.name, Session.INTERNAL_PRIVILEGED, user.data.type, user.data) };
       madeIndexUpdate = true;
     }
     if (have && source.mayUpdateUser) {
       user.data.meta = have.data.meta;
-      have = { data: await this.writer.update(this.controllingBranch.name, Session.INTERNAL_PRIVLEGED, user.data.type, have.data.id, user.data) };
+      have = { data: await this.writer.update(this.controllingBranch.name, Session.INTERNAL_PRIVILEGED, user.data.type, have.data.id, user.data) };
       madeIndexUpdate = true;
     }
 

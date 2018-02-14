@@ -6,14 +6,14 @@ module.exports = class DrupalSearcher {
     this.permissionRepos = permissionRepos;
   }
 
-  async get(branch, type, id, next) {
+  async get(session, branch, type, id, next) {
     if (type === 'drupal-users') {
       return this._getUser(id);
     }
     return next();
   }
 
-  async search(branch, query, next) {
+  async search(session, branch, query, next) {
     return next();
   }
 

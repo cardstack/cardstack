@@ -1,8 +1,17 @@
 const Error = require('@cardstack/plugin-utils/error');
 const find = require('../async-find');
 
+const legalFieldName = /^[a-zA-Z0-9](?:[-_a-zA-Z0-9]*[a-zA-Z0-9])?$/;
+
 module.exports = class Field {
+  static isValidName(name) {
+    return legalFieldName.test(name);
+  }
+
   constructor(model, plugins, allGrants, defaultValues, authLog) {
+    if (!Field.isValidName(model.id)) {
+      throw new Error(`${model.id} is not a valid field name. We follow JSON:API spec for valid member names, see http://jsonapi.org/format/#document-member-names`);
+    }
     this.id = model.id;
     this.authLog = authLog;
     if (!model.attributes || !model.attributes['field-type']) {
@@ -188,7 +197,7 @@ module.exports = class Field {
       this.authLog.debug("approved field write for %s because it matches server provided default", this.id);
     } else if (pendingChange.originalDocument && value === this.valueFrom(pendingChange, 'originalDocument')) {
       this.authLog.debug("approved field write for %s because it was unchanged", this.id);
-    } else if ((grant = await find(this.grants, async g => g['may-write-field'] && await g.matches(pendingChange, context)))) {
+    } else if ((grant = await find(this.grants, async g => g['may-write-fields'] && await g.matches(pendingChange.finalDocument, context)))) {
       this.authLog.debug("approved field write for %s because of grant %s", this.id, grant.id);
     } else {
       // Denied

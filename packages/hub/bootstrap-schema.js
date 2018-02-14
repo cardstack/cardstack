@@ -81,9 +81,11 @@ const models = [
         data: [
           { type: 'fields', id: 'who' },
           { type: 'fields', id: 'may-create-resource' },
+          { type: 'fields', id: 'may-read-resource' },
           { type: 'fields', id: 'may-update-resource' },
           { type: 'fields', id: 'may-delete-resource' },
-          { type: 'fields', id: 'may-write-field' },
+          { type: 'fields', id: 'may-read-fields' },
+          { type: 'fields', id: 'may-write-fields' },
           { type: 'fields', id: 'types' },
           { type: 'fields', id: 'fields' }
         ]
@@ -458,6 +460,13 @@ const models = [
   },
   {
     type: 'fields',
+    id: 'may-read-resource',
+    attributes: {
+      'field-type': '@cardstack/core-types::boolean'
+    }
+  },
+  {
+    type: 'fields',
     id: 'may-update-resource',
     attributes: {
       'field-type': '@cardstack/core-types::boolean'
@@ -472,7 +481,14 @@ const models = [
   },
   {
     type: 'fields',
-    id: 'may-write-field',
+    id: 'may-read-fields',
+    attributes: {
+      'field-type': '@cardstack/core-types::boolean'
+    }
+  },
+  {
+    type: 'fields',
+    id: 'may-write-fields',
     attributes: {
       'field-type': '@cardstack/core-types::boolean'
     }
@@ -512,16 +528,18 @@ const models = [
   },
   {
     type: 'grants',
-    id: '0',
+    id: 'hub-internal-grant',
     attributes: {
-      'may-write-field': true,
+      'may-read-fields': true,
+      'may-write-fields': true,
       'may-create-resource': true,
+      'may-read-resource': true,
       'may-update-resource': true,
       'may-delete-resource': true
     },
     relationships: {
       who: {
-        data: { type: 'users', id: '@cardstack/hub' }
+        data: { type: 'groups', id: '@cardstack/hub' }
       }
     }
   },

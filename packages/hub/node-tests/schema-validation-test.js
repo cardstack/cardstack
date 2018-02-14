@@ -1,6 +1,5 @@
 const ElasticAssert = require('@cardstack/elasticsearch/node-tests/assertions');
 const JSONAPIFactory = require('../../../tests/stub-project/node_modules/@cardstack/test-support/jsonapi-factory');
-const { grantAllPermissions } = require('../../../tests/stub-project/node_modules/@cardstack/test-support/permissions');
 const PendingChange = require('@cardstack/plugin-utils/pending-change');
 const bootstrapSchema = require('../bootstrap-schema');
 const { Registry, Container } = require('@cardstack/di');
@@ -32,6 +31,17 @@ describe('schema/validation', function() {
 
     let titleField = factory.addResource('fields', 'title')
         .withAttributes({ fieldType: '@cardstack/core-types::string' });
+
+    // A wide-open grant, because we're not testing authorization here
+    // (that is covered in schema-auth-test.js).
+    factory.addResource('grants').withRelated('who', { type: 'groups', id: 'everyone' }).withAttributes({
+      mayCreateResource: true,
+      mayReadResource: true,
+      mayUpdateResource: true,
+      mayDeleteResource: true,
+      mayReadFields: true,
+      mayWriteFields: true
+    });
 
     factory.addResource('constraints')
       .withAttributes({
@@ -102,8 +112,6 @@ describe('schema/validation', function() {
             factory.addResource('default-values').withAttributes({ value: 0 })
           )
       ]);
-
-    grantAllPermissions(factory);
 
     let registry = new Registry();
     registry.register('config:project', { path: `${__dirname}/../../../tests/stub-project` });

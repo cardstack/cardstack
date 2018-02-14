@@ -1,9 +1,11 @@
 const Error = require('@cardstack/plugin-utils/error');
 const find = require('../async-find');
 const { flatten } = require('lodash');
+const Realms = require('./realms');
+const authLog = require('@cardstack/logger')('cardstack/auth');
 
 module.exports = class ContentType {
-  constructor(model, allFields, allConstraints, dataSources, defaultDataSource, allGrants, authLog) {
+  constructor(model, allFields, allConstraints, dataSources, defaultDataSource, allGrants) {
     let fields = new Map();
     if (model.relationships && model.relationships.fields) {
       for (let fieldRef of model.relationships.fields.data) {
@@ -38,8 +40,8 @@ module.exports = class ContentType {
       this.dataSource = null;
     }
     this.grants = allGrants.filter(g => g.types == null || g.types.includes(model.id));
+    this._realms = null;
     authLog.trace(`while constructing content type %s, %s of %s grants apply`, this.id, this.grants.length, allGrants.length);
-    this.authLog = authLog;
     this.constraints = allConstraints.filter(constraint => {
       return Object.values(constraint.fieldInputs).some(field => this.fields.get(field.id));
     });
@@ -135,19 +137,19 @@ module.exports = class ContentType {
     if (!finalDocument) {
       let grant = await find(this.grants, async g => g['may-delete-resource'] && await g.matches(originalDocument, context));
       if (grant) {
-        this.authLog.debug("approved deletion of %s %s because of grant %s", originalDocument.type, originalDocument.id, grant.id);
-        this.authLog.trace("grant %s = %j", grant.id, grant);
+        authLog.debug("approved deletion of %s %s because of grant %s", originalDocument.type, originalDocument.id, grant.id);
+        authLog.trace("grant %s = %j", grant.id, grant);
       } else {
-        this.authLog.trace("no matching deletion grant for %j in %j", context, this.grants);
+        authLog.trace("no matching deletion grant for %j in %j", context, this.grants);
         throw new Error("You may not delete this resource", { status: 401 });
       }
     } else if (!originalDocument) {
-      let grant = await find(this.grants, async g => g['may-create-resource'] && await g.matches(originalDocument, context));
+      let grant = await find(this.grants, async g => g['may-create-resource'] && await g.matches(finalDocument, context));
       if (grant) {
-        this.authLog.debug("approved creation of %s %s because of grant %s", finalDocument.type, finalDocument.id, grant.id);
-        this.authLog.trace("grant %s = %j", grant.id, grant);
+        authLog.debug("approved creation of %s %s because of grant %s", finalDocument.type, finalDocument.id, grant.id);
+        authLog.trace("grant %s = %j", grant.id, grant);
       } else {
-        this.authLog.trace("no matching creation grant for %j in %j", context, this.grants);
+        authLog.trace("no matching creation grant for %j in %j", context, this.grants);
         throw new Error("You may not create this resource", { status: 401 });
       }
     } else {
@@ -157,16 +159,51 @@ module.exports = class ContentType {
           (await g.matches(originalDocument, context))
       );
       if (grant) {
-        this.authLog.debug("approved update of %s %s because of grant %s", finalDocument.type, finalDocument.id, grant.id);
-        this.authLog.trace("grant %s = %j", grant.id, grant);
+        authLog.debug("approved update of %s %s because of grant %s", finalDocument.type, finalDocument.id, grant.id);
+        authLog.trace("grant %s = %j", grant.id, grant);
       } else {
-        this.authLog.trace("no matching update grant for %j in %j", context, this.grants);
+        authLog.trace("no matching update grant for %j in %j", context, this.grants);
         throw new Error("You may not update this resource", { status: 401 });
       }
     }
   }
 
+  get realms() {
+    if (!this._realms) {
+      this._realms = new Realms(this.grants);
+    }
+    return this._realms;
+  }
 
+  authorizedReadRealms(resource) {
+    return this.realms.authorizedReadRealms(resource);
+  }
+
+  applyReadAuthorization(resource, userRealms) {
+    if (!this.realms.mayReadResource(resource, userRealms)) {
+      return;
+    }
+    if (this.realms.mayReadAllFields(resource, userRealms)) {
+      return resource;
+    }
+    let output = { type: resource.type, id: resource.id };
+    if (resource.meta) {
+      output.meta = resource.meta;
+    }
+    for (let section of ['attributes', 'relationships']) {
+      if (resource[section]) {
+        for (let [fieldName, value] of Object.entries(resource[section])) {
+          if (this.realms.hasExplicitFieldGrant(resource, userRealms, fieldName)) {
+            if (!output[section]) {
+              output[section] = {};
+            }
+            output[section][fieldName] = value;
+          }
+        }
+      }
+    }
+    return output;
+  }
 
 };
 

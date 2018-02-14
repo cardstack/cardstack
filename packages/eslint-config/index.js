@@ -22,6 +22,7 @@ module.exports = {
     Promise: false,
     Map: false,
     WeakMap: false,
-    Symbol: false
+    Symbol: false,
+    Set: false
   }
 };

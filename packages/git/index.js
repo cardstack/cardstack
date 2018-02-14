@@ -1,5 +1,3 @@
-const whenEnabled = require('@cardstack/plugin-utils/when-enabled');
-
-module.exports = whenEnabled({
+module.exports = {
   "name": "@cardstack/git"
-});
+};

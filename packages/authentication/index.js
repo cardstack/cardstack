@@ -1,10 +1,9 @@
 /* eslint-env node */
 'use strict';
-const whenEnabled = require('@cardstack/plugin-utils/when-enabled');
 const Handlebars = require('handlebars');
 const log = require('@cardstack/logger')('cardstack/auth');
 
-module.exports = whenEnabled({
+module.exports = {
   name: '@cardstack/authentication',
   isDevelopingAddon() {
     return process.env.CARDSTACK_DEV;
@@ -35,4 +34,4 @@ module.exports = whenEnabled({
   }
 
 
-});
+};

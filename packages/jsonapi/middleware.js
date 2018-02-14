@@ -183,7 +183,7 @@ class Handler {
   }
 
   async handleCollectionGET(type) {
-    let { data: models, meta: { page }, included } = await this.searcher.search(this.branch, {
+    let { data: models, meta: { page }, included } = await this.searcher.search(this.session, this.branch, {
       filter: this.filterExpression(type),
       sort: this.query.sort,
       page: this.query.page,
@@ -228,7 +228,7 @@ class Handler {
   }
 
   async _lookupRecord(type, id) {
-    let record = await this.searcher.get(this.branch, type, id);
+    let record = await this.searcher.get(this.session, this.branch, type, id);
     return record;
   }
 
