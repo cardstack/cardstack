@@ -27,7 +27,8 @@ module.exports = declareInjections({
   writer: 'hub:writers',
   indexers: 'hub:indexers',
   sources: 'hub:data-sources',
-  controllingBranch: 'hub:controlling-branch'
+  controllingBranch: 'hub:controlling-branch',
+  currentSchema: 'hub:current-schema'
 },
 
 class Authentication {
@@ -152,13 +153,31 @@ class Authentication {
       return;
     }
 
-    let tokenMeta = await this.createToken({ id: user.data.id, type: user.data.type }, source.tokenExpirySeconds);
+    let sessionPayload = { id: user.data.id, type: user.data.type };
+    let session = new Session(sessionPayload, this.userSearcher);
+    let tokenMeta = await this.createToken(sessionPayload, source.tokenExpirySeconds);
     if (!user.data.meta) {
       user.data.meta = tokenMeta;
     } else {
       Object.assign(user.data.meta, tokenMeta);
     }
-    ctxt.body = user;
+
+    let schema = await this.currentSchema.forControllingBranch();
+    let authorizedUser = await schema.applyReadAuthorization(user, { session });
+    if (!authorizedUser) {
+      // User has no grant to even see that their own record
+      // exists. But users necessarily know they exists if they're
+      // able to log in, so we default to an empty document.
+      authorizedUser = {
+        data: {
+          type: user.data.type,
+          id: user.data.id,
+          meta: user.data.meta
+        }
+      };
+    }
+
+    ctxt.body = authorizedUser;
     ctxt.status = 200;
   }
 

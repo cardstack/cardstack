@@ -14,6 +14,22 @@ describe('authentication/middleware', function() {
   async function setup() {
     let factory = new JSONAPIFactory();
 
+    factory.addResource('grants')
+      .withRelated('who', { type: 'fields', id: 'id' })
+      .withRelated('types', [
+        { type: 'content-types', id: 'test-users' },
+        { type: 'content-types', id: 'doggies' }
+      ])
+      .withRelated('fields', [
+        { type: 'fields', id: 'full-name' },
+        { type: 'fields', id: 'email' },
+        { type: 'fields', id: 'favorite-toy' }
+      ])
+      .withAttributes({
+        mayReadResource: true,
+        mayReadFields: true
+      });
+
     quint = factory.addResource('test-users').withAttributes({
       email: 'quint@example.com',
       fullName: "Quint Faulkner"
@@ -27,7 +43,8 @@ describe('authentication/middleware', function() {
     vanGogh = factory.addResource('doggies').withAttributes({
       email: 'vanny@example.com',
       fullName: 'Van Gogh Abdel-Rahman',
-      favoriteToy: 'squeaky snake'
+      favoriteToy: 'squeaky snake',
+      secretRating: 'Good Boy'
     });
 
     factory.addResource('data-sources', 'echo').withAttributes({
@@ -111,6 +128,9 @@ describe('authentication/middleware', function() {
         "attributes": {
           "full-name": "{{data.attributes.fullName}}",
           "email": "{{data.attributes.email}}"
+          {{#if data.attributes.secret-rating}}
+          ,"secret-rating": "{{data.attributes.secret-rating}}"
+          {{/if}}
         }
       }}`,
       userCorrelationQuery: `{
@@ -121,14 +141,7 @@ describe('authentication/middleware', function() {
       mayCreateUser: true
     });
 
-    factory.addResource('content-types', 'test-users').withRelated('fields', [
-      factory.addResource('fields', 'full-name').withAttributes({
-        fieldType: '@cardstack/core-types::string'
-      }),
-      factory.addResource('fields', 'email').withAttributes({
-        fieldType: '@cardstack/core-types::string'
-      })
-    ]);
+    // test-users content-type is standard in createDefaultEnvironment
 
     factory.addResource('content-types', 'doggies').withRelated('fields', [
       factory.addResource('fields', 'full-name').withAttributes({
@@ -138,6 +151,9 @@ describe('authentication/middleware', function() {
         fieldType: '@cardstack/core-types::string'
       }),
       factory.addResource('fields', 'favorite-toy').withAttributes({
+        fieldType: '@cardstack/core-types::string'
+      }),
+      factory.addResource('fields', 'secret-rating').withAttributes({
         fieldType: '@cardstack/core-types::string'
       })
     ]);
@@ -503,6 +519,7 @@ describe('authentication/middleware', function() {
         expect(response.body).has.deep.property('data.attributes.email', 'vanny@example.com');
         expect(response.body).has.deep.property('data.attributes.full-name', 'Van Gogh Abdel-Rahman');
         expect(response.body).has.deep.property('data.attributes.favorite-toy', 'squeaky snake');
+        expect(response.body).not.has.deep.property('data.attributes.secret-rating');
 
         await env.lookup('hub:indexers').update({ realTime: true });
 
@@ -515,7 +532,8 @@ describe('authentication/middleware', function() {
         expect(response.body.user.data.attributes).deep.equals({
           'full-name': 'Van Gogh Abdel-Rahman',
           email: 'vanny@example.com',
-          'favorite-toy': 'squeaky snake'
+          'favorite-toy': 'squeaky snake',
+          'secret-rating': 'Good Boy'
         });
       });
 
@@ -573,7 +591,8 @@ describe('authentication/middleware', function() {
             type: 'doggies',
             attributes: {
               fullName: 'Ringo Abdel-Rahman',
-              email: 'ringo@example.com'
+              email: 'ringo@example.com',
+              "secret-rating": "Good Boy"
             }
           }
         });
@@ -584,6 +603,7 @@ describe('authentication/middleware', function() {
         expect(response.body).has.deep.property('data.attributes.email', 'ringo@example.com');
         expect(response.body).has.deep.property('data.attributes.full-name', 'Ringo Abdel-Rahman');
         expect(response.body).has.deep.property('data.attributes.favorite-toy', null);
+        expect(response.body).not.has.deep.property('data.attributes.secret-rating');
 
         await env.lookup('hub:indexers').update({ realTime: true });
 
@@ -596,10 +616,26 @@ describe('authentication/middleware', function() {
         expect(response.body.user.data.attributes).deep.equals({
           'full-name': 'Ringo Abdel-Rahman',
           email: 'ringo@example.com',
-          'favorite-toy': null
+          'favorite-toy': null,
+          "secret-rating": "Good Boy"
         });
       });
 
+      it('fields that are hidden from the user are not present in the response', async function() {
+        let response = await request.post(`/auth/correlate-doggies`).send({
+          data: {
+            id: 'w00fw00f',
+            type: 'doggies',
+            attributes: {
+              fullName: 'Ringo Abdel-Rahman',
+              email: 'ringo@example.com',
+              "secret-rating": "Good Boy"
+            }
+          }
+        });
+        expect(response).hasStatus(200);
+        expect(response.body).not.has.deep.property('data.attributes.secret-rating');
+      });
     });
   });
 });
