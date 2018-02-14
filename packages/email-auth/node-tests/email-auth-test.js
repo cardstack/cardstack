@@ -14,6 +14,16 @@ describe('email-auth', function() {
   async function setup() {
     let factory = new JSONAPIFactory();
 
+    factory.addResource('grants')
+      .withRelated('who', { type: 'fields', id: 'id' })
+      .withRelated('types', [
+        { type: 'content-types', id: 'users' }
+      ])
+      .withAttributes({
+        mayReadResource: true,
+        mayReadFields: true
+      });
+
     factory.addResource('users', 'valid-quint-id').withAttributes({
       email: 'quint@example.com',
     });
