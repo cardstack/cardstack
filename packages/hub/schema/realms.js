@@ -1,4 +1,5 @@
 const Grant = require('./grant');
+const { flatten } = require('lodash');
 
 module.exports = class Realms {
   constructor(grants) {
@@ -67,7 +68,7 @@ module.exports = class Realms {
     if (userRealms.find(realm => this._resourceReaders.has(realm))) {
       return true;
     }
-    let dynamicRealms = this._dynamicResourceReaders.map(fieldName => Grant.readField(resource, fieldName));
+    let dynamicRealms = this._dynamicRealms(this._dynamicResourceReaders, resource);
     return Boolean(userRealms.find(realm => dynamicRealms.includes(realm)));
   }
 
@@ -75,7 +76,7 @@ module.exports = class Realms {
     if (userRealms.find(realm => this._allFieldReaders.has(realm))) {
       return true;
     }
-    let dynamicRealms = this._dynamicAllFieldReaders.map(fieldName => Grant.readField(resource, fieldName));
+    let dynamicRealms = this._dynamicRealms(this._dynamicAllFieldReaders, resource);
     return Boolean(userRealms.find(realm => dynamicRealms.includes(realm)));
   }
 
@@ -92,13 +93,17 @@ module.exports = class Realms {
     }
     allowedRealms = this._dynamicFieldReaders.get(fieldName);
     if (allowedRealms) {
-      let dynamicRealms = allowedRealms.map(fieldName => Grant.readField(resource, fieldName));
+      let dynamicRealms = this._dynamicRealms(allowedRealms, resource);
       return Boolean(userRealms.find(realm => dynamicRealms.includes(realm)));
     }
   }
 
+  _dynamicRealms(fieldNames, resource) {
+    return flatten(fieldNames.map(fieldName => Grant.readRealmsFromField(resource, fieldName)));
+  }
+
   authorizedReadRealms(resource) {
-    let dynamicRealms = this._dynamicResourceReaders.map(fieldName => Grant.readField(resource, fieldName));
+    let dynamicRealms = this._dynamicRealms(this._dynamicResourceReaders, resource);
     return [...this._resourceReaders].concat(dynamicRealms);
   }
 

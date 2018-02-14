@@ -3,10 +3,12 @@
   DISCLAIMER: I'm documenting how I want these to work. I have not yet
   certified that they do. -ef4
 
+  About Grants
+  ============
 
   A grant is a combination of:
 
-   - a group that is receiving permissions
+   - a group that is receiving permissions, determined by the `who` relationship
 
    - one or more permissions (may-read-resource, may-write-fields, etc)
 
@@ -18,7 +20,21 @@
      permissions in the grant to only the listed fields.
 
 
+  Who: Assigning the Group
+  ========================
+
+  There are two ways to use the `who` relationship.
+
+  1. It refers to { type: 'groups', id: someGroupId }, in which case
+     it will apply to users who are members of that group.
+
+  2. It refers to { type: 'fields', id: someFieldName }, in which case
+     the group id will be determined dynamically by looking at the
+     value of given resource's field. If the field is a relationship,
+     we will use the id or ids found in that relationship.
+
   Permissions Architecture
+  ========================
 
   Permissions fall into two categories: per-resource and
   per-field. Here I will explain how permissions interact under each
@@ -174,27 +190,38 @@ module.exports = class Grant {
   async matches(resource, context) {
     let groupIds = await (context.session || Session.EVERYONE).realms();
 
-    let effectiveGroupId;
+    let effectiveGroupIds;
     if (this.groupField != null) {
-      effectiveGroupId = Grant.readField(resource, this.groupField);
+      effectiveGroupIds = Grant.readRealmsFromField(resource, this.groupField);
     } else {
-      effectiveGroupId = this.groupId;
+      effectiveGroupIds = [this.groupId];
     }
 
-    let matches = (effectiveGroupId != null) && groupIds.includes(effectiveGroupId);
-    log.trace('testing grant id=%s effectiveGroupId=%s resource=%j context=%j matches=%s', this.id, effectiveGroupId, resource, context, !!matches);
+    let matches = effectiveGroupIds.find(g => groupIds.includes(g));
+    log.trace('testing grant id=%s effectiveGroupIds=%j resource=%j context=%j matches=%s', this.id, effectiveGroupIds, resource, context, !!matches);
     return matches;
   }
 
-  static readField(resource, fieldName) {
+  static readRealmsFromField(resource, fieldName) {
     if (fieldName === 'id') {
-      return resource.id;
+      return [resource.id];
     }
     if (fieldName === 'type') {
-      return resource.type;
+      return [resource.type];
     }
     if (resource.attributes && resource.attributes.hasOwnProperty(fieldName)) {
-      return resource.attributes[fieldName];
+      return [resource.attributes[fieldName]];
     }
+    if (resource.relationships && resource.relationships.hasOwnProperty(fieldName)) {
+      let fieldValue = resource.relationships[fieldName];
+      if (fieldValue.data) {
+        if (Array.isArray(fieldValue.data)) {
+          return fieldValue.data.map(ref => ref.id);
+        } else {
+          return [fieldValue.data.id];
+        }
+      }
+    }
+    return [];
   }
 };

@@ -807,4 +807,36 @@ describe('schema/auth/read', function() {
     expect(approved).not.has.deep.property('data.attributes.title');
   });
 
+  it("approves relationship-conditional grant", async function() {
+    let model = await find('posts', '1');
+    let factory = new JSONAPIFactory();
+
+    factory.addResource('grants')
+      .withRelated('who', { type: 'fields', id: 'tags' })
+      .withAttributes({
+        mayReadResource: true
+      });
+
+    let session = new Session({ type: 'test-users', id: 'one' });
+    let schema = await baseSchema.applyChanges(factory.getModels().map(model => ({ type: model.type, id: model.id, document: model })));
+    let approved = await schema.applyReadAuthorization(model, { session });
+    expect(approved).has.deep.property('data.id', '1');
+  });
+
+  it("rejects relationship-conditional grant", async function() {
+    let model = await find('posts', '1');
+    let factory = new JSONAPIFactory();
+
+    factory.addResource('grants')
+      .withRelated('who', { type: 'fields', id: 'tags' })
+      .withAttributes({
+        mayReadResource: true
+      });
+
+    let session = new Session({ type: 'test-users', id: 'seven' });
+    let schema = await baseSchema.applyChanges(factory.getModels().map(model => ({ type: model.type, id: model.id, document: model })));
+    let approved = await schema.applyReadAuthorization(model, { session });
+    expect(approved).to.be.undefined;
+  });
+
 });
