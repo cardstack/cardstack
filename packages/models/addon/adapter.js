@@ -2,10 +2,13 @@ import DS from 'ember-data';
 import AdapterMixin from 'ember-resource-metadata/adapter-mixin';
 import Ember from 'ember';
 import { hubURL } from '@cardstack/plugin-utils/environment';
+import injectOptional from 'ember-inject-optional';
 
 export default DS.JSONAPIAdapter.extend(AdapterMixin, {
   host: hubURL,
   namespace: 'api',
+  cardstackSession: injectOptional.service(),
+  session: injectOptional.service(),
 
   // queryRecord can use the hub's page.size control to just do a
   // query of with a limit of 1.
@@ -23,6 +26,27 @@ export default DS.JSONAPIAdapter.extend(AdapterMixin, {
       returnValue.meta = response.meta;
     }
     return returnValue;
-  }
+  },
+
+  ajaxOptions() {
+    let hash = this._super(...arguments);
+
+    if (this.get('cardstackSession')) {
+      // @cardstack/authentication is available. If it has a valid
+      // session, apply the token to our request
+
+      let { beforeSend } = hash;
+
+      hash.beforeSend = (xhr) => {
+        this.get('session').authorize('authorizer:cardstack', (headerName, headerValue) => {
+          xhr.setRequestHeader(headerName, headerValue);
+        });
+        if (beforeSend) {
+          beforeSend(xhr);
+        }
+      };
+    }
+    return hash;
+  },
 
 });
