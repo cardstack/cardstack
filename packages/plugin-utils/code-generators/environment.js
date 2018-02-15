@@ -1,4 +1,6 @@
 const Handlebars = require('handlebars');
+const { declareInjections } = require('@cardstack/di');
+
 const template = Handlebars.compile(`
 define("@cardstack/plugin-utils/environment", ["exports"], function (exports) {
   "use strict";
@@ -11,10 +13,11 @@ define("@cardstack/plugin-utils/environment", ["exports"], function (exports) {
 });
 `);
 
-module.exports = class {
-  static create() {
-    return new this();
-  }
+module.exports = declareInjections({
+  publicURL: 'config:public-url'
+},
+
+class {
   async generateCode(appModulePrefix, branch) {
     let env = Object.assign(this._content(), { appModulePrefix, branch });
     return template({ properties: Object.entries(env).map(([name, value]) => ({ name, value })) });
@@ -22,8 +25,8 @@ module.exports = class {
   _content() {
     return {
       defaultBranch: 'master',
-      hubURL: 'http://localhost:3000',
+      hubURL: this.publicURL.url,
       compiledAt: new Date().toISOString()
     };
   }
-};
+});
