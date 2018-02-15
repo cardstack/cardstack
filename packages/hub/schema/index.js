@@ -17,6 +17,7 @@ class Schema {
     this.dataSources = dataSources;
     this.plugins = plugins;
     this._mapping = null;
+    this._customAnalyzers = null;
     this._originalModels = inputModels;
     this.schemaLoader = schemaLoader;
   }
@@ -133,6 +134,28 @@ class Schema {
         });
       }
     }
+  }
+
+  customAnalyzers() {
+    if (!this._customAnalyzers) {
+
+      let allAnalyzers;
+      for (let contentType of this.types.values()) {
+        let analyzers = contentType.customAnalyzers();
+        if (analyzers) {
+          if (!allAnalyzers) {
+            allAnalyzers = {};
+          }
+          Object.assign(allAnalyzers, analyzers);
+        }
+      }
+
+      if (allAnalyzers) {
+        this._customAnalyzers = allAnalyzers;
+      }
+    }
+
+    return this._customAnalyzers;
   }
 
   mapping() {

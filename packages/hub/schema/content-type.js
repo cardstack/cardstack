@@ -132,6 +132,20 @@ module.exports = class ContentType {
     return { properties };
   }
 
+  customAnalyzers() {
+    let analyzers;
+    for (let field of this.fields.values()) {
+      let analyzer = field.customAnalyzer();
+      if (analyzer) {
+        if (!analyzers) {
+          analyzers = {};
+        }
+        Object.assign(analyzers, analyzer);
+      }
+    }
+    return analyzers;
+  }
+
   async _validateResourceLevelAuthorization(pendingChange, context) {
     let { originalDocument, finalDocument } = pendingChange;
     if (!finalDocument) {

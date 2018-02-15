@@ -212,6 +212,13 @@ module.exports = class Field {
     this._validateFormat(value, errors);
     return errors;
   }
+
+  customAnalyzer() {
+    if (typeof this.plugin.customAnalyzer === 'function') {
+      return Object.assign({}, this.plugin.customAnalyzer());
+    }
+  }
+
   mapping(searchTree, allFields) {
     let m = {
       [this.id]: Object.assign({}, this.plugin.defaultMapping(allFields))
