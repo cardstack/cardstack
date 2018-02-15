@@ -90,12 +90,19 @@ module.exports = class SearchClient {
     } else {
       this.log.debug('%s: mapping needs update', branch);
       let tmpIndex = this._tempIndexName(branch);
-      await this.es.indices.create({
+      let esArgs = {
         index: tmpIndex,
         body: {
           mappings: await this._rewriteMapping(branch, wantMapping, 'logicalFieldToES')
         }
-      });
+      };
+      let analyzer = schema.customAnalyzers();
+      if (analyzer) {
+        esArgs.body.settings = {
+          analysis: { analyzer }
+        };
+      }
+      await this.es.indices.create(esArgs);
       await this._reindex(tmpIndex, branch);
     }
   }

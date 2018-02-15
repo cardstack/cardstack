@@ -22,12 +22,16 @@ describe('hub/searchers', function() {
       }),
       factory.addResource('fields', 'example-size').withAttributes({
         fieldType: '@cardstack/core-types::string'
+      }),
+      factory.addResource('fields', 'topping').withAttributes({
+        fieldType: '@cardstack/core-types::case-insensitive'
       })
     ]);
 
     chocolate = factory.addResource('examples').withAttributes({
       exampleFlavor: 'chocolate',
-      exampleSize: 'large'
+      exampleSize: 'large',
+      topping: 'sprinkles'
     });
 
     env = await createDefaultEnvironment(`${__dirname}/../../../tests/stub-searcher`, factory.getModels());
@@ -73,6 +77,13 @@ describe('hub/searchers', function() {
     let response = await env.lookup('hub:searchers').search(env.session, 'master', { filter: { 'example-flavor': { exact: 'chocolate' } } });
     expect(response.data).length(1);
     expect(response.data[0].attributes['example-flavor']).to.equal('chocolate');
+  });
+
+  it("searchers#search finds record via internal searcher with custom analyzer", async function() {
+    await setup({});
+    let response = await env.lookup('hub:searchers').search(env.session, 'master', { filter: { 'topping': { exact: 'SPriNkLeS' } } });
+    expect(response.data).length(1);
+    expect(response.data[0].attributes['topping']).to.equal('sprinkles');
   });
 
   it("a plugin's searchers#search can run before the internal searcher", async function() {
