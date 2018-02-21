@@ -108,7 +108,7 @@ async function spawnHub(packageName, configPath, environment, port, url) {
     process.env[key] = value;
   }
 
-  let proc = spawn(bin, args, { stdio: [0, 1, 2, 'ipc']  });
+  let proc = spawn(process.execPath, [bin, ...args], { stdio: [0, 1, 2, 'ipc']  });
   await new Promise((resolve, reject) => {
     // by convention the hub will send a hello message if it sees we
     // are supervising it over IPC. If we get an error or exit before
