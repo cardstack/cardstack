@@ -74,8 +74,8 @@ let addon = {
       // we wait until here to require this because in the
       // containerized case, "main" and its recursive dependencies
       // never need to load on the host environment.
-      let { spawnHub } = require('./main');
-      return spawnHub(this.project.pkg.name, this.project.configPath(), this._env, process.env.HUB_PORT || 3000);
+      let StartNative = require('./commands/start-native');
+      return StartNative.spawnHub(this.project.pkg.name, this.project.configPath(), this._env, process.env.HUB_PORT || 3000);
     }
   },
 

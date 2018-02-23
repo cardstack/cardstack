@@ -33,20 +33,25 @@ async function runServer(options, seedModels) {
 
 function commandLineOptions() {
   commander
-    .usage('[options] <seed-config-directory>')
-    .option('-p --port <port>', 'Server listen port', 3000)
-    .option('-u --url <url>', "Server's public base URL. Defaults to http://localhost:$PORT.")
-    .option('-c --containerized', 'Run the hub in container mode (temporary feature flag)')
-    .option('-l --leave-services-running', 'Leave dockerized services running, to improve future startup time')
-    .option('--heartbeat', 'Shut down after not receiving a heartbeat from ember-cli')
+    .usage(`
+
+Cardstack Hub takes all its basic settings via environment variables:
+
+CARDSTACK_SESSIONS_KEY  Required  A base64-encoded 32 byte random key for securing sessions. You can generate one using "yarn run cardstack-generate-key".
+SEED_DIR                Required  The path to your seed configuration files.
+ELASTICSEARCH                     The URL to our Elasticsearch instance. Defaults to http://localhost:9200
+PORT                              Port to bind to. Defaults to 3000.
+PUBLIC_HUB_URL                    The public URL at which the Hub can be accessed. Defaults to http://localhost:$PORT.
+`)
     .parse(process.argv);
 
-  if (commander.args.length < 1) {
+  if (!process.env.SEED_DIR) {
+    process.stderr.write("You must set the SEED_DIR environment variable.\n");
     commander.outputHelp();
     process.exit(-1);
   }
 
-  commander.seedConfigDirectory = path.resolve(commander.args[0]);
+  commander.seedConfigDirectory = path.resolve(process.env.SEED_DIR);
 
   let base64Key = process.env.CARDSTACK_SESSIONS_KEY;
   let base64KeyPath = process.env.CARDSTACK_SESSIONS_KEY_FILE;
@@ -61,8 +66,25 @@ function commandLineOptions() {
     }
     commander.sessionsKey = new Buffer(base64Key, 'base64');
   } else {
-    process.stderr.write("You must provide a CardStack session encryption secret, via the CARDSTACK_SESSIONS_KEY or CARDSTACK_SESSIONS_KEY_FILE environment variables. You can generate one by running @cardstack/hub/bin/generate-key.js\n");
+    process.stderr.write("You must set the CARDSTACK_SESSIONS_KEY environment variable.\n");
+    commander.outputHelp();
     process.exit(-1);
+  }
+
+  // The ELASTICSEARCH env var is consumed directly
+  // by @cardstack/elasticsearch/client, so we aren't putting it into
+  // our return value here.
+
+  if (process.env.PORT) {
+    commander.port = parseInt(process.env.PORT, 10);
+  } else {
+    commander.port = 3000;
+  }
+
+  if (process.env.PUBLIC_HUB_URL) {
+    commander.url = process.env.PUBLIC_HUB_URL;
+  } else {
+    commander.url = `http://localhost:${commander.port}`;
   }
 
   return commander;
@@ -105,4 +127,7 @@ process.on('disconnect', () => {
 
 let options = commandLineOptions();
 let seedModels = loadSeedModels(options);
-runServer(options, seedModels);
+runServer(options, seedModels).catch(err => {
+  log.error("Server failed to start cleanly: %s", err.stack || err);
+  process.exit(-1);
+});

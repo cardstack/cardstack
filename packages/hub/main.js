@@ -5,8 +5,6 @@ let EmberConnection;
 let Orchestrator;
 
 const log = require('@cardstack/logger')('cardstack/server');
-const path = require('path');
-const { spawn } = require('child_process');
 
 
 async function wireItUp(projectDir, encryptionKeys, seedModels, opts = {}) {
@@ -76,55 +74,6 @@ async function httpLogging(ctxt, next) {
   log.info('finish %s %s %s', ctxt.request.method, ctxt.request.originalUrl, ctxt.response.status);
 }
 
-function prepareSpawnHub(packageName, configPath, environment, port, explicitURL) {
-  let setEnvVars = Object.create(null);
-  if (!process.env.CARDSTACK_SESSIONS_KEY) {
-    const crypto = require('crypto');
-    let key = crypto.randomBytes(32);
-    setEnvVars.CARDSTACK_SESSIONS_KEY = key.toString('base64');
-  }
-  if (!process.env.DEBUG && environment === 'development') {
-    setEnvVars.DEBUG = 'cardstack/*';
-  }
-  if (!process.env.DEBUG_COLORS) {
-    setEnvVars.DEBUG_COLORS='yes';
-  }
-  if (!process.env.ELASTICSEARCH_PREFIX) {
-    setEnvVars.ELASTICSEARCH_PREFIX = packageName.replace(/^[^a-zA-Z]*/, '').replace(/[^a-zA-Z0-9]/g, '_') + '_' + environment;
-  }
-
-  let seedDir = path.join(path.dirname(configPath),
-                          '..', 'cardstack', 'seeds', environment);
-
-  let bin = path.join(__dirname, 'bin', 'cardstack-hub.js');
-  let url = explicitURL || `http://localhost:${port}`;
-  return { setEnvVars, bin, args: [seedDir, '--port', port, '--url', url] };
-}
-
-async function spawnHub(packageName, configPath, environment, port, url) {
-  let { setEnvVars, bin, args } = prepareSpawnHub(packageName, configPath, environment, port, url);
-
-  for (let [key, value] of Object.entries(setEnvVars)) {
-    process.env[key] = value;
-  }
-
-  let proc = spawn(process.execPath, [bin, ...args], { stdio: [0, 1, 2, 'ipc']  });
-  await new Promise((resolve, reject) => {
-    // by convention the hub will send a hello message if it sees we
-    // are supervising it over IPC. If we get an error or exit before
-    // that, it's a failure to spawn the hub.
-    proc.on('message', message => {
-      if (message === 'hub hello') {
-        resolve();
-      }
-    });
-    proc.on('error', reject);
-    proc.on('exit', reject);
-  });
-  return `http://localhost:${port}`;
-}
 
 exports.wireItUp = wireItUp;
 exports.makeServer = makeServer;
-exports.spawnHub = spawnHub;
-exports.prepareSpawnHub = prepareSpawnHub;
