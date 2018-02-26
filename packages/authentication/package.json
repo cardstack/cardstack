@@ -29,6 +29,7 @@
     "@cardstack/plugin-utils": "^0.5.2",
     "ember-cli-babel": "^6.8.2",
     "ember-cli-htmlbars": "^2.0.1",
+    "ember-css-url": "0.2.0",
     "ember-fetch": "^1.4.0",
     "ember-inflector": "^1.11.0",
     "ember-simple-auth": "^1.2.2",

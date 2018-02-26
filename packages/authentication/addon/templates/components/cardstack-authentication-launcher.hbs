@@ -2,7 +2,7 @@
   {{#if network.iconUrl}}
     <div class="cardstack-rail-item cardstack-non-interactive">
       <div class="cardstack-network-icon"
-           style="background-image: url('{{network.iconUrl}}')">{{network.name}}</div>
+           style={{css-url "background-image" network.iconUrl}} >{{network.name}}</div>
     </div>
   {{/if}}
   {{#if session.user}}

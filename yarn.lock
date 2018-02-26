@@ -3126,6 +3126,12 @@ ember-cookies@^0.0.13:
     ember-cli-babel "^5.1.7"
     ember-getowner-polyfill "^1.2.2"
 
+ember-css-url@0.2.0:
+  version "0.2.0"
+  resolved "https://registry.yarnpkg.com/ember-css-url/-/ember-css-url-0.2.0.tgz#109a04a93a2e3af71c8ac3b56aec42407eb35d0b"
+  dependencies:
+    ember-cli-babel "^6.6.0"
+
 ember-data-relationship-tracker@^0.1.0:
   version "0.1.0"
   resolved "https://registry.yarnpkg.com/ember-data-relationship-tracker/-/ember-data-relationship-tracker-0.1.0.tgz#e0f29511a93f8fb98c0522013b3c540176be4ff3"
