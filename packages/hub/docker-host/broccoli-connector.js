@@ -1,6 +1,6 @@
 const path = require('path');
 const fs = require('fs');
-const http = require('http');
+const request = require('superagent');
 const {promisify} = require('util');
 const writeFile = promisify(fs.writeFile);
 
@@ -24,46 +24,27 @@ class CodeWriter extends Plugin {
       return;
     }
 
-    return new Promise(function(resolve, reject) {
-
-      let request = http.get(url, function(response) {
-          if (response.statusCode < 300) { // good response
-
-            let output = fs.createWriteStream(filePath);
-            response.pipe(output);
-            response.on('end', resolve);
-
-          } else { // error response
-            let body = [];
-            response.on('data', (chunk) => body.push(chunk));
-            response.on('end', function() {
-
-              let msg =
-chalk`
+    try {
+      let response = await request.get(url).buffer(true);
+      await writeFile(filePath, response.text, );
+    }
+    catch(err) { // superagent will throw for all non-success status codes as well as for lower level network errors
+      let msg;
+      if (err.response) {
+        msg = chalk`
 {bold.red Invalid response for generated code from Cardstack Hub. Please resolve the issue, and try again}
-{yellow GET ${url}: ${response.statusCode} ${response.statusMessage}}
-{yellow ${body.join('')}}
+{yellow GET ${url}: ${err.response.status}}
+{yellow ${err.response.text}}
 `.trim();
 
-              let err = new Error();
-              err.stack = msg;
-              reject(err);
-              // This doesn't actually exit the process! Ember-cli traps this thing and waits for the broccoli
-              // build to finish.
-              process.exit();
-            });
-          }
-      });
-
-      request.on('error', function() { // no response
-        let err = new Error();
-        err.stack = chalk.red.bold("Couldn't reach Cardstack Hub. Please make sure it's running, with `ember hub:start`");
-        reject(err);
-        // This doesn't actually exit the process! Ember-cli traps this thing and waits for the broccoli
-        // build to finish.
-        process.exit();
-      });
-    });
+      } else {
+        msg = chalk`
+{bold.red Unable to contact Cardstack Hub to generate code. Please resolve the issue, and try again}
+{yellow GET ${url}: ${err}}
+`.trim();
+      }
+      throw new Error(msg);
+    }
   }
 }
 
