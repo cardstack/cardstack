@@ -83,7 +83,7 @@ const {
   Reference,
   Branch,
   Commit
-} = require('@cardstack/nodegit');
+} = require('nodegit');
 
 const Change = require("./change");
 

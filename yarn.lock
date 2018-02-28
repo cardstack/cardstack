@@ -8,17 +8,6 @@
   dependencies:
     ms "2.0.0"
 
-"@cardstack/nodegit@0.19.0-cardstack.0":
-  version "0.19.0-cardstack.0"
-  resolved "https://registry.yarnpkg.com/@cardstack/nodegit/-/nodegit-0.19.0-cardstack.0.tgz#c106bb3733ff3d4f7ce39a62e369c8d42476ac08"
-  dependencies:
-    fs-extra "~0.26.2"
-    lodash "^4.13.1"
-    nan "^2.2.0"
-    node-gyp "^3.5.0"
-    node-pre-gyp "~0.6.32"
-    promisify-node "~0.3.0"
-
 "@ember/test-helpers@^0.7.1":
   version "0.7.1"
   resolved "https://registry.yarnpkg.com/@ember/test-helpers/-/test-helpers-0.7.1.tgz#14ba828ebc5b7b0e6eb7889352cb40af0c995349"
@@ -4237,7 +4226,7 @@ fs-extra@^0.24.0:
     path-is-absolute "^1.0.0"
     rimraf "^2.2.8"
 
-fs-extra@^0.26.0, fs-extra@~0.26.2:
+fs-extra@^0.26.0:
   version "0.26.7"
   resolved "https://registry.yarnpkg.com/fs-extra/-/fs-extra-0.26.7.tgz#9ae1fdd94897798edab76d0918cf42d0c3184fa9"
   dependencies:
@@ -4287,6 +4276,16 @@ fs-extra@^4.0.0, fs-extra@^4.0.1, fs-extra@^4.0.2:
     graceful-fs "^4.1.2"
     jsonfile "^4.0.0"
     universalify "^0.1.0"
+
+fs-extra@~0.27.0:
+  version "0.27.0"
+  resolved "https://registry.yarnpkg.com/fs-extra/-/fs-extra-0.27.0.tgz#66d4c25d1d2c6a8dafed7718cfcffe930f13b2c0"
+  dependencies:
+    graceful-fs "^4.1.2"
+    jsonfile "^2.1.0"
+    klaw "^1.0.0"
+    path-is-absolute "^1.0.0"
+    rimraf "^2.2.8"
 
 fs-readdir-recursive@^0.1.0:
   version "0.1.2"
@@ -6432,9 +6431,13 @@ mute-stream@0.0.7, mute-stream@~0.0.4:
   version "0.0.7"
   resolved "https://registry.yarnpkg.com/mute-stream/-/mute-stream-0.0.7.tgz#3075ce93bc21b8fab43e1bc4da7e8115ed1e7bab"
 
-nan@^2.2.0, nan@^2.3.0:
+nan@^2.3.0:
   version "2.7.0"
   resolved "https://registry.yarnpkg.com/nan/-/nan-2.7.0.tgz#d95bf721ec877e08db276ed3fc6eb78f9083ad46"
+
+nan@^2.9.2:
+  version "2.9.2"
+  resolved "https://registry.yarnpkg.com/nan/-/nan-2.9.2.tgz#f564d75f5f8f36a6d9456cca7a6c4fe488ab7866"
 
 natural-compare@^1.4.0:
   version "1.4.0"
@@ -6461,7 +6464,7 @@ node-fetch@^2.0.0-alpha.3, node-fetch@^2.0.0-alpha.9:
   version "2.0.0-alpha.9"
   resolved "https://registry.yarnpkg.com/node-fetch/-/node-fetch-2.0.0-alpha.9.tgz#990c0634f510f76449a0d6f6eaec96b22f273628"
 
-node-gyp@^3.5.0:
+node-gyp@^3.6.2:
   version "3.6.2"
   resolved "https://registry.yarnpkg.com/node-gyp/-/node-gyp-3.6.2.tgz#9bfbe54562286284838e750eac05295853fa1c60"
   dependencies:
@@ -6515,7 +6518,7 @@ node-notifier@^5.0.1:
     shellwords "^0.1.0"
     which "^1.2.12"
 
-node-pre-gyp@^0.6.39, node-pre-gyp@~0.6.32:
+node-pre-gyp@^0.6.39, node-pre-gyp@~0.6.39:
   version "0.6.39"
   resolved "https://registry.yarnpkg.com/node-pre-gyp/-/node-pre-gyp-0.6.39.tgz#c00e96860b23c0e1420ac7befc5044e1d78d8649"
   dependencies:
@@ -6540,6 +6543,17 @@ nodegit-promise@~4.0.0:
   resolved "https://registry.yarnpkg.com/nodegit-promise/-/nodegit-promise-4.0.0.tgz#5722b184f2df7327161064a791d2e842c9167b34"
   dependencies:
     asap "~2.0.3"
+
+nodegit@0.21.0:
+  version "0.21.0"
+  resolved "https://registry.yarnpkg.com/nodegit/-/nodegit-0.21.0.tgz#9c81d446fadda73ad8ca4e39ddb2ab7845cfeae9"
+  dependencies:
+    fs-extra "~0.27.0"
+    lodash "^4.13.1"
+    nan "^2.9.2"
+    node-gyp "^3.6.2"
+    node-pre-gyp "~0.6.39"
+    promisify-node "~0.3.0"
 
 nodemailer@^4.0.1:
   version "4.4.0"

@@ -19,7 +19,7 @@
     "eslint-plugin-node": "^5.2.1"
   },
   "dependencies": {
-    "@cardstack/nodegit": "0.19.0-cardstack.0",
+    "nodegit": "0.21.0",
     "@cardstack/plugin-utils": "^0.5.2",
     "moment-timezone": "^0.5.11"
   },
