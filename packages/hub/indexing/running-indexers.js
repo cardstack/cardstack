@@ -1,4 +1,9 @@
 const { BranchUpdate, owningDataSource } = require('./branch-update');
+const DataSource = require('../schema/data-source');
+const log = require('@cardstack/logger')('cardstack/indexers');
+const { flatten } = require('lodash');
+
+log.registerFormatter('t', require('../table-log-formatter'));
 
 module.exports = class RunningIndexers {
   constructor(seedSchema, client) {
@@ -22,49 +27,49 @@ module.exports = class RunningIndexers {
     }
   }
 
-  async _loadSchemas() {
+  async _loadSchemaModels() {
     let newIndexers = [...this.seedSchema.dataSources.values()]
         .map(this._findIndexer.bind(this))
         .filter(Boolean);
     while (newIndexers.length > 0) {
-      let dirtyBranches = await this._activateIndexers(newIndexers);
-      newIndexers = [];
-      await Promise.all(dirtyBranches.map(async branch => {
-        let schema = await this.branches[branch].schema();
-        for (let dataSource of schema.dataSources.values()) {
-          if (!this.seenDataSources[dataSource.id]) {
-            let indexer = this._findIndexer(dataSource);
-            if (indexer) {
-              newIndexers.push(dataSource.indexer);
-            }
-          }
+      let newSchemaModels = await this._activateIndexers(newIndexers);
+      newIndexers = newSchemaModels.map(model => {
+        log.debug("new schema model %s %s", model.type, model.id);
+        if (model.type === 'data-sources' && !this.seenDataSources[model.id]) {
+          log.debug("Discovered data source %s", model.id);
+          let dataSource = new DataSource(model, this.seedSchema.plugins);
+          return this._findIndexer(dataSource);
         }
-      }));
+      }).filter(Boolean);
     }
   }
 
   async _activateIndexers(indexers) {
-    let dirtyBranches = {};
+    log.debug("=Activating indexers=\n%t", () => indexers.map(i => {
+      let source = owningDataSource.get(i);
+      return [ source.sourceType, source.id ];
+    }));
+    let newSchemaModels = [];
     await Promise.all(indexers.map(async indexer => {
       for (let branch of await indexer.branches()) {
-        dirtyBranches[branch] = true;
         if (!this.branches[branch]) {
+          log.debug("Discovered branch %s", branch);
           this.branches[branch] = new BranchUpdate(branch, this.seedSchema, this.client);
         }
-        await this.branches[branch].addIndexer(indexer);
+        newSchemaModels.push(await this.branches[branch].addIndexer(indexer));
       }
     }));
-    return Object.keys(dirtyBranches);
+    return flatten(newSchemaModels);
   }
 
   async update(realTime, hints) {
-    await this._loadSchemas();
+    await this._loadSchemaModels();
     await Promise.all(Object.values(this.branches).map(branch => branch.update(realTime, hints)));
     return await this._schemas();
   }
 
   async schemas() {
-    await this._loadSchemas();
+    await this._loadSchemaModels();
     return await this._schemas();
   }
 

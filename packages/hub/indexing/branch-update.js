@@ -19,14 +19,15 @@ class BranchUpdate {
 
   async addIndexer(indexer) {
     if (this._schema) {
-      this._schema.teardown();
-      this._schema = null;
+      throw new Error("Bug in hub indexing. Something tried to add an indexer after we had already established the schema");
     }
     let updater = await indexer.beginUpdate(this.branch, this._readOtherIndexers.bind(this));
     let dataSource = owningDataSource.get(indexer);
     owningDataSource.set(updater, dataSource);
-    this.schemaModels.push(await updater.schema());
+    let newModels = await updater.schema();
+    this.schemaModels.push(newModels);
     this.updaters[dataSource.id] = updater;
+    return newModels;
   }
 
   async _readOtherIndexers(type, id) {
