@@ -9,7 +9,8 @@ module.exports = class RunningIndexers {
   constructor(seedSchema, client) {
     this.seedSchema = seedSchema;
     this.client = client;
-    this.dataSources = {};
+    this.ownedDataSources = {};
+    this.seenDataSources = {};
     this.branches = {};
   }
 
@@ -17,12 +18,13 @@ module.exports = class RunningIndexers {
     for (let branchUpdate of Object.values(this.branches)) {
       branchUpdate.destroy();
     }
-    for (let dataSource of Object.values(this.dataSources)) {
+    for (let dataSource of Object.values(this.ownedDataSources)) {
       dataSource.teardown();
     }
   }
 
   _findIndexer(dataSource) {
+    this.seenDataSources[dataSource.id] = true;
     if (dataSource.indexer) {
       owningDataSource.set(dataSource.indexer, dataSource);
       return dataSource.indexer;
@@ -37,10 +39,10 @@ module.exports = class RunningIndexers {
       let newSchemaModels = await this._activateIndexers(newIndexers);
       newIndexers = newSchemaModels.map(model => {
         log.debug("new schema model %s %s", model.type, model.id);
-        if (model.type === 'data-sources' && !this.dataSources[model.id]) {
+        if (model.type === 'data-sources' && !this.seenDataSources[model.id]) {
           log.debug("Discovered data source %s", model.id);
           let dataSource = new DataSource(model, this.seedSchema.plugins);
-          this.dataSources[model.id] = dataSource;
+          this.ownedDataSources[model.id] = dataSource;
           return this._findIndexer(dataSource);
         }
       }).filter(Boolean);
