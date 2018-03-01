@@ -20,7 +20,9 @@
   "scripts": {
     "build": "ember build",
     "start": "ember serve",
-    "test": "ember try:each"
+    "test": "ember try:each",
+    "ethereum-tests": "../../node_modules/.bin/truffle test",
+    "private-blockchain": "../../node_modules/.bin/truffle develop"
   },
   "dependencies": {
     "@cardstack/logger": "^0.1.0",
@@ -57,7 +59,8 @@
     "eslint": "4.9.0",
     "eslint-plugin-ember": "^4.6.1",
     "eslint-plugin-node": "^5.2.1",
-    "loader.js": "^4.2.3"
+    "loader.js": "^4.2.3",
+    "truffle": "^4.0.4"
   },
   "engines": {
     "node": ">= 7"

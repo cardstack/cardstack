@@ -3,6 +3,7 @@
 # compiled output
 /dist
 /tmp
+/build
 
 # dependencies
 /node_modules
@@ -16,6 +17,9 @@
 npm-debug.log*
 yarn-error.log
 testem.log
+npm-debug.log
+.DS_Store
+.node-*
 
 # ember-try
 .node_modules.ember-try/
