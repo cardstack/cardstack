@@ -7,7 +7,7 @@ const { apply_patch } = require('jsonpatch');
 const NameMapper = require('./name-mapper');
 const { declareInjections } = require('@cardstack/di');
 const path = require('path');
-const migrate = require('node-pg-migrate').default;
+const migrate = require('@cardstack/node-pg-migrate').default;
 
 // Yes, this is slightly bananas. But it's easier to just read the
 // output of the "test_decoding" plugin that ships with postgres than

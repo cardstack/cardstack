@@ -21,6 +21,7 @@
     "@cardstack/plugin-utils": "^0.5.2",
     "jsonpatch": "^3.0.1",
     "lodash": "^4.17.4",
+    "@cardstack/node-pg-migrate": "2.23.1-cardstack.0",
     "pg": "^7.0.3"
   },
   "keywords": [
