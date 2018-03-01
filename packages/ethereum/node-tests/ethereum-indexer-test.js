@@ -37,9 +37,6 @@ describe('ethereum-indexer', function() {
       });
 
     env = await createDefaultEnvironment(`${__dirname}/..`, factory.getModels());
-
-    await env.lookup('hub:indexers').update({ realTime: true });
-
   }
 
   async function teardown() {
