@@ -1,3 +1,4 @@
+const JSONAPIFactory = require('../../../tests/stub-project/node_modules/@cardstack/test-support/jsonapi-factory');
 const {
   createDefaultEnvironment,
   destroyDefaultEnvironment
@@ -76,4 +77,56 @@ describe('hub/indexers', function() {
       expect(doc).has.deep.property('data.attributes.enabled', false);
     });
   });
+
+
+  describe("nested data sources", function() {
+    afterEach(teardown);
+
+    // TODO: this test passes, but it's not succesfully testing the
+    // semantics we want to test, because we don't actually have
+    // full relationship validation yet.
+    it('can traverse across inconsistent intermediate schemas on the way to building a complete consistent schema', async function() {
+
+      // we have a comment sitting in the inner data source
+      let inner = new JSONAPIFactory();
+      inner.addResource('comments', '1');
+
+      let seeds = new JSONAPIFactory();
+
+      seeds.addResource('content-types', 'posts')
+        .withRelated('fields', [
+          seeds.addResource('fields', 'comments').withAttributes({
+            fieldType: '@cardstack/core-types::has-many'
+          }).withRelated('related-types', [
+            // the comments content type is stored inside "inner"
+            // (unlike the rest of our models, which are stored in the
+            // default data source provided by
+            // createDefaultEnvironment)
+            seeds.addResource('content-types', 'comments')
+              .withRelated(
+                'data-source',
+                seeds.addResource('data-sources', 'inner').withAttributes({
+                  sourceType: '@cardstack/ephemeral',
+                  params: {
+                    initialModels: inner.getModels()
+                  }
+                })
+              )
+          ])
+        ]);
+
+      seeds.addResource('posts', '1').withRelated('comments', [
+        { type: 'comments', id: '1' }
+      ]);
+
+      env = await createDefaultEnvironment(__dirname + '/../../../tests/ephemeral-test-app', seeds.getModels());
+
+      let response = await env.lookup('hub:searchers').get(env.session, 'master', 'posts', '1');
+      expect(response).is.ok;
+      response = await env.lookup('hub:searchers').get(env.session, 'master', 'comments', '1');
+      expect(response).is.ok;
+
+    });
+  });
+
 });

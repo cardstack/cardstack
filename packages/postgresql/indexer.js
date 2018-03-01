@@ -5,6 +5,9 @@ const Error = require('@cardstack/plugin-utils/error');
 const rowToDocument = require('./row-to-doc');
 const { apply_patch } = require('jsonpatch');
 const NameMapper = require('./name-mapper');
+const { declareInjections } = require('@cardstack/di');
+const path = require('path');
+const migrate = require('@cardstack/node-pg-migrate').default;
 
 // Yes, this is slightly bananas. But it's easier to just read the
 // output of the "test_decoding" plugin that ships with postgres than
@@ -14,15 +17,21 @@ const changePattern = /^table ([^.]+)\.([^:]+): ([^:]+): (.*)/;
 // If your id contains spaces or quotes yer gonna have a bad time. Sorry not sorry.
 const idPattern = /id\[[^\]]+\]:'?([^\s']+)/;
 
-module.exports = class Indexer {
-  static create(params) { return new this(params); }
+module.exports = declareInjections({
+  projectConfig: 'config:project'
+}, class Indexer {
 
-  constructor({ branches, dataSource, renameTables, renameColumns, patch }) {
+  static create(params) {
+    return new this(params);
+  }
+
+  constructor({ branches, dataSource, renameTables, renameColumns, patch, projectConfig }) {
     this.branchConfig = branches;
     this.dataSourceId = dataSource.id;
     this.pools = Object.create(null);
     this.mapper = new NameMapper(renameTables, renameColumns);
     this.patch = patch || Object.create(null);
+    this.projectPath = projectConfig.path;
   }
 
   async branches() {
@@ -40,6 +49,7 @@ module.exports = class Indexer {
         password: config.password,
         port: config.port
       });
+      await this._runMigrations(branch);
     }
 
     let client = await this.pools[branch].connect();
@@ -51,7 +61,40 @@ module.exports = class Indexer {
       await pool.end();
     }
   }
-};
+
+  async _runMigrations(branch) {
+    let config = this.branchConfig[branch];
+    if (!config.migrationsDir) {
+      return;
+    }
+    let dir = path.join(this.projectPath, config.migrationsDir);
+
+    await migrate({
+      direction: 'up',
+      migrations_table: 'migrations',
+      checkOrder: false,
+
+      // I added this option in
+      // https://github.com/salsita/node-pg-migrate/pull/204, which is
+      // why we are pointing at my fork of node-pg-migrate for the
+      // present.
+      //
+      // Given that we're running these in a very automated way, I
+      // would much rather put things back exactly as they were when
+      // there are any failures.
+      single_transaction: true,
+
+      database_url: {
+        user: config.user,
+        host: config.host,
+        database: config.database,
+        password: config.password,
+        port: config.port
+      },
+      dir
+    });
+  }
+});
 
 class Updater {
   constructor(client, dataSourceId, mapper, patch) {
