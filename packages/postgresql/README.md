@@ -21,6 +21,8 @@ To enable efficient incremental indexing of the database, we use [Logical Decodi
     wal_level = logical
     max_replication_slots = 1  # Any number greater than 0 will work
 
+If you are using AWS RDS, the AWS-specific setting you need in your parameter group is `rds.logical_replication`.
+
 The test suite is configured to talk to a PostgreSQL docker container. You can start it like:
 
     docker run --name cardstack-postgres -d --rm -p 5444:5432 cardstack/pg-test
