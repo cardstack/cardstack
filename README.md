@@ -76,6 +76,12 @@ There is work-in-progress to make Cardstack Hub automatically manage docker-base
     docker run -d -p 9200:9200 --rm cardstack/elasticsearch:dev
     docker run -d -p 5444:5432 --rm cardstack/pg-test
 
+Additionally, for the Ethereum tests, you'll need to start a private blockchain. We use [truffle](http://truffleframework.com/docs/) to orchestrate our private blockchain and clear on-chain state
+in between the tests. You can start a private blockchain by executing:
+```
+yarn run blockchain &
+```
+
 
 ## Project-wide Policy and Community Governance
 
