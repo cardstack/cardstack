@@ -1,6 +1,6 @@
 {
   "name": "@cardstack/rendering",
-  "version": "0.5.0",
+  "version": "0.5.8",
   "description": "Basic front-end rendering support for Cardstack",
   "keywords": [
     "ember-addon",
