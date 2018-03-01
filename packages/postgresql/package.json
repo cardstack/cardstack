@@ -21,7 +21,6 @@
     "@cardstack/plugin-utils": "^0.5.2",
     "jsonpatch": "^3.0.1",
     "lodash": "^4.17.4",
-    "node-pg-migrate": "https://github.com/ef4/node-pg-migrate#8600bdf2fe681b947b53502f8edf0a6bcbafb52e",
     "pg": "^7.0.3"
   },
   "keywords": [
