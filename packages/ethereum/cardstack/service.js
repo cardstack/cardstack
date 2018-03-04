@@ -26,6 +26,7 @@ class EthereumService {
     this._processQueueTimeoutMs = 1000;
     this._processQueueTimeout = null;
     this._contractDefinitions = null;
+    this._eventDefinitions = {};
     this._contracts = {};
     this._indexerPromise = null; // exposing this for the tests
   }
@@ -61,11 +62,7 @@ class EthereumService {
 
     for (let contract of Object.keys(contracts)) {
       let { abi, addresses } = contracts[contract];
-      let events = {};
-
-      for (let event of abi.filter(item => item.type === 'event')) {
-        events[event.name] = event;
-      }
+      this._eventDefinitions[contract] = getEventDefinitions(contract, contracts);
 
       for (let branch of Object.keys(addresses)) {
         if (!this._providers[branch]) { continue; }
@@ -85,11 +82,10 @@ class EthereumService {
           }
 
           log.trace(`contract event received for ${contract}: ${JSON.stringify(event, null, 2)}`);
-          let addressParams = events[event.event].inputs.filter(input => input.type === 'address');
-          let addresses = addressParams.map(param => event.returnValues[param.name]).filter(address => address !== NULL_ADDRESS);
+          let hints = this._generateHintsFromEvent({ branch, contract, event });
+          log.debug("addings hints to queue", JSON.stringify(hints, null, 2));
 
-          log.debug(`addresses from contract ${contract} event ${event.event}: ${JSON.stringify(addresses)}`);
-          this._queueHints({ branch, contract, addresses, eventName: event.event });
+          this._indexQueue = this._indexQueue.concat(hints);
         });
       }
     }
@@ -145,6 +141,33 @@ class EthereumService {
     return contractInfo;
   }
 
+  async getPastEventsAsHints() {
+    log.debug(`getting past events as hints for contracts`);
+    let hints = [];
+
+    for (let branch of Object.keys(this._contracts)) {
+      for (let contract of Object.keys(this._contracts[branch])) {
+        let aContract = this._contracts[branch][contract];
+        let contractHints = [];
+
+        for (let event of Object.keys(this._contractDefinitions[contract].eventContentTriggers || [])) {
+          let rawHints = [];
+          // TODO we might need to chunk this so we don't blow past the websocket max frame size in the web3 provider: https://github.com/ethereum/web3.js/issues/1297
+          let events = await aContract.getPastEvents(event, { fromBlock: 0, toBlock: 'latest' });
+          log.trace(`discovered ${event} events for contract ${contract}: ${JSON.stringify(events, null, 2)}`);
+
+          for (let rawEvent of events) {
+            rawHints = rawHints.concat(this._generateHintsFromEvent({ branch, contract, event: rawEvent }));
+          }
+          contractHints = contractHints.concat(_.uniqWith(rawHints, _.isEqual));
+        }
+        hints = hints.concat(_.uniqWith(contractHints, _.isEqual));
+      }
+    }
+    log.debug(`discovered contract events resulting in hints: ${JSON.stringify(hints, null, 2)}`);
+    return hints;
+  }
+
   _setProcessQueueTimeout(timeout) {
     clearTimeout(this._processQueueTimeout);
 
@@ -162,7 +185,7 @@ class EthereumService {
       this._isIndexing = true;
       let queue = this._indexQueue;
       this._indexQueue = [];
-      let hints = _.uniqWith(_.flatten(queue), _.isEqual);
+      let hints = _.uniqWith(queue, _.isEqual);
 
       log.debug("processing index queue ", hints);
       this._indexerPromise = this._indexer.update({ hints });
@@ -179,19 +202,35 @@ class EthereumService {
     }
   }
 
-  _queueHints({ branch, contract, eventName, addresses }) {
-    let contentTypes = this._contractDefinitions[contract].eventContentTypeMappings[eventName];
-    if (!contentTypes) { return; }
+  _generateHintsFromEvent({ branch, contract, event }) {
+    let contractHint = { branch, type: contract, id: this._contractDefinitions[contract].addresses[branch], isContractType: true };
+    let addressParams = this._eventDefinitions[contract][event.event].inputs.filter(input => input.type === 'address');
+    let addresses = addressParams.map(param => event.returnValues[param.name]).filter(address => address !== NULL_ADDRESS);
+    let contentTypes = this._contractDefinitions[contract].eventContentTriggers ? this._contractDefinitions[contract].eventContentTriggers[event.event] : null;
 
-    let hints = [];
+    let hints = [ contractHint ];
+    if (!contentTypes || !contentTypes.length ) {
+      return hints;
+    }
+
     for (let type of contentTypes) {
       for (let id of addresses) {
         hints.push({ branch, type, id, contract });
       }
     }
 
-    log.debug("addings hints to queue", JSON.stringify(hints, null, 2));
-
-    this._indexQueue.push(hints);
+    return hints;
   }
+
 });
+
+function  getEventDefinitions(contractName, contractDefinitions) {
+  let { abi } = contractDefinitions[contractName];
+  let events = {};
+
+  for (let event of abi.filter(item => item.type === 'event')) {
+    events[event.name] = event;
+  }
+  return events;
+}
+

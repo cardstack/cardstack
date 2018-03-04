@@ -18,6 +18,7 @@ async function waitForEthereumEvents(service) {
 contract('SampleToken', function(accounts) {
   let accountOne = accounts[0].toLowerCase();
   let accountTwo = accounts[1].toLowerCase();
+  let accountThree = accounts[2].toLowerCase();
 
   describe('private blockchain sanity checks', function() {
     it("should mint SampleToken in the token owner account", async function() {
@@ -76,7 +77,7 @@ contract('SampleToken', function(accounts) {
               "sample-token": {
                 abi: token.abi,
                 addresses: { master: token.address },
-                eventContentTypeMappings: {
+                eventContentTriggers: {
                   Transfer: [ "sample-token-balanceOf" ],
                   Mint: [ "sample-token-balanceOf" ]
                 }
@@ -334,8 +335,6 @@ contract('SampleToken', function(accounts) {
     });
 
     it("indexes mapping entry content types when a contract fires an ethereum event", async function() {
-      let amount = 10;
-
       try {
         await env.lookup('hub:searchers').get(env.session, 'master', 'sample-token-balanceOf', accountOne);
         throw new Error("balanceOf record should not exist for this address");
@@ -351,7 +350,7 @@ contract('SampleToken', function(accounts) {
       }
 
       await token.mint(accountOne, 100);
-      await token.transfer(accountTwo, amount, { from: accountOne });
+      await token.transfer(accountTwo, 10, { from: accountOne });
 
       await waitForEthereumEvents(ethereumService);
 
@@ -377,9 +376,65 @@ contract('SampleToken', function(accounts) {
         }
       });
 
-      let accountTwoLedgerEntry = await env.lookup('hub:searchers').get(env.session, 'master', 'sample-token-balanceOf', accountTwo.toLowerCase());
+      let accountTwoLedgerEntry = await env.lookup('hub:searchers').get(env.session, 'master', 'sample-token-balanceOf', accountTwo);
       expect(accountTwoLedgerEntry.data.attributes["mapping-number-value"]).to.equal("10", "the token balance is correct");
     });
 
+  });
+
+  describe('ethereum-indexer for past events', function() {
+    let env, token, ethereumService;
+
+    async function setup() {
+      let factory = new JSONAPIFactory();
+      token = await SampleToken.new();
+
+      await token.mint(accountOne, 100);
+      await token.transfer(accountTwo, 20, { from: accountOne });
+      await token.transfer(accountThree, 30, { from: accountOne });
+      await token.transfer(accountThree, 7, { from: accountTwo });
+
+      factory.addResource('data-sources')
+        .withAttributes({
+          'source-type': '@cardstack/ethereum',
+          params: {
+            branches: {
+              master: { jsonRpcUrl: "ws://localhost:7545" }
+            },
+            contracts: {
+              "sample-token": {
+                abi: token.abi,
+                addresses: { master: token.address },
+                eventContentTriggers: {
+                  Transfer: [ "sample-token-balanceOf" ],
+                  Mint: [ "sample-token-balanceOf" ]
+                }
+              }
+            }
+          },
+        });
+
+      env = await createDefaultEnvironment(`${__dirname}/..`, factory.getModels());
+      ethereumService = env.lookup(`plugin-services:${require.resolve('../cardstack/service')}`);
+      ethereumService._setProcessQueueTimeout(10);
+    }
+
+    async function teardown() {
+      await destroyDefaultEnvironment(env);
+      await ethereumService.stop();
+    }
+
+    beforeEach(setup);
+    afterEach(teardown);
+
+    it("can index past events on the contract", async function() {
+      let accountOneLedgerEntry = await env.lookup('hub:searchers').get(env.session, 'master', 'sample-token-balanceOf', accountOne.toLowerCase());
+      let accountTwoLedgerEntry = await env.lookup('hub:searchers').get(env.session, 'master', 'sample-token-balanceOf', accountTwo.toLowerCase());
+      let accountThreeLedgerEntry = await env.lookup('hub:searchers').get(env.session, 'master', 'sample-token-balanceOf', accountThree.toLowerCase());
+
+      expect(accountOneLedgerEntry.data.attributes["mapping-number-value"]).to.equal("50", "the token balance is correct");
+      expect(accountTwoLedgerEntry.data.attributes["mapping-number-value"]).to.equal("13", "the token balance is correct");
+      expect(accountThreeLedgerEntry.data.attributes["mapping-number-value"]).to.equal("37", "the token balance is correct");
+    });
   });
 });

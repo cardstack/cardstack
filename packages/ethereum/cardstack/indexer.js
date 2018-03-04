@@ -138,33 +138,43 @@ class Updater {
       await ops.save(model.type, model.id, model);
     }
 
-    for (let contract of Object.keys(this.contracts)) {
-      for (let branch of Object.keys(this.contracts[contract].addresses)) {
-        let model = await this.ethereumService.getContractInfo({ branch, contract });
+    let contractHints = hints && hints.length ? hints.filter(hint => hint.isContractType) : [];
+    if (!contractHints.length) {
+      for (let contract of Object.keys(this.contracts)) {
+        for (let branch of Object.keys(this.contracts[contract].addresses)) {
+          let model = await this.ethereumService.getContractInfo({ branch, contract });
+          await ops.save(model.type, model.id, model);
+        }
+      }
+    } else {
+      for (let { branch, type } of contractHints) {
+        let model = await this.ethereumService.getContractInfo({ branch, contract: type });
         await ops.save(model.type, model.id, model);
       }
     }
 
-    if (hints && hints.length) {
-      for (let { id, branch, type, contract } of hints) {
-        if (!branch || !type || !id || !contract) { continue; }
+    if (!hints || !hints.length) {
+      hints = await this.ethereumService.getPastEventsAsHints();
+    }
 
-        let contractAddress = this.contracts[contract].addresses[branch];
-        let data = await this.ethereumService.getContractInfoFromHint({ id, type, branch, contract });
-        let model = {
-          type,
-          attributes: {
-            'ethereum-address': id, // preserve the case of the ID here to faithfully represent EIP-55 encoding
-            'mapping-number-value': data,
-          },
-          relationships: {}
-        };
-        model.relationships[`${contract}-contract`] = {
-          data: { id: contractAddress, type: contract }
-        };
+    for (let { id, branch, type, contract, isContractType } of hints) {
+      if (!branch || !type || !id || !contract || isContractType) { continue; }
 
-        await ops.save(type, id.toLowerCase(), model);
-      }
+      let contractAddress = this.contracts[contract].addresses[branch];
+      let data = await this.ethereumService.getContractInfoFromHint({ id, type, branch, contract });
+      let model = {
+        type,
+        attributes: {
+          'ethereum-address': id, // preserve the case of the ID here to faithfully represent EIP-55 encoding
+          'mapping-number-value': data,
+        },
+        relationships: {}
+      };
+      model.relationships[`${contract}-contract`] = {
+        data: { id: contractAddress, type: contract }
+      };
+
+      await ops.save(type, id.toLowerCase(), model);
     }
 
     await ops.finishReplaceAll();
