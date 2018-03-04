@@ -10,4 +10,6 @@ import "./zeppelin/MintableToken.sol";
 contract SampleToken is MintableToken {
   string public name = "SampleToken";
   string public symbol = "TOK";
+
+  function fund() payable public { }
 }
