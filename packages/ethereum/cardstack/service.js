@@ -157,7 +157,7 @@ class EthereumService {
             events = await aContract.getPastEvents(event, { fromBlock: 0, toBlock: 'latest' });
           } catch (err) {
             // for some reason web3 throws an error when it cannot find any of the requested events
-            log.warn(`could not find any past contract events of contract ${contract} for event ${event}`);
+            log.info(`could not find any past contract events of contract ${contract} for event ${event}`);
           }
           log.trace(`discovered ${event} events for contract ${contract}: ${JSON.stringify(events, null, 2)}`);
 
