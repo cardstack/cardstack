@@ -25,6 +25,7 @@
     "private-blockchain": "../../node_modules/.bin/truffle develop"
   },
   "dependencies": {
+    "@cardstack/di": "^0.5.8",
     "@cardstack/logger": "^0.1.0",
     "@cardstack/plugin-utils": "^0.5.8",
     "lodash": "^4.17.4",

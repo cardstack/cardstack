@@ -1,36 +1,51 @@
 const { isEqual } = require('lodash');
 const log = require('@cardstack/logger')('cardstack/ethereum/indexer');
+const { declareInjections } = require('@cardstack/di');
 
-module.exports = class Indexer {
+module.exports = declareInjections({
+  searcher: 'hub:searchers',
+  ethereumService: `plugin-services:${require.resolve('./service')}`
+},
+
+class Indexer {
 
   static create(...args) {
+    let [{ ethereumService, branches }] = args;
+    ethereumService.connect(branches);
     return new this(...args);
   }
 
-  constructor({ dataSource, branches, contracts }) {
+  constructor({ ethereumService, dataSource, branches, contracts, searcher }) {
     this.dataSourceId = dataSource.id;
-    this.networks = branches;
     this.contracts = contracts;
+    this.searcher = searcher;
+    this._branches = branches;
+    this.ethereumService = ethereumService;
   }
 
   async branches() {
-    // TODO load this from the config params
-    return ['master'];
+    return Object.keys(this._branches);
   }
 
   async beginUpdate() {
+    await this.ethereumService.start(this.contracts);
+
     return new Updater({
       dataSourceId: this.dataSourceId,
-      contracts: this.contracts
+      contracts: this.contracts,
+      ethereumService: this.ethereumService,
+      searcher: this.searcher
     });
   }
-};
+});
 
 class Updater {
 
-  constructor({ dataSourceId, contracts }) {
+  constructor({ dataSourceId, contracts, ethereumService, searcher }) {
     this.dataSourceId = dataSourceId;
     this.contracts = contracts;
+    this.ethereumService = ethereumService;
+    this.searcher = searcher;
   }
 
   async schema() {
@@ -38,15 +53,9 @@ class Updater {
 
     let defaultFields = [{
       type: "fields",
-      id: "contract-address",
+      id: "ethereum-address",
       attributes: {
-        "field-type": "@cardstack/core-types::string"
-      }
-    },{
-      type: "fields",
-      id: "mapping-address-key",
-      attributes: {
-        "field-type": "@cardstack/core-types::string"
+        "field-type": "@cardstack/core-types::case-insensitive"
       }
     },{
       type: "fields",
@@ -90,7 +99,7 @@ class Updater {
         relationships: {
           fields: {
             data: [
-              { type: "fields", id: "contract-address" },
+              { type: "fields", id: "ethereum-address" },
               { type: "fields", id: "balance-wei" }
             ]
           },
@@ -106,6 +115,7 @@ class Updater {
         });
       });
 
+      schema.push(this._openGrantForContentType(contractName));
       schema.push(contractSchema);
     });
 
@@ -126,6 +136,35 @@ class Updater {
     await ops.beginReplaceAll();
     for (let model of schema) {
       await ops.save(model.type, model.id, model);
+    }
+
+    for (let contract of Object.keys(this.contracts)) {
+      for (let branch of Object.keys(this.contracts[contract].addresses)) {
+        let model = await this.ethereumService.getContractInfo({ branch, contract });
+        await ops.save(model.type, model.id, model);
+      }
+    }
+
+    if (hints && hints.length) {
+      for (let { id, branch, type, contract } of hints) {
+        if (!branch || !type || !id || !contract) { continue; }
+
+        let contractAddress = this.contracts[contract].addresses[branch];
+        let data = await this.ethereumService.getContractInfoFromHint({ id, type, branch, contract });
+        let model = {
+          type,
+          attributes: {
+            'ethereum-address': id, // preserve the case of the ID here to faithfully represent EIP-55 encoding
+            'mapping-number-value': data,
+          },
+          relationships: {}
+        };
+        model.relationships[`${contract}-contract`] = {
+          data: { id: contractAddress, type: contract }
+        };
+
+        await ops.save(type, id.toLowerCase(), model);
+      }
     }
 
     await ops.finishReplaceAll();
@@ -157,21 +196,41 @@ class Updater {
     };
   }
 
-  _mappingFieldFor(contractName, mappingType) {
-    let valueType = mappingType.replace(/^.*-mapping-(.*)-entry$/, "mapping-$1-value");
+  _mappingFieldFor(contractName, fieldName, valueType) {
     return {
       type: "content-types",
-      id: mappingType,
+      id: `${contractName}-${fieldName}`,
       relationships: {
         fields: {
           data: [
-            { type: "fields", id: "mapping-address-key" },
+            { type: "fields", id: "ethereum-address" },
             { type: "fields", id: valueType },
             { type: "fields", id: contractName + "-contract" }
           ]
         },
         'data-source': {
           data: { type: 'data-sources', id: this.dataSourceId.toString() }
+        }
+      }
+    };
+  }
+
+  _openGrantForContentType(contentType) {
+    return {
+      type: 'grants',
+      id: `${contentType}-grant`,
+      attributes: {
+        'may-read-fields': true,
+        'may-read-resource': true,
+      },
+      relationships: {
+        who: {
+          data: { type: 'groups', id: 'everyone' }
+        },
+        types: {
+          "data": [
+            { type: "content-types", id: contentType }
+          ]
         }
       }
     };
@@ -192,15 +251,7 @@ class Updater {
 
         if (type.indexOf("@") > -1) {
           field.attributes = { "field-type": type };
-        } else {
-          field.attributes = { "field-type": "@cardstack/core-types::has-many" };
-          field.relationships = {
-            "related-types": {
-              "data": [
-                { "type": "content-types", "id": type }
-              ]
-            }
-          };
+          fields.push(field);
         }
 
         if (type.indexOf('mapping') > -1) {
@@ -208,13 +259,12 @@ class Updater {
           if (!customTypes.find(field => field.id === relatedField.id)) {
             customTypes.push(relatedField);
           }
-          let mappingField = this._mappingFieldFor(contractName, type);
+          let mappingField = this._mappingFieldFor(contractName, item.name, type);
           if (!customTypes.find(field => field.id === mappingField.id)) {
             customTypes.push(mappingField);
+            customTypes.push(this._openGrantForContentType(`${contractName}-${item.name}`));
           }
         }
-
-        fields.push(field);
       }
     });
 
@@ -241,14 +291,14 @@ class Updater {
     } else if (abiItem.inputs.length === 1 && abiItem.inputs[0].type === "address") {
       switch(abiItem.outputs[0].type) {
         case 'uint256':
-          return `${contractName}-mapping-number-entry`;
+          return `mapping-number-value`;
         case 'bool':
-          return `${contractName}-mapping-boolean-entry`;
+          return `mapping-boolean-value`;
         case 'bytes32':
         case 'string':
         case 'address':
         default:
-          return `${contractName}-mapping-string-entry`;
+          return `mapping-string-value`;
       }
     }
   }
