@@ -8,7 +8,6 @@ const timeout = promisify(setTimeout);
 const JSONAPIFactory = require('@cardstack/test-support/jsonapi-factory');
 
 async function waitForEthereumEvents(service) {
-  await timeout(100);
   while (service._indexQueue.length) {
     await timeout(100);
   }
@@ -380,6 +379,60 @@ contract('SampleToken', function(accounts) {
       expect(accountTwoLedgerEntry.data.attributes["mapping-number-value"]).to.equal("10", "the token balance is correct");
     });
 
+  });
+
+  describe('ethereum-indexer event triggers', function() {
+    let env, token, ethereumService;
+
+    async function setup() {
+      let factory = new JSONAPIFactory();
+      token = await SampleToken.new();
+
+      await token.mint(accountOne, 100);
+
+      factory.addResource('data-sources')
+        .withAttributes({
+          'source-type': '@cardstack/ethereum',
+          params: {
+            branches: {
+              master: { jsonRpcUrl: "ws://localhost:7545" }
+            },
+            contracts: {
+              "sample-token": {
+                abi: token.abi,
+                addresses: { master: token.address },
+                eventContentTriggers: {
+                  MintingFinished: []
+                }
+              }
+            }
+          },
+        });
+
+      env = await createDefaultEnvironment(`${__dirname}/..`, factory.getModels());
+      ethereumService = env.lookup(`plugin-services:${require.resolve('../cardstack/service')}`);
+      ethereumService._setProcessQueueTimeout(10);
+    }
+
+    async function teardown() {
+      await destroyDefaultEnvironment(env);
+      await ethereumService.stop();
+    }
+
+    beforeEach(setup);
+    afterEach(teardown);
+
+    it('can update contract document from event content trigger', async function() {
+
+      let contract = await env.lookup('hub:searchers').get(env.session, 'master', 'sample-token', token.address);
+      expect(contract.data.attributes['sample-token-mintingFinished']).to.equal(false, 'the mintingFinished field is correct');
+
+      await token.finishMinting();
+      await waitForEthereumEvents(ethereumService);
+
+      contract = await env.lookup('hub:searchers').get(env.session, 'master', 'sample-token', token.address);
+      expect(contract.data.attributes['sample-token-mintingFinished']).to.equal(true, 'the mintingFinished field is correct');
+    });
   });
 
   describe('ethereum-indexer for past events', function() {

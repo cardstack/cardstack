@@ -127,15 +127,20 @@ class Updater {
 
   async updateContent(meta, hints, ops) {
     let schema = await this.schema();
+    let isSchemaUnchanged;
+
     if (meta) {
       let { lastSchema } = meta;
-      if (isEqual(lastSchema, schema)) {
-        return;
-      }
+      isSchemaUnchanged = isEqual(lastSchema, schema);
     }
-    await ops.beginReplaceAll();
-    for (let model of schema) {
-      await ops.save(model.type, model.id, model);
+
+    if (!isSchemaUnchanged) {
+      await ops.beginReplaceAll();
+      for (let model of schema) {
+        await ops.save(model.type, model.id, model);
+      }
+    } else {
+      await ops.beginReplaceAll();
     }
 
     let contractHints = hints && hints.length ? hints.filter(hint => hint.isContractType) : [];

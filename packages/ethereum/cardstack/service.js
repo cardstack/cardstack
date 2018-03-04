@@ -1,7 +1,7 @@
 const Web3 = require('web3');
 const log = require('@cardstack/logger')('cardstack/ethereum/service');
 const { declareInjections } = require('@cardstack/di');
-const _ = require('lodash');
+const { uniqWith, isEqual } = require('lodash');
 
 const NULL_ADDRESS = '0x0000000000000000000000000000000000000000';
 
@@ -151,17 +151,22 @@ class EthereumService {
         let contractHints = [];
 
         for (let event of Object.keys(this._contractDefinitions[contract].eventContentTriggers || [])) {
-          let rawHints = [];
-          // TODO we might need to chunk this so we don't blow past the websocket max frame size in the web3 provider: https://github.com/ethereum/web3.js/issues/1297
-          let events = await aContract.getPastEvents(event, { fromBlock: 0, toBlock: 'latest' });
+          let rawHints = [], events = [];
+          try {
+            // TODO we might need to chunk this so we don't blow past the websocket max frame size in the web3 provider: https://github.com/ethereum/web3.js/issues/1297
+            events = await aContract.getPastEvents(event, { fromBlock: 0, toBlock: 'latest' });
+          } catch (err) {
+            // for some reason web3 throws an error when it cannot find any of the requested events
+            log.warn(`could not find any past contract events of contract ${contract} for event ${event}`);
+          }
           log.trace(`discovered ${event} events for contract ${contract}: ${JSON.stringify(events, null, 2)}`);
 
           for (let rawEvent of events) {
             rawHints = rawHints.concat(this._generateHintsFromEvent({ branch, contract, event: rawEvent }));
           }
-          contractHints = contractHints.concat(_.uniqWith(rawHints, _.isEqual));
+          contractHints = contractHints.concat(uniqWith(rawHints, isEqual));
         }
-        hints = hints.concat(_.uniqWith(contractHints, _.isEqual));
+        hints = hints.concat(uniqWith(contractHints, isEqual));
       }
     }
     log.debug(`discovered contract events resulting in hints: ${JSON.stringify(hints, null, 2)}`);
@@ -185,10 +190,10 @@ class EthereumService {
       this._isIndexing = true;
       let queue = this._indexQueue;
       this._indexQueue = [];
-      let hints = _.uniqWith(queue, _.isEqual);
+      let hints = uniqWith(queue, isEqual);
 
       log.debug("processing index queue ", hints);
-      this._indexerPromise = this._indexer.update({ hints });
+      this._indexerPromise = this._indexer.update({ realTime: true, hints });
 
       Promise.resolve(this._indexerPromise)
         .then(() => {
