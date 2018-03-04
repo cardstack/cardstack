@@ -29,7 +29,6 @@ install:
 
 before_script:
  - yarn run blockchain &
- - sleep 5
  - wget -q --waitretry=1 --retry-connrefused -T 1 -O - http://127.0.0.1:9200
  - node packages/postgresql/node-tests/pg-server/wait-for-db.js
 
