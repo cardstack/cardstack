@@ -56,6 +56,8 @@ class LiveQueryService {
   }
 
   listenToIndexer(indexEvents) {
+    //TODO use index_save and index_delete for more fined grained control
+    // on the invalidations
     indexEvents.on('index_update', () => this._invalidateAll());
   }
 
@@ -74,7 +76,7 @@ class ClientSubscriptionSet {
     this.socket = socket;
     this._subscriptions = {};
   }
-  
+
   get subscriptions() {
     return Object.values(this._subscriptions);
   }

@@ -182,7 +182,7 @@ class Indexers {
     } finally {
       running.destroy();
     }
-    this.events.emit('index_update');
+    this.events.emit('index_update', hints);
     log.debug('end update, realTime=%s', realTime);
   }
 

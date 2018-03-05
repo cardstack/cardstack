@@ -137,12 +137,16 @@ describe('hub/indexers', function() {
 
       let resolve;
       let done = new Promise(r => resolve = r);
-      indexers.events.on('index_update', resolve);
 
-      indexers.update();
+      indexers.events.on('index_update', (hints) => {
+        expect(hints).to.deep.equal({ foo: 'bar' });
+        resolve();
+      });
+
+      indexers.update({ realTime: true, hints: { foo: "bar" } });
 
       return done;
     });
   });
-  
+
 });
