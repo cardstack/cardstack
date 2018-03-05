@@ -57,9 +57,9 @@ class LiveQueryService {
   }
 
   listenToIndexer(indexEvents) {
-    indexEvents.on('add', (event, args) => this._trackContentOperationEvent(event, args));
-    indexEvents.on('delete', (event, args) => this._trackContentOperationEvent(event, args));
-    indexEvents.on('delete_all_without_nonce', (event, args) => this._trackContentOperationEvent(event, args));
+    indexEvents.on('add', args => this._trackContentOperationEvent('add', args));
+    indexEvents.on('delete', args => this._trackContentOperationEvent('delete', args));
+    indexEvents.on('delete_all_without_nonce', args => this._trackContentOperationEvent('delete_all_without_nonce', args));
 
     indexEvents.on('update_complete', () => this._invalidateAll());
   }
