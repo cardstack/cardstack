@@ -136,12 +136,6 @@ describe('hub/indexers', function() {
       let indexers = await env.lookup('hub:indexers');
 
       let addCount = 0;
-      let indexUpdatedCount = 0;
-
-      indexers.on('index_updated', hints => {
-        indexUpdatedCount++;
-        expect(hints).to.deep.equal({ foo: 'bar' });
-      });
 
       indexers.on('add', model => {
         addCount++;
@@ -226,7 +220,6 @@ describe('hub/indexers', function() {
       await indexers.update({ realTime: true, hints: { foo: 'bar' } });
 
       expect(addCount).to.equal(3, 'the correct number of add events were emitted');
-      expect(indexUpdatedCount).to.equal(1, 'the correct number of index_updated events were emitted');
     });
   });
 

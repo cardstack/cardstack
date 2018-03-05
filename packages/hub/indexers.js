@@ -59,12 +59,13 @@ class Indexers extends EventEmitter {
     this._forceRefreshQueue = [];
     this._seedSchemaMemo = null;
     this._schemaCache = null;
+    this._operationEvents = [];
   }
 
   async schemaForBranch(branch) {
     if (!this._schemaCache) {
       this._schemaCache = (async () => {
-        let running = new RunningIndexers(await this._seedSchema(), await this._client(), this.emit.bind(this));
+        let running = new RunningIndexers(await this._seedSchema(), await this._client(), this.queueOperationEvent.bind(this));
         try {
           return await running.schemas();
         } finally {
@@ -175,7 +176,7 @@ class Indexers extends EventEmitter {
   async _doUpdate(forceRefresh, hints) {
     log.debug('begin update, forceRefresh=%s', forceRefresh);
     let priorCache = this._schemaCache;
-    let running = new RunningIndexers(await this._seedSchema(), await this._client(), this.emit.bind(this));
+    let running = new RunningIndexers(await this._seedSchema(), await this._client(), this.queueOperationEvent.bind(this));
     try {
       let schemas = await running.update(forceRefresh, hints);
       if (this._schemaCache === priorCache) {
@@ -184,7 +185,7 @@ class Indexers extends EventEmitter {
     } finally {
       running.destroy();
     }
-    this.emit('index_updated', hints);
+    this.flushOperationEvents();
     log.debug('end update, realTime=%s', realTime);
   }
 

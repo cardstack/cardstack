@@ -59,10 +59,9 @@ class LiveQueryService {
     // TODO use the event type and event args to perform more
     // fined grained invalidations
 
-    // indexEvents.on('add', () => this._invalidateAll());
-    // indexEvents.on('delete', () => this._invalidateAll());
-    // indexEvents.on('delete_all_without_nonce', () => this._invalidateAll());
-    indexEvents.on('index_updated', () => this._invalidateAll());
+    indexEvents.on('add', () => this._invalidateAll());
+    indexEvents.on('delete', () => this._invalidateAll());
+    indexEvents.on('delete_all_without_nonce', () => this._invalidateAll());
   }
 
   _invalidateAll() {
