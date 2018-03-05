@@ -10,6 +10,11 @@ module.exports = [
       'may-create-resource': true,
       'may-update-resource': true,
       'may-delete-resource': true
+    },
+    relationships: {
+      who: {
+        data: { type: 'groups', id: 'everyone' }
+      }
     }
   },{
     type: 'fields',
