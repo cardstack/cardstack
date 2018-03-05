@@ -48,15 +48,16 @@ module.exports = declareInjections({
   seedModels: 'config:seed-models'
 },
 
-class Indexers {
+class Indexers extends EventEmitter {
   constructor() {
+    super();
+
     this._clientMemo = null;
     this._running = false;
     this._queue = [];
     this._realTimeQueue = [];
     this._seedSchemaMemo = null;
     this._schemaCache = null;
-    this.events = new EventEmitter();
   }
 
   async schemaForBranch(branch) {
@@ -182,7 +183,7 @@ class Indexers {
     } finally {
       running.destroy();
     }
-    this.events.emit('index_update', hints);
+    this.emit('index_update', hints);
     log.debug('end update, realTime=%s', realTime);
   }
 

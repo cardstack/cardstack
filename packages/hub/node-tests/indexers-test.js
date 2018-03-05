@@ -138,7 +138,7 @@ describe('hub/indexers', function() {
       let resolve;
       let done = new Promise(r => resolve = r);
 
-      indexers.events.on('index_update', hints => {
+      indexers.on('index_update', hints => {
         expect(hints).to.deep.equal({ foo: 'bar' });
         resolve();
       });
