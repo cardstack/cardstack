@@ -26,7 +26,7 @@ class LiveQueryService {
       instance.start({socketPath, socketPort});
     });
 
-    instance.listenToIndexer(indexers.events);
+    instance.listenToIndexer(indexers);
 
     return instance;
   }
