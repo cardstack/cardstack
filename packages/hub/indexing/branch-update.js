@@ -6,10 +6,11 @@ const log = require('@cardstack/logger')('cardstack/indexers');
 const DocumentContext = require('./document-context');
 
 class BranchUpdate {
-  constructor(branch, seedSchema, client) {
+  constructor(branch, seedSchema, client, emitEvent) {
     this.branch = branch;
     this.seedSchema = seedSchema;
     this.client = client;
+    this.emitEvent = emitEvent;
     this.updaters = Object.create(null);
     this.schemaModels = [];
     this._schema = null;
@@ -183,6 +184,7 @@ class BranchUpdate {
         _id: `${this.branch}/${id}`,
       }
     }, searchDoc);
+    this.emitEvent('add', { type, id, doc });
     log.debug("save %s %s", type, id);
   }
 
@@ -195,6 +197,7 @@ class BranchUpdate {
         _id: `${this.branch}/${id}`
       }
     });
+    this.emitEvent('delete', { type, id });
     log.debug("delete %s %s", type, id);
   }
 
@@ -215,6 +218,7 @@ class BranchUpdate {
         }
       }
     });
+    this.emitEvent('delete_all_without_nonce', { sourceId, nonce });
     log.debug("bulk delete older content for data source %s", sourceId);
   }
 

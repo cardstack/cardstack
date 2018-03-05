@@ -6,11 +6,12 @@ const { flatten } = require('lodash');
 log.registerFormatter('t', require('../table-log-formatter'));
 
 module.exports = class RunningIndexers {
-  constructor(seedSchema, client) {
+  constructor(seedSchema, client, emitEvent) {
     this.seedSchema = seedSchema;
     this.client = client;
     this.ownedDataSources = {};
     this.seenDataSources = {};
+    this.emitEvent = emitEvent;
     this.branches = {};
   }
 
@@ -59,7 +60,7 @@ module.exports = class RunningIndexers {
       for (let branch of await indexer.branches()) {
         if (!this.branches[branch]) {
           log.debug("Discovered branch %s", branch);
-          this.branches[branch] = new BranchUpdate(branch, this.seedSchema, this.client);
+          this.branches[branch] = new BranchUpdate(branch, this.seedSchema, this.client, this.emitEvent);
         }
         newSchemaModels.push(await this.branches[branch].addIndexer(indexer));
       }
