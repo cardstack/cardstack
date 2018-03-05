@@ -136,6 +136,12 @@ describe('hub/indexers', function() {
       let indexers = await env.lookup('hub:indexers');
 
       let addCount = 0;
+      let updateCompleteCount = 0;
+
+      indexers.on('update_complete', hints => {
+        updateCompleteCount++;
+        expect(hints).to.deep.equal({ foo: 'bar' });
+      });
 
       indexers.on('add', model => {
         addCount++;
@@ -185,41 +191,41 @@ describe('hub/indexers', function() {
               }
             });
             break;
-          case 'ephemeral-restores' :
+					case 'ephemeral-restores' :
             delete model.doc.relationships['data-source'].data.id;
-            expect(model).to.deep.equal({
-              "type": "content-types",
-              "id": "ephemeral-restores",
-              "doc": {
-                "type": "content-types",
-                "id": "ephemeral-restores",
-                "attributes": {
-                  "is-built-in": true
-                },
-                "relationships": {
-                  "data-source": {
-                    "data": {
-                      "type": "data-sources",
-                    }
-                  },
-                  "fields": {
-                    "data": [
-                      {
-                        "type": "fields",
-                        "id": "checkpoint"
-                      }
-                    ]
-                  }
-                }
-              }
-            });
+						expect(model).to.deep.equal({
+							"type": "content-types",
+							"id": "ephemeral-restores",
+							"doc": {
+								"type": "content-types",
+								"id": "ephemeral-restores",
+								"attributes": {
+									"is-built-in": true
+								},
+								"relationships": {
+									"data-source": {
+										"data": {
+											"type": "data-sources",
+										}
+									},
+									"fields": {
+										"data": [
+											{
+												"type": "fields",
+												"id": "checkpoint"
+											}
+										]
+									}
+								}
+							}
+						});
             break;
         }
       });
 
       await indexers.update({ realTime: true, hints: { foo: 'bar' } });
-
       expect(addCount).to.equal(3, 'the correct number of add events were emitted');
+      expect(updateCompleteCount).to.equal(1, 'the correct number of update_complete events were emitted');
     });
   });
 

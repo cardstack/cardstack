@@ -33,6 +33,7 @@ class LiveQueryService {
 
   constructor() {
     this._client_subscriptions = new WeakMap();
+    this._contentOperationsEvents = [];
   }
 
   async start({socketPath, socketPort}) {
@@ -56,15 +57,23 @@ class LiveQueryService {
   }
 
   listenToIndexer(indexEvents) {
-    // TODO use the event type and event args to perform more
-    // fined grained invalidations
+    indexEvents.on('add', (event, args) => this._trackContentOperationEvent(event, args));
+    indexEvents.on('delete', (event, args) => this._trackContentOperationEvent(event, args));
+    indexEvents.on('delete_all_without_nonce', (event, args) => this._trackContentOperationEvent(event, args));
 
-    indexEvents.on('add', () => this._invalidateAll());
-    indexEvents.on('delete', () => this._invalidateAll());
-    indexEvents.on('delete_all_without_nonce', () => this._invalidateAll());
+    indexEvents.on('update_complete', () => this._invalidateAll());
+  }
+
+  _trackContentOperationEvent(event, args) {
+    this._contentOperationsEvents.push({ event, args });
   }
 
   _invalidateAll() {
+    // TODO use the contract operation events fired since the last invalidation
+    // to figure out how to perform fine-grained invalidations
+    // let contentOperationEvents = this._contentOperationsEvents;
+    this._contentOperationsEvents = [];
+
     let sockets = Object.values(this.namespace.connected);
 
     sockets.forEach((sock) => {
