@@ -55,8 +55,8 @@ class BranchUpdate {
     }
   }
 
-  async update(realTime, hints) {
-    this.bulkOps = this.client.bulkOps({ realTime });
+  async update(forceRefresh, hints) {
+    this.bulkOps = this.client.bulkOps({ forceRefresh });
     await this.client.accomodateSchema(this.branch, await this.schema());
     await this._updateContent(hints);
   }

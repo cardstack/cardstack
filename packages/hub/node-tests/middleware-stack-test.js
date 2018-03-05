@@ -79,7 +79,7 @@ describe('middleware-stack', function() {
       let config = await env.lookup('hub:searchers').get(env.session, 'master', 'plugin-configs', 'stub-middleware-extra');
       config.data.attributes.enabled = true;
       await env.lookup('hub:writers').update('master', env.session, config.data.type, config.data.id, config.data);
-      await env.lookup('hub:indexers').update({ realTime: true });
+      await env.lookup('hub:indexers').update({ forceRefresh: true });
       let response = await request.get('/extra');
       expect(response).hasStatus(200);
       expect(response.body).has.property('message', 'Extra middleware plugin');
@@ -93,7 +93,7 @@ describe('middleware-stack', function() {
           enabled: false
         }
       });
-      await env.lookup('hub:indexers').update({ realTime: true });
+      await env.lookup('hub:indexers').update({ forceRefresh: true });
       let response = await request.get('/first');
       expect(response).hasStatus(404);
     });

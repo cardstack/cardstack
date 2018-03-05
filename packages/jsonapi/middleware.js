@@ -158,7 +158,7 @@ class Handler {
     this.ctxt.body = { data: record };
     this.ctxt.status = 200;
     if (this.query.nowait == null) {
-      await this.indexers.update({ realTime: true, hints: [{ branch: this.branch, id, type }] });
+      await this.indexers.update({ forceRefresh: true, hints: [{ branch: this.branch, id, type }] });
     }
   }
 
@@ -168,7 +168,7 @@ class Handler {
       await this.writers.delete(this.branch, this.session, version, type, id);
       this.ctxt.status = 204;
       if (this.query.nowait == null) {
-        await this.indexers.update({ realTime: true, hints: [{ branch: this.branch, id, type }] });
+        await this.indexers.update({ forceRefresh: true, hints: [{ branch: this.branch, id, type }] });
       }
     } catch (err) {
       // By convention, the writer always refers to the version as
@@ -223,7 +223,7 @@ class Handler {
     }
     this.ctxt.set('location', origin + this.ctxt.request.path + '/' + record.id);
     if (this.query.nowait == null) {
-      await this.indexers.update({ realTime: true, hints: [{ branch: this.branch, id: record.id, type }] });
+      await this.indexers.update({ forceRefresh: true, hints: [{ branch: this.branch, id: record.id, type }] });
     }
   }
 

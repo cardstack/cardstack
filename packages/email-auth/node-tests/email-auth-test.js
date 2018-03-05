@@ -80,7 +80,7 @@ describe('email-auth', function() {
     expect(response.body).has.deep.property('data.id');
     expect(response.body).has.deep.property('data.meta.token');
 
-    await env.lookup('hub:indexers').update({ realTime: true });
+    await env.lookup('hub:indexers').update({ forceRefresh: true });
 
     response = await request.get('/').set('authorization', `Bearer ${response.body.data.meta.token}`);
     expect(response).hasStatus(200);

@@ -56,7 +56,7 @@ describe('postgresql/indexer', function() {
 
     env = await createDefaultEnvironment(`${__dirname}/..`, factory.getModels());
 
-    await env.lookup('hub:indexers').update({ realTime: true });
+    await env.lookup('hub:indexers').update({ forceRefresh: true });
   }
 
   async function teardown() {
@@ -157,7 +157,7 @@ describe('postgresql/indexer', function() {
 
     it('discovers new records', async function() {
       await client.query('insert into articles values ($1, $2)', ['2', 'second article']);
-      await env.lookup('hub:indexers').update({ realTime: true });
+      await env.lookup('hub:indexers').update({ forceRefresh: true });
       let doc = await env.lookup('hub:searchers').get(env.session, 'master', 'articles', '2');
       expect(doc).is.ok;
       let model = doc.data;
@@ -168,7 +168,7 @@ describe('postgresql/indexer', function() {
 
     it('updates records', async function() {
       await client.query('update articles set title=$1 where id=$2', ['I was updated', '0']);
-      await env.lookup('hub:indexers').update({ realTime: true });
+      await env.lookup('hub:indexers').update({ forceRefresh: true });
       let doc = await env.lookup('hub:searchers').get(env.session, 'master', 'articles', '0');
       expect(doc).is.ok;
       let model = doc.data;
@@ -178,7 +178,7 @@ describe('postgresql/indexer', function() {
 
     it('deletes records', async function() {
       await client.query('delete from articles where id=$1', ['0']);
-      await env.lookup('hub:indexers').update({ realTime: true });
+      await env.lookup('hub:indexers').update({ forceRefresh: true });
       try {
         await env.lookup('hub:searchers').get(env.session, 'master', 'articles', '0');
         throw new Error("should not get here");
@@ -189,7 +189,7 @@ describe('postgresql/indexer', function() {
 
     it('discovers newly added content type', async function() {
       await client.query('create table humans (id varchar primary key, name varchar)');
-      await env.lookup('hub:indexers').update({ realTime: true });
+      await env.lookup('hub:indexers').update({ forceRefresh: true });
       let doc = await env.lookup('hub:searchers').get(env.session, 'master', 'content-types', 'humans');
       expect(doc).is.ok;
       let model = doc.data;
@@ -200,7 +200,7 @@ describe('postgresql/indexer', function() {
 
     it('removes deleted content type', async function() {
       await client.query('drop table articles');
-      await env.lookup('hub:indexers').update({ realTime: true });
+      await env.lookup('hub:indexers').update({ forceRefresh: true });
       try {
         await env.lookup('hub:searchers').get(env.session, 'master', 'content-types', 'articles');
         throw new Error("should not get here");
@@ -212,7 +212,7 @@ describe('postgresql/indexer', function() {
     it('discovers newly added column', async function() {
       await client.query('alter table articles add column author varchar');
       await client.query('update articles set author=$1 where id=$2', ['Arthur', '0']);
-      await env.lookup('hub:indexers').update({ realTime: true });
+      await env.lookup('hub:indexers').update({ forceRefresh: true });
       let doc = await env.lookup('hub:searchers').get(env.session, 'master', 'content-types', 'articles');
       expect(doc).is.ok;
       let model = doc.data;

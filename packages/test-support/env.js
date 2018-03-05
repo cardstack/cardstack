@@ -93,7 +93,7 @@ exports.createDefaultEnvironment = async function(projectDir, initialModels = []
       await writers.create('master', session, model.type, model);
     }
 
-    await container.lookup('hub:indexers').update({ realTime: true });
+    await container.lookup('hub:indexers').update({ forceRefresh: true });
 
     Object.assign(container, {
       session,
