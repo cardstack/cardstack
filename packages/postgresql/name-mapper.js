@@ -59,10 +59,12 @@ module.exports = class NameMapper {
     }
     let remappedColumns = this.renameColumns[key];
     if (remappedColumns) {
-      return Object.keys(remappedColumns).find(k => remappedColumns[k] === fieldName) || fieldName;
-    } else {
-      return snakeCase(fieldName);
+      let renamed = Object.keys(remappedColumns).find(k => remappedColumns[k] === fieldName);
+      if (renamed) {
+        return renamed;
+      }
     }
+    return snakeCase(fieldName);
   }
 
 };

@@ -17,7 +17,7 @@ describe('postgresql/writer', function() {
     client = new Client({ database: 'test1', host: 'localhost', user: 'postgres', port: 5444 });
     await client.connect();
     await client.query('create sequence article_id_seq');
-    await client.query(`create table articles (id varchar primary key DEFAULT cast(nextval('article_id_seq') as varchar), title varchar, length integer, published boolean, alt_topic varchar)`);
+    await client.query(`create table articles (id varchar primary key DEFAULT cast(nextval('article_id_seq') as varchar), title varchar, length integer, published boolean, alt_topic varchar, multi_word varchar)`);
     await client.query('insert into articles values ($1, $2, $3, $4)', ['0', 'hello world', 100, true]);
 
     let factory = new JSONAPIFactory();
@@ -94,7 +94,8 @@ describe('postgresql/writer', function() {
         title: 'I was created',
         length: 200,
         published: false,
-        topic: 'x'
+        topic: 'x',
+        'multi-word': 'hello'
       }
     });
     let result = await client.query('select title, length, published, alt_topic from articles where id=$1', [created.id]);
