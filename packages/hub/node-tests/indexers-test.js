@@ -191,34 +191,34 @@ describe('hub/indexers', function() {
               }
             });
             break;
-					case 'ephemeral-restores' :
+          case 'ephemeral-restores' :
             delete model.doc.relationships['data-source'].data.id;
-						expect(model).to.deep.equal({
-							"type": "content-types",
-							"id": "ephemeral-restores",
-							"doc": {
-								"type": "content-types",
-								"id": "ephemeral-restores",
-								"attributes": {
-									"is-built-in": true
-								},
-								"relationships": {
-									"data-source": {
-										"data": {
-											"type": "data-sources",
-										}
-									},
-									"fields": {
-										"data": [
-											{
-												"type": "fields",
-												"id": "checkpoint"
-											}
-										]
-									}
-								}
-							}
-						});
+            expect(model).to.deep.equal({
+              "type": "content-types",
+              "id": "ephemeral-restores",
+              "doc": {
+                "type": "content-types",
+                "id": "ephemeral-restores",
+                "attributes": {
+                  "is-built-in": true
+                },
+                "relationships": {
+                  "data-source": {
+                    "data": {
+                      "type": "data-sources",
+                    }
+                  },
+                  "fields": {
+                    "data": [
+                      {
+                        "type": "fields",
+                        "id": "checkpoint"
+                      }
+                    ]
+                  }
+                }
+              }
+            });
             break;
         }
       });
