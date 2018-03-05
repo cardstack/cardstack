@@ -132,20 +132,101 @@ describe('hub/indexers', function() {
     beforeEach(setup);
     afterEach(teardown);
 
-    it("triggers an event after each indexing", async function() {
+    it("triggers events when indexing", async function() {
       let indexers = await env.lookup('hub:indexers');
 
-      let resolve;
-      let done = new Promise(r => resolve = r);
+      let addCount = 0;
+      let indexUpdatedCount = 0;
 
-      indexers.on('index_update', hints => {
+      indexers.on('index_updated', hints => {
+        indexUpdatedCount++;
         expect(hints).to.deep.equal({ foo: 'bar' });
-        resolve();
       });
 
-      indexers.update({ realTime: true, hints: { foo: "bar" } });
+      indexers.on('add', model => {
+        addCount++;
 
-      return done;
+        switch (model.id) {
+          case 'checkpoint' :
+            expect(model).to.deep.equal({
+              "type": "fields",
+              "id": "checkpoint",
+              "doc": {
+                "type": "fields",
+                "id": "checkpoint",
+                "attributes": {
+                  "field-type": "@cardstack/core-types::belongs-to"
+                },
+                "relationships": {
+                  "related-types": {
+                    "data": [
+                      {
+                        "type": "content-types",
+                        "id": "ephemeral-checkpoints"
+                      }
+                    ]
+                  }
+                }
+              }
+            });
+            break;
+          case 'ephemeral-checkpoints' :
+            delete model.doc.relationships['data-source'].data.id;
+            expect(model).to.deep.equal({
+              "type": "content-types",
+              "id": "ephemeral-checkpoints",
+              "doc": {
+                "type": "content-types",
+                "id": "ephemeral-checkpoints",
+                "attributes": {
+                  "is-built-in": true
+                },
+                "relationships": {
+                  "data-source": {
+                    "data": {
+                      "type": "data-sources",
+                    }
+                  }
+                }
+              }
+            });
+            break;
+					case 'ephemeral-restores' :
+            delete model.doc.relationships['data-source'].data.id;
+						expect(model).to.deep.equal({
+							"type": "content-types",
+							"id": "ephemeral-restores",
+							"doc": {
+								"type": "content-types",
+								"id": "ephemeral-restores",
+								"attributes": {
+									"is-built-in": true
+								},
+								"relationships": {
+									"data-source": {
+										"data": {
+											"type": "data-sources",
+										}
+									},
+									"fields": {
+										"data": [
+											{
+												"type": "fields",
+												"id": "checkpoint"
+											}
+										]
+									}
+								}
+							}
+						});
+            break;
+        }
+      });
+
+      await indexers.update({ realTime: true, hints: { foo: 'bar' } });
+
+      expect(addCount).to.equal(3, 'the correct number of add events were emitted');
+      expect(indexUpdatedCount).to.equal(1, 'the correct number of index_updated events were emitted');
     });
   });
 

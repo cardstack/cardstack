@@ -6,8 +6,10 @@ module.exports = [
     type: 'grants',
     id: '0',
     attributes: {
-      'may-write-field': true,
+      'may-read-fields': true,
+      'may-write-fields': true,
       'may-create-resource': true,
+      'may-read-resource': true,
       'may-update-resource': true,
       'may-delete-resource': true
     },
