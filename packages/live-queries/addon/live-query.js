@@ -7,6 +7,10 @@ export function liveQuery(...args) {
   let fn = args.pop();
   let deps = args;
   return Ember.computed(...deps, function() {
+    if (!this.isComponent) {
+      Ember.Logger.warn(`Live-query should only be used inside a component due to the lifecycle operations that a component uses. If used outside of a component then you must manually cleanup the live query subscription.`);
+    }
+
     if (query) {
       // we have already run before, we're recomputing due to a dependent key change
       query.cleanup();
