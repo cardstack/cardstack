@@ -38,14 +38,11 @@
 */
 
 const EventEmitter = require('events');
-const { flatten, uniqBy } = require('lodash');
 const log = require('@cardstack/logger')('cardstack/indexers');
 const Client = require('@cardstack/elasticsearch/client');
 const { declareInjections } = require('@cardstack/di');
-const toJSONAPI = require('@cardstack/elasticsearch/to-jsonapi');
 const bootstrapSchema = require('./bootstrap-schema');
-
-const owningDataSource = new WeakMap();
+const RunningIndexers = require('./indexing/running-indexers');
 
 module.exports = declareInjections({
   schemaLoader: 'hub:schema-loader',
