@@ -63,7 +63,7 @@ class Indexers extends EventEmitter {
   async schemaForBranch(branch) {
     if (!this._schemaCache) {
       this._schemaCache = (async () => {
-        let running = new RunningIndexers(await this._seedSchema(), await this._client());
+        let running = new RunningIndexers(await this._seedSchema(), await this._client(), this.events.emit.bind(this.events));
         try {
           return await running.schemas();
         } finally {
