@@ -1,7 +1,3 @@
-// FIXME: this file is currently duplicated into a browser version
-// (this one) and a node version (see ../jsonapi-factory.js). Need to
-// do obnoxious build-time thing to make one thing work both ways.
-
 import DAGMap from 'dag-map';
 let idGenerator = 0;
 
@@ -63,7 +59,11 @@ export default class JSONAPIFactory {
       dag.add(`${model.type}/${model.id}`, model, [], dependsOn);
     });
     let output = [];
-    dag.each((key, value) => output.push(value));
+    dag.each((key, value) => {
+      if (value) {
+        output.push(value);
+      }
+    });
     return output;
   }
 
@@ -103,6 +103,9 @@ class ResourceFactory {
     }
     this.data.relationships[dasherize(fieldName)] = { data };
     return this;
+  }
+  asDocument() {
+    return { data: this.data };
   }
 }
 
