@@ -185,7 +185,7 @@ class Indexers extends EventEmitter {
       running.destroy();
     }
     this.emit('update_complete', hints);
-    log.debug('end update, realTime=%s', realTime);
+    log.debug('end update, forceRefresh=%s', forceRefresh);
   }
 
 });
