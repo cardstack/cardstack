@@ -10,13 +10,11 @@ module.exports = {
   included(app) {
     this._super.apply(this, arguments);
 
-    let socketIoPath = require.resolve('socket.io-client/dist/socket.io.js');
-
-    app.import(socketIoPath, {
+    app.import('node_modules/socket.io-client/dist/socket.io.js', {
       using: [
         {
           transformation: 'amd',
-          as: 'socket.io'
+          as: 'socket-io'
         }
       ]
     });
