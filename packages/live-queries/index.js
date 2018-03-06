@@ -12,7 +12,13 @@ module.exports = {
 
     let socketIoPath = require.resolve('socket.io-client/dist/socket.io.js');
 
-    app.import(socketIoPath);
-    app.import("vendor/socket-io-shim.js");
+    app.import(socketIoPath, {
+      using: [
+        {
+          transformation: 'amd',
+          as: 'socket.io'
+        }
+      ]
+    });
   }
 };
