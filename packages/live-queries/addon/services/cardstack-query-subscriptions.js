@@ -14,21 +14,15 @@ export default Service.extend({
     this._connection.on('query-invalidate', this.invalidate.bind(this));
   },
 
-  subscribe(type, query, invalidate) {
-    // Ember Data does stuff with singular types,
-    // but the hub works with pluralized types.
-    // So, pluralize here before sending over the socket
-    type = Ember.String.pluralize(type);
-
+  subscribe(query, invalidate) {
     let subscription_id = this.incrementProperty('_idCounter');
     this._subscriptions[subscription_id] = {
       subscription_id,
-      type,
       query,
       invalidate
     };
 
-    this._connection.emit('query-subscribe', subscription_id, type, query);
+    this._connection.emit('query-subscribe', subscription_id, query);
 
     return subscription_id;
   },

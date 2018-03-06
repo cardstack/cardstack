@@ -24,7 +24,6 @@
   },
   "dependencies": {
     "@cardstack/di": "^0.5.8",
-    "@cardstack/hub": "^0.5.9",
     "@cardstack/logger": "^0.1.0",
     "ember-cli-babel": "^6.8.2",
     "ember-cli-htmlbars": "^2.0.1",

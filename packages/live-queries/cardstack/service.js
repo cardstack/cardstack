@@ -18,14 +18,13 @@ class LiveQueryService {
     // initializer feature type that gets run on startup, and passed its
     // plugin config.
     // We're happy to start the server in the background though, hence .then()
-    plugins.active().then(async function(configured) {
-      let ourConfig = configured.describe('@cardstack/live-queries');
-      let socketPath = ourConfig.attributes['socket-path'] || DEFAULT_SOCKET_IO_PATH;
-      let socketPort = ourConfig.attributes['socket-port'] || DEFAULT_SOCKET_IO_PORT;
+    let configured = await plugins.active();
 
-      instance.start({socketPath, socketPort});
-    });
+    let ourConfig = configured.describe('@cardstack/live-queries');
+    let socketPath = ourConfig.attributes['socket-path'] || DEFAULT_SOCKET_IO_PATH;
+    let socketPort = ourConfig.attributes['socket-port'] || DEFAULT_SOCKET_IO_PORT;
 
+    instance.start({socketPath, socketPort});
     instance.listenToIndexer(indexers);
 
     return instance;
@@ -33,7 +32,7 @@ class LiveQueryService {
 
   constructor() {
     this._client_subscriptions = new WeakMap();
-    this._contentOperationsEvents = [];
+    this._needsInvalidation = false;
   }
 
   async start({socketPath, socketPort}) {
@@ -61,18 +60,20 @@ class LiveQueryService {
     indexEvents.on('delete', args => this._trackContentOperationEvent('delete', args));
     indexEvents.on('delete_all_without_nonce', args => this._trackContentOperationEvent('delete_all_without_nonce', args));
 
-    indexEvents.on('update_complete', () => this._invalidateAll());
+    indexEvents.on('update_complete', () => this._invalidate());
   }
 
-  _trackContentOperationEvent(event, args) {
-    this._contentOperationsEvents.push({ event, args });
+  _trackContentOperationEvent(/*event, args*/) {
+    // TODO enhance the use of the fined grained operation events to
+    // figure out more nuanced invalidation, e.g. compare the subscription
+    // queries to the documents being changed, as well as comparing the
+    // subscription's identities to the grants of the content being changed, etc.
+    this._needsInvalidation = true;
   }
 
-  _invalidateAll() {
-    // TODO use the contract operation events fired since the last invalidation
-    // to figure out how to perform fine-grained invalidations
-    // let contentOperationEvents = this._contentOperationsEvents;
-    this._contentOperationsEvents = [];
+  _invalidate() {
+    if (!this._needsInvalidation) { return; }
+    this._needsInvalidation = false;
 
     let sockets = Object.values(this.namespace.connected);
 
@@ -93,9 +94,9 @@ class ClientSubscriptionSet {
     return Object.values(this._subscriptions);
   }
 
-  subscribe(id, type, query) {
-    log.debug('Client requesting subscription for %s with query %o', type, query);
-    this._subscriptions[id] = new QuerySubscription(this.socket, id, type, query);
+  subscribe(id, query) {
+    log.debug('Client requesting subscription for %s with query %o', query);
+    this._subscriptions[id] = new QuerySubscription(this.socket, id, query);
   }
 
   unsubscribe(id) {
@@ -104,15 +105,14 @@ class ClientSubscriptionSet {
 }
 
 class QuerySubscription {
-  constructor(socket, id, type, query) {
+  constructor(socket, id, query) {
     this.socket = socket;
     this.id = id;
-    this.type = type;
     this.query = query;
   }
 
   invalidate() {
-    log.trace('Invalidation triggered for live query subscription %s (%s) with query: %o', this.id, this.type, this.query);
+    log.trace('Invalidation triggered for live query subscription %s (%s) with query: %o', this.id, this.query);
     this.socket.emit('query-invalidate', this.id);
   }
 }

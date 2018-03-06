@@ -26,13 +26,16 @@ export function liveQuery(...args) {
 
 class LiveQuery {
   constructor({type, query}, owner) {
+    if (!query.filter || !query.filter.type) {
+      throw new Error("Live query currently requires that you include at least a type filter in your query, e.g. `{ filter: { type: 'items' } }`. (note that hub uses pluralized type names)");
+    }
     this.subscriber = owner.lookup('service:cardstack-query-subscriptions');
     this.store = owner.lookup('service:store');
 
     this.request = this.store.query(type, query);
     this.request.then((recordArray) => this._records = recordArray);
 
-    this.id = this.subscriber.subscribe(type, query, this.invalidate.bind(this));
+    this.id = this.subscriber.subscribe(query, this.invalidate.bind(this));
   }
 
   invalidate() {

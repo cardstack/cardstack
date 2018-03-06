@@ -10,7 +10,7 @@ import { host, path } from '@cardstack/live-queries/environment';
 export default Service.extend({
   connect(namespace) {
     Ember.Logger.info(`Connecting to socket.io namespace ${namespace} at url: ${host}/${path}`);
-    return io(host + '/' + namespace, {
+    return io(host + namespace, {
       path
     });
   }

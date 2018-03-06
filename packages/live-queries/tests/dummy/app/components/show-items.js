@@ -5,7 +5,7 @@ export default Component.extend({
   items: liveQuery(function() {
     return {
       type: "item",
-      query: {}
+      query: { filter:  { type: 'items' } }
     };
   })
 });

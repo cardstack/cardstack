@@ -1,3 +1,4 @@
+const { URL } = require('url');
 const Handlebars = require('handlebars');
 const { declareInjections } = require('@cardstack/di');
 
@@ -17,7 +18,8 @@ define("@cardstack/live-queries/environment", ["exports"], function (exports) {
 `);
 
 module.exports = declareInjections({
-  plugins: 'hub:plugins'
+  plugins: 'hub:plugins',
+  publicURL: 'config:public-url'
 },
 
 class LiveQueryCodeGenerator {
@@ -26,22 +28,21 @@ class LiveQueryCodeGenerator {
     let configured = await this.plugins.active();
     let pluginConfig = configured.describe('@cardstack/live-queries');
 
-
-    let protocol = 'http';
-    let hostname = 'localhost';
     let port = pluginConfig.attributes['socket-port'] || DEFAULT_SOCKET_IO_PORT;
-    let socket_host = `${protocol}://${hostname}:${port}`;
+    let socketPath = pluginConfig.attributes['socket-path'] || DEFAULT_SOCKET_IO_PATH;
+    let socketIoUrl = new URL(this.publicURL.url);
 
-    let socket_path = pluginConfig.attributes['socket-path'] || DEFAULT_SOCKET_IO_PATH;
+    socketIoUrl.port = port;
+    socketIoUrl.pathname = '';
 
     return template({ properties: [
       {
         name: 'host',
-        value: socket_host
+        value: socketIoUrl.toString()
       },
       {
         name: 'path',
-        value: socket_path
+        value: socketPath
       }
     ]});
   }
