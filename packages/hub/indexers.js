@@ -4,10 +4,11 @@
     `update`: responsible for getting any new upstream content into
       the search index. update takes these optional arguments:
 
-      - realTime: when true, update will block until the resulting
-        changes are visible in elasticsearch. This is somewhat
-        expensive, which is why we make it optional. Most of the time
-        non-realtime is good enough and much faster. Defaults to false.
+      - forceRefresh: when true, we will force elasticsearch to index
+        the new content immediately. This is expensive if you do it
+        too often. When false, we will wait for the next scheduled
+        refresh to happen (the default Elasticsearch refresh_interval
+        is once per second). Defaults to false.
 
       - hints: can contain a list of `{ branch, id, type }`
         references. This is intended as an optimization hint when we
@@ -52,7 +53,7 @@ class Indexers {
     this._clientMemo = null;
     this._running = false;
     this._queue = [];
-    this._realTimeQueue = [];
+    this._forceRefreshQueue = [];
     this._seedSchemaMemo = null;
     this._schemaCache = null;
   }
@@ -89,14 +90,14 @@ class Indexers {
     }
   }
 
-  async update({ realTime, hints } = {}) {
+  async update({ forceRefresh, hints } = {}) {
     let resolve, reject;
     let promise = new Promise((r,j) => {
       resolve = r;
       reject = j;
     });
-    if (realTime) {
-      this._realTimeQueue.push({ hints, resolve, reject });
+    if (forceRefresh) {
+      this._forceRefreshQueue.push({ hints, resolve, reject });
     } else {
       this._queue.push({ hints, resolve, reject });
     }
@@ -130,7 +131,7 @@ class Indexers {
   async _updateLoop() {
     this._running = true;
     try {
-      while (this._queue.length > 0 || this._realTimeQueue.length > 0) {
+      while (this._queue.length > 0 || this._forceRefreshQueue.length > 0) {
         let queue = this._queue;
         this._queue = [];
         try {
@@ -139,12 +140,12 @@ class Indexers {
           queue.forEach(req => req.reject(err));
           throw err;
         }
-        let realTimeQueue = this._realTimeQueue;
-        this._realTimeQueue = [];
+        let forceRefreshQueue = this._forceRefreshQueue;
+        this._forceRefreshQueue = [];
         try {
-          await this._runBatch(realTimeQueue, true);
+          await this._runBatch(forceRefreshQueue, true);
         } catch (err) {
-          realTimeQueue.forEach(req => req.reject(err));
+          forceRefreshQueue.forEach(req => req.reject(err));
           throw err;
         }
       }
@@ -153,7 +154,7 @@ class Indexers {
     }
   }
 
-  async _runBatch(batch, realTime) {
+  async _runBatch(batch, forceRefresh) {
     if (batch.length > 0) {
       let hints;
       // hints only help if every request in the batch has hints. A
@@ -161,26 +162,26 @@ class Indexers {
       if (batch.every(req => req.hints)) {
         hints = batch.map(req => req.hints).reduce((a,b) => a.concat(b));
       }
-      await this._doUpdate(realTime, hints);
+      await this._doUpdate(forceRefresh, hints);
       for (let { resolve } of batch) {
         resolve();
       }
     }
   }
 
-  async _doUpdate(realTime, hints) {
-    log.debug('begin update, realTime=%s', realTime);
+  async _doUpdate(forceRefresh, hints) {
+    log.debug('begin update, forceRefresh=%s', forceRefresh);
     let priorCache = this._schemaCache;
     let running = new RunningIndexers(await this._seedSchema(), await this._client());
     try {
-      let schemas = await running.update(realTime, hints);
+      let schemas = await running.update(forceRefresh, hints);
       if (this._schemaCache === priorCache) {
         this._schemaCache = Promise.resolve(schemas);
       }
     } finally {
       running.destroy();
     }
-    log.debug('end update, realTime=%s', realTime);
+    log.debug('end update, forceRefresh=%s', forceRefresh);
   }
 
 });

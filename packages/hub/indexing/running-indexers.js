@@ -67,9 +67,9 @@ module.exports = class RunningIndexers {
     return flatten(newSchemaModels);
   }
 
-  async update(realTime, hints) {
+  async update(forceRefresh, hints) {
     await this._loadSchemaModels();
-    await Promise.all(Object.values(this.branches).map(branch => branch.update(realTime, hints)));
+    await Promise.all(Object.values(this.branches).map(branch => branch.update(forceRefresh, hints)));
     return await this._schemas();
   }
 

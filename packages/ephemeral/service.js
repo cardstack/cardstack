@@ -241,7 +241,7 @@ class EphemeralStorage {
 
 
 
-    await this.indexers.update({ realTime: true });
+    await this.indexers.update({ forceRefresh: true });
     log.debug(`restored checkpoint ${id}`);
     return generationCounter;
   }

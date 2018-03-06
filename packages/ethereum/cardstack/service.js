@@ -193,7 +193,7 @@ class EthereumService {
       let hints = uniqWith(queue, isEqual);
 
       log.debug("processing index queue ", hints);
-      this._indexerPromise = this._indexer.update({ realTime: true, hints });
+      this._indexerPromise = this._indexer.update({ forceRefresh: true, hints });
 
       Promise.resolve(this._indexerPromise)
         .then(() => {
@@ -238,4 +238,3 @@ function  getEventDefinitions(contractName, contractDefinitions) {
   }
   return events;
 }
-

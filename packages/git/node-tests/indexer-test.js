@@ -317,8 +317,8 @@ describe('git/indexer', function() {
 
     await logger.expectWarn(/Unable to load previously indexed commit/, async () => {
       // TODO: should only take one cycle
-      await indexer.update({ realTime: true });
-      await indexer.update({ realTime: true });
+      await indexer.update({ forceRefresh: true });
+      await indexer.update({ forceRefresh: true });
     });
 
 

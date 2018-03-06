@@ -1,10 +1,19 @@
 const _ = require('lodash');
 
 class BulkOps {
-  constructor(es, { realTime, batchSize }) {
+  constructor(es, { forceRefresh, batchSize }) {
     this.es = es;
     this.queue = [];
-    this.realTime = realTime;
+
+    // We always either wait for the next scheduled refresh or force
+    // our own refresh. It's important that we never fire off an
+    // operation that _doesn't_ wait for refresh at all (by setting
+    // `refresh` to null or false), because those operations
+    // effectively escape and even if you run a subsequent operation
+    // that does wait, you get no guarantee that the escaped
+    // operations have really finished.
+    this.refresh = forceRefresh ? true : 'wait_for';
+
     this.batchSize = batchSize || 1000;
     this.queryDeletions = [];
   }
@@ -27,7 +36,7 @@ class BulkOps {
     let body = this.queue;
     if (body.length === 0){ return; }
     this.queue = [];
-    let response = await this.es.bulk({ body });
+    let response = await this.es.bulk({ body, refresh: this.refresh });
     let failedOperations = response.items.filter(item => {
       let op = Object.keys(item)[0];
       return item[op].error;
@@ -48,25 +57,11 @@ class BulkOps {
   async finalize() {
     await this.flush();
     await this._runQueryDeletions();
-    if (this.realTime) {
-      // This forces all recent changes to be indexed
-      // immediately. Doing it too often is bad for performance.
-      //
-      // Prior to this implementation, I was using ?refresh=true on
-      // the es.bulk calls above, which may seem more elegant. But it
-      // doesn't allow us to reliably make all of our content visible
-      // in the search results because sometimes a regular
-      // non-realtime indexing operation may have already picked up
-      // your change, and then the realtime indexing operation finds
-      // nothing to do, and elasticsearch only promises that
-      // ?refresh=true works for content inside the given operation --
-      // not other content that may already be in flight.
-      await this.es.indices.refresh({ index: '_all' });
-    }
   }
 
   async _runQueryDeletions() {
     for (let query of this.queryDeletions) {
+      query.refresh = this.refresh;
       await this.es.deleteByQuery(query);
     }
   }

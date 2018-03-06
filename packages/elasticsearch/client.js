@@ -78,8 +78,8 @@ module.exports = class SearchClient {
     this._mappings = null;
   }
 
-  bulkOps({ realTime, batchSize }) {
-    return new BulkOps(this.es, { realTime, batchSize });
+  bulkOps({ forceRefresh, batchSize }) {
+    return new BulkOps(this.es, { forceRefresh, batchSize });
   }
 
   async accomodateSchema(branch, schema) {

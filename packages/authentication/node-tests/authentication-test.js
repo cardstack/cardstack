@@ -377,7 +377,7 @@ describe('authentication/middleware', function() {
         expect(response.body).has.deep.property('data.meta.token');
         expect(response.body).has.deep.property('data.attributes.email', 'quint@example.com');
 
-        await env.lookup('hub:indexers').update({ realTime: true });
+        await env.lookup('hub:indexers').update({ forceRefresh: true });
 
         response = await request.get('/').set('authorization', `Bearer ${response.body.data.meta.token}`);
         expect(response).hasStatus(200);
@@ -489,7 +489,7 @@ describe('authentication/middleware', function() {
         expect(response.body).has.deep.property('data.meta.token');
         expect(response.body).has.deep.property('data.attributes.email', 'updated.email@this-changed.com');
 
-        await env.lookup('hub:indexers').update({ realTime: true });
+        await env.lookup('hub:indexers').update({ forceRefresh: true });
 
         response = await request.get('/').set('authorization', `Bearer ${response.body.data.meta.token}`);
         expect(response).hasStatus(200);
@@ -521,7 +521,7 @@ describe('authentication/middleware', function() {
         expect(response.body).has.deep.property('data.attributes.favorite-toy', 'squeaky snake');
         expect(response.body).not.has.deep.property('data.attributes.secret-rating');
 
-        await env.lookup('hub:indexers').update({ realTime: true });
+        await env.lookup('hub:indexers').update({ forceRefresh: true });
 
         response = await request.get('/').set('authorization', `Bearer ${response.body.data.meta.token}`);
         expect(response).hasStatus(200);
@@ -547,7 +547,7 @@ describe('authentication/middleware', function() {
         expect(response).hasStatus(200);
         expect(response.body).has.deep.property('data.meta.token');
 
-        await env.lookup('hub:indexers').update({ realTime: true });
+        await env.lookup('hub:indexers').update({ forceRefresh: true });
 
         response = await request.get('/').set('authorization', `Bearer ${response.body.data.meta.token}`);
         expect(response).hasStatus(200);
@@ -571,7 +571,7 @@ describe('authentication/middleware', function() {
         expect(response.body).has.deep.property('data.meta.token');
         let autoId = response.body.data.id;
 
-        await env.lookup('hub:indexers').update({ realTime: true });
+        await env.lookup('hub:indexers').update({ forceRefresh: true });
 
         response = await request.get('/').set('authorization', `Bearer ${response.body.data.meta.token}`);
         expect(response).hasStatus(200);
@@ -605,7 +605,7 @@ describe('authentication/middleware', function() {
         expect(response.body).has.deep.property('data.attributes.favorite-toy', null);
         expect(response.body).not.has.deep.property('data.attributes.secret-rating');
 
-        await env.lookup('hub:indexers').update({ realTime: true });
+        await env.lookup('hub:indexers').update({ forceRefresh: true });
 
         response = await request.get('/').set('authorization', `Bearer ${response.body.data.meta.token}`);
         expect(response).hasStatus(200);

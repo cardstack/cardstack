@@ -72,7 +72,7 @@ describe('hub/indexers', function() {
       let source = [...activeSources.values()].find(s => s.sourceType === '@cardstack/ephemeral');
       let storage = await source.writer.storage;
       storage.store(config.type, config.id, config, false, null);
-      await env.lookup('hub:indexers').update({ realTime: true });
+      await env.lookup('hub:indexers').update({ forceRefresh: true });
       doc = await env.lookup('hub:searchers').get(env.session, 'master', 'plugins', 'sample-plugin-one');
       expect(doc).has.deep.property('data.attributes.enabled', false);
     });
