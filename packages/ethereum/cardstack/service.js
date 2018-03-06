@@ -196,12 +196,8 @@ class EthereumService {
       this._indexerPromise = this._indexer.update({ forceRefresh: true, hints });
 
       Promise.resolve(this._indexerPromise)
-        .then(() => {
-          this._processQueueTimeout = scheduleNextProcess();
-        })
-        .finally(() => {
-          this._isIndexing = false;
-        });
+        .then(() => this._processQueueTimeout = scheduleNextProcess())
+        .finally(() => this._isIndexing = false);
     } else {
       this._processQueueTimeout = scheduleNextProcess();
     }
