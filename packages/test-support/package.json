@@ -24,6 +24,7 @@
     "@cardstack/hub": "^0.5.9",
     "@cardstack/logger": "^0.1.0",
     "@cardstack/plugin-utils": "^0.5.8",
+    "@std/esm": "^0.25.1",
     "chai": "^3.5.0",
     "chai-things": "^0.2.0",
     "dag-map": "^2.0.2",
