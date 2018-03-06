@@ -37,6 +37,7 @@
 
 */
 
+const EventEmitter = require('events');
 const log = require('@cardstack/logger')('cardstack/indexers');
 const Client = require('@cardstack/elasticsearch/client');
 const { declareInjections } = require('@cardstack/di');
@@ -48,8 +49,10 @@ module.exports = declareInjections({
   seedModels: 'config:seed-models'
 },
 
-class Indexers {
+class Indexers extends EventEmitter {
   constructor() {
+    super();
+
     this._clientMemo = null;
     this._running = false;
     this._queue = [];
@@ -61,7 +64,7 @@ class Indexers {
   async schemaForBranch(branch) {
     if (!this._schemaCache) {
       this._schemaCache = (async () => {
-        let running = new RunningIndexers(await this._seedSchema(), await this._client());
+        let running = new RunningIndexers(await this._seedSchema(), await this._client(), this.emit.bind(this));
         try {
           return await running.schemas();
         } finally {
@@ -172,7 +175,7 @@ class Indexers {
   async _doUpdate(forceRefresh, hints) {
     log.debug('begin update, forceRefresh=%s', forceRefresh);
     let priorCache = this._schemaCache;
-    let running = new RunningIndexers(await this._seedSchema(), await this._client());
+    let running = new RunningIndexers(await this._seedSchema(), await this._client(), this.emit.bind(this));
     try {
       let schemas = await running.update(forceRefresh, hints);
       if (this._schemaCache === priorCache) {
@@ -181,6 +184,7 @@ class Indexers {
     } finally {
       running.destroy();
     }
+    this.emit('update_complete', hints);
     log.debug('end update, forceRefresh=%s', forceRefresh);
   }
 
