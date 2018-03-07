@@ -17,7 +17,7 @@ describe('postgresql/writer', function() {
     client = new Client({ database: 'test1', host: 'localhost', user: 'postgres', port: 5444 });
     await client.connect();
     await client.query('create sequence article_id_seq');
-    await client.query(`create table articles (id varchar primary key DEFAULT cast(nextval('article_id_seq') as varchar), title varchar, length integer, published boolean, alt_topic varchar, multi_word varchar)`);
+    await client.query(`create table articles (id varchar primary key DEFAULT cast(nextval('article_id_seq') as varchar), title varchar, length integer, published boolean, alt_topic varchar, multi_word varchar, less_than_ten integer, check (less_than_ten < 10))`);
     await client.query('insert into articles values ($1, $2, $3, $4)', ['0', 'hello world', 100, true]);
 
     let factory = new JSONAPIFactory();
@@ -106,6 +106,29 @@ describe('postgresql/writer', function() {
     expect(result.rows[0].published).to.equal(false);
   });
 
+  it('reacts to database failure during create', async function() {
+    try {
+      await writer.create('master', new Session({ id: 'create-only', type: 'users'}), 'articles', {
+        type: 'articles',
+        attributes: {
+          title: 'I was created',
+          length: 200,
+          published: false,
+          topic: 'x',
+          'multi-word': 'hello',
+          lessThanTen: 11
+        }
+      });
+      throw new Error("should not get here");
+    } catch (err) {
+      expect(err.status).to.equal(401);
+      expect(err.title).to.equal('Constraint violation');
+      expect(err.detail).to.match(/violates.*constraint/);
+    }
+    let result = await client.query('select title, length, published, alt_topic from articles where title=$1', ["I was created"]);
+    expect(result.rows).has.length(0);
+  });
+
   it('can create new record with user-provided id', async function() {
     let created = await writer.create('master', new Session({ id: 'create-only', type: 'users'}), 'articles', {
       type: 'articles',
@@ -138,6 +161,22 @@ describe('postgresql/writer', function() {
     expect(result.rows[0].title).to.equal('hello world');
     expect(result.rows[0].length).to.equal(101);
     expect(result.rows[0].alt_topic).to.equal('y');
+  });
+
+  it('handles attempt to update a non-existent record', async function() {
+    try {
+      await writer.update('master', new Session({ id: 'update-only', type: 'users'}), 'articles', '10', {
+        type: 'articles',
+        id: '10',
+        attributes: {
+          length: 101,
+          topic: 'y'
+        }
+      });
+      throw new Error("should not get here");
+    } catch (err) {
+      expect(err.status).to.equal(404);
+    }
   });
 
   it('returns full record from update', async function() {
