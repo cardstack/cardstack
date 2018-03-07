@@ -69,7 +69,7 @@ module.exports = class Writer {
       return change;
     } catch (err) {
       await client.release();
-      throw err;
+      rethrowNicerError(err);
     }
   }
 
@@ -80,15 +80,19 @@ module.exports = class Writer {
     args.push(id);
     try {
       await client.query('begin');
-      let initialDocument = rowToDocument(schema, type, await client.query(`select * from ${dbschema}.${table} where id=$1`, [ id ]));
-      let result = await client.query(`update ${dbschema}.${table} set ${columns.map((name,index) => `${name}=$${index+1}`).join(',')} where id=$${args.length} returning *`, args);
+      let result = await client.query(`select * from ${dbschema}.${table} where id=$1`, [ id ]);
+      if (result.rows < 1) {
+        throw new Error("Not found", { status: 404, source: { pointer: '/data/id' } });
+      }
+      let initialDocument = rowToDocument(schema, type, result.rows[0]);
+      result = await client.query(`update ${dbschema}.${table} set ${columns.map((name,index) => `${name}=$${index+1}`).join(',')} where id=$${args.length} returning *`, args);
       let finalDocument = rowToDocument(schema, type, result.rows[0]);
       let change = new PendingChange(initialDocument, finalDocument, finalize, abort);
       pendingChanges.set(change, { client });
       return change;
     } catch (err) {
       await client.release();
-      throw err;
+      rethrowNicerError(err);
     }
   }
 
@@ -104,7 +108,7 @@ module.exports = class Writer {
       return change;
     } catch (err) {
       await client.release();
-      throw err;
+      rethrowNicerError(err);
     }
 
   }
@@ -165,4 +169,11 @@ async function abort(pendingChange) {
   let { client } = pendingChanges.get(pendingChange);
   await client.query('rollback');
   await client.release();
+}
+
+function rethrowNicerError(err) {
+  if (err.constraint) {
+    throw new Error(err.message, { title: "Constraint violation", status: 401 });
+  }
+  throw err;
 }
