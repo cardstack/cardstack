@@ -7,7 +7,7 @@ const { apply_patch } = require('jsonpatch');
 const NameMapper = require('./name-mapper');
 const { declareInjections } = require('@cardstack/di');
 const path = require('path');
-const migrate = require('@cardstack/node-pg-migrate').default;
+const migrate = require('node-pg-migrate').default;
 
 // Yes, this is slightly bananas. But it's easier to just read the
 // output of the "test_decoding" plugin that ships with postgres than
@@ -73,17 +73,7 @@ module.exports = declareInjections({
       direction: 'up',
       migrations_table: 'migrations',
       checkOrder: false,
-
-      // I added this option in
-      // https://github.com/salsita/node-pg-migrate/pull/204, which is
-      // why we are pointing at my fork of node-pg-migrate for the
-      // present.
-      //
-      // Given that we're running these in a very automated way, I
-      // would much rather put things back exactly as they were when
-      // there are any failures.
       single_transaction: true,
-
       database_url: {
         user: config.user,
         host: config.host,

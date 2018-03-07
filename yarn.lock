@@ -8,17 +8,6 @@
   dependencies:
     ms "2.0.0"
 
-"@cardstack/node-pg-migrate@2.23.1-cardstack.0":
-  version "2.23.1-cardstack.0"
-  resolved "https://registry.yarnpkg.com/@cardstack/node-pg-migrate/-/node-pg-migrate-2.23.1-cardstack.0.tgz#0cd3d41c114487a8bf7dfe202cb0459bb4788d11"
-  dependencies:
-    lodash "~4.17.0"
-    mkdirp "~0.5.1"
-    yargs "~11.0.0"
-  optionalDependencies:
-    config ">=1.0.0"
-    dotenv ">=1.0.0"
-
 "@cardstack/nodegit@0.19.0-cardstack.0":
   version "0.19.0-cardstack.0"
   resolved "https://registry.yarnpkg.com/@cardstack/nodegit/-/nodegit-0.19.0-cardstack.0.tgz#c106bb3733ff3d4f7ce39a62e369c8d42476ac08"
@@ -7227,6 +7216,17 @@ node-notifier@^5.0.1:
     semver "^5.3.0"
     shellwords "^0.1.0"
     which "^1.2.12"
+
+node-pg-migrate@2.24.1:
+  version "2.24.1"
+  resolved "https://registry.yarnpkg.com/node-pg-migrate/-/node-pg-migrate-2.24.1.tgz#d12b1b5a7bc028c78f7cd8e406e1abc625806d68"
+  dependencies:
+    lodash "~4.17.0"
+    mkdirp "~0.5.1"
+    yargs "~11.0.0"
+  optionalDependencies:
+    config ">=1.0.0"
+    dotenv ">=1.0.0"
 
 node-pre-gyp@^0.6.39, node-pre-gyp@~0.6.32:
   version "0.6.39"
