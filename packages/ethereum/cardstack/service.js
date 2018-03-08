@@ -2,6 +2,8 @@ const Web3 = require('web3');
 const log = require('@cardstack/logger')('cardstack/ethereum/service');
 const { declareInjections } = require('@cardstack/di');
 const { uniqWith, isEqual } = require('lodash');
+const { promisify } = require('util');
+const timeout = promisify(setTimeout);
 
 const NULL_ADDRESS = '0x0000000000000000000000000000000000000000';
 
@@ -17,8 +19,8 @@ class EthereumService {
 
   constructor({ indexer }) {
     this._indexer = indexer;
-    this._providers = {};
-    this._eventListeners = {};
+    this._providers = new WeakMap();
+    this._eventListeners = new WeakMap();
     this._hasStartedListening = false;
     this._hasConnected = false;
     this._isIndexing = false;
@@ -26,8 +28,9 @@ class EthereumService {
     this._processQueueTimeoutMs = 1000;
     this._processQueueTimeout = null;
     this._contractDefinitions = null;
-    this._eventDefinitions = {};
-    this._contracts = {};
+    this._branches = null;
+    this._eventDefinitions = new WeakMap();
+    this._contracts = new WeakMap();
     this._indexerPromise = null; // exposing this for the tests
   }
 
@@ -35,11 +38,34 @@ class EthereumService {
     if (this._hasConnected) { return; }
 
     this._hasConnected = true;
+    this._branches = branches;
     for (let branch of Object.keys(branches)) {
       let { jsonRpcUrl } = branches[branch];
       log.info(`connecting to ethereum JSON RPC provider at: ${jsonRpcUrl} for branch "${branch}"`);
-      this._providers[branch] = new Web3(jsonRpcUrl);
+      this._providers[branch] = new Web3(new Web3.providers.WebsocketProvider(jsonRpcUrl));
     }
+  }
+
+  async _reconnect() {
+    log.info("start reconnecting ethereum service...");
+
+    let done;
+    this._reconnectPromise = new Promise(r => done = r);
+
+    await this.stop();
+    await timeout(10 * 1000); // cool down period before we start issuing requests again
+
+    this._hasConnected = false;
+    this._contracts = new WeakMap();
+    this._providers = new WeakMap();
+    this._eventListeners = new WeakMap();
+    this._eventDefinitions = new WeakMap();
+
+    this.connect(this._branches);
+    await this.start(this._contractDefinitions);
+
+    log.info("completed reconnecting to ethereum service");
+    done();
   }
 
   async stop() {
@@ -75,17 +101,19 @@ class EthereumService {
         }
         this._contracts[branch][contract] = aContract;
 
-        this._eventListeners[contract] = aContract.events.allEvents((error, event) => {
+        this._eventListeners[contract] = aContract.events.allEvents(async (error, event) => {
           if (error) {
             log.error(`error received listening for events from contract ${contract}: ${error.reason}`);
-            return;
+            if (error.type === 'close') {
+              await this._reconnect();
+            }
+          } else {
+            log.trace(`contract event received for ${contract}: ${JSON.stringify(event, null, 2)}`);
+            let hints = this._generateHintsFromEvent({ branch, contract, event });
+            log.debug("addings hints to queue", JSON.stringify(hints, null, 2));
+
+            this._indexQueue = this._indexQueue.concat(hints);
           }
-
-          log.trace(`contract event received for ${contract}: ${JSON.stringify(event, null, 2)}`);
-          let hints = this._generateHintsFromEvent({ branch, contract, event });
-          log.debug("addings hints to queue", JSON.stringify(hints, null, 2));
-
-          this._indexQueue = this._indexQueue.concat(hints);
         });
       }
     }
@@ -103,6 +131,8 @@ class EthereumService {
       log.warn(`a contract instance is not yet available for contract: ${contract}, branch: ${branch}`);
       return;
     }
+
+    await this._reconnectPromise;
 
     let address = contractDefinition.addresses[branch];
     let attributes = {
@@ -128,6 +158,8 @@ class EthereumService {
     log.debug(`getting contract data for id: ${id}, type: ${type}, branch: ${branch}`);
     if (!branch || !type || !id) { return; }
 
+    await this._reconnectPromise;
+
     let tokenIndex = type.lastIndexOf('-');
     let method = type.substring(tokenIndex + 1);
 
@@ -137,7 +169,7 @@ class EthereumService {
 
     let aContract = this._contracts[branch][contract];
     let contractInfo = await aContract.methods[method](id).call();
-    log.info(`retreved contract data for contract ${contract}.${method}(${id || ''}): ${contractInfo}`);
+    log.info(`retrieved contract data for contract ${contract}.${method}(${id || ''}): ${contractInfo}`);
     return contractInfo;
   }
 
@@ -145,6 +177,7 @@ class EthereumService {
     log.debug(`getting past events as hints for contracts`);
     let hints = [];
 
+    await this._reconnectPromise;
     for (let branch of Object.keys(this._contracts)) {
       for (let contract of Object.keys(this._contracts[branch])) {
         let aContract = this._contracts[branch][contract];
@@ -156,8 +189,8 @@ class EthereumService {
             // TODO we might need to chunk this so we don't blow past the websocket max frame size in the web3 provider: https://github.com/ethereum/web3.js/issues/1297
             events = await aContract.getPastEvents(event, { fromBlock: 0, toBlock: 'latest' });
           } catch (err) {
-            // for some reason web3 throws an error when it cannot find any of the requested events
-            log.info(`could not find any past contract events of contract ${contract} for event ${event}`);
+            // for some reason web3 on the private blockchain throws an error when it cannot find any of the requested events
+            log.info(`could not find any past contract events of contract ${contract} for event ${event}. ${err.message}`);
           }
           log.trace(`discovered ${event} events for contract ${contract}: ${JSON.stringify(events, null, 2)}`);
 
@@ -197,7 +230,8 @@ class EthereumService {
 
       Promise.resolve(this._indexerPromise)
         .then(() => this._processQueueTimeout = scheduleNextProcess())
-        .finally(() => this._isIndexing = false);
+        .catch(err => log.error(`error encountered processing indexer queue: ${err.message}`))
+        .then(() => this._isIndexing = false); // no finally yet :-( https://stackoverflow.com/questions/35999072/what-is-the-equivalent-of-bluebird-promise-finally-in-native-es6-promises
     } else {
       this._processQueueTimeout = scheduleNextProcess();
     }
