@@ -17,8 +17,8 @@ class EthereumService {
 
   constructor({ indexer }) {
     this._indexer = indexer;
-    this._providers = {};
-    this._eventListeners = {};
+    this._providers = new WeakMap();
+    this._eventListeners = new WeakMap();
     this._hasStartedListening = false;
     this._hasConnected = false;
     this._isIndexing = false;
@@ -26,8 +26,9 @@ class EthereumService {
     this._processQueueTimeoutMs = 1000;
     this._processQueueTimeout = null;
     this._contractDefinitions = null;
-    this._eventDefinitions = {};
-    this._contracts = {};
+    this._branches = null;
+    this._eventDefinitions = new WeakMap();
+    this._contracts = new WeakMap();
     this._indexerPromise = null; // exposing this for the tests
   }
 
@@ -35,11 +36,26 @@ class EthereumService {
     if (this._hasConnected) { return; }
 
     this._hasConnected = true;
+    this._branches = branches;
     for (let branch of Object.keys(branches)) {
       let { jsonRpcUrl } = branches[branch];
       log.info(`connecting to ethereum JSON RPC provider at: ${jsonRpcUrl} for branch "${branch}"`);
-      this._providers[branch] = new Web3(jsonRpcUrl);
+      this._providers[branch] = new Web3(new Web3.providers.WebsocketProvider(jsonRpcUrl));
     }
+  }
+
+  async _reconnect() {
+    log.info("reconnecting ethereum service");
+
+    this._hasConnected = false;
+    this._hasStartedListening = false;
+    this._contracts = new WeakMap();
+    this._providers = new WeakMap();
+    this._eventListeners = new WeakMap();
+    this._eventDefinitions = new WeakMap();
+
+    this.connect(this._branches);
+    await this.start(this._contractDefinitions);
   }
 
   async stop() {
@@ -75,17 +91,19 @@ class EthereumService {
         }
         this._contracts[branch][contract] = aContract;
 
-        this._eventListeners[contract] = aContract.events.allEvents((error, event) => {
+        this._eventListeners[contract] = aContract.events.allEvents(async (error, event) => {
           if (error) {
             log.error(`error received listening for events from contract ${contract}: ${error.reason}`);
-            return;
+            if (error.type === 'close') {
+              await this._reconnect();
+            }
+          } else {
+            log.trace(`contract event received for ${contract}: ${JSON.stringify(event, null, 2)}`);
+            let hints = this._generateHintsFromEvent({ branch, contract, event });
+            log.debug("addings hints to queue", JSON.stringify(hints, null, 2));
+
+            this._indexQueue = this._indexQueue.concat(hints);
           }
-
-          log.trace(`contract event received for ${contract}: ${JSON.stringify(event, null, 2)}`);
-          let hints = this._generateHintsFromEvent({ branch, contract, event });
-          log.debug("addings hints to queue", JSON.stringify(hints, null, 2));
-
-          this._indexQueue = this._indexQueue.concat(hints);
         });
       }
     }
@@ -105,17 +123,22 @@ class EthereumService {
     }
 
     let address = contractDefinition.addresses[branch];
-    let attributes = {
-      'ethereum-address': address,
-      'balance-wei': await this._providers[branch].eth.getBalance(address)
-    };
+    let attributes;
+    try {
+      attributes = {
+        'ethereum-address': address,
+        'balance-wei': await this._providers[branch].eth.getBalance(address)
+      };
 
-    let methods = contractDefinition.abi.filter(item => item.type === 'function' &&
-                                                        item.constant &&
-                                                        !item.inputs.length)
-                                        .map(item => item.name);
-    for (let method of methods) {
-      attributes[`${contract}-${method}`] = await aContract.methods[method]().call();
+      let methods = contractDefinition.abi.filter(item => item.type === 'function' &&
+                                                          item.constant &&
+                                                          !item.inputs.length)
+                                          .map(item => item.name);
+      for (let method of methods) {
+        attributes[`${contract}-${method}`] = await aContract.methods[method]().call();
+      }
+    } catch (err) {
+      debugger;
     }
 
     let model = { id: address, type: contract, attributes };
@@ -136,7 +159,12 @@ class EthereumService {
     }
 
     let aContract = this._contracts[branch][contract];
-    let contractInfo = await aContract.methods[method](id).call();
+    let contractInfo;
+    try {
+      contractInfo = await aContract.methods[method](id).call();
+    } catch (err) {
+      debugger;
+    }
     log.info(`retreved contract data for contract ${contract}.${method}(${id || ''}): ${contractInfo}`);
     return contractInfo;
   }
@@ -156,7 +184,7 @@ class EthereumService {
             // TODO we might need to chunk this so we don't blow past the websocket max frame size in the web3 provider: https://github.com/ethereum/web3.js/issues/1297
             events = await aContract.getPastEvents(event, { fromBlock: 0, toBlock: 'latest' });
           } catch (err) {
-            // for some reason web3 throws an error when it cannot find any of the requested events
+            // for some reason web3 on the private blockchain throws an error when it cannot find any of the requested events
             log.info(`could not find any past contract events of contract ${contract} for event ${event}`);
           }
           log.trace(`discovered ${event} events for contract ${contract}: ${JSON.stringify(events, null, 2)}`);
@@ -195,9 +223,11 @@ class EthereumService {
       log.debug("processing index queue ", hints);
       this._indexerPromise = this._indexer.update({ forceRefresh: true, hints });
 
+      let _finally = () => this._isIndexing = false;
+
       Promise.resolve(this._indexerPromise)
-        .then(() => this._processQueueTimeout = scheduleNextProcess())
-        .finally(() => this._isIndexing = false);
+        .then(() => this._processQueueTimeout = _finally() && scheduleNextProcess())
+        .catch(err => _finally() && log.error(`error encountered processing indexer queue: ${err.message}`));
     } else {
       this._processQueueTimeout = scheduleNextProcess();
     }
