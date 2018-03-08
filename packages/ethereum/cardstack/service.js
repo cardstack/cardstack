@@ -2,6 +2,8 @@ const Web3 = require('web3');
 const log = require('@cardstack/logger')('cardstack/ethereum/service');
 const { declareInjections } = require('@cardstack/di');
 const { uniqWith, isEqual } = require('lodash');
+const { promisify } = require('util');
+const timeout = promisify(setTimeout);
 
 const NULL_ADDRESS = '0x0000000000000000000000000000000000000000';
 
@@ -45,10 +47,15 @@ class EthereumService {
   }
 
   async _reconnect() {
-    log.info("reconnecting ethereum service");
+    log.info("start reconnecting ethereum service...");
+
+    let done;
+    this._reconnectPromise = new Promise(r => done = r);
+
+    await this.stop();
+    await timeout(10 * 1000); // cool down period before we start issuing requests again
 
     this._hasConnected = false;
-    this._hasStartedListening = false;
     this._contracts = new WeakMap();
     this._providers = new WeakMap();
     this._eventListeners = new WeakMap();
@@ -56,6 +63,9 @@ class EthereumService {
 
     this.connect(this._branches);
     await this.start(this._contractDefinitions);
+
+    log.info("completed reconnecting to ethereum service");
+    done();
   }
 
   async stop() {
@@ -122,23 +132,20 @@ class EthereumService {
       return;
     }
 
-    let address = contractDefinition.addresses[branch];
-    let attributes;
-    try {
-      attributes = {
-        'ethereum-address': address,
-        'balance-wei': await this._providers[branch].eth.getBalance(address)
-      };
+    await this._reconnectPromise;
 
-      let methods = contractDefinition.abi.filter(item => item.type === 'function' &&
-                                                          item.constant &&
-                                                          !item.inputs.length)
-                                          .map(item => item.name);
-      for (let method of methods) {
-        attributes[`${contract}-${method}`] = await aContract.methods[method]().call();
-      }
-    } catch (err) {
-      debugger;
+    let address = contractDefinition.addresses[branch];
+    let attributes = {
+      'ethereum-address': address,
+      'balance-wei': await this._providers[branch].eth.getBalance(address)
+    };
+
+    let methods = contractDefinition.abi.filter(item => item.type === 'function' &&
+                                                        item.constant &&
+                                                        !item.inputs.length)
+                                        .map(item => item.name);
+    for (let method of methods) {
+      attributes[`${contract}-${method}`] = await aContract.methods[method]().call();
     }
 
     let model = { id: address, type: contract, attributes };
@@ -151,6 +158,8 @@ class EthereumService {
     log.debug(`getting contract data for id: ${id}, type: ${type}, branch: ${branch}`);
     if (!branch || !type || !id) { return; }
 
+    await this._reconnectPromise;
+
     let tokenIndex = type.lastIndexOf('-');
     let method = type.substring(tokenIndex + 1);
 
@@ -159,13 +168,8 @@ class EthereumService {
     }
 
     let aContract = this._contracts[branch][contract];
-    let contractInfo;
-    try {
-      contractInfo = await aContract.methods[method](id).call();
-    } catch (err) {
-      debugger;
-    }
-    log.info(`retreved contract data for contract ${contract}.${method}(${id || ''}): ${contractInfo}`);
+    let contractInfo = await aContract.methods[method](id).call();
+    log.info(`retrieved contract data for contract ${contract}.${method}(${id || ''}): ${contractInfo}`);
     return contractInfo;
   }
 
@@ -173,6 +177,7 @@ class EthereumService {
     log.debug(`getting past events as hints for contracts`);
     let hints = [];
 
+    await this._reconnectPromise;
     for (let branch of Object.keys(this._contracts)) {
       for (let contract of Object.keys(this._contracts[branch])) {
         let aContract = this._contracts[branch][contract];
@@ -185,7 +190,7 @@ class EthereumService {
             events = await aContract.getPastEvents(event, { fromBlock: 0, toBlock: 'latest' });
           } catch (err) {
             // for some reason web3 on the private blockchain throws an error when it cannot find any of the requested events
-            log.info(`could not find any past contract events of contract ${contract} for event ${event}`);
+            log.info(`could not find any past contract events of contract ${contract} for event ${event}. ${err.message}`);
           }
           log.trace(`discovered ${event} events for contract ${contract}: ${JSON.stringify(events, null, 2)}`);
 
@@ -223,11 +228,10 @@ class EthereumService {
       log.debug("processing index queue ", hints);
       this._indexerPromise = this._indexer.update({ forceRefresh: true, hints });
 
-      let _finally = () => this._isIndexing = false;
-
       Promise.resolve(this._indexerPromise)
-        .then(() => this._processQueueTimeout = _finally() && scheduleNextProcess())
-        .catch(err => _finally() && log.error(`error encountered processing indexer queue: ${err.message}`));
+        .then(() => this._processQueueTimeout = scheduleNextProcess())
+        .catch(err => log.error(`error encountered processing indexer queue: ${err.message}`))
+        .then(() => this._isIndexing = false); // no finally yet :-( https://stackoverflow.com/questions/35999072/what-is-the-equivalent-of-bluebird-promise-finally-in-native-es6-promises
     } else {
       this._processQueueTimeout = scheduleNextProcess();
     }
