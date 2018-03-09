@@ -169,7 +169,7 @@ class EthereumService {
 
     let aContract = this._contracts[branch][contract];
     let contractInfo = await aContract.methods[method](id).call();
-    log.info(`retrieved contract data for contract ${contract}.${method}(${id || ''}): ${contractInfo}`);
+    log.debug(`retrieved contract data for contract ${contract}.${method}(${id || ''}): ${contractInfo}`);
     return contractInfo;
   }
 
