@@ -63,7 +63,23 @@ class BranchUpdate {
   }
 
   async _updateContent(hints) {
-    for (let [sourceId, updater] of Object.entries(this.updaters)) {
+    let schema = await this.schema();
+    let types = hints && Array.isArray(hints) ? hints.map(hint => hint.type).filter(type => Boolean(type)) : [];
+    let updaters = Object.entries(this.updaters);
+
+    let dataSourceIds = types.map(type => {
+      let contentType = schema.types.get(type);
+      if (!contentType) { return; }
+      let dataSource = contentType.dataSource;
+      if (!dataSource) { return; }
+      return dataSource.id;
+    }).filter(item => Boolean(item));
+
+    if (dataSourceIds.length) {
+      updaters = updaters.filter(([ sourceId ]) => dataSourceIds.includes(sourceId));
+    }
+
+    for (let [sourceId, updater] of updaters) {
       let meta = await this._loadMeta(updater);
       let publicOps = Operations.create(this, sourceId);
       let newMeta = await updater.updateContent(meta, hints, publicOps);
