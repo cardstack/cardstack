@@ -82,6 +82,18 @@ in between the tests. You can start a private blockchain by executing:
 yarn run blockchain &
 ```
 
+If you want to run a public blockchain node locally, use the following docker command:
+```
+docker run -d --name ethereum-node -v /your/blockchain/data/dir:/root \
+     -p 8545:8545 -p 8546:8546 -p 30303:30303 \
+     ethereum/client-go --rinkeby --fast --rpc --rpcapi eth,net,web3 --ws --wsorigins '*' --wsapi eth,net,web3
+```
+
+Where `/your/bockchain/data/dir` is a directory on your docker host that will persist the downloaded blocks in between docker restarts.
+Additionaly you can omit the `--rinkeby` flag to run on the ethereum mainnet. The Cardstack hub is most interested in the
+websocket API from geth, which will be running on `ws://localhost:8546`. After you start geth for the first time, it will take a few hours
+to download all the blocks. You can keep track of the downloaded block numbers and compare it with the current block height to monitor progress.
+
 
 ## Project-wide Policy and Community Governance
 
