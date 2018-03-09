@@ -65,7 +65,7 @@ contract('SampleToken', function(accounts) {
       token = await SampleToken.new();
       await token.fund({ value: web3.toWei(0.01, 'ether'), from: accountOne });
 
-      dataSource = factory.addResource('data-sources')
+      dataSource = factory.addResource('data-sources', 'ethereum')
         .withAttributes({
           'source-type': '@cardstack/ethereum',
           params: {
@@ -390,7 +390,7 @@ contract('SampleToken', function(accounts) {
 
       await token.mint(accountOne, 100);
 
-      factory.addResource('data-sources')
+      factory.addResource('data-sources', 'ethereum',)
         .withAttributes({
           'source-type': '@cardstack/ethereum',
           params: {
