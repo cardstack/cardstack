@@ -64,7 +64,7 @@ class BranchUpdate {
 
   async _updateContent(hints) {
     let schema = await this.schema();
-    let types = hints ? hints.map(hint => hint.type).filter(type => Boolean(type)) : [];
+    let types = hints && Array.isArray(hints) ? hints.map(hint => hint.type).filter(type => Boolean(type)) : [];
     let updaters = Object.entries(this.updaters);
 
     let dataSourceIds = types.map(type => {
