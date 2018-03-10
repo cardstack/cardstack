@@ -175,10 +175,10 @@ class BranchUpdate {
     let isSchemaType = schema.isSchemaType(type);
     let model = await updater.read(type, id, isSchemaType);
     if (!model) {
-      // The seeds can provide any type of model, so if we're not
+      // The initial-models can provide any type of model, so if we're not
       // finding something, we should also fallback to checking in
-      // seeds.
-      let seedUpdater = this.updaters['seeds'];
+      // initial-models when the data source is ephemeral.
+      let seedUpdater = this.updaters['initial-models'];
       if (seedUpdater) {
         model = await seedUpdater.read(type, id, isSchemaType);
       }

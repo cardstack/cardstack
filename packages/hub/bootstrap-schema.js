@@ -552,9 +552,9 @@ const models = [
   },
   {
     type: 'data-sources',
-    id: 'seeds',
+    id: 'initial-models',
     attributes: {
-      'source-type': '@cardstack/hub::seeds'
+      'source-type': '@cardstack/hub::initial-models'
     }
   }
 

@@ -7,14 +7,18 @@ let Orchestrator;
 const log = require('@cardstack/logger')('cardstack/server');
 
 
-async function wireItUp(projectDir, encryptionKeys, seedModels, opts = {}) {
+async function wireItUp(projectDir, encryptionKeys, dataSources, opts = {}) {
   let registry = new Registry();
   registry.register('config:project', {
     path: projectDir
   });
-  registry.register('config:seed-models', seedModels);
+  registry.register('config:data-sources', dataSources);
   registry.register('config:encryption-key', encryptionKeys);
   registry.register('config:public-url', { url: opts.url });
+
+  if (typeof opts.seeds === 'function') {
+    registry.register('config:initial-models', await opts.seeds());
+  }
 
   let container = new Container(registry);
 
@@ -34,7 +38,7 @@ async function wireItUp(projectDir, encryptionKeys, seedModels, opts = {}) {
   return container;
 }
 
-async function makeServer(projectDir, encryptionKeys, seedModels, opts = {}) {
+async function makeServer(projectDir, encryptionKeys, dataSources, opts = {}) {
   let readyResolver;
   if (opts.containerized) {
     log.debug('Running in container mode');
@@ -59,7 +63,7 @@ async function makeServer(projectDir, encryptionKeys, seedModels, opts = {}) {
   }
 
   log.info('Starting main hub server');
-  let container = await wireItUp(projectDir, encryptionKeys, seedModels, opts);
+  let container = await wireItUp(projectDir, encryptionKeys, dataSources, opts);
   let app = new Koa();
   app.use(httpLogging);
   app.use(container.lookup('hub:middleware-stack').middleware());

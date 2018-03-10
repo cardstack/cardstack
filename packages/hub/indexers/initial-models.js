@@ -3,28 +3,49 @@ const { isEqual } = require('lodash');
 const bootstrapSchema = require('../bootstrap-schema');
 
 module.exports = declareInjections({
-  seedModels: 'config:seed-models',
+  dataSources: 'config:data-sources',
+  initialModels: 'config:initial-models',
   schemaLoader: 'hub:schema-loader'
 },
 
-class SeedsIndexer {
-  static create({ seedModels, schemaLoader }) {
-    let models = bootstrapSchema.concat(seedModels);
+// This indexer will only auto index initial models that originate
+// from ephemeral at boot time. Non ephemeral models need to be manually
+// indexed.
+
+class InitialModelsIndexer {
+  static create({ dataSources, initialModels, schemaLoader }) {
+    let models = bootstrapSchema.concat(initialModels).concat(dataSources);
     let schemaTypes = schemaLoader.ownTypes();
     let schemaModels = models.filter(m => schemaTypes.includes(m.type));
-    return new this(models, schemaModels);
+    return new this(models, schemaModels, schemaLoader);
   }
 
-  constructor(models, schemaModels) {
+  constructor(models, schemaModels, schemaLoader) {
     this.models = models;
     this.schemaModels = schemaModels;
+    this.schemaLoader = schemaLoader;
   }
 
   async branches() {
     return ['master'];
   }
+
   async beginUpdate(/* branch */) {
-    return new Updater(this.models, this.schemaModels);
+    return new Updater(await this._ephemeralModels(), this.schemaModels);
+  }
+
+  async _ephemeralModels() {
+    let { models, schemaModels, schemaLoader } = this;
+
+    let schema = await schemaLoader.loadFrom(schemaModels);
+
+    return models.filter(model => {
+      let type = schema.types.get(model.type);
+      if (!type) { return; }
+      let source = type.dataSource;
+      if (!source) { return; }
+      return source.sourceType === '@cardstack/ephemeral';
+    });
   }
 });
 
@@ -40,6 +61,7 @@ class Updater {
 
   async updateContent(meta, hints, ops) {
     let { models } = this;
+
     if (meta && isEqual(meta.models, models)) {
       return { models };
     }

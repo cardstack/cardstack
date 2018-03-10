@@ -83,8 +83,19 @@ exports.createDefaultEnvironment = async function(projectDir, initialModels = []
         mayWriteFields: true
       }).withRelated('who', factory.addResource('groups', user.data.id));
 
-    container = await wireItUp(projectDir, crypto.randomBytes(32), factory.getModels(), {
-      disableAutomaticIndexing: true
+    let seeds = [];
+    let dataSources = [];
+    for (let model of factory.getModels()) {
+      if (model.type === 'data-sources' || model.type === 'plugin-configs') {
+        dataSources.push(model);
+      } else {
+        seeds.push(model);
+      }
+    }
+
+    container = await wireItUp(projectDir, crypto.randomBytes(32), dataSources, {
+      disableAutomaticIndexing: true,
+      seeds: () => seeds
     });
 
     let writers = container.lookup('hub:writers');
