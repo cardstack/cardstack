@@ -18,6 +18,8 @@ async function wireItUp(projectDir, encryptionKeys, dataSources, opts = {}) {
 
   if (typeof opts.seeds === 'function') {
     registry.register('config:initial-models', await opts.seeds());
+  } else {
+    registry.register('config:initial-models', []);
   }
 
   let container = new Container(registry);

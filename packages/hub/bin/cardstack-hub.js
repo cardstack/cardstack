@@ -95,10 +95,10 @@ PUBLIC_HUB_URL                    The public URL at which the Hub can be accesse
   return commander;
 }
 
-function readDir(path) {
-  return fs.readdirSync(path).map(filename => {
+function readDir(dir) {
+  return fs.readdirSync(dir).map(filename => {
     if (/\.js$/.test(filename)) {
-      return require(path.join(path, filename));
+      return require(path.join(dir, filename));
     } else {
       return [];
     }

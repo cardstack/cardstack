@@ -16,7 +16,8 @@ class InitialModelsIndexer {
   static create({ dataSources, initialModels, schemaLoader }) {
     let models = bootstrapSchema.concat(initialModels).concat(dataSources);
     let schemaTypes = schemaLoader.ownTypes();
-    let schemaModels = models.filter(m => schemaTypes.includes(m.type));
+    let schemaModels = models.filter(m => m && schemaTypes.includes(m.type));
+
     return new this(models, schemaModels, schemaLoader);
   }
 
@@ -40,6 +41,7 @@ class InitialModelsIndexer {
     let schema = await schemaLoader.loadFrom(schemaModels);
 
     return models.filter(model => {
+      if (!model) { return; }
       let type = schema.types.get(model.type);
       if (!type) { return; }
       let source = type.dataSource;
