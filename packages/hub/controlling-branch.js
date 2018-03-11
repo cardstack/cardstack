@@ -7,7 +7,7 @@
 const { declareInjections } = require('@cardstack/di');
 
 module.exports = declareInjections({
-  seedModels: 'config:seed-models'
+  dataSources: 'config:data-sources'
 },
 
 class ControllingBranch {
@@ -16,7 +16,7 @@ class ControllingBranch {
   }
   get name() {
     if (!this._name) {
-      let config = this.seedModels.find(m => m.type === 'plugin-configs' && m.id === '@cardstack/hub');
+      let config = this.dataSources.find(m => m.type === 'plugin-configs' && m.id === '@cardstack/hub');
       if (config && config.attributes && config.attributes['controlling-branch']) {
         this._name = config.attributes['controlling-branch'];
       } else {
