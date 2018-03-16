@@ -1,4 +1,5 @@
 const Koa = require('koa');
+const Session = require('@cardstack/plugin-utils/session');
 const { Registry, Container } = require('@cardstack/di');
 // lazy load only in container mode, since they uses node 8 features
 let EmberConnection;
@@ -7,16 +8,28 @@ let Orchestrator;
 const log = require('@cardstack/logger')('cardstack/server');
 
 
-async function wireItUp(projectDir, encryptionKeys, seedModels, opts = {}) {
+async function wireItUp(projectDir, encryptionKeys, dataSources, opts = {}) {
   let registry = new Registry();
   registry.register('config:project', {
     path: projectDir
   });
-  registry.register('config:seed-models', seedModels);
+  registry.register('config:data-sources', dataSources);
   registry.register('config:encryption-key', encryptionKeys);
   registry.register('config:public-url', { url: opts.url });
 
+  let seeds;
+  if (typeof opts.seeds === 'function') {
+    seeds = await opts.seeds();
+    registry.register('config:initial-models', seeds);
+  } else {
+    registry.register('config:initial-models', []);
+  }
+
   let container = new Container(registry);
+
+  if (opts.loadSeeds && seeds) {
+    await loadSeeds(container, seeds);
+  }
 
   // in the test suite we want more deterministic control of when
   // indexing happens
@@ -34,7 +47,19 @@ async function wireItUp(projectDir, encryptionKeys, seedModels, opts = {}) {
   return container;
 }
 
-async function makeServer(projectDir, encryptionKeys, seedModels, opts = {}) {
+async function loadSeeds(container, seedModels, opts) {
+  if (!container) { return; }
+
+  log.info("loading seed models");
+
+  let branch = opts && opts.branch || 'master';
+  let writers = container.lookup('hub:writers');
+  for (let model of seedModels) {
+    await writers.create(branch, Session.INTERNAL_PRIVILEGED, model.type, model);
+  }
+}
+
+async function makeServer(projectDir, encryptionKeys, dataSources, opts = {}) {
   let readyResolver;
   if (opts.containerized) {
     log.debug('Running in container mode');
@@ -59,7 +84,7 @@ async function makeServer(projectDir, encryptionKeys, seedModels, opts = {}) {
   }
 
   log.info('Starting main hub server');
-  let container = await wireItUp(projectDir, encryptionKeys, seedModels, opts);
+  let container = await wireItUp(projectDir, encryptionKeys, dataSources, opts);
   let app = new Koa();
   app.use(httpLogging);
   app.use(container.lookup('hub:middleware-stack').middleware());
@@ -77,3 +102,4 @@ async function httpLogging(ctxt, next) {
 
 exports.wireItUp = wireItUp;
 exports.makeServer = makeServer;
+exports.loadSeeds = loadSeeds;

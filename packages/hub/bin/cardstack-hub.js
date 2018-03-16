@@ -18,12 +18,17 @@ if (process.env.EMBER_ENV === 'test') {
   });
 }
 
-async function runServer(options, seedModels) {
+async function runServer(options, dataSources, seedModels) {
   let {
     sessionsKey,
     port,
   } = options;
-  let app = await makeServer(process.cwd(), sessionsKey, seedModels, options);
+
+  if (seedModels) {
+    options.seeds = () => seedModels;
+  }
+
+  let app = await makeServer(process.cwd(), sessionsKey, dataSources, options);
   app.listen(port);
   log.info("server listening on %s", port);
   if (process.connected) {
@@ -33,25 +38,26 @@ async function runServer(options, seedModels) {
 
 function commandLineOptions() {
   commander
+    .option('--load-seeds', 'Load seed models from non-ephemeral sources after starting')
     .usage(`
 
 Cardstack Hub takes all its basic settings via environment variables:
 
 CARDSTACK_SESSIONS_KEY  Required  A base64-encoded 32 byte random key for securing sessions. You can generate one using "yarn run cardstack-generate-key".
-SEED_DIR                Required  The path to your seed configuration files.
+INITIAL_DATA_DIR        Required  The path to your initial data configuration directory.
 ELASTICSEARCH                     The URL to our Elasticsearch instance. Defaults to http://localhost:9200
 PORT                              Port to bind to. Defaults to 3000.
 PUBLIC_HUB_URL                    The public URL at which the Hub can be accessed. Defaults to http://localhost:$PORT.
 `)
     .parse(process.argv);
 
-  if (!process.env.SEED_DIR) {
-    process.stderr.write("You must set the SEED_DIR environment variable.\n");
+  if (!process.env.INITIAL_DATA_DIR) {
+    process.stderr.write("You must set the INITIAL_DATA_DIR environment variable.\n");
     commander.outputHelp();
     process.exit(-1);
   }
 
-  commander.seedConfigDirectory = path.resolve(process.env.SEED_DIR);
+  commander.initialDataDirectory = path.resolve(process.env.INITIAL_DATA_DIR);
 
   let base64Key = process.env.CARDSTACK_SESSIONS_KEY;
   let base64KeyPath = process.env.CARDSTACK_SESSIONS_KEY_FILE;
@@ -90,17 +96,31 @@ PUBLIC_HUB_URL                    The public URL at which the Hub can be accesse
   return commander;
 }
 
-function loadSeedModels(options) {
+function readDir(dir) {
+  return fs.readdirSync(dir).map(filename => {
+    if (/\.js$/.test(filename)) {
+      return require(path.join(dir, filename));
+    } else {
+      return [];
+    }
+  }).reduce((a,b) => a.concat(b), []);
+}
+
+function loadInitialModels(options) {
+  let dataSourcesDir = path.join(options.initialDataDirectory, 'data-sources');
+  let seedsDir = path.join(options.initialDataDirectory, 'seeds');
+
   try {
-    return fs.readdirSync(options.seedConfigDirectory).map(filename => {
-      if (/\.js$/.test(filename)) {
-        return require(path.join(options.seedConfigDirectory, filename));
-      } else {
-        return [];
-      }
-    }).reduce((a,b) => a.concat(b), []);
+    let seedModels;
+    let dataSources = readDir(dataSourcesDir);
+
+    if (fs.existsSync(seedsDir) && fs.statSync(seedsDir).isDirectory()) {
+      seedModels = readDir(seedsDir);
+    }
+
+    return { dataSources, seedModels };
   } catch (err) {
-    process.stderr.write(`Unable to load models from your seed-config-file (${options.seedConfigFile}), ${err}\n`);
+    process.stderr.write(`Unable to load models from your initial-data directory (${options.initialDataDirectory}), ${err}\n`);
     process.exit(-1);
   }
 }
@@ -126,8 +146,8 @@ process.on('disconnect', () => {
 
 
 let options = commandLineOptions();
-let seedModels = loadSeedModels(options);
-runServer(options, seedModels).catch(err => {
+let { dataSources, seedModels } = loadInitialModels(options);
+runServer(options, dataSources, seedModels).catch(err => {
   log.error("Server failed to start cleanly: %s", err.stack || err);
   process.exit(-1);
 });

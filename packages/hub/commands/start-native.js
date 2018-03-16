@@ -28,6 +28,13 @@ module.exports = {
       type: String
     },
     {
+      name: 'seed',
+      aliases: ['s'],
+      description: 'Load the seed models that originate from non-ephemeral sources after starting the hub. (Seed models that originate from ephemeral sources are always loaded on hub start.)',
+      type: Boolean,
+      default: false
+    },
+    {
       name: 'print',
       description: 'Instead of starting the hub, print the startup command(s) we would run.',
       aliases: ['r'],
@@ -38,18 +45,18 @@ module.exports = {
 
   async run(args) {
     if (args.print) {
-      let { setEnvVars, bin, args: shellArgs } = await this.prepareSpawnHub(this.project.pkg.name, this.project.configPath(), args.environment, args.port, args.url);
+      let { setEnvVars, bin, args: shellArgs } = await this.prepareSpawnHub(this.project.pkg.name, this.project.configPath(), args.environment, args.port, args.url, args.seed);
       for (let [key, value] of Object.entries(setEnvVars)) {
         process.stdout.write(`export ${key}=${value}\n`);
       }
       process.stdout.write(`${bin} ${shellArgs.join(' ')}\n`);
     } else {
-      await this.spawnHub(this.project.pkg.name, this.project.configPath(), args.environment, args.port, args.url);
+      await this.spawnHub(this.project.pkg.name, this.project.configPath(), args.environment, args.port, args.url, args.seed);
     }
     await new Promise(() => {});
   },
 
-  prepareSpawnHub(packageName, configPath, environment, port, explicitURL) {
+  prepareSpawnHub(packageName, configPath, environment, port, explicitURL, loadSeeds) {
     let setEnvVars = Object.create(null);
     if (!process.env.CARDSTACK_SESSIONS_KEY) {
       const crypto = require('crypto');
@@ -61,9 +68,9 @@ module.exports = {
       setEnvVars.ELASTICSEARCH_PREFIX = packageName.replace(/^[^a-zA-Z]*/, '').replace(/[^a-zA-Z0-9]/g, '_') + '_' + environment;
     }
 
-    if (!process.env.SEED_DIR) {
-      setEnvVars.SEED_DIR = path.join(path.dirname(configPath),
-                                      '..', 'cardstack', 'seeds', environment);
+    if (!process.env.INITIAL_DATA_DIR) {
+      setEnvVars.INITIAL_DATA_DIR = path.join(path.dirname(configPath),
+                                              '..', 'cardstack', 'initial-data');
 
     }
 
@@ -75,11 +82,16 @@ module.exports = {
 
     let bin = path.resolve(path.join(__dirname, '..', 'bin', 'cardstack-hub.js'));
 
-    return { setEnvVars, bin, args: [] };
+    let args = [];
+    if (loadSeeds) {
+      args.push('--load-seeds');
+    }
+
+    return { setEnvVars, bin, args };
   },
 
-  async spawnHub(packageName, configPath, environment, port, url) {
-    let { setEnvVars, bin, args } = this.prepareSpawnHub(packageName, configPath, environment, port, url);
+  async spawnHub(packageName, configPath, environment, port, url, loadSeeds) {
+    let { setEnvVars, bin, args } = this.prepareSpawnHub(packageName, configPath, environment, port, url, loadSeeds);
 
     for (let [key, value] of Object.entries(setEnvVars)) {
       process.env[key] = value;
