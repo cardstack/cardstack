@@ -38,6 +38,7 @@ async function runServer(options, dataSources, seedModels) {
 
 function commandLineOptions() {
   commander
+    .option('--load-seeds', 'Load seed models from non-ephemeral sources after starting')
     .usage(`
 
 Cardstack Hub takes all its basic settings via environment variables:

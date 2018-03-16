@@ -1,4 +1,5 @@
 const Koa = require('koa');
+const Session = require('@cardstack/plugin-utils/session');
 const { Registry, Container } = require('@cardstack/di');
 // lazy load only in container mode, since they uses node 8 features
 let EmberConnection;
@@ -16,13 +17,19 @@ async function wireItUp(projectDir, encryptionKeys, dataSources, opts = {}) {
   registry.register('config:encryption-key', encryptionKeys);
   registry.register('config:public-url', { url: opts.url });
 
+  let seeds;
   if (typeof opts.seeds === 'function') {
-    registry.register('config:initial-models', await opts.seeds());
+    seeds = await opts.seeds();
+    registry.register('config:initial-models', seeds);
   } else {
     registry.register('config:initial-models', []);
   }
 
   let container = new Container(registry);
+
+  if (opts.loadSeeds && seeds) {
+    await loadSeeds(container, seeds);
+  }
 
   // in the test suite we want more deterministic control of when
   // indexing happens
@@ -38,6 +45,18 @@ async function wireItUp(projectDir, encryptionKeys, dataSources, opts = {}) {
   }
 
   return container;
+}
+
+async function loadSeeds(container, seedModels, opts) {
+  if (!container) { return; }
+
+  log.info("loading seed models");
+
+  let branch = opts && opts.branch || 'master';
+  let writers = container.lookup('hub:writers');
+  for (let model of seedModels) {
+    await writers.create(branch, Session.INTERNAL_PRIVILEGED, model.type, model);
+  }
 }
 
 async function makeServer(projectDir, encryptionKeys, dataSources, opts = {}) {
@@ -83,3 +102,4 @@ async function httpLogging(ctxt, next) {
 
 exports.wireItUp = wireItUp;
 exports.makeServer = makeServer;
+exports.loadSeeds = loadSeeds;
