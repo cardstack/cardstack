@@ -179,12 +179,16 @@ describe('ephemeral-storage', function() {
     });
 
     it('can create a checkpoint', async function() {
-      let response = await request.post('/api/ephemeral-checkpoints').send({
+      let response = await request.post('/test-support/checkpoints').send({
         data: {
           type: 'ephemeral-checkpoints'
         }
       });
+
       expect(response).hasStatus(201);
+      expect(response.body.data.id).to.be.ok;
+      expect(response.body.data.type).to.equal("ephemeral-checkpoints");
+      expect(response.body.data.meta.version).to.be.ok;
     });
 
     it('checkpoint cannot be patched', async function() {
@@ -221,10 +225,11 @@ describe('ephemeral-storage', function() {
       expect(second).hasStatus(200);
 
       // Make a checkpoint
-      let checkpoint = await request.post('/api/ephemeral-checkpoints').send({
+      let checkpoint = await request.post('/test-support/checkpoints').send({
         data: { type: 'ephemeral-checkpoints' }
       });
       expect(checkpoint).hasStatus(201);
+      let checkpointId = checkpoint.body.data.id;
 
       // Now do a post-checkpoint delete, patch, and post
 
@@ -254,7 +259,7 @@ describe('ephemeral-storage', function() {
       expect(third).hasStatus(201);
 
       // Restore the checkpoint
-      response = await request.post(`/api/ephemeral-restores`).send({
+      response = await request.post(`/test-support/restores`).send({
         data: {
           type: 'ephemeral-restores',
           relationships: {
@@ -265,6 +270,17 @@ describe('ephemeral-storage', function() {
         }
       });
       expect(response).hasStatus(201);
+      expect(response.body.data.id).to.be.ok;
+      expect(response.body.data.type).to.equal("ephemeral-restores");
+      expect(response.body.data.meta.version).to.be.ok;
+      expect(response.body.data.relationships).to.deep.equal({
+        checkpoint: {
+          data: {
+            type: "ephemeral-checkpoints",
+            id: checkpointId
+          }
+        }
+      });
 
       // and see that our delete, patch, and post are undone
       response = await request.get('/api/posts/first-post');

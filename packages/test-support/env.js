@@ -8,7 +8,7 @@ const { partition } = require('lodash');
 
 const defaultDataSourceId = 'default-data-source';
 
-exports.createDefaultEnvironment = async function(projectDir, initialModels = []) {
+exports.createDefaultEnvironment = async function(projectDir, initialModels = [], opts = {}) {
   let container;
   try {
     let factory = new JSONAPIFactory();
@@ -93,10 +93,10 @@ exports.createDefaultEnvironment = async function(projectDir, initialModels = []
       }
     }
 
-    container = await wireItUp(projectDir, crypto.randomBytes(32), dataSources, {
-      disableAutomaticIndexing: true,
-      seeds: () => seeds
-    });
+    opts.disableAutomaticIndexing = true;
+    opts.seeds = () => seeds;
+
+    container = await wireItUp(projectDir, crypto.randomBytes(32), dataSources, opts);
 
     let writers = container.lookup('hub:writers');
 

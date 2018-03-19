@@ -48,6 +48,7 @@ INITIAL_DATA_DIR        Required  The path to your initial data configuration di
 ELASTICSEARCH                     The URL to our Elasticsearch instance. Defaults to http://localhost:9200
 PORT                              Port to bind to. Defaults to 3000.
 PUBLIC_HUB_URL                    The public URL at which the Hub can be accessed. Defaults to http://localhost:$PORT.
+CI_SESSION_ID                     A session ID that has full priviledges which is used by CI for test setup and test tear down.
 `)
     .parse(process.argv);
 
@@ -91,6 +92,10 @@ PUBLIC_HUB_URL                    The public URL at which the Hub can be accesse
     commander.url = process.env.PUBLIC_HUB_URL;
   } else {
     commander.url = `http://localhost:${commander.port}`;
+  }
+
+  if (process.env.CI_SESSION_ID) {
+    commander.ciSessionId = process.env.CI_SESSION_ID;
   }
 
   return commander;

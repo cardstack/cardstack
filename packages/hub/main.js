@@ -16,6 +16,7 @@ async function wireItUp(projectDir, encryptionKeys, dataSources, opts = {}) {
   registry.register('config:data-sources', dataSources);
   registry.register('config:encryption-key', encryptionKeys);
   registry.register('config:public-url', { url: opts.url });
+  registry.register('config:ci-session', { id: opts.ciSessionId });
 
   let seeds;
   if (typeof opts.seeds === 'function') {

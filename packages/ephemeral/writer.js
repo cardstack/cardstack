@@ -95,6 +95,14 @@ module.exports = declareInjections({
     return pending;
   }
 
+  async prepareCheckpointCreate(branch, session, type, document, isSchema) {
+    return this.prepareCreate(branch, session, type, document, isSchema);
+  }
+
+  async prepareCheckpointRestore(branch, session, type, document, isSchema) {
+    return this.prepareCreate(branch, session, type, document, isSchema);
+  }
+
   _generateId() {
     return crypto.randomBytes(20).toString('hex');
   }

@@ -10,6 +10,7 @@ const logger = require('@cardstack/logger');
 describe('authentication/middleware', function() {
 
   let request, env, auth, quint, arthur, vanGogh;
+  let ciSessionId = '1234567890';
 
   async function setup() {
     let factory = new JSONAPIFactory();
@@ -158,7 +159,7 @@ describe('authentication/middleware', function() {
       })
     ]);
 
-    env = await createDefaultEnvironment(`${__dirname}/stub-authenticators`, factory.getModels());
+    env = await createDefaultEnvironment(`${__dirname}/stub-authenticators`, factory.getModels(), { ciSessionId });
     let app = new Koa();
     app.use(env.lookup('hub:middleware-stack').middleware());
     app.use(async function(ctxt) {
@@ -221,6 +222,21 @@ describe('authentication/middleware', function() {
       let { token } = await auth.createToken({ id: env.user.data.id, type: env.user.data.type }, 30);
       let response = await request.get('/').set('authorization', `Bearer ${token}`);
       expect(response.body.user).deep.equals(env.user);
+    });
+
+    it('a bearer token that matches the CI session id will return the internal priviledged session', async function() {
+      let response = await request.get('/').set('authorization', `Bearer ${ciSessionId}`);
+      expect(response.body).deep.equals({
+        "user": {
+          "attributes": {
+            "email": "noreply@nowhere.com",
+            "full-name": "@cardstack/hub/authentication",
+          },
+          "id": "@cardstack/hub",
+          "type": "users",
+        },
+        "userId": "@cardstack/hub"
+      });
     });
 
     describe('token endpoints', async function() {
