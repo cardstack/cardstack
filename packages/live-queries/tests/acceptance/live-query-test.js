@@ -3,7 +3,7 @@ import moduleForAcceptance from '../../tests/helpers/module-for-acceptance';
 
 import Fixtures from '@cardstack/test-support/fixtures';
 
-let scenario = new Fixtures(factory => {
+let scenario = new Fixtures('default', factory => {
   factory.addResource('items').withAttributes({content: 'hello'});
 });
 

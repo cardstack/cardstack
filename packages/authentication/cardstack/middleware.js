@@ -91,7 +91,6 @@ class Authentication {
 
   _tokenVerifier() {
     return async (ctxt, next) => {
-      console.log("=============> checking token ", ctxt.header['authorization']);
       let m = bearerTokenPattern.exec(ctxt.header['authorization']);
       if (m) {
         let session = this._tokenToSession(m[1]);
