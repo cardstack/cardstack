@@ -1,4 +1,5 @@
 const JSONAPIFactory = require('../../../tests/stub-project/node_modules/@cardstack/test-support/jsonapi-factory');
+const Session = require('@cardstack/plugin-utils/session');
 const {
   createDefaultEnvironment,
   destroyDefaultEnvironment
@@ -129,10 +130,18 @@ describe('hub/indexers', function() {
   });
 
   describe('events', function() {
-    beforeEach(setup);
     afterEach(teardown);
 
     it("triggers events when indexing", async function() {
+      let seeds = new JSONAPIFactory();
+
+      seeds.addResource('content-types', 'dogs')
+        .withRelated('fields', [
+          seeds.addResource('fields', 'name')
+          .withAttributes({ fieldType: '@cardstack/core-types::string' }),
+        ]);
+
+      env = await createDefaultEnvironment(__dirname + '/../../../tests/ephemeral-test-app', seeds.getModels());
       let indexers = await env.lookup('hub:indexers');
 
       let addCount = 0;
@@ -140,91 +149,39 @@ describe('hub/indexers', function() {
 
       indexers.on('update_complete', hints => {
         updateCompleteCount++;
-        expect(hints).to.deep.equal({ foo: 'bar' });
+        expect(hints).to.deep.equal({ type: 'dogs' });
       });
 
       indexers.on('add', model => {
         addCount++;
 
-        switch (model.id) {
-          case 'checkpoint' :
-            expect(model).to.deep.equal({
-              "type": "fields",
-              "id": "checkpoint",
-              "doc": {
-                "type": "fields",
-                "id": "checkpoint",
-                "attributes": {
-                  "field-type": "@cardstack/core-types::belongs-to"
-                },
-                "relationships": {
-                  "related-types": {
-                    "data": [
-                      {
-                        "type": "content-types",
-                        "id": "ephemeral-checkpoints"
-                      }
-                    ]
-                  }
-                }
-              }
-            });
-            break;
-          case 'ephemeral-checkpoints' :
-            delete model.doc.relationships['data-source'].data.id;
-            expect(model).to.deep.equal({
-              "type": "content-types",
-              "id": "ephemeral-checkpoints",
-              "doc": {
-                "type": "content-types",
-                "id": "ephemeral-checkpoints",
-                "attributes": {
-                  "is-built-in": true
-                },
-                "relationships": {
-                  "data-source": {
-                    "data": {
-                      "type": "data-sources",
-                    }
-                  }
-                }
-              }
-            });
-            break;
-					case 'ephemeral-restores' :
-            delete model.doc.relationships['data-source'].data.id;
-						expect(model).to.deep.equal({
-							"type": "content-types",
-							"id": "ephemeral-restores",
-							"doc": {
-								"type": "content-types",
-								"id": "ephemeral-restores",
-								"attributes": {
-									"is-built-in": true
-								},
-								"relationships": {
-									"data-source": {
-										"data": {
-											"type": "data-sources",
-										}
-									},
-									"fields": {
-										"data": [
-											{
-												"type": "fields",
-												"id": "checkpoint"
-											}
-										]
-									}
-								}
-							}
-						});
-            break;
-        }
+        expect(model.id).to.be.ok;
+        expect(model.doc.id).to.be.ok;
+        expect(model.doc.meta.version).to.be.ok;
+        delete model.id;
+        delete model.doc.id;
+        delete model.doc.meta.version;
+        expect(model).to.deep.equal({
+          "type": "dogs",
+          "doc": {
+            "type": "dogs",
+            "attributes": {
+              "name": "Van Gogh"
+            },
+            "meta": { }
+          }
+        });
       });
 
-      await indexers.update({ realTime: true, hints: { foo: 'bar' } });
-      expect(addCount).to.equal(3, 'the correct number of add events were emitted');
+      await env.lookup('hub:writers').create('master', Session.INTERNAL_PRIVILEGED, 'dogs', {
+        type: 'dogs',
+        attributes: {
+          name: 'Van Gogh'
+        }
+      });
+      await env.lookup('hub:indexers').update({ forceRefresh: true, hints: { type: 'dogs' } });
+
+      expect(addCount).to.equal(1, 'the correct number of add events were emitted');
       expect(updateCompleteCount).to.equal(1, 'the correct number of update_complete events were emitted');
     });
   });

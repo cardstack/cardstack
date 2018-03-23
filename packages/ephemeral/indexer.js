@@ -21,49 +21,8 @@ class Updater {
     this.dataSourceId = dataSourceId;
   }
 
-  _ownSchema() {
-    return [
-      {
-        type: 'fields',
-        id: 'checkpoint',
-        attributes: {
-          'field-type': '@cardstack/core-types::belongs-to'
-        },
-        relationships: {
-          'related-types': {
-            data: [
-              { type: 'content-types', id: 'ephemeral-checkpoints' }
-            ]
-          }
-        }
-      },
-      {
-        type: 'content-types',
-        id: 'ephemeral-checkpoints',
-        attributes: {
-          'is-built-in': true
-        },
-        relationships: {
-          'data-source': { data: { type: 'data-sources', id: this.dataSourceId } }
-        }
-      },
-      { type: 'content-types',
-        id: 'ephemeral-restores',
-        attributes: {
-          'is-built-in': true
-        },
-        relationships: {
-          'data-source': { data: { type: 'data-sources', id: this.dataSourceId } },
-          fields: {
-            data: [ { type: 'fields', id: 'checkpoint' } ]
-          }
-        }
-      }
-    ];
-  }
-
   async schema() {
-    return this.storage.schemaModels().concat(this._ownSchema());
+    return this.storage.schemaModels();
   }
 
   async updateContent(meta, hints, ops) {
@@ -78,10 +37,6 @@ class Updater {
     if (identity !== this.storage.identity) {
       generation = null;
       await ops.beginReplaceAll();
-    }
-
-    for (let model of this._ownSchema()) {
-      await ops.save(model.type, model.id, model);
     }
 
     for (let entry of this.storage.modelsNewerThan(generation)) {

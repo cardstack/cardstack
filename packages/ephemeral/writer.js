@@ -54,10 +54,6 @@ module.exports = declareInjections({
       });
     }
 
-    if (type === 'ephemeral-checkpoints' || type === 'ephemeral-restores') {
-      throw new Error(`${type} may not be patched`, { status: 400 });
-    }
-
     let before = this.storage.lookup(type, id);
     if (!before) {
       throw new Error(`${type} with id ${id} does not exist`, {
@@ -79,10 +75,6 @@ module.exports = declareInjections({
       });
     }
 
-    if (type === 'ephemeral-checkpoints' || type === 'ephemeral-restores') {
-      throw new Error(`${type} may not be deleted`, { status: 400 });
-    }
-
     let before = this.storage.lookup(type, id);
     if (!before) {
       throw new Error(`${type} with id ${id} does not exist`, {
@@ -95,11 +87,11 @@ module.exports = declareInjections({
     return pending;
   }
 
-  async prepareCheckpointCreate(branch, session, type, document, isSchema) {
+  async prepareCreateCheckpoint(branch, session, type, document, isSchema) {
     return this.prepareCreate(branch, session, type, document, isSchema);
   }
 
-  async prepareCheckpointRestore(branch, session, type, document, isSchema) {
+  async prepareApplyCheckpoint(branch, session, type, document, isSchema) {
     return this.prepareCreate(branch, session, type, document, isSchema);
   }
 
@@ -126,9 +118,9 @@ function patch(before, diffDocument) {
 async function finalizer(pendingChange) {
   let { storage, isSchema, ifMatch, type, id } = pendingChanges.get(pendingChange);
 
-  if (type === 'ephemeral-checkpoints') {
+  if (type === 'checkpoints') {
     return { version: storage.makeCheckpoint(id) };
-  } else if (type === 'ephemeral-restores') {
+  } else if (type === 'restores') {
     return { version: await storage.restoreCheckpoint(pendingChange.finalDocument.relationships.checkpoint.data.id) };
   } else {
     return { version: storage.store(type, id, pendingChange.finalDocument, isSchema, ifMatch) };

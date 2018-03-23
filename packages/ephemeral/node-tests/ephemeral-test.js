@@ -13,7 +13,7 @@ const {
 const JSONAPIFactory = require('../../../tests/ephemeral-test-app/node_modules/@cardstack/test-support/jsonapi-factory');
 
 describe('ephemeral-storage', function() {
-  let env, request;
+  let env, request, dataSource;
 
   async function setup() {
     let factory = new JSONAPIFactory();
@@ -36,11 +36,15 @@ describe('ephemeral-storage', function() {
     });
 
 
-    let dataSource = factory.addResource('data-sources').withAttributes({
+    dataSource = factory.addResource('data-sources').withAttributes({
       sourceType: '@cardstack/ephemeral',
       params: {
         initialModels: initial.getModels()
       }
+    });
+
+    factory.addResource('data-sources', 'test-support').withAttributes({
+      sourceType: '@cardstack/test-support'
     });
 
     factory.addResource('content-types', 'posts').withRelated(
@@ -179,40 +183,46 @@ describe('ephemeral-storage', function() {
     });
 
     it('can create a checkpoint', async function() {
-      let response = await request.post('/test-support/checkpoints').send({
+      let response = await request.post('/api/checkpoints').send({
         data: {
-          type: 'ephemeral-checkpoints'
+          type: 'checkpoints',
+          relationships: {
+            'checkpoint-data-source': { data: { type: 'data-sources', id: dataSource.id } }
+          }
         }
       });
 
       expect(response).hasStatus(201);
-      expect(response.body.data.id).to.be.ok;
-      expect(response.body.data.type).to.equal("ephemeral-checkpoints");
-      expect(response.body.data.meta.version).to.be.ok;
     });
 
     it('checkpoint cannot be patched', async function() {
-      let checkpoint = await request.post('/api/ephemeral-checkpoints').send({
+      let checkpoint = await request.post('/api/checkpoints').send({
         data: {
-          type: 'ephemeral-checkpoints'
+          type: 'checkpoints',
+          relationships: {
+            'checkpoint-data-source': { data: { type: 'data-sources', id: dataSource.id } }
+          }
         }
       });
       expect(checkpoint).hasStatus(201);
-      let response = await request.patch(`/api/ephemeral-checkpoints/${checkpoint.body.data.id}`).send(checkpoint.body);
+      let response = await request.patch(`/api/checkpoints/${checkpoint.body.data.id}`).send(checkpoint.body);
       expect(response).hasStatus(400);
-      expect(response.body.errors[0].detail).to.equal('ephemeral-checkpoints may not be patched');
+      expect(response.body.errors[0].detail).to.equal('checkpoints may not be patched');
     });
 
     it('checkpoint cannot be deleted', async function() {
-      let checkpoint = await request.post('/api/ephemeral-checkpoints').send({
+      let checkpoint = await request.post('/api/checkpoints').send({
         data: {
-          type: 'ephemeral-checkpoints'
+          type: 'checkpoints',
+          relationships: {
+            'checkpoint-data-source': { data: { type: 'data-sources', id: dataSource.id } }
+          }
         }
       });
       expect(checkpoint).hasStatus(201);
-      let response = await request.delete(`/api/ephemeral-checkpoints/${checkpoint.body.data.id}`).set('If-Match', checkpoint.body.data.meta.version);
+      let response = await request.delete(`/api/checkpoints/${checkpoint.body.data.id}`).set('If-Match', checkpoint.body.data.meta.version);
       expect(response).hasStatus(400);
-      expect(response.body.errors[0].detail).to.equal('ephemeral-checkpoints may not be deleted');
+      expect(response.body.errors[0].detail).to.equal('checkpoints may not be deleted');
     });
 
 
@@ -225,11 +235,15 @@ describe('ephemeral-storage', function() {
       expect(second).hasStatus(200);
 
       // Make a checkpoint
-      let checkpoint = await request.post('/test-support/checkpoints').send({
-        data: { type: 'ephemeral-checkpoints' }
+      let checkpoint = await request.post('/api/checkpoints').send({
+        data: {
+          type: 'checkpoints',
+          relationships: {
+            'checkpoint-data-source': { data: { type: 'data-sources', id: dataSource.id } }
+          }
+        }
       });
       expect(checkpoint).hasStatus(201);
-      let checkpointId = checkpoint.body.data.id;
 
       // Now do a post-checkpoint delete, patch, and post
 
@@ -259,28 +273,17 @@ describe('ephemeral-storage', function() {
       expect(third).hasStatus(201);
 
       // Restore the checkpoint
-      response = await request.post(`/test-support/restores`).send({
+      response = await request.post(`/api/restores`).send({
         data: {
-          type: 'ephemeral-restores',
+          type: 'restores',
           relationships: {
-            checkpoint: {
-              data: { type: 'ephemeral-checkpoints', id: checkpoint.body.data.id }
-            }
+            checkpoint: { data: { type: 'checkpoints', id: checkpoint.body.data.id } },
+            'checkpoint-data-source': { data: { type: 'data-sources', id: dataSource.id } }
           }
         }
       });
+
       expect(response).hasStatus(201);
-      expect(response.body.data.id).to.be.ok;
-      expect(response.body.data.type).to.equal("ephemeral-restores");
-      expect(response.body.data.meta.version).to.be.ok;
-      expect(response.body.data.relationships).to.deep.equal({
-        checkpoint: {
-          data: {
-            type: "ephemeral-checkpoints",
-            id: checkpointId
-          }
-        }
-      });
 
       // and see that our delete, patch, and post are undone
       response = await request.get('/api/posts/first-post');
@@ -296,13 +299,12 @@ describe('ephemeral-storage', function() {
     });
 
     it('can reset to empty', async function() {
-      let response = await request.post('/api/ephemeral-restores').send({
+      let response = await request.post('/api/restores').send({
         data: {
-          type: 'ephemeral-restores',
+          type: 'restores',
           relationships: {
-            checkpoint: {
-              data: { type: 'ephemeral-checkpoints', id: 'empty' }
-            }
+            checkpoint: { data: { type: 'checkpoints', id: 'empty' } },
+            'checkpoint-data-source': { data: { type: 'data-sources', id: dataSource.id } }
           }
         }
       });
