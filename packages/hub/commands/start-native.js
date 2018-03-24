@@ -77,8 +77,6 @@ module.exports = {
 
     let args = [];
 
-    console.log("ENV VARS = ", JSON.stringify(setEnvVars, null, 2));
-
     return { setEnvVars, bin, args };
   },
 

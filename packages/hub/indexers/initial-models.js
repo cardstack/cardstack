@@ -14,7 +14,8 @@ module.exports = declareInjections({
 
 class InitialModelsIndexer {
   static create({ dataSources, initialModels, schemaLoader }) {
-    let models = bootstrapSchema.concat(initialModels()).concat(dataSources);
+    let seedModels = typeof initialModels === 'function' ? initialModels() : [];
+    let models = bootstrapSchema.concat(seedModels).concat(dataSources);
     let schemaTypes = schemaLoader.ownTypes();
     let schemaModels = models.filter(m => m && schemaTypes.includes(m.type));
 
