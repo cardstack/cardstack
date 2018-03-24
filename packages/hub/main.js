@@ -18,19 +18,13 @@ async function wireItUp(projectDir, encryptionKeys, dataSources, opts = {}) {
   registry.register('config:public-url', { url: opts.url });
   registry.register('config:ci-session', { id: opts.ciSessionId });
 
-  let seeds;
   if (typeof opts.seeds === 'function') {
-    seeds = await opts.seeds();
-    registry.register('config:initial-models', seeds);
+    registry.register('config:initial-models', opts.seeds);
   } else {
-    registry.register('config:initial-models', []);
+    registry.register('config:initial-models', () => []);
   }
 
   let container = new Container(registry);
-
-  if (opts.loadSeeds && seeds) {
-    await loadSeeds(container, seeds);
-  }
 
   // in the test suite we want more deterministic control of when
   // indexing happens
@@ -51,13 +45,14 @@ async function wireItUp(projectDir, encryptionKeys, dataSources, opts = {}) {
 async function loadSeeds(container, seedModels, opts) {
   if (!container) { return; }
 
-  log.info("loading seed models");
-
   let branch = opts && opts.branch || 'master';
   let writers = container.lookup('hub:writers');
+
   for (let model of seedModels) {
     await writers.create(branch, Session.INTERNAL_PRIVILEGED, model.type, model);
   }
+
+  await container.lookup('hub:indexers').update({ forceRefresh: true });
 }
 
 async function makeServer(projectDir, encryptionKeys, dataSources, opts = {}) {

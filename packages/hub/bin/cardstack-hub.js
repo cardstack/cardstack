@@ -7,6 +7,9 @@ const fs = require('fs');
 const logger = require('@cardstack/logger');
 const log = logger('cardstack/server');
 
+const seedsFolder = 'seeds';
+const dataSourcesFolder = 'data-sources';
+
 if (process.env.EMBER_ENV === 'test') {
   logger.configure({
     defaultLevel: 'warn'
@@ -18,15 +21,14 @@ if (process.env.EMBER_ENV === 'test') {
   });
 }
 
-async function runServer(options, dataSources, seedModels) {
+async function runServer(options, dataSources) {
   let {
     sessionsKey,
     port,
   } = options;
 
-  if (seedModels) {
-    options.seeds = () => seedModels;
-  }
+  let seedsDir = path.join(options.initialDataDirectory, seedsFolder);
+  options.seeds = () => loadModels(seedsDir);
 
   let app = await makeServer(process.cwd(), sessionsKey, dataSources, options);
   app.listen(port);
@@ -38,7 +40,6 @@ async function runServer(options, dataSources, seedModels) {
 
 function commandLineOptions() {
   commander
-    .option('--load-seeds', 'Load seed models from non-ephemeral sources after starting')
     .usage(`
 
 Cardstack Hub takes all its basic settings via environment variables:
@@ -111,21 +112,17 @@ function readDir(dir) {
   }).reduce((a,b) => a.concat(b), []);
 }
 
-function loadInitialModels(options) {
-  let dataSourcesDir = path.join(options.initialDataDirectory, 'data-sources');
-  let seedsDir = path.join(options.initialDataDirectory, 'seeds');
-
+function loadModels(modelsDir) {
   try {
-    let seedModels;
-    let dataSources = readDir(dataSourcesDir);
+    let models = [];
 
-    if (fs.existsSync(seedsDir) && fs.statSync(seedsDir).isDirectory()) {
-      seedModels = readDir(seedsDir);
+    if (fs.existsSync(modelsDir) && fs.statSync(modelsDir).isDirectory()) {
+      models = readDir(modelsDir);
     }
 
-    return { dataSources, seedModels };
+    return models;
   } catch (err) {
-    process.stderr.write(`Unable to load models from your initial-data directory (${options.initialDataDirectory}), ${err}\n`);
+    process.stderr.write(`Unable to load models from the directory (${modelsDir}), ${err}\n`);
     process.exit(-1);
   }
 }
@@ -151,8 +148,15 @@ process.on('disconnect', () => {
 
 
 let options = commandLineOptions();
-let { dataSources, seedModels } = loadInitialModels(options);
-runServer(options, dataSources, seedModels).catch(err => {
+let dataSources = loadModels(path.join(options.initialDataDirectory, dataSourcesFolder));
+runServer(options, dataSources).catch(err => {
   log.error("Server failed to start cleanly: %s", err.stack || err);
   process.exit(-1);
 });
+
+module.exports = {
+  commandLineOptions,
+  seedsFolder,
+  loadModels,
+  dataSourcesFolder
+};

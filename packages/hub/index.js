@@ -19,7 +19,8 @@ let addon = {
       };
     } else {
       return {
-        'hub:start': require('./commands/start-native')
+        'hub:start': require('./commands/start-native'),
+        'hub:seed': require('./commands/seed')
       };
     }
   },
