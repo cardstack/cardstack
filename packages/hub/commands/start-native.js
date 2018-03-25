@@ -63,7 +63,7 @@ module.exports = {
 
     if (!process.env.INITIAL_DATA_DIR) {
       setEnvVars.INITIAL_DATA_DIR = path.join(path.dirname(configPath),
-                                              '..', 'cardstack', 'initial-data');
+                                              '..', 'cardstack');
 
     }
 
