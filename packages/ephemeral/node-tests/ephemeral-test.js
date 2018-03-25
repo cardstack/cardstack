@@ -290,7 +290,18 @@ describe('ephemeral-storage', function() {
     });
 
     it('can reset to empty', async function() {
-      let response = await request.post('/api/restores').send({
+      let response = await request.post('/api/posts').send({
+        data: {
+          type: "posts",
+          attributes: {
+            title: "hello"
+          }
+        }
+      });
+      expect(response).hasStatus(201);
+      let id = response.body.data.id;
+
+      response = await request.post('/api/restores').send({
         data: {
           type: 'restores',
           relationships: {
@@ -300,7 +311,7 @@ describe('ephemeral-storage', function() {
         }
       });
       expect(response).hasStatus(201);
-      response = await request.get('/api/posts/first-post');
+      response = await request.get(`/api/posts/${id}`);
       expect(response).hasStatus(404);
     });
   });
