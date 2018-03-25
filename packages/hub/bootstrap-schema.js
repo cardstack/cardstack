@@ -552,9 +552,9 @@ const models = [
   },
   {
     type: 'data-sources',
-    id: 'initial-models',
+    id: 'static-models',
     attributes: {
-      'source-type': '@cardstack/hub::initial-models'
+      'source-type': '@cardstack/hub::static-models'
     }
   }
 

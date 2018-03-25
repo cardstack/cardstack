@@ -221,7 +221,9 @@ describe('authentication/middleware', function() {
     it('offers full user load within session', async function() {
       let { token } = await auth.createToken({ id: env.user.data.id, type: env.user.data.type }, 30);
       let response = await request.get('/').set('authorization', `Bearer ${token}`);
-      expect(response.body.user).deep.equals(env.user);
+      expect(response.body.user.data).has.property('id', env.user.data.id);
+      expect(response.body.user.data).has.property('type', env.user.data.type);
+      expect(response.body.user.data.attributes).deep.equals(env.user.data.attributes);
     });
 
     it('a bearer token that matches the CI session id will return the internal priviledged session', async function() {
@@ -312,7 +314,9 @@ describe('authentication/middleware', function() {
         response = await request.get('/').set('authorization', `Bearer ${response.body.data.meta.token}`);
         expect(response).hasStatus(200);
         expect(response.body).has.property('userId', env.user.data.id);
-        expect(response.body.user).deep.equals(env.user);
+        expect(response.body.user.data).has.property('id', env.user.data.id);
+        expect(response.body.user.data).has.property('type', env.user.data.type);
+        expect(response.body.user.data.attributes).deep.equals(env.user.data.attributes);
       });
 
       it('can throw', async function() {

@@ -2,17 +2,16 @@ const temp = require('./temp-helper');
 const ElasticAssert = require('@cardstack/elasticsearch/node-tests/assertions');
 const JSONAPIFactory = require('./jsonapi-factory');
 const crypto = require('crypto');
-const { wireItUp } = require('@cardstack/hub/main');
+const { wireItUp, loadSeeds } = require('@cardstack/hub/main');
 const Session = require('@cardstack/plugin-utils/session');
 const { partition } = require('lodash');
-
 const defaultDataSourceId = 'default-data-source';
 
 exports.createDefaultEnvironment = async function(projectDir, initialModels = [], opts = {}) {
   let container;
   try {
     let factory = new JSONAPIFactory();
-
+    factory.importModels(initialModels);
 
     factory.addResource('content-types', 'test-users').withRelated('fields', [
       factory.addResource('fields', 'full-name').withAttributes({
@@ -35,41 +34,13 @@ exports.createDefaultEnvironment = async function(projectDir, initialModels = []
       user
     );
 
-    // we have a default ephemeral data source during tests. But users
-    // can create additional data sources and declare initial models
-    // that belong within them.
-    //
-    // We can create (and validate) all the initialModels in the
-    // ephemeral store in a single shot using the ephemeral plugin's
-    // params.initialModels.
-    //
-    // Any other ("foreign") initial models will be written one-by-one
-    // further below.
-    //
-    // This means you can't have a model in the ephemeral store that
-    // depends on a model that is not in the ephemeral store. Or
-    // rather, if you want to do that you should do it yourself
-    // directly in your test setup instead of passing everything into
-    // createDefaultEnvironment.
-    //
-    // Note that the above caveat only applies to node-tests that use
-    // this module -- apps are free to put things into their ephemeral
-    // store's initialModels that depend on other data sources, and
-    // that works fine (as long as you've done whatever is necessary
-    // to get those other data source populated).
-    //
-    let [
-      foreignInitialModels,
-      ephemeralInitialModels
-    ] = partitionInitialModels(initialModels);
-
-    factory.addResource('plugin-configs', '@cardstack/hub')
+    let defaultDataSource = new JSONAPIFactory();
+    defaultDataSource.addResource('plugin-configs', '@cardstack/hub')
       .withRelated(
         defaultDataSourceId,
-        factory.addResource('data-sources')
+        defaultDataSource.addResource('data-sources')
           .withAttributes({
-            'source-type': '@cardstack/ephemeral',
-            params: { initialModels: ephemeralInitialModels }
+            'source-type': '@cardstack/ephemeral'
           })
       );
 
@@ -83,28 +54,20 @@ exports.createDefaultEnvironment = async function(projectDir, initialModels = []
         mayWriteFields: true
       }).withRelated('who', factory.addResource('groups', user.data.id));
 
-    let seeds = [];
-    let dataSources = [];
-    for (let model of factory.getModels()) {
-      if (model.type === 'data-sources' || model.type === 'plugin-configs') {
-        dataSources.push(model);
-      } else {
-        seeds.push(model);
-      }
-    }
+    let [
+      foreignInitialModels,
+      ephemeralInitialModels
+    ] = partitionInitialModels(factory.getModels());
 
     opts.disableAutomaticIndexing = true;
-    opts.seeds = () => seeds;
+    opts.seeds = () => ephemeralInitialModels;
 
-    container = await wireItUp(projectDir, crypto.randomBytes(32), dataSources, opts);
-
-    let writers = container.lookup('hub:writers');
-
-    for (let model of foreignInitialModels) {
-      await writers.create('master', session, model.type, model);
+    container = await wireItUp(projectDir, crypto.randomBytes(32), defaultDataSource.getModels(), opts);
+    if (foreignInitialModels.length) {
+      await loadSeeds(container, foreignInitialModels);
+    } else {
+      await container.lookup('hub:indexers').update({ forceRefresh: true });
     }
-
-    await container.lookup('hub:indexers').update({ forceRefresh: true });
 
     Object.assign(container, {
       session,

@@ -1,7 +1,8 @@
 const { declareInjections } = require('@cardstack/di');
 
 module.exports = declareInjections({
-  service: `plugin-services:${require.resolve('./service')}`
+  service: `plugin-services:${require.resolve('./service')}`,
+  loadInitialModels: 'config:initial-models'
 }, class Indexer {
 
   async branches() {
@@ -9,7 +10,11 @@ module.exports = declareInjections({
   }
 
   async beginUpdate(branch, readOtherIndexers) {
-    let storage = await this.service.findOrCreateStorage(this.dataSource.id, this.initialModels, readOtherIndexers);
+    let initialModels = this.initialModels || [];
+    if (typeof this.loadInitialModels === 'function') {
+      initialModels = initialModels.concat(await this.loadInitialModels());
+    }
+    let storage = await this.service.findOrCreateStorage(this.dataSource.id, initialModels, readOtherIndexers);
     return new Updater(storage, this.dataSource.id);
   }
 });
