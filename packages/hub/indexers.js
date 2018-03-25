@@ -46,7 +46,7 @@ const RunningIndexers = require('./indexing/running-indexers');
 
 module.exports = declareInjections({
   schemaLoader: 'hub:schema-loader',
-  seedModels: 'config:seed-models'
+  dataSources: 'config:data-sources'
 },
 
 class Indexers extends EventEmitter {
@@ -57,7 +57,7 @@ class Indexers extends EventEmitter {
     this._running = false;
     this._queue = [];
     this._forceRefreshQueue = [];
-    this._seedSchemaMemo = null;
+    this._dataSourcesMemo = null;
     this._schemaCache = null;
   }
 
@@ -88,8 +88,8 @@ class Indexers extends EventEmitter {
 
   static teardown(instance) {
     instance.invalidateSchemaCache();
-    if (instance._seedSchemaMemo) {
-      instance._seedSchemaMemo.teardown();
+    if (instance._dataSourcesMemo) {
+      instance._dataSourcesMemo.teardown();
     }
   }
 
@@ -124,11 +124,11 @@ class Indexers extends EventEmitter {
   }
 
   async _seedSchema() {
-    if (!this._seedSchemaMemo) {
+    if (!this._dataSourcesMemo) {
       let types = this.schemaLoader.ownTypes();
-      this._seedSchemaMemo = await this.schemaLoader.loadFrom(bootstrapSchema.concat(this.seedModels.filter(model => types.includes(model.type))));
+      this._dataSourcesMemo = await this.schemaLoader.loadFrom(bootstrapSchema.concat(this.dataSources.filter(model => types.includes(model.type))));
     }
-    return this._seedSchemaMemo;
+    return this._dataSourcesMemo;
   }
 
   async _updateLoop() {

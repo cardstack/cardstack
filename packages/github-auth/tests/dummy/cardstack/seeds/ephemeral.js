@@ -1,28 +1,6 @@
 /* eslint-env node */
 const JSONAPIFactory = require('@cardstack/test-support/jsonapi-factory');
 
-module.exports = [
-  {
-    type: 'data-sources',
-    id: 'default',
-    attributes: {
-      'source-type': '@cardstack/ephemeral',
-      params: {
-        initialModels: initialModels()
-      }
-    }
-  },
-  {
-    type: 'plugin-configs',
-    id: '@cardstack/hub',
-    relationships: {
-      'default-data-source': {
-        data: { type: 'data-sources', id: 'default' }
-      }
-    }
-  }
-];
-
 function initialModels() {
   let factory = new JSONAPIFactory();
   factory.addResource('data-sources', 'github')
@@ -36,3 +14,5 @@ function initialModels() {
     })
   return factory.getModels()
 }
+
+module.exports = initialModels();

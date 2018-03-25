@@ -2,7 +2,8 @@ import Factory from './jsonapi-factory';
 import { hubURL } from '@cardstack/plugin-utils/environment';
 
 export default class Fixtures {
-  constructor(fn) {
+  constructor(dataSourceId, fn) {
+    this.dataSourceId = dataSourceId;
     this.factory = new Factory();
     this._id = null;
     fn(this.factory);
@@ -41,10 +42,15 @@ export default class Fixtures {
   }
 
   async _createCheckpoint() {
-    let response = await fetch(`${hubURL}/api/ephemeral-checkpoints`, {
+    let response = await fetch(`${hubURL}/api/checkpoints`, {
       method: 'POST',
       body: JSON.stringify({
-        data: { type: 'ephemeral-checkpoints' }
+        data: {
+          type: 'checkpoints',
+          relationships: {
+            'checkpoint-data-source': { data: { type: 'data-sources', id: this.dataSourceId } }
+          }
+        }
       })
     });
     if (response.status !== 201) {
@@ -54,15 +60,14 @@ export default class Fixtures {
   }
 
   async _restoreCheckpoint(id) {
-    let response = await fetch(`${hubURL}/api/ephemeral-restores`, {
+    let response = await fetch(`${hubURL}/api/restores`, {
       method: 'POST',
       body: JSON.stringify({
         data: {
-          type: 'ephemeral-restores',
+          type: 'restores',
           relationships: {
-            checkpoint: {
-              data: { type: 'ephemeral-checkpoints', id }
-            }
+            checkpoint: { data: { type: 'checkpoints', id } },
+            'checkpoint-data-source': { data: { type: 'data-sources', id: this.dataSourceId } }
           }
         }
       })

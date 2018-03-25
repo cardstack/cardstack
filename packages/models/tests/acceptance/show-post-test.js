@@ -9,7 +9,7 @@ moduleForAcceptance('Acceptance | show post', {
   }
 });
 
-let scenario = new Fixtures(factory => {
+let scenario = new Fixtures('default', factory => {
   factory.addResource('content-types', 'posts')
     .withRelated('fields', [
       factory.addResource('fields', 'title').withAttributes({

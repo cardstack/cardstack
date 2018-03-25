@@ -5,7 +5,7 @@ module.exports = [
     type: 'data-sources',
     id: 'default',
     attributes: {
-      'source-type': '@cardstack/ephemeral'
+      'source-type': '@cardstack/ephemeral',
     }
   },
   {
@@ -18,3 +18,4 @@ module.exports = [
     }
   }
 ];
+

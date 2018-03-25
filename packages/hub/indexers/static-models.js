@@ -1,15 +1,21 @@
+/*
+  This indexers is responsible for reflecting all our initial static
+  models (which includes the bootstrap schema plus the user's
+  hard-coded data-sources) in the search index.
+*/
+
 const { declareInjections } = require('@cardstack/di');
 const { isEqual } = require('lodash');
 const bootstrapSchema = require('../bootstrap-schema');
 
 module.exports = declareInjections({
-  seedModels: 'config:seed-models',
+  dataSources: 'config:data-sources',
   schemaLoader: 'hub:schema-loader'
 },
 
-class SeedsIndexer {
-  static create({ seedModels, schemaLoader }) {
-    let models = bootstrapSchema.concat(seedModels);
+class StaticModelsIndexer {
+  static create({ dataSources, schemaLoader }) {
+    let models = bootstrapSchema.concat(dataSources);
     let schemaTypes = schemaLoader.ownTypes();
     let schemaModels = models.filter(m => schemaTypes.includes(m.type));
     return new this(models, schemaModels);

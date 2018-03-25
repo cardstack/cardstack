@@ -43,26 +43,4 @@ function initialModels() {
   return initial.getModels();
 }
 
-module.exports = [
-  {
-    type: 'data-sources',
-    id: 'default',
-    attributes: {
-      'source-type': '@cardstack/ephemeral',
-      params: {
-        initialModels: initialModels()
-      }
-    }
-  },
-  {
-    type: 'plugin-configs',
-    id: '@cardstack/hub',
-    relationships: {
-      'default-data-source': {
-        data: { type: 'data-sources', id: 'default' }
-      }
-    }
-  }
-];
-
-module.exports.initialModels = initialModels;
+module.exports = initialModels();

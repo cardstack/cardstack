@@ -28,6 +28,7 @@ module.exports = declareInjections({
   indexers: 'hub:indexers',
   sources: 'hub:data-sources',
   controllingBranch: 'hub:controlling-branch',
+  ciSession: 'config:ci-session',
   currentSchema: 'hub:current-schema'
 },
 
@@ -53,6 +54,11 @@ class Authentication {
   }
 
   _tokenToSession(token) {
+    let ciSessionId = this.ciSession && this.ciSession.id;
+    if (ciSessionId && token === ciSessionId) {
+      return Session.INTERNAL_PRIVILEGED;
+    }
+
     try {
       let [sessionPayload, validUntil] = this.encryptor.verifyAndDecrypt(token);
       if (validUntil <= Date.now()/1000) {

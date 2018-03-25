@@ -19,7 +19,8 @@ let addon = {
       };
     } else {
       return {
-        'hub:start': require('./commands/start-native')
+        'hub:start': require('./commands/start-native'),
+        'hub:seed': require('./commands/seed')
       };
     }
   },
@@ -45,7 +46,7 @@ let addon = {
   async url() {
     if (!this._hub) {
       this._env = process.env.EMBER_ENV || 'development';
-      if (fs.existsSync(path.join(path.dirname(this.project.configPath()), '..', 'cardstack', 'seeds', this._env))) {
+      if (fs.existsSync(path.join(path.dirname(this.project.configPath()), '..', 'cardstack'))) {
         this._hub = this._startHub();
       } else {
         this._hub = Promise.resolve(null);

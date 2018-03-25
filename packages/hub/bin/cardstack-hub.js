@@ -7,6 +7,9 @@ const fs = require('fs');
 const logger = require('@cardstack/logger');
 const log = logger('cardstack/server');
 
+const seedsFolder = 'seeds';
+const dataSourcesFolder = 'data-sources';
+
 if (process.env.EMBER_ENV === 'test') {
   logger.configure({
     defaultLevel: 'warn'
@@ -18,12 +21,16 @@ if (process.env.EMBER_ENV === 'test') {
   });
 }
 
-async function runServer(options, seedModels) {
+async function runServer(options, dataSources) {
   let {
     sessionsKey,
     port,
   } = options;
-  let app = await makeServer(process.cwd(), sessionsKey, seedModels, options);
+
+  let seedsDir = path.join(options.initialDataDirectory, seedsFolder);
+  options.seeds = () => loadModels(seedsDir);
+
+  let app = await makeServer(process.cwd(), sessionsKey, dataSources, options);
   app.listen(port);
   log.info("server listening on %s", port);
   if (process.connected) {
@@ -38,20 +45,21 @@ function commandLineOptions() {
 Cardstack Hub takes all its basic settings via environment variables:
 
 CARDSTACK_SESSIONS_KEY  Required  A base64-encoded 32 byte random key for securing sessions. You can generate one using "yarn run cardstack-generate-key".
-SEED_DIR                Required  The path to your seed configuration files.
+INITIAL_DATA_DIR        Required  The path to your initial data configuration directory.
 ELASTICSEARCH                     The URL to our Elasticsearch instance. Defaults to http://localhost:9200
 PORT                              Port to bind to. Defaults to 3000.
 PUBLIC_HUB_URL                    The public URL at which the Hub can be accessed. Defaults to http://localhost:$PORT.
+CI_SESSION_ID                     A session ID that has full priviledges which is used by CI for test setup and test tear down.
 `)
     .parse(process.argv);
 
-  if (!process.env.SEED_DIR) {
-    process.stderr.write("You must set the SEED_DIR environment variable.\n");
+  if (!process.env.INITIAL_DATA_DIR) {
+    process.stderr.write("You must set the INITIAL_DATA_DIR environment variable.\n");
     commander.outputHelp();
     process.exit(-1);
   }
 
-  commander.seedConfigDirectory = path.resolve(process.env.SEED_DIR);
+  commander.initialDataDirectory = path.resolve(process.env.INITIAL_DATA_DIR);
 
   let base64Key = process.env.CARDSTACK_SESSIONS_KEY;
   let base64KeyPath = process.env.CARDSTACK_SESSIONS_KEY_FILE;
@@ -87,20 +95,34 @@ PUBLIC_HUB_URL                    The public URL at which the Hub can be accesse
     commander.url = `http://localhost:${commander.port}`;
   }
 
+  if (process.env.CI_SESSION_ID) {
+    commander.ciSessionId = process.env.CI_SESSION_ID;
+  }
+
   return commander;
 }
 
-function loadSeedModels(options) {
+function readDir(dir) {
+  return fs.readdirSync(dir).map(filename => {
+    if (/\.js$/.test(filename)) {
+      return require(path.join(dir, filename));
+    } else {
+      return [];
+    }
+  }).reduce((a,b) => a.concat(b), []);
+}
+
+function loadModels(modelsDir) {
   try {
-    return fs.readdirSync(options.seedConfigDirectory).map(filename => {
-      if (/\.js$/.test(filename)) {
-        return require(path.join(options.seedConfigDirectory, filename));
-      } else {
-        return [];
-      }
-    }).reduce((a,b) => a.concat(b), []);
+    let models = [];
+
+    if (fs.existsSync(modelsDir) && fs.statSync(modelsDir).isDirectory()) {
+      models = readDir(modelsDir);
+    }
+
+    return models;
   } catch (err) {
-    process.stderr.write(`Unable to load models from your seed-config-file (${options.seedConfigFile}), ${err}\n`);
+    process.stderr.write(`Unable to load models from the directory (${modelsDir}), ${err}\n`);
     process.exit(-1);
   }
 }
@@ -126,8 +148,15 @@ process.on('disconnect', () => {
 
 
 let options = commandLineOptions();
-let seedModels = loadSeedModels(options);
-runServer(options, seedModels).catch(err => {
+let dataSources = loadModels(path.join(options.initialDataDirectory, dataSourcesFolder));
+runServer(options, dataSources).catch(err => {
   log.error("Server failed to start cleanly: %s", err.stack || err);
   process.exit(-1);
 });
+
+module.exports = {
+  commandLineOptions,
+  seedsFolder,
+  loadModels,
+  dataSourcesFolder
+};

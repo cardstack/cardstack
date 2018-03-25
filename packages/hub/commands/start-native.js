@@ -61,9 +61,9 @@ module.exports = {
       setEnvVars.ELASTICSEARCH_PREFIX = packageName.replace(/^[^a-zA-Z]*/, '').replace(/[^a-zA-Z0-9]/g, '_') + '_' + environment;
     }
 
-    if (!process.env.SEED_DIR) {
-      setEnvVars.SEED_DIR = path.join(path.dirname(configPath),
-                                      '..', 'cardstack', 'seeds', environment);
+    if (!process.env.INITIAL_DATA_DIR) {
+      setEnvVars.INITIAL_DATA_DIR = path.join(path.dirname(configPath),
+                                              '..', 'cardstack');
 
     }
 
@@ -75,7 +75,9 @@ module.exports = {
 
     let bin = path.resolve(path.join(__dirname, '..', 'bin', 'cardstack-hub.js'));
 
-    return { setEnvVars, bin, args: [] };
+    let args = [];
+
+    return { setEnvVars, bin, args };
   },
 
   async spawnHub(packageName, configPath, environment, port, url) {

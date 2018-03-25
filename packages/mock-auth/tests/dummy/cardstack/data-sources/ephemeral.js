@@ -1,17 +1,11 @@
 /* eslint-env node */
 
-const { initialModels } = require('../test/ephemeral');
-
-
 module.exports = [
   {
     type: 'data-sources',
     id: 'default',
     attributes: {
       'source-type': '@cardstack/ephemeral',
-      params: {
-        initialModels: initialModels()
-      }
     }
   },
   {
@@ -24,3 +18,4 @@ module.exports = [
     }
   }
 ];
+

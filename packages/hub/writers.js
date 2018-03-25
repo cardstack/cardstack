@@ -65,6 +65,50 @@ class Writers {
     }
   }
 
+  async createCheckpoint(branch, session, type, document) {
+    log.info("creating checkpoint type=%s", type);
+    let schema = await this.schema.forBranch(branch);
+    let writer = this._lookupWriter(schema, type);
+    if (typeof writer.prepareCheckpointCreate !== "function") {
+      throw new Error(`the writer ${writer} does not support checkpoint creation`);
+    }
+
+    let isSchema = this.schemaTypes.includes(type);
+    let pending = await writer.prepareCheckpointCreate(branch, session, type, document, isSchema);
+    try {
+      let newSchema = await schema.validate(pending, { type, session });
+      let response = await this._finalizeAndReply(pending);
+      if (newSchema) {
+        this.schema.invalidateCache();
+      }
+      return response;
+    } finally {
+      if (pending) { await pending.abort();  }
+    }
+  }
+
+  async restoreCheckpoint(branch, session, type, document) {
+    log.info("restoring checkpoint type=%s", type);
+    let schema = await this.schema.forBranch(branch);
+    let writer = this._lookupWriter(schema, type);
+    if (typeof writer.prepareCheckpointRestore !== "function") {
+      throw new Error(`the writer ${writer} does not support checkpoint restoration`);
+    }
+
+    let isSchema = this.schemaTypes.includes(type);
+    let pending = await writer.prepareCheckpointRestore(branch, session, type, document, isSchema);
+    try {
+      let newSchema = await schema.validate(pending, { type, session });
+      let response = await this._finalizeAndReply(pending);
+      if (newSchema) {
+        this.schema.invalidateCache();
+      }
+      return response;
+    } finally {
+      if (pending) { await pending.abort();  }
+    }
+  }
+
   async _finalizeAndReply(pending) {
     let meta = await pending.finalize();
     let finalDocument = pending.finalDocument;

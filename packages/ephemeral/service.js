@@ -51,6 +51,8 @@ module.exports = declareInjections({
           storage.store(model.type, model.id, model, isSchema);
         }
       }
+      // the special "empty" checkpoint is always available
+      storage.makeCheckpoint('empty');
     }
     return storage;
   }
@@ -138,8 +140,7 @@ class EphemeralStorage {
     this.models = new Map();
     this.indexers = indexers;
 
-    // The special checkpoint "empty" is always available
-    this.checkpoints = new Map([['empty', new Map()]]);
+    this.checkpoints = new Map();
 
     // We can't validate right at startup, because we need to let all
     // the indexers reach a working state before we can tell if our

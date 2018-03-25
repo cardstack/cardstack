@@ -8,7 +8,8 @@ const supertest = require('supertest');
 const Koa = require('koa');
 const {
   createDefaultEnvironment,
-  destroyDefaultEnvironment
+  destroyDefaultEnvironment,
+  defaultDataSourceId
 } = require('../../../tests/ephemeral-test-app/node_modules/@cardstack/test-support/env');
 const JSONAPIFactory = require('../../../tests/ephemeral-test-app/node_modules/@cardstack/test-support/jsonapi-factory');
 
@@ -17,35 +18,29 @@ describe('ephemeral-storage', function() {
 
   async function setup() {
     let factory = new JSONAPIFactory();
-    let initial = new JSONAPIFactory();
-    initial.addResource('posts', 'initial').withAttributes({ title: 'initial post' });
-    initial.addResource('content-types', 'extra-things').withRelated('fields', [
-      initial.addResource('fields', 'extra-field').withAttributes({
+    factory.addResource('posts', 'initial').withAttributes({ title: 'initial post' });
+    factory.addResource('content-types', 'extra-things').withRelated('fields', [
+      factory.addResource('fields', 'extra-field').withAttributes({
         fieldType: '@cardstack/core-types::string'
       })
     ]);
 
-    initial.addResource('posts', 'first-post').withAttributes({
+    factory.addResource('posts', 'first-post').withAttributes({
       title: 'The First Post',
       body: 'First post body'
     });
 
-    initial.addResource('posts', 'second-post').withAttributes({
+    factory.addResource('posts', 'second-post').withAttributes({
       title: 'The Second Post',
       body: 'Second post body'
     });
 
 
-    let dataSource = factory.addResource('data-sources').withAttributes({
-      sourceType: '@cardstack/ephemeral',
-      params: {
-        initialModels: initial.getModels()
-      }
+    factory.addResource('data-sources', 'test-support').withAttributes({
+      sourceType: '@cardstack/test-support'
     });
 
-    factory.addResource('content-types', 'posts').withRelated(
-      'dataSource', dataSource
-    ).withRelated('fields', [
+    factory.addResource('content-types', 'posts').withRelated('fields', [
       factory.addResource('fields', 'title').withAttributes({
         fieldType: '@cardstack/core-types::string'
       }),
@@ -69,7 +64,7 @@ describe('ephemeral-storage', function() {
     before(setup);
     after(teardown);
 
-    it('respects params.initialModels', async function() {
+    it('respects initial models', async function() {
       let response = await request.get(`/api/posts/initial`);
       expect(response).hasStatus(200);
       expect(response.body).has.deep.property('data.attributes.title', 'initial post');
@@ -81,7 +76,7 @@ describe('ephemeral-storage', function() {
     afterEach(teardown);
 
 
-    it('respect schema in params.initialModels', async function() {
+    it('respect schema in initial models', async function() {
       let response = await request.post(`/api/extra-things`).send({
         data: {
           type: 'extra-things',
@@ -179,36 +174,46 @@ describe('ephemeral-storage', function() {
     });
 
     it('can create a checkpoint', async function() {
-      let response = await request.post('/api/ephemeral-checkpoints').send({
+      let response = await request.post('/api/checkpoints').send({
         data: {
-          type: 'ephemeral-checkpoints'
+          type: 'checkpoints',
+          relationships: {
+            'checkpoint-data-source': { data: { type: 'data-sources', id: defaultDataSourceId } }
+          }
         }
       });
+
       expect(response).hasStatus(201);
     });
 
     it('checkpoint cannot be patched', async function() {
-      let checkpoint = await request.post('/api/ephemeral-checkpoints').send({
+      let checkpoint = await request.post('/api/checkpoints').send({
         data: {
-          type: 'ephemeral-checkpoints'
+          type: 'checkpoints',
+          relationships: {
+            'checkpoint-data-source': { data: { type: 'data-sources', id: defaultDataSourceId } }
+          }
         }
       });
       expect(checkpoint).hasStatus(201);
-      let response = await request.patch(`/api/ephemeral-checkpoints/${checkpoint.body.data.id}`).send(checkpoint.body);
+      let response = await request.patch(`/api/checkpoints/${checkpoint.body.data.id}`).send(checkpoint.body);
       expect(response).hasStatus(400);
-      expect(response.body.errors[0].detail).to.equal('ephemeral-checkpoints may not be patched');
+      expect(response.body.errors[0].detail).to.equal('checkpoints may not be patched');
     });
 
     it('checkpoint cannot be deleted', async function() {
-      let checkpoint = await request.post('/api/ephemeral-checkpoints').send({
+      let checkpoint = await request.post('/api/checkpoints').send({
         data: {
-          type: 'ephemeral-checkpoints'
+          type: 'checkpoints',
+          relationships: {
+            'checkpoint-data-source': { data: { type: 'data-sources', id: defaultDataSourceId } }
+          }
         }
       });
       expect(checkpoint).hasStatus(201);
-      let response = await request.delete(`/api/ephemeral-checkpoints/${checkpoint.body.data.id}`).set('If-Match', checkpoint.body.data.meta.version);
+      let response = await request.delete(`/api/checkpoints/${checkpoint.body.data.id}`).set('If-Match', checkpoint.body.data.meta.version);
       expect(response).hasStatus(400);
-      expect(response.body.errors[0].detail).to.equal('ephemeral-checkpoints may not be deleted');
+      expect(response.body.errors[0].detail).to.equal('checkpoints may not be deleted');
     });
 
 
@@ -221,8 +226,13 @@ describe('ephemeral-storage', function() {
       expect(second).hasStatus(200);
 
       // Make a checkpoint
-      let checkpoint = await request.post('/api/ephemeral-checkpoints').send({
-        data: { type: 'ephemeral-checkpoints' }
+      let checkpoint = await request.post('/api/checkpoints').send({
+        data: {
+          type: 'checkpoints',
+          relationships: {
+            'checkpoint-data-source': { data: { type: 'data-sources', id: defaultDataSourceId } }
+          }
+        }
       });
       expect(checkpoint).hasStatus(201);
 
@@ -254,16 +264,16 @@ describe('ephemeral-storage', function() {
       expect(third).hasStatus(201);
 
       // Restore the checkpoint
-      response = await request.post(`/api/ephemeral-restores`).send({
+      response = await request.post(`/api/restores`).send({
         data: {
-          type: 'ephemeral-restores',
+          type: 'restores',
           relationships: {
-            checkpoint: {
-              data: { type: 'ephemeral-checkpoints', id: checkpoint.body.data.id }
-            }
+            checkpoint: { data: { type: 'checkpoints', id: checkpoint.body.data.id } },
+            'checkpoint-data-source': { data: { type: 'data-sources', id: defaultDataSourceId } }
           }
         }
       });
+
       expect(response).hasStatus(201);
 
       // and see that our delete, patch, and post are undone
@@ -280,18 +290,28 @@ describe('ephemeral-storage', function() {
     });
 
     it('can reset to empty', async function() {
-      let response = await request.post('/api/ephemeral-restores').send({
+      let response = await request.post('/api/posts').send({
         data: {
-          type: 'ephemeral-restores',
-          relationships: {
-            checkpoint: {
-              data: { type: 'ephemeral-checkpoints', id: 'empty' }
-            }
+          type: "posts",
+          attributes: {
+            title: "hello"
           }
         }
       });
       expect(response).hasStatus(201);
-      response = await request.get('/api/posts/first-post');
+      let id = response.body.data.id;
+
+      response = await request.post('/api/restores').send({
+        data: {
+          type: 'restores',
+          relationships: {
+            checkpoint: { data: { type: 'checkpoints', id: 'empty' } },
+            'checkpoint-data-source': { data: { type: 'data-sources', id: defaultDataSourceId } }
+          }
+        }
+      });
+      expect(response).hasStatus(201);
+      response = await request.get(`/api/posts/${id}`);
       expect(response).hasStatus(404);
     });
   });
@@ -300,18 +320,8 @@ describe('ephemeral-storage', function() {
   describe('invalid', function() {
 
     it('rejects an initial data model that violates schema', async function() {
-      let initial = new JSONAPIFactory();
-      initial.addResource('no-such-types').withAttributes({ title: 'initial post' });
-
       let factory = new JSONAPIFactory();
-
-      factory.addResource('data-sources').withAttributes({
-        sourceType: '@cardstack/ephemeral',
-        params: {
-          initialModels: initial.getModels()
-        }
-      });
-
+      factory.addResource('no-such-types').withAttributes({ title: 'initial post' });
       try {
         await createDefaultEnvironment(__dirname + '/../../../tests/ephemeral-test-app', factory.getModels());
         throw new Error("should not get here");
@@ -321,20 +331,10 @@ describe('ephemeral-storage', function() {
     });
 
     it('rejects an initial schema model that violates bootstrap schema', async function() {
-      let initial = new JSONAPIFactory();
-      initial.addResource('content-types', 'animals').withRelated('fields', [
+      let factory = new JSONAPIFactory();
+      factory.addResource('content-types', 'animals').withRelated('fields', [
         { type: 'fields', id: 'not-a-real-field' }
       ]);
-
-      let factory = new JSONAPIFactory();
-
-      factory.addResource('data-sources').withAttributes({
-        sourceType: '@cardstack/ephemeral',
-        params: {
-          initialModels: initial.getModels()
-        }
-      });
-
       try {
         await createDefaultEnvironment(__dirname + '/../../../tests/ephemeral-test-app', factory.getModels());
         throw new Error("should not get here");

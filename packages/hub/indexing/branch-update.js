@@ -175,12 +175,14 @@ class BranchUpdate {
     let isSchemaType = schema.isSchemaType(type);
     let model = await updater.read(type, id, isSchemaType);
     if (!model) {
-      // The seeds can provide any type of model, so if we're not
-      // finding something, we should also fallback to checking in
-      // seeds.
-      let seedUpdater = this.updaters['seeds'];
-      if (seedUpdater) {
-        model = await seedUpdater.read(type, id, isSchemaType);
+      // TODO: this is a complexity that can go away after we refactor
+      // so that a content type can live in multiple data
+      // sources. Right now it's needed because our bootstrap schema
+      // and hard-coded data sources can provide models of types that
+      // are otherwise also stored elsewhere.
+      let staticUpdater = this.updaters['static-models'];
+      if (staticUpdater) {
+        model = await staticUpdater.read(type, id, isSchemaType);
       }
     }
     return model;

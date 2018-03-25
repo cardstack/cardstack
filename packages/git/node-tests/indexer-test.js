@@ -33,7 +33,7 @@ describe('git/indexer', function() {
       );
 
     let registry = new Registry();
-    registry.register('config:seed-models', factory.getModels());
+    registry.register('config:data-sources', factory.getModels());
     registry.register('config:project', {
       path: `${__dirname}/..`
     });
@@ -427,7 +427,7 @@ describe('git/indexer failures', function() {
       );
 
     let registry = new Registry();
-    registry.register('config:seed-models', factory.getModels());
+    registry.register('config:data-sources', factory.getModels());
     registry.register('config:project', {
       path: `${__dirname}/..`
     });
