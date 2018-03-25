@@ -7,6 +7,8 @@ const Session = require('@cardstack/plugin-utils/session');
 const { partition } = require('lodash');
 const defaultDataSourceId = 'default-data-source';
 
+exports.defaultDataSourceId = defaultDataSourceId;
+
 exports.createDefaultEnvironment = async function(projectDir, initialModels = [], opts = {}) {
   let container;
   try {
@@ -37,8 +39,8 @@ exports.createDefaultEnvironment = async function(projectDir, initialModels = []
     let defaultDataSource = new JSONAPIFactory();
     defaultDataSource.addResource('plugin-configs', '@cardstack/hub')
       .withRelated(
-        defaultDataSourceId,
-        defaultDataSource.addResource('data-sources')
+        'default-data-source',
+        defaultDataSource.addResource('data-sources', defaultDataSourceId)
           .withAttributes({
             'source-type': '@cardstack/ephemeral'
           })

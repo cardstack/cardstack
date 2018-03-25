@@ -8,48 +8,39 @@ const supertest = require('supertest');
 const Koa = require('koa');
 const {
   createDefaultEnvironment,
-  destroyDefaultEnvironment
+  destroyDefaultEnvironment,
+  defaultDataSourceId
 } = require('../../../tests/ephemeral-test-app/node_modules/@cardstack/test-support/env');
 const JSONAPIFactory = require('../../../tests/ephemeral-test-app/node_modules/@cardstack/test-support/jsonapi-factory');
 
 describe('ephemeral-storage', function() {
-  let env, request, dataSource;
+  let env, request;
 
   async function setup() {
     let factory = new JSONAPIFactory();
-    let initial = new JSONAPIFactory();
-    initial.addResource('posts', 'initial').withAttributes({ title: 'initial post' });
-    initial.addResource('content-types', 'extra-things').withRelated('fields', [
-      initial.addResource('fields', 'extra-field').withAttributes({
+    factory.addResource('posts', 'initial').withAttributes({ title: 'initial post' });
+    factory.addResource('content-types', 'extra-things').withRelated('fields', [
+      factory.addResource('fields', 'extra-field').withAttributes({
         fieldType: '@cardstack/core-types::string'
       })
     ]);
 
-    initial.addResource('posts', 'first-post').withAttributes({
+    factory.addResource('posts', 'first-post').withAttributes({
       title: 'The First Post',
       body: 'First post body'
     });
 
-    initial.addResource('posts', 'second-post').withAttributes({
+    factory.addResource('posts', 'second-post').withAttributes({
       title: 'The Second Post',
       body: 'Second post body'
     });
 
 
-    dataSource = factory.addResource('data-sources').withAttributes({
-      sourceType: '@cardstack/ephemeral',
-      params: {
-        initialModels: initial.getModels()
-      }
-    });
-
     factory.addResource('data-sources', 'test-support').withAttributes({
       sourceType: '@cardstack/test-support'
     });
 
-    factory.addResource('content-types', 'posts').withRelated(
-      'dataSource', dataSource
-    ).withRelated('fields', [
+    factory.addResource('content-types', 'posts').withRelated('fields', [
       factory.addResource('fields', 'title').withAttributes({
         fieldType: '@cardstack/core-types::string'
       }),
@@ -73,7 +64,7 @@ describe('ephemeral-storage', function() {
     before(setup);
     after(teardown);
 
-    it('respects params.initialModels', async function() {
+    it('respects initial models', async function() {
       let response = await request.get(`/api/posts/initial`);
       expect(response).hasStatus(200);
       expect(response.body).has.deep.property('data.attributes.title', 'initial post');
@@ -85,7 +76,7 @@ describe('ephemeral-storage', function() {
     afterEach(teardown);
 
 
-    it('respect schema in params.initialModels', async function() {
+    it('respect schema in initial models', async function() {
       let response = await request.post(`/api/extra-things`).send({
         data: {
           type: 'extra-things',
@@ -187,7 +178,7 @@ describe('ephemeral-storage', function() {
         data: {
           type: 'checkpoints',
           relationships: {
-            'checkpoint-data-source': { data: { type: 'data-sources', id: dataSource.id } }
+            'checkpoint-data-source': { data: { type: 'data-sources', id: defaultDataSourceId } }
           }
         }
       });
@@ -200,7 +191,7 @@ describe('ephemeral-storage', function() {
         data: {
           type: 'checkpoints',
           relationships: {
-            'checkpoint-data-source': { data: { type: 'data-sources', id: dataSource.id } }
+            'checkpoint-data-source': { data: { type: 'data-sources', id: defaultDataSourceId } }
           }
         }
       });
@@ -215,7 +206,7 @@ describe('ephemeral-storage', function() {
         data: {
           type: 'checkpoints',
           relationships: {
-            'checkpoint-data-source': { data: { type: 'data-sources', id: dataSource.id } }
+            'checkpoint-data-source': { data: { type: 'data-sources', id: defaultDataSourceId } }
           }
         }
       });
@@ -239,7 +230,7 @@ describe('ephemeral-storage', function() {
         data: {
           type: 'checkpoints',
           relationships: {
-            'checkpoint-data-source': { data: { type: 'data-sources', id: dataSource.id } }
+            'checkpoint-data-source': { data: { type: 'data-sources', id: defaultDataSourceId } }
           }
         }
       });
@@ -278,7 +269,7 @@ describe('ephemeral-storage', function() {
           type: 'restores',
           relationships: {
             checkpoint: { data: { type: 'checkpoints', id: checkpoint.body.data.id } },
-            'checkpoint-data-source': { data: { type: 'data-sources', id: dataSource.id } }
+            'checkpoint-data-source': { data: { type: 'data-sources', id: defaultDataSourceId } }
           }
         }
       });
@@ -304,7 +295,7 @@ describe('ephemeral-storage', function() {
           type: 'restores',
           relationships: {
             checkpoint: { data: { type: 'checkpoints', id: 'empty' } },
-            'checkpoint-data-source': { data: { type: 'data-sources', id: dataSource.id } }
+            'checkpoint-data-source': { data: { type: 'data-sources', id: defaultDataSourceId } }
           }
         }
       });
@@ -318,18 +309,8 @@ describe('ephemeral-storage', function() {
   describe('invalid', function() {
 
     it('rejects an initial data model that violates schema', async function() {
-      let initial = new JSONAPIFactory();
-      initial.addResource('no-such-types').withAttributes({ title: 'initial post' });
-
       let factory = new JSONAPIFactory();
-
-      factory.addResource('data-sources').withAttributes({
-        sourceType: '@cardstack/ephemeral',
-        params: {
-          initialModels: initial.getModels()
-        }
-      });
-
+      factory.addResource('no-such-types').withAttributes({ title: 'initial post' });
       try {
         await createDefaultEnvironment(__dirname + '/../../../tests/ephemeral-test-app', factory.getModels());
         throw new Error("should not get here");
@@ -339,20 +320,10 @@ describe('ephemeral-storage', function() {
     });
 
     it('rejects an initial schema model that violates bootstrap schema', async function() {
-      let initial = new JSONAPIFactory();
-      initial.addResource('content-types', 'animals').withRelated('fields', [
+      let factory = new JSONAPIFactory();
+      factory.addResource('content-types', 'animals').withRelated('fields', [
         { type: 'fields', id: 'not-a-real-field' }
       ]);
-
-      let factory = new JSONAPIFactory();
-
-      factory.addResource('data-sources').withAttributes({
-        sourceType: '@cardstack/ephemeral',
-        params: {
-          initialModels: initial.getModels()
-        }
-      });
-
       try {
         await createDefaultEnvironment(__dirname + '/../../../tests/ephemeral-test-app', factory.getModels());
         throw new Error("should not get here");

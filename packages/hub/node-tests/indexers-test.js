@@ -87,12 +87,7 @@ describe('hub/indexers', function() {
     // full relationship validation yet.
     it('can traverse across inconsistent intermediate schemas on the way to building a complete consistent schema', async function() {
 
-      // we have a comment sitting in the inner data source
-      let inner = new JSONAPIFactory();
-      inner.addResource('comments', '1');
-
       let seeds = new JSONAPIFactory();
-
       seeds.addResource('content-types', 'posts')
         .withRelated('fields', [
           seeds.addResource('fields', 'comments').withAttributes({
@@ -106,17 +101,14 @@ describe('hub/indexers', function() {
               .withRelated(
                 'data-source',
                 seeds.addResource('data-sources', 'inner').withAttributes({
-                  sourceType: '@cardstack/ephemeral',
-                  params: {
-                    initialModels: inner.getModels()
-                  }
+                  sourceType: '@cardstack/ephemeral'
                 })
               )
           ])
         ]);
 
       seeds.addResource('posts', '1').withRelated('comments', [
-        { type: 'comments', id: '1' }
+        seeds.addResource('comments', '1')
       ]);
 
       env = await createDefaultEnvironment(__dirname + '/../../../tests/ephemeral-test-app', seeds.getModels());

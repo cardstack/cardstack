@@ -10,6 +10,9 @@ module.exports = declareInjections({
   }
 
   async beginUpdate(branch, readOtherIndexers) {
+    if (this.initialModels) {
+      throw new Error("The ephemeral data source no longer accepts params.initialModels. Use the new general-purpose seed model support instead.");
+    }
     let initialModels = this.initialModels || [];
     if (typeof this.loadInitialModels === 'function') {
       initialModels = initialModels.concat(await this.loadInitialModels());
