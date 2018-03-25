@@ -35,7 +35,6 @@ describe('ephemeral-storage', function() {
       body: 'Second post body'
     });
 
-
     factory.addResource('data-sources', 'test-support').withAttributes({
       sourceType: '@cardstack/test-support'
     });

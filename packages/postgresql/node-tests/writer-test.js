@@ -5,9 +5,16 @@ const {
 const { Client } = require('pg');
 const JSONAPIFactory = require('@cardstack/test-support/jsonapi-factory');
 const Session = require('@cardstack/plugin-utils/session');
+const supertest = require('supertest');
+const Koa = require('koa');
+
+const {promisify} = require('util');
+const timeout = promisify(setTimeout);
 
 describe('postgresql/writer', function() {
-  let pgClient, client, env, writer;
+  let pgClient, client, env, writer, request;
+  let dataSourceId = 'postgres';
+  let ciSessionId = '1234567890';
 
   beforeEach(async function() {
     pgClient = new Client({ database: 'postgres', host: 'localhost', user: 'postgres', port: 5444 });
@@ -22,7 +29,7 @@ describe('postgresql/writer', function() {
 
     let factory = new JSONAPIFactory();
 
-    factory.addResource('data-sources')
+    factory.addResource('data-sources', dataSourceId)
       .withAttributes({
         'source-type': '@cardstack/postgresql',
         params: {
@@ -41,6 +48,10 @@ describe('postgresql/writer', function() {
           }
         }
       });
+
+    factory.addResource('data-sources', 'test-support').withAttributes({
+      sourceType: '@cardstack/test-support'
+    });
 
     // I'm creating some restrictive grants here to ensure that the
     // operations we think we're getting are really the ones we're
@@ -74,7 +85,11 @@ describe('postgresql/writer', function() {
       }).withRelated('who', factory.addResource('groups', 'delete-only'));
 
 
-    env = await createDefaultEnvironment(`${__dirname}/..`, factory.getModels());
+    env = await createDefaultEnvironment(`${__dirname}/../../../tests/postgres-test-app`, factory.getModels(), { ciSessionId });
+    let app = new Koa();
+    app.use(env.lookup('hub:middleware-stack').middleware());
+    request = supertest(app.callback());
+
     await env.lookup('hub:indexers').update({ forceRefresh: true });
     writer = env.lookup('hub:writers');
   });
@@ -195,6 +210,45 @@ describe('postgresql/writer', function() {
     await writer.delete('master', new Session({ id: 'delete-only', type: 'users'}), null, 'articles', '0');
     let result = await client.query('select 1 from articles where id=$1', ['0']);
     expect(result.rows.length).to.equal(0);
+  });
+
+  it('cannot create a checkpoint', async function() {
+    let response = await request.post(`/api/checkpoints`)
+      .set('authorization', `Bearer ${ciSessionId}`)
+      .send({
+        data: {
+          type: 'checkpoints',
+        }
+      });
+    expect(response).hasStatus(400);
+  });
+
+  it('can restore a checkpoint using sql statements', async function() {
+    let result = await client.query('select * from articles');
+    expect(result.rows).has.length(1);
+
+    let response = await request.post(`/api/restores`)
+      .set('authorization', `Bearer ${ciSessionId}`)
+      .send({
+        data: {
+          type: 'restores',
+          attributes: {
+            params: { 'sql-statements': [ 'delete from articles' ] }
+          },
+          relationships: {
+            'checkpoint-data-source': { data: { type: 'data-sources', id: dataSourceId } }
+          }
+        }
+      });
+    expect(response).hasStatus(201);
+
+    result = await client.query('select * from articles');
+    expect(result.rows).has.length(0);
+
+    // The DB connection is still being used by the server, such that dropping the table at
+    // this point will result in an error. unsure how to await that, or force the table drop
+    // to not care....
+    await timeout(5000);
   });
 
 });
