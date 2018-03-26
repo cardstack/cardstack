@@ -18,26 +18,20 @@ class BranchUpdate {
     this._schema = null;
     this.bulkOps = null;
     this._touched = Object.create(null);
+    this.read = this.read.bind(this);
   }
 
   async addIndexer(indexer) {
     if (this._schema) {
       throw new Error("Bug in hub indexing. Something tried to add an indexer after we had already established the schema");
     }
-    let updater = await indexer.beginUpdate(this.branch, this._readOtherIndexers.bind(this));
+    let updater = await indexer.beginUpdate(this.branch);
     let dataSource = owningDataSource.get(indexer);
     owningDataSource.set(updater, dataSource);
     let newModels = await updater.schema();
     this.schemaModels.push(newModels);
     this.updaters[dataSource.id] = updater;
     return newModels;
-  }
-
-  async _readOtherIndexers(type, id) {
-    if (!this._schema) {
-      throw new Error("Not allowed to readOtherIndexers until your own updateContent() hook. You're trying to use it before all the other indexers have had a chance to activate.");
-    }
-    return this.read(type, id);
   }
 
   async schema() {
@@ -95,7 +89,7 @@ class BranchUpdate {
     for (let [sourceId, updater] of updaters) {
       let meta = await this._loadMeta(updater);
       let publicOps = Operations.create(this, sourceId);
-      let newMeta = await updater.updateContent(meta, hints, publicOps);
+      let newMeta = await updater.updateContent(meta, hints, publicOps, this.read);
       await this._saveMeta(updater, newMeta);
     }
     await this._invalidations();
@@ -186,7 +180,7 @@ class BranchUpdate {
     let updater = this.updaters[source.id];
     if (!updater) { return; }
     let isSchemaType = schema.isSchemaType(type);
-    let model = await updater.read(type, id, isSchemaType);
+    let model = await updater.read(type, id, isSchemaType, this.read);
     if (!model) {
       // TODO: this is a complexity that can go away after we refactor
       // so that a content type can live in multiple data
@@ -195,7 +189,7 @@ class BranchUpdate {
       // are otherwise also stored elsewhere.
       let staticUpdater = this.updaters['static-models'];
       if (staticUpdater) {
-        model = await staticUpdater.read(type, id, isSchemaType);
+        model = await staticUpdater.read(type, id, isSchemaType, this.read);
       }
     }
     return model;

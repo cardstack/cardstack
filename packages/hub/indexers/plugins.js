@@ -9,22 +9,21 @@ class PluginIndexer {
   async branches() {
     return ['master'];
   }
-  async beginUpdate(branch, readOtherIndexers) {
-    return new Updater(this.pluginLoader, readOtherIndexers);
+  async beginUpdate() {
+    return new Updater(this.pluginLoader);
   }
 });
 
 class Updater {
-  constructor(pluginLoader, readOtherIndexers) {
+  constructor(pluginLoader) {
     this.pluginLoader = pluginLoader;
-    this.readOtherIndexers = readOtherIndexers;
     this._plugins = null;
   }
 
-  async plugins() {
+  async plugins(read) {
     if (!this._plugins) {
       let installedPlugins = await this.pluginLoader.installedPlugins();
-      let pluginConfigs = (await Promise.all(installedPlugins.map(plugin => this.readOtherIndexers('plugin-configs', plugin.id)))).filter(Boolean);
+      let pluginConfigs = (await Promise.all(installedPlugins.map(plugin => read('plugin-configs', plugin.id)))).filter(Boolean);
       this._plugins = await this.pluginLoader.configuredPlugins(pluginConfigs);
     }
     return this._plugins;
@@ -34,8 +33,8 @@ class Updater {
     return [];
   }
 
-  async updateContent(meta, hints, ops) {
-    let activePlugins = await this.plugins();
+  async updateContent(meta, hints, ops, read) {
+    let activePlugins = await this.plugins(read);
     let plugins = activePlugins.describeAll();
     if (meta && isEqual(meta.plugins, plugins)) {
       return { plugins };
@@ -51,11 +50,11 @@ class Updater {
     return { plugins };
   }
 
-  async read(type, id /*, isSchema */) {
+  async read(type, id, isSchema, read) {
     if (type === 'plugins') {
-      return (await this.plugins()).describe(id);
+      return (await this.plugins(read)).describe(id);
     } else {
-      return (await this.plugins()).describeFeature(type, id);
+      return (await this.plugins(read)).describeFeature(type, id);
     }
   }
 }

@@ -35,12 +35,12 @@ module.exports = declareInjections({
     return storage;
   }
 
-  async findOrCreateStorage(dataSourceId, initialModels, readOtherIndexers) {
+  async findOrCreateStorage(dataSourceId, initialModels) {
     let storage = this._dataSources.get(dataSourceId);
     if (!storage) {
       let validator;
       if (initialModels) {
-        validator = this.validateModels.bind(this, initialModels, readOtherIndexers);
+        validator = this.validateModels.bind(this, initialModels);
       }
       storage = new EphemeralStorage(this.indexers, validator);
       this._dataSources.set(dataSourceId, storage);
@@ -149,11 +149,11 @@ class EphemeralStorage {
     this.validatorHook = validatorHook;
   }
 
-  async maybeTriggerDelayedValidation() {
+  async maybeTriggerDelayedValidation(readOtherIndexers) {
     let hook = this.validatorHook;
     if (hook) {
       this.validatorHook = null;
-      await hook();
+      await hook(readOtherIndexers);
     }
   }
 
