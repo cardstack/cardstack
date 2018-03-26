@@ -8,9 +8,6 @@ const Session = require('@cardstack/plugin-utils/session');
 const supertest = require('supertest');
 const Koa = require('koa');
 
-const {promisify} = require('util');
-const timeout = promisify(setTimeout);
-
 describe('postgresql/writer', function() {
   let pgClient, client, env, writer, request;
   let dataSourceId = 'postgres';
@@ -244,11 +241,6 @@ describe('postgresql/writer', function() {
 
     result = await client.query('select * from articles');
     expect(result.rows).has.length(0);
-
-    // The DB connection is still being used by the server, such that dropping the table at
-    // this point will result in an error. unsure how to await that, or force the table drop
-    // to not care....
-    await timeout(5000);
   });
 
 });

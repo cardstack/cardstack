@@ -5,6 +5,8 @@ const Client = require('@cardstack/elasticsearch/client');
 const log = require('@cardstack/logger')('cardstack/indexers');
 const DocumentContext = require('./document-context');
 
+const FINALIZED = {};
+
 class BranchUpdate {
   constructor(branch, seedSchema, client, emitEvent) {
     this.branch = branch;
@@ -39,19 +41,30 @@ class BranchUpdate {
   }
 
   async schema() {
+    if (this._schema === FINALIZED) {
+      throw new Error("Bug: the schema has already been taken away from this branch update");
+    }
     if (!this._schema) {
       this._schema = await this.seedSchema.applyChanges(flatten(this.schemaModels).map(model => ({ type: model.type, id: model.id, document: model })));
     }
     return this._schema;
   }
 
-  destroy() {
-    if (this._schema) {
-      this._schema.teardown();
+  async takeSchema() {
+    let schema = await this.schema();
+    // We are giving away ownership, so we don't retain our reference
+    // and we don't tear it down when we are destroyed
+    this._schema = FINALIZED;
+    return schema;
+  }
+
+  async destroy() {
+    if (this._schema && this._schema !== FINALIZED) {
+      await this._schema.teardown();
     }
     for (let updater of Object.values(this.updaters)) {
       if (typeof updater.destroy === 'function') {
-        updater.destroy();
+        await updater.destroy();
       }
     }
   }

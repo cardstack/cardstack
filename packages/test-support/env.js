@@ -95,7 +95,8 @@ exports.createDefaultEnvironment = async function(projectDir, initialModels = []
 
 exports.destroyDefaultEnvironment = async function(env) {
   if (env) {
-    await env.teardown();
+    env.teardown();
+    await env.teardownSettled();
     await destroyIndices();
     await temp.cleanup();
   }
