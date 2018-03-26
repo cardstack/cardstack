@@ -68,28 +68,27 @@ class Indexers extends EventEmitter {
         try {
           return await running.schemas();
         } finally {
-          running.destroy();
+          await running.destroy();
         }
       })();
     }
     return (await this._schemaCache)[branch];
   }
 
-  invalidateSchemaCache() {
+  async invalidateSchemaCache() {
     if (this._schemaCache) {
-      this._schemaCache.then(cache => {
-        for (let schema of Object.values(cache)) {
-          schema.teardown();
-        }
-      });
+      let cache = await this._schemaCache;
+      for (let schema of Object.values(cache)) {
+        await schema.teardown();
+      }
     }
     this._schemaCache = null;
   }
 
-  static teardown(instance) {
-    instance.invalidateSchemaCache();
+  static async teardown(instance) {
+    await instance.invalidateSchemaCache();
     if (instance._dataSourcesMemo) {
-      instance._dataSourcesMemo.teardown();
+      await instance._dataSourcesMemo.teardown();
     }
   }
 
@@ -179,13 +178,24 @@ class Indexers extends EventEmitter {
     try {
       let schemas = await running.update(forceRefresh, hints);
       if (this._schemaCache === priorCache) {
+        if (priorCache) {
+          await teardownCachedSchemas(await priorCache);
+        }
         this._schemaCache = Promise.resolve(schemas);
+      } else {
+        await teardownCachedSchemas(schemas);
       }
     } finally {
-      running.destroy();
+      await running.destroy();
     }
     this.emit('update_complete', hints);
     log.debug('end update, forceRefresh=%s', forceRefresh);
   }
 
 });
+
+async function teardownCachedSchemas(schemaCache) {
+  for (let schema of Object.values(schemaCache)) {
+    await schema.teardown();
+  }
+}

@@ -9,7 +9,7 @@ module.exports = declareInjections({
     return ['master'];
   }
 
-  async beginUpdate(branch, readOtherIndexers) {
+  async beginUpdate(/* branch */) {
     if (this.initialModels) {
       throw new Error("The ephemeral data source no longer accepts params.initialModels. Use the new general-purpose seed model support instead.");
     }
@@ -17,7 +17,7 @@ module.exports = declareInjections({
     if (typeof this.loadInitialModels === 'function') {
       initialModels = initialModels.concat(await this.loadInitialModels());
     }
-    let storage = await this.service.findOrCreateStorage(this.dataSource.id, initialModels, readOtherIndexers);
+    let storage = await this.service.findOrCreateStorage(this.dataSource.id, initialModels);
     return new Updater(storage, this.dataSource.id);
   }
 });
@@ -33,8 +33,8 @@ class Updater {
     return this.storage.schemaModels();
   }
 
-  async updateContent(meta, hints, ops) {
-    await this.storage.maybeTriggerDelayedValidation();
+  async updateContent(meta, hints, ops, readOtherIndexers) {
+    await this.storage.maybeTriggerDelayedValidation(readOtherIndexers);
     let generation, identity;
     if (meta) {
       generation = meta.generation;

@@ -15,12 +15,12 @@ module.exports = class RunningIndexers {
     this.branches = {};
   }
 
-  destroy() {
+  async destroy() {
     for (let branchUpdate of Object.values(this.branches)) {
-      branchUpdate.destroy();
+      await branchUpdate.destroy();
     }
     for (let dataSource of Object.values(this.ownedDataSources)) {
-      dataSource.teardown();
+      await dataSource.teardown();
     }
   }
 
@@ -82,7 +82,7 @@ module.exports = class RunningIndexers {
   async _schemas() {
     let schemas = Object.create(null);
     for (let [branch, branchUpdate] of Object.entries(this.branches)) {
-      schemas[branch] = await branchUpdate.schema();
+      schemas[branch] = await branchUpdate.takeSchema();
     }
     return schemas;
   }

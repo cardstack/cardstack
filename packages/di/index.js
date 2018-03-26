@@ -53,6 +53,7 @@ exports.Registry = class Registry extends GlimmerRegistry {
 exports.Container = class Container extends GlimmerContainer {
   constructor(registry, nextResolver) {
     super(registry, new Resolver(registry, nextResolver));
+    this._teardownPromises = [];
   }
   lookup(...args) {
     let result = super.lookup(...args);
@@ -71,9 +72,14 @@ exports.Container = class Container extends GlimmerContainer {
           setOwner(instance, this);
           return instance;
         },
-        teardown: result.teardown
+        teardown: (...args) => {
+          this._teardownPromises.push(result.teardown(...args));
+        }
       };
     }
+  }
+  teardownSettled() {
+    return Promise.all(this._teardownPromises);
   }
 };
 

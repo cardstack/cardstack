@@ -5,6 +5,8 @@ const Client = require('@cardstack/elasticsearch/client');
 const log = require('@cardstack/logger')('cardstack/indexers');
 const DocumentContext = require('./document-context');
 
+const FINALIZED = {};
+
 class BranchUpdate {
   constructor(branch, seedSchema, client, emitEvent) {
     this.branch = branch;
@@ -16,13 +18,14 @@ class BranchUpdate {
     this._schema = null;
     this.bulkOps = null;
     this._touched = Object.create(null);
+    this.read = this.read.bind(this);
   }
 
   async addIndexer(indexer) {
     if (this._schema) {
       throw new Error("Bug in hub indexing. Something tried to add an indexer after we had already established the schema");
     }
-    let updater = await indexer.beginUpdate(this.branch, this._readOtherIndexers.bind(this));
+    let updater = await indexer.beginUpdate(this.branch);
     let dataSource = owningDataSource.get(indexer);
     owningDataSource.set(updater, dataSource);
     let newModels = await updater.schema();
@@ -31,27 +34,31 @@ class BranchUpdate {
     return newModels;
   }
 
-  async _readOtherIndexers(type, id) {
-    if (!this._schema) {
-      throw new Error("Not allowed to readOtherIndexers until your own updateContent() hook. You're trying to use it before all the other indexers have had a chance to activate.");
-    }
-    return this.read(type, id);
-  }
-
   async schema() {
+    if (this._schema === FINALIZED) {
+      throw new Error("Bug: the schema has already been taken away from this branch update");
+    }
     if (!this._schema) {
       this._schema = await this.seedSchema.applyChanges(flatten(this.schemaModels).map(model => ({ type: model.type, id: model.id, document: model })));
     }
     return this._schema;
   }
 
-  destroy() {
-    if (this._schema) {
-      this._schema.teardown();
+  async takeSchema() {
+    let schema = await this.schema();
+    // We are giving away ownership, so we don't retain our reference
+    // and we don't tear it down when we are destroyed
+    this._schema = FINALIZED;
+    return schema;
+  }
+
+  async destroy() {
+    if (this._schema && this._schema !== FINALIZED) {
+      await this._schema.teardown();
     }
     for (let updater of Object.values(this.updaters)) {
       if (typeof updater.destroy === 'function') {
-        updater.destroy();
+        await updater.destroy();
       }
     }
   }
@@ -82,7 +89,7 @@ class BranchUpdate {
     for (let [sourceId, updater] of updaters) {
       let meta = await this._loadMeta(updater);
       let publicOps = Operations.create(this, sourceId);
-      let newMeta = await updater.updateContent(meta, hints, publicOps);
+      let newMeta = await updater.updateContent(meta, hints, publicOps, this.read);
       await this._saveMeta(updater, newMeta);
     }
     await this._invalidations();
@@ -173,7 +180,7 @@ class BranchUpdate {
     let updater = this.updaters[source.id];
     if (!updater) { return; }
     let isSchemaType = schema.isSchemaType(type);
-    let model = await updater.read(type, id, isSchemaType);
+    let model = await updater.read(type, id, isSchemaType, this.read);
     if (!model) {
       // TODO: this is a complexity that can go away after we refactor
       // so that a content type can live in multiple data
@@ -182,7 +189,7 @@ class BranchUpdate {
       // are otherwise also stored elsewhere.
       let staticUpdater = this.updaters['static-models'];
       if (staticUpdater) {
-        model = await staticUpdater.read(type, id, isSchemaType);
+        model = await staticUpdater.read(type, id, isSchemaType, this.read);
       }
     }
     return model;

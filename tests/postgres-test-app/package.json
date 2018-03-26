@@ -1,0 +1,11 @@
+{
+  "name": "postgres-test-app",
+  "dependencies": {
+    "@cardstack/ephemeral": "*",
+    "@cardstack/hub": "*",
+    "@cardstack/jsonapi": "*",
+    "@cardstack/postgresql": "*",
+    "@cardstack/test-support": "*",
+    "@cardstack/test-support-authenticator": "*"
+  }
+}
