@@ -158,7 +158,9 @@ module.exports = class SearchClient {
       return null;
     } else {
       let index = Object.keys(mapping)[0];
-      return mapping[index].mappings;
+      let { mappings } = mapping[index];
+      delete mappings.constructor; // ignore this mapping: seems to be ES internal and it confuses javascript
+      return mappings;
     }
   }
 
@@ -184,7 +186,11 @@ module.exports = class SearchClient {
     }
 
     // Not stable. Generate some useful debug info about why.
-    this.log.info("mapping diff: %p", { left: have, right: combined });
+    try {
+      this.log.info("mapping diff: %p", { left: have, right: combined });
+    } catch (err) {
+      this.log.warn("Encountered error trying to perform a json-diff in order to illustrate the elastic search mapping differences", err);
+    }
     return false;
   }
 

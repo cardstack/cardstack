@@ -313,6 +313,50 @@ describe('ephemeral-storage', function() {
       response = await request.get(`/api/posts/${id}`);
       expect(response).hasStatus(404);
     });
+
+    it('can restore to the "seeds" checkpoint', async function() {
+      for (let id of ['initial', 'first-post', 'second-post']) {
+        let response = await request.get(`/api/posts/${id}`);
+        await request.delete(`/api/posts/${id}`).set('If-Match', response.body.data.meta.version);
+      }
+
+      let response = await request.post('/api/restores').send({
+        data: {
+          type: 'restores',
+          relationships: {
+            checkpoint: { data: { type: 'checkpoints', id: 'seeds' } }
+          }
+        }
+      });
+      expect(response).hasStatus(201);
+
+      response = await request.get(`/api/posts/initial`);
+      expect(response).hasStatus(200);
+      expect(response.body).has.deep.property('data.attributes.title', 'initial post');
+
+      response = await request.get(`/api/posts/first-post`);
+      expect(response).hasStatus(200);
+      expect(response.body).has.deep.property('data.attributes.title', 'The First Post');
+
+      response = await request.get(`/api/posts/second-post`);
+      expect(response).hasStatus(200);
+      expect(response.body).has.deep.property('data.attributes.title', 'The Second Post');
+    });
+
+    it('cannot clobber the "seeds" checkpoint', async function() {
+      let response = await request.post('/api/checkpoints').send({
+        data: {
+          id: 'seeds',
+          type: 'checkpoints',
+          relationships: {
+            'checkpoint-data-source': { data: { type: 'data-sources', id: defaultDataSourceId } }
+          }
+        }
+      });
+
+      expect(response).hasStatus(400);
+    });
+
   });
 
 
