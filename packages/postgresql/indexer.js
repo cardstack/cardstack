@@ -194,8 +194,8 @@ class Updater {
           AND KCU2.CONSTRAINT_NAME = RC.UNIQUE_CONSTRAINT_NAME
           AND KCU2.ORDINAL_POSITION = KCU1.ORDINAL_POSITION`);
 
-    for (let {fk_column_name, referenced_table_name, fk_constraint_schema} of relationshipColumns) {
-      let field = fields[fk_column_name];
+    for (let {fk_table_name, fk_column_name, referenced_table_name, fk_constraint_schema} of relationshipColumns) {
+      let field = fields[this.mapper.fieldNameFor(fk_constraint_schema, fk_table_name, fk_column_name)];
       if (!field) {
         throw new Error(`There was a problem with the relationship field ${fk_column_name}, it could not be found to turn into a relationship`);
       }
