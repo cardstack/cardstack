@@ -1,3 +1,5 @@
+const Ember = require('ember-source/dist/ember.debug');
+const { dasherize } = Ember.String;
 const { isEqual } = require('lodash');
 const log = require('@cardstack/logger')('cardstack/ethereum/indexer');
 const { declareInjections } = require('@cardstack/di');
@@ -214,7 +216,7 @@ class Updater {
   _mappingFieldFor(contractName, fieldName, valueType) {
     return {
       type: "content-types",
-      id: `${contractName}-${fieldName}`,
+      id: `${contractName}-${dasherize(fieldName)}`,
       relationships: {
         fields: {
           data: [
@@ -261,7 +263,7 @@ class Updater {
 
         let field = {
           type: "fields",
-          id: `${contractName}-${item.name}`,
+          id: `${contractName}-${dasherize(item.name)}`,
         };
 
         if (type.indexOf("@") > -1) {
@@ -277,7 +279,7 @@ class Updater {
           let mappingField = this._mappingFieldFor(contractName, item.name, type);
           if (!customTypes.find(field => field.id === mappingField.id)) {
             customTypes.push(mappingField);
-            customTypes.push(this._openGrantForContentType(`${contractName}-${item.name}`));
+            customTypes.push(this._openGrantForContentType(`${contractName}-${dasherize(item.name)}`));
           }
         }
       }
