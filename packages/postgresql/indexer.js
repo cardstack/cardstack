@@ -72,6 +72,7 @@ module.exports = declareInjections({
     await migrate({
       direction: 'up',
       migrationsTable: 'migrations',
+      singleTransaction: true,
       checkOrder: false,
       databaseUrl: {
         user: config.user,
