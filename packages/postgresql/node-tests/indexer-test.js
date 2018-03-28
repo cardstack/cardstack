@@ -21,6 +21,11 @@ describe('postgresql/indexer', function() {
     await client.query('insert into articles values ($1, $2, $3, $4, $5, $6)', ['0', 'hello world', 100, true, null, '0']);
     await client.query('insert into articles values ($1, $2, $3, $4)', ['1', null, null, false]);
 
+    await client.query('create table favorite_toys (id varchar primary key, name varchar)');
+    await client.query('insert into favorite_toys values ($1, $2)', ['0', 'Squeaky Snake']);
+    await client.query('create table doggies (id varchar primary key, name varchar, favorite_toy varchar references favorite_toys(id))');
+    await client.query('insert into doggies values ($1, $2, $3)', ['0', 'Van Gogh', '0']);
+
     let factory = new JSONAPIFactory();
 
     dataSource = factory.addResource('data-sources')
@@ -84,6 +89,18 @@ describe('postgresql/indexer', function() {
       expect(model).is.ok;
       expect(model).has.deep.property('relationships.fields.data');
       expect(model.relationships.fields.data).collectionContains({ id: 'title' });
+      expect(model.relationships.fields.data).not.collectionContains({ id: 'id' });
+      expect(model.relationships['data-source'].data).has.property('id', dataSource.id);
+    });
+
+    it('handles relationships with underscored names', async function() {
+      let doc = await env.lookup('hub:searchers').get(env.session, 'master', 'content-types', 'doggies');
+      expect(doc).is.ok;
+      let model = doc.data;
+
+      expect(model).is.ok;
+      expect(model).has.deep.property('relationships.fields.data');
+      expect(model.relationships.fields.data).collectionContains({ id: 'favorite-toy' });
       expect(model.relationships.fields.data).not.collectionContains({ id: 'id' });
       expect(model.relationships['data-source'].data).has.property('id', dataSource.id);
     });
