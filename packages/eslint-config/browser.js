@@ -16,8 +16,7 @@ module.exports = {
     // TODO: turn these on
     'ember/new-module-imports': 'off',
     'ember/closure-actions': 'off',
-    'ember/no-old-shims': 'off',
-    'ember/avoid-leaking-state-in-ember-objects': 'off'
+    'ember/no-old-shims': 'off'
   },
   // TODO: get rid of all these once we port the tests
   globals: {

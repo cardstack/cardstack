@@ -56,40 +56,44 @@ export default Ember.Service.extend({
 
   // Which tab are we showing in the toolbox?
   activePanel: 'cs-composition-panel',
-  activePanelChoices: [
-    {
-      id: 'cs-composition-panel',
-      icon: {
-        name: 'write',
-        width: 13,
-        height: 18
-      },
-    }
-  ],
+  activePanelChoices: Ember.computed(function() {
+    return [
+      {
+        id: 'cs-composition-panel',
+        icon: {
+          name: 'write',
+          width: 13,
+          height: 18
+        },
+      }
+    ];
+  }),
 
   // Are we viewing the current URL as a normal page in its own right,
   // or in one of its other forms (like a preview card)?
   previewFormat: 'page',
-  previewFormatChoices: [
-    {
-      id: 'page',
-      description: 'Page',
-      icon: {
-        name: 'page',
-        width: 18,
-        height: 24
+  previewFormatChoices: Ember.computed(function() {
+    return [
+      {
+        id: 'page',
+        description: 'Page',
+        icon: {
+          name: 'page',
+          width: 18,
+          height: 24
+        }
+      },
+      {
+        id: 'cards',
+        description: 'Card',
+        icon: {
+          name: 'tiles',
+          width: 20,
+          height: 24
+        }
       }
-    },
-    {
-      id: 'cards',
-      description: 'Card',
-      icon: {
-        name: 'tiles',
-        width: 20,
-        height: 24
-      }
-    }
-  ],
+    ];
+  }),
 
   requestedEditing: false,
 
