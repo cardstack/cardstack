@@ -71,6 +71,8 @@ module.exports = {
       setEnvVars.HUB_URL = explicitURL;
     }
 
+    setEnvVars.HUB_ENVIRONMENT = environment || 'development';
+
     setEnvVars.PORT = port;
 
     let bin = path.resolve(path.join(__dirname, '..', 'bin', 'cardstack-hub.js'));

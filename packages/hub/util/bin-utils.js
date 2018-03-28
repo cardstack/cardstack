@@ -17,6 +17,7 @@ ELASTICSEARCH                     The URL to our Elasticsearch instance. Default
 PORT                              Port to bind to. Defaults to 3000.
 PUBLIC_HUB_URL                    The public URL at which the Hub can be accessed. Defaults to http://localhost:$PORT.
 CI_SESSION_ID                     A session ID that has full priviledges which is used by CI for test setup and test tear down.
+HUB_ENVIRONMENT                   The environment the hub is running in. Possible values are "development", "production", and "test". Defaults to "development".
 `)
     .parse(process.argv);
 
@@ -65,6 +66,8 @@ CI_SESSION_ID                     A session ID that has full priviledges which i
   if (process.env.CI_SESSION_ID) {
     commander.ciSessionId = process.env.CI_SESSION_ID;
   }
+
+  commander.environment = process.env.HUB_ENVIRONMENT || "development";
 
   return commander;
 }
