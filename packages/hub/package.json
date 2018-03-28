@@ -1,6 +1,6 @@
 {
   "name": "@cardstack/hub",
-  "version": "0.6.0",
+  "version": "0.6.2",
   "bin": {
     "cardstack-hub": "./bin/cardstack-hub.js",
     "cardstack-generate-key": "./bin/generate-key.js"
@@ -16,7 +16,7 @@
   },
   "description": "Stock API server for the Cardstack tech stack.",
   "dependencies": {
-    "@cardstack/codegen": "^0.6.0",
+    "@cardstack/codegen": "^0.6.2",
     "@cardstack/core-types": "^0.5.8",
     "@cardstack/di": "^0.6.0",
     "@cardstack/elasticsearch": "^0.6.0",
