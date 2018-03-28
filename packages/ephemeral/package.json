@@ -1,6 +1,6 @@
 {
   "name": "@cardstack/ephemeral",
-  "version": "0.5.11",
+  "version": "0.6.0",
   "keywords": [
     "cardstack-plugin"
   ],
@@ -8,9 +8,9 @@
     "api-version": 1
   },
   "dependencies": {
-    "@cardstack/di": "^0.5.8",
+    "@cardstack/di": "^0.6.0",
     "@cardstack/logger": "^0.1.0",
-    "@cardstack/plugin-utils": "^0.5.8",
+    "@cardstack/plugin-utils": "^0.6.0",
     "lodash": "^4.17.4"
   },
   "devDependencies": {
