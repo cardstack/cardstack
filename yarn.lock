@@ -8,6 +8,18 @@
   dependencies:
     ms "2.0.0"
 
+"@cardstack/node-pg-migrate@3.0.0-rc2-cardstack.0":
+  version "3.0.0-rc2-cardstack.0"
+  resolved "https://registry.yarnpkg.com/@cardstack/node-pg-migrate/-/node-pg-migrate-3.0.0-rc2-cardstack.0.tgz#4a470a11562903a9ac9c6c58ad62961ecd9b1ea0"
+  dependencies:
+    "@types/pg" "^7.4.5"
+    lodash "~4.17.0"
+    mkdirp "~0.5.1"
+    yargs "~11.0.0"
+  optionalDependencies:
+    config ">=1.0.0"
+    dotenv ">=1.0.0"
+
 "@cardstack/nodegit@0.21.2-cardstack.1":
   version "0.21.2-cardstack.1"
   resolved "https://registry.yarnpkg.com/@cardstack/nodegit/-/nodegit-0.21.2-cardstack.1.tgz#551efebaca210d9f5bfcf8dc9537d3e5d4e9fe95"
@@ -64,6 +76,28 @@
 "@std/esm@^0.25.1":
   version "0.25.1"
   resolved "https://registry.yarnpkg.com/@std/esm/-/esm-0.25.1.tgz#90ce810e48bf3eda8f3533dabc5d4e31046d8228"
+
+"@types/events@*":
+  version "1.2.0"
+  resolved "https://registry.yarnpkg.com/@types/events/-/events-1.2.0.tgz#81a6731ce4df43619e5c8c945383b3e62a89ea86"
+
+"@types/node@*":
+  version "9.6.0"
+  resolved "https://registry.yarnpkg.com/@types/node/-/node-9.6.0.tgz#d3480ee666df9784b1001a1872a2f6ccefb6c2d7"
+
+"@types/pg-types@*":
+  version "1.11.4"
+  resolved "https://registry.yarnpkg.com/@types/pg-types/-/pg-types-1.11.4.tgz#8d7c59fb509ce3dca3f8bae589252051c639a9a8"
+  dependencies:
+    moment ">=2.14.0"
+
+"@types/pg@^7.4.5":
+  version "7.4.5"
+  resolved "https://registry.yarnpkg.com/@types/pg/-/pg-7.4.5.tgz#eca6fdfefaa0865cb652b9a8265be217e10acb1e"
+  dependencies:
+    "@types/events" "*"
+    "@types/node" "*"
+    "@types/pg-types" "*"
 
 JSONStream@^1.0.4:
   version "1.3.1"
@@ -7078,6 +7112,10 @@ moment-timezone@^0.5.11, moment-timezone@^0.5.13:
   version "2.19.3"
   resolved "https://registry.yarnpkg.com/moment/-/moment-2.19.3.tgz#bdb99d270d6d7fda78cc0fbace855e27fe7da69f"
 
+moment@>=2.14.0:
+  version "2.21.0"
+  resolved "https://registry.yarnpkg.com/moment/-/moment-2.21.0.tgz#2a114b51d2a6ec9e6d83cf803f838a878d8a023a"
+
 moment@^2.6.0:
   version "2.18.1"
   resolved "https://registry.yarnpkg.com/moment/-/moment-2.18.1.tgz#c36193dd3ce1c2eed2adb7c802dbbc77a81b1c0f"
@@ -7230,17 +7268,6 @@ node-notifier@^5.0.1:
     semver "^5.3.0"
     shellwords "^0.1.0"
     which "^1.2.12"
-
-node-pg-migrate@2.24.1:
-  version "2.24.1"
-  resolved "https://registry.yarnpkg.com/node-pg-migrate/-/node-pg-migrate-2.24.1.tgz#d12b1b5a7bc028c78f7cd8e406e1abc625806d68"
-  dependencies:
-    lodash "~4.17.0"
-    mkdirp "~0.5.1"
-    yargs "~11.0.0"
-  optionalDependencies:
-    config ">=1.0.0"
-    dotenv ">=1.0.0"
 
 node-pre-gyp@^0.6.39, node-pre-gyp@~0.6.39:
   version "0.6.39"
