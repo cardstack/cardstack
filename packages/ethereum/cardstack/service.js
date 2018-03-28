@@ -1,3 +1,5 @@
+const Ember = require('ember-source/dist/ember.debug');
+const { dasherize, camelize, capitalize } = Ember.String;
 const Web3 = require('web3');
 const log = require('@cardstack/logger')('cardstack/ethereum/service');
 const { declareInjections } = require('@cardstack/di');
@@ -145,7 +147,7 @@ class EthereumService {
                                                         !item.inputs.length)
                                         .map(item => item.name);
     for (let method of methods) {
-      attributes[`${contract}-${method}`] = await aContract.methods[method]().call();
+      attributes[`${contract}-${dasherize(method)}`] = await aContract.methods[method]().call();
     }
 
     let model = { id: address, type: contract, attributes };
@@ -160,15 +162,18 @@ class EthereumService {
 
     await this._reconnectPromise;
 
-    let tokenIndex = type.lastIndexOf('-');
-    let method = type.substring(tokenIndex + 1);
+    let contractNameRegex = new RegExp(`^${contract}-`);
+    let dasherizedMethod = type.replace(contractNameRegex, '');
+    let method = camelize(dasherizedMethod);
 
     if (!this._contracts[branch] || !this._contracts[branch][contract]) {
       throw new Error(`cannot find contract with branch: ${branch}, type: ${type}`);
     }
 
     let aContract = this._contracts[branch][contract];
-    let contractInfo = await aContract.methods[method](id).call();
+    let contractMethod = typeof aContract.methods[method] === 'function' ? aContract.methods[method] :
+                                                                           aContract.methods[capitalize(method)];
+    let contractInfo = await contractMethod(id).call();
     log.debug(`retrieved contract data for contract ${contract}.${method}(${id || ''}): ${contractInfo}`);
     return contractInfo;
   }
