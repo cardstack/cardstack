@@ -7,7 +7,12 @@
   "devDependencies": {
     "@cardstack/test-support": "*",
     "stub-middleware-extra": "*",
-    "koa-better-route": "*",
     "supertest": "*"
+  },
+  "dependencies": {
+    "koa-better-route": "*"
+  },
+  "engines": {
+    "node": ">= 8"
   }
 }

@@ -6,5 +6,8 @@
     "@cardstack/jsonapi": "*",
     "@cardstack/test-support": "*",
     "@cardstack/test-support-authenticator": "*"
+  },
+  "engines": {
+    "node": ">= 8"
   }
 }

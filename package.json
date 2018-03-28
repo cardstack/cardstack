@@ -13,9 +13,9 @@
     "mocha": "^4.0.1"
   },
   "scripts": {
-    "test": "npm run node-tests && npm run ember-tests && npm run truffle-tests",
+    "test": "npm run lint:js && npm run node-tests && npm run ember-tests && npm run truffle-tests",
     "node-tests": "mocha ./packages/test-support/bin/run.js --timeout 10000",
-    "node-lint": "mocha ./packages/test-support/bin/lint.js",
+    "lint:js": "eslint .",
     "ember-tests": "node packages/test-support/ember-test-runner.js",
     "truffle-tests": "LOG_LEVELS='*=warn' node packages/test-support/truffle-test-runner.js",
     "server": "node packages/hub/bin/server.js",

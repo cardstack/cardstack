@@ -1,5 +1,7 @@
 #!/usr/bin/env node
 
+/* eslint-disable no-process-exit */
+
 const { makeServer } = require('../main');
 const commander = require('commander');
 const path = require('path');
@@ -64,7 +66,7 @@ CI_SESSION_ID                     A session ID that has full priviledges which i
   let base64Key = process.env.CARDSTACK_SESSIONS_KEY;
   let base64KeyPath = process.env.CARDSTACK_SESSIONS_KEY_FILE;
   if (base64Key) {
-    commander.sessionsKey = new Buffer(base64Key, 'base64');
+    commander.sessionsKey = Buffer.from(base64Key, 'base64');
   } else if (base64KeyPath) {
     try {
       base64Key = fs.readFileSync(base64KeyPath, 'utf8');
@@ -72,7 +74,7 @@ CI_SESSION_ID                     A session ID that has full priviledges which i
       process.stderr.write(`Could not read the file specified by CARDSTACK_SESSIONS_KEY_FILE (${base64KeyPath}).\n`);
       process.exit(1);
     }
-    commander.sessionsKey = new Buffer(base64Key, 'base64');
+    commander.sessionsKey = Buffer.from(base64Key, 'base64');
   } else {
     process.stderr.write("You must set the CARDSTACK_SESSIONS_KEY environment variable.\n");
     commander.outputHelp();

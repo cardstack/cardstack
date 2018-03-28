@@ -1,4 +1,4 @@
-module.exports = {
+module.exports = Object.assign({}, require('./index'), {
   globals: {
     describe: false,
     it: false,
@@ -8,4 +8,4 @@ module.exports = {
     after: false,
     expect: false
   }
-};
+});

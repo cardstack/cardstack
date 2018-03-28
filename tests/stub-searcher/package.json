@@ -6,5 +6,8 @@
   },
   "devDependencies": {
     "@cardstack/test-support": "*"
+  },
+  "engines": {
+    "node": ">= 8"
   }
 }

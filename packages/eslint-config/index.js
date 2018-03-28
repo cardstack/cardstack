@@ -2,11 +2,14 @@ module.exports = {
   parserOptions: {
     ecmaVersion: 8
   },
-  extends: 'eslint:recommended',
   env: {
-    'node': true
+    'node': true,
+    'browser': false,
+    'es6': true
   },
-  rules: {
+  // I'm doing this instead of `extends` so that this config module
+  // can be used within override blocks of other config modules.
+  rules: Object.assign({}, require('eslint-plugin-node').configs.recommended.rules, {
     'no-constant-condition': ["error", { checkLoops: false }],
     'require-yield': 0,
     'no-var': "error",
@@ -15,14 +18,6 @@ module.exports = {
       'allowModules': []
     }],
     'node/no-missing-require': ['error']
-
-  },
-  plugins: ['node'],
-  globals: {
-    Promise: false,
-    Map: false,
-    WeakMap: false,
-    Symbol: false,
-    Set: false
-  }
+  }),
+  plugins: ['node']
 };

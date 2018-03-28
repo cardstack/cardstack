@@ -3,7 +3,8 @@
   "version": "0.6.2",
   "bin": {
     "cardstack-hub": "./bin/cardstack-hub.js",
-    "cardstack-generate-key": "./bin/generate-key.js"
+    "cardstack-generate-key": "./bin/generate-key.js",
+    "cardstack-seed": "./bin/seed-models.js"
   },
   "keywords": [
     "cardstack-plugin",
@@ -47,10 +48,13 @@
   "devDependencies": {
     "@cardstack/eslint-config": "^0.5.0",
     "eslint": "4.9.0",
-    "eslint-plugin-ember": "^4.6.1",
+    "eslint-plugin-ember": "^5.0.0",
     "eslint-plugin-node": "^5.2.1",
     "koa-better-route": "^0.1.0",
     "supertest": "^2.0.1"
+  },
+  "engines": {
+    "node": ">= 8"
   },
   "ember-addon": {
     "defaultBlueprint": "cardstack-hub-allow-all"

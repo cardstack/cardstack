@@ -1,3 +1,5 @@
+/* eslint-disable no-process-exit */
+
 const path = require('path');
 const glob = require('glob');
 const spawn = require('child_process').spawn;

@@ -7,8 +7,13 @@
       "../.."
     ]
   },
-  "devDependencies": {
-    "@cardstack/test-support": "*",
+  "dependencies": {
     "@cardstack/plugin-utils": "*"
+  },
+  "devDependencies": {
+    "@cardstack/test-support": "*"
+  },
+  "engines": {
+    "node": ">= 8"
   }
 }
