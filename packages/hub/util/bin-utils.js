@@ -1,43 +1,9 @@
-#!/usr/bin/env node
-
-/* eslint-disable no-process-exit */
-
-const { makeServer } = require('../main');
+const commander = require('commander');
 const path = require('path');
-const { commandLineOptions,
-        loadModels,
-        seedsFolder,
-        dataSourcesFolder } = require('../util/bin-utils');
-const logger = require('@cardstack/logger');
-const log = logger('cardstack/server');
+const fs = require('fs');
 
-if (process.env.EMBER_ENV === 'test') {
-  logger.configure({
-    defaultLevel: 'warn'
-  });
-} else {
-  logger.configure({
-    defaultLevel: 'warn',
-    logLevels: [['cardstack/*', 'info']]
-  });
-}
-
-async function runServer(options, dataSources) {
-  let {
-    sessionsKey,
-    port,
-  } = options;
-
-  let seedsDir = path.join(options.initialDataDirectory, seedsFolder);
-  options.seeds = () => loadModels(seedsDir);
-
-  let app = await makeServer(process.cwd(), sessionsKey, dataSources, options);
-  app.listen(port);
-  log.info("server listening on %s", port);
-  if (process.connected) {
-    process.send('hub hello');
-  }
-}
+const seedsFolder = 'seeds';
+const dataSourcesFolder = 'data-sources';
 
 function commandLineOptions() {
   commander
@@ -65,7 +31,7 @@ CI_SESSION_ID                     A session ID that has full priviledges which i
   let base64Key = process.env.CARDSTACK_SESSIONS_KEY;
   let base64KeyPath = process.env.CARDSTACK_SESSIONS_KEY_FILE;
   if (base64Key) {
-    commander.sessionsKey = Buffer.from(base64Key, 'base64');
+    commander.sessionsKey = new Buffer(base64Key, 'base64');
   } else if (base64KeyPath) {
     try {
       base64Key = fs.readFileSync(base64KeyPath, 'utf8');
@@ -73,7 +39,7 @@ CI_SESSION_ID                     A session ID that has full priviledges which i
       process.stderr.write(`Could not read the file specified by CARDSTACK_SESSIONS_KEY_FILE (${base64KeyPath}).\n`);
       process.exit(1);
     }
-    commander.sessionsKey = Buffer.from(base64Key, 'base64');
+    commander.sessionsKey = new Buffer(base64Key, 'base64');
   } else {
     process.stderr.write("You must set the CARDSTACK_SESSIONS_KEY environment variable.\n");
     commander.outputHelp();
@@ -128,29 +94,9 @@ function loadModels(modelsDir) {
   }
 }
 
-process.on('warning', (warning) => {
-  process.stderr.write(warning.stack);
-});
-
-
-if (process.connected === false) {
-  // This happens if we were started by another node process with IPC
-  // and that parent has already died by the time we got here.
-  //
-  // (If we weren't started under IPC, `process.connected` is
-  // undefined, so this never happens.)
-  log.info(`Shutting down because connected parent process has already exited.`);
-  process.exit(0);
-}
-process.on('disconnect', () => {
-  log.info(`Hub shutting down because connected parent process exited.`);
-  process.exit(0);
-});
-
-
-let options = commandLineOptions();
-let dataSources = loadModels(path.join(options.initialDataDirectory, dataSourcesFolder));
-runServer(options, dataSources).catch(err => {
-  log.error("Server failed to start cleanly: %s", err.stack || err);
-  process.exit(-1);
-});
+module.exports = {
+  commandLineOptions,
+  seedsFolder,
+  loadModels,
+  dataSourcesFolder
+};
