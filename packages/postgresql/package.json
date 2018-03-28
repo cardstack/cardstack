@@ -20,7 +20,7 @@
   "dependencies": {
     "@cardstack/di": "^0.6.0",
     "@cardstack/logger": "^0.1.0",
-    "@cardstack/node-pg-migrate": "3.0.0-rc2-cardstack.0",
+    "@cardstack/node-pg-migrate": "3.0.0-rc2-cardstack.1",
     "@cardstack/plugin-utils": "^0.6.0",
     "jsonpatch": "^3.0.1",
     "lodash": "^4.17.4",

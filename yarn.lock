@@ -8,9 +8,9 @@
   dependencies:
     ms "2.0.0"
 
-"@cardstack/node-pg-migrate@3.0.0-rc2-cardstack.0":
-  version "3.0.0-rc2-cardstack.0"
-  resolved "https://registry.yarnpkg.com/@cardstack/node-pg-migrate/-/node-pg-migrate-3.0.0-rc2-cardstack.0.tgz#4a470a11562903a9ac9c6c58ad62961ecd9b1ea0"
+"@cardstack/node-pg-migrate@3.0.0-rc2-cardstack.1":
+  version "3.0.0-rc2-cardstack.1"
+  resolved "https://registry.yarnpkg.com/@cardstack/node-pg-migrate/-/node-pg-migrate-3.0.0-rc2-cardstack.1.tgz#26dcb5d53cb097371118e0299a02da9857b9904f"
   dependencies:
     "@types/pg" "^7.4.5"
     lodash "~4.17.0"
