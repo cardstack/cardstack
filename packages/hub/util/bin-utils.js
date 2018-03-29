@@ -1,3 +1,5 @@
+/* eslint-disable no-process-exit */
+
 const commander = require('commander');
 const path = require('path');
 const fs = require('fs');
@@ -32,7 +34,7 @@ HUB_ENVIRONMENT                   The environment the hub is running in. Possibl
   let base64Key = process.env.CARDSTACK_SESSIONS_KEY;
   let base64KeyPath = process.env.CARDSTACK_SESSIONS_KEY_FILE;
   if (base64Key) {
-    commander.sessionsKey = new Buffer(base64Key, 'base64');
+    commander.sessionsKey = Buffer.from(base64Key, 'base64');
   } else if (base64KeyPath) {
     try {
       base64Key = fs.readFileSync(base64KeyPath, 'utf8');
@@ -40,7 +42,7 @@ HUB_ENVIRONMENT                   The environment the hub is running in. Possibl
       process.stderr.write(`Could not read the file specified by CARDSTACK_SESSIONS_KEY_FILE (${base64KeyPath}).\n`);
       process.exit(1);
     }
-    commander.sessionsKey = new Buffer(base64Key, 'base64');
+    commander.sessionsKey = Buffer.from(base64Key, 'base64');
   } else {
     process.stderr.write("You must set the CARDSTACK_SESSIONS_KEY environment variable.\n");
     commander.outputHelp();
