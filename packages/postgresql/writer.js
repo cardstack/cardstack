@@ -167,6 +167,7 @@ module.exports = class Writer {
 
     // Handle relationships - TODO: no handling of polymorphism here yet
     (document ? Object.entries(document.relationships || {}) : []).map(([key, value]) => {
+      key = this.mapper.columnNameFor(schema, table, key);
       if (value && value.data && value.data.id) {
         columns.push(quoteKey(key));
         args.push(value.data.id);

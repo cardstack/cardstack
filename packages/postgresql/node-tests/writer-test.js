@@ -24,6 +24,9 @@ describe('postgresql/writer', function() {
     await client.query(`create table articles (id varchar primary key DEFAULT cast(nextval('article_id_seq') as varchar), title varchar, length integer, published boolean, alt_topic varchar, multi_word varchar, less_than_ten integer, check (less_than_ten < 10))`);
     await client.query('insert into articles values ($1, $2, $3, $4)', ['0', 'hello world', 100, true]);
 
+    await client.query('create table favorite_toys (id varchar primary key, name varchar)');
+    await client.query('create table doggies (id varchar primary key, name varchar, favorite_toy varchar references favorite_toys(id))');
+
     let factory = new JSONAPIFactory();
 
     factory.addResource('data-sources', dataSourceId)
@@ -207,6 +210,29 @@ describe('postgresql/writer', function() {
     await writer.delete('master', new Session({ id: 'delete-only', type: 'users'}), null, 'articles', '0');
     let result = await client.query('select 1 from articles where id=$1', ['0']);
     expect(result.rows.length).to.equal(0);
+  });
+
+  it('can write a record that includes a relationship', async function() {
+    let testFactory = new JSONAPIFactory();
+
+    let squeakySnake = testFactory.addResource('favorite-toys').withAttributes({
+      name: 'Squeaky Snake'
+    });
+
+    testFactory.addResource('doggies').withAttributes({
+      name: "Van Gogh"
+    }).withRelated('favorite-toy', squeakySnake);
+
+    let [ snakeModel, dogModel ] = testFactory.getModels();
+
+    await writer.create('master', new Session({ id: 'create-only', type: 'users'}), snakeModel.type, snakeModel);
+    await writer.create('master', new Session({ id: 'create-only', type: 'users'}), dogModel.type, dogModel);
+
+    let { rows } = await client.query('select name, favorite_toy from doggies where id=$1', [dogModel.id]);
+    let [ result ] = rows;
+
+    expect(result.name).to.equal("Van Gogh");
+    expect(result.favorite_toy).to.equal(snakeModel.id);
   });
 
   it('cannot create a checkpoint', async function() {
