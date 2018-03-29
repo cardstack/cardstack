@@ -6,7 +6,7 @@ const path = require('path');
 const { commandLineOptions,
         loadModels,
         seedsFolder,
-        dataSourcesFolder } = require('./cardstack-hub');
+        dataSourcesFolder } = require('../util/bin-utils');
 const { wireItUp, loadSeeds } = require('../main');
 const logger = require('@cardstack/logger');
 const log = logger('cardstack/server');
