@@ -22,7 +22,7 @@ describe('hub/encryptor', function() {
     let e = new Encryptor(crypto.randomBytes(32));
     let message = { hello: 'world' };
     let ciphertext = e.encryptAndSign(message);
-    let buffer = new Buffer(ciphertext, 'utf8');
+    let buffer = Buffer.from(ciphertext, 'utf8');
     let sections = ciphertext.split('--');
     for (let i = 0; i < buffer.length; i+= sections.shift().length + 2) {
       let copied = Buffer.from(buffer);

@@ -11,8 +11,8 @@ function initialModels() {
         'client-secret': process.env.GITHUB_CLIENT_SECRET,
         token: process.env.GITHUB_TOKEN
       }
-    })
-  return factory.getModels()
+    });
+  return factory.getModels();
 }
 
 module.exports = initialModels();

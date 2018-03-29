@@ -41,8 +41,8 @@ class Encryptor {
       throw new Error("Not a valid signed message");
     }
     let [ciphertext, iv, authTag] = parts;
-    let decipher = crypto.createDecipheriv('aes-256-gcm', this.key, new Buffer(iv, 'base64'));
-    decipher.setAuthTag(new Buffer(authTag, 'base64'));
+    let decipher = crypto.createDecipheriv('aes-256-gcm', this.key, Buffer.from(iv, 'base64'));
+    decipher.setAuthTag(Buffer.from(authTag, 'base64'));
     let decrypted = decipher.update(ciphertext, 'base64', 'utf8');
     decrypted += decipher.final('utf8');
     return JSON.parse(decrypted);

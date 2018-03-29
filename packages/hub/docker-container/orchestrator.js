@@ -1,3 +1,5 @@
+/* eslint-disable no-process-exit */
+
 const util = require('util');
 const child_process = require('child_process');
 const getContainerId = require('docker-container-id');
@@ -126,5 +128,3 @@ async function getServiceContainerId(serviceName) {
   let {stdout} = await execFile('docker', ['ps', '-q', '-f', `label=com.cardstack.service=${serviceName}`]);
   return stdout.trim();
 }
-
-

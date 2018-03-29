@@ -1,4 +1,5 @@
 /* eslint-disable no-console */
+/* eslint-disable no-process-exit */
 const { Client } = require('pg');
 
 const started = Date.now();

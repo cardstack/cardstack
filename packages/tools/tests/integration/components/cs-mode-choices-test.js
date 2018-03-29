@@ -10,10 +10,12 @@ moduleForComponent('cs-mode-choices', 'Integration | Component | cs mode choices
       // This is the basic protocol required by cs-mode-choices: a
       // property to control, choices, and a setter function:
       favoriteColor: 'blue',
-      favoriteColorChoices: [
-        { id: 'blue', description: 'Blue' },
-        { id: 'red', description: 'Red' }
-      ],
+      favoriteColorChoices: Ember.computed(function() {
+        return [
+          { id: 'blue', description: 'Blue' },
+          { id: 'red', description: 'Red' }
+        ];
+      }),
       setFavoriteColor(color) {
         this.set('favoriteColor', color);
       }

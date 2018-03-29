@@ -11,7 +11,7 @@ export default Ember.Component.extend({
   store: Ember.inject.service(),
   cardstackRouting: injectOptional.service(),
 
-  availableTypes: [],
+  availableTypes: Ember.computed(function() { return []; }),
 
   loadAvailableTypes: task(function * () {
     let types = yield this.get('store').query('content-type', { filter: { not: { 'is-built-in' : true } } });

@@ -2,8 +2,8 @@
 'use strict';
 
 const EmberAddon = require('ember-cli/lib/broccoli/ember-addon');
-var CssImport = require('postcss-import');
-var CssNext = require('postcss-cssnext');
+const CssImport = require('postcss-import');
+const CssNext = require('postcss-cssnext');
 
 module.exports = function(defaults) {
   let app = new EmberAddon(defaults, {

@@ -1,7 +1,6 @@
 const glob = require('glob');
 const requireUncached = require('require-uncached');
 const prepare = require('./prepare-node-tests');
-const lint = require('./node-lint-runner');
 
 
 module.exports = function() {
@@ -17,5 +16,4 @@ module.exports = function() {
     }
   }
 
-  lint();
 };

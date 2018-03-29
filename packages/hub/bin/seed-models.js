@@ -1,5 +1,7 @@
 #!/usr/bin/env node
 
+/* eslint-disable no-process-exit */
+
 const path = require('path');
 const { commandLineOptions,
         loadModels,

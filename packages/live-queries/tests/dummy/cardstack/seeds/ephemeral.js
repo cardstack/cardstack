@@ -11,7 +11,7 @@ function initialModels() {
     });
   */
 
-  return factory.getModels()
+  return factory.getModels();
 }
 
 module.exports = initialModels();

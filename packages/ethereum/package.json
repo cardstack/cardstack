@@ -38,13 +38,13 @@
     "@cardstack/models": "^0.6.2",
     "@cardstack/test-support": "^0.6.2",
     "eslint": "4.9.0",
-    "eslint-plugin-ember": "^4.6.1",
+    "eslint-plugin-ember": "^5.0.0",
     "eslint-plugin-node": "^5.2.1",
     "loader.js": "^4.2.3",
     "truffle": "^4.0.4"
   },
   "engines": {
-    "node": ">= 7"
+    "node": ">= 8"
   },
   "ember-addon": {
     "configPath": "tests/dummy/config"

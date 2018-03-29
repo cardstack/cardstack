@@ -126,7 +126,7 @@ export default Ember.Component.extend({
     }
   }),
 
-  anythingDirty: computed('model.hasDirtyFields', 'model.hasDirtyAttributes', function() {
+  anythingDirty: computed('model.{hasDirtyFields,hasDirtyAttributes}', function() {
     // hasDirtyFields comes from the ember-data-relationship-tracker
     // addon, if it's available. It's fine if it's not since the value
     // will default to false, you just don't get relationship dirty

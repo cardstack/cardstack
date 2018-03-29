@@ -1,4 +1,5 @@
 /* eslint-disable no-console */
+/* eslint-disable no-process-exit */
 const { createDefaultEnvironment } = require('@cardstack/test-support/env');
 const JSONAPIFactory = require('@cardstack/test-support/jsonapi-factory');
 
