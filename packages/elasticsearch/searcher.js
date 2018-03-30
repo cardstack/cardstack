@@ -1,4 +1,5 @@
 const Client = require('./client');
+const { get } = require('lodash');
 const log = require('@cardstack/logger')('cardstack/searcher');
 const Error = require('@cardstack/plugin-utils/error');
 const { declareInjections } = require('@cardstack/di');
@@ -245,18 +246,21 @@ class Searcher {
       });
     }
 
+    let queryTermFormatter = get(field, 'plugin.queryTermFormatter', term => term);
+
     if (typeof value === 'string') {
       // Bare strings are shorthand for a match filter
       let esName = await this.client.logicalFieldToES(branch, field.queryFieldName);
       let path = aboveSegments.concat(esName).join('.');
-      return { match: { [path] : value } };
+      return { match: { [path] : queryTermFormatter(value) } };
     }
 
     if (Array.isArray(value)) {
       // Bare arrays are shorthand for a multi term filter
       let esName = await this.client.logicalFieldToES(branch, field.queryFieldName);
       let path = aboveSegments.concat(esName).join('.');
-      return { terms: { [path] : value.map(elt => elt.toLowerCase()) } };
+      // unsure why multi-term filter, specifically, needs toLowerCase() query terms
+      return { terms: { [path] : value.map(elt => queryTermFormatter(elt).toLowerCase()) } };
     }
 
     if (value.range) {
@@ -305,21 +309,23 @@ class Searcher {
       }
 
       if (typeof innerQuery === 'string') {
+        innerQuery = queryTermFormatter(innerQuery);
         // This is the sortFieldName because that one is designed for
         // exact matching (in addition to sorting).
-        return { term: { [path] : innerQuery.toLowerCase() } };
+        return { term: { [path] : innerQuery } };
       }
       if (Array.isArray(innerQuery)) {
+        innerQuery = innerQuery.map(el => queryTermFormatter(el));
         // This is the sortFieldName because that one is designed for
         // exact matching (in addition to sorting).
-        return { terms: { [path] : innerQuery.map(elt => elt.toLowerCase()) } };
+        return { terms: { [path] : innerQuery } };
       }
     }
 
     if (value.prefix != null) {
       let esName = await this.client.logicalFieldToES(branch, field.queryFieldName);
       let path = aboveSegments.concat(esName).join('.');
-      return { match_phrase_prefix: { [path] : value.prefix } };
+      return { match_phrase_prefix: { [path] : queryTermFormatter(value.prefix) } };
     }
 
     throw new Error(`Unimplemented filter ${key} ${value}`);
