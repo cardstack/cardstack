@@ -317,7 +317,7 @@ class Updater {
   }
 
   async _toDocument(type, row) {
-    let doc = rowToDocument(await this.schema(), type, row);
+    let doc = rowToDocument(this.mapper, await this.schema(), type, row);
     return this._maybePatch(doc);
   }
 

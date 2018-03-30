@@ -1,6 +1,5 @@
-const { snakeCase } = require('lodash');
-
-module.exports = function rowToDocument(schemaModels, type, row) {
+module.exports = function rowToDocument(mapper, schemaModels, type, row) {
+  let { schema, table } = mapper.tableForType(type);
   let contentType = schemaModels.find(m => m.type === 'content-types' && m.id === type);
   let fields = contentType.relationships.fields.data.map(ref => schemaModels.find(m => m.type === ref.type && m.id === ref.id));
   let doc = {
@@ -9,12 +8,19 @@ module.exports = function rowToDocument(schemaModels, type, row) {
     attributes: {},
     relationships: {}
   };
-  for (let field of fields) {
-    if(field.attributes['field-type'] === '@cardstack/core-types::belongs-to') {
-      let relatedId = row[field.id];
+
+  for (let col of Object.keys(row)) {
+    let fieldName = mapper.fieldNameFor(schema, table, col);
+    if (fieldName === 'id') { continue; }
+
+    let field = fields.find(f => f.id === fieldName);
+    if (!field) { continue; }
+
+    if (field.attributes['field-type'] === '@cardstack/core-types::belongs-to') {
+      let relatedId = row[col];
 
       if (relatedId) {
-        doc.relationships[snakeCase(field.id)] = {
+        doc.relationships[fieldName] = {
           data: {
             id: relatedId,
             type: field.relationships['related-types'].data[0].id // TODO: This doesn't support polymorphic relationships
@@ -23,7 +29,7 @@ module.exports = function rowToDocument(schemaModels, type, row) {
       }
 
     } else {
-      doc.attributes[field.id] = convertValue(row[snakeCase(field.id)], field.attributes['field-type']);
+      doc.attributes[fieldName] = convertValue(row[col], field.attributes['field-type']);
     }
   }
   return doc;
