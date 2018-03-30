@@ -1,6 +1,6 @@
 const log = require('@cardstack/logger')('cardstack/postgresql');
 const { Pool } = require('pg');
-const { partition, isEqual } = require('lodash');
+const { get, partition, isEqual } = require('lodash');
 const Error = require('@cardstack/plugin-utils/error');
 const rowToDocument = require('./row-to-doc');
 const { apply_patch } = require('jsonpatch');
@@ -25,13 +25,14 @@ module.exports = declareInjections({
     return new this(params);
   }
 
-  constructor({ branches, dataSource, renameTables, renameColumns, patch, projectConfig }) {
+  constructor({ branches, dataSource, renameTables, renameColumns, typeHints, patch, projectConfig }) {
     this.branchConfig = branches;
     this.dataSourceId = dataSource.id;
     this.pools = Object.create(null);
     this.mapper = new NameMapper(renameTables, renameColumns);
     this.patch = patch || Object.create(null);
     this.projectPath = projectConfig.path;
+    this.typeHints = typeHints;
   }
 
   async branches() {
@@ -53,7 +54,7 @@ module.exports = declareInjections({
     }
 
     let client = await this.pools[branch].connect();
-    return new Updater(client, this.dataSourceId, this.mapper, this.patch);
+    return new Updater(client, this.dataSourceId, this.mapper, this.patch, this.typeHints);
   }
 
   async teardown() {
@@ -87,11 +88,12 @@ module.exports = declareInjections({
 });
 
 class Updater {
-  constructor(client, dataSourceId, mapper, patch) {
+  constructor(client, dataSourceId, mapper, patch, typeHints) {
     this.client = client;
     this.dataSourceId = dataSourceId;
     this.mapper = mapper;
     this.patch = patch;
+    this.typeHints = typeHints;
   }
 
   destroy() {
@@ -154,7 +156,7 @@ class Updater {
         continue;
       }
 
-      let fieldType = this._fieldTypeFor(data_type);
+      let fieldType = get(this.typeHints, `${table_name}.${column_name}`) || this._fieldTypeFor(data_type);
       if (!fieldType) {
         log.warn('Ignoring column "%s" because of unknown data type "%s"', fieldName, data_type);
         continue;

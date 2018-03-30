@@ -21,7 +21,7 @@ describe('postgresql/indexer', function() {
     await client.query('insert into articles values ($1, $2, $3, $4, $5, $6)', ['0', 'hello world', 100, true, null, '0']);
     await client.query('insert into articles values ($1, $2, $3, $4)', ['1', null, null, false]);
 
-    await client.query('create table favorite_toys (id varchar primary key, name varchar)');
+    await client.query('create table favorite_toys (id varchar primary key, toy_name varchar)');
     await client.query('insert into favorite_toys values ($1, $2)', ['0', 'Squeaky Snake']);
     await client.query('create table doggies (id varchar primary key, name varchar, favorite_toy varchar references favorite_toys(id))');
     await client.query('insert into doggies values ($1, $2, $3)', ['0', 'Van Gogh', '0']);
@@ -46,6 +46,11 @@ describe('postgresql/indexer', function() {
           renameColumns: {
             articles: {
               topic: 'real-topic'
+            }
+          },
+          typeHints: {
+            favorite_toys: {
+              toy_name: '@cardstack/core-types::case-insensitive'
             }
           },
           patch: {
@@ -152,6 +157,11 @@ describe('postgresql/indexer', function() {
       expect(doc.data.relationships.fields.data.map(f => f.id)).contains('real-topic');
     });
 
+    it('can use type hints', async function() {
+      let response = await env.lookup('hub:searchers').search(env.session, 'master', { filter: { 'toy-name': { exact: 'SQueAkY sNakE' } } });
+      expect(response.data).length(1);
+      expect(response.data[0].attributes['toy-name']).to.equal('Squeaky Snake');
+    });
 
     it('can customize discovered schema', async function() {
       let doc = await env.lookup('hub:searchers').get(env.session, 'master', 'content-types', 'articles');
