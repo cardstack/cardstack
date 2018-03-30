@@ -45,6 +45,9 @@ describe('elasticsearch/searcher', function() {
         fieldType: '@cardstack/core-types::string'
       }),
       factory.getResource('fields', 'favorite-color'),
+      factory.addResource('fields', 'favorite-toy').withAttributes({
+        fieldType: '@cardstack/core-types::string'
+      }),
       factory.addResource('fields', 'hello').withAttributes({
         fieldType: '@cardstack/core-types::string'
       })
@@ -66,6 +69,7 @@ describe('elasticsearch/searcher', function() {
 
     factory.addResource('articles', '1').withAttributes({
       hello: 'magic words',
+      favoriteToy: 'Sneaky Snake',
       favoriteColor: 'red'
     });
 
@@ -583,6 +587,25 @@ describe('elasticsearch/searcher', function() {
     });
     expect(response.data).length(1);
     expect(response.data[0]).has.deep.property('attributes.hello', 'magic words');
+  });
+
+  it('can do exact term matching with a field that contains a capital letter', async function() {
+    let response = await searcher.search(env.session, 'master', {
+      filter: {
+        'favorite-toy': { exact: 'Sneaky Snake' }
+      }
+    });
+    expect(response.data).length(1);
+    expect(response.data[0]).has.deep.property('attributes.favorite-toy', 'Sneaky Snake');
+
+    response = await searcher.search(env.session, 'master', {
+      filter: {
+        'favorite-toy': { exact: ['Sneaky Snake', 'boisterous baboon'] }
+      }
+    });
+
+    expect(response.data).length(1);
+    expect(response.data[0]).has.deep.property('attributes.favorite-toy', 'Sneaky Snake');
   });
 
   it('incomplete phrase does not match', async function() {

@@ -9,6 +9,10 @@ module.exports = {
     };
   },
 
+  queryTermFormatter(term) {
+    return term.toLowerCase();
+  },
+
   customAnalyzer() {
     return {
       case_insensitive_keyword_analyzer: {
