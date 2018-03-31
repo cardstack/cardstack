@@ -67,6 +67,8 @@ module.exports = declareInjections({
   async _prepareSeedsCheckpoint(branch, session, type, document) {
     let seedModels = await this.seeds();
 
+    await this.indexers.update({ forceRefresh: true });
+
     for (let model of seedModels) {
       let existingModel;
       try {
@@ -84,7 +86,12 @@ module.exports = declareInjections({
         let { data } = existingModel;
         model.id = data.id;
         model.meta = model.meta || {};
-        model.meta.version = data.meta.version;
+
+        let version = get(data, 'meta.version');
+        if (version) {
+          model.meta.version = version;
+        }
+
         await this.writers.update(branch, session, model.type, data.id, model);
       }
     }
