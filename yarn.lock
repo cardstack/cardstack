@@ -20,7 +20,7 @@
     config ">=1.0.0"
     dotenv ">=1.0.0"
 
-"@cardstack/nodegit@0.21.2-cardstack.1":
+"@cardstack/nodegit@^0.21.2-cardstack.1":
   version "0.21.2-cardstack.1"
   resolved "https://registry.yarnpkg.com/@cardstack/nodegit/-/nodegit-0.21.2-cardstack.1.tgz#551efebaca210d9f5bfcf8dc9537d3e5d4e9fe95"
   dependencies:
