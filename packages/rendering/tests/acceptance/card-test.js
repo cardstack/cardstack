@@ -1,14 +1,15 @@
-import { test } from 'qunit';
-import moduleForAcceptance from '../../tests/helpers/module-for-acceptance';
+import { module, test } from 'qunit';
+import { setupApplicationTest } from 'ember-qunit';
+import { visit, currentURL } from '@ember/test-helpers';
 
-moduleForAcceptance('Acceptance | card');
+module('Acceptance | card', function(hooks) {
+  setupApplicationTest(hooks);
 
-test('visiting /card', function(assert) {
-  visit('/card');
+  test('visiting /card', async function(assert) {
+    await visit('/card');
 
-  andThen(function() {
     assert.equal(currentURL(), '/card');
-    assert.equal(find('.card-flavor').text(), 'tea');
-    assert.equal(find('.card-size').text(), '1 cup');
+    assert.equal(this.element.querySelector('.card-flavor').textContent.trim(), 'tea');
+    assert.equal(this.element.querySelector('.card-size').textContent.trim(), '1 cup');
   });
 });

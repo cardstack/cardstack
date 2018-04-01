@@ -1,20 +1,19 @@
-import { test } from 'qunit';
-import moduleForAcceptance from '../../tests/helpers/module-for-acceptance';
+import { module, test } from 'qunit';
+import { setupApplicationTest } from 'ember-qunit';
+import { visit, currentURL } from '@ember/test-helpers';
 
-moduleForAcceptance('Acceptance | new-content');
+module('Acceptance | new-content', function(hooks) {
+  setupApplicationTest(hooks);
 
-test('renders', function(assert) {
-  visit('/c/posts/new');
-  andThen(function() {
+  test('renders', async function(assert) {
+    await visit('/c/posts/new');
     assert.equal(currentURL(), '/c/posts/new');
-    assert.equal(find('.title').length, 1);
+    assert.equal(this.element.querySelectorAll('.title').length, 1);
   });
-});
 
-test('renders default content type', function(assert) {
-  visit('/c/pages/new');
-  andThen(function() {
+  test('renders default content type', async function(assert) {
+    await visit('/c/pages/new');
     assert.equal(currentURL(), '/c/pages/new');
-    assert.equal(find('.blurb').length, 1);
+    assert.equal(this.element.querySelectorAll('.blurb').length, 1);
   });
 });

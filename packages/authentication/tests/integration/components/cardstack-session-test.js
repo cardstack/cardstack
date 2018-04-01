@@ -1,17 +1,19 @@
-import { moduleForComponent, test } from 'ember-qunit';
+import { module, test } from 'qunit';
+import { setupRenderingTest } from 'ember-qunit';
+import { render } from '@ember/test-helpers';
 import hbs from 'htmlbars-inline-precompile';
 
-moduleForComponent('cardstack-user', 'Integration | Component | cardstack session', {
-  integration: true
-});
+module('Integration | Component | cardstack session', function(hooks) {
+  setupRenderingTest(hooks);
 
-test('it renders', function(assert) {
+  test('it renders', async function(assert) {
 
-  this.render(hbs`
-    {{#cardstack-session as |session|}}
-      template block text
-    {{/cardstack-session}}
-  `);
+    await render(hbs`
+      {{#cardstack-session as |session|}}
+        template block text
+      {{/cardstack-session}}
+    `);
 
-  assert.equal(this.$().text().trim(), 'template block text');
+    assert.equal(this.$().text().trim(), 'template block text');
+  });
 });

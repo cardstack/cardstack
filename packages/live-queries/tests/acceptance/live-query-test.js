@@ -1,5 +1,6 @@
-import { test } from 'qunit';
-import moduleForAcceptance from '../../tests/helpers/module-for-acceptance';
+import { module, test } from 'qunit';
+import { setupApplicationTest } from 'ember-qunit';
+import { visit, fillIn, click } from '@ember/test-helpers';
 
 import Fixtures from '@cardstack/test-support/fixtures';
 
@@ -7,23 +8,25 @@ let scenario = new Fixtures('default', factory => {
   factory.addResource('items').withAttributes({content: 'hello'});
 });
 
-moduleForAcceptance('Acceptance | live query', {
-  async beforeEach() {
+module('Acceptance | live query', function(hooks) {
+  setupApplicationTest(hooks);
+
+  hooks.beforeEach(async function() {
     await scenario.setup();
-  }
-});
+  });
 
 
-test('Adding a record, and seeing it appear in the query', async function(assert) {
-  await visit('/');
+  test('Adding a record, and seeing it appear in the query', async function(assert) {
+    await visit('/');
 
-  let items = Array.from(find('.item')).map(e=>e.textContent);
-  assert.deepEqual(items, ['hello']);
+    let items = Array.from(this.element.querySelectorAll('.item')).map(e=>e.textContent);
+    assert.deepEqual(items, ['hello']);
 
-  await fillIn('.new-item-content', 'world');
-  await click('.new-item-submit');
+    await fillIn('.new-item-content', 'world');
+    await click('.new-item-submit');
 
-  items = Array.from(find('.item')).map(e=>e.textContent).sort();
-  assert.deepEqual(items, ['hello', 'world'])
+    items = Array.from(this.element.querySelectorAll('.item')).map(e=>e.textContent).sort();
+    assert.deepEqual(items, ['hello', 'world'])
 
+  });
 });

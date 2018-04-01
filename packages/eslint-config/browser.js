@@ -16,19 +16,8 @@ module.exports = {
     // TODO: turn these on
     'ember/new-module-imports': 'off',
     'ember/closure-actions': 'off',
-    'ember/no-old-shims': 'off'
-  },
-  // TODO: get rid of all these once we port the tests
-  globals: {
-    visit: false,
-    andThen: false,
-    currentURL: false,
-    findWithAssert: false,
-    setResolver: false,
-    resolver: false,
-    fillIn: false,
-    click: false,
-    assertTrimmedText: false
+    'ember/no-old-shims': 'off',
+    'no-restricted-globals': [2, 'find']
   },
   overrides: [
     // This loads our node rules
