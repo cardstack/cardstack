@@ -1,12 +1,13 @@
-import { test } from 'qunit';
-import moduleForAcceptance from '../../tests/helpers/module-for-acceptance';
+import { module, test } from 'qunit';
+import { setupApplicationTest } from 'ember-qunit';
+import { visit, currentURL } from '@ember/test-helpers';
 
-moduleForAcceptance('Acceptance | index');
+module('Acceptance | index', function(hooks) {
+  setupApplicationTest(hooks);
 
-test('renders own page content', function(assert) {
-  visit('/c');
-  andThen(function() {
+  test('renders own page content', async function(assert) {
+    await visit('/c');
     assert.equal(currentURL(), '/c');
-    assert.equal(find('.blurb').text(), 'this is the homepage');
+    assert.equal(this.element.querySelectorAll('.blurb').text(), 'this is the homepage');
   });
 });

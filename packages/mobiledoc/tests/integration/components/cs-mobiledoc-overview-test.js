@@ -1,31 +1,33 @@
-import { moduleForComponent, skip } from 'ember-qunit';
+import { module, skip } from 'qunit';
+import { setupRenderingTest } from 'ember-qunit';
+import '@ember/test-helpers';
 import hbs from 'htmlbars-inline-precompile';
 
-moduleForComponent('cs-mobiledoc-overview', 'Integration | Component | cs mobiledoc overview', {
-  integration: true
-});
+module('Integration | Component | cs mobiledoc overview', function(hooks) {
+  setupRenderingTest(hooks);
 
-skip('it renders', function(assert) {
-  this.set('sample', {
-    "version": "0.3.0",
-    "atoms": [],
-    "cards": [],
-    "markups": [],
-    "sections": [
-      [
-        1,
-        "p",
+  skip('it renders', function(assert) {
+    this.set('sample', {
+      "version": "0.3.0",
+      "atoms": [],
+      "cards": [],
+      "markups": [],
+      "sections": [
         [
+          1,
+          "p",
           [
-            0,
-            [],
-            0,
-            "First paragraph."
+            [
+              0,
+              [],
+              0,
+              "First paragraph."
+            ]
           ]
         ]
       ]
-    ]
+    });
+    this.render(hbs`{{cs-mobiledoc-overview mobiledoc=sample}}`);
+    assert.equal(this.$('li').length, 1);
   });
-  this.render(hbs`{{cs-mobiledoc-overview mobiledoc=sample}}`);
-  assert.equal(this.$('li').length, 1);
 });

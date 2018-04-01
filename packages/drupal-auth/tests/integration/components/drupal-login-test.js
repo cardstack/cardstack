@@ -1,25 +1,27 @@
-import { moduleForComponent, skip } from 'ember-qunit';
+import { module, skip } from 'qunit';
+import { setupRenderingTest } from 'ember-qunit';
+import '@ember/test-helpers';
 import hbs from 'htmlbars-inline-precompile';
 
-moduleForComponent('drupal-login', 'Integration | Component | drupal login', {
-  integration: true
-});
+module('Integration | Component | drupal login', function(hooks) {
+  setupRenderingTest(hooks);
 
-skip('it renders', function(assert) {
+  skip('it renders', function(assert) {
 
-  // Set any properties with this.set('myProperty', 'value');
-  // Handle any actions with this.on('myAction', function(val) { ... });
+    // Set any properties with this.set('myProperty', 'value');
+    // Handle any actions with this.on('myAction', function(val) { ... });
 
-  this.render(hbs`{{drupal-login}}`);
+    this.render(hbs`{{drupal-login}}`);
 
-  assert.equal(this.$().text().trim(), '');
+    assert.equal(this.$().text().trim(), '');
 
-  // Template block usage:
-  this.render(hbs`
-    {{#drupal-login}}
-      template block text
-    {{/drupal-login}}
-  `);
+    // Template block usage:
+    this.render(hbs`
+      {{#drupal-login}}
+        template block text
+      {{/drupal-login}}
+    `);
 
-  assert.equal(this.$().text().trim(), 'template block text');
+    assert.equal(this.$().text().trim(), 'template block text');
+  });
 });

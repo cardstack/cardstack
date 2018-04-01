@@ -1,43 +1,36 @@
-import { test } from 'qunit';
-import moduleForAcceptance from '../../tests/helpers/module-for-acceptance';
+import { module, test } from 'qunit';
+import { setupApplicationTest } from 'ember-qunit';
+import { visit, currentURL } from '@ember/test-helpers';
 
-moduleForAcceptance('Acceptance | content');
+module('Acceptance | content', function(hooks) {
+  setupApplicationTest(hooks);
 
-test('renders own page content', function(assert) {
-  visit('/c/posts/1');
-  andThen(function() {
+  test('renders own page content', async function(assert) {
+    await visit('/c/posts/1');
     assert.equal(currentURL(), '/c/posts/1');
-    assert.equal(find('.title').text(), 'hello world');
+    assert.equal(this.element.querySelector('.title').textContent.trim(), 'hello world');
   });
-});
 
-test('redirects for default content type', function(assert) {
-  visit('/c/pages/second');
-  andThen(function() {
+  test('redirects for default content type', async function(assert) {
+    await visit('/c/pages/second');
     assert.equal(currentURL(), '/c/second');
-    assert.equal(find('.blurb').text(), 'I am the second page');
+    assert.equal(this.element.querySelector('.blurb').textContent.trim(), 'I am the second page');
   });
-});
 
-test('redirects for singular content type', function(assert) {
-  visit('/c/post/1');
-  andThen(function() {
+  test('redirects for singular content type', async function(assert) {
+    await visit('/c/post/1');
     assert.equal(currentURL(), '/c/posts/1');
   });
-});
 
-test('redirects for singular default content type', function(assert) {
-  visit('/c/page/second');
-  andThen(function() {
+  test('redirects for singular default content type', async function(assert) {
+    await visit('/c/page/second');
     assert.equal(currentURL(), '/c/second');
   });
-});
 
 
-test('renders placeholder type when content is missing', function(assert) {
-  visit('/c/posts/bogus');
-  andThen(function() {
+  test('renders placeholder type when content is missing', async function(assert) {
+    await visit('/c/posts/bogus');
     assert.equal(currentURL(), '/c/posts/bogus');
-    assert.equal(find('h1:contains(Not Found)').length, 1);
+    assert.equal(this.element.querySelector('h1').textContent.trim(), 'Not Found');
   });
 });

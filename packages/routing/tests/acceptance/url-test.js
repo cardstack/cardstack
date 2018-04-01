@@ -1,12 +1,13 @@
-import { test } from 'qunit';
-import moduleForAcceptance from '../../tests/helpers/module-for-acceptance';
+import { module, test } from 'qunit';
+import { setupApplicationTest } from 'ember-qunit';
+import { visit } from '@ember/test-helpers';
 
-moduleForAcceptance('Acceptance | cardstack-url');
+module('Acceptance | cardstack-url', function(hooks) {
+  setupApplicationTest(hooks);
 
-test('renders correct links', function(assert) {
-  visit('/links');
-  andThen(function() {
-    assert.equal(find('.page-test').text(), '/c/the-permalink');
-    assert.equal(find('.post-test').text(), '/c/posts/123%2045');
+  test('renders correct links', async function(assert) {
+    await visit('/links');
+    assert.equal(this.element.querySelector('.page-test').textContent.trim(), '/c/the-permalink');
+    assert.equal(this.element.querySelector('.post-test').textContent.trim(), '/c/posts/123%2045');
   });
 });
