@@ -8,6 +8,6 @@ module('Acceptance | index', function(hooks) {
   test('renders own page content', async function(assert) {
     await visit('/c');
     assert.equal(currentURL(), '/c');
-    assert.equal(this.element.querySelectorAll('.blurb').text(), 'this is the homepage');
+    assert.equal(this.element.querySelector('.blurb').textContent.trim(), 'this is the homepage');
   });
 });
