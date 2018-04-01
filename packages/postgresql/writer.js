@@ -63,7 +63,7 @@ module.exports = class Writer {
     try {
       await client.query('begin');
       let result = await client.query(`insert into ${schema}.${table} (${columns.join(',')}) values (${placeholders}) returning *`, args);
-      let finalDocument = rowToDocument(await this._getSchema(branch), type, result.rows[0]);
+      let finalDocument = rowToDocument(this.mapper, await this._getSchema(branch), type, result.rows[0]);
       let change = new PendingChange(null, finalDocument, finalize, abort);
       pendingChanges.set(change, { client });
       return change;
@@ -84,9 +84,9 @@ module.exports = class Writer {
       if (result.rows < 1) {
         throw new Error("Not found", { status: 404, source: { pointer: '/data/id' } });
       }
-      let initialDocument = rowToDocument(schema, type, result.rows[0]);
+      let initialDocument = rowToDocument(this.mapper, schema, type, result.rows[0]);
       result = await client.query(`update ${dbschema}.${table} set ${columns.map((name,index) => `${name}=$${index+1}`).join(',')} where id=$${args.length} returning *`, args);
-      let finalDocument = rowToDocument(schema, type, result.rows[0]);
+      let finalDocument = rowToDocument(this.mapper, schema, type, result.rows[0]);
       let change = new PendingChange(initialDocument, finalDocument, finalize, abort);
       pendingChanges.set(change, { client });
       return change;
@@ -101,7 +101,7 @@ module.exports = class Writer {
     let client = await this._getPool(branch).connect();
     try {
       await client.query('begin');
-      let initialDocument = rowToDocument(await this._getSchema(branch), type, await client.query(`select * from ${schema}.${table} where id=$1`, [ id ]));
+      let initialDocument = rowToDocument(this.mapper, await this._getSchema(branch), type, await client.query(`select * from ${schema}.${table} where id=$1`, [ id ]));
       await client.query(`delete from ${schema}.${table} where id=$1`, [id]);
       let change = new PendingChange(initialDocument, null, finalize, abort);
       pendingChanges.set(change, { client });

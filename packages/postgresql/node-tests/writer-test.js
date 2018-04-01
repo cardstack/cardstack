@@ -119,6 +119,23 @@ describe('postgresql/writer', function() {
     expect(result.rows[0].length).to.equal(200);
     expect(result.rows[0].alt_topic).to.equal('x');
     expect(result.rows[0].published).to.equal(false);
+
+    await env.lookup('hub:indexers').update({ forceRefresh: true });
+
+    let { body: { data } } = await request.get(`/api/articles/${created.id}`);
+    expect(data).to.deep.equal({
+      "id": created.id,
+      "type": "articles",
+      "attributes": {
+        "multi-word": "hello",
+        "less-than-ten": null,
+        "title": "I was created",
+        "published": false,
+        "length": 200,
+        "topic": "x"
+      },
+      "relationships": {}
+    });
   });
 
   it('reacts to database failure during create', async function() {
