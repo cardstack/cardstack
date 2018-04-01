@@ -1,11 +1,13 @@
-import { moduleForComponent, test } from 'ember-qunit';
+import { module, test } from 'qunit';
+import { setupRenderingTest } from 'ember-qunit';
+import { render } from '@ember/test-helpers';
 import hbs from 'htmlbars-inline-precompile';
 
-moduleForComponent('cs-editor-switch', 'Integration | Component | cs editor switch', {
-  integration: true
-});
+module('Integration | Component | cs editor switch', function(hooks) {
+  setupRenderingTest(hooks);
 
-test('it renders', function(assert) {
-  this.render(hbs`{{cs-editor-switch}}`);
-  assert.equal(this.$('label:contains(Editor)').length, 1, "found label");
+  test('it renders', async function(assert) {
+    await render(hbs`{{cs-editor-switch}}`);
+    assert.equal(this.$('label:contains(Editor)').length, 1, "found label");
+  });
 });

@@ -1,22 +1,25 @@
-import { test } from 'qunit';
-import moduleForAcceptance from '../../tests/helpers/module-for-acceptance';
+import { module, test } from 'qunit';
+import { setupApplicationTest } from 'ember-qunit';
+import { visit, click } from '@ember/test-helpers';
 
-moduleForAcceptance('Acceptance | tools', {
-  beforeEach() {
+module('Acceptance | tools', function(hooks) {
+  setupApplicationTest(hooks);
+
+  hooks.beforeEach(function() {
     delete localStorage['cardstack-tools'];
-  },
-  afterEach() {
+  });
+
+  hooks.afterEach(function() {
     delete localStorage['cardstack-tools'];
-  }
-});
+  });
 
 
-test('activate tools', function(assert) {
-  visit('/1');
-  click('.cardstack-tools-launcher');
-  click('label:contains("Title")')
-  andThen(function() {
-    let matching = Array.from(find('input')).find(element => element.value === 'hello world');
+  test('activate tools', async function(assert) {
+    await visit('/1');
+    await click('.cardstack-tools-launcher');
+    let element = [...this.element.querySelectorAll('label')].find(element => /Title/.test(element.textContent));
+    await click(element);
+    let matching = Array.from(this.element.querySelectorAll('input')).find(element => element.value === 'hello world');
     assert.ok(matching, 'found field editor for title');
   });
 });
