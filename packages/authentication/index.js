@@ -1,4 +1,3 @@
-/* eslint-env node */
 'use strict';
 const Handlebars = require('handlebars');
 const log = require('@cardstack/logger')('cardstack/auth');
