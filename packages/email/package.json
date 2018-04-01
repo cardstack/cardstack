@@ -1,6 +1,6 @@
 {
   "name": "@cardstack/email",
-  "version": "0.6.3",
+  "version": "0.6.5",
   "keywords": [
     "cardstack-plugin"
   ],
@@ -12,11 +12,11 @@
   "description": "Email sending plugin for Cardstack",
   "dependencies": {
     "@cardstack/logger": "^0.1.0",
-    "@cardstack/plugin-utils": "^0.6.3",
+    "@cardstack/plugin-utils": "^0.6.5",
     "nodemailer": "^4.0.1"
   },
   "devDependencies": {
-    "@cardstack/eslint-config": "^0.6.3",
+    "@cardstack/eslint-config": "^0.6.5",
     "eslint": "4.9.0",
     "eslint-plugin-ember": "^5.0.0",
     "eslint-plugin-node": "^5.2.1"

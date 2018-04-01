@@ -1,6 +1,6 @@
 {
   "name": "@cardstack/hub",
-  "version": "0.6.3",
+  "version": "0.6.5",
   "bin": {
     "cardstack-hub": "./bin/cardstack-hub.js",
     "cardstack-generate-key": "./bin/generate-key.js",
@@ -17,13 +17,13 @@
   },
   "description": "Stock API server for the Cardstack tech stack.",
   "dependencies": {
-    "@cardstack/codegen": "^0.6.3",
-    "@cardstack/core-types": "^0.6.3",
-    "@cardstack/di": "^0.6.3",
-    "@cardstack/elasticsearch": "^0.6.3",
-    "@cardstack/handlebars": "^0.6.3",
+    "@cardstack/codegen": "^0.6.5",
+    "@cardstack/core-types": "^0.6.5",
+    "@cardstack/di": "^0.6.5",
+    "@cardstack/elasticsearch": "^0.6.5",
+    "@cardstack/handlebars": "^0.6.5",
     "@cardstack/logger": "^0.1.0",
-    "@cardstack/plugin-utils": "^0.6.3",
+    "@cardstack/plugin-utils": "^0.6.5",
     "broccoli-concat": "^3.2.2",
     "broccoli-plugin": "^1.3.0",
     "broccoli-source": "^1.1.0",
@@ -46,7 +46,7 @@
     "tar-stream": "^1.5.4"
   },
   "devDependencies": {
-    "@cardstack/eslint-config": "^0.6.3",
+    "@cardstack/eslint-config": "^0.6.5",
     "eslint": "4.9.0",
     "eslint-plugin-ember": "^5.0.0",
     "eslint-plugin-node": "^5.2.1",
