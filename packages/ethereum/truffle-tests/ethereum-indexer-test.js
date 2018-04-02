@@ -78,7 +78,8 @@ contract('SampleToken', function(accounts) {
                 addresses: { master: token.address },
                 eventContentTriggers: {
                   Transfer: [ "sample-token-balance-ofs" ],
-                  Mint: [ "sample-token-balance-ofs" ]
+                  Mint: [ "sample-token-balance-ofs" ],
+                  WhiteList: [ "sample-token-approved-buyers", "sample-token-custom-buyer-limits" ]
                 }
               }
             }
@@ -126,6 +127,10 @@ contract('SampleToken', function(accounts) {
                 {
                   "type": "fields",
                   "id": "sample-token-total-supply"
+                },
+                {
+                  "type": "fields",
+                  "id": "sample-token-balance-limit"
                 },
                 {
                   "id": "sample-token-owner",
@@ -191,6 +196,71 @@ contract('SampleToken', function(accounts) {
                 {
                   "type": "fields",
                   "id": "mapping-number-value"
+                },
+                {
+                  "type": "fields",
+                  "id": "sample-token-contract"
+                }
+              ]
+            },
+            "data-source": {
+              "data": {
+                "type": "data-sources",
+                "id": dataSource.id
+              }
+            }
+          }
+        }
+      });
+
+
+      schema = await env.lookup('hub:searchers').get(env.session, 'master', 'content-types', 'sample-token-custom-buyer-limits');
+      expect(schema).to.deep.equal({
+        "data": {
+          "type": "content-types",
+          "id": "sample-token-custom-buyer-limits",
+          "relationships": {
+            "fields": {
+              "data": [
+                {
+                  "type": "fields",
+                  "id": "ethereum-address"
+                },
+                {
+                  "type": "fields",
+                  "id": "mapping-number-value"
+                },
+                {
+                  "type": "fields",
+                  "id": "sample-token-contract"
+                }
+              ]
+            },
+            "data-source": {
+              "data": {
+                "type": "data-sources",
+                "id": dataSource.id
+              }
+            }
+          }
+        }
+      });
+
+      schema = await env.lookup('hub:searchers').get(env.session, 'master', 'content-types', 'sample-token-approved-buyers');
+      expect(schema).to.deep.equal({
+        "data": {
+          "type": "content-types",
+          "id": "sample-token-approved-buyers",
+          "relationships": {
+            "fields": {
+              "data": [
+                {
+                  "type": "fields",
+                  "id": "ethereum-address"
+                },
+                {
+                  "type": "fields",
+                  "id": "mapping-boolean-value"
                 },
                 {
                   "type": "fields",
@@ -323,6 +393,7 @@ contract('SampleToken', function(accounts) {
           "attributes": {
             "ethereum-address": token.address,
             "balance-wei": "10000000000000000",
+            "sample-token-balance-limit": "0",
             "sample-token-minting-finished": false,
             "sample-token-name": "SampleToken",
             "sample-token-total-supply": "0",
@@ -377,6 +448,89 @@ contract('SampleToken', function(accounts) {
 
       let accountTwoLedgerEntry = await env.lookup('hub:searchers').get(env.session, 'master', 'sample-token-balance-ofs', accountTwo);
       expect(accountTwoLedgerEntry.data.attributes["mapping-number-value"]).to.equal("10", "the token balance is correct");
+    });
+
+    it("indexes mapping entry content with different field types for the same event", async function() {
+      try {
+        await env.lookup('hub:searchers').get(env.session, 'master', 'sample-token-custom-buyer-limits', accountOne);
+        throw new Error("sample-token-custom-buyer-limits record should not exist for this address");
+      } catch (err) {
+        expect(err.message).to.equal(`No such resource master/sample-token-custom-buyer-limits/${accountOne}`);
+      }
+
+      try {
+        await env.lookup('hub:searchers').get(env.session, 'master', 'sample-token-approved-buyers', accountOne);
+        throw new Error("sample-token-approved-buyers record should not exist for this address");
+      } catch (err) {
+        expect(err.message).to.equal(`No such resource master/sample-token-approved-buyers/${accountOne}`);
+      }
+
+      try {
+        await env.lookup('hub:searchers').get(env.session, 'master', 'sample-token-custom-buyer-limits', accountTwo);
+        throw new Error("sample-token-custom-buyer-limits record should not exist for this address");
+      } catch (err) {
+        expect(err.message).to.equal(`No such resource master/sample-token-custom-buyer-limits/${accountTwo}`);
+      }
+
+      try {
+        await env.lookup('hub:searchers').get(env.session, 'master', 'sample-token-approved-buyers', accountTwo);
+        throw new Error("sample-token-approved-buyers record should not exist for this address");
+      } catch (err) {
+        expect(err.message).to.equal(`No such resource master/sample-token-approved-buyers/${accountTwo}`);
+      }
+
+      await token.addBuyer(accountOne);
+      await token.setCustomBuyer(accountTwo, 10);
+      await waitForEthereumEvents(ethereumService);
+      await env.lookup('hub:indexers').update({ forceRefresh: true });
+
+      let accountOneApprovedBuyer = await env.lookup('hub:searchers').get(env.session, 'master', 'sample-token-approved-buyers', accountOne);
+      accountOneApprovedBuyer.data.attributes["ethereum-address"] = accountOneApprovedBuyer.data.attributes["ethereum-address"].toLowerCase();
+      expect(accountOneApprovedBuyer).to.deep.equal({
+        "data": {
+          "id": accountOne,
+          "type": "sample-token-approved-buyers",
+          "attributes": {
+            "ethereum-address": accountOne,
+            "mapping-boolean-value": true
+          },
+          "relationships": {
+            "sample-token-contract": {
+              "data": {
+                "id": token.address,
+                "type": "sample-tokens"
+              }
+            }
+          }
+        }
+      });
+
+      let accountOneCustomBuyerLimit = await env.lookup('hub:searchers').get(env.session, 'master', 'sample-token-custom-buyer-limits', accountOne);
+      accountOneCustomBuyerLimit.data.attributes["ethereum-address"] = accountOneCustomBuyerLimit.data.attributes["ethereum-address"].toLowerCase();
+      expect(accountOneCustomBuyerLimit).to.deep.equal({
+        "data": {
+          "id": accountOne,
+          "type": "sample-token-custom-buyer-limits",
+          "attributes": {
+            "ethereum-address": accountOne,
+            "mapping-number-value": "0"
+          },
+          "relationships": {
+            "sample-token-contract": {
+              "data": {
+                "id": token.address,
+                "type": "sample-tokens"
+              }
+            }
+          }
+        }
+      });
+
+      let accountTwoApprovedBuyer = await env.lookup('hub:searchers').get(env.session, 'master', 'sample-token-approved-buyers', accountTwo);
+      expect(accountTwoApprovedBuyer.data.attributes["mapping-boolean-value"]).to.equal(true, "the mapping-boolean-value is correct");
+
+      let accountTwoCustomBuyerLimit = await env.lookup('hub:searchers').get(env.session, 'master', 'sample-token-custom-buyer-limits', accountTwo);
+      expect(accountTwoCustomBuyerLimit.data.attributes["mapping-number-value"]).to.equal("10", "the mapping-number-value is correct");
     });
 
   });
