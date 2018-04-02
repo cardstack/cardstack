@@ -10,7 +10,8 @@ module.exports = {
     'plugin:ember/recommended'
   ],
   env: {
-    browser: true
+    browser: true,
+    es6: true
   },
   rules: {
     // TODO: turn these on

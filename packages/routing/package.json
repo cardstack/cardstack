@@ -25,7 +25,7 @@
     "ember-cli-babel": "^6.8.2",
     "ember-cli-htmlbars": "^2.0.1",
     "ember-href-to": "^1.13.0",
-    "ember-inflector": "^1.11.0"
+    "ember-inflector": "^2.1.0"
   },
   "devDependencies": {
     "@cardstack/eslint-config": "^0.6.5",

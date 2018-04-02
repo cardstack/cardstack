@@ -32,7 +32,7 @@
     "ember-cli-htmlbars": "^2.0.1",
     "ember-css-url": "0.2.0",
     "ember-fetch": "^1.4.0",
-    "ember-inflector": "^1.11.0",
+    "ember-inflector": "^2.1.0",
     "ember-simple-auth": "^1.2.2",
     "handlebars": "^4.0.6",
     "koa-better-route": "^0.1.0",
