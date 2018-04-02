@@ -169,15 +169,19 @@ class Updater {
       if (!branch || !type || !id || !contract || isContractType) { continue; }
 
       let contractAddress = this.contracts[contract].addresses[branch];
-      let data = await this.ethereumService.getContractInfoFromHint({ id, type, branch, contract });
+      let { data, methodName } = await this.ethereumService.getContractInfoFromHint({ id, type, branch, contract });
+      let methodAbiEntry = this.contracts[contract]["abi"].find(item => item.type === 'function' &&
+                                                                        item.constant &&
+                                                                        item.name === methodName);
+      let fieldName = this._fieldTypeFor(contract, methodAbiEntry);
       let model = {
         type,
         attributes: {
-          'ethereum-address': id, // preserve the case of the ID here to faithfully represent EIP-55 encoding
-          'mapping-number-value': data,
+          'ethereum-address': id // preserve the case of the ID here to faithfully represent EIP-55 encoding
         },
         relationships: {}
       };
+      model.attributes[fieldName] = data;
       model.relationships[`${contract}-contract`] = {
         data: { id: contractAddress, type: pluralize(contract) }
       };
