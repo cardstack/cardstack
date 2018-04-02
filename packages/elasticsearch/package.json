@@ -1,6 +1,6 @@
 {
   "name": "@cardstack/elasticsearch",
-  "version": "0.6.5",
+  "version": "0.6.6",
   "author": "Edward Faulkner <edward@eaf4.com>",
   "repository": "https://github.com/cardstack/cardstack",
   "keywords": [
@@ -10,15 +10,15 @@
     "api-version": 1
   },
   "dependencies": {
-    "@cardstack/di": "^0.6.5",
+    "@cardstack/di": "^0.6.6",
     "@cardstack/logger": "^0.1.0",
-    "@cardstack/plugin-utils": "^0.6.5",
+    "@cardstack/plugin-utils": "^0.6.6",
     "elasticsearch": "^12.1.3",
     "jsondiffpatch": "^0.2.5",
     "lodash": "^4.17.4"
   },
   "devDependencies": {
-    "@cardstack/eslint-config": "^0.6.5",
+    "@cardstack/eslint-config": "^0.6.6",
     "eslint": "4.9.0",
     "eslint-plugin-ember": "^5.0.0",
     "eslint-plugin-node": "^5.2.1"
