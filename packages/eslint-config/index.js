@@ -17,7 +17,8 @@ module.exports = {
     'node/no-extraneous-require': ['error', {
       'allowModules': []
     }],
-    'node/no-missing-require': ['error']
+    'node/no-missing-require': ['error'],
+    'no-undef': 'error'
   }),
   plugins: ['node']
 };
