@@ -22,7 +22,7 @@ module.exports = {
   },
   overrides: [
     // This loads our node rules
-    Object.assign({}, require('./index'), {
+    Object.assign({}, require('./-node'), {
       // And applies them to all the paths that are node paths in a
       // standard ember-addon
       files: [

@@ -1,4 +1,4 @@
-module.exports = Object.assign({}, require('./index'), {
+module.exports = Object.assign({}, require('./-node'), {
   globals: {
     describe: false,
     it: false,
