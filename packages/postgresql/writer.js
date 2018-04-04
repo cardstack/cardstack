@@ -12,11 +12,12 @@ module.exports = class Writer {
   static create(params) {
     return new this(params);
   }
-  constructor({ branches, dataSource, renameColumns, renameTables }) {
+  constructor({ branches, dataSource, renameColumns, renameTables, checkpoints }) {
     this.branchConfig = branches;
     this.pools = Object.create(null);
     this.schemas = Object.create(null);
     this.dataSource = dataSource;
+    this.checkpoints = checkpoints;
     this.mapper = new NameMapper(renameTables, renameColumns);
   }
 
@@ -114,9 +115,17 @@ module.exports = class Writer {
   }
 
   async prepareApplyCheckpoint(branch, session, type, document/*, isSchema*/) {
-    let sqlStatements = get(document, 'attributes.params.sql-statements');
-    if (!sqlStatements || !Array.isArray(sqlStatements)) {
-      throw new Error("The checkpoint restore for the @cardstack/postgresql data source does not specify a params.sql-statements as an array", { status: 400 });
+    let relatedCheckpointId = get(document, 'relationships.checkpoint.data.id');
+    if (!relatedCheckpointId) {
+      throw new Error('The checkpoint restore does not refer to an checkpoint id.', { status: 400 });
+    }
+    let checkpoint = get(this.checkpoints, relatedCheckpointId);
+    if (!checkpoint) {
+      throw new Error(`The related checkpoint id ${relatedCheckpointId} does not exist for the data source ${this.dataSource.id}.`, { status: 400 });
+    }
+    let sqlStatements = get(checkpoint, 'attributes.params.sql-statements');
+    if (!sqlStatements || !Array.isArray(sqlStatements) || !sqlStatements.length) {
+      throw new Error(`There are no sql statements to execute for the checkpoint ${relatedCheckpointId}.`, { status: 400 });
     }
 
     let client = await this._getPool(branch).connect();

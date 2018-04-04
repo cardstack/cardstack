@@ -45,6 +45,14 @@ describe('postgresql/writer', function() {
             articles: {
               alt_topic: 'topic'
             }
+          },
+          checkpoints: {
+            eraseArticles: {
+              type: 'checkpoints',
+              attributes: {
+                params: { 'sql-statements': [ 'delete from articles' ] }
+              }
+            }
           }
         }
       });
@@ -252,7 +260,7 @@ describe('postgresql/writer', function() {
     expect(result.favorite_toy).to.equal(snakeModel.id);
   });
 
-  it('cannot create a checkpoint', async function() {
+  it('cannot create a new checkpoint', async function() {
     let response = await request.post(`/api/checkpoints`)
       .set('authorization', `Bearer ${ciSessionId}`)
       .send({
@@ -263,7 +271,7 @@ describe('postgresql/writer', function() {
     expect(response).hasStatus(400);
   });
 
-  it('can restore a checkpoint using sql statements', async function() {
+  it('can restore a checkpoint that was created via data source config', async function() {
     let result = await client.query('select * from articles');
     expect(result.rows).has.length(1);
 
@@ -272,10 +280,8 @@ describe('postgresql/writer', function() {
       .send({
         data: {
           type: 'restores',
-          attributes: {
-            params: { 'sql-statements': [ 'delete from articles' ] }
-          },
           relationships: {
+            checkpoint: { data: { type: 'checkpoints', id: 'eraseArticles' } },
             'checkpoint-data-source': { data: { type: 'data-sources', id: dataSourceId } }
           }
         }

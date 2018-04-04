@@ -29,9 +29,7 @@ class Updater {
         },
         relationships: {
           'related-types': {
-            data: [
-              { type: 'content-types', id: 'data-sources' }
-            ]
+            data: [ { type: 'content-types', id: 'data-sources' } ]
           }
         }
       },
@@ -43,9 +41,7 @@ class Updater {
         },
         relationships: {
           'related-types': {
-            data: [
-              { type: 'content-types', id: 'checkpoints' }
-            ]
+            data: [ { type: 'content-types', id: 'checkpoints' } ]
           }
         }
       },
@@ -58,11 +54,13 @@ class Updater {
         relationships: {
           'data-source': { data: { type: 'data-sources', id: this.dataSourceId } },
           fields: {
-            data: [ { type: 'fields', id: 'checkpoint-data-source' } ]
+            data: [ { type: 'fields', id: 'params' },
+                    { type: 'fields', id: 'checkpoint-data-source' } ]
           }
         }
       },
-      { type: 'content-types',
+      {
+        type: 'content-types',
         id: 'restores',
         attributes: {
           'is-built-in': true
@@ -71,8 +69,7 @@ class Updater {
           'data-source': { data: { type: 'data-sources', id: this.dataSourceId } },
           fields: {
             data: [ { type: 'fields', id: 'checkpoint' },
-                    { type: 'fields', id: 'checkpoint-data-source' },
-                    { type: 'fields', id: 'params' } ]
+                    { type: 'fields', id: 'checkpoint-data-source' } ]
           }
         }
       }
