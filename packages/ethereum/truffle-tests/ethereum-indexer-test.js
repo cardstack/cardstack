@@ -77,8 +77,8 @@ contract('SampleToken', function(accounts) {
                 abi: token.abi,
                 addresses: { master: token.address },
                 eventContentTriggers: {
-                  Transfer: [ "sample-token-balance-of" ],
-                  Mint: [ "sample-token-balance-of" ]
+                  Transfer: [ "sample-token-balance-ofs" ],
+                  Mint: [ "sample-token-balance-ofs" ]
                 }
               }
             }
@@ -99,10 +99,10 @@ contract('SampleToken', function(accounts) {
     afterEach(teardown);
 
     it('can generate schema from ERC-20 contract`s ABI', async function() {
-      let schema = await env.lookup('hub:searchers').get(env.session, 'master', 'content-types', 'sample-token');
+      let schema = await env.lookup('hub:searchers').get(env.session, 'master', 'content-types', 'sample-tokens');
       expect(schema).to.deep.equal({
         "data": {
-          "id": "sample-token",
+          "id": "sample-tokens",
           "type": "content-types",
           "relationships": {
             "fields": {
@@ -160,7 +160,7 @@ contract('SampleToken', function(accounts) {
             "types": {
               "data": [
                 {
-                  "id": "sample-token",
+                  "id": "sample-tokens",
                   "type": "content-types"
                 }
               ]
@@ -176,11 +176,11 @@ contract('SampleToken', function(accounts) {
       });
 
 
-      schema = await env.lookup('hub:searchers').get(env.session, 'master', 'content-types', 'sample-token-balance-of');
+      schema = await env.lookup('hub:searchers').get(env.session, 'master', 'content-types', 'sample-token-balance-ofs');
       expect(schema).to.deep.equal({
         "data": {
           "type": "content-types",
-          "id": "sample-token-balance-of",
+          "id": "sample-token-balance-ofs",
           "relationships": {
             "fields": {
               "data": [
@@ -227,7 +227,7 @@ contract('SampleToken', function(accounts) {
             "types": {
               "data": [
                 {
-                  "id": "sample-token-balance-of",
+                  "id": "sample-token-balance-ofs",
                   "type": "content-types"
                 }
               ]
@@ -304,7 +304,7 @@ contract('SampleToken', function(accounts) {
               "data": [
                 {
                   "type": "content-types",
-                  "id": "sample-token"
+                  "id": "sample-tokens"
                 }
               ]
             }
@@ -314,12 +314,12 @@ contract('SampleToken', function(accounts) {
     });
 
     it("indexes a contract", async function() {
-      let contract = await env.lookup('hub:searchers').get(env.session, 'master', 'sample-token', token.address);
+      let contract = await env.lookup('hub:searchers').get(env.session, 'master', 'sample-tokens', token.address);
       contract.data.attributes["sample-token-owner"] = contract.data.attributes["sample-token-owner"].toLowerCase();
       expect(contract).to.deep.equal({
         "data": {
           "id": token.address,
-          "type": "sample-token",
+          "type": "sample-tokens",
           "attributes": {
             "ethereum-address": token.address,
             "balance-wei": "10000000000000000",
@@ -335,17 +335,17 @@ contract('SampleToken', function(accounts) {
 
     it("indexes mapping entry content types when a contract fires an ethereum event", async function() {
       try {
-        await env.lookup('hub:searchers').get(env.session, 'master', 'sample-token-balance-of', accountOne);
+        await env.lookup('hub:searchers').get(env.session, 'master', 'sample-token-balance-ofs', accountOne);
         throw new Error("balance-of record should not exist for this address");
       } catch (err) {
-        expect(err.message).to.equal(`No such resource master/sample-token-balance-of/${accountOne}`);
+        expect(err.message).to.equal(`No such resource master/sample-token-balance-ofs/${accountOne}`);
       }
 
       try {
-        await env.lookup('hub:searchers').get(env.session, 'master', 'sample-token-balance-of', accountTwo);
+        await env.lookup('hub:searchers').get(env.session, 'master', 'sample-token-balance-ofs', accountTwo);
         throw new Error("balance-of record should not exist for this address");
       } catch (err) {
-        expect(err.message).to.equal(`No such resource master/sample-token-balance-of/${accountTwo}`);
+        expect(err.message).to.equal(`No such resource master/sample-token-balance-ofs/${accountTwo}`);
       }
 
       await token.mint(accountOne, 100);
@@ -353,13 +353,13 @@ contract('SampleToken', function(accounts) {
 
       await waitForEthereumEvents(ethereumService);
 
-      let accountOneLedgerEntry = await env.lookup('hub:searchers').get(env.session, 'master', 'sample-token-balance-of', accountOne);
+      let accountOneLedgerEntry = await env.lookup('hub:searchers').get(env.session, 'master', 'sample-token-balance-ofs', accountOne);
       expect(accountOneLedgerEntry.data.attributes["ethereum-address"]).to.not.equal(accountOneLedgerEntry.data.id, 'the case between the addresses is different');
       accountOneLedgerEntry.data.attributes["ethereum-address"] = accountOneLedgerEntry.data.attributes["ethereum-address"].toLowerCase();
       expect(accountOneLedgerEntry).to.deep.equal({
         "data": {
           "id": accountOne,
-          "type": "sample-token-balance-of",
+          "type": "sample-token-balance-ofs",
           "attributes": {
             "ethereum-address": accountOne,
             "mapping-number-value": "90"
@@ -368,14 +368,14 @@ contract('SampleToken', function(accounts) {
             "sample-token-contract": {
               "data": {
                 "id": token.address,
-                "type": "sample-token"
+                "type": "sample-tokens"
               }
             }
           }
         }
       });
 
-      let accountTwoLedgerEntry = await env.lookup('hub:searchers').get(env.session, 'master', 'sample-token-balance-of', accountTwo);
+      let accountTwoLedgerEntry = await env.lookup('hub:searchers').get(env.session, 'master', 'sample-token-balance-ofs', accountTwo);
       expect(accountTwoLedgerEntry.data.attributes["mapping-number-value"]).to.equal("10", "the token balance is correct");
     });
 
@@ -424,13 +424,13 @@ contract('SampleToken', function(accounts) {
 
     it('can update contract document from event content trigger', async function() {
 
-      let contract = await env.lookup('hub:searchers').get(env.session, 'master', 'sample-token', token.address);
+      let contract = await env.lookup('hub:searchers').get(env.session, 'master', 'sample-tokens', token.address);
       expect(contract.data.attributes['sample-token-minting-finished']).to.equal(false, 'the minting-finished field is correct');
 
       await token.finishMinting();
       await waitForEthereumEvents(ethereumService);
 
-      contract = await env.lookup('hub:searchers').get(env.session, 'master', 'sample-token', token.address);
+      contract = await env.lookup('hub:searchers').get(env.session, 'master', 'sample-tokens', token.address);
       expect(contract.data.attributes['sample-token-minting-finished']).to.equal(true, 'the minting-finished field is correct');
     });
   });
@@ -459,8 +459,8 @@ contract('SampleToken', function(accounts) {
                 abi: token.abi,
                 addresses: { master: token.address },
                 eventContentTriggers: {
-                  Transfer: [ "sample-token-balance-of" ],
-                  Mint: [ "sample-token-balance-of" ]
+                  Transfer: [ "sample-token-balance-ofs" ],
+                  Mint: [ "sample-token-balance-ofs" ]
                 }
               }
             }
@@ -481,9 +481,9 @@ contract('SampleToken', function(accounts) {
     afterEach(teardown);
 
     it("can index past events on the contract", async function() {
-      let accountOneLedgerEntry = await env.lookup('hub:searchers').get(env.session, 'master', 'sample-token-balance-of', accountOne.toLowerCase());
-      let accountTwoLedgerEntry = await env.lookup('hub:searchers').get(env.session, 'master', 'sample-token-balance-of', accountTwo.toLowerCase());
-      let accountThreeLedgerEntry = await env.lookup('hub:searchers').get(env.session, 'master', 'sample-token-balance-of', accountThree.toLowerCase());
+      let accountOneLedgerEntry = await env.lookup('hub:searchers').get(env.session, 'master', 'sample-token-balance-ofs', accountOne.toLowerCase());
+      let accountTwoLedgerEntry = await env.lookup('hub:searchers').get(env.session, 'master', 'sample-token-balance-ofs', accountTwo.toLowerCase());
+      let accountThreeLedgerEntry = await env.lookup('hub:searchers').get(env.session, 'master', 'sample-token-balance-ofs', accountThree.toLowerCase());
 
       expect(accountOneLedgerEntry.data.attributes["mapping-number-value"]).to.equal("50", "the token balance is correct");
       expect(accountTwoLedgerEntry.data.attributes["mapping-number-value"]).to.equal("13", "the token balance is correct");

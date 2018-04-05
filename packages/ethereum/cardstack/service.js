@@ -1,5 +1,6 @@
 const Ember = require('ember-source/dist/ember.debug');
 const { dasherize, camelize, capitalize } = Ember.String;
+const { pluralize, singularize } = require('inflection');
 const Web3 = require('web3');
 const log = require('@cardstack/logger')('cardstack/ethereum/service');
 const { declareInjections } = require('@cardstack/di');
@@ -123,7 +124,16 @@ class EthereumService {
     this._processQueue();
   }
 
-  async getContractInfo({ branch, contract }) {
+  async getContractInfo({ branch, contract, type }) {
+    if (!contract && type) {
+      log.debug(`getting all top level contract info for contract type: ${type}, branch: ${branch}`);
+      if (this._contractDefinitions[singularize(type)]) {
+        contract = singularize(type);
+      } else {
+        contract = type;
+      }
+    }
+
     log.debug(`getting all top level contract info for contract: ${contract}, branch: ${branch}`);
     let contractDefinition = this._contractDefinitions[contract];
     if (!contractDefinition) { throw new Error(`cannot find contract with branch: ${branch}, contract name: ${contract}`); }
@@ -150,7 +160,7 @@ class EthereumService {
       attributes[`${contract}-${dasherize(method)}`] = await aContract.methods[method]().call();
     }
 
-    let model = { id: address, type: contract, attributes };
+    let model = { id: address, type: pluralize(contract), attributes };
 
     log.trace(`retrieved contract model for contract ${contract}, branch ${branch}, address ${address}: ${JSON.stringify(model, null, 2)}`);
     return model;
@@ -171,8 +181,17 @@ class EthereumService {
     }
 
     let aContract = this._contracts[branch][contract];
-    let contractMethod = typeof aContract.methods[method] === 'function' ? aContract.methods[method] :
-                                                                           aContract.methods[capitalize(method)];
+    let contractMethod;
+    if (typeof aContract.methods[method] === 'function') {
+      contractMethod = aContract.methods[method];
+    } else if (typeof aContract.methods[singularize(method)] === 'function') {
+      contractMethod = aContract.methods[singularize(method)];
+    } else if (typeof aContract.methods[capitalize(method)] === 'function') {
+      contractMethod = aContract.methods[capitalize(method)];
+    } else if (typeof aContract.methods[singularize(capitalize(method))] === 'function') {
+      contractMethod = aContract.methods[singularize(capitalize(method))];
+    }
+
     let contractInfo = await contractMethod(id).call();
     log.debug(`retrieved contract data for contract ${contract}.${method}(${id || ''}): ${contractInfo}`);
     return contractInfo;
@@ -243,7 +262,7 @@ class EthereumService {
   }
 
   _generateHintsFromEvent({ branch, contract, event }) {
-    let contractHint = { branch, type: contract, id: this._contractDefinitions[contract].addresses[branch], isContractType: true };
+    let contractHint = { branch, type: pluralize(contract), id: this._contractDefinitions[contract].addresses[branch], isContractType: true };
     let addressParams = this._eventDefinitions[contract][event.event].inputs.filter(input => input.type === 'address');
     let addresses = addressParams.map(param => event.returnValues[param.name]).filter(address => address !== NULL_ADDRESS);
     let contentTypes = this._contractDefinitions[contract].eventContentTriggers ? this._contractDefinitions[contract].eventContentTriggers[event.event] : null;

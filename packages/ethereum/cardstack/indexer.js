@@ -1,5 +1,6 @@
 const Ember = require('ember-source/dist/ember.debug');
 const { dasherize } = Ember.String;
+const { pluralize } = require('inflection');
 const { isEqual } = require('lodash');
 const log = require('@cardstack/logger')('cardstack/ethereum/indexer');
 const { declareInjections } = require('@cardstack/di');
@@ -97,7 +98,7 @@ class Updater {
 
       let contractSchema =  {
         type: 'content-types',
-        id: contractName,
+        id: pluralize(contractName),
         relationships: {
           fields: {
             data: [
@@ -155,7 +156,7 @@ class Updater {
       }
     } else {
       for (let { branch, type } of contractHints) {
-        let model = await this.ethereumService.getContractInfo({ branch, contract: type });
+        let model = await this.ethereumService.getContractInfo({ branch, type });
         await ops.save(model.type, model.id, model);
       }
     }
@@ -178,7 +179,7 @@ class Updater {
         relationships: {}
       };
       model.relationships[`${contract}-contract`] = {
-        data: { id: contractAddress, type: contract }
+        data: { id: contractAddress, type: pluralize(contract) }
       };
 
       await ops.save(type, id.toLowerCase(), model);
@@ -206,7 +207,7 @@ class Updater {
       relationships: {
         "related-types": {
           "data": [
-            { "type": "content-types", "id": contractName }
+            { "type": "content-types", "id": pluralize(contractName) }
           ]
         },
       }
@@ -216,7 +217,7 @@ class Updater {
   _mappingFieldFor(contractName, fieldName, valueType) {
     return {
       type: "content-types",
-      id: `${contractName}-${dasherize(fieldName)}`,
+      id: pluralize(`${contractName}-${dasherize(fieldName)}`),
       relationships: {
         fields: {
           data: [
@@ -246,7 +247,7 @@ class Updater {
         },
         types: {
           "data": [
-            { type: "content-types", id: contentType }
+            { type: "content-types", id: pluralize(contentType) }
           ]
         }
       }
