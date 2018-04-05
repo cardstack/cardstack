@@ -1,6 +1,6 @@
 {
   "name": "@cardstack/ephemeral",
-  "version": "0.6.6",
+  "version": "0.6.7",
   "keywords": [
     "cardstack-plugin"
   ],
@@ -8,13 +8,13 @@
     "api-version": 1
   },
   "dependencies": {
-    "@cardstack/di": "^0.6.6",
+    "@cardstack/di": "^0.6.7",
     "@cardstack/logger": "^0.1.0",
-    "@cardstack/plugin-utils": "^0.6.6",
+    "@cardstack/plugin-utils": "^0.6.7",
     "lodash": "^4.17.4"
   },
   "devDependencies": {
-    "@cardstack/eslint-config": "^0.6.6",
+    "@cardstack/eslint-config": "^0.6.7",
     "eslint": "4.9.0",
     "eslint-plugin-ember": "^5.0.0",
     "eslint-plugin-node": "^5.2.1",
