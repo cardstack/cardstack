@@ -6,6 +6,7 @@ const fs = require('fs');
 
 const seedsFolder = 'seeds';
 const dataSourcesFolder = 'data-sources';
+const defaultTestingToken = 'testing-token';
 
 function commandLineOptions() {
   commander
@@ -67,6 +68,8 @@ HUB_ENVIRONMENT                   The environment the hub is running in. Possibl
 
   if (process.env.CI_SESSION_ID) {
     commander.ciSessionId = process.env.CI_SESSION_ID;
+  } else if (process.env.HUB_ENVIRONMENT === 'test') {
+    commander.ciSessionId = defaultTestingToken;
   }
 
   commander.environment = process.env.HUB_ENVIRONMENT || "development";
@@ -103,5 +106,6 @@ module.exports = {
   commandLineOptions,
   seedsFolder,
   loadModels,
-  dataSourcesFolder
+  dataSourcesFolder,
+  defaultTestingToken
 };

@@ -113,27 +113,6 @@ module.exports = class Writer {
 
   }
 
-  async prepareApplyCheckpoint(branch, session, type, document/*, isSchema*/) {
-    let sqlStatements = get(document, 'attributes.params.sql-statements');
-    if (!sqlStatements || !Array.isArray(sqlStatements)) {
-      throw new Error("The checkpoint restore for the @cardstack/postgresql data source does not specify a params.sql-statements as an array", { status: 400 });
-    }
-
-    let client = await this._getPool(branch).connect();
-    try {
-      await client.query('begin');
-      for (let sql of sqlStatements) {
-        await client.query(sql);
-      }
-      let change = new PendingChange(null, document, finalize, abort);
-      pendingChanges.set(change, { client });
-      return change;
-    } catch (err) {
-      await client.release();
-      rethrowNicerError(err);
-    }
-  }
-
   _prepareQuery(isSchema, branch, type, document) {
     if (isSchema) {
       throw new Error("The @cardstack/postgresql data source does not support schema creation", { status: 400 });

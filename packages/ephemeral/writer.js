@@ -87,14 +87,6 @@ module.exports = declareInjections({
     return pending;
   }
 
-  async prepareCreateCheckpoint(branch, session, type, document, isSchema) {
-    return this.prepareCreate(branch, session, type, document, isSchema);
-  }
-
-  async prepareApplyCheckpoint(branch, session, type, document, isSchema) {
-    return this.prepareCreate(branch, session, type, document, isSchema);
-  }
-
   _generateId() {
     return crypto.randomBytes(20).toString('hex');
   }

@@ -51,8 +51,6 @@ module.exports = declareInjections({
           storage.store(model.type, model.id, model, isSchema);
         }
       }
-      // the special "empty" checkpoint is always available
-      storage.makeCheckpoint('empty');
     }
     return storage;
   }

@@ -53,13 +53,6 @@ module.exports = [
     }
   },
   {
-    type: 'data-sources',
-    id: 'test-support',
-    attributes: {
-      'source-type': '@cardstack/test-support',
-    }
-  },
-  {
     type: 'plugin-configs',
     id: '@cardstack/hub',
     relationships: {
