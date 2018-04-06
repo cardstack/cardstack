@@ -21,17 +21,25 @@ class BranchUpdate {
     this.read = this.read.bind(this);
   }
 
-  async addIndexer(indexer) {
+  async addDataSource(dataSource) {
     if (this._schema) {
       throw new Error("Bug in hub indexing. Something tried to add an indexer after we had already established the schema");
     }
+    let indexer = dataSource.indexer;
+    if (!indexer) {
+      return [];
+    }
     let updater = await indexer.beginUpdate(this.branch);
-    let dataSource = owningDataSource.get(indexer);
     owningDataSource.set(updater, dataSource);
     let newModels = await updater.schema();
     this.schemaModels.push(newModels);
     this.updaters[dataSource.id] = updater;
     return newModels;
+  }
+
+  addStaticModels(schemaModels, allModels) {
+    this.schemaModels = this.schemaModels.concat(schemaModels);
+    this.updaters['static-models'].staticModels = allModels;
   }
 
   async schema() {
@@ -258,4 +266,3 @@ class BranchUpdate {
 }
 
 exports.BranchUpdate = BranchUpdate;
-exports.owningDataSource = owningDataSource;

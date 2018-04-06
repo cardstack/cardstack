@@ -38,6 +38,14 @@ class Updater {
   constructor(models, schemaModels) {
     this.models = models;
     this.schemaModels = schemaModels;
+
+    // because we are special and built into the hub, this gets set
+    // magically for us after the schema() hook but before the
+    // updateContent() hook. We cannot return the static schema models
+    // ourselves from our schema() hook because the full set of schema
+    // models isn't known until the complete crawl of all data sources
+    // (including ours) has happened.
+    this.staticModels = null;
   }
 
   async schema() {
@@ -45,7 +53,7 @@ class Updater {
   }
 
   async updateContent(meta, hints, ops) {
-    let { models } = this;
+    let models = this.models.concat(this.staticModels);
     if (meta && isEqual(meta.models, models)) {
       return { models };
     }
@@ -58,6 +66,7 @@ class Updater {
   }
 
   async read(type, id /*, isSchema */) {
-    return this.models.find(m => m.type === type && m.id === id);
+    let matches = m => m.type === type && m.id === id;
+    return this.models.find(matches) || this.staticModels.find(matches);
   }
 }

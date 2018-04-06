@@ -14,7 +14,9 @@ module.exports = class DataSource {
     this._searcher = null;
     this._Authenticator = plugins.lookupFeatureFactory('authenticators', this.sourceType);
     this._authenticator = null;
-    if (!this._Writer && !this._Indexer && !this._Searcher && !this._Authenticator) {
+    this._StaticModels = plugins.lookupFeatureFactory('static-models', this.sourceType);
+    this._staticModels = null;
+    if (!this._Writer && !this._Indexer && !this._Searcher && !this._Authenticator && !this._StaticModels) {
       throw new Error(`${this.sourceType} is either missing or does not appear to be a valid data source plugin`);
     }
     this.mayCreateUser = !!model.attributes['may-create-user'];
@@ -46,6 +48,16 @@ module.exports = class DataSource {
       this._authenticator = this._Authenticator.create(this._params);
     }
     return this._authenticator;
+  }
+  get staticModels() {
+    if (!this._staticModels) {
+      if (this._StaticModels) {
+        this._staticModels = this._StaticModels.class.call(null, this._params);
+      } else {
+        this._staticModels = [];
+      }
+    }
+    return this._staticModels;
   }
   async teardown() {
     if (this._writer && typeof this._writer.teardown === 'function') {
