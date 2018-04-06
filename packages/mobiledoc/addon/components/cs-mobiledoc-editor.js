@@ -21,7 +21,10 @@ export default Component.extend({
     yield timeout(500); // this debounces changes so that we're not
                         // propagating things up to the model on every
                         // keystroke, which can cause laggy typing.
-    this.sendAction('on-change', doc);
+    let handler = this.get('on-change');
+    if (handler) {
+      handler(doc);
+    }
     this._nextDoc = null;
   }).restartable(),
 
@@ -30,7 +33,10 @@ export default Component.extend({
       // If there were changes pending in the debouncer, hurry them
       // out before we're destroyed.
       this.get('onChange').cancelAll();
-      this.sendAction('on-change', this._nextDoc);
+      let handler = this.get('on-change');
+      if (handler) {
+        handler(this._nextDoc);
+      }
     }
     this._super();
   },

@@ -17,7 +17,7 @@ export default Component.extend({
     },
 
     updateImage() {
-      this.sendAction('updateImage', this.get('dataURL'));
+      this.get('updateImage')(this.get('dataURL'));
     }
   }
 });

@@ -14,7 +14,6 @@ module.exports = {
     es6: true
   },
   rules: {
-    'ember/closure-actions': 'off',
     'no-restricted-globals': [2, 'find']
   },
   overrides: [

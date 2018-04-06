@@ -8,10 +8,16 @@ export default Component.extend({
   animationRules,
 
   mouseEnter(event) {
-    this.sendAction('hovered', event);
+    let hovered = this.get('hovered');
+    if (hovered) {
+      hovered(event);
+    }
   },
   mouseLeave(event) {
-    this.sendAction('unhovered', event);
+    let unhovered = this.get('unhovered');
+    if (unhovered) {
+      unhovered(event);
+    }
   },
 
   actions: {
