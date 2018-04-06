@@ -110,6 +110,20 @@ module('Integration | Models', function(hooks) {
     assert.equal(models.get('length'), 1, "the newly updated model should be immediately visible in search results");
   });
 
+  test('it can delete', async function(assert) {
+    let model = await run(() => this.store.findRecord('post', '1'));
+    await run(() => model.destroyRecord());
+
+    let notFound = false;
+    try {
+      await run(() => this.store.queryRecord('post', { filter: { title: 'world' }}));
+    } catch (err) {
+      notFound = err.errors[0].code === 404;
+    }
+
+    assert.ok(notFound, 'the deleted record could not be found');
+  });
+
   test('it can get a belongs-to relationship', async function(assert) {
     let post = await run(() => this.store.findRecord('post', '2'));
     let author = await run(() => post.get('author'));

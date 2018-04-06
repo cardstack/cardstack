@@ -4,6 +4,8 @@ import Ember from 'ember';
 import { hubURL } from '@cardstack/plugin-utils/environment';
 import injectOptional from 'ember-inject-optional';
 
+const { get } = Ember;
+
 export default DS.JSONAPIAdapter.extend(AdapterMixin, {
   host: hubURL,
   namespace: 'api',
@@ -26,6 +28,22 @@ export default DS.JSONAPIAdapter.extend(AdapterMixin, {
       returnValue.meta = response.meta;
     }
     return returnValue;
+  },
+
+  deleteRecord(store, type, snapshot) {
+    let id = snapshot.id;
+
+    let options = {};
+    let metaService = this.get('_resourceMetadata');
+    let meta = metaService.peek(snapshot.record);
+    let version = get(meta, 'version');
+
+    if (version) {
+      options.headers = { "If-Match": version };
+    }
+
+    // Note: this bypasses the `ds-improved-ajax` feature
+    return this.ajax(this.buildURL(type.modelName, id, snapshot, 'deleteRecord'), "DELETE", options);
   },
 
   ajaxOptions() {
