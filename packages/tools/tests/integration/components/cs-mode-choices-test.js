@@ -1,19 +1,21 @@
+import { run } from '@ember/runloop';
+import { computed } from '@ember/object';
+import Service from '@ember/service';
 import { module, test } from 'qunit';
 import { setupRenderingTest } from 'ember-qunit';
 import { render } from '@ember/test-helpers';
 import hbs from 'htmlbars-inline-precompile';
-import Ember from 'ember';
 
 module('Integration | Component | cs mode choices', function(hooks) {
   setupRenderingTest(hooks);
 
   hooks.beforeEach(function() {
-    this.owner.register('service:cardstack-tools', Ember.Service.extend({
+    this.owner.register('service:cardstack-tools', Service.extend({
 
       // This is the basic protocol required by cs-mode-choices: a
       // property to control, choices, and a setter function:
       favoriteColor: 'blue',
-      favoriteColorChoices: Ember.computed(function() {
+      favoriteColorChoices: computed(function() {
         return [
           { id: 'blue', description: 'Blue' },
           { id: 'red', description: 'Red' }
@@ -47,7 +49,7 @@ module('Integration | Component | cs mode choices', function(hooks) {
         </section>
       {{/cs-mode-choices}}
     `);
-    Ember.run(() => this.$('.cs-mode-button:contains(Red)').click());
+    run(() => this.$('.cs-mode-button:contains(Red)').click());
     assert.equal(this.get('tools.favoriteColor'), 'red');
   });
 });

@@ -1,7 +1,7 @@
-import Ember from 'ember';
+import Route from '@ember/routing/route';
 import { defaultBranch } from '@cardstack/plugin-utils/environment';
 
-export default Ember.Route.extend({
+export default Route.extend({
   queryParams: {
     branch: {
       refreshModel: true

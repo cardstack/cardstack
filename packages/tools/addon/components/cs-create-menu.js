@@ -1,17 +1,20 @@
-import Ember from 'ember';
+import { getOwner } from '@ember/application';
+import { computed } from '@ember/object';
+import { inject as service } from '@ember/service';
+import Component from '@ember/component';
 import layout from '../templates/components/cs-create-menu';
 import { transitionTo } from '../private-api';
 import { task } from 'ember-concurrency';
 import injectOptional from 'ember-inject-optional';
 
-export default Ember.Component.extend({
+export default Component.extend({
   layout,
   classNames: ['cs-create-menu'],
-  tools: Ember.inject.service('cardstack-tools'),
-  store: Ember.inject.service(),
+  tools: service('cardstack-tools'),
+  store: service(),
   cardstackRouting: injectOptional.service(),
 
-  availableTypes: Ember.computed(function() { return []; }),
+  availableTypes: computed(function() { return []; }),
 
   loadAvailableTypes: task(function * () {
     let types = yield this.get('store').query('content-type', { filter: { not: { 'is-built-in' : true } } });
@@ -21,7 +24,7 @@ export default Ember.Component.extend({
   actions: {
     create(which) {
       let { name, params, queryParams } = this.get('cardstackRouting').routeForNew(which.id, this.get('tools.branch'));
-      transitionTo(Ember.getOwner(this), name, params.map(p => p[1]), queryParams);
+      transitionTo(getOwner(this), name, params.map(p => p[1]), queryParams);
       this.get('tools').setActivePanel('cs-composition-panel');
       this.get('tools').setEditing(true);
     }

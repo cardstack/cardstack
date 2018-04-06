@@ -1,11 +1,12 @@
-import Ember from 'ember';
+import { helper as buildHelper } from '@ember/component/helper';
+import { get } from '@ember/object';
 
 export function modelType(model) {
   if (model) {
-    return Ember.get(model, 'type') || model.constructor.modelName;
+    return get(model, 'type') || model.constructor.modelName;
   }
 }
 
-export default Ember.Helper.helper(function([model]){
+export default buildHelper(function([model]){
   return modelType(model);
 });

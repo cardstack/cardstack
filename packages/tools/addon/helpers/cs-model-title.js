@@ -1,4 +1,4 @@
-import Ember from 'ember';
+import { helper as buildHelper } from '@ember/component/helper';
 
 let defaults = [
   'title',
@@ -17,4 +17,4 @@ export function csModelTitle([model]) {
   }
 }
 
-export default Ember.Helper.helper(csModelTitle);
+export default buildHelper(csModelTitle);

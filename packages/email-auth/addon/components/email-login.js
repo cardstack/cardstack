@@ -1,8 +1,8 @@
-import Ember from 'ember';
+import { getOwner } from '@ember/application';
+import Component from '@ember/component';
+import { inject as service } from '@ember/service';
 import layout from '../templates/components/email-login';
 import { task } from 'ember-concurrency';
-
-const { getOwner, Component, inject: { service } } = Ember;
 
 export default Component.extend({
   layout,

@@ -1,7 +1,7 @@
-import Ember from 'ember';
+import Component from '@ember/component';
 import layout from '../templates/components/cs-toggle-switch';
 
-export default Ember.Component.extend({
+export default Component.extend({
   layout,
   classNames: ['cs-toggle-switch'],
   classNameBindings: ['enabled::disabled'],

@@ -1,11 +1,12 @@
-import Ember from 'ember';
+import { warn } from '@ember/debug';
+import { inject as service } from '@ember/service';
 import Base from 'ember-simple-auth/authenticators/base';
 import RSVP from 'rsvp';
 import { hubURL } from '@cardstack/plugin-utils/environment';
 
 export default Base.extend({
-  cardstackSession: Ember.inject.service(),
-  session: Ember.inject.service(),
+  cardstackSession: service(),
+  session: service(),
 
   restore(rawSession) {
     return new RSVP.Promise((resolve, reject) => {
@@ -49,7 +50,7 @@ export default Base.extend({
          response.headers.get("content-type").toLowerCase().indexOf("application/json") >= 0) {
         return response.json()
       } else {
-        Ember.warn(`Got a non-json response from ${hubURL}/auth/${authenticationSource}`, false, { id: 'cardstack-authentication-nonjson-response' });
+        warn(`Got a non-json response from ${hubURL}/auth/${authenticationSource}`, false, { id: 'cardstack-authentication-nonjson-response' });
         return {};
       }
     });

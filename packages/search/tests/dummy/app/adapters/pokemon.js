@@ -1,5 +1,5 @@
+import { assign } from '@ember/polyfills';
 import JSONAPIAdapter from 'ember-data/adapters/json-api';
-import Ember from 'ember';
 import RSVP from 'rsvp';
 
 const delay = 500;
@@ -23,7 +23,7 @@ export default JSONAPIAdapter.extend({
       }
       return true;
     }).map(p => {
-      let attributes = Ember.assign({}, p);
+      let attributes = assign({}, p);
       delete attributes.id;
       return {
         type: 'pokemons',

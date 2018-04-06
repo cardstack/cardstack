@@ -1,8 +1,8 @@
-import Ember from 'ember';
+import Service, { inject as service } from '@ember/service';
 import { task } from 'ember-concurrency';
 
-export default Ember.Service.extend({
-  session: Ember.inject.service(),
+export default Service.extend({
+  session: service(),
 
   source: 'mock-auth',
 

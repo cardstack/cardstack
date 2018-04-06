@@ -1,4 +1,4 @@
-import Ember from 'ember';
+import { helper as buildHelper } from '@ember/component/helper';
 import metaForField from '../-private/meta-for-field';
 import stripNamespace from '../-private/strip-namespace';
 
@@ -25,4 +25,4 @@ export function fieldType(content, fieldName) {
   return type;
 }
 
-export default Ember.Helper.helper(fieldType);
+export default buildHelper(fieldType);

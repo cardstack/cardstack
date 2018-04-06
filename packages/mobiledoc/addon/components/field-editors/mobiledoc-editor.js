@@ -1,11 +1,12 @@
-import Ember from 'ember';
+import { computed } from '@ember/object';
+import Component from '@ember/component';
+import { capitalize } from '@ember/string';
 import layout from '../../templates/components/field-editors/mobiledoc-editor';
-const { capitalize } = Ember.String;
 
-export default Ember.Component.extend({
+export default Component.extend({
   layout,
   classNames: ['mobiledoc-overview'],
-  sections: Ember.computed('mobiledoc', function() {
+  sections: computed('mobiledoc', function() {
     let doc = this.get('mobiledoc');
     if (!doc) {
       return [];

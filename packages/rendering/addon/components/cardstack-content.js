@@ -1,15 +1,17 @@
-import Ember from 'ember';
+import { guidFor } from '@ember/object/internals';
+import { computed } from '@ember/object';
+import Component from '@ember/component';
 import layout from '../templates/components/cardstack-content';
 import { modelType } from '@cardstack/rendering/helpers/cs-model-type';
 
-export default Ember.Component.extend({
+export default Component.extend({
   layout,
   format: 'card',
   tagName: '',
-  id: Ember.computed('content', 'format', function() {
-    return `${Ember.guidFor(this.get('content'))}/${this.get('format')}`;
+  id: computed('content', 'format', function() {
+    return `${guidFor(this.get('content'))}/${this.get('format')}`;
   }),
-  specificComponent: Ember.computed('content', 'format', function() {
+  specificComponent: computed('content', 'format', function() {
     let format = this.get('format');
     if (this.get('content.isCardstackPlaceholder')) {
       return `cardstack/cardstack-placeholder-${format}`;

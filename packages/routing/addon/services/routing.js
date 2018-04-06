@@ -1,8 +1,8 @@
-import Ember from 'ember';
+import Service from '@ember/service';
 import { pluralize, singularize } from 'ember-inflector';
 import { defaultBranch } from '@cardstack/plugin-utils/environment';
 
-export default Ember.Service.extend({
+export default Service.extend({
   defaultContentType: 'pages',
 
   routeFor(type, routingId, branch) {

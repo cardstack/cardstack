@@ -1,9 +1,9 @@
+import { run } from '@ember/runloop';
 import { module, test } from 'qunit';
 import { setupRenderingTest } from 'ember-qunit';
 import { render } from '@ember/test-helpers';
 import hbs from 'htmlbars-inline-precompile';
 import DS from 'ember-data';
-import Ember from 'ember';
 
 module('Integration | Component | cs field editor', function(hooks) {
   setupRenderingTest(hooks);
@@ -27,7 +27,7 @@ module('Integration | Component | cs field editor', function(hooks) {
   });
 
   test('it renders correct field editor based on attr transform type', async function(assert) {
-    Ember.run(() => {
+    run(() => {
       this.set('model', this.get('store').createRecord('example'));
     });
     await render(hbs`{{cs-field-editor content=model field="title" }}`);
@@ -35,7 +35,7 @@ module('Integration | Component | cs field editor', function(hooks) {
   });
 
   test('it renders correct field editor based on custom fieldType annotation', async function(assert) {
-    Ember.run(() => {
+    run(() => {
       this.set('model', this.get('store').createRecord('example'));
     });
     await render(hbs`{{cs-field-editor content=model field="score" }}`);
@@ -43,7 +43,7 @@ module('Integration | Component | cs field editor', function(hooks) {
   });
 
   test('it passes content and field name to editor', async function(assert) {
-    Ember.run(() => {
+    run(() => {
       this.set('model', this.get('store').createRecord('example', { echo: 'woohoo' }));
     });
     await render(hbs`{{cs-field-editor content=model field="echo" }}`);
@@ -51,7 +51,7 @@ module('Integration | Component | cs field editor', function(hooks) {
   });
 
   test('it passes enabled state to editor', async function(assert) {
-    Ember.run(() => {
+    run(() => {
       this.set('model', this.get('store').createRecord('example', { echo: 'woohoo' }));
     });
     this.set('enabled', true);

@@ -1,4 +1,4 @@
-import { helper } from 'ember-helper';
+import { helper } from '@ember/component/helper';
 import $ from 'jquery';
 
 export default helper(function([selector, handler]) {

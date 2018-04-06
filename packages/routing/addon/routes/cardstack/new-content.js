@@ -1,7 +1,9 @@
-import Ember from 'ember';
+import { getOwner } from '@ember/application';
+import { inject as service } from '@ember/service';
+import Route from '@ember/routing/route';
 
-export default Ember.Route.extend({
-  service: Ember.inject.service('cardstack-routing'),
+export default Route.extend({
+  service: service('cardstack-routing'),
   queryParams: {
     // optionally prefill the routingId for the new record
     routingId: {
@@ -19,7 +21,7 @@ export default Ember.Route.extend({
     }
 
     let initialProperties = Object.create(null);
-    let modelClass = Ember.getOwner(this).resolveRegistration(`model:${modelType}`);
+    let modelClass = getOwner(this).resolveRegistration(`model:${modelType}`);
     if (!modelClass) {
       throw new Error(`@cardstack/routing tried to use model ${modelType} but it does not exist`);
     }

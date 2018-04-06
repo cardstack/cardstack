@@ -1,11 +1,13 @@
-import Ember from 'ember';
+import { getOwner } from '@ember/application';
+import { computed } from '@ember/object';
+import Component from '@ember/component';
+import { guidFor } from '@ember/object/internals';
 import layout from '../templates/components/cs-field';
-const { guidFor } = Ember;
 import { fieldType } from '../helpers/cs-field-type';
 import { fieldCaption } from '../helpers/cs-field-caption';
 import injectOptional from 'ember-inject-optional';
 
-export default Ember.Component.extend({
+export default Component.extend({
   layout,
   tagName: '',
 
@@ -14,30 +16,30 @@ export default Ember.Component.extend({
   // present.
   tools: injectOptional.service('cardstack-tools'),
 
-  fieldType: Ember.computed('content', 'fieldName', function() {
+  fieldType: computed('content', 'fieldName', function() {
     return fieldType(this.get('content'), this.get('fieldName'));
   }),
 
-  fieldCaption: Ember.computed('content', 'fieldName', function() {
+  fieldCaption: computed('content', 'fieldName', function() {
     return fieldCaption(this.get('content'), this.get('fieldName'));
   }),
 
-  fieldConfig: Ember.computed('fieldType', function() {
+  fieldConfig: computed('fieldType', function() {
     let type = this.get('fieldType');
     if (type) {
-      return Ember.getOwner(this).resolveRegistration(`field-type:${type}`);
+      return getOwner(this).resolveRegistration(`field-type:${type}`);
     }
   }),
 
-  id: Ember.computed('content', 'fieldName', function() {
+  id: computed('content', 'fieldName', function() {
     return `${guidFor(this.get('content'))}/cs-field/${this.get('fieldName')}`;
   }),
 
-  defaultRenderer: Ember.computed('fieldType', function() {
+  defaultRenderer: computed('fieldType', function() {
     return `field-renderers/${this.get('fieldType')}-renderer`;
   }),
 
-  fieldInfo: Ember.computed('content', 'fieldName', 'fieldCaption', function() {
+  fieldInfo: computed('content', 'fieldName', 'fieldCaption', function() {
     return {
       name: this.get('fieldName'),
       content: this.get('content'),

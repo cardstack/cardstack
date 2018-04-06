@@ -1,36 +1,39 @@
-import Ember from 'ember';
+import { getOwner } from '@ember/application';
+import { computed } from '@ember/object';
+import { alias } from '@ember/object/computed';
+import Service, { inject as service } from '@ember/service';
 import { transitionTo } from '../private-api';
 import { modelType } from '@cardstack/rendering/helpers/cs-model-type';
 import injectOptional from 'ember-inject-optional';
 import { defaultBranch } from '@cardstack/plugin-utils/environment';
 
-export default Ember.Service.extend({
-  overlays: Ember.inject.service('ember-overlays'),
-  resourceMetadata: Ember.inject.service(),
-  marks: Ember.computed.alias('overlays.marks'),
+export default Service.extend({
+  overlays: service('ember-overlays'),
+  resourceMetadata: service(),
+  marks: alias('overlays.marks'),
 
-  fields: Ember.computed('marks', function() {
+  fields: computed('marks', function() {
     return this.get('marks').filter(m => m.group === 'cardstack-fields');
   }),
 
-  contentPages: Ember.computed('marks', function() {
+  contentPages: computed('marks', function() {
     return this.get('marks').filter(m => m.group === 'cardstack-pages');
   }),
 
-  activeContentItem: Ember.computed('contentPages', function() {
+  activeContentItem: computed('contentPages', function() {
     return this.get('contentPages')[0];
   }),
 
-  _activeItemMeta: Ember.computed('activeContentItem', function() {
+  _activeItemMeta: computed('activeContentItem', function() {
     let model = this.get('activeContentItem.model')
     if (model) {
       return this.get('resourceMetadata').read(model);
     }
   }),
 
-  branch: Ember.computed.alias('_activeItemMeta.branch'),
+  branch: alias('_activeItemMeta.branch'),
 
-  activeFields: Ember.computed('activeContentItem', 'fields', function() {
+  activeFields: computed('activeContentItem', 'fields', function() {
     let item = this.get('activeContentItem');
     if (item) {
       return this.get('fields').filter(f => f.model.content === item.model);
@@ -41,7 +44,7 @@ export default Ember.Service.extend({
 
   // Can tools be enabled at all? This affects whether we will offer a
   // launcher button
-  available: Ember.computed('sessionService.session.isAuthenticated', function() {
+  available: computed('sessionService.session.isAuthenticated', function() {
     // If cardstack-session service is available, tools are only
     // available when the session is authenticated. Otherwise we
     // default to always available.
@@ -56,7 +59,7 @@ export default Ember.Service.extend({
 
   // Which tab are we showing in the toolbox?
   activePanel: 'cs-composition-panel',
-  activePanelChoices: Ember.computed(function() {
+  activePanelChoices: computed(function() {
     return [
       {
         id: 'cs-composition-panel',
@@ -72,7 +75,7 @@ export default Ember.Service.extend({
   // Are we viewing the current URL as a normal page in its own right,
   // or in one of its other forms (like a preview card)?
   previewFormat: 'page',
-  previewFormatChoices: Ember.computed(function() {
+  previewFormatChoices: computed(function() {
     return [
       {
         id: 'page',
@@ -98,8 +101,8 @@ export default Ember.Service.extend({
   requestedEditing: false,
 
   // This is a placeholder until I integrate the auth system here.
-  mayEditLive: Ember.computed(function() {
-    let { cardstack } = Ember.getOwner(this).resolveRegistration('config:environment');
+  mayEditLive: computed(function() {
+    let { cardstack } = getOwner(this).resolveRegistration('config:environment');
     if (cardstack && typeof cardstack.mayEditLive === 'boolean') {
       return cardstack.mayEditLive;
     } else {
@@ -107,7 +110,7 @@ export default Ember.Service.extend({
     }
   }),
 
-  editing: Ember.computed('requestedEditing', 'branch', function() {
+  editing: computed('requestedEditing', 'branch', function() {
     return this.get('requestedEditing') &&
       (this.get('mayEditLive') ||
        this.get('branch') !== defaultBranch);
@@ -177,7 +180,7 @@ export default Ember.Service.extend({
         args,
         queryParams
       } = this.get('cardstackRouting').routeFor(modelType(model), model.get('slug'), which);
-      transitionTo(Ember.getOwner(this), name, args, queryParams);
+      transitionTo(getOwner(this), name, args, queryParams);
     }
   },
 

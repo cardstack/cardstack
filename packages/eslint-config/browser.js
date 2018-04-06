@@ -14,10 +14,6 @@ module.exports = {
     es6: true
   },
   rules: {
-    // TODO: turn these on
-    'ember/new-module-imports': 'off',
-    'ember/closure-actions': 'off',
-    'ember/no-old-shims': 'off',
     'no-restricted-globals': [2, 'find']
   },
   overrides: [
