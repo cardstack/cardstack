@@ -191,28 +191,21 @@ class Authentication {
     if (!user.data || !user.data.type) { return; }
 
     let have;
-    let query = source['userCorrelationQuery'] || (
-     user.data.id ? `{
-        "filter": {
-          "type": "{{data.type}}",
-          "id": { "exact": "{{data.id}}" }
-        },
-        "page": { "size": 1 }
-      }` : null);
-
-    if (query) {
-      try {
+    try {
+      let query = source['userCorrelationQuery'];
+      if (query) {
         let compiled = Handlebars.compile(query);
-        have = await this.userSearcher.search(JSON.parse(compiled(user)));
-      } catch (err) {
-        if (err.status !== 404) {
-          throw err;
+        let searchResult = await this.userSearcher.search(JSON.parse(compiled(user)));
+        if (searchResult.data.length > 0) {
+          have = { data: searchResult.data[0] };
         }
+      } else {
+        have = await this.userSearcher.get(user.data.type, user.data.id);
       }
-    }
-
-    if (have && have.data && Array.isArray(have.data)) {
-      have = have.data.length ? { data: have.data[0] } : null;
+    } catch (err) {
+      if (err.status !== 404) {
+        throw err;
+      }
     }
 
     let madeIndexUpdate = false;
