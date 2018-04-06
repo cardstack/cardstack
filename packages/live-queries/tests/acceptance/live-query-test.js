@@ -7,10 +7,6 @@ import Fixtures from '@cardstack/test-support/fixtures';
 let scenario = new Fixtures({
   create(factory) {
     factory.addResource('items').withAttributes({content: 'hello'});
-  },
-
-  destroy() {
-    return [{ type: 'items' }];
   }
 });
 

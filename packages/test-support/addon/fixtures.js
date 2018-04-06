@@ -10,10 +10,7 @@ export default class Fixtures {
   }
 
   setupTest(hooks) {
-    hooks.beforeEach(async () => {
-      await this.teardown(); // clean up state that may be left over from failed test(s)
-      await this.setup();
-    });
+    hooks.beforeEach(async () => await this.setup());
     hooks.afterEach(async () => await this.teardown());
   }
 
@@ -53,7 +50,12 @@ export default class Fixtures {
   }
 
   async teardown() {
-    let destructionList = this._destroy();
+    if (typeof this._create !== 'function') { return; }
+
+    let destructionList = [];
+    if (typeof this._destroy === 'function') {
+      destructionList = destructionList.concat(this._destroy());
+    }
 
     let createdModels = this._factory.getModels().map(model => {
       return { id: model.id, type: model.type };
