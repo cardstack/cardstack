@@ -1,4 +1,6 @@
-import Ember from 'ember';
+import { inject as service } from '@ember/service';
+import Helper from '@ember/component/helper';
+import { get } from '@ember/object';
 import { modelType } from '@cardstack/rendering/helpers/cs-model-type';
 import { defaultBranch } from '@cardstack/plugin-utils/environment';
 import { pluralize } from 'ember-inflector';
@@ -9,9 +11,9 @@ export function urlForModel(context, model, { branch } = {}) {
     let type = pluralize(modelType(model));
     let routingId;
     if (model.constructor.routingField) {
-      routingId = Ember.get(model, model.constructor.routingField);
+      routingId = get(model, model.constructor.routingField);
     } else {
-      routingId = Ember.get(model, 'id');
+      routingId = get(model, 'id');
     }
     return urlForParams(context, type, routingId, { branch });
   }
@@ -22,12 +24,12 @@ export function urlForParams(context, type, routingId, { branch } = {}) {
     return;
   }
   type = pluralize(type);
-  let { name, params, queryParams } = Ember.get(context, 'cardstackRouting').routeFor(type, routingId, branch || defaultBranch);
+  let { name, params, queryParams } = get(context, 'cardstackRouting').routeFor(type, routingId, branch || defaultBranch);
   return hrefTo(context, name, ...params.map(p => p[1]), { isQueryParams: true, values: queryParams });
 }
 
-export default Ember.Helper.extend({
-  cardstackRouting: Ember.inject.service(),
+export default Helper.extend({
+  cardstackRouting: service(),
   compute(args, hash) {
     if (args.length === 2) {
       let [ type, routingId ] = args;

@@ -1,14 +1,15 @@
+import { run } from '@ember/runloop';
+import Service from '@ember/service';
 import { module, test } from 'qunit';
 import { setupRenderingTest } from 'ember-qunit';
 import { render } from '@ember/test-helpers';
 import hbs from 'htmlbars-inline-precompile';
-import Ember from 'ember';
 
 module('Integration | Component | cardstack tools launcher', function(hooks) {
   setupRenderingTest(hooks);
 
   hooks.beforeEach(function() {
-    this.owner.register('service:cardstack-tools', Ember.Service.extend({
+    this.owner.register('service:cardstack-tools', Service.extend({
       available: true,
       active: false,
       setActive(value) {
@@ -45,7 +46,7 @@ module('Integration | Component | cardstack tools launcher', function(hooks) {
 
   test('clicking icon toggles tools', async function(assert) {
     await render(hbs`{{cardstack-tools-launcher}}`);
-    Ember.run(() => {
+    run(() => {
       this.$('svg').click();
     });
     assert.equal(this.$('svg.active').length, 1, "found active icon");

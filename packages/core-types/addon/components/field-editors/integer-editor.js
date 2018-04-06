@@ -1,7 +1,7 @@
-import Ember from 'ember';
+import Component from '@ember/component';
 import layout from '../../templates/components/field-editors/integer-editor';
 
-export default Ember.Component.extend({
+export default Component.extend({
   layout,
   invalid: false,
   refresh: 1,

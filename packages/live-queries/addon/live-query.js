@@ -1,12 +1,12 @@
 import Ember from "ember";
 import { getOwner } from '@ember/application';
-import { getProperties } from '@ember/object';
+import { getProperties, computed } from '@ember/object';
 
 export function liveQuery(...args) {
   let query;
   let fn = args.pop();
   let deps = args;
-  return Ember.computed(...deps, function() {
+  return computed(...deps, function() {
     if (!this.isComponent) {
       Ember.Logger.warn(`Live-query should only be used inside a component due to the lifecycle operations that a component uses. If used outside of a component then you must manually cleanup the live query subscription.`);
     }

@@ -1,14 +1,15 @@
+import { run } from '@ember/runloop';
+import Service from '@ember/service';
 import { module, test } from 'qunit';
 import { setupRenderingTest } from 'ember-qunit';
 import { render } from '@ember/test-helpers';
 import hbs from 'htmlbars-inline-precompile';
-import Ember from 'ember';
 
 module('Integration | Component | cs branch control', function(hooks) {
   setupRenderingTest(hooks);
 
   hooks.beforeEach(function() {
-    this.owner.register('service:cardstack-tools', Ember.Service.extend({
+    this.owner.register('service:cardstack-tools', Service.extend({
       branch: 'master',
       init() {
         this._super();
@@ -35,7 +36,7 @@ module('Integration | Component | cs branch control', function(hooks) {
 
   test('it enters preview', async function(assert) {
     await render(hbs`{{cs-branch-control}}`);
-    Ember.run(() => {
+    run(() => {
       this.$('button:contains(Preview)').click();
     });
     assert.deepEqual(this.get('tools.branchSets'), ['draft']);
@@ -45,7 +46,7 @@ module('Integration | Component | cs branch control', function(hooks) {
   test('it enters live', async function(assert) {
     this.get('tools').set('branch', 'b');
     await render(hbs`{{cs-branch-control}}`);
-    Ember.run(() => {
+    run(() => {
       this.$('button:contains(Live)').click();
     });
     assert.deepEqual(this.get('tools.branchSets'), ['master']);

@@ -1,6 +1,6 @@
-import Ember from 'ember';
+import Component from '@ember/component';
 import layout from '../../templates/components/inline-field-editors/mobiledoc-editor';
 
-export default Ember.Component.extend({
+export default Component.extend({
   layout
 });

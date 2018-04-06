@@ -1,8 +1,9 @@
-import Ember from 'ember';
+import { computed } from '@ember/object';
+import Component from '@ember/component';
 import layout from '../templates/components/cs-mobiledoc-editor';
 import { task, timeout } from 'ember-concurrency';
 
-export default Ember.Component.extend({
+export default Component.extend({
   layout,
 
   // We are deliberately only reading `mobiledoc` once and not
@@ -10,7 +11,7 @@ export default Ember.Component.extend({
   // property as a way to explicitly invalidate the document if
   // needed. This guards against data loops that would otherwise lose
   // cursor position.
-  innerMobiledoc: Ember.computed('docKey', function() {
+  innerMobiledoc: computed('docKey', function() {
     return this.get('mobiledoc');
   }),
 

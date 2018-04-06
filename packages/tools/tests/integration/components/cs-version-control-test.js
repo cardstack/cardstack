@@ -1,8 +1,9 @@
+import { run } from '@ember/runloop';
+import EmberObject from '@ember/object';
 import { module, test } from 'qunit';
 import { setupRenderingTest } from 'ember-qunit';
 import { render } from '@ember/test-helpers';
 import hbs from 'htmlbars-inline-precompile';
-import Ember from 'ember';
 import DS from 'ember-data';
 
 let model;
@@ -15,7 +16,7 @@ module('Integration | Component | cs version control', function(hooks) {
     // looking for its metadata, and ember-resource-metadata works
     // through ember-data's identity map.
     this.owner.register('model:thing', DS.Model.extend());
-    model = Ember.Object.create({
+    model = EmberObject.create({
       id: 1,
       type: 'thing'
     });
@@ -50,7 +51,7 @@ module('Integration | Component | cs version control', function(hooks) {
     model.set('hasDirtyFields', true);
     model.set('isNew', false);
     await render(hbs`{{cs-version-control model=model enabled=true}}`);
-    Ember.run(() => {
+    run(() => {
       this.$('.cs-version-control-footer button').click();
     });
   });
@@ -63,7 +64,7 @@ module('Integration | Component | cs version control', function(hooks) {
     model.set('hasDirtyFields', false);
     model.set('isNew', false);
     await render(hbs`{{cs-version-control model=model enabled=true}}`);
-    Ember.run(() => {
+    run(() => {
       this.$('.cs-version-control-footer button').click();
     });
   });

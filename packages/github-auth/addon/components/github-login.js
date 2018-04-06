@@ -1,14 +1,15 @@
-import Ember from 'ember';
+import { inject as service } from '@ember/service';
+import Component from '@ember/component';
+import { getOwner } from '@ember/application';
 import layout from '../templates/components/github-login';
 import { configure, getConfiguration } from 'torii/configuration';
 import { task } from 'ember-concurrency';
-const { getOwner } = Ember;
 
-export default Ember.Component.extend({
+export default Component.extend({
   layout,
   tagName: '',
-  session: Ember.inject.service(),
-  torii: Ember.inject.service(),
+  session: service(),
+  torii: service(),
 
   // This is the id of the authentication-sources model on the
   // server. Ours uses 'github' by default. It would theoretically be

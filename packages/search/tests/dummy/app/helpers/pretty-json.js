@@ -1,7 +1,7 @@
-import Ember from 'ember';
+import { helper as buildHelper } from '@ember/component/helper';
 
 export function prettyJson([value]) {
   return JSON.stringify(value, null, 2);
 }
 
-export default Ember.Helper.helper(prettyJson);
+export default buildHelper(prettyJson);

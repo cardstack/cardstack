@@ -1,4 +1,6 @@
-import Ember from 'ember';
+import { getOwner } from '@ember/application';
+import { inject as service } from '@ember/service';
+import Component from '@ember/component';
 import layout from '../templates/components/cs-version-control';
 import { task } from 'ember-concurrency';
 import { transitionTo } from '../private-api';
@@ -6,13 +8,13 @@ import { modelType } from '@cardstack/rendering/helpers/cs-model-type';
 import { defaultBranch } from '@cardstack/plugin-utils/environment';
 import { computed } from "@ember/object";
 
-export default Ember.Component.extend({
+export default Component.extend({
   layout,
   tagName: '',
   opened: true,
   animationRules,
-  resourceMetadata: Ember.inject.service(),
-  store: Ember.inject.service(),
+  resourceMetadata: service(),
+  store: service(),
 
   modelMeta: computed('model', function() {
     return this.get('resourceMetadata').read(this.get('model'));
@@ -146,7 +148,7 @@ export default Ember.Component.extend({
     let model = this.get('model');
     let placeholder = { isCardstackPlaceholder: true, type: modelType(model), slug: model.get('slug') };
     if (model.get('isNew')) {
-      transitionTo(Ember.getOwner(this), 'cardstack.new-content', [placeholder]);
+      transitionTo(getOwner(this), 'cardstack.new-content', [placeholder]);
       return;
     }
     let branch = this.get('modelMeta.branch');
@@ -154,7 +156,7 @@ export default Ember.Component.extend({
     let route = this.get('cardstackRouting').routeFor(modelType(model), model.get('slug'), branch);
     yield this.get('model').destroyRecord();
     if (route) {
-      transitionTo(Ember.getOwner(this), route.name, [placeholder], route.queryParams);
+      transitionTo(getOwner(this), route.name, [placeholder], route.queryParams);
     }
   }),
 

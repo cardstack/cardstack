@@ -1,4 +1,4 @@
-import Ember from 'ember';
+import { A } from '@ember/array';
 import Thread from '@cardstack/models/generated/thread';
 import { task } from 'ember-concurrency';
 import { computed } from "@ember/object"
@@ -17,7 +17,7 @@ export default Thread.extend({
   tags: computed('_syncedMessages.[]', {
     get() {
       this.get('loadTags').perform();
-      return Ember.A();
+      return A();
     },
     set(k, v) {
       return v;
@@ -62,7 +62,7 @@ export default Thread.extend({
   _syncedMessages: computed({
     get() {
       this.get('_loadMessages').perform();
-      return Ember.A();
+      return A();
     },
     set(k,v) {
       return v;

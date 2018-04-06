@@ -1,11 +1,13 @@
-import Ember from 'ember';
+import { alias } from '@ember/object/computed';
+import { inject as service } from '@ember/service';
+import Component from '@ember/component';
 import layout from '../templates/components/cardstack-tools-launcher';
 
-export default Ember.Component.extend({
+export default Component.extend({
   layout,
-  tools: Ember.inject.service('cardstack-tools'),
-  toolsAvailable: Ember.computed.alias('tools.available'),
-  active: Ember.computed.alias('tools.active'),
+  tools: service('cardstack-tools'),
+  toolsAvailable: alias('tools.available'),
+  active: alias('tools.active'),
   tagName: '',
   actions: {
     setActive(isActive) {

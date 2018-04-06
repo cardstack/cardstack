@@ -1,8 +1,10 @@
-import Ember from 'ember';
+import { getOwner } from '@ember/application';
+import { inject as service } from '@ember/service';
+import Route from '@ember/routing/route';
 
-export default Ember.Route.extend({
+export default Route.extend({
 
-  service: Ember.inject.service('cardstack-routing'),
+  service: service('cardstack-routing'),
 
   _commonModelHook(type, slug) {
     let { branch } = this.modelFor('cardstack');
@@ -16,7 +18,7 @@ export default Ember.Route.extend({
       this.replaceWith(name, ...params.map(p => p[1]), { queryParams });
     }
 
-    let modelClass = Ember.getOwner(this).resolveRegistration(`model:${mType}`);
+    let modelClass = getOwner(this).resolveRegistration(`model:${mType}`);
     if (!modelClass) {
       throw new Error(`@cardstack/routing tried to use model ${mType} but it does not exist`);
     }

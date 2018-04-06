@@ -1,7 +1,7 @@
-import Ember from 'ember';
+import Component from '@ember/component';
 import layout from '../templates/components/cs-collapsible-section';
 
-export default Ember.Component.extend({
+export default Component.extend({
   layout,
   tagName: 'section',
   classNameBindings: ['opened:opened:closed'],

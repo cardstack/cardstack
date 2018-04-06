@@ -1,11 +1,12 @@
-import Ember from 'ember';
+import { inject as service } from '@ember/service';
+import Component from '@ember/component';
 import layout from '../templates/components/cardstack-session';
 
-export default Ember.Component.extend({
+export default Component.extend({
   layout,
   tagName: "",
-  session: Ember.inject.service(),
-  cardstackSession: Ember.inject.service(),
+  session: service(),
+  cardstackSession: service(),
 
   actions: {
     logout() {

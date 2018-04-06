@@ -1,10 +1,11 @@
-import Ember from 'ember';
+import { not } from '@ember/object/computed';
+import Component from '@ember/component';
 import layout from '../../templates/components/field-editors/image-editor';
 
-export default Ember.Component.extend({
+export default Component.extend({
   layout,
 
-  disabled: Ember.computed.not('enabled'),
+  disabled: not('enabled'),
 
   actions: {
     updateImage(dataURL) {

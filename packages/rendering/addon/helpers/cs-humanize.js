@@ -1,5 +1,5 @@
-import { helper } from 'ember-helper';
-import { capitalize } from 'ember-string';
+import { helper } from '@ember/component/helper';
+import { capitalize } from '@ember/string';
 
 export default helper(function([a]) {
   if (a) {

@@ -1,8 +1,9 @@
-import Ember from 'ember';
+import { inject as service } from '@ember/service';
+import Component from '@ember/component';
 import layout from '../templates/components/mock-login';
 
-export default Ember.Component.extend({
+export default Component.extend({
   layout,
   tagName: '',
-  mockLogin: Ember.inject.service()
+  mockLogin: service()
 });

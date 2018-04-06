@@ -1,10 +1,11 @@
-import Ember from 'ember';
-const { htmlSafe } = Ember.String;
+import { getOwner } from '@ember/application';
+import Helper from '@ember/component/helper';
+import { htmlSafe } from '@ember/string';
 
-export default Ember.Helper.extend({
+export default Helper.extend({
   init() {
     this._super.apply(this, arguments);
-    this.environment = Ember.getOwner(this).resolveRegistration('config:environment').environment;
+    this.environment = getOwner(this).resolveRegistration('config:environment').environment;
   },
   compute(messages) {
     if (this.environment === 'production') {

@@ -1,12 +1,13 @@
-import Ember from 'ember';
+import { not, alias } from '@ember/object/computed';
+import Component from '@ember/component';
 import layout from '../templates/components/cs-mode-button';
 
-export default Ember.Component.extend({
+export default Component.extend({
   layout,
   classNames: ['cs-mode-button'],
   classNameBindings: ['active', 'iconOnly'],
-  iconOnly: Ember.computed.not('mode.description'),
-  active: Ember.computed.alias('mode.active'),
+  iconOnly: not('mode.description'),
+  active: alias('mode.active'),
   click() {
     this.get('mode.makeActive')();
   }
