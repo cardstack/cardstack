@@ -20,6 +20,7 @@ const featureTypes = [
   'writers',
   'searchers',
   'indexers',
+  'static-models',
   'authenticators',
   'middleware',
   'messengers',

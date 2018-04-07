@@ -1,4 +1,4 @@
-const { BranchUpdate, owningDataSource } = require('./branch-update');
+const { BranchUpdate } = require('./branch-update');
 const DataSource = require('../schema/data-source');
 const log = require('@cardstack/logger')('cardstack/indexers');
 const { flatten } = require('lodash');
@@ -6,13 +6,15 @@ const { flatten } = require('lodash');
 log.registerFormatter('t', require('../table-log-formatter'));
 
 module.exports = class RunningIndexers {
-  constructor(seedSchema, client, emitEvent) {
+  constructor(seedSchema, client, emitEvent, schemaTypes) {
     this.seedSchema = seedSchema;
     this.client = client;
     this.emitEvent = emitEvent;
+    this.schemaTypes = schemaTypes;
     this.ownedDataSources = {};
     this.seenDataSources = {};
     this.branches = {};
+    this.staticModels = [];
   }
 
   async destroy() {
@@ -24,45 +26,59 @@ module.exports = class RunningIndexers {
     }
   }
 
-  _findIndexer(dataSource) {
+  _sawDataSource(dataSource) {
     this.seenDataSources[dataSource.id] = true;
-    if (dataSource.indexer) {
-      owningDataSource.set(dataSource.indexer, dataSource);
-      return dataSource.indexer;
-    }
+    return dataSource;
   }
 
   async _loadSchemaModels() {
-    let newIndexers = [...this.seedSchema.dataSources.values()]
-        .map(this._findIndexer.bind(this))
-        .filter(Boolean);
-    while (newIndexers.length > 0) {
-      let newSchemaModels = await this._activateIndexers(newIndexers);
-      newIndexers = newSchemaModels.map(model => {
+    let newDataSources = [...this.seedSchema.dataSources.values()]
+        .map(this._sawDataSource.bind(this));
+
+    while (newDataSources.length > 0) {
+      let newSchemaModels = await this._activateDataSources(newDataSources);
+      newDataSources = newSchemaModels.map(model => {
         log.debug("new schema model %s %s", model.type, model.id);
         if (model.type === 'data-sources' && !this.seenDataSources[model.id]) {
           log.debug("Discovered data source %s", model.id);
           let dataSource = new DataSource(model, this.seedSchema.plugins);
           this.ownedDataSources[model.id] = dataSource;
-          return this._findIndexer(dataSource);
+          return this._sawDataSource(dataSource);
         }
       }).filter(Boolean);
     }
+
+    let staticModels = flatten(this.staticModels);
+    let staticSchema = staticModels.filter(doc => this.schemaTypes.includes(doc.type));
+    Object.values(this.branches).forEach(branchUpdate => {
+      branchUpdate.addStaticModels(staticSchema, staticModels);
+    });
   }
 
-  async _activateIndexers(indexers) {
-    log.debug("=Activating indexers=\n%t", () => indexers.map(i => {
-      let source = owningDataSource.get(i);
+  async _activateDataSources(dataSources) {
+    log.debug("=Activating data sources=\n%t", () => dataSources.map(source => {
       return [ source.sourceType, source.id ];
     }));
     let newSchemaModels = [];
-    await Promise.all(indexers.map(async indexer => {
-      for (let branch of await indexer.branches()) {
-        if (!this.branches[branch]) {
-          log.debug("Discovered branch %s", branch);
-          this.branches[branch] = new BranchUpdate(branch, this.seedSchema, this.client, this.emitEvent);
+    await Promise.all(dataSources.map(async source => {
+      let indexer = source.indexer;
+      if (indexer){
+        for (let branch of await indexer.branches()) {
+          if (!this.branches[branch]) {
+            log.debug("Discovered branch %s", branch);
+            this.branches[branch] = new BranchUpdate(branch, this.seedSchema, this.client, this.emitEvent);
+          }
+          newSchemaModels.push(await this.branches[branch].addDataSource(source));
         }
-        newSchemaModels.push(await this.branches[branch].addIndexer(indexer));
+      }
+      let staticModels = source.staticModels;
+      if (staticModels.length > 0) {
+        // this ensures that static models can contain more data
+        // sources and they will actually get crawled correctly.
+        newSchemaModels.push(staticModels);
+        // and this is where we gather all staticModels until the next
+        // step where we will actually let them get indexed
+        this.staticModels.push(staticModels);
       }
     }));
     return flatten(newSchemaModels);
