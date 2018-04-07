@@ -8,8 +8,7 @@ const supertest = require('supertest');
 const Koa = require('koa');
 const {
   createDefaultEnvironment,
-  destroyDefaultEnvironment,
-  defaultDataSourceId
+  destroyDefaultEnvironment
 } = require('../../../tests/ephemeral-test-app/node_modules/@cardstack/test-support/env');
 const JSONAPIFactory = require('../../../tests/ephemeral-test-app/node_modules/@cardstack/test-support/jsonapi-factory');
 
