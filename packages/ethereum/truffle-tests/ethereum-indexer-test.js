@@ -104,6 +104,9 @@ contract('SampleToken', function(accounts) {
         "data": {
           "id": "sample-tokens",
           "type": "content-types",
+          "meta": {
+            "source": "ethereum"
+          },
           "relationships": {
             "fields": {
               "data": [
@@ -171,6 +174,9 @@ contract('SampleToken', function(accounts) {
                 "type": "groups"
               }
             }
+          },
+          "meta": {
+            "source": "ethereum"
           }
         }
       });
@@ -204,6 +210,9 @@ contract('SampleToken', function(accounts) {
                 "id": dataSource.id
               }
             }
+          },
+          "meta": {
+            "source": "ethereum"
           }
         }
       });
@@ -232,6 +241,9 @@ contract('SampleToken', function(accounts) {
                 }
               ]
             }
+          },
+          "meta": {
+            "source": "ethereum"
           }
         }
       });
@@ -243,6 +255,9 @@ contract('SampleToken', function(accounts) {
           "id": "sample-token-name",
           "attributes": {
             "field-type": "@cardstack/core-types::string"
+          },
+          "meta": {
+            "source": "ethereum"
           }
         }
       });
@@ -254,6 +269,9 @@ contract('SampleToken', function(accounts) {
           "id": "sample-token-minting-finished",
           "attributes": {
             "field-type": "@cardstack/core-types::boolean"
+          },
+          "meta": {
+            "source": "ethereum"
           }
         }
       });
@@ -265,6 +283,9 @@ contract('SampleToken', function(accounts) {
           "id": "sample-token-owner",
           "attributes": {
             "field-type": "@cardstack/core-types::string"
+          },
+          "meta": {
+            "source": "ethereum"
           }
         }
       });
@@ -276,6 +297,9 @@ contract('SampleToken', function(accounts) {
           "id": "sample-token-symbol",
           "attributes": {
             "field-type": "@cardstack/core-types::string"
+          },
+          "meta": {
+            "source": "ethereum"
           }
         }
       });
@@ -287,6 +311,9 @@ contract('SampleToken', function(accounts) {
           "id": "sample-token-total-supply",
           "attributes": {
             "field-type": "@cardstack/core-types::string"
+          },
+          "meta": {
+            "source": "ethereum"
           }
         }
       });
@@ -308,6 +335,9 @@ contract('SampleToken', function(accounts) {
                 }
               ]
             }
+          },
+          "meta": {
+            "source": "ethereum"
           }
         }
       });
@@ -328,6 +358,9 @@ contract('SampleToken', function(accounts) {
             "sample-token-total-supply": "0",
             "sample-token-owner": accounts[0],
             "sample-token-symbol": "TOK"
+          },
+          "meta": {
+            "source": "ethereum"
           }
         }
       });
@@ -371,6 +404,9 @@ contract('SampleToken', function(accounts) {
                 "type": "sample-tokens"
               }
             }
+          },
+          "meta": {
+            "source": "ethereum"
           }
         }
       });

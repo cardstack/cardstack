@@ -119,18 +119,15 @@ describe('postgresql/writer', function() {
     await env.lookup('hub:indexers').update({ forceRefresh: true });
 
     let { body: { data } } = await request.get(`/api/articles/${created.id}`);
-    expect(data).to.deep.equal({
-      "id": created.id,
-      "type": "articles",
-      "attributes": {
-        "multi-word": "hello",
-        "less-than-ten": null,
-        "title": "I was created",
-        "published": false,
-        "length": 200,
-        "topic": "x"
-      },
-      "relationships": {}
+    expect(data).has.property('id', created.id);
+    expect(data).has.property('type', 'articles');
+    expect(data.attributes).to.deep.equal({
+      "multi-word": "hello",
+      "less-than-ten": null,
+      "title": "I was created",
+      "published": false,
+      "length": 200,
+      "topic": "x"
     });
   });
 

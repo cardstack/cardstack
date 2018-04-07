@@ -13,32 +13,41 @@ module.exports = declareInjections({
 class Searchers {
   constructor() {
     this._lastActiveSources = null;
-    this._searchers = null;
+    this._sources = null;
   }
 
-  async _lookupSearchers() {
+  async _lookupSources() {
     let activeSources = await this.sources.active();
     if (activeSources !== this._lastActiveSources) {
       this._lastActiveSources = activeSources;
-      this._searchers = [...activeSources.values()].map(v => v.searcher).filter(Boolean);
-      this._searchers.push(this.internalSearcher);
-      log.debug('found %s searchers', this._searchers.length);
+      this._sources = [...activeSources.values()].filter(v => v.searcher);
+      this._sources.push({ searcher: this.internalSearcher });
+      log.debug('found %s searchers', this._sources.length);
     }
-    return this._searchers;
+    return this._sources;
   }
 
   async get(session, branch, type, id) {
     if (arguments.length < 4) {
       throw new Error(`session is now a required argument to searchers.get`);
     }
-    let searchers = await this._lookupSearchers();
+    let sources = await this._lookupSources();
     let index = 0;
     let sessionOrEveryone = session || Session.EVERYONE;
     let schemaPromise = this.currentSchema.forBranch(branch);
     let next = async () => {
-      let searcher = searchers[index++];
-      if (searcher) {
-        return searcher.get(sessionOrEveryone, branch, type, id, next);
+      let source = sources[index++];
+      if (source) {
+        let response = await source.searcher.get(sessionOrEveryone, branch, type, id, next);
+        if (source.id != null && response && response.data) {
+          if (!response.data.meta) {
+            response.data.meta = {};
+          }
+          if (response.data.meta.source == null) {
+            response.data.meta.source = source.id;
+          }
+        }
+        return response;
       }
     };
     let result = await next();
@@ -68,14 +77,23 @@ class Searchers {
       throw new Error(`session is now a required argument to searchers.search`);
     }
 
-    let searchers = await this._lookupSearchers();
+    let sources = await this._lookupSources();
     let schemaPromise = this.currentSchema.forBranch(branch);
     let index = 0;
     let sessionOrEveryone = session || Session.EVERYONE;
     let next = async () => {
-      let searcher = searchers[index++];
-      if (searcher) {
-        return searcher.search(sessionOrEveryone, branch, query, next);
+      let source = sources[index++];
+      if (source) {
+        let response = await source.searcher.search(sessionOrEveryone, branch, query, next);
+        response.data.forEach(resource => {
+          if (!resource.meta) {
+            resource.meta = {};
+          }
+          if (resource.meta.source == null) {
+            resource.meta.source = source.id;
+          }
+        });
+        return response;
       }
     };
     let result = await next();
