@@ -79,7 +79,8 @@ contract('SampleToken', function(accounts) {
                 eventContentTriggers: {
                   Transfer: [ "sample-token-balance-ofs" ],
                   Mint: [ "sample-token-balance-ofs" ],
-                  WhiteList: [ "sample-token-approved-buyers", "sample-token-custom-buyer-limits" ]
+                  WhiteList: [ "sample-token-approved-buyers", "sample-token-custom-buyer-limits" ],
+                  VestedTokenGrant: [ "sample-token-vesting-schedules" ]
                 }
               }
             }
@@ -195,11 +196,11 @@ contract('SampleToken', function(accounts) {
                 },
                 {
                   "type": "fields",
-                  "id": "mapping-number-value"
+                  "id": "sample-token-contract"
                 },
                 {
                   "type": "fields",
-                  "id": "sample-token-contract"
+                  "id": "mapping-number-value"
                 }
               ]
             },
@@ -228,11 +229,11 @@ contract('SampleToken', function(accounts) {
                 },
                 {
                   "type": "fields",
-                  "id": "mapping-number-value"
+                  "id": "sample-token-contract"
                 },
                 {
                   "type": "fields",
-                  "id": "sample-token-contract"
+                  "id": "mapping-number-value"
                 }
               ]
             },
@@ -241,6 +242,152 @@ contract('SampleToken', function(accounts) {
                 "type": "data-sources",
                 "id": dataSource.id
               }
+            }
+          }
+        }
+      });
+
+      schema = await env.lookup('hub:searchers').get(env.session, 'master', 'content-types', 'sample-token-vesting-schedules');
+      expect(schema).to.deep.equal({
+        "data": {
+          "type": "content-types",
+          "id": "sample-token-vesting-schedules",
+          "relationships": {
+            "fields": {
+              "data": [
+                {
+                  "type": "fields",
+                  "id": "ethereum-address"
+                },
+                {
+                  "type": "fields",
+                  "id": "sample-token-contract"
+                },
+                {
+                  "type": "fields",
+                  "id": "vesting-schedule-start-date"
+                },
+                {
+                  "type": "fields",
+                  "id": "vesting-schedule-cliff-date"
+                },
+                {
+                  "type": "fields",
+                  "id": "vesting-schedule-duration-sec"
+                },
+                {
+                  "type": "fields",
+                  "id": "vesting-schedule-fully-vested-amount"
+                },
+                {
+                  "type": "fields",
+                  "id": "vesting-schedule-revoke-date"
+                },
+                {
+                  "type": "fields",
+                  "id": "vesting-schedule-is-revocable"
+                }
+              ]
+            },
+            "data-source": {
+              "data": {
+                "type": "data-sources",
+                "id": dataSource.id
+              }
+            }
+          }
+        }
+      });
+
+      schema = await env.lookup('hub:searchers').get(env.session, 'master', 'fields', 'vesting-schedule-start-date');
+      expect(schema).to.deep.equal({
+        "data": {
+          "type": "fields",
+          "id": "vesting-schedule-start-date",
+          "attributes": {
+            "field-type": "@cardstack/core-types::string"
+          }
+        }
+      });
+
+      schema = await env.lookup('hub:searchers').get(env.session, 'master', 'fields', 'vesting-schedule-cliff-date');
+      expect(schema).to.deep.equal({
+        "data": {
+          "type": "fields",
+          "id": "vesting-schedule-cliff-date",
+          "attributes": {
+            "field-type": "@cardstack/core-types::string"
+          }
+        }
+      });
+
+      schema = await env.lookup('hub:searchers').get(env.session, 'master', 'fields', 'vesting-schedule-duration-sec');
+      expect(schema).to.deep.equal({
+        "data": {
+          "type": "fields",
+          "id": "vesting-schedule-duration-sec",
+          "attributes": {
+            "field-type": "@cardstack/core-types::string"
+          }
+        }
+      });
+
+      schema = await env.lookup('hub:searchers').get(env.session, 'master', 'fields', 'vesting-schedule-fully-vested-amount');
+      expect(schema).to.deep.equal({
+        "data": {
+          "type": "fields",
+          "id": "vesting-schedule-fully-vested-amount",
+          "attributes": {
+            "field-type": "@cardstack/core-types::string"
+          }
+        }
+      });
+
+      schema = await env.lookup('hub:searchers').get(env.session, 'master', 'fields', 'vesting-schedule-revoke-date');
+      expect(schema).to.deep.equal({
+        "data": {
+          "type": "fields",
+          "id": "vesting-schedule-revoke-date",
+          "attributes": {
+            "field-type": "@cardstack/core-types::string"
+          }
+        }
+      });
+
+      schema = await env.lookup('hub:searchers').get(env.session, 'master', 'fields', 'vesting-schedule-is-revocable');
+      expect(schema).to.deep.equal({
+        "data": {
+          "type": "fields",
+          "id": "vesting-schedule-is-revocable",
+          "attributes": {
+            "field-type": "@cardstack/core-types::boolean"
+          }
+        }
+      });
+
+      schema = await env.lookup('hub:searchers').get(env.session, 'master', 'grants', 'sample-token-vesting-schedule-grant');
+      expect(schema).to.deep.equal({
+        "data": {
+          "type": "grants",
+          "id": "sample-token-vesting-schedule-grant",
+          "attributes": {
+            "may-read-fields": true,
+            "may-read-resource": true
+          },
+          "relationships": {
+            "who": {
+              "data": {
+                "id": "everyone",
+                "type": "groups"
+              }
+            },
+            "types": {
+              "data": [
+                {
+                  "id": "sample-token-vesting-schedules",
+                  "type": "content-types"
+                }
+              ]
             }
           }
         }
@@ -260,11 +407,11 @@ contract('SampleToken', function(accounts) {
                 },
                 {
                   "type": "fields",
-                  "id": "mapping-boolean-value"
+                  "id": "sample-token-contract"
                 },
                 {
                   "type": "fields",
-                  "id": "sample-token-contract"
+                  "id": "mapping-boolean-value"
                 }
               ]
             },
@@ -404,6 +551,45 @@ contract('SampleToken', function(accounts) {
       });
     });
 
+    it("indexes mapping entry that contains multiple return values", async function() {
+      await token.grantVestedTokens(accountOne,
+                                    100,
+                                    1000000000,
+                                    1000500000,
+                                    500000,
+                                    1000600000,
+                                    true);
+      await waitForEthereumEvents(ethereumService);
+
+      let vestingSchedule = await env.lookup('hub:searchers').get(env.session, 'master', 'sample-token-vesting-schedules', accountOne);
+
+      expect(vestingSchedule.data.attributes["ethereum-address"]).to.not.equal(vestingSchedule.data.id, 'the case between the addresses is different');
+      vestingSchedule.data.attributes["ethereum-address"] = vestingSchedule.data.attributes["ethereum-address"].toLowerCase();
+      expect(vestingSchedule).to.deep.equal({
+        "data": {
+          "id": accountOne,
+          "type": "sample-token-vesting-schedules",
+          "attributes": {
+            "ethereum-address": accountOne,
+            "vesting-schedule-fully-vested-amount": "100",
+            "vesting-schedule-start-date": "1000000000",
+            "vesting-schedule-cliff-date": "1000500000",
+            "vesting-schedule-duration-sec": "500000",
+            "vesting-schedule-revoke-date": "1000600000",
+            "vesting-schedule-is-revocable": true
+          },
+          "relationships": {
+            "sample-token-contract": {
+              "data": {
+                "id": token.address,
+                "type": "sample-tokens"
+              }
+            }
+          }
+        }
+      });
+    });
+
     it("indexes mapping entry content types when a contract fires an ethereum event", async function() {
       try {
         await env.lookup('hub:searchers').get(env.session, 'master', 'sample-token-balance-ofs', accountOne);
@@ -532,7 +718,6 @@ contract('SampleToken', function(accounts) {
       let accountTwoCustomBuyerLimit = await env.lookup('hub:searchers').get(env.session, 'master', 'sample-token-custom-buyer-limits', accountTwo);
       expect(accountTwoCustomBuyerLimit.data.attributes["mapping-number-value"]).to.equal("10", "the mapping-number-value is correct");
     });
-
   });
 
   describe('ethereum-indexer event triggers', function() {
