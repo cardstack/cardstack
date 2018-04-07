@@ -207,6 +207,7 @@ class BranchUpdate {
     this._touched[`${type}/${id}`] = true;
     let searchDoc = await this._prepareSearchDoc(type, id, doc);
     searchDoc.cardstack_source = sourceId;
+    searchDoc.cardstack_pristine.data.meta.source = sourceId;
     if (nonce) {
       searchDoc.cardstack_generation = nonce;
     }

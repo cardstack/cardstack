@@ -123,8 +123,9 @@ module.exports = class DocumentContext {
     // relationship.
 
     if (jsonapiDoc.meta) {
-      searchDoc.cardstack_meta = jsonapiDoc.meta;
-      pristine.data.meta = jsonapiDoc.meta;
+      pristine.data.meta = Object.assign({}, jsonapiDoc.meta);
+    } else {
+      pristine.data.meta = {};
     }
 
     if (depth > 0) {

@@ -40,6 +40,13 @@ describe('hub/indexers', function() {
       expect(doc).is.ok;
     });
 
+    it("includes the data source on each resource", async function() {
+      let doc = await env.lookup('hub:searchers').get(env.session, 'master', 'plugins', 'sample-plugin-one');
+      expect(doc).has.deep.property('data.meta.source', 'plugins');
+      doc = await env.lookup('hub:searchers').get(env.session, 'master', 'content-types', 'fields');
+      expect(doc).has.deep.property('data.meta.source', 'static-models');
+    });
+
     it("includes features within plugins", async function() {
       let doc = await env.lookup('hub:searchers').get(env.session, 'master', 'plugins', 'sample-plugin-one');
       expect(doc).has.property('included');
