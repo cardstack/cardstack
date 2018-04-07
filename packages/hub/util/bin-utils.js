@@ -3,7 +3,6 @@
 const commander = require('commander');
 const path = require('path');
 const fs = require('fs');
-const crypto = require('crypto');
 
 const testingToken = require('crypto').randomBytes(32).toString('base64').replace(/\W+/g, '');
 const seedsFolder = 'seeds';

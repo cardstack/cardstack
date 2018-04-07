@@ -181,20 +181,20 @@ class EthereumService {
     }
 
     let aContract = this._contracts[branch][contract];
-    let contractMethod;
+    let methodName;
     if (typeof aContract.methods[method] === 'function') {
-      contractMethod = aContract.methods[method];
+      methodName = method;
     } else if (typeof aContract.methods[singularize(method)] === 'function') {
-      contractMethod = aContract.methods[singularize(method)];
+      methodName = singularize(method);
     } else if (typeof aContract.methods[capitalize(method)] === 'function') {
-      contractMethod = aContract.methods[capitalize(method)];
+      methodName = capitalize(method);
     } else if (typeof aContract.methods[singularize(capitalize(method))] === 'function') {
-      contractMethod = aContract.methods[singularize(capitalize(method))];
+      methodName = singularize(capitalize(method));
     }
 
-    let contractInfo = await contractMethod(id).call();
-    log.debug(`retrieved contract data for contract ${contract}.${method}(${id || ''}): ${contractInfo}`);
-    return contractInfo;
+    let data = await aContract.methods[methodName](id).call();
+    log.debug(`retrieved contract data for contract ${contract}.${methodName}(${id || ''}): ${data}`);
+    return { data, methodName };
   }
 
   async getPastEventsAsHints() {
