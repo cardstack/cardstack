@@ -35,10 +35,6 @@ describe('ephemeral-storage', function() {
       body: 'Second post body'
     });
 
-    factory.addResource('data-sources', 'test-support').withAttributes({
-      sourceType: '@cardstack/test-support'
-    });
-
     factory.addResource('content-types', 'posts').withRelated('fields', [
       factory.addResource('fields', 'title').withAttributes({
         fieldType: '@cardstack/core-types::string'
@@ -172,51 +168,11 @@ describe('ephemeral-storage', function() {
       expect(response).hasStatus(409);
     });
 
-    it('can create a checkpoint', async function() {
-      let response = await request.post('/api/checkpoints').send({
-        data: {
-          type: 'checkpoints',
-          relationships: {
-            'checkpoint-data-source': { data: { type: 'data-sources', id: defaultDataSourceId } }
-          }
-        }
-      });
-
-      expect(response).hasStatus(201);
-    });
-
-    it('checkpoint cannot be patched', async function() {
-      let checkpoint = await request.post('/api/checkpoints').send({
-        data: {
-          type: 'checkpoints',
-          relationships: {
-            'checkpoint-data-source': { data: { type: 'data-sources', id: defaultDataSourceId } }
-          }
-        }
-      });
-      expect(checkpoint).hasStatus(201);
-      let response = await request.patch(`/api/checkpoints/${checkpoint.body.data.id}`).send(checkpoint.body);
-      expect(response).hasStatus(400);
-      expect(response.body.errors[0].detail).to.equal('checkpoints may not be patched');
-    });
-
-    it('checkpoint cannot be deleted', async function() {
-      let checkpoint = await request.post('/api/checkpoints').send({
-        data: {
-          type: 'checkpoints',
-          relationships: {
-            'checkpoint-data-source': { data: { type: 'data-sources', id: defaultDataSourceId } }
-          }
-        }
-      });
-      expect(checkpoint).hasStatus(201);
-      let response = await request.delete(`/api/checkpoints/${checkpoint.body.data.id}`).set('If-Match', checkpoint.body.data.meta.version);
-      expect(response).hasStatus(400);
-      expect(response.body.errors[0].detail).to.equal('checkpoints may not be deleted');
-    });
-
-
-    it('can restore a checkpoint', async function() {
+    // keeping this test here despite the fact we dont currently use checkpoints
+    // in Fixtures so that this functionality can be introduced again at a later date
+    it('can create and restore an ephemeral checkpoint', async function() {
+      let ephemeralService = env.lookup(`plugin-services:${require.resolve('../service')}`);
+      let storage = ephemeralService.findStorage('default-data-source');
 
       // Grab initial records
       let first = await request.get('/api/posts/first-post');
@@ -224,16 +180,8 @@ describe('ephemeral-storage', function() {
       expect(first).hasStatus(200);
       expect(second).hasStatus(200);
 
-      // Make a checkpoint
-      let checkpoint = await request.post('/api/checkpoints').send({
-        data: {
-          type: 'checkpoints',
-          relationships: {
-            'checkpoint-data-source': { data: { type: 'data-sources', id: defaultDataSourceId } }
-          }
-        }
-      });
-      expect(checkpoint).hasStatus(201);
+      let checkpointId = "0";
+      storage.makeCheckpoint(checkpointId);
 
       // Now do a post-checkpoint delete, patch, and post
 
@@ -262,18 +210,7 @@ describe('ephemeral-storage', function() {
       });
       expect(third).hasStatus(201);
 
-      // Restore the checkpoint
-      response = await request.post(`/api/restores`).send({
-        data: {
-          type: 'restores',
-          relationships: {
-            checkpoint: { data: { type: 'checkpoints', id: checkpoint.body.data.id } },
-            'checkpoint-data-source': { data: { type: 'data-sources', id: defaultDataSourceId } }
-          }
-        }
-      });
-
-      expect(response).hasStatus(201);
+      await storage.restoreCheckpoint(checkpointId);
 
       // and see that our delete, patch, and post are undone
       response = await request.get('/api/posts/first-post');
@@ -287,76 +224,6 @@ describe('ephemeral-storage', function() {
       expect(response).hasStatus(404);
 
     });
-
-    it('can reset to empty', async function() {
-      let response = await request.post('/api/posts').send({
-        data: {
-          type: "posts",
-          attributes: {
-            title: "hello"
-          }
-        }
-      });
-      expect(response).hasStatus(201);
-      let id = response.body.data.id;
-
-      response = await request.post('/api/restores').send({
-        data: {
-          type: 'restores',
-          relationships: {
-            checkpoint: { data: { type: 'checkpoints', id: 'empty' } },
-            'checkpoint-data-source': { data: { type: 'data-sources', id: defaultDataSourceId } }
-          }
-        }
-      });
-      expect(response).hasStatus(201);
-      response = await request.get(`/api/posts/${id}`);
-      expect(response).hasStatus(404);
-    });
-
-    it('can restore to the "seeds" checkpoint', async function() {
-      for (let id of ['initial', 'first-post', 'second-post']) {
-        let response = await request.get(`/api/posts/${id}`);
-        await request.delete(`/api/posts/${id}`).set('If-Match', response.body.data.meta.version);
-      }
-
-      let response = await request.post('/api/restores').send({
-        data: {
-          type: 'restores',
-          relationships: {
-            checkpoint: { data: { type: 'checkpoints', id: 'seeds' } }
-          }
-        }
-      });
-      expect(response).hasStatus(201);
-
-      response = await request.get(`/api/posts/initial`);
-      expect(response).hasStatus(200);
-      expect(response.body).has.deep.property('data.attributes.title', 'initial post');
-
-      response = await request.get(`/api/posts/first-post`);
-      expect(response).hasStatus(200);
-      expect(response.body).has.deep.property('data.attributes.title', 'The First Post');
-
-      response = await request.get(`/api/posts/second-post`);
-      expect(response).hasStatus(200);
-      expect(response.body).has.deep.property('data.attributes.title', 'The Second Post');
-    });
-
-    it('cannot clobber the "seeds" checkpoint', async function() {
-      let response = await request.post('/api/checkpoints').send({
-        data: {
-          id: 'seeds',
-          type: 'checkpoints',
-          relationships: {
-            'checkpoint-data-source': { data: { type: 'data-sources', id: defaultDataSourceId } }
-          }
-        }
-      });
-
-      expect(response).hasStatus(400);
-    });
-
   });
 
 

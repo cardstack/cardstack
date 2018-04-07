@@ -31,6 +31,7 @@
     "denodeify": "^1.2.1",
     "ember-cli-babel": "^6.8.2",
     "glob": "^7.1.1",
+    "handlebars": "^4.0.6",
     "koa-better-route": "^0.1.0",
     "koa-compose": "^3.2.1",
     "koa-json-body": "^5.3.0",

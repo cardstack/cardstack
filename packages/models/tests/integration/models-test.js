@@ -7,52 +7,65 @@ import RSVP from 'rsvp';
 module('Integration | Models', function(hooks) {
   setupTest(hooks);
 
+  let scenario = new Fixtures({
+    create(factory) {
+      factory.addResource('content-types', 'posts')
+        .withRelated('fields', [
+          factory.addResource('fields', 'title').withAttributes({
+            fieldType: '@cardstack/core-types::string',
+            caption: 'Fancy Title',
+            editorComponent: 'fancy-title-editor',
+            inlineEditorComponent: 'fancy-title-inline-editor'
+          }),
+          factory.addResource('fields', 'author').withAttributes({
+            fieldType: '@cardstack/core-types::belongs-to'
+          }).withRelated('related-types', [
+            factory.addResource('content-types', 'authors').withRelated('fields', [
+              factory.addResource('fields', 'name').withAttributes({
+                fieldType: '@cardstack/core-types::string'
+              })
+            ])
+          ])
+        ]);
+      factory.addResource('posts', '1')
+        .withAttributes({
+          title: 'hello world'
+        });
+      factory.addResource('posts', '2')
+        .withAttributes({
+          title: 'second'
+        }).withRelated(
+          'author',
+          factory.addResource('authors').withAttributes({ name: 'Author of Second' })
+        );
+      factory.addResource('content-types', 'pages')
+        .withAttributes({
+          routingField: 'permalink'
+        })
+        .withRelated('fields', [
+          factory.addResource('fields', 'permalink').withAttributes({
+            fieldType: '@cardstack/core-types::string'
+          })
+        ]);
+    },
+
+    destroy() {
+      return [{
+        type: 'posts'
+      },{
+        type: 'pages'
+      },{
+        type: 'authors'
+      }];
+    }
+  });
+
+  scenario.setupTest(hooks);
+
   hooks.beforeEach(async function() {
-    await scenario.setup();
     await this.owner.lookup('service:cardstack-codegen').refreshCode();
     this.store = this.owner.lookup('service:store');
    });
-
-  let scenario = new Fixtures('default', factory => {
-    factory.addResource('content-types', 'posts')
-      .withRelated('fields', [
-        factory.addResource('fields', 'title').withAttributes({
-          fieldType: '@cardstack/core-types::string',
-          caption: 'Fancy Title',
-          editorComponent: 'fancy-title-editor',
-          inlineEditorComponent: 'fancy-title-inline-editor'
-        }),
-        factory.addResource('fields', 'author').withAttributes({
-          fieldType: '@cardstack/core-types::belongs-to'
-        }).withRelated('related-types', [
-          factory.addResource('content-types', 'authors').withRelated('fields', [
-            factory.addResource('fields', 'name').withAttributes({
-              fieldType: '@cardstack/core-types::string'
-            })
-          ])
-        ])
-      ]);
-    factory.addResource('posts', '1')
-      .withAttributes({
-        title: 'hello world'
-      });
-    factory.addResource('posts', '2')
-      .withAttributes({
-        title: 'second'
-      }).withRelated(
-        'author',
-        factory.addResource('authors').withAttributes({ name: 'Author of Second' })
-      );
-    factory.addResource('content-types', 'pages')
-      .withAttributes({
-        routingField: 'permalink'
-      })
-      .withRelated('fields', [
-        factory.addResource('fields', 'permalink').withAttributes({
-          fieldType: '@cardstack/core-types::string'
-        })
-      ]);
-  });
 
   test('it can findRecord', async function(assert) {
     let model = await run(() => {

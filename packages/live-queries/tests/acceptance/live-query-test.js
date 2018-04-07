@@ -4,17 +4,15 @@ import { visit, fillIn, click } from '@ember/test-helpers';
 
 import Fixtures from '@cardstack/test-support/fixtures';
 
-let scenario = new Fixtures('default', factory => {
-  factory.addResource('items').withAttributes({content: 'hello'});
+let scenario = new Fixtures({
+  create(factory) {
+    factory.addResource('items').withAttributes({content: 'hello'});
+  }
 });
 
 module('Acceptance | live query', function(hooks) {
   setupApplicationTest(hooks);
-
-  hooks.beforeEach(async function() {
-    await scenario.setup();
-  });
-
+  scenario.setupTest(hooks);
 
   test('Adding a record, and seeing it appear in the query', async function(assert) {
     await visit('/');

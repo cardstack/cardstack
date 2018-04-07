@@ -1,79 +1,105 @@
 import Factory from './jsonapi-factory';
 import { hubURL } from '@cardstack/plugin-utils/environment';
+import { ciSessionId } from '@cardstack/test-support/environment';
 
 export default class Fixtures {
-  constructor(dataSourceId, fn) {
-    this.dataSourceId = dataSourceId;
-    this.factory = new Factory();
-    this._id = null;
-    fn(this.factory);
+  constructor({ create, destroy }) {
+    this._factory = new Factory();
+    this._create = create;
+    this._destroy = destroy;
   }
+
+  setupTest(hooks) {
+    hooks.beforeEach(async () => await this.setup());
+    hooks.afterEach(async () => await this.teardown());
+  }
+
   async setup() {
-    if (this._id == null) {
-      await this._restoreCheckpoint('empty');
-      let models = this.factory.getModels();
-      for (let [index, model] of models.entries()) {
-        let url = `${hubURL}/api/${model.type}`;
-        if (index < models.length - 1) {
-          // On all but the last api request, we opt in to not waiting
-          // for the content to be indexed. This lets us move faster
-          // and then wait for indexing to happen once at the end.
-          url += '?nowait';
-        }
-        let response = await fetch(url, {
-          method: 'POST',
-          body: JSON.stringify({
-            data: {
-              id: model.id,
-              type: model.type,
-              attributes: model.attributes,
-              relationships: model.relationships
-            }
-          })
+    if (typeof this._create !== 'function') { return; }
+
+    await this._create(this._factory);
+
+    let models = this._factory.getModels();
+
+    for (let [index, model] of models.entries()) {
+      let url = `${hubURL}/api/${model.type}`;
+      if (index < models.length - 1) {
+        // On all but the last api request, we opt in to not waiting
+        // for the content to be indexed. This lets us move faster
+        // and then wait for indexing to happen once at the end.
+        url += '?nowait';
+      }
+      let response = await fetch(url, {
+        method: 'POST',
+        headers: {
+          authorization: `Bearer ${ciSessionId}`,
+        },
+        body: JSON.stringify({
+          data: {
+            id: model.id,
+            type: model.type,
+            attributes: model.attributes,
+            relationships: model.relationships
+          }
+        })
+      });
+      if (response.status !== 201) {
+        throw new Error(`Unexpected response ${response.status} while trying to define fixtures: ${await response.text()}`);
+      }
+    }
+  }
+
+  async teardown() {
+    if (typeof this._create !== 'function') { return; }
+
+    let destructionList = [];
+    if (typeof this._destroy === 'function') {
+      destructionList = destructionList.concat(this._destroy());
+    }
+
+    let createdModels = this._factory.getModels().map(model => {
+      return { id: model.id, type: model.type };
+    });
+    destructionList = destructionList.concat(createdModels.reverse());
+
+    for (let item of destructionList) {
+      if (!item.type) { continue; }
+
+      if (item.id) {
+        let response = await fetch(`${hubURL}/api/${item.type}/${item.id}`, {
+          method: 'GET',
+          headers: { authorization: `Bearer ${ciSessionId}` }
         });
-        if (response.status !== 201) {
-          throw new Error(`Unexpected response ${response.status} while trying to define fixtures: ${await response.text()}`);
+
+        if (response.status !== 200) { continue; }
+
+        let { data:model } = await response.json();
+        await this._deleteModel(model);
+      } else {
+        let response = await fetch(`${hubURL}/api/${item.type}`, {
+          method: 'GET',
+          headers: { authorization: `Bearer ${ciSessionId}` }
+        });
+
+        if (response.status !== 200) { continue; }
+
+        let { data:models } = await response.json();
+        for (let model of models) {
+          await this._deleteModel(model);
         }
       }
-      this._id = await this._createCheckpoint();
-    } else {
-      await this._restoreCheckpoint(this._id);
     }
   }
 
-  async _createCheckpoint() {
-    let response = await fetch(`${hubURL}/api/checkpoints`, {
-      method: 'POST',
-      body: JSON.stringify({
-        data: {
-          type: 'checkpoints',
-          relationships: {
-            'checkpoint-data-source': { data: { type: 'data-sources', id: this.dataSourceId } }
-          }
-        }
-      })
-    });
-    if (response.status !== 201) {
-      throw new Error(`Unexpected response ${response.status} while trying to create checkpoint: ${await response.text()}`);
+  async _deleteModel(model) {
+    let version = model.meta && model.meta.version;
+    let headers = { authorization: `Bearer ${ciSessionId}` };
+    if (version) {
+      headers["If-Match"] = version;
     }
-    return (await response.json()).data.id;
-  }
-
-  async _restoreCheckpoint(id) {
-    let response = await fetch(`${hubURL}/api/restores`, {
-      method: 'POST',
-      body: JSON.stringify({
-        data: {
-          type: 'restores',
-          relationships: {
-            checkpoint: { data: { type: 'checkpoints', id } },
-            'checkpoint-data-source': { data: { type: 'data-sources', id: this.dataSourceId } }
-          }
-        }
-      })
+    await fetch(`${hubURL}/api/${model.type}/${model.id}`, {
+      method: 'DELETE',
+      headers
     });
-    if (response.status !== 201) {
-      throw new Error(`Unexpected response ${response.status} while trying to restore checkpoint: ${await response.text()}`);
-    }
   }
 }

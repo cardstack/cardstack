@@ -49,10 +49,6 @@ describe('postgresql/writer', function() {
         }
       });
 
-    factory.addResource('data-sources', 'test-support').withAttributes({
-      sourceType: '@cardstack/test-support'
-    });
-
     // I'm creating some restrictive grants here to ensure that the
     // operations we think we're getting are really the ones we're
     // getting. (It's currently possible for a writer implementation
@@ -251,39 +247,4 @@ describe('postgresql/writer', function() {
     expect(result.name).to.equal("Van Gogh");
     expect(result.favorite_toy).to.equal(snakeModel.id);
   });
-
-  it('cannot create a checkpoint', async function() {
-    let response = await request.post(`/api/checkpoints`)
-      .set('authorization', `Bearer ${ciSessionId}`)
-      .send({
-        data: {
-          type: 'checkpoints',
-        }
-      });
-    expect(response).hasStatus(400);
-  });
-
-  it('can restore a checkpoint using sql statements', async function() {
-    let result = await client.query('select * from articles');
-    expect(result.rows).has.length(1);
-
-    let response = await request.post(`/api/restores`)
-      .set('authorization', `Bearer ${ciSessionId}`)
-      .send({
-        data: {
-          type: 'restores',
-          attributes: {
-            params: { 'sql-statements': [ 'delete from articles' ] }
-          },
-          relationships: {
-            'checkpoint-data-source': { data: { type: 'data-sources', id: dataSourceId } }
-          }
-        }
-      });
-    expect(response).hasStatus(201);
-
-    result = await client.query('select * from articles');
-    expect(result.rows).has.length(0);
-  });
-
 });
