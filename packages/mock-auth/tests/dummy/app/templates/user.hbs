@@ -1,0 +1,12 @@
+{{#cardstack-session as |session|}}
+  {{#if model.error}}
+    <div>Error loading user: {{model.error.detail}}</div>
+  {{/if}}
+  {{#if session.isAuthenticated }}
+    {{#if model.avatarUrl}}
+      <div><img src="{{model.avatarUrl}}" width="200"></div>
+    {{/if}}
+    <div>name: {{model.name}}</div>
+    <div>email: {{model.email}}</div>
+  {{/if}}
+{{/cardstack-session}}
