@@ -8,9 +8,9 @@ export default Base.extend({
   cardstackSession: service(),
   session: service(),
 
-  restore(rawSession) {
+  async restore(rawSession) {
     return new RSVP.Promise((resolve, reject) => {
-      let validSession =
+      let potentiallyValidSession =
         rawSession && rawSession.data && rawSession.data.meta &&
         rawSession.data.meta.validUntil &&
         rawSession.data.meta.validUntil > Date.now() / 1000;
@@ -22,11 +22,25 @@ export default Base.extend({
       let secret             = localStorage.getItem('cardstack-secret-token'),
         authenticationSource = localStorage.getItem('cardstack-authentication-source');
 
-      if ( !validSession && secret && authenticationSource ) {
+      if (!potentiallyValidSession && secret && authenticationSource ) {
         localStorage.removeItem('cardstack-secret-token'),
         localStorage.removeItem('cardstack-authentication-source');
         this.authenticate( authenticationSource, { secret }).then(resolve, reject);
-      } else if ( validSession || partialSession ) {
+      } else if (potentiallyValidSession) {
+        // dont assume the session you have is valid just because session token hasn't yet expired
+        // attempt to fetch the user model that you posses to confirm the session is valid
+        let { type, id, meta: { token } } = rawSession.data;
+        fetch(`${hubURL}/api/${type}/${id}`, {
+          method: 'GET',
+          headers: { 'authorization': `Bearer ${token}` }
+        }).then(response => {
+          if (response.status === 200) {
+            resolve(rawSession);
+          } else {
+            reject();
+          }
+        });
+      } else if (partialSession) {
         resolve(rawSession);
       } else {
         reject();
