@@ -540,6 +540,16 @@ describe('authentication/middleware', function() {
         expect(response).hasStatus(401);
       });
 
+      it('can use grants to limit the user information that is returned', async function() {
+        let { token } = await auth.createToken({ id: vanGogh.id, type: 'doggies' }, 30);
+        let response = await request.get(`/auth/echo/status`).set('authorization', `Bearer ${token}`);
+
+        expect(response).hasStatus(200);
+        expect(response.body).has.deep.property('data.id', vanGogh.id);
+        expect(response.body).has.deep.property('data.attributes.favorite-toy', 'squeaky snake');
+        expect(response.body).not.has.deep.property('data.attributes.secret-rating');
+      });
+
     });
   });
 

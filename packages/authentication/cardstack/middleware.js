@@ -138,8 +138,10 @@ class Authentication {
 
           if (!user) { throw new Error(`cant find user type ${session.type} id ${session.id}`); }
 
+          let authorizedUser = await this._applyReadAuthorization(session, user);
+
           ctxt.status = 200;
-          ctxt.body = user;
+          ctxt.body = authorizedUser;
         });
       }
     ]));
@@ -204,6 +206,13 @@ class Authentication {
       Object.assign(user.data.meta, tokenMeta);
     }
 
+    let authorizedUser = await this._applyReadAuthorization(session, user);
+
+    ctxt.body = authorizedUser;
+    ctxt.status = 200;
+  }
+
+  async _applyReadAuthorization(session, user) {
     let schema = await this.currentSchema.forControllingBranch();
     let authorizedUser = await schema.applyReadAuthorization(user, { session });
     if (!authorizedUser) {
@@ -219,8 +228,7 @@ class Authentication {
       };
     }
 
-    ctxt.body = authorizedUser;
-    ctxt.status = 200;
+    return authorizedUser;
   }
 
   async _processExternalUser(user, source) {
