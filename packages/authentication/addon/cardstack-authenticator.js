@@ -8,9 +8,9 @@ export default Base.extend({
   cardstackSession: service(),
   session: service(),
 
-  restore(rawSession) {
+  async restore(rawSession) {
     return new RSVP.Promise((resolve, reject) => {
-      let validSession =
+      let potentiallyValidSession =
         rawSession && rawSession.data && rawSession.data.meta &&
         rawSession.data.meta.validUntil &&
         rawSession.data.meta.validUntil > Date.now() / 1000;
@@ -22,11 +22,25 @@ export default Base.extend({
       let secret             = localStorage.getItem('cardstack-secret-token'),
         authenticationSource = localStorage.getItem('cardstack-authentication-source');
 
-      if ( !validSession && secret && authenticationSource ) {
+      if (!potentiallyValidSession && secret && authenticationSource ) {
         localStorage.removeItem('cardstack-secret-token'),
         localStorage.removeItem('cardstack-authentication-source');
         this.authenticate( authenticationSource, { secret }).then(resolve, reject);
-      } else if ( validSession || partialSession ) {
+      } else if (potentiallyValidSession && authenticationSource) {
+        // dont assume the session you have is valid just because session token hasn't yet expired
+        localStorage.removeItem('cardstack-authentication-source');
+        let { meta: { token } } = rawSession.data;
+        fetch(`${hubURL}/auth/${authenticationSource}/status`, {
+          method: 'GET',
+          headers: { 'authorization': `Bearer ${token}` }
+        }).then(response => {
+          if (response.status === 200) {
+            resolve(rawSession);
+          } else {
+            reject();
+          }
+        });
+      } else if (partialSession) {
         resolve(rawSession);
       } else {
         reject();
@@ -46,6 +60,9 @@ export default Base.extend({
       if (response.status !== 200) {
         throw new Error("Authentication attempt failed");
       }
+
+      localStorage.setItem('cardstack-authentication-source', authenticationSource);
+
       if(response.headers.get("content-type") &&
          response.headers.get("content-type").toLowerCase().indexOf("application/json") >= 0) {
         return response.json()

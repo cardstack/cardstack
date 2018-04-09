@@ -47,7 +47,9 @@ class Updater {
           'fields': { data: [
             { type: 'fields', id: 'name' },
             { type: 'fields', id: 'email' },
-            { type: 'fields', id: 'avatar-url' }
+            { type: 'fields', id: 'avatar-url' },
+            { type: 'fields', id: 'email-verified' },
+            { type: 'fields', id: 'message' },
           ] }
         }
       },
@@ -70,6 +72,20 @@ class Updater {
         id: 'avatar-url',
         attributes: {
           'field-type': '@cardstack/core-types::string'
+        }
+      },
+      {
+        type: 'fields',
+        id: 'email-verified',
+        attributes: {
+          'field-type': '@cardstack/core-types::boolean'
+        }
+      },
+      {
+        type: 'fields',
+        id: 'message',
+        attributes: {
+          'field-type': '@cardstack/core-types::object'
         }
       },
     ];

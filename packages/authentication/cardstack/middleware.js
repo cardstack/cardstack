@@ -14,7 +14,7 @@ const { rewriteExternalUser } = require('..');
 function addCorsHeaders(response) {
   response.set('Access-Control-Allow-Origin', '*');
   response.set('Access-Control-Allow-Methods', 'GET,POST,OPTIONS');
-  response.set('Access-Control-Allow-Headers', 'Content-Type');
+  response.set('Access-Control-Allow-Headers', 'Content-Type,Authorization');
 }
 
 function isPartialSession(doc) {
@@ -85,6 +85,8 @@ class Authentication {
       this._tokenVerifier(),
       this._tokenIssuerPreflight(prefix),
       this._tokenIssuer(prefix),
+      this._tokenStatusPreflight(prefix),
+      this._tokenStatus(prefix),
       this._exposeConfiguration(prefix)
     ]);
   }
@@ -107,6 +109,42 @@ class Authentication {
       addCorsHeaders(ctxt.response);
       ctxt.status = 200;
     });
+  }
+
+  _tokenStatusPreflight(prefix) {
+    return route.options(`/${prefix}/:module/status`,  async (ctxt) => {
+      addCorsHeaders(ctxt.response);
+      ctxt.status = 200;
+    });
+  }
+
+  _tokenStatus(prefix){
+    return route.get(`/${prefix}/:module/status`, compose([
+      async (ctxt) => {
+        addCorsHeaders(ctxt.response);
+        await withJsonErrorHandling(ctxt, async () => {
+          let session = ctxt.state.cardstackSession;
+          if (!session) {
+            ctxt.status = 401;
+            ctxt.body = {
+              errors: [{
+                title: "Not authorized",
+                detail: "The authentication plugin was unable to validate the session"
+              }]
+            };
+            return;
+          }
+          let user = await this.userSearcher.get(session.type, session.id);
+
+          if (!user) { throw new Error(`cant find user type ${session.type} id ${session.id}`); }
+
+          let authorizedUser = await this._applyReadAuthorization(session, user);
+
+          ctxt.status = 200;
+          ctxt.body = authorizedUser;
+        });
+      }
+    ]));
   }
 
   async _locateAuthenticationSource(name) {
@@ -168,6 +206,13 @@ class Authentication {
       Object.assign(user.data.meta, tokenMeta);
     }
 
+    let authorizedUser = await this._applyReadAuthorization(session, user);
+
+    ctxt.body = authorizedUser;
+    ctxt.status = 200;
+  }
+
+  async _applyReadAuthorization(session, user) {
     let schema = await this.currentSchema.forControllingBranch();
     let authorizedUser = await schema.applyReadAuthorization(user, { session });
     if (!authorizedUser) {
@@ -183,8 +228,7 @@ class Authentication {
       };
     }
 
-    ctxt.body = authorizedUser;
-    ctxt.status = 200;
+    return authorizedUser;
   }
 
   async _processExternalUser(user, source) {

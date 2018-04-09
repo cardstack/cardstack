@@ -12,6 +12,7 @@ function initialModels() {
             name: "Hassan Abdel-Rahman",
             email: "hassan.abdelrahman@gmail.com",
             picture: "https://lh3.googleusercontent.com/-U2m6pPQ7vKY/AAAAAAAAAAI/AAAAAAAAAc0/z6Y4IOekEcU/photo.jpg",
+            verified: true
           }
         }
       }
