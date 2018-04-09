@@ -1,4 +1,3 @@
-const { URL } = require('url');
 const Handlebars = require('handlebars');
 const { declareInjections } = require('@cardstack/di');
 

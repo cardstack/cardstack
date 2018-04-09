@@ -4,13 +4,13 @@ const {
   destroyDefaultEnvironment
 } = require('../../../tests/stub-searcher/node_modules/@cardstack/test-support/env');
 
-describe('hub/searchers', function() {
-  let env, chocolate;
+describe('hub/searchers/basics', function() {
+  let env, chocolate, source;
 
   async function setup(stubParams) {
     let factory = new JSONAPIFactory();
 
-    factory.addResource('data-sources').
+    source = factory.addResource('data-sources').
       withAttributes({
         sourceType: 'stub-searcher',
         params: stubParams
@@ -91,6 +91,18 @@ describe('hub/searchers', function() {
     let response = await env.lookup('hub:searchers').search(env.session, 'master', { filter: { 'example-flavor': { exact: 'chocolate' } } });
     expect(response.data).length(1);
     expect(response.data[0].attributes['example-flavor']).to.equal('vanilla');
+  });
+
+  it("adds source id to model when using searcher#get", async function() {
+    await setup({ injectFirst: 'vanilla' });
+    let response = await env.lookup('hub:searchers').get(env.session, 'master', 'examples', 'anything');
+    expect(response.data).has.deep.property('meta.source', source.id);
+  });
+
+  it("adds source id to model when using searcher#search", async function() {
+    await setup({ injectFirst: 'vanilla' });
+    let response = await env.lookup('hub:searchers').search(env.session, 'master', {});
+    expect(response.data[0]).has.deep.property('meta.source', source.id);
   });
 
 });

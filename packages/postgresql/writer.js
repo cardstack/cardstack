@@ -1,7 +1,7 @@
 const PendingChange = require('@cardstack/plugin-utils/pending-change');
 const Error = require('@cardstack/plugin-utils/error');
 const { Pool } = require('pg');
-const { get, range }  = require('lodash');
+const { range }  = require('lodash');
 const rowToDocument = require('./row-to-doc');
 const NameMapper = require('./name-mapper');
 

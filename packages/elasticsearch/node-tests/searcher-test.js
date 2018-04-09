@@ -158,7 +158,7 @@ describe('elasticsearch/searcher', function() {
   it('returns properly formatted records', async function() {
     let model = (await searcher.get(env.session, 'master', 'people', '1')).data;
     let meta = model.meta;
-    expect(Object.keys(meta).sort()).deep.equals(['version']);
+    expect(Object.keys(meta).sort()).deep.equals(['source', 'version']);
     delete model.meta;
     expect(model).deep.equals({
       type: 'people',
