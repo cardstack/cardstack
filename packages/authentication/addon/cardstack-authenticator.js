@@ -26,11 +26,11 @@ export default Base.extend({
         localStorage.removeItem('cardstack-secret-token'),
         localStorage.removeItem('cardstack-authentication-source');
         this.authenticate( authenticationSource, { secret }).then(resolve, reject);
-      } else if (potentiallyValidSession) {
+      } else if (potentiallyValidSession && authenticationSource) {
         // dont assume the session you have is valid just because session token hasn't yet expired
-        // attempt to fetch the user model that you posses to confirm the session is valid
-        let { type, id, meta: { token } } = rawSession.data;
-        fetch(`${hubURL}/api/${type}/${id}`, {
+        localStorage.removeItem('cardstack-authentication-source');
+        let { meta: { token } } = rawSession.data;
+        fetch(`${hubURL}/auth/${authenticationSource}/status`, {
           method: 'GET',
           headers: { 'authorization': `Bearer ${token}` }
         }).then(response => {
@@ -60,6 +60,9 @@ export default Base.extend({
       if (response.status !== 200) {
         throw new Error("Authentication attempt failed");
       }
+
+      localStorage.setItem('cardstack-authentication-source', authenticationSource);
+
       if(response.headers.get("content-type") &&
          response.headers.get("content-type").toLowerCase().indexOf("application/json") >= 0) {
         return response.json()

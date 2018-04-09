@@ -249,8 +249,20 @@ describe('authentication/middleware', function() {
         expect(response.headers['access-control-allow-methods']).matches(/POST/);
       });
 
+      it('supports CORS preflight for status endpoint', async function() {
+        let response = await request.options('/auth/echo/status');
+        expect(response).hasStatus(200);
+        expect(response.headers['access-control-allow-methods']).matches(/GET/);
+        expect(response.headers['access-control-allow-headers']).matches(/Authorization/);
+      });
+
       it('supports CORS', async function() {
         let response = await request.post('/auth/echo').send({});
+        expect(response.headers['access-control-allow-origin']).equals('*');
+      });
+
+      it('supports CORS for status endpoint', async function() {
+        let response = await request.get('/auth/echo/status');
         expect(response.headers['access-control-allow-origin']).equals('*');
       });
 
@@ -485,6 +497,47 @@ describe('authentication/middleware', function() {
         expect(response.body.meta).deep.equals({
           'partial-session': true
         });
+      });
+
+    });
+
+    describe('token status', function() {
+      it('can get status for valid token', async function() {
+        let { token } = await auth.createToken({ id: quint.id, type: 'test-users' }, 30);
+        let response = await request.get(`/auth/echo/status`).set('authorization', `Bearer ${token}`);
+
+        expect(response).hasStatus(200);
+        expect(response.body).has.deep.property('data.id', quint.id);
+        expect(response.body).has.deep.property('data.type', 'test-users');
+        expect(response.body).has.deep.property('data.attributes.full-name', 'Quint Faulkner');
+        expect(response.body).has.deep.property('data.attributes.email', 'quint@example.com');
+      });
+
+      it('can return updated user info when getting token status', async function() {
+        let { token } = await auth.createToken({ id: quint.id, type: 'test-users' }, 30);
+        let { data:updatedQuint } = await env.lookup('hub:searchers').get(env.session, 'master', 'test-users', quint.id);
+        updatedQuint.attributes.email = 'updated@example.com';
+
+        await env.lookup('hub:writers').update('master', env.session, 'test-users', quint.id, updatedQuint);
+        await env.lookup('hub:indexers').update({ forceRefresh: true });
+
+        let response = await request.get(`/auth/echo/status`).set('authorization', `Bearer ${token}`);
+
+        expect(response).hasStatus(200);
+        expect(response.body).has.deep.property('data.attributes.email', 'updated@example.com');
+      });
+
+      it('can reject when you get status for an expired token', async function() {
+        let { token } = await auth.createToken({ id: quint.id, type: 'test-users' }, -30);
+        let response = await request.get(`/auth/echo/status`).set('authorization', `Bearer ${token}`);
+
+        expect(response).hasStatus(401);
+      });
+
+      it('can reject when you get status for an invalid token', async function() {
+        let response = await request.get(`/auth/echo/status`).set('authorization', `Bearer this--is--not--a--real--token`);
+
+        expect(response).hasStatus(401);
       });
 
     });
