@@ -1,5 +1,7 @@
 {{#cardstack-session as |session|}}
+  <div>Has authenticated session: {{session.isAuthenticated}}</div>
   {{#if session.isAuthenticated }}
+    <div>{{#link-to 'user' session.user.id}}Profile{{/link-to}}</div>
     <button {{action session.logout}}>Logout {{session.user.name}}</button>
   {{else}}
     {{#mock-login as |login|}}
@@ -7,3 +9,5 @@
     {{/mock-login}}
   {{/if}}
 {{/cardstack-session}}
+
+{{outlet}}
