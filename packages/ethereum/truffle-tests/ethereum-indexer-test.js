@@ -78,7 +78,9 @@ contract('SampleToken', function(accounts) {
                 addresses: { master: token.address },
                 eventContentTriggers: {
                   Transfer: [ "sample-token-balance-ofs" ],
-                  Mint: [ "sample-token-balance-ofs" ]
+                  Mint: [ "sample-token-balance-ofs" ],
+                  WhiteList: [ "sample-token-approved-buyers", "sample-token-custom-buyer-limits" ],
+                  VestedTokenGrant: [ "sample-token-vesting-schedules" ]
                 }
               }
             }
@@ -126,6 +128,10 @@ contract('SampleToken', function(accounts) {
                 {
                   "type": "fields",
                   "id": "sample-token-total-supply"
+                },
+                {
+                  "type": "fields",
+                  "id": "sample-token-balance-limit"
                 },
                 {
                   "id": "sample-token-owner",
@@ -190,11 +196,222 @@ contract('SampleToken', function(accounts) {
                 },
                 {
                   "type": "fields",
+                  "id": "sample-token-contract"
+                },
+                {
+                  "type": "fields",
                   "id": "mapping-number-value"
+                }
+              ]
+            },
+            "data-source": {
+              "data": {
+                "type": "data-sources",
+                "id": dataSource.id
+              }
+            }
+          }
+        }
+      });
+
+
+      schema = await env.lookup('hub:searchers').get(env.session, 'master', 'content-types', 'sample-token-custom-buyer-limits');
+      expect(schema).to.deep.equal({
+        "data": {
+          "type": "content-types",
+          "id": "sample-token-custom-buyer-limits",
+          "relationships": {
+            "fields": {
+              "data": [
+                {
+                  "type": "fields",
+                  "id": "ethereum-address"
                 },
                 {
                   "type": "fields",
                   "id": "sample-token-contract"
+                },
+                {
+                  "type": "fields",
+                  "id": "mapping-number-value"
+                }
+              ]
+            },
+            "data-source": {
+              "data": {
+                "type": "data-sources",
+                "id": dataSource.id
+              }
+            }
+          }
+        }
+      });
+
+      schema = await env.lookup('hub:searchers').get(env.session, 'master', 'content-types', 'sample-token-vesting-schedules');
+      expect(schema).to.deep.equal({
+        "data": {
+          "type": "content-types",
+          "id": "sample-token-vesting-schedules",
+          "relationships": {
+            "fields": {
+              "data": [
+                {
+                  "type": "fields",
+                  "id": "ethereum-address"
+                },
+                {
+                  "type": "fields",
+                  "id": "sample-token-contract"
+                },
+                {
+                  "type": "fields",
+                  "id": "vesting-schedule-start-date"
+                },
+                {
+                  "type": "fields",
+                  "id": "vesting-schedule-cliff-date"
+                },
+                {
+                  "type": "fields",
+                  "id": "vesting-schedule-duration-sec"
+                },
+                {
+                  "type": "fields",
+                  "id": "vesting-schedule-fully-vested-amount"
+                },
+                {
+                  "type": "fields",
+                  "id": "vesting-schedule-revoke-date"
+                },
+                {
+                  "type": "fields",
+                  "id": "vesting-schedule-is-revocable"
+                }
+              ]
+            },
+            "data-source": {
+              "data": {
+                "type": "data-sources",
+                "id": dataSource.id
+              }
+            }
+          }
+        }
+      });
+
+      schema = await env.lookup('hub:searchers').get(env.session, 'master', 'fields', 'vesting-schedule-start-date');
+      expect(schema).to.deep.equal({
+        "data": {
+          "type": "fields",
+          "id": "vesting-schedule-start-date",
+          "attributes": {
+            "field-type": "@cardstack/core-types::string"
+          }
+        }
+      });
+
+      schema = await env.lookup('hub:searchers').get(env.session, 'master', 'fields', 'vesting-schedule-cliff-date');
+      expect(schema).to.deep.equal({
+        "data": {
+          "type": "fields",
+          "id": "vesting-schedule-cliff-date",
+          "attributes": {
+            "field-type": "@cardstack/core-types::string"
+          }
+        }
+      });
+
+      schema = await env.lookup('hub:searchers').get(env.session, 'master', 'fields', 'vesting-schedule-duration-sec');
+      expect(schema).to.deep.equal({
+        "data": {
+          "type": "fields",
+          "id": "vesting-schedule-duration-sec",
+          "attributes": {
+            "field-type": "@cardstack/core-types::string"
+          }
+        }
+      });
+
+      schema = await env.lookup('hub:searchers').get(env.session, 'master', 'fields', 'vesting-schedule-fully-vested-amount');
+      expect(schema).to.deep.equal({
+        "data": {
+          "type": "fields",
+          "id": "vesting-schedule-fully-vested-amount",
+          "attributes": {
+            "field-type": "@cardstack/core-types::string"
+          }
+        }
+      });
+
+      schema = await env.lookup('hub:searchers').get(env.session, 'master', 'fields', 'vesting-schedule-revoke-date');
+      expect(schema).to.deep.equal({
+        "data": {
+          "type": "fields",
+          "id": "vesting-schedule-revoke-date",
+          "attributes": {
+            "field-type": "@cardstack/core-types::string"
+          }
+        }
+      });
+
+      schema = await env.lookup('hub:searchers').get(env.session, 'master', 'fields', 'vesting-schedule-is-revocable');
+      expect(schema).to.deep.equal({
+        "data": {
+          "type": "fields",
+          "id": "vesting-schedule-is-revocable",
+          "attributes": {
+            "field-type": "@cardstack/core-types::boolean"
+          }
+        }
+      });
+
+      schema = await env.lookup('hub:searchers').get(env.session, 'master', 'grants', 'sample-token-vesting-schedule-grant');
+      expect(schema).to.deep.equal({
+        "data": {
+          "type": "grants",
+          "id": "sample-token-vesting-schedule-grant",
+          "attributes": {
+            "may-read-fields": true,
+            "may-read-resource": true
+          },
+          "relationships": {
+            "who": {
+              "data": {
+                "id": "everyone",
+                "type": "groups"
+              }
+            },
+            "types": {
+              "data": [
+                {
+                  "id": "sample-token-vesting-schedules",
+                  "type": "content-types"
+                }
+              ]
+            }
+          }
+        }
+      });
+
+      schema = await env.lookup('hub:searchers').get(env.session, 'master', 'content-types', 'sample-token-approved-buyers');
+      expect(schema).to.deep.equal({
+        "data": {
+          "type": "content-types",
+          "id": "sample-token-approved-buyers",
+          "relationships": {
+            "fields": {
+              "data": [
+                {
+                  "type": "fields",
+                  "id": "ethereum-address"
+                },
+                {
+                  "type": "fields",
+                  "id": "sample-token-contract"
+                },
+                {
+                  "type": "fields",
+                  "id": "mapping-boolean-value"
                 }
               ]
             },
@@ -323,11 +540,51 @@ contract('SampleToken', function(accounts) {
           "attributes": {
             "ethereum-address": token.address,
             "balance-wei": "10000000000000000",
+            "sample-token-balance-limit": "0",
             "sample-token-minting-finished": false,
             "sample-token-name": "SampleToken",
             "sample-token-total-supply": "0",
             "sample-token-owner": accounts[0],
             "sample-token-symbol": "TOK"
+          }
+        }
+      });
+    });
+
+    it("indexes mapping entry that contains multiple return values", async function() {
+      await token.grantVestedTokens(accountOne,
+                                    100,
+                                    1000000000,
+                                    1000500000,
+                                    500000,
+                                    1000600000,
+                                    true);
+      await waitForEthereumEvents(ethereumService);
+
+      let vestingSchedule = await env.lookup('hub:searchers').get(env.session, 'master', 'sample-token-vesting-schedules', accountOne);
+
+      expect(vestingSchedule.data.attributes["ethereum-address"]).to.not.equal(vestingSchedule.data.id, 'the case between the addresses is different');
+      vestingSchedule.data.attributes["ethereum-address"] = vestingSchedule.data.attributes["ethereum-address"].toLowerCase();
+      expect(vestingSchedule).to.deep.equal({
+        "data": {
+          "id": accountOne,
+          "type": "sample-token-vesting-schedules",
+          "attributes": {
+            "ethereum-address": accountOne,
+            "vesting-schedule-fully-vested-amount": "100",
+            "vesting-schedule-start-date": "1000000000",
+            "vesting-schedule-cliff-date": "1000500000",
+            "vesting-schedule-duration-sec": "500000",
+            "vesting-schedule-revoke-date": "1000600000",
+            "vesting-schedule-is-revocable": true
+          },
+          "relationships": {
+            "sample-token-contract": {
+              "data": {
+                "id": token.address,
+                "type": "sample-tokens"
+              }
+            }
           }
         }
       });
@@ -379,6 +636,88 @@ contract('SampleToken', function(accounts) {
       expect(accountTwoLedgerEntry.data.attributes["mapping-number-value"]).to.equal("10", "the token balance is correct");
     });
 
+    it("indexes mapping entry content with different field types for the same event", async function() {
+      try {
+        await env.lookup('hub:searchers').get(env.session, 'master', 'sample-token-custom-buyer-limits', accountOne);
+        throw new Error("sample-token-custom-buyer-limits record should not exist for this address");
+      } catch (err) {
+        expect(err.message).to.equal(`No such resource master/sample-token-custom-buyer-limits/${accountOne}`);
+      }
+
+      try {
+        await env.lookup('hub:searchers').get(env.session, 'master', 'sample-token-approved-buyers', accountOne);
+        throw new Error("sample-token-approved-buyers record should not exist for this address");
+      } catch (err) {
+        expect(err.message).to.equal(`No such resource master/sample-token-approved-buyers/${accountOne}`);
+      }
+
+      try {
+        await env.lookup('hub:searchers').get(env.session, 'master', 'sample-token-custom-buyer-limits', accountTwo);
+        throw new Error("sample-token-custom-buyer-limits record should not exist for this address");
+      } catch (err) {
+        expect(err.message).to.equal(`No such resource master/sample-token-custom-buyer-limits/${accountTwo}`);
+      }
+
+      try {
+        await env.lookup('hub:searchers').get(env.session, 'master', 'sample-token-approved-buyers', accountTwo);
+        throw new Error("sample-token-approved-buyers record should not exist for this address");
+      } catch (err) {
+        expect(err.message).to.equal(`No such resource master/sample-token-approved-buyers/${accountTwo}`);
+      }
+
+      await token.addBuyer(accountOne);
+      await token.setCustomBuyer(accountTwo, 10);
+      await waitForEthereumEvents(ethereumService);
+      await env.lookup('hub:indexers').update({ forceRefresh: true });
+
+      let accountOneApprovedBuyer = await env.lookup('hub:searchers').get(env.session, 'master', 'sample-token-approved-buyers', accountOne);
+      accountOneApprovedBuyer.data.attributes["ethereum-address"] = accountOneApprovedBuyer.data.attributes["ethereum-address"].toLowerCase();
+      expect(accountOneApprovedBuyer).to.deep.equal({
+        "data": {
+          "id": accountOne,
+          "type": "sample-token-approved-buyers",
+          "attributes": {
+            "ethereum-address": accountOne,
+            "mapping-boolean-value": true
+          },
+          "relationships": {
+            "sample-token-contract": {
+              "data": {
+                "id": token.address,
+                "type": "sample-tokens"
+              }
+            }
+          }
+        }
+      });
+
+      let accountOneCustomBuyerLimit = await env.lookup('hub:searchers').get(env.session, 'master', 'sample-token-custom-buyer-limits', accountOne);
+      accountOneCustomBuyerLimit.data.attributes["ethereum-address"] = accountOneCustomBuyerLimit.data.attributes["ethereum-address"].toLowerCase();
+      expect(accountOneCustomBuyerLimit).to.deep.equal({
+        "data": {
+          "id": accountOne,
+          "type": "sample-token-custom-buyer-limits",
+          "attributes": {
+            "ethereum-address": accountOne,
+            "mapping-number-value": "0"
+          },
+          "relationships": {
+            "sample-token-contract": {
+              "data": {
+                "id": token.address,
+                "type": "sample-tokens"
+              }
+            }
+          }
+        }
+      });
+
+      let accountTwoApprovedBuyer = await env.lookup('hub:searchers').get(env.session, 'master', 'sample-token-approved-buyers', accountTwo);
+      expect(accountTwoApprovedBuyer.data.attributes["mapping-boolean-value"]).to.equal(true, "the mapping-boolean-value is correct");
+
+      let accountTwoCustomBuyerLimit = await env.lookup('hub:searchers').get(env.session, 'master', 'sample-token-custom-buyer-limits', accountTwo);
+      expect(accountTwoCustomBuyerLimit.data.attributes["mapping-number-value"]).to.equal("10", "the mapping-number-value is correct");
+    });
   });
 
   describe('ethereum-indexer event triggers', function() {
