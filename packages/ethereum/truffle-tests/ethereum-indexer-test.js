@@ -216,6 +216,9 @@ contract('SampleToken', function(accounts) {
                 "id": dataSource.id
               }
             }
+          },
+          "meta": {
+            "source": "ethereum"
           }
         }
       });
@@ -249,6 +252,9 @@ contract('SampleToken', function(accounts) {
                 "id": dataSource.id
               }
             }
+          },
+          "meta": {
+            "source": "ethereum"
           }
         }
       });
@@ -301,6 +307,9 @@ contract('SampleToken', function(accounts) {
                 "id": dataSource.id
               }
             }
+          },
+          "meta": {
+            "source": "ethereum"
           }
         }
       });
@@ -312,6 +321,9 @@ contract('SampleToken', function(accounts) {
           "id": "vesting-schedule-start-date",
           "attributes": {
             "field-type": "@cardstack/core-types::string"
+          },
+          "meta": {
+            "source": "ethereum"
           }
         }
       });
@@ -323,6 +335,9 @@ contract('SampleToken', function(accounts) {
           "id": "vesting-schedule-cliff-date",
           "attributes": {
             "field-type": "@cardstack/core-types::string"
+          },
+          "meta": {
+            "source": "ethereum"
           }
         }
       });
@@ -334,6 +349,9 @@ contract('SampleToken', function(accounts) {
           "id": "vesting-schedule-duration-sec",
           "attributes": {
             "field-type": "@cardstack/core-types::string"
+          },
+          "meta": {
+            "source": "ethereum"
           }
         }
       });
@@ -345,6 +363,9 @@ contract('SampleToken', function(accounts) {
           "id": "vesting-schedule-fully-vested-amount",
           "attributes": {
             "field-type": "@cardstack/core-types::string"
+          },
+          "meta": {
+            "source": "ethereum"
           }
         }
       });
@@ -356,6 +377,9 @@ contract('SampleToken', function(accounts) {
           "id": "vesting-schedule-revoke-date",
           "attributes": {
             "field-type": "@cardstack/core-types::string"
+          },
+          "meta": {
+            "source": "ethereum"
           }
         }
       });
@@ -367,6 +391,9 @@ contract('SampleToken', function(accounts) {
           "id": "vesting-schedule-is-revocable",
           "attributes": {
             "field-type": "@cardstack/core-types::boolean"
+          },
+          "meta": {
+            "source": "ethereum"
           }
         }
       });
@@ -395,6 +422,9 @@ contract('SampleToken', function(accounts) {
                 }
               ]
             }
+          },
+          "meta": {
+            "source": "ethereum"
           }
         }
       });
@@ -618,6 +648,9 @@ contract('SampleToken', function(accounts) {
                 "type": "sample-tokens"
               }
             }
+          },
+          "meta": {
+            "source": "ethereum"
           }
         }
       });
@@ -723,6 +756,9 @@ contract('SampleToken', function(accounts) {
                 "type": "sample-tokens"
               }
             }
+          },
+          "meta": {
+            "source": "ethereum"
           }
         }
       });
@@ -744,6 +780,9 @@ contract('SampleToken', function(accounts) {
                 "type": "sample-tokens"
               }
             }
+          },
+          "meta": {
+            "source": "ethereum"
           }
         }
       });
