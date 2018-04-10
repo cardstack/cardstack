@@ -1,6 +1,6 @@
 {
   "name": "@cardstack/test-support",
-  "version": "0.6.7",
+  "version": "0.6.8",
   "description": "Shared test support for cardstack packages.",
   "main": "index.js",
   "scripts": {
@@ -18,12 +18,12 @@
     "api-version": 1
   },
   "dependencies": {
-    "@cardstack/di": "^0.6.7",
-    "@cardstack/elasticsearch": "^0.6.7",
-    "@cardstack/ephemeral": "^0.6.7",
-    "@cardstack/hub": "^0.6.7",
+    "@cardstack/di": "^0.6.8",
+    "@cardstack/elasticsearch": "^0.6.8",
+    "@cardstack/ephemeral": "^0.6.8",
+    "@cardstack/hub": "^0.6.8",
     "@cardstack/logger": "^0.1.0",
-    "@cardstack/plugin-utils": "^0.6.7",
+    "@cardstack/plugin-utils": "^0.6.8",
     "@std/esm": "^0.25.1",
     "chai": "^3.5.0",
     "chai-things": "^0.2.0",
@@ -43,7 +43,7 @@
     "temp": "^0.8.3"
   },
   "devDependencies": {
-    "@cardstack/eslint-config": "^0.6.7",
+    "@cardstack/eslint-config": "^0.6.8",
     "eslint": "4.9.0",
     "eslint-plugin-ember": "^5.0.0",
     "eslint-plugin-node": "^5.2.1"
