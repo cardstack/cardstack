@@ -246,10 +246,10 @@ class LogBridge {
     this.log.trace(`${method} ${requestUrl.path} ${responseStatus}`);
   }
   // map 1-to-1 with out log levels, but our 'warn' is their 'warning'
-  debug(message) { this.log.debug(message); }
-  info(message) { this.log.info(message); }
-  warning(message) { this.log.warn(message); }
-  error(message) { this.log.error(message); }
+  debug(...message) { this.log.debug(...message); }
+  info(...message) { this.log.info(...message); }
+  warning(...message) { this.log.warn(...message); }
+  error(...message) { this.log.error(...message); }
 
   close() {}
 }
