@@ -3,6 +3,7 @@ const {
   destroyDefaultEnvironment
 } = require('@cardstack/test-support/env');
 const { Client } = require('pg');
+const ElasticAssert = require('@cardstack/elasticsearch/node-tests/assertions');
 const JSONAPIFactory = require('@cardstack/test-support/jsonapi-factory');
 
 describe('postgresql/indexer', function() {
@@ -249,6 +250,22 @@ describe('postgresql/indexer', function() {
       expect(doc).has.deep.property('data.attributes.author', 'Arthur');
     });
 
+    it('cleans up abandoned replication slots', async function() {
+      await env.lookup('hub:indexers').update({ forceRefresh: true });
+      let result = await client.query('SELECT * FROM pg_replication_slots');
+      let [ { slot_name: abandonedSlot } ] = result.rows;
+
+      // deleting the index will cause the replication slot to be abandoned
+      let ea = new ElasticAssert();
+      await ea.deleteContentIndices();
+      await env.lookup('hub:indexers').update({ forceRefresh: true });
+
+      result = await client.query('SELECT * FROM pg_replication_slots');
+      expect(result.rows.length).to.equal(1); // currently test DB is configured to fire an error if more than 1 slot created, but including this test in case that is ever changed
+
+      let [ { slot_name: currentSlot } ] = result.rows;
+      expect(currentSlot).to.not.equal(abandonedSlot);
+    });
 
   });
 });
