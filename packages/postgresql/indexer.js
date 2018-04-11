@@ -17,6 +17,8 @@ const changePattern = /^table ([^.]+)\.([^:]+): ([^:]+): (.*)/;
 // If your id contains spaces or quotes yer gonna have a bad time. Sorry not sorry.
 const idPattern = /id\[[^\]]+\]:'?([^\s']+)/;
 
+const replicationSlotPrefix = process.env.ELASTICSEARCH_PREFIX || 'cardstack';
+
 module.exports = declareInjections({
   projectConfig: 'config:project'
 }, class Indexer {
@@ -221,7 +223,7 @@ class Updater {
     if (meta && meta.replicationSlot) {
       replicationSlot = meta.replicationSlot;
     } else {
-      replicationSlot = `cardstack_${Math.floor(Math.random() * Number.MAX_SAFE_INTEGER)}`;
+      replicationSlot = `${replicationSlotPrefix}_${Math.floor(Math.random() * Number.MAX_SAFE_INTEGER)}`;
     }
 
     let lastSchema;
@@ -293,6 +295,7 @@ class Updater {
 
   async _fullUpdate(replicationSlot, ops) {
     await ops.beginReplaceAll();
+    await this._removeAbandonedReplicationSlots(replicationSlot);
     await this.query(`SELECT * FROM pg_create_logical_replication_slot($1, 'test_decoding')`, [replicationSlot]);
     log.debug("Created new replication slot %s", replicationSlot);
     for (let model of await this.schema()) {
@@ -306,6 +309,14 @@ class Updater {
     // initial crawl.
     await this._processReplicationLog(replicationSlot, ops);
     await ops.finishReplaceAll();
+  }
+
+  async _removeAbandonedReplicationSlots(currentReplicationSlot) {
+    let { rows:slots } = await this.query(`SELECT * FROM pg_replication_slots where slot_name like '${replicationSlotPrefix}_%'`);
+    for (let { slot_name:slot } of slots) {
+      if (slot === currentReplicationSlot) { continue; }
+      await this.query(`select pg_drop_replication_slot($1) from pg_replication_slots;`, [ slot ]);
+    }
   }
 
   async _fullUpdateType(type, ops) {
