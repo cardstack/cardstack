@@ -10,7 +10,10 @@ export default class Fixtures {
   }
 
   setupTest(hooks) {
-    hooks.beforeEach(async () => await this.setup());
+    hooks.beforeEach(async () => {
+      await this.teardown();
+      await this.setup();
+    });
     hooks.afterEach(async () => await this.teardown());
   }
 
