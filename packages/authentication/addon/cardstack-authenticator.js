@@ -35,6 +35,7 @@ export default Base.extend({
           headers: { 'authorization': `Bearer ${token}` }
         }).then(response => {
           if (response.status === 200) {
+            localStorage.setItem('cardstack-authentication-source', authenticationSource);
             resolve(rawSession);
           } else {
             reject();
