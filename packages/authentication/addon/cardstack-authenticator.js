@@ -36,7 +36,7 @@ export default Base.extend({
         }).then(response => {
           if (response.status === 200) {
             localStorage.setItem('cardstack-authentication-source', authenticationSource);
-            resolve(rawSession);
+            resolve(response.json());
           } else {
             reject();
           }
