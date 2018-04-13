@@ -1,6 +1,6 @@
 {
   "name": "@cardstack/email-auth",
-  "version": "0.6.9",
+  "version": "0.6.10",
   "description": "The default blueprint for ember-cli addons.",
   "keywords": [
     "ember-addon",
@@ -27,7 +27,7 @@
     "handlebars": "^4.0.6"
   },
   "devDependencies": {
-    "@cardstack/authentication": "^0.6.9",
+    "@cardstack/authentication": "^0.6.10",
     "@cardstack/eslint-config": "^0.6.8",
     "@cardstack/test-support": "^0.6.9",
     "@cardstack/test-support-messenger": "^0.6.8",
