@@ -193,6 +193,10 @@ module.exports = class ContentType {
     return this.realms.authorizedReadRealms(resource);
   }
 
+  hasLoginAuthorization(userRealms) {
+    return this.realms.mayLogin(userRealms);
+  }
+
   applyReadAuthorization(resource, userRealms) {
     if (!this.realms.mayReadResource(resource, userRealms)) {
       return;

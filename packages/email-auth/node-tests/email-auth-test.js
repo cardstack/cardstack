@@ -24,6 +24,13 @@ describe('email-auth', function() {
         mayReadFields: true
       });
 
+    factory.addResource('grants')
+      .withRelated('who', { type: 'groups', id: 'everyone' })
+      .withRelated('types', [{ type: 'content-types', id: 'users' } ])
+      .withAttributes({
+        mayLogin: true
+      });
+
     factory.addResource('users', 'valid-quint-id').withAttributes({
       email: 'quint@example.com',
     });

@@ -11,11 +11,18 @@ module.exports = class Realms {
     let allFields = new Set();
     let dynamicAllFields = [];
 
+    // set of realms that are allowed to login
+    let canLogin = new Set();
+
     // keys are field names. values are sets of realms
     let fields = new Map();
     let dynamicFields = new Map();
 
     for (let grant of grants) {
+      if (grant['may-login'] && grant.groupId != null) {
+        canLogin.add(grant.groupId);
+      }
+
       if (grant['may-read-resource']) {
         if (grant.groupId != null) {
           resource.add(grant.groupId);
@@ -62,6 +69,11 @@ module.exports = class Realms {
     this._dynamicAllFieldReaders = dynamicAllFields;
     this._fieldReaders = fields;
     this._dynamicFieldReaders = dynamicFields;
+    this._allowedToLogin = canLogin;
+  }
+
+  mayLogin(userRealms) {
+    return Boolean(userRealms.find(realm => this._allowedToLogin.has(realm)));
   }
 
   mayReadResource(resource, userRealms) {

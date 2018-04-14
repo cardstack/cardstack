@@ -53,7 +53,8 @@ exports.createDefaultEnvironment = async function(projectDir, initialModels = []
         mayUpdateResource: true,
         mayDeleteResource: true,
         mayReadFields: true,
-        mayWriteFields: true
+        mayWriteFields: true,
+        mayLogin: true
       }).withRelated('who', factory.addResource('groups', user.data.id));
 
     let [
