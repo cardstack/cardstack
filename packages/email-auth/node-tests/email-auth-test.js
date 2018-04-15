@@ -26,7 +26,6 @@ describe('email-auth', function() {
 
     factory.addResource('grants')
       .withRelated('who', { type: 'groups', id: 'everyone' })
-      .withRelated('types', [{ type: 'content-types', id: 'users' } ])
       .withAttributes({
         mayLogin: true
       });

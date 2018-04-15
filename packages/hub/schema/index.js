@@ -199,23 +199,17 @@ class Schema {
     }
   }
 
-  async hasLoginAuthorization(user={}) {
-    let { id, type } = user;
-    if (!type) {
+  async hasLoginAuthorization(context={}) {
+    let session = context.session || Session.EVERYONE;
+    let userRealms = await session.realms();
+
+    if (!session.type) {
       return;
     }
 
-    let userType = this.types.get(type);
+    let userType = this.types.get(session.type);
     if (!userType) {
       return;
-    }
-
-    // TODO refactor this when we flesh out how groups
-    // are created. right now we use the user's id as their
-    // realm id
-    let userRealms = [ 'everyone' ];
-    if (id) {
-      userRealms.push(id);
     }
 
     return userType.hasLoginAuthorization(userRealms);
