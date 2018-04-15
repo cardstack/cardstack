@@ -199,15 +199,14 @@ class Schema {
     }
   }
 
-  async hasLoginAuthorization(context={}) {
-    let session = context.session || Session.EVERYONE;
-    let userRealms = await session.realms();
+  async hasLoginAuthorization(potentialSession=Session.EVERYONE) {
+    let userRealms = await potentialSession.realms();
 
-    if (!session.type) {
+    if (!potentialSession.type) {
       return;
     }
 
-    let userType = this.types.get(session.type);
+    let userType = this.types.get(potentialSession.type);
     if (!userType) {
       return;
     }

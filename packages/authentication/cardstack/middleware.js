@@ -201,7 +201,7 @@ class Authentication {
     let session = new Session(sessionPayload, this.userSearcher);
 
     let schema = await this.currentSchema.forControllingBranch();
-    let canLogin = await schema.hasLoginAuthorization({ session });
+    let canLogin = await schema.hasLoginAuthorization(session);
 
     if (!canLogin) {
       ctxt.status = 401;
