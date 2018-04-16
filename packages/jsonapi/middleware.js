@@ -11,7 +11,8 @@ const { withJsonErrorHandling } = Error;
 module.exports = declareInjections({
   searcher: 'hub:searchers',
   writers: 'hub:writers',
-  indexers: 'hub:indexers'
+  indexers: 'hub:indexers',
+  schema: 'hub:current-schema'
 }, {
   create({ searcher, writers, indexers }) {
     return {

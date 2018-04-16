@@ -199,6 +199,21 @@ class Schema {
     }
   }
 
+  async hasLoginAuthorization(potentialSession=Session.EVERYONE) {
+    let userRealms = await potentialSession.realms();
+
+    if (!potentialSession.type) {
+      return;
+    }
+
+    let userType = this.types.get(potentialSession.type);
+    if (!userType) {
+      return;
+    }
+
+    return userType.hasLoginAuthorization(userRealms);
+  }
+
   async applyReadAuthorization(document, context={}) {
     if (!document.data) {
       return;

@@ -143,7 +143,8 @@ const actions = [
   'may-update-resource',
   'may-delete-resource',
   'may-read-fields',
-  'may-write-fields'
+  'may-write-fields',
+  'may-login'
 ];
 const log = require('@cardstack/logger')('cardstack/auth');
 const Session = require('@cardstack/plugin-utils/session');

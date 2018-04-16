@@ -199,6 +199,22 @@ class Authentication {
 
     let sessionPayload = { id: user.data.id, type: user.data.type };
     let session = new Session(sessionPayload, this.userSearcher);
+
+    let schema = await this.currentSchema.forControllingBranch();
+    let canLogin = await schema.hasLoginAuthorization(session);
+
+    if (!canLogin) {
+      ctxt.status = 401;
+      ctxt.body = {
+        errors: [{
+          title: "Not authorized",
+          detail: "You do not posses a grant that authorizes you to login"
+        }]
+      };
+
+      return;
+    }
+
     let tokenMeta = await this.createToken(sessionPayload, source.tokenExpirySeconds);
     if (!user.data.meta) {
       user.data.meta = tokenMeta;

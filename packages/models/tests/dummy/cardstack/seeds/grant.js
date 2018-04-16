@@ -11,7 +11,8 @@ module.exports = [
       'may-create-resource': true,
       'may-update-resource': true,
       'may-delete-resource': true,
-      'may-read-resource': true
+      'may-read-resource': true,
+      'may-login': true
     },
     relationships: {
       who: {

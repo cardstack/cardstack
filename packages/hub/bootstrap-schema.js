@@ -86,6 +86,7 @@ const models = [
           { type: 'fields', id: 'may-delete-resource' },
           { type: 'fields', id: 'may-read-fields' },
           { type: 'fields', id: 'may-write-fields' },
+          { type: 'fields', id: 'may-login' },
           { type: 'fields', id: 'types' },
           { type: 'fields', id: 'fields' }
         ]
@@ -495,6 +496,13 @@ const models = [
   },
   {
     type: 'fields',
+    id: 'may-login',
+    attributes: {
+      'field-type': '@cardstack/core-types::boolean'
+    }
+  },
+  {
+    type: 'fields',
     id: 'plugin',
     attributes: {
       'field-type': '@cardstack/core-types::belongs-to'
@@ -535,7 +543,8 @@ const models = [
       'may-create-resource': true,
       'may-read-resource': true,
       'may-update-resource': true,
-      'may-delete-resource': true
+      'may-delete-resource': true,
+      'may-login': true
     },
     relationships: {
       who: {

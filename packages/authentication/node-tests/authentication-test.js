@@ -31,6 +31,12 @@ describe('authentication/middleware', function() {
         mayReadFields: true
       });
 
+    factory.addResource('grants')
+      .withRelated('who', { type: 'groups', id: 'everyone' })
+      .withAttributes({
+        mayLogin: true
+      });
+
     quint = factory.addResource('test-users').withAttributes({
       email: 'quint@example.com',
       fullName: "Quint Faulkner"
