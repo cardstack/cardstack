@@ -94,6 +94,25 @@ Additionaly you can omit the `--rinkeby` flag to run on the ethereum mainnet. Th
 websocket API from geth, which will be running on `ws://localhost:8546`. After you start geth for the first time, it will take a few hours
 to download all the blocks. You can keep track of the downloaded block numbers and compare it with the current block height to monitor progress.
 
+### Development in Windows
+
+If you are building the Cardstack `ethereum` plugin, either standalone or as a dependency in another project, you will need to have the Windows C++ binaries (akin to having XCode installed on macOS) and the Python executable available. If you do not, you will likely encounter an error similar to the following:
+
+```
+node_modules\\scrypt\\build\\scrypt_wrapper.vcxproj(20,3): error MSB4019: The imported project \"C:\\Microsoft.Cpp.Default.props\" was not found. Confirm that the path in the <Import> declaration is correct, and that the file exists on disk.
+gyp ERR! build error
+gyp ERR! stack Error: `C:\\Windows\\Microsoft.NET\\Framework\\v4.0.30319\\msbuild.exe` failed with exit code: 1
+
+```
+
+Fortunately, you do *not* need to install the entire Visual Studio suite to accomplish this, there is a very helpful npm package called `windows-build-tools`, tl;dr, do this (it takes a *long* time):
+
+```
+npm install --global --production windows-build-tools
+```
+
+Refer to the [repo](https://github.com/felixrieseberg/windows-build-tools) for more info.
+
 
 ## Project-wide Policy and Community Governance
 
