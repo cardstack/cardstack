@@ -619,6 +619,62 @@ describe('schema/auth/write', function() {
     });
   });
 
+  it("forbids creation of a resource that you're not authorized to read", async function() {
+    // As a policy, we require you to have resource-level read auth on
+    // things you are creating or updating. This is because we're
+    // going to echo the results back to you, and we don't want there
+    // to be any ambiguity that would allow secrets to leak.
+    factory.addResource('grants').withAttributes({ mayCreateResource: true }).withRelated('who', everyone);
+    let schema = await loader.loadFrom(factory.getModels());
+    let action = create({
+      type: 'articles',
+      id: '1',
+      attributes: {
+        coolness: 6
+      }
+    });
+    let errors = await schema.validationErrors(action);
+    expect(errors).collectionContains({
+      status: 404,
+      detail: '"articles" is not a valid type'
+    });
+  });
+
+  it("forbids update of a resource that you're not authorized to read", async function() {
+    // As a policy, we require you to have resource-level read auth on
+    // things you are creating or updating . This is because we're
+    // going to echo the results back to you, and we don't want there
+    // to be any ambiguity that would allow secrets to leak.
+    factory.addResource('grants').withAttributes({ mayUpdateResource: true }).withRelated('who', everyone);
+    let schema = await loader.loadFrom(factory.getModels());
+    let action = update({
+      type: 'articles',
+      id: '1',
+      attributes: {
+        coolness: 6
+      }
+    },{
+      type: 'articles',
+      id: '1',
+      attributes: {
+        coolness: 6
+      }
+    });
+    let errors = await schema.validationErrors(action);
+    expect(errors).collectionContains({
+      status: 404,
+      detail: '"articles" is not a valid type'
+    });
+  });
+
+  it("forbids inclusion of fields you're not authorized to read, even if they are unchanged, during create", async function() {
+    throw new Error("implement me");
+  });
+
+  it("forbids inclusion of fields you're not authorized to read, even if they are unchanged, during update", async function() {
+    throw new Error("implement me");
+  });
+
 });
 
 function create(document) {
