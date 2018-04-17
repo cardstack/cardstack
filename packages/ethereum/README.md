@@ -1,6 +1,17 @@
 # @cardstack/ethereum
 * `yarn install`
 
+## Development in Windows
+
+Because of the dependency on `sha3`, you will need to have C++ binaries and the Python executable available during `yarn install`. The easiest way to do this in Windows:
+
+```
+npm install --global --production windows-build-tools
+```
+
+Refer to the [repo](https://github.com/felixrieseberg/windows-build-tools) for more info.
+
+
 ## Running
 
 * To view a working demo of this addon, run `ember serve`
