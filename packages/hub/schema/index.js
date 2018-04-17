@@ -214,6 +214,15 @@ class Schema {
     return userType.hasLoginAuthorization(userRealms);
   }
 
+  // This takes an arbitrary JSON:API document and makes it safe to
+  // show within the given context. If it can't be shown at all
+  // (because the primary resource is not readable), we return
+  // undefined.
+  //
+  // Otherwise, we go through each included resource and field to
+  // ensure there are valid grants for them. We return a new sanitized
+  // document that strips out any included resources or fields that
+  // were lacking grants.
   async applyReadAuthorization(document, context={}) {
     if (!document.data) {
       return;
