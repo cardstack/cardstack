@@ -146,39 +146,37 @@ module.exports = class ContentType {
     return analyzers;
   }
 
+  async _assertGrant(documents, context, permission, description) {
+    let grant = await find(this.grants, async g => {
+      if (!g[permission]) {
+        return false;
+      }
+      let documentMatches = await Promise.all(documents.map(document => g.matches(document, context)));
+      return documentMatches.every(Boolean);
+    });
+    if (grant) {
+      authLog.debug("approved %s of %s %s because of grant %s", description, documents[0].type, documents[0].id, grant.id);
+      authLog.trace("grant %s = %j", grant.id, grant);
+    } else {
+      authLog.trace("no matching %s grant for %j in %j", description, context, this.grants);
+      if (permission === 'may-read-resource') {
+        throw new Error(`Not found`, { status: 404 });
+      } else {
+        throw new Error(`You may not ${description} this resource`, { status: 401 });
+      }
+    }
+  }
+
   async _validateResourceLevelAuthorization(pendingChange, context) {
     let { originalDocument, finalDocument } = pendingChange;
     if (!finalDocument) {
-      let grant = await find(this.grants, async g => g['may-delete-resource'] && await g.matches(originalDocument, context));
-      if (grant) {
-        authLog.debug("approved deletion of %s %s because of grant %s", originalDocument.type, originalDocument.id, grant.id);
-        authLog.trace("grant %s = %j", grant.id, grant);
-      } else {
-        authLog.trace("no matching deletion grant for %j in %j", context, this.grants);
-        throw new Error("You may not delete this resource", { status: 401 });
-      }
+      await this._assertGrant([originalDocument], context, 'may-delete-resource', 'delete');
     } else if (!originalDocument) {
-      let grant = await find(this.grants, async g => g['may-create-resource'] && await g.matches(finalDocument, context));
-      if (grant) {
-        authLog.debug("approved creation of %s %s because of grant %s", finalDocument.type, finalDocument.id, grant.id);
-        authLog.trace("grant %s = %j", grant.id, grant);
-      } else {
-        authLog.trace("no matching creation grant for %j in %j", context, this.grants);
-        throw new Error("You may not create this resource", { status: 401 });
-      }
+      await this._assertGrant([finalDocument], context, 'may-read-resource', 'read (during create)');
+      await this._assertGrant([finalDocument], context, 'may-create-resource', 'create');
     } else {
-      let grant = await find(this.grants,
-        async g => g['may-update-resource'] &&
-          (await g.matches(finalDocument, context)) &&
-          (await g.matches(originalDocument, context))
-      );
-      if (grant) {
-        authLog.debug("approved update of %s %s because of grant %s", finalDocument.type, finalDocument.id, grant.id);
-        authLog.trace("grant %s = %j", grant.id, grant);
-      } else {
-        authLog.trace("no matching update grant for %j in %j", context, this.grants);
-        throw new Error("You may not update this resource", { status: 401 });
-      }
+      await this._assertGrant([finalDocument, originalDocument], context, 'may-read-resource', 'read (during update)');
+      await this._assertGrant([finalDocument, originalDocument], context, 'may-update-resource', 'update');
     }
   }
 
