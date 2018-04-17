@@ -3,6 +3,7 @@ const find = require('../async-find');
 const { flatten } = require('lodash');
 const Realms = require('./realms');
 const authLog = require('@cardstack/logger')('cardstack/auth');
+const Session = require('@cardstack/plugin-utils/session');
 
 module.exports = class ContentType {
   constructor(model, allFields, allConstraints, dataSources, defaultDataSource, allGrants) {
@@ -66,18 +67,24 @@ module.exports = class ContentType {
       return;
     }
 
+
+    let errors = [];
+    let badFields = Object.create(null);
+
+    this._validateFieldReadAuth(pendingChange, context, errors, badFields);
+
     for (let field of this.fields.values()) {
       await field.applyDefault(pendingChange, context);
     }
 
-    let errors = [];
-    let badFields = Object.create(null);
     for (let field of this.fields.values()) {
-      let fieldErrors = await field.validationErrors(pendingChange, context);
-      if (fieldErrors.length > 0) {
-        badFields[field.id] = true;
+      if (!badFields[field.id]) {
+        let fieldErrors = await field.validationErrors(pendingChange, context);
+        if (fieldErrors.length > 0) {
+          badFields[field.id] = true;
+        }
+        errors = errors.concat(tagFieldErrors(field, fieldErrors));
       }
-      errors = errors.concat(tagFieldErrors(field, fieldErrors));
     }
 
     errors = errors.concat(await this._checkConstraints(pendingChange, badFields));
@@ -99,26 +106,26 @@ module.exports = class ContentType {
     return flatten(await Promise.all(activeConstraints.map(constraint => constraint.validationErrors(pendingChange, this.fields))));
   }
 
+  _unknownFieldError(fieldName, section) {
+    return new Error(`type "${this.id}" has no field named "${fieldName}"`, {
+      status: 400,
+      title: 'Validation error',
+      source: { pointer: `/data/${section}/${fieldName}` }
+    });
+  }
+
   _validateUnknownFields(document, errors) {
     if (document.attributes) {
       for (let fieldName of Object.keys(document.attributes)) {
         if (!this.fields.has(fieldName)) {
-          errors.push(new Error(`type "${this.id}" has no field named "${fieldName}"`, {
-            status: 400,
-            title: 'Validation error',
-            source: { pointer: `/data/attributes/${fieldName}` }
-          }));
+          errors.push(this._unknownFieldError(fieldName, 'attributes'));
         }
       }
     }
     if (document.relationships) {
       for (let fieldName of Object.keys(document.relationships)) {
         if (!this.fields.has(fieldName)) {
-          errors.push(new Error(`type "${this.id}" has no field named "${fieldName}"`, {
-            status: 400,
-            title: 'Validation error',
-            source: { pointer: `/data/relationships/${fieldName}` }
-          }));
+          errors.push(this._unknownFieldError(fieldName, 'relationships'));
         }
       }
     }
@@ -220,6 +227,27 @@ module.exports = class ContentType {
     }
     return output;
   }
+
+  // this is for internal use during validation of create and update
+  async _validateFieldReadAuth(pendingChange, context, errors, badFields) {
+    let resource = pendingChange.finalDocument;
+    let session = context.session || Session.EVERYONE;
+    let userRealms = await session.realms();
+    if (this.realms.mayReadAllFields(pendingChange.finalDocument, userRealms)) {
+      return;
+    }
+    for (let section of ['attributes', 'relationships']) {
+      if (resource[section]) {
+        for (let fieldName of Object.keys(resource[section])) {
+          if (!this.realms.hasExplicitFieldGrant(resource, userRealms, fieldName)) {
+            errors.push(this._unknownFieldError(fieldName, section));
+            badFields[fieldName] = true;
+          }
+        }
+      }
+    }
+  }
+
 
 };
 
