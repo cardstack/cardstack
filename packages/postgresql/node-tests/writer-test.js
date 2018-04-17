@@ -61,7 +61,9 @@ describe('postgresql/writer', function() {
         mayCreateResource: false,
         mayUpdateResource: true,
         mayDeleteResource: false,
-        mayWriteFields: true
+        mayWriteFields: true,
+        mayReadResource: true,
+        mayReadFields: true
       }).withRelated('who', factory.addResource('groups', 'update-only'));
 
     factory.addResource('grants')
@@ -69,7 +71,9 @@ describe('postgresql/writer', function() {
         mayCreateResource: true,
         mayUpdateResource: false,
         mayDeleteResource: false,
-        mayWriteFields: true
+        mayWriteFields: true,
+        mayReadResource: true,
+        mayReadFields: true
       }).withRelated('who', factory.addResource('groups', 'create-only'));
 
     factory.addResource('grants')
@@ -77,7 +81,9 @@ describe('postgresql/writer', function() {
         mayCreateResource: false,
         mayUpdateResource: false,
         mayDeleteResource: true,
-        mayWriteFields: true
+        mayWriteFields: true,
+        mayReadResource: true,
+        mayReadFields: true
       }).withRelated('who', factory.addResource('groups', 'delete-only'));
 
 
