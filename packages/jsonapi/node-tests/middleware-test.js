@@ -666,7 +666,7 @@ describe('jsonapi/middleware', function() {
           }
         }
       });
-      expect(response.status).to.equal(401);
+      expect(response.status).to.equal(404);
     });
 
     it('applies authorization during update', async function() {
@@ -682,7 +682,7 @@ describe('jsonapi/middleware', function() {
           meta: { version }
         }
       });
-      expect(response).hasStatus(401);
+      expect(response).hasStatus(404);
     });
 
     it('applies authorization during delete', async function() {

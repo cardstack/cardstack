@@ -3,6 +3,7 @@ const find = require('../async-find');
 const { flatten } = require('lodash');
 const Realms = require('./realms');
 const authLog = require('@cardstack/logger')('cardstack/auth');
+const Session = require('@cardstack/plugin-utils/session');
 
 module.exports = class ContentType {
   constructor(model, allFields, allConstraints, dataSources, defaultDataSource, allGrants) {
@@ -66,18 +67,24 @@ module.exports = class ContentType {
       return;
     }
 
+
+    let errors = [];
+    let badFields = Object.create(null);
+
+    this._validateFieldReadAuth(pendingChange, context, errors, badFields);
+
     for (let field of this.fields.values()) {
       await field.applyDefault(pendingChange, context);
     }
 
-    let errors = [];
-    let badFields = Object.create(null);
     for (let field of this.fields.values()) {
-      let fieldErrors = await field.validationErrors(pendingChange, context);
-      if (fieldErrors.length > 0) {
-        badFields[field.id] = true;
+      if (!badFields[field.id]) {
+        let fieldErrors = await field.validationErrors(pendingChange, context);
+        if (fieldErrors.length > 0) {
+          badFields[field.id] = true;
+        }
+        errors = errors.concat(tagFieldErrors(field, fieldErrors));
       }
-      errors = errors.concat(tagFieldErrors(field, fieldErrors));
     }
 
     errors = errors.concat(await this._checkConstraints(pendingChange, badFields));
@@ -99,26 +106,26 @@ module.exports = class ContentType {
     return flatten(await Promise.all(activeConstraints.map(constraint => constraint.validationErrors(pendingChange, this.fields))));
   }
 
+  _unknownFieldError(fieldName, section) {
+    return new Error(`type "${this.id}" has no field named "${fieldName}"`, {
+      status: 400,
+      title: 'Validation error',
+      source: { pointer: `/data/${section}/${fieldName}` }
+    });
+  }
+
   _validateUnknownFields(document, errors) {
     if (document.attributes) {
       for (let fieldName of Object.keys(document.attributes)) {
         if (!this.fields.has(fieldName)) {
-          errors.push(new Error(`type "${this.id}" has no field named "${fieldName}"`, {
-            status: 400,
-            title: 'Validation error',
-            source: { pointer: `/data/attributes/${fieldName}` }
-          }));
+          errors.push(this._unknownFieldError(fieldName, 'attributes'));
         }
       }
     }
     if (document.relationships) {
       for (let fieldName of Object.keys(document.relationships)) {
         if (!this.fields.has(fieldName)) {
-          errors.push(new Error(`type "${this.id}" has no field named "${fieldName}"`, {
-            status: 400,
-            title: 'Validation error',
-            source: { pointer: `/data/relationships/${fieldName}` }
-          }));
+          errors.push(this._unknownFieldError(fieldName, 'relationships'));
         }
       }
     }
@@ -146,39 +153,37 @@ module.exports = class ContentType {
     return analyzers;
   }
 
+  async _assertGrant(documents, context, permission, description) {
+    let grant = await find(this.grants, async g => {
+      if (!g[permission]) {
+        return false;
+      }
+      let documentMatches = await Promise.all(documents.map(document => g.matches(document, context)));
+      return documentMatches.every(Boolean);
+    });
+    if (grant) {
+      authLog.debug("approved %s of %s %s because of grant %s", description, documents[0].type, documents[0].id, grant.id);
+      authLog.trace("grant %s = %j", grant.id, grant);
+    } else {
+      authLog.trace("no matching %s grant for %j in %j", description, context, this.grants);
+      if (permission === 'may-read-resource') {
+        throw new Error(`Not found`, { status: 404 });
+      } else {
+        throw new Error(`You may not ${description} this resource`, { status: 401 });
+      }
+    }
+  }
+
   async _validateResourceLevelAuthorization(pendingChange, context) {
     let { originalDocument, finalDocument } = pendingChange;
     if (!finalDocument) {
-      let grant = await find(this.grants, async g => g['may-delete-resource'] && await g.matches(originalDocument, context));
-      if (grant) {
-        authLog.debug("approved deletion of %s %s because of grant %s", originalDocument.type, originalDocument.id, grant.id);
-        authLog.trace("grant %s = %j", grant.id, grant);
-      } else {
-        authLog.trace("no matching deletion grant for %j in %j", context, this.grants);
-        throw new Error("You may not delete this resource", { status: 401 });
-      }
+      await this._assertGrant([originalDocument], context, 'may-delete-resource', 'delete');
     } else if (!originalDocument) {
-      let grant = await find(this.grants, async g => g['may-create-resource'] && await g.matches(finalDocument, context));
-      if (grant) {
-        authLog.debug("approved creation of %s %s because of grant %s", finalDocument.type, finalDocument.id, grant.id);
-        authLog.trace("grant %s = %j", grant.id, grant);
-      } else {
-        authLog.trace("no matching creation grant for %j in %j", context, this.grants);
-        throw new Error("You may not create this resource", { status: 401 });
-      }
+      await this._assertGrant([finalDocument], context, 'may-read-resource', 'read (during create)');
+      await this._assertGrant([finalDocument], context, 'may-create-resource', 'create');
     } else {
-      let grant = await find(this.grants,
-        async g => g['may-update-resource'] &&
-          (await g.matches(finalDocument, context)) &&
-          (await g.matches(originalDocument, context))
-      );
-      if (grant) {
-        authLog.debug("approved update of %s %s because of grant %s", finalDocument.type, finalDocument.id, grant.id);
-        authLog.trace("grant %s = %j", grant.id, grant);
-      } else {
-        authLog.trace("no matching update grant for %j in %j", context, this.grants);
-        throw new Error("You may not update this resource", { status: 401 });
-      }
+      await this._assertGrant([finalDocument, originalDocument], context, 'may-read-resource', 'read (during update)');
+      await this._assertGrant([finalDocument, originalDocument], context, 'may-update-resource', 'update');
     }
   }
 
@@ -222,6 +227,27 @@ module.exports = class ContentType {
     }
     return output;
   }
+
+  // this is for internal use during validation of create and update
+  async _validateFieldReadAuth(pendingChange, context, errors, badFields) {
+    let resource = pendingChange.finalDocument;
+    let session = context.session || Session.EVERYONE;
+    let userRealms = await session.realms();
+    if (this.realms.mayReadAllFields(pendingChange.finalDocument, userRealms)) {
+      return;
+    }
+    for (let section of ['attributes', 'relationships']) {
+      if (resource[section]) {
+        for (let fieldName of Object.keys(resource[section])) {
+          if (!this.realms.hasExplicitFieldGrant(resource, userRealms, fieldName)) {
+            errors.push(this._unknownFieldError(fieldName, section));
+            badFields[fieldName] = true;
+          }
+        }
+      }
+    }
+  }
+
 
 };
 
