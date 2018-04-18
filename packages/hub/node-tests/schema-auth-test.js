@@ -790,7 +790,7 @@ describe('schema/auth/write', function() {
   });
 
 
-  it("forbids inclusion of fields you're not authorized to read, even if they are unchanged, during update", async function() {
+  it("does not leak existence of fields you're not authorized to read, even if they are unchanged, during update", async function() {
     factory.addResource('grants').withAttributes({ mayReadResource: true }).withRelated('who', everyone);
     factory.addResource('grants').withAttributes({ mayUpdateResource: true, mayWriteFields: true }).withRelated('who', everyone);
     let schema = await loader.loadFrom(factory.getModels());
@@ -813,6 +813,63 @@ describe('schema/auth/write', function() {
     });
     expect(errors).has.length(1);
   });
+
+  it("does not leak existence of fields you're not authorized to read, during update", async function() {
+    factory.addResource('grants').withAttributes({ mayReadResource: true }).withRelated('who', everyone);
+    factory.addResource('grants').withAttributes({ mayUpdateResource: true, mayWriteFields: true }).withRelated('who', everyone);
+    let schema = await loader.loadFrom(factory.getModels());
+    let action = update({
+      type: 'articles',
+      attributes: {
+        title: "old title",
+        coolness: 0
+      },
+    }, {
+      type: 'articles',
+      attributes: {
+        title: "new title",
+        coolness: 1
+      }
+    });
+    let errors = await schema.validationErrors(action);
+    expect(errors).collectionContains({
+      status: 400,
+      title: 'Validation error',
+      detail: 'type "articles" has no field named "title"'
+    });
+    expect(errors).collectionContains({
+      status: 400,
+      title: 'Validation error',
+      detail: 'type "articles" has no field named "coolness"'
+    });
+    expect(errors).has.length(2);
+  });
+
+  it("does not leak other errors for fields you're not authorized to read, during update", async function() {
+    factory.addResource('grants').withAttributes({ mayReadResource: true }).withRelated('who', everyone);
+    factory.addResource('grants').withAttributes({ mayUpdateResource: true, mayWriteFields: true }).withRelated('who', everyone);
+    let schema = await loader.loadFrom(factory.getModels());
+    let action = update({
+      type: 'articles',
+      attributes: {
+        coolness: 10
+      }
+    },{
+      type: 'articles',
+      attributes: {
+        // This is a format error
+        coolness: "purple"
+      }
+    });
+    let errors = await schema.validationErrors(action);
+    expect(errors).collectionContains({
+      status: 400,
+      title: 'Validation error',
+      detail: 'type "articles" has no field named "coolness"'
+    });
+    expect(errors).has.length(1);
+  });
+
 
 });
 
