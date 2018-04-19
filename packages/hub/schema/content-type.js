@@ -6,18 +6,23 @@ const authLog = require('@cardstack/logger')('cardstack/auth');
 const Session = require('@cardstack/plugin-utils/session');
 
 module.exports = class ContentType {
-  constructor(model, allFields, allConstraints, dataSources, defaultDataSource, allGrants) {
+  constructor(model, allFields, allComputedFields, allConstraints, dataSources, defaultDataSource, allGrants) {
     let fields = new Map();
+    let virtualFields = new Map();
     if (model.relationships && model.relationships.fields) {
       for (let fieldRef of model.relationships.fields.data) {
-        let field = allFields.get(fieldRef.id);
-        if (!field) {
+        let field;
+        if ((field = allFields.get(fieldRef.id))) {
+          fields.set(fieldRef.id, field);
+          virtualFields.set(fieldRef.id, field);
+        } else if ((field = allComputedFields.get(fieldRef.id))) {
+          virtualFields.set(fieldRef.id, field);
+        } else {
           throw new Error(`content type "${model.id}" refers to missing field "${fieldRef.id}"`, {
             status: 400,
             title: 'Broken field reference'
           });
         }
-        fields.set(fieldRef.id, field);
       }
     }
 
@@ -26,6 +31,7 @@ module.exports = class ContentType {
     fields.set('id', allFields.get('id'));
 
     this.fields = fields;
+    this.virtualFields = virtualFields;
     this.id = model.id;
     if (model.relationships && model.relationships['data-source'] && model.relationships['data-source'].data) {
       this.dataSource = dataSources.get(model.relationships['data-source'].data.id);

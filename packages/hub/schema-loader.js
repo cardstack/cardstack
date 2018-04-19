@@ -1,5 +1,6 @@
 const Error = require('@cardstack/plugin-utils/error');
 const Field = require('./schema/field');
+const ComputedField = require('./schema/computed-field');
 const Constraint = require('./schema/constraint');
 const ContentType = require('./schema/content-type');
 const DataSource = require('./schema/data-source');
@@ -10,7 +11,7 @@ const {
   getOwner
 } = require('@cardstack/di');
 
-const ownTypes = Object.freeze(['content-types', 'fields', 'constraints', 'input-assignments', 'data-sources', 'grants', 'plugin-configs', 'default-values']);
+const ownTypes = Object.freeze(['content-types', 'fields', 'computed-fields', 'constraints', 'input-assignments', 'data-sources', 'grants', 'plugin-configs', 'default-values']);
 
 module.exports = declareInjections({
   pluginLoader: 'hub:plugin-loader'
@@ -36,11 +37,12 @@ class SchemaLoader {
     let defaultValues = findDefaultValues(models);
     let grants = findGrants(models);
     let fields = findFields(models, plugins, grants, defaultValues);
+    let computedFields = findComputedFields(models, plugins, grants);
     let constraints = await findConstraints(models, plugins, fields);
     let dataSources = findDataSources(models, plugins);
     let defaultDataSource = findDefaultDataSource(plugins);
     schemaLog.trace('default data source %j', defaultDataSource);
-    let types = findTypes(models, fields, constraints, dataSources, defaultDataSource, grants);
+    let types = findTypes(models, fields, computedFields, constraints, dataSources, defaultDataSource, grants);
     validateRelatedTypes(types, fields);
     return getOwner(this).factoryFor('hub:schema').create({ types, fields, dataSources, inputModels, plugins });
   }
@@ -96,6 +98,16 @@ function findFields(models, plugins, grants, defaultValues) {
   return fields;
 }
 
+function findComputedFields(models, plugins, grants) {
+  let computedFields = new Map();
+  for (let model of models) {
+    if (model.type === 'computed-fields') {
+      computedFields.set(model.id, new ComputedField(model, plugins, grants));
+    }
+  }
+  return computedFields;
+}
+
 function findDataSources(models, plugins) {
   let dataSources = new Map();
   for (let model of models) {
@@ -113,11 +125,11 @@ function findDefaultDataSource(plugins) {
   }
 }
 
-function findTypes(models, fields, constraints, dataSources, defaultDataSource, grants) {
+function findTypes(models, fields, computedFields, constraints, dataSources, defaultDataSource, grants) {
   let types = new Map();
   for (let model of models) {
     if (model.type === 'content-types') {
-      types.set(model.id, new ContentType(model, fields, constraints, dataSources, defaultDataSource, grants));
+      types.set(model.id, new ContentType(model, fields, computedFields, constraints, dataSources, defaultDataSource, grants));
     }
   }
   return types;

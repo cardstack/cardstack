@@ -17,6 +17,7 @@ log.registerFormatter('t', require('./table-log-formatter'));
 const featureTypes = [
   'constraint-types',
   'field-types',
+  'computed-field-types',
   'writers',
   'searchers',
   'indexers',

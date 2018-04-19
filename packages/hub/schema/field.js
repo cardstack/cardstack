@@ -26,7 +26,6 @@ module.exports = class Field {
     // Default values are modeled as relationships to separate models
     // so that we can distinguish a default value of null from not
     // having a default value.
-
     this.defaultAtUpdate = this._lookupDefaultValue(model, 'default-at-update', defaultValues);
     this.defaultAtCreate = this._lookupDefaultValue(model, 'default-at-create', defaultValues);
 
@@ -52,7 +51,8 @@ module.exports = class Field {
   }
 
   _lookupDefaultValue(model, relationship, defaultValues) {
-    if (model.relationships &&
+    if (defaultValues &&
+        model.relationships &&
         model.relationships[relationship] &&
         model.relationships[relationship].data) {
       let valueModelId = model.relationships[relationship].data.id;

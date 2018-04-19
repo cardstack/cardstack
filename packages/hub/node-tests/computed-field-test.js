@@ -20,7 +20,7 @@ describe('hub/computed-fields', function() {
           fieldType: '@cardstack/core-types::integer'
         }),
         factory.addResource('computed-fields', 'weight-in-grams').withAttributes({
-          fieldType: 'sample-computed-fields::multiply-by-constant',
+          computedFieldType: 'sample-computed-fields::multiply-by-constant',
           params: {
             sourceField: 'weight-in-grams',
             factor: 28
