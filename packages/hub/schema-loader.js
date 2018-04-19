@@ -32,11 +32,10 @@ class SchemaLoader {
   async loadFrom(inputModels) {
     let models = inputModels;
     let plugins = await this.pluginLoader.configuredPlugins(models.filter(model => model.type === 'plugin-configs'));
-    let authLog = logger('cardstack/auth');
     let schemaLog = logger('cardstack/schema');
     let defaultValues = findDefaultValues(models);
     let grants = findGrants(models);
-    let fields = findFields(models, plugins, grants, defaultValues, authLog);
+    let fields = findFields(models, plugins, grants, defaultValues);
     let constraints = await findConstraints(models, plugins, fields);
     let dataSources = findDataSources(models, plugins);
     let defaultDataSource = findDefaultDataSource(plugins);
@@ -87,11 +86,11 @@ function findGrants(models) {
     .map(model => new Grant(model));
 }
 
-function findFields(models, plugins, grants, defaultValues, authLog) {
+function findFields(models, plugins, grants, defaultValues) {
   let fields = new Map();
   for (let model of models) {
     if (model.type === 'fields') {
-      fields.set(model.id, new Field(model, plugins, grants, defaultValues, authLog));
+      fields.set(model.id, new Field(model, plugins, grants, defaultValues));
     }
   }
   return fields;

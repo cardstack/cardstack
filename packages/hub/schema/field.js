@@ -1,5 +1,6 @@
 const Error = require('@cardstack/plugin-utils/error');
 const find = require('../async-find');
+const authLog = require('@cardstack/logger')('cardstack/auth');
 
 const legalFieldName = /^[a-zA-Z0-9](?:[-_a-zA-Z0-9]*[a-zA-Z0-9])?$/;
 
@@ -8,12 +9,11 @@ module.exports = class Field {
     return legalFieldName.test(name);
   }
 
-  constructor(model, plugins, allGrants, defaultValues, authLog) {
+  constructor(model, plugins, allGrants, defaultValues) {
     if (!Field.isValidName(model.id)) {
       throw new Error(`${model.id} is not a valid field name. We follow JSON:API spec for valid member names, see http://jsonapi.org/format/#document-member-names`);
     }
     this.id = model.id;
-    this.authLog = authLog;
     if (!model.attributes || !model.attributes['field-type']) {
       throw new Error(`field ${model.id} has no field-type attribute`);
     }
@@ -194,14 +194,14 @@ module.exports = class Field {
     let grant;
 
     if (pendingChange.serverProvidedValues.has(this.id) && pendingChange.serverProvidedValues.get(this.id) === value) {
-      this.authLog.debug("approved field write for %s because it matches server provided default", this.id);
+      authLog.debug("approved field write for %s because it matches server provided default", this.id);
     } else if (pendingChange.originalDocument && value === this.valueFrom(pendingChange, 'originalDocument')) {
-      this.authLog.debug("approved field write for %s because it was unchanged", this.id);
+      authLog.debug("approved field write for %s because it was unchanged", this.id);
     } else if ((grant = await find(this.grants, async g => g['may-write-fields'] && await g.matches(pendingChange.finalDocument, context)))) {
-      this.authLog.debug("approved field write for %s because of grant %s", this.id, grant.id);
+      authLog.debug("approved field write for %s because of grant %s", this.id, grant.id);
     } else {
       // Denied
-      this.authLog.debug("denied field write for %s", this.id);
+      authLog.debug("denied field write for %s", this.id);
       return [new Error(`You may not write field "${this.id}"`, {
         status: 401
       })];
