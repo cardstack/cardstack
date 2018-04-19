@@ -39,32 +39,32 @@ module.exports = class DocumentContext {
       return;
     }
 
-    let pristineAttributes = {};
-    pristineDocOut.data.attributes = pristineAttributes;
+    pristineDocOut.data.attributes = {};
 
     for (let field of contentType.realFields.values()) {
       if (field.id === 'id' || field.id === 'type' || field.isRelationship) {
         continue;
       }
       let value = jsonapiDoc.attributes[field.id];
+      await this._buildAttribute(field, value, pristineDocOut, searchDocOut);
+    }
+  }
 
-      // Write our value into the search doc
-      {
-        let esName = await this._logicalFieldToES(field.id);
-        searchDocOut[esName] = value;
-      }
+  async _buildAttribute(field, value, pristineDocOut, searchDocOut) {
+    // Write our value into the search doc
+    let esName = await this._logicalFieldToES(field.id);
+    searchDocOut[esName] = value;
 
-      // Write our value into the pristine doc
-      pristineAttributes[field.id] = value;
+    // Write our value into the pristine doc
+    pristineDocOut.data.attributes[field.id] = value;
 
-      // If the search plugin has any derived fields, those also go
-      // into the search doc.
-      let derivedFields = field.derivedFields(value);
-      if (derivedFields) {
-        for (let [derivedName, derivedValue] of Object.entries(derivedFields)) {
-          let esName = await this._logicalFieldToES(derivedName);
-          searchDocOut[esName] = derivedValue;
-        }
+    // If the search plugin has any derived fields, those also go
+    // into the search doc.
+    let derivedFields = field.derivedFields(value);
+    if (derivedFields) {
+      for (let [derivedName, derivedValue] of Object.entries(derivedFields)) {
+        let esName = await this._logicalFieldToES(derivedName);
+        searchDocOut[esName] = derivedValue;
       }
     }
   }
