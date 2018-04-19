@@ -1,4 +1,5 @@
 const authLog = require('@cardstack/logger')('cardstack/auth');
+const log = require('@cardstack/logger')('cardstack/indexers');
 const { uniqBy } = require('lodash');
 
 module.exports = class DocumentContext {
@@ -9,7 +10,6 @@ module.exports = class DocumentContext {
     this.type = type;
     this.id = id;
     this.doc = doc;
-
 
     // included resources that we actually found
     this.pristineIncludes = [];
@@ -22,15 +22,60 @@ module.exports = class DocumentContext {
 
   async searchDoc() {
     let contentType = this.schema.types.get(this.type);
-    let searchTree = contentType ? contentType.includesTree : null;
-    return this._build(this.type, this.id, this.doc, searchTree, 0);
+    if (!contentType) {
+      return;
+    }
+    return this._build(this.type, this.id, this.doc, contentType.includesTree, 0);
   }
 
   async _logicalFieldToES(fieldName) {
     return this.branchUpdate.client.logicalFieldToES(this.branchUpdate.branch, fieldName);
   }
 
+  // copies attribues appropriately from jsonapiDoc into
+  // pristineDocOut and searchDocOut.
+  async _buildAttributes(contentType, jsonapiDoc, pristineDocOut, searchDocOut) {
+    if (!jsonapiDoc.attributes) {
+      return;
+    }
+
+    let pristineAttributes = {};
+    pristineDocOut.data.attributes = pristineAttributes;
+
+    for (let field of contentType.realFields.values()) {
+      if (field.id === 'id' || field.id === 'type') {
+        continue;
+      }
+      let value = jsonapiDoc.attributes[field.id];
+
+      // Write our value into the search doc
+      {
+        let esName = await this._logicalFieldToES(field.id);
+        searchDocOut[esName] = value;
+      }
+
+      // Write our value into the pristine doc
+      pristineAttributes[field.id] = value;
+
+      // If the search plugin has any derived fields, those also go
+      // into the search doc.
+      let derivedFields = field.derivedFields(value);
+      if (derivedFields) {
+        for (let [derivedName, derivedValue] of Object.entries(derivedFields)) {
+          let esName = await this._logicalFieldToES(derivedName);
+          searchDocOut[esName] = derivedValue;
+        }
+      }
+    }
+  }
+
   async _build(type, id, jsonapiDoc, searchTree, depth) {
+    let contentType = this.schema.types.get(type);
+    if (!contentType) {
+      log.warn("ignoring unknown document type=%s id=%s", type, id);
+      return;
+    }
+
     // we store the id as a regular field in elasticsearch here, because
     // we use elasticsearch's own built-in _id for our own composite key
     // that takes into account branches.
@@ -55,28 +100,10 @@ module.exports = class DocumentContext {
       searchDoc[esType] = type;
     }
 
-    if (jsonapiDoc.attributes) {
-      pristine.data.attributes = jsonapiDoc.attributes;
-      for (let attribute of Object.keys(jsonapiDoc.attributes)) {
-        let value = jsonapiDoc.attributes[attribute];
-        let field = this.schema.realFields.get(attribute);
-        if (field) {
-          let derivedFields = field.derivedFields(value);
-          if (derivedFields) {
-            for (let [derivedName, derivedValue] of Object.entries(derivedFields)) {
-              let esName = await this._logicalFieldToES(derivedName);
-              searchDoc[esName] = derivedValue;
-            }
-          }
-        }
-        let esName = await this._logicalFieldToES(attribute);
-        searchDoc[esName] = value;
-      }
-    }
+    await this._buildAttributes(contentType, jsonapiDoc, pristine, searchDoc);
+
     if (jsonapiDoc.relationships) {
       let relationships = pristine.data.relationships = Object.assign({}, jsonapiDoc.relationships);
-
-
       for (let attribute of Object.keys(jsonapiDoc.relationships)) {
         let value = jsonapiDoc.relationships[attribute];
         let field = this.schema.realFields.get(attribute);
@@ -98,7 +125,8 @@ module.exports = class DocumentContext {
               let resource = await this.branchUpdate.read(value.data.type, value.data.id);
               if (resource) {
                 related = await this._build(resource.type, resource.id, resource, searchTree[attribute], depth + 1);
-              } else {
+              }
+              if (!related) {
                 relationships[attribute] = Object.assign({}, relationships[attribute], { data: null });
               }
 

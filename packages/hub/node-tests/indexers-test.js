@@ -2,7 +2,8 @@ const JSONAPIFactory = require('../../../tests/stub-project/node_modules/@cardst
 const Session = require('@cardstack/plugin-utils/session');
 const {
   createDefaultEnvironment,
-  destroyDefaultEnvironment
+  destroyDefaultEnvironment,
+  defaultDataSourceId
 } = require('../../../tests/stub-project/node_modules/@cardstack/test-support/env');
 
 describe('hub/indexers', function() {
@@ -57,6 +58,7 @@ describe('hub/indexers', function() {
       let doc = await env.lookup('hub:searchers').get(env.session, 'master', 'field-types', 'sample-plugin-one::x');
       expect(doc).is.ok;
     });
+
   });
 
   describe('read-write', function() {
@@ -183,6 +185,65 @@ describe('hub/indexers', function() {
       expect(addCount).to.equal(1, 'the correct number of add events were emitted');
       expect(updateCompleteCount).to.equal(1, 'the correct number of update_complete events were emitted');
     });
+  });
+
+  describe('invalid data', function() {
+    beforeEach(async function() {
+      let factory = new JSONAPIFactory();
+      factory.addResource('content-types', 'samples')
+        .withRelated('fields', [
+          factory.addResource('fields', 'real-field')
+            .withAttributes({
+              fieldType: '@cardstack/core-types::string'
+            })
+        ]);
+      env = await createDefaultEnvironment(__dirname + '/../../../tests/ephemeral-test-app', factory.getModels());
+    });
+
+    afterEach(teardown);
+
+    async function saveEphemeral(fn) {
+      let factory = new JSONAPIFactory();
+      fn(factory);
+      // Go through the back door to insert some invalid data into
+      // ephemeral storage (if we try to do a write, it would fail
+      // validation before we store it in the data source -- in this
+      // test we want to see what happens when a data source already
+      // contains bad data)
+      let sources = await env.lookup('hub:data-sources').active();
+      let source = sources.get(defaultDataSourceId);
+      let storage = source.writer.storage;
+      for (let doc of factory.getModels()) {
+        storage.store(doc.type, doc.id, doc, false);
+      }
+      await env.lookup('hub:indexers').update({ forceRefresh: true });
+    }
+
+    it("does not allow unknown attributes into search index", async function() {
+      await saveEphemeral(f => {
+        f.addResource('samples', 'has-bogus-attribute').withAttributes({
+          realField: 'yes',
+          fakeField: 'no'
+        });
+      });
+
+      let doc = await env.lookup('hub:searchers').get(env.session, 'master', 'samples', 'has-bogus-attribute');
+      expect(doc).has.deep.property('data.attributes');
+      expect(doc.data.attributes).has.property('real-field');
+      expect(doc.data.attributes).not.has.property('fake-field');
+    });
+
+    it("does not allow unknown document types into search index", async function() {
+      await saveEphemeral(f => {
+        f.addResource('not-a-thing', '1').withAttributes({
+          realField: 'yes'
+        });
+      });
+      let response = await env.lookup('hub:searchers').search(env.session, 'master', { filter: { type: 'not-a-thing' }});
+      expect(response.data).has.length(0);
+    });
+
+
   });
 
 });

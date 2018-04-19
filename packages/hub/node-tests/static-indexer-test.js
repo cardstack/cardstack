@@ -35,7 +35,7 @@ describe('static-indexer', function() {
   it('has access to data source params', async function() {
     env = await createDefaultEnvironment(project, factory.getModels());
     let thing = await env.lookup('hub:searchers').get(env.session, 'master', 'other-things', '2');
-    expect(thing).has.deep.property('data.attributes.title', 'chocolate cake');
+    expect(thing).has.deep.property('data.attributes.title-of-thing', 'chocolate cake');
   });
 
 });
