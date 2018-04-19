@@ -188,20 +188,6 @@ describe('hub/indexers', function() {
   });
 
   describe('invalid data', function() {
-    beforeEach(async function() {
-      let factory = new JSONAPIFactory();
-      factory.addResource('content-types', 'samples')
-        .withRelated('fields', [
-          factory.addResource('fields', 'real-field')
-            .withAttributes({
-              fieldType: '@cardstack/core-types::string'
-            })
-        ]);
-      env = await createDefaultEnvironment(__dirname + '/../../../tests/ephemeral-test-app', factory.getModels());
-    });
-
-    afterEach(teardown);
-
     async function saveEphemeral(fn) {
       let factory = new JSONAPIFactory();
       fn(factory);
@@ -219,26 +205,57 @@ describe('hub/indexers', function() {
       await env.lookup('hub:indexers').update({ forceRefresh: true });
     }
 
-    it("does not allow unknown attributes into search index", async function() {
+    before(async function() {
+      let factory = new JSONAPIFactory();
+      factory.addResource('content-types', 'samples')
+        .withRelated('fields', [
+          factory.addResource('fields', 'real-field')
+            .withAttributes({
+              fieldType: '@cardstack/core-types::string'
+            }),
+          factory.addResource('fields', 'real-relationship')
+            .withAttributes({
+              fieldType: '@cardstack/core-types::belongs-to'
+            })
+        ]);
+      env = await createDefaultEnvironment(__dirname + '/../../../tests/ephemeral-test-app', factory.getModels());
       await saveEphemeral(f => {
         f.addResource('samples', 'has-bogus-attribute').withAttributes({
           realField: 'yes',
           fakeField: 'no'
         });
+        f.addResource('samples', 'has-bogus-relationship')
+          .withRelated('realRelationship', {
+            type: 'content-types', id: 'samples'
+          })
+          .withRelated('fakeRelationship', {
+            type: 'content-types', id: 'samples'
+          });
+        f.addResource('not-a-thing', '1').withAttributes({
+          realField: 'yes'
+        });
       });
 
+    });
+
+    after(teardown);
+
+
+    it("does not allow unknown attributes into search index", async function() {
       let doc = await env.lookup('hub:searchers').get(env.session, 'master', 'samples', 'has-bogus-attribute');
       expect(doc).has.deep.property('data.attributes');
       expect(doc.data.attributes).has.property('real-field');
       expect(doc.data.attributes).not.has.property('fake-field');
     });
 
+    it("does not allow unknown relationships into search index", async function() {
+      let doc = await env.lookup('hub:searchers').get(env.session, 'master', 'samples', 'has-bogus-relationship');
+      expect(doc).has.deep.property('data.relationships');
+      expect(doc.data.relationships).has.property('real-relationship');
+      expect(doc.data.relationships).not.has.property('fake-relationship');
+    });
+
     it("does not allow unknown document types into search index", async function() {
-      await saveEphemeral(f => {
-        f.addResource('not-a-thing', '1').withAttributes({
-          realField: 'yes'
-        });
-      });
       let response = await env.lookup('hub:searchers').search(env.session, 'master', { filter: { type: 'not-a-thing' }});
       expect(response.data).has.length(0);
     });
