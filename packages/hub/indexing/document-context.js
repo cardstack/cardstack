@@ -73,45 +73,47 @@ module.exports = class DocumentContext {
     if (!jsonapiDoc.relationships) {
       return;
     }
-
-    let pristineRelationships = pristineDocOut.data.relationships = {};
-
+    pristineDocOut.data.relationships = {};
     for (let field of contentType.realFields.values()) {
       if (!field.isRelationship) {
         continue;
       }
       let value = jsonapiDoc.relationships[field.id];
-      if (value && value.hasOwnProperty('data')) {
-        let related;
-        if (value.data && searchTree[field.id]) {
-          if (Array.isArray(value.data)) {
-            related = await Promise.all(value.data.map(async ({ type, id }) => {
-              this.references.push(`${type}/${id}`);
-              let resource = await this.branchUpdate.read(type, id);
-              if (resource) {
-                return this._build(type, id, resource, searchTree[field.id], depth + 1);
-              }
-            }));
-            related = related.filter(Boolean);
-            pristineRelationships[field.id] = Object.assign({}, value, { data: related.map(r => ({ type: r.type, id: r.id })) });
-          } else {
-            this.references.push(`${value.data.type}/${value.data.id}`);
-            let resource = await this.branchUpdate.read(value.data.type, value.data.id);
-            if (resource) {
-              related = await this._build(resource.type, resource.id, resource, searchTree[field.id], depth + 1);
-            }
-            let data = related ? { type: related.type, id: related.id } : null;
-            pristineRelationships[field.id] = Object.assign({}, value, { data });
-          }
-        } else {
-          related = value.data;
-          pristineRelationships[field.id] = Object.assign({}, value);
-        }
-        let esName = await this._logicalFieldToES(field.id);
-        searchDocOut[esName] = related;
-      }
+      await this._buildRelationship(field, value, pristineDocOut, searchDocOut, searchTree, depth);
     }
+  }
 
+  async _buildRelationship(field, value, pristineDocOut, searchDocOut, searchTree, depth) {
+    if (!value || !value.hasOwnProperty('data')) {
+      return;
+    }
+    let related;
+    if (value.data && searchTree[field.id]) {
+      if (Array.isArray(value.data)) {
+        related = await Promise.all(value.data.map(async ({ type, id }) => {
+          this.references.push(`${type}/${id}`);
+          let resource = await this.branchUpdate.read(type, id);
+          if (resource) {
+            return this._build(type, id, resource, searchTree[field.id], depth + 1);
+          }
+        }));
+        related = related.filter(Boolean);
+        pristineDocOut.data.relationships[field.id] = Object.assign({}, value, { data: related.map(r => ({ type: r.type, id: r.id })) });
+      } else {
+        this.references.push(`${value.data.type}/${value.data.id}`);
+        let resource = await this.branchUpdate.read(value.data.type, value.data.id);
+        if (resource) {
+          related = await this._build(resource.type, resource.id, resource, searchTree[field.id], depth + 1);
+        }
+        let data = related ? { type: related.type, id: related.id } : null;
+        pristineDocOut.data.relationships[field.id] = Object.assign({}, value, { data });
+      }
+    } else {
+      related = value.data;
+      pristineDocOut.data.relationships[field.id] = Object.assign({}, value);
+    }
+    let esName = await this._logicalFieldToES(field.id);
+    searchDocOut[esName] = related;
   }
 
   async _build(type, id, jsonapiDoc, searchTree, depth) {

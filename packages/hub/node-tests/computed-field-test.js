@@ -50,5 +50,7 @@ describe('hub/computed-fields', function() {
     });
 
     it("indexes a computed relationship");
+
+    it("can search a computed relationship's included attributes");
   });
 });
