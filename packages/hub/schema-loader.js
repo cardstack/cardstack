@@ -87,11 +87,11 @@ function findGrants(models) {
     .map(model => new Grant(model));
 }
 
-function findFields(models, plugins, types, grants, defaultValues, authLog) {
+function findFields(models, plugins, grants, defaultValues, authLog) {
   let fields = new Map();
   for (let model of models) {
     if (model.type === 'fields') {
-      fields.set(model.id, new Field(model, plugins, types, grants, defaultValues, authLog));
+      fields.set(model.id, new Field(model, plugins, grants, defaultValues, authLog));
     }
   }
   return fields;
