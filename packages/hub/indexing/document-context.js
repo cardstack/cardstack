@@ -59,7 +59,7 @@ module.exports = class DocumentContext {
       pristine.data.attributes = jsonapiDoc.attributes;
       for (let attribute of Object.keys(jsonapiDoc.attributes)) {
         let value = jsonapiDoc.attributes[attribute];
-        let field = this.schema.fields.get(attribute);
+        let field = this.schema.realFields.get(attribute);
         if (field) {
           let derivedFields = field.derivedFields(value);
           if (derivedFields) {
@@ -79,7 +79,7 @@ module.exports = class DocumentContext {
 
       for (let attribute of Object.keys(jsonapiDoc.relationships)) {
         let value = jsonapiDoc.relationships[attribute];
-        let field = this.schema.fields.get(attribute);
+        let field = this.schema.realFields.get(attribute);
         if (field && value && value.hasOwnProperty('data')) {
           let related;
           if (value.data && searchTree[attribute]) {

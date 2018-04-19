@@ -99,7 +99,7 @@ class CodeGenerator {
   _generatedModel(modelName, type) {
     return modelTemplate({
       modelName,
-      fields: [...type.fields.values()].filter(f => f.id !== 'id' && f.id !== 'type'),
+      fields: [...type.realAndComputedFields.values()].filter(f => f.id !== 'id' && f.id !== 'type'),
       routingField: type.routingField
     });
   }

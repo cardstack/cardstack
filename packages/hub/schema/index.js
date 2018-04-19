@@ -11,15 +11,31 @@ class Schema {
     return new this(opts);
   }
 
-  constructor({ types, fields, dataSources, inputModels, plugins, schemaLoader }) {
+  constructor({ types, fields, computedFields, dataSources, inputModels, plugins, schemaLoader }) {
     this.types = types;
-    this.fields = fields;
+    this.realFields = fields;
+    this.computedFields = computedFields;
+    this._realAndComputedFields = null;
     this.dataSources = dataSources;
     this.plugins = plugins;
     this._mapping = null;
     this._customAnalyzers = null;
     this._originalModels = inputModels;
     this.schemaLoader = schemaLoader;
+  }
+
+  get realAndComputedFields() {
+    if (!this._realAndComputedFields) {
+      let m = new Map();
+      for (let [id, field] of this.realFields) {
+        m.set(id, field);
+      }
+      for (let [id, computed] of this.computedFields) {
+        m.set(id, computed.virtualField);
+      }
+      this._realAndComputedFields = m;
+    }
+    return this._realAndComputedFields;
   }
 
   async teardown() {

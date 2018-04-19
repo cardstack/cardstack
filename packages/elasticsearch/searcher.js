@@ -200,7 +200,7 @@ class Searcher {
       return this._fieldFilter(branch, schema, aboveSegments, belowSegments[0], value);
     } else {
       let key = belowSegments[0];
-      let field = schema.fields.get(key);
+      let field = schema.realAndComputedFields.get(key);
       if (!field) {
         throw new Error(`Cannot filter by unknown field "${key}" within "${aboveSegments.join('.')}"`, {
           status: 400,
@@ -227,7 +227,7 @@ class Searcher {
   }
 
   async _fieldFilter(branch, schema, aboveSegments, key, value) {
-    let field = schema.fields.get(key);
+    let field = schema.realAndComputedFields.get(key);
 
     if (!field) {
       throw new Error(`Cannot filter by unknown field "${key}"`, {
@@ -350,7 +350,7 @@ class Searcher {
       order = 'asc';
     }
 
-    let field = schema.fields.get(realName);
+    let field = schema.realAndComputedFields.get(realName);
     if (!field) {
       throw new Error(`Cannot sort by unknown field "${realName}"`, {
         status: 400,

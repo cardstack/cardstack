@@ -44,7 +44,7 @@ class SchemaLoader {
     schemaLog.trace('default data source %j', defaultDataSource);
     let types = findTypes(models, fields, computedFields, constraints, dataSources, defaultDataSource, grants);
     validateRelatedTypes(types, fields);
-    return getOwner(this).factoryFor('hub:schema').create({ types, fields, dataSources, inputModels, plugins });
+    return getOwner(this).factoryFor('hub:schema').create({ types, fields, computedFields, dataSources, inputModels, plugins });
   }
 });
 
