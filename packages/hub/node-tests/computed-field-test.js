@@ -44,9 +44,11 @@ describe('hub/computed-fields', function() {
     before(setup);
     after(teardown);
 
-    it("supports computed fields", async function() {
+    it.skip("indexes a computed attribute", async function() {
       let model = await env.lookup('hub:searchers').get(env.session, 'master', 'foods', apple.id);
       expect(model.data).has.deep.property('attributes.weight-in-grams', 448);
     });
+
+    it("indexes a computed relationship");
   });
 });
