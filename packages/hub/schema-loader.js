@@ -37,7 +37,8 @@ class SchemaLoader {
     let defaultValues = findDefaultValues(models);
     let grants = findGrants(models);
     let fields = findFields(models, plugins, grants, defaultValues);
-    let computedFields = findComputedFields(models, plugins, grants);
+    let computedFields = findComputedFields(models, plugins, grants, fields);
+    discoverComputedFieldTypes(fields, computedFields);
     let constraints = await findConstraints(models, plugins, fields);
     let dataSources = findDataSources(models, plugins);
     let defaultDataSource = findDefaultDataSource(plugins);
@@ -98,14 +99,23 @@ function findFields(models, plugins, grants, defaultValues) {
   return fields;
 }
 
-function findComputedFields(models, plugins, grants) {
+function findComputedFields(models, plugins, grants, fields) {
   let computedFields = new Map();
   for (let model of models) {
     if (model.type === 'computed-fields') {
-      computedFields.set(model.id, new ComputedField(model, plugins, grants));
+      computedFields.set(model.id, new ComputedField(model, plugins, grants, fields, computedFields));
     }
   }
   return computedFields;
+}
+
+function discoverComputedFieldTypes(fields, computedFields) {
+  for (let computedField of computedFields.values()) {
+    // This needs to happen after all the fields and computed fields
+    // are known, so we can derive the virtual fields created by each
+    // of our computed fields.
+    computedField.virtualField;
+  }
 }
 
 function findDataSources(models, plugins) {

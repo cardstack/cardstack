@@ -32,20 +32,42 @@ module.exports = class DocumentContext {
     return this.branchUpdate.client.logicalFieldToES(this.branchUpdate.branch, fieldName);
   }
 
+  async _buildValue(contentType, field, jsonapiDoc) {
+    let computedField = contentType.computedFields.get(field.id);
+    if (computedField) {
+      return computedField.compute.call(null, {
+        field: async (name) => {
+          let requestedField = contentType.realAndComputedFields.get(name);
+          if (!requestedField) {
+            throw new Error(`computed field ${field.id} tried to access nonexistent field ${name}`);
+          }
+          return this._buildValue(contentType, requestedField, jsonapiDoc);
+        }
+      }, computedField.params);
+    } else if (field.isRelationship) {
+      let relObj = jsonapiDoc.relationships[field.id];
+      if (relObj) {
+        return relObj.data;
+      }
+    } else if (field.id === 'id' || field.id === 'type') {
+      return jsonapiDoc[field.id];
+    } else {
+      return jsonapiDoc.attributes[field.id];
+    }
+  }
+
   // copies attribues appropriately from jsonapiDoc into
   // pristineDocOut and searchDocOut.
   async _buildAttributes(contentType, jsonapiDoc, pristineDocOut, searchDocOut) {
     if (!jsonapiDoc.attributes) {
       return;
     }
-
     pristineDocOut.data.attributes = {};
-
-    for (let field of contentType.realFields.values()) {
+    for (let field of contentType.realAndComputedFields.values()) {
       if (field.id === 'id' || field.id === 'type' || field.isRelationship) {
         continue;
       }
-      let value = jsonapiDoc.attributes[field.id];
+      let value = await this._buildValue(contentType, field, jsonapiDoc);
       await this._buildAttribute(field, value, pristineDocOut, searchDocOut);
     }
   }
