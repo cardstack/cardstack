@@ -6,7 +6,7 @@ const {
 } = require('../../../tests/sample-computed-fields/node_modules/@cardstack/test-support/env');
 
 describe('hub/computed-fields', function() {
-  let env, apple;
+  let env, apple, banana;
 
   async function setup () {
     let factory = new JSONAPIFactory();
@@ -16,8 +16,14 @@ describe('hub/computed-fields', function() {
         factory.addResource('fields', 'title').withAttributes({
           fieldType: '@cardstack/core-types::string'
         }),
+        factory.addResource('fields', 'color').withAttributes({
+          fieldType: '@cardstack/core-types::string'
+        }),
         factory.addResource('fields', 'nutrients').withAttributes({
           fieldType: '@cardstack/core-types::any'
+        }),
+        factory.addResource('fields', 'goes-well-with').withAttributes({
+          fieldType: '@cardstack/core-types::has-many'
         }),
         factory.addResource('fields', 'weight-in-ounces').withAttributes({
           fieldType: '@cardstack/core-types::integer'
@@ -53,16 +59,32 @@ describe('hub/computed-fields', function() {
           params: {
             sourceField: 'nutrients'
           }
+        }),
+        factory.addResource('computed-fields', 'good-with-red').withAttributes({
+          computedFieldType: 'sample-computed-fields::goes-well-with-color',
+          params: {
+            color: 'red'
+          }
         })
       ]);
 
     apple = factory.addResource('foods').withAttributes({
       title: 'Apple',
+      color: 'red',
       weightInOunces: 16,
       nutrients: {
         fiber: 100
       }
     });
+
+    banana = factory.addResource('foods').withAttributes({
+      title: 'Banana',
+      color: 'yellow',
+      weightInOunces: 12,
+      nutrients: {
+        potassium: 40
+      }
+    }).withRelated('goesWellWith', [apple]);
 
     env = await createDefaultEnvironment(`${__dirname}/../../../tests/sample-computed-fields`, factory.getModels());
   }
@@ -96,17 +118,28 @@ describe('hub/computed-fields', function() {
       expect(model.data.attributes['echo-id']).to.equal(model.data.id);
     });
 
-    // the "identity" computed field type is being used with both
-    // strings and POJOs. That will cause elasticsearch to blow up
-    // unless the dynamic type support is working.
+    // our "sample-computed-fields::identity" computed-field-type is
+    // being used with both strings and POJOs. That will cause
+    // elasticsearch to blow up unless the dynamic type support is
+    // working.
     it("can determine its type dynamically", async function() {
       let model = await env.lookup('hub:searchers').get(env.session, 'master', 'foods', apple.id);
       expect(model.data).has.deep.property('attributes.echo-nutrients');
       expect(model.data.attributes['echo-nutrients']).to.deep.equal(model.data.attributes.nutrients);
     });
 
+    it("can depend on fields on a related resource", async function() {
+      let model = await env.lookup('hub:searchers').get(env.session, 'master', 'foods', apple.id);
+      expect(model.data).has.deep.property('attributes.good-with-red', false);
+      model = await env.lookup('hub:searchers').get(env.session, 'master', 'foods', banana.id);
+      expect(model.data).has.deep.property('attributes.good-with-red', true);
+
+    });
+
     it("can compute a relationship");
 
     it("can search a computed relationship's included attributes");
+
+    it("can compute an attribute even when there are no real attributes");
   });
 });

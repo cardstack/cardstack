@@ -10,24 +10,26 @@ module.exports = class ComputedField {
     let { type, compute } = plugins.lookupFeatureFactoryAndAssert('computed-field-types', fieldType).class;
 
     this._virtualField = null;
-    this.compute = compute;
+    this._compute = compute;
     this.params = model.attributes.params || {};
 
     this._finishSetup = () => {
       if (typeof type === 'function') {
-        type = type({
-          typeOf(otherFieldId)  {
-            let otherField = allFields.get(otherFieldId);
-            if (otherField) {
-              return otherField.fieldType;
-            }
-            otherField = allComputedFields.get(otherFieldId);
-            if (otherField) {
-              return otherField.virtualField.fieldType;
-            }
-            throw new Error(`computed field ${model.id} tries to base its type on the nonexistent field ${otherFieldId}`);
+        type = type(function typeOf(otherFieldId)  {
+          let otherField = allFields.get(otherFieldId);
+          if (otherField) {
+            return otherField.fieldType;
           }
+          otherField = allComputedFields.get(otherFieldId);
+          if (otherField) {
+            return otherField.virtualField.fieldType;
+          }
+          throw new Error(`computed field ${model.id} tries to base its type on the nonexistent field ${otherFieldId}`);
         }, this.params);
+      }
+
+      if (!type) {
+        throw new Error(`The ${fieldType} computed-field-type plugin doesn't export its type`);
       }
 
       let virtualModel = {
@@ -48,5 +50,9 @@ module.exports = class ComputedField {
       this._finishSetup();
     }
     return this._virtualField;
+  }
+
+  async compute(userModel) {
+    return this._compute(userModel, this.params);
   }
 };

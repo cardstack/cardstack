@@ -1,5 +1,6 @@
 const authLog = require('@cardstack/logger')('cardstack/auth');
 const log = require('@cardstack/logger')('cardstack/indexers');
+const Model = require('../model');
 const { uniqBy } = require('lodash');
 
 module.exports = class DocumentContext {
@@ -28,37 +29,18 @@ module.exports = class DocumentContext {
     return this._build(this.type, this.id, this.doc, contentType.includesTree, 0);
   }
 
+  async read(type, id) {
+    this.references.push(`${type}/${id}`);
+    return this.branchUpdate.read(type, id);
+  }
+
   async _logicalFieldToES(fieldName) {
     return this.branchUpdate.client.logicalFieldToES(this.branchUpdate.branch, fieldName);
   }
 
-  async _buildValue(contentType, field, jsonapiDoc) {
-    let computedField = contentType.computedFields.get(field.id);
-    if (computedField) {
-      return computedField.compute.call(null, {
-        field: async (name) => {
-          let requestedField = contentType.realAndComputedFields.get(name);
-          if (!requestedField) {
-            throw new Error(`computed field ${field.id} tried to access nonexistent field ${name}`);
-          }
-          return this._buildValue(contentType, requestedField, jsonapiDoc);
-        }
-      }, computedField.params);
-    } else if (field.isRelationship) {
-      let relObj = jsonapiDoc.relationships[field.id];
-      if (relObj) {
-        return relObj.data;
-      }
-    } else if (field.id === 'id' || field.id === 'type') {
-      return jsonapiDoc[field.id];
-    } else {
-      return jsonapiDoc.attributes[field.id];
-    }
-  }
-
   // copies attribues appropriately from jsonapiDoc into
   // pristineDocOut and searchDocOut.
-  async _buildAttributes(contentType, jsonapiDoc, pristineDocOut, searchDocOut) {
+  async _buildAttributes(contentType, jsonapiDoc, userModel, pristineDocOut, searchDocOut) {
     if (!jsonapiDoc.attributes) {
       return;
     }
@@ -67,7 +49,7 @@ module.exports = class DocumentContext {
       if (field.id === 'id' || field.id === 'type' || field.isRelationship) {
         continue;
       }
-      let value = await this._buildValue(contentType, field, jsonapiDoc);
+      let value = await userModel.getField(field.id);
       await this._buildAttribute(field, value, pristineDocOut, searchDocOut);
     }
   }
@@ -113,8 +95,7 @@ module.exports = class DocumentContext {
     if (value.data && searchTree[field.id]) {
       if (Array.isArray(value.data)) {
         related = await Promise.all(value.data.map(async ({ type, id }) => {
-          this.references.push(`${type}/${id}`);
-          let resource = await this.branchUpdate.read(type, id);
+          let resource = await this.read(type, id);
           if (resource) {
             return this._build(type, id, resource, searchTree[field.id], depth + 1);
           }
@@ -122,8 +103,7 @@ module.exports = class DocumentContext {
         related = related.filter(Boolean);
         pristineDocOut.data.relationships[field.id] = Object.assign({}, value, { data: related.map(r => ({ type: r.type, id: r.id })) });
       } else {
-        this.references.push(`${value.data.type}/${value.data.id}`);
-        let resource = await this.branchUpdate.read(value.data.type, value.data.id);
+        let resource = await this.read(value.data.type, value.data.id);
         if (resource) {
           related = await this._build(resource.type, resource.id, resource, searchTree[field.id], depth + 1);
         }
@@ -169,7 +149,8 @@ module.exports = class DocumentContext {
       searchDoc[esType] = type;
     }
 
-    await this._buildAttributes(contentType, jsonapiDoc, pristine, searchDoc);
+    let userModel = new Model(contentType, jsonapiDoc, this.schema, this.read.bind(this));
+    await this._buildAttributes(contentType, jsonapiDoc, userModel, pristine, searchDoc);
     await this._buildRelationships(contentType, jsonapiDoc, pristine, searchDoc, searchTree, depth);
 
     // top level document embeds all the other pristine includes
