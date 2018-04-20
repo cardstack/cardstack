@@ -45,9 +45,12 @@ module.exports = class DocumentContext {
       if (field.id === 'id' || field.id === 'type' || field.isRelationship) {
         continue;
       }
-      let value = await userModel.getField(field.id);
-      await this._buildAttribute(field, value, pristineDocOut, searchDocOut);
-    }
+      if (contentType.computedFields.has(field.id) ||
+          (jsonapiDoc.attributes && jsonapiDoc.attributes.hasOwnProperty(field.id))) {
+        let value = await userModel.getField(field.id);
+        await this._buildAttribute(field, value, pristineDocOut, searchDocOut);
+      }
+     }
   }
 
   async _buildAttribute(field, value, pristineDocOut, searchDocOut) {
@@ -74,8 +77,11 @@ module.exports = class DocumentContext {
       if (!field.isRelationship) {
         continue;
       }
-      let value = { data: await userModel.getField(field.id) };
-      await this._buildRelationship(field, value, pristineDocOut, searchDocOut, searchTree, depth);
+      if (contentType.computedFields.has(field.id) ||
+          (jsonapiDoc.relationships && jsonapiDoc.relationships.hasOwnProperty(field.id))) {
+        let value = { data: await userModel.getField(field.id) };
+        await this._buildRelationship(field, value, pristineDocOut, searchDocOut, searchTree, depth);
+      }
     }
   }
 
