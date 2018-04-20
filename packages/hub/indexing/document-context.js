@@ -41,10 +41,6 @@ module.exports = class DocumentContext {
   // copies attribues appropriately from jsonapiDoc into
   // pristineDocOut and searchDocOut.
   async _buildAttributes(contentType, jsonapiDoc, userModel, pristineDocOut, searchDocOut) {
-    if (!jsonapiDoc.attributes) {
-      return;
-    }
-    pristineDocOut.data.attributes = {};
     for (let field of contentType.realAndComputedFields.values()) {
       if (field.id === 'id' || field.id === 'type' || field.isRelationship) {
         continue;
@@ -60,7 +56,7 @@ module.exports = class DocumentContext {
     searchDocOut[esName] = value;
 
     // Write our value into the pristine doc
-    pristineDocOut.data.attributes[field.id] = value;
+    ensure(pristineDocOut, 'attributes')[field.id] = value;
 
     // If the search plugin has any derived fields, those also go
     // into the search doc.
@@ -73,16 +69,12 @@ module.exports = class DocumentContext {
     }
   }
 
-  async _buildRelationships(contentType, jsonapiDoc, pristineDocOut, searchDocOut, searchTree, depth) {
-    if (!jsonapiDoc.relationships) {
-      return;
-    }
-    pristineDocOut.data.relationships = {};
-    for (let field of contentType.realFields.values()) {
+  async _buildRelationships(contentType, jsonapiDoc, userModel, pristineDocOut, searchDocOut, searchTree, depth) {
+    for (let field of contentType.realAndComputedFields.values()) {
       if (!field.isRelationship) {
         continue;
       }
-      let value = jsonapiDoc.relationships[field.id];
+      let value = { data: await userModel.getField(field.id) };
       await this._buildRelationship(field, value, pristineDocOut, searchDocOut, searchTree, depth);
     }
   }
@@ -101,18 +93,18 @@ module.exports = class DocumentContext {
           }
         }));
         related = related.filter(Boolean);
-        pristineDocOut.data.relationships[field.id] = Object.assign({}, value, { data: related.map(r => ({ type: r.type, id: r.id })) });
+        ensure(pristineDocOut, 'relationships')[field.id] = Object.assign({}, value, { data: related.map(r => ({ type: r.type, id: r.id })) });
       } else {
         let resource = await this.read(value.data.type, value.data.id);
         if (resource) {
           related = await this._build(resource.type, resource.id, resource, searchTree[field.id], depth + 1);
         }
         let data = related ? { type: related.type, id: related.id } : null;
-        pristineDocOut.data.relationships[field.id] = Object.assign({}, value, { data });
+        ensure(pristineDocOut, 'relationships')[field.id] = Object.assign({}, value, { data });
       }
     } else {
       related = value.data;
-      pristineDocOut.data.relationships[field.id] = Object.assign({}, value);
+      ensure(pristineDocOut, 'relationships')[field.id] = Object.assign({}, value);
     }
     let esName = await this._logicalFieldToES(field.id);
     searchDocOut[esName] = related;
@@ -151,7 +143,7 @@ module.exports = class DocumentContext {
 
     let userModel = new Model(contentType, jsonapiDoc, this.schema, this.read.bind(this));
     await this._buildAttributes(contentType, jsonapiDoc, userModel, pristine, searchDoc);
-    await this._buildRelationships(contentType, jsonapiDoc, pristine, searchDoc, searchTree, depth);
+    await this._buildRelationships(contentType, jsonapiDoc, userModel, pristine, searchDoc, searchTree, depth);
 
     // top level document embeds all the other pristine includes
     if (this.pristineIncludes.length > 0 && depth === 0) {
@@ -180,3 +172,10 @@ module.exports = class DocumentContext {
   }
 
 };
+
+function ensure(obj, section) {
+  if (!obj.data[section]) {
+    obj.data[section] = {};
+  }
+  return obj.data[section];
+}

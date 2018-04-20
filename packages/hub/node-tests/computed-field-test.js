@@ -6,10 +6,35 @@ const {
 } = require('../../../tests/sample-computed-fields/node_modules/@cardstack/test-support/env');
 
 describe('hub/computed-fields', function() {
-  let env, apple, banana;
+  let env, apple, banana, chocolate;
 
   async function setup () {
     let factory = new JSONAPIFactory();
+
+    apple = factory.addResource('foods').withAttributes({
+      title: 'Apple',
+      color: 'red',
+      weightInOunces: 16,
+      nutrients: {
+        fiber: 100
+      }
+    });
+
+    banana = factory.addResource('foods').withAttributes({
+      title: 'Banana',
+      color: 'yellow',
+      weightInOunces: 12,
+      nutrients: {
+        potassium: 40
+      }
+    }).withRelated('goesWellWith', [apple]);
+
+
+    chocolate = factory.addResource('foods').withAttributes({
+      title: 'chocolate',
+      color: 'brown',
+      weightInOunces: 16,
+    });
 
     factory.addResource('content-types', 'foods')
       .withRelated('fields', [
@@ -65,26 +90,27 @@ describe('hub/computed-fields', function() {
           params: {
             color: 'red'
           }
+        }),
+        factory.addResource('computed-fields', 'auto-chocolate').withAttributes({
+          computedFieldType: 'sample-computed-fields::chocolate',
+          params: {
+            chocoId: chocolate.id
+          }
         })
       ]);
 
-    apple = factory.addResource('foods').withAttributes({
-      title: 'Apple',
-      color: 'red',
-      weightInOunces: 16,
-      nutrients: {
-        fiber: 100
-      }
-    });
+    factory.addResource('content-types', 'only-computed')
+      .withAttributes({
+        defaultIncludes: ['auto-chocolate']
+      })
+      .withRelated('fields', [
+        factory.getResource('computed-fields', 'auto-chocolate'),
+        factory.addResource('computed-fields', 'always-42').withAttributes({
+          computedFieldType: 'sample-computed-fields::forty-two'
+        })
+      ]);
 
-    banana = factory.addResource('foods').withAttributes({
-      title: 'Banana',
-      color: 'yellow',
-      weightInOunces: 12,
-      nutrients: {
-        potassium: 40
-      }
-    }).withRelated('goesWellWith', [apple]);
+    factory.addResource('only-computed', '1');
 
     env = await createDefaultEnvironment(`${__dirname}/../../../tests/sample-computed-fields`, factory.getModels());
   }
@@ -136,10 +162,27 @@ describe('hub/computed-fields', function() {
 
     });
 
-    it("can compute a relationship");
+    it("can compute a relationship", async function() {
+      let model = await env.lookup('hub:searchers').get(env.session, 'master', 'foods', apple.id);
+      expect(model.data).has.deep.property('relationships.auto-chocolate');
+      expect(model.data.relationships['auto-chocolate']).deep.equals({ data: { type: 'foods', id: chocolate.id } });
+    });
 
-    it("can search a computed relationship's included attributes");
+    it("can search a computed relationship's included attributes", async function() {
+      let response = await env.lookup('hub:searchers').search(env.session, 'master', { filter: { 'auto-chocolate.title': 'Chocolate' }});
+      expect(response.data).has.length(1);
+      expect(response.data[0]).has.property('id', '1');
+      expect(response.data[0]).has.property('type', 'only-computed');
+    });
 
-    it("can compute an attribute even when there are no real attributes");
+    it("can compute an attribute even when there are no real attributes", async function() {
+      let model = await env.lookup('hub:searchers').get(env.session, 'master', 'only-computed', '1');
+      expect(model.data).has.deep.property('attributes.always-42', 42);
+    });
+
+    it("can compute a relationship even when there are no real relationships", async function() {
+      let model = await env.lookup('hub:searchers').get(env.session, 'master', 'only-computed', '1');
+      expect(model.data).has.deep.property('relationships.auto-chocolate.data.id', chocolate.id);
+    });
   });
 });

@@ -18,14 +18,16 @@ module.exports = class Model {
     if (computedField) {
       return computedField.compute(this);
     } else if (field.isRelationship) {
-      let relObj = jsonapiDoc.relationships[field.id];
-      if (relObj) {
-        return relObj.data;
+      if (jsonapiDoc.relationships) {
+        let relObj = jsonapiDoc.relationships[field.id];
+        if (relObj) {
+          return relObj.data;
+        }
       }
     } else if (field.id === 'id' || field.id === 'type') {
       return jsonapiDoc[field.id];
     } else {
-      return jsonapiDoc.attributes[field.id];
+      return jsonapiDoc.attributes && jsonapiDoc.attributes[field.id];
     }
   }
 
