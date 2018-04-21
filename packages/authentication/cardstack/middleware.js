@@ -138,10 +138,7 @@ class Authentication {
 
           if (!user) { throw new Error(`cant find user type ${session.type} id ${session.id}`); }
 
-          let authorizedUser = await this._applyReadAuthorization(session, user);
-
-          ctxt.status = 200;
-          ctxt.body = authorizedUser;
+          await this._generateSession(ctxt, user);
         });
       }
     ]));
@@ -155,6 +152,38 @@ class Authentication {
     }
     log.warn('Did not locate authentication source "%s"', name);
     throw new Error(`No such authentication source "${name}"`, { status: 404 });
+  }
+
+  async _generateSession(ctxt, user, tokenExpirySeconds=24*3600) {
+    let sessionPayload = { id: user.data.id, type: user.data.type };
+    let session = new Session(sessionPayload, this.userSearcher);
+
+    let schema = await this.currentSchema.forControllingBranch();
+    let canLogin = await schema.hasLoginAuthorization(session);
+
+    if (!canLogin) {
+      ctxt.status = 401;
+      ctxt.body = {
+        errors: [{
+          title: "Not authorized",
+          detail: "You do not posses a grant that authorizes you to login"
+        }]
+      };
+
+      return;
+    }
+
+    let tokenMeta = await this.createToken(sessionPayload, tokenExpirySeconds);
+    if (!user.data.meta) {
+      user.data.meta = tokenMeta;
+    } else {
+      Object.assign(user.data.meta, tokenMeta);
+    }
+
+    let authorizedUser = await this._applyReadAuthorization(session, user);
+
+    ctxt.body = authorizedUser;
+    ctxt.status = 200;
   }
 
   async _invokeAuthenticationSource(ctxt, source) {
@@ -197,35 +226,7 @@ class Authentication {
       return;
     }
 
-    let sessionPayload = { id: user.data.id, type: user.data.type };
-    let session = new Session(sessionPayload, this.userSearcher);
-
-    let schema = await this.currentSchema.forControllingBranch();
-    let canLogin = await schema.hasLoginAuthorization(session);
-
-    if (!canLogin) {
-      ctxt.status = 401;
-      ctxt.body = {
-        errors: [{
-          title: "Not authorized",
-          detail: "You do not posses a grant that authorizes you to login"
-        }]
-      };
-
-      return;
-    }
-
-    let tokenMeta = await this.createToken(sessionPayload, source.tokenExpirySeconds);
-    if (!user.data.meta) {
-      user.data.meta = tokenMeta;
-    } else {
-      Object.assign(user.data.meta, tokenMeta);
-    }
-
-    let authorizedUser = await this._applyReadAuthorization(session, user);
-
-    ctxt.body = authorizedUser;
-    ctxt.status = 200;
+    await this._generateSession(ctxt, user, source.tokenExpirySeconds);
   }
 
   async _applyReadAuthorization(session, user) {
