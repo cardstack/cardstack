@@ -517,6 +517,9 @@ describe('authentication/middleware', function() {
         expect(response.body).has.deep.property('data.type', 'test-users');
         expect(response.body).has.deep.property('data.attributes.full-name', 'Quint Faulkner');
         expect(response.body).has.deep.property('data.attributes.email', 'quint@example.com');
+        expect(response.body).has.deep.property('data.meta.validUntil');
+        expect(response.body).has.deep.property('data.meta.token');
+        expect(response.body.data.meta.token).to.not.equal(token, 'a new token as been issued');
       });
 
       it('can return updated user info when getting token status', async function() {
