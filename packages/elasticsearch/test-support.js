@@ -1,4 +1,4 @@
-const Client = require('../client');
+const Client = require('./client');
 
 module.exports = class ElasticAsserter {
   constructor(){

@@ -1,4 +1,4 @@
-const ElasticAssert = require('@cardstack/elasticsearch/node-tests/assertions');
+const ElasticAssert = require('@cardstack/elasticsearch/test-support');
 const JSONAPIFactory = require('../../../tests/stub-project/node_modules/@cardstack/test-support/jsonapi-factory');
 const PendingChange = require('@cardstack/plugin-utils/pending-change');
 const bootstrapSchema = require('../bootstrap-schema');

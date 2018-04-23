@@ -1,5 +1,5 @@
 const temp = require('./temp-helper');
-const ElasticAssert = require('@cardstack/elasticsearch/node-tests/assertions');
+const ElasticAssert = require('@cardstack/elasticsearch/test-support');
 const JSONAPIFactory = require('./jsonapi-factory');
 const crypto = require('crypto');
 const { wireItUp, loadSeeds } = require('@cardstack/hub/main');
