@@ -17,7 +17,8 @@ const changePattern = /^table ([^.]+)\.([^:]+): ([^:]+): (.*)/;
 // If your id contains spaces or quotes yer gonna have a bad time. Sorry not sorry.
 const idPattern = /id\[[^\]]+\]:'?([^\s']+)/;
 
-const replicationSlotPrefix = process.env.ELASTICSEARCH_PREFIX || 'cardstack';
+const unknownEnv = 'cardstack_unknown_env';
+const replicationSlotPrefix = process.env.ELASTICSEARCH_PREFIX || unknownEnv;
 
 module.exports = declareInjections({
   projectConfig: 'config:project'
@@ -312,7 +313,7 @@ class Updater {
   }
 
   async _removeAbandonedReplicationSlots(currentReplicationSlot) {
-    let { rows:slots } = await this.query(`SELECT * FROM pg_replication_slots where slot_name like '${replicationSlotPrefix}_%'`);
+    let { rows:slots } = await this.query(`SELECT * FROM pg_replication_slots where slot_name like '${replicationSlotPrefix}_%' OR slot_name like '${unknownEnv}'`);
     for (let { slot_name:slot } of slots) {
       if (slot === currentReplicationSlot) { continue; }
       await this.query(`select pg_drop_replication_slot($1) from pg_replication_slots;`, [ slot ]);
