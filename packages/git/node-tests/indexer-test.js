@@ -1,7 +1,7 @@
 const Change = require('../change');
 const temp = require('@cardstack/test-support/temp-helper');
 const { commitOpts, makeRepo } = require('./support');
-const ElasticAssert = require('@cardstack/elasticsearch/node-tests/assertions');
+const ElasticAssert = require('@cardstack/elasticsearch/test-support');
 const JSONAPIFactory = require('@cardstack/test-support/jsonapi-factory');
 const { Registry, Container } = require('@cardstack/di');
 const logger = require('@cardstack/logger');
@@ -12,7 +12,7 @@ function toJSONAPI(doc) {
 }
 
 describe('git/indexer', function() {
-  let root, indexer, ea, dataSource;
+  let root, indexer, ea, dataSource, assertNoDocument;
 
   beforeEach(async function() {
     ea = new ElasticAssert();
@@ -38,6 +38,16 @@ describe('git/indexer', function() {
       path: `${__dirname}/..`
     });
     indexer = new Container(registry).lookup('hub:indexers');
+
+    assertNoDocument = async function(branch, type, id) {
+      try {
+        await ea.documentContents(branch, type, id);
+      } catch(err) {
+        expect(err.message).to.match(/not found/i);
+        return;
+      }
+      throw new Error(`expected not to find document branch=${branch} type=${type} id=${id}`);
+    };
   });
 
   afterEach(async function() {
@@ -174,7 +184,7 @@ describe('git/indexer', function() {
 
     let indexerState = await ea.indexerState('master', dataSource.id);
     expect(indexerState.commit).to.equal(head);
-    await ea.assertNoDocument('master', 'articles', 'hello-world');
+    await assertNoDocument('master', 'articles', 'hello-world');
   });
 
   it('ignores newly added document with malformed json', async function() {
@@ -193,7 +203,7 @@ describe('git/indexer', function() {
 
     let indexerState = await ea.indexerState('master', dataSource.id);
     expect(indexerState.commit).to.equal(head);
-    await ea.assertNoDocument('master', 'articles', 'hello-world');
+    await assertNoDocument('master', 'articles', 'hello-world');
   });
 
   it('does not reindex unchanged content', async function() {
@@ -241,7 +251,7 @@ describe('git/indexer', function() {
     file.delete();
     await change.finalize(commitOpts());
     await indexer.update();
-    await ea.assertNoDocument('master', 'articles', 'hello-world');
+    await assertNoDocument('master', 'articles', 'hello-world');
 
   });
 
@@ -302,7 +312,7 @@ describe('git/indexer', function() {
       let upstream = toJSONAPI(await ea.documentContents('master', 'articles', 'upstream'));
       expect(upstream).has.deep.property('attributes.title', 'article from upstream');
 
-      await ea.assertNoDocument('master', 'articles', 'right');
+      await assertNoDocument('master', 'articles', 'right');
     }
 
     let change = await Change.create(repo, head, 'master');
@@ -336,7 +346,7 @@ describe('git/indexer', function() {
       expect(upstream).has.deep.property('attributes.title', 'article from upstream');
 
       // Delete
-      await ea.assertNoDocument('master', 'articles', 'left');
+      await assertNoDocument('master', 'articles', 'left');
     }
   });
 

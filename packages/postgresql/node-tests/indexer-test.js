@@ -3,7 +3,7 @@ const {
   destroyDefaultEnvironment
 } = require('@cardstack/test-support/env');
 const { Client } = require('pg');
-const ElasticAssert = require('@cardstack/elasticsearch/node-tests/assertions');
+const ElasticAssert = require('@cardstack/elasticsearch/test-support');
 const JSONAPIFactory = require('@cardstack/test-support/jsonapi-factory');
 
 describe('postgresql/indexer', function() {
