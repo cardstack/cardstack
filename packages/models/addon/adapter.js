@@ -53,11 +53,10 @@ export default DS.JSONAPIAdapter.extend(AdapterMixin, {
       // session, apply the token to our request
 
       let { beforeSend } = hash;
+      let { access_token } = this.get('session.data.authenticated');
 
       hash.beforeSend = (xhr) => {
-        this.get('session').authorize('authorizer:cardstack', (headerName, headerValue) => {
-          xhr.setRequestHeader(headerName, headerValue);
-        });
+        xhr.setRequestHeader('Authorization', `Bearer ${access_token}`);
         if (beforeSend) {
           beforeSend(xhr);
         }
