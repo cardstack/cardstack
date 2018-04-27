@@ -112,6 +112,23 @@ describe('hub/computed-fields', function() {
 
     factory.addResource('only-computed', '1');
 
+    factory.addResource('content-types', 'sample-searcher-models')
+      .withRelated('fields', [
+        factory.addResource('fields', 'height').withAttributes({
+          fieldType: '@cardstack/core-types::integer'
+        }),
+        factory.addResource('computed-fields', 'double-height').withAttributes({
+          computedFieldType: 'sample-computed-fields::multiply-by-constant',
+          params: {
+            sourceField: 'height',
+            factor: 2
+          }
+        })
+      ])
+      .withRelated('data-source', factory.addResource('data-sources')
+                   .withAttributes({ sourceType: 'sample-computed-fields' })
+                  );
+
     env = await createDefaultEnvironment(`${__dirname}/../../../tests/sample-computed-fields`, factory.getModels());
   }
 
@@ -217,6 +234,18 @@ describe('hub/computed-fields', function() {
       expect(model.data).has.deep.property('attributes.good-with-red', false);
     });
 
+    it.skip("adds computed fields to custom searcher's get response", async function() {
+      let model = await env.lookup('hub:searchers').get(env.session, 'master', 'sample-searcher-models', '1');
+      expect(model).has.deep.property('data.attributes.double-height', 2);
+    });
+
+    it.skip("adds computed fields to custom searcher's search response", async function() {
+      let response = await env.lookup('hub:searchers').search(env.session, 'master', { filter: { type: 'sample-searcher-models' } });
+      expect(response.data).has.length(1);
+      expect(response.data[0]).has.deep.property('attributes.double-height', 2);
+    });
+
   });
+
 
 });
