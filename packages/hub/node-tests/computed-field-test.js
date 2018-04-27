@@ -185,4 +185,38 @@ describe('hub/computed-fields', function() {
       expect(model.data).has.deep.property('relationships.auto-chocolate.data.id', chocolate.id);
     });
   });
+
+  describe('read-write', function() {
+    beforeEach(setup);
+    afterEach(teardown);
+
+    it.skip("includes computed field in create response", async function() {
+      let model = await env.lookup('hub:writers').create('master', env.session, 'foods', {
+        type: 'foods',
+        attributes: {
+          title: 'Crumb',
+          'weight-in-ounces': 1
+        }
+      });
+      expect(model).has.deep.property('attributes.weight-in-grams', 28);
+    });
+
+    it.skip("includes computed field in update response", async function() {
+      let model = await env.lookup('hub:searchers').get(env.session, 'master', 'foods', banana.id);
+      model.data.attributes['weight-in-ounces'] = 1;
+      let response = await env.lookup('hub:writers').update('master', env.session, 'foods', banana.id, model.data);
+      expect(response).has.deep.property('attributes.weight-in-grams', 28);
+    });
+
+    it.skip("updates computed field in response to a dependent model changing", async function() {
+      let model = await env.lookup('hub:searchers').get(env.session, 'master', 'foods', apple.id);
+      model.data.attributes['color'] = 'blue';
+      await env.lookup('hub:writers').update('master', env.session, 'foods', apple.id, model.data);
+      await env.lookup('hub:indexers').update({ forceRefresh: true });
+      model = await env.lookup('hub:searchers').get(env.session, 'master', 'foods', banana.id);
+      expect(model.data).has.deep.property('attributes.good-with-red', false);
+    });
+
+  });
+
 });
