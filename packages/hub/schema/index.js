@@ -48,6 +48,27 @@ class Schema {
     return this.schemaLoader.ownTypes().includes(type);
   }
 
+  withOnlyRealFields(doc) {
+    let activeDoc = doc;
+    for (let section of ['attributes', 'relationships']) {
+      if (!doc[section]) {
+        continue;
+      }
+      for (let fieldName of Object.keys(doc[section])) {
+        if (this.computedFields.has(fieldName)) {
+          if (activeDoc === doc) {
+            activeDoc = Object.assign({}, doc);
+          }
+          if (activeDoc[section] === doc[section]) {
+            activeDoc[section] = Object.assign({}, doc[section]);
+          }
+          delete activeDoc[section][fieldName];
+        }
+      }
+    }
+    return activeDoc;
+  }
+
   // derives a new schema by adding, updating, or removing
   // models. Takes a list of { type, id, document } objects. A null document
   // means deletion.

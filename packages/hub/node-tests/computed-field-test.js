@@ -225,7 +225,7 @@ describe('hub/computed-fields', function() {
       expect(response).has.deep.property('attributes.weight-in-grams', 28);
     });
 
-    it.skip("updates computed field in response to a dependent model changing", async function() {
+    it("updates computed field in response to a dependent model changing", async function() {
       let model = await env.lookup('hub:searchers').get(env.session, 'master', 'foods', apple.id);
       model.data.attributes['color'] = 'blue';
       await env.lookup('hub:writers').update('master', env.session, 'foods', apple.id, model.data);

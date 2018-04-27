@@ -17,7 +17,13 @@ class Writers {
     let schema = await this.schema.forBranch(branch);
     let writer = this._lookupWriter(schema, type);
     let isSchema = this.schemaTypes.includes(type);
-    let pending = await writer.prepareCreate(branch, session, type, document, isSchema);
+    let pending = await writer.prepareCreate(
+      branch,
+      session,
+      type,
+      schema.withOnlyRealFields(document),
+      isSchema
+    );
     try {
       let newSchema = await schema.validate(pending, { type, session });
       let response = await this._finalizeAndReply(pending);
@@ -35,7 +41,14 @@ class Writers {
     let schema = await this.schema.forBranch(branch);
     let writer = this._lookupWriter(schema, type);
     let isSchema = this.schemaTypes.includes(type);
-    let pending = await writer.prepareUpdate(branch, session, type, id, document, isSchema);
+    let pending = await writer.prepareUpdate(
+      branch,
+      session,
+      type,
+      id,
+      schema.withOnlyRealFields(document),
+      isSchema
+    );
     try {
       let newSchema = await schema.validate(pending, { type, id, session });
       let response = await this._finalizeAndReply(pending);
