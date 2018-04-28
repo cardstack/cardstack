@@ -47,6 +47,33 @@ module('Integration | Models', function(hooks) {
             fieldType: '@cardstack/core-types::string'
           })
         ]);
+
+
+      factory.addResource('data-sources', 'mock-auth').
+        withAttributes({
+          sourceType: '@cardstack/mock-auth',
+          mayCreateUser: true,
+          params: {
+            users: {
+              // TODO: we only need `verified` because the mock-auth
+              // module is unnecessarily specialized. We should
+              // simplify it down to a very barebones user so this can
+              // just say `'sample-user': { }`.
+              'sample-user': { verified: true }
+            }
+          }
+        })
+      factory.addResource('grants')
+        .withAttributes({
+          mayWriteFields: true,
+          mayReadFields: true,
+          mayCreateResource: true,
+          mayReadResource: true,
+          mayUpdateResource: true,
+          mayDeleteResource: true,
+          mayLogin: true
+        })
+        .withRelated('who', { type: 'groups', id: 'sample-user' });
     },
 
     destroy() {
@@ -64,6 +91,7 @@ module('Integration | Models', function(hooks) {
 
   hooks.beforeEach(async function() {
     await this.owner.lookup('service:cardstack-codegen').refreshCode();
+    await this.owner.lookup('service:mock-login').get('login').perform('sample-user');
     this.store = this.owner.lookup('service:store');
    });
 
