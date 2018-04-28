@@ -201,6 +201,12 @@ class Updater {
           AND KCU2.ORDINAL_POSITION = KCU1.ORDINAL_POSITION`);
 
     for (let {fk_table_name, fk_column_name, referenced_table_name, fk_constraint_schema} of relationshipColumns) {
+      let hint = get(this.typeHints, `${fk_table_name}.${fk_column_name}`);
+      if (hint && hint !== '@cardstack/core-types::belongs-to' && hint !== '@cardstack/core-types::has-many') {
+        // this column has been forced to be a non-relationship type, so we leave it alone here.
+        continue;
+      }
+
       let field = fields[this.mapper.fieldNameFor(fk_constraint_schema, fk_table_name, fk_column_name)];
       if (!field) {
         throw new Error(`There was a problem with the relationship field ${fk_column_name}, it could not be found to turn into a relationship`);
