@@ -152,13 +152,13 @@ class BranchUpdate {
         body: esBody
       });
 
-      let docs = result.hits.hits;
-      if (docs.length === size) {
-        throw new Error("Bug in hub:indexers: need to process larger invalidation sets");
-      }
+      let docs = result.hits.hits.map(hit => {
+        let { id, type } = hit._source.cardstack_pristine.data;
+        return { id, type };
+      });
       accumulatedDocs = accumulatedDocs.concat(docs);
     }
-    return accumulatedDocs.map(doc => doc._source.cardstack_pristine.data);
+    return accumulatedDocs;
   }
 
   // This method does not need to recursively invalidate, because each
