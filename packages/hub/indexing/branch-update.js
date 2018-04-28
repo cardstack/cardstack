@@ -29,11 +29,10 @@ class BranchUpdate {
     if (!indexer) {
       return [];
     }
-    let updater = await indexer.beginUpdate(this.branch);
+    let updater = this.updaters[dataSource.id] = await indexer.beginUpdate(this.branch);
     owningDataSource.set(updater, dataSource);
     let newModels = await updater.schema();
     this.schemaModels.push(newModels);
-    this.updaters[dataSource.id] = updater;
     return newModels;
   }
 
