@@ -18,9 +18,9 @@ class Indexer {
     return new this(...args);
   }
 
-  constructor({ ethereumService, dataSource, branches, contracts, searcher }) {
+  constructor({ ethereumService, dataSource, branches, contract, searcher }) {
     this.dataSourceId = dataSource.id;
-    this.contracts = contracts;
+    this.contract = contract;
     this.searcher = searcher;
     this._branches = branches;
     this.ethereumService = ethereumService;
@@ -31,11 +31,11 @@ class Indexer {
   }
 
   async beginUpdate() {
-    await this.ethereumService.start(this.contracts);
+    await this.ethereumService.start({ contract: this.contract, name: this.dataSourceId });
 
     return new Updater({
       dataSourceId: this.dataSourceId,
-      contracts: this.contracts,
+      contract: this.contract,
       ethereumService: this.ethereumService,
       searcher: this.searcher
     });
@@ -44,9 +44,9 @@ class Indexer {
 
 class Updater {
 
-  constructor({ dataSourceId, contracts, ethereumService, searcher }) {
+  constructor({ dataSourceId, contract, ethereumService, searcher }) {
     this.dataSourceId = dataSourceId;
-    this.contracts = contracts;
+    this.contract = contract;
     this.ethereumService = ethereumService;
     this.searcher = searcher;
   }
@@ -87,42 +87,39 @@ class Updater {
     }];
 
     let schema = [].concat(defaultFields);
-    let contractNames = Object.keys(this.contracts);
+    let contractName = this.dataSourceId;
+    let abi = this.contract["abi"];
+    let { fields, customTypes } = this._getFieldsFromAbi(contractName, abi);
 
-    contractNames.forEach(contractName => {
-      let abi = this.contracts[contractName]["abi"];
-      let { fields, customTypes } = this._getFieldsFromAbi(contractName, abi);
+    schema = schema.concat(customTypes)
+                   .concat(fields);
 
-      schema = schema.concat(customTypes)
-                     .concat(fields);
-
-      let contractSchema =  {
-        type: 'content-types',
-        id: pluralize(contractName),
-        relationships: {
-          fields: {
-            data: [
-              { type: "fields", id: "ethereum-address" },
-              { type: "fields", id: "balance-wei" }
-            ]
-          },
-          'data-source': {
-            data: { type: 'data-sources', id: this.dataSourceId.toString() }
-          }
+    let contractSchema =  {
+      type: 'content-types',
+      id: pluralize(contractName),
+      relationships: {
+        fields: {
+          data: [
+            { type: "fields", id: "ethereum-address" },
+            { type: "fields", id: "balance-wei" }
+          ]
+        },
+        'data-source': {
+          data: { type: 'data-sources', id: this.dataSourceId.toString() }
         }
-      };
+      }
+    };
 
-      fields.forEach(field => {
-        contractSchema.relationships.fields.data.push({
-          type: "fields", id: field.id
-        });
+    fields.forEach(field => {
+      contractSchema.relationships.fields.data.push({
+        type: "fields", id: field.id
       });
-
-      schema.push(this._openGrantForContentType(contractName));
-      schema.push(contractSchema);
     });
 
-    log.debug(`Created schema for contracts: \n ${JSON.stringify(schema, null, 2)}`);
+    schema.push(this._openGrantForContentType(contractName));
+    schema.push(contractSchema);
+
+    log.debug(`Created schema for contract ${contractName}: \n ${JSON.stringify(schema, null, 2)}`);
     this._schema = schema;
 
     return this._schema;
@@ -148,11 +145,9 @@ class Updater {
 
     let contractHints = hints && hints.length ? hints.filter(hint => hint.isContractType) : [];
     if (!contractHints.length) {
-      for (let contract of Object.keys(this.contracts)) {
-        for (let branch of Object.keys(this.contracts[contract].addresses)) {
-          let model = await this.ethereumService.getContractInfo({ branch, contract });
-          await ops.save(model.type, model.id, model);
-        }
+      for (let branch of Object.keys(this.contract.addresses)) {
+        let model = await this.ethereumService.getContractInfo({ branch, contract: this.dataSourceId });
+        await ops.save(model.type, model.id, model);
       }
     } else {
       for (let { branch, type } of contractHints) {
@@ -165,15 +160,16 @@ class Updater {
       hints = await this.ethereumService.getPastEventsAsHints();
     }
 
-    for (let { id, branch, type, contract, isContractType } of hints) {
-      if (!branch || !type || !id || !contract || isContractType) { continue; }
+    for (let { id, branch, type, isContractType } of hints) {
+      let contractName = this.dataSourceId;
+      if (!branch || !type || !id || isContractType) { continue; }
 
-      let contractAddress = this.contracts[contract].addresses[branch];
-      let { data, methodName } = await this.ethereumService.getContractInfoFromHint({ id, type, branch, contract });
-      let methodAbiEntry = this.contracts[contract]["abi"].find(item => item.type === 'function' &&
+      let contractAddress = this.contract.addresses[branch];
+      let { data, methodName } = await this.ethereumService.getContractInfoFromHint({ id, type, branch, contractName });
+      let methodAbiEntry = this.contract["abi"].find(item => item.type === 'function' &&
                                                                         item.constant &&
                                                                         item.name === methodName);
-      let { isMapping, fields } = this._fieldTypeFor(contract, methodAbiEntry);
+      let { isMapping, fields } = this._fieldTypeFor(contractName, methodAbiEntry);
       if (!isMapping || !fields.length) { continue; }
 
       let model = {
@@ -194,8 +190,8 @@ class Updater {
         model.attributes[fields[0].name] = data;
       }
 
-      model.relationships[`${contract}-contract`] = {
-        data: { id: contractAddress, type: pluralize(contract) }
+      model.relationships[`${contractName}-contract`] = {
+        data: { id: contractAddress, type: pluralize(contractName) }
       };
 
       await ops.save(type, id.toLowerCase(), model);
@@ -211,6 +207,7 @@ class Updater {
     if (isSchema) {
       return (await this.schema()).find(model => model.type === type && model.id === model.id);
     }
+    //TODO handle non-schema read
   }
 
   _namedFieldFor(fieldName, type) {

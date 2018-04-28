@@ -3,13 +3,15 @@ const {
   createDefaultEnvironment,
   destroyDefaultEnvironment
 } = require('@cardstack/test-support/env');
-const addresses = require('./test-data');
+const addresses = require('./data/addresses');
 const { promisify } = require('util');
 const timeout = promisify(setTimeout);
 const JSONAPIFactory = require('@cardstack/test-support/jsonapi-factory');
 
+const contractName = 'sample-token';
+
 async function waitForEthereumEvents(service) {
-  while (service._indexQueue.length) {
+  while (service._indexQueue[contractName].length) {
     await timeout(100);
   }
   await service._indexerPromise;
@@ -66,23 +68,21 @@ contract('SampleToken', function(accounts) {
       token = await SampleToken.new();
       await token.fund({ value: web3.toWei(0.01, 'ether'), from: accountOne });
 
-      dataSource = factory.addResource('data-sources', 'ethereum')
+      dataSource = factory.addResource('data-sources', contractName)
         .withAttributes({
           'source-type': '@cardstack/ethereum',
           params: {
             branches: {
               master: { jsonRpcUrl: "ws://localhost:7545" }
             },
-            contracts: {
-              "sample-token": {
-                abi: token.abi,
-                addresses: { master: token.address },
-                eventContentTriggers: {
-                  Transfer: [ "sample-token-balance-ofs" ],
-                  Mint: [ "sample-token-balance-ofs" ],
-                  WhiteList: [ "sample-token-approved-buyers", "sample-token-custom-buyer-limits" ],
-                  VestedTokenGrant: [ "sample-token-vesting-schedules" ]
-                }
+            contract: {
+              abi: token.abi,
+              addresses: { master: token.address },
+              eventContentTriggers: {
+                Transfer: [ "sample-token-balance-ofs" ],
+                Mint: [ "sample-token-balance-ofs" ],
+                WhiteList: [ "sample-token-approved-buyers", "sample-token-custom-buyer-limits" ],
+                VestedTokenGrant: [ "sample-token-vesting-schedules" ]
               }
             }
           },
@@ -94,8 +94,8 @@ contract('SampleToken', function(accounts) {
     }
 
     async function teardown() {
+      await ethereumService.stopAll();
       await destroyDefaultEnvironment(env);
-      await ethereumService.stop();
     }
 
     beforeEach(setup);
@@ -108,7 +108,7 @@ contract('SampleToken', function(accounts) {
           "id": "sample-tokens",
           "type": "content-types",
           "meta": {
-            "source": "ethereum"
+            "source": contractName
           },
           "relationships": {
             "fields": {
@@ -187,7 +187,7 @@ contract('SampleToken', function(accounts) {
             }
           },
           "meta": {
-            "source": "ethereum"
+            "source": contractName
           }
         }
       });
@@ -223,7 +223,7 @@ contract('SampleToken', function(accounts) {
             }
           },
           "meta": {
-            "source": "ethereum"
+            "source": contractName
           }
         }
       });
@@ -259,7 +259,7 @@ contract('SampleToken', function(accounts) {
             }
           },
           "meta": {
-            "source": "ethereum"
+            "source": contractName
           }
         }
       });
@@ -314,7 +314,7 @@ contract('SampleToken', function(accounts) {
             }
           },
           "meta": {
-            "source": "ethereum"
+            "source": contractName
           }
         }
       });
@@ -328,7 +328,7 @@ contract('SampleToken', function(accounts) {
             "field-type": "@cardstack/core-types::string"
           },
           "meta": {
-            "source": "ethereum"
+            "source": contractName
           }
         }
       });
@@ -342,7 +342,7 @@ contract('SampleToken', function(accounts) {
             "field-type": "@cardstack/core-types::string"
           },
           "meta": {
-            "source": "ethereum"
+            "source": contractName
           }
         }
       });
@@ -356,7 +356,7 @@ contract('SampleToken', function(accounts) {
             "field-type": "@cardstack/core-types::string"
           },
           "meta": {
-            "source": "ethereum"
+            "source": contractName
           }
         }
       });
@@ -370,7 +370,7 @@ contract('SampleToken', function(accounts) {
             "field-type": "@cardstack/core-types::string"
           },
           "meta": {
-            "source": "ethereum"
+            "source": contractName
           }
         }
       });
@@ -384,7 +384,7 @@ contract('SampleToken', function(accounts) {
             "field-type": "@cardstack/core-types::string"
           },
           "meta": {
-            "source": "ethereum"
+            "source": contractName
           }
         }
       });
@@ -398,7 +398,7 @@ contract('SampleToken', function(accounts) {
             "field-type": "@cardstack/core-types::boolean"
           },
           "meta": {
-            "source": "ethereum"
+            "source": contractName
           }
         }
       });
@@ -429,7 +429,7 @@ contract('SampleToken', function(accounts) {
             }
           },
           "meta": {
-            "source": "ethereum"
+            "source": contractName
           }
         }
       });
@@ -464,7 +464,7 @@ contract('SampleToken', function(accounts) {
             }
           },
           "meta": {
-            "source": "ethereum"
+            "source": contractName
           }
         }
       });
@@ -495,7 +495,7 @@ contract('SampleToken', function(accounts) {
             }
           },
           "meta": {
-            "source": "ethereum"
+            "source": contractName
           }
         }
       });
@@ -509,7 +509,7 @@ contract('SampleToken', function(accounts) {
             "field-type": "@cardstack/core-types::string"
           },
           "meta": {
-            "source": "ethereum"
+            "source": contractName
           }
         }
       });
@@ -523,7 +523,7 @@ contract('SampleToken', function(accounts) {
             "field-type": "@cardstack/core-types::boolean"
           },
           "meta": {
-            "source": "ethereum"
+            "source": contractName
           }
         }
       });
@@ -537,7 +537,7 @@ contract('SampleToken', function(accounts) {
             "field-type": "@cardstack/core-types::string"
           },
           "meta": {
-            "source": "ethereum"
+            "source": contractName
           }
         }
       });
@@ -551,7 +551,7 @@ contract('SampleToken', function(accounts) {
             "field-type": "@cardstack/core-types::string"
           },
           "meta": {
-            "source": "ethereum"
+            "source": contractName
           }
         }
       });
@@ -565,7 +565,7 @@ contract('SampleToken', function(accounts) {
             "field-type": "@cardstack/core-types::string"
           },
           "meta": {
-            "source": "ethereum"
+            "source": contractName
           }
         }
       });
@@ -589,7 +589,7 @@ contract('SampleToken', function(accounts) {
             }
           },
           "meta": {
-            "source": "ethereum"
+            "source": contractName
           }
         }
       });
@@ -614,7 +614,7 @@ contract('SampleToken', function(accounts) {
             "sample-token-symbol": "TOK"
           },
           "meta": {
-            "source": "ethereum"
+            "source": contractName
           }
         }
       });
@@ -622,12 +622,12 @@ contract('SampleToken', function(accounts) {
 
     it("indexes mapping entry that contains multiple return values", async function() {
       await token.grantVestedTokens(accountOne,
-                                    100,
-                                    1000000000,
-                                    1000500000,
-                                    500000,
-                                    1000600000,
-                                    true);
+        100,
+        1000000000,
+        1000500000,
+        500000,
+        1000600000,
+        true);
       await waitForEthereumEvents(ethereumService);
 
       let vestingSchedule = await env.lookup('hub:searchers').get(env.session, 'master', 'sample-token-vesting-schedules', accountOne);
@@ -656,7 +656,7 @@ contract('SampleToken', function(accounts) {
             }
           },
           "meta": {
-            "source": "ethereum"
+            "source": contractName
           }
         }
       });
@@ -702,7 +702,7 @@ contract('SampleToken', function(accounts) {
             }
           },
           "meta": {
-            "source": "ethereum"
+            "source": contractName
           }
         }
       });
@@ -764,7 +764,7 @@ contract('SampleToken', function(accounts) {
             }
           },
           "meta": {
-            "source": "ethereum"
+            "source": contractName
           }
         }
       });
@@ -788,7 +788,7 @@ contract('SampleToken', function(accounts) {
             }
           },
           "meta": {
-            "source": "ethereum"
+            "source": contractName
           }
         }
       });
@@ -810,20 +810,18 @@ contract('SampleToken', function(accounts) {
 
       await token.mint(accountOne, 100);
 
-      factory.addResource('data-sources', 'ethereum',)
+      factory.addResource('data-sources', contractName)
         .withAttributes({
           'source-type': '@cardstack/ethereum',
           params: {
             branches: {
               master: { jsonRpcUrl: "ws://localhost:7545" }
             },
-            contracts: {
-              "sample-token": {
-                abi: token.abi,
-                addresses: { master: token.address },
-                eventContentTriggers: {
-                  MintingFinished: []
-                }
+            contract: {
+              abi: token.abi,
+              addresses: { master: token.address },
+              eventContentTriggers: {
+                MintingFinished: []
               }
             }
           },
@@ -835,8 +833,8 @@ contract('SampleToken', function(accounts) {
     }
 
     async function teardown() {
+      await ethereumService.stopAll();
       await destroyDefaultEnvironment(env);
-      await ethereumService.stop();
     }
 
     beforeEach(setup);
@@ -871,22 +869,20 @@ contract('SampleToken', function(accounts) {
         await token.addBuyer(address);
       }
 
-      factory.addResource('data-sources')
+      factory.addResource('data-sources', contractName)
         .withAttributes({
           'source-type': '@cardstack/ethereum',
           params: {
             branches: {
               master: { jsonRpcUrl: "ws://localhost:7545" }
             },
-            contracts: {
-              "sample-token": {
-                abi: token.abi,
-                addresses: { master: token.address },
-                eventContentTriggers: {
-                  WhiteList: [ "sample-token-approved-buyers" ],
-                  Transfer: [ "sample-token-balance-ofs" ],
-                  Mint: [ "sample-token-balance-ofs" ]
-                }
+            contract: {
+              abi: token.abi,
+              addresses: { master: token.address },
+              eventContentTriggers: {
+                WhiteList: [ "sample-token-approved-buyers" ],
+                Transfer: [ "sample-token-balance-ofs" ],
+                Mint: [ "sample-token-balance-ofs" ]
               }
             }
           },
@@ -898,8 +894,8 @@ contract('SampleToken', function(accounts) {
     }
 
     async function teardown() {
+      await ethereumService.stopAll();
       await destroyDefaultEnvironment(env);
-      await ethereumService.stop();
     }
 
     beforeEach(setup);
