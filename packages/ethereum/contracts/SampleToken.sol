@@ -11,6 +11,7 @@ contract SampleToken is MintableToken {
   string public name = "SampleToken";
   string public symbol = "TOK";
   uint256 public balanceLimit;
+  uint256 public buyerCount;
 
   mapping (address => uint256) public customBuyerLimit;
   mapping (address => bool) public approvedBuyer;
@@ -40,6 +41,7 @@ contract SampleToken is MintableToken {
 
   function addBuyer(address buyer) onlyOwner public returns (bool) {
     approvedBuyer[buyer] = true;
+    buyerCount = buyerCount + 1;
 
     uint256 _balanceLimit = customBuyerLimit[buyer];
     if (_balanceLimit == 0) {
