@@ -148,6 +148,10 @@ class Updater {
       let contentTypeName = this.mapper.typeNameFor(table_schema, table_name);
       let fieldName = this.mapper.fieldNameFor(table_schema, table_name, column_name);
 
+      if (!types[contentTypeName]) {
+        types[contentTypeName] = this._initializeContentType(contentTypeName);
+      }
+
       // Every content type always has an ID field implicitly, it
       // doesn't need to be created.
       if (fieldName === 'id') {
@@ -169,9 +173,6 @@ class Updater {
         fields[fieldName] = this._initializeField(fieldName, fieldType);
       }
 
-      if (!types[contentTypeName]) {
-        types[contentTypeName] = this._initializeContentType(contentTypeName);
-      }
       types[contentTypeName].relationships.fields.data.push({ type: 'fields', id: fieldName });
     }
 
