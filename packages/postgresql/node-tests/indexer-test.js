@@ -27,6 +27,13 @@ describe('postgresql/indexer', function() {
     await client.query('create table doggies (id varchar primary key, name varchar, favorite_toy varchar references favorite_toys(id))');
     await client.query('insert into doggies values ($1, $2, $3)', ['0', 'Van Gogh', '0']);
 
+    await client.query('create table grades (id varchar primary key)');
+    await client.query('insert into grades values ($1)', ['A']);
+    await client.query('create table report_cards (id varchar primary key, history_grade varchar references grades(id))');
+    await client.query('insert into report_cards values ($1, $2)', ['0', 'A']);
+
+
+
     let factory = new JSONAPIFactory();
 
     dataSource = factory.addResource('data-sources')
@@ -52,6 +59,9 @@ describe('postgresql/indexer', function() {
           typeHints: {
             favorite_toys: {
               toy_name: '@cardstack/core-types::case-insensitive'
+            },
+            report_cards: {
+              history_grade: '@cardstack/core-types::string'
             }
           },
           patch: {
@@ -175,6 +185,11 @@ describe('postgresql/indexer', function() {
       expect(doc).has.property('included');
       expect(doc.included).has.length(1);
       expect(doc.included[0]).has.deep.property('attributes.name', 'Some Editor');
+    });
+
+    it('can use type hints to make a relationship into an attribute', async function() {
+      let doc = await env.lookup('hub:searchers').get(env.session, 'master', 'report-cards', '0');
+      expect(doc.data.attributes).has.property('history-grade', 'A');
     });
 
   });
