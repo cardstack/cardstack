@@ -23,18 +23,18 @@ class EthereumService {
 
   constructor({ indexer }) {
     this._indexer = indexer;
-    this._providers = new WeakMap();
-    this._eventListeners = new WeakMap();
+    this._providers = {};
+    this._eventListeners = {};
     this._hasStartedListening = {};
     this._hasConnected = false;
     this._isIndexing = {};
     this._indexQueue = {};
     this._processQueueTimeoutMs = 1000;
-    this._processQueueTimeout = new WeakMap();
-    this._contractDefinitions = new WeakMap();
+    this._processQueueTimeout = {};
+    this._contractDefinitions = {};
     this._branches = null;
-    this._eventDefinitions = new WeakMap();
-    this._contracts = new WeakMap();
+    this._eventDefinitions = {};
+    this._contracts = {};
     this._indexerPromise = null; // exposing this for the tests
   }
 

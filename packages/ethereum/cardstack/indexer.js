@@ -129,6 +129,7 @@ class Updater {
     let schema = await this.schema();
     let isSchemaUnchanged;
     let blockHeights = Object.assign({}, get(meta, 'lastBlockHeights') || {});
+    let needsFinishReplaceAll;
 
     if (meta) {
       let { lastSchema } = meta;
@@ -137,10 +138,11 @@ class Updater {
 
     if (!isSchemaUnchanged) {
       await ops.beginReplaceAll();
+      needsFinishReplaceAll = true;
+
       for (let model of schema) {
         await ops.save(model.type, model.id, model);
       }
-      await ops.finishReplaceAll();
     }
 
     let contractHints = hints && hints.length ? hints.filter(hint => hint.isContractType) : [];
@@ -198,6 +200,10 @@ class Updater {
       };
 
       await ops.save(type, id.toLowerCase(), model);
+    }
+
+    if (needsFinishReplaceAll) {
+      await ops.finishReplaceAll();
     }
 
     return {
