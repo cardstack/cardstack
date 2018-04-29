@@ -4,11 +4,12 @@ const { pluralize, singularize } = require('inflection');
 const Web3 = require('web3');
 const log = require('@cardstack/logger')('cardstack/ethereum/service');
 const { declareInjections } = require('@cardstack/di');
-const { uniqWith, isEqual } = require('lodash');
+const { uniqWith, isEqual, get } = require('lodash');
 const { promisify } = require('util');
 const timeout = promisify(setTimeout);
 
 const NULL_ADDRESS = '0x0000000000000000000000000000000000000000';
+const MAX_WS_MESSAGE_SIZE_BYTES = 20000000;
 
 module.exports = declareInjections({
   indexer: 'hub:indexers'
@@ -46,6 +47,15 @@ class EthereumService {
       let { jsonRpcUrl } = branches[branch];
       log.info(`connecting to ethereum JSON RPC provider at: ${jsonRpcUrl} for branch "${branch}"`);
       this._providers[branch] = new Web3(new Web3.providers.WebsocketProvider(jsonRpcUrl));
+
+      // The default WS message size is too small to handle much activity, and sadly the WS configuration
+      // is not exposed from web3, so we need to reach a bit deep into the web3 WS provider to adjust the
+      // websocket client config.
+      let websocketConfig = get(this, `_providers.${branch}.currentProvider.connection._client.config`);
+      if (websocketConfig) {
+         websocketConfig.maxReceivedFrameSize = MAX_WS_MESSAGE_SIZE_BYTES;
+         websocketConfig.maxReceivedMessageSize = MAX_WS_MESSAGE_SIZE_BYTES;
+      }
     }
   }
 

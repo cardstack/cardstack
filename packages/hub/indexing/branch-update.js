@@ -131,27 +131,34 @@ class BranchUpdate {
 
   async _findTouchedReferences() {
     let size = 100;
-    let esBody = {
-      query: {
-        bool: {
-          must: [
-            { terms: { cardstack_references : Object.keys(this._touched) } }
-          ],
-        }
-      },
-      size
-    };
+    let touched = Object.keys(this._touched);
+    let accumulatedDocs = [];
 
-    let result = await this.client.es.search({
-      index: Client.branchToIndexName(this.branch),
-      body: esBody
-    });
+    for (let i = 0; i * size < touched.length; i++) {
+      let touchedBatch = touched.slice(i * size, (i + 1) * size);
+      let esBody = {
+        query: {
+          bool: {
+            must: [
+              { terms: { cardstack_references : touchedBatch } }
+            ],
+          }
+        },
+        size
+      };
 
-    let docs = result.hits.hits;
-    if (docs.length === size) {
-      throw new Error("Bug in hub:indexers: need to process larger invalidation sets");
+      let result = await this.client.es.search({
+        index: Client.branchToIndexName(this.branch),
+        body: esBody
+      });
+
+      let docs = result.hits.hits.map(hit => {
+        let { id, type } = hit._source.cardstack_pristine.data;
+        return { id, type };
+      });
+      accumulatedDocs = accumulatedDocs.concat(docs);
     }
-    return docs.map(doc => doc._source.cardstack_pristine.data);
+    return accumulatedDocs;
   }
 
   // This method does not need to recursively invalidate, because each

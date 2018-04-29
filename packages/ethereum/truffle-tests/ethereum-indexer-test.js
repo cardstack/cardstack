@@ -3,6 +3,7 @@ const {
   createDefaultEnvironment,
   destroyDefaultEnvironment
 } = require('@cardstack/test-support/env');
+const addresses = require('./test-data');
 const { promisify } = require('util');
 const timeout = promisify(setTimeout);
 const JSONAPIFactory = require('@cardstack/test-support/jsonapi-factory');
@@ -143,6 +144,10 @@ contract('SampleToken', function(accounts) {
                 {
                   "type": "fields",
                   "id": "sample-token-symbol"
+                },
+                {
+                  "type": "fields",
+                  "id": "sample-token-buyer-count"
                 }
               ]
             },
@@ -601,6 +606,7 @@ contract('SampleToken', function(accounts) {
             "ethereum-address": token.address,
             "balance-wei": "10000000000000000",
             "sample-token-balance-limit": "0",
+            "sample-token-buyer-count": "0",
             "sample-token-minting-finished": false,
             "sample-token-name": "SampleToken",
             "sample-token-total-supply": "0",
@@ -861,6 +867,10 @@ contract('SampleToken', function(accounts) {
       await token.transfer(accountThree, 30, { from: accountOne });
       await token.transfer(accountThree, 7, { from: accountTwo });
 
+      for (let address of addresses) {
+        await token.addBuyer(address);
+      }
+
       factory.addResource('data-sources')
         .withAttributes({
           'source-type': '@cardstack/ethereum',
@@ -873,6 +883,7 @@ contract('SampleToken', function(accounts) {
                 abi: token.abi,
                 addresses: { master: token.address },
                 eventContentTriggers: {
+                  WhiteList: [ "sample-token-approved-buyers" ],
                   Transfer: [ "sample-token-balance-ofs" ],
                   Mint: [ "sample-token-balance-ofs" ]
                 }
@@ -898,7 +909,9 @@ contract('SampleToken', function(accounts) {
       let accountOneLedgerEntry = await env.lookup('hub:searchers').get(env.session, 'master', 'sample-token-balance-ofs', accountOne.toLowerCase());
       let accountTwoLedgerEntry = await env.lookup('hub:searchers').get(env.session, 'master', 'sample-token-balance-ofs', accountTwo.toLowerCase());
       let accountThreeLedgerEntry = await env.lookup('hub:searchers').get(env.session, 'master', 'sample-token-balance-ofs', accountThree.toLowerCase());
+      let tokenRecord = await env.lookup('hub:searchers').get(env.session, 'master', 'sample-tokens', token.address);
 
+      expect(tokenRecord.data.attributes["sample-token-buyer-count"]).to.equal("1000", "the buyer count is correct");
       expect(accountOneLedgerEntry.data.attributes["mapping-number-value"]).to.equal("50", "the token balance is correct");
       expect(accountTwoLedgerEntry.data.attributes["mapping-number-value"]).to.equal("13", "the token balance is correct");
       expect(accountThreeLedgerEntry.data.attributes["mapping-number-value"]).to.equal("37", "the token balance is correct");
