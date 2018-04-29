@@ -128,7 +128,7 @@ class Updater {
   async updateContent(meta, hints, ops) {
     let schema = await this.schema();
     let isSchemaUnchanged;
-    let blockHeights = get(meta, 'lastBlockHeights') || {};
+    let blockHeights = Object.assign({}, get(meta, 'lastBlockHeights') || {});
 
     if (meta) {
       let { lastSchema } = meta;

@@ -9,6 +9,12 @@ const timeout = promisify(setTimeout);
 const JSONAPIFactory = require('@cardstack/test-support/jsonapi-factory');
 
 const contractName = 'sample-token';
+let ethereumService, env;
+
+async function teardown() {
+  await ethereumService.stopAll();
+  await destroyDefaultEnvironment(env);
+}
 
 async function waitForEthereumEvents(service) {
   while (service._indexQueue[contractName].length) {
@@ -21,6 +27,7 @@ contract('SampleToken', function(accounts) {
   let accountOne = accounts[0].toLowerCase();
   let accountTwo = accounts[1].toLowerCase();
   let accountThree = accounts[2].toLowerCase();
+  let accountFour = accounts[3].toLowerCase();
 
   describe('private blockchain sanity checks', function() {
     it("should mint SampleToken in the token owner account", async function() {
@@ -61,7 +68,7 @@ contract('SampleToken', function(accounts) {
   });
 
   describe('ethereum-indexer', function() {
-    let env, dataSource, token, ethereumService;
+    let dataSource, token;
 
     async function setup() {
       let factory = new JSONAPIFactory();
@@ -91,11 +98,6 @@ contract('SampleToken', function(accounts) {
       env = await createDefaultEnvironment(`${__dirname}/..`, factory.getModels());
       ethereumService = env.lookup(`plugin-services:${require.resolve('../cardstack/service')}`);
       ethereumService._setProcessQueueTimeout(10);
-    }
-
-    async function teardown() {
-      await ethereumService.stopAll();
-      await destroyDefaultEnvironment(env);
     }
 
     beforeEach(setup);
@@ -802,7 +804,7 @@ contract('SampleToken', function(accounts) {
   });
 
   describe('ethereum-indexer event triggers', function() {
-    let env, token, ethereumService;
+    let token;
 
     async function setup() {
       let factory = new JSONAPIFactory();
@@ -832,11 +834,6 @@ contract('SampleToken', function(accounts) {
       ethereumService._setProcessQueueTimeout(10);
     }
 
-    async function teardown() {
-      await ethereumService.stopAll();
-      await destroyDefaultEnvironment(env);
-    }
-
     beforeEach(setup);
     afterEach(teardown);
 
@@ -854,7 +851,73 @@ contract('SampleToken', function(accounts) {
   });
 
   describe('ethereum-indexer for past events', function() {
-    let env, token, ethereumService;
+    let token;
+
+    afterEach(teardown);
+
+    it("indexes past events that occur at a block height heigher than the last time it has indexed", async function() {
+      let factory = new JSONAPIFactory();
+      token = await SampleToken.new();
+
+      let dataSource = factory.addResource('data-sources', contractName)
+        .withAttributes({
+          'source-type': '@cardstack/ethereum',
+          params: {
+            branches: {
+              master: { jsonRpcUrl: "ws://localhost:7545" }
+            },
+            contract: {
+              abi: token.abi,
+              addresses: { master: token.address },
+              eventContentTriggers: {
+                WhiteList: [ "sample-token-approved-buyers" ],
+                Transfer: [ "sample-token-balance-ofs" ],
+                Mint: [ "sample-token-balance-ofs" ]
+              }
+            }
+          },
+        });
+
+      let contract = dataSource.data.attributes.params.contract,
+      env = await createDefaultEnvironment(`${__dirname}/..`, factory.getModels());
+      let indexers = await env.lookup('hub:indexers');
+
+      ethereumService = env.lookup(`plugin-services:${require.resolve('../cardstack/service')}`);
+      ethereumService._setProcessQueueTimeout(10);
+      await ethereumService.stopAll();
+
+      let addCount = 0;
+
+      indexers.on('add', () => {
+        addCount++;
+      });
+
+      await token.mint(accountOne, 100);
+      await token.transfer(accountTwo, 20, { from: accountOne });
+      await token.transfer(accountThree, 30, { from: accountOne });
+
+      await ethereumService.start({ contract, name: contractName });
+      await indexers.update({ forceRefresh: true });
+
+      expect(addCount).to.equal(4, 'the correct number of records were indexed');
+
+      await ethereumService.stopAll();
+
+      await token.transfer(accountFour, 20, { from: accountOne });
+
+      await ethereumService.start({ contract, name: contractName });
+      await indexers.update({ forceRefresh: true });
+
+      // the add count increases by 3:
+      //   1 record for the sender of the transfer
+      //   1 record for the recipient of transfer
+      //   1 record for the token
+      expect(addCount).to.equal(7, 'the correct number of records were indexed');
+    });
+  });
+
+  describe('ethereum-indexer for a large amount of past events', function() {
+    let token;
 
     async function setup() {
       let factory = new JSONAPIFactory();
@@ -893,15 +956,10 @@ contract('SampleToken', function(accounts) {
       ethereumService._setProcessQueueTimeout(10);
     }
 
-    async function teardown() {
-      await ethereumService.stopAll();
-      await destroyDefaultEnvironment(env);
-    }
-
     beforeEach(setup);
     afterEach(teardown);
 
-    it("can index past events on the contract", async function() {
+    it("can index a large amount of past events on the contract", async function() {
       let accountOneLedgerEntry = await env.lookup('hub:searchers').get(env.session, 'master', 'sample-token-balance-ofs', accountOne.toLowerCase());
       let accountTwoLedgerEntry = await env.lookup('hub:searchers').get(env.session, 'master', 'sample-token-balance-ofs', accountTwo.toLowerCase());
       let accountThreeLedgerEntry = await env.lookup('hub:searchers').get(env.session, 'master', 'sample-token-balance-ofs', accountThree.toLowerCase());
