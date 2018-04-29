@@ -101,6 +101,10 @@ class EthereumService {
     this._hasStartedListening[name] = false;
   }
 
+  async getBlockHeight(branch) {
+    return await this._providers[branch].eth.getBlockNumber();
+  }
+
   async start({ name, contract }) {
     if (this._hasStartedListening[name]) { return; }
 
@@ -217,21 +221,24 @@ class EthereumService {
     return { data, methodName };
   }
 
-  async getPastEventsAsHints() {
-    log.debug(`getting past events as hints for contracts`);
+  async getPastEventsAsHints(blockHeights) {
+    log.debug(`getting past events as hints for contracts ${blockHeights ? JSON.stringify(blockHeights) : ''}`);
     let hints = [];
+    let currentBlockHeights = {};
 
     await this._reconnectPromise;
     for (let branch of Object.keys(this._contracts)) {
+      currentBlockHeights[branch] = await this.getBlockHeight(branch);
       for (let contract of Object.keys(this._contracts[branch])) {
         let aContract = this._contracts[branch][contract];
         let contractHints = [];
 
         for (let event of Object.keys(this._contractDefinitions[contract].eventContentTriggers || [])) {
           let rawHints = [], events = [];
+          let lastIndexedBlockHeight = get(blockHeights, branch);
           try {
             // TODO we might need to chunk this so we don't blow past the websocket max frame size in the web3 provider: https://github.com/ethereum/web3.js/issues/1297
-            events = await aContract.getPastEvents(event, { fromBlock: 0, toBlock: 'latest' });
+            events = await aContract.getPastEvents(event, { fromBlock: lastIndexedBlockHeight ? lastIndexedBlockHeight + 1 : 0, toBlock: 'latest' });
           } catch (err) {
             // for some reason web3 on the private blockchain throws an error when it cannot find any of the requested events
             log.info(`could not find any past contract events of contract ${contract} for event ${event}. ${err.message}`);
@@ -247,7 +254,7 @@ class EthereumService {
       }
     }
     log.debug(`discovered contract events resulting in hints: ${JSON.stringify(hints, null, 2)}`);
-    return hints;
+    return { hints, blockHeights: currentBlockHeights };
   }
 
   _setProcessQueueTimeout(name, timeout) {

@@ -1,7 +1,7 @@
 const Ember = require('ember-source/dist/ember.debug');
 const { dasherize } = Ember.String;
 const { pluralize } = require('inflection');
-const { isEqual } = require('lodash');
+const { isEqual, get } = require('lodash');
 const log = require('@cardstack/logger')('cardstack/ethereum/indexer');
 const { declareInjections } = require('@cardstack/di');
 
@@ -128,6 +128,7 @@ class Updater {
   async updateContent(meta, hints, ops) {
     let schema = await this.schema();
     let isSchemaUnchanged;
+    let blockHeights = get(meta, 'lastBlockHeights') || {};
 
     if (meta) {
       let { lastSchema } = meta;
@@ -139,13 +140,13 @@ class Updater {
       for (let model of schema) {
         await ops.save(model.type, model.id, model);
       }
-    } else {
-      await ops.beginReplaceAll();
+      await ops.finishReplaceAll();
     }
 
     let contractHints = hints && hints.length ? hints.filter(hint => hint.isContractType) : [];
     if (!contractHints.length) {
       for (let branch of Object.keys(this.contract.addresses)) {
+        blockHeights[branch] = await this.ethereumService.getBlockHeight(branch);
         let model = await this.ethereumService.getContractInfo({ branch, contract: this.dataSourceId });
         await ops.save(model.type, model.id, model);
       }
@@ -157,7 +158,9 @@ class Updater {
     }
 
     if (!hints || !hints.length) {
-      hints = await this.ethereumService.getPastEventsAsHints();
+      let pastInfo = await this.ethereumService.getPastEventsAsHints(get(meta, 'lastBlockHeights'));
+      hints = pastInfo.hints;
+      blockHeights = pastInfo.blockHeights;
     }
 
     for (let { id, branch, type, isContractType } of hints) {
@@ -197,8 +200,8 @@ class Updater {
       await ops.save(type, id.toLowerCase(), model);
     }
 
-    await ops.finishReplaceAll();
     return {
+      lastBlockHeights: blockHeights,
       lastSchema: schema
     };
   }

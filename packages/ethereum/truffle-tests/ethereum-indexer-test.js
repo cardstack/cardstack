@@ -911,6 +911,11 @@ contract('SampleToken', function(accounts) {
       expect(accountOneLedgerEntry.data.attributes["mapping-number-value"]).to.equal("50", "the token balance is correct");
       expect(accountTwoLedgerEntry.data.attributes["mapping-number-value"]).to.equal("13", "the token balance is correct");
       expect(accountThreeLedgerEntry.data.attributes["mapping-number-value"]).to.equal("37", "the token balance is correct");
+
+      for (let address of addresses) {
+        let whitelistEntry = await env.lookup('hub:searchers').get(env.session, 'master', 'sample-token-approved-buyers', address.toLowerCase());
+        expect(whitelistEntry.data.attributes["mapping-boolean-value"]).to.equal(true);
+      }
     });
   });
 });
