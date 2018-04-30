@@ -17,6 +17,12 @@ function initialModels() {
         }
       }
     });
+
+  factory.addResource('grants')
+    .withRelated('who', { type: 'groups', id: 'everyone' })
+    .withAttributes({
+      mayLogin: true
+    });
   return factory.getModels();
 }
 
