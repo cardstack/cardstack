@@ -48,7 +48,7 @@ contract SampleToken is MintableToken {
       _balanceLimit = balanceLimit;
     }
 
-    WhiteList(buyer, _balanceLimit);
+    emit WhiteList(buyer, _balanceLimit);
 
     return true;
   }
@@ -67,7 +67,7 @@ contract SampleToken is MintableToken {
     vestingRevokeDate[beneficiary] = revokeDate;
     vestingIsRevocable[beneficiary] = isRevocable;
 
-    VestedTokenGrant(beneficiary, startDate, cliffSec, durationSec, fullyVestedAmount, revokeDate, isRevocable);
+    emit VestedTokenGrant(beneficiary, startDate, cliffSec, durationSec, fullyVestedAmount, revokeDate, isRevocable);
 
     return true;
   }
