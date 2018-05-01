@@ -194,7 +194,7 @@ module.exports = class Field {
     let value = this.valueFrom(pendingChange, 'finalDocument');
     let grant;
 
-    if (pendingChange.serverProvidedValues.has(this.id) && pendingChange.serverProvidedValues.get(this.id) === value) {
+    if (pendingChange.serverProvidedValues.has(this.id) && isEqual(pendingChange.serverProvidedValues.get(this.id), value)) {
       this.authLog.debug("approved field write for %s because it matches server provided default", this.id);
     } else if (pendingChange.originalDocument && isEqual(value, this.valueFrom(pendingChange, 'originalDocument'))) {
       this.authLog.debug("approved field write for %s because it was unchanged", this.id);
