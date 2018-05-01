@@ -65,8 +65,10 @@ export default class Fixtures {
     });
     destructionList = destructionList.concat(createdModels.reverse());
 
-    for (let item of destructionList) {
+    for (let [index, item] of destructionList.entries()) {
       if (!item.type) { continue; }
+
+      let isLast = index === destructionList.length - 1;
 
       if (item.id) {
         let response = await fetch(`${hubURL}/api/${item.type}/${item.id}`, {
@@ -77,7 +79,7 @@ export default class Fixtures {
         if (response.status !== 200) { continue; }
 
         let { data:model } = await response.json();
-        await this._deleteModel(model);
+        await this._deleteModel(model, isLast);
       } else {
         let response = await fetch(`${hubURL}/api/${item.type}`, {
           method: 'GET',
@@ -88,19 +90,23 @@ export default class Fixtures {
 
         let { data:models } = await response.json();
         for (let model of models) {
-          await this._deleteModel(model);
+          await this._deleteModel(model, isLast);
         }
       }
     }
   }
 
-  async _deleteModel(model) {
+  async _deleteModel(model, waitForIndexing) {
     let version = model.meta && model.meta.version;
     let headers = { authorization: `Bearer ${ciSessionId}` };
     if (version) {
       headers["If-Match"] = version;
     }
-    await fetch(`${hubURL}/api/${model.type}/${model.id}`, {
+    let url = `${hubURL}/api/${model.type}/${model.id}`;
+    if (!waitForIndexing) {
+      url += '?nowait';
+    }
+    await fetch(url, {
       method: 'DELETE',
       headers
     });
