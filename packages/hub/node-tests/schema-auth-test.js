@@ -32,7 +32,20 @@ describe('schema/auth/write', function() {
           }).withRelated(
             'defaultAtUpdate',
             factory.addResource('default-values').withAttributes({ value: false })
-          )
+          ),
+        factory.addResource('fields', 'misc')
+          .withAttributes({
+            fieldType: '@cardstack/core-types::object'
+          }),
+        factory.addResource('fields', 'author').withAttributes({
+          fieldType: '@cardstack/core-types::belongs-to'
+        }).withRelated('related-types', [
+          factory.addResource('content-types', 'authors').withRelated('fields', [
+            factory.addResource('fields', 'name').withAttributes({
+              fieldType: '@cardstack/core-types::string'
+            })
+          ])
+        ]),
       ]);
 
     factory.addResource('content-types', 'events')
@@ -527,6 +540,224 @@ describe('schema/auth/write', function() {
       id: '1',
       attributes: {
         coolness: 7
+      }
+    });
+    let errors = await schema.validationErrors(action);
+    expect(errors).to.deep.equal([]);
+  });
+
+  it("approves via a field-specific grant for a record that has a relationship", async function () {
+    allReadable();
+    factory.addResource('grants').withAttributes({ mayUpdateResource: true, mayWriteFields: true })
+      .withRelated('who', everyone)
+      .withRelated('fields', [
+        factory.getResource('fields', 'coolness')
+      ]);
+    let schema = await loader.loadFrom(factory.getModels());
+    await create({
+      id: '1',
+      type: 'authors',
+      attributes: {
+        name: 'Van Gogh'
+      }
+    });
+    let action = update({
+      type: 'articles',
+      id: '1',
+      attributes: {
+        coolness: 6
+      },
+      relationships: {
+        author: {
+          data: { type: 'authors', id: '1' }
+        }
+      }
+    },{
+      type: 'articles',
+      id: '1',
+      attributes: {
+        coolness: 7
+      },
+      relationships: {
+        author: {
+          data: { type: 'authors', id: '1' }
+        }
+      }
+    });
+    let errors = await schema.validationErrors(action);
+    expect(errors).to.deep.equal([]);
+  });
+
+  it("rejects via a field-specific grant an update to a relationship", async function() {
+    allReadable();
+    factory.addResource('grants').withAttributes({ mayUpdateResource: true, mayWriteFields: true })
+      .withRelated('who', everyone)
+      .withRelated('fields', [
+        factory.getResource('fields', 'coolness')
+      ]);
+    let schema = await loader.loadFrom(factory.getModels());
+    await create({
+      id: '1',
+      type: 'authors',
+      attributes: {
+        name: 'Van Gogh'
+      }
+    });
+    let action = update({
+      type: 'articles',
+      id: '1',
+      attributes: {
+        coolness: 6
+      },
+      relationships: {
+        author: {
+          data: { type: 'authors', id: '1' }
+        }
+      }
+    },{
+      type: 'articles',
+      id: '1',
+      attributes: {
+        coolness: 6
+      },
+      relationships: {
+        author: {
+          data: { type: 'authors', id: '2' }
+        }
+      }
+    });
+    let errors = await schema.validationErrors(action);
+    expect(errors).collectionContains({
+      status: 401,
+      detail: 'You may not write field "author"'
+    });
+  });
+
+  it("approves via a field-specific grant an update to a relationship", async function() {
+    allReadable();
+    factory.addResource('grants').withAttributes({ mayUpdateResource: true, mayWriteFields: true })
+      .withRelated('who', everyone)
+      .withRelated('fields', [
+        factory.getResource('fields', 'author')
+      ]);
+    let schema = await loader.loadFrom(factory.getModels());
+    await create({
+      id: '1',
+      type: 'authors',
+      attributes: {
+        name: 'Van Gogh'
+      }
+    });
+    await create({
+      id: '2',
+      type: 'authors',
+      attributes: {
+        name: 'Ringo'
+      }
+    });
+    let action = update({
+      type: 'articles',
+      id: '1',
+      attributes: {
+        coolness: 6
+      },
+      relationships: {
+        author: {
+          data: { type: 'authors', id: '1' }
+        }
+      }
+    },{
+      type: 'articles',
+      id: '1',
+      attributes: {
+        coolness: 6
+      },
+      relationships: {
+        author: {
+          data: { type: 'authors', id: '2' }
+        }
+      }
+    });
+    let errors = await schema.validationErrors(action);
+    expect(errors).to.deep.equal([]);
+  });
+
+  it("approves via a field-specific grant for a update to a record that has an object type field", async function () {
+    allReadable();
+    factory.addResource('grants').withAttributes({ mayUpdateResource: true, mayWriteFields: true })
+      .withRelated('who', everyone)
+      .withRelated('fields', [
+        factory.getResource('fields', 'coolness')
+      ]);
+    let schema = await loader.loadFrom(factory.getModels());
+    let action = update({
+      type: 'articles',
+      id: '1',
+      attributes: {
+        coolness: 6,
+        misc: { foo: 'bar' }
+      }
+    },{
+      type: 'articles',
+      id: '1',
+      attributes: {
+        coolness: 7,
+        misc: { foo: 'bar' }
+      }
+    });
+    let errors = await schema.validationErrors(action);
+    expect(errors).to.deep.equal([]);
+  });
+
+  it("rejects via a field-specific grant an update to an object type field", async function() {
+    allReadable();
+    factory.addResource('grants').withAttributes({ mayUpdateResource: true, mayWriteFields: true })
+      .withRelated('who', everyone)
+      .withRelated('fields', [
+        factory.getResource('fields', 'coolness')
+      ]);
+    let schema = await loader.loadFrom(factory.getModels());
+    let action = update({
+      type: 'articles',
+      id: '1',
+      attributes: {
+        coolness: 6,
+        misc: { foo: 'bar' }
+      }
+    },{
+      type: 'articles',
+      id: '1',
+      attributes: {
+        coolness: 6,
+        misc: { foo: 'bazz' }
+      }
+    });
+    let errors = await schema.validationErrors(action);
+    expect(errors).collectionContains({
+      status: 401,
+      detail: 'You may not write field "misc"'
+    });
+  });
+
+  it("approves via a field-specific grant an update to an object type field", async function() {
+    allReadable();
+    factory.addResource('grants').withAttributes({ mayUpdateResource: true, mayWriteFields: true })
+      .withRelated('who', everyone)
+      .withRelated('fields', [
+        factory.getResource('fields', 'misc')
+      ]);
+    let schema = await loader.loadFrom(factory.getModels());
+    let action = update({
+      type: 'articles',
+      id: '1',
+      attributes: {
+        misc: { foo: 'bar' }
+      }
+    },{
+      type: 'articles',
+      id: '1',
+      attributes: {
+        misc: { foo: 'bazz' }
       }
     });
     let errors = await schema.validationErrors(action);

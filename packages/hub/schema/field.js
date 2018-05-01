@@ -1,5 +1,6 @@
 const Error = require('@cardstack/plugin-utils/error');
 const find = require('../async-find');
+const { isEqual } = require('lodash');
 
 const legalFieldName = /^[a-zA-Z0-9](?:[-_a-zA-Z0-9]*[a-zA-Z0-9])?$/;
 
@@ -195,7 +196,7 @@ module.exports = class Field {
 
     if (pendingChange.serverProvidedValues.has(this.id) && pendingChange.serverProvidedValues.get(this.id) === value) {
       this.authLog.debug("approved field write for %s because it matches server provided default", this.id);
-    } else if (pendingChange.originalDocument && value === this.valueFrom(pendingChange, 'originalDocument')) {
+    } else if (pendingChange.originalDocument && isEqual(value, this.valueFrom(pendingChange, 'originalDocument'))) {
       this.authLog.debug("approved field write for %s because it was unchanged", this.id);
     } else if ((grant = await find(this.grants, async g => g['may-write-fields'] && await g.matches(pendingChange.finalDocument, context)))) {
       this.authLog.debug("approved field write for %s because of grant %s", this.id, grant.id);
