@@ -4,23 +4,19 @@ const {
   destroyDefaultEnvironment
 } = require('@cardstack/test-support/env');
 const addresses = require('./data/addresses');
-const { promisify } = require('util');
-const timeout = promisify(setTimeout);
 const JSONAPIFactory = require('@cardstack/test-support/jsonapi-factory');
 
 const contractName = 'sample-token';
-let ethereumService, env;
+let buffer, ethereumService, env;
 
 async function teardown() {
+  await buffer._bufferedLoadPromise;
   await ethereumService.stopAll();
   await destroyDefaultEnvironment(env);
 }
 
-async function waitForEthereumEvents(service) {
-  while (service._indexQueue[contractName].length) {
-    await timeout(100);
-  }
-  await service._indexerPromise;
+async function waitForEthereumEvents(buffer) {
+  await buffer._bufferedLoadPromise;
 }
 
 contract('SampleToken', function(accounts) {
@@ -96,8 +92,10 @@ contract('SampleToken', function(accounts) {
         });
 
       env = await createDefaultEnvironment(`${__dirname}/..`, factory.getModels());
-      ethereumService = env.lookup(`plugin-services:${require.resolve('../cardstack/service')}`);
-      ethereumService._setProcessQueueTimeout(10);
+      buffer = env.lookup(`plugin-services:${require.resolve('../cardstack/buffer')}`);
+      ethereumService = buffer.ethereumService;
+
+      await waitForEthereumEvents(buffer);
     }
 
     beforeEach(setup);
@@ -600,6 +598,7 @@ contract('SampleToken', function(accounts) {
     it("indexes a contract", async function() {
       let contract = await env.lookup('hub:searchers').get(env.session, 'master', 'sample-tokens', token.address);
       contract.data.attributes["sample-token-owner"] = contract.data.attributes["sample-token-owner"].toLowerCase();
+      delete contract.data.meta;
       expect(contract).to.deep.equal({
         "data": {
           "id": token.address,
@@ -614,9 +613,6 @@ contract('SampleToken', function(accounts) {
             "sample-token-total-supply": "0",
             "sample-token-owner": accounts[0],
             "sample-token-symbol": "TOK"
-          },
-          "meta": {
-            "source": contractName
           }
         }
       });
@@ -630,12 +626,14 @@ contract('SampleToken', function(accounts) {
         500000,
         1000600000,
         true);
-      await waitForEthereumEvents(ethereumService);
+
+      await waitForEthereumEvents(buffer);
 
       let vestingSchedule = await env.lookup('hub:searchers').get(env.session, 'master', 'sample-token-vesting-schedules', accountOne);
 
       expect(vestingSchedule.data.attributes["ethereum-address"]).to.not.equal(vestingSchedule.data.id, 'the case between the addresses is different');
       vestingSchedule.data.attributes["ethereum-address"] = vestingSchedule.data.attributes["ethereum-address"].toLowerCase();
+      delete vestingSchedule.data.meta;
       expect(vestingSchedule).to.deep.equal({
         "data": {
           "id": accountOne,
@@ -657,9 +655,6 @@ contract('SampleToken', function(accounts) {
               }
             }
           },
-          "meta": {
-            "source": contractName
-          }
         }
       });
     });
@@ -682,11 +677,12 @@ contract('SampleToken', function(accounts) {
       await token.mint(accountOne, 100);
       await token.transfer(accountTwo, 10, { from: accountOne });
 
-      await waitForEthereumEvents(ethereumService);
+      await waitForEthereumEvents(buffer);
 
       let accountOneLedgerEntry = await env.lookup('hub:searchers').get(env.session, 'master', 'sample-token-balance-ofs', accountOne);
       expect(accountOneLedgerEntry.data.attributes["ethereum-address"]).to.not.equal(accountOneLedgerEntry.data.id, 'the case between the addresses is different');
       accountOneLedgerEntry.data.attributes["ethereum-address"] = accountOneLedgerEntry.data.attributes["ethereum-address"].toLowerCase();
+      delete accountOneLedgerEntry.data.meta;
       expect(accountOneLedgerEntry).to.deep.equal({
         "data": {
           "id": accountOne,
@@ -703,9 +699,6 @@ contract('SampleToken', function(accounts) {
               }
             }
           },
-          "meta": {
-            "source": contractName
-          }
         }
       });
 
@@ -744,11 +737,14 @@ contract('SampleToken', function(accounts) {
 
       await token.addBuyer(accountOne);
       await token.setCustomBuyer(accountTwo, 10);
-      await waitForEthereumEvents(ethereumService);
+      await waitForEthereumEvents(buffer);
+
       await env.lookup('hub:indexers').update({ forceRefresh: true });
+      await waitForEthereumEvents(buffer);
 
       let accountOneApprovedBuyer = await env.lookup('hub:searchers').get(env.session, 'master', 'sample-token-approved-buyers', accountOne);
       accountOneApprovedBuyer.data.attributes["ethereum-address"] = accountOneApprovedBuyer.data.attributes["ethereum-address"].toLowerCase();
+      delete accountOneApprovedBuyer.data.meta;
       expect(accountOneApprovedBuyer).to.deep.equal({
         "data": {
           "id": accountOne,
@@ -765,14 +761,12 @@ contract('SampleToken', function(accounts) {
               }
             }
           },
-          "meta": {
-            "source": contractName
-          }
         }
       });
 
       let accountOneCustomBuyerLimit = await env.lookup('hub:searchers').get(env.session, 'master', 'sample-token-custom-buyer-limits', accountOne);
       accountOneCustomBuyerLimit.data.attributes["ethereum-address"] = accountOneCustomBuyerLimit.data.attributes["ethereum-address"].toLowerCase();
+      delete accountOneCustomBuyerLimit.data.meta;
       expect(accountOneCustomBuyerLimit).to.deep.equal({
         "data": {
           "id": accountOne,
@@ -789,9 +783,6 @@ contract('SampleToken', function(accounts) {
               }
             }
           },
-          "meta": {
-            "source": contractName
-          }
         }
       });
 
@@ -830,20 +821,21 @@ contract('SampleToken', function(accounts) {
         });
 
       env = await createDefaultEnvironment(`${__dirname}/..`, factory.getModels());
-      ethereumService = env.lookup(`plugin-services:${require.resolve('../cardstack/service')}`);
-      ethereumService._setProcessQueueTimeout(10);
+      buffer = env.lookup(`plugin-services:${require.resolve('../cardstack/buffer')}`);
+      ethereumService = buffer.ethereumService;
+
+      await waitForEthereumEvents(buffer);
     }
 
     beforeEach(setup);
     afterEach(teardown);
 
     it('can update contract document from event content trigger', async function() {
-
       let contract = await env.lookup('hub:searchers').get(env.session, 'master', 'sample-tokens', token.address);
       expect(contract.data.attributes['sample-token-minting-finished']).to.equal(false, 'the minting-finished field is correct');
 
       await token.finishMinting();
-      await waitForEthereumEvents(ethereumService);
+      await waitForEthereumEvents(buffer);
 
       contract = await env.lookup('hub:searchers').get(env.session, 'master', 'sample-tokens', token.address);
       expect(contract.data.attributes['sample-token-minting-finished']).to.equal(true, 'the minting-finished field is correct');
@@ -851,11 +843,9 @@ contract('SampleToken', function(accounts) {
   });
 
   describe('ethereum-indexer for past events', function() {
-    let token;
+    let token, indexers, contract;
 
-    afterEach(teardown);
-
-    it("indexes past events that occur at a block height heigher than the last time it has indexed", async function() {
+    async function setup() {
       let factory = new JSONAPIFactory();
       token = await SampleToken.new();
 
@@ -878,17 +868,26 @@ contract('SampleToken', function(accounts) {
           },
         });
 
-      let contract = dataSource.data.attributes.params.contract,
+      contract = dataSource.data.attributes.params.contract,
       env = await createDefaultEnvironment(`${__dirname}/..`, factory.getModels());
-      let indexers = await env.lookup('hub:indexers');
+      indexers = await env.lookup('hub:indexers');
 
-      ethereumService = env.lookup(`plugin-services:${require.resolve('../cardstack/service')}`);
-      ethereumService._setProcessQueueTimeout(10);
+      buffer = env.lookup(`plugin-services:${require.resolve('../cardstack/buffer')}`);
+      ethereumService = buffer.ethereumService;
+
+      await waitForEthereumEvents(buffer);
+    }
+
+    beforeEach(setup);
+    afterEach(teardown);
+
+    it("indexes past events that occur at a block height heigher than the last time it has indexed", async function() {
       await ethereumService.stopAll();
 
       let addCount = 0;
 
-      indexers.on('add', () => {
+      indexers.on('add', ({ type }) => {
+        if (!['sample-tokens', 'sample-token-balance-ofs'].includes(type)) { return; }
         addCount++;
       });
 
@@ -896,8 +895,9 @@ contract('SampleToken', function(accounts) {
       await token.transfer(accountTwo, 20, { from: accountOne });
       await token.transfer(accountThree, 30, { from: accountOne });
 
-      await ethereumService.start({ contract, name: contractName });
+      await ethereumService.start({ contract, name: contractName, buffer });
       await indexers.update({ forceRefresh: true });
+      await waitForEthereumEvents(buffer);
 
       expect(addCount).to.equal(4, 'the correct number of records were indexed');
 
@@ -905,8 +905,9 @@ contract('SampleToken', function(accounts) {
 
       await token.transfer(accountFour, 20, { from: accountOne });
 
-      await ethereumService.start({ contract, name: contractName });
+      await ethereumService.start({ contract, name: contractName, buffer });
       await indexers.update({ forceRefresh: true });
+      await waitForEthereumEvents(buffer);
 
       // the add count increases by 3:
       //   1 record for the sender of the transfer
@@ -952,8 +953,10 @@ contract('SampleToken', function(accounts) {
         });
 
       env = await createDefaultEnvironment(`${__dirname}/..`, factory.getModels());
-      ethereumService = env.lookup(`plugin-services:${require.resolve('../cardstack/service')}`);
-      ethereumService._setProcessQueueTimeout(10);
+      buffer = env.lookup(`plugin-services:${require.resolve('../cardstack/buffer')}`);
+      ethereumService = buffer.ethereumService;
+
+      await waitForEthereumEvents(buffer);
     }
 
     beforeEach(setup);
