@@ -26,7 +26,7 @@ describe('schema/auth/read', function() {
     for (let model of factory.getModels()) {
       if (model.type === 'grants') {
         let resource = factory.getResource('grants', model.id);
-        resource.withRelated('who', { type: 'groups', id: 'session-with-grants' });
+        resource.withRelated('who', [{ type: 'test-users', id: 'session-with-grants' }]);
       }
     }
 
@@ -38,7 +38,7 @@ describe('schema/auth/read', function() {
   before(async function() {
     let factory = new JSONAPIFactory();
 
-    factory.addResource('content-types', 'posts', '1')
+    factory.addResource('content-types', 'posts')
       .withAttributes({
         defaultIncludes: ['tags', 'author', 'author.flavor']
       })
@@ -67,7 +67,10 @@ describe('schema/auth/read', function() {
           fieldType: '@cardstack/core-types::has-many'
         }).withRelated('related-types', [
           factory.addResource('content-types', 'tags')
-        ])
+        ]),
+        factory.addResource('fields', 'collaborators').withAttributes({
+          fieldType: '@cardstack/core-types::has-many'
+        }).withRelated('related-types', [ factory.getResource('content-types', 'authors') ])
       ]);
 
 
@@ -83,7 +86,19 @@ describe('schema/auth/read', function() {
       .withRelated('tags', [
         factory.addResource('tags', 'one'),
         factory.addResource('tags', 'two')
+      ])
+      .withRelated('collaborators', [
+        factory.addResource('authors', '2').withAttributes({
+          name: 'Quint Faulkner'
+        })
       ]);
+
+    factory.addResource('posts', '2').withAttributes({
+      title: 'Second Post',
+      subtitle: 'This one has no author'
+    });
+
+
     let sessions = {};
 
     {
@@ -92,7 +107,7 @@ describe('schema/auth/read', function() {
       });
       sessions.postAndTagResources = new Session(user);
       factory.addResource('grants')
-        .withRelated('who', { type: 'groups', id: user.id })
+        .withRelated('who', [{ type: user.type, id: user.id }])
         .withRelated('types', [
           factory.getResource('content-types', 'posts'),
           factory.getResource('content-types', 'tags')
@@ -108,7 +123,7 @@ describe('schema/auth/read', function() {
       });
       sessions.postAndAuthorResourcesWithTitleAndAuthorFields = new Session(user);
       factory.addResource('grants')
-        .withRelated('who', { type: 'groups', id: user.id })
+        .withRelated('who', [{ type: user.type, id: user.id }])
         .withRelated('types', [
           factory.getResource('content-types', 'posts'),
           factory.getResource('content-types', 'authors')
@@ -129,7 +144,7 @@ describe('schema/auth/read', function() {
       });
       sessions.postResourceWithUnlimitedFieldsAndAuthorResource = new Session(user);
       factory.addResource('grants')
-        .withRelated('who', { type: 'groups', id: user.id })
+        .withRelated('who', [{ type: user.type, id: user.id }])
         .withRelated('types', [
           factory.getResource('content-types', 'posts')
         ])
@@ -138,7 +153,7 @@ describe('schema/auth/read', function() {
           mayReadFields: true
         });
       factory.addResource('grants')
-        .withRelated('who', { type: 'groups', id: user.id })
+        .withRelated('who', [{ type: user.id, id: user.id }])
         .withRelated('types', [
           factory.getResource('content-types', 'authors')
         ])
@@ -673,12 +688,12 @@ describe('schema/auth/read', function() {
     expect(approved.included[0]).has.deep.property('attributes.name');
   });
 
-  it("approves conditional grant for resource", async function() {
+  it("approves field-dependent grant for resource", async function() {
     let model = await find('posts', '1');
     let factory = new JSONAPIFactory();
 
     factory.addResource('grants')
-      .withRelated('who', { type: 'fields', id: 'subtitle' })
+      .withRelated('who', [{ type: 'fields', id: 'author' }])
       .withRelated('types', [
         { type: 'content-types', id: 'posts' }
       ])
@@ -687,18 +702,18 @@ describe('schema/auth/read', function() {
         mayReadFields: true
       });
 
-    let session = new Session({ type: 'test-users', id: 'It is the best' });
+    let session = new Session({ type: 'authors', id: '1' });
     let schema = await baseSchema.applyChanges(factory.getModels().map(model => ({ type: model.type, id: model.id, document: model })));
     let approved = await schema.applyReadAuthorization(model, { session });
     expect(approved).is.not.undefined;
   });
 
-  it("rejects conditional grant for resource", async function() {
+  it("rejects field-dependent grant for resource when value is mismatched", async function() {
     let model = await find('posts', '1');
     let factory = new JSONAPIFactory();
 
     factory.addResource('grants')
-      .withRelated('who', { type: 'fields', id: 'subtitle' })
+      .withRelated('who', [{ type: 'fields', id: 'author' }])
       .withRelated('types', [
         { type: 'content-types', id: 'posts' }
       ])
@@ -707,68 +722,109 @@ describe('schema/auth/read', function() {
         mayReadFields: true
       });
 
-    let session = new Session({ type: 'test-users', id: 'other' });
+    let session = new Session({ type: 'authors', id: '2' });
     let schema = await baseSchema.applyChanges(factory.getModels().map(model => ({ type: model.type, id: model.id, document: model })));
     let approved = await schema.applyReadAuthorization(model, { session });
     expect(approved).is.undefined;
   });
 
-  it("approves conditional grant for all fields", async function() {
+  it("rejects field-dependent grant for resource when type is mismatched", async function() {
     let model = await find('posts', '1');
     let factory = new JSONAPIFactory();
 
     factory.addResource('grants')
-      .withRelated('who', { type: 'groups', id: 'It is the best' })
+      .withRelated('who', [{ type: 'fields', id: 'author' }])
+      .withRelated('types', [
+        { type: 'content-types', id: 'posts' }
+      ])
+      .withAttributes({
+        mayReadResource: true,
+        mayReadFields: true
+      });
+
+    let session = new Session({ type: 'test-users', id: '1' });
+    let schema = await baseSchema.applyChanges(factory.getModels().map(model => ({ type: model.type, id: model.id, document: model })));
+    let approved = await schema.applyReadAuthorization(model, { session });
+    expect(approved).is.undefined;
+  });
+
+  it("rejects field-dependent grant for resource when field is null", async function() {
+    let model = await find('posts', '2');
+    let factory = new JSONAPIFactory();
+
+    factory.addResource('grants')
+      .withRelated('who', [{ type: 'fields', id: 'author' }])
+      .withRelated('types', [
+        { type: 'content-types', id: 'posts' }
+      ])
+      .withAttributes({
+        mayReadResource: true,
+        mayReadFields: true
+      });
+
+    let session = new Session({ type: 'authors', id: '1' });
+    let schema = await baseSchema.applyChanges(factory.getModels().map(model => ({ type: model.type, id: model.id, document: model })));
+    let approved = await schema.applyReadAuthorization(model, { session });
+    expect(approved).is.undefined;
+  });
+
+
+  it("approves field-dependent grant for all fields", async function() {
+    let model = await find('posts', '1');
+    let factory = new JSONAPIFactory();
+
+    factory.addResource('grants')
+      .withRelated('who', [{ type: 'authors', id: '1' }])
       .withAttributes({
         mayReadResource: true
       });
 
     factory.addResource('grants')
-      .withRelated('who', { type: 'fields', id: 'subtitle' })
+      .withRelated('who', [{ type: 'fields', id: 'author' }])
       .withAttributes({
         mayReadFields: true
       });
 
-    let session = new Session({ type: 'test-users', id: 'It is the best' });
+    let session = new Session({ type: 'authors', id: '1' });
     let schema = await baseSchema.applyChanges(factory.getModels().map(model => ({ type: model.type, id: model.id, document: model })));
     let approved = await schema.applyReadAuthorization(model, { session });
     expect(approved).has.deep.property('data.attributes.title');
   });
 
-  it("rejects conditional grant for all fields", async function() {
+  it("rejects field-dependent grant for all fields", async function() {
     let model = await find('posts', '1');
     let factory = new JSONAPIFactory();
 
     factory.addResource('grants')
-      .withRelated('who', { type: 'groups', id: 'other' })
+      .withRelated('who', [{ type: 'authors', id: '2' }])
       .withAttributes({
         mayReadResource: true
       });
 
     factory.addResource('grants')
-      .withRelated('who', { type: 'fields', id: 'subtitle' })
+      .withRelated('who', [{ type: 'fields', id: 'author' }])
       .withAttributes({
         mayReadFields: true
       });
 
-    let session = new Session({ type: 'test-users', id: 'other' });
+    let session = new Session({ type: 'authors', id: '2' });
     let schema = await baseSchema.applyChanges(factory.getModels().map(model => ({ type: model.type, id: model.id, document: model })));
     let approved = await schema.applyReadAuthorization(model, { session });
     expect(approved).not.has.deep.property('data.attributes.title');
   });
 
-  it("approves conditional grant for specific fields", async function() {
+  it("approves field-dependent grant for specific fields", async function() {
     let model = await find('posts', '1');
     let factory = new JSONAPIFactory();
 
     factory.addResource('grants')
-      .withRelated('who', { type: 'groups', id: 'It is the best' })
+      .withRelated('who', [{ type: 'authors', id: '1' }])
       .withAttributes({
         mayReadResource: true
       });
 
     factory.addResource('grants')
-      .withRelated('who', { type: 'fields', id: 'subtitle' })
+      .withRelated('who', [{ type: 'fields', id: 'author' }])
       .withRelated('fields', [
         { type: 'fields', id: 'title' }
       ])
@@ -776,24 +832,24 @@ describe('schema/auth/read', function() {
         mayReadFields: true
       });
 
-    let session = new Session({ type: 'test-users', id: 'It is the best' });
+    let session = new Session({ type: 'authors', id: '1' });
     let schema = await baseSchema.applyChanges(factory.getModels().map(model => ({ type: model.type, id: model.id, document: model })));
     let approved = await schema.applyReadAuthorization(model, { session });
     expect(approved).has.deep.property('data.attributes.title');
   });
 
-  it("rejects conditional grant for specific fields", async function() {
+  it("rejects field-dependent grant for specific fields", async function() {
     let model = await find('posts', '1');
     let factory = new JSONAPIFactory();
 
     factory.addResource('grants')
-      .withRelated('who', { type: 'groups', id: 'other' })
+      .withRelated('who', [{ type: 'authors', id: '2' }])
       .withAttributes({
         mayReadResource: true
       });
 
     factory.addResource('grants')
-      .withRelated('who', { type: 'fields', id: 'subtitle' })
+      .withRelated('who', [{ type: 'fields', id: 'author' }])
       .withRelated('fields', [
         { type: 'fields', id: 'title' }
       ])
@@ -801,39 +857,39 @@ describe('schema/auth/read', function() {
         mayReadFields: true
       });
 
-    let session = new Session({ type: 'test-users', id: 'other' });
+    let session = new Session({ type: 'authors', id: '2' });
     let schema = await baseSchema.applyChanges(factory.getModels().map(model => ({ type: model.type, id: model.id, document: model })));
     let approved = await schema.applyReadAuthorization(model, { session });
     expect(approved).not.has.deep.property('data.attributes.title');
   });
 
-  it("approves relationship-conditional grant", async function() {
+  it("approves hasMany field-dependent grant", async function() {
     let model = await find('posts', '1');
     let factory = new JSONAPIFactory();
 
     factory.addResource('grants')
-      .withRelated('who', { type: 'fields', id: 'tags' })
+      .withRelated('who', [{ type: 'fields', id: 'collaborators' }])
       .withAttributes({
         mayReadResource: true
       });
 
-    let session = new Session({ type: 'test-users', id: 'one' });
+    let session = new Session({ type: 'authors', id: '2' });
     let schema = await baseSchema.applyChanges(factory.getModels().map(model => ({ type: model.type, id: model.id, document: model })));
     let approved = await schema.applyReadAuthorization(model, { session });
     expect(approved).has.deep.property('data.id', '1');
   });
 
-  it("rejects relationship-conditional grant", async function() {
+  it("rejects hasMany field-dependent grant", async function() {
     let model = await find('posts', '1');
     let factory = new JSONAPIFactory();
 
     factory.addResource('grants')
-      .withRelated('who', { type: 'fields', id: 'tags' })
+      .withRelated('who', [{ type: 'fields', id: 'collaborators' }])
       .withAttributes({
         mayReadResource: true
       });
 
-    let session = new Session({ type: 'test-users', id: 'seven' });
+    let session = new Session({ type: 'authors', id: '1' });
     let schema = await baseSchema.applyChanges(factory.getModels().map(model => ({ type: model.type, id: model.id, document: model })));
     let approved = await schema.applyReadAuthorization(model, { session });
     expect(approved).to.be.undefined;

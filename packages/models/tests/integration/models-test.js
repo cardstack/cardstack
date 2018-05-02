@@ -73,7 +73,7 @@ module('Integration | Models', function(hooks) {
           mayDeleteResource: true,
           mayLogin: true
         })
-        .withRelated('who', { type: 'groups', id: 'sample-user' });
+        .withRelated('who', [{ type: 'mock-users', id: 'sample-user' }]);
     },
 
     destroy() {

@@ -183,7 +183,7 @@ module.exports = class ContentType {
       await this._assertGrant([finalDocument], context, 'may-create-resource', 'create');
     } else {
       await this._assertGrant([finalDocument, originalDocument], context, 'may-read-resource', 'read (during update)');
-      await this._assertGrant([finalDocument, originalDocument], context, 'may-update-resource', 'update');
+      await this._assertGrant([originalDocument], context, 'may-update-resource', 'update');
     }
   }
 
@@ -233,9 +233,11 @@ module.exports = class ContentType {
     let resource = pendingChange.finalDocument;
     let session = context.session || Session.EVERYONE;
     let userRealms = await session.realms();
-    if (this.realms.mayReadAllFields(pendingChange.finalDocument, userRealms)) {
+
+    if (this.realms.mayReadAllFields(resource, userRealms)) {
       return;
     }
+
     for (let section of ['attributes', 'relationships']) {
       if (resource[section]) {
         for (let fieldName of Object.keys(resource[section])) {
@@ -247,8 +249,6 @@ module.exports = class ContentType {
       }
     }
   }
-
-
 };
 
 function tagFieldErrors(field, errors) {

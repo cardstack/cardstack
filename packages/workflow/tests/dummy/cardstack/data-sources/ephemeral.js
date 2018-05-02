@@ -30,7 +30,7 @@ module.exports = [
     },
     relationships: {
       who: {
-        data: { type: 'groups', id: 'everyone' }
+        data: [{ type: 'groups', id: 'everyone' }]
       }
     }
   }

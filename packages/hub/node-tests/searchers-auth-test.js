@@ -43,7 +43,7 @@ describe('hub/searchers/auth', function() {
     factory.addResource('posts', '1').withAttributes({
       title: 'First Post',
       subtitle: 'It is the best'
-    }).withRelated('author', factory.addResource('authors').withAttributes({
+    }).withRelated('author', factory.addResource('authors', 'arthur').withAttributes({
       name: 'Arthur Faulkner'
     })).withRelated('tags', [
       factory.addResource('tags', 'one'),
@@ -79,7 +79,7 @@ describe('hub/searchers/auth', function() {
     await setup(factory => {
       factory.addResource('grants')
         .withAttributes({ mayReadResource: true, mayReadFields: true })
-        .withRelated('who', everyone);
+        .withRelated('who', [everyone]);
     });
     let doc = await searchers.get(Session.EVERYONE, 'master', 'posts', '1');
     expect(doc).has.deep.property('data.attributes.title', 'First Post');
@@ -89,7 +89,7 @@ describe('hub/searchers/auth', function() {
     await setup(factory => {
       factory.addResource('grants')
         .withAttributes({ mayReadResource: true, mayReadFields: true })
-        .withRelated('who', everyone)
+        .withRelated('who', [everyone])
         .withRelated('types', [{ type: 'content-types', id: 'posts' }]);
     });
     let doc = await searchers.get(Session.EVERYONE, 'master', 'posts', '1');
@@ -100,7 +100,7 @@ describe('hub/searchers/auth', function() {
     await setup(factory => {
       factory.addResource('grants')
         .withAttributes({ mayReadResource: true })
-        .withRelated('who', everyone)
+        .withRelated('who', [everyone])
         .withRelated('types', [{ type: 'content-types', id: 'fields' }]);
     });
     try {
@@ -122,7 +122,7 @@ describe('hub/searchers/auth', function() {
     await setup(factory => {
       factory.addResource('grants')
         .withAttributes({ mayReadResource: true })
-        .withRelated('who', everyone)
+        .withRelated('who', [everyone])
         .withRelated('types', [{ type: 'content-types', id: 'posts' }]);
     });
     let response = await searchers.search(Session.EVERYONE, 'master', { filter: { type: 'posts' } });
@@ -133,7 +133,7 @@ describe('hub/searchers/auth', function() {
     await setup(factory => {
       factory.addResource('grants')
         .withAttributes({ mayReadResource: true, mayReadFields: true })
-        .withRelated('who', everyone)
+        .withRelated('who', [everyone])
         .withRelated('fields', [{ type: 'fields', id: 'title' }]);
     });
     let doc = await searchers.get(Session.EVERYONE, 'master', 'posts', '1');
@@ -144,7 +144,7 @@ describe('hub/searchers/auth', function() {
     await setup(factory => {
       factory.addResource('grants')
         .withAttributes({ mayReadResource: true, mayReadFields: true })
-        .withRelated('who', everyone)
+        .withRelated('who', [everyone])
         .withRelated('fields', [{ type: 'fields', id: 'title' }]);
     });
     let doc = await searchers.get(Session.EVERYONE, 'master', 'posts', '1');
@@ -155,7 +155,7 @@ describe('hub/searchers/auth', function() {
     await setup(factory => {
       factory.addResource('grants')
         .withAttributes({ mayReadResource: true, mayReadFields: true })
-        .withRelated('who', everyone)
+        .withRelated('who', [everyone])
         .withRelated('fields', [{ type: 'fields', id: 'title' }]);
     });
     let doc = await searchers.search(Session.EVERYONE, 'master', { filter: { type: 'posts' } });
@@ -166,7 +166,7 @@ describe('hub/searchers/auth', function() {
     await setup(factory => {
       factory.addResource('grants')
         .withAttributes({ mayReadResource: true, mayReadFields: true })
-        .withRelated('who', everyone)
+        .withRelated('who', [everyone])
         .withRelated('fields', [{ type: 'fields', id: 'title' }]);
     });
     let doc = await searchers.search(Session.EVERYONE, 'master', { filter: { type: 'posts' } });
@@ -177,7 +177,7 @@ describe('hub/searchers/auth', function() {
     await setup(factory => {
       factory.addResource('grants')
         .withAttributes({ mayReadResource: true, mayReadFields: true })
-        .withRelated('who', everyone)
+        .withRelated('who', [everyone])
         .withRelated('fields', [{ type: 'fields', id: 'title' }]);
     });
     let doc = await searchers.get(Session.EVERYONE, 'master', 'posts', '1');
@@ -188,7 +188,7 @@ describe('hub/searchers/auth', function() {
     await setup(factory => {
       factory.addResource('grants')
         .withAttributes({ mayReadResource: true, mayReadFields: true })
-        .withRelated('who', everyone)
+        .withRelated('who', [everyone])
         .withRelated('fields', [
           { type: 'fields', id: 'title' },
           { type: 'fields', id: 'author' }
@@ -202,13 +202,24 @@ describe('hub/searchers/auth', function() {
     await setup(factory => {
       factory.addResource('grants')
         .withAttributes({ mayReadResource: true, mayReadFields: true })
-        .withRelated('who', { type: 'fields', id: 'subtitle' });
+        .withRelated('who', [{ type: 'fields', id: 'author' }]);
     });
-    let doc = await searchers.search(new Session({ type: 'test-users', id: 'It is the best' }), 'master', { filter: { type: 'posts' } });
+    let doc = await searchers.search(new Session({ type: 'authors', id: 'arthur' }), 'master', { filter: { type: 'posts' } });
     expect(doc.data).has.length(1);
     expect(doc.data[0]).has.deep.property('attributes.title', 'First Post');
     expect(doc.meta).has.deep.property('page.total', 1);
   });
+
+  it("doesn't matches inapplicable attribute-dependent grant", async function() {
+    await setup(factory => {
+      factory.addResource('grants')
+        .withAttributes({ mayReadResource: true, mayReadFields: true })
+        .withRelated('who', [{ type: 'fields', id: 'author' }]);
+    });
+    let doc = await searchers.search(new Session({ type: 'authors', id: 'other' }), 'master', { filter: { type: 'posts' } });
+    expect(doc.data).has.length(0);
+  });
+
 
   it("reacts when a grant is created");
   it("reacts when a grant is updated");

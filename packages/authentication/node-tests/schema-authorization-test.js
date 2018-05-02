@@ -14,17 +14,17 @@ describe('authentication/schema-authorization', function() {
     let factory = new JSONAPIFactory();
 
     factory.addResource('grants')
-      .withRelated('who', { type: 'groups', id: 'authorized-user' })
+      .withRelated('who', [{ type: 'test-users', id: 'authorized-user' }])
       .withAttributes({
         mayLogin: true
       });
     factory.addResource('grants')
-      .withRelated('who', { type: 'groups', id: 'unauthorized-user' })
+      .withRelated('who', [{ type: 'test-users', id: 'unauthorized-user' }])
       .withAttributes({
         mayLogin: false
       });
     factory.addResource('grants')
-      .withRelated('who', { type: 'groups', id: 'user' });
+      .withRelated('who', [{ type: 'test-users', id: 'user' }]);
 
     user = factory.addResource('test-users', 'user').withAttributes({
       email: 'vangogh@example.com',

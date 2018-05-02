@@ -5,11 +5,11 @@ class Session {
   //
   // optionalUser can be a jsonapi document representing that user (a
   // full document, including the top-level `data` property)
-  constructor(payload, userSearcher, optionalUser, optionalGroupIds) {
+  constructor(payload, userSearcher, optionalUser, optionalRealms) {
     this.payload = payload;
     this.userSearcher = userSearcher;
     this._user = optionalUser;
-    this._realms = optionalGroupIds;
+    this._realms = optionalRealms;
   }
   get id() {
     return this.payload.id;
@@ -35,9 +35,9 @@ class Session {
   async realms() {
     if (!this._realms) {
       if (this.id === 'everyone') {
-        this._realms = ['everyone'];
+        this._realms = ['groups/everyone'];
       } else {
-        this._realms = [this.id, 'everyone'];
+        this._realms = [`${encodeURIComponent(this.type)}/${encodeURIComponent(this.id)}`, 'groups/everyone'];
       }
     }
     return this._realms;
@@ -55,11 +55,11 @@ Object.defineProperty(Session, 'INTERNAL_PRIVILEGED', {
   get() {
     if (!privilegedSession) {
       privilegedSession = new Session(
-        { id: '@cardstack/hub', type: 'users' },
+        { id: '@cardstack/hub', type: 'groups' },
         null,
         {
           id: '@cardstack/hub',
-          type: 'users',
+          type: 'groups',
           attributes: {
             'full-name': '@cardstack/hub/authentication',
             email: 'noreply@nowhere.com'

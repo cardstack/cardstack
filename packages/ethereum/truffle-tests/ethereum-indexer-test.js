@@ -182,10 +182,10 @@ contract('SampleToken', function(accounts) {
               ]
             },
             "who": {
-              "data": {
+              "data": [{
                 "id": "everyone",
                 "type": "groups"
-              }
+              }]
             }
           },
           "meta": {
@@ -416,10 +416,10 @@ contract('SampleToken', function(accounts) {
           },
           "relationships": {
             "who": {
-              "data": {
+              "data": [{
                 "id": "everyone",
                 "type": "groups"
-              }
+              }]
             },
             "types": {
               "data": [
@@ -482,10 +482,10 @@ contract('SampleToken', function(accounts) {
           },
           "relationships": {
             "who": {
-              "data": {
+              "data": [{
                 "id": "everyone",
                 "type": "groups"
-              }
+              }]
             },
             "types": {
               "data": [

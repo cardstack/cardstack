@@ -55,7 +55,7 @@ exports.createDefaultEnvironment = async function(projectDir, initialModels = []
         mayReadFields: true,
         mayWriteFields: true,
         mayLogin: true
-      }).withRelated('who', factory.addResource('groups', user.data.id));
+      }).withRelated('who', [{ type: user.data.type, id: user.data.id }]);
 
     let [
       foreignInitialModels,

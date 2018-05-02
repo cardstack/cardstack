@@ -64,7 +64,7 @@ describe('postgresql/writer', function() {
         mayWriteFields: true,
         mayReadResource: true,
         mayReadFields: true
-      }).withRelated('who', factory.addResource('groups', 'update-only'));
+      }).withRelated('who', [factory.addResource('test-users', 'update-only')]);
 
     factory.addResource('grants')
       .withAttributes({
@@ -74,7 +74,7 @@ describe('postgresql/writer', function() {
         mayWriteFields: true,
         mayReadResource: true,
         mayReadFields: true
-      }).withRelated('who', factory.addResource('groups', 'create-only'));
+      }).withRelated('who', [factory.addResource('test-users', 'create-only')]);
 
     factory.addResource('grants')
       .withAttributes({
@@ -84,7 +84,7 @@ describe('postgresql/writer', function() {
         mayWriteFields: true,
         mayReadResource: true,
         mayReadFields: true
-      }).withRelated('who', factory.addResource('groups', 'delete-only'));
+      }).withRelated('who', [factory.addResource('test-users', 'delete-only')]);
 
 
     env = await createDefaultEnvironment(`${__dirname}/../../../tests/postgres-test-app`, factory.getModels(), { ciSessionId });
@@ -105,7 +105,7 @@ describe('postgresql/writer', function() {
   });
 
   it('can create new record', async function() {
-    let created = await writer.create('master', new Session({ id: 'create-only', type: 'users'}), 'articles', {
+    let created = await writer.create('master', new Session({ id: 'create-only', type: 'test-users'}), 'articles', {
       type: 'articles',
       attributes: {
         title: 'I was created',
@@ -139,7 +139,7 @@ describe('postgresql/writer', function() {
 
   it('reacts to database failure during create', async function() {
     try {
-      await writer.create('master', new Session({ id: 'create-only', type: 'users'}), 'articles', {
+      await writer.create('master', new Session({ id: 'create-only', type: 'test-users'}), 'articles', {
         type: 'articles',
         attributes: {
           title: 'I was created',
@@ -161,7 +161,7 @@ describe('postgresql/writer', function() {
   });
 
   it('can create new record with user-provided id', async function() {
-    let created = await writer.create('master', new Session({ id: 'create-only', type: 'users'}), 'articles', {
+    let created = await writer.create('master', new Session({ id: 'create-only', type: 'test-users'}), 'articles', {
       type: 'articles',
       id: '42',
       attributes: {
@@ -179,7 +179,7 @@ describe('postgresql/writer', function() {
   });
 
   it('can update a record', async function() {
-    await writer.update('master', new Session({ id: 'update-only', type: 'users'}), 'articles', '0', {
+    await writer.update('master', new Session({ id: 'update-only', type: 'test-users'}), 'articles', '0', {
       type: 'articles',
       id: '0',
       attributes: {
@@ -196,7 +196,7 @@ describe('postgresql/writer', function() {
 
   it('handles attempt to update a non-existent record', async function() {
     try {
-      await writer.update('master', new Session({ id: 'update-only', type: 'users'}), 'articles', '10', {
+      await writer.update('master', new Session({ id: 'update-only', type: 'test-users'}), 'articles', '10', {
         type: 'articles',
         id: '10',
         attributes: {
@@ -211,7 +211,7 @@ describe('postgresql/writer', function() {
   });
 
   it('returns full record from update', async function() {
-    let updated = await writer.update('master', new Session({ id: 'update-only', type: 'users'}), 'articles', '0', {
+    let updated = await writer.update('master', new Session({ id: 'update-only', type: 'test-users'}), 'articles', '0', {
       type: 'articles',
       id: '0',
       attributes: {
@@ -223,7 +223,7 @@ describe('postgresql/writer', function() {
   });
 
   it('can delete a record', async function() {
-    await writer.delete('master', new Session({ id: 'delete-only', type: 'users'}), null, 'articles', '0');
+    await writer.delete('master', new Session({ id: 'delete-only', type: 'test-users'}), null, 'articles', '0');
     let result = await client.query('select 1 from articles where id=$1', ['0']);
     expect(result.rows.length).to.equal(0);
   });
@@ -241,8 +241,8 @@ describe('postgresql/writer', function() {
 
     let [ snakeModel, dogModel ] = testFactory.getModels();
 
-    await writer.create('master', new Session({ id: 'create-only', type: 'users'}), snakeModel.type, snakeModel);
-    await writer.create('master', new Session({ id: 'create-only', type: 'users'}), dogModel.type, dogModel);
+    await writer.create('master', new Session({ id: 'create-only', type: 'test-users'}), snakeModel.type, snakeModel);
+    await writer.create('master', new Session({ id: 'create-only', type: 'test-users'}), dogModel.type, dogModel);
 
     let { rows } = await client.query('select name, favorite_toy from doggies where id=$1', [dogModel.id]);
     let [ result ] = rows;

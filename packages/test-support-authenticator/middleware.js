@@ -17,7 +17,7 @@ class TestAuthenticator {
     return async (ctxt, next) => {
       if (self.userId != null) {
         ctxt.state.cardstackSession = new Session(
-          { id: self.userId, type: 'users' },
+          { id: self.userId, type: 'test-users' },
           (type, id) => self.searcher.get(Session.INTERNAL_PRIVILEGED, 'master', type, id)
         );
       }

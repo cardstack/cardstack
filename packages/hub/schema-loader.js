@@ -10,7 +10,7 @@ const {
   getOwner
 } = require('@cardstack/di');
 
-const ownTypes = Object.freeze(['content-types', 'fields', 'constraints', 'input-assignments', 'data-sources', 'grants', 'plugin-configs', 'default-values']);
+const ownTypes = Object.freeze(['content-types', 'fields', 'constraints', 'input-assignments', 'data-sources', 'grants', 'groups', 'plugin-configs', 'default-values']);
 
 module.exports = declareInjections({
   pluginLoader: 'hub:plugin-loader'
