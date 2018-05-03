@@ -48,10 +48,17 @@ describe('schema/auth/write', function() {
         ]),
       ]);
 
+    factory.addResource('content-types', 'test-users');
+
     factory.addResource('content-types', 'events')
       .withRelated('fields', [
         factory.getResource('fields', 'title')
       ]);
+
+    factory.addResource('groups', 'people').withAttributes({
+      searchQuery: { filter: { type: { exact: ['authors', 'test-users'] } } }
+    });
+
     let registry = new Registry();
     registry.register('config:project', { path: `${__dirname}/../../../tests/stub-project` });
     loader = new Container(registry).lookup('hub:schema-loader');
@@ -67,6 +74,17 @@ describe('schema/auth/write', function() {
       mayReadResource: true,
       mayReadFields: true
     }).withRelated('who', [everyone]);
+  }
+
+  function makeSession(schema, { type, id }) {
+    let ownRealm = Session.encodeBaseRealm(type, id);
+    return new Session({ type, id }, {
+      get(type, id) {
+        if (type === 'user-realms' && id === ownRealm) {
+          return schema.userRealms({ type, id });
+        }
+      }
+    });
   }
 
   it("attempting to create a thing you can't read results in Not Found", async function() {
@@ -115,7 +133,7 @@ describe('schema/auth/write', function() {
     let action = create({
       type: 'articles'
     });
-    let session = new Session({ id: '0' }, null, { id: '0' });
+    let session = makeSession(schema, { type: 'test-users', id: '0' });
     let errors = await schema.validationErrors(action, { session });
     expect(errors).deep.equal([]);
   });
@@ -159,7 +177,7 @@ describe('schema/auth/write', function() {
     let action = create({
       type: 'articles'
     });
-    let session = new Session({ type: 'test-users', id: '0' });
+    let session = makeSession(schema, { type: 'test-users', id: '0' });
     let errors = await schema.validationErrors(action, { session });
     expect(errors).deep.equal([]);
   });
@@ -173,7 +191,7 @@ describe('schema/auth/write', function() {
       type: 'authors',
       id: '123'
     });
-    let session = new Session({ type: 'authors', id: '123' });
+    let session = makeSession(schema, { type: 'authors', id: '123' });
     let errors = await schema.validationErrors(action, { session });
     expect(errors).deep.equal([]);
   });
@@ -187,7 +205,7 @@ describe('schema/auth/write', function() {
       type: 'authors',
       id: '124'
     });
-    let session = new Session({ type: 'authors', id: '123' });
+    let session = makeSession(schema, { type: 'authors', id: '123' });
     let errors = await schema.validationErrors(action, { session });
     expect(errors).collectionContains({
       status: 401,
@@ -211,7 +229,7 @@ describe('schema/auth/write', function() {
         }
       }
     });
-    let session = new Session({ type: 'authors', id: '1' }, null);
+    let session = makeSession(schema, { type: 'authors', id: '1' }, null);
     let errors = await schema.validationErrors(action, { session });
     expect(errors).deep.equal([]);
   });
@@ -232,7 +250,7 @@ describe('schema/auth/write', function() {
         }
       }
     });
-    let session = new Session({ type: 'authors', id: '1' }, null);
+    let session = makeSession(schema, { type: 'authors', id: '1' }, null);
     let errors = await schema.validationErrors(action, { session });
     expect(errors).collectionContains({
       status: 401,
@@ -265,7 +283,7 @@ describe('schema/auth/write', function() {
       type: 'articles',
       id: '1'
     });
-    let session = new Session({ type: 'test-users', id: '123' });
+    let session = makeSession(schema, { type: 'test-users', id: '123' });
     let errors = await schema.validationErrors(action, { session });
     expect(errors).collectionContains({
       status: 401,
@@ -362,7 +380,7 @@ describe('schema/auth/write', function() {
         }
       }
     });
-    let session = new Session({ type: 'authors', id: '1' });
+    let session = makeSession(schema, { type: 'authors', id: '1' });
     let errors = await schema.validationErrors(action, { session });
     expect(errors).collectionContains({
       status: 401,
@@ -393,7 +411,7 @@ describe('schema/auth/write', function() {
         }
       }
     });
-    let session = new Session({ type: 'authors', id: '2' });
+    let session = makeSession(schema, { type: 'authors', id: '2' });
     let errors = await schema.validationErrors(action, { session });
     expect(errors).deep.equals([]);
   });
@@ -412,7 +430,7 @@ describe('schema/auth/write', function() {
         }
       }
     });
-    let session = new Session({ type: 'authors', id: '123' });
+    let session = makeSession(schema, { type: 'authors', id: '123' });
     let errors = await schema.validationErrors(action, { session });
     expect(errors).collectionContains({
       status: 401,
@@ -437,7 +455,7 @@ describe('schema/auth/write', function() {
         }
       }
     });
-    let session = new Session({ type: 'authors', id: '123' });
+    let session = makeSession(schema, { type: 'authors', id: '123' });
     let errors = await schema.validationErrors(action, { session });
     expect(errors).deep.equal([]);
   });

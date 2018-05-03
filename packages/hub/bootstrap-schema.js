@@ -177,6 +177,21 @@ const models = [
   },
   {
     type: 'content-types',
+    id: 'user-realms',
+    attributes: {
+      'is-built-in': true
+    },
+    relationships: {
+      fields: {
+        data: [
+          { type: 'fields', id: 'user' },
+          { type: 'fields', id: 'realms' }
+        ]
+      }
+    }
+  },
+  {
+    type: 'content-types',
     id: 'input-assignments',
     attributes: {
       'is-built-in': true
@@ -195,6 +210,20 @@ const models = [
     id: 'search-query',
     attributes: {
       'field-type': '@cardstack/core-types::object'
+    }
+  },
+  {
+    type: 'fields',
+    id: 'user',
+    attributes: {
+      'field-type': '@cardstack/core-types::belongs-to'
+    }
+  },
+  {
+    type: 'fields',
+    id: 'realms',
+    attributes: {
+      'field-type': '@cardstack/core-types::string-array'
     }
   },
   {

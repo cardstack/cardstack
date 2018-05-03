@@ -6,7 +6,7 @@ const authLog = require('@cardstack/logger')('cardstack/auth');
 const Session = require('@cardstack/plugin-utils/session');
 
 module.exports = class ContentType {
-  constructor(model, allFields, allConstraints, dataSources, defaultDataSource, allGrants) {
+  constructor(model, allFields, allConstraints, dataSources, defaultDataSource, allGrants, allGroups) {
     let fields = new Map();
     if (model.relationships && model.relationships.fields) {
       for (let fieldRef of model.relationships.fields.data) {
@@ -41,6 +41,7 @@ module.exports = class ContentType {
       this.dataSource = null;
     }
     this.grants = allGrants.filter(g => g.types == null || g.types.includes(model.id));
+    this._groups = allGroups.filter(g => g.types.includes(model.id));
     this._realms = null;
     authLog.trace(`while constructing content type %s, %s of %s grants apply`, this.id, this.grants.length, allGrants.length);
     this.constraints = allConstraints.filter(constraint => {
@@ -185,6 +186,14 @@ module.exports = class ContentType {
       await this._assertGrant([finalDocument, originalDocument], context, 'may-read-resource', 'read (during update)');
       await this._assertGrant([originalDocument], context, 'may-update-resource', 'update');
     }
+  }
+
+  isGroupable() {
+    return this._groups.length > 0;
+  }
+
+  groups(document) {
+    return this._groups.filter(g => g.test(document));
   }
 
   get realms() {

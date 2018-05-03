@@ -18,6 +18,13 @@ module.exports = class DocumentContext {
     // missing. We track the missing ones so that if they later appear
     // in the data we can invalidate to pick them up.
     this.references = [];
+
+    // special case for the built-in implicit relationship between
+    // user-realms and the underlying user record it is tracking
+    if (type === 'user-realms') {
+      let user = doc.relationships.user.data;
+      this.references.push(`${user.type}/${user.id}`);
+    }
   }
 
   async searchDoc() {

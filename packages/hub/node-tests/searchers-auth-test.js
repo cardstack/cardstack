@@ -7,7 +7,7 @@ const Session = require('@cardstack/plugin-utils/session');
 const everyone = { type: 'groups', id: 'everyone' };
 
 describe('hub/searchers/auth', function() {
-  let env, searchers;
+  let env, searchers, sessions;
 
   async function setup(fn) {
     let factory = new JSONAPIFactory();
@@ -39,6 +39,9 @@ describe('hub/searchers/auth', function() {
         ])
       ]);
 
+    factory.addResource('authors', 'quint').withAttributes({
+      name: 'Quint Faulkner'
+    });
 
     factory.addResource('posts', '1').withAttributes({
       title: 'First Post',
@@ -56,6 +59,7 @@ describe('hub/searchers/auth', function() {
 
     env = await createDefaultEnvironment(`${__dirname}/../../../tests/stub-searcher`, factory.getModels());
     searchers = env.lookup('hub:searchers');
+    sessions = env.lookup('hub:sessions');
   }
 
   afterEach(async function() {
@@ -204,7 +208,7 @@ describe('hub/searchers/auth', function() {
         .withAttributes({ mayReadResource: true, mayReadFields: true })
         .withRelated('who', [{ type: 'fields', id: 'author' }]);
     });
-    let doc = await searchers.search(new Session({ type: 'authors', id: 'arthur' }), 'master', { filter: { type: 'posts' } });
+    let doc = await searchers.search(sessions.create('authors', 'arthur'), 'master', { filter: { type: 'posts' } });
     expect(doc.data).has.length(1);
     expect(doc.data[0]).has.deep.property('attributes.title', 'First Post');
     expect(doc.meta).has.deep.property('page.total', 1);
@@ -216,8 +220,195 @@ describe('hub/searchers/auth', function() {
         .withAttributes({ mayReadResource: true, mayReadFields: true })
         .withRelated('who', [{ type: 'fields', id: 'author' }]);
     });
-    let doc = await searchers.search(new Session({ type: 'authors', id: 'other' }), 'master', { filter: { type: 'posts' } });
+    let doc = await searchers.search(sessions.create('authors', 'other'), 'master', { filter: { type: 'posts' } });
     expect(doc.data).has.length(0);
+  });
+
+  it("matches a group grant", async function() {
+    await setup(factory => {
+      factory.addResource('grants')
+        .withAttributes({ mayReadResource: true, mayReadFields: true })
+        .withRelated('who', [{ type: 'groups', id: 'cool-kids' }]);
+      factory.addResource('groups', 'cool-kids')
+        .withAttributes({
+          searchQuery: { filter: { type: { exact: 'authors' }, name: { exact: 'Arthur Faulkner' } } }
+        });
+    });
+    let doc = await searchers.search(sessions.create('authors', 'arthur'), 'master', { filter: { type: 'posts' } });
+    expect(doc.data).has.length(1);
+    expect(doc.data[0]).has.deep.property('attributes.title', 'First Post');
+    expect(doc.meta).has.deep.property('page.total', 1);
+  });
+
+  it("does not match a group grant", async function() {
+    await setup(factory => {
+      factory.addResource('grants')
+        .withAttributes({ mayReadResource: true, mayReadFields: true })
+        .withRelated('who', [{ type: 'groups', id: 'cool-kids' }]);
+      factory.addResource('groups', 'cool-kids')
+        .withAttributes({
+          searchQuery: { filter: { type: { exact: 'authors' }, name: { exact: 'Somebody Else' } } }
+        });
+    });
+    let doc = await searchers.search(sessions.create('authors', 'arthur'), 'master', { filter: { type: 'posts' } });
+    expect(doc.data).has.length(0);
+  });
+
+  it("matches a multi-group grant", async function() {
+    await setup(factory => {
+      factory.addResource('grants')
+        .withAttributes({ mayReadResource: true, mayReadFields: true })
+        .withRelated('who', [{ type: 'groups', id: 'cool-kids' }, { type: 'groups', id: 'famous-people' }]);
+      factory.addResource('groups', 'cool-kids')
+        .withAttributes({
+          searchQuery: { filter: { type: { exact: 'authors' }, name: { exact: 'Arthur Faulkner' } } }
+        });
+      factory.addResource('groups', 'famous-people')
+        .withAttributes({
+          searchQuery: { filter: { type: { exact: 'authors' }, name: { exact: 'Arthur Faulkner' } } }
+        });
+    });
+    let doc = await searchers.search(sessions.create('authors', 'arthur'), 'master', { filter: { type: 'posts' } });
+    expect(doc.data).has.length(1);
+    expect(doc.data[0]).has.deep.property('attributes.title', 'First Post');
+    expect(doc.meta).has.deep.property('page.total', 1);
+  });
+
+  it("does not matches a multi-group grant without all the groups", async function() {
+    await setup(factory => {
+      factory.addResource('grants')
+        .withAttributes({ mayReadResource: true, mayReadFields: true })
+        .withRelated('who', [{ type: 'groups', id: 'cool-kids' }, { type: 'groups', id: 'famous-people' }]);
+      factory.addResource('groups', 'cool-kids')
+        .withAttributes({
+          searchQuery: { filter: { type: { exact: 'authors' }, name: { exact: 'Somebody Else' } } }
+        });
+      factory.addResource('groups', 'famous-people')
+        .withAttributes({
+          searchQuery: { filter: { type: { exact: 'authors' }, name: { exact: 'Arthur Faulkner' } } }
+        });
+    });
+    let doc = await searchers.search(sessions.create('authors', 'arthur'), 'master', { filter: { type: 'posts' } });
+    expect(doc.data).has.length(0);
+  });
+
+  it("matches a combined group and field-dependent user grant", async function() {
+    await setup(factory => {
+      factory.addResource('grants')
+        .withAttributes({ mayReadResource: true, mayReadFields: true })
+        .withRelated('who', [{ type: 'groups', id: 'cool-kids' }, { type: 'fields', id: 'author' }]);
+      factory.addResource('groups', 'cool-kids')
+        .withAttributes({
+          searchQuery: { filter: { type: { exact: 'authors' }, name: { exact: 'Arthur Faulkner' } } }
+        });
+    });
+    let doc = await searchers.search(sessions.create('authors', 'arthur'), 'master', { filter: { type: 'posts' } });
+    expect(doc.data).has.length(1);
+    expect(doc.data[0]).has.deep.property('attributes.title', 'First Post');
+    expect(doc.meta).has.deep.property('page.total', 1);
+  });
+
+  it("rejects a combined group and field-dependent user grant when the group is missing", async function() {
+    await setup(factory => {
+      factory.addResource('grants')
+        .withAttributes({ mayReadResource: true, mayReadFields: true })
+        .withRelated('who', [{ type: 'groups', id: 'cool-kids' }, { type: 'fields', id: 'author' }]);
+      factory.addResource('groups', 'cool-kids')
+        .withAttributes({
+          searchQuery: { filter: { type: { exact: 'authors' }, name: { exact: 'other' } } }
+        });
+    });
+    let doc = await searchers.search(sessions.create('authors', 'arthur'), 'master', { filter: { type: 'posts' } });
+    expect(doc.data).has.length(0);
+  });
+
+  it("rejects a combined group and field-dependent user grant when the user does not match", async function() {
+    await setup(factory => {
+      factory.addResource('grants')
+        .withAttributes({ mayReadResource: true, mayReadFields: true })
+        .withRelated('who', [{ type: 'groups', id: 'cool-kids' }, { type: 'fields', id: 'author' }]);
+      factory.addResource('groups', 'cool-kids')
+        .withAttributes({
+          searchQuery: { filter: { type: { exact: 'authors' }, name: { exact: 'Quint Faulkner' } } }
+        });
+    });
+    let doc = await searchers.search(sessions.create('authors', 'quint'), 'master', { filter: { type: 'posts' } });
+    expect(doc.data).has.length(0);
+  });
+
+  it("rejects a combined group and field-dependent user grant when the group does not match", async function() {
+    await setup(factory => {
+      factory.addResource('grants')
+        .withAttributes({ mayReadResource: true, mayReadFields: true })
+        .withRelated('who', [{ type: 'groups', id: 'cool-kids' }, { type: 'fields', id: 'author' }]);
+      factory.addResource('groups', 'cool-kids')
+        .withAttributes({
+          searchQuery: { filter: { type: { exact: 'authors' }, name: { exact: 'Quint Faulkner' } } }
+        });
+    });
+    let doc = await searchers.search(sessions.create('authors', 'arthur'), 'master', { filter: { type: 'posts' } });
+    expect(doc.data).has.length(0);
+  });
+
+  it("stops matching a group grant when the user is deleted", async function() {
+    await setup(factory => {
+      factory.addResource('grants')
+        .withAttributes({ mayReadResource: true, mayReadFields: true })
+        .withRelated('who', [{ type: 'groups', id: 'cool-kids' }]);
+      factory.addResource('groups', 'cool-kids')
+        .withAttributes({
+          searchQuery: { filter: { type: { exact: 'authors' }, name: { exact: 'Arthur Faulkner' } } }
+        });
+    });
+
+    let session = sessions.create('authors', 'arthur');
+    let user = await searchers.get(Session.INTERNAL_PRIVILEGED, 'master', 'authors', 'arthur');
+    await env.lookup('hub:writers').delete('master', Session.INTERNAL_PRIVILEGED, user.data.meta.version, user.data.type, user.data.id);
+    await env.lookup('hub:indexers').update({ forceRefresh: true });
+    let doc = await searchers.search(session, 'master', { filter: { type: 'posts' } });
+    expect(doc.data).has.length(0);
+  });
+
+  it("stops matching a group grant when the user is modified out of the group", async function() {
+    await setup(factory => {
+      factory.addResource('grants')
+        .withAttributes({ mayReadResource: true, mayReadFields: true })
+        .withRelated('who', [{ type: 'groups', id: 'cool-kids' }]);
+      factory.addResource('groups', 'cool-kids')
+        .withAttributes({
+          searchQuery: { filter: { type: { exact: 'authors' }, name: { exact: 'Arthur Faulkner' } } }
+        });
+    });
+
+    let session = sessions.create('authors', 'arthur');
+    let user = await searchers.get(Session.INTERNAL_PRIVILEGED, 'master', 'authors', 'arthur');
+    user.data.attributes.name = 'Updated name';
+    await env.lookup('hub:writers').update('master', Session.INTERNAL_PRIVILEGED, user.data.type, user.data.id, user.data);
+    await env.lookup('hub:indexers').update({ forceRefresh: true });
+    let doc = await searchers.search(session, 'master', { filter: { type: 'posts' } });
+    expect(doc.data).has.length(0);
+  });
+
+  it("starts matching a group grant when the user is modified into the group", async function() {
+    await setup(factory => {
+      factory.addResource('grants')
+        .withAttributes({ mayReadResource: true, mayReadFields: true })
+        .withRelated('who', [{ type: 'groups', id: 'cool-kids' }]);
+      factory.addResource('groups', 'cool-kids')
+        .withAttributes({
+          searchQuery: { filter: { type: { exact: 'authors' }, name: { exact: 'Updated name' } } }
+        });
+    });
+
+    let session = sessions.create('authors', 'arthur');
+    let user = await searchers.get(Session.INTERNAL_PRIVILEGED, 'master', 'authors', 'arthur');
+    user.data.attributes.name = 'Updated name';
+    await env.lookup('hub:writers').update('master', Session.INTERNAL_PRIVILEGED, user.data.type, user.data.id, user.data);
+    await env.lookup('hub:indexers').update({ forceRefresh: true });
+    let doc = await searchers.search(session, 'master', { filter: { type: 'posts' } });
+    expect(doc.data).has.length(1);
+    expect(doc.data[0]).has.deep.property('attributes.title', 'First Post');
+    expect(doc.meta).has.deep.property('page.total', 1);
   });
 
 

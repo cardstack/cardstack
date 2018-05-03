@@ -4,16 +4,18 @@ const { flatten } = require('lodash');
 const Client = require('@cardstack/elasticsearch/client');
 const log = require('@cardstack/logger')('cardstack/indexers');
 const DocumentContext = require('./document-context');
+const Session = require('@cardstack/plugin-utils/session');
 
 const FINALIZED = {};
 
 class BranchUpdate {
-  constructor(branch, seedSchema, client, emitEvent) {
+  constructor(branch, seedSchema, client, emitEvent, isControllingBranch) {
     this.branch = branch;
     this.seedSchema = seedSchema;
     this.client = client;
     this.updaters = Object.create(null);
     this.emitEvent = emitEvent;
+    this.isControllingBranch = isControllingBranch;
     this.schemaModels = [];
     this._schema = null;
     this.bulkOps = null;
@@ -173,11 +175,19 @@ class BranchUpdate {
       if (!this._touched[key]) {
         this._touched[key] = true;
         pendingOps.push((async ()=> {
-          let resource = await this.read(type, id);
-          if (resource) {
-            let sourceId = schema.types.get(type).dataSource.id;
-            let nonce = 0;
-            await this.add(type, id, resource, sourceId, nonce);
+          if (type === 'user-realms') {
+            // if we have an invalidated user-realms and it hasn't
+            // already been touched, that's because the corresponding
+            // user was delete, so we should also delete the
+            // user-realms.
+            await this.delete(type, id);
+          } else {
+            let resource = await this.read(type, id);
+            if (resource) {
+              let sourceId = schema.types.get(type).dataSource.id;
+              let nonce = 0;
+              await this.add(type, id, resource, sourceId, nonce);
+            }
           }
         })());
       }
@@ -226,6 +236,29 @@ class BranchUpdate {
     }, searchDoc);
     this.emitEvent('add', { type, id, doc });
     log.debug("save %s %s", type, id);
+    if (this.isControllingBranch) {
+      await this._maybeUpdateRealms(type, id, doc, sourceId, nonce);
+    }
+  }
+
+  async _maybeUpdateRealms(type, id, doc, sourceId, nonce) {
+    let schema = await this.schema();
+    let realms = await schema.userRealms(doc);
+    if (realms) {
+      let userRealmsId = Session.encodeBaseRealm(type, id);
+      await this.add('user-realms', userRealmsId, {
+        type: 'user-realms',
+        id: userRealmsId,
+        attributes: {
+          realms
+        },
+        relationships: {
+          user: {
+            data: { type, id }
+          }
+        }
+      }, sourceId, nonce);
+    }
   }
 
   async delete(type, id) {

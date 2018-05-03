@@ -34,16 +34,37 @@ class Session {
   // access)
   async realms() {
     if (!this._realms) {
-      if (this.id === 'everyone') {
-        this._realms = ['groups/everyone'];
+      if (!this.userSearcher || !this.userSearcher.get ) {
+        throw new Error(`no valid user searcher in session for ${this.type} ${this.id}`);
+      }
+
+      let ownBaseRealm = Session.encodeBaseRealm(this.type, this.id);
+
+      let realmsDoc;
+      try {
+        realmsDoc = await this.userSearcher.get('user-realms', ownBaseRealm);
+      } catch(err) {
+        if (err.status !== 404) {
+          throw err;
+        }
+      }
+      if (realmsDoc && realmsDoc.data && realmsDoc.data.attributes && realmsDoc.data.attributes.realms) {
+        this._realms = [...realmsDoc.data.attributes.realms, everyoneRealm];
       } else {
-        this._realms = [`${encodeURIComponent(this.type)}/${encodeURIComponent(this.id)}`, 'groups/everyone'];
+        this._realms = [ownBaseRealm, everyoneRealm];
       }
     }
     return this._realms;
   }
 
+  static encodeBaseRealm(type, id) {
+    return `${encodeURIComponent(type)}/${encodeURIComponent(id)}`;
+  }
+
 }
+
+const everyoneRealm = Session.encodeBaseRealm('groups', 'everyone');
+
 
 module.exports = Session;
 
@@ -64,7 +85,8 @@ Object.defineProperty(Session, 'INTERNAL_PRIVILEGED', {
             'full-name': '@cardstack/hub/authentication',
             email: 'noreply@nowhere.com'
           }
-        }
+        },
+        [Session.encodeBaseRealm('groups', '@cardstack/hub'), everyoneRealm]
       );
     }
     return privilegedSession;
@@ -86,7 +108,8 @@ Object.defineProperty(Session, 'EVERYONE', {
             'full-name': 'Anonymous',
             email: 'noreply@nowhere.com'
           }
-        }
+        },
+        [everyoneRealm]
       );
     }
     return everyoneSession;

@@ -1,5 +1,5 @@
 const Grant = require('./grant');
-const { flatten } = require('lodash');
+const { flatten, uniq } = require('lodash');
 const log = require('@cardstack/logger')('cardstack/auth');
 
 
@@ -161,7 +161,7 @@ module.exports = class Realms {
       }
     }
 
-    return realmIntersections(choiceRealms, singleRealms).map(list => list.sort().join('/'));
+    return realmIntersections(choiceRealms, singleRealms).map(list => uniq(list).sort().join('/'));
   }
 
   authorizedReadRealms(resource) {

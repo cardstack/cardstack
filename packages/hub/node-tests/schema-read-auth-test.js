@@ -17,6 +17,16 @@ describe('schema/auth/read', function() {
     return searchers.search(Session.INTERNAL_PRIVILEGED, 'master', { filter: { type } });
   }
 
+  function makeSession(schema, { type, id }) {
+    let ownRealm = Session.encodeBaseRealm(type, id);
+    return new Session({ type, id }, {
+      get(type, id) {
+        if (type === 'user-realms' && id === ownRealm) {
+          return schema.userRealms({ type, id });
+        }
+      }
+    });
+  }
 
   async function withGrants(fn) {
     let factory = new JSONAPIFactory();
@@ -30,8 +40,8 @@ describe('schema/auth/read', function() {
       }
     }
 
-    let session = new Session({ type: 'test-users', id: 'session-with-grants' });
     let schema = await baseSchema.applyChanges(factory.getModels().map(model => ({ type: model.type, id: model.id, document: model })));
+    let session = makeSession(schema, { type: 'test-users', id: 'session-with-grants' });
     return { schema, session };
   }
 
@@ -99,13 +109,10 @@ describe('schema/auth/read', function() {
     });
 
 
-    let sessions = {};
-
     {
       let user = factory.addResource('test-users').withAttributes({
         fullName: 'Alice'
       });
-      sessions.postAndTagResources = new Session(user);
       factory.addResource('grants')
         .withRelated('who', [{ type: user.type, id: user.id }])
         .withRelated('types', [
@@ -121,7 +128,6 @@ describe('schema/auth/read', function() {
       let user = factory.addResource('test-users').withAttributes({
         fullName: 'Bob'
       });
-      sessions.postAndAuthorResourcesWithTitleAndAuthorFields = new Session(user);
       factory.addResource('grants')
         .withRelated('who', [{ type: user.type, id: user.id }])
         .withRelated('types', [
@@ -142,7 +148,6 @@ describe('schema/auth/read', function() {
       let user = factory.addResource('test-users').withAttributes({
         fullName: 'Charlie'
       });
-      sessions.postResourceWithUnlimitedFieldsAndAuthorResource = new Session(user);
       factory.addResource('grants')
         .withRelated('who', [{ type: user.type, id: user.id }])
         .withRelated('types', [
@@ -702,8 +707,8 @@ describe('schema/auth/read', function() {
         mayReadFields: true
       });
 
-    let session = new Session({ type: 'authors', id: '1' });
     let schema = await baseSchema.applyChanges(factory.getModels().map(model => ({ type: model.type, id: model.id, document: model })));
+    let session = makeSession(schema, { type: 'authors', id: '1' });
     let approved = await schema.applyReadAuthorization(model, { session });
     expect(approved).is.not.undefined;
   });
@@ -722,8 +727,8 @@ describe('schema/auth/read', function() {
         mayReadFields: true
       });
 
-    let session = new Session({ type: 'authors', id: '2' });
     let schema = await baseSchema.applyChanges(factory.getModels().map(model => ({ type: model.type, id: model.id, document: model })));
+    let session = makeSession(schema, { type: 'authors', id: '2' });
     let approved = await schema.applyReadAuthorization(model, { session });
     expect(approved).is.undefined;
   });
@@ -742,8 +747,8 @@ describe('schema/auth/read', function() {
         mayReadFields: true
       });
 
-    let session = new Session({ type: 'test-users', id: '1' });
     let schema = await baseSchema.applyChanges(factory.getModels().map(model => ({ type: model.type, id: model.id, document: model })));
+    let session = makeSession(schema, { type: 'test-users', id: '1' });
     let approved = await schema.applyReadAuthorization(model, { session });
     expect(approved).is.undefined;
   });
@@ -762,8 +767,8 @@ describe('schema/auth/read', function() {
         mayReadFields: true
       });
 
-    let session = new Session({ type: 'authors', id: '1' });
     let schema = await baseSchema.applyChanges(factory.getModels().map(model => ({ type: model.type, id: model.id, document: model })));
+    let session = makeSession(schema, { type: 'authors', id: '1' });
     let approved = await schema.applyReadAuthorization(model, { session });
     expect(approved).is.undefined;
   });
@@ -785,8 +790,8 @@ describe('schema/auth/read', function() {
         mayReadFields: true
       });
 
-    let session = new Session({ type: 'authors', id: '1' });
     let schema = await baseSchema.applyChanges(factory.getModels().map(model => ({ type: model.type, id: model.id, document: model })));
+    let session = makeSession(schema, { type: 'authors', id: '1' });
     let approved = await schema.applyReadAuthorization(model, { session });
     expect(approved).has.deep.property('data.attributes.title');
   });
@@ -807,8 +812,8 @@ describe('schema/auth/read', function() {
         mayReadFields: true
       });
 
-    let session = new Session({ type: 'authors', id: '2' });
     let schema = await baseSchema.applyChanges(factory.getModels().map(model => ({ type: model.type, id: model.id, document: model })));
+    let session = makeSession(schema, { type: 'authors', id: '2' });
     let approved = await schema.applyReadAuthorization(model, { session });
     expect(approved).not.has.deep.property('data.attributes.title');
   });
@@ -832,8 +837,8 @@ describe('schema/auth/read', function() {
         mayReadFields: true
       });
 
-    let session = new Session({ type: 'authors', id: '1' });
     let schema = await baseSchema.applyChanges(factory.getModels().map(model => ({ type: model.type, id: model.id, document: model })));
+    let session = makeSession(schema, { type: 'authors', id: '1' });
     let approved = await schema.applyReadAuthorization(model, { session });
     expect(approved).has.deep.property('data.attributes.title');
   });
@@ -857,8 +862,8 @@ describe('schema/auth/read', function() {
         mayReadFields: true
       });
 
-    let session = new Session({ type: 'authors', id: '2' });
     let schema = await baseSchema.applyChanges(factory.getModels().map(model => ({ type: model.type, id: model.id, document: model })));
+    let session = makeSession(schema, { type: 'authors', id: '2' });
     let approved = await schema.applyReadAuthorization(model, { session });
     expect(approved).not.has.deep.property('data.attributes.title');
   });
@@ -873,8 +878,8 @@ describe('schema/auth/read', function() {
         mayReadResource: true
       });
 
-    let session = new Session({ type: 'authors', id: '2' });
     let schema = await baseSchema.applyChanges(factory.getModels().map(model => ({ type: model.type, id: model.id, document: model })));
+    let session = makeSession(schema, { type: 'authors', id: '2' });
     let approved = await schema.applyReadAuthorization(model, { session });
     expect(approved).has.deep.property('data.id', '1');
   });
@@ -889,8 +894,8 @@ describe('schema/auth/read', function() {
         mayReadResource: true
       });
 
-    let session = new Session({ type: 'authors', id: '1' });
     let schema = await baseSchema.applyChanges(factory.getModels().map(model => ({ type: model.type, id: model.id, document: model })));
+    let session = makeSession(schema, { type: 'authors', id: '1' });
     let approved = await schema.applyReadAuthorization(model, { session });
     expect(approved).to.be.undefined;
   });

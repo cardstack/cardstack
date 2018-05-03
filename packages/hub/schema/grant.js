@@ -201,6 +201,7 @@ const actions = [
 ];
 const log = require('@cardstack/logger')('cardstack/auth');
 const Session = require('@cardstack/plugin-utils/session');
+const { uniq } = require('lodash');
 
 module.exports = class Grant {
   constructor(document) {
@@ -244,7 +245,7 @@ module.exports = class Grant {
         } else {
           return {
             realmField: null,
-            staticRealm: `${encodeURIComponent(type)}/${encodeURIComponent(id)}`
+            staticRealm: Session.encodeBaseRealm(type, id)
           };
         }
       });
@@ -256,35 +257,30 @@ module.exports = class Grant {
   async matches(resource, context) {
     let userRealms = await (context.session || Session.EVERYONE).realms();
 
-    let approvedRealm = this.who.map(({ staticRealm, realmField }) => {
+    let approvedRealm = uniq(this.who.map(({ staticRealm, realmField }) => {
       if (realmField) {
         return Grant.readRealmsFromField(resource, realmField);
       } else {
         return [staticRealm];
       }
-    }).sort().join('/');
+    })).sort().join('/');
 
     let matches = userRealms.includes(approvedRealm);
     log.trace('testing grant id=%s approvedRealm=%s resource=%j userRealms=%j matches=%s', this.id, approvedRealm, resource, userRealms, !!matches);
     return matches;
   }
 
-  // TODO move these onto Realms once we get rid of matches()
-  static encodeBaseRealm(type, id) {
-    return `${encodeURIComponent(type)}/${encodeURIComponent(id)}`;
-  }
-
   static readRealmsFromField(resource, fieldName) {
     if (fieldName === 'id') {
-      return [this.encodeBaseRealm(resource.type, resource.id)];
+      return [Session.encodeBaseRealm(resource.type, resource.id)];
     }
     if (resource.relationships && resource.relationships.hasOwnProperty(fieldName)) {
       let fieldValue = resource.relationships[fieldName];
       if (fieldValue.data) {
         if (Array.isArray(fieldValue.data)) {
-          return fieldValue.data.map(({ type, id }) => this.encodeBaseRealm(type, id));
+          return fieldValue.data.map(({ type, id }) => Session.encodeBaseRealm(type, id));
         } else {
-          return [this.encodeBaseRealm(fieldValue.data.type, fieldValue.data.id)];
+          return [Session.encodeBaseRealm(fieldValue.data.type, fieldValue.data.id)];
         }
       }
     }
