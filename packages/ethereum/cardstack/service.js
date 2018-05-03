@@ -3,7 +3,6 @@ const { dasherize, camelize, capitalize } = Ember.String;
 const { pluralize, singularize } = require('inflection');
 const Web3 = require('web3');
 const log = require('@cardstack/logger')('cardstack/ethereum/service');
-const { declareInjections } = require('@cardstack/di');
 const { uniqWith, isEqual, get } = require('lodash');
 const { promisify } = require('util');
 const timeout = promisify(setTimeout);
@@ -11,31 +10,21 @@ const timeout = promisify(setTimeout);
 const NULL_ADDRESS = '0x0000000000000000000000000000000000000000';
 const MAX_WS_MESSAGE_SIZE_BYTES = 20000000;
 
-module.exports = declareInjections({
-  indexer: 'hub:indexers'
-},
-
-class EthereumService {
+module.exports = class EthereumService {
 
   static create(...args) {
     return new this(...args);
   }
 
-  constructor({ indexer }) {
-    this._indexer = indexer;
+  constructor() {
     this._providers = {};
     this._eventListeners = {};
     this._hasStartedListening = {};
     this._hasConnected = false;
-    this._isIndexing = {};
-    this._indexQueue = {};
-    this._processQueueTimeoutMs = 1000;
-    this._processQueueTimeout = {};
     this._contractDefinitions = {};
     this._branches = null;
     this._eventDefinitions = {};
     this._contracts = {};
-    this._indexerPromise = null; // exposing this for the tests
   }
 
   connect(branches) {
@@ -89,14 +78,12 @@ class EthereumService {
   async stop(name) {
     log.info("stopping event listening for contract " + name);
 
-    await this._indexerPromise;
     if (!this._eventListeners[name]) { return; }
 
     for (let branch of Object.keys(this._eventListeners[name])) {
       this._eventListeners[name][branch].unsubscribe();
     }
 
-    clearTimeout(this._processQueueTimeout[name]);
     this._eventListeners[name] = {};
     this._hasStartedListening[name] = false;
   }
@@ -105,7 +92,7 @@ class EthereumService {
     return await this._providers[branch].eth.getBlockNumber();
   }
 
-  async start({ name, contract }) {
+  async start({ name, contract, buffer }) {
     if (this._hasStartedListening[name]) { return; }
 
     await this.stop(name);
@@ -140,12 +127,10 @@ class EthereumService {
           let hints = this._generateHintsFromEvent({ branch, contract: name, event });
           log.debug("addings hints to queue", JSON.stringify(hints, null, 2));
 
-          this._indexQueue[name] = (this._indexQueue[name] || []).concat(hints);
+          buffer.loadModels(name, null, hints);
         }
       });
     }
-
-    this._processQueue(name);
   }
 
   async getContractInfo({ branch, contract, type }) {
@@ -224,11 +209,9 @@ class EthereumService {
   async getPastEventsAsHints(blockHeights) {
     log.debug(`getting past events as hints for contracts ${blockHeights ? JSON.stringify(blockHeights) : ''}`);
     let hints = [];
-    let currentBlockHeights = {};
 
     await this._reconnectPromise;
     for (let branch of Object.keys(this._contracts)) {
-      currentBlockHeights[branch] = await this.getBlockHeight(branch);
       for (let contract of Object.keys(this._contracts[branch])) {
         let aContract = this._contracts[branch][contract];
         let contractHints = [];
@@ -254,39 +237,7 @@ class EthereumService {
       }
     }
     log.debug(`discovered contract events resulting in hints: ${JSON.stringify(hints, null, 2)}`);
-    return { hints, blockHeights: currentBlockHeights };
-  }
-
-  _setProcessQueueTimeout(name, timeout) {
-    clearTimeout(this._processQueueTimeout[name]);
-
-    this._processQueueTimeoutMs = timeout;
-    this._processQueue(name);
-  }
-
-   // the web3 event handler assumes synchronous event callback functions,
-   // so we're dealing with the async nature of our event callbacks in this
-   // queue processor.
-  _processQueue(name) {
-    let scheduleNextProcess = contractName => setTimeout(() => this._processQueue(contractName), this._processQueueTimeoutMs);
-
-    if (!this._indexQueue[name] ||
-         this._indexQueue[name].length && !this._isIndexing[name]) {
-      this._isIndexing[name] = true;
-      let queue = this._indexQueue[name];
-      this._indexQueue[name] = [];
-      let hints = uniqWith(queue, isEqual);
-
-      log.debug("processing index queue ", hints);
-      this._indexerPromise = this._indexer.update({ forceRefresh: true, hints });
-
-      Promise.resolve(this._indexerPromise)
-        .then(() => this._processQueueTimeout[name] = scheduleNextProcess(name))
-        .catch(err => log.error(`error encountered processing indexer queue for contract ${name}: ${err.message}`, err.stackTrace))
-        .then(() => this._isIndexing[name] = false); // no finally yet :-( https://stackoverflow.com/questions/35999072/what-is-the-equivalent-of-bluebird-promise-finally-in-native-es6-promises
-    } else {
-      this._processQueueTimeout[name] = scheduleNextProcess(name);
-    }
+    return hints;
   }
 
   _generateHintsFromEvent({ branch, contract, event }) {
@@ -308,8 +259,7 @@ class EthereumService {
 
     return hints;
   }
-
-});
+};
 
 function  getEventDefinitions(contractName, { abi }) {
   let events = {};
