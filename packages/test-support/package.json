@@ -1,6 +1,6 @@
 {
   "name": "@cardstack/test-support",
-  "version": "0.7.0",
+  "version": "0.7.1",
   "description": "Shared test support for cardstack packages.",
   "main": "index.js",
   "scripts": {
@@ -21,7 +21,7 @@
     "@cardstack/di": "0.6.14",
     "@cardstack/elasticsearch": "0.7.0",
     "@cardstack/ephemeral": "0.7.0",
-    "@cardstack/hub": "0.7.0",
+    "@cardstack/hub": "0.7.1",
     "@cardstack/logger": "^0.1.0",
     "@cardstack/plugin-utils": "0.7.0",
     "@std/esm": "^0.25.1",
