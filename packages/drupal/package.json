@@ -1,6 +1,6 @@
 {
   "name": "@cardstack/drupal",
-  "version": "0.6.19",
+  "version": "0.7.0",
   "description": "Drupal data source plugin for @cardstack/hub.",
   "repository": "https://github.com/cardstack/cardstack",
   "author": "Edward Faulkner <edward@eaf4.com>",
@@ -11,7 +11,7 @@
   "main": "indexer.js",
   "devDependencies": {
     "@cardstack/eslint-config": "0.6.14",
-    "@cardstack/test-support": "0.6.19",
+    "@cardstack/test-support": "0.7.0",
     "eslint": "4.9.0",
     "eslint-plugin-ember": "^5.0.0",
     "eslint-plugin-node": "^5.2.1"
@@ -24,7 +24,7 @@
   },
   "dependencies": {
     "@cardstack/logger": "^0.1.0",
-    "@cardstack/plugin-utils": "0.6.14",
+    "@cardstack/plugin-utils": "0.7.0",
     "ember-source": "~2.18.2",
     "es6-promise": "^4.1.1",
     "jsonpatch": "^3.0.1",
