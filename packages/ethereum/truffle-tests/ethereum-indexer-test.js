@@ -10,13 +10,13 @@ const contractName = 'sample-token';
 let buffer, ethereumService, env;
 
 async function teardown() {
-  await buffer._bufferedLoadPromise;
+  await buffer.flush();
   await ethereumService.stopAll();
   await destroyDefaultEnvironment(env);
 }
 
 async function waitForEthereumEvents(buffer) {
-  await buffer._bufferedLoadPromise;
+  await buffer.flush();
 }
 
 contract('SampleToken', function(accounts) {
