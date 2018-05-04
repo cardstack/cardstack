@@ -74,6 +74,13 @@ exports.createDefaultEnvironment = async function(projectDir, initialModels = []
         let plugins = await this.lookup('hub:plugins').active();
         let m = plugins.lookupFeatureAndAssert('middleware', '@cardstack/test-support-authenticator');
         m.userId = id;
+        m.type = 'test-users';
+      },
+      async setUser(type, id) {
+        let plugins = await this.lookup('hub:plugins').active();
+        let m = plugins.lookupFeatureAndAssert('middleware', '@cardstack/test-support-authenticator');
+        m.userId = id;
+        m.type = type;
       }
     });
     return container;
