@@ -250,7 +250,7 @@ class Updater {
       },
       relationships: {
         who: {
-          data: { type: 'groups', id: 'everyone' }
+          data: [{ type: 'groups', id: 'everyone' }]
         },
         types: {
           "data": [

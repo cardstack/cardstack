@@ -19,7 +19,7 @@ function initialModels() {
     });
 
   factory.addResource('grants')
-    .withRelated('who', { type: 'groups', id: 'everyone' })
+    .withRelated('who', [{ type: 'groups', id: 'everyone' }])
     .withAttributes({
       mayLogin: true
     });

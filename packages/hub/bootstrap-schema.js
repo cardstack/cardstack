@@ -166,6 +166,28 @@ const models = [
     id: 'groups',
     attributes: {
       'is-built-in': true
+    },
+    relationships: {
+      fields: {
+        data: [
+          { type: 'fields', id: 'search-query' }
+        ]
+      }
+    }
+  },
+  {
+    type: 'content-types',
+    id: 'user-realms',
+    attributes: {
+      'is-built-in': true
+    },
+    relationships: {
+      fields: {
+        data: [
+          { type: 'fields', id: 'user' },
+          { type: 'fields', id: 'realms' }
+        ]
+      }
     }
   },
   {
@@ -181,6 +203,27 @@ const models = [
           { type: 'fields', id: 'field' }
         ]
       }
+    }
+  },
+  {
+    type: 'fields',
+    id: 'search-query',
+    attributes: {
+      'field-type': '@cardstack/core-types::object'
+    }
+  },
+  {
+    type: 'fields',
+    id: 'user',
+    attributes: {
+      'field-type': '@cardstack/core-types::belongs-to'
+    }
+  },
+  {
+    type: 'fields',
+    id: 'realms',
+    attributes: {
+      'field-type': '@cardstack/core-types::string-array'
     }
   },
   {
@@ -283,13 +326,16 @@ const models = [
     type: 'fields',
     id: 'who',
     attributes: {
-      'field-type': '@cardstack/core-types::belongs-to'
-    },
-    relationships: {
-      'related-types': {
-        data: [{ type: 'content-types', id: 'groups' }]
-      }
+      'field-type': '@cardstack/core-types::has-many'
     }
+    // I'm not restricting related-types here because it can include
+    // whatever app-defined types are used to represent users. In
+    // addition to those types, `who` can contain:
+    //  - groups
+    //  - fields (which adds a layer of indirection, and the value of
+    //    the field in the object we are evaluating access for must be
+    //    a relationship to one of the other things that are allowed
+    //    in `who`).
   },
   {
     type: 'fields',
@@ -548,7 +594,7 @@ const models = [
     },
     relationships: {
       who: {
-        data: { type: 'groups', id: '@cardstack/hub' }
+        data: [{ type: 'groups', id: '@cardstack/hub' }]
       }
     }
   },

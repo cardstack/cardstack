@@ -6,7 +6,7 @@ const authLog = require('@cardstack/logger')('cardstack/auth');
 const Session = require('@cardstack/plugin-utils/session');
 
 module.exports = class ContentType {
-  constructor(model, allFields, allConstraints, dataSources, defaultDataSource, allGrants) {
+  constructor(model, allFields, allConstraints, dataSources, defaultDataSource, allGrants, allGroups) {
     let fields = new Map();
     if (model.relationships && model.relationships.fields) {
       for (let fieldRef of model.relationships.fields.data) {
@@ -41,6 +41,7 @@ module.exports = class ContentType {
       this.dataSource = null;
     }
     this.grants = allGrants.filter(g => g.types == null || g.types.includes(model.id));
+    this._groups = allGroups.filter(g => g.types.includes(model.id));
     this._realms = null;
     authLog.trace(`while constructing content type %s, %s of %s grants apply`, this.id, this.grants.length, allGrants.length);
     this.constraints = allConstraints.filter(constraint => {
@@ -183,8 +184,16 @@ module.exports = class ContentType {
       await this._assertGrant([finalDocument], context, 'may-create-resource', 'create');
     } else {
       await this._assertGrant([finalDocument, originalDocument], context, 'may-read-resource', 'read (during update)');
-      await this._assertGrant([finalDocument, originalDocument], context, 'may-update-resource', 'update');
+      await this._assertGrant([originalDocument], context, 'may-update-resource', 'update');
     }
+  }
+
+  isGroupable() {
+    return this._groups.length > 0;
+  }
+
+  groups(document) {
+    return this._groups.filter(g => g.test(document));
   }
 
   get realms() {
@@ -233,9 +242,11 @@ module.exports = class ContentType {
     let resource = pendingChange.finalDocument;
     let session = context.session || Session.EVERYONE;
     let userRealms = await session.realms();
-    if (this.realms.mayReadAllFields(pendingChange.finalDocument, userRealms)) {
+
+    if (this.realms.mayReadAllFields(resource, userRealms)) {
       return;
     }
+
     for (let section of ['attributes', 'relationships']) {
       if (resource[section]) {
         for (let fieldName of Object.keys(resource[section])) {
@@ -247,8 +258,6 @@ module.exports = class ContentType {
       }
     }
   }
-
-
 };
 
 function tagFieldErrors(field, errors) {

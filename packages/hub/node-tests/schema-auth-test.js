@@ -48,10 +48,17 @@ describe('schema/auth/write', function() {
         ]),
       ]);
 
+    factory.addResource('content-types', 'test-users');
+
     factory.addResource('content-types', 'events')
       .withRelated('fields', [
         factory.getResource('fields', 'title')
       ]);
+
+    factory.addResource('groups', 'people').withAttributes({
+      searchQuery: { filter: { type: { exact: ['authors', 'test-users'] } } }
+    });
+
     let registry = new Registry();
     registry.register('config:project', { path: `${__dirname}/../../../tests/stub-project` });
     loader = new Container(registry).lookup('hub:schema-loader');
@@ -66,7 +73,18 @@ describe('schema/auth/write', function() {
     factory.addResource('grants').withAttributes({
       mayReadResource: true,
       mayReadFields: true
-    }).withRelated('who', everyone);
+    }).withRelated('who', [everyone]);
+  }
+
+  function makeSession(schema, { type, id }) {
+    let ownRealm = Session.encodeBaseRealm(type, id);
+    return new Session({ type, id }, {
+      get(type, id) {
+        if (type === 'user-realms' && id === ownRealm) {
+          return schema.userRealms({ type, id });
+        }
+      }
+    });
   }
 
   it("attempting to create a thing you can't read results in Not Found", async function() {
@@ -99,7 +117,7 @@ describe('schema/auth/write', function() {
 
   it("everyone grant allows creation when there's no session", async function() {
     allReadable();
-    factory.addResource('grants').withAttributes({ mayCreateResource: true }).withRelated('who', everyone);
+    factory.addResource('grants').withAttributes({ mayCreateResource: true }).withRelated('who', [everyone]);
     let schema = await loader.loadFrom(factory.getModels());
     let action = create({
       type: 'articles'
@@ -110,19 +128,19 @@ describe('schema/auth/write', function() {
 
   it("everyone grant allows creation when there's some session", async function() {
     allReadable();
-    factory.addResource('grants').withAttributes({ mayCreateResource: true }).withRelated('who', everyone);
+    factory.addResource('grants').withAttributes({ mayCreateResource: true }).withRelated('who', [everyone]);
     let schema = await loader.loadFrom(factory.getModels());
     let action = create({
       type: 'articles'
     });
-    let session = new Session({ id: '0' }, null, { id: '0' });
+    let session = makeSession(schema, { type: 'test-users', id: '0' });
     let errors = await schema.validationErrors(action, { session });
     expect(errors).deep.equal([]);
   });
 
   it("user-provided id denied without a grant", async function() {
     allReadable();
-    factory.addResource('grants').withAttributes({ mayCreateResource: true }).withRelated('who', everyone);
+    factory.addResource('grants').withAttributes({ mayCreateResource: true }).withRelated('who', [everyone]);
     let schema = await loader.loadFrom(factory.getModels());
     let action = create({
       type: 'articles',
@@ -136,8 +154,8 @@ describe('schema/auth/write', function() {
   });
 
   it("user-provided id approved with a grant", async function() {
-    factory.addResource('grants').withAttributes({ mayCreateResource: true, mayReadResource: true }).withRelated('who', everyone);
-    factory.addResource('grants').withAttributes({ mayWriteFields: true }).withRelated('who', everyone)
+    factory.addResource('grants').withAttributes({ mayCreateResource: true, mayReadResource: true }).withRelated('who', [everyone]);
+    factory.addResource('grants').withAttributes({ mayWriteFields: true }).withRelated('who', [everyone])
       .withRelated('fields', [
         factory.getResource('fields', 'id')
       ]);
@@ -154,12 +172,12 @@ describe('schema/auth/write', function() {
   it("user-specific grant allows creation", async function() {
     allReadable();
     factory.addResource('grants').withAttributes({ mayCreateResource: true })
-      .withRelated('who', { type: 'groups', id: '0' });
+      .withRelated('who', [{ type: 'test-users', id: '0' }]);
     let schema = await loader.loadFrom(factory.getModels());
     let action = create({
       type: 'articles'
     });
-    let session = new Session({ id: '0' }, null, { id: '0' });
+    let session = makeSession(schema, { type: 'test-users', id: '0' });
     let errors = await schema.validationErrors(action, { session });
     expect(errors).deep.equal([]);
   });
@@ -167,13 +185,13 @@ describe('schema/auth/write', function() {
   it("id-dependent grant allows creation", async function() {
     allReadable();
     factory.addResource('grants').withAttributes({ mayCreateResource: true, mayWriteFields: true })
-      .withRelated('who', { type: 'fields', id: 'id' });
+      .withRelated('who', [{ type: 'fields', id: 'id' }]);
     let schema = await loader.loadFrom(factory.getModels());
     let action = create({
-      type: 'articles',
+      type: 'authors',
       id: '123'
     });
-    let session = new Session({ id: '123' }, null, { id: '123' });
+    let session = makeSession(schema, { type: 'authors', id: '123' });
     let errors = await schema.validationErrors(action, { session });
     expect(errors).deep.equal([]);
   });
@@ -181,13 +199,13 @@ describe('schema/auth/write', function() {
   it("id-dependent grant rejects creation", async function() {
     allReadable();
     factory.addResource('grants').withAttributes({ mayCreateResource: true, mayWriteFields: true })
-      .withRelated('who', { type: 'fields', id: 'id' });
+      .withRelated('who', [{ type: 'fields', id: 'id' }]);
     let schema = await loader.loadFrom(factory.getModels());
     let action = create({
-      type: 'articles',
+      type: 'authors',
       id: '124'
     });
-    let session = new Session({ id: '123' }, null, { id: '123' });
+    let session = makeSession(schema, { type: 'authors', id: '123' });
     let errors = await schema.validationErrors(action, { session });
     expect(errors).collectionContains({
       status: 401,
@@ -198,15 +216,20 @@ describe('schema/auth/write', function() {
   it("attribute-dependent grant allows creation", async function() {
     allReadable();
     factory.addResource('grants').withAttributes({ mayCreateResource: true, mayWriteFields: true })
-      .withRelated('who', { type: 'fields', id: 'title' });
+      .withRelated('who', [{ type: 'fields', id: 'author' }]);
     let schema = await loader.loadFrom(factory.getModels());
     let action = create({
       type: 'articles',
       attributes: {
         title: '123'
+      },
+      relationships: {
+        author: {
+          data: { type: 'authors', id: '1' }
+        }
       }
     });
-    let session = new Session({ id: '123' }, null, { id: '123' });
+    let session = makeSession(schema, { type: 'authors', id: '1' }, null);
     let errors = await schema.validationErrors(action, { session });
     expect(errors).deep.equal([]);
   });
@@ -214,16 +237,20 @@ describe('schema/auth/write', function() {
   it("attribute-dependent grant rejects creation", async function() {
     allReadable();
     factory.addResource('grants').withAttributes({ mayCreateResource: true, mayWriteFields: true })
-      .withRelated('who', { type: 'fields', id: 'title' });
+      .withRelated('who', [{ type: 'fields', id: 'author' }]);
     let schema = await loader.loadFrom(factory.getModels());
     let action = create({
       type: 'articles',
       attributes: {
-        title: '124'
+        title: '123'
+      },
+      relationships: {
+        author: {
+          data: { type: 'authors', id: '2' }
+        }
       }
-
     });
-    let session = new Session({ id: '123' }, null, { id: '123' });
+    let session = makeSession(schema, { type: 'authors', id: '1' }, null);
     let errors = await schema.validationErrors(action, { session });
     expect(errors).collectionContains({
       status: 401,
@@ -231,11 +258,10 @@ describe('schema/auth/write', function() {
     });
   });
 
-
   it("user-specific grant doesn't match missing user", async function() {
     allReadable();
     factory.addResource('grants').withAttributes({ mayCreateResource: true })
-      .withRelated('who', { type: 'groups', id: '0' });
+      .withRelated('who', [{ type: 'test-users', id: '0' }]);
     let schema = await loader.loadFrom(factory.getModels());
     let action = create({
       type: 'articles',
@@ -251,13 +277,14 @@ describe('schema/auth/write', function() {
   it("user-specific grant doesn't match wrong user", async function() {
     allReadable();
     factory.addResource('grants').withAttributes({ mayCreateResource: true })
-      .withRelated('who', { type: 'groups', id: '0' });
+      .withRelated('who', [{ type: 'test-users', id: '0' }]);
     let schema = await loader.loadFrom(factory.getModels());
     let action = create({
       type: 'articles',
       id: '1'
     });
-    let errors = await schema.validationErrors(action, { user: { id: 1 }});
+    let session = makeSession(schema, { type: 'test-users', id: '123' });
+    let errors = await schema.validationErrors(action, { session });
     expect(errors).collectionContains({
       status: 401,
       detail: 'You may not create this resource'
@@ -267,7 +294,7 @@ describe('schema/auth/write', function() {
   it("allows by type", async function() {
     allReadable();
     factory.addResource('grants').withAttributes({ mayCreateResource: true })
-      .withRelated('who', everyone)
+      .withRelated('who', [everyone])
       .withRelated('types', [factory.getResource('content-types', 'articles')]);
     let schema = await loader.loadFrom(factory.getModels());
     let action = create({
@@ -280,7 +307,7 @@ describe('schema/auth/write', function() {
   it("forbids by type", async function() {
     allReadable();
     factory.addResource('grants').withAttributes({ mayCreateResource: true })
-      .withRelated('who', everyone)
+      .withRelated('who', [everyone])
       .withRelated('types', [factory.getResource('content-types', 'articles')]);
     let schema = await loader.loadFrom(factory.getModels());
     let action = create({
@@ -330,26 +357,30 @@ describe('schema/auth/write', function() {
     });
   });
 
-  it("forbids update when attribute-dependent grant does not match initial state", async function() {
-    factory.addResource('grants').withAttributes({ mayReadResource: true })
-      .withRelated('who', everyone);
+  it("forbids update when attribute-dependent grant matches only the final state", async function() {
+    factory.addResource('grants').withAttributes({ mayReadResource: true, mayReadFields: true })
+      .withRelated('who', [everyone]);
     factory.addResource('grants').withAttributes({ mayUpdateResource: true, mayWriteFields: true })
-      .withRelated('who', { type: 'fields', id: 'title' });
+      .withRelated('who', [{ type: 'fields', id: 'author' }]);
     let schema = await loader.loadFrom(factory.getModels());
     let action = update({
       type: 'articles',
       id: '1',
-      attributes: {
-        title: '124'
+      relationships: {
+        author: {
+          data: { type: 'authors', id: '2' }
+        }
       }
     },{
       type: 'articles',
       id: '1',
-      attributes: {
-        title: '123'
+      relationships: {
+        author: {
+          data: { type: 'authors', id: '1' }
+        }
       }
     });
-    let session = new Session({ id: '123' }, null, { id: '123' });
+    let session = makeSession(schema, { type: 'authors', id: '1' });
     let errors = await schema.validationErrors(action, { session });
     expect(errors).collectionContains({
       status: 401,
@@ -358,42 +389,48 @@ describe('schema/auth/write', function() {
   });
 
   it("allows update when attribute-dependent grant matches initial state", async function() {
-    factory.addResource('grants').withAttributes({ mayReadResource: true })
-      .withRelated('who', everyone);
+    factory.addResource('grants').withAttributes({ mayReadResource: true, mayReadFields: true })
+      .withRelated('who', [everyone]);
     factory.addResource('grants').withAttributes({ mayUpdateResource: true, mayWriteFields: true })
-      .withRelated('who', { type: 'fields', id: 'title' });
+      .withRelated('who', [{ type: 'fields', id: 'author' }]);
     let schema = await loader.loadFrom(factory.getModels());
     let action = update({
       type: 'articles',
       id: '1',
-      attributes: {
-        title: '123'
+      relationships: {
+        author: {
+          data: { type: 'authors', id: '2' }
+        }
       }
     },{
       type: 'articles',
       id: '1',
-      attributes: {
-        title: '124'
+      relationships: {
+        author: {
+          data: { type: 'authors', id: '1' }
+        }
       }
     });
-    let session = new Session({ id: '123' }, null, { id: '123' });
+    let session = makeSession(schema, { type: 'authors', id: '2' });
     let errors = await schema.validationErrors(action, { session });
-    expect(errors).collectionContains({
-      status: 401,
-      detail: 'You may not update this resource'
-    });
+    expect(errors).deep.equals([]);
   });
 
   it("forbids deletion when attribute-dependent grant does not match", async function() {
-    factory.addResource('grants').withAttributes({ mayDeleteResource: true })
-      .withRelated('who', { type: 'fields', id: 'title' });
+    factory.addResource('grants').withAttributes({ mayDeleteResource: true, mayReadFields: true })
+      .withRelated('who', [{ type: 'fields', id: 'author' }]);
 
     let schema = await loader.loadFrom(factory.getModels());
     let action = deleteIt({
       type: 'articles',
-      id: '1'
+      id: '1',
+      relationships: {
+        author: {
+          data: { type: 'authors', id: '124' }
+        }
+      }
     });
-    let session = new Session({ id: '123' }, null, { id: '123' });
+    let session = makeSession(schema, { type: 'authors', id: '123' });
     let errors = await schema.validationErrors(action, { session });
     expect(errors).collectionContains({
       status: 401,
@@ -403,7 +440,7 @@ describe('schema/auth/write', function() {
 
   it("allows deletion when attribute-dependent grant matches", async function() {
     factory.addResource('grants').withAttributes({ mayDeleteResource: true })
-      .withRelated('who', { type: 'fields', id: 'title' });
+      .withRelated('who', [{ type: 'fields', id: 'author' }]);
 
     let schema = await loader.loadFrom(factory.getModels());
     let action = deleteIt({
@@ -411,9 +448,14 @@ describe('schema/auth/write', function() {
       id: '1',
       attributes: {
         title: '123'
+      },
+      relationships: {
+        author: {
+          data: { type: 'authors', id: '123' }
+        }
       }
     });
-    let session = new Session({ id: '123' }, null, { id: '123' });
+    let session = makeSession(schema, { type: 'authors', id: '123' });
     let errors = await schema.validationErrors(action, { session });
     expect(errors).deep.equal([]);
   });
@@ -421,7 +463,7 @@ describe('schema/auth/write', function() {
 
   it("approves field write at creation via grant", async function () {
     allReadable();
-    factory.addResource('grants').withAttributes({ mayCreateResource: true, mayWriteFields: true }).withRelated('who', everyone);
+    factory.addResource('grants').withAttributes({ mayCreateResource: true, mayWriteFields: true }).withRelated('who', [everyone]);
     let schema = await loader.loadFrom(factory.getModels());
     let action = create({
       type: 'articles',
@@ -436,7 +478,7 @@ describe('schema/auth/write', function() {
 
   it("approves null field write at creation when no default is set", async function () {
     allReadable();
-    factory.addResource('grants').withAttributes({ mayCreateResource: true }).withRelated('who', everyone);
+    factory.addResource('grants').withAttributes({ mayCreateResource: true }).withRelated('who', [everyone]);
     let schema = await loader.loadFrom(factory.getModels());
     let action = create({
       type: 'articles',
@@ -450,7 +492,7 @@ describe('schema/auth/write', function() {
 
   it("rejects null field write at creation when default is set", async function () {
     allReadable();
-    factory.addResource('grants').withAttributes({ mayCreateResource: true }).withRelated('who', everyone);
+    factory.addResource('grants').withAttributes({ mayCreateResource: true }).withRelated('who', [everyone]);
     let schema = await loader.loadFrom(factory.getModels());
     let action = create({
       type: 'articles',
@@ -469,7 +511,7 @@ describe('schema/auth/write', function() {
 
   it("approves field write at creation when it matches default value", async function () {
     allReadable();
-    factory.addResource('grants').withAttributes({ mayCreateResource: true }).withRelated('who', everyone);
+    factory.addResource('grants').withAttributes({ mayCreateResource: true }).withRelated('who', [everyone]);
     let schema = await loader.loadFrom(factory.getModels());
     let action = create({
       type: 'articles',
@@ -484,7 +526,7 @@ describe('schema/auth/write', function() {
 
   it("rejects field write at creation", async function () {
     allReadable();
-    factory.addResource('grants').withAttributes({ mayCreateResource: true }).withRelated('who', everyone);
+    factory.addResource('grants').withAttributes({ mayCreateResource: true }).withRelated('who', [everyone]);
     let schema = await loader.loadFrom(factory.getModels());
     let action = create({
       type: 'articles',
@@ -502,7 +544,7 @@ describe('schema/auth/write', function() {
 
   it("approves field write at update via grant", async function () {
     allReadable();
-    factory.addResource('grants').withAttributes({ mayUpdateResource: true, mayWriteFields: true }).withRelated('who', everyone);
+    factory.addResource('grants').withAttributes({ mayUpdateResource: true, mayWriteFields: true }).withRelated('who', [everyone]);
     let schema = await loader.loadFrom(factory.getModels());
     let action = update({
       type: 'articles',
@@ -524,7 +566,7 @@ describe('schema/auth/write', function() {
   it("approves via a field-specific grant", async function () {
     allReadable();
     factory.addResource('grants').withAttributes({ mayUpdateResource: true, mayWriteFields: true })
-      .withRelated('who', everyone)
+      .withRelated('who', [everyone])
       .withRelated('fields', [
         factory.getResource('fields', 'coolness')
       ]);
@@ -549,7 +591,7 @@ describe('schema/auth/write', function() {
   it("approves via a field-specific grant for a record that has a relationship", async function () {
     allReadable();
     factory.addResource('grants').withAttributes({ mayUpdateResource: true, mayWriteFields: true })
-      .withRelated('who', everyone)
+      .withRelated('who', [everyone])
       .withRelated('fields', [
         factory.getResource('fields', 'coolness')
       ]);
@@ -591,7 +633,7 @@ describe('schema/auth/write', function() {
   it("rejects via a field-specific grant an update to a relationship", async function() {
     allReadable();
     factory.addResource('grants').withAttributes({ mayUpdateResource: true, mayWriteFields: true })
-      .withRelated('who', everyone)
+      .withRelated('who', [everyone])
       .withRelated('fields', [
         factory.getResource('fields', 'coolness')
       ]);
@@ -636,7 +678,7 @@ describe('schema/auth/write', function() {
   it("approves via a field-specific grant an update to a relationship", async function() {
     allReadable();
     factory.addResource('grants').withAttributes({ mayUpdateResource: true, mayWriteFields: true })
-      .withRelated('who', everyone)
+      .withRelated('who', [everyone])
       .withRelated('fields', [
         factory.getResource('fields', 'author')
       ]);
@@ -685,7 +727,7 @@ describe('schema/auth/write', function() {
   it("approves via a field-specific grant for a update to a record that has an object type field", async function () {
     allReadable();
     factory.addResource('grants').withAttributes({ mayUpdateResource: true, mayWriteFields: true })
-      .withRelated('who', everyone)
+      .withRelated('who', [everyone])
       .withRelated('fields', [
         factory.getResource('fields', 'coolness')
       ]);
@@ -712,7 +754,7 @@ describe('schema/auth/write', function() {
   it("rejects via a field-specific grant an update to an object type field", async function() {
     allReadable();
     factory.addResource('grants').withAttributes({ mayUpdateResource: true, mayWriteFields: true })
-      .withRelated('who', everyone)
+      .withRelated('who', [everyone])
       .withRelated('fields', [
         factory.getResource('fields', 'coolness')
       ]);
@@ -742,7 +784,7 @@ describe('schema/auth/write', function() {
   it("approves via a field-specific grant an update to an object type field", async function() {
     allReadable();
     factory.addResource('grants').withAttributes({ mayUpdateResource: true, mayWriteFields: true })
-      .withRelated('who', everyone)
+      .withRelated('who', [everyone])
       .withRelated('fields', [
         factory.getResource('fields', 'misc')
       ]);
@@ -767,7 +809,7 @@ describe('schema/auth/write', function() {
   it("rejects a non-matching field-specific grant", async function () {
     allReadable();
     factory.addResource('grants').withAttributes({ mayUpdateResource: true, mayWriteFields: true })
-      .withRelated('who', everyone)
+      .withRelated('who', [everyone])
       .withRelated('fields', [
         factory.getResource('fields', 'coolness')
       ]);
@@ -792,7 +834,7 @@ describe('schema/auth/write', function() {
 
   it("approves field write at update via unchanged value", async function () {
     allReadable();
-    factory.addResource('grants').withAttributes({ mayUpdateResource: true }).withRelated('who', everyone);
+    factory.addResource('grants').withAttributes({ mayUpdateResource: true }).withRelated('who', [everyone]);
     let schema = await loader.loadFrom(factory.getModels());
     let action = update({
       type: 'articles',
@@ -813,7 +855,7 @@ describe('schema/auth/write', function() {
 
   it("approves field write at update when it matches default", async function () {
     allReadable();
-    factory.addResource('grants').withAttributes({ mayUpdateResource: true }).withRelated('who', everyone);
+    factory.addResource('grants').withAttributes({ mayUpdateResource: true }).withRelated('who', [everyone]);
     let schema = await loader.loadFrom(factory.getModels());
     let action = update({
       type: 'articles',
@@ -834,7 +876,7 @@ describe('schema/auth/write', function() {
 
   it("allows inclusion of non-changed field updateDefault will change it", async function () {
     allReadable();
-    factory.addResource('grants').withAttributes({ mayUpdateResource: true }).withRelated('who', everyone);
+    factory.addResource('grants').withAttributes({ mayUpdateResource: true }).withRelated('who', [everyone]);
     let schema = await loader.loadFrom(factory.getModels());
     let action = update({
       type: 'articles',
@@ -856,7 +898,7 @@ describe('schema/auth/write', function() {
 
   it("rejects write of field that differs from updateDefault", async function () {
     allReadable();
-    factory.addResource('grants').withAttributes({ mayUpdateResource: true }).withRelated('who', everyone);
+    factory.addResource('grants').withAttributes({ mayUpdateResource: true }).withRelated('who', [everyone]);
     let schema = await loader.loadFrom(factory.getModels());
     let action = update({
       type: 'articles',
@@ -880,7 +922,7 @@ describe('schema/auth/write', function() {
 
   it("rejects field write at update", async function () {
     allReadable();
-    factory.addResource('grants').withAttributes({ mayUpdateResource: true }).withRelated('who', everyone);
+    factory.addResource('grants').withAttributes({ mayUpdateResource: true }).withRelated('who', [everyone]);
     let schema = await loader.loadFrom(factory.getModels());
     let action = update({
       type: 'articles',
@@ -907,7 +949,7 @@ describe('schema/auth/write', function() {
     // things you are creating or updating. This is because we're
     // going to echo the results back to you, and we don't want there
     // to be any ambiguity that would allow secrets to leak.
-    factory.addResource('grants').withAttributes({ mayCreateResource: true }).withRelated('who', everyone);
+    factory.addResource('grants').withAttributes({ mayCreateResource: true }).withRelated('who', [everyone]);
     let schema = await loader.loadFrom(factory.getModels());
     let action = create({
       type: 'articles',
@@ -928,7 +970,7 @@ describe('schema/auth/write', function() {
     // things you are creating or updating . This is because we're
     // going to echo the results back to you, and we don't want there
     // to be any ambiguity that would allow secrets to leak.
-    factory.addResource('grants').withAttributes({ mayUpdateResource: true }).withRelated('who', everyone);
+    factory.addResource('grants').withAttributes({ mayUpdateResource: true }).withRelated('who', [everyone]);
     let schema = await loader.loadFrom(factory.getModels());
     let action = update({
       type: 'articles',
@@ -951,8 +993,8 @@ describe('schema/auth/write', function() {
   });
 
   it("does not leak existence of fields you're not authorized to read, even if they are unchanged, during create", async function() {
-    factory.addResource('grants').withAttributes({ mayReadResource: true }).withRelated('who', everyone);
-    factory.addResource('grants').withAttributes({ mayCreateResource: true, mayWriteFields: true }).withRelated('who', everyone);
+    factory.addResource('grants').withAttributes({ mayReadResource: true }).withRelated('who', [everyone]);
+    factory.addResource('grants').withAttributes({ mayCreateResource: true, mayWriteFields: true }).withRelated('who', [everyone]);
     let schema = await loader.loadFrom(factory.getModels());
     let action = create({
       type: 'articles',
@@ -976,8 +1018,8 @@ describe('schema/auth/write', function() {
   });
 
   it("does not leak existence of fields you're not authorized to read during create", async function() {
-    factory.addResource('grants').withAttributes({ mayReadResource: true }).withRelated('who', everyone);
-    factory.addResource('grants').withAttributes({ mayCreateResource: true, mayWriteFields: true }).withRelated('who', everyone);
+    factory.addResource('grants').withAttributes({ mayReadResource: true }).withRelated('who', [everyone]);
+    factory.addResource('grants').withAttributes({ mayCreateResource: true, mayWriteFields: true }).withRelated('who', [everyone]);
     let schema = await loader.loadFrom(factory.getModels());
     let action = create({
       type: 'articles',
@@ -1001,8 +1043,8 @@ describe('schema/auth/write', function() {
   });
 
   it("does not leak other errors for fields you're not authorized to read, during create", async function() {
-    factory.addResource('grants').withAttributes({ mayReadResource: true }).withRelated('who', everyone);
-    factory.addResource('grants').withAttributes({ mayCreateResource: true, mayWriteFields: true }).withRelated('who', everyone);
+    factory.addResource('grants').withAttributes({ mayReadResource: true }).withRelated('who', [everyone]);
+    factory.addResource('grants').withAttributes({ mayCreateResource: true, mayWriteFields: true }).withRelated('who', [everyone]);
     let schema = await loader.loadFrom(factory.getModels());
     let action = create({
       type: 'articles',
@@ -1022,8 +1064,8 @@ describe('schema/auth/write', function() {
 
 
   it("does not leak existence of fields you're not authorized to read, even if they are unchanged, during update", async function() {
-    factory.addResource('grants').withAttributes({ mayReadResource: true }).withRelated('who', everyone);
-    factory.addResource('grants').withAttributes({ mayUpdateResource: true, mayWriteFields: true }).withRelated('who', everyone);
+    factory.addResource('grants').withAttributes({ mayReadResource: true }).withRelated('who', [everyone]);
+    factory.addResource('grants').withAttributes({ mayUpdateResource: true, mayWriteFields: true }).withRelated('who', [everyone]);
     let schema = await loader.loadFrom(factory.getModels());
     let action = update({
       type: 'articles',
@@ -1046,8 +1088,8 @@ describe('schema/auth/write', function() {
   });
 
   it("does not leak existence of fields you're not authorized to read, during update", async function() {
-    factory.addResource('grants').withAttributes({ mayReadResource: true }).withRelated('who', everyone);
-    factory.addResource('grants').withAttributes({ mayUpdateResource: true, mayWriteFields: true }).withRelated('who', everyone);
+    factory.addResource('grants').withAttributes({ mayReadResource: true }).withRelated('who', [everyone]);
+    factory.addResource('grants').withAttributes({ mayUpdateResource: true, mayWriteFields: true }).withRelated('who', [everyone]);
     let schema = await loader.loadFrom(factory.getModels());
     let action = update({
       type: 'articles',
@@ -1077,8 +1119,8 @@ describe('schema/auth/write', function() {
   });
 
   it("does not leak other errors for fields you're not authorized to read, during update", async function() {
-    factory.addResource('grants').withAttributes({ mayReadResource: true }).withRelated('who', everyone);
-    factory.addResource('grants').withAttributes({ mayUpdateResource: true, mayWriteFields: true }).withRelated('who', everyone);
+    factory.addResource('grants').withAttributes({ mayReadResource: true }).withRelated('who', [everyone]);
+    factory.addResource('grants').withAttributes({ mayUpdateResource: true, mayWriteFields: true }).withRelated('who', [everyone]);
     let schema = await loader.loadFrom(factory.getModels());
     let action = update({
       type: 'articles',

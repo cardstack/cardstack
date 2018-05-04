@@ -23,6 +23,7 @@ function isPartialSession(doc) {
 
 module.exports = declareInjections({
   encryptor: 'hub:encryptor',
+  sessions: 'hub:sessions',
   searcher: 'hub:searchers',
   writer: 'hub:writers',
   indexers: 'hub:indexers',
@@ -64,7 +65,7 @@ class Authentication {
       if (validUntil <= Date.now()/1000) {
         log.debug("Ignoring expired token");
       } else {
-        return new Session(sessionPayload, this.userSearcher);
+        return this.sessions.create(sessionPayload.type, sessionPayload.id);
       }
     } catch (err) {
       if (/unable to authenticate data|invalid key length|Not a valid signed message/.test(err.message)) {
@@ -156,7 +157,7 @@ class Authentication {
 
   async _generateSession(ctxt, user, tokenExpirySeconds=24*3600) {
     let sessionPayload = { id: user.data.id, type: user.data.type };
-    let session = new Session(sessionPayload, this.userSearcher);
+    let session = this.sessions.create(sessionPayload.type, sessionPayload.id);
 
     let schema = await this.currentSchema.forControllingBranch();
     let canLogin = await schema.hasLoginAuthorization(session);

@@ -16,7 +16,7 @@ describe('authentication/middleware', function() {
     let factory = new JSONAPIFactory();
 
     factory.addResource('grants')
-      .withRelated('who', { type: 'fields', id: 'id' })
+      .withRelated('who', [{ type: 'fields', id: 'id' }])
       .withRelated('types', [
         { type: 'content-types', id: 'test-users' },
         { type: 'content-types', id: 'doggies' }
@@ -32,7 +32,7 @@ describe('authentication/middleware', function() {
       });
 
     factory.addResource('grants')
-      .withRelated('who', { type: 'groups', id: 'everyone' })
+      .withRelated('who', [{ type: 'groups', id: 'everyone' }])
       .withAttributes({
         mayLogin: true
       });
@@ -241,7 +241,7 @@ describe('authentication/middleware', function() {
             "full-name": "@cardstack/hub/authentication",
           },
           "id": "@cardstack/hub",
-          "type": "users",
+          "type": "groups",
         },
         "userId": "@cardstack/hub"
       });

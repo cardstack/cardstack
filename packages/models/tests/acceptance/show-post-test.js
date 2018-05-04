@@ -27,7 +27,7 @@ module('Acceptance | show post', function(hooks) {
           mayUpdateResource: true,
           mayDeleteResource: true
         })
-        .withRelated('who', { type: 'groups', id: 'everyone' });
+        .withRelated('who', [{ type: 'groups', id: 'everyone' }]);
     },
 
     destroy() {
