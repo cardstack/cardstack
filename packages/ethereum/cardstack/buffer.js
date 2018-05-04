@@ -40,7 +40,7 @@ class EthereumBuffer {
     this.client = null;
     this.contractDefinitions = {};
     this.contractName = null;
-    this._bufferedLoadPromise = null; // expose this promise to the tests
+    this._flushedPromise = null;
     this._setupPromise = this._ensureClient();
     this._processingHints = [];
     this.bulkOps = null;
@@ -56,9 +56,13 @@ class EthereumBuffer {
     await this.ethereumService.start({ name, contract, buffer: this });
   }
 
+  async flush() {
+    return this._flushedPromise;
+  }
+
   loadModels(contractName, blockHeights, hints) {
     // we are intentionally not returning this promise, but rather save it for our tests to use
-    this._bufferedLoadPromise = Promise.resolve(this._bufferedLoadPromise)
+    this._flushedPromise = Promise.resolve(this._flushedPromise)
       .then(() => this._processHints({contractName, blockHeights, hints }));
   }
 
