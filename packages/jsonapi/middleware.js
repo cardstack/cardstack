@@ -36,7 +36,7 @@ function jsonapiMiddleware(searcher, writers, indexers) {
   if (options.prefix) {
     prefixPattern = new RegExp(`^/${options.prefix}/?(.*)`);
   }
-  let body = koaJSONBody({ limit: '1mb' });
+  let body = koaJSONBody({ limit: '16mb' });
 
   return async (ctxt, next) => {
     if (prefixPattern) {
