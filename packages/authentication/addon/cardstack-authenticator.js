@@ -58,6 +58,11 @@ export default Base.extend({
       },
       body: JSON.stringify(payload)
     }).then(response => {
+      if (response.status === 401) {
+        return response.json().then(body => {
+          throw new Error(body.errors[0].detail);
+        })
+      }
       if (response.status !== 200) {
         throw new Error("Authentication attempt failed");
       }

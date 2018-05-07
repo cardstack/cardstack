@@ -14,7 +14,13 @@ export default Service.extend({
   login: task(function * (mockUserId) {
     mockUserId = this.get('mockUserId') || mockUserId;
     if (mockUserId ) {
-      yield this.get('session').authenticate('authenticator:cardstack', this.get('source'), { authorizationCode: mockUserId });
+      let message;
+
+      try {
+        yield this.get('session').authenticate('authenticator:cardstack', this.get('source'), { authorizationCode: mockUserId });
+      } catch(err) {
+        message = err.message;
+      }
 
       let session = get(this, 'cardstackSession');
       let onAuthenticationHandler = get(this, 'authenticationHandler');
@@ -28,9 +34,9 @@ export default Service.extend({
         onPartialAuthenticationHandler === 'function') {
         onPartialAuthenticationHandler(session);
       } else if (!get(session, 'isAuthenticated') &&
-        !get(session, 'isPartiallyAuthenticated') &&
+        !get(session, 'isPartiallyAuthenticated') && typeof
         onAuthenticationFailedHandler === 'function') {
-        onAuthenticationFailedHandler();
+        onAuthenticationFailedHandler(message);
       }
     }
   }).drop()
