@@ -15,8 +15,16 @@ module.exports = class EmailMessenger {
         throw new Error(`Could not find defaultFrom in message sink params`);
       }
 
+      let config = { apiVersion: '2010-12-01' };
+
+      if (process.env.SES_REGION) {
+        config.region = process.env.SES_REGION;
+      }
+
+      log.debug(`Configuring email messenger using SES with config ${JSON.stringify(config,null,2)}`);
+
       this.transporter = nodemailer.createTransport({
-        SES: new aws.SES({ apiVersion: '2010-12-01' })
+        SES: new aws.SES(config)
       }, {
         from: params.defaultFrom
       });
@@ -27,6 +35,9 @@ module.exports = class EmailMessenger {
           throw new Error(`Could not find ${prop} in message sink params`);
         }
       });
+
+      log.debug(`Configuring email messenger using SMTP with host: ${params.smtpHost}, user: ${params.smtpUser}, defaultFrom: ${params.defaultFrom} (password not logged)`);
+
       this.transporter = nodemailer.createTransport({
         host: params.smtpHost,
         auth: {
