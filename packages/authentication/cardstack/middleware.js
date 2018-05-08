@@ -140,6 +140,11 @@ class Authentication {
           if (!user) { throw new Error(`cant find user type ${session.type} id ${session.id}`); }
 
           await this._generateSession(ctxt, user);
+
+          let m = bearerTokenPattern.exec(ctxt.header['authorization']);
+          if (m) {
+            ctxt.body.data.meta['prevToken'] = m[1];
+          }
         });
       }
     ]));
