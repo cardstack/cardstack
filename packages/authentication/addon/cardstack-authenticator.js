@@ -6,7 +6,7 @@ import RSVP from 'rsvp';
 import { hubURL } from '@cardstack/plugin-utils/environment';
 
 const clientId = Math.floor(Math.random() * 10000000000);
-const validTokenGracePeriod = 30 * 1000;
+const validTokenGracePeriod = 10 * 1000;
 
 export default Base.extend({
   cardstackSession: service(),
