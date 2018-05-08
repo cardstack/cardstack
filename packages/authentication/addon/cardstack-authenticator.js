@@ -1,8 +1,12 @@
 import { warn } from '@ember/debug';
 import { inject as service } from '@ember/service';
+import { get } from '@ember/object';
 import Base from 'ember-simple-auth/authenticators/base';
 import RSVP from 'rsvp';
 import { hubURL } from '@cardstack/plugin-utils/environment';
+
+const clientId = Math.floor(Math.random() * 10000000000);
+const validTokenGracePeriod = 30 * 1000;
 
 export default Base.extend({
   cardstackSession: service(),
@@ -15,6 +19,17 @@ export default Base.extend({
         rawSession.data.meta.validUntil &&
         rawSession.data.meta.validUntil > Date.now() / 1000;
 
+      let { token:prevToken,
+            clientId:tokenClientId,
+            issued:tokenIssued } = JSON.parse(localStorage.getItem('cardstack-prev-token') || "{}");
+      if (prevToken &&
+          prevToken === get(rawSession, 'data.meta.prevToken') &&
+          clientId !== tokenClientId &&
+          (Date.now() - tokenIssued) < validTokenGracePeriod) {
+        // cardstack app is running in another tab, just return the session you have
+        resolve(rawSession);
+        return;
+      }
       let partialSession =
         rawSession.meta &&
         rawSession.meta['partial-session'];
@@ -35,6 +50,11 @@ export default Base.extend({
           headers: { 'authorization': `Bearer ${token}` }
         }).then(response => {
           if (response.status === 200) {
+            localStorage.setItem('cardstack-prev-token', JSON.stringify({
+              token,
+              clientId,
+              issued: Date.now()
+            }));
             localStorage.setItem('cardstack-authentication-source', authenticationSource);
             resolve(response.json());
           } else {
