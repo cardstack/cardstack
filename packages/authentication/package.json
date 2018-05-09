@@ -1,6 +1,6 @@
 {
   "name": "@cardstack/authentication",
-  "version": "0.7.6",
+  "version": "0.7.7",
   "description": "Authentication infrastructure for Cardstack.",
   "keywords": [
     "ember-addon",
