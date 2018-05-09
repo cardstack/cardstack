@@ -95,6 +95,7 @@ class Authentication {
   _tokenVerifier() {
     return async (ctxt, next) => {
       log.trace(`client X-Forwarded-For header: ${ctxt.header['X-Forwarded-For']}`);
+      log.trace(`client X-Real-IP header: ${ctxt.header['X-Real-IP']}`);
       log.trace(`client IP address: ${ctxt.ip}`);
 
       let m = bearerTokenPattern.exec(ctxt.header['authorization']);
