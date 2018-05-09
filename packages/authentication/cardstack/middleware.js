@@ -94,6 +94,9 @@ class Authentication {
 
   _tokenVerifier() {
     return async (ctxt, next) => {
+      log.trace(`client X-Forwarded-For header: ${ctxt.header['X-Forwarded-For']}`);
+      log.trace(`client IP address: ${ctxt.ip}`);
+
       let m = bearerTokenPattern.exec(ctxt.header['authorization']);
       if (m) {
         let session = this._tokenToSession(m[1]);
