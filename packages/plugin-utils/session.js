@@ -5,11 +5,12 @@ class Session {
   //
   // optionalUser can be a jsonapi document representing that user (a
   // full document, including the top-level `data` property)
-  constructor(payload, userSearcher, optionalUser, optionalRealms) {
+  constructor(payload, userSearcher, optionalUser, optionalRealms, meta) {
     this.payload = payload;
     this.userSearcher = userSearcher;
     this._user = optionalUser;
     this._realms = optionalRealms;
+    this.meta = meta;
   }
   get id() {
     return this.payload.id;

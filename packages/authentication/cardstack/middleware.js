@@ -54,7 +54,7 @@ class Authentication {
     };
   }
 
-  _tokenToSession(token) {
+  async _tokenToSession(token, ctxt) {
     let ciSessionId = this.ciSession && this.ciSession.id;
     if (ciSessionId && token === ciSessionId) {
       return Session.INTERNAL_PRIVILEGED;
@@ -65,7 +65,8 @@ class Authentication {
       if (validUntil <= Date.now()/1000) {
         log.debug("Ignoring expired token");
       } else {
-        return this.sessions.create(sessionPayload.type, sessionPayload.id);
+        let sessionMeta = await this._sessionMeta(ctxt);
+        return this.sessions.create(sessionPayload.type, sessionPayload.id, sessionMeta);
       }
     } catch (err) {
       if (/unable to authenticate data|invalid key length|Not a valid signed message/.test(err.message)) {
@@ -99,7 +100,7 @@ class Authentication {
 
       let m = bearerTokenPattern.exec(ctxt.header['authorization']);
       if (m) {
-        let session = this._tokenToSession(m[1]);
+        let session = await this._tokenToSession(m[1], ctxt);
         if (session) {
           ctxt.state.cardstackSession = session;
         }
@@ -163,9 +164,28 @@ class Authentication {
     throw new Error(`No such authentication source "${name}"`, { status: 404 });
   }
 
+  async _sessionMeta(ctxt) {
+    let config, ip;
+
+    try {
+       config = await this.searcher.getFromControllingBranch(Session.INTERNAL_PRIVILEGED, 'plugin-configs', '@cardstack/authentication');
+    } catch (e) {
+      // no config for the authentication plugin, assume header should not be respected
+    }
+
+    if (config && config.data.attributes['plugin-config'] && config.data.attributes['plugin-config']['allow-x-forwarded-for']) {
+      ip = ctxt.header['x-forwarded-for'] || ctxt.ip;
+    } else {
+      ip = ctxt && ctxt.ip;
+    }
+
+    return {ip};
+  }
+
   async _generateSession(ctxt, user, tokenExpirySeconds=24*3600) {
     let sessionPayload = { id: user.data.id, type: user.data.type };
-    let session = this.sessions.create(sessionPayload.type, sessionPayload.id);
+    let sessionMeta = await this._sessionMeta();
+    let session = this.sessions.create(sessionPayload.type, sessionPayload.id, sessionMeta);
 
     let schema = await this.currentSchema.forControllingBranch();
     let canLogin = await schema.hasLoginAuthorization(session);
