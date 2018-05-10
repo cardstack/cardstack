@@ -81,11 +81,20 @@ async function makeServer(projectDir, encryptionKeys, dataSources, opts = {}) {
 
   log.info('Starting main hub server');
   let container = await wireItUp(projectDir, encryptionKeys, dataSources, opts);
-  let app = new Koa();
-  app.use(httpLogging);
-  app.use(container.lookup('hub:middleware-stack').middleware());
+  let app = await makeApp(container, dataSources);
   log.info('Main hub initialized');
   if (opts.containerized) { readyResolver(); }
+  return app;
+}
+
+async function makeApp(container, dataSources) {
+  let app = new Koa();
+  let hubConfig = dataSources.find(m => m.type === 'plugin-configs' && m.id === '@cardstack/hub');
+  if (hubConfig && hubConfig.attributes && hubConfig.attributes.params && hubConfig.attributes.params['behind-trusted-proxy'] != null) {
+    app.proxy = Boolean(hubConfig.attributes.params['behind-trusted-proxy']);
+  }
+  app.use(httpLogging);
+  app.use(container.lookup('hub:middleware-stack').middleware());
   return app;
 }
 
@@ -99,3 +108,4 @@ async function httpLogging(ctxt, next) {
 exports.wireItUp = wireItUp;
 exports.makeServer = makeServer;
 exports.loadSeeds = loadSeeds;
+exports.makeApp = makeApp;

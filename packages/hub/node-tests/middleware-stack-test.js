@@ -1,6 +1,5 @@
 const JSONAPIFactory = require('../../../tests/stub-middleware/node_modules/@cardstack/test-support/jsonapi-factory');
 const supertest = require('supertest');
-const Koa = require('koa');
 const {
   createDefaultEnvironment,
   destroyDefaultEnvironment
@@ -16,8 +15,7 @@ describe('middleware-stack', function() {
       enabled: false
     });
     env = await createDefaultEnvironment(__dirname + '/../../../tests/stub-middleware', factory.getModels());
-    let app = new Koa();
-    app.use(env.lookup('hub:middleware-stack').middleware());
+    let app = await env.makeApp(env);
     request = supertest(app.callback());
   }
 
@@ -69,6 +67,12 @@ describe('middleware-stack', function() {
       expect(response.body.state).has.property('thirdRan');
     });
 
+    it('does not respect x-forwarded-for by default', async function() {
+      let response = await request.get('/ip').set('X-Forwarded-For', '4.3.2.1');
+      expect(response).hasStatus(200);
+      expect(response.body.ip).to.not.equal('4.3.2.1');
+    });
+
   });
 
   describe('(dynamic)', function() {
@@ -96,6 +100,26 @@ describe('middleware-stack', function() {
       await env.lookup('hub:indexers').update({ forceRefresh: true });
       let response = await request.get('/first');
       expect(response).hasStatus(404);
+    });
+  });
+
+  describe('when configured to trust proxy', function() {
+    it('it uses x-forwarded-for header', async function() {
+      let factory = new JSONAPIFactory();
+      factory.addResource('plugin-configs', 'stub-middleware-extra').withAttributes({
+        enabled: false
+      });
+      factory.addResource('plugin-configs', '@cardstack/hub').withAttributes({
+        params: {
+          'behind-trusted-proxy': true
+        }
+      });
+      env = await createDefaultEnvironment(__dirname + '/../../../tests/stub-middleware', factory.getModels());
+      let app = await env.makeApp();
+      request = supertest(app.callback());
+      let response = await request.get('/ip').set('X-Forwarded-For', '4.3.2.1');
+      expect(response).hasStatus(200);
+      expect(response.body.ip).to.equal('4.3.2.1');
     });
 
   });

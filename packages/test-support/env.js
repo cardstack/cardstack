@@ -2,7 +2,7 @@ const temp = require('./temp-helper');
 const ElasticAssert = require('@cardstack/elasticsearch/test-support');
 const JSONAPIFactory = require('./jsonapi-factory');
 const crypto = require('crypto');
-const { wireItUp, loadSeeds } = require('@cardstack/hub/main');
+const { wireItUp, loadSeeds, makeApp } = require('@cardstack/hub/main');
 const { partition } = require('lodash');
 const defaultDataSourceId = 'default-data-source';
 
@@ -11,6 +11,30 @@ exports.defaultDataSourceId = defaultDataSourceId;
 exports.createDefaultEnvironment = async function(projectDir, initialModels = [], opts = {}) {
   let container;
   try {
+    let defaultDataSource = new JSONAPIFactory();
+
+    defaultDataSource.addResource('data-sources', defaultDataSourceId)
+      .withAttributes({
+        'source-type': '@cardstack/ephemeral'
+      });
+
+    let hubConfig = initialModels.find(m => m.type === 'plugin-configs' && m.id === '@cardstack/hub');
+    if (hubConfig) {
+      initialModels = initialModels.splice(initialModels.indexOf(hubConfig), 1);
+      if (!hubConfig.relationships) {
+        hubConfig.relationships = {};
+      }
+      if (!hubConfig.relationships['default-data-source']) {
+        hubConfig.relationships['default-data-source'] = { data: { type: 'data-sources', id: defaultDataSourceId }};
+      }
+      defaultDataSource.importModels([hubConfig]);
+    } else {
+      defaultDataSource.addResource('plugin-configs', '@cardstack/hub')
+        .withRelated(
+          'default-data-source', { type: 'data-sources', id: defaultDataSourceId }
+        );
+    }
+
     let factory = new JSONAPIFactory();
     factory.importModels(initialModels);
 
@@ -29,15 +53,6 @@ exports.createDefaultEnvironment = async function(projectDir, initialModels = []
       email: 'test@example.com'
     }).asDocument();
 
-    let defaultDataSource = new JSONAPIFactory();
-    defaultDataSource.addResource('plugin-configs', '@cardstack/hub')
-      .withRelated(
-        'default-data-source',
-        defaultDataSource.addResource('data-sources', defaultDataSourceId)
-          .withAttributes({
-            'source-type': '@cardstack/ephemeral'
-          })
-      );
 
     factory.addResource('grants')
       .withAttributes({
@@ -81,6 +96,9 @@ exports.createDefaultEnvironment = async function(projectDir, initialModels = []
         let m = plugins.lookupFeatureAndAssert('middleware', '@cardstack/test-support-authenticator');
         m.userId = id;
         m.type = type;
+      },
+      async makeApp() {
+        return makeApp(this, defaultDataSource.getModels());
       }
     });
     return container;

@@ -121,7 +121,8 @@ const models = [
     relationships: {
       fields: {
         data: [
-          { type: 'fields', id: 'enabled' }
+          { type: 'fields', id: 'enabled' },
+          { type: 'fields', id: 'params' }
         ]
       }
     }
