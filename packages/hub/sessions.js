@@ -26,7 +26,7 @@ class Sessions {
     return this._userSearcher;
   }
 
-  create(type, id) {
-    return new Session({ type, id }, this.userSearcher);
+  create(type, id, meta) {
+    return new Session({ type, id }, this.userSearcher, null, null, meta);
   }
 });
