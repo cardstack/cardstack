@@ -1,6 +1,7 @@
 'use strict';
 const Handlebars = require('handlebars');
 const log = require('@cardstack/logger')('cardstack/auth');
+const he = require('he');
 
 module.exports = {
   name: '@cardstack/authentication',
@@ -21,6 +22,9 @@ module.exports = {
     } else {
       let compiled = Handlebars.compile(userTemplate);
       let stringRewritten = compiled(externalUser);
+      // replace double quote HTML entities first with escaped quotes
+      // so we dont end up escaping legit JSON quotes
+      stringRewritten = he.decode(stringRewritten.replace(/&quot;/g, '\\"')).replace(/\s/g, ' ');
       try {
         rewritten = JSON.parse(stringRewritten);
       } catch (err) {
