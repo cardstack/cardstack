@@ -653,6 +653,30 @@ describe('authentication/middleware', function() {
         });
       });
 
+      it('can cleanse auth data from characters that would cause invalid JSON when creating user', async function() {
+        let response = await request.post(`/auth/create-via-template`).send({
+          id: '4321',
+          firstName: 'Spaces   vs\tTabs & stuff',
+          lastName: '"why tabs"\nO\'Reilley',
+          email: 'new@example.com'
+        });
+        expect(response).hasStatus(200);
+        expect(response.body).has.deep.property('data.meta.token');
+
+        await env.lookup('hub:indexers').update({ forceRefresh: true });
+
+        response = await request.get('/').set('authorization', `Bearer ${response.body.data.meta.token}`);
+        expect(response).hasStatus(200);
+        expect(response.body.userId).equals('my-prefix-4321');
+        expect(response.body.user).has.property('data');
+        expect(response.body.user.data).has.property('id', 'my-prefix-4321');
+        expect(response.body.user.data).has.property('type', 'test-users');
+        expect(response.body.user.data.attributes).deep.equals({
+          email: 'new@example.com',
+          'full-name': 'Spaces   vs Tabs & stuff "why tabs" O\'Reilley'
+        });
+      });
+
       it('can create a new user with automatic id', async function() {
         let response = await request.post(`/auth/create-via-template-no-id`).send({
           firstName: 'Newly',
