@@ -5,11 +5,9 @@ const bearerTokenPattern = /bearer +(.*)$/i;
 const compose = require('koa-compose');
 const route = require('koa-better-route');
 const koaJSONBody = require('koa-json-body');
-const Handlebars = require('handlebars');
 
 const { declareInjections } = require('@cardstack/di');
 const { withJsonErrorHandling } = Error;
-const { rewriteExternalUser } = require('..');
 
 function addCorsHeaders(response) {
   response.set('Access-Control-Allow-Origin', '*');
@@ -234,7 +232,8 @@ class Authentication {
       delete result.meta;
       user = result;
     } else {
-      let rewritten = rewriteExternalUser(result, source);
+      let rewritten = await source.rewriteExternalUser(result);
+      
       if (isPartialSession(rewritten)) {
         ctxt.body = rewritten;
         ctxt.status = 200;
@@ -282,10 +281,9 @@ class Authentication {
 
     let have;
     try {
-      let query = source['userCorrelationQuery'];
+      let query = await source.externalUserCorrelationQuery(user);
       if (query) {
-        let compiled = Handlebars.compile(query);
-        let searchResult = await this.userSearcher.search(JSON.parse(compiled(user)));
+        let searchResult = await this.userSearcher.search(query);
         if (searchResult.data.length > 0) {
           have = { data: searchResult.data[0] };
         }

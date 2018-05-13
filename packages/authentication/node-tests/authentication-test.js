@@ -89,7 +89,7 @@ describe('authentication/middleware', function() {
 
     factory.addResource('data-sources', 'id-rewriter').withAttributes({
       sourceType: 'stub-authenticators::echo',
-      userTemplate: '{ "data": { "id": "{{upstreamId}}", "type": "test-users" }}'
+      userRewriter: './rewriter1.js'
     });
 
     factory.addResource('data-sources', 'has-default-template').withAttributes({
@@ -99,26 +99,13 @@ describe('authentication/middleware', function() {
 
     factory.addResource('data-sources', 'create-via-template').withAttributes({
       sourceType: 'stub-authenticators::echo',
-      userTemplate: `{"data":{
-        "id": "my-prefix-{{id}}",
-        "type": "test-users",
-        "attributes": {
-          "full-name": "{{firstName}} {{lastName}}",
-          "email": "{{email}}"
-        }
-      }}`,
+      userRewriter: './rewriter2.js',
       mayCreateUser: true
     });
 
     factory.addResource('data-sources', 'create-via-template-no-id').withAttributes({
       sourceType: 'stub-authenticators::echo',
-      userTemplate: `{"data":{
-        "type": "test-users",
-        "attributes": {
-          "full-name": "{{firstName}} {{lastName}}",
-          "email": "{{email}}"
-        }
-      }}`,
+      userRewriter: './rewriter3.js',
       mayCreateUser: true
     });
 
@@ -130,20 +117,8 @@ describe('authentication/middleware', function() {
 
     factory.addResource('data-sources', 'correlate-doggies').withAttributes({
       sourceType: 'stub-authenticators::echo',
-      userTemplate: `{"data":{
-        "type": "doggies",
-        "attributes": {
-          "full-name": "{{data.attributes.fullName}}",
-          "email": "{{data.attributes.email}}"
-          {{#if data.attributes.secret-rating}}
-          ,"secret-rating": "{{data.attributes.secret-rating}}"
-          {{/if}}
-        }
-      }}`,
-      userCorrelationQuery: `{
-        "filter": { "email": { "exact": "{{data.attributes.email}}" } },
-        "page": { "size": 1 }
-      }`,
+      userRewriter: './rewriter4.js',
+      userCorrelationQuery: './query1.js',
       mayUpdateUser: true,
       mayCreateUser: true
     });
@@ -391,7 +366,7 @@ describe('authentication/middleware', function() {
         expect(response.body).has.deep.property('data.attributes.full-name', 'Mr X');
       });
 
-      it('applies userTemplate to rewrite ids', async function() {
+      it('applies userRewriter to rewrite ids', async function() {
         let response = await request.post(`/auth/id-rewriter`).send({
           upstreamId: arthur.id
         });
@@ -653,7 +628,7 @@ describe('authentication/middleware', function() {
         });
       });
 
-      it('can cleanse auth data from characters that would cause invalid JSON when creating user', async function() {
+      it('can accept auth data with characters that would cause invalid JSON when creating user', async function() {
         let response = await request.post(`/auth/create-via-template`).send({
           id: '4321',
           firstName: 'Spaces   vs\tTabs & stuff',
@@ -673,7 +648,7 @@ describe('authentication/middleware', function() {
         expect(response.body.user.data).has.property('type', 'test-users');
         expect(response.body.user.data.attributes).deep.equals({
           email: 'new@example.com',
-          'full-name': 'Spaces   vs Tabs & stuff "why tabs" O\'Reilley'
+          'full-name': 'Spaces   vs\tTabs & stuff "why tabs"\nO\'Reilley'
         });
       });
 
