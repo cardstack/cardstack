@@ -6,32 +6,31 @@ module.exports = class {
   }
   constructor(params) {
     this.users = params["users"];
+  }
 
-    this.defaultUserTemplate = `{
-      "data": {
-        "id": "{{id}}",
-        "type": "mock-users",
-        "attributes": {
-          "name": "{{name}}",
-          "email":"{{email}}",
-          "avatar-url":"{{{picture}}}",
-          "email-verified":{{#if verified}}true{{else}}false{{/if}}
-          {{#unless verified}}
-            ,
-            "message": {
-              "state": "verify-email",
-              "id": "{{id}}"
-            }
-          {{/unless}}
+  defaultUserRewriter(user) {
+    let output = {
+      data: {
+        id: user.id,
+        type: "mock-users",
+        attributes: {
+          name: user.name,
+          email: user.email,
+          "avatar-url": user.picture,
+          "email-verified": Boolean(user.verified)
         }
       }
-      {{#unless verified}}
-        ,
-        "meta": {
-          "partial-session": true
-        }
-      {{/unless}}
-    }`;
+    };
+    if (!user.verified) {
+      output.data.attributes.message = {
+        state: "verify-email",
+        id: user.id
+      };
+      output.data.meta = {
+        "partial-session": true
+      };
+    }
+    return output;
   }
 
   async authenticate(payload /*, userSearcher */) {

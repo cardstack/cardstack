@@ -6,8 +6,8 @@ module.exports = function({ dataSource, provideUserSchema }) {
     return [];
   }
 
-  if (dataSource.userTemplate){
-    log.warn("If you use a custom user-template on the github-auth data source, you should probably also set params.provideUserSchema=false and provide your own user model");
+  if (dataSource.userRewriter){
+    log.warn("If you use a custom user-rewriter on the github-auth data source, you should probably also set params.provideUserSchema=false and provide your own user model");
   }
 
   return [

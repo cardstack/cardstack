@@ -138,7 +138,7 @@ const models = [
         data: [
           { type: 'fields', id: 'source-type' },
           { type: 'fields', id: 'params' },
-          { type: 'fields', id: 'user-template' },
+          { type: 'fields', id: 'user-rewriter' },
           { type: 'fields', id: 'user-correlation-query' },
           { type: 'fields', id: 'may-create-user' },
           { type: 'fields', id: 'may-update-user' },
@@ -292,9 +292,9 @@ const models = [
   },
   {
     type: 'fields',
-    id: 'user-template',
+    id: 'user-rewriter',
     attributes: {
-      'field-type': '@cardstack/handlebars'
+      'field-type': '@cardstack/core-types::string'
     }
   },
   {

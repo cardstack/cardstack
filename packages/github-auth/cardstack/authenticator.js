@@ -8,7 +8,6 @@ module.exports = class {
   constructor(params) {
     this.clientId = params['client-id'];
     this.clientSecret = params['client-secret'];
-    this.defaultUserTemplate =  "{ \"data\": { \"id\": \"{{login}}\", \"type\": \"github-users\", \"attributes\": { \"name\": \"{{name}}\", \"email\":\"{{email}}\", \"avatar-url\":\"{{avatar_url}}\" }}}";
   }
   async authenticate(payload /*, userSearcher */) {
     if (!payload.authorizationCode) {
@@ -69,6 +68,20 @@ module.exports = class {
   exposeConfig() {
     return {
       clientId: this.clientId
+    };
+  }
+
+  defaultUserRewriter(user) {
+    return {
+      data: {
+        id: user.login,
+        type: "github-users",
+        attributes: {
+          name: user.name,
+          email: user.email,
+          "avatar-url": user.avatar_url
+        }
+      }
     };
   }
 

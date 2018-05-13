@@ -14,7 +14,8 @@ const {
 const ownTypes = Object.freeze(['content-types', 'fields', 'constraints', 'input-assignments', 'data-sources', 'grants', 'groups', 'plugin-configs', 'default-values']);
 
 module.exports = declareInjections({
-  pluginLoader: 'hub:plugin-loader'
+  pluginLoader: 'hub:plugin-loader',
+  project: 'config:project'
 },
 
 class SchemaLoader {
@@ -22,8 +23,9 @@ class SchemaLoader {
     return new this(opts);
   }
 
-  constructor({ pluginLoader }) {
+  constructor({ pluginLoader, project }) {
     this.pluginLoader = pluginLoader;
+    this.projectPath = project.path;
   }
 
   ownTypes() {
@@ -39,7 +41,7 @@ class SchemaLoader {
     let grants = findGrants(models);
     let fields = findFields(models, plugins, grants, defaultValues, authLog);
     let constraints = await findConstraints(models, plugins, fields);
-    let dataSources = findDataSources(models, plugins);
+    let dataSources = findDataSources(models, plugins, this.projectPath);
     let defaultDataSource = findDefaultDataSource(plugins);
     schemaLog.trace('default data source %j', defaultDataSource);
     let groups = findGroups(models, fields);
@@ -100,11 +102,11 @@ function findFields(models, plugins, types, grants, defaultValues, authLog) {
   return fields;
 }
 
-function findDataSources(models, plugins) {
+function findDataSources(models, plugins, projectPath) {
   let dataSources = new Map();
   for (let model of models) {
     if (model.type === 'data-sources') {
-      dataSources.set(model.id, new DataSource(model, plugins));
+      dataSources.set(model.id, new DataSource(model, plugins, projectPath));
     }
   }
   return dataSources;

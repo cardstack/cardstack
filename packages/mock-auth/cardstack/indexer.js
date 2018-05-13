@@ -11,8 +11,8 @@ module.exports = class Indexer {
     if (provideUserSchema === false) {
       this.disabled = true;
     } else {
-      if (dataSource.userTemplate){
-        log.warn("If you use a custom user-template on the mock-auth data source, you should probably also set params.provideUserSchema=false and provide your own user model");
+      if (dataSource.userRewriter){
+        log.warn("If you use a custom user-rewriter on the mock-auth data source, you should probably also set params.provideUserSchema=false and provide your own user model");
       }
     }
   }
