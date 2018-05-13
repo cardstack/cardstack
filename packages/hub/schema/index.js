@@ -25,6 +25,13 @@ class Schema {
     this.schemaLoader = schemaLoader;
   }
 
+  equalTo(otherSchema) {
+    return otherSchema && isEqual(
+      new Set(this._originalModels),
+      new Set(otherSchema._originalModels)
+    );
+  }
+
   async teardown() {
     for (let source of this.dataSources.values()) {
       await source.teardown();

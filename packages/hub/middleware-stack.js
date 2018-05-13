@@ -9,7 +9,8 @@ module.exports = declareInjections({
 
 class MiddlewareStack {
   constructor() {
-    this._lastStack = null;
+    this._lastStack = [];
+    this._lastHandler = null;
     this._lastActivePlugins = null;
   }
 
@@ -23,7 +24,7 @@ class MiddlewareStack {
   async _middlewarePlugins() {
     let activePlugins = await this.plugins.active();
     if (activePlugins === this._lastActivePlugins) {
-      return this._lastStack;
+      return this._lastHandler;
     }
     let map = new DAGMap;
 
@@ -63,10 +64,17 @@ class MiddlewareStack {
         log.info(` --- ${name} ---`);
       }
     });
-    stack = compose(stack.map(module => module.middleware()));
+    
+    for (let middleware of this._lastStack) {
+      if (typeof middleware.teardown === 'function') {
+        await middleware.teardown();
+      }
+    }
     this._lastStack = stack;
+    let handler = compose(stack.map(module => module.middleware()));
+    this._lastHandler = handler;
     this._lastActivePlugins = activePlugins;
-    return stack;
+    return handler;
   }
 
 
