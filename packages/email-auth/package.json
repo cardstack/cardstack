@@ -1,6 +1,6 @@
 {
   "name": "@cardstack/email-auth",
-  "version": "0.7.11",
+  "version": "0.7.12",
   "description": "The default blueprint for ember-cli addons.",
   "keywords": [
     "ember-addon",
@@ -27,9 +27,9 @@
     "handlebars": "^4.0.6"
   },
   "devDependencies": {
-    "@cardstack/authentication": "0.7.11",
+    "@cardstack/authentication": "0.7.12",
     "@cardstack/eslint-config": "0.6.14",
-    "@cardstack/test-support": "0.7.10",
+    "@cardstack/test-support": "0.7.12",
     "@cardstack/test-support-messenger": "0.7.10",
     "broccoli-asset-rev": "^2.4.5",
     "ember-cli": "^3.0.0",
