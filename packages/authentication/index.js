@@ -24,7 +24,8 @@ module.exports = {
       let stringRewritten = compiled(externalUser);
       // replace double quote HTML entities first with escaped quotes
       // so we dont end up escaping legit JSON quotes
-      stringRewritten = he.decode(stringRewritten.replace(/&quot;/g, '\\"')).replace(/\s/g, ' ');
+      stringRewritten = he.decode(stringRewritten.replace(/\\/g,'')
+                                                 .replace(/&quot;/g, '\\"')).replace(/\s/g, ' ');
       try {
         rewritten = JSON.parse(stringRewritten);
       } catch (err) {
