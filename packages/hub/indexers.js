@@ -179,12 +179,31 @@ class Indexers extends EventEmitter {
     try {
       let schemas = await running.update(forceRefresh, hints);
       if (this._schemaCache === priorCache) {
+        // nobody else has done a more recent update of the schema
+        // cache than us, so we can try to update it.
         if (priorCache) {
-          await teardownCachedSchemas(await priorCache);
+          // Compare each branch, so we don't invalidate the schemas
+          // unnecessarily
+          for (let [branch, newSchema] of Object.entries(schemas)) {
+            let oldSchema = priorCache[branch];
+            if (!newSchema.equalTo(oldSchema)) {
+              log.info('schema for branch %s was changed', branch);
+              priorCache[branch] = newSchema;
+              if (oldSchema) {
+                await oldSchema.teardown();
+              }
+            }
+          }
+        } else {
+          this._schemaCache = Promise.resolve(schemas);
         }
-        this._schemaCache = Promise.resolve(schemas);
       } else {
-        await teardownCachedSchemas(schemas);
+        // somebody else has updated the cache in the time since we
+        // started running, so just drop the schemas we computed
+        // during indexing
+        for (let schema of Object.values(schemas)) {
+          await schema.teardown();
+        }
       }
     } finally {
       await running.destroy();
@@ -194,9 +213,3 @@ class Indexers extends EventEmitter {
   }
 
 });
-
-async function teardownCachedSchemas(schemaCache) {
-  for (let schema of Object.values(schemaCache)) {
-    await schema.teardown();
-  }
-}
