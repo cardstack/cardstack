@@ -1,6 +1,6 @@
 {
   "name": "@cardstack/postgresql",
-  "version": "0.8.0",
+  "version": "0.8.1",
   "description": "PostgreSQL data source plugin for @cardstack/hub.",
   "repository": "https://github.com/cardstack/cardstack",
   "author": "Edward Faulkner <edward@eaf4.com>",
