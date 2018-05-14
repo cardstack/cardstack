@@ -320,7 +320,7 @@ class Updater {
   }
 
   async _removeAbandonedReplicationSlots(currentReplicationSlot) {
-    let { rows:slots } = await this.query(`SELECT * FROM pg_replication_slots where slot_name like '${replicationSlotPrefix}_%' OR slot_name like '${unknownEnv}'`);
+    let { rows:slots } = await this.query(`SELECT * FROM pg_replication_slots where slot_name like '${replicationSlotPrefix}_%' OR slot_name like '${unknownEnv}_%'`);
     for (let { slot_name:slot } of slots) {
       if (slot === currentReplicationSlot) { continue; }
       await this.query(`select pg_drop_replication_slot($1) from pg_replication_slots;`, [ slot ]);
