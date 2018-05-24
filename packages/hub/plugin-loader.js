@@ -24,7 +24,8 @@ const featureTypes = [
   'authenticators',
   'middleware',
   'messengers',
-  'code-generators'
+  'code-generators',
+  'queues'
 ];
 const javascriptPattern = /(.*)\.js$/;
 
