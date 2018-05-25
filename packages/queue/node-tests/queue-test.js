@@ -10,16 +10,21 @@ describe('@cardstack/queue', function() {
   let env, queue;
 
   async function setup() {
-    env = await createDefaultEnvironment(`${__dirname}/..`);
+    let pgBossConfig = {
+      database:             'postgres',
+      host:                 'localhost',
+      user:                 'postgres',
+      port:                 5444,
+      newJobCheckInterval:  100 // set to minimum to speed up tests
+    };
+
+    env = await createDefaultEnvironment(`${__dirname}/..`, [], { pgBossConfig });
 
     queue = env.lookup('hub:queues');
-
-    await env.lookup('hub:indexers').update({ forceRefresh: true });
   }
 
   async function teardown() {
     await destroyDefaultEnvironment(env);
-    await queue.stop();
   }
 
   beforeEach(setup);
@@ -30,10 +35,14 @@ describe('@cardstack/queue', function() {
   });
 
   it('can subscribe to a job', async function() {
+    let isDone = false;
     await queue.publish('test-job');
-    await new Promise((resolve) =>
-      queue.subscribe('test-job', resolve)
-    );
+    let handler = () => {
+      isDone = true;
+    };
+    await queue.subscribe('test-job', handler);
+    await delay(500);
+    expect(isDone).to.be.ok;
   });
 
   it('can return a promise that resolves after a job is complete', async function() {

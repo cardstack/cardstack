@@ -2,17 +2,18 @@ const PgBoss = require('pg-boss');
 const log = require('@cardstack/logger')('cardstack/queue');
 
 module.exports = class Queue {
-  constructor() {
+  constructor(config) {
     this.boss = null;
     this.promiseResolveCallbacks = {};
     this.promiseRejectCallbacks = {};
     this.callbackedQueues = [];
     this.jobErrors = {};
+    this.config = config;
   }
 
   async _ensureBoss() {
     if (!this.boss) {
-      this.boss = new PgBoss({ database: 'postgres', host: 'localhost', user: 'postgres', port: 5444 });
+      this.boss = new PgBoss(this.config);
       await this.boss.start();
       log.debug("Boss started");
     }
