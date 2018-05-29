@@ -17,6 +17,12 @@ async function wireItUp(projectDir, encryptionKeys, dataSources, opts = {}) {
   registry.register('config:encryption-key', encryptionKeys);
   registry.register('config:public-url', { url: opts.url });
   registry.register('config:ci-session', { id: opts.ciSessionId });
+  registry.register('config:pg-boss', opts.pgBossConfig || {
+    database: process.env.PG_BOSS_DATABASE,
+    host:     process.env.PG_BOSS_HOST,
+    user:     process.env.PG_BOSS_USER,
+    port:     process.env.PG_BOSS_PORT
+  });
 
   if (typeof opts.seeds === 'function') {
     registry.register('config:initial-models', opts.seeds);
