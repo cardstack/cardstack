@@ -58,15 +58,21 @@ module.exports = class EthereumService {
     await timeout(10 * 1000); // cool down period before we start issuing requests again
 
     this._hasConnected = false;
-    this._contracts = new WeakMap();
-    this._providers = new WeakMap();
-    this._eventListeners = new WeakMap();
-    this._eventDefinitions = new WeakMap();
+    this._contracts = {};
+    this._providers = {};
+    this._eventListeners = {};
+    this._eventDefinitions = {};
 
     this.connect(this._branches);
-    await this.start(this._contractDefinitions);
 
-    log.info("completed reconnecting to ethereum service");
+    for (let name of Object.keys(this._contractDefinitions)) {
+      await this.start({
+        name,
+        contract: this._contractDefinitions[name],
+      });
+    }
+
+    log.info("finished trying to reconnect to ethereum service");
     done();
   }
 
@@ -89,7 +95,16 @@ module.exports = class EthereumService {
   }
 
   async getBlockHeight(branch) {
-    return await this._providers[branch].eth.getBlockNumber();
+    await this._reconnectPromise;
+
+    let result;
+    try {
+      result = await this._providers[branch].eth.getBlockNumber();
+    } catch (err) {
+      log.error(`Encountered error trying to get block height: ${err}`);
+      await this._reconnect();
+    }
+    return result;
   }
 
   async start({ name, contract, buffer }) {
@@ -127,10 +142,24 @@ module.exports = class EthereumService {
           let hints = this._generateHintsFromEvent({ branch, contract: name, event });
           log.debug("addings hints to queue", JSON.stringify(hints, null, 2));
 
-          buffer.loadModels(name, null, hints);
+          if (buffer) {
+            buffer.loadModels(name, null, hints);
+          }
         }
       });
     }
+  }
+
+  async callContractMethod(contract, methodName, arg) {
+    let result;
+    try {
+      result = arg == null ? await contract.methods[methodName]().call() :
+                             await contract.methods[methodName](arg).call();
+    } catch (err) {
+      log.error(`Encountered error invoking contract method name '${methodName}'${arg != null ? " with parameter '" + arg + "'" : ''}. ${err}`);
+      await this._reconnect();
+    }
+    return result;
   }
 
   async getContractInfo({ branch, contract, type }) {
@@ -166,7 +195,7 @@ module.exports = class EthereumService {
                                                         !item.inputs.length)
                                         .map(item => item.name);
     for (let method of methods) {
-      attributes[`${contract}-${dasherize(method)}`] = await aContract.methods[method]().call();
+      attributes[`${contract}-${dasherize(method)}`] = await this.callContractMethod(aContract, method);
     }
 
     let model = { id: address, type: pluralize(contract), attributes };
@@ -201,7 +230,7 @@ module.exports = class EthereumService {
       methodName = singularize(capitalize(method));
     }
 
-    let data = await aContract.methods[methodName](id).call();
+    let data = await this.callContractMethod(aContract, methodName, id);
     log.debug(`retrieved contract data for contract ${contractName}.${methodName}(${id || ''}): ${data}`);
     return { data, methodName };
   }
