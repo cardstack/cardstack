@@ -1,20 +1,3 @@
-body {
-  background-color: #f0f0f0;
-}
-
-.field-editor {
-  position: relative;
-  width: 300px;
-  margin: 40px auto;
-}
-
-.mobiledoc-editor {
-  background-color: white;
-  padding: 10px 15px;
-  border: solid 1px #d8d8d8;
-  border-radius: 3px;
-}
-
 .block-control {
   z-index: 1;
   top: 0;

@@ -1,1 +1,8 @@
-{{mobiledoc-editor mobiledoc=innerMobiledoc on-change=(perform onChange) }}
+{{#-priv-mobiledoc-editor mobiledoc=innerMobiledoc
+                   on-change=(perform onChange)
+                   cursor-changed=(action "cursorChanged")
+                   as |editor| }}
+
+  {{to-elsewhere named="paragraph-tools" send=(component "paragraph-options" editor=editor cursor=cursorState)}}
+
+{{/-priv-mobiledoc-editor}}
