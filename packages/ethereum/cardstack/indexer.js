@@ -6,6 +6,8 @@ const log = require('@cardstack/logger')('cardstack/ethereum/indexer');
 const { declareInjections } = require('@cardstack/di');
 const { fieldTypeFor } = require('./abi-utils');
 
+const defaultBranch = 'master';
+
 module.exports = declareInjections({
   searcher: 'hub:searchers',
   ethereumService: `plugin-services:${require.resolve('./service')}`,
@@ -152,15 +154,18 @@ class Updater {
       await ops.save(model.type, model.id, model);
     }
 
-    let models = await this.buffer.readModels(this.dataSourceId, blockHeights, hints);
+    let shouldSkip = await this.buffer.shouldSkipIndexing(this.dataSourceId, defaultBranch);
+    if (!shouldSkip) {
+      let models = await this.buffer.readModels(this.dataSourceId, blockHeights, hints);
 
-    for (let model of models) {
-      let { blockheight, branch } = model.meta;
-      if (!blockHeights[branch] || blockHeights[branch] < blockheight) {
-        blockHeights[branch] = blockheight;
+      for (let model of models) {
+        let { blockheight, branch } = model.meta;
+        if (!blockHeights[branch] || blockHeights[branch] < blockheight) {
+          blockHeights[branch] = blockheight;
+        }
+
+        await ops.save(model.type, model.id, model);
       }
-
-      await ops.save(model.type, model.id, model);
     }
 
     if (needsFinishReplaceAll) {

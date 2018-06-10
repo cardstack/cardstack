@@ -10,6 +10,7 @@ import "./zeppelin/MintableToken.sol";
 contract SampleToken is MintableToken {
   string public name = "SampleToken";
   string public symbol = "TOK";
+  bool public tokenFrozen = false;
   uint256 public balanceLimit;
   uint256 public buyerCount;
 
@@ -30,6 +31,10 @@ contract SampleToken is MintableToken {
 
   function setBalanceLimit(uint256 _balanceLimit) onlyOwner public returns (bool) {
     balanceLimit = _balanceLimit;
+  }
+
+  function setTokenFrozen(bool _isFrozen) onlyOwner public returns (bool) {
+    tokenFrozen = _isFrozen;
   }
 
   function setLedger(address _address, uint256 balance) onlyOwner returns (bool) {
