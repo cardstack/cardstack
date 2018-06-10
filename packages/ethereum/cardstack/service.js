@@ -25,6 +25,7 @@ module.exports = class EthereumService {
     this._branches = null;
     this._eventDefinitions = {};
     this._contracts = {};
+    this._pastContracts = {};
   }
 
   connect(branches) {
@@ -59,6 +60,7 @@ module.exports = class EthereumService {
 
     this._hasConnected = false;
     this._contracts = {};
+    this._pastContracts = {};
     this._providers = {};
     this._eventListeners = {};
     this._eventDefinitions = {};
@@ -114,7 +116,7 @@ module.exports = class EthereumService {
     this._hasStartedListening[name] = true;
     this._contractDefinitions[name] = contract;
 
-    let { abi, addresses } = contract;
+    let { abi, addresses, pastAddresses } = contract;
     this._eventDefinitions[name] = getEventDefinitions(name, contract);
 
     if (!this._eventListeners[name]) {
@@ -147,6 +149,21 @@ module.exports = class EthereumService {
           }
         }
       });
+    }
+
+    if (!pastAddresses) { return; }
+
+    for (let branch of Object.keys(pastAddresses)) {
+      if (!this._providers[branch]) { continue; }
+
+      for (let pastAddress of pastAddresses[branch]) {
+        // TODO we should ideally not be using the curent ABI against a past contract
+        let aContract = new this._providers[branch].eth.Contract(abi, pastAddress);
+        if (!this._pastContracts[branch]) {
+          this._pastContracts[branch] = {};
+        }
+        this._pastContracts[branch][pastAddress] = aContract;
+      }
     }
   }
 
@@ -242,27 +259,37 @@ module.exports = class EthereumService {
     await this._reconnectPromise;
     for (let branch of Object.keys(this._contracts)) {
       for (let contract of Object.keys(this._contracts[branch])) {
+        let pastAddresses = get(this._contractDefinitions[contract], `pastAddresses.${branch}`) || [];
         let aContract = this._contracts[branch][contract];
         let contractHints = [];
+        let contractProviders = pastAddresses.map(address => {
+          return { address, provider: this._pastContracts[branch][address] };
+        });
+        contractProviders.push({
+          address: this._contractDefinitions[contract]["addresses"][branch],
+          provider: aContract
+        });
 
-        for (let event of Object.keys(this._contractDefinitions[contract].eventContentTriggers || [])) {
-          let rawHints = [], events = [];
-          let lastIndexedBlockHeight = get(blockHeights, branch);
-          try {
-            // TODO we might need to chunk this so we don't blow past the websocket max frame size in the web3 provider: https://github.com/ethereum/web3.js/issues/1297
-            events = await aContract.getPastEvents(event, { fromBlock: lastIndexedBlockHeight ? lastIndexedBlockHeight + 1 : 0, toBlock: 'latest' });
-          } catch (err) {
-            // for some reason web3 on the private blockchain throws an error when it cannot find any of the requested events
-            log.info(`could not find any past contract events of contract ${contract} for event ${event}. ${err.message}`);
-          }
-          log.trace(`discovered ${event} events for contract ${contract}: ${JSON.stringify(events, null, 2)}`);
+        for (let { address, provider } of contractProviders) {
+          for (let event of Object.keys(this._contractDefinitions[contract].eventContentTriggers || [])) {
+            let rawHints = [], events = [];
+            let lastIndexedBlockHeight = get(blockHeights, branch);
+            try {
+              // TODO we might need to chunk this so we don't blow past the websocket max frame size in the web3 provider: https://github.com/ethereum/web3.js/issues/1297
+              events = await provider.getPastEvents(event, { fromBlock: lastIndexedBlockHeight ? lastIndexedBlockHeight + 1 : 0, toBlock: 'latest' });
+            } catch (err) {
+              // for some reason web3 on the private blockchain throws an error when it cannot find any of the requested events
+              log.info(`could not find any past contract events of contract ${contract}, address ${address} for event ${event}. ${err.message}`);
+            }
+            log.trace(`discovered ${event} events for contract ${contract}, address ${address}: ${JSON.stringify(events, null, 2)}`);
 
-          for (let rawEvent of events) {
-            rawHints = rawHints.concat(this._generateHintsFromEvent({ branch, contract, event: rawEvent }));
+            for (let rawEvent of events) {
+              rawHints = rawHints.concat(this._generateHintsFromEvent({ branch, contract, event: rawEvent }));
+            }
+            contractHints = contractHints.concat(uniqWith(rawHints, isEqual));
           }
-          contractHints = contractHints.concat(uniqWith(rawHints, isEqual));
+          hints = hints.concat(uniqWith(contractHints, isEqual));
         }
-        hints = hints.concat(uniqWith(contractHints, isEqual));
       }
     }
     log.debug(`discovered contract events resulting in hints: ${JSON.stringify(hints, null, 2)}`);

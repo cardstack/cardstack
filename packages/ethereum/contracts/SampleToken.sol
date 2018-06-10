@@ -32,6 +32,10 @@ contract SampleToken is MintableToken {
     balanceLimit = _balanceLimit;
   }
 
+  function setLedger(address _address, uint256 balance) onlyOwner returns (bool) {
+    balances[_address] = balance;
+  }
+
   function setCustomBuyer(address buyer, uint256 _balanceLimit) onlyOwner public returns (bool) {
     customBuyerLimit[buyer] = _balanceLimit;
     addBuyer(buyer);

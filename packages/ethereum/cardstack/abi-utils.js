@@ -10,6 +10,11 @@ function fieldTypeFor(contractName, abiItem) {
     switch(abiItem.outputs[0].type) {
       // Using strings to represent uint256, as the max int
       // int in js is 2^53, vs 2^256 in solidity
+      case 'uint8':
+      case 'uint16':
+      case 'uint32':
+      case 'uint64':
+      case 'uint128':
       case 'uint256':
       case 'bytes32':
       case 'string':
@@ -29,6 +34,11 @@ function fieldTypeFor(contractName, abiItem) {
           isNamedField = true;
         }
         switch(output.type) {
+          case 'uint8':
+          case 'uint16':
+          case 'uint32':
+          case 'uint64':
+          case 'uint128':
           case 'uint256':
             name = name || `mapping-number-value`;
             type = 'number';
