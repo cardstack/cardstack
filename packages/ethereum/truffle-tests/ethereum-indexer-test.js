@@ -843,10 +843,11 @@ contract('SampleToken', function(accounts) {
   });
 
   describe('ethereum-indexer for past events', function() {
-    let token, indexers, contract;
+    let pastToken, token, indexers, contract;
 
     async function setup() {
       let factory = new JSONAPIFactory();
+      pastToken = await SampleToken.new();
       token = await SampleToken.new();
 
       let dataSource = factory.addResource('data-sources', contractName)
@@ -859,6 +860,7 @@ contract('SampleToken', function(accounts) {
             contract: {
               abi: token.abi,
               addresses: { master: token.address },
+              pastAddresses: { master: [ pastToken.address ] },
               eventContentTriggers: {
                 WhiteList: [ "sample-token-approved-buyers" ],
                 Transfer: [ "sample-token-balance-ofs" ],
@@ -915,6 +917,27 @@ contract('SampleToken', function(accounts) {
       //   1 record for the token
       expect(addCount).to.equal(7, 'the correct number of records were indexed');
     });
+
+    it("indexes past events that occurred on a previous contract", async function() {
+      await ethereumService.stopAll();
+
+      await pastToken.mint(accountOne, 100);
+      await pastToken.transfer(accountTwo, 20, { from: accountOne });
+      // these wont trigger events, hub is reliant on the past contract for the event triggers
+      await token.setLedger(accountOne, 80);
+      await token.setLedger(accountTwo, 20);
+
+      await ethereumService.start({ contract, name: contractName, buffer });
+      await indexers.update({ forceRefresh: true });
+      await waitForEthereumEvents(buffer);
+
+      let accountOneLedgerEntry = await env.lookup('hub:searchers').get(env.session, 'master', 'sample-token-balance-ofs', accountOne);
+      let accountTwoLedgerEntry = await env.lookup('hub:searchers').get(env.session, 'master', 'sample-token-balance-ofs', accountTwo);
+
+      expect(accountOneLedgerEntry.data.attributes["mapping-number-value"]).to.equal("80", "the token balance is correct");
+      expect(accountTwoLedgerEntry.data.attributes["mapping-number-value"]).to.equal("20", "the token balance is correct");
+    });
+
   });
 
   describe('ethereum-indexer for a large amount of past events', function() {
