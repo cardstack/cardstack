@@ -305,6 +305,7 @@ module.exports = class EthereumService {
         }
       }
     }
+    log.info(`Generated ${hints.length} hints from past contract events since blockheight ${JSON.stringify(blockHeights)}`);
     log.debug(`discovered contract events resulting in hints: ${JSON.stringify(hints, null, 2)}`);
     return hints;
   }

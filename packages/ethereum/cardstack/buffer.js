@@ -172,6 +172,7 @@ class EthereumBuffer {
     }
 
     if (!hints || !hints.length) {
+      log.info(`Retreving full history for contract ${contractName} address: ${JSON.stringify((contractDefinition.addresses))} since blockheight ${JSON.stringify(blockHeights)}`);
       hints = await this.ethereumService.getPastEventsAsHints(blockHeights);
     }
 
