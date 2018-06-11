@@ -1,6 +1,6 @@
 {
   "name": "@cardstack/ethereum",
-  "version": "0.8.6",
+  "version": "0.8.7",
   "description": "ethereum plugin for Cardstack",
   "keywords": [
     "ember-addon",
