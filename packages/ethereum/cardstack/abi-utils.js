@@ -2,7 +2,7 @@ const Ember = require('ember-source/dist/ember.debug');
 const { dasherize } = Ember.String;
 
 function fieldTypeFor(contractName, abiItem) {
-  if (!abiItem.outputs || !abiItem.outputs.length) { return; }
+  if (!abiItem || !abiItem.outputs || !abiItem.outputs.length) { return; }
 
   if (!abiItem.inputs.length) {
     // We are not handling multiple return types for non-mapping functions
