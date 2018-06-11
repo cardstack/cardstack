@@ -148,6 +148,10 @@ contract('SampleToken', function(accounts) {
                 {
                   "type": "fields",
                   "id": "sample-token-buyer-count"
+                },
+                {
+                  "id": "sample-token-token-frozen",
+                  "type": "fields"
                 }
               ]
             },
@@ -612,6 +616,7 @@ contract('SampleToken', function(accounts) {
             "sample-token-name": "SampleToken",
             "sample-token-total-supply": "0",
             "sample-token-owner": accounts[0],
+            "sample-token-token-frozen": false,
             "sample-token-symbol": "TOK"
           }
         }
@@ -861,6 +866,7 @@ contract('SampleToken', function(accounts) {
               abi: token.abi,
               addresses: { master: token.address },
               pastAddresses: { master: [ pastToken.address ] },
+              indexingSkipIndicators: [ "tokenFrozen" ],
               eventContentTriggers: {
                 WhiteList: [ "sample-token-approved-buyers" ],
                 Transfer: [ "sample-token-balance-ofs" ],
@@ -916,6 +922,39 @@ contract('SampleToken', function(accounts) {
       //   1 record for the recipient of transfer
       //   1 record for the token
       expect(addCount).to.equal(7, 'the correct number of records were indexed');
+    });
+
+    it("skips indexing when contract state indicates that the contract is not prepared to be indexed", async function() {
+      await ethereumService.stopAll();
+
+      let addCount = 0;
+
+      indexers.on('add', ({ type }) => {
+        if (!['sample-tokens', 'sample-token-balance-ofs'].includes(type)) { return; }
+        addCount++;
+      });
+
+      await token.mint(accountOne, 100);
+      await token.transfer(accountTwo, 20, { from: accountOne });
+      await token.setTokenFrozen(true);
+
+      await ethereumService.start({ contract, name: contractName, buffer });
+      await indexers.update({ forceRefresh: true });
+      await waitForEthereumEvents(buffer);
+
+      expect(addCount).to.equal(0, 'the contract is not indexed while it is frozen');
+
+      await token.setTokenFrozen(false);
+
+      await indexers.update({ forceRefresh: true });
+      await waitForEthereumEvents(buffer);
+
+      expect(addCount).to.equal(3, 'the correct number of records were indexed');
+      let accountOneLedgerEntry = await env.lookup('hub:searchers').get(env.session, 'master', 'sample-token-balance-ofs', accountOne);
+      let accountTwoLedgerEntry = await env.lookup('hub:searchers').get(env.session, 'master', 'sample-token-balance-ofs', accountTwo);
+
+      expect(accountOneLedgerEntry.data.attributes["mapping-number-value"]).to.equal("80", "the token balance is correct");
+      expect(accountTwoLedgerEntry.data.attributes["mapping-number-value"]).to.equal("20", "the token balance is correct");
     });
 
     it("indexes past events that occurred on a previous contract", async function() {

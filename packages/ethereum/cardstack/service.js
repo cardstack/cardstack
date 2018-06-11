@@ -179,6 +179,19 @@ module.exports = class EthereumService {
     return result;
   }
 
+  async shouldSkipIndexing(contractName, branch) {
+    let contract = this._contracts[branch][contractName];
+    let skipMethods = get(this._contractDefinitions, `${contractName}.indexingSkipIndicators`);
+    if (!contract || !skipMethods || !skipMethods.length) { return false; }
+
+    for (let method of skipMethods) {
+      let shouldSkip = await this.callContractMethod(contract, method);
+      if (shouldSkip) { return true; }
+    }
+
+    return false;
+  }
+
   async getContractInfo({ branch, contract, type }) {
     if (!contract && type) {
       log.debug(`getting all top level contract info for contract type: ${type}, branch: ${branch}`);

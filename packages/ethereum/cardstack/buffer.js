@@ -66,6 +66,10 @@ class EthereumBuffer {
       .then(() => this._processHints({contractName, blockHeights, hints }));
   }
 
+  async shouldSkipIndexing(contractName, branch) {
+    return await this.ethereumService.shouldSkipIndexing(contractName, branch);
+  }
+
   async readModels(contractName, blockHeights, hints) {
     let bufferedModels = [];
     let unbufferedHints = [];
