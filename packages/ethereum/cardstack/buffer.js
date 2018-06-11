@@ -185,7 +185,10 @@ class EthereumBuffer {
       let methodAbiEntry = contractDefinition["abi"].find(item => item.type === 'function' &&
         item.constant &&
         item.name === methodName);
-      let { isMapping, fields } = fieldTypeFor(contractName, methodAbiEntry);
+      let fieldInfo = fieldTypeFor(contractName, methodAbiEntry);
+      if (!fieldInfo) { continue; }
+
+      let { isMapping, fields } = fieldInfo;
       if (!isMapping || !fields.length) { continue; }
 
       let model = {
