@@ -182,6 +182,11 @@ module.exports = class EthereumService {
   }
 
   async shouldSkipIndexing(contractName, branch) {
+    if (!this._contracts[branch] || !this._contracts[branch][contractName]) {
+      log.warn(`cannot find contract provider with branch: ${branch} contractName: ${contractName} when determining if indexing should be skipped`);
+      return true;
+    }
+
     let contract = this._contracts[branch][contractName];
     let skipMethods = get(this._contractDefinitions, `${contractName}.indexingSkipIndicators`);
     if (!contract || !skipMethods || !skipMethods.length) { return false; }
@@ -237,7 +242,7 @@ module.exports = class EthereumService {
   }
 
   async getContractInfoFromHint({ id, branch, type, contractName}) {
-    log.debug(`getting contract data for id: ${id}, type: ${type}, branch: ${branch}`);
+    log.debug(`getting contract data for id: ${id}, type: ${type}, branch: ${branch}, contractName: ${contractName}`);
     if (!branch || !type || !id) { return; }
 
     await this._reconnectPromise;
@@ -247,7 +252,7 @@ module.exports = class EthereumService {
     let method = camelize(dasherizedMethod);
 
     if (!this._contracts[branch] || !this._contracts[branch][contractName]) {
-      throw new Error(`cannot find contract with branch: ${branch}, type: ${type}`);
+      throw new Error(`cannot find contract provider with branch: ${branch} contractName: ${contractName} that will be used to access data for ${type}`);
     }
 
     let aContract = this._contracts[branch][contractName];
