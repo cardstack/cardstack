@@ -35,7 +35,7 @@ describe('authentication/middleware/ip', function() {
     await destroyDefaultEnvironment(env);
   }
 
-  after(teardown);
+  afterEach(teardown);
 
   it('there is no session meta if there is no session', async function() {
     await setup();

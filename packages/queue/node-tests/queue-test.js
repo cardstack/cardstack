@@ -10,15 +10,7 @@ describe('@cardstack/queue', function() {
   let env, queue;
 
   async function setup() {
-    let pgBossConfig = {
-      database:             'postgres',
-      host:                 'localhost',
-      user:                 'postgres',
-      port:                 5444,
-      newJobCheckInterval:  100 // set to minimum to speed up tests
-    };
-
-    env = await createDefaultEnvironment(`${__dirname}/..`, [], { pgBossConfig });
+    env = await createDefaultEnvironment(`${__dirname}/..`);
 
     queue = env.lookup('hub:queues');
   }

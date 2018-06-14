@@ -12,7 +12,10 @@ function toJSONAPI(doc) {
 }
 
 describe('git/indexer', function() {
-  let root, indexer, ea, dataSource, assertNoDocument;
+  this.timeout(5000);
+  this.slow(3000);
+
+  let root, indexer, ea, dataSource, assertNoDocument, container;
 
   beforeEach(async function() {
     ea = new ElasticAssert();
@@ -37,7 +40,18 @@ describe('git/indexer', function() {
     registry.register('config:project', {
       path: `${__dirname}/..`
     });
-    indexer = new Container(registry).lookup('hub:indexers');
+    registry.register('config:pg-boss', {
+      database:             'postgres',
+      host:                 'localhost',
+      user:                 'postgres',
+      port:                 5444,
+      newJobCheckInterval:  100 // set to minimum to speed up tests
+    });
+
+    container = new Container(registry);
+    indexer = container.lookup('hub:indexers');
+
+    await container.lookup('hub:queues')._ensureBoss();
 
     assertNoDocument = async function(branch, type, id) {
       try {
@@ -51,6 +65,7 @@ describe('git/indexer', function() {
   });
 
   afterEach(async function() {
+    await container.lookup('hub:queues').stop();
     await temp.cleanup();
     await ea.deleteContentIndices();
   });
@@ -445,7 +460,7 @@ describe('git/indexer', function() {
 });
 
 describe('git/indexer failures', function() {
-  let root, indexer, ea;
+  let root, indexer, ea, container;
 
   beforeEach(async function() {
     ea = new ElasticAssert();
@@ -470,10 +485,24 @@ describe('git/indexer failures', function() {
     registry.register('config:project', {
       path: `${__dirname}/..`
     });
-    indexer = new Container(registry).lookup('hub:indexers');
+
+    registry.register('config:pg-boss', {
+      database:             'postgres',
+      host:                 'localhost',
+      user:                 'postgres',
+      port:                 5444,
+      newJobCheckInterval:  100 // set to minimum to speed up tests
+    });
+
+    container = new Container(registry);
+    indexer = container.lookup('hub:indexers');
+
+    await container.lookup('hub:queues')._ensureBoss();
+
   });
 
   afterEach(async function() {
+    await container.lookup('hub:queues').stop();
     await temp.cleanup();
     await ea.deleteContentIndices();
   });
