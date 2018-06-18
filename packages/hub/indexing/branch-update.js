@@ -18,7 +18,6 @@ class BranchUpdate {
     this.isControllingBranch = isControllingBranch;
     this.schemaModels = [];
     this._schema = null;
-    this.bulkOps = null;
     this._touched = Object.create(null);
     this.read = this.read.bind(this);
   }
@@ -73,7 +72,6 @@ class BranchUpdate {
   }
 
   async update(forceRefresh, hints) {
-    this.bulkOps = this.client.bulkOps({ forceRefresh });
     await this.client.accomodateSchema(this.branch, await this.schema());
     await this._updateContent(hints);
   }
@@ -102,7 +100,6 @@ class BranchUpdate {
       await this._saveMeta(updater, newMeta);
     }
     await this._invalidations();
-    await this.bulkOps.finalize();
   }
 
   async _loadMeta(updater) {

@@ -1,0 +1,3 @@
+# Implementation notes for pgsearch refactor
+
+1. Rename `_client` in hub/indexers

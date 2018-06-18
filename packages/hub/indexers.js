@@ -39,7 +39,7 @@
 
 const EventEmitter = require('events');
 const log = require('@cardstack/logger')('cardstack/indexers');
-const Client = require('@cardstack/elasticsearch/client');
+const PgIndexers = require('@cardstack/pgsearch/indexers');
 const { declareInjections } = require('@cardstack/di');
 const bootstrapSchema = require('./bootstrap-schema');
 const RunningIndexers = require('./indexing/running-indexers');
@@ -118,7 +118,7 @@ class Indexers extends EventEmitter {
 
   async _client() {
     if (!this._clientMemo) {
-      this._clientMemo = await Client.create();
+      this._clientMemo = await PgIndexers.create();
     }
     return this._clientMemo;
   }

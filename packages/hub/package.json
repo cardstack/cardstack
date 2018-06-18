@@ -23,6 +23,7 @@
     "@cardstack/elasticsearch": "0.8.0",
     "@cardstack/handlebars": "0.8.0",
     "@cardstack/logger": "^0.1.0",
+    "@cardstack/pgsearch": "0.8.0",
     "@cardstack/plugin-utils": "0.8.0",
     "@cardstack/queue": "0.8.3",
     "broccoli-concat": "^3.2.2",
