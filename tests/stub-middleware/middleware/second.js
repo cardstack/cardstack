@@ -1,9 +1,14 @@
 const route = require('koa-better-route');
 
-module.exports = class SecondMiddleware {
+class SecondMiddleware {
   static create() {
+    SecondMiddleware._constructs += 1;
     return new this();
   }
+  async teardown() {
+    SecondMiddleware._teardowns += 1;
+  }
+
   get category() {
     return 'dos';
   }
@@ -15,4 +20,9 @@ module.exports = class SecondMiddleware {
       };
     });
   }
-};
+}
+
+SecondMiddleware._constructs = 0;
+SecondMiddleware._teardowns = 0;
+
+module.exports = SecondMiddleware;

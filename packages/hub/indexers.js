@@ -46,7 +46,8 @@ const RunningIndexers = require('./indexing/running-indexers');
 
 module.exports = declareInjections({
   schemaLoader: 'hub:schema-loader',
-  dataSources: 'config:data-sources'
+  dataSources: 'config:data-sources',
+  controllingBranch: 'hub:controlling-branch'
 },
 
 class Indexers extends EventEmitter {
@@ -64,7 +65,7 @@ class Indexers extends EventEmitter {
   async schemaForBranch(branch) {
     if (!this._schemaCache) {
       this._schemaCache = (async () => {
-        let running = new RunningIndexers(await this._seedSchema(), await this._client(), this.emit.bind(this), this.schemaLoader.ownTypes());
+        let running = new RunningIndexers(await this._seedSchema(), await this._client(), this.emit.bind(this), this.schemaLoader.ownTypes(), this.controllingBranch.name);
         try {
           return await running.schemas();
         } finally {
@@ -174,16 +175,35 @@ class Indexers extends EventEmitter {
   async _doUpdate(forceRefresh, hints) {
     log.debug('begin update, forceRefresh=%s', forceRefresh);
     let priorCache = this._schemaCache;
-    let running = new RunningIndexers(await this._seedSchema(), await this._client(), this.emit.bind(this), this.schemaLoader.ownTypes());
+    let running = new RunningIndexers(await this._seedSchema(), await this._client(), this.emit.bind(this), this.schemaLoader.ownTypes(), this.controllingBranch.name);
     try {
       let schemas = await running.update(forceRefresh, hints);
       if (this._schemaCache === priorCache) {
+        // nobody else has done a more recent update of the schema
+        // cache than us, so we can try to update it.
         if (priorCache) {
-          await teardownCachedSchemas(await priorCache);
+          // Compare each branch, so we don't invalidate the schemas
+          // unnecessarily
+          for (let [branch, newSchema] of Object.entries(schemas)) {
+            let oldSchema = priorCache[branch];
+            if (!newSchema.equalTo(oldSchema)) {
+              log.info('schema for branch %s was changed', branch);
+              priorCache[branch] = newSchema;
+              if (oldSchema) {
+                await oldSchema.teardown();
+              }
+            }
+          }
+        } else {
+          this._schemaCache = Promise.resolve(schemas);
         }
-        this._schemaCache = Promise.resolve(schemas);
       } else {
-        await teardownCachedSchemas(schemas);
+        // somebody else has updated the cache in the time since we
+        // started running, so just drop the schemas we computed
+        // during indexing
+        for (let schema of Object.values(schemas)) {
+          await schema.teardown();
+        }
       }
     } finally {
       await running.destroy();
@@ -193,9 +213,3 @@ class Indexers extends EventEmitter {
   }
 
 });
-
-async function teardownCachedSchemas(schemaCache) {
-  for (let schema of Object.values(schemaCache)) {
-    await schema.teardown();
-  }
-}

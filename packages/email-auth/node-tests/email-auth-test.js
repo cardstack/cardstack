@@ -15,7 +15,7 @@ describe('email-auth', function() {
     let factory = new JSONAPIFactory();
 
     factory.addResource('grants')
-      .withRelated('who', { type: 'fields', id: 'id' })
+      .withRelated('who', [{ type: 'fields', id: 'id' }])
       .withRelated('types', [
         { type: 'content-types', id: 'users' }
       ])
@@ -25,7 +25,7 @@ describe('email-auth', function() {
       });
 
     factory.addResource('grants')
-      .withRelated('who', { type: 'groups', id: 'everyone' })
+      .withRelated('who', [{ type: 'groups', id: 'everyone' }])
       .withAttributes({
         mayLogin: true
       });

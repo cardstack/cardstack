@@ -3,10 +3,11 @@
   "packages": [
     "packages/*"
   ],
-  "version": "0.6.12",
+  "version": "0.8.8",
   "npmClient": "yarn",
   "npmClientArgs": [
     "--ignore-engines"
   ],
-  "useWorkspaces": true
+  "useWorkspaces": true,
+  "exact": true
 }

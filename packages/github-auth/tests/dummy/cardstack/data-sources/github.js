@@ -19,8 +19,8 @@ module.exports = [
       'may-read-fields': true
     },
     relationships: {
-      who: {
-        data: { type: 'fields', id: 'id' }
+      who:{
+        data: [{ type: 'fields', id: 'id' }]
       },
       types: {
         data: [

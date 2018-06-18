@@ -3,6 +3,10 @@
     <div class="cardstack-rail-item cardstack-non-interactive">
       <div class="cardstack-network-icon"
            style={{css-url "background-image" network.iconUrl}} >{{network.name}}</div>
+
+      {{#if session.user}}
+        {{cardstack-content content=session.user format="sidebar-network"}}
+      {{/if}}
     </div>
   {{/if}}
   {{#if session.user}}

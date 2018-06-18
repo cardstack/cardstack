@@ -18,6 +18,16 @@ module('Acceptance | show post', function(hooks) {
         .withAttributes({
           title: 'hello world'
         });
+      factory.addResource('grants', 'wide-open')
+        .withAttributes({
+          mayWriteFields: true,
+          mayReadFields: true,
+          mayCreateResource: true,
+          mayReadResource: true,
+          mayUpdateResource: true,
+          mayDeleteResource: true
+        })
+        .withRelated('who', [{ type: 'groups', id: 'everyone' }]);
     },
 
     destroy() {

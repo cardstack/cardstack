@@ -6,6 +6,9 @@ const {
   destroyDefaultEnvironment
 } = require('../../../tests/stub-middleware/node_modules/@cardstack/test-support/env');
 
+
+let SecondMiddleware = require('../../../tests/stub-middleware/middleware/second.js');
+
 describe('middleware-stack', function() {
 
   let env, request;
@@ -97,6 +100,38 @@ describe('middleware-stack', function() {
       let response = await request.get('/first');
       expect(response).hasStatus(404);
     });
+
+    it('does not tear down middlewares when no schema has changed', async function() {
+      SecondMiddleware._teardowns = 0;
+      let response = await request.get('/first');
+      expect(response).hasStatus(200);
+
+      await env.lookup('hub:indexers').update({ forceRefresh: true });
+      response = await request.get('/first');
+      expect(response).hasStatus(200);
+      expect(SecondMiddleware._teardowns).to.equal(0);
+    });
+
+    it('tears down middlewares when schema changes', async function() {
+      SecondMiddleware._teardowns = 0;
+
+      let response = await request.get('/first');
+      expect(response).hasStatus(200);
+
+      await env.lookup('hub:writers').create('master', env.session, 'plugin-configs', {
+        id: 'stub-middleware',
+        type: 'plugin-configs',
+        attributes: {
+          enabled: false
+        }
+      });
+      await env.lookup('hub:indexers').update({ forceRefresh: true });
+      response = await request.get('/first');
+      expect(response).hasStatus(404);
+      expect(SecondMiddleware._teardowns).to.equal(1);
+
+    });
+
 
   });
 });

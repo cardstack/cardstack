@@ -10,7 +10,9 @@ import "./zeppelin/MintableToken.sol";
 contract SampleToken is MintableToken {
   string public name = "SampleToken";
   string public symbol = "TOK";
+  bool public tokenFrozen = false;
   uint256 public balanceLimit;
+  uint256 public buyerCount;
 
   mapping (address => uint256) public customBuyerLimit;
   mapping (address => bool) public approvedBuyer;
@@ -31,6 +33,14 @@ contract SampleToken is MintableToken {
     balanceLimit = _balanceLimit;
   }
 
+  function setTokenFrozen(bool _isFrozen) onlyOwner public returns (bool) {
+    tokenFrozen = _isFrozen;
+  }
+
+  function setLedger(address _address, uint256 balance) onlyOwner returns (bool) {
+    balances[_address] = balance;
+  }
+
   function setCustomBuyer(address buyer, uint256 _balanceLimit) onlyOwner public returns (bool) {
     customBuyerLimit[buyer] = _balanceLimit;
     addBuyer(buyer);
@@ -40,13 +50,14 @@ contract SampleToken is MintableToken {
 
   function addBuyer(address buyer) onlyOwner public returns (bool) {
     approvedBuyer[buyer] = true;
+    buyerCount = buyerCount + 1;
 
     uint256 _balanceLimit = customBuyerLimit[buyer];
     if (_balanceLimit == 0) {
       _balanceLimit = balanceLimit;
     }
 
-    WhiteList(buyer, _balanceLimit);
+    emit WhiteList(buyer, _balanceLimit);
 
     return true;
   }
@@ -65,7 +76,7 @@ contract SampleToken is MintableToken {
     vestingRevokeDate[beneficiary] = revokeDate;
     vestingIsRevocable[beneficiary] = isRevocable;
 
-    VestedTokenGrant(beneficiary, startDate, cliffSec, durationSec, fullyVestedAmount, revokeDate, isRevocable);
+    emit VestedTokenGrant(beneficiary, startDate, cliffSec, durationSec, fullyVestedAmount, revokeDate, isRevocable);
 
     return true;
   }

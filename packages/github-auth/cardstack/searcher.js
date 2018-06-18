@@ -1,5 +1,4 @@
 const request = require('./lib/request');
-const { rewriteExternalUser } = require('@cardstack/authentication');
 
 module.exports = class GitHubSearcher {
   static create(...args) {
@@ -34,8 +33,6 @@ module.exports = class GitHubSearcher {
       }
     };
     let response = await request(options);
-    return rewriteExternalUser(response.body, this.dataSource);
+    return await this.dataSource.rewriteExternalUser(response.body);
   }
-
-
 };

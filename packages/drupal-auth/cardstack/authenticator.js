@@ -76,7 +76,15 @@ module.exports = class {
     };
   }
 
-  constructor() {
-    this.defaultUserTemplate =  "{ \"id\": \"{{login}}\", \"type\": \"drupal-users\", \"attributes\": { \"name\": \"{{name}}\", \"email\":\"{{email}}\", \"avatar-url\":\"{{avatar_url}}\" }}";
+  defaultUserRewriter(user) {
+    return {
+      id: user.login,
+      type: "drupal-users",
+      attributes: {
+        name: user.name,
+        email: user.email,
+        "avatar-url": user.avatar_url
+      }
+    };
   }
 };

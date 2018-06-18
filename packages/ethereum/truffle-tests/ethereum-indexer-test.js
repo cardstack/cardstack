@@ -3,21 +3,27 @@ const {
   createDefaultEnvironment,
   destroyDefaultEnvironment
 } = require('@cardstack/test-support/env');
-const { promisify } = require('util');
-const timeout = promisify(setTimeout);
+const addresses = require('./data/addresses');
 const JSONAPIFactory = require('@cardstack/test-support/jsonapi-factory');
 
-async function waitForEthereumEvents(service) {
-  while (service._indexQueue.length) {
-    await timeout(100);
-  }
-  await service._indexerPromise;
+const contractName = 'sample-token';
+let buffer, ethereumService, env;
+
+async function teardown() {
+  await buffer.flush();
+  await ethereumService.stopAll();
+  await destroyDefaultEnvironment(env);
+}
+
+async function waitForEthereumEvents(buffer) {
+  await buffer.flush();
 }
 
 contract('SampleToken', function(accounts) {
   let accountOne = accounts[0].toLowerCase();
   let accountTwo = accounts[1].toLowerCase();
   let accountThree = accounts[2].toLowerCase();
+  let accountFour = accounts[3].toLowerCase();
 
   describe('private blockchain sanity checks', function() {
     it("should mint SampleToken in the token owner account", async function() {
@@ -58,43 +64,38 @@ contract('SampleToken', function(accounts) {
   });
 
   describe('ethereum-indexer', function() {
-    let env, dataSource, token, ethereumService;
+    let dataSource, token;
 
     async function setup() {
       let factory = new JSONAPIFactory();
       token = await SampleToken.new();
       await token.fund({ value: web3.toWei(0.01, 'ether'), from: accountOne });
 
-      dataSource = factory.addResource('data-sources', 'ethereum')
+      dataSource = factory.addResource('data-sources', contractName)
         .withAttributes({
           'source-type': '@cardstack/ethereum',
           params: {
             branches: {
               master: { jsonRpcUrl: "ws://localhost:7545" }
             },
-            contracts: {
-              "sample-token": {
-                abi: token.abi,
-                addresses: { master: token.address },
-                eventContentTriggers: {
-                  Transfer: [ "sample-token-balance-ofs" ],
-                  Mint: [ "sample-token-balance-ofs" ],
-                  WhiteList: [ "sample-token-approved-buyers", "sample-token-custom-buyer-limits" ],
-                  VestedTokenGrant: [ "sample-token-vesting-schedules" ]
-                }
+            contract: {
+              abi: token.abi,
+              addresses: { master: token.address },
+              eventContentTriggers: {
+                Transfer: [ "sample-token-balance-ofs" ],
+                Mint: [ "sample-token-balance-ofs" ],
+                WhiteList: [ "sample-token-approved-buyers", "sample-token-custom-buyer-limits" ],
+                VestedTokenGrant: [ "sample-token-vesting-schedules" ]
               }
             }
           },
         });
 
       env = await createDefaultEnvironment(`${__dirname}/..`, factory.getModels());
-      ethereumService = env.lookup(`plugin-services:${require.resolve('../cardstack/service')}`);
-      ethereumService._setProcessQueueTimeout(10);
-    }
+      buffer = env.lookup(`plugin-services:${require.resolve('../cardstack/buffer')}`);
+      ethereumService = buffer.ethereumService;
 
-    async function teardown() {
-      await destroyDefaultEnvironment(env);
-      await ethereumService.stop();
+      await waitForEthereumEvents(buffer);
     }
 
     beforeEach(setup);
@@ -107,7 +108,7 @@ contract('SampleToken', function(accounts) {
           "id": "sample-tokens",
           "type": "content-types",
           "meta": {
-            "source": "ethereum"
+            "source": contractName
           },
           "relationships": {
             "fields": {
@@ -143,6 +144,14 @@ contract('SampleToken', function(accounts) {
                 {
                   "type": "fields",
                   "id": "sample-token-symbol"
+                },
+                {
+                  "type": "fields",
+                  "id": "sample-token-buyer-count"
+                },
+                {
+                  "id": "sample-token-token-frozen",
+                  "type": "fields"
                 }
               ]
             },
@@ -175,14 +184,14 @@ contract('SampleToken', function(accounts) {
               ]
             },
             "who": {
-              "data": {
+              "data": [{
                 "id": "everyone",
                 "type": "groups"
-              }
+              }]
             }
           },
           "meta": {
-            "source": "ethereum"
+            "source": contractName
           }
         }
       });
@@ -218,7 +227,7 @@ contract('SampleToken', function(accounts) {
             }
           },
           "meta": {
-            "source": "ethereum"
+            "source": contractName
           }
         }
       });
@@ -254,7 +263,7 @@ contract('SampleToken', function(accounts) {
             }
           },
           "meta": {
-            "source": "ethereum"
+            "source": contractName
           }
         }
       });
@@ -309,7 +318,7 @@ contract('SampleToken', function(accounts) {
             }
           },
           "meta": {
-            "source": "ethereum"
+            "source": contractName
           }
         }
       });
@@ -323,7 +332,7 @@ contract('SampleToken', function(accounts) {
             "field-type": "@cardstack/core-types::string"
           },
           "meta": {
-            "source": "ethereum"
+            "source": contractName
           }
         }
       });
@@ -337,7 +346,7 @@ contract('SampleToken', function(accounts) {
             "field-type": "@cardstack/core-types::string"
           },
           "meta": {
-            "source": "ethereum"
+            "source": contractName
           }
         }
       });
@@ -351,7 +360,7 @@ contract('SampleToken', function(accounts) {
             "field-type": "@cardstack/core-types::string"
           },
           "meta": {
-            "source": "ethereum"
+            "source": contractName
           }
         }
       });
@@ -365,7 +374,7 @@ contract('SampleToken', function(accounts) {
             "field-type": "@cardstack/core-types::string"
           },
           "meta": {
-            "source": "ethereum"
+            "source": contractName
           }
         }
       });
@@ -379,7 +388,7 @@ contract('SampleToken', function(accounts) {
             "field-type": "@cardstack/core-types::string"
           },
           "meta": {
-            "source": "ethereum"
+            "source": contractName
           }
         }
       });
@@ -393,7 +402,7 @@ contract('SampleToken', function(accounts) {
             "field-type": "@cardstack/core-types::boolean"
           },
           "meta": {
-            "source": "ethereum"
+            "source": contractName
           }
         }
       });
@@ -409,10 +418,10 @@ contract('SampleToken', function(accounts) {
           },
           "relationships": {
             "who": {
-              "data": {
+              "data": [{
                 "id": "everyone",
                 "type": "groups"
-              }
+              }]
             },
             "types": {
               "data": [
@@ -424,7 +433,7 @@ contract('SampleToken', function(accounts) {
             }
           },
           "meta": {
-            "source": "ethereum"
+            "source": contractName
           }
         }
       });
@@ -459,7 +468,7 @@ contract('SampleToken', function(accounts) {
             }
           },
           "meta": {
-            "source": "ethereum"
+            "source": contractName
           }
         }
       });
@@ -475,10 +484,10 @@ contract('SampleToken', function(accounts) {
           },
           "relationships": {
             "who": {
-              "data": {
+              "data": [{
                 "id": "everyone",
                 "type": "groups"
-              }
+              }]
             },
             "types": {
               "data": [
@@ -490,7 +499,7 @@ contract('SampleToken', function(accounts) {
             }
           },
           "meta": {
-            "source": "ethereum"
+            "source": contractName
           }
         }
       });
@@ -504,7 +513,7 @@ contract('SampleToken', function(accounts) {
             "field-type": "@cardstack/core-types::string"
           },
           "meta": {
-            "source": "ethereum"
+            "source": contractName
           }
         }
       });
@@ -518,7 +527,7 @@ contract('SampleToken', function(accounts) {
             "field-type": "@cardstack/core-types::boolean"
           },
           "meta": {
-            "source": "ethereum"
+            "source": contractName
           }
         }
       });
@@ -532,7 +541,7 @@ contract('SampleToken', function(accounts) {
             "field-type": "@cardstack/core-types::string"
           },
           "meta": {
-            "source": "ethereum"
+            "source": contractName
           }
         }
       });
@@ -546,7 +555,7 @@ contract('SampleToken', function(accounts) {
             "field-type": "@cardstack/core-types::string"
           },
           "meta": {
-            "source": "ethereum"
+            "source": contractName
           }
         }
       });
@@ -560,7 +569,7 @@ contract('SampleToken', function(accounts) {
             "field-type": "@cardstack/core-types::string"
           },
           "meta": {
-            "source": "ethereum"
+            "source": contractName
           }
         }
       });
@@ -584,7 +593,7 @@ contract('SampleToken', function(accounts) {
             }
           },
           "meta": {
-            "source": "ethereum"
+            "source": contractName
           }
         }
       });
@@ -593,6 +602,7 @@ contract('SampleToken', function(accounts) {
     it("indexes a contract", async function() {
       let contract = await env.lookup('hub:searchers').get(env.session, 'master', 'sample-tokens', token.address);
       contract.data.attributes["sample-token-owner"] = contract.data.attributes["sample-token-owner"].toLowerCase();
+      delete contract.data.meta;
       expect(contract).to.deep.equal({
         "data": {
           "id": token.address,
@@ -601,14 +611,13 @@ contract('SampleToken', function(accounts) {
             "ethereum-address": token.address,
             "balance-wei": "10000000000000000",
             "sample-token-balance-limit": "0",
+            "sample-token-buyer-count": "0",
             "sample-token-minting-finished": false,
             "sample-token-name": "SampleToken",
             "sample-token-total-supply": "0",
             "sample-token-owner": accounts[0],
+            "sample-token-token-frozen": false,
             "sample-token-symbol": "TOK"
-          },
-          "meta": {
-            "source": "ethereum"
           }
         }
       });
@@ -616,18 +625,20 @@ contract('SampleToken', function(accounts) {
 
     it("indexes mapping entry that contains multiple return values", async function() {
       await token.grantVestedTokens(accountOne,
-                                    100,
-                                    1000000000,
-                                    1000500000,
-                                    500000,
-                                    1000600000,
-                                    true);
-      await waitForEthereumEvents(ethereumService);
+        100,
+        1000000000,
+        1000500000,
+        500000,
+        1000600000,
+        true);
+
+      await waitForEthereumEvents(buffer);
 
       let vestingSchedule = await env.lookup('hub:searchers').get(env.session, 'master', 'sample-token-vesting-schedules', accountOne);
 
       expect(vestingSchedule.data.attributes["ethereum-address"]).to.not.equal(vestingSchedule.data.id, 'the case between the addresses is different');
       vestingSchedule.data.attributes["ethereum-address"] = vestingSchedule.data.attributes["ethereum-address"].toLowerCase();
+      delete vestingSchedule.data.meta;
       expect(vestingSchedule).to.deep.equal({
         "data": {
           "id": accountOne,
@@ -649,9 +660,6 @@ contract('SampleToken', function(accounts) {
               }
             }
           },
-          "meta": {
-            "source": "ethereum"
-          }
         }
       });
     });
@@ -674,11 +682,12 @@ contract('SampleToken', function(accounts) {
       await token.mint(accountOne, 100);
       await token.transfer(accountTwo, 10, { from: accountOne });
 
-      await waitForEthereumEvents(ethereumService);
+      await waitForEthereumEvents(buffer);
 
       let accountOneLedgerEntry = await env.lookup('hub:searchers').get(env.session, 'master', 'sample-token-balance-ofs', accountOne);
       expect(accountOneLedgerEntry.data.attributes["ethereum-address"]).to.not.equal(accountOneLedgerEntry.data.id, 'the case between the addresses is different');
       accountOneLedgerEntry.data.attributes["ethereum-address"] = accountOneLedgerEntry.data.attributes["ethereum-address"].toLowerCase();
+      delete accountOneLedgerEntry.data.meta;
       expect(accountOneLedgerEntry).to.deep.equal({
         "data": {
           "id": accountOne,
@@ -695,9 +704,6 @@ contract('SampleToken', function(accounts) {
               }
             }
           },
-          "meta": {
-            "source": "ethereum"
-          }
         }
       });
 
@@ -736,11 +742,14 @@ contract('SampleToken', function(accounts) {
 
       await token.addBuyer(accountOne);
       await token.setCustomBuyer(accountTwo, 10);
-      await waitForEthereumEvents(ethereumService);
+      await waitForEthereumEvents(buffer);
+
       await env.lookup('hub:indexers').update({ forceRefresh: true });
+      await waitForEthereumEvents(buffer);
 
       let accountOneApprovedBuyer = await env.lookup('hub:searchers').get(env.session, 'master', 'sample-token-approved-buyers', accountOne);
       accountOneApprovedBuyer.data.attributes["ethereum-address"] = accountOneApprovedBuyer.data.attributes["ethereum-address"].toLowerCase();
+      delete accountOneApprovedBuyer.data.meta;
       expect(accountOneApprovedBuyer).to.deep.equal({
         "data": {
           "id": accountOne,
@@ -757,14 +766,12 @@ contract('SampleToken', function(accounts) {
               }
             }
           },
-          "meta": {
-            "source": "ethereum"
-          }
         }
       });
 
       let accountOneCustomBuyerLimit = await env.lookup('hub:searchers').get(env.session, 'master', 'sample-token-custom-buyer-limits', accountOne);
       accountOneCustomBuyerLimit.data.attributes["ethereum-address"] = accountOneCustomBuyerLimit.data.attributes["ethereum-address"].toLowerCase();
+      delete accountOneCustomBuyerLimit.data.meta;
       expect(accountOneCustomBuyerLimit).to.deep.equal({
         "data": {
           "id": accountOne,
@@ -781,9 +788,6 @@ contract('SampleToken', function(accounts) {
               }
             }
           },
-          "meta": {
-            "source": "ethereum"
-          }
         }
       });
 
@@ -796,7 +800,7 @@ contract('SampleToken', function(accounts) {
   });
 
   describe('ethereum-indexer event triggers', function() {
-    let env, token, ethereumService;
+    let token;
 
     async function setup() {
       let factory = new JSONAPIFactory();
@@ -804,45 +808,39 @@ contract('SampleToken', function(accounts) {
 
       await token.mint(accountOne, 100);
 
-      factory.addResource('data-sources', 'ethereum',)
+      factory.addResource('data-sources', contractName)
         .withAttributes({
           'source-type': '@cardstack/ethereum',
           params: {
             branches: {
               master: { jsonRpcUrl: "ws://localhost:7545" }
             },
-            contracts: {
-              "sample-token": {
-                abi: token.abi,
-                addresses: { master: token.address },
-                eventContentTriggers: {
-                  MintingFinished: []
-                }
+            contract: {
+              abi: token.abi,
+              addresses: { master: token.address },
+              eventContentTriggers: {
+                MintingFinished: []
               }
             }
           },
         });
 
       env = await createDefaultEnvironment(`${__dirname}/..`, factory.getModels());
-      ethereumService = env.lookup(`plugin-services:${require.resolve('../cardstack/service')}`);
-      ethereumService._setProcessQueueTimeout(10);
-    }
+      buffer = env.lookup(`plugin-services:${require.resolve('../cardstack/buffer')}`);
+      ethereumService = buffer.ethereumService;
 
-    async function teardown() {
-      await destroyDefaultEnvironment(env);
-      await ethereumService.stop();
+      await waitForEthereumEvents(buffer);
     }
 
     beforeEach(setup);
     afterEach(teardown);
 
     it('can update contract document from event content trigger', async function() {
-
       let contract = await env.lookup('hub:searchers').get(env.session, 'master', 'sample-tokens', token.address);
       expect(contract.data.attributes['sample-token-minting-finished']).to.equal(false, 'the minting-finished field is correct');
 
       await token.finishMinting();
-      await waitForEthereumEvents(ethereumService);
+      await waitForEthereumEvents(buffer);
 
       contract = await env.lookup('hub:searchers').get(env.session, 'master', 'sample-tokens', token.address);
       expect(contract.data.attributes['sample-token-minting-finished']).to.equal(true, 'the minting-finished field is correct');
@@ -850,7 +848,139 @@ contract('SampleToken', function(accounts) {
   });
 
   describe('ethereum-indexer for past events', function() {
-    let env, token, ethereumService;
+    let pastToken, token, indexers, contract;
+
+    async function setup() {
+      let factory = new JSONAPIFactory();
+      pastToken = await SampleToken.new();
+      token = await SampleToken.new();
+
+      let dataSource = factory.addResource('data-sources', contractName)
+        .withAttributes({
+          'source-type': '@cardstack/ethereum',
+          params: {
+            branches: {
+              master: { jsonRpcUrl: "ws://localhost:7545" }
+            },
+            contract: {
+              abi: token.abi,
+              addresses: { master: token.address },
+              pastAddresses: { master: [ pastToken.address ] },
+              indexingSkipIndicators: [ "tokenFrozen" ],
+              eventContentTriggers: {
+                WhiteList: [ "sample-token-approved-buyers" ],
+                Transfer: [ "sample-token-balance-ofs" ],
+                Mint: [ "sample-token-balance-ofs" ]
+              }
+            }
+          },
+        });
+
+      contract = dataSource.data.attributes.params.contract,
+      env = await createDefaultEnvironment(`${__dirname}/..`, factory.getModels());
+      indexers = await env.lookup('hub:indexers');
+
+      buffer = env.lookup(`plugin-services:${require.resolve('../cardstack/buffer')}`);
+      ethereumService = buffer.ethereumService;
+
+      await waitForEthereumEvents(buffer);
+    }
+
+    beforeEach(setup);
+    afterEach(teardown);
+
+    it("indexes past events that occur at a block height heigher than the last time it has indexed", async function() {
+      await ethereumService.stopAll();
+
+      let addCount = 0;
+
+      indexers.on('add', ({ type }) => {
+        if (!['sample-tokens', 'sample-token-balance-ofs'].includes(type)) { return; }
+        addCount++;
+      });
+
+      await token.mint(accountOne, 100);
+      await token.transfer(accountTwo, 20, { from: accountOne });
+      await token.transfer(accountThree, 30, { from: accountOne });
+
+      await ethereumService.start({ contract, name: contractName, buffer });
+      await indexers.update({ forceRefresh: true });
+      await waitForEthereumEvents(buffer);
+
+      expect(addCount).to.equal(4, 'the correct number of records were indexed');
+
+      await ethereumService.stopAll();
+
+      await token.transfer(accountFour, 20, { from: accountOne });
+
+      await ethereumService.start({ contract, name: contractName, buffer });
+      await indexers.update({ forceRefresh: true });
+      await waitForEthereumEvents(buffer);
+
+      // the add count increases by 3:
+      //   1 record for the sender of the transfer
+      //   1 record for the recipient of transfer
+      //   1 record for the token
+      expect(addCount).to.equal(7, 'the correct number of records were indexed');
+    });
+
+    it("skips indexing when contract state indicates that the contract is not prepared to be indexed", async function() {
+      await ethereumService.stopAll();
+
+      let addCount = 0;
+
+      indexers.on('add', ({ type }) => {
+        if (!['sample-tokens', 'sample-token-balance-ofs'].includes(type)) { return; }
+        addCount++;
+      });
+
+      await token.mint(accountOne, 100);
+      await token.transfer(accountTwo, 20, { from: accountOne });
+      await token.setTokenFrozen(true);
+
+      await ethereumService.start({ contract, name: contractName, buffer });
+      await indexers.update({ forceRefresh: true });
+      await waitForEthereumEvents(buffer);
+
+      expect(addCount).to.equal(0, 'the contract is not indexed while it is frozen');
+
+      await token.setTokenFrozen(false);
+
+      await indexers.update({ forceRefresh: true });
+      await waitForEthereumEvents(buffer);
+
+      expect(addCount).to.equal(3, 'the correct number of records were indexed');
+      let accountOneLedgerEntry = await env.lookup('hub:searchers').get(env.session, 'master', 'sample-token-balance-ofs', accountOne);
+      let accountTwoLedgerEntry = await env.lookup('hub:searchers').get(env.session, 'master', 'sample-token-balance-ofs', accountTwo);
+
+      expect(accountOneLedgerEntry.data.attributes["mapping-number-value"]).to.equal("80", "the token balance is correct");
+      expect(accountTwoLedgerEntry.data.attributes["mapping-number-value"]).to.equal("20", "the token balance is correct");
+    });
+
+    it("indexes past events that occurred on a previous contract", async function() {
+      await ethereumService.stopAll();
+
+      await pastToken.mint(accountOne, 100);
+      await pastToken.transfer(accountTwo, 20, { from: accountOne });
+      // these wont trigger events, hub is reliant on the past contract for the event triggers
+      await token.setLedger(accountOne, 80);
+      await token.setLedger(accountTwo, 20);
+
+      await ethereumService.start({ contract, name: contractName, buffer });
+      await indexers.update({ forceRefresh: true });
+      await waitForEthereumEvents(buffer);
+
+      let accountOneLedgerEntry = await env.lookup('hub:searchers').get(env.session, 'master', 'sample-token-balance-ofs', accountOne);
+      let accountTwoLedgerEntry = await env.lookup('hub:searchers').get(env.session, 'master', 'sample-token-balance-ofs', accountTwo);
+
+      expect(accountOneLedgerEntry.data.attributes["mapping-number-value"]).to.equal("80", "the token balance is correct");
+      expect(accountTwoLedgerEntry.data.attributes["mapping-number-value"]).to.equal("20", "the token balance is correct");
+    });
+
+  });
+
+  describe('ethereum-indexer for a large amount of past events', function() {
+    let token;
 
     async function setup() {
       let factory = new JSONAPIFactory();
@@ -861,47 +991,54 @@ contract('SampleToken', function(accounts) {
       await token.transfer(accountThree, 30, { from: accountOne });
       await token.transfer(accountThree, 7, { from: accountTwo });
 
-      factory.addResource('data-sources')
+      for (let address of addresses) {
+        await token.addBuyer(address);
+      }
+
+      factory.addResource('data-sources', contractName)
         .withAttributes({
           'source-type': '@cardstack/ethereum',
           params: {
             branches: {
               master: { jsonRpcUrl: "ws://localhost:7545" }
             },
-            contracts: {
-              "sample-token": {
-                abi: token.abi,
-                addresses: { master: token.address },
-                eventContentTriggers: {
-                  Transfer: [ "sample-token-balance-ofs" ],
-                  Mint: [ "sample-token-balance-ofs" ]
-                }
+            contract: {
+              abi: token.abi,
+              addresses: { master: token.address },
+              eventContentTriggers: {
+                WhiteList: [ "sample-token-approved-buyers" ],
+                Transfer: [ "sample-token-balance-ofs" ],
+                Mint: [ "sample-token-balance-ofs" ]
               }
             }
           },
         });
 
       env = await createDefaultEnvironment(`${__dirname}/..`, factory.getModels());
-      ethereumService = env.lookup(`plugin-services:${require.resolve('../cardstack/service')}`);
-      ethereumService._setProcessQueueTimeout(10);
-    }
+      buffer = env.lookup(`plugin-services:${require.resolve('../cardstack/buffer')}`);
+      ethereumService = buffer.ethereumService;
 
-    async function teardown() {
-      await destroyDefaultEnvironment(env);
-      await ethereumService.stop();
+      await waitForEthereumEvents(buffer);
     }
 
     beforeEach(setup);
     afterEach(teardown);
 
-    it("can index past events on the contract", async function() {
+    it("can index a large amount of past events on the contract", async function() {
       let accountOneLedgerEntry = await env.lookup('hub:searchers').get(env.session, 'master', 'sample-token-balance-ofs', accountOne.toLowerCase());
       let accountTwoLedgerEntry = await env.lookup('hub:searchers').get(env.session, 'master', 'sample-token-balance-ofs', accountTwo.toLowerCase());
       let accountThreeLedgerEntry = await env.lookup('hub:searchers').get(env.session, 'master', 'sample-token-balance-ofs', accountThree.toLowerCase());
+      let tokenRecord = await env.lookup('hub:searchers').get(env.session, 'master', 'sample-tokens', token.address);
 
+      expect(tokenRecord.data.attributes["sample-token-buyer-count"]).to.equal("1000", "the buyer count is correct");
       expect(accountOneLedgerEntry.data.attributes["mapping-number-value"]).to.equal("50", "the token balance is correct");
       expect(accountTwoLedgerEntry.data.attributes["mapping-number-value"]).to.equal("13", "the token balance is correct");
       expect(accountThreeLedgerEntry.data.attributes["mapping-number-value"]).to.equal("37", "the token balance is correct");
+
+      for (let address of addresses) {
+        let whitelistEntry = await env.lookup('hub:searchers').get(env.session, 'master', 'sample-token-approved-buyers', address.toLowerCase());
+        expect(whitelistEntry.data.attributes["mapping-boolean-value"]).to.equal(true);
+      }
     });
   });
 });

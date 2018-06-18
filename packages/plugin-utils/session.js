@@ -5,11 +5,12 @@ class Session {
   //
   // optionalUser can be a jsonapi document representing that user (a
   // full document, including the top-level `data` property)
-  constructor(payload, userSearcher, optionalUser, optionalGroupIds) {
+  constructor(payload, userSearcher, optionalUser, optionalRealms, meta) {
     this.payload = payload;
     this.userSearcher = userSearcher;
     this._user = optionalUser;
-    this._realms = optionalGroupIds;
+    this._realms = optionalRealms;
+    this.meta = meta;
   }
   get id() {
     return this.payload.id;
@@ -34,16 +35,37 @@ class Session {
   // access)
   async realms() {
     if (!this._realms) {
-      if (this.id === 'everyone') {
-        this._realms = ['everyone'];
+      if (!this.userSearcher || !this.userSearcher.get ) {
+        throw new Error(`no valid user searcher in session for ${this.type} ${this.id}`);
+      }
+
+      let ownBaseRealm = Session.encodeBaseRealm(this.type, this.id);
+
+      let realmsDoc;
+      try {
+        realmsDoc = await this.userSearcher.get('user-realms', ownBaseRealm);
+      } catch(err) {
+        if (err.status !== 404) {
+          throw err;
+        }
+      }
+      if (realmsDoc && realmsDoc.data && realmsDoc.data.attributes && realmsDoc.data.attributes.realms) {
+        this._realms = [...realmsDoc.data.attributes.realms, everyoneRealm];
       } else {
-        this._realms = [this.id, 'everyone'];
+        this._realms = [ownBaseRealm, everyoneRealm];
       }
     }
     return this._realms;
   }
 
+  static encodeBaseRealm(type, id) {
+    return `${encodeURIComponent(type)}/${encodeURIComponent(id)}`;
+  }
+
 }
+
+const everyoneRealm = Session.encodeBaseRealm('groups', 'everyone');
+
 
 module.exports = Session;
 
@@ -55,16 +77,17 @@ Object.defineProperty(Session, 'INTERNAL_PRIVILEGED', {
   get() {
     if (!privilegedSession) {
       privilegedSession = new Session(
-        { id: '@cardstack/hub', type: 'users' },
+        { id: '@cardstack/hub', type: 'groups' },
         null,
         {
           id: '@cardstack/hub',
-          type: 'users',
+          type: 'groups',
           attributes: {
             'full-name': '@cardstack/hub/authentication',
             email: 'noreply@nowhere.com'
           }
-        }
+        },
+        [Session.encodeBaseRealm('groups', '@cardstack/hub'), everyoneRealm]
       );
     }
     return privilegedSession;
@@ -86,7 +109,8 @@ Object.defineProperty(Session, 'EVERYONE', {
             'full-name': 'Anonymous',
             email: 'noreply@nowhere.com'
           }
-        }
+        },
+        [everyoneRealm]
       );
     }
     return everyoneSession;

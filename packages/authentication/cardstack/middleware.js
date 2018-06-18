@@ -5,11 +5,9 @@ const bearerTokenPattern = /bearer +(.*)$/i;
 const compose = require('koa-compose');
 const route = require('koa-better-route');
 const koaJSONBody = require('koa-json-body');
-const Handlebars = require('handlebars');
 
 const { declareInjections } = require('@cardstack/di');
 const { withJsonErrorHandling } = Error;
-const { rewriteExternalUser } = require('..');
 
 function addCorsHeaders(response) {
   response.set('Access-Control-Allow-Origin', '*');
@@ -23,6 +21,7 @@ function isPartialSession(doc) {
 
 module.exports = declareInjections({
   encryptor: 'hub:encryptor',
+  sessions: 'hub:sessions',
   searcher: 'hub:searchers',
   writer: 'hub:writers',
   indexers: 'hub:indexers',
@@ -53,7 +52,7 @@ class Authentication {
     };
   }
 
-  _tokenToSession(token) {
+  async _tokenToSession(token, ctxt) {
     let ciSessionId = this.ciSession && this.ciSession.id;
     if (ciSessionId && token === ciSessionId) {
       return Session.INTERNAL_PRIVILEGED;
@@ -64,7 +63,8 @@ class Authentication {
       if (validUntil <= Date.now()/1000) {
         log.debug("Ignoring expired token");
       } else {
-        return new Session(sessionPayload, this.userSearcher);
+        let sessionMeta = await this._sessionMeta(ctxt);
+        return this.sessions.create(sessionPayload.type, sessionPayload.id, sessionMeta);
       }
     } catch (err) {
       if (/unable to authenticate data|invalid key length|Not a valid signed message/.test(err.message)) {
@@ -93,9 +93,12 @@ class Authentication {
 
   _tokenVerifier() {
     return async (ctxt, next) => {
+      log.trace(`client headers: ${JSON.stringify(ctxt.header)}`);
+      log.trace(`client IP address: ${ctxt.ip}`);
+
       let m = bearerTokenPattern.exec(ctxt.header['authorization']);
       if (m) {
-        let session = this._tokenToSession(m[1]);
+        let session = await this._tokenToSession(m[1], ctxt);
         if (session) {
           ctxt.state.cardstackSession = session;
         }
@@ -139,6 +142,11 @@ class Authentication {
           if (!user) { throw new Error(`cant find user type ${session.type} id ${session.id}`); }
 
           await this._generateSession(ctxt, user);
+
+          let m = bearerTokenPattern.exec(ctxt.header['authorization']);
+          if (m) {
+            ctxt.body.data.meta['prevToken'] = m[1];
+          }
         });
       }
     ]));
@@ -154,9 +162,28 @@ class Authentication {
     throw new Error(`No such authentication source "${name}"`, { status: 404 });
   }
 
+  async _sessionMeta(ctxt) {
+    let config, ip;
+
+    try {
+       config = await this.searcher.getFromControllingBranch(Session.INTERNAL_PRIVILEGED, 'plugin-configs', '@cardstack/authentication');
+    } catch (e) {
+      // no config for the authentication plugin, assume header should not be respected
+    }
+
+    if (config && config.data.attributes['plugin-config'] && config.data.attributes['plugin-config']['allow-x-forwarded-for']) {
+      ip = ctxt.header['x-forwarded-for'] || ctxt.ip;
+    } else {
+      ip = ctxt && ctxt.ip;
+    }
+
+    return {ip};
+  }
+
   async _generateSession(ctxt, user, tokenExpirySeconds=24*3600) {
     let sessionPayload = { id: user.data.id, type: user.data.type };
-    let session = new Session(sessionPayload, this.userSearcher);
+    let sessionMeta = await this._sessionMeta();
+    let session = this.sessions.create(sessionPayload.type, sessionPayload.id, sessionMeta);
 
     let schema = await this.currentSchema.forControllingBranch();
     let canLogin = await schema.hasLoginAuthorization(session);
@@ -205,7 +232,8 @@ class Authentication {
       delete result.meta;
       user = result;
     } else {
-      let rewritten = rewriteExternalUser(result, source);
+      let rewritten = await source.rewriteExternalUser(result);
+      
       if (isPartialSession(rewritten)) {
         ctxt.body = rewritten;
         ctxt.status = 200;
@@ -253,10 +281,9 @@ class Authentication {
 
     let have;
     try {
-      let query = source['userCorrelationQuery'];
+      let query = await source.externalUserCorrelationQuery(user);
       if (query) {
-        let compiled = Handlebars.compile(query);
-        let searchResult = await this.userSearcher.search(JSON.parse(compiled(user)));
+        let searchResult = await this.userSearcher.search(query);
         if (searchResult.data.length > 0) {
           have = { data: searchResult.data[0] };
         }

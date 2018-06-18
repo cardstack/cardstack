@@ -3,7 +3,6 @@ const ElasticAssert = require('@cardstack/elasticsearch/test-support');
 const JSONAPIFactory = require('./jsonapi-factory');
 const crypto = require('crypto');
 const { wireItUp, loadSeeds } = require('@cardstack/hub/main');
-const Session = require('@cardstack/plugin-utils/session');
 const { partition } = require('lodash');
 const defaultDataSourceId = 'default-data-source';
 
@@ -30,12 +29,6 @@ exports.createDefaultEnvironment = async function(projectDir, initialModels = []
       email: 'test@example.com'
     }).asDocument();
 
-    let session = new Session(
-      { id: 'the-default-test-user', type: 'test-users'},
-      null,
-      user
-    );
-
     let defaultDataSource = new JSONAPIFactory();
     defaultDataSource.addResource('plugin-configs', '@cardstack/hub')
       .withRelated(
@@ -55,7 +48,7 @@ exports.createDefaultEnvironment = async function(projectDir, initialModels = []
         mayReadFields: true,
         mayWriteFields: true,
         mayLogin: true
-      }).withRelated('who', factory.addResource('groups', user.data.id));
+      }).withRelated('who', [{ type: user.data.type, id: user.data.id }]);
 
     let [
       foreignInitialModels,
@@ -72,6 +65,8 @@ exports.createDefaultEnvironment = async function(projectDir, initialModels = []
       await container.lookup('hub:indexers').update({ forceRefresh: true });
     }
 
+    let session = container.lookup('hub:sessions').create('test-users', 'the-default-test-user');
+
     Object.assign(container, {
       session,
       user,
@@ -79,6 +74,13 @@ exports.createDefaultEnvironment = async function(projectDir, initialModels = []
         let plugins = await this.lookup('hub:plugins').active();
         let m = plugins.lookupFeatureAndAssert('middleware', '@cardstack/test-support-authenticator');
         m.userId = id;
+        m.type = 'test-users';
+      },
+      async setUser(type, id) {
+        let plugins = await this.lookup('hub:plugins').active();
+        let m = plugins.lookupFeatureAndAssert('middleware', '@cardstack/test-support-authenticator');
+        m.userId = id;
+        m.type = type;
       }
     });
     return container;

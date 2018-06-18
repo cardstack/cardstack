@@ -1,6 +1,7 @@
 const Error = require('@cardstack/plugin-utils/error');
 const Session = require('@cardstack/plugin-utils/session');
 const { declareInjections } = require('@cardstack/di');
+const { partition, uniqWith, isEqual, uniq } = require('lodash');
 
 module.exports = declareInjections({
   schemaLoader: 'hub:schema-loader'
@@ -11,7 +12,7 @@ class Schema {
     return new this(opts);
   }
 
-  constructor({ types, fields, computedFields, dataSources, inputModels, plugins, schemaLoader }) {
+  constructor({ types, fields, computedFields, dataSources, inputModels, plugins, schemaLoader, grants }) {
     this.types = types;
     this.realFields = fields;
     this.computedFields = computedFields;
@@ -21,6 +22,8 @@ class Schema {
     this._mapping = null;
     this._customAnalyzers = null;
     this._originalModels = inputModels;
+    this._allGrants = grants;
+    this._abstractRealms = null;
     this.schemaLoader = schemaLoader;
   }
 
@@ -36,6 +39,13 @@ class Schema {
       this._realAndComputedFields = m;
     }
     return this._realAndComputedFields;
+  }
+
+  equalTo(otherSchema) {
+    return otherSchema && isEqual(
+      new Set(this._originalModels),
+      new Set(otherSchema._originalModels)
+    );
   }
 
   async teardown() {
@@ -401,6 +411,53 @@ class Schema {
     } else {
       return [];
     }
+  }
+
+  // This gives us the complete set of realms that are in use by this
+  // schema. They are "abstract" because they can be data-dependent.
+  abstractRealms() {
+    if (!this._abstractRealms) {
+      this._abstractRealms = uniqWith(this._allGrants.map(({ who }) => {
+        let [statics, dynamics] = partition(who, (entry) => entry.staticRealm);
+        return {
+          statics: statics.map(s => s.staticRealm),
+          dynamicSlots: dynamics.length
+        };
+      }), isEqual);
+    }
+    return this._abstractRealms;
+  }
+
+  userRealms(userDoc) {
+    let contentType = this.types.get(userDoc.type);
+    if (!contentType || !contentType.isGroupable()) {
+      return;
+    }
+    let groups = contentType.groups(userDoc).map(group => Session.encodeBaseRealm('groups', group.id));
+    let ownBaseRealm = Session.encodeBaseRealm(userDoc.type, userDoc.id);
+    if (groups.length === 0) {
+      // if you're not in any groups, only your own base realm matters
+      return [ownBaseRealm];
+    } else {
+      // this finds all the in-use abstract realms that the user
+      // (represented by `doc`) might have access to, based on the
+      // static group requirements in each one.
+      let hits = this.abstractRealms().filter(abstractRealm => abstractRealm.statics.every(realm => groups.includes(realm)));
+
+      // And this fills in any dynamic slots with our own base realm,
+      // which is the only case I'm supporting for now. We could
+      // support more full combinatoric expansion so that dynamic
+      // slots can be filled with groups, but I don't need that
+      // feature and it's potentially expensive.
+      return hits.map(abstractRealm => {
+        if (abstractRealm.dynamicSlots > 0) {
+          return uniq([...abstractRealm.statics, ownBaseRealm]).sort().join('/');
+        } else {
+          return uniq(abstractRealm.statics).sort().join('/');
+        }
+      });
+    }
+
   }
 
 });

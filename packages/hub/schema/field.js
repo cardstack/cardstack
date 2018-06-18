@@ -1,6 +1,7 @@
 const Error = require('@cardstack/plugin-utils/error');
 const find = require('../async-find');
 const authLog = require('@cardstack/logger')('cardstack/auth');
+const { isEqual } = require('lodash');
 
 const legalFieldName = /^[a-zA-Z0-9](?:[-_a-zA-Z0-9]*[a-zA-Z0-9])?$/;
 
@@ -193,12 +194,14 @@ module.exports = class Field {
     let value = this.valueFrom(pendingChange, 'finalDocument');
     let grant;
 
-    if (pendingChange.serverProvidedValues.has(this.id) && pendingChange.serverProvidedValues.get(this.id) === value) {
+    if (pendingChange.serverProvidedValues.has(this.id) && isEqual(pendingChange.serverProvidedValues.get(this.id), value)) {
       authLog.debug("approved field write for %s because it matches server provided default", this.id);
-    } else if (pendingChange.originalDocument && value === this.valueFrom(pendingChange, 'originalDocument')) {
+    } else if (pendingChange.originalDocument && isEqual(value, this.valueFrom(pendingChange, 'originalDocument'))) {
       authLog.debug("approved field write for %s because it was unchanged", this.id);
-    } else if ((grant = await find(this.grants, async g => g['may-write-fields'] && await g.matches(pendingChange.finalDocument, context)))) {
-      authLog.debug("approved field write for %s because of grant %s", this.id, grant.id);
+    } else if (pendingChange.originalDocument && (grant = await find(this.grants, async g => g['may-write-fields'] && await g.matches(pendingChange.originalDocument, context)))) {
+      authLog.debug("approved field write for %s because grant %s applies to original document", this.id, grant.id);
+    } else if (!pendingChange.originalDocument && (grant = await find(this.grants, async g => g['may-write-fields'] && await g.matches(pendingChange.finalDocument, context)))) {
+      authLog.debug("approved field write for %s because grant %s applies to final document", this.id, grant.id);
     } else {
       // Denied
       authLog.debug("denied field write for %s", this.id);

@@ -1,5 +1,3 @@
-const { rewriteExternalUser } = require('@cardstack/authentication');
-
 module.exports = class MockSearcher {
   static create(...args) {
     return new this(...args);
@@ -25,7 +23,7 @@ module.exports = class MockSearcher {
     let mockUser = this.users && this.users[login];
     if (mockUser) {
       mockUser.id = login;
-      return rewriteExternalUser(mockUser, this.dataSource);
+      return await this.dataSource.rewriteExternalUser(mockUser);
     }
   }
 

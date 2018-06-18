@@ -1,6 +1,6 @@
 {
   "name": "@cardstack/ethereum",
-  "version": "0.6.12",
+  "version": "0.8.8",
   "description": "ethereum plugin for Cardstack",
   "keywords": [
     "ember-addon",
@@ -25,24 +25,26 @@
     "private-blockchain": "../../node_modules/.bin/truffle develop"
   },
   "dependencies": {
-    "@cardstack/di": "^0.6.8",
+    "@cardstack/di": "0.8.0",
+    "@cardstack/elasticsearch": "0.8.0",
     "@cardstack/logger": "^0.1.0",
-    "@cardstack/plugin-utils": "^0.6.8",
+    "@cardstack/plugin-utils": "0.8.0",
     "ember-source": "~2.18.2",
+    "handlebars": "^4.0.6",
     "inflection": "^1.12.0",
     "lodash": "^4.17.4",
     "web3": "^1.0.0-beta.30"
   },
   "devDependencies": {
-    "@cardstack/eslint-config": "^0.6.8",
-    "@cardstack/jsonapi": "^0.6.12",
-    "@cardstack/models": "^0.6.12",
-    "@cardstack/test-support": "^0.6.12",
+    "@cardstack/eslint-config": "0.8.0",
+    "@cardstack/jsonapi": "0.8.3",
+    "@cardstack/models": "0.8.3",
+    "@cardstack/test-support": "0.8.3",
     "eslint": "4.9.0",
     "eslint-plugin-ember": "^5.0.0",
     "eslint-plugin-node": "^5.2.1",
     "loader.js": "^4.2.3",
-    "truffle": "^4.0.4"
+    "truffle": "git+https://github.com/habdelra/truffle#0858c52378101247b173a434eb672694557c0ee3"
   },
   "engines": {
     "node": ">= 8"

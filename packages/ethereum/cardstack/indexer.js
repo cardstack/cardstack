@@ -1,13 +1,17 @@
 const Ember = require('ember-source/dist/ember.debug');
 const { dasherize } = Ember.String;
 const { pluralize } = require('inflection');
-const { isEqual } = require('lodash');
+const { isEqual, get } = require('lodash');
 const log = require('@cardstack/logger')('cardstack/ethereum/indexer');
 const { declareInjections } = require('@cardstack/di');
+const { fieldTypeFor } = require('./abi-utils');
+
+const defaultBranch = 'master';
 
 module.exports = declareInjections({
   searcher: 'hub:searchers',
-  ethereumService: `plugin-services:${require.resolve('./service')}`
+  ethereumService: `plugin-services:${require.resolve('./service')}`,
+  buffer: `plugin-services:${require.resolve('./buffer')}`
 },
 
 class Indexer {
@@ -18,10 +22,11 @@ class Indexer {
     return new this(...args);
   }
 
-  constructor({ ethereumService, dataSource, branches, contracts, searcher }) {
+  constructor({ ethereumService, dataSource, branches, contract, searcher, buffer }) {
     this.dataSourceId = dataSource.id;
-    this.contracts = contracts;
+    this.contract = contract;
     this.searcher = searcher;
+    this.buffer = buffer;
     this._branches = branches;
     this.ethereumService = ethereumService;
   }
@@ -31,12 +36,16 @@ class Indexer {
   }
 
   async beginUpdate() {
-    await this.ethereumService.start(this.contracts);
+    await this.buffer.start({
+      ethereumService: this.ethereumService,
+      name: this.dataSourceId,
+      contract: this.contract
+    });
 
     return new Updater({
       dataSourceId: this.dataSourceId,
-      contracts: this.contracts,
-      ethereumService: this.ethereumService,
+      contract: this.contract,
+      buffer: this.buffer,
       searcher: this.searcher
     });
   }
@@ -44,11 +53,11 @@ class Indexer {
 
 class Updater {
 
-  constructor({ dataSourceId, contracts, ethereumService, searcher }) {
+  constructor({ dataSourceId, contract, searcher, buffer }) {
     this.dataSourceId = dataSourceId;
-    this.contracts = contracts;
-    this.ethereumService = ethereumService;
+    this.contract = contract;
     this.searcher = searcher;
+    this.buffer = buffer;
   }
 
   async schema() {
@@ -87,42 +96,39 @@ class Updater {
     }];
 
     let schema = [].concat(defaultFields);
-    let contractNames = Object.keys(this.contracts);
+    let contractName = this.dataSourceId;
+    let abi = this.contract["abi"];
+    let { fields, customTypes } = this._getFieldsFromAbi(contractName, abi);
 
-    contractNames.forEach(contractName => {
-      let abi = this.contracts[contractName]["abi"];
-      let { fields, customTypes } = this._getFieldsFromAbi(contractName, abi);
+    schema = schema.concat(customTypes)
+                   .concat(fields);
 
-      schema = schema.concat(customTypes)
-                     .concat(fields);
-
-      let contractSchema =  {
-        type: 'content-types',
-        id: pluralize(contractName),
-        relationships: {
-          fields: {
-            data: [
-              { type: "fields", id: "ethereum-address" },
-              { type: "fields", id: "balance-wei" }
-            ]
-          },
-          'data-source': {
-            data: { type: 'data-sources', id: this.dataSourceId.toString() }
-          }
+    let contractSchema =  {
+      type: 'content-types',
+      id: pluralize(contractName),
+      relationships: {
+        fields: {
+          data: [
+            { type: "fields", id: "ethereum-address" },
+            { type: "fields", id: "balance-wei" }
+          ]
+        },
+        'data-source': {
+          data: { type: 'data-sources', id: this.dataSourceId.toString() }
         }
-      };
+      }
+    };
 
-      fields.forEach(field => {
-        contractSchema.relationships.fields.data.push({
-          type: "fields", id: field.id
-        });
+    fields.forEach(field => {
+      contractSchema.relationships.fields.data.push({
+        type: "fields", id: field.id
       });
-
-      schema.push(this._openGrantForContentType(contractName));
-      schema.push(contractSchema);
     });
 
-    log.debug(`Created schema for contracts: \n ${JSON.stringify(schema, null, 2)}`);
+    schema.push(this._openGrantForContentType(contractName));
+    schema.push(contractSchema);
+
+    log.debug(`Created schema for contract ${contractName}: \n ${JSON.stringify(schema, null, 2)}`);
     this._schema = schema;
 
     return this._schema;
@@ -131,6 +137,8 @@ class Updater {
   async updateContent(meta, hints, ops) {
     let schema = await this.schema();
     let isSchemaUnchanged;
+    let blockHeights = Object.assign({}, get(meta, 'lastBlockHeights') || {});
+    let needsFinishReplaceAll;
 
     if (meta) {
       let { lastSchema } = meta;
@@ -138,71 +146,34 @@ class Updater {
     }
 
     if (!isSchemaUnchanged) {
-      await ops.beginReplaceAll();
-      for (let model of schema) {
-        await ops.save(model.type, model.id, model);
-      }
-    } else {
+      needsFinishReplaceAll = true;
       await ops.beginReplaceAll();
     }
 
-    let contractHints = hints && hints.length ? hints.filter(hint => hint.isContractType) : [];
-    if (!contractHints.length) {
-      for (let contract of Object.keys(this.contracts)) {
-        for (let branch of Object.keys(this.contracts[contract].addresses)) {
-          let model = await this.ethereumService.getContractInfo({ branch, contract });
-          await ops.save(model.type, model.id, model);
+    for (let model of schema) {
+      await ops.save(model.type, model.id, model);
+    }
+
+    let shouldSkip = await this.buffer.shouldSkipIndexing(this.dataSourceId, defaultBranch);
+    if (!shouldSkip) {
+      let models = await this.buffer.readModels(this.dataSourceId, blockHeights, hints);
+
+      for (let model of models) {
+        let { blockheight, branch } = model.meta;
+        if (!blockHeights[branch] || blockHeights[branch] < blockheight) {
+          blockHeights[branch] = blockheight;
         }
-      }
-    } else {
-      for (let { branch, type } of contractHints) {
-        let model = await this.ethereumService.getContractInfo({ branch, type });
+
         await ops.save(model.type, model.id, model);
       }
     }
 
-    if (!hints || !hints.length) {
-      hints = await this.ethereumService.getPastEventsAsHints();
+    if (needsFinishReplaceAll) {
+      await ops.finishReplaceAll();
     }
 
-    for (let { id, branch, type, contract, isContractType } of hints) {
-      if (!branch || !type || !id || !contract || isContractType) { continue; }
-
-      let contractAddress = this.contracts[contract].addresses[branch];
-      let { data, methodName } = await this.ethereumService.getContractInfoFromHint({ id, type, branch, contract });
-      let methodAbiEntry = this.contracts[contract]["abi"].find(item => item.type === 'function' &&
-                                                                        item.constant &&
-                                                                        item.name === methodName);
-      let { isMapping, fields } = this._fieldTypeFor(contract, methodAbiEntry);
-      if (!isMapping || !fields.length) { continue; }
-
-      let model = {
-        type,
-        attributes: {
-          'ethereum-address': id // preserve the case of the ID here to faithfully represent EIP-55 encoding
-        },
-        relationships: {}
-      };
-
-      if (typeof data === "object") {
-        for (let returnName of Object.keys(data)) {
-          let fieldName = `${dasherize(methodName)}-${dasherize(returnName)}`;
-          if (!fields.find(field => field.name === fieldName)) { continue; }
-          model.attributes[fieldName] = data[returnName];
-        }
-      } else {
-        model.attributes[fields[0].name] = data;
-      }
-
-      model.relationships[`${contract}-contract`] = {
-        data: { id: contractAddress, type: pluralize(contract) }
-      };
-
-      await ops.save(type, id.toLowerCase(), model);
-    }
-
-    await ops.finishReplaceAll();
     return {
+      lastBlockHeights: blockHeights,
       lastSchema: schema
     };
   }
@@ -211,6 +182,8 @@ class Updater {
     if (isSchema) {
       return (await this.schema()).find(model => model.type === type && model.id === model.id);
     }
+
+    return await this.buffer.readModel({ type, id });
   }
 
   _namedFieldFor(fieldName, type) {
@@ -282,7 +255,7 @@ class Updater {
       },
       relationships: {
         who: {
-          data: { type: 'groups', id: 'everyone' }
+          data: [{ type: 'groups', id: 'everyone' }]
         },
         types: {
           "data": [
@@ -298,7 +271,7 @@ class Updater {
     let customTypes = [];
     abi.forEach(item => {
       if (item.type === "function" && item.constant) {
-        let fieldInfo = this._fieldTypeFor(contractName, item);
+        let fieldInfo = fieldTypeFor(contractName, item);
         if (!fieldInfo) { return; }
         let { isMapping, fields:nestedFields } = fieldInfo;
 
@@ -333,56 +306,6 @@ class Updater {
     });
 
     return { fields, customTypes };
-  }
-
-  _fieldTypeFor(contractName, abiItem) {
-    if (!abiItem.outputs || !abiItem.outputs.length) { return; }
-
-    if (!abiItem.inputs.length) {
-      // We are not handling multiple return types for non-mapping functions
-      // unclear what that would actually look like in the schema...
-      switch(abiItem.outputs[0].type) {
-        // Using strings to represent uint256, as the max int
-        // int in js is 2^53, vs 2^256 in solidity
-        case 'uint256':
-        case 'bytes32':
-        case 'string':
-        case 'address':
-          return { fields: [{ type: '@cardstack/core-types::string' }]};
-        case 'bool':
-          return { fields: [{ type: '@cardstack/core-types::boolean' }]};
-      }
-    // deal with just mappings that use address as a key for now
-    } else if (abiItem.inputs.length === 1 && abiItem.inputs[0].type === "address") {
-      return {
-        isMapping: true,
-        fields: abiItem.outputs.map(output => {
-          let name, type, isNamedField;
-          if (output.name && abiItem.outputs.length > 1) {
-            name = `${dasherize(abiItem.name)}-${dasherize(output.name)}`;
-            isNamedField = true;
-          }
-          switch(output.type) {
-            case 'uint256':
-              name = name || `mapping-number-value`;
-              type = 'number';
-              break;
-            case 'bool':
-              name = name || `mapping-boolean-value`;
-              type = 'boolean';
-              break;
-            case 'bytes32':
-            case 'string':
-            case 'address':
-            default:
-              name = name || `mapping-string-value`;
-              type = 'string';
-          }
-
-          return { name, type, isNamedField };
-        })
-      };
-    }
   }
 
 }

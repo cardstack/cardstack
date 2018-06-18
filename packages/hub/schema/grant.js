@@ -23,15 +23,68 @@
   Who: Assigning the Group
   ========================
 
-  There are two ways to use the `who` relationship.
+  The `who` relationship determines who we are giving permission
+  to. It is a list, and a user must match _every_ entry in the list in
+  order to benefit from the grant. Each item in the list is a
+  reference to one of the following things:
 
-  1. It refers to { type: 'groups', id: someGroupId }, in which case
-     it will apply to users who are members of that group.
+  1. A user. Which content-types are used to represent users is
+     app-specific, based on the set of authenticator plugins you
+     configure and how you map them into your own user types. But if
+     you allow people to log in as `{ type: 'users, id: '1' }`, then
+     you can put `{ type: 'users', id: '1' }` here in the `who`
+     relationship and it will apply to that specific user.
 
-  2. It refers to { type: 'fields', id: someFieldName }, in which case
-     the group id will be determined dynamically by looking at the
-     value of given resource's field. If the field is a relationship,
-     we will use the id or ids found in that relationship.
+  2. A group, like { type: 'groups', id: someGroupId }, in which case
+     it will apply to all users who are members of that group.
+
+  3. A field like { type: 'fields', id: someFieldName }, in which case
+     the set of users will be determined dynamically by looking at the
+     value of given resource's field. The field itself must be either:
+
+       - a relationship to one or many users.
+
+       - the `id` field, which is treated implicitly as a relationship
+         to the record itself, meaning you can write a grant against
+         the `id` field in order to give a user permissions to their
+         own user record.
+
+  In general, it is beter to use groups rather than make lots of
+  separate grants for each user. The biggest use for individual user
+  grants is when you use them via field indirection, so that a
+  resource can contain its own list of owners, etc.
+
+  For example, you can have a resource like this that stores its own collaborators list:
+
+    {
+      type: 'posts',
+      id: '1',
+      relationships: {
+        collaborators: {
+          data: [ { type: 'users', id: '1'}, { type: 'users', id: '2' } ]
+        }
+      }
+    }
+
+  And write a grant like this that allows people to edit only posts
+  which list them as collaborators, and only if they are in the
+  'unbanned-users' group.
+
+    {
+      type: 'grants',
+      id: '432',
+      attributes: {
+        mayUpdateResource: true,
+        mayWriteFields: true
+      },
+      relationships: {
+        types: [ { type: 'content-types', id: 'posts' } ],
+        who: [ { type: 'fields', id: 'collaborators' }, { type: 'groups', id: 'unbanned-users' } ]
+      }
+    }
+
+
+
 
   Permissions Architecture
   ========================
@@ -148,6 +201,7 @@ const actions = [
 ];
 const log = require('@cardstack/logger')('cardstack/auth');
 const Session = require('@cardstack/plugin-utils/session');
+const { uniq } = require('lodash');
 
 module.exports = class Grant {
   constructor(document) {
@@ -160,8 +214,7 @@ module.exports = class Grant {
 
     this.types = null;
     this.fields = null;
-    this.groupId = null;
-    this.groupField = null;
+    this.who = null;
     this.id = document.id;
     if (this.id == null) {
       throw new Error(`grant must have an id: ${JSON.stringify(document)}`);
@@ -176,50 +229,58 @@ module.exports = class Grant {
     }
 
     if (rels.who && rels.who.data) {
-      if (rels.who.data.type === 'groups') {
-        this.groupId = rels.who.data.id;
-      } else if (rels.who.data.type === 'fields') {
-        this.groupField = rels.who.data.id;
-      } else {
-        throw new Error(`grant's "who" field must refer to a group or a field: ${JSON.stringify(document)}`);
+      if (!Array.isArray(rels.who.data)) {
+        log.warn(`The "who" fields on content-types "grants" has switched from belongsTo to hasMany, so you must provide an array`);
+        rels.who.data = [rels.who.data];
       }
+      this.who = rels.who.data.map(({ type, id }) => {
+        if (type === 'fields') {
+          if (this['may-login']) {
+            throw new Error(`may-login grants may not be field-dependent (because they don't apply to a resource that would have fields to compare with): ${JSON.stringify(document, null, 2)}`);
+          }
+          return {
+            realmField: id,
+            staticRealm: null
+          };
+        } else {
+          return {
+            realmField: null,
+            staticRealm: Session.encodeBaseRealm(type, id)
+          };
+        }
+      });
     } else {
       throw new Error(`grant must have a "who" field: ${JSON.stringify(document)}`);
     }
   }
 
   async matches(resource, context) {
-    let groupIds = await (context.session || Session.EVERYONE).realms();
+    let userRealms = await (context.session || Session.EVERYONE).realms();
 
-    let effectiveGroupIds;
-    if (this.groupField != null) {
-      effectiveGroupIds = Grant.readRealmsFromField(resource, this.groupField);
-    } else {
-      effectiveGroupIds = [this.groupId];
-    }
+    let approvedRealm = uniq(this.who.map(({ staticRealm, realmField }) => {
+      if (realmField) {
+        return Grant.readRealmsFromField(resource, realmField);
+      } else {
+        return [staticRealm];
+      }
+    })).sort().join('/');
 
-    let matches = effectiveGroupIds.find(g => groupIds.includes(g));
-    log.trace('testing grant id=%s effectiveGroupIds=%j resource=%j context=%j matches=%s', this.id, effectiveGroupIds, resource, context, !!matches);
+    let matches = userRealms.includes(approvedRealm);
+    log.trace('testing grant id=%s approvedRealm=%s resource=%j userRealms=%j matches=%s', this.id, approvedRealm, resource, userRealms, !!matches);
     return matches;
   }
 
   static readRealmsFromField(resource, fieldName) {
     if (fieldName === 'id') {
-      return [resource.id];
-    }
-    if (fieldName === 'type') {
-      return [resource.type];
-    }
-    if (resource.attributes && resource.attributes.hasOwnProperty(fieldName)) {
-      return [resource.attributes[fieldName]];
+      return [Session.encodeBaseRealm(resource.type, resource.id)];
     }
     if (resource.relationships && resource.relationships.hasOwnProperty(fieldName)) {
       let fieldValue = resource.relationships[fieldName];
       if (fieldValue.data) {
         if (Array.isArray(fieldValue.data)) {
-          return fieldValue.data.map(ref => ref.id);
+          return fieldValue.data.map(({ type, id }) => Session.encodeBaseRealm(type, id));
         } else {
-          return [fieldValue.data.id];
+          return [Session.encodeBaseRealm(fieldValue.data.type, fieldValue.data.id)];
         }
       }
     }

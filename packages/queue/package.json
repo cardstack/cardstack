@@ -1,0 +1,34 @@
+{
+  "name": "@cardstack/queue",
+  "version": "0.8.3",
+  "description": "Job queueing plugin for @cardstack/hub.",
+  "repository": "https://github.com/cardstack/cardstack",
+  "author": "Alex Speller <alex@alexspeller.com>",
+  "license": "MIT",
+  "engines": {
+    "node": ">= 7.7"
+  },
+  "devDependencies": {
+    "@cardstack/eslint-config": "0.8.0",
+    "@cardstack/test-support": "0.8.3",
+    "delay": "2.0.0",
+    "eslint": "4.9.0",
+    "eslint-plugin-ember": "^5.0.0",
+    "eslint-plugin-node": "^5.2.1"
+  },
+  "dependencies": {
+    "@cardstack/di": "0.8.0",
+    "@cardstack/logger": "^0.1.0",
+    "@cardstack/plugin-utils": "0.8.0",
+    "pg-boss": "^2.5.1"
+  },
+  "keywords": [
+    "cardstack-plugin"
+  ],
+  "cardstack-plugin": {
+    "api-version": 1
+  },
+  "scripts": {
+    "test": "mocha ../test-support/bin/run.js"
+  }
+}
