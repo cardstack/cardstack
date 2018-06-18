@@ -1,0 +1,12 @@
+{
+  "name": "pgsearch-test-app",
+  "dependencies": {
+  },
+  "devDependencies": {
+    "@cardstack/mobiledoc": "*",
+    "@cardstack/test-support": "*"
+  },
+  "engines": {
+    "node": ">= 8"
+  }
+}
