@@ -147,14 +147,29 @@ describe('git/indexer', function() {
 
 
   it('indexes newly added document', async function() {
-    let { repo, head } = await makeRepo(root);
+    let { repo, head } = await makeRepo(root, {
+      'schema/content-types/articles.json': JSON.stringify({
+        relationships: {
+          fields: {
+            data: [
+              { type: 'fields', id: 'title' }
+            ]
+          }
+        }
+      }),
+      'schema/fields/title.json': JSON.stringify({
+        attributes: {
+          'field-type': '@cardstack/core-types::string'
+        }
+      })
+    });
 
     await indexer.update();
 
     let change = await Change.create(repo, head, 'master');
     let file = await change.get('contents/articles/hello-world.json', { allowCreate: true });
     file.setContent(JSON.stringify({
-      attributes: { hello: 'world' }
+      attributes: { title: 'world' }
     }));
     head = await change.finalize(commitOpts());
 
@@ -165,7 +180,7 @@ describe('git/indexer', function() {
 
     let contents = await ea.documentContents('master', 'articles', 'hello-world');
     let jsonapi = toJSONAPI(contents);
-    expect(jsonapi).has.deep.property('attributes.hello', 'world');
+    expect(jsonapi).has.deep.property('attributes.title', 'world');
   });
 
   it('ignores newly added document that lacks json extension', async function() {
@@ -285,6 +300,20 @@ describe('git/indexer', function() {
     });
 
     let { repo, head } = await makeRepo(root, {
+      'schema/content-types/articles.json': JSON.stringify({
+        relationships: {
+          fields: {
+            data: [
+              { type: 'fields', id: 'title' }
+            ]
+          }
+        }
+      }),
+      'schema/fields/title.json': JSON.stringify({
+        attributes: {
+          'field-type': '@cardstack/core-types::string'
+        }
+      }),
       'contents/articles/upstream.json': JSON.stringify({
         attributes: {
           title: 'article from upstream'

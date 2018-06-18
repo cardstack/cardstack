@@ -6,26 +6,48 @@ const authLog = require('@cardstack/logger')('cardstack/auth');
 const Session = require('@cardstack/plugin-utils/session');
 
 module.exports = class ContentType {
-  constructor(model, allFields, allConstraints, dataSources, defaultDataSource, allGrants, allGroups) {
-    let fields = new Map();
+  constructor(model, allFields, allComputedFields, allConstraints, dataSources, defaultDataSource, allGrants, allGroups) {
+    let realFields = new Map();
+    let computedFields = new Map();
+    let realAndComputedFields = new Map();
+
     if (model.relationships && model.relationships.fields) {
       for (let fieldRef of model.relationships.fields.data) {
-        let field = allFields.get(fieldRef.id);
-        if (!field) {
+        let field;
+        if ((field = allFields.get(fieldRef.id))) {
+          realFields.set(fieldRef.id, field);
+          realAndComputedFields.set(fieldRef.id, field);
+        } else if ((field = allComputedFields.get(fieldRef.id))) {
+          computedFields.set(fieldRef.id, field);
+          realAndComputedFields.set(fieldRef.id, field.virtualField);
+        } else {
           throw new Error(`content type "${model.id}" refers to missing field "${fieldRef.id}"`, {
             status: 400,
             title: 'Broken field reference'
           });
         }
-        fields.set(fieldRef.id, field);
       }
     }
 
     // type and id fields are always implicitly present
-    fields.set('type', allFields.get('type'));
-    fields.set('id', allFields.get('id'));
+    realFields.set('type', allFields.get('type'));
+    realFields.set('id', allFields.get('id'));
+    realAndComputedFields.set('type', allFields.get('type'));
+    realAndComputedFields.set('id', allFields.get('id'));
 
-    this.fields = fields;
+    // the actual fields that are stored in the data source. These are instances of Field.
+    this.realFields = realFields;
+
+    // any computed fields that are defined. These are not stored in
+    // the data source, we just derive them from other things that
+    // are. These are instances of ComputedField.
+    this.computedFields = computedFields;
+
+    // this combines both kinds of fields. But these are always
+    // instances of Field -- each ComputedField knows how to represent
+    // itself as a Field too.
+    this.realAndComputedFields = realAndComputedFields;
+
     this.id = model.id;
     if (model.relationships && model.relationships['data-source'] && model.relationships['data-source'].data) {
       this.dataSource = dataSources.get(model.relationships['data-source'].data.id);
@@ -45,7 +67,7 @@ module.exports = class ContentType {
     this._realms = null;
     authLog.trace(`while constructing content type %s, %s of %s grants apply`, this.id, this.grants.length, allGrants.length);
     this.constraints = allConstraints.filter(constraint => {
-      return Object.values(constraint.fieldInputs).some(field => this.fields.get(field.id));
+      return Object.values(constraint.fieldInputs).some(field => this.realFields.get(field.id));
     });
     this.routingField = model.attributes && model.attributes['routing-field'];
 
@@ -74,11 +96,11 @@ module.exports = class ContentType {
 
     this._validateFieldReadAuth(pendingChange, context, errors, badFields);
 
-    for (let field of this.fields.values()) {
+    for (let field of this.realFields.values()) {
       await field.applyDefault(pendingChange, context);
     }
 
-    for (let field of this.fields.values()) {
+    for (let field of this.realFields.values()) {
       if (!badFields[field.id]) {
         let fieldErrors = await field.validationErrors(pendingChange, context);
         if (fieldErrors.length > 0) {
@@ -104,7 +126,7 @@ module.exports = class ContentType {
 
   async _checkConstraints(pendingChange, badFields) {
     let activeConstraints = this.constraints.filter(constraint => Object.values(constraint.fieldInputs).every(field => !badFields[field.id]));
-    return flatten(await Promise.all(activeConstraints.map(constraint => constraint.validationErrors(pendingChange, this.fields))));
+    return flatten(await Promise.all(activeConstraints.map(constraint => constraint.validationErrors(pendingChange, this.realFields))));
   }
 
   _unknownFieldError(fieldName, section) {
@@ -118,14 +140,14 @@ module.exports = class ContentType {
   _validateUnknownFields(document, errors) {
     if (document.attributes) {
       for (let fieldName of Object.keys(document.attributes)) {
-        if (!this.fields.has(fieldName)) {
+        if (!this.realFields.has(fieldName)) {
           errors.push(this._unknownFieldError(fieldName, 'attributes'));
         }
       }
     }
     if (document.relationships) {
       for (let fieldName of Object.keys(document.relationships)) {
-        if (!this.fields.has(fieldName)) {
+        if (!this.realFields.has(fieldName)) {
           errors.push(this._unknownFieldError(fieldName, 'relationships'));
         }
       }
@@ -134,7 +156,7 @@ module.exports = class ContentType {
 
   mapping() {
     let properties = {};
-    for (let field of this.fields.values()) {
+    for (let field of this.realAndComputedFields.values()) {
       Object.assign(properties, field.mapping(this.includesTree, this.allFields));
     }
     return { properties };
@@ -142,7 +164,7 @@ module.exports = class ContentType {
 
   customAnalyzers() {
     let analyzers;
-    for (let field of this.fields.values()) {
+    for (let field of this.realAndComputedFields.values()) {
       let analyzer = field.customAnalyzer();
       if (analyzer) {
         if (!analyzers) {

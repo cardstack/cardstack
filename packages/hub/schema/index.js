@@ -12,9 +12,11 @@ class Schema {
     return new this(opts);
   }
 
-  constructor({ types, fields, dataSources, inputModels, plugins, schemaLoader, grants }) {
+  constructor({ types, fields, computedFields, dataSources, inputModels, plugins, schemaLoader, grants }) {
     this.types = types;
-    this.fields = fields;
+    this.realFields = fields;
+    this.computedFields = computedFields;
+    this._realAndComputedFields = null;
     this.dataSources = dataSources;
     this.plugins = plugins;
     this._mapping = null;
@@ -23,6 +25,20 @@ class Schema {
     this._allGrants = grants;
     this._abstractRealms = null;
     this.schemaLoader = schemaLoader;
+  }
+
+  get realAndComputedFields() {
+    if (!this._realAndComputedFields) {
+      let m = new Map();
+      for (let [id, field] of this.realFields) {
+        m.set(id, field);
+      }
+      for (let [id, computed] of this.computedFields) {
+        m.set(id, computed.virtualField);
+      }
+      this._realAndComputedFields = m;
+    }
+    return this._realAndComputedFields;
   }
 
   equalTo(otherSchema) {
@@ -40,6 +56,27 @@ class Schema {
 
   isSchemaType(type) {
     return this.schemaLoader.ownTypes().includes(type);
+  }
+
+  withOnlyRealFields(doc) {
+    let activeDoc = doc;
+    for (let section of ['attributes', 'relationships']) {
+      if (!doc[section]) {
+        continue;
+      }
+      for (let fieldName of Object.keys(doc[section])) {
+        if (this.computedFields.has(fieldName)) {
+          if (activeDoc === doc) {
+            activeDoc = Object.assign({}, doc);
+          }
+          if (activeDoc[section] === doc[section]) {
+            activeDoc[section] = Object.assign({}, doc[section]);
+          }
+          delete activeDoc[section][fieldName];
+        }
+      }
+    }
+    return activeDoc;
   }
 
   // derives a new schema by adding, updating, or removing

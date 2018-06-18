@@ -424,7 +424,7 @@ describe('schema/validation', function() {
     }, null);
     let newSchema = await schema.validate(pending);
     expect(newSchema).is.ok;
-    expect([...newSchema.fields.keys()]).contains('extra-field');
+    expect([...newSchema.realFields.keys()]).contains('extra-field');
   });
 
   it("applies related-types validation in belongs-to", async function() {

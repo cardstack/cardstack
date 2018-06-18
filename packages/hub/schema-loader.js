@@ -1,5 +1,6 @@
 const Error = require('@cardstack/plugin-utils/error');
 const Field = require('./schema/field');
+const ComputedField = require('./schema/computed-field');
 const Constraint = require('./schema/constraint');
 const ContentType = require('./schema/content-type');
 const DataSource = require('./schema/data-source');
@@ -11,7 +12,7 @@ const {
   getOwner
 } = require('@cardstack/di');
 
-const ownTypes = Object.freeze(['content-types', 'fields', 'constraints', 'input-assignments', 'data-sources', 'grants', 'groups', 'plugin-configs', 'default-values']);
+const ownTypes = Object.freeze(['content-types', 'fields', 'computed-fields', 'constraints', 'input-assignments', 'data-sources', 'grants', 'groups', 'plugin-configs', 'default-values']);
 
 module.exports = declareInjections({
   pluginLoader: 'hub:plugin-loader',
@@ -35,20 +36,21 @@ class SchemaLoader {
   async loadFrom(inputModels) {
     let models = inputModels;
     let plugins = await this.pluginLoader.configuredPlugins(models.filter(model => model.type === 'plugin-configs'));
-    let authLog = logger('cardstack/auth');
     let schemaLog = logger('cardstack/schema');
     let defaultValues = findDefaultValues(models);
     let grants = findGrants(models);
-    let fields = findFields(models, plugins, grants, defaultValues, authLog);
+    let fields = findFields(models, plugins, grants, defaultValues);
+    let computedFields = findComputedFields(models, plugins, grants, fields);
+    discoverComputedFieldTypes(fields, computedFields);
     let constraints = await findConstraints(models, plugins, fields);
     let dataSources = findDataSources(models, plugins, this.projectPath);
     let defaultDataSource = findDefaultDataSource(plugins);
     schemaLog.trace('default data source %j', defaultDataSource);
     let groups = findGroups(models, fields);
-    let types = findTypes(models, fields, constraints, dataSources, defaultDataSource, grants, groups);
+    let types = findTypes(models, fields, computedFields, constraints, dataSources, defaultDataSource, grants, groups);
     validateRelatedTypes(types, fields);
 
-    return getOwner(this).factoryFor('hub:schema').create({ types, fields, dataSources, inputModels, plugins, grants });
+    return getOwner(this).factoryFor('hub:schema').create({ types, fields, computedFields, dataSources, inputModels, plugins, grants });
   }
 });
 
@@ -92,14 +94,33 @@ function findGrants(models) {
     .map(model => new Grant(model));
 }
 
-function findFields(models, plugins, types, grants, defaultValues, authLog) {
+function findFields(models, plugins, grants, defaultValues) {
   let fields = new Map();
   for (let model of models) {
     if (model.type === 'fields') {
-      fields.set(model.id, new Field(model, plugins, types, grants, defaultValues, authLog));
+      fields.set(model.id, new Field(model, plugins, grants, defaultValues));
     }
   }
   return fields;
+}
+
+function findComputedFields(models, plugins, grants, fields) {
+  let computedFields = new Map();
+  for (let model of models) {
+    if (model.type === 'computed-fields') {
+      computedFields.set(model.id, new ComputedField(model, plugins, grants, fields, computedFields));
+    }
+  }
+  return computedFields;
+}
+
+function discoverComputedFieldTypes(fields, computedFields) {
+  for (let computedField of computedFields.values()) {
+    // This needs to happen after all the fields and computed fields
+    // are known, so we can derive the virtual fields created by each
+    // of our computed fields.
+    computedField.virtualField;
+  }
 }
 
 function findDataSources(models, plugins, projectPath) {
@@ -119,11 +140,11 @@ function findDefaultDataSource(plugins) {
   }
 }
 
-function findTypes(models, fields, constraints, dataSources, defaultDataSource, grants, groups) {
+function findTypes(models, fields, computedFields, constraints, dataSources, defaultDataSource, grants, groups) {
   let types = new Map();
   for (let model of models) {
     if (model.type === 'content-types') {
-      types.set(model.id, new ContentType(model, fields, constraints, dataSources, defaultDataSource, grants, groups));
+      types.set(model.id, new ContentType(model, fields, computedFields, constraints, dataSources, defaultDataSource, grants, groups));
     }
   }
   return types;

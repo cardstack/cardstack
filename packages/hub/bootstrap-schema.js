@@ -34,8 +34,26 @@ const models = [
           { type: 'fields', id: 'default-at-create' },
           { type: 'fields', id: 'default-at-update' },
           { type: 'fields', id: 'caption' },
+          { type: 'fields', id: 'searchable' },
           { type: 'fields', id: 'editor-component'},
           { type: 'fields', id: 'inline-editor-component'}
+        ]
+      }
+    }
+  },
+  {
+    type: 'content-types',
+    id: 'computed-fields',
+    attributes: {
+      'is-built-in': true
+    },
+    relationships: {
+      fields: {
+        data: [
+          { type: 'fields', id: 'computed-field-type' },
+          { type: 'fields', id: 'caption' },
+          { type: 'fields', id: 'searchable' },
+          { type: 'fields', id: 'params' }
         ]
       }
     }
@@ -413,9 +431,23 @@ const models = [
   },
   {
     type: 'fields',
+    id: 'computed-field-type',
+    attributes: {
+      'field-type': '@cardstack/core-types::string'
+    }
+  },
+  {
+    type: 'fields',
     id: 'caption',
     attributes: {
       'field-type': '@cardstack/core-types::string'
+    }
+  },
+  {
+    type: 'fields',
+    id: 'searchable',
+    attributes: {
+      'field-type': '@cardstack/core-types::boolean'
     }
   },
   {

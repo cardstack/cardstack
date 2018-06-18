@@ -222,6 +222,11 @@ class BranchUpdate {
   async add(type, id, doc, sourceId, nonce) {
     this._touched[`${type}/${id}`] = true;
     let searchDoc = await this._prepareSearchDoc(type, id, doc);
+    if (!searchDoc) {
+      // bad documents get ignored. The DocumentContext logs these for
+      // us, so all we need to do here is nothing.
+      return;
+    }
     searchDoc.cardstack_source = sourceId;
     searchDoc.cardstack_pristine.data.meta.source = sourceId;
     if (nonce) {
