@@ -21,7 +21,7 @@
     "@cardstack/di": "0.8.0",
     "@cardstack/elasticsearch": "0.8.0",
     "@cardstack/logger": "^0.1.0",
-    "@cardstack/node-pg-migrate": "3.0.0-rc2-cardstack.1",
+    "node-pg-migrate": "3.5.0",
     "@cardstack/plugin-utils": "0.8.0",
     "jsonpatch": "^3.0.1",
     "lodash": "^4.17.4",
