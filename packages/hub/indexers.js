@@ -91,6 +91,9 @@ class Indexers extends EventEmitter {
     if (instance._dataSourcesMemo) {
       await instance._dataSourcesMemo.teardown();
     }
+    if (instance._clientMemo) {
+      await instance._clientMemo.teardown();
+    }
   }
 
   async update({ forceRefresh, hints } = {}) {

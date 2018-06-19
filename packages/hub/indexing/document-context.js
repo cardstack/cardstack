@@ -42,7 +42,7 @@ module.exports = class DocumentContext {
   }
 
   async _logicalFieldToES(fieldName) {
-    return this.branchUpdate.client.logicalFieldToES(this.branchUpdate.branch, fieldName);
+    return fieldName;
   }
 
   // copies attribues appropriately from jsonapiDoc into

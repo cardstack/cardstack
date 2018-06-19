@@ -103,15 +103,10 @@ class BranchUpdate {
   }
 
   async _loadMeta(updater) {
-    let doc = await this.client.es.getSource({
-      index: Client.branchToIndexName(this.branch),
-      type: 'meta',
+    return this.client.loadMeta({
+      branch: this.branch,
       id: owningDataSource.get(updater).id,
-      ignore: [404]
     });
-    if (doc) {
-      return doc.params;
-    }
   }
 
   async _saveMeta(updater, newMeta) {
@@ -119,13 +114,11 @@ class BranchUpdate {
     // property so that we can tell elasticsearch not to index any of
     // it. We don't want inconsistent types across plugins to cause
     // mapping errors.
-    await this.bulkOps.add({
-      index: {
-        _index: Client.branchToIndexName(this.branch),
-        _type: 'meta',
-        _id: owningDataSource.get(updater).id,
-      }
-    }, { params: newMeta });
+    return this.client.saveMeta({
+        branch: this.branch,
+        id: owningDataSource.get(updater).id,
+        params: newMeta
+    });
   }
 
   async _findTouchedReferences() {
@@ -224,18 +217,18 @@ class BranchUpdate {
       // us, so all we need to do here is nothing.
       return;
     }
-    searchDoc.cardstack_source = sourceId;
     searchDoc.cardstack_pristine.data.meta.source = sourceId;
-    if (nonce) {
-      searchDoc.cardstack_generation = nonce;
-    }
-    await this.bulkOps.add({
-      index: {
-        _index: Client.branchToIndexName(this.branch),
-        _type: type,
-        _id: `${this.branch}/${id}`,
-      }
-    }, searchDoc);
+  
+    await this.client.saveDocument({
+      branch: this.branch,
+      type,
+      id,
+      searchDoc,
+      pristineDoc: searchDoc.cardstack_pristine,
+      source: sourceId,
+      generation: nonce,
+
+    });
     this.emitEvent('add', { type, id, doc });
     log.debug("save %s %s", type, id);
     if (this.isControllingBranch) {
@@ -277,22 +270,7 @@ class BranchUpdate {
   }
 
   async deleteAllWithoutNonce(sourceId, nonce) {
-    await this.bulkOps.add('deleteByQuery', {
-      index: Client.branchToIndexName(this.branch),
-      conflicts: 'proceed',
-      body: {
-        query: {
-          bool: {
-            must: [
-              { term: { cardstack_source: sourceId } },
-            ],
-            must_not: [
-              { term: { cardstack_generation: nonce } }
-            ]
-          }
-        }
-      }
-    });
+    await this.client.deleteOlderGenerations(this.branch, sourceId, nonce);
     this.emitEvent('delete_all_without_nonce', { sourceId, nonce });
     log.debug("bulk delete older content for data source %s", sourceId);
   }

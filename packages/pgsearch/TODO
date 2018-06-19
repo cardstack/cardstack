@@ -1,3 +1,5 @@
 # Implementation notes for pgsearch refactor
 
 1. Rename `_client` in hub/indexers
+2. Delete the no-op `_logicalFieldToES` in DocumentContext.
+3. Refactord cardstack_pristine, cardstack_references, etc, out of searchDoc.
