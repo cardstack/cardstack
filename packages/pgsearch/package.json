@@ -12,7 +12,8 @@
   "dependencies": {
     "@cardstack/logger": "^0.1.0",
     "pg": "^7.0.3",
-    "@cardstack/plugin-utils": "0.8.0"
+    "@cardstack/plugin-utils": "0.8.0",
+    "node-pg-migrate": "3.5.0"
   },
   "devDependencies": {
     "@cardstack/eslint-config": "0.8.0",
