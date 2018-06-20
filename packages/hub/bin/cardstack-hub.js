@@ -31,6 +31,14 @@ async function runServer(options, dataSources) {
   let seedsDir = path.join(options.initialDataDirectory, seedsFolder);
   options.seeds = () => loadModels(seedsDir);
 
+  options.pgBossConfig = options.pgBossConfig || {
+    database:             'postgres',
+    host:                 'localhost',
+    user:                 'postgres',
+    port:                 5444,
+    newJobCheckInterval:  100 // set to minimum to speed up tests
+  };
+
   let app = await makeServer(process.cwd(), sessionsKey, dataSources, options);
   app.listen(port);
   log.info("server listening on %s", port);

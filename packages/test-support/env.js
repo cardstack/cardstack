@@ -58,6 +58,15 @@ exports.createDefaultEnvironment = async function(projectDir, initialModels = []
     opts.disableAutomaticIndexing = true;
     opts.seeds = () => ephemeralInitialModels;
 
+    opts.pgBossConfig = opts.pgBossConfig || {
+      database:             'postgres',
+      host:                 'localhost',
+      user:                 'postgres',
+      port:                 5444,
+      newJobCheckInterval:  100 // set to minimum to speed up tests
+    };
+
+
     container = await wireItUp(projectDir, crypto.randomBytes(32), defaultDataSource.getModels(), opts);
     if (foreignInitialModels.length) {
       await loadSeeds(container, foreignInitialModels);
