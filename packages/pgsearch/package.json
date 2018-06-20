@@ -10,6 +10,7 @@
     "api-version": 1
   },
   "dependencies": {
+    "@cardstack/di": "^0.8.0",
     "@cardstack/logger": "^0.1.0",
     "@cardstack/plugin-utils": "0.8.0",
     "node-pg-migrate": "3.5.0",

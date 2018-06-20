@@ -4,8 +4,8 @@ const migrate = require('node-pg-migrate').default;
 const log = require('@cardstack/logger')('cardstack/pgsearch');
 const { join } = require('path');
 
-module.exports = class Indexers {
-    static async create() {
+module.exports = class PgClient {
+    static create() {
         return new this();
     }
 
@@ -27,8 +27,10 @@ module.exports = class Indexers {
         });
     }
 
-    async teardown() {
-       await this.pool.end();
+    static async teardown(instance) {
+        if (instance.pool) {
+            await instance.pool.end();
+        }
     }
 
     async accomodateSchema(/* branch, schema */){
@@ -50,7 +52,7 @@ module.exports = class Indexers {
           });
     }
 
-    async _query(sql, params) {
+    async query(sql, params) {
         let client = await this.pool.connect();
         try {
             return await client.query(sql, params);
@@ -61,7 +63,7 @@ module.exports = class Indexers {
     }
 
     async loadMeta({ branch, id }) {
-        let response = await this._query('SELECT params from meta where branch=$1 and id=$2', [branch, id]);
+        let response = await this.query('SELECT params from meta where branch=$1 and id=$2', [branch, id]);
         if (response.rowCount > 0){
             return response.rows[0].params;
         }
@@ -69,17 +71,17 @@ module.exports = class Indexers {
 
     async saveDocument({ branch, type, id, searchDoc, pristineDoc, source, generation, refs }) {
         let sql = 'insert into documents (branch, type, id, search_doc, pristine_doc, source, generation, refs) values ($1, $2, $3, $4, $5, $6, $7, $8) on conflict on constraint documents_pkey do UPDATE SET search_doc = EXCLUDED.search_doc, pristine_doc = EXCLUDED.pristine_doc, source = EXCLUDED.source, generation = EXCLUDED.generation, refs = EXCLUDED.refs';
-        await this._query(sql, [branch, type, id, searchDoc, pristineDoc, source, generation, refs]);
+        await this.query(sql, [branch, type, id, searchDoc, pristineDoc, source, generation, refs]);
     }
 
     async deleteOlderGenerations(branch, sourceId, nonce) {
        let sql = 'delete from documents where generation!=$1 and source=$2 and branch=$3';
-       await this._query(sql, [nonce, sourceId, branch]);
+       await this.query(sql, [nonce, sourceId, branch]);
     }
 
     async saveMeta({branch, id, params}) {
         let sql = 'insert into meta (branch, id, params) values ($1, $2, $3) on conflict on constraint meta_pkey do UPDATE SET params = EXCLUDED.params';
-        await this._query(sql, [branch, id, params]);
+        await this.query(sql, [branch, id, params]);
     }
 
     async docsThatReference(branch, references, fn){        

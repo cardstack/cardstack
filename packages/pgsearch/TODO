@@ -5,3 +5,4 @@
 3. Refactord cardstack_pristine, cardstack_references, etc, out of searchDoc.
 4. When we invalidate documents, we're feeding post-processed ones back into the indexing process. We will need to strip off computed properties, etc, there. For now it's possible they would persist.
 5. verify cursor behavior in docsThatReference (either manually or write a test)
+6. Improve DI system to remove hack where we do require.resolve during injections.
