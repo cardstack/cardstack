@@ -6,6 +6,7 @@ exports.up = pgm => {
         branch: "varchar",
         search_doc: "jsonb",
         pristine_doc: "jsonb",
+        upstream_doc: "jsonb",
         source: "varchar",
         generation: "bigint",
         refs: "varchar[]"

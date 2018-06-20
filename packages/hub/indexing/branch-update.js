@@ -127,7 +127,7 @@ class BranchUpdate {
   async _invalidations() {
     let schema = await this.schema();
     await this.client.docsThatReference(this.branch, Object.keys(this._touched), async doc => {
-      let { type, id } = doc.data;
+      let { type, id } = doc;
       let key = `${type}/${id}`;
       if (!this._touched[key]) {
         if (type === 'user-realms') {
@@ -143,7 +143,7 @@ class BranchUpdate {
           // this code isn't running) or it's old (so it's correct to have a
           // non-current nonce).
           let nonce = 0;
-          await this.add(type, id, doc.data, sourceId, nonce);
+          await this.add(type, id, doc, sourceId, nonce);
         }
       }
     });
@@ -189,6 +189,7 @@ class BranchUpdate {
       id,
       searchDoc,
       pristineDoc: searchDoc.cardstack_pristine,
+      upstreamDoc: doc,
       source: sourceId,
       generation: nonce,
       refs: searchDoc.cardstack_references

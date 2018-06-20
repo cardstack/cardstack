@@ -69,9 +69,9 @@ module.exports = class PgClient {
         }
     }
 
-    async saveDocument({ branch, type, id, searchDoc, pristineDoc, source, generation, refs }) {
-        let sql = 'insert into documents (branch, type, id, search_doc, pristine_doc, source, generation, refs) values ($1, $2, $3, $4, $5, $6, $7, $8) on conflict on constraint documents_pkey do UPDATE SET search_doc = EXCLUDED.search_doc, pristine_doc = EXCLUDED.pristine_doc, source = EXCLUDED.source, generation = EXCLUDED.generation, refs = EXCLUDED.refs';
-        await this.query(sql, [branch, type, id, searchDoc, pristineDoc, source, generation, refs]);
+    async saveDocument({ branch, type, id, searchDoc, pristineDoc, upstreamDoc, source, generation, refs }) {
+        let sql = 'insert into documents (branch, type, id, search_doc, pristine_doc, upstream_doc, source, generation, refs) values ($1, $2, $3, $4, $5, $6, $7, $8, $9) on conflict on constraint documents_pkey do UPDATE SET search_doc = EXCLUDED.search_doc, pristine_doc = EXCLUDED.pristine_doc, source = EXCLUDED.source, generation = EXCLUDED.generation, refs = EXCLUDED.refs, upstream_doc = EXCLUDED.upstream_doc';
+        await this.query(sql, [branch, type, id, searchDoc, pristineDoc, upstreamDoc, source, generation, refs]);
     }
 
     async deleteOlderGenerations(branch, sourceId, nonce) {
@@ -87,7 +87,7 @@ module.exports = class PgClient {
     async docsThatReference(branch, references, fn){        
         const queryBatchSize = 100;
         const rowBatchSize = 100;
-        const sql = 'select pristine_doc from documents where branch=$1 and refs && $2';
+        const sql = 'select upstream_doc from documents where branch=$1 and refs && $2';
         let client = await this.pool.connect();
         try {
             for (let i = 0; i < references.length; i += queryBatchSize){
@@ -97,7 +97,7 @@ module.exports = class PgClient {
                 do {
                     rows = await readCursor(cursor, rowBatchSize);
                     for (let row of rows){
-                        await fn(row.pristine_doc);
+                        await fn(row.upstream_doc);
                     }
                 } while (rows.length > 0);
             }
