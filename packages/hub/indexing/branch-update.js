@@ -121,68 +121,32 @@ class BranchUpdate {
     });
   }
 
-  async _findTouchedReferences() {
-    let size = 100;
-    let touched = Object.keys(this._touched);
-    let accumulatedDocs = [];
-
-    for (let i = 0; i * size < touched.length; i++) {
-      let touchedBatch = touched.slice(i * size, (i + 1) * size);
-      let esBody = {
-        query: {
-          bool: {
-            must: [
-              { terms: { cardstack_references : touchedBatch } }
-            ],
-          }
-        },
-        size
-      };
-
-      let result = await this.client.es.search({
-        index: Client.branchToIndexName(this.branch),
-        body: esBody
-      });
-
-      let docs = result.hits.hits.map(hit => {
-        let { id, type } = hit._source.cardstack_pristine.data;
-        return { id, type };
-      });
-      accumulatedDocs = accumulatedDocs.concat(docs);
-    }
-    return accumulatedDocs;
-  }
-
   // This method does not need to recursively invalidate, because each
   // document stores a complete, rolled-up picture of which other
   // documents it references.
   async _invalidations() {
     let schema = await this.schema();
-    let pendingOps = [];
-    let references = await this._findTouchedReferences();
-    for (let { type, id } of references) {
+    await this.client.docsThatReference(this.branch, Object.keys(this._touched), async doc => {
+      let { type, id } = doc.data;
       let key = `${type}/${id}`;
       if (!this._touched[key]) {
-        this._touched[key] = true;
-        pendingOps.push((async ()=> {
-          if (type === 'user-realms') {
-            // if we have an invalidated user-realms and it hasn't
-            // already been touched, that's because the corresponding
-            // user was delete, so we should also delete the
-            // user-realms.
-            await this.delete(type, id);
-          } else {
-            let resource = await this.read(type, id);
-            if (resource) {
-              let sourceId = schema.types.get(type).dataSource.id;
-              let nonce = 0;
-              await this.add(type, id, resource, sourceId, nonce);
-            }
-          }
-        })());
+        if (type === 'user-realms') {
+          // if we have an invalidated user-realms and it hasn't
+          // already been touched, that's because the corresponding
+          // user was delete, so we should also delete the
+          // user-realms.
+          await this.delete(type, id);
+        } else {
+          let sourceId = schema.types.get(type).dataSource.id;
+          // this is correct because IF this document's data source is currently
+          // doing a replace-all operation, it was either already touched (so
+          // this code isn't running) or it's old (so it's correct to have a
+          // non-current nonce).
+          let nonce = 0;
+          await this.add(type, id, doc.data, sourceId, nonce);
+        }
       }
-    }
-    await Promise.all(pendingOps);
+    });
   }
 
   async read(type, id) {
@@ -227,7 +191,7 @@ class BranchUpdate {
       pristineDoc: searchDoc.cardstack_pristine,
       source: sourceId,
       generation: nonce,
-
+      refs: searchDoc.cardstack_references
     });
     this.emitEvent('add', { type, id, doc });
     log.debug("save %s %s", type, id);

@@ -7,9 +7,11 @@ exports.up = pgm => {
         search_doc: "jsonb",
         pristine_doc: "jsonb",
         source: "varchar",
-        generation: "bigint"
+        generation: "bigint",
+        refs: "varchar[]"
     });
     pgm.addConstraint("documents", "documents_pkey", { primaryKey: ["type", "id", "branch"]});
+    pgm.createIndex("documents", "refs", { method: "GIN" });
 
     pgm.createTable("meta", {
         id: "varchar",
