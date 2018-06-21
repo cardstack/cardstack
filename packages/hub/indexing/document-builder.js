@@ -11,6 +11,7 @@ module.exports = class DocumentBuilder {
     this.type = type;
     this.id = id;
     this.doc = doc;
+    this._pristineDoc = null;
 
     // included resources that we actually found
     this.pristineIncludes = [];
@@ -29,6 +30,19 @@ module.exports = class DocumentBuilder {
       let user = doc.relationships.user.data;
       this.references.push(`${user.type}/${user.id}`);
     }
+  }
+
+  async pristineDoc() {
+    let contentType = this.schema.types.get(this.type);
+    if (!contentType) {
+      return;
+    }
+
+    if (!this._pristineDoc) {
+      this._pristineDoc = await this._build(this.type, this.id, this.doc, contentType.includesTree, 0);
+    }
+
+    return this._pristineDoc;
   }
 
   async searchDoc() {
@@ -50,15 +64,6 @@ module.exports = class DocumentBuilder {
     return searchDoc;
   }
 
-  async pristineDoc() {
-    let contentType = this.schema.types.get(this.type);
-    if (!contentType) {
-      return;
-    }
-
-    return this._build(this.type, this.id, this.doc, contentType.includesTree, 0);
-  }
-
   async read(type, id) {
     this.references.push(`${type}/${id}`);
     return this.branchUpdate.read(type, id);
@@ -69,7 +74,7 @@ module.exports = class DocumentBuilder {
       this.searchDocFields = {};
     }
 
-    let esName = await this._logicalFieldToSearchDocField(field);
+    let name = await this.branchUpdate.client.logicalFieldToES(this.branchUpdate.branch, field);
 
     if (Array.isArray(value)) {
       value = value.map(rec => flattenJsonapi(rec));
@@ -77,11 +82,7 @@ module.exports = class DocumentBuilder {
       value = flattenJsonapi(value);
     }
 
-    this.searchDocFields[esName] = value;
-  }
-
-  async _logicalFieldToSearchDocField(fieldName) {
-    return this.branchUpdate.client.logicalFieldToES(this.branchUpdate.branch, fieldName);
+    this.searchDocFields[name] = value;
   }
 
   // copies attribues appropriately from jsonapiDoc into
@@ -101,8 +102,7 @@ module.exports = class DocumentBuilder {
 
   async _buildAttribute(field, value, pristineDocOut, searchDocOut) {
     // Write our value into the search doc
-    let esName = await this._logicalFieldToSearchDocField(field.id);
-    searchDocOut[esName] = value;
+    searchDocOut[field.id] = value;
 
     // Write our value into the pristine doc
     ensure(pristineDocOut, 'attributes')[field.id] = value;
@@ -158,7 +158,7 @@ module.exports = class DocumentBuilder {
       ensure(pristineDocOut, 'relationships')[field.id] = Object.assign({}, value);
     }
 
-    if (depth == 0) {
+    if (depth === 0) {
       searchDocOut[field.id] = related;
     }
   }
@@ -180,24 +180,14 @@ module.exports = class DocumentBuilder {
       await this._addSearchDocField('id', id);
     }
 
-    // this is the copy of the document we will return to anybody who
-    // retrieves it. It's supposed to already be a correct jsonapi
-    // response, as opposed to the searchDoc itself which is mangled
-    // for searchability.
-    let resultDoc = {
+    let doc = {
       data: { id, type }
     };
 
-    // we are going inside a parent document's includes, so we need
-    // our own type here.
-    if (depth > 0) {
-      await this._addSearchDocField('type', type);
-    }
-
     let userModel = new Model(contentType, jsonapiDoc, this.schema, this.read.bind(this));
     let searchDocFields = {};
-    await this._buildAttributes(contentType, jsonapiDoc, userModel, resultDoc, searchDocFields);
-    await this._buildRelationships(contentType, jsonapiDoc, userModel, resultDoc, searchDocFields, searchTree, depth);
+    await this._buildAttributes(contentType, jsonapiDoc, userModel, doc, searchDocFields);
+    await this._buildRelationships(contentType, jsonapiDoc, userModel, doc, searchDocFields, searchTree, depth);
 
     if (depth === 0) {
       for (let field of Object.keys(searchDocFields)) {
@@ -207,19 +197,19 @@ module.exports = class DocumentBuilder {
 
     // top level document embeds all the other pristine includes
     if (this.pristineIncludes.length > 0 && depth === 0) {
-      resultDoc.included = uniqBy([resultDoc].concat(this.pristineIncludes), r => `${r.type}/${r.id}`).slice(1);
+      doc.included = uniqBy([doc].concat(this.pristineIncludes), r => `${r.type}/${r.id}`).slice(1);
     }
 
     if (jsonapiDoc.meta) {
-      resultDoc.data.meta = Object.assign({}, jsonapiDoc.meta);
+      doc.data.meta = Object.assign({}, jsonapiDoc.meta);
     } else {
-      resultDoc.data.meta = {};
+      doc.data.meta = {};
     }
 
     if (depth > 0) {
-      this.pristineIncludes.push(resultDoc.data);
+      this.pristineIncludes.push(doc.data);
     }
-    return resultDoc;
+    return doc;
   }
 
 };
@@ -235,12 +225,12 @@ function flattenJsonapi(record) {
   // passthru if it doesn't look like json api
   if (!record.data) { return record; }
 
-  record = record.data;
-  let { id, type } = record;
+  let { data } = record;
+  let { id, type } = data;
   let flattenedRecord = { id, type };
 
-  for (let attr of Object.keys(record.attributes || {})) {
-    flattenedRecord[attr] = record.attributes[attr];
+  for (let attr of Object.keys(data.attributes || {})) {
+    flattenedRecord[attr] = data.attributes[attr];
   }
   return flattenedRecord;
 }
