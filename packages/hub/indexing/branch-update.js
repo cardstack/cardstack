@@ -3,7 +3,7 @@ const owningDataSource = new WeakMap();
 const { flatten } = require('lodash');
 const Client = require('@cardstack/elasticsearch/client');
 const log = require('@cardstack/logger')('cardstack/indexers');
-const DocumentContext = require('./document-context');
+const DocumentBuilder = require('./document-builder');
 const Session = require('@cardstack/plugin-utils/session');
 
 const FINALIZED = {};
@@ -223,7 +223,7 @@ class BranchUpdate {
     this._touched[`${type}/${id}`] = true;
     let searchDoc = await this._prepareSearchDoc(type, id, doc);
     if (!searchDoc) {
-      // bad documents get ignored. The DocumentContext logs these for
+      // bad documents get ignored. The DocumentBuilder logs these for
       // us, so all we need to do here is nothing.
       return;
     }
@@ -304,8 +304,8 @@ class BranchUpdate {
 
   async _prepareSearchDoc(type, id, doc) {
     let schema = await this.schema();
-    let context = new DocumentContext(this, schema, type, id, doc);
-    return context.searchDoc();
+    let builder = new DocumentBuilder(this, schema, type, id, doc);
+    return builder.searchDoc();
   }
 
 }

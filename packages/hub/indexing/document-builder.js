@@ -1,15 +1,16 @@
+const authLog = require('@cardstack/logger')('cardstack/auth');
 const log = require('@cardstack/logger')('cardstack/hub/indexing');
 const Model = require('../model');
 const { uniqBy } = require('lodash');
 
 module.exports = class DocumentBuilder {
-  constructor({ schema, type, id, doc, fieldMapping, getResource }) {
+
+  constructor(branchUpdate, schema, type, id, doc) {
+    this.branchUpdate = branchUpdate;
     this.schema = schema;
     this.type = type;
     this.id = id;
     this.doc = doc;
-    this._fieldMapping = fieldMapping ? fieldMapping : fieldName => fieldName; //TODO need a less ES specific way of approaching this
-    this._getResource = getResource;
 
     // included resources that we actually found
     this.pristineIncludes = [];
@@ -19,13 +20,68 @@ module.exports = class DocumentBuilder {
     // in the data we can invalidate to pick them up.
     this.references = [];
 
-    // All the ES specific stuff accumulates in this property so that the build() output is pure JSONAPI
-    this.additionalEsFields = {}; // TODO eventually need to refactor this out of here
+    // All the searchDoc embellishments accumulate in here
+    this.searchDocFields = {};
+
+    // special case for the built-in implicit relationship between
+    // user-realms and the underlying user record it is tracking
+    if (type === 'user-realms') {
+      let user = doc.relationships.user.data;
+      this.references.push(`${user.type}/${user.id}`);
+    }
+  }
+
+  async searchDoc() {
+    let contentType = this.schema.types.get(this.type);
+    if (!contentType) {
+      return;
+    }
+
+    let pristine = await this.pristineDoc();
+    let searchDoc = Object.assign({}, this.searchDocFields);
+
+    // The next fields in the searchDoc get a "cardstack_" prefix so
+    // they aren't likely to collide with the user's attribute or
+    // relationship.
+    searchDoc.cardstack_pristine = Object.assign({}, pristine);
+    searchDoc.cardstack_references = this.references;
+    searchDoc.cardstack_realms = this.schema.authorizedReadRealms(this.type, pristine.data);
+    authLog.trace("setting resource_realms for %s %s: %j", this.type, this.id, searchDoc.cardstack_realms);
+    return searchDoc;
+  }
+
+  async pristineDoc() {
+    let contentType = this.schema.types.get(this.type);
+    if (!contentType) {
+      return;
+    }
+
+    return this._build(this.type, this.id, this.doc, contentType.includesTree, 0);
   }
 
   async read(type, id) {
     this.references.push(`${type}/${id}`);
-    return this._getResource(type, id);
+    return this.branchUpdate.read(type, id);
+  }
+
+  async _addSearchDocField(field, value) {
+    if (!this.searchDocFields) {
+      this.searchDocFields = {};
+    }
+
+    let esName = await this._logicalFieldToSearchDocField(field);
+
+    if (Array.isArray(value)) {
+      value = value.map(rec => flattenJsonapi(rec));
+    } else if (value && value instanceof Object) {
+      value = flattenJsonapi(value);
+    }
+
+    this.searchDocFields[esName] = value;
+  }
+
+  async _logicalFieldToSearchDocField(fieldName) {
+    return this.branchUpdate.client.logicalFieldToES(this.branchUpdate.branch, fieldName);
   }
 
   // copies attribues appropriately from jsonapiDoc into
@@ -45,7 +101,7 @@ module.exports = class DocumentBuilder {
 
   async _buildAttribute(field, value, pristineDocOut, searchDocOut) {
     // Write our value into the search doc
-    let esName = await this._fieldMapping(field.id);
+    let esName = await this._logicalFieldToSearchDocField(field.id);
     searchDocOut[esName] = value;
 
     // Write our value into the pristine doc
@@ -56,8 +112,7 @@ module.exports = class DocumentBuilder {
     let derivedFields = field.derivedFields(value);
     if (derivedFields) {
       for (let [derivedName, derivedValue] of Object.entries(derivedFields)) {
-        let esName = await this._fieldMapping(derivedName);
-        searchDocOut[esName] = derivedValue;
+        searchDocOut[derivedName] = derivedValue;
       }
     }
   }
@@ -85,7 +140,7 @@ module.exports = class DocumentBuilder {
         related = await Promise.all(value.data.map(async ({ type, id }) => {
           let resource = await this.read(type, id);
           if (resource) {
-            return this.build(type, id, resource, searchTree[field.id], depth + 1);
+            return this._build(type, id, resource, searchTree[field.id], depth + 1);
           }
         }));
         related = related.filter(Boolean);
@@ -93,7 +148,7 @@ module.exports = class DocumentBuilder {
       } else {
         let resource = await this.read(value.data.type, value.data.id);
         if (resource) {
-          related = await this.build(resource.type, resource.id, resource, searchTree[field.id], depth + 1);
+          related = await this._build(resource.type, resource.id, resource, searchTree[field.id], depth + 1);
         }
         let data = related ? { type: related.data.type, id: related.data.id } : null;
         ensure(pristineDocOut, 'relationships')[field.id] = Object.assign({}, value, { data });
@@ -103,23 +158,12 @@ module.exports = class DocumentBuilder {
       ensure(pristineDocOut, 'relationships')[field.id] = Object.assign({}, value);
     }
 
-    // TODO eventually get this out of here...
     if (depth == 0) {
-      let esName = await this._fieldMapping(field.id);
-
-      if (Array.isArray(related)) {
-        related = related.map(rec => flattenJsonapi(rec));
-      } else if (related && related instanceof Object) {
-        related = flattenJsonapi(related);
-      }
-
-      searchDocOut[esName] = related;
+      searchDocOut[field.id] = related;
     }
   }
 
-  async build(type, id, jsonapiDoc, searchTree, depth) {
-    //TODO use class members fields for type, id and doc when not supplied as params
-
+  async _build(type, id, jsonapiDoc, searchTree, depth) {
     let contentType = this.schema.types.get(type);
     if (!contentType) {
       log.warn("ignoring unknown document type=%s id=%s", type, id);
@@ -133,8 +177,7 @@ module.exports = class DocumentBuilder {
     // we don't store the type as a regular field in elasticsearch,
     // because we're keeping it in the built in _type field.
     if (depth === 0) {
-      let esId = await this._fieldMapping('id');
-      this.additionalEsFields = { [esId]: id };
+      await this._addSearchDocField('id', id);
     }
 
     // this is the copy of the document we will return to anybody who
@@ -148,18 +191,17 @@ module.exports = class DocumentBuilder {
     // we are going inside a parent document's includes, so we need
     // our own type here.
     if (depth > 0) {
-      let esType = await this._fieldMapping('type');
-      this.additionalEsFields[esType] = type;
+      await this._addSearchDocField('type', type);
     }
 
     let userModel = new Model(contentType, jsonapiDoc, this.schema, this.read.bind(this));
-    let esFieldsToAdd = {}; //TODO need a less ES specific way of approaching this
-    await this._buildAttributes(contentType, jsonapiDoc, userModel, resultDoc, esFieldsToAdd);
-    await this._buildRelationships(contentType, jsonapiDoc, userModel, resultDoc, esFieldsToAdd, searchTree, depth);
+    let searchDocFields = {};
+    await this._buildAttributes(contentType, jsonapiDoc, userModel, resultDoc, searchDocFields);
+    await this._buildRelationships(contentType, jsonapiDoc, userModel, resultDoc, searchDocFields, searchTree, depth);
 
     if (depth === 0) {
-      for (let field of Object.keys(esFieldsToAdd)) {
-        this.additionalEsFields[field] = esFieldsToAdd[field];
+      for (let field of Object.keys(searchDocFields)) {
+        await this._addSearchDocField(field, searchDocFields[field]);
       }
     }
 
@@ -179,6 +221,7 @@ module.exports = class DocumentBuilder {
     }
     return resultDoc;
   }
+
 };
 
 function ensure(obj, section) {
@@ -188,16 +231,16 @@ function ensure(obj, section) {
   return obj.data[section];
 }
 
-function flattenJsonapi(jsonApi) {
-  if (jsonApi.data) {
-    jsonApi = jsonApi.data;
-  }
-  let flattenedRecord = {
-    id: jsonApi.id,
-    type: jsonApi.type
-  };
-  for (let attr of Object.keys(jsonApi.attributes || {})) {
-    flattenedRecord[attr] = jsonApi.attributes[attr];
+function flattenJsonapi(record) {
+  // passthru if it doesn't look like json api
+  if (!record.data) { return record; }
+
+  record = record.data;
+  let { id, type } = record;
+  let flattenedRecord = { id, type };
+
+  for (let attr of Object.keys(record.attributes || {})) {
+    flattenedRecord[attr] = record.attributes[attr];
   }
   return flattenedRecord;
 }
