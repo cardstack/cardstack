@@ -66,15 +66,17 @@ module.exports = declareInjections({
     }));
   }
 
-  pathExpression(schema, path){
-    let field = schema.realAndComputedFields.get(path);
-    return field.buildQueryExpression(['search_doc']);
-  }
-
   fieldFilter(branch, schema, key, value) {
+    let field = schema.realAndComputedFields.get(key);
+    if (!field) {
+      throw new Error(`Cannot filter by unknown field "${key}"`, {
+        status: 400,
+        title: "Unknown field in filter"
+      });
+    }
+    let expression = field.buildQueryExpression(['search_doc']);
     if (typeof value === 'string') {
-      let fieldExpression = this.pathExpression(schema, key);
-      return [ ...fieldExpression, '=', { param: value }];
+      return [ ...expression, '=', { param: value }];
     }
     if (Array.isArray(value)){
       return any(value.map(item => this.fieldFilter(branch, schema, key, item)));
@@ -109,7 +111,14 @@ module.exports = declareInjections({
       realName = name;
       order = 'asc';
     }
-    return [...this.pathExpression(schema, realName), order];
+    let field = schema.realAndComputedFields.get(realName);
+    if (!field) {
+      throw new Error(`Cannot sort by unknown field "${realName}"`, {
+        status: 400,
+        title: "Unknown sort field"
+      });
+    }
+    return [...field.buildQueryExpression(['search_doc']), order];
   }
  });
 
