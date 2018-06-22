@@ -59,7 +59,7 @@ module.exports = declareInjections({
         if (!Array.isArray(value)) {
           throw new Error(`the "or" operator must receive an array of other filters`, { status: 400 });
         }
-        return any(value.map(item => this.filterCondition(branch, schema, item)))
+        return any(value.map(item => this.filterCondition(branch, schema, item)));
       default:
         return this.fieldFilter(branch, schema, key, value);
       }
@@ -68,12 +68,7 @@ module.exports = declareInjections({
 
   pathExpression(schema, path){
     let field = schema.realAndComputedFields.get(path);
-    if (path === 'type' || path === 'id'){
-      // Our standard top-level fields are available as real columns
-      return [`${safeIdentifier(field.id)}`]
-    } else {
-      return [`search_doc ->>`, { param: field.id }];
-    }
+    return field.buildQueryExpression(['search_doc']);
   }
 
   fieldFilter(branch, schema, key, value) {
@@ -117,15 +112,6 @@ module.exports = declareInjections({
     return [...this.pathExpression(schema, realName), order];
   }
  });
-
-
-const safePattern = /^[a-zA-Z_0-9]+$/;
-function safeIdentifier(identifier){
-  if (!safePattern.test(identifier)){
-    throw new Error(`possible not safe SQL identifier: ${identifier}`);
-  }
-  return identifier;
-}
 
 function addExplicitParens(expression){
   return ['(', ...expression, ')'];

@@ -6,5 +6,8 @@ module.exports = {
     return {
       type: "long"
     };
+  },
+  buildQueryExpression(sourceExpression, name){
+    return ['(', ...sourceExpression, '->>', { param: name }, ')::bigint'];
   }
 };

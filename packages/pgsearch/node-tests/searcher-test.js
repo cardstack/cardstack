@@ -81,7 +81,7 @@ describe('pgsearch/searcher', function() {
     factory.addResource('people', '1').withAttributes({
       firstName: 'Quint',
       lastName: 'Faulkner',
-      age: 6,
+      age: 10,
       description: {
         version: "0.3.1",
         markups: [],
@@ -98,7 +98,7 @@ describe('pgsearch/searcher', function() {
     factory.addResource('people', '2').withAttributes({
       firstName: 'Arthur',
       lastName: 'Faulkner',
-      age: 1,
+      age: 5,
       favoriteColor: 'red'
     });
 
@@ -167,7 +167,7 @@ describe('pgsearch/searcher', function() {
         'first-name': 'Quint',
         'last-name': 'Faulkner',
         'favorite-color': null,
-        age: 6,
+        age: 10,
         description: {
           version: "0.3.1",
           markups: [],
@@ -328,7 +328,7 @@ describe('pgsearch/searcher', function() {
       filter: {
         age: {
           range: {
-            lt: '2'
+            lt: '7'
           }
         }
       }
