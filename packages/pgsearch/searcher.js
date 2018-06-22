@@ -32,6 +32,11 @@ module.exports = declareInjections({
     }
 
     let query = [`select pristine_doc from documents where`, ...every(conditions)];
+
+    if (sort) {
+      query = query.concat(this.buildSorts(schema, sort));
+    }
+
     let sql = queryToSQL(query);
     log.trace("search %s %j", sql.text, sql.values);
     let response = await this.client.query(sql);
@@ -61,22 +66,58 @@ module.exports = declareInjections({
     }));
   }
 
+  pathExpression(schema, path){
+    let field = schema.realAndComputedFields.get(path);
+    if (path === 'type' || path === 'id'){
+      // Our standard top-level fields are available as real columns
+      return [`${safeIdentifier(field.id)}`]
+    } else {
+      return [`search_doc ->>`, { param: field.id }];
+    }
+  }
+
   fieldFilter(branch, schema, key, value) {
-    let field = schema.realAndComputedFields.get(key);
     if (typeof value === 'string') {
-      if (key === 'type' || key === 'id'){
-        // Our standard top-level fields are available as real columns
-        return [ `${safeIdentifier(field.id)} =`, { param: value }];
-      } else {
-        return [`search_doc ->>`, { param: field.id }, '=', { param: value }];
-      }
+      let fieldExpression = this.pathExpression(schema, key);
+      return [ ...fieldExpression, '=', { param: value }];
     }
     if (Array.isArray(value)){
       return any(value.map(item => this.fieldFilter(branch, schema, key, item)));
     }
     throw new Error("Unimplemented field value");
   }
+
+  buildSorts(schema, sorts){
+    let expressions;
+    if (Array.isArray(sorts)){
+      if (sorts.length === 0){
+        return [];
+      }
+      expressions = sorts.map(name => this.buildSort(schema, name));
+    } else {
+      expressions = [this.buildSort(schema, sorts)];
+    }
+    return ['order by '].concat(expressions.reduce((accum, item) => {
+      if (accum.length > 0){
+        accum.push(',');
+      }
+      return accum.concat(item);
+    }, []));
+  }
+
+  buildSort(schema, name){
+    let realName, order;
+    if (name.indexOf('-') === 0) {
+      realName = name.slice(1);
+      order = 'desc';
+    } else {
+      realName = name;
+      order = 'asc';
+    }
+    return [...this.pathExpression(schema, realName), order];
+  }
  });
+
 
 const safePattern = /^[a-zA-Z_0-9]+$/;
 function safeIdentifier(identifier){
