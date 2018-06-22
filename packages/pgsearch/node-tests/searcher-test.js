@@ -311,6 +311,17 @@ describe('pgsearch/searcher', function() {
     expect(models).includes.something.with.deep.property('attributes.first-name', 'Arthur');
   });
 
+  it('can use NOT expressions in filters', async function() {
+    let { data: models } = await searcher.search(env.session, 'master', {
+      filter: {
+        type: 'people',
+        not: { 'first-name': 'Quint' }
+      }
+    });
+    expect(models).to.have.length(1);
+    expect(models).includes.something.with.deep.property('attributes.first-name', 'Arthur');
+  });
+
 
   it('can filter by range', async function() {
     let { data: models } = await searcher.search(env.session, 'master', {
