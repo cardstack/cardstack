@@ -192,7 +192,8 @@ class BranchUpdate {
       upstreamDoc: doc,
       source: sourceId,
       generation: nonce,
-      refs: searchDoc.cardstack_references
+      refs: searchDoc.cardstack_references,
+      realms: searchDoc.cardstack_realms
     });
     this.emitEvent('add', { type, id, doc });
     log.debug("save %s %s", type, id);

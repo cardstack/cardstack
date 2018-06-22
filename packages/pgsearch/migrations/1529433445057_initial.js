@@ -9,7 +9,8 @@ exports.up = pgm => {
         upstream_doc: "jsonb",
         source: "varchar",
         generation: "bigint",
-        refs: "varchar[]"
+        refs: "varchar[]",
+        realms: "varchar[]"
     });
     pgm.addConstraint("documents", "documents_pkey", { primaryKey: ["type", "id", "branch"]});
     pgm.createIndex("documents", "refs", { method: "GIN" });
