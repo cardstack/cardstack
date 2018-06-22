@@ -52,10 +52,10 @@ module.exports = class PgClient {
           });
     }
 
-    async query(sql, params) {
+    async query(...args) {
         let client = await this.pool.connect();
         try {
-            return await client.query(sql, params);
+            return await client.query(...args);
         }
         finally {
             client.release();
