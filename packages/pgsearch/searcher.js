@@ -73,14 +73,37 @@ module.exports = declareInjections({
   }
 
   buildQueryExpression(schema, key, errorHint){
-    let field = schema.realAndComputedFields.get(key);
-    if (!field) {
-      throw new Error(`Cannot ${errorHint} by unknown field "${key}"`, {
-        status: 400,
-        title: `Unknown field in ${errorHint}`
-      });
+    let segments = key.split('.');
+    let partialPath = '';
+    let currentContext = ['search_doc'];
+
+    while (segments.length > 0) {
+      let fieldName = segments.shift();
+      let field = schema.realAndComputedFields.get(fieldName);
+      if (!field) {
+        throw new Error(`Cannot ${errorHint} by unknown field "${partialPath}${fieldName}"`, {
+          status: 400,
+          title: `Unknown field in ${errorHint}`
+        });
+      }
+      
+      if (segments.length > 0) {
+        if (!field.isRelationship){
+          throw new Error(`Cannot ${errorHint} by unknown field "${partialPath}${fieldName}.${segments[0]}"`, {
+            status: 400,
+            title: `Unknown field in ${errorHint}`
+          });
+        }
+        if (field.fieldType === '@cardstack/core-types::has-many') {
+          throw new Error("unimplemented");
+        } else {
+          currentContext = ['(', ...currentContext, ')->', { param: field.id } ];
+        }
+      } else {
+        currentContext = field.buildQueryExpression(currentContext);
+      }
     }
-    return field.buildQueryExpression(['search_doc']);
+    return currentContext;
   }
 
   fieldFilter(branch, schema, key, value) {
