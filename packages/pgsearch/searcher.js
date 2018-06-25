@@ -93,6 +93,10 @@ module.exports = declareInjections({
 
     if (value.exact) {
       if (Array.isArray(value.exact)) {
+        // TODO: this is redundant, you could do the same thing more verbosely
+        // by using an array above this point. And it's inconsistent with the
+        // other operators that don't necessarily support arrays. We should
+        // either make them all work or none work.
         return any(value.exact.map(item => this.fieldFilter(branch, schema, key, { exact: item })));
       } else {
         return [ ...expression, '=', { param: value.exact }];
@@ -106,12 +110,18 @@ module.exports = declareInjections({
         }
       }).filter(Boolean));
     }
+
     if (value.exists != null){
       if (String(value.exists) === "false") {
         return [...expression, "is null"];
       } else {
         return [...expression, "is not null"];
       }
+    }
+
+    if (value.prefix) {
+      let param = value.prefix.replace(/[^a-zA-Z0-9]/g, '') + ":*";
+      return [`to_tsvector('english',`, ...expression, `) @@ to_tsquery('english',`, { param }, `)` ];
     }
     throw new Error("Unimplemented field value");
   }
