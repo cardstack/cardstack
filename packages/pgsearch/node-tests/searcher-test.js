@@ -676,6 +676,7 @@ describe('pgsearch/searcher', function() {
   });
 
   it('can filter non-searchable hasMany by id', async function() {
+    // todo: select array(select jsonb_array_elements(search_doc->'members')->>'id') from documents;
     let response = await searcher.search(env.session, 'master', {
       filter: {
         'members.id': { exact: '1' }
