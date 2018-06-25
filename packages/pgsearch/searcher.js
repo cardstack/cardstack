@@ -2,6 +2,12 @@ const log = require('@cardstack/logger')('cardstack/pgsearch');
 const Error = require('@cardstack/plugin-utils/error');
 const { declareInjections } = require('@cardstack/di');
 
+const RANGE_OPERATORS = {
+  lte: '<=',
+  gte: '>=', 
+  lt: '<',
+  gt: '>'
+};
 
 module.exports = declareInjections({
   schema: 'hub:current-schema',
@@ -80,6 +86,13 @@ module.exports = declareInjections({
     }
     if (Array.isArray(value)){
       return any(value.map(item => this.fieldFilter(branch, schema, key, item)));
+    }
+    if (value.range) {
+      return every(Object.keys(RANGE_OPERATORS).map(limit => {
+        if (value.range[limit]) {
+          return [...expression, RANGE_OPERATORS[limit], { param: value.range[limit] }];
+        }
+      }).filter(Boolean));
     }
     throw new Error("Unimplemented field value");
   }
