@@ -7,6 +7,8 @@ const Router = EmberRouter.extend({
 });
 
 Router.map(function() {
+  this.route('tools');
+  this.route('no-tools');
 });
 
 export default Router;
