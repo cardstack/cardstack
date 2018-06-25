@@ -76,10 +76,10 @@ module.exports = declareInjections({
     let segments = key.split('.');
     let partialPath = '';
     let currentContext = ['search_doc'];
-    return this._buildQueryExpression(schema, segments, errorHint, partialPath, currentContext);
+    return this._buildQueryExpression(schema, segments, errorHint, partialPath, currentContext, false);
   }
 
-  _buildQueryExpression(schema, segments, errorHint, partialPath, currentContext) {
+  _buildQueryExpression(schema, segments, errorHint, partialPath, currentContext, insideHasMany) {
     let [ first, ...rest ] = segments;
     let fieldName = segments.shift();
     let field = schema.realAndComputedFields.get(fieldName);
@@ -98,25 +98,42 @@ module.exports = declareInjections({
         });
       }
       if (field.fieldType === '@cardstack/core-types::has-many') {
-        throw new Error("unimplemented");
+        let { expression } = this._buildQueryExpression(
+          schema, 
+          rest, 
+          errorHint, 
+          `${partialPath}${first}.`, 
+          ['jsonb_array_elements(', ...currentContext, '->', { param: field.id }, ')' ],
+          true
+        );
+        if (insideHasMany) {
+          return { isPlural: true, expression };
+        } else {
+          return { isPlural: true, expression: ['array(select', ...expression, ')'] };
+        }
       } else {
-        return this._buildQueryExpression(schema, rest, errorHint, `${partialPath}${first}.`, ['(', ...currentContext, ')->', { param: field.id } ]);
+        return this._buildQueryExpression(schema, rest, errorHint, `${partialPath}${first}.`, ['(', ...currentContext, ')->', { param: field.id } ], insideHasMany);
       }
     } else {
-       return field.buildQueryExpression(currentContext);
+       return { isPlural: false, expression: field.buildQueryExpression(currentContext) };
     }
   }
 
   fieldFilter(branch, schema, key, value) {
-    let expression = this.buildQueryExpression(schema, key, 'filter');
     if (Array.isArray(value)){
       return any(value.map(item => this.fieldFilter(branch, schema, key, item)));
     }
 
+    let { isPlural, expression } = this.buildQueryExpression(schema, key, 'filter');
+
     if (typeof value === 'string') {
       // TODO: Default query behavior is full-text matching. Switch to exact match instead.
       // TODO: this is super slow until we implement schema-dependent indices in postgres
-      return [`to_tsvector('english',`, ...expression, `) @@ plainto_tsquery('english',`, { param: value }, `)` ];
+      if (isPlural){
+        return [`to_tsvector('english',`, `array_to_string(`, ...expression, `, ' ')`, `) @@ plainto_tsquery('english',`, { param: value }, `)` ];
+      } else {
+        return [`to_tsvector('english',`, ...expression, `) @@ plainto_tsquery('english',`, { param: value }, `)` ];
+      }
     }
 
     if (value.exact) {
@@ -127,8 +144,16 @@ module.exports = declareInjections({
         // either make them all work or none work.
         return any(value.exact.map(item => this.fieldFilter(branch, schema, key, { exact: item })));
       } else {
-        return [ ...expression, '=', { param: value.exact }];
+        if (isPlural){
+          return [...expression, '&&', { param: [value.exact] }];
+        } else {
+          return [ ...expression, '=', { param: value.exact }];
+        }
       }
+    }
+
+    if (isPlural){
+      throw new Error(`this kind of query is not implemented across a has-many relationship`);
     }
 
     if (value.range) {
@@ -181,7 +206,7 @@ module.exports = declareInjections({
       realName = name;
       order = 'asc';
     }
-    let expression = this.buildQueryExpression(schema, realName, 'sort');
+    let { expression } = this.buildQueryExpression(schema, realName, 'sort');
 
     return [...expression, order];
   }
