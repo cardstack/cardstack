@@ -81,12 +81,24 @@ module.exports = declareInjections({
       });
     }
     let expression = field.buildQueryExpression(['search_doc']);
-    if (typeof value === 'string') {
-      return [ ...expression, '=', { param: value }];
-    }
     if (Array.isArray(value)){
       return any(value.map(item => this.fieldFilter(branch, schema, key, item)));
     }
+
+    if (typeof value === 'string') {
+      // TODO: Default query behavior is full-text matching. Switch to exact match instead.
+      // TODO: this is super slow until we implement schema-dependent indices in postgres
+      return [`to_tsvector('english',`, ...expression, `) @@ plainto_tsquery('english',`, { param: value }, `)` ];
+    }
+
+    if (value.exact) {
+      if (Array.isArray(value.exact)) {
+        return any(value.exact.map(item => this.fieldFilter(branch, schema, key, { exact: item })));
+      } else {
+        return [ ...expression, '=', { param: value.exact }];
+      }
+    }
+
     if (value.range) {
       return every(Object.keys(RANGE_OPERATORS).map(limit => {
         if (value.range[limit]) {
