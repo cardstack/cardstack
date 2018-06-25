@@ -94,6 +94,13 @@ module.exports = declareInjections({
         }
       }).filter(Boolean));
     }
+    if (value.exists != null){
+      if (String(value.exists) === "false") {
+        return [...expression, "is null"];
+      } else {
+        return [...expression, "is not null"];
+      }
+    }
     throw new Error("Unimplemented field value");
   }
 
