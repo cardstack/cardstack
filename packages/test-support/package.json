@@ -23,6 +23,7 @@
     "@cardstack/ephemeral": "0.8.0",
     "@cardstack/hub": "0.8.3",
     "@cardstack/logger": "^0.1.0",
+    "@cardstack/pgsearch": "0.8.0",
     "@cardstack/plugin-utils": "0.8.0",
     "@std/esm": "^0.25.1",
     "chai": "^3.5.0",

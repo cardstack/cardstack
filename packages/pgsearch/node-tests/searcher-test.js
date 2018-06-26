@@ -106,7 +106,7 @@ describe('pgsearch/searcher', function() {
     });
 
     for (let i = 0; i < 20; i++) {
-      let comment = factory.addResource('comments');
+      let comment = factory.addResource('comments', String(i));
       comment.withAttributes({
         body: `comment ${comment.id}`,
         score: Math.abs(10 - i)

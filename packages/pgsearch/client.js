@@ -1,8 +1,24 @@
-const { Pool } = require('pg');
+
+const { Pool, Client } = require('pg');
 const Cursor = require('pg-cursor');
 const migrate = require('node-pg-migrate').default;
 const log = require('@cardstack/logger')('cardstack/pgsearch');
 const { join } = require('path');
+
+// TODO: once our migrations is complete, rename this env var everywhere because
+// it's no longer about elasticsearch and it's not a prefix.
+const dbSuffix = process.env.ELASTICSEARCH_PREFIX || 'content';
+
+// TODO just rely on the standard PG env vars: 
+// https://www.postgresql.org/docs/9.1/static/libpq-envars.html
+// but check that pg-migrate does too
+const config = {
+    host: 'localhost',
+    port: 5444,
+    user: 'postgres',
+    database: `pgsearch_${dbSuffix}`
+};
+
 
 module.exports = class PgClient {
     static create() {
@@ -10,21 +26,16 @@ module.exports = class PgClient {
     }
 
     constructor(){
-        // TODO read environment vars?
-        this.config = {
-            host: 'localhost',
-            port: 5444,
-            user: 'postgres',
-            database: 'test1'
-        };
-
+        
         this.pool = new Pool({
-            user: this.config.user,
-            host: this.config.host,
-            database: this.config.database,
-            password: this.config.password,
-            port: this.config.port
+            user: config.user,
+            host: config.host,
+            database: config.database,
+            password: config.password,
+            port: config.port
         });
+
+        this._didEnsureDatabaseSetup = false;
     }
 
     static async teardown(instance) {
@@ -33,23 +44,52 @@ module.exports = class PgClient {
         }
     }
 
-    async accomodateSchema(/* branch, schema */){
-        // TODO: add specialized indices to postgres?
+    async ensureDatabaseSetup() {
+        if (this._didEnsureDatabaseSetup){
+            return;
+        }
+
+        let client = new Client(Object.assign({}, config, { database: 'postgres' }));
+        try {
+            await client.connect();
+            let response = await client.query(`select count(*)=1 as has_database from pg_database where datname=$1`, [config.database]);
+            if (!response.rows[0].has_database) {
+                await client.query(`create database ${safeDatabaseName(config.database)}`);
+            }
+        } finally {
+            client.end();
+        }
+
         await migrate({
             direction: 'up',
             migrationsTable: 'migrations',
             singleTransaction: true,
             checkOrder: false,
             databaseUrl: {
-              user: this.config.user,
-              host: this.config.host,
-              database: this.config.database,
-              password: this.config.password,
-              port: this.config.port
+              user: config.user,
+              host: config.host,
+              database: config.database,
+              password: config.password,
+              port: config.port
             },
             dir: join(__dirname, 'migrations'),
             log: (...args) => log.debug(...args)
-          });
+        });
+    }
+
+    static async deleteSearchIndexIHopeYouKnowWhatYouAreDoing() {
+        let client = new Client(Object.assign({}, config, { database: 'postgres' }));
+        try {
+            await client.connect();
+            await client.query(`drop database ${safeDatabaseName(config.database)}`);
+        } finally {
+            client.end();
+        }
+    }
+
+    async accomodateSchema(/* branch, schema */){
+        await this.ensureDatabaseSetup();
+        // TODO: add specialized indices to postgres?
     }
 
     async query(...args) {
@@ -119,4 +159,11 @@ function readCursor(cursor, rowCount){
             }
         });
     });
+}
+
+function safeDatabaseName(name){
+    if (!/^[a-zA-Z_0-9]+$/.test(name)){
+        throw new Error(`unsure if db name ${name} is safe`);
+    }
+    return name;
 }

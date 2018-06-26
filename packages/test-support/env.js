@@ -1,5 +1,6 @@
 const temp = require('./temp-helper');
 const ElasticAssert = require('@cardstack/elasticsearch/test-support');
+const PgClient = require('@cardstack/pgsearch/client');
 const JSONAPIFactory = require('./jsonapi-factory');
 const crypto = require('crypto');
 const { wireItUp, loadSeeds } = require('@cardstack/hub/main');
@@ -90,7 +91,7 @@ exports.createDefaultEnvironment = async function(projectDir, initialModels = []
     if (container) {
       container.teardown();
     }
-    destroyIndices();
+    destroySearchIndex();
     temp.cleanup();
     throw err;
   }
@@ -100,14 +101,17 @@ exports.destroyDefaultEnvironment = async function(env) {
   if (env) {
     env.teardown();
     await env.teardownSettled();
-    await destroyIndices();
+    await destroySearchIndex();
     await temp.cleanup();
   }
 };
 
-async function destroyIndices() {
+async function destroySearchIndex() {
   let ea = new ElasticAssert();
-  await ea.deleteContentIndices();
+  await Promise.all([
+    ea.deleteContentIndices(),
+    PgClient.deleteSearchIndexIHopeYouKnowWhatYouAreDoing()
+  ]);
 }
 
 
