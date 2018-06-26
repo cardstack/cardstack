@@ -1,7 +1,6 @@
 const Operations = require('./operations');
 const owningDataSource = new WeakMap();
 const { flatten } = require('lodash');
-const Client = require('@cardstack/elasticsearch/client');
 const log = require('@cardstack/logger')('cardstack/indexers');
 const DocumentContext = require('./document-context');
 const Session = require('@cardstack/plugin-utils/session');
@@ -224,12 +223,10 @@ class BranchUpdate {
 
   async delete(type, id) {
     this._touched[`${type}/${id}`] = true;
-    await this.bulkOps.add({
-      delete: {
-        _index: Client.branchToIndexName(this.branch),
-        _type: type,
-        _id: `${this.branch}/${id}`
-      }
+    await this.client.deleteDocument({
+      branch: this.branch,
+      type,
+      id
     });
     this.emitEvent('delete', { type, id });
     log.debug("delete %s %s", type, id);

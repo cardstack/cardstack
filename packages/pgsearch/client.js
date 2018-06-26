@@ -119,6 +119,11 @@ module.exports = class PgClient {
        await this.query(sql, [nonce, sourceId, branch]);
     }
 
+    async deleteDocument({ branch, type, id }) {
+       let sql = 'delete from documents where branch=$1 and type=$2 and id=$3';
+       await this.query(sql, [branch, type, id]);
+    }
+
     async saveMeta({branch, id, params}) {
         let sql = 'insert into meta (branch, id, params) values ($1, $2, $3) on conflict on constraint meta_pkey do UPDATE SET params = EXCLUDED.params';
         await this.query(sql, [branch, id, params]);
