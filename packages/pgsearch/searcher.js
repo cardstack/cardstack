@@ -39,6 +39,8 @@ module.exports = declareInjections({
       conditions.push(this.filterCondition(branch, schema, filter));
     }
 
+    let totalResponsePromise = this.client.query(queryToSQL([`select count(*) from documents where`, ...every(conditions)]));
+
     let sorts = new Sorts(this, schema, sort);
     if (page && page.cursor) {
       conditions.push(sorts.afterExpression(page.cursor));
@@ -55,12 +57,16 @@ module.exports = declareInjections({
     let sql = queryToSQL(query);
     log.trace("search %s %j", sql.text, sql.values);
     let response = await this.client.query(sql);
+    let totalResponse = await totalResponsePromise;
 
-    return this.assembleResponse(response, size, sorts);
+    return this.assembleResponse(response, totalResponse, size, sorts);
   }
 
-  assembleResponse(response, requestedSize, sorts){
-    let page = {};
+  assembleResponse(response, totalResponse, requestedSize, sorts){
+    let page = {
+       // nobody has more than 2^53-1 total docs right?
+      total: parseInt(totalResponse.rows[0].count, 10)
+    };
     let documents = response.rows;
     if(response.rowCount > requestedSize){
       documents = documents.slice(0, requestedSize);
