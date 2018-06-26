@@ -1,9 +1,9 @@
 const authLog = require('@cardstack/logger')('cardstack/auth');
-const log = require('@cardstack/logger')('cardstack/indexers');
+const log = require('@cardstack/logger')('cardstack/hub/indexing');
 const Model = require('../model');
 const { uniqBy } = require('lodash');
 
-module.exports = class DocumentContext {
+module.exports = class DocumentBuilder {
 
   constructor(branchUpdate, schema, type, id, doc) {
     this.branchUpdate = branchUpdate;
@@ -11,6 +11,7 @@ module.exports = class DocumentContext {
     this.type = type;
     this.id = id;
     this.doc = doc;
+    this._pristineDoc = null;
 
     // included resources that we actually found
     this.pristineIncludes = [];
@@ -20,6 +21,9 @@ module.exports = class DocumentContext {
     // in the data we can invalidate to pick them up.
     this.references = [];
 
+    // All the searchDoc embellishments accumulate in here
+    this.searchDocFields = {};
+
     // special case for the built-in implicit relationship between
     // user-realms and the underlying user record it is tracking
     if (type === 'user-realms') {
@@ -28,12 +32,36 @@ module.exports = class DocumentContext {
     }
   }
 
+  async pristineDoc() {
+    let contentType = this.schema.types.get(this.type);
+    if (!contentType) {
+      return;
+    }
+
+    if (!this._pristineDoc) {
+      this._pristineDoc = await this._build(this.type, this.id, this.doc, contentType.includesTree, 0);
+    }
+
+    return this._pristineDoc;
+  }
+
   async searchDoc() {
     let contentType = this.schema.types.get(this.type);
     if (!contentType) {
       return;
     }
-    return this._build(this.type, this.id, this.doc, contentType.includesTree, 0);
+
+    let pristine = await this.pristineDoc();
+    let searchDoc = Object.assign({}, this.searchDocFields);
+
+    // The next fields in the searchDoc get a "cardstack_" prefix so
+    // they aren't likely to collide with the user's attribute or
+    // relationship.
+    searchDoc.cardstack_pristine = Object.assign({}, pristine);
+    searchDoc.cardstack_references = this.references;
+    searchDoc.cardstack_realms = this.schema.authorizedReadRealms(this.type, pristine.data);
+    authLog.trace("setting resource_realms for %s %s: %j", this.type, this.id, searchDoc.cardstack_realms);
+    return searchDoc;
   }
 
   async read(type, id) {
@@ -41,8 +69,20 @@ module.exports = class DocumentContext {
     return this.branchUpdate.read(type, id);
   }
 
-  async _logicalFieldToES(fieldName) {
-    return this.branchUpdate.client.logicalFieldToES(this.branchUpdate.branch, fieldName);
+  async _addSearchDocField(field, value) {
+    if (!this.searchDocFields) {
+      this.searchDocFields = {};
+    }
+
+    let name = await this.branchUpdate.client.logicalFieldToES(this.branchUpdate.branch, field);
+
+    if (Array.isArray(value)) {
+      value = value.map(rec => flattenJsonapi(rec));
+    } else if (value && value instanceof Object) {
+      value = flattenJsonapi(value);
+    }
+
+    this.searchDocFields[name] = value;
   }
 
   // copies attribues appropriately from jsonapiDoc into
@@ -62,8 +102,7 @@ module.exports = class DocumentContext {
 
   async _buildAttribute(field, value, pristineDocOut, searchDocOut) {
     // Write our value into the search doc
-    let esName = await this._logicalFieldToES(field.id);
-    searchDocOut[esName] = value;
+    searchDocOut[field.id] = value;
 
     // Write our value into the pristine doc
     ensure(pristineDocOut, 'attributes')[field.id] = value;
@@ -73,8 +112,7 @@ module.exports = class DocumentContext {
     let derivedFields = field.derivedFields(value);
     if (derivedFields) {
       for (let [derivedName, derivedValue] of Object.entries(derivedFields)) {
-        let esName = await this._logicalFieldToES(derivedName);
-        searchDocOut[esName] = derivedValue;
+        searchDocOut[derivedName] = derivedValue;
       }
     }
   }
@@ -106,21 +144,23 @@ module.exports = class DocumentContext {
           }
         }));
         related = related.filter(Boolean);
-        ensure(pristineDocOut, 'relationships')[field.id] = Object.assign({}, value, { data: related.map(r => ({ type: r.type, id: r.id })) });
+        ensure(pristineDocOut, 'relationships')[field.id] = Object.assign({}, value, { data: related.map(r => ({ type: r.data.type, id: r.data.id })) });
       } else {
         let resource = await this.read(value.data.type, value.data.id);
         if (resource) {
           related = await this._build(resource.type, resource.id, resource, searchTree[field.id], depth + 1);
         }
-        let data = related ? { type: related.type, id: related.id } : null;
+        let data = related ? { type: related.data.type, id: related.data.id } : null;
         ensure(pristineDocOut, 'relationships')[field.id] = Object.assign({}, value, { data });
       }
     } else {
       related = value.data;
       ensure(pristineDocOut, 'relationships')[field.id] = Object.assign({}, value);
     }
-    let esName = await this._logicalFieldToES(field.id);
-    searchDocOut[esName] = related;
+
+    if (depth === 0) {
+      searchDocOut[field.id] = related;
+    }
   }
 
   async _build(type, id, jsonapiDoc, searchTree, depth) {
@@ -136,52 +176,40 @@ module.exports = class DocumentContext {
     //
     // we don't store the type as a regular field in elasticsearch,
     // because we're keeping it in the built in _type field.
-    let esId = await this._logicalFieldToES('id');
-    let searchDoc = { [esId]: id };
+    if (depth === 0) {
+      await this._addSearchDocField('id', id);
+    }
 
-    // this is the copy of the document we will return to anybody who
-    // retrieves it. It's supposed to already be a correct jsonapi
-    // response, as opposed to the searchDoc itself which is mangled
-    // for searchability.
-    let pristine = {
+    let doc = {
       data: { id, type }
     };
 
-    // we are going inside a parent document's includes, so we need
-    // our own type here.
-    if (depth > 0) {
-      let esType = await this._logicalFieldToES('type');
-      searchDoc[esType] = type;
-    }
-
     let userModel = new Model(contentType, jsonapiDoc, this.schema, this.read.bind(this));
-    await this._buildAttributes(contentType, jsonapiDoc, userModel, pristine, searchDoc);
-    await this._buildRelationships(contentType, jsonapiDoc, userModel, pristine, searchDoc, searchTree, depth);
+    let searchDocFields = {};
+    await this._buildAttributes(contentType, jsonapiDoc, userModel, doc, searchDocFields);
+    await this._buildRelationships(contentType, jsonapiDoc, userModel, doc, searchDocFields, searchTree, depth);
+
+    if (depth === 0) {
+      for (let field of Object.keys(searchDocFields)) {
+        await this._addSearchDocField(field, searchDocFields[field]);
+      }
+    }
 
     // top level document embeds all the other pristine includes
     if (this.pristineIncludes.length > 0 && depth === 0) {
-      pristine.included = uniqBy([pristine].concat(this.pristineIncludes), r => `${r.type}/${r.id}`).slice(1);
+      doc.included = uniqBy([doc].concat(this.pristineIncludes), r => `${r.type}/${r.id}`).slice(1);
     }
 
-    // The next fields in the searchDoc get a "cardstack_" prefix so
-    // they aren't likely to collide with the user's attribute or
-    // relationship.
-
     if (jsonapiDoc.meta) {
-      pristine.data.meta = Object.assign({}, jsonapiDoc.meta);
+      doc.data.meta = Object.assign({}, jsonapiDoc.meta);
     } else {
-      pristine.data.meta = {};
+      doc.data.meta = {};
     }
 
     if (depth > 0) {
-      this.pristineIncludes.push(pristine.data);
-    } else {
-      searchDoc.cardstack_pristine = pristine;
-      searchDoc.cardstack_references = this.references;
-      searchDoc.cardstack_realms = this.schema.authorizedReadRealms(type, jsonapiDoc);
-      authLog.trace("setting resource_realms for %s %s: %j", type, id, searchDoc.cardstack_realms);
+      this.pristineIncludes.push(doc.data);
     }
-    return searchDoc;
+    return doc;
   }
 
 };
@@ -191,4 +219,18 @@ function ensure(obj, section) {
     obj.data[section] = {};
   }
   return obj.data[section];
+}
+
+function flattenJsonapi(record) {
+  // passthru if it doesn't look like json api
+  if (!record.data) { return record; }
+
+  let { data } = record;
+  let { id, type } = data;
+  let flattenedRecord = { id, type };
+
+  for (let attr of Object.keys(data.attributes || {})) {
+    flattenedRecord[attr] = data.attributes[attr];
+  }
+  return flattenedRecord;
 }
