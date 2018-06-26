@@ -209,7 +209,7 @@ class Searcher {
       }
       let here = aboveSegments.concat(field.queryFieldName);
 
-      if (field.fieldType === '@cardstack/core-types::has-many') {
+        if (field.fieldType === '@cardstack/core-types::has-many') {
         return {
           nested: {
             path: here.join('.'),

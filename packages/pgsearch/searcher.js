@@ -1,6 +1,7 @@
 const log = require('@cardstack/logger')('cardstack/pgsearch');
 const Error = require('@cardstack/plugin-utils/error');
 const { declareInjections } = require('@cardstack/di');
+const { zip } = require('lodash');
 
 const RANGE_OPERATORS = {
   lte: '<=',
@@ -8,6 +9,8 @@ const RANGE_OPERATORS = {
   lt: '<',
   gt: '>'
 };
+
+const PRIMARY_KEY = Object.freeze(['branch', 'type', 'id']);
 
 module.exports = declareInjections({
   schema: 'hub:current-schema',
@@ -37,17 +40,51 @@ module.exports = declareInjections({
       conditions.push(this.filterCondition(branch, schema, filter));
     }
 
-    let query = [`select pristine_doc from documents where`, ...every(conditions)];
-
-    if (sort) {
-      query = query.concat(this.buildSorts(schema, sort));
+    let { orderExpression, afterExpression } = this.buildSorts(schema, sort, page);
+    if (afterExpression) {
+      conditions.push(afterExpression);
     }
 
+    let query = [`select`, PRIMARY_KEY.join(', ') ,`, pristine_doc from documents where`, ...every(conditions), ...orderExpression];
+
+    let size = 10;
+    if (page && /^\d+$/.test(page.size)) {
+      size = parseInt(page.size, 10);
+    }
+    query = [...query, "limit", {param: size + 1}];
+  
     let sql = queryToSQL(query);
     log.trace("search %s %j", sql.text, sql.values);
     let response = await this.client.query(sql);
-    return { data: response.rows.map(row => row.pristine_doc.data)};
+
+    return this.assembleResponse(response, size);
   }
+
+  assembleResponse(response, requestedSize){
+    let page = {};
+    let documents = response.rows;
+    if(response.rowCount > requestedSize){
+      documents = documents.slice(0, requestedSize);
+      let last = documents[documents.length - 1];
+      page.cursor = encodeURIComponent(JSON.stringify(PRIMARY_KEY.map(fieldName => last[fieldName])));
+    }
+    let included = [];
+    let data = documents.map(
+      row => {
+        let jsonapi = row.pristine_doc;
+        if (jsonapi.included) {
+          included = included.concat(jsonapi.included);
+        }
+        return jsonapi.data;
+      }
+    );
+    return {
+      data,
+      included,
+      meta: { page },
+    };
+  }
+
 
   filterCondition(branch, schema, filter){
     return every(Object.entries(filter).map(([key, value]) => {
@@ -73,6 +110,9 @@ module.exports = declareInjections({
   }
 
   buildQueryExpression(schema, key, errorHint){
+    if (key === 'branch' || key === 'type' || key === 'id'){
+      return { isPlural: false, expression: [key] };
+    }
     let segments = key.split('.');
     let partialPath = '';
     let currentContext = ['search_doc'];
@@ -179,25 +219,44 @@ module.exports = declareInjections({
     throw new Error("Unimplemented field value");
   }
 
-  buildSorts(schema, sorts){
-    let expressions;
-    if (Array.isArray(sorts)){
-      if (sorts.length === 0){
-        return [];
+  buildSorts(schema, rawSorts, page){
+    let sorts;
+    if (rawSorts) {
+      if (Array.isArray(rawSorts)){
+        sorts = rawSorts.map(name => this.parseSort(schema, name));
+      } else {
+        sorts = [this.parseSort(schema, rawSorts)];
       }
-      expressions = sorts.map(name => this.buildSort(schema, name));
     } else {
-      expressions = [this.buildSort(schema, sorts)];
+      sorts = [];
     }
-    return ['order by '].concat(expressions.reduce((accum, item) => {
-      if (accum.length > 0){
-        accum.push(',');
+
+    PRIMARY_KEY.forEach(name => {
+      if (!sorts.find(entry => entry.name === name)) {
+        sorts.push(this.parseSort(schema, name));
       }
-      return accum.concat(item);
-    }, []));
+    });
+
+    let orderExpression = ['order by '].concat(separatedByCommas(sorts.map(({ expression, order }) => [...expression, order])));
+
+    let afterExpression;
+    if (page && page.cursor) {
+      let cursorValues;
+      try {
+        cursorValues = JSON.parse(decodeURIComponent(page.cursor));
+        if (cursorValues.length !== PRIMARY_KEY.length) {
+          throw new Error("Invalid cursor value", { status: 400 });
+        }
+      } catch (err) {
+        throw new Error("Invalid cursor value", { status: 400 });
+      }
+      // todo: derive afterExpression from cursorValues
+    }
+
+    return { orderExpression, afterExpression };
   }
 
-  buildSort(schema, name){
+  parseSort(schema, name){
     let realName, order;
     if (name.indexOf('-') === 0) {
       realName = name.slice(1);
@@ -207,13 +266,25 @@ module.exports = declareInjections({
       order = 'asc';
     }
     let { expression } = this.buildQueryExpression(schema, realName, 'sort');
-
-    return [...expression, order];
+    return { 
+      name: realName, 
+      order,
+      expression
+     };
   }
  });
 
 function addExplicitParens(expression){
   return ['(', ...expression, ')'];
+}
+
+function separatedByCommas(expressions) {
+  return expressions.reduce((accum, expression) => {
+    if (accum.length > 0){
+      accum.push(',');
+    }
+    return accum.concat(expression);
+  }, []);
 }
 
 function every(expressions){
@@ -233,7 +304,7 @@ function any(expressions){
 function queryToSQL(query){
   let values = [];
   let text = query.map(element =>{
-    if (element.param) {
+    if (element.hasOwnProperty('param')) {
       values.push(element.param);
       return `$${values.length}`;
     } else {

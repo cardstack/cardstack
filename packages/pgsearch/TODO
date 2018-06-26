@@ -7,3 +7,5 @@
 5. verify cursor behavior in docsThatReference (either manually or write a test)
 6. Improve DI system to remove hack where we do require.resolve during injections.
 7. Drop queryFieldName and querySortName?
+8. Switch filter default from non-exact to exact.
+9. Drop implicit "any" array support inside operators like 'exact'
