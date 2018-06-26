@@ -26,7 +26,7 @@ module.exports = declareInjections({
     }
   }
 
-  async search(session, branch, { queryString, filter, sort, page } ) {
+  async search(session, branch, { filter, sort, page } ) {
     let realms = await session.realms();
     let schema = await this.schema.forBranch(branch);
 

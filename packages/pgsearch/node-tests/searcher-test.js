@@ -187,7 +187,7 @@ describe('pgsearch/searcher', function() {
     });
   });
 
-  it('can be searched via queryString', async function() {
+  it.skip('can be searched via queryString', async function() {
     let { data: models } = await searcher.search(env.session, 'master', {
       queryString: 'magic'
     });
@@ -196,7 +196,7 @@ describe('pgsearch/searcher', function() {
     expect(models.filter(m => m.type === 'comments')).to.have.length(4);
   });
 
-  it('can be searched via queryString, negative result', async function() {
+  it.skip('can be searched via queryString, negative result', async function() {
     let { data: models } = await searcher.search(env.session, 'master', {
       queryString: 'thisisanunusedterm'
     });
