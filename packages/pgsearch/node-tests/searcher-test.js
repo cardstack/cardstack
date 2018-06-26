@@ -57,6 +57,9 @@ describe('pgsearch/searcher', function() {
       factory.addResource('fields', 'body').withAttributes({
         fieldType: '@cardstack/core-types::string'
       }),
+      factory.addResource('fields', 'score').withAttributes({
+        fieldType: '@cardstack/core-types::integer'
+      }),
       factory.addResource('fields', 'article').withAttributes({
         fieldType: '@cardstack/core-types::belongs-to'
       }).withRelated('related-types', [ factory.getResource('content-types', 'articles') ]),
@@ -105,7 +108,8 @@ describe('pgsearch/searcher', function() {
     for (let i = 0; i < 20; i++) {
       let comment = factory.addResource('comments');
       comment.withAttributes({
-        body: `comment ${comment.id}`
+        body: `comment ${comment.id}`,
+        score: Math.abs(10 - i)
       });
       if (i < 4) {
         comment
@@ -554,6 +558,33 @@ describe('pgsearch/searcher', function() {
 
     allModels = allModels.concat(response.data);
     expect(uniq(allModels.map(m => m.id))).length(20);
+  });
+
+  it('can paginate when sorting by custom field', async function() {
+    let response = await searcher.search(env.session, 'master', {
+      filter: { type: 'comments' },
+      sort: 'score',
+      page: {
+        size: 10
+      }
+    });
+    expect(response.data).length(10);
+    expect(response.meta.page).has.property('cursor');
+    expect(response.data[0].id).to.equal('10');
+    expect(response.data[1].id).to.equal('11'); // this relies on knowing that the fallback sort order is branch/type/id
+    expect(response.data[2].id).to.equal('9');
+
+    response = await searcher.search(env.session, 'master', {
+      filter: { type: 'comments' },
+      sort: 'score',
+      page: {
+        size: 10,
+        cursor: response.meta.page.cursor
+      }
+    });
+    expect(response.data).length(10);
+    expect(response.meta.page).not.has.property('cursor');
+    expect(response.data[0].id).to.equal('5');
   });
 
   it('can get an individual record', async function() {

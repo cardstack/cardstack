@@ -1,7 +1,6 @@
 const log = require('@cardstack/logger')('cardstack/pgsearch');
 const Error = require('@cardstack/plugin-utils/error');
 const { declareInjections } = require('@cardstack/di');
-const { zip } = require('lodash');
 
 const RANGE_OPERATORS = {
   lte: '<=',
@@ -40,12 +39,12 @@ module.exports = declareInjections({
       conditions.push(this.filterCondition(branch, schema, filter));
     }
 
-    let { orderExpression, afterExpression } = this.buildSorts(schema, sort, page);
-    if (afterExpression) {
-      conditions.push(afterExpression);
+    let sorts = new Sorts(this, schema, sort);
+    if (page && page.cursor) {
+      conditions.push(sorts.afterExpression(page.cursor));
     }
 
-    let query = [`select`, PRIMARY_KEY.join(', ') ,`, pristine_doc from documents where`, ...every(conditions), ...orderExpression];
+    let query = [`select`, ...sorts.cursorColumns() ,`, pristine_doc from documents where`, ...every(conditions), ...sorts.orderExpression()];
 
     let size = 10;
     if (page && /^\d+$/.test(page.size)) {
@@ -57,16 +56,16 @@ module.exports = declareInjections({
     log.trace("search %s %j", sql.text, sql.values);
     let response = await this.client.query(sql);
 
-    return this.assembleResponse(response, size);
+    return this.assembleResponse(response, size, sorts);
   }
 
-  assembleResponse(response, requestedSize){
+  assembleResponse(response, requestedSize, sorts){
     let page = {};
     let documents = response.rows;
     if(response.rowCount > requestedSize){
       documents = documents.slice(0, requestedSize);
       let last = documents[documents.length - 1];
-      page.cursor = encodeURIComponent(JSON.stringify(PRIMARY_KEY.map(fieldName => last[fieldName])));
+      page.cursor = sorts.getCursor(last);
     }
     let included = [];
     let data = documents.map(
@@ -219,63 +218,15 @@ module.exports = declareInjections({
     throw new Error("Unimplemented field value");
   }
 
-  buildSorts(schema, rawSorts, page){
-    let sorts;
-    if (rawSorts) {
-      if (Array.isArray(rawSorts)){
-        sorts = rawSorts.map(name => this.parseSort(schema, name));
-      } else {
-        sorts = [this.parseSort(schema, rawSorts)];
-      }
-    } else {
-      sorts = [];
-    }
-
-    PRIMARY_KEY.forEach(name => {
-      if (!sorts.find(entry => entry.name === name)) {
-        sorts.push(this.parseSort(schema, name));
-      }
-    });
-
-    let orderExpression = ['order by '].concat(separatedByCommas(sorts.map(({ expression, order }) => [...expression, order])));
-
-    let afterExpression;
-    if (page && page.cursor) {
-      let cursorValues;
-      try {
-        cursorValues = JSON.parse(decodeURIComponent(page.cursor));
-        if (cursorValues.length !== PRIMARY_KEY.length) {
-          throw new Error("Invalid cursor value", { status: 400 });
-        }
-      } catch (err) {
-        throw new Error("Invalid cursor value", { status: 400 });
-      }
-      // todo: derive afterExpression from cursorValues
-    }
-
-    return { orderExpression, afterExpression };
-  }
-
-  parseSort(schema, name){
-    let realName, order;
-    if (name.indexOf('-') === 0) {
-      realName = name.slice(1);
-      order = 'desc';
-    } else {
-      realName = name;
-      order = 'asc';
-    }
-    let { expression } = this.buildQueryExpression(schema, realName, 'sort');
-    return { 
-      name: realName, 
-      order,
-      expression
-     };
-  }
+  
  });
 
 function addExplicitParens(expression){
-  return ['(', ...expression, ')'];
+  if (expression.length === 0) {
+    return expression;
+  } else {
+    return ['(', ...expression, ')'];
+  }
 }
 
 function separatedByCommas(expressions) {
@@ -317,3 +268,84 @@ function queryToSQL(query){
   };
 }
 
+class Sorts {
+  constructor(searcher, schema, rawSorts){
+    let sorts;
+    if (rawSorts) {
+      if (Array.isArray(rawSorts)){
+        sorts = rawSorts.map(name => this.parseSort(searcher, schema, name));
+      } else {
+        sorts = [this.parseSort(searcher, schema, rawSorts)];
+      }
+    } else {
+      sorts = [];
+    }
+
+    PRIMARY_KEY.forEach(name => {
+      if (!sorts.find(entry => entry.name === name)) {
+        sorts.push(this.parseSort(searcher, schema, name));
+      }
+    });
+    this._sorts = sorts;
+  }
+
+  orderExpression() {
+    return ['order by '].concat(separatedByCommas(this._sorts.map(({ expression, order }) => [...expression, order])));
+  }
+
+  afterExpression(cursor) {
+    let cursorValues = this._parseCursor(cursor);
+    return this._afterExpression(cursorValues, 0);
+  }
+
+  _afterExpression(cursorValues, index) {
+    if(index === this._sorts.length) {
+      return [false];
+    }
+    let { expression, order } = this._sorts[index];
+    let value = { param: cursorValues[index] };
+    let operator = order === 'asc' ? '>' : '<';
+
+    return ['(', ...expression, operator, value, ') OR ((', ...expression, '=', value, ') AND (', ...this._afterExpression(cursorValues, index + 1), '))'];
+  }
+
+  _parseCursor(cursor) {
+    let cursorValues;
+    try {
+      cursorValues = JSON.parse(decodeURIComponent(cursor));
+      if (cursorValues.length !== this._sorts.length) {
+        throw new Error("Invalid cursor value", { status: 400 });
+      }
+    } catch (err) {
+      throw new Error("Invalid cursor value", { status: 400 });
+    }
+    return cursorValues;
+  }
+
+  getCursor(lastRow) {
+    return encodeURIComponent(JSON.stringify(this._sorts.map((unused, index)=> lastRow[`cursor${index}`])));
+  }
+    
+  parseSort(searcher, schema, name){
+    let realName, order;
+    if (name.indexOf('-') === 0) {
+      realName = name.slice(1);
+      order = 'desc';
+    } else {
+      realName = name;
+      order = 'asc';
+    }
+    let { expression } = searcher.buildQueryExpression(schema, realName, 'sort');
+    return { 
+      name: realName, 
+      order,
+      expression
+     };
+  }
+
+  cursorColumns() {
+    return separatedByCommas(this._sorts.map(({ expression }, index)=> {
+      return [...expression, `AS cursor${index}`];
+    }));
+  }
+}
