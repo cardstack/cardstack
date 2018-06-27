@@ -322,10 +322,9 @@ describe('git/indexer', function() {
 });
 
 describe('git/indexer failures', function() {
-  let root, indexer, ea;
+  let root, env;
 
   beforeEach(async function() {
-    ea = new ElasticAssert();
     root = await temp.mkdir('cardstack-server-test');
 
     let factory = new JSONAPIFactory();
@@ -341,22 +340,15 @@ describe('git/indexer failures', function() {
         'default-data-source',
         dataSource
       );
-
-    let registry = new Registry();
-    registry.register('config:data-sources', factory.getModels());
-    registry.register('config:project', {
-      path: `${__dirname}/..`
-    });
-    indexer = new Container(registry).lookup('hub:indexers');
+    env = await createDefaultEnvironment(join(__dirname, '..'), factory.getModels());
   });
 
   afterEach(async function() {
     await temp.cleanup();
-    await ea.deleteContentIndices();
+    await destroyDefaultEnvironment(env);
   });
 
   it("makes a repo if one doesn't already exist", async function() {
-    await indexer.update();
     expect(fs.existsSync(root + '/repo-to-be-created')).is.ok;
   });
 });
