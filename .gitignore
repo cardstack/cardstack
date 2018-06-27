@@ -5,3 +5,4 @@
 *.log
 lerna-debug.log
 tmp
+.DS_Store
