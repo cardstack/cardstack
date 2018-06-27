@@ -1,13 +1,11 @@
 const Change = require('../change');
 const temp = require('@cardstack/test-support/temp-helper');
 const { commitOpts, makeRepo } = require('./support');
-const ElasticAssert = require('@cardstack/elasticsearch/test-support');
 const JSONAPIFactory = require('@cardstack/test-support/jsonapi-factory');
 const { 
   createDefaultEnvironment, 
   destroyDefaultEnvironment 
 } = require('@cardstack/test-support/env');
-const { Registry, Container } = require('@cardstack/di');
 const logger = require('@cardstack/logger');
 const fs = require('fs');
 const { join } = require('path');
