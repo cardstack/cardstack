@@ -12,6 +12,7 @@ exports.up = pgm => {
         refs: "varchar[]",
         realms: "varchar[]"
     });
+    pgm.sql('ALTER TABLE documents SET UNLOGGED');
     pgm.addConstraint("documents", "documents_pkey", { primaryKey: ["type", "id", "branch"]});
     pgm.createIndex("documents", "refs", { method: "GIN" });
 
@@ -20,6 +21,7 @@ exports.up = pgm => {
         branch: "varchar",
         params: "jsonb"
     });
+    pgm.sql('ALTER TABLE meta SET UNLOGGED');
     pgm.addConstraint("meta", "meta_pkey", { primaryKey: ["id", "branch"]});
 };
 
