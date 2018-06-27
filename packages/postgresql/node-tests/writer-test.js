@@ -98,7 +98,9 @@ describe('postgresql/writer', function() {
 
   afterEach(async function() {
     await destroyDefaultEnvironment(env);
-    await client.end();
+    if (client) {
+      await client.end();
+    }
     await pgClient.query(`select pg_drop_replication_slot(slot_name) from pg_replication_slots;`);
     await pgClient.query(`drop database test1`);
     await pgClient.end();
