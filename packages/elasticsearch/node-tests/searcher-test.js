@@ -13,7 +13,7 @@ const Factory = require('../../../tests/elasticsearch-test-app/node_modules/@car
 
 const { uniq } = require('lodash');
 
-describe('elasticsearch/searcher', function() {
+describe.skip('elasticsearch/searcher', function() {
 
   let searcher, env, factory;
 
