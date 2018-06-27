@@ -5,12 +5,18 @@ const { uniqBy } = require('lodash');
 
 module.exports = class DocumentContext {
 
-  constructor(branchUpdate, schema, type, id, doc) {
-    this.branchUpdate = branchUpdate;
+  constructor({ read, schema, type, id, branch, sourceId, generation, upstreamDoc, searchDocFieldMapping }) {
     this.schema = schema;
     this.type = type;
     this.id = id;
-    this.doc = doc;
+    this.branch = branch;
+    this.sourceId = sourceId;
+    this.generation = generation;
+    this.upstreamDoc = upstreamDoc;
+    this._read = read;
+
+    //TODO refactor this away after we have replaced ES with pg-search
+    this._searchDocFieldMapping = typeof searchDocFieldMapping === 'function' ? searchDocFieldMapping : field => field;
 
     // included resources that we actually found
     this.pristineIncludes = [];
@@ -18,31 +24,71 @@ module.exports = class DocumentContext {
     // references to included resource that were both found or
     // missing. We track the missing ones so that if they later appear
     // in the data we can invalidate to pick them up.
-    this.references = [];
+    this._references = [];
 
     // special case for the built-in implicit relationship between
     // user-realms and the underlying user record it is tracking
     if (type === 'user-realms') {
-      let user = doc.relationships.user.data;
-      this.references.push(`${user.type}/${user.id}`);
+      let user = upstreamDoc.relationships.user.data;
+      this._references.push(`${user.type}/${user.id}`);
     }
   }
 
   async searchDoc() {
+    let searchDoc = await this._getCachedSearchDoc();
+    if (!searchDoc) { return; }
+
+    // TODO adapting the searchdoc response to new structure available to pg-search, still need to refactor this internally to remove these deletes
+    delete searchDoc.cardstack_pristine;
+    delete searchDoc.cardstack_references;
+    delete searchDoc.cardstack_realms;
+
+    return searchDoc;
+  }
+
+  async pristineDoc() {
+    let searchDoc = await this._getCachedSearchDoc();
+    if (!searchDoc) { return; }
+
+    let pristine = searchDoc.cardstack_pristine;
+    pristine.data.meta.source = this.sourceId;
+
+    return pristine;
+  }
+
+  async realms() {
+    let searchDoc = await this._getCachedSearchDoc();
+    if (!searchDoc) { return; }
+
+    return searchDoc.cardstack_realms;
+  }
+
+  async references() {
+    await this._getCachedSearchDoc(); // side effect builds up the references
+    return this._references;
+  }
+
+  async read(type, id) {
+    this._references.push(`${type}/${id}`);
+    return this._read(type, id);
+  }
+
+  async _logicalFieldToES(fieldName) {
+    return this._searchDocFieldMapping(fieldName);
+  }
+
+  // TODO come up with a better way to cache (use Model)
+  async _getCachedSearchDoc() {
     let contentType = this.schema.types.get(this.type);
     if (!contentType) {
       return;
     }
-    return this._build(this.type, this.id, this.doc, contentType.includesTree, 0);
-  }
-
-  async read(type, id) {
-    this.references.push(`${type}/${id}`);
-    return this.branchUpdate.read(type, id);
-  }
-
-  async _logicalFieldToES(fieldName) {
-    return this.branchUpdate.client.logicalFieldToES(this.branchUpdate.branch, fieldName);
+    if (!this._searchDoc) {
+      this._searchDoc = await this._build(this.type, this.id, this.upstreamDoc, contentType.includesTree, 0);
+    }
+    if (this._searchDoc) {
+      return Object.assign({}, this._searchDoc);
+    }
   }
 
   // copies attribues appropriately from jsonapiDoc into
@@ -177,7 +223,7 @@ module.exports = class DocumentContext {
       this.pristineIncludes.push(pristine.data);
     } else {
       searchDoc.cardstack_pristine = pristine;
-      searchDoc.cardstack_references = this.references;
+      searchDoc.cardstack_references = this._references;
       searchDoc.cardstack_realms = this.schema.authorizedReadRealms(type, jsonapiDoc);
       authLog.trace("setting resource_realms for %s %s: %j", type, id, searchDoc.cardstack_realms);
     }
