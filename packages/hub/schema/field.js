@@ -255,7 +255,15 @@ module.exports = class Field {
       }
     }
     return [...sourceExpression, `->>`, { param: this.id }];
-  } 
+  }
+
+  buildValueExpression(value) {
+    let valueExpression = [{ param: value }];
+    if (this.plugin.buildValueExpression) {
+      return this.plugin.buildValueExpression(valueExpression);
+    }
+    return valueExpression;
+  }
 
   // FIXME: delete this
   get sortFieldName() {

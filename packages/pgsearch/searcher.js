@@ -4,7 +4,7 @@ const { declareInjections } = require('@cardstack/di');
 
 const RANGE_OPERATORS = {
   lte: '<=',
-  gte: '>=', 
+  gte: '>=',
   lt: '<',
   gt: '>'
 };
@@ -31,8 +31,8 @@ module.exports = declareInjections({
     let schema = await this.schema.forBranch(branch);
 
     let conditions = [
-      ['branch = ', { param: branch }],
-      ['realms && ', { param: realms }]
+      ['branch = ', param(branch) ],
+      ['realms && ', param(realms) ]
     ];
 
     if (filter) {
@@ -52,8 +52,8 @@ module.exports = declareInjections({
     if (page && /^\d+$/.test(page.size)) {
       size = parseInt(page.size, 10);
     }
-    query = [...query, "limit", {param: size + 1}];
-  
+    query = [...query, "limit", param(size + 1) ];
+
     let sql = queryToSQL(query);
     log.trace("search %s %j", sql.text, sql.values);
     let response = await this.client.query(sql);
@@ -101,7 +101,7 @@ module.exports = declareInjections({
         // top-level conditions. But for completeness, it works.
         if (!Array.isArray(value)) {
           throw new Error(`the "and" operator must receive an array of other filters`, { status: 400 });
-        }      
+        }
         return every(value.map(item => this.filterCondition(branch, schema, item)));
       case 'or':
         if (!Array.isArray(value)) {
@@ -116,7 +116,7 @@ module.exports = declareInjections({
 
   buildQueryExpression(schema, key, errorHint){
     if (key === 'branch' || key === 'type' || key === 'id'){
-      return { isPlural: false, expression: [key] };
+      return { isPlural: false, expression: [key], leafField: { buildValueExpression(value) { return [{ param: value }]; } } };
     }
     let segments = key.split('.');
     let partialPath = '';
@@ -134,7 +134,7 @@ module.exports = declareInjections({
         title: `Unknown field in ${errorHint}`
       });
     }
-    
+
     if (rest.length > 0) {
       if (!field.isRelationship){
         throw new Error(`Cannot ${errorHint} by unknown field "${partialPath}${fieldName}.${segments[0]}"`, {
@@ -143,24 +143,24 @@ module.exports = declareInjections({
         });
       }
       if (field.fieldType === '@cardstack/core-types::has-many') {
-        let { expression } = this._buildQueryExpression(
-          schema, 
-          rest, 
-          errorHint, 
-          `${partialPath}${first}.`, 
-          ['jsonb_array_elements(', ...currentContext, '->', { param: field.id }, ')' ],
+        let { expression, leafField } = this._buildQueryExpression(
+          schema,
+          rest,
+          errorHint,
+          `${partialPath}${first}.`,
+          ['jsonb_array_elements(', ...currentContext, '->', param(field.id), ')' ],
           true
         );
         if (insideHasMany) {
-          return { isPlural: true, expression };
+          return { isPlural: true, expression, leafField };
         } else {
-          return { isPlural: true, expression: ['array(select', ...expression, ')'] };
+          return { isPlural: true, expression: ['array(select', ...expression, ')'], leafField };
         }
       } else {
-        return this._buildQueryExpression(schema, rest, errorHint, `${partialPath}${first}.`, ['(', ...currentContext, ')->', { param: field.id } ], insideHasMany);
+        return this._buildQueryExpression(schema, rest, errorHint, `${partialPath}${first}.`, ['(', ...currentContext, ')->', param(field.id) ], insideHasMany);
       }
     } else {
-       return { isPlural: false, expression: field.buildQueryExpression(currentContext) };
+       return { isPlural: false, expression: field.buildQueryExpression(currentContext), leafField: field };
     }
   }
 
@@ -169,15 +169,15 @@ module.exports = declareInjections({
       return any(value.map(item => this.fieldFilter(branch, schema, key, item)));
     }
 
-    let { isPlural, expression } = this.buildQueryExpression(schema, key, 'filter');
+    let { isPlural, expression, leafField } = this.buildQueryExpression(schema, key, 'filter');
 
     if (typeof value === 'string') {
       // TODO: Default query behavior is full-text matching. Switch to exact match instead.
       // TODO: this is super slow until we implement schema-dependent indices in postgres
       if (isPlural){
-        return [`to_tsvector('english',`, `array_to_string(`, ...expression, `, ' ')`, `) @@ plainto_tsquery('english',`, { param: value }, `)` ];
+        return [`to_tsvector('english',`, `array_to_string(`, ...expression, `, ' ')`, `) @@ plainto_tsquery('english',`, ...leafField.buildValueExpression(value), `)` ];
       } else {
-        return [`to_tsvector('english',`, ...expression, `) @@ plainto_tsquery('english',`, { param: value }, `)` ];
+        return [`to_tsvector('english',`, ...expression, `) @@ plainto_tsquery('english',`, ...leafField.buildValueExpression(value), `)` ];
       }
     }
 
@@ -190,9 +190,9 @@ module.exports = declareInjections({
         return any(value.exact.map(item => this.fieldFilter(branch, schema, key, { exact: item })));
       } else {
         if (isPlural){
-          return [...expression, '&&', { param: [value.exact] }];
+          return [...expression, '&&', 'array[', ...leafField.buildValueExpression(value.exact), ']'];
         } else {
-          return [ ...expression, '=', { param: value.exact }];
+          return [ ...expression, '=', ...leafField.buildValueExpression(value.exact)];
         }
       }
     }
@@ -204,7 +204,7 @@ module.exports = declareInjections({
     if (value.range) {
       return every(Object.keys(RANGE_OPERATORS).map(limit => {
         if (value.range[limit]) {
-          return [...expression, RANGE_OPERATORS[limit], { param: value.range[limit] }];
+          return [...expression, RANGE_OPERATORS[limit], ...leafField.buildValueExpression(value.range[limit])];
         }
       }).filter(Boolean));
     }
@@ -219,12 +219,12 @@ module.exports = declareInjections({
 
     if (value.prefix) {
       let param = value.prefix.replace(/[^a-zA-Z0-9]/g, '') + ":*";
-      return [`to_tsvector('english',`, ...expression, `) @@ to_tsquery('english',`, { param }, `)` ];
+      return [`to_tsvector('english',`, ...expression, `) @@ to_tsquery('english',`, ...leafField.buildValueExpression(param), `)` ];
     }
     throw new Error("Unimplemented field value");
   }
 
-  
+
  });
 
 function addExplicitParens(expression){
@@ -242,6 +242,10 @@ function separatedByCommas(expressions) {
     }
     return accum.concat(expression);
   }, []);
+}
+
+function param(value) {
+  return { param: value };
 }
 
 function every(expressions){
@@ -308,11 +312,11 @@ class Sorts {
     if(index === this._sorts.length) {
       return [false];
     }
-    let { expression, order } = this._sorts[index];
-    let value = { param: cursorValues[index] };
+    let { expression, order, leafField } = this._sorts[index];
+    let value = leafField.buildValueExpression(cursorValues[index]);
     let operator = order === 'asc' ? '>' : '<';
 
-    return ['(', ...expression, operator, value, ') OR ((', ...expression, '=', value, ') AND (', ...this._afterExpression(cursorValues, index + 1), '))'];
+    return ['(', ...expression, operator, ...value, ') OR ((', ...expression, '=', ...value, ') AND (', ...this._afterExpression(cursorValues, index + 1), '))'];
   }
 
   _parseCursor(cursor) {
@@ -331,7 +335,7 @@ class Sorts {
   getCursor(lastRow) {
     return encodeURIComponent(JSON.stringify(this._sorts.map((unused, index)=> lastRow[`cursor${index}`])));
   }
-    
+
   parseSort(searcher, schema, name){
     let realName, order;
     if (name.indexOf('-') === 0) {
@@ -341,11 +345,12 @@ class Sorts {
       realName = name;
       order = 'asc';
     }
-    let { expression } = searcher.buildQueryExpression(schema, realName, 'sort');
-    return { 
-      name: realName, 
+    let { expression, leafField } = searcher.buildQueryExpression(schema, realName, 'sort');
+    return {
+      name: realName,
       order,
-      expression
+      expression,
+      leafField
      };
   }
 
