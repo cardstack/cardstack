@@ -9,7 +9,7 @@ const { join } = require('path');
 // it's no longer about elasticsearch and it's not a prefix.
 const dbSuffix = process.env.ELASTICSEARCH_PREFIX || 'content';
 
-// TODO just rely on the standard PG env vars: 
+// TODO just rely on the standard PG env vars:
 // https://www.postgresql.org/docs/9.1/static/libpq-envars.html
 // but check that pg-migrate does too
 const config = {
@@ -26,7 +26,7 @@ module.exports = class PgClient {
     }
 
     constructor(){
-        
+
         this.pool = new Pool({
             user: config.user,
             host: config.host,
@@ -81,7 +81,7 @@ module.exports = class PgClient {
         let client = new Client(Object.assign({}, config, { database: 'postgres' }));
         try {
             await client.connect();
-            await client.query(`drop database ${safeDatabaseName(config.database)}`);
+            await client.query(`drop database if exists ${safeDatabaseName(config.database)}`);
         } finally {
             client.end();
         }
@@ -129,7 +129,7 @@ module.exports = class PgClient {
         await this.query(sql, [branch, id, params]);
     }
 
-    async docsThatReference(branch, references, fn){        
+    async docsThatReference(branch, references, fn){
         const queryBatchSize = 100;
         const rowBatchSize = 100;
         const sql = 'select upstream_doc from documents where branch=$1 and refs && $2';
@@ -150,7 +150,7 @@ module.exports = class PgClient {
         finally {
             client.release();
         }
-       
+
     }
 };
 
