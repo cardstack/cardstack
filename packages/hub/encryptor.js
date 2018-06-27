@@ -43,7 +43,7 @@ class Encryptor {
     let [ciphertext, iv, authTag] = parts;
     let authTagBuffer = Buffer.from(authTag, 'base64');
     if(authTagBuffer.length !== 16){
-      throw new Error("Not a valid signed message");
+      throw new Error("unable to authenticate data");
     }
     let decipher = crypto.createDecipheriv('aes-256-gcm', this.key, Buffer.from(iv, 'base64'));
     decipher.setAuthTag(authTagBuffer);
