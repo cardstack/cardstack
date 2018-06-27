@@ -308,7 +308,7 @@ class Updater {
     await this.query(`SELECT * FROM pg_create_logical_replication_slot($1, 'test_decoding')`, [replicationSlot]);
     log.debug("Created new replication slot %s", replicationSlot);
     for (let model of await this.schema()) {
-      ops.save(model.type, model.id, model);
+      await ops.save(model.type, model.id, model);
       if (model.type === 'content-types') {
         await this._fullUpdateType(model.id, ops);
       }
