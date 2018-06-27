@@ -221,17 +221,34 @@ class BranchUpdate {
 
   async add(type, id, doc, sourceId, nonce) {
     this._touched[`${type}/${id}`] = true;
-    let searchDoc = await this._prepareSearchDoc(type, id, doc);
+    let schema = await this.schema();
+    let context = new DocumentContext({
+      schema,
+      type,
+      id,
+      sourceId,
+      generation: nonce,
+      upstreamDoc: doc,
+      branch: this.branch,
+      read: (type, id) => this.read(type, id),
+      searchDocFieldMapping: (fieldName) => this.client.logicalFieldToES(this.branch, fieldName) // remove this after we replace ES
+    });
+
+    let searchDoc = await context.searchDoc();
     if (!searchDoc) {
       // bad documents get ignored. The DocumentContext logs these for
       // us, so all we need to do here is nothing.
       return;
     }
-    searchDoc.cardstack_source = sourceId;
-    searchDoc.cardstack_pristine.data.meta.source = sourceId;
-    if (nonce) {
-      searchDoc.cardstack_generation = nonce;
+    searchDoc.cardstack_pristine = await context.pristineDoc();
+    searchDoc.cardstack_references = await context.references();
+    searchDoc.cardstack_realms = await context.realms();
+    searchDoc.cardstack_source = context.sourceId;
+
+    if (context.generation) {
+      searchDoc.cardstack_generation = context.generation;
     }
+
     await this.bulkOps.add({
       index: {
         _index: Client.branchToIndexName(this.branch),
@@ -299,15 +316,6 @@ class BranchUpdate {
     this.emitEvent('delete_all_without_nonce', { sourceId, nonce });
     log.debug("bulk delete older content for data source %s", sourceId);
   }
-
-
-
-  async _prepareSearchDoc(type, id, doc) {
-    let schema = await this.schema();
-    let context = new DocumentContext(this, schema, type, id, doc);
-    return context.searchDoc();
-  }
-
 }
 
 exports.BranchUpdate = BranchUpdate;
