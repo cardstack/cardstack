@@ -3,7 +3,6 @@ const {
   destroyDefaultEnvironment
 } = require('@cardstack/test-support/env');
 const { Client } = require('pg');
-const ElasticAssert = require('@cardstack/elasticsearch/test-support');
 const JSONAPIFactory = require('@cardstack/test-support/jsonapi-factory');
 
 describe('postgresql/indexer', function() {
@@ -273,8 +272,8 @@ describe('postgresql/indexer', function() {
       let [ { slot_name: abandonedSlot } ] = result.rows;
 
       // deleting the index will cause the replication slot to be abandoned
-      let ea = new ElasticAssert();
-      await ea.deleteContentIndices();
+      let pgSearchClient = env.lookup(`plugin-client:${require.resolve('@cardstack/pgsearch/client')}`);
+      await pgSearchClient.query('delete from meta where id=$1', [dataSource.id]);
       await env.lookup('hub:indexers').update({ forceRefresh: true });
 
       result = await client.query('SELECT * FROM pg_replication_slots');
