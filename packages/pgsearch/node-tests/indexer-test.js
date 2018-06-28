@@ -7,10 +7,10 @@
 const {
   createDefaultEnvironment,
   destroyDefaultEnvironment
-} = require('../../../tests/elasticsearch-test-app/node_modules/@cardstack/test-support/env');
-const Factory = require('../../../tests/elasticsearch-test-app/node_modules/@cardstack/test-support/jsonapi-factory');
+} = require('../../../tests/pgsearch-test-app/node_modules/@cardstack/test-support/env');
+const Factory = require('../../../tests/pgsearch-test-app/node_modules/@cardstack/test-support/jsonapi-factory');
 
-describe('elasticsearch/indexer', function() {
+describe('pgsearch/indexer', function() {
 
   let env, factory, writer, indexer, searcher;
 
@@ -40,7 +40,7 @@ describe('elasticsearch/indexer', function() {
       ])
     ]);
 
-    env = await createDefaultEnvironment(`${__dirname}/../../../tests/elasticsearch-test-app`, factory.getModels());
+    env = await createDefaultEnvironment(`${__dirname}/../../../tests/pgsearch-test-app`, factory.getModels());
     writer = env.lookup('hub:writers');
     indexer = env.lookup('hub:indexers');
     searcher = env.lookup('hub:searchers');

@@ -5,7 +5,7 @@ const { uniqBy } = require('lodash');
 
 module.exports = class DocumentContext {
 
-  constructor({ read, schema, type, id, branch, sourceId, generation, upstreamDoc, searchDocFieldMapping }) {
+  constructor({ read, schema, type, id, branch, sourceId, generation, upstreamDoc }) {
     this.schema = schema;
     this.type = type;
     this.id = id;
@@ -14,9 +14,6 @@ module.exports = class DocumentContext {
     this.generation = generation;
     this.upstreamDoc = upstreamDoc;
     this._read = read;
-
-    //TODO refactor this away after we have replaced ES with pg-search
-    this._searchDocFieldMapping = typeof searchDocFieldMapping === 'function' ? searchDocFieldMapping : field => field;
 
     // included resources that we actually found
     this.pristineIncludes = [];
@@ -74,7 +71,7 @@ module.exports = class DocumentContext {
   }
 
   async _logicalFieldToES(fieldName) {
-    return this._searchDocFieldMapping(fieldName);
+    return fieldName;
   }
 
   // TODO come up with a better way to cache (use Model)

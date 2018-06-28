@@ -1,27 +1,49 @@
 const Change = require('../change');
 const temp = require('@cardstack/test-support/temp-helper');
 const { commitOpts, makeRepo } = require('./support');
-const ElasticAssert = require('@cardstack/elasticsearch/test-support');
 const JSONAPIFactory = require('@cardstack/test-support/jsonapi-factory');
-const { Registry, Container } = require('@cardstack/di');
+const {
+  createDefaultEnvironment,
+  destroyDefaultEnvironment
+} = require('@cardstack/test-support/env');
 const logger = require('@cardstack/logger');
 const fs = require('fs');
+const { join } = require('path');
 
-function toJSONAPI(doc) {
-  return doc.cardstack_pristine.data;
+function toResource(doc) {
+  return doc.data;
 }
 
 describe('git/indexer', function() {
-  this.timeout(5000);
-  this.slow(3000);
-
-  let root, indexer, ea, dataSource, assertNoDocument, container;
+  let root, env, indexer, searcher, dataSource, assertNoDocument, start, client;
 
   beforeEach(async function() {
-    ea = new ElasticAssert();
     root = await temp.mkdir('cardstack-server-test');
 
     let factory = new JSONAPIFactory();
+
+    factory.addResource('content-types', 'articles')
+      .withAttributes({
+        defaultIncludes: ['author']
+      })
+      .withRelated('fields', [
+        factory.addResource('fields', 'title')
+          .withAttributes({
+            fieldType: '@cardstack/core-types::string'
+          }),
+        factory.addResource('fields', 'author')
+          .withAttributes({
+            fieldType: '@cardstack/core-types::belongs-to'
+          })
+      ]);
+
+    factory.addResource('content-types', 'people')
+      .withRelated('fields', [
+        factory.addResource('fields', 'name')
+          .withAttributes({
+            fieldType: '@cardstack/core-types::string'
+          })
+      ]);
 
     dataSource = factory.addResource('data-sources')
         .withAttributes({
@@ -35,29 +57,18 @@ describe('git/indexer', function() {
         dataSource
       );
 
-    let registry = new Registry();
-    registry.register('config:data-sources', factory.getModels());
-    registry.register('config:project', {
-      path: `${__dirname}/..`
-    });
-    registry.register('config:pg-boss', {
-      database:             'postgres',
-      host:                 'localhost',
-      user:                 'postgres',
-      port:                 5444,
-      newJobCheckInterval:  100 // set to minimum to speed up tests
-    });
-
-    container = new Container(registry);
-    indexer = container.lookup('hub:indexers');
-
-    await container.lookup('hub:queues')._ensureBoss();
+    start = async function() {
+      env = await createDefaultEnvironment(join(__dirname, '..'), factory.getModels());
+      indexer = env.lookup('hub:indexers');
+      searcher = env.lookup('hub:searchers');
+      client = env.lookup(`plugin-client:${require.resolve('@cardstack/pgsearch/client')}`);
+    };
 
     assertNoDocument = async function(branch, type, id) {
       try {
-        await ea.documentContents(branch, type, id);
+        await searcher.get(env.session, branch, type, id);
       } catch(err) {
-        expect(err.message).to.match(/not found/i);
+        expect(err.status).to.equal(404);
         return;
       }
       throw new Error(`expected not to find document branch=${branch} type=${type} id=${id}`);
@@ -65,121 +76,21 @@ describe('git/indexer', function() {
   });
 
   afterEach(async function() {
-    await container.lookup('hub:queues').stop();
     await temp.cleanup();
-    await ea.deleteContentIndices();
+    await destroyDefaultEnvironment(env);
   });
 
   it('processes first empty branch', async function() {
     let { head } = await makeRepo(root);
-    await indexer.update();
-    let aliases = await ea.contentAliases();
-    expect([...aliases.keys()]).to.deep.equal(['master']);
-    let indices = await ea.contentIndices();
-    expect(indices).to.have.lengthOf(1);
-    let indexerState = await ea.indexerState('master', dataSource.id);
+    await start();
+    let indexerState = await client.loadMeta({ branch: 'master', id: dataSource.id });
     expect(indexerState.commit).to.equal(head);
   });
 
-
-  it('does not reindex when mapping definition is stable', async function() {
-    let { repo, head } = await makeRepo(root, {
-      'schema/content-types/articles.json': JSON.stringify({
-        relationships: {
-          fields: {
-            data: [
-              { type: 'fields', id: 'sample-string' },
-              { type: 'fields', id: 'sample-object' }
-            ]
-          }
-        }
-      }),
-      'schema/fields/sample-string.json': JSON.stringify({
-        attributes: {
-          'field-type': '@cardstack/core-types::string'
-        }
-      }),
-      'schema/fields/sample-object.json': JSON.stringify({
-        attributes: {
-          'field-type': '@cardstack/core-types::object'
-        }
-      })
-    });
-    await indexer.update();
-    let originalIndexName = (await ea.contentAliases()).get('master');
-    expect(originalIndexName).ok;
-    let change = await Change.create(repo, head, 'master');
-    let file = await change.get('contents/articles/hello-world.json', { allowCreate: true });
-    file.setContent(JSON.stringify({
-      attributes: {
-        'sample-string': 'world',
-        'sapmle-object': { bar: 'baz' }
-      }
-    }));
-    await change.finalize(commitOpts());
-    await indexer.update();
-    expect((await ea.contentAliases()).get('master')).to.equal(originalIndexName);
-  });
-
-  it('reindexes when mapping definition is changed', async function() {
-    let { repo, head } = await makeRepo(root, {
-      'schema/content-types/articles.json': JSON.stringify({
-        relationships: {
-          fields: {
-            data: [
-              { type: 'fields', id: 'title' }
-            ]
-          }
-        }
-      }),
-      'schema/fields/title.json': JSON.stringify({
-        attributes: {
-          'field-type': '@cardstack/core-types::string'
-        }
-      }),
-      'contents/articles/hello-world.json': JSON.stringify({
-        attributes: {
-          title: 'Hello world'
-        }
-      })
-    });
-
-    await indexer.update();
-    let originalIndexName = (await ea.contentAliases()).get('master');
-
-    let change = await Change.create(repo, head, 'master');
-    let file = await change.get('schema/fields/title.json', { allowUpdate: true });
-    file.setContent(JSON.stringify({
-      attributes: {
-        'field-type': '@cardstack/core-types::string',
-        'searchable': false
-      }
-    }));
-    await change.finalize(commitOpts());
-    await indexer.update();
-    expect((await ea.contentAliases()).get('master')).to.not.equal(originalIndexName);
-  });
-
-
   it('indexes newly added document', async function() {
-    let { repo, head } = await makeRepo(root, {
-      'schema/content-types/articles.json': JSON.stringify({
-        relationships: {
-          fields: {
-            data: [
-              { type: 'fields', id: 'title' }
-            ]
-          }
-        }
-      }),
-      'schema/fields/title.json': JSON.stringify({
-        attributes: {
-          'field-type': '@cardstack/core-types::string'
-        }
-      })
-    });
+    let { repo, head } = await makeRepo(root);
 
-    await indexer.update();
+    await start();
 
     let change = await Change.create(repo, head, 'master');
     let file = await change.get('contents/articles/hello-world.json', { allowCreate: true });
@@ -190,29 +101,29 @@ describe('git/indexer', function() {
 
     await indexer.update();
 
-    let indexerState = await ea.indexerState('master', dataSource.id);
+    let indexerState = await client.loadMeta({ branch: 'master', id: dataSource.id });
     expect(indexerState.commit).to.equal(head);
 
-    let contents = await ea.documentContents('master', 'articles', 'hello-world');
-    let jsonapi = toJSONAPI(contents);
+    let contents = await searcher.get(env.session, 'master', 'articles', 'hello-world');
+    let jsonapi = toResource(contents);
     expect(jsonapi).has.deep.property('attributes.title', 'world');
   });
 
   it('ignores newly added document that lacks json extension', async function() {
     let { repo, head } = await makeRepo(root);
 
-    await indexer.update();
+    await start();
 
     let change = await Change.create(repo, head, 'master');
     let file = await change.get('contents/articles/hello-world', { allowCreate: true });
     file.setContent(JSON.stringify({
-      attributes: { hello: 'world' }
+      attributes: { title: 'world' }
     }));
     head = await change.finalize(commitOpts());
 
     await indexer.update();
 
-    let indexerState = await ea.indexerState('master', dataSource.id);
+    let indexerState = await client.loadMeta({ branch: 'master', id: dataSource.id });
     expect(indexerState.commit).to.equal(head);
     await assertNoDocument('master', 'articles', 'hello-world');
   });
@@ -220,18 +131,18 @@ describe('git/indexer', function() {
   it('ignores newly added document with malformed json', async function() {
     let { repo, head } = await makeRepo(root);
 
-    await indexer.update();
+    await start();
 
     let change = await Change.create(repo, head, 'master');
     let file = await change.get('contents/articles/hello-world.json', { allowCreate: true });
-    file.setContent('not json');
+    file.setContent('{"attributes:{"title":"world"}}');
     head = await change.finalize(commitOpts());
 
     await logger.expectWarn(/Ignoring record with invalid json at contents\/articles\/hello-world.json/, async () => {
       await indexer.update();
     });
 
-    let indexerState = await ea.indexerState('master', dataSource.id);
+    let indexerState = await client.loadMeta({ branch: 'master', id: dataSource.id });
     expect(indexerState.commit).to.equal(head);
     await assertNoDocument('master', 'articles', 'hello-world');
   });
@@ -239,42 +150,45 @@ describe('git/indexer', function() {
   it('does not reindex unchanged content', async function() {
     let { repo, head } = await makeRepo(root, {
       'contents/articles/hello-world.json': JSON.stringify({
-        hello: 'world'
+        attributes: { title: 'world' }
       })
     });
 
-    await indexer.update();
+    await start();
 
-    // Here we manually reach into elasticsearch to dirty a cached
+    // Here we manually reach into postgres to dirty a cached
     // document in order to see whether the indexer will leave it
     // alone
-    await ea.putDocument('master', 'articles', 'hello-world', { original: true });
+    let row = await client.query(`select pristine_doc from documents where branch=$1 and type=$2 and id=$3`, ['master', 'articles', 'hello-world']);
+    let editedDoc = Object.assign({}, row.rows[0].pristine_doc);
+    editedDoc.data.attributes.title = 'somebody else';
+    await client.query(`update documents set pristine_doc=$1 where branch=$2 and type=$3 and id=$4`, [editedDoc, 'master', 'articles', 'hello-world']);
 
     let change = await Change.create(repo, head, 'master');
     let file = await change.get('contents/articles/second.json', { allowCreate: true });
     file.setContent(JSON.stringify({
-      attributes: { hello: 'world' }
+      attributes: { title: 'world' }
     }));
     head = await change.finalize(commitOpts());
 
     await indexer.update();
 
-    let indexerState = await ea.indexerState('master', dataSource.id);
+    let indexerState = await client.loadMeta({ branch: 'master', id: dataSource.id });
     expect(indexerState.commit).to.equal(head);
 
-    let contents = await ea.documentContents('master', 'articles', 'hello-world');
-    expect(contents).to.deep.equal({ original: true });
+    let contents = await searcher.get(env.session, 'master', 'articles', 'hello-world');
+    expect(contents).to.have.deep.property('data.attributes.title', 'somebody else');
   });
 
 
   it('deletes removed content', async function() {
     let { repo, head } = await makeRepo(root, {
       'contents/articles/hello-world.json': JSON.stringify({
-        hello: 'world'
+        title: 'world'
       })
     });
 
-    await indexer.update();
+    await start();
 
     let change = await Change.create(repo, head, 'master');
     let file = await change.get('contents/articles/hello-world.json');
@@ -282,7 +196,6 @@ describe('git/indexer', function() {
     await change.finalize(commitOpts());
     await indexer.update();
     await assertNoDocument('master', 'articles', 'hello-world');
-
   });
 
   it('replaces unrelated content it finds in the search index', async function() {
@@ -315,20 +228,6 @@ describe('git/indexer', function() {
     });
 
     let { repo, head } = await makeRepo(root, {
-      'schema/content-types/articles.json': JSON.stringify({
-        relationships: {
-          fields: {
-            data: [
-              { type: 'fields', id: 'title' }
-            ]
-          }
-        }
-      }),
-      'schema/fields/title.json': JSON.stringify({
-        attributes: {
-          'field-type': '@cardstack/core-types::string'
-        }
-      }),
       'contents/articles/upstream.json': JSON.stringify({
         attributes: {
           title: 'article from upstream'
@@ -342,18 +241,16 @@ describe('git/indexer', function() {
       })
     });
 
-    // TODO: this should only require one update cycle.
-    await indexer.update();
-    await indexer.update();
+    await start();
 
     {
-      let both = toJSONAPI(await ea.documentContents('master', 'articles', 'both'));
+      let both = toResource(await searcher.get(env.session, 'master', 'articles', 'both'));
       expect(both).has.deep.property('attributes.title', 'article from both repos, left version');
 
-      let left = toJSONAPI(await ea.documentContents('master', 'articles', 'left'));
+      let left = toResource(await searcher.get(env.session, 'master', 'articles', 'left'));
       expect(left).has.deep.property('attributes.title', 'article from left repo');
 
-      let upstream = toJSONAPI(await ea.documentContents('master', 'articles', 'upstream'));
+      let upstream = toResource(await searcher.get(env.session, 'master', 'articles', 'upstream'));
       expect(upstream).has.deep.property('attributes.title', 'article from upstream');
 
       await assertNoDocument('master', 'articles', 'right');
@@ -370,23 +267,21 @@ describe('git/indexer', function() {
     await change.finalize(commitOpts());
 
     await logger.expectWarn(/Unable to load previously indexed commit/, async () => {
-      // TODO: should only take one cycle
-      await indexer.update({ forceRefresh: true });
       await indexer.update({ forceRefresh: true });
     });
 
 
     {
       // Update
-      let both = toJSONAPI(await ea.documentContents('master', 'articles', 'both'));
+      let both = toResource(await searcher.get(env.session, 'master', 'articles', 'both'));
       expect(both).has.deep.property('attributes.title', 'article from both repos, right version');
 
       // Create
-      let right = toJSONAPI(await ea.documentContents('master', 'articles', 'right'));
+      let right = toResource(await searcher.get(env.session, 'master', 'articles', 'right'));
       expect(right).has.deep.property('attributes.title', 'article from right repo');
 
       // Leave other data sources alone
-      let upstream = toJSONAPI(await ea.documentContents('master', 'articles', 'upstream'));
+      let upstream = toResource(await searcher.get(env.session, 'master', 'articles', 'upstream'));
       expect(upstream).has.deep.property('attributes.title', 'article from upstream');
 
       // Delete
@@ -396,43 +291,6 @@ describe('git/indexer', function() {
 
   it('supports default-includes', async function() {
     await makeRepo(root, {
-      'schema/content-types/articles.json': JSON.stringify({
-        attributes: {
-          'default-includes': ['author']
-        },
-        relationships: {
-          fields: {
-            data: [
-              { type: 'fields', id: 'title' },
-              { type: 'fields', id: 'author' }
-            ]
-          }
-        }
-      }),
-      'schema/content-types/people.json': JSON.stringify({
-        relationships: {
-          fields: {
-            data: [
-              { type: 'fields', id: 'name' }
-            ]
-          }
-        }
-      }),
-      'schema/fields/title.json': JSON.stringify({
-        attributes: {
-          'field-type': '@cardstack/core-types::string'
-        }
-      }),
-      'schema/fields/author.json': JSON.stringify({
-        attributes: {
-          'field-type': '@cardstack/core-types::belongs-to'
-        }
-      }),
-      'schema/fields/name.json': JSON.stringify({
-        attributes: {
-          'field-type': '@cardstack/core-types::string'
-        }
-      }),
       'contents/articles/hello-world.json': JSON.stringify({
         attributes: {
           title: 'Hello world'
@@ -450,20 +308,21 @@ describe('git/indexer', function() {
       })
     });
 
-    await indexer.update();
+    await start();
 
-    let contents = await ea.documentContents('master', 'articles', 'hello-world');
-    expect(contents).has.deep.property('author.name', 'Q');
+    let contents = await searcher.get(env.session, 'master', 'articles', 'hello-world');
+    expect(contents).has.deep.property('included');
+    expect(contents.included).has.length(1);
+    expect(contents.included[0]).has.deep.property('attributes.name', 'Q');
   });
 
 
 });
 
 describe('git/indexer failures', function() {
-  let root, indexer, ea, container;
+  let root, env;
 
   beforeEach(async function() {
-    ea = new ElasticAssert();
     root = await temp.mkdir('cardstack-server-test');
 
     let factory = new JSONAPIFactory();
@@ -479,36 +338,15 @@ describe('git/indexer failures', function() {
         'default-data-source',
         dataSource
       );
-
-    let registry = new Registry();
-    registry.register('config:data-sources', factory.getModels());
-    registry.register('config:project', {
-      path: `${__dirname}/..`
-    });
-
-    registry.register('config:pg-boss', {
-      database:             'postgres',
-      host:                 'localhost',
-      user:                 'postgres',
-      port:                 5444,
-      newJobCheckInterval:  100 // set to minimum to speed up tests
-    });
-
-    container = new Container(registry);
-    indexer = container.lookup('hub:indexers');
-
-    await container.lookup('hub:queues')._ensureBoss();
-
+    env = await createDefaultEnvironment(join(__dirname, '..'), factory.getModels());
   });
 
   afterEach(async function() {
-    await container.lookup('hub:queues').stop();
     await temp.cleanup();
-    await ea.deleteContentIndices();
+    await destroyDefaultEnvironment(env);
   });
 
   it("makes a repo if one doesn't already exist", async function() {
-    await indexer.update();
     expect(fs.existsSync(root + '/repo-to-be-created')).is.ok;
   });
 });

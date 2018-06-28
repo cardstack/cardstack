@@ -7,13 +7,5 @@ module.exports = {
       type: "keyword",
       index: false
     };
-  },
-
-  sortFieldName() {
-    return `_type`;
-  },
-
-  queryFieldName() {
-    return `_type`;
   }
 };

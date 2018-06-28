@@ -39,7 +39,6 @@
 
 const EventEmitter = require('events');
 const log = require('@cardstack/logger')('cardstack/indexers');
-const Client = require('@cardstack/elasticsearch/client');
 const { declareInjections } = require('@cardstack/di');
 const bootstrapSchema = require('./bootstrap-schema');
 const RunningIndexers = require('./indexing/running-indexers');
@@ -48,6 +47,7 @@ module.exports = declareInjections({
   schemaLoader: 'hub:schema-loader',
   dataSources: 'config:data-sources',
   controllingBranch: 'hub:controlling-branch',
+  client: `plugin-client:${require.resolve('@cardstack/pgsearch/client')}`,
   jobQueue: 'hub:queues'
 },
 
@@ -55,7 +55,6 @@ class Indexers extends EventEmitter {
   constructor() {
     super();
 
-    this._clientMemo = null;
     this._queue = [];
     this._forceRefreshQueue = [];
     this._dataSourcesMemo = null;
@@ -65,7 +64,7 @@ class Indexers extends EventEmitter {
   async schemaForBranch(branch) {
     if (!this._schemaCache) {
       this._schemaCache = (async () => {
-        let running = new RunningIndexers(await this._seedSchema(), await this._client(), this.emit.bind(this), this.schemaLoader.ownTypes(), this.controllingBranch.name);
+        let running = new RunningIndexers(await this._seedSchema(), this.client, this.emit.bind(this), this.schemaLoader.ownTypes(), this.controllingBranch.name);
         try {
           return await running.schemas();
         } finally {
@@ -114,13 +113,6 @@ class Indexers extends EventEmitter {
     }
   }
 
-  async _client() {
-    if (!this._clientMemo) {
-      this._clientMemo = await Client.create();
-    }
-    return this._clientMemo;
-  }
-
   async _seedSchema() {
     if (!this._dataSourcesMemo) {
       let types = this.schemaLoader.ownTypes();
@@ -132,7 +124,7 @@ class Indexers extends EventEmitter {
   async _doUpdate(forceRefresh, hints) {
     log.debug('begin update, forceRefresh=%s', forceRefresh);
     let priorCache = this._schemaCache;
-    let running = new RunningIndexers(await this._seedSchema(), await this._client(), this.emit.bind(this), this.schemaLoader.ownTypes(), this.controllingBranch.name);
+    let running = new RunningIndexers(await this._seedSchema(), this.client, this.emit.bind(this), this.schemaLoader.ownTypes(), this.controllingBranch.name);
     try {
       let schemas = await running.update(forceRefresh, hints);
       if (this._schemaCache === priorCache) {

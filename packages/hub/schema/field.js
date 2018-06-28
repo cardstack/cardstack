@@ -243,6 +243,29 @@ module.exports = class Field {
     }
     return m;
   }
+
+  buildQueryExpression(sourceExpression) {
+    if (this.plugin.buildQueryExpression) {
+      return this.plugin.buildQueryExpression(sourceExpression, this.id);
+    }
+    if (this.id === 'type' || this.id === 'id'){
+      if (isEqual(sourceExpression, ['search_doc'])) {
+        // Optimization for pulling top-level fields that have their own columns
+        return [this.id];
+      }
+    }
+    return [...sourceExpression, `->>`, { param: this.id }];
+  }
+
+  buildValueExpression(value) {
+    let valueExpression = [{ param: value }];
+    if (this.plugin.buildValueExpression) {
+      return this.plugin.buildValueExpression(valueExpression);
+    }
+    return valueExpression;
+  }
+
+  // FIXME: delete this
   get sortFieldName() {
     if (this.plugin.sortFieldName) {
       return this.plugin.sortFieldName(this.id);
@@ -250,6 +273,8 @@ module.exports = class Field {
       return this.id;
     }
   }
+
+  // FIXME: delete this
   get queryFieldName() {
     if (this.plugin.queryFieldName) {
       return this.plugin.queryFieldName(this.id);

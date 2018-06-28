@@ -1,7 +1,6 @@
 const Operations = require('./operations');
 const owningDataSource = new WeakMap();
 const { flatten } = require('lodash');
-const Client = require('@cardstack/elasticsearch/client');
 const log = require('@cardstack/logger')('cardstack/indexers');
 const DocumentContext = require('./document-context');
 const Session = require('@cardstack/plugin-utils/session');
@@ -18,7 +17,6 @@ class BranchUpdate {
     this.isControllingBranch = isControllingBranch;
     this.schemaModels = [];
     this._schema = null;
-    this.bulkOps = null;
     this._touched = Object.create(null);
     this.read = this.read.bind(this);
   }
@@ -73,7 +71,6 @@ class BranchUpdate {
   }
 
   async update(forceRefresh, hints) {
-    this.bulkOps = this.client.bulkOps({ forceRefresh });
     await this.client.accomodateSchema(this.branch, await this.schema());
     await this._updateContent(hints);
   }
@@ -102,19 +99,13 @@ class BranchUpdate {
       await this._saveMeta(updater, newMeta);
     }
     await this._invalidations();
-    await this.bulkOps.finalize();
   }
 
   async _loadMeta(updater) {
-    let doc = await this.client.es.getSource({
-      index: Client.branchToIndexName(this.branch),
-      type: 'meta',
+    return this.client.loadMeta({
+      branch: this.branch,
       id: owningDataSource.get(updater).id,
-      ignore: [404]
     });
-    if (doc) {
-      return doc.params;
-    }
   }
 
   async _saveMeta(updater, newMeta) {
@@ -122,45 +113,11 @@ class BranchUpdate {
     // property so that we can tell elasticsearch not to index any of
     // it. We don't want inconsistent types across plugins to cause
     // mapping errors.
-    await this.bulkOps.add({
-      index: {
-        _index: Client.branchToIndexName(this.branch),
-        _type: 'meta',
-        _id: owningDataSource.get(updater).id,
-      }
-    }, { params: newMeta });
-  }
-
-  async _findTouchedReferences() {
-    let size = 100;
-    let touched = Object.keys(this._touched);
-    let accumulatedDocs = [];
-
-    for (let i = 0; i * size < touched.length; i++) {
-      let touchedBatch = touched.slice(i * size, (i + 1) * size);
-      let esBody = {
-        query: {
-          bool: {
-            must: [
-              { terms: { cardstack_references : touchedBatch } }
-            ],
-          }
-        },
-        size
-      };
-
-      let result = await this.client.es.search({
-        index: Client.branchToIndexName(this.branch),
-        body: esBody
-      });
-
-      let docs = result.hits.hits.map(hit => {
-        let { id, type } = hit._source.cardstack_pristine.data;
-        return { id, type };
-      });
-      accumulatedDocs = accumulatedDocs.concat(docs);
-    }
-    return accumulatedDocs;
+    return this.client.saveMeta({
+        branch: this.branch,
+        id: owningDataSource.get(updater).id,
+        params: newMeta
+    });
   }
 
   // This method does not need to recursively invalidate, because each
@@ -168,31 +125,27 @@ class BranchUpdate {
   // documents it references.
   async _invalidations() {
     let schema = await this.schema();
-    let pendingOps = [];
-    let references = await this._findTouchedReferences();
-    for (let { type, id } of references) {
+    await this.client.docsThatReference(this.branch, Object.keys(this._touched), async doc => {
+      let { type, id } = doc;
       let key = `${type}/${id}`;
       if (!this._touched[key]) {
-        this._touched[key] = true;
-        pendingOps.push((async ()=> {
-          if (type === 'user-realms') {
-            // if we have an invalidated user-realms and it hasn't
-            // already been touched, that's because the corresponding
-            // user was delete, so we should also delete the
-            // user-realms.
-            await this.delete(type, id);
-          } else {
-            let resource = await this.read(type, id);
-            if (resource) {
-              let sourceId = schema.types.get(type).dataSource.id;
-              let nonce = 0;
-              await this.add(type, id, resource, sourceId, nonce);
-            }
-          }
-        })());
+        if (type === 'user-realms') {
+          // if we have an invalidated user-realms and it hasn't
+          // already been touched, that's because the corresponding
+          // user was delete, so we should also delete the
+          // user-realms.
+          await this.delete(type, id);
+        } else {
+          let sourceId = schema.types.get(type).dataSource.id;
+          // this is correct because IF this document's data source is currently
+          // doing a replace-all operation, it was either already touched (so
+          // this code isn't running) or it's old (so it's correct to have a
+          // non-current nonce).
+          let nonce = 0;
+          await this.add(type, id, doc, sourceId, nonce);
+        }
       }
-    }
-    await Promise.all(pendingOps);
+    });
   }
 
   async read(type, id) {
@@ -230,8 +183,7 @@ class BranchUpdate {
       generation: nonce,
       upstreamDoc: doc,
       branch: this.branch,
-      read: (type, id) => this.read(type, id),
-      searchDocFieldMapping: (fieldName) => this.client.logicalFieldToES(this.branch, fieldName) // remove this after we replace ES
+      read: (type, id) => this.read(type, id)
     });
 
     let searchDoc = await context.searchDoc();
@@ -240,22 +192,18 @@ class BranchUpdate {
       // us, so all we need to do here is nothing.
       return;
     }
-    searchDoc.cardstack_pristine = await context.pristineDoc();
-    searchDoc.cardstack_references = await context.references();
-    searchDoc.cardstack_realms = await context.realms();
-    searchDoc.cardstack_source = context.sourceId;
-
-    if (context.generation) {
-      searchDoc.cardstack_generation = context.generation;
-    }
-
-    await this.bulkOps.add({
-      index: {
-        _index: Client.branchToIndexName(this.branch),
-        _type: type,
-        _id: `${this.branch}/${id}`,
-      }
-    }, searchDoc);
+    await this.client.saveDocument({
+      branch: this.branch,
+      type,
+      id,
+      searchDoc,
+      pristineDoc: await context.pristineDoc(),
+      upstreamDoc: doc,
+      source: context.sourceId,
+      generation: context.generation,
+      refs: await context.references(),
+      realms: await context.realms()
+    });
     this.emitEvent('add', { type, id, doc });
     log.debug("save %s %s", type, id);
     if (this.isControllingBranch) {
@@ -285,34 +233,17 @@ class BranchUpdate {
 
   async delete(type, id) {
     this._touched[`${type}/${id}`] = true;
-    await this.bulkOps.add({
-      delete: {
-        _index: Client.branchToIndexName(this.branch),
-        _type: type,
-        _id: `${this.branch}/${id}`
-      }
+    await this.client.deleteDocument({
+      branch: this.branch,
+      type,
+      id
     });
     this.emitEvent('delete', { type, id });
     log.debug("delete %s %s", type, id);
   }
 
   async deleteAllWithoutNonce(sourceId, nonce) {
-    await this.bulkOps.add('deleteByQuery', {
-      index: Client.branchToIndexName(this.branch),
-      conflicts: 'proceed',
-      body: {
-        query: {
-          bool: {
-            must: [
-              { term: { cardstack_source: sourceId } },
-            ],
-            must_not: [
-              { term: { cardstack_generation: nonce } }
-            ]
-          }
-        }
-      }
-    });
+    await this.client.deleteOlderGenerations(this.branch, sourceId, nonce);
     this.emitEvent('delete_all_without_nonce', { sourceId, nonce });
     log.debug("bulk delete older content for data source %s", sourceId);
   }

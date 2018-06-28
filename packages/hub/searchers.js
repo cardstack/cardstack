@@ -6,7 +6,7 @@ const Session = require('@cardstack/plugin-utils/session');
 module.exports = declareInjections({
   controllingBranch: 'hub:controlling-branch',
   sources: 'hub:data-sources',
-  internalSearcher: `plugin-searchers:${require.resolve('@cardstack/elasticsearch/searcher')}`,
+  internalSearcher: `plugin-searchers:${require.resolve('@cardstack/pgsearch/searcher')}`,
   currentSchema: 'hub:current-schema'
 },
 
