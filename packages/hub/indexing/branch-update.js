@@ -18,7 +18,8 @@ class BranchUpdate {
     this.schemaModels = [];
     this._schema = null;
     this._touched = Object.create(null);
-    this.read = this.read.bind(this);
+    this._touchCounter = 0;
+    this.uncachedRead = this.uncachedRead.bind(this);
   }
 
   async addDataSource(dataSource) {
@@ -95,7 +96,7 @@ class BranchUpdate {
     for (let [sourceId, updater] of updaters) {
       let meta = await this._loadMeta(updater);
       let publicOps = Operations.create(this, sourceId);
-      let newMeta = await updater.updateContent(meta, hints, publicOps, this.read);
+      let newMeta = await updater.updateContent(meta, hints, publicOps, this.uncachedRead);
       await this._saveMeta(updater, newMeta);
     }
     await this._invalidations();
@@ -120,15 +121,33 @@ class BranchUpdate {
     });
   }
 
+  _isInvalidated(type, id, refs) {
+    let key = `${type}/${id}`;
+    let docTouchedAt = this._touched[key];
+    if (docTouchedAt == null) {
+      // our document hasn't been updated at all, so it definitely needs to be redone
+      return true;
+    }
+    for (let ref of refs) {
+      let refTouchedAt = this._touched[ref];
+      if (refTouchedAt != null && refTouchedAt > docTouchedAt) {
+        // we found one of our references that was touched later than us, so we
+        // need to be redone
+        return true;
+      }
+    }
+    return false;
+  }
+
   // This method does not need to recursively invalidate, because each
   // document stores a complete, rolled-up picture of which other
   // documents it references.
   async _invalidations() {
     let schema = await this.schema();
-    await this.client.docsThatReference(this.branch, Object.keys(this._touched), async doc => {
+    await this.client.docsThatReference(this.branch, Object.keys(this._touched), async (doc, refs) => {
       let { type, id } = doc;
-      let key = `${type}/${id}`;
-      if (!this._touched[key]) {
+
+      if (this._isInvalidated(type, id, refs)) {
         if (type === 'user-realms') {
           // if we have an invalidated user-realms and it hasn't
           // already been touched, that's because the corresponding
@@ -149,6 +168,10 @@ class BranchUpdate {
   }
 
   async read(type, id) {
+    return this.client.readUpstreamDocument({ branch: this.branch, type, id });
+  }
+
+  async uncachedRead(type, id) {
     let schema = await this.schema();
     let contentType = schema.types.get(type);
     if (!contentType) { return; }
@@ -157,7 +180,7 @@ class BranchUpdate {
     let updater = this.updaters[source.id];
     if (!updater) { return; }
     let isSchemaType = schema.isSchemaType(type);
-    let model = await updater.read(type, id, isSchemaType, this.read);
+    let model = await updater.read(type, id, isSchemaType, this.uncachedRead);
     if (!model) {
       // TODO: this is a complexity that can go away after we refactor
       // so that a content type can live in multiple data
@@ -166,14 +189,14 @@ class BranchUpdate {
       // are otherwise also stored elsewhere.
       let staticUpdater = this.updaters['static-models'];
       if (staticUpdater) {
-        model = await staticUpdater.read(type, id, isSchemaType, this.read);
+        model = await staticUpdater.read(type, id, isSchemaType, this.uncachedRead);
       }
     }
     return model;
   }
 
   async add(type, id, doc, sourceId, nonce) {
-    this._touched[`${type}/${id}`] = true;
+    this._touched[`${type}/${id}`] = this._touchCounter++;
     let schema = await this.schema();
     let context = new DocumentContext({
       schema,
@@ -232,7 +255,7 @@ class BranchUpdate {
   }
 
   async delete(type, id) {
-    this._touched[`${type}/${id}`] = true;
+    this._touched[`${type}/${id}`] = this._touchCounter++;
     await this.client.deleteDocument({
       branch: this.branch,
       type,

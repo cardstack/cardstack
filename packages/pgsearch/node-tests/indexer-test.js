@@ -12,7 +12,7 @@ const Factory = require('../../../tests/pgsearch-test-app/node_modules/@cardstac
 
 describe('pgsearch/indexer', function() {
 
-  let env, factory, writer, indexer, searcher;
+  let env, factory, writer, indexer, searcher, changedModels;
 
   before(async function() {
     this.timeout(2500);
@@ -39,6 +39,13 @@ describe('pgsearch/indexer', function() {
         factory.getResource('content-types', 'people')
       ])
     ]);
+
+    changedModels = [];
+    factory.addResource('data-sources')
+      .withAttributes({
+        'source-type': 'fake-indexer',
+        params: { changedModels }
+      });
 
     env = await createDefaultEnvironment(`${__dirname}/../../../tests/pgsearch-test-app`, factory.getModels());
     writer = env.lookup('hub:writers');
@@ -153,6 +160,78 @@ describe('pgsearch/indexer', function() {
     article.attributes.title = 'A Better Title';
     await writer.update('master', env.session, 'people', person.id, person);
     await writer.update('master', env.session, 'articles', article.id, article);
+    await indexer.update({ forceRefresh: true });
+
+    let found = await searcher.get(env.session, 'master', 'articles', article.id);
+    expect(found).is.ok;
+    expect(found).has.deep.property('data.attributes.title', 'A Better Title');
+    expect(found).has.deep.property('data.relationships.author.data.id', person.id);
+    expect(found).has.property('included');
+    expect(found.included).length(1);
+    expect(found.included[0].attributes.name).to.equal('Edward V');
+  });
+
+  it('reindexes correctly when related resource is saved before own resource', async function() {
+    let person = await writer.create('master', env.session, 'people', {
+      type: 'people',
+      attributes: {
+        name: 'Quint'
+      }
+    });
+    expect(person).has.deep.property('id');
+    let article = await writer.create('master', env.session, 'articles', {
+      type: 'articles',
+      attributes: {
+        title: 'Hello World'
+      },
+      relationships: {
+        author: { data: { type: 'people', id: person.id } }
+      }
+    });
+    expect(article).has.deep.property('id');
+    await indexer.update({ forceRefresh: true });
+
+    person.attributes.name = 'Edward V';
+    article.attributes.title = 'A Better Title';
+    changedModels.push({ type: person.type, id: person.id, model: person });
+    changedModels.push({ type: article.type, id: article.id, model: article });
+
+    await indexer.update({ forceRefresh: true });
+
+    let found = await searcher.get(env.session, 'master', 'articles', article.id);
+    expect(found).is.ok;
+    expect(found).has.deep.property('data.attributes.title', 'A Better Title');
+    expect(found).has.deep.property('data.relationships.author.data.id', person.id);
+    expect(found).has.property('included');
+    expect(found.included).length(1);
+    expect(found.included[0].attributes.name).to.equal('Edward V');
+  });
+
+  it('reindexes correctly when related resource is saved after own resource', async function() {
+    let person = await writer.create('master', env.session, 'people', {
+      type: 'people',
+      attributes: {
+        name: 'Quint'
+      }
+    });
+    expect(person).has.deep.property('id');
+    let article = await writer.create('master', env.session, 'articles', {
+      type: 'articles',
+      attributes: {
+        title: 'Hello World'
+      },
+      relationships: {
+        author: { data: { type: 'people', id: person.id } }
+      }
+    });
+    expect(article).has.deep.property('id');
+    await indexer.update({ forceRefresh: true });
+
+    person.attributes.name = 'Edward V';
+    article.attributes.title = 'A Better Title';
+    changedModels.push({ type: article.type, id: article.id, model: article });
+    changedModels.push({ type: person.type, id: person.id, model: person });
+
     await indexer.update({ forceRefresh: true });
 
     let found = await searcher.get(env.session, 'master', 'articles', article.id);
