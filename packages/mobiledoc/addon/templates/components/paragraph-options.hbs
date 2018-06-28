@@ -1,0 +1,91 @@
+{{#if (or cursor.hasSelection weHaveSelection)}}
+  <div class="paragraph-options">
+    {{#if linking}}
+      <span class="block-option active">{{cs-icon name="EditorLink"}}</span>
+      {{cs-one-way-input value=linkUrl
+                         update=(action "setLinkUrl")
+                         placeholder="http://" }}
+      <div class="checkbox">
+        <label>
+          <input type="checkbox" checked={{isExternalLink}} onchange={{action "setLinkExternal" value="target.checked"}} />
+          Open in New Window
+        </label>
+      </div>
+    {{else}}
+      <div>
+        {{#mobiledoc-markup-button editor=editor for="strong" }}
+          {{cs-icon name="EditorBold"}}
+        {{/mobiledoc-markup-button}}
+
+        {{#mobiledoc-markup-button editor=editor for="em" }}
+          {{cs-icon name="EditorItalic"}}
+        {{/mobiledoc-markup-button}}
+
+        {{#mobiledoc-markup-button editor=editor for="u" }}
+          {{cs-icon name="EditorUnderline"}}
+        {{/mobiledoc-markup-button}}
+
+        {{#mobiledoc-markup-button editor=editor for="s" }}
+          {{cs-icon name="EditorStrikethrough"}}
+        {{/mobiledoc-markup-button}}
+      </div>
+      <div>
+        {{#mobiledoc-markup-button editor=editor for="sup" }}
+          {{cs-icon name="EditorSuperscript"}}
+        {{/mobiledoc-markup-button}}
+
+        {{#mobiledoc-markup-button editor=editor for="sub" }}
+          {{cs-icon name="EditorSubscript"}}
+        {{/mobiledoc-markup-button}}
+
+        <button active={{editor.activeMarkupTagNames.isA}} onclick={{action "toggleLink"}}>
+          {{cs-icon name="EditorLink"}}
+        </button>
+      </div>
+    {{/if}}
+  </div>
+{{/if}}
+
+<div class="block-control">
+
+  {{#if currentIcon}}
+  <div class="current-block" {{action "toggleMenu"}}>
+    {{#if (eq 'p' _lastActiveSection.tagName)}}
+      {{cs-icon name="EditorP"}}
+    {{else if (eq 'h2' _lastActiveSection.tagName)}}
+      {{cs-icon name="EditorH2"}}
+    {{else if (eq 'h3' _lastActiveSection.tagName)}}
+      {{cs-icon name="EditorH3"}}
+    {{else if (eq 'ul' _lastActiveSection.tagName)}}
+      {{cs-icon name="EditorList"}}
+    {{else if (eq 'ol' _lastActiveSection.tagName)}}
+      {{cs-icon name="EditorNumberList"}}
+    {{else if (eq 'blockquote' _lastActiveSection.tagName)}}
+      {{cs-icon name="EditorQuote"}}
+    {{/if}}
+  </div>
+  {{/if}}
+
+  {{#if blockMenu}}
+  <div class="block-options">
+    <button {{action "toggleSection" "p"}} class="editor-p">
+      {{cs-icon name="EditorP"}}
+    </button>
+    <button {{action "toggleSection" "h2"}} class="editor-h2">
+      {{cs-icon name="EditorH2"}}
+    </button>
+    <button {{action "toggleSection" "h3"}} class="editor-h3">
+      {{cs-icon name="EditorH3"}}
+    </button>
+    <button {{action "toggleSection" "ul"}} class="editor-ul">
+      {{cs-icon name="EditorList"}}
+    </button>
+    <button {{action "toggleSection" "ol"}} class="editor-ol">
+      {{cs-icon name="EditorNumberList"}}
+    </button>
+    <button {{action "toggleSection" "blockquote"}} class="editor-blockquote">
+      {{cs-icon name="EditorQuote"}}
+    </button>
+  </div>
+  {{/if}}
+</div>

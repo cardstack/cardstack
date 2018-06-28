@@ -41,4 +41,9 @@ export default Component.extend({
     this._super();
   },
 
+  actions: {
+    cursorChanged(cursorUpdate) {
+      this.set('cursorState', cursorUpdate);
+    }
+  }
 });

@@ -47,14 +47,14 @@ module.exports = declareInjections({
   schemaLoader: 'hub:schema-loader',
   dataSources: 'config:data-sources',
   controllingBranch: 'hub:controlling-branch',
-  client: `plugin-client:${require.resolve('@cardstack/pgsearch/client')}`
+  client: `plugin-client:${require.resolve('@cardstack/pgsearch/client')}`,
+  jobQueue: 'hub:queues'
 },
 
 class Indexers extends EventEmitter {
   constructor() {
     super();
 
-    this._running = false;
     this._queue = [];
     this._forceRefreshQueue = [];
     this._dataSourcesMemo = null;
@@ -93,26 +93,24 @@ class Indexers extends EventEmitter {
   }
 
   async update({ forceRefresh, hints } = {}) {
-    let resolve, reject;
-    let promise = new Promise((r,j) => {
-      resolve = r;
-      reject = j;
-    });
-    if (forceRefresh) {
-      this._forceRefreshQueue.push({ hints, resolve, reject });
-    } else {
-      this._queue.push({ hints, resolve, reject });
-    }
-    if (!this._running) {
-      this._updateLoop().then(() => {
-        log.debug("Update loop finished");
-      }, err => {
-        log.error("Unexpected error in _updateLoop %s", err);
+    await this._setupWorkers();
+    // the singletonKey being the same as the queue name means that only one
+    // indexing job can be queued at the same time. singletonNextSlot means that
+    // the job will queue to run after the current running job instead of
+    // blocking publish.
+    await this.jobQueue.publishAndWait('hub/indexers/update',
+      { forceRefresh, hints },
+      { singletonKey: 'hub/indexers/update', singletonNextSlot: true }
+    );
+  }
+
+  async _setupWorkers() {
+    if (!this._workersSetup) {
+      await this.jobQueue.subscribe("hub/indexers/update", async ({data: { forceRefresh, hints }}) => {
+        await this._doUpdate(forceRefresh, hints);
       });
-    } else {
-      log.debug("Joining update loop");
+      this._workersSetup = true;
     }
-    await promise;
   }
 
   async _seedSchema() {
@@ -121,47 +119,6 @@ class Indexers extends EventEmitter {
       this._dataSourcesMemo = await this.schemaLoader.loadFrom(bootstrapSchema.concat(this.dataSources.filter(model => types.includes(model.type))));
     }
     return this._dataSourcesMemo;
-  }
-
-  async _updateLoop() {
-    this._running = true;
-    try {
-      while (this._queue.length > 0 || this._forceRefreshQueue.length > 0) {
-        let queue = this._queue;
-        this._queue = [];
-        try {
-          await this._runBatch(queue, false);
-        } catch (err) {
-          queue.forEach(req => req.reject(err));
-          throw err;
-        }
-        let forceRefreshQueue = this._forceRefreshQueue;
-        this._forceRefreshQueue = [];
-        try {
-          await this._runBatch(forceRefreshQueue, true);
-        } catch (err) {
-          forceRefreshQueue.forEach(req => req.reject(err));
-          throw err;
-        }
-      }
-    } finally {
-      this._running = false;
-    }
-  }
-
-  async _runBatch(batch, forceRefresh) {
-    if (batch.length > 0) {
-      let hints;
-      // hints only help if every request in the batch has hints. A
-      // request with no hints means "index everything" anyway.
-      if (batch.every(req => req.hints)) {
-        hints = batch.map(req => req.hints).reduce((a,b) => a.concat(b));
-      }
-      await this._doUpdate(forceRefresh, hints);
-      for (let { resolve } of batch) {
-        resolve();
-      }
-    }
   }
 
   async _doUpdate(forceRefresh, hints) {

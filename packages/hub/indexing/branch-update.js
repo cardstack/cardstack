@@ -174,25 +174,35 @@ class BranchUpdate {
 
   async add(type, id, doc, sourceId, nonce) {
     this._touched[`${type}/${id}`] = true;
-    let searchDoc = await this._prepareSearchDoc(type, id, doc);
+    let schema = await this.schema();
+    let context = new DocumentContext({
+      schema,
+      type,
+      id,
+      sourceId,
+      generation: nonce,
+      upstreamDoc: doc,
+      branch: this.branch,
+      read: (type, id) => this.read(type, id)
+    });
+
+    let searchDoc = await context.searchDoc();
     if (!searchDoc) {
       // bad documents get ignored. The DocumentContext logs these for
       // us, so all we need to do here is nothing.
       return;
     }
-    searchDoc.cardstack_pristine.data.meta.source = sourceId;
-  
     await this.client.saveDocument({
       branch: this.branch,
       type,
       id,
       searchDoc,
-      pristineDoc: searchDoc.cardstack_pristine,
+      pristineDoc: await context.pristineDoc(),
       upstreamDoc: doc,
-      source: sourceId,
-      generation: nonce,
-      refs: searchDoc.cardstack_references,
-      realms: searchDoc.cardstack_realms
+      source: context.sourceId,
+      generation: context.generation,
+      refs: await context.references(),
+      realms: await context.realms()
     });
     this.emitEvent('add', { type, id, doc });
     log.debug("save %s %s", type, id);
@@ -237,15 +247,6 @@ class BranchUpdate {
     this.emitEvent('delete_all_without_nonce', { sourceId, nonce });
     log.debug("bulk delete older content for data source %s", sourceId);
   }
-
-
-
-  async _prepareSearchDoc(type, id, doc) {
-    let schema = await this.schema();
-    let context = new DocumentContext(this, schema, type, id, doc);
-    return context.searchDoc();
-  }
-
 }
 
 exports.BranchUpdate = BranchUpdate;
