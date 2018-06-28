@@ -154,13 +154,6 @@ module.exports = class ContentType {
     }
   }
 
-  mapping() {
-    let properties = {};
-    for (let field of this.realAndComputedFields.values()) {
-      Object.assign(properties, field.mapping(this.includesTree, this.allFields));
-    }
-    return { properties };
-  }
 
 
   async _assertGrant(documents, context, permission, description) {

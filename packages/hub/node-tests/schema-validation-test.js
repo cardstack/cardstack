@@ -299,11 +299,6 @@ describe('schema/validation', function() {
     expect(errors).includes.something.with.property('detail', 'published-date must be present');
   });
 
-  it("generates a mapping", async function() {
-    let mapping = schema.mapping();
-    expect(mapping).has.deep.property("articles.properties.published-date.index", false);
-    expect(mapping).has.deep.property("events.properties.title");
-  });
 
   it("can lookup up a writer for a content type", async function() {
     expect(schema.types.get('articles').dataSource).is.ok;

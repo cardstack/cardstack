@@ -217,28 +217,6 @@ module.exports = class Field {
   }
 
 
-  mapping(searchTree, allFields) {
-    let m = {
-      [this.id]: Object.assign({}, allFields)
-    };
-
-    if (this.searchable) {
-      if (this.plugin.derivedMappings) {
-        Object.assign(m, this.plugin.derivedMappings(this.id));
-      }
-      if (this.isRelationship) {
-        m[this.id].properties = recursiveMappings(searchTree && searchTree[this.id], allFields);
-      }
-    } else {
-      if (m[this.id].type === 'object') {
-        m[this.id].enabled = false;
-      } else {
-        m[this.id].index = false;
-      }
-    }
-    return m;
-  }
-
   buildQueryExpression(sourceExpression) {
     if (this.plugin.buildQueryExpression) {
       return this.plugin.buildQueryExpression(sourceExpression, this.id);
@@ -261,31 +239,8 @@ module.exports = class Field {
   }
 
 
-  derivedFields(value) {
-    if (this.plugin.derivedFields) {
-      return this.plugin.derivedFields(this.id, value);
-    }
-  }
-
 };
 
-function recursiveMappings(searchTree, allFields) {
-  let outputList = [];
-  if (searchTree) {
-    // we are a deep-searchable relationship, so we need to
-    // include all the other potential fields underneath
-    // ourselves
-    for (let field of allFields.values()) {
-      outputList.push(field.mapping(searchTree[field.id], allFields));
-    }
-  } else {
-    // we are a leaf relationship. We still always include type and id
-    // mappings
-    outputList.push(allFields.get('id').mapping(searchTree, allFields));
-    outputList.push(allFields.get('type').mapping(searchTree, allFields));
-  }
-  return Object.assign({}, ...outputList);
-}
 
 function humanize(string) {
   // First regex taken from Ember.String.capitalize
