@@ -1,9 +1,10 @@
 # Implementation notes for pgsearch refactor
 
 3. Refactord cardstack_pristine, cardstack_references, etc, out of searchDoc.
-4. When we invalidate documents, we're feeding post-processed ones back into the indexing process. We will need to strip off computed properties, etc, there. For now it's possible they would persist.
-4.5 The `read` method in branch update should get smarter.
 5. verify cursor behavior in docsThatReference (either manually or write a test)
 6. Improve DI system to remove hack where we do require.resolve during injections.
 8. Switch filter default from non-exact to exact.
 9. Drop implicit "any" array support inside operators like 'exact'
+10. readOtherIndexers can become a full searcher, but that involves more sophisticated invalidation queries
+uncachedRead should go away (this is easier to do if we replace readOtherIndexers with a full searcher)
+custom search representations not implemented (example: mobiledoc, which still has leftover mobiledoc-text-renderer dep), tests passing by accident
