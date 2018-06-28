@@ -59,7 +59,7 @@ describe('pgsearch/indexer', function() {
 
   // this scenario technically violates jsonapi spec, but our indexer needs to be tolerant of it
   it('tolerates missing relationship', async function() {
-    let article = await writer.create('master', env.session, 'articles', {
+    let { data:article } = await writer.create('master', env.session, 'articles', {
       type: 'articles',
       attributes: {
         title: 'Hello World'
@@ -76,14 +76,14 @@ describe('pgsearch/indexer', function() {
   });
 
   it('indexes a belongs-to', async function() {
-    let person = await writer.create('master', env.session, 'people', {
+    let { data:person } = await writer.create('master', env.session, 'people', {
       type: 'people',
       attributes: {
         name: 'Quint'
       }
     });
     expect(person).has.deep.property('id');
-    let article = await writer.create('master', env.session, 'articles', {
+    let { data:article } = await writer.create('master', env.session, 'articles', {
       type: 'articles',
       attributes: {
         title: 'Hello World'
@@ -104,14 +104,14 @@ describe('pgsearch/indexer', function() {
   });
 
   it('reindexes included resources', async function() {
-    let person = await writer.create('master', env.session, 'people', {
+    let { data:person } = await writer.create('master', env.session, 'people', {
       type: 'people',
       attributes: {
         name: 'Quint'
       }
     });
     expect(person).has.deep.property('id');
-    let article = await writer.create('master', env.session, 'articles', {
+    let { data:article } = await writer.create('master', env.session, 'articles', {
       type: 'articles',
       attributes: {
         title: 'Hello World'
@@ -137,14 +137,14 @@ describe('pgsearch/indexer', function() {
   });
 
   it('reindexes included resources when both docs are already changing', async function() {
-    let person = await writer.create('master', env.session, 'people', {
+    let { data:person } = await writer.create('master', env.session, 'people', {
       type: 'people',
       attributes: {
         name: 'Quint'
       }
     });
     expect(person).has.deep.property('id');
-    let article = await writer.create('master', env.session, 'articles', {
+    let { data:article } = await writer.create('master', env.session, 'articles', {
       type: 'articles',
       attributes: {
         title: 'Hello World'
@@ -244,7 +244,7 @@ describe('pgsearch/indexer', function() {
   });
 
   it('ignores a broken belongs-to', async function() {
-    let article = await writer.create('master', env.session, 'articles', {
+    let { data:article } = await writer.create('master', env.session, 'articles', {
       type: 'articles',
       attributes: {
         title: 'Hello World'
@@ -261,7 +261,7 @@ describe('pgsearch/indexer', function() {
   });
 
   it('ignores a broken has-many', async function() {
-    let person = await writer.create('master', env.session, 'people', {
+    let { data:person } = await writer.create('master', env.session, 'people', {
       type: 'people',
       attributes: {
         name: 'Quint'
@@ -269,7 +269,7 @@ describe('pgsearch/indexer', function() {
     });
     expect(person).has.deep.property('id');
 
-    let article = await writer.create('master', env.session, 'articles', {
+    let { data:article } = await writer.create('master', env.session, 'articles', {
       type: 'articles',
       attributes: {
         title: 'Hello World'
@@ -289,7 +289,7 @@ describe('pgsearch/indexer', function() {
 
 
   it('can fix broken relationship when it is later fixed', async function() {
-    let article = await writer.create('master', env.session, 'articles', {
+    let { data:article } = await writer.create('master', env.session, 'articles', {
       type: 'articles',
       attributes: {
         title: 'Hello World'

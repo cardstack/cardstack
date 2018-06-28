@@ -156,8 +156,9 @@ class Handler {
   async handleIndividualPATCH(type, id) {
     let data = this._mandatoryBodyData();
     let record = await this.writers.update(this.branch, this.session, type, id, data);
-    this.ctxt.body = { data: record };
+    this.ctxt.body = record;
     this.ctxt.status = 200;
+    // TODO this should no longer be necessary after the writer is able to insert the search doc into the index
     if (this.query.nowait == null) {
       await this.indexers.update({ forceRefresh: true, hints: [{ branch: this.branch, id, type }] });
     }
@@ -168,6 +169,7 @@ class Handler {
       let version = this.ctxt.header['if-match'];
       await this.writers.delete(this.branch, this.session, version, type, id);
       this.ctxt.status = 204;
+      // TODO this should no longer be necessary after the writer is able to insert the search doc into the index
       if (this.query.nowait == null) {
         await this.indexers.update({ forceRefresh: true, hints: [{ branch: this.branch, id, type }] });
       }
@@ -216,15 +218,16 @@ class Handler {
   async handleCollectionPOST(type) {
     let data = this._mandatoryBodyData();
     let record = await this.writers.create(this.branch, this.session, type, data);
-    this.ctxt.body = { data: record };
+    this.ctxt.body = record;
     this.ctxt.status = 201;
     let origin = this.ctxt.request.origin;
     if (this.prefix) {
       origin += '/' + this.prefix;
     }
-    this.ctxt.set('location', origin + this.ctxt.request.path + '/' + record.id);
+    this.ctxt.set('location', origin + this.ctxt.request.path + '/' + record.data.id);
+    // TODO this should no longer be necessary after the writer is able to insert the search doc into the index
     if (this.query.nowait == null) {
-      await this.indexers.update({ forceRefresh: true, hints: [{ branch: this.branch, id: record.id, type }] });
+      await this.indexers.update({ forceRefresh: true, hints: [{ branch: this.branch, id: record.data.id, type }] });
     }
   }
 

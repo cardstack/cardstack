@@ -94,7 +94,7 @@ describe('git/writer', function() {
 
   describe('create', function() {
     it('saves attributes', async function () {
-      let record = await writers.create('master', env.session, 'articles', {
+      let { data:record } = await writers.create('master', env.session, 'articles', {
         type: 'articles',
         attributes: {
           title: 'Second Article'
@@ -122,7 +122,7 @@ describe('git/writer', function() {
 
 
     it('returns correct document', async function () {
-      let record = await writers.create('master', env.session, 'articles', {
+      let { data:record } = await writers.create('master', env.session, 'articles', {
         type: 'articles',
         attributes: {
           title: 'Second Article'
@@ -138,7 +138,7 @@ describe('git/writer', function() {
     });
 
     it('returns default attribute', async function() {
-      let record = await writers.create('master', env.session, 'things-with-defaults', {
+      let { data:record } = await writers.create('master', env.session, 'things-with-defaults', {
         id: '1',
         type: 'things-with-defaults',
       });
@@ -168,7 +168,7 @@ describe('git/writer', function() {
     });
 
     it('allows optional clientside id', async function() {
-      let record = await writers.create('master', env.session, 'articles', {
+      let { data:record } = await writers.create('master', env.session, 'articles', {
         id: 'special',
         type: 'articles',
         attributes: {
@@ -384,7 +384,7 @@ describe('git/writer', function() {
     }
 
     it('returns updated document', async function() {
-      let record = await writers.update('master', env.session, 'articles', '1', {
+      let { data:record } = await writers.update('master', env.session, 'articles', '1', {
         id: '1',
         type: 'articles',
         attributes: {
@@ -400,7 +400,7 @@ describe('git/writer', function() {
 
 
     it('returns unchanged field', async function() {
-      let record = await writers.update('master', env.session, 'people', '1', {
+      let { data:record } = await writers.update('master', env.session, 'people', '1', {
         id: '1',
         type: 'people',
         attributes: {
@@ -414,7 +414,7 @@ describe('git/writer', function() {
     });
 
     it('returns default attribute value', async function() {
-      let record = await writers.update('master', env.session, 'things-with-defaults', '4', {
+      let { data:record } = await writers.update('master', env.session, 'things-with-defaults', '4', {
         id: '4',
         type: 'things-with-defaults',
         meta: {
@@ -637,7 +637,7 @@ describe('git/writer', function() {
 
   describe('belongsTo', function() {
     it('saves at creation', async function() {
-      let record = await writers.create('master', env.session, 'articles', {
+      let { data:record } = await writers.create('master', env.session, 'articles', {
         type: 'articles',
         relationships: {
           'primary-image': {
@@ -665,7 +665,7 @@ describe('git/writer', function() {
     });
 
     it('echos at creation', async function() {
-      let record = await writers.create('master', env.session, 'articles', {
+      let { data:record } = await writers.create('master', env.session, 'articles', {
         type: 'articles',
         relationships: {
           'primary-image': {
@@ -713,7 +713,7 @@ describe('git/writer', function() {
     });
 
     it('echos at update', async function() {
-      let record = await writers.update('master', env.session, 'articles', '1', {
+      let { data:record } = await writers.update('master', env.session, 'articles', '1', {
         id: '1',
         type: 'articles',
         relationships: {

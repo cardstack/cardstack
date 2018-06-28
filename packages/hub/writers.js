@@ -92,7 +92,7 @@ class Writers {
     if (finalDocument.relationships) {
       responseDocument.relationships = finalDocument.relationships;
     }
-    return responseDocument;
+    return { data: responseDocument }; // TODO use document context's pristineDoc to generate response document
   }
 
   _lookupWriter(schema, type) {
