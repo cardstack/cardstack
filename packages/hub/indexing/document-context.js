@@ -70,9 +70,6 @@ module.exports = class DocumentContext {
     return this._read(type, id);
   }
 
-  async _logicalFieldToES(fieldName) {
-    return fieldName;
-  }
 
   // TODO come up with a better way to cache (use Model)
   async _getCachedSearchDoc() {
@@ -105,21 +102,9 @@ module.exports = class DocumentContext {
 
   async _buildAttribute(field, value, pristineDocOut, searchDocOut) {
     // Write our value into the search doc
-    let esName = await this._logicalFieldToES(field.id);
-    searchDocOut[esName] = value;
-
+    searchDocOut[field.id] = value;
     // Write our value into the pristine doc
     ensure(pristineDocOut, 'attributes')[field.id] = value;
-
-    // If the search plugin has any derived fields, those also go
-    // into the search doc.
-    let derivedFields = field.derivedFields(value);
-    if (derivedFields) {
-      for (let [derivedName, derivedValue] of Object.entries(derivedFields)) {
-        let esName = await this._logicalFieldToES(derivedName);
-        searchDocOut[esName] = derivedValue;
-      }
-    }
   }
 
   async _buildRelationships(contentType, jsonapiDoc, userModel, pristineDocOut, searchDocOut, searchTree, depth) {
@@ -162,8 +147,7 @@ module.exports = class DocumentContext {
       related = value.data;
       ensure(pristineDocOut, 'relationships')[field.id] = Object.assign({}, value);
     }
-    let esName = await this._logicalFieldToES(field.id);
-    searchDocOut[esName] = related;
+    searchDocOut[field.id] = related;
   }
 
   async _build(type, id, jsonapiDoc, searchTree, depth) {
@@ -179,8 +163,7 @@ module.exports = class DocumentContext {
     //
     // we don't store the type as a regular field in elasticsearch,
     // because we're keeping it in the built in _type field.
-    let esId = await this._logicalFieldToES('id');
-    let searchDoc = { [esId]: id };
+    let searchDoc = { ['id']: id };
 
     // this is the copy of the document we will return to anybody who
     // retrieves it. It's supposed to already be a correct jsonapi
@@ -193,8 +176,7 @@ module.exports = class DocumentContext {
     // we are going inside a parent document's includes, so we need
     // our own type here.
     if (depth > 0) {
-      let esType = await this._logicalFieldToES('type');
-      searchDoc[esType] = type;
+      searchDoc['type'] = type;
     }
 
     let userModel = new Model(contentType, jsonapiDoc, this.schema, this.read.bind(this));

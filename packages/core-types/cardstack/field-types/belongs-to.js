@@ -11,11 +11,6 @@ module.exports = {
     }
     return true;
   },
-  defaultMapping() {
-    return {
-      type: "object"
-    };
-  },
   default: { data: null },
   isRelationship: true
 };

@@ -216,33 +216,6 @@ module.exports = class Field {
     return errors;
   }
 
-  customAnalyzer() {
-    if (typeof this.plugin.customAnalyzer === 'function') {
-      return Object.assign({}, this.plugin.customAnalyzer());
-    }
-  }
-
-  mapping(searchTree, allFields) {
-    let m = {
-      [this.id]: Object.assign({}, this.plugin.defaultMapping(allFields))
-    };
-
-    if (this.searchable) {
-      if (this.plugin.derivedMappings) {
-        Object.assign(m, this.plugin.derivedMappings(this.id));
-      }
-      if (this.isRelationship) {
-        m[this.id].properties = recursiveMappings(searchTree && searchTree[this.id], allFields);
-      }
-    } else {
-      if (m[this.id].type === 'object') {
-        m[this.id].enabled = false;
-      } else {
-        m[this.id].index = false;
-      }
-    }
-    return m;
-  }
 
   buildQueryExpression(sourceExpression) {
     if (this.plugin.buildQueryExpression) {
@@ -265,49 +238,9 @@ module.exports = class Field {
     return valueExpression;
   }
 
-  // FIXME: delete this
-  get sortFieldName() {
-    if (this.plugin.sortFieldName) {
-      return this.plugin.sortFieldName(this.id);
-    } else {
-      return this.id;
-    }
-  }
-
-  // FIXME: delete this
-  get queryFieldName() {
-    if (this.plugin.queryFieldName) {
-      return this.plugin.queryFieldName(this.id);
-    } else {
-      return this.id;
-    }
-  }
-
-  derivedFields(value) {
-    if (this.plugin.derivedFields) {
-      return this.plugin.derivedFields(this.id, value);
-    }
-  }
 
 };
 
-function recursiveMappings(searchTree, allFields) {
-  let outputList = [];
-  if (searchTree) {
-    // we are a deep-searchable relationship, so we need to
-    // include all the other potential fields underneath
-    // ourselves
-    for (let field of allFields.values()) {
-      outputList.push(field.mapping(searchTree[field.id], allFields));
-    }
-  } else {
-    // we are a leaf relationship. We still always include type and id
-    // mappings
-    outputList.push(allFields.get('id').mapping(searchTree, allFields));
-    outputList.push(allFields.get('type').mapping(searchTree, allFields));
-  }
-  return Object.assign({}, ...outputList);
-}
 
 function humanize(string) {
   // First regex taken from Ember.String.capitalize

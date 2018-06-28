@@ -14,12 +14,6 @@ module.exports = {
     }
     return true;
   },
-
-  defaultMapping() {
-    return {
-      type: "nested"
-    };
-  },
   default: { data: [] },
   isRelationship: true
 };

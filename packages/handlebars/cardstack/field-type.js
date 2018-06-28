@@ -8,10 +8,4 @@ module.exports = {
       return false;
     }
   },
-  defaultMapping() {
-    return {
-      type: 'object',
-      enabled: false
-    };
-  }
 };

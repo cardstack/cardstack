@@ -205,28 +205,6 @@ class Schema {
     return this._customAnalyzers;
   }
 
-  mapping() {
-    if (!this._mapping) {
-      this._mapping = {
-        meta: {
-          properties: {
-            params: { type: 'object', enabled: false }
-          }
-        }
-      };
-      for (let contentType of this.types.values()) {
-        this._mapping[contentType.id] = contentType.mapping();
-        this._mapping[contentType.id].properties.cardstack_source = { type: 'keyword' };
-        this._mapping[contentType.id].properties.cardstack_generation = { type: 'keyword' };
-        this._mapping[contentType.id].properties.cardstack_pristine = { type: 'object', enabled: false };
-        this._mapping[contentType.id].properties.cardstack_references = { type: 'keyword' };
-        this._mapping[contentType.id].properties.cardstack_realms = { type: 'keyword' };
-      }
-
-    }
-    return this._mapping;
-  }
-
   _readAuthIncluded(included, userRealms) {
     let modified = false;
     let safeIncluded = included.map(resource => {
