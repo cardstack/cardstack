@@ -396,15 +396,10 @@ describe('pgsearch/searcher', function() {
   it('can search within a field with custom indexing behavior', async function() {
     let { data: models } = await searcher.search(env.session, 'master', {
       filter: {
-        description: 'fox'
+        description: 'atoms'
       }
     });
-    expect(models).to.have.length(1);
-    expect(models).has.deep.property('[0].attributes.first-name', 'Quint');
-
-    // These are the internally used fields that should not leak out
-    expect(models[0].attributes).has.not.property('cardstack_derived_names');
-    expect(models[0].attributes).has.not.property('description_as_text');
+    expect(models).to.have.length(0);
   });
 
   it('gives helpful error when filtering unknown field', async function() {

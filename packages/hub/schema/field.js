@@ -238,6 +238,13 @@ module.exports = class Field {
     return valueExpression;
   }
 
+  searchIndexFormat(value) {
+   if(this.plugin.searchIndexFormat) {
+     return this.plugin.searchIndexFormat(value);
+   }
+   return value;
+  }
+
 
 };
 

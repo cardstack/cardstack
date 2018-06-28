@@ -102,7 +102,7 @@ module.exports = class DocumentContext {
 
   async _buildAttribute(field, value, pristineDocOut, searchDocOut) {
     // Write our value into the search doc
-    searchDocOut[field.id] = value;
+    searchDocOut[field.id] = field.searchIndexFormat(value);
     // Write our value into the pristine doc
     ensure(pristineDocOut, 'attributes')[field.id] = value;
   }
