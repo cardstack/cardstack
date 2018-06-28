@@ -1,10 +1,12 @@
 const Error = require('@cardstack/plugin-utils/error');
 const log = require('@cardstack/logger')('cardstack/writers');
+const DocumentContext = require('./indexing/document-context');
 const { declareInjections } = require('@cardstack/di');
 
 module.exports = declareInjections({
   schema: 'hub:current-schema',
-  schemaLoader: 'hub:schema-loader'
+  schemaLoader: 'hub:schema-loader',
+  searchers: 'hub:searchers',
 },
 
 class Writers {
@@ -26,11 +28,13 @@ class Writers {
     );
     try {
       let newSchema = await schema.validate(pending, { type, session });
-      let response = await this._finalizeAndReply(pending);
+      let context = await this._finalizeAndReply(pending, branch, session, type, schema);
       if (newSchema) {
         this.schema.invalidateCache();
       }
-      return response;
+
+      // TODO index the search doc
+      return context.pristineDoc();
     } finally {
       if (pending) { await pending.abort();  }
     }
@@ -51,11 +55,11 @@ class Writers {
     );
     try {
       let newSchema = await schema.validate(pending, { type, id, session });
-      let response = await this._finalizeAndReply(pending);
+      let context = await this._finalizeAndReply(pending, branch, session, type, schema);
       if (newSchema) {
         this.schema.invalidateCache();
       }
-      return response;
+      return context.pristineDoc();
     } finally {
       if (pending) { await pending.abort();  }
     }
@@ -78,21 +82,21 @@ class Writers {
     }
   }
 
-  async _finalizeAndReply(pending) {
+  async _finalizeAndReply(pending, branch, session, type, schema) {
     let meta = await pending.finalize();
+    let contentType = schema.types.get(type);
     let finalDocument = pending.finalDocument;
-    let responseDocument = {
+    finalDocument.meta = meta;
+
+    return new DocumentContext({
+      type,
+      branch,
+      schema,
       id: finalDocument.id,
-      type: finalDocument.type,
-      meta
-    };
-    if (finalDocument.attributes) {
-      responseDocument.attributes = finalDocument.attributes;
-    }
-    if (finalDocument.relationships) {
-      responseDocument.relationships = finalDocument.relationships;
-    }
-    return { data: responseDocument }; // TODO use document context's pristineDoc to generate response document
+      upstreamDoc: finalDocument,
+      sourceId: contentType.dataSource.id,
+      read: (type, id) => this.searchers.get(session, branch, type, id)
+    });
   }
 
   _lookupWriter(schema, type) {
