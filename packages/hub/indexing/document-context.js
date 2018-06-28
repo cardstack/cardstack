@@ -70,9 +70,6 @@ module.exports = class DocumentContext {
     return this._read(type, id);
   }
 
-  async _logicalFieldToES(fieldName) {
-    return fieldName;
-  }
 
   // TODO come up with a better way to cache (use Model)
   async _getCachedSearchDoc() {
@@ -105,7 +102,7 @@ module.exports = class DocumentContext {
 
   async _buildAttribute(field, value, pristineDocOut, searchDocOut) {
     // Write our value into the search doc
-    let esName = await this._logicalFieldToES(field.id);
+    let esName = field.id;
     searchDocOut[esName] = value;
 
     // Write our value into the pristine doc
@@ -116,7 +113,7 @@ module.exports = class DocumentContext {
     let derivedFields = field.derivedFields(value);
     if (derivedFields) {
       for (let [derivedName, derivedValue] of Object.entries(derivedFields)) {
-        let esName = await this._logicalFieldToES(derivedName);
+        let esName = derivedName;
         searchDocOut[esName] = derivedValue;
       }
     }
@@ -162,7 +159,7 @@ module.exports = class DocumentContext {
       related = value.data;
       ensure(pristineDocOut, 'relationships')[field.id] = Object.assign({}, value);
     }
-    let esName = await this._logicalFieldToES(field.id);
+    let esName = field.id;
     searchDocOut[esName] = related;
   }
 
@@ -179,7 +176,7 @@ module.exports = class DocumentContext {
     //
     // we don't store the type as a regular field in elasticsearch,
     // because we're keeping it in the built in _type field.
-    let esId = await this._logicalFieldToES('id');
+    let esId = 'id';
     let searchDoc = { [esId]: id };
 
     // this is the copy of the document we will return to anybody who
@@ -193,7 +190,7 @@ module.exports = class DocumentContext {
     // we are going inside a parent document's includes, so we need
     // our own type here.
     if (depth > 0) {
-      let esType = await this._logicalFieldToES('type');
+      let esType = 'type';
       searchDoc[esType] = type;
     }
 

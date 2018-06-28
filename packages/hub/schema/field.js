@@ -216,15 +216,10 @@ module.exports = class Field {
     return errors;
   }
 
-  customAnalyzer() {
-    if (typeof this.plugin.customAnalyzer === 'function') {
-      return Object.assign({}, this.plugin.customAnalyzer());
-    }
-  }
 
   mapping(searchTree, allFields) {
     let m = {
-      [this.id]: Object.assign({}, this.plugin.defaultMapping(allFields))
+      [this.id]: Object.assign({}, allFields)
     };
 
     if (this.searchable) {
@@ -265,23 +260,6 @@ module.exports = class Field {
     return valueExpression;
   }
 
-  // FIXME: delete this
-  get sortFieldName() {
-    if (this.plugin.sortFieldName) {
-      return this.plugin.sortFieldName(this.id);
-    } else {
-      return this.id;
-    }
-  }
-
-  // FIXME: delete this
-  get queryFieldName() {
-    if (this.plugin.queryFieldName) {
-      return this.plugin.queryFieldName(this.id);
-    } else {
-      return this.id;
-    }
-  }
 
   derivedFields(value) {
     if (this.plugin.derivedFields) {

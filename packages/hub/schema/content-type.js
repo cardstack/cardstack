@@ -162,19 +162,6 @@ module.exports = class ContentType {
     return { properties };
   }
 
-  customAnalyzers() {
-    let analyzers;
-    for (let field of this.realAndComputedFields.values()) {
-      let analyzer = field.customAnalyzer();
-      if (analyzer) {
-        if (!analyzers) {
-          analyzers = {};
-        }
-        Object.assign(analyzers, analyzer);
-      }
-    }
-    return analyzers;
-  }
 
   async _assertGrant(documents, context, permission, description) {
     let grant = await find(this.grants, async g => {
