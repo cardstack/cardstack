@@ -115,7 +115,7 @@ module.exports = class PgClient {
     }
 
     async deleteOlderGenerations(branch, sourceId, nonce) {
-       let sql = 'delete from documents where generation!=$1 and source=$2 and branch=$3';
+       let sql = 'delete from documents where (generation != $1 or generation is null) and source=$2 and branch=$3';
        await this.query(sql, [nonce, sourceId, branch]);
     }
 
