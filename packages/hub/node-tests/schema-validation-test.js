@@ -1,12 +1,14 @@
-const ElasticAssert = require('@cardstack/elasticsearch/test-support');
 const JSONAPIFactory = require('../../../tests/stub-project/node_modules/@cardstack/test-support/jsonapi-factory');
 const PendingChange = require('@cardstack/plugin-utils/pending-change');
 const bootstrapSchema = require('../bootstrap-schema');
-const { Registry, Container } = require('@cardstack/di');
+const {
+  createDefaultEnvironment,
+  destroyDefaultEnvironment
+} = require('../../../tests/stub-project/node_modules/@cardstack/test-support/env');
 
 describe('schema/validation', function() {
 
-  let schema, ephemeralDataSource;
+  let schema, ephemeralDataSource, env;
 
   before(async function() {
     let factory = new JSONAPIFactory();
@@ -113,16 +115,13 @@ describe('schema/validation', function() {
           )
       ]);
 
-    let registry = new Registry();
-    registry.register('config:project', { path: `${__dirname}/../../../tests/stub-project` });
-    let container = new Container(registry);
-    let loader = container.lookup('hub:schema-loader');
+    env = await createDefaultEnvironment(`${__dirname}/../../../tests/stub-project`);
+    let loader = env.lookup('hub:schema-loader');
     schema = await loader.loadFrom(factory.getModels());
   });
 
   after(async function() {
-    let ea = new ElasticAssert();
-    await ea.deleteContentIndices();
+    await destroyDefaultEnvironment(env);
   });
 
   it("rejects unknown type", async function() {

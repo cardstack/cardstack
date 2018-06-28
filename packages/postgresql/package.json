@@ -19,7 +19,6 @@
   },
   "dependencies": {
     "@cardstack/di": "0.8.0",
-    "@cardstack/elasticsearch": "0.8.0",
     "@cardstack/logger": "^0.1.0",
     "node-pg-migrate": "3.5.0",
     "@cardstack/plugin-utils": "0.8.0",

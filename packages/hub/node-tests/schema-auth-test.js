@@ -1,15 +1,22 @@
-const ElasticAssert = require('@cardstack/elasticsearch/test-support');
 const JSONAPIFactory = require('../../../tests/stub-project/node_modules/@cardstack/test-support/jsonapi-factory');
 const PendingChange = require('@cardstack/plugin-utils/pending-change');
+const {
+  createDefaultEnvironment,
+  destroyDefaultEnvironment
+} = require('../../../tests/stub-project/node_modules/@cardstack/test-support/env');
 const bootstrapSchema = require('../bootstrap-schema');
-const { Registry, Container } = require('@cardstack/di');
 const Session = require('@cardstack/plugin-utils/session');
 
 const everyone = { type: 'groups', id: 'everyone' };
 
 describe('schema/auth/write', function() {
 
-  let factory, loader;
+  let factory, loader, env;
+
+  before(async function() {
+    env = await createDefaultEnvironment(`${__dirname}/../../../tests/stub-project`);
+    loader = env.lookup('hub:schema-loader');
+  }),
 
   beforeEach(async function() {
     factory = new JSONAPIFactory();
@@ -58,15 +65,10 @@ describe('schema/auth/write', function() {
     factory.addResource('groups', 'people').withAttributes({
       searchQuery: { filter: { type: { exact: ['authors', 'test-users'] } } }
     });
-
-    let registry = new Registry();
-    registry.register('config:project', { path: `${__dirname}/../../../tests/stub-project` });
-    loader = new Container(registry).lookup('hub:schema-loader');
   });
 
-  afterEach(async function() {
-    let ea = new ElasticAssert();
-    await ea.deleteContentIndices();
+  after(async function() {
+    await destroyDefaultEnvironment(env);
   });
 
   function allReadable() {

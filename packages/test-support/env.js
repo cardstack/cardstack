@@ -1,5 +1,4 @@
 const temp = require('./temp-helper');
-const ElasticAssert = require('@cardstack/elasticsearch/test-support');
 const PgClient = require('@cardstack/pgsearch/client');
 const JSONAPIFactory = require('./jsonapi-factory');
 const crypto = require('crypto');
@@ -107,11 +106,7 @@ exports.destroyDefaultEnvironment = async function(env) {
 };
 
 async function destroySearchIndex() {
-  let ea = new ElasticAssert();
-  await Promise.all([
-    ea.deleteContentIndices(),
-    PgClient.deleteSearchIndexIHopeYouKnowWhatYouAreDoing()
-  ]);
+  await PgClient.deleteSearchIndexIHopeYouKnowWhatYouAreDoing();
 }
 
 
