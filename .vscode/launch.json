@@ -36,29 +36,6 @@
         {
             "type": "node",
             "request": "launch",
-            "name": "Launch Server",
-            "program": "${workspaceRoot}/packages/hub/bin/server.js",
-            "cwd": "${workspaceRoot}",
-            "runtimeArgs": [
-                "--harmony"
-            ],
-            "args":[
-
-            ]
-        },
-        {
-            "type": "node",
-            "request": "launch",
-            "name": "Launch Oauth2-client Program",
-            "program": "${workspaceRoot}/packages/oauth2-client/bin/server.js",
-            "cwd": "${workspaceRoot}",
-            "runtimeArgs": [
-                "--harmony"
-            ]
-        },
-        {
-            "type": "node",
-            "request": "launch",
             "name": "Launch Test Suite",
             "program": "${workspaceRoot}/node_modules/.bin/_mocha",
             "cwd": "${workspaceRoot}",
@@ -67,28 +44,8 @@
                 "--timeout",
                 "200000",
                 //"--grep",
-                //"git/indexer.*unrelated"
-            ],
-            "runtimeArgs": [
-                "--harmony"
+                //"indexes plugin-config changes"
             ]
-        },
-        {
-            "type": "node",
-            "request": "attach",
-            "name": "Attach to Process",
-            "port": 5858,
-            "address": "10.0.15.2"
-        },
-        {
-          "type": "node",
-          "request": "launch",
-          "name": "Launch Workflow Dummy App",
-          "cwd": "${workspaceRoot}/packages/workflow",
-          "program": "${workspaceRoot}/packages/workflow/node_modules/ember-cli/bin/ember",
-          "args": [
-            "s",
-          ]
         }
     ]
 }
