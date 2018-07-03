@@ -18,6 +18,8 @@ class Writers {
 
   async create(branch, session, type, document) {
     log.info("creating type=%s", type);
+    await this.pgSearchClient.ensureDatabaseSetup();
+
     let schema = await this.schema.forBranch(branch);
     let writer = this._lookupWriter(schema, type);
     let isSchema = this.schemaTypes.includes(type);
@@ -44,8 +46,9 @@ class Writers {
   }
 
   async update(branch, session, type, id, document) {
-    debugger;
     log.info("updating type=%s id=%s", type, id);
+    await this.pgSearchClient.ensureDatabaseSetup();
+
     let schema = await this.schema.forBranch(branch);
     let writer = this._lookupWriter(schema, type);
     let isSchema = this.schemaTypes.includes(type);
@@ -74,6 +77,8 @@ class Writers {
 
   async delete(branch, session, version, type, id) {
     log.info("deleting type=%s id=%s", type, id);
+    await this.pgSearchClient.ensureDatabaseSetup();
+
     let schema = await this.schema.forBranch(branch);
     let writer = this._lookupWriter(schema, type);
     let isSchema = this.schemaTypes.includes(type);
