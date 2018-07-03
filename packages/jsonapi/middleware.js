@@ -158,10 +158,6 @@ class Handler {
     let record = await this.writers.update(this.branch, this.session, type, id, data);
     this.ctxt.body = record;
     this.ctxt.status = 200;
-    // TODO this should no longer be necessary after the writer is able to insert the search doc into the index
-    // if (this.query.nowait == null) {
-    //   await this.indexers.update({ forceRefresh: true, hints: [{ branch: this.branch, id, type }] });
-    // }
   }
 
   async handleIndividualDELETE(type, id) {
@@ -169,10 +165,6 @@ class Handler {
       let version = this.ctxt.header['if-match'];
       await this.writers.delete(this.branch, this.session, version, type, id);
       this.ctxt.status = 204;
-      // TODO this should no longer be necessary after the writer is able to insert the search doc into the index
-      // if (this.query.nowait == null) {
-      //   await this.indexers.update({ forceRefresh: true, hints: [{ branch: this.branch, id, type }] });
-      // }
     } catch (err) {
       // By convention, the writer always refers to the version as
       // /data/meta/version, since that's where it would come from in
@@ -225,10 +217,6 @@ class Handler {
       origin += '/' + this.prefix;
     }
     this.ctxt.set('location', origin + this.ctxt.request.path + '/' + record.data.id);
-    // TODO this should no longer be necessary after the writer is able to insert the search doc into the index
-    // if (this.query.nowait == null) {
-    //   await this.indexers.update({ forceRefresh: true, hints: [{ branch: this.branch, id: record.data.id, type }] });
-    // }
   }
 
   async _lookupRecord(type, id) {

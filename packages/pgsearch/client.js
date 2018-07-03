@@ -102,37 +102,37 @@ module.exports = class PgClient {
     }
   }
 
-    async loadMeta({ branch, id }) {
-        let response = await this.query('SELECT params from meta where branch=$1 and id=$2', [branch, id]);
-        if (response.rowCount > 0){
-            return response.rows[0].params;
-        }
+  async loadMeta({ branch, id }) {
+    let response = await this.query('SELECT params from meta where branch=$1 and id=$2', [branch, id]);
+    if (response.rowCount > 0){
+      return response.rows[0].params;
+    }
+  }
+
+  async readUpstreamDocument({ branch, type, id }) {
+    let sql = 'select upstream_doc from documents where branch=$1 and type=$2 and id=$3';
+    let response = await this.query(sql, [branch, type, id]);
+    if (response.rowCount > 0) {
+      return response.rows[0].upstream_doc;
+    }
+  }
+
+  async saveDocument({ context, branch, type, id, searchDoc, pristineDoc, upstreamDoc, source, generation, refs, realms }) {
+    if (context) {
+      branch = context.branch;
+      type = context.type;
+      id = context.id;
+      source = context.sourceId;
+      generation = context.generation;
+      upstreamDoc = context.upstreamDoc;
+      searchDoc = await context.searchDoc();
+      pristineDoc = await context.pristineDoc();
+      refs = await context.references();
+      realms = await context.realms();
     }
 
-    async readUpstreamDocument({ branch, type, id }) {
-        let sql = 'select upstream_doc from documents where branch=$1 and type=$2 and id=$3';
-        let response = await this.query(sql, [branch, type, id]);
-        if (response.rowCount > 0) {
-            return response.rows[0].upstream_doc;
-        }
-    }
-
-    async saveDocument({ context, branch, type, id, searchDoc, pristineDoc, upstreamDoc, source, generation, refs, realms }) {
-      if (context) {
-        branch = context.branch;
-        type = context.type;
-        id = context.id;
-        source = context.sourceId;
-        generation = context.generation;
-        upstreamDoc = context.upstreamDoc;
-        searchDoc = await context.searchDoc();
-        pristineDoc = await context.pristineDoc();
-        refs = await context.references();
-        realms = await context.realms();
-      }
-
-        let sql = 'insert into documents (branch, type, id, search_doc, pristine_doc, upstream_doc, source, generation, refs, realms) values ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10) on conflict on constraint documents_pkey do UPDATE SET search_doc = EXCLUDED.search_doc, pristine_doc = EXCLUDED.pristine_doc, upstream_doc = EXCLUDED.upstream_doc, source = EXCLUDED.source, generation = EXCLUDED.generation, refs = EXCLUDED.refs, realms = EXCLUDED.realms';
-        await this.query(sql, [branch, type, id, searchDoc, pristineDoc, upstreamDoc, source, generation, refs, realms]);
+    let sql = 'insert into documents (branch, type, id, search_doc, pristine_doc, upstream_doc, source, generation, refs, realms) values ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10) on conflict on constraint documents_pkey do UPDATE SET search_doc = EXCLUDED.search_doc, pristine_doc = EXCLUDED.pristine_doc, upstream_doc = EXCLUDED.upstream_doc, source = EXCLUDED.source, generation = EXCLUDED.generation, refs = EXCLUDED.refs, realms = EXCLUDED.realms';
+    await this.query(sql, [branch, type, id, searchDoc, pristineDoc, upstreamDoc, source, generation, refs, realms]);
   }
 
   async deleteOlderGenerations(branch, sourceId, nonce) {
@@ -153,7 +153,7 @@ module.exports = class PgClient {
   async docsThatReference(branch, references, fn){
     const queryBatchSize = 100;
     const rowBatchSize = 100;
-    const sql = 'select upstream_doc from documents where branch=$1 and refs && $2';
+    const sql = 'select upstream_doc, refs from documents where branch=$1 and refs && $2';
     let client = await this.pool.connect();
     try {
       for (let i = 0; i < references.length; i += queryBatchSize){
@@ -163,7 +163,7 @@ module.exports = class PgClient {
         do {
           rows = await readCursor(cursor, rowBatchSize);
           for (let row of rows){
-            await fn(row.upstream_doc);
+            await fn(row.upstream_doc, row.refs);
           }
         } while (rows.length > 0);
       }
@@ -172,26 +172,7 @@ module.exports = class PgClient {
       client.release();
     }
 
-        const sql = 'select upstream_doc, refs from documents where branch=$1 and refs && $2';
-        let client = await this.pool.connect();
-        try {
-            for (let i = 0; i < references.length; i += queryBatchSize){
-                let queryRefs = references.slice(i, i + queryBatchSize);
-                let cursor = client.query(new Cursor(sql, [branch, queryRefs]));
-                let rows;
-                do {
-                    rows = await readCursor(cursor, rowBatchSize);
-                    for (let row of rows){
-                        await fn(row.upstream_doc, row.refs);
-                    }
-                } while (rows.length > 0);
-            }
-        }
-        finally {
-            client.release();
-        }
-
-    }
+  }
 };
 
 function readCursor(cursor, rowCount){

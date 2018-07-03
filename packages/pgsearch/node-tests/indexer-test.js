@@ -172,14 +172,14 @@ describe('pgsearch/indexer', function() {
   });
 
   it('reindexes correctly when related resource is saved before own resource', async function() {
-    let person = await writer.create('master', env.session, 'people', {
+    let { data:person } = await writer.create('master', env.session, 'people', {
       type: 'people',
       attributes: {
         name: 'Quint'
       }
     });
     expect(person).has.deep.property('id');
-    let article = await writer.create('master', env.session, 'articles', {
+    let { data:article } = await writer.create('master', env.session, 'articles', {
       type: 'articles',
       attributes: {
         title: 'Hello World'
@@ -208,14 +208,14 @@ describe('pgsearch/indexer', function() {
   });
 
   it('reindexes correctly when related resource is saved after own resource', async function() {
-    let person = await writer.create('master', env.session, 'people', {
+    let { data:person } = await writer.create('master', env.session, 'people', {
       type: 'people',
       attributes: {
         name: 'Quint'
       }
     });
     expect(person).has.deep.property('id');
-    let article = await writer.create('master', env.session, 'articles', {
+    let { data:article } = await writer.create('master', env.session, 'articles', {
       type: 'articles',
       attributes: {
         title: 'Hello World'
