@@ -2,11 +2,13 @@ const Error = require('@cardstack/plugin-utils/error');
 const log = require('@cardstack/logger')('cardstack/writers');
 const DocumentContext = require('./indexing/document-context');
 const { declareInjections } = require('@cardstack/di');
+const Session = require('@cardstack/plugin-utils/session');
 
 module.exports = declareInjections({
   schema: 'hub:current-schema',
   schemaLoader: 'hub:schema-loader',
   searchers: 'hub:searchers',
+  pgSearchClient: `plugin-client:${require.resolve('@cardstack/pgsearch/client')}`
 },
 
 class Writers {
@@ -33,7 +35,8 @@ class Writers {
         this.schema.invalidateCache();
       }
 
-      // TODO index the search doc
+      await this.pgSearchClient.saveDocument({ context });
+
       return context.pristineDoc();
     } finally {
       if (pending) { await pending.abort();  }
@@ -41,6 +44,7 @@ class Writers {
   }
 
   async update(branch, session, type, id, document) {
+    debugger;
     log.info("updating type=%s id=%s", type, id);
     let schema = await this.schema.forBranch(branch);
     let writer = this._lookupWriter(schema, type);
@@ -59,6 +63,9 @@ class Writers {
       if (newSchema) {
         this.schema.invalidateCache();
       }
+
+      await this.pgSearchClient.saveDocument({ context });
+
       return context.pristineDoc();
     } finally {
       if (pending) { await pending.abort();  }
@@ -74,9 +81,12 @@ class Writers {
     try {
       let newSchema = await schema.validate(pending, { session });
       await pending.finalize();
+
       if (newSchema) {
         this.schema.invalidateCache();
       }
+
+      await this.pgSearchClient.deleteDocument({ branch, type, id });
     } finally {
       if (pending) { await pending.abort();  }
     }
@@ -95,7 +105,18 @@ class Writers {
       id: finalDocument.id,
       upstreamDoc: finalDocument,
       sourceId: contentType.dataSource.id,
-      read: (type, id) => this.searchers.get(session, branch, type, id)
+      read: async (type, id) => {
+        let result;
+        try {
+          result = await this.searchers.get(Session.INTERNAL_PRIVILEGED, branch, type, id);
+        } catch (err) {
+          if (err.status !== 404) { throw err; }
+        }
+
+        if (result && result.data) {
+          return result.data;
+        }
+      }
     });
   }
 

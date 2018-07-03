@@ -648,6 +648,7 @@ describe('schema/auth/read', function() {
     expect(approved.included).not.collectionContains({ type: 'flavors' });
   });
 
+  // TODO need to test this for create and updates too
   it("removes unauthorized attributes from includes", async function(){
     let model = await find('posts', '1');
     let { schema, session } = await withGrants(factory => {
