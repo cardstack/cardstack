@@ -24,14 +24,8 @@ export default class Fixtures {
 
     let models = this._factory.getModels();
 
-    for (let [index, model] of models.entries()) {
+    for (let [, model] of models.entries()) {
       let url = `${hubURL}/api/${model.type}`;
-      if (index < models.length - 1) {
-        // On all but the last api request, we opt in to not waiting
-        // for the content to be indexed. This lets us move faster
-        // and then wait for indexing to happen once at the end.
-        url += '?nowait';
-      }
       let response = await fetch(url, {
         method: 'POST',
         headers: {
@@ -96,16 +90,13 @@ export default class Fixtures {
     }
   }
 
-  async _deleteModel(model, waitForIndexing) {
+  async _deleteModel(model) {
     let version = model.meta && model.meta.version;
     let headers = { authorization: `Bearer ${ciSessionId}` };
     if (version) {
       headers["If-Match"] = version;
     }
     let url = `${hubURL}/api/${model.type}/${model.id}`;
-    if (!waitForIndexing) {
-      url += '?nowait';
-    }
     await fetch(url, {
       method: 'DELETE',
       headers
