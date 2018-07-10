@@ -204,6 +204,14 @@ module.exports = class PgClient {
     let refs = await context.references();
     let realms = await context.realms();
 
+    if (touched) {
+      touched[`${type}/${id}`] = touchCounter++;
+    }
+
+    if (!searchDoc) {
+      return;
+    }
+
     let sql = 'insert into documents (branch, type, id, search_doc, pristine_doc, upstream_doc, source, generation, refs, realms) values ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10) on conflict on constraint documents_pkey do UPDATE SET search_doc = EXCLUDED.search_doc, pristine_doc = EXCLUDED.pristine_doc, upstream_doc = EXCLUDED.upstream_doc, source = EXCLUDED.source, generation = EXCLUDED.generation, refs = EXCLUDED.refs, realms = EXCLUDED.realms';
     await this.query(sql, [branch, type, id, searchDoc, pristineDoc, upstreamDoc, source, generation, refs, realms]);
   }

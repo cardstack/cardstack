@@ -38,7 +38,8 @@ class Writers {
         this.schema.invalidateCache();
       }
 
-      await this.pgSearchClient.saveDocument(context);
+      await this.pgSearchClient.saveDocument({ context });
+      await this._invalidations(context);
 
       pristine = await context.pristineDoc();
     } finally {
@@ -71,7 +72,8 @@ class Writers {
         this.schema.invalidateCache();
       }
 
-      await this.pgSearchClient.saveDocument(context);
+      await this.pgSearchClient.saveDocument({ context });
+      await this._invalidations(context);
 
       pristine = await context.pristineDoc();
     } finally {
@@ -115,19 +117,37 @@ class Writers {
       sourceId,
       id: finalDocument.id,
       upstreamDoc: finalDocument,
-      read: async (type, id) => {
-        let result;
-        try {
-          result = await this.searchers.get(Session.INTERNAL_PRIVILEGED, branch, type, id);
-        } catch (err) {
-          if (err.status !== 404) { throw err; }
-        }
-
-        if (result && result.data) {
-          return result.data;
-        }
-      }
+      read: this._read(branch)
     });
+  }
+
+  async _invalidations(context) {
+    let touchCounter = 0;
+    let touched = {
+      [`${context.type}/${context.id}`]: touchCounter++
+    };
+    await this.pgSearchClient.invalidations({
+      touched: touched,
+      touchCounter: touchCounter,
+      schema: context.schema,
+      branch: context.branch,
+      read: this._read(context.branch)
+    });
+  }
+
+  _read(branch) {
+    return async (type, id) => {
+      let result;
+      try {
+        result = await this.searchers.get(Session.INTERNAL_PRIVILEGED, branch, type, id);
+      } catch (err) {
+        if (err.status !== 404) { throw err; }
+      }
+
+      if (result && result.data) {
+        return result.data;
+      }
+    };
   }
 
   _getSchemaDetailsForType(schema, type) {
