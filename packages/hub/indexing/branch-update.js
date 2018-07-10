@@ -99,7 +99,19 @@ class BranchUpdate {
       let newMeta = await updater.updateContent(meta, hints, publicOps, this.uncachedRead);
       await this._saveMeta(updater, newMeta);
     }
-    await this._invalidations();
+    await this.client.invalidations({
+      touched: this._touched,
+      touchCounter: this._touchCounter,
+      schema: await this.schema(),
+      branch: this.branch,
+      read: (type, id) => this.read(type, id),
+      wasInvalidated: async ({ operation, type, id, doc, sourceId, nonce }) => {
+        this.emitEvent(operation, { type, id, doc });
+        if (operation === 'add' && this.isControllingBranch) {
+          await this._maybeUpdateRealms(type, id, doc, sourceId, nonce);
+        }
+      }
+    });
   }
 
   async _loadMeta(updater) {
@@ -118,52 +130,6 @@ class BranchUpdate {
         branch: this.branch,
         id: owningDataSource.get(updater).id,
         params: newMeta
-    });
-  }
-
-  _isInvalidated(type, id, refs) {
-    let key = `${type}/${id}`;
-    let docTouchedAt = this._touched[key];
-    if (docTouchedAt == null) {
-      // our document hasn't been updated at all, so it definitely needs to be redone
-      return true;
-    }
-    for (let ref of refs) {
-      let refTouchedAt = this._touched[ref];
-      if (refTouchedAt != null && refTouchedAt > docTouchedAt) {
-        // we found one of our references that was touched later than us, so we
-        // need to be redone
-        return true;
-      }
-    }
-    return false;
-  }
-
-  // This method does not need to recursively invalidate, because each
-  // document stores a complete, rolled-up picture of which other
-  // documents it references.
-  async _invalidations() {
-    let schema = await this.schema();
-    await this.client.docsThatReference(this.branch, Object.keys(this._touched), async (doc, refs) => {
-      let { type, id } = doc;
-
-      if (this._isInvalidated(type, id, refs)) {
-        if (type === 'user-realms') {
-          // if we have an invalidated user-realms and it hasn't
-          // already been touched, that's because the corresponding
-          // user was delete, so we should also delete the
-          // user-realms.
-          await this.delete(type, id);
-        } else {
-          let sourceId = schema.types.get(type).dataSource.id;
-          // this is correct because IF this document's data source is currently
-          // doing a replace-all operation, it was either already touched (so
-          // this code isn't running) or it's old (so it's correct to have a
-          // non-current nonce).
-          let nonce = 0;
-          await this.add(type, id, doc, sourceId, nonce);
-        }
-      }
     });
   }
 
@@ -215,7 +181,7 @@ class BranchUpdate {
       // us, so all we need to do here is nothing.
       return;
     }
-    await this.client.saveDocument(context);
+    await this.client.saveDocument({ context });
     this.emitEvent('add', { type, id, doc });
     log.debug("save %s %s", type, id);
     if (this.isControllingBranch) {

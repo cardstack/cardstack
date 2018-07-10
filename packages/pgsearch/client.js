@@ -3,6 +3,7 @@ const { Pool, Client } = require('pg');
 const Cursor = require('pg-cursor');
 const migrate = require('node-pg-migrate').default;
 const log = require('@cardstack/logger')('cardstack/pgsearch');
+const DocumentContext = require('@cardstack/hub/indexing/document-context');
 const { join } = require('path');
 
 // TODO: once our migrations is complete, rename this env var everywhere because
@@ -117,7 +118,81 @@ module.exports = class PgClient {
     }
   }
 
-  async saveDocument(context) {
+  // This method does not need to recursively invalidate, because each
+  // document stores a complete, rolled-up picture of which other
+  // documents it references.
+  async invalidations({ schema, branch, read, wasInvalidated, touched, touchCounter }) {
+    await this.docsThatReference(branch, Object.keys(touched), async (doc, refs) => {
+      let { type, id } = doc;
+
+      if (this._isInvalidated(touched, type, id, refs)) {
+        if (type === 'user-realms') {
+          // if we have an invalidated user-realms and it hasn't
+          // already been touched, that's because the corresponding
+          // user was delete, so we should also delete the
+          // user-realms.
+          await this.deleteDocument({ branch, type, id, touched, touchCounter });
+          log.debug("delete %s %s", type, id);
+
+          let operation = 'delete';
+          if (typeof wasInvalidated === 'function') {
+            await wasInvalidated({ operation, type, id, doc });
+          }
+        } else {
+          let sourceId = schema.types.get(type).dataSource.id;
+          // this is correct because IF this document's data source is currently
+          // doing a replace-all operation, it was either already touched (so
+          // this code isn't running) or it's old (so it's correct to have a
+          // non-current nonce).
+          let nonce = 0;
+          // await this.add(type, id, doc, sourceId, nonce);
+          let context = new DocumentContext({
+            schema,
+            type,
+            id,
+            sourceId,
+            generation: nonce,
+            upstreamDoc: doc,
+            branch: branch,
+            read: (type, id) => read(type, id)
+          });
+          let searchDoc = await context.searchDoc();
+          if (!searchDoc) {
+            // bad documents get ignored. The DocumentContext logs these for
+            // us, so all we need to do here is nothing.
+            return;
+          }
+          await this.saveDocument({ context, touched, touchCounter });
+          log.debug("save %s %s", type, id);
+
+          let operation = 'add';
+          if (typeof wasInvalidated === 'function') {
+            await wasInvalidated({ operation, type, id, doc, sourceId, nonce });
+          }
+        }
+      }
+    });
+  }
+
+  _isInvalidated(touched, type, id, refs) {
+    let key = `${type}/${id}`;
+    let docTouchedAt = touched[key];
+    if (docTouchedAt == null) {
+      // our document hasn't been updated at all, so it definitely needs to be redone
+      return true;
+    }
+    for (let ref of refs) {
+      let refTouchedAt = touched[ref];
+      if (refTouchedAt != null && refTouchedAt > docTouchedAt) {
+        // we found one of our references that was touched later than us, so we
+        // need to be redone
+        return true;
+      }
+    }
+    return false;
+  }
+
+  async saveDocument({ context, touched, touchCounter }) {
     let branch = context.branch;
     let type = context.type;
     let id = context.id;
@@ -138,7 +213,10 @@ module.exports = class PgClient {
     await this.query(sql, [nonce, sourceId, branch]);
   }
 
-  async deleteDocument({ branch, type, id }) {
+  async deleteDocument({ branch, type, id, touched, touchCounter }) {
+    if (touched) {
+      touched[`${type}/${id}`] = touchCounter++;
+    }
     let sql = 'delete from documents where branch=$1 and type=$2 and id=$3';
     await this.query(sql, [branch, type, id]);
   }

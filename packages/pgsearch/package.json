@@ -13,6 +13,7 @@
     "@cardstack/di": "^0.8.0",
     "@cardstack/logger": "^0.1.0",
     "@cardstack/plugin-utils": "0.8.0",
+    "@cardstack/hub": "0.8.3",
     "node-pg-migrate": "3.5.0",
     "pg": "^7.0.3",
     "pg-cursor": "^1.3.0"
