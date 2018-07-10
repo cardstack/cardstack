@@ -3380,6 +3380,12 @@ elliptic@^6.0.0, elliptic@^6.4.0:
     minimalistic-assert "^1.0.0"
     minimalistic-crypto-utils "^1.0.0"
 
+ember-ajax@^3.0.0:
+  version "3.1.0"
+  resolved "https://registry.yarnpkg.com/ember-ajax/-/ember-ajax-3.1.0.tgz#3db36e67357ef447639517656aeac4bb13e73a9c"
+  dependencies:
+    ember-cli-babel "^6.6.0"
+
 ember-basic-dropdown@^1.0.0:
   version "1.0.2"
   resolved "https://registry.yarnpkg.com/ember-basic-dropdown/-/ember-basic-dropdown-1.0.2.tgz#2ccd62a2a4e9bc91abdb69e04a4844ba4cfa90ed"
@@ -3461,6 +3467,16 @@ ember-cli-broccoli-sane-watcher@^2.0.4:
     heimdalljs-logger "^0.1.7"
     rsvp "^3.0.18"
     sane "^1.1.1"
+
+ember-cli-dependency-checker@^2.0.0:
+  version "2.2.1"
+  resolved "https://registry.yarnpkg.com/ember-cli-dependency-checker/-/ember-cli-dependency-checker-2.2.1.tgz#1eb728258dc7d528951c391d39b365e1beedecca"
+  dependencies:
+    chalk "^2.3.0"
+    find-yarn-workspace-root "^1.1.0"
+    is-git-url "^1.0.0"
+    resolve "^1.5.0"
+    semver "^5.3.0"
 
 ember-cli-dependency-checker@^2.1.0:
   version "2.1.0"
@@ -3741,6 +3757,93 @@ ember-cli@3.0.0:
 ember-cli@^3.0.0:
   version "3.0.2"
   resolved "https://registry.yarnpkg.com/ember-cli/-/ember-cli-3.0.2.tgz#2272a2b2ffd9932cae247130d148aded60b446e7"
+  dependencies:
+    amd-name-resolver "1.0.0"
+    babel-plugin-transform-es2015-modules-amd "^6.24.0"
+    bower-config "^1.3.0"
+    bower-endpoint-parser "0.2.2"
+    broccoli-babel-transpiler "^6.0.0"
+    broccoli-builder "^0.18.8"
+    broccoli-concat "^3.2.2"
+    broccoli-config-loader "^1.0.0"
+    broccoli-config-replace "^1.1.2"
+    broccoli-debug "^0.6.3"
+    broccoli-funnel "^2.0.0"
+    broccoli-funnel-reducer "^1.0.0"
+    broccoli-merge-trees "^2.0.0"
+    broccoli-middleware "^1.2.1"
+    broccoli-source "^1.1.0"
+    broccoli-stew "^1.2.0"
+    calculate-cache-key-for-tree "^1.0.0"
+    capture-exit "^1.1.0"
+    chalk "^2.0.1"
+    clean-base-url "^1.0.0"
+    compression "^1.4.4"
+    configstore "^3.0.0"
+    console-ui "^2.1.0"
+    core-object "^3.1.3"
+    dag-map "^2.0.2"
+    diff "^3.2.0"
+    ember-cli-broccoli-sane-watcher "^2.0.4"
+    ember-cli-is-package-missing "^1.0.0"
+    ember-cli-lodash-subset "^2.0.1"
+    ember-cli-normalize-entity-name "^1.0.0"
+    ember-cli-preprocess-registry "^3.1.0"
+    ember-cli-string-utils "^1.0.0"
+    ensure-posix-path "^1.0.2"
+    execa "^0.8.0"
+    exists-sync "0.0.4"
+    exit "^0.1.2"
+    express "^4.12.3"
+    filesize "^3.1.3"
+    find-up "^2.1.0"
+    fs-extra "^4.0.0"
+    fs-tree-diff "^0.5.2"
+    get-caller-file "^1.0.0"
+    git-repo-info "^1.4.1"
+    glob "7.1.1"
+    heimdalljs "^0.2.3"
+    heimdalljs-fs-monitor "^0.1.0"
+    heimdalljs-graph "^0.3.1"
+    heimdalljs-logger "^0.1.7"
+    http-proxy "^1.9.0"
+    inflection "^1.7.0"
+    is-git-url "^1.0.0"
+    isbinaryfile "^3.0.0"
+    js-yaml "^3.6.1"
+    json-stable-stringify "^1.0.1"
+    leek "0.0.24"
+    lodash.template "^4.2.5"
+    markdown-it "^8.3.0"
+    markdown-it-terminal "0.1.0"
+    minimatch "^3.0.0"
+    morgan "^1.8.1"
+    node-modules-path "^1.0.0"
+    nopt "^3.0.6"
+    npm-package-arg "^6.0.0"
+    portfinder "^1.0.7"
+    promise-map-series "^0.2.1"
+    quick-temp "^0.1.8"
+    resolve "^1.3.0"
+    rsvp "^4.7.0"
+    sane "^2.2.0"
+    semver "^5.1.1"
+    silent-error "^1.0.0"
+    sort-package-json "^1.4.0"
+    symlink-or-copy "^1.1.8"
+    temp "0.8.3"
+    testem "^2.0.0"
+    tiny-lr "^1.0.3"
+    tree-sync "^1.2.1"
+    uuid "^3.0.0"
+    validate-npm-package-name "^3.0.0"
+    walk-sync "^0.3.0"
+    watch-detector "^0.1.0"
+    yam "0.0.22"
+
+ember-cli@~3.0.2:
+  version "3.0.4"
+  resolved "https://registry.yarnpkg.com/ember-cli/-/ember-cli-3.0.4.tgz#89275dd59994c64fa0ed5dcec24c83cd2935320b"
   dependencies:
     amd-name-resolver "1.0.0"
     babel-plugin-transform-es2015-modules-amd "^6.24.0"
@@ -5088,6 +5191,13 @@ find-up@^2.0.0, find-up@^2.1.0:
   dependencies:
     locate-path "^2.0.0"
 
+find-yarn-workspace-root@^1.1.0:
+  version "1.2.0"
+  resolved "https://registry.yarnpkg.com/find-yarn-workspace-root/-/find-yarn-workspace-root-1.2.0.tgz#c7468a8b42bf290b5d036cd3b0d5bf97b09ffc7e"
+  dependencies:
+    fs-extra "^4.0.3"
+    micromatch "^3.1.4"
+
 findup-sync@2.0.0:
   version "2.0.0"
   resolved "https://registry.yarnpkg.com/findup-sync/-/findup-sync-2.0.0.tgz#9326b1488c22d1a6088650a86901b2d9a90a2cbc"
@@ -5251,6 +5361,14 @@ fs-extra@^3.0.1:
 fs-extra@^4.0.0, fs-extra@^4.0.2:
   version "4.0.2"
   resolved "https://registry.yarnpkg.com/fs-extra/-/fs-extra-4.0.2.tgz#f91704c53d1b461f893452b0c307d9997647ab6b"
+  dependencies:
+    graceful-fs "^4.1.2"
+    jsonfile "^4.0.0"
+    universalify "^0.1.0"
+
+fs-extra@^4.0.3:
+  version "4.0.3"
+  resolved "https://registry.yarnpkg.com/fs-extra/-/fs-extra-4.0.3.tgz#0d852122e5bc5beb453fb028e9c0c9bf36340c94"
   dependencies:
     graceful-fs "^4.1.2"
     jsonfile "^4.0.0"
