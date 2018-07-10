@@ -5,84 +5,95 @@ const {
   destroyDefaultEnvironment
 } = require('../../../tests/stub-searcher/node_modules/@cardstack/test-support/env');
 
-describe('schema/auth/read', function() {
+let env, baseSchema, searchers, writers;
 
-  let env, baseSchema, searchers;
+async function create(session, document) {
+  return writers.create('master', session, document.type, document);
+}
 
-  async function find(type, id) {
-    return searchers.get(Session.INTERNAL_PRIVILEGED, 'master', type, id);
-  }
+async function update(session, document) {
+  return writers.update('master', session, document.type, document.id, document);
+}
 
-  async function findAll(type) {
-    return searchers.search(Session.INTERNAL_PRIVILEGED, 'master', { filter: { type } });
-  }
+async function find(type, id) {
+  return searchers.get(Session.INTERNAL_PRIVILEGED, 'master', type, id);
+}
 
-  function makeSession(schema, { type, id }) {
-    let ownRealm = Session.encodeBaseRealm(type, id);
-    return new Session({ type, id }, {
-      get(type, id) {
-        if (type === 'user-realms' && id === ownRealm) {
-          return schema.userRealms({ type, id });
-        }
-      }
-    });
-  }
+async function findAll(type) {
+  return searchers.search(Session.INTERNAL_PRIVILEGED, 'master', { filter: { type } });
+}
 
-  async function withGrants(fn) {
-    let factory = new JSONAPIFactory();
-
-    fn(factory);
-
-    for (let model of factory.getModels()) {
-      if (model.type === 'grants') {
-        let resource = factory.getResource('grants', model.id);
-        resource.withRelated('who', [{ type: 'test-users', id: 'session-with-grants' }]);
+function makeSession(schema, { type, id }) {
+  let ownRealm = Session.encodeBaseRealm(type, id);
+  return new Session({ type, id }, {
+    get(type, id) {
+      if (type === 'user-realms' && id === ownRealm) {
+        return schema.userRealms({ type, id });
       }
     }
+  });
+}
 
-    let schema = await baseSchema.applyChanges(factory.getModels().map(model => ({ type: model.type, id: model.id, document: model })));
-    let session = makeSession(schema, { type: 'test-users', id: 'session-with-grants' });
-    return { schema, session };
+async function withGrants(fn) {
+  let factory = new JSONAPIFactory();
+
+  fn && fn(factory);
+
+  for (let model of factory.getModels()) {
+    if (model.type === 'grants') {
+      let resource = factory.getResource('grants', model.id);
+      resource.withRelated('who', [{ type: 'test-users', id: 'session-with-grants' }]);
+    }
   }
+
+  let schema = await baseSchema.applyChanges(factory.getModels().map(model => ({ type: model.type, id: model.id, document: model })));
+  let session = makeSession(schema, { type: 'test-users', id: 'session-with-grants' });
+  return { schema, session };
+}
+
+function createSchema(factory) {
+  factory.addResource('content-types', 'posts')
+    .withAttributes({
+      defaultIncludes: ['tags', 'author', 'author.flavor']
+    })
+    .withRelated('fields', [
+      factory.addResource('fields', 'title').withAttributes({
+        fieldType: '@cardstack/core-types::string'
+      }),
+      factory.addResource('fields', 'subtitle').withAttributes({
+        fieldType: '@cardstack/core-types::string'
+      }),
+      factory.addResource('fields', 'author').withAttributes({
+        fieldType: '@cardstack/core-types::belongs-to'
+      }).withRelated('related-types', [
+        factory.addResource('content-types', 'authors').withRelated('fields', [
+          factory.addResource('fields', 'name').withAttributes({
+            fieldType: '@cardstack/core-types::string'
+          }),
+          factory.addResource('fields', 'flavor').withAttributes({
+            fieldType: '@cardstack/core-types::belongs-to'
+          }).withRelated('related-types', [
+            factory.addResource('content-types', 'flavors')
+          ])
+        ])
+      ]),
+      factory.addResource('fields', 'tags').withAttributes({
+        fieldType: '@cardstack/core-types::has-many'
+      }).withRelated('related-types', [
+        factory.addResource('content-types', 'tags')
+      ]),
+      factory.addResource('fields', 'collaborators').withAttributes({
+        fieldType: '@cardstack/core-types::has-many'
+      }).withRelated('related-types', [ factory.getResource('content-types', 'authors') ])
+    ]);
+}
+
+describe('schema/auth/read', function() {
 
   before(async function() {
     let factory = new JSONAPIFactory();
 
-    factory.addResource('content-types', 'posts')
-      .withAttributes({
-        defaultIncludes: ['tags', 'author', 'author.flavor']
-      })
-      .withRelated('fields', [
-        factory.addResource('fields', 'title').withAttributes({
-          fieldType: '@cardstack/core-types::string'
-        }),
-        factory.addResource('fields', 'subtitle').withAttributes({
-          fieldType: '@cardstack/core-types::string'
-        }),
-        factory.addResource('fields', 'author').withAttributes({
-          fieldType: '@cardstack/core-types::belongs-to'
-        }).withRelated('related-types', [
-          factory.addResource('content-types', 'authors').withRelated('fields', [
-            factory.addResource('fields', 'name').withAttributes({
-              fieldType: '@cardstack/core-types::string'
-            }),
-            factory.addResource('fields', 'flavor').withAttributes({
-              fieldType: '@cardstack/core-types::belongs-to'
-            }).withRelated('related-types', [
-              factory.addResource('content-types', 'flavors')
-            ])
-          ])
-        ]),
-        factory.addResource('fields', 'tags').withAttributes({
-          fieldType: '@cardstack/core-types::has-many'
-        }).withRelated('related-types', [
-          factory.addResource('content-types', 'tags')
-        ]),
-        factory.addResource('fields', 'collaborators').withAttributes({
-          fieldType: '@cardstack/core-types::has-many'
-        }).withRelated('related-types', [ factory.getResource('content-types', 'authors') ])
-      ]);
-
+    createSchema(factory);
 
     factory.addResource('posts', '1').withAttributes({
       title: 'First Post',
@@ -170,6 +181,7 @@ describe('schema/auth/read', function() {
     env = await createDefaultEnvironment(`${__dirname}/../../../tests/stub-project`, factory.getModels());
     baseSchema = await env.lookup('hub:current-schema').forControllingBranch();
     searchers = env.lookup('hub:searchers');
+    writers = env.lookup('hub:writers');
   });
 
   after(async function() {
@@ -898,6 +910,144 @@ describe('schema/auth/read', function() {
     let session = makeSession(schema, { type: 'authors', id: '1' });
     let approved = await schema.applyReadAuthorization(model, { session });
     expect(approved).to.be.undefined;
+  });
+
+});
+
+describe('with grants for resource creation/update', function() {
+  before(async function() {
+    let factory = new JSONAPIFactory();
+
+    createSchema(factory);
+
+    factory.addResource('grants')
+      .withRelated('who', [{ type: 'test-users', id: 'session-with-grants' }])
+      .withRelated('types', [
+        { type: 'content-types', id: 'posts' },
+      ])
+      .withAttributes({
+        mayReadResource: true,
+        mayReadFields: true,
+        mayCreateResource: true,
+        mayUpdateResource: true,
+        mayWriteFields: true,
+      });
+
+    factory.addResource('grants')
+      .withRelated('who', [{ type: 'test-users', id: 'session-with-grants' }])
+      .withRelated('types', [
+        { type: 'content-types', id: 'authors' }
+      ])
+      .withAttributes({
+        mayReadResource: true,
+      });
+
+    env = await createDefaultEnvironment(`${__dirname}/../../../tests/stub-project`, factory.getModels());
+    baseSchema = await env.lookup('hub:current-schema').forControllingBranch();
+    searchers = env.lookup('hub:searchers');
+    writers = env.lookup('hub:writers');
+  });
+
+  after(async function() {
+    if (env) {
+      await destroyDefaultEnvironment(env);
+    }
+  });
+
+  it("removed unauthorized attributes from includes during create", async function() {
+    let author = await create(Session.INTERNAL_PRIVILEGED, {
+      type: 'authors',
+      attributes: {
+        name: 'Van Gogh'
+      }
+    });
+
+    let { session } = await withGrants();
+
+    let post = await create(session, {
+      type: 'posts',
+      attributes: {
+        title: 'my post',
+        subtitle: 'grape nuts'
+      },
+      relationships: {
+        author: {
+          data: { type: 'authors', id: author.data.id }
+        }
+      }
+    });
+
+    expect(post.included).has.length(1);
+    expect(post.included[0]).has.deep.property('type', 'authors');
+    expect(post.included[0]).not.has.deep.property('attributes.name');
+  });
+
+  it("removed unauthorized attributes from includes during update", async function() {
+    let author = await create(Session.INTERNAL_PRIVILEGED, {
+      type: 'authors',
+      attributes: {
+        name: 'Van Gogh'
+      }
+    });
+    let author2 = await create(Session.INTERNAL_PRIVILEGED, {
+      type: 'authors',
+      attributes: {
+        name: 'Ringo'
+      }
+    });
+
+    let { data: post } = await create(Session.INTERNAL_PRIVILEGED, {
+      type: 'posts',
+      attributes: {
+        title: 'my post',
+        subtitle: 'grape nuts'
+      },
+      relationships: {
+        author: {
+          data: { type: 'authors', id: author.data.id }
+        }
+      }
+    });
+
+    post.relationships.author.data = { type: 'authors', id: author2.data.id };
+
+    let { session } = await withGrants();
+    post = await update(session, post);
+
+    expect(post.included).has.length(1);
+    expect(post.included[0]).has.deep.property('type', 'authors');
+    expect(post.included[0]).not.has.deep.property('attributes.name');
+  });
+
+  it("removed unauthorized attributes, even if unchanged, from includes during update", async function() {
+    let author = await create(Session.INTERNAL_PRIVILEGED, {
+      type: 'authors',
+      attributes: {
+        name: 'Van Gogh'
+      }
+    });
+
+    let { data: post } = await create(Session.INTERNAL_PRIVILEGED, {
+      type: 'posts',
+      attributes: {
+        title: 'my post',
+        subtitle: 'grape nuts'
+      },
+      relationships: {
+        author: {
+          data: { type: 'authors', id: author.data.id }
+        }
+      }
+    });
+
+    post.attributes.title = 'foo';
+
+    let { session } = await withGrants();
+    post = await update(session, post);
+
+    expect(post.included).has.length(1);
+    expect(post.included[0]).has.deep.property('type', 'authors');
+    expect(post.included[0]).not.has.deep.property('attributes.name');
   });
 
 });

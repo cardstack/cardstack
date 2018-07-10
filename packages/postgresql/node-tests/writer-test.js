@@ -107,7 +107,7 @@ describe('postgresql/writer', function() {
   });
 
   it('can create new record', async function() {
-    let created = await writer.create('master', sessions.create('test-users', 'create-only'), 'articles', {
+    let { data:created } = await writer.create('master', sessions.create('test-users', 'create-only'), 'articles', {
       type: 'articles',
       attributes: {
         title: 'I was created',
@@ -163,7 +163,7 @@ describe('postgresql/writer', function() {
   });
 
   it('can create new record with user-provided id', async function() {
-    let created = await writer.create('master', sessions.create('test-users', 'create-only'), 'articles', {
+    let { data:created } = await writer.create('master', sessions.create('test-users', 'create-only'), 'articles', {
       type: 'articles',
       id: '42',
       attributes: {
@@ -213,7 +213,7 @@ describe('postgresql/writer', function() {
   });
 
   it('returns full record from update', async function() {
-    let updated = await writer.update('master', sessions.create('test-users', 'update-only'), 'articles', '0', {
+    let { data:updated } = await writer.update('master', sessions.create('test-users', 'update-only'), 'articles', '0', {
       type: 'articles',
       id: '0',
       attributes: {

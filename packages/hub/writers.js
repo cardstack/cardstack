@@ -1,10 +1,14 @@
 const Error = require('@cardstack/plugin-utils/error');
 const log = require('@cardstack/logger')('cardstack/writers');
+const DocumentContext = require('./indexing/document-context');
 const { declareInjections } = require('@cardstack/di');
+const Session = require('@cardstack/plugin-utils/session');
 
 module.exports = declareInjections({
   schema: 'hub:current-schema',
-  schemaLoader: 'hub:schema-loader'
+  schemaLoader: 'hub:schema-loader',
+  searchers: 'hub:searchers',
+  pgSearchClient: `plugin-client:${require.resolve('@cardstack/pgsearch/client')}`
 },
 
 class Writers {
@@ -14,8 +18,10 @@ class Writers {
 
   async create(branch, session, type, document) {
     log.info("creating type=%s", type);
+    await this.pgSearchClient.ensureDatabaseSetup();
+
     let schema = await this.schema.forBranch(branch);
-    let writer = this._lookupWriter(schema, type);
+    let { writer, sourceId } = this._getSchemaDetailsForType(schema, type);
     let isSchema = this.schemaTypes.includes(type);
     let pending = await writer.prepareCreate(
       branch,
@@ -24,22 +30,30 @@ class Writers {
       schema.withOnlyRealFields(document),
       isSchema
     );
+    let pristine;
     try {
       let newSchema = await schema.validate(pending, { type, session });
-      let response = await this._finalizeAndReply(pending);
+      let context = await this._finalize(pending, branch, type, schema, sourceId);
       if (newSchema) {
         this.schema.invalidateCache();
       }
-      return response;
+
+      await this.pgSearchClient.saveDocument(context);
+
+      pristine = await context.pristineDoc();
     } finally {
       if (pending) { await pending.abort();  }
     }
+
+    return schema.applyReadAuthorization(pristine, { session });
   }
 
   async update(branch, session, type, id, document) {
     log.info("updating type=%s id=%s", type, id);
+    await this.pgSearchClient.ensureDatabaseSetup();
+
     let schema = await this.schema.forBranch(branch);
-    let writer = this._lookupWriter(schema, type);
+    let { writer, sourceId } = this._getSchemaDetailsForType(schema, type);
     let isSchema = this.schemaTypes.includes(type);
     let pending = await writer.prepareUpdate(
       branch,
@@ -49,53 +63,74 @@ class Writers {
       schema.withOnlyRealFields(document),
       isSchema
     );
+    let pristine;
     try {
       let newSchema = await schema.validate(pending, { type, id, session });
-      let response = await this._finalizeAndReply(pending);
+      let context = await this._finalize(pending, branch, type, schema, sourceId);
       if (newSchema) {
         this.schema.invalidateCache();
       }
-      return response;
+
+      await this.pgSearchClient.saveDocument(context);
+
+      pristine = await context.pristineDoc();
     } finally {
       if (pending) { await pending.abort();  }
     }
+
+    return schema.applyReadAuthorization(pristine, { session });
   }
 
   async delete(branch, session, version, type, id) {
     log.info("deleting type=%s id=%s", type, id);
+    await this.pgSearchClient.ensureDatabaseSetup();
+
     let schema = await this.schema.forBranch(branch);
-    let writer = this._lookupWriter(schema, type);
+    let { writer } = this._getSchemaDetailsForType(schema, type);
     let isSchema = this.schemaTypes.includes(type);
     let pending = await writer.prepareDelete(branch, session, version, type, id, isSchema);
     try {
       let newSchema = await schema.validate(pending, { session });
       await pending.finalize();
+
       if (newSchema) {
         this.schema.invalidateCache();
       }
+
+      await this.pgSearchClient.deleteDocument({ branch, type, id });
     } finally {
       if (pending) { await pending.abort();  }
     }
   }
 
-  async _finalizeAndReply(pending) {
+  async _finalize(pending, branch, type, schema, sourceId) {
     let meta = await pending.finalize();
     let finalDocument = pending.finalDocument;
-    let responseDocument = {
+    finalDocument.meta = meta;
+
+    return new DocumentContext({
+      type,
+      branch,
+      schema,
+      sourceId,
       id: finalDocument.id,
-      type: finalDocument.type,
-      meta
-    };
-    if (finalDocument.attributes) {
-      responseDocument.attributes = finalDocument.attributes;
-    }
-    if (finalDocument.relationships) {
-      responseDocument.relationships = finalDocument.relationships;
-    }
-    return responseDocument;
+      upstreamDoc: finalDocument,
+      read: async (type, id) => {
+        let result;
+        try {
+          result = await this.searchers.get(Session.INTERNAL_PRIVILEGED, branch, type, id);
+        } catch (err) {
+          if (err.status !== 404) { throw err; }
+        }
+
+        if (result && result.data) {
+          return result.data;
+        }
+      }
+    });
   }
 
-  _lookupWriter(schema, type) {
+  _getSchemaDetailsForType(schema, type) {
     let contentType = schema.types.get(type);
     let writer;
     if (!contentType || !contentType.dataSource || !(writer = contentType.dataSource.writer)) {
@@ -106,6 +141,8 @@ class Writers {
         title: "Not a writable type"
       });
     }
-    return writer;
+
+    let sourceId = contentType.dataSource.id;
+    return { writer, sourceId };
   }
 });
