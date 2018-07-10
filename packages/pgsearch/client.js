@@ -117,19 +117,17 @@ module.exports = class PgClient {
     }
   }
 
-  async saveDocument({ context, branch, type, id, searchDoc, pristineDoc, upstreamDoc, source, generation, refs, realms }) {
-    if (context) {
-      branch = context.branch;
-      type = context.type;
-      id = context.id;
-      source = context.sourceId;
-      generation = context.generation;
-      upstreamDoc = context.upstreamDoc;
-      searchDoc = await context.searchDoc();
-      pristineDoc = await context.pristineDoc();
-      refs = await context.references();
-      realms = await context.realms();
-    }
+  async saveDocument(context) {
+    let branch = context.branch;
+    let type = context.type;
+    let id = context.id;
+    let source = context.sourceId;
+    let generation = context.generation;
+    let upstreamDoc = context.upstreamDoc;
+    let searchDoc = await context.searchDoc();
+    let pristineDoc = await context.pristineDoc();
+    let refs = await context.references();
+    let realms = await context.realms();
 
     let sql = 'insert into documents (branch, type, id, search_doc, pristine_doc, upstream_doc, source, generation, refs, realms) values ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10) on conflict on constraint documents_pkey do UPDATE SET search_doc = EXCLUDED.search_doc, pristine_doc = EXCLUDED.pristine_doc, upstream_doc = EXCLUDED.upstream_doc, source = EXCLUDED.source, generation = EXCLUDED.generation, refs = EXCLUDED.refs, realms = EXCLUDED.realms';
     await this.query(sql, [branch, type, id, searchDoc, pristineDoc, upstreamDoc, source, generation, refs, realms]);

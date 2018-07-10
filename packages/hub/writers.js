@@ -21,7 +21,7 @@ class Writers {
     await this.pgSearchClient.ensureDatabaseSetup();
 
     let schema = await this.schema.forBranch(branch);
-    let writer = this._lookupWriter(schema, type);
+    let { writer, sourceId } = this._getSchemaDetailsForType(schema, type);
     let isSchema = this.schemaTypes.includes(type);
     let pending = await writer.prepareCreate(
       branch,
@@ -30,19 +30,22 @@ class Writers {
       schema.withOnlyRealFields(document),
       isSchema
     );
+    let pristine;
     try {
       let newSchema = await schema.validate(pending, { type, session });
-      let context = await this._finalizeAndReply(pending, branch, session, type, schema);
+      let context = await this._finalize(pending, branch, type, schema, sourceId);
       if (newSchema) {
         this.schema.invalidateCache();
       }
 
-      await this.pgSearchClient.saveDocument({ context });
+      await this.pgSearchClient.saveDocument(context);
 
-      return context.pristineDoc();
+      pristine = await context.pristineDoc();
     } finally {
       if (pending) { await pending.abort();  }
     }
+
+    return schema.applyReadAuthorization(pristine, { session });
   }
 
   async update(branch, session, type, id, document) {
@@ -50,7 +53,7 @@ class Writers {
     await this.pgSearchClient.ensureDatabaseSetup();
 
     let schema = await this.schema.forBranch(branch);
-    let writer = this._lookupWriter(schema, type);
+    let { writer, sourceId } = this._getSchemaDetailsForType(schema, type);
     let isSchema = this.schemaTypes.includes(type);
     let pending = await writer.prepareUpdate(
       branch,
@@ -60,19 +63,22 @@ class Writers {
       schema.withOnlyRealFields(document),
       isSchema
     );
+    let pristine;
     try {
       let newSchema = await schema.validate(pending, { type, id, session });
-      let context = await this._finalizeAndReply(pending, branch, session, type, schema);
+      let context = await this._finalize(pending, branch, type, schema, sourceId);
       if (newSchema) {
         this.schema.invalidateCache();
       }
 
-      await this.pgSearchClient.saveDocument({ context });
+      await this.pgSearchClient.saveDocument(context);
 
-      return context.pristineDoc();
+      pristine = await context.pristineDoc();
     } finally {
       if (pending) { await pending.abort();  }
     }
+
+    return schema.applyReadAuthorization(pristine, { session });
   }
 
   async delete(branch, session, version, type, id) {
@@ -80,7 +86,7 @@ class Writers {
     await this.pgSearchClient.ensureDatabaseSetup();
 
     let schema = await this.schema.forBranch(branch);
-    let writer = this._lookupWriter(schema, type);
+    let { writer } = this._getSchemaDetailsForType(schema, type);
     let isSchema = this.schemaTypes.includes(type);
     let pending = await writer.prepareDelete(branch, session, version, type, id, isSchema);
     try {
@@ -97,9 +103,8 @@ class Writers {
     }
   }
 
-  async _finalizeAndReply(pending, branch, session, type, schema) {
+  async _finalize(pending, branch, type, schema, sourceId) {
     let meta = await pending.finalize();
-    let contentType = schema.types.get(type);
     let finalDocument = pending.finalDocument;
     finalDocument.meta = meta;
 
@@ -107,9 +112,9 @@ class Writers {
       type,
       branch,
       schema,
+      sourceId,
       id: finalDocument.id,
       upstreamDoc: finalDocument,
-      sourceId: contentType.dataSource.id,
       read: async (type, id) => {
         let result;
         try {
@@ -125,7 +130,7 @@ class Writers {
     });
   }
 
-  _lookupWriter(schema, type) {
+  _getSchemaDetailsForType(schema, type) {
     let contentType = schema.types.get(type);
     let writer;
     if (!contentType || !contentType.dataSource || !(writer = contentType.dataSource.writer)) {
@@ -136,6 +141,8 @@ class Writers {
         title: "Not a writable type"
       });
     }
-    return writer;
+
+    let sourceId = contentType.dataSource.id;
+    return { writer, sourceId };
   }
 });

@@ -215,18 +215,7 @@ class BranchUpdate {
       // us, so all we need to do here is nothing.
       return;
     }
-    await this.client.saveDocument({
-      branch: this.branch,
-      type,
-      id,
-      searchDoc,
-      pristineDoc: await context.pristineDoc(),
-      upstreamDoc: doc,
-      source: context.sourceId,
-      generation: context.generation,
-      refs: await context.references(),
-      realms: await context.realms()
-    });
+    await this.client.saveDocument(context);
     this.emitEvent('add', { type, id, doc });
     log.debug("save %s %s", type, id);
     if (this.isControllingBranch) {
