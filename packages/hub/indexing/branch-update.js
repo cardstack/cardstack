@@ -16,8 +16,7 @@ class BranchUpdate {
     this.isControllingBranch = isControllingBranch;
     this.schemaModels = [];
     this._schema = null;
-    this._touched = Object.create(null);
-    this._touchCounter = 0;
+    this._batch = client.beginBatch();
     this.uncachedRead = this.uncachedRead.bind(this);
   }
 
@@ -98,13 +97,8 @@ class BranchUpdate {
       let newMeta = await updater.updateContent(meta, hints, publicOps, this.uncachedRead);
       await this._saveMeta(updater, newMeta);
     }
-    await this.client.invalidations({
-      touched: this._touched,
-      touchCounter: this._touchCounter,
-      schema: await this.schema(),
-      branch: this.branch,
-      read: (type, id) => this.read(type, id),
-    });
+
+    await this._batch.done();
   }
 
   async _loadMeta(updater) {
@@ -155,7 +149,6 @@ class BranchUpdate {
   }
 
   async add(type, id, doc, sourceId, nonce) {
-    this._touched[`${type}/${id}`] = this._touchCounter++;
     let schema = await this.schema();
     let context = new DocumentContext({
       schema,
@@ -174,18 +167,25 @@ class BranchUpdate {
       // us, so all we need to do here is nothing.
       return;
     }
-    await this.client.saveDocument({ context, touched: this._touched, touchCounter: this._touchCounter });
+
+    await this._batch.saveDocument(context);
+
     this.emitEvent('add', { type, id, doc });
     log.debug("save %s %s", type, id);
   }
 
   async delete(type, id) {
-    this._touched[`${type}/${id}`] = this._touchCounter++;
-    await this.client.deleteDocument({
-      branch: this.branch,
+    let schema = await this.schema();
+    let context = new DocumentContext({
+      schema,
       type,
-      id
+      id,
+      branch: this.branch,
+      read: (type, id) => this.read(type, id)
     });
+
+    await this._batch.deleteDocument(context);
+
     this.emitEvent('delete', { type, id });
     log.debug("delete %s %s", type, id);
   }
