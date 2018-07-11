@@ -3,7 +3,6 @@ const owningDataSource = new WeakMap();
 const { flatten } = require('lodash');
 const log = require('@cardstack/logger')('cardstack/indexers');
 const DocumentContext = require('./document-context');
-const Session = require('@cardstack/plugin-utils/session');
 
 const FINALIZED = {};
 
@@ -105,12 +104,6 @@ class BranchUpdate {
       schema: await this.schema(),
       branch: this.branch,
       read: (type, id) => this.read(type, id),
-      wasInvalidated: async ({ operation, type, id, doc, sourceId, nonce }) => {
-        this.emitEvent(operation, { type, id, doc });
-        if (operation === 'add' && this.isControllingBranch) {
-          await this._maybeUpdateRealms(type, id, doc, sourceId, nonce);
-        }
-      }
     });
   }
 
@@ -181,32 +174,9 @@ class BranchUpdate {
       // us, so all we need to do here is nothing.
       return;
     }
-    await this.client.saveDocument({ context });
+    await this.client.saveDocument({ context, touched: this._touched, touchCounter: this._touchCounter });
     this.emitEvent('add', { type, id, doc });
     log.debug("save %s %s", type, id);
-    if (this.isControllingBranch) {
-      await this._maybeUpdateRealms(type, id, doc, sourceId, nonce);
-    }
-  }
-
-  async _maybeUpdateRealms(type, id, doc, sourceId, nonce) {
-    let schema = await this.schema();
-    let realms = await schema.userRealms(doc);
-    if (realms) {
-      let userRealmsId = Session.encodeBaseRealm(type, id);
-      await this.add('user-realms', userRealmsId, {
-        type: 'user-realms',
-        id: userRealmsId,
-        attributes: {
-          realms
-        },
-        relationships: {
-          user: {
-            data: { type, id }
-          }
-        }
-      }, sourceId, nonce);
-    }
   }
 
   async delete(type, id) {

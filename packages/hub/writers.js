@@ -38,8 +38,10 @@ class Writers {
         this.schema.invalidateCache();
       }
 
-      await this.pgSearchClient.saveDocument({ context });
-      await this._invalidations(context);
+      let touchCounter = 0;
+      let touched = { [`${context.type}/${context.id}`]: touchCounter };
+      await this.pgSearchClient.saveDocument({ context, touched, touchCounter });
+      await this._invalidations(context, touched, ++touchCounter);
 
       pristine = await context.pristineDoc();
     } finally {
@@ -72,8 +74,10 @@ class Writers {
         this.schema.invalidateCache();
       }
 
-      await this.pgSearchClient.saveDocument({ context });
-      await this._invalidations(context);
+      let touchCounter = 0;
+      let touched = { [`${context.type}/${context.id}`]: touchCounter };
+      await this.pgSearchClient.saveDocument({ context, touched, touchCounter });
+      await this._invalidations(context, touched, ++touchCounter);
 
       pristine = await context.pristineDoc();
     } finally {
@@ -121,14 +125,10 @@ class Writers {
     });
   }
 
-  async _invalidations(context) {
-    let touchCounter = 0;
-    let touched = {
-      [`${context.type}/${context.id}`]: touchCounter++
-    };
+  async _invalidations(context, touched, touchCounter) {
     await this.pgSearchClient.invalidations({
-      touched: touched,
-      touchCounter: touchCounter,
+      touched,
+      touchCounter,
       schema: context.schema,
       branch: context.branch,
       read: this._read(context.branch)

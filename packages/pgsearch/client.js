@@ -4,6 +4,9 @@ const Cursor = require('pg-cursor');
 const migrate = require('node-pg-migrate').default;
 const log = require('@cardstack/logger')('cardstack/pgsearch');
 const DocumentContext = require('@cardstack/hub/indexing/document-context');
+const Session = require('@cardstack/plugin-utils/session');
+const { declareInjections } = require('@cardstack/di');
+const EventEmitter = require('events');
 const { join } = require('path');
 
 // TODO: once our migrations is complete, rename this env var everywhere because
@@ -21,12 +24,19 @@ const config = {
 };
 
 
-module.exports = class PgClient {
-  static create() {
-    return new this();
+module.exports = declareInjections({
+  controllingBranch: 'hub:controlling-branch',
+},
+
+class PgClient extends EventEmitter {
+  static create(args) {
+    return new this(args);
   }
 
-  constructor(){
+  constructor({ controllingBranch }){
+    super();
+
+    this.controllingBranch = controllingBranch;
 
     this.pool = new Pool({
       user: config.user,
@@ -121,11 +131,28 @@ module.exports = class PgClient {
   // This method does not need to recursively invalidate, because each
   // document stores a complete, rolled-up picture of which other
   // documents it references.
-  async invalidations({ schema, branch, read, wasInvalidated, touched, touchCounter }) {
+  async invalidations({ schema, branch, read, touched, touchCounter }) {
     await this.docsThatReference(branch, Object.keys(touched), async (doc, refs) => {
       let { type, id } = doc;
 
       if (this._isInvalidated(touched, type, id, refs)) {
+        let sourceId = schema.types.get(type).dataSource.id;
+        // this is correct because IF this document's data source is currently
+        // doing a replace-all operation, it was either already touched (so
+        // this code isn't running) or it's old (so it's correct to have a
+        // non-current nonce).
+        let nonce = 0;
+        let context = new DocumentContext({
+          schema,
+          branch,
+          type,
+          id,
+          sourceId,
+          generation: nonce,
+          upstreamDoc: doc,
+          read: (type, id) => read(type, id)
+        });
+
         if (type === 'user-realms') {
           // if we have an invalidated user-realms and it hasn't
           // already been touched, that's because the corresponding
@@ -133,29 +160,8 @@ module.exports = class PgClient {
           // user-realms.
           await this.deleteDocument({ branch, type, id, touched, touchCounter });
           log.debug("delete %s %s", type, id);
-
-          let operation = 'delete';
-          if (typeof wasInvalidated === 'function') {
-            await wasInvalidated({ operation, type, id, doc });
-          }
+          await this._emitEvent('delete', context);
         } else {
-          let sourceId = schema.types.get(type).dataSource.id;
-          // this is correct because IF this document's data source is currently
-          // doing a replace-all operation, it was either already touched (so
-          // this code isn't running) or it's old (so it's correct to have a
-          // non-current nonce).
-          let nonce = 0;
-          // await this.add(type, id, doc, sourceId, nonce);
-          let context = new DocumentContext({
-            schema,
-            type,
-            id,
-            sourceId,
-            generation: nonce,
-            upstreamDoc: doc,
-            branch: branch,
-            read: (type, id) => read(type, id)
-          });
           let searchDoc = await context.searchDoc();
           if (!searchDoc) {
             // bad documents get ignored. The DocumentContext logs these for
@@ -164,11 +170,7 @@ module.exports = class PgClient {
           }
           await this.saveDocument({ context, touched, touchCounter });
           log.debug("save %s %s", type, id);
-
-          let operation = 'add';
-          if (typeof wasInvalidated === 'function') {
-            await wasInvalidated({ operation, type, id, doc, sourceId, nonce });
-          }
+          await this._emitEvent('add', context);
         }
       }
     });
@@ -190,6 +192,42 @@ module.exports = class PgClient {
       }
     }
     return false;
+  }
+
+  async _emitEvent(operation, context) {
+    let { type, id, upstreamDoc:doc } = context;
+    this.emit(operation, { type, id, doc });
+  }
+
+  async maybeUpdateRealms(context, touched, touchCounter) {
+    let { id, type, branch, sourceId, generation, schema, read, upstreamDoc:doc } = context;
+    let realms = await schema.userRealms(doc);
+    if (realms) {
+      let userRealmsId = Session.encodeBaseRealm(type, id);
+      let userRealmContext = new DocumentContext({
+        type: 'user-realms',
+        id: userRealmsId,
+        branch,
+        sourceId,
+        generation,
+        schema,
+        read: (type, id) => read(type, id),
+        upstreamDoc: {
+          type: 'user-realms',
+          id: userRealmsId,
+          attributes: {
+            realms
+          },
+          relationships: {
+            user: {
+              data: { type, id }
+            }
+          }
+        }
+      });
+
+      await this.saveDocument({ context: userRealmContext, touched, touchCounter });
+    }
   }
 
   async saveDocument({ context, touched, touchCounter }) {
@@ -214,6 +252,11 @@ module.exports = class PgClient {
 
     let sql = 'insert into documents (branch, type, id, search_doc, pristine_doc, upstream_doc, source, generation, refs, realms) values ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10) on conflict on constraint documents_pkey do UPDATE SET search_doc = EXCLUDED.search_doc, pristine_doc = EXCLUDED.pristine_doc, upstream_doc = EXCLUDED.upstream_doc, source = EXCLUDED.source, generation = EXCLUDED.generation, refs = EXCLUDED.refs, realms = EXCLUDED.realms';
     await this.query(sql, [branch, type, id, searchDoc, pristineDoc, upstreamDoc, source, generation, refs, realms]);
+    await this._emitEvent('add', context);
+
+    if (this.controllingBranch.name === branch) {
+      await this.maybeUpdateRealms(context, touched, touchCounter);
+    }
   }
 
   async deleteOlderGenerations(branch, sourceId, nonce) {
@@ -227,6 +270,7 @@ module.exports = class PgClient {
     }
     let sql = 'delete from documents where branch=$1 and type=$2 and id=$3';
     await this.query(sql, [branch, type, id]);
+    await this._emitEvent('delete', { type, id });
   }
 
   async saveMeta({branch, id, params}) {
@@ -257,7 +301,7 @@ module.exports = class PgClient {
     }
 
   }
-};
+});
 
 function readCursor(cursor, rowCount){
   return new Promise((resolve, reject) => {
