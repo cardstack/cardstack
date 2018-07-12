@@ -5,7 +5,7 @@ const { uniqBy } = require('lodash');
 
 module.exports = class DocumentContext {
 
-  constructor({ read, schema, type, id, branch, sourceId, generation, upstreamDoc }) {
+  constructor({ read, schema, type, id, branch, sourceId, generation, upstreamDoc, additionalIncludes=[] }) {
     this.schema = schema;
     this.type = type;
     this.id = id;
@@ -13,6 +13,7 @@ module.exports = class DocumentContext {
     this.sourceId = sourceId;
     this.generation = generation;
     this.upstreamDoc = upstreamDoc;
+    this.additionalIncludes = additionalIncludes;
     this._read = read;
 
     // included resources that we actually found
@@ -125,12 +126,12 @@ module.exports = class DocumentContext {
       return;
     }
     let related;
-    if (value.data && searchTree[field.id]) {
+    if (value.data && (searchTree && searchTree[field.id] || this.additionalIncludes.includes(field.id))) {
       if (Array.isArray(value.data)) {
         related = await Promise.all(value.data.map(async ({ type, id }) => {
           let resource = await this.read(type, id);
           if (resource) {
-            return this._build(type, id, resource, searchTree[field.id], depth + 1);
+            return this._build(type, id, resource, searchTree && searchTree[field.id], depth + 1);
           }
         }));
         related = related.filter(Boolean);
@@ -138,7 +139,7 @@ module.exports = class DocumentContext {
       } else {
         let resource = await this.read(value.data.type, value.data.id);
         if (resource) {
-          related = await this._build(resource.type, resource.id, resource, searchTree[field.id], depth + 1);
+          related = await this._build(resource.type, resource.id, resource, searchTree && searchTree[field.id], depth + 1);
         }
         let data = related ? { type: related.type, id: related.id } : null;
         ensure(pristineDocOut, 'relationships')[field.id] = Object.assign({}, value, { data });

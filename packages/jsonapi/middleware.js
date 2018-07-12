@@ -1,6 +1,6 @@
 const Error = require('@cardstack/plugin-utils/error');
 const qs = require('qs');
-const { merge, flatten, uniq, uniqBy } = require('lodash');
+const { merge, flatten, uniq } = require('lodash');
 const koaJSONBody = require('koa-json-body');
 const log = require('@cardstack/logger')('cardstack/jsonapi');
 const { declareInjections } = require('@cardstack/di');
@@ -183,7 +183,8 @@ class Handler {
       sort: this.query.sort,
       page: this.query.page,
       queryString: this.query.q
-    });
+      // TODO: I feel like we can do better here....
+    }, flatten(this.includes || []));
     let body = { data: models, meta: { total: page.total } };
     if (page.cursor) {
       body.links = {
@@ -191,19 +192,8 @@ class Handler {
       };
     }
     this.ctxt.body = body;
-    if (this.includes === defaultIncludes) {
-      if (included) {
-        // the default includes out of the searcher are not guaranteed
-        // to be deduplicated
-        body.included = uniqBy(models.concat(included), r => `${r.type}/${r.id}`).slice(models.length);
-      }
-    } else {
-      if (included && included.length > 0) {
-        // we don't need to do any deduplication here because
-        // loadAllIncluded is going to take over.
-        body.included = included;
-      }
-      await this._loadAllIncluded(models);
+    if (this.query.include !== '' && included && included.length > 0) {
+      body.included = included;
     }
   }
 
