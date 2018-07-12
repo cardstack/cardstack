@@ -38,7 +38,9 @@ class Writers {
         this.schema.invalidateCache();
       }
 
-      await this.pgSearchClient.saveDocument(context);
+      let batch = this.pgSearchClient.beginBatch();
+      await batch.saveDocument(context);
+      await batch.done();
 
       pristine = await context.pristineDoc();
     } finally {
@@ -71,7 +73,9 @@ class Writers {
         this.schema.invalidateCache();
       }
 
-      await this.pgSearchClient.saveDocument(context);
+      let batch = this.pgSearchClient.beginBatch();
+      await batch.saveDocument(context);
+      await batch.done();
 
       pristine = await context.pristineDoc();
     } finally {
@@ -86,48 +90,56 @@ class Writers {
     await this.pgSearchClient.ensureDatabaseSetup();
 
     let schema = await this.schema.forBranch(branch);
-    let { writer } = this._getSchemaDetailsForType(schema, type);
+    let { writer, sourceId } = this._getSchemaDetailsForType(schema, type);
     let isSchema = this.schemaTypes.includes(type);
     let pending = await writer.prepareDelete(branch, session, version, type, id, isSchema);
     try {
       let newSchema = await schema.validate(pending, { session });
-      await pending.finalize();
+      let context = await this._finalize(pending, branch, type, schema, sourceId, id);
 
       if (newSchema) {
         this.schema.invalidateCache();
       }
 
-      await this.pgSearchClient.deleteDocument({ branch, type, id });
+      let batch = this.pgSearchClient.beginBatch();
+      await batch.deleteDocument(context);
+      await batch.done();
     } finally {
       if (pending) { await pending.abort();  }
     }
   }
 
-  async _finalize(pending, branch, type, schema, sourceId) {
+  async _finalize(pending, branch, type, schema, sourceId, id) {
     let meta = await pending.finalize();
     let finalDocument = pending.finalDocument;
-    finalDocument.meta = meta;
+    if (finalDocument) {
+      finalDocument.meta = meta;
+    }
 
     return new DocumentContext({
       type,
       branch,
       schema,
       sourceId,
-      id: finalDocument.id,
+      id: id || finalDocument.id,
       upstreamDoc: finalDocument,
-      read: async (type, id) => {
-        let result;
-        try {
-          result = await this.searchers.get(Session.INTERNAL_PRIVILEGED, branch, type, id);
-        } catch (err) {
-          if (err.status !== 404) { throw err; }
-        }
-
-        if (result && result.data) {
-          return result.data;
-        }
-      }
+      read: this._read(branch)
     });
+  }
+
+  _read(branch) {
+    return async (type, id) => {
+      let result;
+      try {
+        result = await this.searchers.get(Session.INTERNAL_PRIVILEGED, branch, type, id);
+      } catch (err) {
+        if (err.status !== 404) { throw err; }
+      }
+
+      if (result && result.data) {
+        return result.data;
+      }
+    };
   }
 
   _getSchemaDetailsForType(schema, type) {

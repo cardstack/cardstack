@@ -3,6 +3,10 @@ const { Pool, Client } = require('pg');
 const Cursor = require('pg-cursor');
 const migrate = require('node-pg-migrate').default;
 const log = require('@cardstack/logger')('cardstack/pgsearch');
+const DocumentContext = require('@cardstack/hub/indexing/document-context');
+const Session = require('@cardstack/plugin-utils/session');
+const { declareInjections } = require('@cardstack/di');
+const EventEmitter = require('events');
 const { join } = require('path');
 
 // TODO: once our migrations is complete, rename this env var everywhere because
@@ -20,12 +24,19 @@ const config = {
 };
 
 
-module.exports = class PgClient {
-  static create() {
-    return new this();
+module.exports = declareInjections({
+  controllingBranch: 'hub:controlling-branch',
+},
+
+class PgClient extends EventEmitter {
+  static create(args) {
+    return new this(args);
   }
 
-  constructor(){
+  constructor({ controllingBranch }){
+    super();
+
+    this.controllingBranch = controllingBranch;
 
     this.pool = new Pool({
       user: config.user,
@@ -117,20 +128,8 @@ module.exports = class PgClient {
     }
   }
 
-  async saveDocument(context) {
-    let branch = context.branch;
-    let type = context.type;
-    let id = context.id;
-    let source = context.sourceId;
-    let generation = context.generation;
-    let upstreamDoc = context.upstreamDoc;
-    let searchDoc = await context.searchDoc();
-    let pristineDoc = await context.pristineDoc();
-    let refs = await context.references();
-    let realms = await context.realms();
-
-    let sql = 'insert into documents (branch, type, id, search_doc, pristine_doc, upstream_doc, source, generation, refs, realms) values ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10) on conflict on constraint documents_pkey do UPDATE SET search_doc = EXCLUDED.search_doc, pristine_doc = EXCLUDED.pristine_doc, upstream_doc = EXCLUDED.upstream_doc, source = EXCLUDED.source, generation = EXCLUDED.generation, refs = EXCLUDED.refs, realms = EXCLUDED.realms';
-    await this.query(sql, [branch, type, id, searchDoc, pristineDoc, upstreamDoc, source, generation, refs, realms]);
+  beginBatch() {
+    return new Batch(this);
   }
 
   async deleteOlderGenerations(branch, sourceId, nonce) {
@@ -138,14 +137,14 @@ module.exports = class PgClient {
     await this.query(sql, [nonce, sourceId, branch]);
   }
 
-  async deleteDocument({ branch, type, id }) {
-    let sql = 'delete from documents where branch=$1 and type=$2 and id=$3';
-    await this.query(sql, [branch, type, id]);
-  }
-
   async saveMeta({branch, id, params}) {
     let sql = 'insert into meta (branch, id, params) values ($1, $2, $3) on conflict on constraint meta_pkey do UPDATE SET params = EXCLUDED.params';
     await this.query(sql, [branch, id, params]);
+  }
+
+  async emitEvent(operation, context) {
+    let { type, id, upstreamDoc:doc } = context;
+    this.emit(operation, { type, id, doc });
   }
 
   async docsThatReference(branch, references, fn){
@@ -169,9 +168,159 @@ module.exports = class PgClient {
     finally {
       client.release();
     }
+  }
+});
+
+class Batch {
+  constructor(client) {
+    this.client = client;
+    this._touched = Object.create(null);
+    this._touchCounter = 0;
+    this._schema = null;
+    this._read = null;
+    this._branch = null;
+  }
+
+  async saveDocument(context) {
+    let { schema, branch, type, id, sourceId, generation, upstreamDoc, _read:read } = context;
+    let searchDoc = await context.searchDoc();
+    let pristineDoc = await context.pristineDoc();
+    let refs = await context.references();
+    let realms = await context.realms();
+
+    this._schema = schema;
+    this._read = read;
+    this._branch = branch;
+
+    this._touched[`${type}/${id}`] = this._touchCounter++;
+
+    if (!searchDoc) { return; }
+
+    let sql = 'insert into documents (branch, type, id, search_doc, pristine_doc, upstream_doc, source, generation, refs, realms) values ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10) on conflict on constraint documents_pkey do UPDATE SET search_doc = EXCLUDED.search_doc, pristine_doc = EXCLUDED.pristine_doc, upstream_doc = EXCLUDED.upstream_doc, source = EXCLUDED.source, generation = EXCLUDED.generation, refs = EXCLUDED.refs, realms = EXCLUDED.realms';
+
+    await this.client.query(sql, [branch, type, id, searchDoc, pristineDoc, upstreamDoc, sourceId, generation, refs, realms]);
+    await this.client.emitEvent('add', context);
+    log.debug("save %s %s", type, id);
+
+    if (this.client.controllingBranch.name === branch) {
+      await this.maybeUpdateRealms(context);
+    }
+  }
+
+  async deleteDocument(context) {
+    let { branch, type, id, schema, _read:read } = context;
+
+    this._schema = schema;
+    this._read = read;
+    this._branch = branch;
+
+    this._touched[`${type}/${id}`] = this._touchCounter++;
+    let sql = 'delete from documents where branch=$1 and type=$2 and id=$3';
+
+    await this.client.query(sql, [branch, type, id]);
+    await this.client.emitEvent('delete', { type, id });
+    log.debug("delete %s %s", type, id);
 
   }
-};
+
+  async done() {
+    await this._invalidations(this._schema, this._branch, this._read);
+  }
+
+  // This method does not need to recursively invalidate, because each
+  // document stores a complete, rolled-up picture of which other
+  // documents it references.
+  async _invalidations(schema, branch, read) {
+    await this.client.docsThatReference(branch, Object.keys(this._touched), async (doc, refs) => {
+      let { type, id } = doc;
+
+      if (this._isInvalidated(type, id, refs)) {
+        let sourceId = schema.types.get(type).dataSource.id;
+        // this is correct because IF this document's data source is currently
+        // doing a replace-all operation, it was either already touched (so
+        // this code isn't running) or it's old (so it's correct to have a
+        // non-current nonce).
+        let nonce = 0;
+        let context = new DocumentContext({
+          schema,
+          branch,
+          type,
+          id,
+          sourceId,
+          generation: nonce,
+          upstreamDoc: doc,
+          read: (type, id) => read(type, id)
+        });
+
+        if (type === 'user-realms') {
+          // if we have an invalidated user-realms and it hasn't
+          // already been touched, that's because the corresponding
+          // user was delete, so we should also delete the
+          // user-realms.
+          await this.deleteDocument({ branch, type, id });
+        } else {
+          let searchDoc = await context.searchDoc();
+          if (!searchDoc) {
+            // bad documents get ignored. The DocumentContext logs these for
+            // us, so all we need to do here is nothing.
+            return;
+          }
+          await this.saveDocument(context);
+        }
+      }
+    });
+  }
+
+  _isInvalidated(type, id, refs) {
+    let key = `${type}/${id}`;
+    let docTouchedAt = this._touched[key];
+    if (docTouchedAt == null) {
+      // our document hasn't been updated at all, so it definitely needs to be redone
+      return true;
+    }
+    for (let ref of refs) {
+      let refTouchedAt = this._touched[ref];
+      if (refTouchedAt != null && refTouchedAt > docTouchedAt) {
+        // we found one of our references that was touched later than us, so we
+        // need to be redone
+        return true;
+      }
+    }
+    return false;
+  }
+
+  async maybeUpdateRealms(context) {
+    let { id, type, branch, sourceId, generation, schema, read, upstreamDoc:doc } = context;
+    let realms = await schema.userRealms(doc);
+    if (realms) {
+      let userRealmsId = Session.encodeBaseRealm(type, id);
+      let userRealmContext = new DocumentContext({
+        type: 'user-realms',
+        id: userRealmsId,
+        branch,
+        sourceId,
+        generation,
+        schema,
+        read: (type, id) => read(type, id),
+        upstreamDoc: {
+          type: 'user-realms',
+          id: userRealmsId,
+          attributes: {
+            realms
+          },
+          relationships: {
+            user: {
+              data: { type, id }
+            }
+          }
+        }
+      });
+
+      await this.saveDocument(userRealmContext);
+    }
+  }
+
+}
 
 function readCursor(cursor, rowCount){
   return new Promise((resolve, reject) => {

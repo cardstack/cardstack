@@ -3,7 +3,6 @@ const owningDataSource = new WeakMap();
 const { flatten } = require('lodash');
 const log = require('@cardstack/logger')('cardstack/indexers');
 const DocumentContext = require('./document-context');
-const Session = require('@cardstack/plugin-utils/session');
 
 const FINALIZED = {};
 
@@ -17,8 +16,7 @@ class BranchUpdate {
     this.isControllingBranch = isControllingBranch;
     this.schemaModels = [];
     this._schema = null;
-    this._touched = Object.create(null);
-    this._touchCounter = 0;
+    this._batch = client.beginBatch();
     this.uncachedRead = this.uncachedRead.bind(this);
   }
 
@@ -99,7 +97,8 @@ class BranchUpdate {
       let newMeta = await updater.updateContent(meta, hints, publicOps, this.uncachedRead);
       await this._saveMeta(updater, newMeta);
     }
-    await this._invalidations();
+
+    await this._batch.done();
   }
 
   async _loadMeta(updater) {
@@ -118,52 +117,6 @@ class BranchUpdate {
         branch: this.branch,
         id: owningDataSource.get(updater).id,
         params: newMeta
-    });
-  }
-
-  _isInvalidated(type, id, refs) {
-    let key = `${type}/${id}`;
-    let docTouchedAt = this._touched[key];
-    if (docTouchedAt == null) {
-      // our document hasn't been updated at all, so it definitely needs to be redone
-      return true;
-    }
-    for (let ref of refs) {
-      let refTouchedAt = this._touched[ref];
-      if (refTouchedAt != null && refTouchedAt > docTouchedAt) {
-        // we found one of our references that was touched later than us, so we
-        // need to be redone
-        return true;
-      }
-    }
-    return false;
-  }
-
-  // This method does not need to recursively invalidate, because each
-  // document stores a complete, rolled-up picture of which other
-  // documents it references.
-  async _invalidations() {
-    let schema = await this.schema();
-    await this.client.docsThatReference(this.branch, Object.keys(this._touched), async (doc, refs) => {
-      let { type, id } = doc;
-
-      if (this._isInvalidated(type, id, refs)) {
-        if (type === 'user-realms') {
-          // if we have an invalidated user-realms and it hasn't
-          // already been touched, that's because the corresponding
-          // user was delete, so we should also delete the
-          // user-realms.
-          await this.delete(type, id);
-        } else {
-          let sourceId = schema.types.get(type).dataSource.id;
-          // this is correct because IF this document's data source is currently
-          // doing a replace-all operation, it was either already touched (so
-          // this code isn't running) or it's old (so it's correct to have a
-          // non-current nonce).
-          let nonce = 0;
-          await this.add(type, id, doc, sourceId, nonce);
-        }
-      }
     });
   }
 
@@ -196,7 +149,6 @@ class BranchUpdate {
   }
 
   async add(type, id, doc, sourceId, nonce) {
-    this._touched[`${type}/${id}`] = this._touchCounter++;
     let schema = await this.schema();
     let context = new DocumentContext({
       schema,
@@ -215,41 +167,25 @@ class BranchUpdate {
       // us, so all we need to do here is nothing.
       return;
     }
-    await this.client.saveDocument(context);
+
+    await this._batch.saveDocument(context);
+
     this.emitEvent('add', { type, id, doc });
     log.debug("save %s %s", type, id);
-    if (this.isControllingBranch) {
-      await this._maybeUpdateRealms(type, id, doc, sourceId, nonce);
-    }
-  }
-
-  async _maybeUpdateRealms(type, id, doc, sourceId, nonce) {
-    let schema = await this.schema();
-    let realms = await schema.userRealms(doc);
-    if (realms) {
-      let userRealmsId = Session.encodeBaseRealm(type, id);
-      await this.add('user-realms', userRealmsId, {
-        type: 'user-realms',
-        id: userRealmsId,
-        attributes: {
-          realms
-        },
-        relationships: {
-          user: {
-            data: { type, id }
-          }
-        }
-      }, sourceId, nonce);
-    }
   }
 
   async delete(type, id) {
-    this._touched[`${type}/${id}`] = this._touchCounter++;
-    await this.client.deleteDocument({
-      branch: this.branch,
+    let schema = await this.schema();
+    let context = new DocumentContext({
+      schema,
       type,
-      id
+      id,
+      branch: this.branch,
+      read: (type, id) => this.read(type, id)
     });
+
+    await this._batch.deleteDocument(context);
+
     this.emitEvent('delete', { type, id });
     log.debug("delete %s %s", type, id);
   }
