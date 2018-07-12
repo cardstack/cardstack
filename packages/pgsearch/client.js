@@ -194,13 +194,13 @@ class Batch {
 
     this._touched[`${type}/${id}`] = this._touchCounter++;
 
-    if (!searchDoc) {
-      return;
-    }
+    if (!searchDoc) { return; }
 
     let sql = 'insert into documents (branch, type, id, search_doc, pristine_doc, upstream_doc, source, generation, refs, realms) values ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10) on conflict on constraint documents_pkey do UPDATE SET search_doc = EXCLUDED.search_doc, pristine_doc = EXCLUDED.pristine_doc, upstream_doc = EXCLUDED.upstream_doc, source = EXCLUDED.source, generation = EXCLUDED.generation, refs = EXCLUDED.refs, realms = EXCLUDED.realms';
+
     await this.client.query(sql, [branch, type, id, searchDoc, pristineDoc, upstreamDoc, sourceId, generation, refs, realms]);
     await this.client.emitEvent('add', context);
+    log.debug("save %s %s", type, id);
 
     if (this.client.controllingBranch.name === branch) {
       await this.maybeUpdateRealms(context);
@@ -216,8 +216,10 @@ class Batch {
 
     this._touched[`${type}/${id}`] = this._touchCounter++;
     let sql = 'delete from documents where branch=$1 and type=$2 and id=$3';
+
     await this.client.query(sql, [branch, type, id]);
     await this.client.emitEvent('delete', { type, id });
+    log.debug("delete %s %s", type, id);
 
   }
 
@@ -256,8 +258,6 @@ class Batch {
           // user was delete, so we should also delete the
           // user-realms.
           await this.deleteDocument({ branch, type, id });
-          log.debug("delete %s %s", type, id);
-          await this.client.emitEvent('delete', context);
         } else {
           let searchDoc = await context.searchDoc();
           if (!searchDoc) {
@@ -266,8 +266,6 @@ class Batch {
             return;
           }
           await this.saveDocument(context);
-          log.debug("save %s %s", type, id);
-          await this.client.emitEvent('add', context);
         }
       }
     });

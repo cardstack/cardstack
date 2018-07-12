@@ -243,6 +243,39 @@ describe('pgsearch/indexer', function() {
     expect(found.included[0].attributes.name).to.equal('Edward V');
   });
 
+  it('invalidates resource that contains included resource that was updated', async function() {
+    let { data:person } = await writer.create('master', env.session, 'people', {
+      type: 'people',
+      attributes: {
+        name: 'Quint'
+      }
+    });
+    expect(person).has.deep.property('id');
+    let { data:article } = await writer.create('master', env.session, 'articles', {
+      type: 'articles',
+      attributes: {
+        title: 'Hello World'
+      },
+      relationships: {
+        author: { data: { type: 'people', id: person.id } }
+      }
+    });
+    expect(article).has.deep.property('id');
+
+    person.attributes.name = 'Edward V';
+    await writer.update('master', env.session, 'people', person.id, person);
+
+    // note that indexer.update() is not called -- invalidation happens as a direct result of updating the doc
+
+    let found = await searcher.get(env.session, 'master', 'articles', article.id);
+    expect(found).is.ok;
+    expect(found).has.deep.property('data.attributes.title');
+    expect(found).has.deep.property('data.relationships.author.data.id', person.id);
+    expect(found).has.property('included');
+    expect(found.included).length(1);
+    expect(found.included[0].attributes.name).to.equal('Edward V');
+  });
+
   it('ignores a broken belongs-to', async function() {
     let { data:article } = await writer.create('master', env.session, 'articles', {
       type: 'articles',
