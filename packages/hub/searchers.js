@@ -100,13 +100,12 @@ class Searchers {
     let result = await next();
     if (result) {
       let schema = await schemaPromise;
-      let include = get(query, 'queryString.include');
-      let additionalIncludes = include ? include.split(',').map(part => part.split('.')) : [];
+      let additionalIncludes = (get(query, 'queryString.include') || '').split(',');
       let pristineResult = await (new DocumentContext({
         branch,
         schema,
-        upstreamDoc: result,
         additionalIncludes,
+        upstreamDoc: result,
         read: this._read(branch)
       }).pristineDoc());
 

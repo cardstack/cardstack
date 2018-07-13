@@ -13,8 +13,9 @@ module.exports = class DocumentContext {
     this.sourceId = sourceId;
     this.generation = generation;
     this.upstreamDoc = upstreamDoc;
-    this.additionalIncludes = additionalIncludes;
+    this.additionalIncludes = additionalIncludes ? additionalIncludes.map(part => part.split('.')) : [];
     this._read = read;
+    this.cache = {};
     this.isCollection = upstreamDoc && upstreamDoc.data && Array.isArray(upstreamDoc.data);
 
     // included resources that we actually found
@@ -78,8 +79,19 @@ module.exports = class DocumentContext {
 
   async read(type, id) {
     this._references.push(`${type}/${id}`);
-    //TODO implement some kind of caching here a'la jsonapi middleware's _loadAllIncluded()
-    return this._read(type, id);
+
+    let key = `${type}/${id}`;
+    let cached = this.cache[key];
+    if (cached) {
+      return cached;
+    }
+
+    let resource = await this._read(type, id);
+    if (resource) {
+      this.cache[key] = resource;
+    }
+
+    return resource;
   }
 
 
@@ -167,16 +179,14 @@ module.exports = class DocumentContext {
   }
 
   _buildSearchTree(searchTree, contentType, segments) {
-    if (!segments.length) { return contentType; }
-    if (searchTree[segments[0]]) { return; }
+    if (!segments.length) { return {}; }
 
     let field = contentType.realAndComputedFields.get(segments[0]);
-    if (!field || !field.relatedTypes) { return contentType; }
+    if (!field || !field.relatedTypes) { return {}; }
 
     let relatedTypes = Object.keys(field.relatedTypes);
-    if (!relatedTypes.length) { return contentType; }
+    if (!relatedTypes.length) { return {}; }
 
-    //TODO how to decide which related type to use?
     searchTree[segments[0]] = this._buildSearchTree(Object.assign({}, searchTree), this.schema.types.get(relatedTypes[0]), segments.slice(1));
 
     return searchTree;
