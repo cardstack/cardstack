@@ -182,9 +182,8 @@ class Handler {
       filter: this.filterExpression(type),
       sort: this.query.sort,
       page: this.query.page,
-      queryString: this.query.q
-      // TODO: I feel like we can do better here....
-    }, flatten(this.includes || []));
+      queryString: this.query
+    });
     let body = { data: models, meta: { total: page.total } };
     if (page.cursor) {
       body.links = {

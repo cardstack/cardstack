@@ -3,7 +3,7 @@ const log = require('@cardstack/logger')('cardstack/searchers');
 const Error = require('@cardstack/plugin-utils/error');
 const Session = require('@cardstack/plugin-utils/session');
 const DocumentContext = require('./indexing/document-context');
-const { uniqBy } = require('lodash');
+const { get } = require('lodash');
 
 module.exports = declareInjections({
   controllingBranch: 'hub:controlling-branch',
@@ -74,11 +74,10 @@ class Searchers {
     return this.get(session, this.controllingBranch.name, type, id);
   }
 
-  async search(session, branch, query, additionalIncludes) {
+  async search(session, branch, query) {
     if (arguments.length < 3) {
       throw new Error(`session is now a required argument to searchers.search`);
     }
-
     let sources = await this._lookupSources();
     let schemaPromise = this.currentSchema.forBranch(branch);
     let index = 0;
@@ -101,37 +100,18 @@ class Searchers {
     let result = await next();
     if (result) {
       let schema = await schemaPromise;
-      let pristineResult = [];
-      let included = [];
-      let rootItems = [];
+      let include = get(query, 'queryString.include');
+      let additionalIncludes = include ? include.split(',').map(part => part.split('.')) : [];
+      let pristineResult = await (new DocumentContext({
+        branch,
+        schema,
+        upstreamDoc: result,
+        additionalIncludes,
+        read: this._read(branch)
+      }).pristineDoc());
 
-      for (let doc of result.data) {
-        let pristine = await (new DocumentContext({
-          branch,
-          schema,
-          id: doc.id,
-          type: doc.type,
-          sourceId: doc.meta.source,
-          upstreamDoc: doc,
-          additionalIncludes,
-          read: this._read(branch)
-        }).pristineDoc());
-
-        rootItems.push(`${doc.type}/${doc.id}`);
-        if (pristine.included) {
-          included = included.concat(pristine.included);
-          delete pristine.included;
-        }
-        pristineResult.push(pristine);
-      }
-
-      included = included.filter(r => !rootItems.includes(`${r.type}/${r.id}`));
-      if (included.length) {
-        result.included = uniqBy(included, r => `${r.type}/${r.id}`);
-      }
-
-      let authorizedResult = await schema.applyReadAuthorization(result, { session });
-      if (authorizedResult.data.length !== result.data.length) {
+      let authorizedResult = await schema.applyReadAuthorization(pristineResult, { session });
+      if (authorizedResult.data.length !== pristineResult.data.length) {
         // We can eventually make this more of just a warning, but for
         // now it's cleaner to just force the searchers to implement
         // grants correctly. Otherwise we will need to be able to
