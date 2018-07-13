@@ -1,0 +1,8 @@
+{{#toolbar-manager topRightCornerBelongsTo="right"}}
+  {{yield (hash
+    launcher = (component 'fixed-within-toolbars' top=0 right=0)
+  )}}
+{{/toolbar-manager}}
+
+{{cardstack-modal-target}}
+

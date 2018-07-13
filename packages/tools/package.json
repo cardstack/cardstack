@@ -21,6 +21,7 @@
   },
   "dependencies": {
     "@cardstack/plugin-utils": "0.8.0",
+    "@cardstack/edges": "0.0.0",
     "@cardstack/rendering": "0.8.0",
     "ember-cli-babel": "^6.8.2",
     "ember-cli-htmlbars": "^2.0.1",
@@ -32,7 +33,6 @@
     "ember-inject-optional": "^0.1.0",
     "ember-moment": "^7.3.0",
     "ember-resource-metadata": "^0.2.0",
-    "ember-toolbars": "^0.4.1",
     "ember-truth-helpers": "^2.0.0",
     "liquid-fire": "^0.29.0",
     "postcss-cssnext": "^2.10.0",

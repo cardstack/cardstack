@@ -1,18 +1,16 @@
-{{#toolbar-manager topRightCornerBelongsTo="right"}}
+{{#cardstack-edges topRightCornerBelongsTo="right" as |edges|}}
   {{yield}}
 
-  {{#fixed-within-toolbars top=0 right=0}}
+  {{#edges.launcher}}
     {{cardstack-tools-launcher}}
-  {{/fixed-within-toolbars}}
-
-{{/toolbar-manager}}
+  {{/edges.launcher}}
+{{/cardstack-edges}}
 
 {{#if tools.active}}
-  {{in-top-toolbar show=(component "cardstack-header") }}
-  {{in-right-toolbar show=(component "cardstack-toolbox") }}
+  {{cardstack-edge 'top' (component "cardstack-header")}}
+  {{cardstack-edge 'right' (component "cardstack-toolbox")}}
   {{cs-field-overlays}}
 {{/if}}
 
-{{cardstack-modal-target}}
 
 {{from-elsewhere name="paragraph-tools"}}

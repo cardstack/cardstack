@@ -4357,7 +4357,7 @@ ember-text-measurer@^0.4.0:
   dependencies:
     ember-cli-babel "^6.8.2"
 
-ember-toolbars@^0.4.1:
+ember-toolbars@^0.4.1, ember-toolbars@^0.4.2:
   version "0.4.2"
   resolved "https://registry.yarnpkg.com/ember-toolbars/-/ember-toolbars-0.4.2.tgz#30fda5b29937e28556a639af444808b7f3433691"
   dependencies:
