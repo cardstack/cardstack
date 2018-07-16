@@ -143,14 +143,12 @@ class Handler {
   }
 
   async handleIndividualGET(type, id) {
-    let body = await this._lookupRecord(type, id);
-    this.ctxt.body = body;
-    if (this.includes === defaultIncludes) {
-      // leave alone whatever includes were already on the document we
-      // got out of the search index.
-      return;
+    let include = (this.query.include || '').split(',');
+    let body = await this.searcher.get(this.session, this.branch, type, id, include);
+    if (this.query.include === '') {
+      delete body.included;
     }
-    await this._loadAllIncluded([body.data]);
+    this.ctxt.body = body;
   }
 
   async handleIndividualPATCH(type, id) {

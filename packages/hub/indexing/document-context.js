@@ -1,11 +1,11 @@
 const authLog = require('@cardstack/logger')('cardstack/auth');
 const log = require('@cardstack/logger')('cardstack/indexers');
 const Model = require('../model');
-const { uniqBy } = require('lodash');
+const { get, uniqBy } = require('lodash');
 
 module.exports = class DocumentContext {
 
-  constructor({ read, schema, type, id, branch, sourceId, generation, upstreamDoc, additionalIncludes=[] }) {
+  constructor({ read, schema, type, id, branch, sourceId, generation, upstreamDoc, includePaths }) {
     this.schema = schema;
     this.type = type;
     this.id = id;
@@ -13,7 +13,7 @@ module.exports = class DocumentContext {
     this.sourceId = sourceId;
     this.generation = generation;
     this.upstreamDoc = upstreamDoc;
-    this.additionalIncludes = additionalIncludes ? additionalIncludes.map(part => part.split('.')) : [];
+    this.includePaths = includePaths ? includePaths.map(part => part ? part.split('.') : null).filter(i => Boolean(i)) : [];
     this._read = read;
     this.cache = {};
     this.isCollection = upstreamDoc && upstreamDoc.data && Array.isArray(upstreamDoc.data);
@@ -28,8 +28,8 @@ module.exports = class DocumentContext {
 
     // special case for the built-in implicit relationship between
     // user-realms and the underlying user record it is tracking
-    if (type === 'user-realms') {
-      let user = upstreamDoc.relationships.user.data;
+    let user = get(upstreamDoc, 'relationships.user.data');
+    if (type === 'user-realms' && user) {
       this._references.push(`${user.type}/${user.id}`);
     }
   }
@@ -54,7 +54,7 @@ module.exports = class DocumentContext {
 
     let pristine = searchDoc.cardstack_pristine;
 
-    if (!this.isCollection) {
+    if (!this.isCollection && this.sourceId != null) {
       pristine.data.meta.source = this.sourceId;
     }
 
@@ -214,12 +214,17 @@ module.exports = class DocumentContext {
         let contentType = this.schema.types.get(resource.type);
         if (!contentType) { continue; }
 
-        let additionalIncludes = {};
-        for (let segments of this.additionalIncludes) {
-          this._buildSearchTree(additionalIncludes, contentType, segments);
+        let includesTree;
+        if (this.includePaths.length) {
+          includesTree = {};
+          for (let segments of this.includePaths) {
+            this._buildSearchTree(includesTree, contentType, segments);
+          }
+        } else {
+          includesTree = contentType.includesTree;
         }
 
-        let pristineItem = await this._build(resource.type, resource.id, resource, Object.assign(additionalIncludes, contentType.includesTree), depth + 1);
+        let pristineItem = await this._build(resource.type, resource.id, resource, includesTree, depth + 1);
         assignMeta(pristineItem, jsonapiDoc.data[index]);
 
         pristine.data.push(pristineItem);
@@ -232,6 +237,14 @@ module.exports = class DocumentContext {
         log.warn("ignoring unknown document type=%s id=%s", type, id);
         return;
       }
+
+      if (depth === 0 && this.includePaths.length){
+        searchTree = {};
+        for (let segments of this.includePaths) {
+          this._buildSearchTree(searchTree, contentType, segments);
+        }
+      }
+
       // we are going inside a parent document's includes, so we need
       // our own type here.
       if (depth > 0) {

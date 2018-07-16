@@ -29,14 +29,14 @@ class Searchers {
     return this._sources;
   }
 
-  async get(session, branch, type, id) {
+  async get(session, branch, type, id, includePaths) {
     if (arguments.length < 4) {
       throw new Error(`session is now a required argument to searchers.get`);
     }
     let sources = await this._lookupSources();
     let index = 0;
     let sessionOrEveryone = session || Session.EVERYONE;
-    let schemaPromise = this.currentSchema.forBranch(branch);
+    // let schemaPromise = this.currentSchema.forBranch(branch);
     let next = async () => {
       let source = sources[index++];
       if (source) {
@@ -53,18 +53,29 @@ class Searchers {
       }
     };
     let result = await next();
+    let authorizedResult;
+    if (result && result.data) {
+      // let schema = await schemaPromise;
+      let schema = await this.currentSchema.forBranch(branch);
+      let pristineResult = await (new DocumentContext({
+        id,
+        type,
+        branch,
+        schema,
+        includePaths,
+        upstreamDoc: result.data,
+        read: this._read(branch)
+      }).pristineDoc());
 
-    if (result) {
-      let schema = await schemaPromise;
-      result = await schema.applyReadAuthorization(result, { session, type, id });
+      authorizedResult = await schema.applyReadAuthorization(pristineResult, { session, type, id });
     }
 
-    if (!result) {
+    if (!authorizedResult) {
       throw new Error(`No such resource ${branch}/${type}/${id}`, {
         status: 404
       });
     }
-    return result;
+    return authorizedResult;
   }
 
   async getFromControllingBranch(session, type, id) {
@@ -100,11 +111,11 @@ class Searchers {
     let result = await next();
     if (result) {
       let schema = await schemaPromise;
-      let additionalIncludes = (get(query, 'queryString.include') || '').split(',');
+      let includePaths = (get(query, 'queryString.include') || '').split(',');
       let pristineResult = await (new DocumentContext({
         branch,
         schema,
-        additionalIncludes,
+        includePaths,
         upstreamDoc: result,
         read: this._read(branch)
       }).pristineDoc());
