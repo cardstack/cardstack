@@ -72,8 +72,7 @@ class Indexers extends EventEmitter {
         }
       })();
     }
-    let schema = (await this._schemaCache)[branch];
-    return schema;
+    return (await this._schemaCache)[branch];
   }
 
   async invalidateSchemaCache() {
