@@ -1,34 +1,33 @@
 const Error = require('@cardstack/plugin-utils/error');
 const qs = require('qs');
-const { merge, flatten, uniq, uniqBy } = require('lodash');
+const { merge } = require('lodash');
 const koaJSONBody = require('koa-json-body');
 const log = require('@cardstack/logger')('cardstack/jsonapi');
 const { declareInjections } = require('@cardstack/di');
 const { URL } = require('url');
-const defaultIncludes = {};
 const { withJsonErrorHandling } = Error;
 
 module.exports = declareInjections({
   searcher: 'hub:searchers',
   writers: 'hub:writers',
   indexers: 'hub:indexers',
-  schema: 'hub:current-schema'
+  controllingBranch: 'hub:controlling-branch',
 }, {
-  create({ searcher, writers, indexers }) {
+  create({ searcher, writers, indexers, controllingBranch }) {
     return {
       category: 'api',
       after: 'authentication',
       middleware() {
-        return jsonapiMiddleware(searcher, writers, indexers);
+        return jsonapiMiddleware(searcher, writers, indexers, controllingBranch.name);
       }
     };
   }
 });
 
-function jsonapiMiddleware(searcher, writers, indexers) {
+function jsonapiMiddleware(searcher, writers, indexers, defaultBranch) {
   // TODO move into config
   let options = {
-    defaultBranch: 'master',
+    defaultBranch,
     prefix: 'api'
   };
 
@@ -84,26 +83,10 @@ class Handler {
     this.query = qs.parse(this.ctxt.request.querystring, { plainObjects: true });
     this.branch = this.query.branch || options.defaultBranch;
     this.prefix = options.prefix || '';
-    this._includes = null;
   }
 
   get session() {
     return this.ctxt.state.cardstackSession;
-  }
-
-  get includes() {
-    if (!this._includes) {
-      if (this.query.include != null) {
-        if (this.query.include) {
-          this._includes = this.query.include.split(',').map(part => part.split('.'));
-        } else {
-          this._includes = [];
-        }
-      } else {
-        this._includes = defaultIncludes;
-      }
-    }
-    return this._includes;
   }
 
   filterExpression(type, id) {
@@ -143,14 +126,12 @@ class Handler {
   }
 
   async handleIndividualGET(type, id) {
-    let body = await this._lookupRecord(type, id);
-    this.ctxt.body = body;
-    if (this.includes === defaultIncludes) {
-      // leave alone whatever includes were already on the document we
-      // got out of the search index.
-      return;
+    let include = (this.query.include || '').split(',');
+    let body = await this.searcher.get(this.session, this.branch, type, id, include);
+    if (this.query.include === '') {
+      delete body.included;
     }
-    await this._loadAllIncluded([body.data]);
+    this.ctxt.body = body;
   }
 
   async handleIndividualPATCH(type, id) {
@@ -182,7 +163,7 @@ class Handler {
       filter: this.filterExpression(type),
       sort: this.query.sort,
       page: this.query.page,
-      queryString: this.query.q
+      queryString: this.query
     });
     let body = { data: models, meta: { total: page.total } };
     if (page.cursor) {
@@ -191,19 +172,8 @@ class Handler {
       };
     }
     this.ctxt.body = body;
-    if (this.includes === defaultIncludes) {
-      if (included) {
-        // the default includes out of the searcher are not guaranteed
-        // to be deduplicated
-        body.included = uniqBy(models.concat(included), r => `${r.type}/${r.id}`).slice(models.length);
-      }
-    } else {
-      if (included && included.length > 0) {
-        // we don't need to do any deduplication here because
-        // loadAllIncluded is going to take over.
-        body.included = included;
-      }
-      await this._loadAllIncluded(models);
+    if (this.query.include !== '' && included && included.length > 0) {
+      body.included = included;
     }
   }
 
@@ -217,36 +187,6 @@ class Handler {
       origin += '/' + this.prefix;
     }
     this.ctxt.set('location', origin + this.ctxt.request.path + '/' + record.data.id);
-  }
-
-  async _lookupRecord(type, id) {
-    let record = await this.searcher.get(this.session, this.branch, type, id);
-    return record;
-  }
-
-  async _cachedLookupRecord(type, id, cache) {
-    let key = `${type}/${id}`;
-    {
-      let cached = cache[key];
-      if (cached) {
-        return cached;
-      }
-    }
-    let resource = await this._lookupRecord(type, id);
-    if (resource) {
-      if (!cache[key]) {
-        cache[key] = resource.data;
-      }
-      if (resource.included) {
-        for (let inner of resource.included) {
-          let innerKey = `${inner.type}/${inner.id}`;
-          if (!cache[innerKey]) {
-            cache[innerKey] = inner;
-          }
-        }
-      }
-      return cache[key];
-    }
   }
 
   _mandatoryBodyData() {
@@ -268,73 +208,5 @@ class Handler {
     let u = new URL(origin + (this.ctxt.req.originalUrl || this.ctxt.req.url));
     u.search = "?" + qs.stringify(p, { encode: false });
     return u.href;
-  }
-
-  async _loadAllIncluded(root) {
-    // this is a map from each requested include path to a promise
-    // that resolves with the list of resources in that set
-    let sets = Object.create(null);
-
-    // this is a map from type/id strings to each of the resources we
-    // have already loaded.
-    let cache = Object.create(null);
-    for (let resource of root) {
-      cache[`${resource.type}/${resource.id}`] = resource;
-    }
-
-    // some included models may have already come along with the
-    // document we got out of the searcher
-    if (this.ctxt.body.included) {
-      for (let resource of this.ctxt.body.included) {
-        cache[`${resource.type}/${resource.id}`] = resource;
-      }
-    }
-
-    this.includes.forEach(segments => this._loadIncluded(root, segments, cache, sets));
-
-    // this uniq works because our cache works as an identity map
-    let included = uniq(root.concat(flatten(await Promise.all(Object.values(sets)))));
-
-    if (included.length > root.length) {
-      this.ctxt.body.included = included.slice(root.length);
-    } else {
-      delete this.ctxt.body.included;
-    }
-  }
-
-  async _loadIncluded(root, segments, cache, sets) {
-    let name = segments.join('.');
-    if (sets[name]) {
-      return sets[name];
-    }
-
-    return sets[name] = (async () => {
-      let tail = segments[segments.length - 1];
-      let sourceSet;
-      if (segments.length === 1) {
-        sourceSet = root;
-      } else {
-        sourceSet = await this._loadIncluded(root, segments.slice(0, -1), cache, sets);
-      }
-
-      // TODO: we could correlate all the things that need to be
-      // fetched at this level into a single query, or at least a
-      // single query per type.
-      let lists = await Promise.all(sourceSet.map(async record => {
-        if (!record.relationships || !record.relationships[tail]) {
-          return [];
-        }
-        let data = record.relationships[tail].data;
-        if (Array.isArray(data)) {
-          return Promise.all(data.map(ref => this._cachedLookupRecord(ref.type, ref.id, cache)));
-        } else if (data) {
-          let resource = await this._cachedLookupRecord(data.type, data.id, cache);
-          return [resource];
-        } else {
-          return [];
-        }
-      }));
-      return flatten(lists);
-    })();
   }
 }

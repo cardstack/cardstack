@@ -2,6 +2,8 @@ const { declareInjections } = require('@cardstack/di');
 const log = require('@cardstack/logger')('cardstack/searchers');
 const Error = require('@cardstack/plugin-utils/error');
 const Session = require('@cardstack/plugin-utils/session');
+const DocumentContext = require('./indexing/document-context');
+const { get } = require('lodash');
 
 module.exports = declareInjections({
   controllingBranch: 'hub:controlling-branch',
@@ -27,7 +29,7 @@ class Searchers {
     return this._sources;
   }
 
-  async get(session, branch, type, id) {
+  async get(session, branch, type, id, includePaths) {
     if (arguments.length < 4) {
       throw new Error(`session is now a required argument to searchers.get`);
     }
@@ -51,18 +53,28 @@ class Searchers {
       }
     };
     let result = await next();
-
-    if (result) {
+    let authorizedResult;
+    if (result && result.data) {
       let schema = await schemaPromise;
-      result = await schema.applyReadAuthorization(result, { session, type, id });
+      let pristineResult = await (new DocumentContext({
+        id,
+        type,
+        branch,
+        schema,
+        includePaths,
+        upstreamDoc: result.data,
+        read: this._read(branch)
+      }).pristineDoc());
+
+      authorizedResult = await schema.applyReadAuthorization(pristineResult, { session, type, id });
     }
 
-    if (!result) {
+    if (!authorizedResult) {
       throw new Error(`No such resource ${branch}/${type}/${id}`, {
         status: 404
       });
     }
-    return result;
+    return authorizedResult;
   }
 
   async getFromControllingBranch(session, type, id) {
@@ -76,7 +88,6 @@ class Searchers {
     if (arguments.length < 3) {
       throw new Error(`session is now a required argument to searchers.search`);
     }
-
     let sources = await this._lookupSources();
     let schemaPromise = this.currentSchema.forBranch(branch);
     let index = 0;
@@ -99,8 +110,17 @@ class Searchers {
     let result = await next();
     if (result) {
       let schema = await schemaPromise;
-      let authorizedResult = await schema.applyReadAuthorization(result, { session });
-      if (authorizedResult.data.length !== result.data.length) {
+      let includePaths = (get(query, 'queryString.include') || '').split(',');
+      let pristineResult = await (new DocumentContext({
+        branch,
+        schema,
+        includePaths,
+        upstreamDoc: result,
+        read: this._read(branch)
+      }).pristineDoc());
+
+      let authorizedResult = await schema.applyReadAuthorization(pristineResult, { session });
+      if (authorizedResult.data.length !== pristineResult.data.length) {
         // We can eventually make this more of just a warning, but for
         // now it's cleaner to just force the searchers to implement
         // grants correctly. Otherwise we will need to be able to
@@ -118,5 +138,19 @@ class Searchers {
     return this.search(session, this.controllingBranch.name, query);
   }
 
+  _read(branch) {
+    return async (type, id) => {
+      let result;
+      try {
+        result = await this.get(Session.INTERNAL_PRIVILEGED, branch, type, id);
+      } catch (err) {
+        if (err.status !== 404) { throw err; }
+      }
+
+      if (result && result.data) {
+        return result.data;
+      }
+    };
+  }
 
 });
