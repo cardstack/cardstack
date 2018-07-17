@@ -15,6 +15,7 @@ module.exports = class DocumentContext {
     this.upstreamDoc = upstreamDoc;
     this.includePaths = includePaths ? includePaths.map(part => part ? part.split('.') : null).filter(i => Boolean(i)) : [];
     this._read = read;
+    this._realms = [];
     this.cache = {};
     this.isCollection = upstreamDoc && upstreamDoc.data && Array.isArray(upstreamDoc.data);
 
@@ -37,43 +38,28 @@ module.exports = class DocumentContext {
   async searchDoc() {
     if (this.isCollection) { return; }
 
-    let searchDoc = await this._getCachedSearchDoc();
+    let searchDoc = await this._buildCachedResponse();
     if (!searchDoc) { return; }
-
-    // TODO adapting the searchdoc response to new structure available to pg-search, still need to refactor this internally to remove these deletes
-    delete searchDoc.cardstack_pristine;
-    delete searchDoc.cardstack_references;
-    delete searchDoc.cardstack_realms;
 
     return searchDoc;
   }
 
   async pristineDoc() {
-    let searchDoc = await this._getCachedSearchDoc();
-    if (!searchDoc) { return; }
-
-    let pristine = searchDoc.cardstack_pristine;
-
-    if (!this.isCollection && this.sourceId != null) {
-      pristine.data.meta.source = this.sourceId;
-    }
-
-    return pristine;
+    await this._buildCachedResponse();
+    return this._pristine;
   }
 
   async realms() {
     if (this.isCollection) { return; }
 
-    let searchDoc = await this._getCachedSearchDoc();
-    if (!searchDoc) { return; }
-
-    return searchDoc.cardstack_realms;
+    await this._buildCachedResponse();
+    return this._realms;
   }
 
   async references() {
     if (this.isCollection) { return; }
 
-    await this._getCachedSearchDoc(); // side effect builds up the references
+    await this._buildCachedResponse();
     return this._references;
   }
 
@@ -96,7 +82,7 @@ module.exports = class DocumentContext {
 
 
   // TODO come up with a better way to cache (use Model)
-  async _getCachedSearchDoc() {
+  async _buildCachedResponse() {
     let searchTree;
     if (!this.isCollection) {
       let contentType = this.schema.types.get(this.type);
@@ -269,14 +255,13 @@ module.exports = class DocumentContext {
     if (depth > 0) {
       this.pristineIncludes.push(pristine.data);
     } else {
-      // The next fields in the searchDoc get a "cardstack_" prefix so
-      // they aren't likely to collide with the user's attribute or
-      // relationship.
-      searchDoc.cardstack_pristine = pristine;
+      this._pristine = pristine;
       if (!isCollection) {
-        searchDoc.cardstack_references = this._references;
-        searchDoc.cardstack_realms = this.schema.authorizedReadRealms(type, jsonapiDoc);
-        authLog.trace("setting resource_realms for %s %s: %j", type, id, searchDoc.cardstack_realms);
+        if (this.sourceId != null) {
+          this._pristine.data.meta.source = this.sourceId;
+        }
+        this._realms = this.schema.authorizedReadRealms(type, jsonapiDoc);
+        authLog.trace("setting resource_realms for %s %s: %j", type, id, this._realms);
       }
     }
     if (this.isCollection && depth === 1) {
