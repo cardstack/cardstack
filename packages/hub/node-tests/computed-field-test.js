@@ -207,7 +207,7 @@ describe('hub/computed-fields', function() {
     beforeEach(setup);
     afterEach(teardown);
 
-    it.skip("includes computed field in create response", async function() {
+    it("includes computed field in create response", async function() {
       let model = await env.lookup('hub:writers').create('master', env.session, 'foods', {
         type: 'foods',
         attributes: {
@@ -215,14 +215,14 @@ describe('hub/computed-fields', function() {
           'weight-in-ounces': 1
         }
       });
-      expect(model).has.deep.property('attributes.weight-in-grams', 28);
+      expect(model.data).has.deep.property('attributes.weight-in-grams', 28);
     });
 
-    it.skip("includes computed field in update response", async function() {
+    it("includes computed field in update response", async function() {
       let model = await env.lookup('hub:searchers').get(env.session, 'master', 'foods', banana.id);
       model.data.attributes['weight-in-ounces'] = 1;
       let response = await env.lookup('hub:writers').update('master', env.session, 'foods', banana.id, model.data);
-      expect(response).has.deep.property('attributes.weight-in-grams', 28);
+      expect(response.data).has.deep.property('attributes.weight-in-grams', 28);
     });
 
     it("updates computed field in response to a dependent model changing", async function() {
@@ -234,12 +234,12 @@ describe('hub/computed-fields', function() {
       expect(model.data).has.deep.property('attributes.good-with-red', false);
     });
 
-    it.skip("adds computed fields to custom searcher's get response", async function() {
+    it("adds computed fields to custom searcher's get response", async function() {
       let model = await env.lookup('hub:searchers').get(env.session, 'master', 'sample-searcher-models', '1');
       expect(model).has.deep.property('data.attributes.double-height', 2);
     });
 
-    it.skip("adds computed fields to custom searcher's search response", async function() {
+    it("adds computed fields to custom searcher's search response", async function() {
       let response = await env.lookup('hub:searchers').search(env.session, 'master', { filter: { type: 'sample-searcher-models' } });
       expect(response.data).has.length(1);
       expect(response.data[0]).has.deep.property('attributes.double-height', 2);
