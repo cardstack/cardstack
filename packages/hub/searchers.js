@@ -36,7 +36,7 @@ class Searchers {
     let sources = await this._lookupSources();
     let index = 0;
     let sessionOrEveryone = session || Session.EVERYONE;
-    // let schemaPromise = this.currentSchema.forBranch(branch);
+    let schemaPromise = this.currentSchema.forBranch(branch);
     let next = async () => {
       let source = sources[index++];
       if (source) {
@@ -55,8 +55,7 @@ class Searchers {
     let result = await next();
     let authorizedResult;
     if (result && result.data) {
-      // let schema = await schemaPromise;
-      let schema = await this.currentSchema.forBranch(branch);
+      let schema = await schemaPromise;
       let pristineResult = await (new DocumentContext({
         id,
         type,

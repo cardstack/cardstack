@@ -135,10 +135,10 @@ class Indexers extends EventEmitter {
           // Compare each branch, so we don't invalidate the schemas
           // unnecessarily
           for (let [branch, newSchema] of Object.entries(schemas)) {
-            let oldSchema = priorCache[branch];
+            let oldSchema = (await priorCache)[branch];
             if (!newSchema.equalTo(oldSchema)) {
               log.info('schema for branch %s was changed', branch);
-              priorCache[branch] = newSchema;
+              (await priorCache)[branch] = newSchema;
               if (oldSchema) {
                 await oldSchema.teardown();
               }
