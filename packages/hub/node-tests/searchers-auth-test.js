@@ -412,7 +412,78 @@ describe('hub/searchers/auth', function() {
   });
 
 
-  it("reacts when a grant is created");
-  it("reacts when a grant is updated");
-  it("reacts when a grant is deleted");
+  it("reacts when a grant is created", async function() {
+    await setup(factory => {
+      factory.addResource('groups', 'cool-kids')
+        .withAttributes({
+          searchQuery: { filter: { type: { exact: 'authors' }, name: { exact: 'Arthur Faulkner' } } }
+        });
+    });
+
+    let factory = new JSONAPIFactory();
+
+    factory.addResource('grants')
+      .withAttributes({ mayReadResource: true, mayReadFields: true })
+      .withRelated('who', [{ type: 'groups', id: 'cool-kids' }]);
+
+    let writers = env.lookup('hub:writers');
+    for (let model of factory.getModels()) {
+      let { type } = model;
+      await writers.create('master', Session.INTERNAL_PRIVILEGED, type, model);
+    }
+
+    let doc = await searchers.search(sessions.create('authors', 'arthur'), 'master', { filter: { type: 'posts' } });
+    expect(doc.data).has.length(1);
+    expect(doc.data[0]).has.deep.property('attributes.title', 'First Post');
+    expect(doc.meta).has.deep.property('page.total', 1);
+  });
+
+  it("reacts when a grant is updated", async function() {
+    await setup(factory => {
+      factory.addResource('groups', 'not-cool-kids')
+        .withAttributes({
+          searchQuery: { filter: { type: { exact: 'authors' }, name: { exact: 'Hassan Abdel-Rahman' } } }
+        });
+      factory.addResource('groups', 'cool-kids')
+        .withAttributes({
+          searchQuery: { filter: { type: { exact: 'authors' }, name: { exact: 'Arthur Faulkner' } } }
+        });
+      factory.addResource('grants', 'test-grant')
+        .withAttributes({ mayReadResource: true, mayReadFields: true })
+        .withRelated('who', [{ type: 'groups', id: 'not-cool-kids' }]);
+    });
+
+    let writers = env.lookup('hub:writers');
+    let searchers = env.lookup('hub:searchers');
+    let grant = await searchers.get(Session.INTERNAL_PRIVILEGED, 'master', 'grants', 'test-grant');
+
+    grant.data.relationships.who.data = [{ id: 'cool-kids', type: 'groups' }];
+    await writers.update('master', Session.INTERNAL_PRIVILEGED, 'grants', 'test-grant', grant.data);
+
+    let doc = await searchers.search(sessions.create('authors', 'arthur'), 'master', { filter: { type: 'posts' } });
+    expect(doc.data).has.length(1);
+    expect(doc.data[0]).has.deep.property('attributes.title', 'First Post');
+    expect(doc.meta).has.deep.property('page.total', 1);
+  });
+
+  it("reacts when a grant is deleted", async function() {
+    await setup(factory => {
+      factory.addResource('groups', 'cool-kids')
+        .withAttributes({
+          searchQuery: { filter: { type: { exact: 'authors' }, name: { exact: 'Arthur Faulkner' } } }
+        });
+      factory.addResource('grants', 'test-grant')
+        .withAttributes({ mayReadResource: true, mayReadFields: true })
+        .withRelated('who', [{ type: 'groups', id: 'not-cool-kids' }]);
+    });
+
+    let writers = env.lookup('hub:writers');
+    let searchers = env.lookup('hub:searchers');
+    let grant = await searchers.get(Session.INTERNAL_PRIVILEGED, 'master', 'grants', 'test-grant');
+
+    await writers.delete('master', Session.INTERNAL_PRIVILEGED, grant.data.meta.version, 'grants', 'test-grant');
+
+    let doc = await searchers.search(sessions.create('authors', 'arthur'), 'master', { filter: { type: 'posts' } });
+    expect(doc.data).has.length(0);
+  });
 });

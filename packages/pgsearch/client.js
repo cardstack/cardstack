@@ -149,21 +149,28 @@ class PgClient extends EventEmitter {
 
   async docsThatReference(branch, references, fn){
     const queryBatchSize = 100;
+    for (let i = 0; i < references.length; i += queryBatchSize){
+      let queryRefs = references.slice(i, i + queryBatchSize);
+      await this._iterateThroughRows(
+        'select upstream_doc, refs from documents where branch=$1 and refs && $2',
+        [branch, queryRefs],
+        async (row) => await fn(row.upstream_doc, row.refs)
+      );
+    }
+  }
+
+  async _iterateThroughRows(sql, params, fn) {
     const rowBatchSize = 100;
-    const sql = 'select upstream_doc, refs from documents where branch=$1 and refs && $2';
     let client = await this.pool.connect();
     try {
-      for (let i = 0; i < references.length; i += queryBatchSize){
-        let queryRefs = references.slice(i, i + queryBatchSize);
-        let cursor = client.query(new Cursor(sql, [branch, queryRefs]));
-        let rows;
-        do {
-          rows = await readCursor(cursor, rowBatchSize);
-          for (let row of rows){
-            await fn(row.upstream_doc, row.refs);
-          }
-        } while (rows.length > 0);
-      }
+      let cursor = client.query(new Cursor(sql, params));
+      let rows;
+      do {
+        rows = await readCursor(cursor, rowBatchSize);
+        for (let row of rows){
+          await fn(row);
+        }
+      } while (rows.length > 0);
     }
     finally {
       client.release();
@@ -179,6 +186,8 @@ class Batch {
     this._schema = null;
     this._read = null;
     this._branch = null;
+    this._grantsTouched = false;
+    this._groupsTouched = false;
   }
 
   async saveDocument(context) {
@@ -202,9 +211,7 @@ class Batch {
     await this.client.emitEvent('add', context);
     log.debug("save %s %s", type, id);
 
-    if (this.client.controllingBranch.name === branch) {
-      await this.maybeUpdateRealms(context);
-    }
+    await this._handleGrantOrGroupsTouched(context);
   }
 
   async deleteDocument(context) {
@@ -221,10 +228,63 @@ class Batch {
     await this.client.emitEvent('delete', { type, id });
     log.debug("delete %s %s", type, id);
 
+    await this._handleGrantOrGroupsTouched(context);
   }
 
   async done() {
     await this._invalidations(this._schema, this._branch, this._read);
+
+    if (this._grantsTouched) {
+      await this._recalcuateRealms();
+      // recalculate the user-realms, as the hub optimizes realms assigned
+      // to users to only "in-use" realms. which may have changed by
+      // recalculating realms above
+      await this._recalculateUserRealms();
+    } else if (this._groupsTouched) {
+      await this._recalculateUserRealms();
+    }
+  }
+
+  async _handleGrantOrGroupsTouched(context) {
+    let { branch, type } = context;
+
+    if (this.client.controllingBranch.name === branch) {
+      this._grantsTouched = this._grantsTouched || type === 'grants';
+      this._groupsTouched = this._groupsTouched || type === 'groups';
+      await this._maybeUpdateRealms(context);
+    }
+  }
+
+  async _recalcuateRealms() {
+    let branch = this.client.controllingBranch.name;
+    await this.client._iterateThroughRows(
+      'select id, type, upstream_doc from documents where branch=$1',
+      [branch],
+      async ({ id, upstream_doc:upstreamDoc, type }) => {
+        let realms = this._schema.authorizedReadRealms(type, upstreamDoc);
+        const sql = 'update documents set realms=$1 where id=$2 and type=$3 and branch=$4';
+        await this.client.query(sql, [realms, id, type, branch]);
+      });
+  }
+
+  async _recalculateUserRealms() {
+    let branch = this.client.controllingBranch.name;
+    await this.client._iterateThroughRows(
+      `select id, type, source, upstream_doc, generation from documents where branch=$1 and type != 'user-realms'`,
+      [branch],
+      async ({ id, type, source:sourceId, upstream_doc:upstreamDoc, generation }) => {
+          let context = new DocumentContext({
+            branch,
+            type,
+            id,
+            sourceId,
+            generation,
+            upstreamDoc,
+            schema: this._schema,
+            read: this._read
+          });
+          await this._maybeUpdateRealms(context);
+      });
   }
 
   // This method does not need to recursively invalidate, because each
@@ -249,7 +309,7 @@ class Batch {
           sourceId,
           generation: nonce,
           upstreamDoc: doc,
-          read: (type, id) => read(type, id)
+          read
         });
 
         if (type === 'user-realms') {
@@ -289,8 +349,10 @@ class Batch {
     return false;
   }
 
-  async maybeUpdateRealms(context) {
+  async _maybeUpdateRealms(context) {
     let { id, type, branch, sourceId, generation, schema, read, upstreamDoc:doc } = context;
+    if (!doc) { return; }
+
     let realms = await schema.userRealms(doc);
     if (realms) {
       let userRealmsId = Session.encodeBaseRealm(type, id);

@@ -1,5 +1,4 @@
 import DAGMap from 'dag-map';
-import { some } from 'lodash';
 
 let idGenerator = 0;
 
@@ -28,8 +27,6 @@ export default class JSONAPIFactory {
 
   getModels() {
     let dag = new DAGMap();
-    let grants = this.data.filter(model => model.type === 'grants');
-    let alreadyDependsOnGrants;
     this.data.forEach(model => {
       let dependsOn = [];
       if (model.relationships) {
@@ -37,34 +34,10 @@ export default class JSONAPIFactory {
           let data = model.relationships[rel].data;
           if (Array.isArray(data)) {
             dependsOn = dependsOn.concat(data.map(ref => `${ref.type}/${ref.id}`));
-            alreadyDependsOnGrants = some(data, ref => ref.type === 'grants');
           } else {
-            alreadyDependsOnGrants = data.type === 'grants';
             dependsOn.push(`${data.type}/${data.id}`);
           }
         });
-      }
-
-      // There is an implicit relationship between grants and pretty much every other record.
-      // This is a short term fix to deal with this situation. Ultimately we want to invalidate everybody's
-      // realms everytime grants change. Need to be careful not to create circular relationships, so not
-      // adding grant dependencies to bootstrap schema or to instances of types that grants are depending on.
-      if (!alreadyDependsOnGrants &&
-          !['data-sources','content-types','fields','grants','default-values','groups'].includes(model.type)) {
-        for (let grant of grants) {
-          if (grant.relationships) {
-            for (let rel of Object.keys(grant.relationships)) {
-              let data = grant.relationships[rel].data;
-              if (Array.isArray(data) && !some(data, ref => ref.type === model.type)) {
-                dependsOn.push(`${grant.type}/${grant.id}`);
-              } else if (!Array.isArray(data) && (model.type !== data.type)) {
-                dependsOn.push(`${grant.type}/${grant.id}`);
-              } else { break; }
-            }
-          } else {
-            dependsOn.push(`${grant.type}/${grant.id}`);
-          }
-        }
       }
 
       dependsOn.push(`content-types/${model.type}`);
