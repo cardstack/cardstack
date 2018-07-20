@@ -33,7 +33,7 @@ class Writers {
     let pristine;
     try {
       let newSchema = await schema.validate(pending, { type, session });
-      let context = await this._finalize(pending, branch, type, schema, sourceId);
+      let context = await this._finalize(pending, branch, type, newSchema || schema, sourceId);
       if (newSchema) {
         this.schema.invalidateCache();
       }
@@ -68,7 +68,7 @@ class Writers {
     let pristine;
     try {
       let newSchema = await schema.validate(pending, { type, id, session });
-      let context = await this._finalize(pending, branch, type, schema, sourceId);
+      let context = await this._finalize(pending, branch, type, newSchema || schema, sourceId);
       if (newSchema) {
         this.schema.invalidateCache();
       }
@@ -95,7 +95,7 @@ class Writers {
     let pending = await writer.prepareDelete(branch, session, version, type, id, isSchema);
     try {
       let newSchema = await schema.validate(pending, { session });
-      let context = await this._finalize(pending, branch, type, schema, sourceId, id);
+      let context = await this._finalize(pending, branch, type, newSchema || schema, sourceId, id);
 
       if (newSchema) {
         this.schema.invalidateCache();
