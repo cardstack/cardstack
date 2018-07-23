@@ -1,3 +1,6 @@
+const bootstrapSchema = require('@cardstack/hub/bootstrap-schema');
+const systemModels = [{ id: '@cardstack/hub', type: 'groups' }];
+
 module.exports = class StubSearcher {
   static create(params) {
     return new this(params);
@@ -8,6 +11,10 @@ module.exports = class StubSearcher {
   }
 
   async get(session, branch, type, id, next) {
+    if (bootstrapSchema.concat(systemModels).find(m => m.type === type && m.id === id)) {
+      return await next();
+    }
+
     if (this.params.injectFirst) {
       return { data: makeModel(type, id, this.params.injectFirst) };
     }

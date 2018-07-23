@@ -5,6 +5,7 @@
     "api-version": 1
   },
   "devDependencies": {
+    "@cardstack/hub": "*",
     "@cardstack/test-support": "*"
   },
   "engines": {
