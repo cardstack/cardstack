@@ -1,6 +1,7 @@
 const temp = require('./temp-helper');
 const PgClient = require('@cardstack/pgsearch/client');
 const JSONAPIFactory = require('./jsonapi-factory');
+const Session = require('@cardstack/plugin-utils/session');
 const crypto = require('crypto');
 const { wireItUp, loadSeeds } = require('@cardstack/hub/main');
 const { partition } = require('lodash');
@@ -50,10 +51,11 @@ exports.createDefaultEnvironment = async function(projectDir, initialModels = []
         mayLogin: true
       }).withRelated('who', [{ type: user.data.type, id: user.data.id }]);
 
+    let models = factory.getModels();
     let [
       foreignInitialModels,
       ephemeralInitialModels
-    ] = partitionInitialModels(factory.getModels());
+    ] = partitionInitialModels(models);
 
     opts.disableAutomaticIndexing = true;
     opts.seeds = () => ephemeralInitialModels;
@@ -73,6 +75,22 @@ exports.createDefaultEnvironment = async function(projectDir, initialModels = []
     } else {
       await container.lookup('hub:indexers').update({ forceRefresh: true });
     }
+
+    let ephemeralStorage = await container.lookup(`plugin-services:${require.resolve('@cardstack/ephemeral/service')}`);
+    let searchers = await container.lookup(`hub:searchers`);
+    let controllingBranch = await container.lookup(`hub:controlling-branch`);
+    await ephemeralStorage.validateModels(models, async(type, id) => {
+      let result;
+      try {
+        result = await searchers.get(Session.INTERNAL_PRIVILEGED, controllingBranch.name, type, id);
+      } catch (err) {
+        if (err.status !== 404) { throw err; }
+      }
+
+      if (result && result.data) {
+        return result.data;
+      }
+    });
 
     let session = container.lookup('hub:sessions').create('test-users', 'the-default-test-user');
 

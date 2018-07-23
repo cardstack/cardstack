@@ -63,8 +63,8 @@ module.exports = declareInjections({
   // a consistent schema, because we're allowed to depend on models
   // coming out of other indexers (and we probably depend on
   // the @cardstack/hub::seeds indexer in any case).
-  async validateModels(initialModels, readOtherIndexers) {
-    let models = await crawlModels(initialModels, readOtherIndexers);
+  async validateModels(initialModels, read) {
+    let models = await crawlModels(initialModels, read);
     let schemaTypes = this.schemaLoader.ownTypes();
     let [schemaModels, dataModels] = partition(models, model => schemaTypes.includes(model.type));
     let schema = await this.schemaLoader.loadFrom(schemaModels);
@@ -75,7 +75,7 @@ module.exports = declareInjections({
 });
 
 
-async function crawlModels(initialModels, readOtherIndexers) {
+async function crawlModels(initialModels, read) {
   let models = new Map();
   let foundModels = initialModels;
   while (foundModels.length > 0) {
@@ -91,7 +91,7 @@ async function crawlModels(initialModels, readOtherIndexers) {
       let key = `${type}/${id}`;
       if (!models.has(key)) {
         models.set(key, null);
-        let output = await readOtherIndexers(type, id);
+        let output = await read(type, id);
         return output;
       }
     }))).filter(Boolean);
@@ -145,14 +145,6 @@ class EphemeralStorage {
     // models are consistent with all the rest. So we allow a hook for
     // delayed validation.
     this.validatorHook = validatorHook;
-  }
-
-  async maybeTriggerDelayedValidation(readOtherIndexers) {
-    let hook = this.validatorHook;
-    if (hook) {
-      this.validatorHook = null;
-      await hook(readOtherIndexers);
-    }
   }
 
   get identity() {

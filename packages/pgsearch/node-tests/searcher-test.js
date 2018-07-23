@@ -170,7 +170,6 @@ describe('pgsearch/searcher', function() {
       attributes: {
         'first-name': 'Quint',
         'last-name': 'Faulkner',
-        'favorite-color': null,
         age: 10,
         description: {
           version: "0.3.1",

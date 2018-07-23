@@ -33,8 +33,7 @@ class Updater {
     return this.storage.schemaModels();
   }
 
-  async updateContent(meta, hints, ops, readOtherIndexers) {
-    await this.storage.maybeTriggerDelayedValidation(readOtherIndexers);
+  async updateContent(meta, hints, ops) {
     let generation, identity;
     if (meta) {
       generation = meta.generation;

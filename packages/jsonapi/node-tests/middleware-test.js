@@ -179,7 +179,7 @@ describe('jsonapi/middleware', function() {
       expect(response).hasStatus(200);
       expect(response.body).deep.property('data.id', '0');
       expect(response.body).deep.property('data.attributes.title', 'Hello world');
-      expect(response.body).deep.property('data.relationships.author.data', null);
+      expect(response.body).to.not.have.property('data.relationships');
     });
 
     it('returns 404 for missing individual resource', async function() {
