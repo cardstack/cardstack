@@ -20,41 +20,38 @@ class Updater {
     this._plugins = null;
   }
 
-  async plugins(read) {
+  async plugins() {
     if (!this._plugins) {
-      let installedPlugins = await this.pluginLoader.installedPlugins();
-      let pluginConfigs = (await Promise.all(installedPlugins.map(plugin => read('plugin-configs', plugin.id)))).filter(Boolean);
-      this._plugins = await this.pluginLoader.configuredPlugins(pluginConfigs);
+      this._plugins = await this.pluginLoader.installedPlugins();
     }
     return this._plugins;
+  }
+
+  async features() {
+    if (!this._features) {
+      this._features = await this.pluginLoader.installedFeatures();
+    }
+    return this._features;
   }
 
   async schema() {
     return [];
   }
 
-  async updateContent(meta, hints, ops, read) {
-    let activePlugins = await this.plugins(read);
-    let plugins = activePlugins.describeAll();
+  async updateContent(meta, hints, ops) {
+    let plugins = await this.plugins();
+    let features = await this.features();
     if (meta && isEqual(meta.plugins, plugins)) {
       return { plugins };
     }
     await ops.beginReplaceAll();
     for (let plugin of plugins) {
       await ops.save('plugins', plugin.id, plugin);
-      for (let { type, id } of plugin.relationships.features.data) {
-        await ops.save(type, id, activePlugins.describeFeature(type, id));
-      }
+    }
+    for (let feature of features) {
+      await ops.save(feature.type, feature.id, feature);
     }
     await ops.finishReplaceAll();
     return { plugins };
-  }
-
-  async read(type, id, isSchema, read) {
-    if (type === 'plugins') {
-      return (await this.plugins(read)).describe(id);
-    } else {
-      return (await this.plugins(read)).describeFeature(type, id);
-    }
   }
 }

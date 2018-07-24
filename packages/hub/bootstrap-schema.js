@@ -122,7 +122,8 @@ const models = [
       fields: {
         data: [
           { type: 'fields', id: 'features' },
-          { type: 'fields', id: 'enabled' }
+          { type: 'fields', id: 'config' },
+          { type: 'computed-fields', id: 'plugin-enabled' }
         ]
       },
       'data-source': {
@@ -611,6 +612,24 @@ const models = [
     id: 'enabled',
     attributes: {
       'field-type': '@cardstack/core-types::boolean'
+    }
+  },
+  {
+    type: 'computed-fields',
+    id: 'plugin-enabled',
+    attributes: {
+      'computed-field-type': '@cardstack/core-types::alias',
+      params: {
+        'aliasPath': 'config.enabled',
+        'defaultValue': true
+      }
+    }
+  },
+  {
+    type: 'fields',
+    id: 'config',
+    attributes: {
+      'field-type': '@cardstack/core-types::belongs-to'
     }
   },
   {
