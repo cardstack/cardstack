@@ -8,6 +8,10 @@ module.exports = class Model {
     priv.set(this, { contentType, jsonapiDoc, read, schema });
   }
 
+  getContentType() {
+    return priv.get(this).contentType;
+  }
+
   async getField(fieldName) {
     let { contentType, jsonapiDoc } = priv.get(this);
     let field = contentType.realAndComputedFields.get(fieldName);
@@ -47,8 +51,9 @@ module.exports = class Model {
       throw new Error(`${jsonapiDoc.type} ${jsonapiDoc.id} tried to getModel nonexistent type ${type} `);
     }
     let model = await read(type, id);
+    if (!model) { return; }
+
     return new Model(contentType, model, schema, read);
   }
-
 
 };

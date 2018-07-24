@@ -73,6 +73,9 @@ class PluginLoader {
         plugin.relationships = {
           features: {
             data: features.map(({ type, id }) => ({ type, id }))
+          },
+          config: {
+            data: { type: 'plugin-configs', id: plugin.id }
           }
         };
         allFeatures = allFeatures.concat(features);
