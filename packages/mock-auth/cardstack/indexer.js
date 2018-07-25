@@ -108,10 +108,4 @@ class Updater {
       lastSchema: schema
     };
   }
-
-  async read(type, id, isSchema) {
-    if (isSchema) {
-      return (await this.schema()).find(model => model.type === type && model.id === model.id);
-    }
-  }
 }
