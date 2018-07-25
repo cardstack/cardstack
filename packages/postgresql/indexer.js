@@ -18,7 +18,7 @@ const changePattern = /^table ([^.]+)\.([^:]+): ([^:]+): (.*)/;
 const idPattern = /id\[[^\]]+\]:'?([^\s']+)/;
 
 const unknownEnv = 'cardstack_unknown_env';
-const replicationSlotPrefix = process.env.ELASTICSEARCH_PREFIX || unknownEnv;
+const replicationSlotPrefix = process.env.PGSEARCH_NAMESPACE || unknownEnv;
 
 module.exports = declareInjections({
   projectConfig: 'config:project'

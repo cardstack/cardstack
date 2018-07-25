@@ -14,10 +14,10 @@ if (!process.__didSetCardstackWarning) {
   });
 }
 
-if (!process.env['ELASTICSEARCH_PREFIX']) {
+if (!process.env['PGSEARCH_NAMESPACE']) {
   // Avoid stomping on any existing content in elasticsearch by
   // namespacing the test indices differently.
-  process.env['ELASTICSEARCH_PREFIX'] = `test_${Date.now()}`;
+  process.env['PGSEARCH_NAMESPACE'] = `test_${Date.now()}`;
 }
 
 // TODO - add back throwing an exception for unexpected logging of warns and errors
