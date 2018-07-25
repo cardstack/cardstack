@@ -363,7 +363,7 @@ class Batch {
         sourceId,
         generation,
         schema,
-        read: (type, id) => read(type, id),
+        read,
         upstreamDoc: {
           type: 'user-realms',
           id: userRealmsId,

@@ -17,7 +17,7 @@ class BranchUpdate {
     this.schemaModels = [];
     this._schema = null;
     this._batch = client.beginBatch();
-    this.uncachedRead = this.uncachedRead.bind(this);
+    this.read = this.read.bind(this);
   }
 
   async addDataSource(dataSource) {
@@ -94,7 +94,7 @@ class BranchUpdate {
     for (let [sourceId, updater] of updaters) {
       let meta = await this._loadMeta(updater);
       let publicOps = Operations.create(this, sourceId);
-      let newMeta = await updater.updateContent(meta, hints, publicOps, this.uncachedRead);
+      let newMeta = await updater.updateContent(meta, hints, publicOps);
       await this._saveMeta(updater, newMeta);
     }
 
@@ -124,30 +124,6 @@ class BranchUpdate {
     return this.client.readUpstreamDocument({ branch: this.branch, type, id });
   }
 
-  async uncachedRead(type, id) {
-    let schema = await this.schema();
-    let contentType = schema.types.get(type);
-    if (!contentType) { return; }
-    let source = contentType.dataSource;
-    if (!source) { return; }
-    let updater = this.updaters[source.id];
-    if (!updater) { return; }
-    let isSchemaType = schema.isSchemaType(type);
-    let model = await updater.read(type, id, isSchemaType, this.uncachedRead);
-    if (!model) {
-      // TODO: this is a complexity that can go away after we refactor
-      // so that a content type can live in multiple data
-      // sources. Right now it's needed because our bootstrap schema
-      // and hard-coded data sources can provide models of types that
-      // are otherwise also stored elsewhere.
-      let staticUpdater = this.updaters['static-models'];
-      if (staticUpdater) {
-        model = await staticUpdater.read(type, id, isSchemaType, this.uncachedRead);
-      }
-    }
-    return model;
-  }
-
   async add(type, id, doc, sourceId, nonce) {
     let schema = await this.schema();
     let context = new DocumentContext({
@@ -158,7 +134,7 @@ class BranchUpdate {
       generation: nonce,
       upstreamDoc: doc,
       branch: this.branch,
-      read: (type, id) => this.read(type, id)
+      read: this.read
     });
 
     let searchDoc = await context.searchDoc();
@@ -181,7 +157,7 @@ class BranchUpdate {
       type,
       id,
       branch: this.branch,
-      read: (type, id) => this.read(type, id)
+      read: this.read
     });
 
     await this._batch.deleteDocument(context);

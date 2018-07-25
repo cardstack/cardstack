@@ -178,14 +178,6 @@ class Updater {
     };
   }
 
-  async read(type, id, isSchema) {
-    if (isSchema) {
-      return (await this.schema()).find(model => model.type === type && model.id === model.id);
-    }
-
-    return await this.buffer.readModel({ type, id });
-  }
-
   _namedFieldFor(fieldName, type) {
     let fieldType;
     switch(type) {

@@ -64,9 +64,4 @@ class Updater {
     await ops.finishReplaceAll();
     return { models };
   }
-
-  async read(type, id /*, isSchema */) {
-    let matches = m => m.type === type && m.id === id;
-    return this.models.find(matches) || this.staticModels.find(matches);
-  }
 }

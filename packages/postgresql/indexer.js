@@ -119,18 +119,6 @@ class Updater {
     return this._schema;
   }
 
-  async read(type, id, isSchema) {
-    if (isSchema) {
-      let schema = await this.schema();
-      return schema.find(model => model.type === type && model.id === id);
-    }
-    let { schema, table } = this.mapper.tableForType(type);
-    let result = await this.query(`select * from ${schema}.${table} where id=$1`, [id]);
-    if (result.rows.length > 0) {
-      return await this._toDocument(type, result.rows[0]);
-    }
-  }
-
   async _loadSchema() {
     // This is an inner join, so it will "miss" any table that has no
     // columns. But that's a silly case I don't want to support

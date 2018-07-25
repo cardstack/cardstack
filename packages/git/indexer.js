@@ -189,21 +189,6 @@ class GitUpdater {
     };
   }
 
-  async read(type, id, isSchema) {
-    await this._loadCommit();
-    let entry;
-    try {
-      entry = await this.rootTree.getEntry(`${ isSchema ? 'schema' : 'contents' }/${type}/${id}.json`);
-    } catch(err) {
-      // unfortunately nodegit doesn't seem to have a non-throwing way
-      // to test for the existence of a complete path
-    }
-    if (entry) {
-      let doc = await this._entryToDoc(type, id, entry);
-      return doc;
-    }
-  }
-
   async _loadCommit() {
     if (!this.commit) {
       this.commit = await this._commitAtBranch(this.branch);

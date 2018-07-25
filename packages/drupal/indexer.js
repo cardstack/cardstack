@@ -115,10 +115,6 @@ class Updater {
     };
   }
 
-  async read() {
-    throw new Error("Drupal indexer doesn't implement resource embedding yet");
-  }
-
   _makeField(propName, propDef, fields) {
     let canonicalName = drupalToCardstackField(propName);
     if (!fields[canonicalName]) {

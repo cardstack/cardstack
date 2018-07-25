@@ -70,7 +70,7 @@ describe('hub/indexers', function() {
       // backend instead of going through hub:writers. That ensures
       // we aren't relying on side-effects from the writers.
       let doc = await env.lookup('hub:searchers').get(env.session, 'master', 'plugins', 'sample-plugin-one');
-      expect(doc).has.deep.property('data.attributes.enabled', true);
+      expect(doc).has.deep.property('data.attributes.plugin-enabled', true);
       let config = {
         id: 'sample-plugin-one',
         type: 'plugin-configs',
@@ -84,7 +84,7 @@ describe('hub/indexers', function() {
       storage.store(config.type, config.id, config, false, null);
       await env.lookup('hub:indexers').update({ forceRefresh: true });
       doc = await env.lookup('hub:searchers').get(env.session, 'master', 'plugins', 'sample-plugin-one');
-      expect(doc).has.deep.property('data.attributes.enabled', false);
+      expect(doc).has.deep.property('data.attributes.plugin-enabled', false);
     });
   });
 
