@@ -9,7 +9,7 @@ function esURL() {
 }
 
 const fieldPrefix = '';
-const branchPrefix = process.env.ELASTICSEARCH_PREFIX || 'content';
+const branchPrefix = process.env.PGSEARCH_NAMESPACE || 'content';
 
 /*
   the SearchClient holds a connection to elasticsearch plus additional

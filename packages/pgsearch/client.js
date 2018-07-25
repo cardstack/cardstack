@@ -9,9 +9,7 @@ const { declareInjections } = require('@cardstack/di');
 const EventEmitter = require('events');
 const { join } = require('path');
 
-// TODO: once our migrations is complete, rename this env var everywhere because
-// it's no longer about elasticsearch and it's not a prefix.
-const dbSuffix = process.env.ELASTICSEARCH_PREFIX || 'content';
+const dbSuffix = process.env.PGSEARCH_NAMESPACE || 'content';
 
 // TODO just rely on the standard PG env vars:
 // https://www.postgresql.org/docs/9.1/static/libpq-envars.html

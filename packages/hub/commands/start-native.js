@@ -57,8 +57,8 @@ module.exports = {
       setEnvVars.CARDSTACK_SESSIONS_KEY = key.toString('base64');
     }
 
-    if (!process.env.ELASTICSEARCH_PREFIX) {
-      setEnvVars.ELASTICSEARCH_PREFIX = packageName.replace(/^[^a-zA-Z]*/, '').replace(/[^a-zA-Z0-9]/g, '_') + '_' + environment;
+    if (!process.env.PGSEARCH_NAMESPACE) {
+      setEnvVars.PGSEARCH_NAMESPACE = packageName.replace(/^[^a-zA-Z]*/, '').replace(/[^a-zA-Z0-9]/g, '_') + '_' + environment;
     }
 
     if (!process.env.INITIAL_DATA_DIR) {
