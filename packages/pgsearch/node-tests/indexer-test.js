@@ -60,12 +60,14 @@ describe('pgsearch/indexer', function() {
   // this scenario technically violates jsonapi spec, but our indexer needs to be tolerant of it
   it('tolerates missing relationship', async function() {
     let { data:article } = await writer.create('master', env.session, 'articles', {
-      type: 'articles',
-      attributes: {
-        title: 'Hello World'
-      },
-      relationships: {
-        author: null
+      data: {
+        type: 'articles',
+        attributes: {
+          title: 'Hello World'
+        },
+        relationships: {
+          author: null
+        }
       }
     });
     expect(article).has.deep.property('id');
@@ -77,19 +79,23 @@ describe('pgsearch/indexer', function() {
 
   it('indexes a belongs-to', async function() {
     let { data:person } = await writer.create('master', env.session, 'people', {
-      type: 'people',
-      attributes: {
-        name: 'Quint'
+      data: {
+        type: 'people',
+        attributes: {
+          name: 'Quint'
+        }
       }
     });
     expect(person).has.deep.property('id');
     let { data:article } = await writer.create('master', env.session, 'articles', {
-      type: 'articles',
-      attributes: {
-        title: 'Hello World'
-      },
-      relationships: {
-        author: { data: { type: 'people', id: person.id } }
+      data: {
+        type: 'articles',
+        attributes: {
+          title: 'Hello World'
+        },
+        relationships: {
+          author: { data: { type: 'people', id: person.id } }
+        }
       }
     });
     expect(article).has.deep.property('id');
@@ -105,26 +111,30 @@ describe('pgsearch/indexer', function() {
 
   it('reindexes included resources', async function() {
     let { data:person } = await writer.create('master', env.session, 'people', {
-      type: 'people',
-      attributes: {
-        name: 'Quint'
+      data: {
+        type: 'people',
+        attributes: {
+          name: 'Quint'
+        }
       }
     });
     expect(person).has.deep.property('id');
     let { data:article } = await writer.create('master', env.session, 'articles', {
-      type: 'articles',
-      attributes: {
-        title: 'Hello World'
-      },
-      relationships: {
-        author: { data: { type: 'people', id: person.id } }
+      data: {
+        type: 'articles',
+        attributes: {
+          title: 'Hello World'
+        },
+        relationships: {
+          author: { data: { type: 'people', id: person.id } }
+        }
       }
     });
     expect(article).has.deep.property('id');
     await indexer.update({ forceRefresh: true });
 
     person.attributes.name = 'Edward V';
-    await writer.update('master', env.session, 'people', person.id, person);
+    await writer.update('master', env.session, 'people', person.id, { data: person });
     await indexer.update({ forceRefresh: true });
 
     let found = await searcher.get(env.session, 'master', 'articles', article.id);
@@ -138,19 +148,23 @@ describe('pgsearch/indexer', function() {
 
   it('reindexes included resources when both docs are already changing', async function() {
     let { data:person } = await writer.create('master', env.session, 'people', {
-      type: 'people',
-      attributes: {
-        name: 'Quint'
+      data: {
+        type: 'people',
+        attributes: {
+          name: 'Quint'
+        }
       }
     });
     expect(person).has.deep.property('id');
     let { data:article } = await writer.create('master', env.session, 'articles', {
-      type: 'articles',
-      attributes: {
-        title: 'Hello World'
-      },
-      relationships: {
-        author: { data: { type: 'people', id: person.id } }
+      data: {
+        type: 'articles',
+        attributes: {
+          title: 'Hello World'
+        },
+        relationships: {
+          author: { data: { type: 'people', id: person.id } }
+        }
       }
     });
     expect(article).has.deep.property('id');
@@ -158,8 +172,8 @@ describe('pgsearch/indexer', function() {
 
     person.attributes.name = 'Edward V';
     article.attributes.title = 'A Better Title';
-    await writer.update('master', env.session, 'people', person.id, person);
-    await writer.update('master', env.session, 'articles', article.id, article);
+    await writer.update('master', env.session, 'people', person.id, { data: person });
+    await writer.update('master', env.session, 'articles', article.id, { data: article });
     await indexer.update({ forceRefresh: true });
 
     let found = await searcher.get(env.session, 'master', 'articles', article.id);
@@ -173,19 +187,23 @@ describe('pgsearch/indexer', function() {
 
   it('reindexes correctly when related resource is saved before own resource', async function() {
     let { data:person } = await writer.create('master', env.session, 'people', {
-      type: 'people',
-      attributes: {
-        name: 'Quint'
+      data: {
+        type: 'people',
+        attributes: {
+          name: 'Quint'
+        }
       }
     });
     expect(person).has.deep.property('id');
     let { data:article } = await writer.create('master', env.session, 'articles', {
-      type: 'articles',
-      attributes: {
-        title: 'Hello World'
-      },
-      relationships: {
-        author: { data: { type: 'people', id: person.id } }
+      data: {
+        type: 'articles',
+        attributes: {
+          title: 'Hello World'
+        },
+        relationships: {
+          author: { data: { type: 'people', id: person.id } }
+        }
       }
     });
     expect(article).has.deep.property('id');
@@ -209,19 +227,23 @@ describe('pgsearch/indexer', function() {
 
   it('reindexes correctly when related resource is saved after own resource', async function() {
     let { data:person } = await writer.create('master', env.session, 'people', {
-      type: 'people',
-      attributes: {
-        name: 'Quint'
+      data: {
+        type: 'people',
+        attributes: {
+          name: 'Quint'
+        }
       }
     });
     expect(person).has.deep.property('id');
     let { data:article } = await writer.create('master', env.session, 'articles', {
-      type: 'articles',
-      attributes: {
-        title: 'Hello World'
-      },
-      relationships: {
-        author: { data: { type: 'people', id: person.id } }
+      data: {
+        type: 'articles',
+        attributes: {
+          title: 'Hello World'
+        },
+        relationships: {
+          author: { data: { type: 'people', id: person.id } }
+        }
       }
     });
     expect(article).has.deep.property('id');
@@ -245,25 +267,29 @@ describe('pgsearch/indexer', function() {
 
   it('invalidates resource that contains included resource that was updated', async function() {
     let { data:person } = await writer.create('master', env.session, 'people', {
-      type: 'people',
-      attributes: {
-        name: 'Quint'
+      data: {
+        type: 'people',
+        attributes: {
+          name: 'Quint'
+        }
       }
     });
     expect(person).has.deep.property('id');
     let { data:article } = await writer.create('master', env.session, 'articles', {
-      type: 'articles',
-      attributes: {
-        title: 'Hello World'
-      },
-      relationships: {
-        author: { data: { type: 'people', id: person.id } }
+      data: {
+        type: 'articles',
+        attributes: {
+          title: 'Hello World'
+        },
+        relationships: {
+          author: { data: { type: 'people', id: person.id } }
+        }
       }
     });
     expect(article).has.deep.property('id');
 
     person.attributes.name = 'Edward V';
-    await writer.update('master', env.session, 'people', person.id, person);
+    await writer.update('master', env.session, 'people', person.id, { data: person });
 
     // note that indexer.update() is not called -- invalidation happens as a direct result of updating the doc
 
@@ -278,12 +304,14 @@ describe('pgsearch/indexer', function() {
 
   it('ignores a broken belongs-to', async function() {
     let { data:article } = await writer.create('master', env.session, 'articles', {
-      type: 'articles',
-      attributes: {
-        title: 'Hello World'
-      },
-      relationships: {
-        author: { data: { type: 'people', id: 'x' } },
+      data: {
+        type: 'articles',
+        attributes: {
+          title: 'Hello World'
+        },
+        relationships: {
+          author: { data: { type: 'people', id: 'x' } },
+        }
       }
     });
     expect(article).has.deep.property('id');
@@ -295,20 +323,24 @@ describe('pgsearch/indexer', function() {
 
   it('ignores a broken has-many', async function() {
     let { data:person } = await writer.create('master', env.session, 'people', {
-      type: 'people',
-      attributes: {
-        name: 'Quint'
+      data: {
+        type: 'people',
+        attributes: {
+          name: 'Quint'
+        }
       }
     });
     expect(person).has.deep.property('id');
 
     let { data:article } = await writer.create('master', env.session, 'articles', {
-      type: 'articles',
-      attributes: {
-        title: 'Hello World'
-      },
-      relationships: {
-        reviewers: { data: [{ type: 'people', id: person.id }, { type: "people", id: 'x'} ]}
+      data: {
+        type: 'articles',
+        attributes: {
+          title: 'Hello World'
+        },
+        relationships: {
+          reviewers: { data: [{ type: 'people', id: person.id }, { type: "people", id: 'x'} ]}
+        }
       }
     });
     expect(article).has.deep.property('id');
@@ -323,12 +355,14 @@ describe('pgsearch/indexer', function() {
 
   it('can fix broken relationship when it is later fixed', async function() {
     let { data:article } = await writer.create('master', env.session, 'articles', {
-      type: 'articles',
-      attributes: {
-        title: 'Hello World'
-      },
-      relationships: {
-        author: { data: { type: 'people', id: 'x' } }
+      data: {
+        type: 'articles',
+        attributes: {
+          title: 'Hello World'
+        },
+        relationships: {
+          author: { data: { type: 'people', id: 'x' } }
+        }
       }
     });
     expect(article).has.deep.property('id');
@@ -340,10 +374,12 @@ describe('pgsearch/indexer', function() {
     expect(found).has.deep.property('data.relationships.author.data', null);
 
     await writer.create('master', env.session, 'people', {
-      id: 'x',
-      type: 'people',
-      attributes: {
-        name: 'Quint'
+      data: {
+        id: 'x',
+        type: 'people',
+        attributes: {
+          name: 'Quint'
+        }
       }
     });
 

@@ -81,7 +81,7 @@ describe('middleware-stack', function() {
     it('can dynamically mount more middleware', async function() {
       let config = await env.lookup('hub:searchers').get(env.session, 'master', 'plugin-configs', 'stub-middleware-extra');
       config.data.attributes.enabled = true;
-      await env.lookup('hub:writers').update('master', env.session, config.data.type, config.data.id, config.data);
+      await env.lookup('hub:writers').update('master', env.session, config.data.type, config.data.id, config);
       await env.lookup('hub:indexers').update({ forceRefresh: true });
       let response = await request.get('/extra');
       expect(response).hasStatus(200);
@@ -90,10 +90,12 @@ describe('middleware-stack', function() {
 
     it('can dynamically remove middleware', async function() {
       await env.lookup('hub:writers').create('master', env.session, 'plugin-configs', {
-        id: 'stub-middleware',
-        type: 'plugin-configs',
-        attributes: {
-          enabled: false
+        data: {
+          id: 'stub-middleware',
+          type: 'plugin-configs',
+          attributes: {
+            enabled: false
+          }
         }
       });
       await env.lookup('hub:indexers').update({ forceRefresh: true });
@@ -119,10 +121,12 @@ describe('middleware-stack', function() {
       expect(response).hasStatus(200);
 
       await env.lookup('hub:writers').create('master', env.session, 'plugin-configs', {
-        id: 'stub-middleware',
-        type: 'plugin-configs',
-        attributes: {
-          enabled: false
+        data: {
+          id: 'stub-middleware',
+          type: 'plugin-configs',
+          attributes: {
+            enabled: false
+          }
         }
       });
       await env.lookup('hub:indexers').update({ forceRefresh: true });

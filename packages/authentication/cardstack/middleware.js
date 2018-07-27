@@ -298,12 +298,12 @@ class Authentication {
 
     let madeIndexUpdate = false;
     if (!have && source.mayCreateUser) {
-      have = await this.writer.create(this.controllingBranch.name, Session.INTERNAL_PRIVILEGED, user.data.type, user.data);
+      have = await this.writer.create(this.controllingBranch.name, Session.INTERNAL_PRIVILEGED, user.data.type, user);
       madeIndexUpdate = true;
     }
     if (have && source.mayUpdateUser) {
       user.data.meta = have.data.meta;
-      have = await this.writer.update(this.controllingBranch.name, Session.INTERNAL_PRIVILEGED, user.data.type, have.data.id, user.data);
+      have = await this.writer.update(this.controllingBranch.name, Session.INTERNAL_PRIVILEGED, user.data.type, have.data.id, user);
       madeIndexUpdate = true;
     }
 

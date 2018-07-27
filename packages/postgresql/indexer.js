@@ -254,7 +254,7 @@ class Updater {
     for (let model of await this.schema()) {
       let prior = oldSchema[model.type + '/' + model.id];
       if (!prior || !isEqual(prior, model)) {
-        await ops.save(model.type, model.id, model);
+        await ops.save(model.type, model.id, { data: model });
       }
       delete oldSchema[model.type + '/' + model.id];
     }
@@ -284,7 +284,7 @@ class Updater {
         }
         let result = await this.query(`SELECT * from ${schema}.${table} where id = any($1)`, [ rest.map(({id}) => id) ]);
         for (let row of result.rows) {
-          await ops.save(type, row.id, await this._toDocument(type, row));
+          await ops.save(type, row.id, { data: await this._toDocument(type, row) });
         }
       }
     }
@@ -296,7 +296,7 @@ class Updater {
     await this.query(`SELECT * FROM pg_create_logical_replication_slot($1, 'test_decoding')`, [replicationSlot]);
     log.debug("Created new replication slot %s", replicationSlot);
     for (let model of await this.schema()) {
-      await ops.save(model.type, model.id, model);
+      await ops.save(model.type, model.id, { data: model });
       if (model.type === 'content-types') {
         await this._fullUpdateType(model.id, ops);
       }
@@ -320,7 +320,7 @@ class Updater {
     let { schema, table } = this.mapper.tableForType(type);
     let result = await this.query(`select * from ${schema}.${table}`);
     for (let row of result.rows) {
-      await ops.save(type, row.id, await this._toDocument(type, row));
+      await ops.save(type, row.id, { data: await this._toDocument(type, row) });
     }
   }
 

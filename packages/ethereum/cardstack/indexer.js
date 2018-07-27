@@ -151,7 +151,7 @@ class Updater {
     }
 
     for (let model of schema) {
-      await ops.save(model.type, model.id, model);
+      await ops.save(model.type, model.id, { data: model });
     }
 
     let shouldSkip = await this.buffer.shouldSkipIndexing(this.dataSourceId, defaultBranch);
@@ -164,7 +164,7 @@ class Updater {
           blockHeights[branch] = blockheight;
         }
 
-        await ops.save(model.type, model.id, model);
+        await ops.save(model.type, model.id, { data: model });
       }
     }
 

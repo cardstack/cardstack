@@ -46,10 +46,10 @@ class Updater {
     }
     await ops.beginReplaceAll();
     for (let plugin of plugins) {
-      await ops.save('plugins', plugin.id, plugin);
+      await ops.save('plugins', plugin.id, { data: plugin });
     }
     for (let feature of features) {
-      await ops.save(feature.type, feature.id, feature);
+      await ops.save(feature.type, feature.id, { data: feature });
     }
     await ops.finishReplaceAll();
     return { plugins };

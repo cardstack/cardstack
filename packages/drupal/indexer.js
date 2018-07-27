@@ -237,7 +237,7 @@ class Updater {
       let url = new URL(this._schema.endpoints[type], this.url).href + '/' + id;
       try {
         let response = await this._get(url);
-        await ops.save(type, id, drupalToCardstackDoc(response.body.data, this._schema.models));
+        await ops.save(type, id, { data: drupalToCardstackDoc(response.body.data, this._schema.models) });
       } catch (err) {
         if (err.status === 404) {
           await ops.delete(type, id);
@@ -251,7 +251,7 @@ class Updater {
   async _fullUpdate(meta, ops) {
     await ops.beginReplaceAll();
     for (let model of this._schema.models) {
-      await ops.save(model.type, model.id, model);
+      await ops.save(model.type, model.id, { data: model });
     }
     for (let endpoint of Object.values(this._schema.endpoints)) {
       let url = new URL(endpoint, this.url).href;
@@ -260,7 +260,7 @@ class Updater {
         try {
           let response = await this._get(url);
           for (let model of response.body.data) {
-            await ops.save(model.type, model.id, drupalToCardstackDoc(model, this._schema.models));
+            await ops.save(model.type, model.id, { data: drupalToCardstackDoc(model, this._schema.models) });
           }
           url = response.body.links.next;
         } catch (err) {

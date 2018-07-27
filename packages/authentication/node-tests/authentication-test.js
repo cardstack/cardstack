@@ -502,7 +502,7 @@ describe('authentication/middleware', function() {
         let { data:updatedQuint } = await env.lookup('hub:searchers').get(env.session, 'master', 'test-users', quint.id);
         updatedQuint.attributes.email = 'updated@example.com';
 
-        await env.lookup('hub:writers').update('master', env.session, 'test-users', quint.id, updatedQuint);
+        await env.lookup('hub:writers').update('master', env.session, 'test-users', quint.id, { data: updatedQuint });
         await env.lookup('hub:indexers').update({ forceRefresh: true });
 
         let response = await request.get(`/auth/echo/status`).set('authorization', `Bearer ${token}`);

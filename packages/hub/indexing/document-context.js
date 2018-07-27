@@ -6,6 +6,11 @@ const { get, uniqBy } = require('lodash');
 module.exports = class DocumentContext {
 
   constructor({ read, schema, type, id, branch, sourceId, generation, upstreamDoc, includePaths }) {
+    if (upstreamDoc && !upstreamDoc.data) {
+      throw new Error('The upstreamDoc must have a top-level "data" property', {
+        status: 400
+      });
+    }
     this.schema = schema;
     this.type = type;
     this.id = id;
@@ -29,7 +34,7 @@ module.exports = class DocumentContext {
 
     // special case for the built-in implicit relationship between
     // user-realms and the underlying user record it is tracking
-    let user = get(upstreamDoc, 'relationships.user.data');
+    let user = get(upstreamDoc, 'data.relationships.user.data');
     if (type === 'user-realms' && user) {
       this._references.push(`${user.type}/${user.id}`);
     }
@@ -231,10 +236,12 @@ module.exports = class DocumentContext {
         }
       }
 
-      // we are going inside a parent document's includes, so we need
-      // our own type here.
       if (depth > 0) {
+        // we are going inside a parent document's includes, so we need
+        // our own type here.
         searchDoc['type'] = type;
+      } else {
+        jsonapiDoc = jsonapiDoc.data;
       }
       let userModel = new Model(contentType, jsonapiDoc, this.schema, this.read.bind(this));
       await this._buildAttributes(contentType, jsonapiDoc, userModel, pristine, searchDoc);

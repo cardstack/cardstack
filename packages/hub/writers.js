@@ -18,6 +18,11 @@ class Writers {
 
   async create(branch, session, type, document) {
     log.info("creating type=%s", type);
+    if (!document.data) {
+      throw new Error('The document must have a top-level "data" property', {
+        status: 400
+      });
+    }
     await this.pgSearchClient.ensureDatabaseSetup();
 
     let schema = await this.schema.forBranch(branch);
@@ -27,7 +32,7 @@ class Writers {
       branch,
       session,
       type,
-      schema.withOnlyRealFields(document),
+      schema.withOnlyRealFields(document.data),
       isSchema
     );
     let pristine;
@@ -52,6 +57,11 @@ class Writers {
 
   async update(branch, session, type, id, document) {
     log.info("updating type=%s id=%s", type, id);
+    if (!document.data) {
+      throw new Error('The document must have a top-level "data" property', {
+        status: 400
+      });
+    }
     await this.pgSearchClient.ensureDatabaseSetup();
 
     let schema = await this.schema.forBranch(branch);
@@ -62,7 +72,7 @@ class Writers {
       session,
       type,
       id,
-      schema.withOnlyRealFields(document),
+      schema.withOnlyRealFields(document.data),
       isSchema
     );
     let pristine;
@@ -122,7 +132,7 @@ class Writers {
       schema,
       sourceId,
       id: id || finalDocument.id,
-      upstreamDoc: finalDocument,
+      upstreamDoc: finalDocument ? { data: finalDocument } : null,
       read: this._read(branch)
     });
   }
