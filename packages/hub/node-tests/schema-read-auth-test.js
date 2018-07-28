@@ -8,11 +8,11 @@ const {
 let env, baseSchema, searchers, writers;
 
 async function create(session, document) {
-  return writers.create('master', session, document.type, document);
+  return writers.create('master', session, document.data.type, document);
 }
 
 async function update(session, document) {
-  return writers.update('master', session, document.type, document.id, document);
+  return writers.update('master', session, document.data.type, document.data.id, document);
 }
 
 async function find(type, id) {
@@ -956,23 +956,27 @@ describe('with grants for resource creation/update', function() {
 
   it("removed unauthorized attributes from includes during create", async function() {
     let author = await create(Session.INTERNAL_PRIVILEGED, {
-      type: 'authors',
-      attributes: {
-        name: 'Van Gogh'
+      data: {
+        type: 'authors',
+        attributes: {
+          name: 'Van Gogh'
+        }
       }
     });
 
     let { session } = await withGrants();
 
     let post = await create(session, {
-      type: 'posts',
-      attributes: {
-        title: 'my post',
-        subtitle: 'grape nuts'
-      },
-      relationships: {
-        author: {
-          data: { type: 'authors', id: author.data.id }
+      data: {
+        type: 'posts',
+        attributes: {
+          title: 'my post',
+          subtitle: 'grape nuts'
+        },
+        relationships: {
+          author: {
+            data: { type: 'authors', id: author.data.id }
+          }
         }
       }
     });
@@ -984,27 +988,33 @@ describe('with grants for resource creation/update', function() {
 
   it("removed unauthorized attributes from includes during update", async function() {
     let author = await create(Session.INTERNAL_PRIVILEGED, {
-      type: 'authors',
-      attributes: {
-        name: 'Van Gogh'
+      data: {
+        type: 'authors',
+        attributes: {
+          name: 'Van Gogh'
+        }
       }
     });
     let author2 = await create(Session.INTERNAL_PRIVILEGED, {
-      type: 'authors',
-      attributes: {
-        name: 'Ringo'
+      data: {
+        type: 'authors',
+        attributes: {
+          name: 'Ringo'
+        }
       }
     });
 
     let { data: post } = await create(Session.INTERNAL_PRIVILEGED, {
-      type: 'posts',
-      attributes: {
-        title: 'my post',
-        subtitle: 'grape nuts'
-      },
-      relationships: {
-        author: {
-          data: { type: 'authors', id: author.data.id }
+      data: {
+        type: 'posts',
+        attributes: {
+          title: 'my post',
+          subtitle: 'grape nuts'
+        },
+        relationships: {
+          author: {
+            data: { type: 'authors', id: author.data.id }
+          }
         }
       }
     });
@@ -1012,7 +1022,7 @@ describe('with grants for resource creation/update', function() {
     post.relationships.author.data = { type: 'authors', id: author2.data.id };
 
     let { session } = await withGrants();
-    post = await update(session, post);
+    post = await update(session, { data: post });
 
     expect(post.included).has.length(1);
     expect(post.included[0]).has.deep.property('type', 'authors');
@@ -1021,21 +1031,25 @@ describe('with grants for resource creation/update', function() {
 
   it("removed unauthorized attributes, even if unchanged, from includes during update", async function() {
     let author = await create(Session.INTERNAL_PRIVILEGED, {
-      type: 'authors',
-      attributes: {
-        name: 'Van Gogh'
+      data: {
+        type: 'authors',
+        attributes: {
+          name: 'Van Gogh'
+        }
       }
     });
 
     let { data: post } = await create(Session.INTERNAL_PRIVILEGED, {
-      type: 'posts',
-      attributes: {
-        title: 'my post',
-        subtitle: 'grape nuts'
-      },
-      relationships: {
-        author: {
-          data: { type: 'authors', id: author.data.id }
+      data: {
+        type: 'posts',
+        attributes: {
+          title: 'my post',
+          subtitle: 'grape nuts'
+        },
+        relationships: {
+          author: {
+            data: { type: 'authors', id: author.data.id }
+          }
         }
       }
     });
@@ -1043,7 +1057,7 @@ describe('with grants for resource creation/update', function() {
     post.attributes.title = 'foo';
 
     let { session } = await withGrants();
-    post = await update(session, post);
+    post = await update(session, { data: post });
 
     expect(post.included).has.length(1);
     expect(post.included[0]).has.deep.property('type', 'authors');

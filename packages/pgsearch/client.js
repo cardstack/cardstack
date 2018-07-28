@@ -259,7 +259,7 @@ class Batch {
       'select id, type, upstream_doc from documents where branch=$1',
       [branch],
       async ({ id, upstream_doc:upstreamDoc, type }) => {
-        let realms = this._schema.authorizedReadRealms(type, upstreamDoc);
+        let realms = this._schema.authorizedReadRealms(type, upstreamDoc.data);
         const sql = 'update documents set realms=$1 where id=$2 and type=$3 and branch=$4';
         await this.client.query(sql, [realms, id, type, branch]);
       });
@@ -290,7 +290,7 @@ class Batch {
   // documents it references.
   async _invalidations(schema, branch, read) {
     await this.client.docsThatReference(branch, Object.keys(this._touched), async (doc, refs) => {
-      let { type, id } = doc;
+      let { type, id } = doc.data;
 
       if (this._isInvalidated(type, id, refs)) {
         let sourceId = schema.types.get(type).dataSource.id;
@@ -351,7 +351,7 @@ class Batch {
     let { id, type, branch, sourceId, generation, schema, read, upstreamDoc:doc } = context;
     if (!doc) { return; }
 
-    let realms = await schema.userRealms(doc);
+    let realms = await schema.userRealms(doc.data);
     if (realms) {
       let userRealmsId = Session.encodeBaseRealm(type, id);
       let userRealmContext = new DocumentContext({
@@ -363,14 +363,16 @@ class Batch {
         schema,
         read,
         upstreamDoc: {
-          type: 'user-realms',
-          id: userRealmsId,
-          attributes: {
-            realms
-          },
-          relationships: {
-            user: {
-              data: { type, id }
+          data: {
+            type: 'user-realms',
+            id: userRealmsId,
+            attributes: {
+              realms
+            },
+            relationships: {
+              user: {
+                data: { type, id }
+              }
             }
           }
         }

@@ -62,7 +62,7 @@ class Searchers {
         branch,
         schema,
         includePaths,
-        upstreamDoc: result.data,
+        upstreamDoc: result,
         read: this._read(branch)
       }).pristineDoc());
 

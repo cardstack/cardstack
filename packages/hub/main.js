@@ -55,7 +55,7 @@ async function loadSeeds(container, seedModels, opts) {
   let writers = container.lookup('hub:writers');
 
   for (let model of seedModels) {
-    await writers.create(branch, Session.INTERNAL_PRIVILEGED, model.type, model);
+    await writers.create(branch, Session.INTERNAL_PRIVILEGED, model.type, { data: model });
   }
 
   await container.lookup('hub:indexers').update({ forceRefresh: true });

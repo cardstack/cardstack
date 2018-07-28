@@ -134,7 +134,12 @@ class BranchUpdate {
       generation: nonce,
       upstreamDoc: doc,
       branch: this.branch,
-      read: this.read
+      read: async (type, id) => {
+        let doc = await this.read(type, id);
+        if (doc) {
+          return doc.data;
+        }
+      }
     });
 
     let searchDoc = await context.searchDoc();
@@ -157,7 +162,12 @@ class BranchUpdate {
       type,
       id,
       branch: this.branch,
-      read: this.read
+      read: async (type, id) => {
+        let doc = await this.read(type, id);
+        if (doc) {
+          return doc.data;
+        }
+      }
     });
 
     await this._batch.deleteDocument(context);

@@ -161,7 +161,7 @@ class GitUpdater {
     await this._indexTree(ops, null, this.rootTree, {
       only: this.basePath.concat(['schema'])
     });
-    return models;
+    return models.map(m => m.data);
   }
 
   async updateContent(meta, hints, ops) {
@@ -251,7 +251,7 @@ class GitUpdater {
       let { type, id } = identify(newEntry);
       let doc = await this._entryToDoc(type, id, newEntry);
       if (doc) {
-        await ops.save(type, id, doc);
+        await ops.save(type, id, { data: doc });
       }
     }
   }

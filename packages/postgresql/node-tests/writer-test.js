@@ -108,13 +108,15 @@ describe('postgresql/writer', function() {
 
   it('can create new record', async function() {
     let { data:created } = await writer.create('master', sessions.create('test-users', 'create-only'), 'articles', {
-      type: 'articles',
-      attributes: {
-        title: 'I was created',
-        length: 200,
-        published: false,
-        topic: 'x',
-        'multi-word': 'hello'
+      data: {
+        type: 'articles',
+        attributes: {
+          title: 'I was created',
+          length: 200,
+          published: false,
+          topic: 'x',
+          'multi-word': 'hello'
+        }
       }
     });
     let result = await client.query('select title, length, published, alt_topic from articles where id=$1', [created.id]);
@@ -142,14 +144,16 @@ describe('postgresql/writer', function() {
   it('reacts to database failure during create', async function() {
     try {
       await writer.create('master', sessions.create('test-users', 'create-only'), 'articles', {
-        type: 'articles',
-        attributes: {
-          title: 'I was created',
-          length: 200,
-          published: false,
-          topic: 'x',
-          'multi-word': 'hello',
-          lessThanTen: 11
+        data: {
+          type: 'articles',
+          attributes: {
+            title: 'I was created',
+            length: 200,
+            published: false,
+            topic: 'x',
+            'multi-word': 'hello',
+            lessThanTen: 11
+          }
         }
       });
       throw new Error("should not get here");
@@ -164,12 +168,14 @@ describe('postgresql/writer', function() {
 
   it('can create new record with user-provided id', async function() {
     let { data:created } = await writer.create('master', sessions.create('test-users', 'create-only'), 'articles', {
-      type: 'articles',
-      id: '42',
-      attributes: {
-        title: 'I was created',
-        length: 200,
-        published: false
+      data: {
+        type: 'articles',
+        id: '42',
+        attributes: {
+          title: 'I was created',
+          length: 200,
+          published: false
+        }
       }
     });
     expect(created.id).to.equal('42');
@@ -182,11 +188,13 @@ describe('postgresql/writer', function() {
 
   it('can update a record', async function() {
     await writer.update('master', sessions.create('test-users', 'update-only'), 'articles', '0', {
-      type: 'articles',
-      id: '0',
-      attributes: {
-        length: 101,
-        topic: 'y'
+      data: {
+        type: 'articles',
+        id: '0',
+        attributes: {
+          length: 101,
+          topic: 'y'
+        }
       }
     });
     let result = await client.query('select title, length, published, alt_topic from articles where id=$1', ['0']);
@@ -199,11 +207,13 @@ describe('postgresql/writer', function() {
   it('handles attempt to update a non-existent record', async function() {
     try {
       await writer.update('master', sessions.create('test-users', 'update-only'), 'articles', '10', {
-        type: 'articles',
-        id: '10',
-        attributes: {
-          length: 101,
-          topic: 'y'
+        data: {
+          type: 'articles',
+          id: '10',
+          attributes: {
+            length: 101,
+            topic: 'y'
+          }
         }
       });
       throw new Error("should not get here");
@@ -214,10 +224,12 @@ describe('postgresql/writer', function() {
 
   it('returns full record from update', async function() {
     let { data:updated } = await writer.update('master', sessions.create('test-users', 'update-only'), 'articles', '0', {
-      type: 'articles',
-      id: '0',
-      attributes: {
-        length: 101
+      data: {
+        type: 'articles',
+        id: '0',
+        attributes: {
+          length: 101
+        }
       }
     });
     expect(updated).has.deep.property('attributes.length', 101);
@@ -243,8 +255,8 @@ describe('postgresql/writer', function() {
 
     let [ snakeModel, dogModel ] = testFactory.getModels();
 
-    await writer.create('master', sessions.create('test-users', 'create-only'), snakeModel.type, snakeModel);
-    await writer.create('master', sessions.create('test-users', 'create-only'), dogModel.type, dogModel);
+    await writer.create('master', sessions.create('test-users', 'create-only'), snakeModel.type, { data: snakeModel });
+    await writer.create('master', sessions.create('test-users', 'create-only'), dogModel.type, { data: dogModel });
 
     let { rows } = await client.query('select name, favorite_toy from doggies where id=$1', [dogModel.id]);
     let [ result ] = rows;

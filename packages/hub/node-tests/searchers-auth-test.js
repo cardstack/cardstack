@@ -383,7 +383,7 @@ describe('hub/searchers/auth', function() {
     let session = sessions.create('authors', 'arthur');
     let user = await searchers.get(Session.INTERNAL_PRIVILEGED, 'master', 'authors', 'arthur');
     user.data.attributes.name = 'Updated name';
-    await env.lookup('hub:writers').update('master', Session.INTERNAL_PRIVILEGED, user.data.type, user.data.id, user.data);
+    await env.lookup('hub:writers').update('master', Session.INTERNAL_PRIVILEGED, user.data.type, user.data.id, user);
     await env.lookup('hub:indexers').update({ forceRefresh: true });
     let doc = await searchers.search(session, 'master', { filter: { type: 'posts' } });
     expect(doc.data).has.length(0);
@@ -403,7 +403,7 @@ describe('hub/searchers/auth', function() {
     let session = sessions.create('authors', 'arthur');
     let user = await searchers.get(Session.INTERNAL_PRIVILEGED, 'master', 'authors', 'arthur');
     user.data.attributes.name = 'Updated name';
-    await env.lookup('hub:writers').update('master', Session.INTERNAL_PRIVILEGED, user.data.type, user.data.id, user.data);
+    await env.lookup('hub:writers').update('master', Session.INTERNAL_PRIVILEGED, user.data.type, user.data.id, user);
     await env.lookup('hub:indexers').update({ forceRefresh: true });
     let doc = await searchers.search(session, 'master', { filter: { type: 'posts' } });
     expect(doc.data).has.length(1);
@@ -429,7 +429,7 @@ describe('hub/searchers/auth', function() {
     let writers = env.lookup('hub:writers');
     for (let model of factory.getModels()) {
       let { type } = model;
-      await writers.create('master', Session.INTERNAL_PRIVILEGED, type, model);
+      await writers.create('master', Session.INTERNAL_PRIVILEGED, type, { data: model });
     }
 
     let doc = await searchers.search(sessions.create('authors', 'arthur'), 'master', { filter: { type: 'posts' } });
@@ -458,7 +458,7 @@ describe('hub/searchers/auth', function() {
     let grant = await searchers.get(Session.INTERNAL_PRIVILEGED, 'master', 'grants', 'test-grant');
 
     grant.data.relationships.who.data = [{ id: 'cool-kids', type: 'groups' }];
-    await writers.update('master', Session.INTERNAL_PRIVILEGED, 'grants', 'test-grant', grant.data);
+    await writers.update('master', Session.INTERNAL_PRIVILEGED, 'grants', 'test-grant', grant);
 
     let doc = await searchers.search(sessions.create('authors', 'arthur'), 'master', { filter: { type: 'posts' } });
     expect(doc.data).has.length(1);

@@ -157,27 +157,31 @@ describe('hub/indexers', function() {
         addCount++;
 
         expect(model.id).to.be.ok;
-        expect(model.doc.id).to.be.ok;
-        expect(model.doc.meta.version).to.be.ok;
+        expect(model.doc.data.id).to.be.ok;
+        expect(model.doc.data.meta.version).to.be.ok;
         delete model.id;
-        delete model.doc.id;
-        delete model.doc.meta.version;
+        delete model.doc.data.id;
+        delete model.doc.data.meta.version;
         expect(model).to.deep.equal({
-          "type": "dogs",
-          "doc": {
-            "type": "dogs",
-            "attributes": {
-              "name": "Van Gogh"
-            },
-            "meta": { }
+          type: "dogs",
+          doc: {
+            data: {
+              type: "dogs",
+              attributes: {
+                name: "Van Gogh"
+              },
+              meta: { }
+            }
           }
         });
       });
 
       await env.lookup('hub:writers').create('master', Session.INTERNAL_PRIVILEGED, 'dogs', {
-        type: 'dogs',
-        attributes: {
-          name: 'Van Gogh'
+        data: {
+          type: 'dogs',
+          attributes: {
+            name: 'Van Gogh'
+          }
         }
       });
       await env.lookup('hub:indexers').update({ forceRefresh: true, hints: { type: 'dogs' } });

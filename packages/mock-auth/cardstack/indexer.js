@@ -101,7 +101,7 @@ class Updater {
     }
     await ops.beginReplaceAll();
     for (let model of schema) {
-      await ops.save(model.type, model.id, model);
+      await ops.save(model.type, model.id, { data: model });
     }
     await ops.finishReplaceAll();
     return {

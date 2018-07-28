@@ -196,7 +196,7 @@ class Handler {
         status: 400
       });
     }
-    return data;
+    return { data };
   }
 
   _urlWithUpdatedParams(params) {
