@@ -7,20 +7,29 @@ const DocumentContext = require('@cardstack/hub/indexing/document-context');
 const Session = require('@cardstack/plugin-utils/session');
 const { declareInjections } = require('@cardstack/di');
 const EventEmitter = require('events');
+const parse = require('pg-connection-string');
 const { join } = require('path');
 
 const dbSuffix = process.env.PGSEARCH_NAMESPACE || 'content';
 
-// TODO just rely on the standard PG env vars:
-// https://www.postgresql.org/docs/9.1/static/libpq-envars.html
-// but check that pg-migrate does too
-const config = {
-  host: 'localhost',
-  port: 5444,
-  user: 'postgres',
-  database: `pgsearch_${dbSuffix}`
-};
-
+let config;
+if (process.env.PGHOST && process.env.PGPORT && process.env.PGUSER) {
+	config = {
+		host: process.env.PGHOST,
+		port: process.env.PGPORT,
+		user: process.env.PGUSER,
+    password: process.env.PGPASSWORD
+	};
+} else if (process.env.DB_URL) {
+  config = parse(process.env.DB_URL);
+} else {
+	config = {
+		host: 'localhost',
+		port: 5444,
+		user: 'postgres',
+	};
+}
+config.database = `pgsearch_${dbSuffix}`;
 
 module.exports = declareInjections({
   controllingBranch: 'hub:controlling-branch',
