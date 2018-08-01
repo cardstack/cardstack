@@ -17,7 +17,10 @@ export default Component.extend({
   availableTypes: computed(function() { return []; }),
 
   loadAvailableTypes: task(function * () {
-    let types = yield this.get('store').query('content-type', { filter: { 'is-built-in' : { exists: false } } });
+    let creatableTypes = this.get('tools.creatableTypes');
+    if (!creatableTypes || !creatableTypes.length) { return; }
+
+    let types = yield this.get('store').query('content-type', { page: { size: 50 }, filter: { 'id' : { exact: creatableTypes } } });
     this.set('availableTypes', types);
   }).on('init'),
 
