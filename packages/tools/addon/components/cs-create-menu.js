@@ -17,7 +17,7 @@ export default Component.extend({
   availableTypes: computed(function() { return []; }),
 
   loadAvailableTypes: task(function * () {
-    let types = yield this.get('store').query('content-type', { filter: { not: { 'is-built-in' : true } } });
+    let types = yield this.get('store').query('content-type', { filter: { 'is-built-in' : { exists: false } } });
     this.set('availableTypes', types);
   }).on('init'),
 
