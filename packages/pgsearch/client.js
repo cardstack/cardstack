@@ -199,6 +199,11 @@ class Batch {
 
   async saveDocument(context) {
     let { schema, branch, type, id, sourceId, generation, upstreamDoc, _read:read } = context;
+    if (id == null) {
+      log.warn(`pgsearch cannot save document without id ${JSON.stringify(upstreamDoc)}`);
+      return;
+    }
+
     let searchDoc = await context.searchDoc();
     let pristineDoc = await context.pristineDoc();
     let refs = await context.references();
