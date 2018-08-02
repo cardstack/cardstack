@@ -300,19 +300,12 @@ class Authentication {
       }
     }
 
-    let madeIndexUpdate = false;
     if (!have && source.mayCreateUser) {
       have = await this.writer.create(this.controllingBranch.name, Session.INTERNAL_PRIVILEGED, user.data.type, user);
-      madeIndexUpdate = true;
     }
     if (have && source.mayUpdateUser) {
       user.data.meta = have.data.meta;
       have = await this.writer.update(this.controllingBranch.name, Session.INTERNAL_PRIVILEGED, user.data.type, have.data.id, user);
-      madeIndexUpdate = true;
-    }
-
-    if (madeIndexUpdate) {
-      await this.indexers.update({ hints: [{ type: have.data.type, id: have.data.id, branch: this.controllingBranch.name }] });
     }
 
     return have;
