@@ -51,6 +51,8 @@ export default Service.extend({
     return !this.get('sessionService') || this.get('sessionService.session.isAuthenticated');
   }),
 
+  creatableTypes: alias('sessionService.creatableTypes'),
+
   sessionService: injectOptional.service('cardstack-session'),
 
   // Tools are active when the user has hit the launcher button and

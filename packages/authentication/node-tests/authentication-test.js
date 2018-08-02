@@ -37,7 +37,16 @@ describe('authentication/middleware', function() {
         mayLogin: true
       });
 
-    quint = factory.addResource('test-users').withAttributes({
+    factory.addResource('grants')
+      .withRelated('who', [{ type: 'test-users', id: 'quint' }])
+      .withRelated('types', [
+        { type: 'content-types', id: 'doggies' }
+      ])
+      .withAttributes({
+        mayCreateResource: true
+      });
+
+    quint = factory.addResource('test-users', 'quint').withAttributes({
       email: 'quint@example.com',
       fullName: "Quint Faulkner"
     });
@@ -343,6 +352,20 @@ describe('authentication/middleware', function() {
         expect(response).hasStatus(200);
         expect(response.body).has.property('userId', quint.id);
         expect(response.body.user).has.deep.property('data.attributes.full-name', "Quint Faulkner");
+      });
+
+      it('can include creatable content types in meta when user has grant to create content types', async function() {
+        let response = await request.post(`/auth/by-email`).send({
+          email: 'quint@example.com'
+        });
+        expect(response.body.data.meta.creatableTypes).deep.equals([ 'doggies' ]);
+      });
+
+      it('will not include creatable content types in meta when user has no grant to create content types', async function() {
+        let response = await request.post(`/auth/by-email`).send({
+          email: 'arthur@example.com'
+        });
+        expect(response.body).to.not.have.deep.property('data.meta.creatableTypes');
       });
 
       it('can provide preloaded user', async function() {

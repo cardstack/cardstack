@@ -187,6 +187,7 @@ class Authentication {
 
     let schema = await this.currentSchema.forControllingBranch();
     let canLogin = await schema.hasLoginAuthorization(session);
+    let creatableTypes = await schema.authorizedCreatableContentTypes(session);
 
     if (!canLogin) {
       ctxt.status = 401;
@@ -205,6 +206,9 @@ class Authentication {
       user.data.meta = tokenMeta;
     } else {
       Object.assign(user.data.meta, tokenMeta);
+    }
+    if (creatableTypes.length) {
+      user.data.meta.creatableTypes = creatableTypes;
     }
 
     let authorizedUser = await this._applyReadAuthorization(session, user);
@@ -233,7 +237,7 @@ class Authentication {
       user = result;
     } else {
       let rewritten = await source.rewriteExternalUser(result);
-      
+
       if (isPartialSession(rewritten)) {
         ctxt.body = rewritten;
         ctxt.status = 200;

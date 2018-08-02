@@ -124,6 +124,16 @@ module.exports = class ContentType {
     }
   }
 
+  async authorizedToCreateResource(context) {
+    let grant = await find(this.grants, async g => {
+      if (!g['may-create-resource']) {
+        return false;
+      }
+      return g.matches(null, context);
+    });
+    return Boolean(grant);
+  }
+
   async _checkConstraints(pendingChange, badFields) {
     let activeConstraints = this.constraints.filter(constraint => Object.values(constraint.fieldInputs).every(field => !badFields[field.id]));
     return flatten(await Promise.all(activeConstraints.map(constraint => constraint.validationErrors(pendingChange, this.realFields))));

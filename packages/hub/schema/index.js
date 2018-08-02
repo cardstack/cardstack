@@ -79,6 +79,17 @@ class Schema {
     return activeDoc;
   }
 
+  async authorizedCreatableContentTypes(session=Session.EVERYONE) {
+    let authorizedTypes = [];
+    for (let [ typeName, contentType ] of this.types.entries()) {
+      let canCreate = await contentType.authorizedToCreateResource({ session });
+      if (canCreate) {
+        authorizedTypes.push(typeName);
+      }
+    }
+    return authorizedTypes;
+  }
+
   // derives a new schema by adding, updating, or removing
   // models. Takes a list of { type, id, document } objects. A null document
   // means deletion.

@@ -15,6 +15,8 @@ export default Service.extend({
     return this.get('session.isAuthenticated') && !this.get('isPartiallyAuthenticated');
   }),
 
+  creatableTypes: alias('_rawSession.data.meta.creatableTypes'),
+
   isPartiallyAuthenticated: alias('_rawSession.meta.partial-session'),
 
   partialSession: computed('isPartiallyAuthenticated', '_rawSession', function() {
