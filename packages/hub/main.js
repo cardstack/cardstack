@@ -35,7 +35,10 @@ async function wireItUp(projectDir, encryptionKeys, dataSources, opts = {}) {
   // in the test suite we want more deterministic control of when
   // indexing happens
   if (!opts.disableAutomaticIndexing) {
-    await container.lookup('hub:indexers').update();
+    await container.lookup(`plugin-client:${require.resolve('@cardstack/pgsearch/client')}`).ensureDatabaseSetup();
+
+    // some datasources are dependent upon a sync at boot for index of pristine system
+    container.lookup('hub:indexers').update(); // dont await boot-time indexing, invalidation logic has our back
     setInterval(() => container.lookup('hub:indexers').update(), 600000);
   }
 
