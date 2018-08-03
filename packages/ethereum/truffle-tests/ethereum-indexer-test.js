@@ -92,6 +92,7 @@ contract('SampleToken', function(accounts) {
         });
 
       env = await createDefaultEnvironment(`${__dirname}/..`, factory.getModels());
+      await env.lookup(`plugin-client:${require.resolve('@cardstack/pgsearch/client')}`).ensureDatabaseSetup();
       buffer = env.lookup(`plugin-services:${require.resolve('../cardstack/buffer')}`);
       ethereumService = buffer.ethereumService;
 
