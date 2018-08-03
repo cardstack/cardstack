@@ -25,6 +25,7 @@ function collapseBufferedHints(hints) {
 
 module.exports = declareInjections({
   indexer: 'hub:indexers',
+  pgsearchClient: `plugin-client:${require.resolve('@cardstack/pgsearch/client')}`
 },
 
 class EthereumBuffer {
@@ -33,14 +34,16 @@ class EthereumBuffer {
     return new this(...args);
   }
 
-  constructor({ indexer }) {
+  constructor({ indexer, pgsearchClient }) {
     this.branches = null;
     this.ethereumService = null;
     this.indexer = indexer;
+    this.pgsearchClient = pgsearchClient;
     this.client = null;
     this.contractDefinitions = {};
     this.contractName = null;
     this._flushedPromise = null;
+    this._bufferedRecordIndexingPromise = null;
     this._setupPromise = this._ensureClient();
     this._processingHints = [];
     this.bulkOps = null;
@@ -113,6 +116,8 @@ class EthereumBuffer {
   }
 
   async _ensureClient() {
+    await this.pgsearchClient.ensureDatabaseSetup();
+
     if (!this.client) {
       this.client = await Client.create();
     }
@@ -217,14 +222,18 @@ class EthereumBuffer {
       bufferedHints.push(await this._bufferRecord(attachMeta(model, { blockheight, branch, contractName })));
     }
 
-    log.debug(`finalizing bulk ops for buffered index update with last indexed blockheights ${JSON.stringify(blockHeights)}, hints: ${JSON.stringify(hints, null, 2)}`);
+    log.debug(`finalizing bulk ops for buffered index update with last indexed blockheights ${JSON.stringify(blockHeights)}`);
     await this.bulkOps.finalize();
 
-    log.debug(`starting hub index of buffered ethereum models with last indexed blockheights ${JSON.stringify(blockHeights)}, hints: ${JSON.stringify(hints, null, 2)}`);
-    await this.indexer.update({
-      hints: collapseBufferedHints(bufferedHints)
-    });
-    log.debug(`completed hub index of buffered ethereum models with last indexed blockheights ${JSON.stringify(blockHeights)}, hints: ${JSON.stringify(hints, null, 2)}`);
+    log.debug(`starting hub index of buffered ethereum models with last indexed blockheights ${JSON.stringify(blockHeights)}`);
+    // dont await this promise as these indexing jobs will be blocked on the indexing job that kicked off this buffered load. save this promise for testing purposes
+    this._bufferedRecordIndexingPromise = Promise.resolve(this._bufferedRecordIndexingPromise)
+      .then(() => this.indexer.update({
+        forceRefresh: true,
+        hints: collapseBufferedHints(bufferedHints)
+      }));
+    log.debug(`completed issuing hub index jobs of buffered ethereum models with last indexed blockheights ${JSON.stringify(blockHeights)}`);
+
 
     this._processingHints = [];
   }
