@@ -228,10 +228,13 @@ class EthereumBuffer {
     log.debug(`starting hub index of buffered ethereum models with last indexed blockheights ${JSON.stringify(blockHeights)}`);
     // dont await this promise as these indexing jobs will be blocked on the indexing job that kicked off this buffered load. save this promise for testing purposes
     this._bufferedRecordIndexingPromise = Promise.resolve(this._bufferedRecordIndexingPromise)
-      .then(() => this.indexer.update({
-        forceRefresh: true,
-        hints: collapseBufferedHints(bufferedHints)
-      }));
+      .then(() => {
+        log.debug(`queuing index jobs of buffered ethereum models with last indexed blockheights ${JSON.stringify(blockHeights)}, hints: ${JSON.stringify(hints)}`);
+        return this.indexer.update({
+          forceRefresh: true,
+          hints: collapseBufferedHints(bufferedHints)
+        });
+      });
     log.debug(`completed issuing hub index jobs of buffered ethereum models with last indexed blockheights ${JSON.stringify(blockHeights)}`);
 
 
