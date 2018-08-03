@@ -1,5 +1,5 @@
 import { run } from '@ember/runloop';
-import Service from '@ember/service';
+import { computed } from '@ember/object';
 import { module, test } from 'qunit';
 import { setupRenderingTest } from 'ember-qunit';
 import { render } from '@ember/test-helpers';
@@ -9,18 +9,15 @@ module('Integration | Component | cs branch control', function(hooks) {
   setupRenderingTest(hooks);
 
   hooks.beforeEach(function() {
-    this.owner.register('service:cardstack-tools', Service.extend({
+    this.tools = this.owner.lookup('service:cardstack-tools');
+    this.tools.reopen({
       branch: 'master',
-      init() {
-        this._super();
-        this.branchSets = [];
-      },
+      branchSets: computed(() => []),
       setBranch(which) {
-        this.branchSets.push(which);
+        this.get('branchSets').push(which);
         this.set('branch', which);
       }
-    }));
-    this.tools = this.owner.lookup('service:cardstack-tools');
+    });
   });
 
   test('it renders in live mode', async function(assert) {

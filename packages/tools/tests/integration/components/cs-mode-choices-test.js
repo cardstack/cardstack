@@ -1,6 +1,5 @@
 import { run } from '@ember/runloop';
 import { computed } from '@ember/object';
-import Service from '@ember/service';
 import { module, test } from 'qunit';
 import { setupRenderingTest } from 'ember-qunit';
 import { render } from '@ember/test-helpers';
@@ -10,8 +9,8 @@ module('Integration | Component | cs mode choices', function(hooks) {
   setupRenderingTest(hooks);
 
   hooks.beforeEach(function() {
-    this.owner.register('service:cardstack-tools', Service.extend({
-
+    this.tools = this.owner.lookup('service:cardstack-tools');
+    this.tools.reopen({
       // This is the basic protocol required by cs-mode-choices: a
       // property to control, choices, and a setter function:
       favoriteColor: 'blue',
@@ -24,9 +23,7 @@ module('Integration | Component | cs mode choices', function(hooks) {
       setFavoriteColor(color) {
         this.set('favoriteColor', color);
       }
-
-    }));
-    this.tools = this.owner.lookup('service:cardstack-tools');
+    });
   });
 
   test('it renders', async function(assert) {
