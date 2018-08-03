@@ -1,6 +1,6 @@
 {
   "name": "@cardstack/codegen",
-  "version": "0.9.11",
+  "version": "0.9.13",
   "description": "Dynamic code generation infrastructure for Cardstack",
   "keywords": [
     "ember-addon",
@@ -32,8 +32,8 @@
   },
   "devDependencies": {
     "@cardstack/eslint-config": "0.8.0",
-    "@cardstack/jsonapi": "0.9.11",
-    "@cardstack/test-support": "0.9.11",
+    "@cardstack/jsonapi": "0.9.13",
+    "@cardstack/test-support": "0.9.13",
     "ember-cli": "^3.0.0",
     "ember-cli-dependency-checker": "^2.1.0",
     "ember-cli-eslint": "^4.2.1",
