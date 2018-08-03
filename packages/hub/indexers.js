@@ -94,13 +94,11 @@ class Indexers extends EventEmitter {
 
   async update({ forceRefresh, hints } = {}) {
     await this._setupWorkers();
-    // the singletonKey being the same as the queue name means that only one
-    // indexing job can be queued at the same time. singletonNextSlot means that
-    // the job will queue to run after the current running job instead of
-    // blocking publish.
+    // Note that we dont want singletonKey, its inefficient due to the sophisticated invalidation we are using,
+    // also we dont want to use singletoneNextSlot, since all the indexing calls are important (as they can have different hints, and we dont want to collapse jobs)
     await this.jobQueue.publishAndWait('hub/indexers/update',
       { forceRefresh, hints },
-      { singletonKey: 'hub/indexers/update', singletonNextSlot: true, expireIn: '2 hours' }
+      {  expireIn: '2 hours' }
     );
   }
 

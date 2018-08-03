@@ -5,8 +5,6 @@ const {
 } = require('@cardstack/test-support/env');
 const addresses = require('./data/addresses');
 const JSONAPIFactory = require('@cardstack/test-support/jsonapi-factory');
-const { promisify } = require('util');
-const timeout = promisify(setTimeout);
 
 const contractName = 'sample-token';
 let buffer, ethereumService, env;
@@ -19,14 +17,6 @@ async function teardown() {
 
 async function waitForEthereumEvents(buffer) {
   await buffer.flush();
-
-  // due to the way indexing queing works, its easy to deadlock when you await
-  // indexing jobs that are spawned by the buffer, as jobs are single threaded
-  // and new jobs wont start until old jobs complete. this provides some
-  // breathing room to prevent deadlock
-  await timeout(5000);
-
-  await buffer._bufferedRecordIndexingPromise;
 }
 
 contract('SampleToken', function(accounts) {
