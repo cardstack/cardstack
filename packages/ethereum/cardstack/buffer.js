@@ -151,7 +151,7 @@ class EthereumBuffer {
   }
 
   async _processHints({ contractName, blockHeights, hints }) {
-    log.debug(`processing hints for ethereum with last indexed blockheights ${JSON.stringify(blockHeights)}, ${JSON.stringify(hints, null, 2)}`);
+    log.debug(`processing hints for ethereum with last indexed blockheights ${JSON.stringify(blockHeights)}, hinst: ${JSON.stringify(hints, null, 2)}`);
     this.bulkOps = this.client.bulkOps({});
     this._processingHints = hints;
     let contractDefinition = this.contractDefinitions[contractName];
@@ -217,11 +217,14 @@ class EthereumBuffer {
       bufferedHints.push(await this._bufferRecord(attachMeta(model, { blockheight, branch, contractName })));
     }
 
+    log.debug(`finalizing bulk ops for buffered index update with last indexed blockheights ${JSON.stringify(blockHeights)}, hints: ${JSON.stringify(hints, null, 2)}`);
     await this.bulkOps.finalize();
 
+    log.debug(`starting hub index of buffered ethereum models with last indexed blockheights ${JSON.stringify(blockHeights)}, hints: ${JSON.stringify(hints, null, 2)}`);
     await this.indexer.update({
       hints: collapseBufferedHints(bufferedHints)
     });
+    log.debug(`completed hub index of buffered ethereum models with last indexed blockheights ${JSON.stringify(blockHeights)}, hints: ${JSON.stringify(hints, null, 2)}`);
 
     this._processingHints = [];
   }
