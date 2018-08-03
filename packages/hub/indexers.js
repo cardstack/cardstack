@@ -100,7 +100,7 @@ class Indexers extends EventEmitter {
     // blocking publish.
     await this.jobQueue.publishAndWait('hub/indexers/update',
       { forceRefresh, hints },
-      { singletonKey: 'hub/indexers/update', singletonNextSlot: true }
+      { singletonKey: 'hub/indexers/update', singletonNextSlot: true, expireIn: '2 hours' }
     );
   }
 
