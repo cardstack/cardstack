@@ -73,21 +73,29 @@ module.exports = declareInjections({
     }
     let dir = path.join(this.projectPath, config.migrationsDir);
 
-    await migrate({
-      direction: 'up',
-      migrationsTable: 'migrations',
-      singleTransaction: true,
-      checkOrder: false,
-      databaseUrl: {
-        user: config.user,
-        host: config.host,
-        database: config.database,
-        password: config.password,
-        port: config.port
-      },
-      dir,
-      log: (...args) => log.debug(...args)
-    });
+    try {
+      await migrate({
+        direction: 'up',
+        migrationsTable: 'migrations',
+        singleTransaction: true,
+        checkOrder: false,
+        databaseUrl: {
+          user: config.user,
+          host: config.host,
+          database: config.database,
+          password: config.password,
+          port: config.port
+        },
+        dir,
+        log: (...args) => log.debug(...args)
+      });
+    } catch (err) {
+      if (err.message && err.message.indexOf('migration is already running') > -1) {
+        log.warn("Migration is already running");
+      } else {
+        throw err;
+      }
+    }
   }
 });
 
