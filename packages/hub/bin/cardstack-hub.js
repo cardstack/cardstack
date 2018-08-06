@@ -42,7 +42,6 @@ if (process.env.PGHOST && process.env.PGPORT && process.env.PGUSER) {
     database: 'postgres'
 	};
 }
-config.newJobCheckInterval = 100; // set to minimum to speed up tests
 
 async function runServer(options, dataSources) {
   let {
