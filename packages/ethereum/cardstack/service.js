@@ -141,11 +141,11 @@ module.exports = class EthereumService {
           }
         } else {
           log.trace(`contract event received for ${name}: ${JSON.stringify(event, null, 2)}`);
-          let hints = this._generateHintsFromEvent({ branch, contract: name, event });
-          log.debug("addings hints to queue", JSON.stringify(hints, null, 2));
+          let identifiers = this._generateHintsFromEvent({ branch, contract: name, event });
+          log.debug("calling index for identifers", JSON.stringify(identifiers, null, 2));
 
           if (buffer) {
-            buffer.loadModels(name, null, hints);
+            buffer.indexModels(name, null, identifiers);
           }
         }
       });
