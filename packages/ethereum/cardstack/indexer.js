@@ -46,6 +46,7 @@ class Indexer {
       dataSourceId: this.dataSourceId,
       contract: this.contract,
       buffer: this.buffer,
+      branches: await this.branches(),
       searcher: this.searcher
     });
   }
@@ -53,11 +54,12 @@ class Indexer {
 
 class Updater {
 
-  constructor({ dataSourceId, contract, searcher, buffer }) {
+  constructor({ dataSourceId, contract, searcher, buffer, branches }) {
     this.dataSourceId = dataSourceId;
     this.contract = contract;
     this.searcher = searcher;
     this.buffer = buffer;
+    this.branches = branches;
   }
 
   async schema() {
@@ -137,8 +139,7 @@ class Updater {
   async updateContent(meta, hints, ops) {
     let schema = await this.schema();
     let isSchemaUnchanged;
-    let blockHeights = Object.assign({}, get(meta, 'lastBlockHeights') || {});
-    let needsFinishReplaceAll;
+    let lastBlockHeights = get(meta, 'lastBlockHeights');
 
     if (meta) {
       let { lastSchema } = meta;
@@ -146,30 +147,23 @@ class Updater {
     }
 
     if (!isSchemaUnchanged) {
-      needsFinishReplaceAll = true;
       await ops.beginReplaceAll();
-    }
-
-    for (let model of schema) {
-      await ops.save(model.type, model.id, { data: model });
+      for (let model of schema) {
+        await ops.save(model.type, model.id, { data: model });
+      }
+      await ops.finishReplaceAll();
     }
 
     let shouldSkip = await this.buffer.shouldSkipIndexing(this.dataSourceId, defaultBranch);
+    let blockHeights = Object.assign({}, lastBlockHeights || {});
     if (!shouldSkip) {
-      let models = await this.buffer.readModels(this.dataSourceId, blockHeights, hints);
-
-      for (let model of models) {
-        let { blockheight, branch } = model.meta;
+      for (let branch of this.branches) {
+        let blockheight = await this.buffer.getBlockHeight(branch);
         if (!blockHeights[branch] || blockHeights[branch] < blockheight) {
           blockHeights[branch] = blockheight;
         }
-
-        await ops.save(model.type, model.id, { data: model });
       }
-    }
-
-    if (needsFinishReplaceAll) {
-      await ops.finishReplaceAll();
+      await this.buffer.indexModels(this.dataSourceId, lastBlockHeights);
     }
 
     return {

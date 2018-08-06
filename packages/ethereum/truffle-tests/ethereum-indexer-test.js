@@ -848,7 +848,7 @@ contract('SampleToken', function(accounts) {
   });
 
   describe('ethereum-indexer for past events', function() {
-    let pastToken, token, indexers, contract;
+    let pastToken, token, pgclient, indexers, contract;
 
     async function setup() {
       let factory = new JSONAPIFactory();
@@ -879,6 +879,7 @@ contract('SampleToken', function(accounts) {
       contract = dataSource.data.attributes.params.contract,
       env = await createDefaultEnvironment(`${__dirname}/..`, factory.getModels());
       indexers = await env.lookup('hub:indexers');
+      pgclient = await env.lookup(`plugin-client:${require.resolve('@cardstack/pgsearch/client')}`);
 
       buffer = env.lookup(`plugin-services:${require.resolve('../cardstack/buffer')}`);
       ethereumService = buffer.ethereumService;
@@ -894,7 +895,7 @@ contract('SampleToken', function(accounts) {
 
       let addCount = 0;
 
-      indexers.on('add', ({ type }) => {
+      pgclient.on('add', ({ type }) => {
         if (!['sample-tokens', 'sample-token-balance-ofs'].includes(type)) { return; }
         addCount++;
       });
@@ -929,7 +930,7 @@ contract('SampleToken', function(accounts) {
 
       let addCount = 0;
 
-      indexers.on('add', ({ type }) => {
+      pgclient.on('add', ({ type }) => {
         if (!['sample-tokens', 'sample-token-balance-ofs'].includes(type)) { return; }
         addCount++;
       });

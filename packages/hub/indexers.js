@@ -98,7 +98,7 @@ class Indexers extends EventEmitter {
     // also we dont want to use singletoneNextSlot, since all the indexing calls are important (as they can have different hints, and we dont want to collapse jobs)
     await this.jobQueue.publishAndWait('hub/indexers/update',
       { forceRefresh, hints },
-      {  expireIn: '2 hours' }
+      { singletonKey: 'hub/indexers/update', singletonNextSlot: true, expireIn: '2 hours' }
     );
   }
 
