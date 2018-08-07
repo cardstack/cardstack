@@ -21,7 +21,8 @@ async function wireItUp(projectDir, encryptionKeys, dataSources, opts = {}) {
     database: process.env.PG_BOSS_DATABASE,
     host:     process.env.PG_BOSS_HOST,
     user:     process.env.PG_BOSS_USER,
-    port:     process.env.PG_BOSS_PORT
+    port:     process.env.PG_BOSS_PORT,
+    password: process.env.PG_BOSS_PASSWORD
   });
 
   if (typeof opts.seeds === 'function') {
