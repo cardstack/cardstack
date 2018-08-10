@@ -45,6 +45,7 @@ While third-party Cardstack plugins are heartily encouraged, the plugins in this
 | @cardstack/email-auth     | ./packages/email-auth     | User authentication via email (or any other messenger plugin) verification. |
 | @cardstack/ephemeral      | ./packages/ephemeral      | An in-memory data source that is very useful in testing and development. Implements both indexer and writer features.|
 | @cardstack/eslint-config  | ./packages/eslint-config  | Standard [eslint](https://eslint.org/) rules used throughout the Cardstack packages. |
+| @cardstack/ethereum       | ./packages/ethereum       | Data source plugin for indexing Ethereum smart contracts. Provides incremental indexing via blockheight, as well as indexing based on configured Ethereum events. Indexes smart contracts, address based mappings within smart contracts, and Ethereum events fired from smart contracts.|
 | @cardstack/git            | ./packages/git            | Data source plugin for indexing and writing a Git repository. |
 | @cardstack/github-auth    | ./packages/github-auth    | An authenticator plugin for authenticating users against GitHub via OAuth2. |
 | @cardstack/handlebars     | ./packages/handlebars     | A field-type plugin for manipulating [Handlebars](http://handlebarsjs.com/) templates.|
@@ -53,8 +54,10 @@ While third-party Cardstack plugins are heartily encouraged, the plugins in this
 | @cardstack/jsonapi        | ./packages/jsonapi        | A middleware plugin that implements a [JSONAPI spec](http://jsonapi.org/)-compliant web API. This is the most conventional way to speak to Cardstack Hub. |
 | @cardstack/mobiledoc      | ./packages/mobiledoc      | A field-type plugin for [Mobiledoc](https://bustle.github.io/mobiledoc-kit/demo/)-formatted content. Mobiledoc is Cardstack's preferred way to store rich user-editable content.|
 | @cardstack/models         | ./packages/models         | A code-generator plugin that provides automatic [Ember Data](https://github.com/emberjs/data) models to match your current user-defined schema. |
+| @cardstack/pgsearch       | ./packages/pgsearch       | A library used manage the backing index in postgres. Provides reference invalidation logic to accurately update resources and referenced resources from the index.|
 | @cardstack/plugin-utils   | ./packages/plugin-utils   | Library used by most other Cardstack plugins for common things like Hub-friendly logging, standard Error formatting, etc. |
 | @cardstack/postgresql     | ./packages/postgresql     | Data source plugin for read/write connectivity to [PostgreSQL](https://www.postgresql.org/). Provides reliable incremental indexing via [Logical Decoding](https://www.postgresql.org/docs/9.6/static/logicaldecoding.html).|
+| @cardstack/queue          | ./packages/queue          | A library that provides a job queuing service for async tasks leveraging pg-boss |
 | @cardstack/rendering      | ./packages/rendering      | Fundamental client-side components for rendering Cardstack-managed content.|
 | @cardstack/routing        | ./packages/routing        | Standardized client-side routing to all Cardstack-managed content.|
 | @cardstack/search         | ./packages/search         | Client-side components for querying arbitrary sets of Cardstack Content.|
