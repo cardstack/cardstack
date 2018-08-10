@@ -79,6 +79,24 @@ class Updater {
       }
     },{
       type: "fields",
+      id: "block-number",
+      attributes: {
+        "field-type": "@cardstack/core-types::integer"
+      }
+    },{
+      type: "fields",
+      id: "transaction-id",
+      attributes: {
+        "field-type": "@cardstack/core-types::integer"
+      }
+    },{
+      type: "fields",
+      id: "event-name",
+      attributes: {
+        "field-type": "@cardstack/core-types::string"
+      }
+    },{
+      type: "fields",
       id: "mapping-boolean-value",
       attributes: {
         "field-type": "@cardstack/core-types::boolean"
@@ -91,6 +109,12 @@ class Updater {
       }
     },{
       type: "fields",
+      id: "mapping-address-value",
+      attributes: {
+        "field-type": "@cardstack/core-types::case-insensitive"
+      }
+    },{
+      type: "fields",
       id: "mapping-number-value",
       attributes: {
         "field-type": "@cardstack/core-types::string" // ethereum numbers are too large for JS, use a string to internally represent ethereum numbers
@@ -100,10 +124,10 @@ class Updater {
     let schema = [].concat(defaultFields);
     let contractName = this.dataSourceId;
     let abi = this.contract["abi"];
-    let { fields, customTypes } = this._getFieldsFromAbi(contractName, abi);
+    let { contractFields, schemaItems } = this._getSchemaFromAbi(contractName, abi);
 
-    schema = schema.concat(customTypes)
-                   .concat(fields);
+    schema = schema.concat(schemaItems)
+                   .concat(contractFields);
 
     let contractSchema =  {
       type: 'content-types',
@@ -121,7 +145,7 @@ class Updater {
       }
     };
 
-    fields.forEach(field => {
+    contractFields.forEach(field => {
       contractSchema.relationships.fields.data.push({
         type: "fields", id: field.id
       });
@@ -163,7 +187,7 @@ class Updater {
           blockHeights[branch] = blockheight;
         }
       }
-      await this.buffer.indexModels(this.dataSourceId, lastBlockHeights);
+      await this.buffer.index(this.dataSourceId, lastBlockHeights);
     }
 
     return {
@@ -179,6 +203,12 @@ class Updater {
       // int in js is 2^53, vs 2^256 in solidity
       case 'boolean':
         fieldType = '@cardstack/core-types::boolean';
+        break;
+      case 'has-many':
+        fieldType = '@cardstack/core-types::has-many';
+        break;
+      case 'address':
+        fieldType = '@cardstack/core-types::case-insensitive';
         break;
       case 'number':
       case 'string':
@@ -211,14 +241,36 @@ class Updater {
     };
   }
 
-  _mappingFieldFor(contractName, fieldName, fields) {
+  _mappingContentTypeFor(contractName, mappingName, fields) {
     return {
       type: "content-types",
-      id: pluralize(`${contractName}-${dasherize(fieldName)}`),
+      id: pluralize(`${contractName}-${dasherize(mappingName)}`),
       relationships: {
         fields: {
           data: [
             { type: "fields", id: "ethereum-address" },
+            { type: "fields", id: contractName + "-contract" }
+          ].concat(fields.map(field => {
+            return { type: "fields", id: field.name };
+          }))
+        },
+        'data-source': {
+          data: { type: 'data-sources', id: this.dataSourceId.toString() }
+        }
+      }
+    };
+  }
+
+  _eventContentTypeFor(contractName, eventName, fields) {
+    return {
+      type: "content-types",
+      id: pluralize(`${contractName}-${dasherize(eventName)}-events`),
+      relationships: {
+        fields: {
+          data: [
+            { type: "fields", id: "block-number" },
+            { type: "fields", id: "transaction-id" },
+            { type: "fields", id: "event-name" },
             { type: "fields", id: contractName + "-contract" }
           ].concat(fields.map(field => {
             return { type: "fields", id: field.name };
@@ -252,46 +304,73 @@ class Updater {
     };
   }
 
-  _getFieldsFromAbi(contractName, abi) {
-    let fields = [];
-    let customTypes = [];
+  _getSchemaFromAbi(contractName, abi) {
+    let contractFields = [], schemaItems = [];
     abi.forEach(item => {
-      if (item.type === "function" && item.constant) {
+      if (item.type === "event" || (item.type === "function" && item.constant)) {
         let fieldInfo = fieldTypeFor(contractName, item);
         if (!fieldInfo) { return; }
-        let { isMapping, fields:nestedFields } = fieldInfo;
 
-        let field = {
-          type: "fields",
-          id: `${contractName}-${dasherize(item.name)}`,
-        };
+        let { isEvent, isMapping, fields } = fieldInfo;
+        if (!isMapping && !isEvent && fields.length === 1) {
+          contractFields.push({
+            type: "fields",
+            id: `${contractName}-${dasherize(item.name)}`,
+            attributes: { "field-type": fields[0]["type"] },
+          });
+          return;
+        }
 
-        if (!isMapping && nestedFields.length === 1) {
-          field.attributes = { "field-type": nestedFields[0]["type"] };
-          fields.push(field);
+        for (let field of fields) {
+          if (!field.isNamedField) { continue; }
+          schemaItems.push(this._namedFieldFor(field.name, field.type));
+        }
+
+        let relatedField = this._belongsToFieldFor(contractName);
+        if (!schemaItems.find(i => i.id === relatedField.id && i.type === 'fields')) {
+          schemaItems.push(relatedField);
         }
 
         if (isMapping) {
-          for (let mappingField of nestedFields) {
-            if (!mappingField.isNamedField) { continue; }
-            customTypes.push(this._namedFieldFor(mappingField.name, mappingField.type));
+          let mappingContentType = this._mappingContentTypeFor(contractName, item.name, fields);
+          if (!schemaItems.find(i => i.id === mappingContentType.id && i.type === 'content-types')) {
+            schemaItems.push(mappingContentType);
+            schemaItems.push(this._openGrantForContentType(`${contractName}-${dasherize(item.name)}`));
           }
+        } else if (isEvent) {
+          schemaItems.push(this._namedFieldFor(`${contractName}-${dasherize(item.name)}-events`, 'has-many'));
 
-          let relatedField = this._belongsToFieldFor(contractName);
-          if (!customTypes.find(field => field.id === relatedField.id)) {
-            customTypes.push(relatedField);
-          }
-
-          let mappingField = this._mappingFieldFor(contractName, item.name, nestedFields);
-          if (!customTypes.find(field => field.id === mappingField.id)) {
-            customTypes.push(mappingField);
-            customTypes.push(this._openGrantForContentType(`${contractName}-${dasherize(item.name)}`));
+          let eventContentType = this._eventContentTypeFor(contractName, item.name, fields);
+          if (!schemaItems.find(i => i.id === eventContentType.id && i.type === 'content-types')) {
+            schemaItems.push(eventContentType);
+            schemaItems.push(this._openGrantForContentType(`${contractName}-${dasherize(item.name)}-events`));
           }
         }
       }
     });
 
-    return { fields, customTypes };
+    let eventContentTriggers = this.contract.eventContentTriggers || {};
+    for (let event of Object.keys(eventContentTriggers)) {
+      let eventField = `${contractName}-${dasherize(event)}-events`;
+      let contentTypesToUpdate = eventContentTriggers[event];
+
+      if (!contentTypesToUpdate.length) {
+        let eventFieldIndex = schemaItems.findIndex(i => i.id === eventField && i.type === 'fields');
+        if (eventFieldIndex < 0) { continue; }
+
+        contractFields.push(schemaItems[eventFieldIndex]);
+        schemaItems.splice(eventFieldIndex, 1);
+      } else {
+        for (let contentTypeName of contentTypesToUpdate) {
+          let contentType = schemaItems.find(i => i.id === contentTypeName);
+          if (!contentType) { continue; }
+
+          contentType.relationships.fields.data.push({ type: 'fields', id: eventField });
+        }
+      }
+    }
+
+    return { contractFields, schemaItems };
   }
 
 }

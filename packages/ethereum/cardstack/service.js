@@ -3,7 +3,7 @@ const { dasherize, camelize, capitalize } = Ember.String;
 const { pluralize, singularize } = require('inflection');
 const Web3 = require('web3');
 const log = require('@cardstack/logger')('cardstack/ethereum/service');
-const { uniqWith, isEqual, get } = require('lodash');
+const { get } = require('lodash');
 const { promisify } = require('util');
 const timeout = promisify(setTimeout);
 
@@ -141,11 +141,16 @@ module.exports = class EthereumService {
           }
         } else {
           log.trace(`contract event received for ${name}: ${JSON.stringify(event, null, 2)}`);
-          let identifiers = this._generateHintsFromEvent({ branch, contract: name, event });
-          log.debug("calling index for identifers", JSON.stringify(identifiers, null, 2));
+          if (!Object.keys(this._contractDefinitions[name].eventContentTriggers || {}).includes(event.event)){
+            log.info(`skipping contract ${name} indexing for event ${event.event} since it is not configured as an event of intrest`);
+            return;
+          }
+
+          let historyData = this._generateHistoryDataFromEvent({ branch, contract: name, event });
+          log.debug("calling index for identifers", JSON.stringify(historyData.identifiers, null, 2));
 
           if (buffer) {
-            buffer.indexModels(name, null, identifiers);
+            buffer.index(name, null, [ historyData ]);
           }
         }
       });
@@ -241,7 +246,7 @@ module.exports = class EthereumService {
     return model;
   }
 
-  async getContractInfoFromHint({ id, branch, type, contractName}) {
+  async getContractInfoForIdentifier({ id, branch, type, contractName}) {
     log.debug(`getting contract data for id: ${id}, type: ${type}, branch: ${branch}, contractName: ${contractName}`);
     if (!branch || !type || !id) { return; }
 
@@ -272,16 +277,15 @@ module.exports = class EthereumService {
     return { data, methodName };
   }
 
-  async getPastEventsAsHints(blockHeights) {
+  async getContractHistorySince(blockHeights) {
     log.debug(`getting past events as hints for contracts ${blockHeights ? JSON.stringify(blockHeights) : ''}`);
-    let hints = [];
+    let history = [];
 
     await this._reconnectPromise;
     for (let branch of Object.keys(this._contracts)) {
       for (let contract of Object.keys(this._contracts[branch])) {
         let pastAddresses = get(this._contractDefinitions[contract], `pastAddresses.${branch}`) || [];
         let aContract = this._contracts[branch][contract];
-        let contractHints = [];
         let contractProviders = pastAddresses.map(address => {
           return { address, provider: this._pastContracts[branch][address] };
         });
@@ -292,7 +296,7 @@ module.exports = class EthereumService {
 
         for (let { address, provider } of contractProviders) {
           for (let event of Object.keys(this._contractDefinitions[contract].eventContentTriggers || [])) {
-            let rawHints = [], events = [];
+            let events = [];
             let lastIndexedBlockHeight = get(blockHeights, branch);
             try {
               // TODO we might need to chunk this so we don't blow past the websocket max frame size in the web3 provider: https://github.com/ethereum/web3.js/issues/1297
@@ -303,38 +307,36 @@ module.exports = class EthereumService {
             }
             log.trace(`discovered ${event} events for contract ${contract}, address ${address}: ${JSON.stringify(events, null, 2)}`);
 
-            for (let rawEvent of events) {
-              rawHints = rawHints.concat(this._generateHintsFromEvent({ branch, contract, event: rawEvent }));
+            for (let event of events) {
+              history.push(this._generateHistoryDataFromEvent({ branch, contract, event }));
             }
-            contractHints = contractHints.concat(uniqWith(rawHints, isEqual));
           }
-          hints = hints.concat(uniqWith(contractHints, isEqual));
         }
       }
     }
-    log.info(`Generated ${hints.length} hints from past contract events since blockheight ${JSON.stringify(blockHeights)}`);
-    log.debug(`discovered contract events resulting in hints: ${JSON.stringify(hints, null, 2)}`);
-    return hints;
+    log.info(`Gathered ${history.length} events from contract history since blockheight ${JSON.stringify(blockHeights)}`);
+    log.debug(`Discovered contract history data: ${JSON.stringify(history, null, 2)}`);
+    return history;
   }
 
-  _generateHintsFromEvent({ branch, contract, event }) {
-    let contractHint = { branch, type: pluralize(contract), id: this._contractDefinitions[contract].addresses[branch], isContractType: true };
+  _generateHistoryDataFromEvent({ branch, contract, event }) {
+    let contractIdentifier = { branch, type: pluralize(contract), id: this._contractDefinitions[contract].addresses[branch], isContractType: true };
     let addressParams = this._eventDefinitions[contract][event.event].inputs.filter(input => input.type === 'address');
     let addresses = addressParams.map(param => event.returnValues[param.name]).filter(address => address !== NULL_ADDRESS);
     let contentTypes = this._contractDefinitions[contract].eventContentTriggers ? this._contractDefinitions[contract].eventContentTriggers[event.event] : null;
 
-    let hints = [ contractHint ];
+    let identifiers = [ contractIdentifier ];
     if (!contentTypes || !contentTypes.length ) {
-      return hints;
+      return { branch, event, identifiers };
     }
 
     for (let type of contentTypes) {
       for (let id of addresses) {
-        hints.push({ branch, type, id, contract });
+        identifiers.push({ branch, type, id, contract });
       }
     }
 
-    return hints;
+    return { branch, event, identifiers };
   }
 };
 

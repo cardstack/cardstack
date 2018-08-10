@@ -1,10 +1,43 @@
 const Ember = require('ember-source/dist/ember.debug');
 const { dasherize } = Ember.String;
 
-function fieldTypeFor(contractName, abiItem) {
-  if (!abiItem || !abiItem.outputs || !abiItem.outputs.length) { return; }
+function solidityTypeToInternalType(type) {
+  switch(type) {
+    case 'uint8':
+    case 'uint16':
+    case 'uint32':
+    case 'uint64':
+    case 'uint128':
+    case 'uint256':
+      return 'number';
+    case 'bool':
+      return 'boolean';
+    case 'address':
+      return 'address';
+    case 'bytes32':
+    case 'string':
+    default:
+      return 'string';
+  }
+}
 
-  if (!abiItem.inputs.length) {
+function fieldTypeFor(contractName, abiItem) {
+  if (!abiItem ||
+      (abiItem.type === 'function' && !abiItem.outputs) ||
+      (abiItem.type === 'function' && !abiItem.outputs.length)) { return; }
+
+  if (abiItem.type === 'event') {
+    let isNamedField = true;
+    return {
+      isEvent: true,
+      fields: abiItem.inputs.map(input => {
+        let type = solidityTypeToInternalType(input.type);
+        let name = `${dasherize(abiItem.name)}-event-${dasherize(input.name.replace(/^_/, ''))}`;
+
+        return { name, type, isNamedField };
+      })
+    };
+  } else if (!abiItem.inputs.length) {
     // We are not handling multiple return types for non-mapping functions
     // unclear what that would actually look like in the schema...
     switch(abiItem.outputs[0].type) {
@@ -18,8 +51,9 @@ function fieldTypeFor(contractName, abiItem) {
       case 'uint256':
       case 'bytes32':
       case 'string':
-      case 'address':
         return { fields: [{ type: '@cardstack/core-types::string' }]};
+      case 'address':
+        return { fields: [{ type: '@cardstack/core-types::case-insensitive' }]};
       case 'bool':
         return { fields: [{ type: '@cardstack/core-types::boolean' }]};
     }
@@ -28,31 +62,25 @@ function fieldTypeFor(contractName, abiItem) {
     return {
       isMapping: true,
       fields: abiItem.outputs.map(output => {
-        let name, type, isNamedField;
+        let name, isNamedField;
+        let type = solidityTypeToInternalType(output.type);
         if (output.name && abiItem.outputs.length > 1) {
-          name = `${dasherize(abiItem.name)}-${dasherize(output.name)}`;
+          name = `${dasherize(abiItem.name)}-${dasherize(output.name.replace(/^_/, ''))}`;
           isNamedField = true;
         }
-        switch(output.type) {
-          case 'uint8':
-          case 'uint16':
-          case 'uint32':
-          case 'uint64':
-          case 'uint128':
-          case 'uint256':
+        switch(type) {
+          case 'number':
             name = name || `mapping-number-value`;
-            type = 'number';
             break;
-          case 'bool':
+          case 'boolean':
             name = name || `mapping-boolean-value`;
-            type = 'boolean';
             break;
-          case 'bytes32':
-          case 'string':
           case 'address':
+            name = name || `mapping-address-value`;
+            break;
+          case 'string':
           default:
             name = name || `mapping-string-value`;
-            type = 'string';
         }
 
         return { name, type, isNamedField };
