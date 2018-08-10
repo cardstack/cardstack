@@ -11,8 +11,8 @@ module('Integration | Component | field editors/string editor', function(hooks) 
       title: 'hello'
     });
     await render(hbs`{{field-editors/string-editor content=model field="title" enabled=true}}`);
-    assert.equal(this.$('input').val(), 'hello');
-    assert.equal(this.$('input[disabled]').length, 0);
+    assert.dom('input').hasValue('hello', 'string field has correct value');
+    assert.dom('input').isNotDisabled('string field is not disabled');
   });
 
   test('it can be disabled', async function(assert) {
@@ -20,6 +20,6 @@ module('Integration | Component | field editors/string editor', function(hooks) 
       title: 'hello'
     });
     await render(hbs`{{field-editors/string-editor content=model field="title" enabled=false}}`);
-    assert.equal(this.$('input[disabled]').length, 1);
+    assert.dom('input[disabled]').isDisabled('date field is disabled');
   });
 });
