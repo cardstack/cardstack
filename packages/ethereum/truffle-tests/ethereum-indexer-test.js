@@ -5,8 +5,10 @@ const {
 } = require('@cardstack/test-support/env');
 const addresses = require('./data/addresses');
 const JSONAPIFactory = require('@cardstack/test-support/jsonapi-factory');
+const { set, get } = require('lodash');
 
 const contractName = 'sample-token';
+const NULL_ADDRESS = '0x0000000000000000000000000000000000000000';
 let buffer, ethereumService, env;
 
 async function teardown() {
@@ -82,6 +84,7 @@ contract('SampleToken', function(accounts) {
               abi: token.abi,
               addresses: { master: token.address },
               eventContentTriggers: {
+                TokenFrozen: [],
                 Transfer: [ "sample-token-balance-ofs" ],
                 Mint: [ "sample-token-balance-ofs" ],
                 WhiteList: [ "sample-token-approved-buyers", "sample-token-custom-buyer-limits" ],
@@ -152,6 +155,10 @@ contract('SampleToken', function(accounts) {
                 {
                   "id": "sample-token-token-frozen",
                   "type": "fields"
+                },
+                {
+                  "id": "sample-token-token-frozen-events",
+                  "type": "fields"
                 }
               ]
             },
@@ -216,6 +223,14 @@ contract('SampleToken', function(accounts) {
                 {
                   "type": "fields",
                   "id": "mapping-number-value"
+                },
+                {
+                  "type": "fields",
+                  "id": "sample-token-transfer-events",
+                },
+                {
+                  "type": "fields",
+                  "id": "sample-token-mint-events",
                 }
               ]
             },
@@ -252,6 +267,10 @@ contract('SampleToken', function(accounts) {
                 {
                   "type": "fields",
                   "id": "mapping-number-value"
+                },
+                {
+                  "type": "fields",
+                  "id": "sample-token-white-list-events"
                 }
               ]
             },
@@ -307,6 +326,10 @@ contract('SampleToken', function(accounts) {
                 {
                   "type": "fields",
                   "id": "vesting-schedule-is-revocable"
+                },
+                {
+                  "type": "fields",
+                  "id": "sample-token-vested-token-grant-events"
                 }
               ]
             },
@@ -457,6 +480,10 @@ contract('SampleToken', function(accounts) {
                 {
                   "type": "fields",
                   "id": "mapping-boolean-value"
+                },
+                {
+                  "type": "fields",
+                  "id": "sample-token-white-list-events"
                 }
               ]
             },
@@ -538,7 +565,7 @@ contract('SampleToken', function(accounts) {
           "type": "fields",
           "id": "sample-token-owner",
           "attributes": {
-            "field-type": "@cardstack/core-types::string"
+            "field-type": "@cardstack/core-types::case-insensitive"
           },
           "meta": {
             "source": contractName
@@ -597,6 +624,696 @@ contract('SampleToken', function(accounts) {
           }
         }
       });
+
+      schema = await env.lookup('hub:searchers').get(env.session, 'master', 'content-types', 'sample-token-transfer-events');
+      expect(schema).to.deep.equal({
+        "data": {
+          "type": "content-types",
+          "id": "sample-token-transfer-events",
+          "relationships": {
+            "fields": {
+              "data": [
+                {
+                  "type": "fields",
+                  "id": "block-number"
+                },
+                {
+                  "type": "fields",
+                  "id": "transaction-id"
+                },
+                {
+                  "type": "fields",
+                  "id": "event-name"
+                },
+                {
+                  "type": "fields",
+                  "id": "sample-token-contract"
+                },
+                {
+                  "type": "fields",
+                  "id": "transfer-event-from"
+                },
+                {
+                  "type": "fields",
+                  "id": "transfer-event-to"
+                },
+                {
+                  "type": "fields",
+                  "id": "transfer-event-value"
+                },
+              ]
+            },
+            "data-source": {
+              "data": {
+                "type": "data-sources",
+                "id": dataSource.id
+              }
+            }
+          },
+          "meta": {
+            "source": contractName
+          }
+        }
+      });
+
+      schema = await env.lookup('hub:searchers').get(env.session, 'master', 'grants', 'sample-token-transfer-events-grant');
+      expect(schema).to.deep.equal({
+        "data": {
+          "type": "grants",
+          "id": "sample-token-transfer-events-grant",
+          "attributes": {
+            "may-read-fields": true,
+            "may-read-resource": true
+          },
+          "relationships": {
+            "who": {
+              "data": [{
+                "id": "everyone",
+                "type": "groups"
+              }]
+            },
+            "types": {
+              "data": [
+                {
+                  "id": "sample-token-transfer-events",
+                  "type": "content-types"
+                }
+              ]
+            }
+          },
+          "meta": {
+            "source": contractName
+          }
+        }
+      });
+
+      schema = await env.lookup('hub:searchers').get(env.session, 'master', 'fields', 'sample-token-transfer-events');
+      expect(schema).to.deep.equal({
+        "data": {
+          "type": "fields",
+          "id": "sample-token-transfer-events",
+          "attributes": {
+            "field-type": "@cardstack/core-types::has-many"
+          },
+          "meta": {
+            "source": contractName
+          }
+        }
+      });
+
+      schema = await env.lookup('hub:searchers').get(env.session, 'master', 'fields', 'transfer-event-from');
+      expect(schema).to.deep.equal({
+        "data": {
+          "type": "fields",
+          "id": "transfer-event-from",
+          "attributes": {
+            "field-type": "@cardstack/core-types::case-insensitive"
+          },
+          "meta": {
+            "source": contractName
+          }
+        }
+      });
+
+      schema = await env.lookup('hub:searchers').get(env.session, 'master', 'fields', 'transfer-event-to');
+      expect(schema).to.deep.equal({
+        "data": {
+          "type": "fields",
+          "id": "transfer-event-to",
+          "attributes": {
+            "field-type": "@cardstack/core-types::case-insensitive"
+          },
+          "meta": {
+            "source": contractName
+          }
+        }
+      });
+
+      schema = await env.lookup('hub:searchers').get(env.session, 'master', 'fields', 'transfer-event-value');
+      expect(schema).to.deep.equal({
+        "data": {
+          "type": "fields",
+          "id": "transfer-event-value",
+          "attributes": {
+            "field-type": "@cardstack/core-types::string"
+          },
+          "meta": {
+            "source": contractName
+          }
+        }
+      });
+
+      schema = await env.lookup('hub:searchers').get(env.session, 'master', 'content-types', 'sample-token-token-frozen-events');
+      expect(schema).to.deep.equal({
+        "data": {
+          "type": "content-types",
+          "id": "sample-token-token-frozen-events",
+          "relationships": {
+            "fields": {
+              "data": [
+                {
+                  "type": "fields",
+                  "id": "block-number"
+                },
+                {
+                  "type": "fields",
+                  "id": "transaction-id"
+                },
+                {
+                  "type": "fields",
+                  "id": "event-name"
+                },
+                {
+                  "type": "fields",
+                  "id": "sample-token-contract"
+                },
+                {
+                  "type": "fields",
+                  "id": "token-frozen-event-is-frozen"
+                },
+              ]
+            },
+            "data-source": {
+              "data": {
+                "type": "data-sources",
+                "id": dataSource.id
+              }
+            }
+          },
+          "meta": {
+            "source": contractName
+          }
+        }
+      });
+
+      schema = await env.lookup('hub:searchers').get(env.session, 'master', 'grants', 'sample-token-token-frozen-events-grant');
+      expect(schema).to.deep.equal({
+        "data": {
+          "type": "grants",
+          "id": "sample-token-token-frozen-events-grant",
+          "attributes": {
+            "may-read-fields": true,
+            "may-read-resource": true
+          },
+          "relationships": {
+            "who": {
+              "data": [{
+                "id": "everyone",
+                "type": "groups"
+              }]
+            },
+            "types": {
+              "data": [
+                {
+                  "id": "sample-token-token-frozen-events",
+                  "type": "content-types"
+                }
+              ]
+            }
+          },
+          "meta": {
+            "source": contractName
+          }
+        }
+      });
+
+      schema = await env.lookup('hub:searchers').get(env.session, 'master', 'fields', 'sample-token-token-frozen-events');
+      expect(schema).to.deep.equal({
+        "data": {
+          "type": "fields",
+          "id": "sample-token-token-frozen-events",
+          "attributes": {
+            "field-type": "@cardstack/core-types::has-many"
+          },
+          "meta": {
+            "source": contractName
+          }
+        }
+      });
+
+      schema = await env.lookup('hub:searchers').get(env.session, 'master', 'fields', 'token-frozen-event-is-frozen');
+      expect(schema).to.deep.equal({
+        "data": {
+          "type": "fields",
+          "id": "token-frozen-event-is-frozen",
+          "attributes": {
+            "field-type": "@cardstack/core-types::boolean"
+          },
+          "meta": {
+            "source": contractName
+          }
+        }
+      });
+
+      schema = await env.lookup('hub:searchers').get(env.session, 'master', 'content-types', 'sample-token-mint-events');
+      expect(schema).to.deep.equal({
+        "data": {
+          "type": "content-types",
+          "id": "sample-token-mint-events",
+          "relationships": {
+            "fields": {
+              "data": [
+                {
+                  "type": "fields",
+                  "id": "block-number"
+                },
+                {
+                  "type": "fields",
+                  "id": "transaction-id"
+                },
+                {
+                  "type": "fields",
+                  "id": "event-name"
+                },
+                {
+                  "type": "fields",
+                  "id": "sample-token-contract"
+                },
+                {
+                  "type": "fields",
+                  "id": "mint-event-to"
+                },
+                {
+                  "type": "fields",
+                  "id": "mint-event-amount"
+                },
+              ]
+            },
+            "data-source": {
+              "data": {
+                "type": "data-sources",
+                "id": dataSource.id
+              }
+            }
+          },
+          "meta": {
+            "source": contractName
+          }
+        }
+      });
+
+      schema = await env.lookup('hub:searchers').get(env.session, 'master', 'grants', 'sample-token-mint-events-grant');
+      expect(schema).to.deep.equal({
+        "data": {
+          "type": "grants",
+          "id": "sample-token-mint-events-grant",
+          "attributes": {
+            "may-read-fields": true,
+            "may-read-resource": true
+          },
+          "relationships": {
+            "who": {
+              "data": [{
+                "id": "everyone",
+                "type": "groups"
+              }]
+            },
+            "types": {
+              "data": [
+                {
+                  "id": "sample-token-mint-events",
+                  "type": "content-types"
+                }
+              ]
+            }
+          },
+          "meta": {
+            "source": contractName
+          }
+        }
+      });
+
+      schema = await env.lookup('hub:searchers').get(env.session, 'master', 'fields', 'sample-token-mint-events');
+      expect(schema).to.deep.equal({
+        "data": {
+          "type": "fields",
+          "id": "sample-token-mint-events",
+          "attributes": {
+            "field-type": "@cardstack/core-types::has-many"
+          },
+          "meta": {
+            "source": contractName
+          }
+        }
+      });
+
+      schema = await env.lookup('hub:searchers').get(env.session, 'master', 'fields', 'mint-event-to');
+      expect(schema).to.deep.equal({
+        "data": {
+          "type": "fields",
+          "id": "mint-event-to",
+          "attributes": {
+            "field-type": "@cardstack/core-types::case-insensitive"
+          },
+          "meta": {
+            "source": contractName
+          }
+        }
+      });
+
+      schema = await env.lookup('hub:searchers').get(env.session, 'master', 'fields', 'mint-event-amount');
+      expect(schema).to.deep.equal({
+        "data": {
+          "type": "fields",
+          "id": "mint-event-amount",
+          "attributes": {
+            "field-type": "@cardstack/core-types::string"
+          },
+          "meta": {
+            "source": contractName
+          }
+        }
+      });
+
+      schema = await env.lookup('hub:searchers').get(env.session, 'master', 'content-types', 'sample-token-white-list-events');
+      expect(schema).to.deep.equal({
+        "data": {
+          "type": "content-types",
+          "id": "sample-token-white-list-events",
+          "relationships": {
+            "fields": {
+              "data": [
+                {
+                  "type": "fields",
+                  "id": "block-number"
+                },
+                {
+                  "type": "fields",
+                  "id": "transaction-id"
+                },
+                {
+                  "type": "fields",
+                  "id": "event-name"
+                },
+                {
+                  "type": "fields",
+                  "id": "sample-token-contract"
+                },
+                {
+                  "type": "fields",
+                  "id": "white-list-event-buyer"
+                },
+                {
+                  "type": "fields",
+                  "id": "white-list-event-hold-cap"
+                },
+              ]
+            },
+            "data-source": {
+              "data": {
+                "type": "data-sources",
+                "id": dataSource.id
+              }
+            }
+          },
+          "meta": {
+            "source": contractName
+          }
+        }
+      });
+
+      schema = await env.lookup('hub:searchers').get(env.session, 'master', 'grants', 'sample-token-white-list-events-grant');
+      expect(schema).to.deep.equal({
+        "data": {
+          "type": "grants",
+          "id": "sample-token-white-list-events-grant",
+          "attributes": {
+            "may-read-fields": true,
+            "may-read-resource": true
+          },
+          "relationships": {
+            "who": {
+              "data": [{
+                "id": "everyone",
+                "type": "groups"
+              }]
+            },
+            "types": {
+              "data": [
+                {
+                  "id": "sample-token-white-list-events",
+                  "type": "content-types"
+                }
+              ]
+            }
+          },
+          "meta": {
+            "source": contractName
+          }
+        }
+      });
+
+      schema = await env.lookup('hub:searchers').get(env.session, 'master', 'fields', 'sample-token-white-list-events');
+      expect(schema).to.deep.equal({
+        "data": {
+          "type": "fields",
+          "id": "sample-token-white-list-events",
+          "attributes": {
+            "field-type": "@cardstack/core-types::has-many"
+          },
+          "meta": {
+            "source": contractName
+          }
+        }
+      });
+
+      schema = await env.lookup('hub:searchers').get(env.session, 'master', 'fields', 'white-list-event-buyer');
+      expect(schema).to.deep.equal({
+        "data": {
+          "type": "fields",
+          "id": "white-list-event-buyer",
+          "attributes": {
+            "field-type": "@cardstack/core-types::case-insensitive"
+          },
+          "meta": {
+            "source": contractName
+          }
+        }
+      });
+
+      schema = await env.lookup('hub:searchers').get(env.session, 'master', 'fields', 'white-list-event-hold-cap');
+      expect(schema).to.deep.equal({
+        "data": {
+          "type": "fields",
+          "id": "white-list-event-hold-cap",
+          "attributes": {
+            "field-type": "@cardstack/core-types::string"
+          },
+          "meta": {
+            "source": contractName
+          }
+        }
+      });
+
+      schema = await env.lookup('hub:searchers').get(env.session, 'master', 'content-types', 'sample-token-vested-token-grant-events');
+      expect(schema).to.deep.equal({
+        "data": {
+          "type": "content-types",
+          "id": "sample-token-vested-token-grant-events",
+          "relationships": {
+            "fields": {
+              "data": [
+                {
+                  "type": "fields",
+                  "id": "block-number"
+                },
+                {
+                  "type": "fields",
+                  "id": "transaction-id"
+                },
+                {
+                  "type": "fields",
+                  "id": "event-name"
+                },
+                {
+                  "type": "fields",
+                  "id": "sample-token-contract"
+                },
+                {
+                  "type": "fields",
+                  "id": "vested-token-grant-event-beneficiary"
+                },
+                {
+                  "type": "fields",
+                  "id": "vested-token-grant-event-start-date"
+                },
+                {
+                  "type": "fields",
+                  "id": "vested-token-grant-event-cliff-sec"
+                },
+                {
+                  "type": "fields",
+                  "id": "vested-token-grant-event-duration-sec"
+                },
+                {
+                  "type": "fields",
+                  "id": "vested-token-grant-event-fully-vested-amount"
+                },
+                {
+                  "type": "fields",
+                  "id": "vested-token-grant-event-revoke-date"
+                },
+                {
+                  "type": "fields",
+                  "id": "vested-token-grant-event-is-revocable"
+                },
+              ]
+            },
+            "data-source": {
+              "data": {
+                "type": "data-sources",
+                "id": dataSource.id
+              }
+            }
+          },
+          "meta": {
+            "source": contractName
+          }
+        }
+      });
+
+      schema = await env.lookup('hub:searchers').get(env.session, 'master', 'grants', 'sample-token-vested-token-grant-events-grant');
+      expect(schema).to.deep.equal({
+        "data": {
+          "type": "grants",
+          "id": "sample-token-vested-token-grant-events-grant",
+          "attributes": {
+            "may-read-fields": true,
+            "may-read-resource": true
+          },
+          "relationships": {
+            "who": {
+              "data": [{
+                "id": "everyone",
+                "type": "groups"
+              }]
+            },
+            "types": {
+              "data": [
+                {
+                  "id": "sample-token-vested-token-grant-events",
+                  "type": "content-types"
+                }
+              ]
+            }
+          },
+          "meta": {
+            "source": contractName
+          }
+        }
+      });
+
+      schema = await env.lookup('hub:searchers').get(env.session, 'master', 'fields', 'sample-token-vested-token-grant-events');
+      expect(schema).to.deep.equal({
+        "data": {
+          "type": "fields",
+          "id": "sample-token-vested-token-grant-events",
+          "attributes": {
+            "field-type": "@cardstack/core-types::has-many"
+          },
+          "meta": {
+            "source": contractName
+          }
+        }
+      });
+
+      schema = await env.lookup('hub:searchers').get(env.session, 'master', 'fields', 'vested-token-grant-event-beneficiary');
+      expect(schema).to.deep.equal({
+        "data": {
+          "type": "fields",
+          "id": "vested-token-grant-event-beneficiary",
+          "attributes": {
+            "field-type": "@cardstack/core-types::case-insensitive"
+          },
+          "meta": {
+            "source": contractName
+          }
+        }
+      });
+
+      schema = await env.lookup('hub:searchers').get(env.session, 'master', 'fields', 'vested-token-grant-event-start-date');
+      expect(schema).to.deep.equal({
+        "data": {
+          "type": "fields",
+          "id": "vested-token-grant-event-start-date",
+          "attributes": {
+            "field-type": "@cardstack/core-types::string"
+          },
+          "meta": {
+            "source": contractName
+          }
+        }
+      });
+
+      schema = await env.lookup('hub:searchers').get(env.session, 'master', 'fields', 'vested-token-grant-event-cliff-sec');
+      expect(schema).to.deep.equal({
+        "data": {
+          "type": "fields",
+          "id": "vested-token-grant-event-cliff-sec",
+          "attributes": {
+            "field-type": "@cardstack/core-types::string"
+          },
+          "meta": {
+            "source": contractName
+          }
+        }
+      });
+
+      schema = await env.lookup('hub:searchers').get(env.session, 'master', 'fields', 'vested-token-grant-event-duration-sec');
+      expect(schema).to.deep.equal({
+        "data": {
+          "type": "fields",
+          "id": "vested-token-grant-event-duration-sec",
+          "attributes": {
+            "field-type": "@cardstack/core-types::string"
+          },
+          "meta": {
+            "source": contractName
+          }
+        }
+      });
+
+      schema = await env.lookup('hub:searchers').get(env.session, 'master', 'fields', 'vested-token-grant-event-fully-vested-amount');
+      expect(schema).to.deep.equal({
+        "data": {
+          "type": "fields",
+          "id": "vested-token-grant-event-fully-vested-amount",
+          "attributes": {
+            "field-type": "@cardstack/core-types::string"
+          },
+          "meta": {
+            "source": contractName
+          }
+        }
+      });
+
+      schema = await env.lookup('hub:searchers').get(env.session, 'master', 'fields', 'vested-token-grant-event-revoke-date');
+      expect(schema).to.deep.equal({
+        "data": {
+          "type": "fields",
+          "id": "vested-token-grant-event-revoke-date",
+          "attributes": {
+            "field-type": "@cardstack/core-types::string"
+          },
+          "meta": {
+            "source": contractName
+          }
+        }
+      });
+
+      schema = await env.lookup('hub:searchers').get(env.session, 'master', 'fields', 'vested-token-grant-event-is-revocable');
+      expect(schema).to.deep.equal({
+        "data": {
+          "type": "fields",
+          "id": "vested-token-grant-event-is-revocable",
+          "attributes": {
+            "field-type": "@cardstack/core-types::boolean"
+          },
+          "meta": {
+            "source": contractName
+          }
+        }
+      });
     });
 
     it("indexes a contract", async function() {
@@ -624,13 +1341,14 @@ contract('SampleToken', function(accounts) {
     });
 
     it("indexes mapping entry that contains multiple return values", async function() {
-      await token.grantVestedTokens(accountOne,
+      let { logs:events } = await token.grantVestedTokens(accountOne,
         100,
         1000000000,
         1000500000,
         500000,
         1000600000,
         true);
+      let eventId = `${events[0].transactionHash}_${events[0].logIndex}`;
 
       await waitForEthereumEvents(buffer);
 
@@ -658,6 +1376,14 @@ contract('SampleToken', function(accounts) {
                 "id": token.address,
                 "type": "sample-tokens"
               }
+            },
+            "sample-token-vested-token-grant-events": {
+              "data": [
+                {
+                  "id": eventId,
+                  "type": "sample-token-vested-token-grant-events"
+                }
+              ]
             }
           },
         }
@@ -679,8 +1405,11 @@ contract('SampleToken', function(accounts) {
         expect(err.message).to.equal(`No such resource master/sample-token-balance-ofs/${accountTwo}`);
       }
 
-      await token.mint(accountOne, 100);
-      await token.transfer(accountTwo, 10, { from: accountOne });
+      let { logs:mintEvents } = await token.mint(accountOne, 100);
+      let { logs:transferEvents } = await token.transfer(accountTwo, 10, { from: accountOne });
+      let mintEventId = `${mintEvents[0].transactionHash}_${mintEvents[0].logIndex}`;
+      let transferEvent1Id = `${mintEvents[1].transactionHash}_${mintEvents[1].logIndex}`;
+      let transferEvent2Id = `${transferEvents[0].transactionHash}_${transferEvents[0].logIndex}`;
 
       await waitForEthereumEvents(buffer);
 
@@ -702,6 +1431,18 @@ contract('SampleToken', function(accounts) {
                 "id": token.address,
                 "type": "sample-tokens"
               }
+            },
+            "sample-token-mint-events": {
+              "data": [{ type: "sample-token-mint-events", id: mintEventId }]
+            },
+            "sample-token-transfer-events": {
+              "data": [{
+                type: "sample-token-transfer-events",
+                id: transferEvent1Id
+              },{
+                type: "sample-token-transfer-events",
+                id: transferEvent2Id
+              }]
             }
           },
         }
@@ -709,6 +1450,40 @@ contract('SampleToken', function(accounts) {
 
       let accountTwoLedgerEntry = await env.lookup('hub:searchers').get(env.session, 'master', 'sample-token-balance-ofs', accountTwo);
       expect(accountTwoLedgerEntry.data.attributes["mapping-number-value"]).to.equal("10", "the token balance is correct");
+
+      let transferEvent1 = await env.lookup('hub:searchers').get(env.session, 'master', 'sample-token-transfer-events', transferEvent1Id);
+      delete transferEvent1.data.meta;
+      toLowercase(transferEvent1, 'data.attributes.transfer-event-from');
+      toLowercase(transferEvent1, 'data.attributes.transfer-event-to');
+      expect(transferEvent1).to.deep.equal({
+        data: {
+          id: transferEvent1Id,
+          type: 'sample-token-transfer-events',
+          attributes: {
+            'block-number': mintEvents[0].blockNumber,
+            'transaction-id': mintEvents[0].transactionHash,
+            'event-name': 'Transfer',
+            'transfer-event-from': NULL_ADDRESS,
+            'transfer-event-to': accountOne,
+            'transfer-event-value': '100'
+          },
+          relationships: {
+            "sample-token-contract": {
+              data: { id: token.address, type: "sample-tokens" }
+            },
+          }
+        }
+      });
+
+      let transferEvent2 = await env.lookup('hub:searchers').get(env.session, 'master', 'sample-token-transfer-events', transferEvent2Id);
+      toLowercase(transferEvent2, 'data.attributes.transfer-event-from');
+      toLowercase(transferEvent2, 'data.attributes.transfer-event-to');
+      expect(transferEvent2.data.attributes["block-number"]).to.equal(transferEvents[0].blockNumber, 'the block number is correct');
+      expect(transferEvent2.data.attributes["transaction-id"]).to.equal(transferEvents[0].transactionHash, 'the transaction id is correct');
+      expect(transferEvent2.data.attributes["event-name"]).to.equal('Transfer', 'the event name is correct');
+      expect(transferEvent2.data.attributes["transfer-event-from"]).to.equal(accountOne, 'the transaction event from address is correct');
+      expect(transferEvent2.data.attributes["transfer-event-to"]).to.equal(accountTwo, 'the transaction event to address is correct');
+      expect(transferEvent2.data.attributes["transfer-event-value"]).to.equal('10', 'the transaction event value is correct');
     });
 
     it("indexes mapping entry content with different field types for the same event", async function() {
@@ -740,7 +1515,8 @@ contract('SampleToken', function(accounts) {
         expect(err.message).to.equal(`No such resource master/sample-token-approved-buyers/${accountTwo}`);
       }
 
-      await token.addBuyer(accountOne);
+      let { logs:events } = await token.addBuyer(accountOne);
+      let eventId = `${events[0].transactionHash}_${events[0].logIndex}`;
       await token.setCustomBuyer(accountTwo, 10);
       await waitForEthereumEvents(buffer);
 
@@ -764,6 +1540,14 @@ contract('SampleToken', function(accounts) {
                 "id": token.address,
                 "type": "sample-tokens"
               }
+            },
+            "sample-token-white-list-events": {
+              "data": [
+                {
+                  "id": eventId,
+                  "type": "sample-token-white-list-events"
+                }
+              ]
             }
           },
         }
@@ -786,6 +1570,14 @@ contract('SampleToken', function(accounts) {
                 "id": token.address,
                 "type": "sample-tokens"
               }
+            },
+            "sample-token-white-list-events": {
+              "data": [
+                {
+                  "id": eventId,
+                  "type": "sample-token-white-list-events"
+                }
+              ]
             }
           },
         }
@@ -819,7 +1611,7 @@ contract('SampleToken', function(accounts) {
               abi: token.abi,
               addresses: { master: token.address },
               eventContentTriggers: {
-                MintingFinished: []
+                MintFinished: []
               }
             }
           },
@@ -839,11 +1631,21 @@ contract('SampleToken', function(accounts) {
       let contract = await env.lookup('hub:searchers').get(env.session, 'master', 'sample-tokens', token.address);
       expect(contract.data.attributes['sample-token-minting-finished']).to.equal(false, 'the minting-finished field is correct');
 
-      await token.finishMinting();
+      let { logs:events } = await token.finishMinting();
+      let eventId = `${events[0].transactionHash}_${events[0].logIndex}`;
       await waitForEthereumEvents(buffer);
 
       contract = await env.lookup('hub:searchers').get(env.session, 'master', 'sample-tokens', token.address);
       expect(contract.data.attributes['sample-token-minting-finished']).to.equal(true, 'the minting-finished field is correct');
+
+      expect(contract.data.relationships['sample-token-mint-finished-events']).to.deep.equal({
+        "data": [{ type: "sample-token-mint-finished-events", id: eventId }]
+      });
+
+      let event = await env.lookup('hub:searchers').get(env.session, 'master', 'sample-token-mint-finished-events', eventId);
+      expect(event.data.attributes["block-number"]).to.equal(events[0].blockNumber, 'the block number is correct');
+      expect(event.data.attributes["transaction-id"]).to.equal(events[0].transactionHash, 'the transaction id is correct');
+      expect(event.data.attributes["event-name"]).to.equal('MintFinished', 'the event name is correct');
     });
   });
 
@@ -890,6 +1692,36 @@ contract('SampleToken', function(accounts) {
     beforeEach(setup);
     afterEach(teardown);
 
+    it('can capture events documents from events that were fired before hub started', async function() {
+      let { logs:mintEvents } = await token.mint(accountOne, 100);
+      let mintEventId = `${mintEvents[0].transactionHash}_${mintEvents[0].logIndex}`;
+      let transferEventId = `${mintEvents[1].transactionHash}_${mintEvents[1].logIndex}`;
+
+      await ethereumService.start({ contract, name: contractName, buffer });
+      await indexers.update({ forceRefresh: true });
+      await waitForEthereumEvents(buffer);
+
+      let accountOneLedgerEntry = await env.lookup('hub:searchers').get(env.session, 'master', 'sample-token-balance-ofs', accountOne);
+
+      expect(accountOneLedgerEntry.data.relationships['sample-token-mint-events']).to.deep.equal({
+        "data": [{ type: "sample-token-mint-events", id: mintEventId }]
+      });
+
+      expect(accountOneLedgerEntry.data.relationships['sample-token-transfer-events']).to.deep.equal({
+        "data": [{ type: "sample-token-transfer-events", id: transferEventId }]
+      });
+
+      let transferEvent = await env.lookup('hub:searchers').get(env.session, 'master', 'sample-token-transfer-events', transferEventId);
+      toLowercase(transferEvent, 'data.attributes.transfer-event-from');
+      toLowercase(transferEvent, 'data.attributes.transfer-event-to');
+      expect(transferEvent.data.attributes["block-number"]).to.equal(mintEvents[1].blockNumber, 'the block number is correct');
+      expect(transferEvent.data.attributes["transaction-id"]).to.equal(mintEvents[1].transactionHash, 'the transaction id is correct');
+      expect(transferEvent.data.attributes["event-name"]).to.equal('Transfer', 'the event name is correct');
+      expect(transferEvent.data.attributes["transfer-event-from"]).to.equal(NULL_ADDRESS, 'the transaction event from address is correct');
+      expect(transferEvent.data.attributes["transfer-event-to"]).to.equal(accountOne, 'the transaction event to address is correct');
+      expect(transferEvent.data.attributes["transfer-event-value"]).to.equal('100', 'the transaction event value is correct');
+    });
+
     it("indexes past events that occur at a block height heigher than the last time it has indexed", async function() {
       await ethereumService.stopAll();
 
@@ -908,7 +1740,7 @@ contract('SampleToken', function(accounts) {
       await indexers.update({ forceRefresh: true });
       await waitForEthereumEvents(buffer);
 
-      expect(addCount).to.equal(4, 'the correct number of records were indexed');
+      expect(addCount).to.equal(7, 'the correct number of records were indexed');
 
       await ethereumService.stopAll();
 
@@ -922,7 +1754,7 @@ contract('SampleToken', function(accounts) {
       //   1 record for the sender of the transfer
       //   1 record for the recipient of transfer
       //   1 record for the token
-      expect(addCount).to.equal(7, 'the correct number of records were indexed');
+      expect(addCount).to.equal(10, 'the correct number of records were indexed');
     });
 
     it("skips indexing when contract state indicates that the contract is not prepared to be indexed", async function() {
@@ -950,7 +1782,7 @@ contract('SampleToken', function(accounts) {
       await indexers.update({ forceRefresh: true });
       await waitForEthereumEvents(buffer);
 
-      expect(addCount).to.equal(3, 'the correct number of records were indexed');
+      expect(addCount).to.equal(5, 'the correct number of records were indexed');
       let accountOneLedgerEntry = await env.lookup('hub:searchers').get(env.session, 'master', 'sample-token-balance-ofs', accountOne);
       let accountTwoLedgerEntry = await env.lookup('hub:searchers').get(env.session, 'master', 'sample-token-balance-ofs', accountTwo);
 
@@ -1030,11 +1862,13 @@ contract('SampleToken', function(accounts) {
       let accountTwoLedgerEntry = await env.lookup('hub:searchers').get(env.session, 'master', 'sample-token-balance-ofs', accountTwo.toLowerCase());
       let accountThreeLedgerEntry = await env.lookup('hub:searchers').get(env.session, 'master', 'sample-token-balance-ofs', accountThree.toLowerCase());
       let tokenRecord = await env.lookup('hub:searchers').get(env.session, 'master', 'sample-tokens', token.address);
+      let events = await env.lookup('hub:searchers').search(env.session, 'master', { page: { size: 5000 }, filter: { type: 'sample-token-white-list-events' } });
 
       expect(tokenRecord.data.attributes["sample-token-buyer-count"]).to.equal("1000", "the buyer count is correct");
       expect(accountOneLedgerEntry.data.attributes["mapping-number-value"]).to.equal("50", "the token balance is correct");
       expect(accountTwoLedgerEntry.data.attributes["mapping-number-value"]).to.equal("13", "the token balance is correct");
       expect(accountThreeLedgerEntry.data.attributes["mapping-number-value"]).to.equal("37", "the token balance is correct");
+      expect(events.data.length).to.equal(addresses.length, 'the correct number of whitelist event documents were created');
 
       for (let address of addresses) {
         let whitelistEntry = await env.lookup('hub:searchers').get(env.session, 'master', 'sample-token-approved-buyers', address.toLowerCase());
@@ -1043,3 +1877,10 @@ contract('SampleToken', function(accounts) {
     });
   });
 });
+
+function toLowercase(object, path) {
+  let value = get(object, path);
+  if (!value) { return; }
+
+  set(object, path, value.toLowerCase());
+}

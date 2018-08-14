@@ -26,6 +26,7 @@ contract SampleToken is MintableToken {
 
   event WhiteList(address indexed buyer, uint256 holdCap);
   event VestedTokenGrant(address indexed beneficiary, uint256 startDate, uint256 cliffSec, uint256 durationSec, uint256 fullyVestedAmount, uint256 revokeDate, bool isRevocable);
+  event TokenFrozen(bool isFrozen);
 
   function fund() payable public { }
 
@@ -35,9 +36,12 @@ contract SampleToken is MintableToken {
 
   function setTokenFrozen(bool _isFrozen) onlyOwner public returns (bool) {
     tokenFrozen = _isFrozen;
+    emit TokenFrozen(_isFrozen);
+
+    return true;
   }
 
-  function setLedger(address _address, uint256 balance) onlyOwner returns (bool) {
+  function setLedger(address _address, uint256 balance) onlyOwner public returns (bool) {
     balances[_address] = balance;
   }
 
