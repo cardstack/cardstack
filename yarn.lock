@@ -4357,9 +4357,18 @@ ember-text-measurer@^0.4.0:
   dependencies:
     ember-cli-babel "^6.8.2"
 
-ember-toolbars@^0.4.1, ember-toolbars@^0.4.2:
+ember-toolbars@^0.4.1:
   version "0.4.2"
   resolved "https://registry.yarnpkg.com/ember-toolbars/-/ember-toolbars-0.4.2.tgz#30fda5b29937e28556a639af444808b7f3433691"
+  dependencies:
+    ember-cli-babel "^6.9.0"
+    ember-cli-htmlbars "^2.0.3"
+    ember-elsewhere "^1.0.3"
+    liquid-fire "^0.29.0"
+
+ember-toolbars@^0.5.0:
+  version "0.5.0"
+  resolved "https://registry.yarnpkg.com/ember-toolbars/-/ember-toolbars-0.5.0.tgz#0f9d31af50c316344e02f3f5c87fa37304df95a2"
   dependencies:
     ember-cli-babel "^6.9.0"
     ember-cli-htmlbars "^2.0.3"
