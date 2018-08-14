@@ -5,6 +5,7 @@ const { isEqual, get } = require('lodash');
 const log = require('@cardstack/logger')('cardstack/ethereum/indexer');
 const { declareInjections } = require('@cardstack/di');
 const { fieldTypeFor } = require('./abi-utils');
+const { apply_patch } = require('jsonpatch');
 
 const defaultBranch = 'master';
 
@@ -22,11 +23,12 @@ class Indexer {
     return new this(...args);
   }
 
-  constructor({ ethereumService, dataSource, branches, contract, searcher, buffer }) {
+  constructor({ ethereumService, dataSource, branches, contract, patch, searcher, buffer }) {
     this.dataSourceId = dataSource.id;
     this.contract = contract;
     this.searcher = searcher;
     this.buffer = buffer;
+    this.patch = patch || Object.create(null);
     this._branches = branches;
     this.ethereumService = ethereumService;
   }
@@ -46,6 +48,7 @@ class Indexer {
       dataSourceId: this.dataSourceId,
       contract: this.contract,
       buffer: this.buffer,
+      patch: this.patch,
       branches: await this.branches(),
       searcher: this.searcher
     });
@@ -54,11 +57,12 @@ class Indexer {
 
 class Updater {
 
-  constructor({ dataSourceId, contract, searcher, buffer, branches }) {
+  constructor({ dataSourceId, contract, searcher, buffer, patch, branches }) {
     this.dataSourceId = dataSourceId;
     this.contract = contract;
     this.searcher = searcher;
     this.buffer = buffer;
+    this.patch = patch;
     this.branches = branches;
   }
 
@@ -154,8 +158,9 @@ class Updater {
     schema.push(this._openGrantForContentType(contractName));
     schema.push(contractSchema);
 
-    log.debug(`Created schema for contract ${contractName}: \n ${JSON.stringify(schema, null, 2)}`);
-    this._schema = schema;
+    this._schema = schema.map(doc => this._maybePatch(doc));
+
+    log.debug(`Created schema for contract ${contractName}: \n ${JSON.stringify(this.schema, null, 2)}`);
 
     return this._schema;
   }
@@ -194,6 +199,17 @@ class Updater {
       lastBlockHeights: blockHeights,
       lastSchema: schema
     };
+  }
+
+  _maybePatch(doc) {
+    let typePatches = this.patch[doc.type];
+    if (typePatches) {
+      let modelPatches = typePatches[doc.id];
+      if (modelPatches) {
+        doc = apply_patch(doc, modelPatches);
+      }
+    }
+    return doc;
   }
 
   _namedFieldFor(fieldName, type) {

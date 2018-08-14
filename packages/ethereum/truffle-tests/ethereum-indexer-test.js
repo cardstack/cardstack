@@ -1812,6 +1812,84 @@ contract('SampleToken', function(accounts) {
 
   });
 
+  describe('ethereum-indexer can patch schema', function() {
+    let pastToken, token;
+
+    async function setup() {
+      let factory = new JSONAPIFactory();
+      pastToken = await SampleToken.new();
+      token = await SampleToken.new();
+
+      await token.mint(accountOne, 100);
+      await token.mint(accountThree, 100);
+
+      let dataSource = factory.addResource('data-sources', contractName)
+        .withAttributes({
+          'source-type': '@cardstack/ethereum',
+          params: {
+            branches: {
+              master: { jsonRpcUrl: "ws://localhost:7545" }
+            },
+            contract: {
+              abi: token.abi,
+              addresses: { master: token.address },
+              pastAddresses: { master: [ pastToken.address ] },
+              indexingSkipIndicators: [ "tokenFrozen" ],
+              eventContentTriggers: {
+                Transfer: [ "sample-token-balance-ofs" ],
+              }
+            },
+            patch: {
+              'content-types': {
+                'sample-token-balance-ofs': [{
+                  op: 'add',
+                  path: '/relationships/fields/data/-',
+                  value: { type: 'computed-fields', id: 'utility-payment-amount' }
+                }]
+              }
+            }
+          },
+        });
+
+      factory.addResource('computed-fields', 'utility-payment-amount').withAttributes({
+        computedFieldType: 'sample-computed-fields::transfer-sum',
+        params: {
+          transferEvent: 'sample-token-transfer-events',
+          transferAddressField: 'transfer-event-to',
+          transferAddressValue: accountTwo,
+          transferAmountField: 'transfer-event-value'
+        }
+      });
+
+      contract = dataSource.data.attributes.params.contract,
+      env = await createDefaultEnvironment(`${__dirname}/../../../tests/ethereum-computed-fields`, factory.getModels());
+
+      buffer = env.lookup(`plugin-services:${require.resolve('../cardstack/buffer')}`);
+      ethereumService = buffer.ethereumService;
+
+      await waitForEthereumEvents(buffer);
+    }
+
+    beforeEach(setup);
+    afterEach(teardown);
+
+    it('can patch schema with computed-fields', async function() {
+      await token.transfer(accountTwo, 20, { from: accountOne });
+      await token.transfer(accountThree, 10, { from: accountOne });
+      await token.transfer(accountOne, 10, { from: accountTwo });
+      await token.transfer(accountTwo, 30, { from: accountOne });
+      await token.transfer(accountTwo, 20, { from: accountThree });
+
+      await waitForEthereumEvents(buffer);
+
+      let accountOneBalance = await env.lookup('hub:searchers').get(env.session, 'master', 'sample-token-balance-ofs', accountOne);
+      let accountThreeBalance = await env.lookup('hub:searchers').get(env.session, 'master', 'sample-token-balance-ofs', accountThree);
+
+      expect(accountOneBalance.data.attributes['utility-payment-amount']).to.equal(50, 'utility-payment-amount computed field is correct');
+      expect(accountThreeBalance.data.attributes['utility-payment-amount']).to.equal(20, 'utility-payment-amount computed field is correct');
+    });
+  });
+
   describe('ethereum-indexer for a large amount of past events', function() {
     let token;
 
