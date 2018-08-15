@@ -2,7 +2,7 @@ const Ember = require('ember-source/dist/ember.debug');
 const { dasherize, camelize, capitalize } = Ember.String;
 const { pluralize, singularize } = require('inflection');
 const Web3 = require('web3');
-const log = require('@cardstack/logger')('cardstack/ethereum/service');
+const log = require('@cardstack/logger')('cardstack/ethereum/client');
 const { get } = require('lodash');
 const { promisify } = require('util');
 const timeout = promisify(setTimeout);
@@ -10,7 +10,7 @@ const timeout = promisify(setTimeout);
 const NULL_ADDRESS = '0x0000000000000000000000000000000000000000';
 const MAX_WS_MESSAGE_SIZE_BYTES = 20000000;
 
-module.exports = class EthereumService {
+module.exports = class EthereumClient {
 
   static create(...args) {
     return new this(...args);
@@ -50,7 +50,7 @@ module.exports = class EthereumService {
   }
 
   async _reconnect() {
-    log.info("start reconnecting ethereum service...");
+    log.info("start reconnecting ethereum client...");
 
     let done;
     this._reconnectPromise = new Promise(r => done = r);
@@ -74,7 +74,7 @@ module.exports = class EthereumService {
       });
     }
 
-    log.info("finished trying to reconnect to ethereum service");
+    log.info("finished trying to reconnect to ethereum client");
     done();
   }
 
@@ -109,7 +109,7 @@ module.exports = class EthereumService {
     return result;
   }
 
-  async start({ name, contract, buffer }) {
+  async start({ name, contract, eventIndexer }) {
     if (this._hasStartedListening[name]) { return; }
 
     await this.stop(name);
@@ -149,8 +149,10 @@ module.exports = class EthereumService {
           let historyData = this._generateHistoryDataFromEvent({ branch, contract: name, event });
           log.debug("calling index for identifers", JSON.stringify(historyData.identifiers, null, 2));
 
-          if (buffer) {
-            buffer.index(name, null, [ historyData ]);
+          if (eventIndexer) {
+            // Note that this is an async function call, but that the web3 event handler doesnt support awaiting async function invocations.
+            // Make sure to await the eventIndexer's indexing promise when testing so that async is not leaked.
+            eventIndexer.index(name, null, [ historyData ]);
           }
         }
       });

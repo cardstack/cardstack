@@ -11,26 +11,26 @@ const defaultBranch = 'master';
 
 module.exports = declareInjections({
   searcher: 'hub:searchers',
-  ethereumService: `plugin-services:${require.resolve('./service')}`,
-  buffer: `plugin-services:${require.resolve('./buffer')}`
+  ethereumClient: `plugin-services:${require.resolve('./client')}`,
+  eventIndexer: `plugin-services:${require.resolve('./event-indexer')}`
 },
 
 class Indexer {
 
   static create(...args) {
-    let [{ ethereumService, branches }] = args;
-    ethereumService.connect(branches);
+    let [{ ethereumClient, branches }] = args;
+    ethereumClient.connect(branches);
     return new this(...args);
   }
 
-  constructor({ ethereumService, dataSource, branches, contract, patch, searcher, buffer }) {
+  constructor({ ethereumClient, dataSource, branches, contract, patch, searcher, eventIndexer }) {
     this.dataSourceId = dataSource.id;
     this.contract = contract;
     this.searcher = searcher;
-    this.buffer = buffer;
+    this.eventIndexer = eventIndexer;
     this.patch = patch || Object.create(null);
     this._branches = branches;
-    this.ethereumService = ethereumService;
+    this.ethereumClient = ethereumClient;
   }
 
   async branches() {
@@ -38,8 +38,8 @@ class Indexer {
   }
 
   async beginUpdate() {
-    await this.buffer.start({
-      ethereumService: this.ethereumService,
+    await this.eventIndexer.start({
+      ethereumClient: this.ethereumClient,
       name: this.dataSourceId,
       contract: this.contract
     });
@@ -47,7 +47,7 @@ class Indexer {
     return new Updater({
       dataSourceId: this.dataSourceId,
       contract: this.contract,
-      buffer: this.buffer,
+      eventIndexer: this.eventIndexer,
       patch: this.patch,
       branches: await this.branches(),
       searcher: this.searcher
@@ -57,11 +57,11 @@ class Indexer {
 
 class Updater {
 
-  constructor({ dataSourceId, contract, searcher, buffer, patch, branches }) {
+  constructor({ dataSourceId, contract, searcher, eventIndexer, patch, branches }) {
     this.dataSourceId = dataSourceId;
     this.contract = contract;
     this.searcher = searcher;
-    this.buffer = buffer;
+    this.eventIndexer = eventIndexer;
     this.patch = patch;
     this.branches = branches;
   }
@@ -183,16 +183,17 @@ class Updater {
       await ops.finishReplaceAll();
     }
 
-    let shouldSkip = await this.buffer.shouldSkipIndexing(this.dataSourceId, defaultBranch);
+    let shouldSkip = await this.eventIndexer.shouldSkipIndexing(this.dataSourceId, defaultBranch);
     let blockHeights = Object.assign({}, lastBlockHeights || {});
     if (!shouldSkip) {
       for (let branch of this.branches) {
-        let blockheight = await this.buffer.getBlockHeight(branch);
+        let blockheight = await this.eventIndexer.getBlockHeight(branch);
         if (!blockHeights[branch] || blockHeights[branch] < blockheight) {
           blockHeights[branch] = blockheight;
         }
       }
-      await this.buffer.index(this.dataSourceId, lastBlockHeights);
+
+      await this.eventIndexer.index(this.dataSourceId, lastBlockHeights);
     }
 
     return {

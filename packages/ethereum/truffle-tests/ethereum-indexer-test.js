@@ -9,16 +9,16 @@ const { set, get } = require('lodash');
 
 const contractName = 'sample-token';
 const NULL_ADDRESS = '0x0000000000000000000000000000000000000000';
-let buffer, ethereumService, env;
+let eventIndexer, ethereumClient, env;
 
 async function teardown() {
-  await buffer.flush();
-  await ethereumService.stopAll();
+  await eventIndexer._indexingPromise;
+  await ethereumClient.stopAll();
   await destroyDefaultEnvironment(env);
 }
 
-async function waitForEthereumEvents(buffer) {
-  await buffer.flush();
+async function waitForEthereumEvents(indexer) {
+  await indexer._indexingPromise;
 }
 
 contract('SampleToken', function(accounts) {
@@ -95,10 +95,10 @@ contract('SampleToken', function(accounts) {
         });
 
       env = await createDefaultEnvironment(`${__dirname}/..`, factory.getModels());
-      buffer = env.lookup(`plugin-services:${require.resolve('../cardstack/buffer')}`);
-      ethereumService = buffer.ethereumService;
+      eventIndexer = env.lookup(`plugin-services:${require.resolve('../cardstack/event-indexer')}`);
+      ethereumClient = eventIndexer.ethereumClient;
 
-      await waitForEthereumEvents(buffer);
+      await waitForEthereumEvents(eventIndexer);
     }
 
     beforeEach(setup);
@@ -1350,7 +1350,7 @@ contract('SampleToken', function(accounts) {
         true);
       let eventId = `${events[0].transactionHash}_${events[0].logIndex}`;
 
-      await waitForEthereumEvents(buffer);
+      await waitForEthereumEvents(eventIndexer);
 
       let vestingSchedule = await env.lookup('hub:searchers').get(env.session, 'master', 'sample-token-vesting-schedules', accountOne);
 
@@ -1411,7 +1411,7 @@ contract('SampleToken', function(accounts) {
       let transferEvent1Id = `${mintEvents[1].transactionHash}_${mintEvents[1].logIndex}`;
       let transferEvent2Id = `${transferEvents[0].transactionHash}_${transferEvents[0].logIndex}`;
 
-      await waitForEthereumEvents(buffer);
+      await waitForEthereumEvents(eventIndexer);
 
       let accountOneLedgerEntry = await env.lookup('hub:searchers').get(env.session, 'master', 'sample-token-balance-ofs', accountOne);
       expect(accountOneLedgerEntry.data.attributes["ethereum-address"]).to.not.equal(accountOneLedgerEntry.data.id, 'the case between the addresses is different');
@@ -1518,10 +1518,10 @@ contract('SampleToken', function(accounts) {
       let { logs:events } = await token.addBuyer(accountOne);
       let eventId = `${events[0].transactionHash}_${events[0].logIndex}`;
       await token.setCustomBuyer(accountTwo, 10);
-      await waitForEthereumEvents(buffer);
+      await waitForEthereumEvents(eventIndexer);
 
       await env.lookup('hub:indexers').update({ forceRefresh: true });
-      await waitForEthereumEvents(buffer);
+      await waitForEthereumEvents(eventIndexer);
 
       let accountOneApprovedBuyer = await env.lookup('hub:searchers').get(env.session, 'master', 'sample-token-approved-buyers', accountOne);
       accountOneApprovedBuyer.data.attributes["ethereum-address"] = accountOneApprovedBuyer.data.attributes["ethereum-address"].toLowerCase();
@@ -1618,10 +1618,10 @@ contract('SampleToken', function(accounts) {
         });
 
       env = await createDefaultEnvironment(`${__dirname}/..`, factory.getModels());
-      buffer = env.lookup(`plugin-services:${require.resolve('../cardstack/buffer')}`);
-      ethereumService = buffer.ethereumService;
+      eventIndexer = env.lookup(`plugin-services:${require.resolve('../cardstack/event-indexer')}`);
+      ethereumClient = eventIndexer.ethereumClient;
 
-      await waitForEthereumEvents(buffer);
+      await waitForEthereumEvents(eventIndexer);
     }
 
     beforeEach(setup);
@@ -1633,7 +1633,7 @@ contract('SampleToken', function(accounts) {
 
       let { logs:events } = await token.finishMinting();
       let eventId = `${events[0].transactionHash}_${events[0].logIndex}`;
-      await waitForEthereumEvents(buffer);
+      await waitForEthereumEvents(eventIndexer);
 
       contract = await env.lookup('hub:searchers').get(env.session, 'master', 'sample-tokens', token.address);
       expect(contract.data.attributes['sample-token-minting-finished']).to.equal(true, 'the minting-finished field is correct');
@@ -1683,10 +1683,10 @@ contract('SampleToken', function(accounts) {
       indexers = await env.lookup('hub:indexers');
       pgclient = await env.lookup(`plugin-client:${require.resolve('@cardstack/pgsearch/client')}`);
 
-      buffer = env.lookup(`plugin-services:${require.resolve('../cardstack/buffer')}`);
-      ethereumService = buffer.ethereumService;
+      eventIndexer = env.lookup(`plugin-services:${require.resolve('../cardstack/event-indexer')}`);
+      ethereumClient = eventIndexer.ethereumClient;
 
-      await waitForEthereumEvents(buffer);
+      await waitForEthereumEvents(eventIndexer);
     }
 
     beforeEach(setup);
@@ -1697,9 +1697,9 @@ contract('SampleToken', function(accounts) {
       let mintEventId = `${mintEvents[0].transactionHash}_${mintEvents[0].logIndex}`;
       let transferEventId = `${mintEvents[1].transactionHash}_${mintEvents[1].logIndex}`;
 
-      await ethereumService.start({ contract, name: contractName, buffer });
+      await ethereumClient.start({ contract, name: contractName, eventIndexer });
       await indexers.update({ forceRefresh: true });
-      await waitForEthereumEvents(buffer);
+      await waitForEthereumEvents(eventIndexer);
 
       let accountOneLedgerEntry = await env.lookup('hub:searchers').get(env.session, 'master', 'sample-token-balance-ofs', accountOne);
 
@@ -1723,7 +1723,7 @@ contract('SampleToken', function(accounts) {
     });
 
     it("indexes past events that occur at a block height heigher than the last time it has indexed", async function() {
-      await ethereumService.stopAll();
+      await ethereumClient.stopAll();
 
       let addCount = 0;
 
@@ -1736,19 +1736,19 @@ contract('SampleToken', function(accounts) {
       await token.transfer(accountTwo, 20, { from: accountOne });
       await token.transfer(accountThree, 30, { from: accountOne });
 
-      await ethereumService.start({ contract, name: contractName, buffer });
+      await ethereumClient.start({ contract, name: contractName, eventIndexer });
       await indexers.update({ forceRefresh: true });
-      await waitForEthereumEvents(buffer);
+      await waitForEthereumEvents(eventIndexer);
 
       expect(addCount).to.equal(7, 'the correct number of records were indexed');
 
-      await ethereumService.stopAll();
+      await ethereumClient.stopAll();
 
       await token.transfer(accountFour, 20, { from: accountOne });
 
-      await ethereumService.start({ contract, name: contractName, buffer });
+      await ethereumClient.start({ contract, name: contractName, eventIndexer });
       await indexers.update({ forceRefresh: true });
-      await waitForEthereumEvents(buffer);
+      await waitForEthereumEvents(eventIndexer);
 
       // the add count increases by 3:
       //   1 record for the sender of the transfer
@@ -1758,7 +1758,7 @@ contract('SampleToken', function(accounts) {
     });
 
     it("skips indexing when contract state indicates that the contract is not prepared to be indexed", async function() {
-      await ethereumService.stopAll();
+      await ethereumClient.stopAll();
 
       let addCount = 0;
 
@@ -1771,16 +1771,16 @@ contract('SampleToken', function(accounts) {
       await token.transfer(accountTwo, 20, { from: accountOne });
       await token.setTokenFrozen(true);
 
-      await ethereumService.start({ contract, name: contractName, buffer });
+      await ethereumClient.start({ contract, name: contractName, eventIndexer });
       await indexers.update({ forceRefresh: true });
-      await waitForEthereumEvents(buffer);
+      await waitForEthereumEvents(eventIndexer);
 
       expect(addCount).to.equal(0, 'the contract is not indexed while it is frozen');
 
       await token.setTokenFrozen(false);
 
       await indexers.update({ forceRefresh: true });
-      await waitForEthereumEvents(buffer);
+      await waitForEthereumEvents(eventIndexer);
 
       expect(addCount).to.equal(5, 'the correct number of records were indexed');
       let accountOneLedgerEntry = await env.lookup('hub:searchers').get(env.session, 'master', 'sample-token-balance-ofs', accountOne);
@@ -1791,7 +1791,7 @@ contract('SampleToken', function(accounts) {
     });
 
     it("indexes past events that occurred on a previous contract", async function() {
-      await ethereumService.stopAll();
+      await ethereumClient.stopAll();
 
       await pastToken.mint(accountOne, 100);
       await pastToken.transfer(accountTwo, 20, { from: accountOne });
@@ -1799,9 +1799,9 @@ contract('SampleToken', function(accounts) {
       await token.setLedger(accountOne, 80);
       await token.setLedger(accountTwo, 20);
 
-      await ethereumService.start({ contract, name: contractName, buffer });
+      await ethereumClient.start({ contract, name: contractName, eventIndexer });
       await indexers.update({ forceRefresh: true });
-      await waitForEthereumEvents(buffer);
+      await waitForEthereumEvents(eventIndexer);
 
       let accountOneLedgerEntry = await env.lookup('hub:searchers').get(env.session, 'master', 'sample-token-balance-ofs', accountOne);
       let accountTwoLedgerEntry = await env.lookup('hub:searchers').get(env.session, 'master', 'sample-token-balance-ofs', accountTwo);
@@ -1864,10 +1864,10 @@ contract('SampleToken', function(accounts) {
       contract = dataSource.data.attributes.params.contract,
       env = await createDefaultEnvironment(`${__dirname}/../../../tests/ethereum-computed-fields`, factory.getModels());
 
-      buffer = env.lookup(`plugin-services:${require.resolve('../cardstack/buffer')}`);
-      ethereumService = buffer.ethereumService;
+      eventIndexer = env.lookup(`plugin-services:${require.resolve('../cardstack/event-indexer')}`);
+      ethereumClient = eventIndexer.ethereumClient;
 
-      await waitForEthereumEvents(buffer);
+      await waitForEthereumEvents(eventIndexer);
     }
 
     beforeEach(setup);
@@ -1880,7 +1880,7 @@ contract('SampleToken', function(accounts) {
       await token.transfer(accountTwo, 30, { from: accountOne });
       await token.transfer(accountTwo, 20, { from: accountThree });
 
-      await waitForEthereumEvents(buffer);
+      await waitForEthereumEvents(eventIndexer);
 
       let accountOneBalance = await env.lookup('hub:searchers').get(env.session, 'master', 'sample-token-balance-ofs', accountOne);
       let accountThreeBalance = await env.lookup('hub:searchers').get(env.session, 'master', 'sample-token-balance-ofs', accountThree);
@@ -1926,10 +1926,10 @@ contract('SampleToken', function(accounts) {
         });
 
       env = await createDefaultEnvironment(`${__dirname}/..`, factory.getModels());
-      buffer = env.lookup(`plugin-services:${require.resolve('../cardstack/buffer')}`);
-      ethereumService = buffer.ethereumService;
+      eventIndexer = env.lookup(`plugin-services:${require.resolve('../cardstack/event-indexer')}`);
+      ethereumClient = eventIndexer.ethereumClient;
 
-      await waitForEthereumEvents(buffer);
+      await waitForEthereumEvents(eventIndexer);
     }
 
     beforeEach(setup);
