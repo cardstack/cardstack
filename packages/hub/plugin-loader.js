@@ -47,50 +47,52 @@ class PluginLoader {
       throw new Error("`config:project` must have a `path`");
     }
     this.project = project;
-    this._installedPlugins = null;
-    this._installedFeatures = null;
+    this._pluginsAndFeatures = null;
+  }
+
+  async _findPluginsAndFeatures() {
+    let output = [];
+    let seen = Object.create(null);
+
+    let projectPath = path.resolve(this.project.path);
+    log.info("starting from path %s", projectPath);
+
+    // at the top-level (the project itself) we always include dev
+    // deps. Not doing so under some conditions would be too big a
+    // troll.
+    let includeDevDependencies = true;
+
+    await this._crawlPlugins(projectPath, output, seen, includeDevDependencies, []);
+
+    let allFeatures = [];
+    for (let plugin of output) {
+      let features = await discoverFeatures(plugin.attributes.dir, plugin.id);
+      plugin.relationships = {
+        features: {
+          data: features.map(({ type, id }) => ({ type, id }))
+        },
+        config: {
+          data: { type: 'plugin-configs', id: plugin.id }
+        }
+      };
+      allFeatures = allFeatures.concat(features);
+    }
+    log.info("=== found installed plugins===\n%t", () => summarize(output, allFeatures));
+    return { installedPlugins: output, installedFeatures: allFeatures };
   }
 
   async installedPlugins() {
-    if (!this._installedPlugins) {
-      let output = [];
-      let seen = Object.create(null);
-
-      let projectPath = path.resolve(this.project.path);
-      log.info("starting from path %s", projectPath);
-
-      // at the top-level (the project itself) we always include dev
-      // deps. Not doing so under some conditions would be too big a
-      // troll.
-      let includeDevDependencies = true;
-
-      await this._crawlPlugins(projectPath, output, seen, includeDevDependencies, []);
-      this._installedPlugins = output;
-
-      let allFeatures = [];
-      for (let plugin of output) {
-        let features = await discoverFeatures(plugin.attributes.dir, plugin.id);
-        plugin.relationships = {
-          features: {
-            data: features.map(({ type, id }) => ({ type, id }))
-          },
-          config: {
-            data: { type: 'plugin-configs', id: plugin.id }
-          }
-        };
-        allFeatures = allFeatures.concat(features);
-      }
-      this._installedFeatures = allFeatures;
-      log.info("=== found installed plugins===\n%t", () => summarize(output, allFeatures));
+    if (!this._pluginsAndFeatures) {
+      this._pluginsAndFeatures = this._findPluginsAndFeatures();
     }
-    return this._installedPlugins;
+    return (await this._pluginsAndFeatures).installedPlugins;
   }
 
   async installedFeatures() {
-    if (!this._installedFeatures) {
-      await this.installedPlugins();
+    if (!this._pluginsAndFeatures) {
+      this._pluginsAndFeatures = this._findPluginsAndFeatures();
     }
-    return this._installedFeatures;
+    return (await this._pluginsAndFeatures).installedFeatures;
   }
 
   async configuredPlugins(configModels) {
