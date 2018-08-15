@@ -1,9 +1,9 @@
 <div class="{{concat field '-selector'}}">
-  {{#power-select disabled=(not enabled)
-                  selected=(get model field)
+  {{#power-select-multiple disabled=(not enabled)
+                  selected=(get content field)
                   options=options
-                  onchange=(action "makeSelection")
+                  onchange=(action (mut option))
                   as |option|}}
     {{option.title}}
-  {{/power-select}}
+  {{/power-select-multiple}}
 </div>
