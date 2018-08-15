@@ -11,6 +11,7 @@ export default Service.extend({
   overlays: service('ember-overlays'),
   resourceMetadata: service(),
   marks: alias('overlays.marks'),
+  cardstackEdges: service(),
 
   fields: computed('marks', function() {
     return this.get('marks').filter(m => m.group === 'cardstack-fields');
@@ -142,6 +143,10 @@ export default Service.extend({
 
     // a field is opened when the user is actively editing it
     this.openedFieldId = null;
+
+    // Register items for edges
+
+    this.get('cardstackEdges').registerTopLevelComponent('cardstack-tools-edges');
   },
 
   _updatePersistent(key, value) {

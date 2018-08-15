@@ -17,7 +17,7 @@ module('Acceptance | tools', function(hooks) {
   test('activate tools', async function(assert) {
     await visit('/1');
     await click('.cardstack-tools-launcher');
-    let element = [...this.element.querySelectorAll('label')].find(element => /Title/.test(element.textContent));
+    let element = [...this.element.querySelectorAll('.cs-toolbox-section label')].find(element => /Title/.test(element.textContent));
     await click(element);
     let matching = Array.from(this.element.querySelectorAll('input')).find(element => element.value === 'hello world');
     assert.ok(matching, 'found field editor for title');
