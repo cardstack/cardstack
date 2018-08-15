@@ -1,6 +1,6 @@
 {
   "name": "@cardstack/tools",
-  "version": "0.9.16",
+  "version": "0.9.18",
   "description": "The default blueprint for ember-cli addons.",
   "keywords": [
     "ember-addon",
@@ -20,8 +20,8 @@
     "test": "ember try:each"
   },
   "dependencies": {
+    "@cardstack/edges": "0.9.18",
     "@cardstack/plugin-utils": "0.8.0",
-    "@cardstack/edges": "0.0.0",
     "@cardstack/rendering": "0.8.0",
     "ember-cli-babel": "^6.8.2",
     "ember-cli-htmlbars": "^2.0.1",
