@@ -1,6 +1,7 @@
 const Koa = require('koa');
 const Session = require('@cardstack/plugin-utils/session');
 const { Registry, Container } = require('@cardstack/di');
+const postgresConfig = require('@cardstack/plugin-utils/postgres-config');
 // lazy load only in container mode, since they uses node 8 features
 let EmberConnection;
 let Orchestrator;
@@ -17,13 +18,13 @@ async function wireItUp(projectDir, encryptionKeys, dataSources, opts = {}) {
   registry.register('config:encryption-key', encryptionKeys);
   registry.register('config:public-url', { url: opts.url });
   registry.register('config:ci-session', { id: opts.ciSessionId });
-  registry.register('config:pg-boss', opts.pgBossConfig || {
-    database: process.env.PG_BOSS_DATABASE,
+  registry.register('config:pg-boss', postgresConfig(Object.assign({
+    database: process.env.PG_BOSS_DATABASE || `pgboss_${opts.environment}`,
     host:     process.env.PG_BOSS_HOST,
     user:     process.env.PG_BOSS_USER,
     port:     process.env.PG_BOSS_PORT,
     password: process.env.PG_BOSS_PASSWORD
-  });
+  }, opts.pgBossConfig)));
 
   if (typeof opts.seeds === 'function') {
     registry.register('config:initial-models', opts.seeds);

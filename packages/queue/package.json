@@ -20,6 +20,7 @@
     "@cardstack/di": "0.8.0",
     "@cardstack/logger": "^0.1.0",
     "@cardstack/plugin-utils": "0.8.0",
+    "pg": "^7.0.3",
     "pg-boss": "^2.5.1"
   },
   "keywords": [

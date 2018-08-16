@@ -7,29 +7,10 @@ const DocumentContext = require('@cardstack/hub/indexing/document-context');
 const Session = require('@cardstack/plugin-utils/session');
 const { declareInjections } = require('@cardstack/di');
 const EventEmitter = require('events');
-const parse = require('pg-connection-string');
+const postgresConfig = require('@cardstack/plugin-utils/postgres-config');
 const { join } = require('path');
 
-const dbSuffix = process.env.PGSEARCH_NAMESPACE || 'content';
-
-let config;
-if (process.env.PGHOST && process.env.PGPORT && process.env.PGUSER) {
-	config = {
-		host: process.env.PGHOST,
-		port: process.env.PGPORT,
-		user: process.env.PGUSER,
-    password: process.env.PGPASSWORD
-	};
-} else if (process.env.DB_URL) {
-  config = parse(process.env.DB_URL);
-} else {
-	config = {
-		host: 'localhost',
-		port: 5444,
-		user: 'postgres',
-	};
-}
-config.database = `pgsearch_${dbSuffix}`;
+const config = postgresConfig({ database: `pgsearch_${process.env.PGSEARCH_NAMESPACE}` });
 
 module.exports = declareInjections({
   controllingBranch: 'hub:controlling-branch',
