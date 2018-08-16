@@ -166,7 +166,7 @@ module('Integration | Models', function(hooks) {
   });
 
   test('it can get a belongs-to relationship', async function(assert) {
-    let post = await run(() => this.store.findRecord('post', '2'));
+    let post = await run(() => this.store.findRecord('post', '2', { include: 'author' }));
     let author = await run(() => post.get('author'));
     assert.equal(author.get('name'), 'Author of Second');
   });
