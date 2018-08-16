@@ -23,6 +23,7 @@
     "ember-cli-babel": "^6.8.2",
     "handlebars": "^4.0.6",
     "ms": "2.0.0",
+    "pg-connection-string": "^2.0.0",
     "superagent": "^3.8.1",
     "symlink-or-copy": "^1.1.8"
   },

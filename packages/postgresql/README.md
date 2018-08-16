@@ -25,7 +25,7 @@ If you are using AWS RDS, the AWS-specific setting you need in your parameter gr
 
 The test suite is configured to talk to a PostgreSQL docker container. You can start it like:
 
-    docker run --name cardstack-postgres -d --rm -p 5444:5432 cardstack/pg-test
+    docker run --name cardstack-postgres -d --rm -p 5432:5432 cardstack/pg-test
 
 And stop it like:
 
