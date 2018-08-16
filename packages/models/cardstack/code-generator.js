@@ -14,13 +14,17 @@ Handlebars.registerHelper('relationship-method', function(field) {
   }
 });
 
-Handlebars.registerHelper('related-type', function(field) {
+Handlebars.registerHelper('related-type', function(field, modelName) {
   if (field.relatedTypes) {
     let type = Object.keys(field.relatedTypes)[0];
     if (type) {
       return inflection.singularize(type);
     }
   }
+  // we default to our own type. This is weird, but it turns out that for most
+  // of the operations we care about, Ember Data doesn't really care what type
+  // we put here so long as its a valid type that exists.
+  return modelName;
 });
 
 const modelTemplate = Handlebars.compile(`
@@ -32,8 +36,10 @@ define('@cardstack/models/generated/{{modelName}}', ['exports', '@cardstack/mode
    exports.default = _model.default.extend({
      {{#each fields as |field|}}
        {{#if field.isRelationship}}
-         {{#with (related-type field) as |type|}}
+         {{#with (related-type field ../modelName) as |type|}}
            {{camelize field.id}}:  _emberData.default.{{relationship-method field}}("{{type}}", {
+             async: false,
+             inverse: null,
              caption: "{{field.caption}}",
              editorComponent: "{{field.editorComponent}}",
              inlineEditorComponent: "{{field.inlineEditorComponent}}"
