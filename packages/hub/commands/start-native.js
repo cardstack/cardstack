@@ -71,7 +71,7 @@ module.exports = {
       setEnvVars.HUB_URL = explicitURL;
     }
 
-    setEnvVars.HUB_ENVIRONMENT = environment || 'development';
+    setEnvVars.HUB_ENVIRONMENT = process.env.HUB_ENVIRONMENT || environment || 'development';
 
     setEnvVars.PORT = port;
 
