@@ -9,7 +9,6 @@ const { commandLineOptions,
         seedsFolder,
         dataSourcesFolder } = require('../util/bin-utils');
 const logger = require('@cardstack/logger');
-const parse = require('pg-connection-string');
 const log = logger('cardstack/server');
 
 if (process.env.EMBER_ENV === 'test') {
@@ -23,26 +22,6 @@ if (process.env.EMBER_ENV === 'test') {
   });
 }
 
-let config;
-if (process.env.PGHOST && process.env.PGPORT && process.env.PGUSER) {
-	config = {
-		host: process.env.PGHOST,
-		port: process.env.PGPORT,
-		user: process.env.PGUSER,
-    password: process.env.PGPASSWORD,
-    database: process.env.PGDATABASE || 'postgres'
-	};
-} else if (process.env.DB_URL) {
-  config = parse(process.env.DB_URL);
-} else {
-	config = {
-		host: 'localhost',
-		port: 5444,
-		user: 'postgres',
-    database: 'postgres'
-	};
-}
-
 async function runServer(options, dataSources) {
   let {
     sessionsKey,
@@ -51,8 +30,6 @@ async function runServer(options, dataSources) {
 
   let seedsDir = path.join(options.initialDataDirectory, seedsFolder);
   options.seeds = () => loadModels(seedsDir);
-
-  options.pgBossConfig = options.pgBossConfig || config;
 
   let app = await makeServer(process.cwd(), sessionsKey, dataSources, options);
   app.listen(port);

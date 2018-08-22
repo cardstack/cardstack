@@ -1,3 +1,4 @@
+const { Client } = require('pg');
 const PgBoss = require('pg-boss');
 const log = require('@cardstack/logger')('cardstack/queue');
 
@@ -11,8 +12,22 @@ module.exports = class Queue {
     this.config = config;
   }
 
+  async _ensureDatabaseSetup() {
+    let client = new Client(Object.assign({}, this.config, { database: 'postgres' }));
+    try {
+      await client.connect();
+      let response = await client.query(`select count(*)=1 as has_database from pg_database where datname=$1`, [this.config.database]);
+      if (!response.rows[0].has_database) {
+        await client.query(`create database ${safeDatabaseName(this.config.database)}`);
+      }
+    } finally {
+      client.end();
+    }
+  }
+
   async _ensureBoss() {
     if (!this.boss) {
+      await this._ensureDatabaseSetup();
       this.boss = new PgBoss(this.config);
       await this.boss.start();
       log.debug("Boss started");
@@ -102,3 +117,10 @@ module.exports = class Queue {
     delete this.promiseRejectCallbacks[jobId];
   }
 };
+
+function safeDatabaseName(name){
+  if (!/^[a-zA-Z_0-9]+$/.test(name)){
+    throw new Error(`unsure if db name ${name} is safe`);
+  }
+  return name;
+}

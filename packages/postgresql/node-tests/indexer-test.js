@@ -4,16 +4,17 @@ const {
 } = require('@cardstack/test-support/env');
 const { Client } = require('pg');
 const JSONAPIFactory = require('@cardstack/test-support/jsonapi-factory');
+const postgresConfig = require('@cardstack/plugin-utils/postgres-config');
 
 describe('postgresql/indexer', function() {
   let pgClient, client, env, dataSource;
 
   async function setup() {
-    pgClient = new Client({ database: 'postgres', host: 'localhost', user: 'postgres', port: 5444 });
+    pgClient = new Client(postgresConfig());
     await pgClient.connect();
     await pgClient.query(`create database test1`);
 
-    client = new Client({ database: 'test1', host: 'localhost', user: 'postgres', port: 5444 });
+    client = new Client(postgresConfig({ database: 'test1' }));
     await client.connect();
     await client.query('create table editors (id varchar primary key, name varchar)');
     await client.query('insert into editors values ($1, $2)', ['0', 'Some Editor']);
@@ -40,12 +41,7 @@ describe('postgresql/indexer', function() {
         'source-type': '@cardstack/postgresql',
         params: {
           branches: {
-            master: {
-              host: 'localhost',
-              user: 'postgres',
-              database: 'test1',
-              port: 5444
-            }
+            master: postgresConfig({ database: 'test1'})
           },
           renameTables: {
             editors: 'real-editors',

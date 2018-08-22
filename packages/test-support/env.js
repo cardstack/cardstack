@@ -61,10 +61,6 @@ exports.createDefaultEnvironment = async function(projectDir, initialModels = []
     opts.seeds = () => ephemeralInitialModels;
 
     opts.pgBossConfig = opts.pgBossConfig || {
-      database:             'postgres',
-      host:                 'localhost',
-      user:                 'postgres',
-      port:                 5444,
       newJobCheckInterval:  100 // set to minimum to speed up tests
     };
 

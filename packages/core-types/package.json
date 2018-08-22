@@ -1,6 +1,6 @@
 {
   "name": "@cardstack/core-types",
-  "version": "0.9.16",
+  "version": "0.10.1",
   "description": "The default blueprint for ember-cli addons.",
   "keywords": [
     "ember-addon",
@@ -38,7 +38,7 @@
     "@cardstack/eslint-config": "0.8.0",
     "@cardstack/jsonapi": "0.8.3",
     "@cardstack/models": "0.8.3",
-    "@cardstack/plugin-utils": "0.8.0",
+    "@cardstack/plugin-utils": "0.10.1",
     "@cardstack/rendering": "0.8.0",
     "@cardstack/test-support": "0.8.3",
     "@cardstack/tools": "0.8.3",

@@ -4,6 +4,7 @@ const {
 } = require('@cardstack/test-support/env');
 const { Client } = require('pg');
 const JSONAPIFactory = require('@cardstack/test-support/jsonapi-factory');
+const postgresConfig = require('@cardstack/plugin-utils/postgres-config');
 
 describe('postgresql/migrations', function() {
   let pgClient, env;
@@ -15,13 +16,9 @@ describe('postgresql/migrations', function() {
         'source-type': '@cardstack/postgresql',
         params: {
           branches: {
-            master: {
-              host: 'localhost',
-              user: 'postgres',
-              database: 'test1',
-              port: 5444,
+            master: Object.assign(postgresConfig({ database: 'test1' }), {
               migrationsDir: migrationScenario ? `node-tests/migrations/${migrationScenario}` : null
-            }
+            })
           }
         }
       });
@@ -29,7 +26,7 @@ describe('postgresql/migrations', function() {
   }
 
   beforeEach(async function() {
-    pgClient = new Client({ database: 'postgres', host: 'localhost', user: 'postgres', port: 5444 });
+    pgClient = new Client(postgresConfig());
     await pgClient.connect();
     await pgClient.query(`create database test1`);
   });

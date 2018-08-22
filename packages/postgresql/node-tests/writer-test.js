@@ -6,6 +6,7 @@ const { Client } = require('pg');
 const JSONAPIFactory = require('@cardstack/test-support/jsonapi-factory');
 const supertest = require('supertest');
 const Koa = require('koa');
+const postgresConfig = require('@cardstack/plugin-utils/postgres-config');
 
 describe('postgresql/writer', function() {
   let pgClient, client, env, writer, request, sessions;
@@ -13,11 +14,11 @@ describe('postgresql/writer', function() {
   let ciSessionId = '1234567890';
 
   beforeEach(async function() {
-    pgClient = new Client({ database: 'postgres', host: 'localhost', user: 'postgres', port: 5444 });
+    pgClient = new Client(postgresConfig());
     await pgClient.connect();
     await pgClient.query(`create database test1`);
 
-    client = new Client({ database: 'test1', host: 'localhost', user: 'postgres', port: 5444 });
+    client = new Client(postgresConfig({ database: 'test1' }));
     await client.connect();
     await client.query('create sequence article_id_seq');
     await client.query(`create table articles (id varchar primary key DEFAULT cast(nextval('article_id_seq') as varchar), title varchar, length integer, published boolean, alt_topic varchar, multi_word varchar, less_than_ten integer, check (less_than_ten < 10))`);
@@ -33,12 +34,7 @@ describe('postgresql/writer', function() {
         'source-type': '@cardstack/postgresql',
         params: {
           branches: {
-            master: {
-              host: 'localhost',
-              user: 'postgres',
-              database: 'test1',
-              port: 5444
-            }
+            master: postgresConfig({ database: 'test1' })
           },
           renameColumns: {
             articles: {
