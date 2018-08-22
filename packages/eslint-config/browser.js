@@ -22,7 +22,7 @@ module.exports = {
       // And applies them to all the paths that are node paths in a
       // standard ember-addon
       files: [
-        './index.js',
+        'index.js',
         'testem.js',
         'ember-cli-build.js',
         'cardstack/**/*.js',
