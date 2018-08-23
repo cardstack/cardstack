@@ -9,6 +9,7 @@ const { declareInjections } = require('@cardstack/di');
 const EventEmitter = require('events');
 const postgresConfig = require('@cardstack/plugin-utils/postgres-config');
 const { join } = require('path');
+const { upsert, queryToSQL, param } = require('./util');
 
 const config = postgresConfig({ database: `pgsearch_${process.env.PGSEARCH_NAMESPACE}` });
 
@@ -178,7 +179,7 @@ class Batch {
     this._groupsTouched = false;
   }
 
-  async saveDocument(context) {
+  async saveDocument(context, opts = {}) {
     let { schema, branch, type, id, sourceId, generation, upstreamDoc, _read:read } = context;
     if (id == null) {
       log.warn(`pgsearch cannot save document without id ${JSON.stringify(upstreamDoc)}`);
@@ -198,9 +199,20 @@ class Batch {
 
     if (!searchDoc) { return; }
 
-    let sql = 'insert into documents (branch, type, id, search_doc, pristine_doc, upstream_doc, source, generation, refs, realms) values ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10) on conflict on constraint documents_pkey do UPDATE SET search_doc = EXCLUDED.search_doc, pristine_doc = EXCLUDED.pristine_doc, upstream_doc = EXCLUDED.upstream_doc, source = EXCLUDED.source, generation = EXCLUDED.generation, refs = EXCLUDED.refs, realms = EXCLUDED.realms';
+    await this.client.query(queryToSQL(upsert('documents', 'documents_pkey', {
+      branch: param(branch),
+      type: param(type),
+      id: param(id),
+      search_doc: param(searchDoc),
+      pristine_doc: param(pristineDoc),
+      upstream_doc: param(upstreamDoc),
+      source: param(sourceId),
+      generation: param(generation),
+      refs: param(refs),
+      realms: param(realms),
+      expires: expirationExpression(opts.maxAge)
+    })));
 
-    await this.client.query(sql, [branch, type, id, searchDoc, pristineDoc, upstreamDoc, sourceId, generation, refs, realms]);
     await this.client.emitEvent('add', context);
     log.debug("save %s %s", type, id);
 
@@ -284,6 +296,7 @@ class Batch {
   // document stores a complete, rolled-up picture of which other
   // documents it references.
   async _invalidations(schema, branch, read) {
+    await this.client.query('delete from documents where expires < now()');
     await this.client.docsThatReference(branch, Object.keys(this._touched), async (doc, refs) => {
       let { type, id } = doc.data;
 
@@ -396,4 +409,14 @@ function safeDatabaseName(name){
     throw new Error(`unsure if db name ${name} is safe`);
   }
   return name;
+}
+
+function expirationExpression(maxAge) {
+  if (maxAge == null) {
+    return ['NULL'];
+  } else {
+    // this has string mangling of a potentially-user-provided argument but it's
+    // safe because we're doing that _inside_ of param().
+    return ['now() + cast(', param(maxAge + ' seconds'), 'as interval)'];
+  }
 }

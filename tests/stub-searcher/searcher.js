@@ -8,6 +8,7 @@ module.exports = class StubSearcher {
 
   constructor(params) {
     this.params = params;
+    this.counter = 0;
   }
 
   async get(session, branch, type, id, next) {
@@ -16,7 +17,7 @@ module.exports = class StubSearcher {
     }
 
     if (this.params.injectFirst) {
-      return { data: makeModel(type, id, this.params.injectFirst) };
+      return { data: this.makeModel(type, id, this.params.injectFirst), meta: this.makeMeta(type, id) };
     }
 
     let result = await next();
@@ -24,14 +25,14 @@ module.exports = class StubSearcher {
       return result;
     }
     if (this.params.injectSecond) {
-      return { data: makeModel(type, id, this.params.injectSecond) };
+      return { data: this.makeModel(type, id, this.params.injectSecond), meta: this.makeMeta(type, id) };
     }
   }
 
   async search(session, branch, query, next) {
     if (this.params.injectFirst) {
       return {
-        data: [ makeModel('examples', '2', this.params.injectFirst) ],
+        data: [ this.makeModel('examples', '2', this.params.injectFirst) ],
         meta: {
           page: {}
         }
@@ -39,14 +40,25 @@ module.exports = class StubSearcher {
     }
     return next();
   }
+
+  makeModel(type, id, flavor) {
+    return {
+      type,
+      id,
+      attributes: {
+        'example-flavor': flavor,
+        'example-counter': this.counter++
+      }
+    };
+  }
+
+  makeMeta(type, id) {
+    if (this.params.metaFor) {
+      return this.params.metaFor[`${type}/${id}`];
+    }
+    return {};
+  }
+
 };
 
-function makeModel(type, id, flavor) {
-  return {
-    type,
-    id,
-    attributes: {
-      'example-flavor': flavor
-    }
-  };
-}
+
