@@ -1,6 +1,14 @@
 const log = require('@cardstack/logger')('cardstack/pgsearch');
 const Error = require('@cardstack/plugin-utils/error');
 const { declareInjections } = require('@cardstack/di');
+const {
+  queryToSQL,
+  param,
+  every,
+  addExplicitParens,
+  any,
+  separatedByCommas
+} = require('./util');
 
 const RANGE_OPERATORS = {
   lte: '<=',
@@ -20,7 +28,7 @@ module.exports = declareInjections({
    }
 
   async get(session, branch, type, id) {
-    let response = await this.client.query('select pristine_doc from documents where branch=$1 and type=$2 and id=$3', [branch, type, id]);
+    let response = await this.client.query('select pristine_doc from documents where branch=$1 and type=$2 and id=$3 and expires is null or expires > now()', [branch, type, id]);
     if (response.rowCount > 0){
       return response.rows[0].pristine_doc;
     }
@@ -32,7 +40,8 @@ module.exports = declareInjections({
 
     let conditions = [
       ['branch = ', param(branch) ],
-      ['realms && ', param(realms) ]
+      ['realms && ', param(realms) ],
+      ['expires is null or expires > now()']
     ];
 
     if (filter) {
@@ -227,56 +236,6 @@ module.exports = declareInjections({
 
  });
 
-function addExplicitParens(expression){
-  if (expression.length === 0) {
-    return expression;
-  } else {
-    return ['(', ...expression, ')'];
-  }
-}
-
-function separatedByCommas(expressions) {
-  return expressions.reduce((accum, expression) => {
-    if (accum.length > 0){
-      accum.push(',');
-    }
-    return accum.concat(expression);
-  }, []);
-}
-
-function param(value) {
-  return { param: value };
-}
-
-function every(expressions){
-  if (expressions.length === 0){
-    return ['true'];
-  }
-  return expressions.map(addExplicitParens).reduce((accum, expression) => [...accum, 'AND', ...expression]);
-}
-
-function any(expressions){
-  if (expressions.length === 0){
-    return ['false'];
-  }
-  return expressions.map(addExplicitParens).reduce((accum, expression) => [...accum, 'OR', ...expression]);
-}
-
-function queryToSQL(query){
-  let values = [];
-  let text = query.map(element =>{
-    if (element.hasOwnProperty('param')) {
-      values.push(element.param);
-      return `$${values.length}`;
-    } else {
-      return element;
-    }
-  }).join(' ');
-  return {
-    text,
-    values
-  };
-}
 
 class Sorts {
   constructor(searcher, schema, rawSorts){

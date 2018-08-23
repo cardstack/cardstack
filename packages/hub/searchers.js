@@ -9,6 +9,7 @@ module.exports = declareInjections({
   controllingBranch: 'hub:controlling-branch',
   sources: 'hub:data-sources',
   internalSearcher: `plugin-searchers:${require.resolve('@cardstack/pgsearch/searcher')}`,
+  client: `plugin-client:${require.resolve('@cardstack/pgsearch/client')}`,
   currentSchema: 'hub:current-schema'
 },
 
@@ -54,9 +55,10 @@ class Searchers {
     };
     let result = await next();
     let authorizedResult;
+    let documentContext;
     if (result && result.data) {
       let schema = await schemaPromise;
-      let pristineResult = await (new DocumentContext({
+      documentContext = new DocumentContext({
         id,
         type,
         branch,
@@ -64,8 +66,8 @@ class Searchers {
         includePaths,
         upstreamDoc: result,
         read: this._read(branch)
-      }).pristineDoc());
-
+      });
+      let pristineResult = await (documentContext.pristineDoc());
       authorizedResult = await schema.applyReadAuthorization(pristineResult, { session, type, id });
     }
 
@@ -74,6 +76,12 @@ class Searchers {
         status: 404
       });
     }
+
+    let maxAge = get(result, 'meta.cardstack-cache-control.max-age');
+    if (maxAge != null) {
+      await this._updateCache(maxAge, documentContext);
+    }
+
     return authorizedResult;
   }
 
@@ -151,6 +159,15 @@ class Searchers {
         return result.data;
       }
     };
+  }
+
+  async _updateCache(maxAge, documentContext) {
+    let batch = this.client.beginBatch();
+    try {
+      await batch.saveDocument(documentContext, { maxAge });
+    } finally {
+      await batch.done();
+    }
   }
 
 });
