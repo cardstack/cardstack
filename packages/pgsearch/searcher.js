@@ -28,7 +28,7 @@ module.exports = declareInjections({
    }
 
   async get(session, branch, type, id) {
-    let response = await this.client.query('select pristine_doc from documents where branch=$1 and type=$2 and id=$3 and expires is null or expires > now()', [branch, type, id]);
+    let response = await this.client.query('select pristine_doc from documents where branch=$1 and type=$2 and id=$3 and (expires is null or expires > now())', [branch, type, id]);
     if (response.rowCount > 0){
       return response.rows[0].pristine_doc;
     }
