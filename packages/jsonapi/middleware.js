@@ -163,6 +163,7 @@ class Handler {
       filter: this.filterExpression(type),
       sort: this.query.sort,
       page: this.query.page,
+      include: this.query.include,
       queryString: this.query.q
     });
     let body = { data: models, meta: { total: page.total } };
