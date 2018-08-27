@@ -34,7 +34,7 @@ module.exports = declareInjections({
     }
   }
 
-  async search(session, branch, { filter, sort, page } ) {
+  async search(session, branch, { filter, sort, page, queryString } ) {
     let realms = await session.realms();
     let schema = await this.schema.forBranch(branch);
 
@@ -46,6 +46,10 @@ module.exports = declareInjections({
 
     if (filter) {
       conditions.push(this.filterCondition(branch, schema, filter));
+    }
+
+    if (queryString) {
+      conditions.push(this.queryCondition(branch, schema, queryString));
     }
 
     let totalResponsePromise = this.client.query(queryToSQL([`select count(*) from documents where`, ...every(conditions)]));
@@ -99,6 +103,10 @@ module.exports = declareInjections({
     };
   }
 
+  queryCondition(branch, schema, value) {
+    let { leafField } = this.buildQueryExpression(schema, 'query', 'filter');
+    return [`to_tsvector('english', search_doc) @@ plainto_tsquery('english', `, ...leafField.buildValueExpression(value), `)` ];
+  }
 
   filterCondition(branch, schema, filter){
     return every(Object.entries(filter).map(([key, value]) => {
@@ -124,7 +132,7 @@ module.exports = declareInjections({
   }
 
   buildQueryExpression(schema, key, errorHint){
-    if (key === 'branch' || key === 'type' || key === 'id'){
+    if (key === 'branch' || key === 'type' || key === 'id' || key === 'query'){
       return { isPlural: false, expression: [key], leafField: { buildValueExpression(value) { return [{ param: value }]; } } };
     }
     let segments = key.split('.');
