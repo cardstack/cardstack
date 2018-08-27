@@ -223,7 +223,7 @@ describe('jsonapi/middleware', function() {
       expect(response.body).has.deep.property('data[0].attributes.title', 'Hello world');
     });
 
-    it.skip('can use query string', async function() {
+    it('can use query string', async function() {
       let response = await request.get('/api/articles?q=second');
       expect(response).hasStatus(200);
       expect(response.body).has.property('data');
