@@ -105,7 +105,7 @@ module.exports = declareInjections({
 
   queryCondition(branch, schema, value) {
     let { leafField } = this.buildQueryExpression(schema, 'query', 'filter');
-    return [`to_tsvector('english', search_doc) @@ plainto_tsquery('english', `, ...leafField.buildValueExpression(value), `)` ];
+    return [`q @@ plainto_tsquery('english', `, ...leafField.buildValueExpression(value), `)` ];
   }
 
   filterCondition(branch, schema, filter){
