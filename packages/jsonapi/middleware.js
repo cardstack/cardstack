@@ -100,6 +100,13 @@ class Handler {
       // name itself is taking precedence).
       filter.type = type;
     }
+
+    if (filter.type === 'all') {
+      // this allows for a user to query all document types at once using the
+      // endpoint name 'all'
+      delete filter.type;
+    }
+
     if (id != null) {
       filter.id = id;
     }
