@@ -34,7 +34,7 @@ module.exports = declareInjections({
     }
   }
 
-  async search(session, branch, { filter, sort, page } ) {
+  async search(session, branch, { filter, sort, page, queryString } ) {
     let realms = await session.realms();
     let schema = await this.schema.forBranch(branch);
 
@@ -46,6 +46,10 @@ module.exports = declareInjections({
 
     if (filter) {
       conditions.push(this.filterCondition(branch, schema, filter));
+    }
+
+    if (queryString) {
+      conditions.push(this.queryCondition(queryString));
     }
 
     let totalResponsePromise = this.client.query(queryToSQL([`select count(*) from documents where`, ...every(conditions)]));
@@ -99,6 +103,9 @@ module.exports = declareInjections({
     };
   }
 
+  queryCondition(value) {
+    return [`q @@ plainto_tsquery('english', `, param(value), `)` ];
+  }
 
   filterCondition(branch, schema, filter){
     return every(Object.entries(filter).map(([key, value]) => {

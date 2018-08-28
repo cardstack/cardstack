@@ -118,7 +118,7 @@ class Searchers {
     let result = await next();
     if (result) {
       let schema = await schemaPromise;
-      let includePaths = (get(query, 'queryString.include') || '').split(',');
+      let includePaths = (get(query, 'include') || '').split(',');
       let pristineResult = await (new DocumentContext({
         branch,
         schema,

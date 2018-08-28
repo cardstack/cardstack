@@ -20,6 +20,7 @@ cache:
 
 before_install:
   - docker run -d --rm -p 9200:9200 --name elasticsearch cardstack/elasticsearch:dev
+  - pushd packages/postgresql/node-tests/pg-server; docker build . -t cardstack/pg-test; popd;
   - docker run -d --rm -p 5444:5432 --name postgres      cardstack/pg-test
   - export PATH=$HOME/.yarn/bin:$PATH
 
@@ -34,5 +35,3 @@ before_script:
 
 script:
   - yarn test
-
-
