@@ -49,7 +49,7 @@ module.exports = declareInjections({
     }
 
     if (queryString) {
-      conditions.push(this.queryCondition(branch, schema, queryString));
+      conditions.push(this.queryCondition(queryString));
     }
 
     let totalResponsePromise = this.client.query(queryToSQL([`select count(*) from documents where`, ...every(conditions)]));
@@ -103,9 +103,8 @@ module.exports = declareInjections({
     };
   }
 
-  queryCondition(branch, schema, value) {
-    let { leafField } = this.buildQueryExpression(schema, 'query', 'filter');
-    return [`q @@ plainto_tsquery('english', `, ...leafField.buildValueExpression(value), `)` ];
+  queryCondition(value) {
+    return [`q @@ plainto_tsquery('english', `, param(value), `)` ];
   }
 
   filterCondition(branch, schema, filter){
@@ -132,7 +131,7 @@ module.exports = declareInjections({
   }
 
   buildQueryExpression(schema, key, errorHint){
-    if (key === 'branch' || key === 'type' || key === 'id' || key === 'query'){
+    if (key === 'branch' || key === 'type' || key === 'id'){
       return { isPlural: false, expression: [key], leafField: { buildValueExpression(value) { return [{ param: value }]; } } };
     }
     let segments = key.split('.');
