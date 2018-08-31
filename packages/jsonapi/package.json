@@ -26,6 +26,9 @@
     "lodash": "^4.17.4",
     "qs": "^6.4.0"
   },
+  "scripts": {
+    "test": "mocha ../test-support/bin/run.js"
+  },
   "keywords": [
     "cardstack-plugin",
     "ember-addon"

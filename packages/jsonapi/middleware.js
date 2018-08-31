@@ -111,16 +111,17 @@ class Handler {
     await withJsonErrorHandling(this.ctxt, async () => {
       let segments = this.ctxt.request.path.split('/').map(decodeURIComponent);
       let kind;
-      if (segments.length == 2) {
+
+      if (segments.length < 3) {
         kind = 'Collection';
-      } else if (segments.length === 3) {
+      } else {
         kind = 'Individual';
       }
       let methodName = `handle${kind}${this.ctxt.request.method}`;
       log.debug("attempting to match method %s", methodName);
       let method = this[methodName];
       if (method) {
-        await method.apply(this, segments.slice(1));
+        await method.apply(this, segments.slice(1).filter(Boolean));
       }
     });
   }
