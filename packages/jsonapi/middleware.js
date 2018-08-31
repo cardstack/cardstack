@@ -100,13 +100,6 @@ class Handler {
       // name itself is taking precedence).
       filter.type = type;
     }
-
-    if (filter.type === 'all') {
-      // this allows for a user to query all document types at once using the
-      // endpoint name 'all'
-      delete filter.type;
-    }
-
     if (id != null) {
       filter.id = id;
     }
@@ -119,24 +112,16 @@ class Handler {
       let segments = this.ctxt.request.path.split('/').map(decodeURIComponent);
       let kind;
 
-      if (segments.length == 2) {
+      if (segments.length < 3) {
         kind = 'Collection';
-      } else if (segments.length === 3) {
+      } else {
         kind = 'Individual';
       }
       let methodName = `handle${kind}${this.ctxt.request.method}`;
       log.debug("attempting to match method %s", methodName);
       let method = this[methodName];
       if (method) {
-        let rest = segments.slice(1);
-
-
-        if(rest[0].length === 0) {
-          // no type given - will default to 'all'
-          rest[0] = 'all';
-        }
-
-        await method.apply(this, rest);
+        await method.apply(this, segments.slice(1).filter(Boolean));
       }
     });
   }

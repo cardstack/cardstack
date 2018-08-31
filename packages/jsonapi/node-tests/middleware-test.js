@@ -231,16 +231,6 @@ describe('jsonapi/middleware', function() {
       expect(response.body).has.deep.property('data[0].attributes.title', 'Second');
     });
 
-    it('can use query string to query all types', async function() {
-      let response = await request.get('/api/all?q=second');
-      expect(response).hasStatus(200);
-      expect(response.body).has.property('data');
-      // TODO: this expectation has been figured out experimentally. We should verify
-      // that we want each of the returned cards included in the search results
-      expect(response.body.data).length(6);
-      expect(response.body).has.deep.property('data[0].attributes.title', 'Second');
-    });
-
     it('can use query string to query all types using bare api endpoint', async function() {
       let response = await request.get('/api?q=second');
       expect(response).hasStatus(200);
