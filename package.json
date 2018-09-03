@@ -18,7 +18,7 @@
     "lint:js": "eslint .",
     "ember-tests": "node packages/test-support/ember-test-runner.js",
     "truffle-tests": "LOG_LEVELS='*=warn' node packages/test-support/truffle-test-runner.js",
-    "server": "node packages/hub/bin/server.js",
+    "server": "node packages/hub/bin/cardstack-hub.js",
     "blockchain": "truffle develop"
   },
   "dependencies": {
