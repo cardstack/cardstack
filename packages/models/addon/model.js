@@ -1,12 +1,14 @@
 import DS from 'ember-data';
 import RelationshipTracker from "ember-data-relationship-tracker";
 import { inject as service } from '@ember/service';
-import { computed, defineProperty } from '@ember/object';
+import { computed, defineProperty, get } from '@ember/object';
 import { readOnly, or } from '@ember/object/computed';
 import { capitalize } from '@ember/string';
 
 export default DS.Model.extend(RelationshipTracker, {
   resourceMetadata: service(),
+
+  relationshipTrackerVersionKey: 'version',
 
   init() {
     this._super();
@@ -39,7 +41,10 @@ export default DS.Model.extend(RelationshipTracker, {
   },
 
   async saveRelated() {
-    let relationshipsByName = this.constructor.relationshipsByName;
+    let relationshipsByName = get(this.constructor, 'relationshipsByName');
+    //TODO: Go through owned relationships and save the ones which `hasDirtyFields`
+    // and then recurse down to save their `hasDirtyFields` owned relations
+    // Save children first.
     let relatedSaves = this.dirtyRelationships.map(field => {
       let { kind } = relationshipsByName.get(field);
       let relatedRecords = kind === 'hasMany' ? this[field] : [ this.field ];
