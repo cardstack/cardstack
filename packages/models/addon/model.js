@@ -57,7 +57,7 @@ function createHasDirtyForRelationship(model, name, kind) {
       return model.get(name).toArray().some((related) => related.hasDirtyAttributes);
     }));
   } else {
-    defineProperty(model, propertyName, or(`${name}.hasDirtyAttributes`));
+    defineProperty(model, propertyName, readOnly(`${name}.hasDirtyAttributes`));
   }
   return propertyName;
 }
