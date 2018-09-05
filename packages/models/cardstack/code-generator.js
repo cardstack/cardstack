@@ -54,13 +54,6 @@ define('@cardstack/models/generated/{{modelName}}', ['exports', '@cardstack/mode
         }),
        {{/if}}
      {{/each}}
-
-     resourceMetadata: Ember.inject.service(),
-
-     version: Ember.computed(function() {
-       let meta = this.get('resourceMetadata').read(this);
-       return meta && meta.version;
-     })
    }){{#if routingField}}.reopenClass({ routingField: "{{routingField}}" }){{/if}};
 });
 `);

@@ -1,7 +1,16 @@
 import DS from 'ember-data';
 import RelationshipTracker from "ember-data-relationship-tracker";
+import { inject as service } from '@ember/service';
+import { computed } from '@ember/object';
 
 export default DS.Model.extend(RelationshipTracker, {
+  resourceMetadata: service(),
+
+  version: computed(function() {
+    let meta = this.get('resourceMetadata').read(this);
+    return meta && meta.version;
+  }),
+
   async save() {
     // this._super is not safe to use asynchronously
     // see https://github.com/ember-cli/ember-cli/issues/6282
