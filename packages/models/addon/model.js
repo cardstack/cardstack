@@ -1,10 +1,29 @@
 import DS from 'ember-data';
 import RelationshipTracker from "ember-data-relationship-tracker";
 import { inject as service } from '@ember/service';
-import { computed } from '@ember/object';
+import { computed, defineProperty } from '@ember/object';
+import { readOnly, or } from '@ember/object/computed';
+import { capitalize } from '@ember/string';
 
 export default DS.Model.extend(RelationshipTracker, {
   resourceMetadata: service(),
+
+  init() {
+    this._super();
+    let relationMap = this.constructor.relationshipsByName;
+    let dirtyTrackingProperties = [];
+    relationMap.forEach((relation) => {
+      let { kind, meta } = relation;
+      let { owned } = meta.options;
+      if (owned) {
+        let propertyName = createHasDirtyForRelationship(this, meta.name, kind);
+        dirtyTrackingProperties.push(propertyName);
+      }
+    });
+    if (dirtyTrackingProperties.length > 0) {
+      createHasDirtyOwned(this, dirtyTrackingProperties);
+    }
+  },
 
   version: computed(function() {
     let meta = this.get('resourceMetadata').read(this);
@@ -30,6 +49,22 @@ export default DS.Model.extend(RelationshipTracker, {
     return Promise.all(flatten(relatedSaves));
   },
 });
+
+function createHasDirtyForRelationship(model, name, kind) {
+  let propertyName = `hasDirty${capitalize(name)}`;
+  if (kind === 'hasMany') {
+    defineProperty(model, propertyName, computed(`${name}.@each.hasDirtyAttributes`, function() {
+      return model.get(name).toArray().some((related) => related.hasDirtyAttributes);
+    }));
+  } else {
+    defineProperty(model, propertyName, or(`${name}.hasDirtyAttributes`));
+  }
+  return propertyName;
+}
+
+function createHasDirtyOwned(model, properties) {
+  defineProperty(model, 'hasDirtyOwned', or(properties.join(',')));
+}
 
 function flatten(arrays) {
   return arrays.reduce((flattened, array) => {
