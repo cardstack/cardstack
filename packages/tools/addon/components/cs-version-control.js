@@ -7,6 +7,7 @@ import { transitionTo } from '../private-api';
 import { modelType } from '@cardstack/rendering/helpers/cs-model-type';
 import { defaultBranch } from '@cardstack/plugin-utils/environment';
 import { computed } from "@ember/object";
+import { or } from '@ember/object/computed';
 
 export default Component.extend({
   layout,
@@ -128,17 +129,12 @@ export default Component.extend({
     }
   }),
 
-  anythingDirty: computed('model.{hasDirtyFields,hasDirtyAttributes,hasDirtyOwned}', function() {
-    // hasDirtyFields comes from the ember-data-relationship-tracker
-    // addon, if it's available. It's fine if it's not since the value
-    // will default to false, you just don't get relationship dirty
-    // tracking
-    return this.get('model.hasDirtyFields') || this.get('model.hasDirtyAttributes') || this.get('model.hasDirtyOwned');
-  }),
+  // hasDirtyFields comes from the ember-data-relationship-tracker
+  // addon, if it's available. It's fine if it's not since the value
+  // will default to false, you just don't get relationship dirty tracking
+  anythingDirty: or('model.{hasDirtyFields,hasDirtyAttributes,hasDirtyOwned}'),
 
-  anythingPending: computed('model.isNew', 'anythingDirty', function() {
-    return this.get('model.isNew') || this.get('anythingDirty');
-  }),
+  anythingPending: or('model.isNew', 'anythingDirty'),
 
   update: task(function * () {
     yield this.get('model').save();
