@@ -1,5 +1,3 @@
-/*eslint node/no-unsupported-features: ["error", {version: 6, ignores: ["asyncAwait"]}]*/
-
 const TextRenderer = require('mobiledoc-text-renderer').default;
 const renderer = new TextRenderer({cards: []});
 
