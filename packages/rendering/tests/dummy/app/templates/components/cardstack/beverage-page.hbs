@@ -1,4 +1,18 @@
 <div class="page-flavor">{{cs-field content "flavor"}}</div>
-{{#cs-field-group content name="size" fields="size,sizeUnits" as |s|}}
+{{!-- {{#cs-field-group content name="size" fields="size,sizeUnits" as |s|}}
   <div class="page-size">{{s.size}} {{s.sizeUnits}}</div>
-{{/cs-field-group}}
+{{/cs-field-group}} --}}
+
+
+{{!-- {{#cs-field-alternatives content name="size" caption="Beverage size"}}
+
+{{/cs-field-alternatives}} --}}
+
+{{#cs-field-alternatives content name="size" caption="Beverage size" as |rt|}}
+  {{#rt.alternative name='size-measurement' fields="size" as |alt1|}}
+    <div>{{alt1.size}}</div>
+  {{/rt.alternative}}
+  {{#rt.alternative name='size-label' fields="sizeUnits" as |alt1|}}
+    <div>{{alt1.sizeUnits}}</div>
+  {{/rt.alternative}}
+{{/cs-field-alternatives}}

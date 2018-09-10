@@ -1,0 +1,10 @@
+{{#mark-overlay id=id model=fieldInfo group="cardstack-fields" ~}}
+  {{yield
+    (hash 
+      alternative=(component 'cs-field-alternatives/alternative'
+        content=content
+        registerAlternative=(action 'registerAlternative')
+      )
+    )
+  ~}}
+{{/mark-overlay ~}}
