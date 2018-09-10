@@ -12,9 +12,8 @@ export default DS.Model.extend(RelationshipTracker, {
 
   init() {
     this._super();
-    let relationMap = this.constructor.relationshipsByName;
     let dirtyTrackingProperties = [];
-    relationMap.forEach((relation) => {
+    this._relationshipsByName.forEach((relation) => {
       let { kind, meta } = relation;
       let { owned } = meta.options;
       if (owned) {
@@ -41,18 +40,21 @@ export default DS.Model.extend(RelationshipTracker, {
   },
 
   async saveRelated() {
-    let relationshipsByName = get(this.constructor, 'relationshipsByName');
     //TODO: Go through owned relationships and save the ones which `hasDirtyFields`
     // and then recurse down to save their `hasDirtyFields` owned relations
     // Save children first.
     let relatedSaves = this.dirtyRelationships.map(field => {
-      let { kind } = relationshipsByName.get(field);
+      let { kind } = this._relationshipsByName.get(field);
       let relatedRecords = kind === 'hasMany' ? this[field] : [ this.field ];
       let dirtyRecords = relatedRecords.filter(record => record.hasDirtyFields);
       return dirtyRecords.invoke('save');
     });
     return Promise.all(flatten(relatedSaves));
   },
+
+  _relationshipsByName() {
+    return get(this.constructor, 'relationshipsByName');
+  }
 });
 
 function createHasDirtyForRelationship(model, name, kind) {
