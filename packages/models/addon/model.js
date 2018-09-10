@@ -4,6 +4,7 @@ import { inject as service } from '@ember/service';
 import { computed, defineProperty, get } from '@ember/object';
 import { readOnly, or } from '@ember/object/computed';
 import { capitalize } from '@ember/string';
+import { run } from '@ember/runloop';
 
 export default DS.Model.extend(RelationshipTracker, {
   resourceMetadata: service(),
@@ -36,7 +37,9 @@ export default DS.Model.extend(RelationshipTracker, {
     // this._super is not safe to use asynchronously
     // see https://github.com/ember-cli/ember-cli/issues/6282
     let modelSave = this._super.bind(this);
-    await this.saveRelated();
+    run(async () => {
+      await this.saveRelated();
+    });
     await modelSave();
   },
 
