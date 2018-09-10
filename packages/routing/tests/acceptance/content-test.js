@@ -1,6 +1,6 @@
 import { module, test } from 'qunit';
 import { setupApplicationTest } from 'ember-qunit';
-import { visit, currentURL } from '@ember/test-helpers';
+import { visit, currentURL, click } from '@ember/test-helpers';
 
 module('Acceptance | content', function(hooks) {
   setupApplicationTest(hooks);
@@ -32,5 +32,12 @@ module('Acceptance | content', function(hooks) {
     await visit('/c/posts/bogus');
     assert.equal(currentURL(), '/c/posts/bogus');
     assert.equal(this.element.querySelector('h1').textContent.trim(), 'Not Found');
+  });
+
+  test('reloads models on route transitions', async function(assert) {
+    await visit('/c/categories/category-1');
+    await click('[data-test-post="1"]')
+
+    assert.equal(currentURL(), '/c/posts/1');
   });
 });

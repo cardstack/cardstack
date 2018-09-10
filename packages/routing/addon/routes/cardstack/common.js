@@ -29,7 +29,7 @@ export default Route.extend({
         branch
       });
     } else {
-      promise = this.store.findRecord(mType, slug, { branch });
+      promise = this.store.findRecord(mType, slug, { branch, reload: true });
     }
 
     return promise.catch(err => {
