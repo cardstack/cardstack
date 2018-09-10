@@ -8,12 +8,12 @@ import { capitalize } from '@ember/string';
 export default DS.Model.extend(RelationshipTracker, {
   resourceMetadata: service(),
 
-  relationshipTrackerVersionKey: 'version',
+  relationshipTrackerVersionKey: 'relationshipTrackerVersion',
 
   init() {
     this._super();
     let dirtyTrackingProperties = [];
-    this._relationshipsByName.forEach((relation) => {
+    this._relationshipsByName().forEach((relation) => {
       let { kind, meta } = relation;
       let { owned } = meta.options;
       if (owned) {
@@ -26,7 +26,7 @@ export default DS.Model.extend(RelationshipTracker, {
     }
   },
 
-  version: computed(function() {
+  relationshipTrackerVersion: computed(function() {
     let meta = this.get('resourceMetadata').read(this);
     return meta && meta.version;
   }),
@@ -44,7 +44,7 @@ export default DS.Model.extend(RelationshipTracker, {
     // and then recurse down to save their `hasDirtyFields` owned relations
     // Save children first.
     let relatedSaves = this.dirtyRelationships.map(field => {
-      let { kind } = this._relationshipsByName.get(field);
+      let { kind } = this._relationshipsByName().get(field);
       let relatedRecords = kind === 'hasMany' ? this[field] : [ this.field ];
       let dirtyRecords = relatedRecords.filter(record => record.hasDirtyFields);
       return dirtyRecords.invoke('save');
