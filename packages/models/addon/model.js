@@ -8,22 +8,23 @@ import { capitalize } from '@ember/string';
 export default DS.Model.extend(RelationshipTracker, {
   resourceMetadata: service(),
 
-  relationshipTrackerVersionKey: 'relationshipTrackerVersion',
-
   init() {
     this._super();
-    let dirtyTrackingProperties = [];
+    let dirtyTrackingProperties = {};
     this._relationshipsByName().forEach((relation) => {
       let { kind, meta } = relation;
-      let { owned } = meta.options;
-      if (owned) {
-        let propertyName = createHasDirtyForRelationship(this, meta.name, kind);
-        dirtyTrackingProperties.push(propertyName);
+      if (meta) {
+        let { owned } = meta.options;
+        if (owned) {
+          let propertyName = createHasDirtyForRelationship(this, meta.name, kind);
+          dirtyTrackingProperties[meta.name] = propertyName;
+        }
       }
     });
-    if (dirtyTrackingProperties.length > 0) {
-      createHasDirtyOwned(this, dirtyTrackingProperties);
+    if (Object.keys(dirtyTrackingProperties).length > 0) {
+      createHasDirtyOwned(this, Object.values(dirtyTrackingProperties));
     }
+    this.set('dirtyTrackingRelationNames', dirtyTrackingProperties);
   },
 
   relationshipTrackerVersion: computed(function() {
@@ -40,14 +41,15 @@ export default DS.Model.extend(RelationshipTracker, {
   },
 
   async saveRelated() {
-    //TODO: Go through owned relationships and save the ones which `hasDirtyFields`
-    // and then recurse down to save their `hasDirtyFields` owned relations
-    // Save children first.
-    let relatedSaves = this.dirtyRelationships.map(field => {
-      let { kind } = this._relationshipsByName().get(field);
-      let relatedRecords = kind === 'hasMany' ? this[field] : [ this.field ];
-      let dirtyRecords = relatedRecords.filter(record => record.hasDirtyFields);
-      return dirtyRecords.invoke('save');
+    let relatedSaves = Object.keys(this.dirtyTrackingRelationNames).map((relationName) => {
+      let isRelationDirty = this.dirtyTrackingRelationNames[relationName];
+      if (isRelationDirty) {
+        let { kind } = this._relationshipsByName().get(relationName);
+        let related = this.get(relationName);
+        let relatedRecords = kind === 'hasMany' ? related : [ this.related ];
+        let dirtyRecords = relatedRecords.filter(record => record.hasDirtyFields);
+        return dirtyRecords.invoke('save');
+      }
     });
     return Promise.all(flatten(relatedSaves));
   },

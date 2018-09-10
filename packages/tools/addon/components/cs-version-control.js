@@ -132,7 +132,7 @@ export default Component.extend({
   // hasDirtyFields comes from the ember-data-relationship-tracker
   // addon, if it's available. It's fine if it's not since the value
   // will default to false, you just don't get relationship dirty tracking
-  anythingDirty: or('model.{hasDirtyFields,hasDirtyAttributes,hasDirtyOwned}'),
+  anythingDirty: or('model.{hasDirtyFields,hasDirtyOwned}'),
 
   anythingPending: or('model.isNew', 'anythingDirty'),
 
