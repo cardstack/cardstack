@@ -1,0 +1,20 @@
+{{#step-manager as |w|}}
+  {{#each alternatives as |alternative|}}
+    <button
+      onclick={{action w.transition-to alternative.name}}
+      aria-pressed={{eq w.currentStep alternative.name}}
+    >
+      {{alternative.name}}
+    </button>
+  {{/each}}
+
+  {{#each alternatives as |alternative|}}
+    {{#w.step name=alternative.name}}
+      <h3>{{alternative.name}}</h3>
+      {{#each alternative.fieldNames as |fieldName|}}
+        <label>{{cs-field-caption content fieldName}}</label>
+        {{cs-field-editor content=content field=fieldName enabled=enabled}}
+      {{/each}}
+    {{/w.step}}
+  {{/each}}
+{{/step-manager}}
