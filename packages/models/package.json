@@ -28,9 +28,9 @@
     "@cardstack/di": "0.8.0",
     "@cardstack/plugin-utils": "0.10.1",
     "ember-cli-babel": "^6.8.2",
-    "ember-data-relationship-tracker": "^0.2.1",
+    "ember-data-relationship-tracker": "^0.3.0",
     "ember-inject-optional": "^0.1.0",
-    "ember-resource-metadata": "^0.2.0",
+    "ember-resource-metadata": "^0.3.0",
     "handlebars": "^4.0.6",
     "inflection": "^1.12.0"
   },
