@@ -176,7 +176,7 @@ module.exports = class EthereumClient {
 
   async callContractMethod(contract, methodName, arg) {
     let result;
-    if (!contract || !methodName) { return; }
+    if (!contract || !methodName || typeof contract.methods[methodName] !== 'function') { return; }
 
     try {
       result = arg == null ? await contract.methods[methodName]().call() :
