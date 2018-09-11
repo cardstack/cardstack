@@ -20,7 +20,11 @@ export default Component.extend({
     return fields;
   }),
 
-  init() {
+  active: computed('alternativesStatus', 'name', function() {
+    return this.get('alternativesStatus')[this.get('name')];
+  }),
+
+  didInsertElement() {
     this._super(...arguments);
     assert('Alternative name must be provided', !!this.get('name'));
     assert('Alternative fieldNames must be provided', !!this.get('fieldNames'));
