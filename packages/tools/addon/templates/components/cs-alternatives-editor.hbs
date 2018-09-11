@@ -1,7 +1,7 @@
 {{#step-manager as |w|}}
   {{#each alternatives as |alternative|}}
     <button
-      onclick={{action w.transition-to alternative.name}}
+      onclick={{action "switchAlternative" w.currentStep alternative.name w.transition-to}}
       aria-pressed={{eq w.currentStep alternative.name}}
     >
       {{alternative.name}}
