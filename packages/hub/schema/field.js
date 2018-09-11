@@ -23,6 +23,8 @@ module.exports = class Field {
     this.editorComponent = model.attributes['editor-component'];
     this.inlineEditorComponent = model.attributes['inline-editor-component'];
     this.searchable = model.attributes.searchable == null ? true : model.attributes.searchable;
+    let owned = model.attributes.owned;
+    this.owned = typeof owned === 'undefined' ? false : owned;
 
     // Default values are modeled as relationships to separate models
     // so that we can distinguish a default value of null from not

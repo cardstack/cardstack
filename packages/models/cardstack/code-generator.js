@@ -42,7 +42,8 @@ define('@cardstack/models/generated/{{modelName}}', ['exports', '@cardstack/mode
              inverse: null,
              caption: "{{field.caption}}",
              editorComponent: "{{field.editorComponent}}",
-             inlineEditorComponent: "{{field.inlineEditorComponent}}"
+             inlineEditorComponent: "{{field.inlineEditorComponent}}",
+             owned: {{field.owned}}
             }),
          {{/with}}
        {{else}}
