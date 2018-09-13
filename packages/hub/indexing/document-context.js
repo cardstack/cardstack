@@ -74,15 +74,12 @@ module.exports = class DocumentContext {
     let key = `${type}/${id}`;
     let cached = this.cache[key];
     if (cached) {
-      return cached;
+      return await cached;
     }
 
-    let resource = await this._read(type, id);
-    if (resource) {
-      this.cache[key] = resource;
-    }
+    this.cache[key] = this._read(type, id);
 
-    return resource;
+    return await this.cache[key];
   }
 
 
