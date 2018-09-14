@@ -30,14 +30,10 @@ class Searchers {
     return this._sources;
   }
 
-  async get(session, branch, type, id, includePaths) {
-    if (arguments.length < 4) {
-      throw new Error(`session is now a required argument to searchers.get`);
-    }
+  async _getResourceAndMeta(session, branch, type, id) {
     let sources = await this._lookupSources();
     let index = 0;
     let sessionOrEveryone = session || Session.EVERYONE;
-    let schemaPromise = this.currentSchema.forBranch(branch);
     let next = async () => {
       let source = sources[index++];
       if (source) {
@@ -53,18 +49,28 @@ class Searchers {
         return response;
       }
     };
+
     let result = await next();
+
+    return { resource: result && result.data, meta: result && result.meta };
+  }
+
+  async get(session, branch, type, id, includePaths) {
+    if (arguments.length < 4) {
+      throw new Error(`session is now a required argument to searchers.get`);
+    }
+    let { resource, meta } = await this._getResourceAndMeta(session, branch, type, id);
     let authorizedResult;
     let documentContext;
-    if (result && result.data) {
-      let schema = await schemaPromise;
+    if (resource) {
+      let schema = await this.currentSchema.forBranch(branch);
       documentContext = new DocumentContext({
         id,
         type,
         branch,
         schema,
         includePaths,
-        upstreamDoc: result,
+        upstreamDoc: { data: resource, meta },
         read: this._read(branch)
       });
       let pristineResult = await (documentContext.pristineDoc());
@@ -77,7 +83,7 @@ class Searchers {
       });
     }
 
-    let maxAge = get(result, 'meta.cardstack-cache-control.max-age');
+    let maxAge = get(meta, 'cardstack-cache-control.max-age');
     if (maxAge != null) {
       await this._updateCache(maxAge, documentContext);
     }
@@ -148,16 +154,13 @@ class Searchers {
 
   _read(branch) {
     return async (type, id) => {
-      let result;
+      let resource;
       try {
-        result = await this.get(Session.INTERNAL_PRIVILEGED, branch, type, id);
+        resource = (await this._getResourceAndMeta(Session.INTERNAL_PRIVILEGED, branch, type, id)).resource;
       } catch (err) {
         if (err.status !== 404) { throw err; }
       }
-
-      if (result && result.data) {
-        return result.data;
-      }
+      return resource;
     };
   }
 
