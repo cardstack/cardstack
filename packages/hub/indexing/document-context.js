@@ -1,5 +1,5 @@
 const authLog = require('@cardstack/logger')('cardstack/auth');
-const log = require('@cardstack/logger')('cardstack/indexers');
+const log = require('@cardstack/logger')('cardstack/indexing/document-context');
 const Model = require('../model');
 const { get, uniqBy } = require('lodash');
 
@@ -69,6 +69,8 @@ module.exports = class DocumentContext {
   }
 
   async read(type, id) {
+    log.debug(`Reading record ${type}/${id}`);
+
     this._references.push(`${type}/${id}`);
 
     let key = `${type}/${id}`;
@@ -94,6 +96,7 @@ module.exports = class DocumentContext {
     }
 
     if (!this._searchDoc) {
+      log.debug(`Building ${this.type}/${this.id}`);
       this._searchDoc = await this._build(this.type, this.id, this.upstreamDoc, searchTree, 0);
     }
     if (this._searchDoc) {
