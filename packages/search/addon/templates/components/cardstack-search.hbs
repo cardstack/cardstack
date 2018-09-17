@@ -3,6 +3,11 @@
 {{else}}
   {{yield to="inverse"}}
 {{/each}}
+
+{{#if search.isRunning}}
+  <div class="cardstack-email-loading">Loading...</div>
+{{/if}}
+
 {{#if cursor}}
-  <div {{action (perform search cursor) }}>More</div>
+  <button class="load-more" {{action (perform search cursor) }}>Load More</button>
 {{/if}}
