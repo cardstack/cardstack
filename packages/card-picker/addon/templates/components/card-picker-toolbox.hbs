@@ -4,6 +4,8 @@
 
 <div class="cards-list">
   {{#cardstack-search query=query as |content|}}
-    {{cardstack-content format="embedded" content=content}}
+    <div onclick={{action 'select' content}}>
+      {{cardstack-content format="embedded" content=content}}
+    </div>
   {{/cardstack-search}}
 </div>
