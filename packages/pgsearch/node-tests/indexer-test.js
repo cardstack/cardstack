@@ -9,10 +9,11 @@ const {
   destroyDefaultEnvironment
 } = require('../../../tests/pgsearch-test-app/node_modules/@cardstack/test-support/env');
 const Factory = require('../../../tests/pgsearch-test-app/node_modules/@cardstack/test-support/jsonapi-factory');
+const DocumentContext = require('@cardstack/hub/indexing/document-context');
 
 describe('pgsearch/indexer', function() {
 
-  let env, factory, writer, indexer, searcher, changedModels;
+  let env, factory, writer, indexer, searcher, currentSchema, changedModels;
 
   before(async function() {
     this.timeout(2500);
@@ -51,6 +52,7 @@ describe('pgsearch/indexer', function() {
     writer = env.lookup('hub:writers');
     indexer = env.lookup('hub:indexers');
     searcher = env.lookup('hub:searchers');
+    currentSchema = env.lookup('hub:current-schema');
   });
 
   after(async function() {
@@ -107,6 +109,65 @@ describe('pgsearch/indexer', function() {
     expect(found).has.property('included');
     expect(found.included).length(1);
     expect(found.included[0].attributes.name).to.equal('Quint');
+  });
+
+  it('reuses included resources when building pristine document when upstreamDoc has includes', async function() {
+    const branch = 'master';
+    const schema = await currentSchema.forBranch(branch);
+
+    let documentFetchCount = 0;
+    let read = async (type, id) => {
+      documentFetchCount++;
+      let result;
+      try {
+        result = await searcher.get(env.session, branch, type, id);
+      } catch (err) {
+        if (err.status !== 404) { throw err; }
+      }
+
+      if (result && result.data) {
+        return result.data;
+      }
+    };
+
+    let { data:person } = await writer.create(branch, env.session, 'people', {
+      data: {
+        type: 'people',
+        attributes: {
+          name: 'Quint'
+        }
+      }
+    });
+    let { data:article } = await writer.create(branch, env.session, 'articles', {
+      data: {
+        type: 'articles',
+        attributes: {
+          title: 'Hello World'
+        },
+        relationships: {
+          author: { data: { type: 'people', id: person.id } }
+        }
+      }
+    });
+
+    let { id, type } = article;
+    let { data:resource, included } = await searcher.get(env.session, branch, type, id);
+
+    let pristineDoc = await (new DocumentContext({ id, type, branch, schema, read,
+      upstreamDoc: { data: resource },
+    })).pristineDoc();
+
+    expect(documentFetchCount).to.equal(1);
+    expect(pristineDoc).to.deep.equal({ data: resource, included });
+
+    documentFetchCount = 0;
+
+    pristineDoc = await (new DocumentContext({ id, type, branch, schema, read,
+      upstreamDoc: { data: resource, included },
+    })).pristineDoc();
+
+    expect(documentFetchCount).to.equal(0);
+    expect(pristineDoc).to.deep.equal({ data: resource, included });
   });
 
   it('reindexes included resources', async function() {
