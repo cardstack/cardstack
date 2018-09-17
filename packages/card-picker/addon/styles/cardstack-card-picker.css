@@ -1,0 +1,29 @@
+.cardstack-card-picker {
+  height: 30rem;
+  width: 100%;
+  background-color: var(--light-background);
+  overflow-y: scroll;
+}
+
+.cardstack-card-picker > .heading {
+  height: 3rem;
+  position: sticky;
+  background-color: var(--active-background);
+  top: 0;
+  z-index: 20;
+
+  display: flex;
+  align-items: center;
+  padding-left: 2rem;
+}
+
+.cardstack-card-picker > .cards-list {
+  display: grid;
+
+  grid-template-columns: repeat(auto-fill, minmax(360px, 1fr));
+  grid-gap: 40px;
+}
+
+.cardstack-card-picker button.load-more {
+  margin: 2rem auto;
+}
