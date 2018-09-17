@@ -37,7 +37,26 @@ export default Service.extend({
   activeFields: computed('activeContentItem', 'fields', function() {
     let item = this.get('activeContentItem');
     if (item) {
-      return this.get('fields').filter(f => f.model.content === item.model);
+      return this.get('fields').filter(f => {
+        let activeItemModel = item.model;
+        let activeItemClass = activeItemModel.constructor;
+        let fieldModel = f.model.content;
+        let fieldClass = fieldModel.constructor;
+        if (fieldModel === activeItemModel) {
+          return true;
+        }
+        let isOwnedField = false;
+        activeItemClass.relationships.forEach(([ relationshipDefinition ]) => {
+          let { meta } = relationshipDefinition;
+          let { owned } = meta.options;
+          if (owned) {
+            if (meta.type === fieldClass.modelName) {
+              isOwnedField = true;
+            }
+          }
+        });
+        return isOwnedField;
+      });
     } else {
       return [];
     }
