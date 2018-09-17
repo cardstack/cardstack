@@ -5,5 +5,13 @@ import layout from '../../templates/components/field-editors/card-picker';
 
 export default Component.extend({
   tools: service('cardstack-card-picker'),
-  layout
+  layout,
+
+  actions: {
+    pickCard() {
+      this.tools.pickCard().then((card) => {
+        this.set(`content.${this.get('field')}`, card);
+      })
+    }
+  }
 });

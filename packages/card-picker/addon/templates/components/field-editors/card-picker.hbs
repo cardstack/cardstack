@@ -1,5 +1,14 @@
-PICK ME!
+{{#if (get content field)}}
+  <div>
+    Card Type: {{cs-humanize (cs-model-type (get content field))}}
+  </div>
+  <div>
+    Card Id: {{get (get content field) 'id'}}
+  </div>
+{{else}}
+  No Card Selected
+{{/if}}
 
-{{tools.active}}
-
-{{yield}}
+{{#if enabled}}
+  <button onclick={{action 'pickCard'}}>Change</button>
+{{/if}}
