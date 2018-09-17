@@ -18,7 +18,7 @@ const pokemon = [
 export default JSONAPIAdapter.extend({
   query(store, type, query) {
     let data = pokemon.filter(p => {
-      if (query.queryString) {
+      if (query.q) {
         return p.name.toLowerCase().indexOf(query.queryString.toLowerCase()) > -1;
       }
       return true;
@@ -31,6 +31,7 @@ export default JSONAPIAdapter.extend({
         attributes
       };
     });
+
     return new RSVP.Promise(resolve => {
       setTimeout(resolve, delay);
     }).then(() => {
