@@ -62,12 +62,12 @@ describe('mobiledoc/read-time-computed-field', function() {
     before(setup);
     after(teardown);
 
-    it("can depend on params", async function() {
+    it("can report a reasonable read time for a short article", async function() {
       let model = await env.lookup('hub:searchers').get(env.session, 'master', 'articles', article1.id);
       expect(model.data).has.deep.property('attributes.read-time', 2);
     });
 
-    it("can depend on another computed field", async function() {
+    it("can report a significantly longer time for a much longer article", async function() {
       let model = await env.lookup('hub:searchers').get(env.session, 'master', 'articles', article2.id);
       expect(model.data).has.deep.property('attributes.read-time', 26);
     });
