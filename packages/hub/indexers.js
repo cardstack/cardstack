@@ -39,7 +39,7 @@
 
 const EventEmitter = require('events');
 const log = require('@cardstack/logger')('cardstack/indexers');
-const { declareInjections } = require('@cardstack/di');
+const { declareInjections, getOwner } = require('@cardstack/di');
 const bootstrapSchema = require('./bootstrap-schema');
 const RunningIndexers = require('./indexing/running-indexers');
 
@@ -64,7 +64,7 @@ class Indexers extends EventEmitter {
   async schemaForBranch(branch) {
     if (!this._schemaCache) {
       this._schemaCache = (async () => {
-        let running = new RunningIndexers(await this._seedSchema(), this.client, this.emit.bind(this), this.schemaLoader.ownTypes(), this.controllingBranch.name);
+        let running = new RunningIndexers(await this._seedSchema(), this.client, this.emit.bind(this), this.schemaLoader.ownTypes(), this.controllingBranch.name, getOwner(this));
         try {
           return await running.schemas();
         } finally {
@@ -122,7 +122,7 @@ class Indexers extends EventEmitter {
   async _doUpdate(forceRefresh, hints) {
     log.debug('begin update, forceRefresh=%s', forceRefresh);
     let priorCache = this._schemaCache;
-    let running = new RunningIndexers(await this._seedSchema(), this.client, this.emit.bind(this), this.schemaLoader.ownTypes(), this.controllingBranch.name);
+    let running = new RunningIndexers(await this._seedSchema(), this.client, this.emit.bind(this), this.schemaLoader.ownTypes(), this.controllingBranch.name, getOwner(this));
     try {
       let schemas = await running.update(forceRefresh, hints);
       if (this._schemaCache === priorCache) {

@@ -3,17 +3,19 @@ const owningDataSource = new WeakMap();
 const { flatten } = require('lodash');
 const log = require('@cardstack/logger')('cardstack/indexers');
 const DocumentContext = require('./document-context');
+const Session = require('@cardstack/plugin-utils/session');
 
 const FINALIZED = {};
 
 class BranchUpdate {
-  constructor(branch, seedSchema, client, emitEvent, isControllingBranch) {
+  constructor(branch, seedSchema, client, emitEvent, isControllingBranch, owner) {
     this.branch = branch;
     this.seedSchema = seedSchema;
     this.client = client;
     this.updaters = Object.create(null);
     this.emitEvent = emitEvent;
     this.isControllingBranch = isControllingBranch;
+    this.searchers = owner.lookup('hub:searchers');
     this.schemaModels = [];
     this._schema = null;
     this._batch = client.beginBatch();
@@ -121,7 +123,14 @@ class BranchUpdate {
   }
 
   async read(type, id) {
-    return this.client.readUpstreamDocument({ branch: this.branch, type, id });
+    let doc;
+    try {
+      doc = await this.searchers.get(Session.INTERNAL_PRIVILEGED, this.branch, type, id);
+    } catch (err) {
+      if (err.status !== 404) { throw err; }
+    }
+
+    return doc;
   }
 
   async add(type, id, doc, sourceId, nonce) {
