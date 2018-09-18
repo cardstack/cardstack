@@ -1,5 +1,6 @@
 @import "base";
 @import "cardstack-card-picker";
+@import "cardstack-cards-editor";
 
 :root {
     --deep-background: #000;

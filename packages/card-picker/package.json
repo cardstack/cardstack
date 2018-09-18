@@ -24,7 +24,8 @@
     "@cardstack/edges": "0.10.0",
     "@cardstack/search": "*",
     "ember-cli-babel": "^6.16.0",
-    "ember-cli-htmlbars": "^3.0.0"
+    "ember-cli-htmlbars": "^3.0.0",
+    "ember-sortable": "^1.11.2"
   },
   "devDependencies": {
     "@ember/optional-features": "^0.6.3",

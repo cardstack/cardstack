@@ -1,14 +1,20 @@
 {{#if (get content field)}}
-  <div>
-    Card Type: {{cs-humanize (cs-model-type (get content field))}}
-  </div>
-  <div>
-    Card Id: {{get (get content field) 'id'}}
+  <div class="cards-editor--input-row">
+    <span>{{cs-humanize (cs-model-type (get content field))}} (ID: {{get (get content field) 'id'}}) </span>
+    {{#if enabled}}
+      <button class="text-button" onclick={{action "deleteCard"}}>
+        Delete
+      </button>
+    {{/if}}
   </div>
 {{else}}
-  No Card Selected
+  <div class="cards-editor--input-row">
+    <span>No Card Selected</span>
+  </div>
 {{/if}}
 
-{{#if enabled}}
-  <button onclick={{action 'pickCard'}}>Change</button>
-{{/if}}
+{{#liquid-if enabled rules=animationRules growDuration=250}}
+  <div class="cards-editor--button-panel">
+    <button onclick={{action "pickCard"}}>{{if (get content field) "Change Card" "Add Card"}}</button>
+  </div>
+{{/liquid-if}}
