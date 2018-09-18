@@ -1,13 +1,13 @@
 {
   "name": "@cardstack/card-picker",
   "version": "0.0.0",
-  "description": "The default blueprint for ember-cli addons.",
+  "description": "Card-Picker system for cardstack",
   "keywords": [
     "ember-addon"
   ],
-  "repository": "",
+  "repository": "https://github.com/cardstack/cardstack",
   "license": "MIT",
-  "author": "",
+  "author": "Chris Manson <chris.manson@simplabs.com>",
   "directories": {
     "doc": "doc",
     "test": "tests"
@@ -28,6 +28,7 @@
     "ember-sortable": "^1.11.2"
   },
   "devDependencies": {
+    "@cardstack/eslint-config": "0.8.0",
     "@ember/optional-features": "^0.6.3",
     "broccoli-asset-rev": "^2.7.0",
     "ember-ajax": "^3.1.0",
