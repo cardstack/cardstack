@@ -57,6 +57,14 @@ describe('pgsearch/indexer', function() {
     await destroyDefaultEnvironment(env);
   });
 
+  async function alterExpiration(branch, type, id, interval) {
+    let client = env.lookup(`plugin-client:${require.resolve('@cardstack/pgsearch/client')}`);
+    let result = await client.query(`update documents set expires = now() + $1 where branch=$2 and type=$3 and id=$4`, [interval, branch, type, id]);
+    if (result.rowCount !== 1) {
+      throw new Error(`test was unable to alter expiration`);
+    }
+  }
+
   // this scenario technically violates jsonapi spec, but our indexer needs to be tolerant of it
   it('tolerates missing relationship', async function() {
     let { data:article } = await writer.create('master', env.session, 'articles', {
@@ -300,6 +308,42 @@ describe('pgsearch/indexer', function() {
     expect(found).has.property('included');
     expect(found.included).length(1);
     expect(found.included[0].attributes.name).to.equal('Edward V');
+  });
+
+  it('invalidates expired resources', async function() {
+    let { data:person } = await writer.create('master', env.session, 'people', {
+      data: {
+        type: 'people',
+        attributes: {
+          name: 'Quint'
+        }
+      }
+    });
+    await alterExpiration('master', 'people', person.id, '300 seconds');
+
+    let { data:article } = await writer.create('master', env.session, 'articles', {
+      data: {
+        type: 'articles',
+        attributes: {
+          title: 'Hello World'
+        },
+        relationships: {
+          author: { data: { type: 'people', id: person.id } }
+        }
+      }
+    });
+
+    let found = await searcher.get(env.session, 'master', 'articles', article.id);
+    expect(found).has.deep.property('data.relationships.author.data.id', person.id);
+    expect(found.included[0].attributes.name).to.equal('Quint');
+
+    await alterExpiration('master', 'people', person.id, '-300 seconds');
+    // just need to touch any document to trigger expired resource invalidation
+    await writer.update('master', env.session, 'articles', article.id, { data: article });
+
+    found = await searcher.get(env.session, 'master', 'articles', article.id);
+    expect(found).to.not.have.property('included');
+    expect(found).to.have.deep.property('data.relationships.author.data', null);
   });
 
   it('ignores a broken belongs-to', async function() {

@@ -132,7 +132,7 @@ describe('hub/searchers/basics', function() {
     // for expiration, and I don't want to wait around, so instead we'll do
     // something fast that will fail loudly if the implementation changes out
     // from under us.
-   async function alterExpiration(branch, type, id, interval) {
+    async function alterExpiration(branch, type, id, interval) {
       let client = env.lookup(`plugin-client:${require.resolve('@cardstack/pgsearch/client')}`);
       let result = await client.query('update documents set expires = expires + $1 where branch=$2 and type=$3 and id=$4', [interval, branch, type, id]);
       if (result.rowCount !== 1) {
