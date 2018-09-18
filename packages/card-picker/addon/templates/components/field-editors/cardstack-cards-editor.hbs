@@ -1,16 +1,24 @@
-{{#if (get content field)}}
-  {{#each (get content field) as |card index|}}
-    <div>
-      Card {{index}} Type: {{cs-humanize (cs-model-type card)}}
-    </div>
-    <div>
-      Card {{index}} Id: {{get card 'id'}}
-    </div>
+{{#sortable-group onChange=(action "orderChanged") as |group|}}
+  {{#each (get content field) as |card|}}
+    {{#sortable-item model=card group=group spacing=15 handle=".drag-handle"}}
+      <div class="cards-editor--input-row">
+        {{#if enabled}}
+          <svg class="drag-handle" width="24" height="24" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+            <path d="M 20 9 L 4 9 L 4 11 L 20 11 L 20 9 Z M 4 15 L 20 15 L 20 13 L 4 13 L 4 15 Z M 4 17 h 16 v 2 h -16 v -2 Z" style="fill: rgb(170, 170, 170);"/>
+          </svg>
+        {{/if}}
+        <span>{{cs-humanize (cs-model-type card)}} (ID: {{get card 'id'}}) </span>
+        {{#if enabled}}
+          <button class="text-button" onclick={{action "deleteCard" card}}>
+            Delete
+          </button>
+        {{/if}}
+      </div>
+    {{/sortable-item}}
   {{/each}}
-{{else}}
-  No Card Selected
-{{/if}}
-
-{{#if enabled}}
-  <button onclick={{action 'addCard'}}>Add Card</button>
-{{/if}}
+{{/sortable-group}}
+{{#liquid-if enabled rules=animationRules growDuration=250}}
+  <div class="cards-editor--button-panel">
+    <button onclick={{action "addCard"}}>Add Card</button>
+  </div>
+{{/liquid-if}}
