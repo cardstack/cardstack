@@ -1,0 +1,16 @@
+{{#if (get content field)}}
+  {{#each (get content field) as |card index|}}
+    <div>
+      Card {{index}} Type: {{cs-humanize (cs-model-type card)}}
+    </div>
+    <div>
+      Card {{index}} Id: {{get card 'id'}}
+    </div>
+  {{/each}}
+{{else}}
+  No Card Selected
+{{/if}}
+
+{{#if enabled}}
+  <button onclick={{action 'addCard'}}>Add Card</button>
+{{/if}}
