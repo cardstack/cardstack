@@ -297,6 +297,10 @@ class Batch {
   // document stores a complete, rolled-up picture of which other
   // documents it references.
   async _invalidations(schema, branch, read) {
+    await this.client._iterateThroughRows(
+      'select id, type from documents where expires < now()', [], async({ id, type }) => {
+        this._touched[`${type}/${id}`] = this._touchCounter++;
+      });
     await this.client.query('delete from documents where expires < now()');
     await this.client.docsThatReference(branch, Object.keys(this._touched), async (doc, refs) => {
       let { type, id } = doc.data;
