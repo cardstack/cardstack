@@ -1,6 +1,6 @@
 <div class="{{concat field '-selector'}}">
   {{#power-select disabled=(not enabled)
-                  selected=(get model field)
+                  selected=(get content field)
                   options=options
                   onchange=(action "makeSelection")
                   as |option|}}
