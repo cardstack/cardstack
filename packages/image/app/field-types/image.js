@@ -1,8 +1,7 @@
 export function isEmpty(value) {
-  let hasImage = value && (value.base64);
-  return !hasImage;
+  return !value || value.isPlaceholder;
 }
 
 export function placeholder(/* humanizedFieldName */) {
-  return {};
+  return {isPlaceholder: true};
 }

@@ -8,11 +8,8 @@ export default Component.extend({
   disabled: not('enabled'),
 
   actions: {
-    updateImage(dataURL) {
-      let imageData = {
-        base64: dataURL
-      }
-      this.set(`content.${this.get('field')}`, imageData);
+    updateImage(image) {
+      this.set(`content.${this.get('field')}`, image);
       this.set('showUploader', false);
     }
   }

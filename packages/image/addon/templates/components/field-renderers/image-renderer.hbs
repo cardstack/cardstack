@@ -1,6 +1,6 @@
-{{#if value.base64}}
-  <img src={{value.base64}}>
-{{else}}
+{{#if value.isPlaceholder}}
   <div class="cardstack-image-placeholder">
   </div>
+{{else if value}}
+  <img src={{cs-image-url value}} alt="">
 {{/if}}

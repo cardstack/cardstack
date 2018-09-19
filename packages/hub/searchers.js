@@ -91,6 +91,27 @@ class Searchers {
     return authorizedResult;
   }
 
+  async getBinary(session, branch, type, id) {
+    // look up authorized result to check read is authorized by going through
+    // the default auth stack for the JSON representation. Error will be thrown
+    // if authorization is not correct.
+    await this.get(session, branch, type, id);
+
+    let index = 0;
+    let sources = await this._lookupSources();
+    let sessionOrEveryone = session || Session.EVERYONE;
+    let next = async () => {
+      let source = sources[index++];
+      if (source && (typeof source.searcher.getBinary === 'function')) {
+        let response = await source.searcher.getBinary(sessionOrEveryone, branch, type, id, next);
+        return response;
+      }
+    };
+    let result = await next();
+
+    return result;
+  }
+
   async getFromControllingBranch(session, type, id) {
     if (arguments.length < 3) {
       throw new Error(`session is now a required argument to searchers.getFromControllingBranch`);
