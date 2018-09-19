@@ -33,7 +33,11 @@
           {{/with}}
         {{/each}}
       {{else}}
-        {{cs-field-editor content=fieldMark.model.content field=fieldMark.model.name enabled=editingEnabled}}
+        {{#if fieldMark.model.alternatives}}
+          {{cs-alternatives-editor content=fieldMark.model.content alternatives=fieldMark.model.alternatives enabled=editingEnabled}}
+        {{else}}
+          {{cs-field-editor content=fieldMark.model.content field=fieldMark.model.name enabled=editingEnabled}}
+        {{/if}}
       {{/if}}
       </div>
     {{/cs-collapsible-section}}

@@ -1,4 +1,19 @@
 <div class="page-flavor">{{cs-field content "flavor"}}</div>
+
 {{#cs-field-group content name="size" fields="size,sizeUnits" as |s|}}
   <div class="page-size">{{s.size}} {{s.sizeUnits}}</div>
 {{/cs-field-group}}
+
+{{#cs-field-alternatives content name="extra-info" caption="Extra information" as |rt|}}
+  {{#rt.alternative name='serial-code' fields="serialCode" as |info|}}
+    <div>
+      <strong>Serial code:</strong> {{info.serialCode}}
+    </div>
+  {{/rt.alternative}}
+  {{#rt.alternative name='details' fields="price,expirationDate" as |info|}}
+    <div>
+      <strong>Price:</strong> {{info.price}} <br>
+      <strong>Expiration Date:</strong>{{info.expirationDate}}
+    </div>
+  {{/rt.alternative}}
+{{/cs-field-alternatives}}

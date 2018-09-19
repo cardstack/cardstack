@@ -6,9 +6,19 @@
   <p>
     {{cs-field content 'publishedAt'}}
   </p>
-  <p>
+  {{!-- <p>
     {{#cs-field-group content name="reading-time" caption="Underestimated Read Time" fields="readingTimeValue,readingTimeUnits" as |rt|}}
       <div>{{rt.readingTimeValue}} {{rt.readingTimeUnits}}</div>
     {{/cs-field-group}}
+  </p> --}}
+  <p>
+    {{#cs-field-alternatives content name="reading-time" caption="Underestimated Read Time" as |rt|}}
+      {{#rt.alternative name='first-alt' fields="readingTimeValue" as |alt1|}}
+        <div>{{alt1.readingTimeValue}}</div>
+      {{/rt.alternative}}
+      {{#rt.alternative name='second-alt' fields="readingTimeUnits" as |alt1|}}
+        <div>{{alt1.readingTimeUnits}}</div>
+      {{/rt.alternative}}
+    {{/cs-field-alternatives}}
   </p>
 </div>
