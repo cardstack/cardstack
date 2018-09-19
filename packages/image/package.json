@@ -1,6 +1,6 @@
 {
   "name": "@cardstack/image",
-  "version": "0.9.0",
+  "version": "0.10.1",
   "description": "Image field plugin for cardstack",
   "keywords": [
     "ember-addon",
@@ -24,6 +24,7 @@
     "test": "ember try:each"
   },
   "dependencies": {
+    "@cardstack/plugin-utils": "^0.10.1",
     "ember-cli-babel": "^6.8.2",
     "ember-cli-htmlbars": "^2.0.1"
   },
@@ -53,7 +54,7 @@
     "loader.js": "^4.2.3"
   },
   "engines": {
-    "node": "^4.5 || 6.* || >= 7.*"
+    "node": ">= 8"
   },
   "ember-addon": {
     "configPath": "tests/dummy/config"

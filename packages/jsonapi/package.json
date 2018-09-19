@@ -22,8 +22,10 @@
     "@cardstack/di": "0.8.0",
     "@cardstack/logger": "^0.1.0",
     "@cardstack/plugin-utils": "0.10.1",
+    "async-busboy": "^0.7.0",
     "koa-json-body": "^5.3.0",
     "lodash": "^4.17.4",
+    "mime-match": "^1.0.2",
     "qs": "^6.4.0"
   },
   "scripts": {

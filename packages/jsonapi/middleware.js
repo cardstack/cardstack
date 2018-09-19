@@ -6,6 +6,8 @@ const log = require('@cardstack/logger')('cardstack/jsonapi');
 const { declareInjections } = require('@cardstack/di');
 const { URL } = require('url');
 const { withJsonErrorHandling } = Error;
+const asyncBusboy = require('async-busboy');
+const mimeMatch = require("mime-match");
 
 module.exports = declareInjections({
   searcher: 'hub:searchers',
@@ -55,6 +57,20 @@ function jsonapiMiddleware(searcher, writers, indexers, defaultBranch) {
       return;
     }
 
+    let handler = new Handler(searcher, writers, indexers, ctxt, options);
+
+    let contentType = ctxt.request.headers['content-type'];
+    let isMultipart = contentType && contentType.includes('multipart/form-data');
+
+    let [accepted] = ctxt.request.headers['accept'].split(";");
+    let types = accepted.split(",");
+    let isImage = types.some(t => mimeMatch(t, "image/*"));
+
+    if (isMultipart || isImage) {
+      return handler.runBinary();
+    }
+
+
     // This is here in case an earlier middleware needs to parse the
     // body before us. That's OK as long as they also set this flag to
     // warn us.
@@ -69,7 +85,6 @@ function jsonapiMiddleware(searcher, writers, indexers, defaultBranch) {
         }
       });
     }
-    let handler = new Handler(searcher, writers, indexers, ctxt, options);
     return handler.run();
   };
 }
@@ -109,21 +124,38 @@ class Handler {
   async run() {
     this.ctxt.response.set('Content-Type', 'application/vnd.api+json');
     await withJsonErrorHandling(this.ctxt, async () => {
-      let segments = this.ctxt.request.path.split('/').map(decodeURIComponent);
-      let kind;
-
-      if (segments.length < 3) {
-        kind = 'Collection';
-      } else {
-        kind = 'Individual';
-      }
-      let methodName = `handle${kind}${this.ctxt.request.method}`;
+     let [methodName, segments] = this.getBaseMethodNameAndSegments();
       log.debug("attempting to match method %s", methodName);
       let method = this[methodName];
       if (method) {
         await method.apply(this, segments.slice(1).filter(Boolean));
       }
     });
+  }
+
+  async runBinary() {
+    let [baseMethodName, segments] = this.getBaseMethodNameAndSegments();
+    let methodName = `${baseMethodName}Binary`;
+
+    log.debug("attempting to match method %s", methodName);
+    let method = this[methodName];
+    if (method) {
+      await method.apply(this, segments.slice(1));
+    }
+  }
+
+  getBaseMethodNameAndSegments() {
+    let segments = this.ctxt.request.path.split('/').map(decodeURIComponent);
+    let kind;
+
+    if (segments.length < 3) {
+      kind = 'Collection';
+    } else {
+      kind = 'Individual';
+    }
+    let methodName = `handle${kind}${this.ctxt.request.method}`;
+
+    return [methodName, segments];
   }
 
   async handleIndividualGET(type, id) {
@@ -133,6 +165,13 @@ class Handler {
       delete body.included;
     }
     this.ctxt.body = body;
+  }
+
+  async handleIndividualGETBinary(type, id) {
+    let json = await this.searcher.get(this.session, this.branch, type, id);
+    let buffer = await this.searcher.getBinary(this.session, this.branch, type, id);
+    this.ctxt.set('content-type', json.data.attributes['content-type']);
+    this.ctxt.body = buffer;
   }
 
   async handleIndividualPATCH(type, id) {
@@ -190,6 +229,20 @@ class Handler {
     }
     this.ctxt.set('location', origin + this.ctxt.request.path + '/' + record.data.id);
   }
+
+  async handleCollectionPOSTBinary(type) {
+    let { files } = await asyncBusboy(this.ctxt.req);
+
+    let record = await this.writers.createBinary(this.branch, this.session, type, files[0]);
+    this.ctxt.body = record;
+    this.ctxt.status = 201;
+    let origin = this.ctxt.request.origin;
+    if (this.prefix) {
+      origin += '/' + this.prefix;
+    }
+    this.ctxt.set('location', origin + this.ctxt.request.path + '/' + record.data.id);
+  }
+
 
   _mandatoryBodyData() {
     let data;

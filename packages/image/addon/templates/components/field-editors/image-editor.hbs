@@ -18,6 +18,9 @@
                send=(hash
                       content=(component "field-editors/image-upload-modal"
                         updateImage=(action 'updateImage')
-                        cancel=(action (mut showUploader) false))
+                        cancel=(action (mut showUploader) false)
+                        content=content
+                        field=field
+                      )
                       outsideClick=(action (mut showUploader) false))}}
 {{/if}}
