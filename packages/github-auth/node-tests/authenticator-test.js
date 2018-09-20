@@ -44,8 +44,8 @@ describe('github-auth/authenticator', function() {
     await destroyDefaultEnvironment(env);
   }
 
-  before(setup);
-  after(teardown);
+  beforeEach(setup);
+  afterEach(teardown);
 
   it('returns token for an authenticated github session', async function() {
     nock('https://github.com')
@@ -56,7 +56,7 @@ describe('github-auth/authenticator', function() {
       .get('/user')
       .reply(function() {
         return [ 200, githubUser, {
-          'Cache-Control': 'private, max-age=60, s-maxage=60'
+          'cache-control': 'private, max-age=60, s-maxage=60'
         }];
       });
 
@@ -64,7 +64,7 @@ describe('github-auth/authenticator', function() {
       .get('/users/habdelra')
       .reply(function() {
         return [ 200, githubUsersResponse, {
-          'Cache-Control': 'private, max-age=60, s-maxage=60'
+          'cache-control': 'private, max-age=60, s-maxage=60'
         }];
       });
 
