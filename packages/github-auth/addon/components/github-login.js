@@ -1,9 +1,9 @@
 import { inject as service } from '@ember/service';
 import Component from '@ember/component';
-import { getOwner } from '@ember/application';
 import layout from '../templates/components/github-login';
 import { configure, getConfiguration } from 'torii/configuration';
 import { task } from 'ember-concurrency';
+import { clientId } from '@cardstack/github-auth/environment';
 
 export default Component.extend({
   layout,
@@ -17,15 +17,16 @@ export default Component.extend({
   // different github oauth2 apps at once.
   source: 'github',
 
-  fetchConfig: task(function * () {
-    let { clientId } = yield getOwner(this).lookup('authenticator:cardstack').fetchConfig(this.get('source'));
+  init() {
+    this._super();
+
     extendToriiProviders({
       'github-oauth2': {
         apiKey: clientId,
         scope: 'user:email'
       }
     });
-  }).observes('source').on('init'),
+  },
 
   login: task(function * () {
     // this should wait for fetchConfig to be done, but if we block
