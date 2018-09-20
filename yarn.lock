@@ -2,6 +2,23 @@
 # yarn lockfile v1
 
 
+"@cardstack/authentication@0.10.5":
+  version "0.10.5"
+  resolved "https://registry.yarnpkg.com/@cardstack/authentication/-/authentication-0.10.5.tgz#e898878d09929a83938b940128be6d4ec10e262d"
+  dependencies:
+    "@cardstack/di" "0.8.0"
+    "@cardstack/logger" "^0.1.0"
+    "@cardstack/plugin-utils" "0.10.1"
+    ember-cli-babel "^6.8.2"
+    ember-cli-htmlbars "^2.0.1"
+    ember-css-url "0.2.0"
+    ember-fetch "^5.1.1"
+    ember-inflector "^2.1.0"
+    ember-simple-auth "^1.2.2"
+    koa-better-route "^0.1.0"
+    koa-compose "^3.2.1"
+    koa-json-body "^5.3.0"
+
 "@cardstack/logger@^0.1.0":
   version "0.1.0"
   resolved "https://registry.yarnpkg.com/@cardstack/logger/-/logger-0.1.0.tgz#50107d5738079f10913158f86bdcec7c7242c784"
@@ -4127,6 +4144,13 @@ ember-inject-optional@^0.1.0:
   resolved "https://registry.yarnpkg.com/ember-inject-optional/-/ember-inject-optional-0.1.0.tgz#1a803eb6d6941219e78dcb4434a4b5434bc6bfbc"
   dependencies:
     ember-cli-babel "^6.3.0"
+
+ember-let@^0.7.1:
+  version "0.7.1"
+  resolved "https://registry.yarnpkg.com/ember-let/-/ember-let-0.7.1.tgz#5faedab2c334e070dcda64eb5fce2d5dc69256e1"
+  dependencies:
+    ember-cli-babel "^6.6.0"
+    ember-cli-version-checker "^2.1.0"
 
 ember-load-initializers@^1.0.0:
   version "1.0.0"

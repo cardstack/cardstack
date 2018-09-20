@@ -36,7 +36,9 @@ const models = [
           { type: 'fields', id: 'caption' },
           { type: 'fields', id: 'searchable' },
           { type: 'fields', id: 'editor-component'},
-          { type: 'fields', id: 'inline-editor-component'}
+          { type: 'fields', id: 'editor-options'},
+          { type: 'fields', id: 'inline-editor-component'},
+          { type: 'fields', id: 'inline-editor-options'}
         ]
       }
     }
@@ -460,9 +462,23 @@ const models = [
   },
   {
     type: 'fields',
+    id: 'editor-options',
+    attributes: {
+      'field-type': '@cardstack/core-types::object'
+    }
+  },
+  {
+    type: 'fields',
     id: 'inline-editor-component',
     attributes: {
       'field-type': '@cardstack/core-types::string'
+    }
+  },
+  {
+    type: 'fields',
+    id: 'inline-editor-options',
+    attributes: {
+      'field-type': '@cardstack/core-types::object'
     }
   },
   {

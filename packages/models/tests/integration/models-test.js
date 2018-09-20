@@ -15,7 +15,9 @@ module('Integration | Models', function(hooks) {
             fieldType: '@cardstack/core-types::string',
             caption: 'Fancy Title',
             editorComponent: 'fancy-title-editor',
-            inlineEditorComponent: 'fancy-title-inline-editor'
+            inlineEditorComponent: 'fancy-title-inline-editor',
+            editorOptions: { style: 'extra-fancy' },
+            inlineEditorOptions: { style: 'extra-fancy-inline' }
           }),
           factory.addResource('fields', 'author').withAttributes({
             fieldType: '@cardstack/core-types::belongs-to'
@@ -199,6 +201,16 @@ module('Integration | Models', function(hooks) {
   test('it reflects configured inline editor', async function(assert) {
     let model = await run(() => this.store.createRecord('post'));
     assert.equal(model.constructor.metaForProperty('title').options.inlineEditorComponent, 'fancy-title-inline-editor');
+  });
+
+  test('it reflects configured editor options', async function(assert) {
+    let model = await run(() => this.store.createRecord('post'));
+    assert.deepEqual(model.constructor.metaForProperty('title').options.editorOptions, { style: 'extra-fancy' });
+  });
+
+  test('it reflects configured inline editor options', async function(assert) {
+    let model = await run(() => this.store.createRecord('post'));
+    assert.deepEqual(model.constructor.metaForProperty('title').options.inlineEditorOptions, { style: 'extra-fancy-inline' });
   });
 
   // Ember runloop.
