@@ -60,7 +60,10 @@
     "eslint": "4.9.0",
     "eslint-plugin-ember": "^5.0.0",
     "eslint-plugin-node": "^5.2.1",
-    "loader.js": "^4.2.3"
+    "koa": "2",
+    "loader.js": "^4.2.3",
+    "nock": "^10.0.0",
+    "supertest": "^2.0.1"
   },
   "engines": {
     "node": ">= 8"

@@ -1,0 +1,20 @@
+{
+  "name": "github-authenticator",
+  "keywords": ["cardstack-plugin"],
+  "cardstack-plugin": {
+    "api-version": 1,
+    "in-repo-plugins": [
+      "../.."
+    ]
+  },
+  "dependencies": {
+    "@cardstack/authentication": "*",
+    "@cardstack/plugin-utils": "*"
+  },
+  "devDependencies": {
+    "@cardstack/test-support": "*"
+  },
+  "engines": {
+    "node": ">= 8"
+  }
+}

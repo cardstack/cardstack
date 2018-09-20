@@ -13,6 +13,18 @@ module.exports = [
   },
   {
     type: 'grants',
+    id: 'login',
+    attributes: {
+      'may-login': true
+    },
+    relationships: {
+      who:{
+        data: [{ type: 'groups', id: 'everyone' }]
+      }
+    }
+  },
+  {
+    type: 'grants',
     id: 'see-myself',
     attributes: {
       'may-read-resource': true,
