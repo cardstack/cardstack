@@ -11,12 +11,10 @@ export default Component.extend({
     pickCard() {
       this.tools.pickCard().then((card) => {
         this.set(`content.${this.get('field')}`, card);
-        this.set('content.lastUpdated', Date.now().toString())
       })
     },
     deleteCard() {
       this.set(`content.${this.get('field')}`, null);
-      this.set('content.lastUpdated', Date.now().toString())
     }
   }
 });

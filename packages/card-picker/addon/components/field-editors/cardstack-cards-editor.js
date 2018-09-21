@@ -11,16 +11,13 @@ export default Component.extend({
     addCard() {
       this.tools.pickCard().then((card) => {
         this.get(`content.${this.get('field')}`).pushObject(card);
-        this.set('content.lastUpdated', Date.now().toString());
       })
     },
     orderChanged(rearrangedCards) {
       this.set(`content.${this.get('field')}`, rearrangedCards);
-      this.set('content.lastUpdated', Date.now().toString())
     },
     deleteCard(card) {
       this.get(`content.${this.get('field')}`).removeObject(card);
-      this.set('content.lastUpdated', Date.now().toString())
     }
   }
 });
