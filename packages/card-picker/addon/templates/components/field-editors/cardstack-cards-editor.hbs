@@ -3,11 +3,20 @@
     {{#sortable-item model=card group=group spacing=15 handle=".drag-handle"}}
       <div class="cards-editor--input-row">
         {{#if enabled}}
-          <svg class="drag-handle" width="24" height="24" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-            <path d="M 20 9 L 4 9 L 4 11 L 20 11 L 20 9 Z M 4 15 L 20 15 L 20 13 L 4 13 L 4 15 Z M 4 17 h 16 v 2 h -16 v -2 Z" style="fill: rgb(170, 170, 170);"/>
+          <svg
+            class="drag-handle"
+            width="24"
+            height="24"
+            viewBox="0 0 24 24"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <path
+              d="M 20 9 L 4 9 L 4 11 L 20 11 L 20 9 Z M 4 15 L 20 15 L 20 13 L 4 13 L 4 15 Z M 4 17 h 16 v 2 h -16 v -2 Z"
+              fill="rgb(170, 170, 170);"
+            />
           </svg>
         {{/if}}
-        <span>{{cs-humanize (cs-model-type card)}} (ID: {{get card 'id'}}) </span>
+        <span>{{cs-humanize (cs-model-type card)}} (ID: {{get card "id"}}) </span>
         {{#if enabled}}
           <button class="text-button" onclick={{action "deleteCard" card}}>
             Delete
