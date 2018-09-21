@@ -5,7 +5,11 @@ const {
 } = require('@cardstack/test-support/env');
 const JSONAPIFactory = require('@cardstack/test-support/jsonapi-factory');
 const {
-  githubUsersResponse
+  githubUsersResponse,
+  githubAdminPermissions,
+  githubWritePermissions,
+  githubReadPermissions,
+  githubNoPermissions
 } = require('./fixtures/github-responses');
 
 describe('github-auth/searcher', function() {
@@ -22,6 +26,202 @@ describe('github-auth/searcher', function() {
   async function teardown() {
     await destroyDefaultEnvironment(env);
   }
+
+  describe('github no permissions configured', function() {
+    async function setup() {
+      let factory = new JSONAPIFactory();
+
+      factory.addResource('data-sources', 'github').withAttributes({
+        sourceType: '@cardstack/github-auth',
+        params: {
+          'client-id': 'mock-github-client-id',
+          'client-secret': 'mock-github-client-secret',
+          token: 'mock-github-token',
+        }
+      });
+
+      env = await createDefaultEnvironment(`${__dirname}/github-authenticator`, factory.getModels());
+      searchers = env.lookup('hub:searchers');
+    }
+
+    beforeEach(setup);
+    afterEach(teardown);
+
+    it('does not set permissions for user when no permissions configured', async function() {
+      let userMock = Object.assign({}, githubUsersResponse);
+      let { login:id } = userMock;
+
+      nock('https://api.github.com')
+        .get(`/users/${id}`)
+        .reply(200, userMock);
+
+      let user = await searchers.get(env.session, 'master', 'github-users', id);
+      expect(user.data.attributes.permissions.length).to.equal(0);
+    });
+  });
+
+  describe('github user permissions', function() {
+    async function setup() {
+      let factory = new JSONAPIFactory();
+
+      factory.addResource('data-sources', 'github').withAttributes({
+        sourceType: '@cardstack/github-auth',
+        params: {
+          'client-id': 'mock-github-client-id',
+          'client-secret': 'mock-github-client-secret',
+          token: 'mock-github-token',
+          permissions: [
+            { repo: 'cardstack/repo1', permission: 'read' },
+            { repo: 'cardstack/repo1', permission: 'write' },
+            { repo: 'cardstack/repo1', permission: 'admin' },
+
+            { repo: 'cardstack/repo2', permission: 'read' },
+
+            { repo: 'cardstack/repo3', permission: 'write' },
+          ]
+        }
+      });
+
+      env = await createDefaultEnvironment(`${__dirname}/github-authenticator`, factory.getModels());
+      searchers = env.lookup('hub:searchers');
+    }
+
+    beforeEach(setup);
+    afterEach(teardown);
+
+    it('does not set permissions for user with no access to repo', async function() {
+      let userMock = Object.assign({}, githubUsersResponse);
+      let permissionMock = Object.assign({}, githubNoPermissions);
+      let { login:id } = userMock;
+
+      nock('https://api.github.com')
+        .get(`/users/${id}`)
+        .reply(200, userMock);
+
+      nock('https://api.github.com')
+        .get(`/repos/cardstack/repo1/collaborators/${id}/permission`)
+        .reply(200, permissionMock);
+
+      nock('https://api.github.com')
+        .get(`/repos/cardstack/repo2/collaborators/${id}/permission`)
+        .reply(200, permissionMock);
+
+      nock('https://api.github.com')
+        .get(`/repos/cardstack/repo3/collaborators/${id}/permission`)
+        .reply(200, permissionMock);
+
+      let user = await searchers.get(env.session, 'master', 'github-users', id);
+      expect(user.data.attributes.permissions.length).to.equal(0);
+    });
+
+    it('can set permissions for user with read access on repo', async function() {
+      let userMock = Object.assign({}, githubUsersResponse);
+      let permissionMock = Object.assign({}, githubReadPermissions);
+      let { login:id } = userMock;
+
+      nock('https://api.github.com')
+        .get(`/users/${id}`)
+        .reply(200, userMock);
+
+      nock('https://api.github.com')
+        .get(`/repos/cardstack/repo1/collaborators/${id}/permission`)
+        .reply(200, permissionMock);
+
+      nock('https://api.github.com')
+        .get(`/repos/cardstack/repo2/collaborators/${id}/permission`)
+        .reply(200, permissionMock);
+
+      nock('https://api.github.com')
+        .get(`/repos/cardstack/repo3/collaborators/${id}/permission`)
+        .reply(200, permissionMock);
+
+      let user = await searchers.get(env.session, 'master', 'github-users', id);
+
+      expect(user.data.attributes.permissions).to.include({ repo: 'cardstack/repo1', permission: 'read' });
+      expect(user.data.attributes.permissions).to.not.include({ repo: 'cardstack/repo1', permission: 'write' });
+      expect(user.data.attributes.permissions).to.not.include({ repo: 'cardstack/repo1', permission: 'admin' });
+
+      expect(user.data.attributes.permissions).to.include({ repo: 'cardstack/repo2', permission: 'read' });
+      expect(user.data.attributes.permissions).to.not.include({ repo: 'cardstack/repo2', permission: 'write' });
+      expect(user.data.attributes.permissions).to.not.include({ repo: 'cardstack/repo2', permission: 'admin' });
+
+      expect(user.data.attributes.permissions).to.not.include({ repo: 'cardstack/repo3', permission: 'read' });
+      expect(user.data.attributes.permissions).to.not.include({ repo: 'cardstack/repo3', permission: 'write' });
+      expect(user.data.attributes.permissions).to.not.include({ repo: 'cardstack/repo3', permission: 'admin' });
+    });
+
+    it('can set permissions for user with write access on repo', async function() {
+      let userMock = Object.assign({}, githubUsersResponse);
+      let permissionMock = Object.assign({}, githubWritePermissions);
+      let { login:id } = userMock;
+
+      nock('https://api.github.com')
+        .get(`/users/${id}`)
+        .reply(200, userMock);
+
+      nock('https://api.github.com')
+        .get(`/repos/cardstack/repo1/collaborators/${id}/permission`)
+        .reply(200, permissionMock);
+
+      nock('https://api.github.com')
+        .get(`/repos/cardstack/repo2/collaborators/${id}/permission`)
+        .reply(200, permissionMock);
+
+      nock('https://api.github.com')
+        .get(`/repos/cardstack/repo3/collaborators/${id}/permission`)
+        .reply(200, permissionMock);
+
+      let user = await searchers.get(env.session, 'master', 'github-users', id);
+
+      expect(user.data.attributes.permissions).to.include({ repo: 'cardstack/repo1', permission: 'read' });
+      expect(user.data.attributes.permissions).to.include({ repo: 'cardstack/repo1', permission: 'write' });
+      expect(user.data.attributes.permissions).to.not.include({ repo: 'cardstack/repo1', permission: 'admin' });
+
+      expect(user.data.attributes.permissions).to.include({ repo: 'cardstack/repo2', permission: 'read' });
+      expect(user.data.attributes.permissions).to.not.include({ repo: 'cardstack/repo2', permission: 'write' });
+      expect(user.data.attributes.permissions).to.not.include({ repo: 'cardstack/repo2', permission: 'admin' });
+
+      expect(user.data.attributes.permissions).to.not.include({ repo: 'cardstack/repo3', permission: 'read' });
+      expect(user.data.attributes.permissions).to.include({ repo: 'cardstack/repo3', permission: 'write' });
+      expect(user.data.attributes.permissions).to.not.include({ repo: 'cardstack/repo3', permission: 'admin' });
+    });
+
+    it('can set permissions for user with admin access on repo', async function() {
+      let userMock = Object.assign({}, githubUsersResponse);
+      let permissionMock = Object.assign({}, githubAdminPermissions);
+      let { login:id } = userMock;
+
+      nock('https://api.github.com')
+        .get(`/users/${id}`)
+        .reply(200, userMock);
+
+      nock('https://api.github.com')
+        .get(`/repos/cardstack/repo1/collaborators/${id}/permission`)
+        .reply(200, permissionMock);
+
+      nock('https://api.github.com')
+        .get(`/repos/cardstack/repo2/collaborators/${id}/permission`)
+        .reply(200, permissionMock);
+
+      nock('https://api.github.com')
+        .get(`/repos/cardstack/repo3/collaborators/${id}/permission`)
+        .reply(200, permissionMock);
+
+      let user = await searchers.get(env.session, 'master', 'github-users', id);
+
+      expect(user.data.attributes.permissions).to.include({ repo: 'cardstack/repo1', permission: 'read' });
+      expect(user.data.attributes.permissions).to.include({ repo: 'cardstack/repo1', permission: 'write' });
+      expect(user.data.attributes.permissions).to.include({ repo: 'cardstack/repo1', permission: 'admin' });
+
+      expect(user.data.attributes.permissions).to.include({ repo: 'cardstack/repo2', permission: 'read' });
+      expect(user.data.attributes.permissions).to.not.include({ repo: 'cardstack/repo2', permission: 'write' });
+      expect(user.data.attributes.permissions).to.not.include({ repo: 'cardstack/repo2', permission: 'admin' });
+
+      expect(user.data.attributes.permissions).to.not.include({ repo: 'cardstack/repo3', permission: 'read' });
+      expect(user.data.attributes.permissions).to.include({ repo: 'cardstack/repo3', permission: 'write' });
+      expect(user.data.attributes.permissions).to.not.include({ repo: 'cardstack/repo3', permission: 'admin' });
+    });
+  });
 
   describe('default cache control', function() {
     async function setup() {

@@ -79,7 +79,8 @@ module.exports = class {
         attributes: {
           name: user.name,
           email: user.email,
-          "avatar-url": user.avatar_url
+          "avatar-url": user.avatar_url,
+          permissions: user.permissions || []
         }
       }
     };
