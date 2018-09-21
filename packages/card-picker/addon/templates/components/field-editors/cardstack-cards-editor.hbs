@@ -18,7 +18,7 @@
         {{/if}}
         <span>{{cs-humanize (cs-model-type card)}} (ID: {{get card "id"}}) </span>
         {{#if enabled}}
-          <button class="text-button" onclick={{action "deleteCard" card}}>
+          <button data-test-delete-card class="text-button" onclick={{action "deleteCard" card}}>
             Delete
           </button>
         {{/if}}
@@ -26,8 +26,10 @@
     {{/sortable-item}}
   {{/each}}
 {{/sortable-group}}
-{{#liquid-if enabled rules=animationRules growDuration=250}}
+
+{{!-- TODO: replace these with liquid-if when we fix jQuery problem --}}
+{{#if enabled rules=animationRules growDuration=250}}
   <div class="cards-editor--button-panel">
-    <button onclick={{action "addCard"}}>Add Card</button>
+    <button data-test-add-card onclick={{action "addCard"}}>Add Card</button>
   </div>
-{{/liquid-if}}
+{{/if}}
