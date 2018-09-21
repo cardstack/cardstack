@@ -2,7 +2,11 @@
   <div class="cards-editor--input-row">
     <span>{{cs-humanize (cs-model-type (get content field))}} (ID: {{get (get content field) "id"}}) </span>
     {{#if enabled}}
-      <button data-test-delete-card class="text-button" onclick={{action "deleteCard"}}>
+      <button
+        data-test-delete-card
+        class="text-button"
+        onclick={{action "deleteCard"}}
+      >
         Delete
       </button>
     {{/if}}

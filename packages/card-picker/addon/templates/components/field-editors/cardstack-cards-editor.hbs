@@ -18,7 +18,11 @@
         {{/if}}
         <span>{{cs-humanize (cs-model-type card)}} (ID: {{get card "id"}}) </span>
         {{#if enabled}}
-          <button data-test-delete-card class="text-button" onclick={{action "deleteCard" card}}>
+          <button
+            data-test-delete-card
+            class="text-button"
+            onclick={{action "deleteCard" card}}
+          >
             Delete
           </button>
         {{/if}}
