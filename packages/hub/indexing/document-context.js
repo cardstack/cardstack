@@ -21,6 +21,7 @@ module.exports = class DocumentContext {
     this.includePaths = includePaths ? includePaths.map(part => part ? part.split('.') : null).filter(i => Boolean(i)) : [];
     this._read = read;
     this._realms = [];
+    this._pendingReads = [];
     this.cache = {};
     this.isCollection = upstreamDoc && upstreamDoc.data && Array.isArray(upstreamDoc.data);
     this.suppliedIncluded = upstreamDoc && upstreamDoc.included;
@@ -85,9 +86,17 @@ module.exports = class DocumentContext {
       return await cached;
     }
 
-    this.cache[key] = this._read(type, id);
+    // Remove this trap after we have figured out the root cause of the DocumentContext.read out-of-control recursion
+    if (this._pendingReads.includes(key)) {
+      throw new Error(`Cycle encountered in DocumentContext.read for ${this.type}/${this.id}. Pending resource reads are ${JSON.stringify(this._pendingReads)}`);
+    }
+    this._pendingReads.push(key);
 
-    return await this.cache[key];
+    this.cache[key] = this._read(type, id);
+    let resource = await this.cache[key];
+
+    this._pendingReads = this._pendingReads.filter(i => i !== key);
+    return resource;
   }
 
   // TODO come up with a better way to cache (use Model)

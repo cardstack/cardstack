@@ -123,14 +123,16 @@ class BranchUpdate {
   }
 
   async read(type, id) {
-    let doc;
+    let resource;
     try {
-      doc = await this.searchers.get(Session.INTERNAL_PRIVILEGED, this.branch, type, id);
+      resource = (await this.searchers._getResourceAndMeta(Session.INTERNAL_PRIVILEGED, this.branch, type, id)).resource;
     } catch (err) {
       if (err.status !== 404) { throw err; }
     }
 
-    return doc;
+    if (resource) {
+      return resource;
+    }
   }
 
   async add(type, id, doc, sourceId, nonce) {
@@ -143,12 +145,7 @@ class BranchUpdate {
       generation: nonce,
       upstreamDoc: doc,
       branch: this.branch,
-      read: async (type, id) => {
-        let doc = await this.read(type, id);
-        if (doc) {
-          return doc.data;
-        }
-      }
+      read: this.read
     });
 
     let searchDoc = await context.searchDoc();
@@ -171,12 +168,7 @@ class BranchUpdate {
       type,
       id,
       branch: this.branch,
-      read: async (type, id) => {
-        let doc = await this.read(type, id);
-        if (doc) {
-          return doc.data;
-        }
-      }
+      read: this.read
     });
 
     await this._batch.deleteDocument(context);
