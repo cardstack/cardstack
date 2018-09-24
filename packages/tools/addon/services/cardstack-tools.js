@@ -35,27 +35,20 @@ export default Service.extend({
   branch: alias('_activeItemMeta.branch'),
 
   activeFields: computed('activeContentItem', 'fields', function() {
+    let store = getOwner(this).lookup('service:store');
     let item = this.get('activeContentItem');
+    let activeItemModel = item.model;
+    let owned = ownedRelatedRecords(store, [item.model]);
     if (item) {
       return this.get('fields').filter(f => {
-        let activeItemModel = item.model;
-        let activeItemClass = activeItemModel.constructor;
         let fieldModel = f.model.content;
-        let fieldClass = fieldModel.constructor;
         if (fieldModel === activeItemModel) {
           return true;
         }
-        let isOwnedField = false;
-        activeItemClass.relationships.forEach(([ relationshipDefinition ]) => {
-          let { meta } = relationshipDefinition;
-          let { owned } = meta.options;
-          if (owned) {
-            if (meta.type === fieldClass.modelName) {
-              isOwnedField = true;
-            }
-          }
-        });
-        return isOwnedField;
+        if (owned.includes(fieldModel)) {
+          return true;
+        }
+        return false;
       });
     } else {
       return [];
@@ -219,3 +212,23 @@ export default Service.extend({
   }
 
 });
+
+function ownedRelatedRecords(store, records, out = []) {
+  let [record, ...rest] = records;
+  if (!record) {
+    return out;
+  }
+
+  let recordClass = record.constructor;
+  recordClass.relationships.forEach(([ relationshipDefinition ]) => {
+    let { meta } = relationshipDefinition;
+    let { owned } = meta.options;
+    if (owned) {
+      let relatedRecords = record.get(meta.name).toArray();
+      rest = rest.concat(relatedRecords);
+      out = out.concat(relatedRecords);
+    }
+  });
+  return ownedRelatedRecords(store, rest, out);
+}
+
