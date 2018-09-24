@@ -82,7 +82,9 @@ const {
   Repository,
   Reference,
   Branch,
-  Commit
+  Commit,
+  Clone,
+  Cred,
 } = require('@cardstack/nodegit');
 
 const Change = require("./change");
@@ -94,11 +96,12 @@ const log = require('@cardstack/logger')('cardstack/git-indexer');
 module.exports = class Indexer {
   static create(params) { return new this(params); }
 
-  constructor({ repo, basePath, branchPrefix }) {
+  constructor({ repo, basePath, branchPrefix, remote }) {
     this.repoPath = repo;
     this.branchPrefix = branchPrefix || "";
     this.basePath = basePath ? basePath.split('/') : [];
     this.repo = null;
+    this.remote = remote;
   }
 
 
@@ -107,7 +110,23 @@ module.exports = class Indexer {
       try {
         this.repo = await Repository.open(this.repoPath);
       } catch (e) {
-        if (/Failed to resolve path/i.test(e.message)) {
+        if (/could not find repository from/i.test(e.message)) {
+          if (this.remote) {
+            this.repo = await Clone(this.remote.url, this.repoPath, {
+              fetchOpts: {
+                callbacks: {
+                  credentials: (url, userName) => {
+                    if (this.remote.privateKey) {
+                      return Cred.sshKeyMemoryNew(userName, this.remote.publicKey || '', this.remote.privateKey, this.remote.passphrase || '');
+                    }
+                    return Cred.sshKeyFromAgent(userName);
+                  }
+                }
+              }
+            });
+            return;
+          }
+
           let change = await Change.createInitial(this.repoPath, 'master');
           this.repo = change.repo;
 
