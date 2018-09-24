@@ -86,15 +86,15 @@ class EthereumEventIndexer {
 
   _read(branch) {
     return async (type, id) => {
-      let result;
+      let resource;
       try {
-        result = await this.searchers.get(Session.INTERNAL_PRIVILEGED, branch, type, id);
+        resource = (await this.searchers._getResourceAndMeta(Session.INTERNAL_PRIVILEGED, branch, type, id)).resource;
       } catch (err) {
         if (err.status !== 404) { throw err; }
       }
 
-      if (result && result.data) {
-        return result.data;
+      if (resource) {
+        return resource;
       }
     };
   }
