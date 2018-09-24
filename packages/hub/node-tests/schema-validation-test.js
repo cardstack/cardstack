@@ -34,6 +34,12 @@ describe('schema/validation', function() {
     let titleField = factory.addResource('fields', 'title')
         .withAttributes({ fieldType: '@cardstack/core-types::string' });
 
+    let coverImageField = factory.addResource('fields', 'cover-image')
+      .withAttributes({ fieldType: '@cardstack/core-types::string' });
+
+    let coverVideoField = factory.addResource('fields', 'cover-video')
+        .withAttributes({ fieldType: '@cardstack/core-types::string' });
+
     // A wide-open grant, because we're not testing authorization here
     // (that is covered in schema-auth-test.js).
     factory.addResource('grants').withRelated('who', { type: 'groups', id: 'everyone' }).withAttributes({
@@ -54,6 +60,20 @@ describe('schema/validation', function() {
         factory.addResource('input-assignments')
           .withAttributes({ inputName: 'target' })
           .withRelated('field', titleField)
+      ])
+      .withRelated('required-content-types', [ articleType ]);
+    
+    factory.addResource('constraints')
+      .withAttributes({
+        constraintType: '@cardstack/core-types::mutually-exclusive'
+      })
+      .withRelated('input-assignments', [
+        factory.addResource('input-assignments')
+          .withAttributes({ inputName: 'target' })
+          .withRelated('field', coverImageField),
+        factory.addResource('input-assignments')
+          .withAttributes({ inputName: 'alternative' })
+          .withRelated('field', coverVideoField)
       ])
       .withRelated('required-content-types', [ articleType ]);
 
@@ -77,6 +97,8 @@ describe('schema/validation', function() {
     articleType.withRelated('fields', [
       titleField,
       publishedDateField,
+      coverImageField,
+      coverVideoField,
       factory.addResource('fields', 'colors')
         .withAttributes({
           fieldType: '@cardstack/core-types::string-array'
@@ -284,6 +306,23 @@ describe('schema/validation', function() {
       }
     }));
     expect(errors).includes.something.with.property('detail', 'published-date must be present');
+  });
+
+  it.only("applies constraints to mutually exclusive fields", async function() {
+    let errors = await schema.validationErrors(create({
+      type: 'articles',
+      id: '1',
+      attributes: {
+        coverImage: 'some-image.png',
+        coverVideo: 'some-video.mp4'
+      }
+    }));
+    console.log(errors);
+    expect(errors).collectionContains({
+      detail: 'Only either cover-image or cover-video can have a value, not both.',
+      status: 400,
+      source: { pointer: '/data/attributes/title' }
+    });
   });
 
   it("does not run a constraint whose input has already failed format validation", async function() {
