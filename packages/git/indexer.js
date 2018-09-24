@@ -110,7 +110,7 @@ module.exports = class Indexer {
       try {
         this.repo = await Repository.open(this.repoPath);
       } catch (e) {
-        if (/could not find repository from/i.test(e.message)) {
+        if (/(could not find repository from|Failed to resolve path)/i.test(e.message)) {
           if (this.remote) {
             this.repo = await Clone(this.remote.url, this.repoPath, {
               fetchOpts: {
