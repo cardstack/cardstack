@@ -62,7 +62,7 @@ describe('schema/validation', function() {
           .withRelated('field', titleField)
       ])
       .withRelated('required-content-types', [ articleType ]);
-    
+
     factory.addResource('constraints')
       .withAttributes({
         constraintType: '@cardstack/core-types::mutually-exclusive'
@@ -313,15 +313,15 @@ describe('schema/validation', function() {
       type: 'articles',
       id: '1',
       attributes: {
-        coverImage: 'some-image.png',
-        coverVideo: 'some-video.mp4'
+        'cover-image': 'some-image.png',
+        'cover-video': 'some-video.mp4'
       }
     }));
-    console.log(errors);
+
     expect(errors).collectionContains({
       detail: 'Only either cover-image or cover-video can have a value, not both.',
       status: 400,
-      source: { pointer: '/data/attributes/title' }
+      source: { pointer: '/data/attributes/cover-video' }
     });
   });
 
