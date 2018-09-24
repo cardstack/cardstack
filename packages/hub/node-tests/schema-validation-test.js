@@ -77,6 +77,10 @@ describe('schema/validation', function() {
     articleType.withRelated('fields', [
       titleField,
       publishedDateField,
+      factory.addResource('fields', 'colors')
+        .withAttributes({
+          fieldType: '@cardstack/core-types::string-array'
+        }),
       factory.addResource('fields', 'primary-image')
         .withAttributes({
           fieldType: '@cardstack/core-types::belongs-to'
@@ -223,7 +227,8 @@ describe('schema/validation', function() {
       id: '1',
       attributes: {
         title: "hello world",
-        "published-date": "2013-02-08 09:30:26.123+07:00"
+        "published-date": "2013-02-08 09:30:26.123+07:00",
+        colors: ['red', 'green', 'blue']
       }
     }))).deep.equals([]);
   });
@@ -234,7 +239,8 @@ describe('schema/validation', function() {
       id: '1',
       attributes: {
         title: 21,
-        "published-date": "Not a date"
+        "published-date": "Not a date",
+        colors: 'Not a string array'
       }
     }));
     expect(errors).collectionContains({
@@ -245,6 +251,11 @@ describe('schema/validation', function() {
     expect(errors).collectionContains({
       detail: '"Not a date" is not a valid value for field "published-date"',
       source: { pointer: '/data/attributes/published-date' },
+      status: 400
+    });
+    expect(errors).collectionContains({
+      detail: '"Not a string array" is not a valid value for field "colors"',
+      source: { pointer: '/data/attributes/colors' },
       status: 400
     });
   });

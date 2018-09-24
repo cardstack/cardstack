@@ -1,26 +1,28 @@
 import Component from '@ember/component';
 import { inject as service } from '@ember/service';
+import { task } from 'ember-concurrency';
 import layout from '../../templates/components/field-editors/dropdown-choices-editor';
+import { get, set } from '@ember/object';
 
 export default Component.extend({
   layout,
   store: service(),
 
-  didReceiveAttrs() {
-    let field = this.get('field');
+  loadOptions: task(function*() {
+    let store = get(this, 'store');
+    let field = get(this, 'field');
 
-    return this.get('store').findAll(field).then((types) => {
-      if (!this.isDestroyed) {
-        this.set('options', types);
-      }
-    });
-  },
+    let options = yield store.findAll(field);
+
+    set(this, 'options', options);
+  }).on('init'),
 
   actions: {
     makeSelection(option) {
-      let field = this.get('field');
+      let field = get(this, 'field');
+      let content = get(this, 'content');
 
-      this.get('content').set(field, option);
+      set(content, field, option);
     }
   }
 });

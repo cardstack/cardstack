@@ -2,6 +2,7 @@
 /config/ember-try.js
 /dist
 /tests
+/node-tests
 /tmp
 **/.gitkeep
 .bowerrc

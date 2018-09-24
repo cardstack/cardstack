@@ -1,6 +1,6 @@
 {
   "name": "@cardstack/mobiledoc",
-  "version": "0.10.5",
+  "version": "0.10.10",
   "description": "Mobiledoc field plugin for cardstack",
   "keywords": [
     "ember-addon",
@@ -21,7 +21,9 @@
     "build": "ember build",
     "lint:js": "eslint ./*.js addon addon-test-support app config lib server test-support tests",
     "start": "ember serve",
-    "test": "ember try:each"
+    "test": "ember test && mocha ../test-support/bin/run.js",
+    "test-ember": "ember test",
+    "test-node": "mocha ../test-support/bin/run.js"
   },
   "dependencies": {
     "ember-cli-babel": "^6.8.2",
@@ -33,9 +35,12 @@
     "mobiledoc-text-renderer": "^0.3.2"
   },
   "devDependencies": {
+    "@cardstack/authentication": "0.10.5",
+    "@cardstack/ephemeral": "0.10.1",
     "@cardstack/eslint-config": "0.8.0",
-    "@cardstack/hub": "0.10.5",
-    "@cardstack/tools": "0.10.5",
+    "@cardstack/hub": "0.10.10",
+    "@cardstack/test-support": "0.10.10",
+    "@cardstack/tools": "0.10.10",
     "broccoli-asset-rev": "^2.4.5",
     "ember-cli": "^3.0.0",
     "ember-cli-dependency-checker": "^2.1.0",
@@ -63,7 +68,7 @@
     "qunit-dom": "^0.6.3"
   },
   "engines": {
-    "node": "^4.5 || 6.* || >= 7.*"
+    "node": ">= 8"
   },
   "ember-addon": {
     "configPath": "tests/dummy/config"

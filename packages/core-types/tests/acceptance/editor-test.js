@@ -29,6 +29,8 @@ module('Acceptance | field editors', async function(hooks) {
     await fillIn('.ember-text-field:nth-of-type(2)', '1998-01-01')
     await selectChoose('.feeling-selector', 'Sad');
 
+    assert.dom('.ember-power-select-selected-item').hasText('Sad');
+
     feeling = await model.get('feeling.title');
 
     assert.equal(model.get('name'), 'METAL Mario', 'metal mario is more metal');

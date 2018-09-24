@@ -25,7 +25,7 @@ export default class Fixtures {
     let models = this._factory.getModels();
 
     for (let [, model] of models.entries()) {
-      let url = `${hubURL}/api/${model.type}`;
+      let url = `${hubURL}/api/${encodeURIComponent(model.type)}`;
       let response = await fetch(url, {
         method: 'POST',
         headers: {
@@ -65,7 +65,7 @@ export default class Fixtures {
       let isLast = index === destructionList.length - 1;
 
       if (item.id) {
-        let response = await fetch(`${hubURL}/api/${item.type}/${item.id}`, {
+        let response = await fetch(`${hubURL}/api/${encodeURIComponent(item.type)}/${encodeURIComponent(item.id)}`, {
           method: 'GET',
           headers: { authorization: `Bearer ${ciSessionId}` }
         });
@@ -75,7 +75,7 @@ export default class Fixtures {
         let { data:model } = await response.json();
         await this._deleteModel(model, isLast);
       } else {
-        let response = await fetch(`${hubURL}/api/${item.type}`, {
+        let response = await fetch(`${hubURL}/api/${encodeURIComponent(item.type)}`, {
           method: 'GET',
           headers: { authorization: `Bearer ${ciSessionId}` }
         });
@@ -91,12 +91,14 @@ export default class Fixtures {
   }
 
   async _deleteModel(model) {
+    if (model.type === 'user-realms') { return; }
+
     let version = model.meta && model.meta.version;
     let headers = { authorization: `Bearer ${ciSessionId}` };
     if (version) {
       headers["If-Match"] = version;
     }
-    let url = `${hubURL}/api/${model.type}/${model.id}`;
+    let url = `${hubURL}/api/${encodeURIComponent(model.type)}/${encodeURIComponent(model.id)}`;
     await fetch(url, {
       method: 'DELETE',
       headers

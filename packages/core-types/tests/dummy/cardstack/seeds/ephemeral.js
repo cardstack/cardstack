@@ -5,6 +5,11 @@ function initialModels() {
   let initial = new JSONAPIFactory();
 
   initial.addResource('content-types', 'drivers')
+  .withAttributes({
+    defaultIncludes: [
+      'feeling'
+    ]
+  })
   .withRelated('fields', [
     initial.addResource('fields', 'name').withAttributes({
       fieldType: '@cardstack/core-types::string'

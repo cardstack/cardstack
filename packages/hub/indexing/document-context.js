@@ -1,5 +1,5 @@
 const authLog = require('@cardstack/logger')('cardstack/auth');
-const log = require('@cardstack/logger')('cardstack/indexers');
+const log = require('@cardstack/logger')('cardstack/indexing/document-context');
 const Model = require('../model');
 const { get, uniqBy } = require('lodash');
 
@@ -23,6 +23,7 @@ module.exports = class DocumentContext {
     this._realms = [];
     this.cache = {};
     this.isCollection = upstreamDoc && upstreamDoc.data && Array.isArray(upstreamDoc.data);
+    this.suppliedIncluded = upstreamDoc && upstreamDoc.included;
 
     // included resources that we actually found
     this.pristineIncludes = [];
@@ -69,22 +70,25 @@ module.exports = class DocumentContext {
   }
 
   async read(type, id) {
+    log.debug(`Reading record ${type}/${id}`);
+
     this._references.push(`${type}/${id}`);
 
     let key = `${type}/${id}`;
+    let includedResource = this.suppliedIncluded ? this.suppliedIncluded.find(i => key === `${i.type}/${i.id}`) : null;
+    if (includedResource) {
+      return includedResource;
+    }
+
     let cached = this.cache[key];
     if (cached) {
-      return cached;
+      return await cached;
     }
 
-    let resource = await this._read(type, id);
-    if (resource) {
-      this.cache[key] = resource;
-    }
+    this.cache[key] = this._read(type, id);
 
-    return resource;
+    return await this.cache[key];
   }
-
 
   // TODO come up with a better way to cache (use Model)
   async _buildCachedResponse() {
@@ -97,6 +101,7 @@ module.exports = class DocumentContext {
     }
 
     if (!this._searchDoc) {
+      log.debug(`Building ${this.type}/${this.id}`);
       this._searchDoc = await this._build(this.type, this.id, this.upstreamDoc, searchTree, 0);
     }
     if (this._searchDoc) {
