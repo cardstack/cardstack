@@ -1,6 +1,5 @@
-import { assign } from '@ember/polyfills';
-import JSONAPIAdapter from 'ember-data/adapters/json-api';
-import RSVP from 'rsvp';
+import Service from '@ember/service';
+import qs from 'qs';
 
 const delay = 500;
 
@@ -10,20 +9,24 @@ const pokemon = [
     name: 'Bulbasaur'
   },
   {
-    id: 2,
+    id: 25,
     name: 'Pikachu'
   }
 ];
 
-export default JSONAPIAdapter.extend({
-  query(store, type, query) {
+export default Service.extend({
+  request(path) {
+    let query = path.match(/\?(.*)$/)[1];
+
+    let queryString = qs.parse(query).q;
+
     let data = pokemon.filter(p => {
-      if (query.queryString) {
-        return p.name.toLowerCase().indexOf(query.queryString.toLowerCase()) > -1;
+      if (queryString) {
+        return p.name.toLowerCase().indexOf(queryString.toLowerCase()) > -1;
       }
       return true;
     }).map(p => {
-      let attributes = assign({}, p);
+      let attributes = Object.assign({}, p);
       delete attributes.id;
       return {
         type: 'pokemons',
@@ -31,10 +34,11 @@ export default JSONAPIAdapter.extend({
         attributes
       };
     });
-    return new RSVP.Promise(resolve => {
+
+    return new Promise(resolve => {
       setTimeout(resolve, delay);
     }).then(() => {
       return { data };
     });
   }
-});
+})

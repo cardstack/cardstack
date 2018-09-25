@@ -1,46 +1,55 @@
 import { observer, computed } from '@ember/object';
-import { warn } from '@ember/debug';
 import { inject as service } from '@ember/service';
 import Component from '@ember/component';
 import layout from '../templates/components/cardstack-search';
 import { task } from 'ember-concurrency';
 import { singularize } from 'ember-inflector';
 import { timeout } from 'ember-concurrency';
+import qs from 'qs';
 
 export default Component.extend({
   layout,
   tagName: '',
   store: service(),
+  ajax: service(),
 
   search: task(function * (cursor, debounce) {
     if (debounce) {
       yield timeout(300);
     }
+
     let query = this.get('query');
+
     if (!query) {
       this.set('items', []);
       this.set('links', null);
+      this.set('meta', null);
       return;
     }
-    if (!query.type) {
-      warn("cardstack-search queries must have a `type`", false, { id: 'cardstack-search-needs-type' });
-      this.set('items', []);
-      this.set('links', null);
-    } else {
-      let restQuery = Object.assign({}, query, { type: undefined });
-      if (cursor) {
-        restQuery.page = { cursor };
-      }
-      let records = yield this.get('store').query(singularize(query.type), restQuery);
-      if (cursor) {
-        this.get('items.content').pushObjects(records.content);
-        this.set('links', records.links);
-      } else {
-        this.set('items', records);
-        this.set('links', records.links);
-      }
 
+    let restQuery = Object.assign({}, query);
+
+    if (cursor) {
+      restQuery.page = { cursor };
     }
+
+    let adapter = this.get('store').adapterFor('article');
+
+    let response = yield this.get('ajax').request(`/${this.type || ''}?${qs.stringify(restQuery)}`, {
+      host: adapter.host,
+      namespace: adapter.namespace,
+    });
+
+    let models = pushMixedPayload(this.get('store'), response);
+
+    if (cursor) {
+      this.get('items').pushObjects(models);
+    } else {
+      this.set('items', models);
+    }
+
+    this.set('links', response.links);
+    this.set('meta', response.meta)
   }).on('init').restartable(),
 
   research: observer('query', function() {
@@ -55,3 +64,17 @@ export default Component.extend({
   })
 
 });
+
+function pushMixedPayload(store, rawPayload) {
+  let serializer = store.serializerFor('application');
+
+  return rawPayload.data.map(model => {
+    let ModelClass = store.modelFor(singularize(model.type));
+
+    let jsonApiPayload = serializer.normalizeResponse(store, ModelClass, Object.assign({}, rawPayload, {
+      data: model
+    }), null, 'query');
+
+    return store.push(jsonApiPayload);
+  });
+}
