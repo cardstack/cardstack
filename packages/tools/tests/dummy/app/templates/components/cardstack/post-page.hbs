@@ -11,4 +11,12 @@
       <div>{{rt.readingTimeValue}} {{rt.readingTimeUnits}}</div>
     {{/cs-field-group}}
   </p>
+  <h4>Comments</h4>
+  <ul>
+    {{#each content.comments as |comment|}}
+    <li>
+      {{cs-field comment.author 'name'}}: {{cs-field comment 'body'}}
+    </li>
+    {{/each}}
+  </ul>
 </div>
