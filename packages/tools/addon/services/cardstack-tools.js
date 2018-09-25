@@ -36,10 +36,9 @@ export default Service.extend({
   branch: alias('_activeItemMeta.branch'),
 
   activeFields: computed('activeContentItem', 'fields', function() {
-    let store = getOwner(this).lookup('service:store');
     let item = this.get('activeContentItem');
     let activeItemModel = item.model;
-    let owned = ownedRelatedRecords(store, [item.model]);
+    let owned = ownedRelatedRecords([item.model]);
     if (item) {
       return this.get('fields').filter(f => {
         let fieldModel = f.model.content;
@@ -214,7 +213,7 @@ export default Service.extend({
 
 });
 
-function ownedRelatedRecords(store, records, out = []) {
+function ownedRelatedRecords(records, out = []) {
   let [record, ...rest] = records;
   if (!record) {
     return out;
@@ -230,6 +229,6 @@ function ownedRelatedRecords(store, records, out = []) {
       out = out.concat(relatedRecords);
     }
   });
-  return ownedRelatedRecords(store, rest, out);
+  return ownedRelatedRecords(rest, out);
 }
 
