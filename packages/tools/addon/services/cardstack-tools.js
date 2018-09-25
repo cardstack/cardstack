@@ -224,7 +224,10 @@ function ownedRelatedRecords(records, out = []) {
     let { meta } = relationshipDefinition;
     let { owned } = meta.options;
     if (owned) {
-      let relatedRecords = record.get(meta.name).toArray();
+      let relatedRecords = record.get(meta.name);
+      if (meta.kind === 'hasMany') {
+        relatedRecords = relatedRecords.toArray();
+      }
       rest = rest.concat(relatedRecords);
       out = out.concat(relatedRecords);
     }
