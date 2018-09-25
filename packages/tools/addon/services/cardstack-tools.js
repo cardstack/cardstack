@@ -1,4 +1,5 @@
 import { getOwner } from '@ember/application';
+import { get } from '@ember/object';
 import { computed } from '@ember/object';
 import { alias } from '@ember/object/computed';
 import Service, { inject as service } from '@ember/service';
@@ -220,7 +221,7 @@ function ownedRelatedRecords(store, records, out = []) {
   }
 
   let recordClass = record.constructor;
-  recordClass.relationships.forEach(([ relationshipDefinition ]) => {
+  get(recordClass, 'relationships').forEach(([ relationshipDefinition ]) => {
     let { meta } = relationshipDefinition;
     let { owned } = meta.options;
     if (owned) {
