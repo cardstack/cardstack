@@ -1,7 +1,11 @@
 const isEmpty = require('lodash.isempty');
 
+const isNil = (obj) => {
+  return obj === null || obj === undefined;
+};
+
 const isBlank = (obj) => {
-  let none = obj === null || obj === undefined;
+  let none = isNil(obj);
   if (none) {
     return none;
   }
@@ -17,6 +21,11 @@ const isBlank = (obj) => {
 
   if (typeof obj === 'string') {
     return /\S/.test(obj) === false;
+  }
+
+  let emptyRelationship = 'data' in obj && isNil(obj.data);
+  if (emptyRelationship) {
+    return emptyRelationship;
   }
 
   return false;
