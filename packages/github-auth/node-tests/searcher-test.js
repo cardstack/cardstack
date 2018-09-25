@@ -137,17 +137,17 @@ describe('github-auth/searcher', function() {
 
       let user = await searchers.get(env.session, 'master', 'github-users', id);
 
-      expect(user.data.attributes.permissions).to.include({ repo: 'cardstack/repo1', permission: 'read' });
-      expect(user.data.attributes.permissions).to.not.include({ repo: 'cardstack/repo1', permission: 'write' });
-      expect(user.data.attributes.permissions).to.not.include({ repo: 'cardstack/repo1', permission: 'admin' });
+      expect(user.data.attributes.permissions).to.include('cardstack/repo1:read');
+      expect(user.data.attributes.permissions).to.not.include('cardstack/repo1:write');
+      expect(user.data.attributes.permissions).to.not.include('cardstack/repo1:admin');
 
-      expect(user.data.attributes.permissions).to.include({ repo: 'cardstack/repo2', permission: 'read' });
-      expect(user.data.attributes.permissions).to.not.include({ repo: 'cardstack/repo2', permission: 'write' });
-      expect(user.data.attributes.permissions).to.not.include({ repo: 'cardstack/repo2', permission: 'admin' });
+      expect(user.data.attributes.permissions).to.include('cardstack/repo2:read');
+      expect(user.data.attributes.permissions).to.not.include('cardstack/repo2:write');
+      expect(user.data.attributes.permissions).to.not.include('cardstack/repo2:admin');
 
-      expect(user.data.attributes.permissions).to.not.include({ repo: 'cardstack/repo3', permission: 'read' });
-      expect(user.data.attributes.permissions).to.not.include({ repo: 'cardstack/repo3', permission: 'write' });
-      expect(user.data.attributes.permissions).to.not.include({ repo: 'cardstack/repo3', permission: 'admin' });
+      expect(user.data.attributes.permissions).to.not.include('cardstack/repo3:read');
+      expect(user.data.attributes.permissions).to.not.include('cardstack/repo3:write');
+      expect(user.data.attributes.permissions).to.not.include('cardstack/repo3:admin');
     });
 
     it('can set permissions for user with write access on repo', async function() {
@@ -173,17 +173,17 @@ describe('github-auth/searcher', function() {
 
       let user = await searchers.get(env.session, 'master', 'github-users', id);
 
-      expect(user.data.attributes.permissions).to.include({ repo: 'cardstack/repo1', permission: 'read' });
-      expect(user.data.attributes.permissions).to.include({ repo: 'cardstack/repo1', permission: 'write' });
-      expect(user.data.attributes.permissions).to.not.include({ repo: 'cardstack/repo1', permission: 'admin' });
+      expect(user.data.attributes.permissions).to.include('cardstack/repo1:read');
+      expect(user.data.attributes.permissions).to.include('cardstack/repo1:write');
+      expect(user.data.attributes.permissions).to.not.include('cardstack/repo1:admin');
 
-      expect(user.data.attributes.permissions).to.include({ repo: 'cardstack/repo2', permission: 'read' });
-      expect(user.data.attributes.permissions).to.not.include({ repo: 'cardstack/repo2', permission: 'write' });
-      expect(user.data.attributes.permissions).to.not.include({ repo: 'cardstack/repo2', permission: 'admin' });
+      expect(user.data.attributes.permissions).to.include('cardstack/repo2:read');
+      expect(user.data.attributes.permissions).to.not.include('cardstack/repo2:write');
+      expect(user.data.attributes.permissions).to.not.include('cardstack/repo2:admin');
 
-      expect(user.data.attributes.permissions).to.not.include({ repo: 'cardstack/repo3', permission: 'read' });
-      expect(user.data.attributes.permissions).to.include({ repo: 'cardstack/repo3', permission: 'write' });
-      expect(user.data.attributes.permissions).to.not.include({ repo: 'cardstack/repo3', permission: 'admin' });
+      expect(user.data.attributes.permissions).to.not.include('cardstack/repo3:read');
+      expect(user.data.attributes.permissions).to.include('cardstack/repo3:write');
+      expect(user.data.attributes.permissions).to.not.include('cardstack/repo3:admin');
     });
 
     it('can set permissions for user with admin access on repo', async function() {
@@ -209,17 +209,17 @@ describe('github-auth/searcher', function() {
 
       let user = await searchers.get(env.session, 'master', 'github-users', id);
 
-      expect(user.data.attributes.permissions).to.include({ repo: 'cardstack/repo1', permission: 'read' });
-      expect(user.data.attributes.permissions).to.include({ repo: 'cardstack/repo1', permission: 'write' });
-      expect(user.data.attributes.permissions).to.include({ repo: 'cardstack/repo1', permission: 'admin' });
+      expect(user.data.attributes.permissions).to.include('cardstack/repo1:read');
+      expect(user.data.attributes.permissions).to.include('cardstack/repo1:write');
+      expect(user.data.attributes.permissions).to.include('cardstack/repo1:admin');
 
-      expect(user.data.attributes.permissions).to.include({ repo: 'cardstack/repo2', permission: 'read' });
-      expect(user.data.attributes.permissions).to.not.include({ repo: 'cardstack/repo2', permission: 'write' });
-      expect(user.data.attributes.permissions).to.not.include({ repo: 'cardstack/repo2', permission: 'admin' });
+      expect(user.data.attributes.permissions).to.include('cardstack/repo2:read');
+      expect(user.data.attributes.permissions).to.not.include('cardstack/repo2:write');
+      expect(user.data.attributes.permissions).to.not.include('cardstack/repo2:admin');
 
-      expect(user.data.attributes.permissions).to.not.include({ repo: 'cardstack/repo3', permission: 'read' });
-      expect(user.data.attributes.permissions).to.include({ repo: 'cardstack/repo3', permission: 'write' });
-      expect(user.data.attributes.permissions).to.not.include({ repo: 'cardstack/repo3', permission: 'admin' });
+      expect(user.data.attributes.permissions).to.not.include('cardstack/repo3:read');
+      expect(user.data.attributes.permissions).to.include('cardstack/repo3:write');
+      expect(user.data.attributes.permissions).to.not.include('cardstack/repo3:admin');
     });
   });
 

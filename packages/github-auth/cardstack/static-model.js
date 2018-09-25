@@ -50,7 +50,7 @@ module.exports = function({ dataSource, provideUserSchema }) {
       type: 'fields',
       id: 'permissions',
       attributes: {
-        'field-type': '@cardstack/core-types::object'
+        'field-type': '@cardstack/core-types::string-array'
       }
     },
   ];
