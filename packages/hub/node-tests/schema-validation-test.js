@@ -308,7 +308,7 @@ describe('schema/validation', function() {
     expect(errors).includes.something.with.property('detail', 'published-date must be present');
   });
 
-  it.only("applies constraints to mutually exclusive fields", async function() {
+  it("applies constraints to mutually exclusive fields", async function() {
     let errors = await schema.validationErrors(create({
       type: 'articles',
       id: '1',
