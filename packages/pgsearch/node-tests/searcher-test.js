@@ -31,6 +31,9 @@ describe('pgsearch/searcher', function() {
       factory.addResource('fields', 'age').withAttributes({
         fieldType: '@cardstack/core-types::integer'
       }),
+      factory.addResource('fields', 'favorite-shapes').withAttributes({
+        fieldType: '@cardstack/core-types::string-array'
+      }),
       factory.addResource('fields', 'favorite-color').withAttributes({
         fieldType: '@cardstack/core-types::string'
       }),
@@ -85,6 +88,7 @@ describe('pgsearch/searcher', function() {
       firstName: 'Quint',
       lastName: 'Faulkner',
       age: 10,
+      favoriteShapes: ['pentagon', 'rhombus', 'circle'],
       description: {
         version: "0.3.1",
         markups: [],
@@ -102,6 +106,7 @@ describe('pgsearch/searcher', function() {
       firstName: 'Arthur',
       lastName: 'Faulkner',
       age: 5,
+      favoriteShapes: ['square', 'triangle', 'circle'],
       favoriteColor: 'red'
     });
 
@@ -171,6 +176,7 @@ describe('pgsearch/searcher', function() {
         'first-name': 'Quint',
         'last-name': 'Faulkner',
         age: 10,
+        'favorite-shapes': ['pentagon', 'rhombus', 'circle'],
         description: {
           version: "0.3.1",
           markups: [],
@@ -245,6 +251,24 @@ describe('pgsearch/searcher', function() {
     expect(models).to.have.length(2);
     expect(models).includes.something.with.property('type', 'articles');
     expect(models).includes.something.with.property('type', 'people');
+  });
+
+  it('can filter a string-array field by terms', async function() {
+    let { data: models } = await searcher.search(env.session, 'master', {
+      filter: {
+        'favorite-shapes': ['hexagon', 'square']
+      }
+    });
+    expect(models).to.have.length(1);
+  });
+
+  it('can filter a string-array field one term', async function() {
+    let { data: models } = await searcher.search(env.session, 'master', {
+      filter: {
+        'favorite-shapes': 'pentagon'
+      }
+    });
+    expect(models).to.have.length(1);
   });
 
   it('can sort by id', async function() {
