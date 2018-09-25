@@ -7,7 +7,12 @@ module.exports = [
       params: {
         'client-id': process.env.GITHUB_CLIENT_ID,
         'client-secret': process.env.GITHUB_CLIENT_SECRET,
-        token: process.env.GITHUB_TOKEN
+        token: process.env.GITHUB_TOKEN,
+        permissions: [
+          { repo: 'cardstack/cardstack', permission: 'read' },
+          { repo: 'cardstack/cardstack', permission: 'write' },
+          { repo: 'cardstack/cardstack', permission: 'admin' }
+        ]
       }
     }
   },

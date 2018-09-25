@@ -93,5 +93,97 @@ module.exports = {
       "collaborators": 0,
       "private_repos": 0
     }
-  }
+  },
+  githubAdminPermissions: {
+    "permission": "admin",
+    "user": {
+      "login": "habdelra",
+      "id": 61076,
+      "node_id": "MDQ6VXNlcjYxMDc1",
+      "avatar_url": "https://avatars2.githubusercontent.com/u/61075?v=4",
+      "gravatar_id": "",
+      "url": "https://api.github.com/users/habdelra",
+      "html_url": "https://github.com/habdelra",
+      "followers_url": "https://api.github.com/users/habdelra/followers",
+      "following_url": "https://api.github.com/users/habdelra/following{/other_user}",
+      "gists_url": "https://api.github.com/users/habdelra/gists{/gist_id}",
+      "starred_url": "https://api.github.com/users/habdelra/starred{/owner}{/repo}",
+      "subscriptions_url": "https://api.github.com/users/habdelra/subscriptions",
+      "organizations_url": "https://api.github.com/users/habdelra/orgs",
+      "repos_url": "https://api.github.com/users/habdelra/repos",
+      "events_url": "https://api.github.com/users/habdelra/events{/privacy}",
+      "received_events_url": "https://api.github.com/users/habdelra/received_events",
+      "type": "User",
+      "site_admin": false
+    }
+  },
+  githubWritePermissions: {
+    "permission": "write",
+    "user": {
+      "login": "habdelra",
+      "id": 61076,
+      "node_id": "MDQ6VXNlcjYxMDc1",
+      "avatar_url": "https://avatars2.githubusercontent.com/u/61075?v=4",
+      "gravatar_id": "",
+      "url": "https://api.github.com/users/habdelra",
+      "html_url": "https://github.com/habdelra",
+      "followers_url": "https://api.github.com/users/habdelra/followers",
+      "following_url": "https://api.github.com/users/habdelra/following{/other_user}",
+      "gists_url": "https://api.github.com/users/habdelra/gists{/gist_id}",
+      "starred_url": "https://api.github.com/users/habdelra/starred{/owner}{/repo}",
+      "subscriptions_url": "https://api.github.com/users/habdelra/subscriptions",
+      "organizations_url": "https://api.github.com/users/habdelra/orgs",
+      "repos_url": "https://api.github.com/users/habdelra/repos",
+      "events_url": "https://api.github.com/users/habdelra/events{/privacy}",
+      "received_events_url": "https://api.github.com/users/habdelra/received_events",
+      "type": "User",
+      "site_admin": false
+    }
+  },
+  githubReadPermissions: {
+    "permission": "read",
+    "user": {
+      "login": "habdelra",
+      "id": 61076,
+      "node_id": "MDQ6VXNlcjYxMDc1",
+      "avatar_url": "https://avatars2.githubusercontent.com/u/61075?v=4",
+      "gravatar_id": "",
+      "url": "https://api.github.com/users/habdelra",
+      "html_url": "https://github.com/habdelra",
+      "followers_url": "https://api.github.com/users/habdelra/followers",
+      "following_url": "https://api.github.com/users/habdelra/following{/other_user}",
+      "gists_url": "https://api.github.com/users/habdelra/gists{/gist_id}",
+      "starred_url": "https://api.github.com/users/habdelra/starred{/owner}{/repo}",
+      "subscriptions_url": "https://api.github.com/users/habdelra/subscriptions",
+      "organizations_url": "https://api.github.com/users/habdelra/orgs",
+      "repos_url": "https://api.github.com/users/habdelra/repos",
+      "events_url": "https://api.github.com/users/habdelra/events{/privacy}",
+      "received_events_url": "https://api.github.com/users/habdelra/received_events",
+      "type": "User",
+      "site_admin": false
+    }
+  },
+  githubNoPermissions: {
+    "permission": "none",
+    "user": {
+      "login": "habdelra",
+      "id": 61076,
+      "node_id": "MDQ6VXNlcjYxMDc1",
+      "avatar_url": "https://avatars2.githubusercontent.com/u/61075?v=4",
+      "gravatar_id": "",
+      "url": "https://api.github.com/users/habdelra",
+      "html_url": "https://github.com/habdelra",
+      "followers_url": "https://api.github.com/users/habdelra/followers",
+      "following_url": "https://api.github.com/users/habdelra/following{/other_user}",
+      "gists_url": "https://api.github.com/users/habdelra/gists{/gist_id}",
+      "starred_url": "https://api.github.com/users/habdelra/starred{/owner}{/repo}",
+      "subscriptions_url": "https://api.github.com/users/habdelra/subscriptions",
+      "organizations_url": "https://api.github.com/users/habdelra/orgs",
+      "repos_url": "https://api.github.com/users/habdelra/repos",
+      "events_url": "https://api.github.com/users/habdelra/events{/privacy}",
+      "received_events_url": "https://api.github.com/users/habdelra/received_events",
+      "type": "User",
+      "site_admin": false
+    }
+  },
 };

@@ -20,7 +20,8 @@ module.exports = function({ dataSource, provideUserSchema }) {
         'fields': { data: [
           { type: 'fields', id: 'name' },
           { type: 'fields', id: 'email' },
-          { type: 'fields', id: 'avatar-url' }
+          { type: 'fields', id: 'avatar-url' },
+          { type: 'fields', id: 'permissions' }
         ] }
       }
     },
@@ -43,6 +44,13 @@ module.exports = function({ dataSource, provideUserSchema }) {
       id: 'avatar-url',
       attributes: {
         'field-type': '@cardstack/core-types::string'
+      }
+    },
+    {
+      type: 'fields',
+      id: 'permissions',
+      attributes: {
+        'field-type': '@cardstack/core-types::object'
       }
     },
   ];
