@@ -100,7 +100,7 @@ module.exports = class GitHubSearcher {
 
       for (let repoPermission of repos[repo]) {
         if (userExpandedPermissions.includes(repoPermission.permission)) {
-          permissions.push(repoPermission);
+          permissions.push(`${repoPermission.repo}:${repoPermission.permission}`);
         }
       }
     }

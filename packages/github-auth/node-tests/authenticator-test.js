@@ -86,7 +86,7 @@ describe('github-auth/authenticator', function() {
       "name": "Hassan Abdel-Rahman",
       "email": "hassan@cardstack.com",
       "avatar-url": "https://avatars2.githubusercontent.com/u/61075?v=4",
-      "permissions": [{ "repo": "cardstack/repo1", "permission": "read" }]
+      "permissions": ["cardstack/repo1:read"]
     });
     expect(response.body.data.meta.token).is.ok;
     expect(response.body.data.meta.validUntil).is.ok;
