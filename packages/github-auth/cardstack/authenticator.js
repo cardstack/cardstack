@@ -65,12 +65,6 @@ module.exports = class {
     return userResponse.body;
   }
 
-  exposeConfig() {
-    return {
-      clientId: this.clientId
-    };
-  }
-
   defaultUserRewriter(user) {
     return {
       data: {
