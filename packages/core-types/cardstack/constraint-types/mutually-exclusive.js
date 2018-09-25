@@ -1,3 +1,5 @@
+const isEmpty = require('lodash.isempty');
+
 const isBlank = (obj) => {
   let none = obj === null || obj === undefined;
   if (none) {
@@ -8,24 +10,9 @@ const isBlank = (obj) => {
     return !obj.size;
   }
 
-  let objectType = typeof obj;
-
-  if (objectType === 'object') {
-    let size =obj.size;
-    if (typeof size === 'number') {
-      return !size;
-    }
-  }
-
-  if (typeof obj.length === 'number' && objectType !== 'function') {
-    return !obj.length;
-  }
-
-  if (objectType === 'object') {
-    let length = obj.length;
-    if (typeof length === 'number') {
-      return !length;
-    }
+  let empty = isEmpty(obj);
+  if (empty) {
+    return empty;
   }
 
   if (typeof obj === 'string') {

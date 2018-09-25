@@ -29,6 +29,7 @@
     "ember-cli-htmlbars": "^2.0.1",
     "ember-cli-postcss": "https://github.com/ef4/ember-cli-postcss#0550adab2c0c0ab856efec6a4da8164eadd01e47",
     "ember-power-select": "^2.0.4",
+    "lodash.isempty": "^4.4.0",
     "moment-timezone": "^0.5.11",
     "postcss-cssnext": "^2.10.0",
     "postcss-import": "^9.1.0"
@@ -58,7 +59,7 @@
     "ember-load-initializers": "^1.0.0",
     "ember-maybe-import-regenerator": "^0.1.6",
     "ember-resolver": "^4.0.0",
-    "ember-source": "~3.0.0",
+    "ember-source": "~2.12.0",
     "ember-source-channel-url": "^1.0.1",
     "ember-try": "^0.2.23",
     "eslint": "4.9.0",
