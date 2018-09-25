@@ -27,6 +27,11 @@ Handlebars.registerHelper('related-type', function(field, modelName) {
   return modelName;
 });
 
+Handlebars.registerHelper('json', function(obj) {
+  obj = obj || {};
+  return JSON.stringify(obj);
+});
+
 const modelTemplate = Handlebars.compile(`
 define('@cardstack/models/generated/{{modelName}}', ['exports', '@cardstack/models/model', 'ember-data'], function (exports, _model, _emberData) {
   'use strict';
@@ -43,16 +48,20 @@ define('@cardstack/models/generated/{{modelName}}', ['exports', '@cardstack/mode
              caption: "{{field.caption}}",
              editorComponent: "{{field.editorComponent}}",
              inlineEditorComponent: "{{field.inlineEditorComponent}}",
+             editorOptions: {{{json field.editorOptions}}},
+             inlineEditorOptions: {{{json field.inlineEditorOptions}}},
              owned: {{field.owned}}
             }),
-         {{/with}}
-       {{else}}
-        {{camelize field.id}}: _emberData.default.attr({
-          fieldType: "{{field.fieldType}}",
-          caption: "{{field.caption}}",
-          editorComponent: "{{field.editorComponent}}",
-          inlineEditorComponent: "{{field.inlineEditorComponent}}"
-        }),
+          {{/with}}
+        {{else}}
+          {{camelize field.id}}: _emberData.default.attr({
+            fieldType: "{{field.fieldType}}",
+            caption: "{{field.caption}}",
+            editorComponent: "{{field.editorComponent}}",
+            inlineEditorComponent: "{{field.inlineEditorComponent}}",
+            editorOptions: {{{json field.editorOptions}}},
+            inlineEditorOptions: {{{json field.inlineEditorOptions}}}
+          }),
        {{/if}}
      {{/each}}
    }){{#if routingField}}.reopenClass({ routingField: "{{routingField}}" }){{/if}};

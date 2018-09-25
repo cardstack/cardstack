@@ -2,11 +2,15 @@ import Component from '@ember/component';
 import { inject as service } from '@ember/service';
 import { task } from 'ember-concurrency';
 import layout from '../../templates/components/field-editors/dropdown-choices-editor';
-import { get, set } from '@ember/object';
+import { get, getWithDefault, set, computed } from '@ember/object';
 
 export default Component.extend({
   layout,
   store: service(),
+
+  displayFieldName: computed('editorOptions.displayFieldName', function() {
+    return getWithDefault(this, 'editorOptions.displayFieldName', 'title');
+  }),
 
   loadOptions: task(function*() {
     let store = get(this, 'store');

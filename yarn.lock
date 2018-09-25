@@ -4145,6 +4145,13 @@ ember-inject-optional@^0.1.0:
   dependencies:
     ember-cli-babel "^6.3.0"
 
+ember-let@^0.7.1:
+  version "0.7.1"
+  resolved "https://registry.yarnpkg.com/ember-let/-/ember-let-0.7.1.tgz#5faedab2c334e070dcda64eb5fce2d5dc69256e1"
+  dependencies:
+    ember-cli-babel "^6.6.0"
+    ember-cli-version-checker "^2.1.0"
+
 ember-load-initializers@^1.0.0:
   version "1.0.0"
   resolved "https://registry.yarnpkg.com/ember-load-initializers/-/ember-load-initializers-1.0.0.tgz#4919eaf06f6dfeca7e134633d8c05a6c9921e6e7"
