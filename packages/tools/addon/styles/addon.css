@@ -23,6 +23,8 @@
     --faded-tools-highlight: #032c5b77;
 
     --tools-preview: #860404;
+    --cs-tools-error-background: #fff9e5;
+    --cs-tools-error-color: #796832;
 }
 
 @font-face {
