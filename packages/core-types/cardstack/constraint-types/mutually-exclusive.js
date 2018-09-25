@@ -20,7 +20,7 @@ const isBlank = (obj) => {
   }
 
   return false;
-}
+};
 
 module.exports = {
   inputs: {
