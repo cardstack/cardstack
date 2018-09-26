@@ -4085,9 +4085,9 @@ ember-data@^3.3.0:
     semver "^5.1.0"
     silent-error "^1.0.0"
 
-"ember-data@github:emberjs/data#c83849df47c9e858f60e842687b4739787713110":
-  version "3.5.0-canary"
-  resolved "https://codeload.github.com/emberjs/data/tar.gz/c83849df47c9e858f60e842687b4739787713110"
+ember-data@^3.4.2:
+  version "3.4.2"
+  resolved "https://registry.yarnpkg.com/ember-data/-/ember-data-3.4.2.tgz#675cc4f1be8df1f5c0bfe4191afa6986377721c0"
   dependencies:
     "@ember/ordered-set" "^2.0.0"
     babel-plugin-feature-flags "^0.3.1"
