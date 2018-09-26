@@ -2,11 +2,21 @@
   "name": "@cardstack/git",
   "version": "0.10.13",
   "description": "Git data source plugin for @cardstack/hub.",
+  "keywords": [
+    "cardstack-plugin",
+    "ember-addon"
+  ],
   "repository": "https://github.com/cardstack/cardstack",
-  "author": "Edward Faulkner <edward@eaf4.com>",
   "license": "MIT",
-  "engines": {
-    "node": ">= 7.7"
+  "author": "Edward Faulkner <edward@eaf4.com>",
+  "scripts": {
+    "test": "mocha ../test-support/bin/run.js"
+  },
+  "dependencies": {
+    "@cardstack/logger": "^0.1.0",
+    "@cardstack/nodegit": "^0.21.2-cardstack.1",
+    "@cardstack/plugin-utils": "0.10.1",
+    "moment-timezone": "^0.5.11"
   },
   "devDependencies": {
     "@cardstack/di": "0.8.0",
@@ -16,16 +26,9 @@
     "eslint-plugin-ember": "^5.0.0",
     "eslint-plugin-node": "^5.2.1"
   },
-  "dependencies": {
-    "@cardstack/logger": "^0.1.0",
-    "@cardstack/nodegit": "^0.21.2-cardstack.1",
-    "@cardstack/plugin-utils": "0.10.1",
-    "moment-timezone": "^0.5.11"
+  "engines": {
+    "node": ">= 7.7"
   },
-  "keywords": [
-    "cardstack-plugin",
-    "ember-addon"
-  ],
   "cardstack-plugin": {
     "api-version": 1
   },
