@@ -1,4 +1,4 @@
-const { get, isEqual } = require('lodash');
+const { get, isEqual, intersection } = require('lodash');
 
 module.exports = class Group {
   constructor(model, allFields) {
@@ -45,7 +45,11 @@ module.exports = class Group {
       // only on the computed fields branch. When that is ready we can
       // update.
       let haveValue = field.valueFrom(change);
-      return allowedValues.find(v => isEqual(v, haveValue));
+      if (Array.isArray(haveValue) && field.fieldType === '@cardstack/core-types::string-array') {
+        return Boolean(intersection(allowedValues, haveValue).length);
+      } else {
+        return allowedValues.find(v => isEqual(v, haveValue));
+      }
     });
   }
 
