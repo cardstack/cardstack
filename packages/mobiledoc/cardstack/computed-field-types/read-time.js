@@ -7,6 +7,11 @@ exports.type = '@cardstack/core-types::integer';
 
 exports.compute = async function(model, { sourceField }) {
   let mobiledoc = await model.getField(sourceField);
+
+  if (!mobiledoc) {
+    return 0;
+  }
+
   let bodyText = renderer.render(mobiledoc).result;
 
   return Math.round(bodyText.split(' ').length / WORDS_PER_MIN);
