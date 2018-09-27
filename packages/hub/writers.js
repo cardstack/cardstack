@@ -23,36 +23,8 @@ class Writers {
         status: 400
       });
     }
-    await this.pgSearchClient.ensureDatabaseSetup();
 
-    let schema = await this.schema.forBranch(branch);
-    let { writer, sourceId } = this._getSchemaDetailsForType(schema, type);
-    let isSchema = this.schemaTypes.includes(type);
-    let pending = await writer.prepareCreate(
-      branch,
-      session,
-      type,
-      schema.withOnlyRealFields(document.data),
-      isSchema
-    );
-    let pristine;
-    try {
-      let newSchema = await schema.validate(pending, { type, session });
-      let context = await this._finalize(pending, branch, type, newSchema || schema, sourceId);
-      if (newSchema) {
-        this.schema.invalidateCache();
-      }
-
-      let batch = this.pgSearchClient.beginBatch();
-      await batch.saveDocument(context);
-      await batch.done();
-
-      pristine = await context.pristineDoc();
-    } finally {
-      if (pending) { await pending.abort();  }
-    }
-
-    return schema.applyReadAuthorization(pristine, { session });
+    return await this.handleCreate(false, branch, session, type, document);
   }
 
   async createBinary(branch, session, type, stream) {
@@ -62,16 +34,37 @@ class Writers {
         status: 400
       });
     }
+
+    return await this.handleCreate(true, branch, session, type, stream);
+
+  }
+
+  async handleCreate(isBinary, branch, session, type, documentOrStream) {
     await this.pgSearchClient.ensureDatabaseSetup();
 
     let schema = await this.schema.forBranch(branch);
     let { writer, sourceId } = this._getSchemaDetailsForType(schema, type);
-    let pending = await writer.prepareBinaryCreate(
-      branch,
-      session,
-      type,
-      stream
-    );
+
+    let pending;
+
+    if (isBinary) {
+      pending = await writer.prepareBinaryCreate(
+        branch,
+        session,
+        type,
+        documentOrStream
+      );
+    } else {
+      let isSchema = this.schemaTypes.includes(type);
+      pending = await writer.prepareCreate(
+        branch,
+        session,
+        type,
+        schema.withOnlyRealFields(documentOrStream.data),
+        isSchema
+      );
+    }
+
     let pristine;
     try {
       let newSchema = await schema.validate(pending, { type, session });

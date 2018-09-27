@@ -35,17 +35,17 @@ module.exports = class Writer {
   async prepareBinaryCreate(branch, session, type, stream) {
     let finalizer = async (pendingChange) => {
       let Key = `${pendingChange.finalDocument.id}`;
-      // encode metadata as json because values are required to be strings and
-      // we want to store various JSON values
+
       let Metadata = {
-        jsonAttrs: JSON.stringify(pendingChange.finalDocument.attributes)
+        "sha-sum": pendingChange.finalDocument.attributes['sha-sum']
       };
+
       await this.s3Upload(branch, { Key, Body: stream, Metadata });
     };
 
     let id = uuidv4();
     let document = {
-      type: 'files',
+      type: 'cs-files',
       id,
       attributes: {
         'created-at':  moment().format(),

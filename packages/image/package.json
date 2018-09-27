@@ -25,6 +25,7 @@
   },
   "dependencies": {
     "@cardstack/plugin-utils": "^0.10.1",
+    "@cardstack/test-support": "^0.10.9",
     "ember-cli-babel": "^6.8.2",
     "ember-cli-htmlbars": "^2.0.1"
   },

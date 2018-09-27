@@ -60,13 +60,13 @@ function jsonapiMiddleware(searcher, writers, indexers, defaultBranch) {
     let handler = new Handler(searcher, writers, indexers, ctxt, options);
 
     let contentType = ctxt.request.headers['content-type'];
-    let isMultipart = contentType && contentType.includes('multipart/form-data');
+    let isJsonApi = contentType && contentType.includes('application/vnd.api+json');
 
     let [accepted] = ctxt.request.headers['accept'].split(";");
     let types = accepted.split(",");
-    let isImage = types.some(t => mimeMatch(t, "image/*"));
+    let acceptsJsonApi = types.some(t => mimeMatch(t, "application/vnd.api+json"));
 
-    if (isMultipart || isImage) {
+    if (!isJsonApi && !acceptsJsonApi) {
       return handler.runBinary();
     }
 
@@ -168,8 +168,7 @@ class Handler {
   }
 
   async handleIndividualGETBinary(type, id) {
-    let json = await this.searcher.get(this.session, this.branch, type, id);
-    let buffer = await this.searcher.getBinary(this.session, this.branch, type, id);
+    let [buffer, json] = await this.searcher.getBinary(this.session, this.branch, type, id);
     this.ctxt.set('content-type', json.data.attributes['content-type']);
     this.ctxt.body = buffer;
   }
@@ -232,6 +231,10 @@ class Handler {
 
   async handleCollectionPOSTBinary(type) {
     let { files } = await asyncBusboy(this.ctxt.req);
+
+    if (!files[0]) {
+      throw new Error("A file was not included in your post request. If you are not trying to upload a file, make sure to set your request content type to application/vnd.api+json", {status: 400});
+    }
 
     let record = await this.writers.createBinary(this.branch, this.session, type, files[0]);
     this.ctxt.body = record;

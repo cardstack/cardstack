@@ -22,6 +22,7 @@ export function fieldType(content, fieldName) {
   if (type) {
     type = stripNamespace(type);
   }
+
   return type;
 }
 
