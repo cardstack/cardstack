@@ -6,6 +6,9 @@ import layout from '../templates/components/cs-create-menu';
 import { transitionTo } from '../private-api';
 import { task } from 'ember-concurrency';
 import injectOptional from 'ember-inject-optional';
+import { singularize } from 'ember-inflector';
+
+const formats = ['embedded', 'isolated'];
 
 export default Component.extend({
   layout,
@@ -20,6 +23,17 @@ export default Component.extend({
     let creatableTypes = this.get('tools.creatableTypes');
     if (!creatableTypes || !creatableTypes.length) { return; }
 
+    let owner = getOwner(this);
+    let lookup = owner.lookup('component-lookup:main');
+    creatableTypes = creatableTypes.filter(contentType => {
+      let type = singularize(contentType);
+      for (let format of formats) {
+        if (lookup.componentFor(`cardstack/${type}-${format}`, owner) ||
+            lookup.layoutFor(`cardstack/${type}-${format}`, owner)) {
+          return true;
+        }
+      }
+    });
     let types = yield this.get('store').query('content-type', { page: { size: 50 }, filter: { 'id' : { exact: creatableTypes } } });
     this.set('availableTypes', types);
   }).on('init'),
