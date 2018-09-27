@@ -1,5 +1,7 @@
 const {
-  Repository
+  Repository,
+  Cred,
+  Clone
 } = require('@cardstack/nodegit');
 
 const crypto = require('crypto');
@@ -8,6 +10,10 @@ const os = require('os');
 const process = require('process');
 const Error = require('@cardstack/plugin-utils/error');
 const PendingChange = require('@cardstack/plugin-utils/pending-change');
+const { promisify } = require('util');
+const temp = require('temp').track();
+
+const mkdir = promisify(temp.mkdir);
 
 const pendingChanges = new WeakMap();
 
@@ -15,7 +21,7 @@ module.exports = class Writer {
   static create(params) {
     return new this(params);
   }
-  constructor({ repo, idGenerator, basePath, branchPrefix }) {
+  constructor({ repo, idGenerator, basePath, branchPrefix, remote }) {
     this.repoPath = repo;
     this.basePath = basePath;
     this.branchPrefix = branchPrefix || "";
@@ -24,6 +30,7 @@ module.exports = class Writer {
     this.myName = `PID${process.pid} on ${hostname}`;
     this.myEmail = `${os.userInfo().username}@${hostname}`;
     this.idGenerator = idGenerator;
+    this.remote = remote;
   }
 
   async prepareCreate(branch, session, type, document, isSchema) {
@@ -54,7 +61,7 @@ module.exports = class Writer {
         gitDocument.relationships = document.relationships;
       }
 
-      let pending = new PendingChange(null, gitDocument, finalizer);
+      let pending = new PendingChange(null, gitDocument, finalizer.bind(this));
       let signature = await this._commitOptions('create', document.type, id, session);
       pendingChanges.set(pending, { type: document.type, id, signature, change, file });
       return pending;
@@ -83,7 +90,7 @@ module.exports = class Writer {
       after.id = document.id;
       after.type = document.type;
       let signature = await this._commitOptions('update', type, id, session);
-      let pending = new PendingChange(before, after, finalizer);
+      let pending = new PendingChange(before, after, finalizer.bind(this));
       pendingChanges.set(pending, { type, id, signature, change, file });
       return pending;
     });
@@ -104,7 +111,7 @@ module.exports = class Writer {
       file.delete();
       before.id = id;
       before.type = type;
-      let pending = new PendingChange(before, null, finalizer);
+      let pending = new PendingChange(before, null, finalizer.bind(this));
       let signature = await this._commitOptions('delete', type, id, session);
       pendingChanges.set(pending, { type, id, signature, change });
       return pending;
@@ -130,6 +137,23 @@ module.exports = class Writer {
 
   async _ensureRepo() {
     if (!this.repo) {
+      if (this.remote) {
+        let tempRepoPath = await mkdir('cardstack-temp-repo');
+        this.repo = await Clone(this.remote.url, tempRepoPath, {
+          fetchOpts: {
+            callbacks: {
+              credentials: (url, userName) => {
+                if (this.remote.privateKey) {
+                  return Cred.sshKeyMemoryNew(userName, this.remote.publicKey || '', this.remote.privateKey, this.remote.passphrase || '');
+                }
+                return Cred.sshKeyFromAgent(userName);
+              }
+            }
+          }
+        });
+        return;
+      }
+
       this.repo = await Repository.open(this.repoPath);
     }
   }
@@ -204,7 +228,7 @@ async function finalizer(pendingChange) {
         file.delete();
       }
     }
-    let version = await change.finalize(signature);
+    let version = await change.finalize(signature, this.remote);
     return { version, hash: (file ? file.savedId() : null) };
   });
 }

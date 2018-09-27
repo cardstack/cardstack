@@ -86,10 +86,14 @@ const {
   Clone,
   Cred,
 } = require('@cardstack/nodegit');
+const { promisify } = require('util');
+const temp = require('temp').track();
 
 const Change = require("./change");
 
 const { safeEntryByName } = require('./mutable-tree');
+
+const mkdir = promisify(temp.mkdir);
 
 const log = require('@cardstack/logger')('cardstack/git-indexer');
 
@@ -97,6 +101,9 @@ module.exports = class Indexer {
   static create(params) { return new this(params); }
 
   constructor({ repo, basePath, branchPrefix, remote }) {
+    if (repo && remote) {
+      throw new Error('You cannot define the params \'remote\' and \'repo\' at the same time for this data source');
+    }
     this.repoPath = repo;
     this.branchPrefix = branchPrefix || "";
     this.basePath = basePath ? basePath.split('/') : [];
@@ -107,25 +114,27 @@ module.exports = class Indexer {
 
   async _ensureRepo() {
     if (!this.repo) {
+      if (this.remote) {
+        let tempRepoPath = await mkdir('cardstack-temp-repo');
+        this.repo = await Clone(this.remote.url, tempRepoPath, {
+          fetchOpts: {
+            callbacks: {
+              credentials: (url, userName) => {
+                if (this.remote.privateKey) {
+                  return Cred.sshKeyMemoryNew(userName, this.remote.publicKey || '', this.remote.privateKey, this.remote.passphrase || '');
+                }
+                return Cred.sshKeyFromAgent(userName);
+              }
+            }
+          }
+        });
+        return;
+      }
+
       try {
         this.repo = await Repository.open(this.repoPath);
       } catch (e) {
         if (/(could not find repository from|Failed to resolve path)/i.test(e.message)) {
-          if (this.remote) {
-            this.repo = await Clone(this.remote.url, this.repoPath, {
-              fetchOpts: {
-                callbacks: {
-                  credentials: (url, userName) => {
-                    if (this.remote.privateKey) {
-                      return Cred.sshKeyMemoryNew(userName, this.remote.publicKey || '', this.remote.privateKey, this.remote.passphrase || '');
-                    }
-                    return Cred.sshKeyFromAgent(userName);
-                  }
-                }
-              }
-            });
-            return;
-          }
 
           let change = await Change.createInitial(this.repoPath, 'master');
           this.repo = change.repo;

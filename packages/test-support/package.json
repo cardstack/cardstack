@@ -26,6 +26,7 @@
     "@cardstack/plugin-utils": "0.10.1",
     "@std/esm": "^0.25.1",
     "chai": "^3.5.0",
+    "chai-as-promised": "^7.1.1",
     "chai-things": "^0.2.0",
     "dag-map": "^2.0.2",
     "denodeify": "^1.2.1",

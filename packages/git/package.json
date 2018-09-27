@@ -16,7 +16,8 @@
     "@cardstack/logger": "^0.1.0",
     "@cardstack/nodegit": "^0.21.2-cardstack.1",
     "@cardstack/plugin-utils": "0.10.1",
-    "moment-timezone": "^0.5.11"
+    "moment-timezone": "^0.5.11",
+    "temp": "^0.8.3"
   },
   "devDependencies": {
     "@cardstack/di": "0.8.0",
