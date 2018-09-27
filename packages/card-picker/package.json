@@ -1,6 +1,6 @@
 {
   "name": "@cardstack/card-picker",
-  "version": "0.0.0",
+  "version": "0.10.15",
   "description": "Card-Picker system for cardstack",
   "keywords": [
     "ember-addon"
@@ -22,7 +22,7 @@
   },
   "dependencies": {
     "@cardstack/edges": "0.10.0",
-    "@cardstack/search": "*",
+    "@cardstack/search": "0.10.15",
     "ember-cli-babel": "^6.16.0",
     "ember-cli-htmlbars": "^3.0.0",
     "ember-sortable": "^1.11.2"
