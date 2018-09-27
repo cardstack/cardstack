@@ -17,7 +17,7 @@
   {{to-elsewhere named="cardstack-modal"
                send=(hash
                       content=(component "field-editors/image-upload-modal"
-                        updateImage=(action 'updateImage')
+                        updateImage=(perform updateImage)
                         cancel=(action (mut showUploader) false)
                         content=content
                         field=field

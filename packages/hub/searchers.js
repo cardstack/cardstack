@@ -91,11 +91,11 @@ class Searchers {
     return authorizedResult;
   }
 
-  async getBinary(session, branch, type, id) {
+  async getBinary(session, branch, type, id, includePaths) {
     // look up authorized result to check read is authorized by going through
     // the default auth stack for the JSON representation. Error will be thrown
     // if authorization is not correct.
-    await this.get(session, branch, type, id);
+    let document = await this.get(session, branch, type, id, includePaths);
 
     let index = 0;
     let sources = await this._lookupSources();
@@ -109,7 +109,7 @@ class Searchers {
     };
     let result = await next();
 
-    return result;
+    return [result, document];
   }
 
   async getFromControllingBranch(session, type, id) {

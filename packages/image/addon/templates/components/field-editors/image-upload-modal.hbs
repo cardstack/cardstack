@@ -1,13 +1,15 @@
-<input type='file' accept="image/*" onchange={{action 'uploadFile'}}>
+<input type='file' accept="image/*" onchange={{perform uploadFile}}>
 
-{{#if file}}
-  <img src={{cs-image-url file}} alt="">
+{{#if uploadFile.isRunning}}
+  <em>Uploading File &hellip;</em>
+{{else if uploadFile.lastSuccessful.value}}
+  <img src={{cs-image-url uploadFile.lastSuccessful.value}} alt="">
 {{/if}}
 
 <div class="cardstack-image-upload-modal-buttons">
   <button {{action cancel}}>Cancel</button>
 
-  {{#if file}}
+  {{#if uploadFile.lastSuccessful.value}}
     <button {{action 'updateImage'}}>Update Image</button>
   {{/if}}
 </div>
