@@ -29,6 +29,16 @@
     ember-fetch "^5.1.1"
     koa-better-route "^0.1.0"
 
+"@cardstack/codegen@0.10.15":
+  version "0.10.15"
+  resolved "https://registry.yarnpkg.com/@cardstack/codegen/-/codegen-0.10.15.tgz#2cc7c5b6e0af9ef28872bd1143b085378d66bea3"
+  dependencies:
+    "@cardstack/di" "0.8.0"
+    "@cardstack/plugin-utils" "0.10.1"
+    ember-cli-babel "^6.8.2"
+    ember-fetch "^5.1.1"
+    koa-better-route "^0.1.0"
+
 "@cardstack/core-types@0.10.10":
   version "0.10.10"
   resolved "https://registry.yarnpkg.com/@cardstack/core-types/-/core-types-0.10.10.tgz#051beec21d4a4e2d76c652aca68b1c60122e754d"
@@ -38,6 +48,20 @@
     ember-cli-htmlbars "^2.0.1"
     ember-cli-postcss "https://github.com/ef4/ember-cli-postcss#0550adab2c0c0ab856efec6a4da8164eadd01e47"
     ember-power-select "^2.0.4"
+    moment-timezone "^0.5.11"
+    postcss-cssnext "^2.10.0"
+    postcss-import "^9.1.0"
+
+"@cardstack/core-types@0.10.15":
+  version "0.10.15"
+  resolved "https://registry.yarnpkg.com/@cardstack/core-types/-/core-types-0.10.15.tgz#3dbf2db89a74b054f1f3c512396faa1d83e02cb3"
+  dependencies:
+    "@cardstack/di" "0.8.0"
+    ember-cli-babel "^6.8.2"
+    ember-cli-htmlbars "^2.0.1"
+    ember-cli-postcss "https://github.com/ef4/ember-cli-postcss#0550adab2c0c0ab856efec6a4da8164eadd01e47"
+    ember-power-select "^2.0.4"
+    lodash.isempty "^4.4.0"
     moment-timezone "^0.5.11"
     postcss-cssnext "^2.10.0"
     postcss-import "^9.1.0"
@@ -75,11 +99,69 @@
     tar-fs "^1.16.0"
     tar-stream "^1.5.4"
 
+"@cardstack/hub@0.10.15":
+  version "0.10.15"
+  resolved "https://registry.yarnpkg.com/@cardstack/hub/-/hub-0.10.15.tgz#4edd1392bb2ffa2bd8096ee55a45aabc7d154232"
+  dependencies:
+    "@cardstack/codegen" "0.10.15"
+    "@cardstack/core-types" "0.10.15"
+    "@cardstack/di" "0.8.0"
+    "@cardstack/handlebars" "0.9.0"
+    "@cardstack/logger" "^0.1.0"
+    "@cardstack/pgsearch" "0.10.15"
+    "@cardstack/plugin-utils" "0.10.1"
+    "@cardstack/queue" "0.10.15"
+    broccoli-concat "^3.2.2"
+    broccoli-plugin "^1.3.0"
+    broccoli-source "^1.1.0"
+    chalk "^2.3.0"
+    commander "^2.9.0"
+    dag-map "^2.0.2"
+    denodeify "^1.2.1"
+    docker-container-id "^1.0.1"
+    ember-cli-babel "^6.8.2"
+    handlebars "^4.0.6"
+    koa "2"
+    koa-compose "^3.2.1"
+    lodash "^4.17.4"
+    nssocket "^0.6.0"
+    path-is-inside "^1.0.2"
+    quick-temp "^0.1.8"
+    resolve "^1.3.3"
+    superagent "^3.8.1"
+    tar-fs "^1.16.0"
+    tar-stream "^1.5.4"
+
+"@cardstack/jsonapi@0.10.15":
+  version "0.10.15"
+  resolved "https://registry.yarnpkg.com/@cardstack/jsonapi/-/jsonapi-0.10.15.tgz#4c5e60748bd25261a8e2f307d0d44b8d4ab39d32"
+  dependencies:
+    "@cardstack/di" "0.8.0"
+    "@cardstack/logger" "^0.1.0"
+    "@cardstack/plugin-utils" "0.10.1"
+    koa-json-body "^5.3.0"
+    lodash "^4.17.4"
+    qs "^6.4.0"
+
 "@cardstack/logger@^0.1.0":
   version "0.1.0"
   resolved "https://registry.yarnpkg.com/@cardstack/logger/-/logger-0.1.0.tgz#50107d5738079f10913158f86bdcec7c7242c784"
   dependencies:
     ms "2.0.0"
+
+"@cardstack/models@0.10.15":
+  version "0.10.15"
+  resolved "https://registry.yarnpkg.com/@cardstack/models/-/models-0.10.15.tgz#d596c29c93a901b675c804e4e612ecf20e14eb40"
+  dependencies:
+    "@cardstack/codegen" "0.10.15"
+    "@cardstack/di" "0.8.0"
+    "@cardstack/plugin-utils" "0.10.1"
+    ember-cli-babel "^6.8.2"
+    ember-data-relationship-tracker "^0.3.0"
+    ember-inject-optional "^0.1.0"
+    ember-resource-metadata "^0.3.0"
+    handlebars "^4.0.6"
+    inflection "^1.12.0"
 
 "@cardstack/nodegit@^0.21.2-cardstack.1":
   version "0.21.2-cardstack.1"
@@ -104,9 +186,31 @@
     pg "^7.0.3"
     pg-cursor "^1.3.0"
 
+"@cardstack/pgsearch@0.10.15":
+  version "0.10.15"
+  resolved "https://registry.yarnpkg.com/@cardstack/pgsearch/-/pgsearch-0.10.15.tgz#ec70575b655da45991b2333d4a15b24de89f6fe2"
+  dependencies:
+    "@cardstack/di" "^0.8.0"
+    "@cardstack/hub" "0.10.15"
+    "@cardstack/logger" "^0.1.0"
+    "@cardstack/plugin-utils" "0.10.1"
+    node-pg-migrate "3.5.0"
+    pg "^7.0.3"
+    pg-cursor "^1.3.0"
+
 "@cardstack/queue@0.10.10":
   version "0.10.10"
   resolved "https://registry.yarnpkg.com/@cardstack/queue/-/queue-0.10.10.tgz#b0c3224afb2304bb925d797870c5747da3ec613b"
+  dependencies:
+    "@cardstack/di" "0.8.0"
+    "@cardstack/logger" "^0.1.0"
+    "@cardstack/plugin-utils" "0.10.1"
+    pg "^7.0.3"
+    pg-boss "^2.5.1"
+
+"@cardstack/queue@0.10.15":
+  version "0.10.15"
+  resolved "https://registry.yarnpkg.com/@cardstack/queue/-/queue-0.10.15.tgz#b19c1c286b1b382f27472d8325ff14f66de0abcc"
   dependencies:
     "@cardstack/di" "0.8.0"
     "@cardstack/logger" "^0.1.0"
@@ -123,6 +227,34 @@
     "@cardstack/hub" "0.10.10"
     "@cardstack/logger" "^0.1.0"
     "@cardstack/pgsearch" "0.10.10"
+    "@cardstack/plugin-utils" "0.10.1"
+    "@std/esm" "^0.25.1"
+    chai "^3.5.0"
+    chai-things "^0.2.0"
+    dag-map "^2.0.2"
+    denodeify "^1.2.1"
+    ember-cli-babel "^6.8.2"
+    glob "^7.1.1"
+    handlebars "^4.0.6"
+    koa-better-route "^0.1.0"
+    koa-compose "^3.2.1"
+    koa-json-body "^5.3.0"
+    lodash "^4.17.4"
+    mocha-eslint "^3.0.1"
+    qs "^6.4.0"
+    require-uncached "^1.0.3"
+    resolve "^1.3.3"
+    temp "^0.8.3"
+
+"@cardstack/test-support@0.10.15":
+  version "0.10.15"
+  resolved "https://registry.yarnpkg.com/@cardstack/test-support/-/test-support-0.10.15.tgz#8a124777b3b01695c9ec41d1c042125ccdd51b42"
+  dependencies:
+    "@cardstack/di" "0.8.0"
+    "@cardstack/ephemeral" "0.10.1"
+    "@cardstack/hub" "0.10.15"
+    "@cardstack/logger" "^0.1.0"
+    "@cardstack/pgsearch" "0.10.15"
     "@cardstack/plugin-utils" "0.10.1"
     "@std/esm" "^0.25.1"
     chai "^3.5.0"
@@ -502,7 +634,7 @@ acorn@^5.2.1:
   version "5.2.1"
   resolved "https://registry.yarnpkg.com/acorn/-/acorn-5.2.1.tgz#317ac7821826c22c702d66189ab8359675f135d7"
 
-acorn@^5.6.2:
+acorn@^5.5.0, acorn@^5.6.2:
   version "5.7.3"
   resolved "https://registry.yarnpkg.com/acorn/-/acorn-5.7.3.tgz#67aa231bf8812974b85235a96771eb6bd07ea279"
 
@@ -4025,6 +4157,12 @@ doctrine@^2.0.2:
   dependencies:
     esutils "^2.0.2"
 
+doctrine@^2.1.0:
+  version "2.1.0"
+  resolved "https://registry.yarnpkg.com/doctrine/-/doctrine-2.1.0.tgz#5cd01fc101621b42c4cd7f5d1a66243716d3f39d"
+  dependencies:
+    esutils "^2.0.2"
+
 dom-walk@^0.1.0:
   version "0.1.1"
   resolved "https://registry.yarnpkg.com/dom-walk/-/dom-walk-0.1.1.tgz#672226dc74c8f799ad35307df936aba11acd6018"
@@ -4410,6 +4548,17 @@ ember-cli-normalize-entity-name@^1.0.0:
 ember-cli-path-utils@^1.0.0:
   version "1.0.0"
   resolved "https://registry.yarnpkg.com/ember-cli-path-utils/-/ember-cli-path-utils-1.0.0.tgz#4e39af8b55301cddc5017739b77a804fba2071ed"
+
+"ember-cli-postcss@git+https://github.com/ef4/ember-cli-postcss.git#0550adab2c0c0ab856efec6a4da8164eadd01e47":
+  version "3.5.0"
+  uid "0550adab2c0c0ab856efec6a4da8164eadd01e47"
+  resolved "git+https://github.com/ef4/ember-cli-postcss.git#0550adab2c0c0ab856efec6a4da8164eadd01e47"
+  dependencies:
+    bower "1.8.0"
+    broccoli-merge-trees "2.0.0"
+    broccoli-postcss "3.5.0"
+    broccoli-postcss-single "1.4.0"
+    merge "1.2.0"
 
 "ember-cli-postcss@https://github.com/ef4/ember-cli-postcss#0550adab2c0c0ab856efec6a4da8164eadd01e47":
   version "3.5.0"
@@ -4802,7 +4951,7 @@ ember-cli@~3.0.2:
     watch-detector "^0.1.0"
     yam "0.0.22"
 
-ember-cli@~3.4.2:
+ember-cli@~3.4.2, ember-cli@~3.4.3:
   version "3.4.3"
   resolved "https://registry.yarnpkg.com/ember-cli/-/ember-cli-3.4.3.tgz#33560c6416612bd8dc56858cffb2c81897ec8822"
   dependencies:
@@ -5854,6 +6003,10 @@ eslint-utils@^1.3.0, eslint-utils@^1.3.1:
   version "1.3.1"
   resolved "https://registry.yarnpkg.com/eslint-utils/-/eslint-utils-1.3.1.tgz#9a851ba89ee7c460346f97cf8939c7298827e512"
 
+eslint-visitor-keys@^1.0.0:
+  version "1.0.0"
+  resolved "https://registry.yarnpkg.com/eslint-visitor-keys/-/eslint-visitor-keys-1.0.0.tgz#3f3180fb2e291017716acb4c9d6d5b5c34a6a81d"
+
 eslint@4.9.0:
   version "4.9.0"
   resolved "https://registry.yarnpkg.com/eslint/-/eslint-4.9.0.tgz#76879d274068261b191fe0f2f56c74c2f4208e8b"
@@ -5978,11 +6131,61 @@ eslint@^4.0.0:
     table "^4.0.1"
     text-table "~0.2.0"
 
+eslint@^4.9.0:
+  version "4.19.1"
+  resolved "http://registry.npmjs.org/eslint/-/eslint-4.19.1.tgz#32d1d653e1d90408854bfb296f076ec7e186a300"
+  dependencies:
+    ajv "^5.3.0"
+    babel-code-frame "^6.22.0"
+    chalk "^2.1.0"
+    concat-stream "^1.6.0"
+    cross-spawn "^5.1.0"
+    debug "^3.1.0"
+    doctrine "^2.1.0"
+    eslint-scope "^3.7.1"
+    eslint-visitor-keys "^1.0.0"
+    espree "^3.5.4"
+    esquery "^1.0.0"
+    esutils "^2.0.2"
+    file-entry-cache "^2.0.0"
+    functional-red-black-tree "^1.0.1"
+    glob "^7.1.2"
+    globals "^11.0.1"
+    ignore "^3.3.3"
+    imurmurhash "^0.1.4"
+    inquirer "^3.0.6"
+    is-resolvable "^1.0.0"
+    js-yaml "^3.9.1"
+    json-stable-stringify-without-jsonify "^1.0.1"
+    levn "^0.3.0"
+    lodash "^4.17.4"
+    minimatch "^3.0.2"
+    mkdirp "^0.5.1"
+    natural-compare "^1.4.0"
+    optionator "^0.8.2"
+    path-is-inside "^1.0.2"
+    pluralize "^7.0.0"
+    progress "^2.0.0"
+    regexpp "^1.0.1"
+    require-uncached "^1.0.3"
+    semver "^5.3.0"
+    strip-ansi "^4.0.0"
+    strip-json-comments "~2.0.1"
+    table "4.0.2"
+    text-table "~0.2.0"
+
 espree@^3.4.0, espree@^3.5.1, espree@^3.5.2:
   version "3.5.2"
   resolved "https://registry.yarnpkg.com/espree/-/espree-3.5.2.tgz#756ada8b979e9dcfcdb30aad8d1a9304a905e1ca"
   dependencies:
     acorn "^5.2.1"
+    acorn-jsx "^3.0.0"
+
+espree@^3.5.4:
+  version "3.5.4"
+  resolved "https://registry.yarnpkg.com/espree/-/espree-3.5.4.tgz#b0f447187c8a8bed944b815a660bddf5deb5d1a7"
+  dependencies:
+    acorn "^5.5.0"
     acorn-jsx "^3.0.0"
 
 esprima-fb@~15001.1001.0-dev-harmony-fb:
@@ -11296,6 +11499,10 @@ regex-not@^1.0.0, regex-not@^1.0.2:
     extend-shallow "^3.0.2"
     safe-regex "^1.1.0"
 
+regexpp@^1.0.1:
+  version "1.1.0"
+  resolved "https://registry.yarnpkg.com/regexpp/-/regexpp-1.1.0.tgz#0e3516dd0b7904f413d2d4193dce4618c3a689ab"
+
 regexpp@^2.0.0:
   version "2.0.0"
   resolved "https://registry.yarnpkg.com/regexpp/-/regexpp-2.0.0.tgz#b2a7534a85ca1b033bcf5ce9ff8e56d4e0755365"
@@ -12599,6 +12806,17 @@ symlink-or-copy@^1.2.0:
   version "1.2.0"
   resolved "https://registry.yarnpkg.com/symlink-or-copy/-/symlink-or-copy-1.2.0.tgz#5d49108e2ab824a34069b68974486c290020b393"
 
+table@4.0.2, table@^4.0.1:
+  version "4.0.2"
+  resolved "https://registry.yarnpkg.com/table/-/table-4.0.2.tgz#a33447375391e766ad34d3486e6e2aedc84d2e36"
+  dependencies:
+    ajv "^5.2.3"
+    ajv-keywords "^2.1.0"
+    chalk "^2.1.0"
+    lodash "^4.17.4"
+    slice-ansi "1.0.0"
+    string-width "^2.1.1"
+
 table@^3.7.8:
   version "3.8.3"
   resolved "https://registry.yarnpkg.com/table/-/table-3.8.3.tgz#2bbc542f0fda9861a755d3947fefd8b3f513855f"
@@ -12609,17 +12827,6 @@ table@^3.7.8:
     lodash "^4.0.0"
     slice-ansi "0.0.4"
     string-width "^2.0.0"
-
-table@^4.0.1:
-  version "4.0.2"
-  resolved "https://registry.yarnpkg.com/table/-/table-4.0.2.tgz#a33447375391e766ad34d3486e6e2aedc84d2e36"
-  dependencies:
-    ajv "^5.2.3"
-    ajv-keywords "^2.1.0"
-    chalk "^2.1.0"
-    lodash "^4.17.4"
-    slice-ansi "1.0.0"
-    string-width "^2.1.1"
 
 tap-parser@^5.1.0:
   version "5.4.0"
