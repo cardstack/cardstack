@@ -10,7 +10,7 @@ module.exports = class EmailMessenger {
 
     if(params.useSes) {
       // If SES is required, you must add aws-sdk to the consuming project
-      const aws = require("aws-sdk");  // eslint-disable-line node/no-missing-require
+      const aws = require("aws-sdk");  // eslint-disable-line node/no-missing-require, node/no-extraneous-require
       if (!params.defaultFrom) {
         throw new Error(`Could not find defaultFrom in message sink params`);
       }
