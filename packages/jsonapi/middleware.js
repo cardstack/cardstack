@@ -62,7 +62,7 @@ function jsonapiMiddleware(searcher, writers, indexers, defaultBranch) {
     let contentType = ctxt.request.headers['content-type'];
     let isJsonApi = contentType && contentType.includes('application/vnd.api+json');
 
-    let [accepted] = ctxt.request.headers['accept'].split(";");
+    let [accepted] = (ctxt.request.headers['accept'] || "").split(";");
     let types = accepted.split(",");
     let acceptsJsonApi = types.some(t => mimeMatch(t, "application/vnd.api+json"));
 
