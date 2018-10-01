@@ -5864,6 +5864,12 @@ emit-function@0.0.2:
   version "0.0.2"
   resolved "https://registry.yarnpkg.com/emit-function/-/emit-function-0.0.2.tgz#e3a50b3d61be1bf8ca88b924bf713157a5bec124"
 
+emitter-component@~1.0.1:
+  version "1.0.1"
+  resolved "https://registry.yarnpkg.com/emitter-component/-/emitter-component-1.0.1.tgz#89b1bf871b5adbb875e1f3ee25211311fc5a3163"
+  dependencies:
+    indexof "0.0.1"
+
 emojis-list@^2.0.0:
   version "2.1.0"
   resolved "https://registry.yarnpkg.com/emojis-list/-/emojis-list-2.1.0.tgz#4daa4d9db00f9819880c79fa457ae5b09a1fd389"
@@ -12972,6 +12978,12 @@ sum-up@^1.0.1:
   resolved "https://registry.yarnpkg.com/sum-up/-/sum-up-1.0.3.tgz#1c661f667057f63bcb7875aa1438bc162525156e"
   dependencies:
     chalk "^1.0.0"
+
+superagent-defaults@0.1.14:
+  version "0.1.14"
+  resolved "https://registry.yarnpkg.com/superagent-defaults/-/superagent-defaults-0.1.14.tgz#0539c5a6eef17605d41b0b924a62911913b34178"
+  dependencies:
+    emitter-component "~1.0.1"
 
 superagent@^2.0.0:
   version "2.3.0"

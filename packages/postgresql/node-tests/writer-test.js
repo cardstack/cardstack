@@ -124,7 +124,7 @@ describe('postgresql/writer', function() {
 
     await env.lookup('hub:indexers').update({ forceRefresh: true });
 
-    let { body: { data } } = await request.get(`/api/articles/${created.id}`);
+    let { body: { data } } = await request.get(`/api/articles/${created.id}`).set('Accept', 'application/vnd.api+json');
     expect(data).has.property('id', created.id);
     expect(data).has.property('type', 'articles');
     expect(data.attributes).to.deep.equal({

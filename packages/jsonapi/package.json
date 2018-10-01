@@ -16,6 +16,7 @@
     "eslint-plugin-ember": "^5.0.0",
     "eslint-plugin-node": "^5.2.1",
     "koa": "2",
+    "superagent-defaults": "0.1.14",
     "supertest": "^2.0.1"
   },
   "dependencies": {
