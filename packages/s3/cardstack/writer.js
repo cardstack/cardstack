@@ -3,7 +3,7 @@ const uuidv4 = require('uuid/v4');
 const { statSync } = require("fs");
 const sha1File = require('sha1-file');
 const moment = require("moment");
-const AWS = require('aws-sdk');
+const { makeS3Client } = require('./s3');
 const log = require('@cardstack/logger')('cardstack/image');
 
 
@@ -21,14 +21,7 @@ module.exports = class Writer {
     let config = this.branches[branch];
     log.debug(`Uploading file to S3 key ${options.Key}`);
 
-    let s3 = new AWS.S3({
-      accessKeyId:      config.access_key_id,
-      secretAccessKey:  config.secret_access_key,
-      region:           config.region,
-      params:           { Bucket: config.bucket }
-    });
-
-    await s3.upload(options).promise();
+    await makeS3Client(config).upload(options).promise();
     log.debug(`Upload of ${options.Key} successful`);
   }
 

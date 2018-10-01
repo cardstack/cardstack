@@ -1,7 +1,6 @@
 const { declareInjections }   = require('@cardstack/di');
-
-const AWS = require('aws-sdk');
 const log = require('@cardstack/logger')('cardstack/s3');
+const { makeS3Client } = require('./s3');
 
 
 module.exports = declareInjections({
@@ -31,15 +30,7 @@ class S3Searcher {
     let config = this.branches[branch];
     log.debug(`Attempting to read ${options.Key} from bucket ${config.bucket}`);
 
-    let s3 = new AWS.S3({
-      accessKeyId:      config.access_key_id,
-      secretAccessKey:  config.secret_access_key,
-      region:           config.region,
-      params:           { Bucket: config.bucket }
-    });
-
-    return await s3.getObject(options).promise();
-
+    return await makeS3Client(config).getObject(options).promise();
   }
 
   async getBinary(session, branch, type, id) {
