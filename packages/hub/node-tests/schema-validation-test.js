@@ -122,6 +122,17 @@ describe('schema/validation', function() {
         factory.getResource('fields', 'title')
       ]);
 
+    factory.addResource('constraints')
+      .withAttributes({
+        constraintType: '@cardstack/core-types::not-empty',
+        inputs: { ignoreBlank: true }
+      })
+      .withRelated('input-assignments', [
+        factory.addResource('input-assignments')
+          .withAttributes({ inputName: 'target' })
+          .withRelated('field', factory.getResource('fields', 'title')),
+      ]);
+
     factory.addResource('content-types', 'things-with-defaults')
       .withRelated('fields', [
         factory.addResource('fields', 'timestamp')
@@ -306,6 +317,17 @@ describe('schema/validation', function() {
       }
     }));
     expect(errors).includes.something.with.property('detail', 'published-date must be present');
+  });
+
+  it("applies constraints to empty fields", async function() {
+    let errors = await schema.validationErrors(create({
+      type: 'events',
+      id: '1',
+      attributes: {
+        title: "   "
+      }
+    }));
+    expect(errors).includes.something.with.property('detail', 'published-date must not be empty');
   });
 
   it("applies constraints to mutually exclusive fields", async function() {
