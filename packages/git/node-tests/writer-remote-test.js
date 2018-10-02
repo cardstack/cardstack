@@ -133,75 +133,75 @@ describe('git/writer with remote', function() {
       });
     });
 
-    // it.skip('reports merge conflict', async function() {
-    //   await writers.update('master', env.session, 'articles', '1', {
-    //     data: {
-    //       id: '1',
-    //       type: 'articles',
-    //       attributes: {
-    //         title: 'Updated title'
-    //       },
-    //       meta: {
-    //         version: head
-    //       }
-    //     }
-    //   });
-    //
-    //   try {
-    //     await writers.update('master', env.session, 'articles', '1', {
-    //       data: {
-    //         id: '1',
-    //         type: 'articles',
-    //         attributes: {
-    //           title: 'Conflicting title'
-    //         },
-    //         meta: {
-    //           version: head
-    //         }
-    //       }
-    //     });
-    //     throw new Error("should not get here");
-    //   } catch (err) {
-    //     if (!err.status) {
-    //       throw err;
-    //     }
-    //     expect(err.status).to.equal(409);
-    //     expect(err.detail).to.match(/merge conflict/i);
-    //   }
-    // });
+    it.skip('reports merge conflict', async function() {
+      await writers.update('master', env.session, 'articles', '1', {
+        data: {
+          id: '1',
+          type: 'articles',
+          attributes: {
+            title: 'Updated title'
+          },
+          meta: {
+            version: head
+          }
+        }
+      });
+
+      try {
+        await writers.update('master', env.session, 'articles', '1', {
+          data: {
+            id: '1',
+            type: 'articles',
+            attributes: {
+              title: 'Conflicting title'
+            },
+            meta: {
+              version: head
+            }
+          }
+        });
+        throw new Error("should not get here");
+      } catch (err) {
+        if (!err.status) {
+          throw err;
+        }
+        expect(err.status).to.equal(409);
+        expect(err.detail).to.match(/merge conflict/i);
+      }
+    });
   });
 
   describe('delete', function() {
-    // it.skip('deletes document', async function() {
-    //   await writers.delete('master', env.session, head, 'people', '1');
-    //   let articles = (await inRepo(repoPath).listTree('master', 'contents/people')).map(a => a.name);
-    //   expect(articles).to.not.contain('1.json');
-    // });
-    //
-    // it.skip('reports merge conflict', async function() {
-    //   await writers.update('master', env.session, 'articles', '1', {
-    //     data: {
-    //       id: '1',
-    //       type: 'articles',
-    //       attributes: {
-    //         title: 'Updated title'
-    //       },
-    //       meta: {
-    //         version: head
-    //       }
-    //     }
-    //   });
-    //
-    //   try {
-    //     await writers.delete('master', env.session, head, 'articles', '1');
-    //     throw new Error("should not get here");
-    //   } catch (err) {
-    //     if (!err.status) {
-    //       throw err;
-    //     }
-    //     expect(err.status).to.equal(409);
-    //     expect(err.detail).to.match(/merge conflict/i);
-    //   }
-    // });
+    it.skip('deletes document', async function() {
+      await writers.delete('master', env.session, head, 'people', '1');
+      let articles = (await inRepo(repoPath).listTree('master', 'contents/people')).map(a => a.name);
+      expect(articles).to.not.contain('1.json');
+    });
+
+    it.skip('reports merge conflict', async function() {
+      await writers.update('master', env.session, 'articles', '1', {
+        data: {
+          id: '1',
+          type: 'articles',
+          attributes: {
+            title: 'Updated title'
+          },
+          meta: {
+            version: head
+          }
+        }
+      });
+
+      try {
+        await writers.delete('master', env.session, head, 'articles', '1');
+        throw new Error("should not get here");
+      } catch (err) {
+        if (!err.status) {
+          throw err;
+        }
+        expect(err.status).to.equal(409);
+        expect(err.detail).to.match(/merge conflict/i);
+      }
+    });
   });
 });
