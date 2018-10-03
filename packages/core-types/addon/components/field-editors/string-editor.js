@@ -5,12 +5,15 @@ import layout from '../../templates/components/field-editors/string-editor';
 
 export default Component.extend({
   layout,
+
   disabled: not('enabled'),
 
   isContentInvalid: not('content.isValid'),
 
-  hasValidationError: computed('isContentInvalid', function() {
-    return this.content.errors.has(this.field);
+  hasValidationError: computed('isContentInvalid', 'content.errors', function() {
+    if (this.isContentInvalid) {
+      return this.content.errors.has(this.field);
+    }
   }),
 
   firstValidationError: computed('hasValidationError', function() {
