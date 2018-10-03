@@ -1,3 +1,10 @@
 .integer-editor.invalid > input {
-    background-color: #FBC0BB;
+  background-color: #FBC0BB;
+}
+.string-editor.invalid > input {
+  background-color: #FBC0BB;
+}
+.string-editor > .error-message {
+  color: red;
+  font-size: 0.8rem;
 }
