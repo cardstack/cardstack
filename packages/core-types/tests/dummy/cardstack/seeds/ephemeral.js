@@ -20,6 +20,9 @@ function initialModels() {
     initial.addResource('fields', 'dob').withAttributes({
       fieldType: '@cardstack/core-types::date'
     }),
+    initial.addResource('fields', 'is-good-guy').withAttributes({
+      fieldType: '@cardstack/core-types::boolean'
+    }),
     initial.addResource('fields', 'feeling').withAttributes({
       fieldType: '@cardstack/core-types::belongs-to',
       editorComponent: 'field-editors/dropdown-choices-editor'
@@ -60,32 +63,36 @@ function initialModels() {
   initial.addResource('drivers', 'kingboo')
     .withAttributes({
       name: 'King Boo',
-      dob: '1998-01-21'
+      dob: '1998-01-21',
+      isGoodGuy: false
     })
     .withRelated('feeling', exuberantFeeling)
     .withRelated('vehicle', standardKartVehicle);
 
-  initial.addResource('drivers', 'metalmario')
+    initial.addResource('drivers', 'metalmario')
     .withAttributes({
       name: 'Metal Mario',
-      dob: '1999-01-01'
+      dob: '1999-01-01',
+      isGoodGuy: true
     })
     .withRelated('feeling', happyFeeling)
     .withRelated('vehicle', sportBikeVehicle)
     .withRelated('alternate-vehicle', standardKartVehicle);
 
-  initial.addResource('drivers', 'link')
+    initial.addResource('drivers', 'link')
     .withAttributes({
       name: 'Link',
-      dob: '2003-01-01'
+      dob: '2003-01-01',
+      isGoodGuy: true
     })
     .withRelated('feeling', happyFeeling)
     .withRelated('vehicle', sportBikeVehicle);
 
-  initial.addResource('drivers', 'shyguy')
+    initial.addResource('drivers', 'shyguy')
     .withAttributes({
       name: 'Shy Guy',
-      dob: '2001-01-01'
+      dob: '2001-01-01',
+      isGoodGuy: false
     })
     .withRelated('feeling', sadFeeling)
     .withRelated('vehicle', sportBikeVehicle);

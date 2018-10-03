@@ -1,6 +1,6 @@
 import { module, test } from 'qunit';
 import { setupApplicationTest } from 'ember-qunit';
-import { visit, currentURL, fillIn } from '@ember/test-helpers';
+import { visit, currentURL, fillIn, click } from '@ember/test-helpers';
 import { selectChoose } from 'ember-power-select/test-support/helpers';
 import RSVP from 'rsvp';
 
@@ -25,12 +25,14 @@ module('Acceptance | field editors', async function(hooks) {
 
     assert.equal(model.get('name'), 'Metal Mario', 'driver name is correct');
     assert.equal(model.get('dob'), '1999-01-01', 'driver dob is correct');
+    assert.equal(model.get('isGoodGuy'), true, 'driver is a good guy');
     assert.equal(feeling, 'Happy', 'driver is feeling happy');
     assert.equal(vehicle, 'Sport Bike', 'driver is using a sport bike');
     assert.equal(alternateVehicle, 'Standard Kart', 'drivers alternate vehicle is a standard kart');
 
     await fillIn('.ember-text-field:nth-of-type(1)', 'METAL Mario');
     await fillIn('.ember-text-field:nth-of-type(2)', '1998-01-01');
+    await click('.cs-toggle-switch');
     await selectChoose('.feeling-selector', 'Sad');
     await selectChoose('.vehicle-selector', 'Honeycoupe');
     await selectChoose('.alternate-vehicle-selector', 'Wild Wiggler');
@@ -45,6 +47,7 @@ module('Acceptance | field editors', async function(hooks) {
 
     assert.equal(model.get('name'), 'METAL Mario', 'metal mario is more metal');
     assert.equal(model.get('dob'), '1998-01-01', 'metal mario was born earlier');
+    assert.equal(model.get('isGoodGuy'), false, 'metal mario is a bad guy');
     assert.equal(feeling, 'Sad', 'metal mario is sad');
     assert.equal(vehicle, 'Honeycoupe', 'metal mario is driving a honeycoupe');
     assert.equal(alternateVehicle, 'Wild Wiggler', 'metal marios alternate vehicle is a wild wiggler');
