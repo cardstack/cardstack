@@ -327,7 +327,7 @@ describe('schema/validation', function() {
         title: "   "
       }
     }));
-    expect(errors).includes.something.with.property('detail', 'published-date must not be empty');
+    expect(errors).includes.something.with.property('detail', 'title must not be empty');
   });
 
   it("applies constraints to mutually exclusive fields", async function() {
