@@ -1,1 +1,4 @@
+{{#if (and isContentInvalid hasValidationError)}}
+  {{firstValidationError}}
+{{/if}}
 {{input value=(get content field) disabled=disabled }}

@@ -215,12 +215,12 @@ describe('schema/validation', function() {
     expect(errors).collectionContains({
       detail: 'type "articles" has no field named "popularity"',
       source: { pointer: '/data/attributes/popularity' },
-      status: 400
+      status: 422
     });
     expect(errors).collectionContains({
       detail: 'type "articles" has no field named "pomposity"',
       source: { pointer: '/data/attributes/pomposity' },
-      status: 400
+      status: 422
     });
   });
 
@@ -235,7 +235,7 @@ describe('schema/validation', function() {
     expect(errors).collectionContains({
       detail: 'field "title" should be in attributes, not relationships',
       source: { pointer: '/data/relationships/title' },
-      status: 400
+      status: 422
     });
   });
 
@@ -250,7 +250,7 @@ describe('schema/validation', function() {
     expect(errors).collectionContains({
       detail: 'field "primary-image" should be in relationships, not attributes',
       source: { pointer: '/data/attributes/primary-image' },
-      status: 400
+      status: 422
     });
   });
 
@@ -279,17 +279,17 @@ describe('schema/validation', function() {
     expect(errors).collectionContains({
       detail: '21 is not a valid value for field "title"',
       source: { pointer: '/data/attributes/title' },
-      status: 400
+      status: 422
     });
     expect(errors).collectionContains({
       detail: '"Not a date" is not a valid value for field "published-date"',
       source: { pointer: '/data/attributes/published-date' },
-      status: 400
+      status: 422
     });
     expect(errors).collectionContains({
       detail: '"Not a string array" is not a valid value for field "colors"',
       source: { pointer: '/data/attributes/colors' },
-      status: 400
+      status: 422
     });
   });
 
@@ -303,7 +303,7 @@ describe('schema/validation', function() {
     }));
     expect(errors).collectionContains({
       detail: 'title can be at most 40 characters long, it was 59',
-      status: 400,
+      status: 422,
       source: { pointer: '/data/attributes/title' }
     });
   });
@@ -327,7 +327,7 @@ describe('schema/validation', function() {
         title: "   "
       }
     }));
-    expect(errors).includes.something.with.property('detail', 'title must not be empty');
+    expect(errors).includes.something.with.property('detail', 'Title must not be empty');
   });
 
   it("applies constraints to mutually exclusive fields", async function() {
@@ -342,7 +342,7 @@ describe('schema/validation', function() {
 
     expect(errors).collectionContains({
       detail: 'Only either cover-image or cover-video can have a value, not both.',
-      status: 400,
+      status: 422,
       source: { pointer: '/data/attributes/cover-video' }
     });
   });
@@ -458,7 +458,7 @@ describe('schema/validation', function() {
     }, null, null);
     let errors = await schema.validationErrors(pending);
     expect(errors).collectionContains({
-      status: 400,
+      status: 422,
       title: 'Broken field reference',
       detail: 'content type "articles" refers to missing field "primary-image"'
     });
@@ -508,7 +508,7 @@ describe('schema/validation', function() {
     });
     let errors = await schema.validationErrors(pending);
     expect(errors).collectionContains({
-      status: 400,
+      status: 422,
       title: 'Validation error',
       detail: 'field "primary-image" refers to disallowed type "not-an-image"'
     });
@@ -529,7 +529,7 @@ describe('schema/validation', function() {
     });
     let errors = await schema.validationErrors(pending);
     expect(errors).collectionContains({
-      status: 400,
+      status: 422,
       title: 'Validation error',
       detail: 'field "detail-images" refers to disallowed type(s) "not-an-image"'
     });
@@ -550,7 +550,7 @@ describe('schema/validation', function() {
     });
     let errors = await schema.validationErrors(pending);
     expect(errors).collectionContains({
-      status: 400,
+      status: 422,
       title: 'Validation error',
       detail: 'field "primary-image" accepts only a single resource, not a list of resources'
     });
@@ -587,7 +587,7 @@ describe('schema/validation', function() {
     });
     let errors = await schema.validationErrors(pending);
     expect(errors).collectionContains({
-      status: 400,
+      status: 422,
       title: 'Validation error',
       detail: 'field "detail-images" accepts only a list of resources, not a single resource'
     });

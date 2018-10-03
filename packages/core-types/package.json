@@ -29,6 +29,7 @@
     "ember-cli-htmlbars": "^2.0.1",
     "ember-cli-postcss": "https://github.com/ef4/ember-cli-postcss#0550adab2c0c0ab856efec6a4da8164eadd01e47",
     "ember-power-select": "^2.0.4",
+    "handlebars": "^4.0.6",
     "lodash.isempty": "^4.4.0",
     "moment-timezone": "^0.5.11",
     "postcss-cssnext": "^2.10.0",

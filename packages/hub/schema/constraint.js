@@ -71,7 +71,7 @@ module.exports = class Constraint {
       return Object.values(this.fieldInputs).map(
         field => new Error(detail, {
           title: 'Validation error',
-          status: 400,
+          status: 422,
           source: { pointer: field.pointer() }
         })
       );
