@@ -1,9 +1,13 @@
-<div class="{{concat field '-selector'}}">
-  {{#power-select disabled=(not enabled)
-                  selected=(get content field)
-                  options=options
-                  onchange=(action "makeSelection")
-                  as |option|}}
-    {{get option displayFieldName}}
-  {{/power-select}}
+<div class="{{concat (dasherize field) '-selector'}}">
+  {{#unless missingContentType}}
+      {{#power-select disabled=(not enabled)
+                      selected=(get content field)
+                      options=options
+                      onchange=(action "makeSelection")
+                      as |option|}}
+        {{get option displayFieldName}}
+      {{/power-select}}
+  {{else}}
+    {{cs-assert "Field" field "has no associated content type"}}
+  {{/unless}}
 </div>
