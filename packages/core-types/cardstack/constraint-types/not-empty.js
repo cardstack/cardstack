@@ -5,7 +5,8 @@ Handlebars.registerHelper('capitalize', function(str) {
     return '';
   }
   return str.split(/-/)
-    .map((word) => word.replace(/^(\w)/, (m, d) => d.toUpperCase()));
+    .map((word) => word.replace(/^(\w)/, (m, d) => d.toUpperCase()))
+    .join(' ');
 });
 
 module.exports = {

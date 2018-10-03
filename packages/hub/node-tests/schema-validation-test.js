@@ -119,7 +119,8 @@ describe('schema/validation', function() {
 
     factory.addResource('content-types', 'events')
       .withRelated('fields', [
-        factory.getResource('fields', 'title')
+        factory.addResource('fields', 'event-title')
+          .withAttributes({ fieldType: '@cardstack/core-types::string' })
       ]);
 
     factory.addResource('constraints')
@@ -130,7 +131,7 @@ describe('schema/validation', function() {
       .withRelated('input-assignments', [
         factory.addResource('input-assignments')
           .withAttributes({ inputName: 'target' })
-          .withRelated('field', factory.getResource('fields', 'title')),
+          .withRelated('field', factory.getResource('fields', 'event-title')),
       ]);
 
     factory.addResource('content-types', 'things-with-defaults')
@@ -324,10 +325,10 @@ describe('schema/validation', function() {
       type: 'events',
       id: '1',
       attributes: {
-        title: "   "
+        "event-title": "   "
       }
     }));
-    expect(errors).includes.something.with.property('detail', 'Title must not be empty');
+    expect(errors).includes.something.with.property('detail', 'Event Title must not be empty');
   });
 
   it("applies constraints to mutually exclusive fields", async function() {
