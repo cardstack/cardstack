@@ -1,6 +1,6 @@
-<div class="string-editor {{if hasValidationError 'invalid'}}">
-  {{#if hasValidationError}}
-    <span class="error-message">{{firstValidationError}}</span>
+<div class="field-editor {{if invalid 'invalid'}}">
+  {{#if invalid}}
+    <span class="error-message">{{errorMessage}}</span>
   {{/if}}
   {{input value=(get content field) disabled=disabled}}
 </div>

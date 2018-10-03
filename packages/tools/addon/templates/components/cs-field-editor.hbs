@@ -1,6 +1,16 @@
 {{#let (cs-field-editor-for content field) (cs-field-editor-options-for content field) as |editorName editorOptions|}}
   {{#if (is-component editorName)}}
-    {{component editorName content=content field=field editorOptions=editorOptions tagName="" enabled=enabled}}
+    {{component
+      editorName
+      content=content
+      field=field
+      editorOptions=editorOptions
+      tagName=""
+      enabled=enabled
+      disabled=disabled
+      invalid=hasValidationError
+      errorMessage=firstValidationError
+    }}
   {{else}}
     {{cs-assert "No such field editor" editorName}}
   {{/if}}
