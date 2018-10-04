@@ -1,1 +1,13 @@
-{{input type="date" value=(get content field) disabled=disabled}}
+{{#if (eq editorOptions.style "ymd")}}
+    <select>
+        <option value="2018">2018</option>
+    </select>
+    <select>
+        <option value="01">January</option>
+    </select>
+    <select>
+        <option value="01">01</option>
+    </select>
+{{else}}
+    {{input type="date" value=(get content field) disabled=disabled}}
+{{/if}}

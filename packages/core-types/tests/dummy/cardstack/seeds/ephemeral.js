@@ -20,6 +20,10 @@ function initialModels() {
     initial.addResource('fields', 'dob').withAttributes({
       fieldType: '@cardstack/core-types::date'
     }),
+    initial.addResource('fields', 'dob-ymd').withAttributes({
+      fieldType: '@cardstack/core-types::date',
+      editorOptions: { style: 'ymd' }
+    }),
     initial.addResource('fields', 'is-good-guy').withAttributes({
       fieldType: '@cardstack/core-types::boolean'
     }),

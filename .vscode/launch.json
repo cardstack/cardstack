@@ -34,6 +34,30 @@
             ]
         },
         {
+            "name": "Ember core-types test browser",
+            "type": "chrome",
+            "request": "launch",
+            "url": "http://localhost:7357",
+            "webRoot": "${workspaceFolder}/packages/core-types/tests/dummy"
+        },
+        {
+            "type": "node",
+            "request": "launch",
+            "name": "Launch Hub",
+            "cwd": "${workspaceRoot}/packages/core-types",
+            "console": "integratedTerminal",
+            "env": {
+                "CARDSTACK_SESSIONS_KEY":"OQUQi8NH0asrYgeoE10ijOFBhd/P1BU8HZP/rNqO5nw=",
+                "PGSEARCH_NAMESPACE":"cardstack_data_development",
+                "INITIAL_DATA_DIR":"${workspaceFolder}/packages/core-types/tests/dummy/cardstack",
+                "HUB_ENVIRONMENT":"test",
+                "PORT":"3000"
+            },
+            "args": [
+                "${workspaceFolder}/packages/hub/bin/cardstack-hub.js"
+            ]
+        },
+        {
             "type": "node",
             "request": "launch",
             "name": "Launch Test Suite",

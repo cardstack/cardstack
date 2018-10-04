@@ -1,0 +1,51 @@
+{
+  // Use IntelliSense to learn about possible attributes.
+  // Hover to view descriptions of existing attributes.
+  // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "type": "chrome",
+      "request": "launch",
+      "name": "Launch Program",
+      "program": "ember",
+      "args": [
+          "test",
+          "-s"
+      ],
+
+    },
+    {
+      "type": "node",
+      "request": "launch",
+      "name": "Run Hub",
+      "cwd": "${workspaceRoot}/test-harness",
+      "program": "${workspaceRoot}/node_modules/@cardstack/hub/bin/cardstack-hub.js",
+      "console": "integratedTerminal",
+      "args": [
+      ],
+      "env": {
+        "PGPORT": "5432",
+        "CARDSTACK_SESSIONS_KEY": "SBgEzGrr5IcpFbRQHQVjfSY/Rt70yXsljfcrl4k99Fw=",
+        "PGSEARCH_NAMESPACE": "test_harness_development",
+        "INITIAL_DATA_DIR": "${workspaceRoot}/test-harness/cardstack",
+        "HUB_ENVIRONMENT": "development",
+        "PORT": "3000"
+      }
+    },
+    {
+      "type": "node",
+      "request": "launch",
+      "name": "Run ember",
+      "cwd": "${workspaceRoot}/test-harness",
+      "program": "${workspaceRoot}/test-harness/node_modules/.bin/ember",
+      "args": [
+          "serve",
+          "--print"
+      ],
+      "env": {
+        "HUB_URL": "http://localhost:3000"
+      }
+    },
+  ]
+}

@@ -19,6 +19,7 @@ module('Integration | Component | field editors/date editor', function(hooks) {
     this.set('model', {
       expiration: 'pizza'
     });
+    debugger;
     await render(hbs`{{field-editors/date-editor content=model field="expiration" enabled=true}}`);
     assert.dom('input[type=date]').hasNoValue('date input has no value');
     assert.dom('input').isNotDisabled('date field is not disabled');
