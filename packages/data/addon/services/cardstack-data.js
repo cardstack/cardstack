@@ -6,6 +6,10 @@ import DS from 'ember-data';
 
 const noFields = '___no-fields___';
 
+function getType(record) {
+  return record.get('type') || record.constructor.modelName;
+}
+
 export default Service.extend({
   store: inject(),
 
@@ -28,6 +32,8 @@ export default Service.extend({
     let record = await store.findRecord(type, id, { include });
 
     await this._loadRelatedRecords(record, format);
+
+    return record;
   },
 
   // caching the content types to more efficiently deal with parallel content type lookups
@@ -41,9 +47,9 @@ export default Service.extend({
   },
 
   async _loadRelatedRecords(record, format) {
-    if (!record || !record.get('type')) { return; }
+    if (!record || !getType(record)) { return; }
 
-    let contentType = await this._getContentType(record.get('type'));
+    let contentType = await this._getContentType(getType(record));
     let fieldset = contentType.get(`fieldsets.${format}`);
 
     if (!fieldset || !fieldset.length) { return; } // record is already loaded, you are all done
@@ -66,12 +72,12 @@ export default Service.extend({
   },
 
   async _recurseRecord(record, format) {
-    let loadedRecord = await this._loadRecord(record.get('type'), record.id, format);
+    let loadedRecord = await this._loadRecord(getType(record), record.id, format);
     if (!loadedRecord) { return; }
     await this._loadRelatedRecords(loadedRecord, format);
   },
 
-  async _loadRecord(type, id, format) {
+  async _loadRecord(/*branch="master",*/type, id, format) {
     let store = this.get('store');
     let fieldRecordType = await this._getContentType(type);
     let fieldset = fieldRecordType.get(`fieldsets.${format}`);
