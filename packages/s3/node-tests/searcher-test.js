@@ -55,7 +55,7 @@ describe('cardstack/s3/searcher', function() {
     await destroyDefaultEnvironment(env);
   });
 
-  it("Creates a file in S3", async function() {
+  it("Finds a file in S3", async function() {
     await env.setUser('test-users', 'the-default-test-user');
 
     let response = await request.get('/api/cs-files/1234');

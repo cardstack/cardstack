@@ -11,7 +11,8 @@
     "@cardstack/di": "0.8.0",
     "@cardstack/logger": "^0.1.0",
     "@cardstack/plugin-utils": "0.10.1",
-    "lodash": "^4.17.4"
+    "lodash": "^4.17.4",
+    "stream-to-promise": "2.2.0"
   },
   "devDependencies": {
     "@cardstack/eslint-config": "0.8.0",
