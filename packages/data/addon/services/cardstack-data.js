@@ -44,7 +44,7 @@ export default Service.extend({
       return await this._contentTypeCache[type];
     }
 
-    this._contentTypeCache[type] = await this.get('store').findRecord('content-type', pluralize(type));
+    this._contentTypeCache[type] = this.get('store').findRecord('content-type', pluralize(type));
     return await this._contentTypeCache[type];
   },
 
@@ -91,7 +91,7 @@ export default Service.extend({
 
     if (this._loadedRecordsCache[cacheKey]) {
       await this._loadedRecordsCache[cacheKey];
-      return; // no need to process any further, as it has this record already been loaded into the store
+      return; // no need to process any further, as this record has already been loaded into the store
     }
 
     // we need to specify `reload` in order to allow the included resources to be added to the store.
