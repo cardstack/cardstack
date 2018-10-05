@@ -221,7 +221,7 @@ function ownedRelatedRecords(records, out = []) {
 
   let recordClass = record.constructor;
   get(recordClass, 'relationships').forEach(([ relationshipDefinition ]) => {
-    let { meta } = relationshipDefinition;
+    let meta = recordClass.metaForProperty(relationshipDefinition.name);
     let { owned } = meta.options;
     if (owned) {
       let relatedRecords = record.get(meta.name);
