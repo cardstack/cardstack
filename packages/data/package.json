@@ -1,6 +1,6 @@
 {
   "name": "@cardstack/data",
-  "version": "0.10.18",
+  "version": "0.10.19",
   "description": "Data support for Cardstack cards",
   "keywords": [
     "ember-addon",
