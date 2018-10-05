@@ -77,6 +77,18 @@ module.exports = class ContentType {
       this.includesTree = Object.create(null);
     }
 
+    if (model.attributes && model.attributes['fieldsets']) {
+      let fieldsets = model.attributes['fieldsets'];
+      for (let format of Object.keys(fieldsets)) {
+        if (!Array.isArray(fieldsets[format])) {
+          throw new Error(`content type "${model.id}" contains fieldset for format "${format}" that is not an array: "${JSON.stringify(fieldsets[format])}"`, {
+            status: 400,
+            title: 'Invalid fieldset'
+          });
+        }
+      }
+    }
+
     this.allFields = allFields;
   }
 

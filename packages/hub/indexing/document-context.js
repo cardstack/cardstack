@@ -183,16 +183,10 @@ module.exports = class DocumentContext {
     searchDocOut[field.id] = related;
   }
 
-  _buildSearchTree(searchTree, contentType, segments) {
+  _buildSearchTree(searchTree, segments) {
     if (!segments.length) { return {}; }
 
-    let field = contentType.realAndComputedFields.get(segments[0]);
-    if (!field || !field.relatedTypes) { return {}; }
-
-    let relatedTypes = Object.keys(field.relatedTypes);
-    if (!relatedTypes.length) { return {}; }
-
-    searchTree[segments[0]] = this._buildSearchTree(Object.assign({}, searchTree), this.schema.types.get(relatedTypes[0]), segments.slice(1));
+    searchTree[segments[0]] = this._buildSearchTree(Object.assign({}, searchTree), segments.slice(1));
 
     return searchTree;
   }
@@ -223,7 +217,7 @@ module.exports = class DocumentContext {
         if (this.includePaths.length) {
           includesTree = {};
           for (let segments of this.includePaths) {
-            this._buildSearchTree(includesTree, contentType, segments);
+            this._buildSearchTree(includesTree, segments);
           }
         } else {
           includesTree = contentType.includesTree;
@@ -246,7 +240,7 @@ module.exports = class DocumentContext {
       if (depth === 0 && this.includePaths.length){
         searchTree = {};
         for (let segments of this.includePaths) {
-          this._buildSearchTree(searchTree, contentType, segments);
+          this._buildSearchTree(searchTree, segments);
         }
       }
 

@@ -29,6 +29,11 @@ export default DS.JSONAPIAdapter.extend(AdapterMixin, {
     return returnValue;
   },
 
+  buildURL(modelName, id, snapshot, requestType, query) {
+    let actualModelName = snapshot && snapshot.modelName;
+    return this._super(actualModelName || modelName, id, snapshot, requestType, query);
+  },
+
   deleteRecord(store, type, snapshot) {
     let id = snapshot.id;
 

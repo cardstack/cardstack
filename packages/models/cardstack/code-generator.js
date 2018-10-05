@@ -37,6 +37,7 @@ define('@cardstack/models/generated/{{modelName}}', ['exports', '@cardstack/mode
      value: true
    });
    exports.default = _model.default.extend({
+     type: "{{modelName}}",
      {{#each fields as |field|}}
        {{#if field.isRelationship}}
          {{#with (related-type field ../modelName) as |type|}}
