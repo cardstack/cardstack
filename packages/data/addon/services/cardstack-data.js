@@ -1,6 +1,7 @@
 import Service from '@ember/service';
 import { inject } from '@ember/service';
 import { camelize } from '@ember/string';
+import { defaultBranch } from '@cardstack/plugin-utils/environment';
 import { singularize, pluralize } from 'ember-inflector';
 import DS from 'ember-data';
 
@@ -19,19 +20,20 @@ export default Service.extend({
     this._contentTypeCache = {};
   },
 
-  async load(type, id, format) {
+  async load(branch, type, id, format) {
+    branch = branch || defaultBranch;
     let store = this.get('store');
     let contentType = await this._getContentType(type);
     let fieldset = contentType.get(`fieldsets.${format}`);
 
     if (!fieldset) {
-      return await store.findRecord(singularize(type), id);
+      return await store.findRecord(singularize(type), id, { branch });
     }
 
     let include = fieldset.map(i => i.field).join(',') || noFields; // note that ember data ignores an empty string includes, so setting to nonsense field
-    let record = await store.findRecord(type, id, { include });
+    let record = await store.findRecord(type, id, { include, branch });
 
-    await this._loadRelatedRecords(record, format);
+    await this._loadRelatedRecords(branch, record, format);
 
     return record;
   },
@@ -46,7 +48,7 @@ export default Service.extend({
     return await this._contentTypeCache[type];
   },
 
-  async _loadRelatedRecords(record, format) {
+  async _loadRelatedRecords(branch, record, format) {
     if (!record || !getType(record)) { return; }
 
     let contentType = await this._getContentType(getType(record));
@@ -61,23 +63,23 @@ export default Service.extend({
 
       if (fieldRecord instanceof DS.ManyArray) {
         for (let fieldRecordItem of fieldRecord.toArray()) {
-          recordLoadPromises.push(this._recurseRecord(fieldRecordItem, fieldItem.format));
+          recordLoadPromises.push(this._recurseRecord(branch, fieldRecordItem, fieldItem.format));
         }
       } else {
-        recordLoadPromises.push(this._recurseRecord(fieldRecord, fieldItem.format));
+        recordLoadPromises.push(this._recurseRecord(branch, fieldRecord, fieldItem.format));
       }
     }
 
     await Promise.all(recordLoadPromises);
   },
 
-  async _recurseRecord(record, format) {
-    let loadedRecord = await this._loadRecord(getType(record), record.id, format);
+  async _recurseRecord(branch, record, format) {
+    let loadedRecord = await this._loadRecord(branch, getType(record), record.id, format);
     if (!loadedRecord) { return; }
-    await this._loadRelatedRecords(loadedRecord, format);
+    await this._loadRelatedRecords(branch, loadedRecord, format);
   },
 
-  async _loadRecord(/*branch="master",*/type, id, format) {
+  async _loadRecord(branch, type, id, format) {
     let store = this.get('store');
     let fieldRecordType = await this._getContentType(type);
     let fieldset = fieldRecordType.get(`fieldsets.${format}`);
@@ -85,7 +87,7 @@ export default Service.extend({
     if (!fieldset) { return; }
 
     let include = fieldset.map(i => i.field).join(',') || noFields; // note that ember data ignores an empty string includes, so setting to nonsense field
-    let cacheKey = `${type}/${id}:${include}`;
+    let cacheKey = `${branch}/${type}/${id}:${include}`;
 
     if (this._loadedRecordsCache[cacheKey]) {
       await this._loadedRecordsCache[cacheKey];
@@ -95,7 +97,7 @@ export default Service.extend({
     // we need to specify `reload` in order to allow the included resources to be added to the store.
     // otherwise, if the primary resource is already in the store, ember data is skipping adding the
     // included resources into the store.
-    this._loadedRecordsCache[cacheKey] = store.findRecord(type, id, { include, reload: true });
+    this._loadedRecordsCache[cacheKey] = store.findRecord(type, id, { include, reload: true, branch });
 
     return await this._loadedRecordsCache[cacheKey];
   }

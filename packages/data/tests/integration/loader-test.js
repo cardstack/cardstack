@@ -202,7 +202,7 @@ module('Integration | @cardstack/data service', function (hooks) {
 
     test("it can load relationships specified in the request format's fieldset", async function (assert) {
       let dataService = this.owner.lookup('service:cardstackData');
-      let homepage = await run(() => dataService.load('page', 'homepage', 'isolated'));
+      let homepage = await run(() => dataService.load('master', 'page', 'homepage', 'isolated'));
 
       let articles = homepage.get('articles').toArray().map(i => i.toJSON());
       let author = homepage.get('articles.firstObject.author');
@@ -269,7 +269,7 @@ module('Integration | @cardstack/data service', function (hooks) {
 
     test("it loads the defaultIncludes when a format is requested that is not in the fieldset", async function(assert) {
       let dataService = this.owner.lookup('service:cardstackData');
-      let homepage = await run(() => dataService.load('page', 'homepage', 'embedded'));
+      let homepage = await run(() => dataService.load('master', 'page', 'homepage', 'embedded'));
 
       let articles = homepage.get('articles').toArray().map(i => i.toJSON());
       let error;
@@ -344,7 +344,7 @@ module('Integration | @cardstack/data service', function (hooks) {
     // So ultimately we should also assert that the relationship field does not exist as part of this test.
     test("it does not load a relationship that is not in a request format's fieldset but is defaultIncluded", async function (assert) {
       let dataService = this.owner.lookup('service:cardstackData');
-      let homepage = await run(() => dataService.load('page', 'homepage', 'isolated'));
+      let homepage = await run(() => dataService.load('master', 'page', 'homepage', 'isolated'));
 
       let articles = homepage.get('articles').toArray().map(i => i.toJSON());
       let error;
