@@ -1,6 +1,6 @@
 {
   "name": "@cardstack/pgsearch",
-  "version": "0.10.17",
+  "version": "0.10.18",
   "author": "Edward Faulkner <edward@eaf4.com>",
   "repository": "https://github.com/cardstack/cardstack",
   "keywords": [
@@ -11,7 +11,7 @@
   },
   "dependencies": {
     "@cardstack/di": "^0.8.0",
-    "@cardstack/hub": "0.10.17",
+    "@cardstack/hub": "0.10.18",
     "@cardstack/logger": "^0.1.0",
     "@cardstack/plugin-utils": "0.10.1",
     "node-pg-migrate": "3.5.0",
