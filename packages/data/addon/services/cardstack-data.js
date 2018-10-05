@@ -20,18 +20,20 @@ export default Service.extend({
     this._contentTypeCache = {};
   },
 
-  async load(branch, type, id, format) {
+  async load(branch, type, id, format, opts={}) {
     branch = branch || defaultBranch;
     let store = this.get('store');
     let contentType = await this._getContentType(type);
     let fieldset = contentType.get(`fieldsets.${format}`);
+    let _opts = Object.assign({ branch }, opts);
 
     if (!fieldset) {
-      return await store.findRecord(singularize(type), id, { branch });
+      return await store.findRecord(singularize(type), id, _opts);
     }
 
     let include = fieldset.map(i => i.field).join(',') || noFields; // note that ember data ignores an empty string includes, so setting to nonsense field
-    let record = await store.findRecord(type, id, { include, branch });
+    _opts.include = include;
+    let record = await store.findRecord(type, id, _opts);
 
     await this._loadRelatedRecords(branch, record, format);
 
