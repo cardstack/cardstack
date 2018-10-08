@@ -43,6 +43,11 @@
         {{/if}}
       {{/with}}
     </footer>
+    {{#liquid-if updateError}}
+      <div class="cs-version-control-footer--errors">
+        {{updateError}}
+      </div>
+    {{/liquid-if}}
   {{/liquid-if}}
 
 {{/cs-collapsible-section}}

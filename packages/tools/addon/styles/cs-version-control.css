@@ -50,3 +50,9 @@
 .cs-toolbox-section.cs-version-control-preview.closed > header:hover {
     background-color: var(--tools-preview);
 }
+
+.cs-version-control-footer--errors {
+    color: var(--cs-tools-error-color);
+    background: var(--cs-tools-error-background);
+    padding: 0.75em;
+}

@@ -6,7 +6,7 @@ import { task } from 'ember-concurrency';
 import { transitionTo } from '../private-api';
 import { modelType } from '@cardstack/rendering/helpers/cs-model-type';
 import { defaultBranch } from '@cardstack/plugin-utils/environment';
-import { computed } from "@ember/object";
+import { computed, get } from "@ember/object";
 import { or } from '@ember/object/computed';
 
 export default Component.extend({
@@ -137,7 +137,12 @@ export default Component.extend({
   anythingPending: or('model.isNew', 'anythingDirty'),
 
   update: task(function * () {
-    yield this.get('model').save();
+    this.set('updateError', null);
+    try {
+      yield this.get('model').save();
+    } catch (error) {
+      this.set('updateError', get(error, 'errors.0.detail'));
+    }
   }).keepLatest(),
 
   delete: task(function * () {

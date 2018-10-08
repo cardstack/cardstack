@@ -2,7 +2,7 @@ import { run } from '@ember/runloop';
 import EmberObject from '@ember/object';
 import { module, test } from 'qunit';
 import { setupRenderingTest } from 'ember-qunit';
-import { render } from '@ember/test-helpers';
+import { render, waitFor } from '@ember/test-helpers';
 import hbs from 'htmlbars-inline-precompile';
 import DS from 'ember-data';
 
@@ -54,6 +54,25 @@ module('Integration | Component | cs version control', function(hooks) {
     run(() => {
       this.$('.cs-version-control-footer button').click();
     });
+  });
+
+  test('error after save displays detail', async function(assert) {
+    assert.expect(1);
+    model.set('save', function() {
+      throw {
+        errors: [{
+          detail: 'Error message'
+        }]
+      };
+    });
+    model.set('hasDirtyFields', true);
+    model.set('isNew', false);
+    await render(hbs`{{cs-version-control model=model enabled=true}}`);
+    run(() => {
+      this.$('.cs-version-control-footer button').click();
+    });
+    await waitFor('.cs-version-control-footer--errors');
+    assert.equal(this.$('.cs-version-control-footer--errors').text().trim(), 'Error message');
   });
 
   test('clicking update on clean model does nothing', async function(assert) {
