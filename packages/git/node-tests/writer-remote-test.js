@@ -16,7 +16,7 @@ const { promisify } = require('util');
 const temp = require('temp').track();
 
 // this is a known commit that is at the head of the remote repo
-const REMOTE_HEAD = 'e2c073f7a4f97662990df39c51fa942ee22f4542';
+const REMOTE_HEAD = 'e9ad9f2666a4eff985706dfb2e11aa10491100d7';
 const privateKey = readFileSync(join(__dirname, 'git-ssh-server', 'cardstack-test-key'), 'utf8');
 
 const fetchOpts = {
@@ -172,10 +172,13 @@ describe('git/writer with remote', function() {
   });
 
   describe('delete', function() {
-    it.skip('deletes document', async function() {
-      await writers.delete('master', env.session, head, 'people', '1');
-      let articles = (await inRepo(repoPath).listTree('master', 'contents/people')).map(a => a.name);
-      expect(articles).to.not.contain('1.json');
+    it('deletes document', async function() {
+      await writers.delete('master', env.session, REMOTE_HEAD, 'events', 'event-1');
+
+      await repo.fetch('origin', fetchOpts);
+
+      let articles = (await inRepo(tempRepoPath).listTree('origin/master', 'contents/events')).map(a => a.name);
+      expect(articles).to.not.contain('event-1.json');
     });
 
     it.skip('reports merge conflict', async function() {
