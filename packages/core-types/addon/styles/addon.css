@@ -3,11 +3,11 @@
   --error-background: #fbc0bb;
 }
 
-.field-editor.invalid > input {
-  background-color: var(--error-background);
-}
-.field-editor > .error-message {
+.field-editor--error-message {
   color: var(--error-color);
+  background-color: var(--error-background);
   font-size: 0.8rem;
+  width: 100%;
+  padding: 0.25rem;
 }
 
