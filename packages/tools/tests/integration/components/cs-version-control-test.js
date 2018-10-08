@@ -59,11 +59,11 @@ module('Integration | Component | cs version control', function(hooks) {
   test('error after save displays detail', async function(assert) {
     assert.expect(1);
     model.set('save', function() {
-      throw new Error({
+      throw {
         errors: [{
           detail: 'Error message'
         }]
-      });
+      };
     });
     model.set('hasDirtyFields', true);
     model.set('isNew', false);

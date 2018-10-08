@@ -141,8 +141,7 @@ export default Component.extend({
     try {
       yield this.get('model').save();
     } catch (error) {
-      console.log(error);
-      this.set('updateError', get(error, 'errors.firstObject.detail'));
+      this.set('updateError', get(error, 'errors.0.detail'));
     }
   }).keepLatest(),
 
