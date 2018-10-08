@@ -11,8 +11,10 @@
 
 <div> {{!- this one scrolls }}
 
-  {{cs-version-control model=model
-                       enabled=editingEnabled }}
+  {{cs-version-control
+    model=model
+    enabled=editingEnabled
+  }}
 
 
   {{#each fields key="id" as |fieldMark|}}

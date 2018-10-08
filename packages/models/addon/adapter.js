@@ -45,6 +45,24 @@ export default DS.JSONAPIAdapter.extend(AdapterMixin, {
     return this.ajax(this.buildURL(type.modelName, id, snapshot, 'deleteRecord'), "DELETE", options);
   },
 
+  urlForCreateRecord(modelName, snapshot) {
+    let baseURL = this._super(...arguments);
+    return this._addQueryParams(baseURL, snapshot);
+  },
+
+  urlForUpdateRecord(id, modelName, snapshot) {
+    let baseURL = this._super(...arguments);
+    return this._addQueryParams(baseURL, snapshot);
+  },
+
+  _addQueryParams(url, snapshot) {
+    let { onlyValidate } = snapshot.adapterOptions;
+    if (onlyValidate) {
+      return `${url}?onlyValidate=true`
+    }
+    return url;
+  },
+
   ajaxOptions() {
     let hash = this._super(...arguments);
 

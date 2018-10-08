@@ -117,13 +117,39 @@ class Handler {
       } else {
         kind = 'Individual';
       }
-      let methodName = `handle${kind}${this.ctxt.request.method}`;
+      let query = this.ctxt.request.query;
+      let methodName;
+      if (query.onlyValidate) {
+        methodName = `handle${kind}Validate`;
+      } else {
+        methodName = `handle${kind}${this.ctxt.request.method}`;
+      }
       log.debug("attempting to match method %s", methodName);
       let method = this[methodName];
       if (method) {
         await method.apply(this, segments.slice(1).filter(Boolean));
       }
     });
+  }
+
+  async handleIndividualValidate(type, id) {
+    let data = this._mandatoryBodyData();
+    let schema = await this.writers.schema.forBranch(this.branch);
+    let session = this.session;
+    let { writer /*, sourceId */ } = this.writers._getSchemaDetailsForType(schema, type);
+    let isSchema = this.writers.schemaTypes.includes(type);
+    let pendingChange = await writer.prepareUpdate(
+      this.branch,
+      session,
+      type,
+      id,
+      schema.withOnlyRealFields(data.data),
+      isSchema
+    );
+    await schema.validate(pendingChange, { type, id, session });
+    //TODO: Do we need to schema.invalidateCache if `schema.validate` returns a truthy value?
+    this.ctxt.body = data;
+    this.ctxt.status = 200;
   }
 
   async handleIndividualGET(type, id) {

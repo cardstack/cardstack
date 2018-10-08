@@ -40,7 +40,7 @@ export default DS.Model.extend(RelationshipTracker, {
     run(async () => {
       await this.saveRelated();
     });
-    await modelSave();
+    await modelSave(...arguments);
   },
 
   async saveRelated() {
