@@ -16,24 +16,36 @@
 
 
   {{#each fields key="id" as |fieldMark|}}
-    {{#cs-collapsible-section class="cs-toolbox-section"
-                              title=fieldMark.model.caption
-                              opened=(eq fieldMark.id openedFieldId)
-                              open=(action openField fieldMark)
-                              close=(action openField null)
-                              hovered=(perform highlightAndScrollToField fieldMark)
-                              unhovered=(perform highlightAndScrollToField null) }}
-
+    {{#cs-collapsible-section
+      class="cs-toolbox-section"
+      title=fieldMark.model.caption
+      opened=(eq fieldMark.id openedFieldId)
+      open=(action openField fieldMark)
+      close=(action openField null)
+      hovered=(perform highlightAndScrollToField fieldMark)
+      unhovered=(perform highlightAndScrollToField null)
+    as |register unregister|}}
       <div class="cs-field-editor-section">
+
       {{#if fieldMark.model.grouped}}
         {{#each fieldMark.model.grouped as |fieldName|}}
           {{#with fieldMark.model.content as |content|}}
             <label>{{cs-field-caption content fieldName}}</label>
-            {{cs-field-editor content=content field=fieldName enabled=editingEnabled}}
+            {{cs-field-editor
+              content=content
+              field=fieldName
+              enabled=editingEnabled
+              registerInSection=register
+            }}
           {{/with}}
         {{/each}}
       {{else}}
-        {{cs-field-editor content=fieldMark.model.content field=fieldMark.model.name enabled=editingEnabled}}
+        {{cs-field-editor
+          content=fieldMark.model.content
+          field=fieldMark.model.name
+          enabled=editingEnabled
+          registerInSection=register
+        }}
       {{/if}}
       </div>
     {{/cs-collapsible-section}}

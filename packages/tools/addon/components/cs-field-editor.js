@@ -12,6 +12,11 @@ export default Component.extend({
   field: '',
   enabled: true,
 
+  didInsertElement() {
+    this._super();
+    this.registerInSection(this);
+  },
+
   disabled: not('enabled'),
 
   isContentInvalid: not('content.isValid'),
@@ -28,4 +33,5 @@ export default Component.extend({
       return errorsForField.firstObject.message;
     }
   }),
+
 });

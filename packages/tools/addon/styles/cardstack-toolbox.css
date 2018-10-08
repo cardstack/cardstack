@@ -55,6 +55,10 @@
     fill: rgba(250,250,250,.5);
 }
 
+.cs-toolbox-section.invalid > header {
+  border: 2px solid var(--error-border);
+}
+
 .cs-toolbox-section > header > label {
     float: left;
     cursor: pointer;

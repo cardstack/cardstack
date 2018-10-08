@@ -1,8 +1,13 @@
+:root {
+  --error-color: red;
+  --error-background: #fbc0bb;
+}
+
 .field-editor.invalid > input {
-  background-color: #FBC0BB;
+  background-color: var(--error-background);
 }
 .field-editor > .error-message {
-  color: red;
+  color: var(--error-color);
   font-size: 0.8rem;
 }
 

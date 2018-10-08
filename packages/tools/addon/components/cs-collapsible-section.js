@@ -1,11 +1,17 @@
 import Component from '@ember/component';
+import { computed } from '@ember/object';
 import layout from '../templates/components/cs-collapsible-section';
 
 export default Component.extend({
   layout,
   tagName: 'section',
-  classNameBindings: ['opened:opened:closed'],
+  classNameBindings: ['opened:opened:closed', 'hasInvalidFields:invalid'],
   animationRules,
+
+  init() {
+    this._super();
+    this.set('fieldEditors', []);
+  },
 
   mouseEnter(event) {
     let hovered = this.get('hovered');
@@ -20,7 +26,19 @@ export default Component.extend({
     }
   },
 
+  hasInvalidFields: computed('fieldEditors.@each.hasValidationError', function() {
+    return this.fieldEditors.isAny('hasValidationError');
+  }),
+
   actions: {
+    registerFieldEditor(fieldEditor) {
+      this.fieldEditors.addObject(fieldEditor);
+    },
+
+    unregisterFieldEditor(fieldEditor) {
+      this.fieldEditors.removeObject(fieldEditor);
+    },
+
     toggle() {
       if (this.get('opened')) {
         this.get('close')();
