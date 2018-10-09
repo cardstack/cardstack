@@ -17,6 +17,10 @@
   }}
 
 
+  {{!-- TODO:
+      class=(concat "cs-toolbox-section" (if (has-errors fieldMark.model) 'invalid')
+      OR hasErrors=(has-errors model=fieldMark.model)
+  --}}
   {{#each fields key="id" as |fieldMark|}}
     {{#cs-collapsible-section
       class="cs-toolbox-section"
@@ -26,9 +30,8 @@
       close=(action openField null)
       hovered=(perform highlightAndScrollToField fieldMark)
       unhovered=(perform highlightAndScrollToField null)
-    as |register unregister|}}
+    }}
       <div class="cs-field-editor-section">
-
       {{#if fieldMark.model.grouped}}
         {{#each fieldMark.model.grouped as |fieldName|}}
           {{#with fieldMark.model.content as |content|}}
@@ -37,7 +40,6 @@
               content=content
               field=fieldName
               enabled=editingEnabled
-              registerInSection=register
             }}
           {{/with}}
         {{/each}}
@@ -46,7 +48,6 @@
           content=fieldMark.model.content
           field=fieldMark.model.name
           enabled=editingEnabled
-          registerInSection=register
         }}
       {{/if}}
       </div>

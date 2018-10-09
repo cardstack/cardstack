@@ -147,7 +147,7 @@ class Handler {
       isSchema
     );
     await schema.validate(pendingChange, { type, id, session });
-    //TODO: Do we need to schema.invalidateCache if `schema.validate` returns a truthy value?
+    // NOTE: We don't want validation to change the document in any way
     this.ctxt.body = data;
     this.ctxt.status = 200;
   }

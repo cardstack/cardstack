@@ -5,7 +5,5 @@
   </button>
 </header>
 {{#liquid-if opened rules=animationRules growDuration=250 growPixelsPerSecond=1}}
-  {{yield
-    (action "registerFieldEditor")
-  }}
+  {{yield}}
 {{/liquid-if}}

@@ -328,7 +328,7 @@ describe('schema/validation', function() {
         "event-title": "   "
       }
     }));
-    expect(errors).includes.something.with.property('detail', 'Event Title must not be empty');
+    expect(errors).includes.something.with.property('detail', 'event-title must not be empty');
   });
 
   it("applies constraints to mutually exclusive fields", async function() {

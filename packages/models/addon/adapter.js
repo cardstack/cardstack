@@ -61,8 +61,8 @@ export default DS.JSONAPIAdapter.extend(AdapterMixin, {
   },
 
   _addQueryParams(url, snapshot) {
-    let { onlyValidate } = snapshot.adapterOptions;
-    if (onlyValidate) {
+    let { adapterOptions } = snapshot;
+    if (adapterOptions && adapterOptions.onlyValidate) {
       return `${url}?onlyValidate=true`
     }
     return url;
