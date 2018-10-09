@@ -3,13 +3,14 @@ module.exports = class MockSearcher {
     return new this(...args);
   }
   constructor(opts) {
-    let { dataSource, users } = opts;
+    let { dataSource, users, mockedTypes } = opts;
     this.users = users;
     this.dataSource = dataSource;
+    this.mockedTypes = ['mock-users'].concat(mockedTypes || []);
   }
 
   async get(session, branch, type, id, next) {
-    if (type === 'mock-users') {
+    if (this.mockedTypes.includes(type)) {
       return this._getUser(id);
     }
     return next();
