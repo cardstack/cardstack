@@ -23,7 +23,7 @@ export default Component.extend({
 
   hasValidationError: computed('isContentInvalid', 'content.errors', function() {
     if (this.isContentInvalid) {
-      return this.content.errors.has(this.field);
+      return this.content.get('errors').has(this.field);
     }
   }),
 
