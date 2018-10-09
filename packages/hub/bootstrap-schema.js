@@ -15,7 +15,8 @@ const models = [
           { type: 'fields', id: 'fields' },
           { type: 'fields', id: 'is-built-in' },
           { type: 'fields', id: 'routing-field' },
-          { type: 'fields', id: 'default-includes' }
+          { type: 'fields', id: 'default-includes' },
+          { type: 'fields', id: 'fieldsets' }
         ]
       }
     }
@@ -274,6 +275,13 @@ const models = [
     id: 'default-includes',
     attributes: {
       'field-type': '@cardstack/core-types::string-array'
+    }
+  },
+  {
+    type: 'fields',
+    id: 'fieldsets',
+    attributes: {
+      'field-type': '@cardstack/core-types::object'
     }
   },
   {

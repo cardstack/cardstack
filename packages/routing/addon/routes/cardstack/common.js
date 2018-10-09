@@ -2,9 +2,12 @@ import { getOwner } from '@ember/application';
 import { inject as service } from '@ember/service';
 import Route from '@ember/routing/route';
 
+const isolatedFormat = 'isolated';
+
 export default Route.extend({
 
   service: service('cardstack-routing'),
+  data: service('cardstack-data'),
 
   _commonModelHook(type, slug) {
     let { branch } = this.modelFor('cardstack');
@@ -29,7 +32,7 @@ export default Route.extend({
         branch
       });
     } else {
-      promise = this.store.findRecord(mType, slug, { branch, reload: true });
+      promise = this.get('data').load(branch, mType, slug, isolatedFormat, { reload: true });
     }
 
     return promise.catch(err => {

@@ -27,7 +27,10 @@ function initialModels() {
 
   initial.addResource('content-types', 'posts')
     .withAttributes({
-      defaultIncludes: ['page']
+      fieldsets: {
+        isolated: [{ field: 'page', format: 'embedded'}],
+        embedded: [{ field: 'page', format: 'embedded'}]
+      }
     })
     .withRelated('fields', [
       initial.addResource('fields', 'title').withAttributes({

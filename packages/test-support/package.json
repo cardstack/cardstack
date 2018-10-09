@@ -1,6 +1,6 @@
 {
   "name": "@cardstack/test-support",
-  "version": "0.10.15",
+  "version": "0.10.20",
   "description": "Shared test support for cardstack packages.",
   "main": "index.js",
   "scripts": {
@@ -20,9 +20,9 @@
   "dependencies": {
     "@cardstack/di": "0.8.0",
     "@cardstack/ephemeral": "0.10.1",
-    "@cardstack/hub": "0.10.15",
+    "@cardstack/hub": "0.10.20",
     "@cardstack/logger": "^0.1.0",
-    "@cardstack/pgsearch": "0.10.15",
+    "@cardstack/pgsearch": "0.10.20",
     "@cardstack/plugin-utils": "0.10.1",
     "@std/esm": "^0.25.1",
     "chai": "^3.5.0",

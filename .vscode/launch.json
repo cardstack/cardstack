@@ -36,6 +36,30 @@
         {
             "type": "node",
             "request": "launch",
+            "name": "Launch Dummy App Hub",
+            "cwd": "${workspaceRoot}/packages/data",
+            "console": "integratedTerminal",
+            "env": {
+                "CARDSTACK_SESSIONS_KEY":"OQUQi8NH0asrYgeoE10ijOFBhd/P1BU8HZP/rNqO5nw=",
+                "PGSEARCH_NAMESPACE":"cardstack_data_development",
+                "INITIAL_DATA_DIR":"${workspaceFolder}/packages/data/tests/dummy/cardstack",
+                "HUB_ENVIRONMENT":"test",
+                "PORT":"3000"
+            },
+            "args": [
+                "${workspaceFolder}/packages/hub/bin/cardstack-hub.js"
+            ]
+        },
+        {
+            "name": "Ember test browser",
+            "type": "chrome",
+            "request": "launch",
+            "url": "http://localhost:7357",
+            "webRoot": "${workspaceFolder}/packages/data/tests/dummy"
+        },
+        {
+            "type": "node",
+            "request": "launch",
             "name": "Launch Test Suite",
             "program": "${workspaceRoot}/node_modules/.bin/_mocha",
             "cwd": "${workspaceRoot}",
