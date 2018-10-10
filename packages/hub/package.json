@@ -1,6 +1,6 @@
 {
   "name": "@cardstack/hub",
-  "version": "0.10.21",
+  "version": "0.10.22",
   "bin": {
     "cardstack-hub": "./bin/cardstack-hub.js",
     "cardstack-generate-key": "./bin/generate-key.js",
@@ -18,11 +18,11 @@
   "description": "Stock API server for the Cardstack tech stack.",
   "dependencies": {
     "@cardstack/codegen": "0.10.18",
-    "@cardstack/core-types": "0.10.21",
+    "@cardstack/core-types": "0.10.22",
     "@cardstack/di": "0.8.0",
     "@cardstack/handlebars": "0.9.0",
     "@cardstack/logger": "^0.1.0",
-    "@cardstack/pgsearch": "0.10.21",
+    "@cardstack/pgsearch": "0.10.22",
     "@cardstack/plugin-utils": "0.10.1",
     "@cardstack/queue": "0.10.18",
     "broccoli-concat": "^3.2.2",
