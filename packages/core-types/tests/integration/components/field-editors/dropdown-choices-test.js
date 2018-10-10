@@ -4,11 +4,17 @@ import { render } from '@ember/test-helpers';
 import { clickTrigger, selectChoose } from 'ember-power-select/test-support/helpers';
 import hbs from 'htmlbars-inline-precompile';
 
+const modelStub = {
+  watchRelationship: (field, fn) => {
+    fn.call(this);
+  }
+};
+
 module('Integration | Component | field editors/dropdown choices editor', async function(hooks) {
   setupRenderingTest(hooks);
 
   test('can select an option from the dropdown', async function(assert) {
-    this.set('model', {});
+    this.set('model', modelStub);
     await render(hbs`{{field-editors/dropdown-choices-editor content=model field="feeling" enabled=true}}`);
 
     await clickTrigger();
@@ -20,7 +26,7 @@ module('Integration | Component | field editors/dropdown choices editor', async 
   });
 
   test('can specify a different field to use for option', async function(assert) {
-    this.set('model', {});
+    this.set('model', modelStub);
     this.set('editorOptions', { displayFieldName: 'name' });
     await render(hbs`{{field-editors/dropdown-choices-editor content=model field="vehicle" editorOptions=editorOptions enabled=true}}`);
 
