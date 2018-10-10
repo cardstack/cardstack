@@ -40,6 +40,23 @@ export default Service.extend({
     return record;
   },
 
+  async query(type, format, opts={}) {
+    let store = this.get('store');
+    let branch = opts.branch || defaultBranch;
+    let _opts = Object.assign({ modelName: type }, opts);
+
+    let result = await store.query(type, _opts);
+
+    let recordLoadPromises = [];
+    for (let record of result.toArray()) {
+      recordLoadPromises.push(this.load(branch, getType(record), record.id, format, { reload: true }));
+    }
+
+    await Promise.all(recordLoadPromises);
+
+    return result;
+  },
+
   // caching the content types to more efficiently deal with parallel content type lookups
   async _getContentType(type) {
     if (this._contentTypeCache[type]) {
