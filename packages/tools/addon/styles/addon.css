@@ -35,11 +35,18 @@
     cursor: pointer;
 }
 
+.cardstack-tools-launcher-wrapper {
+  position: absolute;
+  top: 0;
+  right: 0;
+  z-index: 100;
+}
+
 /* these classes comes from the ember-sidebars addon. We need to
    increase the z-indices of the sidebars so they stay on top of the
    scrims provided by ember-overlays. */
 .cst-right, .cst-top {
-    z-index: 10;
+    z-index: 100;
 }
 
 .cardstack-toolbox {
