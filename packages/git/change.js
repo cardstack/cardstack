@@ -1,7 +1,6 @@
 const {
   Branch,
   Commit,
-  Cred,
   Merge,
   Repository,
   Signature,
