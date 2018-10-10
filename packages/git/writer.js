@@ -95,7 +95,15 @@ module.exports = class Writer {
 
     await this._ensureRepo();
     return withErrorHandling(id, type, async () => {
-      let change = await Change.create(this.repo, document.meta.version, this.branchPrefix + branch);
+      const branchName = this.branchPrefix + branch;
+      let change;
+
+      if(this.remote) {
+        change = await Change.createRemote(this.repo, branchName, this.fetchOpts);
+      } else {
+        change = await Change.create(this.repo, document.meta.version, branchName);
+      }
+
       let file = await change.get(this._filenameFor(type, id, isSchema), { allowUpdate: true });
       let before = JSON.parse(await file.getBuffer());
       let after = patch(before, document);
@@ -122,7 +130,15 @@ module.exports = class Writer {
     }
     await this._ensureRepo();
     return withErrorHandling(id, type, async () => {
-      let change = await Change.create(this.repo, version, this.branchPrefix + branch);
+      const branchName = this.branchPrefix + branch;
+      let change;
+
+      if(this.remote) {
+        change = await Change.createRemote(this.repo, branchName, this.fetchOpts);
+      } else {
+        change = await Change.create(this.repo, version, branchName);
+      }
+
       let file = await change.get(this._filenameFor(type, id, isSchema));
       let before = JSON.parse(await file.getBuffer());
       file.delete();
