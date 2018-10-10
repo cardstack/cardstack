@@ -31,13 +31,30 @@ module.exports = class Writer {
     this.myEmail = `${os.userInfo().username}@${hostname}`;
     this.idGenerator = idGenerator;
     this.remote = remote;
+    this.fetchOpts = {
+      callbacks: {
+        credentials: (url, userName) => {
+          if (remote && remote.privateKey) {
+            return Cred.sshKeyMemoryNew(userName, remote.publicKey || '', remote.privateKey, remote.passphrase || '');
+          }
+          return Cred.sshKeyFromAgent(userName);
+        }
+      }
+    };
   }
 
   async prepareCreate(branch, session, type, document, isSchema) {
     return withErrorHandling(document.id, type, async () => {
       await this._ensureRepo();
+      const branchName = this.branchPrefix + branch;
+      let change;
 
-      let change = await Change.create(this.repo, null, this.branchPrefix + branch);
+      if(this.remote) {
+        change = await Change.createRemote(this.repo, branchName, this.fetchOpts);
+      } else {
+        change = await Change.create(this.repo, null, branchName);
+      }
+
       let id = document.id;
       let file;
       while (id == null) {
@@ -140,16 +157,7 @@ module.exports = class Writer {
       if (this.remote) {
         let tempRepoPath = await mkdir('cardstack-temp-repo');
         this.repo = await Clone(this.remote.url, tempRepoPath, {
-          fetchOpts: {
-            callbacks: {
-              credentials: (url, userName) => {
-                if (this.remote.privateKey) {
-                  return Cred.sshKeyMemoryNew(userName, this.remote.publicKey || '', this.remote.privateKey, this.remote.passphrase || '');
-                }
-                return Cred.sshKeyFromAgent(userName);
-              }
-            }
-          }
+          fetchOpts: this.fetchOpts,
         });
         return;
       }
@@ -228,7 +236,7 @@ async function finalizer(pendingChange) {
         file.delete();
       }
     }
-    let version = await change.finalize(signature, this.remote);
+    let version = await change.finalize(signature, this.remote, this.fetchOpts);
     return { version, hash: (file ? file.savedId() : null) };
   });
 }

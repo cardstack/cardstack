@@ -15,6 +15,7 @@ const {
   OverwriteRejected
 } = require('./mutable-tree');
 const moment = require('moment-timezone');
+const crypto = require('crypto');
 
 // This is supposed to enable thread-safe locking around all async
 // operations.
@@ -62,7 +63,22 @@ class Change {
     return new this(repo, targetBranch, parentTree, parents, parentCommit, headRef, headCommit);
   }
 
-  constructor(repo, targetBranch, parentTree, parents, parentCommit, headRef, headCommit) {
+  static async createRemote(repo, targetBranch, fetchOpts) {
+    await repo.fetch('origin', fetchOpts);
+    const remoteBranchName = `temp-remote-${crypto.randomBytes(20).toString('hex')}`;
+    const remoteHead = await repo.getReferenceCommit(`refs/remotes/origin/${targetBranch}`);
+    await repo.createBranch(remoteBranchName, remoteHead);
+
+    let headRef = await Branch.lookup(repo, remoteBranchName, Branch.BRANCH.LOCAL);
+    let headCommit = await Commit.lookup(repo, headRef.target());
+
+    let parentTree = await headCommit.getTree();
+    let parents = [headCommit];
+
+    return new this(repo, remoteBranchName, parentTree, parents, headCommit, headRef, headCommit, targetBranch, fetchOpts);
+  }
+
+  constructor(repo, targetBranch, parentTree, parents, parentCommit, headRef, headCommit, remoteTargetBranch, fetchOpts) {
     this.repo = repo;
     this.parentTree = parentTree;
     this.root = new MutableTree(repo, parentTree);
@@ -71,6 +87,8 @@ class Change {
     this.headRef = headRef;
     this.headCommit = headCommit;
     this.targetBranch = targetBranch;
+    this.remoteTargetBranch = remoteTargetBranch;
+    this.fetchOpts = fetchOpts;
   }
 
   async get(path, { allowCreate, allowUpdate } = {}) {
@@ -78,24 +96,13 @@ class Change {
     return new FileHandle(tree, leaf, leafName, allowUpdate, path);
   }
 
-  async finalize(commitOpts, remoteConfig) {
+  async finalize(commitOpts) {
     let newCommit = await this._makeCommit(commitOpts);
     let mergeCommit = await this._mergeCommit(newCommit, commitOpts);
 
-    try {
+    if(this.remoteTargetBranch) {
       let remote = await this.repo.getRemote('origin');
-      await remote.push(["refs/heads/master:refs/heads/master"], {
-        callbacks: {
-          credentials: (url, userName) => {
-            if (remoteConfig.privateKey) {
-              return Cred.sshKeyMemoryNew(userName, remoteConfig.publicKey || '', remoteConfig.privateKey, remoteConfig.passphrase || '');
-            }
-            return Cred.sshKeyFromAgent(userName);
-          }
-        }
-      });
-    } catch (e) {
-      // Do nothing
+      await remote.push([`refs/heads/${this.targetBranch}:refs/heads/${this.remoteTargetBranch}`], this.fetchOpts);
     }
 
     return mergeCommit;
