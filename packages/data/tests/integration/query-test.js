@@ -91,6 +91,50 @@ module('Integration | @cardstack/data service query()', function (hooks) {
       });
     });
 
+    test("it can load relationships for a queryCard in a particular format", async function (assert) {
+      let dataService = this.owner.lookup('service:cardstackData');
+      let homepage = await run(() => dataService.queryCard('page', 'isolated', { filter: { title: 'Homepage' } }));
+
+      let articles = homepage.get('articles').toArray().map(i => i.toJSON());
+      let author = homepage.get('articles.firstObject.author');
+      let error;
+      try {
+        homepage.get('articles.firstObject.author.location');
+      } catch (e) { error = e; }
+      assert.ok(error.message.match(/You looked up the 'location' relationship on a 'puppy' with id vanGogh but some of the associated records were not loaded/));
+
+      try {
+        homepage.get('articles.lastObject.dog');
+      } catch (e) { error = e; }
+      assert.ok(error.message.match(/You looked up the 'dog' relationship on a 'doggy-article' with id swim but some of the associated records were not loaded/));
+
+      assert.deepEqual(homepage.toJSON(), {
+        title: 'Homepage',
+        articles: ['bones', 'why', 'swim']
+      });
+      assert.deepEqual(articles, [{
+        title: 'Top 10 Bones',
+        body: 'I really like to chew bones, there are many good bones, but these bones are the best...',
+        author: 'vanGogh',
+        relatedArticle: 'walk'
+      }, {
+        title: 'Why Doors?',
+        body: "Do you understand doors? If you're like me doors are probably super confusing, let's get to the bottom of this mystery.",
+        author: 'vanGogh',
+        relatedArticle: null
+      }, {
+        title: 'I Like to Swim',
+        body: "Swimming is my favorite, and then I love my wet dog smell.",
+        dog: "ringo"
+      }]);
+
+      assert.deepEqual(author.toJSON(), {
+        name: 'Van Gogh',
+        bio: 'A cute puppy that loves to play with his squeaky snake',
+        location: 'nyc'
+      });
+    });
+
   });
 
   module('with defaultIncludes', function (hooks) {
