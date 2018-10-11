@@ -70,6 +70,7 @@
     "eslint-plugin-ember": "^5.0.0",
     "eslint-plugin-node": "^5.2.1",
     "loader.js": "^4.2.3",
+    "qunit-dom": "^0.7.1",
     "squishable-container": "^0.1.0"
   },
   "engines": {

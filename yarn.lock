@@ -2,6 +2,23 @@
 # yarn lockfile v1
 
 
+"@cardstack/authentication@0.10.18":
+  version "0.10.18"
+  resolved "https://registry.yarnpkg.com/@cardstack/authentication/-/authentication-0.10.18.tgz#326c090d6a4a6777a24a18a766e1b01a29e622a0"
+  dependencies:
+    "@cardstack/di" "0.8.0"
+    "@cardstack/logger" "^0.1.0"
+    "@cardstack/plugin-utils" "0.10.1"
+    ember-cli-babel "^6.8.2"
+    ember-cli-htmlbars "^2.0.1"
+    ember-css-url "0.2.0"
+    ember-fetch "^5.1.1"
+    ember-inflector "^2.1.0"
+    ember-simple-auth "^1.2.2"
+    koa-better-route "^0.1.0"
+    koa-compose "^3.2.1"
+    koa-json-body "^5.3.0"
+
 "@cardstack/authentication@0.10.5":
   version "0.10.5"
   resolved "https://registry.yarnpkg.com/@cardstack/authentication/-/authentication-0.10.5.tgz#e898878d09929a83938b940128be6d4ec10e262d"
@@ -42,6 +59,20 @@
     postcss-cssnext "^2.10.0"
     postcss-import "^9.1.0"
 
+"@cardstack/core-types@0.10.18":
+  version "0.10.18"
+  resolved "https://registry.yarnpkg.com/@cardstack/core-types/-/core-types-0.10.18.tgz#cca1691d72c50360ba11ea0a46a95789cc461da8"
+  dependencies:
+    "@cardstack/di" "0.8.0"
+    ember-cli-babel "^6.8.2"
+    ember-cli-htmlbars "^2.0.1"
+    ember-cli-postcss "https://github.com/ef4/ember-cli-postcss#0550adab2c0c0ab856efec6a4da8164eadd01e47"
+    ember-power-select "^2.0.4"
+    lodash.isempty "^4.4.0"
+    moment-timezone "^0.5.11"
+    postcss-cssnext "^2.10.0"
+    postcss-import "^9.1.0"
+
 "@cardstack/hub@0.10.10":
   version "0.10.10"
   resolved "https://registry.yarnpkg.com/@cardstack/hub/-/hub-0.10.10.tgz#ad7c7654b9f5f6826367b41300778968247b5449"
@@ -54,6 +85,39 @@
     "@cardstack/pgsearch" "0.10.10"
     "@cardstack/plugin-utils" "0.10.1"
     "@cardstack/queue" "0.10.10"
+    broccoli-concat "^3.2.2"
+    broccoli-plugin "^1.3.0"
+    broccoli-source "^1.1.0"
+    chalk "^2.3.0"
+    commander "^2.9.0"
+    dag-map "^2.0.2"
+    denodeify "^1.2.1"
+    docker-container-id "^1.0.1"
+    ember-cli-babel "^6.8.2"
+    handlebars "^4.0.6"
+    koa "2"
+    koa-compose "^3.2.1"
+    lodash "^4.17.4"
+    nssocket "^0.6.0"
+    path-is-inside "^1.0.2"
+    quick-temp "^0.1.8"
+    resolve "^1.3.3"
+    superagent "^3.8.1"
+    tar-fs "^1.16.0"
+    tar-stream "^1.5.4"
+
+"@cardstack/hub@0.10.18":
+  version "0.10.18"
+  resolved "https://registry.yarnpkg.com/@cardstack/hub/-/hub-0.10.18.tgz#857cb7d9c1d31a9f6cc3161868c11cf37d94a568"
+  dependencies:
+    "@cardstack/codegen" "0.10.18"
+    "@cardstack/core-types" "0.10.18"
+    "@cardstack/di" "0.8.0"
+    "@cardstack/handlebars" "0.9.0"
+    "@cardstack/logger" "^0.1.0"
+    "@cardstack/pgsearch" "0.10.18"
+    "@cardstack/plugin-utils" "0.10.1"
+    "@cardstack/queue" "0.10.18"
     broccoli-concat "^3.2.2"
     broccoli-plugin "^1.3.0"
     broccoli-source "^1.1.0"
@@ -104,6 +168,18 @@
     pg "^7.0.3"
     pg-cursor "^1.3.0"
 
+"@cardstack/pgsearch@0.10.18":
+  version "0.10.18"
+  resolved "https://registry.yarnpkg.com/@cardstack/pgsearch/-/pgsearch-0.10.18.tgz#0f9cba53b8e1c75ddaba98dbeb1789eefd852542"
+  dependencies:
+    "@cardstack/di" "^0.8.0"
+    "@cardstack/hub" "0.10.18"
+    "@cardstack/logger" "^0.1.0"
+    "@cardstack/plugin-utils" "0.10.1"
+    node-pg-migrate "3.5.0"
+    pg "^7.0.3"
+    pg-cursor "^1.3.0"
+
 "@cardstack/queue@0.10.10":
   version "0.10.10"
   resolved "https://registry.yarnpkg.com/@cardstack/queue/-/queue-0.10.10.tgz#b0c3224afb2304bb925d797870c5747da3ec613b"
@@ -123,6 +199,34 @@
     "@cardstack/hub" "0.10.10"
     "@cardstack/logger" "^0.1.0"
     "@cardstack/pgsearch" "0.10.10"
+    "@cardstack/plugin-utils" "0.10.1"
+    "@std/esm" "^0.25.1"
+    chai "^3.5.0"
+    chai-things "^0.2.0"
+    dag-map "^2.0.2"
+    denodeify "^1.2.1"
+    ember-cli-babel "^6.8.2"
+    glob "^7.1.1"
+    handlebars "^4.0.6"
+    koa-better-route "^0.1.0"
+    koa-compose "^3.2.1"
+    koa-json-body "^5.3.0"
+    lodash "^4.17.4"
+    mocha-eslint "^3.0.1"
+    qs "^6.4.0"
+    require-uncached "^1.0.3"
+    resolve "^1.3.3"
+    temp "^0.8.3"
+
+"@cardstack/test-support@0.10.18":
+  version "0.10.18"
+  resolved "https://registry.yarnpkg.com/@cardstack/test-support/-/test-support-0.10.18.tgz#525796d215dd1cae8384bbfe28ef4bc7de61aad8"
+  dependencies:
+    "@cardstack/di" "0.8.0"
+    "@cardstack/ephemeral" "0.10.1"
+    "@cardstack/hub" "0.10.18"
+    "@cardstack/logger" "^0.1.0"
+    "@cardstack/pgsearch" "0.10.18"
     "@cardstack/plugin-utils" "0.10.1"
     "@std/esm" "^0.25.1"
     chai "^3.5.0"
