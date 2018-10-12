@@ -62,13 +62,14 @@
             "request": "launch",
             "name": "Launch Test Suite",
             "program": "${workspaceRoot}/node_modules/.bin/_mocha",
+            "console": "integratedTerminal",
             "cwd": "${workspaceRoot}",
             "args": [
                 "packages/test-support/bin/run.js",
                 "--timeout",
                 "200000",
-                //"--grep",
-                //"indexes plugin-config changes"
+                // "--grep",
+                // "includes the graph of relationships"
             ]
         }
     ]
