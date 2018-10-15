@@ -5700,10 +5700,10 @@ ember-css-url@0.2.0:
   dependencies:
     ember-cli-babel "^6.6.0"
 
-ember-data-relationship-tracker@^0.3.0:
-  version "0.3.0"
-  resolved "https://registry.yarnpkg.com/ember-data-relationship-tracker/-/ember-data-relationship-tracker-0.3.0.tgz#87199e34187070184b477d080ac20ab1b5207e17"
-  integrity sha512-X8LMs8bLwmWqUaWMP6w7Nbh/PSV9xU4d6QybOE8XtDBRnuDbrr1rg2UUNRq8m0AMqM2t9Wz85pUMsd5uXtJi8Q==
+ember-data-relationship-tracker@^0.3.2:
+  version "0.3.2"
+  resolved "https://registry.yarnpkg.com/ember-data-relationship-tracker/-/ember-data-relationship-tracker-0.3.2.tgz#463c8cdd3194d6f0f26de9c5ca7da722c160ada0"
+  integrity sha512-urlKfcjqWMo3X1aoPqXuFdKSqiZXQXrlQcavswZZXU10Y6DELxU6Sn1vYwAXr1udK+bJbbpSEO0fQ4SDrvsGBw==
   dependencies:
     ember-cli-babel "^6.8.2"
     ember-lodash "^4.17.2"

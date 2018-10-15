@@ -16,14 +16,16 @@
     enabled=editingEnabled
   }}
 
-
-  {{!-- TODO:
-      class=(concat "cs-toolbox-section" (if (has-errors fieldMark.model) 'invalid')
-      OR hasErrors=(has-errors model=fieldMark.model)
-  --}}
   {{#each fields key="id" as |fieldMark|}}
     {{#cs-collapsible-section
-      class="cs-toolbox-section"
+      class=(concat "cs-toolbox-section "
+        (if (cs-has-errors
+              fieldMark.model
+              fieldMark.model.content.isValid
+              fieldMark.model.content.errors)
+              "invalid"
+            )
+        )
       title=fieldMark.model.caption
       opened=(eq fieldMark.id openedFieldId)
       open=(action openField fieldMark)
