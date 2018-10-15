@@ -30,7 +30,7 @@ export default DS.JSONAPIAdapter.extend(AdapterMixin, {
   },
 
   buildURL(modelName, id, snapshot, requestType, query) {
-    let actualModelName = snapshot && snapshot.modelName;
+    let actualModelName = snapshot && snapshot.modelName || query && query.modelName;
     return this._super(actualModelName || modelName, id, snapshot, requestType, query);
   },
 

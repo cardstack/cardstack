@@ -27,12 +27,12 @@ export default Route.extend({
     }
     let promise;
     if (modelClass.routingField) {
-      promise = this.store.queryRecord(mType, {
+      promise = this.get('data').queryCard(mType, isolatedFormat, {
         filter: { [modelClass.routingField]: { exact: slug } },
         branch
       });
     } else {
-      promise = this.get('data').load(branch, mType, slug, isolatedFormat, { reload: true });
+      promise = this.get('data').load(mType, slug, isolatedFormat, { branch, reload: true });
     }
 
     return promise.catch(err => {

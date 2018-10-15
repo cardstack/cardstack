@@ -20,9 +20,9 @@ export default Service.extend({
     this._contentTypeCache = {};
   },
 
-  async load(branch, type, id, format, opts={}) {
-    branch = branch || defaultBranch;
+  async load(type, id, format, opts={}) {
     let store = this.get('store');
+    let branch = opts.branch || defaultBranch;
     let contentType = await this._getContentType(type);
     let fieldset = contentType.get(`fieldsets.${format}`);
     let _opts = Object.assign({ branch }, opts);
@@ -38,6 +38,31 @@ export default Service.extend({
     await this._loadRelatedRecords(branch, record, format);
 
     return record;
+  },
+
+  async query(type, format, opts={}) {
+    let store = this.get('store');
+    let branch = opts.branch || defaultBranch;
+    let _opts = Object.assign({ branch, modelName: type }, opts);
+
+    let result = await store.query(type, _opts);
+
+    let recordLoadPromises = [];
+    for (let record of result.toArray()) {
+      recordLoadPromises.push(this.load(getType(record), record.id, format, { branch, reload: true }));
+    }
+
+    await Promise.all(recordLoadPromises);
+
+    return result;
+  },
+
+  async queryCard(type, format, opts={}) {
+    let card;
+    let result = await this.query(type, format, opts);
+    if (result && (card = result.toArray()) && card) {
+      return card[0];
+    }
   },
 
   // caching the content types to more efficiently deal with parallel content type lookups
