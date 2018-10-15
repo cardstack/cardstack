@@ -1,6 +1,7 @@
 import Component from '@ember/component';
 import { not } from '@ember/object/computed';
 import { computed } from '@ember/object';
+import { task } from 'ember-concurrency';
 import layout from '../templates/components/cs-field-editor';
 
 export default Component.extend({
@@ -29,4 +30,7 @@ export default Component.extend({
     }
   }),
 
+  validate: task(function * () {
+    yield this.content.validate();
+  })
 });

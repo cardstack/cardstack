@@ -1,3 +1,7 @@
 <div class="field-editor">
-  {{input value=(get content field) disabled=disabled focus-out=(perform validate)}}
+  {{input
+    value=(get content field)
+    disabled=disabled
+    focus-out=(action onchange)
+  }}
 </div>

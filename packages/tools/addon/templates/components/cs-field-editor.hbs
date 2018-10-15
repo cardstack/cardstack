@@ -15,6 +15,7 @@ as |editorName editorOptions|
       tagName=""
       enabled=enabled
       disabled=disabled
+      onchange=(perform validate)
     }}
   {{else}}
     {{cs-assert "No such field editor" editorName}}
