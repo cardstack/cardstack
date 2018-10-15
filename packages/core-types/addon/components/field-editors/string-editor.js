@@ -9,10 +9,6 @@ export default Component.extend({
   disabled: not('enabled'),
 
   validate: task(function * () {
-    yield this.content.save({
-      adapterOptions: {
-        onlyValidate: true
-      }
-    });
+    yield this.content.validate();
   })
 });
