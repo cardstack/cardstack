@@ -1,13 +1,12 @@
 import { getOwner } from '@ember/application';
 import { inject as service } from '@ember/service';
 import Route from '@ember/routing/route';
-
-const isolatedFormat = 'isolated';
+import { pluralize } from 'ember-inflector';
 
 export default Route.extend({
 
   service: service('cardstack-routing'),
-  data: service('cardstack-data'),
+  store: service('store'),
 
   _commonModelHook(type, slug) {
     let { branch } = this.modelFor('cardstack');
@@ -25,26 +24,19 @@ export default Route.extend({
     if (!modelClass) {
       throw new Error(`@cardstack/routing tried to use model ${mType} but it does not exist`);
     }
-    let promise;
-    if (modelClass.routingField) {
-      promise = this.get('data').queryCard(mType, isolatedFormat, {
-        filter: { [modelClass.routingField]: { exact: slug } },
-        branch
-      });
-    } else {
-      promise = this.get('data').load(mType, slug, isolatedFormat, { branch, reload: true });
-    }
 
-    return promise.catch(err => {
-      if (!is404(err)) {
-        throw err;
-      }
-      return {
-        isCardstackPlaceholder: true,
-        type: mType,
-        slug
-      };
-    });
+    return this.get('store').findRecord('space', `${pluralize(mType)}/${slug}`, { branch, reload: true })
+      .then(space => space.get('primaryCard'))
+      .catch(err => {
+        if (!is404(err)) {
+          throw err;
+        }
+        return {
+          isCardstackPlaceholder: true,
+          type: mType,
+          slug
+        };
+      });
   }
 });
 
