@@ -4,7 +4,7 @@ const {
 } = require('@cardstack/test-support/env');
 const JSONAPIFactory = require('@cardstack/test-support/jsonapi-factory');
 
-describe('spaces/searcher', function() {
+describe('routing/searcher', function() {
   let env, searchers;
 
   async function setup() {
@@ -12,8 +12,7 @@ describe('spaces/searcher', function() {
 
     factory.addResource('data-sources')
       .withAttributes({
-        'source-type': '@cardstack/spaces',
-        params: {}
+        'source-type': '@cardstack/routing',
       });
 
     factory.addResource('content-types', 'pages')
