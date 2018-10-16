@@ -3,7 +3,7 @@ import { setupApplicationTest } from 'ember-qunit';
 import { visit, currentURL, click, find, findAll, triggerEvent } from '@ember/test-helpers';
 import fetch from 'fetch';
 
-module('Acceptance | show post', function(hooks) {
+module('Acceptance | image attachment', function(hooks) {
   setupApplicationTest(hooks);
 
 
