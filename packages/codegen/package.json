@@ -1,6 +1,6 @@
 {
   "name": "@cardstack/codegen",
-  "version": "0.10.18",
+  "version": "0.11.0",
   "description": "Dynamic code generation infrastructure for Cardstack",
   "keywords": [
     "ember-addon",
