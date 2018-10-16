@@ -2,7 +2,7 @@ import { module, test } from 'qunit';
 import { setupApplicationTest } from 'ember-qunit';
 import { visit, currentURL } from '@ember/test-helpers';
 
-module('Acceptance | card', function(hooks) {
+module('Acceptance | embedded', function(hooks) {
   setupApplicationTest(hooks);
 
   test('visiting /card', async function(assert) {
