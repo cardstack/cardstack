@@ -1,8 +1,7 @@
-import { run } from '@ember/runloop';
 import EmberObject from '@ember/object';
 import { module, test } from 'qunit';
 import { setupRenderingTest } from 'ember-qunit';
-import { render } from '@ember/test-helpers';
+import { render, click } from '@ember/test-helpers';
 import hbs from 'htmlbars-inline-precompile';
 import DS from 'ember-data';
 
@@ -26,21 +25,22 @@ module('Integration | Component | cs version control', function(hooks) {
     this.owner.register('config:enviroment', {
       cardstack: { defaultBranch: 'master' }
     });
+    this.owner.lookup('router:main').setupRouter();
   });
 
   test('render with saved content', async function(assert) {
     model.set('hasDirtyFields', false);
     model.set('isNew', false);
     await render(hbs`{{cs-version-control model=model enabled=true}}`);
-    assert.equal(this.$('.cs-version-control-footer button[disabled]').text().trim(), 'Update');
+    assert.dom('.cs-version-control-footer button[disabled]').hasText('Update');
   });
 
   test('render with dirty content', async function(assert) {
     model.set('hasDirtyFields', true);
     model.set('isNew', false);
     await render(hbs`{{cs-version-control model=model enabled=true}}`);
-    assert.equal(this.$('.cs-version-control-footer button[disabled]').length, 0, 'no disabled button');
-    assert.equal(this.$('.cs-version-control-footer button').text().trim(), 'Update');
+    assert.dom('.cs-version-control-footer button[disabled]').doesNotExist('no disabled button');
+    assert.dom('.cs-version-control-footer button').hasText('Update');
   });
 
   test('clicking update on dirty model triggers save', async function(assert) {
@@ -51,9 +51,7 @@ module('Integration | Component | cs version control', function(hooks) {
     model.set('hasDirtyFields', true);
     model.set('isNew', false);
     await render(hbs`{{cs-version-control model=model enabled=true}}`);
-    run(() => {
-      this.$('.cs-version-control-footer button').click();
-    });
+    await click('.cs-version-control-footer button');
   });
 
   test('clicking update on clean model does nothing', async function(assert) {
@@ -64,8 +62,16 @@ module('Integration | Component | cs version control', function(hooks) {
     model.set('hasDirtyFields', false);
     model.set('isNew', false);
     await render(hbs`{{cs-version-control model=model enabled=true}}`);
-    run(() => {
-      this.$('.cs-version-control-footer button').click();
+    await click('.cs-version-control-footer button');
+  });
+
+  test('clicking delete triggers deleteRecord', async function(assert) {
+    assert.expect(1);
+    model.set('destroyRecord', function() {
+      assert.ok(true);
     });
+    model.set('isNew', false);
+    await render(hbs`{{cs-version-control model=model enabled=true}}`);
+    await click('.cs-version-control-footer .text-button');
   });
 });
