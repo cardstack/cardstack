@@ -1,6 +1,7 @@
 const {
   Branch,
   Commit,
+  Cred,
   Merge,
   Repository,
   Signature,
@@ -77,9 +78,27 @@ class Change {
     return new FileHandle(tree, leaf, leafName, allowUpdate, path);
   }
 
-  async finalize(commitOpts) {
+  async finalize(commitOpts, remoteConfig) {
     let newCommit = await this._makeCommit(commitOpts);
-    return this._mergeCommit(newCommit, commitOpts);
+    let mergeCommit = await this._mergeCommit(newCommit, commitOpts);
+
+    try {
+      let remote = await this.repo.getRemote('origin');
+      await remote.push(["refs/heads/master:refs/heads/master"], {
+        callbacks: {
+          credentials: (url, userName) => {
+            if (remoteConfig.privateKey) {
+              return Cred.sshKeyMemoryNew(userName, remoteConfig.publicKey || '', remoteConfig.privateKey, remoteConfig.passphrase || '');
+            }
+            return Cred.sshKeyFromAgent(userName);
+          }
+        }
+      });
+    } catch (e) {
+      // Do nothing
+    }
+
+    return mergeCommit;
   }
 
   async _makeCommit(commitOpts) {

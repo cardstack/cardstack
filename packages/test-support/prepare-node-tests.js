@@ -2,6 +2,7 @@ const chai = require('chai');
 chai.use(require('chai-things'));
 chai.use(require('./collection-contains'));
 chai.use(require('./has-status'));
+chai.use(require('chai-as-promised'));
 
 if (!process.__didSetCardstackWarning) {
   process.__didSetCardstackWarning = true;
