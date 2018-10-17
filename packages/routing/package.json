@@ -59,12 +59,13 @@
     "qunit-dom": "^0.7.1"
   },
   "engines": {
-    "node": "6.* || 8.* || >= 10.*"
+    "node": "8.* || >= 10.*"
   },
   "ember-addon": {
     "configPath": "tests/dummy/config"
   },
   "cardstack-plugin": {
-    "api-version": 1
+    "api-version": 1,
+    "src": "cardstack"
   }
 }
