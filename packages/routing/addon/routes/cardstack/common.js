@@ -40,7 +40,6 @@ export default Route.extend({
   }
 });
 
-
 function is404(err) {
   return err.isAdapterError && err.errors && err.errors.length > 0 && (
     err.errors[0].code === 404 || err.errors[0].status === "404"
