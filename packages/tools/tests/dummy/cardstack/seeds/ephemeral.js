@@ -53,6 +53,17 @@ function initialModels() {
       ]),
     ]);
 
+    initial.addResource('constraints')
+      .withAttributes({
+        constraintType: '@cardstack/core-types::not-empty',
+        inputs: { ignoreBlank: true }
+      })
+      .withRelated('input-assignments', [
+        initial.addResource('input-assignments')
+          .withAttributes({ inputName: 'target' })
+          .withRelated('field', initial.getResource('fields', 'title'))
+      ]);
+
   let guybrush = initial.addResource('bloggers', '1')
     .withAttributes({
       name: 'Guybrush Threepwood'
