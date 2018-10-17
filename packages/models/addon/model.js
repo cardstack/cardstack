@@ -58,14 +58,6 @@ export default DS.Model.extend(RelationshipTracker, {
     return Promise.all(flatten(relatedSaves));
   },
 
-  async validate() {
-    return await this.save({
-      adapterOptions: {
-        onlyValidate: true
-      }
-    })
-  },
-
   _relationshipsByName() {
     return get(this.constructor, 'relationshipsByName');
   }

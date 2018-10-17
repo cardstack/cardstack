@@ -3,6 +3,8 @@ import { inject } from '@ember/service';
 import { camelize } from '@ember/string';
 import { defaultBranch } from '@cardstack/plugin-utils/environment';
 import { singularize, pluralize } from 'ember-inflector';
+import { hubURL } from '@cardstack/plugin-utils/environment';
+import fetch from 'fetch';
 import DS from 'ember-data';
 
 const noFields = '___no-fields___';
@@ -63,6 +65,40 @@ export default Service.extend({
     if (result && (card = result.toArray()) && card) {
       return card[0];
     }
+  },
+
+  async validate(model) {
+    let type = getType(model);
+    let url = `${hubURL}/api-validate/${pluralize(type)}`;
+    let verb;
+    if (model.get('isNew')) {
+      verb = 'POST';
+    } else {
+      url += `/${model.id}`;
+      verb = 'PATCH';
+    }
+
+    // TODO: Return all the fields in all owned relationships, too
+    let response = await fetch(url, {
+        method: verb,
+        body: JSON.stringify(model.serialize())
+      });
+    let { status } = response;
+    if (status === 422) {
+      let body = await response.json();
+      let errorsByField = body.errors.reduce((errorsByField, error) => {
+        let { detail: errorMessage, source } = error;
+        let match = new RegExp('/data/attributes/(.+)').exec(source.pointer);
+        let fieldName = match[1];
+        if (!errorsByField[fieldName]) {
+          errorsByField[fieldName] = [];
+        }
+        errorsByField[fieldName].push(errorMessage);
+        return errorsByField;
+      }, {});
+      return errorsByField;
+    }
+    return response;
   },
 
   // caching the content types to more efficiently deal with parallel content type lookups

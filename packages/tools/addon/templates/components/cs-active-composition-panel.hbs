@@ -19,13 +19,9 @@
   {{#each fields key="id" as |fieldMark|}}
     {{#cs-collapsible-section
       class=(concat "cs-toolbox-section "
-        (if (cs-has-errors
-              fieldMark.model
-              fieldMark.model.content.isValid
-              fieldMark.model.content.errors)
-              "invalid"
-            )
-        )
+        (if
+          (cs-has-errors validationErrors fieldMark.model)
+          "invalid"))
       title=fieldMark.model.caption
       opened=(eq fieldMark.id openedFieldId)
       open=(action openField fieldMark)
@@ -42,6 +38,8 @@
               content=content
               field=fieldName
               enabled=editingEnabled
+              validate=validate
+              errors=(get validationErrors fieldName)
             }}
           {{/with}}
         {{/each}}
@@ -50,6 +48,8 @@
           content=fieldMark.model.content
           field=fieldMark.model.name
           enabled=editingEnabled
+          validate=validate
+          errors=(get validationErrors fieldMark.model.name)
         }}
       {{/if}}
       </div>

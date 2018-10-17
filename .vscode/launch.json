@@ -4,6 +4,7 @@
     // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
     "version": "0.2.0",
     "configurations": [
+
         {
             "type": "node",
             "request": "launch",
@@ -36,7 +37,7 @@
         {
             "type": "node",
             "request": "launch",
-            "name": "Launch Dummy App Hub",
+            "name": "Launch data Dummy App Hub",
             "cwd": "${workspaceRoot}/packages/data",
             "console": "integratedTerminal",
             "env": {
@@ -44,6 +45,24 @@
                 "PGSEARCH_NAMESPACE":"cardstack_data_development",
                 "INITIAL_DATA_DIR":"${workspaceFolder}/packages/data/tests/dummy/cardstack",
                 "HUB_ENVIRONMENT":"test",
+                "PORT":"3000"
+            },
+            "args": [
+                "${workspaceFolder}/packages/hub/bin/cardstack-hub.js"
+            ]
+        },
+        {
+            "type": "node",
+            "request": "launch",
+            "name": "Launch tools Dummy App Hub",
+            "cwd": "${workspaceRoot}/packages/tools",
+            "console": "integratedTerminal",
+            "env": {
+                "CARDSTACK_SESSIONS_KEY":"OQUQi8NH0asrYgeoE10ijOFBhd/P1BU8HZP/rNqO5nw=",
+                "PGSEARCH_NAMESPACE":"cardstack_data_development",
+                "INITIAL_DATA_DIR":"${workspaceFolder}/packages/tools/tests/dummy/cardstack",
+                "HUB_ENVIRONMENT":"test",
+                "PGPORT": "5444",
                 "PORT":"3000"
             },
             "args": [

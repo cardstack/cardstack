@@ -28,12 +28,12 @@ function jsonapiMiddleware(searcher, writers, indexers, defaultBranch) {
   // TODO move into config
   let options = {
     defaultBranch,
-    prefix: 'api'
+    servedPrefixes: 'api-validate|api'
   };
 
   let prefixPattern;
-  if (options.prefix) {
-    prefixPattern = new RegExp(`^/${options.prefix}/?(.*)`);
+  if (options.servedPrefixes) {
+    prefixPattern = new RegExp(`^/(${options.servedPrefixes})/?(.*)`);
   }
   let body = koaJSONBody({ limit: '16mb' });
 
@@ -41,7 +41,8 @@ function jsonapiMiddleware(searcher, writers, indexers, defaultBranch) {
     if (prefixPattern) {
       let m = prefixPattern.exec(ctxt.request.path);
       if (m) {
-        ctxt.request.path = '/'+m[1];
+        options.prefix = m[1];
+        ctxt.request.path = '/'+m[2];
       } else {
         return next();
       }
@@ -89,6 +90,10 @@ class Handler {
     return this.ctxt.state.cardstackSession;
   }
 
+  get isValidationRequest() {
+    return this.prefix === 'api-validate';
+  }
+
   filterExpression(type, id) {
     let filter = this.query.filter;
     if (!filter) {
@@ -112,14 +117,16 @@ class Handler {
       let segments = this.ctxt.request.path.split('/').map(decodeURIComponent);
       let kind;
 
+      //TODO: Just checking how many segments we have is not robust enough
+      // PATCH /comments doesn't make sense, and
+      // POST /comments/1 either
       if (segments.length < 3) {
         kind = 'Collection';
       } else {
         kind = 'Individual';
       }
-      let query = this.ctxt.request.query;
       let methodName;
-      if (query.onlyValidate) {
+      if (this.isValidationRequest) {
         methodName = `handle${kind}Validate`;
       } else {
         methodName = `handle${kind}${this.ctxt.request.method}`;
@@ -148,7 +155,7 @@ class Handler {
     );
     await schema.validate(pendingChange, { type, id, session });
     // NOTE: We don't want validation to change the document in any way
-    this.ctxt.body = data;
+    // this.ctxt.body = data;
     this.ctxt.status = 200;
   }
 
