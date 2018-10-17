@@ -5,6 +5,7 @@ import { computed, defineProperty, get } from '@ember/object';
 import { readOnly, or } from '@ember/object/computed';
 import { capitalize } from '@ember/string';
 import { run } from '@ember/runloop';
+import { A as EmberArray } from '@ember/array';
 
 export default DS.Model.extend(RelationshipTracker, {
   resourceMetadata: service(),
@@ -49,9 +50,9 @@ export default DS.Model.extend(RelationshipTracker, {
       if (isRelationDirty) {
         let { kind } = this._relationshipsByName().get(relationName);
         let related = this.get(relationName);
-        let relatedRecords = kind === 'hasMany' ? related : [ this.related ];
+        let relatedRecords = kind === 'hasMany' ? related : [ related ];
         let dirtyRecords = relatedRecords.filter(record => record.hasDirtyFields);
-        return dirtyRecords.invoke('save');
+        return EmberArray(dirtyRecords).invoke('save');
       }
     });
     return Promise.all(flatten(relatedSaves));

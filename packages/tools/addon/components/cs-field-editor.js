@@ -18,15 +18,15 @@ export default Component.extend({
   isContentInvalid: not('content.isValid'),
 
   hasValidationError: computed('isContentInvalid', 'content.errors', function() {
-    if (this.isContentInvalid) {
+    if (this.get('isContentInvalid')) {
       return this.content.get('errors').has(this.field);
     }
   }),
 
   firstValidationError: computed('hasValidationError', function() {
     if (this.hasValidationError) {
-      let errorsForField = this.content.errors.errorsFor(this.field);
-      return errorsForField.firstObject.message;
+      let errorsForField = this.content.get('errors').errorsFor(this.field);
+      return errorsForField.get('firstObject.message');
     }
   }),
 
