@@ -19,6 +19,9 @@
     outline: none;
 }
 
+.cs-field-editor-section .cs-toggle-switch {
+    display: block;
+}
 
 .cs-mobiledoc-overview > ol {
     list-style: none;
