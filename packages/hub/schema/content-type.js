@@ -2,6 +2,7 @@ const Error = require('@cardstack/plugin-utils/error');
 const find = require('../async-find');
 const { flatten } = require('lodash');
 const Realms = require('./realms');
+const log = require('@cardstack/logger')('cardstack/ephemeral');
 const authLog = require('@cardstack/logger')('cardstack/auth');
 const Session = require('@cardstack/plugin-utils/session');
 
@@ -160,6 +161,9 @@ module.exports = class ContentType {
   }
 
   _validateUnknownFields(document, errors) {
+    log.info('document:', JSON.stringify(document, null, 2));
+    // log.info('this.realFields:', this.realFields);
+
     if (document.attributes) {
       for (let fieldName of Object.keys(document.attributes)) {
         if (!this.realFields.has(fieldName)) {

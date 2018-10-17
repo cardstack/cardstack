@@ -239,6 +239,17 @@ describe('ephemeral-storage', function() {
       }
     });
 
+    it('rejects an initial data model with non-existent attribute', async function() {
+      let factory = new JSONAPIFactory();
+      factory.addResource('content-types', 'posts').withAttributes({ 'not-a-real-attribute': 'dongles' });
+      try {
+        await createDefaultEnvironment(__dirname + '/../../../tests/ephemeral-test-app', factory.getModels());
+        throw new Error("should not get here");
+      } catch(err) {
+        expect(err.message).to.equal('type "posts" has no field named "not-a-real-attribute"');
+      }
+    });
+
     it('rejects an initial schema model that violates bootstrap schema', async function() {
       let factory = new JSONAPIFactory();
       factory.addResource('content-types', 'animals').withRelated('fields', [
@@ -251,7 +262,6 @@ describe('ephemeral-storage', function() {
         expect(err.message).to.equal('content type "animals" refers to missing field "not-a-real-field"');
       }
     });
-
   });
 
 
