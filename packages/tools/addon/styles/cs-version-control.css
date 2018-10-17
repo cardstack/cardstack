@@ -17,8 +17,14 @@
     color: var(--deep-background);
 }
 
-.cs-version-control-footer--button {
+.cs-version-control-footer--button-area {
     float: right;
+    display: flex;
+    flex-flow: row nowrap;
+    align-items: center;
+}
+
+.cs-version-control-footer--button {
     background-color: var(--tools-highlight);
     border: 1px solid var(--deep-tools-highlight);
     color: var(--bright-foreground);
@@ -50,3 +56,31 @@
 .cs-toolbox-section.cs-version-control-preview.closed > header:hover {
     background-color: var(--tools-preview);
 }
+
+.cs-version-control--loading {
+    display: inline-block;
+    width: 24px;
+    height: 24px;
+    margin-right: 10px;
+}
+.cs-version-control--loading:after {
+    content: " ";
+    display: block;
+    width: 16px;
+    height: 16px;
+    margin: 1px;
+    border-radius: 50%;
+    border: 3px solid var(--tools-highlight);
+    border-color: var(--tools-highlight) transparent var(--tools-highlight) transparent;
+    animation: lds-dual-ring 1.2s linear infinite;
+}
+
+@keyframes lds-dual-ring {
+    0% {
+        transform: rotate(0deg);
+    }
+    100% {
+        transform: rotate(360deg);
+    }
+}
+  
