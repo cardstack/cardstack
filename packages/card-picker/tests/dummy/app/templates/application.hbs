@@ -1,3 +1,8 @@
-<h2 id="title">Welcome to Ember</h2>
+<h2 id="title">Welcome to @cardstack/card-picker!</h2>
 
+{{#cs-field model "cards" as |cards|}}
+  {{#each cards as |card|}}
+    {{cardstack-content content=card format="embedded"}}
+  {{/each}}
+{{/cs-field}}
 {{outlet}}
