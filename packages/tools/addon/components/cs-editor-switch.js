@@ -9,6 +9,9 @@ export default Component.extend({
   actions: {
     setEditing(value) {
       this.get('tools').setEditing(value);
+      if (!value) {
+        this.get('tools').openField();
+      }
     }
   }
 });
