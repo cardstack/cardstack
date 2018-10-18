@@ -29,11 +29,11 @@
     "ember-cli-htmlbars": "^2.0.1"
   },
   "devDependencies": {
-    "@cardstack/authentication": "0.10.17",
+    "@cardstack/authentication": "0.10.24",
     "@cardstack/ephemeral": "0.10.1",
     "@cardstack/eslint-config": "0.8.0",
-    "@cardstack/jsonapi": "0.10.17",
-    "@cardstack/mock-auth": "0.10.17",
+    "@cardstack/jsonapi": "0.10.18",
+    "@cardstack/mock-auth": "0.10.24",
     "@cardstack/models": "^0.10.1",
     "@cardstack/test-support": "^0.10.9",
     "@cardstack/tools": "^0.10.17",
