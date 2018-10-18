@@ -1,6 +1,6 @@
 {
   "name": "@cardstack/data",
-  "version": "0.11.1",
+  "version": "0.11.2",
   "description": "Data support for Cardstack cards",
   "keywords": [
     "ember-addon",
@@ -30,7 +30,7 @@
     "@cardstack/ephemeral": "0.10.1",
     "@cardstack/eslint-config": "0.8.0",
     "@cardstack/jsonapi": "0.10.18",
-    "@cardstack/test-support": "0.11.1",
+    "@cardstack/test-support": "0.11.2",
     "@ember/optional-features": "^0.6.3",
     "broccoli-asset-rev": "^2.7.0",
     "ember-ajax": "^3.1.0",
