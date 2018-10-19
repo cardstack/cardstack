@@ -41,19 +41,32 @@ class EmailMiddleware {
           }
         });
       }
+
+      let { from, subject, text, html } = ctxt.request.body.data.attributes;
       
       await this.messengers.send(messageSinkId, {
         to: defaultMailTo,
-        subject: 'Hello from cardstack',
-        from: 'jorge.lainfiesta@cardstack.com',
-        text: 'Hello my friend',
-        html: '<h1>Hello my friend</h1>'
+        subject,
+        from,
+        text,
+        html
       });
 
-      ctxt.body = `console.log('Hello world: ${messageSinkId}')`;
+      ctxt.body = {
+        data: {
+          type: 'email',
+          id: '?',
+          attributes: {
+            subject,
+            from,
+            text,
+            html
+          }
+        }
+      };
+      ctxt.response.set('Content-Type', 'application/vnd.api+json');
       ctxt.response.set('Access-Control-Allow-Origin', '*');
-      ctxt.response.set('Content-Type', 'application/javascript');
-      ctxt.status = 200;
+      ctxt.status = 201;
     });
   }
 
