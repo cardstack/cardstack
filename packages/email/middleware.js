@@ -2,6 +2,7 @@ const { declareInjections } = require('@cardstack/di');
 const route = require('koa-better-route');
 const koaJSONBody = require('koa-json-body');
 
+
 module.exports = declareInjections({
   messengers: 'hub:messengers'
 },
@@ -18,9 +19,15 @@ class CodeGenMiddleware {
 
     let body = koaJSONBody({ limit: '16mb' });
 
-    return route.post('/email/send', body, async (ctxt) => {
+    return route.post('/email/send', async (ctxt) => {
 
-      console.log(ctx.request.body)
+      if (!ctxt.state.bodyAlreadyParsed) {
+        await body(ctxt, err => {
+          if (err) {
+            throw err;
+          }
+        });
+      }
       
       await this.messengers.send(messageSinkId, {
         to: defaultMailTo,
