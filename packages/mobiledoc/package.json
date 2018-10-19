@@ -35,7 +35,7 @@
     "mobiledoc-text-renderer": "^0.3.2"
   },
   "devDependencies": {
-    "@cardstack/authentication": "0.10.5",
+    "@cardstack/authentication": "0.11.2",
     "@cardstack/ephemeral": "0.10.1",
     "@cardstack/eslint-config": "0.8.0",
     "@cardstack/hub": "0.11.2",

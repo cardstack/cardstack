@@ -28,7 +28,7 @@
     "symlink-or-copy": "^1.1.8"
   },
   "peerDependencies": {
-    "@cardstack/jsonapi": "^0.4.4"
+    "@cardstack/jsonapi": "0.10.18"
   },
   "keywords": [
     "cardstack-plugin",

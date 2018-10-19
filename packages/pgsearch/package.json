@@ -10,7 +10,7 @@
     "api-version": 1
   },
   "dependencies": {
-    "@cardstack/di": "^0.8.0",
+    "@cardstack/di": "0.8.0",
     "@cardstack/hub": "0.11.2",
     "@cardstack/logger": "^0.1.0",
     "@cardstack/plugin-utils": "0.10.1",
