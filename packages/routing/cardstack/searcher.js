@@ -34,29 +34,32 @@ class RoutingSearcher {
       throw new Error(`The requested space '${id}' is not valid. A card type and card ID must be supplied`, { status: 400 });
     }
 
+    let card, included, searchResult;
     let schema =  await this.schema.forBranch(branch);
     let contentType = schema.types.get(cardType);
-    let card;
+
     if (this.cardType !== 'spaces'){
       if (contentType && contentType.routingField) {
-        let { data:docs } = await this.searchers.search(session, branch, {
+        searchResult = await this.searchers.search(session, branch, {
           filter: {
             type: cardType,
             [contentType.routingField]: { exact: cardId }
           }
         });
-        if (docs && docs.length) {
-          card = docs[0];
+        if (searchResult.data && searchResult.data.length) {
+          card = searchResult.data[0];
         }
       } else {
-        let { data:doc } = await this.searchers.get(session, branch, cardType, cardId);
-        card = doc;
+        searchResult = await this.searchers.get(session, branch, cardType, cardId);
+        card = searchResult.data;
       }
     }
 
     if (!card) {
       throw new Error(`The primary card '${cardType}/${cardId}' for the requested space '${id}' does not exist`, { status: 404 });
     }
+
+    included = [ card ].concat(searchResult.included || []);
 
     return {
       data: {
@@ -68,7 +71,8 @@ class RoutingSearcher {
             data: { type: card.type, id: card.id }
           }
         }
-      }
+      },
+      included
     };
   }
 
