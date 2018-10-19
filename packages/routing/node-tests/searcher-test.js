@@ -10,11 +10,6 @@ describe('routing/searcher', function() {
   async function setup() {
     let factory = new JSONAPIFactory();
 
-    factory.addResource('data-sources')
-      .withAttributes({
-        'source-type': '@cardstack/routing',
-      });
-
     factory.addResource('content-types', 'pages')
       .withAttributes({
         fieldsets: {
@@ -30,7 +25,13 @@ describe('routing/searcher', function() {
         }),
       ]);
     factory.addResource('content-types', 'posts')
+      .withAttributes({
+        'routing-field': 'slug'
+      })
       .withRelated('fields', [
+        factory.addResource('fields', 'slug').withAttributes({
+          fieldType: '@cardstack/core-types::string'
+        }),
         factory.addResource('fields', 'body').withAttributes({
           fieldType: '@cardstack/core-types::string'
         }),
@@ -55,12 +56,15 @@ describe('routing/searcher', function() {
       })
       .withRelated('posts', [
         factory.addResource('posts', 'rainy-day').withAttributes({
+          slug: 'rainy',
           body: "It's so rainy today and I wanna go outside but I don't want to get wet."
         }).withRelated('author', author),
         factory.addResource('posts', 'tummy-rub').withAttributes({
+          slug: 'tummy',
           body: "Rub my tummy now or I'll whine all night."
         }).withRelated('author', author),
         factory.addResource('posts', 'tug-of-war').withAttributes({
+          slug: 'tugofwar',
           body: "I'm the best at tug of war, you can't steal my toys from me."
         }).withRelated('author', author),
       ]);
@@ -99,6 +103,25 @@ describe('routing/searcher', function() {
       'posts/tummy-rub',
       'posts/tug-of-war'
     ]);
+  });
+
+  it("returns 404 when the requested space's primary card does not exist", async function(){
+    let error;
+    try {
+      await searchers.get(env.session, 'master', 'spaces', 'doesnt/exist');
+    } catch (e) {
+      error = e;
+    }
+
+    expect(error.message).equals(`No such resource master/doesnt/exist`);
+    expect(error.status).equals(404);
+  });
+
+  it("returns a space using the primary-card's routing field", async function() {
+    let { data:space } = await searchers.get(env.session, 'master', 'spaces', 'posts/tummy');
+    expect(space).has.property('id', 'posts/tummy');
+    expect(space).has.deep.property('relationships.primary-card.data.id', 'tummy-rub');
+    expect(space).has.deep.property('relationships.primary-card.data.type', 'posts');
   });
 
 });

@@ -702,6 +702,13 @@ const models = [
     attributes: {
       'source-type': '@cardstack/hub::static-models'
     }
+  },
+  {
+    type: 'data-sources',
+    id: 'spaces',
+    attributes: {
+      'source-type': '@cardstack/routing'
+    }
   }
 
 ];

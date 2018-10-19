@@ -37,12 +37,12 @@
             "type": "node",
             "request": "launch",
             "name": "Launch Dummy App Hub",
-            "cwd": "${workspaceRoot}/packages/data",
+            "cwd": "${workspaceRoot}/packages/routing",
             "console": "integratedTerminal",
             "env": {
                 "CARDSTACK_SESSIONS_KEY":"OQUQi8NH0asrYgeoE10ijOFBhd/P1BU8HZP/rNqO5nw=",
                 "PGSEARCH_NAMESPACE":"cardstack_data_development",
-                "INITIAL_DATA_DIR":"${workspaceFolder}/packages/data/tests/dummy/cardstack",
+                "INITIAL_DATA_DIR":"${workspaceFolder}/packages/routing/tests/dummy/cardstack",
                 "HUB_ENVIRONMENT":"test",
                 "PORT":"3000"
             },
@@ -69,7 +69,7 @@
                 "--timeout",
                 "200000",
                 // "--grep",
-                // "includes the graph of relationships"
+                // "returns a space whose"
             ]
         }
     ]
