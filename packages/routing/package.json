@@ -21,6 +21,7 @@
   },
   "dependencies": {
     "@cardstack/data": "0.11.2",
+    "@cardstack/di": "0.8.0",
     "@cardstack/plugin-utils": "0.10.1",
     "@cardstack/rendering": "0.11.0",
     "ember-cli-babel": "^6.16.0",
