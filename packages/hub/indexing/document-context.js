@@ -76,6 +76,9 @@ module.exports = class DocumentContext {
     this._references.push(`${type}/${id}`);
 
     let key = `${type}/${id}`;
+    if (get(this, 'upstreamDoc.data.id') === id && get(this, 'upstreamDoc.data.type') === type) {
+      return this.upstreamDoc.data;
+    }
     let includedResource = this.suppliedIncluded ? this.suppliedIncluded.find(i => key === `${i.type}/${i.id}`) : null;
     if (includedResource) {
       return includedResource;
@@ -272,7 +275,9 @@ module.exports = class DocumentContext {
 
     // top level document embeds all the other pristine includes
     if (this.pristineIncludes.length > 0 && depth === 0) {
-      pristine.included = uniqBy([pristine].concat(this.pristineIncludes), r => `${r.type}/${r.id}`).slice(1);
+      pristine.included = uniqBy([pristine].concat(this.pristineIncludes), r => `${r.type}/${r.id}`)
+        .slice(1)
+        .filter(r => !(r.type == type && r.id == id));
     }
 
     if (depth > 0) {

@@ -28,9 +28,14 @@ describe('pgsearch/indexer', function() {
       factory.addResource('fields', 'author').withAttributes({
         fieldType: '@cardstack/core-types::belongs-to'
       }).withRelated('related-types', [
-        factory.addResource('content-types', 'people').withRelated('fields', [
+        factory.addResource('content-types', 'people')
+        .withAttributes({ defaultIncludes: ['friends'] })
+        .withRelated('fields', [
           factory.addResource('fields', 'name').withAttributes({
             fieldType: '@cardstack/core-types::string'
+          }),
+          factory.addResource('fields', 'friends').withAttributes({
+            fieldType: '@cardstack/core-types::has-many'
           })
         ])
       ]),
@@ -117,6 +122,101 @@ describe('pgsearch/indexer', function() {
     expect(found).has.property('included');
     expect(found.included).length(1);
     expect(found.included[0].attributes.name).to.equal('Quint');
+  });
+
+  it('indexes a resource that is related to itself', async function() {
+    let { data:person } = await writer.create('master', env.session, 'people', {
+      data: {
+        id: 'vanGogh',
+        type: 'people',
+        attributes: {
+          name: 'Van Gogh'
+        },
+        relationships: {
+          friends: { data: [{ type: 'people', id: 'vanGogh' }] }
+        }
+      }
+    });
+
+    let found = await searcher.get(env.session, 'master', 'people', person.id);
+    expect(found).is.ok;
+    expect(found).has.deep.property('data.attributes.name');
+    expect(found.data.relationships).deep.equals({ friends: { data: [{ type: 'people', id: person.id }]}});
+    expect(found).has.property('included');
+    expect(found.included).length(0);
+  });
+
+  it('indexes a resource that includes a resource which has a relation to itself', async function() {
+    let { data:circularPerson } = await writer.create('master', env.session, 'people', {
+      data: {
+        id: 'vanGogh2',
+        type: 'people',
+        attributes: {
+          name: 'Van Gogh'
+        },
+        relationships: {
+          friends: { data: [{ type: 'people', id: 'vanGogh2' }] }
+        }
+      }
+    });
+    let { data:person } = await writer.create('master', env.session, 'people', {
+      data: {
+        id: 'ringo',
+        type: 'people',
+        attributes: {
+          name: 'Ringo'
+        },
+        relationships: {
+          friends: { data: [{ type: 'people', id: 'vanGogh2' }] }
+        }
+      }
+    });
+
+    let found = await searcher.get(env.session, 'master', 'people', person.id);
+    expect(found).is.ok;
+    expect(found).has.deep.property('data.attributes.name');
+    expect(found.data.relationships).deep.equals({ friends: { data: [{ type: 'people', id: circularPerson.id }]}});
+    expect(found).has.property('included');
+    expect(found.included).length(1);
+    expect(found.included[0].attributes.name).to.equal('Van Gogh');
+    expect(found.included[0].relationships).deep.equals({ friends: { data: [{ type: 'people', id: circularPerson.id }]}});
+  });
+
+  it('indexes a circular relationship', async function() {
+    let { data:person1 } = await writer.create('master', env.session, 'people', {
+      data: {
+        id: 'hassan',
+        type: 'people',
+        attributes: {
+          name: 'Hassan'
+        },
+        relationships: {
+          friends: { data: [{ type: 'people', id: 'vanGogh3' }] }
+        }
+      }
+    });
+    let { data:person2 } = await writer.create('master', env.session, 'people', {
+      data: {
+        id: 'vanGogh3',
+        type: 'people',
+        attributes: {
+          name: 'Van Gogh'
+        },
+        relationships: {
+          friends: { data: [{ type: 'people', id: 'hassan' }] }
+        }
+      }
+    });
+
+    let found = await searcher.get(env.session, 'master', 'people', person1.id);
+    expect(found).is.ok;
+    expect(found).has.deep.property('data.attributes.name');
+    expect(found.data.relationships).deep.equals({ friends: { data: [{ type: 'people', id: person2.id }]}});
+    expect(found).has.property('included');
+    expect(found.included).length(1);
+
+    expect(found.included[0].attributes.name).to.equal('Van Gogh');
+    expect(found.included[0].relationships).deep.equals({ friends: { data: [{ type: 'people', id: person1.id }]}});
   });
 
   it('reuses included resources when building pristine document when upstreamDoc has includes', async function() {
