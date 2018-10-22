@@ -1,4 +1,4 @@
-/* eslint-disable no-console, node/no-extraneous-require */
+/* eslint-disable no-console */
 
 let glob = require('glob');
 let path = require('path');

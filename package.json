@@ -8,7 +8,8 @@
   "engines": {
     "node": ">= 7.7"
   },
-  "devDependencies": {
+  "dependencies": {
+    "glob": "^7.1.2",
     "lerna": "^2.0.0-rc.5",
     "mocha": "^4.0.1"
   },
@@ -21,8 +22,6 @@
     "truffle-tests": "LOG_LEVELS='*=warn' node packages/test-support/truffle-test-runner.js",
     "server": "node packages/hub/bin/server.js",
     "blockchain": "truffle develop"
-  },
-  "dependencies": {
   },
   "workspaces": ["packages/*"],
   "private": true
