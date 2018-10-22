@@ -50,6 +50,7 @@ module.exports = declareInjections({
           let isSchema = schemaTypes.includes(model.type);
           storage.store(model.type, model.id, model, isSchema);
         }
+        await storage.validatorHook(storage.lookup.bind(storage));
       }
     }
     return storage;
