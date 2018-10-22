@@ -69,7 +69,7 @@
                 "--timeout",
                 "200000",
                 // "--grep",
-                // "indexes a cycle"
+                // "circular relationship"
             ]
         }
     ]

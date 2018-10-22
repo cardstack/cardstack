@@ -19,6 +19,22 @@ describe('pgsearch/indexer', function() {
     this.timeout(2500);
     factory = new Factory();
 
+    factory.addResource('content-types', 'puppies')
+      .withAttributes({
+        fieldsetExpansionFormat: 'isolated',
+        fieldsets: {
+          isolated: [{ field: 'puppy-friends', format: 'isolated' }]
+        }
+      })
+      .withRelated('fields', [
+        factory.addResource('fields', 'name').withAttributes({
+          fieldType: '@cardstack/core-types::string'
+        }),
+        factory.addResource('fields', 'puppy-friends').withAttributes({
+          fieldType: '@cardstack/core-types::has-many'
+        })
+      ]);
+
     factory.addResource('content-types', 'articles').withAttributes({
       defaultIncludes: ['author', 'reviewers']
     }).withRelated('fields', [
@@ -29,7 +45,9 @@ describe('pgsearch/indexer', function() {
         fieldType: '@cardstack/core-types::belongs-to'
       }).withRelated('related-types', [
         factory.addResource('content-types', 'people')
-        .withAttributes({ defaultIncludes: ['friends'] })
+          .withAttributes({
+            defaultIncludes: ['friends'],
+          })
         .withRelated('fields', [
           factory.addResource('fields', 'name').withAttributes({
             fieldType: '@cardstack/core-types::string'
@@ -217,6 +235,153 @@ describe('pgsearch/indexer', function() {
 
     expect(found.included[0].attributes.name).to.equal('Van Gogh');
     expect(found.included[0].relationships).deep.equals({ friends: { data: [{ type: 'people', id: person1.id }]}});
+  });
+
+  it('indexes a circular relationship by following fieldset paths', async function() {
+    let { data:puppy1 } = await writer.create('master', env.session, 'puppies', {
+      data: {
+        id: 'ringo',
+        type: 'puppies',
+        attributes: {
+          name: 'Ringo'
+        },
+        relationships: {
+          'puppy-friends': { data: [{ type: 'puppies', id: 'vanGogh' }] }
+        }
+      }
+    });
+    let { data:puppy2 } = await writer.create('master', env.session, 'puppies', {
+      data: {
+        id: 'vanGogh',
+        type: 'puppies',
+        attributes: {
+          name: 'Van Gogh'
+        },
+        relationships: {
+          'puppy-friends': { data: [{ type: 'puppies', id: 'ringo' }] }
+        }
+      }
+    });
+
+    let found = await searcher.get(env.session, 'master', 'puppies', puppy1.id);
+    expect(found).is.ok;
+    expect(found).has.deep.property('data.attributes.name');
+    expect(found.data.relationships).deep.equals({ 'puppy-friends': { data: [{ type: 'puppies', id: puppy2.id }]}});
+    expect(found).has.property('included');
+    expect(found.included).length(1);
+
+    expect(found.included[0].attributes.name).to.equal('Van Gogh');
+    expect(found.included[0].relationships).deep.equals({ 'puppy-friends': { data: [{ type: 'puppies', id: puppy1.id }]}});
+  });
+
+  it('indexes a resource that is related to itself by following fieldset paths', async function() {
+    let { data:puppy } = await writer.create('master', env.session, 'puppies', {
+      data: {
+        id: 'vanGogh2',
+        type: 'puppies',
+        attributes: {
+          name: 'Van Gogh'
+        },
+        relationships: {
+          'puppy-friends': { data: [{ type: 'puppies', id: 'vanGogh2' }] }
+        }
+      }
+    });
+
+    let found = await searcher.get(env.session, 'master', 'puppies', puppy.id);
+    expect(found).is.ok;
+    expect(found).has.deep.property('data.attributes.name');
+    expect(found.data.relationships).deep.equals({ 'puppy-friends': { data: [{ type: 'puppies', id: puppy.id }]}});
+    expect(found).has.property('included');
+    expect(found.included).length(0);
+  });
+
+  it('indexes a resource that includes a resource which has a relation to itself by following fieldset paths', async function() {
+    let { data:circularPuppy } = await writer.create('master', env.session, 'puppies', {
+      data: {
+        id: 'vanGogh3',
+        type: 'puppies',
+        attributes: {
+          name: 'Van Gogh'
+        },
+        relationships: {
+          'puppy-friends': { data: [{ type: 'puppies', id: 'vanGogh3' }] }
+        }
+      }
+    });
+    let { data:puppy } = await writer.create('master', env.session, 'puppies', {
+      data: {
+        id: 'ringo2',
+        type: 'puppies',
+        attributes: {
+          name: 'Ringo'
+        },
+        relationships: {
+          'puppy-friends': { data: [{ type: 'puppies', id: 'vanGogh3' }] }
+        }
+      }
+    });
+
+    let found = await searcher.get(env.session, 'master', 'puppies', puppy.id);
+    expect(found).is.ok;
+    expect(found).has.deep.property('data.attributes.name');
+    expect(found.data.relationships).deep.equals({ 'puppy-friends': { data: [{ type: 'puppies', id: circularPuppy.id }]}});
+    expect(found).has.property('included');
+    expect(found.included).length(1);
+    expect(found.included[0].attributes.name).to.equal('Van Gogh');
+    expect(found.included[0].relationships).deep.equals({ 'puppy-friends': { data: [{ type: 'puppies', id: circularPuppy.id }]}});
+  });
+
+  it('indexes a resource that includes resources that have a circular relationship by following fieldset paths', async function() {
+    let { data:puppy } = await writer.create('master', env.session, 'puppies', {
+      data: {
+        type: 'puppies',
+        attributes: {
+          name: 'Bagel'
+        },
+        relationships: {
+          'puppy-friends': { data: [{ type: 'puppies', id: 'ringo3' }] }
+        }
+      }
+    });
+    let { data:puppy1 } = await writer.create('master', env.session, 'puppies', {
+      data: {
+        id: 'ringo3',
+        type: 'puppies',
+        attributes: {
+          name: 'Ringo'
+        },
+        relationships: {
+          'puppy-friends': { data: [{ type: 'puppies', id: 'vanGogh4' }] }
+        }
+      }
+    });
+    let { data:puppy2 } = await writer.create('master', env.session, 'puppies', {
+      data: {
+        id: 'vanGogh4',
+        type: 'puppies',
+        attributes: {
+          name: 'Van Gogh'
+        },
+        relationships: {
+          'puppy-friends': { data: [{ type: 'puppies', id: 'ringo3' }] }
+        }
+      }
+    });
+
+    let found = await searcher.get(env.session, 'master', 'puppies', puppy.id);
+    expect(found).is.ok;
+    expect(found).has.deep.property('data.attributes.name');
+    expect(found.data.relationships).deep.equals({ 'puppy-friends': { data: [{ type: 'puppies', id: puppy1.id }]}});
+    expect(found).has.property('included');
+    expect(found.included).length(2);
+    let included1 = found.included.find(i => i.type === puppy1.type && i.id === puppy1.id);
+    let included2 = found.included.find(i => i.type === puppy2.type && i.id === puppy2.id);
+
+    expect(included1.attributes.name).to.equal('Ringo');
+    expect(included1.relationships).deep.equals({ 'puppy-friends': { data: [{ type: 'puppies', id: puppy2.id }]}});
+    expect(included2.attributes.name).to.equal('Van Gogh');
+    expect(included2.relationships).deep.equals({ 'puppy-friends': { data: [{ type: 'puppies', id: puppy1.id }]}});
   });
 
   it('reuses included resources when building pristine document when upstreamDoc has includes', async function() {

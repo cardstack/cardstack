@@ -22,6 +22,7 @@ module.exports = class DocumentContext {
     this._read = read;
     this._realms = [];
     this._pendingReads = [];
+    this._followedRelationships = {};
     this.cache = {};
     this.isCollection = upstreamDoc && upstreamDoc.data && Array.isArray(upstreamDoc.data);
     this.suppliedIncluded = upstreamDoc && upstreamDoc.included;
@@ -264,7 +265,11 @@ module.exports = class DocumentContext {
       }
       let userModel = new Model(contentType, jsonapiDoc, this.schema, this.read.bind(this));
       await this._buildAttributes(contentType, jsonapiDoc, userModel, pristine, searchDoc);
-      await this._buildRelationships(contentType, jsonapiDoc, userModel, pristine, searchDoc, searchTree, depth, fieldsets);
+
+      if (!this._followedRelationships[`${type}/${id}`]) {
+        this._followedRelationships[`${type}/${id}`] = true;
+        await this._buildRelationships(contentType, jsonapiDoc, userModel, pristine, searchDoc, searchTree, depth, fieldsets);
+      }
 
       assignMeta(pristine.data, jsonapiDoc);
     }
@@ -281,7 +286,7 @@ module.exports = class DocumentContext {
     }
 
     if (depth > 0) {
-      this.pristineIncludes.push(pristine.data);
+      this.pristineIncludes.push(jsonapiDoc);
     } else {
       this._pristine = pristine;
       if (!isCollection) {
