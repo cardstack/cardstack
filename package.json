@@ -8,20 +8,20 @@
   "engines": {
     "node": ">= 7.7"
   },
-  "devDependencies": {
+  "dependencies": {
+    "glob": "^7.1.2",
     "lerna": "^2.0.0-rc.5",
     "mocha": "^4.0.1"
   },
   "scripts": {
-    "test": "npm run lint:js && npm run node-tests && npm run ember-tests && npm run truffle-tests",
+    "test": "npm run lint:deps && npm run lint:js && npm run node-tests && npm run ember-tests && npm run truffle-tests",
     "node-tests": "mocha ./packages/test-support/bin/run.js --timeout 10000",
+    "lint:deps": "node scripts/find-bad-deps.js",
     "lint:js": "eslint .",
     "ember-tests": "node packages/test-support/ember-test-runner.js",
     "truffle-tests": "LOG_LEVELS='*=warn' node packages/test-support/truffle-test-runner.js",
     "server": "node packages/hub/bin/server.js",
     "blockchain": "truffle develop"
-  },
-  "dependencies": {
   },
   "workspaces": ["packages/*"],
   "private": true
