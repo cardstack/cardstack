@@ -22,6 +22,7 @@ module.exports = class DocumentContext {
     this._read = read;
     this._realms = [];
     this._pendingReads = [];
+    this._followedRelationships = {};
     this.cache = {};
     this.isCollection = upstreamDoc && upstreamDoc.data && Array.isArray(upstreamDoc.data);
     this.suppliedIncluded = upstreamDoc && upstreamDoc.included;
@@ -76,6 +77,9 @@ module.exports = class DocumentContext {
     this._references.push(`${type}/${id}`);
 
     let key = `${type}/${id}`;
+    if (get(this, 'upstreamDoc.data.id') === id && get(this, 'upstreamDoc.data.type') === type) {
+      return this.upstreamDoc.data;
+    }
     let includedResource = this.suppliedIncluded ? this.suppliedIncluded.find(i => key === `${i.type}/${i.id}`) : null;
     if (includedResource) {
       return includedResource;
@@ -261,7 +265,11 @@ module.exports = class DocumentContext {
       }
       let userModel = new Model(contentType, jsonapiDoc, this.schema, this.read.bind(this));
       await this._buildAttributes(contentType, jsonapiDoc, userModel, pristine, searchDoc);
-      await this._buildRelationships(contentType, jsonapiDoc, userModel, pristine, searchDoc, searchTree, depth, fieldsets);
+
+      if (!this._followedRelationships[`${type}/${id}`]) {
+        this._followedRelationships[`${type}/${id}`] = true;
+        await this._buildRelationships(contentType, jsonapiDoc, userModel, pristine, searchDoc, searchTree, depth, fieldsets);
+      }
 
       assignMeta(pristine.data, jsonapiDoc);
     }
@@ -272,11 +280,13 @@ module.exports = class DocumentContext {
 
     // top level document embeds all the other pristine includes
     if (this.pristineIncludes.length > 0 && depth === 0) {
-      pristine.included = uniqBy([pristine].concat(this.pristineIncludes), r => `${r.type}/${r.id}`).slice(1);
+      pristine.included = uniqBy([pristine].concat(this.pristineIncludes), r => `${r.type}/${r.id}`)
+        .slice(1)
+        .filter(r => !(r.type == type && r.id == id));
     }
 
     if (depth > 0) {
-      this.pristineIncludes.push(pristine.data);
+      this.pristineIncludes.push(jsonapiDoc);
     } else {
       this._pristine = pristine;
       if (!isCollection) {
