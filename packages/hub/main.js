@@ -38,10 +38,7 @@ async function wireItUp(projectDir, encryptionKeys, dataSources, opts = {}) {
   // indexing happens
   if (!opts.disableAutomaticIndexing) {
     await container.lookup(`plugin-client:${require.resolve('@cardstack/pgsearch/client')}`).ensureDatabaseSetup();
-
-    // some datasources are dependent upon a sync at boot for index of pristine system
-    container.lookup('hub:indexers').update(); // dont await boot-time indexing, invalidation logic has our back
-    setInterval(() => container.lookup('hub:indexers').update(), 600000);
+    startIndexing(opts.environment, container);  // dont await boot-time indexing, invalidation logic has our back
   }
 
   // this registration pattern is how we make broccoli wait for our
@@ -51,6 +48,32 @@ async function wireItUp(projectDir, encryptionKeys, dataSources, opts = {}) {
   }
 
   return container;
+}
+
+async function startIndexing(environment, container) {
+  // some datasources are dependent upon a sync at boot for index of pristine system
+  await container.lookup('hub:indexers').update();
+
+  let ephemeralStorage = await container.lookup(`plugin-services:${require.resolve('@cardstack/ephemeral/service')}`);
+  if (environment !== 'production' && ephemeralStorage) {
+    let searchers = await container.lookup(`hub:searchers`);
+    let models = await (await container.lookup('config:initial-models'))();
+
+    await ephemeralStorage.validateModels(models, async (type, id) => {
+      let result;
+      try {
+        result = await searchers.getFromControllingBranch(Session.INTERNAL_PRIVILEGED, type, id);
+      } catch (err) {
+        if (err.status !== 404) { throw err; }
+      }
+
+      if (result && result.data) {
+        return result.data;
+      }
+    });
+  }
+
+  setInterval(() => container.lookup('hub:indexers').update(), 600000);
 }
 
 async function loadSeeds(container, seedModels, opts) {
