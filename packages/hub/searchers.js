@@ -105,6 +105,8 @@ class Searchers {
       if (source && (typeof source.searcher.getBinary === 'function')) {
         let response = await source.searcher.getBinary(sessionOrEveryone, branch, type, id, next);
         return response;
+      } else {
+        return await next();
       }
     };
     let result = await next();
