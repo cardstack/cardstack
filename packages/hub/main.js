@@ -54,16 +54,15 @@ async function startIndexing(environment, container) {
   // some datasources are dependent upon a sync at boot for index of pristine system
   await container.lookup('hub:indexers').update();
 
-  if (environment !== 'production') {
-    let ephemeralStorage = await container.lookup(`plugin-services:${require.resolve('@cardstack/ephemeral/service')}`);
+  let ephemeralStorage = await container.lookup(`plugin-services:${require.resolve('@cardstack/ephemeral/service')}`);
+  if (environment !== 'production' && ephemeralStorage) {
     let searchers = await container.lookup(`hub:searchers`);
-    let controllingBranch = await container.lookup(`hub:controlling-branch`);
     let models = await (await container.lookup('config:initial-models'))();
 
     await ephemeralStorage.validateModels(models, async (type, id) => {
       let result;
       try {
-        result = await searchers.get(Session.INTERNAL_PRIVILEGED, controllingBranch.name, type, id);
+        result = await searchers.getFromControllingBranch(Session.INTERNAL_PRIVILEGED, type, id);
       } catch (err) {
         if (err.status !== 404) { throw err; }
       }

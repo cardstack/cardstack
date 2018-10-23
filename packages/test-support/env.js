@@ -74,11 +74,10 @@ exports.createDefaultEnvironment = async function(projectDir, initialModels = []
 
     let ephemeralStorage = await container.lookup(`plugin-services:${require.resolve('@cardstack/ephemeral/service')}`);
     let searchers = await container.lookup(`hub:searchers`);
-    let controllingBranch = await container.lookup(`hub:controlling-branch`);
     await ephemeralStorage.validateModels(models, async(type, id) => {
       let result;
       try {
-        result = await searchers.get(Session.INTERNAL_PRIVILEGED, controllingBranch.name, type, id);
+        result = await searchers.getFromControllingBranch(Session.INTERNAL_PRIVILEGED, type, id);
       } catch (err) {
         if (err.status !== 404) { throw err; }
       }
