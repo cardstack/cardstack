@@ -2,6 +2,8 @@ const crypto = require('crypto');
 const Error = require('@cardstack/plugin-utils/error');
 const PendingChange = require('@cardstack/plugin-utils/pending-change');
 const { declareInjections } = require('@cardstack/di');
+const { statSync } = require("fs");
+const streamToPromise = require('stream-to-promise');
 
 const pendingChanges = new WeakMap();
 
@@ -43,6 +45,36 @@ module.exports = declareInjections({
 
     let pending = new PendingChange(null, storedDocument, finalizer);
     pendingChanges.set(pending, { type, id, storage: this.storage, isSchema: isSchema });
+    return pending;
+  }
+
+  async prepareBinaryCreate(branch, session, type, stream) {
+    if (branch !== 'master') {
+      throw new Error("ephemeral storage only supports branch master");
+    }
+
+    let id = this._generateId();
+
+    let storedDocument = {
+      type: 'cs-files',
+      id,
+      attributes: {
+        'created-at':   new Date().toISOString(),
+        'size':         statSync(stream.path).size,
+        'content-type': stream.mimeType,
+        'file-name':    stream.filename
+      }
+    };
+
+    let binaryFinalizer = async (pendingChange) => {
+      let { storage, type, id } = pendingChanges.get(pendingChange);
+      let blob = await streamToPromise(stream);
+
+      return { version: storage.storeBinary(type, id, blob) };
+    };
+
+    let pending = new PendingChange(null, storedDocument, binaryFinalizer);
+    pendingChanges.set(pending, { type, id, storage: this.storage });
     return pending;
   }
 

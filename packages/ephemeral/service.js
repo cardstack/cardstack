@@ -136,6 +136,7 @@ class EphemeralStorage {
     // map from `${type}/${id}` to { model, isSchema, generation, type, id }
     // if model == null, that's a tombstone
     this.models = new Map();
+    this.blobs = new Map();
     this.indexers = indexers;
 
     this.checkpoints = new Map();
@@ -169,6 +170,13 @@ class EphemeralStorage {
     }
   }
 
+  lookupBinary(type, id) {
+    let entry = this.blobs.get(`${type}/${id}`);
+    if (entry) {
+      return entry.blob;
+    }
+  }
+
   store(type, id, model, isSchema, ifMatch) {
     generationCounter++;
     let key = `${type}/${id}`;
@@ -188,6 +196,21 @@ class EphemeralStorage {
       generation: generationCounter,
       type,
       id
+    });
+
+    return generationCounter;
+  }
+
+  storeBinary(type, id, blob) {
+    generationCounter++;
+    let key = `${type}/${id}`;
+
+    log.debug('storing blob %s %s', type, id);
+
+    this.blobs.set(key, {
+      type,
+      id,
+      blob
     });
 
     return generationCounter;
