@@ -1,6 +1,6 @@
 import { module, test } from 'qunit';
 import { setupApplicationTest } from 'ember-qunit';
-import { visit, currentURL, click, find, findAll, triggerEvent } from '@ember/test-helpers';
+import { visit, currentURL, click, find, findAll, triggerEvent, waitUntil } from '@ember/test-helpers';
 import fetch from 'fetch';
 
 module('Acceptance | image attachment', function(hooks) {
@@ -30,6 +30,10 @@ module('Acceptance | image attachment', function(hooks) {
 
     await click(findContains('button', 'Update Image'));
     assert.ok(find('img.cs-image[src*="/api/cs-files/"]'));
+
+    // wait until no animation is happening before ending the test to prevent
+    // ember errors
+    await waitUntil(() => !find('.liquid-animating') )
   });
 });
 
