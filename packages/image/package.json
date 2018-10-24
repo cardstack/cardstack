@@ -35,6 +35,7 @@
     "@cardstack/jsonapi": "0.11.4",
     "@cardstack/mock-auth": "0.11.4",
     "@cardstack/models": "0.11.4",
+    "@cardstack/rendering": "0.11.4",
     "@cardstack/routing": "0.11.4",
     "@cardstack/test-support": "0.11.4",
     "@cardstack/tools": "0.11.4",
