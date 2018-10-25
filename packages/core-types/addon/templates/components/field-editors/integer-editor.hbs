@@ -1,7 +1,7 @@
-<div class="field-editor {{if invalid 'invalid'}}">
-{{cs-one-way-input
-       value=(get content field)
-       update=(action "update")
-       disabled=(not enabled)
-       onchange=(action "normalize") }}
+<div class="field-editor">
+  {{input
+    value=(get content field)
+    disabled=disabled
+    focus-out=(perform onchange)
+  }}
 </div>

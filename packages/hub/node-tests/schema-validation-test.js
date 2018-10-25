@@ -280,17 +280,17 @@ describe('schema/validation', function() {
     expect(errors).collectionContains({
       detail: '21 is not a valid value for field "title"',
       source: { pointer: '/data/attributes/title' },
-      status: 400
+      status: 422
     });
     expect(errors).collectionContains({
       detail: '"Not a date" is not a valid value for field "published-date"',
       source: { pointer: '/data/attributes/published-date' },
-      status: 400
+      status: 422
     });
     expect(errors).collectionContains({
       detail: '"Not a string array" is not a valid value for field "colors"',
       source: { pointer: '/data/attributes/colors' },
-      status: 400
+      status: 422
     });
   });
 
