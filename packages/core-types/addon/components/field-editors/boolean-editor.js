@@ -11,6 +11,7 @@ export default Component.extend({
       let field = get(this, 'field');
 
       set(content, field, value);
+      this.get('onchange').perform();
     }
   }
 });

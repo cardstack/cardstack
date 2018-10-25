@@ -45,6 +45,9 @@ function initialModels() {
         caption: 'Units',
         fieldType: '@cardstack/core-types::string'
       }),
+      initial.addResource('fields', 'archived').withAttributes({
+        fieldType: '@cardstack/core-types::boolean'
+      }),
       initial.addResource('fields', 'comments').withAttributes({
         fieldType: '@cardstack/core-types::has-many',
         owned: true,
@@ -98,6 +101,7 @@ function initialModels() {
       publishedAt: new Date(2017, 3, 24),
       readingTimeValue: 8,
       readingTimeUnits: 'minutes',
+      archived: false
     })
     .withRelated('comments', [ threeHeadedMonkey ]);
 
@@ -107,6 +111,7 @@ function initialModels() {
       publishedAt: new Date(2017, 9, 20),
       readingTimeValue: 2,
       readingTimeUnits: 'hours',
+      archived: true
     })
     .withRelated('comments', [ doorstop ]);
 
