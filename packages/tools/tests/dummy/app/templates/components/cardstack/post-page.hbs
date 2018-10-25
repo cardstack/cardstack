@@ -7,7 +7,10 @@
     {{cs-field content 'publishedAt'}}
   </p>
   <p>
-    {{cs-field content 'archived'}}
+    Category: {{cs-field content 'category'}}
+  </p>
+  <p>
+    Archived: {{cs-field content 'archived'}}
   </p>
   <p>
     {{#cs-field-group content name="reading-time" caption="Underestimated Read Time" fields="readingTimeValue,readingTimeUnits" as |rt|}}

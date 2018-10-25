@@ -2,6 +2,19 @@
 
 const JSONAPIFactory = require('@cardstack/test-support/jsonapi-factory');
 
+function addConstraint(factory, constraint, field) {
+  factory.addResource('constraints')
+    .withAttributes({
+      constraintType: constraint,
+      inputs: { ignoreBlank: true }
+    })
+    .withRelated('input-assignments', [
+      factory.addResource('input-assignments')
+        .withAttributes({ inputName: 'target' })
+        .withRelated('field', factory.getResource('fields', field)),
+    ]);
+}
+
 function initialModels() {
   let initial = new JSONAPIFactory();
 
@@ -48,6 +61,10 @@ function initialModels() {
       initial.addResource('fields', 'archived').withAttributes({
         fieldType: '@cardstack/core-types::boolean'
       }),
+      initial.addResource('fields', 'category').withAttributes({
+        fieldType: '@cardstack/core-types::string',
+        editorComponent: 'field-editors/category-editor'
+      }),
       initial.addResource('fields', 'comments').withAttributes({
         fieldType: '@cardstack/core-types::has-many',
         owned: true,
@@ -56,27 +73,9 @@ function initialModels() {
       ]),
     ]);
 
-    initial.addResource('constraints')
-      .withAttributes({
-        constraintType: '@cardstack/core-types::not-empty',
-        inputs: { ignoreBlank: true }
-      })
-      .withRelated('input-assignments', [
-        initial.addResource('input-assignments')
-          .withAttributes({ inputName: 'target' })
-          .withRelated('field', initial.getResource('fields', 'title')),
-      ]);
-
-    initial.addResource('constraints')
-      .withAttributes({
-        constraintType: '@cardstack/core-types::not-empty',
-        inputs: { ignoreBlank: true }
-      })
-      .withRelated('input-assignments', [
-        initial.addResource('input-assignments')
-          .withAttributes({ inputName: 'target' })
-          .withRelated('field', initial.getResource('fields', 'body')),
-      ]);
+    addConstraint(initial, '@cardstack/core-types::not-empty', 'title');
+    addConstraint(initial, '@cardstack/core-types::not-empty', 'body');
+    addConstraint(initial, '@cardstack/core-types::not-empty', 'category');
 
   let guybrush = initial.addResource('bloggers', '1')
     .withAttributes({
@@ -101,7 +100,8 @@ function initialModels() {
       publishedAt: new Date(2017, 3, 24),
       readingTimeValue: 8,
       readingTimeUnits: 'minutes',
-      archived: false
+      category: 'adventure',
+      archived: false,
     })
     .withRelated('comments', [ threeHeadedMonkey ]);
 
@@ -111,6 +111,7 @@ function initialModels() {
       publishedAt: new Date(2017, 9, 20),
       readingTimeValue: 2,
       readingTimeUnits: 'hours',
+      category: 'lifestyle',
       archived: true
     })
     .withRelated('comments', [ doorstop ]);

@@ -14,6 +14,7 @@
   {{cs-version-control
     model=model
     enabled=editingEnabled
+    on-error=(action (mut validationErrors))
   }}
 
   {{#each fields key="id" as |fieldMark|}}

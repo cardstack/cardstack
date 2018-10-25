@@ -12,9 +12,11 @@ export default Component.extend({
   tagName: '',
   opened: true,
   animationRules,
+  "on-error": null,
   resourceMetadata: service(),
   store: service(),
   router: service(),
+  data: service('cardstack-data'),
 
   modelMeta: computed('model', function() {
     return this.get('resourceMetadata').read(this.get('model'));
@@ -136,7 +138,12 @@ export default Component.extend({
   anythingPending: or('model.isNew', 'anythingDirty'),
 
   update: task(function * () {
-    yield this.get('model').save();
+    let model = this.get('model');
+    let errors = yield this.get('data').validate(model);
+    if (errors) {
+      return this['on-error'](errors);
+    }
+    yield model.save();
   }).keepLatest(),
 
   delete: task(function * () {
