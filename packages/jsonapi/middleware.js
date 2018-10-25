@@ -35,7 +35,7 @@ function jsonapiMiddleware(searcher, writers, indexers, defaultBranch) {
 
   let prefixPattern;
   if (options.servedPrefixes) {
-    prefixPattern = new RegExp(`^/(${options.servedPrefixes})/?(.*)`)
+    prefixPattern = new RegExp(`^/(${options.servedPrefixes})/?(.*)`);
   }
   let body = koaJSONBody({ limit: '16mb' });
 
