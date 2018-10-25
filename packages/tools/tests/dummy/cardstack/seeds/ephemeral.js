@@ -110,18 +110,18 @@ function initialModels() {
     .withAttributes({
       title: 'hello world',
       publishedAt: new Date(2017, 3, 24),
-      readingTimeValue: 8,
-      readingTimeUnits: initial.getResource('time-units', '1')
+      readingTimeValue: 8
     })
+    .withRelated('reading-time-unit', { type: 'time-units', id: '1' })
     .withRelated('comments', [ threeHeadedMonkey ]);
 
   initial.addResource('posts', '2')
     .withAttributes({
       title: 'second',
       publishedAt: new Date(2017, 9, 20),
-      readingTimeValue: 2,
-      readingTimeUnits: initial.getResource('time-units', '2')
+      readingTimeValue: 2
     })
+    .withRelated('reading-time-unit', { type: 'time-units', id: '2' })
     .withRelated('comments', [ doorstop ]);
 
   return initial.getModels();
