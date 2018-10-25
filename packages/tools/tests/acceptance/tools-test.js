@@ -52,7 +52,14 @@ module('Acceptance | tools', function(hooks) {
     let titleEditor = findInputWithValue.call(this, 'hello world');
     await fillIn(titleEditor, '');
     await triggerEvent(titleEditor, 'blur');
-
     assert.dom('.field-editor--error-message').hasText('title must not be empty');
+
+    element = findTriggerElementWithLabel.call(this, /Body/);
+    await click(element);
+
+    let commentBodyEditor = findInputWithValue.call(this, 'Look behind you, a Three-Headed Monkey!');
+    await fillIn(commentBodyEditor, '');
+    await triggerEvent(commentBodyEditor, 'blur');
+    assert.dom('.field-editor--error-message').hasText('body must not be empty');
   });
 });
