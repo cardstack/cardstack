@@ -7,6 +7,7 @@ const {
 const { currentVersion } = require('./support');
 const JSONAPIFactory = require('@cardstack/test-support/jsonapi-factory');
 const log = require('@cardstack/logger')('jsonapi-test');
+const defaults = require('superagent-defaults');
 
 describe('jsonapi/middleware', function() {
 
@@ -159,7 +160,8 @@ describe('jsonapi/middleware', function() {
       log.info('%s %s %s', ctxt.request.method, ctxt.request.originalUrl, ctxt.response.status);
     });
     app.use(env.lookup('hub:middleware-stack').middleware());
-    request = supertest(app.callback());
+    request = defaults(supertest(app.callback()));
+    request.set('Accept', 'application/vnd.api+json');
   }
 
   async function sharedTeardown() {

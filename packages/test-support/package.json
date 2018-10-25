@@ -1,6 +1,6 @@
 {
   "name": "@cardstack/test-support",
-  "version": "0.10.24",
+  "version": "0.11.5",
   "description": "Shared test support for cardstack packages.",
   "main": "index.js",
   "scripts": {
@@ -18,18 +18,22 @@
     "api-version": 1
   },
   "dependencies": {
-    "@cardstack/di": "0.8.0",
-    "@cardstack/ephemeral": "0.10.1",
-    "@cardstack/hub": "0.10.24",
+    "@cardstack/data": "0.11.5",
+    "@cardstack/di": "0.11.4",
+    "@cardstack/ephemeral": "0.11.5",
+    "@cardstack/hub": "0.11.5",
     "@cardstack/logger": "^0.1.0",
-    "@cardstack/pgsearch": "0.10.24",
-    "@cardstack/plugin-utils": "0.10.1",
+    "@cardstack/pgsearch": "0.11.5",
+    "@cardstack/plugin-utils": "0.11.5",
     "@std/esm": "^0.25.1",
+    "broccoli-funnel": "^2.0.1",
     "chai": "^3.5.0",
+    "chai-as-promised": "^7.1.1",
     "chai-things": "^0.2.0",
     "dag-map": "^2.0.2",
     "denodeify": "^1.2.1",
     "ember-cli-babel": "^6.8.2",
+    "ember-cli-htmlbars-inline-precompile": "^1.0.3",
     "glob": "^7.1.1",
     "handlebars": "^4.0.6",
     "koa-better-route": "^0.1.0",
@@ -43,7 +47,7 @@
     "temp": "^0.8.3"
   },
   "devDependencies": {
-    "@cardstack/eslint-config": "0.8.0",
+    "@cardstack/eslint-config": "0.11.4",
     "eslint": "4.9.0",
     "eslint-plugin-ember": "^5.0.0",
     "eslint-plugin-node": "^5.2.1"

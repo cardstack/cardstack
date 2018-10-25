@@ -1,7 +1,8 @@
 import EmberObject from '@ember/object';
 import { module, test } from 'qunit';
 import { setupRenderingTest } from 'ember-qunit';
-import { render, click } from '@ember/test-helpers';
+import { timeout } from 'ember-concurrency';
+import { render, click, waitFor } from '@ember/test-helpers';
 import hbs from 'htmlbars-inline-precompile';
 import DS from 'ember-data';
 
@@ -17,7 +18,16 @@ module('Integration | Component | cs version control', function(hooks) {
     this.owner.register('model:thing', DS.Model.extend());
     model = EmberObject.create({
       id: 1,
-      type: 'thing'
+      type: 'thing',
+      serialize() {
+        return {
+          id: '1',
+          type: 'things',
+          data: {
+            attributes: {}
+          }
+        }
+      }
     });
     this.set('model', model);
     this.meta = this.owner.lookup('service:resource-metadata');
@@ -52,6 +62,18 @@ module('Integration | Component | cs version control', function(hooks) {
     model.set('isNew', false);
     await render(hbs`{{cs-version-control model=model enabled=true}}`);
     await click('.cs-version-control-footer button');
+  });
+
+  test('clicking update shows loading spinner', async function(assert) {
+    assert.expect(2);
+    model.set('save', async () => await timeout(5));
+    model.set('hasDirtyFields', true);
+    model.set('isNew', false);
+    assert.notOk(this.$('.cs-version-control--loading').length, 'Does not display loading before click');
+    await render(hbs`{{cs-version-control model=model enabled=true}}`);
+    click('.cs-version-control-footer button');
+    await waitFor('.cs-version-control--loading');
+    assert.ok(this.$('.cs-version-control--loading').length, 'Displays loading after click');
   });
 
   test('clicking update on clean model does nothing', async function(assert) {

@@ -30,6 +30,7 @@ export default class Fixtures {
         method: 'POST',
         headers: {
           authorization: `Bearer ${ciSessionId}`,
+          "content-type": 'application/vnd.api+json'
         },
         body: JSON.stringify({
           data: {
@@ -67,7 +68,10 @@ export default class Fixtures {
       if (item.id) {
         let response = await fetch(`${hubURL}/api/${encodeURIComponent(item.type)}/${encodeURIComponent(item.id)}`, {
           method: 'GET',
-          headers: { authorization: `Bearer ${ciSessionId}` }
+          headers: {
+            authorization: `Bearer ${ciSessionId}`,
+            accept: 'application/vnd.api+json'
+          }
         });
 
         if (response.status !== 200) { continue; }
@@ -77,7 +81,10 @@ export default class Fixtures {
       } else {
         let response = await fetch(`${hubURL}/api/${encodeURIComponent(item.type)}`, {
           method: 'GET',
-          headers: { authorization: `Bearer ${ciSessionId}` }
+          headers: {
+            authorization: `Bearer ${ciSessionId}`,
+            accept: 'application/vnd.api+json'
+          }
         });
 
         if (response.status !== 200) { continue; }
@@ -94,7 +101,10 @@ export default class Fixtures {
     if (model.type === 'user-realms') { return; }
 
     let version = model.meta && model.meta.version;
-    let headers = { authorization: `Bearer ${ciSessionId}` };
+    let headers = {
+      authorization: `Bearer ${ciSessionId}`,
+      'content-type': 'application/vnd.api+json'
+    };
     if (version) {
       headers["If-Match"] = version;
     }

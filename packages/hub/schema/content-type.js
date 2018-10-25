@@ -87,7 +87,10 @@ module.exports = class ContentType {
           });
         }
       }
+      this.fieldsets = fieldsets;
     }
+
+    this.fieldsetExpansionFormat = model.attributes && model.attributes['fieldset-expansion-format'];
 
     this.allFields = allFields;
   }

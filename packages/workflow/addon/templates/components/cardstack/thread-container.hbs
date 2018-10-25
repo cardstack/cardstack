@@ -4,7 +4,7 @@
   <hr>
   {{#each thread.sortedMessages as |message|}}
     {{#with message.loadedCard as |card|}}
-      {{#with (or message.cardFormat 'card') as |cardFormat|}}
+      {{#with (or message.cardFormat 'embedded') as |cardFormat|}}
         {{cardstack-content content=card format=cardFormat}}
       {{/with}}
     {{/with}}

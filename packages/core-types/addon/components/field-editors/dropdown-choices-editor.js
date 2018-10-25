@@ -38,7 +38,9 @@ export default Component.extend({
       let field = get(this, 'field');
       let content = get(this, 'content');
 
-      set(content, field, option);
+      content.watchRelationship(field, () => {
+        set(content, field, option);
+      })
     }
   }
 });

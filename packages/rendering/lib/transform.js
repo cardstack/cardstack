@@ -32,7 +32,8 @@ function BindTransform({ moduleName }) {
 }
 
 BindTransform.prototype.transform = function(ast) {
-  if (/\btemplates\/components\/cardstack\//.test(this.moduleName)){
+  if (/\btemplates\/components\/cardstack\//.test(this.moduleName) ||
+      /\btemplates\/(embedded|isolated).hbs/.test(this.moduleName)){
     var b = this.syntax.builders;
     var foundBlockParams = collectBlockParams(ast);
 

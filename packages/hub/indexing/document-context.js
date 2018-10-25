@@ -22,6 +22,7 @@ module.exports = class DocumentContext {
     this._read = read;
     this._realms = [];
     this._pendingReads = [];
+    this._followedRelationships = {};
     this.cache = {};
     this.isCollection = upstreamDoc && upstreamDoc.data && Array.isArray(upstreamDoc.data);
     this.suppliedIncluded = upstreamDoc && upstreamDoc.included;
@@ -76,6 +77,9 @@ module.exports = class DocumentContext {
     this._references.push(`${type}/${id}`);
 
     let key = `${type}/${id}`;
+    if (get(this, 'upstreamDoc.data.id') === id && get(this, 'upstreamDoc.data.type') === type) {
+      return this.upstreamDoc.data;
+    }
     let includedResource = this.suppliedIncluded ? this.suppliedIncluded.find(i => key === `${i.type}/${i.id}`) : null;
     if (includedResource) {
       return includedResource;
@@ -140,7 +144,7 @@ module.exports = class DocumentContext {
     ensure(pristineDocOut, 'attributes')[field.id] = value;
   }
 
-  async _buildRelationships(contentType, jsonapiDoc, userModel, pristineDocOut, searchDocOut, searchTree, depth) {
+  async _buildRelationships(contentType, jsonapiDoc, userModel, pristineDocOut, searchDocOut, searchTree, depth, fieldsets) {
     for (let field of contentType.realAndComputedFields.values()) {
       if (!field.isRelationship) {
         continue;
@@ -148,12 +152,13 @@ module.exports = class DocumentContext {
       if (contentType.computedFields.has(field.id) ||
           (jsonapiDoc.relationships && jsonapiDoc.relationships.hasOwnProperty(field.id))) {
         let value = { data: await userModel.getField(field.id) };
-        await this._buildRelationship(field, value, pristineDocOut, searchDocOut, searchTree, depth);
+        let fieldset = fieldsets && fieldsets.find(f => f.field === field.id);
+        await this._buildRelationship(field, value, pristineDocOut, searchDocOut, searchTree, depth, get(fieldset, 'format'));
       }
     }
   }
 
-  async _buildRelationship(field, value, pristineDocOut, searchDocOut, searchTree, depth) {
+  async _buildRelationship(field, value, pristineDocOut, searchDocOut, searchTree, depth, format) {
     if (!value || !value.hasOwnProperty('data')) {
       return;
     }
@@ -163,7 +168,7 @@ module.exports = class DocumentContext {
         related = await Promise.all(value.data.map(async ({ type, id }) => {
           let resource = await this.read(type, id);
           if (resource) {
-            return this._build(type, id, resource, searchTree[field.id], depth + 1);
+            return this._build(type, id, resource, searchTree[field.id], depth + 1, format);
           }
         }));
         related = related.filter(Boolean);
@@ -171,7 +176,7 @@ module.exports = class DocumentContext {
       } else {
         let resource = await this.read(value.data.type, value.data.id);
         if (resource) {
-          related = await this._build(resource.type, resource.id, resource, searchTree[field.id], depth + 1);
+          related = await this._build(resource.type, resource.id, resource, searchTree[field.id], depth + 1, format);
         }
         let data = related ? { type: related.type, id: related.id } : null;
         ensure(pristineDocOut, 'relationships')[field.id] = Object.assign({}, value, { data });
@@ -191,7 +196,7 @@ module.exports = class DocumentContext {
     return searchTree;
   }
 
-  async _build(type, id, jsonapiDoc, searchTree, depth) {
+  async _build(type, id, jsonapiDoc, searchTree, depth, fieldsetFormat) {
     let isCollection = this.isCollection && depth === 0;
     // we store the id as a regular field in elasticsearch here, because
     // we use elasticsearch's own built-in _id for our own composite key
@@ -220,7 +225,7 @@ module.exports = class DocumentContext {
             this._buildSearchTree(includesTree, segments);
           }
         } else {
-          includesTree = contentType.includesTree;
+          includesTree = Object.assign({}, contentType.includesTree);
         }
 
         let pristineItem = await this._build(resource.type, resource.id, resource, includesTree, depth + 1);
@@ -244,6 +249,13 @@ module.exports = class DocumentContext {
         }
       }
 
+      let fieldsets = get(contentType, `fieldsets.${fieldsetFormat || contentType.fieldsetExpansionFormat}`);
+      if (fieldsets && fieldsets.length) {
+        for (let { field } of fieldsets) {
+          this._buildSearchTree(searchTree, [ field ]);
+        }
+      }
+
       if (depth > 0) {
         // we are going inside a parent document's includes, so we need
         // our own type here.
@@ -253,7 +265,11 @@ module.exports = class DocumentContext {
       }
       let userModel = new Model(contentType, jsonapiDoc, this.schema, this.read.bind(this));
       await this._buildAttributes(contentType, jsonapiDoc, userModel, pristine, searchDoc);
-      await this._buildRelationships(contentType, jsonapiDoc, userModel, pristine, searchDoc, searchTree, depth);
+
+      if (!this._followedRelationships[`${type}/${id}`]) {
+        this._followedRelationships[`${type}/${id}`] = true;
+        await this._buildRelationships(contentType, jsonapiDoc, userModel, pristine, searchDoc, searchTree, depth, fieldsets);
+      }
 
       assignMeta(pristine.data, jsonapiDoc);
     }
@@ -264,11 +280,13 @@ module.exports = class DocumentContext {
 
     // top level document embeds all the other pristine includes
     if (this.pristineIncludes.length > 0 && depth === 0) {
-      pristine.included = uniqBy([pristine].concat(this.pristineIncludes), r => `${r.type}/${r.id}`).slice(1);
+      pristine.included = uniqBy([pristine].concat(this.pristineIncludes), r => `${r.type}/${r.id}`)
+        .slice(1)
+        .filter(r => !(r.type == type && r.id == id));
     }
 
     if (depth > 0) {
-      this.pristineIncludes.push(pristine.data);
+      this.pristineIncludes.push(jsonapiDoc);
     } else {
       this._pristine = pristine;
       if (!isCollection) {

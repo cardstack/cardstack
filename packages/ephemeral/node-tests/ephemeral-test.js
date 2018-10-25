@@ -5,6 +5,7 @@
 */
 
 const supertest = require('supertest');
+const defaults = require('superagent-defaults');
 const Koa = require('koa');
 const {
   createDefaultEnvironment,
@@ -47,7 +48,8 @@ describe('ephemeral-storage', function() {
 
     let app = new Koa();
     app.use(env.lookup('hub:middleware-stack').middleware());
-    request = supertest(app.callback());
+    request = defaults(supertest(app.callback()));
+    request.set('Accept', 'application/vnd.api+json');
   }
 
   async function teardown() {

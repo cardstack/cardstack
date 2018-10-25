@@ -16,7 +16,8 @@ const models = [
           { type: 'fields', id: 'is-built-in' },
           { type: 'fields', id: 'routing-field' },
           { type: 'fields', id: 'default-includes' },
-          { type: 'fields', id: 'fieldsets' }
+          { type: 'fields', id: 'fieldsets' },
+          { type: 'fields', id: 'fieldset-expansion-format' }
         ]
       }
     }
@@ -282,6 +283,13 @@ const models = [
     id: 'fieldsets',
     attributes: {
       'field-type': '@cardstack/core-types::object'
+    }
+  },
+  {
+    type: 'fields',
+    id: 'fieldset-expansion-format',
+    attributes: {
+      'field-type': '@cardstack/core-types::string'
     }
   },
   {
@@ -693,6 +701,13 @@ const models = [
     id: 'static-models',
     attributes: {
       'source-type': '@cardstack/hub::static-models'
+    }
+  },
+  {
+    type: 'data-sources',
+    id: 'spaces',
+    attributes: {
+      'source-type': '@cardstack/routing'
     }
   }
 

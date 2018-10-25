@@ -12,7 +12,7 @@ export default Component.extend({
   tagName: '',
   opened: true,
   animationRules,
-  "on-error": null,
+  "on-error": function() {},
   resourceMetadata: service(),
   store: service(),
   router: service(),
@@ -140,7 +140,7 @@ export default Component.extend({
   update: task(function * () {
     let model = this.get('model');
     let errors = yield this.get('data').validate(model);
-    if (errors) {
+    if (Object.keys(errors).length > 0) {
       return this['on-error'](errors);
     }
     yield model.save();

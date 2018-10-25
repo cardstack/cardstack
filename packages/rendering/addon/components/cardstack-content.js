@@ -6,7 +6,7 @@ import { modelType } from '@cardstack/rendering/helpers/cs-model-type';
 
 export default Component.extend({
   layout,
-  format: 'card',
+  format: 'embedded',
   tagName: '',
   id: computed('content', 'format', function() {
     return `${guidFor(this.get('content'))}/${this.get('format')}`;

@@ -70,7 +70,7 @@ export default Service.extend({
 
   async validate(model) {
     let relatedOwned = [];
-    let relationships = get(model.constructor, 'relationshipsByName');
+    let relationships = get(model.constructor, 'relationshipsByName') || [];
     relationships.forEach((relationshipDef) => {
       let { name, kind, meta } = relationshipDef;
       if (meta) {

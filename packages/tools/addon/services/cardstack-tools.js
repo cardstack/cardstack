@@ -89,11 +89,11 @@ export default Service.extend({
 
   // Are we viewing the current URL as a normal page in its own right,
   // or in one of its other forms (like a preview card)?
-  previewFormat: 'page',
+  previewFormat: 'isolated',
   previewFormatChoices: computed(function() {
     return [
       {
-        id: 'page',
+        id: 'isolated',
         description: 'Page',
         icon: {
           name: 'page',
@@ -102,7 +102,7 @@ export default Service.extend({
         }
       },
       {
-        id: 'cards',
+        id: 'embedded',
         description: 'Card',
         icon: {
           name: 'tiles',
@@ -221,7 +221,7 @@ function ownedRelatedRecords(records, out = []) {
 
   let recordClass = record.constructor;
   get(recordClass, 'relationships').forEach(([ relationshipDefinition ]) => {
-    let { meta } = relationshipDefinition;
+    let meta = recordClass.metaForProperty(relationshipDefinition.name);
     let { owned } = meta.options;
     if (owned) {
       let relatedRecords = record.get(meta.name);

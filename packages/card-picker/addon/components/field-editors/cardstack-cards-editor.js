@@ -1,5 +1,6 @@
 import Component from '@ember/component';
 import { inject as service } from '@ember/service';
+import { get, set } from '@ember/object';
 
 import layout from '../../templates/components/field-editors/cardstack-cards-editor';
 
@@ -9,15 +10,32 @@ export default Component.extend({
 
   actions: {
     addCard() {
+      let field = get(this, 'field');
+      let content = get(this, 'content');
+
       this.tools.pickCard().then((card) => {
-        this.get(`content.${this.get('field')}`).pushObject(card);
+        content.watchRelationship(field, () => {
+          get(content, field).pushObject(card);
+        });
       })
     },
+    
     orderChanged(rearrangedCards) {
-      this.set(`content.${this.get('field')}`, rearrangedCards);
+      let field = get(this, 'field');
+      let content = get(this, 'content');
+
+      content.watchRelationship(field, () => {
+        set(content, field, rearrangedCards);
+      });
     },
+
     deleteCard(card) {
-      this.get(`content.${this.get('field')}`).removeObject(card);
+      let field = get(this, 'field');
+      let content = get(this, 'content');
+
+      content.watchRelationship(field, () => {
+        get(content, field).removeObject(card);
+      });
     }
   }
 });
