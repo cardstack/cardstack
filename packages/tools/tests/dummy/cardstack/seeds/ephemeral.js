@@ -27,7 +27,7 @@ function initialModels() {
 
   initial.addResource('content-types', 'posts')
     .withAttributes({
-      defaultIncludes: ['comments', 'comments.author']
+      defaultIncludes: ['comments', 'comments.author', 'reading-time-unit']
     })
     .withRelated('fields', [
       initial.addResource('fields', 'title').withAttributes({
@@ -41,13 +41,17 @@ function initialModels() {
         caption: 'Value',
         fieldType: '@cardstack/core-types::integer'
       }),
-      initial.addResource('fields', 'reading-time-units').withAttributes({
+      initial.addResource('fields', 'reading-time-unit').withAttributes({
         caption: 'Units',
-        fieldType: '@cardstack/core-types::string'
-      }),
-      initial.addResource('fields', 'archived').withAttributes({
-        fieldType: '@cardstack/core-types::boolean'
-      }),
+        fieldType: '@cardstack/core-types::belongs-to',
+        editorComponent: 'field-editors/dropdown-choices-editor'
+      }).withRelated('related-types', [
+        initial.addResource('content-types', 'time-units')
+          .withRelated('fields', [
+            initial.addResource('fields', 'title')
+              .withAttributes({ fieldType: '@cardstack/core-types::string' })
+          ])
+        ]),
       initial.addResource('fields', 'comments').withAttributes({
         fieldType: '@cardstack/core-types::has-many',
         owned: true,
@@ -95,13 +99,19 @@ function initialModels() {
     })
     .withRelated('author', guybrush);
 
+  initial.addResource('time-units', '1')
+    .withAttributes({ title: 'minutes' });
+  initial.addResource('time-units', '2')
+    .withAttributes({ title: 'hours' });
+  initial.addResource('time-units', '3')
+    .withAttributes({ title: 'days' });
+
   initial.addResource('posts', '1')
     .withAttributes({
       title: 'hello world',
       publishedAt: new Date(2017, 3, 24),
       readingTimeValue: 8,
-      readingTimeUnits: 'minutes',
-      archived: false
+      readingTimeUnits: initial.getResource('time-units', '1')
     })
     .withRelated('comments', [ threeHeadedMonkey ]);
 
@@ -110,8 +120,7 @@ function initialModels() {
       title: 'second',
       publishedAt: new Date(2017, 9, 20),
       readingTimeValue: 2,
-      readingTimeUnits: 'hours',
-      archived: true
+      readingTimeUnits: initial.getResource('time-units', '2')
     })
     .withRelated('comments', [ doorstop ]);
 
