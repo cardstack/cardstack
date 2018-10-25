@@ -3,6 +3,7 @@ import layout from '../templates/components/cs-active-composition-panel';
 import { task, timeout } from 'ember-concurrency';
 import scrollToBounds from '../scroll-to-bounds';
 import { inject as service } from '@ember/service';
+import { camelize } from '@ember/string';
 
 export default Component.extend({
   layout,
@@ -14,7 +15,11 @@ export default Component.extend({
 
   validate: task(function * () {
     let errors = yield this.get('data').validate(this.model);
-    this.set('validationErrors', errors);
+    let errorsForFieldNames = {};
+    for (let key in errors) {
+      errorsForFieldNames[camelize(key)] = errors[key];
+    }
+    this.set('validationErrors', errorsForFieldNames);
   }),
 
   highlightAndScrollToField: task(function * (field) {
