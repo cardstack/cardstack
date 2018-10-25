@@ -52,6 +52,11 @@ describe('hub/plugin-loader', function() {
     });
   });
 
+  it('skips plugins with duplicate module names', async function() {
+    let plugins = await pluginLoader.installedPlugins();
+    expect(plugins.filter(p => p.id === 'sample-plugin-one').length).equals(1);
+  });
+
   it('locates second-level plugins', async function() {
     let plugins = await pluginLoader.installedPlugins();
     expect(plugins).collectionContains({

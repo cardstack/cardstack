@@ -11,6 +11,7 @@ const fs = require('fs');
 const realpath = denodeify(fs.realpath);
 const readdir = denodeify(fs.readdir);
 const Error = require('@cardstack/plugin-utils/error');
+const { get } = require('lodash');
 
 log.registerFormatter('t', require('./table-log-formatter'));
 
@@ -114,21 +115,22 @@ class PluginLoader {
 
   async _crawlPlugins(dir, outputPlugins, seen, includeDevDependencies, breadcrumbs) {
     log.trace("plugin crawl dir=%s, includeDevDependencies=%s, breadcrumbs=%j", dir, includeDevDependencies, breadcrumbs);
-    if (seen[dir]) {
-      if (seen[dir].attributes && seen[dir].attributes.includedFrom) {
+    let realdir = await realpath(dir);
+    let packageJSON = path.join(realdir, 'package.json');
+    let json = require(packageJSON);
+
+    let dupeModule;
+    if (seen[dir] || (dupeModule = Object.values(seen).find(i => i.id === json.name))) {
+      if (get(seen, `${dir}.attributes.includedFrom`) || get(dupeModule, 'attributes.includedFrom')) {
         // if we've seen this dir before *and* it's a cardstack
         // plugin, we should update its includedFrom to include the
         // new path that we arrived by
-        seen[dir].attributes.includedFrom.push(breadcrumbs);
+        (dupeModule || seen[dir]).attributes.includedFrom.push(breadcrumbs);
       }
       return;
     }
     seen[dir] = true;
-    let realdir = await realpath(dir);
-    let packageJSON = path.join(realdir, 'package.json');
     let moduleRoot = path.dirname(await resolve(packageJSON, { basedir: this.project.path }));
-
-    let json = require(packageJSON);
 
     if (!json.keywords || !json.keywords.includes('cardstack-plugin') || !json['cardstack-plugin']) {
       // top-level app doesn't need to be a cardstack-plugin, but when
