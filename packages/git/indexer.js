@@ -97,6 +97,8 @@ const mkdir = promisify(temp.mkdir);
 
 const log = require('@cardstack/logger')('cardstack/git-indexer');
 
+const service = require('./service');
+
 module.exports = class Indexer {
   static create(params) { return new this(params); }
 
@@ -115,19 +117,7 @@ module.exports = class Indexer {
   async _ensureRepo() {
     if (!this.repo) {
       if (this.remote) {
-        let tempRepoPath = await mkdir('cardstack-temp-repo');
-        this.repo = await Clone(this.remote.url, tempRepoPath, {
-          fetchOpts: {
-            callbacks: {
-              credentials: (url, userName) => {
-                if (this.remote.privateKey) {
-                  return Cred.sshKeyMemoryNew(userName, this.remote.publicKey || '', this.remote.privateKey, this.remote.passphrase || '');
-                }
-                return Cred.sshKeyFromAgent(userName);
-              }
-            }
-          }
-        });
+        this.repo = await service.getRepo(this.remote.url, this.remote);
         return;
       }
 

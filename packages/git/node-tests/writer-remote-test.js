@@ -15,6 +15,8 @@ const { readFileSync } = require('fs');
 const { promisify } = require('util');
 const temp = require('temp').track();
 
+const mkdir = promisify(temp.mkdir);
+
 // this is a known commit that is at the head of the remote repo
 const REMOTE_HEAD = 'e9ad9f2666a4eff985706dfb2e11aa10491100d7';
 const privateKey = readFileSync(join(__dirname, 'git-ssh-server', 'cardstack-test-key'), 'utf8');
@@ -33,8 +35,6 @@ async function resetRemote(repo) {
   let remote = await repo.getRemote('origin');
   await remote.push(["+refs/heads/master:refs/heads/master"], fetchOpts);
 }
-
-const mkdir = promisify(temp.mkdir);
 
 describe('git/writer with remote', function() {
 
