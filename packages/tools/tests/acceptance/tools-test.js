@@ -1,13 +1,6 @@
 import { module, test } from 'qunit';
 import { setupApplicationTest } from 'ember-qunit';
-import { visit, click, fillIn, triggerEvent } from '@ember/test-helpers';
-import RSVP from 'rsvp';
-
-function timeout(ms) {
-  return new RSVP.Promise((resolve) => {
-    setTimeout(resolve, ms);
-  });
-}
+import { visit, click, fillIn, triggerEvent, waitFor } from '@ember/test-helpers';
 
 function findTriggerElementWithLabel(labelRegex) {
   return [...this.element.querySelectorAll('.cs-toolbox-section label')].find(element => labelRegex.test(element.textContent));
@@ -32,7 +25,7 @@ module('Acceptance | tools', function(hooks) {
   test('activate tools', async function(assert) {
     await visit('/1');
     await click('.cardstack-tools-launcher');
-    await timeout(10);
+    await waitFor('.cs-active-composition-panel');
 
     let element = findTriggerElementWithLabel.call(this, /Title/);
     await click(element);
@@ -60,7 +53,7 @@ module('Acceptance | tools', function(hooks) {
     let titleEditor = findInputWithValue.call(this, 'hello world');
     await fillIn(titleEditor, '');
     await triggerEvent(titleEditor, 'blur');
-    await timeout(10);
+    await waitFor('.field-editor--error-message');
     assert.dom('.field-editor--error-message').hasText('title must not be empty');
 
     element = findTriggerElementWithLabel.call(this, /Body/);
@@ -69,7 +62,7 @@ module('Acceptance | tools', function(hooks) {
     let commentBodyEditor = findInputWithValue.call(this, 'Look behind you, a Three-Headed Monkey!');
     await fillIn(commentBodyEditor, '');
     await triggerEvent(commentBodyEditor, 'blur');
-    await timeout(10);
+    await waitFor('.field-editor--error-message');
     assert.dom('.field-editor--error-message').hasText('body must not be empty');
   });
 });
