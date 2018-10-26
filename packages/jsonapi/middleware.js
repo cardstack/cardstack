@@ -66,10 +66,11 @@ function jsonapiMiddleware(searcher, writers, indexers, defaultBranch) {
 
     let [acceptedTypes] = (ctxt.request.headers['accept'] || "").split(";");
     let types = acceptedTypes.split(",");
+    let acceptsEverything = (types.length === 1 && types[0] === "*/*");
     let acceptsJsonApi = types.some(t => mimeMatch(t, "application/vnd.api+json"));
     let acceptsJson = types.some(t => mimeMatch(t, "application/json"));
 
-    if (isMultipart || (acceptedTypes.length && !acceptsJson && !isJsonApi && !acceptsJsonApi)) {
+    if (isMultipart || (acceptedTypes.length && !acceptsEverything && !acceptsJson && !isJsonApi && !acceptsJsonApi)) {
       return handler.runBinary();
     }
 
