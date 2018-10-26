@@ -1,6 +1,6 @@
 {
   "name": "@cardstack/plugin-utils",
-  "version": "0.11.5",
+  "version": "0.11.6",
   "description": "Support library for authors of cardstack plugins.",
   "main": "index.js",
   "repository": "https://github.com/cardstack/cardstack",
