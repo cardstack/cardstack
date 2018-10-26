@@ -59,18 +59,23 @@ async function startIndexing(environment, container) {
     let searchers = await container.lookup(`hub:searchers`);
     let models = await (await container.lookup('config:initial-models'))();
 
-    await ephemeralStorage.validateModels(models, async (type, id) => {
-      let result;
-      try {
-        result = await searchers.getFromControllingBranch(Session.INTERNAL_PRIVILEGED, type, id);
-      } catch (err) {
-        if (err.status !== 404) { throw err; }
-      }
+    try {
+      await ephemeralStorage.validateModels(models, async (type, id) => {
+        let result;
+        try {
+          result = await searchers.getFromControllingBranch(Session.INTERNAL_PRIVILEGED, type, id);
+        } catch (err) {
+          if (err.status !== 404) { throw err; }
+        }
 
-      if (result && result.data) {
-        return result.data;
-      }
-    });
+        if (result && result.data) {
+          return result.data;
+        }
+      });
+    } catch (err) {
+      log.error(`Shutting down hub due to invalid model(s): ${err.message}`);
+      process.exit(1);
+    }
   }
 
   setInterval(() => container.lookup('hub:indexers').update(), 600000);
