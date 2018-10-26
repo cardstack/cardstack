@@ -4,7 +4,6 @@
     // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
     "version": "0.2.0",
     "configurations": [
-
         {
             "type": "node",
             "request": "launch",
@@ -35,6 +34,23 @@
             ]
         },
         {
+          "type": "node",
+          "request": "launch",
+          "name": "Launch Dummy Image Hub",
+          "cwd": "${workspaceRoot}/packages/image",
+          "console": "integratedTerminal",
+          "env": {
+              "CARDSTACK_SESSIONS_KEY":"OQUQi8NH0asrYgeoE10ijOFBhd/P1BU8HZP/rNqO5nw=",
+              "PGSEARCH_NAMESPACE":"cardstack_data_development",
+              "INITIAL_DATA_DIR":"${workspaceFolder}/packages/image/tests/dummy/cardstack",
+              "PGPORT": "5444",
+              "PORT":"3000"
+          },
+          "args": [
+              "${workspaceFolder}/packages/hub/bin/cardstack-hub.js"
+          ]
+        },
+        {
             "type": "node",
             "request": "launch",
             "name": "Launch Dummy Routing Hub",
@@ -55,7 +71,7 @@
         {
           "type": "node",
           "request": "launch",
-          "name": "Launch tools Dummy App Hub",
+          "name": "Launch Dummy Tools Hub",
           "cwd": "${workspaceRoot}/packages/tools",
           "console": "integratedTerminal",
           "env": {

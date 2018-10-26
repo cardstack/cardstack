@@ -39,7 +39,7 @@
               content=content
               field=fieldName
               enabled=editingEnabled
-              onchange=(action validate)
+              onchange=(action "validate")
               errors=(get validationErrors fieldName)
             }}
           {{/with}}
@@ -49,7 +49,7 @@
           content=fieldMark.model.content
           field=fieldMark.model.name
           enabled=editingEnabled
-          onchange=(action validate)
+          onchange=(action "validate")
           errors=(get validationErrors fieldMark.model.name)
         }}
       {{/if}}

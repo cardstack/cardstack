@@ -13,7 +13,7 @@ export default Component.extend({
 
   data: service('cardstack-data'),
 
-  validate: task(function * () {
+  validateTask: task(function * () {
     let errors = yield this.get('data').validate(this.model);
     let errorsForFieldNames = {};
     for (let key in errors) {
@@ -32,7 +32,7 @@ export default Component.extend({
 
   actions: {
     validate() {
-      return this.get('validate').perform();
+      return this.get('validateTask').perform();
     }
   }
 });
