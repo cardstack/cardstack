@@ -62,12 +62,31 @@
               "CARDSTACK_SESSIONS_KEY":"OQUQi8NH0asrYgeoE10ijOFBhd/P1BU8HZP/rNqO5nw=",
               "PGSEARCH_NAMESPACE":"cardstack_data_development",
               "INITIAL_DATA_DIR":"${workspaceFolder}/packages/tools/tests/dummy/cardstack",
-              "HUB_ENVIRONMENT":"test",
               "PGPORT": "5444",
               "PORT":"3000"
           },
           "args": [
               "${workspaceFolder}/packages/hub/bin/cardstack-hub.js"
+          ]
+        },
+        {
+          "type": "node",
+          "request": "launch",
+          "name": "Launch tools test server",
+          "cwd": "${workspaceRoot}/packages/tools",
+          "console": "integratedTerminal",
+          "env": {
+              "CARDSTACK_SESSIONS_KEY":"OQUQi8NH0asrYgeoE10ijOFBhd/P1BU8HZP/rNqO5nw=",
+              "PGSEARCH_NAMESPACE":"cardstack_data_development",
+              "INITIAL_DATA_DIR":"${workspaceFolder}/packages/tools/tests/dummy/cardstack",
+              "HUB_ENVIRONMENT":"test",
+              "PGPORT": "5444",
+              "PORT":"3000"
+          },
+          "program": "${workspaceRoot}/packages/routing/node_modules/ember-cli/bin/ember",
+          "args": [
+            "test",
+            "--server"
           ]
         },
         {
