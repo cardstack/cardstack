@@ -10,7 +10,7 @@ module('Integration | Component | field editors/date editor', function(hooks) {
     this.set('model', {
       expiration: '2030-01-01'
     });
-    await render(hbs`{{field-editors/date-editor content=model field="expiration" enabled=true}}`);
+    await render(hbs`{{field-editors/date-editor content=model field="expiration"}}`);
     assert.dom('input[type=date]').hasValue('2030-01-01', 'date input has correct value');
     assert.dom('input').isNotDisabled('date field is not disabled');
   });
@@ -19,7 +19,7 @@ module('Integration | Component | field editors/date editor', function(hooks) {
     this.set('model', {
       expiration: 'pizza'
     });
-    await render(hbs`{{field-editors/date-editor content=model field="expiration" enabled=true}}`);
+    await render(hbs`{{field-editors/date-editor content=model field="expiration"}}`);
     assert.dom('input[type=date]').hasNoValue('date input has no value');
     assert.dom('input').isNotDisabled('date field is not disabled');
   });
@@ -28,7 +28,7 @@ module('Integration | Component | field editors/date editor', function(hooks) {
     this.set('model', {
       expiration: '2030-01-01'
     });
-    await render(hbs`{{field-editors/date-editor content=model field="expiration" enabled=false}}`);
+    await render(hbs`{{field-editors/date-editor content=model field="expiration" disabled=true}}`);
     assert.dom('input').isDisabled('date field is disabled');
   });
 });

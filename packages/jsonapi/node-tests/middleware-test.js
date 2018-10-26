@@ -322,7 +322,7 @@ describe('jsonapi/middleware', function() {
           }
         }
       });
-      expect(response).hasStatus(400);
+      expect(response).hasStatus(422);
       expect(response.body.errors).length(2);
       expect(response.body.errors).collectionContains({
         title: 'Validation error',
@@ -348,7 +348,7 @@ describe('jsonapi/middleware', function() {
           meta: { version }
         }
       });
-      expect(response.status).to.equal(400);
+      expect(response.status).to.equal(422);
 
       // we should not hit the body not-null constraint here, since
       // we're leaving it unchanged

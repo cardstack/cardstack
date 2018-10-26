@@ -31,7 +31,7 @@ module('Acceptance | field editors', async function(hooks) {
     assert.equal(alternateVehicle, 'Standard Kart', 'drivers alternate vehicle is a standard kart');
 
     await fillIn('.ember-text-field:nth-of-type(1)', 'METAL Mario');
-    await fillIn('.ember-text-field:nth-of-type(2)', '1998-01-01');
+    await fillIn('input[type=date]', '1998-01-01');
     await click('.cs-toggle-switch');
     await selectChoose('.feeling-selector', 'Sad');
     await selectChoose('.vehicle-selector', 'Honeycoupe');

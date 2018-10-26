@@ -12,6 +12,7 @@
     --activating-background: #404040;
     --active-background: #545454;
     --light-background: #737373;
+    --error-border: red;
 
     --muted-foreground: #777;
     --rising-foreground: #aaa;

@@ -123,7 +123,7 @@ module.exports = class Field {
     }
     if (typeof result === 'string') {
       errors.push(new Error(result, {
-        status: 400,
+        status: 422,
         title: "Validation error"
       }));
     }

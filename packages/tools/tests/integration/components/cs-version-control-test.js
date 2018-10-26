@@ -18,7 +18,16 @@ module('Integration | Component | cs version control', function(hooks) {
     this.owner.register('model:thing', DS.Model.extend());
     model = EmberObject.create({
       id: 1,
-      type: 'thing'
+      type: 'thing',
+      serialize() {
+        return {
+          id: '1',
+          type: 'things',
+          data: {
+            attributes: {}
+          }
+        }
+      }
     });
     this.set('model', model);
     this.meta = this.owner.lookup('service:resource-metadata');

@@ -119,7 +119,19 @@ describe('schema/validation', function() {
 
     factory.addResource('content-types', 'events')
       .withRelated('fields', [
-        factory.getResource('fields', 'title')
+        factory.addResource('fields', 'event-title')
+          .withAttributes({ fieldType: '@cardstack/core-types::string' })
+      ]);
+
+    factory.addResource('constraints')
+      .withAttributes({
+        constraintType: '@cardstack/core-types::not-empty',
+        inputs: { ignoreBlank: true }
+      })
+      .withRelated('input-assignments', [
+        factory.addResource('input-assignments')
+          .withAttributes({ inputName: 'target' })
+          .withRelated('field', factory.getResource('fields', 'event-title')),
       ]);
 
     factory.addResource('content-types', 'things-with-defaults')
@@ -268,17 +280,17 @@ describe('schema/validation', function() {
     expect(errors).collectionContains({
       detail: '21 is not a valid value for field "title"',
       source: { pointer: '/data/attributes/title' },
-      status: 400
+      status: 422
     });
     expect(errors).collectionContains({
       detail: '"Not a date" is not a valid value for field "published-date"',
       source: { pointer: '/data/attributes/published-date' },
-      status: 400
+      status: 422
     });
     expect(errors).collectionContains({
       detail: '"Not a string array" is not a valid value for field "colors"',
       source: { pointer: '/data/attributes/colors' },
-      status: 400
+      status: 422
     });
   });
 
@@ -292,7 +304,7 @@ describe('schema/validation', function() {
     }));
     expect(errors).collectionContains({
       detail: 'title can be at most 40 characters long, it was 59',
-      status: 400,
+      status: 422,
       source: { pointer: '/data/attributes/title' }
     });
   });
@@ -308,6 +320,17 @@ describe('schema/validation', function() {
     expect(errors).includes.something.with.property('detail', 'published-date must be present');
   });
 
+  it("applies constraints to empty fields", async function() {
+    let errors = await schema.validationErrors(create({
+      type: 'events',
+      id: '1',
+      attributes: {
+        "event-title": "   "
+      }
+    }));
+    expect(errors).includes.something.with.property('detail', 'event-title must not be empty');
+  });
+
   it("applies constraints to mutually exclusive fields", async function() {
     let errors = await schema.validationErrors(create({
       type: 'articles',
@@ -320,7 +343,7 @@ describe('schema/validation', function() {
 
     expect(errors).collectionContains({
       detail: 'Only either cover-image or cover-video can have a value, not both.',
-      status: 400,
+      status: 422,
       source: { pointer: '/data/attributes/cover-video' }
     });
   });
@@ -486,7 +509,7 @@ describe('schema/validation', function() {
     });
     let errors = await schema.validationErrors(pending);
     expect(errors).collectionContains({
-      status: 400,
+      status: 422,
       title: 'Validation error',
       detail: 'field "primary-image" refers to disallowed type "not-an-image"'
     });
@@ -507,7 +530,7 @@ describe('schema/validation', function() {
     });
     let errors = await schema.validationErrors(pending);
     expect(errors).collectionContains({
-      status: 400,
+      status: 422,
       title: 'Validation error',
       detail: 'field "detail-images" refers to disallowed type(s) "not-an-image"'
     });
@@ -528,7 +551,7 @@ describe('schema/validation', function() {
     });
     let errors = await schema.validationErrors(pending);
     expect(errors).collectionContains({
-      status: 400,
+      status: 422,
       title: 'Validation error',
       detail: 'field "primary-image" accepts only a single resource, not a list of resources'
     });
@@ -565,7 +588,7 @@ describe('schema/validation', function() {
     });
     let errors = await schema.validationErrors(pending);
     expect(errors).collectionContains({
-      status: 400,
+      status: 422,
       title: 'Validation error',
       detail: 'field "detail-images" accepts only a list of resources, not a single resource'
     });

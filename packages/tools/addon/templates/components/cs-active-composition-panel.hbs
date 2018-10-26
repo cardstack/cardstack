@@ -11,29 +11,47 @@
 
 <div> {{!- this one scrolls }}
 
-  {{cs-version-control model=model
-                       enabled=editingEnabled }}
-
+  {{cs-version-control
+    model=model
+    enabled=editingEnabled
+    on-error=(action (mut validationErrors))
+  }}
 
   {{#each fields key="id" as |fieldMark|}}
-    {{#cs-collapsible-section class="cs-toolbox-section"
-                              title=fieldMark.model.caption
-                              opened=(eq fieldMark.id openedFieldId)
-                              open=(action openField fieldMark)
-                              close=(action openField null)
-                              hovered=(perform highlightAndScrollToField fieldMark)
-                              unhovered=(perform highlightAndScrollToField null) }}
-
+    {{#cs-collapsible-section
+      class=(concat "cs-toolbox-section "
+        (if
+          (cs-has-errors validationErrors fieldMark.model)
+          "invalid"))
+      title=fieldMark.model.caption
+      opened=(eq fieldMark.id openedFieldId)
+      open=(action openField fieldMark)
+      close=(action openField null)
+      hovered=(perform highlightAndScrollToField fieldMark)
+      unhovered=(perform highlightAndScrollToField null)
+    }}
       <div class="cs-field-editor-section">
       {{#if fieldMark.model.grouped}}
         {{#each fieldMark.model.grouped as |fieldName|}}
           {{#with fieldMark.model.content as |content|}}
             <label>{{cs-field-caption content fieldName}}</label>
-            {{cs-field-editor content=content field=fieldName enabled=editingEnabled}}
+            {{cs-field-editor
+              content=content
+              field=fieldName
+              enabled=editingEnabled
+              onchange=(action "validate")
+              errors=(get validationErrors fieldName)
+            }}
           {{/with}}
         {{/each}}
       {{else}}
-        {{cs-field-editor content=fieldMark.model.content field=fieldMark.model.name enabled=editingEnabled}}
+        {{cs-field-editor
+          content=fieldMark.model.content
+          field=fieldMark.model.name
+          enabled=editingEnabled
+          onchange=(action "validate")
+          errors=(get validationErrors fieldMark.model.name)
+        }}
       {{/if}}
       </div>
     {{/cs-collapsible-section}}

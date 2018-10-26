@@ -3,6 +3,9 @@ import { inject } from '@ember/service';
 import { camelize } from '@ember/string';
 import { defaultBranch } from '@cardstack/plugin-utils/environment';
 import { singularize, pluralize } from 'ember-inflector';
+import { hubURL } from '@cardstack/plugin-utils/environment';
+import { get } from '@ember/object';
+import fetch from 'fetch';
 import DS from 'ember-data';
 
 const noFields = '___no-fields___';
@@ -63,6 +66,75 @@ export default Service.extend({
     if (result && (card = result.toArray()) && card) {
       return card[0];
     }
+  },
+
+  async validate(model) {
+    let relatedOwned = [];
+    let relationships = get(model.constructor, 'relationshipsByName') || [];
+    relationships.forEach((relationshipDef) => {
+      let { name, kind, meta } = relationshipDef;
+      if (meta) {
+        let { owned } = meta.options;
+        if (owned) {
+          let related = model.get(name);
+          if (kind === 'belongsTo' ) {
+            relatedOwned.push(related);
+          } else {
+            relatedOwned.push(...related.toArray());
+          }
+        }
+      }
+    });
+
+    let toValidate = [model, ...relatedOwned];
+    let responses = toValidate.map(async (record) => {
+      let { url, verb } = this._validationRequestParams(record);
+      let response = await fetch(url, {
+        method: verb,
+        headers: {
+          'Content-Type': 'application/vnd.api+json'
+        },
+        body: JSON.stringify(record.serialize())
+      });
+      let { status } = response;
+      if (status === 422) {
+        return response.json();
+      }
+    });
+
+    let json = await Promise.all(responses);
+    return json.reduce((mergedErrors, body) => {
+      if (!body) {
+        return mergedErrors;
+      }
+      return Object.assign(mergedErrors, this._errorsByField(body));
+    }, {});
+  },
+
+  _errorsByField(body) {
+    return body.errors.reduce((errorsByField, error) => {
+      let { detail: errorMessage, source } = error;
+      let match = new RegExp('/data/attributes/(.+)').exec(source.pointer);
+      let fieldName = match[1];
+      if (!errorsByField[fieldName]) {
+        errorsByField[fieldName] = [];
+      }
+      errorsByField[fieldName].push(errorMessage);
+      return errorsByField;
+    }, {});
+  },
+
+  _validationRequestParams(model) {
+    let type = getType(model);
+    let url = `${hubURL}/api-validate/${pluralize(type)}`;
+    let verb;
+    if (model.get('isNew')) {
+      verb = 'POST';
+    } else {
+      url += `/${model.id}`;
+      verb = 'PATCH';
+    }
+    return { url, verb };
   },
 
   // caching the content types to more efficiently deal with parallel content type lookups
