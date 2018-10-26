@@ -58,7 +58,10 @@ describe('cardstack/s3/searcher', function() {
   it("Finds a file in S3", async function() {
     await env.setUser('test-users', 'the-default-test-user');
 
-    let response = await request.get('/api/cs-files/1234');
+    let response = await request
+      .get('/api/cs-files/1234')
+      .set('Accept', 'text/plain');
+
 
     expect(response.status).to.equal(200);
     expect(response.text).to.equal("Here is the body");
