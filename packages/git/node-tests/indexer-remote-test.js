@@ -137,7 +137,7 @@ describe('git/indexer cloning', function() {
   it('clones the remote repo', async function() {
     await start();
     let indexerState = await client.loadMeta({ branch: 'master', id: dataSource.id });
-    expect(indexerState.commit).to.equal('e9ad9f2666a4eff985706dfb2e11aa10491100d7');
+    expect(indexerState.commit).to.equal('e2c073f7a4f97662990df39c51fa942ee22f4542');
   });
 
   it('indexes existing data in the remote after it is cloned', async function() {
@@ -145,7 +145,7 @@ describe('git/indexer cloning', function() {
     await indexer.update();
 
     let indexerState = await client.loadMeta({ branch: 'master', id: dataSource.id });
-    expect(indexerState.commit).to.equal('e9ad9f2666a4eff985706dfb2e11aa10491100d7');
+    expect(indexerState.commit).to.equal('e2c073f7a4f97662990df39c51fa942ee22f4542');
 
     let contents = await searcher.get(env.session, 'master', 'events', 'event-1');
     let jsonapi = toResource(contents);

@@ -7,7 +7,7 @@ describe('hub/plugin-loader', function() {
   before(async function() {
     let registry = new Registry();
     registry.register('config:project', {
-      path: __dirname + '/../../../tests/stub-project'
+      path: __dirname + '/../../../tests/plugin-loader-test-project'
     }, { instantiate: false });
     pluginLoader = new Container(registry).lookup('hub:plugin-loader');
 
@@ -53,6 +53,10 @@ describe('hub/plugin-loader', function() {
   });
 
   it('skips plugins with duplicate module names', async function() {
+    // note that we're able to test the skipping behavior here because the plugin loader
+    // tests don't use createDefaultEnvironment and hence can't set the environment in the
+    // container, which is coincidentally convenient. Otherwise this will throw errors in the
+    // test environment.
     let plugins = await pluginLoader.installedPlugins();
     expect(plugins.filter(p => p.id === 'sample-plugin-one').length).equals(1);
   });

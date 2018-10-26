@@ -1,8 +1,6 @@
 {
   "name": "ephemeral-test-app",
   "dependencies": {
-    "@cardstack/ephemeral": "*",
-    "@cardstack/hub": "*",
     "@cardstack/jsonapi": "*",
     "@cardstack/test-support": "*",
     "@cardstack/test-support-authenticator": "*"

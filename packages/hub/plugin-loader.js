@@ -31,7 +31,8 @@ const featureTypes = [
 const javascriptPattern = /(.*)\.js$/;
 
 module.exports = declareInjections({
-  project: 'config:project'
+  project: 'config:project',
+  environment: 'config:environment'
 },
 
 class PluginLoader {
@@ -39,7 +40,7 @@ class PluginLoader {
     return new this(opts);
   }
 
-  constructor({ project }) {
+  constructor({ project, environment }) {
     if (!project) {
       throw new Error("Missing configuration `config:project`");
     }
@@ -48,6 +49,7 @@ class PluginLoader {
       throw new Error("`config:project` must have a `path`");
     }
     this.project = project;
+    this.environment = get(environment, 'name');
     this._pluginsAndFeatures = null;
   }
 
@@ -131,7 +133,12 @@ class PluginLoader {
     let packageJSON = path.join(realdir, 'package.json');
     let json = require(packageJSON);
     if ((dupeModule = Object.values(seen).find(i => i.id === json.name))) {
-      log.warn(`The plugin module name '${json.name}' has already been loaded from the module path ${dupeModule.attributes.dir}, skipping load of module at path ${realdir}.`);
+      let msg = action => `The plugin module name '${json.name}' has already been loaded from the module path ${dupeModule.attributes.rawDir}, ${action} load of module at path ${dir}.`;
+      if (this.environment !== 'test') {
+        log.warn(msg('skipping'));
+      } else {
+        throw new Error(msg('conflict with'));
+      }
       if (get(dupeModule, 'attributes.includedFrom')) {
         dupeModule.attributes.includedFrom.push(breadcrumbs);
       }
@@ -164,6 +171,7 @@ class PluginLoader {
       type: 'plugins',
       attributes: {
         dir: moduleRoot,
+        rawDir: dir,
         includedFrom: [breadcrumbs]
       }
     };

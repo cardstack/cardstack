@@ -10,7 +10,7 @@ describe('@cardstack/queue', function() {
   let env, queue;
 
   async function setup() {
-    env = await createDefaultEnvironment(`${__dirname}/..`);
+    env = await createDefaultEnvironment(`${__dirname}/../../../tests/stub-project`);
 
     queue = env.lookup('hub:queues');
   }

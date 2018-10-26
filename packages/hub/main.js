@@ -14,6 +14,7 @@ async function wireItUp(projectDir, encryptionKeys, dataSources, opts = {}) {
   registry.register('config:project', {
     path: projectDir
   });
+  registry.register('config:environment', { name: opts.environment });
   registry.register('config:data-sources', dataSources);
   registry.register('config:encryption-key', encryptionKeys);
   registry.register('config:public-url', { url: opts.url });

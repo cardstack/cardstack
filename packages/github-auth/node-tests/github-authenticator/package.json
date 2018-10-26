@@ -8,8 +8,7 @@
     ]
   },
   "dependencies": {
-    "@cardstack/authentication": "*",
-    "@cardstack/plugin-utils": "*"
+    "@cardstack/authentication": "*"
   },
   "devDependencies": {
     "@cardstack/test-support": "*"

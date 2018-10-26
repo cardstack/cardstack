@@ -69,7 +69,7 @@
                 "--timeout",
                 "200000",
                 // "--grep",
-                // "plugins with duplicate module names"
+                // "duplicate module names"
             ]
         }
     ]

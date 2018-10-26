@@ -69,7 +69,7 @@ describe('routing/searcher', function() {
         }).withRelated('author', author),
       ]);
 
-    env = await createDefaultEnvironment(`${__dirname}/test-project`, factory.getModels());
+    env = await createDefaultEnvironment(`${__dirname}/../../../tests/stub-project`, factory.getModels());
     searchers = env.lookup('hub:searchers');
   }
 
