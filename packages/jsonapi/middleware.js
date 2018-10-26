@@ -61,12 +61,14 @@ function jsonapiMiddleware(searcher, writers, indexers, defaultBranch) {
 
     let contentType = ctxt.request.headers['content-type'];
     let isJsonApi = contentType && contentType.includes('application/vnd.api+json');
+    let isMultipart = contentType && contentType.includes('multipart/form-data');
 
-    let [accepted] = (ctxt.request.headers['accept'] || "").split(";");
-    let types = accepted.split(",");
+    let [acceptedTypes] = (ctxt.request.headers['accept'] || "").split(";");
+    let types = acceptedTypes.split(",");
     let acceptsJsonApi = types.some(t => mimeMatch(t, "application/vnd.api+json"));
+    let acceptsJson = types.some(t => mimeMatch(t, "application/json"));
 
-    if (!isJsonApi && !acceptsJsonApi) {
+    if (isMultipart || (acceptedTypes.length && !acceptsJson && !isJsonApi && !acceptsJsonApi)) {
       return handler.runBinary();
     }
 
