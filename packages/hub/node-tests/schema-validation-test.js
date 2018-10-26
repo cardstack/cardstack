@@ -509,7 +509,7 @@ describe('schema/validation', function() {
     });
     let errors = await schema.validationErrors(pending);
     expect(errors).collectionContains({
-      status: 400,
+      status: 422,
       title: 'Validation error',
       detail: 'field "primary-image" refers to disallowed type "not-an-image"'
     });
@@ -530,7 +530,7 @@ describe('schema/validation', function() {
     });
     let errors = await schema.validationErrors(pending);
     expect(errors).collectionContains({
-      status: 400,
+      status: 422,
       title: 'Validation error',
       detail: 'field "detail-images" refers to disallowed type(s) "not-an-image"'
     });
@@ -551,7 +551,7 @@ describe('schema/validation', function() {
     });
     let errors = await schema.validationErrors(pending);
     expect(errors).collectionContains({
-      status: 400,
+      status: 422,
       title: 'Validation error',
       detail: 'field "primary-image" accepts only a single resource, not a list of resources'
     });
@@ -588,7 +588,7 @@ describe('schema/validation', function() {
     });
     let errors = await schema.validationErrors(pending);
     expect(errors).collectionContains({
-      status: 400,
+      status: 422,
       title: 'Validation error',
       detail: 'field "detail-images" accepts only a list of resources, not a single resource'
     });
