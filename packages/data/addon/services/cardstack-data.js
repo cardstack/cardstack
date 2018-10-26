@@ -91,6 +91,9 @@ export default Service.extend({
       let { url, verb } = this._validationRequestParams(record);
       let response = await fetch(url, {
         method: verb,
+        headers: {
+          'Content-Type': 'application/vnd.api+json'
+        },
         body: JSON.stringify(record.serialize())
       });
       let { status } = response;
