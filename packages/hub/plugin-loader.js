@@ -115,20 +115,29 @@ class PluginLoader {
 
   async _crawlPlugins(dir, outputPlugins, seen, includeDevDependencies, breadcrumbs) {
     log.trace("plugin crawl dir=%s, includeDevDependencies=%s, breadcrumbs=%j", dir, includeDevDependencies, breadcrumbs);
-    let realdir = await realpath(dir);
-    let packageJSON = path.join(realdir, 'package.json');
-    let json = require(packageJSON);
 
-    let dupeModule;
-    if (seen[dir] || (dupeModule = Object.values(seen).find(i => i.id === json.name))) {
-      if (get(seen, `${dir}.attributes.includedFrom`) || get(dupeModule, 'attributes.includedFrom')) {
+    if (seen[dir]) {
+      if (get(seen, `${dir}.attributes.includedFrom`)) {
         // if we've seen this dir before *and* it's a cardstack
         // plugin, we should update its includedFrom to include the
         // new path that we arrived by
-        (dupeModule || seen[dir]).attributes.includedFrom.push(breadcrumbs);
+        seen[dir].attributes.includedFrom.push(breadcrumbs);
       }
       return;
     }
+
+    let dupeModule;
+    let realdir = await realpath(dir);
+    let packageJSON = path.join(realdir, 'package.json');
+    let json = require(packageJSON);
+    if ((dupeModule = Object.values(seen).find(i => i.id === json.name))) {
+      log.warn(`The plugin module name '${json.name}' has already been loaded from the module path ${dupeModule.attributes.dir}, skipping load of module at path ${realdir}.`);
+      if (get(dupeModule, 'attributes.includedFrom')) {
+        dupeModule.attributes.includedFrom.push(breadcrumbs);
+      }
+      return;
+    }
+
     seen[dir] = true;
     let moduleRoot = path.dirname(await resolve(packageJSON, { basedir: this.project.path }));
 
