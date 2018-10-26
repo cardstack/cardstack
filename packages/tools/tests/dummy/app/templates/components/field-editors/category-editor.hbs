@@ -1,3 +1,7 @@
 <div class="field-editor category-editor">
-  {{input value=(get content field) disabled=disabled}}
+  {{input
+    value=(get content field)
+    disabled=disabled
+    focus-out=onchange
+  }}
 </div>

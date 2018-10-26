@@ -28,5 +28,11 @@ export default Component.extend({
       yield timeout(500);
       scrollToBounds(field.bounds());
     }
-  }).restartable()
+  }).restartable(),
+
+  actions: {
+    validate() {
+      return this.get('validate').perform();
+    }
+  }
 });

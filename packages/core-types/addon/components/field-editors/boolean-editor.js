@@ -13,7 +13,7 @@ export default Component.extend({
       set(content, field, value);
       let onchange = this.get('onchange');
       if (onchange) {
-        onchange.perform();
+        onchange();
       }
     }
   }
