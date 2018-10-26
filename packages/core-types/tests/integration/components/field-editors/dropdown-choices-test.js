@@ -15,7 +15,7 @@ module('Integration | Component | field editors/dropdown choices editor', async 
 
   test('can select an option from the dropdown', async function(assert) {
     this.set('model', modelStub);
-    await render(hbs`{{field-editors/dropdown-choices-editor content=model field="feeling" enabled=true}}`);
+    await render(hbs`{{field-editors/dropdown-choices-editor content=model field="feeling"}}`);
 
     await clickTrigger();
     assert.dom('.ember-power-select-option').exists({ count: 4 }, 'Dropdown is rendered');
@@ -28,7 +28,7 @@ module('Integration | Component | field editors/dropdown choices editor', async 
   test('can specify a different field to use for option', async function(assert) {
     this.set('model', modelStub);
     this.set('editorOptions', { displayFieldName: 'name' });
-    await render(hbs`{{field-editors/dropdown-choices-editor content=model field="vehicle" editorOptions=editorOptions enabled=true}}`);
+    await render(hbs`{{field-editors/dropdown-choices-editor content=model field="vehicle" editorOptions=editorOptions}}`);
 
     await clickTrigger();
     assert.dom('.ember-power-select-option').exists({ count: 4 }, 'Dropdown is rendered');
@@ -40,7 +40,7 @@ module('Integration | Component | field editors/dropdown choices editor', async 
 
   test('it can be disabled', async function(assert) {
     this.set('model', {});
-    await render(hbs`{{field-editors/dropdown-choices-editor content=model field="feeling" enabled=false}}`);
+    await render(hbs`{{field-editors/dropdown-choices-editor content=model field="feeling" disabled=true}}`);
 
     await clickTrigger();
     assert.dom('.ember-power-select-option').doesNotExist('Dropdown is disabled');

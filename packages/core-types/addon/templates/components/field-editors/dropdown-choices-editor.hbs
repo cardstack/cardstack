@@ -1,6 +1,6 @@
 <div class="{{concat (dasherize field) '-selector'}}">
   {{#unless missingContentType}}
-      {{#power-select disabled=(not enabled)
+      {{#power-select disabled=disabled
                       selected=(get content field)
                       options=options
                       onchange=(action "makeSelection")
