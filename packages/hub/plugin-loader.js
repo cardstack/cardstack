@@ -118,18 +118,18 @@ class PluginLoader {
   async _crawlPlugins(dir, outputPlugins, seen, includeDevDependencies, breadcrumbs) {
     log.trace("plugin crawl dir=%s, includeDevDependencies=%s, breadcrumbs=%j", dir, includeDevDependencies, breadcrumbs);
 
-    if (seen[dir]) {
+    let realdir = await realpath(dir);
+    if (seen[realdir]) {
       if (get(seen, `${dir}.attributes.includedFrom`)) {
         // if we've seen this dir before *and* it's a cardstack
         // plugin, we should update its includedFrom to include the
         // new path that we arrived by
-        seen[dir].attributes.includedFrom.push(breadcrumbs);
+        seen[realdir].attributes.includedFrom.push(breadcrumbs);
       }
       return;
     }
 
     let dupeModule;
-    let realdir = await realpath(dir);
     let packageJSON = path.join(realdir, 'package.json');
     let json = require(packageJSON);
     if ((dupeModule = Object.values(seen).find(i => i.id === json.name))) {
@@ -145,7 +145,7 @@ class PluginLoader {
       return;
     }
 
-    seen[dir] = true;
+    seen[realdir] = true;
     let moduleRoot = path.dirname(await resolve(packageJSON, { basedir: this.project.path }));
 
     if (!json.keywords || !json.keywords.includes('cardstack-plugin') || !json['cardstack-plugin']) {
@@ -166,7 +166,7 @@ class PluginLoader {
       }
     }
 
-    seen[dir] = {
+    seen[realdir] = {
       id: json.name,
       type: 'plugins',
       attributes: {
@@ -176,7 +176,7 @@ class PluginLoader {
       }
     };
 
-    outputPlugins.push(seen[dir]);
+    outputPlugins.push(seen[realdir]);
 
     let deps = json.dependencies ? Object.keys(json.dependencies).map(dep => ({ dep, type: 'dependencies' })) : [];
     if (includeDevDependencies && json.devDependencies) {
