@@ -25,6 +25,7 @@ module('Acceptance | field editors', async function(hooks) {
 
     assert.equal(model.get('name'), 'Metal Mario', 'driver name is correct');
     assert.equal(model.get('dob'), '1999-01-01', 'driver dob is correct');
+    assert.equal(model.get('latestVictory'), '2018-10-25T13:56:05', 'driver latest victory is correct');
     assert.equal(model.get('isGoodGuy'), true, 'driver is a good guy');
     assert.equal(feeling, 'Happy', 'driver is feeling happy');
     assert.equal(vehicle, 'Sport Bike', 'driver is using a sport bike');
@@ -32,6 +33,7 @@ module('Acceptance | field editors', async function(hooks) {
 
     await fillIn('.ember-text-field:nth-of-type(1)', 'METAL Mario');
     await fillIn('input[type=date]', '1998-01-01');
+    await fillIn('input[type=datetime-local]', '2018-10-27T23:56:07');
     await click('.cs-toggle-switch');
     await selectChoose('.feeling-selector', 'Sad');
     await selectChoose('.vehicle-selector', 'Honeycoupe');
@@ -47,6 +49,7 @@ module('Acceptance | field editors', async function(hooks) {
 
     assert.equal(model.get('name'), 'METAL Mario', 'metal mario is more metal');
     assert.equal(model.get('dob'), '1998-01-01', 'metal mario was born earlier');
+    assert.equal(model.get('latestVictory'), '2018-10-27T23:56:07', 'metal mario won a race more recently');
     assert.equal(model.get('isGoodGuy'), false, 'metal mario is a bad guy');
     assert.equal(feeling, 'Sad', 'metal mario is sad');
     assert.equal(vehicle, 'Honeycoupe', 'metal mario is driving a honeycoupe');
