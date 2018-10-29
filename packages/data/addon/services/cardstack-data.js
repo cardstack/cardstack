@@ -1,5 +1,6 @@
 import Service from '@ember/service';
 import { inject } from '@ember/service';
+import injectOptional from 'ember-inject-optional';
 import { camelize } from '@ember/string';
 import { defaultBranch } from '@cardstack/plugin-utils/environment';
 import { singularize, pluralize } from 'ember-inflector';
@@ -16,6 +17,7 @@ function getType(record) {
 
 export default Service.extend({
   store: inject(),
+  session: injectOptional.service(),
 
   init() {
     this._super();
@@ -89,10 +91,12 @@ export default Service.extend({
     let toValidate = [model, ...relatedOwned];
     let responses = toValidate.map(async (record) => {
       let { url, verb } = this._validationRequestParams(record);
+      let token = this.get('session.data.authenticated.data.meta.token');
       let response = await fetch(url, {
         method: verb,
         headers: {
-          'Content-Type': 'application/vnd.api+json'
+          'Content-Type': 'application/vnd.api+json',
+          'Authorization': `Bearer ${token}`
         },
         body: JSON.stringify(record.serialize())
       });
