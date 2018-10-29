@@ -20,6 +20,10 @@ function initialModels() {
     initial.addResource('fields', 'dob').withAttributes({
       fieldType: '@cardstack/core-types::date'
     }),
+    initial.addResource('fields', 'latest-victory').withAttributes({
+      fieldType: '@cardstack/core-types::date',
+      editorComponent: 'field-editors/datetime-editor'
+    }),
     initial.addResource('fields', 'is-good-guy').withAttributes({
       fieldType: '@cardstack/core-types::boolean'
     }),
@@ -64,6 +68,7 @@ function initialModels() {
     .withAttributes({
       name: 'King Boo',
       dob: '1998-01-21',
+      latestVictory: '2018-10-24T13:56:05',
       isGoodGuy: false
     })
     .withRelated('feeling', exuberantFeeling)
@@ -73,6 +78,7 @@ function initialModels() {
     .withAttributes({
       name: 'Metal Mario',
       dob: '1999-01-01',
+      latestVictory: '2018-10-25T13:56:05',
       isGoodGuy: true
     })
     .withRelated('feeling', happyFeeling)
@@ -83,6 +89,7 @@ function initialModels() {
     .withAttributes({
       name: 'Link',
       dob: '2003-01-01',
+      latestVictory: '2018-10-23T13:56:05',
       isGoodGuy: true
     })
     .withRelated('feeling', happyFeeling)
