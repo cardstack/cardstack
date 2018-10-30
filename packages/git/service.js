@@ -4,9 +4,14 @@ const filenamifyUrl = require('filenamify-url');
 const { existsSync } = require('fs');
 const { join } = require('path');
 const { Clone, Cred } = require('@cardstack/nodegit');
+const temp = require('temp');
 
 class GitLocalCache {
   constructor() {
+    this.clearCache();
+  }
+
+  clearCache() {
     this._remotes = new Map();
   }
 
@@ -29,7 +34,19 @@ class GitLocalCache {
   }
 
   async _makeRepo(remote) {
-    let cacheDirectory = remote.cacheDir || '/srv/hub/local-git-repos';
+    let cacheDirectory = remote.cacheDir;
+
+    if (!cacheDirectory) {
+      if(!this.cacheDirectory) {
+        this.cacheDirectory = temp.path('git-local-cache');
+      }
+
+      if(!existsSync(this.cacheDirectory)) {
+        await mkdirp(this.cacheDirectory);
+      }
+
+      cacheDirectory = this.cacheDirectory;
+    }
 
     let repoPath = join(cacheDirectory, filenamifyUrl(remote.url));
 

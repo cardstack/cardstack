@@ -38,14 +38,15 @@ async function resetRemote(repo) {
 
 describe('git/writer with remote', function() {
 
-  let env, writers, repo, tempRepoPath;
+  let env, writers, repo, tempRepoPath, tempRemoteRepoPath;
 
   beforeEach(async function() {
     let factory = new JSONAPIFactory();
 
     tempRepoPath = await mkdir('cardstack-temp-test-repo');
+    tempRemoteRepoPath = await mkdir('cardstack-temp-test-remote-repo');
 
-    repo = await Clone('ssh://root@localhost:9022/root/data-test', tempRepoPath, {
+    repo = await Clone('ssh://root@localhost:9022/root/data-test', tempRemoteRepoPath, {
       fetchOpts,
     });
 
@@ -55,7 +56,8 @@ describe('git/writer with remote', function() {
           params: {
             remote: {
               url: 'ssh://root@localhost:9022/root/data-test',
-              privateKey
+              privateKey,
+              cacheDir: tempRepoPath,
             }
           }
         });
@@ -78,7 +80,7 @@ describe('git/writer with remote', function() {
 
   afterEach(async function() {
     await resetRemote(repo);
-    // await temp.cleanup();
+    await temp.cleanup();
     await destroyDefaultEnvironment(env);
   });
 
@@ -94,7 +96,7 @@ describe('git/writer with remote', function() {
         }
       });
       await repo.fetch('origin', fetchOpts);
-      let saved = await inRepo(tempRepoPath).getJSONContents('origin/master', `contents/events/${record.id}.json`);
+      let saved = await inRepo(tempRemoteRepoPath).getJSONContents('origin/master', `contents/events/${record.id}.json`);
       expect(saved).to.deep.equal({
         attributes: {
           title: 'Second Event',
@@ -123,7 +125,7 @@ describe('git/writer with remote', function() {
 
 
       await repo.fetch('origin', fetchOpts);
-      let updated = await inRepo(tempRepoPath).getJSONContents('origin/master', `contents/events/event-1.json`);
+      let updated = await inRepo(tempRemoteRepoPath).getJSONContents('origin/master', `contents/events/event-1.json`);
 
       expect(updated).to.deep.equal({
         attributes: {
@@ -142,7 +144,7 @@ describe('git/writer with remote', function() {
 
       await repo.fetch('origin', fetchOpts);
 
-      let articles = (await inRepo(tempRepoPath).listTree('origin/master', 'contents/events')).map(a => a.name);
+      let articles = (await inRepo(tempRemoteRepoPath).listTree('origin/master', 'contents/events')).map(a => a.name);
       expect(articles).to.not.contain('event-1.json');
     });
 
