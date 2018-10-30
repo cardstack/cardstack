@@ -124,7 +124,7 @@
                 "--timeout",
                 "200000",
                 // "--grep",
-                // "circular relationship"
+                // "duplicate module names"
             ]
         }
     ]

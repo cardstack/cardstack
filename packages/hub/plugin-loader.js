@@ -11,6 +11,7 @@ const fs = require('fs');
 const realpath = denodeify(fs.realpath);
 const readdir = denodeify(fs.readdir);
 const Error = require('@cardstack/plugin-utils/error');
+const { get } = require('lodash');
 
 log.registerFormatter('t', require('./table-log-formatter'));
 
@@ -30,7 +31,8 @@ const featureTypes = [
 const javascriptPattern = /(.*)\.js$/;
 
 module.exports = declareInjections({
-  project: 'config:project'
+  project: 'config:project',
+  environment: 'config:environment'
 },
 
 class PluginLoader {
@@ -38,7 +40,7 @@ class PluginLoader {
     return new this(opts);
   }
 
-  constructor({ project }) {
+  constructor({ project, environment }) {
     if (!project) {
       throw new Error("Missing configuration `config:project`");
     }
@@ -47,6 +49,7 @@ class PluginLoader {
       throw new Error("`config:project` must have a `path`");
     }
     this.project = project;
+    this.environment = get(environment, 'name');
     this._pluginsAndFeatures = null;
   }
 
@@ -114,21 +117,36 @@ class PluginLoader {
 
   async _crawlPlugins(dir, outputPlugins, seen, includeDevDependencies, breadcrumbs) {
     log.trace("plugin crawl dir=%s, includeDevDependencies=%s, breadcrumbs=%j", dir, includeDevDependencies, breadcrumbs);
-    if (seen[dir]) {
-      if (seen[dir].attributes && seen[dir].attributes.includedFrom) {
+
+    let realdir = await realpath(dir);
+    if (seen[realdir]) {
+      if (get(seen, `${dir}.attributes.includedFrom`)) {
         // if we've seen this dir before *and* it's a cardstack
         // plugin, we should update its includedFrom to include the
         // new path that we arrived by
-        seen[dir].attributes.includedFrom.push(breadcrumbs);
+        seen[realdir].attributes.includedFrom.push(breadcrumbs);
       }
       return;
     }
-    seen[dir] = true;
-    let realdir = await realpath(dir);
-    let packageJSON = path.join(realdir, 'package.json');
-    let moduleRoot = path.dirname(await resolve(packageJSON, { basedir: this.project.path }));
 
+    let dupeModule;
+    let packageJSON = path.join(realdir, 'package.json');
     let json = require(packageJSON);
+    if ((dupeModule = Object.values(seen).find(i => i.id === json.name))) {
+      let msg = action => `The plugin module name '${json.name}' has already been loaded from the module path ${dupeModule.attributes.rawDir}, ${action} load of module at path ${dir}.`;
+      if (this.environment !== 'test') {
+        log.warn(msg('skipping'));
+      } else {
+        throw new Error(msg('conflict with'));
+      }
+      if (get(dupeModule, 'attributes.includedFrom')) {
+        dupeModule.attributes.includedFrom.push(breadcrumbs);
+      }
+      return;
+    }
+
+    seen[realdir] = true;
+    let moduleRoot = path.dirname(await resolve(packageJSON, { basedir: this.project.path }));
 
     if (!json.keywords || !json.keywords.includes('cardstack-plugin') || !json['cardstack-plugin']) {
       // top-level app doesn't need to be a cardstack-plugin, but when
@@ -148,16 +166,17 @@ class PluginLoader {
       }
     }
 
-    seen[dir] = {
+    seen[realdir] = {
       id: json.name,
       type: 'plugins',
       attributes: {
         dir: moduleRoot,
+        rawDir: dir,
         includedFrom: [breadcrumbs]
       }
     };
 
-    outputPlugins.push(seen[dir]);
+    outputPlugins.push(seen[realdir]);
 
     let deps = json.dependencies ? Object.keys(json.dependencies).map(dep => ({ dep, type: 'dependencies' })) : [];
     if (includeDevDependencies && json.devDependencies) {

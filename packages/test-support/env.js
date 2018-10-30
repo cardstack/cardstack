@@ -58,6 +58,7 @@ exports.createDefaultEnvironment = async function(projectDir, initialModels = []
     ] = partitionInitialModels(models);
 
     opts.disableAutomaticIndexing = true;
+    opts.environment = 'test';
     opts.seeds = () => ephemeralInitialModels;
 
     opts.pgBossConfig = opts.pgBossConfig || {
