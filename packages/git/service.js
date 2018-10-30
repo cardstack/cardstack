@@ -17,6 +17,18 @@ class GitLocalCache {
       return existingRepo.repo;
     }
 
+    let { repo, fetchOpts, repoPath } = await this._makeRepo(remote);
+
+    this._remotes.set(remote.url, {
+      repo,
+      fetchOpts,
+      repoPath,
+    });
+
+    return repo;
+  }
+
+  async _makeRepo(remote) {
     let cacheDirectory = remote.cacheDir || '/srv/hub/local-git-repos';
 
     let repoPath = join(cacheDirectory, filenamifyUrl(remote.url));
@@ -36,17 +48,15 @@ class GitLocalCache {
       }
     };
 
-    let repo = await Clone(remote.url, repoPath, {
+    let repo = Clone(remote.url, repoPath, {
       fetchOpts
     });
 
-    this._remotes.set(remote.url, {
+    return {
       repo,
       fetchOpts,
-      repoPath,
-    });
-
-    return repo;
+      repoPath
+    };
   }
 }
 
