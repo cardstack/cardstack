@@ -6,7 +6,7 @@ import { defaultBranch } from '@cardstack/plugin-utils/environment';
 import { singularize, pluralize } from 'ember-inflector';
 import { hubURL } from '@cardstack/plugin-utils/environment';
 import { get } from '@ember/object';
-import fetch from 'fetch';
+import fetch from 'ember-fetch/ajax';
 import DS from 'ember-data';
 
 const noFields = '___no-fields___';
