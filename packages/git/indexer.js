@@ -83,17 +83,11 @@ const {
   Reference,
   Branch,
   Commit,
-  Clone,
-  Cred,
 } = require('nodegit');
-const { promisify } = require('util');
-const temp = require('temp').track();
 
 const Change = require("./change");
 
 const { safeEntryByName } = require('./mutable-tree');
-
-const mkdir = promisify(temp.mkdir);
 
 const log = require('@cardstack/logger')('cardstack/git-indexer');
 
