@@ -174,11 +174,28 @@ class Handler {
     return [methodName, segments];
   }
 
-  async handleIndividualValidate(type, id) {
+  async handleCollectionValidate(type) {
+    let session = this.session;
     let data = this._mandatoryBodyData();
     let schema = await this.writers.schema.forBranch(this.branch);
+    let { writer } = this.writers._getSchemaDetailsForType(schema, type);
+    let isSchema = this.writers.schemaTypes.includes(type);
+    let pendingChange = await writer.prepareCreate(
+      this.branch,
+      session,
+      type,
+      schema.withOnlyRealFields(data.data),
+      isSchema
+    );
+    await schema.validate(pendingChange, { type, session });
+    this.ctxt.status = 200;
+  }
+
+  async handleIndividualValidate(type, id) {
     let session = this.session;
-    let { writer /*, sourceId */ } = this.writers._getSchemaDetailsForType(schema, type);
+    let data = this._mandatoryBodyData();
+    let schema = await this.writers.schema.forBranch(this.branch);
+    let { writer } = this.writers._getSchemaDetailsForType(schema, type);
     let isSchema = this.writers.schemaTypes.includes(type);
     let pendingChange = await writer.prepareUpdate(
       this.branch,
