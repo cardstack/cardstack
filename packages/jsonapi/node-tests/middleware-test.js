@@ -15,9 +15,8 @@ describe('jsonapi/middleware', function() {
 
   async function sharedSetup() {
     let factory = new JSONAPIFactory();
-    let articleType = factory.addResource('content-types', 'articles');
 
-    articleType.withRelated('fields', [
+    factory.addResource('content-types', 'articles').withRelated('fields', [
       factory.addResource('fields', 'title')
         .withAttributes({ fieldType: '@cardstack/core-types::string' }),
       factory.addResource('fields', 'body')
@@ -27,7 +26,15 @@ describe('jsonapi/middleware', function() {
         .withRelated('related-types', [{ type: 'content-types', id: 'authors' }]),
       factory.addResource('fields', 'editor')
         .withAttributes({ fieldType: '@cardstack/core-types::belongs-to' })
-        .withRelated('related-types', [{ type: 'content-types', id: 'authors' }])
+        .withRelated('related-types', [{ type: 'content-types', id: 'authors' }]),
+      factory.addResource('fields', 'article-links').withAttributes({
+        fieldType: '@cardstack/core-types::has-many'
+      }).withRelated('related-types', [
+        factory.addResource('content-types', 'article-links')
+        .withRelated('fields', [
+          factory.addResource('fields', 'url').withAttributes({ fieldType: '@cardstack/core-types::string' })
+        ])
+      ]),
     ]);
 
     factory.addResource('constraints')
@@ -92,7 +99,17 @@ describe('jsonapi/middleware', function() {
             })
           ]
         )
-      );
+        ).withRelated(
+          'article-links',
+          [
+            factory.addResource('article-links', 'link-1').withAttributes({
+              url: 'http://cardstack.com/cards/articles/1'
+            }),
+            factory.addResource('article-links', 'link-2').withAttributes({
+              url: 'http://cardstack.com/cards/articles/3'
+            })
+          ]
+        );
 
     factory.addResource('articles', 3)
       .withAttributes({

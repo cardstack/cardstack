@@ -112,7 +112,7 @@ class Handler {
     return this.prefix === 'api-validate';
   }
 
-  filterExpression(type, id) {
+  typeFilterExpression(type, id) {
     let filter = this.query.filter;
     if (!filter) {
       filter = {};
@@ -121,7 +121,9 @@ class Handler {
       // This overwrites any additional type filter the user tried to
       // provide in their query, which is reasonable (the endpoint
       // name itself is taking precedence).
-      filter.type = type;
+      filter.type = {
+        exact: type
+      };
     }
     if (id != null) {
       filter.id = id;
@@ -252,7 +254,7 @@ class Handler {
 
   async handleCollectionGET(type) {
     let { data: models, meta: { page }, included } = await this.searcher.search(this.session, this.branch, {
-      filter: this.filterExpression(type),
+      filter: this.typeFilterExpression(type),
       sort: this.query.sort,
       page: this.query.page,
       include: this.query.include,

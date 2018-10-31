@@ -68,7 +68,7 @@ module.exports = declareInjections({
     query = [...query, "limit", param(size + 1) ];
 
     let sql = queryToSQL(query);
-    log.trace("search %s %j", sql.text, sql.values);
+    log.trace("search: %s trace: %j", sql.text, sql.values);
     let response = await this.client.query(sql);
     let totalResponse = await totalResponsePromise;
 
