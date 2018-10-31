@@ -266,13 +266,6 @@ const models = [
   },
   {
     type: 'fields',
-    id: 'searchable-relationships',
-    attributes: {
-      'field-type': '@cardstack/core-types::string-array'
-    }
-  },
-  {
-    type: 'fields',
     id: 'default-includes',
     attributes: {
       'field-type': '@cardstack/core-types::string-array'
@@ -394,13 +387,6 @@ const models = [
     id: 'params',
     attributes: {
       'field-type': '@cardstack/core-types::object'
-    }
-  },
-  {
-    type: 'fields',
-    id: 'group-id',
-    attributes: {
-      'field-type': '@cardstack/core-types::string'
     }
   },
   {
