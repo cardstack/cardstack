@@ -1,21 +1,28 @@
 {{#overlay-marks group="cardstack-fields" as |mark|}}
-  {{#create-overlay at=mark
-                   label=mark.model.caption
-                   highlighted=(eq mark.id tools.highlightedFieldId)
-                   hoverable=tools.editing
-                   class="cs-field-overlay"
-                   focused=(eq mark.id tools.openedFieldId)
-                   onclick=(action "openField" mark)
-                   dismiss=(action "openField" null)
-                   }}
-    {{#if (and (eq mark.id tools.openedFieldId) (not mark.model.grouped)) }}
-      {{#with (cs-field-editor-for mark.model.content mark.model.name variant="inline") as |editorName|}}
+  {{#let
+    mark.model.name
+    mark.model.content
+    mark.model.caption
+    (cs-field-editor-for mark.model.content mark.model.name variant="inline")
+  as |fieldName content caption editorName|}}
+    {{#create-overlay at=mark
+                    label=caption
+                    highlighted=(eq mark.id tools.highlightedFieldId)
+                    hoverable=tools.editing
+                    class=(concat "cs-field-overlay "
+                      (if (is-component editorName) "with-inline-editor ")
+                      (if isOverlayPassthrough "passthrough"))
+                    focused=(eq mark.id tools.openedFieldId)
+                    onclick=(action "openField" mark)
+                    dismiss=(action "openField" null)
+                    }}
+      {{#if (and (eq mark.id tools.openedFieldId) (not mark.model.grouped)) }}
         {{#if (is-component editorName)}}
-          {{component editorName content=mark.model.content field=mark.model.name enabled=true tagName=""}}
+          {{component editorName content=content field=fieldName enabled=true tagName=""}}
         {{/if}}
-      {{/with}}
-    {{/if}}
-  {{/create-overlay}}
+      {{/if}}
+    {{/create-overlay}}
+  {{/let}}
 {{/overlay-marks}}
 
 {{#overlay-marks group="cardstack-content" as |mark|}}

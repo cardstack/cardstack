@@ -5,6 +5,7 @@ import { pluralize } from 'ember-inflector';
 import { get } from '@ember/object';
 import Component from '@ember/component';
 import layout from '../templates/components/cs-field-overlays';
+import { equal } from '@ember/object/computed';
 
 export default Component.extend({
   layout,
@@ -14,10 +15,21 @@ export default Component.extend({
   cardstackRouting: service(),
   router: service(),
 
+  selectedOverlayState: null,
+  isOverlayOpen: equal('selectedOverlayState', 'open'),
+  isOverlayPassthrough: equal('selectedOverlayState', 'passthrough'),
+
   actions: {
     openField(which) {
+      if (!which) {
+        this.set('selectedOverlayState', 'closed');
+      } else {
+        //TODO: Fields with inline-editors cannot be set to passthrough
+        this.set('selectedOverlayState', this.isOverlayOpen ? 'passthrough' : 'open');
+      }
       this.get('tools').openField(which);
     },
+
     navigateToCard(model) {
       let routingId;
       let type = pluralize(modelType(model));
