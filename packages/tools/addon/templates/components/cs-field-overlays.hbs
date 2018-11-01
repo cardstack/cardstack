@@ -5,23 +5,25 @@
     mark.model.caption
     (cs-field-editor-for mark.model.content mark.model.name variant="inline")
   as |fieldName content caption editorName|}}
-    {{#create-overlay at=mark
-                    label=caption
-                    highlighted=(eq mark.id tools.highlightedFieldId)
-                    hoverable=tools.editing
-                    class=(concat "cs-field-overlay "
-                      (if (is-component editorName) "with-inline-editor ")
-                      (if isOverlayPassthrough "passthrough"))
-                    focused=(eq mark.id tools.openedFieldId)
-                    onclick=(action "openField" mark)
-                    dismiss=(action "openField" null)
-                    }}
-      {{#if (and (eq mark.id tools.openedFieldId) (not mark.model.grouped)) }}
-        {{#if (is-component editorName)}}
-          {{component editorName content=content field=fieldName enabled=true tagName=""}}
+    {{#let (is-component editorName) as |hasInlineEditor|}}
+      {{#create-overlay at=mark
+        label=caption
+        highlighted=(eq mark.id tools.highlightedFieldId)
+        hoverable=tools.editing
+        class=(concat "cs-field-overlay "
+          (if hasInlineEditor "with-inline-editor ")
+          (if (and isOverlayPassthrough (not hasInlineEditor)) "passthrough"))
+        focused=(eq mark.id tools.openedFieldId)
+        onclick=(action "openField" mark)
+        dismiss=(action "openField" null)
+      }}
+        {{#if (and (eq mark.id tools.openedFieldId) (not mark.model.grouped)) }}
+          {{#if hasInlineEditor}}
+            {{component editorName content=content field=fieldName enabled=true tagName=""}}
+          {{/if}}
         {{/if}}
-      {{/if}}
-    {{/create-overlay}}
+      {{/create-overlay}}
+    {{/let}}
   {{/let}}
 {{/overlay-marks}}
 

@@ -24,7 +24,6 @@ export default Component.extend({
       if (!which) {
         this.set('selectedOverlayState', 'closed');
       } else {
-        //TODO: Fields with inline-editors cannot be set to passthrough
         this.set('selectedOverlayState', this.isOverlayOpen ? 'passthrough' : 'open');
       }
       this.get('tools').openField(which);
