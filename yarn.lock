@@ -5002,9 +5002,10 @@ ember-cli-path-utils@^1.0.0:
   resolved "https://registry.yarnpkg.com/ember-cli-path-utils/-/ember-cli-path-utils-1.0.0.tgz#4e39af8b55301cddc5017739b77a804fba2071ed"
   integrity sha1-Tjmvi1UwHN3FAXc5t3qAT7ogce0=
 
-"ember-cli-postcss@https://github.com/ef4/ember-cli-postcss#0550adab2c0c0ab856efec6a4da8164eadd01e47":
-  version "3.5.0"
-  resolved "https://github.com/ef4/ember-cli-postcss#0550adab2c0c0ab856efec6a4da8164eadd01e47"
+ember-cli-postcss@3.5.1:
+  version "3.5.1"
+  resolved "https://registry.yarnpkg.com/ember-cli-postcss/-/ember-cli-postcss-3.5.1.tgz#3930541bbac81288b6749f86cbced09f351d3160"
+  integrity sha512-y4yApHn63DHML6uoCMb+uV1HgXSFDMxsx7TN8VnkVAHMSPiWRxjybSr7iQ8nxjfgFynVIE6HZtvjTQZ1cw/9gg==
   dependencies:
     bower "1.8.0"
     broccoli-merge-trees "2.0.0"
