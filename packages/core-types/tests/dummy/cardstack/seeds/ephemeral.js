@@ -50,7 +50,12 @@ function initialModels() {
       fieldType: '@cardstack/core-types::belongs-to',
       editorComponent: 'field-editors/dropdown-choices-editor',
       editorOptions: { displayFieldName: 'name' }
-    }).withRelated('related-types', [{ type: 'content-types', id: 'vehicles' }])
+    }).withRelated('related-types', [{ type: 'content-types', id: 'vehicles' }]),
+    initial.addResource('fields', 'allied-drivers').withAttributes({
+      fieldType: '@cardstack/core-types::belongs-to',
+      editorComponent: 'field-editors/advanced-search-editor',
+      editorOptions: { displayFieldName: 'name' }
+    })
   ]);
 
   let happyFeeling = initial.addResource('feelings', '1').withAttributes({ title: 'Happy' });
