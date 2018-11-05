@@ -3,7 +3,7 @@ const {
   Branch,
   Reference,
   Commit
-} = require('@cardstack/nodegit');
+} = require('nodegit');
 
 
 /* eslint-env node */

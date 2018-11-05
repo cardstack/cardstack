@@ -2,7 +2,7 @@ const {
   Repository,
   Cred,
   Clone
-} = require('@cardstack/nodegit');
+} = require('nodegit');
 
 const crypto = require('crypto');
 const Change = require('./change');

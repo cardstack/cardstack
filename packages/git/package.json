@@ -14,9 +14,9 @@
   },
   "dependencies": {
     "@cardstack/logger": "^0.1.0",
-    "@cardstack/nodegit": "^0.21.2-cardstack.1",
     "@cardstack/plugin-utils": "0.11.6",
     "moment-timezone": "^0.5.11",
+    "nodegit": "^0.23.0",
     "temp": "^0.8.3"
   },
   "devDependencies": {

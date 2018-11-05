@@ -2,7 +2,7 @@
 // not-yet-written tree. But you can't recursively put a Treebuilder
 // inside a Treebuilder. That's where this class comes in.
 
-const { TreeEntry, Treebuilder, Blob } = require('@cardstack/nodegit');
+const { TreeEntry, Treebuilder, Blob } = require('nodegit');
 const { FILEMODE } = TreeEntry;
 const tombstone = {};
 
