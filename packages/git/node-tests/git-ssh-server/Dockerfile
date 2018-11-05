@@ -15,7 +15,8 @@ RUN ssh-keygen -A
 
 COPY cardstack-test-key.pub /root/.ssh/authorized_keys
 RUN chmod 600 /root/.ssh/authorized_keys && chown root:root /root/.ssh/authorized_keys
-ADD data-test-repo /root/data-test
+RUN mkdir /root/data-test
+RUN git init --bare /root/data-test
 RUN chown root:root -R /root/data-test
 
 EXPOSE 22
