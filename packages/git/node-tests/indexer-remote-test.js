@@ -26,29 +26,34 @@ const fetchOpts = {
   }
 };
 
+async function resetRemote() {
+  let root = await temp.mkdir('cardstack-server-test');
+
+  let tempRepo = await makeRepo(root, {
+    'contents/events/event-1.json': JSON.stringify({
+      attributes: {
+        title: "This is a test event",
+        'published-date': "2018-09-25"
+      }
+    }),
+    'contents/events/event-2.json': JSON.stringify({
+      attributes: {
+        title: "This is another test event",
+        "published-date": "2018-10-25"
+      }
+    })
+  });
+
+  let remote = await Remote.create(tempRepo.repo, 'origin', 'ssh://root@localhost:9022/root/data-test');
+  await remote.push(["+refs/heads/master:refs/heads/master"], fetchOpts);
+  return tempRepo;
+}
+
 describe('git/indexer remote config', function() {
   this.timeout(10000);
 
   beforeEach(async function() {
-    let root = await temp.mkdir('cardstack-server-test');
-
-    let { repo } = await makeRepo(root, {
-      'contents/events/event-1.json': JSON.stringify({
-        attributes: {
-          title: "This is a test event",
-          'published-date': "2018-09-25"
-        }
-      }),
-      'contents/events/event-2.json': JSON.stringify({
-        attributes: {
-          title: "This is another test event",
-          "published-date": "2018-10-25"
-        }
-      })
-    });
-
-    let remote = await Remote.create(repo, 'origin', 'ssh://root@localhost:9022/root/data-test');
-    await remote.push(["+refs/heads/master:refs/heads/master"], fetchOpts);
+    await resetRemote();
   });
 
   afterEach(async function() {
@@ -123,33 +128,15 @@ describe('git/indexer remote config', function() {
   });
 });
 
-describe.only('git/indexer cloning', function() {
+describe('git/indexer cloning', function() {
   let env, indexer, searcher, dataSource, start, client, head;
 
   this.timeout(10000);
 
   beforeEach(async function() {
-    let root = await temp.mkdir('cardstack-server-test');
-
-    let tempRepo = await makeRepo(root, {
-      'contents/events/event-1.json': JSON.stringify({
-        attributes: {
-          title: "This is a test event",
-          'published-date': "2018-09-25"
-        }
-      }),
-      'contents/events/event-2.json': JSON.stringify({
-        attributes: {
-          title: "This is another test event",
-          "published-date": "2018-10-25"
-        }
-      })
-    });
+    let tempRepo = await resetRemote();
 
     head = tempRepo.head;
-
-    let remote = await Remote.create(tempRepo.repo, 'origin', 'ssh://root@localhost:9022/root/data-test');
-    await remote.push(["+refs/heads/master:refs/heads/master"], fetchOpts);
 
     let factory = new JSONAPIFactory();
 

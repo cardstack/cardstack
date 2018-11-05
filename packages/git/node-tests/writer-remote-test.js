@@ -1,10 +1,10 @@
 const {
   Cred,
   Clone,
-  Reset
+  Remote,
 } = require('nodegit');
 
-const { inRepo } = require('./support');
+const { inRepo, makeRepo } = require('./support');
 const {
   createDefaultEnvironment,
   destroyDefaultEnvironment
@@ -13,12 +13,10 @@ const JSONAPIFactory = require('@cardstack/test-support/jsonapi-factory');
 const { join } = require('path');
 const { readFileSync } = require('fs');
 const { promisify } = require('util');
-const temp = require('temp').track();
+const temp = require('@cardstack/test-support/temp-helper');
 
 const mkdir = promisify(temp.mkdir);
 
-// this is a known commit that is at the head of the remote repo
-const REMOTE_HEAD = 'e9ad9f2666a4eff985706dfb2e11aa10491100d7';
 const privateKey = readFileSync(join(__dirname, 'git-ssh-server', 'cardstack-test-key'), 'utf8');
 
 const fetchOpts = {
@@ -29,17 +27,37 @@ const fetchOpts = {
   }
 };
 
-async function resetRemote(repo) {
-  let commit = await repo.getCommit(REMOTE_HEAD);
-  await Reset.reset(repo, commit, Reset.TYPE.HARD);
-  let remote = await repo.getRemote('origin');
+async function resetRemote() {
+  let root = await temp.mkdir('cardstack-server-test');
+
+  let tempRepo = await makeRepo(root, {
+    'contents/events/event-1.json': JSON.stringify({
+      attributes: {
+        title: "This is a test event",
+        'published-date': "2018-09-25"
+      }
+    }),
+    'contents/events/event-2.json': JSON.stringify({
+      attributes: {
+        title: "This is another test event",
+        "published-date": "2018-10-25"
+      }
+    })
+  });
+
+  let remote = await Remote.create(tempRepo.repo, 'origin', 'ssh://root@localhost:9022/root/data-test');
   await remote.push(["+refs/heads/master:refs/heads/master"], fetchOpts);
+  return tempRepo;
 }
 
 describe('git/writer with remote', function() {
-  let env, writers, repo, tempRepoPath, tempRemoteRepoPath;
+  let env, writers, repo, tempRepoPath, tempRemoteRepoPath, head;
 
   beforeEach(async function() {
+    let tempRepo = await resetRemote();
+
+    head = tempRepo.head;
+
     let factory = new JSONAPIFactory();
 
     tempRepoPath = await mkdir('cardstack-temp-test-repo');
@@ -78,7 +96,6 @@ describe('git/writer with remote', function() {
   });
 
   afterEach(async function() {
-    await resetRemote(repo);
     await temp.cleanup();
     await destroyDefaultEnvironment(env);
   });
@@ -115,12 +132,12 @@ describe('git/writer with remote', function() {
             title: 'Updated title'
           },
           meta: {
-            version: REMOTE_HEAD
+            version: head
           }
         }
       });
       expect(record).has.deep.property('attributes.title', 'Updated title');
-      expect(record).has.deep.property('meta.version').not.equal(REMOTE_HEAD);
+      expect(record).has.deep.property('meta.version').not.equal(head);
 
 
       await repo.fetch('origin', fetchOpts);
@@ -139,7 +156,7 @@ describe('git/writer with remote', function() {
 
   describe('delete', function() {
     it('deletes document', async function() {
-      await writers.delete('master', env.session, REMOTE_HEAD, 'events', 'event-1');
+      await writers.delete('master', env.session, head, 'events', 'event-1');
 
       await repo.fetch('origin', fetchOpts);
 
