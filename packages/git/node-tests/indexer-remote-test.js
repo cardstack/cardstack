@@ -12,6 +12,8 @@ const {
   Remote,
 } = require('@cardstack/nodegit');
 
+const service = require('../service');
+
 const privateKey = readFileSync(join(__dirname, 'git-ssh-server', 'cardstack-test-key'), 'utf8');
 
 function toResource(doc) {
@@ -46,6 +48,7 @@ async function resetRemote() {
 
   let remote = await Remote.create(tempRepo.repo, 'origin', 'ssh://root@localhost:9022/root/data-test');
   await remote.push(["+refs/heads/master:refs/heads/master"], fetchOpts);
+
   return tempRepo;
 }
 
@@ -58,6 +61,7 @@ describe('git/indexer remote config', function() {
 
   afterEach(async function() {
     await temp.cleanup();
+    service.clearCache();
   });
 
   it('throws an error when remote and repo are defined', function() {
@@ -117,6 +121,7 @@ describe('git/indexer remote config', function() {
           repo
         }
       });
+
     factory.addResource('plugin-configs', '@cardstack/hub')
       .withRelated(
         'default-data-source',
@@ -152,13 +157,16 @@ describe('git/indexer cloning', function() {
           })
       ]);
 
+    let cacheDir = await temp.mkdir('indexer-cloning-test');
+
     dataSource = factory.addResource('data-sources')
         .withAttributes({
           'source-type': '@cardstack/git',
           params: {
             remote: {
               url: 'ssh://root@localhost:9022/root/data-test',
-              privateKey
+              privateKey,
+              cacheDir,
             }
           }
         });
@@ -180,6 +188,7 @@ describe('git/indexer cloning', function() {
   afterEach(async function() {
     await temp.cleanup();
     await destroyDefaultEnvironment(env);
+    service.clearCache();
   });
 
   it('clones the remote repo', async function() {
