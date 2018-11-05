@@ -4,8 +4,13 @@ const {
   createDefaultEnvironment,
   destroyDefaultEnvironment
 } = require('@cardstack/test-support/env');
+const { makeRepo } = require('./support');
 const { join } = require('path');
 const { readFileSync } = require('fs');
+const {
+  Cred,
+  Remote,
+} = require('@cardstack/nodegit');
 
 const privateKey = readFileSync(join(__dirname, 'git-ssh-server', 'cardstack-test-key'), 'utf8');
 
@@ -13,8 +18,42 @@ function toResource(doc) {
   return doc.data;
 }
 
+const fetchOpts = {
+  callbacks: {
+    credentials: (url, userName) => {
+      return Cred.sshKeyMemoryNew(userName, '', privateKey, '');
+    }
+  }
+};
+
 describe('git/indexer remote config', function() {
   this.timeout(10000);
+
+  beforeEach(async function() {
+    let root = await temp.mkdir('cardstack-server-test');
+
+    let { repo } = await makeRepo(root, {
+      'contents/events/event-1.json': JSON.stringify({
+        attributes: {
+          title: "This is a test event",
+          'published-date': "2018-09-25"
+        }
+      }),
+      'contents/events/event-2.json': JSON.stringify({
+        attributes: {
+          title: "This is another test event",
+          "published-date": "2018-10-25"
+        }
+      })
+    });
+
+    let remote = await Remote.create(repo, 'origin', 'ssh://root@localhost:9022/root/data-test');
+    await remote.push(["+refs/heads/master:refs/heads/master"], fetchOpts);
+  });
+
+  afterEach(async function() {
+    await temp.cleanup();
+  });
 
   it('throws an error when remote and repo are defined', function() {
     let factory = new JSONAPIFactory();
@@ -84,12 +123,34 @@ describe('git/indexer remote config', function() {
   });
 });
 
-describe('git/indexer cloning', function() {
-  let env, indexer, searcher, dataSource, start, client;
+describe.only('git/indexer cloning', function() {
+  let env, indexer, searcher, dataSource, start, client, head;
 
   this.timeout(10000);
 
   beforeEach(async function() {
+    let root = await temp.mkdir('cardstack-server-test');
+
+    let tempRepo = await makeRepo(root, {
+      'contents/events/event-1.json': JSON.stringify({
+        attributes: {
+          title: "This is a test event",
+          'published-date': "2018-09-25"
+        }
+      }),
+      'contents/events/event-2.json': JSON.stringify({
+        attributes: {
+          title: "This is another test event",
+          "published-date": "2018-10-25"
+        }
+      })
+    });
+
+    head = tempRepo.head;
+
+    let remote = await Remote.create(tempRepo.repo, 'origin', 'ssh://root@localhost:9022/root/data-test');
+    await remote.push(["+refs/heads/master:refs/heads/master"], fetchOpts);
+
     let factory = new JSONAPIFactory();
 
     factory.addResource('content-types', 'events')
@@ -137,15 +198,12 @@ describe('git/indexer cloning', function() {
   it('clones the remote repo', async function() {
     await start();
     let indexerState = await client.loadMeta({ branch: 'master', id: dataSource.id });
-    expect(indexerState.commit).to.equal('e9ad9f2666a4eff985706dfb2e11aa10491100d7');
+    expect(indexerState.commit).to.equal(head);
   });
 
   it('indexes existing data in the remote after it is cloned', async function() {
     await start();
     await indexer.update();
-
-    let indexerState = await client.loadMeta({ branch: 'master', id: dataSource.id });
-    expect(indexerState.commit).to.equal('e9ad9f2666a4eff985706dfb2e11aa10491100d7');
 
     let contents = await searcher.get(env.session, 'master', 'events', 'event-1');
     let jsonapi = toResource(contents);
