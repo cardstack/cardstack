@@ -167,3 +167,79 @@ describe('git/writer with remote', function() {
     // TODO: come up with testing scenarios for conflicts
   });
 });
+
+describe('git/writer with empty remote', function() {
+  let env, writers, repo, tempRepoPath, tempRemoteRepoPath;
+
+  beforeEach(async function() {
+    let root = await temp.mkdir('cardstack-server-test');
+
+    let { repo: remoteRepo } = await makeRepo(root);
+
+    let remote = await Remote.create(remoteRepo, 'origin', 'ssh://root@localhost:9022/root/data-test');
+    await remote.push(["+refs/heads/master:refs/heads/master"], fetchOpts);
+
+    let factory = new JSONAPIFactory();
+
+    tempRepoPath = await mkdir('cardstack-temp-test-repo');
+    tempRemoteRepoPath = await mkdir('cardstack-temp-test-remote-repo');
+
+    repo = await Clone('ssh://root@localhost:9022/root/data-test', tempRemoteRepoPath, {
+      fetchOpts,
+    });
+
+    let dataSource = factory.addResource('data-sources')
+        .withAttributes({
+          'source-type': '@cardstack/git',
+          params: {
+            remote: {
+              url: 'ssh://root@localhost:9022/root/data-test',
+              privateKey,
+              cacheDir: tempRepoPath,
+            }
+          }
+        });
+
+    factory.addResource('content-types', 'events')
+      .withRelated('fields', [
+        factory.addResource('fields', 'title').withAttributes({ fieldType: '@cardstack/core-types::string' }),
+        factory.addResource('fields', 'published-date').withAttributes({ fieldType: '@cardstack/core-types::string' })
+      ]).withRelated('data-source', dataSource);
+
+    factory.addResource('plugin-configs', '@cardstack/hub')
+      .withRelated(
+        'default-data-source',
+        dataSource
+      );
+
+    env = await createDefaultEnvironment(`${__dirname}/..`, factory.getModels());
+    writers = env.lookup('hub:writers');
+  });
+
+  afterEach(async function() {
+    await temp.cleanup();
+    await destroyDefaultEnvironment(env);
+  });
+
+  describe('create', function() {
+    it('allows you to create a record in an empty git repo', async function () {
+      let { data:record } = await writers.create('master', env.session, 'events', {
+        data: {
+          type: 'events',
+          attributes: {
+            title: 'Fresh Event',
+            'published-date': '2018-09-01',
+          }
+        }
+      });
+      await repo.fetch('origin', fetchOpts);
+      let saved = await inRepo(tempRemoteRepoPath).getJSONContents('origin/master', `contents/events/${record.id}.json`);
+      expect(saved).to.deep.equal({
+        attributes: {
+          title: 'Fresh Event',
+          'published-date': '2018-09-01',
+        }
+      });
+    });
+  });
+});
