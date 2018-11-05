@@ -37,7 +37,6 @@ async function resetRemote(repo) {
 }
 
 describe('git/writer with remote', function() {
-
   let env, writers, repo, tempRepoPath, tempRemoteRepoPath;
 
   beforeEach(async function() {

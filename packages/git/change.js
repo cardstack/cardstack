@@ -15,6 +15,7 @@ const {
 } = require('./mutable-tree');
 const moment = require('moment-timezone');
 const crypto = require('crypto');
+const delay = require('delay');
 
 // This is supposed to enable thread-safe locking around all async
 // operations.
@@ -42,7 +43,7 @@ class Change {
     return new this(repo, targetBranch, parentTree, parents, parentCommit, null, null);
   }
 
-  static async create(repo, parentId, targetBranch) {
+  static async create(repo, parentId, targetBranch, fetchOpts) {
     let headRef = await Branch.lookup(repo, targetBranch, Branch.BRANCH.LOCAL);
     let headCommit = await Commit.lookup(repo, headRef.target());
 
@@ -59,25 +60,10 @@ class Change {
       parentTree = await parentCommit.getTree();
       parents.push(parentCommit);
     }
-    return new this(repo, targetBranch, parentTree, parents, parentCommit, headRef, headCommit);
+    return new this(repo, targetBranch, parentTree, parents, parentCommit, headRef, headCommit, fetchOpts);
   }
 
-  static async createRemote(repo, targetBranch, fetchOpts) {
-    await repo.fetch('origin', fetchOpts);
-    const remoteBranchName = `temp-remote-${crypto.randomBytes(20).toString('hex')}`;
-    const remoteHead = await repo.getReferenceCommit(`refs/remotes/origin/${targetBranch}`);
-    await repo.createBranch(remoteBranchName, remoteHead);
-
-    let headRef = await Branch.lookup(repo, remoteBranchName, Branch.BRANCH.LOCAL);
-    let headCommit = await Commit.lookup(repo, headRef.target());
-
-    let parentTree = await headCommit.getTree();
-    let parents = [headCommit];
-
-    return new this(repo, remoteBranchName, parentTree, parents, headCommit, headRef, headCommit, targetBranch, fetchOpts);
-  }
-
-  constructor(repo, targetBranch, parentTree, parents, parentCommit, headRef, headCommit, remoteTargetBranch, fetchOpts) {
+  constructor(repo, targetBranch, parentTree, parents, parentCommit, headRef, headCommit, fetchOpts) {
     this.repo = repo;
     this.parentTree = parentTree;
     this.root = new MutableTree(repo, parentTree);
@@ -86,7 +72,6 @@ class Change {
     this.headRef = headRef;
     this.headCommit = headCommit;
     this.targetBranch = targetBranch;
-    this.remoteTargetBranch = remoteTargetBranch;
     this.fetchOpts = fetchOpts;
   }
 
@@ -97,14 +82,15 @@ class Change {
 
   async finalize(commitOpts) {
     let newCommit = await this._makeCommit(commitOpts);
-    let mergeCommit = await this._mergeCommit(newCommit, commitOpts);
+    let commitId;
 
-    if(this.remoteTargetBranch) {
-      let remote = await this.repo.getRemote('origin');
-      await remote.push([`refs/heads/${this.targetBranch}:refs/heads/${this.remoteTargetBranch}`], this.fetchOpts);
+    if(this.fetchOpts) {
+      commitId = this._pushCommit(newCommit);
+    } else {
+      commitId = await this._mergeCommit(newCommit, commitOpts);
     }
 
-    return mergeCommit;
+    return commitId;
   }
 
   async _makeCommit(commitOpts) {
@@ -118,6 +104,31 @@ class Change {
     let { author, committer } = signature(commitOpts);
     let commitOid = await Commit.create(this.repo, null, author, committer, 'UTF-8', commitOpts.message, tree, this.parents.length, this.parents);
     return Commit.lookup(this.repo, commitOid);
+  }
+
+  async _pushCommit(newCommit, delayTime) {
+    if(delayTime > 5000) {
+      throw new Error('Push failed');
+    }
+
+    const remoteBranchName = `temp-remote-${crypto.randomBytes(20).toString('hex')}`;
+    await Branch.create(this.repo, remoteBranchName, newCommit, false);
+
+    let remote = await this.repo.getRemote('origin');
+
+    try {
+      await remote.push([`refs/heads/${remoteBranchName}:refs/heads/${this.targetBranch}`], this.fetchOpts);
+      return newCommit.id().tostrS();
+    } catch (e) {
+      // pull remote and retry with longer delay
+      let timeToDelay = delayTime || 500;
+      await delay(timeToDelay);
+
+      this.repo.fetchAll(this.fetchOpts);
+      this.repo.mergeBranches(this.targetBranch, `origin/${this.targetBranch}`, null, Merge.PREFERENCE.FASTFORWARD_ONLY);
+
+      return this._pushCommit(newCommit, delayTime * 2);
+    }
   }
 
   async _mergeCommit(newCommit, commitOpts) {

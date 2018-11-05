@@ -31,29 +31,26 @@ module.exports = class Writer {
     this.myEmail = `${os.userInfo().username}@${hostname}`;
     this.idGenerator = idGenerator;
     this.remote = remote;
-    this.fetchOpts = {
-      callbacks: {
-        credentials: (url, userName) => {
-          if (remote && remote.privateKey) {
-            return Cred.sshKeyMemoryNew(userName, remote.publicKey || '', remote.privateKey, remote.passphrase || '');
+
+    if(remote) {
+      this.fetchOpts = {
+        callbacks: {
+          credentials: (url, userName) => {
+            if (remote && remote.privateKey) {
+              return Cred.sshKeyMemoryNew(userName, remote.publicKey || '', remote.privateKey, remote.passphrase || '');
+            }
+            return Cred.sshKeyFromAgent(userName);
           }
-          return Cred.sshKeyFromAgent(userName);
         }
-      }
-    };
+      };
+    }
   }
 
   async prepareCreate(branch, session, type, document, isSchema) {
     return withErrorHandling(document.id, type, async () => {
       await this._ensureRepo();
       const branchName = this.branchPrefix + branch;
-      let change;
-
-      if(this.remote) {
-        change = await Change.createRemote(this.repo, branchName, this.fetchOpts);
-      } else {
-        change = await Change.create(this.repo, null, branchName);
-      }
+      const change = await Change.create(this.repo, null, branchName, this.fetchOpts);
 
       let id = document.id;
       let file;
@@ -96,13 +93,7 @@ module.exports = class Writer {
     await this._ensureRepo();
     return withErrorHandling(id, type, async () => {
       const branchName = this.branchPrefix + branch;
-      let change;
-
-      if(this.remote) {
-        change = await Change.createRemote(this.repo, branchName, this.fetchOpts);
-      } else {
-        change = await Change.create(this.repo, document.meta.version, branchName);
-      }
+      const change = await Change.create(this.repo, document.meta.version, branchName, this.fetchOpts);
 
       let file = await change.get(this._filenameFor(type, id, isSchema), { allowUpdate: true });
       let before = JSON.parse(await file.getBuffer());
@@ -131,13 +122,7 @@ module.exports = class Writer {
     await this._ensureRepo();
     return withErrorHandling(id, type, async () => {
       const branchName = this.branchPrefix + branch;
-      let change;
-
-      if(this.remote) {
-        change = await Change.createRemote(this.repo, branchName, this.fetchOpts);
-      } else {
-        change = await Change.create(this.repo, version, branchName);
-      }
+      const change = await Change.create(this.repo, version, branchName, this.fetchOpts);
 
       let file = await change.get(this._filenameFor(type, id, isSchema));
       let before = JSON.parse(await file.getBuffer());
