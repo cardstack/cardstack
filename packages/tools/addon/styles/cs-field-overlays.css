@@ -26,6 +26,6 @@
   pointer-events: none;
 }
 
-.cs-field-overlay.passthrough .overlay-scrim {
+.cs-field-overlay.passthrough > * {
   pointer-events: auto;
 }
