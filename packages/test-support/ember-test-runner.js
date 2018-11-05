@@ -29,8 +29,9 @@ function testPackage(package) {
   });
 }
 
-async function run(cardsDirectory='cards') {
-  let packages = glob.sync(path.join(__dirname, cardsDirectory, '*', 'ember-cli-build.js')).map(p => path.dirname(p));
+async function run(cardsDirectory) {
+  console.log('cards directory', path.join(process.cwd(), cardsDirectory));
+  let packages = glob.sync(path.join(process.cwd(), cardsDirectory, '*', 'ember-cli-build.js')).map(p => path.dirname(p));
   for (let package of packages) {
     process.stdout.write(`Starting test suite for ${path.basename(package)}\n`);
     await testPackage(package);
@@ -38,7 +39,7 @@ async function run(cardsDirectory='cards') {
   process.stdout.write(`Finished all test suites\n`);
 }
 
-run(process.argv.length > 2 && process.argv[2]).then(() => process.exit(0), err => {
+run(process.argv.length > 2 && process.argv[2] || '.').then(() => process.exit(0), err => {
   /* eslint-disable no-console */
   console.log(err);
   process.exit(-1);
