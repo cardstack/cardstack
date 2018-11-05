@@ -1,20 +1,31 @@
-.cs-field-overlay .overlay-label {
-    font-size: 10px;
-    text-transform: uppercase;
-    background-color: var(--tools-highlight);
-}
-
-.cs-field-overlay .overlay-border {
-    border-color: var(--tools-highlight);
-}
-
+.cs-field-overlay .overlay-label,
 .cs-content-overlay .overlay-label {
-    font-size: 10px;
-    text-transform: uppercase;
-    background-color: var(--deep-tools-highlight);
+  font-size: 10px;
+  text-transform: uppercase;
+  background-color: var(--deep-tools-highlight);
 }
 
+.cs-field-overlay .overlay-border,
 .cs-content-overlay .overlay-border {
-    border-color: var(--deep-tools-highlight);
-    background-color: var(--faded-tools-highlight);
+  border-color: var(--deep-tools-highlight);
+  background-color: var(--faded-tools-highlight);
+}
+
+.cs-field-overlay.with-inline-editor .overlay-label,
+.cs-field-overlay.passthrough .overlay-label {
+  background-color: var(--tools-highlight);
+}
+
+.cs-field-overlay.with-inline-editor .overlay-border,
+.cs-field-overlay.passthrough .overlay-border {
+  border-color: var(--tools-highlight);
+  background-color: transparent;
+}
+
+.cs-field-overlay.passthrough {
+  pointer-events: none;
+}
+
+.cs-field-overlay.passthrough > * {
+  pointer-events: auto;
 }

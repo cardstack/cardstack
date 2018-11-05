@@ -18,6 +18,7 @@ export default Component.extend({
     openField(which) {
       this.get('tools').openField(which);
     },
+
     navigateToCard(model) {
       let routingId;
       let type = pluralize(modelType(model));
