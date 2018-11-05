@@ -1,6 +1,6 @@
 {
   "name": "@cardstack/ethereum",
-  "version": "0.11.7",
+  "version": "0.11.8",
   "description": "ethereum plugin for Cardstack",
   "keywords": [
     "ember-addon",
@@ -26,9 +26,9 @@
   },
   "dependencies": {
     "@cardstack/di": "0.11.4",
-    "@cardstack/hub": "0.11.7",
+    "@cardstack/hub": "0.11.8",
     "@cardstack/logger": "^0.1.0",
-    "@cardstack/pgsearch": "0.11.7",
+    "@cardstack/pgsearch": "0.11.8",
     "@cardstack/plugin-utils": "0.11.6",
     "ember-source": "~2.18.2",
     "handlebars": "^4.0.6",
@@ -39,9 +39,9 @@
   },
   "devDependencies": {
     "@cardstack/eslint-config": "0.11.4",
-    "@cardstack/jsonapi": "0.11.7",
-    "@cardstack/models": "0.11.7",
-    "@cardstack/test-support": "0.11.7",
+    "@cardstack/jsonapi": "0.11.8",
+    "@cardstack/models": "0.11.8",
+    "@cardstack/test-support": "0.11.8",
     "eslint": "4.9.0",
     "eslint-plugin-ember": "^5.0.0",
     "eslint-plugin-node": "^5.2.1",
