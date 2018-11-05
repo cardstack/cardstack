@@ -49,8 +49,7 @@ module.exports = class Writer {
   async prepareCreate(branch, session, type, document, isSchema) {
     return withErrorHandling(document.id, type, async () => {
       await this._ensureRepo();
-      const branchName = this.branchPrefix + branch;
-      const change = await Change.create(this.repo, null, branchName, this.fetchOpts);
+      let change = await Change.create(this.repo, null, this.branchPrefix + branch, this.fetchOpts);
 
       let id = document.id;
       let file;
@@ -92,8 +91,7 @@ module.exports = class Writer {
 
     await this._ensureRepo();
     return withErrorHandling(id, type, async () => {
-      const branchName = this.branchPrefix + branch;
-      const change = await Change.create(this.repo, document.meta.version, branchName, this.fetchOpts);
+      let change = await Change.create(this.repo, document.meta.version, this.branchPrefix + branch, this.fetchOpts);
 
       let file = await change.get(this._filenameFor(type, id, isSchema), { allowUpdate: true });
       let before = JSON.parse(await file.getBuffer());
@@ -121,8 +119,7 @@ module.exports = class Writer {
     }
     await this._ensureRepo();
     return withErrorHandling(id, type, async () => {
-      const branchName = this.branchPrefix + branch;
-      const change = await Change.create(this.repo, version, branchName, this.fetchOpts);
+      let change = await Change.create(this.repo, version, this.branchPrefix + branch, this.fetchOpts);
 
       let file = await change.get(this._filenameFor(type, id, isSchema));
       let before = JSON.parse(await file.getBuffer());
