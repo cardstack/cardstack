@@ -1,10 +1,10 @@
 import { helper } from '@ember/component/helper';
 
-export function csHasErrors([errors, fieldModel]) {
+export function csHasErrors([errors, model, options]) {
   if (!errors) { return false; }
-  let { grouped, content } = fieldModel;
-  let fields = grouped ? grouped : [fieldModel.name];
-  return hasErrorForAnyField(errors, content, fields);
+  let { name: fieldName, grouped } = options;
+  let fields = grouped ? grouped : [fieldName];
+  return hasErrorForAnyField(errors, model, fields);
 }
 
 export default helper(csHasErrors);
