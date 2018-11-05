@@ -7,6 +7,13 @@ sudo: required
 services:
  - docker
 
+addons:
+  apt:
+    sources:
+      - ubuntu-toolchain-r-test
+    packages:
+      - libstdc++-4.9-dev
+
 env:
   global:
     - ELASTICSEARCH=http://127.0.0.1:9200
