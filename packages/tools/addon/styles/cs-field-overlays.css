@@ -5,15 +5,15 @@
   background-color: var(--deep-tools-highlight);
 }
 
-.cs-field-overlay.with-inline-editor .overlay-label,
-.cs-field-overlay.passthrough .overlay-label {
-  background-color: var(--tools-highlight);
-}
-
 .cs-field-overlay .overlay-border,
 .cs-content-overlay .overlay-border {
   border-color: var(--deep-tools-highlight);
   background-color: var(--faded-tools-highlight);
+}
+
+.cs-field-overlay.with-inline-editor .overlay-label,
+.cs-field-overlay.passthrough .overlay-label {
+  background-color: var(--tools-highlight);
 }
 
 .cs-field-overlay.with-inline-editor .overlay-border,

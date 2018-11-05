@@ -3,8 +3,9 @@
     mark.model.name
     mark.model.content
     mark.model.caption
+    (eq mark.id tools.openedFieldId)
     (cs-field-editor-for mark.model.content mark.model.name variant="inline")
-  as |fieldName content caption editorName|}}
+  as |fieldName content caption isOpenedField editorName|}}
     {{#let (is-component editorName) as |hasInlineEditor|}}
       {{#create-overlay at=mark
         label=caption
@@ -12,7 +13,7 @@
         hoverable=tools.editing
         class=(concat "cs-field-overlay "
           (if hasInlineEditor "with-inline-editor ")
-          (if (and isOverlayPassthrough (not hasInlineEditor)) "passthrough"))
+          (if (and isOpenedField (not hasInlineEditor)) "passthrough"))
         focused=(eq mark.id tools.openedFieldId)
         onclick=(action "openField" mark)
         dismiss=(action "openField" null)
