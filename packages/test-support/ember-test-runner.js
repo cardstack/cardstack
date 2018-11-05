@@ -30,7 +30,6 @@ function testPackage(package) {
 }
 
 async function run(cardsDirectory) {
-  console.log('cards directory', path.join(process.cwd(), cardsDirectory));
   let packages = glob.sync(path.join(process.cwd(), cardsDirectory, '*', 'ember-cli-build.js')).map(p => path.dirname(p));
   for (let package of packages) {
     process.stdout.write(`Starting test suite for ${path.basename(package)}\n`);
