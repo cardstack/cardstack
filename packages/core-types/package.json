@@ -25,6 +25,7 @@
   },
   "dependencies": {
     "@cardstack/di": "0.11.4",
+    "@cardstack/edges": "0.11.8",
     "ember-cli-babel": "^6.8.2",
     "ember-cli-htmlbars": "^2.0.1",
     "ember-cli-postcss": "3.5.1",

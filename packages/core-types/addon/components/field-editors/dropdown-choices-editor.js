@@ -11,6 +11,13 @@ import metaForField from '@cardstack/rendering/-private/meta-for-field';
 export default Component.extend({
   layout,
   store: service(),
+  cardstackEdges: service(),
+  init() {
+    this._super();
+
+    // Register items for edges
+    this.get('cardstackEdges').registerTopLevelComponent('dropdown-container');
+  },
 
   displayFieldName: computed('editorOptions.displayFieldName', function() {
     return getWithDefault(this, 'editorOptions.displayFieldName', 'title');
