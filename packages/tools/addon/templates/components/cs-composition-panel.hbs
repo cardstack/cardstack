@@ -6,7 +6,8 @@
   {{else}}
     {{cs-active-composition-panel
       model=tools.activeContentItem.model
-      fields=tools.activeFields
+      renderedFields=tools.activeFields
+      modelFields=tools.modelFields
       openedFieldId=tools.openedFieldId
       highlightedFieldId=tool.highlightedFieldId
       openField=(action "openField")

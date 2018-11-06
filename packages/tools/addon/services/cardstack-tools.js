@@ -7,6 +7,7 @@ import { transitionTo } from '../private-api';
 import { modelType } from '@cardstack/rendering/helpers/cs-model-type';
 import injectOptional from 'ember-inject-optional';
 import { defaultBranch } from '@cardstack/plugin-utils/environment';
+import { guidFor } from '@ember/object/internals';
 
 export default Service.extend({
   overlays: service('ember-overlays'),
@@ -14,8 +15,34 @@ export default Service.extend({
   marks: alias('overlays.marks'),
   cardstackEdges: service(),
 
-  fields: computed('marks', function() {
+  renderedFields: computed('marks', function() {
     return this.get('marks').filter(m => m.group === 'cardstack-fields');
+  }),
+
+  _renderedFieldNames: computed('renderedFields', function() {
+    return this.get('renderedFields').reduce((fieldNames, fieldMark) => {
+      let { grouped, name } = fieldMark.model;
+      return fieldNames.concat(grouped ? grouped : name);
+    }, []);
+  }),
+
+  modelFields: computed('_renderedFieldNames', 'activeContentItem.model', function() {
+    let fields = [];
+    let renderedFieldNames = this.get('_renderedFieldNames');
+    let model = this.get('activeContentItem.model');
+    model.eachAttribute((attribute, meta) => {
+      // When fields are also shown from owned, related records
+      // simply checking field name duplication won't be enough:
+      // we have to also check if the models are the same
+      // Or maybe not: https://github.com/cardstack/cardstack/issues/390
+      if (!renderedFieldNames.includes(meta.name)) {
+        let fieldInfo = Object.assign({}, meta);
+        fieldInfo.id = guidFor(fieldInfo);
+        fieldInfo.model = model;
+        fields.push(fieldInfo);
+      }
+    });
+    return fields;
   }),
 
   contentPages: computed('marks', function() {
@@ -35,12 +62,12 @@ export default Service.extend({
 
   branch: alias('_activeItemMeta.branch'),
 
-  activeFields: computed('activeContentItem', 'fields', function() {
+  activeFields: computed('activeContentItem', 'renderedFields', function() {
     let item = this.get('activeContentItem');
     let activeItemModel = item.model;
     let owned = ownedRelatedRecords([item.model]);
     if (item) {
-      return this.get('fields').filter(f => {
+      return this.get('renderedFields').filter(f => {
         let fieldModel = f.model.content;
         if (fieldModel === activeItemModel) {
           return true;

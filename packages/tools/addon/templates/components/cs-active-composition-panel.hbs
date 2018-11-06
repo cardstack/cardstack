@@ -17,44 +17,70 @@
     on-error=(action (mut validationErrors))
   }}
 
-  {{#each fields key="id" as |fieldMark|}}
+  {{#each renderedFields key="id" as |fieldMark|}}
+    {{#let fieldMark.model as |model|}}
+      {{#cs-collapsible-section
+        class=(concat "cs-toolbox-section "
+          (if
+            (cs-has-errors validationErrors model (hash name=model.name grouped=model.grouped))
+            "invalid"))
+        title=model.caption
+        opened=(eq fieldMark.id openedFieldId)
+        open=(action openField fieldMark)
+        close=(action openField null)
+        hovered=(perform highlightAndScrollToField fieldMark)
+        unhovered=(perform highlightAndScrollToField null)
+      }}
+        <div class="cs-field-editor-section">
+        {{#if model.grouped}}
+          {{#each model.grouped as |fieldName|}}
+            {{#with model.content as |content|}}
+              <label>{{cs-field-caption content fieldName}}</label>
+              {{cs-field-editor
+                content=content
+                field=fieldName
+                enabled=editingEnabled
+                onchange=(action "validate")
+                errors=(get validationErrors fieldName)
+              }}
+            {{/with}}
+          {{/each}}
+        {{else}}
+          {{cs-field-editor
+            content=model.content
+            field=model.name
+            enabled=editingEnabled
+            onchange=(action "validate")
+            errors=(get validationErrors model.name)
+          }}
+        {{/if}}
+        </div>
+      {{/cs-collapsible-section}}
+    {{/let}}
+  {{/each}}
+
+  {{#each modelFields as |field|}}
     {{#cs-collapsible-section
       class=(concat "cs-toolbox-section "
         (if
-          (cs-has-errors validationErrors fieldMark.model)
+          (cs-has-errors validationErrors field.model (hash name=field.name))
           "invalid"))
-      title=fieldMark.model.caption
-      opened=(eq fieldMark.id openedFieldId)
-      open=(action openField fieldMark)
+      title=field.options.caption
+      opened=(eq field.id openedFieldId)
+      open=(action openField field)
       close=(action openField null)
-      hovered=(perform highlightAndScrollToField fieldMark)
-      unhovered=(perform highlightAndScrollToField null)
     }}
       <div class="cs-field-editor-section">
-      {{#if fieldMark.model.grouped}}
-        {{#each fieldMark.model.grouped as |fieldName|}}
-          {{#with fieldMark.model.content as |content|}}
-            <label>{{cs-field-caption content fieldName}}</label>
-            {{cs-field-editor
-              content=content
-              field=fieldName
-              enabled=editingEnabled
-              onchange=(action "validate")
-              errors=(get validationErrors fieldName)
-            }}
-          {{/with}}
-        {{/each}}
-      {{else}}
         {{cs-field-editor
-          content=fieldMark.model.content
-          field=fieldMark.model.name
+          content=field.model
+          field=field.name
           enabled=editingEnabled
           onchange=(action "validate")
-          errors=(get validationErrors fieldMark.model.name)
+          errors=(get validationErrors field.name)
         }}
-      {{/if}}
       </div>
     {{/cs-collapsible-section}}
   {{/each}}
+
 
 </div>

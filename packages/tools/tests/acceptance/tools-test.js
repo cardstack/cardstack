@@ -6,6 +6,10 @@ function findTriggerElementWithLabel(labelRegex) {
   return [...this.element.querySelectorAll('.cs-toolbox-section label')].find(element => labelRegex.test(element.textContent));
 }
 
+function findSectionLabels(label) {
+  return [...this.element.querySelectorAll('.cs-toolbox-section label')].filter(element => label === element.textContent);
+}
+
 function findInputWithValue(value) {
   return Array.from(this.element.querySelectorAll('input'))
     .find(element => element.value === value);
@@ -64,5 +68,16 @@ module('Acceptance | tools', function(hooks) {
     await triggerEvent(commentBodyEditor, 'blur');
     await waitFor('.field-editor--error-message');
     assert.dom('.field-editor--error-message').hasText('body must not be empty');
+  });
+
+  test('show all fields, not just those rendered from template', async function(assert) {
+    await visit('/1');
+    await click('.cardstack-tools-launcher');
+
+    let archivedSection = findTriggerElementWithLabel.call(this, /Archived/);
+    assert.ok(archivedSection, "Unrendered field appears in editor");
+
+    let titleSections = findSectionLabels.call(this, "Title");
+    assert.equal(titleSections.length, 1, "Rendered fields only appear once");
   });
 });
