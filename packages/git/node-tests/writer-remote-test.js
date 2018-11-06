@@ -2,7 +2,7 @@ const {
   Cred,
   Clone,
   Reset
-} = require('@cardstack/nodegit');
+} = require('nodegit');
 
 const { inRepo } = require('./support');
 const {

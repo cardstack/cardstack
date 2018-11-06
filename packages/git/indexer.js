@@ -85,7 +85,7 @@ const {
   Commit,
   Clone,
   Cred,
-} = require('@cardstack/nodegit');
+} = require('nodegit');
 const { promisify } = require('util');
 const temp = require('temp').track();
 
