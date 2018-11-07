@@ -6,38 +6,28 @@ module('Acceptance | content', function(hooks) {
   setupApplicationTest(hooks);
 
   test('renders own page content', async function(assert) {
-    await visit('/c/posts/1');
-    assert.equal(currentURL(), '/c/posts/1');
+    await visit('/posts/1');
+    assert.equal(currentURL(), '/posts/1');
     assert.equal(this.element.querySelector('.title').textContent.trim(), 'hello world');
   });
 
-  test('redirects for default content type', async function(assert) {
-    await visit('/c/pages/second');
-    assert.equal(currentURL(), '/c/second');
-    assert.equal(this.element.querySelector('.blurb').textContent.trim(), 'I am the second page');
+  test('passes query params to primary card in route', async function(assert){
+    await visit('/posts/1?foo=bar&bee=bop');
+    assert.equal(currentURL(), '/posts/1?foo=bar&bee=bop');
+    assert.equal(this.element.querySelector('.foo').textContent.trim(), 'foo is bar');
+    assert.equal(this.element.querySelector('.bee').textContent.trim(), 'bee is bop');
   });
 
-  test('redirects for singular content type', async function(assert) {
-    await visit('/c/post/1');
-    assert.equal(currentURL(), '/c/posts/1');
-  });
-
-  test('redirects for singular default content type', async function(assert) {
-    await visit('/c/page/second');
-    assert.equal(currentURL(), '/c/second');
-  });
-
-
-  test('renders placeholder type when content is missing', async function(assert) {
-    await visit('/c/posts/bogus');
-    assert.equal(currentURL(), '/c/posts/bogus');
+  test('renders error card content is missing', async function(assert) {
+    await visit('/posts/bogus');
+    assert.equal(currentURL(), '/posts/bogus');
     assert.equal(this.element.querySelector('h1').textContent.trim(), 'Not Found');
   });
 
   test('reloads models on route transitions', async function(assert) {
-    await visit('/c/categories/category-1');
+    await visit('/categories/category-1');
     await click('[data-test-post="1"]')
 
-    assert.equal(currentURL(), '/c/posts/1');
+    assert.equal(currentURL(), '/posts/1');
   });
 });

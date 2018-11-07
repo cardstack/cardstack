@@ -7,6 +7,7 @@ const { get } = require('lodash');
 
 module.exports = declareInjections({
   controllingBranch: 'hub:controlling-branch',
+  plugins: 'hub:plugins',
   sources: 'hub:data-sources',
   internalSearcher: `plugin-searchers:${require.resolve('@cardstack/pgsearch/searcher')}`,
   client: `plugin-client:${require.resolve('@cardstack/pgsearch/client')}`,
@@ -52,25 +53,31 @@ class Searchers {
 
     let result = await next();
 
-    return { resource: result && result.data, meta: result && result.meta };
+    return {
+      resource: result && result.data,
+      meta: result && result.meta,
+      included: result && result.included
+    };
   }
 
   async get(session, branch, type, id, includePaths) {
     if (arguments.length < 4) {
       throw new Error(`session is now a required argument to searchers.get`);
     }
-    let { resource, meta } = await this._getResourceAndMeta(session, branch, type, id);
+    let { resource, meta, included } = await this._getResourceAndMeta(session, branch, type, id);
     let authorizedResult;
     let documentContext;
     if (resource) {
       let schema = await this.currentSchema.forBranch(branch);
+      let plugins = await this.plugins.active();
       documentContext = new DocumentContext({
         id,
         type,
         branch,
         schema,
+        plugins,
         includePaths,
-        upstreamDoc: { data: resource, meta },
+        upstreamDoc: { data: resource, meta, included },
         read: this._read(branch)
       });
       let pristineResult = await documentContext.pristineDoc();

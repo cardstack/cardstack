@@ -4,6 +4,7 @@ const {
   createDefaultEnvironment,
   destroyDefaultEnvironment
 } = require('../../../tests/stub-searcher/node_modules/@cardstack/test-support/env');
+const { get } = require('lodash');
 
 let env, baseSchema, searchers, writers;
 
@@ -42,7 +43,9 @@ async function withGrants(fn) {
   for (let model of factory.getModels()) {
     if (model.type === 'grants') {
       let resource = factory.getResource('grants', model.id);
-      resource.withRelated('who', [{ type: 'test-users', id: 'session-with-grants' }]);
+      if (!get(resource, 'data.relationships.who')) {
+        resource.withRelated('who', [{ type: 'test-users', id: 'session-with-grants' }]);
+      }
     }
   }
 
@@ -220,6 +223,22 @@ describe('schema/auth/read', function() {
         });
     });
     let approved = await schema.applyReadAuthorization(model, { session });
+    expect(approved).has.deep.property('data.id', '1');
+  });
+
+  it("returns resource when anonymous has a grant with matching type for 'everyone' group", async function() {
+    let model = await find('posts', '1');
+    let { schema } = await withGrants(factory => {
+      factory.addResource('grants')
+        .withRelated('types', [
+          { type: 'content-types', id: 'posts' },
+        ])
+        .withRelated('who', [{ type: 'groups', id: 'everyone' }])
+        .withAttributes({
+          mayReadResource: true
+        });
+    });
+    let approved = await schema.applyReadAuthorization(model);
     expect(approved).has.deep.property('data.id', '1');
   });
 

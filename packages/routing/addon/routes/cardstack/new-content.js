@@ -31,5 +31,11 @@ export default Route.extend({
       initialProperties.id = routingId;
     }
     return this.store.createRecord(modelType, initialProperties);
+  },
+
+  setupController(controller, model) {
+    this._super(controller, model);
+
+    controller.set('isNewContent', true);
   }
 });

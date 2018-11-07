@@ -6,9 +6,6 @@ function initialModels() {
   let initial = new JSONAPIFactory();
 
   initial.addResource('content-types', 'pages')
-  .withAttributes({
-    'routing-field': 'permalink'
-  })
   .withRelated('fields', [
       initial.addResource('fields', 'blurb').withAttributes({
         fieldType: '@cardstack/core-types::string'

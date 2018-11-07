@@ -12,6 +12,20 @@ module.exports = class Model {
     return priv.get(this).contentType;
   }
 
+  getId() {
+    let { jsonapiDoc } = priv.get(this);
+    if (jsonapiDoc) {
+      return jsonapiDoc.id;
+    }
+  }
+
+  getMeta() {
+    let { jsonapiDoc } = priv.get(this);
+    if (jsonapiDoc) {
+      return jsonapiDoc.meta;
+    }
+  }
+
   async getField(fieldName) {
     let { contentType, jsonapiDoc } = priv.get(this);
     let field = contentType.realAndComputedFields.get(fieldName);

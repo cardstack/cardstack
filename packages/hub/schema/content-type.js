@@ -77,6 +77,8 @@ module.exports = class ContentType {
       this.includesTree = Object.create(null);
     }
 
+    this.routerName = model.attributes && model.attributes.router;
+
     if (model.attributes && model.attributes['fieldsets']) {
       let fieldsets = model.attributes['fieldsets'];
       for (let format of Object.keys(fieldsets)) {

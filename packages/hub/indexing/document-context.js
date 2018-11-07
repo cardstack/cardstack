@@ -1,17 +1,19 @@
 const authLog = require('@cardstack/logger')('cardstack/auth');
 const log = require('@cardstack/logger')('cardstack/indexing/document-context');
 const Model = require('../model');
+const { getPath } = require('@cardstack/routing/cardstack/router-utils');
 const { get, uniqBy } = require('lodash');
 
 module.exports = class DocumentContext {
 
-  constructor({ read, schema, type, id, branch, sourceId, generation, upstreamDoc, includePaths }) {
+  constructor({ read, plugins, schema, type, id, branch, sourceId, generation, upstreamDoc, includePaths }) {
     if (upstreamDoc && !upstreamDoc.data) {
       throw new Error('The upstreamDoc must have a top-level "data" property', {
         status: 400
       });
     }
     this.schema = schema;
+    this.plugins = plugins;
     this.type = type;
     this.id = id;
     this.branch = branch;
@@ -23,6 +25,8 @@ module.exports = class DocumentContext {
     this._realms = [];
     this._pendingReads = [];
     this._followedRelationships = {};
+    this._routingCardId = get(upstreamDoc, 'meta.routing-card.data.id');
+    this._routingCardType = get(upstreamDoc, 'meta.routing-card.data.type');
     this.cache = {};
     this.isCollection = upstreamDoc && upstreamDoc.data && Array.isArray(upstreamDoc.data);
     this.suppliedIncluded = upstreamDoc && upstreamDoc.included;
@@ -71,15 +75,18 @@ module.exports = class DocumentContext {
     return this._references;
   }
 
-  async read(type, id) {
+  async read(type, id, notAReference) {
     log.debug(`Reading record ${type}/${id}`);
 
-    this._references.push(`${type}/${id}`);
+    if (!notAReference) {
+      this._references.push(`${type}/${id}`);
+    }
 
     let key = `${type}/${id}`;
     if (get(this, 'upstreamDoc.data.id') === id && get(this, 'upstreamDoc.data.type') === type) {
       return this.upstreamDoc.data;
     }
+
     let includedResource = this.suppliedIncluded ? this.suppliedIncluded.find(i => key === `${i.type}/${i.id}`) : null;
     if (includedResource) {
       return includedResource;
@@ -196,6 +203,21 @@ module.exports = class DocumentContext {
     return searchTree;
   }
 
+  async _addSelfLink(jsonapiDoc) {
+    if (this._routingCardId && this._routingCardType && this.plugins) {
+      let routingCard = await this.read(this._routingCardType, this._routingCardId, true);
+      let path = await getPath(this.plugins,
+                               this.schema,
+                               { data: routingCard },
+                               { data: jsonapiDoc },
+                               get(this.upstreamDoc, 'meta.using-default-router'));
+      if (path) {
+        jsonapiDoc.links = jsonapiDoc.links || {};
+        jsonapiDoc.links.self = path;
+      }
+    }
+  }
+
   async _build(type, id, jsonapiDoc, searchTree, depth, fieldsetFormat) {
     let isCollection = this.isCollection && depth === 0;
     // we store the id as a regular field in elasticsearch here, because
@@ -284,6 +306,8 @@ module.exports = class DocumentContext {
         .slice(1)
         .filter(r => !(r.type == type && r.id == id));
     }
+
+    await this._addSelfLink(jsonapiDoc);
 
     if (depth > 0) {
       this.pristineIncludes.push(jsonapiDoc);

@@ -1,42 +1,40 @@
-import { getOwner } from '@ember/application';
-import { inject as service } from '@ember/service';
+import qs from 'qs';
 import Route from '@ember/routing/route';
-import { pluralize } from 'ember-inflector';
+import { inject as service } from '@ember/service';
 
 export default Route.extend({
-
-  service: service('cardstack-routing'),
   store: service('store'),
+  service: service('cardstack-routing'),
 
-  _commonModelHook(type, slug) {
+  _commonModelHook(path, transition) {
     let { branch } = this.modelFor('cardstack');
-    let mType = this.get('service').modelType(type, branch);
-    let { name, params, queryParams } = this.get('service').routeFor(type, slug, branch);
-    let paramMap = Object.create(null);
-    params.forEach(([k,v]) => paramMap[k] = v);
+    let queryParams = '';
 
-    if (this.routeName !== name ||
-        (paramMap.type && paramMap.type !== type)) {
-      this.replaceWith(name, ...params.map(p => p[1]), { queryParams });
+    if (Object.keys(transition.queryParams).length) {
+      queryParams = `?${qs.stringify(transition.queryParams)}`;
     }
 
-    let modelClass = getOwner(this).resolveRegistration(`model:${mType}`);
-    if (!modelClass) {
-      throw new Error(`@cardstack/routing tried to use model ${mType} but it does not exist`);
-    }
-
-    return this.get('store').findRecord('space', `${pluralize(mType)}/${slug}`, { branch, reload: true })
-      .then(space => space.get('primaryCard'))
+    return this.get('store').findRecord('space', `${path.charAt(0) !== '/' ? '/' : ''}${path}${queryParams}`, { branch, reload: true })
       .catch(err => {
         if (!is404(err)) {
           throw err;
         }
         return {
           isCardstackPlaceholder: true,
-          type: mType,
-          slug
+          path
         };
       });
+  },
+
+  setupController(controller, model) {
+    this._super(controller, model);
+    if (!model) { return; }
+
+    let queryParamsString = model.get('queryParams');
+    if (!queryParamsString) { return; }
+
+    let params = qs.parse(queryParamsString.replace('?', ''));
+    controller.set('params', params);
   }
 });
 

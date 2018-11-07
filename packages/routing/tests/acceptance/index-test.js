@@ -5,9 +5,9 @@ import { visit, currentURL } from '@ember/test-helpers';
 module('Acceptance | index', function(hooks) {
   setupApplicationTest(hooks);
 
-  test('renders own page content', async function(assert) {
-    await visit('/c');
-    assert.equal(currentURL(), '/c');
-    assert.equal(this.element.querySelector('.blurb').textContent.trim(), 'this is the homepage');
+  test('renders default application card', async function(assert) {
+    await visit('/');
+    assert.equal(currentURL(), '/');
+    assert.equal(this.element.querySelector('h2').textContent.trim(), 'Welcome to Cardstack!');
   });
 });

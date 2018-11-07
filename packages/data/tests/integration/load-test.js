@@ -65,27 +65,32 @@ module('Integration | @cardstack/data service load()', function (hooks) {
 
       assert.deepEqual(homepage.toJSON(), {
         title: 'Homepage',
+        selfLink: undefined,
         articles: ['bones', 'why', 'swim']
       });
       assert.deepEqual(articles, [{
         title: 'Top 10 Bones',
         body: 'I really like to chew bones, there are many good bones, but these bones are the best...',
         author: 'vanGogh',
+        selfLink: undefined,
         relatedArticle: 'walk'
       }, {
         title: 'Why Doors?',
         body: "Do you understand doors? If you're like me doors are probably super confusing, let's get to the bottom of this mystery.",
         author: 'vanGogh',
+        selfLink: undefined,
         relatedArticle: null
       }, {
         title: 'I Like to Swim',
         body: "Swimming is my favorite, and then I love my wet dog smell.",
+        selfLink: undefined,
         dog: "ringo"
       }]);
 
       assert.deepEqual(author.toJSON(), {
         name: 'Van Gogh',
         bio: 'A cute puppy that loves to play with his squeaky snake',
+        selfLink: undefined,
         location: 'nyc'
       });
     });
@@ -126,21 +131,25 @@ module('Integration | @cardstack/data service load()', function (hooks) {
 
       assert.deepEqual(homepage.toJSON(), {
         title: 'Homepage',
+        selfLink: undefined,
         articles: ['bones', 'why', 'swim']
       });
       assert.deepEqual(articles, [{
         title: 'Top 10 Bones',
         body: 'I really like to chew bones, there are many good bones, but these bones are the best...',
         author: 'vanGogh',
+        selfLink: undefined,
         relatedArticle: 'walk'
       }, {
         title: 'Why Doors?',
         body: "Do you understand doors? If you're like me doors are probably super confusing, let's get to the bottom of this mystery.",
         author: 'vanGogh',
+        selfLink: undefined,
         relatedArticle: null
       }, {
         title: 'I Like to Swim',
         body: "Swimming is my favorite, and then I love my wet dog smell.",
+        selfLink: undefined,
         dog: "ringo"
       }]);
     });
@@ -201,21 +210,25 @@ module('Integration | @cardstack/data service load()', function (hooks) {
 
       assert.deepEqual(homepage.toJSON(), {
         title: 'Homepage',
+        selfLink: undefined,
         articles: ['bones', 'why', 'swim']
       });
       assert.deepEqual(articles, [{
         title: 'Top 10 Bones',
         body: 'I really like to chew bones, there are many good bones, but these bones are the best...',
         author: 'vanGogh',
+        selfLink: undefined,
         relatedArticle: 'walk'
       }, {
         title: 'Why Doors?',
         body: "Do you understand doors? If you're like me doors are probably super confusing, let's get to the bottom of this mystery.",
         author: 'vanGogh',
+        selfLink: undefined,
         relatedArticle: null
       }, {
         title: 'I Like to Swim',
         body: "Swimming is my favorite, and then I love my wet dog smell.",
+        selfLink: undefined,
         dog: "ringo"
       }]);
     });
