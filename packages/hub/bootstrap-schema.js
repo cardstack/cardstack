@@ -117,6 +117,22 @@ const models = [
   },
   {
     type: 'content-types',
+    id: 'permissions',
+    attributes: {
+      'is-built-in': true
+    },
+    relationships: {
+      fields: {
+        data: [
+          { type: 'fields', id: 'may-update-resource' },
+          { type: 'fields', id: 'may-delete-resource' },
+          { type: 'fields', id: 'may-write-fields' },
+        ]
+      }
+    }
+  },
+  {
+    type: 'content-types',
     id: 'plugins',
     attributes: {
       'is-built-in': true,
