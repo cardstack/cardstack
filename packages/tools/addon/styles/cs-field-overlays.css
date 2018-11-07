@@ -22,7 +22,8 @@
   background-color: transparent;
 }
 
-.cs-field-overlay.passthrough {
+.cs-field-overlay.passthrough,
+.cs-field-overlay.passthrough > .overlay-border {
   pointer-events: none;
 }
 
