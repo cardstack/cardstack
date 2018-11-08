@@ -87,7 +87,9 @@ class Change {
     if(this.fetchOpts) {
       commitId = this._pushCommit(newCommit);
     } else {
-      commitId = await this._mergeCommit(newCommit, commitOpts);
+      let mergeCommit = await this._makeMergeCommit(newCommit, commitOpts);      
+      await this._applyCommit(mergeCommit);
+      commitId = mergeCommit.id().tostrS();
     }
 
     return commitId;
@@ -131,14 +133,15 @@ class Change {
     }
   }
 
-  async _mergeCommit(newCommit, commitOpts) {
+  async _makeMergeCommit(newCommit, commitOpts) {
     if (!this.headCommit) {
-      return this._newBranch(newCommit);
+      // new branch, so no merge needed
+      return newCommit;
     }
     let baseOid = await Merge.base(this.repo, newCommit, this.headCommit);
     if (baseOid.equal(this.headCommit.id())) {
-      await this.headRef.setTarget(newCommit.id(), 'fast forward');
-      return newCommit.id().tostrS();
+      // fast forward (we think), so no merge needed
+      return newCommit;
     }
     let index = await Merge.commits(this.repo, newCommit, this.headCommit, null);
     if (index.hasConflicts()) {
@@ -148,14 +151,18 @@ class Change {
     let tree = await Tree.lookup(this.repo, treeOid, null);
     let { author, committer } = signature(commitOpts);
     let mergeCommitOid = await Commit.create(this.repo, null, author, committer, 'UTF-8', `Clean merge into ${this.targetBranch}`, tree, 2, [newCommit, this.headCommit]);
-    let mergeCommit = await Commit.lookup(this.repo, mergeCommitOid);
-    await this.headRef.setTarget(mergeCommit.id(), 'fast forward');
-    return mergeCommit.id().tostrS();
+    return await Commit.lookup(this.repo, mergeCommitOid);
+  }
+
+  async _applyCommit(commit) {
+    if (!this.headCommit) {
+      return await this._newBranch(commit);
+    }
+    await this.headRef.setTarget(commit.id(), 'fast forward');
   }
 
   async _newBranch(newCommit) {
     await Branch.create(this.repo, this.targetBranch, newCommit, false);
-    return newCommit.id().tostrS();
   }
 }
 
