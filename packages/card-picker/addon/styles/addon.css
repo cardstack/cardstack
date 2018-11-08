@@ -31,5 +31,5 @@
    increase the z-indices of the sidebars so they stay on top of the
    scrims provided by ember-overlays. */
 .cst-bottom {
-    z-index: 15;
+    z-index: 150;
 }
