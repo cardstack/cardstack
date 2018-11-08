@@ -2166,19 +2166,6 @@ broccoli-kitchen-sink-helpers@^0.3.1:
     glob "^5.0.10"
     mkdirp "^0.5.1"
 
-broccoli-lint-eslint@^4.2.1:
-  version "4.2.1"
-  resolved "https://registry.yarnpkg.com/broccoli-lint-eslint/-/broccoli-lint-eslint-4.2.1.tgz#f780dc083a7357a9746a9cfa8f76feb092777477"
-  integrity sha512-Jvm06UvuMPa5gEH+9/Sb+QpoIodDAYzbyIUEqxniPCdA6JJooa91hQDCTJc32RUV46JNMcLhb3Dl55BdA8v5mw==
-  dependencies:
-    aot-test-generators "^0.1.0"
-    broccoli-concat "^3.2.2"
-    broccoli-persistent-filter "^1.4.3"
-    eslint "^4.0.0"
-    json-stable-stringify "^1.0.1"
-    lodash.defaultsdeep "^4.6.0"
-    md5-hex "^2.0.0"
-
 broccoli-merge-trees@2.0.0, broccoli-merge-trees@^2.0.0:
   version "2.0.0"
   resolved "https://registry.yarnpkg.com/broccoli-merge-trees/-/broccoli-merge-trees-2.0.0.tgz#10aea46dd5cebcc8b8f7d5a54f0a84a4f0bb90b9"
@@ -4261,13 +4248,6 @@ doctrine@^2.0.0:
     esutils "^2.0.2"
     isarray "^1.0.0"
 
-doctrine@^2.0.2:
-  version "2.0.2"
-  resolved "https://registry.yarnpkg.com/doctrine/-/doctrine-2.0.2.tgz#68f96ce8efc56cc42651f1faadb4f175273b0075"
-  integrity sha512-y0tm5Pq6ywp3qSTZ1vPgVdAnbDEoeoc5wlOHXoY1c4Wug/a7JvqHIl7BTvwodaHmejWkK/9dSb3sCYfyo/om8A==
-  dependencies:
-    esutils "^2.0.2"
-
 doctrine@^2.1.0:
   version "2.1.0"
   resolved "https://registry.yarnpkg.com/doctrine/-/doctrine-2.1.0.tgz#5cd01fc101621b42c4cd7f5d1a66243716d3f39d"
@@ -4560,26 +4540,6 @@ ember-cli-dependency-checker@^3.0.0:
     is-git-url "^1.0.0"
     resolve "^1.5.0"
     semver "^5.3.0"
-
-ember-cli-eslint@^4.2.1:
-  version "4.2.2"
-  resolved "https://registry.yarnpkg.com/ember-cli-eslint/-/ember-cli-eslint-4.2.2.tgz#4445b3365954e7a90d93d366761e088b0486ae79"
-  integrity sha512-kVL2Hs7oItg2GHfWhN/AfLzx+DToXWrRzdSth10oONTlKgRCYu/5QPR3x6XuQuSlOSYBqLGOud/1tmD2u0nEmQ==
-  dependencies:
-    broccoli-lint-eslint "^4.2.1"
-    ember-cli-version-checker "^2.1.0"
-    rsvp "^4.6.1"
-    walk-sync "^0.3.0"
-
-ember-cli-eslint@^4.2.3:
-  version "4.2.3"
-  resolved "https://registry.yarnpkg.com/ember-cli-eslint/-/ember-cli-eslint-4.2.3.tgz#2844d3f5e8184f19b2d7132ba99eb0b370b55598"
-  integrity sha512-1fqRz9QVLTT790Zr07aDFmAprZ1vVsaBGJOGQgDEFmBpogq8BeaQopaxogWFp748hol8nGC4QP5tbzhVD6KQHw==
-  dependencies:
-    broccoli-lint-eslint "^4.2.1"
-    ember-cli-version-checker "^2.1.0"
-    rsvp "^4.6.1"
-    walk-sync "^0.3.0"
 
 ember-cli-get-component-path-option@^1.0.0:
   version "1.0.0"
@@ -6399,49 +6359,6 @@ eslint@^3.0.0:
     text-table "~0.2.0"
     user-home "^2.0.0"
 
-eslint@^4.0.0:
-  version "4.12.0"
-  resolved "https://registry.yarnpkg.com/eslint/-/eslint-4.12.0.tgz#a7ce78eba8cc8f2443acfbbc870cc31a65135884"
-  integrity sha512-Ohv4NU0FffkEe4so8DBrdfRUbGUtM4XnBTDll2pY7OdW3VkjBOZPerx3Bmuhg6S6D6r8+cli0EezN0xawUfYwg==
-  dependencies:
-    ajv "^5.3.0"
-    babel-code-frame "^6.22.0"
-    chalk "^2.1.0"
-    concat-stream "^1.6.0"
-    cross-spawn "^5.1.0"
-    debug "^3.0.1"
-    doctrine "^2.0.2"
-    eslint-scope "^3.7.1"
-    espree "^3.5.2"
-    esquery "^1.0.0"
-    estraverse "^4.2.0"
-    esutils "^2.0.2"
-    file-entry-cache "^2.0.0"
-    functional-red-black-tree "^1.0.1"
-    glob "^7.1.2"
-    globals "^11.0.1"
-    ignore "^3.3.3"
-    imurmurhash "^0.1.4"
-    inquirer "^3.0.6"
-    is-resolvable "^1.0.0"
-    js-yaml "^3.9.1"
-    json-stable-stringify-without-jsonify "^1.0.1"
-    levn "^0.3.0"
-    lodash "^4.17.4"
-    minimatch "^3.0.2"
-    mkdirp "^0.5.1"
-    natural-compare "^1.4.0"
-    optionator "^0.8.2"
-    path-is-inside "^1.0.2"
-    pluralize "^7.0.0"
-    progress "^2.0.0"
-    require-uncached "^1.0.3"
-    semver "^5.3.0"
-    strip-ansi "^4.0.0"
-    strip-json-comments "~2.0.1"
-    table "^4.0.1"
-    text-table "~0.2.0"
-
 eslint@^4.9.0:
   version "4.19.1"
   resolved "http://registry.npmjs.org/eslint/-/eslint-4.19.1.tgz#32d1d653e1d90408854bfb296f076ec7e186a300"
@@ -6486,7 +6403,7 @@ eslint@^4.9.0:
     table "4.0.2"
     text-table "~0.2.0"
 
-espree@^3.4.0, espree@^3.5.1, espree@^3.5.2:
+espree@^3.4.0, espree@^3.5.1:
   version "3.5.2"
   resolved "https://registry.yarnpkg.com/espree/-/espree-3.5.2.tgz#756ada8b979e9dcfcdb30aad8d1a9304a905e1ca"
   integrity sha512-sadKeYwaR/aJ3stC2CdvgXu1T16TdYN+qwCpcWbMnGJ8s0zNWemzrvb2GbD4OhmJ/fwpJjudThAlLobGbWZbCQ==
@@ -12939,7 +12856,7 @@ rsvp@^3.0.14, rsvp@^3.0.16, rsvp@^3.0.17, rsvp@^3.0.18, rsvp@^3.0.21, rsvp@^3.0.
   resolved "https://registry.yarnpkg.com/rsvp/-/rsvp-3.6.2.tgz#2e96491599a96cde1b515d5674a8f7a91452926a"
   integrity sha512-OfWGQTb9vnwRjwtA2QwpG2ICclHC3pgXZO5xt8H2EfgDquO0qVdSb5T88L4qJVAEugbS56pAuV4XZM58UX8ulw==
 
-rsvp@^4.6.1, rsvp@^4.7.0:
+rsvp@^4.7.0:
   version "4.7.0"
   resolved "https://registry.yarnpkg.com/rsvp/-/rsvp-4.7.0.tgz#dc1b0b1a536f7dec9d2be45e0a12ad4197c9fd96"
   integrity sha1-3BsLGlNvfeydK+ReChKtQZfJ/ZY=
