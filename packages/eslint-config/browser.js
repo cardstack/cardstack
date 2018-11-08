@@ -4,17 +4,24 @@ module.exports = {
     ecmaVersion: 2017,
     sourceType: 'module'
   },
-  plugins: ['ember'],
+  plugins: ['ember', 'prettier'],
   extends: [
     'eslint:recommended',
-    'plugin:ember/recommended'
+    'plugin:ember/recommended',
+    'prettier',
   ],
   env: {
     browser: true,
     es6: true
   },
   rules: {
-    'no-restricted-globals': [2, 'find']
+    'no-restricted-globals': [2, 'find'],
+    'prettier/prettier': ['error', {
+      printWidth: 120,
+      singleQuote: true,
+      tabWidth: 2,
+      trailingComma: "all",
+    }],
   },
   overrides: [
     // This loads our node rules
