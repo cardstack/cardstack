@@ -16,6 +16,7 @@ const {
 const moment = require('moment-timezone');
 const crypto = require('crypto');
 const delay = require('delay');
+const log = require('@cardstack/logger')('cardstack/git');
 
 // This is supposed to enable thread-safe locking around all async
 // operations.
@@ -84,7 +85,7 @@ class Change {
     let commitId;
 
     if(this.fetchOpts) {
-      commitId = this._pushCommit(newCommit);
+      commitId = await this._pushCommit(newCommit, commitOpts);
     } else {
       let mergeCommit = await this._makeMergeCommit(newCommit, commitOpts);      
       await this._applyCommit(mergeCommit);
@@ -107,29 +108,29 @@ class Change {
     return Commit.lookup(this.repo, commitOid);
   }
 
-  async _pushCommit(newCommit, delayTime) {
-    if(delayTime > 5000) {
-      throw new Error('Push failed');
+  async _pushCommit(newCommit, commitOpts) {
+    let delayTime = 500;
+    while (delayTime <= 5000) {
+      let mergeCommit = await this._makeMergeCommit(newCommit, commitOpts);
+      const remoteBranchName = `temp-remote-${crypto.randomBytes(20).toString('hex')}`;
+      await Branch.create(this.repo, remoteBranchName, mergeCommit, false);
+
+      let remote = await this.repo.getRemote('origin');
+
+      try {
+        await remote.push([`refs/heads/${remoteBranchName}:refs/heads/${this.targetBranch}`], this.fetchOpts);
+        return newCommit.id().tostrS();
+      } catch (err) {
+        // pull remote and retry with longer delay
+        await delay(delayTime);
+        await this.repo.fetchAll(this.fetchOpts);
+
+        log.warn('Push to remote failed "%s"', err);
+
+        delayTime *= 2;
+      }
     }
-
-    const remoteBranchName = `temp-remote-${crypto.randomBytes(20).toString('hex')}`;
-    await Branch.create(this.repo, remoteBranchName, newCommit, false);
-
-    let remote = await this.repo.getRemote('origin');
-
-    try {
-      await remote.push([`refs/heads/${remoteBranchName}:refs/heads/${this.targetBranch}`], this.fetchOpts);
-      return newCommit.id().tostrS();
-    } catch (e) {
-      // pull remote and retry with longer delay
-      let timeToDelay = delayTime || 500;
-      await delay(timeToDelay);
-
-      this.repo.fetchAll(this.fetchOpts);
-      this.repo.mergeBranches(this.targetBranch, `origin/${this.targetBranch}`, null, Merge.PREFERENCE.FASTFORWARD_ONLY);
-
-      return this._pushCommit(newCommit, delayTime * 2);
-    }
+    throw new Error('Push failed');
   }
 
   async _makeMergeCommit(newCommit, commitOpts) {

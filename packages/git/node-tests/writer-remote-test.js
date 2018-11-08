@@ -4,7 +4,6 @@ const {
   Remote,
 } = require('nodegit');
 
-const { inRepo, makeRepo } = require('./support');
 const {
   createDefaultEnvironment,
   destroyDefaultEnvironment
@@ -14,6 +13,9 @@ const { join } = require('path');
 const { readFileSync } = require('fs');
 const { promisify } = require('util');
 const temp = require('@cardstack/test-support/temp-helper');
+
+const { inRepo, makeRepo } = require('./support');
+const Change = require('../change');
 
 const mkdir = promisify(temp.mkdir);
 
@@ -36,13 +38,13 @@ async function resetRemote() {
         title: "This is a test event",
         'published-date': "2018-09-25"
       }
-    }),
+    }, null, 2),
     'contents/events/event-2.json': JSON.stringify({
       attributes: {
         title: "This is another test event",
         "published-date": "2018-10-25"
       }
-    })
+    }, null, 2)
   });
 
   let remote = await Remote.create(tempRepo.repo, 'origin', 'ssh://root@localhost:9022/root/data-test');
@@ -51,12 +53,13 @@ async function resetRemote() {
 }
 
 describe('git/writer with remote', function() {
-  let env, writers, repo, tempRepoPath, tempRemoteRepoPath, head;
+  let env, writers, repo, tempRepoPath, tempRemoteRepoPath, head, remoteRepo;
 
   beforeEach(async function() {
     let tempRepo = await resetRemote();
 
     head = tempRepo.head;
+    remoteRepo = tempRepo.repo;
 
     let factory = new JSONAPIFactory();
 
@@ -151,7 +154,105 @@ describe('git/writer with remote', function() {
       });
     });
 
-    // TODO: come up with testing scenarios for conflicts
+    it('successfully merges updates when repo is out of sync', async function() {
+      this.timeout(20000);
+
+      let change = await Change.create(remoteRepo, head, 'master');
+
+      let file = await change.get('contents/events/event-2.json', { allowUpdate: true });
+
+      file.setContent(JSON.stringify({
+        attributes: {
+          title: "This is a test event",
+          'published-date': "2019-09-25"
+        }
+      }));
+
+      await change.finalize({
+        authorName: 'John Milton',
+        authorEmail: 'john@paradiselost.com',
+        message: 'I probably shouldnt update this out of sync'
+      });
+
+      let remote = await remoteRepo.getRemote('origin');
+      await remote.push(["refs/heads/master:refs/heads/master"], fetchOpts);
+
+      let { data:record } = await writers.update('master', env.session, 'events', 'event-1', {
+        data: {
+          id: 'event-1',
+          type: 'events',
+          attributes: {
+            title: 'Updated title',
+          },
+          meta: {
+            version: head
+          }
+        }
+      });
+      expect(record).has.deep.property('attributes.title', 'Updated title');
+      expect(record).has.deep.property('meta.version').not.equal(head);
+
+
+      await repo.fetch('origin', fetchOpts);
+      let updated = await inRepo(tempRemoteRepoPath).getJSONContents('origin/master', `contents/events/event-1.json`);
+
+      expect(updated).to.deep.equal({
+        attributes: {
+          title: 'Updated title',
+          'published-date': '2018-09-25',
+        }
+      });
+    });
+
+    it('successfully merges updates when same file is out of sync', async function() {
+      this.timeout(20000);
+
+      let change = await Change.create(remoteRepo, head, 'master');
+
+      let file = await change.get('contents/events/event-1.json', { allowUpdate: true });
+
+      file.setContent(JSON.stringify({
+        attributes: {
+          title: "This is a test event",
+          'published-date': "2018-09-25"
+        }
+      }, null, 2));
+
+      await change.finalize({
+        authorName: 'John Milton',
+        authorEmail: 'john@paradiselost.com',
+        message: 'I probably shouldnt update this out of sync'
+      });
+
+      let remote = await remoteRepo.getRemote('origin');
+      await remote.push(["refs/heads/master:refs/heads/master"], fetchOpts);
+
+      let { data:record } = await writers.update('master', env.session, 'events', 'event-1', {
+        data: {
+          id: 'event-1',
+          type: 'events',
+          attributes: {
+            title: 'Updated title'
+          },
+          meta: {
+            version: head
+          }
+        }
+      });
+      expect(record).has.deep.property('attributes.title', 'Updated title');
+      expect(record).has.deep.property('meta.version').not.equal(head);
+
+
+      await repo.fetch('origin', fetchOpts);
+      let updated = await inRepo(tempRemoteRepoPath).getJSONContents('origin/master', `contents/events/event-1.json`);
+
+      expect(updated).to.deep.equal({
+        attributes: {
+          title: 'Updated title',
+          'published-date': '2018-09-25',
+        }
+      });
+    });
   });
 
   describe('delete', function() {
