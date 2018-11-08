@@ -271,6 +271,7 @@ class Handler {
 
   async handleCollectionPOST(type) {
     let data = this._mandatoryBodyData();
+    data = this._processCardstackQueries(data);
     let record = await this.writers.create(this.branch, this.session, type, data);
     this.ctxt.body = record;
     this.ctxt.status = 201;
@@ -307,6 +308,28 @@ class Handler {
       });
     }
     return { data };
+  }
+
+  _processCardstackQueries(data) {
+    // log.info('data: %j', data);
+    let relationships = data && data.data && data.data.relationships || '';
+    if (relationships) {
+      let queryFields = Object.keys(relationships).filter(field => {
+        return relationships[field].data && relationships[field].data[0] && relationships[field].data[0].type === 'cardstack-queries';
+      });
+
+      // log.info('queryFields: %s', queryFields);
+
+      queryFields.forEach(field => {
+        relationships[field].links = {
+          related: relationships[field].data[0].id
+        };
+        relationships[field].data = [];
+      });
+    }
+
+    // log.info('data: %j', data);
+    return data;
   }
 
   _urlWithUpdatedParams(params) {

@@ -10,7 +10,7 @@ const log = require('@cardstack/logger')('jsonapi-test');
 const defaults = require('superagent-defaults');
 
 describe('jsonapi/middleware', function() {
-
+  this.timeout(5000);
   let request, env, app;
 
   async function sharedSetup() {
@@ -35,6 +35,9 @@ describe('jsonapi/middleware', function() {
           factory.addResource('fields', 'url').withAttributes({ fieldType: '@cardstack/core-types::string' })
         ])
       ]),
+      factory.addResource('fields', 'related-articles').withAttributes({
+        fieldType: '@cardstack/core-types::has-many'
+      })
     ]);
 
     factory.addResource('constraints')
@@ -68,7 +71,7 @@ describe('jsonapi/middleware', function() {
         body: "This is the first article"
       });
 
-    factory.addResource('articles', 1)
+    let article1 = factory.addResource('articles', 1)
       .withAttributes({
         title: "Second",
         body: "This is the second article"
@@ -99,17 +102,17 @@ describe('jsonapi/middleware', function() {
             })
           ]
         )
-        ).withRelated(
-          'article-links',
-          [
-            factory.addResource('article-links', 'link-1').withAttributes({
-              url: 'http://cardstack.com/cards/articles/1'
-            }),
-            factory.addResource('article-links', 'link-2').withAttributes({
-              url: 'http://cardstack.com/cards/articles/3'
-            })
-          ]
-        );
+      ).withRelated(
+        'article-links',
+        [
+          factory.addResource('article-links', 'link-1').withAttributes({
+            url: 'http://cardstack.com/cards/articles/1'
+          }),
+          factory.addResource('article-links', 'link-2').withAttributes({
+            url: 'http://cardstack.com/cards/articles/3'
+          })
+        ]
+      );
 
     factory.addResource('articles', 3)
       .withAttributes({
@@ -118,6 +121,9 @@ describe('jsonapi/middleware', function() {
       }).withRelated(
         'author',
         factory.getResource('authors', 'q')
+      ).withRelated(
+        'related-articles',
+        [article1]
       );
 
     factory.addResource('authors').withAttributes({
@@ -639,6 +645,14 @@ describe('jsonapi/middleware', function() {
           attributes: {
             title: 'I am new',
             body: 'xxx'
+          },
+          relationships: {
+            'related-articles': {
+              data: [{
+                type: 'cardstack-queries',
+                id: '/api?filter[type]=articles&q=Bagby&page[size]=3&sort=-updated'
+              }]
+            }
           }
         }
       });
@@ -647,6 +661,7 @@ describe('jsonapi/middleware', function() {
       expect(response.headers).has.property('location');
       expect(response.body).has.deep.property('data.id');
       expect(response.body).has.deep.property('data.attributes.title', 'I am new');
+      expect(response.body).has.deep.property('data.relationships.related-articles.links.related', '/api?filter[type]=articles&q=Bagby&page[size]=3&sort=-updated');
       expect(response.body).has.deep.property('data.meta.version');
 
       response = await request.get(makeRelativeLink(response, response.headers.location));

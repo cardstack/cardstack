@@ -35,6 +35,22 @@ module.exports = class Model {
     }
   }
 
+  async getLinks(fieldName) {
+    let { contentType, jsonapiDoc } = priv.get(this);
+    let field = contentType.realAndComputedFields.get(fieldName);
+    if (!field) {
+      throw new Error(`tried to access nonexistent field ${fieldName}`);
+    }
+    if (field.isRelationship) {
+      if (jsonapiDoc.relationships) {
+        let relObj = jsonapiDoc.relationships[field.id];
+        if (relObj) {
+          return relObj.links;
+        }
+      }
+    }
+  }
+
   async getRelated(fieldName) {
     let refs = await this.getField(fieldName);
     if (Array.isArray(refs)) {

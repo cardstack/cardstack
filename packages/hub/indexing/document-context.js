@@ -151,7 +151,10 @@ module.exports = class DocumentContext {
       }
       if (contentType.computedFields.has(field.id) ||
           (jsonapiDoc.relationships && jsonapiDoc.relationships.hasOwnProperty(field.id))) {
-        let value = { data: await userModel.getField(field.id) };
+        let value = {
+          data: await userModel.getField(field.id),
+          links: await userModel.getLinks(field.id)
+        };
         let fieldset = fieldsets && fieldsets.find(f => f.field === field.id);
         await this._buildRelationship(field, value, pristineDocOut, searchDocOut, searchTree, depth, get(fieldset, 'format'));
       }
@@ -162,6 +165,7 @@ module.exports = class DocumentContext {
     if (!value || !value.hasOwnProperty('data')) {
       return;
     }
+    // log.info('\nfield.id: %s\nvalue: %j\npristineDocOut: %j\nsearchDocOut: %j\nsearchTree: %j\ndepth: %j\nformat: %s\n', field.id, value, pristineDocOut, searchDocOut, searchTree, depth, format);
     let related;
     if (value.data && searchTree[field.id]) {
       if (Array.isArray(value.data)) {
