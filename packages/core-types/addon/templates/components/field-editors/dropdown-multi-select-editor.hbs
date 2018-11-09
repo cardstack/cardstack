@@ -3,7 +3,7 @@
     {{#power-select-multiple disabled=disabled
                              selected=(get content field)
                              options=options
-                             onchange=(action (mut (get content field)))
+                             onchange=(action "makeSelection")
                              as |option|}}
       {{get option displayFieldName}}
     {{/power-select-multiple}}
