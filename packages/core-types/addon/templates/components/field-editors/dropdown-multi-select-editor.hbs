@@ -1,0 +1,13 @@
+<div class="{{concat (dasherize field) '-selector'}}">
+  {{#unless missingContentType}}
+    {{#power-select-multiple disabled=disabled
+                             selected=(get content field)
+                             options=options
+                             onchange=(action (mut (get content field)))
+                             as |option|}}
+      {{get option displayFieldName}}
+    {{/power-select-multiple}}
+  {{else}}
+    {{cs-assert "Field" field "has no associated content type"}}
+  {{/unless}}
+</div>
