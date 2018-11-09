@@ -1,7 +1,7 @@
 import { module, test } from 'qunit';
 import { setupApplicationTest } from 'ember-qunit';
 import { visit, currentURL, fillIn, click } from '@ember/test-helpers';
-import { selectChoose } from 'ember-power-select/test-support/helpers';
+import { selectChoose, removeMultipleOption } from 'ember-power-select/test-support/helpers';
 import RSVP from 'rsvp';
 
 function run(fn) {
@@ -45,17 +45,20 @@ module('Acceptance | field editors', async function(hooks) {
     await selectChoose('.vehicle-selector', 'Honeycoupe');
     await selectChoose('.alternate-vehicle-selector', 'Wild Wiggler');
     await selectChoose('.tracks-selector', 'Twisted Mansion');
+    await removeMultipleOption('.tracks-selector', 'Rainbow Road');
+    await removeMultipleOption('.tracks-selector', 'Koopa City');
 
     assert.dom('.feeling-selector .ember-power-select-selected-item').hasText('Sad');
     assert.dom('.vehicle-selector .ember-power-select-selected-item').hasText('Honeycoupe');
     assert.dom('.alternate-vehicle-selector .ember-power-select-selected-item').hasText('Wild Wiggler');
-    assert.dom('.tracks-selector .ember-power-select-multiple-option').exists({ count: 4 });
-    assert.dom('.tracks-selector .ember-power-select-multiple-option:nth-of-type(1)').hasText('× Rainbow Road');
-    assert.dom('.tracks-selector .ember-power-select-multiple-option:nth-of-type(4)').hasText('× Twisted Mansion');
+    assert.dom('.tracks-selector .ember-power-select-multiple-option').exists({ count: 2 });
+    assert.dom('.tracks-selector .ember-power-select-multiple-option:nth-of-type(1)').hasText('× Sweet Sweet Canyon');
+    assert.dom('.tracks-selector .ember-power-select-multiple-option:nth-of-type(2)').hasText('× Twisted Mansion');
 
     feeling = await model.get('feeling.title');
     vehicle = await model.get('vehicle.name');
     alternateVehicle = await model.get('alternateVehicle.name');
+    firstTrack = await model.get('tracks.firstObject.name');
     lastTrack = await model.get('tracks.lastObject.name');
 
     assert.equal(model.get('name'), 'METAL Mario', 'metal mario is more metal');
@@ -65,6 +68,7 @@ module('Acceptance | field editors', async function(hooks) {
     assert.equal(feeling, 'Sad', 'metal mario is sad');
     assert.equal(vehicle, 'Honeycoupe', 'metal mario is driving a honeycoupe');
     assert.equal(alternateVehicle, 'Wild Wiggler', 'metal marios alternate vehicle is a wild wiggler');
+    assert.equal(firstTrack, 'Sweet Sweet Canyon', 'drivers first track is sweet sweet canyon');
     assert.equal(lastTrack, 'Twisted Mansion', 'drivers final track is twisted mansion');
   });
 });
