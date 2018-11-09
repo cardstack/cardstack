@@ -3,7 +3,7 @@
     {{#power-select-multiple disabled=disabled
                              selected=(get content field)
                              options=options
-                             searchField="name"
+                             searchField=displayFieldName
                              onchange=(action "makeSelection")
                              as |option|}}
       {{get option displayFieldName}}
