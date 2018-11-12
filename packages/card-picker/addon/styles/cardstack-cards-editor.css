@@ -9,6 +9,8 @@
 }
 .cards-editor--input-row > span {
   flex-grow: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 .cards-editor--input-row > .text-button {
   display: inline-block;
