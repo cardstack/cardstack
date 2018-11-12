@@ -1,11 +1,14 @@
 .cards-editor--input-row {
   display: flex;
   margin-bottom: 1rem;
-  flex: 1 1 300px;
 }
 .cards-editor--input-row > .drag-handle {
   margin-right: 0.25rem;
   cursor: pointer;
+  flex: 0 0 auto;
+}
+.cards-editor--input-row > span {
+  flex-grow: 1;
 }
 .cards-editor--input-row > .text-button {
   display: inline-block;
@@ -19,6 +22,7 @@
   user-select: none;
   text-decoration: underline;
   color: var(--rising-foreground);
+  flex: 0 0 auto;
 }
 .cards-editor--button-panel > button {
   background-color: var(--tools-highlight);
