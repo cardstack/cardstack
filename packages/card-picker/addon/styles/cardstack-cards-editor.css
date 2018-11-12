@@ -1,11 +1,14 @@
 .cards-editor--input-row {
   display: flex;
+  align-items: flex-start;
   margin-bottom: 1rem;
 }
 .cards-editor--input-row > .drag-handle {
   margin-right: 0.25rem;
+  margin-top: -3px;
   cursor: pointer;
   flex: 0 0 auto;
+  align-self: center;
 }
 .cards-editor--input-row > span {
   flex-grow: 1;
