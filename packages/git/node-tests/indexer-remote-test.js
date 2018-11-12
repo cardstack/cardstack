@@ -10,7 +10,7 @@ const { readFileSync } = require('fs');
 const {
   Cred,
   Remote,
-} = require('@cardstack/nodegit');
+} = require('nodegit');
 
 const service = require('../service');
 

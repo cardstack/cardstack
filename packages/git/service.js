@@ -3,7 +3,7 @@ const mkdirp = promisify(require('mkdirp'));
 const filenamifyUrl = require('filenamify-url');
 const { existsSync } = require('fs');
 const { join } = require('path');
-const { Clone, Cred, Merge } = require('@cardstack/nodegit');
+const { Clone, Cred, Merge } = require('nodegit');
 const temp = require('temp');
 
 class GitLocalCache {
