@@ -31,13 +31,26 @@ module.exports = class Writer {
     this.myEmail = `${os.userInfo().username}@${hostname}`;
     this.idGenerator = idGenerator;
     this.remote = remote;
+
+    if(remote) {
+      this.fetchOpts = {
+        callbacks: {
+          credentials: (url, userName) => {
+            if (remote && remote.privateKey) {
+              return Cred.sshKeyMemoryNew(userName, remote.publicKey || '', remote.privateKey, remote.passphrase || '');
+            }
+            return Cred.sshKeyFromAgent(userName);
+          }
+        }
+      };
+    }
   }
 
   async prepareCreate(branch, session, type, document, isSchema) {
     return withErrorHandling(document.id, type, async () => {
       await this._ensureRepo();
+      let change = await Change.create(this.repo, null, this.branchPrefix + branch, this.fetchOpts);
 
-      let change = await Change.create(this.repo, null, this.branchPrefix + branch);
       let id = document.id;
       let file;
       while (id == null) {
@@ -78,7 +91,8 @@ module.exports = class Writer {
 
     await this._ensureRepo();
     return withErrorHandling(id, type, async () => {
-      let change = await Change.create(this.repo, document.meta.version, this.branchPrefix + branch);
+      let change = await Change.create(this.repo, document.meta.version, this.branchPrefix + branch, this.fetchOpts);
+
       let file = await change.get(this._filenameFor(type, id, isSchema), { allowUpdate: true });
       let before = JSON.parse(await file.getBuffer());
       let after = patch(before, document);
@@ -105,7 +119,8 @@ module.exports = class Writer {
     }
     await this._ensureRepo();
     return withErrorHandling(id, type, async () => {
-      let change = await Change.create(this.repo, version, this.branchPrefix + branch);
+      let change = await Change.create(this.repo, version, this.branchPrefix + branch, this.fetchOpts);
+
       let file = await change.get(this._filenameFor(type, id, isSchema));
       let before = JSON.parse(await file.getBuffer());
       file.delete();
@@ -140,16 +155,7 @@ module.exports = class Writer {
       if (this.remote) {
         let tempRepoPath = await mkdir('cardstack-temp-repo');
         this.repo = await Clone(this.remote.url, tempRepoPath, {
-          fetchOpts: {
-            callbacks: {
-              credentials: (url, userName) => {
-                if (this.remote.privateKey) {
-                  return Cred.sshKeyMemoryNew(userName, this.remote.publicKey || '', this.remote.privateKey, this.remote.passphrase || '');
-                }
-                return Cred.sshKeyFromAgent(userName);
-              }
-            }
-          }
+          fetchOpts: this.fetchOpts,
         });
         return;
       }
@@ -228,7 +234,7 @@ async function finalizer(pendingChange) {
         file.delete();
       }
     }
-    let version = await change.finalize(signature, this.remote);
+    let version = await change.finalize(signature, this.remote, this.fetchOpts);
     return { version, hash: (file ? file.savedId() : null) };
   });
 }
