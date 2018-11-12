@@ -82,18 +82,30 @@ class Change {
 
   async finalize(commitOpts) {
     let newCommit = await this._makeCommit(commitOpts);
-    let commitId;
 
-    if(this.fetchOpts) {
-      commitId = await this._pushCommit(newCommit, commitOpts);
-    } else {
-      let mergeCommit = await this._makeMergeCommit(newCommit, commitOpts);      
-      await this._applyCommit(mergeCommit);
-      commitId = mergeCommit.id().tostrS();
-    }
+    let delayTime = 500;
+    let mergeCommit;
+    while (delayTime <= 5000) {
+      mergeCommit = await this._makeMergeCommit(newCommit, commitOpts);
 
-    return commitId;
+      try {
+        if(this.fetchOpts) {
+          await this._pushCommit(mergeCommit);
+        } else {
+          await this._applyCommit(mergeCommit);
+        }
+      } catch (err) {
+        await delay(delayTime);
+        log.warn('Failed to finalize commit "%s"', err);
+
+        delayTime *= 2;
+      }
+
+    return mergeCommit.id().tostrS();
   }
+
+  throw new Error('Failed to finalise commit and could not recover');
+}
 
   async _makeCommit(commitOpts) {
     let treeOid = await this.root.write(true);
@@ -108,29 +120,19 @@ class Change {
     return Commit.lookup(this.repo, commitOid);
   }
 
-  async _pushCommit(newCommit, commitOpts) {
-    let delayTime = 500;
-    while (delayTime <= 5000) {
-      let mergeCommit = await this._makeMergeCommit(newCommit, commitOpts);
-      const remoteBranchName = `temp-remote-${crypto.randomBytes(20).toString('hex')}`;
-      await Branch.create(this.repo, remoteBranchName, mergeCommit, false);
+  async _pushCommit(mergeCommit) {
+    const remoteBranchName = `temp-remote-${crypto.randomBytes(20).toString('hex')}`;
+    await Branch.create(this.repo, remoteBranchName, mergeCommit, false);
 
-      let remote = await this.repo.getRemote('origin');
+    let remote = await this.repo.getRemote('origin');
 
-      try {
-        await remote.push([`refs/heads/${remoteBranchName}:refs/heads/${this.targetBranch}`], this.fetchOpts);
-        return newCommit.id().tostrS();
-      } catch (err) {
-        // pull remote and retry with longer delay
-        await delay(delayTime);
-        await this.repo.fetchAll(this.fetchOpts);
-
-        log.warn('Push to remote failed "%s"', err);
-
-        delayTime *= 2;
-      }
+    try {
+      await remote.push([`refs/heads/${remoteBranchName}:refs/heads/${this.targetBranch}`], this.fetchOpts);
+    } catch (err) {
+      // pull remote before allowing process to continue
+      await this.repo.fetchAll(this.fetchOpts);
+      throw err;
     }
-    throw new Error('Push failed');
   }
 
   async _makeMergeCommit(newCommit, commitOpts) {
