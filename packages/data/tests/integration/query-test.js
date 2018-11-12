@@ -48,7 +48,7 @@ module('Integration | @cardstack/data service query()', function (hooks) {
 
     test("it can load relationships for a query in a particular format", async function (assert) {
       let dataService = this.owner.lookup('service:cardstackData');
-      let pages = await run(() => dataService.query('page', 'isolated', { filter: { title: 'Homepage' } }));
+      let pages = await run(() => dataService.query('isolated', { filter: { title: 'Homepage' }, type: 'page' }));
 
       let homepage = pages.get('firstObject')
       let articles = homepage.get('articles').toArray().map(i => i.toJSON());
@@ -93,7 +93,7 @@ module('Integration | @cardstack/data service query()', function (hooks) {
 
     test("it can load relationships for a queryCard in a particular format", async function (assert) {
       let dataService = this.owner.lookup('service:cardstackData');
-      let homepage = await run(() => dataService.queryCard('page', 'isolated', { filter: { title: 'Homepage' } }));
+      let homepage = await run(() => dataService.queryCard('isolated', { filter: { title: 'Homepage' }, type: 'page' }));
 
       let articles = homepage.get('articles').toArray().map(i => i.toJSON());
       let author = homepage.get('articles.firstObject.author');
@@ -135,6 +135,16 @@ module('Integration | @cardstack/data service query()', function (hooks) {
       });
     });
 
+    test("it can load cards without a type", async function (assert) {
+      let dataService = this.owner.lookup('service:cardstackData');
+      let pages = await run(() => dataService.query('isolated', { filter: { title: 'Homepage' } }));
+
+      assert.equal(1, pages.length);
+
+      let homepage = pages.get('firstObject');
+
+      assert.ok(homepage);
+    });
   });
 
   module('with defaultIncludes', function (hooks) {
@@ -160,7 +170,7 @@ module('Integration | @cardstack/data service query()', function (hooks) {
 
     test("it loads the defaultIncludes when a format is requested that is not in the fieldset", async function(assert) {
       let dataService = this.owner.lookup('service:cardstackData');
-      let pages = await run(() => dataService.query('page', 'isolated', { filter: { title: 'Homepage' } }));
+      let pages = await run(() => dataService.query('isolated', { filter: { title: 'Homepage' }, type: 'page' }));
 
       let homepage = pages.get('firstObject')
       let articles = homepage.get('articles').toArray().map(i => i.toJSON());
@@ -236,7 +246,7 @@ module('Integration | @cardstack/data service query()', function (hooks) {
     // So ultimately we should also assert that the relationship field does not exist as part of this test.
     test("it does not load a relationship that is not in a request format's fieldset but is defaultIncluded", async function (assert) {
       let dataService = this.owner.lookup('service:cardstackData');
-      let pages = await run(() => dataService.query('page', 'isolated', { filter: { title: 'Homepage' } }));
+      let pages = await run(() => dataService.query('isolated', { filter: { title: 'Homepage' }, type: 'page' }));
 
       let homepage = pages.get('firstObject')
       let articles = homepage.get('articles').toArray().map(i => i.toJSON());
@@ -267,6 +277,16 @@ module('Integration | @cardstack/data service query()', function (hooks) {
       }]);
     });
 
+    test("it can load cards without a type", async function (assert) {
+      let dataService = this.owner.lookup('service:cardstackData');
+      let pages = await run(() => dataService.query('isolated', { filter: { title: 'Homepage' } }));
+
+      assert.equal(1, pages.length);
+
+      let homepage = pages.get('firstObject');
+
+      assert.ok(homepage);
+    });
   });
 
   // Ember runloop.

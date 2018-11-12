@@ -45,9 +45,10 @@ export default Service.extend({
     return record;
   },
 
-  async query(type, format, opts={}) {
+  async query(format, opts={}) {
     let store = this.get('store');
     let branch = opts.branch || defaultBranch;
+    let type = opts.type || 'cardstack-card';
     let _opts = Object.assign({ branch, modelName: type }, opts);
 
     let result = await store.query(type, _opts);
@@ -62,9 +63,9 @@ export default Service.extend({
     return result;
   },
 
-  async queryCard(type, format, opts={}) {
+  async queryCard(format, opts={}) {
     let card;
-    let result = await this.query(type, format, opts);
+    let result = await this.query(format, opts);
     if (result && (card = result.toArray()) && card) {
       return card[0];
     }
