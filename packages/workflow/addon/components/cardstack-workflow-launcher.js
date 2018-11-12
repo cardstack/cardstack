@@ -5,9 +5,8 @@ import layout from '../templates/components/cardstack-workflow-launcher';
 
 export default Component.extend({
   layout,
-  tagName: "",
+  tagName: '',
   classNames: ['cardstack-workflow-launcher'],
   workflow: service('cardstack-workflow'),
   notificationCount: readOnly('workflow.notificationCount'),
-
 });

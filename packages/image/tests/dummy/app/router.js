@@ -4,7 +4,7 @@ import { cardstackRoutes } from '@cardstack/routing';
 
 const Router = EmberRouter.extend({
   location: config.locationType,
-  rootURL: config.rootURL
+  rootURL: config.rootURL,
 });
 
 Router.map(function() {

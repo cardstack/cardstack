@@ -7,5 +7,5 @@ export default Component.extend({
   layout,
   classNames: ['cardstack-toolbox', 'cardstack-tools', 'cardstack-toolbox-width'],
   cardstackRouting: injectOptional.service('cardstack-routing'),
-  tools: service('cardstack-tools')
+  tools: service('cardstack-tools'),
 });

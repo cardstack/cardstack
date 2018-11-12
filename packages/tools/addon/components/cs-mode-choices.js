@@ -16,7 +16,6 @@ export default Component.extend({
   actions: {
     activate(modeId) {
       this.get('tools')[`set${capitalize(this.get('for'))}`](modeId);
-    }
-  }
-
+    },
+  },
 });

@@ -9,12 +9,12 @@ export default Service.extend({
   config: computed(function() {
     return getOwner(this).resolveRegistration('config:environment');
   }),
-  refreshCode(branch=defaultBranch) {
+  refreshCode(branch = defaultBranch) {
     let modulePrefix = this.get('config.modulePrefix');
     return fetch(`${hubURL}/codegen/${branch}/${modulePrefix}`)
       .then(response => response.text())
       .then(source => load(source, modulePrefix, getOwner(this)));
-  }
+  },
 });
 
 function load(source, modulePrefix, owner) {

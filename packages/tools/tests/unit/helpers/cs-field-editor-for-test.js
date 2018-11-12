@@ -1,4 +1,3 @@
-
 import { csFieldEditorFor } from 'dummy/helpers/cs-field-editor-for';
 import { module, test } from 'qunit';
 
@@ -7,16 +6,20 @@ module('Unit | Helper | cs field editor for', function() {
   TestModel.metaForProperty = function(which) {
     if (which === 'theField') {
       return {
-        options: { fieldType: 'test-field-type' }
+        options: { fieldType: 'test-field-type' },
       };
     } else if (which == 'theFieldWithCustomEditor') {
       return {
-        options: { fieldType: 'test-field-type', editorComponent: 'my-custom-editor', inlineEditorComponent: 'my-custom-inline-editor' }
+        options: {
+          fieldType: 'test-field-type',
+          editorComponent: 'my-custom-editor',
+          inlineEditorComponent: 'my-custom-inline-editor',
+        },
       };
     } else {
-      throw new Error("no such field");
+      throw new Error('no such field');
     }
-  }
+  };
 
   test('it maps to a field editor component', function(assert) {
     let result = csFieldEditorFor([new TestModel(), 'theField'], {});
@@ -34,7 +37,7 @@ module('Unit | Helper | cs field editor for', function() {
   });
 
   test('it can do a custom inline editor', function(assert) {
-    let result = csFieldEditorFor([new TestModel(), 'theFieldWithCustomEditor'], {variant: 'inline'});
+    let result = csFieldEditorFor([new TestModel(), 'theFieldWithCustomEditor'], { variant: 'inline' });
     assert.equal(result, 'my-custom-inline-editor');
   });
 

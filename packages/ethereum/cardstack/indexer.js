@@ -9,54 +9,54 @@ const { apply_patch } = require('jsonpatch');
 
 const defaultBranch = 'master';
 
-module.exports = declareInjections({
-  searcher: 'hub:searchers',
-  ethereumClient: `plugin-services:${require.resolve('./client')}`,
-  eventIndexer: `plugin-services:${require.resolve('./event-indexer')}`
-},
+module.exports = declareInjections(
+  {
+    searcher: 'hub:searchers',
+    ethereumClient: `plugin-services:${require.resolve('./client')}`,
+    eventIndexer: `plugin-services:${require.resolve('./event-indexer')}`,
+  },
 
-class Indexer {
+  class Indexer {
+    static create(...args) {
+      let [{ ethereumClient, branches }] = args;
+      ethereumClient.connect(branches);
+      return new this(...args);
+    }
 
-  static create(...args) {
-    let [{ ethereumClient, branches }] = args;
-    ethereumClient.connect(branches);
-    return new this(...args);
-  }
+    constructor({ ethereumClient, dataSource, branches, contract, patch, searcher, eventIndexer }) {
+      this.dataSourceId = dataSource.id;
+      this.contract = contract;
+      this.searcher = searcher;
+      this.eventIndexer = eventIndexer;
+      this.patch = patch || Object.create(null);
+      this._branches = branches;
+      this.ethereumClient = ethereumClient;
+    }
 
-  constructor({ ethereumClient, dataSource, branches, contract, patch, searcher, eventIndexer }) {
-    this.dataSourceId = dataSource.id;
-    this.contract = contract;
-    this.searcher = searcher;
-    this.eventIndexer = eventIndexer;
-    this.patch = patch || Object.create(null);
-    this._branches = branches;
-    this.ethereumClient = ethereumClient;
-  }
+    async branches() {
+      return Object.keys(this._branches);
+    }
 
-  async branches() {
-    return Object.keys(this._branches);
-  }
+    async beginUpdate() {
+      await this.eventIndexer.start({
+        ethereumClient: this.ethereumClient,
+        name: this.dataSourceId,
+        contract: this.contract,
+      });
 
-  async beginUpdate() {
-    await this.eventIndexer.start({
-      ethereumClient: this.ethereumClient,
-      name: this.dataSourceId,
-      contract: this.contract
-    });
-
-    return new Updater({
-      dataSourceId: this.dataSourceId,
-      contract: this.contract,
-      eventIndexer: this.eventIndexer,
-      patch: this.patch,
-      branches: await this.branches(),
-      searcher: this.searcher
-    });
-  }
-});
+      return new Updater({
+        dataSourceId: this.dataSourceId,
+        contract: this.contract,
+        eventIndexer: this.eventIndexer,
+        patch: this.patch,
+        branches: await this.branches(),
+        searcher: this.searcher,
+      });
+    }
+  },
+);
 
 class Updater {
-
   constructor({ dataSourceId, contract, searcher, eventIndexer, patch, branches }) {
     this.dataSourceId = dataSourceId;
     this.contract = contract;
@@ -67,91 +67,100 @@ class Updater {
   }
 
   async schema() {
-    if (this._schema) { return this._schema; }
+    if (this._schema) {
+      return this._schema;
+    }
 
-    let defaultFields = [{
-      type: "fields",
-      id: "ethereum-address",
-      attributes: {
-        "field-type": "@cardstack/core-types::case-insensitive"
-      }
-    },{
-      type: "fields",
-      id: "balance-wei",
-      attributes: {
-        "field-type": "@cardstack/core-types::string"
-      }
-    },{
-      type: "fields",
-      id: "block-number",
-      attributes: {
-        "field-type": "@cardstack/core-types::integer"
-      }
-    },{
-      type: "fields",
-      id: "transaction-id",
-      attributes: {
-        "field-type": "@cardstack/core-types::integer"
-      }
-    },{
-      type: "fields",
-      id: "event-name",
-      attributes: {
-        "field-type": "@cardstack/core-types::string"
-      }
-    },{
-      type: "fields",
-      id: "mapping-boolean-value",
-      attributes: {
-        "field-type": "@cardstack/core-types::boolean"
-      }
-    },{
-      type: "fields",
-      id: "mapping-string-value",
-      attributes: {
-        "field-type": "@cardstack/core-types::string"
-      }
-    },{
-      type: "fields",
-      id: "mapping-address-value",
-      attributes: {
-        "field-type": "@cardstack/core-types::case-insensitive"
-      }
-    },{
-      type: "fields",
-      id: "mapping-number-value",
-      attributes: {
-        "field-type": "@cardstack/core-types::string" // ethereum numbers are too large for JS, use a string to internally represent ethereum numbers
-      }
-    }];
+    let defaultFields = [
+      {
+        type: 'fields',
+        id: 'ethereum-address',
+        attributes: {
+          'field-type': '@cardstack/core-types::case-insensitive',
+        },
+      },
+      {
+        type: 'fields',
+        id: 'balance-wei',
+        attributes: {
+          'field-type': '@cardstack/core-types::string',
+        },
+      },
+      {
+        type: 'fields',
+        id: 'block-number',
+        attributes: {
+          'field-type': '@cardstack/core-types::integer',
+        },
+      },
+      {
+        type: 'fields',
+        id: 'transaction-id',
+        attributes: {
+          'field-type': '@cardstack/core-types::integer',
+        },
+      },
+      {
+        type: 'fields',
+        id: 'event-name',
+        attributes: {
+          'field-type': '@cardstack/core-types::string',
+        },
+      },
+      {
+        type: 'fields',
+        id: 'mapping-boolean-value',
+        attributes: {
+          'field-type': '@cardstack/core-types::boolean',
+        },
+      },
+      {
+        type: 'fields',
+        id: 'mapping-string-value',
+        attributes: {
+          'field-type': '@cardstack/core-types::string',
+        },
+      },
+      {
+        type: 'fields',
+        id: 'mapping-address-value',
+        attributes: {
+          'field-type': '@cardstack/core-types::case-insensitive',
+        },
+      },
+      {
+        type: 'fields',
+        id: 'mapping-number-value',
+        attributes: {
+          'field-type': '@cardstack/core-types::string', // ethereum numbers are too large for JS, use a string to internally represent ethereum numbers
+        },
+      },
+    ];
 
     let schema = [].concat(defaultFields);
     let contractName = this.dataSourceId;
-    let abi = this.contract["abi"];
+    let abi = this.contract['abi'];
     let { contractFields, schemaItems } = this._getSchemaFromAbi(contractName, abi);
 
-    schema = schema.concat(schemaItems)
-                   .concat(contractFields);
+    schema = schema.concat(schemaItems).concat(contractFields);
 
-    let contractSchema =  {
+    let contractSchema = {
       type: 'content-types',
       id: pluralize(contractName),
       relationships: {
         fields: {
-          data: [
-            { type: "fields", id: "ethereum-address" },
-            { type: "fields", id: "balance-wei" }
-          ]
+          data: [{ type: 'fields', id: 'ethereum-address' }, { type: 'fields', id: 'balance-wei' }],
         },
         'data-source': {
-          data: { type: 'data-sources', id: this.dataSourceId.toString() }
-        }
-      }
+          data: { type: 'data-sources', id: this.dataSourceId.toString() },
+        },
+      },
     };
 
     contractFields.forEach(field => {
       contractSchema.relationships.fields.data.push({
-        type: "fields", id: field.id
+        type: 'fields',
+        id: field.id,
       });
     });
 
@@ -198,7 +207,7 @@ class Updater {
 
     return {
       lastBlockHeights: blockHeights,
-      lastSchema: schema
+      lastSchema: schema,
     };
   }
 
@@ -215,7 +224,7 @@ class Updater {
 
   _namedFieldFor(fieldName, type) {
     let fieldType;
-    switch(type) {
+    switch (type) {
       // Using strings to represent uint256, as the max int
       // int in js is 2^53, vs 2^256 in solidity
       case 'boolean':
@@ -236,8 +245,8 @@ class Updater {
       type: 'fields',
       id: fieldName,
       attributes: {
-        "field-type": fieldType
-      }
+        'field-type': fieldType,
+      },
     };
   }
 
@@ -246,57 +255,56 @@ class Updater {
       type: 'fields',
       id: contractName + '-contract',
       attributes: {
-        "field-type": "@cardstack/core-types::belongs-to"
+        'field-type': '@cardstack/core-types::belongs-to',
       },
       relationships: {
-        "related-types": {
-          "data": [
-            { "type": "content-types", "id": pluralize(contractName) }
-          ]
+        'related-types': {
+          data: [{ type: 'content-types', id: pluralize(contractName) }],
         },
-      }
+      },
     };
   }
 
   _mappingContentTypeFor(contractName, mappingName, fields) {
     return {
-      type: "content-types",
+      type: 'content-types',
       id: pluralize(`${contractName}-${dasherize(mappingName)}`),
       relationships: {
         fields: {
-          data: [
-            { type: "fields", id: "ethereum-address" },
-            { type: "fields", id: contractName + "-contract" }
-          ].concat(fields.map(field => {
-            return { type: "fields", id: field.name };
-          }))
+          data: [{ type: 'fields', id: 'ethereum-address' }, { type: 'fields', id: contractName + '-contract' }].concat(
+            fields.map(field => {
+              return { type: 'fields', id: field.name };
+            }),
+          ),
         },
         'data-source': {
-          data: { type: 'data-sources', id: this.dataSourceId.toString() }
-        }
-      }
+          data: { type: 'data-sources', id: this.dataSourceId.toString() },
+        },
+      },
     };
   }
 
   _eventContentTypeFor(contractName, eventName, fields) {
     return {
-      type: "content-types",
+      type: 'content-types',
       id: pluralize(`${contractName}-${dasherize(eventName)}-events`),
       relationships: {
         fields: {
           data: [
-            { type: "fields", id: "block-number" },
-            { type: "fields", id: "transaction-id" },
-            { type: "fields", id: "event-name" },
-            { type: "fields", id: contractName + "-contract" }
-          ].concat(fields.map(field => {
-            return { type: "fields", id: field.name };
-          }))
+            { type: 'fields', id: 'block-number' },
+            { type: 'fields', id: 'transaction-id' },
+            { type: 'fields', id: 'event-name' },
+            { type: 'fields', id: contractName + '-contract' },
+          ].concat(
+            fields.map(field => {
+              return { type: 'fields', id: field.name };
+            }),
+          ),
         },
         'data-source': {
-          data: { type: 'data-sources', id: this.dataSourceId.toString() }
-        }
-      }
+          data: { type: 'data-sources', id: this.dataSourceId.toString() },
+        },
+      },
     };
   }
 
@@ -310,36 +318,39 @@ class Updater {
       },
       relationships: {
         who: {
-          data: [{ type: 'groups', id: 'everyone' }]
+          data: [{ type: 'groups', id: 'everyone' }],
         },
         types: {
-          "data": [
-            { type: "content-types", id: pluralize(contentType) }
-          ]
-        }
-      }
+          data: [{ type: 'content-types', id: pluralize(contentType) }],
+        },
+      },
     };
   }
 
   _getSchemaFromAbi(contractName, abi) {
-    let contractFields = [], schemaItems = [];
+    let contractFields = [],
+      schemaItems = [];
     abi.forEach(item => {
-      if (item.type === "event" || (item.type === "function" && item.constant)) {
+      if (item.type === 'event' || (item.type === 'function' && item.constant)) {
         let fieldInfo = fieldTypeFor(contractName, item);
-        if (!fieldInfo) { return; }
+        if (!fieldInfo) {
+          return;
+        }
 
         let { isEvent, isMapping, fields } = fieldInfo;
         if (!isMapping && !isEvent && fields.length === 1) {
           contractFields.push({
-            type: "fields",
+            type: 'fields',
             id: `${contractName}-${dasherize(item.name)}`,
-            attributes: { "field-type": fields[0]["type"] },
+            attributes: { 'field-type': fields[0]['type'] },
           });
           return;
         }
 
         for (let field of fields) {
-          if (!field.isNamedField) { continue; }
+          if (!field.isNamedField) {
+            continue;
+          }
           schemaItems.push(this._namedFieldFor(field.name, field.type));
         }
 
@@ -373,14 +384,18 @@ class Updater {
 
       if (!contentTypesToUpdate.length) {
         let eventFieldIndex = schemaItems.findIndex(i => i.id === eventField && i.type === 'fields');
-        if (eventFieldIndex < 0) { continue; }
+        if (eventFieldIndex < 0) {
+          continue;
+        }
 
         contractFields.push(schemaItems[eventFieldIndex]);
         schemaItems.splice(eventFieldIndex, 1);
       } else {
         for (let contentTypeName of contentTypesToUpdate) {
           let contentType = schemaItems.find(i => i.id === contentTypeName);
-          if (!contentType) { continue; }
+          if (!contentType) {
+            continue;
+          }
 
           contentType.relationships.fields.data.push({ type: 'fields', id: eventField });
         }
@@ -389,5 +404,4 @@ class Updater {
 
     return { contractFields, schemaItems };
   }
-
 }

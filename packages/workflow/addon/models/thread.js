@@ -1,17 +1,17 @@
 import { A } from '@ember/array';
 import Thread from '@cardstack/models/generated/thread';
 import { task } from 'ember-concurrency';
-import { computed } from "@ember/object"
-import { readOnly } from "@ember/object/computed";
+import { computed } from '@ember/object';
+import { readOnly } from '@ember/object/computed';
 import RSVP from 'rsvp';
 
 export default Thread.extend({
-  priority:       readOnly('_latestMessageWithPriority.priority'),
-  priorityLevel:  readOnly('priority.level'),
-  updatedAt:      readOnly('latestMessage.sentAt'),
+  priority: readOnly('_latestMessageWithPriority.priority'),
+  priorityLevel: readOnly('priority.level'),
+  updatedAt: readOnly('latestMessage.sentAt'),
 
   isUnhandled: computed('_syncedMessages.@each.isUnhandled', function() {
-    return this.get('_syncedMessages').any((message) => message.get('isUnhandled'));
+    return this.get('_syncedMessages').any(message => message.get('isUnhandled'));
   }),
 
   tags: computed('_syncedMessages.[]', {
@@ -21,11 +21,11 @@ export default Thread.extend({
     },
     set(k, v) {
       return v;
-    }
+    },
   }),
 
-  loadTags: task(function * () {
-    let tagLoadingTasks = this.get('_syncedMessages').map((message) => {
+  loadTags: task(function*() {
+    let tagLoadingTasks = this.get('_syncedMessages').map(message => {
       //  _loadTags has a side-effect as it also sets its `loadedTags`
       // this might cause problems, so we can split the task that also mutates
       // into a "pure" task and a setter.
@@ -39,7 +39,7 @@ export default Thread.extend({
   }),
 
   tagIds: computed(function() {
-    return this.get('tags').map((tag) => tag.get('id'));
+    return this.get('tags').map(tag => tag.get('id'));
   }),
 
   sortedMessages: computed('_syncedMessages.[]', function() {
@@ -53,7 +53,7 @@ export default Thread.extend({
   },
 
   _latestMessageWithPriority: computed('sortedMessages.[]', function() {
-    return this.get('sortedMessages').find((message) => {
+    return this.get('sortedMessages').find(message => {
       let priorityId = message.belongsTo('priority').id();
       return !!priorityId;
     });
@@ -64,13 +64,13 @@ export default Thread.extend({
       this.get('_loadMessages').perform();
       return A();
     },
-    set(k,v) {
+    set(k, v) {
       return v;
-    }
+    },
   }),
 
-  _loadMessages: task(function * () {
-    let messages = yield this.get("messages");
+  _loadMessages: task(function*() {
+    let messages = yield this.get('messages');
     this.set('_syncedMessages', messages);
   }).restartable(),
 });

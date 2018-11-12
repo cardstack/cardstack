@@ -7,13 +7,17 @@ module('Integration | Component | cardstack session', function(hooks) {
   setupRenderingTest(hooks);
 
   test('it renders', async function(assert) {
-
     await render(hbs`
       {{#cardstack-session as |session|}}
         template block text
       {{/cardstack-session}}
     `);
 
-    assert.equal(this.$().text().trim(), 'template block text');
+    assert.equal(
+      this.$()
+        .text()
+        .trim(),
+      'template block text',
+    );
   });
 });

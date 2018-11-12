@@ -10,5 +10,5 @@ export default Component.extend({
     if (this.get('enabled')) {
       this.get('change')(!this.get('value'));
     }
-  }
+  },
 });

@@ -27,7 +27,6 @@ module('Acceptance | content', function(hooks) {
     assert.equal(currentURL(), '/c/second');
   });
 
-
   test('renders placeholder type when content is missing', async function(assert) {
     await visit('/c/posts/bogus');
     assert.equal(currentURL(), '/c/posts/bogus');
@@ -36,7 +35,7 @@ module('Acceptance | content', function(hooks) {
 
   test('reloads models on route transitions', async function(assert) {
     await visit('/c/categories/category-1');
-    await click('[data-test-post="1"]')
+    await click('[data-test-post="1"]');
 
     assert.equal(currentURL(), '/c/posts/1');
   });

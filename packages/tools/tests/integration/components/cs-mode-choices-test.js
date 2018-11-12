@@ -15,14 +15,11 @@ module('Integration | Component | cs mode choices', function(hooks) {
       // property to control, choices, and a setter function:
       favoriteColor: 'blue',
       favoriteColorChoices: computed(function() {
-        return [
-          { id: 'blue', description: 'Blue' },
-          { id: 'red', description: 'Red' }
-        ];
+        return [{ id: 'blue', description: 'Blue' }, { id: 'red', description: 'Red' }];
       }),
       setFavoriteColor(color) {
         this.set('favoriteColor', color);
-      }
+      },
     });
   });
 

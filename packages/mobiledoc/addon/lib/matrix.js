@@ -14,12 +14,7 @@ class Matrix {
     return `matrix(${this.a}, ${this.b}, ${this.c}, ${this.d}, ${this.tx}, ${this.ty})`;
   }
   isIdentity() {
-    return this.a === 1 &&
-      this.b === 0 &&
-      this.c === 0 &&
-      this.d === 1 &&
-      this.tx === 0 &&
-      this.ty === 0;
+    return this.a === 1 && this.b === 0 && this.c === 0 && this.d === 1 && this.tx === 0 && this.ty === 0;
   }
   mult(other) {
     return new Matrix(
@@ -28,7 +23,7 @@ class Matrix {
       this.a * other.c + this.c * other.d,
       this.b * other.c + this.d * other.d,
       this.a * other.tx + this.c * other.ty + this.tx,
-      this.b * other.tx + this.d * other.ty + this.ty
+      this.b * other.tx + this.d * other.ty + this.ty,
     );
   }
 }
@@ -39,12 +34,14 @@ function identity() {
 
 export function parseMatrix(matrixString) {
   let match = /matrix\((.*)\)/.exec(matrixString);
-  if (!match) { return identity(); }
+  if (!match) {
+    return identity();
+  }
   return new Matrix(...match[1].split(',').map(parseFloat));
 }
 
 export function parseOrigin(originString) {
-  let [x, y] =  originString.split(' ').map(parseFloat);
+  let [x, y] = originString.split(' ').map(parseFloat);
   return new Matrix(1, 0, 0, 1, -x, -y);
 }
 

@@ -3,8 +3,8 @@ import { htmlSafe } from '@ember/string';
 
 function formatAttrs(attrs) {
   return Object.keys(attrs)
-    .map((key) => attrs[key] != null && `${key}="${attrs[key]}"`)
-    .filter((attr) => attr)
+    .map(key => attrs[key] != null && `${key}="${attrs[key]}"`)
+    .filter(attr => attr)
     .join(' ');
 }
 

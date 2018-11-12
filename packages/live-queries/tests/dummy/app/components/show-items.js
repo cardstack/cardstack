@@ -1,11 +1,11 @@
-import Component from "@ember/component";
-import { liveQuery } from "@cardstack/live-queries";
+import Component from '@ember/component';
+import { liveQuery } from '@cardstack/live-queries';
 
 export default Component.extend({
   items: liveQuery(function() {
     return {
-      type: "item",
-      query: { filter:  { type: 'items' } }
+      type: 'item',
+      query: { filter: { type: 'items' } },
     };
-  })
+  }),
 });

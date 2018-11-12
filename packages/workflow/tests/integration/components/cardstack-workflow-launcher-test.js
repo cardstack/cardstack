@@ -13,15 +13,20 @@ module('Integration | Component | cardstack-workflow-launcher', function(hooks) 
   });
 
   hooks.beforeEach(function() {
-    this.owner.register('service:cardstack-workflow', Service.extend({
-      notificationCount: 3
-    }));
+    this.owner.register(
+      'service:cardstack-workflow',
+      Service.extend({
+        notificationCount: 3,
+      }),
+    );
     this.workflow = this.owner.lookup('service:cardstack-workflow');
   });
 
   test('it renders with default implementation', async function(assert) {
-    this.actions.toggleOpen = () => { this.toggleProperty('isOpen'); };
+    this.actions.toggleOpen = () => {
+      this.toggleProperty('isOpen');
+    };
     await render(hbs`{{cardstack-workflow-launcher onClick=(action 'toggleOpen')}}`);
-    assert.equal(this.$(".cardstack-workflow-alert").hasClass("show-alert"), true);
+    assert.equal(this.$('.cardstack-workflow-alert').hasClass('show-alert'), true);
   });
 });

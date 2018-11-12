@@ -24,16 +24,16 @@ module('Integration | Component | cs version control', function(hooks) {
           id: '1',
           type: 'things',
           data: {
-            attributes: {}
-          }
-        }
-      }
+            attributes: {},
+          },
+        };
+      },
     });
     this.set('model', model);
     this.meta = this.owner.lookup('service:resource-metadata');
     this.get('meta').write(model, { branch: 'master' });
     this.owner.register('config:enviroment', {
-      cardstack: { defaultBranch: 'master' }
+      cardstack: { defaultBranch: 'master' },
     });
     this.owner.lookup('router:main').setupRouter();
   });
@@ -79,7 +79,7 @@ module('Integration | Component | cs version control', function(hooks) {
   test('clicking update on clean model does nothing', async function(assert) {
     assert.expect(0);
     model.set('save', function() {
-      throw new Error("should not happen");
+      throw new Error('should not happen');
     });
     model.set('hasDirtyFields', false);
     model.set('isNew', false);

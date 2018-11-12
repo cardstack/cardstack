@@ -27,8 +27,8 @@ export default Component.extend({
       } else {
         this.get('open')();
       }
-    }
-  }
+    },
+  },
 });
 
 function animationRules() {
@@ -36,6 +36,6 @@ function animationRules() {
     this.fromValue(false),
     this.toValue(true),
     this.use('to-down', { duration: 250 }),
-    this.reverse('to-up', { duration: 250 })
+    this.reverse('to-up', { duration: 250 }),
   );
 }

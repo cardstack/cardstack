@@ -3,5 +3,5 @@ import layout from '../templates/components/cardstack-modal-target';
 
 export default Component.extend({
   layout,
-  classNames: ['cardstack-modal']
+  classNames: ['cardstack-modal'],
 });

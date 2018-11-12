@@ -5,5 +5,5 @@ module.exports = {
   name: '@cardstack/ethereum',
   isDevelopingAddon() {
     return process.env.CARDSTACK_DEV;
-  }
+  },
 };

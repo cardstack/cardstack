@@ -15,6 +15,6 @@ export default Component.extend({
     },
     toggleActive() {
       this.get('tools').setActive(!this.get('active'));
-    }
-  }
+    },
+  },
 });

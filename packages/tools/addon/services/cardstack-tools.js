@@ -54,7 +54,7 @@ export default Service.extend({
   }),
 
   _activeItemMeta: computed('activeContentItem', function() {
-    let model = this.get('activeContentItem.model')
+    let model = this.get('activeContentItem.model');
     if (model) {
       return this.get('resourceMetadata').read(model);
     }
@@ -108,9 +108,9 @@ export default Service.extend({
         icon: {
           name: 'write',
           width: 13,
-          height: 18
+          height: 18,
         },
-      }
+      },
     ];
   }),
 
@@ -125,8 +125,8 @@ export default Service.extend({
         icon: {
           name: 'page',
           width: 18,
-          height: 24
-        }
+          height: 24,
+        },
       },
       {
         id: 'embedded',
@@ -134,9 +134,9 @@ export default Service.extend({
         icon: {
           name: 'tiles',
           width: 20,
-          height: 24
-        }
-      }
+          height: 24,
+        },
+      },
     ];
   }),
 
@@ -153,9 +153,7 @@ export default Service.extend({
   }),
 
   editing: computed('requestedEditing', 'branch', function() {
-    return this.get('requestedEditing') &&
-      (this.get('mayEditLive') ||
-       this.get('branch') !== defaultBranch);
+    return this.get('requestedEditing') && (this.get('mayEditLive') || this.get('branch') !== defaultBranch);
   }),
 
   init() {
@@ -173,7 +171,6 @@ export default Service.extend({
       // Ignored
     }
     this.persistentState = priorState || {};
-
 
     /* --  Ephemermal state -- */
 
@@ -219,13 +216,13 @@ export default Service.extend({
   },
 
   setBranch(which) {
-    let model = this.get('activeContentItem.model')
+    let model = this.get('activeContentItem.model');
     if (model && model.get('slug')) {
-      let {
-        name,
-        args,
-        queryParams
-      } = this.get('cardstackRouting').routeFor(modelType(model), model.get('slug'), which);
+      let { name, args, queryParams } = this.get('cardstackRouting').routeFor(
+        modelType(model),
+        model.get('slug'),
+        which,
+      );
       transitionTo(getOwner(this), name, args, queryParams);
     }
   },
@@ -236,8 +233,7 @@ export default Service.extend({
 
   highlightField(which) {
     this.set('highlightedFieldId', which ? which.id : null);
-  }
-
+  },
 });
 
 function ownedRelatedRecords(records, out = []) {
@@ -247,7 +243,7 @@ function ownedRelatedRecords(records, out = []) {
   }
 
   let recordClass = record.constructor;
-  get(recordClass, 'relationships').forEach(([ relationshipDefinition ]) => {
+  get(recordClass, 'relationships').forEach(([relationshipDefinition]) => {
     let meta = recordClass.metaForProperty(relationshipDefinition.name);
     let { owned } = meta.options;
     if (owned) {
@@ -261,4 +257,3 @@ function ownedRelatedRecords(records, out = []) {
   });
   return ownedRelatedRecords(rest, out);
 }
-

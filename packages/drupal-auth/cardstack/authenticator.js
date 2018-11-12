@@ -4,12 +4,12 @@ const log = require('@cardstack/logger')('cardstack/drupal-auth');
 
 module.exports = class {
   static create() {
-    return new this;
+    return new this();
   }
   async authenticate(payload, params, userSearcher) {
     if (!payload.authorizationCode) {
       throw new Error("missing required field 'authorizationCode'", {
-        status: 400
+        status: 400,
       });
     }
 
@@ -18,9 +18,8 @@ module.exports = class {
       client_secret: params['client-secret'],
       code: decodeURIComponent(payload.authorizationCode),
       grant_type: 'authorization_code',
-      redirect_uri: payload.redirectUri
+      redirect_uri: payload.redirectUri,
     };
-
 
     if (payload.state) {
       payloadToDrupal.state = payload.state;
@@ -28,41 +27,41 @@ module.exports = class {
 
     try {
       let response = await request
-          .post(params.url + '/oauth/token')
-          .type('form')
-          .set('Accept', 'application/json')
-          .set('User-Agent', '@cardstack/drupal-auth')
-          .send(payloadToDrupal);
-      log.debug("POST to token endpoint returned %s", response.status);
+        .post(params.url + '/oauth/token')
+        .type('form')
+        .set('Accept', 'application/json')
+        .set('User-Agent', '@cardstack/drupal-auth')
+        .send(payloadToDrupal);
+      log.debug('POST to token endpoint returned %s', response.status);
       let accessToken = response.body.access_token;
-      response = await request.get(params.url + '/oauth/debug?_format=json')
+      response = await request
+        .get(params.url + '/oauth/debug?_format=json')
         .set('Authorization', `Bearer ${accessToken}`);
-      log.debug("GET from token endpoint returned %s", response.status);
+      log.debug('GET from token endpoint returned %s', response.status);
 
       let type = params.userType || 'users';
 
       if (params.userIdField) {
-        log.debug("Searching for %s=%s", params.userIdField, response.body.id);
+        log.debug('Searching for %s=%s', params.userIdField, response.body.id);
         let { data: models } = await userSearcher.search({
           filter: {
             type,
-            [params.userIdField]: { exact: response.body.id }
+            [params.userIdField]: { exact: response.body.id },
           },
-          page: { limit: 1 }
+          page: { limit: 1 },
         });
         if (models.length > 0) {
-          log.debug("Found user %s", models[0].id);
+          log.debug('Found user %s', models[0].id);
           return { preloadedUser: models[0] };
         } else {
-          log.debug("No such user");
+          log.debug('No such user');
         }
       } else {
-        return { user: { id: response.body.id, type }};
+        return { user: { id: response.body.id, type } };
       }
-
-    } catch(err) {
+    } catch (err) {
       if (err.status) {
-        log.debug("Drupal replied with %s: %s", err.status, JSON.stringify(err.response.body, null, 2));
+        log.debug('Drupal replied with %s: %s', err.status, JSON.stringify(err.response.body, null, 2));
       } else {
         log.debug(err);
       }
@@ -72,19 +71,19 @@ module.exports = class {
   exposeConfig(params) {
     return {
       clientId: params['client-id'],
-      drupalUrl: params.url
+      drupalUrl: params.url,
     };
   }
 
   defaultUserRewriter(user) {
     return {
       id: user.login,
-      type: "drupal-users",
+      type: 'drupal-users',
       attributes: {
         name: user.name,
         email: user.email,
-        "avatar-url": user.avatar_url
-      }
+        'avatar-url': user.avatar_url,
+      },
     };
   }
 };

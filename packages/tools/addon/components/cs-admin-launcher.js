@@ -7,5 +7,5 @@ export default Component.extend({
   menuOpen: false,
   click() {
     this.set('menuOpen', !this.get('menuOpen'));
-  }
+  },
 });

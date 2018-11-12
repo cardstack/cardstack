@@ -4,7 +4,7 @@ const { get, groupBy } = require('lodash');
 const githubPermissions = {
   admin: ['read', 'write', 'admin'],
   write: ['read', 'write'],
-  read:  ['read']
+  read: ['read'],
 };
 
 module.exports = class GitHubSearcher {
@@ -41,22 +41,24 @@ module.exports = class GitHubSearcher {
       path: `/users/${login}`,
       method: 'GET',
       headers: {
-        'Accept': 'application/json',
+        Accept: 'application/json',
         'User-Agent': '@cardstack/github-auth',
-        Authorization: `token ${this.token}`
-      }
+        Authorization: `token ${this.token}`,
+      },
     };
     let response = await request(options);
     let userData = response.body;
-    if (!userData) { return; }
+    if (!userData) {
+      return;
+    }
 
     userData.permissions = await this._getPermissions(userData.login);
     let user = await this.dataSource.rewriteExternalUser(userData);
 
     let maxAge = this.cacheMaxAge;
     if (maxAge == null) {
-      let cacheControl = get(response, 'response.headers.cache-control') ||
-                         get(response, 'response.headers.Cache-Control');
+      let cacheControl =
+        get(response, 'response.headers.cache-control') || get(response, 'response.headers.Cache-Control');
       if (cacheControl) {
         let match = /max-age=(\d+)/.exec(cacheControl);
         if (match && match.length > 1) {
@@ -74,7 +76,9 @@ module.exports = class GitHubSearcher {
   }
 
   async _getPermissions(username) {
-    if (!username || !this.permissions || !this.permissions.length) { return; }
+    if (!username || !this.permissions || !this.permissions.length) {
+      return;
+    }
 
     let permissions = [];
     let repos = groupBy(this.permissions, 'repo');
@@ -86,17 +90,21 @@ module.exports = class GitHubSearcher {
         path: `/repos/${repo}/collaborators/${username}/permission`,
         method: 'GET',
         headers: {
-          'Accept': 'application/json',
+          Accept: 'application/json',
           'User-Agent': '@cardstack/github-auth',
-          Authorization: `token ${this.token}`
-        }
+          Authorization: `token ${this.token}`,
+        },
       };
       let response = await request(options);
       let userPermission = get(response, 'body.permission');
-      if (!userPermission) { continue; }
+      if (!userPermission) {
+        continue;
+      }
 
       let userExpandedPermissions = githubPermissions[userPermission];
-      if (!userExpandedPermissions) { continue; }
+      if (!userExpandedPermissions) {
+        continue;
+      }
 
       for (let repoPermission of repos[repo]) {
         if (userExpandedPermissions.includes(repoPermission.permission)) {

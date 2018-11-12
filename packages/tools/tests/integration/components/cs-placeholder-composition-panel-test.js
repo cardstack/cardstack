@@ -12,12 +12,17 @@ module('Integration | Component | cs placeholder composition panel', function(ho
       isCardstackPlaceholder: true,
       type: 'page',
       slug: 'somewhere',
-      branch: 'x'
+      branch: 'x',
     });
   });
 
   test('it renders', async function(assert) {
     await render(hbs`{{cs-placeholder-composition-panel content=content}}`);
-    assert.equal(this.$('.content-title').text().trim(), 'Not found');
+    assert.equal(
+      this.$('.content-title')
+        .text()
+        .trim(),
+      'Not found',
+    );
   });
 });

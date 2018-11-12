@@ -8,5 +8,7 @@ export default Provider.extend({
   baseUrl: computed('drupalUrl', function() {
     return `${this.get('drupalUrl')}/oauth/authorize`;
   }),
-  responseParams: computed(function() { return ['code', 'state']; })
+  responseParams: computed(function() {
+    return ['code', 'state'];
+  }),
 });

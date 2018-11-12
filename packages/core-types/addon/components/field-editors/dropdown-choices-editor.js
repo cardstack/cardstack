@@ -7,7 +7,6 @@ import { get, getWithDefault, set, computed } from '@ember/object';
 // @TODO: expose public api
 import metaForField from '@cardstack/rendering/-private/meta-for-field';
 
-
 export default Component.extend({
   layout,
   store: service(),
@@ -28,12 +27,12 @@ export default Component.extend({
     let content = get(this, 'content');
     let field = get(this, 'field');
     let meta = metaForField(content, field);
-    let contentType = (meta && meta.type) ? meta.type : dasherize(field);
+    let contentType = meta && meta.type ? meta.type : dasherize(field);
 
     let options;
     try {
       options = yield store.findAll(contentType);
-    } catch(e) {
+    } catch (e) {
       set(this, 'missingContentType', true);
     }
 
@@ -47,7 +46,7 @@ export default Component.extend({
 
       content.watchRelationship(field, () => {
         set(content, field, option);
-      })
-    }
-  }
+      });
+    },
+  },
 });

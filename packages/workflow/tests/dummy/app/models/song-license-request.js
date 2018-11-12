@@ -10,5 +10,5 @@ export default SongLicenseRequest.extend({
 
   deny() {
     this.set('status', 'denied');
-  }
+  },
 });

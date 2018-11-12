@@ -24,6 +24,6 @@ export default Component.extend({
     },
     goPreview() {
       this.get('tools').setBranch('draft');
-    }
-  }
+    },
+  },
 });

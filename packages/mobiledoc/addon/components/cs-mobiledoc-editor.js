@@ -15,12 +15,12 @@ export default Component.extend({
     return this.get('mobiledoc');
   }),
 
-  onChange: task(function * (doc) {
+  onChange: task(function*(doc) {
     this.propertyDidChange('cursorState');
     this._nextDoc = doc;
     yield timeout(500); // this debounces changes so that we're not
-                        // propagating things up to the model on every
-                        // keystroke, which can cause laggy typing.
+    // propagating things up to the model on every
+    // keystroke, which can cause laggy typing.
     let handler = this.get('on-change');
     if (handler) {
       handler(doc);
@@ -28,7 +28,7 @@ export default Component.extend({
     this._nextDoc = null;
   }).restartable(),
 
-  willDestroyElement(){
+  willDestroyElement() {
     if (this.get('onChange.isRunning')) {
       // If there were changes pending in the debouncer, hurry them
       // out before we're destroyed.
@@ -44,6 +44,6 @@ export default Component.extend({
   actions: {
     cursorChanged(cursorUpdate) {
       this.set('cursorState', cursorUpdate);
-    }
-  }
+    },
+  },
 });

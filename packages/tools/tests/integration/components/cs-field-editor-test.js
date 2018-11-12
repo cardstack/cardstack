@@ -9,20 +9,32 @@ module('Integration | Component | cs field editor', function(hooks) {
   setupRenderingTest(hooks);
 
   hooks.beforeEach(function() {
-    this.owner.register('model:example', DS.Model.extend({
-      title: DS.attr('string'),
-      score: DS.attr({ fieldType: 'custom-score' }),
-      echo: DS.attr({ fieldType: 'echo' })
-    }));
-    this.owner.register('template:components/field-editors/string-editor', hbs`
+    this.owner.register(
+      'model:example',
+      DS.Model.extend({
+        title: DS.attr('string'),
+        score: DS.attr({ fieldType: 'custom-score' }),
+        echo: DS.attr({ fieldType: 'echo' }),
+      }),
+    );
+    this.owner.register(
+      'template:components/field-editors/string-editor',
+      hbs`
       This is the string editor
-    `);
-    this.owner.register('template:components/field-editors/custom-score-editor', hbs`
+    `,
+    );
+    this.owner.register(
+      'template:components/field-editors/custom-score-editor',
+      hbs`
       This is the custom score editor
-    `);
-    this.owner.register('template:components/field-editors/echo-editor', hbs`
+    `,
+    );
+    this.owner.register(
+      'template:components/field-editors/echo-editor',
+      hbs`
       <div class="echo {{if enabled 'enabled'}}">{{get content field}}</div>
-    `);
+    `,
+    );
     this.store = this.owner.lookup('service:store');
   });
 
@@ -31,7 +43,12 @@ module('Integration | Component | cs field editor', function(hooks) {
       this.set('model', this.get('store').createRecord('example'));
     });
     await render(hbs`{{cs-field-editor content=model field="title" }}`);
-    assert.equal(this.$().text().trim(), 'This is the string editor');
+    assert.equal(
+      this.$()
+        .text()
+        .trim(),
+      'This is the string editor',
+    );
   });
 
   test('it renders correct field editor based on custom fieldType annotation', async function(assert) {
@@ -39,7 +56,12 @@ module('Integration | Component | cs field editor', function(hooks) {
       this.set('model', this.get('store').createRecord('example'));
     });
     await render(hbs`{{cs-field-editor content=model field="score" }}`);
-    assert.equal(this.$().text().trim(), 'This is the custom score editor');
+    assert.equal(
+      this.$()
+        .text()
+        .trim(),
+      'This is the custom score editor',
+    );
   });
 
   test('it passes content and field name to editor', async function(assert) {
@@ -47,7 +69,12 @@ module('Integration | Component | cs field editor', function(hooks) {
       this.set('model', this.get('store').createRecord('example', { echo: 'woohoo' }));
     });
     await render(hbs`{{cs-field-editor content=model field="echo" }}`);
-    assert.equal(this.$('.echo').text().trim(), 'woohoo');
+    assert.equal(
+      this.$('.echo')
+        .text()
+        .trim(),
+      'woohoo',
+    );
   });
 
   test('it passes enabled state to editor', async function(assert) {

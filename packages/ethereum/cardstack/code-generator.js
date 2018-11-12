@@ -16,34 +16,42 @@ define("@cardstack/ethereum/environment", ["exports"], function (exports) {
 });
 `);
 
-module.exports = declareInjections({
-  sources: 'hub:data-sources',
-},
+module.exports = declareInjections(
+  {
+    sources: 'hub:data-sources',
+  },
 
+  class EthereumCodeGenerator {
+    async generateCode() {
+      let activeSources = await this.sources.active();
+      let ethereumSources = [...activeSources.values()].filter(s => s.sourceType === '@cardstack/ethereum');
+      if (!ethereumSources || !ethereumSources.length) {
+        return;
+      }
 
-class EthereumCodeGenerator {
+      let sourceConfigs = [];
+      for (let source of ethereumSources) {
+        let {
+          id,
+          _params: {
+            contract: { addresses },
+          },
+        } = source;
 
-  async generateCode() {
-    let activeSources = await this.sources.active();
-    let ethereumSources = [...activeSources.values()].filter(s => s.sourceType === '@cardstack/ethereum');
-    if (!ethereumSources || !ethereumSources.length) { return; }
+        sourceConfigs.push({
+          contract: id,
+          address: addresses[defaultBranch],
+        });
+      }
 
-    let sourceConfigs = [];
-    for (let source of ethereumSources) {
-      let { id, _params:{ contract: { addresses } } } = source;
-
-      sourceConfigs.push({
-        contract: id,
-        address: addresses[defaultBranch]
+      return template({
+        properties: sourceConfigs.map(config => {
+          return {
+            name: camelize(config.contract + '-address'),
+            value: config.address,
+          };
+        }),
       });
     }
-
-    return template({ properties: sourceConfigs.map(config => {
-      return {
-        name: camelize(config.contract + '-address'),
-        value: config.address
-      };
-    })});
-  }
-});
-
+  },
+);

@@ -25,19 +25,20 @@ module('Integration | Component | field-editors/cardstack-cards-editor', functio
   skip('it allows you to delete card if enabled and has field content', async function(assert) {
     this.set('enabled', true);
     this.set('actions', {
-      orderChanged() {
-
-      }
-    })
+      orderChanged() {},
+    });
 
     this.set('content', {
-      articles: [{
-        id: '55',
-        type: 'super-fake-card'
-      }, {
-        id: '57',
-        type: 'super-fake-card'
-      }],
+      articles: [
+        {
+          id: '55',
+          type: 'super-fake-card',
+        },
+        {
+          id: '57',
+          type: 'super-fake-card',
+        },
+      ],
     });
 
     this.set('field', 'articles');

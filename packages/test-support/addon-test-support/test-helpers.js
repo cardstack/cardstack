@@ -7,12 +7,14 @@ import { htmlSafe } from '@ember/string';
 // in a rendering test, you need use this.
 export function setupURLs(hooks) {
   hooks.beforeEach(function() {
-    this.owner.lookup('router:main').setupRouter()
-  })
+    this.owner.lookup('router:main').setupRouter();
+  });
 }
 
-export function findCard(type, id, format='isolated') {
-  return getContext().owner.lookup('service:cardstackData').load(type, id, format);
+export function findCard(type, id, format = 'isolated') {
+  return getContext()
+    .owner.lookup('service:cardstackData')
+    .load(type, id, format);
 }
 
 export function renderCard(type, id, format, options = {}) {

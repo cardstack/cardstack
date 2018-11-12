@@ -1,4 +1,3 @@
-
 import { csFieldEditorOptionsFor } from 'dummy/helpers/cs-field-editor-options-for';
 import { module, test } from 'qunit';
 
@@ -7,32 +6,43 @@ module('Unit | Helper | cs field editor options for', function() {
   TestModel.metaForProperty = function(which) {
     if (which === 'theField') {
       return {
-        options: { fieldType: 'test-field-type' }
+        options: { fieldType: 'test-field-type' },
       };
     } else if (which == 'theFieldWithEditorOptions') {
       return {
-        options: { fieldType: 'test-field-type', editorOptions: { foo: 'bar' } }
+        options: { fieldType: 'test-field-type', editorOptions: { foo: 'bar' } },
       };
     } else if (which == 'theFieldWithCustomEditor') {
       return {
-        options: { fieldType: 'test-field-type', editorComponent: 'my-custom-editor' }
+        options: { fieldType: 'test-field-type', editorComponent: 'my-custom-editor' },
       };
     } else if (which == 'theFieldWithCustomEditorAndOptions') {
       return {
-        options: { fieldType: 'test-field-type', editorComponent: 'my-custom-editor', editorOptions: { foo: 'bar' } }
+        options: { fieldType: 'test-field-type', editorComponent: 'my-custom-editor', editorOptions: { foo: 'bar' } },
       };
     } else if (which == 'theFieldWithCustomInlineEditor') {
       return {
-        options: { fieldType: 'test-field-type', editorComponent: 'my-custom-editor', editorOptions: { foo: 'bar' }, inlineEditorComponent: 'my-custom-inline-editor' }
+        options: {
+          fieldType: 'test-field-type',
+          editorComponent: 'my-custom-editor',
+          editorOptions: { foo: 'bar' },
+          inlineEditorComponent: 'my-custom-inline-editor',
+        },
       };
     } else if (which == 'theFieldWithCustomInlineEditorAndOptions') {
       return {
-        options: { fieldType: 'test-field-type', editorComponent: 'my-custom-editor', editorOptions: { foo: 'bar' }, inlineEditorComponent: 'my-custom-inline-editor', inlineEditorOptions: { baz: 'quux' } }
+        options: {
+          fieldType: 'test-field-type',
+          editorComponent: 'my-custom-editor',
+          editorOptions: { foo: 'bar' },
+          inlineEditorComponent: 'my-custom-inline-editor',
+          inlineEditorOptions: { baz: 'quux' },
+        },
       };
     } else {
-      throw new Error("no such field");
+      throw new Error('no such field');
     }
-  }
+  };
 
   test('it returns empty object when not specified', function(assert) {
     let result = csFieldEditorOptionsFor([new TestModel(), 'theField'], {});
@@ -60,7 +70,9 @@ module('Unit | Helper | cs field editor options for', function() {
   });
 
   test('it returns options for custom inline editor when specified', function(assert) {
-    let result = csFieldEditorOptionsFor([new TestModel(), 'theFieldWithCustomInlineEditorAndOptions'], { variant: 'inline' });
+    let result = csFieldEditorOptionsFor([new TestModel(), 'theFieldWithCustomInlineEditorAndOptions'], {
+      variant: 'inline',
+    });
     assert.deepEqual(result, { baz: 'quux' });
   });
 

@@ -8,7 +8,7 @@ module('Integration | Component | field editors/date editor', function(hooks) {
 
   test('it renders', async function(assert) {
     this.set('model', {
-      expiration: '2030-01-01'
+      expiration: '2030-01-01',
     });
     await render(hbs`{{field-editors/date-editor content=model field="expiration"}}`);
     assert.dom('input[type=date]').hasValue('2030-01-01', 'date input has correct value');
@@ -17,7 +17,7 @@ module('Integration | Component | field editors/date editor', function(hooks) {
 
   test('it renders with invalid date', async function(assert) {
     this.set('model', {
-      expiration: 'pizza'
+      expiration: 'pizza',
     });
     await render(hbs`{{field-editors/date-editor content=model field="expiration"}}`);
     assert.dom('input[type=date]').hasNoValue('date input has no value');
@@ -26,7 +26,7 @@ module('Integration | Component | field editors/date editor', function(hooks) {
 
   test('it can be disabled', async function(assert) {
     this.set('model', {
-      expiration: '2030-01-01'
+      expiration: '2030-01-01',
     });
     await render(hbs`{{field-editors/date-editor content=model field="expiration" disabled=true}}`);
     assert.dom('input').isDisabled('date field is disabled');

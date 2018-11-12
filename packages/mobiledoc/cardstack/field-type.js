@@ -7,9 +7,8 @@ module.exports = {
   },
 
   searchIndexFormat(value) {
-    if(value) {
+    if (value) {
       return renderer.render(value).result;
     }
-  }
-
+  },
 };

@@ -1,5 +1,5 @@
 /* eslint-env node */
-"use strict";
+'use strict';
 
 /*
   This is the beginning of an experimental code transform for cardstack templates.
@@ -32,20 +32,22 @@ function BindTransform({ moduleName }) {
 }
 
 BindTransform.prototype.transform = function(ast) {
-  if (/\btemplates\/components\/cardstack\//.test(this.moduleName) ||
-      /\btemplates\/(embedded|isolated).hbs/.test(this.moduleName)){
+  if (
+    /\btemplates\/components\/cardstack\//.test(this.moduleName) ||
+    /\btemplates\/(embedded|isolated).hbs/.test(this.moduleName)
+  ) {
     var b = this.syntax.builders;
     var foundBlockParams = collectBlockParams(ast);
 
     this.syntax.traverse(ast, {
       ElementNode(node) {
         var contentProperty,
-            unusedBlockParam,
-            foundDynamicContent = false,
-            newAttributes = [];
+          unusedBlockParam,
+          foundDynamicContent = false,
+          newAttributes = [];
 
         var tag = node.tag;
-        for (var i=0; i < node.attributes.length; i++) {
+        for (var i = 0; i < node.attributes.length; i++) {
           var nodeAttributes = node.attributes[i];
           var name = nodeAttributes.name;
           var value = nodeAttributes.value;
@@ -76,9 +78,12 @@ BindTransform.prototype.transform = function(ast) {
         if (foundDynamicContent) {
           var newTag = b.element(tag, newAttributes, []);
           var blockWithParam = b.program([newTag], [unusedBlockParam]);
-          let block = b.block(b.path('cs-field'), [
-            b.path("content"), b.string(contentProperty)
-          ], b.hash(), blockWithParam);
+          let block = b.block(
+            b.path('cs-field'),
+            [b.path('content'), b.string(contentProperty)],
+            b.hash(),
+            blockWithParam,
+          );
           return block;
         }
 
@@ -87,9 +92,9 @@ BindTransform.prototype.transform = function(ast) {
 
       MustacheStatement(node) {
         if (node.path.parts.length === 2 && node.path.parts[0] === 'content') {
-          return b.mustache(b.path("cs-field"), [b.path("content"), b.string(node.path.parts[1])]);
+          return b.mustache(b.path('cs-field'), [b.path('content'), b.string(node.path.parts[1])]);
         }
-      }
+      },
     });
   }
   return ast;
@@ -111,14 +116,12 @@ function getUnusedBlockParam(foundNames) {
   return paramName;
 }
 
-
-
 function collectBlockParams(ast, foundBlockParams) {
   if (!foundBlockParams) {
     foundBlockParams = [];
   }
 
-  for (var i=0; i<ast.body.length; i++) {
+  for (var i = 0; i < ast.body.length; i++) {
     var tree = ast.body[i];
     var program = tree.program;
     if (program) {

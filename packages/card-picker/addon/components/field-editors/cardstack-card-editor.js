@@ -9,12 +9,12 @@ export default Component.extend({
 
   actions: {
     pickCard() {
-      this.tools.pickCard().then((card) => {
+      this.tools.pickCard().then(card => {
         this.set(`content.${this.get('field')}`, card);
-      })
+      });
     },
     deleteCard() {
       this.set(`content.${this.get('field')}`, null);
-    }
-  }
+    },
+  },
 });

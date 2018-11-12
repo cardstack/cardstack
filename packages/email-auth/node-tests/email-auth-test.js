@@ -1,33 +1,29 @@
 const supertest = require('supertest');
 const Koa = require('koa');
-const {
-  createDefaultEnvironment,
-  destroyDefaultEnvironment
-} = require('@cardstack/test-support/env');
+const { createDefaultEnvironment, destroyDefaultEnvironment } = require('@cardstack/test-support/env');
 const JSONAPIFactory = require('@cardstack/test-support/jsonapi-factory');
 const TestMessenger = require('@cardstack/test-support-messenger/messenger');
 
 describe('email-auth', function() {
-
   let request, env;
 
   async function setup() {
     let factory = new JSONAPIFactory();
 
-    factory.addResource('grants')
+    factory
+      .addResource('grants')
       .withRelated('who', [{ type: 'fields', id: 'id' }])
-      .withRelated('types', [
-        { type: 'content-types', id: 'users' }
-      ])
+      .withRelated('types', [{ type: 'content-types', id: 'users' }])
       .withAttributes({
         mayReadResource: true,
-        mayReadFields: true
+        mayReadFields: true,
       });
 
-    factory.addResource('grants')
+    factory
+      .addResource('grants')
       .withRelated('who', [{ type: 'groups', id: 'everyone' }])
       .withAttributes({
-        mayLogin: true
+        mayLogin: true,
       });
 
     factory.addResource('users', 'valid-quint-id').withAttributes({
@@ -35,21 +31,21 @@ describe('email-auth', function() {
     });
 
     factory.addResource('message-sinks', 'the-sink').withAttributes({
-      messengerType: '@cardstack/test-support-messenger'
+      messengerType: '@cardstack/test-support-messenger',
     });
 
     factory.addResource('data-sources', 'email-auth').withAttributes({
       sourceType: '@cardstack/email-auth',
       mayCreateUser: true,
       params: {
-        messageSinkId: 'the-sink'
-      }
+        messageSinkId: 'the-sink',
+      },
     });
 
     factory.addResource('content-types', 'users').withRelated('fields', [
       factory.addResource('fields', 'email').withAttributes({
-        fieldType: '@cardstack/core-types::string'
-      })
+        fieldType: '@cardstack/core-types::string',
+      }),
     ]);
 
     env = await createDefaultEnvironment(`${__dirname}/..`, factory.getModels());
@@ -80,7 +76,7 @@ describe('email-auth', function() {
 
   it('creates a new user', async function() {
     let response = await request.post(`/auth/email-auth`).send({
-      email: 'arthur@example.com'
+      email: 'arthur@example.com',
     });
     expect(response).hasStatus(200);
     expect(response.body).has.deep.property('data.id');
@@ -99,7 +95,7 @@ describe('email-auth', function() {
 
   it('requires referer', async function() {
     let response = await request.post(`/auth/email-auth`).send({
-      email: 'quint@example.com'
+      email: 'quint@example.com',
     });
     expect(response).hasStatus(400);
   });
@@ -107,7 +103,7 @@ describe('email-auth', function() {
   it('challenges returning user', async function() {
     let response = await request.post(`/auth/email-auth`).send({
       email: 'quint@example.com',
-      referer: 'http://example.com'
+      referer: 'http://example.com',
     });
     expect(response).hasStatus(200);
     expect(response.body).not.has.deep.property('meta.token');
@@ -115,28 +111,32 @@ describe('email-auth', function() {
       type: 'users',
       attributes: {
         message: 'Check your email',
-        state: 'pending-email'
-      }
+        state: 'pending-email',
+      },
     });
     expect(response.body.meta).deep.equals({
-      'partial-session': true
+      'partial-session': true,
     });
     let sentMessages = await TestMessenger.sentMessages(env);
     expect(sentMessages).has.length(1, 'sent messages has the wrong length');
     expect(sentMessages[0]).has.deep.property('message.subject');
-    expect(sentMessages[0].message.text).to.match(/http:\/\/example\.com\/@cardstack\/email-auth\/redirect.html\?secret=...../);
+    expect(sentMessages[0].message.text).to.match(
+      /http:\/\/example\.com\/@cardstack\/email-auth\/redirect.html\?secret=...../,
+    );
   });
 
   it('allows returning user with valid token', async function() {
     let response = await request.post(`/auth/email-auth`).send({
       email: 'quint@example.com',
-      referer: 'http://example.com'
+      referer: 'http://example.com',
     });
     expect(response).hasStatus(200);
     expect(response.body).has.deep.property('data.attributes.state', 'pending-email');
     let sentMessages = await TestMessenger.sentMessages(env);
     expect(sentMessages).has.length(1);
-    let m = /http:\/\/example\.com\/@cardstack\/email-auth\/redirect.html\?secret=(.*)/.exec(sentMessages[0].message.text);
+    let m = /http:\/\/example\.com\/@cardstack\/email-auth\/redirect.html\?secret=(.*)/.exec(
+      sentMessages[0].message.text,
+    );
     expect(m).is.ok;
     let secret = decodeURIComponent(m[1]);
     response = await request.post('/auth/email-auth').send({ secret });
@@ -155,30 +155,29 @@ describe('email-auth', function() {
   });
 
   it('rejects valid but expired token', async function() {
-    let token = env.lookup('hub:encryptor').encryptAndSign(['valid-quint-id', Math.floor(Date.now()/1000 - 60)]);
+    let token = env.lookup('hub:encryptor').encryptAndSign(['valid-quint-id', Math.floor(Date.now() / 1000 - 60)]);
     let response = await request.post(`/auth/email-auth`).send({
-      secret: token
+      secret: token,
     });
     expect(response).hasStatus(401);
   });
 
   it('rejects valid token for missing user', async function() {
-    let token = env.lookup('hub:encryptor').encryptAndSign(['not-valid-id', Math.floor(Date.now()/1000 + 60)]);
+    let token = env.lookup('hub:encryptor').encryptAndSign(['not-valid-id', Math.floor(Date.now() / 1000 + 60)]);
     let response = await request.post(`/auth/email-auth`).send({
-      secret: token
+      secret: token,
     });
     expect(response).hasStatus(404);
   });
 
   it('matches the token format our tests expect', async function() {
-    let token = env.lookup('hub:encryptor').encryptAndSign(['valid-quint-id', Math.floor(Date.now()/1000 + 60)]);
+    let token = env.lookup('hub:encryptor').encryptAndSign(['valid-quint-id', Math.floor(Date.now() / 1000 + 60)]);
     let response = await request.post(`/auth/email-auth`).send({
-      secret: token
+      secret: token,
     });
     expect(response).hasStatus(200);
     expect(response.body.data.attributes).deep.equals({
       email: 'quint@example.com',
     });
   });
-
 });

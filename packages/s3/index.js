@@ -1,5 +1,5 @@
 'use strict';
 
 module.exports = {
-  name: '@cardstack/s3'
+  name: '@cardstack/s3',
 };

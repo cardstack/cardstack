@@ -3,5 +3,5 @@ export function isEmpty(value) {
 }
 
 export function placeholder(/* humanizedFieldName */) {
-  return {isPlaceholder: true};
+  return { isPlaceholder: true };
 }

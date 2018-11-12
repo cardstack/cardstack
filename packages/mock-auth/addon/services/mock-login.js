@@ -11,14 +11,16 @@ export default Service.extend({
   partialAuthenticationHandler: null,
   authenticationFailedHandler: null,
 
-  login: task(function * (mockUserId) {
+  login: task(function*(mockUserId) {
     mockUserId = this.get('mockUserId') || mockUserId;
-    if (mockUserId ) {
+    if (mockUserId) {
       let message;
 
       try {
-        yield this.get('session').authenticate('authenticator:cardstack', this.get('source'), { authorizationCode: mockUserId });
-      } catch(err) {
+        yield this.get('session').authenticate('authenticator:cardstack', this.get('source'), {
+          authorizationCode: mockUserId,
+        });
+      } catch (err) {
         message = err.message;
       }
 
@@ -27,18 +29,17 @@ export default Service.extend({
       let onPartialAuthenticationHandler = get(this, 'partialAuthenticationHandler');
       let onAuthenticationFailedHandler = get(this, 'authenticationFailedHandler');
 
-      if (get(session, 'isAuthenticated') &&
-        typeof onAuthenticationHandler === 'function') {
+      if (get(session, 'isAuthenticated') && typeof onAuthenticationHandler === 'function') {
         onAuthenticationHandler(session);
-      } else if (get(session, 'isPartiallyAuthenticated') && typeof
-        onPartialAuthenticationHandler === 'function') {
+      } else if (get(session, 'isPartiallyAuthenticated') && typeof onPartialAuthenticationHandler === 'function') {
         onPartialAuthenticationHandler(session);
-      } else if (!get(session, 'isAuthenticated') &&
-        !get(session, 'isPartiallyAuthenticated') && typeof
-        onAuthenticationFailedHandler === 'function') {
+      } else if (
+        !get(session, 'isAuthenticated') &&
+        !get(session, 'isPartiallyAuthenticated') &&
+        typeof onAuthenticationFailedHandler === 'function'
+      ) {
         onAuthenticationFailedHandler(message);
       }
     }
-  }).drop()
+  }).drop(),
 });
-

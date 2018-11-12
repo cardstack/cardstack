@@ -8,7 +8,7 @@ module('Integration | Component | field editors/datetime editor', function(hooks
 
   test('it renders', async function(assert) {
     this.set('model', {
-      expiration: '2030-01-01T10:00:00'
+      expiration: '2030-01-01T10:00:00',
     });
     await render(hbs`{{field-editors/datetime-editor content=model field="expiration" enabled=true}}`);
 
@@ -18,7 +18,7 @@ module('Integration | Component | field editors/datetime editor', function(hooks
 
   test('it renders with invalid datetime', async function(assert) {
     this.set('model', {
-      expiration: 'pizza'
+      expiration: 'pizza',
     });
     await render(hbs`{{field-editors/datetime-editor content=model field="expiration" enabled=true}}`);
     assert.dom('input[type=datetime-local]').hasNoValue('datetime input has no value');
@@ -27,7 +27,7 @@ module('Integration | Component | field editors/datetime editor', function(hooks
 
   test('it can be disabled', async function(assert) {
     this.set('model', {
-      expiration: '2030-01-01T10:00:00'
+      expiration: '2030-01-01T10:00:00',
     });
     await render(hbs`{{field-editors/datetime-editor content=model field="expiration" enabled=false}}`);
     assert.dom('input').isDisabled('datetime field is disabled');

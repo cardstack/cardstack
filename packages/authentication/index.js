@@ -4,5 +4,5 @@ module.exports = {
   name: '@cardstack/authentication',
   isDevelopingAddon() {
     return process.env.CARDSTACK_DEV;
-  }
+  },
 };

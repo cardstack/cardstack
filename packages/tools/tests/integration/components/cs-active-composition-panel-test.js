@@ -7,13 +7,17 @@ module('Integration | Component | cs active composition panel', function(hooks) 
   setupRenderingTest(hooks);
 
   skip('it renders', function(assert) {
-
     // Set any properties with this.set('myProperty', 'value');
     // Handle any actions with this.on('myAction', function(val) { ... });
 
     this.render(hbs`{{cs-active-composition-panel}}`);
 
-    assert.equal(this.$().text().trim(), '');
+    assert.equal(
+      this.$()
+        .text()
+        .trim(),
+      '',
+    );
 
     // Template block usage:
     this.render(hbs`
@@ -22,6 +26,11 @@ module('Integration | Component | cs active composition panel', function(hooks) 
       {{/cs-active-composition-panel}}
     `);
 
-    assert.equal(this.$().text().trim(), 'template block text');
+    assert.equal(
+      this.$()
+        .text()
+        .trim(),
+      'template block text',
+    );
   });
 });

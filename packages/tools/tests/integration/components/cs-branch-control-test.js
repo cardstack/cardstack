@@ -16,19 +16,29 @@ module('Integration | Component | cs branch control', function(hooks) {
       setBranch(which) {
         this.get('branchSets').push(which);
         this.set('branch', which);
-      }
+      },
     });
   });
 
   test('it renders in live mode', async function(assert) {
     await render(hbs`{{cs-branch-control}}`);
-    assert.equal(this.$('button.active').text().trim(), 'Live');
+    assert.equal(
+      this.$('button.active')
+        .text()
+        .trim(),
+      'Live',
+    );
   });
 
   test('it renders in preview mode', async function(assert) {
     this.get('tools').set('branch', 'b');
     await render(hbs`{{cs-branch-control}}`);
-    assert.equal(this.$('button.active').text().trim(), 'Preview');
+    assert.equal(
+      this.$('button.active')
+        .text()
+        .trim(),
+      'Preview',
+    );
   });
 
   test('it enters preview', async function(assert) {
@@ -37,7 +47,12 @@ module('Integration | Component | cs branch control', function(hooks) {
       this.$('button:contains(Preview)').click();
     });
     assert.deepEqual(this.get('tools.branchSets'), ['draft']);
-    assert.equal(this.$('button.active').text().trim(), 'Preview');
+    assert.equal(
+      this.$('button.active')
+        .text()
+        .trim(),
+      'Preview',
+    );
   });
 
   test('it enters live', async function(assert) {
@@ -47,6 +62,11 @@ module('Integration | Component | cs branch control', function(hooks) {
       this.$('button:contains(Live)').click();
     });
     assert.deepEqual(this.get('tools.branchSets'), ['master']);
-    assert.equal(this.$('button.active').text().trim(), 'Live');
+    assert.equal(
+      this.$('button.active')
+        .text()
+        .trim(),
+      'Live',
+    );
   });
 });

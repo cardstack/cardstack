@@ -13,13 +13,13 @@ export default Component.extend({
       let field = get(this, 'field');
       let content = get(this, 'content');
 
-      this.tools.pickCard().then((card) => {
+      this.tools.pickCard().then(card => {
         content.watchRelationship(field, () => {
           get(content, field).pushObject(card);
         });
-      })
+      });
     },
-    
+
     orderChanged(rearrangedCards) {
       let field = get(this, 'field');
       let content = get(this, 'content');
@@ -36,6 +36,6 @@ export default Component.extend({
       content.watchRelationship(field, () => {
         get(content, field).removeObject(card);
       });
-    }
-  }
+    },
+  },
 });

@@ -1,4 +1,4 @@
-import Component from "@ember/component";
+import Component from '@ember/component';
 
 export default Component.extend({
   thread: null,
@@ -6,6 +6,6 @@ export default Component.extend({
   actions: {
     select() {
       this.get('onSelect')();
-    }
-  }
+    },
+  },
 });

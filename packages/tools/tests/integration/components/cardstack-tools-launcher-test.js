@@ -9,20 +9,23 @@ module('Integration | Component | cardstack tools launcher', function(hooks) {
   setupRenderingTest(hooks);
 
   hooks.beforeEach(function() {
-    this.owner.register('service:cardstack-tools', Service.extend({
-      available: true,
-      active: false,
-      setActive(value) {
-        this.set('active', value);
-      }
-    }));
+    this.owner.register(
+      'service:cardstack-tools',
+      Service.extend({
+        available: true,
+        active: false,
+        setActive(value) {
+          this.set('active', value);
+        },
+      }),
+    );
     this.tools = this.owner.lookup('service:cardstack-tools');
   });
 
   test('it renders with default implementation', async function(assert) {
     await render(hbs`{{cardstack-tools-launcher}}`);
-    assert.equal(this.$('svg').length, 1, "found svg icon");
-    assert.equal(this.$('svg.active').length, 0, "not active");
+    assert.equal(this.$('svg').length, 1, 'found svg icon');
+    assert.equal(this.$('svg.active').length, 0, 'not active');
   });
 
   test('it renders with custom implementation', async function(assert) {
@@ -41,7 +44,7 @@ module('Integration | Component | cardstack tools launcher', function(hooks) {
   test('it does not render when tools are not available', async function(assert) {
     this.get('tools').set('available', false);
     await render(hbs`{{cardstack-tools-launcher}}`);
-    assert.equal(this.$('svg').length, 0, "no icon");
+    assert.equal(this.$('svg').length, 0, 'no icon');
   });
 
   test('clicking icon toggles tools', async function(assert) {
@@ -49,6 +52,6 @@ module('Integration | Component | cardstack tools launcher', function(hooks) {
     run(() => {
       this.$('svg').click();
     });
-    assert.equal(this.$('svg.active').length, 1, "found active icon");
+    assert.equal(this.$('svg.active').length, 1, 'found active icon');
   });
 });

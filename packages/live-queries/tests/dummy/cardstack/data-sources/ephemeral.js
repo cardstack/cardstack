@@ -11,55 +11,57 @@ module.exports = [
       'may-read-resource': true,
       'may-update-resource': true,
       'may-delete-resource': true,
-      'may-login': true
+      'may-login': true,
     },
     relationships: {
       who: {
-        data: [{ type: 'groups', id: 'everyone' }]
-      }
-    }
-  },{
+        data: [{ type: 'groups', id: 'everyone' }],
+      },
+    },
+  },
+  {
     type: 'fields',
     id: 'content',
     attributes: {
-      'field-type': '@cardstack/core-types::string'
-    }
-  },{
+      'field-type': '@cardstack/core-types::string',
+    },
+  },
+  {
     type: 'content-types',
     id: 'items',
     relationships: {
       fields: {
-        data: [
-          { type: 'fields', id: 'content' }
-        ]
-      }
-    }
-  },{
+        data: [{ type: 'fields', id: 'content' }],
+      },
+    },
+  },
+  {
     type: 'plugin-configs',
-    id: '@cardstack/ephemeral'
-  },{
+    id: '@cardstack/ephemeral',
+  },
+  {
     type: 'plugin-configs',
     id: '@cardstack/live-queries',
     attributes: {
       'socket-namespace': 'live-queries',
       'socket-path': '/',
-      'socket-port': 3200
-    }
+      'socket-port': 3200,
+    },
   },
   {
     type: 'data-sources',
     id: 'default',
     attributes: {
       'source-type': '@cardstack/ephemeral',
-    }
+    },
   },
   {
     type: 'plugin-configs',
     id: '@cardstack/hub',
     relationships: {
       'default-data-source': {
-        data: { type: 'data-sources', id: 'default' }
-      }
-    }
-  }
+        data: { type: 'data-sources', id: 'default' },
+      },
+    },
+  },
 ];

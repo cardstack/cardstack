@@ -1,5 +1,5 @@
 const TextRenderer = require('mobiledoc-text-renderer').default;
-const renderer = new TextRenderer({cards: []});
+const renderer = new TextRenderer({ cards: [] });
 
 const WORDS_PER_MIN = 200;
 

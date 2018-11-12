@@ -1,11 +1,10 @@
 import Component from '@ember/component';
-import { hubURL } from "@cardstack/plugin-utils/environment";
+import { hubURL } from '@cardstack/plugin-utils/environment';
 import layout from '../../templates/components/field-editors/image-upload-modal';
-import $ from "jquery";
-import { inject as service } from "@ember/service";
-import { computed } from "@ember/object";
-import { task } from "ember-concurrency";
-
+import $ from 'jquery';
+import { inject as service } from '@ember/service';
+import { computed } from '@ember/object';
+import { task } from 'ember-concurrency';
 
 export default Component.extend({
   classNames: ['cardstack-image-upload-modal'],
@@ -16,17 +15,17 @@ export default Component.extend({
     return `${hubURL}/api/cs-files`;
   }),
 
-  uploadFile: task(function * (event) {
+  uploadFile: task(function*(event) {
     let file = event.target.files[0];
     let data = new FormData();
     data.append('file', file);
 
     let jsonApiDocument = yield $.ajax({
-        url: this.get('endpointUrl'),
-        type: "POST",
-        data,
-        contentType: false,
-        processData: false
+      url: this.get('endpointUrl'),
+      type: 'POST',
+      data,
+      contentType: false,
+      processData: false,
     });
 
     this.get('store').pushPayload(jsonApiDocument);
@@ -34,12 +33,11 @@ export default Component.extend({
     let fileRecord = this.get('store').peekRecord(type, id);
 
     return fileRecord;
-
   }).restartable(),
 
   actions: {
     updateImage() {
       this.get('updateImage')(this.get('uploadFile.lastSuccessful.value'));
-    }
-  }
+    },
+  },
 });

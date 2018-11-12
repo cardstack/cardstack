@@ -13,8 +13,8 @@ module.exports = function(environment) {
       },
       EXTEND_PROTOTYPES: {
         // Prevent Ember Data from overriding Date.parse.
-        Date: false
-      }
+        Date: false,
+      },
     },
 
     APP: {
@@ -22,8 +22,7 @@ module.exports = function(environment) {
       // when it is created
     },
 
-    torii: {}
-
+    torii: {},
   };
 
   if (environment === 'development') {

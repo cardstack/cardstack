@@ -4,7 +4,7 @@ import layout from '../templates/components/cs-version-control';
 import { task } from 'ember-concurrency';
 import { modelType } from '@cardstack/rendering/helpers/cs-model-type';
 import { defaultBranch } from '@cardstack/plugin-utils/environment';
-import { computed } from "@ember/object";
+import { computed } from '@ember/object';
 import { or } from '@ember/object/computed';
 
 export default Component.extend({
@@ -12,7 +12,7 @@ export default Component.extend({
   tagName: '',
   opened: true,
   animationRules,
-  "on-error": function() {},
+  'on-error': function() {},
   resourceMetadata: service(),
   store: service(),
   router: service(),
@@ -38,7 +38,7 @@ export default Component.extend({
     }
   }),
 
-  fetchUpstreamModel: task(function * () {
+  fetchUpstreamModel: task(function*() {
     this.set('upstreamModel', null);
     if (this.get('onMaster')) {
       // Nothing to do, we're already on the default branch, so there
@@ -64,44 +64,51 @@ export default Component.extend({
       }
       throw err;
     }
-  }).observes('modelMeta.branch', 'model.id').on('init'),
+  })
+    .observes('modelMeta.branch', 'model.id')
+    .on('init'),
 
   // this describes the state of our model relative to its branch. So
   // "saved" here means it has been saved to its branch, etc.
   modificationState: computed('model.isNew', 'anythingDirty', function() {
     if (this.get('model.isNew')) {
-      return "new";
-    } else  if (this.get('anythingDirty')) {
-      return "changed";
+      return 'new';
+    } else if (this.get('anythingDirty')) {
+      return 'changed';
     } else {
-      return "saved";
+      return 'saved';
     }
   }),
 
   // this describes the state of our model relative to its value on
   // the default branch.
-  upstreamState: computed('upstreamMeta.hash', 'modelMeta.hash', 'onMaster', 'fetchUpstreamModel.isRunning', function() {
-    if (this.get('onMaster')) {
-      return 'self';
-    }
+  upstreamState: computed(
+    'upstreamMeta.hash',
+    'modelMeta.hash',
+    'onMaster',
+    'fetchUpstreamModel.isRunning',
+    function() {
+      if (this.get('onMaster')) {
+        return 'self';
+      }
 
-    if (this.get('fetchUpstreamModel.isRunning')) {
-      return 'pending';
-    }
+      if (this.get('fetchUpstreamModel.isRunning')) {
+        return 'pending';
+      }
 
-    let upstreamMeta = this.get('upstreamMeta');
-    if (!upstreamMeta) {
-      return 'created';
-    }
+      let upstreamMeta = this.get('upstreamMeta');
+      if (!upstreamMeta) {
+        return 'created';
+      }
 
-    let meta = this.get('modelMeta');
-    if (meta.hash === upstreamMeta.hash) {
-      return 'same';
-    } else {
-      return 'different';
-    }
-
-  }),
+      let meta = this.get('modelMeta');
+      if (meta.hash === upstreamMeta.hash) {
+        return 'same';
+      } else {
+        return 'different';
+      }
+    },
+  ),
 
   titleClass: computed('upstreamState', function() {
     let state = this.get('upstreamState');
@@ -111,22 +118,22 @@ export default Component.extend({
   }),
 
   title: computed('modificationState', 'upstreamState', function() {
-    switch(this.get('modificationState')) {
-    case 'new':
-      return 'Drafted'
-    case 'changed':
-      return 'Changed';
-    case 'saved':
-      switch(this.get('upstreamState')) {
-      case 'pending':
-        return '...';
-      case 'self':
-        return 'Live';
-      case 'created':
-      case 'different':
-      case 'same':
-        return 'Preview';
-      }
+    switch (this.get('modificationState')) {
+      case 'new':
+        return 'Drafted';
+      case 'changed':
+        return 'Changed';
+      case 'saved':
+        switch (this.get('upstreamState')) {
+          case 'pending':
+            return '...';
+          case 'self':
+            return 'Live';
+          case 'created':
+          case 'different':
+          case 'same':
+            return 'Preview';
+        }
     }
   }),
 
@@ -137,7 +144,7 @@ export default Component.extend({
 
   anythingPending: or('model.isNew', 'anythingDirty'),
 
-  update: task(function * () {
+  update: task(function*() {
     let model = this.get('model');
     let errors = yield this.get('data').validate(model);
     if (Object.keys(errors).length > 0) {
@@ -146,7 +153,7 @@ export default Component.extend({
     yield model.save();
   }).keepLatest(),
 
-  delete: task(function * () {
+  delete: task(function*() {
     yield this.get('model').destroyRecord();
 
     this.get('router').transitionTo('application');
@@ -158,8 +165,8 @@ export default Component.extend({
     },
     close() {
       this.set('opened', false);
-    }
-  }
+    },
+  },
 });
 
 function animationRules() {
@@ -167,6 +174,6 @@ function animationRules() {
     this.fromValue(false),
     this.toValue(true),
     this.use('to-down', { duration: 250 }),
-    this.reverse('to-up', { duration: 250 })
+    this.reverse('to-up', { duration: 250 }),
   );
 }

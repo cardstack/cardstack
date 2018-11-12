@@ -5,5 +5,5 @@ import layout from '../templates/components/card-picker-edges';
 
 export default Component.extend({
   tools: service('cardstack-card-picker'),
-  layout
+  layout,
 });

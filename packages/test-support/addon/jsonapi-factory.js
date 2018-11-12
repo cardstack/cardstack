@@ -7,7 +7,7 @@ export default class JSONAPIFactory {
     this.data = [];
   }
 
-  addResource(type, id=null) {
+  addResource(type, id = null) {
     if (id == null) {
       id = idGenerator++;
     }
@@ -45,11 +45,7 @@ export default class JSONAPIFactory {
       // These are all bootstrap schema and we need to not include them
       // here to avoid circularity.
       dependsOn = dependsOn.filter(dep => {
-        return ![
-          'content-types/content-types',
-          'content-types/fields',
-          'fields/fields'
-        ].includes(dep);
+        return !['content-types/content-types', 'content-types/fields', 'fields/fields'].includes(dep);
       });
 
       dag.add(`${model.type}/${model.id}`, model, [], dependsOn);
@@ -66,7 +62,6 @@ export default class JSONAPIFactory {
   importModels(models) {
     this.data = this.data.concat(models);
   }
-
 }
 
 class ResourceFactory {
@@ -89,13 +84,13 @@ class ResourceFactory {
       throw new Error(`No value for ${fieldName}`);
     }
     if (!this.data.relationships) {
-        this.data.relationships = {};
+      this.data.relationships = {};
     }
     let data;
     if (Array.isArray(value)) {
-      data = value.map(entry => ({ type: entry.type, id: entry.id}));
+      data = value.map(entry => ({ type: entry.type, id: entry.id }));
     } else {
-      data ={ type: value.type, id: value.id};
+      data = { type: value.type, id: value.id };
     }
     this.data.relationships[dasherize(fieldName)] = { data };
     return this;
@@ -106,5 +101,5 @@ class ResourceFactory {
 }
 
 function dasherize(camelCase) {
-  return camelCase.replace(/([a-z])([A-Z])/g, (a,b,c) => `${b}-${c.toLowerCase()}`);
+  return camelCase.replace(/([a-z])([A-Z])/g, (a, b, c) => `${b}-${c.toLowerCase()}`);
 }

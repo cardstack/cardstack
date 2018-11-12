@@ -11,7 +11,7 @@ export default Service.extend({
   connect(namespace) {
     Ember.Logger.info(`Connecting to socket.io namespace ${namespace} at url: ${host}/${path}`);
     return io(host + namespace, {
-      path
+      path,
     });
-  }
+  },
 });

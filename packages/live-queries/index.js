@@ -13,9 +13,9 @@ module.exports = {
       using: [
         {
           transformation: 'amd',
-          as: 'socket-io'
-        }
-      ]
+          as: 'socket-io',
+        },
+      ],
     });
-  }
+  },
 };

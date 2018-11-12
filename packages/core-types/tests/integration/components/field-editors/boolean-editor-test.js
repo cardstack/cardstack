@@ -8,7 +8,7 @@ module('Integration | Component | field editors/boolean editor', function(hooks)
 
   test('it renders', async function(assert) {
     this.set('model', {
-      addKetchup: false
+      addKetchup: false,
     });
     await render(hbs`{{field-editors/boolean-editor content=model field="addKetchup"}}`);
     assert.dom('.cs-toggle-switch').hasText('Off', 'slider has correct value');
@@ -20,7 +20,7 @@ module('Integration | Component | field editors/boolean editor', function(hooks)
 
   test('it can be disabled', async function(assert) {
     this.set('model', {
-      addKetchup: false
+      addKetchup: false,
     });
     await render(hbs`{{field-editors/boolean-editor content=model field="addKetchup" disabled=true}}`);
     assert.dom('.cs-toggle-switch.disabled').exists('slider is disabled');

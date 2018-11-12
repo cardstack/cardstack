@@ -10,7 +10,7 @@ module('Integration | Component | cs editor switch', function(hooks) {
 
   test('it renders', async function(assert) {
     await render(hbs`{{cs-editor-switch}}`);
-    assert.equal(this.$('label:contains(Editor)').length, 1, "found label");
+    assert.equal(this.$('label:contains(Editor)').length, 1, 'found label');
   });
 
   test('clears opened field after switch is off', async function(assert) {
@@ -24,7 +24,7 @@ module('Integration | Component | cs editor switch', function(hooks) {
       },
       openField(value) {
         this.openedFieldId = value;
-      }
+      },
     });
     this.owner.register('service:cardstack-tools', toolsStub);
 

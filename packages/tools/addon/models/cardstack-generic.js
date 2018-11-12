@@ -5,5 +5,5 @@ export default Model.extend({
   realId: attr(),
   realType: attr('string'),
   attributes: attr(),
-  relationships: attr()
+  relationships: attr(),
 });

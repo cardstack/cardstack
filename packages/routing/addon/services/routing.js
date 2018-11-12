@@ -13,20 +13,20 @@ export default Service.extend({
         return {
           name: 'cardstack.index',
           params: [],
-          queryParams
-        }
+          queryParams,
+        };
       } else {
         return {
           name: 'cardstack.default-content',
-          params: [ ['routingId', routingId ] ],
-          queryParams
+          params: [['routingId', routingId]],
+          queryParams,
         };
       }
     } else {
       return {
         name: 'cardstack.content',
-        params: [ ['type', type], ['routingId', routingId] ],
-        queryParams
+        params: [['type', type], ['routingId', routingId]],
+        queryParams,
       };
     }
   },
@@ -36,9 +36,9 @@ export default Service.extend({
     type = pluralize(type);
     return {
       name: 'cardstack.new-content',
-      params: [ ['type', type] ],
-      queryParams
-    }
+      params: [['type', type]],
+      queryParams,
+    };
   },
 
   _qpsForBranch(branch) {
@@ -56,6 +56,5 @@ export default Service.extend({
       return singularize(type);
     }
     return `${branch}--${singularize(type)}`;
-  }
-
+  },
 });

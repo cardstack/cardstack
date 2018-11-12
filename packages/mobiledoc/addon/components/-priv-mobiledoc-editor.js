@@ -15,14 +15,15 @@ export default MobiledocEditor.extend({
     this._super(editor);
 
     editor.cursorDidChange(() => {
-      if (this.isDestroyed) { return; }
+      if (this.isDestroyed) {
+        return;
+      }
 
       run.join(() => {
         let bounds;
         if (editor.cursor.selection.rangeCount > 0) {
           bounds = editor.cursor.selection.getRangeAt(0).getBoundingClientRect();
         }
-
 
         let activeSection = editor.activeSection;
 
@@ -34,7 +35,7 @@ export default MobiledocEditor.extend({
             hasSelection: editor.cursor.hasSelection(),
             hasCursor: editor.cursor.hasCursor(),
             activeSection,
-            activeSectionBounds: activeSection ? activeSection.renderNode._element.getBoundingClientRect() : null
+            activeSectionBounds: activeSection ? activeSection.renderNode._element.getBoundingClientRect() : null,
           });
         }
       });
@@ -43,9 +44,11 @@ export default MobiledocEditor.extend({
     editor.registerKeyCommand({
       str: 'backspace',
       run(editor) {
-        if (editor.range.focusedPosition.section.type === 'list-item' &&
-           editor.range.focusedPosition.section.prev &&
-           editor.range.focusedPosition.offset === 0) {
+        if (
+          editor.range.focusedPosition.section.type === 'list-item' &&
+          editor.range.focusedPosition.section.prev &&
+          editor.range.focusedPosition.offset === 0
+        ) {
           let prevSection = editor.range.focusedPosition.section.prev;
           let range = new Range(prevSection.headPosition(), prevSection.tailPosition());
           let markups = prevSection.markupsInRange(range);
@@ -61,7 +64,7 @@ export default MobiledocEditor.extend({
         } else {
           return false;
         }
-      }
+      },
     });
 
     editor.registerKeyCommand({
@@ -73,9 +76,7 @@ export default MobiledocEditor.extend({
         let markup = markups.find(item => {
           return item.attributes && item.attributes.href === NEW_LINE_HREF;
         });
-        if (section.type === 'list-item' &&
-           editor.range.focusedPosition.section.next &&
-           !markup) {
+        if (section.type === 'list-item' && editor.range.focusedPosition.section.next && !markup) {
           editor.run(postEditor => {
             let markup = postEditor.builder.createMarkup('a', { href: NEW_LINE_HREF });
             postEditor.insertTextWithMarkup(section.tailPosition(), String.fromCharCode(8203), [markup]);
@@ -83,7 +84,7 @@ export default MobiledocEditor.extend({
         } else {
           return false;
         }
-      }
+      },
     });
-  }
+  },
 });

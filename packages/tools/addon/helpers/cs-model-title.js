@@ -1,9 +1,6 @@
 import { helper as buildHelper } from '@ember/component/helper';
 
-let defaults = [
-  'title',
-  'name'
-];
+let defaults = ['title', 'name'];
 
 export function csModelTitle([model]) {
   if (model) {

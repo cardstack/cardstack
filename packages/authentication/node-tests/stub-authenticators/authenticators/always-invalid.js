@@ -5,6 +5,6 @@ module.exports = class {
     return new this();
   }
   async authenticate() {
-    throw new Error("Your input is terrible and you should feel bad", { status: 400 });
+    throw new Error('Your input is terrible and you should feel bad', { status: 400 });
   }
 };

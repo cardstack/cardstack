@@ -23,12 +23,12 @@ export default Component.extend({
     extendToriiProviders({
       'github-oauth2': {
         apiKey: clientId,
-        scope: 'user:email'
-      }
+        scope: 'user:email',
+      },
     });
   },
 
-  login: task(function * () {
+  login: task(function*() {
     // this should wait for fetchConfig to be done, but if we block
     // before opening the popup window we run afoul of popup
     // blockers. So instead in our template we don't render ourself at
@@ -36,7 +36,7 @@ export default Component.extend({
     // would require changes to Torii.
     let { authorizationCode } = yield this.get('torii').open('github-oauth2');
     yield this.get('session').authenticate('authenticator:cardstack', this.get('source'), { authorizationCode });
-  }).drop()
+  }).drop(),
 });
 
 function extendToriiProviders(newConfig) {
@@ -44,6 +44,6 @@ function extendToriiProviders(newConfig) {
   if (!toriiConfig.providers) {
     toriiConfig.providers = {};
   }
-  Object.assign(toriiConfig.providers, newConfig)
+  Object.assign(toriiConfig.providers, newConfig);
   configure(toriiConfig);
 }

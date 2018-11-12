@@ -1,5 +1,5 @@
 'use strict';
 
 module.exports = {
-  name: '@cardstack/workflow'
+  name: '@cardstack/workflow',
 };

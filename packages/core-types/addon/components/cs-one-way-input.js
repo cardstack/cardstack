@@ -15,22 +15,22 @@ export default Component.extend({
       }
     },
     onChange(value) {
-      let onchange = this.get("onchange");
+      let onchange = this.get('onchange');
       if (onchange) {
         onchange(value);
       }
     },
     onFocus(event) {
-      let onfocus = this.get("onfocus");
+      let onfocus = this.get('onfocus');
       if (onfocus) {
         onfocus(event);
       }
     },
     onBlur(event) {
-      let onblur = this.get("onblur");
+      let onblur = this.get('onblur');
       if (onblur) {
         onblur(event);
       }
-    }
-  }
+    },
+  },
 });

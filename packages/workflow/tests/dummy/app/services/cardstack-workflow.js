@@ -27,5 +27,5 @@ export default workflowService.extend({
   readChatMessage(chatMessage) {
     this.process(chatMessage.get('message'));
     chatMessage.read();
-  }
+  },
 });

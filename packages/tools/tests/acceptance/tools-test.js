@@ -3,16 +3,19 @@ import { setupApplicationTest } from 'ember-qunit';
 import { visit, click, fillIn, triggerEvent, waitFor } from '@ember/test-helpers';
 
 function findTriggerElementWithLabel(labelRegex) {
-  return [...this.element.querySelectorAll('.cs-toolbox-section label')].find(element => labelRegex.test(element.textContent));
+  return [...this.element.querySelectorAll('.cs-toolbox-section label')].find(element =>
+    labelRegex.test(element.textContent),
+  );
 }
 
 function findSectionLabels(label) {
-  return [...this.element.querySelectorAll('.cs-toolbox-section label')].filter(element => label === element.textContent);
+  return [...this.element.querySelectorAll('.cs-toolbox-section label')].filter(
+    element => label === element.textContent,
+  );
 }
 
 function findInputWithValue(value) {
-  return Array.from(this.element.querySelectorAll('input'))
-    .find(element => element.value === value);
+  return Array.from(this.element.querySelectorAll('input')).find(element => element.value === value);
 }
 
 module('Acceptance | tools', function(hooks) {
@@ -75,9 +78,9 @@ module('Acceptance | tools', function(hooks) {
     await click('.cardstack-tools-launcher');
 
     let archivedSection = findTriggerElementWithLabel.call(this, /Archived/);
-    assert.ok(archivedSection, "Unrendered field appears in editor");
+    assert.ok(archivedSection, 'Unrendered field appears in editor');
 
-    let titleSections = findSectionLabels.call(this, "Title");
-    assert.equal(titleSections.length, 1, "Rendered fields only appear once");
+    let titleSections = findSectionLabels.call(this, 'Title');
+    assert.equal(titleSections.length, 1, 'Rendered fields only appear once');
   });
 });

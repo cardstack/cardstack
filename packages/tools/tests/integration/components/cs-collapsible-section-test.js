@@ -13,7 +13,12 @@ module('Integration | Component | cs collapsible section', function(hooks) {
       {{/cs-collapsible-section}}
     `);
 
-    assert.equal(this.$('header').text().trim(), 'My section');
+    assert.equal(
+      this.$('header')
+        .text()
+        .trim(),
+      'My section',
+    );
     assert.equal(this.$('.sample').length, 0, "doesn't render body when closed");
   });
 
@@ -25,6 +30,6 @@ module('Integration | Component | cs collapsible section', function(hooks) {
       {{/cs-collapsible-section}}
     `);
 
-    assert.equal(this.$('.sample').length, 1, "found body");
+    assert.equal(this.$('.sample').length, 1, 'found body');
   });
 });

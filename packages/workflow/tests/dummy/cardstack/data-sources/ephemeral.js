@@ -6,16 +6,16 @@ module.exports = [
     id: '@cardstack/hub',
     relationships: {
       'default-data-source': {
-        data: { type: 'data-sources', id: 0 }
-      }
-    }
+        data: { type: 'data-sources', id: 0 },
+      },
+    },
   },
   {
     type: 'data-sources',
     id: 0,
     attributes: {
       'source-type': '@cardstack/ephemeral',
-    }
+    },
   },
   {
     type: 'grants',
@@ -26,12 +26,12 @@ module.exports = [
       'may-update-resource': true,
       'may-delete-resource': true,
       'may-read-fields': true,
-      'may-write-fields': true
+      'may-write-fields': true,
     },
     relationships: {
       who: {
-        data: [{ type: 'groups', id: 'everyone' }]
-      }
-    }
-  }
+        data: [{ type: 'groups', id: 'everyone' }],
+      },
+    },
+  },
 ];

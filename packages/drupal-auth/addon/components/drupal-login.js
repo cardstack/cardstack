@@ -17,25 +17,32 @@ export default Component.extend({
   // different drupal oauth2 apps at once.
   source: 'drupal',
 
-  fetchConfig: task(function * () {
-    let { clientId, drupalUrl } = yield getOwner(this).lookup('authenticator:cardstack').fetchConfig(this.get('source'));
+  fetchConfig: task(function*() {
+    let { clientId, drupalUrl } = yield getOwner(this)
+      .lookup('authenticator:cardstack')
+      .fetchConfig(this.get('source'));
     extendToriiProviders({
       'drupal-oauth2-code': {
         apiKey: clientId,
-        drupalUrl
-      }
+        drupalUrl,
+      },
     });
-  }).observes('source').on('init'),
+  })
+    .observes('source')
+    .on('init'),
 
-  login: task(function * () {
+  login: task(function*() {
     // this should wait for fetchConfig to be done, but if we block
     // before opening the popup window we run afoul of popup
     // blockers. So instead in our template we don't render ourself at
     // all until after fetchConfig finishes. Fixing this more nicely
     // would require changes to Torii.
     let { authorizationCode, redirectUri } = yield this.get('torii').open('drupal-oauth2-code');
-    yield this.get('session').authenticate('authenticator:cardstack', this.get('source'), { authorizationCode, redirectUri });
-  }).drop()
+    yield this.get('session').authenticate('authenticator:cardstack', this.get('source'), {
+      authorizationCode,
+      redirectUri,
+    });
+  }).drop(),
 });
 
 function extendToriiProviders(newConfig) {
@@ -43,6 +50,6 @@ function extendToriiProviders(newConfig) {
   if (!toriiConfig.providers) {
     toriiConfig.providers = {};
   }
-  Object.assign(toriiConfig.providers, newConfig)
+  Object.assign(toriiConfig.providers, newConfig);
   configure(toriiConfig);
 }

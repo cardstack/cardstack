@@ -6,6 +6,8 @@ export default Component.extend({
   addContent() {
     let content = this.get('newContent');
     this.set('newContent', '');
-    this.get('store').createRecord('item', {content}).save();
-  }
+    this.get('store')
+      .createRecord('item', { content })
+      .save();
+  },
 });

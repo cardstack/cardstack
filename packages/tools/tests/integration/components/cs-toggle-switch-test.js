@@ -14,7 +14,7 @@ module('Integration | Component | cs toggle switch', function(hooks) {
         <div class="negative"></div>
       {{/cs-toggle-switch}}
     `);
-    assert.equal(this.$(".positive").length, 1, 'renders positive');
+    assert.equal(this.$('.positive').length, 1, 'renders positive');
   });
 
   test('it renders inverse', async function(assert) {
@@ -25,6 +25,6 @@ module('Integration | Component | cs toggle switch', function(hooks) {
         <div class="negative"></div>
       {{/cs-toggle-switch}}
     `);
-    assert.equal(this.$(".negative").length, 1, 'renders inverse');
+    assert.equal(this.$('.negative').length, 1, 'renders inverse');
   });
 });

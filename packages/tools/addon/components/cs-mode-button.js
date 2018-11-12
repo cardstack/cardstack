@@ -10,5 +10,5 @@ export default Component.extend({
   active: alias('mode.active'),
   click() {
     this.get('mode.makeActive')();
-  }
+  },
 });

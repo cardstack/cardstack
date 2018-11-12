@@ -7,8 +7,8 @@ export default Route.extend({
   queryParams: {
     // optionally prefill the routingId for the new record
     routingId: {
-      refreshModel: true
-    }
+      refreshModel: true,
+    },
   },
 
   model({ type }, transition) {
@@ -31,5 +31,5 @@ export default Route.extend({
       initialProperties.id = routingId;
     }
     return this.store.createRecord(modelType, initialProperties);
-  }
+  },
 });

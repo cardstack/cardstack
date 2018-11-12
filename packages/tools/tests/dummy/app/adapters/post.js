@@ -4,5 +4,5 @@ import { hubURL } from '@cardstack/plugin-utils/environment';
 
 export default DS.JSONAPIAdapter.extend(AdapterMixin, {
   host: hubURL,
-  namespace: 'api'
+  namespace: 'api',
 });

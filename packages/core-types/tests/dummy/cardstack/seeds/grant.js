@@ -1,7 +1,6 @@
 /* eslint-env node */
 
 module.exports = [
-
   {
     type: 'grants',
     id: 'wide-open',
@@ -11,15 +10,17 @@ module.exports = [
       'may-create-resource': true,
       'may-update-resource': true,
       'may-delete-resource': true,
-      'may-read-resource': true
+      'may-read-resource': true,
     },
     relationships: {
       who: {
-        data: [{
-          type: 'groups',
-          id: 'everyone'
-        }]
-      }
-    }
-  }
+        data: [
+          {
+            type: 'groups',
+            id: 'everyone',
+          },
+        ],
+      },
+    },
+  },
 ];

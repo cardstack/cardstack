@@ -14,13 +14,20 @@ export default Component.extend({
   store: service(),
   cardstackRouting: injectOptional.service(),
 
-  availableTypes: computed(function() { return []; }),
+  availableTypes: computed(function() {
+    return [];
+  }),
 
-  loadAvailableTypes: task(function * () {
+  loadAvailableTypes: task(function*() {
     let creatableTypes = this.get('tools.creatableTypes');
-    if (!creatableTypes || !creatableTypes.length) { return; }
+    if (!creatableTypes || !creatableTypes.length) {
+      return;
+    }
 
-    let types = yield this.get('store').query('content-type', { page: { size: 50 }, filter: { 'id' : { exact: creatableTypes } } });
+    let types = yield this.get('store').query('content-type', {
+      page: { size: 50 },
+      filter: { id: { exact: creatableTypes } },
+    });
     this.set('availableTypes', types);
   }).on('init'),
 
@@ -30,6 +37,6 @@ export default Component.extend({
       transitionTo(getOwner(this), name, params.map(p => p[1]), queryParams);
       this.get('tools').setActivePanel('cs-composition-panel');
       this.get('tools').setEditing(true);
-    }
-  }
+    },
+  },
 });

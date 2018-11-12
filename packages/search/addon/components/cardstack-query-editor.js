@@ -10,7 +10,7 @@ export default Component.extend({
   }),
   actions: {
     update() {
-      this.get("update")(assign({}, this.get("internalQuery")));
-    }
-  }
+      this.get('update')(assign({}, this.get('internalQuery')));
+    },
+  },
 });

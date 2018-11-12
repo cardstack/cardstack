@@ -9,13 +9,9 @@ module.exports = function(defaults) {
     postcssOptions: {
       compile: {
         enabled: true,
-        plugins: [
-          { module: CssImport },
-          { module: CssNext }
-        ]
-      }
-    }
-
+        plugins: [{ module: CssImport }, { module: CssNext }],
+      },
+    },
   });
 
   /*

@@ -5,6 +5,6 @@ export default Route.extend({
     return {
       myPost: this.store.createRecord('post', { id: '123 45' }),
       myPage: this.store.createRecord('page', { permalink: 'the-permalink' }),
-    }
-  }
+    };
+  },
 });

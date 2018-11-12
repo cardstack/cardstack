@@ -5,7 +5,7 @@ export default Route.extend({
     return this.store.createRecord('beverage', {
       flavor: 'cola',
       size: 16,
-      sizeUnits: 'oz'
+      sizeUnits: 'oz',
     });
-  }
+  },
 });

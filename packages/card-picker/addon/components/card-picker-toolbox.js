@@ -12,10 +12,10 @@ export default Component.extend({
   actions: {
     select(model, event) {
       event.stopPropagation();
-      event.preventDefault()
+      event.preventDefault();
 
       this.tools.resolveCard(model);
       return false;
-    }
-  }
+    },
+  },
 });

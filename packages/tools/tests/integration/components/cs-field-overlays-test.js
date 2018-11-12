@@ -8,6 +8,11 @@ module('Integration | Component | cs field overlays', function(hooks) {
 
   test('it renders', async function(assert) {
     await render(hbs`{{cs-field-overlays}}`);
-    assert.equal(this.$().text().trim(), '');
+    assert.equal(
+      this.$()
+        .text()
+        .trim(),
+      '',
+    );
   });
 });

@@ -15,6 +15,6 @@ export default Component.extend({
       if (onchange) {
         onchange();
       }
-    }
-  }
+    },
+  },
 });

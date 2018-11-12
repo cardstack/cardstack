@@ -1,1 +1,1 @@
-export { liveQuery } from "./live-query";
+export { liveQuery } from './live-query';

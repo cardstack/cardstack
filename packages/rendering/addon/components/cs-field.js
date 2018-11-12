@@ -43,9 +43,9 @@ export default Component.extend({
     return {
       name: this.get('fieldName'),
       content: this.get('content'),
-      caption: this.get('fieldCaption')
+      caption: this.get('fieldCaption'),
     };
   }),
 }).reopenClass({
-  positionalParams: ['content', 'fieldName']
+  positionalParams: ['content', 'fieldName'],
 });

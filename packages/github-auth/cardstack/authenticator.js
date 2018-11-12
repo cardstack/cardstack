@@ -12,14 +12,14 @@ module.exports = class {
   async authenticate(payload /*, userSearcher */) {
     if (!payload.authorizationCode) {
       throw new Error("missing required field 'authorizationCode'", {
-        status: 400
+        status: 400,
       });
     }
 
     let payloadToGitHub = {
       client_id: this.clientId,
       client_secret: this.clientSecret,
-      code: payload.authorizationCode
+      code: payload.authorizationCode,
     };
     if (payload.state) {
       payloadToGitHub.state = payload.state;
@@ -34,15 +34,15 @@ module.exports = class {
       headers: {
         'Content-Type': 'application/json',
         'Content-Length': Buffer.byteLength(data),
-        'Accept': 'application/json',
-        'User-Agent': '@cardstack/github-auth'
-      }
+        Accept: 'application/json',
+        'User-Agent': '@cardstack/github-auth',
+      },
     };
 
     let { response, body: responseBody } = await request(options, data);
     if (response.statusCode !== 200) {
       throw new Error(responseBody.error, {
-        status: response.statusCode
+        status: response.statusCode,
       });
     }
 
@@ -52,10 +52,10 @@ module.exports = class {
       path: '/user',
       method: 'GET',
       headers: {
-        'Accept': 'application/json',
+        Accept: 'application/json',
         'User-Agent': '@cardstack/github-auth',
-        Authorization: `token ${responseBody.access_token}`
-      }
+        Authorization: `token ${responseBody.access_token}`,
+      },
     };
 
     let userResponse = await request(options);
@@ -69,15 +69,14 @@ module.exports = class {
     return {
       data: {
         id: user.login,
-        type: "github-users",
+        type: 'github-users',
         attributes: {
           name: user.name,
           email: user.email,
-          "avatar-url": user.avatar_url,
-          permissions: user.permissions || []
-        }
-      }
+          'avatar-url': user.avatar_url,
+          permissions: user.permissions || [],
+        },
+      },
     };
   }
-
 };

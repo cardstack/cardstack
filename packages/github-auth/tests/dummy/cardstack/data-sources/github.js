@@ -11,39 +11,37 @@ module.exports = [
         permissions: [
           { repo: 'cardstack/cardstack', permission: 'read' },
           { repo: 'cardstack/cardstack', permission: 'write' },
-          { repo: 'cardstack/cardstack', permission: 'admin' }
-        ]
-      }
-    }
+          { repo: 'cardstack/cardstack', permission: 'admin' },
+        ],
+      },
+    },
   },
   {
     type: 'grants',
     id: 'login',
     attributes: {
-      'may-login': true
+      'may-login': true,
     },
     relationships: {
-      who:{
-        data: [{ type: 'groups', id: 'everyone' }]
-      }
-    }
+      who: {
+        data: [{ type: 'groups', id: 'everyone' }],
+      },
+    },
   },
   {
     type: 'grants',
     id: 'see-myself',
     attributes: {
       'may-read-resource': true,
-      'may-read-fields': true
+      'may-read-fields': true,
     },
     relationships: {
-      who:{
-        data: [{ type: 'fields', id: 'id' }]
+      who: {
+        data: [{ type: 'fields', id: 'id' }],
       },
       types: {
-        data: [
-          { type: 'content-types', id: 'github-users' }
-        ]
-      }
-    }
-  }
+        data: [{ type: 'content-types', id: 'github-users' }],
+      },
+    },
+  },
 ];

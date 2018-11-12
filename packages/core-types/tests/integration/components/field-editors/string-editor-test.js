@@ -8,7 +8,7 @@ module('Integration | Component | field editors/string editor', function(hooks) 
 
   test('it renders', async function(assert) {
     this.set('model', {
-      title: 'hello'
+      title: 'hello',
     });
     await render(hbs`{{field-editors/string-editor content=model field="title"}}`);
     assert.dom('input').hasValue('hello', 'text input has correct value');
@@ -17,7 +17,7 @@ module('Integration | Component | field editors/string editor', function(hooks) 
 
   test('it can be disabled', async function(assert) {
     this.set('model', {
-      title: 'hello'
+      title: 'hello',
     });
     await render(hbs`{{field-editors/string-editor content=model field="title" disabled=true}}`);
     assert.dom('input[disabled]').isDisabled('text input is disabled');

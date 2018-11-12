@@ -84,39 +84,47 @@ define('{{target}}', ['exports', '{{source}}'], function (exports, _source) {
 });
 `);
 
-module.exports = declareInjections({
-  schema: 'hub:current-schema'
-},
+module.exports = declareInjections(
+  {
+    schema: 'hub:current-schema',
+  },
 
-class CodeGenerator {
-  async generateCode(appModulePrefix, branch) {
-    let schema = await this.schema.forBranch(branch);
-    let modules = [];
+  class CodeGenerator {
+    async generateCode(appModulePrefix, branch) {
+      let schema = await this.schema.forBranch(branch);
+      let modules = [];
 
-    for (let type of schema.types.values()) {
-      let modelName = inflection.singularize(type.id);
+      for (let type of schema.types.values()) {
+        let modelName = inflection.singularize(type.id);
 
-      modules.push(this._generatedModel(modelName, type));
+        modules.push(this._generatedModel(modelName, type));
 
-      modules.push(
-        reexportTemplate({ target: `${appModulePrefix}/models/${modelName}`, source: `@cardstack/models/generated/${modelName}` })
-      );
+        modules.push(
+          reexportTemplate({
+            target: `${appModulePrefix}/models/${modelName}`,
+            source: `@cardstack/models/generated/${modelName}`,
+          }),
+        );
 
-      modules.push(
-        reexportTemplate({ target: `${appModulePrefix}/adapters/${modelName}`, source: `@cardstack/models/adapter` })
-      );
+        modules.push(
+          reexportTemplate({ target: `${appModulePrefix}/adapters/${modelName}`, source: `@cardstack/models/adapter` }),
+        );
 
-      modules.push(
-        reexportTemplate({ target: `${appModulePrefix}/serializers/${modelName}`, source: `@cardstack/models/serializer` })
-      );
+        modules.push(
+          reexportTemplate({
+            target: `${appModulePrefix}/serializers/${modelName}`,
+            source: `@cardstack/models/serializer`,
+          }),
+        );
+      }
+      return modules.join('');
     }
-    return modules.join("");
-  }
-  _generatedModel(modelName, type) {
-    return modelTemplate({
-      modelName,
-      fields: [...type.realAndComputedFields.values()].filter(f => f.id !== 'id' && f.id !== 'type'),
-      routingField: type.routingField
-    });
-  }
-});
+    _generatedModel(modelName, type) {
+      return modelTemplate({
+        modelName,
+        fields: [...type.realAndComputedFields.values()].filter(f => f.id !== 'id' && f.id !== 'type'),
+        routingField: type.routingField,
+      });
+    }
+  },
+);

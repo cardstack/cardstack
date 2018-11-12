@@ -1,5 +1,5 @@
-import Component from "@ember/component";
-import { inject } from "@ember/service";
+import Component from '@ember/component';
+import { inject } from '@ember/service';
 
 export default Component.extend({
   workflow: inject('cardstack-workflow'),
@@ -8,6 +8,5 @@ export default Component.extend({
     read() {
       this.get('workflow').readChatMessage(this.get('content'));
     },
-  }
+  },
 });
-

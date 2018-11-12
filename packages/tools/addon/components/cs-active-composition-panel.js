@@ -13,7 +13,7 @@ export default Component.extend({
 
   data: service('cardstack-data'),
 
-  validateTask: task(function * () {
+  validateTask: task(function*() {
     let errors = yield this.get('data').validate(this.model);
     let errorsForFieldNames = {};
     for (let key in errors) {
@@ -22,7 +22,7 @@ export default Component.extend({
     this.set('validationErrors', errorsForFieldNames);
   }),
 
-  highlightAndScrollToField: task(function * (field) {
+  highlightAndScrollToField: task(function*(field) {
     this.get('highlightField')(field);
     if (field) {
       yield timeout(500);
@@ -33,6 +33,6 @@ export default Component.extend({
   actions: {
     validate() {
       return this.get('validateTask').perform();
-    }
-  }
+    },
+  },
 });

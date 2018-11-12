@@ -9,6 +9,6 @@ export default Component.extend({
   actions: {
     create() {
       this.get('tools').setActivePanel('cs-create-menu');
-    }
-  }
+    },
+  },
 });

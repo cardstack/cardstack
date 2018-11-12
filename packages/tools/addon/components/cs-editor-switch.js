@@ -12,6 +12,6 @@ export default Component.extend({
       if (!value) {
         this.get('tools').openField();
       }
-    }
-  }
+    },
+  },
 });

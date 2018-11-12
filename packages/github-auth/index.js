@@ -4,5 +4,5 @@ module.exports = {
   name: '@cardstack/github-auth',
   isDevelopingAddon() {
     return process.env.CARDSTACK_DEV;
-  }
+  },
 };

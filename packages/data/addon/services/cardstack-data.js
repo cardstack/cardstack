@@ -25,7 +25,7 @@ export default Service.extend({
     this._contentTypeCache = {};
   },
 
-  async load(type, id, format, opts={}) {
+  async load(type, id, format, opts = {}) {
     let store = this.get('store');
     let branch = opts.branch || defaultBranch;
     let contentType = await this._getContentType(type);
@@ -45,7 +45,7 @@ export default Service.extend({
     return record;
   },
 
-  async query(type, format, opts={}) {
+  async query(type, format, opts = {}) {
     let store = this.get('store');
     let branch = opts.branch || defaultBranch;
     let _opts = Object.assign({ branch, modelName: type }, opts);
@@ -62,7 +62,7 @@ export default Service.extend({
     return result;
   },
 
-  async queryCard(type, format, opts={}) {
+  async queryCard(type, format, opts = {}) {
     let card;
     let result = await this.query(type, format, opts);
     if (result && (card = result.toArray()) && card) {
@@ -73,13 +73,13 @@ export default Service.extend({
   async validate(model) {
     let relatedOwned = [];
     let relationships = get(model.constructor, 'relationshipsByName') || [];
-    relationships.forEach((relationshipDef) => {
+    relationships.forEach(relationshipDef => {
       let { name, kind, meta } = relationshipDef;
       if (meta) {
         let { owned } = meta.options;
         if (owned) {
           let related = model.get(name);
-          if (kind === 'belongsTo' ) {
+          if (kind === 'belongsTo') {
             relatedOwned.push(related);
           } else {
             relatedOwned.push(...related.toArray());
@@ -89,16 +89,16 @@ export default Service.extend({
     });
 
     let toValidate = [model, ...relatedOwned];
-    let responses = toValidate.map(async (record) => {
+    let responses = toValidate.map(async record => {
       let { url, verb } = this._validationRequestParams(record);
       let token = this.get('session.data.authenticated.data.meta.token');
       let response = await fetch(url, {
         method: verb,
         headers: {
           'Content-Type': 'application/vnd.api+json',
-          'Authorization': `Bearer ${token}`
+          Authorization: `Bearer ${token}`,
         },
-        body: JSON.stringify(record.serialize())
+        body: JSON.stringify(record.serialize()),
       });
       let { status } = response;
       if (status === 422) {
@@ -152,17 +152,23 @@ export default Service.extend({
   },
 
   async _loadRelatedRecords(branch, record, format) {
-    if (!record || !getType(record)) { return; }
+    if (!record || !getType(record)) {
+      return;
+    }
 
     let contentType = await this._getContentType(getType(record));
     let fieldset = contentType.get(`fieldsets.${format}`);
 
-    if (!fieldset || !fieldset.length) { return; } // record is already loaded, you are all done
+    if (!fieldset || !fieldset.length) {
+      return;
+    } // record is already loaded, you are all done
 
     let recordLoadPromises = [];
     for (let fieldItem of fieldset) {
       let fieldRecord = await record.get(camelize(fieldItem.field));
-      if (!fieldRecord) { continue; }
+      if (!fieldRecord) {
+        continue;
+      }
 
       if (fieldRecord instanceof DS.ManyArray) {
         for (let fieldRecordItem of fieldRecord.toArray()) {
@@ -178,7 +184,9 @@ export default Service.extend({
 
   async _recurseRecord(branch, record, format) {
     let loadedRecord = await this._loadRecord(branch, getType(record), record.id, format);
-    if (!loadedRecord) { return; }
+    if (!loadedRecord) {
+      return;
+    }
     await this._loadRelatedRecords(branch, loadedRecord, format);
   },
 
@@ -187,7 +195,9 @@ export default Service.extend({
     let fieldRecordType = await this._getContentType(type);
     let fieldset = fieldRecordType.get(`fieldsets.${format}`);
 
-    if (!fieldset) { return; }
+    if (!fieldset) {
+      return;
+    }
 
     let include = fieldset.map(i => i.field).join(',') || noFields; // note that ember data ignores an empty string includes, so setting to nonsense field
     let cacheKey = `${branch}/${type}/${id}:${include}`;
@@ -203,5 +213,5 @@ export default Service.extend({
     this._loadedRecordsCache[cacheKey] = store.findRecord(type, id, { include, reload: true, branch });
 
     return await this._loadedRecordsCache[cacheKey];
-  }
+  },
 });

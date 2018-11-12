@@ -13,7 +13,7 @@ export default Component.extend({
   store: service(),
   ajax: service(),
 
-  search: task(function * (cursor, debounce) {
+  search: task(function*(cursor, debounce) {
     if (debounce) {
       yield timeout(300);
     }
@@ -49,8 +49,10 @@ export default Component.extend({
     }
 
     this.set('links', response.links);
-    this.set('meta', response.meta)
-  }).on('init').restartable(),
+    this.set('meta', response.meta);
+  })
+    .on('init')
+    .restartable(),
 
   research: observer('query', function() {
     this.get('search').perform(null, true);
@@ -61,8 +63,7 @@ export default Component.extend({
     if (nextUrl) {
       return new URL(nextUrl).searchParams.get('page[cursor]');
     }
-  })
-
+  }),
 });
 
 function pushMixedPayload(store, rawPayload) {
@@ -71,9 +72,15 @@ function pushMixedPayload(store, rawPayload) {
   return rawPayload.data.map(model => {
     let ModelClass = store.modelFor(singularize(model.type));
 
-    let jsonApiPayload = serializer.normalizeResponse(store, ModelClass, Object.assign({}, rawPayload, {
-      data: model
-    }), null, 'query');
+    let jsonApiPayload = serializer.normalizeResponse(
+      store,
+      ModelClass,
+      Object.assign({}, rawPayload, {
+        data: model,
+      }),
+      null,
+      'query',
+    );
 
     return store.push(jsonApiPayload);
   });

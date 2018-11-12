@@ -18,7 +18,9 @@ export default class Fixtures {
   }
 
   async setup() {
-    if (typeof this._create !== 'function') { return; }
+    if (typeof this._create !== 'function') {
+      return;
+    }
 
     await this._create(this._factory);
 
@@ -30,25 +32,29 @@ export default class Fixtures {
         method: 'POST',
         headers: {
           authorization: `Bearer ${ciSessionId}`,
-          "content-type": 'application/vnd.api+json'
+          'content-type': 'application/vnd.api+json',
         },
         body: JSON.stringify({
           data: {
             id: model.id,
             type: model.type,
             attributes: model.attributes,
-            relationships: model.relationships
-          }
-        })
+            relationships: model.relationships,
+          },
+        }),
       });
       if (response.status !== 201) {
-        throw new Error(`Unexpected response ${response.status} while trying to define fixtures: ${await response.text()}`);
+        throw new Error(
+          `Unexpected response ${response.status} while trying to define fixtures: ${await response.text()}`,
+        );
       }
     }
   }
 
   async teardown() {
-    if (typeof this._create !== 'function') { return; }
+    if (typeof this._create !== 'function') {
+      return;
+    }
 
     let destructionList = [];
     if (typeof this._destroy === 'function') {
@@ -61,7 +67,9 @@ export default class Fixtures {
     destructionList = destructionList.concat(createdModels.reverse());
 
     for (let [index, item] of destructionList.entries()) {
-      if (!item.type) { continue; }
+      if (!item.type) {
+        continue;
+      }
 
       let isLast = index === destructionList.length - 1;
 
@@ -70,26 +78,30 @@ export default class Fixtures {
           method: 'GET',
           headers: {
             authorization: `Bearer ${ciSessionId}`,
-            accept: 'application/vnd.api+json'
-          }
+            accept: 'application/vnd.api+json',
+          },
         });
 
-        if (response.status !== 200) { continue; }
+        if (response.status !== 200) {
+          continue;
+        }
 
-        let { data:model } = await response.json();
+        let { data: model } = await response.json();
         await this._deleteModel(model, isLast);
       } else {
         let response = await fetch(`${hubURL}/api/${encodeURIComponent(item.type)}`, {
           method: 'GET',
           headers: {
             authorization: `Bearer ${ciSessionId}`,
-            accept: 'application/vnd.api+json'
-          }
+            accept: 'application/vnd.api+json',
+          },
         });
 
-        if (response.status !== 200) { continue; }
+        if (response.status !== 200) {
+          continue;
+        }
 
-        let { data:models } = await response.json();
+        let { data: models } = await response.json();
         for (let model of models) {
           await this._deleteModel(model, isLast);
         }
@@ -98,20 +110,22 @@ export default class Fixtures {
   }
 
   async _deleteModel(model) {
-    if (model.type === 'user-realms') { return; }
+    if (model.type === 'user-realms') {
+      return;
+    }
 
     let version = model.meta && model.meta.version;
     let headers = {
       authorization: `Bearer ${ciSessionId}`,
-      'content-type': 'application/vnd.api+json'
+      'content-type': 'application/vnd.api+json',
     };
     if (version) {
-      headers["If-Match"] = version;
+      headers['If-Match'] = version;
     }
     let url = `${hubURL}/api/${encodeURIComponent(model.type)}/${encodeURIComponent(model.id)}`;
     await fetch(url, {
       method: 'DELETE',
-      headers
+      headers,
     });
   }
 }

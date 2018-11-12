@@ -38,6 +38,5 @@ export default Service.extend({
         return this.get('store').peekRecord(singularize(rawSession.data.type), rawSession.data.id);
       }
     }
-  })
-
+  }),
 });

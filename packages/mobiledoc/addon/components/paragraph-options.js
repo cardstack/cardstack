@@ -15,7 +15,7 @@ export default Component.extend({
       if (activeSection.tagName === 'li') {
         activeSection = activeSection.parent;
       }
-      this.set('_lastActiveSection',  activeSection);
+      this.set('_lastActiveSection', activeSection);
     }
 
     let element = this.get('element');
@@ -32,20 +32,20 @@ export default Component.extend({
     }
   },
 
-  currentIcon: computed('cursor', function () {
-    switch(this.get('_lastActiveSection.tagName')) {
-    case 'blockquote':
-      return 'EditorQuote';
-    case 'p':
-      return 'EditorP';
-    case 'h2':
-      return 'EditorH2';
-    case 'h3':
-      return 'EditorH3';
-    case 'ul':
-      return 'EditorList';
-    case 'ol':
-      return 'EditorNumberList';
+  currentIcon: computed('cursor', function() {
+    switch (this.get('_lastActiveSection.tagName')) {
+      case 'blockquote':
+        return 'EditorQuote';
+      case 'p':
+        return 'EditorP';
+      case 'h2':
+        return 'EditorH2';
+      case 'h3':
+        return 'EditorH3';
+      case 'ul':
+        return 'EditorList';
+      case 'ol':
+        return 'EditorNumberList';
     }
   }),
 
@@ -57,7 +57,11 @@ export default Component.extend({
       let t = currentTransform(para);
 
       para.css({
-        transform: `translateX(${rect.left - my.left + t.tx - my.width / 2 + rect.width / 2}px) translateY(${rect.top - my.top + t.ty - my.height - 10}px)`
+        transform: `translateX(${rect.left - my.left + t.tx - my.width / 2 + rect.width / 2}px) translateY(${rect.top -
+          my.top +
+          t.ty -
+          my.height -
+          10}px)`,
       });
     }
 
@@ -65,13 +69,13 @@ export default Component.extend({
     if (section) {
       section = section.getBoundingClientRect();
     }
-    
+
     let block = this.$('.block-control');
     if (section && block.length > 0) {
       let my = block[0].getBoundingClientRect();
       let t = currentTransform(block);
       block.css({
-        transform: `translateX(${section.left - my.left + t.tx - 60}px) translateY(${section.top - my.top + t.ty}px)`
+        transform: `translateX(${section.left - my.left + t.tx - 60}px) translateY(${section.top - my.top + t.ty}px)`,
       });
     }
   },
@@ -79,9 +83,10 @@ export default Component.extend({
   updateLinkMarkup() {
     let editor = this.get('editor.editor');
     let range = this.get('linking');
-    if (!range) { return; }
+    if (!range) {
+      return;
+    }
     editor.run(postEditor => {
-
       let existingMarkup = editor.detectMarkupInRange(range, 'a');
       let isNewline = existingMarkup && existingMarkup.attributes && existingMarkup.attributes.href === NEW_LINE_HREF;
       if (existingMarkup && !isNewline) {
@@ -92,7 +97,7 @@ export default Component.extend({
       if (url && url.length > 0) {
         let attrs = { href: this.get('linkUrl') };
         if (this.get('isExternalLink')) {
-          attrs.target = "_new";
+          attrs.target = '_new';
         }
 
         let markup = postEditor.builder.createMarkup('a', attrs);
@@ -107,7 +112,7 @@ export default Component.extend({
     },
     toggleSection(tag) {
       this.editor.editor.run(postEditor => {
-        let range = new Range(this._lastActiveSection.headPosition(),this._lastActiveSection.tailPosition());
+        let range = new Range(this._lastActiveSection.headPosition(), this._lastActiveSection.tailPosition());
         postEditor.toggleSection(tag, range);
       });
       this.propertyDidChange('_lastActiveSection');
@@ -117,7 +122,7 @@ export default Component.extend({
       let editor = this.editor.editor;
       let range = editor.range;
       let headSection = range.head.section,
-          tailSection = range.tail.section;
+        tailSection = range.tail.section;
       if (!(headSection.isMarkerable && tailSection.isMarkerable)) {
         return;
       }
@@ -143,6 +148,6 @@ export default Component.extend({
         this.set('linkUrl', link);
         this.updateLinkMarkup();
       }
-    }
-  }
+    },
+  },
 });

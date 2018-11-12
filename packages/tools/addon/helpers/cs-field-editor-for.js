@@ -9,9 +9,8 @@ export function csFieldEditorFor([content, fieldName], { variant }) {
 
   if (options.editorComponent && !variant) {
     return options.editorComponent;
-  }
-  else if (options.inlineEditorComponent && variant == 'inline') {
-    return options.inlineEditorComponent
+  } else if (options.inlineEditorComponent && variant == 'inline') {
+    return options.inlineEditorComponent;
   }
 
   if (!type) {
@@ -29,5 +28,5 @@ export default helper(csFieldEditorFor);
 
 function fieldOptions(content, fieldName) {
   let meta = metaForField(content, fieldName);
-  return (meta && meta.options) ? meta.options : {}
+  return meta && meta.options ? meta.options : {};
 }

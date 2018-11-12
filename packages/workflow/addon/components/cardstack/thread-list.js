@@ -1,6 +1,8 @@
-import Component from "@ember/component";
+import Component from '@ember/component';
 import { computed } from '@ember/object';
 
 export default Component.extend({
-  threads: computed(function(){ return []; })
+  threads: computed(function() {
+    return [];
+  }),
 });

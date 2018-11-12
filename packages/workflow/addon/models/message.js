@@ -3,7 +3,7 @@ import { equal } from '@ember/object/computed';
 import { A } from '@ember/array';
 
 import { task } from 'ember-concurrency';
-import { computed } from "@ember/object";
+import { computed } from '@ember/object';
 
 import { singularize } from 'ember-inflector';
 
@@ -15,7 +15,7 @@ export default Message.extend({
     },
     set(k, v) {
       return v;
-    }
+    },
   }),
 
   handle() {
@@ -24,7 +24,7 @@ export default Message.extend({
 
   isUnhandled: equal('status', 'unhandled'),
 
-  _loadCard: task(function * () {
+  _loadCard: task(function*() {
     let cardType = singularize(this.get('cardType'));
     let card = yield this.get('store').findRecord(cardType, this.get('cardId'));
     this.set('loadedCard', card);
@@ -37,12 +37,12 @@ export default Message.extend({
     },
     set(k, v) {
       return v;
-    }
+    },
   }),
 
-  _loadTags: task(function * () {
+  _loadTags: task(function*() {
     let tags = yield this.get('tags');
     this.set('loadedTags', tags);
     return tags;
   }),
-})
+});

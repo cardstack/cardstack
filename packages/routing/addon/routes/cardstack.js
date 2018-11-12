@@ -4,8 +4,8 @@ import { defaultBranch } from '@cardstack/plugin-utils/environment';
 export default Route.extend({
   queryParams: {
     branch: {
-      refreshModel: true
-    }
+      refreshModel: true,
+    },
   },
 
   model(params, transition) {
@@ -14,6 +14,5 @@ export default Route.extend({
       branch = defaultBranch;
     }
     return { branch };
-  }
-
+  },
 });

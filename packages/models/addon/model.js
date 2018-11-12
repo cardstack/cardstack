@@ -1,5 +1,5 @@
 import DS from 'ember-data';
-import RelationshipTracker from "ember-data-relationship-tracker";
+import RelationshipTracker from 'ember-data-relationship-tracker';
 import { inject as service } from '@ember/service';
 import { computed, defineProperty, get } from '@ember/object';
 import { readOnly, or } from '@ember/object/computed';
@@ -13,7 +13,7 @@ export default DS.Model.extend(RelationshipTracker, {
   init() {
     this._super();
     let dirtyTrackingProperties = {};
-    this._relationshipsByName().forEach((relation) => {
+    this._relationshipsByName().forEach(relation => {
       let { kind, meta } = relation;
       if (meta) {
         let { owned } = meta.options;
@@ -45,12 +45,12 @@ export default DS.Model.extend(RelationshipTracker, {
   },
 
   async saveRelated() {
-    let relatedSaves = Object.keys(this.dirtyTrackingRelationNames).map((relationName) => {
+    let relatedSaves = Object.keys(this.dirtyTrackingRelationNames).map(relationName => {
       let isRelationDirty = this.dirtyTrackingRelationNames[relationName];
       if (isRelationDirty) {
         let { kind } = this._relationshipsByName().get(relationName);
         let related = this.get(relationName);
-        let relatedRecords = kind === 'hasMany' ? related : [ related ];
+        let relatedRecords = kind === 'hasMany' ? related : [related];
         let dirtyRecords = relatedRecords.filter(record => record.hasDirtyFields);
         return EmberArray(dirtyRecords).invoke('save');
       }
@@ -60,15 +60,22 @@ export default DS.Model.extend(RelationshipTracker, {
 
   _relationshipsByName() {
     return get(this.constructor, 'relationshipsByName');
-  }
+  },
 });
 
 function createHasDirtyForRelationship(model, name, kind) {
   let propertyName = `hasDirty${capitalize(name)}`;
   if (kind === 'hasMany') {
-    defineProperty(model, propertyName, computed(`${name}.@each.hasDirtyAttributes`, function() {
-      return model.get(name).toArray().some((related) => related.hasDirtyAttributes);
-    }));
+    defineProperty(
+      model,
+      propertyName,
+      computed(`${name}.@each.hasDirtyAttributes`, function() {
+        return model
+          .get(name)
+          .toArray()
+          .some(related => related.hasDirtyAttributes);
+      }),
+    );
   } else {
     defineProperty(model, propertyName, readOnly(`${name}.hasDirtyAttributes`));
   }

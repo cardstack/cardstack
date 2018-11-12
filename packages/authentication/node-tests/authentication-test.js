@@ -1,127 +1,119 @@
 const supertest = require('supertest');
 const Koa = require('koa');
-const {
-  createDefaultEnvironment,
-  destroyDefaultEnvironment
-} = require('@cardstack/test-support/env');
+const { createDefaultEnvironment, destroyDefaultEnvironment } = require('@cardstack/test-support/env');
 const JSONAPIFactory = require('@cardstack/test-support/jsonapi-factory');
 const logger = require('@cardstack/logger');
 
 describe('authentication/middleware', function() {
-
   let request, env, auth, quint, arthur, vanGogh;
   let ciSessionId = '1234567890';
 
   async function setup() {
     let factory = new JSONAPIFactory();
 
-    factory.addResource('grants')
+    factory
+      .addResource('grants')
       .withRelated('who', [{ type: 'fields', id: 'id' }])
-      .withRelated('types', [
-        { type: 'content-types', id: 'test-users' },
-        { type: 'content-types', id: 'doggies' }
-      ])
+      .withRelated('types', [{ type: 'content-types', id: 'test-users' }, { type: 'content-types', id: 'doggies' }])
       .withRelated('fields', [
         { type: 'fields', id: 'full-name' },
         { type: 'fields', id: 'email' },
-        { type: 'fields', id: 'favorite-toy' }
+        { type: 'fields', id: 'favorite-toy' },
       ])
       .withAttributes({
         mayReadResource: true,
-        mayReadFields: true
+        mayReadFields: true,
       });
 
-    factory.addResource('grants')
+    factory
+      .addResource('grants')
       .withRelated('who', [{ type: 'groups', id: 'everyone' }])
       .withAttributes({
-        mayLogin: true
+        mayLogin: true,
       });
 
-    factory.addResource('grants')
+    factory
+      .addResource('grants')
       .withRelated('who', [{ type: 'test-users', id: 'quint' }])
-      .withRelated('types', [
-        { type: 'content-types', id: 'doggies' }
-      ])
+      .withRelated('types', [{ type: 'content-types', id: 'doggies' }])
       .withAttributes({
-        mayCreateResource: true
+        mayCreateResource: true,
       });
 
     quint = factory.addResource('test-users', 'quint').withAttributes({
       email: 'quint@example.com',
-      fullName: "Quint Faulkner"
+      fullName: 'Quint Faulkner',
     });
 
     arthur = factory.addResource('test-users', 'a-1').withAttributes({
       email: 'arthur@example.com',
-      fullName: "Arthur Faulkner"
+      fullName: 'Arthur Faulkner',
     });
 
     vanGogh = factory.addResource('doggies').withAttributes({
       email: 'vanny@example.com',
       fullName: 'Van Gogh Abdel-Rahman',
       favoriteToy: 'squeaky snake',
-      secretRating: 'Good Boy'
+      secretRating: 'Good Boy',
     });
 
     factory.addResource('data-sources', 'echo').withAttributes({
-      sourceType: 'stub-authenticators::echo'
+      sourceType: 'stub-authenticators::echo',
     });
 
     factory.addResource('data-sources', 'returns-nothing').withAttributes({
-      sourceType: 'stub-authenticators::returns-nothing'
+      sourceType: 'stub-authenticators::returns-nothing',
     });
 
     factory.addResource('data-sources', 'by-email').withAttributes({
       sourceType: 'stub-authenticators::by-email',
       params: {
-        hidden: true
-      }
+        hidden: true,
+      },
     });
 
     factory.addResource('data-sources', 'always-invalid').withAttributes({
-      sourceType: 'stub-authenticators::always-invalid'
+      sourceType: 'stub-authenticators::always-invalid',
     });
 
     factory.addResource('data-sources', 'config-echo-quint').withAttributes({
       sourceType: 'stub-authenticators::config-echo',
       params: {
-        data: { id: quint.id, type: 'test-users' }
-      }
+        data: { id: quint.id, type: 'test-users' },
+      },
     });
 
     factory.addResource('data-sources', 'config-echo-arthur').withAttributes({
       sourceType: 'stub-authenticators::config-echo',
       params: {
-        data: { id: arthur.id, type: 'test-users' }
-      }
+        data: { id: arthur.id, type: 'test-users' },
+      },
     });
 
     factory.addResource('data-sources', 'id-rewriter').withAttributes({
       sourceType: 'stub-authenticators::echo',
-      userRewriter: './rewriter1.js'
+      userRewriter: './rewriter1.js',
     });
 
     factory.addResource('data-sources', 'has-default-template').withAttributes({
-      sourceType: 'stub-authenticators::has-default-template'
+      sourceType: 'stub-authenticators::has-default-template',
     });
-
 
     factory.addResource('data-sources', 'create-via-template').withAttributes({
       sourceType: 'stub-authenticators::echo',
       userRewriter: './rewriter2.js',
-      mayCreateUser: true
+      mayCreateUser: true,
     });
 
     factory.addResource('data-sources', 'create-via-template-no-id').withAttributes({
       sourceType: 'stub-authenticators::echo',
       userRewriter: './rewriter3.js',
-      mayCreateUser: true
+      mayCreateUser: true,
     });
-
 
     factory.addResource('data-sources', 'update-user').withAttributes({
       sourceType: 'stub-authenticators::echo',
-      mayUpdateUser: true
+      mayUpdateUser: true,
     });
 
     factory.addResource('data-sources', 'correlate-doggies').withAttributes({
@@ -129,24 +121,24 @@ describe('authentication/middleware', function() {
       userRewriter: './rewriter4.js',
       userCorrelationQuery: './query1.js',
       mayUpdateUser: true,
-      mayCreateUser: true
+      mayCreateUser: true,
     });
 
     // test-users content-type is standard in createDefaultEnvironment
 
     factory.addResource('content-types', 'doggies').withRelated('fields', [
       factory.addResource('fields', 'full-name').withAttributes({
-        fieldType: '@cardstack/core-types::string'
+        fieldType: '@cardstack/core-types::string',
       }),
       factory.addResource('fields', 'email').withAttributes({
-        fieldType: '@cardstack/core-types::string'
+        fieldType: '@cardstack/core-types::string',
       }),
       factory.addResource('fields', 'favorite-toy').withAttributes({
-        fieldType: '@cardstack/core-types::string'
+        fieldType: '@cardstack/core-types::string',
       }),
       factory.addResource('fields', 'secret-rating').withAttributes({
-        fieldType: '@cardstack/core-types::string'
-      })
+        fieldType: '@cardstack/core-types::string',
+      }),
     ]);
 
     env = await createDefaultEnvironment(`${__dirname}/stub-authenticators`, factory.getModels(), { ciSessionId });
@@ -174,7 +166,6 @@ describe('authentication/middleware', function() {
   }
 
   describe('(read)', function() {
-
     before(setup);
     after(teardown);
 
@@ -202,7 +193,6 @@ describe('authentication/middleware', function() {
       expect(response.body).has.property('userId', env.user.data.id);
     });
 
-
     it('token comes with validity timestamp', async function() {
       let { validUntil } = await auth.createToken({ id: env.user.data.id, type: 'test-users' }, 30);
       expect(validUntil).is.a('number');
@@ -219,20 +209,19 @@ describe('authentication/middleware', function() {
     it('a bearer token that matches the CI session id will return the internal priviledged session', async function() {
       let response = await request.get('/').set('authorization', `Bearer ${ciSessionId}`);
       expect(response.body).deep.equals({
-        "user": {
-          "attributes": {
-            "email": "noreply@nowhere.com",
-            "full-name": "@cardstack/hub/authentication",
+        user: {
+          attributes: {
+            email: 'noreply@nowhere.com',
+            'full-name': '@cardstack/hub/authentication',
           },
-          "id": "@cardstack/hub",
-          "type": "groups",
+          id: '@cardstack/hub',
+          type: 'groups',
         },
-        "userId": "@cardstack/hub"
+        userId: '@cardstack/hub',
       });
     });
 
     describe('token endpoints', async function() {
-
       it('supports CORS preflight', async function() {
         let response = await request.options('/auth/echo');
         expect(response).hasStatus(200);
@@ -264,43 +253,41 @@ describe('authentication/middleware', function() {
       });
 
       it('finds authenticator', async function() {
-        let response = await request.post(`/auth/echo`).send({ data: {id : env.user.data.id, type: 'test-users' }});
+        let response = await request.post(`/auth/echo`).send({ data: { id: env.user.data.id, type: 'test-users' } });
         expect(response).hasStatus(200);
       });
 
       it('responds with token', async function() {
-        let response = await request.post(`/auth/echo`).send({ data: { id: env.user.data.id, type: 'test-users' }});
+        let response = await request.post(`/auth/echo`).send({ data: { id: env.user.data.id, type: 'test-users' } });
         expect(response).hasStatus(200);
         expect(response.body.data.meta.token).is.a('string');
       });
 
       it('responds with validity timestamp', async function() {
-        let response = await request.post(`/auth/echo`).send({ data: { id: env.user.data.id, type: 'test-users' }});
+        let response = await request.post(`/auth/echo`).send({ data: { id: env.user.data.id, type: 'test-users' } });
         expect(response).hasStatus(200);
         expect(response.body.data.meta.validUntil).is.a('number');
       });
 
       it('responds with a copy of the user record', async function() {
-        let response = await request.post(`/auth/echo`).send({ data: { id: env.user.data.id, type: 'test-users' }});
+        let response = await request.post(`/auth/echo`).send({ data: { id: env.user.data.id, type: 'test-users' } });
         expect(response).hasStatus(200);
         let responseWithoutMeta = Object.assign({}, response.body);
         delete responseWithoutMeta.data.meta;
         expect(responseWithoutMeta).deep.equals(env.user);
       });
-
     });
 
     describe('token issuers', function() {
-
       it('can run with multiple configs', async function() {
         let response = await request.post(`/auth/config-echo-quint`).send({
-          data: 'ignored'
+          data: 'ignored',
         });
         expect(response).hasStatus(200);
         expect(response.body).has.deep.property('data.id', quint.id);
 
         response = await request.post(`/auth/config-echo-arthur`).send({
-          user: 'ignored'
+          user: 'ignored',
         });
         expect(response).hasStatus(200);
         expect(response.body).has.deep.property('data.id', arthur.id);
@@ -308,7 +295,7 @@ describe('authentication/middleware', function() {
 
       it('can approve via id', async function() {
         let response = await request.post(`/auth/echo`).send({
-          data: { id: env.user.data.id, type: 'test-users' }
+          data: { id: env.user.data.id, type: 'test-users' },
         });
         expect(response).hasStatus(200);
         expect(response.body).has.deep.property('data.meta.token');
@@ -325,25 +312,23 @@ describe('authentication/middleware', function() {
         let response = await request.post(`/auth/always-invalid`).send({});
         expect(response).hasStatus(400);
         expect(response.body.errors).collectionContains({
-          detail: "Your input is terrible and you should feel bad"
+          detail: 'Your input is terrible and you should feel bad',
         });
       });
 
       it('can reject by returning no id', async function() {
-        let response = await request.post(`/auth/echo`).send({
-        });
+        let response = await request.post(`/auth/echo`).send({});
         expect(response).hasStatus(401);
       });
 
       it('can reject by returning nothing', async function() {
-        let response = await request.post(`/auth/returns-nothing`).send({
-        });
+        let response = await request.post(`/auth/returns-nothing`).send({});
         expect(response).hasStatus(401);
       });
 
       it('can search for users', async function() {
         let response = await request.post(`/auth/by-email`).send({
-          email: 'quint@example.com'
+          email: 'quint@example.com',
         });
         expect(response).hasStatus(200);
         expect(response.body).has.deep.property('data.meta.token');
@@ -351,19 +336,19 @@ describe('authentication/middleware', function() {
         response = await request.get('/').set('authorization', `Bearer ${response.body.data.meta.token}`);
         expect(response).hasStatus(200);
         expect(response.body).has.property('userId', quint.id);
-        expect(response.body.user).has.deep.property('data.attributes.full-name', "Quint Faulkner");
+        expect(response.body.user).has.deep.property('data.attributes.full-name', 'Quint Faulkner');
       });
 
       it('can include creatable content types in meta when user has grant to create content types', async function() {
         let response = await request.post(`/auth/by-email`).send({
-          email: 'quint@example.com'
+          email: 'quint@example.com',
         });
-        expect(response.body.data.meta.creatableTypes).deep.equals([ 'doggies' ]);
+        expect(response.body.data.meta.creatableTypes).deep.equals(['doggies']);
       });
 
       it('will not include creatable content types in meta when user has no grant to create content types', async function() {
         let response = await request.post(`/auth/by-email`).send({
-          email: 'arthur@example.com'
+          email: 'arthur@example.com',
         });
         expect(response.body).to.not.have.deep.property('data.meta.creatableTypes');
       });
@@ -374,12 +359,12 @@ describe('authentication/middleware', function() {
             id: 'x',
             type: 'test-users',
             attributes: {
-              'full-name': 'Mr X'
-            }
+              'full-name': 'Mr X',
+            },
           },
           meta: {
-            preloaded: true
-          }
+            preloaded: true,
+          },
         });
         expect(response).hasStatus(200);
 
@@ -391,13 +376,12 @@ describe('authentication/middleware', function() {
 
       it('applies userRewriter to rewrite ids', async function() {
         let response = await request.post(`/auth/id-rewriter`).send({
-          upstreamId: arthur.id
+          upstreamId: arthur.id,
         });
         expect(response).hasStatus(200);
         expect(response.body).has.deep.property('data.id', arthur.id);
         expect(response.body).has.deep.property('data.attributes.full-name', 'Arthur Faulkner');
       });
-
 
       it('ignores user update when not configured', async function() {
         let response = await request.post(`/auth/echo`).send({
@@ -405,9 +389,9 @@ describe('authentication/middleware', function() {
             id: quint.id,
             type: 'test-users',
             attributes: {
-              email: 'updated.email@this-changed.com'
-            }
-          }
+              email: 'updated.email@this-changed.com',
+            },
+          },
         });
         expect(response).hasStatus(200);
         expect(response.body).has.deep.property('data.meta.token');
@@ -423,7 +407,7 @@ describe('authentication/middleware', function() {
         expect(response.body.user.data).has.property('type', 'test-users');
         expect(response.body.user.data.attributes).deep.equals({
           'full-name': 'Quint Faulkner',
-          email: 'quint@example.com'
+          email: 'quint@example.com',
         });
       });
 
@@ -434,9 +418,9 @@ describe('authentication/middleware', function() {
             type: 'test-users',
             attributes: {
               'full-name': 'Newly Created',
-              email: 'new@example.com'
-            }
-          }
+              email: 'new@example.com',
+            },
+          },
         });
         expect(response).hasStatus(401);
       });
@@ -447,9 +431,9 @@ describe('authentication/middleware', function() {
             id: 'my-prefix-4321',
             attributes: {
               'full-name': 'Newly Created',
-              email: 'new@example.com'
-            }
-          }
+              email: 'new@example.com',
+            },
+          },
         });
         expect(response).hasStatus(401);
       });
@@ -457,10 +441,9 @@ describe('authentication/middleware', function() {
       it('can choose to expose some configuration', async function() {
         let response = await request.get('/auth/config-echo-quint');
         expect(response.body).deep.equals({
-          data: { id: quint.id, type: 'test-users' }
+          data: { id: quint.id, type: 'test-users' },
         });
       });
-
 
       it('does not expose config unless opted in', async function() {
         let response = await request.get('/auth/by-email');
@@ -469,7 +452,7 @@ describe('authentication/middleware', function() {
 
       it(`applies plugin's default template to rewrite ids`, async function() {
         let response = await request.post(`/auth/has-default-template`).send({
-          upstreamId: arthur.id
+          upstreamId: arthur.id,
         });
         expect(response).hasStatus(200);
         expect(response.body).has.deep.property('data.id', arthur.id);
@@ -482,12 +465,12 @@ describe('authentication/middleware', function() {
             type: 'test-users',
             attributes: {
               state: 'i-am-partial',
-              message: "you're not done yet"
-            }
+              message: "you're not done yet",
+            },
           },
           meta: {
-            'partial-session': true
-          }
+            'partial-session': true,
+          },
         });
         expect(response).hasStatus(200);
         expect(response.body).not.has.deep.property('meta.token');
@@ -495,14 +478,13 @@ describe('authentication/middleware', function() {
           type: 'test-users',
           attributes: {
             state: 'i-am-partial',
-            message: "you're not done yet"
-          }
+            message: "you're not done yet",
+          },
         });
         expect(response.body.meta).deep.equals({
-          'partial-session': true
+          'partial-session': true,
         });
       });
-
     });
 
     describe('token status', function() {
@@ -522,7 +504,9 @@ describe('authentication/middleware', function() {
 
       it('can return updated user info when getting token status', async function() {
         let { token } = await auth.createToken({ id: quint.id, type: 'test-users' }, 30);
-        let { data:updatedQuint } = await env.lookup('hub:searchers').get(env.session, 'master', 'test-users', quint.id);
+        let { data: updatedQuint } = await env
+          .lookup('hub:searchers')
+          .get(env.session, 'master', 'test-users', quint.id);
         updatedQuint.attributes.email = 'updated@example.com';
 
         await env.lookup('hub:writers').update('master', env.session, 'test-users', quint.id, { data: updatedQuint });
@@ -542,7 +526,9 @@ describe('authentication/middleware', function() {
       });
 
       it('can reject when you get status for an invalid token', async function() {
-        let response = await request.get(`/auth/echo/status`).set('authorization', `Bearer this--is--not--a--real--token`);
+        let response = await request
+          .get(`/auth/echo/status`)
+          .set('authorization', `Bearer this--is--not--a--real--token`);
 
         expect(response).hasStatus(401);
       });
@@ -556,7 +542,6 @@ describe('authentication/middleware', function() {
         expect(response.body).has.deep.property('data.attributes.favorite-toy', 'squeaky snake');
         expect(response.body).not.has.deep.property('data.attributes.secret-rating');
       });
-
     });
   });
 
@@ -571,9 +556,9 @@ describe('authentication/middleware', function() {
             id: quint.id,
             type: 'test-users',
             attributes: {
-              email: 'updated.email@this-changed.com'
-            }
-          }
+              email: 'updated.email@this-changed.com',
+            },
+          },
         });
         expect(response).hasStatus(200);
         expect(response.body).has.deep.property('data.meta.token');
@@ -589,7 +574,7 @@ describe('authentication/middleware', function() {
         expect(response.body.user.data).has.property('type', 'test-users');
         expect(response.body.user.data.attributes).deep.equals({
           'full-name': 'Quint Faulkner',
-          email: 'updated.email@this-changed.com'
+          email: 'updated.email@this-changed.com',
         });
       });
 
@@ -600,9 +585,9 @@ describe('authentication/middleware', function() {
             type: 'doggies',
             attributes: {
               fullName: 'Van Gogh Abdel-Rahman',
-              email: 'vanny@example.com'
-            }
-          }
+              email: 'vanny@example.com',
+            },
+          },
         });
         expect(response).hasStatus(200);
         expect(response.body).has.deep.property('data.meta.token');
@@ -623,7 +608,7 @@ describe('authentication/middleware', function() {
           'full-name': 'Van Gogh Abdel-Rahman',
           email: 'vanny@example.com',
           'favorite-toy': 'squeaky snake',
-          'secret-rating': 'Good Boy'
+          'secret-rating': 'Good Boy',
         });
       });
 
@@ -632,7 +617,7 @@ describe('authentication/middleware', function() {
           id: '4321',
           firstName: 'Newly',
           lastName: 'Created',
-          email: 'new@example.com'
+          email: 'new@example.com',
         });
         expect(response).hasStatus(200);
         expect(response.body).has.deep.property('data.meta.token');
@@ -647,7 +632,7 @@ describe('authentication/middleware', function() {
         expect(response.body.user.data).has.property('type', 'test-users');
         expect(response.body.user.data.attributes).deep.equals({
           email: 'new@example.com',
-          'full-name': 'Newly Created'
+          'full-name': 'Newly Created',
         });
       });
 
@@ -656,7 +641,7 @@ describe('authentication/middleware', function() {
           id: '4321',
           firstName: 'Spaces   vs\tTabs & stuff',
           lastName: '"why tabs"\nO\'Reilley',
-          email: 'new@example.com'
+          email: 'new@example.com',
         });
         expect(response).hasStatus(200);
         expect(response.body).has.deep.property('data.meta.token');
@@ -671,7 +656,7 @@ describe('authentication/middleware', function() {
         expect(response.body.user.data).has.property('type', 'test-users');
         expect(response.body.user.data.attributes).deep.equals({
           email: 'new@example.com',
-          'full-name': 'Spaces   vs\tTabs & stuff "why tabs"\nO\'Reilley'
+          'full-name': 'Spaces   vs\tTabs & stuff "why tabs"\nO\'Reilley',
         });
       });
 
@@ -679,7 +664,7 @@ describe('authentication/middleware', function() {
         let response = await request.post(`/auth/create-via-template-no-id`).send({
           firstName: 'Newly',
           lastName: 'Created',
-          email: 'new@example.com'
+          email: 'new@example.com',
         });
         expect(response).hasStatus(200);
         expect(response.body).has.deep.property('data.meta.token');
@@ -694,7 +679,7 @@ describe('authentication/middleware', function() {
         expect(response.body.user.data).has.property('type', 'test-users');
         expect(response.body.user.data.attributes).deep.equals({
           email: 'new@example.com',
-          'full-name': 'Newly Created'
+          'full-name': 'Newly Created',
         });
       });
 
@@ -706,9 +691,9 @@ describe('authentication/middleware', function() {
             attributes: {
               fullName: 'Ringo Abdel-Rahman',
               email: 'ringo@example.com',
-              "secret-rating": "Good Boy"
-            }
-          }
+              'secret-rating': 'Good Boy',
+            },
+          },
         });
         expect(response).hasStatus(200);
         expect(response.body).has.deep.property('data.id');
@@ -731,7 +716,7 @@ describe('authentication/middleware', function() {
           'full-name': 'Ringo Abdel-Rahman',
           email: 'ringo@example.com',
           'favorite-toy': null,
-          "secret-rating": "Good Boy"
+          'secret-rating': 'Good Boy',
         });
       });
 
@@ -743,9 +728,9 @@ describe('authentication/middleware', function() {
             attributes: {
               fullName: 'Ringo Abdel-Rahman',
               email: 'ringo@example.com',
-              "secret-rating": "Good Boy"
-            }
-          }
+              'secret-rating': 'Good Boy',
+            },
+          },
         });
         expect(response).hasStatus(200);
         expect(response.body).not.has.deep.property('data.attributes.secret-rating');

@@ -7,7 +7,7 @@ import hbs from 'htmlbars-inline-precompile';
 const modelStub = {
   watchRelationship: (field, fn) => {
     fn.call(this);
-  }
+  },
 };
 
 module('Integration | Component | field editors/dropdown choices editor', async function(hooks) {
@@ -28,7 +28,9 @@ module('Integration | Component | field editors/dropdown choices editor', async 
   test('can specify a different field to use for option', async function(assert) {
     this.set('model', modelStub);
     this.set('editorOptions', { displayFieldName: 'name' });
-    await render(hbs`{{field-editors/dropdown-choices-editor content=model field="vehicle" editorOptions=editorOptions}}`);
+    await render(
+      hbs`{{field-editors/dropdown-choices-editor content=model field="vehicle" editorOptions=editorOptions}}`,
+    );
 
     await clickTrigger();
     assert.dom('.ember-power-select-option').exists({ count: 4 }, 'Dropdown is rendered');

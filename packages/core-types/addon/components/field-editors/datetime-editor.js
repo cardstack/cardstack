@@ -4,5 +4,5 @@ import layout from '../../templates/components/field-editors/datetime-editor';
 
 export default Component.extend({
   layout,
-  disabled: not('enabled')
+  disabled: not('enabled'),
 });

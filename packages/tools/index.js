@@ -12,12 +12,9 @@ module.exports = {
     postcssOptions: {
       compile: {
         enabled: true,
-        plugins: [
-          { module: CssImport },
-          { module: CssNext }
-        ]
-      }
-    }
+        plugins: [{ module: CssImport }, { module: CssNext }],
+      },
+    },
   },
 
   contentFor(type) {
@@ -32,7 +29,6 @@ module.exports = {
     document.body.insertBefore(div, document.body.childNodes[0]);
   };
 </script>`;
-
     }
-  }
+  },
 };

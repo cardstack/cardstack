@@ -6,5 +6,5 @@ export default ChatMessage.extend({
 
   read() {
     this.set('status', 'read');
-  }
-})
+  },
+});

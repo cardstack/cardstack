@@ -10,6 +10,6 @@ export default Component.extend({
     },
     highlightField(which) {
       return this.get('tools').highlightField(which);
-    }
-  }
+    },
+  },
 });

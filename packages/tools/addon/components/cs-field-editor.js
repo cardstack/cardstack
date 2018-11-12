@@ -17,5 +17,5 @@ export default Component.extend({
 
   firstError: computed('errors.[]', function() {
     return this.errors && this.errors[0];
-  })
+  }),
 });

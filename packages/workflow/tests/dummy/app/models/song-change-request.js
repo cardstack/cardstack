@@ -10,5 +10,5 @@ export default SongChangeRequest.extend({
 
   deny() {
     this.set('status', 'denied');
-  }
+  },
 });

@@ -16,20 +16,20 @@ import EditorLink from '../templates/icons/editor/Link';
 import EditorUnderline from '../templates/icons/editor/Underline';
 
 const icons = {
-  'EditorH2' : EditorH2,
-  'EditorH3' : EditorH3,
-  'EditorList' : EditorList,
-  'EditorNumberList' : EditorNumberList,
-  'EditorP' : EditorP,
-  'EditorQuote' : EditorQuote,
+  EditorH2: EditorH2,
+  EditorH3: EditorH3,
+  EditorList: EditorList,
+  EditorNumberList: EditorNumberList,
+  EditorP: EditorP,
+  EditorQuote: EditorQuote,
 
-  'EditorBold' : EditorBold,
-  'EditorSuperscript' : EditorSuperscript,
-  'EditorSubscript' : EditorSubscript,
-  'EditorStrikethrough' : EditorStrikethrough,
-  'EditorItalic' : EditorItalic,
-  'EditorLink' : EditorLink,
-  'EditorUnderline' : EditorUnderline,
+  EditorBold: EditorBold,
+  EditorSuperscript: EditorSuperscript,
+  EditorSubscript: EditorSubscript,
+  EditorStrikethrough: EditorStrikethrough,
+  EditorItalic: EditorItalic,
+  EditorLink: EditorLink,
+  EditorUnderline: EditorUnderline,
 };
 
 export default Component.extend({
@@ -39,5 +39,5 @@ export default Component.extend({
   active: false,
   didReceiveAttrs() {
     this.set('layout', icons[this.get('name')]);
-  }
+  },
 });

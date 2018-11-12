@@ -24,10 +24,10 @@ module.exports = class DrupalSearcher {
       path: `/users/${login}`,
       method: 'GET',
       headers: {
-        'Accept': 'application/json',
+        Accept: 'application/json',
         'User-Agent': '@cardstack/drupal-auth',
-        Authorization: `token ${this.ownToken}`
-      }
+        Authorization: `token ${this.ownToken}`,
+      },
     };
     let response = await request(options);
     return this._rewriteUser(response.body);
@@ -40,9 +40,8 @@ module.exports = class DrupalSearcher {
       attributes: {
         name: ghUser.name,
         'avatar-url': ghUser.avatar_url,
-        email: ghUser.email
-      }
+        email: ghUser.email,
+      },
     };
   }
-
 };

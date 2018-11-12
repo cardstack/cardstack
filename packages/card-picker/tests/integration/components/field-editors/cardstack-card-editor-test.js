@@ -33,7 +33,7 @@ module('Integration | Component | field-editors/cardstack-card-editor', function
     this.set('content', {
       article: {
         id: '55',
-        type: 'super-fake-card'
+        type: 'super-fake-card',
       },
     });
 

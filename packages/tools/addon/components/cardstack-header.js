@@ -3,5 +3,5 @@ import layout from '../templates/components/cardstack-header';
 
 export default Component.extend({
   layout,
-  classNames: ['cardstack-header', 'cardstack-tools']
+  classNames: ['cardstack-header', 'cardstack-tools'],
 });

@@ -5,18 +5,18 @@ module.exports = class {
   }
   async authenticate({ email }, userSearcher) {
     if (email == null) {
-      throw new Error("email is required", { status: 400 });
+      throw new Error('email is required', { status: 400 });
     }
     let { data } = await userSearcher.search({
       filter: { email: { exact: email } },
-      page: { size: 1 }
+      page: { size: 1 },
     });
     if (data.length > 0) {
       return {
         data: data[0],
         meta: {
-          preloaded: true
-        }
+          preloaded: true,
+        },
       };
     }
   }

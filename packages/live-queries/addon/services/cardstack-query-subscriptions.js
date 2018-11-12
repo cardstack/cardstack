@@ -19,7 +19,7 @@ export default Service.extend({
     this._subscriptions[subscription_id] = {
       subscription_id,
       query,
-      invalidate
+      invalidate,
     };
 
     this._connection.emit('query-subscribe', subscription_id, query);
@@ -45,9 +45,11 @@ export default Service.extend({
     if (!sub) {
       Ember.Logger.warn(`Invalidation received for non-existant query subscription ${subscription_id}`);
     } else if (sub._deleting) {
-      Ember.Logger.warn(`Invalidation received for query subscription ${subscription_id} while an unsubscribe is in-flight`);
+      Ember.Logger.warn(
+        `Invalidation received for query subscription ${subscription_id} while an unsubscribe is in-flight`,
+      );
     } else {
       sub.invalidate();
     }
-  }
+  },
 });

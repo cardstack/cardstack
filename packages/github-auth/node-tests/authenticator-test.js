@@ -1,16 +1,13 @@
 const supertest = require('supertest');
 const Koa = require('koa');
 const nock = require('nock');
-const {
-  createDefaultEnvironment,
-  destroyDefaultEnvironment
-} = require('@cardstack/test-support/env');
+const { createDefaultEnvironment, destroyDefaultEnvironment } = require('@cardstack/test-support/env');
 const JSONAPIFactory = require('@cardstack/test-support/jsonapi-factory');
 const {
   validAccessToken,
   githubUser,
   githubUsersResponse,
-  githubReadPermissions
+  githubReadPermissions,
 } = require('./fixtures/github-responses');
 
 describe('github-auth/authenticator', function() {
@@ -20,18 +17,20 @@ describe('github-auth/authenticator', function() {
   async function setup() {
     let factory = new JSONAPIFactory();
 
-    factory.addResource('grants')
+    factory
+      .addResource('grants')
       .withRelated('who', [{ type: 'groups', id: 'everyone' }])
       .withAttributes({
-        mayLogin: true
+        mayLogin: true,
       });
 
-    factory.addResource('grants')
+    factory
+      .addResource('grants')
       .withRelated('who', [{ type: 'groups', id: 'everyone' }])
       .withRelated('types', [{ type: 'content-types', id: 'github-users' }])
       .withAttributes({
         'may-read-resource': true,
-        'may-read-fields': true
+        'may-read-fields': true,
       });
 
     factory.addResource('data-sources', 'github').withAttributes({
@@ -40,8 +39,8 @@ describe('github-auth/authenticator', function() {
         'client-id': 'mock-github-client-id',
         'client-secret': 'mock-github-client-secret',
         token: 'mock-github-token',
-        permissions: [{ repo: 'cardstack/repo1', permission: 'read' }]
-      }
+        permissions: [{ repo: 'cardstack/repo1', permission: 'read' }],
+      },
     });
 
     env = await createDefaultEnvironment(`${__dirname}/github-authenticator`, factory.getModels(), { ciSessionId });
@@ -58,7 +57,7 @@ describe('github-auth/authenticator', function() {
   afterEach(teardown);
 
   it('returns github-users document for an authenticated github session', async function() {
-    let { login:id } = githubUser;
+    let { login: id } = githubUser;
 
     nock('https://github.com')
       .post('/login/oauth/access_token')
@@ -83,10 +82,10 @@ describe('github-auth/authenticator', function() {
     expect(response.body).has.deep.property('data.id', id);
     expect(response.body).has.deep.property('data.meta.source', 'github');
     expect(response.body.data.attributes).to.deep.equal({
-      "name": "Hassan Abdel-Rahman",
-      "email": "hassan@cardstack.com",
-      "avatar-url": "https://avatars2.githubusercontent.com/u/61075?v=4",
-      "permissions": ["cardstack/repo1:read"]
+      name: 'Hassan Abdel-Rahman',
+      email: 'hassan@cardstack.com',
+      'avatar-url': 'https://avatars2.githubusercontent.com/u/61075?v=4',
+      permissions: ['cardstack/repo1:read'],
     });
     expect(response.body.data.meta.token).is.ok;
     expect(response.body.data.meta.validUntil).is.ok;
