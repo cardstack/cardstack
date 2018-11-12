@@ -40,6 +40,10 @@
                 content=content
                 field=fieldName
                 enabled=editingEnabled
+                canUpdate=(and
+                  permissions.mayUpdateResource
+                  (contains fieldName permissions.writableFields)
+                )
                 onchange=(action "validate")
                 errors=(get validationErrors fieldName)
               }}
@@ -50,6 +54,10 @@
             content=model.content
             field=model.name
             enabled=editingEnabled
+            canUpdate=(and
+              permissions.mayUpdateResource
+              (contains model.name permissions.writableFields)
+            )
             onchange=(action "validate")
             errors=(get validationErrors model.name)
           }}
@@ -75,6 +83,10 @@
           content=field.model
           field=field.name
           enabled=editingEnabled
+          canUpdate=(and
+            permissions.mayUpdateResource
+            (contains field.name permissions.writableFields)
+          )
           onchange=(action "validate")
           errors=(get validationErrors field.name)
         }}

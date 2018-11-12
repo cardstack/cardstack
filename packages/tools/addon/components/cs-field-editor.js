@@ -13,7 +13,9 @@ export default Component.extend({
   enabled: true,
   errors: null,
 
-  disabled: not('enabled'),
+  disabled: computed('enabled', 'canUpdate', function() {
+    return !(this.enabled && this.canUpdate);
+  }),
 
   firstError: computed('errors.[]', function() {
     return this.errors && this.errors[0];

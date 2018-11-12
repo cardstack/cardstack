@@ -129,7 +129,8 @@ export default Service.extend({
     let { attributes, relationships } = data;
     return {
       mayUpdateResource: attributes['may-update-resource'],
-      writeableFields: relationships['writable-fields'].data.map((field) => field.id)
+      writableFields: relationships['writable-fields'].data
+        .map((field) => camelize(field.id))
     }
   },
 

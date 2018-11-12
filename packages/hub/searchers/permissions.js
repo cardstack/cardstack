@@ -43,7 +43,7 @@ class PermissionsSearcher {
     }
 
     // todo: a field should only be writable if it is also readable. See how _validateFieldReadAuth does it.
-    let writableFields = await Promise.all([...contentType.realAndComputedFields.values()].map(async field => {
+    let writableFields = await Promise.all([...contentType.realFields.values()].map(async field => {
       let grant = await find(field.grants, async g => g['may-write-fields'] && await g.matches(document.data, context));
       if (grant) {
         return field;
