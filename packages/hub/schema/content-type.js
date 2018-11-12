@@ -179,8 +179,6 @@ module.exports = class ContentType {
     }
   }
 
-
-
   async _assertGrant(documents, context, permission, description) {
     let grant = await find(this.grants, async g => {
       if (!g[permission]) {

@@ -4,7 +4,9 @@ const { declareInjections } = require('@cardstack/di');
 const { partition, uniqWith, isEqual, uniq } = require('lodash');
 
 module.exports = declareInjections({
-  schemaLoader: 'hub:schema-loader'
+  schemaLoader: 'hub:schema-loader',
+  searchers: 'hub:searchers',
+  controllingBranch: 'hub:controlling-branch'
 },
 
 class Schema {
@@ -12,7 +14,7 @@ class Schema {
     return new this(opts);
   }
 
-  constructor({ types, fields, computedFields, dataSources, inputModels, plugins, schemaLoader, grants }) {
+  constructor({ types, fields, computedFields, dataSources, inputModels, plugins, schemaLoader, searchers, controllingBranch, grants }) {
     this.types = types;
     this.realFields = fields;
     this.computedFields = computedFields;
@@ -25,6 +27,8 @@ class Schema {
     this._allGrants = grants;
     this._abstractRealms = null;
     this.schemaLoader = schemaLoader;
+    this.searchers = searchers;
+    this.controllingBranch = controllingBranch;
   }
 
   get realAndComputedFields() {
@@ -290,10 +294,27 @@ class Schema {
         return;
       }
 
-      authorizedResource = primaryType.applyReadAuthorization(document.data, userRealms);
-      if (!authorizedResource) {
-        return;
+      // applying read authorization for permission resources is a special case
+      // a permission resource can be read if the subject of the permission object can be read
+      if (document.data.type === 'permissions') {
+        let [ queryType, queryId ] = document.data.id.split('/');
+        let permissionsSubject = await this.searchers.get(session, this.controllingBranch.name, queryType, queryId);
+        let permissionsSubjectType = this.types.get(queryType);
+        try {
+          await permissionsSubjectType._assertGrant([permissionsSubject.data], context, 'may-read-resource', 'read');
+          authorizedResource = document.data;
+        } catch(error) {
+          if (!error.isCardstackError) {
+            throw error;
+          }
+        }
+      } else {
+        authorizedResource = primaryType.applyReadAuthorization(document.data, userRealms);
+        if (!authorizedResource) {
+          return;
+        }
       }
+
     }
 
     let output = document;
