@@ -16,6 +16,7 @@ const temp = require('@cardstack/test-support/temp-helper');
 
 const { inRepo, makeRepo } = require('./support');
 const Change = require('../change');
+const service = require('../service');
 
 const mkdir = promisify(temp.mkdir);
 
@@ -101,6 +102,7 @@ describe('git/writer with remote', function() {
   afterEach(async function() {
     await temp.cleanup();
     await destroyDefaultEnvironment(env);
+    service.clearCache();
   });
 
   describe('create', function() {
