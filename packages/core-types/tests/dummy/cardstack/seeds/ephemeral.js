@@ -10,7 +10,8 @@ function initialModels() {
     defaultIncludes: [
       'feeling',
       'vehicle',
-      'alternate-vehicle'
+      'alternate-vehicle',
+      'tracks'
     ]
   })
   .withRelated('fields', [
@@ -50,7 +51,19 @@ function initialModels() {
       fieldType: '@cardstack/core-types::belongs-to',
       editorComponent: 'field-editors/dropdown-choices-editor',
       editorOptions: { displayFieldName: 'name' }
-    }).withRelated('related-types', [{ type: 'content-types', id: 'vehicles' }])
+    }).withRelated('related-types', [
+      { type: 'content-types', id: 'vehicles' }
+    ]),
+    initial.addResource('fields', 'tracks').withAttributes({
+      fieldType: '@cardstack/core-types::has-many',
+      editorComponent: 'field-editors/dropdown-multi-select-editor',
+      editorOptions: { displayFieldName: 'name' }
+    }).withRelated('related-types', [
+      initial.addResource('content-types', 'tracks')
+      .withRelated('fields', [
+        initial.addResource('fields', 'name').withAttributes({ fieldType: '@cardstack/core-types::string' })
+      ])
+    ])
   ]);
 
   let happyFeeling = initial.addResource('feelings', '1').withAttributes({ title: 'Happy' });
@@ -63,6 +76,10 @@ function initialModels() {
   initial.addResource('vehicles', '3').withAttributes({ name: 'Honeycoupe' });
   initial.addResource('vehicles', '4').withAttributes({ name: 'Wild Wiggler' });
 
+  let rainbowRoad = initial.addResource('tracks', 'rainbow-road').withAttributes({ name: 'Rainbow Road' });
+  let sweetSweetCanyon = initial.addResource('tracks', 'sweet-sweet-canyon').withAttributes({ name: 'Sweet Sweet Canyon' });
+  let koopaCity = initial.addResource('tracks', 'koopa-city').withAttributes({ name: 'Koopa City' });
+  let twistedMansion = initial.addResource('tracks', 'twisted-mansion').withAttributes({ name: 'Twisted Mansion' });
 
   initial.addResource('drivers', 'kingboo')
     .withAttributes({
@@ -72,7 +89,8 @@ function initialModels() {
       isGoodGuy: false
     })
     .withRelated('feeling', exuberantFeeling)
-    .withRelated('vehicle', standardKartVehicle);
+    .withRelated('vehicle', standardKartVehicle)
+    .withRelated('tracks', [ twistedMansion ]);
 
     initial.addResource('drivers', 'metalmario')
     .withAttributes({
@@ -83,7 +101,8 @@ function initialModels() {
     })
     .withRelated('feeling', happyFeeling)
     .withRelated('vehicle', sportBikeVehicle)
-    .withRelated('alternate-vehicle', standardKartVehicle);
+    .withRelated('alternate-vehicle', standardKartVehicle)
+    .withRelated('tracks', [ rainbowRoad, sweetSweetCanyon, koopaCity ]);
 
     initial.addResource('drivers', 'link')
     .withAttributes({

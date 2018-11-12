@@ -83,19 +83,15 @@ const {
   Reference,
   Branch,
   Commit,
-  Clone,
-  Cred,
 } = require('nodegit');
-const { promisify } = require('util');
-const temp = require('temp').track();
 
 const Change = require("./change");
 
 const { safeEntryByName } = require('./mutable-tree');
 
-const mkdir = promisify(temp.mkdir);
+const log = require('@cardstack/logger')('cardstack/git');
 
-const log = require('@cardstack/logger')('cardstack/git-indexer');
+const service = require('./service');
 
 module.exports = class Indexer {
   static create(params) { return new this(params); }
@@ -115,19 +111,7 @@ module.exports = class Indexer {
   async _ensureRepo() {
     if (!this.repo) {
       if (this.remote) {
-        let tempRepoPath = await mkdir('cardstack-temp-repo');
-        this.repo = await Clone(this.remote.url, tempRepoPath, {
-          fetchOpts: {
-            callbacks: {
-              credentials: (url, userName) => {
-                if (this.remote.privateKey) {
-                  return Cred.sshKeyMemoryNew(userName, this.remote.publicKey || '', this.remote.privateKey, this.remote.passphrase || '');
-                }
-                return Cred.sshKeyFromAgent(userName);
-              }
-            }
-          }
-        });
+        this.repo = await service.getRepo(this.remote.url, this.remote);
         return;
       }
 
@@ -168,7 +152,14 @@ module.exports = class Indexer {
 
   async beginUpdate(branch) {
     await this._ensureRepo();
-    return new GitUpdater(this.repo, this.branchPrefix + branch, this.repoPath, this.basePath);
+
+    let targetBranch = this.branchPrefix + branch;
+
+    if (this.remote) {
+      await service.pullRepo(this.remote.url, targetBranch);
+    }
+
+    return new GitUpdater(this.repo, targetBranch, this.repoPath, this.basePath);
   }
 };
 

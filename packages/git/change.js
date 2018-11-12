@@ -1,7 +1,6 @@
 const {
   Branch,
   Commit,
-  Cred,
   Merge,
   Repository,
   Signature,
@@ -15,6 +14,9 @@ const {
   OverwriteRejected
 } = require('./mutable-tree');
 const moment = require('moment-timezone');
+const crypto = require('crypto');
+const delay = require('delay');
+const log = require('@cardstack/logger')('cardstack/git');
 
 // This is supposed to enable thread-safe locking around all async
 // operations.
@@ -42,15 +44,12 @@ class Change {
     return new this(repo, targetBranch, parentTree, parents, parentCommit, null, null);
   }
 
-  static async create(repo, parentId, targetBranch) {
-    let headRef = await Branch.lookup(repo, targetBranch, Branch.BRANCH.LOCAL);
-    let headCommit = await Commit.lookup(repo, headRef.target());
-
+  static async create(repo, parentId, targetBranch, fetchOpts) {
     let parentCommit;
     if (parentId) {
       parentCommit = await Commit.lookup(repo, parentId);
     } else {
-      parentCommit = headCommit;
+      parentCommit = await headCommit(repo, targetBranch, fetchOpts);
     }
 
     let parentTree;
@@ -59,18 +58,21 @@ class Change {
       parentTree = await parentCommit.getTree();
       parents.push(parentCommit);
     }
-    return new this(repo, targetBranch, parentTree, parents, parentCommit, headRef, headCommit);
+    return new this(repo, targetBranch, parentTree, parents, parentCommit, fetchOpts);
   }
 
-  constructor(repo, targetBranch, parentTree, parents, parentCommit, headRef, headCommit) {
+  constructor(repo, targetBranch, parentTree, parents, parentCommit, fetchOpts) {
     this.repo = repo;
     this.parentTree = parentTree;
     this.root = new MutableTree(repo, parentTree);
     this.parents = parents;
     this.parentCommit = parentCommit;
-    this.headRef = headRef;
-    this.headCommit = headCommit;
     this.targetBranch = targetBranch;
+    this.fetchOpts = fetchOpts;
+  }
+
+  async _headCommit() {
+    return headCommit(this.repo, this.targetBranch, this.fetchOpts);
   }
 
   async get(path, { allowCreate, allowUpdate } = {}) {
@@ -78,28 +80,32 @@ class Change {
     return new FileHandle(tree, leaf, leafName, allowUpdate, path);
   }
 
-  async finalize(commitOpts, remoteConfig) {
+  async finalize(commitOpts) {
     let newCommit = await this._makeCommit(commitOpts);
-    let mergeCommit = await this._mergeCommit(newCommit, commitOpts);
 
-    try {
-      let remote = await this.repo.getRemote('origin');
-      await remote.push(["refs/heads/master:refs/heads/master"], {
-        callbacks: {
-          credentials: (url, userName) => {
-            if (remoteConfig.privateKey) {
-              return Cred.sshKeyMemoryNew(userName, remoteConfig.publicKey || '', remoteConfig.privateKey, remoteConfig.passphrase || '');
-            }
-            return Cred.sshKeyFromAgent(userName);
-          }
+    let delayTime = 500;
+    let mergeCommit;
+    while (delayTime <= 5000) {
+      mergeCommit = await this._makeMergeCommit(newCommit, commitOpts);
+
+      try {
+        if(this.fetchOpts) {
+          await this._pushCommit(mergeCommit);
+        } else {
+          await this._applyCommit(mergeCommit);
         }
-      });
-    } catch (e) {
-      // Do nothing
-    }
+      } catch (err) {
+        await delay(delayTime);
+        log.warn('Failed to finalize commit "%s"', err);
 
-    return mergeCommit;
+        delayTime *= 2;
+      }
+
+    return mergeCommit.id().tostrS();
   }
+
+  throw new Error('Failed to finalise commit and could not recover');
+}
 
   async _makeCommit(commitOpts) {
     let treeOid = await this.root.write(true);
@@ -114,31 +120,57 @@ class Change {
     return Commit.lookup(this.repo, commitOid);
   }
 
-  async _mergeCommit(newCommit, commitOpts) {
-    if (!this.headCommit) {
-      return this._newBranch(newCommit);
+  async _pushCommit(mergeCommit) {
+    const remoteBranchName = `temp-remote-${crypto.randomBytes(20).toString('hex')}`;
+    await Branch.create(this.repo, remoteBranchName, mergeCommit, false);
+
+    let remote = await this.repo.getRemote('origin');
+
+    try {
+      await remote.push([`refs/heads/${remoteBranchName}:refs/heads/${this.targetBranch}`], this.fetchOpts);
+    } catch (err) {
+      // pull remote before allowing process to continue
+      await this.repo.fetchAll(this.fetchOpts);
+      throw err;
     }
-    let baseOid = await Merge.base(this.repo, newCommit, this.headCommit);
-    if (baseOid.equal(this.headCommit.id())) {
-      await this.headRef.setTarget(newCommit.id(), 'fast forward');
-      return newCommit.id().tostrS();
+  }
+
+  async _makeMergeCommit(newCommit, commitOpts) {
+    let headCommit = await this._headCommit();
+
+    if (!headCommit) {
+      // new branch, so no merge needed
+      return newCommit;
     }
-    let index = await Merge.commits(this.repo, newCommit, this.headCommit, null);
+    let baseOid = await Merge.base(this.repo, newCommit, headCommit);
+    if (baseOid.equal(headCommit.id())) {
+      // fast forward (we think), so no merge needed
+      return newCommit;
+    }
+    let index = await Merge.commits(this.repo, newCommit, headCommit, null);
     if (index.hasConflicts()) {
       throw new GitConflict(index);
     }
     let treeOid = await index.writeTreeTo(this.repo);
     let tree = await Tree.lookup(this.repo, treeOid, null);
     let { author, committer } = signature(commitOpts);
-    let mergeCommitOid = await Commit.create(this.repo, null, author, committer, 'UTF-8', `Clean merge into ${this.targetBranch}`, tree, 2, [newCommit, this.headCommit]);
-    let mergeCommit = await Commit.lookup(this.repo, mergeCommitOid);
-    await this.headRef.setTarget(mergeCommit.id(), 'fast forward');
-    return mergeCommit.id().tostrS();
+    let mergeCommitOid = await Commit.create(this.repo, null, author, committer, 'UTF-8', `Clean merge into ${this.targetBranch}`, tree, 2, [newCommit, headCommit]);
+    return await Commit.lookup(this.repo, mergeCommitOid);
+  }
+
+  async _applyCommit(commit) {
+    let headCommit = await this._headCommit();
+
+    if (!headCommit) {
+      return await this._newBranch(commit);
+    }
+
+    let headRef = await Branch.lookup(this.repo, this.targetBranch, Branch.BRANCH.LOCAL);
+    await headRef.setTarget(commit.id(), 'fast forward');
   }
 
   async _newBranch(newCommit) {
     await Branch.create(this.repo, this.targetBranch, newCommit, false);
-    return newCommit.id().tostrS();
   }
 }
 
@@ -212,3 +244,21 @@ Change.NotFound = NotFound;
 Change.OverwriteRejected = OverwriteRejected;
 
 module.exports = Change;
+
+async function headCommit(repo, targetBranch, fetchOpts) {
+  let headRef;
+  try {
+    if (fetchOpts) {
+      headRef = await Branch.lookup(repo, `origin/${targetBranch}`, Branch.BRANCH.REMOTE);
+    } else {
+      headRef = await Branch.lookup(repo, targetBranch, Branch.BRANCH.LOCAL);
+    }
+  } catch(err) {
+    if (err.errorFunction !== 'Branch.lookup') {
+      throw err;
+    }
+  }
+  if (headRef) {
+    return await Commit.lookup(repo, headRef.target());
+  }
+}
