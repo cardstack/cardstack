@@ -152,7 +152,14 @@ module.exports = class Indexer {
 
   async beginUpdate(branch) {
     await this._ensureRepo();
-    return new GitUpdater(this.repo, this.branchPrefix + branch, this.repoPath, this.basePath);
+
+    let targetBranch = this.branchPrefix + branch;
+
+    if (this.remote) {
+      await service.pullRepo(this.remote.url, targetBranch);
+    }
+
+    return new GitUpdater(this.repo, targetBranch, this.repoPath, this.basePath);
   }
 };
 

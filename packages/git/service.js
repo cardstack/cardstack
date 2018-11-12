@@ -3,7 +3,7 @@ const mkdirp = promisify(require('mkdirp'));
 const filenamifyUrl = require('filenamify-url');
 const { existsSync } = require('fs');
 const { join } = require('path');
-const { Clone, Cred } = require('@cardstack/nodegit');
+const { Clone, Cred, Merge } = require('@cardstack/nodegit');
 const temp = require('temp');
 
 class GitLocalCache {
@@ -65,7 +65,7 @@ class GitLocalCache {
       }
     };
 
-    let repo = Clone(remote.url, repoPath, {
+    let repo = await Clone(remote.url, repoPath, {
       fetchOpts
     });
 
@@ -74,6 +74,13 @@ class GitLocalCache {
       fetchOpts,
       repoPath
     };
+  }
+
+  async pullRepo(remoteUrl, targetBranch) {
+    let { repo, fetchOpts } = this._remotes.get(remoteUrl);
+
+    await repo.fetchAll(fetchOpts);
+    await repo.mergeBranches(targetBranch, `origin/${targetBranch}`, null, Merge.PREFERENCE.FASTFORWARD_ONLY);
   }
 }
 
