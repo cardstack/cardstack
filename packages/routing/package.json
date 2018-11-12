@@ -1,6 +1,6 @@
 {
   "name": "@cardstack/routing",
-  "version": "0.11.8",
+  "version": "0.11.9",
   "description": "The default blueprint for ember-cli addons.",
   "keywords": [
     "ember-addon",
@@ -20,19 +20,19 @@
     "test": "ember try:each"
   },
   "dependencies": {
-    "@cardstack/data": "0.11.8",
-    "@cardstack/di": "0.11.4",
-    "@cardstack/plugin-utils": "0.11.6",
-    "@cardstack/rendering": "0.11.5",
+    "@cardstack/data": "0.11.9",
+    "@cardstack/di": "0.11.9",
+    "@cardstack/plugin-utils": "0.11.9",
+    "@cardstack/rendering": "0.11.9",
     "ember-cli-babel": "^6.16.0",
     "ember-cli-htmlbars": "^3.0.0",
     "ember-href-to": "^1.13.0",
     "ember-inflector": "^2.1.0"
   },
   "devDependencies": {
-    "@cardstack/eslint-config": "0.11.4",
-    "@cardstack/jsonapi": "0.11.8",
-    "@cardstack/test-support": "0.11.8",
+    "@cardstack/eslint-config": "0.11.9",
+    "@cardstack/jsonapi": "0.11.9",
+    "@cardstack/test-support": "0.11.9",
     "broccoli-asset-rev": "^2.7.0",
     "ember-ajax": "^3.1.0",
     "ember-cli": "^3.4.3",
