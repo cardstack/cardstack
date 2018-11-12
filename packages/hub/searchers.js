@@ -73,8 +73,10 @@ class Searchers {
         upstreamDoc: { data: resource, meta },
         read: this._read(branch)
       });
-      let pristineResult = await (documentContext.pristineDoc());
-      authorizedResult = await schema.applyReadAuthorization(pristineResult, { session, type, id });
+      let pristineResult = await documentContext.pristineDoc();
+      if (pristineResult) {
+        authorizedResult = await schema.applyReadAuthorization(pristineResult, { session, type, id });
+      }
     }
 
     if (!authorizedResult) {

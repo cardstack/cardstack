@@ -78,7 +78,6 @@
               "CARDSTACK_SESSIONS_KEY":"OQUQi8NH0asrYgeoE10ijOFBhd/P1BU8HZP/rNqO5nw=",
               "PGSEARCH_NAMESPACE":"cardstack_data_development",
               "INITIAL_DATA_DIR":"${workspaceFolder}/packages/tools/tests/dummy/cardstack",
-              "PGPORT": "5444",
               "PORT":"3000"
           },
           "args": [
