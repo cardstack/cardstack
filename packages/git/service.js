@@ -4,7 +4,7 @@ const filenamifyUrl = require('filenamify-url');
 const { existsSync } = require('fs');
 const { join } = require('path');
 const { Clone, Cred, Merge } = require('nodegit');
-const temp = require('temp');
+const { tmpdir } = require('os');
 
 class GitLocalCache {
   constructor() {
@@ -38,7 +38,7 @@ class GitLocalCache {
 
     if (!cacheDirectory) {
       if(!this.cacheDirectory) {
-        this.cacheDirectory = temp.path('git-local-cache');
+        this.cacheDirectory = join(tmpdir(), 'cardstack-git-local-cache');
       }
 
       if(!existsSync(this.cacheDirectory)) {
