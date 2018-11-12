@@ -3,11 +3,11 @@
   margin-bottom: 1rem;
   flex: 1 1 300px;
 }
- .cards-editor--input-row > .drag-handle {
+.cards-editor--input-row > .drag-handle {
   margin-right: 0.25rem;
   cursor: pointer;
 }
- .cards-editor--input-row > .text-button {
+.cards-editor--input-row > .text-button {
   display: inline-block;
   border: 0;
   margin-top: .4em;
@@ -20,7 +20,7 @@
   text-decoration: underline;
   color: var(--rising-foreground);
 }
- .cards-editor--button-panel > button {
+.cards-editor--button-panel > button {
   background-color: var(--tools-highlight);
   border: 1px solid var(--deep-tools-highlight);
   color: var(--bright-foreground);
