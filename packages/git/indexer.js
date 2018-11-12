@@ -89,7 +89,7 @@ const Change = require("./change");
 
 const { safeEntryByName } = require('./mutable-tree');
 
-const log = require('@cardstack/logger')('cardstack/git-indexer');
+const log = require('@cardstack/logger')('cardstack/git');
 
 const service = require('./service');
 
