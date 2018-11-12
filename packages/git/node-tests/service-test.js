@@ -21,6 +21,10 @@ describe('local git cache service', function() {
     service.clearCache();
   });
 
+  afterEach(() => {
+    service.clearCache();
+  });
+
   it('creates a local clone of the repo with a naming convention', async function() {
     let tempRepoPath = await mkdir('test-1');
 

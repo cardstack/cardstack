@@ -322,6 +322,7 @@ describe('git/writer with empty remote', function() {
   afterEach(async function() {
     await temp.cleanup();
     await destroyDefaultEnvironment(env);
+    service.clearCache();
   });
 
   describe('create', function() {
