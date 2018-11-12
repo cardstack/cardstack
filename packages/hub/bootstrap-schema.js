@@ -704,6 +704,23 @@ const models = [
     }
   },
   {
+    type: 'grants',
+    id: 'wide-open-for-permissions',
+    attributes: {
+      'may-read-resource': true,
+      'may-update-resource': true,
+      'may-read-fields': true,
+    },
+    relationships: {
+      who: {
+        data: [{ type: 'groups', id: 'everyone' }]
+      },
+      types: {
+        data: [{ type: 'content-types', id: 'permissions' }]
+      }
+    }
+  },
+  {
     type: 'data-sources',
     id: 'plugins',
     attributes: {

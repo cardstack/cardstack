@@ -91,7 +91,7 @@ export default Service.extend({
     let toValidate = [model, ...relatedOwned];
     let responses = toValidate.map(async (record) => {
       let { url, verb } = this._validationRequestParams(record);
-      let token = this.get('session.data.authenticated.data.meta.token');
+      let token = this._sessionToken();
       let response = await fetch(url, {
         method: verb,
         headers: {
@@ -113,6 +113,28 @@ export default Service.extend({
       }
       return Object.assign(mergedErrors, this._errorsByField(body));
     }, {});
+  },
+
+  async fetchPermissionsFor(model) {
+    let token = this._sessionToken();
+    let permissionsPath = encodeURIComponent(`${pluralize(getType(model))}/${model.id}`);
+    let url = `${hubURL}/api/permissions/${permissionsPath}`;
+    let response = await fetch(url, {
+      headers: {
+        'Content-Type': 'application/vnd.api+json',
+        'Authorization': `Bearer ${token}`
+      },
+    });
+    let { data } = await response.json();
+    let { attributes, relationships } = data;
+    return {
+      mayUpdateResource: attributes['may-update-resource'],
+      writeableFields: relationships['writable-fields'].data.map((field) => field.id)
+    }
+  },
+
+  _sessionToken() {
+    return this.get('session.data.authenticated.data.meta.token');
   },
 
   _errorsByField(body) {
