@@ -1,7 +1,7 @@
 <div class="post-page">
   <div>{{#link-to "posts"}}Back to posts{{/link-to}}</div>
   <h1>
-    {{cs-field content 'title'}}
+    {{cs-field content 'title'}} by {{cs-field content.author 'name'}}
   </h1>
   <p>
     {{cs-field content 'publishedAt'}}
@@ -18,7 +18,7 @@
   <ul>
     {{#each content.comments as |comment|}}
     <li>
-      {{cs-field comment.author 'name'}}: {{cs-field comment 'body'}}
+      {{cs-field comment.poster 'name'}}: {{cs-field comment 'body'}}
     </li>
     {{/each}}
   </ul>

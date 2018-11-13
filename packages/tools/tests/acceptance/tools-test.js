@@ -44,7 +44,7 @@ module('Acceptance | tools', function(hooks) {
     element = findTriggerElementWithLabel.call(this, /Name/);
     await click(element);
     matching = findInputWithValue.call(this, 'Guybrush Threepwood');
-    assert.ok(matching, 'found field editor for comment author name');
+    assert.ok(matching, 'found field editor for comment poster name');
   });
 
   test('show validation error', async function(assert) {
@@ -62,7 +62,6 @@ module('Acceptance | tools', function(hooks) {
 
     element = findTriggerElementWithLabel.call(this, /Body/);
     await click(element);
-
     let commentBodyEditor = findInputWithValue.call(this, 'Look behind you, a Three-Headed Monkey!');
     await fillIn(commentBodyEditor, '');
     await triggerEvent(commentBodyEditor, 'blur');
@@ -79,5 +78,17 @@ module('Acceptance | tools', function(hooks) {
 
     let titleSections = findSectionLabels.call(this, "Title");
     assert.equal(titleSections.length, 1, "Rendered fields only appear once");
+  });
+
+  test('disable inputs for computed fields', async function(assert) {
+    await visit('/1');
+    await click('.cardstack-tools-launcher');
+
+
+    let authorNameSectionTrigger = findTriggerElementWithLabel.call(this, /Author Name/);
+    await click(authorNameSectionTrigger);
+
+    let nameInput = findInputWithValue.call(this, 'LeChuck');
+    assert.dom(nameInput).isDisabled('Computed field is disabled');
   });
 });

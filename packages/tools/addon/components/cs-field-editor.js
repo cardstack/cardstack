@@ -1,5 +1,4 @@
 import Component from '@ember/component';
-import { not } from '@ember/object/computed';
 import { computed } from '@ember/object';
 import layout from '../templates/components/cs-field-editor';
 
