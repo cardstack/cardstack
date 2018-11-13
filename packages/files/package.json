@@ -1,10 +1,15 @@
 {
   "name": "@cardstack/files",
-  "version": "0.0.0",
+  "version": "0.11.9",
   "description": "The default blueprint for ember-cli addons.",
   "keywords": [
-    "ember-addon"
+    "ember-addon",
+    "cardstack-plugin"
   ],
+  "cardstack-plugin": {
+    "api-version": 1,
+    "src": "cardstack"
+  },
   "license": "MIT",
   "author": "",
   "directories": {
@@ -19,19 +24,30 @@
     "test": "ember try:each"
   },
   "dependencies": {
-    "ember-cli-babel": "^6.6.0"
+    "@cardstack/di": "0.11.9",
+    "@cardstack/hub": "0.11.9",
+    "@cardstack/jsonapi": "0.11.9",
+    "@cardstack/logger": "^0.1.0",
+    "@cardstack/plugin-utils": "0.11.9",
+    "@cardstack/test-support": "0.11.9",
+    "ember-cli-babel": "^6.6.0",
+    "lodash": "^4.17.11",
+    "moment": "^2.22.2",
+    "sha1-file": "^1.0.1",
+    "sinon": "^6.3.4",
+    "supertest": "^3.3.0",
+    "uuid": "^3.3.2"
   },
   "devDependencies": {
+    "@cardstack/test-support-authenticator": "0.11.9",
     "broccoli-asset-rev": "^2.4.5",
     "ember-ajax": "^3.0.0",
     "ember-cli": "~3.0.2",
     "ember-cli-dependency-checker": "^2.0.0",
-    "ember-cli-eslint": "^4.2.1",
     "ember-cli-htmlbars": "^2.0.1",
     "ember-cli-htmlbars-inline-precompile": "^1.0.0",
     "ember-cli-inject-live-reload": "^1.4.1",
     "ember-cli-qunit": "^4.1.1",
-    "ember-cli-shims": "^1.2.0",
     "ember-cli-sri": "^2.1.0",
     "ember-cli-uglify": "^2.0.0",
     "ember-disable-prototype-extensions": "^1.1.2",
@@ -47,7 +63,7 @@
     "loader.js": "^4.2.3"
   },
   "engines": {
-    "node": "^4.5 || 6.* || >= 7.*"
+    "node": ">= 8"
   },
   "ember-addon": {
     "configPath": "tests/dummy/config"
