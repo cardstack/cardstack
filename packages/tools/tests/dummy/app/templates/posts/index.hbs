@@ -1,10 +1,3 @@
-{{#cardstack-session as |session|}}
-  {{#unless session.isAuthenticated}}
-    {{#mock-login as |login|}}
-      <button onclick={{action login}}>Log in</button>
-    {{/mock-login}}
-  {{/unless}}
-{{/cardstack-session}}
 {{#each model as |post|}}
   {{cardstack-content content=post format="embedded"}}
 {{/each}}
