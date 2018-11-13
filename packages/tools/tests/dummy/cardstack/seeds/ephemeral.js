@@ -18,6 +18,25 @@ function addConstraint(factory, constraint, field) {
 function initialModels() {
   let initial = new JSONAPIFactory();
 
+  initial.addResource('data-sources', 'mock-auth')
+    .withAttributes({
+      sourceType: '@cardstack/mock-auth',
+      'user-rewriter': './cardstack/mock-auth-rewriter.js',
+      params: {
+        provideUserSchema: false,
+        mockedTypes: ['mock-users'],
+        users: {
+          'mock-user': {
+            type: 'mock-users',
+            id: 'mock-user',
+            attributes: {
+              name: "Mock User",
+            },
+          },
+        }
+      }
+    });
+
   initial.addResource('content-types', 'bloggers')
     .withRelated('fields', [
       initial.addResource('fields', 'name').withAttributes({

@@ -30,10 +30,16 @@ module.exports = [
     },
     relationships: {
       who: {
-        data: [{
+        data: [
+        {
           type: 'groups',
           id: 'everyone'
-        }]
+        },
+        {
+          type: 'mock-users',
+          id: 'mock-user'
+        },
+        ]
       }
     }
   }
