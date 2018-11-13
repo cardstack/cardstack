@@ -298,14 +298,19 @@ class Schema {
       // a permission resource can be read if the subject of the permission object can be read
       if (document.data.type === 'permissions') {
         let [ queryType, queryId ] = document.data.id.split('/');
-        let permissionsSubject = await this.searchers.get(session, this.controllingBranch.name, queryType, queryId);
-        let permissionsSubjectType = this.types.get(queryType);
-        try {
-          await permissionsSubjectType._assertGrant([permissionsSubject.data], context, 'may-read-resource', 'read');
+        if (!queryId) {
+          //TODO: Not sure what to check here as there's no specific resource I can check the `may-read-resource` grant for
           authorizedResource = document.data;
-        } catch(error) {
-          if (!error.isCardstackError) {
-            throw error;
+        } else {
+          let permissionsSubject = await this.searchers.get(session, this.controllingBranch.name, queryType, queryId);
+          let permissionsSubjectType = this.types.get(queryType);
+          try {
+            await permissionsSubjectType._assertGrant([permissionsSubject.data], context, 'may-read-resource', 'read');
+            authorizedResource = document.data;
+          } catch(error) {
+            if (!error.isCardstackError) {
+              throw error;
+            }
           }
         }
       } else {

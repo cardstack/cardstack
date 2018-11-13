@@ -117,7 +117,13 @@ export default Service.extend({
 
   async fetchPermissionsFor(model) {
     let token = this._sessionToken();
-    let permissionsPath = encodeURIComponent(`${pluralize(getType(model))}/${model.id}`);
+    let modelName = pluralize(getType(model));
+    let permissionsPath;
+    if (model.id) {
+      permissionsPath = encodeURIComponent(`${modelName}/${model.id}`);
+    } else {
+      permissionsPath = encodeURIComponent(modelName);
+    }
     let url = `${hubURL}/api/permissions/${permissionsPath}`;
     let response = await fetch(url, {
       headers: {

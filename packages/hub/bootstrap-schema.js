@@ -124,6 +124,7 @@ const models = [
     relationships: {
       fields: {
         data: [
+          { type: 'fields', id: 'may-create-resource' },
           { type: 'fields', id: 'may-update-resource' },
           { type: 'fields', id: 'may-delete-resource' },
           { type: 'fields', id: 'writable-fields' }
