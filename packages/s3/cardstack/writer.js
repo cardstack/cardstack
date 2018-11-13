@@ -38,7 +38,7 @@ module.exports = class Writer {
 
     let id = uuidv4();
     let document = {
-      type: 'cs-files',
+      type: 'cardstack-files',
       id,
       attributes: {
         'created-at':  moment().format(),

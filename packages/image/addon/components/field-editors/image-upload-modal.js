@@ -13,7 +13,7 @@ export default Component.extend({
   layout,
 
   endpointUrl: computed('typeName', function() {
-    return `${hubURL}/api/cs-files`;
+    return `${hubURL}/api/cardstack-files`;
   }),
 
   uploadFile: task(function * (event) {

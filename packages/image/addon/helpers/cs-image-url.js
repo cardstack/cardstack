@@ -8,7 +8,7 @@ export function csImageUrl([imageOrFile]) {
   } else {
     id = imageOrFile.belongsTo('file').id()
   }
-  return `${hubURL}/api/cs-files/${id}`;
+  return `${hubURL}/api/cardstack-files/${id}`;
 }
 
 export default helper(csImageUrl);

@@ -32,6 +32,7 @@
     "@cardstack/authentication": "0.11.9",
     "@cardstack/ephemeral": "0.11.9",
     "@cardstack/eslint-config": "0.11.9",
+    "@cardstack/files": "0.11.9",
     "@cardstack/jsonapi": "0.11.9",
     "@cardstack/mock-auth": "0.11.9",
     "@cardstack/models": "0.11.9",

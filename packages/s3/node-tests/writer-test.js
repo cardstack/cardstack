@@ -29,6 +29,13 @@ describe('cardstack/s3/writer', function() {
       }
     });
 
+    factory.addResource('data-sources').withAttributes({
+      sourceType: '@cardstack/files',
+      params: {
+        storeFilesIn: { type: 'data-sources', id: 's3' }
+      }
+    });
+
     env = await createDefaultEnvironment(`${__dirname}/..`, factory.getModels());
 
     await env.lookup('hub:indexers').update({ forceRefresh: true });
@@ -54,7 +61,7 @@ describe('cardstack/s3/writer', function() {
   it("Creates a file in S3", async function() {
     await env.setUser('test-users', 'the-default-test-user');
 
-    let response = await request.post('/api/cs-files')
+    let response = await request.post('/api/cardstack-files')
       .attach('avatar', join(__dirname, 'fixtures/small.jpg'));
 
 
