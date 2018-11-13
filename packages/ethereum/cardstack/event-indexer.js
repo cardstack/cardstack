@@ -2,7 +2,6 @@ const Ember = require('ember-source/dist/ember.debug');
 const { dasherize } = Ember.String;
 const { pluralize } = require('inflection');
 const { declareInjections } = require('@cardstack/di');
-const DocumentContext = require('@cardstack/hub/indexing/document-context');
 const Session = require('@cardstack/plugin-utils/session');
 const log = require('@cardstack/logger')('cardstack/ethereum/event-indexer');
 const { fieldTypeFor } = require('./abi-utils');
@@ -66,45 +65,29 @@ class EthereumEventIndexer {
   }
 
   async _indexRecord(batch, record) {
-    log.debug(`indexing model in pgsearch ${JSON.stringify(record, null, 2)}`);
+    log.debug('indexing model in pgsearch %j', record);
     let { id, type, meta: { branch }} = record;
     let schema = await this.schema.forBranch(branch);
     let contentType = schema.types.get(type);
     let sourceId = contentType.dataSource.id;
-    let context = new DocumentContext({
+    let context = this.searchers.createDocumentContext({
       id,
       type,
       branch,
       schema,
       sourceId,
-      upstreamDoc: { data: record },
-      read: this._read(branch)
+      upstreamDoc: { data: record }
     });
 
     await batch.saveDocument(context);
   }
 
-  _read(branch) {
-    return async (type, id) => {
-      let resource;
-      try {
-        resource = (await this.searchers._getResourceAndMeta(Session.INTERNAL_PRIVILEGED, branch, type, id)).resource;
-      } catch (err) {
-        if (err.status !== 404) { throw err; }
-      }
-
-      if (resource) {
-        return resource;
-      }
-    };
-  }
-
   async _processRecords({ contractName, blockHeights, history }) {
-    log.debug(`processing records for ethereum with last indexed blockheights ${JSON.stringify(blockHeights)}, history: ${JSON.stringify(history, null, 2)}`);
+    log.debug('processing records for ethereum with last indexed blockheights %j, history: %j', blockHeights, history);
     let contractDefinition = this.contractDefinitions[contractName];
     if (!contractDefinition) { return; }
 
-    let batch = this.pgsearchClient.beginBatch();
+    let batch = this.pgsearchClient.beginBatch(this.schema, this.searchers);
 
     for (let branch of Object.keys(contractDefinition.addresses)) {
       let blockheight = await this.ethereumClient.getBlockHeight(branch);
@@ -125,7 +108,12 @@ class EthereumEventIndexer {
         await this._indexRecord(batch, attachMeta(eventModel, { blockheight, branch, contractName }));
 
         if (!contractDefinition.eventContentTriggers[eventModel.attributes['event-name']].length) {
-          let contract = await this._read(branch)(pluralize(contractName), contractAddress);
+          let contract;
+          try {
+            contract = (await this.searchers.getResourceAndMeta(Session.INTERNAL_PRIVILEGED, branch, pluralize(contractName), contractAddress)).resource;
+          } catch (err) {
+            if (err.status !== 404) { throw err; }
+          }
           if (!contract) {
             log.error(`Cannot find contract ${pluralize(contractName)}/${contractAddress} from index when trying to associate event to contract ${JSON.stringify(eventModel)}`);
             continue;
@@ -173,7 +161,12 @@ class EthereumEventIndexer {
           model.attributes[fields[0].name] = data;
         }
 
-        let existingRecord = await this._read(branch)(type, id.toLowerCase());
+        let existingRecord;
+        try {
+          existingRecord = (await this.searchers.getResourceAndMeta(Session.INTERNAL_PRIVILEGED, branch, type, id.toLowerCase())).resource;
+        } catch (err) {
+          if (err.status !== 404) { throw err; }
+        }
         if (existingRecord) {
           model.relationships = existingRecord.relationships;
         } else {
@@ -192,9 +185,10 @@ class EthereumEventIndexer {
 
     await batch.done();
 
-    log.debug(`completed indexing ethereum models with last indexed blockheights ${JSON.stringify(blockHeights)}`);
+    log.debug('completed indexing ethereum models with last indexed blockheights %j', blockHeights);
   }
 });
+
 
 function addEventRelationship(model, event) {
   if (!model.relationships) {
