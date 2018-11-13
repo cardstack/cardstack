@@ -11,6 +11,14 @@ export default DS.JSONAPIAdapter.extend(AdapterMixin, {
   cardstackSession: injectOptional.service(),
   session: injectOptional.service(),
 
+  pathForType(modelName) {
+    if (modelName === 'cardstack-card') {
+      return '';
+    } else {
+      return this._super(...arguments);
+    }
+  },
+
   // queryRecord can use the hub's page.size control to just do a
   // query of with a limit of 1.
   async queryRecord(store, type, query) {
