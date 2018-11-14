@@ -123,9 +123,21 @@ function initialModels() {
     })
     .withRelated('poster', guybrush);
 
-  let doorstop = initial.addResource('comments', '2')
+  let diapers = initial.addResource('comments', '2')
+    .withAttributes({
+      body: 'Have you stopped wearing diapers yet?'
+    })
+    .withRelated('poster', guybrush);
+
+  let doorstop = initial.addResource('comments', '3')
     .withAttributes({
       body: 'You’re about as fearsome as a doorstop.'
+    })
+    .withRelated('poster', guybrush);
+
+  let brains = initial.addResource('comments', '4')
+    .withAttributes({
+      body: "You're no match for my brains, you poor fool."
     })
     .withRelated('poster', guybrush);
 
@@ -138,15 +150,15 @@ function initialModels() {
 
   initial.addResource('posts', '1')
     .withAttributes({
-      title: 'hello world',
+      title: '10 steps to becoming a fearsome pirate',
       publishedAt: new Date(2017, 3, 24),
-      category: 'adventure',
+      category: 'swashhbucking adventure',
       archived: false,
       readingTimeValue: 8
     })
     .withRelated('reading-time-unit', { type: 'time-units', id: '1' })
     .withRelated('author', lechuck)
-    .withRelated('comments', [ threeHeadedMonkey ]);
+    .withRelated('comments', [ threeHeadedMonkey, diapers ]);
 
   initial.addResource('posts', '2')
     .withAttributes({
@@ -158,7 +170,7 @@ function initialModels() {
     })
     .withRelated('reading-time-unit', { type: 'time-units', id: '2' })
     .withRelated('author', lechuck)
-    .withRelated('comments', [ doorstop ]);
+    .withRelated('comments', [ doorstop, brains ]);
 
   return initial.getModels();
 }
