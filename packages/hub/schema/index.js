@@ -293,33 +293,14 @@ class Schema {
       if (!primaryType) {
         return;
       }
-
-      // applying read authorization for permission resources is a special case
-      // a permission resource can be read if the subject of the permission object can be read
       if (document.data.type === 'permissions') {
-        let [ queryType, queryId ] = document.data.id.split('/');
-        if (!queryId) {
-          //TODO: Not sure what to check here as there's no specific resource I can check the `may-read-resource` grant for
-          authorizedResource = document.data;
-        } else {
-          let permissionsSubject = await this.searchers.get(session, this.controllingBranch.name, queryType, queryId);
-          let permissionsSubjectType = this.types.get(queryType);
-          try {
-            await permissionsSubjectType._assertGrant([permissionsSubject.data], context, 'may-read-resource', 'read');
-            authorizedResource = document.data;
-          } catch(error) {
-            if (!error.isCardstackError) {
-              throw error;
-            }
-          }
-        }
+        authorizedResource = await this._readAuthorizationForPermissions(document, session, context);
       } else {
         authorizedResource = primaryType.applyReadAuthorization(document.data, userRealms);
         if (!authorizedResource) {
           return;
         }
       }
-
     }
 
     let output = document;
@@ -473,6 +454,36 @@ class Schema {
       });
     }
 
+  }
+
+  async _readAuthorizationForPermissions(document, session, context) {
+    // Applying read authorization for permission resources is a special case
+    // a permission resource can be read if the subject of the permission object can be read
+    if (document.data.type === 'permissions') {
+      let [ queryType, queryId ] = document.data.id.split('/');
+      let permissionsSubjectType = this.types.get(queryType);
+      let permissionsSubject = {};
+      if (!queryId) {
+        // Checking grants should always happen on a document
+        // so in the case we don't have one to check, we need to
+        // to assemble a document from what we know about the fields
+        permissionsSubject = {
+          data: {
+            type: queryType
+          }
+        };
+      } else {
+        permissionsSubject = await this.searchers.get(session, this.controllingBranch.name, queryType, queryId);
+      }
+      try {
+        await permissionsSubjectType._assertGrant([permissionsSubject.data], context, 'may-read-resource', 'read');
+        return document.data;
+      } catch(error) {
+        if (!error.isCardstackError) {
+          throw error;
+        }
+      }
+    }
   }
 
 });

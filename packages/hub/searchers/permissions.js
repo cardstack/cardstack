@@ -22,40 +22,36 @@ class PermissionsSearcher {
     }
 
     let [ queryType, queryId ] = id.split('/');
-    // TODO: check for null queryId (no '/' in id)
 
     let context = { session, type: queryType };
 
     let contentType = (await this.schema.forBranch(branch)).types.get(queryType);
     // TODO: check for missing content type
 
-    let mayCreateResource;
     let mayUpdateResource = true;
     let document;
     if (!queryId) {
-      // fetching permissions for a new resource
-       mayCreateResource = await contentType.authorizedToCreateResource(context);
-       //TODO: How can I create a resource to pass to `grant.matches` when I don't have anything yet?
-       document = {
-         data: {
-           type
-         },
-         relationships: {
-
-         }
-       };
+      // We're fetching permissions for a new resource
+      // Checking grants should always happen on a document
+      // so in the case we don't have one to check, we need to
+      // to assemble a document from what we know about the fields
+      document = {
+        data: {
+          type: queryType
+        },
+      };
     } else {
       document = await this.searchers.get(session, branch, queryType, queryId);
       if (!document) { return; } // we don't have it or don't have permission to read it
+    }
 
-      try {
-        await contentType._assertGrant([document.data], context, 'may-update-resource', 'update');
-      } catch(err) {
-        if (!err.isCardstackError) {
-          throw err;
-        }
-        mayUpdateResource = false;
+    try {
+      await contentType._assertGrant([document.data], context, 'may-update-resource', 'update');
+    } catch(err) {
+      if (!err.isCardstackError) {
+        throw err;
       }
+      mayUpdateResource = false;
     }
 
     // todo: a field should only be writable if it is also readable. See how _validateFieldReadAuth does it.
@@ -71,7 +67,6 @@ class PermissionsSearcher {
         type: 'permissions',
         id,
         attributes: {
-          'may-create-resource': mayCreateResource,
           'may-update-resource': mayUpdateResource,
           'may-delete-resource': false,
         },

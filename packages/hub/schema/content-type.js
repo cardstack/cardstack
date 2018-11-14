@@ -139,6 +139,7 @@ module.exports = class ContentType {
     }
   }
 
+  // TODO: rename to maybe...Type
   async authorizedToCreateResource(context) {
     let grant = await find(this.grants, async g => {
       if (!g['may-create-resource']) {
