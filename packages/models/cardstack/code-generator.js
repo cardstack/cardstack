@@ -110,6 +110,12 @@ class CodeGenerator {
         reexportTemplate({ target: `${appModulePrefix}/serializers/${modelName}`, source: `@cardstack/models/serializer` })
       );
     }
+
+    // define an adapter for the cardstack-card base type as well to allow for polymorphic queries
+    modules.push(
+      reexportTemplate({ target: `${appModulePrefix}/adapters/cardstack-card`, source: `@cardstack/models/adapter` })
+    );
+
     return modules.join("");
   }
   _generatedModel(modelName, type) {
