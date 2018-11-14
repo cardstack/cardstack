@@ -1,6 +1,7 @@
 import { module, test } from 'qunit';
 import { setupApplicationTest } from 'ember-qunit';
 import { visit, click, fillIn, triggerEvent, waitFor } from '@ember/test-helpers';
+import { login } from '../helpers/login';
 
 function findTriggerElementWithLabel(labelRegex) {
   return [...this.element.querySelectorAll('.cs-toolbox-section label')].find(element => labelRegex.test(element.textContent));
@@ -28,6 +29,7 @@ module('Acceptance | tools', function(hooks) {
 
   test('activate tools', async function(assert) {
     await visit('/1');
+    await login();
     await click('.cardstack-tools-launcher');
     await waitFor('.cs-active-composition-panel');
 
@@ -49,6 +51,7 @@ module('Acceptance | tools', function(hooks) {
 
   test('show validation error', async function(assert) {
     await visit('/1');
+    await login();
     await click('.cardstack-tools-launcher');
 
     let element = findTriggerElementWithLabel.call(this, /Title/);
@@ -71,6 +74,7 @@ module('Acceptance | tools', function(hooks) {
 
   test('show all fields, not just those rendered from template', async function(assert) {
     await visit('/1');
+    await login();
     await click('.cardstack-tools-launcher');
 
     let archivedSection = findTriggerElementWithLabel.call(this, /Archived/);
@@ -82,8 +86,8 @@ module('Acceptance | tools', function(hooks) {
 
   test('disable inputs for computed fields', async function(assert) {
     await visit('/1');
+    await login();
     await click('.cardstack-tools-launcher');
-
 
     let authorNameSectionTrigger = findTriggerElementWithLabel.call(this, /Author Name/);
     await click(authorNameSectionTrigger);
