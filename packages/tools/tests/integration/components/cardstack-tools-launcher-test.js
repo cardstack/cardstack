@@ -9,7 +9,14 @@ module('Integration | Component | cardstack tools launcher', function(hooks) {
   setupRenderingTest(hooks);
 
   hooks.beforeEach(function() {
+    this.owner.register('service:cardstack-session', Service.extend({
+      init() {
+        this._super(...arguments);
+        this.set('session', { isAuthenticated: true });
+      }
+    }));
     this.owner.register('service:cardstack-tools', Service.extend({
+      sessionService: this.owner.lookup('service:cardstack-session'),
       available: true,
       active: false,
       setActive(value) {
