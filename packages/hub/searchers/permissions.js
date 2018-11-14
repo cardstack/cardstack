@@ -1,3 +1,4 @@
+const Error = require('@cardstack/plugin-utils/error');
 const { declareInjections } = require('@cardstack/di');
 const find = require('../async-find');
 
@@ -26,7 +27,12 @@ class PermissionsSearcher {
     let context = { session, type: queryType };
 
     let contentType = (await this.schema.forBranch(branch)).types.get(queryType);
-    // TODO: check for missing content type
+    if (!contentType) {
+      throw new Error(`content type "${queryType}" not found`, {
+        status: 404,
+        title: 'Missing content type'
+      });
+    }
 
     let mayUpdateResource = true;
     let document;
@@ -54,9 +60,12 @@ class PermissionsSearcher {
       mayUpdateResource = false;
     }
 
-    // todo: a field should only be writable if it is also readable. See how _validateFieldReadAuth does it.
     let writableFields = await Promise.all([...contentType.realFields.values()].map(async field => {
-      let grant = await find(field.grants, async g => g['may-write-fields'] && await g.matches(document.data, context));
+      let grant = await find(field.grants, async g => {
+        // there has to be a grant that gives both reading and writing perm
+        // on the field for it to be considered writable
+        return g['may-read-fields'] && g['may-write-fields'] && await g.matches(document.data, context);
+      });
       if (grant) {
         return field;
       }

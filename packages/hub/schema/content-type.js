@@ -105,7 +105,6 @@ module.exports = class ContentType {
       return;
     }
 
-
     let errors = [];
     let badFields = Object.create(null);
 
