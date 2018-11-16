@@ -4,19 +4,29 @@
   tests we have a separate "test-app" that holds our devDependencies.
 */
 
-const {
-  createDefaultEnvironment,
-  destroyDefaultEnvironment
-} = require('../../../tests/pgsearch-test-app/node_modules/@cardstack/test-support/env');
 const Factory = require('../../../tests/pgsearch-test-app/node_modules/@cardstack/test-support/jsonapi-factory');
 
 const DocumentContext = require('../indexing/document-context');
+const { Registry, Container } = require('@cardstack/di');
+
+const bootstrapSchema = require('../bootstrap-schema');
+
 
 describe('DocumentContext', function() {
-  let env, factory, writer, searcher, currentSchema, changedModels;
+  let schemaLoader;
 
   before(async function() {
-    factory = new Factory();
+    let registry = new Registry();
+
+    registry.register('config:project', {
+      path: __dirname + '/../../../tests/pgsearch-test-app'
+    }, { instantiate: false });
+
+    schemaLoader = await new Container(registry).lookup('hub:schema-loader');
+  });
+
+  it('searchDoc does not contain unsearchable fields', async function() {
+    let factory = new Factory();
 
     factory.addResource('content-types', 'puppies')
       .withRelated('fields', [
@@ -29,56 +39,12 @@ describe('DocumentContext', function() {
         }),
       ]);
 
-    changedModels = [];
-    factory.addResource('data-sources')
-      .withAttributes({
-        'source-type': 'fake-indexer',
-        params: { changedModels }
-      });
 
-    env = await createDefaultEnvironment(`${__dirname}/../../../tests/pgsearch-test-app`, factory.getModels());
-    writer = env.lookup('hub:writers');
-    searcher = env.lookup('hub:searchers');
-    currentSchema = env.lookup('hub:current-schema');
-  });
+    let schema = await schemaLoader.loadFrom(bootstrapSchema.concat(factory.getModels()));
 
-  after(async function() {
-    await destroyDefaultEnvironment(env);
-  });
 
-  it('searchDoc does not contain unsearchable fields', async function() {
-    const branch = 'master';
-    const schema = await currentSchema.forBranch(branch);
-
-    let read = async (type, id) => {
-      let result;
-      try {
-        result = await searcher.get(env.session, branch, type, id);
-      } catch (err) {
-        if (err.status !== 404) { throw err; }
-      }
-
-      if (result && result.data) {
-        return result.data;
-      }
-    };
-
-    let { data:ringo } = await writer.create('master', env.session, 'puppies', {
-      data: {
-        id: 'ringo',
-        type: 'puppies',
-        attributes: {
-          name: 'Ringo',
-          breed: 'yorkie'
-        }
-      }
-    });
-
-    let { id, type } = ringo;
-    let { data:resource } = await searcher.get(env.session, branch, type, id);
-
-    let searchDoc = await (new DocumentContext({ id, type, branch, schema, read,
-      upstreamDoc: { data: resource },
+    let searchDoc = await (new DocumentContext({ id: 'ringo', type: 'puppies', branch: 'master', schema, read: null,
+      upstreamDoc: { data: { attributes: { name: 'Ringo', breed: 'yorkie' }} },
     })).searchDoc();
 
     expect(searchDoc).to.deep.equal({
