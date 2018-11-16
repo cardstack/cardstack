@@ -16,5 +16,25 @@ module.exports = [
         data: { type: 'data-sources', id: 'default' }
       }
     }
+  },
+  {
+    type: 'data-sources',
+    id: '@cardstack/files',
+    attributes: {
+      'source-type': '@cardstack/files',
+      params: {
+        storeFilesIn: { type: 'data-sources', id: 'default' }
+      }
+    }
+  },
+  {
+    type: 'data-sources',
+    id: '@cardstack/image',
+    attributes: {
+      'source-type': '@cardstack/image',
+      params: {
+        storeImageMetadataIn: { type: 'data-sources', id: 'default' }
+      }
+    }
   }
 ];

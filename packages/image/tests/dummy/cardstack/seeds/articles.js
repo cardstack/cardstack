@@ -2,29 +2,6 @@ const Factory = require('@cardstack/test-support/jsonapi-factory');
 
 let factory = new Factory();
 
-factory.addResource('data-sources').withAttributes({
-  sourceType: '@cardstack/files',
-  params: {
-    storeFilesIn: { type: 'data-sources', id: 'default' }
-  }
-});
-
-factory.addResource('content-types', 'images')
-  .withAttributes({
-    defaultIncludes: ['file']
-  })
-  .withRelated('fields', [
-    factory.addResource('fields', 'alt-text').withAttributes({fieldType: '@cardstack/core-types::string'}),
-    factory.addResource('fields', 'file')
-      .withAttributes({
-        'field-type': '@cardstack/core-types::belongs-to',
-      })
-      .withRelated('relatedTypes', [
-        {type: 'content-types', id: 'cardstack-files'}
-      ])
-  ]);
-
-
 factory.addResource('content-types', 'articles')
   .withAttributes({
     defaultIncludes: ['cover-image']
@@ -37,7 +14,7 @@ factory.addResource('content-types', 'articles')
         'field-type': '@cardstack/core-types::belongs-to',
       })
       .withRelated('relatedTypes', [
-        {type: 'content-types', id: 'images'}
+        {type: 'content-types', id: 'cardstack-images'}
       ])
   ]);
 
