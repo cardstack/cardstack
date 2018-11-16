@@ -88,20 +88,3 @@
     border-top-right-radius: 10px;
     border-bottom-right-radius: 10px;
 }
-
-.cs-create-button {
-    float: right;
-    line-height: 1.5em;
-    margin: 0.5em 0.3em;
-    padding: .4em 1.4em .4em;
-    border: none;
-    border-radius: 4px;
-    background-color: var(--bright-foreground);
-    font-size: .8em;
-    cursor: pointer;
-    outline-width: 0;
-}
-
-.cs-create-button:hover {
-    background-color: var(--light-foreground);
-}

@@ -1,0 +1,126 @@
+.cs-active-composition-panel {
+    display: flex;
+    flex-direction: column;
+    min-height: 10rem;
+    background-color: var(--normal-bg);
+    color: var(--bright-fg);
+    border: 1px solid var(--light05);
+    border-radius: 20px;
+    box-shadow: 0 2px 15px 0 var(--dark50);
+}
+
+.cs-active-composition-panel > div {
+    flex: 1;
+    overflow-y: scroll;
+    padding-bottom: 2em;
+}
+
+.cs-content-info {
+    display: flex;
+    padding: 2em 1em;
+    border-top-left-radius: 20px;
+    border-top-right-radius: 20px;
+}
+
+.cs-content-info > svg {
+    width: 1.4em;
+    margin-right: 1em;
+    fill: var(--bright-fg);
+}
+
+.cs-content-info > div {
+    max-width: 16em;
+}
+
+.cs-content-info .content-type {
+    font-size: 0.69em;
+    line-height: 1.36;
+    letter-spacing: 1px;
+    opacity: 0.5;
+    text-transform: uppercase;
+    margin: 0 0 2px;
+    font-weight: bold;
+}
+
+.cs-content-info .content-title {
+    margin: 0;
+    font-size: 0.9em;
+    line-height: 1.38;
+    letter-spacing: 0.1px;
+}
+
+.cs-field-editor-section {
+    padding: 0.75em;
+    margin: 0;
+}
+
+.cs-toolbox-section {
+    margin: 0;
+    border-top: 1px solid var(--light25);
+    background-color: var(--normal-bg);
+    color: var(--bright-fg);
+    font-size: 0.9em;
+}
+
+.cs-toolbox-section > header {
+    user-select: none;
+    margin: 0;
+    padding: .75em 1em .5em;
+    font-weight: bold;
+    overflow: hidden;
+    cursor: pointer;
+}
+
+.cs-toolbox-section:last-of-type {
+    border-bottom: 1px solid var(--light25);
+}
+
+.cs-toolbox-section.opened {
+    background-color: var(--active-bg);
+}
+
+.cs-toolbox-section > header:hover {
+    background-color: var(--active-bg);
+}
+
+.cs-toolbox-section.invalid > header {
+    border: 2px solid var(--error-border);
+}
+
+.cs-toolbox-section > header > label {
+    float: left;
+    cursor: pointer;
+}
+
+.cs-toolbox-section > header > button {
+    height: 16px;
+    width: 16px;
+    margin-top: 2px;
+    border-radius: 2px;
+    background: none;
+    float: right;
+    border: none;
+    padding: 0;
+    cursor: pointer;
+}
+
+.cs-toolbox-section > header > button > svg {
+    width: 8px;
+    height: 10px;
+    color: var(--bright-fg);
+    fill: var(--bright-fg);
+    transition: transform 250ms ease;
+}
+
+.cs-toolbox-section.closed > header > button > svg {
+    transform: rotate(-90deg);
+}
+
+.cs-toolbox-section > header > button:focus {
+    outline: none;
+}
+
+.cs-toolbox-section > header > button:focus > svg {
+    color: var(--active-fg);
+    fill: var(--active-fg);
+}

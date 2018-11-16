@@ -1,117 +1,34 @@
 @import "cs-version-control";
+@import "cs-create-button";
+@import "cs-mode-button";
+@import "cs-active-composition-panel";
 
-.cs-content-info {
-    padding: 0.75em 0.75em 10px;
-    background-color: var(--active-background);
-}
-.cs-content-info > svg {
-    float: left;
-    margin-right: 1em;
-    fill: var(--bright-foreground);
-}
+.cardstack-toolbox {
+    height: 100vh;
 
-.cs-content-info > .content-type {
-    font-size: 10px;
-    line-height: 11px;
-    letter-spacing: .05em;
-    opacity: .6;
-    text-transform: uppercase;
-    margin: 0 0 2px;
-    font-weight: 100;
+    /* no margin collapse */
+    /* padding-top: 0.1px;
+    padding-bottom: 0.1px;
+
+    padding-left: 1px; */
+
+    padding: 15px 15px 15px 50px;
 }
 
-.cs-content-info > .content-title {
-    font-size: 12px;
-    margin: 0;
+.cardstack-toolbox-width {
+    width: 22rem;
 }
 
-.cs-toolbox-section {
-    margin: 0;
-}
-
-.cs-toolbox-section > header {
-    user-select: none;
-    margin: 0px;
-    padding: .75em .75em .5em;
-    background-color: var(--light-background);
-    border-top: 1px solid var(--normal-background);
-    overflow: hidden;
-    cursor: pointer;
-    color: white;
-    fill: rgba(204,204,204,1);
-}
-
-.cs-toolbox-section.closed > header {
-    background-color: var(--activating-background);
-    font-weight: bold;
-    border-top: 1px solid var(--deep-background);
-    color: #989898;
-    fill: rgba(250,250,250,.2);
-}
-
-.cs-toolbox-section.closed > header:hover {
-    background-color: var(--active-background);
-    color: #d6d6d6;
-    fill: rgba(250,250,250,.5);
-}
-
-.cs-toolbox-section.invalid > header {
-  border: 2px solid var(--error-border);
-}
-
-.cs-toolbox-section > header > label {
-    float: left;
-    cursor: pointer;
-    font-size: .75em;
-}
-
-.cs-toolbox-section > header > button {
-    height: 16px;
-    width: 16px;
-    margin-top: 2px;
-    border-radius: 2px;
-    background-color: var(--normal-background);
-    float: right;
-    border: none;
-    padding: 0;
-    cursor: pointer;
-}
-
-.cs-toolbox-section > header > button:focus {
-    outline: none;
-}
-
-.cs-toolbox-section > header > button > svg {
-    width: 8px;
-    height: 10px;
-    transition: transform 250ms ease;
-}
-
-.cs-toolbox-section.closed > header > button > svg {
-    transform: rotate(-90deg);
-}
-
-.cs-active-composition-panel {
-    display: flex;
-    flex-direction: column;
-    height: 100%;
-}
-
-.cs-active-composition-panel > div {
-    flex: 1;
-    overflow-y: scroll;
-    padding-bottom: 10em;
-}
-
-.cs-field-editor-section {
-    padding: 0.75em;
-    margin: 0;
-    background-color: var(--bright-foreground);
-    color: var(--normal-background);
+.cs-create-menu {
+    min-height: 10rem;
+    background-color: var(--normal-bg);
+    color: var(--bright-fg);
+    border: 1px solid var(--light05);
+    border-radius: 20px;
+    box-shadow: 0 2px 15px 0 var(--dark50);
 }
 
 .cs-create-menu > ul {
-    background-color: var(--bright-foreground);
     list-style-type: none;
     line-height: 2em;
     overflow-y: scroll;
@@ -151,9 +68,7 @@
 
 .cs-create-menu > header {
     padding: 1em 1em 0.833em;
-    background-color: var(--active-background);
     font-size: 0.75rem;
-    color: #fff;
     user-select: none;
     cursor: default;
     height: 3rem;
@@ -162,70 +77,6 @@
 .cs-create-menu > ul > li:hover > button {
     border-color: #292A2C;
     color: #292A2C;
-}
-
-.cs-toolbox-header {
-    display: flex;
-    height: 42px;
-}
-
-.cs-toolbox-header > section {
-    background-color: var(--normal-background);
-    margin-right: 1px;
-}
-
-.cs-toolbox-header > section.spacer {
-    flex: 1;
-}
-
-.cs-mode-button {
-    cursor: pointer;
-    height: var(--cs-header-height);
-    box-sizing: border-box;
-    color: var(--muted-foreground);
-    fill: var(--muted-foreground);
-}
-.cs-mode-button.icon-only {
-    padding: .6em .5em;
-    width: 2.5em;
-    text-align: center;
-    color: var(--bright-foreground);
-    fill: var(--bright-foreground);
-}
-.cs-mode-button.icon-only:hover {
-    color: var(--bright-foreground);
-    fill: var(--bright-foreground);
-}
-.cs-mode-button.icon-only .cs-mode-icon {
-    float: none;
-    padding: 0;
-    height: auto;
-}
-.cs-mode-button:hover {
-    background-color: var(--activating-background);
-    color: var(--rising-foreground);
-    fill: var(--rising-foreground);
-}
-.cs-mode-button.active {
-    background-color: var(--active-background);
-    color: var(--bright-foreground);
-    fill: var(--bright-foreground);
-}
-.cs-mode-icon {
-    float: left;
-    padding-top: 0.5625rem;
-    padding-left: 1.25rem;
-    padding-right: 0.75rem;
-    height: 1.5rem;
-}
-.cs-mode-label {
-    cursor: pointer;
-    display: inline-block;
-    font-size: 0.75em;
-    font-weight: 100;
-    margin-top: 0.5rem;
-    margin-right: 1.6875rem;
-    line-height: calc(var(--cs-header-height)/0.75 - 0.5em/0.75);
 }
 
 .cs-placeholder-create {
