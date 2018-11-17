@@ -1,0 +1,19 @@
+.cardstack-tools-launcher {
+    padding: 10px 15px;
+    background-color: var(--normal-bg);
+    color: var(--bright-fg);
+    fill: var(--bright-fg);
+    border: 1px solid var(--light05);
+    border-radius: 5px;
+    box-shadow: 0 2px 15px 0 var(--dark50);
+    cursor: pointer;
+    margin-top: -5px;
+    margin-right: -5px;
+}
+
+.cardstack-tools-launcher:hover,
+.cardstack-tools-launcher:focus {
+    outline: none;
+    color: var(--active-fg);
+    fill: var(--active-fg);
+}

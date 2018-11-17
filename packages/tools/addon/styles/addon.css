@@ -4,6 +4,7 @@
 @import "cs-toggle-switch";
 @import "cs-field-overlays";
 @import "cs-account-icon";
+@import "cardstack-tools-launcher";
 @import "theme";
 
 :root {
@@ -49,16 +50,12 @@
     src: url('../@cardstack/tools/OpenSans-Regular.ttf');
 }
 
-.cardstack-tools-launcher {
-    background-color: black;
-    cursor: pointer;
-}
 
 .cardstack-tools-launcher-wrapper {
     position: absolute;
     top: 0;
     right: 0;
-    z-index: 100;
+    z-index: 999;
 }
 
 /* these classes comes from the ember-sidebars addon. We need to
