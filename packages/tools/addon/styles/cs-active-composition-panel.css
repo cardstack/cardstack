@@ -9,10 +9,34 @@
     box-shadow: 0 2px 15px 0 var(--dark50);
 }
 
-.cs-active-composition-panel > div {
+.cs-active-composition-panel--body {
+    box-sizing: border-box;
     flex: 1;
     overflow-y: scroll;
-    padding-bottom: 2em;
+    max-height: 30em;
+    padding-bottom: 5em;
+}
+
+.cs-active-composition-panel--footer {
+    box-shadow: 0 2px 15px 0 var(--dark50);
+    border-bottom-left-radius: 20px;
+    border-bottom-right-radius: 20px;
+}
+
+.cs-active-composition-panel--footer > button {
+    position: relative;
+    width: 100%;
+    padding: 1em;
+    border: none;
+    background: none;
+    color: var(--light50);
+    fill: var(--bright-fg);
+    font-size: 14px;
+}
+
+.cs-active-composition-panel--footer > button > svg {
+    position: absolute;
+    left: 1em;
 }
 
 .cs-content-info {

@@ -4,7 +4,7 @@
 @import "cs-active-composition-panel";
 
 .cardstack-toolbox {
-    height: 100vh;
+    min-height: 100vh;
 
     /* no margin collapse */
     /* padding-top: 0.1px;

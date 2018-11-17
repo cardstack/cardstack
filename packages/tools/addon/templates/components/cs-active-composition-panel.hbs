@@ -12,7 +12,7 @@
 </section>
 
 {{!- this one scrolls }}
-<div>
+<div class="cs-active-composition-panel--body">
 
   {{cs-version-control
     model=model
@@ -112,6 +112,11 @@
       {{/cs-collapsible-section}}
     {{/let}}
   {{/each}}
+</div>
 
-
+<div class="cs-active-composition-panel--footer">
+  <button>
+    {{cs-svg 'create' width="16px" height="16px"}}
+    <label>Insert Into Page</label>
+  </button>
 </div>
