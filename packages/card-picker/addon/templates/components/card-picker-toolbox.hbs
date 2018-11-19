@@ -1,10 +1,19 @@
-<div class="heading">
+<div class="heading" data-card-picker-toolbox-header>
   {{cardstack-query-editor query=query update=(action (mut query))}}
+  <button
+    onclick={{action "closePicker"}}
+    class="cardstack-card-picker--close-button"
+  >
+    Close
+  </button>
 </div>
 
 <div class="cards-list">
   {{#cardstack-search query=query as |content|}}
-    <div role="button" onclick={{action "select" content}}>
+    <div
+      role="button"
+      onclick={{action "select" content}}
+    >
       {{cardstack-content format="embedded" content=content}}
     </div>
   {{/cardstack-search}}
