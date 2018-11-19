@@ -25,31 +25,47 @@ describe('DocumentContext', function() {
     schemaLoader = await new Container(registry).lookup('hub:schema-loader');
   });
 
-  it('searchDoc does not contain unsearchable fields', async function() {
+  it('searchDoc does not contain unsearchable fields but the pristineDoc does', async function() {
     let factory = new Factory();
 
     factory.addResource('content-types', 'puppies')
       .withRelated('fields', [
         factory.addResource('fields', 'name').withAttributes({
           fieldType: '@cardstack/core-types::string',
-          searchable: false
         }),
         factory.addResource('fields', 'breed').withAttributes({
-          fieldType: '@cardstack/core-types::string'
+          fieldType: '@cardstack/core-types::string',
+          searchable: false,
         }),
       ]);
 
-
     let schema = await schemaLoader.loadFrom(bootstrapSchema.concat(factory.getModels()));
 
-
-    let searchDoc = await (new DocumentContext({ id: 'ringo', type: 'puppies', branch: 'master', schema, read: null,
+    let docContext = new DocumentContext({
+      id: 'ringo',
+      type: 'puppies',
+      schema,
       upstreamDoc: { data: { attributes: { name: 'Ringo', breed: 'yorkie' }} },
-    })).searchDoc();
+    });
+
+    let searchDoc = await docContext.searchDoc();
+    let pristineDoc = await docContext.pristineDoc();
 
     expect(searchDoc).to.deep.equal({
       id: 'ringo',
       name: 'Ringo'
+    });
+
+    expect(pristineDoc).to.deep.equal({
+      data: {
+        id: 'ringo',
+        type: 'puppies',
+        attributes: {
+          name: 'Ringo',
+          breed: 'yorkie',
+        },
+        meta: {}
+      }
     });
   });
 });
