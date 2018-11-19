@@ -6,7 +6,8 @@ export default Controller.extend({
 
   actions: {
     openButton() {
-      this.get('tools').pickCard();
+      let pickupPromise = this.get('tools').pickCard();
+      pickupPromise.catch(() => {});
     }
   }
 });
