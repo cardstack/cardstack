@@ -1,6 +1,6 @@
 import { module, test } from 'qunit';
 import { setupRenderingTest } from 'ember-qunit';
-import { render, fillIn } from '@ember/test-helpers';
+import { render, fillIn, triggerEvent } from '@ember/test-helpers';
 import EmberObject from '@ember/object';
 import hbs from 'htmlbars-inline-precompile';
 
@@ -40,5 +40,21 @@ module('Integration | Component | field editors/integer editor', function(hooks)
         disabled=true
       }}`);
     assert.dom('input').isDisabled();
+  });
+
+  test('onchange is called when the field is left', async function(assert) {
+    let changed;
+    this.set('onchange', () => {
+      changed = true;
+    });
+    this.set('model', EmberObject.create({ rating: 3 }));
+    await render(hbs`
+      {{field-editors/integer-editor
+        content=model
+        field="rating"
+        onchange=onchange
+      }}`);
+    await triggerEvent('input', 'blur');
+    assert.ok(changed);
   });
 });
