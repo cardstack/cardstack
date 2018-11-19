@@ -3,6 +3,7 @@ import layout from '../../templates/components/field-editors/integer-editor';
 
 export default Component.extend({
   layout,
+  onchange() {},
 
   actions: {
     update(value) {

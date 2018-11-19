@@ -8,30 +8,22 @@ module('Integration | Component | field editors/integer editor', function(hooks)
   setupRenderingTest(hooks);
 
   test('it renders', async function(assert) {
-    this.setProperties({
-      model: EmberObject.create({ rating: 3 }),
-      onchange() {}
-    });
+    this.set('model', EmberObject.create({ rating: 3 }));
     await render(hbs`
       {{field-editors/integer-editor
         content=model
         field="rating"
-        onchange=onchange
       }}`);
     assert.dom('input[type=number]').hasValue('3', 'number input has correct value');
     assert.dom('input').isNotDisabled();
   });
 
   test('it updates the value correctly', async function(assert) {
-    this.setProperties({
-      model: EmberObject.create({ rating: 3 }),
-      onchange() {}
-    });
+    this.set('model', EmberObject.create({ rating: 3 }));
     await render(hbs`
       {{field-editors/integer-editor
         content=model
         field="rating"
-        onchange=onchange
       }}`);
     await fillIn('input', '5');
     assert.dom('input[type=number]').hasValue('5', 'input is updated');
@@ -40,15 +32,11 @@ module('Integration | Component | field editors/integer editor', function(hooks)
   });
 
   test('it can be disabled', async function(assert) {
-    this.setProperties({
-      model: EmberObject.create({ rating: 3 }),
-      onchange() {}
-    });
+    this.set('model', EmberObject.create({ rating: 3 }));
     await render(hbs`
       {{field-editors/integer-editor
         content=model
         field="rating"
-        onchange=onchange
         disabled=true
       }}`);
     assert.dom('input').isDisabled();
