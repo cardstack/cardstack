@@ -8,10 +8,10 @@ export default Component.extend({
     update(value) {
       let content = this.get('content');
       let field = this.get('field');
-      if (value == null || value === '') {
+      if (!value) {
         content.set(field, null);
       } else {
-        content.set(field, +value);
+        content.set(field, Number(value));
       }
     }
   }
