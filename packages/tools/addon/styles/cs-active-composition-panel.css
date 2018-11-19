@@ -1,7 +1,12 @@
 .cs-active-composition-panel {
+    box-sizing: border-box;
+    position: absolute;
+    right: 15px;
+    top: 15px;
     display: flex;
     flex-direction: column;
-    min-height: 10rem;
+    min-height: 30%;
+    max-height: 85%;
     background-color: var(--normal-bg);
     color: var(--bright-fg);
     border: 1px solid var(--light05);
@@ -10,17 +15,17 @@
 }
 
 .cs-active-composition-panel--body {
-    box-sizing: border-box;
-    flex: 1;
-    overflow-y: scroll;
-    max-height: 30em;
+    max-height: 16em;
     padding-bottom: 5em;
+    overflow-y: scroll;
 }
 
 .cs-active-composition-panel--footer {
-    box-shadow: 0 2px 15px 0 var(--dark50);
+    position: relative;
+    background-color: var(--normal-bg);
     border-bottom-left-radius: 20px;
     border-bottom-right-radius: 20px;
+    box-shadow: 0 -2px 15px 0 var(--dark25);
 }
 
 .cs-active-composition-panel--footer > button {
@@ -93,6 +98,10 @@
     font-weight: bold;
     overflow: hidden;
     cursor: pointer;
+}
+
+.cs-toolbox-section:first-of-type {
+    border-top: none;
 }
 
 .cs-toolbox-section:last-of-type {

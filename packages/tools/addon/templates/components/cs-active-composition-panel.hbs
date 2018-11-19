@@ -1,15 +1,5 @@
-<section class="cs-content-info">
-  {{cs-svg "article" width="22px" height="28px"}}
-  <div>
-    <p class="content-type">{{cs-humanize (cs-model-type model) }}</p>
-    <p class="content-title">
-      {{#if model.created}}
-        {{moment-format model.created "YYYY-MM-DD"}}
-      {{/if}}
-      {{cs-model-title model}}
-    </p>
-  </div>
-</section>
+{{cs-composition-panel-header model=model
+                              editingEnabled=editingEnabled}}
 
 {{!- this one scrolls }}
 <div class="cs-active-composition-panel--body">
@@ -114,9 +104,9 @@
   {{/each}}
 </div>
 
-<div class="cs-active-composition-panel--footer">
+<footer class="cs-active-composition-panel--footer">
   <button>
     {{cs-svg 'create' width="16px" height="16px"}}
     <label>Insert Into Page</label>
   </button>
-</div>
+</footer>

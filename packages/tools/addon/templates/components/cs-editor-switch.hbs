@@ -1,7 +1,4 @@
-<label class="cs-editor-switch--label">
-  {{if enabled 'Done Editing' 'Edit Article'}}
-</label>
-<button class={{concat "cs-editor-switch--icon " (if enabled 'enabled' 'disabled')}}
+<button class={{concat "cs-editor-switch " (if enabled 'enabled' 'disabled')}}
         {{action "toggleEditing"}}>
   {{cs-svg (if enabled "done" "write") width="20px" height="20px"}}
 </button>

@@ -10,7 +10,6 @@ import { or } from '@ember/object/computed';
 export default Component.extend({
   layout,
   tagName: '',
-  opened: true,
   animationRules,
   "on-error": function() {},
   resourceMetadata: service(),
@@ -103,30 +102,42 @@ export default Component.extend({
 
   }),
 
-  titleClass: computed('upstreamState', function() {
-    let state = this.get('upstreamState');
-    if (state === 'created' || state === 'different') {
-      return 'cs-version-control-preview';
-    }
-  }),
-
   title: computed('modificationState', 'upstreamState', function() {
-    switch(this.get('modificationState')) {
+    switch (this.get('modificationState')) {
     case 'new':
       return 'Drafted'
     case 'changed':
       return 'Changed';
     case 'saved':
-      switch(this.get('upstreamState')) {
-      case 'pending':
-        return '...';
-      case 'self':
-        return 'Live';
-      case 'created':
-      case 'different':
-      case 'same':
-        return 'Preview';
+      switch (this.get('upstreamState')) {
+        case 'pending':
+          return '...';
+        case 'self':
+          return 'Live';
+        case 'created':
+        case 'different':
+        case 'same':
+          return 'Preview';
       }
+    }
+  }),
+
+  disabled: computed.equal('modificationState', 'saved'),
+
+  currentState: computed('modificationState', 'upstreamState', function() {
+    let modificationState = this.get('modificationState');
+    let upstreamState = this.get('upstreamState');
+
+    switch (modificationState) {
+      case 'new':
+        return 'draft'
+      case 'changed':
+        return 'edited';
+      case 'saved':
+        if (upstreamState === 'self') return 'published';
+        else return 'saved';
+      default:
+        return;
     }
   }),
 

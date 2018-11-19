@@ -4,11 +4,10 @@
 
 .cardstack-header {
     min-height: var(--cs-header-height);
-    background-color: var(--deep-background);
+    background-color: var(--dark-bg);
     display: flex;
 }
 .cardstack-header > section {
-    background-color: var(--normal-background);
     margin-right: 1px;
 }
 

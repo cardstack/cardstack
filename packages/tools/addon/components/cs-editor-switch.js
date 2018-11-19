@@ -5,7 +5,7 @@ import layout from '../templates/components/cs-editor-switch';
 
 export default Component.extend({
   layout,
-  classNames: ['cs-editor-switch'],
+  tagName: '',
   tools: service('cardstack-tools'),
   enabled: alias('tools.editing'),
   actions: {

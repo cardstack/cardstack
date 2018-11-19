@@ -42,6 +42,22 @@
     </g>
   </symbol>
 
+
+  <symbol id="dropdown-buttons" viewBox="0 0 7 16" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+      <g stroke="none" stroke-width="1" fill-rule="evenodd">
+          <g transform="translate(-1375.000000, -219.000000)" fill-rule="nonzero">
+              <g transform="translate(1110.000000, 81.000000)">
+                  <g transform="translate(20.000000, 126.000000)">
+                      <g>
+                        <polygon points="251.017315 24 252 25.0955528 248.5 28 245 25.0955528 245.982685 24 248.5 26.0889739"></polygon>
+                        <polygon transform="translate(248.500000, 14.000000) rotate(-180.000000) translate(-248.500000, -14.000000) " points="251.017315 12 252 13.0955528 248.5 16 245 13.0955528 245.982685 12 248.5 14.0889739"></polygon>
+                      </g>
+                  </g>
+              </g>
+          </g>
+      </g>
+  </symbol>
+
    <symbol id="remove-this" viewBox="0 0 13 18" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:sketch="http://www.bohemiancoding.com/sketch/ns">
     <g id="Page-1" stroke="none" stroke-width="1" fill-rule="evenodd" sketch:type="MSPage">
       <g id="AIA_text_formatting" sketch:type="MSArtboardGroup" transform="translate(-1140.000000, -12.000000)" >

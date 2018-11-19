@@ -2,26 +2,11 @@
     position: absolute;
     right: 14px;
     top: 14px;
-    display: flex;
-    justify-content: flex-end;
-    align-items: center;
-    color: var(--bright-fg);
-    cursor: pointer;
-}
-.cs-editor-switch > label {
-    color: var(--light50);
-    display: inline-block;
-    padding: 10px;
-    font-size: 0.875em;
-    cursor: pointer;
-}
-
-.cs-editor-switch--icon {
     margin: 0;
     padding: 0;
     width: 3em;
     height: 3em;
-    background: var(--gradient-bg);
+    background: var(--gradient-fg);
     color: var(--bright-fg);
     fill: var(--bright-fg);
     border: none;
@@ -29,25 +14,46 @@
     box-shadow: 0 2px 15px 0 var(--dark50);
     font-size: 16px;
     cursor: pointer;
+    z-index: 1;
 }
 
-.cs-editor-switch--icon:hover,
-.cs-editor-switch--icon:focus {
+.cs-editor-switch:hover,
+.cs-editor-switch:focus {
     outline: none;
     color: var(--active-fg);
     fill: var(--active-fg);
 }
 
-.cs-editor-switch--icon.enabled {
+.cs-editor-switch.enabled {
     background: var(--light-bg);
     color: var(--purple-fg);
     fill: url(#gradient-fill) var(--purple-fg);
 }
 
-.cs-editor-switch--icon.enabled:hover,
-.cs-editor-switch--icon.enabled:focus {
+.cs-editor-switch.enabled:hover,
+.cs-editor-switch.enabled:focus {
     outline: none;
     background: black;
     color: var(--active-fg);
     fill: var(--active-fg);
+}
+
+.cs-editor-switch.disabled:hover::before {
+    position: absolute;
+    display: block;
+    clear: both;
+    content: 'Edit Page';
+    margin-left: -70px;
+    color: var(--light50);
+    font-size: 14px;
+}
+
+.cs-editor-switch.enabled:hover::before {
+    position: absolute;
+    display: block;
+    clear: both;
+    content: 'Done Editing';
+    margin-left: -90px;
+    color: var(--light50);
+    font-size: 14px;
 }

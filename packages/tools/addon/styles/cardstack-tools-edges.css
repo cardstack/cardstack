@@ -1,0 +1,6 @@
+.cardstack-tools-edges-launcher > div {
+    /* this is for the edges launcher button */
+    /* sets z-index on 'fixed-withing-toolbars' component
+      which belongs to ember-toolbars package */
+    z-index: 999;
+}
