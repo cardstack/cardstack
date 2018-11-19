@@ -1,0 +1,53 @@
+.cs-editor-switch {
+    position: absolute;
+    right: 14px;
+    top: 14px;
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    color: var(--bright-fg);
+    cursor: pointer;
+}
+.cs-editor-switch > label {
+    color: var(--light50);
+    display: inline-block;
+    padding: 10px;
+    font-size: 0.875em;
+    cursor: pointer;
+}
+
+.cs-editor-switch--icon {
+    margin: 0;
+    padding: 0;
+    width: 3em;
+    height: 3em;
+    background: var(--gradient-bg);
+    color: var(--bright-fg);
+    fill: var(--bright-fg);
+    border: none;
+    border-radius: 50%;
+    box-shadow: 0 2px 15px 0 var(--dark50);
+    font-size: 16px;
+    cursor: pointer;
+}
+
+.cs-editor-switch--icon:hover,
+.cs-editor-switch--icon:focus {
+    outline: none;
+    color: var(--active-fg);
+    fill: var(--active-fg);
+}
+
+.cs-editor-switch--icon.enabled {
+    background: var(--light-bg);
+    color: var(--purple-fg);
+    fill: url(#gradient-fill) var(--purple-fg);
+}
+
+.cs-editor-switch--icon.enabled:hover,
+.cs-editor-switch--icon.enabled:focus {
+    outline: none;
+    background: black;
+    color: var(--active-fg);
+    fill: var(--active-fg);
+}

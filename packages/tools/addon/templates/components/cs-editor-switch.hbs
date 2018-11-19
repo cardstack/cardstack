@@ -1,6 +1,7 @@
-<label>Editor</label>
-{{#cs-toggle-switch value=tools.editing change=(action "setEditing") }}
-  On
-{{else}}
-  Off
-{{/cs-toggle-switch}}
+<label class="cs-editor-switch--label">
+  {{if enabled 'Done Editing' 'Edit Article'}}
+</label>
+<button class={{concat "cs-editor-switch--icon " (if enabled 'enabled' 'disabled')}}
+        {{action "toggleEditing"}}>
+  {{cs-svg (if enabled "done" "write") width="20px" height="20px"}}
+</button>

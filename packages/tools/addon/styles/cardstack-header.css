@@ -27,19 +27,6 @@
     line-height: calc(var(--cs-header-height) - 0.3em);
 }
 
-.cs-editor-switch {
-    padding: 0.5rem 0.5rem 0 0.875rem;
-    min-width: 6.5rem;
-    line-height: calc(var(--cs-header-height) - 1em);
-}
-.cs-editor-switch > label {
-    font-size: 0.75rem;
-    font-weight: 100;
-    float: left;
-    margin-right: 1rem;
-    line-height: calc(var(--cs-header-height)/0.75 - 0.75em);
-}
-
 .cs-branch-control {
     height: 100%;
     display: flex;

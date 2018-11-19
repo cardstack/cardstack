@@ -112,11 +112,10 @@ export default Service.extend({
       {
         id: 'cs-composition-panel',
         icon: {
-          name: 'write',
+          name: 'remove-this',
           width: 20,
           height: 20
-        },
-        description: 'Edit Page'
+        }
       }
     ];
   }),

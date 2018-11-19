@@ -1,7 +1,7 @@
 .cs-mode-button {
     position: absolute;
-    right: 14px;
-    top: 14px;
+    right: 74px;
+    bottom: 14px;
     box-sizing: border-box;
     display: flex;
     justify-content: flex-end;
@@ -26,7 +26,7 @@
     padding: 0;
     width: 3em;
     height: 3em;
-    background: var(--gradient-bg);
+    background: var(--normal-bg);
     color: var(--bright-fg);
     fill: var(--bright-fg);
     border-radius: 50%;
@@ -40,59 +40,3 @@
     color: var(--active-fg);
     fill: var(--active-fg);
 }
-
-.cs-mode-button.active > .cs-mode-button--background {
-    background: var(--light-bg);
-    color: var(--purple-fg);
-    fill: url(#gradient-fill) var(--purple-fg);
-}
-
-.cs-mode-button.active:hover > .cs-mode-button--background {
-    background: black;
-    color: var(--active-fg);
-    fill: var(--active-fg);
-}
-
-
-/*
-.cs-mode-button.icon-only {
-    padding: .6em .5em;
-    width: 2.5em;
-    text-align: center;
-    color: var(--bright-foreground);
-    fill: var(--bright-foreground);
-}
-.cs-mode-button.icon-only:hover {
-    color: var(--bright-foreground);
-    fill: var(--bright-foreground);
-}
-.cs-mode-button.icon-only .cs-mode-icon {
-    float: none;
-    padding: 0;
-    height: auto;
-}
-.cs-mode-button:hover {
-    color: var(--rising-foreground);
-    fill: var(--rising-foreground);
-}
-.cs-mode-button.active {
-    color: var(--bright-foreground);
-    fill: var(--bright-foreground);
-}
-.cs-mode-icon {
-    float: left;
-    padding-top: 0.5625rem;
-    padding-left: 1.25rem;
-    padding-right: 0.75rem;
-    height: 1.5rem;
-}
-.cs-mode-label {
-    cursor: pointer;
-    display: inline-block;
-    font-size: 0.75em;
-    font-weight: 100;
-    margin-top: 0.5rem;
-    margin-right: 1.6875rem;
-    line-height: calc(var(--cs-header-height)/0.75 - 0.5em/0.75);
-}
-*/

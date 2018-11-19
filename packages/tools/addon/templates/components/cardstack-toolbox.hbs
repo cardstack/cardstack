@@ -1,12 +1,16 @@
-{{#cs-mode-choices for="activePanel" as |choice|}}
-  {{cs-mode-button mode=choice}}
-{{/cs-mode-choices}}
+{{cs-editor-switch}}
 
 {{#if (is-component tools.activePanel)}}
   {{component tools.activePanel tools=tools}}
 {{else}}
   WAT is {{tools.activePanel}}
 {{/if}}
+
+{{!-- this will be removed once we have new template for Add New Card Type--}}
+  {{#cs-mode-choices for="activePanel" as |choice|}}
+    {{cs-mode-button mode=choice}}
+  {{/cs-mode-choices}}
+{{!--  --}}
 
 {{#if cardstackRouting}}
   {{cs-create-button routing=cardstackRouting}}

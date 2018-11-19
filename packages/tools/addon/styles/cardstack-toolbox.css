@@ -1,4 +1,5 @@
 @import "cs-version-control";
+@import "cs-editor-switch";
 @import "cs-create-button";
 @import "cs-mode-button";
 @import "cs-active-composition-panel";
