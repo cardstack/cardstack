@@ -43,7 +43,6 @@
               "CARDSTACK_SESSIONS_KEY":"OQUQi8NH0asrYgeoE10ijOFBhd/P1BU8HZP/rNqO5nw=",
               "PGSEARCH_NAMESPACE":"cardstack_data_development",
               "INITIAL_DATA_DIR":"${workspaceFolder}/packages/image/tests/dummy/cardstack",
-              "PGPORT": "5444",
               "PORT":"3000"
           },
           "args": [
@@ -95,7 +94,6 @@
               "PGSEARCH_NAMESPACE":"cardstack_data_development",
               "INITIAL_DATA_DIR":"${workspaceFolder}/packages/tools/tests/dummy/cardstack",
               "HUB_ENVIRONMENT":"test",
-              "PGPORT": "5444",
               "PORT":"3000"
           },
           "program": "${workspaceRoot}/packages/routing/node_modules/ember-cli/bin/ember",
