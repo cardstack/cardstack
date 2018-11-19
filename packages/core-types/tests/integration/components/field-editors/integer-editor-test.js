@@ -33,10 +33,10 @@ module('Integration | Component | field editors/integer editor', function(hooks)
         field="rating"
         onchange=onchange
       }}`);
-    await fillIn('.field-editor > input', '5');
+    await fillIn('input', '5');
     assert.dom('input[type=number]').hasValue('5', 'input is updated');
     assert.dom('input').isNotDisabled();
-    assert.equal(this.get('model.rating'), '5', 'model attribute is updated');
+    assert.strictEqual(this.get('model.rating'), 5, 'model attribute is updated');
   });
 
   test('it can be disabled', async function(assert) {
