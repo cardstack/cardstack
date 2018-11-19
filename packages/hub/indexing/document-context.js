@@ -124,24 +124,38 @@ module.exports = class DocumentContext {
 
   // copies attribues appropriately from jsonapiDoc into
   // pristineDocOut and searchDocOut.
-  async _buildAttributes(contentType, jsonapiDoc, userModel, pristineDocOut, searchDocOut) {
+  async _buildSearchAttributes(contentType, jsonapiDoc, userModel, searchDocOut) {
     for (let field of contentType.realAndComputedFields.values()) {
       if (field.id === 'id' || field.id === 'type' || field.isRelationship) {
         continue;
       }
+
+      if(!field.searchable) {
+        continue;
+      }
+
       if (contentType.computedFields.has(field.id) ||
           (jsonapiDoc.attributes && jsonapiDoc.attributes.hasOwnProperty(field.id))) {
         let value = await userModel.getField(field.id);
-        await this._buildAttribute(field, value, pristineDocOut, searchDocOut);
+        // Write our value into the search doc
+        searchDocOut[field.id] = field.searchIndexFormat(value);
       }
      }
   }
 
-  async _buildAttribute(field, value, pristineDocOut, searchDocOut) {
-    // Write our value into the search doc
-    searchDocOut[field.id] = field.searchIndexFormat(value);
-    // Write our value into the pristine doc
-    ensure(pristineDocOut, 'attributes')[field.id] = value;
+  async _buildPristineAttributes(contentType, jsonapiDoc, userModel, pristineDocOut) {
+    for (let field of contentType.realAndComputedFields.values()) {
+      if (field.id === 'id' || field.id === 'type' || field.isRelationship) {
+        continue;
+      }
+
+      if (contentType.computedFields.has(field.id) ||
+          (jsonapiDoc.attributes && jsonapiDoc.attributes.hasOwnProperty(field.id))) {
+        let value = await userModel.getField(field.id);
+        // Write our value into the pristine doc
+        ensure(pristineDocOut, 'attributes')[field.id] = value;
+      }
+     }
   }
 
   async _buildRelationships(contentType, jsonapiDoc, userModel, pristineDocOut, searchDocOut, searchTree, depth, fieldsets) {
@@ -264,7 +278,8 @@ module.exports = class DocumentContext {
         jsonapiDoc = jsonapiDoc.data;
       }
       let userModel = new Model(contentType, jsonapiDoc, this.schema, this.read.bind(this));
-      await this._buildAttributes(contentType, jsonapiDoc, userModel, pristine, searchDoc);
+      await this._buildSearchAttributes(contentType, jsonapiDoc, userModel, searchDoc);
+      await this._buildPristineAttributes(contentType, jsonapiDoc, userModel, pristine);
 
       if (!this._followedRelationships[`${type}/${id}`]) {
         this._followedRelationships[`${type}/${id}`] = true;

@@ -25,7 +25,7 @@ describe('DocumentContext', function() {
     schemaLoader = await new Container(registry).lookup('hub:schema-loader');
   });
 
-  it('searchDoc does not contain unsearchable fields but the pristineDoc does', async function() {
+  it('should exclude unsearchable fields from searchDoc but not from the pristineDoc', async function() {
     let factory = new Factory();
 
     factory.addResource('content-types', 'puppies')
@@ -68,4 +68,7 @@ describe('DocumentContext', function() {
       }
     });
   });
+
+  it('should exclude unsearchable relationships from searchDoc but not from the pristineDoc');
+  it('should exclude unsearchable fields on a related card from the searchDoc but not from the pristineDoc');
 });
