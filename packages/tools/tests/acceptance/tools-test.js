@@ -35,7 +35,7 @@ module('Acceptance | tools', function(hooks) {
 
     let element = findTriggerElementWithLabel.call(this, /Title/);
     await click(element);
-    let matching = findInputWithValue.call(this, 'hello world');
+    let matching = findInputWithValue.call(this, '10 steps to becoming a fearsome pirate');
     assert.ok(matching, 'found field editor for title');
 
     element = findTriggerElementWithLabel.call(this, /Body/);
@@ -57,7 +57,7 @@ module('Acceptance | tools', function(hooks) {
     let element = findTriggerElementWithLabel.call(this, /Title/);
     await click(element);
 
-    let titleEditor = findInputWithValue.call(this, 'hello world');
+    let titleEditor = findInputWithValue.call(this, '10 steps to becoming a fearsome pirate');
     await fillIn(titleEditor, '');
     await triggerEvent(titleEditor, 'blur');
     await waitFor('.field-editor--error-message');
