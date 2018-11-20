@@ -243,7 +243,36 @@ describe('hub/routers', function () {
     });
   });
 
-  describe('using configured application card', function () {
+  describe('using default application card whose enclosing cardstack app has a routing feature', function() {
+    beforeEach(async function () {
+      let factory = new JSONAPIFactory();
+
+      setupTests(factory);
+
+      env = await createDefaultEnvironment(`${__dirname}/../../../tests/app-with-routing-feature`, factory.getModels());
+      searchers = env.lookup('hub:searchers');
+    });
+
+    it('can get the space using a route from the cardstack application`s routing feature', async function () {
+      let { included, data: space } = await searchers.get(env.session, 'master', 'spaces', '/cards/puppies/vanGogh');
+
+      expect(space).has.property('type', 'spaces');
+      expect(space).has.property('id', '/cards/puppies/vanGogh');
+      expect(space).has.deep.property('attributes.query-params', '');
+      expect(space).has.deep.property('relationships.primary-card.data.id', 'vanGogh');
+      expect(space).has.deep.property('relationships.primary-card.data.type', 'puppies');
+
+      expect(included.length).equals(1);
+      expect(included[0]).has.property('id', 'vanGogh');
+      expect(included[0]).has.property('type', 'puppies');
+      expect(included[0]).has.deep.property('attributes.name', 'Van Gogh');
+      expect(included[0]).has.deep.property('attributes.dog-breed', 'dalmatian');
+      expect(included[0]).has.deep.property('attributes.favorite-toy', 'squeaky-snake');
+      expect(included[0]).has.deep.property('links.self', '/cards/puppies/vanGogh');
+    });
+  });
+
+  describe('using configured application card that has a routing feature', function () {
     beforeEach(async function () {
       let factory = new JSONAPIFactory();
 

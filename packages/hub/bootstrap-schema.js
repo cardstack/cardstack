@@ -144,6 +144,7 @@ const models = [
         data: [
           { type: 'fields', id: 'features' },
           { type: 'fields', id: 'config' },
+          { type: 'fields', id: 'is-root-plugin' },
           { type: 'computed-fields', id: 'plugin-enabled' }
         ]
       },
@@ -664,6 +665,13 @@ const models = [
   {
     type: 'fields',
     id: 'enabled',
+    attributes: {
+      'field-type': '@cardstack/core-types::boolean'
+    }
+  },
+  {
+    type: 'fields',
+    id: 'is-root-plugin',
     attributes: {
       'field-type': '@cardstack/core-types::boolean'
     }

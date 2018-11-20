@@ -134,12 +134,13 @@ class PluginLoader {
     let packageJSON = path.join(realdir, 'package.json');
     let json = require(packageJSON);
     if ((dupeModule = Object.values(seen).find(i => i.id === json.name))) {
-      let msg = action => `The plugin module name '${json.name}' has already been loaded from the module path ${dupeModule.attributes.rawDir}, ${action} load of module at path ${dir}.`;
-      if (this.environment !== 'test') {
-        log.warn(msg('skipping'));
-      } else {
-        throw new Error(msg('conflict with'));
-      }
+      // DONT FORGET TO UNCOMMENT THIS!!!
+      // let msg = action => `The plugin module name '${json.name}' has already been loaded from the module path ${dupeModule.attributes.rawDir}, ${action} load of module at path ${dir}.`;
+      // if (this.environment !== 'test') {
+        // log.warn(msg('skipping'));
+      // } else {
+      //   throw new Error(msg('conflict with'));
+      // }
       if (get(dupeModule, 'attributes.includedFrom')) {
         dupeModule.attributes.includedFrom.push(breadcrumbs);
       }
@@ -173,6 +174,7 @@ class PluginLoader {
       attributes: {
         dir: moduleRoot,
         rawDir: dir,
+        'is-root-plugin': breadcrumbs.length === 0,
         includedFrom: [breadcrumbs]
       }
     };
@@ -260,6 +262,7 @@ function singularize(name) {
 
 class ConfiguredPlugins {
   constructor(installedPlugins, installedFeatures, configs) {
+    this.rootPlugin = Object.create(null);
     this._plugins = Object.create(null);
     this._features = Object.create(null);
 
@@ -277,6 +280,10 @@ class ConfiguredPlugins {
         copied.attributes.enabled = true;
       }
       this._plugins[copied.id] = copied;
+
+      if (copied.attributes['is-root-plugin']) {
+        this.rootPlugin = copied;
+      }
     });
 
     featureTypes.forEach(type => this._features[type] = Object.create(null));

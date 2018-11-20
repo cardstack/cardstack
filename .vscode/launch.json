@@ -118,7 +118,7 @@
                 "--timeout",
                 "200000",
                 // "--grep",
-                // "no route that can get the card"
+                // "statically mapped routing for the application card when no routing has been specified"
             ]
         }
     ]

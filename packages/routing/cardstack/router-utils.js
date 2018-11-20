@@ -18,9 +18,17 @@ async function getPath(plugins, schema, routingCard, card, useDefaultRouter) {
 async function getRouter(plugins, schema, cardContext) {
   let type = get(cardContext, 'data.type');
   let routerName = schema.types.get(type).routerName;
-  if (!routerName) { return; }
+  let router;
+  if (!routerName) {
+    let feature = plugins.lookupFeatureFactory('routers', schema.plugins.rootPlugin.id);
+    if (feature && typeof feature.class === 'function') {
+      router = feature.class;
+    } else {
+      return;
+    }
+  }
 
-  let { class: router } = plugins.lookupFeatureFactoryAndAssert('routers', routerName);
+  router = router || (plugins.lookupFeatureFactoryAndAssert('routers', routerName)).class;
 
   if (typeof router !== 'function') {
     throw new Error(`The router for content type '${type}' is not a function.`);
