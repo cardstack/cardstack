@@ -28,8 +28,10 @@ module('Acceptance | image attachment', function(hooks) {
 
     await triggerEvent('.cardstack-image-upload-modal input[type=file]', 'change', [blob] );
 
+    await waitUntil(() => findContains('button', 'Update Image') );
+
     await click(findContains('button', 'Update Image'));
-    assert.ok(find('img.cs-image[src*="/api/cs-files/"]'));
+    assert.ok(find('img.cs-image[src*="/api/cardstack-files/"]'));
 
     // wait until no animation is happening before ending the test to prevent
     // ember errors

@@ -1,6 +1,6 @@
 import { not } from '@ember/object/computed';
 import Component from '@ember/component';
-import layout from '../../templates/components/field-editors/image-editor';
+import layout from '../../templates/components/field-editors/cardstack-image-editor';
 import { task } from "ember-concurrency";
 import { inject as service } from '@ember/service';
 
@@ -11,7 +11,7 @@ export default Component.extend({
   disabled: not('enabled'),
 
   updateImage: task(function * (file) {
-    let image = this.get('store').createRecord('image', { file });
+    let image = this.get('store').createRecord('cardstack-image', { file });
     yield image.save();
     this.set(`content.${this.get('field')}`, image);
     this.set('showUploader', false);

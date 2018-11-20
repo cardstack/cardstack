@@ -27,7 +27,14 @@ describe('cardstack/s3/searcher', function() {
       }
     });
 
-    factory.addResource('cs-files', '1234').withAttributes({
+    factory.addResource('data-sources').withAttributes({
+      sourceType: '@cardstack/files',
+      params: {
+        storeFilesIn: { type: 'data-sources', id: 's3' }
+      }
+    });
+
+    factory.addResource('cardstack-files', '1234').withAttributes({
       'sha-sum': 'sum',
       'content-type': 'text/plain'
     });
@@ -59,7 +66,7 @@ describe('cardstack/s3/searcher', function() {
     await env.setUser('test-users', 'the-default-test-user');
 
     let response = await request
-      .get('/api/cs-files/1234')
+      .get('/api/cardstack-files/1234')
       .set('Accept', 'text/plain');
 
 

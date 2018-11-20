@@ -56,7 +56,7 @@ module.exports = declareInjections({
     let id = this._generateId();
 
     let storedDocument = {
-      type: 'cs-files',
+      type: 'cardstack-files',
       id,
       attributes: {
         'created-at':   new Date().toISOString(),

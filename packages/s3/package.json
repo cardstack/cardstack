@@ -25,6 +25,7 @@
   },
   "dependencies": {
     "@cardstack/di": "0.11.9",
+    "@cardstack/files": "0.11.9",
     "@cardstack/hub": "0.11.9",
     "@cardstack/jsonapi": "0.11.9",
     "@cardstack/logger": "^0.1.0",
