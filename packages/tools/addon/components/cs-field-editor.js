@@ -12,6 +12,7 @@ export default Component.extend({
   field: '',
   enabled: true,
   errors: null,
+  onchange() {},
 
   disabled: not('enabled'),
 
