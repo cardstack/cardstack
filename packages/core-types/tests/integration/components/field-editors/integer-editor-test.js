@@ -1,6 +1,6 @@
 import { module, test } from 'qunit';
 import { setupRenderingTest } from 'ember-qunit';
-import { render, fillIn, triggerEvent } from '@ember/test-helpers';
+import { render, fillIn, focus, blur } from '@ember/test-helpers';
 import EmberObject from '@ember/object';
 import hbs from 'htmlbars-inline-precompile';
 
@@ -57,8 +57,8 @@ module('Integration | Component | field editors/integer editor', function(hooks)
         field="rating"
         onchange=onchange
       }}`);
-    // await blur('.field-editor > input');
-    await triggerEvent(input, 'blur');
+    await focus(input);
+    await blur(input);
     assert.verifySteps(['change']);
   });
 });

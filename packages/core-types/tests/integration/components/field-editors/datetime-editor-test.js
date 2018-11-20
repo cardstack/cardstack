@@ -1,6 +1,6 @@
 import { module, test } from 'qunit';
 import { setupRenderingTest } from 'ember-qunit';
-import { render, triggerEvent } from '@ember/test-helpers';
+import { render, focus, blur } from '@ember/test-helpers';
 import EmberObject from '@ember/object';
 import hbs from 'htmlbars-inline-precompile';
 
@@ -71,7 +71,8 @@ module('Integration | Component | field editors/datetime editor', function(hooks
         field="rating"
         onchange=onchange
       }}`);
-    await triggerEvent('input', 'blur');
+    await focus(input);
+    await blur(input);
     assert.verifySteps(['change']);
   });
 });
