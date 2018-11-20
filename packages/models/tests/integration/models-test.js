@@ -119,6 +119,14 @@ module('Integration | Models', function(hooks) {
     assert.equal(models.objectAt(0).get('id'), '1')
   });
 
+  test('it can query for the base type', async function(assert) {
+    let models = await run(
+      () => this.store.query('cardstack-card', { filter: { title: 'world' } })
+    );
+    assert.equal(models.get('length'), 1);
+    assert.equal(models.objectAt(0).get('id'), '1')
+  });
+
   test('it can queryRecord', async function(assert) {
     let model = await run(
       () => this.store.queryRecord('post', { filter: { title: 'world' } })

@@ -11,6 +11,7 @@ export default Component.extend({
   field: '',
   enabled: true,
   errors: null,
+  onchange() {},
 
   disabled: computed('enabled', 'canUpdate', function() {
     return !(this.enabled && this.canUpdate);

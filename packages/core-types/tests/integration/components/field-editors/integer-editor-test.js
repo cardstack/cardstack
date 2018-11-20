@@ -6,38 +6,41 @@ import hbs from 'htmlbars-inline-precompile';
 
 const INPUT = '.field-editor > input';
 
-module('Integration | Component | field editors/string editor', function(hooks) {
+module('Integration | Component | field editors/integer editor', function(hooks) {
   setupRenderingTest(hooks);
 
   test('it renders', async function(assert) {
-    this.set('model', EmberObject.create({ title: 'Go, Fabi, go!' }));
-    this.set('onchange', () => {});
+    this.set('model', EmberObject.create({ rating: 3 }));
     await render(hbs`
-      {{field-editors/string-editor
+      {{field-editors/integer-editor
         content=model
-        field="title"
-        onchange=onchange
-      }}`
-    );
-    assert.dom(INPUT).hasValue('Go, Fabi, go!', 'text input has correct value');
+        field="rating"
+      }}`);
+    assert.dom(INPUT).hasValue('3', 'number input has correct value');
     assert.dom(INPUT).isNotDisabled();
+  });
 
-    await fillIn(INPUT, 'Win that gold from Magnus');
-    assert.dom(INPUT).hasValue('Win that gold from Magnus', 'input is updated');
-    assert.equal(this.get('model.title'), 'Win that gold from Magnus', 'model attribute is updated');
+  test('it updates the value correctly', async function(assert) {
+    this.set('model', EmberObject.create({ rating: 3 }));
+    await render(hbs`
+      {{field-editors/integer-editor
+        content=model
+        field="rating"
+      }}`);
+    await fillIn(INPUT, '5');
+    assert.dom(INPUT).hasValue('5', 'input is updated');
+    assert.dom(INPUT).isNotDisabled();
+    assert.strictEqual(this.get('model.rating'), 5, 'model attribute is updated');
   });
 
   test('it can be disabled', async function(assert) {
-    this.set('model', EmberObject.create({ title: 'Go, Fabi, go!' }));
-    this.set('onchange', () => {});
+    this.set('model', EmberObject.create({ rating: 3 }));
     await render(hbs`
-      {{field-editors/string-editor
+      {{field-editors/integer-editor
         content=model
-        field="title"
-        onchange=onchange
+        field="rating"
         disabled=true
-      }}`
-    );
+      }}`);
     assert.dom(INPUT).isDisabled();
   });
 

@@ -6052,12 +6052,12 @@ ember-disable-prototype-extensions@^1.1.2, ember-disable-prototype-extensions@^1
   integrity sha1-GWkTUhdlS14nj5/i2dTkm1cgMp4=
 
 ember-elsewhere@^1.0.3:
-  version "1.0.3"
-  resolved "https://registry.yarnpkg.com/ember-elsewhere/-/ember-elsewhere-1.0.3.tgz#6477c31c1574d27a818d92590fddedfd5761a325"
-  integrity sha512-xA/xbHmcfhq1yV4PYMQ3x+NdTN3ji6QRad7KGMPIR8mxhkhgKqHGZ5eJdcZks3EYkV68pwaHWqgqeccq0GKEKg==
+  version "1.0.5"
+  resolved "https://registry.yarnpkg.com/ember-elsewhere/-/ember-elsewhere-1.0.5.tgz#7ec292b03930765f021b51c51802b84f82f0c56c"
+  integrity sha512-yGm1NMUwft8ur2XVLKsZuQS1nn91nnXfjQkJX/Cx8pUAz1YTnTuvP24Hn1MLP72PmAx6ebPDCp1DEz7RKE81ew==
   dependencies:
-    ember-cli-babel "^6.3.0"
-    ember-cli-htmlbars "^2.0.1"
+    ember-cli-babel "^6.16.0"
+    ember-cli-htmlbars "^3.0.0"
 
 ember-export-application-global@^2.0.0:
   version "2.0.0"

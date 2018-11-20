@@ -1,7 +1,10 @@
 import { module, test } from 'qunit';
 import { setupRenderingTest } from 'ember-qunit';
-import { render } from '@ember/test-helpers';
+import { render, focus, blur } from '@ember/test-helpers';
+import EmberObject from '@ember/object';
 import hbs from 'htmlbars-inline-precompile';
+
+const INPUT = '.field-editor > input';
 
 module('Integration | Component | field editors/datetime editor', function(hooks) {
   setupRenderingTest(hooks);
@@ -10,26 +13,62 @@ module('Integration | Component | field editors/datetime editor', function(hooks
     this.set('model', {
       expiration: '2030-01-01T10:00:00'
     });
-    await render(hbs`{{field-editors/datetime-editor content=model field="expiration" enabled=true}}`);
+    this.set('onchange', () => {});
+    await render(hbs`
+      {{field-editors/datetime-editor
+        content=model
+        field="expiration"
+        onchange=onchange
+      }}`
+    );
 
-    assert.dom('input[type=datetime-local]').hasValue('2030-01-01T10:00:00', 'datetime input has correct value');
-    assert.dom('input').isNotDisabled('datetime field is not disabled');
+    assert.dom(INPUT).hasValue('2030-01-01T10:00:00', 'datetime input has correct value');
+    assert.dom(INPUT).isNotDisabled();
   });
 
   test('it renders with invalid datetime', async function(assert) {
     this.set('model', {
       expiration: 'pizza'
     });
-    await render(hbs`{{field-editors/datetime-editor content=model field="expiration" enabled=true}}`);
-    assert.dom('input[type=datetime-local]').hasNoValue('datetime input has no value');
-    assert.dom('input').isNotDisabled('datetime field is not disabled');
+    this.set('onchange', () => {});
+    await render(hbs`
+      {{field-editors/datetime-editor
+        content=model
+        field="expiration"
+        onchange=onchange
+      }}`
+    );
+    assert.dom(INPUT).hasNoValue('datetime input has no value');
+    assert.dom(INPUT).isNotDisabled();
   });
 
   test('it can be disabled', async function(assert) {
     this.set('model', {
       expiration: '2030-01-01T10:00:00'
     });
-    await render(hbs`{{field-editors/datetime-editor content=model field="expiration" enabled=false}}`);
-    assert.dom('input').isDisabled('datetime field is disabled');
+    this.set('onchange', () => {});
+    await render(hbs`
+      {{field-editors/datetime-editor
+        content=model
+        field="expiration"
+        onchange=onchange
+        disabled=true
+      }}`
+    );
+    assert.dom(INPUT).isDisabled();
+  });
+
+  test('onchange is called when the field is left', async function(assert) {
+    this.set('onchange', () => assert.step('change'))
+    this.set('model', EmberObject.create({ rating: 3 }));
+    await render(hbs`
+      {{field-editors/datetime-editor
+        content=model
+        field="rating"
+        onchange=onchange
+      }}`);
+    await focus(INPUT);
+    await blur(INPUT);
+    assert.verifySteps(['change']);
   });
 });
