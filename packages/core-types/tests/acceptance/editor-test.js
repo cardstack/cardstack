@@ -37,7 +37,7 @@ module('Acceptance | field editors', async function(hooks) {
     assert.equal(firstTrack, 'Rainbow Road', 'drivers first track is rainbow road');
     assert.equal(lastTrack, 'Koopa City', 'drivers final track is koopa city');
 
-    await fillIn('.ember-text-field:nth-of-type(1)', 'METAL Mario');
+    await fillIn('.field-editor:nth-of-type(1) > input', 'METAL Mario');
     await fillIn('input[type=date]', '1998-01-01');
     await fillIn('input[type=datetime-local]', '2018-10-27T23:56:07');
     await click('.cs-toggle-switch');

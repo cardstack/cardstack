@@ -13,6 +13,13 @@ export default Component.extend({
   enabled: true,
   errors: null,
 
+  init() {
+    this._super(...arguments);
+    if (!this.onchange) {
+      this.onchange = () => {};
+    }
+  },
+
   disabled: not('enabled'),
 
   firstError: computed('errors.[]', function() {
