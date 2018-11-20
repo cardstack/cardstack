@@ -4,14 +4,10 @@ import { render, fillIn, focus, blur } from '@ember/test-helpers';
 import EmberObject from '@ember/object';
 import hbs from 'htmlbars-inline-precompile';
 
-let input;
+const INPUT = '.field-editor > input';
 
 module('Integration | Component | field editors/integer editor', function(hooks) {
   setupRenderingTest(hooks);
-
-  hooks.beforeEach(() => {
-    input = '.field-editor > input';
-  });
 
   test('it renders', async function(assert) {
     this.set('model', EmberObject.create({ rating: 3 }));
@@ -20,8 +16,8 @@ module('Integration | Component | field editors/integer editor', function(hooks)
         content=model
         field="rating"
       }}`);
-    assert.dom(input).hasValue('3', 'number input has correct value');
-    assert.dom(input).isNotDisabled();
+    assert.dom(INPUT).hasValue('3', 'number input has correct value');
+    assert.dom(INPUT).isNotDisabled();
   });
 
   test('it updates the value correctly', async function(assert) {
@@ -31,9 +27,9 @@ module('Integration | Component | field editors/integer editor', function(hooks)
         content=model
         field="rating"
       }}`);
-    await fillIn(input, '5');
-    assert.dom(input).hasValue('5', 'input is updated');
-    assert.dom(input).isNotDisabled();
+    await fillIn(INPUT, '5');
+    assert.dom(INPUT).hasValue('5', 'input is updated');
+    assert.dom(INPUT).isNotDisabled();
     assert.strictEqual(this.get('model.rating'), 5, 'model attribute is updated');
   });
 
@@ -45,7 +41,7 @@ module('Integration | Component | field editors/integer editor', function(hooks)
         field="rating"
         disabled=true
       }}`);
-    assert.dom(input).isDisabled();
+    assert.dom(INPUT).isDisabled();
   });
 
   test('onchange is called when the field is left', async function(assert) {
@@ -57,8 +53,8 @@ module('Integration | Component | field editors/integer editor', function(hooks)
         field="rating"
         onchange=onchange
       }}`);
-    await focus(input);
-    await blur(input);
+    await focus(INPUT);
+    await blur(INPUT);
     assert.verifySteps(['change']);
   });
 });

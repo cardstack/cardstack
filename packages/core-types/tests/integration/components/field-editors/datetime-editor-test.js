@@ -4,14 +4,10 @@ import { render, focus, blur } from '@ember/test-helpers';
 import EmberObject from '@ember/object';
 import hbs from 'htmlbars-inline-precompile';
 
-let input;
+const INPUT = '.field-editor > input';
 
 module('Integration | Component | field editors/datetime editor', function(hooks) {
   setupRenderingTest(hooks);
-
-  hooks.beforeEach(() => {
-    input = '.field-editor > input';
-  });
 
   test('it renders', async function(assert) {
     this.set('model', {
@@ -26,8 +22,8 @@ module('Integration | Component | field editors/datetime editor', function(hooks
       }}`
     );
 
-    assert.dom(input).hasValue('2030-01-01T10:00:00', 'datetime input has correct value');
-    assert.dom(input).isNotDisabled();
+    assert.dom(INPUT).hasValue('2030-01-01T10:00:00', 'datetime input has correct value');
+    assert.dom(INPUT).isNotDisabled();
   });
 
   test('it renders with invalid datetime', async function(assert) {
@@ -42,8 +38,8 @@ module('Integration | Component | field editors/datetime editor', function(hooks
         onchange=onchange
       }}`
     );
-    assert.dom(input).hasNoValue('datetime input has no value');
-    assert.dom(input).isNotDisabled();
+    assert.dom(INPUT).hasNoValue('datetime input has no value');
+    assert.dom(INPUT).isNotDisabled();
   });
 
   test('it can be disabled', async function(assert) {
@@ -59,7 +55,7 @@ module('Integration | Component | field editors/datetime editor', function(hooks
         disabled=true
       }}`
     );
-    assert.dom(input).isDisabled();
+    assert.dom(INPUT).isDisabled();
   });
 
   test('onchange is called when the field is left', async function(assert) {
@@ -71,8 +67,8 @@ module('Integration | Component | field editors/datetime editor', function(hooks
         field="rating"
         onchange=onchange
       }}`);
-    await focus(input);
-    await blur(input);
+    await focus(INPUT);
+    await blur(INPUT);
     assert.verifySteps(['change']);
   });
 });

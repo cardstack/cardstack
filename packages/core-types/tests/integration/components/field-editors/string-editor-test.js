@@ -4,14 +4,10 @@ import { render, fillIn, focus, blur } from '@ember/test-helpers';
 import EmberObject from '@ember/object';
 import hbs from 'htmlbars-inline-precompile';
 
-let input;
+const INPUT = '.field-editor > input';
 
 module('Integration | Component | field editors/string editor', function(hooks) {
   setupRenderingTest(hooks);
-
-  hooks.beforeEach(() => {
-    input = '.field-editor > input';
-  });
 
   test('it renders', async function(assert) {
     this.set('model', EmberObject.create({ title: 'Go, Fabi, go!' }));
@@ -23,11 +19,11 @@ module('Integration | Component | field editors/string editor', function(hooks) 
         onchange=onchange
       }}`
     );
-    assert.dom(input).hasValue('Go, Fabi, go!', 'text input has correct value');
-    assert.dom(input).isNotDisabled();
+    assert.dom(INPUT).hasValue('Go, Fabi, go!', 'text input has correct value');
+    assert.dom(INPUT).isNotDisabled();
 
-    await fillIn(input, 'Win that gold from Magnus');
-    assert.dom(input).hasValue('Win that gold from Magnus', 'input is updated');
+    await fillIn(INPUT, 'Win that gold from Magnus');
+    assert.dom(INPUT).hasValue('Win that gold from Magnus', 'input is updated');
     assert.equal(this.get('model.title'), 'Win that gold from Magnus', 'model attribute is updated');
   });
 
@@ -42,7 +38,7 @@ module('Integration | Component | field editors/string editor', function(hooks) 
         disabled=true
       }}`
     );
-    assert.dom(input).isDisabled();
+    assert.dom(INPUT).isDisabled();
   });
 
   test('onchange is called when the field is left', async function(assert) {
@@ -54,8 +50,8 @@ module('Integration | Component | field editors/string editor', function(hooks) 
         field="rating"
         onchange=onchange
       }}`);
-    await focus(input);
-    await blur(input);
+    await focus(INPUT);
+    await blur(INPUT);
     assert.verifySteps(['change']);
   });
 });

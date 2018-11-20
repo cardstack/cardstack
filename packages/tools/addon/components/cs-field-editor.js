@@ -12,13 +12,7 @@ export default Component.extend({
   field: '',
   enabled: true,
   errors: null,
-
-  init() {
-    this._super(...arguments);
-    if (!this.onchange) {
-      this.onchange = () => {};
-    }
-  },
+  onchange() {},
 
   disabled: not('enabled'),
 
