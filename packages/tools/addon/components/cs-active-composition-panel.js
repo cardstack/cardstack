@@ -10,8 +10,19 @@ export default Component.extend({
   classNames: ['cs-active-composition-panel'],
 
   validationErrors: null,
+  permissions: null,
 
   data: service('cardstack-data'),
+
+  willInsertElement() {
+    this._super(...arguments);
+    this.get('fetchPermissions').perform();
+  },
+
+  fetchPermissions: task(function * () {
+    let permissions = yield this.get('data').fetchPermissionsFor(this.model);
+    this.set('permissions', permissions);
+  }),
 
   validateTask: task(function * () {
     let errors = yield this.get('data').validate(this.model);

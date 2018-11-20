@@ -254,7 +254,7 @@ module.exports = class Field {
 
 
 function humanize(string) {
-  // First regex taken from Ember.String.capitalize
+  // First regex taken from @ember/string#capitalize
   // Would be great to "merge" this with the cs-humanize helper
   // in the rendering package
   return string.replace(/(^|\/)([a-z])/g, function(match) {

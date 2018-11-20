@@ -18,6 +18,18 @@ function addConstraint(factory, constraint, field) {
 function initialModels() {
   let initial = new JSONAPIFactory();
 
+  initial.addResource('grants')
+    .withRelated('who', [{ type: 'groups', id: 'everyone' }])
+    .withAttributes({
+      'may-create-resource': true,
+      'may-read-resource': true,
+      'may-update-resource': true,
+      'may-delete-resource': true,
+      'may-write-fields': true,
+      'may-read-fields': true,
+      'may-login': true
+    });
+
   initial.addResource('content-types', 'bloggers')
     .withRelated('fields', [
       initial.addResource('fields', 'name').withAttributes({
@@ -30,7 +42,7 @@ function initialModels() {
       initial.addResource('fields', 'body').withAttributes({
         fieldType: '@cardstack/core-types::string'
       }),
-      initial.addResource('fields', 'author').withAttributes({
+      initial.addResource('fields', 'poster').withAttributes({
         fieldType: '@cardstack/core-types::belongs-to',
         owned: true,
       }).withRelated('related-types', [
@@ -40,7 +52,7 @@ function initialModels() {
 
   initial.addResource('content-types', 'posts')
     .withAttributes({
-      defaultIncludes: ['comments', 'comments.author', 'reading-time-unit']
+      defaultIncludes: ['author', 'comments', 'comments.poster', 'reading-time-unit']
     })
     .withRelated('fields', [
       initial.addResource('fields', 'title').withAttributes({
@@ -78,6 +90,17 @@ function initialModels() {
       }).withRelated('related-types', [
         initial.getResource('content-types', 'comments')
       ]),
+      initial.addResource('fields', 'author').withAttributes({
+        fieldType: '@cardstack/core-types::belongs-to',
+      }).withRelated('related-types', [
+        initial.getResource('content-types', 'bloggers')
+      ]),
+      initial.addResource('computed-fields', 'author-name').withAttributes({
+        computedFieldType: '@cardstack/core-types::alias',
+        params: {
+          aliasPath: 'author.name',
+        }
+      }),
     ]);
 
     addConstraint(initial, '@cardstack/core-types::not-empty', 'title');
@@ -89,17 +112,34 @@ function initialModels() {
       name: 'Guybrush Threepwood'
     });
 
+  let lechuck = initial.addResource('bloggers', '2')
+    .withAttributes({
+      name: 'LeChuck'
+    });
+
   let threeHeadedMonkey = initial.addResource('comments', '1')
     .withAttributes({
       body: 'Look behind you, a Three-Headed Monkey!'
     })
-    .withRelated('author', guybrush);
+    .withRelated('poster', guybrush);
 
-  let doorstop = initial.addResource('comments', '2')
+  let diapers = initial.addResource('comments', '2')
+    .withAttributes({
+      body: 'Have you stopped wearing diapers yet?'
+    })
+    .withRelated('poster', guybrush);
+
+  let doorstop = initial.addResource('comments', '3')
     .withAttributes({
       body: 'You’re about as fearsome as a doorstop.'
     })
-    .withRelated('author', guybrush);
+    .withRelated('poster', guybrush);
+
+  let brains = initial.addResource('comments', '4')
+    .withAttributes({
+      body: "You're no match for my brains, you poor fool."
+    })
+    .withRelated('poster', guybrush);
 
   initial.addResource('time-units', '1')
     .withAttributes({ title: 'minutes' });
@@ -110,14 +150,15 @@ function initialModels() {
 
   initial.addResource('posts', '1')
     .withAttributes({
-      title: 'hello world',
+      title: '10 steps to becoming a fearsome pirate',
       publishedAt: new Date(2017, 3, 24),
-      category: 'adventure',
+      category: 'swashhbucking adventure',
       archived: false,
       readingTimeValue: 8
     })
     .withRelated('reading-time-unit', { type: 'time-units', id: '1' })
-    .withRelated('comments', [ threeHeadedMonkey ]);
+    .withRelated('author', lechuck)
+    .withRelated('comments', [ threeHeadedMonkey, diapers ]);
 
   initial.addResource('posts', '2')
     .withAttributes({
@@ -128,7 +169,8 @@ function initialModels() {
       readingTimeValue: 2
     })
     .withRelated('reading-time-unit', { type: 'time-units', id: '2' })
-    .withRelated('comments', [ doorstop ]);
+    .withRelated('author', lechuck)
+    .withRelated('comments', [ doorstop, brains ]);
 
   return initial.getModels();
 }

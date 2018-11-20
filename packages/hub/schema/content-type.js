@@ -105,7 +105,6 @@ module.exports = class ContentType {
       return;
     }
 
-
     let errors = [];
     let badFields = Object.create(null);
 
@@ -139,6 +138,7 @@ module.exports = class ContentType {
     }
   }
 
+  // TODO: rename to maybe...Type
   async authorizedToCreateResource(context) {
     let grant = await find(this.grants, async g => {
       if (!g['may-create-resource']) {
@@ -178,8 +178,6 @@ module.exports = class ContentType {
       }
     }
   }
-
-
 
   async _assertGrant(documents, context, permission, description) {
     let grant = await find(this.grants, async g => {

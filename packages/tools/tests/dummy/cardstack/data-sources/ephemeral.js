@@ -18,23 +18,19 @@ module.exports = [
     }
   },
   {
-    type: 'grants',
-    id: 'wide-open',
+    type: 'data-sources',
+    id: 'mock-auth',
     attributes: {
-      'may-create-resource': true,
-      'may-read-resource': true,
-      'may-update-resource': true,
-      'may-delete-resource': true,
-      'may-write-fields': true,
-      'may-read-fields': true
-    },
-    relationships: {
-      who: {
-        data: [{
-          type: 'groups',
-          id: 'everyone'
-        }]
+      'source-type': '@cardstack/mock-auth',
+      params: {
+        users: {
+          user1: {
+            name: 'Carl Stack',
+            email: 'carlstack@cardstack.com',
+            verified: true
+          }
+        }
       }
     }
-  }
+  },
 ];

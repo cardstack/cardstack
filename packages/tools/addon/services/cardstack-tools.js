@@ -30,6 +30,7 @@ export default Service.extend({
     let fields = [];
     let renderedFieldNames = this.get('_renderedFieldNames');
     let model = this.get('activeContentItem.model');
+    if (!model) { return fields; }
     model.eachAttribute((attribute, meta) => {
       // When fields are also shown from owned, related records
       // simply checking field name duplication won't be enough:
@@ -64,6 +65,7 @@ export default Service.extend({
 
   activeFields: computed('activeContentItem', 'renderedFields', function() {
     let item = this.get('activeContentItem');
+    if (!item) { return []; }
     let activeItemModel = item.model;
     let owned = ownedRelatedRecords([item.model]);
     if (item) {

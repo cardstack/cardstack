@@ -18,13 +18,13 @@
   }}
 
   {{#each renderedFields key="id" as |fieldMark|}}
-    {{#let fieldMark.model as |model|}}
+    {{#let fieldMark.model as |fieldModel|}}
       {{#cs-collapsible-section
         class=(concat "cs-toolbox-section "
           (if
-            (cs-has-errors validationErrors model (hash name=model.name grouped=model.grouped))
+            (cs-has-errors validationErrors fieldModel (hash name=fieldModel.name grouped=fieldModel.grouped))
             "invalid"))
-        title=model.caption
+        title=fieldModel.caption
         opened=(eq fieldMark.id openedFieldId)
         open=(action openField fieldMark)
         close=(action openField null)
@@ -32,28 +32,46 @@
         unhovered=(perform highlightAndScrollToField null)
       }}
         <div class="cs-field-editor-section">
-        {{#if model.grouped}}
-          {{#each model.grouped as |fieldName|}}
-            {{#with model.content as |content|}}
-              <label>{{cs-field-caption content fieldName}}</label>
-              {{cs-field-editor
-                content=content
-                field=fieldName
-                enabled=editingEnabled
-                onchange=(action "validate")
-                errors=(get validationErrors fieldName)
-              }}
-            {{/with}}
-          {{/each}}
-        {{else}}
-          {{cs-field-editor
-            content=model.content
-            field=model.name
-            enabled=editingEnabled
-            onchange=(action "validate")
-            errors=(get validationErrors model.name)
-          }}
-        {{/if}}
+          {{#if fieldModel.grouped}}
+            {{#each fieldModel.grouped as |fieldName|}}
+              {{#with fieldModel.content as |content|}}
+                <label>{{cs-field-caption content fieldName}}</label>
+                {{!--
+                  We allow editing fields of related resources. We should come back to this after #448 is completed.
+                --}}
+                {{cs-field-editor
+                  content=content
+                  field=fieldName
+                  enabled=editingEnabled
+                  canUpdate=(or
+                    (not (eq fieldModel.content model))
+                    (and
+                      permissions.mayUpdateResource
+                      (contains fieldName permissions.writableFields))
+                  )
+                  onchange=(action "validate")
+                  errors=(get validationErrors fieldName)
+                }}
+              {{/with}}
+            {{/each}}
+          {{else}}
+            {{!--
+              We allow editing fields of related resources. We should come back to this after #448 is completed.
+            --}}
+            {{cs-field-editor
+              content=fieldModel.content
+              field=fieldModel.name
+              enabled=editingEnabled
+              canUpdate=(or
+                (not (eq fieldModel.content model))
+                (and
+                  permissions.mayUpdateResource
+                  (contains fieldModel.name permissions.writableFields))
+              )
+              onchange=(action "validate")
+              errors=(get validationErrors fieldModel.name)
+            }}
+          {{/if}}
         </div>
       {{/cs-collapsible-section}}
     {{/let}}
@@ -75,6 +93,10 @@
           content=field.model
           field=field.name
           enabled=editingEnabled
+          canUpdate=(and
+            permissions.mayUpdateResource
+            (contains field.name permissions.writableFields)
+          )
           onchange=(action "validate")
           errors=(get validationErrors field.name)
         }}

@@ -117,6 +117,22 @@ const models = [
   },
   {
     type: 'content-types',
+    id: 'permissions',
+    attributes: {
+      'is-built-in': true
+    },
+    relationships: {
+      fields: {
+        data: [
+          { type: 'fields', id: 'may-update-resource' },
+          { type: 'fields', id: 'may-delete-resource' },
+          { type: 'fields', id: 'writable-fields' }
+        ]
+      }
+    }
+  },
+  {
+    type: 'content-types',
     id: 'plugins',
     attributes: {
       'is-built-in': true,
@@ -509,6 +525,18 @@ const models = [
   },
   {
     type: 'fields',
+    id: 'writable-fields',
+    attributes: {
+      'field-type': '@cardstack/core-types::has-many',
+    },
+    relationships: {
+      'related-types': {
+        data: [{ type: 'content-types', id: 'fields' }]
+      }
+    }
+  },
+  {
+    type: 'fields',
     id: 'inputs',
     attributes: {
       'field-type': '@cardstack/core-types::object',
@@ -680,6 +708,13 @@ const models = [
     id: 'plugins',
     attributes: {
       'source-type': '@cardstack/hub::plugins'
+    }
+  },
+  {
+    type: 'data-sources',
+    id: 'permissions',
+    attributes: {
+      'source-type': '@cardstack/hub::permissions',
     }
   },
   {

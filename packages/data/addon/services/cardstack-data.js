@@ -92,13 +92,9 @@ export default Service.extend({
     let toValidate = [model, ...relatedOwned];
     let responses = toValidate.map(async (record) => {
       let { url, verb } = this._validationRequestParams(record);
-      let token = this.get('session.data.authenticated.data.meta.token');
       let response = await fetch(url, {
         method: verb,
-        headers: {
-          'Content-Type': 'application/vnd.api+json',
-          'Authorization': `Bearer ${token}`
-        },
+        headers: this._headers(),
         body: JSON.stringify(record.serialize())
       });
       let { status } = response;
@@ -114,6 +110,42 @@ export default Service.extend({
       }
       return Object.assign(mergedErrors, this._errorsByField(body));
     }, {});
+  },
+
+  async fetchPermissionsFor(model) {
+    let modelName = pluralize(getType(model));
+    let permissionsPath;
+    if (model.id) {
+      permissionsPath = encodeURIComponent(`${modelName}/${model.id}`);
+    } else {
+      permissionsPath = encodeURIComponent(modelName);
+    }
+    let url = `${hubURL}/api/permissions/${permissionsPath}`;
+    let response = await fetch(url, {
+      headers: this._headers()
+    });
+    let { data } = await response.json();
+    let { attributes, relationships } = data;
+    return {
+      mayUpdateResource: attributes['may-update-resource'],
+      writableFields: relationships['writable-fields'].data
+        .map((field) => camelize(field.id))
+    }
+  },
+
+  _headers() {
+    let headers = {
+      'Content-Type': 'application/vnd.api+json',
+    };
+    let token = this._sessionToken();
+    if (token) {
+      headers['Authorization'] = `Bearer ${token}`;
+    }
+    return headers;
+  },
+
+  _sessionToken() {
+    return this.get('session.data.authenticated.data.meta.token');
   },
 
   _errorsByField(body) {

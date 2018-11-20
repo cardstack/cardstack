@@ -49,7 +49,7 @@
          the `id` field in order to give a user permissions to their
          own user record.
 
-  In general, it is beter to use groups rather than make lots of
+  In general, it is better to use groups rather than make lots of
   separate grants for each user. The biggest use for individual user
   grants is when you use them via field indirection, so that a
   resource can contain its own list of owners, etc.

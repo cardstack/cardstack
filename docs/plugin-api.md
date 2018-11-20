@@ -21,14 +21,18 @@ Optionally, a plugin can declare what subdirectory it's cardstack-specific modul
 
 This is particularly useful for modules that are also ember-addon or standlalone libraries in their own right.
 
-A plugin can provide many different kinds of cardstack features. See the `featureTypes` list in `packages/hub/plugins` for the definitive list. At the time of writing, they are:
+A plugin can provide many different kinds of cardstack features. See the `featureTypes` list in `packages/hub/plugin-loader` for the definitive list. This currently includes:
 
  - constraints
  - fields
+ - computed-fields
  - writers
  - searchers
  - indexers
  - authenticators
+ - middleware
+ - messengers
+ - code-generators
 
 Features are discovered and named via conventions. This is probably best illustrated by example. Given an NPM package named "my-cardstack-plugin" (with no `src` in the `cardstack-plugin` section in its `package.json`), the following files will result in the following discovered features:
 
