@@ -14,11 +14,15 @@ export default Component.extend({
 
   data: service('cardstack-data'),
 
-  async willInsertElement() {
+  willInsertElement() {
     this._super(...arguments);
-    let permissions = await this.get('data').fetchPermissionsFor(this.model);
-    this.set('permissions', permissions);
+    this.get('fetchPermissions').perform();
   },
+
+  fetchPermissions: task(function * () {
+    let permissions = yield this.get('data').fetchPermissionsFor(this.model);
+    this.set('permissions', permissions);
+  }),
 
   validateTask: task(function * () {
     let errors = yield this.get('data').validate(this.model);
