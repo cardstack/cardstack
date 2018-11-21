@@ -9,7 +9,7 @@ exports.compute = async function(model) {
   let meta = primaryCard.getMeta();
 
   if (meta && meta['is-error-card']) {
-    return errorCardMapping[primaryCard.getId()] || 500;
+    return errorCardMapping[await primaryCard.getField('id')] || 500;
   }
 
   return 200;
