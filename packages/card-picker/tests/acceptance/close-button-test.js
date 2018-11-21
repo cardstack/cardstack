@@ -6,7 +6,7 @@ module('Acceptance | close button', function(hooks) {
   setupApplicationTest(hooks);
 
   test('Open button opens bottom edge', async function(assert) {
-    await visit('/close-button');
+    await visit('/');
     await click('[data-test-open-bottom-edge]');
     await waitFor('[data-card-picker-toolbox-header]');
     assert.dom('[data-card-picker-toolbox-header]').exists();
@@ -14,7 +14,7 @@ module('Acceptance | close button', function(hooks) {
   });
 
   test('Close button closes bottom edge', async function(assert) {
-    await visit('/close-button');
+    await visit('/');
     await click('[data-test-open-bottom-edge]');
     await waitFor('[data-card-picker-toolbox-header]');
     await click('[data-test-card-picker-close-button]');
