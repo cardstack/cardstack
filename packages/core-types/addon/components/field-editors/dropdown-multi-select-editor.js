@@ -1,5 +1,6 @@
 import Component from '@ember/component';
 import { dasherize } from '@ember/string';
+import { singularize } from 'ember-inflector';
 import { inject as service } from '@ember/service';
 import { task } from 'ember-concurrency';
 import layout from '../../templates/components/field-editors/dropdown-multi-select-editor';
@@ -28,7 +29,7 @@ export default Component.extend({
     let content = get(this, 'content');
     let field = get(this, 'field');
     let meta = metaForField(content, field);
-    let contentType = (meta && meta.type) ? meta.type : dasherize(field);
+    let contentType = (meta && meta.type) ? meta.type : singularize(dasherize(field));
 
     let options;
     try {

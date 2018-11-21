@@ -57,12 +57,21 @@ function initialModels() {
     initial.addResource('fields', 'tracks').withAttributes({
       fieldType: '@cardstack/core-types::has-many',
       editorComponent: 'field-editors/dropdown-multi-select-editor',
-      editorOptions: { displayFieldName: 'name' }
     }).withRelated('related-types', [
       initial.addResource('content-types', 'tracks')
       .withRelated('fields', [
-        initial.addResource('fields', 'name').withAttributes({ fieldType: '@cardstack/core-types::string' })
+        initial.addResource('fields', 'title').withAttributes({ fieldType: '@cardstack/core-types::string' })
       ])
+    ]),
+    initial.addResource('fields', 'races').withAttributes({
+      fieldType: '@cardstack/core-types::has-many',
+      editorComponent: 'field-editors/dropdown-multi-select-editor',
+      editorOptions: { displayFieldName: 'name' }
+    }).withRelated('related-types', [
+      initial.addResource('content-types', 'races')
+        .withRelated('fields', [
+          initial.addResource('fields', 'name').withAttributes({ fieldType: '@cardstack/core-types::string' })
+        ])
     ])
   ]);
 
@@ -76,10 +85,14 @@ function initialModels() {
   initial.addResource('vehicles', '3').withAttributes({ name: 'Honeycoupe' });
   initial.addResource('vehicles', '4').withAttributes({ name: 'Wild Wiggler' });
 
-  let rainbowRoad = initial.addResource('tracks', 'rainbow-road').withAttributes({ name: 'Rainbow Road' });
-  let sweetSweetCanyon = initial.addResource('tracks', 'sweet-sweet-canyon').withAttributes({ name: 'Sweet Sweet Canyon' });
-  let koopaCity = initial.addResource('tracks', 'koopa-city').withAttributes({ name: 'Koopa City' });
-  let twistedMansion = initial.addResource('tracks', 'twisted-mansion').withAttributes({ name: 'Twisted Mansion' });
+  let rainbowRoad = initial.addResource('tracks', 'rainbow-road').withAttributes({ title: 'Rainbow Road' });
+  let sweetSweetCanyon = initial.addResource('tracks', 'sweet-sweet-canyon').withAttributes({ title: 'Sweet Sweet Canyon' });
+  let koopaCity = initial.addResource('tracks', 'koopa-city').withAttributes({ title: 'Koopa City' });
+  let twistedMansion = initial.addResource('tracks', 'twisted-mansion').withAttributes({ title: 'Twisted Mansion' });
+
+  let race1 = initial.addResource('races', 'race-1').withAttributes({ name: 'Race 1' });
+  let race2 = initial.addResource('races', 'race-2').withAttributes({ name: 'Race 2' });
+  initial.addResource('races', 'race-3').withAttributes({ name: 'Race 3' });
 
   initial.addResource('drivers', 'kingboo')
     .withAttributes({
@@ -102,7 +115,8 @@ function initialModels() {
     .withRelated('feeling', happyFeeling)
     .withRelated('vehicle', sportBikeVehicle)
     .withRelated('alternate-vehicle', standardKartVehicle)
-    .withRelated('tracks', [ rainbowRoad, sweetSweetCanyon, koopaCity ]);
+    .withRelated('tracks', [ rainbowRoad, sweetSweetCanyon, koopaCity ])
+    .withRelated('races', [ race1, race2 ]);
 
     initial.addResource('drivers', 'link')
     .withAttributes({
