@@ -42,15 +42,15 @@ module('Integration | Component | cs version control', function(hooks) {
     model.set('hasDirtyFields', false);
     model.set('isNew', false);
     await render(hbs`{{cs-version-control model=model enabled=true}}`);
-    assert.dom('.cs-version-control-footer button[disabled]').hasText('Update');
+    assert.dom('.cs-version-control--button.disabled').hasText('Save');
   });
 
   test('render with dirty content', async function(assert) {
     model.set('hasDirtyFields', true);
     model.set('isNew', false);
     await render(hbs`{{cs-version-control model=model enabled=true}}`);
-    assert.dom('.cs-version-control-footer button[disabled]').doesNotExist('no disabled button');
-    assert.dom('.cs-version-control-footer button').hasText('Update');
+    assert.dom('.cs-version-control--button.disabled').doesNotExist('no disabled button');
+    assert.dom('.cs-version-control--button-save.enabled').hasText('Save');
   });
 
   test('clicking update on dirty model triggers save', async function(assert) {
@@ -61,7 +61,7 @@ module('Integration | Component | cs version control', function(hooks) {
     model.set('hasDirtyFields', true);
     model.set('isNew', false);
     await render(hbs`{{cs-version-control model=model enabled=true}}`);
-    await click('.cs-version-control-footer button');
+    await click('.cs-version-control--button-save.enabled');
   });
 
   test('clicking update shows loading spinner', async function(assert) {
@@ -71,7 +71,7 @@ module('Integration | Component | cs version control', function(hooks) {
     model.set('isNew', false);
     assert.notOk(this.$('.cs-version-control--loading').length, 'Does not display loading before click');
     await render(hbs`{{cs-version-control model=model enabled=true}}`);
-    click('.cs-version-control-footer button');
+    click('.cs-version-control--button-save');
     await waitFor('.cs-version-control--loading');
     assert.ok(this.$('.cs-version-control--loading').length, 'Displays loading after click');
   });
@@ -84,7 +84,7 @@ module('Integration | Component | cs version control', function(hooks) {
     model.set('hasDirtyFields', false);
     model.set('isNew', false);
     await render(hbs`{{cs-version-control model=model enabled=true}}`);
-    await click('.cs-version-control-footer button');
+    await click('.cs-version-control--button-save');
   });
 
   test('clicking delete triggers deleteRecord', async function(assert) {
@@ -94,6 +94,6 @@ module('Integration | Component | cs version control', function(hooks) {
     });
     model.set('isNew', false);
     await render(hbs`{{cs-version-control model=model enabled=true}}`);
-    await click('.cs-version-control-footer .text-button');
+    await click('.cs-version-control--delete-button');
   });
 });

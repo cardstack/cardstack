@@ -22,25 +22,27 @@
       {{#if update.isRunning}}
         <span class="cs-version-control--loading" aria-label="Loading"></span>
       {{/if}}
+
       <button
-        class="cs-version-control-footer--button {{if disabled "disabled" "cs-version-control-footer-button--save"}}"
+        class="cs-version-control--button cs-version-control--button-save {{if disabled "disabled" "enabled"}}"
         disabled={{disabled}}
         {{action (perform update)}}
       >
         Save
       </button>
-      <button class="cs-version-control-footer--button">
+      <button class="cs-version-control--button cs-version-control--button-cancel">
         Cancel
       </button>
     </div>
+
     {{#with (concat modelType '-action-buttons') as |buttonsComponent|}}
       {{#if (is-component buttonsComponent)}}
         {{component buttonsComponent model=model modificationState=modificationState}}
       {{/if}}
     {{/with}}
 
-    <div class="cs-version-control-footer--delete">
-      <a class="cs-version-control-footer--delete-button" {{action (perform delete)}}>Delete</a>
+    <div class="cs-version-control--delete">
+      <a class="cs-version-control--delete-button" {{action (perform delete)}}>Delete</a>
     </div>
   </div>
 {{/liquid-if}}

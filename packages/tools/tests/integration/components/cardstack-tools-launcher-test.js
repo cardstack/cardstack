@@ -54,8 +54,8 @@ module('Integration | Component | cardstack tools launcher', function(hooks) {
   test('clicking icon toggles tools', async function(assert) {
     await render(hbs`{{cardstack-tools-launcher}}`);
     run(() => {
-      this.$('svg').click();
+      this.$('button').click();
     });
-    assert.equal(this.$('svg.active').length, 1, "found active icon");
+    assert.equal(this.$('button.active').length, 1, "found active button");
   });
 });
