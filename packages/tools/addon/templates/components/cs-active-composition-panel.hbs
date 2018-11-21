@@ -32,9 +32,9 @@
         unhovered=(perform highlightAndScrollToField null)
       }}
         <div class="cs-field-editor-section">
-          {{#if fieldModel.grouped}}
-            {{#each fieldModel.grouped as |fieldName|}}
-              {{#with fieldModel.content as |content|}}
+          {{#let fieldModel.content (eq fieldModel.content model) as |content isPageModelField|}}
+            {{#if fieldModel.grouped}}
+              {{#each fieldModel.grouped as |fieldName|}}
                 <label>{{cs-field-caption content fieldName}}</label>
                 {{!--
                   We allow editing fields of related resources. We should come back to this after #448 is completed.
@@ -44,7 +44,7 @@
                   field=fieldName
                   enabled=editingEnabled
                   canUpdate=(or
-                    (not (eq fieldModel.content model))
+                    (not isPageModelField)
                     (and
                       permissions.mayUpdateResource
                       (contains fieldName permissions.writableFields))
@@ -52,26 +52,26 @@
                   onchange=(action "validate")
                   errors=(get validationErrors fieldName)
                 }}
-              {{/with}}
-            {{/each}}
-          {{else}}
-            {{!--
-              We allow editing fields of related resources. We should come back to this after #448 is completed.
-            --}}
-            {{cs-field-editor
-              content=fieldModel.content
-              field=fieldModel.name
-              enabled=editingEnabled
-              canUpdate=(or
-                (not (eq fieldModel.content model))
-                (and
-                  permissions.mayUpdateResource
-                  (contains fieldModel.name permissions.writableFields))
-              )
-              onchange=(action "validate")
-              errors=(get validationErrors fieldModel.name)
-            }}
-          {{/if}}
+              {{/each}}
+            {{else}}
+              {{!--
+                We allow editing fields of related resources. We should come back to this after #448 is completed.
+              --}}
+              {{cs-field-editor
+                content=content
+                field=fieldModel.name
+                enabled=editingEnabled
+                canUpdate=(or
+                  (not isPageModelField)
+                  (and
+                    permissions.mayUpdateResource
+                    (contains fieldModel.name permissions.writableFields))
+                )
+                onchange=(action "validate")
+                errors=(get validationErrors fieldModel.name)
+              }}
+            {{/if}}
+          {{/let}}
         </div>
       {{/cs-collapsible-section}}
     {{/let}}
