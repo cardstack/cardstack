@@ -4,6 +4,7 @@ import injectOptional from 'ember-inject-optional';
 import { camelize } from '@ember/string';
 import { defaultBranch } from '@cardstack/plugin-utils/environment';
 import { singularize, pluralize } from 'ember-inflector';
+import { capitalize } from '@ember/string';
 import { hubURL } from '@cardstack/plugin-utils/environment';
 import { get } from '@ember/object';
 import fetch from 'fetch';
@@ -131,6 +132,14 @@ export default Service.extend({
       writableFields: relationships['writable-fields'].data
         .map((field) => camelize(field.id))
     }
+  },
+
+  getCardMeta(card, attribute) {
+    if (attribute === 'human-id') {
+      return [`${capitalize(getType(card))} `, card.id]
+        .join('#');
+    }
+    return '';
   },
 
   _headers() {

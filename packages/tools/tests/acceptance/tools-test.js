@@ -38,7 +38,7 @@ module('Acceptance | tools', function(hooks) {
     let matching = findInputWithValue.call(this, '10 steps to becoming a fearsome pirate');
     assert.ok(matching, 'found field editor for title');
 
-    element = findTriggerElementWithLabel.call(this, /Body/);
+    element = findTriggerElementWithLabel.call(this, /Comment #1: Body/);
     await click(element);
     matching = findInputWithValue.call(this, 'Look behind you, a Three-Headed Monkey!');
     assert.ok(matching, 'found field editor for comment body');
@@ -82,6 +82,18 @@ module('Acceptance | tools', function(hooks) {
 
     let titleSections = findSectionLabels.call(this, "Title");
     assert.equal(titleSections.length, 1, "Rendered fields only appear once");
+  });
+
+  test('collapsible panel captions are unambiguous', async function(assert) {
+    await visit('/1');
+    await login();
+    await click('.cardstack-tools-launcher');
+
+    assert.ok(findTriggerElementWithLabel.call(this, /Blogger #1: Name/));
+    assert.ok(findTriggerElementWithLabel.call(this, /Comment #1: Body/));
+    assert.ok(findTriggerElementWithLabel.call(this, /Comment #1: Karma/));
+    assert.ok(findTriggerElementWithLabel.call(this, /Comment #2: Body/));
+    assert.ok(findTriggerElementWithLabel.call(this, /Comment #2: Karma/));
   });
 
   test('disable inputs for computed fields', async function(assert) {
