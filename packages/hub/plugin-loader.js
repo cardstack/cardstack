@@ -134,13 +134,12 @@ class PluginLoader {
     let packageJSON = path.join(realdir, 'package.json');
     let json = require(packageJSON);
     if ((dupeModule = Object.values(seen).find(i => i.id === json.name))) {
-      // DONT FORGET TO UNCOMMENT THIS!!!
-      // let msg = action => `The plugin module name '${json.name}' has already been loaded from the module path ${dupeModule.attributes.rawDir}, ${action} load of module at path ${dir}.`;
-      // if (this.environment !== 'test') {
-        // log.warn(msg('skipping'));
-      // } else {
-      //   throw new Error(msg('conflict with'));
-      // }
+      let msg = action => `The plugin module name '${json.name}' has already been loaded from the module path ${dupeModule.attributes.rawDir}, ${action} load of module at path ${dir}.`;
+      if (this.environment !== 'test') {
+        log.warn(msg('skipping'));
+      } else {
+        throw new Error(msg('conflict with'));
+      }
       if (get(dupeModule, 'attributes.includedFrom')) {
         dupeModule.attributes.includedFrom.push(breadcrumbs);
       }

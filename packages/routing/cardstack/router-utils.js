@@ -47,8 +47,8 @@ function findStaticMappingRoute(router) {
     let { path, query } = route;
     if (!path || !query) { continue; }
 
-    let typeReplacement = get(query, 'filter.type');
     // TODO need to refactor this after our search filtering defaults to exact match
+    let typeReplacement = get(query, 'filter.type.exact');
     let idReplacement = get(query, 'filter.id.exact');
 
     if (typeReplacement && idReplacement &&
@@ -70,7 +70,7 @@ function findFriendlyIdBasedRoute(router, card) {
     let filter = query.filter;
     if (!filter) { continue; }
 
-    if (filter.type !== card.type || Object.keys(filter).length !== 2) { continue; }
+    if (get(filter, 'type.exact') !== card.type || Object.keys(filter).length !== 2) { continue; }
     let uniqueFieldName = Object.keys(filter).find(i => i !== 'type');
 
     // TODO need to refactor this after our search filtering defaults to exact match
@@ -87,19 +87,20 @@ function findVanityPathRoute(router, card) {
     if (!path || !query) { continue; }
 
     if (!path.includes(':') &&
-        get(query, 'filter.type') === card.type &&
         // TODO need to refactor this after our search filtering defaults to exact match
+        get(query, 'filter.type.exact') === card.type &&
         get(query, 'filter.id.exact') === card.id) {
       return route;
     }
   }
 }
 
-function getCanonicalPathFromRoute(route, card) {
+function resolvePathRelacementTags(route, card) {
   if (!get(route, 'query.filter') || !route.path) { return; }
 
   let filter = route.query.filter;
-  let typeReplacement = filter.type.charAt(0) === ':' ? filter.type : null;
+  let typeReplacement = get(filter, 'type.exact');
+  typeReplacement = typeReplacement.charAt(0) === ':' ? typeReplacement : null;
   let uniqueFieldName = Object.keys(filter).find(i => i !== 'type');
 
   let path = route.path;
@@ -108,8 +109,9 @@ function getCanonicalPathFromRoute(route, card) {
   }
 
   if (uniqueFieldName === 'id') {
-    path = path.replace(':id', card.id);
-  } else if (filter[uniqueFieldName].exact === ':friendly_id') {
+    let idReplacement = get(filter, 'id.exact');
+    path = idReplacement ? path.replace(idReplacement, card.id) : path;
+  } else if (get(filter[uniqueFieldName], 'exact') === ':friendly_id') {
     path = path.replace(':friendly_id', card.attributes[uniqueFieldName]);
   }
 
@@ -124,12 +126,12 @@ function getCanonicalPath(router, card) {
 
   route = findFriendlyIdBasedRoute(router, card);
   if (route) {
-    return getCanonicalPathFromRoute(route, card);
+    return resolvePathRelacementTags(route, card);
   }
 
   route = findStaticMappingRoute(router);
   if (route) {
-    return getCanonicalPathFromRoute(route, card);
+    return resolvePathRelacementTags(route, card);
   }
 }
 
