@@ -1,4 +1,4 @@
-{{#if tools.active}}
+{{#if (and tools.active tools.available)}}
   {{cardstack-edge "top" (component "cardstack-header")}}
   {{cardstack-edge "right" (component "cardstack-toolbox")}}
   {{cs-field-overlays}}
