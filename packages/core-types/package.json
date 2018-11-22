@@ -67,7 +67,7 @@
     "eslint-plugin-ember": "^5.0.0",
     "eslint-plugin-node": "^5.2.1",
     "loader.js": "^4.2.3",
-    "qunit-dom": "^0.7.1"
+    "qunit-dom": "^0.8.0"
   },
   "engines": {
     "node": ">= 8"
