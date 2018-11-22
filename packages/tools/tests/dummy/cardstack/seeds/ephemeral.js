@@ -48,11 +48,32 @@ function initialModels() {
       }).withRelated('related-types', [
         initial.getResource('content-types', 'bloggers')
       ]),
+      initial.addResource('fields', 'karma-value').withAttributes({
+        caption: 'Value',
+        fieldType: '@cardstack/core-types::integer'
+      }),
+      initial.addResource('fields', 'karma-type').withAttributes({
+        caption: 'Type',
+        fieldType: '@cardstack/core-types::belongs-to',
+        editorComponent: 'field-editors/dropdown-choices-editor'
+      }).withRelated('related-types', [
+        initial.addResource('content-types', 'karma-types')
+          .withRelated('fields', [
+            initial.addResource('fields', 'title')
+              .withAttributes({ fieldType: '@cardstack/core-types::string' })
+          ])
+        ]),
     ]);
 
   initial.addResource('content-types', 'posts')
     .withAttributes({
-      defaultIncludes: ['author', 'comments', 'comments.poster', 'reading-time-unit']
+      defaultIncludes: [
+        'author',
+        'reading-time-unit',
+        'comments',
+        'comments.poster',
+        'comments.karma-type',
+      ]
     })
     .withRelated('fields', [
       initial.addResource('fields', 'title').withAttributes({
@@ -117,17 +138,28 @@ function initialModels() {
       name: 'LeChuck'
     });
 
+  let goodKarma = initial.addResource('karma-types', '1')
+    .withAttributes({ title: 'Good' });
+  let badKarma = initial.addResource('karma-types', '2')
+    .withAttributes({ title: 'Bad' });
+  initial.addResource('karma-types', '3')
+    .withAttributes({ title: 'Nirvana' });
+
   let threeHeadedMonkey = initial.addResource('comments', '1')
     .withAttributes({
-      body: 'Look behind you, a Three-Headed Monkey!'
+      body: 'Look behind you, a Three-Headed Monkey!',
+      karmaValue: 10
     })
-    .withRelated('poster', guybrush);
+    .withRelated('poster', guybrush)
+    .withRelated('karma-type', goodKarma);
 
   let diapers = initial.addResource('comments', '2')
     .withAttributes({
-      body: 'Have you stopped wearing diapers yet?'
+      body: 'Have you stopped wearing diapers yet?',
+      karmaValue: 5
     })
-    .withRelated('poster', guybrush);
+    .withRelated('poster', guybrush)
+    .withRelated('karma-type', badKarma);
 
   let doorstop = initial.addResource('comments', '3')
     .withAttributes({

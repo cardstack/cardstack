@@ -18,13 +18,13 @@
   }}
 
   {{#each renderedFields key="id" as |fieldMark|}}
-    {{#let fieldMark.model as |fieldModel|}}
+    {{#let fieldMark.model (eq fieldMark.model.content model) as |fieldModel isPageModelField|}}
       {{#cs-collapsible-section
         class=(concat "cs-toolbox-section "
           (if
             (cs-has-errors validationErrors fieldModel (hash name=fieldModel.name grouped=fieldModel.grouped))
             "invalid"))
-        title=fieldModel.caption
+        title=(cs-card-meta-caption fieldModel.content fieldModel.caption isPageModelField)
         opened=(eq fieldMark.id openedFieldId)
         open=(action openField fieldMark)
         close=(action openField null)
@@ -32,9 +32,9 @@
         unhovered=(perform highlightAndScrollToField null)
       }}
         <div class="cs-field-editor-section">
-          {{#if fieldModel.grouped}}
-            {{#each fieldModel.grouped as |fieldName|}}
-              {{#with fieldModel.content as |content|}}
+          {{#let fieldModel.content as |content|}}
+            {{#if fieldModel.grouped}}
+              {{#each fieldModel.grouped as |fieldName|}}
                 <label>{{cs-field-caption content fieldName}}</label>
                 {{!--
                   We allow editing fields of related resources. We should come back to this after #448 is completed.
@@ -44,7 +44,7 @@
                   field=fieldName
                   enabled=editingEnabled
                   canUpdate=(or
-                    (not (eq fieldModel.content model))
+                    (not isPageModelField)
                     (and
                       permissions.mayUpdateResource
                       (contains fieldName permissions.writableFields))
@@ -52,56 +52,58 @@
                   onchange=(action "validate")
                   errors=(get validationErrors fieldName)
                 }}
-              {{/with}}
-            {{/each}}
-          {{else}}
-            {{!--
-              We allow editing fields of related resources. We should come back to this after #448 is completed.
-            --}}
-            {{cs-field-editor
-              content=fieldModel.content
-              field=fieldModel.name
-              enabled=editingEnabled
-              canUpdate=(or
-                (not (eq fieldModel.content model))
-                (and
-                  permissions.mayUpdateResource
-                  (contains fieldModel.name permissions.writableFields))
-              )
-              onchange=(action "validate")
-              errors=(get validationErrors fieldModel.name)
-            }}
-          {{/if}}
+              {{/each}}
+            {{else}}
+              {{!--
+                We allow editing fields of related resources. We should come back to this after #448 is completed.
+              --}}
+              {{cs-field-editor
+                content=content
+                field=fieldModel.name
+                enabled=editingEnabled
+                canUpdate=(or
+                  (not isPageModelField)
+                  (and
+                    permissions.mayUpdateResource
+                    (contains fieldModel.name permissions.writableFields))
+                )
+                onchange=(action "validate")
+                errors=(get validationErrors fieldModel.name)
+              }}
+            {{/if}}
+          {{/let}}
         </div>
       {{/cs-collapsible-section}}
     {{/let}}
   {{/each}}
 
   {{#each modelFields as |field|}}
-    {{#cs-collapsible-section
-      class=(concat "cs-toolbox-section "
-        (if
-          (cs-has-errors validationErrors field.model (hash name=field.name))
-          "invalid"))
-      title=field.options.caption
-      opened=(eq field.id openedFieldId)
-      open=(action openField field)
-      close=(action openField null)
-    }}
-      <div class="cs-field-editor-section">
-        {{cs-field-editor
-          content=field.model
-          field=field.name
-          enabled=editingEnabled
-          canUpdate=(and
-            permissions.mayUpdateResource
-            (contains field.name permissions.writableFields)
-          )
-          onchange=(action "validate")
-          errors=(get validationErrors field.name)
-        }}
-      </div>
-    {{/cs-collapsible-section}}
+    {{#let (eq field.model model) as |isPageModelField|}}
+      {{#cs-collapsible-section
+        class=(concat "cs-toolbox-section "
+          (if
+            (cs-has-errors validationErrors field.model (hash name=field.name))
+            "invalid"))
+        title=(cs-card-meta-caption field.model field.options.caption isPageModelField)
+        opened=(eq field.id openedFieldId)
+        open=(action openField field)
+        close=(action openField null)
+      }}
+        <div class="cs-field-editor-section">
+          {{cs-field-editor
+            content=field.model
+            field=field.name
+            enabled=editingEnabled
+            canUpdate=(and
+              permissions.mayUpdateResource
+              (contains field.name permissions.writableFields)
+            )
+            onchange=(action "validate")
+            errors=(get validationErrors field.name)
+          }}
+        </div>
+      {{/cs-collapsible-section}}
+    {{/let}}
   {{/each}}
 
 
