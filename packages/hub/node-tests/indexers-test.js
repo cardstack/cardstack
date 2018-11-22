@@ -1,10 +1,10 @@
-const JSONAPIFactory = require('../../../tests/stub-project/node_modules/@cardstack/test-support/jsonapi-factory');
+const JSONAPIFactory = require('@cardstack/test-support/jsonapi-factory');
 const Session = require('@cardstack/plugin-utils/session');
 const {
   createDefaultEnvironment,
   destroyDefaultEnvironment,
   defaultDataSourceId
-} = require('../../../tests/stub-project/node_modules/@cardstack/test-support/env');
+} = require('@cardstack/test-support/env');
 
 describe('hub/indexers', function() {
   let env;

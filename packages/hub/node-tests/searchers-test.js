@@ -1,8 +1,8 @@
-const JSONAPIFactory = require('../../../tests/stub-searcher/node_modules/@cardstack/test-support/jsonapi-factory');
+const JSONAPIFactory = require('@cardstack/test-support/jsonapi-factory');
 const {
   createDefaultEnvironment,
   destroyDefaultEnvironment
-} = require('../../../tests/stub-searcher/node_modules/@cardstack/test-support/env');
+} = require('@cardstack/test-support/env');
 
 describe('hub/searchers/basics', function() {
   let env, chocolate, source;

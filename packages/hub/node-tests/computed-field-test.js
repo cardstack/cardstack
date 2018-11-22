@@ -1,9 +1,9 @@
-const JSONAPIFactory = require('../../../tests/sample-computed-fields/node_modules/@cardstack/test-support/jsonapi-factory');
+const JSONAPIFactory = require('@cardstack/test-support/jsonapi-factory');
 
 const {
   createDefaultEnvironment,
   destroyDefaultEnvironment
-} = require('../../../tests/sample-computed-fields/node_modules/@cardstack/test-support/env');
+} = require('@cardstack/test-support/env');
 
 describe('hub/computed-fields', function() {
   let env, apple, banana, chocolate;

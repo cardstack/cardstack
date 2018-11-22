@@ -1,8 +1,8 @@
-const JSONAPIFactory = require('../../../tests/stub-project/node_modules/@cardstack/test-support/jsonapi-factory');
+const JSONAPIFactory = require('@cardstack/test-support/jsonapi-factory');
 const {
   createDefaultEnvironment,
   destroyDefaultEnvironment
-} = require('../../../tests/stub-project/node_modules/@cardstack/test-support/env');
+} = require('@cardstack/test-support/env');
 
 describe('schema/group', function() {
   let env, hassan, ed, vanGogh, schema;

@@ -1,8 +1,8 @@
-const JSONAPIFactory = require('../../../tests/stub-static-models/node_modules/@cardstack/test-support/jsonapi-factory');
+const JSONAPIFactory = require('@cardstack/test-support/jsonapi-factory');
 const {
   createDefaultEnvironment,
   destroyDefaultEnvironment
-} = require('../../../tests/stub-static-models/node_modules/@cardstack/test-support/env');
+} = require('@cardstack/test-support/env');
 const project = __dirname + '/../../../tests/stub-static-models';
 
 describe('static-indexer', function() {

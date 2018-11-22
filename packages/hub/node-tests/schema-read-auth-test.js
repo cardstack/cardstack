@@ -1,9 +1,9 @@
 const Session = require('@cardstack/plugin-utils/session');
-const JSONAPIFactory = require('../../../tests/stub-project/node_modules/@cardstack/test-support/jsonapi-factory');
+const JSONAPIFactory = require('@cardstack/test-support/jsonapi-factory');
 const {
   createDefaultEnvironment,
   destroyDefaultEnvironment
-} = require('../../../tests/stub-searcher/node_modules/@cardstack/test-support/env');
+} = require('@cardstack/test-support/env');
 
 let env, baseSchema, searchers, writers;
 
