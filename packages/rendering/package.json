@@ -52,7 +52,7 @@
     "eslint-plugin-ember": "^5.0.0",
     "eslint-plugin-node": "^5.2.1",
     "loader.js": "^4.2.3",
-    "mocha": "^4.0.1"
+    "mocha": "^5.2.0"
   },
   "engines": {
     "node": ">= 8"
