@@ -4,7 +4,7 @@ const {
 } = require('@cardstack/test-support/env');
 const JSONAPIFactory = require('@cardstack/test-support/jsonapi-factory');
 const { join } = require('path');
-const { readFileSync, readdirSync } = require('fs');
+const { readFileSync, readdirSync, mkdirSync, rmdirSync } = require('fs');
 const { promisify } = require('util');
 const sinon = require('sinon');
 const temp = require('temp').track();
@@ -140,5 +140,55 @@ describe('local git cache service', function() {
     await destroyDefaultEnvironment(env);
     service.getRepo.restore();
     service._makeRepo.restore();
+  });
+
+  it('allows you to restart the hub and it will re-use the exising cached folder', async function() {
+    this.timeout(20000);
+
+    sinon.spy(service, 'getRepo');
+    sinon.spy(service, '_makeRepo');
+
+    let tempRepoPath = await temp.path('test-4');
+    mkdirSync(tempRepoPath);
+
+    let factory = new JSONAPIFactory();
+
+    let dataSource1 = factory.addResource('data-sources')
+        .withAttributes({
+          'source-type': '@cardstack/git',
+          params: {
+            remote: {
+              url: 'ssh://root@localhost:9022/root/data-test',
+              privateKey,
+              cacheDir: tempRepoPath,
+            }
+          }
+        });
+
+    factory.addResource('plugin-configs', '@cardstack/hub')
+      .withRelated(
+        'default-data-source-test-1',
+        dataSource1
+      );
+
+    let env = await createDefaultEnvironment(`${__dirname}/..`, factory.getModels());
+
+    sinon.assert.calledTwice(service.getRepo);
+    sinon.assert.calledOnce(service._makeRepo);
+
+    await destroyDefaultEnvironment(env);
+    service.clearCache();
+
+    // create the environment a second time
+    env = await createDefaultEnvironment(`${__dirname}/..`, factory.getModels());
+
+    sinon.assert.callCount(service.getRepo, 4);
+    sinon.assert.calledTwice(service._makeRepo);
+
+
+    rmdirSync(tempRepoPath);
+    service.getRepo.restore();
+    service._makeRepo.restore();
+    await destroyDefaultEnvironment(env);
   });
 });
