@@ -4,10 +4,13 @@ const {
 } = require('@cardstack/test-support/env');
 const JSONAPIFactory = require('@cardstack/test-support/jsonapi-factory');
 const { join } = require('path');
-const { readFileSync, readdirSync, mkdirSync, rmdirSync } = require('fs');
+const { readFileSync, writeFileSync, readdirSync, mkdirSync } = require('fs');
 const { promisify } = require('util');
 const sinon = require('sinon');
 const temp = require('temp').track();
+const filenamifyUrl = require('filenamify-url');
+const rimraf = promisify(require('rimraf'));
+
 const service = require('../service');
 
 const mkdir = promisify(temp.mkdir);
@@ -21,8 +24,9 @@ describe('local git cache service', function() {
     service.clearCache();
   });
 
-  afterEach(() => {
+  afterEach(async () => {
     service.clearCache();
+    await temp.cleanup();
   });
 
   it('creates a local clone of the repo with a naming convention', async function() {
@@ -52,7 +56,6 @@ describe('local git cache service', function() {
 
     expect(readdirSync(tempRepoPath)).to.have.length(1);
 
-    await temp.cleanup();
     await destroyDefaultEnvironment(env);
   });
 
@@ -101,7 +104,6 @@ describe('local git cache service', function() {
 
     expect(readdirSync(tempRepoPath)).to.have.length(2);
 
-    await temp.cleanup();
     await destroyDefaultEnvironment(env);
   });
 
@@ -136,7 +138,6 @@ describe('local git cache service', function() {
     sinon.assert.calledTwice(service.getRepo);
     sinon.assert.calledOnce(service._makeRepo);
 
-    await temp.cleanup();
     await destroyDefaultEnvironment(env);
     service.getRepo.restore();
     service._makeRepo.restore();
@@ -186,7 +187,52 @@ describe('local git cache service', function() {
     sinon.assert.calledTwice(service._makeRepo);
 
 
-    rmdirSync(tempRepoPath);
+    await rimraf(tempRepoPath);
+    service.getRepo.restore();
+    service._makeRepo.restore();
+    await destroyDefaultEnvironment(env);
+  });
+
+  it('will re-clone the remote repo if the local folder exists but is not a valid git repo', async function() {
+    this.timeout(20000);
+
+    sinon.spy(service, 'getRepo');
+    sinon.spy(service, '_makeRepo');
+
+    let url = 'ssh://root@localhost:9022/root/data-test';
+
+    let tempRepoPath = await mkdir('test-5');
+
+    let repoPath = join(tempRepoPath, filenamifyUrl(url));
+    mkdirSync(repoPath);
+    mkdirSync(join(repoPath, '.git'));
+    writeFileSync(join(repoPath, '.git', 'index'), 'I really shouldnt be here');
+
+    let factory = new JSONAPIFactory();
+
+    let dataSource1 = factory.addResource('data-sources')
+        .withAttributes({
+          'source-type': '@cardstack/git',
+          params: {
+            remote: {
+              url,
+              privateKey,
+              cacheDir: tempRepoPath,
+            }
+          }
+        });
+
+    factory.addResource('plugin-configs', '@cardstack/hub')
+      .withRelated(
+        'default-data-source-test-1',
+        dataSource1
+      );
+
+    let env = await createDefaultEnvironment(`${__dirname}/..`, factory.getModels());
+
+    sinon.assert.calledTwice(service.getRepo);
+    sinon.assert.calledOnce(service._makeRepo);
+
     service.getRepo.restore();
     service._makeRepo.restore();
     await destroyDefaultEnvironment(env);

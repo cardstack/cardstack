@@ -2,8 +2,9 @@ const { promisify } = require('util');
 const mkdirp = promisify(require('mkdirp'));
 const filenamifyUrl = require('filenamify-url');
 const { existsSync } = require('fs');
+const rimraf = promisify(require('rimraf'));
 const { join } = require('path');
-const { Clone, Cred, Merge } = require('nodegit');
+const { Clone, Cred, Merge, Repository } = require('nodegit');
 const { tmpdir } = require('os');
 
 class GitLocalCache {
@@ -46,10 +47,6 @@ class GitLocalCache {
 
     let repoPath = join(cacheDirectory, filenamifyUrl(remote.url));
 
-    if(!existsSync(repoPath)) {
-      await mkdirp(repoPath);
-    }
-
     let fetchOpts = {
       callbacks: {
         credentials: (url, userName) => {
@@ -61,9 +58,28 @@ class GitLocalCache {
       }
     };
 
-    let repo = await Clone(remote.url, repoPath, {
-      fetchOpts
-    });
+    let repo;
+
+    if(existsSync(repoPath)) {
+      try {
+        repo = await Repository.open(repoPath);
+      } catch (e) {
+        // if opening existing repo fails for any reason we should just delete it and clone it
+        await rimraf(repoPath);
+
+        await mkdirp(repoPath);
+
+        repo = await Clone(remote.url, repoPath, {
+          fetchOpts
+        });
+      }
+    } else {
+      await mkdirp(repoPath);
+
+      repo = await Clone(remote.url, repoPath, {
+        fetchOpts
+      });
+    }
 
     return {
       repo,

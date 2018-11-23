@@ -20,6 +20,7 @@
     "mkdirp": "^0.5.1",
     "moment-timezone": "^0.5.11",
     "nodegit": "^0.23.0",
+    "rimraf": "^2.6.2",
     "temp": "^0.8.3"
   },
   "devDependencies": {
