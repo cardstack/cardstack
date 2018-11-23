@@ -37,15 +37,11 @@ class GitLocalCache {
     let cacheDirectory = remote.cacheDir;
 
     if (!cacheDirectory) {
-      if(!this.cacheDirectory) {
-        this.cacheDirectory = join(tmpdir(), 'cardstack-git-local-cache');
-      }
+      cacheDirectory = join(tmpdir(), 'cardstack-git-local-cache');
 
-      if(!existsSync(this.cacheDirectory)) {
-        await mkdirp(this.cacheDirectory);
+      if(!existsSync(cacheDirectory)) {
+        await mkdirp(cacheDirectory);
       }
-
-      cacheDirectory = this.cacheDirectory;
     }
 
     let repoPath = join(cacheDirectory, filenamifyUrl(remote.url));
