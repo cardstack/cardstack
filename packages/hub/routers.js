@@ -157,7 +157,7 @@ class Routers {
           'routing-card': { data: { type: routingCard.data.type, id: routingCard.data.id } }
         } : {
           'routing-card': { data: { type: previousCardContext.data.type, id: previousCardContext.data.id } },
-          'route-path-suffix': route.path.split('?')[0]
+          'route-path-suffix': route.path.split('?')[0] + (matchedQueryParams ? matchedQueryParams.replace(/([?&])([^=]+)/g, `$1${cardContext.data.type}[$2]`) : '')
         };
 
       if (usingDefaultRouter || (!route.query && previousUsingDefaultRouter)) {
