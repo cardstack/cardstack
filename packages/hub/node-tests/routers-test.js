@@ -329,7 +329,7 @@ describe('hub/routers', function () {
       expect(included[0]).has.property('id', 'sally');
       expect(included[0]).has.property('type', 'kitties');
       expect(included[0]).has.deep.property('attributes.name', 'Sally');
-      expect(included[0]).has.deep.property('links.self', '/forward/kitties/sally?kitties[foo]=bar&kitties[bee]=bop');
+      expect(included[0]).has.deep.property('links.self', '/forward/kitties/sally');
     });
 
     it('can throw error if the router has recursed through more than the maximum number of router recursions', async function () {
