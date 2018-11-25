@@ -5,7 +5,7 @@ module.exports = {
     'Chrome'
   ],
   launch_in_dev: [
-    // 'Chrome'
+    'Chrome'
   ],
   browser_args: {
     Chrome: {

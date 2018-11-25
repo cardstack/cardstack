@@ -27,6 +27,7 @@ function initialModels() {
 
   initial.addResource('content-types', 'posts')
     .withAttributes({
+      router: '@cardstack/test-support-router',
       fieldsets: {
         isolated: [{ field: 'page', format: 'embedded'}],
         embedded: [{ field: 'page', format: 'embedded'}]

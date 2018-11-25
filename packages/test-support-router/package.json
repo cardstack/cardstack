@@ -1,0 +1,29 @@
+{
+  "name": "@cardstack/test-support-router",
+  "keywords": [
+    "cardstack-plugin"
+  ],
+  "cardstack-plugin": {
+    "api-version": 1
+  },
+  "version": "0.11.10",
+  "devDependencies": {
+    "@cardstack/eslint-config": "0.11.9",
+    "eslint": "^5.8.0",
+    "eslint-plugin-ember": "^5.0.0",
+    "eslint-plugin-node": "^5.2.1"
+  },
+  "author": "Hassan Abdel-Rahman <hassan.abdelrahman@gmail.com>",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/cardstack/cardstack/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/cardstack/cardstack.git"
+  },
+  "homepage": "https://github.com/cardstack/cardstack#readme",
+  "engines": {
+    "node": ">= 8"
+  }
+}

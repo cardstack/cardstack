@@ -11,7 +11,7 @@
     "infinite-recursing": "*",
     "non-canonical-routing": "*",
     "bad-router-missing-path": "*",
-    "bad-router-missing-query": "*"
+    "router-missing-query": "*"
   },
   "devDependencies": {
     "@cardstack/hub": "*",

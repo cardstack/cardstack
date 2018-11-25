@@ -12,8 +12,8 @@ module('Acceptance | content', function(hooks) {
   });
 
   test('passes query params to primary card in route', async function(assert){
-    await visit('/posts/1?foo=bar&bee=bop');
-    assert.equal(currentURL(), '/posts/1?foo=bar&bee=bop');
+    await visit('/posts/1?posts[foo]=bar&posts[bee]=bop');
+    assert.equal(currentURL(), '/posts/1?posts[foo]=bar&posts[bee]=bop');
     assert.equal(this.element.querySelector('.foo').textContent.trim(), 'foo is bar');
     assert.equal(this.element.querySelector('.bee').textContent.trim(), 'bee is bop');
   });

@@ -84,7 +84,18 @@ class Routers {
     return { data: await this._getErrorCard(schema, typeStack, notFoundErrorCardId) };
   }
 
-  async _recurseThruSpaces({ plugins, schema, branch, originalPath, cardContext, remainingPath, typeStack=[], count=0 }) {
+  async _recurseThruSpaces({
+    plugins,
+    schema,
+    branch,
+    originalPath,
+    cardContext,
+    remainingPath,
+    previousCardContext,
+    previousUsingDefaultRouter,
+    typeStack = [],
+    count = 0 }) {
+
     if (count > maxRoutingRecursion) {
       throw new Error(`The space for path '${originalPath}' could not be resolved after ${maxRoutingRecursion} routing attempts.`);
     }
@@ -102,46 +113,64 @@ class Routers {
     }
 
     let updatedRemainingPath = remainingPath;
+    let matchedQueryParams;
+    let route;
     if (router) {
-      let route = getRoute(router, remainingPath, cardContext.data.type);
+      route = getRoute(router, remainingPath, cardContext.data.type);
       if (!route) {
         cardContext = await this._getNotFoundErrorCard(schema, typeStack);
       } else {
         updatedRemainingPath = route.remainingPath;
-        let { data: cards, included } = await this.searchers.search(Session.INTERNAL_PRIVILEGED, branch, route.query);
+        matchedQueryParams = route.matchedQueryParams;
+        let { data: cards, included } = route.query ?
+          await this.searchers.search(Session.INTERNAL_PRIVILEGED, branch, route.query) :
+          { data: [ routingCard.data ], included: routingCard.included };
 
         if (!cards || !cards.length) {
           cardContext = await this._getNotFoundErrorCard(schema, typeStack);
         } else {
           cardContext = { data: cards[0], included };
-          if (updatedRemainingPath && updatedRemainingPath.charAt(0) === '/') {
-            return await this._recurseThruSpaces({ plugins, schema, branch, originalPath, cardContext, remainingPath: updatedRemainingPath, typeStack, count: count + 1 });
+
+          if (canConsumePath(updatedRemainingPath, cardContext)) {
+            return await this._recurseThruSpaces({
+              plugins,
+              schema,
+              branch,
+              originalPath,
+              cardContext,
+              previousCardContext: routingCard,
+              previousUsingDefaultRouter: usingDefaultRouter,
+              remainingPath: updatedRemainingPath,
+              typeStack,
+              count: count + 1
+            });
            }
         }
       }
     }
 
-    if (get(cardContext, 'data.meta.is-error-card')) {
-      // regurgitate the consumed path, as you were not able to resolve the path after all
-      updatedRemainingPath = '';
-    }
-
-    let consumedPath = originalPath.replace(updatedRemainingPath, '');
     let included = [ cardContext.data ].concat(cardContext.included || []);
 
-    let meta = {
-      'routing-card': { data: { type: routingCard.data.type, id: routingCard.data.id } }
-    };
-    if (usingDefaultRouter) {
-      meta['using-default-router'] = true;
+    let meta;
+    if (route) {
+      meta = route.query ? {
+          'routing-card': { data: { type: routingCard.data.type, id: routingCard.data.id } }
+        } : {
+          'routing-card': { data: { type: previousCardContext.data.type, id: previousCardContext.data.id } },
+          'route-path-suffix': route.path.split('?')[0]
+        };
+
+      if (usingDefaultRouter || (!route.query && previousUsingDefaultRouter)) {
+        meta['using-default-router'] = true;
+      }
     }
 
     return {
       data: {
-        id: consumedPath,
+        id: originalPath,
         type: 'spaces',
         attributes: {
-          'query-params': updatedRemainingPath
+          'query-params': matchedQueryParams || ''
         },
         relationships: {
           'primary-card': {
@@ -153,5 +182,11 @@ class Routers {
       included
     };
   }
-
 });
+
+function canConsumePath(path, cardContext) {
+  if (path.charAt(0) === '/') { return true; }
+
+  return path.charAt(0) === '?' &&
+         decodeURI(path).match(new RegExp(`${cardContext.data.type}\\[[^\\]]+\\]=`));
+}

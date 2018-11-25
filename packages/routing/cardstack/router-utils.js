@@ -136,20 +136,20 @@ function getCanonicalPath(router, card) {
 }
 
 function getRoute(router, path, type) {
-  let { route: matchedRoute, remainingPath } = routeThatMatchesPath(router, path, type);
+  let { route: matchedRoute, remainingPath, matchedQueryParams } = routeThatMatchesPath(router, path, type);
 
   if (!matchedRoute) { return; }
-  if (!matchedRoute.query) {
-    throw new Error(`The route '${path}' for the router of content-type '${type}' is missing a query.`);
-  }
 
   let dictionary = buildSubstitutionDictionary(matchedRoute, path, type);
-  let query = JSON.stringify(matchedRoute.query);
-  for (let dynamicSegmentName of Object.keys(dictionary)) {
-    query = query.replace(new RegExp(`:${dynamicSegmentName}`, 'g'), dictionary[dynamicSegmentName]);
+  let query;
+  if (matchedRoute.query) {
+    query = JSON.stringify(matchedRoute.query);
+    for (let dynamicSegmentName of Object.keys(dictionary)) {
+      query = query.replace(new RegExp(`:${dynamicSegmentName}`, 'g'), dictionary[dynamicSegmentName]);
+    }
   }
 
-  return { query: JSON.parse(query), remainingPath };
+  return { query: query && JSON.parse(query), remainingPath, matchedQueryParams, path: matchedRoute.path };
 }
 
 function buildSubstitutionDictionary(route, path, type) {
@@ -187,6 +187,7 @@ function buildSubstitutionDictionary(route, path, type) {
 
 function routeThatMatchesPath(router, path, type) {
   let matchedRoute;
+  let matchedQueryParams;
   let remainingPath = path;
 
   for (let route of router) {
@@ -197,18 +198,21 @@ function routeThatMatchesPath(router, path, type) {
       (match, separator, param) => `\\${separator}${type}\\[${param}\\]=[^&]+`)
       .replace(/:[^/?#&]+/g, '[^/?#&]+')}`);
 
-    if (path.match(routeRegex)) {
+    if (decodeURI(path).match(routeRegex)) {
       matchedRoute = route;
 
       // consume the path part of the URL
       let pathRegex = new RegExp(`${route.path.split('?')[0].replace(/:[^/?#&]+/g, '[^/?#&]+')}`);
-      remainingPath = remainingPath.replace(pathRegex, '');
+      remainingPath = decodeURI(remainingPath).replace(pathRegex, '');
 
       // consume the query param part of the URL
       if (route.path.includes('?')) {
-        let queryParamRegex = new RegExp(`^${('?' + route.path.split('?')[1]).replace(/([?&])([^?&]+)=:[^&]+/g,
+        let routeQueryParams = route.path.split('?')[1];
+        let queryParamRegex = new RegExp(`^${('?' + routeQueryParams).replace(/([?&])([^?&]+)=:[^&]+/g,
           (match, separator, param) => `\\${separator}${type}\\[${param}\\]=[^&]+`)}`);
-        remainingPath = remainingPath.replace(queryParamRegex, '');
+        let queryParamMatch = decodeURI(remainingPath).match(queryParamRegex);
+        matchedQueryParams = queryParamMatch && queryParamMatch[0].replace(new RegExp(`${type}\\[([^\\]]+)\\]`, 'g'), '$1');
+        remainingPath = decodeURI(remainingPath).replace(queryParamRegex, '');
       }
 
       if (!remainingPath.includes('?') && remainingPath.includes('&')) {
@@ -218,7 +222,7 @@ function routeThatMatchesPath(router, path, type) {
     }
   }
 
-  return { route: matchedRoute, remainingPath };
+  return { route: matchedRoute, remainingPath, matchedQueryParams };
 }
 
 module.exports = {

@@ -212,6 +212,7 @@ module.exports = class DocumentContext {
                                { data: jsonapiDoc },
                                get(this.upstreamDoc, 'meta.using-default-router'));
       if (path) {
+        path += get(this.upstreamDoc, 'meta.route-path-suffix') || '';
         jsonapiDoc.links = jsonapiDoc.links || {};
         jsonapiDoc.links.self = path;
       }

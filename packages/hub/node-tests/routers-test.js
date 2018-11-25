@@ -114,7 +114,7 @@ describe('hub/routers', function () {
       ]);
 
     factory.addResource('content-types', 'kitties')
-      .withAttributes({ router: 'bad-router-missing-query' })
+      .withAttributes({ router: 'router-missing-query' })
       .withRelated('fields', [
         factory.addResource('fields', 'name').withAttributes({
           fieldType: '@cardstack/core-types::string'
@@ -300,14 +300,36 @@ describe('hub/routers', function () {
       expect(error.message).equals(`The router for content type 'ponies' has a route that is missing a path.`);
     });
 
-    it('can throw error if route is missing query definition', async function () {
-      let error;
-      try {
-        await searchers.get(env.session, 'master', 'spaces', '/forward/kitties/sally/favorite');
-      } catch (e) {
-        error = e;
-      }
-      expect(error.message).equals(`The route '/favorite' for the router of content-type 'kitties' is missing a query.`);
+    it('can return the routing card as the primary card when no query exists for the route', async function () {
+      let { included, data: space } = await searchers.get(env.session, 'master', 'spaces', '/forward/kitties/sally/favorite');
+
+      expect(space).has.property('type', 'spaces');
+      expect(space).has.property('id', '/forward/kitties/sally/favorite');
+      expect(space).has.deep.property('attributes.query-params', '');
+      expect(space).has.deep.property('relationships.primary-card.data.id', 'sally');
+      expect(space).has.deep.property('relationships.primary-card.data.type', 'kitties');
+
+      expect(included.length).equals(1);
+      expect(included[0]).has.property('id', 'sally');
+      expect(included[0]).has.property('type', 'kitties');
+      expect(included[0]).has.deep.property('attributes.name', 'Sally');
+      expect(included[0]).has.deep.property('links.self', '/forward/kitties/sally/favorite');
+    });
+
+    it('can return the routing card as the primary card when no query exists for the route with query param', async function () {
+      let { included, data: space } = await searchers.get(env.session, 'master', 'spaces', '/forward/kitties/sally?kitties[foo]=bar&kitties[bee]=bop&ignore-me=true');
+
+      expect(space).has.property('type', 'spaces');
+      expect(space).has.property('id', '/forward/kitties/sally?kitties[foo]=bar&kitties[bee]=bop&ignore-me=true');
+      expect(space).has.deep.property('attributes.query-params', '?foo=bar&bee=bop');
+      expect(space).has.deep.property('relationships.primary-card.data.id', 'sally');
+      expect(space).has.deep.property('relationships.primary-card.data.type', 'kitties');
+
+      expect(included.length).equals(1);
+      expect(included[0]).has.property('id', 'sally');
+      expect(included[0]).has.property('type', 'kitties');
+      expect(included[0]).has.deep.property('attributes.name', 'Sally');
+      expect(included[0]).has.deep.property('links.self', '/forward/kitties/sally');
     });
 
     it('can throw error if the router has recursed through more than the maximum number of router recursions', async function () {
@@ -484,7 +506,7 @@ describe('hub/routers', function () {
 
       expect(space).has.property('type', 'spaces');
       expect(space).has.property('id', '/sorted?cards[sort]=favorite-toy&foo=bar&bee=bop');
-      expect(space).has.deep.property('attributes.query-params', '?foo=bar&bee=bop');
+      expect(space).has.deep.property('attributes.query-params', '?sort=favorite-toy');
       expect(space).has.deep.property('relationships.primary-card.data.id', 'vanGogh');
       expect(space).has.deep.property('relationships.primary-card.data.type', 'puppies');
 
@@ -497,12 +519,12 @@ describe('hub/routers', function () {
       expect(included[0]).has.deep.property('links.self', '/favorite-puppy');
     });
 
-    it('can include query params that were not consumed', async function () {
+    it('does not include query params that were not consumed', async function () {
       let { data: space } = await searchers.get(env.session, 'master', 'spaces', '/favorite-puppy?foo=bar');
 
       expect(space).has.property('type', 'spaces');
       expect(space).has.property('id', '/favorite-puppy?foo=bar');
-      expect(space).has.deep.property('attributes.query-params', '?foo=bar');
+      expect(space).has.deep.property('attributes.query-params', '');
       expect(space).has.deep.property('relationships.primary-card.data.id', 'vanGogh');
       expect(space).has.deep.property('relationships.primary-card.data.type', 'puppies');
     });
