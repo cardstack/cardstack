@@ -11,7 +11,7 @@ export default Route.extend({
     let queryParams = '';
 
     if (Object.keys(transition.queryParams).length) {
-      queryParams = `?${qs.stringify(transition.queryParams)}`;
+      queryParams = `?${qs.stringify(transition.queryParams, { encodeValuesOnly: true })}`;
     }
 
     return this.get('store').findRecord('space', `${path.charAt(0) !== '/' ? '/' : ''}${path}${queryParams}`, { branch, reload: true })
@@ -35,7 +35,7 @@ export default Route.extend({
 
     let params = qs.parse(queryParamsString.replace('?', ''));
     controller.set('params', params);
-  }
+  },
 });
 
 function is404(err) {

@@ -1,5 +1,5 @@
 const Error = require('@cardstack/plugin-utils/error');
-const { get } = require('lodash');
+const { uniq, get } = require('lodash');
 
 async function getPath(plugins, schema, routingCard, card, useDefaultRouter) {
   if (!routingCard) { return; }
@@ -136,7 +136,10 @@ function getCanonicalPath(router, card) {
 }
 
 function getRoute(router, path, type) {
-  let { route: matchedRoute, remainingPath, matchedQueryParams } = routeThatMatchesPath(router, path, type);
+  let { route: matchedRoute,
+    remainingPath,
+    matchedQueryParams,
+    allowedQueryParams } = routeThatMatchesPath(router, path, type);
 
   if (!matchedRoute) { return; }
 
@@ -149,7 +152,13 @@ function getRoute(router, path, type) {
     }
   }
 
-  return { query: query && JSON.parse(query), remainingPath, matchedQueryParams, path: matchedRoute.path };
+  return {
+    query: query && JSON.parse(query),
+    remainingPath,
+    matchedQueryParams,
+    allowedQueryParams,
+    path: matchedRoute.path,
+  };
 }
 
 function buildSubstitutionDictionary(route, path, type) {
@@ -188,6 +197,7 @@ function buildSubstitutionDictionary(route, path, type) {
 function routeThatMatchesPath(router, path, type) {
   let matchedRoute;
   let matchedQueryParams;
+  let allowedQueryParams;
   let remainingPath = path;
 
   for (let route of router) {
@@ -208,6 +218,7 @@ function routeThatMatchesPath(router, path, type) {
       // consume the query param part of the URL
       if (route.path.includes('?')) {
         let routeQueryParams = route.path.split('?')[1];
+        allowedQueryParams = routeQueryParams.split('&').map(i => i.split('=')[0]);
         let queryParamRegex = new RegExp(`^${('?' + routeQueryParams).replace(/([?&])([^?&]+)=:[^&]+/g,
           (match, separator, param) => `\\${separator}${type}\\[${param}\\]=[^&]+`)}`);
         let queryParamMatch = decodeURI(remainingPath).match(queryParamRegex);
@@ -222,12 +233,27 @@ function routeThatMatchesPath(router, path, type) {
     }
   }
 
-  return { route: matchedRoute, remainingPath, matchedQueryParams };
+  return { route: matchedRoute, remainingPath, matchedQueryParams, allowedQueryParams };
+}
+
+function getAllowedQueryParamsForRouter(router) {
+  if (!Array.isArray(router)) { return; }
+
+  let queryParams = [];
+  for (let route of router) {
+    if (!route.path || !route.path.includes('?')) { continue; }
+
+    let routeQueryParams = route.path.split('?')[1];
+    queryParams = queryParams.concat(routeQueryParams.split('&').map(i => i.split('=')[0]));
+  }
+
+  return uniq(queryParams);
 }
 
 module.exports = {
   getPath,
   getRoute,
   getRouter,
-  getDefaultRouter
+  getDefaultRouter,
+  getAllowedQueryParamsForRouter
 };

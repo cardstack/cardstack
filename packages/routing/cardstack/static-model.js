@@ -16,6 +16,7 @@ module.exports = function() {
         data: [
           { type: 'fields', id: 'primary-card' },
           { type: 'fields', id: 'query-params' },
+          { type: 'fields', id: 'allowed-query-params' },
           { type: 'computed-fields', id: 'http-status' }
         ]
       }
@@ -75,6 +76,13 @@ module.exports = function() {
     id: 'query-params',
     attributes: {
       'field-type': '@cardstack/core-types::string'
+    }
+  },
+  {
+    type: 'fields',
+    id: 'allowed-query-params',
+    attributes: {
+      'field-type': '@cardstack/core-types::object'
     }
   },
   {

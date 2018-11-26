@@ -2,7 +2,10 @@ const log = require('@cardstack/logger')('cardstack/routers');
 const { declareInjections } = require('@cardstack/di');
 const Error = require('@cardstack/plugin-utils/error');
 const Session = require('@cardstack/plugin-utils/session');
-const { getRoute, getRouter, getDefaultRouter } = require('@cardstack/routing/cardstack/router-utils');
+const { getRoute,
+  getRouter,
+  getDefaultRouter,
+  getAllowedQueryParamsForRouter } = require('@cardstack/routing/cardstack/router-utils');
 const { get } = require('lodash');
 
 const maxRoutingRecursion = 50;
@@ -114,6 +117,7 @@ class Routers {
 
     let updatedRemainingPath = remainingPath;
     let matchedQueryParams;
+    let allowedQueryParams;
     let route;
     if (router) {
       route = getRoute(router, remainingPath, cardContext.data.type);
@@ -122,6 +126,7 @@ class Routers {
       } else {
         updatedRemainingPath = route.remainingPath;
         matchedQueryParams = route.matchedQueryParams;
+        allowedQueryParams = route.allowedQueryParams;
         let { data: cards, included } = route.query ?
           await this.searchers.search(Session.INTERNAL_PRIVILEGED, branch, route.query) :
           { data: [ routingCard.data ], included: routingCard.included };
@@ -149,6 +154,14 @@ class Routers {
       }
     }
 
+    // check to see if the primary card has its own router that uses query params
+    if (!allowedQueryParams && route && route.query) {
+      let primaryCardRouter = await getRouter(plugins, schema, cardContext);
+      if (primaryCardRouter !== router) {
+        allowedQueryParams = getAllowedQueryParamsForRouter(primaryCardRouter);
+      }
+    }
+
     let included = [ cardContext.data ].concat(cardContext.included || []);
 
     let meta;
@@ -170,7 +183,8 @@ class Routers {
         id: originalPath,
         type: 'spaces',
         attributes: {
-          'query-params': matchedQueryParams || ''
+          'query-params': matchedQueryParams || '',
+          'allowed-query-params': allowedQueryParams || []
         },
         relationships: {
           'primary-card': {

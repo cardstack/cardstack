@@ -1,33 +1,61 @@
 import { module, test } from 'qunit';
 import { setupApplicationTest } from 'ember-qunit';
-import { visit, currentURL, click } from '@ember/test-helpers';
+import { visit, click } from '@ember/test-helpers';
+
+// use the main:router location API to get the current URL since we are
+// maniupating the URL using the location API
+function currentURL(owner) {
+  let router = owner.lookup('router:main');
+  return router.get('location').getURL();
+}
 
 module('Acceptance | content', function(hooks) {
   setupApplicationTest(hooks);
 
   test('renders own page content', async function(assert) {
     await visit('/posts/1');
-    assert.equal(currentURL(), '/posts/1');
-    assert.equal(this.element.querySelector('.title').textContent.trim(), 'hello world');
+    assert.equal(currentURL(this.owner), '/posts/1');
+    assert.dom('.title').hasText('hello world');
   });
 
   test('passes query params to primary card in route', async function(assert){
     await visit('/posts/1?posts[foo]=bar&posts[bee]=bop');
-    assert.equal(currentURL(), '/posts/1?posts[foo]=bar&posts[bee]=bop');
-    assert.equal(this.element.querySelector('.foo').textContent.trim(), 'foo is bar');
-    assert.equal(this.element.querySelector('.bee').textContent.trim(), 'bee is bop');
+    assert.equal(currentURL(this.owner), '/posts/1?posts[foo]=bar&posts[bee]=bop');
+    assert.dom('.foo').hasText('foo is bar');
+    assert.dom('.bee').hasText('bee is bop');
   });
 
   test('renders error card content is missing', async function(assert) {
     await visit('/posts/bogus');
-    assert.equal(currentURL(), '/posts/bogus');
-    assert.equal(this.element.querySelector('h1').textContent.trim(), 'Not Found');
+    assert.equal(currentURL(this.owner), '/posts/bogus');
+    assert.dom('h1').hasText('Not Found');
   });
 
   test('reloads models on route transitions', async function(assert) {
     await visit('/categories/category-1');
     await click('[data-test-post="1"]')
 
-    assert.equal(currentURL(), '/posts/1');
+    assert.equal(currentURL(this.owner), '/posts/1');
+  });
+
+  test('card can set query param', async function(assert) {
+    await visit('/posts/1');
+    await click('.set-query-param-1');
+
+    assert.equal(currentURL(this.owner), '/posts/1?posts[foo]=fee');
+  });
+
+  test('card can change query param', async function(assert) {
+    await visit('/posts/1?posts[foo]=bar');
+    await click('.set-query-param-2');
+
+    assert.equal(currentURL(this.owner), '/posts/1?posts[foo]=fee%20fo%20fum');
+  });
+
+  test('card can not set undeclared query param', async function(assert) {
+    await visit('/posts/1');
+    await click('.set-undeclared-query-param');
+
+    assert.equal(currentURL(this.owner), '/posts/1');
   });
 });

@@ -199,6 +199,7 @@ describe('hub/routers', function () {
       expect(space).has.property('type', 'spaces');
       expect(space).has.property('id', '/');
       expect(space).has.deep.property('attributes.query-params', '');
+      expect(space.attributes['allowed-query-params']).to.have.members([]);
       expect(space).has.deep.property('relationships.primary-card.data.id', 'getting-started');
       expect(space).has.deep.property('relationships.primary-card.data.type', 'application-cards');
 
@@ -214,6 +215,7 @@ describe('hub/routers', function () {
       expect(space).has.property('type', 'spaces');
       expect(space).has.property('id', '/puppies/vanGogh');
       expect(space).has.deep.property('attributes.query-params', '');
+      expect(space.attributes['allowed-query-params']).to.have.members([]);
       expect(space).has.deep.property('relationships.primary-card.data.id', 'vanGogh');
       expect(space).has.deep.property('relationships.primary-card.data.type', 'puppies');
 
@@ -231,7 +233,7 @@ describe('hub/routers', function () {
 
       expect(space).has.property('type', 'spaces');
       expect(space).has.property('id', '/rodents/rocky/forward/rats/pizza-rat');
-      expect(space).has.deep.property('attributes.query-params', '');
+      expect(space.attributes['allowed-query-params']).to.have.members(['sort']);
       expect(space).has.deep.property('relationships.primary-card.data.id', 'pizza-rat');
       expect(space).has.deep.property('relationships.primary-card.data.type', 'rats');
 
@@ -259,6 +261,7 @@ describe('hub/routers', function () {
       expect(space).has.property('type', 'spaces');
       expect(space).has.property('id', '/cards/puppies/vanGogh');
       expect(space).has.deep.property('attributes.query-params', '');
+      expect(space.attributes['allowed-query-params']).to.have.members([]);
       expect(space).has.deep.property('relationships.primary-card.data.id', 'vanGogh');
       expect(space).has.deep.property('relationships.primary-card.data.type', 'puppies');
 
@@ -306,6 +309,7 @@ describe('hub/routers', function () {
       expect(space).has.property('type', 'spaces');
       expect(space).has.property('id', '/forward/kitties/sally/favorite');
       expect(space).has.deep.property('attributes.query-params', '');
+      expect(space.attributes['allowed-query-params']).to.have.members([]);
       expect(space).has.deep.property('relationships.primary-card.data.id', 'sally');
       expect(space).has.deep.property('relationships.primary-card.data.type', 'kitties');
 
@@ -322,6 +326,24 @@ describe('hub/routers', function () {
       expect(space).has.property('type', 'spaces');
       expect(space).has.property('id', '/forward/kitties/sally?kitties[foo]=bar&kitties[bee]=bop&ignore-me=true');
       expect(space).has.deep.property('attributes.query-params', '?foo=bar&bee=bop');
+      expect(space.attributes['allowed-query-params']).to.have.members(['foo', 'bee']);
+      expect(space).has.deep.property('relationships.primary-card.data.id', 'sally');
+      expect(space).has.deep.property('relationships.primary-card.data.type', 'kitties');
+
+      expect(included.length).equals(1);
+      expect(included[0]).has.property('id', 'sally');
+      expect(included[0]).has.property('type', 'kitties');
+      expect(included[0]).has.deep.property('attributes.name', 'Sally');
+      expect(included[0]).has.deep.property('links.self', '/forward/kitties/sally');
+    });
+
+    it('can return the routing card as the primary card when primary card has query param based routes', async function () {
+      let { included, data: space } = await searchers.get(env.session, 'master', 'spaces', '/forward/kitties/sally');
+
+      expect(space).has.property('type', 'spaces');
+      expect(space).has.property('id', '/forward/kitties/sally');
+      expect(space).has.deep.property('attributes.query-params', '');
+      expect(space.attributes['allowed-query-params']).to.have.members(['foo', 'bee']);
       expect(space).has.deep.property('relationships.primary-card.data.id', 'sally');
       expect(space).has.deep.property('relationships.primary-card.data.type', 'kitties');
 
@@ -358,6 +380,7 @@ describe('hub/routers', function () {
       expect(space).has.property('type', 'spaces');
       expect(space).has.property('id', '/route-that-doesnt-exist');
       expect(space).has.deep.property('attributes.query-params', '');
+      expect(space.attributes['allowed-query-params']).to.have.members([]);
       expect(space).has.deep.property('relationships.primary-card.data.id', 'not-found');
       expect(space).has.deep.property('relationships.primary-card.data.type', 'error-cards');
 
@@ -372,6 +395,7 @@ describe('hub/routers', function () {
       expect(space).has.property('type', 'spaces');
       expect(space).has.property('id', '/forward/cards/route-that-doesnt-exist');
       expect(space).has.deep.property('attributes.query-params', '');
+      expect(space.attributes['allowed-query-params']).to.have.members([]);
       expect(space).has.deep.property('relationships.primary-card.data.id', 'not-found');
       expect(space).has.deep.property('relationships.primary-card.data.type', 'error-cards');
 
@@ -387,6 +411,7 @@ describe('hub/routers', function () {
       expect(space).has.property('type', 'spaces');
       expect(space).has.property('id', '/favorite-puppy/blah');
       expect(space).has.deep.property('attributes.query-params', '');
+      expect(space.attributes['allowed-query-params']).to.have.members([]);
       expect(space).has.deep.property('relationships.primary-card.data.id', 'not-found');
       expect(space).has.deep.property('relationships.primary-card.data.type', 'error-cards');
 
@@ -401,6 +426,7 @@ describe('hub/routers', function () {
       expect(space).has.property('type', 'spaces');
       expect(space).has.property('id', '/forward/rodents/rocky/forward/hamsters/yehudaster/whaaa');
       expect(space).has.deep.property('attributes.query-params', '');
+      expect(space.attributes['allowed-query-params']).to.have.members([]);
       expect(space).has.deep.property('relationships.primary-card.data.id', 'not-found');
       expect(space).has.deep.property('relationships.primary-card.data.type', 'hamsters-errors');
 
@@ -415,6 +441,7 @@ describe('hub/routers', function () {
       expect(space).has.property('type', 'spaces');
       expect(space).has.property('id', '/forward/rats/pizza-rat/blah');
       expect(space).has.deep.property('attributes.query-params', '');
+      expect(space.attributes['allowed-query-params']).to.have.members([]);
       expect(space).has.deep.property('relationships.primary-card.data.id', 'not-found');
       expect(space).has.deep.property('relationships.primary-card.data.type', 'error-cards');
 
@@ -429,6 +456,7 @@ describe('hub/routers', function () {
       expect(space).has.property('type', 'spaces');
       expect(space).has.property('id', '/forward/fishes/nemo/blah');
       expect(space).has.deep.property('attributes.query-params', '');
+      expect(space.attributes['allowed-query-params']).to.have.members([]);
       expect(space).has.deep.property('relationships.primary-card.data.id', 'not-found');
       expect(space).has.deep.property('relationships.primary-card.data.type', 'error-cards');
 
@@ -453,6 +481,7 @@ describe('hub/routers', function () {
       expect(space).has.property('type', 'spaces');
       expect(space).has.property('id', '/favorite-puppy');
       expect(space).has.deep.property('attributes.query-params', '');
+      expect(space.attributes['allowed-query-params']).to.have.members([]);
       expect(space).has.deep.property('relationships.primary-card.data.id', 'vanGogh');
       expect(space).has.deep.property('relationships.primary-card.data.type', 'puppies');
 
@@ -471,6 +500,7 @@ describe('hub/routers', function () {
       expect(space).has.property('type', 'spaces');
       expect(space).has.property('id', '/buddy/Ringo');
       expect(space).has.deep.property('attributes.query-params', '');
+      expect(space.attributes['allowed-query-params']).to.have.members([]);
       expect(space).has.deep.property('relationships.primary-card.data.id', 'ringo');
       expect(space).has.deep.property('relationships.primary-card.data.type', 'puppies');
 
@@ -489,6 +519,7 @@ describe('hub/routers', function () {
       expect(space).has.property('type', 'spaces');
       expect(space).has.property('id', '/contextual-favorite-toy/squeaky-snake');
       expect(space).has.deep.property('attributes.query-params', '');
+      expect(space.attributes['allowed-query-params']).to.have.members([]);
       expect(space).has.deep.property('relationships.primary-card.data.id', 'vanGogh');
       expect(space).has.deep.property('relationships.primary-card.data.type', 'puppies');
 
@@ -507,6 +538,7 @@ describe('hub/routers', function () {
       expect(space).has.property('type', 'spaces');
       expect(space).has.property('id', '/sorted?cards[sort]=favorite-toy&foo=bar&bee=bop');
       expect(space).has.deep.property('attributes.query-params', '?sort=favorite-toy');
+      expect(space.attributes['allowed-query-params']).to.have.members(['sort']);
       expect(space).has.deep.property('relationships.primary-card.data.id', 'vanGogh');
       expect(space).has.deep.property('relationships.primary-card.data.type', 'puppies');
 
@@ -525,6 +557,7 @@ describe('hub/routers', function () {
       expect(space).has.property('type', 'spaces');
       expect(space).has.property('id', '/favorite-puppy?foo=bar');
       expect(space).has.deep.property('attributes.query-params', '');
+      expect(space.attributes['allowed-query-params']).to.have.members([]);
       expect(space).has.deep.property('relationships.primary-card.data.id', 'vanGogh');
       expect(space).has.deep.property('relationships.primary-card.data.type', 'puppies');
     });
