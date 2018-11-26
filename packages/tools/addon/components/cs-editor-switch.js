@@ -7,6 +7,9 @@ export default Component.extend({
   actions: {
     setEditing(value) {
       this.get('tools').setEditing(value);
+      if (!value) {
+        this.get('tools').openField();
+      }
     },
     toggleEditing() {
       this.get('tools').setEditing(!this.get('enabled'));

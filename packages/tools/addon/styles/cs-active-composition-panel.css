@@ -78,11 +78,6 @@
     letter-spacing: 0.1px;
 }
 
-.cs-field-editor-section {
-    padding: 0.75em;
-    margin: 0;
-}
-
 .cs-toolbox-section {
     margin: 0;
     border-top: 1px solid var(--light25);
@@ -156,4 +151,11 @@
 .cs-toolbox-section > header > button:focus > svg {
     color: var(--active-fg);
     fill: var(--active-fg);
+}
+
+.cs-field-editor-section {
+    margin: 0;
+    padding: 0.75em;
+    color: var(--bright-fg);
+    background-color: var(--dark-bg);
 }

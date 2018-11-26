@@ -6,16 +6,50 @@
   replaced by a real theme protocol.
 */
 
-.cs-field-editor-section input[type="text"] {
-    width: 100%;
-    box-sizing: border-box;
-    padding: 0.5em 1em;
-    line-height: 1.9em;
-    border-width: 2px;
+.cs-field-editor-section label {
+    display: inline-block;
+    padding-bottom: 0.5rem;
+    color: var(--light50);
+    font-size: 0.9rem;
+    letter-spacing: 0.3px;
+    line-height: 1.375;
 }
 
-.cs-field-editor-section input[type="text"]:focus {
-    border: 2px solid var(--tools-highlight);
+.cs-field-editor-section input {
+    width: 100%;
+    box-sizing: border-box;
+    margin-bottom: 0.5rem;
+    padding: 0.5rem 1rem;
+    border: 1px solid var(--light25);
+    border-radius: 3px;
+    background-color: var(--dark-bg);
+    color: var(--bright-fg);
+    font-size: 0.8rem;
+    letter-spacing: 0.3px;
+    line-height: 1.375;
+}
+
+.cs-field-editor-section input:focus {
+    border: 2px solid var(--active-fg);
+    outline: none;
+}
+
+.cs-field-editor-section input[type="number"] {
+    width: auto;
+}
+
+/* overrides ember-power-select styles for cs-field-editor-section */
+.cs-field-editor-section .ember-power-select-trigger {
+    margin-bottom: 0.5rem;
+    padding: 0.5rem 1rem 0.5rem 0.5rem;
+    border: 1px solid var(--light25);
+    border-radius: 3px;
+    background-color: var(--dark-bg);
+    color: var(--bright-fg);
+}
+
+.cs-field-editor-section .ember-power-select-trigger:focus {
+    border: 2px solid var(--active-fg);
     outline: none;
 }
 
