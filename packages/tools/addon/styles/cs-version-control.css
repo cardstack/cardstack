@@ -66,14 +66,14 @@
     cursor: pointer;
 }
 
-.cs-version-control-footer--button:hover,
-.cs-version-control-footer--button:focus {
+.cs-version-control--button:hover,
+.cs-version-control--button:focus {
     outline: none;
     color: var(--active-fg);
 }
 
-.cs-version-control-footer--button[disabled],
-.cs-version-control-footer--button.disabled {
+.cs-version-control--button[disabled],
+.cs-version-control--button.disabled {
     background: none;
     border: 1px solid var(--light25);
     color: var(--light25);

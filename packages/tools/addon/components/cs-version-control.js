@@ -10,6 +10,7 @@ import { or } from '@ember/object/computed';
 export default Component.extend({
   layout,
   tagName: '',
+  opened: true,
   animationRules,
   "on-error": function() {},
   resourceMetadata: service(),
@@ -103,21 +104,21 @@ export default Component.extend({
   }),
 
   title: computed('modificationState', 'upstreamState', function() {
-    switch (this.get('modificationState')) {
+    switch(this.get('modificationState')) {
     case 'new':
       return 'Drafted'
     case 'changed':
       return 'Changed';
     case 'saved':
-      switch (this.get('upstreamState')) {
-        case 'pending':
-          return '...';
-        case 'self':
-          return 'Live';
-        case 'created':
-        case 'different':
-        case 'same':
-          return 'Preview';
+      switch(this.get('upstreamState')) {
+      case 'pending':
+        return '...';
+      case 'self':
+        return 'Live';
+      case 'created':
+      case 'different':
+      case 'same':
+        return 'Preview';
       }
     }
   }),

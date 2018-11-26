@@ -5,7 +5,8 @@
     top: 15px;
     display: flex;
     flex-direction: column;
-    min-height: 30%;
+    width: 80%;
+    min-height: 25rem;
     max-height: 85%;
     background-color: var(--normal-bg);
     color: var(--bright-fg);
@@ -15,7 +16,6 @@
 }
 
 .cs-active-composition-panel--body {
-    max-height: 16em;
     padding-bottom: 5em;
     overflow-y: scroll;
 }
