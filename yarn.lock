@@ -580,10 +580,11 @@
   resolved "https://registry.yarnpkg.com/@glimmer/di/-/di-0.2.0.tgz#73bfd4a6ee4148a80bf092e8a5d29bcac9d4ce7e"
 
 "@glimmer/interfaces@^0.25.6":
-  version "0.25.6"
-  resolved "https://registry.yarnpkg.com/@glimmer/interfaces/-/interfaces-0.25.6.tgz#88a6cdb4f414c3a82662cc5fc5cb5bfd91d4ef10"
+  version "0.25.8"
+  resolved "https://registry.yarnpkg.com/@glimmer/interfaces/-/interfaces-0.25.8.tgz#178052f11c5a8d887ca508fec2309b01d9f8344f"
+  integrity sha512-e4ckEer700Tits6+Vb0VCPFb7+9JmC9xlep0gRZoVtdclxChK5oPhqsD/KfyEfKlJW05vK9AI7kV1hHqd+cyGA==
   dependencies:
-    "@glimmer/wire-format" "^0.25.6"
+    "@glimmer/wire-format" "^0.25.8"
 
 "@glimmer/interfaces@^0.36.4":
   version "0.36.4"
@@ -616,8 +617,9 @@
     simple-html-tokenizer "^0.5.6"
 
 "@glimmer/util@^0.25.6":
-  version "0.25.6"
-  resolved "https://registry.yarnpkg.com/@glimmer/util/-/util-0.25.6.tgz#de8dde7f5d30f9c0e3e2f083e3f6d3426a92b302"
+  version "0.25.8"
+  resolved "https://registry.yarnpkg.com/@glimmer/util/-/util-0.25.8.tgz#bf796152d15c2020b30f9e00757d220ebe8b1dd8"
+  integrity sha512-nIELcKEevSV4h75mOqzaDcHLWqwd2GCKDNzPyon1DDcU7mbYI6AB7BY+8sPbg6fJOS7zUfcx3f+sNfrb3cRy0w==
 
 "@glimmer/util@^0.36.4":
   version "0.36.4"
@@ -5476,6 +5478,14 @@ ember-elsewhere@^1.0.3:
   dependencies:
     ember-cli-babel "^6.3.0"
     ember-cli-htmlbars "^2.0.1"
+
+ember-elsewhere@^1.0.5:
+  version "1.0.5"
+  resolved "https://registry.yarnpkg.com/ember-elsewhere/-/ember-elsewhere-1.0.5.tgz#7ec292b03930765f021b51c51802b84f82f0c56c"
+  integrity sha512-yGm1NMUwft8ur2XVLKsZuQS1nn91nnXfjQkJX/Cx8pUAz1YTnTuvP24Hn1MLP72PmAx6ebPDCp1DEz7RKE81ew==
+  dependencies:
+    ember-cli-babel "^6.16.0"
+    ember-cli-htmlbars "^3.0.0"
 
 ember-export-application-global@^2.0.0:
   version "2.0.0"
