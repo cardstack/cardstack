@@ -69,7 +69,7 @@ class Schema {
         continue;
       }
       for (let fieldName of Object.keys(doc[section])) {
-        if (this.computedFields.has(fieldName)) {
+        if (!this.realFields.has(fieldName)) {
           if (activeDoc === doc) {
             activeDoc = Object.assign({}, doc);
           }
