@@ -163,19 +163,25 @@ module.exports = class ContentType {
   }
 
   _validateUnknownFields(pending, errors) {
-    let { finalDocument } = pending;
+    let { finalDocument, originalDocument } = pending;
 
     if (finalDocument.attributes) {
+      let originalFields = originalDocument && originalDocument.attributes
+        ? Object.keys(originalDocument.attributes) : [];
+
       for (let fieldName of Object.keys(finalDocument.attributes)) {
-        if (!this.realFields.has(fieldName)) {
+        if (!this.realFields.has(fieldName) && !originalFields.includes(fieldName)) {
           errors.push(this._unknownFieldError(fieldName, 'attributes'));
         }
       }
     }
 
     if (finalDocument.relationships) {
+      let originalFields = originalDocument && originalDocument.relationships
+        ? Object.keys(originalDocument.relationships) : [];
+
       for (let fieldName of Object.keys(finalDocument.relationships)) {
-        if (!this.realFields.has(fieldName)) {
+        if (!this.realFields.has(fieldName) && !originalFields.includes(fieldName)) {
           errors.push(this._unknownFieldError(fieldName, 'relationships'));
         }
       }

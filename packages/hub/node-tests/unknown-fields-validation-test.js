@@ -60,7 +60,9 @@ describe('unknown fields validation', function() {
     expect(article.data.attributes).to.have.property('header', 'bar');
   });
 
-  it('backend has old field, request has old field', async function () {
+  // This is an artificial test case that should never actually happen in the app
+  // as the JSONAPI will only return fields that are included in the schema
+  it.skip('backend has old field, request has old field', async function () {
     let model = await createArticle({ title: 'foo' });
     await changeArticleField();
 
