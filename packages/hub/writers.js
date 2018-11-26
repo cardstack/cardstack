@@ -184,9 +184,12 @@ class Writers {
 
   _getSchemaDetailsForType(schema, type) {
     let contentType = schema.types.get(type);
-    let writer;
-    if (!contentType || !contentType.dataSource || !(writer = contentType.dataSource.writer)) {
-      log.debug('non-writeable type %s: exists=%s hasDataSource=%s hasWriter=%s', type, !!contentType, !!(contentType && contentType.dataSource), !!writer);
+    if (!contentType || !contentType.dataSource || !contentType.dataSource.writer) {
+      log.debug('non-writeable type %s: exists=%s hasDataSource=%s hasWriter=%s',
+        type,
+        Boolean(contentType),
+        Boolean(contentType && contentType.dataSource),
+        Boolean(contentType && contentType.dataSource && contentType.dataSource.writer));
 
       throw new Error(`"${type}" is not a writable type`, {
         status: 403,
@@ -194,6 +197,7 @@ class Writers {
       });
     }
 
+    let writer = contentType.dataSource.writer;
     let sourceId = contentType.dataSource.id;
     return { writer, sourceId };
   }
