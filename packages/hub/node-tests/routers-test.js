@@ -233,7 +233,7 @@ describe('hub/routers', function () {
 
       expect(space).has.property('type', 'spaces');
       expect(space).has.property('id', '/rodents/rocky/forward/rats/pizza-rat');
-      expect(space.attributes['allowed-query-params']).to.have.members(['sort']);
+      expect(space.attributes['allowed-query-params']).to.have.members([]);
       expect(space).has.deep.property('relationships.primary-card.data.id', 'pizza-rat');
       expect(space).has.deep.property('relationships.primary-card.data.type', 'rats');
 

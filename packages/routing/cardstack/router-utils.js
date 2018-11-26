@@ -236,12 +236,12 @@ function routeThatMatchesPath(router, path, type) {
   return { route: matchedRoute, remainingPath, matchedQueryParams, allowedQueryParams };
 }
 
-function getAllowedQueryParamsForRouter(router) {
+function getAllowedQueryParamsForRoutingCard(router) {
   if (!Array.isArray(router)) { return; }
 
   let queryParams = [];
   for (let route of router) {
-    if (!route.path || !route.path.includes('?')) { continue; }
+    if (!route.path || !route.path.includes('?') || route.query) { continue; }
 
     let routeQueryParams = route.path.split('?')[1];
     queryParams = queryParams.concat(routeQueryParams.split('&').map(i => i.split('=')[0]));
@@ -255,5 +255,5 @@ module.exports = {
   getRoute,
   getRouter,
   getDefaultRouter,
-  getAllowedQueryParamsForRouter
+  getAllowedQueryParamsForRoutingCard
 };

@@ -5,7 +5,7 @@ const Session = require('@cardstack/plugin-utils/session');
 const { getRoute,
   getRouter,
   getDefaultRouter,
-  getAllowedQueryParamsForRouter } = require('@cardstack/routing/cardstack/router-utils');
+  getAllowedQueryParamsForRoutingCard } = require('@cardstack/routing/cardstack/router-utils');
 const { get } = require('lodash');
 
 const maxRoutingRecursion = 50;
@@ -154,11 +154,11 @@ class Routers {
       }
     }
 
-    // check to see if the primary card has its own router that uses query params
+    // check to see if the primary card has its own query-less routes that uses query params
     if (!allowedQueryParams && route && route.query) {
       let primaryCardRouter = await getRouter(plugins, schema, cardContext);
       if (primaryCardRouter !== router) {
-        allowedQueryParams = getAllowedQueryParamsForRouter(primaryCardRouter);
+        allowedQueryParams = getAllowedQueryParamsForRoutingCard(primaryCardRouter);
       }
     }
 
