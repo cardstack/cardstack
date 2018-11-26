@@ -38,7 +38,7 @@
     "ember-moment": "^7.3.0",
     "ember-resource-metadata": "^0.3.0",
     "ember-truth-helpers": "^2.0.0",
-    "liquid-fire": "^0.29.0",
+    "liquid-fire": "^0.29.5",
     "postcss-cssnext": "^2.10.0",
     "postcss-import": "^9.1.0"
   },

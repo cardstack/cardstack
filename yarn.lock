@@ -5248,6 +5248,13 @@ ember-cookies@^0.3.0:
     ember-cli-babel "^6.8.2"
     ember-getowner-polyfill "^1.1.0 || ^2.0.0"
 
+ember-copy@^1.0.0:
+  version "1.0.0"
+  resolved "https://registry.yarnpkg.com/ember-copy/-/ember-copy-1.0.0.tgz#426554ba6cf65920f31d24d0a3ca2cb1be16e4aa"
+  integrity sha512-aiZNAvOmdemHdvZNn0b5b/0d9g3JFpcOsrDgfhYEbfd7SzE0b69YiaVK2y3wjqfjuuiA54vOllGN4pjSzECNSw==
+  dependencies:
+    ember-cli-babel "^6.6.0"
+
 ember-css-url@0.2.0:
   version "0.2.0"
   resolved "https://registry.yarnpkg.com/ember-css-url/-/ember-css-url-0.2.0.tgz#109a04a93a2e3af71c8ac3b56aec42407eb35d0b"
@@ -8916,6 +8923,23 @@ liquid-fire@^0.29.0:
     ember-hash-helper-polyfill "^0.2.0"
     match-media "^0.2.0"
     velocity-animate ">= 0.11.8"
+
+liquid-fire@^0.29.5:
+  version "0.29.5"
+  resolved "https://registry.yarnpkg.com/liquid-fire/-/liquid-fire-0.29.5.tgz#da8e3158e3f96c34a8cf371b90b8ae941ea8960d"
+  integrity sha512-h+KxMaCvavkAfL5duNc5tQikrZxzbGVvUdmBU9mjkInUQQKvTjpD1DwphRKk6qWRRuDY9HT2ecY0Hf6/gMXkJA==
+  dependencies:
+    broccoli-funnel "^1.0.1"
+    broccoli-merge-trees "^1.0.0"
+    broccoli-stew "^1.4.2"
+    ember-cli-babel "^6.6.0"
+    ember-cli-htmlbars "^2.0.1"
+    ember-cli-version-checker "^2.0.0"
+    ember-copy "^1.0.0"
+    ember-getowner-polyfill "^2.0.1"
+    ember-hash-helper-polyfill "^0.2.0"
+    match-media "^0.2.0"
+    velocity-animate "^1.5.1"
 
 livereload-js@^2.2.2:
   version "2.2.2"
@@ -13812,6 +13836,11 @@ vary@^1, vary@^1.0.0, vary@^1.1.2, vary@~1.1.2:
 "velocity-animate@>= 0.11.8":
   version "1.5.0"
   resolved "https://registry.yarnpkg.com/velocity-animate/-/velocity-animate-1.5.0.tgz#fc8771d8dfe1136ff02a707e10fbb0957c4b030f"
+
+velocity-animate@^1.5.1:
+  version "1.5.2"
+  resolved "https://registry.yarnpkg.com/velocity-animate/-/velocity-animate-1.5.2.tgz#5a351d75fca2a92756f5c3867548b873f6c32105"
+  integrity sha512-m6EXlCAMetKztO1ppBhGU1/1MR3IiEevO6ESq6rcrSQ3Q77xYSW13jkfXW88o4xMrkXJhy/U7j4wFR/twMB0Eg==
 
 verror@1.10.0:
   version "1.10.0"
