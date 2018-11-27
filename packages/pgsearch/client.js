@@ -188,6 +188,7 @@ class Batch {
 
     let searchDoc = await context.searchDoc();
     let pristineDoc = await context.pristineDoc();
+    let fullTextDoc = await context.fullTextDoc();
     let refs = await context.references();
     let realms = await context.realms();
 
@@ -204,7 +205,7 @@ class Batch {
       type: param(type),
       id: param(id),
       search_doc: param(searchDoc),
-      q: ['to_tsvector(', param(searchDoc), ')'],
+      q: ['to_tsvector(', param(fullTextDoc), ')'],
       pristine_doc: param(pristineDoc),
       upstream_doc: param(upstreamDoc),
       source: param(sourceId),
