@@ -7,7 +7,7 @@
   </div>
 
   <button class="cs-version-control-dropdown--button">
-    {{cs-svg 'dropdown-buttons' width="1.2rem" height="1.2rem"}}
+    {{cs-svg "dropdown-buttons" width="1.2rem" height="1.2rem"}}
   </button>
 </div>
 
@@ -34,15 +34,17 @@
         Cancel
       </button>
     </div>
-
-    {{#with (concat modelType '-action-buttons') as |buttonsComponent|}}
+    {{#with (concat modelType "-action-buttons") as |buttonsComponent|}}
       {{#if (is-component buttonsComponent)}}
         {{component buttonsComponent model=model modificationState=modificationState}}
       {{/if}}
     {{/with}}
 
-    <div class="cs-version-control--delete">
-      <a class="cs-version-control--delete-button" {{action (perform delete)}}>Delete</a>
-    </div>
+    <button
+      class="cs-version-control--delete-button"
+      {{action (perform delete)}}
+    >
+      Delete
+    </button>
   </div>
 {{/liquid-if}}

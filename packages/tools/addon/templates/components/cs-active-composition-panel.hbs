@@ -1,15 +1,10 @@
-{{cs-composition-panel-header model=model
-                              editingEnabled=editingEnabled}}
+{{cs-composition-panel-header
+  model=model
+  editingEnabled=editingEnabled
+}}
 
 {{!- this one scrolls }}
 <div class="cs-active-composition-panel--body">
-
-  {{cs-version-control
-    model=model
-    enabled=editingEnabled
-    on-error=(action (mut validationErrors))
-  }}
-
   {{#each renderedFields key="id" as |fieldMark|}}
     {{! template-lint-disable attribute-indentation }}
     {{#let
@@ -105,8 +100,13 @@
 </div>
 
 <footer class="cs-active-composition-panel--footer">
-  <button>
-    {{cs-svg 'create' width="16px" height="16px"}}
-    <label>Insert Into Page</label>
+  <button class="cs-insert-button" type="button">
+    {{cs-svg
+      "insert"
+      width="16px"
+      height="16px"
+      class="cs-insert-button--icon"
+    }}
+    Insert Into Page
   </button>
 </footer>

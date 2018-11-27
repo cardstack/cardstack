@@ -1,5 +1,4 @@
 <svg style="position: absolute; width: 0; height: 0;" width="0" height="0" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
-
   <symbol id="cardstack-icon" viewBox="0 0 20 20">
     <g id="Symbols" stroke="none" stroke-width="1" fill-rule="evenodd">
       <g id="icon/maximize" transform="translate(-3.000000, -3.000000)">
@@ -7,7 +6,6 @@
       </g>
     </g>
   </symbol>
-
   <symbol id="page" viewBox="0 0 18 24" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:sketch="http://www.bohemiancoding.com/sketch/ns">
     <g id="Page-1" stroke="none" stroke-width="1" fill-rule="evenodd" sketch:type="MSPage">
       <g id="AIA_text_formatting" sketch:type="MSArtboardGroup" transform="translate(-225.000000, -9.000000)" >
@@ -41,8 +39,6 @@
       </g>
     </g>
   </symbol>
-
-
   <symbol id="dropdown-buttons" viewBox="0 0 7 16" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
       <g stroke="none" stroke-width="1" fill-rule="evenodd">
           <g transform="translate(-1375.000000, -219.000000)" fill-rule="nonzero">
@@ -57,8 +53,7 @@
           </g>
       </g>
   </symbol>
-
-   <symbol id="remove-this" viewBox="0 0 13 18" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:sketch="http://www.bohemiancoding.com/sketch/ns">
+  <symbol id="remove-this" viewBox="0 0 13 18" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:sketch="http://www.bohemiancoding.com/sketch/ns">
     <g id="Page-1" stroke="none" stroke-width="1" fill-rule="evenodd" sketch:type="MSPage">
       <g id="AIA_text_formatting" sketch:type="MSArtboardGroup" transform="translate(-1140.000000, -12.000000)" >
         <g id="Fill-2151-+-Fill-2152-Copy" sketch:type="MSLayerGroup" transform="translate(1140.000000, 12.000000)">
@@ -68,13 +63,11 @@
       </g>
     </g>
   </symbol>
-
   <symbol id="write" viewBox="0 0 20 20" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
     <g fill-rule="nonzero" transform="translate(-3.000000, -3.000000)">
       <path d="M17 5.414l-12 12V21h3.586l12-12L17 5.414zm.707-2.121l5 5a1 1 0 0 1 0 1.414l-13 13A1 1 0 0 1 9 23H4a1 1 0 0 1-1-1v-5a1 1 0 0 1 .293-.707l13-13a1 1 0 0 1 1.414 0z"></path>
     </g>
   </symbol>
-
   <symbol id="done" viewBox="0 0 18 13" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
     <linearGradient id="gradient-fill" x1="31.472%" x2="64.238%" y1="-22.474%" y2="114.386%">
       <stop offset="0%" stop-color="#3023AE"/>
@@ -86,7 +79,6 @@
       </g>
     </g>
   </symbol>
-
   <symbol id="archive" viewBox="0 0 22 24" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:sketch="http://www.bohemiancoding.com/sketch/ns">
     <g id="Page-1" stroke="none" stroke-width="1" fill-rule="evenodd" sketch:type="MSPage">
       <g id="AIA_text_formatting" sketch:type="MSArtboardGroup" transform="translate(-1179.000000, -10.000000)" >
@@ -97,7 +89,6 @@
       </g>
     </g>
   </symbol>
-
   <symbol id="article" viewBox="0 0 18 22" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:sketch="http://www.bohemiancoding.com/sketch/ns">
     <g id="01-Editing,-properties-panel" stroke="none" stroke-width="1" fill-rule="evenodd">
         <g id="04-Edit-mode" transform="translate(-1133.000000, -124.000000)">
@@ -108,7 +99,6 @@
     </g>
     </g>
   </symbol>
-
   <symbol id="toggle-arrow" viewBox="0 0 6 10" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
     <g id="Symbols" stroke="none" stroke-width="1" fill-rule="evenodd">
       <g id="icon/chevron-right" transform="translate(-10.000000, -8.000000)">
@@ -116,13 +106,16 @@
       </g>
     </g>
   </symbol>
-
   <symbol id="create" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 16 16">
     <g stroke="none" fill-rule="nonzero" transform="translate(-5.000000, -5.000000)">
       <path d="M14,12 L20,12 C20.5522847,12 21,12.4477153 21,13 C21,13.5522847 20.5522847,14 20,14 L14,14 L14,20 C14,20.5522847 13.5522847,21 13,21 C12.4477153,21 12,20.5522847 12,20 L12,14 L6,14 C5.44771525,14 5,13.5522847 5,13 C5,12.4477153 5.44771525,12 6,12 L12,12 L12,6 C12,5.44771525 12.4477153,5 13,5 C13.5522847,5 14,5.44771525 14,6 L14,12 Z"></path>
     </g>
   </symbol>
-
+  <symbol id="insert" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 16 16">
+    <g stroke="none" fill-rule="nonzero" transform="translate(-5.000000, -5.000000)">
+      <path d="M14,12 L20,12 C20.5522847,12 21,12.4477153 21,13 C21,13.5522847 20.5522847,14 20,14 L14,14 L14,20 C14,20.5522847 13.5522847,21 13,21 C12.4477153,21 12,20.5522847 12,20 L12,14 L6,14 C5.44771525,14 5,13.5522847 5,13 C5,12.4477153 5.44771525,12 6,12 L12,12 L12,6 C12,5.44771525 12.4477153,5 13,5 C13.5522847,5 14,5.44771525 14,6 L14,12 Z"></path>
+    </g>
+  </symbol>
   <symbol id="item-grab" viewBox="0 0 2 10" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:sketch="http://www.bohemiancoding.com/sketch/ns">
     <g id="Page-1" stroke="none" stroke-width="1" fill-rule="evenodd" sketch:type="MSPage">
       <g id="AIA_text_formatting" sketch:type="MSArtboardGroup" transform="translate(-1410.000000, -745.000000)" >
@@ -136,7 +129,6 @@
       </g>
     </g>
   </symbol>
-
   <symbol id="trash" viewBox="0 0 14 18" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:sketch="http://www.bohemiancoding.com/sketch/ns">
     <g id="Image-Uploader" stroke="none" stroke-width="1" fill-rule="evenodd" sketch:type="MSPage">
       <g id="Uploaded" sketch:type="MSArtboardGroup" transform="translate(-785.000000, -722.000000)">

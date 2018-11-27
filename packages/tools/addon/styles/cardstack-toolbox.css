@@ -55,12 +55,11 @@
 
 .cs-create-menu > ul > li > button {
     float: right;
-    padding: .5em 1em;
+    padding: 0.5em 2.5em;
     font-size: 0.75rem;
     background-color: #F2F2F2;
     border: 1px solid #cacaca;
     color: #737373;
-    padding: .5em 2.5em;
     border-radius: 3px;
     text-decoration: none;
     cursor: pointer;

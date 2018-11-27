@@ -46,6 +46,10 @@
     fill: var(--active-fg);
 }
 
+.cs-version-control-footer {
+    text-align: right;
+}
+
 .cs-version-control-footer--button-area {
     display: flex;
     flex-flow: row nowrap;
@@ -69,6 +73,7 @@
 .cs-version-control--button:hover,
 .cs-version-control--button:focus {
     outline: none;
+    border-color: var(--light50);
     color: var(--active-fg);
 }
 
@@ -77,7 +82,7 @@
     background: none;
     border: 1px solid var(--light25);
     color: var(--light25);
-    cursor: not-allowed;
+    cursor: initial;
 }
 
 .cs-version-control--button-save.enabled {
@@ -85,15 +90,15 @@
     border: none;
 }
 
-.cs-version-control--delete {
+.cs-version-control--delete-button {
+    display: inline;
+    padding: 0.5rem;
+    background: none;
+    border: none;
+    color: var(--bright-fg);
     font-size: 0.75rem;
     line-height: 1;
     text-align: right;
-}
-
-.cs-version-control--delete-button {
-    display: inline-block;
-    font-size: 0.75rem;
     text-decoration: underline;
     user-select: none;
     cursor: pointer;

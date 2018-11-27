@@ -28,7 +28,7 @@
     box-shadow: 0 -2px 15px 0 var(--dark25);
 }
 
-.cs-active-composition-panel--footer > button {
+.cs-insert-button {
     position: relative;
     width: 100%;
     padding: 1em;
@@ -37,9 +37,18 @@
     color: var(--light50);
     fill: var(--bright-fg);
     font-size: 14px;
+    text-align: center;
+    cursor: pointer;
 }
 
-.cs-active-composition-panel--footer > button > svg {
+.cs-insert-button:hover,
+.cs-insert-button:focus {
+    color: var(--active-fg);
+    fill: var(--active-fg);
+    outline: none;
+}
+
+.cs-insert-button--icon {
     position: absolute;
     left: 1em;
 }
@@ -156,6 +165,6 @@
 .cs-field-editor-section {
     margin: 0;
     padding: 0.75em;
+    background-color: var(--normal-bg);
     color: var(--bright-fg);
-    background-color: var(--dark-bg);
 }
