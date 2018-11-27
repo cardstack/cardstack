@@ -126,7 +126,7 @@ module.exports = class ContentType {
 
     errors = errors.concat(await this._checkConstraints(pendingChange, badFields));
 
-    this._validateUnknownFields(pendingChange.finalDocument, errors);
+    this._validateUnknownFields(pendingChange, errors);
 
     if (errors.length > 1) {
       let err = errors[0];
@@ -162,17 +162,26 @@ module.exports = class ContentType {
     });
   }
 
-  _validateUnknownFields(document, errors) {
-    if (document.attributes) {
-      for (let fieldName of Object.keys(document.attributes)) {
-        if (!this.realFields.has(fieldName)) {
+  _validateUnknownFields(pending, errors) {
+    let { finalDocument, originalDocument } = pending;
+
+    if (finalDocument.attributes) {
+      let originalFields = originalDocument && originalDocument.attributes
+        ? Object.keys(originalDocument.attributes) : [];
+
+      for (let fieldName of Object.keys(finalDocument.attributes)) {
+        if (!this.realFields.has(fieldName) && !originalFields.includes(fieldName)) {
           errors.push(this._unknownFieldError(fieldName, 'attributes'));
         }
       }
     }
-    if (document.relationships) {
-      for (let fieldName of Object.keys(document.relationships)) {
-        if (!this.realFields.has(fieldName)) {
+
+    if (finalDocument.relationships) {
+      let originalFields = originalDocument && originalDocument.relationships
+        ? Object.keys(originalDocument.relationships) : [];
+
+      for (let fieldName of Object.keys(finalDocument.relationships)) {
+        if (!this.realFields.has(fieldName) && !originalFields.includes(fieldName)) {
           errors.push(this._unknownFieldError(fieldName, 'relationships'));
         }
       }
