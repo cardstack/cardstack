@@ -58,4 +58,22 @@ module('Acceptance | content', function(hooks) {
 
     assert.equal(currentURL(this.owner), '/posts/1');
   });
+
+  test('card can set page title', async function(assert) {
+    await visit('/posts/1');
+    let headData = this.owner.lookup('service:head-data');
+
+    assert.equal(headData.title, 'hello world');
+  });
+
+  test('page title updates when the route changes', async function(assert) {
+    await visit('/posts/1');
+    assert.equal(currentURL(this.owner), '/posts/1');
+
+    await visit('/posts/2');
+    assert.equal(currentURL(this.owner), '/posts/2');
+    let headData = this.owner.lookup('service:head-data');
+
+    assert.equal(headData.title, 'second post');
+  });
 });

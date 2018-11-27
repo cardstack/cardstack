@@ -538,7 +538,7 @@ describe('hub/routers', function () {
       expect(space).has.property('type', 'spaces');
       expect(space).has.property('id', '/sorted?cards[sort]=favorite-toy&foo=bar&bee=bop');
       expect(space).has.deep.property('attributes.query-params', '?sort=favorite-toy');
-      expect(space.attributes['allowed-query-params']).to.have.members(['sort']);
+      expect(space.attributes['allowed-query-params']).to.have.members(['sort', 'extra']);
       expect(space).has.deep.property('relationships.primary-card.data.id', 'vanGogh');
       expect(space).has.deep.property('relationships.primary-card.data.type', 'puppies');
 

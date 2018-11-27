@@ -22,10 +22,12 @@
   "dependencies": {
     "@cardstack/data": "0.11.10",
     "@cardstack/di": "0.11.9",
+    "@cardstack/edges": "0.11.9",
     "@cardstack/plugin-utils": "0.11.9",
     "@cardstack/rendering": "0.11.9",
     "ember-auto-import": "^1.2.15",
     "ember-cli-babel": "^6.16.0",
+    "ember-cli-head": "^0.4.1",
     "ember-cli-htmlbars": "^3.0.0",
     "ember-href-to": "^1.13.0",
     "ember-inflector": "^2.1.0",

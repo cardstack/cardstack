@@ -46,6 +46,10 @@ export default Service.extend({
     return record;
   },
 
+  async getCardMetadata(card, attribute) {
+    return get(card, attribute);
+  },
+
   async query(format, opts={}) {
     let store = this.get('store');
     let branch = opts.branch || defaultBranch;

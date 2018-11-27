@@ -1,9 +1,13 @@
 import qs from 'qs';
 import Route from '@ember/routing/route';
 import { inject as service } from '@ember/service';
+import { task } from 'ember-concurrency';
 
 export default Route.extend({
-  store: service('store'),
+  store: service(),
+  cardstackEdges: service(),
+  cardstackData: service(),
+  headData: service(),
   service: service('cardstack-routing'),
 
   _commonModelHook(path, transition) {
@@ -28,6 +32,8 @@ export default Route.extend({
 
   setupController(controller, model) {
     this._super(controller, model);
+    this.get('cardstackEdges').registerTopLevelComponent('head-layout');
+
     if (!model) { return; }
 
     let queryParamsString = model.get('queryParams');
@@ -36,6 +42,17 @@ export default Route.extend({
     let params = qs.parse(queryParamsString.replace('?', ''));
     controller.set('params', params);
   },
+
+  updatePageTitle: task(function* (card) {
+    if (!card) { return; }
+
+    let title = yield this.cardstackData.getCardMetadata(card, 'title');
+    this.headData.set('title', title);
+  }).keepLatest(),
+
+  afterModel(model) {
+    this.updatePageTitle.perform(model.get('primaryCard'));
+  }
 });
 
 function is404(err) {

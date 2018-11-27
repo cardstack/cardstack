@@ -183,7 +183,7 @@ function buildSubstitutionDictionary(route, path, type) {
       if ((nameValuePair = routeQueryParam.split('=')).length > 1 && (name = nameValuePair[1]).charAt(0) === ':') {
         let queryParamRegex = new RegExp(`${type}\\[${nameValuePair[0]}\\]=`);
         let queryParam = queryParams.find(i => i.match(queryParamRegex));
-        if ((queryParamSplit = queryParam.split('=')).length > 1) {
+        if (queryParam && (queryParamSplit = queryParam.split('=')).length > 1) {
           let [, value] = queryParamSplit;
           dictionary[name.replace(':', '')] = decodeURIComponent(value);
         }
@@ -199,13 +199,15 @@ function routeThatMatchesPath(router, path, type) {
   let matchedQueryParams;
   let allowedQueryParams;
   let remainingPath = path;
+  let queryParamReplacement = (match, separator, param) => {
+    return `${separator === '&' ? '(\\&)?' : '\\' + separator}(${type}\\[${param}\\]=[^&]+)?`;
+  };
 
   for (let route of router) {
     if (!route.path) {
       throw new Error(`The router for content type '${type}' has a route that is missing a path.`);
     }
-    let routeRegex = new RegExp(`^${route.path.replace(/([?&])([^?&]+)=:[^&]+/g,
-      (match, separator, param) => `\\${separator}${type}\\[${param}\\]=[^&]+`)
+    let routeRegex = new RegExp(`^${route.path.replace(/([?&])([^?&]+)=:[^&]+/g, queryParamReplacement)
       .replace(/:[^/?#&]+/g, '[^/?#&]+')}`);
 
     if (decodeURI(path).match(routeRegex)) {
@@ -219,10 +221,12 @@ function routeThatMatchesPath(router, path, type) {
       if (route.path.includes('?')) {
         let routeQueryParams = route.path.split('?')[1];
         allowedQueryParams = routeQueryParams.split('&').map(i => i.split('=')[0]);
-        let queryParamRegex = new RegExp(`^${('?' + routeQueryParams).replace(/([?&])([^?&]+)=:[^&]+/g,
-          (match, separator, param) => `\\${separator}${type}\\[${param}\\]=[^&]+`)}`);
+        let queryParamRegex = new RegExp(`^${('?' + routeQueryParams).replace(/([?&])([^?&]+)=:[^&]+/g, queryParamReplacement)}`);
         let queryParamMatch = decodeURI(remainingPath).match(queryParamRegex);
         matchedQueryParams = queryParamMatch && queryParamMatch[0].replace(new RegExp(`${type}\\[([^\\]]+)\\]`, 'g'), '$1');
+        if (matchedQueryParams && matchedQueryParams.slice(-1) === '&') {
+          matchedQueryParams = matchedQueryParams.slice(0, -1);
+        }
         remainingPath = decodeURI(remainingPath).replace(queryParamRegex, '');
       }
 
