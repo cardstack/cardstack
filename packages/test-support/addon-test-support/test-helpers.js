@@ -13,33 +13,11 @@ export function setupURLs(hooks) {
   })
 }
 
-export function findCard(type, id, format='isolated') {
-  return getContext().owner.lookup('service:cardstackData').load(type, id, format);
-}
-
 export function getSpaceForCard(type, id) {
   return getContext().owner.lookup('service:store').findRecord('space', `/${pluralize(type)}/${id}`);
 }
 
 export function renderCard(type, id, format, options = {}) {
-  return findCard(type, id, format).then(card => {
-    let context = getContext();
-    context.set('card', card);
-    context.set('format', format);
-
-    if (options.width) {
-      context.set('widthStyle', htmlSafe(`width: ${options.width}`));
-      return render(hbs`
-      <div style="{{widthStyle}}">
-        {{cardstack-content event-isolated content=card format=format }}
-      </div>`);
-    } else {
-      return render(hbs`{{cardstack-content event-isolated content=card format=format }}`);
-    }
-  });
-}
-
-export function renderCardInSpace(type, id, format, options = {}) {
   return getSpaceForCard(type, id).then(space => {
     let context = getContext();
     let card = space.get('primaryCard');
