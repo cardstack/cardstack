@@ -5,7 +5,9 @@ as |editorName editorOptions|
 }}
   {{#if (is-component editorName)}}
     {{#if firstError}}
-      <div class="field-editor--error-message">{{firstError}}</div>
+      <div class="field-editor--error-message" data-test-validation-error={{field}}>
+        {{firstError}}
+      </div>
     {{/if}}
     {{component
       editorName

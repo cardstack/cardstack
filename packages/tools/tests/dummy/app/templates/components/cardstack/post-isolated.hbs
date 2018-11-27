@@ -18,8 +18,13 @@
   <ul>
     {{#each content.comments as |comment|}}
       <li>
-        {{cs-field comment.poster 'name'}}: {{cs-field comment 'body'}}
-        {{#cs-field-group comment name="karma" caption="Karma" fields="karmaValue,karmaType" as |ck|}}
+        {{cs-field comment.poster "name"}}: {{cs-field comment "body"}}
+        {{#cs-field-group
+          comment
+          name="karma"
+          caption="Karma"
+          fields="karmaValue,karmaType"
+        as |ck|}}
           <div>{{ck.karmaValue}} {{ck.karmaType}}</div>
         {{/cs-field-group}}
       </li>
