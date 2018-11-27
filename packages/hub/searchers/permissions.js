@@ -61,12 +61,19 @@ class PermissionsSearcher {
     }
 
     let writableFields = await Promise.all([...contentType.realFields.values()].map(async field => {
-      let grant = await find(field.grants, async g => {
-        // there has to be a grant that gives both reading and writing perm
-        // on the field for it to be considered writable
-        return g['may-read-fields'] && g['may-write-fields'] && await g.matches(document.data, context);
+      // there has to be a grant that gives both reading and writing perm
+      // on the field for it to be considered writable
+      let readGrant = await find(field.grants, async g => {
+        return g['may-read-fields'] && await g.matches(document.data, context);
       });
-      if (grant) {
+      if (!readGrant) {
+        return;
+      }
+
+      let writeGrant = await find(field.grants, async g => {
+        return g['may-write-fields'] && await g.matches(document.data, context);
+      });
+      if (writeGrant) {
         return field;
       }
     }));
