@@ -52,7 +52,7 @@ describe.only('pgsearch/indexer searchable fields', function() {
       .withRelated('fields', [
         factory.addResource('fields', 'name').withAttributes({
           fieldType: '@cardstack/core-types::string',
-          // includeInDocumentSearch: false
+          includeInDocumentSearch: false
         }),
         factory.addResource('fields', 'breed').withAttributes({
           fieldType: '@cardstack/core-types::string'
