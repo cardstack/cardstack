@@ -136,7 +136,11 @@ export default Service.extend({
 
   getCardMeta(card, attribute) {
     if (attribute === 'human-id') {
-      return [`${capitalize(getType(card))} `, card.id]
+      let humanType = getType(card)
+        .split('-')
+        .map((s) => capitalize(s))
+        .join(' ');
+      return [`${humanType} `, card.id]
         .join('#');
     }
     return '';
