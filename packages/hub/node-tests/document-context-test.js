@@ -7,22 +7,42 @@
 const Factory = require('../../../tests/pgsearch-test-app/node_modules/@cardstack/test-support/jsonapi-factory');
 
 const DocumentContext = require('../indexing/document-context');
-const { Registry, Container } = require('@cardstack/di');
 
-const bootstrapSchema = require('../bootstrap-schema');
+const {
+  createDefaultEnvironment,
+  destroyDefaultEnvironment
+} = require('../../../tests/pgsearch-test-app/node_modules/@cardstack/test-support/env');
 
 
 describe('DocumentContext', function() {
-  let schemaLoader;
+  let env, writer, searcher;
 
-  before(async function() {
-    let registry = new Registry();
+  async function createFromFactory(factory) {
+    for(const model of factory.getModels()) {
+      await writer.create('master', env.session, model.type, {
+        data: model
+      });
+    }
+  }
 
-    registry.register('config:project', {
-      path: __dirname + '/../../../tests/pgsearch-test-app'
-    }, { instantiate: false });
+  beforeEach(async function() {
+    let factory = new Factory();
 
-    schemaLoader = await new Container(registry).lookup('hub:schema-loader');
+    factory.addResource('data-sources')
+      .withAttributes({
+        'source-type': 'fake-indexer',
+        params: {
+          changedModels: []
+        }
+      });
+
+    env = await createDefaultEnvironment(`${__dirname}/../../../tests/pgsearch-test-app`, factory.getModels());
+    writer = env.lookup('hub:writers');
+    searcher = env.lookup('hub:searchers');
+  });
+
+  afterEach(async function() {
+    await destroyDefaultEnvironment(env);
   });
 
   it('should exclude unsearchable fields from fullTextDoc but not from the searchDoc or pristineDoc', async function() {
@@ -39,14 +59,15 @@ describe('DocumentContext', function() {
         }),
       ]);
 
-    let schema = await schemaLoader.loadFrom(bootstrapSchema.concat(factory.getModels()));
+    factory.addResource('puppies', 'ringo')
+      .withAttributes({
+        name: 'Ringo',
+        breed: 'yorkie',
+      });
 
-    let docContext = new DocumentContext({
-      id: 'ringo',
-      type: 'puppies',
-      schema,
-      upstreamDoc: { data: { attributes: { name: 'Ringo', breed: 'yorkie' }} },
-    });
+    await createFromFactory(factory);
+
+    let docContext = await searcher.getContext(env.session, 'master', 'puppies', 'ringo');
 
     let searchDoc = await docContext.searchDoc();
     let fullTextDoc = await docContext.fullTextDoc();
@@ -62,16 +83,13 @@ describe('DocumentContext', function() {
       name: 'Ringo'
     });
 
-    expect(pristineDoc).to.deep.equal({
-      data: {
-        id: 'ringo',
-        type: 'puppies',
-        attributes: {
-          name: 'Ringo',
-          breed: 'yorkie',
-        },
-        meta: {}
-      }
+    expect(pristineDoc.data).to.deep.include({
+      id: 'ringo',
+      type: 'puppies',
+      attributes: {
+        name: 'Ringo',
+        breed: 'yorkie',
+      },
     });
   });
 
