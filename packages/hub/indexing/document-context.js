@@ -146,8 +146,6 @@ module.exports = class DocumentContext {
         continue;
       }
 
-      console.log(field.id, field.includeInDocumentSearch);
-
       if(!field.includeInDocumentSearch) {
         continue;
       }
