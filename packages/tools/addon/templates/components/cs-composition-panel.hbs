@@ -2,7 +2,8 @@
   {{#if tools.activeContentItem.model.isCardstackPlaceholder}}
     {{cs-placeholder-composition-panel
       model=tools.activeContentItem.model
-      editingEnabled=tools.editing }}
+      editingEnabled=tools.editing
+    }}
   {{else}}
     {{cs-active-composition-panel
       model=tools.activeContentItem.model
@@ -12,7 +13,8 @@
       highlightedFieldId=tool.highlightedFieldId
       openField=(action "openField")
       highlightField=(action "highlightField")
-      editingEnabled=tools.editing}}
+      editingEnabled=tools.editing
+    }}
   {{/if}}
 {{else}}
   <section class="cs-content-info">

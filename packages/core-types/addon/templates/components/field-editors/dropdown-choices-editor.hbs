@@ -1,14 +1,16 @@
-<div class="{{concat (dasherize field) '-selector'}}">
-  {{#unless missingContentType}}
-      {{#power-select disabled=disabled
-                      selected=(get content field)
-                      options=options
-                      searchField=displayFieldName
-                      onchange=(action "makeSelection")
-                      as |option|}}
-        {{get option displayFieldName}}
-      {{/power-select}}
-  {{else}}
+<div class={{concat (dasherize field) "-selector"}}>
+  {{#if missingContentType}}
     {{cs-assert "Field" field "has no associated content type"}}
-  {{/unless}}
+  {{else}}
+    {{! template-lint-disable attribute-indentation }}
+    {{#power-select
+      disabled=disabled
+      selected=(get content field)
+      options=options
+      searchField=displayFieldName
+      onchange=(action "makeSelection")
+    as |option|}}
+      {{get option displayFieldName}}
+    {{/power-select}}
+  {{/if}}
 </div>
