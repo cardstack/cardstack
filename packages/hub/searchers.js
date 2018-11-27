@@ -59,24 +59,13 @@ class Searchers {
     if (arguments.length < 4) {
       throw new Error(`session is now a required argument to searchers.get`);
     }
-    let { resource, meta } = await this._getResourceAndMeta(session, branch, type, id);
     let authorizedResult;
-    let documentContext;
-    if (resource) {
+    let documentContext = await this.getContext(session, branch, type, id, includePaths);
+
+    if (documentContext) {
       let schema = await this.currentSchema.forBranch(branch);
-      documentContext = new DocumentContext({
-        id,
-        type,
-        branch,
-        schema,
-        includePaths,
-        upstreamDoc: { data: resource, meta },
-        read: this._read(branch)
-      });
-      let pristineResult = await documentContext.pristineDoc();
-      if (pristineResult) {
-        authorizedResult = await schema.applyReadAuthorization(pristineResult, { session, type, id });
-      }
+      let pristineDoc = await documentContext.pristineDoc();
+      authorizedResult = await schema.applyReadAuthorization(pristineDoc, { session, type, id });
     }
 
     if (!authorizedResult) {
@@ -85,12 +74,34 @@ class Searchers {
       });
     }
 
+    let { meta } = await this._getResourceAndMeta(session, branch, type, id);
     let maxAge = get(meta, 'cardstack-cache-control.max-age');
     if (maxAge != null) {
       await this._updateCache(maxAge, documentContext);
     }
 
     return authorizedResult;
+  }
+
+  async getContext(session, branch, type, id, includePaths ) {
+    if (arguments.length < 4) {
+      throw new Error(`session is now a required argument to searchers.getContext`);
+    }
+
+    let { resource, meta } = await this._getResourceAndMeta(session, branch, type, id);
+
+    if (resource) {
+      let schema = await this.currentSchema.forBranch(branch);
+      return new DocumentContext({
+        id,
+        type,
+        branch,
+        schema,
+        includePaths,
+        upstreamDoc: { data: resource, meta },
+        read: this._read(branch)
+      });
+    }
   }
 
   async getBinary(session, branch, type, id, includePaths) {
