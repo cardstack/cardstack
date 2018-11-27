@@ -24,7 +24,7 @@ module.exports = class Field {
     this.editorOptions = model.attributes['editor-options'];
     this.inlineEditorComponent = model.attributes['inline-editor-component'];
     this.inlineEditorOptions = model.attributes['inline-editor-options'];
-    this.searchable = model.attributes.searchable == null ? true : model.attributes.searchable;
+    this.includeInDocumentSearch = model.attributes['include-in-document-search'] == null ? true : model.attributes['include-in-document-search'];
     let owned = model.attributes.owned;
     this.owned = typeof owned === 'undefined' ? false : owned;
 

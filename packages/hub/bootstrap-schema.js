@@ -36,7 +36,7 @@ const models = [
           { type: 'fields', id: 'default-at-create' },
           { type: 'fields', id: 'default-at-update' },
           { type: 'fields', id: 'caption' },
-          { type: 'fields', id: 'searchable' },
+          { type: 'fields', id: 'include-in-document-search' },
           { type: 'fields', id: 'editor-component'},
           { type: 'fields', id: 'editor-options'},
           { type: 'fields', id: 'inline-editor-component'},
@@ -56,7 +56,7 @@ const models = [
         data: [
           { type: 'fields', id: 'computed-field-type' },
           { type: 'fields', id: 'caption' },
-          { type: 'fields', id: 'searchable' },
+          { type: 'fields', id: 'include-in-document-search' },
           { type: 'fields', id: 'params' }
         ]
       }
@@ -466,7 +466,7 @@ const models = [
   },
   {
     type: 'fields',
-    id: 'searchable',
+    id: 'include-in-document-search',
     attributes: {
       'field-type': '@cardstack/core-types::boolean'
     }
