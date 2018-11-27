@@ -4,7 +4,7 @@ const CssImport = require('postcss-import');
 const CssNext = require('postcss-cssnext');
 
 module.exports = {
-  name: '@cardstack/tools',
+  name: require('./package').name,
   isDevelopingAddon() {
     return process.env.CARDSTACK_DEV;
   },

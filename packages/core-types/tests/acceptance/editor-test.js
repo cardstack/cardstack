@@ -23,8 +23,8 @@ module('Acceptance | field editors', async function(hooks) {
     let vehicle = await model.get('vehicle.name');
     let alternateVehicle = await model.get('alternateVehicle.name');
     let tracks = await model.get('tracks.length');
-    let firstTrack = await model.get('tracks.firstObject.name');
-    let lastTrack = await model.get('tracks.lastObject.name');
+    let firstTrack = await model.get('tracks.firstObject.title');
+    let lastTrack = await model.get('tracks.lastObject.title');
 
     assert.equal(model.get('name'), 'Metal Mario', 'driver name is correct');
     assert.equal(model.get('dob'), '1999-01-01', 'driver dob is correct');
@@ -58,8 +58,8 @@ module('Acceptance | field editors', async function(hooks) {
     feeling = await model.get('feeling.title');
     vehicle = await model.get('vehicle.name');
     alternateVehicle = await model.get('alternateVehicle.name');
-    firstTrack = await model.get('tracks.firstObject.name');
-    lastTrack = await model.get('tracks.lastObject.name');
+    firstTrack = await model.get('tracks.firstObject.title');
+    lastTrack = await model.get('tracks.lastObject.title');
 
     assert.equal(model.get('name'), 'METAL Mario', 'metal mario is more metal');
     assert.equal(model.get('dob'), '1998-01-01', 'metal mario was born earlier');

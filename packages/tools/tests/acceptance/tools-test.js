@@ -60,16 +60,16 @@ module('Acceptance | tools', function(hooks) {
     let titleEditor = findInputWithValue.call(this, '10 steps to becoming a fearsome pirate');
     await fillIn(titleEditor, '');
     await triggerEvent(titleEditor, 'blur');
-    await waitFor('.field-editor--error-message');
-    assert.dom('.field-editor--error-message').hasText('title must not be empty');
+    await waitFor('[data-test-validation-error=title]')
+    assert.dom('[data-test-validation-error=title]').hasText('title must not be empty');
 
     element = findTriggerElementWithLabel.call(this, /Body/);
     await click(element);
     let commentBodyEditor = findInputWithValue.call(this, 'Look behind you, a Three-Headed Monkey!');
     await fillIn(commentBodyEditor, '');
     await triggerEvent(commentBodyEditor, 'blur');
-    await waitFor('.field-editor--error-message');
-    assert.dom('.field-editor--error-message').hasText('body must not be empty');
+    await waitFor('[data-test-validation-error=body]')
+    assert.dom('[data-test-validation-error=body]').hasText('body must not be empty');
   });
 
   test('show all fields, not just those rendered from template', async function(assert) {

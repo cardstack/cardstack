@@ -16,6 +16,10 @@ export default Component.extend({
 
       this.tools.resolveCard(model);
       return false;
+    },
+
+    closePicker() {
+      this.get('tools').closePicker();
     }
   }
 });

@@ -19,5 +19,10 @@ export default Service.extend({
   resolveCard(model) {
     this.get('resolve')(model);
     this.set('active', false);
+  },
+
+  closePicker() {
+    this.get('reject')();
+    this.set('active', false);
   }
 });
