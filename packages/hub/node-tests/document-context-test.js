@@ -93,6 +93,107 @@ describe('DocumentContext', function() {
     });
   });
 
+  it('should include relationships but exclude unsearchable fields from from fullTextDoc but not from the searchDoc or pristineDoc', async function() {
+    let factory = new Factory();
+
+    let nameField = factory.addResource('fields', 'name').withAttributes({
+      fieldType: '@cardstack/core-types::string',
+    });
+
+    factory.addResource('content-types', 'owners')
+      .withRelated('fields', [
+        nameField,
+        factory.addResource('fields', 'address').withAttributes({
+          fieldType: '@cardstack/core-types::string',
+        })
+      ]);
+
+    factory.addResource('content-types', 'puppies')
+      .withRelated('fields', [
+        nameField,
+        factory.addResource('fields', 'breed').withAttributes({
+          fieldType: '@cardstack/core-types::string',
+          includeInDocumentSearch: false,
+        }),
+        factory.addResource('fields', 'owner')
+          .withAttributes({
+            fieldType: '@cardstack/core-types::belongs-to'
+          })
+          .withRelated('relatedTypes', [
+            {type: 'content-types', id: 'owners'}
+          ]),
+      ]);
+
+    factory.addResource('owners', 'bob')
+      .withAttributes({
+        name: 'Robert',
+        address: 'Germany',
+      });
+
+    factory.addResource('puppies', 'ringo')
+      .withAttributes({
+        name: 'Ringo',
+        breed: 'yorkie',
+      })
+      .withRelated('owner', { type: 'owners', id: 'bob' });
+
+    await createFromFactory(factory);
+
+    let docContext = await searcher.getContext(env.session, 'master', 'puppies', 'ringo', [
+      'owner',
+    ]);
+
+    let searchDoc = await docContext.searchDoc();
+    let fullTextDoc = await docContext.fullTextDoc();
+    let pristineDoc = await docContext.pristineDoc();
+
+    expect(searchDoc).to.deep.equal({
+      id: 'ringo',
+      name: 'Ringo',
+      breed: 'yorkie',
+      owner: {
+        address: 'Germany',
+        id: 'bob',
+        name: 'Robert',
+        type: 'owners'
+      }
+    });
+
+    expect(fullTextDoc).to.deep.equal({
+      name: 'Ringo',
+      owner: {
+        address: 'Germany',
+        name: 'Robert'
+      }
+    });
+
+    expect(pristineDoc.data).to.deep.include({
+      id: 'ringo',
+      type: 'puppies',
+      attributes: {
+        name: 'Ringo',
+        breed: 'yorkie',
+      },
+      relationships: {
+        owner: {
+          data: {
+            id: "bob",
+            type: "owners",
+          }
+        }
+      },
+    });
+
+    expect(pristineDoc.included[0]).to.deep.include({
+      id: 'bob',
+      type: 'owners',
+      attributes: {
+        name: 'Robert',
+        address: 'Germany'
+      }
+    });
+  });
+
   it('should exclude unsearchable relationships from fullTextDoc but not from the searchDoc or pristineDoc');
   it('should exclude unsearchable fields on a related card from the fullTextDoc but not from the searchDoc or pristineDoc');
 });
