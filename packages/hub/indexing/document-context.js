@@ -57,6 +57,11 @@ module.exports = class DocumentContext {
     return this._pristine;
   }
 
+  async fullTextDoc() {
+    await this._buildCachedResponse();
+    return this._fullText;
+  }
+
   async realms() {
     if (this.isCollection) { return; }
 
@@ -131,6 +136,26 @@ module.exports = class DocumentContext {
           (jsonapiDoc.attributes && jsonapiDoc.attributes.hasOwnProperty(field.id))) {
         let value = await userModel.getField(field.id);
         searchDocOut[field.id] = field.searchIndexFormat(value);
+      }
+    }
+  }
+
+  async _buildFullTextAttributes(contentType, jsonapiDoc, userModel, fullTextDocOut) {
+    for (let field of contentType.realAndComputedFields.values()) {
+      if (field.id === 'id' || field.id === 'type' || field.isRelationship) {
+        continue;
+      }
+
+      console.log(field.id, field.includeInDocumentSearch);
+
+      if(!field.includeInDocumentSearch) {
+        continue;
+      }
+
+      if (contentType.computedFields.has(field.id) ||
+          (jsonapiDoc.attributes && jsonapiDoc.attributes.hasOwnProperty(field.id))) {
+        let value = await userModel.getField(field.id);
+        fullTextDocOut[field.id] = field.searchIndexFormat(value);
       }
     }
   }
@@ -210,6 +235,12 @@ module.exports = class DocumentContext {
     // because we're keeping it in the built in _type field.
     let searchDoc = isCollection ? {} : { ['id']: id };
 
+    // This should be used to populate any full text search indexes provided
+    // a searcher. It will not include an ID and will essentially match the
+    // searchDoc but filters out any attributes that are marked as
+    // `includeInDocumentSearch: false`
+    let fullTextDoc = {};
+
     // this is the copy of the document we will return to anybody who
     // retrieves it. It's supposed to already be a correct jsonapi
     // response, as opposed to the searchDoc itself which is mangled
@@ -269,6 +300,7 @@ module.exports = class DocumentContext {
       }
       let userModel = new Model(contentType, jsonapiDoc, this.schema, this.read.bind(this));
       await this._buildSearchAttributes(contentType, jsonapiDoc, userModel, searchDoc);
+      await this._buildFullTextAttributes(contentType, jsonapiDoc, userModel, fullTextDoc);
       await this._buildPristineAttributes(contentType, jsonapiDoc, userModel, pristine);
 
       if (!this._followedRelationships[`${type}/${id}`]) {
@@ -289,6 +321,9 @@ module.exports = class DocumentContext {
         .slice(1)
         .filter(r => !(r.type == type && r.id == id));
     }
+
+    // TODO: figure out exactly where to set this
+    this._fullText = fullTextDoc;
 
     if (depth > 0) {
       this.pristineIncludes.push(jsonapiDoc);
