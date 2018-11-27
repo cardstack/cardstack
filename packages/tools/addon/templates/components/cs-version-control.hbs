@@ -1,8 +1,10 @@
-{{#cs-collapsible-section class=(concat "cs-toolbox-section " titleClass)
-                          title=title
-                          opened=opened
-                          open=(action "open")
-                          close=(action "close") }}
+{{#cs-collapsible-section
+  class=(concat "cs-toolbox-section " titleClass)
+  title=title
+  opened=opened
+  open=(action "open")
+  close=(action "close")
+}}
 
   <div class="cs-field-editor-section">
     {{#liquid-spacer}}
@@ -31,19 +33,29 @@
 
   </div>
 
-  {{#liquid-if enabled rules=animationRules growDuration=250 growPixelsPerSecond=1}}
+  {{#liquid-if
+    enabled
+    rules=animationRules
+    growDuration=250
+    growPixelsPerSecond=1
+  }}
     <footer class="cs-version-control-footer cs-field-editor-section">
-      <a class="text-button" {{action (perform delete) }}>Delete</a>
+      {{! template-lint-disable no-invalid-interactive }}
+      <a class="text-button" onclick={{action (perform delete)}}>Delete</a>
 
       <div class="cs-version-control-footer--button-area">
         {{#if update.isRunning}}
           <span class="cs-version-control--loading" aria-label="Loading"></span>
         {{/if}}
-        <button class="cs-version-control-footer--button" disabled={{eq modificationState "saved"}} {{action (perform update) }}>
+        <button
+          class="cs-version-control-footer--button"
+          disabled={{eq modificationState "saved"}}
+          onclick={{action (perform update)}}
+        >
           Update
         </button>
       </div>
-      {{#with (concat modelType '-action-buttons') as |buttonsComponent|}}
+      {{#with (concat modelType "-action-buttons") as |buttonsComponent|}}
         {{#if (is-component buttonsComponent)}}
           {{component buttonsComponent model=model modificationState=modificationState}}
         {{/if}}

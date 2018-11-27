@@ -2,6 +2,10 @@
 
 <ul>
   {{#each availableTypes as |type|}}
-    <li {{action "create" type}} >{{cs-humanize type.id}}<button>Add +</button></li>
+    {{! template-lint-disable no-invalid-interactive }}
+    <li onclick={{action "create" type}}>
+      {{cs-humanize type.id}}
+      <button>Add +</button>
+    </li>
   {{/each}}
 </ul>

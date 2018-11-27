@@ -616,7 +616,7 @@
     handlebars "^4.0.6"
     simple-html-tokenizer "^0.5.6"
 
-"@glimmer/util@^0.25.6":
+"@glimmer/util@^0.25.6", "@glimmer/util@^0.25.8":
   version "0.25.8"
   resolved "https://registry.yarnpkg.com/@glimmer/util/-/util-0.25.8.tgz#bf796152d15c2020b30f9e00757d220ebe8b1dd8"
   integrity sha512-nIELcKEevSV4h75mOqzaDcHLWqwd2GCKDNzPyon1DDcU7mbYI6AB7BY+8sPbg6fJOS7zUfcx3f+sNfrb3cRy0w==
@@ -625,11 +625,12 @@
   version "0.36.4"
   resolved "https://registry.yarnpkg.com/@glimmer/util/-/util-0.36.4.tgz#a79287fe261cc5b198d1c35943dc8aa879b98bc5"
 
-"@glimmer/wire-format@^0.25.6":
-  version "0.25.6"
-  resolved "https://registry.yarnpkg.com/@glimmer/wire-format/-/wire-format-0.25.6.tgz#f0543801d234e133bf72d2bdec68dd2c36c06eca"
+"@glimmer/wire-format@^0.25.8":
+  version "0.25.8"
+  resolved "https://registry.yarnpkg.com/@glimmer/wire-format/-/wire-format-0.25.8.tgz#6ecd292c9a7122d7122111154a291a0046e3dec4"
+  integrity sha512-k2NrpguFZDsTxoZ3oKSFwGonOQc/OHqZplimgLDz/hSgDFffHlwf3+580uBLU4QYBYSDOimjgXKpFvBG0FZD9w==
   dependencies:
-    "@glimmer/util" "^0.25.6"
+    "@glimmer/util" "^0.25.8"
 
 "@glimmer/wire-format@^0.36.4":
   version "0.36.4"
@@ -976,6 +977,7 @@ ajv@^5.2.3:
 ajv@^6.1.0:
   version "6.5.4"
   resolved "https://registry.yarnpkg.com/ajv/-/ajv-6.5.4.tgz#247d5274110db653706b550fcc2b797ca28cfc59"
+  integrity sha512-4Wyjt8+t6YszqaXnLDfMmG/8AlO5Zbcsy3ATHncCzjW/NoPzAId8AK6749Ybjmdt+kUY1gP60fCu46oDxPv/mg==
   dependencies:
     fast-deep-equal "^2.0.1"
     fast-json-stable-stringify "^2.0.0"
@@ -5879,6 +5881,18 @@ ember-source@~3.4.0:
 ember-template-lint@^1.0.0-beta.5:
   version "1.0.0-beta.5"
   resolved "https://registry.yarnpkg.com/ember-template-lint/-/ember-template-lint-1.0.0-beta.5.tgz#b9c3459752b9fb6c93f676f5a99e18372ad60af2"
+  dependencies:
+    "@glimmer/compiler" "^0.36.2"
+    chalk "^2.0.0"
+    globby "^8.0.1"
+    minimatch "^3.0.4"
+    resolve "^1.1.3"
+    strip-bom "^3.0.0"
+
+ember-template-lint@^1.0.0-beta.6:
+  version "1.0.0-beta.6"
+  resolved "https://registry.yarnpkg.com/ember-template-lint/-/ember-template-lint-1.0.0-beta.6.tgz#a49d6a37beb3fd7bdae17472efc8ec298d739aa9"
+  integrity sha512-QeP0GB0oFLvtZXszCTHILlHO5RdVybkdhFdoXSST7IdJHdSIourYjhtgkVVdpw9SOP2SV4xLLTev/tXfNyNZXQ==
   dependencies:
     "@glimmer/compiler" "^0.36.2"
     chalk "^2.0.0"
@@ -12013,10 +12027,12 @@ rsvp@^3.0.14, rsvp@^3.0.16, rsvp@^3.0.17, rsvp@^3.0.18, rsvp@^3.0.21, rsvp@^3.0.
 rsvp@^4.6.1, rsvp@^4.8.1:
   version "4.8.4"
   resolved "https://registry.yarnpkg.com/rsvp/-/rsvp-4.8.4.tgz#b50e6b34583f3dd89329a2f23a8a2be072845911"
+  integrity sha512-6FomvYPfs+Jy9TfXmBpBuMWNH94SgCsZmJKcanySzgNNP6LjWxBvyLTa9KaMfDDM5oxRfrKDB0r/qeRsLwnBfA==
 
 rsvp@^4.7.0:
   version "4.7.0"
   resolved "https://registry.yarnpkg.com/rsvp/-/rsvp-4.7.0.tgz#dc1b0b1a536f7dec9d2be45e0a12ad4197c9fd96"
+  integrity sha1-3BsLGlNvfeydK+ReChKtQZfJ/ZY=
 
 rsvp@^4.8.2, rsvp@^4.8.3:
   version "4.8.3"

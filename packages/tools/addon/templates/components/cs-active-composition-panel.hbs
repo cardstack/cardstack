@@ -9,7 +9,8 @@
   </p>
 </section>
 
-<div> {{!- this one scrolls }}
+{{!- this one scrolls }}
+<div>
 
   {{cs-version-control
     model=model
@@ -18,7 +19,11 @@
   }}
 
   {{#each renderedFields key="id" as |fieldMark|}}
-    {{#let fieldMark.model (eq fieldMark.model.content model) as |fieldModel isPageModelField|}}
+    {{! template-lint-disable attribute-indentation }}
+    {{#let
+      fieldMark.model
+      (eq fieldMark.model.content model)
+    as |fieldModel isPageModelField|}}
       {{#cs-collapsible-section
         class=(concat "cs-toolbox-section "
           (if

@@ -1,4 +1,5 @@
 {{#overlay-marks group="cardstack-fields" as |mark|}}
+  {{! template-lint-disable attribute-indentation }}
   {{#let
     mark.model.name
     mark.model.content
@@ -34,6 +35,6 @@
                    highlighted=false
                    hoverable=tools.editing
                    class="cs-content-overlay"
-                   onclick=(action 'navigateToCard' mark.model)
+                   onclick=(action "navigateToCard" mark.model)
                    }}
 {{/overlay-marks}}
