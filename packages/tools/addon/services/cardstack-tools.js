@@ -27,23 +27,27 @@ export default Service.extend({
   }),
 
   modelFields: computed('_renderedFieldNames', 'activeContentItem.model', function() {
-    let fields = [];
     let renderedFieldNames = this.get('_renderedFieldNames');
     let model = this.get('activeContentItem.model');
-    if (!model) { return fields; }
-    model.eachAttribute((attribute, meta) => {
-      // When fields are also shown from owned, related records
-      // simply checking field name duplication won't be enough:
-      // we have to also check if the models are the same
-      // Or maybe not: https://github.com/cardstack/cardstack/issues/390
-      if (!renderedFieldNames.includes(meta.name)) {
-        let fieldInfo = Object.assign({}, meta);
-        fieldInfo.id = guidFor(fieldInfo);
-        fieldInfo.model = model;
-        fields.push(fieldInfo);
-      }
+    if (!model) { return []; }
+
+    let records = [model, ...model.relatedOwnedRecords()];
+    let modelFields = records.map((record) => {
+      let fields = [];
+      record.eachAttribute((attribute, meta) => {
+        // Prevent rendering a field that's already explicitly rendered
+        if (!renderedFieldNames.includes(meta.name)) {
+          let fieldInfo = Object.assign({}, meta);
+          fieldInfo.id = guidFor(fieldInfo);
+          fieldInfo.model = record;
+          fields.push(fieldInfo);
+        }
+      });
+      return fields;
     });
-    return fields;
+    return modelFields.reduce((flattened, fields) => {
+      return flattened.concat(fields);
+    });
   }),
 
   contentPages: computed('marks', function() {
@@ -177,7 +181,7 @@ export default Service.extend({
     this.persistentState = priorState || {};
 
 
-    /* --  Ephemermal state -- */
+    /* --  Ephemeral state -- */
 
     // a field is highlighted when we're drawing a blue border around it
     this.highlightedFieldId = null;
@@ -186,7 +190,6 @@ export default Service.extend({
     this.openedFieldId = null;
 
     // Register items for edges
-
     this.get('cardstackEdges').registerTopLevelComponent('cardstack-tools-edges');
   },
 

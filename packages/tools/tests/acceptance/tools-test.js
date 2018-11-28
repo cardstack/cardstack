@@ -43,9 +43,9 @@ module('Acceptance | tools', function(hooks) {
     matching = findInputWithValue.call(this, 'Look behind you, a Three-Headed Monkey!');
     assert.ok(matching, 'found field editor for comment body');
 
-    element = findTriggerElementWithLabel.call(this, /Name/);
+    element = findTriggerElementWithLabel.call(this, /Author Name/);
     await click(element);
-    matching = findInputWithValue.call(this, 'Guybrush Threepwood');
+    matching = findInputWithValue.call(this, 'LeChuck');
     assert.ok(matching, 'found field editor for comment poster name');
   });
 
@@ -84,12 +84,21 @@ module('Acceptance | tools', function(hooks) {
     assert.equal(titleSections.length, 1, "Rendered fields only appear once");
   });
 
+  test('show unrendered fields from related, owned records', async function(assert) {
+    await visit('/1');
+    await login();
+    await click('.cardstack-tools-launcher');
+
+    assert.ok(findTriggerElementWithLabel.call(this, /Comment #1: Review Status/));
+    assert.ok(findTriggerElementWithLabel.call(this, /Comment #2: Review Status/));
+  });
+
+
   test('collapsible panel captions are unambiguous', async function(assert) {
     await visit('/1');
     await login();
     await click('.cardstack-tools-launcher');
 
-    assert.ok(findTriggerElementWithLabel.call(this, /Blogger #1: Name/));
     assert.ok(findTriggerElementWithLabel.call(this, /Comment #1: Body/));
     assert.ok(findTriggerElementWithLabel.call(this, /Comment #1: Karma/));
     assert.ok(findTriggerElementWithLabel.call(this, /Comment #2: Body/));
