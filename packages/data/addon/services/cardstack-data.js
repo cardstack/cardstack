@@ -143,6 +143,9 @@ export default Service.extend({
       return [`${humanType} `, card.id]
         .join('#');
     }
+    if (attribute === 'uid') {
+      return `${getType(card)}/${card.id}`;
+    }
     return '';
   },
 

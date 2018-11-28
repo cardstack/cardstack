@@ -20,7 +20,17 @@ export default Component.extend({
   },
 
   fetchPermissions: task(function * () {
-    let permissions = yield this.get('data').fetchPermissionsFor(this.model);
+    let records = [this.model, ...this.model.relatedOwnedRecords()];
+    let permissionTuples = yield Promise.all(records.map(async (record) => {
+      let permissions = await this.get('data').fetchPermissionsFor(record);
+      return [record, permissions];
+    }));
+    let permissions = permissionTuples.reduce((hash, permissions) => {
+      let [ record, permissionsForRecord ] = permissions;
+      let key = this.get('data').getCardMeta(record, 'uid');
+      hash[key] = permissionsForRecord;
+      return hash;
+    }, {});
     this.set('permissions', permissions);
   }),
 

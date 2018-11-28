@@ -37,7 +37,10 @@
         unhovered=(perform highlightAndScrollToField null)
       }}
         <div class="cs-field-editor-section">
-          {{#let fieldModel.content as |content|}}
+          {{#let
+            fieldModel.content
+            (get permissions (cs-uid fieldModel.content))
+          as |content fieldModelPermissions|}}
             {{#if fieldModel.grouped}}
               {{#each fieldModel.grouped as |fieldName|}}
                 <label>{{cs-field-caption content fieldName}}</label>
@@ -48,11 +51,9 @@
                   content=content
                   field=fieldName
                   enabled=editingEnabled
-                  canUpdate=(or
-                    (not isPageModelField)
-                    (and
-                      permissions.mayUpdateResource
-                      (contains fieldName permissions.writableFields))
+                  canUpdate=(and
+                    fieldModelPermissions.mayUpdateResource
+                    (contains fieldName fieldModelPermissions.writableFields)
                   )
                   onchange=(action "validate")
                   errors=(get validationErrors fieldName)
@@ -66,11 +67,9 @@
                 content=content
                 field=fieldModel.name
                 enabled=editingEnabled
-                canUpdate=(or
-                  (not isPageModelField)
-                  (and
-                    permissions.mayUpdateResource
-                    (contains fieldModel.name permissions.writableFields))
+                canUpdate=(and
+                  fieldModelPermissions.mayUpdateResource
+                  (contains fieldModel.name fieldModelPermissions.writableFields)
                 )
                 onchange=(action "validate")
                 errors=(get validationErrors fieldModel.name)
@@ -83,7 +82,10 @@
   {{/each}}
 
   {{#each modelFields as |field|}}
-    {{#let (eq field.model model) as |isPageModelField|}}
+    {{#let
+      (get permissions (cs-uid field.model))
+      (eq field.model model)
+    as |fieldModelPermissions isPageModelField|}}
       {{#cs-collapsible-section
         class=(concat "cs-toolbox-section "
           (if
@@ -100,8 +102,8 @@
             field=field.name
             enabled=editingEnabled
             canUpdate=(and
-              permissions.mayUpdateResource
-              (contains field.name permissions.writableFields)
+              fieldModelPermissions.mayUpdateResource
+              (contains field.name fieldModelPermissions.writableFields)
             )
             onchange=(action "validate")
             errors=(get validationErrors field.name)
