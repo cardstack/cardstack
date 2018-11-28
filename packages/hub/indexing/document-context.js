@@ -1,7 +1,7 @@
 const authLog = require('@cardstack/logger')('cardstack/auth');
 const log = require('@cardstack/logger')('cardstack/indexing/document-context');
 const Model = require('../model');
-const { get, uniqBy } = require('lodash');
+const { get, uniqBy, omit } = require('lodash');
 
 module.exports = class DocumentContext {
 
@@ -171,7 +171,7 @@ module.exports = class DocumentContext {
     }
   }
 
-  async _buildRelationships(contentType, jsonapiDoc, userModel, pristineDocOut, searchDocOut, searchTree, depth, fieldsets) {
+  async _buildRelationships(contentType, jsonapiDoc, userModel, pristineDocOut, searchDocOut, fullTextDocOut, searchTree, depth, fieldsets) {
     for (let field of contentType.realAndComputedFields.values()) {
       if (!field.isRelationship) {
         continue;
@@ -181,6 +181,7 @@ module.exports = class DocumentContext {
         let value = { data: await userModel.getField(field.id) };
         let fieldset = fieldsets && fieldsets.find(f => f.field === field.id);
         await this._buildRelationship(field, value, pristineDocOut, searchDocOut, searchTree, depth, get(fieldset, 'format'));
+        await this._buildfullTextRelationship(field, value, fullTextDocOut, searchTree, depth, get(fieldset, 'format'));
       }
     }
   }
@@ -213,6 +214,34 @@ module.exports = class DocumentContext {
       ensure(pristineDocOut, 'relationships')[field.id] = Object.assign({}, value);
     }
     searchDocOut[field.id] = related;
+  }
+
+  async _buildfullTextRelationship(field, value, fullTextDocOut, searchTree, depth, format) {
+    if (!value || !value.hasOwnProperty('data')) {
+      return;
+    }
+
+    let related;
+    if (value.data && searchTree[field.id]) {
+      if (Array.isArray(value.data)) {
+        related = await Promise.all(value.data.map(async ({ type, id }) => {
+          let resource = await this.read(type, id);
+          if (resource) {
+            return this._build(type, id, resource, searchTree[field.id], depth + 1, format);
+          }
+        }));
+        related = related.filter(Boolean);
+      } else {
+        let resource = await this.read(value.data.type, value.data.id);
+        if (resource) {
+          related = await this._build(resource.type, resource.id, resource, searchTree[field.id], depth + 1, format);
+        }
+      }
+    } else {
+      related = value.data;
+    }
+
+    fullTextDocOut[field.id] = omit(related, 'id', 'type');
   }
 
   _buildSearchTree(searchTree, segments) {
@@ -303,7 +332,7 @@ module.exports = class DocumentContext {
 
       if (!this._followedRelationships[`${type}/${id}`]) {
         this._followedRelationships[`${type}/${id}`] = true;
-        await this._buildRelationships(contentType, jsonapiDoc, userModel, pristine, searchDoc, searchTree, depth, fieldsets);
+        await this._buildRelationships(contentType, jsonapiDoc, userModel, pristine, searchDoc, fullTextDoc, searchTree, depth, fieldsets);
       }
 
       assignMeta(pristine.data, jsonapiDoc);
