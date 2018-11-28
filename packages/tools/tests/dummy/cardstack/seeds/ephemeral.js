@@ -44,7 +44,6 @@ function initialModels() {
       }),
       initial.addResource('fields', 'poster').withAttributes({
         fieldType: '@cardstack/core-types::belongs-to',
-        owned: true,
       }).withRelated('related-types', [
         initial.getResource('content-types', 'bloggers')
       ]),
@@ -63,6 +62,9 @@ function initialModels() {
               .withAttributes({ fieldType: '@cardstack/core-types::string' })
           ])
         ]),
+      initial.addResource('fields', 'review-status').withAttributes({
+        fieldType: '@cardstack/core-types::string',
+      }),
     ]);
 
   initial.addResource('content-types', 'posts')
@@ -148,7 +150,8 @@ function initialModels() {
   let threeHeadedMonkey = initial.addResource('comments', '1')
     .withAttributes({
       body: 'Look behind you, a Three-Headed Monkey!',
-      karmaValue: 10
+      karmaValue: 10,
+      reviewStatus: 'approved'
     })
     .withRelated('poster', guybrush)
     .withRelated('karma-type', goodKarma);
@@ -156,7 +159,8 @@ function initialModels() {
   let diapers = initial.addResource('comments', '2')
     .withAttributes({
       body: 'Have you stopped wearing diapers yet?',
-      karmaValue: 5
+      karmaValue: 5,
+      reviewStatus: 'pending'
     })
     .withRelated('poster', guybrush)
     .withRelated('karma-type', badKarma);
