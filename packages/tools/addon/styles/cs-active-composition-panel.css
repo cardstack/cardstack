@@ -77,6 +77,7 @@
     opacity: 0.5;
     text-transform: uppercase;
     margin: 0 0 2px;
+    font-family: 'Open Sans Bold';
     font-weight: bold;
 }
 
@@ -99,6 +100,7 @@
     user-select: none;
     margin: 0;
     padding: .75em 1em .5em;
+    font-family: 'Open Sans Bold';
     font-weight: bold;
     overflow: hidden;
     cursor: pointer;

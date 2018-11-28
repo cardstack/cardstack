@@ -14,6 +14,7 @@
 .cs-version-control-dropdown-option--status {
     display: inline-block;
     padding-right: 1em;
+    font-family: 'Open Sans Bold';
     font-weight: bold;
 }
 
