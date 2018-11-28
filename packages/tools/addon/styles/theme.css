@@ -30,7 +30,7 @@
 }
 
 .cs-field-editor-section input:focus {
-    border: 2px solid var(--active-fg);
+    border-color: var(--active-fg);
     outline: none;
 }
 
@@ -49,7 +49,7 @@
 }
 
 .cs-field-editor-section .ember-power-select-trigger:focus {
-    border: 2px solid var(--active-fg);
+    border-color: var(--active-fg);
     outline: none;
 }
 
