@@ -69,6 +69,7 @@
     {{/let}}
   {{/each}}
 
+  {{!-- These are the fields that exist for the template but are not rendered --}}
   {{#each modelFields as |field|}}
     {{#let (eq field.model model) as |isPageModelField|}}
       {{#cs-collapsible-section
@@ -98,15 +99,3 @@
     {{/let}}
   {{/each}}
 </div>
-
-<footer class="cs-active-composition-panel--footer">
-  <button class="cs-insert-button" type="button">
-    {{cs-svg
-      "insert"
-      width="16px"
-      height="16px"
-      class="cs-insert-button--icon"
-    }}
-    Insert Into Page
-  </button>
-</footer>
