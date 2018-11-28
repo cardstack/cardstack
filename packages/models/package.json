@@ -27,12 +27,14 @@
     "@cardstack/codegen": "0.11.10",
     "@cardstack/di": "0.11.9",
     "@cardstack/plugin-utils": "0.11.9",
+    "ember-auto-import": "^1.2.16",
     "ember-cli-babel": "^6.8.2",
     "ember-data-relationship-tracker": "^0.3.2",
     "ember-inject-optional": "^0.1.0",
     "ember-resource-metadata": "^0.3.0",
     "handlebars": "^4.0.6",
-    "inflection": "^1.12.0"
+    "inflection": "^1.12.0",
+    "lodash-es": "^4.17.11"
   },
   "devDependencies": {
     "@cardstack/authentication": "0.11.10",

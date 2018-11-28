@@ -6,27 +6,34 @@ import { readOnly, or } from '@ember/object/computed';
 import { capitalize } from '@ember/string';
 import { run } from '@ember/runloop';
 import { A as EmberArray } from '@ember/array';
+import { uniq } from 'lodash-es';
 
 export default DS.Model.extend(RelationshipTracker, {
   resourceMetadata: service(),
 
   init() {
     this._super();
-    let dirtyTrackingProperties = {};
+    let ownedRelationships = {};
     this._relationshipsByName().forEach((relation) => {
       let { kind, meta } = relation;
       if (meta) {
         let { owned } = meta.options;
         if (owned) {
-          let propertyName = createHasDirtyForRelationship(this, meta.name, kind);
-          dirtyTrackingProperties[meta.name] = propertyName;
+          //TODO: Create a _ownedRelationships hash:
+          // { comments: 'hasMany', author: 'belongsTo' }
+          // that hash can then be used for creating the dirtyTracking CPs
+          // but also when saving and rendering fields for owner records
+          //TODO: Implement relatedOwnedRecords
+          //TODO: Refactor `saveRelated` to use `relatedOwnedRecords`
+          ownedRelationships[meta.name] = kind;
         }
       }
     });
-    if (Object.keys(dirtyTrackingProperties).length > 0) {
-      createHasDirtyOwned(this, Object.values(dirtyTrackingProperties));
+
+    if (Object.keys(ownedRelationships).length > 0) {
+      this._createDirtyTrackingCPs(ownedRelationships);
     }
-    this.set('dirtyTrackingRelationNames', dirtyTrackingProperties);
+    this.set('ownedRelationships', ownedRelationships);
   },
 
   relationshipTrackerVersion: computed(function() {
@@ -45,12 +52,10 @@ export default DS.Model.extend(RelationshipTracker, {
   },
 
   async saveRelated() {
-    let relatedSaves = Object.keys(this.dirtyTrackingRelationNames).map((relationName) => {
+    let relatedSaves = Object.keys(this.ownedRelationships).map((relationName) => {
       let isRelationDirty = this.dirtyTrackingRelationNames[relationName];
       if (isRelationDirty) {
-        let { kind } = this._relationshipsByName().get(relationName);
-        let related = this.get(relationName);
-        let relatedRecords = kind === 'hasMany' ? related : [ related ];
+        let relatedRecords = relatedRecordsFor(this, relationName);
         let dirtyRecords = relatedRecords.filter(record => record.hasDirtyFields);
         return EmberArray(dirtyRecords).invoke('save');
       }
@@ -58,10 +63,44 @@ export default DS.Model.extend(RelationshipTracker, {
     return Promise.all(flatten(relatedSaves));
   },
 
+  relatedOwnedRecords() {
+    return uniq(relatedOwnedRecords([ this ]));
+  },
+
+  _createDirtyTrackingCPs(ownedRelationships) {
+    let dirtyTrackingProperties = {};
+    for (let relationshipName in ownedRelationships) {
+      let kind = ownedRelationships[relationshipName];
+      let propertyName = createHasDirtyForRelationship(this, relationshipName, kind);
+      dirtyTrackingProperties[relationshipName] = propertyName;
+    }
+    createHasDirtyOwned(this, Object.values(dirtyTrackingProperties));
+    this.set('dirtyTrackingRelationNames', dirtyTrackingProperties);
+  },
+
   _relationshipsByName() {
     return get(this.constructor, 'relationshipsByName');
   }
 });
+
+function relatedOwnedRecords(models, records=[]) {
+  if (models.length === 0) {
+    return records;
+  }
+  let [ model, ...remainingModels ] = models;
+  Object.keys(model.ownedRelationships).map((relationName) => {
+    let relatedRecords = relatedRecordsFor(model, relationName);
+    records = records.concat(relatedRecords);
+    remainingModels = remainingModels.concat(relatedRecords);
+  });
+  return relatedOwnedRecords(remainingModels, records);
+}
+
+function relatedRecordsFor(model, relationName) {
+  let kind = model.ownedRelationships[relationName];
+  let related = model.get(relationName);
+  return kind === 'hasMany' ? related.toArray() : [ related ];
+}
 
 function createHasDirtyForRelationship(model, name, kind) {
   let propertyName = `hasDirty${capitalize(name)}`;
