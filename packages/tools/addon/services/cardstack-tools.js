@@ -35,10 +35,7 @@ export default Service.extend({
     let modelFields = records.map((record) => {
       let fields = [];
       record.eachAttribute((attribute, meta) => {
-        // When fields are also shown from owned, related records
-        // simply checking field name duplication won't be enough:
-        // we have to also check if the models are the same
-        // Or maybe not: https://github.com/cardstack/cardstack/issues/390
+        // Prevent rendering a field that's already explicitly rendered
         if (!renderedFieldNames.includes(meta.name)) {
           let fieldInfo = Object.assign({}, meta);
           fieldInfo.id = guidFor(fieldInfo);
@@ -184,7 +181,7 @@ export default Service.extend({
     this.persistentState = priorState || {};
 
 
-    /* --  Ephemermal state -- */
+    /* --  Ephemeral state -- */
 
     // a field is highlighted when we're drawing a blue border around it
     this.highlightedFieldId = null;
@@ -193,7 +190,6 @@ export default Service.extend({
     this.openedFieldId = null;
 
     // Register items for edges
-
     this.get('cardstackEdges').registerTopLevelComponent('cardstack-tools-edges');
   },
 
