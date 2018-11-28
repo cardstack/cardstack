@@ -10,7 +10,7 @@ const {
 } = require('../../../tests/pgsearch-test-app/node_modules/@cardstack/test-support/env');
 const Factory = require('../../../tests/pgsearch-test-app/node_modules/@cardstack/test-support/jsonapi-factory');
 
-describe.only('pgsearch/indexer searchable fields', function() {
+describe('pgsearch/indexer searchable fields', function() {
   this.timeout(2500);
 
   let writer, searcher, env;

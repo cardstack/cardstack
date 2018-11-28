@@ -12,7 +12,7 @@ const {
 } = require('../../../tests/pgsearch-test-app/node_modules/@cardstack/test-support/env');
 
 
-describe.only('DocumentContext', function() {
+describe('DocumentContext', function() {
   let env, writer, searcher;
 
   async function createFromFactory(factory) {

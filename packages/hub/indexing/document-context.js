@@ -221,6 +221,10 @@ module.exports = class DocumentContext {
       return;
     }
 
+    if(!field.includeInDocumentSearch) {
+      return;
+    }
+
     let related;
     if (value.data && searchTree[field.id]) {
       if (Array.isArray(value.data)) {
