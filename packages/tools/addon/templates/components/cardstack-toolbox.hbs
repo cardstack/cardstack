@@ -1,7 +1,7 @@
 {{!-- this condition won't be necessary when
       the create-menu is moved out of the panel --}}
 {{#if (eq tools.activePanel "cs-composition-panel")}}
-  {{cs-editor-switch enabled=tools.editing tools=tools}}
+  {{cs-editor-switch}}
 {{/if}}
 
 {{#if (is-component tools.activePanel)}}
