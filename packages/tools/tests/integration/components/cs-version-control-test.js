@@ -96,4 +96,24 @@ module('Integration | Component | cs version control', function(hooks) {
     await render(hbs`{{cs-version-control model=model enabled=true}}`);
     await click('.cs-version-control--delete-button');
   });
+
+  test('"draft" status is displayed for new model', async function (assert) {
+    model.set('isNew', true);
+    await render(hbs`{{cs-version-control model=model enabled=true}}`);
+    assert.dom('.cs-version-control-dropdown-option--status').hasText('draft');
+  });
+
+  test('"published" status is displayed for clean model', async function (assert) {
+    model.set('hasDirtyFields', false);
+    model.set('isNew', false);
+    await render(hbs`{{cs-version-control model=model enabled=true}}`);
+    assert.dom('.cs-version-control-dropdown-option--status').hasText('published');
+  });
+
+  test('"edited" status is displayed for dirty model', async function (assert) {
+    model.set('hasDirtyFields', true);
+    model.set('isNew', false);
+    await render(hbs`{{cs-version-control model=model enabled=true}}`);
+    assert.dom('.cs-version-control-dropdown-option--status').hasText('edited');
+  });
 });
