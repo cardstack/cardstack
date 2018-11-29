@@ -1,6 +1,6 @@
 <div class="cs-version-control-dropdown">
   <div class="cs-version-control-dropdown-option">
-    <div class="cs-version-control-dropdown-option--status {{currentState}}">
+    <div class="cs-version-control-dropdown-option--status {{currentState}}" data-test-cs-version-control-dropdown-option-status>
       {{currentState}}
     </div>
     <div class="cs-version-control-dropdown-option--timestamp">Oct 12, 2018 3:50 pm</div>
@@ -20,13 +20,18 @@
   <div class="cs-version-control-footer">
     <div class="cs-version-control-footer--button-area">
       {{#if update.isRunning}}
-        <span class="cs-version-control--loading" aria-label="Loading"></span>
+        <span
+          class="cs-version-control--loading"
+          aria-label="Loading"
+          data-test-cs-version-control-loading
+        ></span>
       {{/if}}
 
       <button
         class="cs-version-control--button cs-version-control--button-save {{if disabled "disabled" "enabled"}}"
         disabled={{disabled}}
         {{action (perform update)}}
+        data-test-cs-version-control-button-save="{{disabled}}"
       >
         Save
       </button>
@@ -43,6 +48,7 @@
     <button
       class="cs-version-control--delete-button"
       {{action (perform delete)}}
+      data-test-cs-version-control-delete-button
     >
       Delete
     </button>
