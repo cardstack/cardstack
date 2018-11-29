@@ -7,11 +7,10 @@ const { get } = require('lodash');
 
 module.exports = declareInjections({
   controllingBranch: 'hub:controlling-branch',
-  plugins: 'hub:plugins',
   sources: 'hub:data-sources',
   internalSearcher: `plugin-searchers:${require.resolve('@cardstack/pgsearch/searcher')}`,
   client: `plugin-client:${require.resolve('@cardstack/pgsearch/client')}`,
-  currentSchema: 'hub:current-schema'
+  currentSchema: 'hub:current-schema',
 },
 
 class Searchers {
@@ -60,6 +59,14 @@ class Searchers {
     };
   }
 
+  // not using DI to prevent circular dependency
+  _getRouters() {
+    if (this.routers) { this.routers; }
+
+    this.routers = this.__owner__.lookup('hub:routers');
+    return this.routers;
+  }
+
   async get(session, branch, type, id, includePaths) {
     if (arguments.length < 4) {
       throw new Error(`session is now a required argument to searchers.get`);
@@ -69,14 +76,13 @@ class Searchers {
     let documentContext;
     if (resource) {
       let schema = await this.currentSchema.forBranch(branch);
-      let plugins = await this.plugins.active();
       documentContext = new DocumentContext({
         id,
         type,
         branch,
         schema,
-        plugins,
         includePaths,
+        routers: this._getRouters(),
         upstreamDoc: { data: resource, meta, included },
         read: this._read(branch)
       });

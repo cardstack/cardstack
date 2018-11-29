@@ -1,4 +1,3 @@
-
 const {
   createDefaultEnvironment,
   destroyDefaultEnvironment
@@ -13,22 +12,15 @@ describe('hub/routers', function () {
   });
 
   function setupTests(factory) {
-    factory.addResource('content-types', 'infinity-cards')
-      .withAttributes({ router: 'infinite-recursing' })
+    factory.addResource('content-types', 'people')
+      .withAttributes({
+        router: [{ path: '/' }]
+      })
       .withRelated('fields', [
         factory.addResource('fields', 'name').withAttributes({
           fieldType: '@cardstack/core-types::string'
-        })
-      ]);
-
-    factory.addResource('content-types', 'cards')
-      .withAttributes({ router: 'sample-router' })
-      .withRelated('fields', [
-        factory.addResource('fields', 'dog-breed').withAttributes({
-          fieldType: '@cardstack/core-types::string'
         }),
       ]);
-
     factory.addResource('content-types', 'puppies')
       .withRelated('fields', [
         factory.addResource('fields', 'name').withAttributes({
@@ -41,29 +33,28 @@ describe('hub/routers', function () {
           fieldType: '@cardstack/core-types::string'
         })
       ]);
+    factory.addResource('content-types', 'puppies-errors');
+    factory.addResource('puppies-errors', 'not-found');
 
-    factory.addResource('content-types', 'rodents')
-      .withAttributes({ router: 'sample-router' })
+    factory.addResource('content-types', 'rats')
+      .withAttributes({
+        router: [{
+          path: '/national-treasure'
+        },{
+          path: '/:card:name/fish-friend',
+            query: {
+              filter: {
+                type: { exact: 'fishes' },
+                id: { exact: ':card:fish-friend' }
+              }
+          }
+        }]
+      })
       .withRelated('fields', [
         factory.addResource('fields', 'name').withAttributes({
           fieldType: '@cardstack/core-types::string'
         }),
-      ]);
-
-    factory.addResource('content-types', 'rodents-errors');
-    factory.addResource('grants', 'rodents-errors-grant')
-      .withAttributes({
-        'may-read-fields': true,
-        'may-read-resource': true
-      })
-      .withRelated('who', [{ type: 'groups', id: 'everyone' }])
-      .withRelated('types', [{ type: 'content-types', id: 'rodents-errors' }]);
-    factory.addResource('rodents-errors', 'not-found');
-
-    factory.addResource('content-types', 'rats')
-      .withAttributes({ router: 'sample-router' })
-      .withRelated('fields', [
-        factory.addResource('fields', 'name').withAttributes({
+        factory.addResource('fields', 'fish-friend').withAttributes({
           fieldType: '@cardstack/core-types::string'
         }),
       ]);
@@ -76,55 +67,67 @@ describe('hub/routers', function () {
       .withRelated('types', [{ type: 'content-types', id: 'rats-errors' }]);
     factory.addResource('content-types', 'rats-errors');
 
-    factory.addResource('content-types', 'hamsters')
-      .withAttributes({ router: 'sample-router' })
+    factory.addResource('content-types', 'fishes')
+      .withAttributes({
+        router: [{
+          path: '/'
+        },{
+          path: '/:card:name/dinner-for',
+          query: {
+            filter: {
+              type: { exact: 'people' },
+              id: { exact: ':card:dinner-for'}
+            }
+          }
+        }]
+      })
+      .withRelated('fields', [
+        factory.addResource('fields', 'name').withAttributes({
+          fieldType: '@cardstack/core-types::string'
+        }),
+        factory.addResource('fields', 'dinner-for').withAttributes({
+          fieldType: '@cardstack/core-types::string'
+        }),
+      ]);
+    factory.addResource('content-types', 'fishes-errors');
+    factory.addResource('fishes-errors', 'not-found');
+
+    factory.addResource('content-types', 'kitties')
+      .withAttributes({
+        router: [{
+          path: '/?foo=:foo&bee=:bee'
+        },{
+          path: '/:card:name/puppy-friends/:id',
+          query: {
+            filter: {
+              type: { exact: 'puppies'},
+              id: { exact: ':id' }
+            }
+          }
+        },{
+          path: '/:card:name/fish-friend/:id',
+          query: {
+            filter: {
+              type: { exact: 'fishes'},
+              id: { exact: ':id' }
+            }
+          }
+        }]
+      })
       .withRelated('fields', [
         factory.addResource('fields', 'name').withAttributes({
           fieldType: '@cardstack/core-types::string'
         }),
       ]);
-
-    factory.addResource('content-types', 'hamsters-errors');
-    factory.addResource('grants', 'hamsters-errors-grant')
+    factory.addResource('grants', 'kitties-errors-grant')
       .withAttributes({
         'may-read-fields': true,
         'may-read-resource': true
       })
       .withRelated('who', [{ type: 'groups', id: 'everyone' }])
-      .withRelated('types', [{ type: 'content-types', id: 'hamsters-errors' }]);
-    factory.addResource('hamsters-errors', 'not-found');
-
-    factory.addResource('content-types', 'fishes')
-      .withAttributes({ router: 'sample-router' })
-      .withRelated('fields', [
-        factory.addResource('fields', 'name').withAttributes({
-          fieldType: '@cardstack/core-types::string'
-        }),
-      ]);
-
-    factory.addResource('content-types', 'fishes-errors');
-    factory.addResource('rodents-errors', 'not-found');
-
-    factory.addResource('content-types', 'ponies')
-      .withAttributes({ router: 'bad-router-missing-path' })
-      .withRelated('fields', [
-        factory.addResource('fields', 'name').withAttributes({
-          fieldType: '@cardstack/core-types::string'
-        }),
-      ]);
-
-    factory.addResource('content-types', 'kitties')
-      .withAttributes({ router: 'router-missing-query' })
-      .withRelated('fields', [
-        factory.addResource('fields', 'name').withAttributes({
-          fieldType: '@cardstack/core-types::string'
-        }),
-      ]);
-
-    factory.addResource('cards', 'app')
-      .withAttributes({
-        'dog-breed': 'dalmatian',
-      });
+      .withRelated('types', [{ type: 'content-types', id: 'kitties-errors' }]);
+    factory.addResource('content-types', 'kitties-errors');
+    factory.addResource('kitties-errors', 'not-found');
 
     factory.addResource('puppies', 'vanGogh')
       .withAttributes({
@@ -147,39 +150,26 @@ describe('hub/routers', function () {
         'favorite-toy': 'tennis ball'
       });
 
-    factory.addResource('ponies', 'lawrence')
-      .withAttributes({
-        name: 'Lawrence',
-      });
-
     factory.addResource('kitties', 'sally')
       .withAttributes({
         name: 'Sally',
       });
 
-    factory.addResource('infinity-cards', 'infinite')
-      .withAttributes({
-        name: 'Infinite',
-      });
-
-    factory.addResource('rodents', 'rocky')
-      .withAttributes({
-        name: 'Rocky the Flying Squirrel',
-      });
-
-    factory.addResource('hamsters', 'yehudaster')
-      .withAttributes({
-        name: 'Yehudaster',
-      });
-
     factory.addResource('rats', 'pizza-rat')
       .withAttributes({
         name: 'Pizza Rat',
+        'fish-friend': 'nemo'
       });
 
     factory.addResource('fishes', 'nemo')
       .withAttributes({
         name: 'Nemo',
+        'dinner-for': 'hassan'
+      });
+
+    factory.addResource('people', 'hassan')
+      .withAttributes({
+        name: 'Hassan',
       });
   }
 
@@ -189,7 +179,7 @@ describe('hub/routers', function () {
 
       setupTests(factory);
 
-      env = await createDefaultEnvironment(`${__dirname}/../../../tests/router-test-app`, factory.getModels());
+      env = await createDefaultEnvironment(`${__dirname}/../../../tests/stub-project`, factory.getModels());
       searchers = env.lookup('hub:searchers');
     });
 
@@ -200,6 +190,7 @@ describe('hub/routers', function () {
       expect(space).has.property('id', '/');
       expect(space).has.deep.property('attributes.query-params', '');
       expect(space.attributes['allowed-query-params']).to.have.members([]);
+      expect(space.attributes['route-stack']).to.eql(['application-cards/getting-started']);
       expect(space).has.deep.property('relationships.primary-card.data.id', 'getting-started');
       expect(space).has.deep.property('relationships.primary-card.data.type', 'application-cards');
 
@@ -216,6 +207,7 @@ describe('hub/routers', function () {
       expect(space).has.property('id', '/puppies/vanGogh');
       expect(space).has.deep.property('attributes.query-params', '');
       expect(space.attributes['allowed-query-params']).to.have.members([]);
+      expect(space.attributes['route-stack']).to.eql(['application-cards/getting-started']);
       expect(space).has.deep.property('relationships.primary-card.data.id', 'vanGogh');
       expect(space).has.deep.property('relationships.primary-card.data.type', 'puppies');
 
@@ -228,54 +220,9 @@ describe('hub/routers', function () {
       expect(included[0]).has.deep.property('links.self', '/puppies/vanGogh');
     });
 
-    it('uses the path of the final router that routed the primary card in links.self', async function () {
-      let { included, data: space } = await searchers.get(env.session, 'master', 'spaces', '/rodents/rocky/forward/rats/pizza-rat');
-
-      expect(space).has.property('type', 'spaces');
-      expect(space).has.property('id', '/rodents/rocky/forward/rats/pizza-rat');
-      expect(space.attributes['allowed-query-params']).to.have.members([]);
-      expect(space).has.deep.property('relationships.primary-card.data.id', 'pizza-rat');
-      expect(space).has.deep.property('relationships.primary-card.data.type', 'rats');
-
-      expect(included.length).equals(1);
-      expect(included[0]).has.property('id', 'pizza-rat');
-      expect(included[0]).has.property('type', 'rats');
-      expect(included[0]).has.deep.property('attributes.name', 'Pizza Rat');
-      expect(included[0]).has.deep.property('links.self', '/forward/rats/pizza-rat');
-    });
   });
 
-  describe('using default application card whose enclosing cardstack app has a routing feature', function() {
-    beforeEach(async function () {
-      let factory = new JSONAPIFactory();
-
-      setupTests(factory);
-
-      env = await createDefaultEnvironment(`${__dirname}/../../../tests/app-with-routing-feature`, factory.getModels());
-      searchers = env.lookup('hub:searchers');
-    });
-
-    it('can get the space using a route from the cardstack application`s routing feature', async function () {
-      let { included, data: space } = await searchers.get(env.session, 'master', 'spaces', '/cards/puppies/vanGogh');
-
-      expect(space).has.property('type', 'spaces');
-      expect(space).has.property('id', '/cards/puppies/vanGogh');
-      expect(space).has.deep.property('attributes.query-params', '');
-      expect(space.attributes['allowed-query-params']).to.have.members([]);
-      expect(space).has.deep.property('relationships.primary-card.data.id', 'vanGogh');
-      expect(space).has.deep.property('relationships.primary-card.data.type', 'puppies');
-
-      expect(included.length).equals(1);
-      expect(included[0]).has.property('id', 'vanGogh');
-      expect(included[0]).has.property('type', 'puppies');
-      expect(included[0]).has.deep.property('attributes.name', 'Van Gogh');
-      expect(included[0]).has.deep.property('attributes.dog-breed', 'dalmatian');
-      expect(included[0]).has.deep.property('attributes.favorite-toy', 'squeaky-snake');
-      expect(included[0]).has.deep.property('links.self', '/cards/puppies/vanGogh');
-    });
-  });
-
-  describe('using configured application card that has a routing feature', function () {
+  describe('using configured application card that has a router', function () {
     beforeEach(async function () {
       let factory = new JSONAPIFactory();
 
@@ -289,44 +236,105 @@ describe('hub/routers', function () {
         })
         .withRelated('default-data-source', { data: { type: 'data-sources', id: 'default' } });
 
+      factory.addResource('content-types', 'cards')
+        .withAttributes({
+          router: [{
+            path: '/favorite-puppy',
+            query: {
+              filter: {
+                type: { exact: 'puppies' },
+                id: { exact: 'vanGogh' }
+              }
+            }
+          },
+          {
+            path: '/buddy/:friendly_id',
+            query: {
+              filter: {
+                type: { exact: 'puppies' },
+                name: { exact: ':friendly_id' }
+              }
+            }
+          },
+          {
+            path: '/kitty-breeds/:card:dog-breed/:id',
+            query: {
+              filter: {
+                type: { exact: 'kitties' },
+                id: { exact: ':id' }
+              }
+            }
+          },
+          {
+            path: '/contextual-favorite-toy/:toy',
+            query: {
+              filter: {
+                type: { exact: 'puppies' },
+                'dog-breed': { exact: ':card:dog-breed' },
+                'favorite-toy': ':toy'
+              }
+            }
+          },
+          {
+            path: '/sorted?sort=:sort&extra=:extra',
+            query: {
+              filter: {
+                type: { exact: 'puppies' },
+              },
+              sort: ':sort'
+            }
+          },
+          {
+            path: '/forward/:type/:id',
+            query: {
+              filter: {
+                type: { exact: ':type' },
+                id: { exact: ':id' }
+              }
+            }
+          }]
+        })
+        .withRelated('fields', [
+          factory.addResource('fields', 'dog-breed').withAttributes({
+            fieldType: '@cardstack/core-types::string'
+          }),
+        ]);
+
+      factory.addResource('cards', 'app')
+        .withAttributes({
+          'dog-breed': 'dalmatian',
+        });
+
       env = await createDefaultEnvironment(`${__dirname}/../../../tests/router-test-app`, factory.getModels());
       searchers = env.lookup('hub:searchers');
     });
 
-    it('can throw error if route is missing path definition', async function () {
-      let error;
-      try {
-        await searchers.get(env.session, 'master', 'spaces', '/forward/ponies/lawrence/blah');
-      } catch (e) {
-        error = e;
-      }
-      expect(error.message).equals(`The router for content type 'ponies' has a route that is missing a path.`);
-    });
-
     it('can return the routing card as the primary card when no query exists for the route', async function () {
-      let { included, data: space } = await searchers.get(env.session, 'master', 'spaces', '/forward/kitties/sally/favorite');
+      let { included, data: space } = await searchers.get(env.session, 'master', 'spaces', '/forward/rats/pizza-rat');
 
       expect(space).has.property('type', 'spaces');
-      expect(space).has.property('id', '/forward/kitties/sally/favorite');
+      expect(space).has.property('id', '/forward/rats/pizza-rat');
       expect(space).has.deep.property('attributes.query-params', '');
       expect(space.attributes['allowed-query-params']).to.have.members([]);
-      expect(space).has.deep.property('relationships.primary-card.data.id', 'sally');
-      expect(space).has.deep.property('relationships.primary-card.data.type', 'kitties');
+      expect(space.attributes['route-stack']).to.eql(['cards/app']);
+      expect(space).has.deep.property('relationships.primary-card.data.id', 'pizza-rat');
+      expect(space).has.deep.property('relationships.primary-card.data.type', 'rats');
 
       expect(included.length).equals(1);
-      expect(included[0]).has.property('id', 'sally');
-      expect(included[0]).has.property('type', 'kitties');
-      expect(included[0]).has.deep.property('attributes.name', 'Sally');
-      expect(included[0]).has.deep.property('links.self', '/forward/kitties/sally/favorite');
+      expect(included[0]).has.property('id', 'pizza-rat');
+      expect(included[0]).has.property('type', 'rats');
+      expect(included[0]).has.deep.property('attributes.name', 'Pizza Rat');
+      expect(included[0]).has.deep.property('links.self', '/forward/rats/pizza-rat/national-treasure');
     });
 
-    it('can return the routing card as the primary card when no query exists for the route with query param', async function () {
+    it('can return the routing card as the primary card when primary card has query param based routes', async function () {
       let { included, data: space } = await searchers.get(env.session, 'master', 'spaces', '/forward/kitties/sally?kitties[foo]=bar&kitties[bee]=bop&ignore-me=true');
 
       expect(space).has.property('type', 'spaces');
       expect(space).has.property('id', '/forward/kitties/sally?kitties[foo]=bar&kitties[bee]=bop&ignore-me=true');
       expect(space).has.deep.property('attributes.query-params', '?foo=bar&bee=bop');
       expect(space.attributes['allowed-query-params']).to.have.members(['foo', 'bee']);
+      expect(space.attributes['route-stack']).to.eql(['kitties/sally', 'cards/app']);
       expect(space).has.deep.property('relationships.primary-card.data.id', 'sally');
       expect(space).has.deep.property('relationships.primary-card.data.type', 'kitties');
 
@@ -337,13 +345,14 @@ describe('hub/routers', function () {
       expect(included[0]).has.deep.property('links.self', '/forward/kitties/sally');
     });
 
-    it('can return the routing card as the primary card when primary card has query param based routes', async function () {
+    it('can return the routing card as the primary card when no query exists for the route with query param', async function () {
       let { included, data: space } = await searchers.get(env.session, 'master', 'spaces', '/forward/kitties/sally');
 
       expect(space).has.property('type', 'spaces');
       expect(space).has.property('id', '/forward/kitties/sally');
       expect(space).has.deep.property('attributes.query-params', '');
       expect(space.attributes['allowed-query-params']).to.have.members(['foo', 'bee']);
+      expect(space.attributes['route-stack']).to.eql(['kitties/sally', 'cards/app']);
       expect(space).has.deep.property('relationships.primary-card.data.id', 'sally');
       expect(space).has.deep.property('relationships.primary-card.data.type', 'kitties');
 
@@ -352,26 +361,6 @@ describe('hub/routers', function () {
       expect(included[0]).has.property('type', 'kitties');
       expect(included[0]).has.deep.property('attributes.name', 'Sally');
       expect(included[0]).has.deep.property('links.self', '/forward/kitties/sally');
-    });
-
-    it('can throw error if the router has recursed through more than the maximum number of router recursions', async function () {
-      let error;
-      try {
-        await searchers.get(env.session, 'master', 'spaces', `/forward/infinity-cards/infinite
-/omg/omg/omg/omg/omg/omg/omg/omg/omg/omg
-/omg/omg/omg/omg/omg/omg/omg/omg/omg/omg
-/omg/omg/omg/omg/omg/omg/omg/omg/omg/omg
-/omg/omg/omg/omg/omg/omg/omg/omg/omg/omg
-/omg/omg/omg/omg/omg/omg/omg/omg/omg/omg/omg`.replace(/\n/g, ''));
-      } catch (e) {
-        error = e;
-      }
-      expect(error.message).equals(`The space for path '/forward/infinity-cards/infinite
-/omg/omg/omg/omg/omg/omg/omg/omg/omg/omg
-/omg/omg/omg/omg/omg/omg/omg/omg/omg/omg
-/omg/omg/omg/omg/omg/omg/omg/omg/omg/omg
-/omg/omg/omg/omg/omg/omg/omg/omg/omg/omg
-/omg/omg/omg/omg/omg/omg/omg/omg/omg/omg/omg' could not be resolved after 50 routing attempts.`.replace(/\n/g, ''));
     });
 
     it('can return an error card when the path does not match any routes', async function () {
@@ -381,6 +370,7 @@ describe('hub/routers', function () {
       expect(space).has.property('id', '/route-that-doesnt-exist');
       expect(space).has.deep.property('attributes.query-params', '');
       expect(space.attributes['allowed-query-params']).to.have.members([]);
+      expect(space.attributes['route-stack']).to.eql([]);
       expect(space).has.deep.property('relationships.primary-card.data.id', 'not-found');
       expect(space).has.deep.property('relationships.primary-card.data.type', 'error-cards');
 
@@ -404,7 +394,6 @@ describe('hub/routers', function () {
       expect(included[0]).has.property('type', 'error-cards');
     });
 
-
     it('can return error card if the router identifies a primary card and the path part of the URL has not been fully consumed', async function () {
       let { included, data: space } = await searchers.get(env.session, 'master', 'spaces', '/favorite-puppy/blah');
 
@@ -421,18 +410,18 @@ describe('hub/routers', function () {
     });
 
     it('can override the system error card with an error card specific to the routing card', async function () {
-      let { included, data: space } = await searchers.get(env.session, 'master', 'spaces', '/forward/rodents/rocky/forward/hamsters/yehudaster/whaaa');
+      let { included, data: space } = await searchers.get(env.session, 'master', 'spaces', '/forward/kitties/sally/whaaa');
 
       expect(space).has.property('type', 'spaces');
-      expect(space).has.property('id', '/forward/rodents/rocky/forward/hamsters/yehudaster/whaaa');
+      expect(space).has.property('id', '/forward/kitties/sally/whaaa');
       expect(space).has.deep.property('attributes.query-params', '');
       expect(space.attributes['allowed-query-params']).to.have.members([]);
       expect(space).has.deep.property('relationships.primary-card.data.id', 'not-found');
-      expect(space).has.deep.property('relationships.primary-card.data.type', 'hamsters-errors');
+      expect(space).has.deep.property('relationships.primary-card.data.type', 'kitties-errors');
 
       expect(included.length).equals(1);
       expect(included[0]).has.property('id', 'not-found');
-      expect(included[0]).has.property('type', 'hamsters-errors');
+      expect(included[0]).has.property('type', 'kitties-errors');
     });
 
     it('uses system error card if the custom error card doesnt have an instance with the id of "not-found"', async function() {
@@ -482,6 +471,7 @@ describe('hub/routers', function () {
       expect(space).has.property('id', '/favorite-puppy');
       expect(space).has.deep.property('attributes.query-params', '');
       expect(space.attributes['allowed-query-params']).to.have.members([]);
+      expect(space.attributes['route-stack']).to.eql(['cards/app']);
       expect(space).has.deep.property('relationships.primary-card.data.id', 'vanGogh');
       expect(space).has.deep.property('relationships.primary-card.data.type', 'puppies');
 
@@ -501,6 +491,7 @@ describe('hub/routers', function () {
       expect(space).has.property('id', '/buddy/Ringo');
       expect(space).has.deep.property('attributes.query-params', '');
       expect(space.attributes['allowed-query-params']).to.have.members([]);
+      expect(space.attributes['route-stack']).to.eql(['cards/app']);
       expect(space).has.deep.property('relationships.primary-card.data.id', 'ringo');
       expect(space).has.deep.property('relationships.primary-card.data.type', 'puppies');
 
@@ -514,12 +505,13 @@ describe('hub/routers', function () {
     });
 
     it('can get the space using a route that uses contextual card data', async function () {
-      let {included,  data: space } = await searchers.get(env.session, 'master', 'spaces', '/contextual-favorite-toy/squeaky-snake');
+      let {included, data: space } = await searchers.get(env.session, 'master', 'spaces', '/contextual-favorite-toy/squeaky-snake');
 
       expect(space).has.property('type', 'spaces');
       expect(space).has.property('id', '/contextual-favorite-toy/squeaky-snake');
       expect(space).has.deep.property('attributes.query-params', '');
       expect(space.attributes['allowed-query-params']).to.have.members([]);
+      expect(space.attributes['route-stack']).to.eql(['cards/app']);
       expect(space).has.deep.property('relationships.primary-card.data.id', 'vanGogh');
       expect(space).has.deep.property('relationships.primary-card.data.type', 'puppies');
 
@@ -539,6 +531,7 @@ describe('hub/routers', function () {
       expect(space).has.property('id', '/sorted?cards[sort]=favorite-toy&foo=bar&bee=bop');
       expect(space).has.deep.property('attributes.query-params', '?sort=favorite-toy');
       expect(space.attributes['allowed-query-params']).to.have.members(['sort', 'extra']);
+      expect(space.attributes['route-stack']).to.eql(['cards/app']);
       expect(space).has.deep.property('relationships.primary-card.data.id', 'vanGogh');
       expect(space).has.deep.property('relationships.primary-card.data.type', 'puppies');
 
@@ -558,10 +551,309 @@ describe('hub/routers', function () {
       expect(space).has.property('id', '/favorite-puppy?foo=bar');
       expect(space).has.deep.property('attributes.query-params', '');
       expect(space.attributes['allowed-query-params']).to.have.members([]);
+      expect(space.attributes['route-stack']).to.eql(['cards/app']);
       expect(space).has.deep.property('relationships.primary-card.data.id', 'vanGogh');
       expect(space).has.deep.property('relationships.primary-card.data.type', 'puppies');
     });
 
+    it('can route to a path that includes routing card data', async function() {
+      let { included, data: space } = await searchers.get(env.session, 'master', 'spaces', '/kitty-breeds/dalmatian/sally');
+
+      expect(space).has.property('type', 'spaces');
+      expect(space).has.property('id', '/kitty-breeds/dalmatian/sally');
+      expect(space).has.deep.property('attributes.query-params', '');
+      expect(space.attributes['allowed-query-params']).to.have.members(['foo', 'bee']);
+      expect(space.attributes['route-stack']).to.eql(['kitties/sally', 'cards/app']);
+      expect(space).has.deep.property('relationships.primary-card.data.id', 'sally');
+      expect(space).has.deep.property('relationships.primary-card.data.type', 'kitties');
+
+      expect(included.length).equals(1);
+      expect(included[0]).has.property('id', 'sally');
+      expect(included[0]).has.property('type', 'kitties');
+      expect(included[0]).has.deep.property('attributes.name', 'Sally');
+      expect(included[0]).has.deep.property('links.self', '/forward/kitties/sally');
+    });
+
+    it('can route to a path that includes routing card data in multiple nested routes', async function() {
+      let { included, data: space } = await searchers.get(env.session, 'master', 'spaces', '/kitty-breeds/dalmatian/sally/Sally/puppy-friends/vanGogh');
+
+      expect(space).has.property('type', 'spaces');
+      expect(space).has.property('id', '/kitty-breeds/dalmatian/sally/Sally/puppy-friends/vanGogh');
+      expect(space).has.deep.property('attributes.query-params', '');
+      expect(space.attributes['allowed-query-params']).to.have.members([]);
+      expect(space.attributes['route-stack']).to.eql(['kitties/sally', 'cards/app']);
+      expect(space).has.deep.property('relationships.primary-card.data.id', 'vanGogh');
+      expect(space).has.deep.property('relationships.primary-card.data.type', 'puppies');
+
+      expect(included.length).equals(1);
+      expect(included[0]).has.property('id', 'vanGogh');
+      expect(included[0]).has.property('type', 'puppies');
+      expect(included[0]).has.deep.property('attributes.name', 'Van Gogh');
+      expect(included[0]).has.deep.property('links.self', '/favorite-puppy');
+    });
+
+    it('can route to a path that includes routing card data in multiple nested routes that terminates in query-less route', async function() {
+      let { included, data: space } = await searchers.get(env.session, 'master', 'spaces', '/kitty-breeds/dalmatian/sally/Sally/fish-friend/nemo');
+
+      expect(space).has.property('type', 'spaces');
+      expect(space).has.property('id', '/kitty-breeds/dalmatian/sally/Sally/fish-friend/nemo');
+      expect(space).has.deep.property('attributes.query-params', '');
+      expect(space.attributes['allowed-query-params']).to.have.members([]);
+      expect(space.attributes['route-stack']).to.eql(['fishes/nemo', 'kitties/sally', 'cards/app']);
+      expect(space).has.deep.property('relationships.primary-card.data.id', 'nemo');
+      expect(space).has.deep.property('relationships.primary-card.data.type', 'fishes');
+
+      expect(included.length).equals(1);
+      expect(included[0]).has.property('id', 'nemo');
+      expect(included[0]).has.property('type', 'fishes');
+      expect(included[0]).has.deep.property('attributes.name', 'Nemo');
+      expect(included[0]).has.deep.property('links.self', '/forward/fishes/nemo');
+    });
+
+    it('can route to a path that includes routing card data whose routing card`s query uses card data', async function() {
+      let { included, data: space } = await searchers.get(env.session, 'master', 'spaces', '/forward/rats/pizza-rat/Pizza%20Rat/fish-friend');
+
+      expect(space).has.property('type', 'spaces');
+      expect(space).has.property('id', '/forward/rats/pizza-rat/Pizza%20Rat/fish-friend');
+      expect(space).has.deep.property('attributes.query-params', '');
+      expect(space.attributes['allowed-query-params']).to.have.members([]);
+      expect(space.attributes['route-stack']).to.eql(['fishes/nemo', 'rats/pizza-rat', 'cards/app']);
+      expect(space).has.deep.property('relationships.primary-card.data.id', 'nemo');
+      expect(space).has.deep.property('relationships.primary-card.data.type', 'fishes');
+
+      expect(included.length).equals(1);
+      expect(included[0]).has.property('id', 'nemo');
+      expect(included[0]).has.property('type', 'fishes');
+      expect(included[0]).has.deep.property('attributes.name', 'Nemo');
+      expect(included[0]).has.deep.property('links.self', '/forward/fishes/nemo');
+    });
+
+    it('can route to a path that includes routing card that is retrieved via upstream routing card data', async function() {
+      let { included, data: space } = await searchers.get(env.session, 'master', 'spaces', '/forward/rats/pizza-rat/Pizza%20Rat/fish-friend/Nemo/dinner-for');
+
+      expect(space).has.property('type', 'spaces');
+      expect(space).has.property('id', '/forward/rats/pizza-rat/Pizza%20Rat/fish-friend/Nemo/dinner-for');
+      expect(space).has.deep.property('attributes.query-params', '');
+      expect(space.attributes['allowed-query-params']).to.have.members([]);
+      expect(space.attributes['route-stack']).to.eql(['people/hassan', 'fishes/nemo', 'rats/pizza-rat', 'cards/app']);
+      expect(space).has.deep.property('relationships.primary-card.data.id', 'hassan');
+      expect(space).has.deep.property('relationships.primary-card.data.type', 'people');
+
+      expect(included.length).equals(1);
+      expect(included[0]).has.property('id', 'hassan');
+      expect(included[0]).has.property('type', 'people');
+      expect(included[0]).has.deep.property('attributes.name', 'Hassan');
+      expect(included[0]).has.deep.property('links.self', '/forward/people/hassan');
+    });
+  });
+
+  describe('route is missing path', function () {
+    beforeEach(async function () {
+      let factory = new JSONAPIFactory();
+
+      factory.addResource('plugin-configs', '@cardstack/hub')
+        .withAttributes({
+          'plugin-config': {
+            'application-card': { type: 'cards', id: 'app' }
+          }
+        })
+        .withRelated('default-data-source', { data: { type: 'data-sources', id: 'default' } });
+
+      factory.addResource('content-types', 'cards')
+        .withAttributes({
+          router: [{
+            path: '/'
+          },{
+            query: {
+              filter: {
+                type: { exact: 'cards' },
+                id: { exact: 'app' }
+              }
+            }
+          }]
+        });
+
+      factory.addResource('cards', 'app');
+
+      env = await createDefaultEnvironment(`${__dirname}/../../../tests/stub-project`, factory.getModels());
+      searchers = env.lookup('hub:searchers');
+    });
+
+    it('throws an error when it encounters a route that is missing a path', async function () {
+      let error;
+      try {
+        await searchers.get(env.session, 'master', 'spaces', '/');
+      } catch (err) { error = err.message; }
+
+      expect(error).to.equal(`The router for content type 'cards' has a route that is missing a path.`);
+    });
+  });
+
+  describe('route path does not start with "/"', function () {
+    beforeEach(async function () {
+      let factory = new JSONAPIFactory();
+
+      factory.addResource('plugin-configs', '@cardstack/hub')
+        .withAttributes({
+          'plugin-config': {
+            'application-card': { type: 'cards', id: 'app' }
+          }
+        })
+        .withRelated('default-data-source', { data: { type: 'data-sources', id: 'default' } });
+
+      factory.addResource('content-types', 'cards')
+        .withAttributes({
+          router: [{
+            path: 'app-card',
+            query: {
+              filter: {
+                type: { exact: 'cards' },
+                id: { exact: 'app' }
+              }
+            }
+          }]
+        });
+
+      factory.addResource('cards', 'app');
+
+      env = await createDefaultEnvironment(`${__dirname}/../../../tests/stub-project`, factory.getModels());
+      searchers = env.lookup('hub:searchers');
+    });
+
+    it('throws an error when it encounters a path definied in a route that does not start with "/"', async function () {
+      let error;
+      try {
+        await searchers.get(env.session, 'master', 'spaces', '/');
+      } catch (err) { error = err.message; }
+
+      expect(error).to.equal(`The path of the route for content type 'cards' at path 'app-card' does not begin with '/'.`);
+    });
+  });
+
+  describe('router with deep stacks', function () {
+    beforeEach(async function () {
+      let factory = new JSONAPIFactory();
+
+      factory.addResource('plugin-configs', '@cardstack/hub')
+        .withAttributes({
+          'plugin-config': {
+            'application-card': { type: 'cards', id: 'app' }
+          }
+        })
+        .withRelated('default-data-source', { data: { type: 'data-sources', id: 'default' } });
+
+      factory.addResource('content-types', 'cards')
+        .withAttributes({
+          router: [{
+            path: '/deep',
+            query: {
+              filter: {
+                type: { exact: ':type' },
+                id: { exact: ':id' }
+              }
+            }
+          }]
+        });
+      factory.addResource('cards', 'app');
+
+      const stackSize = 51;
+
+      for (let i = 0; i < stackSize; i++) {
+        factory.addResource('content-types', `cards-${i}`)
+          .withAttributes({
+            router: [{
+              path: '/deeper',
+              query: {
+                filter: {
+                  type: { exact: ':type' },
+                  id: { exact: ':id' }
+                }
+              }
+            }]
+          });
+      }
+
+      env = await createDefaultEnvironment(`${__dirname}/../../../tests/stub-project`, factory.getModels());
+      searchers = env.lookup('hub:searchers');
+    });
+
+    it('throws an error maximum route stack size is exceeded while building router map', async function () {
+      let error;
+      try {
+        await searchers.get(env.session, 'master', 'spaces', '/deep');
+      } catch (err) { error = err.message; }
+
+      expect(error).to.match(/^Recursed through more than 50 routers when building routing map/);
+    });
+  });
+
+  describe('interior routing card missing', function() {
+    beforeEach(async function () {
+      let factory = new JSONAPIFactory();
+
+      factory.addResource('plugin-configs', '@cardstack/hub')
+        .withAttributes({
+          'plugin-config': {
+            'application-card': { type: 'cards', id: 'app' }
+          }
+        })
+        .withRelated('default-data-source', { data: { type: 'data-sources', id: 'default' } });
+
+      factory.addResource('content-types', 'cards')
+        .withAttributes({
+          router: [{
+            path: '/router',
+            query: {
+              filter: {
+                type: { exact: 'routers' },
+                id: { exact: 'route' }
+              }
+            }
+          }]
+        });
+      factory.addResource('cards', 'app');
+
+      factory.addResource('content-types', 'routers')
+        .withAttributes({
+          router: [{
+            path: '/puppy',
+            query: {
+              filter: {
+                type: { exact: 'puppies' },
+                id: { exact: 'vanGogh' }
+              }
+            }
+          }]
+        });
+      // not creating an instance of this content-type
+
+      factory.addResource('content-types', 'puppies')
+        .withAttributes({
+          router: [{
+            path: '/',
+          }]
+        });
+      factory.addResource('puppies', 'vanGogh');
+
+      env = await createDefaultEnvironment(`${__dirname}/../../../tests/stub-project`, factory.getModels());
+      searchers = env.lookup('hub:searchers');
+    });
+
+    it('returns error card when a route has been matched, but its antecedant routing card does not exist', async function() {
+      let { included, data: space } = await searchers.get(env.session, 'master', 'spaces', '/router/puppy');
+
+      expect(space).has.property('type', 'spaces');
+      expect(space).has.property('id', '/router/puppy');
+      expect(space).has.deep.property('attributes.query-params', '');
+      expect(space.attributes['allowed-query-params']).to.have.members([]);
+      expect(space.attributes['route-stack']).to.eql([]);
+      expect(space).has.deep.property('relationships.primary-card.data.id', 'not-found');
+      expect(space).has.deep.property('relationships.primary-card.data.type', 'error-cards');
+
+      expect(included.length).equals(1);
+      expect(included[0]).has.property('id', 'not-found');
+      expect(included[0]).has.property('type', 'error-cards');
+    });
   });
 
 });

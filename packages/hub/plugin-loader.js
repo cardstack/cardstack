@@ -173,7 +173,6 @@ class PluginLoader {
       attributes: {
         dir: moduleRoot,
         rawDir: dir,
-        'is-root-plugin': breadcrumbs.length === 0,
         includedFrom: [breadcrumbs]
       }
     };

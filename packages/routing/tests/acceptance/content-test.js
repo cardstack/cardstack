@@ -52,11 +52,25 @@ module('Acceptance | content', function(hooks) {
     assert.equal(currentURL(this.owner), '/posts/1?posts[foo]=fee%20fo%20fum');
   });
 
+  test('card can clear query param', async function(assert) {
+    await visit('/posts/1?posts[foo]=bar');
+    await click('.clear-query-param');
+
+    assert.equal(currentURL(this.owner), '/posts/1');
+  });
+
   test('card can not set undeclared query param', async function(assert) {
     await visit('/posts/1');
     await click('.set-undeclared-query-param');
 
     assert.equal(currentURL(this.owner), '/posts/1');
+  });
+
+  test('card can not clear undeclared query param', async function(assert) {
+    await visit('/posts/1?posts[blah]=bar');
+    await click('.clear-undeclared-query-param');
+
+    assert.equal(currentURL(this.owner), '/posts/1?posts[blah]=bar');
   });
 
   test('card can set page title', async function(assert) {

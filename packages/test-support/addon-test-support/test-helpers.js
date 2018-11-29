@@ -13,6 +13,10 @@ export function setupURLs(hooks) {
   })
 }
 
+export function findCard(type, id, format='isolated') {
+  return getContext().owner.lookup('service:cardstackData').load(type, id, format);
+}
+
 export function getSpaceForCard(type, id) {
   return getContext().owner.lookup('service:store').findRecord('space', `/${pluralize(type)}/${id}`);
 }
@@ -24,9 +28,11 @@ export function renderCard(type, id, format, options = {}) {
     let queryParamsString = space.get('queryParams');
     context.set('card', card);
     context.set('format', format);
+    let params = options.params || {};
     if (queryParamsString) {
-      context.set('params', qs.parse(queryParamsString.replace('?', '')));
+      params = Object.assign(qs.parse(queryParamsString.replace('?', '')), params);
     }
+    context.set('params', params);
 
     if (options.width) {
       context.set('widthStyle', htmlSafe(`width: ${options.width}`));

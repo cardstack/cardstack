@@ -1,6 +1,7 @@
 import Controller from '@ember/controller';
 import { inject as service } from '@ember/service';
 import { pluralize } from 'ember-inflector';
+import { some } from 'lodash';
 import qs from 'qs';
 
 export default Controller.extend({
@@ -22,10 +23,16 @@ export default Controller.extend({
         params = qs.parse(currentParams);
       }
 
-      params[type] = params[type] || {};
-      params[type][paramName] = paramValue;
+      if ((paramValue === '' || paramValue === null) && typeof params[type] === 'object') {
+        delete params[type][paramName];
+      } else {
+        params[type] = params[type] || {};
+        params[type][paramName] = paramValue;
+      }
 
-      location.setURL(`${path}?${qs.stringify(params, { encodeValuesOnly: true })}`);
+      let hasParams = some(params, type => typeof type === 'object' && Object.keys(type).length);
+
+      location.setURL(`${path}${hasParams ? '?' : ''}${qs.stringify(params, { encodeValuesOnly: true })}`);
     }
   }
 });

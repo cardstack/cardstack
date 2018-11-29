@@ -1,19 +1,19 @@
 const authLog = require('@cardstack/logger')('cardstack/auth');
 const log = require('@cardstack/logger')('cardstack/indexing/document-context');
 const Model = require('../model');
-const { getPath } = require('@cardstack/routing/cardstack/router-utils');
+const { getPath } = require('@cardstack/routing/cardstack/path');
 const { get, uniqBy } = require('lodash');
 
 module.exports = class DocumentContext {
 
-  constructor({ read, plugins, schema, type, id, branch, sourceId, generation, upstreamDoc, includePaths }) {
+  constructor({ read, routers, schema, type, id, branch, sourceId, generation, upstreamDoc, includePaths }) {
     if (upstreamDoc && !upstreamDoc.data) {
       throw new Error('The upstreamDoc must have a top-level "data" property', {
         status: 400
       });
     }
     this.schema = schema;
-    this.plugins = plugins;
+    this.routers = routers;
     this.type = type;
     this.id = id;
     this.branch = branch;
@@ -25,8 +25,7 @@ module.exports = class DocumentContext {
     this._realms = [];
     this._pendingReads = [];
     this._followedRelationships = {};
-    this._routingCardId = get(upstreamDoc, 'meta.routing-card.data.id');
-    this._routingCardType = get(upstreamDoc, 'meta.routing-card.data.type');
+    this._routeStack = get(upstreamDoc, 'data.attributes.route-stack');
     this.cache = {};
     this.isCollection = upstreamDoc && upstreamDoc.data && Array.isArray(upstreamDoc.data);
     this.suppliedIncluded = upstreamDoc && upstreamDoc.included;
@@ -75,12 +74,10 @@ module.exports = class DocumentContext {
     return this._references;
   }
 
-  async read(type, id, notAReference) {
+  async read(type, id) {
     log.debug(`Reading record ${type}/${id}`);
 
-    if (!notAReference) {
-      this._references.push(`${type}/${id}`);
-    }
+    this._references.push(`${type}/${id}`);
 
     let key = `${type}/${id}`;
     if (get(this, 'upstreamDoc.data.id') === id && get(this, 'upstreamDoc.data.type') === type) {
@@ -203,19 +200,23 @@ module.exports = class DocumentContext {
     return searchTree;
   }
 
+  // We can only resolve self links for spaces documents because they have the necessary routing card
+  // context which is required to resolve the resource links
   async _addSelfLink(jsonapiDoc) {
-    if (this._routingCardId && this._routingCardType && this.plugins) {
-      let routingCard = await this.read(this._routingCardType, this._routingCardId, true);
-      let path = await getPath(this.plugins,
-                               this.schema,
-                               { data: routingCard },
-                               { data: jsonapiDoc },
-                               get(this.upstreamDoc, 'meta.using-default-router'));
-      if (path) {
-        path += get(this.upstreamDoc, 'meta.route-path-suffix') || '';
-        jsonapiDoc.links = jsonapiDoc.links || {};
-        jsonapiDoc.links.self = path;
-      }
+    if (!this.routers || this.type !== 'spaces') { return; }
+
+    let routeStackCards = [];
+    for (let routingCardIdentifier of this._routeStack) {
+      let [ type, id ] = routingCardIdentifier.split('/');
+      routeStackCards.push({ data: await this.read(type, id) });
+    }
+
+    let path = await getPath(routeStackCards,
+      { data: jsonapiDoc },
+      (await this.routers.getRoutersInfo()).routerMapByDepth);
+    if (path) {
+      jsonapiDoc.links = jsonapiDoc.links || {};
+      jsonapiDoc.links.self = path;
     }
   }
 

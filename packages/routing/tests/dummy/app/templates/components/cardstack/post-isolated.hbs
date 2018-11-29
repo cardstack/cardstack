@@ -8,6 +8,8 @@
   <button class="set-query-param-1" {{action setParam 'foo' 'fee'}}>Set query param test 1</button>
   <button class="set-query-param-2" {{action setParam 'foo' 'fee fo fum'}}>Set query param test 2</button>
   <button class="set-undeclared-query-param" {{action setParam 'nope' 'you can`t set me'}}>Set undeclared query param</button>
+  <button class="clear-query-param" {{action setParam 'foo' null}}>Set undeclared query param</button>
+  <button class="clear-undeclared-query-param" {{action setParam 'blah' null}}>Set undeclared query param</button>
 {{/if}}
 
 {{#if params.foo}}
