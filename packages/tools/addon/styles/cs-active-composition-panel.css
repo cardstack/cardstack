@@ -15,7 +15,7 @@
     box-shadow: 0 2px 15px 0 var(--dark50);
 }
 
-.cs-active-composition-panel--body {
+.cs-active-composition-panel--main {
     padding-bottom: 5em;
     overflow-y: scroll;
 }
@@ -132,5 +132,14 @@
 
 .cs-field-editor-section {
     margin: 0;
-    padding: 0.75em;
+    padding: 0.5rem 0.75em;
+}
+
+.cs-field-editor-section--label {
+    display: inline-block;
+    padding-bottom: 0.5rem;
+    color: var(--light50);
+    font-size: 0.9rem;
+    letter-spacing: 0.3px;
+    line-height: 1.375;
 }

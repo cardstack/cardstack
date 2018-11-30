@@ -4,7 +4,7 @@
 }}
 
 {{!- this one scrolls }}
-<div class="cs-active-composition-panel--body">
+<div class="cs-active-composition-panel--main">
   {{#each renderedFields key="id" as |fieldMark|}}
     {{! template-lint-disable attribute-indentation }}
     {{#let
@@ -27,7 +27,9 @@
           {{#let fieldModel.content as |content|}}
             {{#if fieldModel.grouped}}
               {{#each fieldModel.grouped as |fieldName|}}
-                <label>{{cs-field-caption content fieldName}}</label>
+                <label class="cs-field-editor-section--label">
+                  {{cs-field-caption content fieldName}}
+                </label>
                 {{!--
                   We allow editing fields of related resources. We should come back to this after #448 is completed.
                 --}}

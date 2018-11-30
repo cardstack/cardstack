@@ -4,7 +4,7 @@ import layout from '../templates/components/cs-field-editor';
 
 export default Component.extend({
   layout,
-  tagName: '',
+  classNames: ['cs-field-editor'],
 
   // @args
   content: null,
