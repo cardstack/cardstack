@@ -31,7 +31,7 @@ export default Service.extend({
     let model = this.get('activeContentItem.model');
     if (!model) { return []; }
 
-    let records = [model, ...model.relatedOwnedRecords()];
+    let records = [model, ...ownedRelatedRecords([model])];
     let modelFields = records.map((record) => {
       let fields = [];
       record.eachAttribute((attribute, meta) => {
