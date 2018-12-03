@@ -22,7 +22,7 @@ async function getRoute(searchers, router, branch, path, applicationCard) {
   }
 
   let routeStack = [ `${routingCard.data.type}/${routingCard.data.id}` ].concat(matchedRoute.routeStack.map(({contentType}) => {
-    let card = routingCardsCache[`card::${contentType}`];
+    let card = get(routingCardsCache, `antecedantResolution.${contentType}`);
     if (!card) { return; }
     return `${card.data.type}/${card.data.id}`;
   }));
@@ -65,7 +65,7 @@ function isCanonicalRoute(route) {
 async function buildRoutingCardsCache({ searchers, branch, resolvedPath, context, applicationCard, routeStack=[] }) {
   if (!searchers || !branch) { return {}; }
 
-  let routingCards = {};
+  let routingCards = { antecedantResolution: {}, cardResolution: {} };
   let typeRegex = /:(?!card:)[\w-]+\[([^\]]+)\]/g;
   let types = uniq((context.match(typeRegex) || []).map(m => m.replace(typeRegex, '$1')));
 
@@ -76,7 +76,7 @@ async function buildRoutingCardsCache({ searchers, branch, resolvedPath, context
       let fieldRoute = routeStack[stackIndex];
 
       if (stackIndex === routeStack.length - 1) {
-        routingCards[`card::${type}`] = applicationCard;
+        routingCards.antecedantResolution[type] = applicationCard;
       } else {
         cardRoute = routeStack[stackIndex + 1];
       }
@@ -86,14 +86,14 @@ async function buildRoutingCardsCache({ searchers, branch, resolvedPath, context
 
         let query = resolvedPath ? resolveReplacementTagsFromPath(route, resolvedPath, JSON.stringify(route.query)) : JSON.stringify(route.query);
         if (query.includes(':card:')) {
-          query = resolveRoutingCardReplacementTags(routingCards[`card::${route.contentType}`], query, routingCards);
+          query = resolveRoutingCardReplacementTags(get(routingCards, `antecedantResolution.${route.contentType}`), query, routingCards);
         }
         let { data: cards } = await searchers.search(Session.INTERNAL_PRIVILEGED, branch, JSON.parse(query));
         if (cards.length) {
           if (route === cardRoute) {
-            routingCards[`card::${type}`] = { data: cards[0] };
+            routingCards.antecedantResolution[type] = { data: cards[0] };
           } else {
-            routingCards[`field::${type}`] = { data: cards[0] };
+            routingCards.cardResolution[type] = { data: cards[0] };
           }
         }
       }
@@ -103,9 +103,9 @@ async function buildRoutingCardsCache({ searchers, branch, resolvedPath, context
   return routingCards;
 }
 
-function replaceNamespacedField(routingCard, routingCards, keyPrefix) {
+function replaceNamespacedField(routingCard, routingCards, resolutionType) {
   return (match, field, typeTag, type) => {
-    let card = routingCards[keyPrefix + type] || routingCard;
+    let card = get(routingCards, `${resolutionType}.${type}`) || routingCard;
     if (!card) { return match; }
 
     if (field === 'id') {
@@ -126,8 +126,8 @@ function resolveRoutingCardReplacementTags(routingCard, stringToResolve, routing
   if (!stringToResolve) { return stringToResolve; }
 
   return stringToResolve
-    .replace(/:card:([\w-]+)(\[([^\]]+)\])?/g, replaceNamespacedField(routingCard, routingCards, 'card::'))
-    .replace(/:([\w-]+)(\[([^\]]+)\])/g, replaceNamespacedField(routingCard, routingCards, 'field::'));
+    .replace(/:card:([\w-]+)(\[([^\]]+)\])?/g, replaceNamespacedField(routingCard, routingCards, 'antecedantResolution'))
+    .replace(/:([\w-]+)(\[([^\]]+)\])/g, replaceNamespacedField(routingCard, routingCards, 'cardResolution'));
 }
 
 function resolveReplacementTagsFromPath(route, path, string) {
@@ -146,7 +146,7 @@ async function getRoutingCardForRoute(searchers, route, branch, path, routingCar
 
     let query = resolveReplacementTagsFromPath(parentRoute, path, JSON.stringify(parentRoute.query));
     let routingCardType = route.routeStack.length ? route.routeStack[0].contentType : null;
-    query = resolveRoutingCardReplacementTags(routingCardType && routingCardsCache[`card::${routingCardType}`], query, routingCardsCache);
+    query = resolveRoutingCardReplacementTags(get(routingCardsCache, `antecedantResolution.${routingCardType}`), query, routingCardsCache);
     let { data:routingCards } = await searchers.search(Session.INTERNAL_PRIVILEGED, branch, JSON.parse(query));
     return routingCards.length ? { data: routingCards[0] } : null;
   }
