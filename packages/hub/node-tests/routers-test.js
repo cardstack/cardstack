@@ -305,7 +305,7 @@ describe('hub/routers', function () {
           'dog-breed': 'dalmatian',
         });
 
-      env = await createDefaultEnvironment(`${__dirname}/../../../tests/router-test-app`, factory.getModels());
+      env = await createDefaultEnvironment(`${__dirname}/../../../tests/stub-project`, factory.getModels());
       searchers = env.lookup('hub:searchers');
     });
 
