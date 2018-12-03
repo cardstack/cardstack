@@ -30,7 +30,6 @@ class Routers {
     this.routerMapByDepth = groupBy(this.routerMap, route => route.routeStack.length);
     this.applicationCard = applicationCard;
 
-    debugger;
     return { routerMap: this.routerMap, applicationCard: this.applicationCard, routerMapByDepth: this.routerMapByDepth };
   }
 
@@ -158,7 +157,7 @@ class Routers {
         routerMap = routerMap.concat(discoveredRouters);
       }
     }
-debugger;
+
     routerMap = router.filter(route => !pluckedRoutes.includes(route.path)).map(route => {
       return {
         contentType: routingCardType,

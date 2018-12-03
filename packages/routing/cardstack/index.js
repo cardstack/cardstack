@@ -69,6 +69,8 @@ async function buildRoutingCardsCache({ searchers, branch, resolvedPath, context
   let typeRegex = /:(?!card:)[\w-]+\[([^\]]+)\]/g;
   let types = uniq((context.match(typeRegex) || []).map(m => m.replace(typeRegex, '$1')));
 
+  routingCards.antecedantResolution[applicationCard.data.type] = applicationCard;
+
   for (let type of types) {
     if (!routingCards[type]) {
       let cardRoute;
@@ -196,7 +198,7 @@ async function routeThatMatchesPath(searchers, router, branch, path, application
   for (let route of router) {
     let { path: routePath } = route;
     let pathRegex = new RegExp(`${routePath.split('?')[0].replace(/(:card)?:[^/?#&]+/g, '[^/?#&]+')}`);
-    if (decodeURI(path).match(pathRegex)) {
+    if (decodeURI(remainingPath).match(pathRegex)) {
       routingCardsCache = await buildRoutingCardsCache({
         context: route.namespacedPath,
         resolvedPath: path,
