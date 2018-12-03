@@ -3,27 +3,28 @@
 @import "cardstack-cards-editor";
 
 :root {
-    --deep-background: #000;
-    --normal-background: #292A2C;
-    --activating-background: #404040;
-    --active-background: #545454;
-    --light-background: #737373;
+    --deep-background: #01002C;
+    --normal-background: #343356;
+    --active-background: #252440;
+    --light-background: #fff;
 
-    --muted-foreground: #777;
-    --rising-foreground: #aaa;
-    --light-foreground: #F2F2F2;
     --bright-foreground: #fff;
+    --rising-foreground: #aaa;
 
     --tools-highlight: #63a9fa;
     --deep-tools-highlight: #032c5b;
     --faded-tools-highlight: #032c5b77;
+}
 
-    --tools-preview: #860404;
+
+@font-face {
+    font-family: 'Open Sans';
+    src: url('../@cardstack/tools/OpenSans-Regular.ttf');
 }
 
 @font-face {
-    font-family: 'Avenir';
-    src: url('../@cardstack/tools/Avenir.ttc');
+    font-family: 'Open Sans Bold';
+    src: url('../@cardstack/tools/OpenSans-Bold.ttf');
 }
 
 

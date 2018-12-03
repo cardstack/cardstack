@@ -7,10 +7,13 @@
    everything else should have higher priority.
 */
 .cardstack-tools {
-    font-size: 16px;
-    line-height: 1.375em;
-    font-family: 'Avenir', 'helvetica', sans-serif;
+    box-sizing: border-box;
+    background-color: var(--deep-background);
     color: var(--bright-foreground);
-    background-color: var(--normal-background);
+    font-family: 'Open Sans', 'helvetica', sans-serif;
+    font-size: 16px;
+    font-weight: normal;
+    letter-spacing: 0.1px;
+    line-height: 1.375em;
     -webkit-font-smoothing: antialiased;
 }
