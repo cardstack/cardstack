@@ -5,7 +5,7 @@
     width: 4.5em;
     margin: 0;
     padding: 0.3em;
-    background-color: var(--dark-bg);
+    background-color: var(--deep-background);
     border: 1px solid var(--light25);
     border-radius: 3px;
     font-family: 'Open Sans Bold';
@@ -22,8 +22,8 @@
     box-sizing: border-box;
     width: 3em;
     padding: 0.5em 0.4em;
-    background-color: var(--light-bg);
-    color: var(--purple-fg);
+    background-color: var(--light-background);
+    color: var(--normal-foreground);
     border-radius: 3px;
     font-size: 0.6em;
     line-height: 1.1em;

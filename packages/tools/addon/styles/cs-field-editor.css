@@ -8,8 +8,8 @@
     padding: 0.5rem 1rem;
     border: 1px solid var(--light25);
     border-radius: 3px;
-    background-color: var(--light-bg);
-    color: var(--dark-fg);
+    background-color: var(--light-background);
+    color: var(--dark-foreground);
     font-size: 0.8rem;
     font-family: 'Open Sans Bold';
     font-weight: bold;
@@ -18,7 +18,7 @@
 }
 
 .cs-field-editor input:focus {
-    border-color: var(--active-fg);
+    border-color: var(--active-foreground);
     outline: none;
 }
 
@@ -31,12 +31,12 @@
     padding: 0.5rem 1rem 0.5rem 0.5rem;
     border: 1px solid var(--light25);
     border-radius: 3px;
-    background-color: var(--light-bg);
-    color: var(--dark-fg);
+    background-color: var(--light-background);
+    color: var(--dark-foreground);
     font-size: 0.8rem;
 }
 
 .cs-field-editor .ember-power-select-trigger:focus {
-    border-color: var(--active-fg);
+    border-color: var(--active-foreground);
     outline: none;
 }

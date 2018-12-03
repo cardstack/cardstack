@@ -11,15 +11,15 @@
     border-radius: 50%;
     box-shadow: 0 2px 15px 0 var(--dark50);
     font-size: 16px;
-    background-color: var(--normal-bg);
-    color: var(--bright-fg);
-    fill: var(--bright-fg);
+    background-color: var(--normal-background);
+    color: var(--bright-foreground);
+    fill: var(--bright-foreground);
     cursor: pointer;
 }
 
 .cs-create-button:hover,
 .cs-create-button:focus {
     outline: none;
-    color: var(--active-fg);
-    fill: var(--active-fg);
+    color: var(--active-foreground);
+    fill: var(--active-foreground);
 }

@@ -1,12 +1,12 @@
 .cs-version-control-dropdown {
     position: relative;
     padding: 0.6em;
-    background-color: var(--dark-bg);
+    background-color: var(--deep-background);
     border-radius: 5px;
 }
 
 .cs-version-control-dropdown-option {
-    color: var(--bright-fg);
+    color: var(--bright-foreground);
     font-size: 0.8em;
     text-transform: uppercase;
 }
@@ -20,11 +20,11 @@
 
 .cs-version-control-dropdown-option--status.draft,
 .cs-version-control-dropdown-option--status.edited {
-    color: var(--hot-pink-fg);
+    color: var(--hot-pink-foreground);
 }
 
 .cs-version-control-dropdown-option--status.published {
-    color: var(--green-fg);
+    color: var(--green-foreground);
 }
 
 .cs-version-control-dropdown-option--timestamp {
@@ -38,13 +38,13 @@
     padding: 0.6rem;
     border: none;
     background: none;
-    fill: var(--bright-fg);
+    fill: var(--bright-foreground);
 }
 
 .cs-version-control-dropdown--button:hover,
 .cs-version-control-dropdown--button:focus {
     outline: none;
-    fill: var(--active-fg);
+    fill: var(--active-foreground);
 }
 
 .cs-version-control-footer {
@@ -63,7 +63,7 @@
     width: 47%;
     height: 2.5rem;
     padding: 0.7rem;
-    color: var(--bright-fg);
+    color: var(--bright-foreground);
     background: none;
     border: 1px solid var(--light25);
     border-radius: 3px;
@@ -75,7 +75,7 @@
 .cs-version-control--button:focus {
     outline: none;
     border-color: var(--light50);
-    color: var(--active-fg);
+    color: var(--active-foreground);
 }
 
 .cs-version-control--button[disabled],
@@ -87,7 +87,7 @@
 }
 
 .cs-version-control--button-save.enabled {
-    background-color: var(--dark-bg);
+    background-color: var(--deep-background);
     border: none;
 }
 
@@ -96,7 +96,7 @@
     padding: 0.5rem;
     background: none;
     border: none;
-    color: var(--bright-fg);
+    color: var(--bright-foreground);
     font-size: 0.75rem;
     line-height: 1;
     text-align: right;
@@ -108,7 +108,7 @@
 .cs-version-control--delete-button:hover,
 .cs-version-control--delete-button:focus {
     outline: none;
-    color: var(--hot-pink-fg);
+    color: var(--hot-pink-foreground);
 }
 
 .cs-version-control--loading {

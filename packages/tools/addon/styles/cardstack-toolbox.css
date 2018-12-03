@@ -26,8 +26,8 @@
 
 .cs-create-menu {
     min-height: 10rem;
-    background-color: var(--normal-bg);
-    color: var(--bright-fg);
+    background-color: var(--normal-background);
+    color: var(--bright-foreground);
     border: 1px solid var(--light05);
     border-radius: 20px;
     box-shadow: 0 2px 15px 0 var(--dark50);

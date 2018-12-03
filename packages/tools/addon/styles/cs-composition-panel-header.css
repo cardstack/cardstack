@@ -1,7 +1,7 @@
 .cs-composition-panel-header {
     position: relative;
     padding: 1em;
-    color: var(--bright-fg);
+    color: var(--bright-foreground);
     border-top-left-radius: 20px;
     border-top-right-radius: 20px;
     font-size: 16px;
@@ -9,7 +9,7 @@
 }
 
 .cs-composition-panel-header.enabled {
-    background: var(--gradient-bg);
+    background: var(--gradient-background);
 }
 
 .cs-composition-panel-header--label {
@@ -29,8 +29,8 @@
 .cs-composition-panel-header--info > svg {
     width: 1.4em;
     margin-right: 1em;
-    color: var(--bright-fg);
-    fill: var(--bright-fg);
+    color: var(--bright-foreground);
+    fill: var(--bright-foreground);
 }
 
 .cs-composition-panel-header--info > div {

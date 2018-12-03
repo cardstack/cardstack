@@ -6,7 +6,7 @@
     display: flex;
     justify-content: flex-end;
     align-items: center;
-    color: var(--bright-fg);
+    color: var(--bright-foreground);
     cursor: pointer;
 }
 
@@ -26,9 +26,9 @@
     padding: 0;
     width: 3em;
     height: 3em;
-    background: var(--normal-bg);
-    color: var(--bright-fg);
-    fill: var(--bright-fg);
+    background: var(--normal-background);
+    color: var(--bright-foreground);
+    fill: var(--bright-foreground);
     border-radius: 50%;
     box-shadow: 0 2px 15px 0 var(--dark50);
     font-size: 16px;
@@ -37,6 +37,6 @@
 
 .cs-mode-button:hover > .cs-mode-button--background,
 .cs-mode-button:focus > .cs-mode-button--background {
-    color: var(--active-fg);
-    fill: var(--active-fg);
+    color: var(--active-foreground);
+    fill: var(--active-foreground);
 }

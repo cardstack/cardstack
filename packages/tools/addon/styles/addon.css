@@ -9,45 +9,33 @@
 @import "theme";
 
 :root {
-    --deep-background: #000;
-    --normal-background: #292A2C;
-    --activating-background: #404040;
-    --active-background: #545454;
-    --light-background: #737373;
-    --error-border: red;
+    --deep-background: #01002C;
+    --normal-background: #343356;
+    --active-background: #252440;
+    --light-background: #fff;
+    --gradient-background: linear-gradient(40deg, #343356 50%, #793284);
 
-    --muted-foreground: #777;
-    --rising-foreground: #aaa;
-    --light-foreground: #F2F2F2;
+    --dark-foreground: #01002C;
+    --normal-foreground: #343356;
+    --active-foreground: #00e1f9;
     --bright-foreground: #fff;
-
-    --tools-highlight: #63a9fa;
-    --deep-tools-highlight: #032c5b;
-    --faded-tools-highlight: #032c5b77;
-
-    --tools-preview: #860404;
-
-    /* New Color Scheme */
-    --dark-bg: #01002C;
-    --normal-bg: #343356;
-    --active-bg: #252440;
-    --light-bg: #fff;
-    --gradient-bg: linear-gradient(40deg, #343356 50%, #793284);
-
-    --active-fg: #00e1f9;
-    --bright-fg: #fff;
-    --normal-fg: #000;
-    --dark-fg: #01002C;
-    --purple-fg: #343356;
-    --green-fg: #6aca25;
-    --hot-pink-fg: #FF0054;
-    --gradient-fg: linear-gradient(135deg, #3023ae, #c86dd7);
+    --green-foreground: #6aca25;
+    --hot-pink-foreground: #FF0054;
+    --gradient-foreground: linear-gradient(135deg, #3023ae, #c86dd7);
 
     --light50: rgba(255,255,255,0.5);
     --light25: rgba(255,255,255,0.25);
     --light05: rgba(255,255,255,0.05);
     --dark25: rgba(0,0,0,0.25);
     --dark50: rgba(0,0,0,0.5);
+
+    /* From previous color scheme - in use */
+    --light-foreground: #F2F2F2;
+    --tools-highlight: #63a9fa;
+    --deep-tools-highlight: #032c5b;
+    --faded-tools-highlight: #032c5b77;
+    --tools-preview: #860404;
+    --error-border: #860404;
 }
 
 
