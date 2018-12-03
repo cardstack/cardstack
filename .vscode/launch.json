@@ -117,8 +117,8 @@
                 "packages/test-support/bin/run.js",
                 "--timeout",
                 "200000",
-                "--grep",
-                "returns error card when a queryless route has been matched, but its antecedant routing card does not exist"
+                // "--grep",
+                // "returns error card when a queryless route has been matched, but its antecedant routing card does not exist"
             ]
         }
     ]
