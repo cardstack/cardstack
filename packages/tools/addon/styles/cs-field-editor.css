@@ -8,9 +8,11 @@
     padding: 0.5rem 1rem;
     border: 1px solid var(--light25);
     border-radius: 3px;
-    background-color: var(--dark-bg);
-    color: var(--bright-fg);
+    background-color: var(--light-bg);
+    color: var(--dark-fg);
     font-size: 0.8rem;
+    font-family: 'Open Sans Bold';
+    font-weight: bold;
     letter-spacing: 0.3px;
     line-height: 1.375;
 }
@@ -29,8 +31,9 @@
     padding: 0.5rem 1rem 0.5rem 0.5rem;
     border: 1px solid var(--light25);
     border-radius: 3px;
-    background-color: var(--dark-bg);
-    color: var(--bright-fg);
+    background-color: var(--light-bg);
+    color: var(--dark-fg);
+    font-size: 0.8rem;
 }
 
 .cs-field-editor .ember-power-select-trigger:focus {
