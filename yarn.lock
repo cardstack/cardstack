@@ -5108,12 +5108,11 @@ ember-auto-import@^1.2.10:
     walk-sync "^0.3.2"
     webpack "^4.12.0"
 
-ember-auto-import@^1.2.16:
-  version "1.2.16"
-  resolved "https://registry.yarnpkg.com/ember-auto-import/-/ember-auto-import-1.2.16.tgz#3a94fef045e95a0161c420b121fbaccbdaee5977"
-  integrity sha512-2YXYYpeSPuXymwrwTrnDBmXpIarOKlchn5VwkWiy+dZAJAHP4tQ17MGDABYD43gojJzEmcj/Eq26YPYnbrWOtQ==
+ember-auto-import@^1.2.15:
+  version "1.2.15"
+  resolved "https://registry.yarnpkg.com/ember-auto-import/-/ember-auto-import-1.2.15.tgz#3da74f83704f4c095dc1affec25a68f396ed5728"
+  integrity sha512-L9eyO5b135BXdzNMexhoxkPETBUQCkwp3lp4O2uu+hVEDUe2Z9m+/X8TdTRcuavkeFbQk5bgoXAGPzv4yaPjIg==
   dependencies:
-    "@babel/core" "^7.1.6"
     babel-core "^6.26.3"
     babel-plugin-syntax-dynamic-import "^6.18.0"
     babel-template "^6.26.0"
@@ -5136,11 +5135,12 @@ ember-auto-import@^1.2.16:
     walk-sync "^0.3.2"
     webpack "^4.12.0"
 
-ember-auto-import@^1.2.15:
-  version "1.2.15"
-  resolved "https://registry.yarnpkg.com/ember-auto-import/-/ember-auto-import-1.2.15.tgz#3da74f83704f4c095dc1affec25a68f396ed5728"
-  integrity sha512-L9eyO5b135BXdzNMexhoxkPETBUQCkwp3lp4O2uu+hVEDUe2Z9m+/X8TdTRcuavkeFbQk5bgoXAGPzv4yaPjIg==
+ember-auto-import@^1.2.16:
+  version "1.2.16"
+  resolved "https://registry.yarnpkg.com/ember-auto-import/-/ember-auto-import-1.2.16.tgz#3a94fef045e95a0161c420b121fbaccbdaee5977"
+  integrity sha512-2YXYYpeSPuXymwrwTrnDBmXpIarOKlchn5VwkWiy+dZAJAHP4tQ17MGDABYD43gojJzEmcj/Eq26YPYnbrWOtQ==
   dependencies:
+    "@babel/core" "^7.1.6"
     babel-core "^6.26.3"
     babel-plugin-syntax-dynamic-import "^6.18.0"
     babel-template "^6.26.0"
@@ -8590,6 +8590,11 @@ hosted-git-info@^2.1.4:
 hosted-git-info@^2.5.0:
   version "2.6.0"
   resolved "https://registry.yarnpkg.com/hosted-git-info/-/hosted-git-info-2.6.0.tgz#23235b29ab230c576aab0d4f13fc046b0b038222"
+
+hosted-git-info@^2.6.0:
+  version "2.7.1"
+  resolved "https://registry.yarnpkg.com/hosted-git-info/-/hosted-git-info-2.7.1.tgz#97f236977bd6e125408930ff6de3eec6281ec047"
+  integrity sha512-7T/BxH19zbcCTa8XkMlbK5lTo1WtgkFi3GvdWEyNuc4Vex7/9Dqbnpsf4JMydcfj9HCg4zUWFTL3Za6lapg5/w==
 
 http-assert@^1.1.0:
   version "1.3.0"

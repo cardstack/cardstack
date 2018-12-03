@@ -59,7 +59,6 @@ function getCanonicalPath(routerMapByDepth, routeStack, card) {
   if (!path) { return; }
 
   path = resolveRoutingCardFieldsFromPath(route, path, routeStack);
-  path = path.replace(/\[([^\]]+)\]/g, (match, type) => routeStack.map(r => r.data.type).includes(type) ? '' : match); // cleanup namespace artifacts
 
   return path;
 }
@@ -153,14 +152,14 @@ function resolvePathRelacementTagsFromCard(route, card) {
 
   let path = route.namespacedPath;
   if (typeReplacement) {
-    path = path.replace(typeReplacement, card.type);
+    path = path.replace(new RegExp(`${typeReplacement}(\\[[^\\]]+\\])?`), card.type);
   }
 
   if (uniqueFieldName === 'id') {
     let idReplacement = get(filter, 'id.exact');
-    path = idReplacement ? path.replace(idReplacement, card.id) : path;
+    path = idReplacement ? path.replace(new RegExp(`${idReplacement}(\\[[^\\]]+\\])?`), card.id) : path;
   } else if (get(filter[uniqueFieldName], 'exact') === ':friendly_id') {
-    path = path.replace(':friendly_id', card.attributes[uniqueFieldName]);
+    path = path.replace(/:friendly_id(\[[^\]]+\])?/, card.attributes[uniqueFieldName]);
   }
 
   return path;

@@ -40,7 +40,7 @@ class Routers {
 
     let primaryCard;
     let routeInfo = await getRoute(this.searchers, this.routerMap, branch, path, this.applicationCard);
-    let { matchedQueryParams, allowedQueryParams, routingCard, matchedRoute, remainingPath, query, routeStack } = routeInfo || {};
+    let { params={}, allowedQueryParams=[], routingCard, matchedRoute, remainingPath, query, routeStack=[] } = routeInfo || {};
 
     if (!routeInfo) {
       primaryCard = await this._getNotFoundErrorCard(schema);
@@ -65,9 +65,9 @@ class Routers {
         id: path,
         type: 'spaces',
         attributes: {
-          'query-params': matchedQueryParams || '',
-          'allowed-query-params': get(primaryCard, 'data.meta.is-error-card') ? [] : allowedQueryParams || [],
-          'route-stack': routeStack || [],
+          params: get(primaryCard, 'data.meta.is-error-card') ? {} : params,
+          'allowed-query-params': get(primaryCard, 'data.meta.is-error-card') ? [] : allowedQueryParams,
+          'route-stack': routeStack,
         },
         relationships: {
           'primary-card': {

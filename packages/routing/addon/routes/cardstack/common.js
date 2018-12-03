@@ -33,14 +33,6 @@ export default Route.extend({
   setupController(controller, model) {
     this._super(controller, model);
     this.get('cardstackEdges').registerTopLevelComponent('head-layout');
-
-    if (!model) { return; }
-
-    let queryParamsString = model.get('queryParams');
-    if (!queryParamsString) { return; }
-
-    let params = qs.parse(queryParamsString.replace('?', ''));
-    controller.set('params', params);
   },
 
   updatePageTitle: task(function* (card) {

@@ -203,7 +203,7 @@ module.exports = class DocumentContext {
   // We can only resolve self links for spaces documents because they have the necessary routing card
   // context which is required to resolve the resource links
   async _addSelfLink(jsonapiDoc) {
-    if (!this.routers || this.type !== 'spaces') { return; }
+    if (!this.routers || !Array.isArray(this._routeStack)) { return; }
 
     let routeStackCards = [];
     for (let routingCardIdentifier of this._routeStack) {

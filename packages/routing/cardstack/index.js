@@ -5,7 +5,7 @@ async function getRoute(searchers, router, branch, path, applicationCard) {
   let query;
   let { route: matchedRoute,
     remainingPath,
-    matchedQueryParams,
+    params,
     routingCard,
     routingCardsCache,
     allowedQueryParams } = await routeThatMatchesPath(searchers, router, branch, path, applicationCard);
@@ -20,8 +20,6 @@ async function getRoute(searchers, router, branch, path, applicationCard) {
       query = resolveRoutingCardReplacementTags(routingCard, query, routingCardsCache);
     }
   }
-
-  // TODO perform substitution on the additionalParams and return it
 
   let routeStack = [ `${routingCard.data.type}/${routingCard.data.id}` ].concat(matchedRoute.routeStack.map(({contentType}) => {
     let card = routingCardsCache[`card::${contentType}`];
@@ -38,7 +36,7 @@ async function getRoute(searchers, router, branch, path, applicationCard) {
     query: query && JSON.parse(query),
     matchedRoute,
     remainingPath,
-    matchedQueryParams,
+    params,
     allowedQueryParams,
     routingCard,
     routeStack
@@ -137,7 +135,7 @@ function resolveReplacementTagsFromPath(route, path, string) {
   let dictionary = buildSubstitutionDictionary(route, path);
 
   for (let dynamicSegmentName of Object.keys(dictionary)) {
-    result = result.replace(new RegExp(`:${dynamicSegmentName}`, 'g'), dictionary[dynamicSegmentName]);
+    result = result.replace(new RegExp(`:${dynamicSegmentName.replace(/([[\]])/g, '\\$1')}`, 'g'), dictionary[dynamicSegmentName]);
   }
   return result;
 }
@@ -189,18 +187,15 @@ function buildSubstitutionDictionary(route, path) {
   return dictionary;
 }
 
-function queryParamReplacement(type) {
-  return (match, separator, param) =>
-    `${separator === '&' ? '(\\&)?' : '\\' + separator}(${type}\\[${param}\\]=[^&]+)?`;
-}
-
 async function routeThatMatchesPath(searchers, router, branch, path, applicationCard) {
-  let matchedRoute, matchedQueryParams, allowedQueryParams, routingCard, routingCardsCache;
-  let remainingPath = path;
+  let matchedRoute, routingCard, routingCardsCache;
+  let remainingPath = path.split('?')[0];
+  let params = {};
+  let allowedQueryParams = [];
 
   for (let route of router) {
-    let { contentType: type, path: routePath } = route;
-    let pathRegex = new RegExp(`${route.path.split('?')[0].replace(/(:card)?:[^/?#&]+/g, '[^/?#&]+')}`);
+    let { path: routePath } = route;
+    let pathRegex = new RegExp(`${routePath.split('?')[0].replace(/(:card)?:[^/?#&]+/g, '[^/?#&]+')}`);
     if (decodeURI(path).match(pathRegex)) {
       routingCardsCache = await buildRoutingCardsCache({
         context: route.namespacedPath,
@@ -228,28 +223,41 @@ async function routeThatMatchesPath(searchers, router, branch, path, application
 
       matchedRoute = route;
       remainingPath = decodeURI(remainingPath).replace(pathRegex, '');
+      params = buildSubstitutionDictionary(matchedRoute, path);
 
-      // consume the query param part of the URL
-      if (route.path.includes('?')) {
+      // remove params that were included from antecedant routing cards, the only params a card can use are params that derive from its own route
+      let keys = Object.keys(params);
+      for (let key of keys) {
+        if (key.includes('[')) {
+          delete params[key];
+        }
+      }
+
+      if (matchedRoute.additionalParams) {
+        let resolvedAdditionalParams = resolveReplacementTagsFromPath(matchedRoute, path, JSON.stringify(matchedRoute.additionalParams));
+        params = Object.assign({}, params, JSON.parse(resolveRoutingCardReplacementTags(routingCard || applicationCard, resolvedAdditionalParams, routingCardsCache)));
+      }
+
+      if (matchedRoute.path.includes('?')) {
         let routeQueryParams = routePath.split('?')[1];
         allowedQueryParams = routeQueryParams.split('&').map(i => i.split('=')[0]);
-        let queryParamRegex = new RegExp(`^${('?' + routeQueryParams).replace(/([?&])([^?&]+)=:[^&]+/g, queryParamReplacement(type))}`);
-        let queryParamMatch = decodeURI(remainingPath).match(queryParamRegex);
-        matchedQueryParams = queryParamMatch && queryParamMatch[0].replace(new RegExp(`${type}\\[([^\\]]+)\\]`, 'g'), '$1');
-        if (matchedQueryParams && matchedQueryParams.slice(-1) === '&') {
-          matchedQueryParams = matchedQueryParams.slice(0, -1);
-        }
-        remainingPath = decodeURI(remainingPath).replace(queryParamRegex, '');
       }
 
-      if (!remainingPath.includes('?') && remainingPath.includes('&')) {
-        remainingPath = remainingPath.replace('&', '?');
+      let routePathSegment = resolveReplacementTagsFromPath(matchedRoute, path, matchedRoute.routePathSegment);
+      routePathSegment = resolveRoutingCardReplacementTags(routingCard, routePathSegment, routingCardsCache).split("?")[0];
+      let matchedQueryParams = [];
+      for (let queryParam of allowedQueryParams) {
+        if (params[queryParam]) {
+          matchedQueryParams.push(`${queryParam}=${params[queryParam]}`);
+        }
       }
+      params.path = matchedQueryParams.length ? `${routePathSegment}?${matchedQueryParams.join('&')}` : routePathSegment;
+
       break;
     }
   }
 
-  return { route: matchedRoute, remainingPath, matchedQueryParams, allowedQueryParams, routingCard, routingCardsCache };
+  return { route: matchedRoute, remainingPath, params, allowedQueryParams, routingCard, routingCardsCache };
 }
 
 module.exports = {
