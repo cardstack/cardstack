@@ -19,12 +19,6 @@ export default DS.Model.extend(RelationshipTracker, {
       if (meta) {
         let { owned } = meta.options;
         if (owned) {
-          //TODO: Create a _ownedRelationships hash:
-          // { comments: 'hasMany', author: 'belongsTo' }
-          // that hash can then be used for creating the dirtyTracking CPs
-          // but also when saving and rendering fields for owner records
-          //TODO: Implement relatedOwnedRecords
-          //TODO: Refactor `saveRelated` to use `relatedOwnedRecords`
           ownedRelationships[meta.name] = kind;
         }
       }

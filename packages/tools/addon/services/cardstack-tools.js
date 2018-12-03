@@ -1,5 +1,4 @@
 import { getOwner } from '@ember/application';
-import { get } from '@ember/object';
 import { computed } from '@ember/object';
 import { alias } from '@ember/object/computed';
 import Service, { inject as service } from '@ember/service';
@@ -71,7 +70,7 @@ export default Service.extend({
     let item = this.get('activeContentItem');
     if (!item) { return []; }
     let activeItemModel = item.model;
-    let owned = ownedRelatedRecords([item.model]);
+    let owned = item.model.relatedOwnedRecords();
     if (item) {
       return this.get('renderedFields').filter(f => {
         let fieldModel = f.model.content;
@@ -244,26 +243,3 @@ export default Service.extend({
   }
 
 });
-
-function ownedRelatedRecords(records, out = []) {
-  let [record, ...rest] = records;
-  if (!record) {
-    return out;
-  }
-
-  let recordClass = record.constructor;
-  get(recordClass, 'relationships').forEach(([ relationshipDefinition ]) => {
-    let meta = recordClass.metaForProperty(relationshipDefinition.name);
-    let { owned } = meta.options;
-    if (owned) {
-      let relatedRecords = record.get(meta.name);
-      if (meta.kind === 'hasMany') {
-        relatedRecords = relatedRecords.toArray();
-      }
-      rest = rest.concat(relatedRecords);
-      out = out.concat(relatedRecords);
-    }
-  });
-  return ownedRelatedRecords(rest, out);
-}
-
