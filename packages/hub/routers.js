@@ -30,6 +30,7 @@ class Routers {
     this.routerMapByDepth = groupBy(this.routerMap, route => route.routeStack.length);
     this.applicationCard = applicationCard;
 
+    debugger;
     return { routerMap: this.routerMap, applicationCard: this.applicationCard, routerMapByDepth: this.routerMapByDepth };
   }
 
@@ -148,18 +149,16 @@ class Routers {
           ));
         }
       } else {
-        routerMap = routerMap.concat(this._discoverRouters(
-          schema,
-          routingCardTypeQueryValue,
-          childRouteStack
-          ));
-        if (routerMap.length) {
+        let discoveredRouters = this._discoverRouters( schema, routingCardTypeQueryValue, childRouteStack);
+
+        if (discoveredRouters.length) {
           // pruning interior nodes of the route tree, we only care about the leaf nodes
           pluckedRoutes.push(path);
         }
+        routerMap = routerMap.concat(discoveredRouters);
       }
     }
-
+debugger;
     routerMap = router.filter(route => !pluckedRoutes.includes(route.path)).map(route => {
       return {
         contentType: routingCardType,
