@@ -28,34 +28,36 @@ module('Integration | Component | cardstack tools launcher', function(hooks) {
 
   test('it renders with default implementation', async function(assert) {
     await render(hbs`{{cardstack-tools-launcher}}`);
-    assert.equal(this.$('svg').length, 1, "found svg icon");
-    assert.equal(this.$('svg.active').length, 0, "not active");
+    assert.dom('[data-test-cardstack-tools-launcher-button]').exists('found button');
+    assert.dom('[data-test-cardstack-tools-launcher-icon="false"]').exists('button is not active');
   });
 
   test('it renders with custom implementation', async function(assert) {
-    await render(hbs`
+    await render(hbs`git
       {{#cardstack-tools-launcher as |launcher|}}
-        <div class="outer {{if launcher.active 'active'}}">
+        <div class="outer {{if launcher.active 'active'}}" data-test-cardstack-tools-launcher-block>
           <button {{action launcher.setActive true}}>Open</button>
           <button {{action launcher.setActive false}}>Close</button>
           <button {{action launcher.toggleActive}}>Toggle</button>
         </div>
       {{/cardstack-tools-launcher}}
     `);
-    assert.equal(this.$('.outer').length, 1, 'found provided element');
+    assert.dom('[data-test-cardstack-tools-launcher-block]').exists('found provided element');
   });
 
   test('it does not render when tools are not available', async function(assert) {
+    await render(hbs`{{cardstack-tools-edges}}`);
     this.get('tools').set('available', false);
-    await render(hbs`{{cardstack-tools-launcher}}`);
-    assert.equal(this.$('svg').length, 0, "no icon");
+
+    assert.dom('[data-test-cardstack-tools-launcher-icon="false"]').doesNotExist('no icon');
+    assert.dom('[data-test-cardstack-tools-launcher-icon="true"]').doesNotExist('no icon');
   });
 
   test('clicking icon toggles tools', async function(assert) {
     await render(hbs`{{cardstack-tools-launcher}}`);
     run(() => {
-      this.$('button').click();
+      this.$('[data-test-cardstack-tools-launcher-button]').click();
     });
-    assert.equal(this.$('button.active').length, 1, "found active button");
+    assert.dom('[data-test-cardstack-tools-launcher-icon="true"]').exists('found active button');
   });
 });

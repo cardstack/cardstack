@@ -1,10 +1,12 @@
 <button
   class="cs-editor-switch {{if enabled "enabled" "disabled"}}"
   {{action "toggleEditing"}}
+  data-test-cs-editor-switch
 >
   {{cs-svg
     (if enabled "done" "write")
     width="20px"
     height="20px"
+    data-test-cs-editor-switch-icon=enabled
   }}
 </button>

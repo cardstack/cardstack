@@ -11,11 +11,13 @@
     <button
       class="cardstack-tools-launcher {{if active "active"}}"
       {{action "toggleActive"}}
+      data-test-cardstack-tools-launcher-button
     >
       {{cs-svg
         "cardstack-icon"
         width="26px"
         height="26px"
+        data-test-cardstack-tools-launcher-icon=active
       }}
     </button>
   {{/if}}

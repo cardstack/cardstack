@@ -10,7 +10,10 @@ module('Integration | Component | cs editor switch', function(hooks) {
 
   test('it renders', async function(assert) {
     await render(hbs`{{cs-editor-switch}}`);
-    assert.equal(this.$('button.cs-editor-switch').length, 1, "found button");
+    assert.dom('[data-test-cs-editor-switch-icon="false"]').exists('found button');
+
+    await click('[data-test-cs-editor-switch]');
+    assert.dom('[data-test-cs-editor-switch-icon="true"]').exists('found button');
   });
 
   test('clears opened field after switch is off', async function(assert) {
@@ -29,7 +32,7 @@ module('Integration | Component | cs editor switch', function(hooks) {
     this.owner.register('service:cardstack-tools', toolsStub);
 
     await render(hbs`{{cs-editor-switch}}`);
-    await click('.cs-editor-switch');
+    await click('[data-test-cs-editor-switch]');
 
     assert.notOk(get(toolsStub, 'openedFieldId'), 'The field is cleared');
   });
