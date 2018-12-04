@@ -1,0 +1,11 @@
+<div class="card-catalog-isolated">
+  <h1 class="main-title">{{content.title}}</h1>
+
+  <div class="cards-list">
+    {{#each cards as |item|}}
+      {{#if (is-component (concat 'cardstack/' item.type '-embedded'))}}
+        {{cardstack-content format="embedded" content=item}}
+      {{/if}}
+    {{/each}}
+  </div>
+</div>
