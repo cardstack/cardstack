@@ -1,5 +1,4 @@
 import hbs from 'htmlbars-inline-precompile';
-import qs from 'qs';
 import { render, getContext } from '@ember/test-helpers';
 import { htmlSafe } from '@ember/string';
 import { pluralize } from 'ember-inflector';
