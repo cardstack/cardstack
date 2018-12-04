@@ -278,10 +278,6 @@ class ConfiguredPlugins {
         copied.attributes.enabled = true;
       }
       this._plugins[copied.id] = copied;
-
-      if (copied.attributes['is-root-plugin']) {
-        this.rootPlugin = copied;
-      }
     });
 
     featureTypes.forEach(type => this._features[type] = Object.create(null));

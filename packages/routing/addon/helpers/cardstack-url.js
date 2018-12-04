@@ -9,7 +9,7 @@ export function urlForModel(context, model, { branch } = {}) {
     let path = get(model, 'selfLink');
     if (!path) { return; }
 
-    if (path.charAt(0) === '/') {
+    if (path !== '/' && path.charAt(0) === '/') {
       path = path.replace('/', ''); // looks like ember router prepends an extra '/' to the path
     }
     return urlForParams(context, path, { branch });
@@ -19,7 +19,7 @@ export function urlForModel(context, model, { branch } = {}) {
 export function urlForParams(context, path, { branch } = {}) {
   if (!path) { return; }
 
-  if (path.charAt(0) === '/') {
+  if (path !== '/' && path.charAt(0) === '/') {
     path = path.replace('/', ''); // looks like ember router prepends an extra '/' to the path
   }
   path = encodeURI(path);
