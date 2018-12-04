@@ -49,6 +49,16 @@ module('Acceptance | tools', function(hooks) {
     assert.ok(matching, 'found field editor for comment poster name');
   });
 
+  test('field groups for related types are rendered correctly', async function(assert) {
+    await visit('/1');
+    await login();
+    await click('.cardstack-tools-launcher');
+
+    assert.dom('[data-test=reading-time]').containsText('8 minutes');
+    assert.dom('[data-test=karma-0]').containsText('10 Good');
+    assert.dom('[data-test=karma-1]').containsText('5 Bad');
+  });
+
   test('show validation error', async function(assert) {
     await visit('/1');
     await login();
