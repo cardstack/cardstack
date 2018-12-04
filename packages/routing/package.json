@@ -20,7 +20,6 @@
     "test": "ember try:each"
   },
   "dependencies": {
-    "@cardstack/data": "0.12.0",
     "@cardstack/di": "0.12.0",
     "@cardstack/edges": "0.12.0",
     "@cardstack/plugin-utils": "0.12.0",
@@ -36,10 +35,11 @@
     "qs": "^6.5.2"
   },
   "devDependencies": {
+    "@cardstack/data": "0.12.1",
     "@cardstack/eslint-config": "0.12.0",
-    "@cardstack/jsonapi": "0.12.0",
-    "@cardstack/models": "0.12.0",
-    "@cardstack/test-support": "0.12.0",
+    "@cardstack/jsonapi": "0.12.1",
+    "@cardstack/models": "0.12.1",
+    "@cardstack/test-support": "0.12.1",
     "broccoli-asset-rev": "^2.7.0",
     "ember-ajax": "^3.1.0",
     "ember-cli": "^3.4.3",
