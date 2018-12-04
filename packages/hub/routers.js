@@ -30,6 +30,8 @@ class Routers {
     this.routerMapByDepth = groupBy(this.routerMap, route => route.routeStack.length);
     this.applicationCard = applicationCard;
 
+    log.debug(`Generated router map: ${JSON.stringify(this.routerMap, null, 2)}`);
+
     return { routerMap: this.routerMap, applicationCard: this.applicationCard, routerMapByDepth: this.routerMapByDepth };
   }
 
@@ -60,7 +62,7 @@ class Routers {
 
     let included = [ primaryCard.data ].concat(primaryCard.included || []);
 
-    return {
+    let space = {
       data: {
         id: path,
         type: 'spaces',
@@ -77,6 +79,10 @@ class Routers {
       },
       included
     };
+
+    log.debug(`Routing path '${path}' for branch '${branch} to space: ${JSON.stringify(space, null, 2)}`);
+
+    return space;
   }
 
   /*
