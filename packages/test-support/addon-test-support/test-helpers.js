@@ -1,5 +1,4 @@
 import hbs from 'htmlbars-inline-precompile';
-import qs from 'qs';
 import { render, getContext } from '@ember/test-helpers';
 import { htmlSafe } from '@ember/string';
 import { pluralize } from 'ember-inflector';
@@ -25,13 +24,9 @@ export function renderCard(type, id, format, options = {}) {
   return getSpaceForCard(type, id).then(space => {
     let context = getContext();
     let card = space.get('primaryCard');
-    let queryParamsString = space.get('queryParams');
+    let params = space.get('params');
     context.set('card', card);
     context.set('format', format);
-    let params = options.params || {};
-    if (queryParamsString) {
-      params = Object.assign(qs.parse(queryParamsString.replace('?', '')), params);
-    }
     context.set('params', params);
 
     if (options.width) {

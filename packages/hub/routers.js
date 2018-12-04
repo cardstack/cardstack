@@ -30,6 +30,8 @@ class Routers {
     this.routerMapByDepth = groupBy(this.routerMap, route => route.routeStack.length);
     this.applicationCard = applicationCard;
 
+    log.debug(`Generated router map: ${JSON.stringify(this.routerMap, null, 2)}`);
+
     return { routerMap: this.routerMap, applicationCard: this.applicationCard, routerMapByDepth: this.routerMapByDepth };
   }
 
@@ -38,11 +40,12 @@ class Routers {
 
     let schema = await this.currentSchema.forBranch(branch);
 
-    let primaryCard;
+    let primaryCard, errorReason;
     let routeInfo = await getRoute(this.searchers, this.routerMap, branch, path, this.applicationCard);
     let { params={}, allowedQueryParams=[], routingCard, matchedRoute, remainingPath, query, routeStack=[] } = routeInfo || {};
 
     if (!routeInfo) {
+      errorReason = `Can not find route for path '${path}'`;
       primaryCard = await this._getNotFoundErrorCard(schema);
     } else {
       let { data: cards, included } = query ?
@@ -50,8 +53,10 @@ class Routers {
         { data: [routingCard.data], included: routingCard.included };
 
       if (!cards || !cards.length) {
+        errorReason = `Can not find card for route '${matchedRoute.path}' with path '${path}' using query ${JSON.stringify(query)}`;
         primaryCard = await this._getNotFoundErrorCard(schema, matchedRoute);
       } else if (hasUnconsumedPath(remainingPath, { data: cards[0]})) {
+        errorReason = `Path is unconsumed for route '${matchedRoute.path}' with path '${path}' remaining path is '${remainingPath}'`;
         primaryCard = await this._getNotFoundErrorCard(schema, matchedRoute);
       } else {
         primaryCard = { data: cards[0], included };
@@ -60,7 +65,7 @@ class Routers {
 
     let included = [ primaryCard.data ].concat(primaryCard.included || []);
 
-    return {
+    let space = {
       data: {
         id: path,
         type: 'spaces',
@@ -77,6 +82,13 @@ class Routers {
       },
       included
     };
+
+    log.debug(`Routing path '${path}' for branch '${branch}' to space: ${JSON.stringify(space, null, 2)}`);
+    if (errorReason) {
+      log.debug(`Routing to path '${path}' resulted in error card. Reason: ${errorReason}`);
+    }
+
+    return space;
   }
 
   /*
