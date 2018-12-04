@@ -1,0 +1,59 @@
+.cs-editor-switch {
+    position: absolute;
+    right: 14px;
+    top: 14px;
+    margin: 0;
+    padding: 0;
+    width: 3em;
+    height: 3em;
+    background: var(--gradient-foreground);
+    color: var(--bright-foreground);
+    fill: var(--bright-foreground);
+    border: none;
+    border-radius: 50%;
+    box-shadow: 0 2px 15px 0 var(--dark50);
+    font-size: 16px;
+    cursor: pointer;
+    z-index: 1;
+}
+
+.cs-editor-switch:hover,
+.cs-editor-switch:focus {
+    outline: none;
+    color: var(--active-foreground);
+    fill: var(--active-foreground);
+}
+
+.cs-editor-switch.enabled {
+    background: var(--light-background);
+    color: var(--normal-foreground);
+    fill: url(#gradient-fill) var(--normal-foreground);
+}
+
+.cs-editor-switch.enabled:hover,
+.cs-editor-switch.enabled:focus {
+    outline: none;
+    background: black;
+    color: var(--active-foreground);
+    fill: var(--active-foreground);
+}
+
+.cs-editor-switch.disabled:hover::before {
+    position: absolute;
+    display: block;
+    clear: both;
+    content: 'Edit Page';
+    margin-left: -70px;
+    color: var(--light50);
+    font-size: 14px;
+}
+
+.cs-editor-switch.enabled:hover::before {
+    position: absolute;
+    display: block;
+    clear: both;
+    content: 'Done Editing';
+    margin-left: -90px;
+    color: var(--light50);
+    font-size: 14px;
+}

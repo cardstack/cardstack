@@ -6,23 +6,6 @@
   replaced by a real theme protocol.
 */
 
-.cs-field-editor-section input[type="text"] {
-    width: 100%;
-    box-sizing: border-box;
-    padding: 0.5em 1em;
-    line-height: 1.9em;
-    border-width: 2px;
-}
-
-.cs-field-editor-section input[type="text"]:focus {
-    border: 2px solid var(--tools-highlight);
-    outline: none;
-}
-
-.cs-field-editor-section .cs-toggle-switch {
-    display: block;
-}
-
 .cs-mobiledoc-overview > ol {
     list-style: none;
     padding: 0;

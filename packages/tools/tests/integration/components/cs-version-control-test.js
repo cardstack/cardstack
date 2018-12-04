@@ -42,15 +42,15 @@ module('Integration | Component | cs version control', function(hooks) {
     model.set('hasDirtyFields', false);
     model.set('isNew', false);
     await render(hbs`{{cs-version-control model=model enabled=true}}`);
-    assert.dom('.cs-version-control-footer button[disabled]').hasText('Update');
+    assert.dom('[data-test-cs-version-control-button-save="true"]').hasText('Save');
   });
 
   test('render with dirty content', async function(assert) {
     model.set('hasDirtyFields', true);
     model.set('isNew', false);
     await render(hbs`{{cs-version-control model=model enabled=true}}`);
-    assert.dom('.cs-version-control-footer button[disabled]').doesNotExist('no disabled button');
-    assert.dom('.cs-version-control-footer button').hasText('Update');
+    assert.dom('[data-test-cs-version-control-button-save="true"]').doesNotExist('no disabled button');
+    assert.dom('[data-test-cs-version-control-button-save="false"]').hasText('Save');
   });
 
   test('clicking update on dirty model triggers save', async function(assert) {
@@ -61,7 +61,7 @@ module('Integration | Component | cs version control', function(hooks) {
     model.set('hasDirtyFields', true);
     model.set('isNew', false);
     await render(hbs`{{cs-version-control model=model enabled=true}}`);
-    await click('.cs-version-control-footer button');
+    await click('[data-test-cs-version-control-button-save="false"]');
   });
 
   test('clicking update shows loading spinner', async function(assert) {
@@ -69,11 +69,11 @@ module('Integration | Component | cs version control', function(hooks) {
     model.set('save', async () => await timeout(5));
     model.set('hasDirtyFields', true);
     model.set('isNew', false);
-    assert.notOk(this.$('.cs-version-control--loading').length, 'Does not display loading before click');
+    assert.dom('[data-test-cs-version-control-loading]').doesNotExist('Does not display loading before click');
     await render(hbs`{{cs-version-control model=model enabled=true}}`);
-    click('.cs-version-control-footer button');
-    await waitFor('.cs-version-control--loading');
-    assert.ok(this.$('.cs-version-control--loading').length, 'Displays loading after click');
+    click('[data-test-cs-version-control-button-save="false"]');
+    await waitFor('[data-test-cs-version-control-loading]');
+    assert.dom('[data-test-cs-version-control-loading]').exists('Displays loading after click');
   });
 
   test('clicking update on clean model does nothing', async function(assert) {
@@ -84,7 +84,7 @@ module('Integration | Component | cs version control', function(hooks) {
     model.set('hasDirtyFields', false);
     model.set('isNew', false);
     await render(hbs`{{cs-version-control model=model enabled=true}}`);
-    await click('.cs-version-control-footer button');
+    await click('[data-test-cs-version-control-button-save="true"]');
   });
 
   test('clicking delete triggers deleteRecord', async function(assert) {
@@ -94,6 +94,26 @@ module('Integration | Component | cs version control', function(hooks) {
     });
     model.set('isNew', false);
     await render(hbs`{{cs-version-control model=model enabled=true}}`);
-    await click('.cs-version-control-footer .text-button');
+    await click('[data-test-cs-version-control-delete-button]');
+  });
+
+  test('"draft" status is displayed for new model', async function (assert) {
+    model.set('isNew', true);
+    await render(hbs`{{cs-version-control model=model enabled=true}}`);
+    assert.dom('[data-test-cs-version-control-dropdown-option-status]').hasText('draft');
+  });
+
+  test('"published" status is displayed for clean model', async function (assert) {
+    model.set('hasDirtyFields', false);
+    model.set('isNew', false);
+    await render(hbs`{{cs-version-control model=model enabled=true}}`);
+    assert.dom('[data-test-cs-version-control-dropdown-option-status]').hasText('published');
+  });
+
+  test('"edited" status is displayed for dirty model', async function (assert) {
+    model.set('hasDirtyFields', true);
+    model.set('isNew', false);
+    await render(hbs`{{cs-version-control model=model enabled=true}}`);
+    assert.dom('[data-test-cs-version-control-dropdown-option-status]').hasText('edited');
   });
 });

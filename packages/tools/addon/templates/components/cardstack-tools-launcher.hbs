@@ -8,13 +8,17 @@
     }}
   {{else}}
     {{! template-lint-disable no-invalid-interactive }}
-    <div onclick={{action "toggleActive"}}>
+    <button
+      class="cardstack-tools-launcher {{if active "active"}}"
+      {{action "toggleActive"}}
+      data-test-cardstack-tools-launcher-button
+    >
       {{cs-svg
         "cardstack-icon"
         width="26px"
         height="26px"
-        class=(concat "cardstack-tools-launcher " (if active "active"))
+        data-test-cardstack-tools-launcher-icon=active
       }}
-    </div>
+    </button>
   {{/if}}
 {{/if}}

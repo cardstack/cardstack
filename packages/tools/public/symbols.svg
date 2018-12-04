@@ -1,7 +1,11 @@
 <svg style="position: absolute; width: 0; height: 0;" width="0" height="0" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
-  
-  <symbol id="cardstack-icon" viewBox="0 0 28 28"><path d="M0 0h28v28H0V0zm25 14l-10.417 9H3l4.747-4.1h6.94l5.672-4.9H25zm0-5l-10.417 9H3l4.747-4.1h6.94L20.359 9H25zm0-5l-10.417 9H3l10.42-9H25z" fill="#FFF" fill-rule="evenodd"/></symbol>
-
+  <symbol id="cardstack-icon" viewBox="0 0 20 20">
+    <g id="Symbols" stroke="none" stroke-width="1" fill-rule="evenodd">
+      <g id="icon/maximize" transform="translate(-3.000000, -3.000000)">
+        <path d="M6.41421356,21 L10,21 C10.5522847,21 11,21.4477153 11,22 C11,22.5522847 10.5522847,23 10,23 L4,23 C3.44771525,23 3,22.5522847 3,22 L3,16 C3,15.4477153 3.44771525,15 4,15 C4.55228475,15 5,15.4477153 5,16 L5,19.5857864 L10.2928932,14.2928932 C10.6834175,13.9023689 11.3165825,13.9023689 11.7071068,14.2928932 C12.0976311,14.6834175 12.0976311,15.3165825 11.7071068,15.7071068 L6.41421356,21 Z M19.5857864,5 L16,5 C15.4477153,5 15,4.55228475 15,4 C15,3.44771525 15.4477153,3 16,3 L22,3 C22.5522847,3 23,3.44771525 23,4 L23,10 C23,10.5522847 22.5522847,11 22,11 C21.4477153,11 21,10.5522847 21,10 L21,6.41421356 L15.7071068,11.7071068 C15.3165825,12.0976311 14.6834175,12.0976311 14.2928932,11.7071068 C13.9023689,11.3165825 13.9023689,10.6834175 14.2928932,10.2928932 L19.5857864,5 Z"></path>
+      </g>
+    </g>
+  </symbol>
   <symbol id="page" viewBox="0 0 18 24" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:sketch="http://www.bohemiancoding.com/sketch/ns">
     <g id="Page-1" stroke="none" stroke-width="1" fill-rule="evenodd" sketch:type="MSPage">
       <g id="AIA_text_formatting" sketch:type="MSArtboardGroup" transform="translate(-225.000000, -9.000000)" >
@@ -19,7 +23,6 @@
       </g>
     </g>
   </symbol>
-
   <symbol id="tiles" viewBox="0 0 20 24" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:sketch="http://www.bohemiancoding.com/sketch/ns">
     <g id="Page-1" stroke="none" stroke-width="1" fill-rule="evenodd" sketch:type="MSPage">
       <g id="AIA_text_formatting" sketch:type="MSArtboardGroup" transform="translate(-344.000000, -10.000000)" >
@@ -36,7 +39,21 @@
       </g>
     </g>
   </symbol>
-  <symbol id="write" viewBox="0 0 13 18" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:sketch="http://www.bohemiancoding.com/sketch/ns">
+  <symbol id="dropdown-buttons" viewBox="0 0 7 16" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+      <g stroke="none" stroke-width="1" fill-rule="evenodd">
+          <g transform="translate(-1375.000000, -219.000000)" fill-rule="nonzero">
+              <g transform="translate(1110.000000, 81.000000)">
+                  <g transform="translate(20.000000, 126.000000)">
+                      <g>
+                        <polygon points="251.017315 24 252 25.0955528 248.5 28 245 25.0955528 245.982685 24 248.5 26.0889739"></polygon>
+                        <polygon transform="translate(248.500000, 14.000000) rotate(-180.000000) translate(-248.500000, -14.000000) " points="251.017315 12 252 13.0955528 248.5 16 245 13.0955528 245.982685 12 248.5 14.0889739"></polygon>
+                      </g>
+                  </g>
+              </g>
+          </g>
+      </g>
+  </symbol>
+  <symbol id="remove-this" viewBox="0 0 13 18" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:sketch="http://www.bohemiancoding.com/sketch/ns">
     <g id="Page-1" stroke="none" stroke-width="1" fill-rule="evenodd" sketch:type="MSPage">
       <g id="AIA_text_formatting" sketch:type="MSArtboardGroup" transform="translate(-1140.000000, -12.000000)" >
         <g id="Fill-2151-+-Fill-2152-Copy" sketch:type="MSLayerGroup" transform="translate(1140.000000, 12.000000)">
@@ -46,7 +63,22 @@
       </g>
     </g>
   </symbol>
-
+  <symbol id="write" viewBox="0 0 20 20" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <g fill-rule="nonzero" transform="translate(-3.000000, -3.000000)">
+      <path d="M17 5.414l-12 12V21h3.586l12-12L17 5.414zm.707-2.121l5 5a1 1 0 0 1 0 1.414l-13 13A1 1 0 0 1 9 23H4a1 1 0 0 1-1-1v-5a1 1 0 0 1 .293-.707l13-13a1 1 0 0 1 1.414 0z"></path>
+    </g>
+  </symbol>
+  <symbol id="done" viewBox="0 0 18 13" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <linearGradient id="gradient-fill" x1="31.472%" x2="64.238%" y1="-22.474%" y2="114.386%">
+      <stop offset="0%" stop-color="#3023AE"/>
+      <stop offset="100%" stop-color="#C86DD7"/>
+    </linearGradient>
+    <g id="Symbols" stroke="none" stroke-width="1" fill-rule="nonzero">
+      <g id="icon/check" transform="translate(-4.000000, -7.000000)">
+        <path d="M10,17.5857864 L20.2928932,7.29289322 C20.6834175,6.90236893 21.3165825,6.90236893 21.7071068,7.29289322 C22.0976311,7.68341751 22.0976311,8.31658249 21.7071068,8.70710678 L10.7071068,19.7071068 C10.3165825,20.0976311 9.68341751,20.0976311 9.29289322,19.7071068 L4.29289322,14.7071068 C3.90236893,14.3165825 3.90236893,13.6834175 4.29289322,13.2928932 C4.68341751,12.9023689 5.31658249,12.9023689 5.70710678,13.2928932 L10,17.5857864 Z"></path>
+      </g>
+    </g>
+  </symbol>
   <symbol id="archive" viewBox="0 0 22 24" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:sketch="http://www.bohemiancoding.com/sketch/ns">
     <g id="Page-1" stroke="none" stroke-width="1" fill-rule="evenodd" sketch:type="MSPage">
       <g id="AIA_text_formatting" sketch:type="MSArtboardGroup" transform="translate(-1179.000000, -10.000000)" >
@@ -57,28 +89,33 @@
       </g>
     </g>
   </symbol>
-  <symbol id="article" viewBox="0 0 22 28" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:sketch="http://www.bohemiancoding.com/sketch/ns">
-    <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd" sketch:type="MSPage">
-      <g id="AIA_text_formatting" sketch:type="MSArtboardGroup" transform="translate(-1141.000000, -59.000000)" fill="#FFFFFF">
-        <g id="Fill-3-Copy-+-Article-+-2015-04-28---Resilie" sketch:type="MSLayerGroup" transform="translate(1141.000000, 57.000000)">
-          <g id="Fill-3-Copy" transform="translate(0.250208, 1.000000)" sketch:type="MSShapeGroup">
-            <path d="M12.8333333,9.279304 L12.8333333,2.319304 L19.8333333,9.279304 L12.8333333,9.279304 Z M15.75,13.919304 L5.25,13.919304 C4.928,13.919304 4.66666667,13.659464 4.66666667,13.339304 C4.66666667,13.019144 4.928,12.759304 5.25,12.759304 L15.75,12.759304 C16.072,12.759304 16.3333333,13.019144 16.3333333,13.339304 C16.3333333,13.659464 16.072,13.919304 15.75,13.919304 L15.75,13.919304 Z M15.75,17.399304 L5.25,17.399304 C4.928,17.399304 4.66666667,17.139464 4.66666667,16.819304 C4.66666667,16.499144 4.928,16.239304 5.25,16.239304 L15.75,16.239304 C16.072,16.239304 16.3333333,16.499144 16.3333333,16.819304 C16.3333333,17.139464 16.072,17.399304 15.75,17.399304 L15.75,17.399304 Z M15.75,20.879304 L5.25,20.879304 C4.928,20.879304 4.66666667,20.619464 4.66666667,20.299304 C4.66666667,19.979144 4.928,19.719304 5.25,19.719304 L15.75,19.719304 C16.072,19.719304 16.3333333,19.979144 16.3333333,20.299304 C16.3333333,20.619464 16.072,20.879304 15.75,20.879304 L15.75,20.879304 Z M15.75,24.359304 L5.25,24.359304 C4.928,24.359304 4.66666667,24.099464 4.66666667,23.779304 C4.66666667,23.459144 4.928,23.199304 5.25,23.199304 L15.75,23.199304 C16.072,23.199304 16.3333333,23.459144 16.3333333,23.779304 C16.3333333,24.099464 16.072,24.359304 15.75,24.359304 L15.75,24.359304 Z M5.25,9.279304 L10.5,9.279304 C10.822,9.279304 11.0833333,9.539144 11.0833333,9.859304 C11.0833333,10.179464 10.822,10.439304 10.5,10.439304 L5.25,10.439304 C4.928,10.439304 4.66666667,10.179464 4.66666667,9.859304 C4.66666667,9.539144 4.928,9.279304 5.25,9.279304 L5.25,9.279304 Z M20.8296667,8.289824 L13.8296667,1.329824 C13.72,1.220784 13.5706667,1.159304 13.4166667,1.159304 L0.583333333,1.159304 C0.261333333,1.159304 0,1.419144 0,1.739304 L0,28.419304 C0,28.739464 0.261333333,28.999304 0.583333333,28.999304 L20.4166667,28.999304 C20.7386667,28.999304 21,28.739464 21,28.419304 L21,8.699304 C21,8.545024 20.9381667,8.397704 20.8296667,8.289824 L20.8296667,8.289824 Z" id="Fill-3"></path>
-          </g>
+  <symbol id="article" viewBox="0 0 18 22" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:sketch="http://www.bohemiancoding.com/sketch/ns">
+    <g id="01-Editing,-properties-panel" stroke="none" stroke-width="1" fill-rule="evenodd">
+        <g id="04-Edit-mode" transform="translate(-1133.000000, -124.000000)">
+            <g id="icon/page" transform="translate(1129.000000, 122.000000)">
+              <path d="M19.948088,2 C20.3194685,2 20.6602609,2.20581284 20.8331374,2.53450294 L21.8850494,4.53450294 C21.9605492,4.6780506 22,4.83780832 22,5 L22,21 C22,22.6568542 20.6568542,24 19,24 L7,24 C5.34314575,24 4,22.6568542 4,21 L4,5 C4,3.34314575 5.34314575,2 7,2 L19.948088,2 Z M19.3441636,4 L7,4 C6.44771525,4 6,4.44771525 6,5 L6,21 C6,21.5522847 6.44771525,22 7,22 L19,22 C19.5522847,22 20,21.5522847 20,21 L20,5.24694157 L19.3441636,4 Z M17,13 C17.5522847,13 18,13.4477153 18,14 C18,14.5522847 17.5522847,15 17,15 L9,15 C8.44771525,15 8,14.5522847 8,14 C8,13.4477153 8.44771525,13 9,13 L17,13 Z M13,17 C13.5522847,17 14,17.4477153 14,18 C14,18.5522847 13.5522847,19 13,19 L9,19 C8.44771525,19 8,18.5522847 8,18 C8,17.4477153 8.44771525,17 9,17 L13,17 Z M8,7 L18,7 L18,11 L8,11 L8,7 Z" id="path-1"></path>
+            </g>
         </g>
+    </g>
+    </g>
+  </symbol>
+  <symbol id="toggle-arrow" viewBox="0 0 6 10" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <g id="Symbols" stroke="none" stroke-width="1" fill-rule="evenodd">
+      <g id="icon/chevron-right" transform="translate(-10.000000, -8.000000)">
+        <polygon points="16.0722747 10.263618 17.3787511 11.777923 12.7255129 15.7925343 8.07227473 11.777923 9.37875111 10.263618 12.7255129 13.1510584"></polygon>
       </g>
     </g>
   </symbol>
-
-  <symbol id="toggle-arrow" viewBox="0 0 8 7" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:sketch="http://www.bohemiancoding.com/sketch/ns">
-    <g id="Page-1" stroke="none" stroke-width="1" fill-rule="evenodd" sketch:type="MSPage">
-      <g id="AIA_select_type_tag" sketch:type="MSArtboardGroup" transform="translate(-1415.000000, -120.000000)" >
-        <g id="Rectangle-32-+-Fill-43-Copy-12" sketch:type="MSLayerGroup" transform="translate(1411.000000, 115.000000)">
-          <path d="M8.09587395,11.8821596 L11.8980027,8.12084708 C11.9294636,8.08972628 11.9473466,8.04734903 11.9473466,8.00331641 L11.9473466,5.16536459 C11.9473466,5.09848799 11.9069443,5.03823283 11.845016,5.01274026 C11.7834189,4.98691662 11.712218,5.00115273 11.66453,5.048165 L7.97897199,8.72604725 L4.28215432,5.05081358 C4.23479743,5.00347024 4.16359652,4.9895652 4.10166828,5.01505777 C4.04007121,5.04088141 4,5.10113657 4,5.16801317 L4,8.00596499 C4,8.0499976 4.01788302,8.09270593 4.04934389,8.12349566 L7.86339469,11.8824906 C7.9276411,11.9460565 8.03162755,11.9457254 8.09587395,11.8821596" id="Fill-43-Copy-11" sketch:type="MSShapeGroup"></path>
-        </g>
-      </g>
+  <symbol id="create" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 16 16">
+    <g stroke="none" fill-rule="nonzero" transform="translate(-5.000000, -5.000000)">
+      <path d="M14,12 L20,12 C20.5522847,12 21,12.4477153 21,13 C21,13.5522847 20.5522847,14 20,14 L14,14 L14,20 C14,20.5522847 13.5522847,21 13,21 C12.4477153,21 12,20.5522847 12,20 L12,14 L6,14 C5.44771525,14 5,13.5522847 5,13 C5,12.4477153 5.44771525,12 6,12 L12,12 L12,6 C12,5.44771525 12.4477153,5 13,5 C13.5522847,5 14,5.44771525 14,6 L14,12 Z"></path>
     </g>
   </symbol>
-
+  <symbol id="insert" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 16 16">
+    <g stroke="none" fill-rule="nonzero" transform="translate(-5.000000, -5.000000)">
+      <path d="M14,12 L20,12 C20.5522847,12 21,12.4477153 21,13 C21,13.5522847 20.5522847,14 20,14 L14,14 L14,20 C14,20.5522847 13.5522847,21 13,21 C12.4477153,21 12,20.5522847 12,20 L12,14 L6,14 C5.44771525,14 5,13.5522847 5,13 C5,12.4477153 5.44771525,12 6,12 L12,12 L12,6 C12,5.44771525 12.4477153,5 13,5 C13.5522847,5 14,5.44771525 14,6 L14,12 Z"></path>
+    </g>
+  </symbol>
   <symbol id="item-grab" viewBox="0 0 2 10" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:sketch="http://www.bohemiancoding.com/sketch/ns">
     <g id="Page-1" stroke="none" stroke-width="1" fill-rule="evenodd" sketch:type="MSPage">
       <g id="AIA_text_formatting" sketch:type="MSArtboardGroup" transform="translate(-1410.000000, -745.000000)" >
@@ -92,7 +129,6 @@
       </g>
     </g>
   </symbol>
-
   <symbol id="trash" viewBox="0 0 14 18" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:sketch="http://www.bohemiancoding.com/sketch/ns">
     <g id="Image-Uploader" stroke="none" stroke-width="1" fill-rule="evenodd" sketch:type="MSPage">
       <g id="Uploaded" sketch:type="MSArtboardGroup" transform="translate(-785.000000, -722.000000)">

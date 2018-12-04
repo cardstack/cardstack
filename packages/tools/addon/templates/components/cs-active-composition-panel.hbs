@@ -1,23 +1,10 @@
-<section class="cs-content-info">
-  {{cs-svg "article" width="22px" height="28px"}}
-  <p class="content-type">{{cs-humanize (cs-model-type model) }}</p>
-  <p class="content-title">
-    {{#if model.created}}
-      {{moment-format model.created "YYYY-MM-DD"}}
-    {{/if}}
-    {{cs-model-title model}}
-  </p>
-</section>
+{{cs-composition-panel-header
+  model=model
+  editingEnabled=editingEnabled
+}}
 
 {{!- this one scrolls }}
-<div>
-
-  {{cs-version-control
-    model=model
-    enabled=editingEnabled
-    on-error=(action (mut validationErrors))
-  }}
-
+<div class="cs-active-composition-panel--main">
   {{#each renderedFields key="id" as |fieldMark|}}
     {{! template-lint-disable attribute-indentation }}
     {{#let
@@ -40,7 +27,9 @@
           {{#let fieldModel.content as |content|}}
             {{#if fieldModel.grouped}}
               {{#each fieldModel.grouped as |fieldName|}}
-                <label>{{cs-field-caption content fieldName}}</label>
+                <label class="cs-field-editor-section--label">
+                  {{cs-field-caption content fieldName}}
+                </label>
                 {{!--
                   We allow editing fields of related resources. We should come back to this after #448 is completed.
                 --}}
@@ -82,6 +71,7 @@
     {{/let}}
   {{/each}}
 
+  {{!-- These are the fields that exist for the template but are not rendered --}}
   {{#each modelFields as |field|}}
     {{#let (eq field.model model) as |isPageModelField|}}
       {{#cs-collapsible-section
@@ -110,6 +100,4 @@
       {{/cs-collapsible-section}}
     {{/let}}
   {{/each}}
-
-
 </div>

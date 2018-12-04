@@ -1,0 +1,56 @@
+.cs-composition-panel-header {
+    position: relative;
+    padding: 1em;
+    color: var(--bright-foreground);
+    border-top-left-radius: 20px;
+    border-top-right-radius: 20px;
+    font-size: 16px;
+    box-shadow: 0 2px 15px 0 var(--dark25);
+}
+
+.cs-composition-panel-header.enabled {
+    background: var(--gradient-background);
+}
+
+.cs-composition-panel-header--label {
+    color: var(--light50);
+    display: block;
+    padding-bottom: 1em;
+    padding-right: 3em;
+    font-size: 0.875em;
+    text-align: right;
+}
+
+.cs-composition-panel-header--info {
+    display: flex;
+    padding: 2em 0;
+}
+
+.cs-composition-panel-header--info > svg {
+    width: 1.4em;
+    margin-right: 1em;
+    color: var(--bright-foreground);
+    fill: var(--bright-foreground);
+}
+
+.cs-composition-panel-header--info > div {
+    max-width: 16em;
+}
+
+.cs-composition-panel-header--info .content-type {
+    margin: 0 0 2px;
+    color: var(--light50);
+    font-size: 0.69em;
+    font-family: 'Open Sans Bold';
+    font-weight: bold;
+    letter-spacing: 1px;
+    line-height: 1.36;
+    text-transform: uppercase;
+}
+
+.cs-composition-panel-header--info .content-title {
+    margin: 0;
+    font-size: 0.9em;
+    letter-spacing: 0.1px;
+    line-height: 1.38;
+}

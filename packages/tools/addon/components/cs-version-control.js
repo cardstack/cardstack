@@ -103,13 +103,6 @@ export default Component.extend({
 
   }),
 
-  titleClass: computed('upstreamState', function() {
-    let state = this.get('upstreamState');
-    if (state === 'created' || state === 'different') {
-      return 'cs-version-control-preview';
-    }
-  }),
-
   title: computed('modificationState', 'upstreamState', function() {
     switch(this.get('modificationState')) {
     case 'new':
@@ -127,6 +120,25 @@ export default Component.extend({
       case 'same':
         return 'Preview';
       }
+    }
+  }),
+
+  disabled: computed.equal('modificationState', 'saved'),
+
+  currentState: computed('modificationState', 'upstreamState', function() {
+    let modificationState = this.get('modificationState');
+    let upstreamState = this.get('upstreamState');
+
+    switch (modificationState) {
+      case 'new':
+        return 'draft'
+      case 'changed':
+        return 'edited';
+      case 'saved':
+        if (upstreamState === 'self') return 'published';
+        else return 'saved';
+      default:
+        return;
     }
   }),
 

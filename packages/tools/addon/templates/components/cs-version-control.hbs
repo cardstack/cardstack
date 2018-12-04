@@ -1,66 +1,56 @@
-{{#cs-collapsible-section
-  class=(concat "cs-toolbox-section " titleClass)
-  title=title
-  opened=opened
-  open=(action "open")
-  close=(action "close")
-}}
-
-  <div class="cs-field-editor-section">
-    {{#liquid-spacer}}
-      {{#if (eq upstreamState "same")}}
-        <div>Same as live version.</div>
-      {{/if}}
-
-      {{#if (eq upstreamState "different")}}
-        <div>Differs from live version.</div>
-      {{/if}}
-
-      {{#if (eq upstreamState "created")}}
-        <div>Unpublished</div>
-      {{/if}}
-
-      {{#if (eq upstreamState "self")}}
-        <div>Published</div>
-      {{/if}}
-
-      {{#if (eq upstreamState "pending")}}
-        {{!-- its nicer if there's no flicker of height change --}}
-        <div>&nbsp;</div>
-      {{/if}}
-
-    {{/liquid-spacer}}
-
+<div class="cs-version-control-dropdown">
+  <div class="cs-version-control-dropdown-option">
+    <div class="cs-version-control-dropdown-option--status {{currentState}}" data-test-cs-version-control-dropdown-option-status>
+      {{currentState}}
+    </div>
+    <div class="cs-version-control-dropdown-option--timestamp">Oct 12, 2018 3:50 pm</div>
   </div>
 
-  {{#liquid-if
-    enabled
-    rules=animationRules
-    growDuration=250
-    growPixelsPerSecond=1
-  }}
-    <footer class="cs-version-control-footer cs-field-editor-section">
-      {{! template-lint-disable no-invalid-interactive }}
-      <a class="text-button" onclick={{action (perform delete)}}>Delete</a>
+  <button class="cs-version-control-dropdown--button">
+    {{cs-svg "dropdown-buttons" width="1.2rem" height="1.2rem"}}
+  </button>
+</div>
 
-      <div class="cs-version-control-footer--button-area">
-        {{#if update.isRunning}}
-          <span class="cs-version-control--loading" aria-label="Loading"></span>
-        {{/if}}
-        <button
-          class="cs-version-control-footer--button"
-          disabled={{eq modificationState "saved"}}
-          onclick={{action (perform update)}}
-        >
-          Update
-        </button>
-      </div>
-      {{#with (concat modelType "-action-buttons") as |buttonsComponent|}}
-        {{#if (is-component buttonsComponent)}}
-          {{component buttonsComponent model=model modificationState=modificationState}}
-        {{/if}}
-      {{/with}}
-    </footer>
-  {{/liquid-if}}
+{{#liquid-if
+  enabled
+  rules=animationRules
+  growDuration=250
+  growPixelsPerSecond=1
+}}
+  <div class="cs-version-control-footer">
+    <div class="cs-version-control-footer--button-area">
+      {{#if update.isRunning}}
+        <span
+          class="cs-version-control--loading"
+          aria-label="Loading"
+          data-test-cs-version-control-loading
+        ></span>
+      {{/if}}
 
-{{/cs-collapsible-section}}
+      <button
+        class="cs-version-control--button cs-version-control--button-save {{if disabled "disabled" "enabled"}}"
+        disabled={{disabled}}
+        {{action (perform update)}}
+        data-test-cs-version-control-button-save="{{disabled}}"
+      >
+        Save
+      </button>
+      <button class="cs-version-control--button cs-version-control--button-cancel">
+        Cancel
+      </button>
+    </div>
+    {{#with (concat modelType "-action-buttons") as |buttonsComponent|}}
+      {{#if (is-component buttonsComponent)}}
+        {{component buttonsComponent model=model modificationState=modificationState}}
+      {{/if}}
+    {{/with}}
+
+    <button
+      class="cs-version-control--delete-button"
+      {{action (perform delete)}}
+      data-test-cs-version-control-delete-button
+    >
+      Delete
+    </button>
+  </div>
+{{/liquid-if}}

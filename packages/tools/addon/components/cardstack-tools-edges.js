@@ -5,5 +5,5 @@ import layout from '../templates/components/cardstack-tools-edges';
 export default Component.extend({
   tools: service('cardstack-tools'),
   layout,
-  classNames: ['cardstack-tools-launcher-wrapper']
+  tagName: ''
 });

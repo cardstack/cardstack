@@ -8,7 +8,6 @@
     display: flex;
 }
 .cardstack-header > section {
-    background-color: var(--normal-background);
     margin-right: 1px;
 }
 
@@ -25,19 +24,6 @@
     min-width: 2em;
     text-align: center;
     line-height: calc(var(--cs-header-height) - 0.3em);
-}
-
-.cs-editor-switch {
-    padding: 0.5rem 0.5rem 0 0.875rem;
-    min-width: 6.5rem;
-    line-height: calc(var(--cs-header-height) - 1em);
-}
-.cs-editor-switch > label {
-    font-size: 0.75rem;
-    font-weight: 100;
-    float: left;
-    margin-right: 1rem;
-    line-height: calc(var(--cs-header-height)/0.75 - 0.75em);
 }
 
 .cs-branch-control {
@@ -87,21 +73,4 @@
 .cs-branch-control > button:last-child {
     border-top-right-radius: 10px;
     border-bottom-right-radius: 10px;
-}
-
-.cs-create-button {
-    float: right;
-    line-height: 1.5em;
-    margin: 0.5em 0.3em;
-    padding: .4em 1.4em .4em;
-    border: none;
-    border-radius: 4px;
-    background-color: var(--bright-foreground);
-    font-size: .8em;
-    cursor: pointer;
-    outline-width: 0;
-}
-
-.cs-create-button:hover {
-    background-color: var(--light-foreground);
 }

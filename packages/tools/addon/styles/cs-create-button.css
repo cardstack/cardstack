@@ -1,0 +1,25 @@
+.cs-create-button {
+    display: block;
+    position: absolute;
+    right: 14px;
+    bottom: 14px;
+    margin: 0;
+    padding: 0;
+    width: 3em;
+    height: 3em;
+    border: 1px solid var(--light05);
+    border-radius: 50%;
+    box-shadow: 0 2px 15px 0 var(--dark50);
+    font-size: 16px;
+    background-color: var(--normal-background);
+    color: var(--bright-foreground);
+    fill: var(--bright-foreground);
+    cursor: pointer;
+}
+
+.cs-create-button:hover,
+.cs-create-button:focus {
+    outline: none;
+    color: var(--active-foreground);
+    fill: var(--active-foreground);
+}

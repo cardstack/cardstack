@@ -11,6 +11,7 @@ module('Acceptance | image attachment', function(hooks) {
     await this.owner.lookup('service:cardstack-codegen').refreshCode();
     let tools = this.owner.lookup('service:cardstack-tools');
     tools.set('active', true);
+    tools.set('available', true);
     tools.set('editing', true);
   });
 

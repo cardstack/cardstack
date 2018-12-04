@@ -8,6 +8,6 @@ module('Integration | Component | cardstack header', function(hooks) {
 
   test('it renders', async function(assert) {
     await render(hbs`{{cardstack-header}}`);
-    assert.equal(this.$('label:contains(Editor)').length, 1, 'Found editor switch');
+    assert.dom('[data-test-cardstack-header]').exists();
   });
 });
