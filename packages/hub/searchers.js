@@ -10,7 +10,7 @@ module.exports = declareInjections({
   sources: 'hub:data-sources',
   internalSearcher: `plugin-searchers:${require.resolve('@cardstack/pgsearch/searcher')}`,
   client: `plugin-client:${require.resolve('@cardstack/pgsearch/client')}`,
-  currentSchema: 'hub:current-schema'
+  currentSchema: 'hub:current-schema',
 },
 
 class Searchers {
@@ -52,14 +52,26 @@ class Searchers {
 
     let result = await next();
 
-    return { resource: result && result.data, meta: result && result.meta };
+    return {
+      resource: result && result.data,
+      meta: result && result.meta,
+      included: result && result.included
+    };
+  }
+
+  // not using DI to prevent circular dependency
+  _getRouters() {
+    if (this.routers) { this.routers; }
+
+    this.routers = this.__owner__.lookup('hub:routers');
+    return this.routers;
   }
 
   async get(session, branch, type, id, includePaths) {
     if (arguments.length < 4) {
       throw new Error(`session is now a required argument to searchers.get`);
     }
-    let { resource, meta } = await this._getResourceAndMeta(session, branch, type, id);
+    let { resource, meta, included } = await this._getResourceAndMeta(session, branch, type, id);
     let authorizedResult;
     let documentContext;
     if (resource) {
@@ -70,7 +82,8 @@ class Searchers {
         branch,
         schema,
         includePaths,
-        upstreamDoc: { data: resource, meta },
+        routers: this._getRouters(),
+        upstreamDoc: { data: resource, meta, included },
         read: this._read(branch)
       });
       let pristineResult = await documentContext.pristineDoc();

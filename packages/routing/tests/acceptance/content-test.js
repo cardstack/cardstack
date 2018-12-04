@@ -1,43 +1,93 @@
 import { module, test } from 'qunit';
 import { setupApplicationTest } from 'ember-qunit';
-import { visit, currentURL, click } from '@ember/test-helpers';
+import { visit, click } from '@ember/test-helpers';
+
+// use the main:router location API to get the current URL since we are
+// maniupating the URL using the location API
+function currentURL(owner) {
+  let router = owner.lookup('router:main');
+  return router.get('location').getURL();
+}
 
 module('Acceptance | content', function(hooks) {
   setupApplicationTest(hooks);
 
   test('renders own page content', async function(assert) {
-    await visit('/c/posts/1');
-    assert.equal(currentURL(), '/c/posts/1');
-    assert.equal(this.element.querySelector('.title').textContent.trim(), 'hello world');
+    await visit('/posts/1');
+    assert.equal(currentURL(this.owner), '/posts/1');
+    assert.dom('.title').hasText('hello world');
   });
 
-  test('redirects for default content type', async function(assert) {
-    await visit('/c/pages/second');
-    assert.equal(currentURL(), '/c/second');
-    assert.equal(this.element.querySelector('.blurb').textContent.trim(), 'I am the second page');
+  test('passes query params to primary card in route', async function(assert){
+    await visit('/posts/1?posts[foo]=bar&posts[bee]=bop');
+    assert.equal(currentURL(this.owner), '/posts/1?posts[foo]=bar&posts[bee]=bop');
+    assert.dom('.foo').hasText('foo is bar');
+    assert.dom('.bee').hasText('bee is bop');
   });
 
-  test('redirects for singular content type', async function(assert) {
-    await visit('/c/post/1');
-    assert.equal(currentURL(), '/c/posts/1');
-  });
-
-  test('redirects for singular default content type', async function(assert) {
-    await visit('/c/page/second');
-    assert.equal(currentURL(), '/c/second');
-  });
-
-
-  test('renders placeholder type when content is missing', async function(assert) {
-    await visit('/c/posts/bogus');
-    assert.equal(currentURL(), '/c/posts/bogus');
-    assert.equal(this.element.querySelector('h1').textContent.trim(), 'Not Found');
+  test('renders error card content is missing', async function(assert) {
+    await visit('/posts/bogus');
+    assert.equal(currentURL(this.owner), '/posts/bogus');
+    assert.dom('h1').hasText('Not Found');
   });
 
   test('reloads models on route transitions', async function(assert) {
-    await visit('/c/categories/category-1');
+    await visit('/categories/category-1');
     await click('[data-test-post="1"]')
 
-    assert.equal(currentURL(), '/c/posts/1');
+    assert.equal(currentURL(this.owner), '/posts/1');
+  });
+
+  test('card can set query param', async function(assert) {
+    await visit('/posts/1');
+    await click('.set-query-param-1');
+
+    assert.equal(currentURL(this.owner), '/posts/1?posts[foo]=fee');
+  });
+
+  test('card can change query param', async function(assert) {
+    await visit('/posts/1?posts[foo]=bar');
+    await click('.set-query-param-2');
+
+    assert.equal(currentURL(this.owner), '/posts/1?posts[foo]=fee%20fo%20fum');
+  });
+
+  test('card can clear query param', async function(assert) {
+    await visit('/posts/1?posts[foo]=bar');
+    await click('.clear-query-param');
+
+    assert.equal(currentURL(this.owner), '/posts/1');
+  });
+
+  test('card can not set undeclared query param', async function(assert) {
+    await visit('/posts/1');
+    await click('.set-undeclared-query-param');
+
+    assert.equal(currentURL(this.owner), '/posts/1');
+  });
+
+  test('card can not clear undeclared query param', async function(assert) {
+    await visit('/posts/1?posts[blah]=bar');
+    await click('.clear-undeclared-query-param');
+
+    assert.equal(currentURL(this.owner), '/posts/1?posts[blah]=bar');
+  });
+
+  test('card can set page title', async function(assert) {
+    await visit('/posts/1');
+    let headData = this.owner.lookup('service:head-data');
+
+    assert.equal(headData.title, 'hello world');
+  });
+
+  test('page title updates when the route changes', async function(assert) {
+    await visit('/posts/1');
+    assert.equal(currentURL(this.owner), '/posts/1');
+
+    await visit('/posts/2');
+    assert.equal(currentURL(this.owner), '/posts/2');
+    let headData = this.owner.lookup('service:head-data');
+
+    assert.equal(headData.title, 'second post');
   });
 });

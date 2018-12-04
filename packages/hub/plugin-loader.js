@@ -25,6 +25,7 @@ const featureTypes = [
   'static-models',
   'authenticators',
   'middleware',
+  'routers',
   'messengers',
   'code-generators'
 ];
@@ -259,6 +260,7 @@ function singularize(name) {
 
 class ConfiguredPlugins {
   constructor(installedPlugins, installedFeatures, configs) {
+    this.rootPlugin = Object.create(null);
     this._plugins = Object.create(null);
     this._features = Object.create(null);
 

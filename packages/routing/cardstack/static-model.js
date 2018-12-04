@@ -15,9 +15,54 @@ module.exports = function() {
       fields: {
         data: [
           { type: 'fields', id: 'primary-card' },
-          { type: 'fields', id: 'url-segment' }
+          { type: 'fields', id: 'params' },
+          { type: 'fields', id: 'allowed-query-params' },
+          { type: 'fields', id: 'route-stack' },
+          { type: 'computed-fields', id: 'http-status' }
         ]
       }
+    }
+  },
+  {
+    type: 'content-types',
+    id: 'application-cards',
+  },
+  {
+    type: 'content-types',
+    id: 'error-cards',
+  },
+  {
+    type: 'grants',
+    id: 'routing-grant',
+    attributes: {
+      'may-read-fields': true,
+      'may-read-resource': true,
+    },
+    relationships: {
+      who: {
+        data: [{ type: 'groups', id: 'everyone' }]
+      },
+      types: {
+        data: [
+          { type: "content-types", id: 'spaces' },
+          { type: "content-types", id: 'application-cards' },
+          { type: "content-types", id: 'error-cards' }
+        ]
+      }
+    }
+  },
+  {
+    type: 'fields',
+    id: 'status-code',
+    attributes: {
+      'field-type': '@cardstack/core-types::integer'
+    }
+  },
+  {
+    type: 'fields',
+    id: 'message',
+    attributes: {
+      'field-type': '@cardstack/core-types::string'
     }
   },
   {
@@ -29,9 +74,32 @@ module.exports = function() {
   },
   {
     type: 'fields',
-    id: 'url-segment',
+    id: 'allowed-query-params',
     attributes: {
-      'field-type': '@cardstack/core-types::string'
+      'field-type': '@cardstack/core-types::object'
     }
-  }];
+  },
+  {
+    type: 'fields',
+    id: 'route-stack',
+    attributes: {
+      'field-type': '@cardstack/core-types::string-array'
+    }
+  },
+  {
+    type: 'computed-fields',
+    id: 'http-status',
+    attributes: {
+      'computed-field-type': '@cardstack/routing::http-status',
+    }
+  },
+  {
+    type: 'application-cards',
+    id: 'getting-started'
+  },
+  {
+    type: 'error-cards',
+    id: 'not-found'
+  },
+  ];
 };

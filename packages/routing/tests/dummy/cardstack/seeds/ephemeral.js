@@ -6,9 +6,6 @@ function initialModels() {
   let initial = new JSONAPIFactory();
 
   initial.addResource('content-types', 'pages')
-  .withAttributes({
-    'routing-field': 'permalink'
-  })
   .withRelated('fields', [
       initial.addResource('fields', 'blurb').withAttributes({
         fieldType: '@cardstack/core-types::string'
@@ -30,6 +27,9 @@ function initialModels() {
 
   initial.addResource('content-types', 'posts')
     .withAttributes({
+      router: [{
+        path: '/?foo=:foo&bee=:bee'
+      }],
       fieldsets: {
         isolated: [{ field: 'page', format: 'embedded'}],
         embedded: [{ field: 'page', format: 'embedded'}]

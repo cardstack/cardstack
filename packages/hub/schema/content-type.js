@@ -69,6 +69,7 @@ module.exports = class ContentType {
     this.constraints = allConstraints.filter(constraint => {
       return Object.values(constraint.fieldInputs).some(field => this.realFields.get(field.id));
     });
+    //TODO we should get rid of this as part of refactoring the content.new route to use the new routing system
     this.routingField = model.attributes && model.attributes['routing-field'];
 
     if (model.attributes && model.attributes['default-includes']) {
@@ -76,6 +77,8 @@ module.exports = class ContentType {
     } else {
       this.includesTree = Object.create(null);
     }
+
+    this.router = model.attributes && model.attributes.router;
 
     if (model.attributes && model.attributes['fieldsets']) {
       let fieldsets = model.attributes['fieldsets'];

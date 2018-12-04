@@ -55,7 +55,7 @@
             "name": "Launch Dummy Routing Hub",
             "cwd": "${workspaceRoot}/packages/routing",
             "console": "integratedTerminal",
-            "program": "${workspaceRoot}/packages/routing/node_modules/ember-cli/bin/ember",
+            "program": "${workspaceFolder}/packages/hub/bin/cardstack-hub.js",
             "env": {
                 "CARDSTACK_SESSIONS_KEY":"OQUQi8NH0asrYgeoE10ijOFBhd/P1BU8HZP/rNqO5nw=",
                 "PGSEARCH_NAMESPACE":"cardstack_data_development",
@@ -63,9 +63,6 @@
                 "HUB_ENVIRONMENT":"test",
                 "PORT":"3000"
             },
-            "args": [
-                "${workspaceFolder}/packages/hub/bin/cardstack-hub.js"
-            ]
         },
         {
           "type": "node",
@@ -121,7 +118,7 @@
                 "--timeout",
                 "200000",
                 // "--grep",
-                // "duplicate module names"
+                // "can get a path that includes the mount point of the routing card for a queryless routing card"
             ]
         }
     ]

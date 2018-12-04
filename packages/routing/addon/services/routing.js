@@ -3,32 +3,14 @@ import { pluralize, singularize } from 'ember-inflector';
 import { defaultBranch } from '@cardstack/plugin-utils/environment';
 
 export default Service.extend({
-  defaultContentType: 'pages',
-
-  routeFor(type, routingId, branch) {
+  routeFor(path, branch) {
     let queryParams = this._qpsForBranch(branch);
-    type = pluralize(type);
-    if (type === this.defaultContentType) {
-      if (routingId === ' ') {
-        return {
-          name: 'cardstack.index',
-          params: [],
-          queryParams
-        }
-      } else {
-        return {
-          name: 'cardstack.default-content',
-          params: [ ['routingId', routingId ] ],
-          queryParams
-        };
-      }
-    } else {
-      return {
-        name: 'cardstack.content',
-        params: [ ['type', type], ['routingId', routingId] ],
-        queryParams
-      };
-    }
+
+    return {
+      name: 'cardstack.content',
+      params: [ ['path', path] ],
+      queryParams
+    };
   },
 
   routeForNew(type, branch) {

@@ -38,6 +38,7 @@ define('@cardstack/models/generated/{{modelName}}', ['exports', '@cardstack/mode
    });
    exports.default = _model.default.extend({
      type: "{{modelName}}",
+     selfLink: _emberData.default.attr(),
      {{#each fields as |field|}}
        {{#if field.isRelationship}}
          {{#with (related-type field ../modelName) as |type|}}

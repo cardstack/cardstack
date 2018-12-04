@@ -2,6 +2,9 @@ import { getOwner } from '@ember/application';
 import { get } from '@ember/object';
 import { computed } from '@ember/object';
 import { alias } from '@ember/object/computed';
+import { urlForModel } from '@cardstack/routing/helpers/cardstack-url';
+import { pluralize } from 'ember-inflector';
+import { warn } from '@ember/debug';
 import Service, { inject as service } from '@ember/service';
 import { transitionTo } from '../private-api';
 import { modelType } from '@cardstack/rendering/helpers/cs-model-type';
@@ -224,14 +227,18 @@ export default Service.extend({
   },
 
   setBranch(which) {
-    let model = this.get('activeContentItem.model')
-    if (model && model.get('slug')) {
+    let model = this.get('activeContentItem.model');
+    let path = urlForModel(model);
+    if (path) {
       let {
         name,
         args,
         queryParams
-      } = this.get('cardstackRouting').routeFor(modelType(model), model.get('slug'), which);
+      } = this.get('cardstackRouting').routeFor(path, which);
       transitionTo(getOwner(this), name, args, queryParams);
+    } else {
+        let type = pluralize(modelType(model));
+        warn(`The model ${pluralize(type)}/${get(model, 'id')} is not routable, there is no links.self for this model from the API.`);
     }
   },
 
