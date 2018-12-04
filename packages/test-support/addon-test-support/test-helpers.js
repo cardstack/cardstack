@@ -27,7 +27,7 @@ export function renderCard(type, id, format, options = {}) {
     let params = space.get('params');
     context.set('card', card);
     context.set('format', format);
-    context.set('params', params);
+    context.set('params', Object.assign({}, params, options.params || {}));
 
     if (options.width) {
       context.set('widthStyle', htmlSafe(`width: ${options.width}`));
