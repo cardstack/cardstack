@@ -11,5 +11,13 @@ export default DS.JSONAPISerializer.extend(SerializerMixin, {
     }
 
     return this._super.apply(this, arguments);
+  },
+
+  serialize() {
+    let json = this._super(...arguments);
+    if (get(json, 'data.attributes')) {
+      delete json.data.attributes['self-link'];
+    }
+    return json;
   }
 });
