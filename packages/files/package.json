@@ -1,6 +1,6 @@
 {
   "name": "@cardstack/files",
-  "version": "0.12.1",
+  "version": "0.12.2",
   "description": "The default blueprint for ember-cli addons.",
   "keywords": [
     "ember-addon",
@@ -25,11 +25,11 @@
   },
   "dependencies": {
     "@cardstack/di": "0.12.0",
-    "@cardstack/hub": "0.12.1",
-    "@cardstack/jsonapi": "0.12.1",
+    "@cardstack/hub": "0.12.2",
+    "@cardstack/jsonapi": "0.12.2",
     "@cardstack/logger": "^0.1.0",
     "@cardstack/plugin-utils": "0.12.0",
-    "@cardstack/test-support": "0.12.1",
+    "@cardstack/test-support": "0.12.2",
     "ember-cli-babel": "^6.6.0",
     "lodash": "^4.17.11",
     "moment": "^2.22.2",

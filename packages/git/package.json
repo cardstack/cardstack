@@ -1,6 +1,6 @@
 {
   "name": "@cardstack/git",
-  "version": "0.12.1",
+  "version": "0.12.2",
   "description": "Git data source plugin for @cardstack/hub.",
   "keywords": [
     "cardstack-plugin",
@@ -26,7 +26,7 @@
   "devDependencies": {
     "@cardstack/di": "0.12.0",
     "@cardstack/eslint-config": "0.12.0",
-    "@cardstack/test-support": "0.12.1",
+    "@cardstack/test-support": "0.12.2",
     "eslint": "^5.8.0",
     "eslint-plugin-ember": "^5.0.0",
     "eslint-plugin-node": "^5.2.1",
