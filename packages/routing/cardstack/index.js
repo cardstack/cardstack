@@ -108,7 +108,7 @@ async function buildRoutingCardsCache({ searchers, branch, resolvedPath, context
 function replaceNamespacedField(routingCard, routingCards, resolutionType) {
   return (match, field, typeTag, type) => {
     let card = get(routingCards, `${resolutionType}.${type}`) || routingCard;
-    if (!card) { return match; }
+    if (!card || !card.data) { return match; }
 
     if (field === 'id') {
       return card.data.id;
