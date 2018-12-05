@@ -38,7 +38,7 @@ export default Helper.extend({
         return urlForModel(this, arg, hash);
       }
     } else {
-      throw new Error(`the cardstack-url helper expects one argument which can be either the model to our to or the path of the model to route to.`);
+      throw new Error(`the cardstack-url helper expects one argument which can be either the model or the path of the model to route to.`);
     }
   }
 });
