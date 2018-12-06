@@ -2,8 +2,6 @@ const Operations = require('./operations');
 const owningDataSource = new WeakMap();
 const { flatten } = require('lodash');
 const log = require('@cardstack/logger')('cardstack/indexers');
-const DocumentContext = require('./document-context');
-const Session = require('@cardstack/plugin-utils/session');
 
 const FINALIZED = {};
 
@@ -16,10 +14,10 @@ class BranchUpdate {
     this.emitEvent = emitEvent;
     this.isControllingBranch = isControllingBranch;
     this.searchers = owner.lookup('hub:searchers');
+    this.currentSchema = owner.lookup('hub:current-schema');
     this.schemaModels = [];
     this._schema = null;
-    this._batch = client.beginBatch();
-    this.read = this.read.bind(this);
+    this._batch = client.beginBatch(this.currentSchema, this.searchers);
   }
 
   async addDataSource(dataSource) {
@@ -122,30 +120,16 @@ class BranchUpdate {
     });
   }
 
-  async read(type, id) {
-    let resource;
-    try {
-      resource = (await this.searchers._getResourceAndMeta(Session.INTERNAL_PRIVILEGED, this.branch, type, id)).resource;
-    } catch (err) {
-      if (err.status !== 404) { throw err; }
-    }
-
-    if (resource) {
-      return resource;
-    }
-  }
-
   async add(type, id, doc, sourceId, nonce) {
     let schema = await this.schema();
-    let context = new DocumentContext({
+    let context = this.searchers.createDocumentContext({
       schema,
       type,
       id,
       sourceId,
       generation: nonce,
       upstreamDoc: doc,
-      branch: this.branch,
-      read: this.read
+      branch: this.branch
     });
 
     let searchDoc = await context.searchDoc();
@@ -163,12 +147,11 @@ class BranchUpdate {
 
   async delete(type, id) {
     let schema = await this.schema();
-    let context = new DocumentContext({
+    let context = this.searchers.createDocumentContext({
       schema,
       type,
       id,
-      branch: this.branch,
-      read: this.read
+      branch: this.branch
     });
 
     await this._batch.deleteDocument(context);

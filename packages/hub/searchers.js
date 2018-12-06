@@ -30,7 +30,7 @@ class Searchers {
     return this._sources;
   }
 
-  async _getResourceAndMeta(session, branch, type, id) {
+  async getResourceAndMeta(session, branch, type, id) {
     let sources = await this._lookupSources();
     let index = 0;
     let sessionOrEveryone = session || Session.EVERYONE;
@@ -71,20 +71,18 @@ class Searchers {
     if (arguments.length < 4) {
       throw new Error(`session is now a required argument to searchers.get`);
     }
-    let { resource, meta, included } = await this._getResourceAndMeta(session, branch, type, id);
+    let { resource, meta, included } = await this.getResourceAndMeta(session, branch, type, id);
     let authorizedResult;
     let documentContext;
     if (resource) {
       let schema = await this.currentSchema.forBranch(branch);
-      documentContext = new DocumentContext({
+      documentContext = this.createDocumentContext({
         id,
         type,
         branch,
         schema,
         includePaths,
-        routers: this._getRouters(),
-        upstreamDoc: { data: resource, meta, included },
-        read: this._read(branch)
+        upstreamDoc: { data: resource, meta, included }
       });
       let pristineResult = await documentContext.pristineDoc();
       if (pristineResult) {
@@ -163,12 +161,11 @@ class Searchers {
     if (result) {
       let schema = await schemaPromise;
       let includePaths = (get(query, 'include') || '').split(',');
-      let pristineResult = await (new DocumentContext({
+      let pristineResult = await (this.createDocumentContext({
         branch,
         schema,
         includePaths,
         upstreamDoc: result,
-        read: this._read(branch)
       }).pristineDoc());
 
       let authorizedResult = await schema.applyReadAuthorization(pristineResult, { session });
@@ -183,6 +180,21 @@ class Searchers {
     }
   }
 
+  createDocumentContext({ schema, type, id, branch, sourceId, generation, upstreamDoc, includePaths }) {
+    return new DocumentContext({
+      schema,
+      type,
+      id,
+      branch,
+      sourceId,
+      generation,
+      upstreamDoc,
+      includePaths,
+      routers: this._getRouters(),
+      read: this._read(branch)
+    });
+  }
+
   async searchInControllingBranch(session, query) {
     if (arguments.length < 2) {
       throw new Error(`session is now a required argument to searchers.searchInControllingBranch`);
@@ -194,7 +206,7 @@ class Searchers {
     return async (type, id) => {
       let resource;
       try {
-        resource = (await this._getResourceAndMeta(Session.INTERNAL_PRIVILEGED, branch, type, id)).resource;
+        resource = (await this.getResourceAndMeta(Session.INTERNAL_PRIVILEGED, branch, type, id)).resource;
       } catch (err) {
         if (err.status !== 404) { throw err; }
       }
@@ -203,7 +215,7 @@ class Searchers {
   }
 
   async _updateCache(maxAge, documentContext) {
-    let batch = this.client.beginBatch();
+    let batch = this.client.beginBatch(this.currentSchema, this);
     try {
       await batch.saveDocument(documentContext, { maxAge });
     } finally {

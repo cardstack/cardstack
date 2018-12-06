@@ -1,8 +1,6 @@
 const Error = require('@cardstack/plugin-utils/error');
 const log = require('@cardstack/logger')('cardstack/writers');
-const DocumentContext = require('./indexing/document-context');
 const { declareInjections } = require('@cardstack/di');
-const Session = require('@cardstack/plugin-utils/session');
 
 module.exports = declareInjections({
   schema: 'hub:current-schema',
@@ -73,7 +71,7 @@ class Writers {
         this.schema.invalidateCache();
       }
 
-      let batch = this.pgSearchClient.beginBatch();
+      let batch = this.pgSearchClient.beginBatch(this.schema, this.searchers);
       await batch.saveDocument(context);
       await batch.done();
 
@@ -113,7 +111,7 @@ class Writers {
         this.schema.invalidateCache();
       }
 
-      let batch = this.pgSearchClient.beginBatch();
+      let batch = this.pgSearchClient.beginBatch(this.schema, this.searchers);
       await batch.saveDocument(context);
       await batch.done();
 
@@ -141,7 +139,7 @@ class Writers {
         this.schema.invalidateCache();
       }
 
-      let batch = this.pgSearchClient.beginBatch();
+      let batch = this.pgSearchClient.beginBatch(this.schema, this.searchers);
       await batch.deleteDocument(context);
       await batch.done();
     } finally {
@@ -156,30 +154,14 @@ class Writers {
       finalDocument.meta = meta;
     }
 
-    return new DocumentContext({
+    return this.searchers.createDocumentContext({
       type,
       branch,
       schema,
       sourceId,
       id: id || finalDocument.id,
-      upstreamDoc: finalDocument ? { data: finalDocument } : null,
-      read: this._read(branch)
+      upstreamDoc: finalDocument ? { data: finalDocument } : null
     });
-  }
-
-  _read(branch) {
-    return async (type, id) => {
-      let resource;
-      try {
-        resource = (await this.searchers._getResourceAndMeta(Session.INTERNAL_PRIVILEGED, branch, type, id)).resource;
-      } catch (err) {
-        if (err.status !== 404) { throw err; }
-      }
-
-      if (resource) {
-        return resource;
-      }
-    };
   }
 
   _getSchemaDetailsForType(schema, type) {
