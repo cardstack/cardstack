@@ -2,9 +2,11 @@
     padding-bottom: 0.5rem;
 }
 
-.cs-field-editor input {
+.cs-field-editor input,
+.cs-field-editor select {
     width: 100%;
     box-sizing: border-box;
+    margin-bottom: 1rem;
     padding: 0.5rem 1rem;
     border: 1px solid var(--light25);
     border-radius: 3px;
@@ -15,11 +17,8 @@
     line-height: 1.375;
 }
 
-.cs-field-editor input + input {
-    margin-top: 1rem;
-}
-
-.cs-field-editor input:focus {
+.cs-field-editor input:focus,
+.cs-field-editor select:focus {
     border-color: var(--active-foreground);
     outline: none;
 }
@@ -28,9 +27,72 @@
     width: auto;
 }
 
-.cs-field-editor .text-button {
+.cs-field-editor select {
+    width: 100%;
+    box-sizing: border-box;
+    margin-bottom: 1rem;
+    padding: 0.5rem 1rem;
+    border: 1px solid var(--light25);
+    border-radius: 3px;
+    background-color: var(--light-background);
+    color: var(--dark-foreground);
+    font-size: 0.8rem;
+    letter-spacing: 0.3px;
+    line-height: 1.375;
+    cursor: pointer;
+    user-select: none;
+}
+
+.cs-field-editor-group {
+    margin-bottom: 1em;
+    padding: 1em;
+    border: 1px solid var(--light25);
+    border-radius: 3px;
+}
+
+.cs-field-editor-button {
+    width: 100%;
+    padding: 0.7rem;
+    fill: var(--bright-foreground);
+    color: var(--bright-foreground);
+    background: none;
+    border: 1px solid var(--light25);
+    border-radius: 3px;
+    font-size: 0.9rem;
+    cursor: pointer;
+}
+
+.cs-field-editor-button:hover,
+.cs-field-editor-button:focus {
+    outline: none;
+    fill: var(--active-foreground);
+    color: var(--active-foreground);
+    border-color: var(--light50);
+}
+
+.cs-field-editor-text-button {
     background: none;
     border: none;
+    color: var(--bright-foreground);
+    font-size: 0.75rem;
+    line-height: 1;
+    text-decoration: underline;
+    cursor: pointer;
+    user-select: none;
+}
+
+.cs-field-editor-text-button:hover,
+.cs-field-editor-text-button:focus {
+    outline: none;
+    fill: var(--active-foreground);
+    color: var(--active-foreground);
+}
+
+.cs-field-editor-delete-button:hover,
+.cs-field-editor-delete-button:focus {
+    outline: none;
+    fill: var(--hot-pink-foreground);
+    color: var(--hot-pink-foreground);
 }
 
 /* overrides ember-power-select styles for cs-field-editor-section */
