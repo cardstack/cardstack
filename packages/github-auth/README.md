@@ -15,6 +15,8 @@ To run the demo app and interact with GitHub, you need to register your app via 
 
 For the present, you also need a user token that the Hub can use to represent itself. You can use a [Personal Access Token](https://github.com/settings/tokens). Make sure that this token has `repo` and `user` scope, as well as push permissions on the GitHub repos that you configure to use with the github-auth plugin datasource. This allows the plugin to have sufficient privileges to be able to query the repo for collaborator permissions. Set is via the environment variable `GITHUB_TOKEN`.
 
+Note that in order to get access to a github user's email address, the github user *must* set a public email address in their github profile settings. GitHub allows people to opt-in to having a public email, so that means by default, github users do not have a public email address.
+
 * `ember serve`
 * Visit your app at [http://localhost:4200](http://localhost:4200).
 
