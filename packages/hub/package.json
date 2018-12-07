@@ -38,7 +38,7 @@
     "handlebars": "^4.0.6",
     "koa": "2",
     "koa-compose": "^3.2.1",
-    "lodash": "^4.17.4",
+    "lodash": "^4.17.11",
     "nssocket": "^0.6.0",
     "path-is-inside": "^1.0.2",
     "quick-temp": "^0.1.8",
