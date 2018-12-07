@@ -11,10 +11,12 @@
     background-color: var(--light-background);
     color: var(--dark-foreground);
     font-size: 0.8rem;
-    font-family: 'Open Sans Bold';
-    font-weight: bold;
     letter-spacing: 0.3px;
     line-height: 1.375;
+}
+
+.cs-field-editor input + input {
+    margin-top: 1rem;
 }
 
 .cs-field-editor input:focus {
@@ -24,6 +26,11 @@
 
 .cs-field-editor input[type="number"] {
     width: auto;
+}
+
+.cs-field-editor .text-button {
+    background: none;
+    border: none;
 }
 
 /* overrides ember-power-select styles for cs-field-editor-section */
