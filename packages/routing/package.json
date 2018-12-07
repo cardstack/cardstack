@@ -31,8 +31,8 @@
     "ember-href-to": "^1.13.0",
     "ember-inflector": "^2.1.0",
     "inflection": "^1.12.0",
-    "lodash": "^4.17.4",
-    "qs": "^6.5.2"
+    "lodash": "^4.17.11",
+    "qs": "^6.6.0"
   },
   "devDependencies": {
     "@cardstack/data": "0.12.5",

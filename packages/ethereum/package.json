@@ -34,7 +34,7 @@
     "handlebars": "^4.0.6",
     "inflection": "^1.12.0",
     "jsonpatch": "^3.0.1",
-    "lodash": "^4.17.4",
+    "lodash": "^4.17.11",
     "web3": "^1.0.0-beta.30"
   },
   "devDependencies": {
