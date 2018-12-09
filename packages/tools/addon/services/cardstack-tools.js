@@ -39,7 +39,7 @@ export default Service.extend({
       let fields = [];
       record.eachAttribute((attribute, meta) => {
         // Prevent rendering a field that's already explicitly rendered
-        if (!renderedFieldNames.includes(meta.name)) {
+        if (!renderedFieldNames.includes(meta.name) && meta.name !== 'selfLink') {
           let fieldInfo = Object.assign({}, meta);
           fieldInfo.id = guidFor(fieldInfo);
           fieldInfo.model = record;
