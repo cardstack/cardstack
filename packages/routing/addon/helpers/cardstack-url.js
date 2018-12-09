@@ -3,11 +3,16 @@ import Helper from '@ember/component/helper';
 import { get } from '@ember/object';
 import { defaultBranch } from '@cardstack/plugin-utils/environment';
 import { hrefTo } from 'ember-href-to/helpers/href-to';
+import { pluralize } from 'ember-inflector';
 
 export function urlForModel(context, model, { branch } = {}) {
   if (model) {
     let path = get(model, 'selfLink');
-    if (!path) { return; }
+
+    // TODO need to revisit this after we have approach for canonical URL's
+    if (!path) {
+      path = `${pluralize(get(model, 'type'))}/${get(model, 'id')}`;
+    }
 
     if (path !== '/' && path.charAt(0) === '/') {
       path = path.replace('/', ''); // looks like ember router prepends an extra '/' to the path
