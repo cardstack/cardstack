@@ -6,7 +6,7 @@ const log = require('@cardstack/logger')('cardstack/git-hyperledger');
 Change.prototype._makeCommit = async function(commitOpts) {
   let commit = await oldMakeCommit.call(this, commitOpts);
 
-  let gitchain = new Gitchain(this.repo.path(), process.env.HYPERLEDGER_KEY_PATH, {logger: log.info.bind(log)});
+  let gitchain = new Gitchain(this.repo.path(), null, {logger: log.info.bind(log)});
 
   try {
     await gitchain.push(commit.sha());
