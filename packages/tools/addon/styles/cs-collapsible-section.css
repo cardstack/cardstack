@@ -33,8 +33,6 @@
 }
 
 .cs-collapsible-section-header--button > svg {
-    width: 8px;
-    height: 10px;
     color: var(--bright-foreground);
     fill: var(--bright-foreground);
     transition: transform 250ms ease;
