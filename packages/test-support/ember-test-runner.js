@@ -5,10 +5,10 @@ const glob = require('glob');
 const spawn = require('child_process').spawn;
 const resolve = require('resolve');
 
-function testPackage(package) {
+function testPackage(pkg) {
   return new Promise((res, reject) => {
-    let emberBin = resolve.sync('ember-cli/bin/ember', { basedir: package });
-    let proc = spawn(process.execPath, [emberBin, 'test'], { stdio: ['ignore', process.stdout, process.stderr], cwd: package });
+    let emberBin = resolve.sync('ember-cli/bin/ember', { basedir: pkg });
+    let proc = spawn(process.execPath, [emberBin, 'test'], { stdio: ['ignore', process.stdout, process.stderr], cwd: pkg });
     proc.on('exit', function (code, signal) {
       if (signal) {
         process.kill(process.pid, signal);
@@ -31,9 +31,9 @@ function testPackage(package) {
 
 async function run(cardsDirectory) {
   let packages = glob.sync(path.join(process.cwd(), cardsDirectory, '*', 'ember-cli-build.js')).map(p => path.dirname(p));
-  for (let package of packages) {
-    process.stdout.write(`Starting test suite for ${path.basename(package)}\n`);
-    await testPackage(package);
+  for (let pkg of packages) {
+    process.stdout.write(`Starting test suite for ${path.basename(pkg)}\n`);
+    await testPackage(pkg);
   }
   process.stdout.write(`Finished all test suites\n`);
 }
