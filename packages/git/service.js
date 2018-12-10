@@ -6,6 +6,7 @@ const rimraf = promisify(require('rimraf'));
 const { join } = require('path');
 const { Clone, Cred, Merge, Repository } = require('nodegit');
 const { tmpdir } = require('os');
+const log = require('@cardstack/logger')('cardstack/git');
 
 class GitLocalCache {
   constructor() {
@@ -20,6 +21,7 @@ class GitLocalCache {
     let existingRepo = this._remotes.get(remoteUrl);
 
     if (existingRepo) {
+      log.info("existing repo found for %s, reusing it from the cache", remoteUrl);
       return existingRepo.repo;
     }
 
@@ -58,12 +60,16 @@ class GitLocalCache {
       }
     };
 
+    log.info("creating local repo cache for %s in %s", remote.url, repoPath);
+
     let repo;
 
     if(existsSync(repoPath)) {
       try {
+        log.info("repo already exists - reusing local clone");
         repo = await Repository.open(repoPath);
       } catch (e) {
+        log.info("creating repo from %s failed, deleting and recloning", repoPath);
         // if opening existing repo fails for any reason we should just delete it and clone it
         await rimraf(repoPath);
 
@@ -74,6 +80,7 @@ class GitLocalCache {
         });
       }
     } else {
+      log.info("cloning %s into %s", remote.url, repoPath);
       await mkdirp(repoPath);
 
       repo = await Clone(remote.url, repoPath, {
@@ -89,6 +96,7 @@ class GitLocalCache {
   }
 
   async pullRepo(remoteUrl, targetBranch) {
+    log.info("pulling changes for branch %s on %s", targetBranch, remoteUrl);
     let { repo, fetchOpts } = this._remotes.get(remoteUrl);
 
     await repo.fetchAll(fetchOpts);
