@@ -6,6 +6,7 @@
 @import "cs-composition-panel-header";
 @import "cs-version-control";
 @import "cs-field-editor";
+@import "cs-collapsible-section";
 
 .cardstack-toolbox {
     position: relative;

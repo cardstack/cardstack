@@ -1,0 +1,54 @@
+.cs-collapsible-section-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin: 0;
+    padding: 0.75em 1em 0.5em;
+    font-family: 'Open Sans Bold';
+    font-weight: bold;
+    overflow: hidden;
+    cursor: pointer;
+    user-select: none;
+}
+
+.cs-collapsible-section-header:hover {
+    background-color: var(--active-background);
+}
+
+.cs-collapsible-section-header--label {
+    float: left;
+    cursor: pointer;
+}
+
+.cs-collapsible-section-header--button {
+    height: 16px;
+    width: 16px;
+    margin-top: 2px;
+    border-radius: 2px;
+    background: none;
+    float: right;
+    border: none;
+    padding: 0;
+    cursor: pointer;
+}
+
+.cs-collapsible-section-header--button > svg {
+    width: 8px;
+    height: 10px;
+    color: var(--bright-foreground);
+    fill: var(--bright-foreground);
+    transition: transform 250ms ease;
+}
+
+.cs-collapsible-section-header--button:focus {
+    outline: none;
+}
+
+.cs-collapsible-section-header--button:focus > svg {
+    color: var(--active-foreground);
+    fill: var(--active-foreground);
+}
+
+.cs-collapsible-section-header.closed > button > svg {
+    transform: rotate(-90deg);
+}
