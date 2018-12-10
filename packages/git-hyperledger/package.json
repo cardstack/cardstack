@@ -13,7 +13,7 @@
     "test": "mocha ../test-support/bin/run.js"
   },
   "dependencies": {
-    "@cardstack/git": "0.12.2",
+    "@cardstack/git": "0.12.6",
     "@cardstack/logger": "^0.1.0",
     "@cardstack/plugin-utils": "0.12.0",
     "delay": "^4.1.0",
@@ -28,7 +28,7 @@
   "devDependencies": {
     "@cardstack/di": "0.12.0",
     "@cardstack/eslint-config": "0.12.0",
-    "@cardstack/test-support": "0.12.2",
+    "@cardstack/test-support": "0.12.6",
     "eslint": "^5.8.0",
     "eslint-plugin-ember": "^5.0.0",
     "eslint-plugin-node": "^5.2.1",
@@ -42,5 +42,8 @@
   },
   "ember-addon": {
     "defaultBlueprint": "cardstack-git-seeds"
+  },
+  "publishConfig": {
+    "access": "public"
   }
 }
