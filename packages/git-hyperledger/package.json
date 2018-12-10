@@ -23,7 +23,7 @@
     "nodegit": "^0.23.0",
     "rimraf": "^2.6.2",
     "temp": "^0.8.3",
-    "cardstack-gitchain": "^0.0.1"
+    "cardstack-gitchain": "^0.0.2"
   },
   "devDependencies": {
     "@cardstack/di": "0.12.0",
