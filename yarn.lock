@@ -3848,9 +3848,9 @@ cardinal@^1.0.0:
     ansicolors "~0.2.1"
     redeyed "~1.0.0"
 
-cardstack-gitchain@^0.0.2:
-  version "0.0.2"
-  resolved "https://registry.yarnpkg.com/cardstack-gitchain/-/cardstack-gitchain-0.0.2.tgz#a7b062256fb0e41ab9c90d8b572de194168fea58"
+cardstack-gitchain@^0.0.3:
+  version "0.0.3"
+  resolved "https://registry.yarnpkg.com/cardstack-gitchain/-/cardstack-gitchain-0.0.3.tgz#65d7fccdf136177472b8881217ad12138a0f23a7"
   dependencies:
     await-delay "^1.0.0"
     aws-sdk "^2.364.0"
