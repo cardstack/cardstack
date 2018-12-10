@@ -116,4 +116,23 @@ module('Acceptance | tools', function(hooks) {
     let nameInput = findInputWithValue.call(this, 'LeChuck');
     assert.dom(nameInput).isDisabled('Computed field is disabled');
   });
+
+  test('allow editing fields for related, owned records', async function(assert) {
+    await visit('/1');
+    await login();
+    await click('.cardstack-tools-launcher');
+    await click('.cs-toggle-switch');
+
+    let reviewStatusActionTrigger = findTriggerElementWithLabel.call(this, /Comment #1: Review Status/);
+    await click(reviewStatusActionTrigger);
+
+    let reviewStatusInput = findInputWithValue.call(this, 'approved');
+    assert.dom(reviewStatusInput).isNotDisabled();
+
+    reviewStatusActionTrigger = findTriggerElementWithLabel.call(this, /Comment #2: Review Status/);
+    await click(reviewStatusActionTrigger);
+
+    reviewStatusInput = findInputWithValue.call(this, 'pending');
+    assert.dom(reviewStatusInput).isNotDisabled();
+  });
 });
