@@ -1,8 +1,13 @@
 .cs-version-control-dropdown {
     position: relative;
-    padding: 0.6em;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.6rem;
     background-color: var(--deep-background);
     border-radius: 5px;
+    cursor: pointer;
+    user-select: none;
 }
 
 .cs-version-control-dropdown-option {
@@ -13,7 +18,7 @@
 
 .cs-version-control-dropdown-option--status {
     display: inline-block;
-    padding-right: 1em;
+    padding-right: 0.5em;
     font-family: 'Open Sans Bold';
     font-weight: bold;
 }
@@ -29,13 +34,13 @@
 
 .cs-version-control-dropdown-option--timestamp {
     display: inline-block;
+    padding-right: 0.5em;
 }
 
 .cs-version-control-dropdown--button {
-    position: absolute;
-    right: 0;
-    top: 0;
-    padding: 0.6rem;
+    width: 20px;
+    height: 20px;
+    padding: 0;
     border: none;
     background: none;
     fill: var(--bright-foreground);
