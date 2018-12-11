@@ -10,6 +10,7 @@ import { modelType } from '@cardstack/rendering/helpers/cs-model-type';
 import injectOptional from 'ember-inject-optional';
 import { defaultBranch } from '@cardstack/plugin-utils/environment';
 import { guidFor } from '@ember/object/internals';
+import { get } from '@ember/object';
 
 export default Service.extend({
   overlays: service('ember-overlays'),
