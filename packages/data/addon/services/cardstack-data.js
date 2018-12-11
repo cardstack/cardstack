@@ -46,10 +46,6 @@ export default Service.extend({
     return record;
   },
 
-  async getCardMetadata(card, attribute) {
-    return get(card, attribute);
-  },
-
   async query(format, opts={}) {
     let store = this.get('store');
     let branch = opts.branch || defaultBranch;
@@ -150,7 +146,8 @@ export default Service.extend({
     if (attribute === 'uid') {
       return `${getType(card)}/${card.id}`;
     }
-    return '';
+    // The fallback – maybe we should not allow this in the future
+    return get(card, attribute);
   },
 
   _headers() {
