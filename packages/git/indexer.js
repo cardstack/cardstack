@@ -111,6 +111,7 @@ module.exports = class Indexer {
   async _ensureRepo() {
     if (!this.repo) {
       if (this.remote) {
+        log.info('Getting remote repo for %s from service', this.remote.url);
         this.repo = await service.getRepo(this.remote.url, this.remote);
         return;
       }
