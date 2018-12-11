@@ -1,8 +1,11 @@
 {{! template-lint-disable no-invalid-interactive }}
-<header onclick={{action "toggle"}}>
-  <label>{{title}}</label>
-  <button>
-    {{cs-svg "toggle-arrow"}}
+<header
+  class="cs-collapsible-section-header {{if opened "opened" "closed"}}"
+  onclick={{action "toggle"}}
+>
+  <label class="cs-collapsible-section-header--label">{{title}}</label>
+  <button class="cs-collapsible-section-header--button">
+    {{cs-svg "toggle-arrow" width="16px" height="10px"}}
   </button>
 </header>
 {{#liquid-if
