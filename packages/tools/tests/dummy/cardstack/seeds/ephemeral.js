@@ -145,7 +145,7 @@ function initialModels() {
   let badKarma = initial.addResource('karma-types', '2')
     .withAttributes({ title: 'Bad' });
   initial.addResource('karma-types', '3')
-    .withAttributes({ title: 'Nirvana' });
+    .withAttributes({ title: 'Neutral' });
 
   let threeHeadedMonkey = initial.addResource('comments', '1')
     .withAttributes({
