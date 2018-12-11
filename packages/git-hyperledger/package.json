@@ -1,0 +1,49 @@
+{
+  "name": "@cardstack/git-hyperledger",
+  "version": "0.12.2",
+  "description": "Git data source plugin for @cardstack/hub that also pushes commits to hyperledger blockchain",
+  "keywords": [
+    "cardstack-plugin",
+    "ember-addon"
+  ],
+  "repository": "https://github.com/cardstack/cardstack",
+  "license": "MIT",
+  "author": "Edward Faulkner <edward@eaf4.com>",
+  "scripts": {
+    "test": "mocha ../test-support/bin/run.js"
+  },
+  "dependencies": {
+    "@cardstack/git": "0.12.7",
+    "@cardstack/logger": "^0.1.0",
+    "@cardstack/plugin-utils": "0.12.7",
+    "delay": "^4.1.0",
+    "filenamify-url": "^1.0.0",
+    "mkdirp": "^0.5.1",
+    "moment-timezone": "^0.5.11",
+    "nodegit": "^0.23.0",
+    "rimraf": "^2.6.2",
+    "temp": "^0.8.3",
+    "cardstack-gitchain": "^0.0.3"
+  },
+  "devDependencies": {
+    "@cardstack/di": "0.12.7",
+    "@cardstack/eslint-config": "0.12.7",
+    "@cardstack/test-support": "0.12.7",
+    "eslint": "^5.8.0",
+    "eslint-plugin-ember": "^5.0.0",
+    "eslint-plugin-node": "^5.2.1",
+    "sinon": "^7.1.0"
+  },
+  "engines": {
+    "node": ">= 7.7"
+  },
+  "cardstack-plugin": {
+    "api-version": 1
+  },
+  "ember-addon": {
+    "defaultBlueprint": "cardstack-git-seeds"
+  },
+  "publishConfig": {
+    "access": "public"
+  }
+}
