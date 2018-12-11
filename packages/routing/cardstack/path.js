@@ -4,6 +4,10 @@ const { resolveRoutingCardReplacementTags } = require('./index');
 
 async function getPath(routeStackCards, card, routerMapByDepth) {
   if (!routeStackCards || !routeStackCards.length) { return; }
+
+  routeStackCards = routeStackCards.filter(r => Boolean(r.data));
+  if (!routeStackCards.length) { return; }
+
   if (card.data.type === 'spaces') { return; } // spaces content-type is unique in that it IS a path
 
   if (!routerMapByDepth || !card) { return; }
