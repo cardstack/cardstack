@@ -121,7 +121,8 @@ module('Acceptance | tools', function(hooks) {
     await visit('/1');
     await login();
     await click('.cardstack-tools-launcher');
-    await click('.cs-toggle-switch');
+    await waitFor('.cs-editor-switch')
+    await click('.cs-editor-switch');
 
     let reviewStatusActionTrigger = findTriggerElementWithLabel.call(this, /Comment #1: Review Status/);
     await click(reviewStatusActionTrigger);
