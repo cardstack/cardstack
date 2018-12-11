@@ -44,6 +44,7 @@
     "@cardstack/test-support": "0.12.6",
     "eslint": "^5.8.0",
     "eslint-plugin-ember": "^5.0.0",
+    "eslint-plugin-mocha": "^5.2.0",
     "eslint-plugin-node": "^5.2.1",
     "loader.js": "^4.2.3",
     "truffle": "git+https://github.com/habdelra/truffle#0858c52378101247b173a434eb672694557c0ee3"
