@@ -148,7 +148,7 @@ describe('postgresql/writer', function() {
             published: false,
             topic: 'x',
             'multi-word': 'hello',
-            lessThanTen: 11
+            'less-than-ten': 11
           }
         }
       });

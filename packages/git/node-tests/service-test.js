@@ -20,11 +20,11 @@ const privateKey = readFileSync(join(__dirname, 'git-ssh-server', 'cardstack-tes
 describe('local git cache service', function() {
   this.timeout(10000);
 
-  beforeEach(() => {
+  beforeEach(function() {
     service.clearCache();
   });
 
-  afterEach(async () => {
+  afterEach(async function() {
     service.clearCache();
     await temp.cleanup();
   });

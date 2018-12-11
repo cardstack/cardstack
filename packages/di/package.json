@@ -1,6 +1,6 @@
 {
   "name": "@cardstack/di",
-  "version": "0.12.0",
+  "version": "0.12.7",
   "keywords": [],
   "author": "Edward Faulkner <edward@eaf4.com>",
   "repository": "https://github.com/cardstack/cardstack",
@@ -10,9 +10,10 @@
     "resolve": "^1.3.3"
   },
   "devDependencies": {
-    "@cardstack/eslint-config": "0.12.0",
+    "@cardstack/eslint-config": "0.12.7",
     "eslint": "^5.8.0",
     "eslint-plugin-ember": "^5.0.0",
+    "eslint-plugin-mocha": "^5.2.0",
     "eslint-plugin-node": "^5.2.1"
   },
   "engines": {

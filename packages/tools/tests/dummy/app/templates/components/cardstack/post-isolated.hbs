@@ -10,19 +10,25 @@
     Category: {{cs-field content "category"}}
   </p>
   <p>
-    {{! template-lint-disable attribute-indentation }}
     {{#cs-field-group
-      content
-      name="reading-time"
-      caption="Underestimated Read Time"
-      fields="readingTimeValue,readingTimeUnit"
-    as |rt|}}
-      <div>{{rt.readingTimeValue}} {{rt.readingTimeUnit}}</div>
+        content
+        name="reading-time"
+        caption="Underestimated Read Time"
+        fields="readingTimeValue,readingTimeUnit"
+      as |group|}}
+      <div data-test="reading-time">
+        {{!--
+          Only {{content.prop}} gets expanded to {{cs-field content "prop"}}
+          So if a field is to be edited, it needs to use the `cs-field` helper otherwise
+        --}}
+        {{cs-field group "readingTimeValue"}}
+        {{cs-field group.readingTimeUnit "title"}}
+      </div>
     {{/cs-field-group}}
   </p>
   <h4>Comments</h4>
   <ul>
-    {{#each content.comments as |comment|}}
+    {{#each content.comments as |comment i|}}
       <li>
         {{cs-field comment.poster "name"}}: {{cs-field comment "body"}}
         {{! template-lint-disable }}
@@ -31,10 +37,14 @@
           name="karma"
           caption="Karma"
           fields="karmaValue,karmaType"
-        as |ck|}}
-          <div>{{ck.karmaValue}} {{ck.karmaType}}</div>
+        as |group|}}
+          <div data-test={{concat "karma-" i}}>
+            {{cs-field group "karmaValue"}}
+            {{cs-field group.karmaType "title"}}
+          </div>
         {{/cs-field-group}}
       </li>
     {{/each}}
   </ul>
+
 </div>
