@@ -12,10 +12,7 @@
       (eq fieldMark.model.content model)
     as |fieldModel isPageModelField|}}
       {{#cs-collapsible-section
-        class=(concat "cs-toolbox-section "
-          (if
-            (cs-has-errors validationErrors fieldModel (hash name=fieldModel.name grouped=fieldModel.grouped))
-            "invalid"))
+        class=(concat "cs-toolbox-section " (cs-error-class validationErrors fieldModel "invalid"))
         title=(cs-card-meta-caption fieldModel.content fieldModel.caption isPageModelField)
         opened=(eq fieldMark.id openedFieldId)
         open=(action openField fieldMark)
@@ -79,10 +76,7 @@
         (eq field.model model)
       as |fieldModelPermissions isPageModelField|}}
         {{#cs-collapsible-section
-          class=(concat "cs-toolbox-section "
-            (if
-              (cs-has-errors validationErrors field.model (hash name=field.name))
-              "invalid"))
+          class=(concat "cs-toolbox-section " (cs-error-class validationErrors field.model "invalid"))
           title=(cs-card-meta-caption field.model field.options.caption isPageModelField)
           opened=(eq field.id openedFieldId)
           open=(action openField field)
