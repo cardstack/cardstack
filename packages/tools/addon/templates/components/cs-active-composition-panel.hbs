@@ -71,35 +71,37 @@
   {{/each}}
 
   {{!-- These are the fields that exist for the template but are not rendered --}}
-  {{#each modelFields as |field|}}
-    {{#let
-      (get permissions (cs-uid field.model))
-      (eq field.model model)
-    as |fieldModelPermissions isPageModelField|}}
-      {{#cs-collapsible-section
-        class=(concat "cs-toolbox-section "
-          (if
-            (cs-has-errors validationErrors field.model (hash name=field.name))
-            "invalid"))
-        title=(cs-card-meta-caption field.model field.options.caption isPageModelField)
-        opened=(eq field.id openedFieldId)
-        open=(action openField field)
-        close=(action openField null)
-      }}
-        <div class="cs-field-editor-section">
-          {{cs-field-editor
-            content=field.model
-            field=field.name
-            enabled=editingEnabled
-            canUpdate=(and
-              fieldModelPermissions.mayUpdateResource
-              (contains field.name fieldModelPermissions.writableFields)
-            )
-            onchange=(action "validate")
-            errors=(get validationErrors field.name)
-          }}
-        </div>
-      {{/cs-collapsible-section}}
-    {{/let}}
-  {{/each}}
+  {{#unless model.hideEditorField}}
+    {{#each modelFields as |field|}}
+      {{#let
+        (get permissions (cs-uid field.model))
+        (eq field.model model)
+      as |fieldModelPermissions isPageModelField|}}
+        {{#cs-collapsible-section
+          class=(concat "cs-toolbox-section "
+            (if
+              (cs-has-errors validationErrors field.model (hash name=field.name))
+              "invalid"))
+          title=(cs-card-meta-caption field.model field.options.caption isPageModelField)
+          opened=(eq field.id openedFieldId)
+          open=(action openField field)
+          close=(action openField null)
+        }}
+          <div class="cs-field-editor-section">
+            {{cs-field-editor
+              content=field.model
+              field=field.name
+              enabled=editingEnabled
+              canUpdate=(and
+                fieldModelPermissions.mayUpdateResource
+                (contains field.name fieldModelPermissions.writableFields)
+              )
+              onchange=(action "validate")
+              errors=(get validationErrors field.name)
+            }}
+          </div>
+        {{/cs-collapsible-section}}
+      {{/let}}
+    {{/each}}
+  {{/unless}}
 </div>
