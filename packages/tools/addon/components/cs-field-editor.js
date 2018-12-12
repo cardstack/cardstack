@@ -11,7 +11,16 @@ export default Component.extend({
   field: '',
   enabled: true,
   errors: null,
+  permissions: null,
   onchange() {},
+
+  canUpdate: computed('permissions', function() {
+    if (!this.permissions) {
+      return false;
+    }
+    let { mayUpdateResource, writableFields } = this.permissions;
+    return mayUpdateResource && writableFields.includes(this.field);
+  }),
 
   disabled: computed('enabled', 'canUpdate', function() {
     return !(this.enabled && this.canUpdate);

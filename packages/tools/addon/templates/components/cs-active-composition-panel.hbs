@@ -31,33 +31,21 @@
                 <label class="cs-field-editor-section--label">
                   {{cs-field-caption content fieldName}}
                 </label>
-                {{!--
-                  We allow editing fields of related resources. We should come back to this after #448 is completed.
-                --}}
                 {{cs-field-editor
                   content=content
                   field=fieldName
                   enabled=editingEnabled
-                  canUpdate=(and
-                    fieldModelPermissions.mayUpdateResource
-                    (contains fieldName fieldModelPermissions.writableFields)
-                  )
+                  permissions=fieldModelPermissions
                   onchange=(action "validate")
                   errors=(get validationErrors fieldName)
                 }}
               {{/each}}
             {{else}}
-              {{!--
-                We allow editing fields of related resources. We should come back to this after #448 is completed.
-              --}}
               {{cs-field-editor
                 content=content
                 field=fieldModel.name
                 enabled=editingEnabled
-                canUpdate=(and
-                  fieldModelPermissions.mayUpdateResource
-                  (contains fieldModel.name fieldModelPermissions.writableFields)
-                )
+                permissions=fieldModelPermissions
                 onchange=(action "validate")
                 errors=(get validationErrors fieldModel.name)
               }}
@@ -68,7 +56,10 @@
     {{/let}}
   {{/each}}
 
-  {{!-- These are the fields that exist for the template but are not rendered --}}
+  {{!--
+     These are the fields that exist on the model (or in owned relationships)
+     but are not rendered
+  --}}
   {{#unless model.disableAutoEditorFields}}
     {{#each modelFields as |field|}}
       {{#let
@@ -88,10 +79,7 @@
               content=field.model
               field=field.name
               enabled=editingEnabled
-              canUpdate=(and
-                fieldModelPermissions.mayUpdateResource
-                (contains field.name fieldModelPermissions.writableFields)
-              )
+              permissions=fieldModelPermissions
               onchange=(action "validate")
               errors=(get validationErrors field.name)
             }}
