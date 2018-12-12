@@ -20,7 +20,8 @@ export default Component.extend({
   },
 
   fetchPermissions: task(function * () {
-    let records = [this.model, ...this.model.relatedOwnedRecords()];
+    let ownedRecords = yield this.model.relatedOwnedRecords();
+    let records = [this.model, ...ownedRecords];
     let permissionTuples = yield Promise.all(records.map(async (record) => {
       let permissions = await this.get('data').fetchPermissionsFor(record);
       return [record, permissions];

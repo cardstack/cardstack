@@ -4,8 +4,6 @@ import { inject as service } from '@ember/service';
 import { computed, defineProperty, get } from '@ember/object';
 import { readOnly, or } from '@ember/object/computed';
 import { capitalize } from '@ember/string';
-import { run } from '@ember/runloop';
-import { A as EmberArray } from '@ember/array';
 import { uniq } from 'lodash-es';
 
 export default DS.Model.extend(RelationshipTracker, {
@@ -39,25 +37,25 @@ export default DS.Model.extend(RelationshipTracker, {
     // this._super is not safe to use asynchronously
     // see https://github.com/ember-cli/ember-cli/issues/6282
     let modelSave = this._super.bind(this);
-    run(async () => {
+    if (Object.keys(this.ownedRelationships).length > 0) {
       await this.saveRelated();
-    });
+    }
     await modelSave(...arguments);
   },
 
   async saveRelated() {
-    let relatedSaves = Object.keys(this.ownedRelationships).map((relationName) => {
+    let relatedSaves = Object.keys(this.ownedRelationships).map(async (relationName) => {
       let isRelationDirty = this.dirtyTrackingRelationNames[relationName];
       if (isRelationDirty) {
-        let relatedRecords = relatedRecordsFor(this, relationName);
+        let relatedRecords = await relatedRecordsFor(this, relationName);
         let dirtyRecords = relatedRecords.filter(record => record.hasDirtyFields);
-        return EmberArray(dirtyRecords).invoke('save');
+        return Promise.all(dirtyRecords.map(record => record.save()));
       }
     });
     return Promise.all(flatten(relatedSaves));
   },
 
-  relatedOwnedRecords() {
+  async relatedOwnedRecords() {
     return uniq(relatedOwnedRecords([ this ]));
   },
 
@@ -77,22 +75,22 @@ export default DS.Model.extend(RelationshipTracker, {
   }
 });
 
-function relatedOwnedRecords(models, records=[]) {
+async function relatedOwnedRecords(models, records=[]) {
   if (models.length === 0) {
     return records;
   }
   let [ model, ...remainingModels ] = models;
-  Object.keys(model.ownedRelationships).map((relationName) => {
-    let relatedRecords = relatedRecordsFor(model, relationName);
+  Object.keys(model.ownedRelationships).map(async (relationName) => {
+    let relatedRecords = await relatedRecordsFor(model, relationName);
     records = records.concat(relatedRecords);
     remainingModels = remainingModels.concat(relatedRecords);
   });
   return relatedOwnedRecords(remainingModels, records);
 }
 
-function relatedRecordsFor(model, relationName) {
+async function relatedRecordsFor(model, relationName) {
   let kind = model.ownedRelationships[relationName];
-  let related = model.get(relationName);
+  let related = await model.get(relationName);
   return kind === 'hasMany' ? related.toArray() : [ related ];
 }
 

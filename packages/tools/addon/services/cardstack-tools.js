@@ -11,6 +11,7 @@ import injectOptional from 'ember-inject-optional';
 import { defaultBranch } from '@cardstack/plugin-utils/environment';
 import { guidFor } from '@ember/object/internals';
 import { get } from '@ember/object';
+import { task } from 'ember-concurrency';
 
 export default Service.extend({
   overlays: service('ember-overlays'),
@@ -29,12 +30,13 @@ export default Service.extend({
     }, []);
   }),
 
-  modelFields: computed('_renderedFieldNames', 'activeContentItem.model', function() {
+  updateModelFields: task(function * () {
     let renderedFieldNames = this.get('_renderedFieldNames');
     let model = this.get('activeContentItem.model');
     if (!model) { return []; }
 
-    let records = [model, ...model.relatedOwnedRecords()];
+    let ownedRecords = yield model.relatedOwnedRecords();
+    let records = [model, ...ownedRecords];
     let modelFields = records.map((record) => {
       let fields = [];
       record.eachAttribute((attribute, meta) => {
@@ -48,10 +50,10 @@ export default Service.extend({
       });
       return fields;
     });
-    return modelFields.reduce((flattened, fields) => {
+    this.set('modelFields', modelFields.reduce((flattened, fields) => {
       return flattened.concat(fields);
-    });
-  }),
+    }));
+  }).observes('_renderedFieldNames', 'activeContentItem.model').on('init'),
 
   contentPages: computed('marks', function() {
     return this.get('marks').filter(m => m.group === 'cardstack-pages');
@@ -70,13 +72,14 @@ export default Service.extend({
 
   branch: alias('_activeItemMeta.branch'),
 
-  activeFields: computed('activeContentItem', 'renderedFields', function() {
+  updateActiveFields: task(function * () {
     let item = this.get('activeContentItem');
     if (!item) { return []; }
     let activeItemModel = item.model;
-    let owned = item.model.relatedOwnedRecords();
+    let owned = yield item.model.relatedOwnedRecords();
+    let activeFields = [];
     if (item) {
-      return this.get('renderedFields').filter(f => {
+      activeFields = this.get('renderedFields').filter(f => {
         let fieldModel = f.model.content;
         if (fieldModel === activeItemModel) {
           return true;
@@ -86,10 +89,9 @@ export default Service.extend({
         }
         return false;
       });
-    } else {
-      return [];
     }
-  }),
+    this.set('activeFields', activeFields);
+  }).observes('activeContentItem', 'renderedFields').on('init'),
 
   // Can tools be enabled at all? This affects whether we will offer a
   // launcher button
