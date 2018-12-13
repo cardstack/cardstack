@@ -1,6 +1,9 @@
-<button class={{unless previewing "active"}} {{action "goLive"}} >
-  Live
-</button>
-<button class="preview {{if previewing "active"}}" {{action "goPreview"}} >
-  Preview
-</button>
+{{#power-select
+  selected=branch
+  options=(array "master" "other" "face")
+  onchange=(action (mut branch))
+as |name|
+}}
+  {{name}}
+{{/power-select}}
+
