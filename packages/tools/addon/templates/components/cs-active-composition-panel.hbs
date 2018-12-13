@@ -71,7 +71,7 @@
   {{/each}}
 
   {{!-- These are the fields that exist for the template but are not rendered --}}
-  {{#unless model.hideEditorField}}
+  {{#unless model.disableAutoEditorField}}
     {{#each modelFields as |field|}}
       {{#let
         (get permissions (cs-uid field.model))
