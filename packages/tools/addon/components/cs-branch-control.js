@@ -3,27 +3,29 @@ import { inject as service } from '@ember/service';
 import Component from '@ember/component';
 import layout from '../templates/components/cs-branch-control';
 import { defaultBranch } from '@cardstack/plugin-utils/environment';
+import qs from 'qs';
 
 export default Component.extend({
   layout,
+  defaultBranch,
   classNames: ['cs-branch-control'],
-  classNameBindings: ['enabled'],
   tools: service('cardstack-tools'),
 
-  enabled: computed('tools.branch', function() {
-    return !!this.get('tools.branch');
-  }),
+  branch: computed({
+    get() {
+      const search = qs.parse(location.search.replace(/^\?/, ''));
 
-  previewing: computed('enabled', 'tools.branch', function() {
-    return this.get('enabled') && defaultBranch !== this.get('tools.branch');
-  }),
-
-  actions: {
-    goLive() {
-      this.get('tools').setBranch(defaultBranch);
+      return search.branch || defaultBranch;
     },
-    goPreview() {
-      this.get('tools').setBranch('draft');
+    set(key, value) {
+      const search = qs.parse(location.search.replace(/^\?/, ''));
+      if (value === defaultBranch) {
+        delete search.branch;
+      } else {
+        search.branch = value;
+      }
+
+      location.search = qs.stringify(search);
     }
-  }
+  })
 });

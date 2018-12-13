@@ -36,6 +36,7 @@
     "ember-elsewhere": "^1.0.5",
     "ember-inject-optional": "^0.1.0",
     "ember-moment": "^7.3.0",
+    "ember-power-select": "^2.2.1",
     "ember-resource-metadata": "^0.3.0",
     "ember-truth-helpers": "^2.0.0",
     "liquid-fire": "^0.29.5",
