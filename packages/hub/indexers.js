@@ -42,6 +42,7 @@ const log = require('@cardstack/logger')('cardstack/indexers');
 const { declareInjections, getOwner } = require('@cardstack/di');
 const bootstrapSchema = require('./bootstrap-schema');
 const RunningIndexers = require('./indexing/running-indexers');
+const _ = require('lodash');
 
 module.exports = declareInjections({
   schemaLoader: 'hub:schema-loader',
@@ -100,6 +101,20 @@ class Indexers extends EventEmitter {
       { forceRefresh, hints },
       { singletonKey: 'hub/indexers/update', singletonNextSlot: true, expireIn: '2 hours' }
     );
+  }
+
+  async branches() {
+    let sources = this._dataSourcesMemo && this._dataSourcesMemo.dataSources;
+
+    let promises = Array.from(sources.values()).map((dataSource) => {
+      if(dataSource.indexer) {
+        return dataSource.indexer.branches();
+      }
+    });
+
+    let results  = await Promise.all(promises);
+
+    return _.chain(results).compact().flatten().uniq().value();
   }
 
   async _setupWorkers() {

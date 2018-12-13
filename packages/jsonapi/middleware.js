@@ -250,6 +250,13 @@ class Handler {
   }
 
   async handleCollectionGET(type) {
+    if(type === 'branches') {
+      let branches = await this.indexers.branches();
+
+      this.ctxt.body = { data: branches.map(branch => ({id: branch, type: 'branches', attributes: {}}))};
+      return;
+    }
+
     let { data: models, meta: { page }, included } = await this.searcher.search(this.session, this.branch, {
       filter: this.filterExpression(type),
       sort: this.query.sort,
