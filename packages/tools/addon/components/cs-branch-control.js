@@ -13,6 +13,11 @@ export default Component.extend({
   tools: service('cardstack-tools'),
   data: service('cardstack-data'),
 
+  'data-test-branch-control': true,
+  'data-test-branch-control-branch-count': computed('branches', function() {
+    return this.get('branches.length');
+  }),
+
   willInsertElement() {
     this._super(...arguments);
     this.get('fetchBranches').perform();
