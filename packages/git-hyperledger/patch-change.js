@@ -11,7 +11,7 @@ Change.prototype._makeCommit = async function(commitOpts) {
   try {
     await gitchain.push(commit.sha());
   } catch (e) {
-    log.error("Error pushing to hyperledger blockchain");
+    log.error("Error pushing to hyperledger blockchain: ${e} - ${e.message}");
   }
 
   return commit;
