@@ -39,7 +39,7 @@
     "@cardstack/eslint-config": "0.12.7",
     "@cardstack/jsonapi": "0.12.13",
     "@cardstack/models": "0.12.13",
-    "@cardstack/test-support": "0.12.13",
+    "@cardstack/test-support": "0.12.14",
     "broccoli-asset-rev": "^2.7.0",
     "ember-ajax": "^3.1.0",
     "ember-cli": "^3.4.3",

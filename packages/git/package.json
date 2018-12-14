@@ -26,7 +26,7 @@
   "devDependencies": {
     "@cardstack/di": "0.12.7",
     "@cardstack/eslint-config": "0.12.7",
-    "@cardstack/test-support": "0.12.13",
+    "@cardstack/test-support": "0.12.14",
     "eslint": "^5.8.0",
     "eslint-plugin-ember": "^5.0.0",
     "eslint-plugin-mocha": "^5.2.0",
