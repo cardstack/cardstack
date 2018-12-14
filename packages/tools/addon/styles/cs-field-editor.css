@@ -3,7 +3,12 @@
 }
 
 .cs-field-editor input,
-.cs-field-editor select {
+.cs-field-editor select,
+.cs-field-editor button {
+  font-family: 'Open Sans';
+}
+
+.cs-field-editor > .field-editor > input {
     width: 100%;
     box-sizing: border-box;
     margin-bottom: 1rem;
@@ -17,37 +22,13 @@
     line-height: 1.375;
 }
 
-.cs-field-editor input:focus,
-.cs-field-editor select:focus {
+.cs-field-editor > .field-editor > input:focus {
     border-color: var(--active-foreground);
     outline: none;
 }
 
-.cs-field-editor input[type="number"] {
+.cs-field-editor > .field-editor > input[type="number"] {
     width: auto;
-}
-
-.cs-field-editor select {
-    width: 100%;
-    box-sizing: border-box;
-    margin-bottom: 1rem;
-    padding: 0.5rem 1rem;
-    border: 1px solid var(--light25);
-    border-radius: 3px;
-    background-color: var(--light-background);
-    color: var(--dark-foreground);
-    font-size: 0.8rem;
-    letter-spacing: 0.3px;
-    line-height: 1.375;
-    cursor: pointer;
-    user-select: none;
-}
-
-.cs-field-editor-group {
-    margin-bottom: 1em;
-    padding: 1em;
-    border: 1px solid var(--light25);
-    border-radius: 3px;
 }
 
 .cs-field-editor-button {
@@ -71,6 +52,7 @@
 }
 
 .cs-field-editor-text-button {
+    padding: 0;
     background: none;
     border: none;
     color: var(--bright-foreground);
@@ -79,6 +61,8 @@
     text-decoration: underline;
     cursor: pointer;
     user-select: none;
+    -webkit-user-select: none;
+    -moz-user-select: none;
 }
 
 .cs-field-editor-text-button:hover,
@@ -96,7 +80,7 @@
 }
 
 /* overrides ember-power-select styles for cs-field-editor-section */
-.cs-field-editor .ember-power-select-trigger {
+/* .cs-field-editor .ember-power-select-trigger {
     padding: 0.5rem 1rem 0.5rem 0.5rem;
     border: 1px solid var(--light25);
     border-radius: 3px;
@@ -108,4 +92,4 @@
 .cs-field-editor .ember-power-select-trigger:focus {
     border-color: var(--active-foreground);
     outline: none;
-}
+} */
