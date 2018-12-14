@@ -30,7 +30,7 @@
     "@cardstack/ephemeral": "0.12.7",
     "@cardstack/eslint-config": "0.12.7",
     "@cardstack/jsonapi": "0.12.11",
-    "@cardstack/test-support": "0.12.11",
+    "@cardstack/test-support": "0.12.12",
     "@ember/optional-features": "^0.6.3",
     "broccoli-asset-rev": "^2.7.0",
     "ember-ajax": "^3.1.0",
