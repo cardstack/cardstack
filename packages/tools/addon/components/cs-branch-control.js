@@ -13,14 +13,22 @@ export default Component.extend({
   tools: service('cardstack-tools'),
   data: service('cardstack-data'),
 
+  'data-test-branch-control': true,
+  'data-test-branch-control-branch-count': computed('branches', function() {
+    return this.get('branches.length');
+  }),
+
   willInsertElement() {
     this._super(...arguments);
     this.get('fetchBranches').perform();
   },
 
   fetchBranches: task(function * () {
-    let branches = yield this.get('data').branches();
-    this.set('branches', branches);
+    // checking if the branches() fucntion is available on this version of the data service
+    if((typeof this.get('data').branches) === 'function') {
+      let branches = yield this.get('data').branches();
+      this.set('branches', branches);
+    }
   }),
 
   branch: computed({

@@ -5294,6 +5294,15 @@ ember-basic-dropdown@^1.0.0:
     ember-cli-htmlbars "^2.0.3"
     ember-maybe-in-element "^0.1.3"
 
+ember-basic-dropdown@^1.0.5:
+  version "1.1.0"
+  resolved "https://registry.yarnpkg.com/ember-basic-dropdown/-/ember-basic-dropdown-1.1.0.tgz#8b3e339921bd6ebad138081d5b6c60ef137d32bc"
+  integrity sha512-nlXSzHh0ifCTqtZ7Vg545JAOu1PhGwRv16EBt8Lzm4OOOopgmpbyYN/GVx/wnrCPWcTjCFXEeQsEFaHC45zilQ==
+  dependencies:
+    ember-cli-babel "^7.1.0"
+    ember-cli-htmlbars "^3.0.0"
+    ember-maybe-in-element "^0.2.0"
+
 ember-cli-babel@6.12.0, ember-cli-babel@^6.11.0:
   version "6.12.0"
   resolved "https://registry.yarnpkg.com/ember-cli-babel/-/ember-cli-babel-6.12.0.tgz#3adcdbe1278da1fcd0b9038f1360cb4ac5d4414c"
@@ -6040,7 +6049,7 @@ ember-composable-helpers@DockYard/ember-composable-helpers:
   resolved "https://codeload.github.com/DockYard/ember-composable-helpers/tar.gz/09a6b938105519c26d2e4afa6223f7df2db1ab07"
   dependencies:
     broccoli-funnel "^1.0.1"
-    ember-cli-babel "^6.6.0"
+    ember-cli-babel "^7.1.0"
 
 ember-concurrency@^0.8.14, ember-concurrency@^0.8.17:
   version "0.8.17"
@@ -6451,6 +6460,13 @@ ember-maybe-in-element@^0.1.3:
   dependencies:
     ember-cli-babel "^6.11.0"
 
+ember-maybe-in-element@^0.2.0:
+  version "0.2.0"
+  resolved "https://registry.yarnpkg.com/ember-maybe-in-element/-/ember-maybe-in-element-0.2.0.tgz#9ac51cbbd9d83d6230ad996c11e33f0eca3032e0"
+  integrity sha512-R5e6N8yDbfNbA/3lMZsFs2KEzv/jt80TsATiKMCqdqKuSG82KrD25cRdU5VkaE8dTQbziyBeuJs90bBiqOnakQ==
+  dependencies:
+    ember-cli-babel "^7.1.0"
+
 ember-mobiledoc-dom-renderer@^0.6.0:
   version "0.6.0"
   resolved "https://registry.yarnpkg.com/ember-mobiledoc-dom-renderer/-/ember-mobiledoc-dom-renderer-0.6.0.tgz#82274e257d19a4cd08c03dc641e3072c4cd25d6e"
@@ -6507,6 +6523,18 @@ ember-power-select@^2.0.4:
     ember-basic-dropdown "^1.0.0"
     ember-cli-babel "^6.11.0"
     ember-cli-htmlbars "^2.0.1"
+    ember-concurrency "^0.8.19"
+    ember-text-measurer "^0.4.0"
+    ember-truth-helpers "^2.0.0"
+
+ember-power-select@^2.2.1:
+  version "2.2.1"
+  resolved "https://registry.yarnpkg.com/ember-power-select/-/ember-power-select-2.2.1.tgz#8adea6c5c5e9dea0cd64519171b7bf19857b1db6"
+  integrity sha512-v8aQZOlXYzBPpB0gpcpJS3VhQOUznmO8se3VrCp/rqOzGo56jfi5UX6GkE0VhFk224Wtzqq4S+YCmmqEb8A/KQ==
+  dependencies:
+    ember-basic-dropdown "^1.0.5"
+    ember-cli-babel "^6.16.0"
+    ember-cli-htmlbars "^3.0.0"
     ember-concurrency "^0.8.19"
     ember-text-measurer "^0.4.0"
     ember-truth-helpers "^2.0.0"
@@ -6734,6 +6762,14 @@ ember-test-selectors@^0.3.7:
   resolved "https://registry.yarnpkg.com/ember-test-selectors/-/ember-test-selectors-0.3.8.tgz#1e8ae3e78c64bacc4bbfe87f9973c85805699db2"
   dependencies:
     broccoli-stew "^1.4.0"
+    ember-cli-babel "^6.8.2"
+    ember-cli-version-checker "^2.0.0"
+
+ember-test-selectors@^2.0.0:
+  version "2.0.0"
+  resolved "https://registry.yarnpkg.com/ember-test-selectors/-/ember-test-selectors-2.0.0.tgz#c95079b2c562c9a8328832b655ba8818d9076dd7"
+  integrity sha512-w4h7kpBSRQNO4oG84erUeJjVGHZ7VYqy7xsRMX+lwgr7ULS6JAl8fw6J9whD8QRS7nhVED3Z1eMEFKq2DLVp7g==
+  dependencies:
     ember-cli-babel "^6.8.2"
     ember-cli-version-checker "^2.0.0"
 
