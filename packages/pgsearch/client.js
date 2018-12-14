@@ -211,7 +211,7 @@ class Batch {
       type: param(type),
       id: param(id),
       search_doc: param(searchDoc),
-      q: ['to_tsvector(', param(searchDoc), ')'],
+      q: [`to_tsvector('english',`, param(searchDoc), ')'],
       pristine_doc: param(pristineDoc),
       upstream_doc: param(upstreamDoc),
       source: param(sourceId),
