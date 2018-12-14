@@ -189,6 +189,13 @@ const models = [
   },
   {
     type: 'content-types',
+    id: 'branches',
+    attributes: {
+      'is-built-in': true
+    }
+  },
+  {
+    type: 'content-types',
     id: 'message-sinks',
     attributes: {
       'is-built-in': true
