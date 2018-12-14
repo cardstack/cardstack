@@ -1,6 +1,6 @@
 {
   "name": "@cardstack/git-hyperledger",
-  "version": "0.12.15",
+  "version": "0.12.16",
   "description": "Git data source plugin for @cardstack/hub that also pushes commits to hyperledger blockchain",
   "keywords": [
     "cardstack-plugin",
@@ -28,7 +28,7 @@
   "devDependencies": {
     "@cardstack/di": "0.12.7",
     "@cardstack/eslint-config": "0.12.7",
-    "@cardstack/test-support": "0.12.15",
+    "@cardstack/test-support": "0.12.16",
     "eslint": "^5.8.0",
     "eslint-plugin-ember": "^5.0.0",
     "eslint-plugin-node": "^5.2.1",

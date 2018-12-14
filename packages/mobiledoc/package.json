@@ -1,6 +1,6 @@
 {
   "name": "@cardstack/mobiledoc",
-  "version": "0.12.15",
+  "version": "0.12.16",
   "description": "Mobiledoc field plugin for cardstack",
   "keywords": [
     "ember-addon",
@@ -38,9 +38,9 @@
     "@cardstack/authentication": "0.12.15",
     "@cardstack/ephemeral": "0.12.7",
     "@cardstack/eslint-config": "0.12.7",
-    "@cardstack/hub": "0.12.15",
-    "@cardstack/test-support": "0.12.15",
-    "@cardstack/tools": "0.12.14",
+    "@cardstack/hub": "0.12.16",
+    "@cardstack/test-support": "0.12.16",
+    "@cardstack/tools": "0.12.16",
     "broccoli-asset-rev": "^2.4.5",
     "ember-cli": "^3.0.0",
     "ember-cli-dependency-checker": "^2.1.0",
