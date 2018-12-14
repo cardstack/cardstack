@@ -34,6 +34,7 @@ class PgClient extends EventEmitter {
       port: config.port
     });
 
+    this._migrateDbPromise = null;
     this._didEnsureDatabaseSetup = false;
   }
 
@@ -44,10 +45,17 @@ class PgClient extends EventEmitter {
   }
 
   async ensureDatabaseSetup() {
-    if (this._didEnsureDatabaseSetup){
-      return;
-    }
+    if (this._didEnsureDatabaseSetup) { return; }
 
+    if (!this._migrateDbPromise) {
+      this._migrateDbPromise = this._migrateDb();
+    }
+    await this._migrateDbPromise;
+
+    this._didEnsureDatabaseSetup = true;
+  }
+
+  async _migrateDb() {
     let client = new Client(Object.assign({}, config, { database: 'postgres' }));
     try {
       await client.connect();
@@ -74,8 +82,6 @@ class PgClient extends EventEmitter {
       dir: join(__dirname, 'migrations'),
       log: (...args) => log.debug(...args)
     });
-
-    this._didEnsureDatabaseSetup = true;
   }
 
   static async deleteSearchIndexIHopeYouKnowWhatYouAreDoing() {
