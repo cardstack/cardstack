@@ -78,18 +78,3 @@
     fill: var(--hot-pink-foreground);
     color: var(--hot-pink-foreground);
 }
-
-/* overrides ember-power-select styles for cs-field-editor-section */
-/* .cs-field-editor .ember-power-select-trigger {
-    padding: 0.5rem 1rem 0.5rem 0.5rem;
-    border: 1px solid var(--light25);
-    border-radius: 3px;
-    background-color: var(--light-background);
-    color: var(--dark-foreground);
-    font-size: 0.8rem;
-}
-
-.cs-field-editor .ember-power-select-trigger:focus {
-    border-color: var(--active-foreground);
-    outline: none;
-} */
