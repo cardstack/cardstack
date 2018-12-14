@@ -74,6 +74,8 @@ class PgClient extends EventEmitter {
       dir: join(__dirname, 'migrations'),
       log: (...args) => log.debug(...args)
     });
+
+    this._didEnsureDatabaseSetup = true;
   }
 
   static async deleteSearchIndexIHopeYouKnowWhatYouAreDoing() {
