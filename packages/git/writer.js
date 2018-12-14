@@ -135,9 +135,11 @@ module.exports = class Writer {
 
   async _commitOptions(operation, type, id, session) {
     let user = session && await session.loadUser();
+    let userAttributes = (user && user.data && user.data.attributes) || {};
+
     return {
-      authorName: (user && user.attributes && user.attributes['full-name']) || 'Anonymous Coward',
-      authorEmail: (user && user.attributes && user.attributes.email) || 'anon@example.com',
+      authorName: userAttributes['full-name'] || userAttributes.name || 'Anonymous Coward',
+      authorEmail: userAttributes.email || 'anon@example.com',
       committerName: this.myName,
       committerEmail: this.myEmail,
       message: `${operation} ${type} ${String(id).slice(12)}`
