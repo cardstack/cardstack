@@ -1,6 +1,6 @@
 {
   "name": "@cardstack/routing",
-  "version": "0.12.13",
+  "version": "0.12.15",
   "description": "The default blueprint for ember-cli addons.",
   "keywords": [
     "ember-addon",
@@ -35,11 +35,11 @@
     "qs": "^6.6.0"
   },
   "devDependencies": {
-    "@cardstack/data": "0.12.13",
+    "@cardstack/data": "0.12.15",
     "@cardstack/eslint-config": "0.12.7",
-    "@cardstack/jsonapi": "0.12.13",
-    "@cardstack/models": "0.12.13",
-    "@cardstack/test-support": "0.12.14",
+    "@cardstack/jsonapi": "0.12.15",
+    "@cardstack/models": "0.12.15",
+    "@cardstack/test-support": "0.12.15",
     "broccoli-asset-rev": "^2.7.0",
     "ember-ajax": "^3.1.0",
     "ember-cli": "^3.4.3",
