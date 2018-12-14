@@ -29,7 +29,7 @@
   "devDependencies": {
     "@cardstack/authentication": "0.12.15",
     "@cardstack/eslint-config": "0.12.7",
-    "@cardstack/test-support": "0.12.15",
+    "@cardstack/test-support": "0.12.16",
     "@cardstack/test-support-messenger": "0.12.7",
     "broccoli-asset-rev": "^2.4.5",
     "ember-cli": "^3.0.0",

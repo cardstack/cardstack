@@ -60,5 +60,6 @@
   "homepage": "https://github.com/cardstack/cardstack#readme",
   "engines": {
     "node": ">= 8"
-  }
+  },
+  "gitHead": "d6616a33e7760abce65923378e29a5eee0ba4a20"
 }
