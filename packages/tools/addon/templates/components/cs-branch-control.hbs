@@ -1,9 +1,8 @@
 {{#power-select
   selected=branch
-  options=(array "master" "other" "face")
+  options=branches
   onchange=(action (mut branch))
-as |name|
+as |branch|
 }}
-  {{name}}
+  {{branch}}
 {{/power-select}}
-
