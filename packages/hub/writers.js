@@ -64,9 +64,10 @@ class Writers {
     }
 
     let pristine;
+    let context;
     try {
       let newSchema = await schema.validate(pending, { type, session });
-      let context = await this._finalize(pending, branch, type, newSchema || schema, sourceId);
+      context = await this._finalize(pending, branch, type, newSchema || schema, sourceId);
       if (newSchema) {
         this.schema.invalidateCache();
       }
@@ -80,7 +81,7 @@ class Writers {
       if (pending) { await pending.abort();  }
     }
 
-    return schema.applyReadAuthorization(pristine, { session });
+    return context.applyReadAuthorization(pristine, { session });
   }
 
   async update(branch, session, type, id, document) {
@@ -104,9 +105,10 @@ class Writers {
       isSchema
     );
     let pristine;
+    let context;
     try {
       let newSchema = await schema.validate(pending, { type, id, session });
-      let context = await this._finalize(pending, branch, type, newSchema || schema, sourceId);
+      context = await this._finalize(pending, branch, type, newSchema || schema, sourceId);
       if (newSchema) {
         this.schema.invalidateCache();
       }
@@ -120,7 +122,7 @@ class Writers {
       if (pending) { await pending.abort();  }
     }
 
-    return schema.applyReadAuthorization(pristine, { session });
+    return context.applyReadAuthorization(pristine, { session });
   }
 
   async delete(branch, session, version, type, id) {

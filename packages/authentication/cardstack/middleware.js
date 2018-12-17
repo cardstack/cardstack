@@ -262,8 +262,13 @@ class Authentication {
   }
 
   async _applyReadAuthorization(session, user) {
+    let branch = this.controllingBranch.name;
     let schema = await this.currentSchema.forControllingBranch();
-    let authorizedUser = await schema.applyReadAuthorization(user, { session });
+    let documentContext = this.searcher.createDocumentContext({
+      branch,
+      schema,
+    });
+    let authorizedUser = await documentContext.applyReadAuthorization(user, { session });
     if (!authorizedUser) {
       // User has no grant to even see that their own record
       // exists. But users necessarily know they exists if they're
