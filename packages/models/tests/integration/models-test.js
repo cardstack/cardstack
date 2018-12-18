@@ -1,4 +1,4 @@
-import { module, test } from 'qunit';
+import { module, test, skip } from 'qunit';
 import { setupTest } from 'ember-qunit';
 import '@ember/test-helpers';
 import Fixtures from '@cardstack/test-support/fixtures';
@@ -159,6 +159,22 @@ module('Integration | Models', function(hooks) {
       return this.store.query('post', { filter: { title: 'Updated' }});
     });
     assert.equal(models.get('length'), 1, "the newly updated model should be immediately visible in search results");
+  });
+
+  // TODO: make this pass
+  skip('it can update related records', async function(assert) {
+    let post = await run(() => this.store.findRecord('post', '1'));
+    let author = await run(() => this.store.createRecord('author'));
+    await run(() => {
+      author.set('name', 'Pat Smith');
+      post.set('author', author);
+      return post.save();
+    });
+
+    post = await run(() => this.store.findRecord('post', '1', { include: 'author' }));
+    author = await run(() => post.get('author'));
+
+    assert.equal(author.get('name'), 'Pat Smith');
   });
 
   test('it can delete', async function(assert) {
