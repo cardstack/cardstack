@@ -89,7 +89,7 @@ class Updater {
       }
     },{
       type: "fields",
-      id: "transaction-id",
+      id: "transaction-hash",
       attributes: {
         "field-type": "@cardstack/core-types::integer"
       }
@@ -286,7 +286,7 @@ class Updater {
         fields: {
           data: [
             { type: "fields", id: "block-number" },
-            { type: "fields", id: "transaction-id" },
+            { type: "fields", id: "transaction-hash" },
             { type: "fields", id: "event-name" },
             { type: "fields", id: contractName + "-contract" }
           ].concat(fields.map(field => {
