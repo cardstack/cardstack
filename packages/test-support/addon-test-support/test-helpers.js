@@ -31,6 +31,20 @@ export function setupURLs(hooks) {
   })
 }
 
+/**
+ * Allows access to the `cardstack-tools` service during tests.
+ *
+ * Examples:
+ *
+ * ```js
+ * assert.strictEqual(getTools().active, true);
+ * getTools().setActive(false);
+ * ```
+ */
+export function getTools() {
+  return getContext().owner.lookup('service:cardstack-tools');
+}
+
 export function findCard(type, id, format='isolated') {
   return getContext().owner.lookup('service:cardstackData').load(type, id, format);
 }
