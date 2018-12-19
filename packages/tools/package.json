@@ -1,6 +1,6 @@
 {
   "name": "@cardstack/tools",
-  "version": "0.12.16",
+  "version": "0.12.17",
   "description": "The default blueprint for ember-cli addons.",
   "keywords": [
     "ember-addon",
@@ -42,14 +42,14 @@
     "postcss-import": "^9.1.0"
   },
   "devDependencies": {
-    "@cardstack/authentication": "0.12.15",
+    "@cardstack/authentication": "0.12.17",
     "@cardstack/ephemeral": "0.12.7",
     "@cardstack/eslint-config": "0.12.7",
-    "@cardstack/jsonapi": "0.12.15",
-    "@cardstack/mock-auth": "0.12.15",
-    "@cardstack/models": "0.12.15",
-    "@cardstack/routing": "0.12.15",
-    "@cardstack/test-support": "0.12.16",
+    "@cardstack/jsonapi": "0.12.17",
+    "@cardstack/mock-auth": "0.12.17",
+    "@cardstack/models": "0.12.17",
+    "@cardstack/routing": "0.12.17",
+    "@cardstack/test-support": "0.12.17",
     "@ember/optional-features": "^0.6.3",
     "broccoli-asset-rev": "^2.7.0",
     "ember-cli": "~3.4.3",
