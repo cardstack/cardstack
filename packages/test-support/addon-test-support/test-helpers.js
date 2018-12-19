@@ -1,6 +1,7 @@
 import { setupRenderingTest } from 'ember-qunit';
 import hbs from 'htmlbars-inline-precompile';
 
+import { deprecate } from '@ember/application/deprecations';
 import Component from '@ember/component';
 import { computed } from '@ember/object';
 import { readOnly } from '@ember/object/computed';
@@ -39,6 +40,17 @@ export function getSpaceForCard(type, id) {
 }
 
 export function renderCard(type, id, format, options = {}) {
+  let deprecation_message = `\`renderCard()\` was deprecated in favor using the regular \`render()\` test helper with the \`cardstack-card-test\` component:
+
+    await render(hbs\`{{cardstack-card-test "${type}" "${id}" format="${format}"}}\`);
+
+When using the above code make sure to use the \`setupCardTest(hooks)\` test helper, instead of \`setupRenderingTest(hooks)\``;
+
+  deprecate(deprecation_message, false, {
+    id: '@cardstack-test-support-render-card',
+    until: '0.13.0',
+  });
+
   return getSpaceForCard(type, id).then(space => {
     let context = getContext();
     let card = space.get('primaryCard');
