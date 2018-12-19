@@ -1,7 +1,18 @@
+import { setupRenderingTest } from 'ember-qunit';
 import hbs from 'htmlbars-inline-precompile';
 import { render, getContext } from '@ember/test-helpers';
 import { htmlSafe } from '@ember/string';
 import { pluralize } from 'ember-inflector';
+
+/**
+ * This should be used as a replacement for `setupRenderingTest()`
+ * and additionally sets up a few other things that help when
+ * testing cards.
+ */
+export function setupCardTest(hooks) {
+  setupRenderingTest(hooks);
+  setupURLs(hooks);
+}
 
 // This is a workaround for https://github.com/intercom/ember-href-to/issues/94
 // We use href-to internally in cardstack-url. So if you want to generate a link
