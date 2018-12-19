@@ -77,10 +77,10 @@ When using the above code make sure to use the \`setupCardTest(hooks)\` test hel
       context.set('widthStyle', htmlSafe(`width: ${options.width}`));
       return render(hbs`
       <div style="{{widthStyle}}">
-        {{cardstack-content event-isolated content=card format=format params=params }}
+        {{cardstack-content content=card format=format params=params }}
       </div>`);
     } else {
-      return render(hbs`{{cardstack-content event-isolated content=card format=format params=params }}`);
+      return render(hbs`{{cardstack-content content=card format=format params=params }}`);
     }
   });
 }
@@ -129,6 +129,6 @@ export function setupCardTestComponent(hooks) {
     this.owner.register('component:cardstack-card-test', CardTestComponent);
 
     this.owner.register('template:components/cardstack-card-test',
-      hbs`{{#if card}}{{cardstack-content event-isolated content=card format=format params=params}}{{/if}}`);
+      hbs`{{#if card}}{{cardstack-content content=card format=format params=params}}{{/if}}`);
   });
 }
