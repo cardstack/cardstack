@@ -77,24 +77,7 @@ export default Service.extend({
   },
 
   async validate(model) {
-    let relatedOwned = [];
-    let relationships = get(model.constructor, 'relationshipsByName') || [];
-    relationships.forEach((relationshipDef) => {
-      let { name, kind, meta } = relationshipDef;
-      if (meta) {
-        let { owned } = meta.options;
-        if (owned) {
-          let related = model.get(name);
-          if (kind === 'belongsTo' ) {
-            relatedOwned.push(related);
-          } else {
-            relatedOwned.push(...related.toArray());
-          }
-        }
-      }
-    });
-
-    let toValidate = [model, ...relatedOwned];
+    let toValidate = [model, ...model.relatedOwnedRecords()];
     let responses = toValidate.map(async (record) => {
       let { url, verb } = this._validationRequestParams(record);
       let response = await fetch(url, {
