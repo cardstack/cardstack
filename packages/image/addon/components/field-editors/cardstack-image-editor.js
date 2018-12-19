@@ -13,7 +13,19 @@ export default Component.extend({
   updateImage: task(function * (file) {
     let image = this.get('store').createRecord('cardstack-image', { file });
     yield image.save();
-    this.set(`content.${this.get('field')}`, image);
+    let field = this.field;
+    this.content.watchRelationship(field, () => {
+      this.set(`content.${field}`, image);
+    });
     this.set('showUploader', false);
-  }).restartable()
+  }).restartable(),
+
+  actions: {
+    removeImage() {
+      let field = this.field;
+      this.content.watchRelationship(field, () => {
+        this.set(`content.${field}`, null);
+      });
+    }
+  }
 });

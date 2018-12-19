@@ -7,7 +7,7 @@
     {{/if}}
   </button>
   {{#if (get content field "base64")}}
-    <button {{action (mut (get content field)) null}} disabled={{disabled}}>
+    <button onclick={{action "removeImage"}} disabled={{disabled}}>
       Remove image
     </button>
   {{/if}}
