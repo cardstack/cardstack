@@ -93,7 +93,7 @@ function relatedOwnedRecords(models, records=[]) {
 function relatedRecordsFor(model, relationName) {
   let kind = model.ownedRelationships[relationName];
   let related = model.get(relationName);
-  return kind === 'hasMany' ? related.toArray() : [ related ];
+  return (kind === 'hasMany' ? related.toArray() : [ related ]).filter(Boolean);
 }
 
 function createHasDirtyForRelationship(model, name, kind) {
