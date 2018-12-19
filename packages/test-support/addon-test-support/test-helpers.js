@@ -1,7 +1,13 @@
 import { setupRenderingTest } from 'ember-qunit';
 import hbs from 'htmlbars-inline-precompile';
-import { render, getContext } from '@ember/test-helpers';
+
+import Component from '@ember/component';
+import { computed } from '@ember/object';
+import { readOnly } from '@ember/object/computed';
 import { htmlSafe } from '@ember/string';
+import { render, getContext } from '@ember/test-helpers';
+
+import { task } from 'ember-concurrency';
 import { pluralize } from 'ember-inflector';
 
 /**
@@ -11,6 +17,7 @@ import { pluralize } from 'ember-inflector';
  */
 export function setupCardTest(hooks) {
   setupRenderingTest(hooks);
+  setupCardTestComponent(hooks);
   setupURLs(hooks);
 }
 
@@ -49,5 +56,53 @@ export function renderCard(type, id, format, options = {}) {
     } else {
       return render(hbs`{{cardstack-content event-isolated content=card format=format params=params }}`);
     }
+  });
+}
+
+/**
+ * This sets up a `cardstack-card-test` component that can be use to render
+ * cards in the QUnit test fixture:
+ *
+ * ```js
+ * await render(hbs`{{cardstack-card-test "works-detail" 123 format="embedded"}}`);
+ * ```
+ *
+ * The positional parameters are the card name and the ID. The component also
+ * supports optional `format` and `params` parameters.
+ */
+export function setupCardTestComponent(hooks) {
+  hooks.beforeEach(function() {
+    let CardTestComponent = Component.extend({
+      tagName: '',
+
+      // inputs
+      type: null,
+      id: null,
+      format: 'isolated',
+      params: null,
+
+      // filled by `getSpaceForCardTask`
+      space: null,
+
+      // derived data
+      card: readOnly('space.primaryCard'),
+      _params: computed('space', 'params', function() {
+        Object.assign({}, this.get('space.params'), this.params)
+      }),
+
+      getSpaceForCardTask: task(function*() {
+        let space = yield getSpaceForCard(this.type, this.id);
+        this.set('space', space);
+      }).on('didInsertElement').cancelOn('willDestroyElement'),
+    });
+
+    CardTestComponent.reopenClass({
+      positionalParams: ['type', 'id'],
+    });
+
+    this.owner.register('component:cardstack-card-test', CardTestComponent);
+
+    this.owner.register('template:components/cardstack-card-test',
+      hbs`{{#if card}}{{cardstack-content event-isolated content=card format=format params=params}}{{/if}}`);
   });
 }
