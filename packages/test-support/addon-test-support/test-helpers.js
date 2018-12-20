@@ -210,3 +210,24 @@ export async function fillInFieldEditor(name, value) {
     await fillIn(input, value);
   }
 }
+
+export async function saveEdits() {
+  let button = find('[data-test-cs-version-control-button-save]');
+  if (!button) {
+    throw new Error('Could not find save button. Did you open the tools?');
+  }
+  if (button.disabled) {
+    throw new Error('Could not save the edits because the save button is disabled.');
+  }
+
+  await click(button);
+}
+
+export async function cancelEdits() {
+  let button = find('[data-test-cs-version-control-button-cancel]');
+  if (!button) {
+    throw new Error('Could not find cancel button. Did you open the tools?');
+  }
+
+  await click(button);
+}
