@@ -1,7 +1,26 @@
+import { setupRenderingTest } from 'ember-qunit';
 import hbs from 'htmlbars-inline-precompile';
-import { render, getContext } from '@ember/test-helpers';
+
+import { deprecate } from '@ember/application/deprecations';
+import Component from '@ember/component';
+import { computed } from '@ember/object';
+import { readOnly } from '@ember/object/computed';
 import { htmlSafe } from '@ember/string';
+import { render, getContext } from '@ember/test-helpers';
+
+import { task } from 'ember-concurrency';
 import { pluralize } from 'ember-inflector';
+
+/**
+ * This should be used as a replacement for `setupRenderingTest()`
+ * and additionally sets up a few other things that help when
+ * testing cards.
+ */
+export function setupCardTest(hooks) {
+  setupRenderingTest(hooks);
+  setupCardTestComponent(hooks);
+  setupURLs(hooks);
+}
 
 // This is a workaround for https://github.com/intercom/ember-href-to/issues/94
 // We use href-to internally in cardstack-url. So if you want to generate a link
@@ -10,6 +29,20 @@ export function setupURLs(hooks) {
   hooks.beforeEach(function() {
     this.owner.lookup('router:main').setupRouter()
   })
+}
+
+/**
+ * Allows access to the `cardstack-tools` service during tests.
+ *
+ * Examples:
+ *
+ * ```js
+ * assert.strictEqual(getTools().active, true);
+ * getTools().setActive(false);
+ * ```
+ */
+export function getTools() {
+  return getContext().owner.lookup('service:cardstack-tools');
 }
 
 export function findCard(type, id, format='isolated') {
@@ -21,6 +54,17 @@ export function getSpaceForCard(type, id) {
 }
 
 export function renderCard(type, id, format, options = {}) {
+  let deprecation_message = `\`renderCard()\` was deprecated in favor using the regular \`render()\` test helper with the \`cardstack-card-test\` component:
+
+    await render(hbs\`{{cardstack-card-test "${type}" "${id}" format="${format}"}}\`);
+
+When using the above code make sure to use the \`setupCardTest(hooks)\` test helper, instead of \`setupRenderingTest(hooks)\``;
+
+  deprecate(deprecation_message, false, {
+    id: '@cardstack-test-support-render-card',
+    until: '0.13.0',
+  });
+
   return getSpaceForCard(type, id).then(space => {
     let context = getContext();
     let card = space.get('primaryCard');
@@ -33,10 +77,58 @@ export function renderCard(type, id, format, options = {}) {
       context.set('widthStyle', htmlSafe(`width: ${options.width}`));
       return render(hbs`
       <div style="{{widthStyle}}">
-        {{cardstack-content event-isolated content=card format=format params=params }}
+        {{cardstack-content content=card format=format params=params }}
       </div>`);
     } else {
-      return render(hbs`{{cardstack-content event-isolated content=card format=format params=params }}`);
+      return render(hbs`{{cardstack-content content=card format=format params=params }}`);
     }
+  });
+}
+
+/**
+ * This sets up a `cardstack-card-test` component that can be use to render
+ * cards in the QUnit test fixture:
+ *
+ * ```js
+ * await render(hbs`{{cardstack-card-test "works-detail" 123 format="embedded"}}`);
+ * ```
+ *
+ * The positional parameters are the card name and the ID. The component also
+ * supports optional `format` and `params` parameters.
+ */
+export function setupCardTestComponent(hooks) {
+  hooks.beforeEach(function() {
+    let CardTestComponent = Component.extend({
+      tagName: '',
+
+      // inputs
+      type: null,
+      id: null,
+      format: 'isolated',
+      params: null,
+
+      // filled by `getSpaceForCardTask`
+      space: null,
+
+      // derived data
+      card: readOnly('space.primaryCard'),
+      _params: computed('space', 'params', function() {
+        Object.assign({}, this.get('space.params'), this.params)
+      }),
+
+      getSpaceForCardTask: task(function*() {
+        let space = yield getSpaceForCard(this.type, this.id);
+        this.set('space', space);
+      }).on('didInsertElement').cancelOn('willDestroyElement'),
+    });
+
+    CardTestComponent.reopenClass({
+      positionalParams: ['type', 'id'],
+    });
+
+    this.owner.register('component:cardstack-card-test', CardTestComponent);
+
+    this.owner.register('template:components/cardstack-card-test',
+      hbs`{{#if card}}{{cardstack-content content=card format=format params=params}}{{/if}}`);
   });
 }
