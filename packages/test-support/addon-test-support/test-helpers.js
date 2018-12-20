@@ -6,7 +6,7 @@ import Component from '@ember/component';
 import { computed } from '@ember/object';
 import { readOnly } from '@ember/object/computed';
 import { htmlSafe } from '@ember/string';
-import { render, getContext } from '@ember/test-helpers';
+import { render, getContext, settled } from '@ember/test-helpers';
 
 import { task } from 'ember-concurrency';
 import { pluralize } from 'ember-inflector';
@@ -43,6 +43,32 @@ export function setupURLs(hooks) {
  */
 export function getTools() {
   return getContext().owner.lookup('service:cardstack-tools');
+}
+
+/**
+ * Opens the tools, if available.
+ */
+export async function openTools() {
+  let tools = getTools();
+
+  if (!tools.available) {
+    throw new Error('The editor tools are not available.');
+  }
+
+  tools.setActive(true);
+
+  await settled();
+}
+
+/**
+ * Closes the tools.
+ */
+export async function closeTools() {
+  let tools = getTools();
+
+  tools.setActive(false);
+
+  await settled();
 }
 
 export function findCard(type, id, format='isolated') {
