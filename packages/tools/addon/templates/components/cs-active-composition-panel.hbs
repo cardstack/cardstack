@@ -22,6 +22,7 @@
         close=(action openField null)
         hovered=(perform highlightAndScrollToField fieldMark)
         unhovered=(perform highlightAndScrollToField null)
+        data-test-field-name=fieldModel.name
       }}
         <div class="cs-field-editor-section">
           {{#let
@@ -86,6 +87,7 @@
           opened=(eq field.id openedFieldId)
           open=(action openField field)
           close=(action openField null)
+          data-test-field-name=field.name
         }}
           <div class="cs-field-editor-section">
             {{cs-field-editor
