@@ -5,8 +5,8 @@ import { deprecate } from '@ember/application/deprecations';
 import Component from '@ember/component';
 import { computed } from '@ember/object';
 import { readOnly } from '@ember/object/computed';
-import { htmlSafe } from '@ember/string';
-import { render, getContext, settled } from '@ember/test-helpers';
+import { htmlSafe, camelize } from '@ember/string';
+import { render, getContext, settled, find, click, fillIn } from '@ember/test-helpers';
 
 import { task } from 'ember-concurrency';
 import { pluralize } from 'ember-inflector';
@@ -157,4 +157,56 @@ export function setupCardTestComponent(hooks) {
     this.owner.register('template:components/cardstack-card-test',
       hbs`{{#if card}}{{cardstack-content content=card format=format params=params}}{{/if}}`);
   });
+}
+
+function getFieldEditorSectionElement(name) {
+  return find(`[data-test-field-name="${camelize(name)}"]`);
+}
+
+/**
+ * Returns whether an editor for a field with the given name exists.
+ */
+export function hasFieldEditor(name) {
+  return Boolean(getFieldEditorSectionElement(name));
+}
+
+/**
+ * Fills out the editor for the given field name with the supplied value.
+ *
+ * This currently only supports the core types: string, integer, date and boolean.
+ */
+export async function fillInFieldEditor(name, value) {
+  let editorSection = getFieldEditorSectionElement(name);
+  if (!editorSection) {
+    throw new Error(`Could not find editor section for field "${name}".`);
+  }
+
+  if (editorSection.classList.contains('closed')) {
+    await click(editorSection.querySelector(`header`));
+  }
+
+  if (typeof value === 'boolean') {
+    let toggle = editorSection.querySelector(`.cs-field-editor-section .cs-toggle-switch`);
+    if (!toggle) {
+      throw new Error(`Could not find toggle element in editor section for field "${name}".`);
+    }
+
+    let slider = toggle.querySelector('.slider');
+    if (!slider) {
+      throw new Error(`Could not find slider element in editor section for field "${name}".`);
+    }
+
+    let isEnabled = slider.classList.contains('slider-right');
+    if ((isEnabled && value === false) || (!isEnabled && value === true)) {
+      await click(slider);
+    }
+
+  } else {
+    let input = editorSection.querySelector(`.cs-field-editor-section input`);
+    if (!input) {
+      throw new Error(`Could not find input element in editor section for field "${name}".`);
+    }
+
+    await fillIn(input, value);
+  }
 }
