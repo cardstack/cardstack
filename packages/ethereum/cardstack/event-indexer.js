@@ -215,7 +215,7 @@ function generateEventModel(contractName, contractAddress, event) {
   }
   attributes['event-name'] = event.event;
   attributes['block-number'] = event.blockNumber;
-  attributes['transaction-id'] = event.transactionHash;
+  attributes['transaction-hash'] = event.transactionHash;
 
   return {
     id: `${event.transactionHash}_${event.logIndex}`,
