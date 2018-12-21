@@ -17,35 +17,31 @@ module.exports = class EthereumClient {
   }
 
   constructor() {
-    this._providers = {};
+    this._provider = null;
     this._eventListeners = {};
     this._hasStartedListening = {};
     this._hasConnected = false;
     this._contractDefinitions = {};
-    this._branches = null;
+    this._jsonRpcUrl = null;
     this._eventDefinitions = {};
     this._contracts = {};
-    this._pastContracts = {};
   }
 
-  connect(branches) {
+  connect(jsonRpcUrl) {
     if (this._hasConnected) { return; }
 
+    this._jsonRpcUrl = jsonRpcUrl;
     this._hasConnected = true;
-    this._branches = branches;
-    for (let branch of Object.keys(branches)) {
-      let { jsonRpcUrl } = branches[branch];
-      log.info(`connecting to ethereum JSON RPC provider at: ${jsonRpcUrl} for branch "${branch}"`);
-      this._providers[branch] = new Web3(new Web3.providers.WebsocketProvider(jsonRpcUrl));
+    log.info(`connecting to ethereum JSON RPC provider at: ${jsonRpcUrl}`);
+    this._provider = new Web3(new Web3.providers.WebsocketProvider(jsonRpcUrl));
 
-      // The default WS message size is too small to handle much activity, and sadly the WS configuration
-      // is not exposed from web3, so we need to reach a bit deep into the web3 WS provider to adjust the
-      // websocket client config.
-      let websocketConfig = get(this, `_providers.${branch}.currentProvider.connection._client.config`);
-      if (websocketConfig) {
-         websocketConfig.maxReceivedFrameSize = MAX_WS_MESSAGE_SIZE_BYTES;
-         websocketConfig.maxReceivedMessageSize = MAX_WS_MESSAGE_SIZE_BYTES;
-      }
+    // The default WS message size is too small to handle much activity, and sadly the WS configuration
+    // is not exposed from web3, so we need to reach a bit deep into the web3 WS provider to adjust the
+    // websocket client config.
+    let websocketConfig = get(this, `_provider.currentProvider.connection._client.config`);
+    if (websocketConfig) {
+      websocketConfig.maxReceivedFrameSize = MAX_WS_MESSAGE_SIZE_BYTES;
+      websocketConfig.maxReceivedMessageSize = MAX_WS_MESSAGE_SIZE_BYTES;
     }
   }
 
@@ -60,12 +56,11 @@ module.exports = class EthereumClient {
 
     this._hasConnected = false;
     this._contracts = {};
-    this._pastContracts = {};
-    this._providers = {};
+    this._provider = null;
     this._eventListeners = {};
     this._eventDefinitions = {};
 
-    this.connect(this._branches);
+    this.connect(this._jsonRpcUrl);
 
     for (let name of Object.keys(this._contractDefinitions)) {
       await this.start({
@@ -88,20 +83,17 @@ module.exports = class EthereumClient {
 
     if (!this._eventListeners[name]) { return; }
 
-    for (let branch of Object.keys(this._eventListeners[name])) {
-      this._eventListeners[name][branch].unsubscribe();
-    }
-
-    this._eventListeners[name] = {};
+    this._eventListeners[name].unsubscribe();
+    this._eventListeners[name] = null;
     this._hasStartedListening[name] = false;
   }
 
-  async getBlockHeight(branch) {
+  async getBlockHeight() {
     await this._reconnectPromise;
 
     let result;
     try {
-      result = await this._providers[branch].eth.getBlockNumber();
+      result = await this._provider.eth.getBlockNumber();
     } catch (err) {
       log.error(`Encountered error trying to get block height: ${err}`);
       await this._reconnect();
@@ -116,62 +108,39 @@ module.exports = class EthereumClient {
     this._hasStartedListening[name] = true;
     this._contractDefinitions[name] = contract;
 
-    let { abi, addresses, pastAddresses } = contract;
+    let { abi, address } = contract;
     this._eventDefinitions[name] = getEventDefinitions(name, contract);
 
-    if (!this._eventListeners[name]) {
-      this._eventListeners[name] = {};
-    }
-    for (let branch of Object.keys(addresses)) {
-      if (!this._providers[branch]) { continue; }
+    if (!this._provider) { return; }
 
-      log.info(`starting listeners for contract ${name} at ${addresses[branch]}`);
+    log.info(`starting listeners for contract ${name} at ${address}`);
 
-      let aContract = new this._providers[branch].eth.Contract(abi, addresses[branch]);
-      if (!this._contracts[branch]) {
-        this._contracts[branch] = {};
-      }
-      this._contracts[branch][name] = aContract;
+    let aContract = new this._provider.eth.Contract(abi, address);
+    this._contracts[name] = aContract;
 
-      this._eventListeners[name][branch] = aContract.events.allEvents(async (error, event) => {
-        if (error) {
-          log.error(`error received listening for events from contract ${name}: ${error.reason}`);
-          if (error.type === 'close') {
-            await this._reconnect();
-          }
-        } else {
-          log.trace(`contract event received for ${name}: ${JSON.stringify(event, null, 2)}`);
-          if (!Object.keys(this._contractDefinitions[name].eventContentTriggers || {}).includes(event.event)){
-            log.info(`skipping contract ${name} indexing for event ${event.event} since it is not configured as an event of intrest`);
-            return;
-          }
-
-          let historyData = this._generateHistoryDataFromEvent({ branch, contract: name, event });
-          log.debug("calling index for identifers", JSON.stringify(historyData.identifiers, null, 2));
-
-          if (eventIndexer) {
-            // Note that this is an async function call, but that the web3 event handler doesnt support awaiting async function invocations.
-            // Make sure to await the eventIndexer's indexing promise when testing so that async is not leaked.
-            eventIndexer.index(name, null, [ historyData ]);
-          }
+    this._eventListeners[name] = aContract.events.allEvents(async (error, event) => {
+      if (error) {
+        log.error(`error received listening for events from contract ${name}: ${error.reason}`);
+        if (error.type === 'close') {
+          await this._reconnect();
         }
-      });
-    }
-
-    if (!pastAddresses) { return; }
-
-    for (let branch of Object.keys(pastAddresses)) {
-      if (!this._providers[branch]) { continue; }
-
-      for (let pastAddress of pastAddresses[branch]) {
-        // TODO we should ideally not be using the curent ABI against a past contract
-        let aContract = new this._providers[branch].eth.Contract(abi, pastAddress);
-        if (!this._pastContracts[branch]) {
-          this._pastContracts[branch] = {};
+      } else {
+        log.trace(`contract event received for ${name}: ${JSON.stringify(event, null, 2)}`);
+        if (!Object.keys(this._contractDefinitions[name].eventContentTriggers || {}).includes(event.event)) {
+          log.info(`skipping contract ${name} indexing for event ${event.event} since it is not configured as an event of interest`);
+          return;
         }
-        this._pastContracts[branch][pastAddress] = aContract;
+
+        let historyData = this._generateHistoryDataFromEvent({ contract: name, event });
+        log.debug("calling index for identifers", JSON.stringify(historyData.identifiers, null, 2));
+
+        if (eventIndexer) {
+          // Note that this is an async function call, but that the web3 event handler doesnt support awaiting async function invocations.
+          // Make sure to await the eventIndexer's indexing promise when testing so that async is not leaked.
+          eventIndexer.index(name, null, [historyData]);
+        }
       }
-    }
+    });
   }
 
   async callContractMethod(contract, methodName, arg) {
@@ -188,13 +157,13 @@ module.exports = class EthereumClient {
     return result;
   }
 
-  async shouldSkipIndexing(contractName, branch) {
-    if (!this._contracts[branch] || !this._contracts[branch][contractName]) {
-      log.warn(`cannot find contract provider with branch: ${branch} contractName: ${contractName} when determining if indexing should be skipped`);
+  async shouldSkipIndexing(contractName) {
+    if (!this._contracts[contractName]) {
+      log.warn(`cannot find contract provider with contractName: ${contractName} when determining if indexing should be skipped`);
       return true;
     }
 
-    let contract = this._contracts[branch][contractName];
+    let contract = this._contracts[contractName];
     let skipMethods = get(this._contractDefinitions, `${contractName}.indexingSkipIndicators`);
     if (!contract || !skipMethods || !skipMethods.length) { return false; }
 
@@ -206,9 +175,9 @@ module.exports = class EthereumClient {
     return false;
   }
 
-  async getContractInfo({ branch, contract, type }) {
+  async getContractInfo({ contract, type }) {
     if (!contract && type) {
-      log.debug(`getting all top level contract info for contract type: ${type}, branch: ${branch}`);
+      log.debug(`getting all top level contract info for contract type: ${type}`);
       if (this._contractDefinitions[singularize(type)]) {
         contract = singularize(type);
       } else {
@@ -216,22 +185,22 @@ module.exports = class EthereumClient {
       }
     }
 
-    log.debug(`getting all top level contract info for contract: ${contract}, branch: ${branch}`);
+    log.debug(`getting all top level contract info for contract: ${contract}`);
     let contractDefinition = this._contractDefinitions[contract];
-    if (!contractDefinition) { throw new Error(`cannot find contract with branch: ${branch}, contract name: ${contract}`); }
+    if (!contractDefinition) { throw new Error(`cannot find contract with contract name: ${contract}`); }
 
-    let aContract = this._contracts[branch][contract];
+    let aContract = this._contracts[contract];
     if (!aContract) {
-      log.warn(`a contract instance is not yet available for contract: ${contract}, branch: ${branch}`);
+      log.warn(`a contract instance is not yet available for contract: ${contract}`);
       return;
     }
 
     await this._reconnectPromise;
 
-    let address = contractDefinition.addresses[branch];
+    let { address } = contractDefinition;
     let attributes = {
       'ethereum-address': address,
-      'balance-wei': await this._providers[branch].eth.getBalance(address)
+      'balance-wei': await this._provider.eth.getBalance(address)
     };
 
     let methods = contractDefinition.abi.filter(item => item.type === 'function' &&
@@ -244,13 +213,13 @@ module.exports = class EthereumClient {
 
     let model = { id: address, type: pluralize(contract), attributes };
 
-    log.trace(`retrieved contract model for contract ${contract}, branch ${branch}, address ${address}: ${JSON.stringify(model, null, 2)}`);
+    log.trace(`retrieved contract model for contract ${contract}, address ${address}: ${JSON.stringify(model, null, 2)}`);
     return model;
   }
 
-  async getContractInfoForIdentifier({ id, branch, type, contractName}) {
-    log.debug(`getting contract data for id: ${id}, type: ${type}, branch: ${branch}, contractName: ${contractName}`);
-    if (!branch || !type || !id) { return; }
+  async getContractInfoForIdentifier({ id, type, contractName}) {
+    log.debug(`getting contract data for id: ${id}, type: ${type}, contractName: ${contractName}`);
+    if (!type || !id) { return; }
 
     await this._reconnectPromise;
 
@@ -258,11 +227,11 @@ module.exports = class EthereumClient {
     let dasherizedMethod = type.replace(contractNameRegex, '');
     let method = camelize(dasherizedMethod);
 
-    if (!this._contracts[branch] || !this._contracts[branch][contractName]) {
-      throw new Error(`cannot find contract provider with branch: ${branch} contractName: ${contractName} that will be used to access data for ${type}`);
+    if (!this._contracts[contractName]) {
+      throw new Error(`cannot find contract provider with contractName: ${contractName} that will be used to access data for ${type}`);
     }
 
-    let aContract = this._contracts[branch][contractName];
+    let aContract = this._contracts[contractName];
     let methodName;
     if (typeof aContract.methods[method] === 'function') {
       methodName = method;
@@ -279,66 +248,54 @@ module.exports = class EthereumClient {
     return { data, methodName };
   }
 
-  async getContractHistorySince(blockHeights) {
-    log.debug(`getting past events as hints for contracts ${blockHeights ? JSON.stringify(blockHeights) : ''}`);
+  async getContractHistorySince(blockHeight) {
+    log.debug(`getting past events as hints for contracts ${blockHeight ? 'at blockhieght: ' + blockHeight : ''}`);
     let history = [];
 
     await this._reconnectPromise;
-    for (let branch of Object.keys(this._contracts)) {
-      for (let contract of Object.keys(this._contracts[branch])) {
-        let pastAddresses = get(this._contractDefinitions[contract], `pastAddresses.${branch}`) || [];
-        let aContract = this._contracts[branch][contract];
-        let contractProviders = pastAddresses.map(address => {
-          return { address, provider: this._pastContracts[branch][address] };
-        });
-        contractProviders.push({
-          address: this._contractDefinitions[contract]["addresses"][branch],
-          provider: aContract
-        });
+    for (let contract of Object.keys(this._contracts)) {
+      let provider = this._contracts[contract];
+      let { address } = this._contractDefinitions[contract];
+      for (let event of Object.keys(this._contractDefinitions[contract].eventContentTriggers || [])) {
+        let events = [];
+        let lastIndexedBlockHeight = blockHeight;
+        try {
+          // TODO we might need to chunk this so we don't blow past the websocket max frame size in the web3 provider: https://github.com/ethereum/web3.js/issues/1297
+          events = await provider.getPastEvents(event, { fromBlock: lastIndexedBlockHeight ? lastIndexedBlockHeight + 1 : 0, toBlock: 'latest' });
+        } catch (err) {
+          // for some reason web3 on the private blockchain throws an error when it cannot find any of the requested events
+          log.info(`could not find any past contract events of contract ${contract}, address ${address} for event ${event}. ${err.message}`);
+        }
+        log.trace(`discovered ${event} events for contract ${contract}, address ${address}: ${JSON.stringify(events, null, 2)}`);
 
-        for (let { address, provider } of contractProviders) {
-          for (let event of Object.keys(this._contractDefinitions[contract].eventContentTriggers || [])) {
-            let events = [];
-            let lastIndexedBlockHeight = get(blockHeights, branch);
-            try {
-              // TODO we might need to chunk this so we don't blow past the websocket max frame size in the web3 provider: https://github.com/ethereum/web3.js/issues/1297
-              events = await provider.getPastEvents(event, { fromBlock: lastIndexedBlockHeight ? lastIndexedBlockHeight + 1 : 0, toBlock: 'latest' });
-            } catch (err) {
-              // for some reason web3 on the private blockchain throws an error when it cannot find any of the requested events
-              log.info(`could not find any past contract events of contract ${contract}, address ${address} for event ${event}. ${err.message}`);
-            }
-            log.trace(`discovered ${event} events for contract ${contract}, address ${address}: ${JSON.stringify(events, null, 2)}`);
-
-            for (let event of events) {
-              history.push(this._generateHistoryDataFromEvent({ branch, contract, event }));
-            }
-          }
+        for (let event of events) {
+          history.push(this._generateHistoryDataFromEvent({ contract, event }));
         }
       }
     }
-    log.info(`Gathered ${history.length} events from contract history since blockheight ${JSON.stringify(blockHeights)}`);
+    log.info(`Gathered ${history.length} events from contract history since blockheight ${blockHeight}`);
     log.debug(`Discovered contract history data: ${JSON.stringify(history, null, 2)}`);
     return history;
   }
 
-  _generateHistoryDataFromEvent({ branch, contract, event }) {
-    let contractIdentifier = { branch, type: pluralize(contract), id: this._contractDefinitions[contract].addresses[branch], isContractType: true };
+  _generateHistoryDataFromEvent({ contract, event }) {
+    let contractIdentifier = { type: pluralize(contract), id: this._contractDefinitions[contract].address, isContractType: true };
     let addressParams = this._eventDefinitions[contract][event.event].inputs.filter(input => input.type === 'address');
     let addresses = addressParams.map(param => event.returnValues[param.name]).filter(address => address !== NULL_ADDRESS);
     let contentTypes = this._contractDefinitions[contract].eventContentTriggers ? this._contractDefinitions[contract].eventContentTriggers[event.event] : null;
 
     let identifiers = [ contractIdentifier ];
     if (!contentTypes || !contentTypes.length ) {
-      return { branch, event, identifiers };
+      return { event, identifiers };
     }
 
     for (let type of contentTypes) {
       for (let id of addresses) {
-        identifiers.push({ branch, type, id, contract });
+        identifiers.push({ type, id, contract });
       }
     }
 
-    return { branch, event, identifiers };
+    return { event, identifiers };
   }
 };
 

@@ -13,6 +13,7 @@ function attachMeta(model, meta) {
 
 module.exports = declareInjections({
   indexer: 'hub:indexers',
+  controllingBranch: 'hub:controlling-branch',
   searchers: 'hub:searchers',
   schema: 'hub:current-schema',
   pgsearchClient: `plugin-client:${require.resolve('@cardstack/pgsearch/client')}`
@@ -24,12 +25,13 @@ class EthereumEventIndexer {
     return new this(...args);
   }
 
-  constructor({ indexer, pgsearchClient, schema, searchers, }) {
+  constructor({ indexer, pgsearchClient, schema, searchers, controllingBranch}) {
     this.ethereumClient = null;
     this.indexer = indexer;
     this.searchers = searchers;
     this.schema = schema;
     this.pgsearchClient = pgsearchClient;
+    this.controllingBranch = controllingBranch;
     this.contractDefinitions = {};
     this.contractName = null;
     this._indexingPromise = null; // this is exposed to the tests as web3 has poor support for async in event handlers
@@ -45,19 +47,19 @@ class EthereumEventIndexer {
     await this.ethereumClient.start({ name, contract, eventIndexer: this });
   }
 
-  async index(contractName, blockHeights, history) {
+  async index(contractName, blockHeight, history) {
     this._indexingPromise = Promise.resolve(this._indexingPromise)
-      .then(() => this._processRecords({contractName, blockHeights, history }));
+      .then(() => this._processRecords({contractName, blockHeight, history }));
 
     await this._indexingPromise;
   }
 
-  async shouldSkipIndexing(contractName, branch) {
-    return await this.ethereumClient.shouldSkipIndexing(contractName, branch);
+  async shouldSkipIndexing(contractName) {
+    return await this.ethereumClient.shouldSkipIndexing(contractName);
   }
 
-  async getBlockHeight(branch) {
-    return await this.ethereumClient.getBlockHeight(branch);
+  async getBlockHeight() {
+    return await this.ethereumClient.getBlockHeight();
   }
 
   async _ensureClient() {
@@ -66,14 +68,14 @@ class EthereumEventIndexer {
 
   async _indexRecord(batch, record) {
     log.debug('indexing model in pgsearch %j', record);
-    let { id, type, meta: { branch }} = record;
-    let schema = await this.schema.forBranch(branch);
+    let { id, type } = record;
+    let schema = await this.schema.forControllingBranch();
     let contentType = schema.types.get(type);
     let sourceId = contentType.dataSource.id;
     let context = this.searchers.createDocumentContext({
       id,
       type,
-      branch,
+      branch: this.controllingBranch.name,
       schema,
       sourceId,
       upstreamDoc: { data: record }
@@ -82,35 +84,33 @@ class EthereumEventIndexer {
     await batch.saveDocument(context);
   }
 
-  async _processRecords({ contractName, blockHeights, history }) {
-    log.debug('processing records for ethereum with last indexed blockheights %j, history: %j', blockHeights, history);
+  async _processRecords({ contractName, blockHeight, history }) {
+    log.debug('processing records for ethereum with last indexed blockheight %j, history: %j', blockHeight, history);
     let contractDefinition = this.contractDefinitions[contractName];
     if (!contractDefinition) { return; }
 
     let batch = this.pgsearchClient.beginBatch(this.schema, this.searchers);
 
-    for (let branch of Object.keys(contractDefinition.addresses)) {
-      let blockheight = await this.ethereumClient.getBlockHeight(branch);
-      await this._indexRecord(batch, attachMeta(await this.ethereumClient.getContractInfo({ branch, contract: contractName }), { blockheight, branch, contractName }));
-    }
+    let blockheight = await this.ethereumClient.getBlockHeight();
+    await this._indexRecord(batch, attachMeta(await this.ethereumClient.getContractInfo({ contract: contractName }), { blockheight, contractName }));
 
     if (!history || !history.length) {
-      log.info(`Retreving full history for contract ${contractName} address: ${JSON.stringify((contractDefinition.addresses))} since blockheight ${JSON.stringify(blockHeights)}`);
-      history = await this.ethereumClient.getContractHistorySince(blockHeights);
+      log.info(`Retreving full history for contract ${contractName} address: ${JSON.stringify((contractDefinition.addresses))} since blockheight ${blockHeight}`);
+      history = await this.ethereumClient.getContractHistorySince(blockHeight);
     }
 
-    for (let { branch, event, identifiers } of history) {
-      let contractAddress = contractDefinition.addresses[branch];
+    for (let { event, identifiers } of history) {
+      let contractAddress = contractDefinition.address;
 
       let eventModel = event ? generateEventModel(contractName, contractAddress, event) : null;
       if (eventModel) {
-        let blockheight = await this.ethereumClient.getBlockHeight(branch);
-        await this._indexRecord(batch, attachMeta(eventModel, { blockheight, branch, contractName }));
+        let blockheight = await this.ethereumClient.getBlockHeight();
+        await this._indexRecord(batch, attachMeta(eventModel, { blockheight, contractName }));
 
         if (!contractDefinition.eventContentTriggers[eventModel.attributes['event-name']].length) {
           let contract;
           try {
-            contract = (await this.searchers.getResourceAndMeta(Session.INTERNAL_PRIVILEGED, branch, pluralize(contractName), contractAddress)).resource;
+            contract = (await this.searchers.getResourceAndMeta(Session.INTERNAL_PRIVILEGED, this.controllingBranch.name, pluralize(contractName), contractAddress)).resource;
           } catch (err) {
             if (err.status !== 404) { throw err; }
           }
@@ -120,19 +120,19 @@ class EthereumEventIndexer {
           }
 
           addEventRelationship(contract, eventModel);
-          let blockheight = await this.ethereumClient.getBlockHeight(branch);
-          await this._indexRecord(batch, attachMeta(contract, { blockheight, branch, contractName }));
+          let blockheight = await this.ethereumClient.getBlockHeight();
+          await this._indexRecord(batch, attachMeta(contract, { blockheight, contractName }));
         }
       }
 
       if (!identifiers) { continue; }
 
       for (let { id, type, isContractType } of identifiers) {
-        if (!branch || !type || !id || isContractType) { continue; }
+        if (!type || !id || isContractType) { continue; }
 
-        let contractAddress = contractDefinition.addresses[branch];
-        let blockheight = await this.ethereumClient.getBlockHeight(branch);
-        let { data, methodName } = await this.ethereumClient.getContractInfoForIdentifier({ id, type, branch, contractName });
+        let contractAddress = contractDefinition.address;
+        let blockheight = await this.ethereumClient.getBlockHeight();
+        let { data, methodName } = await this.ethereumClient.getContractInfoForIdentifier({ id, type, contractName });
         let methodAbiEntry = contractDefinition["abi"].find(item => item.type === 'function' &&
           item.constant &&
           item.name === methodName);
@@ -163,7 +163,7 @@ class EthereumEventIndexer {
 
         let existingRecord;
         try {
-          existingRecord = (await this.searchers.getResourceAndMeta(Session.INTERNAL_PRIVILEGED, branch, type, id.toLowerCase())).resource;
+          existingRecord = (await this.searchers.getResourceAndMeta(Session.INTERNAL_PRIVILEGED, this.controllingBranch.name, type, id.toLowerCase())).resource;
         } catch (err) {
           if (err.status !== 404) { throw err; }
         }
@@ -179,16 +179,15 @@ class EthereumEventIndexer {
           addEventRelationship(model, eventModel);
         }
 
-        await this._indexRecord(batch, attachMeta(model, { blockheight, branch, contractName }));
+        await this._indexRecord(batch, attachMeta(model, { blockheight, contractName }));
       }
     }
 
     await batch.done();
 
-    log.debug('completed indexing ethereum models with last indexed blockheights %j', blockHeights);
+    log.debug('completed indexing ethereum models with last indexed blockheight %j', blockHeight);
   }
 });
-
 
 function addEventRelationship(model, event) {
   if (!model.relationships) {
