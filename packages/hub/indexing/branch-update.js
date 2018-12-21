@@ -36,6 +36,8 @@ class BranchUpdate {
   }
 
   addStaticModels(schemaModels, allModels) {
+    if (!this.updaters['static-models']) { return; } // static models updaters only run on the master branch
+
     this.schemaModels = this.schemaModels.concat(schemaModels);
     this.updaters['static-models'].staticModels = allModels;
   }

@@ -78,12 +78,10 @@ contract('SampleToken', function (accounts) {
           .withAttributes({
             'source-type': '@cardstack/ethereum',
             params: {
-              branches: {
-                master: { jsonRpcUrl: "ws://localhost:7545" }
-              },
+              jsonRpcUrl: "ws://localhost:7545",
               contract: {
                 abi: token.abi,
-                addresses: { master: token.address },
+                address: token.address,
                 eventContentTriggers: {
                   TokenFrozen: [],
                   Transfer: ["sample-token-balance-ofs"],
@@ -1605,12 +1603,10 @@ contract('SampleToken', function (accounts) {
           .withAttributes({
             'source-type': '@cardstack/ethereum',
             params: {
-              branches: {
-                master: { jsonRpcUrl: "ws://localhost:7545" }
-              },
+              jsonRpcUrl: "ws://localhost:7545",
               contract: {
                 abi: token.abi,
-                addresses: { master: token.address },
+                address: token.address,
                 eventContentTriggers: {
                   MintFinished: []
                 }
@@ -1651,24 +1647,20 @@ contract('SampleToken', function (accounts) {
     });
 
     describe('ethereum-indexer for past events', function () {
-      let pastToken, token, pgclient, indexers, contract;
+      let token, pgclient, indexers, contract;
 
       async function setup() {
         let factory = new JSONAPIFactory();
-        pastToken = await SampleToken.new();
         token = await SampleToken.new();
 
         let dataSource = factory.addResource('data-sources', contractName)
           .withAttributes({
             'source-type': '@cardstack/ethereum',
             params: {
-              branches: {
-                master: { jsonRpcUrl: "ws://localhost:7545" }
-              },
+              jsonRpcUrl: "ws://localhost:7545",
               contract: {
                 abi: token.abi,
-                addresses: { master: token.address },
-                pastAddresses: { master: [pastToken.address] },
+                address: token.address,
                 indexingSkipIndicators: ["tokenFrozen"],
                 eventContentTriggers: {
                   WhiteList: ["sample-token-approved-buyers"],
@@ -1791,34 +1783,13 @@ contract('SampleToken', function (accounts) {
         expect(accountTwoLedgerEntry.data.attributes["mapping-number-value"]).to.equal("20", "the token balance is correct");
       });
 
-      it("indexes past events that occurred on a previous contract", async function () {
-        await ethereumClient.stopAll();
-
-        await pastToken.mint(accountOne, 100);
-        await pastToken.transfer(accountTwo, 20, { from: accountOne });
-        // these wont trigger events, hub is reliant on the past contract for the event triggers
-        await token.setLedger(accountOne, 80);
-        await token.setLedger(accountTwo, 20);
-
-        await ethereumClient.start({ contract, name: contractName, eventIndexer });
-        await indexers.update({ forceRefresh: true });
-        await waitForEthereumEvents(eventIndexer);
-
-        let accountOneLedgerEntry = await env.lookup('hub:searchers').get(env.session, 'master', 'sample-token-balance-ofs', accountOne);
-        let accountTwoLedgerEntry = await env.lookup('hub:searchers').get(env.session, 'master', 'sample-token-balance-ofs', accountTwo);
-
-        expect(accountOneLedgerEntry.data.attributes["mapping-number-value"]).to.equal("80", "the token balance is correct");
-        expect(accountTwoLedgerEntry.data.attributes["mapping-number-value"]).to.equal("20", "the token balance is correct");
-      });
-
     });
 
     describe('ethereum-indexer can patch schema', function () {
-      let pastToken, token;
+      let token;
 
       async function setup() {
         let factory = new JSONAPIFactory();
-        pastToken = await SampleToken.new();
         token = await SampleToken.new();
 
         await token.mint(accountOne, 100);
@@ -1828,13 +1799,10 @@ contract('SampleToken', function (accounts) {
           .withAttributes({
             'source-type': '@cardstack/ethereum',
             params: {
-              branches: {
-                master: { jsonRpcUrl: "ws://localhost:7545" }
-              },
+              jsonRpcUrl: "ws://localhost:7545",
               contract: {
                 abi: token.abi,
-                addresses: { master: token.address },
-                pastAddresses: { master: [pastToken.address] },
+                address: token.address,
                 indexingSkipIndicators: ["tokenFrozen"],
                 eventContentTriggers: {
                   Transfer: ["sample-token-balance-ofs"],
@@ -1911,12 +1879,10 @@ contract('SampleToken', function (accounts) {
           .withAttributes({
             'source-type': '@cardstack/ethereum',
             params: {
-              branches: {
-                master: { jsonRpcUrl: "ws://localhost:7545" }
-              },
+              jsonRpcUrl: "ws://localhost:7545",
               contract: {
                 abi: token.abi,
-                addresses: { master: token.address },
+                address: token.address,
                 eventContentTriggers: {
                   WhiteList: ["sample-token-approved-buyers"],
                   Transfer: ["sample-token-balance-ofs"],

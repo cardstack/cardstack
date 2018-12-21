@@ -11,6 +11,7 @@ const defaultBranch = 'master';
 
 module.exports = declareInjections({
   searcher: 'hub:searchers',
+  controllingBranch: 'hub:controlling-branch',
   ethereumClient: `plugin-services:${require.resolve('./client')}`,
   eventIndexer: `plugin-services:${require.resolve('./event-indexer')}`
 },
@@ -18,23 +19,24 @@ module.exports = declareInjections({
 class Indexer {
 
   static create(...args) {
-    let [{ ethereumClient, branches }] = args;
-    ethereumClient.connect(branches);
+    let [{ ethereumClient, jsonRpcUrl }] = args;
+    ethereumClient.connect(jsonRpcUrl);
     return new this(...args);
   }
 
-  constructor({ ethereumClient, dataSource, branches, contract, patch, searcher, eventIndexer }) {
+  constructor({ ethereumClient, dataSource, jsonRpcUrl, controllingBranch, contract, patch, searcher, eventIndexer }) {
     this.dataSourceId = dataSource.id;
     this.contract = contract;
     this.searcher = searcher;
     this.eventIndexer = eventIndexer;
+    this.controllingBranch = controllingBranch;
     this.patch = patch || Object.create(null);
-    this._branches = branches;
+    this._jsonRpcUrl = jsonRpcUrl;
     this.ethereumClient = ethereumClient;
   }
 
   async branches() {
-    return Object.keys(this._branches);
+    return [ this.controllingBranch.name ];
   }
 
   async beginUpdate() {
@@ -49,7 +51,6 @@ class Indexer {
       contract: this.contract,
       eventIndexer: this.eventIndexer,
       patch: this.patch,
-      branches: await this.branches(),
       searcher: this.searcher
     });
   }
@@ -57,13 +58,12 @@ class Indexer {
 
 class Updater {
 
-  constructor({ dataSourceId, contract, searcher, eventIndexer, patch, branches }) {
+  constructor({ dataSourceId, contract, searcher, eventIndexer, patch }) {
     this.dataSourceId = dataSourceId;
     this.contract = contract;
     this.searcher = searcher;
     this.eventIndexer = eventIndexer;
     this.patch = patch;
-    this.branches = branches;
   }
 
   async schema() {
@@ -168,7 +168,7 @@ class Updater {
   async updateContent(meta, hints, ops) {
     let schema = await this.schema();
     let isSchemaUnchanged;
-    let lastBlockHeights = get(meta, 'lastBlockHeights');
+    let lastBlockHeight = get(meta, 'lastBlockHeight');
 
     if (meta) {
       let { lastSchema } = meta;
@@ -184,20 +184,18 @@ class Updater {
     }
 
     let shouldSkip = await this.eventIndexer.shouldSkipIndexing(this.dataSourceId, defaultBranch);
-    let blockHeights = Object.assign({}, lastBlockHeights || {});
+    let blockHeight = lastBlockHeight;
     if (!shouldSkip) {
-      for (let branch of this.branches) {
-        let blockheight = await this.eventIndexer.getBlockHeight(branch);
-        if (!blockHeights[branch] || blockHeights[branch] < blockheight) {
-          blockHeights[branch] = blockheight;
-        }
+      let eventBlockHeight = await this.eventIndexer.getBlockHeight();
+      if (!blockHeight || blockHeight < eventBlockHeight) {
+        blockHeight = eventBlockHeight;
       }
 
-      await this.eventIndexer.index(this.dataSourceId, lastBlockHeights);
+      await this.eventIndexer.index(this.dataSourceId, lastBlockHeight);
     }
 
     return {
-      lastBlockHeights: blockHeights,
+      lastBlockHeight: blockHeight,
       lastSchema: schema
     };
   }
