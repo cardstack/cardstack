@@ -133,6 +133,21 @@ export default Service.extend({
     return get(card, attribute);
   },
 
+  // async getCardMetadata(card, attribute) {
+  //   let metadata = {};
+
+  //   // we will need to build this interface
+  //   if (typeof card.getMetadata === 'function') {
+  //     metadata = await card.getMetadata();
+  //   }
+
+  //   if (attribute === 'title') {
+  //     return metadata.title || metadata.name;
+  //   }
+
+  //   return metadata[attribute] || get(card, attribute);
+  // },
+
   _headers() {
     let headers = {
       'Content-Type': 'application/vnd.api+json',
