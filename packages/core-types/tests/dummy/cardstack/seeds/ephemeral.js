@@ -25,6 +25,9 @@ function initialModels() {
       fieldType: '@cardstack/core-types::date',
       editorComponent: 'field-editors/datetime-editor'
     }),
+    initial.addResource('fields', 'win-percentage').withAttributes({
+      fieldType: '@cardstack/core-types::fixed-decimal'
+    }),
     initial.addResource('fields', 'is-good-guy').withAttributes({
       fieldType: '@cardstack/core-types::boolean'
     }),
@@ -99,6 +102,7 @@ function initialModels() {
       name: 'King Boo',
       dob: '1998-01-21',
       latestVictory: '2018-10-24T13:56:05',
+      winPercentage: 25.32,
       isGoodGuy: false
     })
     .withRelated('feeling', exuberantFeeling)
@@ -110,6 +114,7 @@ function initialModels() {
       name: 'Metal Mario',
       dob: '1999-01-01',
       latestVictory: '2018-10-25T13:56:05',
+      winPercentage: 51.382,
       isGoodGuy: true
     })
     .withRelated('feeling', happyFeeling)
@@ -123,6 +128,7 @@ function initialModels() {
       name: 'Link',
       dob: '2003-01-01',
       latestVictory: '2018-10-23T13:56:05',
+      winPercentage: 11.49,
       isGoodGuy: true
     })
     .withRelated('feeling', happyFeeling)
@@ -132,6 +138,7 @@ function initialModels() {
     .withAttributes({
       name: 'Shy Guy',
       dob: '2001-01-01',
+      winPercentage: 0,
       isGoodGuy: false
     })
     .withRelated('feeling', sadFeeling)

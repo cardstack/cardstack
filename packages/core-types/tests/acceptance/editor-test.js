@@ -29,6 +29,7 @@ module('Acceptance | field editors', async function(hooks) {
     assert.equal(model.get('name'), 'Metal Mario', 'driver name is correct');
     assert.equal(model.get('dob'), '1999-01-01', 'driver dob is correct');
     assert.equal(model.get('latestVictory'), '2018-10-25T13:56:05', 'driver latest victory is correct');
+    assert.equal(model.get('winPercentage'), 51.382, 'driver win percentage is correct');
     assert.equal(model.get('isGoodGuy'), true, 'driver is a good guy');
     assert.equal(feeling, 'Happy', 'driver is feeling happy');
     assert.equal(vehicle, 'Sport Bike', 'driver is using a sport bike');
@@ -36,10 +37,12 @@ module('Acceptance | field editors', async function(hooks) {
     assert.equal(tracks, '3', 'drivers has 3 tracks');
     assert.equal(firstTrack, 'Rainbow Road', 'drivers first track is rainbow road');
     assert.equal(lastTrack, 'Koopa City', 'drivers final track is koopa city');
+    assert.dom('.rendered-fields .win-percentage').hasText('Win Percentage: 51.38%', 'win percentage is rounded to 2 decimal places');
 
     await fillIn('.field-editor:nth-of-type(1) > input', 'METAL Mario');
     await fillIn('input[type=date]', '1998-01-01');
     await fillIn('input[type=datetime-local]', '2018-10-27T23:56:07');
+    await fillIn('input[type=number]', '53.948');
     await click('.cs-toggle-switch');
     await selectChoose('.feeling-selector', 'Sad');
     await selectChoose('.vehicle-selector', 'Honeycoupe');
@@ -55,6 +58,8 @@ module('Acceptance | field editors', async function(hooks) {
     assert.dom('.tracks-selector .ember-power-select-multiple-option:nth-of-type(1)').hasText('× Sweet Sweet Canyon');
     assert.dom('.tracks-selector .ember-power-select-multiple-option:nth-of-type(2)').hasText('× Twisted Mansion');
 
+    assert.dom('.rendered-fields .win-percentage').hasText('Win Percentage: 53.95%', 'win percentage is updated');
+
     feeling = await model.get('feeling.title');
     vehicle = await model.get('vehicle.name');
     alternateVehicle = await model.get('alternateVehicle.name');
@@ -64,6 +69,7 @@ module('Acceptance | field editors', async function(hooks) {
     assert.equal(model.get('name'), 'METAL Mario', 'metal mario is more metal');
     assert.equal(model.get('dob'), '1998-01-01', 'metal mario was born earlier');
     assert.equal(model.get('latestVictory'), '2018-10-27T23:56:07', 'metal mario won a race more recently');
+    assert.equal(model.get('winPercentage'), 53.948, 'driver win percentage is correct');
     assert.equal(model.get('isGoodGuy'), false, 'metal mario is a bad guy');
     assert.equal(feeling, 'Sad', 'metal mario is sad');
     assert.equal(vehicle, 'Honeycoupe', 'metal mario is driving a honeycoupe');

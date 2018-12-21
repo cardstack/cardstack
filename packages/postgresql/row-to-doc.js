@@ -46,6 +46,7 @@ function convertValue(pgValue, fieldType) {
   case '@cardstack/core-types::boolean':
   case '@cardstack/core-types::date':
   case '@cardstack/core-types::integer':
+  case '@cardstack/core-types::fixed-decimal':
     return pgValue;
   }
 }

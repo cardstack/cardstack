@@ -21,8 +21,8 @@ describe('postgresql/writer', function() {
     client = new Client(postgresConfig({ database: 'test1' }));
     await client.connect();
     await client.query('create sequence article_id_seq');
-    await client.query(`create table articles (id varchar primary key DEFAULT cast(nextval('article_id_seq') as varchar), title varchar, length integer, published boolean, alt_topic varchar, multi_word varchar, less_than_ten integer, check (less_than_ten < 10))`);
-    await client.query('insert into articles values ($1, $2, $3, $4)', ['0', 'hello world', 100, true]);
+    await client.query(`create table articles (id varchar primary key DEFAULT cast(nextval('article_id_seq') as varchar), title varchar, length integer, rating real, published boolean, alt_topic varchar, multi_word varchar, less_than_ten integer, check (less_than_ten < 10))`);
+    await client.query('insert into articles values ($1, $2, $3, $4, $5)', ['0', 'hello world', 100, 7.2, true]);
 
     await client.query('create table favorite_toys (id varchar primary key, name varchar)');
     await client.query('create table doggies (id varchar primary key, name varchar, favorite_toy varchar references favorite_toys(id))');
@@ -109,16 +109,18 @@ describe('postgresql/writer', function() {
         attributes: {
           title: 'I was created',
           length: 200,
+          rating: 4.5,
           published: false,
           topic: 'x',
           'multi-word': 'hello'
         }
       }
     });
-    let result = await client.query('select title, length, published, alt_topic from articles where id=$1', [created.id]);
+    let result = await client.query('select title, length, rating, published, alt_topic from articles where id=$1', [created.id]);
     expect(result.rows).has.length(1);
     expect(result.rows[0].title).to.equal('I was created');
     expect(result.rows[0].length).to.equal(200);
+    expect(result.rows[0].rating).to.equal(4.5);
     expect(result.rows[0].alt_topic).to.equal('x');
     expect(result.rows[0].published).to.equal(false);
 
@@ -133,6 +135,7 @@ describe('postgresql/writer', function() {
       "title": "I was created",
       "published": false,
       "length": 200,
+      "rating": 4.5,
       "topic": "x"
     });
   });
@@ -145,6 +148,7 @@ describe('postgresql/writer', function() {
           attributes: {
             title: 'I was created',
             length: 200,
+            rating: 8.8,
             published: false,
             topic: 'x',
             'multi-word': 'hello',

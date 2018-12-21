@@ -403,6 +403,11 @@ class Updater {
     case 'integer':
       return '@cardstack/core-types::integer';
 
+    case 'decimal':
+    case 'numeric':
+    case 'real':
+      return '@cardstack/core-types::fixed-decimal';
+
     case 'boolean':
       return '@cardstack/core-types::boolean';
 

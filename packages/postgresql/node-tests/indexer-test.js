@@ -18,9 +18,9 @@ describe('postgresql/indexer', function() {
     await client.connect();
     await client.query('create table editors (id varchar primary key, name varchar)');
     await client.query('insert into editors values ($1, $2)', ['0', 'Some Editor']);
-    await client.query('create table articles (id varchar primary key, title varchar, length integer, published boolean, topic varchar, editor varchar references editors(id))');
-    await client.query('insert into articles values ($1, $2, $3, $4, $5, $6)', ['0', 'hello world', 100, true, null, '0']);
-    await client.query('insert into articles values ($1, $2, $3, $4)', ['1', null, null, false]);
+    await client.query('create table articles (id varchar primary key, title varchar, length integer, width real, published boolean, topic varchar, editor varchar references editors(id))');
+    await client.query('insert into articles values ($1, $2, $3, $4, $5, $6, $7)', ['0', 'hello world', 100, 5.23, true, null, '0']);
+    await client.query('insert into articles values ($1, $2, $3, $4, $5)', ['1', null, null, null, false]);
 
     await client.query('create table favorite_toys (id varchar primary key, toy_name varchar)');
     await client.query('insert into favorite_toys values ($1, $2)', ['0', 'Squeaky Snake']);
@@ -133,6 +133,13 @@ describe('postgresql/indexer', function() {
       expect(model).has.deep.property('attributes.length', 100);
     });
 
+    it('can read a real column', async function() {
+      let doc = await env.lookup('hub:searchers').get(env.session, 'master', 'articles', '0');
+      expect(doc).is.ok;
+      let model = doc.data;
+      expect(model).has.deep.property('attributes.width', 5.23);
+    });
+
     it('can read a boolean column', async function() {
       let doc = await env.lookup('hub:searchers').get(env.session, 'master', 'articles', '1');
       expect(doc).is.ok;
@@ -152,6 +159,13 @@ describe('postgresql/indexer', function() {
       expect(doc).is.ok;
       let model = doc.data;
       expect(model).has.deep.property('attributes.length', null);
+    });
+
+    it('can read null real', async function() {
+      let doc = await env.lookup('hub:searchers').get(env.session, 'master', 'articles', '1');
+      expect(doc).is.ok;
+      let model = doc.data;
+      expect(model).has.deep.property('attributes.width', null);
     });
 
     it('can rename tables', async function() {

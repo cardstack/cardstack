@@ -12,6 +12,7 @@ where `<field-type>` is one of:
 * `string-array` _(ex. `["red", "green", "blue"]`)_
 * `case-insensitive` case insensitive string, used for email addresses, among other things _(ex. `"ChRiS.tSe@GmaiL.com"`)_
 * `integer` _(ex. `37`)_
+* `fixed-decimal` _(ex. `63.72`)_
 * `boolean` _(ex. `true`)_
 * `date` _(ex. `"2018-07-22"`)_
 * `object` _(ex. `{ flower: 'rose' }`)_
