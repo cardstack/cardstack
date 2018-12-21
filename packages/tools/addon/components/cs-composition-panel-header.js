@@ -13,6 +13,6 @@ export default Component.extend({
   getModelTitle: task(function * () {
     let card = this.model;
     let title = yield this.cardstackData.getCardMetadata(card, 'title');
-    this.set('modelTitle', title || 'Untitled');
+    this.set('title', title || 'Untitled');
   }).on('init'),
 });
