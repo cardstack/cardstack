@@ -127,13 +127,16 @@
         {
             "type": "node",
             "request": "launch",
-            "name": "Launch Ethereum Indexer Truffle Tests",
+            "name": "Launch Truffle Tests",
             "cwd": "${workspaceRoot}/packages/ethereum",
             "program": "${workspaceRoot}/packages/ethereum/node_modules/.bin/truffle",
             "console": "integratedTerminal",
+            "env": {
+                "LOG_LEVELS":"cardstack/ethereum/transaction-indexer=debug"
+            },
             "args": [
                 "test",
-                "${workspaceRoot}/packages/ethereum/truffle-tests/ethereum-indexer-test.js"
+                "${workspaceRoot}/packages/ethereum/truffle-tests/address-test.js"
             ]
         }
     ]

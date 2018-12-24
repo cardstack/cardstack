@@ -10,59 +10,72 @@ const { apply_patch } = require('jsonpatch');
 const defaultBranch = 'master';
 
 module.exports = declareInjections({
-  searcher: 'hub:searchers',
+  searchers: 'hub:searchers',
   controllingBranch: 'hub:controlling-branch',
   ethereumClient: `plugin-services:${require.resolve('./client')}`,
-  eventIndexer: `plugin-services:${require.resolve('./event-indexer')}`
+  eventIndexer: `plugin-services:${require.resolve('./event-indexer')}`,
+  transactionIndexer: `plugin-services:${require.resolve('./transaction-indexer')}`
 },
 
-class Indexer {
+  class Indexer {
 
-  static create(...args) {
-    let [{ ethereumClient, jsonRpcUrl }] = args;
-    ethereumClient.connect(jsonRpcUrl);
-    return new this(...args);
-  }
+    static create(...args) {
+      let [{ ethereumClient, jsonRpcUrl }] = args;
+      ethereumClient.connect(jsonRpcUrl);
+      return new this(...args);
+    }
 
-  constructor({ ethereumClient, dataSource, jsonRpcUrl, controllingBranch, contract, patch, searcher, eventIndexer }) {
-    this.dataSourceId = dataSource.id;
-    this.contract = contract;
-    this.searcher = searcher;
-    this.eventIndexer = eventIndexer;
-    this.controllingBranch = controllingBranch;
-    this.patch = patch || Object.create(null);
-    this._jsonRpcUrl = jsonRpcUrl;
-    this.ethereumClient = ethereumClient;
-  }
+    constructor({ ethereumClient, dataSource, jsonRpcUrl, controllingBranch, contract, addressIndexing, patch, searchers, eventIndexer, transactionIndexer }) {
+      this.dataSourceId = dataSource.id;
+      this.contract = contract;
+      this.addressIndexing = addressIndexing;
+      this.searchers = searchers;
+      this.eventIndexer = eventIndexer;
+      this.transactionIndexer = transactionIndexer;
+      this.controllingBranch = controllingBranch;
+      this.patch = patch || Object.create(null);
+      this._jsonRpcUrl = jsonRpcUrl;
+      this.ethereumClient = ethereumClient;
+    }
 
-  async branches() {
-    return [ this.controllingBranch.name ];
-  }
+    async branches() {
+      return [this.controllingBranch.name];
+    }
 
-  async beginUpdate() {
-    await this.eventIndexer.start({
-      ethereumClient: this.ethereumClient,
-      name: this.dataSourceId,
-      contract: this.contract
-    });
+    async beginUpdate() {
+      if (this.contract) {
+        await this.eventIndexer.start({
+          ethereumClient: this.ethereumClient,
+          name: this.dataSourceId,
+          contract: this.contract
+        });
+      }
 
-    return new Updater({
-      dataSourceId: this.dataSourceId,
-      contract: this.contract,
-      eventIndexer: this.eventIndexer,
-      patch: this.patch,
-      searcher: this.searcher
-    });
-  }
-});
+      if (this.addressIndexing) {
+        await this.transactionIndexer.start(this.addressIndexing, this.ethereumClient);
+      }
+
+      return new Updater({
+        dataSourceId: this.dataSourceId,
+        contract: this.contract,
+        addressIndexing: this.addressIndexing,
+        eventIndexer: this.eventIndexer,
+        transactionIndexer: this.transactionIndexer,
+        patch: this.patch,
+        searchers: this.searchers
+      });
+    }
+  });
 
 class Updater {
 
-  constructor({ dataSourceId, contract, searcher, eventIndexer, patch }) {
+  constructor({ dataSourceId, contract, addressIndexing, searchers, transactionIndexer, eventIndexer, patch }) {
     this.dataSourceId = dataSourceId;
     this.contract = contract;
-    this.searcher = searcher;
+    this.addressIndexing = addressIndexing;
+    this.searchers = searchers;
     this.eventIndexer = eventIndexer;
+    this.transactionIndexer = transactionIndexer;
     this.patch = patch;
   }
 
@@ -75,100 +88,347 @@ class Updater {
       attributes: {
         "field-type": "@cardstack/core-types::case-insensitive"
       }
-    },{
+    }, {
       type: "fields",
       id: "balance-wei",
       attributes: {
         "field-type": "@cardstack/core-types::string"
       }
-    },{
+    }, {
       type: "fields",
       id: "block-number",
       attributes: {
         "field-type": "@cardstack/core-types::integer"
       }
-    },{
-      type: "fields",
-      id: "transaction-hash",
-      attributes: {
-        "field-type": "@cardstack/core-types::integer"
-      }
-    },{
+    }, {
       type: "fields",
       id: "event-name",
       attributes: {
         "field-type": "@cardstack/core-types::string"
       }
-    },{
+    }, {
       type: "fields",
       id: "mapping-boolean-value",
       attributes: {
         "field-type": "@cardstack/core-types::boolean"
       }
-    },{
+    }, {
       type: "fields",
       id: "mapping-string-value",
       attributes: {
         "field-type": "@cardstack/core-types::string"
       }
-    },{
+    }, {
       type: "fields",
       id: "mapping-address-value",
       attributes: {
         "field-type": "@cardstack/core-types::case-insensitive"
       }
-    },{
+    }, {
       type: "fields",
       id: "mapping-number-value",
       attributes: {
         "field-type": "@cardstack/core-types::string" // ethereum numbers are too large for JS, use a string to internally represent ethereum numbers
       }
-    }];
-
-    let schema = [].concat(defaultFields);
-    let contractName = this.dataSourceId;
-    let abi = this.contract["abi"];
-    let { contractFields, schemaItems } = this._getSchemaFromAbi(contractName, abi);
-
-    schema = schema.concat(schemaItems)
-                   .concat(contractFields);
-
-    let contractSchema =  {
+    }, {
+      type: "fields",
+      id: "transaction-hash",
+      attributes: {
+        "field-type": "@cardstack/core-types::integer"
+      }
+    }, {
+      type: "fields",
+      id: "block-hash",
+      attributes: {
+        "field-type": "@cardstack/core-types::string"
+      }
+    }, {
+      type: "fields",
+      id: "transaction-nonce",
+      attributes: {
+        "field-type": "@cardstack/core-types::integer"
+      }
+    }, {
+      type: "fields",
+      id: "transaction-index",
+      attributes: {
+        "field-type": "@cardstack/core-types::integer"
+      }
+    }, {
+      type: "fields",
+      id: "timestamp",
+      attributes: {
+        "field-type": "@cardstack/core-types::integer"
+      }
+    }, {
+      type: "fields",
+      id: "transaction-value",
+      attributes: {
+        "field-type": "@cardstack/core-types::string"
+      }
+    }, {
+      type: "fields",
+      id: "gas",
+      attributes: {
+        "field-type": "@cardstack/core-types::integer"
+      }
+    }, {
+      type: "fields",
+      id: "gas-price",
+      attributes: {
+        "field-type": "@cardstack/core-types::string"
+      }
+    }, {
+      type: "fields",
+      id: "transaction-data",
+      attributes: {
+        "field-type": "@cardstack/core-types::string"
+      }
+    }, {
+      type: "fields",
+      id: "balance",
+      attributes: {
+        "field-type": "@cardstack/core-types::string"
+      }
+    }, {
+      type: "fields",
+      id: "to-address",
+      attributes: {
+        "field-type": "@cardstack/core-types::belongs-to"
+      },
+      relationships: {
+        'related-types': {
+          data: [{ type: 'content-types', id: 'ethereum-addresses' }]
+        }
+      }
+    }, {
+      type: "fields",
+      id: "from-address",
+      attributes: {
+        "field-type": "@cardstack/core-types::belongs-to"
+      },
+      relationships: {
+        'related-types': {
+          data: [{ type: 'content-types', id: 'ethereum-addresses' }]
+        }
+      }
+    }, {
+      type: "fields",
+      id: "transactions",
+      attributes: {
+        "field-type": "@cardstack/core-types::has-many"
+      },
+      relationships: {
+        'related-types': {
+          data: [{ type: 'content-types', id: 'ethereum-transactions' }]
+        }
+      }
+    }, {
+      type: "fields",
+      id: "address-user",
+      attributes: {
+        "field-type": "@cardstack/core-types::belongs-to"
+      },
+    }, {
+      type: "computed-fields",
+      id: "tracked-user-address",
+      attributes: {
+        "computed-field-type": "@cardstack/core-types::correlate-by-field",
+        params: { relationshipType: 'tracked-ethereum-addresses', field: 'ethereum-address', toLowerCase: true }
+      }
+    }, {
+      type: "computed-fields",
+      id: "tracked-address",
+      attributes: {
+        "computed-field-type": "@cardstack/core-types::correlate-by-field",
+        params: { relationshipType: 'tracked-ethereum-addresses', field: 'id' }
+      }
+    }, {
+      type: "computed-fields",
+      id: "address-source",
+      attributes: {
+        "computed-field-type": "@cardstack/core-types::correlate-by-field",
+        params: { relationshipType: 'ethereum-addresses', field: 'id' }
+      }
+    }, {
       type: 'content-types',
-      id: pluralize(contractName),
+      id: 'ethereum-transactions',
       relationships: {
         fields: {
           data: [
-            { type: "fields", id: "ethereum-address" },
-            { type: "fields", id: "balance-wei" }
+            { type: "fields", id: "block-number" },
+            { type: "fields", id: "timestamp" },
+            { type: "fields", id: "transaction-hash" },
+            { type: "fields", id: "block-hash" },
+            { type: "fields", id: "transaction-nonce" },
+            { type: "fields", id: "transaction-index" },
+            { type: "fields", id: "to-address" },
+            { type: "fields", id: "from-address" },
+            { type: "fields", id: "transaction-value" },
+            { type: "fields", id: "gas" },
+            { type: "fields", id: "gas-price" },
+            { type: "fields", id: "transaction-data" },
+            { type: "fields", id: "transaction-data" },
           ]
         },
         'data-source': {
           data: { type: 'data-sources', id: this.dataSourceId.toString() }
         }
       }
-    };
+    }, {
+      type: 'content-types',
+      id: 'ethereum-addresses',
+      relationships: {
+        fields: {
+          data: [
+            { type: "fields", id: "ethereum-address" }, // use this field to preserve the case of the ID to faithfully represent EIP-55 encoding
+            { type: "fields", id: "balance" },
+            { type: "fields", id: "transactions" },
+            { type: "computed-fields", id: "tracked-address" },
+          ]
+        },
+        'data-source': {
+          data: { type: 'data-sources', id: this.dataSourceId.toString() }
+        }
+      }
+    }, {
+      type: 'content-types',
+      id: 'tracked-ethereum-addresses',
+      relationships: {
+        fields: {
+          data: [
+            { type: "computed-fields", id: "address-source" },
+          ]
+        },
+        'data-source': {
+          data: { type: 'data-sources', id: this.dataSourceId.toString() }
+        }
+      }
+    }, {
+      type: 'content-types',
+      id: 'user-ethereum-addresses',
+      relationships: {
+        fields: {
+          data: [
+            { type: "fields", id: "address-user" },
+            { type: "fields", id: "ethereum-address" },
+            { type: "computed-fields", id: "tracked-user-address" }
+          ]
+        },
+        'data-source': {
+          data: { type: 'data-sources', id: this.dataSourceId.toString() }
+        }
+      }
+    }, {
+      // TODO: think about how we want to expose the grant to create new
+      // tracked ethereum addresses. Perhaps we can push that upstream, so
+      // that cards that want to track ethereum addresses can use their own
+      // "wallet" content types to relate users to addresses, and then programmatically
+      // create tracked-ethereum-addresses using the Session.INTERNAL_PRIVILEGED
+      // to create tracked-ethereum-addresses in their writers. That way we keep
+      // session concerns outside of this plugin.
+      type: 'grants',
+      id: 'ethereum-address-indexing-grant',
+      attributes: {
+        'may-read-fields': true,
+        'may-read-resource': true,
+      },
+      relationships: {
+        who: {
+          data: [{ type: 'groups', id: 'everyone' }]
+        },
+        types: {
+          "data": [
+            { type: "content-types", id: 'tracked-ethereum-addresses' }, // Should we leave it up to cards that use this plugin to determine this type's visibility?
+            { type: "content-types", id: 'proxied-tracked-ethereum-addresses' },
+            { type: "content-types", id: 'ethereum-addresses' },
+            { type: "content-types", id: 'ethereum-transactions' }
+          ]
+        }
+      }
+    }];
 
-    contractFields.forEach(field => {
-      contractSchema.relationships.fields.data.push({
-        type: "fields", id: field.id
+    let schema = [].concat(defaultFields);
+    if (this.contract) {
+      let contractName = this.dataSourceId;
+      let abi = this.contract["abi"];
+      let { contractFields, schemaItems } = this._getSchemaFromAbi(contractName, abi);
+
+      schema = schema.concat(schemaItems)
+        .concat(contractFields);
+
+      let contractSchema = {
+        type: 'content-types',
+        id: pluralize(contractName),
+        relationships: {
+          fields: {
+            data: [
+              { type: "fields", id: "ethereum-address" },
+              { type: "fields", id: "balance-wei" }
+            ]
+          },
+          'data-source': {
+            data: { type: 'data-sources', id: this.dataSourceId.toString() }
+          }
+        }
+      };
+
+      contractFields.forEach(field => {
+        contractSchema.relationships.fields.data.push({
+          type: "fields", id: field.id
+        });
       });
-    });
 
-    schema.push(this._openGrantForContentType(contractName));
-    schema.push(contractSchema);
+      schema.push(this._openGrantForContentType(contractName));
+      schema.push(contractSchema);
+      log.debug(`Created schema for contract ${contractName}: \n ${JSON.stringify(schema, null, 2)}`);
+
+    } else if (get(this, 'addressIndexing.trackedAddressDataSource')) {
+      // We use this "proxy content-type" approach so that we can introduce a shim in the writer
+      // that will allow us to kick off indexing for ethereum addresses when we see a
+      // tracked-ethereum-address resource is created/deleted. This allows the ethereum plugin to leverage
+      // its own backing cardstack data source (git, ephemeral, etc) to persist the tracked-ethereum-address resources.
+      // The proxed-tracked-ethereum-addresses content type, in this case, is an implementation detail that
+      // is not part of the public API for cards that use this plugin. I wonder after query-based
+      // relationships are available, we might be able to refactor this, so we don't need to use this approach?
+      // The challenge here is to coordinate bewtween two different data sources, so that we can properly trigger
+      // address indexing in the ethereum data source.
+      schema = schema.concat([{
+      }, {
+        type: 'content-types',
+        id: 'proxied-tracked-ethereum-addresses',
+        relationships: {
+          'data-source': {
+            data: { type: 'data-sources', id: this.addressIndexing.trackedAddressDataSource }
+          }
+        }
+      }, {
+        type: 'content-types',
+        id: 'proxied-user-ethereum-addresses',
+        relationships: {
+          fields: {
+            data: [
+              { type: "fields", id: "address-user" },
+              { type: "fields", id: "ethereum-address" },
+            ]
+          },
+          'data-source': {
+            data: { type: 'data-sources', id: this.addressIndexing.trackedAddressDataSource }
+          }
+        }
+      }]);
+    }
 
     this._schema = schema.map(doc => this._maybePatch(doc));
-
-    log.debug(`Created schema for contract ${contractName}: \n ${JSON.stringify(this.schema, null, 2)}`);
 
     return this._schema;
   }
 
   async updateContent(meta, hints, ops) {
     let schema = await this.schema();
-    let isSchemaUnchanged;
+    let isSchemaUnchanged, blockHeight, indexedAddressesBlockHeights = {};
     let lastBlockHeight = get(meta, 'lastBlockHeight');
+    let lastAddressesBlockHeight = get(meta, 'lastIndexedAddressesBlockHeight');
 
     if (meta) {
       let { lastSchema } = meta;
@@ -183,18 +443,27 @@ class Updater {
       await ops.finishReplaceAll();
     }
 
-    let shouldSkip = await this.eventIndexer.shouldSkipIndexing(this.dataSourceId, defaultBranch);
-    let blockHeight = lastBlockHeight;
-    if (!shouldSkip) {
-      let eventBlockHeight = await this.eventIndexer.getBlockHeight();
-      if (!blockHeight || blockHeight < eventBlockHeight) {
-        blockHeight = eventBlockHeight;
-      }
+    if (this.contract) {
+      let shouldSkip = await this.eventIndexer.shouldSkipIndexing(this.dataSourceId, defaultBranch);
+      blockHeight = lastBlockHeight;
+      if (!shouldSkip) {
+        let eventBlockHeight = await this.eventIndexer.getBlockHeight();
+        if (!blockHeight || blockHeight < eventBlockHeight) {
+          blockHeight = eventBlockHeight;
+        }
 
-      await this.eventIndexer.index(this.dataSourceId, lastBlockHeight);
+        await this.eventIndexer.index(this.dataSourceId, lastBlockHeight);
+      }
+    }
+
+    if (this.addressIndexing) {
+      indexedAddressesBlockHeights = await this.transactionIndexer.index({
+        lastIndexedBlockHeight: lastAddressesBlockHeight
+      });
     }
 
     return {
+      lastIndexedAddressesBlockHeights: indexedAddressesBlockHeights,
       lastBlockHeight: blockHeight,
       lastSchema: schema
     };
@@ -213,7 +482,7 @@ class Updater {
 
   _namedFieldFor(fieldName, type) {
     let fieldType;
-    switch(type) {
+    switch (type) {
       // Using strings to represent uint256, as the max int
       // int in js is 2^53, vs 2^256 in solidity
       case 'boolean':

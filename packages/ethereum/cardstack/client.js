@@ -19,7 +19,9 @@ module.exports = class EthereumClient {
   constructor() {
     this._provider = null;
     this._eventListeners = {};
+    this._newBlocksEventListener = null;
     this._hasStartedListening = {};
+    this._hasStartedListeningForNewBlocks = false;
     this._hasConnected = false;
     this._contractDefinitions = {};
     this._jsonRpcUrl = null;
@@ -63,7 +65,7 @@ module.exports = class EthereumClient {
     this.connect(this._jsonRpcUrl);
 
     for (let name of Object.keys(this._contractDefinitions)) {
-      await this.start({
+      await this.startEventListening({
         name,
         contract: this._contractDefinitions[name],
       });
@@ -77,7 +79,10 @@ module.exports = class EthereumClient {
     for (let name of Object.keys(this._eventListeners)) {
       await this.stop(name);
     }
+
+    await this.stopListeningForNewBlocks();
   }
+
   async stop(name) {
     log.info("stopping event listening for contract " + name);
 
@@ -86,6 +91,16 @@ module.exports = class EthereumClient {
     this._eventListeners[name].unsubscribe();
     this._eventListeners[name] = null;
     this._hasStartedListening[name] = false;
+  }
+
+  async stopListeningForNewBlocks() {
+    log.info("stopping event listening for new blocks");
+
+    if (!this._newBlocksEventListener) { return; }
+
+    this._newBlocksEventListener.unsubscribe();
+    this._newBlocksEventListener = null;
+    this._hasStartedListeningForNewBlocks = false;
   }
 
   async getBlockHeight() {
@@ -101,7 +116,72 @@ module.exports = class EthereumClient {
     return result;
   }
 
-  async start({ name, contract, eventIndexer }) {
+  async getBlock(blockHeight) {
+    await this._reconnectPromise;
+
+    let result;
+    try {
+      result = await this._provider.eth.getBlock(blockHeight, true);
+    } catch (err) {
+      log.error(`Encountered error trying to get block: ${err}`);
+      await this._reconnect();
+    }
+    return result;
+  }
+
+  async getSentTransactionCount(address, blockHeight) {
+    await this._reconnectPromise;
+
+    let count;
+    try {
+      count = await this._provider.eth.getTransactionCount(address, blockHeight);
+    } catch (err) {
+      log.error(`Encountered error trying to get transaction count: ${err}`);
+      await this._reconnect();
+    }
+    return count;
+  }
+
+  async getBalance(address, blockHeight) {
+    await this._reconnectPromise;
+
+    let balance;
+    try {
+      balance = await this._provider.eth.getBalance(address, blockHeight);
+    } catch (err) {
+      log.error(`Encountered error trying to get balance: ${err}`);
+      await this._reconnect();
+    }
+    return balance;
+  }
+
+  async startNewBlockListening(transactionIndexer) {
+    if (this._hasStartedListeningForNewBlocks) { return; }
+
+    await this.stopListeningForNewBlocks();
+    this._hasStartedListeningForNewBlocks = true;
+
+    log.info(`starting listeners for new blocks`);
+    this._newBlocksEventListener = this._provider.eth.subscribe('newBlockHeaders', async (error, event) => {
+      if (error) {
+        log.error(`error received listening for new blocks`);
+        if (error.type === 'close') {
+          await this._reconnect();
+        }
+      } else {
+        log.debug(`Received new block header event: ${JSON.stringify(event, null, 2)}`);
+
+        let blockNumber = event.number;
+        if (transactionIndexer) {
+          // Note that this is an async function call, but that the web3 event handler doesnt support awaiting async function invocations.
+          // Make sure to await the transactionIndexer's indexing promise when testing so that async is not leaked.
+          transactionIndexer.index({ onlyBlockNumber: blockNumber });
+        }
+      }
+    });
+  }
+
+  async startEventListening({ name, contract, eventIndexer }) {
     if (this._hasStartedListening[name]) { return; }
 
     await this.stop(name);
