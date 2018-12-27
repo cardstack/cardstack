@@ -35,28 +35,28 @@ class BindTransform {
   transform(ast) {
     if (/\btemplates\/components\/cardstack\//.test(this.moduleName) ||
       /\btemplates\/(embedded|isolated).hbs/.test(this.moduleName)){
-      var b = this.syntax.builders;
-      var foundBlockParams = collectBlockParams(ast);
+      let b = this.syntax.builders;
+      let foundBlockParams = collectBlockParams(ast);
 
       this.syntax.traverse(ast, {
         ElementNode(node) {
-          var contentProperty,
+          let contentProperty,
             unusedBlockParam,
             foundDynamicContent = false,
             newAttributes = [];
 
-          var tag = node.tag;
-          for (var i=0; i < node.attributes.length; i++) {
-            var nodeAttributes = node.attributes[i];
-            var name = nodeAttributes.name;
-            var value = nodeAttributes.value;
+          let tag = node.tag;
+          for (let i=0; i < node.attributes.length; i++) {
+            let nodeAttributes = node.attributes[i];
+            let name = nodeAttributes.name;
+            let value = nodeAttributes.value;
             if (!value) {
               break;
             }
 
             if (value.type === 'MustacheStatement') {
-              var path = value.path;
-              var parts = path.parts;
+              let path = value.path;
+              let parts = path.parts;
               if (parts.length === 2 && parts[0] === 'content') {
                 foundDynamicContent = true;
                 // contentProperty is the property that is looked up on content
@@ -75,8 +75,8 @@ class BindTransform {
           }
 
           if (foundDynamicContent) {
-            var newTag = b.element(tag, newAttributes, []);
-            var blockWithParam = b.program([newTag], [unusedBlockParam]);
+            let newTag = b.element(tag, newAttributes, []);
+            let blockWithParam = b.program([newTag], [unusedBlockParam]);
             let block = b.block(b.path('cs-field'), [
               b.path("content"), b.string(contentProperty)
             ], b.hash(), blockWithParam);
@@ -98,9 +98,9 @@ class BindTransform {
 }
 
 function getUnusedBlockParam(foundNames) {
-  var foundName = false;
-  var i = 0;
-  var paramName;
+  let foundName = false;
+  let i = 0;
+  let paramName;
 
   do {
     i++;
@@ -120,9 +120,9 @@ function collectBlockParams(ast, foundBlockParams) {
     foundBlockParams = [];
   }
 
-  for (var i=0; i<ast.body.length; i++) {
-    var tree = ast.body[i];
-    var program = tree.program;
+  for (let i=0; i<ast.body.length; i++) {
+    let tree = ast.body[i];
+    let program = tree.program;
     if (program) {
       foundBlockParams = foundBlockParams.concat(program.blockParams);
       return collectBlockParams(program, foundBlockParams);
