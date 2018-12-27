@@ -7,6 +7,7 @@ const { promisify } = require('./helpers');
 
 const sendTransaction = promisify(web3.eth.sendTransaction);
 const getTransaction = promisify(web3.eth.getTransaction);
+const getTransactionReceipt = promisify(web3.eth.getTransactionReceipt);
 const getBalance = promisify(web3.eth.getBalance);
 const getBlock = promisify(web3.eth.getBlock);
 
@@ -45,7 +46,10 @@ async function getTransactionsFromLatestBlockAndEarlier() {
   return allTransactions;
 }
 
-function assertTxnResourceMatchesEthTxn(actualTxn, expectedTxn, block) {
+async function assertTxnResourceMatchesEthTxn(actualTxn, expectedTxn, block) {
+  let receipt = await getTransactionReceipt(expectedTxn.hash);
+  let expectedStatus = Boolean(parseInt(receipt.status, 16));
+
   expect(actualTxn).has.deep.property('attributes.block-number', expectedTxn.blockNumber);
   expect(actualTxn).has.deep.property('attributes.timestamp', block.timestamp);
   expect(actualTxn).has.deep.property('attributes.transaction-hash', expectedTxn.hash);
@@ -56,6 +60,9 @@ function assertTxnResourceMatchesEthTxn(actualTxn, expectedTxn, block) {
   expect(actualTxn).has.deep.property('attributes.gas', expectedTxn.gas);
   expect(actualTxn).has.deep.property('attributes.gas-price', expectedTxn.gasPrice.toString());
   expect(actualTxn).has.deep.property('attributes.transaction-data', expectedTxn.input);
+  expect(actualTxn).has.deep.property('attributes.transaction-successful', expectedStatus);
+  expect(actualTxn).has.deep.property('attributes.gas-used', receipt.gasUsed);
+  expect(actualTxn).has.deep.property('attributes.cumulative-gas-used', receipt.cumulativeGasUsed);
 }
 
 contract('Ethereum Addresses', function (accounts) {
@@ -124,12 +131,12 @@ contract('Ethereum Addresses', function (accounts) {
       expect(trackedAddress.relationships['address-source'].data).to.eql({ type: 'ethereum-addresses', id: from });
 
       let { data: transaction } = await searchers.getFromControllingBranch(env.session, 'ethereum-transactions', txn.hash);
-      assertTxnResourceMatchesEthTxn(transaction, txn, block);
+      await assertTxnResourceMatchesEthTxn(transaction, txn, block);
       expect(transaction.relationships['to-address'].data).to.eql({ type: 'ethereum-addresses', id: to });
       expect(transaction.relationships['from-address'].data).to.eql({ type: 'ethereum-addresses', id: from });
     });
 
-    it('can index address for reciept of ethers', async function () {
+    it('can index address for receipt of ethers', async function () {
       const value = web3.toWei(0.1, 'ether');
       let txnHash = await sendTransaction({ from, to, value, gasPrice });
       let txn = await getTransaction(txnHash);
@@ -151,7 +158,7 @@ contract('Ethereum Addresses', function (accounts) {
       expect(trackedAddress.relationships['address-source'].data).to.eql({ type: 'ethereum-addresses', id: to });
 
       let { data: transaction } = await searchers.getFromControllingBranch(env.session, 'ethereum-transactions', txn.hash);
-      assertTxnResourceMatchesEthTxn(transaction, txn, block);
+      await assertTxnResourceMatchesEthTxn(transaction, txn, block);
       expect(transaction.relationships['to-address'].data).to.eql({ type: 'ethereum-addresses', id: to });
       expect(transaction.relationships['from-address'].data).to.eql({ type: 'ethereum-addresses', id: from });
     });
@@ -243,17 +250,17 @@ contract('Ethereum Addresses', function (accounts) {
       ]);
 
       let { data: transaction1 } = await searchers.getFromControllingBranch(env.session, 'ethereum-transactions', txn1.hash);
-      assertTxnResourceMatchesEthTxn(transaction1, txn1, block1);
+      await assertTxnResourceMatchesEthTxn(transaction1, txn1, block1);
       expect(transaction1.relationships['to-address'].data).to.eql({ type: 'ethereum-addresses', id: recipient });
       expect(transaction1.relationships['from-address'].data).to.eql({ type: 'ethereum-addresses', id: sender });
 
       let { data: transaction2 } = await searchers.getFromControllingBranch(env.session, 'ethereum-transactions', txn2.hash);
-      assertTxnResourceMatchesEthTxn(transaction2, txn2, block2);
+      await assertTxnResourceMatchesEthTxn(transaction2, txn2, block2);
       expect(transaction2.relationships['to-address'].data).to.eql({ type: 'ethereum-addresses', id: recipient });
       expect(transaction2.relationships['from-address'].data).to.eql({ type: 'ethereum-addresses', id: sender });
 
       let { data: transaction3 } = await searchers.getFromControllingBranch(env.session, 'ethereum-transactions', txn3.hash);
-      assertTxnResourceMatchesEthTxn(transaction3, txn3, block3);
+      await assertTxnResourceMatchesEthTxn(transaction3, txn3, block3);
       expect(transaction3.relationships['to-address'].data).to.eql({ type: 'ethereum-addresses', id: recipient });
       expect(transaction3.relationships['from-address'].data).to.eql({ type: 'ethereum-addresses', id: sender });
     });
@@ -295,17 +302,17 @@ contract('Ethereum Addresses', function (accounts) {
       ]);
 
       let { data: transaction1 } = await searchers.getFromControllingBranch(env.session, 'ethereum-transactions', txn1.hash);
-      assertTxnResourceMatchesEthTxn(transaction1, txn1, block1);
+      await assertTxnResourceMatchesEthTxn(transaction1, txn1, block1);
       expect(transaction1.relationships['to-address'].data).to.eql({ type: 'ethereum-addresses', id: recipient });
       expect(transaction1.relationships['from-address'].data).to.eql({ type: 'ethereum-addresses', id: sender });
 
       let { data: transaction2 } = await searchers.getFromControllingBranch(env.session, 'ethereum-transactions', txn2.hash);
-      assertTxnResourceMatchesEthTxn(transaction2, txn2, block2);
+      await assertTxnResourceMatchesEthTxn(transaction2, txn2, block2);
       expect(transaction2.relationships['to-address'].data).to.eql({ type: 'ethereum-addresses', id: recipient });
       expect(transaction2.relationships['from-address'].data).to.eql({ type: 'ethereum-addresses', id: sender });
 
       let { data: transaction3 } = await searchers.getFromControllingBranch(env.session, 'ethereum-transactions', txn3.hash);
-      assertTxnResourceMatchesEthTxn(transaction3, txn3, block3);
+      await assertTxnResourceMatchesEthTxn(transaction3, txn3, block3);
       expect(transaction3.relationships['to-address'].data).to.eql({ type: 'ethereum-addresses', id: recipient });
       expect(transaction3.relationships['from-address'].data).to.eql({ type: 'ethereum-addresses', id: sender });
     });
@@ -347,17 +354,17 @@ contract('Ethereum Addresses', function (accounts) {
       ]);
 
       let { data: transaction1 } = await searchers.getFromControllingBranch(env.session, 'ethereum-transactions', txn1.hash);
-      assertTxnResourceMatchesEthTxn(transaction1, txn1, block1);
+      await assertTxnResourceMatchesEthTxn(transaction1, txn1, block1);
       expect(transaction1.relationships['to-address'].data).to.eql({ type: 'ethereum-addresses', id: addressY });
       expect(transaction1.relationships['from-address'].data).to.eql({ type: 'ethereum-addresses', id: addressX });
 
       let { data: transaction2 } = await searchers.getFromControllingBranch(env.session, 'ethereum-transactions', txn2.hash);
-      assertTxnResourceMatchesEthTxn(transaction2, txn2, block2);
+      await assertTxnResourceMatchesEthTxn(transaction2, txn2, block2);
       expect(transaction2.relationships['to-address'].data).to.eql({ type: 'ethereum-addresses', id: addressX });
       expect(transaction2.relationships['from-address'].data).to.eql({ type: 'ethereum-addresses', id: addressY });
 
       let { data: transaction3 } = await searchers.getFromControllingBranch(env.session, 'ethereum-transactions', txn3.hash);
-      assertTxnResourceMatchesEthTxn(transaction3, txn3, block3);
+      await assertTxnResourceMatchesEthTxn(transaction3, txn3, block3);
       expect(transaction3.relationships['to-address'].data).to.eql({ type: 'ethereum-addresses', id: addressY });
       expect(transaction3.relationships['from-address'].data).to.eql({ type: 'ethereum-addresses', id: addressX });
     });
@@ -436,7 +443,7 @@ contract('Ethereum Addresses', function (accounts) {
       expect(error.status).to.equal(404);
 
       let { data: transaction } = await searchers.getFromControllingBranch(env.session, 'ethereum-transactions', txn.hash);
-      assertTxnResourceMatchesEthTxn(transaction, txn, block);
+      await assertTxnResourceMatchesEthTxn(transaction, txn, block);
       expect(transaction.relationships['to-address'].data).to.eql({ type: 'ethereum-addresses', id: recipient });
       expect(transaction.relationships['from-address'].data).to.eql({ type: 'ethereum-addresses', id: sender });
     });
@@ -506,17 +513,17 @@ contract('Ethereum Addresses', function (accounts) {
       expect(recipient).has.deep.property('meta.version', txn3.nonce);
 
       let { data: transaction1 } = await searchers.getFromControllingBranch(env.session, 'ethereum-transactions', txn1.hash);
-      assertTxnResourceMatchesEthTxn(transaction1, txn1, block1);
+      await assertTxnResourceMatchesEthTxn(transaction1, txn1, block1);
       expect(transaction1.relationships['to-address'].data).to.eql({ type: 'ethereum-addresses', id: to });
       expect(transaction1.relationships['from-address'].data).to.eql({ type: 'ethereum-addresses', id: from });
 
       let { data: transaction2 } = await searchers.getFromControllingBranch(env.session, 'ethereum-transactions', txn2.hash);
-      assertTxnResourceMatchesEthTxn(transaction2, txn2, block2);
+      await assertTxnResourceMatchesEthTxn(transaction2, txn2, block2);
       expect(transaction2.relationships['to-address'].data).to.eql({ type: 'ethereum-addresses', id: to });
       expect(transaction2.relationships['from-address'].data).to.eql({ type: 'ethereum-addresses', id: from });
 
       let { data: transaction3 } = await searchers.getFromControllingBranch(env.session, 'ethereum-transactions', txn3.hash);
-      assertTxnResourceMatchesEthTxn(transaction3, txn3, block3);
+      await assertTxnResourceMatchesEthTxn(transaction3, txn3, block3);
       expect(transaction3.relationships['to-address'].data).to.eql({ type: 'ethereum-addresses', id: to });
       expect(transaction3.relationships['from-address'].data).to.eql({ type: 'ethereum-addresses', id: from });
 
@@ -564,7 +571,7 @@ contract('Ethereum Addresses', function (accounts) {
       expect(recipientUpdated).has.deep.property('meta.version', txn4.nonce);
 
       let { data: transaction4 } = await searchers.getFromControllingBranch(env.session, 'ethereum-transactions', txn4.hash);
-      assertTxnResourceMatchesEthTxn(transaction4, txn4, block4);
+      await assertTxnResourceMatchesEthTxn(transaction4, txn4, block4);
       expect(transaction4.relationships['to-address'].data).to.eql({ type: 'ethereum-addresses', id: to });
       expect(transaction4.relationships['from-address'].data).to.eql({ type: 'ethereum-addresses', id: from });
     });
@@ -624,17 +631,17 @@ contract('Ethereum Addresses', function (accounts) {
       expect(recipient).has.deep.property('meta.version', txn3.nonce);
 
       let { data: transaction1 } = await searchers.getFromControllingBranch(env.session, 'ethereum-transactions', txn1.hash);
-      assertTxnResourceMatchesEthTxn(transaction1, txn1, block1);
+      await assertTxnResourceMatchesEthTxn(transaction1, txn1, block1);
       expect(transaction1.relationships['to-address'].data).to.eql({ type: 'ethereum-addresses', id: to });
       expect(transaction1.relationships['from-address'].data).to.eql({ type: 'ethereum-addresses', id: from });
 
       let { data: transaction2 } = await searchers.getFromControllingBranch(env.session, 'ethereum-transactions', txn2.hash);
-      assertTxnResourceMatchesEthTxn(transaction2, txn2, block2);
+      await assertTxnResourceMatchesEthTxn(transaction2, txn2, block2);
       expect(transaction2.relationships['to-address'].data).to.eql({ type: 'ethereum-addresses', id: to });
       expect(transaction2.relationships['from-address'].data).to.eql({ type: 'ethereum-addresses', id: from });
 
       let { data: transaction3 } = await searchers.getFromControllingBranch(env.session, 'ethereum-transactions', txn3.hash);
-      assertTxnResourceMatchesEthTxn(transaction3, txn3, block3);
+      await assertTxnResourceMatchesEthTxn(transaction3, txn3, block3);
       expect(transaction3.relationships['to-address'].data).to.eql({ type: 'ethereum-addresses', id: to });
       expect(transaction3.relationships['from-address'].data).to.eql({ type: 'ethereum-addresses', id: from });
 
@@ -662,7 +669,7 @@ contract('Ethereum Addresses', function (accounts) {
       expect(trackedAddress.relationships['address-source'].data).to.eql({ type: 'ethereum-addresses', id: from });
 
       let { data: transaction } = await searchers.getFromControllingBranch(env.session, 'ethereum-transactions', txn.hash);
-      assertTxnResourceMatchesEthTxn(transaction, txn, block);
+      await assertTxnResourceMatchesEthTxn(transaction, txn, block);
       expect(transaction.relationships['to-address'].data).to.eql({ type: 'ethereum-addresses', id: from });
       expect(transaction.relationships['from-address'].data).to.eql({ type: 'ethereum-addresses', id: from });
     });
@@ -693,7 +700,7 @@ contract('Ethereum Addresses', function (accounts) {
       ]);
 
       let { data: transaction } = await searchers.getFromControllingBranch(env.session, 'ethereum-transactions', txn.hash);
-      assertTxnResourceMatchesEthTxn(transaction, txn, block);
+      await assertTxnResourceMatchesEthTxn(transaction, txn, block);
       expect(transaction.relationships['to-address'].data).to.eql({ type: 'ethereum-addresses', id: sender });
       expect(transaction.relationships['from-address'].data).to.eql({ type: 'ethereum-addresses', id: sender });
     });
@@ -748,6 +755,5 @@ contract('Ethereum Addresses', function (accounts) {
       expect(senderDoc).has.deep.property('meta.blockHeight', block2.number);
       expect(senderDoc).has.deep.property('meta.version', txn2.nonce);
     });
-
   });
 });

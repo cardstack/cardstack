@@ -192,6 +192,24 @@ class Updater {
       }
     }, {
       type: "fields",
+      id: "transaction-successful",
+      attributes: {
+        "field-type": "@cardstack/core-types::boolean"
+      }
+    }, {
+      type: "fields",
+      id: "gas-used",
+      attributes: {
+        "field-type": "@cardstack/core-types::integer"
+      }
+    }, {
+      type: "fields",
+      id: "cumulative-gas-used",
+      attributes: {
+        "field-type": "@cardstack/core-types::integer"
+      }
+    }, {
+      type: "fields",
       id: "to-address",
       attributes: {
         "field-type": "@cardstack/core-types::belongs-to"
@@ -269,6 +287,9 @@ class Updater {
             { type: "fields", id: "gas-price" },
             { type: "fields", id: "transaction-data" },
             { type: "fields", id: "transaction-data" },
+            { type: "fields", id: "transaction-successful" },
+            { type: "fields", id: "gas-used" },
+            { type: "fields", id: "cumulative-gas-used" },
           ]
         },
         'data-source': {

@@ -217,22 +217,24 @@ class TransactionIndexer {
       let addressesToIndex = intersection(addressesEligibleForIndexing, [transaction.from.toLowerCase(), (transaction.to || '').toLowerCase()]);
       if (!addressesToIndex.length) { continue; }
 
+      let isSuccessfulTxn;
       try {
         await this.searchers.getFromControllingBranch(Session.INTERNAL_PRIVILEGED, 'ethereum-transactions', transaction.hash);
       } catch (e) {
         if (e.status === 404) {
           log.trace(`index of ethereum transactions found transaction to index at block ${blockNumber}, ${JSON.stringify(transaction, null, 2)}`);
-          await this._indexTransactionResource(batch, block, transaction);
+          let resource = await this._indexTransactionResource(batch, block, transaction);
+          isSuccessfulTxn = resource && get(resource, 'attributes.transaction-successful');
         } else { throw e; }
       }
 
       for (let address of addressesToIndex) {
         discoveredTransactions[address] = discoveredTransactions[address] || [];
-        addressesNonces[address] = Math.max(addressesNonces[address] || 0, transaction.nonce);
         discoveredTransactions[address].unshift(transaction.hash);
+        addressesNonces[address] = Math.max(addressesNonces[address] || 0, transaction.nonce);
       }
 
-      if (newAddresses.includes(transaction.from.toLowerCase())) {
+      if (isSuccessfulTxn && newAddresses.includes(transaction.from.toLowerCase())) {
         if (transaction.to &&
           transaction.value !== '0' &&
           transaction.from.toLowerCase() !== transaction.to.toLowerCase()) {
@@ -242,7 +244,7 @@ class TransactionIndexer {
         newAddressesInfo[transaction.from.toLowerCase()].numSentTxns--;
       }
 
-      if (transaction.to && newAddresses.includes(transaction.to.toLowerCase())) {
+      if (isSuccessfulTxn && transaction.to && newAddresses.includes(transaction.to.toLowerCase())) {
         if (transaction.from.toLowerCase() !== transaction.to.toLowerCase()) {
           let balance = newAddressesInfo[transaction.to.toLowerCase()].balance;
           newAddressesInfo[transaction.to.toLowerCase()].balance = balance.sub(new BN(transaction.value));
@@ -304,6 +306,12 @@ class TransactionIndexer {
   async _indexTransactionResource(batch, block, rawTransaction) {
     if (!rawTransaction) { return; }
 
+    let receipt = await this.ethereumClient.getTransactionReceipt(rawTransaction.hash);
+    if (!receipt) {
+      throw new Error(`No transaction reciept exists for txn hash ${rawTransaction.hash}`);
+    }
+    let status = typeof receipt.status === 'boolean' ? receipt.status : Boolean(parseInt(receipt.status, 16));
+
     let resource = {
       id: rawTransaction.hash,
       type: 'ethereum-transactions',
@@ -315,6 +323,9 @@ class TransactionIndexer {
         'transaction-nonce': rawTransaction.nonce,
         'transaction-index': rawTransaction.transactionIndex,
         'transaction-value': rawTransaction.value,
+        'transaction-successful': status,
+        'gas-used': receipt.gasUsed,
+        'cumulative-gas-used': receipt.cumulativeGasUsed,
         'gas': rawTransaction.gas,
         'gas-price': rawTransaction.gasPrice,
         'transaction-data': rawTransaction.input
@@ -329,6 +340,7 @@ class TransactionIndexer {
     }
 
     await this._indexResource(batch, resource);
+    return resource;
   }
 
   async _prepopulateAddressResource(batch, address, blockHeight) {

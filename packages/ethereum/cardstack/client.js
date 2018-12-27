@@ -123,7 +123,20 @@ module.exports = class EthereumClient {
     try {
       result = await this._provider.eth.getBlock(blockHeight, true);
     } catch (err) {
-      log.error(`Encountered error trying to get block: ${err}`);
+      log.error(`Encountered error trying to get block #${blockHeight}: ${err}`);
+      await this._reconnect();
+    }
+    return result;
+  }
+
+  async getTransactionReceipt(txnHash) {
+    await this._reconnectPromise;
+
+    let result;
+    try {
+      result = await this._provider.eth.getTransactionReceipt(txnHash);
+    } catch (err) {
+      log.error(`Encountered error trying to get transactionReciept for txn ${txnHash}: ${err}`);
       await this._reconnect();
     }
     return result;
@@ -136,7 +149,7 @@ module.exports = class EthereumClient {
     try {
       count = await this._provider.eth.getTransactionCount(address, blockHeight);
     } catch (err) {
-      log.error(`Encountered error trying to get transaction count: ${err}`);
+      log.error(`Encountered error trying to get transaction count for address ${address}: ${err}`);
       await this._reconnect();
     }
     return count;
@@ -149,7 +162,7 @@ module.exports = class EthereumClient {
     try {
       balance = await this._provider.eth.getBalance(address, blockHeight);
     } catch (err) {
-      log.error(`Encountered error trying to get balance: ${err}`);
+      log.error(`Encountered error trying to get balance for address ${address}: ${err}`);
       await this._reconnect();
     }
     return balance;
