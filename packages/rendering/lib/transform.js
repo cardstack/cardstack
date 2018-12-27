@@ -26,74 +26,76 @@
 
 */
 
-function BindTransform({ moduleName }) {
-  this.moduleName = moduleName;
-  this.syntax = null;
-}
+class BindTransform {
+  constructor({ moduleName }) {
+    this.moduleName = moduleName;
+    this.syntax = null;
+  }
 
-BindTransform.prototype.transform = function(ast) {
-  if (/\btemplates\/components\/cardstack\//.test(this.moduleName) ||
+  transform(ast) {
+    if (/\btemplates\/components\/cardstack\//.test(this.moduleName) ||
       /\btemplates\/(embedded|isolated).hbs/.test(this.moduleName)){
-    var b = this.syntax.builders;
-    var foundBlockParams = collectBlockParams(ast);
+      var b = this.syntax.builders;
+      var foundBlockParams = collectBlockParams(ast);
 
-    this.syntax.traverse(ast, {
-      ElementNode(node) {
-        var contentProperty,
+      this.syntax.traverse(ast, {
+        ElementNode(node) {
+          var contentProperty,
             unusedBlockParam,
             foundDynamicContent = false,
             newAttributes = [];
 
-        var tag = node.tag;
-        for (var i=0; i < node.attributes.length; i++) {
-          var nodeAttributes = node.attributes[i];
-          var name = nodeAttributes.name;
-          var value = nodeAttributes.value;
-          if (!value) {
-            break;
-          }
-
-          if (value.type === 'MustacheStatement') {
-            var path = value.path;
-            var parts = path.parts;
-            if (parts.length === 2 && parts[0] === 'content') {
-              foundDynamicContent = true;
-              // contentProperty is the property that is looked up on content
-              // (e.g `imageUrl` in the case of `content.imageUrl`)
-              unusedBlockParam = getUnusedBlockParam(foundBlockParams);
-              contentProperty = parts[1];
-              newAttributes.push(b.attr(name, b.mustache(b.path(unusedBlockParam))));
-            } else {
-              newAttributes.push(b.attr(name, value));
+          var tag = node.tag;
+          for (var i=0; i < node.attributes.length; i++) {
+            var nodeAttributes = node.attributes[i];
+            var name = nodeAttributes.name;
+            var value = nodeAttributes.value;
+            if (!value) {
+              break;
             }
-          } else if (nodeAttributes.type === 'AttrNode') {
-            newAttributes.push(b.attr(name, value));
-          } else if (nodeAttributes.type === 'TextNode') {
-            newAttributes.push(b.attr(name, value.chars));
+
+            if (value.type === 'MustacheStatement') {
+              var path = value.path;
+              var parts = path.parts;
+              if (parts.length === 2 && parts[0] === 'content') {
+                foundDynamicContent = true;
+                // contentProperty is the property that is looked up on content
+                // (e.g `imageUrl` in the case of `content.imageUrl`)
+                unusedBlockParam = getUnusedBlockParam(foundBlockParams);
+                contentProperty = parts[1];
+                newAttributes.push(b.attr(name, b.mustache(b.path(unusedBlockParam))));
+              } else {
+                newAttributes.push(b.attr(name, value));
+              }
+            } else if (nodeAttributes.type === 'AttrNode') {
+              newAttributes.push(b.attr(name, value));
+            } else if (nodeAttributes.type === 'TextNode') {
+              newAttributes.push(b.attr(name, value.chars));
+            }
+          }
+
+          if (foundDynamicContent) {
+            var newTag = b.element(tag, newAttributes, []);
+            var blockWithParam = b.program([newTag], [unusedBlockParam]);
+            let block = b.block(b.path('cs-field'), [
+              b.path("content"), b.string(contentProperty)
+            ], b.hash(), blockWithParam);
+            return block;
+          }
+
+          return node;
+        },
+
+        MustacheStatement(node) {
+          if (node.path.parts.length === 2 && node.path.parts[0] === 'content') {
+            return b.mustache(b.path("cs-field"), [b.path("content"), b.string(node.path.parts[1])]);
           }
         }
-
-        if (foundDynamicContent) {
-          var newTag = b.element(tag, newAttributes, []);
-          var blockWithParam = b.program([newTag], [unusedBlockParam]);
-          let block = b.block(b.path('cs-field'), [
-            b.path("content"), b.string(contentProperty)
-          ], b.hash(), blockWithParam);
-          return block;
-        }
-
-        return node;
-      },
-
-      MustacheStatement(node) {
-        if (node.path.parts.length === 2 && node.path.parts[0] === 'content') {
-          return b.mustache(b.path("cs-field"), [b.path("content"), b.string(node.path.parts[1])]);
-        }
-      }
-    });
+      });
+    }
+    return ast;
   }
-  return ast;
-};
+}
 
 function getUnusedBlockParam(foundNames) {
   var foundName = false;
