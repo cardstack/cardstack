@@ -39,7 +39,7 @@ class BindTransform {
     }
 
     let b = this.syntax.builders;
-    let foundBlockParams = this._collectBlockParams(ast);
+    let blockParams = new BlockParamTracker(ast, this.syntax);
 
     this.syntax.traverse(ast, {
       ElementNode(node) {
@@ -64,7 +64,7 @@ class BindTransform {
               foundDynamicContent = true;
               // contentProperty is the property that is looked up on content
               // (e.g `imageUrl` in the case of `content.imageUrl`)
-              unusedBlockParam = getUnusedBlockParam(foundBlockParams);
+              unusedBlockParam = blockParams.getUnusedBlockParam();
               contentProperty = parts[1];
               newAttributes.push(b.attr(name, b.mustache(b.path(unusedBlockParam))));
             } else {
@@ -98,25 +98,34 @@ class BindTransform {
 
     return ast;
   }
-
-  _collectBlockParams(ast) {
-    let blockParams = [];
-
-    this.syntax.traverse(ast, {
-      Program(node) {
-        blockParams.push(...node.blockParams);
-      }
-    });
-
-    return blockParams;
-  }
 }
 
-function getUnusedBlockParam(foundNames) {
-  for (let i = 1;; i++) {
-    let paramName = 'param' + i;
-    if (!foundNames.includes(paramName)) {
-      return paramName;
+/**
+ * Keeps track of all block params in a template and provides unused names
+ * for new `Program` nodes.
+ */
+class BlockParamTracker {
+  constructor(ast, syntax) {
+    this.i = 1;
+    this.syntax = syntax;
+    this.blockParams = [];
+    this._collectBlockParams(ast);
+  }
+
+  _collectBlockParams(ast) {
+    this.syntax.traverse(ast, {
+      Program: (node) => {
+        this.blockParams.push(...node.blockParams);
+      }
+    });
+  }
+
+  getUnusedBlockParam() {
+    for (;; this.i++) {
+      let paramName = 'param' + this.i;
+      if (!this.blockParams.includes(paramName)) {
+        return paramName;
+      }
     }
   }
 }
