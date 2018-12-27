@@ -118,6 +118,7 @@ contract('Ethereum Addresses', function (accounts) {
       expect(sender.relationships['tracked-address'].data).to.eql({ type: 'tracked-ethereum-addresses', id: from });
       expect(sender).to.not.have.deep.property('meta.loadingTransactions');
       expect(sender).has.deep.property('meta.blockHeight', block.number);
+      expect(sender).has.deep.property('meta.version', txn.nonce);
 
       let { data: trackedAddress } = await searchers.getFromControllingBranch(env.session, 'tracked-ethereum-addresses', from);
       expect(trackedAddress.relationships['address-source'].data).to.eql({ type: 'ethereum-addresses', id: from });
@@ -144,6 +145,7 @@ contract('Ethereum Addresses', function (accounts) {
       expect(recipient.relationships['tracked-address'].data).to.eql({ type: 'tracked-ethereum-addresses', id: to });
       expect(recipient).to.not.have.deep.property('meta.loadingTransactions');
       expect(recipient).has.deep.property('meta.blockHeight', block.number);
+      expect(recipient).has.deep.property('meta.version', txn.nonce);
 
       let { data: trackedAddress } = await searchers.getFromControllingBranch(env.session, 'tracked-ethereum-addresses', to);
       expect(trackedAddress.relationships['address-source'].data).to.eql({ type: 'ethereum-addresses', id: to });
@@ -176,6 +178,7 @@ contract('Ethereum Addresses', function (accounts) {
       ]);
       expect(sender).to.not.have.deep.property('meta.loadingTransactions');
       expect(sender).has.deep.property('meta.blockHeight', block.number);
+      expect(sender).has.deep.property('meta.version', txn3.nonce);
     });
 
     it('can represent multiple transactions for a recipient`s address', async function () {
@@ -200,6 +203,7 @@ contract('Ethereum Addresses', function (accounts) {
       ]);
       expect(recipient).to.not.have.deep.property('meta.loadingTransactions');
       expect(recipient).has.deep.property('meta.blockHeight', block.number);
+      expect(recipient).has.deep.property('meta.version', txn3.nonce);
     });
 
     it('can index past transactions for an address that has sent ethers', async function () {
@@ -231,6 +235,7 @@ contract('Ethereum Addresses', function (accounts) {
       expect(senderDoc).has.deep.property('attributes.balance', senderBalance.toString());
       expect(senderDoc).to.not.have.deep.property('meta.loadingTransactions');
       expect(senderDoc).has.deep.property('meta.blockHeight', block3.number);
+      expect(senderDoc).has.deep.property('meta.version', txn3.nonce);
       expect(txnsForCurrentTest(senderDoc.relationships.transactions.data)).to.eql([
         { type: 'ethereum-transactions', id: txn1.hash },
         { type: 'ethereum-transactions', id: txn2.hash },
@@ -282,6 +287,7 @@ contract('Ethereum Addresses', function (accounts) {
       expect(recipientDoc).has.deep.property('attributes.balance', recipientBalance.toString());
       expect(recipientDoc).to.not.have.deep.property('meta.loadingTransactions');
       expect(recipientDoc).has.deep.property('meta.blockHeight', block3.number);
+      expect(recipientDoc).has.deep.property('meta.version', txn3.nonce);
       expect(txnsForCurrentTest(recipientDoc.relationships.transactions.data)).to.eql([
         { type: 'ethereum-transactions', id: txn1.hash },
         { type: 'ethereum-transactions', id: txn2.hash },
@@ -333,6 +339,7 @@ contract('Ethereum Addresses', function (accounts) {
       expect(recipientDoc).has.deep.property('attributes.balance', balance.toString());
       expect(recipientDoc).to.not.have.deep.property('meta.loadingTransactions');
       expect(recipientDoc).has.deep.property('meta.blockHeight', block3.number);
+      expect(recipientDoc).has.deep.property('meta.version', txn3.nonce);
       expect(txnsForCurrentTest(recipientDoc.relationships.transactions.data)).to.eql([
         { type: 'ethereum-transactions', id: txn1.hash },
         { type: 'ethereum-transactions', id: txn2.hash },
@@ -485,6 +492,7 @@ contract('Ethereum Addresses', function (accounts) {
       ]);
       expect(sender).to.not.have.deep.property('meta.loadingTransactions');
       expect(sender).has.deep.property('meta.blockHeight', block3.number);
+      expect(sender).has.deep.property('meta.version', txn3.nonce);
 
       let { data: recipient } = await searchers.getFromControllingBranch(env.session, 'ethereum-addresses', to);
       expect(recipient).has.deep.property('attributes.balance', recipientBalance.toString());
@@ -495,6 +503,7 @@ contract('Ethereum Addresses', function (accounts) {
       ]);
       expect(recipient).to.not.have.deep.property('meta.loadingTransactions');
       expect(recipient).has.deep.property('meta.blockHeight', block3.number);
+      expect(recipient).has.deep.property('meta.version', txn3.nonce);
 
       let { data: transaction1 } = await searchers.getFromControllingBranch(env.session, 'ethereum-transactions', txn1.hash);
       assertTxnResourceMatchesEthTxn(transaction1, txn1, block1);
@@ -540,6 +549,7 @@ contract('Ethereum Addresses', function (accounts) {
       ]);
       expect(senderUpdated).to.not.have.deep.property('meta.loadingTransactions');
       expect(senderUpdated).has.deep.property('meta.blockHeight', block4.number);
+      expect(senderUpdated).has.deep.property('meta.version', txn4.nonce);
 
       let { data: recipientUpdated } = await searchers.getFromControllingBranch(env.session, 'ethereum-addresses', to);
       expect(recipientUpdated).has.deep.property('attributes.balance', recipientBalance.toString());
@@ -551,6 +561,7 @@ contract('Ethereum Addresses', function (accounts) {
       ]);
       expect(recipientUpdated).to.not.have.deep.property('meta.loadingTransactions');
       expect(recipientUpdated).has.deep.property('meta.blockHeight', block4.number);
+      expect(recipientUpdated).has.deep.property('meta.version', txn4.nonce);
 
       let { data: transaction4 } = await searchers.getFromControllingBranch(env.session, 'ethereum-transactions', txn4.hash);
       assertTxnResourceMatchesEthTxn(transaction4, txn4, block4);
@@ -558,7 +569,7 @@ contract('Ethereum Addresses', function (accounts) {
       expect(transaction4.relationships['from-address'].data).to.eql({ type: 'ethereum-addresses', id: from });
     });
 
-    it('can rebuild ethereum-addresses and ethereum-transaction records if the tracked address is not in the index', async function () {
+    it('can rebuild ethereum-addresses and ethereum-transaction records if the tracked addresses are not in the index', async function () {
       const pgclient = await env.lookup(`plugin-client:${require.resolve('@cardstack/pgsearch/client')}`);
       const value = web3.toWei(0.1, 'ether');
 
@@ -599,6 +610,7 @@ contract('Ethereum Addresses', function (accounts) {
       ]);
       expect(sender).to.not.have.deep.property('meta.loadingTransactions');
       expect(sender).has.deep.property('meta.blockHeight', block3.number);
+      expect(sender).has.deep.property('meta.version', txn3.nonce);
 
       let { data: recipient } = await searchers.getFromControllingBranch(env.session, 'ethereum-addresses', to);
       expect(recipient).has.deep.property('attributes.balance', recipientBalance.toString());
@@ -609,6 +621,7 @@ contract('Ethereum Addresses', function (accounts) {
       ]);
       expect(recipient).to.not.have.deep.property('meta.loadingTransactions');
       expect(recipient).has.deep.property('meta.blockHeight', block3.number);
+      expect(recipient).has.deep.property('meta.version', txn3.nonce);
 
       let { data: transaction1 } = await searchers.getFromControllingBranch(env.session, 'ethereum-transactions', txn1.hash);
       assertTxnResourceMatchesEthTxn(transaction1, txn1, block1);
@@ -643,6 +656,7 @@ contract('Ethereum Addresses', function (accounts) {
       expect(sender.relationships['tracked-address'].data).to.eql({ type: 'tracked-ethereum-addresses', id: from });
       expect(sender).to.not.have.deep.property('meta.loadingTransactions');
       expect(sender).has.deep.property('meta.blockHeight', block.number);
+      expect(sender).has.deep.property('meta.version', txn.nonce);
 
       let { data: trackedAddress } = await searchers.getFromControllingBranch(env.session, 'tracked-ethereum-addresses', from);
       expect(trackedAddress.relationships['address-source'].data).to.eql({ type: 'ethereum-addresses', id: from });
@@ -673,6 +687,7 @@ contract('Ethereum Addresses', function (accounts) {
       expect(senderDoc).has.deep.property('attributes.balance', senderBalance.toString());
       expect(senderDoc).to.not.have.deep.property('meta.loadingTransactions');
       expect(senderDoc).has.deep.property('meta.blockHeight', block.number);
+      expect(senderDoc).has.deep.property('meta.version', txn.nonce);
       expect(txnsForCurrentTest(senderDoc.relationships.transactions.data)).to.eql([
         { type: 'ethereum-transactions', id: txn.hash },
       ]);
@@ -682,5 +697,57 @@ contract('Ethereum Addresses', function (accounts) {
       expect(transaction.relationships['to-address'].data).to.eql({ type: 'ethereum-addresses', id: sender });
       expect(transaction.relationships['from-address'].data).to.eql({ type: 'ethereum-addresses', id: sender });
     });
+
+    it('can index a tracked address that has no transactions', async function() {
+      // need to manufacture a valid address that has not been funded by ganache
+      const trackedAddress = accounts[2].toLowerCase().substring(0, accounts[2].length - 4) + '0000';
+      let block = await getBlock('latest');
+
+      await createTrackedEthereumAddress(trackedAddress);
+
+      let { data: addressDoc } = await searchers.getFromControllingBranch(env.session, 'ethereum-addresses', trackedAddress);
+
+      expect(addressDoc).has.deep.property('attributes.ethereum-address', web3.toChecksumAddress(trackedAddress));
+      expect(addressDoc).has.deep.property('attributes.balance', '0');
+      expect(addressDoc).to.not.have.deep.property('meta.loadingTransactions');
+      expect(addressDoc).has.deep.property('meta.blockHeight', block.number);
+      expect(addressDoc).has.deep.property('meta.version', 0);
+      expect(addressDoc.relationships.transactions.data).to.eql([]);
+    });
+
+    // This asserts that the promise chaining in the TransactonIndexer.index() is chaining the index requests appropriately
+    it('can index a newly added tracked address that immediately appears in a mined block', async function() {
+      const value = web3.toWei(0.1, 'ether');
+      const sender = accounts[2].toLowerCase();
+      const recipient = accounts[3].toLowerCase();
+
+      let txnHash = await sendTransaction({ from: sender, to: recipient, value, gasPrice });
+      let txn1 = await getTransaction(txnHash);
+
+      await env.lookup('hub:writers').create('master', env.session, 'tracked-ethereum-addresses', {
+        data: { id: sender, type: 'tracked-ethereum-addresses' }
+      });
+      // intentionally not awaiting ethereum events while hub looks for txns to index
+      // and a new block mined event with an indexable txn will arrive while this occurs
+
+      txnHash = await sendTransaction({ from: sender, to: recipient, value, gasPrice });
+      let txn2 = await getTransaction(txnHash);
+      let block2 = await getBlock(txn2.blockNumber);
+
+      let senderBalance = await getBalance(sender);
+
+      await waitForEthereumEvents(transactionIndexer);
+
+      let { data: senderDoc } = await searchers.getFromControllingBranch(env.session, 'ethereum-addresses', sender);
+      expect(senderDoc).has.deep.property('attributes.balance', senderBalance.toString());
+      expect(txnsForCurrentTest(senderDoc.relationships.transactions.data)).to.eql([
+        { type: 'ethereum-transactions', id: txn1.hash },
+        { type: 'ethereum-transactions', id: txn2.hash },
+      ]);
+      expect(senderDoc).to.not.have.deep.property('meta.loadingTransactions');
+      expect(senderDoc).has.deep.property('meta.blockHeight', block2.number);
+      expect(senderDoc).has.deep.property('meta.version', txn2.nonce);
+    });
+
   });
 });
