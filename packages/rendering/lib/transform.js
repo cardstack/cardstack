@@ -113,19 +113,12 @@ class BindTransform {
 }
 
 function getUnusedBlockParam(foundNames) {
-  let foundName = false;
-  let i = 0;
-  let paramName;
-
-  do {
-    i++;
-    paramName = 'param' + i;
-    if (foundNames.indexOf(paramName) === -1) {
-      foundName = true;
+  for (let i = 1;; i++) {
+    let paramName = 'param' + i;
+    if (!foundNames.includes(paramName)) {
+      return paramName;
     }
-  } while (!foundName);
-
-  return paramName;
+  }
 }
 
 module.exports = BindTransform;
