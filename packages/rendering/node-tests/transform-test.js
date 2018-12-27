@@ -47,6 +47,13 @@ describe('rendering/transform', function() {
     expect(result).to.equal(outputTemplate);
   });
 
+  it('does not reuse block param names', function() {
+    let template = '<img src={{content.imageUrl}} /><img src={{content.imageUrl}} />';
+    let outputTemplate= '{{#cs-field content "imageUrl" as |param1|}}<img src={{param1}}></img>{{/cs-field}}{{#cs-field content "imageUrl" as |param2|}}<img src={{param2}}></img>{{/cs-field}}';
+    let result = processTemplate(template, { moduleName });
+    expect(result).to.equal(outputTemplate);
+  });
+
   it('it does not crash on literal paths', function() {
     processTemplate("<SomeComponent @a={{true}} />", { moduleName });
     processTemplate("<SomeComponent @b={{1}} />", { moduleName });

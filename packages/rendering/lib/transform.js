@@ -124,6 +124,7 @@ class BlockParamTracker {
     for (;; this.i++) {
       let paramName = 'param' + this.i;
       if (!this.blockParams.includes(paramName)) {
+        this.blockParams.push(paramName);
         return paramName;
       }
     }
