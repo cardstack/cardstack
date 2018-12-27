@@ -33,66 +33,69 @@ class BindTransform {
   }
 
   transform(ast) {
-    if (/\btemplates\/components\/cardstack\//.test(this.moduleName) ||
-      /\btemplates\/(embedded|isolated).hbs/.test(this.moduleName)){
-      let b = this.syntax.builders;
-      let foundBlockParams = collectBlockParams(ast);
+    if (!/\btemplates\/components\/cardstack\//.test(this.moduleName) &&
+      !/\btemplates\/(embedded|isolated).hbs/.test(this.moduleName)) {
+      return ast;
+    }
 
-      this.syntax.traverse(ast, {
-        ElementNode(node) {
-          let contentProperty,
-            unusedBlockParam,
-            foundDynamicContent = false,
-            newAttributes = [];
+    let b = this.syntax.builders;
+    let foundBlockParams = collectBlockParams(ast);
 
-          let tag = node.tag;
-          for (let i=0; i < node.attributes.length; i++) {
-            let nodeAttributes = node.attributes[i];
-            let name = nodeAttributes.name;
-            let value = nodeAttributes.value;
-            if (!value) {
-              break;
-            }
+    this.syntax.traverse(ast, {
+      ElementNode(node) {
+        let contentProperty,
+          unusedBlockParam,
+          foundDynamicContent = false,
+          newAttributes = [];
 
-            if (value.type === 'MustacheStatement') {
-              let path = value.path;
-              let parts = path.parts;
-              if (parts && parts.length === 2 && parts[0] === 'content') {
-                foundDynamicContent = true;
-                // contentProperty is the property that is looked up on content
-                // (e.g `imageUrl` in the case of `content.imageUrl`)
-                unusedBlockParam = getUnusedBlockParam(foundBlockParams);
-                contentProperty = parts[1];
-                newAttributes.push(b.attr(name, b.mustache(b.path(unusedBlockParam))));
-              } else {
-                newAttributes.push(b.attr(name, value));
-              }
-            } else if (nodeAttributes.type === 'AttrNode') {
+        let tag = node.tag;
+        for (let i = 0; i < node.attributes.length; i++) {
+          let nodeAttributes = node.attributes[i];
+          let name = nodeAttributes.name;
+          let value = nodeAttributes.value;
+          if (!value) {
+            break;
+          }
+
+          if (value.type === 'MustacheStatement') {
+            let path = value.path;
+            let parts = path.parts;
+            if (parts && parts.length === 2 && parts[0] === 'content') {
+              foundDynamicContent = true;
+              // contentProperty is the property that is looked up on content
+              // (e.g `imageUrl` in the case of `content.imageUrl`)
+              unusedBlockParam = getUnusedBlockParam(foundBlockParams);
+              contentProperty = parts[1];
+              newAttributes.push(b.attr(name, b.mustache(b.path(unusedBlockParam))));
+            } else {
               newAttributes.push(b.attr(name, value));
-            } else if (nodeAttributes.type === 'TextNode') {
-              newAttributes.push(b.attr(name, value.chars));
             }
-          }
-
-          if (foundDynamicContent) {
-            let newTag = b.element(tag, newAttributes, []);
-            let blockWithParam = b.program([newTag], [unusedBlockParam]);
-            let block = b.block(b.path('cs-field'), [
-              b.path("content"), b.string(contentProperty)
-            ], b.hash(), blockWithParam);
-            return block;
-          }
-
-          return node;
-        },
-
-        MustacheStatement(node) {
-          if (node.path.parts && node.path.parts.length === 2 && node.path.parts[0] === 'content') {
-            return b.mustache(b.path("cs-field"), [b.path("content"), b.string(node.path.parts[1])]);
+          } else if (nodeAttributes.type === 'AttrNode') {
+            newAttributes.push(b.attr(name, value));
+          } else if (nodeAttributes.type === 'TextNode') {
+            newAttributes.push(b.attr(name, value.chars));
           }
         }
-      });
-    }
+
+        if (foundDynamicContent) {
+          let newTag = b.element(tag, newAttributes, []);
+          let blockWithParam = b.program([newTag], [unusedBlockParam]);
+          let block = b.block(b.path('cs-field'), [
+            b.path("content"), b.string(contentProperty)
+          ], b.hash(), blockWithParam);
+          return block;
+        }
+
+        return node;
+      },
+
+      MustacheStatement(node) {
+        if (node.path.parts && node.path.parts.length === 2 && node.path.parts[0] === 'content') {
+          return b.mustache(b.path("cs-field"), [b.path("content"), b.string(node.path.parts[1])]);
+        }
+      }
+    });
+
     return ast;
   }
 }
