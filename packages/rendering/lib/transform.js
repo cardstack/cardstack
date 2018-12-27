@@ -57,7 +57,7 @@ class BindTransform {
             if (value.type === 'MustacheStatement') {
               let path = value.path;
               let parts = path.parts;
-              if (parts.length === 2 && parts[0] === 'content') {
+              if (parts && parts.length === 2 && parts[0] === 'content') {
                 foundDynamicContent = true;
                 // contentProperty is the property that is looked up on content
                 // (e.g `imageUrl` in the case of `content.imageUrl`)
@@ -87,7 +87,7 @@ class BindTransform {
         },
 
         MustacheStatement(node) {
-          if (node.path.parts.length === 2 && node.path.parts[0] === 'content') {
+          if (node.path.parts && node.path.parts.length === 2 && node.path.parts[0] === 'content') {
             return b.mustache(b.path("cs-field"), [b.path("content"), b.string(node.path.parts[1])]);
           }
         }

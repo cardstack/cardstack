@@ -39,4 +39,11 @@ describe('rendering/transform', function() {
     let result = processTemplate(template, { moduleName });
     expect(result).to.equal(outputTemplate);
   });
+
+  it('it does not crash on literal paths', function() {
+    processTemplate("<SomeComponent @a={{true}} />", { moduleName });
+    processTemplate("<SomeComponent @b={{1}} />", { moduleName });
+    processTemplate("<SomeComponent @c={{null}} />", { moduleName });
+    processTemplate("<SomeComponent @d={{undefined}} />", { moduleName });
+  });
 });
