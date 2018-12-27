@@ -39,7 +39,7 @@ class BindTransform {
     }
 
     let b = this.syntax.builders;
-    let foundBlockParams = collectBlockParams(ast);
+    let foundBlockParams = this._collectBlockParams(ast);
 
     this.syntax.traverse(ast, {
       ElementNode(node) {
@@ -98,6 +98,18 @@ class BindTransform {
 
     return ast;
   }
+
+  _collectBlockParams(ast) {
+    let blockParams = [];
+
+    this.syntax.traverse(ast, {
+      Program(node) {
+        blockParams.push(...node.blockParams);
+      }
+    });
+
+    return blockParams;
+  }
 }
 
 function getUnusedBlockParam(foundNames) {
@@ -114,25 +126,6 @@ function getUnusedBlockParam(foundNames) {
   } while (!foundName);
 
   return paramName;
-}
-
-
-
-function collectBlockParams(ast, foundBlockParams) {
-  if (!foundBlockParams) {
-    foundBlockParams = [];
-  }
-
-  for (let i=0; i<ast.body.length; i++) {
-    let tree = ast.body[i];
-    let program = tree.program;
-    if (program) {
-      foundBlockParams = foundBlockParams.concat(program.blockParams);
-      return collectBlockParams(program, foundBlockParams);
-    }
-  }
-
-  return foundBlockParams;
 }
 
 module.exports = BindTransform;

@@ -40,6 +40,13 @@ describe('rendering/transform', function() {
     expect(result).to.equal(outputTemplate);
   });
 
+  it('it *actually* transforms >2 level trees with block params', function() {
+    let template = '<div>{{#image-wrapper as |param1|}}<img class={{param1}} data-test-image="book-image" src={{content.imageUrl}} />{{/image-wrapper}}</div>';
+    let outputTemplate= '<div>{{#image-wrapper as |param1|}}{{#cs-field content "imageUrl" as |param2|}}<img class={{param1}} data-test-image="book-image" src={{param2}}></img>{{/cs-field}}{{/image-wrapper}}</div>';
+    let result = processTemplate(template, { moduleName });
+    expect(result).to.equal(outputTemplate);
+  });
+
   it('it does not crash on literal paths', function() {
     processTemplate("<SomeComponent @a={{true}} />", { moduleName });
     processTemplate("<SomeComponent @b={{1}} />", { moduleName });
