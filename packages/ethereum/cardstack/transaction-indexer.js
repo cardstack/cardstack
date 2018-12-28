@@ -144,7 +144,7 @@ class TransactionIndexer {
     // at least so many "from" transactions have been found, and then continues going back until the balance
     // reaches 0. The inherent limitation is that 0-value transactions before the account was funded will not
     // be found. These sorts of transactions are indicative of interacting with a smart contract, for which
-    // it's probably better suited to use this plugin's contracrt indexing for these types of transactions.
+    // it's probably better suited to use this plugin's contract indexing for these types of transactions.
     for (let blockNumber = currentBlockNumber;
       blockNumber >= 0 &&
         ((oldestIndexedBlock && blockNumber > oldestIndexedBlock) ||

@@ -17,7 +17,7 @@ module.exports = declareInjections({
   transactionIndexer: `plugin-services:${require.resolve('./transaction-indexer')}`
 },
 
-  class Indexer {
+  class EthereumIndexer {
 
     static create(...args) {
       let [{ ethereumClient, jsonRpcUrl }] = args;
@@ -249,24 +249,16 @@ class Updater {
       },
     }, {
       type: "computed-fields",
-      id: "tracked-user-address",
+      id: "preparing-address",
       attributes: {
-        "computed-field-type": "@cardstack/core-types::correlate-by-field",
-        params: { relationshipType: 'tracked-ethereum-addresses', field: 'ethereum-address', toLowerCase: true }
+        "computed-field-type": "@cardstack/ethereum::is-loading-address",
       }
     }, {
       type: "computed-fields",
-      id: "tracked-address",
+      id: "address-data",
       attributes: {
         "computed-field-type": "@cardstack/core-types::correlate-by-field",
-        params: { relationshipType: 'tracked-ethereum-addresses', field: 'id' }
-      }
-    }, {
-      type: "computed-fields",
-      id: "address-source",
-      attributes: {
-        "computed-field-type": "@cardstack/core-types::correlate-by-field",
-        params: { relationshipType: 'ethereum-addresses', field: 'id' }
+        params: { relationshipType: 'ethereum-addresses', field: 'ethereum-address', toLowerCase: true }
       }
     }, {
       type: 'content-types',
@@ -299,13 +291,16 @@ class Updater {
     }, {
       type: 'content-types',
       id: 'ethereum-addresses',
+      attributes: {
+        // cards should patch this schema in the data-source config for setting the fieldsets based on their specific scenarios
+        'default-includes': [ 'transactions' ]
+      },
       relationships: {
         fields: {
           data: [
             { type: "fields", id: "ethereum-address" }, // use this field to preserve the case of the ID to faithfully represent EIP-55 encoding
             { type: "fields", id: "balance" },
             { type: "fields", id: "transactions" },
-            { type: "computed-fields", id: "tracked-address" },
           ]
         },
         'data-source': {
@@ -316,11 +311,6 @@ class Updater {
       type: 'content-types',
       id: 'tracked-ethereum-addresses',
       relationships: {
-        fields: {
-          data: [
-            { type: "computed-fields", id: "address-source" },
-          ]
-        },
         'data-source': {
           data: { type: 'data-sources', id: this.dataSourceId.toString() }
         }
@@ -328,12 +318,17 @@ class Updater {
     }, {
       type: 'content-types',
       id: 'user-ethereum-addresses',
+      attributes: {
+        // cards should patch this schema in the data-source config for setting the fieldsets based on their specific scenarios
+        'default-includes': [ 'address-data.transactions' ]
+      },
       relationships: {
         fields: {
           data: [
             { type: "fields", id: "address-user" },
             { type: "fields", id: "ethereum-address" },
-            { type: "computed-fields", id: "tracked-user-address" }
+            { type: "computed-fields", id: "address-data" },
+            { type: "computed-fields", id: "preparing-address" },
           ]
         },
         'data-source': {
@@ -341,13 +336,6 @@ class Updater {
         }
       }
     }, {
-      // TODO: think about how we want to expose the grant to create new
-      // tracked ethereum addresses. Perhaps we can push that upstream, so
-      // that cards that want to track ethereum addresses can use their own
-      // "wallet" content types to relate users to addresses, and then programmatically
-      // create tracked-ethereum-addresses using the Session.INTERNAL_PRIVILEGED
-      // to create tracked-ethereum-addresses in their writers. That way we keep
-      // session concerns outside of this plugin.
       type: 'grants',
       id: 'ethereum-address-indexing-grant',
       attributes: {
@@ -360,10 +348,28 @@ class Updater {
         },
         types: {
           "data": [
-            { type: "content-types", id: 'tracked-ethereum-addresses' }, // Should we leave it up to cards that use this plugin to determine this type's visibility?
-            { type: "content-types", id: 'proxied-tracked-ethereum-addresses' },
             { type: "content-types", id: 'ethereum-addresses' },
             { type: "content-types", id: 'ethereum-transactions' }
+          ]
+        }
+      }
+    }, {
+      type: 'grants',
+      id: 'user-ethereum-addresses-grant',
+      attributes: {
+        'may-read-resource': true,
+        'may-create-resource': true,
+        'may-delete-resource': true,
+        'may-read-fields': true,
+        'may-write-fields': true,
+      },
+      relationships: {
+        who: {
+          data: [{ type: 'fields', id: 'address-user' }]
+        },
+        types: {
+          "data": [
+            { type: "content-types", id: 'user-ethereum-addresses' },
           ]
         }
       }
@@ -438,6 +444,8 @@ class Updater {
           }
         }
       }]);
+    } else if (this.addressIndexing && !this.addressIndexing.trackedAddressDataSource) {
+      throw new Error(`The data-source ${this.dataSourceId.toString()} needs to specify a data source to persist the tracked-ethereum-addresses documents in the data source configuration params.addressIndexing.trackedAddressDataSource.`);
     }
 
     this._schema = schema.map(doc => this._maybePatch(doc));
@@ -447,7 +455,7 @@ class Updater {
 
   async updateContent(meta, hints, ops) {
     let schema = await this.schema();
-    let isSchemaUnchanged, blockHeight, indexedAddressesBlockHeights = {};
+    let isSchemaUnchanged, blockHeight, indexedAddressesBlockHeight;
     let lastBlockHeight = get(meta, 'lastBlockHeight');
     let lastAddressesBlockHeight = get(meta, 'lastIndexedAddressesBlockHeight');
 
@@ -478,13 +486,13 @@ class Updater {
     }
 
     if (this.addressIndexing) {
-      indexedAddressesBlockHeights = await this.transactionIndexer.index({
+      indexedAddressesBlockHeight = await this.transactionIndexer.index({
         lastIndexedBlockHeight: lastAddressesBlockHeight
       });
     }
 
     return {
-      lastIndexedAddressesBlockHeights: indexedAddressesBlockHeights,
+      lastIndexedAddressesBlockHeight: indexedAddressesBlockHeight,
       lastBlockHeight: blockHeight,
       lastSchema: schema
     };

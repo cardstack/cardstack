@@ -131,12 +131,9 @@
             "cwd": "${workspaceRoot}/packages/ethereum",
             "program": "${workspaceRoot}/packages/ethereum/node_modules/.bin/truffle",
             "console": "integratedTerminal",
-            "env": {
-                "LOG_LEVELS":"cardstack/ethereum/transaction-indexer=debug"
-            },
             "args": [
                 "test",
-                "${workspaceRoot}/packages/ethereum/truffle-tests/address-test.js"
+                "${workspaceRoot}/packages/ethereum/truffle-tests/*-test.js"
             ]
         }
     ]

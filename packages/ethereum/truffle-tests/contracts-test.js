@@ -21,7 +21,7 @@ async function waitForEthereumEvents(indexer) {
   await indexer._indexingPromise;
 }
 
-contract('SampleToken', function (accounts) {
+contract('Token Indexing', function (accounts) {
   let accountOne = accounts[0].toLowerCase();
   let accountTwo = accounts[1].toLowerCase();
   let accountThree = accounts[2].toLowerCase();

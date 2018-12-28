@@ -5,18 +5,21 @@ module.exports = declareInjections({
   searchers: 'hub:searchers',
 },
 
-class TrackedEthereumAddressSearcher {
+class EthereumSearcher {
   static create(...args) {
     return new this(...args);
   }
-  constructor({ searchers }) {
+  constructor({ searchers, dataSource }) {
     this.searchers = searchers;
+    this.dataSourceId = dataSource.id;
   }
 
   async get(session, branch, type, id, next) {
     if (type === 'tracked-ethereum-addresses') {
       let result = await this.searchers.get(session, branch, 'proxied-tracked-ethereum-addresses', id);
       result.data.type = 'tracked-ethereum-addresses';
+      result.data.meta.source = this.dataSourceId;
+      result.data.meta.version = 1;
       return result;
     }
 
@@ -31,6 +34,8 @@ class TrackedEthereumAddressSearcher {
       return {
         data: result.map(i => {
           i.type = 'tracked-ethereum-addresses';
+          i.meta.source = this.dataSourceId;
+          i.meta.version = 1;
           return i;
         })
       };
