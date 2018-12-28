@@ -26,41 +26,45 @@
 
 */
 
-function BindTransform({ moduleName }) {
-  this.moduleName = moduleName;
-  this.syntax = null;
-}
+class BindTransform {
+  constructor({ moduleName }) {
+    this.moduleName = moduleName;
+    this.syntax = null;
+  }
 
-BindTransform.prototype.transform = function(ast) {
-  if (/\btemplates\/components\/cardstack\//.test(this.moduleName) ||
-      /\btemplates\/(embedded|isolated).hbs/.test(this.moduleName)){
-    var b = this.syntax.builders;
-    var foundBlockParams = collectBlockParams(ast);
+  transform(ast) {
+    if (!/\btemplates\/components\/cardstack\//.test(this.moduleName) &&
+      !/\btemplates\/(embedded|isolated).hbs/.test(this.moduleName)) {
+      return ast;
+    }
+
+    let b = this.syntax.builders;
+    let blockParams = new BlockParamTracker(ast, this.syntax);
 
     this.syntax.traverse(ast, {
       ElementNode(node) {
-        var contentProperty,
-            unusedBlockParam,
-            foundDynamicContent = false,
-            newAttributes = [];
+        let contentProperty,
+          unusedBlockParam,
+          foundDynamicContent = false,
+          newAttributes = [];
 
-        var tag = node.tag;
-        for (var i=0; i < node.attributes.length; i++) {
-          var nodeAttributes = node.attributes[i];
-          var name = nodeAttributes.name;
-          var value = nodeAttributes.value;
+        let tag = node.tag;
+        for (let i = 0; i < node.attributes.length; i++) {
+          let nodeAttributes = node.attributes[i];
+          let name = nodeAttributes.name;
+          let value = nodeAttributes.value;
           if (!value) {
             break;
           }
 
           if (value.type === 'MustacheStatement') {
-            var path = value.path;
-            var parts = path.parts;
-            if (parts.length === 2 && parts[0] === 'content') {
+            let path = value.path;
+            let parts = path.parts;
+            if (parts && parts.length === 2 && parts[0] === 'content') {
               foundDynamicContent = true;
               // contentProperty is the property that is looked up on content
               // (e.g `imageUrl` in the case of `content.imageUrl`)
-              unusedBlockParam = getUnusedBlockParam(foundBlockParams);
+              unusedBlockParam = blockParams.getUnusedBlockParam();
               contentProperty = parts[1];
               newAttributes.push(b.attr(name, b.mustache(b.path(unusedBlockParam))));
             } else {
@@ -74,8 +78,8 @@ BindTransform.prototype.transform = function(ast) {
         }
 
         if (foundDynamicContent) {
-          var newTag = b.element(tag, newAttributes, []);
-          var blockWithParam = b.program([newTag], [unusedBlockParam]);
+          let newTag = b.element(tag, newAttributes, []);
+          let blockWithParam = b.program([newTag], [unusedBlockParam]);
           let block = b.block(b.path('cs-field'), [
             b.path("content"), b.string(contentProperty)
           ], b.hash(), blockWithParam);
@@ -86,48 +90,45 @@ BindTransform.prototype.transform = function(ast) {
       },
 
       MustacheStatement(node) {
-        if (node.path.parts.length === 2 && node.path.parts[0] === 'content') {
+        if (node.path.parts && node.path.parts.length === 2 && node.path.parts[0] === 'content') {
           return b.mustache(b.path("cs-field"), [b.path("content"), b.string(node.path.parts[1])]);
         }
       }
     });
+
+    return ast;
   }
-  return ast;
-};
-
-function getUnusedBlockParam(foundNames) {
-  var foundName = false;
-  var i = 0;
-  var paramName;
-
-  do {
-    i++;
-    paramName = 'param' + i;
-    if (foundNames.indexOf(paramName) === -1) {
-      foundName = true;
-    }
-  } while (!foundName);
-
-  return paramName;
 }
 
-
-
-function collectBlockParams(ast, foundBlockParams) {
-  if (!foundBlockParams) {
-    foundBlockParams = [];
+/**
+ * Keeps track of all block params in a template and provides unused names
+ * for new `Program` nodes.
+ */
+class BlockParamTracker {
+  constructor(ast, syntax) {
+    this.i = 1;
+    this.syntax = syntax;
+    this.blockParams = [];
+    this._collectBlockParams(ast);
   }
 
-  for (var i=0; i<ast.body.length; i++) {
-    var tree = ast.body[i];
-    var program = tree.program;
-    if (program) {
-      foundBlockParams = foundBlockParams.concat(program.blockParams);
-      return collectBlockParams(program, foundBlockParams);
+  _collectBlockParams(ast) {
+    this.syntax.traverse(ast, {
+      Program: (node) => {
+        this.blockParams.push(...node.blockParams);
+      }
+    });
+  }
+
+  getUnusedBlockParam() {
+    for (;; this.i++) {
+      let paramName = 'param' + this.i;
+      if (!this.blockParams.includes(paramName)) {
+        this.blockParams.push(paramName);
+        return paramName;
+      }
     }
   }
-
-  return foundBlockParams;
 }
 
 module.exports = BindTransform;

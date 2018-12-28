@@ -39,4 +39,25 @@ describe('rendering/transform', function() {
     let result = processTemplate(template, { moduleName });
     expect(result).to.equal(outputTemplate);
   });
+
+  it('it *actually* transforms >2 level trees with block params', function() {
+    let template = '<div>{{#image-wrapper as |param1|}}<img class={{param1}} data-test-image="book-image" src={{content.imageUrl}} />{{/image-wrapper}}</div>';
+    let outputTemplate= '<div>{{#image-wrapper as |param1|}}{{#cs-field content "imageUrl" as |param2|}}<img class={{param1}} data-test-image="book-image" src={{param2}}></img>{{/cs-field}}{{/image-wrapper}}</div>';
+    let result = processTemplate(template, { moduleName });
+    expect(result).to.equal(outputTemplate);
+  });
+
+  it('does not reuse block param names', function() {
+    let template = '<img src={{content.imageUrl}} /><img src={{content.imageUrl}} />';
+    let outputTemplate= '{{#cs-field content "imageUrl" as |param1|}}<img src={{param1}}></img>{{/cs-field}}{{#cs-field content "imageUrl" as |param2|}}<img src={{param2}}></img>{{/cs-field}}';
+    let result = processTemplate(template, { moduleName });
+    expect(result).to.equal(outputTemplate);
+  });
+
+  it('it does not crash on literal paths', function() {
+    processTemplate("<SomeComponent @a={{true}} />", { moduleName });
+    processTemplate("<SomeComponent @b={{1}} />", { moduleName });
+    processTemplate("<SomeComponent @c={{null}} />", { moduleName });
+    processTemplate("<SomeComponent @d={{undefined}} />", { moduleName });
+  });
 });
