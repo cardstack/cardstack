@@ -12,12 +12,27 @@ const notFoundErrorCardId = 'not-found';
 module.exports = declareInjections({
   currentSchema: 'hub:current-schema',
   searchers: 'hub:searchers',
+  pgsearchClient: `plugin-client:${require.resolve('@cardstack/pgsearch/client')}`
 },
 
 class Routers {
-  // Lazily loading this as running this in the constructor runs into the
-  // situation where the searchers are not ready yet. Is there a better way to know when
-  // the searcher is ready so we can set this up outside of a user request?
+  static create(...args) {
+    return new this(...args);
+  }
+
+  constructor({ currentSchema, searchers, pgsearchClient }) {
+    this.currentSchema = currentSchema;
+    this.searchers = searchers;
+    this.pgsearchClient = pgsearchClient;
+
+    this._setupPromise = this._setup();
+  }
+
+  async _setup() {
+    await this.pgsearchClient.ensureDatabaseSetup();
+    await this.getRoutersInfo();
+  }
+
   async getRoutersInfo() {
     if (this.routerMap && this.applicationCard) {
       return { routerMap: this.routerMap, applicationCard: this.applicationCard, routerMapByDepth: this.routerMapByDepth };
@@ -36,7 +51,7 @@ class Routers {
   }
 
   async getSpace(branch, path) {
-    await this.getRoutersInfo();
+    await this._setupPromise();
 
     let schema = await this.currentSchema.forBranch(branch);
 
