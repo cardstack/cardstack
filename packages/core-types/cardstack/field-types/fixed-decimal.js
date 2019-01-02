@@ -1,8 +1,8 @@
 module.exports = {
   valid(value) {
-    return typeof value==='number';
+    return typeof parseFloat(value) === 'number';
   },
   buildQueryExpression(sourceExpression, name){
-    return ['(', ...sourceExpression, '->>', { param: name }, ')::real'];
+    return ['(', ...sourceExpression, '->>', { param: name }, ')::numeric'];
   }
 };

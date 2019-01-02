@@ -405,7 +405,6 @@ class Updater {
 
     case 'decimal':
     case 'numeric':
-    case 'real':
       return '@cardstack/core-types::fixed-decimal';
 
     case 'boolean':
