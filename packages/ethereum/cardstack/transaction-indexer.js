@@ -136,8 +136,8 @@ class TransactionIndexer {
 
       let deletedAddresses = difference(addresses, await this.getTrackedAddresses());
       if (deletedAddresses.length) {
-        // unlike the "add" case above, this should be pretty quick, so it is ok to await
-        await this.index({ stopIndexingAddresses: deletedAddresses });
+        // intentionally not awaiting (indexing could take awhile), make sure to use TransactionIndexer._indexingPromise in the tests so async doesn't leak
+        this.index({ stopIndexingAddresses: deletedAddresses });
       }
     });
   }
