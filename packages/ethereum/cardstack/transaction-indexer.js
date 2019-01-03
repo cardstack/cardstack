@@ -1,5 +1,5 @@
 const { declareInjections } = require('@cardstack/di');
-const { uniqBy, intersection, get } = require('lodash');
+const { difference, flatMap, uniqBy, intersection, get } = require('lodash');
 const { utils: { BN, toChecksumAddress } } = require('web3');
 const Session = require('@cardstack/plugin-utils/session');
 const log = require('@cardstack/logger')('cardstack/ethereum/transaction-indexer');
@@ -30,6 +30,7 @@ class TransactionIndexer {
     this.controllingBranch = controllingBranch;
     this._indexingPromise = null; // this is exposed to the tests as web3 has poor support for async in event handlers
     this._setupPromise = this._ensureClient();
+    this._boundEventListeners = false;
     this._startedPromise = new Promise(res => this._hasStartedCallBack = res);
   }
 
@@ -38,6 +39,8 @@ class TransactionIndexer {
 
     this.addressIndexing = addressIndexing;
     this.ethereumClient = ethereumClient;
+
+    await this._startTrackedAddressListening();
 
     await this.ethereumClient.startNewBlockListening(this);
     this._hasStartedCallBack();
@@ -60,9 +63,13 @@ class TransactionIndexer {
   }
 
   async getTrackedAddresses() {
+    let trackedAddressContentType = get(this, 'addressIndexing.trackedAddressContentType');
+    let trackedAddressField = get(this, 'addressIndexing.trackedAddressField');
+    if (!trackedAddressContentType || !trackedAddressField) { return; }
+
     let size = get(this, 'addressIndexing.maxAddressesTracked') || DEFAULT_MAX_ADDRESSES_TRACKED;
     let addressQuery = {
-      filter: { type: { exact: 'tracked-ethereum-addresses' } },
+      filter: { type: { exact: trackedAddressContentType } },
       page: { size }
     };
 
@@ -71,7 +78,68 @@ class TransactionIndexer {
       throw new Error(`There are more tracked-ethereum-addresses than the system is configured to return (${size} addresses). Increase the max number of tracked addresses in 'params.addressIndexing.maxAddressesTracked' for data source configuration'.`);
     }
 
-    return results.map(i => i.id).map(i => i.toLowerCase());
+    let field = trackedAddressField === 'id' ? 'id' : `attributes.${trackedAddressField}`;
+    return flatMap(results, i => get(i, field)).map(i => i.toLowerCase());
+  }
+
+  async _startTrackedAddressListening() {
+    if (this._boundEventListeners) { return; }
+
+    this._boundEventListeners = true;
+    let trackedAddressContentType = get(this, 'addressIndexing.trackedAddressContentType');
+    let trackedAddressField = get(this, 'addressIndexing.trackedAddressField');
+    if (!trackedAddressContentType || !trackedAddressField) { return; }
+
+    let schema = await this.schema.forControllingBranch();
+    if (!schema.types.get(trackedAddressContentType)) {
+      throw new Error(`The configured trackedAddressContentType '${trackedAddressContentType}' is not a valid type.`);
+    }
+    if (!schema.realAndComputedFields.get(trackedAddressField)) {
+      throw new Error(`The configured trackedAddressField '${trackedAddressField}' is not a valid field.`);
+    }
+
+    this.pgsearchClient.on('add', async ({ type,  doc: { data: trackedResource } }) => {
+      if (type !== trackedAddressContentType) { return; }
+
+      let field = trackedAddressField === 'id' ? 'id' : `attributes.${trackedAddressField}`;
+      let fieldValue = get(trackedResource, field);
+      if (!fieldValue) { return; }
+
+      let addresses = (Array.isArray(fieldValue) ? fieldValue : [ fieldValue ]).map(i => i.toLowerCase());
+      if (!addresses.length) { return; }
+
+      let trackedAddressCounts = (await this.getTrackedAddresses()).reduce((totals, i) => {
+        if (!addresses.includes(i)) { return totals; }
+        if (!totals[i]) {
+          totals[i] = 0;
+        }
+        totals[i]++;
+        return totals;
+      }, {});
+
+      let newAddresses = Object.keys(trackedAddressCounts).filter(address => trackedAddressCounts[address] < 2); // new address will already be in the index at this point so make sure not to count it
+      if (newAddresses.length) {
+        // intentionally not awaiting (indexing could take awhile), make sure to use TransactionIndexer._indexingPromise in the tests so async doesn't leak
+        this.index({ startIndexingAddresses: newAddresses });
+      }
+    });
+
+    this.pgsearchClient.on('delete', async ({ type,  doc: { data: trackedResource } }) => {
+      if (type !== trackedAddressContentType) { return; }
+
+      let field = trackedAddressField === 'id' ? 'id' : `attributes.${trackedAddressField}`;
+      let fieldValue = get(trackedResource, field);
+      if (!fieldValue) { return; }
+
+      let addresses = (Array.isArray(fieldValue) ? fieldValue : [ fieldValue ]).map(i => i.toLowerCase());
+      if (!addresses.length) { return; }
+
+      let deletedAddresses = difference(addresses, await this.getTrackedAddresses());
+      if (deletedAddresses.length) {
+        // unlike the "add" case above, this should be pretty quick, so it is ok to await
+        await this.index({ stopIndexingAddresses: deletedAddresses });
+      }
+    });
   }
 
   async _ensureClient() {
@@ -81,21 +149,23 @@ class TransactionIndexer {
   async _index({
     lastIndexedBlockHeight,
     onlyBlockNumber,
-    startIndexingAddress,
-    stopIndexingAddress
+    startIndexingAddresses,
+    stopIndexingAddresses,
   }) {
     await this.ensureStarted();
 
+    if (Array.isArray(stopIndexingAddresses)) {
+      return await this._stopIndexingAddresses(stopIndexingAddresses);
+    }
+
     let currentBlockNumber = await this.ethereumClient.getBlockHeight();
-    let trackedAddresses = startIndexingAddress ? [ startIndexingAddress ] : await this.getTrackedAddresses();
+    let trackedAddresses = Array.isArray(startIndexingAddresses) ? startIndexingAddresses : await this.getTrackedAddresses();
     if (!trackedAddresses || !trackedAddresses.length) {
       log.info(`There are no tracked-ethereum-addresses to index.`);
       return;
     }
 
-    if (stopIndexingAddress) {
-      await this._stopIndexingAddress(stopIndexingAddress);
-    } else if (onlyBlockNumber) {
+    if (onlyBlockNumber) {
       await this._indexBlock(trackedAddresses, onlyBlockNumber);
     } else {
       await this._indexBlocks(trackedAddresses, lastIndexedBlockHeight, currentBlockNumber);
@@ -104,11 +174,7 @@ class TransactionIndexer {
   }
 
   async _indexBlocks(trackedAddresses, lastIndexedBlockHeight = 0, currentBlockNumber) {
-    // In the scenarios where we are adding a new address, dont bother with generating last indexed block heights for all
-    // currently indexed addresses, since we really just care about a single address
-    let lastIndexedAddressesBlockHeights = trackedAddresses.length === 1 ?
-      lastIndexedBlockHeights([ await this._getIndexedAddress(trackedAddresses[0]) ].filter(i => Boolean(i))) :
-      lastIndexedBlockHeights(await this._getIndexedAddresses());
+    let lastIndexedAddressesBlockHeights = lastIndexedBlockHeights(await this._getIndexedAddresses());
 
     // if an address document indicates that it has been indexed more recently than the hub:indexers.update() was kicked off, then
     // use that as the block height the document was indexed at as it will always be more accurate.
@@ -253,31 +319,33 @@ class TransactionIndexer {
     }
   }
 
-  async _stopIndexingAddress(address) {
-    if (!address) { return; }
+  async _stopIndexingAddresses(addresses) {
+    if (!addresses || !addresses.length) { return; }
 
     let batch = this.pgsearchClient.beginBatch(this.schema, this.searchers);
-    let document = await this.searchers.getFromControllingBranch(Session.INTERNAL_PRIVILEGED,
-                                                                 'ethereum-addresses',
-                                                                 address,
-                                                                 ['transactions.from-address', 'transactions.to-address']);
-    let { included=[], data:resource } = document;
+    for (let address of addresses) {
+      let document = await this.searchers.getFromControllingBranch(Session.INTERNAL_PRIVILEGED,
+        'ethereum-addresses',
+        address,
+        ['transactions.from-address', 'transactions.to-address']);
+      let { included = [], data: resource } = document;
 
-    // Only remove transactions that are not being referred to from other ethereum-addresses.
-    // Rely on fact that hub will not populate ethereum-addresses in the jsonapi included field that are not indexed
-    let includedAddresses = included.filter(i => i.type === 'ethereum-addresses').map(i => i.id);
-    let includedTxns = included.filter(i => i.type === 'ethereum-transactions');
-    for (let transaction of includedTxns) {
-      let txnAddresses = [get(transaction, 'relationships.from-address.data.id'),
-                          get(transaction, 'relationships.to-address.data.id')]
-        .filter(i => Boolean(i) && i.toLowerCase() !== address.toLowerCase())
-        .filter(i => includedAddresses.includes(i));
-      if (!txnAddresses.length) {
-        await batch.deleteDocument(await this._createDocumentContext(transaction));
+      // Only remove transactions that are not being referred to from other ethereum-addresses.
+      // Rely on fact that hub will not populate ethereum-addresses in the jsonapi included field that are not indexed
+      let includedAddresses = included.filter(i => i.type === 'ethereum-addresses').map(i => i.id);
+      let includedTxns = included.filter(i => i.type === 'ethereum-transactions');
+      for (let transaction of includedTxns) {
+        let txnAddresses = [get(transaction, 'relationships.from-address.data.id'),
+        get(transaction, 'relationships.to-address.data.id')]
+          .filter(i => Boolean(i) && i.toLowerCase() !== address.toLowerCase())
+          .filter(i => includedAddresses.includes(i));
+        if (!txnAddresses.length) {
+          await batch.deleteDocument(await this._createDocumentContext(transaction));
+        }
       }
-    }
 
-    await batch.deleteDocument(await this._createDocumentContext(resource));
+      await batch.deleteDocument(await this._createDocumentContext(resource));
+    }
 
     await batch.done();
   }
@@ -290,17 +358,6 @@ class TransactionIndexer {
     });
 
     return indexedAddresses;
-  }
-
-  async _getIndexedAddress(address) {
-    let indexedAddress;
-    try {
-      indexedAddress = await this.searchers.getFromControllingBranch(Session.INTERNAL_PRIVILEGED, 'ethereum-addresses', address);
-    } catch (e) {
-      if (e.status !== 404) { throw e; }
-      return;
-    }
-    return indexedAddress.data;
   }
 
   async _indexTransactionResource(batch, block, rawTransaction) {

@@ -242,25 +242,6 @@ class Updater {
         }
       }
     }, {
-      type: "fields",
-      id: "address-user",
-      attributes: {
-        "field-type": "@cardstack/core-types::belongs-to"
-      },
-    }, {
-      type: "computed-fields",
-      id: "preparing-address",
-      attributes: {
-        "computed-field-type": "@cardstack/ethereum::is-loading-address",
-      }
-    }, {
-      type: "computed-fields",
-      id: "address-data",
-      attributes: {
-        "computed-field-type": "@cardstack/core-types::correlate-by-field",
-        params: { relationshipType: 'ethereum-addresses', field: 'ethereum-address', toLowerCase: true }
-      }
-    }, {
       type: 'content-types',
       id: 'ethereum-transactions',
       relationships: {
@@ -308,34 +289,6 @@ class Updater {
         }
       }
     }, {
-      type: 'content-types',
-      id: 'tracked-ethereum-addresses',
-      relationships: {
-        'data-source': {
-          data: { type: 'data-sources', id: this.dataSourceId.toString() }
-        }
-      }
-    }, {
-      type: 'content-types',
-      id: 'user-ethereum-addresses',
-      attributes: {
-        // cards should patch this schema in the data-source config for setting the fieldsets based on their specific scenarios
-        'default-includes': [ 'address-data.transactions' ]
-      },
-      relationships: {
-        fields: {
-          data: [
-            { type: "fields", id: "address-user" },
-            { type: "fields", id: "ethereum-address" },
-            { type: "computed-fields", id: "address-data" },
-            { type: "computed-fields", id: "preparing-address" },
-          ]
-        },
-        'data-source': {
-          data: { type: 'data-sources', id: this.dataSourceId.toString() }
-        }
-      }
-    }, {
       type: 'grants',
       id: 'ethereum-address-indexing-grant',
       attributes: {
@@ -350,26 +303,6 @@ class Updater {
           "data": [
             { type: "content-types", id: 'ethereum-addresses' },
             { type: "content-types", id: 'ethereum-transactions' }
-          ]
-        }
-      }
-    }, {
-      type: 'grants',
-      id: 'user-ethereum-addresses-grant',
-      attributes: {
-        'may-read-resource': true,
-        'may-create-resource': true,
-        'may-delete-resource': true,
-        'may-read-fields': true,
-        'may-write-fields': true,
-      },
-      relationships: {
-        who: {
-          data: [{ type: 'fields', id: 'address-user' }]
-        },
-        types: {
-          "data": [
-            { type: "content-types", id: 'user-ethereum-addresses' },
           ]
         }
       }
@@ -409,43 +342,6 @@ class Updater {
       schema.push(this._openGrantForContentType(contractName));
       schema.push(contractSchema);
       log.debug(`Created schema for contract ${contractName}: \n ${JSON.stringify(schema, null, 2)}`);
-
-    } else if (get(this, 'addressIndexing.trackedAddressDataSource')) {
-      // We use this "proxy content-type" approach so that we can introduce a shim in the writer
-      // that will allow us to kick off indexing for ethereum addresses when we see a
-      // tracked-ethereum-address resource is created/deleted. This allows the ethereum plugin to leverage
-      // its own backing cardstack data source (git, ephemeral, etc) to persist the tracked-ethereum-address resources.
-      // The proxed-tracked-ethereum-addresses content type, in this case, is an implementation detail that
-      // is not part of the public API for cards that use this plugin. I wonder after query-based
-      // relationships are available, we might be able to refactor this, so we don't need to use this approach?
-      // The challenge here is to coordinate bewtween two different data sources, so that we can properly trigger
-      // address indexing in the ethereum data source.
-      schema = schema.concat([{
-      }, {
-        type: 'content-types',
-        id: 'proxied-tracked-ethereum-addresses',
-        relationships: {
-          'data-source': {
-            data: { type: 'data-sources', id: this.addressIndexing.trackedAddressDataSource }
-          }
-        }
-      }, {
-        type: 'content-types',
-        id: 'proxied-user-ethereum-addresses',
-        relationships: {
-          fields: {
-            data: [
-              { type: "fields", id: "address-user" },
-              { type: "fields", id: "ethereum-address" },
-            ]
-          },
-          'data-source': {
-            data: { type: 'data-sources', id: this.addressIndexing.trackedAddressDataSource }
-          }
-        }
-      }]);
-    } else if (this.addressIndexing && !this.addressIndexing.trackedAddressDataSource) {
-      throw new Error(`The data-source ${this.dataSourceId.toString()} needs to specify a data source to persist the tracked-ethereum-addresses documents in the data source configuration params.addressIndexing.trackedAddressDataSource.`);
     }
 
     this._schema = schema.map(doc => this._maybePatch(doc));
