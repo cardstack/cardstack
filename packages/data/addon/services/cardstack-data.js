@@ -129,24 +129,12 @@ export default Service.extend({
     if (attribute === 'uid') {
       return `${getType(card)}/${card.id}`;
     }
+    if (attribute === 'title') {
+      return get(card, 'title') || get(card, 'name');
+    }
     // The fallback – maybe we should not allow this in the future
     return get(card, attribute);
   },
-
-  // async getCardMetadata(card, attribute) {
-  //   let metadata = {};
-
-  //   // we will need to build this interface
-  //   if (typeof card.getMetadata === 'function') {
-  //     metadata = await card.getMetadata();
-  //   }
-
-  //   if (attribute === 'title') {
-  //     return metadata.title || metadata.name;
-  //   }
-
-  //   return metadata[attribute] || get(card, attribute);
-  // },
 
   _headers() {
     let headers = {
