@@ -18,7 +18,7 @@ export default Route.extend({
       queryParams = `?${qs.stringify(transition.queryParams, { encodeValuesOnly: true })}`;
     }
 
-    return this.get('store').findRecord('space', `${path.charAt(0) !== '/' ? '/' : ''}${path}${queryParams}`, { branch, reload: true })
+    return this.get('store').findRecord('space', `${path.charAt(0) !== '/' ? '/' : ''}${path}${queryParams}`, { adapterOptions: { branch }, reload: true })
       .catch(err => {
         if (!is404(err)) {
           throw err;

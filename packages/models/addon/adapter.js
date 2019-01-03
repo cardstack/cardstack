@@ -39,7 +39,13 @@ export default DS.JSONAPIAdapter.extend(AdapterMixin, {
 
   buildURL(modelName, id, snapshot, requestType, query) {
     let actualModelName = snapshot && snapshot.modelName || query && query.modelName;
-    return this._super(actualModelName || modelName, id, snapshot, requestType, query);
+    let url = this._super(actualModelName || modelName, id, snapshot, requestType, query);
+
+    if(snapshot && snapshot.adapterOptions && snapshot.adapterOptions.branch) {
+      url += `?branch=${snapshot.adapterOptions.branch}`;
+    }
+
+    return url;
   },
 
   deleteRecord(store, type, snapshot) {
