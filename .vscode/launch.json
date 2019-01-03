@@ -133,7 +133,7 @@
             "console": "integratedTerminal",
             "args": [
                 "test",
-                "${workspaceRoot}/packages/ethereum/truffle-tests/addresses-test.js"
+                "${workspaceRoot}/packages/ethereum/truffle-tests/*-test.js"
             ]
         }
     ]
