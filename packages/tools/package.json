@@ -22,7 +22,7 @@
     "test:all": "ember try:each"
   },
   "dependencies": {
-    "@cardstack/data": "0.12.7",
+    "@cardstack/data": "0.12.18",
     "@cardstack/edges": "0.12.7",
     "@cardstack/plugin-utils": "0.12.7",
     "@cardstack/rendering": "0.12.18",
