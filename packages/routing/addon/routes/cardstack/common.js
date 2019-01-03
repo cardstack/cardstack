@@ -38,7 +38,7 @@ export default Route.extend({
   updatePageTitle: task(function* (card) {
     if (!card) { return; }
 
-    let title = yield this.cardstackData.getCardMetadata(card, 'title');
+    let title = yield this.cardstackData.getCardMeta(card, 'title');
     this.headData.set('title', title);
   }).keepLatest(),
 
