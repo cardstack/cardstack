@@ -51,6 +51,9 @@ describe('pgsearch/searcher', function() {
       factory.addResource('fields', 'favorite-toy').withAttributes({
         fieldType: '@cardstack/core-types::string'
       }),
+      factory.addResource('fields', 'email-address').withAttributes({
+        fieldType: '@cardstack/core-types::case-insensitive'
+      }),
       factory.addResource('fields', 'hello').withAttributes({
         fieldType: '@cardstack/core-types::string'
       })
@@ -76,7 +79,8 @@ describe('pgsearch/searcher', function() {
     factory.addResource('articles', '1').withAttributes({
       hello: 'magic words',
       favoriteToy: 'Sneaky Snake',
-      favoriteColor: 'red'
+      favoriteColor: 'red',
+      'email-address': 'hassan@example.com'
     });
 
     factory.addResource('articles', '2').withAttributes({
@@ -668,6 +672,16 @@ describe('pgsearch/searcher', function() {
     expect(response.data[0]).has.deep.property('attributes.favorite-toy', 'Sneaky Snake');
   });
 
+  it('can ignore case when doing exact term matching for a case insensitive field', async function() {
+    let response = await searcher.search(env.session, 'master', {
+      filter: {
+        'email-address': { exact: 'HASSAN@EXAMPLE.COM' }
+      }
+    });
+    expect(response.data).length(1);
+    expect(response.data[0]).has.deep.property('attributes.email-address', 'hassan@example.com');
+  });
+
   it('incomplete phrase does not match', async function() {
     let response = await searcher.search(env.session, 'master', {
       filter: {
@@ -676,7 +690,6 @@ describe('pgsearch/searcher', function() {
     });
     expect(response.data).length(0);
   });
-
 
   it('can do exact term matching with multiple phrases', async function() {
     let response = await searcher.search(env.session, 'master', {
