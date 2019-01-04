@@ -129,6 +129,9 @@ export default Service.extend({
     if (attribute === 'uid') {
       return `${getType(card)}/${card.id}`;
     }
+    if (attribute === 'title') {
+      return get(card, 'title') || get(card, 'name');
+    }
     // The fallback – maybe we should not allow this in the future
     return get(card, attribute);
   },
