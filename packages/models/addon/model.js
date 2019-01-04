@@ -68,7 +68,7 @@ export default DS.Model.extend(RelationshipTracker, {
       let propertyName = createHasDirtyForRelationship(this, relationshipName, kind);
       dirtyTrackingProperties[relationshipName] = propertyName;
     }
-    createHasDirtyOwned(this, Object.values(dirtyTrackingProperties));
+    createHasDirtyOwned(this, ownedRelationships, Object.values(dirtyTrackingProperties));
     this.set('dirtyTrackingRelationNames', dirtyTrackingProperties);
   },
 
@@ -99,17 +99,37 @@ function relatedRecordsFor(model, relationName) {
 function createHasDirtyForRelationship(model, name, kind) {
   let propertyName = `hasDirty${capitalize(name)}`;
   if (kind === 'hasMany') {
-    defineProperty(model, propertyName, computed(`${name}.@each.hasDirtyAttributes`, function() {
-      return model.get(name).toArray().some((related) => related.hasDirtyAttributes);
+    defineProperty(model, propertyName, computed(`${name}.@each.hasDirtyFields`, function() {
+      return model.get(name).toArray().some((related) => related.hasDirtyFields);
     }));
   } else {
-    defineProperty(model, propertyName, readOnly(`${name}.hasDirtyAttributes`));
+    defineProperty(model, propertyName, readOnly(`${name}.hasDirtyFields`));
   }
   return propertyName;
 }
 
-function createHasDirtyOwned(model, properties) {
-  defineProperty(model, 'hasDirtyOwned', or(properties.join(',')));
+function createHasDirtyOwned(model, ownedRelationships, properties) {
+  defineProperty(model, 'hasDirtyOwnedRelationships', or(properties.join(',')));
+
+  let dependentKeys = Object.keys(ownedRelationships).reduce((dependentKeys, relationName) => {
+    let kind = ownedRelationships[relationName];
+    if (kind === 'belongsTo') {
+      dependentKeys.push(`'${relationName}.hasDirtyOwned'`);
+    } else {
+      dependentKeys.push(`'${relationName}.@each.hasDirtyOwned'`);
+    }
+    return dependentKeys;
+  }, []).join(',');
+
+  defineProperty(model, 'hasDirtyOwned', computed('hasDirtyOwnedRelationships', dependentKeys, function() {
+    if (model.hasDirtyOwnedRelationships) {
+      return true;
+    }
+    return Object.keys(ownedRelationships).some((relationName) => {
+      let relatedRecords = relatedRecordsFor(model, relationName);
+      return relatedRecords.some((records) => records.hasDirtyOwned);
+    });
+  }));
 }
 
 function flatten(arrays) {
