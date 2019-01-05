@@ -1,7 +1,44 @@
 @cardstack/sftp
 ==============================================================================
 
-[Short description of the addon.]
+
+SFTP data source that allows for reading files from and SFTP server. Currently
+only implements a searcher.
+
+To use, add a data source to your app:
+
+```js
+factory.addResource('data-sources', 'sftp')
+  .withAttributes({
+    'source-type': '@cardstack/sftp',
+    params: {
+      contentType: 'sftp-files',
+      branches: {
+        master: {
+          host: '1.2.3.4',
+          port: 22,
+          username: 'someuser',
+          privateKey: require('fs').readFileSync('/path/to/private/key')
+        }
+      }
+    }
+  });
+
+```
+
+Config is passed through to [ssh2](https://github.com/mscdex/ssh2) so see there
+if you want different connection options.
+
+What you pass to the `contentType` option is the name of the content type that
+is created. So if you pass `sftp-files`, your files are accessible at
+e.g. `/api/sftp-files/foo.jpg`
+
+Normal grants are respected.
+
+Use url encoding to access non-root-level files, e.g. if you want to access `foo/bar.jpg`:
+
+`/api/sftp-files/foo%2fbar.jpg`
+
 
 Installation
 ------------------------------------------------------------------------------

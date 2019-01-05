@@ -7,11 +7,16 @@ const supertest       = require('supertest');
 const Koa             = require('koa');
 const AWS             = require('aws-sdk');
 const sinon           = require('sinon');
-const { join }        = require('path');
+
+const { join, extname } = require('path');
+
+const { createReadStream, readFileSync} = require('fs');
 
 
 describe('cardstack/s3/writer', function() {
   let env, request, s3Options, uploadStub;
+
+  let fixtureJpg = join(__dirname, 'fixtures/small.jpg');
 
   beforeEach(async function() {
     this.timeout(10000);
@@ -51,6 +56,14 @@ describe('cardstack/s3/writer', function() {
         promise() { return Promise.resolve(); }
       };
     });
+
+    getStub = AWS.S3.prototype.getObject =  sinon.stub().callsFake(options => {
+      let Body = createReadStream(fixtureJpg);
+      return {
+        promise() { return Promise.resolve({ Body }); }
+      };
+    });
+
   });
 
   afterEach(async function() {
@@ -62,7 +75,7 @@ describe('cardstack/s3/writer', function() {
     await env.setUser('test-users', 'the-default-test-user');
 
     let response = await request.post('/api/cardstack-files')
-      .attach('avatar', join(__dirname, 'fixtures/small.jpg'));
+      .attach('avatar', fixtureJpg);
 
 
     expect(response.status).to.equal(201);
@@ -71,5 +84,22 @@ describe('cardstack/s3/writer', function() {
     expect(s3Options.Key).to.be.ok;
     expect(s3Options.Body.read).to.be.ok;
     expect(s3Options.Metadata['sha-sum']).to.be.ok;
+
+
+    let { id } = response.body.data;
+
+    expect(extname(id)).to.equal('.jpeg');
+
+    let response2 = await request
+      .get(`/api/cardstack-files/${id}`)
+      .set('Accept', 'image/*');
+
+    let data = readFileSync(fixtureJpg);
+
+    expect(response2.status).to.equal(200);
+    expect(response2.header['content-type']).to.equal("image/jpeg");
+    expect(response2.body.join()).to.equal(data.join());
+    expect(getStub.callCount).to.equal(1);
+
   });
 });

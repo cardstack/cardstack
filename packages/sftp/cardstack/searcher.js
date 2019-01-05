@@ -1,17 +1,15 @@
 const { declareInjections }   = require('@cardstack/di');
-const log = require('@cardstack/logger')('cardstack/s3');
-const { makeS3Client } = require('./s3');
-const { get } = require('lodash');
-const { basename } = require('path');
-const { lookup } = require('mime-types');
+const SftpClient = require('ssh2-sftp-client');
+const { dirname, basename } = require('path');
 const moment = require('moment');
-
+const { get } = require('lodash');
+const { lookup } = require('mime-types');
 
 module.exports = declareInjections({
   searcher: 'hub:searchers'
 },
 
-class S3Searcher {
+class SftpSearcher {
   static create(...args) {
     return new this(...args);
   }
@@ -23,6 +21,7 @@ class S3Searcher {
   }
 
   async get(session, branch, type, id, next) {
+
     let result = await next();
 
     if (result) { return result; }
@@ -33,23 +32,27 @@ class S3Searcher {
 
     let dataSourceId = get(contentType, 'data.relationships.data-source.data.id');
 
-    // only look for files in s3 if the content type is actually stored
+    // only look for files on the server if the content type is actually stored
     // in this data source
     if (dataSourceId !== this.dataSource.id) {
       return result;
     }
 
-    try {
-      let name = basename(id);
-      let result = await this.getObject(branch, { Key: id });
+    let client = await this.makeClient(branch);
+    let list = await client.list(dirname(id));
+    let name = basename(id);
+
+    let entry = list.find(e => e.name === name );
+
+    if (entry) {
       let contentType = lookup(name) || 'application/octet-stream';
 
-
       let attributes = {
-        'created-at':  moment(result.LastModified).format(),
-        'content-type': contentType,
-        'size':         result.ContentLength,
-        'file-name':    name
+        'access-time':  moment(entry.accessTime).format(),
+        'modify-time':  moment(entry.modifyTime).format(),
+        'size':         entry.size,
+        'file-name':    name,
+        'content-type': contentType
       };
 
       let data = {
@@ -58,26 +61,27 @@ class S3Searcher {
         attributes
       };
 
-
       return { data };
-    } catch(e) {
+    } else {
       return result;
     }
+
   }
 
   async search(session, branch, query, next) {
     return next();
   }
 
-  async getObject(branch, options) {
-    let config = this.branches[branch];
-    log.debug(`Attempting to read ${options.Key} from bucket ${config.bucket}`);
-
-    return await makeS3Client(config).getObject(options).promise();
+  async getBinary(session, branch, type, id) {
+    let client = await this.makeClient(branch);
+    return client.get(id, true, null);
   }
 
-  async getBinary(session, branch, type, id) {
-    let result = await this.getObject(branch, { Key: id });
-    return result.Body;
+  async makeClient(branch) {
+    let client = new SftpClient();
+
+    await client.connect(this.branches[branch]);
+
+    return client;
   }
 });
