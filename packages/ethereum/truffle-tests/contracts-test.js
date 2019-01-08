@@ -21,7 +21,7 @@ async function waitForEthereumEvents(indexer) {
   await indexer._indexingPromise;
 }
 
-contract('SampleToken', function (accounts) {
+contract('Token Indexing', function (accounts) {
   let accountOne = accounts[0].toLowerCase();
   let accountTwo = accounts[1].toLowerCase();
   let accountThree = accounts[2].toLowerCase();
@@ -1690,7 +1690,7 @@ contract('SampleToken', function (accounts) {
         let mintEventId = `${mintEvents[0].transactionHash}_${mintEvents[0].logIndex}`;
         let transferEventId = `${mintEvents[1].transactionHash}_${mintEvents[1].logIndex}`;
 
-        await ethereumClient.start({ contract, name: contractName, eventIndexer });
+        await ethereumClient.startEventListening({ contract, name: contractName, eventIndexer });
         await indexers.update({ forceRefresh: true });
         await waitForEthereumEvents(eventIndexer);
 
@@ -1729,7 +1729,7 @@ contract('SampleToken', function (accounts) {
         await token.transfer(accountTwo, 20, { from: accountOne });
         await token.transfer(accountThree, 30, { from: accountOne });
 
-        await ethereumClient.start({ contract, name: contractName, eventIndexer });
+        await ethereumClient.startEventListening({ contract, name: contractName, eventIndexer });
         await indexers.update({ forceRefresh: true });
         await waitForEthereumEvents(eventIndexer);
 
@@ -1739,7 +1739,7 @@ contract('SampleToken', function (accounts) {
 
         await token.transfer(accountFour, 20, { from: accountOne });
 
-        await ethereumClient.start({ contract, name: contractName, eventIndexer });
+        await ethereumClient.startEventListening({ contract, name: contractName, eventIndexer });
         await indexers.update({ forceRefresh: true });
         await waitForEthereumEvents(eventIndexer);
 
@@ -1764,7 +1764,7 @@ contract('SampleToken', function (accounts) {
         await token.transfer(accountTwo, 20, { from: accountOne });
         await token.setTokenFrozen(true);
 
-        await ethereumClient.start({ contract, name: contractName, eventIndexer });
+        await ethereumClient.startEventListening({ contract, name: contractName, eventIndexer });
         await indexers.update({ forceRefresh: true });
         await waitForEthereumEvents(eventIndexer);
 

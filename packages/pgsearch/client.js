@@ -236,16 +236,18 @@ class Batch {
   }
 
   async deleteDocument(context) {
-    let { branch, type, id } = context;
+    let { branch, type, id, doc } = context;
+    let { rows } = await this.client.query('select branch, type, id, source, generation, upstream_doc as "upstreamDoc" from documents where branch=$1 and type=$2 and id=$3', [branch, type, id]);
+    let [ eventContext={} ] = rows;
 
     this._touched[`${branch}/${type}/${id}`] = this._touchCounter++;
     let sql = 'delete from documents where branch=$1 and type=$2 and id=$3';
 
     await this.client.query(sql, [branch, type, id]);
-    await this.client.emitEvent('delete', { type, id });
+    await this.client.emitEvent('delete', eventContext);
     log.debug("delete %s %s", type, id);
 
-    await this._handleGrantOrGroupsTouched(context);
+    await this._handleGrantOrGroupsTouched({ type, id, doc });
   }
 
   async done() {

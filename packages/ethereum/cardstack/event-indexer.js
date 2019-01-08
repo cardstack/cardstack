@@ -44,7 +44,7 @@ class EthereumEventIndexer {
     this.contractDefinitions[name] = contract;
     this.ethereumClient = ethereumClient;
 
-    await this.ethereumClient.start({ name, contract, eventIndexer: this });
+    await this.ethereumClient.startEventListening({ name, contract, eventIndexer: this });
   }
 
   async index(contractName, blockHeight, history) {

@@ -127,11 +127,11 @@ class Searchers {
     return [result, document];
   }
 
-  async getFromControllingBranch(session, type, id) {
+  async getFromControllingBranch(session, type, id, includePaths) {
     if (arguments.length < 3) {
       throw new Error(`session is now a required argument to searchers.getFromControllingBranch`);
     }
-    return this.get(session, this.controllingBranch.name, type, id);
+    return this.get(session, this.controllingBranch.name, type, id, includePaths);
   }
 
   async search(session, branch, query) {
@@ -178,6 +178,10 @@ class Searchers {
       }
       return authorizedResult;
     }
+  }
+
+  async searchFromControllingBranch(session, query) {
+    return this.search(session, this.controllingBranch.name, query);
   }
 
   createDocumentContext({ schema, type, id, branch, sourceId, generation, upstreamDoc, includePaths }) {
