@@ -13,6 +13,7 @@ const getBlock = promisify(web3.eth.getBlock);
 let transactionIndexer, ethereumClient, env, searchers, ignoredTxns, accounts, from, to, gasPrice;
 
 async function teardown() {
+  await transactionIndexer._eventProcessingPromise;
   await transactionIndexer._indexingPromise;
   await ethereumClient.stopAll();
   await destroyDefaultEnvironment(env);
@@ -48,6 +49,7 @@ function setup(factoryCallback, afterBootCallback) {
 }
 
 async function waitForEthereumEvents(indexer) {
+  await indexer._eventProcessingPromise;
   await indexer._indexingPromise;
 }
 
