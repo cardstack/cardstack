@@ -3,6 +3,7 @@ const {
   destroyDefaultEnvironment
 } = require('@cardstack/test-support/env');
 const JSONAPIFactory = require('@cardstack/test-support/jsonapi-factory');
+const sleep = require('util').promisify(setTimeout);
 
 const sendTransaction = promisify(web3.eth.sendTransaction);
 const getTransaction = promisify(web3.eth.getTransaction);
@@ -48,6 +49,7 @@ function setup(factoryCallback, afterBootCallback) {
 }
 
 async function waitForEthereumEvents(indexer) {
+  await sleep(250); // leaky async somewhere?
   await indexer._indexingPromise;
 }
 
