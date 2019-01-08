@@ -29,6 +29,7 @@ class TransactionIndexer {
     this.pgsearchClient = pgsearchClient;
     this.controllingBranch = controllingBranch;
     this._indexingPromise = null; // this is exposed to the tests as web3 has poor support for async in event handlers
+    this._eventProcessingPromise = null; // this is exposed to the tests to deal with indexing event async
     this._setupPromise = this._ensureClient();
     this._boundEventListeners = false;
     this._startedPromise = new Promise(res => this._hasStartedCallBack = res);
@@ -98,48 +99,64 @@ class TransactionIndexer {
       throw new Error(`The configured trackedAddressField '${trackedAddressField}' is not a valid field.`);
     }
 
-    this.pgsearchClient.on('add', async ({ type,  doc: { data: trackedResource } }) => {
+    this.pgsearchClient.on('add', async (evt) => {
+      let { type } = evt;
       if (type !== trackedAddressContentType) { return; }
 
-      let field = trackedAddressField === 'id' ? 'id' : `attributes.${trackedAddressField}`;
-      let fieldValue = get(trackedResource, field);
-      if (!fieldValue) { return; }
+      this._eventProcessingPromise = Promise.resolve(this._eventProcessingPromise)
+        .then(() => this._processIndexingAddEvent(trackedAddressField, evt));
 
-      let addresses = (Array.isArray(fieldValue) ? fieldValue : [ fieldValue ]).map(i => i.toLowerCase());
-      if (!addresses.length) { return; }
-
-      let trackedAddressCounts = (await this.getTrackedAddresses()).reduce((totals, i) => {
-        if (!addresses.includes(i)) { return totals; }
-        if (!totals[i]) {
-          totals[i] = 0;
-        }
-        totals[i]++;
-        return totals;
-      }, {});
-
-      let newAddresses = Object.keys(trackedAddressCounts).filter(address => trackedAddressCounts[address] < 2); // new address will already be in the index at this point so make sure not to count it
-      if (newAddresses.length) {
-        // intentionally not awaiting (indexing could take awhile), make sure to use TransactionIndexer._indexingPromise in the tests so async doesn't leak
-        this.index({ startIndexingAddresses: newAddresses });
-      }
+      return await this._eventProcessingPromise;
     });
 
-    this.pgsearchClient.on('delete', async ({ type,  doc: { data: trackedResource } }) => {
+    this.pgsearchClient.on('delete', async (evt) => {
+      let { type } = evt;
       if (type !== trackedAddressContentType) { return; }
 
-      let field = trackedAddressField === 'id' ? 'id' : `attributes.${trackedAddressField}`;
-      let fieldValue = get(trackedResource, field);
-      if (!fieldValue) { return; }
+      this._eventProcessingPromise = Promise.resolve(this._eventProcessingPromise)
+        .then(() => this._processIndexingDeleteEvent(trackedAddressField, evt));
 
-      let addresses = (Array.isArray(fieldValue) ? fieldValue : [ fieldValue ]).map(i => i.toLowerCase());
-      if (!addresses.length) { return; }
-
-      let deletedAddresses = difference(addresses, await this.getTrackedAddresses());
-      if (deletedAddresses.length) {
-        // intentionally not awaiting (indexing could take awhile), make sure to use TransactionIndexer._indexingPromise in the tests so async doesn't leak
-        this.index({ stopIndexingAddresses: deletedAddresses });
-      }
+      return await this._eventProcessingPromise;
     });
+  }
+
+  async _processIndexingAddEvent(trackedAddressField, { doc: { data: trackedResource } }) {
+    let field = trackedAddressField === 'id' ? 'id' : `attributes.${trackedAddressField}`;
+    let fieldValue = get(trackedResource, field);
+    if (!fieldValue) { return; }
+
+    let addresses = (Array.isArray(fieldValue) ? fieldValue : [fieldValue]).map(i => i.toLowerCase());
+    if (!addresses.length) { return; }
+
+    let trackedAddressCounts = (await this.getTrackedAddresses()).reduce((totals, i) => {
+      if (!addresses.includes(i)) { return totals; }
+      if (!totals[i]) {
+        totals[i] = 0;
+      }
+      totals[i]++;
+      return totals;
+    }, {});
+
+    let newAddresses = Object.keys(trackedAddressCounts).filter(address => trackedAddressCounts[address] < 2); // new address will already be in the index at this point so make sure not to count it
+    if (newAddresses.length) {
+      // intentionally not awaiting (indexing could take awhile), make sure to use TransactionIndexer._indexingPromise in the tests so async doesn't leak
+      this.index({ startIndexingAddresses: newAddresses });
+    }
+  }
+
+  async _processIndexingDeleteEvent(trackedAddressField, { doc: { data: trackedResource } }) {
+    let field = trackedAddressField === 'id' ? 'id' : `attributes.${trackedAddressField}`;
+    let fieldValue = get(trackedResource, field);
+    if (!fieldValue) { return; }
+
+    let addresses = (Array.isArray(fieldValue) ? fieldValue : [fieldValue]).map(i => i.toLowerCase());
+    if (!addresses.length) { return; }
+
+    let deletedAddresses = difference(addresses, await this.getTrackedAddresses());
+    if (deletedAddresses.length) {
+      // intentionally not awaiting (indexing could take awhile), make sure to use TransactionIndexer._indexingPromise in the tests so async doesn't leak
+      this.index({ stopIndexingAddresses: deletedAddresses });
+    }
   }
 
   async _ensureClient() {
