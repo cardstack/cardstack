@@ -65,7 +65,7 @@ class Routers {
 
     let included = [ primaryCard.data ].concat(primaryCard.included || []);
     if (get(primaryCard, 'data.meta.is-error-card')) {
-      params = {};
+      params = { path };
       if (session.id && session.type) {
         params.session = { id: session.id, type: session.type };
       }
