@@ -14,7 +14,7 @@ class RoutingSearcher {
 
   async get(session, branch, type, id, next) {
     if (type === 'spaces') {
-      return await this.routers.getSpace(branch, id);
+      return await this.routers.getSpace(branch, id, session);
     }
     return next();
   }

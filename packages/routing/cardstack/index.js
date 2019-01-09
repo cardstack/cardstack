@@ -1,7 +1,7 @@
 const Session = require('@cardstack/plugin-utils/session');
 const { get, uniq } = require('lodash');
 
-async function getRoute(searchers, router, branch, path, applicationCard) {
+async function getRoute(searchers, router, branch, path, applicationCard, session) {
   let query;
   let { route: matchedRoute,
     remainingPath,
@@ -15,7 +15,7 @@ async function getRoute(searchers, router, branch, path, applicationCard) {
   routingCard = routingCard || applicationCard;
 
   if (matchedRoute.query) {
-    query = resolveReplacementTagsFromPath(matchedRoute, path, JSON.stringify(matchedRoute.query));
+    query = resolveReplacementTagsFromPath(matchedRoute, path, JSON.stringify(matchedRoute.query), session);
     if (routingCard) {
       query = resolveRoutingCardReplacementTags(routingCard, query, routingCardsCache);
     }
@@ -30,6 +30,10 @@ async function getRoute(searchers, router, branch, path, applicationCard) {
   if (routeStack.filter(r => !r).length) {
     // interior routing card cannot be found, consider the route unmatched
     return;
+  }
+
+  if (session && session.id && session.type) {
+    params.session = { type: session.type, id: session.id };
   }
 
   return {
@@ -132,9 +136,9 @@ function resolveRoutingCardReplacementTags(routingCard, stringToResolve, routing
     .replace(/:([\w-]+)(\[([^\]]+)\])/g, replaceNamespacedField(routingCard, routingCards, 'cardResolution'));
 }
 
-function resolveReplacementTagsFromPath(route, path, string) {
+function resolveReplacementTagsFromPath(route, path, string, session) {
   let result = string;
-  let dictionary = buildSubstitutionDictionary(route, path);
+  let dictionary = buildSubstitutionDictionary(route, path, session);
 
   for (let dynamicSegmentName of Object.keys(dictionary)) {
     result = result.replace(new RegExp(`:${dynamicSegmentName.replace(/([[\]])/g, '\\$1')}`, 'g'), dictionary[dynamicSegmentName]);
@@ -154,12 +158,19 @@ async function getRoutingCardForRoute(searchers, route, branch, path, routingCar
   }
 }
 
-function buildSubstitutionDictionary(route, path) {
+function buildSubstitutionDictionary(route, path, session) {
   let dictionary = {};
   let type = route.contentType;
   let pathPattern = route.namespacedPath;
   let pathSegments = path.split('?')[0].split('/');
   let routeSegments = pathPattern.split('?')[0].split('/');
+
+  if (session && session.type) {
+    dictionary['session:type'] = session.type;
+  }
+  if (session && session.id) {
+    dictionary['session:id'] = session.id;
+  }
 
   // process the path part of the URL
   for (let i = 0; i < routeSegments.length; i++) {
