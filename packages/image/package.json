@@ -1,6 +1,6 @@
 {
   "name": "@cardstack/image",
-  "version": "0.12.19",
+  "version": "0.12.20",
   "description": "Image field plugin for cardstack",
   "keywords": [
     "ember-addon",
@@ -25,7 +25,7 @@
   },
   "dependencies": {
     "@cardstack/plugin-utils": "0.12.7",
-    "@cardstack/test-support": "0.12.19",
+    "@cardstack/test-support": "0.12.20",
     "ember-cli-babel": "^6.8.2",
     "ember-cli-htmlbars": "^2.0.1"
   },
@@ -33,8 +33,8 @@
     "@cardstack/authentication": "0.12.19",
     "@cardstack/ephemeral": "0.12.7",
     "@cardstack/eslint-config": "0.12.7",
-    "@cardstack/files": "0.12.19",
-    "@cardstack/jsonapi": "0.12.18",
+    "@cardstack/files": "0.12.20",
+    "@cardstack/jsonapi": "0.12.20",
     "@cardstack/mock-auth": "0.12.19",
     "@cardstack/models": "0.12.19",
     "@cardstack/rendering": "0.12.18",

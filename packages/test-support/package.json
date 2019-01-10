@@ -1,6 +1,6 @@
 {
   "name": "@cardstack/test-support",
-  "version": "0.12.19",
+  "version": "0.12.20",
   "description": "Shared test support for cardstack packages.",
   "main": "index.js",
   "scripts": {
@@ -21,9 +21,9 @@
     "@cardstack/data": "0.12.19",
     "@cardstack/di": "0.12.7",
     "@cardstack/ephemeral": "0.12.7",
-    "@cardstack/hub": "0.12.19",
+    "@cardstack/hub": "0.12.20",
     "@cardstack/logger": "^0.1.0",
-    "@cardstack/pgsearch": "0.12.19",
+    "@cardstack/pgsearch": "0.12.20",
     "@cardstack/plugin-utils": "0.12.7",
     "@std/esm": "^0.25.1",
     "broccoli-funnel": "^2.0.1",
