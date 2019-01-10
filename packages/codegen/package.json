@@ -33,7 +33,7 @@
   "devDependencies": {
     "@cardstack/eslint-config": "0.12.7",
     "@cardstack/jsonapi": "0.12.20",
-    "@cardstack/test-support": "0.12.20",
+    "@cardstack/test-support": "0.12.21",
     "ember-cli": "^3.0.0",
     "ember-cli-dependency-checker": "^2.1.0",
     "ember-cli-htmlbars": "^2.0.1",
