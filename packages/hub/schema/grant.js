@@ -258,7 +258,7 @@ module.exports = class Grant {
     let userRealms = await (context.session || Session.EVERYONE).realms();
 
     let approvedRealm = uniq(this.who.map(({ staticRealm, realmField }) => {
-      if (realmField) {
+      if (resource && realmField) {
         return Grant.readRealmsFromField(resource, realmField);
       } else {
         return [staticRealm];
