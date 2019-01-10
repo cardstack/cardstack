@@ -38,11 +38,11 @@
   "devDependencies": {
     "@cardstack/ephemeral": "0.12.7",
     "@cardstack/eslint-config": "0.12.7",
-    "@cardstack/jsonapi": "0.12.18",
+    "@cardstack/jsonapi": "0.12.20",
     "@cardstack/models": "0.12.19",
     "@cardstack/plugin-utils": "0.12.7",
     "@cardstack/rendering": "0.12.18",
-    "@cardstack/test-support": "0.12.19",
+    "@cardstack/test-support": "0.12.20",
     "@cardstack/tools": "0.12.19",
     "broccoli-asset-rev": "^2.4.5",
     "ember-cli": "^3.0.0",
