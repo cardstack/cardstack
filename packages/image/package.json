@@ -1,6 +1,6 @@
 {
   "name": "@cardstack/image",
-  "version": "0.12.21",
+  "version": "0.13.0",
   "description": "Image field plugin for cardstack",
   "keywords": [
     "ember-addon",
@@ -24,22 +24,22 @@
     "test": "ember try:each"
   },
   "dependencies": {
-    "@cardstack/plugin-utils": "0.12.7",
-    "@cardstack/test-support": "0.12.21",
+    "@cardstack/plugin-utils": "0.13.0",
+    "@cardstack/test-support": "0.13.0",
     "ember-cli-babel": "^6.8.2",
     "ember-cli-htmlbars": "^2.0.1"
   },
   "devDependencies": {
-    "@cardstack/authentication": "0.12.21",
-    "@cardstack/ephemeral": "0.12.7",
-    "@cardstack/eslint-config": "0.12.7",
-    "@cardstack/files": "0.12.21",
-    "@cardstack/jsonapi": "0.12.20",
-    "@cardstack/mock-auth": "0.12.21",
-    "@cardstack/models": "0.12.21",
-    "@cardstack/rendering": "0.12.18",
-    "@cardstack/routing": "0.12.21",
-    "@cardstack/tools": "0.12.21",
+    "@cardstack/authentication": "0.13.0",
+    "@cardstack/ephemeral": "0.13.0",
+    "@cardstack/eslint-config": "0.13.0",
+    "@cardstack/files": "0.13.0",
+    "@cardstack/jsonapi": "0.13.0",
+    "@cardstack/mock-auth": "0.13.0",
+    "@cardstack/models": "0.13.0",
+    "@cardstack/rendering": "0.13.0",
+    "@cardstack/routing": "0.13.0",
+    "@cardstack/tools": "0.13.0",
     "broccoli-asset-rev": "^2.4.5",
     "ember-cli": "^3.0.0",
     "ember-cli-dependency-checker": "^2.1.0",
