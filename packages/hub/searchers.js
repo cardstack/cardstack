@@ -110,19 +110,19 @@ class Searchers {
     // if authorization is not correct.
     let document = await this.get(session, branch, type, id, includePaths);
 
-    let index = 0;
+    let sourceId = document.data.meta.source;
+
     let sources = await this._lookupSources();
+
     let sessionOrEveryone = session || Session.EVERYONE;
-    let next = async () => {
-      let source = sources[index++];
-      if (source && (typeof source.searcher.getBinary === 'function')) {
-        let response = await source.searcher.getBinary(sessionOrEveryone, branch, type, id, next);
-        return response;
-      } else {
-        return await next();
-      }
-    };
-    let result = await next();
+
+
+    // we don't need to take a middleware-like approach here because we already
+    // searched for the json representation, so we know exactly what data source
+    // to get the binary blob from
+    let source = sources.find(s => s.id === sourceId);
+
+    let result = await source.searcher.getBinary(sessionOrEveryone, branch, type, id);
 
     return [result, document];
   }

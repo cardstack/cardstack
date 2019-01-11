@@ -23,12 +23,9 @@ class EphemeralSearcher {
     return next();
   }
 
-  async getBinary(session, branch, type, id, next) {
+  async getBinary(session, branch, type, id) {
     let storage = await this.service.findOrCreateStorage(this.dataSource.id);
     let result = storage.lookupBinary(type, id);
-    if (result) {
-      return result;
-    }
-    return next();
+    return result;
   }
 });

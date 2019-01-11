@@ -34,11 +34,6 @@ describe('cardstack/s3/searcher', function() {
       }
     });
 
-    factory.addResource('cardstack-files', '1234').withAttributes({
-      'sha-sum': 'sum',
-      'content-type': 'text/plain'
-    });
-
     env = await createDefaultEnvironment(`${__dirname}/..`, factory.getModels());
 
     await env.lookup('hub:indexers').update({ forceRefresh: true });
@@ -66,15 +61,15 @@ describe('cardstack/s3/searcher', function() {
     await env.setUser('test-users', 'the-default-test-user');
 
     let response = await request
-      .get('/api/cardstack-files/1234')
+      .get('/api/cardstack-files/1234.txt')
       .set('Accept', 'text/plain');
 
 
     expect(response.status).to.equal(200);
     expect(response.text).to.equal("Here is the body");
     expect(response.header['content-type']).to.equal("text/plain");
-    expect(uploadStub.callCount).to.equal(1);
+    expect(uploadStub.callCount).to.equal(2);
 
-    expect(s3Options.Key).to.equal('1234');
+    expect(s3Options.Key).to.equal('1234.txt');
   });
 });

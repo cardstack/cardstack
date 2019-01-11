@@ -5,7 +5,7 @@ const sha1File = require('sha1-file');
 const moment = require("moment");
 const { makeS3Client } = require('./s3');
 const log = require('@cardstack/logger')('cardstack/image');
-
+const { extension } = require('mime-types');
 
 module.exports = class Writer {
   static create(params) {
@@ -36,7 +36,8 @@ module.exports = class Writer {
       await this.s3Upload(branch, { Key, Body: stream, Metadata });
     };
 
-    let id = uuidv4();
+    let id = `${uuidv4()}.${extension(stream.mimeType)}`;
+
     let document = {
       type: 'cardstack-files',
       id,
