@@ -2,6 +2,7 @@ const { declareInjections } = require('@cardstack/di');
 const { difference, flatMap, uniqBy, intersection, get } = require('lodash');
 const { utils: { BN, toChecksumAddress } } = require('web3');
 const Session = require('@cardstack/plugin-utils/session');
+const { coerce, valid, gt, lt } = require('semver');
 const log = require('@cardstack/logger')('cardstack/ethereum/transaction-indexer');
 
 const DEFAULT_MAX_ADDRESSES_TRACKED = 10000;
@@ -176,6 +177,12 @@ class TransactionIndexer {
     }
 
     let currentBlockNumber = await this.ethereumClient.getBlockHeight();
+    if (currentBlockNumber === undefined) {
+      // this can happen if there is a communication error with geth
+      log.warn(`unable to obtain block number from ethereum client, skipping indexing`);
+      return;
+    }
+
     let trackedAddresses = Array.isArray(startIndexingAddresses) ? startIndexingAddresses : await this.getTrackedAddresses();
     if (!trackedAddresses || !trackedAddresses.length) {
       log.info(`There are no tracked-ethereum-addresses to index.`);
@@ -208,7 +215,7 @@ class TransactionIndexer {
       for (let address of newAddresses) {
         let numSentTxns = await this.ethereumClient.getSentTransactionCount(address, currentBlockNumber);
         let balance = new BN(await this.ethereumClient.getBalance(address, currentBlockNumber));
-        newAddressesInfo[address] = { numSentTxns, balance };
+        newAddressesInfo[address] = { numSentTxns, balance, discoveredAtBlock: currentBlockNumber };
 
         // First create the ethereum address so the client has something to look at while it
         // waits for the transactions to appear in the index, as transaction load may take awhile
@@ -218,7 +225,7 @@ class TransactionIndexer {
     }
 
     let discoveredTransactions = {};
-    let addressesNonces = {};
+    let addressesVersions = {};
     let batch = this.pgsearchClient.beginBatch(this.schema, this.searchers);
 
     // Using the number of sent transactions and the balance as a heuristic to prevent having to crawl to
@@ -242,18 +249,26 @@ class TransactionIndexer {
         blockNumber,
         batch,
         discoveredTransactions,
-        addressesNonces
+        addressesVersions
       });
+
+      if (blockNumber === 0 &&
+        (hasBalance(newAddressesInfo) || hasSentTxns(newAddressesInfo))) {
+          let addressesWithBalances = Object.keys(newAddressesInfo).filter(address => newAddressesInfo[address].balance.gt(new BN(0)));
+          let addressesWithSentTransactions = Object.keys(newAddressesInfo).map(address => newAddressesInfo[address].numSentTxns > 0);
+          throw new Error(`Error: the heuristic used to index the ethereum address has reached the genesis block and was unable to reach succesful end state. This should never happen and indicates a bug in our heuristic calcuation.
+ These addresses still have an unresolved balances: ${JSON.stringify(addressesWithBalances)}. These addresses still have unresolved sent transactions: ${JSON.stringify(addressesWithSentTransactions)}`);
+      }
     }
 
     let addressesWithTransactions = Object.keys(discoveredTransactions);
     for (let address of addressesWithTransactions) {
-      await this._indexAddressResource(batch, address, currentBlockNumber, discoveredTransactions[address], addressesNonces[address]);
+      await this._indexAddressResource(batch, address, currentBlockNumber, discoveredTransactions[address], addressesVersions[address], get(newAddressesInfo, `${address}.discoveredAtBlock`));
     }
 
     let newAdressesWithoutTransactions = newAddresses.filter(address => !addressesWithTransactions.includes(address));
     for (let address of newAdressesWithoutTransactions) {
-      await this._indexAddressResource(batch, address, currentBlockNumber);
+      await this._indexAddressResource(batch, address, currentBlockNumber, undefined, undefined, get(newAddressesInfo, `${address}.discoveredAtBlock`));
     }
 
     await batch.done();
@@ -261,7 +276,7 @@ class TransactionIndexer {
 
   async _indexBlock(trackedAddresses, blockNumber) {
     let discoveredTransactions = {};
-    let addressesNonces = {};
+    let addressesVersions = {};
     let lastIndexedAddressesBlockHeights = lastIndexedBlockHeights(await this._getIndexedAddresses());
 
     let batch = this.pgsearchClient.beginBatch(this.schema, this.searchers);
@@ -271,11 +286,11 @@ class TransactionIndexer {
       batch,
       lastIndexedAddressesBlockHeights,
       discoveredTransactions,
-      addressesNonces
+      addressesVersions
     });
 
     for (let address of Object.keys(discoveredTransactions)) {
-      await this._indexAddressResource(batch, address, blockNumber, discoveredTransactions[address], addressesNonces[address]);
+      await this._indexAddressResource(batch, address, blockNumber, discoveredTransactions[address], addressesVersions[address]);
     }
     await batch.done();
   }
@@ -288,49 +303,62 @@ class TransactionIndexer {
     blockNumber,
     batch,
     discoveredTransactions,
-    addressesNonces }) {
+    addressesVersions }) {
     let block = await this.ethereumClient.getBlock(blockNumber);
     if (!block || !block.transactions.length) { return; }
 
     let addressesEligibleForIndexing = trackedAddresses.filter(address =>
       (lastIndexedAddressesBlockHeights[address] && lastIndexedAddressesBlockHeights[address] < blockNumber) ||
-      (newAddressesInfo[address] && newAddressesInfo[address].balance.gt(0)) ||
+      (newAddressesInfo[address] && newAddressesInfo[address].balance.gt(new BN(0))) ||
       (newAddressesInfo[address] && newAddressesInfo[address].numSentTxns > 0));
     for (let transaction of block.transactions) {
       let addressesToIndex = intersection(addressesEligibleForIndexing, [transaction.from.toLowerCase(), (transaction.to || '').toLowerCase()]);
       if (!addressesToIndex.length) { continue; }
 
       let isSuccessfulTxn;
+      let transactionResource;
       try {
-        await this.searchers.getFromControllingBranch(Session.INTERNAL_PRIVILEGED, 'ethereum-transactions', transaction.hash);
+        let existingTransaction = await this.searchers.getFromControllingBranch(Session.INTERNAL_PRIVILEGED, 'ethereum-transactions', transaction.hash);
+        transactionResource = existingTransaction.data;
+        isSuccessfulTxn = transactionResource && get(transactionResource, 'attributes.transaction-successful');
       } catch (e) {
         if (e.status === 404) {
           log.trace(`index of ethereum transactions found transaction to index at block ${blockNumber}, ${JSON.stringify(transaction, null, 2)}`);
-          let resource = await this._indexTransactionResource(batch, block, transaction);
-          isSuccessfulTxn = resource && get(resource, 'attributes.transaction-successful');
+          transactionResource = await this._indexTransactionResource(batch, block, transaction);
+          isSuccessfulTxn = transactionResource && get(transactionResource, 'attributes.transaction-successful');
         } else { throw e; }
       }
 
       for (let address of addressesToIndex) {
         discoveredTransactions[address] = discoveredTransactions[address] || [];
         discoveredTransactions[address].unshift(transaction.hash);
-        addressesNonces[address] = Math.max(addressesNonces[address] || 0, transaction.nonce);
+        let currentVersion = addressesVersions[address];
+        let discoveredVersion = `${blockNumber}.${get(transactionResource, 'attributes.transaction-index')}`;
+        if (valid(discoveredVersion)) {
+          throw new Error(`Cannot process transaction ${transaction.hash}, unable determine transaction's position in the block (index). Reported transaction index is ${get(transactionResource, 'attributes.transaction-index')}`);
+        }
+        addressesVersions[address] = currentVersion && gt(coerce(currentVersion), coerce(discoveredVersion)) ?
+                                     currentVersion : discoveredVersion;
+        if (newAddressesInfo[address]) {
+          newAddressesInfo[address].discoveredAtBlock = Math.min(blockNumber, newAddressesInfo[address].discoveredAtBlock);
+        }
       }
 
       if (isSuccessfulTxn && newAddresses.includes(transaction.from.toLowerCase())) {
-        if (transaction.to &&
-          transaction.value !== '0' &&
-          transaction.from.toLowerCase() !== transaction.to.toLowerCase()) {
-          let balance = newAddressesInfo[transaction.from.toLowerCase()].balance;
-          newAddressesInfo[transaction.from.toLowerCase()].balance = balance.add(new BN(transaction.value));
-        }
+        let balance = newAddressesInfo[transaction.from.toLowerCase()].balance;
+        let gasCost = transactionResource ?
+          (new BN(get(transactionResource, 'attributes.gas-used') || 0))
+            .mul((new BN(get(transactionResource, 'attributes.gas-price') || 0))) :
+          new BN(0);
+        newAddressesInfo[transaction.from.toLowerCase()].balance = balance.add(new BN(transaction.value)).add(gasCost);
         newAddressesInfo[transaction.from.toLowerCase()].numSentTxns--;
       }
 
       if (isSuccessfulTxn && transaction.to && newAddresses.includes(transaction.to.toLowerCase())) {
-        if (transaction.from.toLowerCase() !== transaction.to.toLowerCase()) {
-          let balance = newAddressesInfo[transaction.to.toLowerCase()].balance;
-          newAddressesInfo[transaction.to.toLowerCase()].balance = balance.sub(new BN(transaction.value));
+        let balance = newAddressesInfo[transaction.to.toLowerCase()].balance;
+        newAddressesInfo[transaction.to.toLowerCase()].balance = balance.sub(new BN(transaction.value));
+        if (newAddressesInfo[transaction.to.toLowerCase()].balance.isNeg()) {
+          throw new Error(`Error: the heuristic used to index the ethereum address ${transaction.to} resulted in a negative balance at block #${blockNumber} for transaction hash ${transaction.hash}. This should never happen and indicates a bug in our heuristic calculation.`);
         }
       }
     }
@@ -440,7 +468,7 @@ class TransactionIndexer {
     return await this._indexResource(batch, addressResource);
   }
 
-  async _indexAddressResource(batch, address, blockHeight, transactions = [], lastTxnNonce = 0) {
+  async _indexAddressResource(batch, address, blockHeight, transactions = [], addressVersion='0.0', discoveredAtBlock) {
     if (!address) { return; }
 
     let addressResource;
@@ -452,8 +480,8 @@ class TransactionIndexer {
     if (addressResource) {
       addressResource = addressResource.data;
       let { meta: { version } } = addressResource;
-      if (version && lastTxnNonce < version) {
-        throw new Error(`Cannot index ethereum-addresses/${address} last txn nonce '${lastTxnNonce}' is less than currently indexed document's last txn nonce '${version}'.`);
+      if (version && lt(coerce(addressVersion), coerce(version))) {
+        throw new Error(`Cannot index ethereum-addresses/${address} the address version '${addressVersion}' is less than currently indexed address document version '${version}'. Address versions is dervied from '<blocknumber>.<highest txn index>'.`);
       }
     } else {
       addressResource = {
@@ -469,15 +497,16 @@ class TransactionIndexer {
     }
 
     addressResource.attributes['balance'] = (await this.ethereumClient.getBalance(address, blockHeight)).toString();
-    let updatedTransactions = addressResource.relationships.transactions.data.concat(transactions.map(txn => {
+    let updatedTransactions = addressResource.relationships.transactions.data.concat((transactions || []).map(txn => {
       return { type: 'ethereum-transactions', id: txn };
     }));
 
     addressResource.relationships.transactions.data = uniqBy(updatedTransactions, 'id');
     addressResource.meta = addressResource.meta || {};
     addressResource.meta.blockHeight = blockHeight;
-    addressResource.meta.version = lastTxnNonce;
+    addressResource.meta.version = addressVersion;
     addressResource.meta.loadingTransactions = undefined;
+    addressResource.meta.discoveredAtBlock = Math.min(addressResource.meta.discoveredAtBlock || blockHeight, discoveredAtBlock || blockHeight);
 
     return await this._indexResource(batch, addressResource);
   }
@@ -510,7 +539,7 @@ class TransactionIndexer {
 
 function hasBalance(addressesInfo) {
   let balances = Object.keys(addressesInfo).map(address => addressesInfo[address].balance);
-  return balances.some(b => b.gt(0));
+  return balances.some(b => b.gt(new BN(0)));
 }
 
 function hasSentTxns(addressesInfo) {
