@@ -315,19 +315,17 @@ class TransactionIndexer {
       let addressesToIndex = intersection(addressesEligibleForIndexing, [transaction.from.toLowerCase(), (transaction.to || '').toLowerCase()]);
       if (!addressesToIndex.length) { continue; }
 
-      let isSuccessfulTxn;
       let transactionResource;
       try {
         let existingTransaction = await this.searchers.getFromControllingBranch(Session.INTERNAL_PRIVILEGED, 'ethereum-transactions', transaction.hash);
         transactionResource = existingTransaction.data;
-        isSuccessfulTxn = transactionResource && get(transactionResource, 'attributes.transaction-successful');
       } catch (e) {
         if (e.status === 404) {
           log.trace(`index of ethereum transactions found transaction to index at block ${blockNumber}, ${JSON.stringify(transaction, null, 2)}`);
           transactionResource = await this._indexTransactionResource(batch, block, transaction);
-          isSuccessfulTxn = transactionResource && get(transactionResource, 'attributes.transaction-successful');
         } else { throw e; }
       }
+      let isSuccessfulTxn = transactionResource && get(transactionResource, 'attributes.transaction-successful');
 
       for (let address of addressesToIndex) {
         discoveredTransactions[address] = discoveredTransactions[address] || [];
