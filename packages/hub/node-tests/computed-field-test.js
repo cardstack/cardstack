@@ -6,7 +6,7 @@ const {
 } = require('../../../tests/sample-computed-fields/node_modules/@cardstack/test-support/env');
 
 describe('hub/computed-fields', function() {
-  let env, apple, banana, chocolate;
+  let env, apple, banana, chocolate, meatloaf, cream, sugar, icecream;
 
   async function setup () {
     let factory = new JSONAPIFactory();
@@ -30,18 +30,51 @@ describe('hub/computed-fields', function() {
     }).withRelated('goesWellWith', [apple]);
 
 
-    chocolate = factory.addResource('foods').withAttributes({
+    chocolate = factory.addResource('foods', 'chocolate').withAttributes({
       title: 'chocolate',
       color: 'brown',
       weightInOunces: 16,
     });
 
+    cream = factory.addResource('foods', 'cream').withAttributes({
+      title: 'Cream',
+      color: 'white'
+    });
+    sugar = factory.addResource('foods', 'sugar').withAttributes({
+      title: 'Sugar',
+      color: 'white'
+    });
+    icecream = factory.addResource('foods').withAttributes({
+      title: 'Icecream',
+      color: 'white',
+      'ingredients-label': 'cream, sugar, chocolate'
+    });
+    meatloaf = factory.addResource('foods').withAttributes({
+      title: 'Meatloaf',
+      color: 'brown',
+      'ingredients-label': 'hamburger, egg, ketchup, salt, pepper'
+    });
+    factory.addResource('foods', 'hamburger').withAttributes({
+      title: 'Hamburger',
+      color: 'brown',
+    });
+    factory.addResource('foods', 'ketchup').withAttributes({
+      title: 'Ketchup',
+      color: 'red',
+    });
+
     factory.addResource('content-types', 'foods')
+      .withAttributes({
+        defaultIncludes: ['ingredients']
+      })
       .withRelated('fields', [
         factory.addResource('fields', 'title').withAttributes({
           fieldType: '@cardstack/core-types::string'
         }),
         factory.addResource('fields', 'color').withAttributes({
+          fieldType: '@cardstack/core-types::string'
+        }),
+        factory.addResource('fields', 'ingredients-label').withAttributes({
           fieldType: '@cardstack/core-types::string'
         }),
         factory.addResource('fields', 'nutrients').withAttributes({
@@ -52,6 +85,9 @@ describe('hub/computed-fields', function() {
         }),
         factory.addResource('fields', 'weight-in-ounces').withAttributes({
           fieldType: '@cardstack/core-types::integer'
+        }),
+        factory.addResource('computed-fields', 'ingredients').withAttributes({
+          computedFieldType: 'sample-computed-fields::ingredients-from-label',
         }),
         factory.addResource('computed-fields', 'weight-in-grams').withAttributes({
           computedFieldType: 'sample-computed-fields::multiply-by-constant',
@@ -179,17 +215,36 @@ describe('hub/computed-fields', function() {
 
     });
 
-    it("can compute a relationship", async function() {
+    it("can compute a belongs-to relationship", async function() {
       let model = await env.lookup('hub:searchers').get(env.session, 'master', 'foods', apple.id);
       expect(model.data).has.deep.property('relationships.auto-chocolate');
       expect(model.data.relationships['auto-chocolate']).deep.equals({ data: { type: 'foods', id: chocolate.id } });
     });
 
-    it("can search a computed relationship's included attributes", async function() {
+    it("can compute a has-many relationship", async function() {
+      let model = await env.lookup('hub:searchers').get(env.session, 'master', 'foods', icecream.id);
+      expect(model.data).has.deep.property('relationships.ingredients');
+      expect(model.data.relationships['ingredients']).deep.equals({
+        data: [
+          { type: 'foods', id: cream.id },
+          { type: 'foods', id: sugar.id },
+          { type: 'foods', id: chocolate.id },
+        ]
+      });
+    });
+
+    it("can search a computed belongs-to relationship's included attributes", async function() {
       let response = await env.lookup('hub:searchers').search(env.session, 'master', { filter: { 'auto-chocolate.title': 'Chocolate' }});
       expect(response.data).has.length(1);
       expect(response.data[0]).has.property('id', '1');
       expect(response.data[0]).has.property('type', 'only-computed');
+    });
+
+    it("can search a computed has-many relationship's included attributes", async function() {
+      let response = await env.lookup('hub:searchers').search(env.session, 'master', { filter: { 'ingredients.title': 'Ketchup' }});
+      expect(response.data).has.length(1);
+      expect(response.data[0]).has.property('id', meatloaf.id);
+      expect(response.data[0]).has.property('type', meatloaf.type);
     });
 
     it("can compute an attribute even when there are no real attributes", async function() {
