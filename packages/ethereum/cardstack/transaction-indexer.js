@@ -81,7 +81,7 @@ class TransactionIndexer {
     }
 
     let field = trackedAddressField === 'id' ? 'id' : `attributes.${trackedAddressField}`;
-    return flatMap(results, i => get(i, field)).map(i => i.toLowerCase());
+    return flatMap(results, i => get(i, field)).filter(i => Boolean(i)).map(i => i.toLowerCase());
   }
 
   async _startTrackedAddressListening() {
@@ -210,6 +210,7 @@ class TransactionIndexer {
 
     let newAddresses = trackedAddresses.filter(address => !lastIndexedAddressesBlockHeights[address]);
     let newAddressesInfo = {};
+    let newAddressesThatAreFinished = [];
     if (newAddresses.length) {
       let batch = this.pgsearchClient.beginBatch(this.schema, this.searchers);
       for (let address of newAddresses) {
@@ -226,7 +227,6 @@ class TransactionIndexer {
 
     let discoveredTransactions = {};
     let addressesVersions = {};
-    let batch = this.pgsearchClient.beginBatch(this.schema, this.searchers);
 
     // Using the number of sent transactions and the balance as a heuristic to prevent having to crawl to
     // the genesis block when looking for transactions for an address. Using the available information about
@@ -241,6 +241,8 @@ class TransactionIndexer {
           hasBalance(newAddressesInfo) ||
           hasSentTxns(newAddressesInfo));
       blockNumber--) {
+
+      let batch = this.pgsearchClient.beginBatch(this.schema, this.searchers);
       await this._processBlock({
         trackedAddresses,
         lastIndexedAddressesBlockHeights,
@@ -252,6 +254,19 @@ class TransactionIndexer {
         addressesVersions
       });
 
+      let newlyFinishedAddresses = difference(finishedAddresses(newAddressesInfo), newAddressesThatAreFinished);
+      for (let address of newlyFinishedAddresses) {
+        if (discoveredTransactions[address]) {
+          await this._indexAddressResource(batch, address, currentBlockNumber, discoveredTransactions[address], addressesVersions[address], get(newAddressesInfo, `${address}.discoveredAtBlock`));
+        } else {
+          await this._indexAddressResource(batch, address, currentBlockNumber, undefined, undefined, get(newAddressesInfo, `${address}.discoveredAtBlock`));
+
+        }
+        delete discoveredTransactions[address];
+      }
+      await batch.done();
+      newAddressesThatAreFinished = newAddressesThatAreFinished.concat(newlyFinishedAddresses);
+
       if (blockNumber === 0 &&
         (hasBalance(newAddressesInfo) || hasSentTxns(newAddressesInfo))) {
           let addressesWithBalances = Object.keys(newAddressesInfo).filter(address => newAddressesInfo[address].balance.gt(new BN(0)));
@@ -261,16 +276,17 @@ class TransactionIndexer {
       }
     }
 
+    let batch = this.pgsearchClient.beginBatch(this.schema, this.searchers);
     let addressesWithTransactions = Object.keys(discoveredTransactions);
     for (let address of addressesWithTransactions) {
       await this._indexAddressResource(batch, address, currentBlockNumber, discoveredTransactions[address], addressesVersions[address], get(newAddressesInfo, `${address}.discoveredAtBlock`));
     }
 
-    let newAdressesWithoutTransactions = newAddresses.filter(address => !addressesWithTransactions.includes(address));
+    let newAdressesWithoutTransactions = newAddresses.filter(address => !newAddressesThatAreFinished.includes(address) &&
+                                                                        !addressesWithTransactions.includes(address));
     for (let address of newAdressesWithoutTransactions) {
       await this._indexAddressResource(batch, address, currentBlockNumber, undefined, undefined, get(newAddressesInfo, `${address}.discoveredAtBlock`));
     }
-
     await batch.done();
   }
 
@@ -304,6 +320,7 @@ class TransactionIndexer {
     batch,
     discoveredTransactions,
     addressesVersions }) {
+    log.debug(`processing block #${blockNumber} for transactions that include tracked ethereum addresses`);
     let block = await this.ethereumClient.getBlock(blockNumber);
     if (!block || !block.transactions.length) { return; }
 
@@ -321,7 +338,8 @@ class TransactionIndexer {
         transactionResource = existingTransaction.data;
       } catch (e) {
         if (e.status === 404) {
-          log.trace(`index of ethereum transactions found transaction to index at block ${blockNumber}, ${JSON.stringify(transaction, null, 2)}`);
+          log.debug(`index of ethereum transactions found transaction to index at block ${blockNumber}`);
+          log.trace(`found transaction to index at block ${blockNumber} is: ${JSON.stringify(transaction, null, 2)}`);
           transactionResource = await this._indexTransactionResource(batch, block, transaction);
         } else { throw e; }
       }
@@ -458,7 +476,7 @@ class TransactionIndexer {
       },
       meta: {
         blockHeight,
-        version: 0,
+        version: 0.0,
         loadingTransactions: true
       }
     };
@@ -543,6 +561,12 @@ function hasBalance(addressesInfo) {
 function hasSentTxns(addressesInfo) {
   let numSentTxns = Object.keys(addressesInfo).map(address => addressesInfo[address].numSentTxns);
   return numSentTxns.some(n => n > 0);
+}
+
+function finishedAddresses(addressesInfo) {
+  let noSentTxns = Object.keys(addressesInfo).filter(address => addressesInfo[address].numSentTxns === 0);
+  let noBalance =  Object.keys(addressesInfo).filter(address => addressesInfo[address].balance.isZero());
+  return intersection(noSentTxns, noBalance);
 }
 
 function lastIndexedBlockHeights(indexedAddresses) {

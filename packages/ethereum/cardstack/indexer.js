@@ -236,11 +236,11 @@ class Updater {
       attributes: {
         "field-type": "@cardstack/core-types::has-many"
       },
-      relationships: {
-        'related-types': {
-          data: [{ type: 'content-types', id: 'ethereum-transactions' }]
-        }
-      }
+      // relationships: {
+      //   'related-types': {
+      //     data: [{ type: 'content-types', id: 'ethereum-transactions' }]
+      //   }
+      // }
     }, {
       type: 'content-types',
       id: 'ethereum-transactions',

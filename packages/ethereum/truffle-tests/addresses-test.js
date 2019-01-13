@@ -863,6 +863,10 @@ contract('ethereum-addresses indexing', function (_accounts) {
 
       afterEach(teardown);
 
+      it('ignores tracked address fields that are null', async function() {
+        expect(true).to.equal(false, 'TODO');
+      });
+
       it('can index tracked ethereum addresses where the field is an array of addresses to track', async function () {
         const value = web3.toWei(txnTestEthValue, 'ether');
         const { address: from } = await newAddress();
