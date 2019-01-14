@@ -202,7 +202,7 @@ class TransactionIndexer {
 
     // if an address document indicates that it has been indexed more recently than the hub:indexers.update() was kicked off, then
     // use that as the block height the document was indexed at as it will always be more accurate.
-    let oldestIndexedBlock = Object.keys(lastIndexedAddressesBlockHeights).length ?
+    let oldestLastIndexedBlock = Object.keys(lastIndexedAddressesBlockHeights).length ?
       Object.keys(lastIndexedAddressesBlockHeights)
         .reduce((oldest, address) =>
           Math.min(oldest, Math.max(lastIndexedBlockHeight, lastIndexedAddressesBlockHeights[address])),
@@ -228,53 +228,67 @@ class TransactionIndexer {
     let discoveredTransactions = {};
     let addressesVersions = {};
 
-    // Using the number of sent transactions and the balance as a heuristic to prevent having to crawl to
-    // the genesis block when looking for transactions for an address. Using the available information about
-    // the current state (number of "from" transactions and the current balance), it goes back in time until
-    // at least so many "from" transactions have been found, and then continues going back until the balance
-    // reaches 0. The inherent limitation is that 0-value transactions before the account was funded will not
-    // be found. These sorts of transactions are indicative of interacting with a smart contract, for which
-    // it's probably better suited to use this plugin's contract indexing for these types of transactions.
-    for (let blockNumber = currentBlockNumber;
-      blockNumber >= 0 &&
-        ((oldestIndexedBlock && blockNumber > oldestIndexedBlock) ||
-          hasBalance(newAddressesInfo) ||
-          hasSentTxns(newAddressesInfo));
-      blockNumber--) {
-
-      let batch = this.pgsearchClient.beginBatch(this.schema, this.searchers);
-      await this._processBlock({
+    // Process new blocks that we haven't indexed yet (hub may have been turned off)
+    let latestIndexedBlockNumber = await this._getLatestIndexedBlockNumber();
+    if (latestIndexedBlockNumber != null && currentBlockNumber > latestIndexedBlockNumber) {
+      let blockNumbersToProcess = Array.from({length: currentBlockNumber - latestIndexedBlockNumber}, (v, k) => k + latestIndexedBlockNumber + 1);
+      await this._processBlocks({
+        currentBlockNumber,
+        oldestLastIndexedBlock,
+        newAddressesInfo,
         trackedAddresses,
         lastIndexedAddressesBlockHeights,
         newAddresses,
-        newAddressesInfo,
-        blockNumber,
-        batch,
         discoveredTransactions,
-        addressesVersions
+        addressesVersions,
+        newAddressesThatAreFinished,
+        blockNumbersToProcess
       });
-
-      let newlyFinishedAddresses = difference(finishedAddresses(newAddressesInfo), newAddressesThatAreFinished);
-      for (let address of newlyFinishedAddresses) {
-        if (discoveredTransactions[address]) {
-          await this._indexAddressResource(batch, address, currentBlockNumber, discoveredTransactions[address], addressesVersions[address], get(newAddressesInfo, `${address}.discoveredAtBlock`));
-        } else {
-          await this._indexAddressResource(batch, address, currentBlockNumber, undefined, undefined, get(newAddressesInfo, `${address}.discoveredAtBlock`));
-
-        }
-        delete discoveredTransactions[address];
-      }
-      await batch.done();
-      newAddressesThatAreFinished = newAddressesThatAreFinished.concat(newlyFinishedAddresses);
-
-      if (blockNumber === 0 &&
-        (hasBalance(newAddressesInfo) || hasSentTxns(newAddressesInfo))) {
-          let addressesWithBalances = Object.keys(newAddressesInfo).filter(address => newAddressesInfo[address].balance.gt(new BN(0)));
-          let addressesWithSentTransactions = Object.keys(newAddressesInfo).map(address => newAddressesInfo[address].numSentTxns > 0);
-          throw new Error(`Error: the heuristic used to index the ethereum address has reached the genesis block and was unable to reach succesful end state. This should never happen and indicates a bug in our heuristic calcuation.
- These addresses still have an unresolved balances: ${JSON.stringify(addressesWithBalances)}. These addresses still have unresolved sent transactions: ${JSON.stringify(addressesWithSentTransactions)}`);
-      }
     }
+
+    // Use the blocks that we have indexed to see if the trackedAddress' transactions
+    // appear within any indexed blocks--as this is much much faster than crawling incrementally
+    // through all the blocks looking for transactions.
+    let oldestIndexedBlockNumber = await this._getOldestIndexedBlockNumber();
+    let { data:blocks } = await this.searchers.searchFromControllingBranch(Session.INTERNAL_PRIVILEGED, {
+      filter: {
+        type: { exact: 'blocks' },
+        'transaction-participants': trackedAddresses
+      },
+      sort: '-block-number',
+      page: { size: await this.getBlockHeight() }
+    });
+
+    if (blocks.length) {
+      let blockNumbersToProcess = blocks.map(i => i.id);
+      await this._processBlocks({
+        currentBlockNumber,
+        oldestLastIndexedBlock,
+        newAddressesInfo,
+        trackedAddresses,
+        lastIndexedAddressesBlockHeights,
+        newAddresses,
+        discoveredTransactions,
+        addressesVersions,
+        newAddressesThatAreFinished,
+        blockNumbersToProcess
+      });
+    }
+    // Now index any stragglers that we missed from the blocks in our index. This will
+    // trigger blocks to be added to our index via the searcher and the cache control we are using
+    await this._processBlocks({
+      currentBlockNumber,
+      oldestLastIndexedBlock,
+      newAddressesInfo,
+      trackedAddresses,
+      lastIndexedAddressesBlockHeights,
+      newAddresses,
+      discoveredTransactions,
+      addressesVersions,
+      newAddressesThatAreFinished,
+      startProcessingFromBlock: oldestIndexedBlockNumber
+    });
+    log.debug(`====> newAddressesThatAreFinished at the concolusion of of '_indexBlocks()': ${JSON.stringify(newAddressesThatAreFinished)}`);
 
     let batch = this.pgsearchClient.beginBatch(this.schema, this.searchers);
     let addressesWithTransactions = Object.keys(discoveredTransactions);
@@ -282,12 +296,123 @@ class TransactionIndexer {
       await this._indexAddressResource(batch, address, currentBlockNumber, discoveredTransactions[address], addressesVersions[address], get(newAddressesInfo, `${address}.discoveredAtBlock`));
     }
 
-    let newAdressesWithoutTransactions = newAddresses.filter(address => !newAddressesThatAreFinished.includes(address) &&
-                                                                        !addressesWithTransactions.includes(address));
-    for (let address of newAdressesWithoutTransactions) {
+
+    log.debug(`====> ready to write out addresses that have no transactions after processing all the blocks. discovered transactions: ${JSON.stringify(discoveredTransactions)}, new address info: ${JSON.stringify(this.displayableAddressesInfo(newAddressesInfo))}`);
+    let newAddressesWithoutTransactions = newAddresses.filter(address => !newAddressesThatAreFinished.includes(address) &&
+                                                                         !addressesWithTransactions.includes(address));
+    for (let address of newAddressesWithoutTransactions) {
       await this._indexAddressResource(batch, address, currentBlockNumber, undefined, undefined, get(newAddressesInfo, `${address}.discoveredAtBlock`));
     }
     await batch.done();
+  }
+
+  async _processBlocks({
+    currentBlockNumber,
+    oldestLastIndexedBlock,
+    newAddressesInfo,
+    trackedAddresses,
+    lastIndexedAddressesBlockHeights,
+    newAddresses,
+    discoveredTransactions,
+    addressesVersions,
+    newAddressesThatAreFinished,
+    blockNumbersToProcess,
+    startProcessingFromBlock
+  }) {
+    if (blockNumbersToProcess) {
+      for (let blockNumber of blockNumbersToProcess) {
+        await this._processBlockWithIncrementalAddressIndexing({
+          trackedAddresses,
+          lastIndexedAddressesBlockHeights,
+          newAddresses,
+          newAddressesInfo,
+          blockNumber,
+          discoveredTransactions,
+          addressesVersions,
+          currentBlockNumber,
+          newAddressesThatAreFinished
+        });
+      }
+    } else {
+      // Using the number of sent transactions and the balance as a heuristic to prevent having to crawl to
+      // the genesis block when looking for transactions for an address. Using the available information about
+      // the current state (number of "from" transactions and the current balance), it goes back in time until
+      // at least so many "from" transactions have been found, and then continues going back until the balance
+      // reaches 0. The inherent limitation is that 0-value transactions before the account was funded will not
+      // be found. These sorts of transactions are indicative of interacting with a smart contract, for which
+      // it's probably better suited to use this plugin's contract indexing for these types of transactions.
+      startProcessingFromBlock = startProcessingFromBlock != null ? startProcessingFromBlock : currentBlockNumber;
+      for (let blockNumber = startProcessingFromBlock;
+        blockNumber >= 0 &&
+        ((oldestLastIndexedBlock && blockNumber > oldestLastIndexedBlock) ||
+          hasBalance(newAddressesInfo) ||
+          hasSentTxns(newAddressesInfo));
+        blockNumber--) {
+
+        await this._processBlockWithIncrementalAddressIndexing({
+          trackedAddresses,
+          lastIndexedAddressesBlockHeights,
+          newAddresses,
+          newAddressesInfo,
+          blockNumber,
+          discoveredTransactions,
+          addressesVersions,
+          currentBlockNumber,
+          newAddressesThatAreFinished
+        });
+        if (blockNumber === 0 &&
+          (hasBalance(newAddressesInfo) || hasSentTxns(newAddressesInfo))) {
+          let addressesWithBalances = Object.keys(newAddressesInfo).filter(address => newAddressesInfo[address].balance.gt(new BN(0)));
+          let addressesWithSentTransactions = Object.keys(newAddressesInfo).filter(address => newAddressesInfo[address].numSentTxns > 0);
+          throw new Error(`Error: the heuristic used to index the ethereum address has reached the genesis block and was unable to reach succesful end state. This should never happen and indicates a bug in our heuristic calcuation.
+ These addresses still have an unresolved balances: ${JSON.stringify(addressesWithBalances)}. These addresses still have unresolved sent transactions: ${JSON.stringify(addressesWithSentTransactions)}`);
+        }
+      }
+    }
+    log.debug(`====> newAddressesThatAreFinished at the end of '_processBlocks()': ${JSON.stringify(newAddressesThatAreFinished)}`);
+  }
+
+  async _processBlockWithIncrementalAddressIndexing({
+    trackedAddresses,
+    lastIndexedAddressesBlockHeights,
+    newAddresses,
+    newAddressesInfo,
+    blockNumber,
+    discoveredTransactions,
+    addressesVersions,
+    currentBlockNumber,
+    newAddressesThatAreFinished
+  }) {
+    let batch = this.pgsearchClient.beginBatch(this.schema, this.searchers);
+    await this._processBlock({
+      trackedAddresses,
+      lastIndexedAddressesBlockHeights,
+      newAddresses,
+      newAddressesInfo,
+      blockNumber,
+      batch,
+      discoveredTransactions,
+      addressesVersions
+    });
+
+    let newlyFinishedAddresses = difference(finishedAddresses(newAddressesInfo), newAddressesThatAreFinished);
+    for (let address of newlyFinishedAddresses) {
+      if (discoveredTransactions[address]) {
+        await this._indexAddressResource(batch, address, currentBlockNumber, discoveredTransactions[address], addressesVersions[address], get(newAddressesInfo, `${address}.discoveredAtBlock`));
+      } else {
+        await this._indexAddressResource(batch, address, currentBlockNumber, undefined, undefined, get(newAddressesInfo, `${address}.discoveredAtBlock`));
+
+      }
+      delete discoveredTransactions[address];
+    }
+
+    // TODO write indexing progess to new addresses that are not finished every X amount of blocks
+
+    await batch.done();
+    for (let address of newlyFinishedAddresses) {
+      newAddressesThatAreFinished.push(address); // using Array.concat is problematic as we are relying on the array to mutate, not be reassigned
+    }
+    log.debug(`====> finished indexing addresses ${JSON.stringify(newlyFinishedAddresses)} at block ${blockNumber}. newAddressesThatAreFinished: ${JSON.stringify(newAddressesThatAreFinished)}`);
   }
 
   async _indexBlock(trackedAddresses, blockNumber) {
@@ -321,7 +446,8 @@ class TransactionIndexer {
     discoveredTransactions,
     addressesVersions }) {
     log.debug(`processing block #${blockNumber} for transactions that include tracked ethereum addresses`);
-    let block = await this.ethereumClient.getBlock(blockNumber);
+    let { data: { attributes: { 'block-data': block } } } = await this.searchers.getFromControllingBranch(Session.INTERNAL_PRIVILEGED, 'blocks', blockNumber);
+    // log.debug(`transactions in block #${blockNumber}: ${JSON.stringify(block.transactions, null, 2)}`);
     if (!block || !block.transactions.length) { return; }
 
     let addressesEligibleForIndexing = trackedAddresses.filter(address =>
@@ -361,6 +487,7 @@ class TransactionIndexer {
       }
 
       if (isSuccessfulTxn && newAddresses.includes(transaction.from.toLowerCase())) {
+        log.debug(`====> discovered transaction for 'from' address ${transaction.from} at block ${blockNumber}. trnsaction value: ${transaction.value} current address info: ${JSON.stringify(this.displayableAddressesInfo(newAddressesInfo)[transaction.from.toLowerCase()])}`);
         let balance = newAddressesInfo[transaction.from.toLowerCase()].balance;
         let gasCost = transactionResource ?
           (new BN(get(transactionResource, 'attributes.gas-used') || 0))
@@ -368,14 +495,17 @@ class TransactionIndexer {
           new BN(0);
         newAddressesInfo[transaction.from.toLowerCase()].balance = balance.add(new BN(transaction.value)).add(gasCost);
         newAddressesInfo[transaction.from.toLowerCase()].numSentTxns--;
+        log.debug(`====> discovered transaction for 'from' address ${transaction.from} at block ${blockNumber}. updated address info: ${JSON.stringify(this.displayableAddressesInfo(newAddressesInfo)[transaction.from.toLowerCase()])}`);
       }
 
       if (isSuccessfulTxn && transaction.to && newAddresses.includes(transaction.to.toLowerCase())) {
+        log.debug(`====> discovered transaction for 'to' address ${transaction.to} at block ${blockNumber}. trnsaction value: ${transaction.value} current address info: ${JSON.stringify(this.displayableAddressesInfo(newAddressesInfo)[transaction.to.toLowerCase()])}`);
         let balance = newAddressesInfo[transaction.to.toLowerCase()].balance;
         newAddressesInfo[transaction.to.toLowerCase()].balance = balance.sub(new BN(transaction.value));
         if (newAddressesInfo[transaction.to.toLowerCase()].balance.isNeg()) {
           throw new Error(`Error: the heuristic used to index the ethereum address ${transaction.to} resulted in a negative balance at block #${blockNumber} for transaction hash ${transaction.hash}. This should never happen and indicates a bug in our heuristic calculation.`);
         }
+        log.debug(`====> discovered transaction for 'to' address ${transaction.to} at block ${blockNumber}. updated address info: ${JSON.stringify(this.displayableAddressesInfo(newAddressesInfo)[transaction.to.toLowerCase()])}`);
       }
     }
   }
@@ -486,6 +616,7 @@ class TransactionIndexer {
 
   async _indexAddressResource(batch, address, blockHeight, transactions = [], addressVersion='0.0', discoveredAtBlock) {
     if (!address) { return; }
+    log.debug(`indexing address ${address} at block #${blockHeight} with version ${addressVersion} and transactions${JSON.stringify(transactions)}`);
 
     let addressResource;
     try {
@@ -550,6 +681,41 @@ class TransactionIndexer {
       sourceId,
       upstreamDoc: { data: record }
     });
+  }
+
+  async _getOldestIndexedBlockNumber() {
+    let { data: blocks } = await this.searchers.searchFromControllingBranch(Session.INTERNAL_PRIVILEGED, {
+      filter: {
+        type: { exact: 'blocks' }
+      },
+      sort: 'block-number',
+      page: { size: 1 }
+    });
+
+    if (!blocks.length) { return; }
+
+    return get(blocks, '[0].attributes.block-number');
+  }
+  async _getLatestIndexedBlockNumber() {
+    let { data: blocks } = await this.searchers.searchFromControllingBranch(Session.INTERNAL_PRIVILEGED, {
+      filter: {
+        type: { exact: 'blocks' }
+      },
+      sort: '-block-number',
+      page: { size: 1 }
+    });
+
+    if (!blocks.length) { return; }
+
+    return get(blocks, '[0].attributes.block-number');
+  }
+
+  displayableAddressesInfo(addressesInfo) {
+    let displayableInfo = require('lodash').merge({}, addressesInfo);
+    for (let address of Object.keys(addressesInfo)) {
+      displayableInfo[address].balance = displayableInfo[address].balance.toString();
+    }
+    return displayableInfo;
   }
 });
 

@@ -836,6 +836,14 @@ contract('ethereum-addresses indexing', function (_accounts) {
         expect(senderDoc).has.deep.property('meta.version', `${block2.number}.0`);
         expect(senderDoc).has.deep.property('meta.discoveredAtBlock', setupTxn.blockNumber);
       });
+
+      it.skip('can index tracked address from block cached in the index', async function() {
+        expect(true).to.equal(false, 'TODO');
+      });
+
+      it.skip('can index tracked address whose transaction is not present in blocks cached in the index', async function() {
+        expect(true).to.equal(false, 'TODO');
+      });
     });
 
     describe('using tracked address model as an attribute that holds a string array', function () {
@@ -863,7 +871,7 @@ contract('ethereum-addresses indexing', function (_accounts) {
 
       afterEach(teardown);
 
-      it('ignores tracked address fields that are null', async function() {
+      it.skip('ignores tracked address fields that are null', async function() {
         expect(true).to.equal(false, 'TODO');
       });
 

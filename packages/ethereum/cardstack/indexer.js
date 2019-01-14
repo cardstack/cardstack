@@ -132,6 +132,18 @@ class Updater {
       }
     }, {
       type: "fields",
+      id: "transaction-participants",
+      attributes: {
+        "field-type": "@cardstack/core-types::string-array"
+      }
+    }, {
+      type: "fields",
+      id: "block-data",
+      attributes: {
+        "field-type": "@cardstack/core-types::object"
+      }
+    }, {
+      type: "fields",
       id: "transaction-hash",
       attributes: {
         "field-type": "@cardstack/core-types::integer"
@@ -236,11 +248,23 @@ class Updater {
       attributes: {
         "field-type": "@cardstack/core-types::has-many"
       },
-      // relationships: {
-      //   'related-types': {
-      //     data: [{ type: 'content-types', id: 'ethereum-transactions' }]
-      //   }
-      // }
+    }, {
+      type: 'content-types',
+      id: 'blocks',
+      relationships: {
+        fields: {
+          data: [
+            { type: "fields", id: "block-number" },
+            { type: "fields", id: "block-hash" },
+            { type: "fields", id: "timestamp" },
+            { type: "fields", id: "transaction-participants" },
+            { type: "fields", id: "block-data" },
+          ]
+        },
+        'data-source': {
+          data: { type: 'data-sources', id: this.dataSourceId.toString() }
+        }
+      }
     }, {
       type: 'content-types',
       id: 'ethereum-transactions',
@@ -258,7 +282,6 @@ class Updater {
             { type: "fields", id: "transaction-value" },
             { type: "fields", id: "gas" },
             { type: "fields", id: "gas-price" },
-            { type: "fields", id: "transaction-data" },
             { type: "fields", id: "transaction-data" },
             { type: "fields", id: "transaction-successful" },
             { type: "fields", id: "gas-used" },

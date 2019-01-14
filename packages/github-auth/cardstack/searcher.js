@@ -20,7 +20,7 @@ module.exports = class GitHubSearcher {
   }
 
   async get(session, branch, type, id, next) {
-    let result = await await next();
+    let result = await next();
     if (result) {
       return result;
     }
