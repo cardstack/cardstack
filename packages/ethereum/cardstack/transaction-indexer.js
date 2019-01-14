@@ -1,11 +1,12 @@
 const { declareInjections } = require('@cardstack/di');
-const { difference, flatMap, uniqBy, intersection, get } = require('lodash');
+const { merge, difference, flatMap, uniqBy, intersection, get } = require('lodash');
 const { utils: { BN, toChecksumAddress } } = require('web3');
 const Session = require('@cardstack/plugin-utils/session');
 const { coerce, valid, gt, lt } = require('semver');
 const log = require('@cardstack/logger')('cardstack/ethereum/transaction-indexer');
 
-const DEFAULT_MAX_ADDRESSES_TRACKED = 10000;
+const DEFAULT_MAX_ADDRESSES_TRACKED = 1000000;
+const LOADING_PROGRESS_BLOCK_MOD = 1000;
 
 module.exports = declareInjections({
   indexer: 'hub:indexers',
@@ -21,7 +22,7 @@ class TransactionIndexer {
     return new this(...args);
   }
 
-  constructor({ indexer, pgsearchClient, schema, searchers, controllingBranch}) {
+  constructor({ indexer, pgsearchClient, schema, searchers, controllingBranch }) {
     this.ethereumClient = null;
     this.addressIndexing = null;
     this.indexer = indexer;
@@ -198,7 +199,9 @@ class TransactionIndexer {
   }
 
   async _indexBlocks(trackedAddresses, lastIndexedBlockHeight = 0, currentBlockNumber) {
-    let lastIndexedAddressesBlockHeights = lastIndexedBlockHeights(await this._getIndexedAddresses());
+    let indexedAddresses = await this._getIndexedAddresses();
+    let lastIndexedAddressesBlockHeights = lastIndexedBlockHeights(indexedAddresses);
+    let abortedAddresses = getAbortedAddresses(indexedAddresses);
 
     // if an address document indicates that it has been indexed more recently than the hub:indexers.update() was kicked off, then
     // use that as the block height the document was indexed at as it will always be more accurate.
@@ -208,7 +211,8 @@ class TransactionIndexer {
           Math.min(oldest, Math.max(lastIndexedBlockHeight, lastIndexedAddressesBlockHeights[address])),
           currentBlockNumber) : 0;
 
-    let newAddresses = trackedAddresses.filter(address => !lastIndexedAddressesBlockHeights[address]);
+    let newAddresses = trackedAddresses.filter(address => !lastIndexedAddressesBlockHeights[address] ||
+                                                          abortedAddresses.includes(address));
     let newAddressesInfo = {};
     let newAddressesThatAreFinished = [];
     if (newAddresses.length) {
@@ -227,6 +231,7 @@ class TransactionIndexer {
 
     let discoveredTransactions = {};
     let addressesVersions = {};
+    let newlyAbortedAddresses = {};
 
     // Process new blocks that we haven't indexed yet (hub may have been turned off)
     let latestIndexedBlockNumber = await this._getLatestIndexedBlockNumber();
@@ -242,7 +247,8 @@ class TransactionIndexer {
         discoveredTransactions,
         addressesVersions,
         newAddressesThatAreFinished,
-        blockNumbersToProcess
+        blockNumbersToProcess,
+        abortedAddresses: newlyAbortedAddresses,
       });
     }
 
@@ -271,7 +277,8 @@ class TransactionIndexer {
         discoveredTransactions,
         addressesVersions,
         newAddressesThatAreFinished,
-        blockNumbersToProcess
+        blockNumbersToProcess,
+        abortedAddresses: newlyAbortedAddresses,
       });
     }
     // Now index any stragglers that we missed from the blocks in our index. This will
@@ -286,22 +293,35 @@ class TransactionIndexer {
       discoveredTransactions,
       addressesVersions,
       newAddressesThatAreFinished,
-      startProcessingFromBlock: oldestIndexedBlockNumber
+      startProcessingFromBlock: oldestIndexedBlockNumber,
+      abortedAddresses: newlyAbortedAddresses,
     });
-    log.debug(`====> newAddressesThatAreFinished at the concolusion of of '_indexBlocks()': ${JSON.stringify(newAddressesThatAreFinished)}`);
 
     let batch = this.pgsearchClient.beginBatch(this.schema, this.searchers);
     let addressesWithTransactions = Object.keys(discoveredTransactions);
     for (let address of addressesWithTransactions) {
-      await this._indexAddressResource(batch, address, currentBlockNumber, discoveredTransactions[address], addressesVersions[address], get(newAddressesInfo, `${address}.discoveredAtBlock`));
+      await this._indexAddressResource(
+        batch,
+        address,
+        currentBlockNumber,
+        discoveredTransactions[address],
+        addressesVersions[address],
+        get(newAddressesInfo, `${address}.discoveredAtBlock`),
+        get(newlyAbortedAddresses, `${address}.abortedAtBlock`));
     }
 
-
-    log.debug(`====> ready to write out addresses that have no transactions after processing all the blocks. discovered transactions: ${JSON.stringify(discoveredTransactions)}, new address info: ${JSON.stringify(this.displayableAddressesInfo(newAddressesInfo))}`);
+    log.trace(`====> ready to write out addresses that have no transactions after processing all the blocks. discovered transactions: ${JSON.stringify(discoveredTransactions)}, new address info: ${JSON.stringify(displayableAddressesInfo(newAddressesInfo))}`);
     let newAddressesWithoutTransactions = newAddresses.filter(address => !newAddressesThatAreFinished.includes(address) &&
-                                                                         !addressesWithTransactions.includes(address));
+      !addressesWithTransactions.includes(address));
     for (let address of newAddressesWithoutTransactions) {
-      await this._indexAddressResource(batch, address, currentBlockNumber, undefined, undefined, get(newAddressesInfo, `${address}.discoveredAtBlock`));
+      await this._indexAddressResource(
+        batch,
+        address,
+        currentBlockNumber,
+        undefined,
+        undefined,
+        get(newAddressesInfo, `${address}.discoveredAtBlock`),
+        get(newlyAbortedAddresses, `${address}.abortedAtBlock`));
     }
     await batch.done();
   }
@@ -317,7 +337,8 @@ class TransactionIndexer {
     addressesVersions,
     newAddressesThatAreFinished,
     blockNumbersToProcess,
-    startProcessingFromBlock
+    startProcessingFromBlock,
+    abortedAddresses
   }) {
     if (blockNumbersToProcess) {
       for (let blockNumber of blockNumbersToProcess) {
@@ -330,7 +351,7 @@ class TransactionIndexer {
           discoveredTransactions,
           addressesVersions,
           currentBlockNumber,
-          newAddressesThatAreFinished
+          newAddressesThatAreFinished,
         });
       }
     } else {
@@ -342,12 +363,24 @@ class TransactionIndexer {
       // be found. These sorts of transactions are indicative of interacting with a smart contract, for which
       // it's probably better suited to use this plugin's contract indexing for these types of transactions.
       startProcessingFromBlock = startProcessingFromBlock != null ? startProcessingFromBlock : currentBlockNumber;
+      let stopDescendingAtBlock = 0;
+      let maxDepth = get(this, 'addressIndexing.maxBlockSearchDepth');
+      if (maxDepth) {
+        stopDescendingAtBlock = startProcessingFromBlock - maxDepth;
+      }
       for (let blockNumber = startProcessingFromBlock;
         blockNumber >= 0 &&
         ((oldestLastIndexedBlock && blockNumber > oldestLastIndexedBlock) ||
           hasBalance(newAddressesInfo) ||
           hasSentTxns(newAddressesInfo));
         blockNumber--) {
+        if (blockNumber <= stopDescendingAtBlock) {
+          let newAddressesStillLoading = difference(newAddresses, newAddressesThatAreFinished);
+          for (let address of newAddressesStillLoading) {
+            abortedAddresses[address] = { abortedAtBlock: blockNumber };
+          }
+          break;
+        }
 
         await this._processBlockWithIncrementalAddressIndexing({
           trackedAddresses,
@@ -369,7 +402,6 @@ class TransactionIndexer {
         }
       }
     }
-    log.debug(`====> newAddressesThatAreFinished at the end of '_processBlocks()': ${JSON.stringify(newAddressesThatAreFinished)}`);
   }
 
   async _processBlockWithIncrementalAddressIndexing({
@@ -397,6 +429,7 @@ class TransactionIndexer {
 
     let newlyFinishedAddresses = difference(finishedAddresses(newAddressesInfo), newAddressesThatAreFinished);
     for (let address of newlyFinishedAddresses) {
+      log.debug(`====> finished indexing address ${address} at block ${blockNumber}.`);
       if (discoveredTransactions[address]) {
         await this._indexAddressResource(batch, address, currentBlockNumber, discoveredTransactions[address], addressesVersions[address], get(newAddressesInfo, `${address}.discoveredAtBlock`));
       } else {
@@ -406,13 +439,18 @@ class TransactionIndexer {
       delete discoveredTransactions[address];
     }
 
-    // TODO write indexing progess to new addresses that are not finished every X amount of blocks
-
-    await batch.done();
     for (let address of newlyFinishedAddresses) {
       newAddressesThatAreFinished.push(address); // using Array.concat is problematic as we are relying on the array to mutate, not be reassigned
     }
-    log.debug(`====> finished indexing addresses ${JSON.stringify(newlyFinishedAddresses)} at block ${blockNumber}. newAddressesThatAreFinished: ${JSON.stringify(newAddressesThatAreFinished)}`);
+
+    if (blockNumber % LOADING_PROGRESS_BLOCK_MOD === 0) {
+      let newAddressesStillLoading = difference(newAddresses, newAddressesThatAreFinished);
+      for (let address of newAddressesStillLoading) {
+        await this._saveLoadingProgress(batch, address, blockNumber);
+      }
+    }
+
+    await batch.done();
   }
 
   async _indexBlock(trackedAddresses, blockNumber) {
@@ -445,9 +483,10 @@ class TransactionIndexer {
     batch,
     discoveredTransactions,
     addressesVersions }) {
+
     log.debug(`processing block #${blockNumber} for transactions that include tracked ethereum addresses`);
     let { data: { attributes: { 'block-data': block } } } = await this.searchers.getFromControllingBranch(Session.INTERNAL_PRIVILEGED, 'blocks', blockNumber);
-    // log.debug(`transactions in block #${blockNumber}: ${JSON.stringify(block.transactions, null, 2)}`);
+
     if (!block || !block.transactions.length) { return; }
 
     let addressesEligibleForIndexing = trackedAddresses.filter(address =>
@@ -464,8 +503,7 @@ class TransactionIndexer {
         transactionResource = existingTransaction.data;
       } catch (e) {
         if (e.status === 404) {
-          log.debug(`index of ethereum transactions found transaction to index at block ${blockNumber}`);
-          log.trace(`found transaction to index at block ${blockNumber} is: ${JSON.stringify(transaction, null, 2)}`);
+          log.trace(`index of ethereum transactions found transaction to index at block ${blockNumber}`);
           transactionResource = await this._indexTransactionResource(batch, block, transaction);
         } else { throw e; }
       }
@@ -487,7 +525,7 @@ class TransactionIndexer {
       }
 
       if (isSuccessfulTxn && newAddresses.includes(transaction.from.toLowerCase())) {
-        log.debug(`====> discovered transaction for 'from' address ${transaction.from} at block ${blockNumber}. trnsaction value: ${transaction.value} current address info: ${JSON.stringify(this.displayableAddressesInfo(newAddressesInfo)[transaction.from.toLowerCase()])}`);
+        log.trace(`====> discovered transaction for 'from' address ${transaction.from} at block ${blockNumber}. trnsaction value: ${transaction.value} current address info: ${JSON.stringify(displayableAddressesInfo(newAddressesInfo)[transaction.from.toLowerCase()])}`);
         let balance = newAddressesInfo[transaction.from.toLowerCase()].balance;
         let gasCost = transactionResource ?
           (new BN(get(transactionResource, 'attributes.gas-used') || 0))
@@ -495,17 +533,17 @@ class TransactionIndexer {
           new BN(0);
         newAddressesInfo[transaction.from.toLowerCase()].balance = balance.add(new BN(transaction.value)).add(gasCost);
         newAddressesInfo[transaction.from.toLowerCase()].numSentTxns--;
-        log.debug(`====> discovered transaction for 'from' address ${transaction.from} at block ${blockNumber}. updated address info: ${JSON.stringify(this.displayableAddressesInfo(newAddressesInfo)[transaction.from.toLowerCase()])}`);
+        log.trace(`====> discovered transaction for 'from' address ${transaction.from} at block ${blockNumber}. updated address info: ${JSON.stringify(displayableAddressesInfo(newAddressesInfo)[transaction.from.toLowerCase()])}`);
       }
 
       if (isSuccessfulTxn && transaction.to && newAddresses.includes(transaction.to.toLowerCase())) {
-        log.debug(`====> discovered transaction for 'to' address ${transaction.to} at block ${blockNumber}. trnsaction value: ${transaction.value} current address info: ${JSON.stringify(this.displayableAddressesInfo(newAddressesInfo)[transaction.to.toLowerCase()])}`);
+        log.trace(`====> discovered transaction for 'to' address ${transaction.to} at block ${blockNumber}. trnsaction value: ${transaction.value} current address info: ${JSON.stringify(displayableAddressesInfo(newAddressesInfo)[transaction.to.toLowerCase()])}`);
         let balance = newAddressesInfo[transaction.to.toLowerCase()].balance;
         newAddressesInfo[transaction.to.toLowerCase()].balance = balance.sub(new BN(transaction.value));
         if (newAddressesInfo[transaction.to.toLowerCase()].balance.isNeg()) {
           throw new Error(`Error: the heuristic used to index the ethereum address ${transaction.to} resulted in a negative balance at block #${blockNumber} for transaction hash ${transaction.hash}. This should never happen and indicates a bug in our heuristic calculation.`);
         }
-        log.debug(`====> discovered transaction for 'to' address ${transaction.to} at block ${blockNumber}. updated address info: ${JSON.stringify(this.displayableAddressesInfo(newAddressesInfo)[transaction.to.toLowerCase()])}`);
+        log.trace(`====> discovered transaction for 'to' address ${transaction.to} at block ${blockNumber}. updated address info: ${JSON.stringify(displayableAddressesInfo(newAddressesInfo)[transaction.to.toLowerCase()])}`);
       }
     }
   }
@@ -614,9 +652,28 @@ class TransactionIndexer {
     return await this._indexResource(batch, addressResource);
   }
 
-  async _indexAddressResource(batch, address, blockHeight, transactions = [], addressVersion='0.0', discoveredAtBlock) {
+  async _saveLoadingProgress(batch, address, blockHeight) {
     if (!address) { return; }
-    log.debug(`indexing address ${address} at block #${blockHeight} with version ${addressVersion} and transactions${JSON.stringify(transactions)}`);
+
+    let addressResource;
+    try {
+      addressResource = (await this.searchers.getFromControllingBranch(Session.INTERNAL_PRIVILEGED, 'ethereum-addresses', address.toLowerCase())).data;
+    } catch (err) {
+      if (err.status !== 404) { throw err; }
+      return; // if address is not in the index, dont bother reporting progress
+    }
+
+    if (!get(addressResource, 'meta.loadingTransactions')) { return; }
+
+    addressResource.meta = addressResource.meta || {};
+    addressResource.meta.loadingBlockheight = blockHeight;
+
+    return await this._indexResource(batch, addressResource);
+  }
+
+  async _indexAddressResource(batch, address, blockHeight, transactions = [], addressVersion='0.0', discoveredAtBlock, abortedAtBlock) {
+    if (!address) { return; }
+    log.trace(`indexing address ${address} at block #${blockHeight} with version ${addressVersion} and transactions${JSON.stringify(transactions)}`);
 
     let addressResource;
     try {
@@ -653,6 +710,8 @@ class TransactionIndexer {
     addressResource.meta.blockHeight = blockHeight;
     addressResource.meta.version = addressVersion;
     addressResource.meta.loadingTransactions = undefined;
+    addressResource.meta.loadingBlockheight = undefined;
+    addressResource.meta.abortLoadingBlockheight = abortedAtBlock ? abortedAtBlock : undefined;
     addressResource.meta.discoveredAtBlock = Math.min(addressResource.meta.discoveredAtBlock || blockHeight, discoveredAtBlock || blockHeight);
 
     return await this._indexResource(batch, addressResource);
@@ -710,14 +769,15 @@ class TransactionIndexer {
     return get(blocks, '[0].attributes.block-number');
   }
 
-  displayableAddressesInfo(addressesInfo) {
-    let displayableInfo = require('lodash').merge({}, addressesInfo);
-    for (let address of Object.keys(addressesInfo)) {
-      displayableInfo[address].balance = displayableInfo[address].balance.toString();
-    }
-    return displayableInfo;
-  }
 });
+
+function displayableAddressesInfo(addressesInfo) {
+  let displayableInfo = merge({}, addressesInfo);
+  for (let address of Object.keys(addressesInfo)) {
+    displayableInfo[address].balance = displayableInfo[address].balance.toString();
+  }
+  return displayableInfo;
+}
 
 function hasBalance(addressesInfo) {
   let balances = Object.keys(addressesInfo).map(address => addressesInfo[address].balance);
@@ -741,4 +801,8 @@ function lastIndexedBlockHeights(indexedAddresses) {
     lastIndexedAddressesBlockHeights[address.id.toLowerCase()] = get(address, 'meta.blockHeight');
   }
   return lastIndexedAddressesBlockHeights;
+}
+function getAbortedAddresses(indexedAddresses) {
+  return indexedAddresses.filter(address => get(address, 'meta.abortLoadingBlockheight'))
+                         .map(address => address.id.toLowerCase());
 }
