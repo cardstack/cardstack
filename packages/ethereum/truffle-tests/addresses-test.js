@@ -119,6 +119,8 @@ async function assertTxnResourceMatchesEthTxn(actualTxn, expectedTxn, block) {
   expect(actualTxn).has.deep.property('attributes.transaction-nonce', expectedTxn.nonce);
   expect(actualTxn).has.deep.property('attributes.transaction-index', expectedTxn.transactionIndex);
   expect(actualTxn).has.deep.property('attributes.transaction-value', expectedTxn.value.toString());
+  expect(actualTxn).has.deep.property('attributes.transaction-from', expectedTxn.from.toLowerCase());
+  expect(actualTxn).has.deep.property('attributes.transaction-to', expectedTxn.to.toLowerCase());
   expect(actualTxn).has.deep.property('attributes.gas', expectedTxn.gas);
   expect(actualTxn).has.deep.property('attributes.gas-price', expectedTxn.gasPrice.toString());
   expect(actualTxn).has.deep.property('attributes.transaction-data', expectedTxn.input);

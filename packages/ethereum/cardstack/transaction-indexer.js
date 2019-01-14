@@ -503,6 +503,8 @@ class TransactionIndexer {
         'transaction-nonce': rawTransaction.nonce,
         'transaction-index': rawTransaction.transactionIndex,
         'transaction-value': rawTransaction.value,
+        'transaction-from': rawTransaction.from ? rawTransaction.from.toLowerCase() : null,
+        'transaction-to': rawTransaction.to ? rawTransaction.to.toLowerCase() : null,
         'transaction-successful': status,
         'gas-used': receipt.gasUsed,
         'cumulative-gas-used': receipt.cumulativeGasUsed,

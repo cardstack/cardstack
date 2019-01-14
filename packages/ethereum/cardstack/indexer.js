@@ -210,6 +210,18 @@ class Updater {
       }
     }, {
       type: "fields",
+      id: "transaction-from",
+      attributes: {
+        "field-type": "@cardstack/core-types::case-insensitive"
+      }
+    }, {
+      type: "fields",
+      id: "transaction-to",
+      attributes: {
+        "field-type": "@cardstack/core-types::case-insensitive"
+      }
+    }, {
+      type: "fields",
       id: "gas-used",
       attributes: {
         "field-type": "@cardstack/core-types::integer"
@@ -280,6 +292,8 @@ class Updater {
             { type: "fields", id: "to-address" },
             { type: "fields", id: "from-address" },
             { type: "fields", id: "transaction-value" },
+            { type: "fields", id: "transaction-from" },
+            { type: "fields", id: "transaction-to" },
             { type: "fields", id: "gas" },
             { type: "fields", id: "gas-price" },
             { type: "fields", id: "transaction-data" },
