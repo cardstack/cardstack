@@ -146,4 +146,24 @@ module('Acceptance | tools', function(hooks) {
     reviewStatusInput = findInputWithValue.call(this, 'pending');
     assert.dom(reviewStatusInput).isNotDisabled();
   });
+
+  test('track field dirtiness in owned, related records', async function(assert) {
+    await visit('/1');
+    await login();
+    await click('.cardstack-tools-launcher');
+    await waitFor('.cs-editor-switch')
+    await click('.cs-editor-switch');
+
+    assert.dom('[data-test-cs-version-control-dropdown-option-status]').hasText('published');
+
+    let reviewStatusActionTrigger = findTriggerElementWithLabel.call(this, /Comment #1: Karma/);
+    await click(reviewStatusActionTrigger);
+
+    let karmaInput = findInputWithValue.call(this, '10');
+    await fillIn(karmaInput, '9');
+    assert.dom('[data-test-cs-version-control-dropdown-option-status]').hasText('edited');
+
+    await fillIn(karmaInput, '10');
+    assert.dom('[data-test-cs-version-control-dropdown-option-status]').hasText('published');
+  });
 });
