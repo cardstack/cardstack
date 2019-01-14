@@ -66,8 +66,8 @@ function setup(factoryCallback) {
 }
 
 async function waitForEthereumEvents(indexer) {
-  await indexer._indexingPromise;
   await indexer._eventProcessingPromise;
+  await indexer._indexingPromise;
 }
 
 async function createTrackedEthereumAddress(address) {
