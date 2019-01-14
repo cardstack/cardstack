@@ -146,7 +146,7 @@ class Updater {
       type: "fields",
       id: "transaction-hash",
       attributes: {
-        "field-type": "@cardstack/core-types::integer"
+        "field-type": "@cardstack/core-types::string"
       }
     }, {
       type: "fields",
