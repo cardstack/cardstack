@@ -1,6 +1,6 @@
 {
   "name": "@cardstack/tools",
-  "version": "0.13.0",
+  "version": "0.13.1",
   "description": "The default blueprint for ember-cli addons.",
   "keywords": [
     "ember-addon",
@@ -48,9 +48,9 @@
     "@cardstack/eslint-config": "0.13.0",
     "@cardstack/jsonapi": "0.13.0",
     "@cardstack/mock-auth": "0.13.0",
-    "@cardstack/models": "0.13.0",
+    "@cardstack/models": "0.13.1",
     "@cardstack/routing": "0.13.0",
-    "@cardstack/test-support": "0.13.0",
+    "@cardstack/test-support": "0.13.1",
     "@ember/optional-features": "^0.6.3",
     "broccoli-asset-rev": "^2.7.0",
     "ember-cli": "~3.4.3",
