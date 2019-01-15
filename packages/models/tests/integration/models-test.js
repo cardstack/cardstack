@@ -1,6 +1,5 @@
 import { module, test, skip } from 'qunit';
 import { setupTest } from 'ember-qunit';
-import '@ember/test-helpers';
 import Fixtures from '@cardstack/test-support/fixtures';
 import RSVP from 'rsvp';
 
@@ -85,6 +84,8 @@ module('Integration | Models', function(hooks) {
         type: 'pages'
       },{
         type: 'authors'
+      },{
+        type: 'fields'
       }];
     }
   });
@@ -235,6 +236,19 @@ module('Integration | Models', function(hooks) {
   test('it reflects configured inline editor options', async function(assert) {
     let model = await run(() => this.store.createRecord('post'));
     assert.deepEqual(model.constructor.metaForProperty('title').options.inlineEditorOptions, { style: 'extra-fancy-inline' });
+  });
+
+  test('it sends the branch query param correctly', async function(assert) {
+    let adapter = this.owner.lookup('adapter:post');
+
+    let snapshot = {
+      adapterOptions: {
+        branch: 'master'
+      }
+    };
+    let builtUrl = adapter.buildURL('test', 'id', snapshot, 'findRecord');
+
+    assert.equal(builtUrl, 'http://localhost:3000/api/tests/id?branch=master');
   });
 
   // Ember runloop.
