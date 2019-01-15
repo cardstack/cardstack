@@ -275,8 +275,8 @@ module.exports = class DocumentContext {
 
       let fieldsets = get(contentType, `fieldsets.${fieldsetFormat || contentType.fieldsetExpansionFormat}`);
       if (fieldsets && fieldsets.length) {
-        for (let { field } of fieldsets) {
-          this._buildSearchTree(searchTree, [ field ]);
+        for (let { field:fieldPath } of fieldsets) {
+          this._buildSearchTree(searchTree, fieldPath.split('.'));
         }
       }
 

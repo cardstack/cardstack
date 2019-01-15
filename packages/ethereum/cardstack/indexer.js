@@ -132,9 +132,21 @@ class Updater {
       }
     }, {
       type: "fields",
+      id: "transaction-participants",
+      attributes: {
+        "field-type": "@cardstack/core-types::string-array"
+      }
+    }, {
+      type: "fields",
+      id: "block-data",
+      attributes: {
+        "field-type": "@cardstack/core-types::object"
+      }
+    }, {
+      type: "fields",
       id: "transaction-hash",
       attributes: {
-        "field-type": "@cardstack/core-types::integer"
+        "field-type": "@cardstack/core-types::string"
       }
     }, {
       type: "fields",
@@ -198,6 +210,18 @@ class Updater {
       }
     }, {
       type: "fields",
+      id: "transaction-from",
+      attributes: {
+        "field-type": "@cardstack/core-types::case-insensitive"
+      }
+    }, {
+      type: "fields",
+      id: "transaction-to",
+      attributes: {
+        "field-type": "@cardstack/core-types::case-insensitive"
+      }
+    }, {
+      type: "fields",
       id: "gas-used",
       attributes: {
         "field-type": "@cardstack/core-types::integer"
@@ -236,9 +260,21 @@ class Updater {
       attributes: {
         "field-type": "@cardstack/core-types::has-many"
       },
+    }, {
+      type: 'content-types',
+      id: 'blocks',
       relationships: {
-        'related-types': {
-          data: [{ type: 'content-types', id: 'ethereum-transactions' }]
+        fields: {
+          data: [
+            { type: "fields", id: "block-number" },
+            { type: "fields", id: "block-hash" },
+            { type: "fields", id: "timestamp" },
+            { type: "fields", id: "transaction-participants" },
+            { type: "fields", id: "block-data" },
+          ]
+        },
+        'data-source': {
+          data: { type: 'data-sources', id: this.dataSourceId.toString() }
         }
       }
     }, {
@@ -256,9 +292,10 @@ class Updater {
             { type: "fields", id: "to-address" },
             { type: "fields", id: "from-address" },
             { type: "fields", id: "transaction-value" },
+            { type: "fields", id: "transaction-from" },
+            { type: "fields", id: "transaction-to" },
             { type: "fields", id: "gas" },
             { type: "fields", id: "gas-price" },
-            { type: "fields", id: "transaction-data" },
             { type: "fields", id: "transaction-data" },
             { type: "fields", id: "transaction-successful" },
             { type: "fields", id: "gas-used" },

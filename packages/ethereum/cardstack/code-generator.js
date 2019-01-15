@@ -30,20 +30,26 @@ class EthereumCodeGenerator {
 
     let sourceConfigs = [];
     for (let source of ethereumSources) {
-      let { id, _params:{ contract: { addresses } } } = source;
+      if (source._params.contract) {
+        let { id, _params: { contract: { addresses } } } = source;
 
-      sourceConfigs.push({
-        contract: id,
-        address: addresses[defaultBranch]
-      });
+        sourceConfigs.push({
+          contract: id,
+          address: addresses[defaultBranch]
+        });
+      }
     }
 
-    return template({ properties: sourceConfigs.map(config => {
-      return {
-        name: camelize(config.contract + '-address'),
-        value: config.address
-      };
-    })});
+    if (sourceConfigs.length) {
+      return template({
+        properties: sourceConfigs.map(config => {
+          return {
+            name: camelize(config.contract + '-address'),
+            value: config.address
+          };
+        })
+      });
+    }
   }
 });
 
