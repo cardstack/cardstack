@@ -1,6 +1,6 @@
 {
   "name": "@cardstack/postgresql",
-  "version": "0.13.3",
+  "version": "0.13.6",
   "description": "PostgreSQL data source plugin for @cardstack/hub.",
   "repository": "https://github.com/cardstack/cardstack",
   "author": "Edward Faulkner <edward@eaf4.com>",
@@ -10,7 +10,7 @@
   },
   "devDependencies": {
     "@cardstack/eslint-config": "0.13.0",
-    "@cardstack/test-support": "0.13.3",
+    "@cardstack/test-support": "0.13.6",
     "eslint": "^5.8.0",
     "eslint-plugin-ember": "^5.0.0",
     "eslint-plugin-mocha": "^5.2.0",
