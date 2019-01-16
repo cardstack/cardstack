@@ -1,6 +1,6 @@
 {
   "name": "@cardstack/mock-auth",
-  "version": "0.13.0",
+  "version": "0.13.3",
   "description": "mock user authentication plugin for Cardstack",
   "keywords": [
     "ember-addon",
@@ -32,11 +32,11 @@
     "lodash": "^4.17.11"
   },
   "devDependencies": {
-    "@cardstack/authentication": "0.13.0",
+    "@cardstack/authentication": "0.13.3",
     "@cardstack/eslint-config": "0.13.0",
-    "@cardstack/jsonapi": "0.13.0",
-    "@cardstack/models": "0.13.1",
-    "@cardstack/test-support": "0.13.1",
+    "@cardstack/jsonapi": "0.13.3",
+    "@cardstack/models": "0.13.3",
+    "@cardstack/test-support": "0.13.3",
     "broccoli-asset-rev": "^2.4.5",
     "ember-cli": "^3.0.0",
     "ember-cli-dependency-checker": "^2.1.0",
