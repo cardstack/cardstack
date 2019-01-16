@@ -195,13 +195,13 @@ describe('hub/searchers/basics', function() {
         }
       });
       let response = (await env.lookup('hub:searchers').get(env.session, 'master', type, id, ['example'])).included[0];
-      expect(response).has.deep.property('data.attributes.example-counter');
-      let firstCounter = response.data.attributes['example-counter'];
+      expect(response).has.deep.property('attributes.example-counter');
+      let firstCounter = response.attributes['example-counter'];
 
       await alterExpiration('master', 'examples', '1000', '-301 seconds');
 
       response = (await env.lookup('hub:searchers').get(env.session, 'master', type, id, ['example'])).included[0];
-      let secondCounter = response.data.attributes['example-counter'];
+      let secondCounter = response.attributes['example-counter'];
       expect(firstCounter).to.not.equal(secondCounter);
     });
 
