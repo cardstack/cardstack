@@ -30,7 +30,7 @@ class Searchers {
     return this._sources;
   }
 
-  async getResourceAndMeta(session, branch, type, id) {
+  async getResourceAndMeta(session, branch, type, id, includePaths) {
     let sources = await this._lookupSources();
     let index = 0;
     let sessionOrEveryone = session || Session.EVERYONE;
@@ -52,11 +52,20 @@ class Searchers {
 
     let result = await next();
 
-    return {
-      resource: result && result.data,
-      meta: result && result.meta,
-      included: result && result.included
-    };
+    let { data, meta, included } = result || {};
+    let maxAge = get(result, 'meta.cardstack-cache-control.max-age');
+    if (data && maxAge != null) {
+      let schema = await this.currentSchema.forBranch(branch);
+      await this._updateCache(maxAge, this.createDocumentContext({
+        id,
+        type,
+        branch,
+        schema,
+        includePaths,
+        upstreamDoc: { data, meta, included }
+      }));
+    }
+    return { resource: data, meta, included };
   }
 
   // not using DI to prevent circular dependency
@@ -71,7 +80,7 @@ class Searchers {
     if (arguments.length < 4) {
       throw new Error(`session is now a required argument to searchers.get`);
     }
-    let { resource, meta, included } = await this.getResourceAndMeta(session, branch, type, id);
+    let { resource, meta, included } = await this.getResourceAndMeta(session, branch, type, id, includePaths);
     let authorizedResult;
     let documentContext;
     if (resource) {
@@ -94,11 +103,6 @@ class Searchers {
       throw new Error(`No such resource ${branch}/${type}/${id}`, {
         status: 404
       });
-    }
-
-    let maxAge = get(meta, 'cardstack-cache-control.max-age');
-    if (maxAge != null) {
-      await this._updateCache(maxAge, documentContext);
     }
 
     return authorizedResult;

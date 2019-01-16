@@ -16,19 +16,26 @@ describe('hub/searchers/basics', function() {
         params: stubParams
       });
 
-    factory.addResource('content-types', 'examples').withRelated('fields', [
-      factory.addResource('fields', 'example-flavor').withAttributes({
-        fieldType: '@cardstack/core-types::string'
-      }),
-      factory.addResource('fields', 'example-size').withAttributes({
-        fieldType: '@cardstack/core-types::string'
-      }),
-      factory.addResource('fields', 'topping').withAttributes({
-        fieldType: '@cardstack/core-types::case-insensitive'
-      }),
-      factory.addResource('fields', 'example-counter').withAttributes({
-        fieldType: '@cardstack/core-types::integer'
-      })
+    factory.addResource('content-types', 'puppies')
+      .withRelated('fields', [
+      factory.addResource('fields', 'example').withAttributes({
+        fieldType: '@cardstack/core-types::belongs-to'
+      }).withRelated('relatedTypes', [
+        factory.addResource('content-types', 'examples').withRelated('fields', [
+          factory.addResource('fields', 'example-flavor').withAttributes({
+            fieldType: '@cardstack/core-types::string'
+          }),
+          factory.addResource('fields', 'example-size').withAttributes({
+            fieldType: '@cardstack/core-types::string'
+          }),
+          factory.addResource('fields', 'topping').withAttributes({
+            fieldType: '@cardstack/core-types::case-insensitive'
+          }),
+          factory.addResource('fields', 'example-counter').withAttributes({
+            fieldType: '@cardstack/core-types::integer'
+          })
+        ])
+      ])
     ]);
 
     chocolate = factory.addResource('examples').withAttributes({
@@ -146,6 +153,23 @@ describe('hub/searchers/basics', function() {
       let firstCounter = response.data.attributes['example-counter'];
       response = await env.lookup('hub:searchers').get(env.session, 'master', 'examples', '1000');
       let secondCounter = response.data.attributes['example-counter'];
+      expect(firstCounter).to.equal(secondCounter);
+    });
+
+    it("can cache searcher#get included resources", async function() {
+      let { data: { id, type }} = await env.lookup('hub:writers').create('master', env.session, 'puppies', {
+        data: {
+          type: 'puppies',
+          relationships: {
+            example: { data: { type: 'examples', id: '1000' } }
+          }
+        }
+      });
+      let response = (await env.lookup('hub:searchers').get(env.session, 'master', type, id, ['example'])).included[0];
+      expect(response).has.deep.property('attributes.example-counter');
+      let firstCounter = response.attributes['example-counter'];
+      response = (await env.lookup('hub:searchers').get(env.session, 'master', type, id, ['example'])).included[0];
+      let secondCounter = response.attributes['example-counter'];
       expect(firstCounter).to.equal(secondCounter);
     });
 
