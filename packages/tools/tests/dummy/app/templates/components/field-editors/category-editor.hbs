@@ -1,7 +1,14 @@
-<div class="field-editor category-editor">
-  {{input
-    value=(get content field)
-    disabled=disabled
-    focus-out=onchange
-  }}
-</div>
+{{#let (get content field) as |categories|}}
+  {{#each categories as |category|}}
+    <div class="field-editor category-editor">
+      {{input
+        value=category.name
+        disabled=disabled
+        focus-out=onchange
+      }}
+    </div>
+  {{/each}}
+  <button type="button" onclick={{action 'addCategory'}} data-test-add-category-button>
+    Add
+  </button>
+{{/let}}

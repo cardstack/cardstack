@@ -30,6 +30,16 @@ function initialModels() {
       'may-login': true
     });
 
+  initial.addResource('content-types', 'categories')
+    .withRelated('fields', [
+      initial.addResource('fields', 'name').withAttributes({
+        fieldType: '@cardstack/core-types::string'
+      }),
+      initial.addResource('fields', 'popularity').withAttributes({
+        fieldType: '@cardstack/core-types::integer'
+      }),
+    ]);
+
   initial.addResource('content-types', 'bloggers')
     .withRelated('fields', [
       initial.addResource('fields', 'name').withAttributes({
@@ -71,6 +81,7 @@ function initialModels() {
     .withAttributes({
       defaultIncludes: [
         'author',
+        'categories',
         'reading-time-unit',
         'comments',
         'comments.poster',
@@ -103,10 +114,13 @@ function initialModels() {
       initial.addResource('fields', 'archived').withAttributes({
         fieldType: '@cardstack/core-types::boolean'
       }),
-      initial.addResource('fields', 'category').withAttributes({
-        fieldType: '@cardstack/core-types::string',
-        editorComponent: 'field-editors/category-editor'
-      }),
+      initial.addResource('fields', 'categories').withAttributes({
+        fieldType: '@cardstack/core-types::has-many',
+        editorComponent: 'field-editors/category-editor',
+        owned: true
+      }).withRelated('related-types', [
+        initial.getResource('content-types', 'categories')
+      ]),
       initial.addResource('fields', 'comments').withAttributes({
         fieldType: '@cardstack/core-types::has-many',
         owned: true,
@@ -128,7 +142,6 @@ function initialModels() {
 
     addConstraint(initial, '@cardstack/core-types::not-empty', 'title');
     addConstraint(initial, '@cardstack/core-types::not-empty', 'body');
-    addConstraint(initial, '@cardstack/core-types::not-empty', 'category');
 
   let guybrush = initial.addResource('bloggers', '1')
     .withAttributes({
@@ -138,6 +151,18 @@ function initialModels() {
   let lechuck = initial.addResource('bloggers', '2')
     .withAttributes({
       name: 'LeChuck'
+    });
+
+  let adventure = initial.addResource('categories', '1')
+    .withAttributes({
+      name: 'Swashbuckling Adventure',
+      popularity: 10,
+    });
+
+  let career = initial.addResource('categories', '2')
+    .withAttributes({
+      name: 'Career in Pirating',
+      popularity: 3
     });
 
   let goodKarma = initial.addResource('karma-types', '1')
@@ -188,24 +213,24 @@ function initialModels() {
     .withAttributes({
       title: '10 steps to becoming a fearsome pirate',
       publishedAt: new Date(2017, 3, 24),
-      category: 'swashhbucking adventure',
       archived: false,
       readingTimeValue: 8
     })
     .withRelated('reading-time-unit', { type: 'time-units', id: '1' })
     .withRelated('author', lechuck)
+    .withRelated('categories', [ adventure ])
     .withRelated('comments', [ threeHeadedMonkey, diapers ]);
 
   initial.addResource('posts', '2')
     .withAttributes({
       title: 'second',
       publishedAt: new Date(2017, 9, 20),
-      category: 'lifestyle',
       archived: true,
       readingTimeValue: 2
     })
     .withRelated('reading-time-unit', { type: 'time-units', id: '2' })
     .withRelated('author', lechuck)
+    .withRelated('categories', [ career ])
     .withRelated('comments', [ doorstop, brains ]);
 
   return initial.getModels();

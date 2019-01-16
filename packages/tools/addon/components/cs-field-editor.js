@@ -12,7 +12,16 @@ export default Component.extend({
   enabled: true,
   errors: null,
   permissions: null,
+  fetchPermissions() {},
   onchange() {},
+
+  async init() {
+    this._super(...arguments);
+    if (!this.permissions) {
+      let permissions = await this.fetchPermissions();
+      this.set('permissions', permissions);
+    }
+  },
 
   canUpdate: computed('permissions', function() {
     if (!this.permissions) {

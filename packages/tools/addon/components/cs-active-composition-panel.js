@@ -34,6 +34,10 @@ export default Component.extend({
     this.set('permissions', permissions);
   }),
 
+  fetchPermissionsFor: task(function * (record) {
+    return yield this.get('data').fetchPermissionsFor(record);
+  }),
+
   validateTask: task(function * () {
     let errors = yield this.get('data').validate(this.model);
     let errorsForFieldNames = {};

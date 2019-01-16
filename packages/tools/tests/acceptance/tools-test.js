@@ -166,4 +166,21 @@ module('Acceptance | tools', function(hooks) {
     await fillIn(karmaInput, '10');
     assert.dom('[data-test-cs-version-control-dropdown-option-status]').hasText('published');
   });
+
+  test('allow editing fields of newly added, owned records', async function(assert) {
+    await visit('/1');
+    await login();
+    await click('.cardstack-tools-launcher');
+    await waitFor('.cs-editor-switch')
+    await click('.cs-editor-switch');
+
+    let categoryPanel = findTriggerElementWithLabel.call(this, /Categories/);
+    await click(categoryPanel);
+    await click('[data-test-add-category-button]');
+    await fillIn('.category-editor:last-of-type > input', 'Pirating');
+
+    let popularityPanel = findTriggerElementWithLabel.call(this, /Category #: Popularity/);
+    await click(popularityPanel);
+    assert.dom('.field-editor > input').isNotDisabled();
+  });
 });
