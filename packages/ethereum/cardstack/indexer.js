@@ -43,6 +43,7 @@ module.exports = declareInjections({
     }
 
     async beginUpdate() {
+      log.debug(`starting beginUpdate()`);
       if (this.contract) {
         await this.eventIndexer.start({
           ethereumClient: this.ethereumClient,
@@ -55,6 +56,7 @@ module.exports = declareInjections({
         await this.transactionIndexer.start(this.addressIndexing, this.ethereumClient);
       }
 
+      log.debug(`ending beginUpdate()`);
       return new Updater({
         dataSourceId: this.dataSourceId,
         contract: this.contract,

@@ -152,6 +152,7 @@ module.exports = class Indexer {
   }
 
   async beginUpdate(branch) {
+    log.debug(`starting beginUpdate()`);
     await this._ensureRepo();
 
     let targetBranch = this.branchPrefix + branch;
@@ -159,6 +160,7 @@ module.exports = class Indexer {
     if (this.remote) {
       await service.pullRepo(this.remote.url, targetBranch);
     }
+    log.debug(`ending beginUpdate()`);
 
     return new GitUpdater(this.repo, targetBranch, this.repoPath, this.basePath);
   }
