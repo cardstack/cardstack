@@ -84,8 +84,6 @@ module('Integration | Models', function(hooks) {
         type: 'pages'
       },{
         type: 'authors'
-      },{
-        type: 'fields'
       }];
     }
   });
