@@ -41,5 +41,6 @@
   },
   "ember-addon": {
     "defaultBlueprint": "cardstack-git-seeds"
-  }
+  },
+  "gitHead": "e47bc8184339c4826f8d723c9d1d737e922a0a68"
 }

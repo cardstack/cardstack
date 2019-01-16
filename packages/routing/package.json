@@ -75,5 +75,6 @@
   "cardstack-plugin": {
     "api-version": 1,
     "src": "cardstack"
-  }
+  },
+  "gitHead": "e47bc8184339c4826f8d723c9d1d737e922a0a68"
 }
