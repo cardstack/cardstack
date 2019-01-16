@@ -138,12 +138,19 @@ module.exports = class Indexer {
 
   async branches() {
     await this._ensureRepo();
+
     // nodegit docs show a Branch.iteratorNew method that would be
     // more appropriate than this, but as far as I can tell it is not
     // fully implemented
+    const allBranches = await Reference.list(this.repo);
 
     let pattern = new RegExp(`^refs/heads/${this.branchPrefix}(.*)`);
-    return (await Reference.list(this.repo)).map(entry => {
+
+    if(this.remote) {
+      pattern = new RegExp(`^refs/remotes/origin/${this.branchPrefix}(.*)`);
+    }
+
+    return (allBranches).map(entry => {
       let m = pattern.exec(entry);
       if (m) {
         return m[1];

@@ -154,11 +154,6 @@ describe('hub/indexers', function() {
       });
 
       indexers.on('add', model => {
-        // ignore add events for branches
-        if(model.type === "branches") {
-          return;
-        }
-
         addCount++;
 
         expect(model.id).to.be.ok;
