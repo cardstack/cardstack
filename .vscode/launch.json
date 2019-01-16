@@ -129,7 +129,7 @@
             "program": "${workspaceRoot}/packages/ethereum/node_modules/.bin/truffle",
             "console": "integratedTerminal",
             // "env": {
-            //     "LOG_LEVELS": "cardstack/ethereum/transaction-indexer=trace",
+            //     "LOG_LEVELS": "cardstack/ethereum/transaction-indexer=debug",
             // },
             "args": [
                 "test",

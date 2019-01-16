@@ -62,7 +62,7 @@ class TransactionIndexer {
 
   async index(opts) {
     opts.jobNumber = indexJobNumber++;
-    log.debug(`queing index job for ${JSON.stringify(opts)}`);
+    log.debug(`queuing index job for ${JSON.stringify(opts)}`);
 
     this._indexingPromise = Promise.resolve(this._indexingPromise)
       .then(() => this._index(opts));
@@ -91,7 +91,9 @@ class TransactionIndexer {
     }
 
     let field = trackedAddressField === 'id' ? 'id' : `attributes.${trackedAddressField}`;
-    return flatMap(results, i => get(i, field)).filter(i => Boolean(i)).map(i => i.toLowerCase());
+    let trackedAddresses = flatMap(results, i => get(i, field)).filter(i => Boolean(i)).map(i => i.toLowerCase());
+    log.debug(`found tracked addresses for tracked address field '${trackedAddressContentType}.${field}': ${JSON.stringify(trackedAddresses)}`);
+    return trackedAddresses;
   }
 
   async _startTrackedAddressListening() {
@@ -226,8 +228,11 @@ class TransactionIndexer {
         Math.min(oldest, Math.max(lastIndexedBlockHeight, context.lastIndexedAddressesBlockHeights[address])), context.currentBlockNumber) : 0;
 
     let abortedAddresses = getAbortedAddresses(indexedAddresses);
+    let interruptedAddresses = getInterruptedAddresses(indexedAddresses);
     context.newAddresses = trackedAddresses.filter(address => !context.lastIndexedAddressesBlockHeights[address] ||
-                                                              abortedAddresses.includes(address));
+                                                              abortedAddresses.includes(address) ||
+                                                              interruptedAddresses.includes(address));
+
     if (context.newAddresses.length) {
       let batch = this.pgsearchClient.beginBatch(this.schema, this.searchers);
       for (let address of context.newAddresses) {
@@ -743,5 +748,10 @@ function lastIndexedBlockHeights(indexedAddresses) {
 }
 function getAbortedAddresses(indexedAddresses) {
   return indexedAddresses.filter(address => get(address, 'meta.abortLoadingBlockheight'))
+                         .map(address => address.id.toLowerCase());
+}
+
+function getInterruptedAddresses(indexedAddresses) {
+  return indexedAddresses.filter(address => get(address, 'meta.loadingTransactions'))
                          .map(address => address.id.toLowerCase());
 }
