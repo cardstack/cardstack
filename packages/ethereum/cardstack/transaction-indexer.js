@@ -8,6 +8,8 @@ const log = require('@cardstack/logger')('cardstack/ethereum/transaction-indexer
 const DEFAULT_MAX_ADDRESSES_TRACKED = 1000000;
 const LOADING_PROGRESS_BLOCK_MOD = 1000;
 
+let indexJobNumber = 0;
+
 module.exports = declareInjections({
   indexer: 'hub:indexers',
   controllingBranch: 'hub:controlling-branch',
@@ -38,6 +40,7 @@ class TransactionIndexer {
   }
 
   async start(addressIndexing, ethereumClient) {
+    log.debug(`starting transaction-indexer`);
     await this._setupPromise;
 
     this.addressIndexing = addressIndexing;
@@ -47,14 +50,20 @@ class TransactionIndexer {
 
     await this.ethereumClient.startNewBlockListening(this);
     this._hasStartedCallBack();
+    log.debug(`completed transaction-indexer startup`);
   }
 
   async ensureStarted() {
+    log.debug(`ensuring transaction-indexer has started`);
     await this._setupPromise;
     await this._startedPromise;
+    log.debug(`completed ensuring transaction-indexer has started`);
   }
 
   async index(opts) {
+    opts.jobNumber = indexJobNumber++;
+    log.debug(`queing index job for ${JSON.stringify(opts)}`);
+
     this._indexingPromise = Promise.resolve(this._indexingPromise)
       .then(() => this._index(opts));
 
@@ -88,6 +97,7 @@ class TransactionIndexer {
   async _startTrackedAddressListening() {
     if (this._boundEventListeners) { return; }
 
+    log.debug(`starting indexing event listeners for tracked addresses`);
     this._boundEventListeners = true;
     let trackedAddressContentType = get(this, 'addressIndexing.trackedAddressContentType');
     let trackedAddressField = get(this, 'addressIndexing.trackedAddressField');
@@ -120,6 +130,8 @@ class TransactionIndexer {
 
       return await this._eventProcessingPromise;
     });
+
+    log.debug(`completed setting up event listeners for tracked addresses`);
   }
 
   async _processIndexingAddEvent(trackedAddressField, { doc: { data: trackedResource } }) {
@@ -162,7 +174,9 @@ class TransactionIndexer {
   }
 
   async _ensureClient() {
+    log.debug(`waiting for pgsearch client to start`);
     await this.pgsearchClient.ensureDatabaseSetup();
+    log.debug(`completed pgsearch client startup`);
   }
 
   async _index({
@@ -170,23 +184,28 @@ class TransactionIndexer {
     onlyBlockNumber,
     startIndexingAddresses,
     stopIndexingAddresses,
+    jobNumber
   }) {
+    log.debug(`starting block index for index job #${jobNumber}: ${JSON.stringify({ lastIndexedBlockHeight, onlyBlockNumber, startIndexingAddresses, stopIndexingAddresses})}`);
     await this.ensureStarted();
-
     if (Array.isArray(stopIndexingAddresses)) {
-      return await this._stopIndexingAddresses(stopIndexingAddresses);
+      await this._stopIndexingAddresses(stopIndexingAddresses);
+      log.debug(`completed block index for index job #${jobNumber}`);
+      return;
     }
 
     let currentBlockNumber = await this.ethereumClient.getBlockHeight();
     if (currentBlockNumber === undefined) {
       // this can happen if there is a communication error with geth
       log.warn(`unable to obtain block number from ethereum client, skipping indexing`);
+      log.debug(`stopping block index for index job #${jobNumber}`);
       return;
     }
 
     let trackedAddresses = Array.isArray(startIndexingAddresses) ? startIndexingAddresses : await this.getTrackedAddresses();
     if (!trackedAddresses || !trackedAddresses.length) {
       log.info(`There are no tracked-ethereum-addresses to index.`);
+      log.debug(`completed block index for index job #${jobNumber}`);
       return;
     }
 
@@ -194,8 +213,10 @@ class TransactionIndexer {
       await this._indexBlock(trackedAddresses, onlyBlockNumber);
     } else {
       await this._indexBlocks(trackedAddresses, lastIndexedBlockHeight, currentBlockNumber);
+      log.debug(`completed block index for index job #${jobNumber}`);
       return currentBlockNumber;
     }
+    log.debug(`completed block index for index job #${jobNumber}`);
   }
 
   async _indexBlocks(trackedAddresses, lastIndexedBlockHeight = 0, currentBlockNumber) {
