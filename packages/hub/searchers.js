@@ -52,11 +52,19 @@ class Searchers {
 
     let result = await next();
 
-    return {
-      resource: result && result.data,
-      meta: result && result.meta,
-      included: result && result.included
-    };
+    let { data, meta, included } = result || {};
+    let maxAge = get(result, 'meta.cardstack-cache-control.max-age');
+    if (data && maxAge != null) {
+      let schema = await this.currentSchema.forBranch(branch);
+      await this._updateCache(maxAge, this.createDocumentContext({
+        id,
+        type,
+        branch,
+        schema,
+        upstreamDoc: { data, meta, included }
+      }));
+    }
+    return { resource: data, meta, included };
   }
 
   // not using DI to prevent circular dependency
@@ -94,11 +102,6 @@ class Searchers {
       throw new Error(`No such resource ${branch}/${type}/${id}`, {
         status: 404
       });
-    }
-
-    let maxAge = get(meta, 'cardstack-cache-control.max-age');
-    if (maxAge != null) {
-      await this._updateCache(maxAge, documentContext);
     }
 
     return authorizedResult;
