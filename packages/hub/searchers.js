@@ -30,7 +30,7 @@ class Searchers {
     return this._sources;
   }
 
-  async getResourceAndMeta(session, branch, type, id, includePaths) {
+  async getResourceAndMeta(session, branch, type, id) {
     let sources = await this._lookupSources();
     let index = 0;
     let sessionOrEveryone = session || Session.EVERYONE;
@@ -61,7 +61,6 @@ class Searchers {
         type,
         branch,
         schema,
-        includePaths,
         upstreamDoc: { data, meta, included }
       }));
     }
@@ -80,7 +79,7 @@ class Searchers {
     if (arguments.length < 4) {
       throw new Error(`session is now a required argument to searchers.get`);
     }
-    let { resource, meta, included } = await this.getResourceAndMeta(session, branch, type, id, includePaths);
+    let { resource, meta, included } = await this.getResourceAndMeta(session, branch, type, id);
     let authorizedResult;
     let documentContext;
     if (resource) {
