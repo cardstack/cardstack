@@ -185,6 +185,7 @@ class GitUpdater {
   }
 
   async updateContent(meta, hints, ops) {
+    log.debug(`starting updateContent()`);
     await this._loadCommit();
     let originalTree;
     if (meta && meta.commit) {
@@ -204,6 +205,7 @@ class GitUpdater {
     if (!originalTree) {
       await ops.finishReplaceAll();
     }
+    log.debug(`completed updateContent()`);
     return {
       commit: this.commitId
     };

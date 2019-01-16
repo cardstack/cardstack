@@ -387,6 +387,7 @@ class Updater {
   }
 
   async updateContent(meta, hints, ops) {
+    log.debug(`starting updateContent()`);
     let schema = await this.schema();
     let isSchemaUnchanged, blockHeight, indexedAddressesBlockHeight;
     let lastBlockHeight = get(meta, 'lastBlockHeight');
@@ -406,6 +407,7 @@ class Updater {
     }
 
     if (this.contract) {
+      log.debug(`starting updateContent() indexing of contract events`);
       let shouldSkip = await this.eventIndexer.shouldSkipIndexing(this.dataSourceId, defaultBranch);
       blockHeight = lastBlockHeight;
       if (!shouldSkip) {
@@ -416,14 +418,18 @@ class Updater {
 
         await this.eventIndexer.index(this.dataSourceId, lastBlockHeight);
       }
+      log.debug(`completed updateContent() indexing of contract events`);
     }
 
     if (this.addressIndexing) {
+      log.debug(`starting updateContent() indexing of new blocks`);
       indexedAddressesBlockHeight = await this.transactionIndexer.index({
         lastIndexedBlockHeight: lastAddressesBlockHeight
       });
+      log.debug(`completed updateContent() indexing of new blocks`);
     }
 
+    log.debug(`completed updateContent()`);
     return {
       lastIndexedAddressesBlockHeight: indexedAddressesBlockHeight,
       lastBlockHeight: blockHeight,

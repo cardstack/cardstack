@@ -171,18 +171,20 @@ module.exports = class EthereumClient {
   async startNewBlockListening(transactionIndexer) {
     if (this._hasStartedListeningForNewBlocks) { return; }
 
+    log.info(`starting listening for new blocks - first disconnecting any lingering listeners`);
     await this.stopListeningForNewBlocks();
     this._hasStartedListeningForNewBlocks = true;
 
-    log.info(`starting listeners for new blocks`);
+    log.info(`starting listening for new blocks - now fashioning new listeners`);
     this._newBlocksEventListener = this._provider.eth.subscribe('newBlockHeaders', async (error, event) => {
       if (error) {
-        log.error(`error received listening for new blocks`);
+        log.error(`error received listening for new blocks`, error.message);
         if (error.type === 'close') {
           await this._reconnect();
         }
       } else {
-        log.debug(`Received new block header event: ${JSON.stringify(event, null, 2)}`);
+        log.debug(`Received new block #${event.number}`);
+        log.trace(`Received new block header event: ${JSON.stringify(event, null, 2)}`);
 
         let blockNumber = event.number;
         if (transactionIndexer) {
@@ -192,6 +194,7 @@ module.exports = class EthereumClient {
         }
       }
     });
+    log.debug(`completed startup for new block event listeners`);
   }
 
   async startEventListening({ name, contract, eventIndexer }) {
