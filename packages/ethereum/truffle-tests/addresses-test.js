@@ -113,7 +113,6 @@ async function assertTxnResourceMatchesEthTxn(actualTxn, expectedTxn, block) {
   let expectedStatus = Boolean(parseInt(receipt.status, 16));
 
   expect(actualTxn).has.deep.property('attributes.block-number', expectedTxn.blockNumber);
-  expect(actualTxn).has.deep.property('attributes.timestamp', block.timestamp);
   expect(actualTxn).has.deep.property('attributes.transaction-hash', expectedTxn.hash);
   expect(actualTxn).has.deep.property('attributes.block-hash', expectedTxn.blockHash);
   expect(actualTxn).has.deep.property('attributes.transaction-nonce', expectedTxn.nonce);
@@ -127,6 +126,7 @@ async function assertTxnResourceMatchesEthTxn(actualTxn, expectedTxn, block) {
   expect(actualTxn).has.deep.property('attributes.transaction-successful', expectedStatus);
   expect(actualTxn).has.deep.property('attributes.gas-used', receipt.gasUsed);
   expect(actualTxn).has.deep.property('attributes.cumulative-gas-used', receipt.cumulativeGasUsed);
+  expect(Math.abs(actualTxn.attributes.timestamp - block.timestamp) <= 1).to.equal(true); // ganache (our private blockchain) seems to be fudging this a bit. give it a 1 sec tolerance
 }
 
 contract('ethereum-addresses indexing', function (_accounts) {
