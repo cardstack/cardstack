@@ -103,16 +103,6 @@ class TransactionIndexer {
     let trackedAddressField = get(this, 'addressIndexing.trackedAddressField');
     if (!trackedAddressContentType || !trackedAddressField) { return; }
 
-    log.debug(`_startTrackedAddressListening() getting schema...`);
-    let schema = await this.schema.forControllingBranch();
-    log.debug(`_startTrackedAddressListening() obtained schema`);
-    if (!schema.types.get(trackedAddressContentType)) {
-      throw new Error(`The configured trackedAddressContentType '${trackedAddressContentType}' is not a valid type.`);
-    }
-    if (!schema.realAndComputedFields.get(trackedAddressField)) {
-      throw new Error(`The configured trackedAddressField '${trackedAddressField}' is not a valid field.`);
-    }
-
     this.pgsearchClient.on('add', async (evt) => {
       let { type } = evt;
       if (type !== trackedAddressContentType) { return; }
