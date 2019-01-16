@@ -185,6 +185,26 @@ describe('hub/searchers/basics', function() {
       expect(firstCounter).to.not.equal(secondCounter);
     });
 
+    it("does not return expired searcher#get included resources", async function() {
+      let { data: { id, type }} = await env.lookup('hub:writers').create('master', env.session, 'puppies', {
+        data: {
+          type: 'puppies',
+          relationships: {
+            example: { data: { type: 'examples', id: '1000' } }
+          }
+        }
+      });
+      let response = (await env.lookup('hub:searchers').get(env.session, 'master', type, id, ['example'])).included[0];
+      expect(response).has.deep.property('data.attributes.example-counter');
+      let firstCounter = response.data.attributes['example-counter'];
+
+      await alterExpiration('master', 'examples', '1000', '-301 seconds');
+
+      response = (await env.lookup('hub:searchers').get(env.session, 'master', type, id, ['example'])).included[0];
+      let secondCounter = response.data.attributes['example-counter'];
+      expect(firstCounter).to.not.equal(secondCounter);
+    });
+
     it("does not return expired documents in searcher#search", async function() {
       await env.lookup('hub:searchers').get(env.session, 'master', 'examples', '1000');
       await alterExpiration('master', 'examples', '1000', '-301 seconds');
