@@ -60,7 +60,7 @@ class TransactionIndexer {
     log.debug(`completed ensuring transaction-indexer has started`);
   }
 
-  async index(opts) {
+  async index(opts={}) {
     opts.jobNumber = indexJobNumber++;
     log.debug(`queuing index job for ${JSON.stringify(opts)}`);
 
@@ -174,13 +174,12 @@ class TransactionIndexer {
   }
 
   async _index({
-    lastIndexedBlockHeight,
     onlyBlockNumber,
     startIndexingAddresses,
     stopIndexingAddresses,
     jobNumber
   }) {
-    log.debug(`starting block index for index job #${jobNumber}: ${JSON.stringify({ lastIndexedBlockHeight, onlyBlockNumber, startIndexingAddresses, stopIndexingAddresses})}`);
+    log.debug(`starting block index for index job #${jobNumber}: ${JSON.stringify({ onlyBlockNumber, startIndexingAddresses, stopIndexingAddresses})}`);
     await this.ensureStarted();
     if (Array.isArray(stopIndexingAddresses)) {
       await this._stopIndexingAddresses(stopIndexingAddresses);
@@ -206,14 +205,14 @@ class TransactionIndexer {
     if (onlyBlockNumber) {
       await this._indexBlock(trackedAddresses, onlyBlockNumber);
     } else {
-      await this._indexBlocks(trackedAddresses, lastIndexedBlockHeight, currentBlockNumber);
+      await this._indexBlocks(trackedAddresses, currentBlockNumber);
       log.debug(`completed block index for index job #${jobNumber}`);
       return currentBlockNumber;
     }
     log.debug(`completed block index for index job #${jobNumber}`);
   }
 
-  async _indexBlocks(trackedAddresses, lastIndexedBlockHeight = 0, currentBlockNumber) {
+  async _indexBlocks(trackedAddresses, currentBlockNumber) {
     let indexedAddresses = await this._getIndexedAddresses();
     let context = new BlockProcessingContext({
       currentBlockNumber,
@@ -221,11 +220,9 @@ class TransactionIndexer {
       lastIndexedAddressesBlockHeights: lastIndexedBlockHeights(indexedAddresses),
     });
 
-    // if an address document indicates that it has been indexed more recently than the hub:indexers.update() was kicked off, then
-    // use that as the block height the document was indexed at as it will always be more accurate.
     context.oldestLastIndexedBlock = Object.keys(context.lastIndexedAddressesBlockHeights).length ?
       Object.keys(context.lastIndexedAddressesBlockHeights).reduce((oldest, address) =>
-        Math.min(oldest, Math.max(lastIndexedBlockHeight, context.lastIndexedAddressesBlockHeights[address])), context.currentBlockNumber) : 0;
+        Math.min(oldest, context.lastIndexedAddressesBlockHeights[address]), context.currentBlockNumber) : 0;
 
     let abortedAddresses = getAbortedAddresses(indexedAddresses);
     let interruptedAddresses = getInterruptedAddresses(indexedAddresses);

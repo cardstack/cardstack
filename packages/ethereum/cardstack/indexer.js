@@ -391,9 +391,8 @@ class Updater {
   async updateContent(meta, hints, ops) {
     log.debug(`starting updateContent()`);
     let schema = await this.schema();
-    let isSchemaUnchanged, blockHeight, indexedAddressesBlockHeight;
+    let isSchemaUnchanged, blockHeight;
     let lastBlockHeight = get(meta, 'lastBlockHeight');
-    let lastAddressesBlockHeight = get(meta, 'lastIndexedAddressesBlockHeight');
 
     if (meta) {
       let { lastSchema } = meta;
@@ -425,15 +424,12 @@ class Updater {
 
     if (this.addressIndexing) {
       log.debug(`starting updateContent() indexing of new blocks`);
-      indexedAddressesBlockHeight = await this.transactionIndexer.index({
-        lastIndexedBlockHeight: lastAddressesBlockHeight
-      });
+      await this.transactionIndexer.index();
       log.debug(`completed updateContent() indexing of new blocks`);
     }
 
     log.debug(`completed updateContent()`);
     return {
-      lastIndexedAddressesBlockHeight: indexedAddressesBlockHeight,
       lastBlockHeight: blockHeight,
       lastSchema: schema
     };
