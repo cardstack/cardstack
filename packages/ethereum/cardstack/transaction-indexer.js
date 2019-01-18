@@ -11,7 +11,6 @@ const LOADING_PROGRESS_BLOCK_MOD = 1000;
 let indexJobNumber = 0;
 
 module.exports = declareInjections({
-  indexer: 'hub:indexers',
   controllingBranch: 'hub:controlling-branch',
   searchers: 'hub:searchers',
   schema: 'hub:current-schema',
@@ -24,10 +23,9 @@ class TransactionIndexer {
     return new this(...args);
   }
 
-  constructor({ indexer, pgsearchClient, schema, searchers, controllingBranch }) {
+  constructor({ pgsearchClient, schema, searchers, controllingBranch }) {
     this.ethereumClient = null;
     this.addressIndexing = null;
-    this.indexer = indexer;
     this.searchers = searchers;
     this.schema = schema;
     this.pgsearchClient = pgsearchClient;
