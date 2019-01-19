@@ -204,11 +204,9 @@ class TransactionIndexer {
 
     if (onlyBlockNumber) {
       await this._indexBlock(trackedAddresses, onlyBlockNumber);
-    } else {
-      await this._indexBlocks(trackedAddresses, currentBlockNumber);
-      log.debug(`completed block index for index job #${jobNumber}`);
-      return currentBlockNumber;
     }
+
+    await this._indexBlocks(trackedAddresses, currentBlockNumber);
     log.debug(`completed block index for index job #${jobNumber}`);
   }
 
