@@ -62,13 +62,21 @@ module.exports = class RunningIndexers {
       return [ source.sourceType, source.id ];
     }));
     let newSchemaModels = [];
-    await Promise.all(dataSources.map(async source => {
+
+    let staticModelsDataSources = dataSources.filter(ds => ds.sourceType === '@cardstack/hub::static-models');
+
+    await Promise.all(dataSources.filter(ds => ds.sourceType !== '@cardstack/hub::static-models').map(async source => {
       let indexer = source.indexer;
       if (indexer){
         for (let branch of await indexer.branches()) {
           if (!this.branches[branch]) {
             log.debug("Discovered branch %s", branch);
             this.branches[branch] = new BranchUpdate(branch, this.seedSchema, this.client, this.emitEvent, this.controllingBranch === branch, this.owner);
+
+            // add all staticModels dataSources to all branches
+            await Promise.all(staticModelsDataSources.map(async staticSource => {
+              newSchemaModels.push(await this.branches[branch].addDataSource(staticSource));
+            }));
           }
           newSchemaModels.push(await this.branches[branch].addDataSource(source));
         }
