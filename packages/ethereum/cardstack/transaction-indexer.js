@@ -248,6 +248,7 @@ class TransactionIndexer {
     let latestIndexedBlockNumber = await this._getLatestIndexedBlockNumber();
     if (latestIndexedBlockNumber != null && context.currentBlockNumber > latestIndexedBlockNumber) {
       let blockNumbersToProcess = Array.from({length: context.currentBlockNumber - latestIndexedBlockNumber}, (v, k) => k + latestIndexedBlockNumber + 1);
+      blockNumbersToProcess.reverse(); // the block processing hueristic only works with blocks in descending order
       context.blockNumbersToProcess = blockNumbersToProcess;
       await this._processBlocks(context);
     }
@@ -259,7 +260,7 @@ class TransactionIndexer {
     let { data:blocks } = await this.searchers.searchFromControllingBranch(Session.INTERNAL_PRIVILEGED, {
       filter: {
         type: { exact: 'blocks' },
-        'transaction-participants': context.trackedAddresses
+        'transaction-participants': { exact: context.trackedAddresses }
       },
       sort: '-block-number',
       page: { size: await this.getBlockHeight() }
