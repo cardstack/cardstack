@@ -244,36 +244,6 @@ class TransactionIndexer {
       await batch.done();
     }
 
-    // Process new blocks that we haven't indexed yet (hub may have been turned off)
-    let latestIndexedBlockNumber = await this._getLatestIndexedBlockNumber();
-    if (latestIndexedBlockNumber != null && context.currentBlockNumber > latestIndexedBlockNumber) {
-      let blockNumbersToProcess = Array.from({length: context.currentBlockNumber - latestIndexedBlockNumber}, (v, k) => k + latestIndexedBlockNumber + 1);
-      context.blockNumbersToProcess = blockNumbersToProcess;
-      await this._processBlocks(context);
-    }
-
-    // Use the blocks that we have indexed to see if the trackedAddress' transactions
-    // appear within any indexed blocks--as this is much much faster than crawling incrementally
-    // through all the blocks looking for transactions.
-    let oldestIndexedBlockNumber = await this._getOldestIndexedBlockNumber();
-    let { data:blocks } = await this.searchers.searchFromControllingBranch(Session.INTERNAL_PRIVILEGED, {
-      filter: {
-        type: { exact: 'blocks' },
-        'transaction-participants': context.trackedAddresses
-      },
-      sort: '-block-number',
-      page: { size: await this.getBlockHeight() }
-    });
-
-    if (blocks.length) {
-      let blockNumbersToProcess = blocks.map(i => i.id);
-      context.blockNumbersToProcess = blockNumbersToProcess;
-      await this._processBlocks(context);
-    }
-    // Now index any stragglers that we missed from the blocks in our index. This will
-    // trigger blocks to be added to our index via the searcher and the cache control we are using
-    context.startProcessingFromBlock = oldestIndexedBlockNumber;
-    context.blockNumbersToProcess = null;
     await this._processBlocks(context);
 
     let batch = this.pgsearchClient.beginBatch(this.schema, this.searchers);
@@ -306,46 +276,40 @@ class TransactionIndexer {
   }
 
   async _processBlocks(context) {
-    if (context.blockNumbersToProcess) {
-      for (let blockNumber of context.blockNumbersToProcess) {
-        await this._processBlockWithIncrementalAddressIndexing(blockNumber, context);
-      }
-    } else {
-      // Using the number of sent transactions and the balance as a heuristic to prevent having to crawl to
-      // the genesis block when looking for transactions for an address. Using the available information about
-      // the current state (number of "from" transactions and the current balance), it goes back in time until
-      // at least so many "from" transactions have been found, and then continues going back until the balance
-      // reaches 0. The inherent limitation is that 0-value transactions before the account was funded will not
-      // be found. These sorts of transactions are indicative of interacting with a smart contract, for which
-      // it's probably better suited to use this plugin's contract indexing for these types of transactions.
-      let startProcessingFromBlock = context.startProcessingFromBlock != null ? context.startProcessingFromBlock : context.currentBlockNumber;
-      let stopDescendingAtBlock = 0;
-      let maxDepth = get(this, 'addressIndexing.maxBlockSearchDepth');
-      if (maxDepth) {
-        stopDescendingAtBlock = startProcessingFromBlock - maxDepth;
-      }
-      for (let blockNumber = startProcessingFromBlock;
-        blockNumber >= 0 &&
-        ((context.oldestLastIndexedBlock && blockNumber > context.oldestLastIndexedBlock) ||
-          hasBalance(context.newAddressesInfo) ||
-          hasSentTxns(context.newAddressesInfo));
-        blockNumber--) {
-        if (blockNumber <= stopDescendingAtBlock) {
-          let newAddressesStillLoading = difference(context.newAddresses, context.newAddressesThatAreFinished);
-          for (let address of newAddressesStillLoading) {
-            context.abortedAddresses[address] = { abortedAtBlock: blockNumber };
-          }
-          break;
+    // Using the number of sent transactions and the balance as a heuristic to prevent having to crawl to
+    // the genesis block when looking for transactions for an address. Using the available information about
+    // the current state (number of "from" transactions and the current balance), it goes back in time until
+    // at least so many "from" transactions have been found, and then continues going back until the balance
+    // reaches 0. The inherent limitation is that 0-value transactions before the account was funded will not
+    // be found. These sorts of transactions are indicative of interacting with a smart contract, for which
+    // it's probably better suited to use this plugin's contract indexing for these types of transactions.
+    let startProcessingFromBlock = context.currentBlockNumber;
+    let stopDescendingAtBlock = 0;
+    let maxDepth = get(this, 'addressIndexing.maxBlockSearchDepth');
+    if (maxDepth) {
+      stopDescendingAtBlock = startProcessingFromBlock - maxDepth;
+    }
+    for (let blockNumber = startProcessingFromBlock;
+      blockNumber >= 0 &&
+      ((context.oldestLastIndexedBlock && blockNumber > context.oldestLastIndexedBlock) ||
+        hasBalance(context.newAddressesInfo) ||
+        hasSentTxns(context.newAddressesInfo));
+      blockNumber--) {
+      if (blockNumber <= stopDescendingAtBlock) {
+        let newAddressesStillLoading = difference(context.newAddresses, context.newAddressesThatAreFinished);
+        for (let address of newAddressesStillLoading) {
+          context.abortedAddresses[address] = { abortedAtBlock: blockNumber };
         }
+        break;
+      }
 
-        await this._processBlockWithIncrementalAddressIndexing(blockNumber, context);
-        if (blockNumber === 0 &&
-          (hasBalance(context.newAddressesInfo) || hasSentTxns(context.newAddressesInfo))) {
-          let addressesWithBalances = Object.keys(context.newAddressesInfo).filter(address => context.newAddressesInfo[address].balance.gt(new BN(0)));
-          let addressesWithSentTransactions = Object.keys(context.newAddressesInfo).filter(address => context.newAddressesInfo[address].numSentTxns > 0);
-          throw new Error(`Error: the heuristic used to index the ethereum address has reached the genesis block and was unable to reach succesful end state. This should never happen and indicates a bug in our heuristic calcuation.
+      await this._processBlockWithIncrementalAddressIndexing(blockNumber, context);
+      if (blockNumber === 0 &&
+        (hasBalance(context.newAddressesInfo) || hasSentTxns(context.newAddressesInfo))) {
+        let addressesWithBalances = Object.keys(context.newAddressesInfo).filter(address => context.newAddressesInfo[address].balance.gt(new BN(0)));
+        let addressesWithSentTransactions = Object.keys(context.newAddressesInfo).filter(address => context.newAddressesInfo[address].numSentTxns > 0);
+        throw new Error(`Error: the heuristic used to index the ethereum address has reached the genesis block and was unable to reach succesful end state. This should never happen and indicates a bug in our heuristic calcuation.
  These addresses still have an unresolved balances: ${JSON.stringify(addressesWithBalances)}. These addresses still have unresolved sent transactions: ${JSON.stringify(addressesWithSentTransactions)}`);
-        }
       }
     }
   }
