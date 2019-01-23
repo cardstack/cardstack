@@ -229,7 +229,10 @@ class TransactionIndexer {
     context.newAddresses = trackedAddresses.filter(address => !context.lastIndexedAddressesBlockHeights[address] ||
                                                               abortedAddresses.includes(address) ||
                                                               interruptedAddresses.includes(address));
-
+    context.addressBalances = {};
+    for (let address of trackedAddresses) {
+      context.addressBalances[address] = (await this.ethereumClient.getBalance(address)).toString();
+    }
     if (context.newAddresses.length) {
       let batch = this.pgsearchClient.beginBatch(this.schema, this.searchers);
       for (let address of context.newAddresses) {
@@ -253,6 +256,7 @@ class TransactionIndexer {
         batch,
         address,
         context.currentBlockNumber,
+        context.addressBalances[address],
         context.discoveredTransactions[address],
         context.addressesVersions[address],
         get(context.newAddressesInfo, `${address}.discoveredAtBlock`),
@@ -267,6 +271,7 @@ class TransactionIndexer {
         batch,
         address,
         context.currentBlockNumber,
+        context.addressBalances[address],
         undefined,
         undefined,
         get(context.newAddressesInfo, `${address}.discoveredAtBlock`),
@@ -322,9 +327,9 @@ class TransactionIndexer {
     for (let address of newlyFinishedAddresses) {
       log.debug(`====> finished indexing address ${address} at block ${blockNumber}.`);
       if (context.discoveredTransactions[address]) {
-        await this._indexAddressResource(batch, address, context.currentBlockNumber, context.discoveredTransactions[address], context.addressesVersions[address], get(context.newAddressesInfo, `${address}.discoveredAtBlock`));
+        await this._indexAddressResource(batch, address, context.currentBlockNumber, context.addressBalances[address], context.discoveredTransactions[address], context.addressesVersions[address], get(context.newAddressesInfo, `${address}.discoveredAtBlock`));
       } else {
-        await this._indexAddressResource(batch, address, context.currentBlockNumber, undefined, undefined, get(context.newAddressesInfo, `${address}.discoveredAtBlock`));
+        await this._indexAddressResource(batch, address, context.currentBlockNumber, context.addressBalances[address],undefined, undefined, get(context.newAddressesInfo, `${address}.discoveredAtBlock`));
       }
       delete context.discoveredTransactions[address];
     }
@@ -351,7 +356,8 @@ class TransactionIndexer {
     await this._processBlock(batch, blockNumber, context);
 
     for (let address of Object.keys(discoveredTransactions)) {
-      await this._indexAddressResource(batch, address, blockNumber, discoveredTransactions[address], addressesVersions[address]);
+      let balance = (await this.ethereumClient.getBalance(address)).toString();
+      await this._indexAddressResource(batch, address, blockNumber, balance, discoveredTransactions[address], addressesVersions[address]);
     }
     await batch.done();
   }
@@ -546,7 +552,7 @@ class TransactionIndexer {
     return await this._indexResource(batch, addressResource);
   }
 
-  async _indexAddressResource(batch, address, blockHeight, transactions = [], addressVersion='0.0', discoveredAtBlock, abortedAtBlock) {
+  async _indexAddressResource(batch, address, blockHeight, balance, transactions = [], addressVersion='0.0', discoveredAtBlock, abortedAtBlock) {
     if (!address) { return; }
     log.trace(`indexing address ${address} at block #${blockHeight} with version ${addressVersion} and transactions${JSON.stringify(transactions)}`);
 
@@ -575,7 +581,7 @@ class TransactionIndexer {
       };
     }
 
-    addressResource.attributes['balance'] = (await this.ethereumClient.getBalance(address, blockHeight)).toString();
+    addressResource.attributes.balance = balance;
     let updatedTransactions = addressResource.relationships.transactions.data.concat((transactions || []).map(txn => {
       return { type: 'ethereum-transactions', id: txn };
     }));
