@@ -1,6 +1,6 @@
 {
   "name": "@cardstack/image",
-  "version": "0.13.9",
+  "version": "0.13.11",
   "description": "Image field plugin for cardstack",
   "keywords": [
     "ember-addon",
@@ -25,20 +25,20 @@
   },
   "dependencies": {
     "@cardstack/plugin-utils": "0.13.0",
-    "@cardstack/test-support": "0.13.9",
+    "@cardstack/test-support": "0.13.11",
     "ember-cli-babel": "^6.8.2",
     "ember-cli-htmlbars": "^2.0.1"
   },
   "devDependencies": {
-    "@cardstack/authentication": "0.13.6",
+    "@cardstack/authentication": "0.13.11",
     "@cardstack/ephemeral": "0.13.0",
     "@cardstack/eslint-config": "0.13.0",
-    "@cardstack/files": "0.13.9",
-    "@cardstack/jsonapi": "0.13.6",
-    "@cardstack/mock-auth": "0.13.6",
-    "@cardstack/models": "0.13.6",
+    "@cardstack/files": "0.13.11",
+    "@cardstack/jsonapi": "0.13.11",
+    "@cardstack/mock-auth": "0.13.11",
+    "@cardstack/models": "0.13.11",
     "@cardstack/rendering": "0.13.0",
-    "@cardstack/routing": "0.13.6",
+    "@cardstack/routing": "0.13.11",
     "@cardstack/tools": "0.13.9",
     "broccoli-asset-rev": "^2.4.5",
     "ember-cli": "^3.0.0",
