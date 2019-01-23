@@ -43,7 +43,7 @@
     "@cardstack/eslint-config": "0.13.0",
     "@cardstack/jsonapi": "0.13.11",
     "@cardstack/mock-auth": "0.13.11",
-    "@cardstack/test-support": "0.13.11",
+    "@cardstack/test-support": "0.13.12",
     "broccoli-asset-rev": "^2.4.5",
     "ember-cli": "^3.0.0",
     "ember-cli-dependency-checker": "^2.1.0",
