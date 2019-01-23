@@ -97,6 +97,8 @@ module.exports = class RunningIndexers {
   async update(forceRefresh, hints) {
     await this._loadSchemaModels();
 
+    await Promise.all(Object.values(this.branches).map(branch => branch.update(forceRefresh, hints)));
+
     await Promise.all(Object.keys(this.branches).map((branch) => {
       return this.branches[this.controllingBranch].add(
         'branches',
@@ -104,8 +106,7 @@ module.exports = class RunningIndexers {
         { data: {id: branch, type: 'branches', attributes: {}}},
       );
     }));
-
-    await Promise.all(Object.values(this.branches).map(branch => branch.update(forceRefresh, hints)));
+    
     return await this._schemas();
   }
 
