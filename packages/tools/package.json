@@ -22,7 +22,7 @@
     "test:all": "ember try:each"
   },
   "dependencies": {
-    "@cardstack/data": "0.13.6",
+    "@cardstack/data": "0.13.11",
     "@cardstack/edges": "0.13.0",
     "@cardstack/plugin-utils": "0.13.0",
     "@cardstack/rendering": "0.13.0",
@@ -43,14 +43,14 @@
     "postcss-import": "^9.1.0"
   },
   "devDependencies": {
-    "@cardstack/authentication": "0.13.6",
+    "@cardstack/authentication": "0.13.11",
     "@cardstack/ephemeral": "0.13.0",
     "@cardstack/eslint-config": "0.13.0",
-    "@cardstack/jsonapi": "0.13.6",
-    "@cardstack/mock-auth": "0.13.6",
-    "@cardstack/models": "0.13.6",
-    "@cardstack/routing": "0.13.6",
-    "@cardstack/test-support": "0.13.9",
+    "@cardstack/jsonapi": "0.13.11",
+    "@cardstack/mock-auth": "0.13.11",
+    "@cardstack/models": "0.13.11",
+    "@cardstack/routing": "0.13.11",
+    "@cardstack/test-support": "0.13.11",
     "@ember/optional-features": "^0.6.3",
     "broccoli-asset-rev": "^2.7.0",
     "ember-cli": "~3.4.3",
