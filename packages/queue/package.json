@@ -10,7 +10,7 @@
   },
   "devDependencies": {
     "@cardstack/eslint-config": "0.13.0",
-    "@cardstack/test-support": "0.13.6",
+    "@cardstack/test-support": "0.13.9",
     "delay": "2.0.0",
     "eslint": "^5.8.0",
     "eslint-plugin-ember": "^5.0.0",

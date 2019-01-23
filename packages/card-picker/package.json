@@ -30,7 +30,7 @@
   "devDependencies": {
     "@cardstack/eslint-config": "0.13.0",
     "@cardstack/rendering": "0.13.0",
-    "@cardstack/test-support": "0.13.6",
+    "@cardstack/test-support": "0.13.9",
     "@ember/optional-features": "^0.6.3",
     "broccoli-asset-rev": "^2.7.0",
     "ember-ajax": "^3.1.0",
