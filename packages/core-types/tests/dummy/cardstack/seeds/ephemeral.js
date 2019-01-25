@@ -1,5 +1,6 @@
 /* eslint-env node */
 const JSONAPIFactory = require('@cardstack/test-support/jsonapi-factory');
+const { camelize, dasherize } = require('inflection');
 
 function initialModels() {
   let initial = new JSONAPIFactory();
@@ -11,6 +12,7 @@ function initialModels() {
       'feeling',
       'vehicle',
       'alternate-vehicle',
+      'best-track',
       'tracks'
     ]
   })
@@ -63,6 +65,12 @@ function initialModels() {
         initial.addResource('fields', 'title').withAttributes({ fieldType: '@cardstack/core-types::string' })
       ])
     ]),
+    initial.addResource('fields', 'best-track').withAttributes({
+      fieldType: '@cardstack/core-types::belongs-to',
+      editorComponent: 'field-editors/dropdown-search-editor',
+    }).withRelated('related-types', [
+      { type: 'content-types', id: 'tracks' }
+    ]),
     initial.addResource('fields', 'races').withAttributes({
       fieldType: '@cardstack/core-types::has-many',
       editorComponent: 'field-editors/dropdown-multi-select-editor',
@@ -85,10 +93,15 @@ function initialModels() {
   initial.addResource('vehicles', '3').withAttributes({ name: 'Honeycoupe' });
   initial.addResource('vehicles', '4').withAttributes({ name: 'Wild Wiggler' });
 
-  let rainbowRoad = initial.addResource('tracks', 'rainbow-road').withAttributes({ title: 'Rainbow Road' });
-  let sweetSweetCanyon = initial.addResource('tracks', 'sweet-sweet-canyon').withAttributes({ title: 'Sweet Sweet Canyon' });
-  let koopaCity = initial.addResource('tracks', 'koopa-city').withAttributes({ title: 'Koopa City' });
-  let twistedMansion = initial.addResource('tracks', 'twisted-mansion').withAttributes({ title: 'Twisted Mansion' });
+  let tracks = {};
+  ['Mario Kart Stadium', 'Mario Circuit', 'Sunshine Airport', 'Cloudtop Cruise', 'GCN Yoshi Circuit', 'GCN Baby Park',
+  'Water Park', 'Toad Harbor', 'Dolphin Shoals', 'Bone Dry Dunes', 'Excitebike Arena', 'Wild Woods',
+  'Sweet Sweet Canyon', 'Twisted Mansion', 'Electrodrome', 'Bowsers Castle', 'Dragon Driftway', 'GBA Cheese Land',
+  'Thwomp Ruins', 'Shy Guy Falls', 'Mount Wario', 'Rainbow Road', 'Mute City', 'Animal Crossing'].forEach(track => {
+    let trackId = dasherize(track.toLowerCase());
+    let trackVar = camelize(track.replace(/ /g, ''), true);
+    tracks[trackVar] = initial.addResource('tracks', trackId).withAttributes({ title: track });
+  });
 
   let race1 = initial.addResource('races', 'race-1').withAttributes({ name: 'Race 1' });
   let race2 = initial.addResource('races', 'race-2').withAttributes({ name: 'Race 2' });
@@ -103,7 +116,8 @@ function initialModels() {
     })
     .withRelated('feeling', exuberantFeeling)
     .withRelated('vehicle', standardKartVehicle)
-    .withRelated('tracks', [ twistedMansion ]);
+    .withRelated('tracks', [ tracks.twistedMansion ])
+    .withRelated('best-track', tracks.toadHarbor);
 
     initial.addResource('drivers', 'metalmario')
     .withAttributes({
@@ -115,7 +129,8 @@ function initialModels() {
     .withRelated('feeling', happyFeeling)
     .withRelated('vehicle', sportBikeVehicle)
     .withRelated('alternate-vehicle', standardKartVehicle)
-    .withRelated('tracks', [ rainbowRoad, sweetSweetCanyon, koopaCity ])
+    .withRelated('tracks', [ tracks.rainbowRoad, tracks.sweetSweetCanyon, tracks.toadHarbor ])
+    .withRelated('best-track', tracks.electrodrome)
     .withRelated('races', [ race1, race2 ]);
 
     initial.addResource('drivers', 'link')

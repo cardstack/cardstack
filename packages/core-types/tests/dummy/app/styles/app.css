@@ -1,0 +1,17 @@
+.page-container {
+  display: flex;
+  padding: 20px;
+}
+
+.rendered-fields {
+  width: 400px;
+  padding: 20px;
+}
+
+.rendered-fields .name {
+  font-size: 24px;
+}
+
+.field-editors {
+  padding: 20px;
+} 
