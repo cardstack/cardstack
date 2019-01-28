@@ -19,7 +19,10 @@ module('Integration | Component | cs branch control', function(hooks) {
   test('it displays all of the branches', async function(assert) {
     this.data.reopen({
       branches: async function() {
-        return ['one', 'two', 'master', 'face']
+        return ['one', 'two', 'master', 'face'].map(branch => ({
+          id: branch,
+          type: 'branches'
+        }))
       },
     });
 
