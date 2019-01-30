@@ -207,18 +207,30 @@ class PluginLoader {
 });
 
 async function discoverFeatures(moduleRoot, pluginName) {
+  log.trace('Discovering features in plugin %s (%s)', pluginName, moduleRoot);
+
   let features = [];
   for (let featureType of featureTypes) {
     try {
-      let files = await readdir(path.join(moduleRoot, featureType));
+      let folderPath = path.join(moduleRoot, featureType);
+      log.trace('-- Looking for folder: %s', folderPath);
+
+      let files = await readdir(folderPath);
       for (let file of files) {
+        log.trace('---- Found file: %s', file);
+
         let m = javascriptPattern.exec(file);
         if (m) {
+          let id = `${pluginName}::${m[1]}`;
+          let loadPath = path.join(moduleRoot, featureType, file);
+
+          log.trace('---- Adding %s feature: %s (%s)', featureType, id, loadPath);
+
           features.push({
-            id: `${pluginName}::${m[1]}`,
+            id,
             type: featureType,
             attributes: {
-              'load-path': path.join(moduleRoot, featureType, file)
+              'load-path': loadPath
             },
             relationships: {
               plugin: {
@@ -235,7 +247,11 @@ async function discoverFeatures(moduleRoot, pluginName) {
     }
 
     let filename = path.join(moduleRoot, singularize(featureType) + '.js');
+    log.trace('-- Looking for file: %s', filename);
+
     if (fs.existsSync(filename)) {
+      log.trace('---- Adding %s feature: %s (%s)', featureType, pluginName, filename);
+
       features.push({
         id: pluginName,
         type: featureType,
