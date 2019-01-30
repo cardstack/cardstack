@@ -6,7 +6,7 @@
     {{#power-select
       disabled=disabled
       selected=(get content field)
-      search=(action 'searchFields')
+      search=(perform searchFields)
       searchField=displayFieldName
       onchange=(action "makeSelection")
     as |option|}}
