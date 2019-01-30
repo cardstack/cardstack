@@ -1,0 +1,25 @@
+.cardstack-modal-backdrop {
+    position: fixed;
+    top: 0;
+    width: 100vw;
+    height: 100vh;
+    background-color: black;
+    opacity: 0.8;
+    z-index: 999;
+}
+.cardstack-modal-container {
+    position: fixed;
+    top: 0;
+    width: 100vw;
+    height: 100vh;
+    z-index: 1000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.cardstack-modal-dialog {
+    background-color: white;
+    border-radius: 4px;
+    max-height: 100vh;
+    overflow-y: auto;
+}
