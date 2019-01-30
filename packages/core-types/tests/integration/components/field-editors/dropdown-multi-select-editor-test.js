@@ -18,21 +18,21 @@ module('Integration | Component | field editors/dropdown multi select editor', a
     await render(hbs`{{field-editors/dropdown-multi-select-editor content=model field="tracks" editorOptions=editorOptions}}`);
 
     await clickTrigger();
-    assert.dom('.ember-power-select-option').exists({ count: 4 }, 'Dropdown is rendered');
+    assert.dom('.ember-power-select-option').exists({ count: 10 }, 'Dropdown is rendered');
 
-    await selectChoose('.tracks-selector', 'Twisted Mansion');
-    await selectChoose('.tracks-selector', 'Rainbow Road');
-    await selectChoose('.tracks-selector', 'Koopa City');
+    await selectChoose('.tracks-selector', 'Animal Crossing');
+    await selectChoose('.tracks-selector', 'Bowsers Castle');
+    await selectChoose('.tracks-selector', 'Dragon Driftway');
 
     assert.dom('.ember-power-select-multiple-option').exists({ count: 3 });
-    assert.dom('.ember-power-select-multiple-option:nth-of-type(1)').hasText('× Twisted Mansion');
-    assert.dom('.ember-power-select-multiple-option:nth-of-type(3)').hasText('× Koopa City');
+    assert.dom('.ember-power-select-multiple-option:nth-of-type(1)').hasText('× Animal Crossing');
+    assert.dom('.ember-power-select-multiple-option:nth-of-type(3)').hasText('× Dragon Driftway');
 
-    await removeMultipleOption('.tracks-selector', 'Rainbow Road');
-    await removeMultipleOption('.tracks-selector', 'Koopa City');
+    await removeMultipleOption('.tracks-selector', 'Bowsers Castle');
+    await removeMultipleOption('.tracks-selector', 'Dragon Driftway');
 
     assert.dom('.ember-power-select-multiple-option').exists({ count: 1 });
-    assert.dom('.ember-power-select-multiple-option').hasText('× Twisted Mansion');
+    assert.dom('.ember-power-select-multiple-option').hasText('× Animal Crossing');
   });
 
   test('can specify a different field to use for option', async function(assert) {

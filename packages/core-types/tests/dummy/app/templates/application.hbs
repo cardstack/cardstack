@@ -1,5 +1,23 @@
-{{!-- The following component displays Ember's default welcome message. --}}
-{{welcome-page}}
-{{!-- Feel free to remove this! --}}
+{{#link-to 'editor'}}Open Editor{{/link-to}}
+{{#link-to 'application'}}Close Editor{{/link-to}}
+<div class="page-container">
+  <div class="rendered-fields">
+    <div class="name">{{model.name}}</div>
+    <div class="dob">Born on {{moment-format model.dob 'MMMM Do, YYYY'}}</div>
+    <div class="latest-victory">Last Won on {{moment-format model.latestVictory 'LLLL'}}</div>
+    <p class="stats">
+      {{model.name}} is a <strong>{{if model.isGoodGuy 'Good' 'Bad'}}</strong> guy, who is currently feeling <strong>{{model.feeling.title}}</strong>.
+      Their preferred vehicle is a <strong>{{model.vehicle.name}}</strong>{{#if model.alternateVehicle}}, but they occasionally drive a <strong>{{model.alternateVehicle.name}}</strong>{{/if}}.
+      {{#if model.tracks}}
+        Their favorite tracks are {{#each model.tracks as |track index|}}{{if (gt index 0) ', '}}<strong>{{track.title}}</strong>{{/each}}.
+      {{/if}}
+      {{#if model.bestTrack}}
+        Their best track is <strong>{{model.bestTrack.title}}</strong>.
+      {{/if}}
+    </p>
+  </div>
+  <div class="field-editors">
+    {{outlet}}
+  </div>
 
-{{outlet}}
+</div>
