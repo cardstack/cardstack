@@ -130,40 +130,42 @@ class PluginLoader {
       return;
     }
 
-    let dupeModule;
     let packageJSON = path.join(realdir, 'package.json');
     let json = require(packageJSON);
-    if ((dupeModule = Object.values(seen).find(i => i.id === json.name))) {
+    let dupeModule = Object.values(seen).find(i => i.id === json.name);
+    if (dupeModule) {
       let msg = action => `The plugin module name '${json.name}' has already been loaded from the module path ${dupeModule.attributes.rawDir}, ${action} load of module at path ${dir}.`;
-      if (this.environment !== 'test') {
-        log.warn(msg('skipping'));
-      } else {
+      if (this.environment === 'test') {
         throw new Error(msg('conflict with'));
       }
+
+      log.warn(msg('skipping'));
+
       if (get(dupeModule, 'attributes.includedFrom')) {
         dupeModule.attributes.includedFrom.push(breadcrumbs);
       }
+
       return;
     }
 
     seen[realdir] = true;
     let moduleRoot = path.dirname(await resolve(packageJSON, { basedir: this.project.path }));
 
-    if (!json.keywords || !json.keywords.includes('cardstack-plugin') || !json['cardstack-plugin']) {
-      // top-level app doesn't need to be a cardstack-plugin, but when
-      // crawling any deeper dependencies we only care about them if
-      // they are cardstack-plugins.
-      if (breadcrumbs.length > 0) {
-        log.trace(`%s does not appear to contain a cardstack plugin`, realdir);
-        return;
-      }
-    } else {
+    if (json.keywords && json.keywords.includes('cardstack-plugin') && json['cardstack-plugin']) {
       if (json['cardstack-plugin']['api-version'] !== 1) {
         log.warn(`%s has some fancy cardstack-plugin.version I don't understand. Trying anyway.`, realdir);
       }
       let customSource = json['cardstack-plugin'].src;
       if (customSource) {
         moduleRoot = path.join(moduleRoot, customSource);
+      }
+    } else {
+      // top-level app doesn't need to be a cardstack-plugin, but when
+      // crawling any deeper dependencies we only care about them if
+      // they are cardstack-plugins.
+      if (breadcrumbs.length > 0) {
+        log.trace(`%s does not appear to contain a cardstack plugin`, realdir);
+        return;
       }
     }
 
