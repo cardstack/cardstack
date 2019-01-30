@@ -130,10 +130,10 @@ class PluginLoader {
       return;
     }
 
-    let dupeModule;
     let packageJSON = path.join(realdir, 'package.json');
     let json = require(packageJSON);
-    if ((dupeModule = Object.values(seen).find(i => i.id === json.name))) {
+    let dupeModule = Object.values(seen).find(i => i.id === json.name);
+    if (dupeModule) {
       let msg = action => `The plugin module name '${json.name}' has already been loaded from the module path ${dupeModule.attributes.rawDir}, ${action} load of module at path ${dir}.`;
       if (this.environment !== 'test') {
         log.warn(msg('skipping'));
