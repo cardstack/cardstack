@@ -1,6 +1,6 @@
 {
   "name": "@cardstack/sftp",
-  "version": "0.13.14",
+  "version": "0.13.15",
   "description": "The default blueprint for ember-cli addons.",
   "keywords": [
     "ember-addon",
@@ -25,12 +25,12 @@
   },
   "dependencies": {
     "@cardstack/di": "0.13.0",
-    "@cardstack/files": "0.13.14",
-    "@cardstack/hub": "0.13.14",
-    "@cardstack/jsonapi": "0.13.13",
+    "@cardstack/files": "0.13.15",
+    "@cardstack/hub": "0.13.15",
+    "@cardstack/jsonapi": "0.13.15",
     "@cardstack/logger": "^0.1.0",
     "@cardstack/plugin-utils": "0.13.0",
-    "@cardstack/test-support": "0.13.14",
+    "@cardstack/test-support": "0.13.15",
     "ember-cli-babel": "^6.6.0",
     "lodash": "^4.17.11",
     "mime-types": "^2.1.21",
