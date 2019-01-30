@@ -151,21 +151,21 @@ class PluginLoader {
     seen[realdir] = true;
     let moduleRoot = path.dirname(await resolve(packageJSON, { basedir: this.project.path }));
 
-    if (!json.keywords || !json.keywords.includes('cardstack-plugin') || !json['cardstack-plugin']) {
-      // top-level app doesn't need to be a cardstack-plugin, but when
-      // crawling any deeper dependencies we only care about them if
-      // they are cardstack-plugins.
-      if (breadcrumbs.length > 0) {
-        log.trace(`%s does not appear to contain a cardstack plugin`, realdir);
-        return;
-      }
-    } else {
+    if (json.keywords && json.keywords.includes('cardstack-plugin') && json['cardstack-plugin']) {
       if (json['cardstack-plugin']['api-version'] !== 1) {
         log.warn(`%s has some fancy cardstack-plugin.version I don't understand. Trying anyway.`, realdir);
       }
       let customSource = json['cardstack-plugin'].src;
       if (customSource) {
         moduleRoot = path.join(moduleRoot, customSource);
+      }
+    } else {
+      // top-level app doesn't need to be a cardstack-plugin, but when
+      // crawling any deeper dependencies we only care about them if
+      // they are cardstack-plugins.
+      if (breadcrumbs.length > 0) {
+        log.trace(`%s does not appear to contain a cardstack plugin`, realdir);
+        return;
       }
     }
 
