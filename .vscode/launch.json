@@ -135,6 +135,21 @@
                 "test",
                 "${workspaceRoot}/packages/ethereum/truffle-tests/addresses-test.js"
             ]
+        },
+        {
+            "type": "node",
+            "request": "launch",
+            "name": "Launch Ethereum Transaction Index",
+            "cwd": "${workspaceRoot}/packages/ethereum",
+            "program": "${workspaceRoot}/packages/ethereum/scripts/build-index-coordinator.js",
+            "console": "integratedTerminal",
+            "args": [
+                "--start=3782500",
+                "--end=3782600",
+                "--progressFrequency=10",
+                "--workerCount=1",
+                "--jsonRpcURL=ws://localhost:8546"
+            ]
         }
     ]
 }
