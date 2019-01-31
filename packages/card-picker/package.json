@@ -1,6 +1,6 @@
 {
   "name": "@cardstack/card-picker",
-  "version": "0.13.17",
+  "version": "0.13.19",
   "description": "Card-Picker system for cardstack",
   "keywords": [
     "ember-addon"
@@ -21,16 +21,16 @@
     "test:all": "ember try:each"
   },
   "dependencies": {
-    "@cardstack/edges": "0.13.15",
-    "@cardstack/search": "0.13.0",
+    "@cardstack/edges": "0.13.19",
+    "@cardstack/search": "0.13.19",
     "ember-cli-babel": "^6.16.0",
     "ember-cli-htmlbars": "^3.0.0",
     "ember-sortable": "^1.11.2"
   },
   "devDependencies": {
-    "@cardstack/eslint-config": "0.13.0",
-    "@cardstack/rendering": "0.13.0",
-    "@cardstack/test-support": "0.13.17",
+    "@cardstack/eslint-config": "0.13.19",
+    "@cardstack/rendering": "0.13.19",
+    "@cardstack/test-support": "0.13.19",
     "@ember/optional-features": "^0.6.3",
     "broccoli-asset-rev": "^2.7.0",
     "ember-ajax": "^3.1.0",
