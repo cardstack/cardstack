@@ -80,6 +80,7 @@
               field=field.name
               enabled=editingEnabled
               permissions=fieldModelPermissions
+              fetchPermissions=(perform fetchPermissionsFor field.model)
               onchange=(action "validate")
               errors=(get validationErrors field.name)
             }}

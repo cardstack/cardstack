@@ -109,7 +109,7 @@ function createHasDirtyForRelationship(model, name, kind) {
 }
 
 function createHasDirtyOwned(model, ownedRelationships, properties) {
-  defineProperty(model, 'hasDirtyOwnedRelationships', or(properties.join(',')));
+  defineProperty(model, 'hasDirtyOwnedRelationships', or(...properties));
 
   let dependentKeys = Object.keys(ownedRelationships).reduce((dependentKeys, relationName) => {
     let kind = ownedRelationships[relationName];
