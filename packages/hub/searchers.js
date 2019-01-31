@@ -109,7 +109,7 @@ class Searchers {
       });
       let pristineResult = await documentContext.pristineDoc();
       if (pristineResult) {
-        authorizedResult = await schema.applyReadAuthorization(pristineResult, { session, type, id });
+        authorizedResult = await documentContext.applyReadAuthorization(pristineResult, { session, type, id });
       }
     }
 
@@ -187,14 +187,15 @@ class Searchers {
     if (result) {
       let schema = await schemaPromise;
       let includePaths = (get(query, 'include') || '').split(',');
-      let pristineResult = await (this.createDocumentContext({
+      let documentContext = this.createDocumentContext({
         branch,
         schema,
         includePaths,
         upstreamDoc: result,
-      }).pristineDoc());
+      });
+      let pristineResult = await documentContext.pristineDoc();
 
-      let authorizedResult = await schema.applyReadAuthorization(pristineResult, { session });
+      let authorizedResult = await documentContext.applyReadAuthorization(pristineResult, { session });
       if (authorizedResult.data.length !== pristineResult.data.length) {
         // We can eventually make this more of just a warning, but for
         // now it's cleaner to just force the searchers to implement
