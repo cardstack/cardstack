@@ -1,6 +1,6 @@
 {
   "name": "@cardstack/s3",
-  "version": "0.13.16",
+  "version": "0.13.17",
   "description": "The default blueprint for ember-cli addons.",
   "keywords": [
     "ember-addon",
@@ -25,12 +25,12 @@
   },
   "dependencies": {
     "@cardstack/di": "0.13.0",
-    "@cardstack/files": "0.13.16",
-    "@cardstack/hub": "0.13.16",
-    "@cardstack/jsonapi": "0.13.15",
+    "@cardstack/files": "0.13.17",
+    "@cardstack/hub": "0.13.17",
+    "@cardstack/jsonapi": "0.13.17",
     "@cardstack/logger": "^0.1.0",
     "@cardstack/plugin-utils": "0.13.0",
-    "@cardstack/test-support": "0.13.16",
+    "@cardstack/test-support": "0.13.17",
     "aws-sdk": "^2.317.0",
     "ember-cli-babel": "^6.6.0",
     "koa": "^2.5.3",
