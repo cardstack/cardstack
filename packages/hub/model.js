@@ -8,6 +8,14 @@ module.exports = class Model {
     priv.set(this, { contentType, jsonapiDoc, read, schema });
   }
 
+  get id() {
+    return priv.get(this).jsonapiDoc.id;
+  }
+
+  get type() {
+    return priv.get(this).jsonapiDoc.type;
+  }
+
   getContentType() {
     return priv.get(this).contentType;
   }
