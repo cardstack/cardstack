@@ -117,6 +117,10 @@ export default Service.extend({
     }
   },
 
+  branches() {
+    return this.store.findAll('branch');
+  },
+
   getCardMeta(card, attribute) {
     if (attribute === 'human-id') {
       let humanType = getType(card)

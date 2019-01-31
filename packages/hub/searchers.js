@@ -30,7 +30,14 @@ class Searchers {
     return this._sources;
   }
 
-  async getResourceAndMeta(session, branch, type, id) {
+  async getResourceAndMeta(session, branchRequest, type, id) {
+    let branch = branchRequest;
+
+    // only ever get the branches off the controlling branch
+    if (type === 'branches') {
+      branch = this.controllingBranch.name;
+    }
+
     let sources = await this._lookupSources();
     let index = 0;
     let sessionOrEveryone = session || Session.EVERYONE;
@@ -75,10 +82,18 @@ class Searchers {
     return this.routers;
   }
 
-  async get(session, branch, type, id, includePaths) {
+  async get(session, branchRequest, type, id, includePaths) {
     if (arguments.length < 4) {
       throw new Error(`session is now a required argument to searchers.get`);
     }
+
+    let branch = branchRequest;
+
+    // only ever get the branches off the controlling branch
+    if (type === 'branches') {
+      branch = this.controllingBranch.name;
+    }
+
     let { resource, meta, included } = await this.getResourceAndMeta(session, branch, type, id);
     let authorizedResult;
     let documentContext;
@@ -137,10 +152,18 @@ class Searchers {
     return this.get(session, this.controllingBranch.name, type, id, includePaths);
   }
 
-  async search(session, branch, query) {
+  async search(session, branchRequest, query) {
     if (arguments.length < 3) {
       throw new Error(`session is now a required argument to searchers.search`);
     }
+
+    let branch = branchRequest;
+
+    // only ever get the branches off the controlling branch
+    if (get(query,'filter.type.exact') === "branches") {
+      branch = this.controllingBranch.name;
+    }
+
     let sources = await this._lookupSources();
     let schemaPromise = this.currentSchema.forBranch(branch);
     let index = 0;

@@ -154,6 +154,14 @@ describe('hub/indexers', function() {
       });
 
       indexers.on('add', model => {
+        if(model.type === 'branches') {
+          // this test is written to check the dog model and was originally structured
+          // to exect only one object to be created. Now branch models are automatically
+          // created during a run. This is not a change in behaviour it is just a limitation
+          // of how this test was originally written
+          return;
+        }
+
         addCount++;
 
         expect(model.id).to.be.ok;
