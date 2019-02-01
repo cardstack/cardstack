@@ -4,7 +4,7 @@ const filenamifyUrl = require('filenamify-url');
 const { existsSync } = require('fs');
 const rimraf = promisify(require('rimraf'));
 const { join } = require('path');
-const { Clone, Cred, Merge, Repository } = require('nodegit');
+const { Clone, Cred, Merge, Repository, Reset } = require('nodegit');
 const { tmpdir } = require('os');
 const log = require('@cardstack/logger')('cardstack/git');
 
@@ -100,6 +100,25 @@ class GitLocalCache {
     let { repo, fetchOpts } = this._remotes.get(remoteUrl);
 
     await repo.fetchAll(fetchOpts);
+
+    // if branch does not exist locally then create it and reset to head of remote
+    // this is required because nodegit doesn't support direct pull https://github.com/nodegit/nodegit/issues/1123
+    try {
+      await repo.getReference(`${targetBranch}`);
+      log.info("reference for %s on %s already exists, continuing", targetBranch, remoteUrl);
+    } catch (e) {
+      if(e.message.startsWith('no reference found for shorthand')) {
+        log.info("no local branch for %s on %s. Creating it now...", targetBranch, remoteUrl);
+        let headCommit = await repo.getHeadCommit();
+        let ref = await repo.createBranch(targetBranch, headCommit, false);
+        await repo.checkoutBranch(ref, {});
+        let remoteCommit = await repo.getReferenceCommit(`refs/remotes/origin/${targetBranch}`);
+        Reset.reset(repo, remoteCommit, 3, {});
+      } else {
+        throw e;
+      }
+    }
+
     await repo.mergeBranches(targetBranch, `origin/${targetBranch}`, null, Merge.PREFERENCE.FASTFORWARD_ONLY);
   }
 }
