@@ -214,7 +214,7 @@ class Batch {
 
     if (!searchDoc) { return; }
 
-    await this.client.query(queryToSQL(upsert('documents', 'documents_pkey', {
+    let document = {
       branch: param(branch),
       type: param(type),
       id: param(id),
@@ -223,11 +223,16 @@ class Batch {
       pristine_doc: param(pristineDoc),
       upstream_doc: param(upstreamDoc),
       source: param(sourceId),
-      generation: param(generation),
       refs: param(refs),
       realms: param(realms),
       expires: expirationExpression(opts.maxAge)
-    })));
+    };
+
+    if (generation != null) {
+      document.generation = param(generation);
+    }
+
+    await this.client.query(queryToSQL(upsert('documents', 'documents_pkey', document)));
 
     await this.client.emitEvent('add', context);
     log.debug("save %s %s", type, id);
@@ -323,18 +328,15 @@ class Batch {
       if (this._isInvalidated(branch, type, id, refs)) {
         let schema = await this._schema.forBranch(branch);
         let sourceId = schema.types.get(type).dataSource.id;
-        // this is correct because IF this document's data source is currently
-        // doing a replace-all operation, it was either already touched (so
-        // this code isn't running) or it's old (so it's correct to have a
-        // non-current nonce).
-        let nonce = 0;
+
+        // intentionally not setting the 'generation', as we dont want external data source
+        // triggered invalidation to effect the nonce, which is an internal data source consideration
         let context = this._searchers.createDocumentContext({
           schema,
           branch,
           type,
           id,
           sourceId,
-          generation: nonce,
           upstreamDoc: doc
         });
 
