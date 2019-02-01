@@ -12,6 +12,8 @@ const Error = require('@cardstack/plugin-utils/error');
 const PendingChange = require('@cardstack/plugin-utils/pending-change');
 const { promisify } = require('util');
 const temp = require('temp').track();
+const Gitchain = require('@cardstack/gitchain');
+const log = require('@cardstack/logger')('cardstack/git');
 
 const mkdir = promisify(temp.mkdir);
 
@@ -21,7 +23,7 @@ module.exports = class Writer {
   static create(params) {
     return new this(params);
   }
-  constructor({ repo, idGenerator, basePath, branchPrefix, remote }) {
+  constructor({ repo, idGenerator, basePath, branchPrefix, remote, hyperledger }) {
     this.repoPath = repo;
     this.basePath = basePath;
     this.branchPrefix = branchPrefix || "";
@@ -31,6 +33,14 @@ module.exports = class Writer {
     this.myEmail = `${os.userInfo().username}@${hostname}`;
     this.idGenerator = idGenerator;
     this.remote = remote;
+
+    if (hyperledger) {
+      let config = Object.assign({}, hyperledger);
+      config.logger = log;
+
+      this.gitChain = new Gitchain(repo, config);
+    }
+
 
     if(remote) {
       this.fetchOpts = {
@@ -179,6 +189,15 @@ module.exports = class Writer {
     }
   }
 
+  async _pushToHyperledger(sha) {
+    if(this.gitChain) {
+      // make sure only one push is ongoing at a time, by creating a chain of
+      // promises here
+      this._gitChainPromise = Promise.resolve(this._gitChainPromise).then(() =>
+        this.gitChain.push(sha)
+      );
+    }
+  }
 };
 
 
@@ -237,6 +256,7 @@ async function finalizer(pendingChange) {
       }
     }
     let version = await change.finalize(signature, this.remote, this.fetchOpts);
+    await this._pushToHyperledger(version);
     return { version, hash: (file ? file.savedId() : null) };
   });
 }
