@@ -355,9 +355,14 @@ class TransactionIndexer {
     let batch = this.pgsearchClient.beginBatch(this.schema, this.searchers);
     await this._processBlock(batch, blockNumber, context);
 
-    for (let address of Object.keys(discoveredTransactions)) {
+    let updatedAddresses = Object.keys(discoveredTransactions);
+    let untouchedAddresses = difference(trackedAddresses, updatedAddresses);
+    for (let address of updatedAddresses) {
       let balance = (await this.ethereumClient.getBalance(address)).toString();
       await this._indexAddressResource(batch, address, blockNumber, balance, discoveredTransactions[address], addressesVersions[address]);
+    }
+    for (let address of untouchedAddresses) {
+      await this._setIndexedBlockHeightForAddress(batch, address, blockNumber);
     }
     await batch.done();
   }
@@ -548,6 +553,26 @@ class TransactionIndexer {
 
     addressResource.meta = addressResource.meta || {};
     addressResource.meta.loadingBlockheight = blockHeight;
+
+    return await this._indexResource(batch, addressResource);
+  }
+
+  async _setIndexedBlockHeightForAddress(batch, address, blockHeight) {
+    if (!address) { return; }
+
+    let addressResource;
+    try {
+      addressResource = (await this.searchers.getFromControllingBranch(Session.INTERNAL_PRIVILEGED, 'ethereum-addresses', address.toLowerCase())).data;
+    } catch (err) {
+      if (err.status !== 404) { throw err; }
+      return;
+    }
+
+    if (get(addressResource, 'meta.loadingBlockheight') ||
+        get(addressResource, 'meta.abortLoadingBlockheight')) { return; }
+
+    addressResource.meta = addressResource.meta || {};
+    addressResource.meta.blockHeight = blockHeight;
 
     return await this._indexResource(batch, addressResource);
   }
