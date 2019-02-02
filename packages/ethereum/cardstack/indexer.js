@@ -240,22 +240,12 @@ class Updater {
       attributes: {
         "field-type": "@cardstack/core-types::belongs-to"
       },
-      relationships: {
-        'related-types': {
-          data: [{ type: 'content-types', id: 'ethereum-addresses' }]
-        }
-      }
     }, {
       type: "fields",
       id: "from-address",
       attributes: {
         "field-type": "@cardstack/core-types::belongs-to"
       },
-      relationships: {
-        'related-types': {
-          data: [{ type: 'content-types', id: 'ethereum-addresses' }]
-        }
-      }
     }, {
       type: "fields",
       id: "transactions",
