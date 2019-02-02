@@ -1,6 +1,6 @@
 {
   "name": "@cardstack/search",
-  "version": "0.13.20",
+  "version": "0.13.21",
   "description": "The default blueprint for ember-cli addons.",
   "keywords": [
     "ember-addon",
@@ -32,7 +32,7 @@
     "qs": "^6.6.0"
   },
   "devDependencies": {
-    "@cardstack/eslint-config": "0.13.20",
+    "@cardstack/eslint-config": "0.13.21",
     "broccoli-asset-rev": "^2.4.5",
     "ember-cli": "^3.0.0",
     "ember-cli-dependency-checker": "^2.1.0",
