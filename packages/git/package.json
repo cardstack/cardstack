@@ -13,6 +13,7 @@
     "test": "mocha ../test-support/bin/run.js"
   },
   "dependencies": {
+    "@cardstack/gitchain": "0.1.0",
     "@cardstack/logger": "^0.1.0",
     "@cardstack/plugin-utils": "0.13.21",
     "delay": "^4.1.0",
@@ -31,7 +32,7 @@
     "eslint-plugin-ember": "^5.0.0",
     "eslint-plugin-mocha": "^5.2.0",
     "eslint-plugin-node": "^5.2.1",
-    "sinon": "^7.1.0"
+    "sinon": "7.2.3"
   },
   "engines": {
     "node": ">= 7.7"
