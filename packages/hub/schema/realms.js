@@ -182,7 +182,7 @@ function mayReadLessThanAllFields(grant) {
 function realmIntersections(choiceRealms, singleRealms) {
   let nextChoices = choiceRealms[0];
   if (!nextChoices) {
-    return [singleRealms];
+    return singleRealms.length > 0 ? [singleRealms] : [];
   }
   let rest = realmIntersections(choiceRealms.slice(1), singleRealms);
   return nextChoices.map(choice => rest.concat([choice]));
