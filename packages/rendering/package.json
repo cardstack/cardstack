@@ -1,6 +1,6 @@
 {
   "name": "@cardstack/rendering",
-  "version": "0.13.23",
+  "version": "0.13.24",
   "description": "Basic front-end rendering support for Cardstack",
   "keywords": [
     "ember-addon",
@@ -29,7 +29,7 @@
     "ember-truth-helpers": "^2.0.0"
   },
   "devDependencies": {
-    "@cardstack/eslint-config": "0.13.23",
+    "@cardstack/eslint-config": "0.13.24",
     "@glimmer/syntax": "^0.25.6",
     "broccoli-asset-rev": "^2.4.5",
     "ember-cli": "3.0.0",
