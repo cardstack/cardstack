@@ -37,8 +37,7 @@ module.exports = class Writer {
     if (hyperledger) {
       let config = Object.assign({}, hyperledger);
       config.logger = log;
-
-      this.gitChain = new Gitchain(repo, config);
+      this.hyperledgerConfig = config;
     }
 
 
@@ -176,6 +175,14 @@ module.exports = class Writer {
     }
   }
 
+  async _ensureGitchain() {
+    await this._ensureRepo();
+
+    if (!this.gitChain && this.hyperledgerConfig) {
+      this.gitChain = new Gitchain(this.repo.path(), this.hyperledgerConfig);
+    }
+  }
+
   _generateId() {
     if (this.idGenerator) {
       return this.idGenerator();
@@ -190,6 +197,8 @@ module.exports = class Writer {
   }
 
   async _pushToHyperledger(sha) {
+    await this._ensureGitchain();
+
     if(this.gitChain) {
       // make sure only one push is ongoing at a time, by creating a chain of
       // promises here
