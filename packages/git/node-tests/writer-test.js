@@ -8,6 +8,9 @@ const JSONAPIFactory = require('@cardstack/test-support/jsonapi-factory');
 const temp = require('@cardstack/test-support/temp-helper');
 const { makeRepo } = require('./support');
 const { fake, replace } = require('sinon');
+const { realpath } = require('fs');
+const { promisify } = require('util');
+const realpathPromise = promisify(realpath);
 
 describe('git/writer', function() {
 
@@ -834,6 +837,7 @@ describe('git/writer/hyperledger', function() {
 
     let schema = await writers.schema.forBranch('master');
     writer = schema.dataSources.get('git').writer;
+    await writer._ensureGitchain();
     gitChain = writer.gitChain;
 
   });
@@ -858,7 +862,7 @@ describe('git/writer/hyperledger', function() {
     });
 
     // correct config is passed in to gitChain
-    expect(gitChain.repoPath).to.equal(repoPath);
+    expect(await realpathPromise(gitChain.repoPath)).to.equal(await realpathPromise(repoPath));
     expect(gitChain.readPrivateKey()).to.equal("Here is a private key");
     expect(gitChain.apiBase).to.equal("http://example.com/1234");
 
