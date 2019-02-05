@@ -105,24 +105,20 @@ class TransactionIndexer {
     let trackedAddressField = get(this, 'addressIndexing.trackedAddressField');
     if (!trackedAddressContentType || !trackedAddressField) { return; }
 
-    this.pgsearchClient.on('add', async (evt) => {
+    this.pgsearchClient.on('add', evt => {
       let { type } = evt;
       if (type !== trackedAddressContentType) { return; }
 
       this._eventProcessingPromise = Promise.resolve(this._eventProcessingPromise)
         .then(() => this._processIndexingAddEvent(trackedAddressField, evt));
-
-      return await this._eventProcessingPromise;
     });
 
-    this.pgsearchClient.on('delete', async (evt) => {
+    this.pgsearchClient.on('delete', evt => {
       let { type } = evt;
       if (type !== trackedAddressContentType) { return; }
 
       this._eventProcessingPromise = Promise.resolve(this._eventProcessingPromise)
         .then(() => this._processIndexingDeleteEvent(trackedAddressField, evt));
-
-      return await this._eventProcessingPromise;
     });
 
     log.debug(`completed setting up event listeners for tracked addresses`);
@@ -356,13 +352,9 @@ class TransactionIndexer {
     await this._processBlock(batch, blockNumber, context);
 
     let updatedAddresses = Object.keys(discoveredTransactions);
-    let untouchedAddresses = difference(trackedAddresses, updatedAddresses);
     for (let address of updatedAddresses) {
       let balance = (await this.ethereumClient.getBalance(address)).toString();
       await this._indexAddressResource(batch, address, blockNumber, balance, discoveredTransactions[address], addressesVersions[address]);
-    }
-    for (let address of untouchedAddresses) {
-      await this._setIndexedBlockHeightForAddress(batch, address, blockNumber);
     }
     await batch.done();
   }
