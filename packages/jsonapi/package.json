@@ -1,6 +1,6 @@
 {
   "name": "@cardstack/jsonapi",
-  "version": "0.13.26",
+  "version": "0.13.27",
   "description": "JSONAPI middleware for @cardstack/hub",
   "repository": "https://github.com/cardstack/cardstack",
   "author": "Edward Faulkner <edward@eaf4.com>",
@@ -9,9 +9,9 @@
     "node": ">= 7.7"
   },
   "devDependencies": {
-    "@cardstack/eslint-config": "0.13.26",
-    "@cardstack/test-support": "0.13.26",
-    "@cardstack/test-support-authenticator": "0.13.26",
+    "@cardstack/eslint-config": "0.13.27",
+    "@cardstack/test-support": "0.13.27",
+    "@cardstack/test-support-authenticator": "0.13.27",
     "eslint": "^5.8.0",
     "eslint-plugin-ember": "^5.0.0",
     "eslint-plugin-mocha": "^5.2.0",
@@ -21,9 +21,9 @@
     "supertest": "^2.0.1"
   },
   "dependencies": {
-    "@cardstack/di": "0.13.26",
+    "@cardstack/di": "0.13.27",
     "@cardstack/logger": "^0.1.0",
-    "@cardstack/plugin-utils": "0.13.26",
+    "@cardstack/plugin-utils": "0.13.27",
     "async-busboy": "^0.7.0",
     "koa-json-body": "^5.3.0",
     "lodash": "^4.17.11",
