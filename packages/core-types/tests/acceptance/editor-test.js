@@ -26,6 +26,8 @@ module('Acceptance | field editors', async function(hooks) {
     let firstTrack = await model.get('tracks.firstObject.title');
     let lastTrack = await model.get('tracks.lastObject.title');
     let bestTrack = await model.get('bestTrack.title');
+    let firstFavoriteTrack = await model.get('favoriteTracks.firstObject.title');
+    let lastFavoriteTrack = await model.get('favoriteTracks.lastObject.title');
 
     assert.equal(model.get('name'), 'Metal Mario', 'driver name is correct');
     assert.equal(model.get('dob'), '1999-01-01', 'driver dob is correct');
@@ -38,6 +40,8 @@ module('Acceptance | field editors', async function(hooks) {
     assert.equal(firstTrack, 'Rainbow Road', 'drivers first track is rainbow road');
     assert.equal(lastTrack, 'Toad Harbor', 'drivers final track is Toad Harbor');
     assert.equal(bestTrack, 'Electrodrome', 'drivers best track is Electrodrome');
+    assert.equal(firstFavoriteTrack, 'Mute City', 'drivers first favorite track is mute city');
+    assert.equal(lastFavoriteTrack, 'Mount Wario', 'drivers last favorite track is mount wario');
 
     await fillIn('.field-editor:nth-of-type(1) > input', 'METAL Mario');
     await fillIn('input[type=date]', '1998-01-01');
@@ -49,8 +53,13 @@ module('Acceptance | field editors', async function(hooks) {
     await selectChoose('.tracks-selector', 'Dragon Driftway');
     await selectSearch('.best-track-selector', 'mario');
     await selectChoose('.best-track-selector', 'Mario Circuit');
+    await selectSearch('.favorite-tracks-selector', 'yoshi');
+    await selectChoose('.favorite-tracks-selector', 'GCN Yoshi Circuit');
+    await selectSearch('.favorite-tracks-selector', 'bowser');
+    await selectChoose('.favorite-tracks-selector', 'Bowsers Castle');
     await removeMultipleOption('.tracks-selector', 'Rainbow Road');
     await removeMultipleOption('.tracks-selector', 'Toad Harbor');
+    await removeMultipleOption('.favorite-tracks-selector', 'Mute City');
 
     assert.dom('.feeling-selector .ember-power-select-selected-item').hasText('Sad');
     assert.dom('.vehicle-selector .ember-power-select-selected-item').hasText('Honeycoupe');
@@ -59,6 +68,10 @@ module('Acceptance | field editors', async function(hooks) {
     assert.dom('.tracks-selector .ember-power-select-multiple-option:nth-of-type(1)').hasText('× Sweet Sweet Canyon');
     assert.dom('.tracks-selector .ember-power-select-multiple-option:nth-of-type(2)').hasText('× Dragon Driftway');
     assert.dom('.best-track-selector .ember-power-select-selected-item').hasText('Mario Circuit');
+    assert.dom('.favorite-tracks-selector .ember-power-select-multiple-option').exists({ count: 3 });
+    assert.dom('.favorite-tracks-selector .ember-power-select-multiple-option:nth-of-type(1)').hasText('× Mount Wario');
+    assert.dom('.favorite-tracks-selector .ember-power-select-multiple-option:nth-of-type(2)').hasText('× GCN Yoshi Circuit');
+    assert.dom('.favorite-tracks-selector .ember-power-select-multiple-option:nth-of-type(3)').hasText('× Bowsers Castle');
 
     feeling = await model.get('feeling.title');
     vehicle = await model.get('vehicle.name');
@@ -66,6 +79,8 @@ module('Acceptance | field editors', async function(hooks) {
     firstTrack = await model.get('tracks.firstObject.title');
     lastTrack = await model.get('tracks.lastObject.title');
     bestTrack = await model.get('bestTrack.title');
+    firstFavoriteTrack = await model.get('favoriteTracks.firstObject.title');
+    lastFavoriteTrack = await model.get('favoriteTracks.lastObject.title');
 
     assert.equal(model.get('name'), 'METAL Mario', 'metal mario is more metal');
     assert.equal(model.get('dob'), '1998-01-01', 'metal mario was born earlier');
@@ -77,5 +92,7 @@ module('Acceptance | field editors', async function(hooks) {
     assert.equal(firstTrack, 'Sweet Sweet Canyon', 'drivers first track is sweet sweet canyon');
     assert.equal(lastTrack, 'Dragon Driftway', 'drivers final track is Dragon Driftway');
     assert.equal(bestTrack, 'Mario Circuit', 'drivers best track is Mario Circuit');
+    assert.equal(firstFavoriteTrack, 'Mount Wario', 'drivers first track is sweet sweet canyon');
+    assert.equal(lastFavoriteTrack, 'Bowsers Castle', 'drivers final track is Dragon Driftway');
   });
 });

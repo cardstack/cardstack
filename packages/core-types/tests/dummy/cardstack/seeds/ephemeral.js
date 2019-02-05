@@ -13,7 +13,9 @@ function initialModels() {
       'vehicle',
       'alternate-vehicle',
       'best-track',
-      'tracks'
+      'tracks',
+      'favorite-tracks',
+      'races'
     ]
   })
   .withRelated('fields', [
@@ -68,6 +70,12 @@ function initialModels() {
     initial.addResource('fields', 'best-track').withAttributes({
       fieldType: '@cardstack/core-types::belongs-to',
       editorComponent: 'field-editors/dropdown-search-editor',
+    }).withRelated('related-types', [
+      { type: 'content-types', id: 'tracks' }
+    ]),
+    initial.addResource('fields', 'favorite-tracks').withAttributes({
+      fieldType: '@cardstack/core-types::has-many',
+      editorComponent: 'field-editors/dropdown-search-multi-select-editor',
     }).withRelated('related-types', [
       { type: 'content-types', id: 'tracks' }
     ]),
@@ -131,6 +139,7 @@ function initialModels() {
     .withRelated('alternate-vehicle', standardKartVehicle)
     .withRelated('tracks', [ tracks.rainbowRoad, tracks.sweetSweetCanyon, tracks.toadHarbor ])
     .withRelated('best-track', tracks.electrodrome)
+    .withRelated('favorite-tracks', [tracks.muteCity, tracks.mountWario])
     .withRelated('races', [ race1, race2 ]);
 
     initial.addResource('drivers', 'link')

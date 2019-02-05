@@ -1,0 +1,17 @@
+{{! template-lint-disable no-unnecessary-concat }}
+<div class={{concat (dasherize field) "-selector"}}>
+  {{#if missingContentType}}
+    {{cs-assert "Field" field "has no associated content type"}}
+  {{else}}
+    {{! template-lint-disable attribute-indentation }}
+    {{#power-select-multiple
+      disabled=disabled
+      selected=(get content field)
+      search=(perform searchFields)
+      searchField=displayFieldName
+      onchange=(action "makeSelection")
+    as |option|}}
+      {{get option displayFieldName}}
+    {{/power-select-multiple}}
+  {{/if}}
+</div>
