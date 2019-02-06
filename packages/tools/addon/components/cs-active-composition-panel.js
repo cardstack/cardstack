@@ -14,9 +14,13 @@ export default Component.extend({
 
   data: service('cardstack-data'),
 
-  willInsertElement() {
+  didUpdateAttrs() {
     this._super(...arguments);
-    this.get('fetchPermissions').perform();
+    // Re-fetch permissions if the model has changed
+    if (this.previousModel !== this.model) {
+      this.get('fetchPermissions').perform();
+      this.set('previousModel', this.model);
+    }
   },
 
   fetchPermissions: task(function * () {
