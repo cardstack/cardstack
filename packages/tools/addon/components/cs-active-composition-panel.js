@@ -14,9 +14,17 @@ export default Component.extend({
 
   data: service('cardstack-data'),
 
+  didReceiveAttrs() {
+    this._super(...arguments);
+    this._fetchPermissionsIfModelChanged();
+  },
+
   didUpdateAttrs() {
     this._super(...arguments);
-    // Re-fetch permissions if the model has changed
+    this._fetchPermissionsIfModelChanged();
+  },
+
+  _fetchPermissionsIfModelChanged() {
     if (this.previousModel !== this.model) {
       this.get('fetchPermissions').perform();
       this.set('previousModel', this.model);
@@ -36,7 +44,7 @@ export default Component.extend({
       return hash;
     }, {});
     this.set('permissions', permissions);
-  }),
+  }).drop(),
 
   fetchPermissionsFor: task(function * (record) {
     return yield this.get('data').fetchPermissionsFor(record);
