@@ -60,7 +60,14 @@ try {
         `--end=${workerEndBlock}`,
         `--jobName=#${workerIndex}`,
         `--progressFrequency=${progressFrequency}`
-      ]);
+      ],{
+        env: {
+          PGHOST: process.env.PGHOST,
+          PGPORT: process.env.PGPORT,
+          PGUSER: process.env.PGUSER,
+          PGPASSWORD: process.env.PGPASSWORD
+        }
+      });
       workers[`worker${workerIndex}`] = worker;
 
       worker.on('exit', code => {
