@@ -29,7 +29,7 @@ class Change {
     return new this(repo, targetBranch, null, [], null, null, null);
   }
 
-  static async createBranch(repo, parentId, targetBranch) {
+  static async createBranch(repo, parentId, targetBranch, fetchOpts) {
     let parentCommit;
     if (parentId) {
       parentCommit = await Commit.lookup(repo, parentId);
@@ -41,7 +41,7 @@ class Change {
       parentTree = await parentCommit.getTree();
       parents.push(parentCommit);
     }
-    return new this(repo, targetBranch, parentTree, parents, parentCommit, null, null);
+    return new this(repo, targetBranch, parentTree, parents, parentCommit, fetchOpts, null);
   }
 
   static async create(repo, parentId, targetBranch, fetchOpts) {
