@@ -160,7 +160,12 @@ export default Component.extend({
   }).keepLatest(),
 
   cancel: task(function * () {
-    yield this.get('tools').setEditing(false);
+    if (this.get('anythingDirty')) {
+      let model = this.get('model');
+      let upstreamModel = yield this.get('store').findRecord(model.type, model.id);
+      upstreamModel.rollbackAttributes();
+    }
+    this.get('tools').setEditing(false);
   }),
 
   delete: task(function * () {
