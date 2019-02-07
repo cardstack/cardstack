@@ -31,11 +31,25 @@ module.exports = class TransactionIndex {
     if (this._didEnsureDatabaseSetup) { return; }
 
     if (!this._migrateDbPromise) {
-      this._migrateDbPromise = this._migrateDb();
-    }
-    await this._migrateDbPromise;
+      let hasMigrationErrors = false;
+      do {
+        try {
+          this._migrateDbPromise = this._migrateDb();
+        } catch (err) {
+          // its really tricky to coordinate this across separate EC2 instances, so keep trying
+          if (err.message.includes('Another migration is already running')) {
+            hasMigrationErrors = true;
+            await sleep(1000);
+          } else {
+            throw err;
+          }
+        }
+      } while (hasMigrationErrors);
 
-    this._didEnsureDatabaseSetup = true;
+      await this._migrateDbPromise;
+
+      this._didEnsureDatabaseSetup = true;
+    }
   }
 
   async _migrateDb() {
