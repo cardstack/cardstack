@@ -164,6 +164,7 @@ export default Component.extend({
       let model = this.get('model');
       let upstreamModel = yield this.get('store').findRecord(model.type, model.id);
       upstreamModel.rollbackAttributes();
+      upstreamModel.rollbackRelationships();
     }
     this.get('tools').setEditing(false);
   }),
