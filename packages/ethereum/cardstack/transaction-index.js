@@ -4,12 +4,14 @@ const { join } = require('path');
 const postgresConfig = require('@cardstack/plugin-utils/postgres-config');
 const log = require('@cardstack/logger')('cardstack/ethereum/index');
 const EthereumClient = require('./client');
+const Queue = require('@cardstack/queue');
 const { upsert, queryToSQL, param } = require('@cardstack/pgsearch/util');
 const { promisify } = require('util');
 const sleep = promisify(setTimeout);
 
 const config = postgresConfig({ database: `ethereum_index` });
-const defaultProgressFrequency = 1000;
+const pgbossConfig = postgresConfig({ database: `pgboss_${process.env.HUB_ENVIRONMENT}` });
+const defaultProgressFrequency = 100;
 
 module.exports = class TransactionIndex {
   constructor(jsonRpcUrl='ws://localhost:8546') {
@@ -25,31 +27,27 @@ module.exports = class TransactionIndex {
     this._didEnsureDatabaseSetup = false;
     this.ethereumClient = EthereumClient.create();
     this.ethereumClient.connect(jsonRpcUrl);
+    this.jobQueue = new Queue(pgbossConfig);
   }
 
   async ensureDatabaseSetup() {
     if (this._didEnsureDatabaseSetup) { return; }
 
     if (!this._migrateDbPromise) {
-      let hasMigrationErrors = false;
-      do {
-        try {
-          this._migrateDbPromise = this._migrateDb();
-        } catch (err) {
-          // its really tricky to coordinate this across separate EC2 instances, so keep trying
-          if (err.message.includes('Another migration is already running')) {
-            hasMigrationErrors = true;
-            await sleep(1000);
-          } else {
-            throw err;
-          }
-        }
-      } while (hasMigrationErrors);
-
-      await this._migrateDbPromise;
-
-      this._didEnsureDatabaseSetup = true;
+      this._migrateDbPromise = this._runMigrateDb();
     }
+    await this._migrateDbPromise;
+
+    this._didEnsureDatabaseSetup = true;
+  }
+
+  async _runMigrateDb() {
+    await this.jobQueue.subscribe("ethereum/transaction-index/migrate-db", async () => {
+      await this._migrateDb();
+    });
+
+    await this.jobQueue.publishAndWait('ethereum/transaction-index/migrate-db', null,
+      { singletonKey: 'ethereum/transaction-index/migrate-db', singletonNextSlot: true });
   }
 
   async _migrateDb() {

@@ -12,7 +12,7 @@ const optionDefs = [
   { name: 'start', alias: 's', type: Number, description: '(Optional) The block number to start building the index from. Defaults to "0".' },
   { name: 'end', alias: 'e', type: String, description: '(Optional) The block number to finish building the index from. Defaults to "latest".' },
   { name: 'workerCount', alias: 'w', type: String, description: '(Optional) The number of workers to provision to index blocks. Default is 10 workers.' },
-  { name: 'progressFrequency', alias: 'p', type: Number, description: '(Optional) the frequency of reporting progress in terms of the number of blocks processed. Defaults to reporting progress every 1000 blocks.' },
+  { name: 'progressFrequency', alias: 'p', type: Number, description: '(Optional) the frequency of reporting progress in terms of the number of blocks processed. Defaults to reporting progress every 100 blocks.' },
   { name: 'help', alias: 'h', type: Boolean, description: 'Display this usage guide.' }
 ];
 
@@ -62,6 +62,7 @@ try {
         `--progressFrequency=${progressFrequency}`
       ],{
         env: {
+          HUB_ENVIRONMENT: process.env.HUB_ENVIRONMENT || 'production',
           PGHOST: process.env.PGHOST,
           PGPORT: process.env.PGPORT,
           PGUSER: process.env.PGUSER,

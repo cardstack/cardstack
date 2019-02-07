@@ -30,6 +30,7 @@
     "@cardstack/logger": "^0.1.0",
     "@cardstack/pgsearch": "0.13.28",
     "@cardstack/plugin-utils": "0.13.28",
+    "@cardstack/queue": "0.13.28",
     "command-line-args": "^5.0.2",
     "command-line-usage": "^5.0.5",
     "ember-source": "~2.18.2",
