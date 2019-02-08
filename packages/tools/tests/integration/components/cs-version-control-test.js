@@ -59,15 +59,29 @@ module('Integration | Component | cs version control', function(hooks) {
     assert.dom('[data-test-cs-version-control-button-save="false"]').hasText('Save');
   });
 
+  test('clicking on cancel exists edit mode', async function (assert) {
+    this.tools = this.owner.lookup('service:cardstack-tools');
+    this.tools.setEditing(true);
+    this.model.set('isNew', false);
+
+    await render(hbs`{{cs-version-control model=model enabled=true}}`);
+    await click('[data-test-cs-version-control-button-cancel]');
+
+    assert.equal(this.tools.get('editing'), false);
+  });
+
   test('clicking cancel on dirty model resets changes', async function (assert) {
     this.model.set('isNew', false);
     this.model.set('hasDirtyFields', true);
+    // this.model.set('hasDirtyRelationships', true);
+    // this.model.set('hasDirtyOwnedRelationships', true);
 
     await render(hbs`{{cs-version-control model=model enabled=true}}`);
-    assert.ok(this.model.hasDirtyFields);
-
     await click('[data-test-cs-version-control-button-cancel]');
-    assert.equal(this.model.hasDirtyFields, false);
+
+    assert.equal(this.model.get('hasDirtyFields'), false);
+    // assert.equal(this.model.hasDirtyRelationships, false);
+    // assert.equal(this.model.hasDirtyOwnedRelationships, false);
   });
 
   test('clicking update on dirty model triggers save', async function(assert) {
