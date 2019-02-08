@@ -59,6 +59,17 @@ module('Integration | Component | cs version control', function(hooks) {
     assert.dom('[data-test-cs-version-control-button-save="false"]').hasText('Save');
   });
 
+  test('clicking cancel on dirty model resets changes', async function (assert) {
+    this.model.set('isNew', false);
+    this.model.set('hasDirtyFields', true);
+
+    await render(hbs`{{cs-version-control model=model enabled=true}}`);
+    assert.ok(this.model.hasDirtyFields);
+
+    await click('[data-test-cs-version-control-button-cancel]');
+    assert.equal(this.model.hasDirtyFields, false);
+  });
+
   test('clicking update on dirty model triggers save', async function(assert) {
     assert.expect(1);
     this.model.set('save', function() {
@@ -96,7 +107,7 @@ module('Integration | Component | cs version control', function(hooks) {
   test('clicking delete triggers deleteRecord', async function(assert) {
     assert.expect(1);
     this.model.set('destroyRecord', function() {
-    assert.ok(true);
+      assert.ok(true);
     });
     this.model.set('isNew', false);
     await render(hbs`{{cs-version-control model=model enabled=true}}`);

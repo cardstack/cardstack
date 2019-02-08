@@ -160,13 +160,25 @@ export default Component.extend({
   }).keepLatest(),
 
   cancel: task(function * () {
+    this.get('tools').setEditing(false);
+
     if (this.get('anythingDirty')) {
       let model = this.get('model');
-      let upstreamModel = yield this.get('store').findRecord(model.type, model.id);
-      upstreamModel.rollbackAttributes();
-      upstreamModel.rollbackRelationships();
+
+      model.rollbackAttributes();
+      model.rollbackRelationships();
+
+      if (model.dirtyTrackingRelationNames) {
+        let relationNames = Object.keys(model.dirtyTrackingRelationNames);
+        relationNames.forEach(relation => {
+          let relationItems = model.get(relation);
+          relationItems.forEach(item => {
+            item.rollbackAttributes();
+            item.rollbackRelationships();
+          });
+        });
+      }
     }
-    this.get('tools').setEditing(false);
   }),
 
   delete: task(function * () {
