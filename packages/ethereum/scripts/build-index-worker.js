@@ -8,7 +8,7 @@ const optionDefs = [
   { name: 'start', alias: 's', type: Number, description: '(Optional) The block number to start building the index from. Defaults to "0".' },
   { name: 'end', alias: 'e', type: String, description: '(Optional) The block number to finish building the index from. Defaults to "latest".' },
   { name: 'jobName', alias: 'n', type: String, description: '(Optional) The worker job name (useful for logging)'},
-  { name: 'progressFrequency', alias: 'p', type: Number, description: '(Optional) the frequency of reporting progress in terms of the number of blocks processed. Defaults to reporting progress every 1000 blocks.'},
+  { name: 'progressFrequency', alias: 'p', type: Number, description: '(Optional) the frequency of reporting progress in terms of the number of blocks processed. Defaults to reporting progress every 100 blocks.'},
   { name: 'help', alias: 'h', type: Boolean, description: 'Display this usage guide.' }
 ];
 

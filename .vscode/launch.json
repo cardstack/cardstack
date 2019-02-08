@@ -141,8 +141,11 @@
             "request": "launch",
             "name": "Launch Ethereum Transaction Index",
             "cwd": "${workspaceRoot}/packages/ethereum",
-            "program": "${workspaceRoot}/packages/ethereum/scripts/build-index-coordinator.js",
+            "program": "${workspaceRoot}/packages/ethereum/scripts/build-index.js",
             "console": "integratedTerminal",
+            "env": {
+              "HUB_ENVIRONMENT": "development"
+            },
             "args": [
                 "--start=3782500",
                 "--end=3782600",
