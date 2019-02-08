@@ -33,7 +33,8 @@ module('Integration | Component | cs version control', function(hooks) {
       },
       relatedOwnedRecords() {
         return [];
-      }
+      },
+
     });
     this.set('model', model);
     this.meta = this.owner.lookup('service:resource-metadata');
@@ -59,29 +60,30 @@ module('Integration | Component | cs version control', function(hooks) {
     assert.dom('[data-test-cs-version-control-button-save="false"]').hasText('Save');
   });
 
-  test('clicking on cancel exists edit mode', async function (assert) {
+  test('clicking on cancel exits edit mode', async function (assert) {
     this.tools = this.owner.lookup('service:cardstack-tools');
     this.tools.setEditing(true);
     this.model.set('isNew', false);
-
     await render(hbs`{{cs-version-control model=model enabled=true}}`);
     await click('[data-test-cs-version-control-button-cancel]');
-
     assert.equal(this.tools.get('editing'), false);
   });
 
   test('clicking cancel on dirty model resets changes', async function (assert) {
-    this.model.set('isNew', false);
+    assert.expect(3);
+    this.model.set('rollbackAttributes', function () {
+      assert.ok(true);
+    });
+    this.model.set('rollbackRelationships', function () {
+      assert.ok(true);
+    });
+    this.model.set('reload', function () {
+      assert.ok(true);
+    });
     this.model.set('hasDirtyFields', true);
-    // this.model.set('hasDirtyRelationships', true);
-    // this.model.set('hasDirtyOwnedRelationships', true);
-
+    this.model.set('isNew', false);
     await render(hbs`{{cs-version-control model=model enabled=true}}`);
     await click('[data-test-cs-version-control-button-cancel]');
-
-    assert.equal(this.model.get('hasDirtyFields'), false);
-    // assert.equal(this.model.hasDirtyRelationships, false);
-    // assert.equal(this.model.hasDirtyOwnedRelationships, false);
   });
 
   test('clicking update on dirty model triggers save', async function(assert) {
