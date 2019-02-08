@@ -167,6 +167,7 @@ export default Component.extend({
 
       model.rollbackAttributes();
       model.rollbackRelationships();
+      model.reload(); // this is to rollback attributes that are arrays
 
       if (model.dirtyTrackingRelationNames) {
         let relationNames = Object.keys(model.dirtyTrackingRelationNames);
