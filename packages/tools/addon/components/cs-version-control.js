@@ -163,7 +163,7 @@ export default Component.extend({
     this.get('tools').setEditing(false);
 
     if (this.get('anythingDirty')) {
-      let model = this.get('model');
+      let model = yield this.get('model');
 
       model.rollbackAttributes();
       model.rollbackRelationships();
