@@ -414,7 +414,7 @@ class Updater {
 
     if (this.addressIndexing) {
       log.debug(`starting updateContent() indexing of new blocks`);
-      await this.transactionIndexer.index();
+      blockHeight = await this.transactionIndexer.index({ lastBlockHeight });
       log.debug(`completed updateContent() indexing of new blocks`);
     }
 
