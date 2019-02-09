@@ -46,8 +46,8 @@ module.exports = class TransactionIndex {
       await this._migrateDb();
     });
 
-    await this.jobQueue.publishAndWait('ethereum/transaction-index/migrate-db', null,
-      { singletonKey: 'ethereum/transaction-index/migrate-db', singletonNextSlot: true });
+    await this.jobQueue.publishAndWait('ethereum/transaction-index/migrate-db', {},
+      { singletonKey: 'ethereum/transaction-index/migrate-db', singletonNextSlot: true, expiresIn: '30 seconds' });
   }
 
   async _migrateDb() {
