@@ -28,26 +28,28 @@ module.exports = class TransactionIndex {
     this.ethereumClient = EthereumClient.create();
     this.ethereumClient.connect(jsonRpcUrl);
     this.jobQueue = new Queue(pgbossConfig);
+    this._setupPromise = this.jobQueue.subscribe("ethereum/transaction-index/migrate-db", async () => await this._migrateDb());
   }
 
   async ensureDatabaseSetup() {
+    await this._setupPromise;
+
     if (this._didEnsureDatabaseSetup) { return; }
 
     if (!this._migrateDbPromise) {
-      this._migrateDbPromise = this._runMigrateDb();
+      this._migrateDbPromise = this.jobQueue.publishAndWait('ethereum/transaction-index/migrate-db', {}, {
+        singletonKey: 'ethereum/transaction-index/migrate-db',
+        singletonNextSlot: true,
+        expiresIn: '30 seconds'
+      });
     }
-    await this._migrateDbPromise;
+    let { jobCancelled } = await this._migrateDbPromise || {};
+    if (jobCancelled) {
+      log.debug('Another node process is running db-migrate. wait a little bit for the the migration to complete.');
+      await sleep(10000);
+    }
 
     this._didEnsureDatabaseSetup = true;
-  }
-
-  async _runMigrateDb() {
-    await this.jobQueue.subscribe("ethereum/transaction-index/migrate-db", async () => {
-      await this._migrateDb();
-    });
-
-    await this.jobQueue.publishAndWait('ethereum/transaction-index/migrate-db', {},
-      { singletonKey: 'ethereum/transaction-index/migrate-db', singletonNextSlot: true, expiresIn: '30 seconds' });
   }
 
   async _migrateDb() {
