@@ -36,7 +36,7 @@ module.exports = class Writer {
 
     if (hyperledger) {
       let config = Object.assign({}, hyperledger);
-      config.logger = log.info;
+      config.logger = log.info.bind(log); // TODO fix logger so we don't have to bind
       this.hyperledgerConfig = config;
     }
 
