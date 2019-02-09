@@ -4,8 +4,6 @@ const getUsage = require('command-line-usage');
 const { fork } = require('child_process');
 const path = require('path');
 const Web3 = require('web3');
-const { promisify } = require('util');
-const sleep = promisify(setTimeout);
 
 const optionDefs = [
   { name: 'jsonRpcURL', alias: 'j', type: String, description: 'The URL of the Ethereum JSON RPC API.' },
@@ -87,8 +85,6 @@ try {
           process.exit(exitingWithErrors ? 1 : 0);
         }
       });
-
-      await sleep(1000); // stagger workers so they don't all try to create the DB at the same time if it doesn't exist
     }
   });
 } catch (err) {
