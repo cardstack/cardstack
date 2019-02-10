@@ -4,6 +4,8 @@ const getUsage = require('command-line-usage');
 const { fork } = require('child_process');
 const path = require('path');
 const Web3 = require('web3');
+const { promisify } = require('util');
+const sleep = promisify(setTimeout);
 
 const optionDefs = [
   { name: 'jsonRpcURL', alias: 'j', type: String, description: 'The URL of the Ethereum JSON RPC API.' },
@@ -86,6 +88,8 @@ try {
           process.exit(exitingWithErrors ? 1 : 0);
         }
       });
+
+      await sleep(1000);
     }
   });
 } catch (err) {
