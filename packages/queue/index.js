@@ -52,6 +52,11 @@ module.exports = class Queue {
   async publishAndWait(jobName, ...options) {
     let jobId = await this.publish(jobName, ...options);
 
+    // When pg-boss wants to cancel a job because you are using singletonKey to ensure
+    // job uniqueness or throttling, it will return a null jobId. This guard at least
+    // prevents promises from never resolving when pg-boss tries to cancel a job.
+    if (!jobId) { return { jobCancelled: true }; }
+
     this._setupCallbacks(jobName);
 
     return new Promise((resolve, reject) => {

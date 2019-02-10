@@ -61,6 +61,7 @@ try {
       ],{
         env: {
           HUB_ENVIRONMENT: process.env.HUB_ENVIRONMENT || 'production',
+          LOG_LEVELS: process.env.LOG_LEVELS,
           PGHOST: process.env.PGHOST,
           PGPORT: process.env.PGPORT,
           PGUSER: process.env.PGUSER,
