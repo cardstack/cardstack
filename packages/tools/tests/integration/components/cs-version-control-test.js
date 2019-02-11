@@ -70,14 +70,8 @@ module('Integration | Component | cs version control', function(hooks) {
   });
 
   test('clicking cancel on dirty model resets changes', async function (assert) {
-    assert.expect(3);
-    this.model.set('rollbackAttributes', function () {
-      assert.ok(true);
-    });
-    this.model.set('rollbackRelationships', function () {
-      assert.ok(true);
-    });
-    this.model.set('reload', function () {
+    assert.expect(1);
+    this.model.set('cardstackRollback', function () {
       assert.ok(true);
     });
     this.model.set('hasDirtyFields', true);
