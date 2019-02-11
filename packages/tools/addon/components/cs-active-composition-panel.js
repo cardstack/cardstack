@@ -14,9 +14,21 @@ export default Component.extend({
 
   data: service('cardstack-data'),
 
-  willInsertElement() {
+  didReceiveAttrs() {
     this._super(...arguments);
-    this.get('fetchPermissions').perform();
+    this._fetchPermissionsIfModelChanged();
+  },
+
+  didUpdateAttrs() {
+    this._super(...arguments);
+    this._fetchPermissionsIfModelChanged();
+  },
+
+  _fetchPermissionsIfModelChanged() {
+    if (this.previousModel !== this.model) {
+      this.get('fetchPermissions').perform();
+      this.set('previousModel', this.model);
+    }
   },
 
   fetchPermissions: task(function * () {
@@ -32,7 +44,7 @@ export default Component.extend({
       return hash;
     }, {});
     this.set('permissions', permissions);
-  }),
+  }).drop(),
 
   fetchPermissionsFor: task(function * (record) {
     return yield this.get('data').fetchPermissionsFor(record);
