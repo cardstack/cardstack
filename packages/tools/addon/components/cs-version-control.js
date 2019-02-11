@@ -163,22 +163,7 @@ export default Component.extend({
     this.get('tools').setEditing(false);
 
     if (this.get('anythingDirty')) {
-      let model = yield this.get('model');
-
-      model.rollbackAttributes();
-      model.rollbackRelationships();
-      model.reload(); // this is to rollback attributes that are arrays
-
-      if (model.dirtyTrackingRelationNames) {
-        let relationNames = Object.keys(model.dirtyTrackingRelationNames);
-        relationNames.forEach(relation => {
-          let relationItems = model.get(relation);
-          relationItems.forEach(item => {
-            item.rollbackAttributes();
-            item.rollbackRelationships();
-          });
-        });
-      }
+      yield this.get('model').cardstackRollback();
     }
   }),
 
