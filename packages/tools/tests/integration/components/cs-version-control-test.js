@@ -33,7 +33,8 @@ module('Integration | Component | cs version control', function(hooks) {
       },
       relatedOwnedRecords() {
         return [];
-      }
+      },
+
     });
     this.set('model', model);
     this.meta = this.owner.lookup('service:resource-metadata');
@@ -57,6 +58,26 @@ module('Integration | Component | cs version control', function(hooks) {
     await render(hbs`{{cs-version-control model=model enabled=true}}`);
     assert.dom('[data-test-cs-version-control-button-save="true"]').doesNotExist('no disabled button');
     assert.dom('[data-test-cs-version-control-button-save="false"]').hasText('Save');
+  });
+
+  test('clicking on cancel exits edit mode', async function (assert) {
+    this.tools = this.owner.lookup('service:cardstack-tools');
+    this.tools.setEditing(true);
+    this.model.set('isNew', false);
+    await render(hbs`{{cs-version-control model=model enabled=true}}`);
+    await click('[data-test-cs-version-control-button-cancel]');
+    assert.equal(this.tools.get('editing'), false);
+  });
+
+  test('clicking cancel on dirty model resets changes', async function (assert) {
+    assert.expect(1);
+    this.model.set('cardstackRollback', function () {
+      assert.ok(true);
+    });
+    this.model.set('hasDirtyFields', true);
+    this.model.set('isNew', false);
+    await render(hbs`{{cs-version-control model=model enabled=true}}`);
+    await click('[data-test-cs-version-control-button-cancel]');
   });
 
   test('clicking update on dirty model triggers save', async function(assert) {
@@ -96,7 +117,7 @@ module('Integration | Component | cs version control', function(hooks) {
   test('clicking delete triggers deleteRecord', async function(assert) {
     assert.expect(1);
     this.model.set('destroyRecord', function() {
-    assert.ok(true);
+      assert.ok(true);
     });
     this.model.set('isNew', false);
     await render(hbs`{{cs-version-control model=model enabled=true}}`);

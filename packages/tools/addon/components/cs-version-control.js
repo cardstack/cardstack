@@ -17,6 +17,7 @@ export default Component.extend({
   store: service(),
   router: service(),
   data: service('cardstack-data'),
+  tools: service('cardstack-tools'),
 
   modelMeta: computed('model', function() {
     return this.get('resourceMetadata').read(this.get('model'));
@@ -157,6 +158,14 @@ export default Component.extend({
     }
     yield model.save();
   }).keepLatest(),
+
+  cancel: task(function * () {
+    this.get('tools').setEditing(false);
+
+    if (this.get('anythingDirty')) {
+      yield this.get('model').cardstackRollback();
+    }
+  }),
 
   delete: task(function * () {
     yield this.get('model').destroyRecord();

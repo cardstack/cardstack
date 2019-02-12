@@ -61,6 +61,23 @@ export default DS.Model.extend(RelationshipTracker, {
     return uniq(relatedOwnedRecords([ this ]));
   },
 
+  cardstackRollback() {
+    this.rollbackAttributes();
+    this.rollbackRelationships();
+    this.reload(); // this is to rollback attributes that are arrays
+
+    if (this.dirtyTrackingRelationNames) {
+      let relationNames = Object.keys(this.dirtyTrackingRelationNames);
+      relationNames.forEach(relation => {
+        let relationItems = this.get(relation);
+        relationItems.forEach(item => {
+          item.rollbackAttributes();
+          item.rollbackRelationships();
+        });
+      });
+    }
+  },
+
   _createDirtyTrackingCPs(ownedRelationships) {
     let dirtyTrackingProperties = {};
     for (let relationshipName in ownedRelationships) {
