@@ -4,7 +4,7 @@ import { ciSessionId } from '@cardstack/test-support/environment';
 
 export default class Fixtures {
   constructor({ create, destroy }) {
-    this._factory = new Factory();
+    this._factory = null;
     this._create = create;
     this._destroy = destroy;
   }
@@ -20,7 +20,10 @@ export default class Fixtures {
   async setup() {
     if (typeof this._create !== 'function') { return; }
 
-    await this._create(this._factory);
+    if (!this._factory) {
+      this._factory = new Factory();
+      await this._create(this._factory);
+    }
 
     let models = this._factory.getModels();
 
@@ -48,17 +51,17 @@ export default class Fixtures {
   }
 
   async teardown() {
-    if (typeof this._create !== 'function') { return; }
-
     let destructionList = [];
     if (typeof this._destroy === 'function') {
       destructionList = destructionList.concat(this._destroy());
     }
 
-    let createdModels = this._factory.getModels().map(model => {
-      return { id: model.id, type: model.type };
-    });
-    destructionList = destructionList.concat(createdModels.reverse());
+    if (this._factory) {
+      let createdModels = this._factory.getModels().map(model => {
+        return { id: model.id, type: model.type };
+      });
+      destructionList = destructionList.concat(createdModels.reverse());
+    }
 
     for (let [index, item] of destructionList.entries()) {
       if (!item.type) { continue; }
