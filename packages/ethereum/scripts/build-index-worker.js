@@ -34,7 +34,7 @@ if (help) {
 const fromBlockHeight = start || 0;
 const toBlockHeight = end || 'latest';
 const workerAttribution = jobName ? `Worker ${jobName} - ` : '';
-let index = new IndexBuilder({ jsonRpcUrl });
+let index = new IndexBuilder(jsonRpcUrl);
 
 console.log(`${workerAttribution}Building transaction index from block ${fromBlockHeight} to ${toBlockHeight}`);
 

@@ -99,18 +99,19 @@ module.exports = class TransactionIndexBase extends EventEmitter {
     let totalNumBlocks = endHeight - fromBlockHeight;
     while (currentBlockNumber <= endHeight) {
       let block;
-      let retries = 0;
-      while (!block) {
+      let blockRetries = 0;
+      do {
         block = await this.ethereumClient.getBlock(currentBlockNumber);
-        if (block && retries) {
-          log.info(`${workerAttribution}successfully retrieved block #${currentBlockNumber} after ${retries} retries.`);
-        }
         if (!block) {
-          log.error(`${workerAttribution}Unable to retrieve block #${currentBlockNumber}, trying again (retries: ${retries})`);
+          log.error(`${workerAttribution}Error, unable to retrieve block #${currentBlockNumber}, trying again (retries: ${blockRetries})`);
           await sleep(5000);
+        } else if (block && blockRetries) {
+          log.info(`${workerAttribution}successfully retrieved block #${currentBlockNumber} after ${blockRetries} retries.`);
         }
-        retries++;
+        blockRetries++;
       }
+      while (!block);
+
       let currentNumBlocks = currentBlockNumber - fromBlockHeight;
       if (currentNumBlocks % (progressFrequency || defaultProgressFrequency) === 0) {
         let percentageComplete = Math.round(100 * (currentNumBlocks/totalNumBlocks));
@@ -119,10 +120,18 @@ module.exports = class TransactionIndexBase extends EventEmitter {
       log.debug(`${workerAttribution}Processing block #${block.number}, contains ${block.transactions.length} transactions`);
       for (let transaction of block.transactions) {
         log.trace(`  - ${workerAttribution}processing transaction #${transaction.transactionIndex}`);
-        let receipt = await this.ethereumClient.getTransactionReceipt(transaction.hash);
-        if (!receipt) {
-          throw new Error(`${workerAttribution}No transaction reciept exists for txn hash ${transaction.hash}`);
-        }
+        let receipt;
+        let receiptRetries = 0;
+        do {
+          receipt = await this.ethereumClient.getTransactionReceipt(transaction.hash);
+          if (!receipt) {
+            log.error(`${workerAttribution}Error, no transaction receipt exists for txn hash ${transaction.hash}, trying again (retries: ${receiptRetries})`);
+            sleep(5000);
+          } else if (receipt && receiptRetries) {
+            log.info(`${workerAttribution}successfully retrieved receipt for txn hash ${transaction.hash} after ${receiptRetries} retries.`);
+          }
+          receiptRetries++;
+        } while (!receipt);
 
         let status = typeof receipt.status === 'boolean' ? receipt.status : Boolean(parseInt(receipt.status, 16));
 
