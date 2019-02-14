@@ -63,10 +63,8 @@ export default class Fixtures {
       destructionList = destructionList.concat(createdModels.reverse());
     }
 
-    for (let [index, item] of destructionList.entries()) {
+    for (let item of destructionList) {
       if (!item.type) { continue; }
-
-      let isLast = index === destructionList.length - 1;
 
       if (item.id) {
         let response = await fetch(`${hubURL}/api/${encodeURIComponent(item.type)}/${encodeURIComponent(item.id)}`, {
@@ -80,7 +78,7 @@ export default class Fixtures {
         if (response.status !== 200) { continue; }
 
         let { data:model } = await response.json();
-        await this._deleteModel(model, isLast);
+        await this._deleteModel(model);
       } else {
         let response = await fetch(`${hubURL}/api/${encodeURIComponent(item.type)}`, {
           method: 'GET',
@@ -94,7 +92,7 @@ export default class Fixtures {
 
         let { data:models } = await response.json();
         for (let model of models) {
-          await this._deleteModel(model, isLast);
+          await this._deleteModel(model);
         }
       }
     }
