@@ -17,8 +17,8 @@ const txnTestEthValueWithGasFee = 0.101;
 let transactionIndexer, ethereumClient, env, searchers, accounts, gasPrice;
 
 async function teardown() {
-  await transactionIndexer._eventProcessingPromise;
   await transactionIndexer.transactionIndex._indexingPromise;
+  await transactionIndexer._eventProcessingPromise;
   await transactionIndexer._indexingPromise;
   await transactionIndexer.transactionIndex.__deleteIndex();
   await ethereumClient.stopAll();
@@ -68,8 +68,8 @@ function setup(factoryCallback) {
 }
 
 async function waitForEthereumEvents(indexer) {
-  await indexer._eventProcessingPromise;
   await indexer.transactionIndex._indexingPromise;
+  await indexer._eventProcessingPromise;
   await indexer._indexingPromise;
 }
 
