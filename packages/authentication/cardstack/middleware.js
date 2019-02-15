@@ -68,7 +68,7 @@ class Authentication {
       }
     } catch (err) {
       if (/unable to authenticate data|invalid key length|Not a valid signed message/.test(err.message)) {
-        log.warn("Ignoring invalid token");
+        log.warn(`Ignoring invalid token for ${ctxt.request.method} ${ctxt.request.path} (${ctxt.header['authorization']})`);
       } else {
         throw err;
       }
