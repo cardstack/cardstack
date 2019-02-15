@@ -49,7 +49,7 @@ class TransactionIndex extends TransactionIndexBase {
     }
 
     await this.ensureDatabaseSetup();
-    this._index(); // intentionally not awaiting as this could take a very long time if the index is not primed
+    await this._index();
     await this.ethereumClient.startNewBlockListening(this);
   }
 
