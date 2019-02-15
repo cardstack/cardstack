@@ -8,7 +8,7 @@ const { promisify } = require('util');
 const sleep = promisify(setTimeout);
 
 const optionDefs = [
-  { name: 'jsonRpcURL', alias: 'j', type: String, description: 'The URL of the Ethereum JSON RPC API.' },
+  { name: 'jsonRpcUrl', alias: 'j', type: String, description: 'The URL of the Ethereum JSON RPC API.' },
   { name: 'start', alias: 's', type: Number, description: '(Optional) The block number to start building the index from. Defaults to "0".' },
   { name: 'end', alias: 'e', type: String, description: '(Optional) The block number to finish building the index from. Defaults to "latest".' },
   { name: 'workerCount', alias: 'w', type: String, description: '(Optional) The number of workers to provision to index blocks. Default is 10 workers.' },
@@ -24,8 +24,8 @@ const usage = [{
   optionList: optionDefs
 }];
 
-const { start, end, workerCount, progressFrequency, jsonRpcURL, help } = commandLineArgs(optionDefs);
-if (!jsonRpcURL) {
+const { start, end, workerCount, progressFrequency, jsonRpcUrl, help } = commandLineArgs(optionDefs);
+if (!jsonRpcUrl) {
   console.error("Missing JSON RPC URL specification.");
   console.log(getUsage(usage));
   process.exit(1);
@@ -36,7 +36,7 @@ if (help) {
 }
 
 try {
-  let provider = new Web3(new Web3.providers.WebsocketProvider(jsonRpcURL));
+  let provider = new Web3(new Web3.providers.WebsocketProvider(jsonRpcUrl));
   const fromBlockHeight = start || 0;
   const toBlockHeight = end || 'latest';
 
@@ -55,7 +55,7 @@ try {
       }
 
       let worker = fork(path.join(__dirname, 'build-index-worker.js'), [
-        `--jsonRpcURL=${jsonRpcURL}`,
+        `--jsonRpcUrl=${jsonRpcUrl}`,
         `--start=${workerStartBlock}`,
         `--end=${workerEndBlock}`,
         `--jobName=#${workerIndex}`,
