@@ -18,7 +18,7 @@ function getType(record) {
 
 export default Service.extend({
   store: inject(),
-  session: injectOptional.service(),
+  cardstackSession: injectOptional.service(),
 
   init() {
     this._super();
@@ -144,15 +144,11 @@ export default Service.extend({
     let headers = {
       'Content-Type': 'application/vnd.api+json',
     };
-    let token = this._sessionToken();
+    let token = this.get('cardstackSession.token');
     if (token) {
       headers['Authorization'] = `Bearer ${token}`;
     }
     return headers;
-  },
-
-  _sessionToken() {
-    return this.get('session.data.authenticated.data.meta.token');
   },
 
   _errorsByField(body) {

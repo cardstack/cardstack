@@ -38,6 +38,10 @@ export default Service.extend({
         return this.get('store').peekRecord(singularize(rawSession.data.type), rawSession.data.id);
       }
     }
-  })
+  }),
+
+  token: computed('_rawSession', function() {
+    return this.get('_rawSession.data.meta.token');
+  }),
 
 });
