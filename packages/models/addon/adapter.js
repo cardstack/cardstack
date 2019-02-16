@@ -84,14 +84,9 @@ export default DS.JSONAPIAdapter.extend(AdapterMixin, {
 
   ajaxOptions() {
     let hash = this._super(...arguments);
-
-    if (this.get('cardstackSession')) {
-      // @cardstack/authentication is available. If it has a valid
-      // session, apply the token to our request
-
+    let token = this.get('cardstackSession.token');
+    if (token) {
       let { beforeSend } = hash;
-      let token = this.get('session.data.authenticated.data.meta.token');
-
       hash.beforeSend = (xhr) => {
         xhr.setRequestHeader('Authorization', `Bearer ${token}`);
         if (beforeSend) {
