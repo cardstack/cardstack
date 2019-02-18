@@ -8866,6 +8866,13 @@ he@1.1.1:
   version "1.1.1"
   resolved "https://registry.yarnpkg.com/he/-/he-1.1.1.tgz#93410fd21b009735151f8868c2f271f3427e23fd"
 
+heapdump@^0.3.12:
+  version "0.3.12"
+  resolved "https://registry.yarnpkg.com/heapdump/-/heapdump-0.3.12.tgz#5623be7816a8a92ab2d42b1b422f9e829a58da89"
+  integrity sha512-OSVdkxGd9xAJNEP0RA/ZvKEzGTEjCnkvmMEGF1ScR/87tH92v5Dpv6g/Fs8GvZA9UxdMpxU1G9NEC2D0OxZjJQ==
+  dependencies:
+    nan "^2.11.1"
+
 heimdalljs-fs-monitor@^0.1.0:
   version "0.1.0"
   resolved "https://registry.yarnpkg.com/heimdalljs-fs-monitor/-/heimdalljs-fs-monitor-0.1.0.tgz#d404a65688c6714c485469ed3495da4853440272"

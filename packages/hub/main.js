@@ -2,6 +2,7 @@ const Koa = require('koa');
 const Session = require('@cardstack/plugin-utils/session');
 const { Registry, Container } = require('@cardstack/di');
 const postgresConfig = require('@cardstack/plugin-utils/postgres-config');
+const { writeSnapshot } = require('heapdump');
 // lazy load only in container mode, since they uses node 8 features
 let EmberConnection;
 let Orchestrator;
@@ -31,6 +32,10 @@ async function wireItUp(projectDir, encryptionKeys, dataSources, opts = {}) {
     registry.register('config:initial-models', opts.seeds);
   } else {
     registry.register('config:initial-models', () => []);
+  }
+
+  if (process.env.PROFILE_MEMORY_SEC) {
+    setInterval(() => writeSnapshot((err, filename) => log.info(`heap dump written to ${filename}`)), process.env.PROFILE_MEMORY_SEC * 1000);
   }
 
   let container = new Container(registry);
