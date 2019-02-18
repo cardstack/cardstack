@@ -33,10 +33,6 @@ module.exports = class TransactionIndexBase extends EventEmitter {
     this._didEnsureDatabaseSetup = false;
     this.jobQueue = new Queue(pgbossConfig);
 
-    this._setupPromise = this.jobQueue.subscribe("ethereum/transaction-index/migrate-db", async () => {
-      await this._migrateDb();
-    });
-
     if (jsonRpcUrl) {
       this.ethereumClient = EthereumClient.create();
       this.ethereumClient.connect(jsonRpcUrl);
@@ -49,10 +45,7 @@ module.exports = class TransactionIndexBase extends EventEmitter {
     if (this._didEnsureDatabaseSetup) { return; }
 
     if (!this._migrateDbPromise) {
-      this._migrateDbPromise = this.jobQueue.publishAndWait('ethereum/transaction-index/migrate-db', {}, {
-        singletonKey: 'ethereum/transaction-index/migrate-db',
-        singletonMinutes: 10,
-      });
+      this._migrateDbPromise = this._setupMigrate();
     }
     let { jobCancelled } = await this._migrateDbPromise || {};
     if (jobCancelled && process.env.HUB_ENVIRONMENT !== 'test') {
@@ -61,6 +54,16 @@ module.exports = class TransactionIndexBase extends EventEmitter {
     }
 
     this._didEnsureDatabaseSetup = true;
+  }
+
+  async _setupMigrate() {
+    await this.jobQueue.subscribe("ethereum/transaction-index/migrate-db", async () => {
+      await this._migrateDb();
+    });
+    await this.jobQueue.publishAndWait('ethereum/transaction-index/migrate-db', {}, {
+      singletonKey: 'ethereum/transaction-index/migrate-db',
+      singletonNextSlot: true
+    });
   }
 
   async _migrateDb() {
@@ -93,6 +96,7 @@ module.exports = class TransactionIndexBase extends EventEmitter {
   }
 
   async buildIndex({ fromBlockHeight=0, toBlockHeight='latest', jobName, progressFrequency }) {
+    await this.ensureDatabaseSetup();
     let endHeight = toBlockHeight === 'latest' ? await this.ethereumClient.getBlockHeight() : toBlockHeight;
     let currentBlockNumber = fromBlockHeight;
     let workerAttribution = jobName ? `Worker ${jobName} - ` : '';
