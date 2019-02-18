@@ -51,7 +51,7 @@ module.exports = class TransactionIndexBase extends EventEmitter {
     if (!this._migrateDbPromise) {
       this._migrateDbPromise = this.jobQueue.publishAndWait('ethereum/transaction-index/migrate-db', {}, {
         singletonKey: 'ethereum/transaction-index/migrate-db',
-        singletonMinutes: 10,
+        singletonNextSlot: true
       });
     }
     let { jobCancelled } = await this._migrateDbPromise || {};

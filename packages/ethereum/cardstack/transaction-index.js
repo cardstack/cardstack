@@ -49,7 +49,7 @@ class TransactionIndex extends TransactionIndexBase {
     }
 
     await this.ensureDatabaseSetup();
-    await this._index();
+    this._index(); // dont await the block downloading as the first time index will block until all blocks downloaded (which may cause health checks to fail)
     await this.ethereumClient.startNewBlockListening(this);
   }
 
