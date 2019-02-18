@@ -1,4 +1,5 @@
 const Error = require('@cardstack/plugin-utils/error');
+const Session = require('@cardstack/plugin-utils/session');
 const { declareInjections } = require('@cardstack/di');
 const find = require('../async-find');
 
@@ -47,7 +48,7 @@ class PermissionsSearcher {
         },
       };
     } else {
-      document = await this.searchers.get(session, branch, queryType, queryId);
+      document = await this.searchers.get(Session.INTERNAL_PRIVILEGED, branch, queryType, queryId);
       if (!document) { return; } // we don't have it or don't have permission to read it
     }
 
