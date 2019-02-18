@@ -38,10 +38,7 @@ let index = new IndexBuilder(jsonRpcUrl);
 
 console.log(`${workerAttribution}Building transaction index from block ${fromBlockHeight} to ${toBlockHeight}`);
 
-index.ensureDatabaseSetup()
-  .then(() => {
-    return index.buildIndex({ fromBlockHeight, toBlockHeight, jobName, progressFrequency });
-  })
+index.buildIndex({ fromBlockHeight, toBlockHeight, jobName, progressFrequency })
   .catch(err => {
     console.error(`${workerAttribution}${err.message}`, err);
     process.exit(1);

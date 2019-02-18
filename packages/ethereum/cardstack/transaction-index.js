@@ -25,16 +25,19 @@ types.setTypeParser(INT8_OID, function(val) {
   return parseInt(val, 10);
 });
 
-module.exports = declareInjections({},
+module.exports = declareInjections({
+  jobQueue: 'hub:queues'
+},
 
 class TransactionIndex extends TransactionIndexBase {
   static create(...args) {
     return new this(...args);
   }
 
-  constructor() {
+  constructor({ jobQueue }) {
     super();
 
+    this.jobQueue = jobQueue;
     this._indexingPromise = null;
     this._blockHeight = 0;
   }
@@ -117,10 +120,11 @@ class TransactionIndex extends TransactionIndexBase {
 
   // this is only ever to be used for the test cleanup
   async __deleteIndex() {
-    let client = new Client(Object.assign({}, config));
+    await this.pool.end();
+    let client = new Client(Object.assign({}, config, { database: 'postgres' }));
     try {
       await client.connect();
-      await client.query(`delete from transactions`);
+      await client.query(`drop database if exists ${config.database}`);
     } finally {
       client.end();
     }
