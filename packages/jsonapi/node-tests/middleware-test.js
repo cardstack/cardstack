@@ -201,26 +201,6 @@ describe('jsonapi/middleware', function() {
       expect(response.body).to.not.have.deep.property('data.relationships');
     });
 
-    it('can get an individual resource when the Accept header is not set', async function() {
-      // Don't use the default supertest instance because it has default header set already
-      let request = supertest(app.callback());
-      let response = await request.get('/api/articles/0');
-      expect(response).hasStatus(200);
-      expect(response.body).deep.property('data.id', '0');
-      expect(response.body).deep.property('data.attributes.title', 'Hello world');
-      expect(response.body).to.not.have.deep.property('data.relationships');
-    });
-
-    it('can get an individual resource when the Accept header is set to everything', async function() {
-      // Don't use the default supertest instance because it has default header set already
-      let request = supertest(app.callback());
-      let response = await request.get('/api/articles/0').set("Accept", "*/*");
-      expect(response).hasStatus(200);
-      expect(response.body).deep.property('data.id', '0');
-      expect(response.body).deep.property('data.attributes.title', 'Hello world');
-      expect(response.body).to.not.have.deep.property('data.relationships');
-    });
-
     it('returns 404 for missing individual resource', async function() {
       let response = await request.get('/api/articles/98766');
       expect(response).hasStatus(404);
@@ -236,23 +216,6 @@ describe('jsonapi/middleware', function() {
       expect(response.body.data).collectionContains({ type: 'articles', id: '0' });
       expect(response.body.data).collectionContains({ type: 'articles', id: '1' });
       expect(response.body.data).collectionContains({ type: 'articles', id: '3' });
-    });
-
-    it('can get a collection resource when the Accept header is not set', async function() {
-      // Don't use the default supertest instance because it has default header set already
-      let request = supertest(app.callback());
-      let response = await request.get('/api/content-types');
-      expect(response).hasStatus(200);
-      expect(response.body).to.have.property('data');
-      expect(response.body).to.have.deep.property('meta.total');
-    });
-    it('can get a collection resource when the Accept header is set to everything', async function() {
-    // Don't use the default supertest instance because it has default header set already
-      let request = supertest(app.callback());
-      let response = await request.get('/api/content-types').set("Accept", "*/*");
-      expect(response).hasStatus(200);
-      expect(response.body).to.have.property('data');
-      expect(response.body).to.have.deep.property('meta.total');
     });
 
     it('can sort a collection resource', async function() {

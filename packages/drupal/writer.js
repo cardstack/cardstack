@@ -84,6 +84,7 @@ async function finalize(change) {
   let { method, url, token, schemaModels } = pendingChanges.get(change);
 
   let p = request[method](url)
+      .set('Accept', 'application/vnd.api+json')
       .set('Content-Type', 'application/vnd.api+json')
       .set('Authorization', `Bearer ${token}`);
 

@@ -143,6 +143,7 @@ export default Service.extend({
   _headers() {
     let headers = {
       'Content-Type': 'application/vnd.api+json',
+      'Accept': 'application/vnd.api+json',
     };
     let token = this._sessionToken();
     if (token) {
