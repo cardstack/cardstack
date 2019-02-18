@@ -47,9 +47,7 @@ class TransactionIndex extends TransactionIndexBase {
   }
 
   async start(ethereumClient) {
-    if (!this.ethereumClient) {
-      this.ethereumClient = ethereumClient;
-    }
+    this.ethereumClient = ethereumClient;
 
     await this.ensureDatabaseSetup();
     this._index(); // dont await the block downloading as the first time index will block until all blocks downloaded (which may cause health checks to fail)

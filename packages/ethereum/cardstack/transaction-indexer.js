@@ -35,7 +35,6 @@ class TransactionIndexer {
     this._indexingPromise = null; // this is exposed to the tests to deal with indexing event async
     this._eventProcessingPromise = null; // this is exposed to the tests to deal with indexing event async
     this._transactionIndexPromise = null;
-    this._setupPromise = this._ensureClient();
     this._boundEventListeners = false;
     this._boundBlockListener = false;
     this._transactionIndexHasStarted = false;
@@ -44,7 +43,10 @@ class TransactionIndexer {
 
   async start(addressIndexing, ethereumClient) {
     log.debug(`starting transaction-indexer`);
-    await this._setupPromise;
+
+    log.debug(`waiting for pgsearch client to start`);
+    await this.pgsearchClient.ensureDatabaseSetup();
+    log.debug(`completed pgsearch client startup`);
 
     this.addressIndexing = addressIndexing;
     await this._startTrackedAddressListening();
@@ -54,13 +56,6 @@ class TransactionIndexer {
 
     this._hasStartedCallBack();
     log.debug(`completed transaction-indexer startup`);
-  }
-
-  async ensureStarted() {
-    log.debug(`ensuring transaction-indexer has started`);
-    await this._setupPromise;
-    await this._startedPromise;
-    log.debug(`completed ensuring transaction-indexer has started`);
   }
 
   async index(opts={}) {
@@ -202,12 +197,6 @@ class TransactionIndexer {
     }
   }
 
-  async _ensureClient() {
-    log.debug(`waiting for pgsearch client to start`);
-    await this.pgsearchClient.ensureDatabaseSetup();
-    log.debug(`completed pgsearch client startup`);
-  }
-
   async _index(opts={}) {
     let {
       lastBlockHeight = 0,
@@ -218,7 +207,10 @@ class TransactionIndexer {
     } = opts;
     log.debug(`starting block index for index job #${jobNumber}: ${JSON.stringify(opts)}`);
 
-    await this.ensureStarted();
+    log.debug(`ensuring transaction-indexer has started`);
+    await this._startedPromise;
+    log.debug(`completed ensuring transaction-indexer has started`);
+
     if (Array.isArray(stopIndexingAddresses)) {
       await this._stopIndexingAddresses(stopIndexingAddresses);
       log.debug(`completed block index for index job #${jobNumber}`);
