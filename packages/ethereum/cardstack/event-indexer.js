@@ -35,11 +35,10 @@ class EthereumEventIndexer {
     this.contractDefinitions = {};
     this.contractName = null;
     this._indexingPromise = null; // this is exposed to the tests as web3 has poor support for async in event handlers
-    this._setupPromise = this._ensureClient();
   }
 
   async start({ name, contract, ethereumClient }) {
-    await this._setupPromise;
+    await this.pgsearchClient.ensureDatabaseSetup();
 
     this.contractDefinitions[name] = contract;
     this.ethereumClient = ethereumClient;
@@ -60,10 +59,6 @@ class EthereumEventIndexer {
 
   async getBlockHeight() {
     return await this.ethereumClient.getBlockHeight();
-  }
-
-  async _ensureClient() {
-    await this.pgsearchClient.ensureDatabaseSetup();
   }
 
   async _indexRecord(batch, record) {
