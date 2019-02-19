@@ -153,6 +153,20 @@
                 "--workerCount=1",
                 "--jsonRpcURL=ws://localhost:8546"
             ]
-        }
+        },
+        {
+            "type": "node",
+            "request": "launch",
+            "name": "Launch Hub Node Tests",
+            "cwd": "${workspaceRoot}/packages/hub",
+            "runtimeExecutable": "yarn",
+            "console": "integratedTerminal",
+            "runtimeArgs": [
+              "node-tests", "--timeout=10000"
+            ],
+            "env": {
+              "HUB_ENVIRONMENT": "test"
+            },
+        },
     ]
 }
