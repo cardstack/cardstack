@@ -97,7 +97,6 @@ class Indexers extends EventEmitter {
     // Note that we dont want singletonKey, its inefficient due to the sophisticated invalidation we are using,
     // also we dont want to use singletoneNextSlot, since all the indexing calls are important (as they can have different hints, and we dont want to collapse jobs)
 
-    //TODO: i dont really see what `dontWaitForJob` buys us. remove this after debugging from this commit's newly added debug messages...
     if (dontWaitForJob) {
       await this.jobQueue.publish('hub/indexers/update',
         { forceRefresh, hints },
