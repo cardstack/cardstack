@@ -1,6 +1,6 @@
 {
   "name": "@cardstack/data",
-  "version": "0.13.37",
+  "version": "0.13.39",
   "description": "Data support for Cardstack cards",
   "keywords": [
     "ember-addon",
@@ -20,17 +20,17 @@
     "test": "ember try:each"
   },
   "dependencies": {
-    "@cardstack/models": "0.13.37",
-    "@cardstack/plugin-utils": "0.13.37",
+    "@cardstack/models": "0.13.39",
+    "@cardstack/plugin-utils": "0.13.39",
     "ember-cli-babel": "^6.16.0",
     "ember-concurrency": "^0.8.17",
     "ember-inflector": "^2.1.0"
   },
   "devDependencies": {
-    "@cardstack/ephemeral": "0.13.37",
-    "@cardstack/eslint-config": "0.13.37",
-    "@cardstack/jsonapi": "0.13.37",
-    "@cardstack/test-support": "0.13.37",
+    "@cardstack/ephemeral": "0.13.39",
+    "@cardstack/eslint-config": "0.13.39",
+    "@cardstack/jsonapi": "0.13.39",
+    "@cardstack/test-support": "0.13.39",
     "@ember/optional-features": "^0.6.3",
     "broccoli-asset-rev": "^2.7.0",
     "ember-ajax": "^3.1.0",
