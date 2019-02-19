@@ -139,6 +139,10 @@ module.exports = class EthereumClient {
       log.error(`Encountered error trying to get transactionReciept for txn ${txnHash}: ${err}`);
       await this._reconnect();
     }
+    if (!result) {
+      log.error(`Missing transaction receipt for transactionReciept for txn ${txnHash}, reconnecting to geth`);
+      await this._reconnect();
+    }
     return result;
   }
 
