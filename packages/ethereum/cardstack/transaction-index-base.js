@@ -120,7 +120,7 @@ module.exports = class TransactionIndexBase extends EventEmitter {
           receipt = await this.ethereumClient.getTransactionReceipt(transaction.hash);
           if (!receipt) {
             log.error(`${workerAttribution}Error, no transaction receipt exists for txn hash ${transaction.hash}, trying again (retries: ${receiptRetries})`);
-            sleep(5000);
+            await sleep(5000);
           } else if (receipt && receiptRetries) {
             log.info(`${workerAttribution}successfully retrieved receipt for txn hash ${transaction.hash} after ${receiptRetries} retries.`);
           }
