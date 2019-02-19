@@ -1,24 +1,21 @@
-const { Pool, Client } = require('pg');
+const { Client, Pool } = require('pg');
 const migrate = require('node-pg-migrate').default;
 const { join } = require('path');
 const postgresConfig = require('@cardstack/plugin-utils/postgres-config');
 const log = require('@cardstack/logger')('cardstack/ethereum/transaction-index');
-const EthereumClient = require('./client');
 const EventEmitter = require('events');
-const Queue = require('@cardstack/queue');
 const { upsert, queryToSQL, param } = require('@cardstack/pgsearch/util');
 const { promisify } = require('util');
 const sleep = promisify(setTimeout);
 
 const config = postgresConfig({ database: `ethereum_index` });
-const pgbossConfig = postgresConfig({ database: `pgboss_${process.env.HUB_ENVIRONMENT}` });
 const defaultProgressFrequency = 100;
 
 // Note that this class intentionally does not use DI, as we're trying to keep this module as thin
 // as possible since it is run in a heavily parallelized fashion. DI can be used in child classes
 // that extend this class that are not leveraged for the index building workers
 module.exports = class TransactionIndexBase extends EventEmitter {
-  constructor(jsonRpcUrl) {
+  constructor() {
     super();
 
     this.pool = new Pool({
@@ -31,12 +28,6 @@ module.exports = class TransactionIndexBase extends EventEmitter {
 
     this._migrateDbPromise = null;
     this._didEnsureDatabaseSetup = false;
-    this.jobQueue = new Queue(pgbossConfig);
-
-    if (jsonRpcUrl) {
-      this.ethereumClient = EthereumClient.create();
-      this.ethereumClient.connect(jsonRpcUrl);
-    }
   }
 
   async ensureDatabaseSetup() {
