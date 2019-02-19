@@ -97,7 +97,7 @@ module.exports = class TransactionIndexBase extends EventEmitter {
       do {
         block = await this.ethereumClient.getBlock(currentBlockNumber);
         if (!block) {
-          log.error(`${workerAttribution}Error, unable to retrieve block #${currentBlockNumber}, trying again (retries: ${blockRetries})`);
+          log.warning(`${workerAttribution}Warning, unable to retrieve block #${currentBlockNumber}, trying again (retries: ${blockRetries})`);
           await sleep(5000);
         } else if (block && blockRetries) {
           log.info(`${workerAttribution}successfully retrieved block #${currentBlockNumber} after ${blockRetries} retries.`);
@@ -119,7 +119,7 @@ module.exports = class TransactionIndexBase extends EventEmitter {
         do {
           receipt = await this.ethereumClient.getTransactionReceipt(transaction.hash);
           if (!receipt) {
-            log.error(`${workerAttribution}Error, no transaction receipt exists for txn hash ${transaction.hash}, trying again (retries: ${receiptRetries})`);
+            log.warning(`${workerAttribution}Warning, no transaction receipt exists for txn hash ${transaction.hash}, trying again (retries: ${receiptRetries})`);
             await sleep(5000);
           } else if (receipt && receiptRetries) {
             log.info(`${workerAttribution}successfully retrieved receipt for txn hash ${transaction.hash} after ${receiptRetries} retries.`);
