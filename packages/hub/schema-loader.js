@@ -6,7 +6,7 @@ const ContentType = require('./schema/content-type');
 const DataSource = require('./schema/data-source');
 const Grant = require('./schema/grant');
 const Group = require('./schema/group');
-const logger = require('@cardstack/logger');
+const log = require('@cardstack/logger')('cardstack/schema');
 const {
   declareInjections,
   getOwner
@@ -34,9 +34,10 @@ class SchemaLoader {
   }
 
   async loadFrom(inputModels) {
+    log.debug(`SchemaLoader.loadFrom inputModules=${JSON.stringify(inputModels)}`);
     let models = inputModels;
     let plugins = await this.pluginLoader.configuredPlugins(models.filter(model => model.type === 'plugin-configs'));
-    let schemaLog = logger('cardstack/schema');
+    log.debug(`SchemaLoader.loadFrom() discovered ${plugins.length} plugins`);
     let defaultValues = findDefaultValues(models);
     let grants = findGrants(models);
     let fields = findFields(models, plugins, grants, defaultValues);
@@ -45,10 +46,11 @@ class SchemaLoader {
     let constraints = await findConstraints(models, plugins, fields);
     let dataSources = findDataSources(models, plugins, this.projectPath);
     let defaultDataSource = findDefaultDataSource(plugins);
-    schemaLog.trace('default data source %j', defaultDataSource);
+    log.trace('default data source %j', defaultDataSource);
     let groups = findGroups(models, fields);
     let types = findTypes(models, fields, computedFields, constraints, dataSources, defaultDataSource, grants, groups);
     validateRelatedTypes(types, fields);
+    log.debug(`SchemaLoader.loadFrom completed loading schema`);
 
     return getOwner(this).factoryFor('hub:schema').create({ types, fields, computedFields, dataSources, inputModels, plugins, grants });
   }
