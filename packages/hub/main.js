@@ -58,7 +58,9 @@ async function wireItUp(projectDir, encryptionKeys, dataSources, opts = {}) {
 
 async function startIndexing(environment, container) {
   // some datasources are dependent upon a sync at boot for index of pristine system
-  await container.lookup('hub:indexers').update();
+  await container.lookup('hub:indexers').update({
+    dontWaitForJob: environment === 'production'
+  });
 
   let ephemeralStorage = await container.lookup(`plugin-services:${require.resolve('@cardstack/ephemeral/service')}`);
   if (environment !== 'production' && ephemeralStorage) {
@@ -84,7 +86,7 @@ async function startIndexing(environment, container) {
     }
   }
 
-  setInterval(() => container.lookup('hub:indexers').update(), 600000);
+  setInterval(() => container.lookup('hub:indexers').update({ dontWaitForJob: true }), 600000);
 }
 
 async function loadSeeds(container, seedModels, opts) {

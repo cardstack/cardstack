@@ -92,14 +92,21 @@ class Indexers extends EventEmitter {
     }
   }
 
-  async update({ forceRefresh, hints } = {}) {
+  async update({ forceRefresh, hints, dontWaitForJob } = {}) {
     await this._setupWorkers();
     // Note that we dont want singletonKey, its inefficient due to the sophisticated invalidation we are using,
     // also we dont want to use singletoneNextSlot, since all the indexing calls are important (as they can have different hints, and we dont want to collapse jobs)
-    await this.jobQueue.publishAndWait('hub/indexers/update',
-      { forceRefresh, hints },
-      { singletonKey: 'hub/indexers/update', singletonNextSlot: true, expireIn: '2 hours' }
-    );
+    if (dontWaitForJob) {
+      await this.jobQueue.publish('hub/indexers/update',
+        { forceRefresh, hints },
+        { singletonKey: 'hub/indexers/update', singletonNextSlot: true, expireIn: '2 hours' }
+      );
+    } else {
+      await this.jobQueue.publishAndWait('hub/indexers/update',
+        { forceRefresh, hints },
+        { singletonKey: 'hub/indexers/update', singletonNextSlot: true, expireIn: '2 hours' }
+      );
+    }
   }
 
   async _setupWorkers() {
