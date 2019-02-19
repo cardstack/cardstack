@@ -10,6 +10,7 @@ const sleep = promisify(setTimeout);
 
 const config = postgresConfig({ database: `ethereum_index` });
 const defaultProgressFrequency = 100;
+const maxTransactionReceiptRetries = 100;
 
 // Note that this class intentionally does not use DI, as we're trying to keep this module as thin
 // as possible since it is run in a heavily parallelized fashion. DI can be used in child classes
@@ -120,7 +121,11 @@ module.exports = class TransactionIndexBase extends EventEmitter {
             log.info(`${workerAttribution}successfully retrieved receipt for txn hash ${transaction.hash} after ${receiptRetries} retries.`);
           }
           receiptRetries++;
-        } while (!receipt);
+        } while (!receipt || receiptRetries <= maxTransactionReceiptRetries);
+
+        if (!receipt) {
+          throw new Error(`Cannot retrieve transaction receipt for transaction hash ${transaction.hash} from the geth node. This is indicative of using a geth node that is not using '--syncmode "full"'. Make sure that your geth node is a full node.`);
+        }
 
         let status = typeof receipt.status === 'boolean' ? receipt.status : Boolean(parseInt(receipt.status, 16));
 
