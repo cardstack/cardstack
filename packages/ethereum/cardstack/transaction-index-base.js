@@ -53,7 +53,6 @@ module.exports = class TransactionIndexBase extends EventEmitter {
     });
     await this.jobQueue.publishAndWait('ethereum/transaction-index/migrate-db', {}, {
       singletonKey: 'ethereum/transaction-index/migrate-db',
-      singletonNextSlot: true
     });
   }
 
