@@ -96,6 +96,8 @@ class Indexers extends EventEmitter {
     await this._setupWorkers();
     // Note that we dont want singletonKey, its inefficient due to the sophisticated invalidation we are using,
     // also we dont want to use singletoneNextSlot, since all the indexing calls are important (as they can have different hints, and we dont want to collapse jobs)
+
+    //TODO: i dont really see what `dontWaitForJob` buys us. remove this after debugging from this commit's newly added debug messages...
     if (dontWaitForJob) {
       await this.jobQueue.publish('hub/indexers/update',
         { forceRefresh, hints },
@@ -121,7 +123,9 @@ class Indexers extends EventEmitter {
   async _seedSchema() {
     if (!this._dataSourcesMemo) {
       let types = this.schemaLoader.ownTypes();
+      log.debug(`Indexers._seedSchema starting seed schema load`);
       this._dataSourcesMemo = await this.schemaLoader.loadFrom(bootstrapSchema.concat(this.dataSources.filter(model => types.includes(model.type))));
+      log.debug(`Indexers._seedSchema completed loading seed schema`);
     }
     return this._dataSourcesMemo;
   }

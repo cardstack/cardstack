@@ -37,6 +37,7 @@ module.exports = class RunningIndexers {
     let newDataSources = [...this.seedSchema.dataSources.values()]
         .map(this._sawDataSource.bind(this));
 
+    log.debug(`RunningIndexers._loadSchemaModels() found ${newDataSources.length} newDataSources`);
     while (newDataSources.length > 0) {
       let newSchemaModels = await this._activateDataSources(newDataSources);
       newDataSources = newSchemaModels.map(model => {
@@ -95,6 +96,7 @@ module.exports = class RunningIndexers {
   }
 
   async update(forceRefresh, hints) {
+    log.debug('starting RunningIndexers.update()');
     await this._loadSchemaModels();
 
     await Promise.all(Object.values(this.branches).map(branch => branch.update(forceRefresh, hints)));
@@ -106,7 +108,7 @@ module.exports = class RunningIndexers {
         { data: {id: branch, type: 'branches', attributes: {}}},
       );
     }));
-    
+
     return await this._schemas();
   }
 
