@@ -81,7 +81,10 @@ describe('permissions', function() {
     allReadable();
     let response = await searchers.get(env.session, 'master', 'permissions', `articles/improve-chess`);
     expect(response).is.ok;
+
     let { data } = response;
+    let writableFields = data.relationships['writable-fields'].data.map(field => field.id);
+    expect(writableFields).to.deep.equal(['title', 'coolness', 'reviewed', 'misc', 'author', 'type', 'id']);
     expect(data.type).to.equal('permissions');
     expect(data.id).to.equal('articles/improve-chess');
   });
