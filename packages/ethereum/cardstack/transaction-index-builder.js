@@ -13,4 +13,14 @@ module.exports = class TransactionIndexBuilder extends TransactionIndexBase {
     this.ethereumClient = EthereumClient.create();
     this.ethereumClient.connect(jsonRpcUrl);
   }
+
+  async _setupMigrate() {
+    await this.jobQueue.subscribe("ethereum/transaction-index/migrate-db", async () => {
+      await this._migrateDb();
+    });
+    await this.jobQueue.publishAndWait('ethereum/transaction-index/migrate-db', {}, {
+      singletonKey: 'ethereum/transaction-index/migrate-db',
+      singletonMinutes: 10
+    });
+  }
 };

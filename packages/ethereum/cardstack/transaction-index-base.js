@@ -48,12 +48,7 @@ module.exports = class TransactionIndexBase extends EventEmitter {
   }
 
   async _setupMigrate() {
-    await this.jobQueue.subscribe("ethereum/transaction-index/migrate-db", async () => {
-      await this._migrateDb();
-    });
-    await this.jobQueue.publishAndWait('ethereum/transaction-index/migrate-db', {}, {
-      singletonKey: 'ethereum/transaction-index/migrate-db',
-    });
+    throw new Error(`Please implement this method, '_setupMigrate()' in the TransactionIndexBase child class`);
   }
 
   async _migrateDb() {

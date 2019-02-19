@@ -42,6 +42,15 @@ class TransactionIndex extends TransactionIndexBase {
     this._blockHeight = 0;
   }
 
+  async _setupMigrate() {
+    await this.jobQueue.subscribe("ethereum/transaction-index/migrate-db", async () => {
+      await this._migrateDb();
+    });
+    await this.jobQueue.publishAndWait('ethereum/transaction-index/migrate-db', {}, {
+      singletonKey: 'ethereum/transaction-index/migrate-db',
+    });
+  }
+
   get blockHeight() {
     return this._blockHeight;
   }
