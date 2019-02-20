@@ -85,14 +85,14 @@ module.exports = class TransactionIndexBase extends EventEmitter {
     let endHeight = toBlockHeight === 'latest' ? await this.ethereumClient.getBlockHeight() : toBlockHeight;
     let currentBlockNumber = fromBlockHeight;
     let workerAttribution = jobName ? `Worker ${jobName} - ` : '';
-    let totalNumBlocks = endHeight - fromBlockHeight;
+    let totalNumBlocks = Math.max(endHeight - fromBlockHeight, 1);
     while (currentBlockNumber <= endHeight) {
       let block;
       let blockRetries = 0;
       do {
         block = await this.ethereumClient.getBlock(currentBlockNumber);
         if (!block) {
-          log.warn(`${workerAttribution}Warning, unable to retrieve block #${currentBlockNumber}, trying again (retries: ${blockRetries})`);
+          log.warn(`${workerAttribution}Warning, unable to retrieve block #${currentBlockNumber}, trying again (retries: ${blockRetries + 1})`);
           await sleep(5000);
         } else if (block && blockRetries) {
           log.info(`${workerAttribution}successfully retrieved block #${currentBlockNumber} after ${blockRetries} retries.`);
@@ -114,7 +114,7 @@ module.exports = class TransactionIndexBase extends EventEmitter {
         do {
           receipt = await this.ethereumClient.getTransactionReceipt(transaction.hash);
           if (!receipt) {
-            log.warn(`${workerAttribution}Warning, no transaction receipt exists for txn hash ${transaction.hash}, trying again (retries: ${receiptRetries})`);
+            log.warn(`${workerAttribution}Warning, no transaction receipt exists for txn hash ${transaction.hash}, trying again (retries: ${receiptRetries + 1})`);
             await sleep(5000);
           } else if (receipt && receiptRetries) {
             log.info(`${workerAttribution}successfully retrieved receipt for txn hash ${transaction.hash} after ${receiptRetries} retries.`);

@@ -86,7 +86,7 @@ class TransactionIndex extends TransactionIndexBase {
     }
     query += ` order by block_number, transaction_index`;
 
-    log.debug(`getting transactions for address '${address}' since block '${sinceBlockNumber || 0}' to block '${toBlockNumber || 'latest'}' with sql: ${query}`);
+    log.trace(`getting transactions for address '${address}' since block '${sinceBlockNumber || 0}' to block '${toBlockNumber || 'latest'}' with sql: ${query}`);
     let start = Date.now();
     let { rows } = await this.query(query);
     log.debug(`transaction query for address '${address}' since block '${sinceBlockNumber || 0}' to block '${toBlockNumber || 'latest'}' returned ${rows.length} transactions in ${Date.now() - start}ms`);
