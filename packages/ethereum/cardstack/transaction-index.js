@@ -48,6 +48,7 @@ class TransactionIndex extends TransactionIndexBase {
     });
     await this.jobQueue.publishAndWait('ethereum/transaction-index/migrate-db', {}, {
       singletonKey: 'ethereum/transaction-index/migrate-db',
+      singletonNextSlot: true
     });
   }
 
