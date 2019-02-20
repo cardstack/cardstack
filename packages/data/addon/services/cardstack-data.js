@@ -108,6 +108,9 @@ export default Service.extend({
     let response = await fetch(url, {
       headers: this._headers()
     });
+    if (response.status !== 200) {
+      return;
+    }
     let { data } = await response.json();
     let { attributes, relationships } = data;
     return {
