@@ -7,13 +7,7 @@ const spawn = require('child_process').spawn;
 function testPackage(pkg) {
   return new Promise((res, reject) => {
     let truffleBin = './node_modules/.bin/truffle';
-    let proc = spawn(process.execPath, [truffleBin, 'test'], {
-      stdio: ['ignore', process.stdout, process.stderr],
-      cwd: pkg,
-      env: {
-        HUB_ENVIRONMENT: 'test'
-      }
-    });
+    let proc = spawn(process.execPath, [truffleBin, 'test'], { stdio: ['ignore', process.stdout, process.stderr], cwd: pkg });
     proc.on('exit', function (code, signal) {
       if (signal) {
         process.kill(process.pid, signal);
