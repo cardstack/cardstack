@@ -10,7 +10,7 @@ const sleep = promisify(setTimeout);
 
 const config = postgresConfig({ database: `ethereum_index` });
 const defaultProgressFrequency = 100;
-const maxTransactionReceiptRetries = 100;
+const maxTransactionReceiptRetries = 500;
 
 // Note that this class intentionally does not use DI, as we're trying to keep this module as thin
 // as possible since it is run in a heavily parallelized fashion. DI can be used in child classes
@@ -124,10 +124,14 @@ module.exports = class TransactionIndexBase extends EventEmitter {
         } while (!receipt || receiptRetries <= maxTransactionReceiptRetries);
 
         if (!receipt) {
-          throw new Error(`Cannot retrieve transaction receipt for transaction hash ${transaction.hash} from the geth node. This is indicative of using a geth node that is not using '--syncmode "full"'. Make sure that your geth node is a full node.`);
+          log.error(`Error: Cannot retrieve transaction receipt for transaction hash ${transaction.hash} from the geth node. This is indicative of using a geth node that is not using '--syncmode "full"'. Make sure that your geth node is a full node.`);
+          // This looks like a legit situation. I ran into this on rinkeby where a block returned a transaction that did not exist.
+          // The txn hash this happend for was 0xdd35b57bcdacf1b0052190e085558d598c09b84764e46ba3502db22b3de1393b from infura, i'm unsure which block this came from though.
+          // I think the best way to deal with this is to consider these transactions as failed transactions.
+          receipt = {};
         }
 
-        let status = typeof receipt.status === 'boolean' ? receipt.status : Boolean(parseInt(receipt.status, 16));
+        let status = typeof receipt.status === 'boolean' ? receipt.status : Boolean(parseInt(receipt.status || 0, 16));
 
         await this.query(queryToSQL(upsert('transactions', 'transactions_pkey', {
           transaction_hash:       param(transaction.hash),
