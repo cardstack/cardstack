@@ -121,7 +121,7 @@ module.exports = class TransactionIndexBase extends EventEmitter {
             log.info(`${workerAttribution}successfully retrieved receipt for txn hash ${transaction.hash} after ${receiptRetries} retries.`);
           }
           receiptRetries++;
-        } while (!receipt || receiptRetries <= maxTransactionReceiptRetries);
+        } while (!receipt && receiptRetries <= maxTransactionReceiptRetries);
 
         if (!receipt) {
           log.error(`Error: Cannot retrieve transaction receipt for transaction hash ${transaction.hash} from the geth node. This is indicative of using a geth node that is not using '--syncmode "full"'. Make sure that your geth node is a full node.`);
