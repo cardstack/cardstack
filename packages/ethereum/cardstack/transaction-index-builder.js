@@ -10,8 +10,10 @@ module.exports = class TransactionIndexBuilder extends TransactionIndexBase {
 
     this.jobQueue = new Queue(pgbossConfig);
 
-    this.ethereumClient = EthereumClient.create();
-    this.ethereumClient.connect(jsonRpcUrl);
+    if (jsonRpcUrl) {
+      this.ethereumClient = EthereumClient.create();
+      this.ethereumClient.connect(jsonRpcUrl);
+    }
   }
 
   async _setupMigrate() {
