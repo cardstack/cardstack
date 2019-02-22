@@ -588,9 +588,10 @@
     lodash "^4.17.10"
     to-fast-properties "^2.0.0"
 
-"@cardstack/gitchain@0.1.0":
-  version "0.1.0"
-  resolved "https://registry.yarnpkg.com/@cardstack/gitchain/-/gitchain-0.1.0.tgz#7fedec2353dc8c15f8e3e209c4d3fb3ab48d53d9"
+"@cardstack/gitchain@0.1.1":
+  version "0.1.1"
+  resolved "https://registry.yarnpkg.com/@cardstack/gitchain/-/gitchain-0.1.1.tgz#1144747c17627736bfe0741e44dcad7ad6be16f1"
+  integrity sha512-UAvxjUhBQJsUoBPk7WKRZvhotn0iDFhGDqC3Ur1R5gE1HOlcDSc1S9nDd5cxWq51BB4HDqhBRtctOnqbpn9Yrw==
   dependencies:
     await-delay "^1.0.0"
     aws-sdk "^2.364.0"
