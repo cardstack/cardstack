@@ -1,6 +1,6 @@
 {
   "name": "@cardstack/git",
-  "version": "0.13.39",
+  "version": "0.13.45",
   "description": "Git data source plugin for @cardstack/hub.",
   "keywords": [
     "cardstack-plugin",
