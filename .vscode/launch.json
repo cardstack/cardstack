@@ -147,11 +147,10 @@
               "HUB_ENVIRONMENT": "development"
             },
             "args": [
-                "--start=3782500",
-                "--end=3782600",
+                "--start=3926000",
                 "--progressFrequency=10",
                 "--workerCount=1",
-                "--jsonRpcURL=ws://localhost:8546"
+                "--jsonRpcUrl=ws://localhost:8546"
             ]
         }
     ]

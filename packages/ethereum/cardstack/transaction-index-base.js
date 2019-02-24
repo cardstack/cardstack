@@ -11,6 +11,7 @@ const sleep = promisify(setTimeout);
 const config = postgresConfig({ database: `ethereum_index` });
 const defaultProgressFrequency = 100;
 const maxTransactionReceiptRetries = 500;
+const maxBlockRetries = 500;
 
 // Note that this class intentionally does not use DI, as we're trying to keep this module as thin
 // as possible since it is run in a heavily parallelized fashion. DI can be used in child classes
@@ -46,6 +47,18 @@ module.exports = class TransactionIndexBase extends EventEmitter {
     }
 
     this._didEnsureDatabaseSetup = true;
+  }
+
+  get currentJsonRpcUrl() {
+    throw new Error(`Please implement this method, 'currentJsonRpcUrl()' in the TransactionIndexBase child class`);
+  }
+
+  get canFailoverEthereumClient() {
+    throw new Error(`Please implement this method, 'canFailoverEthereumClient()' in the TransactionIndexBase child class`);
+  }
+
+  async _failoverEthereumClient() {
+    throw new Error(`Please implement this method, '_failoverEthereumClient()' in the TransactionIndexBase child class`);
   }
 
   async _setupMigrate() {
@@ -89,16 +102,27 @@ module.exports = class TransactionIndexBase extends EventEmitter {
     let totalNumBlocks = Math.max(endHeight - fromBlockHeight, 1);
     while (currentBlockNumber <= endHeight) {
       let block;
-      let blockRetries = 0;
       do {
-        block = await this.ethereumClient.getBlock(currentBlockNumber);
-        if (!block) {
-          log.warn(`${workerAttribution}Warning, unable to retrieve block #${currentBlockNumber}, trying again (retries: ${blockRetries + 1})`);
-          await sleep(5000);
-        } else if (block && blockRetries) {
-          log.info(`${workerAttribution}successfully retrieved block #${currentBlockNumber} after ${blockRetries} retries.`);
+        let blockRetries = 0;
+        do {
+          block = await this.ethereumClient.getBlock(currentBlockNumber);
+          if (!block) {
+            log.warn(`${workerAttribution}Warning, unable to retrieve block #${currentBlockNumber}, trying again (retries: ${blockRetries + 1})`);
+            await sleep(5000);
+          } else if (block && blockRetries) {
+            log.info(`${workerAttribution}successfully retrieved block #${currentBlockNumber} after ${blockRetries} retries.`);
+          }
+          blockRetries++;
         }
-        blockRetries++;
+        while (!block && blockRetries <= maxBlockRetries);
+
+        if (!block) {
+          if (this.canFailoverEthereumClient) {
+            await this._failoverEthereumClient();
+          } else {
+            throw new Error(`Cannot download block ${currentBlockNumber} from geth`);
+          }
+        }
       }
       while (!block);
 
@@ -109,27 +133,33 @@ module.exports = class TransactionIndexBase extends EventEmitter {
       }
       log.debug(`${workerAttribution}Processing block #${block.number}, contains ${block.transactions.length} transactions`);
       for (let transaction of block.transactions) {
-        log.trace(`  - ${workerAttribution}processing transaction #${transaction.transactionIndex}`);
         let receipt;
-        let receiptRetries = 0;
         do {
-          receipt = await this.ethereumClient.getTransactionReceipt(transaction.hash);
-          if (!receipt) {
-            log.warn(`${workerAttribution}Warning, no transaction receipt exists for txn hash ${transaction.hash}, trying again (retries: ${receiptRetries + 1})`);
-            await sleep(5000);
-          } else if (receipt && receiptRetries) {
-            log.info(`${workerAttribution}successfully retrieved receipt for txn hash ${transaction.hash} after ${receiptRetries} retries.`);
-          }
-          receiptRetries++;
-        } while (!receipt && receiptRetries <= maxTransactionReceiptRetries);
+          log.trace(`  - ${workerAttribution}processing transaction #${transaction.transactionIndex}`);
+          let receiptRetries = 0;
+          do {
+            receipt = await this.ethereumClient.getTransactionReceipt(transaction.hash);
+            if (!receipt) {
+              log.warn(`${workerAttribution}Warning, no transaction receipt exists for txn hash ${transaction.hash}, trying again (retries: ${receiptRetries + 1})`);
+              await sleep(5000);
+            } else if (receipt && receiptRetries) {
+              log.info(`${workerAttribution}successfully retrieved receipt for txn hash ${transaction.hash} after ${receiptRetries} retries.`);
+            }
+            receiptRetries++;
+          } while (!receipt && receiptRetries <= maxTransactionReceiptRetries);
 
-        if (!receipt) {
-          log.error(`Error: Cannot retrieve transaction receipt for transaction hash ${transaction.hash} from the geth node. This is indicative of using a geth node that is not using '--syncmode "full"'. Make sure that your geth node is a full node.`);
-          // This looks like a legit situation. I ran into this on rinkeby where a block returned a transaction that did not exist.
-          // The txn hash this happend for was 0xdd35b57bcdacf1b0052190e085558d598c09b84764e46ba3502db22b3de1393b from infura, i'm unsure which block this came from though.
-          // I think the best way to deal with this is to consider these transactions as failed transactions.
-          receipt = {};
-        }
+          if (!receipt) {
+            log.error(`Error: Cannot retrieve transaction receipt for transaction hash ${transaction.hash} at block #${block.number} from the geth node. This can be indicative of using a geth node that is not using '--syncmode "full"'. Make sure that your geth node is a full node.`);
+            if (this.canFailoverEthereumClient) {
+              await this._failoverEthereumClient();
+            } else {
+              // This looks like a legit situation. I ran into this on rinkeby where a block returned a transaction that did not exist.
+              // The txn hash this happend for was 0xdd35b57bcdacf1b0052190e085558d598c09b84764e46ba3502db22b3de1393b from infura, i'm unsure which block this came from though.
+              // I think the best way to deal with this is to consider these transactions as failed transactions.
+              receipt = {};
+            }
+          }
+        } while (!receipt);
 
         let status = typeof receipt.status === 'boolean' ? receipt.status : Boolean(parseInt(receipt.status || 0, 16));
 

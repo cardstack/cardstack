@@ -142,7 +142,7 @@ contract('ethereum-addresses indexing', function (_accounts) {
           .withAttributes({
             'source-type': '@cardstack/ethereum',
             params: {
-              jsonRpcUrl: "ws://localhost:7545",
+              jsonRpcUrls: [ "ws://localhost:7545" ],
               addressIndexing: {
                 trackedAddressContentType: 'tracked-ethereum-addresses',
                 trackedAddressField: 'id',
@@ -768,7 +768,7 @@ contract('ethereum-addresses indexing', function (_accounts) {
           .withAttributes({
             'source-type': '@cardstack/ethereum',
             params: {
-              jsonRpcUrl: "ws://localhost:7545",
+              jsonRpcUrls: [ "ws://localhost:7545" ],
               addressIndexing: {
                 trackedAddressContentType: 'tracked-ethereum-addresses',
                 trackedAddressField: 'tracked-addresses',

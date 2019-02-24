@@ -20,12 +20,12 @@ module.exports = declareInjections({
   class EthereumIndexer {
 
     static create(...args) {
-      let [{ ethereumClient, jsonRpcUrl }] = args;
-      ethereumClient.connect(jsonRpcUrl);
+      let [{ ethereumClient, jsonRpcUrls }] = args;
+      ethereumClient.connect(jsonRpcUrls[0]);
       return new this(...args);
     }
 
-    constructor({ ethereumClient, dataSource, jsonRpcUrl, controllingBranch, contract, addressIndexing, patch, searchers, eventIndexer, transactionIndexer }) {
+    constructor({ ethereumClient, dataSource, jsonRpcUrls, controllingBranch, contract, addressIndexing, patch, searchers, eventIndexer, transactionIndexer }) {
       this.dataSourceId = dataSource.id;
       this.contract = contract;
       this.addressIndexing = addressIndexing;
@@ -34,7 +34,7 @@ module.exports = declareInjections({
       this.transactionIndexer = transactionIndexer;
       this.controllingBranch = controllingBranch;
       this.patch = patch || Object.create(null);
-      this._jsonRpcUrl = jsonRpcUrl;
+      this.jsonRpcUrls = jsonRpcUrls;
       this.ethereumClient = ethereumClient;
     }
 
@@ -53,7 +53,7 @@ module.exports = declareInjections({
       }
 
       if (this.addressIndexing) {
-        await this.transactionIndexer.start(this.addressIndexing, this.ethereumClient);
+        await this.transactionIndexer.start(this.addressIndexing, this.ethereumClient, this.jsonRpcUrls);
       }
 
       log.debug(`ending beginUpdate()`);

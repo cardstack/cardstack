@@ -16,6 +16,10 @@ module.exports = class TransactionIndexBuilder extends TransactionIndexBase {
     }
   }
 
+  get canFailoverEthereumClient() {
+    return false;
+  }
+
   async _setupMigrate() {
     await this.jobQueue.subscribe("ethereum/transaction-index/migrate-db", async () => {
       await this._migrateDb();
