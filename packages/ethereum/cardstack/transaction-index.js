@@ -64,6 +64,10 @@ class TransactionIndex extends TransactionIndexBase {
     return true;
   }
 
+  get numFailoverClients() {
+    return this.jsonRpcUrls.length;
+  }
+
   async _failoverEthereumClient() {
     log.warn(`Failing over ethereum client ${this.currentJsonRpcUrl}`);
 

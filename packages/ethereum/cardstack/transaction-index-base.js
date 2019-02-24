@@ -57,6 +57,10 @@ module.exports = class TransactionIndexBase extends EventEmitter {
     throw new Error(`Please implement this method, 'canFailoverEthereumClient()' in the TransactionIndexBase child class`);
   }
 
+  get numFailoverClients() {
+    throw new Error(`Please implement this method, 'numFailoverClients()' in the TransactionIndexBase child class`);
+  }
+
   async _failoverEthereumClient() {
     throw new Error(`Please implement this method, '_failoverEthereumClient()' in the TransactionIndexBase child class`);
   }
@@ -103,6 +107,7 @@ module.exports = class TransactionIndexBase extends EventEmitter {
     while (currentBlockNumber <= endHeight) {
       let block;
       do {
+        let failoverCount = 0;
         let blockRetries = 0;
         do {
           block = await this.ethereumClient.getBlock(currentBlockNumber);
@@ -117,8 +122,9 @@ module.exports = class TransactionIndexBase extends EventEmitter {
         while (!block && blockRetries <= maxBlockRetries);
 
         if (!block) {
-          if (this.canFailoverEthereumClient) {
+          if (this.canFailoverEthereumClient && failoverCount < this.numFailoverClients) {
             await this._failoverEthereumClient();
+            failoverCount++;
           } else {
             throw new Error(`Cannot download block ${currentBlockNumber} from geth`);
           }
@@ -134,6 +140,7 @@ module.exports = class TransactionIndexBase extends EventEmitter {
       log.debug(`${workerAttribution}Processing block #${block.number}, contains ${block.transactions.length} transactions`);
       for (let transaction of block.transactions) {
         let receipt;
+        let failoverCount = 0;
         do {
           log.trace(`  - ${workerAttribution}processing transaction #${transaction.transactionIndex}`);
           let receiptRetries = 0;
@@ -150,8 +157,9 @@ module.exports = class TransactionIndexBase extends EventEmitter {
 
           if (!receipt) {
             log.error(`Error: Cannot retrieve transaction receipt for transaction hash ${transaction.hash} at block #${block.number} from the geth node. This can be indicative of using a geth node that is not using '--syncmode "full"'. Make sure that your geth node is a full node.`);
-            if (this.canFailoverEthereumClient) {
+            if (this.canFailoverEthereumClient && failoverCount < this.numFailoverClients) {
               await this._failoverEthereumClient();
+              failoverCount++;
             } else {
               // This looks like a legit situation. I ran into this on rinkeby where a block returned a transaction that did not exist.
               // The txn hash this happend for was 0xdd35b57bcdacf1b0052190e085558d598c09b84764e46ba3502db22b3de1393b from infura, i'm unsure which block this came from though.
