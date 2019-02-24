@@ -122,7 +122,7 @@ module.exports = class TransactionIndexBase extends EventEmitter {
         while (!block && blockRetries <= maxBlockRetries);
 
         if (!block) {
-          if (this.canFailoverEthereumClient && failoverCount < this.numFailoverClients) {
+          if (this.canFailoverEthereumClient && failoverCount < this.numFailoverClients - 1) {
             await this._failoverEthereumClient();
             failoverCount++;
           } else {
@@ -157,7 +157,7 @@ module.exports = class TransactionIndexBase extends EventEmitter {
 
           if (!receipt) {
             log.error(`Error: Cannot retrieve transaction receipt for transaction hash ${transaction.hash} at block #${block.number} from the geth node. This can be indicative of using a geth node that is not using '--syncmode "full"'. Make sure that your geth node is a full node.`);
-            if (this.canFailoverEthereumClient && failoverCount < this.numFailoverClients) {
+            if (this.canFailoverEthereumClient && failoverCount < this.numFailoverClients - 1) {
               await this._failoverEthereumClient();
               failoverCount++;
             } else {
