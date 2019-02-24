@@ -41,7 +41,7 @@ class TransactionIndexer {
     this._startedPromise = new Promise(res => this._hasStartedCallBack = res);
   }
 
-  async start(addressIndexing, ethereumClient) {
+  async start(addressIndexing, ethereumClient, jsonRpcUrls) {
     log.debug(`starting transaction-indexer`);
 
     log.debug(`waiting for pgsearch client to start`);
@@ -52,7 +52,7 @@ class TransactionIndexer {
     await this._startTrackedAddressListening();
 
     this.ethereumClient = ethereumClient;
-    await this._ensureTransactionIndexStarted(ethereumClient);
+    await this._ensureTransactionIndexStarted(ethereumClient, jsonRpcUrls);
 
     this._hasStartedCallBack();
     log.debug(`completed transaction-indexer startup`);
@@ -68,19 +68,19 @@ class TransactionIndexer {
     return await this._indexingPromise;
   }
 
-  async _ensureTransactionIndexStarted(ethereumClient) {
+  async _ensureTransactionIndexStarted(ethereumClient, jsonRpcUrls) {
     if (this._transactionIndexHasStarted) { return; }
 
     if (!this._transactionIndexPromise) {
-      this._transactionIndexPromise = this._startTransactionIndex(ethereumClient);
+      this._transactionIndexPromise = this._startTransactionIndex(ethereumClient, jsonRpcUrls);
     }
     await this._transactionIndexPromise;
 
     this._transactionIndexHasStarted = true;
   }
 
-  async _startTransactionIndex(ethereumClient) {
-    await this.transactionIndex.start(ethereumClient);
+  async _startTransactionIndex(ethereumClient, jsonRpcUrls) {
+    await this.transactionIndex.start(ethereumClient, jsonRpcUrls);
     await this._startNewBlockListening();
   }
 

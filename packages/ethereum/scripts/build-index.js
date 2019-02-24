@@ -26,7 +26,7 @@ const usage = [{
   optionList: optionDefs
 }];
 
-const { start, end, workerCount, createDb, progressFrequency, jsonRpcUrl, help } = commandLineArgs(optionDefs);
+const { start, end, workerCount=10, createDb, progressFrequency, jsonRpcUrl, help } = commandLineArgs(optionDefs);
 if (!jsonRpcUrl && !createDb) {
   console.error("Missing JSON RPC URL specification.");
   console.log(getUsage(usage));

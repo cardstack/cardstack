@@ -78,7 +78,7 @@ contract('Token Indexing', function (accounts) {
           .withAttributes({
             'source-type': '@cardstack/ethereum',
             params: {
-              jsonRpcUrl: "ws://localhost:7545",
+              jsonRpcUrls: [ "ws://localhost:7545" ],
               contract: {
                 abi: token.abi,
                 address: token.address,
@@ -1603,7 +1603,7 @@ contract('Token Indexing', function (accounts) {
           .withAttributes({
             'source-type': '@cardstack/ethereum',
             params: {
-              jsonRpcUrl: "ws://localhost:7545",
+              jsonRpcUrls: [ "ws://localhost:7545" ],
               contract: {
                 abi: token.abi,
                 address: token.address,
@@ -1657,7 +1657,7 @@ contract('Token Indexing', function (accounts) {
           .withAttributes({
             'source-type': '@cardstack/ethereum',
             params: {
-              jsonRpcUrl: "ws://localhost:7545",
+              jsonRpcUrls: [ "ws://localhost:7545" ],
               contract: {
                 abi: token.abi,
                 address: token.address,
@@ -1799,7 +1799,7 @@ contract('Token Indexing', function (accounts) {
           .withAttributes({
             'source-type': '@cardstack/ethereum',
             params: {
-              jsonRpcUrl: "ws://localhost:7545",
+              jsonRpcUrls: [ "ws://localhost:7545" ],
               contract: {
                 abi: token.abi,
                 address: token.address,
@@ -1879,7 +1879,7 @@ contract('Token Indexing', function (accounts) {
           .withAttributes({
             'source-type': '@cardstack/ethereum',
             params: {
-              jsonRpcUrl: "ws://localhost:7545",
+              jsonRpcUrls: [ "ws://localhost:7545" ],
               contract: {
                 abi: token.abi,
                 address: token.address,

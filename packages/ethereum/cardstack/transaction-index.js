@@ -56,7 +56,38 @@ class TransactionIndex extends TransactionIndexBase {
     return this._blockHeight;
   }
 
-  async start(ethereumClient) {
+  get currentJsonRpcUrl() {
+    return this.jsonRpcUrls[this.urlIndex];
+  }
+
+  get canFailoverEthereumClient() {
+    return true;
+  }
+
+  get numFailoverClients() {
+    return this.jsonRpcUrls.length;
+  }
+
+  async _failoverEthereumClient() {
+    log.warn(`Failing over ethereum client ${this.currentJsonRpcUrl}`);
+
+    await this.ethereumClient.stopAll();
+    if (this.urlIndex > this.jsonRpcUrls.length - 1) {
+      this.urlIndex = 0;
+    } else {
+      this.urlIndex++;
+    }
+
+    this.ethereumClient.connect(this.currentJsonRpcUrl);
+    await this.ensureDatabaseSetup();
+    await this.ethereumClient.startNewBlockListening(this);
+
+    log.info(`Now using ethereum client ${this.currentJsonRpcUrl}`);
+  }
+
+  async start(ethereumClient, jsonRpcUrls) {
+    this.urlIndex = 0;
+    this.jsonRpcUrls = jsonRpcUrls;
     this.ethereumClient = ethereumClient;
 
     await this.ensureDatabaseSetup();

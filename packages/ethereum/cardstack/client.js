@@ -56,7 +56,6 @@ module.exports = class EthereumClient {
     await this.stopAll();
     await timeout(10 * 1000); // cool down period before we start issuing requests again
 
-    this._hasConnected = false;
     this._contracts = {};
     this._provider = null;
     this._eventListeners = {};
@@ -76,6 +75,7 @@ module.exports = class EthereumClient {
   }
 
   async stopAll() {
+    this._hasConnected = false;
     for (let name of Object.keys(this._eventListeners)) {
       await this.stop(name);
     }
