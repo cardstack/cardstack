@@ -122,13 +122,14 @@ export default Service.extend({
   },
 
   getCardMeta(card, attribute) {
+    let hasId = !!card.id;
     if (attribute === 'human-id') {
       let humanType = getType(card)
         .split('-')
-        .map((s) => capitalize(s))
+        .map((s) => hasId ? capitalize(s) : s)
         .join(' ');
-      return [`${humanType} `, card.id]
-        .join('#');
+
+      return card.id ? [`${humanType} `, card.id].join('#') : `New ${humanType}`;
     }
     if (attribute === 'uid') {
       return `${getType(card)}/${card.id}`;
