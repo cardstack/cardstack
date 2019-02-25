@@ -114,8 +114,8 @@ module.exports = class TransactionIndexBase extends EventEmitter {
           if (!block) {
             log.warn(`${workerAttribution}Warning, unable to retrieve block #${currentBlockNumber}, trying again (retries: ${blockRetries + 1})`);
             await sleep(5000);
-          } else if (block && blockRetries) {
-            log.info(`${workerAttribution}successfully retrieved block #${currentBlockNumber} after ${blockRetries} retries.`);
+          } else if (block && (blockRetries || failoverCount)) {
+            log.info(`${workerAttribution}successfully retrieved block #${currentBlockNumber} after ${blockRetries} retries and ${failoverCount} failovers.`);
           }
           blockRetries++;
         }
@@ -149,8 +149,8 @@ module.exports = class TransactionIndexBase extends EventEmitter {
             if (!receipt) {
               log.warn(`${workerAttribution}Warning, no transaction receipt exists for txn hash ${transaction.hash}, trying again (retries: ${receiptRetries + 1})`);
               await sleep(5000);
-            } else if (receipt && receiptRetries) {
-              log.info(`${workerAttribution}successfully retrieved receipt for txn hash ${transaction.hash} after ${receiptRetries} retries.`);
+            } else if (receipt && (receiptRetries || failoverCount)) {
+              log.info(`${workerAttribution}successfully retrieved receipt for txn hash ${transaction.hash} after ${receiptRetries} retries and ${failoverCount} failovers.`);
             }
             receiptRetries++;
           } while (!receipt && receiptRetries <= maxTransactionReceiptRetries);
