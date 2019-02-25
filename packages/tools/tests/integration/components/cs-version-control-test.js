@@ -1,41 +1,27 @@
-import EmberObject from '@ember/object';
 import { module, test } from 'qunit';
 import { setupRenderingTest } from 'ember-qunit';
 import { timeout } from 'ember-concurrency';
 import { render, click, waitFor } from '@ember/test-helpers';
 import hbs from 'htmlbars-inline-precompile';
-import DS from 'ember-data';
+import Fixtures from '@cardstack/test-support/fixtures';
+import testDataSetup from '../../helpers/test-data-setup';
 
-module('Integration | Component | cs version control', function(hooks) {
+module('Integration | Component | cs-version-control', function(hooks) {
   setupRenderingTest(hooks);
 
-  hooks.beforeEach(function() {
-    // We need a valid model here because the component will go
-    // looking for its metadata, and ember-resource-metadata works
-    // through ember-data's identity map.
-    this.owner.register('model:thing', DS.Model.extend());
-    // It's unfortunate we use a mock object for a full-fledged
-    // cardstack Model instance. That makes it necessary to mock out
-    // all the methods exercised from this component, like `relatedOwnedRecords`.
-    // It's not obvious how to use such a Model or at least a DS.Model
-    // as for example the `isNew` CP cannot be set, then
-    let model = EmberObject.create({
-      id: 1,
-      type: 'thing',
-      serialize() {
-        return {
-          id: '1',
-          type: 'things',
-          data: {
-            attributes: {}
-          }
-        }
-      },
-      relatedOwnedRecords() {
-        return [];
-      },
+  let scenario = new Fixtures({
+    create(factory) {
+      testDataSetup(factory);
+    }
+  })
 
-    });
+  scenario.setupTest(hooks);
+
+  hooks.beforeEach(async function() {
+    await this.owner.lookup('service:cardstack-codegen').refreshCode();
+    this.store = this.owner.lookup('service:store');
+
+    let model = await this.store.findRecord('location', 'nyc');
     this.set('model', model);
     this.meta = this.owner.lookup('service:resource-metadata');
     this.get('meta').write(model, { branch: 'master' });
@@ -47,14 +33,12 @@ module('Integration | Component | cs version control', function(hooks) {
 
   test('render with saved content', async function(assert) {
     this.model.set('hasDirtyFields', false);
-    this.model.set('isNew', false);
     await render(hbs`{{cs-version-control model=model enabled=true}}`);
     assert.dom('[data-test-cs-version-control-button-save="true"]').hasText('Save');
   });
 
   test('render with dirty content', async function(assert) {
     this.model.set('hasDirtyFields', true);
-    this.model.set('isNew', false);
     await render(hbs`{{cs-version-control model=model enabled=true}}`);
     assert.dom('[data-test-cs-version-control-button-save="true"]').doesNotExist('no disabled button');
     assert.dom('[data-test-cs-version-control-button-save="false"]').hasText('Save');
@@ -63,7 +47,6 @@ module('Integration | Component | cs version control', function(hooks) {
   test('clicking on cancel exits edit mode', async function (assert) {
     this.tools = this.owner.lookup('service:cardstack-tools');
     this.tools.setEditing(true);
-    this.model.set('isNew', false);
     await render(hbs`{{cs-version-control model=model enabled=true}}`);
     await click('[data-test-cs-version-control-button-cancel]');
     assert.equal(this.tools.get('editing'), false);
@@ -75,7 +58,6 @@ module('Integration | Component | cs version control', function(hooks) {
       assert.ok(true);
     });
     this.model.set('hasDirtyFields', true);
-    this.model.set('isNew', false);
     await render(hbs`{{cs-version-control model=model enabled=true}}`);
     await click('[data-test-cs-version-control-button-cancel]');
   });
@@ -86,7 +68,6 @@ module('Integration | Component | cs version control', function(hooks) {
       assert.ok(true);
     });
     this.model.set('hasDirtyFields', true);
-    this.model.set('isNew', false);
     await render(hbs`{{cs-version-control model=model enabled=true}}`);
     await click('[data-test-cs-version-control-button-save="false"]');
   });
@@ -95,7 +76,6 @@ module('Integration | Component | cs version control', function(hooks) {
     assert.expect(2);
     this.model.set('save', async () => await timeout(5));
     this.model.set('hasDirtyFields', true);
-    this.model.set('isNew', false);
     assert.dom('[data-test-cs-version-control-loading]').doesNotExist('Does not display loading before click');
     await render(hbs`{{cs-version-control model=model enabled=true}}`);
     click('[data-test-cs-version-control-button-save="false"]');
@@ -109,7 +89,6 @@ module('Integration | Component | cs version control', function(hooks) {
       throw new Error("should not happen");
     });
     this.model.set('hasDirtyFields', false);
-    this.model.set('isNew', false);
     await render(hbs`{{cs-version-control model=model enabled=true}}`);
     await click('[data-test-cs-version-control-button-save="true"]');
   });
@@ -119,27 +98,24 @@ module('Integration | Component | cs version control', function(hooks) {
     this.model.set('destroyRecord', function() {
       assert.ok(true);
     });
-    this.model.set('isNew', false);
     await render(hbs`{{cs-version-control model=model enabled=true}}`);
     await click('[data-test-cs-version-control-delete-button]');
   });
 
   test('"draft" status is displayed for new model', async function (assert) {
-    this.model.set('isNew', true);
+    this.set('model', this.store.createRecord('location', { city: 'Portland' }));
     await render(hbs`{{cs-version-control model=model enabled=true}}`);
     assert.dom('[data-test-cs-version-control-dropdown-option-status]').hasText('draft');
   });
 
   test('"published" status is displayed for clean model', async function (assert) {
     this.model.set('hasDirtyFields', false);
-    this.model.set('isNew', false);
     await render(hbs`{{cs-version-control model=model enabled=true}}`);
     assert.dom('[data-test-cs-version-control-dropdown-option-status]').hasText('published');
   });
 
   test('"edited" status is displayed for dirty model', async function (assert) {
     this.model.set('hasDirtyFields', true);
-    this.model.set('isNew', false);
     await render(hbs`{{cs-version-control model=model enabled=true}}`);
     assert.dom('[data-test-cs-version-control-dropdown-option-status]').hasText('edited');
   });
