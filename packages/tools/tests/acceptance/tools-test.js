@@ -179,7 +179,7 @@ module('Acceptance | tools', function(hooks) {
     await click('[data-test-add-category-button]');
     await fillIn('.category-editor:last-of-type > input', 'Pirating');
 
-    let popularityPanel = findTriggerElementWithLabel.call(this, /Category #: Popularity/);
+    let popularityPanel = findTriggerElementWithLabel.call(this, /New category: Popularity/);
     await click(popularityPanel);
     assert.dom('.field-editor > input').isNotDisabled();
   });
