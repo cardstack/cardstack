@@ -1,7 +1,6 @@
 const { declareInjections } = require('@cardstack/di');
 const Handlebars = require('handlebars');
 const inflection = require('inflection');
-const Session = require('@cardstack/plugin-utils/session');
 
 Handlebars.registerHelper('camelize', function(str) {
   return str.replace(/-(\w)/g, (m, d) => d.toUpperCase());
@@ -92,14 +91,14 @@ module.exports = declareInjections({
 },
 
 class CodeGenerator {
-  async generateCode(appModulePrefix, branch) {
+  async generateCode(appModulePrefix, branch, session) {
     let schema = await this.schema.forBranch(branch);
     let modules = [];
 
     for (let type of schema.types.values()) {
       let modelName = inflection.singularize(type.id);
 
-      modules.push(await this._generatedModel(modelName, type, branch));
+      modules.push(await this._generatedModel(modelName, type, branch, session));
 
       modules.push(
         reexportTemplate({ target: `${appModulePrefix}/models/${modelName}`, source: `@cardstack/models/generated/${modelName}` })
@@ -121,11 +120,11 @@ class CodeGenerator {
 
     return modules.join("");
   }
-  async _generatedModel(modelName, type, branch) {
+  async _generatedModel(modelName, type, branch, session) {
     let fields;
     let response;
     try {
-      response = await this.searchers.get(Session.INTERNAL_PRIVILEGED, branch, 'content-types', type.id);
+      response = await this.searchers.get(session, branch, 'content-types', type.id);
     } catch(error) {
       if (error.isCardstackError) {
         return;
