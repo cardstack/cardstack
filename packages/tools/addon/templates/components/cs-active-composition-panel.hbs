@@ -10,49 +10,54 @@
     {{#let
       fieldMark.model
       (eq fieldMark.model.content model)
-    as |fieldModel isPageModelField|}}
-      {{#cs-collapsible-section
-        class=(concat "cs-toolbox-section " (cs-error-class validationErrors fieldModel "invalid"))
-        title=(cs-card-meta-caption fieldModel.content fieldModel.caption isPageModelField)
-        opened=(eq fieldMark.id openedFieldId)
-        open=(action openField fieldMark)
-        close=(action openField null)
-        hovered=(perform highlightAndScrollToField fieldMark)
-        unhovered=(perform highlightAndScrollToField null)
-        data-test-field-name=fieldModel.name
-      }}
-        <div class="cs-field-editor-section">
-          {{#let
-            fieldModel.content
-            (get permissions (cs-uid fieldModel.content))
-          as |content fieldModelPermissions|}}
-            {{#if fieldModel.grouped}}
-              {{#each fieldModel.grouped as |fieldName|}}
-                <label class="cs-field-editor-section--label">
-                  {{cs-field-caption content fieldName}}
-                </label>
+      (cs-field-editor-options-for fieldMark.model.content fieldMark.model.name)
+    as |fieldModel isPageModelField editorOptions|}}
+      {{#unless editorOptions.hideFromEditor}}
+        {{#cs-collapsible-section
+          class=(concat "cs-toolbox-section " (cs-error-class validationErrors fieldModel "invalid"))
+          title=(cs-card-meta-caption fieldModel.content fieldModel.caption isPageModelField)
+          opened=(eq fieldMark.id openedFieldId)
+          open=(action openField fieldMark)
+          close=(action openField null)
+          hovered=(perform highlightAndScrollToField fieldMark)
+          unhovered=(perform highlightAndScrollToField null)
+          data-test-field-name=fieldModel.name
+        }}
+          <div class="cs-field-editor-section">
+            {{#let
+              fieldModel.content
+              (get permissions (cs-uid fieldModel.content))
+            as |content fieldModelPermissions|}}
+              {{#if fieldModel.grouped}}
+                {{#each fieldModel.grouped as |fieldName|}}
+                  <label class="cs-field-editor-section--label">
+                    {{cs-field-caption content fieldName}}
+                  </label>
+                  {{cs-field-editor
+                    content=content
+                    field=fieldName
+                    editorOptions=editorOptions
+                    enabled=editingEnabled
+                    permissions=fieldModelPermissions
+                    onchange=(action "validate")
+                    errors=(get validationErrors fieldName)
+                  }}
+                {{/each}}
+              {{else}}
                 {{cs-field-editor
                   content=content
-                  field=fieldName
+                  field=fieldModel.name
+                  editorOptions=editorOptions
                   enabled=editingEnabled
                   permissions=fieldModelPermissions
                   onchange=(action "validate")
-                  errors=(get validationErrors fieldName)
+                  errors=(get validationErrors fieldModel.name)
                 }}
-              {{/each}}
-            {{else}}
-              {{cs-field-editor
-                content=content
-                field=fieldModel.name
-                enabled=editingEnabled
-                permissions=fieldModelPermissions
-                onchange=(action "validate")
-                errors=(get validationErrors fieldModel.name)
-              }}
-            {{/if}}
-          {{/let}}
-        </div>
-      {{/cs-collapsible-section}}
+              {{/if}}
+            {{/let}}
+          </div>
+        {{/cs-collapsible-section}}
+      {{/unless}}
     {{/let}}
   {{/each}}
 
@@ -60,12 +65,13 @@
      These are the fields that exist on the model (or in owned relationships)
      but are not rendered
   --}}
-  {{#unless model.disableAutoEditorFields}}
-    {{#each modelFields as |field|}}
-      {{#let
-        (get permissions (cs-uid field.model))
-        (eq field.model model)
-      as |fieldModelPermissions isPageModelField|}}
+  {{#each modelFields as |field|}}
+    {{#let
+      (get permissions (cs-uid field.model))
+      (eq field.model model)
+      (cs-field-editor-options-for field.model field.name)
+    as |fieldModelPermissions isPageModelField editorOptions|}}
+      {{#unless editorOptions.hideFromEditor}}
         {{#cs-collapsible-section
           class=(concat "cs-toolbox-section " (cs-error-class validationErrors field.model "invalid"))
           title=(cs-card-meta-caption field.model field.options.caption isPageModelField)
@@ -78,6 +84,7 @@
             {{cs-field-editor
               content=field.model
               field=field.name
+              editorOptions=editorOptions
               enabled=editingEnabled
               permissions=fieldModelPermissions
               fetchPermissions=(perform fetchPermissionsFor field.model)
@@ -86,7 +93,7 @@
             }}
           </div>
         {{/cs-collapsible-section}}
-      {{/let}}
-    {{/each}}
-  {{/unless}}
+      {{/unless}}
+    {{/let}}
+  {{/each}}
 </div>

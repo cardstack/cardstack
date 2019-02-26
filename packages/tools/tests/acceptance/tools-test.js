@@ -183,4 +183,22 @@ module('Acceptance | tools', function(hooks) {
     await click(popularityPanel);
     assert.dom('.field-editor > input').isNotDisabled();
   });
+
+  test('can hide fields from editor', async function (assert) {
+    await visit('/1');
+    await login();
+    await click('.cardstack-tools-launcher');
+    await waitFor('.cs-editor-switch')
+    await click('.cs-editor-switch');
+
+    assert.dom('[data-test-field-name="title"]').hasText('Title');
+    assert.dom('[data-test-field-name="echo-title"]').doesNotExist();
+    assert.dom('[data-test-dummy-echo-title]').hasText('Echo title: Ten steps to becoming a fearsome pirate');
+    assert.dom('[data-test-field-name="echo-published-at"]').doesNotExist();
+    assert.dom('[data-test-field-name="echo-archived"]').doesNotExist();
+    assert.dom('[data-test-field-name="echo-reading-time-value"]').doesNotExist();
+    assert.dom('[data-test-field-name="echo-reading-time-unit"]').doesNotExist();
+    assert.dom('[data-test-field-name="echo-categories"]').doesNotExist();
+    assert.dom('[data-test-field-name="echo-author-name"]').doesNotExist();
+  });
 });
