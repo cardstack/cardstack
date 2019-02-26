@@ -1,6 +1,7 @@
 const { declareInjections } = require('@cardstack/di');
 const Handlebars = require('handlebars');
 const inflection = require('inflection');
+const Session = require('@cardstack/plugin-utils/session');
 
 Handlebars.registerHelper('camelize', function(str) {
   return str.replace(/-(\w)/g, (m, d) => d.toUpperCase());
@@ -86,7 +87,8 @@ define('{{target}}', ['exports', '{{source}}'], function (exports, _source) {
 `);
 
 module.exports = declareInjections({
-  schema: 'hub:current-schema'
+  schema: 'hub:current-schema',
+  searchers: 'hub:searchers',
 },
 
 class CodeGenerator {
@@ -97,7 +99,7 @@ class CodeGenerator {
     for (let type of schema.types.values()) {
       let modelName = inflection.singularize(type.id);
 
-      modules.push(this._generatedModel(modelName, type));
+      modules.push(await this._generatedModel(modelName, type, branch));
 
       modules.push(
         reexportTemplate({ target: `${appModulePrefix}/models/${modelName}`, source: `@cardstack/models/generated/${modelName}` })
@@ -119,10 +121,30 @@ class CodeGenerator {
 
     return modules.join("");
   }
-  _generatedModel(modelName, type) {
+  async _generatedModel(modelName, type, branch) {
+    let fields;
+    let response;
+    try {
+      response = await this.searchers.get(Session.INTERNAL_PRIVILEGED, branch, 'content-types', type.id);
+    } catch(error) {
+      if (error.isCardstackError) {
+        return;
+      }
+      throw error;
+    }
+    let relationships = response.data.relationships;
+    if (!relationships) {
+      fields = [];
+    } else {
+      let { data: fieldsData } = relationships.fields;
+      let readableFieldIds = fieldsData.map((fd) => fd.id);
+      fields = [...type.realAndComputedFields.values()].filter((f) => {
+        return f.id !== 'id' && f.id !== 'type' && readableFieldIds.includes(f.id);
+      });
+    }
     return modelTemplate({
       modelName,
-      fields: [...type.realAndComputedFields.values()].filter(f => f.id !== 'id' && f.id !== 'type'),
+      fields,
       routingField: type.routingField
     });
   }
