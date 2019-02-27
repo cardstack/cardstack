@@ -139,6 +139,10 @@ module.exports = class Indexer {
   async branches() {
     await this._ensureRepo();
 
+    if (this.remote) {
+      await service.fetchAllFromRemote(this.remote.url);
+    }
+
     // nodegit docs show a Branch.iteratorNew method that would be
     // more appropriate than this, but as far as I can tell it is not
     // fully implemented

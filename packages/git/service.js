@@ -95,11 +95,14 @@ class GitLocalCache {
     };
   }
 
+  async fetchAllFromRemote(remoteUrl) {
+    let { repo, fetchOpts } = this._remotes.get(remoteUrl);
+    return await repo.fetchAll(fetchOpts);
+  }
+
   async pullRepo(remoteUrl, targetBranch) {
     log.info("pulling changes for branch %s on %s", targetBranch, remoteUrl);
-    let { repo, fetchOpts } = this._remotes.get(remoteUrl);
-
-    await repo.fetchAll(fetchOpts);
+    let { repo } = this._remotes.get(remoteUrl);
 
     // if branch does not exist locally then create it and reset to head of remote
     // this is required because nodegit doesn't support direct pull https://github.com/nodegit/nodegit/issues/1123
