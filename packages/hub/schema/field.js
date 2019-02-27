@@ -21,7 +21,7 @@ module.exports = class Field {
     this.fieldType = model.attributes['field-type'];
     this.caption = model.attributes.caption || humanize(model.id);
     this.editorComponent = model.attributes['editor-component'];
-    this.editorOptions = model.attributes['editor-options'];
+    this.editorOptions = model.attributes['editor-options'] || {};
     this.inlineEditorComponent = model.attributes['inline-editor-component'];
     this.inlineEditorOptions = model.attributes['inline-editor-options'];
     this.searchable = model.attributes.searchable == null ? true : model.attributes.searchable;

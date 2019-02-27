@@ -183,4 +183,16 @@ module('Acceptance | tools', function(hooks) {
     await click(popularityPanel);
     assert.dom('.field-editor > input').isNotDisabled();
   });
+
+  test('can hide fields from editor', async function (assert) {
+    await visit('/1');
+    await login();
+    await click('.cardstack-tools-launcher');
+    await waitFor('.cs-editor-switch')
+    await click('.cs-editor-switch');
+
+    assert.dom('[data-test-field-name="hidden-field-from-editor"]').doesNotExist();
+    assert.dom('[data-test-dummy-hidden-field-from-editor]').hasText('This field is hidden from the editor');
+    assert.dom('[data-test-field-name="hidden-computed-field-from-editor"]').doesNotExist();
+  });
 });

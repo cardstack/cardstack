@@ -38,7 +38,8 @@ module.exports = class ComputedField {
         attributes: {
           'field-type': type,
           caption: model.attributes.caption,
-          searchable: model.attributes.searchable
+          searchable: model.attributes.searchable,
+          'editor-options': model.attributes['editor-options']
         }
       };
       this._virtualField = new Field(virtualModel, plugins, allGrants);

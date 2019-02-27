@@ -138,6 +138,17 @@ function initialModels() {
           aliasPath: 'author.name',
         }
       }),
+      initial.addResource('fields', 'hidden-field-from-editor').withAttributes({
+        fieldType: '@cardstack/core-types::string',
+        editorOptions: { hideFromEditor: true }
+      }),
+      initial.addResource('computed-fields', 'hidden-computed-field-from-editor').withAttributes({
+        computedFieldType: '@cardstack/core-types::alias',
+        editorOptions: { hideFromEditor: true },
+        params: {
+          aliasPath: 'author-name',
+        }
+      }),
     ]);
 
     addConstraint(initial, '@cardstack/core-types::not-empty', 'title');
@@ -214,7 +225,8 @@ function initialModels() {
       title: '10 steps to becoming a fearsome pirate',
       publishedAt: new Date(2017, 3, 24),
       archived: false,
-      readingTimeValue: 8
+      readingTimeValue: 8,
+      hiddenFieldFromEditor: 'This field is hidden from the editor'
     })
     .withRelated('reading-time-unit', { type: 'time-units', id: '1' })
     .withRelated('author', lechuck)
