@@ -138,40 +138,11 @@ function initialModels() {
           aliasPath: 'author.name',
         }
       }),
-      initial.addResource('fields', 'echo-title').withAttributes({
+      initial.addResource('fields', 'hidden-field-from-editor').withAttributes({
         fieldType: '@cardstack/core-types::string',
         editorOptions: { hideFromEditor: true }
       }),
-      initial.addResource('fields', 'echo-published-at').withAttributes({
-        fieldType: '@cardstack/core-types::date',
-        editorOptions: { hideFromEditor: true }
-      }),
-      initial.addResource('fields', 'echo-archived').withAttributes({
-        fieldType: '@cardstack/core-types::boolean',
-        editorOptions: { hideFromEditor: true }
-      }),
-      initial.addResource('fields', 'echo-reading-time-value').withAttributes({
-        fieldType: '@cardstack/core-types::integer',
-        editorOptions: { hideFromEditor: true }
-      }),
-      initial.addResource('fields', 'echo-reading-time-unit').withAttributes({
-        fieldType: '@cardstack/core-types::belongs-to',
-        editorOptions: { hideFromEditor: true }
-      }).withRelated('related-types', [
-        initial.addResource('content-types', 'time-units')
-          .withRelated('fields', [
-            initial.addResource('fields', 'title')
-              .withAttributes({ fieldType: '@cardstack/core-types::string' })
-          ])
-      ]),
-      initial.addResource('fields', 'echo-categories').withAttributes({
-        fieldType: '@cardstack/core-types::has-many',
-        editorOptions: { hideFromEditor: true },
-        owned: true
-      }).withRelated('related-types', [
-        initial.getResource('content-types', 'categories')
-      ]),
-      initial.addResource('computed-fields', 'echo-author-name').withAttributes({
+      initial.addResource('computed-fields', 'hidden-computed-field-from-editor').withAttributes({
         computedFieldType: '@cardstack/core-types::alias',
         editorOptions: { hideFromEditor: true },
         params: {
@@ -255,16 +226,11 @@ function initialModels() {
       publishedAt: new Date(2017, 3, 24),
       archived: false,
       readingTimeValue: 8,
-      echoTitle: 'Ten steps to becoming a fearsome pirate',
-      echoPublishedAt: new Date(2017, 3, 24),
-      echoArchived: true,
-      echoReadingTimeValue: 8
+      hiddenFieldFromEditor: 'This field is hidden from the editor'
     })
     .withRelated('reading-time-unit', { type: 'time-units', id: '1' })
-    .withRelated('echo-reading-time-unit', { type: 'time-units', id: '1' })
     .withRelated('author', lechuck)
     .withRelated('categories', [ adventure ])
-    .withRelated('echo-categories', [ adventure ])
     .withRelated('comments', [ threeHeadedMonkey, diapers ]);
 
   initial.addResource('posts', '2')

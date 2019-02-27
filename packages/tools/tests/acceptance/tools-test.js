@@ -191,14 +191,8 @@ module('Acceptance | tools', function(hooks) {
     await waitFor('.cs-editor-switch')
     await click('.cs-editor-switch');
 
-    assert.dom('[data-test-field-name="title"]').hasText('Title');
-    assert.dom('[data-test-field-name="echo-title"]').doesNotExist();
-    assert.dom('[data-test-dummy-echo-title]').hasText('Echo title: Ten steps to becoming a fearsome pirate');
-    assert.dom('[data-test-field-name="echo-published-at"]').doesNotExist();
-    assert.dom('[data-test-field-name="echo-archived"]').doesNotExist();
-    assert.dom('[data-test-field-name="echo-reading-time-value"]').doesNotExist();
-    assert.dom('[data-test-field-name="echo-reading-time-unit"]').doesNotExist();
-    assert.dom('[data-test-field-name="echo-categories"]').doesNotExist();
-    assert.dom('[data-test-field-name="echo-author-name"]').doesNotExist();
+    assert.dom('[data-test-field-name="hidden-field-from-editor"]').doesNotExist();
+    assert.dom('[data-test-dummy-hidden-field-from-editor]').hasText('This field is hidden from the editor');
+    assert.dom('[data-test-field-name="hidden-computed-field-from-editor"]').doesNotExist();
   });
 });
