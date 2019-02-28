@@ -72,7 +72,7 @@ class TransactionIndex extends TransactionIndexBase {
     log.warn(`Failing over ethereum client ${this.currentJsonRpcUrl}`);
 
     await this.ethereumClient.stopAll();
-    if (this.urlIndex > this.jsonRpcUrls.length - 1) {
+    if (this.urlIndex >= this.jsonRpcUrls.length - 1) {
       this.urlIndex = 0;
     } else {
       this.urlIndex++;

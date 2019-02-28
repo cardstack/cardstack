@@ -156,12 +156,12 @@ module.exports = class TransactionIndexBase extends EventEmitter {
           } while (!receipt && receiptRetries <= maxTransactionReceiptRetries);
 
           if (!receipt) {
-            log.error(`Error: Cannot retrieve transaction receipt for transaction hash ${transaction.hash} at block #${block.number} from the geth node. This can be indicative of using a geth node that is not using '--syncmode "full"'. Make sure that your geth node is a full node.`);
             if (this.canFailoverEthereumClient && failoverCount < this.numFailoverClients - 1) {
               await this._failoverEthereumClient();
               failoverCount++;
             } else {
-              // This looks like a legit situation. I ran into this on rinkeby where a block returned a transaction that did not exist.
+              log.error(`Error: Cannot retrieve transaction receipt after exhausing all failover instances for transaction hash ${transaction.hash} at block #${block.number} from the geth node. This can be indicative of using a geth node that is not using '--syncmode "full"'. Make sure that your geth node is a full node.`);
+              // This looks like it can be a legit situation. I ran into this on rinkeby where a block returned a transaction that did not exist.
               // The txn hash this happend for was 0xdd35b57bcdacf1b0052190e085558d598c09b84764e46ba3502db22b3de1393b from infura, i'm unsure which block this came from though.
               // I think the best way to deal with this is to consider these transactions as failed transactions.
               receipt = {};
