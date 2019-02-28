@@ -65,7 +65,7 @@ export default Component.extend({
     if (section) {
       section = section.getBoundingClientRect();
     }
-    
+
     let block = this.$('.block-control');
     if (section && block.length > 0) {
       let my = block[0].getBoundingClientRect();
@@ -110,7 +110,7 @@ export default Component.extend({
         let range = new Range(this._lastActiveSection.headPosition(),this._lastActiveSection.tailPosition());
         postEditor.toggleSection(tag, range);
       });
-      this.propertyDidChange('_lastActiveSection');
+      this.notifyPropertyChange('_lastActiveSection');
       this.send('toggleMenu');
     },
     toggleLink() {
