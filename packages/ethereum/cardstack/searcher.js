@@ -50,6 +50,7 @@ class TransactionSearcher {
   }
 
   async _queryTransactions(query) {
+    let limit = get(query, 'page.size');
     let orClause = get(query, 'filter.or[0]'); // assumes all OR clauses are identical except the 'transaction-to'/'transaction-from' clause
     let address = get(orClause, 'transaction-from.exact') ||
                   get(orClause, 'transaction-from') ||
@@ -69,7 +70,16 @@ class TransactionSearcher {
       toBlockNumber = get(orClause, 'block-number.range.lte');
     }
 
-    let txns = await this.transactionIndex.getTransactionsForAddress(address, { sinceBlockNumber, toBlockNumber });
+    let onlySuccessfulTransactions = get(orClause, 'transaction-successful.exact') ||
+      get(orClause, 'transaction-successful');
+
+    let txns = await this.transactionIndex.getTransactionsForAddress(
+      address, {
+        onlySuccessfulTransactions,
+        sinceBlockNumber,
+        toBlockNumber,
+        limit
+      });
     if (!txns) { return { data: [] }; }
 
     return { data: txns.map(t => rawTransactionToResource(t)) };
