@@ -70,8 +70,8 @@ class TransactionSearcher {
       toBlockNumber = get(orClause, 'block-number.range.lte');
     }
 
-    let onlySuccessfulTransactions = get(orClause, 'transaction-successful.exact') ||
-      get(orClause, 'transaction-successful');
+    let onlySuccessfulTransactions = Boolean(get(orClause, 'transaction-successful.exact') ||
+                                             get(orClause, 'transaction-successful'));
 
     let txns = await this.transactionIndex.getTransactionsForAddress(
       address, {
