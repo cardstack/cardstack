@@ -23,9 +23,9 @@
     "@cardstack/plugin-utils": "0.13.50",
     "ember-cli-babel": "^6.8.2",
     "ember-cli-htmlbars": "^2.0.1",
-    "ember-concurrency": "^0.8.17",
-    "ember-data": "^2.12.1",
-    "ember-inflector": "^2.1.0",
+    "ember-concurrency": "^0.8.27",
+    "ember-data": "^3.5.0",
+    "ember-inflector": "^3.0.0",
     "ember-moment": "^7.4.1"
   },
   "devDependencies": {

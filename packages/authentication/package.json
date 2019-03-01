@@ -32,8 +32,8 @@
     "ember-cli-htmlbars": "^2.0.1",
     "ember-css-url": "0.2.0",
     "ember-fetch": "^6.4.0",
-    "ember-inflector": "^2.1.0",
-    "ember-simple-auth": "^1.8.0",
+    "ember-inflector": "^3.0.0",
+    "ember-simple-auth": "^1.8.1",
     "koa-better-route": "^0.1.0",
     "koa-compose": "^3.2.1",
     "koa-json-body": "^5.3.0"
