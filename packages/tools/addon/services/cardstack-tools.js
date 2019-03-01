@@ -10,7 +10,7 @@ import { modelType } from '@cardstack/rendering/helpers/cs-model-type';
 import injectOptional from 'ember-inject-optional';
 import { defaultBranch } from '@cardstack/plugin-utils/environment';
 import { guidFor } from '@ember/object/internals';
-import { get } from '@ember/object';
+import { get, set } from '@ember/object';
 
 export default Service.extend({
   overlays: service('ember-overlays'),
@@ -34,8 +34,18 @@ export default Service.extend({
     let model = this.get('activeContentItem.model');
     if (!model) { return []; }
 
-    let records = [model, ...model.relatedOwnedRecords()];
-    let modelFields = records.map((record) => {
+    let modelFields = [];
+    model.eachAttribute((attribute, meta) => {
+      // Prevent rendering a field that's already explicitly rendered
+      if (!renderedFieldNames.includes(meta.name) && meta.name !== 'selfLink') {
+        let fieldInfo = meta;
+        set(fieldInfo, 'id', guidFor(fieldInfo));
+        set(fieldInfo, 'model', model);
+        modelFields.push(fieldInfo);
+      }
+    });
+
+    let ownedRelationshipFields = model.relatedOwnedRecords().map((record) => {
       let fields = [];
       record.eachAttribute((attribute, meta) => {
         // Prevent rendering a field that's already explicitly rendered
@@ -48,9 +58,9 @@ export default Service.extend({
       });
       return fields;
     });
-    return modelFields.reduce((flattened, fields) => {
+    return modelFields.concat(ownedRelationshipFields.reduce((flattened, fields) => {
       return flattened.concat(fields);
-    });
+    }, []));
   }),
 
   contentPages: computed('marks', function() {

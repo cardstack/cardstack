@@ -94,6 +94,22 @@ module('Acceptance | tools', function(hooks) {
     assert.equal(titleSections.length, 1, "Rendered fields only appear once");
   });
 
+  test('it does not collapse sections for right edge input fields that are not rendered in the template when you type in the field', async function(assert) {
+    await visit('/1');
+    await login();
+    await click('.cardstack-tools-launcher');
+
+    let slugLabel = findTriggerElementWithLabel.call(this, /Slug/);
+    await click(slugLabel);
+    let slugSection = slugLabel.closest('section');
+
+    let slugInput = slugSection.querySelector('input');
+    await fillIn(slugInput, 'h');
+
+    slugInput = slugSection.querySelector('input');
+    assert.dom(slugInput).isVisible();
+  });
+
   test('show unrendered fields from related, owned records', async function(assert) {
     await visit('/1');
     await login();
