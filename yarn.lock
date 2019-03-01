@@ -6207,7 +6207,7 @@ ember-concurrency@^0.8.21:
 
 ember-cookies@^0.3.0:
   version "0.3.1"
-  resolved "https://registry.yarnpkg.com/ember-cookies/-/ember-cookies-0.3.1.tgz#42ca530703092f6cde691103d608a6a5a58f2d76"
+  resolved "https://codeload.github.com/habdelra/ember-cookies/tar.gz/b79b830f13fc2f7705bdc9816b7435d426c5785c"
   dependencies:
     ember-cli-babel "^6.8.2"
     ember-getowner-polyfill "^1.1.0 || ^2.0.0"
@@ -6608,9 +6608,9 @@ ember-mobiledoc-dom-renderer@^0.6.0:
     ember-wormhole "^0.5.2"
     mobiledoc-dom-renderer "^0.6.5"
 
-ember-mobiledoc-editor@^0.5.10:
-  version "0.5.13"
-  resolved "https://registry.yarnpkg.com/ember-mobiledoc-editor/-/ember-mobiledoc-editor-0.5.13.tgz#95f6c10b37341a0d4b4a4272ac5ad1eb6cd54243"
+ember-mobiledoc-editor@backspace/ember-mobiledoc-editor#closure-actions:
+  version "0.5.15"
+  resolved "https://codeload.github.com/backspace/ember-mobiledoc-editor/tar.gz/76ccebc2649f527a4b0c508b7685bbd02f08acd1"
   dependencies:
     broccoli-funnel "^1.1.0"
     broccoli-merge-trees "^2.0.0"
@@ -6618,7 +6618,7 @@ ember-mobiledoc-editor@^0.5.10:
     ember-cli-htmlbars "^2.0.3"
     ember-wormhole "^0.5.1"
     mobiledoc-dom-renderer "^0.6.5"
-    mobiledoc-kit "^0.10.17"
+    mobiledoc-kit "^0.11.1"
 
 ember-moment@^7.3.0:
   version "7.8.0"
@@ -6753,9 +6753,10 @@ ember-runtime-enumerable-includes-polyfill@^2.0.0:
     ember-cli-babel "^6.9.0"
     ember-cli-version-checker "^2.1.0"
 
-ember-simple-auth@^1.8.0:
-  version "1.8.0"
-  resolved "https://registry.yarnpkg.com/ember-simple-auth/-/ember-simple-auth-1.8.0.tgz#e7b80ba0c35ae7e06adba4af365a9f1d3b9c9110"
+ember-simple-auth@^1.8.1:
+  version "1.8.1"
+  resolved "https://registry.yarnpkg.com/ember-simple-auth/-/ember-simple-auth-1.8.1.tgz#ff2de9a035f0902e9de660e93568e6956da2bdb9"
+  integrity sha512-2LV7RCBYMfc1JbJv00lm0GTx9sBMY4w6pzyOolH71J1MW1d+tahonaV4ZE+/R+TB85PMza0wabFh98Xq9xKaqA==
   dependencies:
     base-64 "^0.1.0"
     broccoli-file-creator "^2.0.0"
@@ -11162,9 +11163,10 @@ mobiledoc-dom-renderer@0.6.5, mobiledoc-dom-renderer@^0.6.5:
   version "0.6.5"
   resolved "https://registry.yarnpkg.com/mobiledoc-dom-renderer/-/mobiledoc-dom-renderer-0.6.5.tgz#56c0302c4f9c30840ab5b9b20dfe905aed1e437b"
 
-mobiledoc-kit@^0.10.17:
-  version "0.10.20"
-  resolved "https://registry.yarnpkg.com/mobiledoc-kit/-/mobiledoc-kit-0.10.20.tgz#2925a6223bac2a1eeb3468a4a94d992618089312"
+mobiledoc-kit@^0.11.1:
+  version "0.11.1"
+  resolved "https://registry.yarnpkg.com/mobiledoc-kit/-/mobiledoc-kit-0.11.1.tgz#fb64aac53473d172e42a0898bd354d1184f649e5"
+  integrity sha1-+2SqxTRz0XLkKgiYvTVNEYT2SeU=
   dependencies:
     mobiledoc-dom-renderer "0.6.5"
     mobiledoc-text-renderer "0.3.2"

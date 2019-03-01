@@ -14,8 +14,8 @@ export default Route.extend({
     let { branch } = this.modelFor('cardstack');
     let queryParams = '';
 
-    if (Object.keys(transition.queryParams).length) {
-      queryParams = `?${qs.stringify(transition.queryParams, { encodeValuesOnly: true })}`;
+    if (Object.keys(transition.to.queryParams).length) {
+      queryParams = `?${qs.stringify(transition.to.queryParams, { encodeValuesOnly: true })}`;
     }
 
     return this.get('store').findRecord('space', `${path.charAt(0) !== '/' ? '/' : ''}${path}${queryParams}`, { adapterOptions: { branch }, reload: true })
