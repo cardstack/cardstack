@@ -7,6 +7,7 @@
     border-radius: 5px;
     box-shadow: 0 2px 15px 0 var(--dark50);
     cursor: pointer;
+    transition: transform 250ms ease-in;
 }
 
 .cardstack-tools-launcher:hover,
@@ -14,4 +15,8 @@
     outline: none;
     color: var(--active-foreground);
     fill: var(--active-foreground);
+}
+
+.cardstack-tools-launcher.active {
+    transform: translate(20px, -15px);
 }

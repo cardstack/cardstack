@@ -1,11 +1,11 @@
 {{#toolbar-manager topRightCornerBelongsTo=topRightCornerBelongsTo}}
-  {{yield}}
-
   {{#each cardstackEdges.topLevelComponents as |componentName|}}
     {{component componentName edges=(hash
        launcher = (component 'fixed-within-toolbars' top=0 right=0)
     )}}
   {{/each}}
+
+  {{yield}}
 {{/toolbar-manager}}
 
 
