@@ -53,6 +53,10 @@
 /* these classes comes from the ember-sidebars addon. We need to
    increase the z-indices of the sidebars so they stay on top of the
    scrims provided by ember-overlays. */
-.cst-right, .cst-top {
+.cst-right, .cst-top, .cst-left {
     z-index: 100;
+}
+
+.cst-bottom {
+  z-index: 150;
 }
