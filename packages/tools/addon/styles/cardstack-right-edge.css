@@ -11,13 +11,11 @@
 @import "cs-branch-control";
 @import "cs-placeholder-create";
 
-.cardstack-toolbox {
-    box-sizing: border-box;
-    position: relative;
-    min-height: 100vh;
-    padding: 20px 15px 15px 30px;
-}
+.cardstack-right-edge {
+  --right-edge-width: 22rem;
 
-.cardstack-toolbox-width {
-    width: 22rem;
+  position: relative;
+  width: var(--right-edge-width);
+  min-height: 100vh;
+  padding: 20px 15px 15px var(--edges-gutter);
 }

@@ -8,8 +8,8 @@
 */
 .cardstack-tools {
     box-sizing: border-box;
-    background-color: var(--deep-background);
-    color: var(--bright-foreground);
+    background-color: var(--deep-background, #01002c);
+    color: var(--bright-foreground, #fff);
     font-family: 'Open Sans', 'helvetica', sans-serif;
     font-size: 16px;
     font-weight: normal;

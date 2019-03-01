@@ -1,52 +1,57 @@
 @import "base";
-@import "cardstack-header";
-@import "cardstack-toolbox";
-@import "cs-toggle-switch";
-@import "cs-field-overlays";
-@import "cs-account-icon";
-@import "cardstack-tools-edges";
 @import "cardstack-tools-launcher";
+@import "cardstack-tools-edges";
+@import "cardstack-top-edge";
+@import "cardstack-right-edge";
+@import "cardstack-left-edge";
+@import "cardstack-bottom-edge";
+@import "cs-field-overlays";
+@import "cs-toggle-switch";
+@import "cs-account-icon";
 @import "theme";
 
 :root {
-    --deep-background: #01002C;
-    --normal-background: #343356;
-    --active-background: #252440;
-    --light-background: #fff;
-    --gradient-background: linear-gradient(40deg, #343356 50%, #793284);
+  --deep-background: #01002c;
+  --normal-background: #343356;
+  --active-background: #252440;
+  --light-background: #fff;
+  --gradient-background: linear-gradient(40deg, #343356 50%, #793284);
 
-    --dark-foreground: #01002C;
-    --normal-foreground: #343356;
-    --active-foreground: #00e1f9;
-    --bright-foreground: #fff;
-    --green-foreground: #6aca25;
-    --hot-pink-foreground: #FF0054;
-    --gradient-foreground: linear-gradient(135deg, #3023ae, #c86dd7);
+  --dark-foreground: #01002c;
+  --normal-foreground: #343356;
+  --active-foreground: #00e1f9;
+  --bright-foreground: #fff;
+  --green-foreground: #6aca25;
+  --hot-pink-foreground: #ff0054;
+  --gradient-foreground: linear-gradient(135deg, #3023ae, #c86dd7);
 
-    --light50: rgba(255,255,255,0.5);
-    --light25: rgba(255,255,255,0.25);
-    --light05: rgba(255,255,255,0.05);
-    --dark25: rgba(0,0,0,0.25);
-    --dark50: rgba(0,0,0,0.5);
+  --light50: rgba(255,255,255,0.5);
+  --light25: rgba(255,255,255,0.25);
+  --light05: rgba(255,255,255,0.05);
+  --dark25: rgba(0,0,0,0.25);
+  --dark50: rgba(0,0,0,0.5);
 
-    /* From previous color scheme - in use */
-    --light-foreground: #F2F2F2;
-    --tools-highlight: #63a9fa;
-    --deep-tools-highlight: #032c5b;
-    --faded-tools-highlight: #032c5b77;
-    --tools-preview: #860404;
-    --error-border: #860404;
+  /* From previous color scheme - in use */
+  --light-foreground: #F2F2F2;
+  --tools-highlight: #63a9fa;
+  --deep-tools-highlight: #032c5b;
+  --faded-tools-highlight: #032c5b77;
+  --tools-preview: #860404;
+  --error-border: #860404;
+
+  /* Sizes */
+  --edges-gutter: 30px;
 }
 
 
 @font-face {
-    font-family: 'Open Sans';
-    src: url('../@cardstack/tools/OpenSans-Regular.ttf');
+  font-family: 'Open Sans';
+  src: url('../@cardstack/tools/OpenSans-Regular.ttf');
 }
 
 @font-face {
-    font-family: 'Open Sans Bold';
-    src: url('../@cardstack/tools/OpenSans-Bold.ttf');
+  font-family: 'Open Sans Bold';
+  src: url('../@cardstack/tools/OpenSans-Bold.ttf');
 }
 
 
@@ -54,14 +59,15 @@
    increase the z-indices of the sidebars so they stay on top of the
    scrims provided by ember-overlays. */
 .cst-right, .cst-left {
-    z-index: 100;
+  z-index: 100;
 }
 
 .cst-top {
-    z-index: 100;
-    right: -1px;
+  z-index: 100;
+  right: -1px; /* necessary to remove the flash of white line
+                  while toggling edges */
 }
 
 .cst-bottom {
-    z-index: 150;
+  z-index: 150;
 }

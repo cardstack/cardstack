@@ -1,0 +1,7 @@
+.cardstack-top-edge {
+  --top-edge-height: 60px;
+
+  width: 100%;
+  height: var(--top-edge-height);
+  padding-bottom: var(--edges-gutter);
+}
