@@ -1,0 +1,55 @@
+.cs-create-menu {
+    min-height: 8rem;
+    background-color: var(--normal-background);
+    color: var(--bright-foreground);
+    border: 1px solid var(--light05);
+    border-radius: 20px;
+    box-shadow: 0 2px 15px 0 var(--dark50);
+}
+
+.cs-create-menu > ul {
+    list-style-type: none;
+    line-height: 2em;
+    overflow-y: scroll;
+    padding: .25em 1em;
+    margin: 0;
+    max-height: calc(100vh - 3rem - 42px);
+}
+
+.cs-create-menu > ul > li {
+    overflow: hidden;
+    margin: 1em 0;
+    color: var(--light-foreground);
+    font-size: 16px;
+    font-weight: 100;
+    cursor: pointer;
+}
+
+.cs-create-menu > ul > li > button {
+    float: right;
+    padding: 0.5em 2.5em;
+    background: none;
+    color: var(--bright-foreground);
+    border-radius: 3px;
+    text-decoration: none;
+    cursor: pointer;
+    font-weight: normal;
+    font-family: inherit;
+    font-size: 14px;
+    outline-width: 0;
+}
+
+.cs-create-menu > header {
+    padding: 1em 1em 0.833em;
+    font-size: 14px;
+    font-weight: bold;
+    user-select: none;
+    cursor: default;
+    height: 3rem;
+}
+
+.cs-create-menu > ul > li:hover > button {
+    border-color: var(--active-foreground);
+    background-color: var(--active-background);
+    color: var(--active-foreground);
+}

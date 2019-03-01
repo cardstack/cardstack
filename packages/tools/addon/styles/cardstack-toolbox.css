@@ -1,5 +1,6 @@
 @import "cs-editor-switch";
 @import "cs-mode-button";
+@import "cs-create-menu";
 @import "cs-create-button";
 @import "cs-insert-button";
 @import "cs-active-composition-panel";
@@ -8,6 +9,7 @@
 @import "cs-field-editor";
 @import "cs-collapsible-section";
 @import "cs-branch-control";
+@import "cs-placeholder-create";
 
 .cardstack-toolbox {
     box-sizing: border-box;
@@ -18,84 +20,4 @@
 
 .cardstack-toolbox-width {
     width: 22rem;
-}
-
-.cs-create-menu {
-    min-height: 10rem;
-    background-color: var(--normal-background);
-    color: var(--bright-foreground);
-    border: 1px solid var(--light05);
-    border-radius: 20px;
-    box-shadow: 0 2px 15px 0 var(--dark50);
-}
-
-.cs-create-menu > ul {
-    list-style-type: none;
-    line-height: 2em;
-    overflow-y: scroll;
-    padding: .25em 1em;
-    margin: 0;
-    max-height: calc(100vh - 3rem - 42px);
-}
-
-.cs-create-menu > ul > li {
-    overflow: hidden;
-    margin: 1em 0;
-    color: #7d7d7d;
-    font-size: 12px;
-    font-weight: 100;
-    cursor: pointer;
-}
-
-.cs-create-menu > ul > li:hover {
-    color: var(--deep-background);
-}
-
-.cs-create-menu > ul > li > button {
-    float: right;
-    padding: 0.5em 2.5em;
-    font-size: 0.75rem;
-    background-color: var(--light-foreground);
-    /* border: 1px solid #cacaca; */
-    color: var(--bright-foreground);
-    border-radius: 3px;
-    text-decoration: none;
-    cursor: pointer;
-    font-weight: normal;
-    font-family: inherit;
-    outline-width: 0;
-}
-
-.cs-create-menu > header {
-    padding: 1em 1em 0.833em;
-    font-size: 0.75rem;
-    user-select: none;
-    cursor: default;
-    height: 3rem;
-}
-
-.cs-create-menu > ul > li:hover > button {
-    border-color: #292A2C;
-    color: #292A2C;
-}
-
-.cs-placeholder-create {
-    display: flex;
-    justify-content: flex-end;
-}
-
-.cs-placeholder-create > button {
-    line-height: 1.5em;
-    margin: 0.5em 0.3em;
-    padding: .4em 1.4em .4em;
-    border: none;
-    border-radius: 4px;
-    background-color: var(--bright-foreground);
-    font-size: .8em;
-    cursor: pointer;
-    outline-width: 0;
-}
-
-.cs-placeholder-create > button:hover {
-    background-color: var(--light-foreground);
 }
