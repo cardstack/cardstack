@@ -18,5 +18,5 @@
 }
 
 .cardstack-tools-launcher.active {
-    transform: translate(20px, -15px);
+    transform: translate(15px, -15px);
 }

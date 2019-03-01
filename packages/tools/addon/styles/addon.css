@@ -1,6 +1,4 @@
 @import "base";
-@import "cardstack-tools-launcher";
-@import "cardstack-tools-edges";
 @import "cardstack-top-edge";
 @import "cardstack-right-edge";
 @import "cardstack-left-edge";
@@ -8,6 +6,8 @@
 @import "cs-field-overlays";
 @import "cs-toggle-switch";
 @import "cs-account-icon";
+@import "cardstack-tools-edges";
+@import "cardstack-tools-launcher";
 @import "theme";
 
 :root {
