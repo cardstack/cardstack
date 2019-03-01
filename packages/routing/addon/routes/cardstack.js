@@ -9,7 +9,7 @@ export default Route.extend({
   },
 
   model(params, transition) {
-    let { branch } = transition.to.queryParams;
+    let { branch } = transition.to ? transition.to.queryParams : transition.queryParams;
     if (branch == null) {
       branch = defaultBranch;
     }

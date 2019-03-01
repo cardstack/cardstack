@@ -28,7 +28,7 @@
   "dependencies": {
     "ember-cli-babel": "^6.8.2",
     "ember-cli-htmlbars": "^2.0.1",
-    "ember-concurrency": "^0.8.17",
+    "ember-concurrency": "^0.8.27",
     "ember-elsewhere": "^1.0.3",
     "ember-mobiledoc-dom-renderer": "^0.6.0",
     "ember-mobiledoc-editor": "backspace/ember-mobiledoc-editor#closure-actions",
@@ -49,7 +49,7 @@
     "ember-cli-qunit": "^4.1.0",
     "ember-cli-sri": "^2.1.0",
     "ember-cli-uglify": "^2.0.0",
-    "ember-data": "^2.12.1",
+    "ember-data": "^3.5.0",
     "ember-disable-prototype-extensions": "^1.1.2",
     "ember-export-application-global": "^2.0.0",
     "ember-load-initializers": "^1.0.0",

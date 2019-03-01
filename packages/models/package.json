@@ -32,7 +32,7 @@
     "ember-cli-babel": "^6.8.2",
     "ember-data-relationship-tracker": "^0.3.2",
     "ember-inject-optional": "^0.1.0",
-    "ember-resource-metadata": "^0.3.0",
+    "ember-resource-metadata": "habdelra/ember-resource-metadata#a1eaf9d1be6fe23aab45211e2b80939263016229",
     "handlebars": "^4.0.6",
     "inflection": "^1.12.0",
     "lodash-es": "^4.17.11"
@@ -53,7 +53,7 @@
     "ember-cli-qunit": "^4.1.1",
     "ember-cli-sri": "^2.1.0",
     "ember-cli-uglify": "^2.0.0",
-    "ember-data": "^2.13.1",
+    "ember-data": "^3.5.0",
     "ember-disable-prototype-extensions": "^1.1.2",
     "ember-export-application-global": "^2.0.0",
     "ember-load-initializers": "^1.0.0",
