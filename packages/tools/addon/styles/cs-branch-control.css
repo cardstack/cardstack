@@ -1,13 +1,9 @@
 .cs-branch-control {
-  width: 80%;
-  position: absolute;
-  top: 22px;
-  right: 15px;
-  height: 40px;
+  margin-bottom: 22px;
 }
 
 .cs-branch-control .ember-power-select-trigger {
-  min-height: 40px;
+  min-height: 30px;
   background-color: var(--normal-background);
   border: 0;
   line-height: 2.5;
@@ -19,10 +15,10 @@
 
 .cs-branch-control .ember-power-select-status-icon {
   content: url("data:image/svg+xml; utf8, <svg id='dropdown-buttons' fill='#fff' viewBox='0 0 7 16' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink' width='100%' height='100%'><g stroke='none' stroke-width='1' fill-rule='evenodd'><g transform='translate(-1375.000000, -219.000000)' fill-rule='nonzero'><g transform='translate(1110.000000, 81.000000)'><g transform='translate(20.000000, 126.000000)'><g><polygon points='251.017315 24 252 25.0955528 248.5 28 245 25.0955528 245.982685 24 248.5 26.0889739'></polygon><polygon transform='translate(248.500000, 14.000000) rotate(-180.000000) translate(-248.500000, -14.000000) ' points='251.017315 12 252 13.0955528 248.5 16 245 13.0955528 245.982685 12 248.5 14.0889739'></polygon></g></g></g></g></g></svg>");
-  display:block;
+  display: block;
   right: 20px;
-  width:10px;
-  height:20px;
+  width: 10px;
+  height: 20px;
   border: 0;
   fill: var(--bright-foreground);
 }

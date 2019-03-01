@@ -1,9 +1,9 @@
 :root {
-    --cs-header-height: 2.625em;
+    --cs-header-height: 30px;
 }
 
 .cardstack-header {
-    min-height: var(--cs-header-height);
+    height: var(--cs-header-height);
     background-color: var(--deep-background);
     display: flex;
 }
