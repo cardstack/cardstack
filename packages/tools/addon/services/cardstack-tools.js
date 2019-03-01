@@ -58,11 +58,9 @@ export default Service.extend({
       });
       return fields;
     });
-    let result = modelFields.concat(ownedRelationshipFields.reduce((flattened, fields) => {
+    return modelFields.concat(ownedRelationshipFields.reduce((flattened, fields) => {
       return flattened.concat(fields);
     }, []));
-
-    return result;
   }),
 
   contentPages: computed('marks', function() {
