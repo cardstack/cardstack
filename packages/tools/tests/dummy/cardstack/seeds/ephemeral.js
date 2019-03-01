@@ -114,6 +114,9 @@ function initialModels() {
       initial.addResource('fields', 'archived').withAttributes({
         fieldType: '@cardstack/core-types::boolean'
       }),
+      initial.addResource('fields', 'slug').withAttributes({
+        fieldType: '@cardstack/core-types::string'
+      }),
       initial.addResource('fields', 'categories').withAttributes({
         fieldType: '@cardstack/core-types::has-many',
         editorComponent: 'field-editors/category-editor',
