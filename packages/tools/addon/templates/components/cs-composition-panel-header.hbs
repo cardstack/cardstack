@@ -6,12 +6,14 @@
   }}
   <div>
     <p class="content-type">{{cs-humanize (cs-model-type model)}}</p>
-    <p class="content-title">
-      {{#if model.created}}
-        {{moment-format model.created "YYYY-MM-DD"}}
-      {{/if}}
-      {{title}}
-    </p>
+    {{#if content.title}}
+      <p class="content-title">
+        {{#if model.created}}
+          {{moment-format model.created "YYYY-MM-DD"}}
+        {{/if}}
+        {{title}}
+      </p>
+    {{/if}}
   </div>
 </div>
 
