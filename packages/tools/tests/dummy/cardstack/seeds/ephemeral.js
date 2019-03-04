@@ -21,14 +21,28 @@ function initialModels() {
   initial.addResource('grants')
     .withRelated('who', [{ type: 'groups', id: 'everyone' }])
     .withAttributes({
-      'may-create-resource': true,
       'may-read-resource': true,
-      'may-update-resource': true,
-      'may-delete-resource': true,
-      'may-write-fields': true,
       'may-read-fields': true,
       'may-login': true
     });
+
+  initial.addResource('grants')
+    .withRelated('who', [{ type: 'groups', id: 'everyone' }])
+    .withRelated('types', [
+      { type: 'content-types', id: 'categories' },
+      { type: 'content-types', id: 'bloggers' },
+      { type: 'content-types', id: 'comments' },
+      { type: 'content-types', id: 'karma-types' },
+      { type: 'content-types', id: 'posts' },
+      { type: 'content-types', id: 'time-units' }
+    ])
+    .withAttributes({
+      'may-create-resource': true,
+      'may-update-resource': true,
+      'may-delete-resource': true,
+      'may-write-fields': true
+    });
+
 
   initial.addResource('content-types', 'categories')
     .withRelated('fields', [
@@ -48,6 +62,22 @@ function initialModels() {
     ]);
 
   initial.addResource('content-types', 'comments')
+    .withAttributes({
+      defaultIncludes: [
+        'poster',
+        'karma-type',
+      ],
+      fieldsets: {
+        embedded: [
+          { field: 'poster', format: 'embedded'},
+          { field: 'karma-type', format: 'embedded'},
+        ],
+        isolated: [
+          { field: 'poster', format: 'embedded'},
+          { field: 'karma-type', format: 'embedded'},
+        ]
+      }
+    })
     .withRelated('fields', [
       initial.addResource('fields', 'body').withAttributes({
         fieldType: '@cardstack/core-types::string'
@@ -86,7 +116,15 @@ function initialModels() {
         'comments',
         'comments.poster',
         'comments.karma-type',
-      ]
+      ],
+      fieldsets: {
+        isolated: [
+          { field: 'author', format: 'embedded'},
+          { field: 'categories', format: 'embedded'},
+          { field: 'reading-time-unit', format: 'embedded'},
+          { field: 'comments', format: 'embedded'},
+        ]
+      }
     })
     .withRelated('fields', [
       initial.addResource('fields', 'title').withAttributes({

@@ -16,20 +16,20 @@ export default Component.extend({
 
   didReceiveAttrs() {
     this._super(...arguments);
-    this._fetchPermissionsIfModelChanged();
+    this._fetchPermissionsIfModelChanged.perform();
   },
 
   didUpdateAttrs() {
     this._super(...arguments);
-    this._fetchPermissionsIfModelChanged();
+    this._fetchPermissionsIfModelChanged.perform();
   },
 
-  _fetchPermissionsIfModelChanged() {
+  _fetchPermissionsIfModelChanged: task(function * () {
     if (this.previousModel !== this.model) {
-      this.get('fetchPermissions').perform();
+      yield this.get('fetchPermissions').perform();
       this.set('previousModel', this.model);
     }
-  },
+  }),
 
   fetchPermissions: task(function * () {
     let records = [this.model, ...this.model.relatedOwnedRecords()];
@@ -44,7 +44,7 @@ export default Component.extend({
       return hash;
     }, {});
     this.set('permissions', permissions);
-  }).drop(),
+  }).restartable(),
 
   fetchPermissionsFor: task(function * (record) {
     return yield this.get('data').fetchPermissionsFor(record);

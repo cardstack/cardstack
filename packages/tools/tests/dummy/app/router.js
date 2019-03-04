@@ -1,5 +1,6 @@
 import EmberRouter from '@ember/routing/router';
 import config from './config/environment';
+import { cardstackRoutes } from '@cardstack/routing';
 
 const Router = EmberRouter.extend({
   location: config.locationType,
@@ -7,10 +8,8 @@ const Router = EmberRouter.extend({
 });
 
 Router.map(function() {
-  this.route('posts', { path: '/' }, function() {
-    this.route('new');
-    this.route('show', { path: '/:id' });
-  });
+  this.route('hub', cardstackRoutes);
+  this.route('posts');
 });
 
 export default Router;

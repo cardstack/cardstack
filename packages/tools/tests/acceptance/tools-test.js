@@ -7,6 +7,10 @@ function findTriggerElementWithLabel(labelRegex) {
   return [...this.element.querySelectorAll('.cs-toolbox-section label')].find(element => labelRegex.test(element.textContent));
 }
 
+function findAddNewButtonWithLabel(buttonTextRegex) {
+  return [...this.element.querySelectorAll('.cs-create-menu ul li')].find(element => buttonTextRegex.test(element.textContent));
+}
+
 function findSectionLabels(label) {
   return [...this.element.querySelectorAll('.cs-toolbox-section label')].filter(element => label === element.textContent);
 }
@@ -28,7 +32,7 @@ module('Acceptance | tools', function(hooks) {
   });
 
   test('activate tools', async function(assert) {
-    await visit('/1');
+    await visit('/hub/posts/1');
     await login();
     await click('.cardstack-tools-launcher');
     await waitFor('.cs-active-composition-panel');
@@ -50,7 +54,7 @@ module('Acceptance | tools', function(hooks) {
   });
 
   test('field groups for related types are rendered correctly', async function(assert) {
-    await visit('/1');
+    await visit('/hub/posts/1');
     await login();
     await click('.cardstack-tools-launcher');
 
@@ -60,7 +64,7 @@ module('Acceptance | tools', function(hooks) {
   });
 
   test('show validation error', async function(assert) {
-    await visit('/1');
+    await visit('/hub/posts/1');
     await login();
     await click('.cardstack-tools-launcher');
 
@@ -83,7 +87,7 @@ module('Acceptance | tools', function(hooks) {
   });
 
   test('show all fields, not just those rendered from template', async function(assert) {
-    await visit('/1');
+    await visit('/hub/posts/1');
     await login();
     await click('.cardstack-tools-launcher');
 
@@ -95,7 +99,7 @@ module('Acceptance | tools', function(hooks) {
   });
 
   test('it does not collapse sections for right edge input fields that are not rendered in the template when you type in the field', async function(assert) {
-    await visit('/1');
+    await visit('/hub/posts/1');
     await login();
     await click('.cardstack-tools-launcher');
 
@@ -111,7 +115,7 @@ module('Acceptance | tools', function(hooks) {
   });
 
   test('show unrendered fields from related, owned records', async function(assert) {
-    await visit('/1');
+    await visit('/hub/posts/1');
     await login();
     await click('.cardstack-tools-launcher');
 
@@ -121,7 +125,7 @@ module('Acceptance | tools', function(hooks) {
 
 
   test('collapsible panel captions are unambiguous', async function(assert) {
-    await visit('/1');
+    await visit('/hub/posts/1');
     await login();
     await click('.cardstack-tools-launcher');
 
@@ -132,7 +136,7 @@ module('Acceptance | tools', function(hooks) {
   });
 
   test('disable inputs for computed fields', async function(assert) {
-    await visit('/1');
+    await visit('/hub/posts/1');
     await login();
     await click('.cardstack-tools-launcher');
 
@@ -144,7 +148,7 @@ module('Acceptance | tools', function(hooks) {
   });
 
   test('allow editing fields for related, owned records', async function(assert) {
-    await visit('/1');
+    await visit('/hub/posts/1');
     await login();
     await click('.cardstack-tools-launcher');
     await waitFor('.cs-editor-switch')
@@ -164,7 +168,7 @@ module('Acceptance | tools', function(hooks) {
   });
 
   test('track field dirtiness in owned, related records', async function(assert) {
-    await visit('/1');
+    await visit('/hub/posts/1');
     await login();
     await click('.cardstack-tools-launcher');
     await waitFor('.cs-editor-switch')
@@ -184,7 +188,7 @@ module('Acceptance | tools', function(hooks) {
   });
 
   test('allow editing fields of newly added, owned records', async function(assert) {
-    await visit('/1');
+    await visit('/hub/posts/1');
     await login();
     await click('.cardstack-tools-launcher');
     await waitFor('.cs-editor-switch')
@@ -201,7 +205,7 @@ module('Acceptance | tools', function(hooks) {
   });
 
   test('can hide fields from editor', async function (assert) {
-    await visit('/1');
+    await visit('/hub/posts/1');
     await login();
     await click('.cardstack-tools-launcher');
     await waitFor('.cs-editor-switch')
@@ -210,5 +214,23 @@ module('Acceptance | tools', function(hooks) {
     assert.dom('[data-test-field-name="hidden-field-from-editor"]').doesNotExist();
     assert.dom('[data-test-dummy-hidden-field-from-editor]').hasText('This field is hidden from the editor');
     assert.dom('[data-test-field-name="hidden-computed-field-from-editor"]').doesNotExist();
+  });
+
+  test('allow editing fields of newly added record', async function(assert) {
+    await visit('/hub/posts/1');
+    await login();
+    await click('.cardstack-tools-launcher');
+    await waitFor('.cs-editor-switch')
+    await click('.cs-editor-switch');
+
+    await click('.cs-create-button');
+
+    let newPostButton = findAddNewButtonWithLabel.call(this, /Posts/);
+    await click(newPostButton);
+
+    let titleSectionTrigger = findTriggerElementWithLabel.call(this, /Title/);
+    await click(titleSectionTrigger);
+
+    assert.dom('.field-editor > input').isNotDisabled();
   });
 });
