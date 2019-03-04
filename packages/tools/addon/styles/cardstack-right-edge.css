@@ -1,0 +1,21 @@
+@import "cs-editor-switch";
+@import "cs-mode-button";
+@import "cs-create-menu";
+@import "cs-create-button";
+@import "cs-insert-button";
+@import "cs-active-composition-panel";
+@import "cs-composition-panel-header";
+@import "cs-version-control";
+@import "cs-field-editor";
+@import "cs-collapsible-section";
+@import "cs-branch-control";
+@import "cs-placeholder-create";
+
+.cardstack-right-edge {
+  --right-edge-width: 22rem;
+
+  position: relative;
+  width: var(--right-edge-width);
+  min-height: 100vh;
+  padding: 20px 15px 15px var(--edges-gutter);
+}

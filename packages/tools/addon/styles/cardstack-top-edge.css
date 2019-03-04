@@ -1,0 +1,14 @@
+.cardstack-top-edge {
+  --top-edge-height: 60px;
+
+  width: 100%;
+  height: var(--top-edge-height);
+  padding-bottom: var(--edges-gutter);
+}
+
+/* .cs-admin-launcher {
+    padding: 0.3em 0.5em 0 0.5em;
+    min-width: 2em;
+    text-align: center;
+    line-height: calc(var(--cs-header-height) - 0.3em);
+} */

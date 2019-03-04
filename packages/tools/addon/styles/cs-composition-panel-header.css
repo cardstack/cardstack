@@ -23,7 +23,7 @@
 
 .cs-composition-panel-header--info {
     display: flex;
-    padding: 2em 0;
+    padding: 1em 0 1.5em;
 }
 
 .cs-composition-panel-header--info > svg {
@@ -35,22 +35,23 @@
 
 .cs-composition-panel-header--info > div {
     max-width: 16em;
+    align-self: center;
 }
 
 .cs-composition-panel-header--info .content-type {
-    margin: 0 0 2px;
+    margin: 0;
     color: var(--light50);
     font-size: 0.69em;
     font-family: 'Open Sans Bold';
     font-weight: bold;
     letter-spacing: 1px;
-    line-height: 1.36;
+    line-height: 1.4;
     text-transform: uppercase;
 }
 
 .cs-composition-panel-header--info .content-title {
-    margin: 0;
+    margin: 2px 0 0;
     font-size: 0.9em;
     letter-spacing: 0.1px;
-    line-height: 1.38;
+    line-height: 1.4;
 }

@@ -26,11 +26,3 @@
     font-family: 'Open Sans Bold';
     src: url('../@cardstack/tools/OpenSans-Bold.ttf');
 }
-
-
-/* these classes comes from the ember-sidebars addon. We need to
-   increase the z-indices of the sidebars so they stay on top of the
-   scrims provided by ember-overlays. */
-.cst-bottom {
-    z-index: 150;
-}

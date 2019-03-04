@@ -3,11 +3,11 @@ import { setupRenderingTest } from 'ember-qunit';
 import { render } from '@ember/test-helpers';
 import hbs from 'htmlbars-inline-precompile';
 
-module('Integration | Component | cardstack toolbox', function(hooks) {
+module('Integration | Component | cardstack tools top edge', function(hooks) {
   setupRenderingTest(hooks);
 
   test('it renders', async function(assert) {
-    assert.expect(0);
-    await render(hbs`{{cardstack-toolbox}}`);
+    await render(hbs`{{cardstack-top-edge}}`);
+    assert.dom('[data-test-cardstack-top-edge]').exists();
   });
 });

@@ -1,11 +1,6 @@
 .cs-active-composition-panel {
     box-sizing: border-box;
-    position: absolute;
-    right: 15px;
-    top: 100px;
-    display: flex;
-    flex-direction: column;
-    width: 80%;
+    width: 100%;
     min-height: 25rem;
     max-height: 85%;
     background-color: var(--normal-background);

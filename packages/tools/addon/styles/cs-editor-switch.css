@@ -1,11 +1,10 @@
 .cs-editor-switch {
     position: absolute;
-    right: 14px;
-    top: 99px;
-    margin: 0;
+    right: 15px;
+    margin: -2px -2px 0 0;
     padding: 0;
-    width: 3em;
-    height: 3em;
+    width: 50px;
+    height: 50px;
     background: var(--gradient-foreground);
     color: var(--bright-foreground);
     fill: var(--bright-foreground);
