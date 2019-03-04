@@ -1,5 +1,5 @@
 .block-control {
-  z-index: 1;
+  z-index: 160;
   top: 0;
   left: 0;
   position: absolute;
@@ -9,7 +9,7 @@
 .block-options, .paragraph-options {
   position: absolute;
   top: 46px;
-  left: -34px;
+  left: 0;
   background-color: #fff;
   border-radius: 3px;
   padding: 12px 12px 6px;
@@ -21,7 +21,7 @@
 
 .block-options:after, .paragraph-options:after, .block-options:before, .paragraph-options:before {
   bottom: 100%;
-  left: 25%;
+  left: 9%;
   border: solid transparent;
   content: " ";
   height: 0;
