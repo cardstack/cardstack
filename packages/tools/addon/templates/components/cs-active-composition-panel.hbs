@@ -4,7 +4,7 @@
 }}
 
 {{!- this one scrolls }}
-<div class="cs-active-composition-panel--main">
+<div class="cs-active-composition-panel--main {{if editingEnabled "header-expanded" "header-collapsed"}}">
   {{#each renderedFields key="id" as |fieldMark|}}
     {{! template-lint-disable attribute-indentation }}
     {{#let
