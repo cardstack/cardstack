@@ -1,5 +1,5 @@
 .block-control {
-  z-index: 160;
+  z-index: 110;
   top: 0;
   left: 0;
   position: absolute;
@@ -93,7 +93,7 @@
   left: 0;
   position: absolute;
   box-shadow: 0 -3px 10px rgba(0,0,0,.2);
-  z-index: 1;
+  z-index: 110;
   width: auto;
 }
 .paragraph-options:after, .paragraph-options:before {
@@ -121,5 +121,9 @@
 }
 
 .__mobiledoc-tooltip {
-  z-index: 10;
+  z-index: 110;
+}
+
+.__mobiledoc-editor blockquote {
+  margin-left: 0;
 }

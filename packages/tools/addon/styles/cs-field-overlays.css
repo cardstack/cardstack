@@ -1,3 +1,7 @@
+.cs-field-overlay.show-overlay {
+  z-index: 1;
+}
+
 .cs-field-overlay .overlay-label,
 .cs-content-overlay .overlay-label {
   font-size: 10px;
