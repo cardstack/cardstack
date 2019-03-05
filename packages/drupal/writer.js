@@ -6,13 +6,18 @@ const { isEqual } = require('lodash');
 const { drupalToCardstackDoc, cardstackToDrupalDoc } = require('./lib/document');
 const pendingChanges = new WeakMap();
 const log = require('@cardstack/logger')('cardstack/drupal');
+const { declareInjections } = require('@cardstack/di');
 
-module.exports = class Writer {
+module.exports = declareInjections({
+  searchers: 'hub:searchers',
+  currentSchema: 'hub:current-schema',
+}, class Writer {
   static create(params) {
     return new this(params);
   }
-  constructor({ url, authToken, dataSource }) {
+  constructor({ url, authToken, dataSource, searchers }) {
     this.url = url;
+    this.searchers = searchers;
     this.authToken = authToken;
     this._schema = null;
     this.dataSource = dataSource;
@@ -47,8 +52,16 @@ module.exports = class Writer {
     this._assertNotSchema(isSchema);
     let url = await this._findURL(type);
     let token = this.authToken;
-    let { models: schemaModels } = await this._getSchema();
-    let change = new PendingChange(null, document, finalize);
+    let schema = await this._getSchema();
+    let { models: schemaModels } = schema;
+    let change = new PendingChange({
+      finalDocument: document,
+      finalizer: finalize,
+      branch,
+      searchers: this.searchers,
+      schema,
+      sourceId: this.dataSource.id
+    });
     pendingChanges.set(change, { url, token, method: 'post', schemaModels });
     return change;
   }
@@ -57,9 +70,18 @@ module.exports = class Writer {
     this._assertNotSchema(isSchema);
     let url = (await this._findURL(type)) + '/' + id;
     let response = await request.get(url);
-    let { models: schemaModels } = await this._getSchema();
+    let schema = await this._getSchema();
+    let { models: schemaModels } = schema;
     let originalDocument = drupalToCardstackDoc(response.body.data, schemaModels);
-    let change = new PendingChange(originalDocument, patch(originalDocument, document), finalize);
+    let change = new PendingChange({
+      originalDocument,
+      finalDocument: patch(originalDocument, document),
+      finalizer: finalize,
+      branch,
+      searchers: this.searchers,
+      schema,
+      sourceId: this.dataSource.id
+    });
     let token = this.authToken;
     pendingChanges.set(change, { url, token, method: 'patch', schemaModels });
     return change;
@@ -78,7 +100,7 @@ module.exports = class Writer {
     }
   }
 
-};
+});
 
 async function finalize(change) {
   let { method, url, token, schemaModels } = pendingChanges.get(change);

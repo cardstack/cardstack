@@ -4,16 +4,22 @@ const { Pool } = require('pg');
 const { range }  = require('lodash');
 const rowToDocument = require('./row-to-doc');
 const NameMapper = require('./name-mapper');
+const { declareInjections } = require('@cardstack/di');
 
 const safeIdentifier = /^[a-zA-Z0-9._]+$/;
 const pendingChanges = new WeakMap();
 
-module.exports = class Writer {
+module.exports = declareInjections({
+  searchers: 'hub:searchers',
+  currentSchema: 'hub:current-schema'
+}, class Writer {
   static create(params) {
     return new this(params);
   }
-  constructor({ branches, dataSource, renameColumns, renameTables }) {
+  constructor({ branches, dataSource, renameColumns, renameTables, searchers, currentSchema }) {
     this.branchConfig = branches;
+    this.searchers = searchers;
+    this.currentSchema = currentSchema;
     this.pools = Object.create(null);
     this.schemas = Object.create(null);
     this.dataSource = dataSource;
@@ -64,7 +70,15 @@ module.exports = class Writer {
       await client.query('begin');
       let result = await client.query(`insert into ${schema}.${table} (${columns.join(',')}) values (${placeholders}) returning *`, args);
       let finalDocument = rowToDocument(this.mapper, await this._getSchema(branch), type, result.rows[0]);
-      let change = new PendingChange(null, finalDocument, finalize, abort);
+      let change = new PendingChange({
+        finalDocument,
+        finalizer: finalize,
+        aborter: abort,
+        searchers: this.searchers,
+        schema: await this.currentSchema.forBranch(branch),
+        branch,
+        sourceId: this.dataSource.id
+      });
       pendingChanges.set(change, { client });
       return change;
     } catch (err) {
@@ -87,7 +101,16 @@ module.exports = class Writer {
       let initialDocument = rowToDocument(this.mapper, schema, type, result.rows[0]);
       result = await client.query(`update ${dbschema}.${table} set ${columns.map((name,index) => `${name}=$${index+1}`).join(',')} where id=$${args.length} returning *`, args);
       let finalDocument = rowToDocument(this.mapper, schema, type, result.rows[0]);
-      let change = new PendingChange(initialDocument, finalDocument, finalize, abort);
+      let change = new PendingChange({
+        originalDocument: initialDocument,
+        finalDocument,
+        finalizer: finalize,
+        aborter: abort,
+        searchers: this.searchers,
+        schema: await this.currentSchema.forBranch(branch),
+        branch,
+        sourceId: this.dataSource.id
+      });
       pendingChanges.set(change, { client });
       return change;
     } catch (err) {
@@ -103,7 +126,15 @@ module.exports = class Writer {
       await client.query('begin');
       let initialDocument = rowToDocument(this.mapper, await this._getSchema(branch), type, await client.query(`select * from ${schema}.${table} where id=$1`, [ id ]));
       await client.query(`delete from ${schema}.${table} where id=$1`, [id]);
-      let change = new PendingChange(initialDocument, null, finalize, abort);
+      let change = new PendingChange({
+        originalDocument: initialDocument,
+        finalizer: finalize,
+        aborter: abort,
+        searchers: this.searchers,
+        schema: await this.currentSchema.forBranch(branch),
+        branch,
+        sourceId: this.dataSource.id
+      });
       pendingChanges.set(change, { client });
       return change;
     } catch (err) {
@@ -154,7 +185,7 @@ module.exports = class Writer {
     });
     return { table, schema, args, columns };
   }
-};
+});
 
 function quoteKey(key) {
   return `"${key}"`;

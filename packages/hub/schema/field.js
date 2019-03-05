@@ -202,9 +202,9 @@ module.exports = class Field {
       authLog.debug("approved field write for %s because it matches server provided default", this.id);
     } else if (pendingChange.originalDocument && isEqual(value, this.valueFrom(pendingChange, 'originalDocument'))) {
       authLog.debug("approved field write for %s because it was unchanged", this.id);
-    } else if (pendingChange.originalDocument && (grant = await find(this.grants, async g => g['may-write-fields'] && await g.matches(pendingChange.originalDocument, context)))) {
+    } else if (pendingChange.originalDocumentContext && (grant = await find(this.grants, async g => g['may-write-fields'] && await g.matches(pendingChange.originalDocumentContext, context)))) {
       authLog.debug("approved field write for %s because grant %s applies to original document", this.id, grant.id);
-    } else if (!pendingChange.originalDocument && (grant = await find(this.grants, async g => g['may-write-fields'] && await g.matches(pendingChange.finalDocument, context)))) {
+    } else if (!pendingChange.originalDocumentContext && (grant = await find(this.grants, async g => g['may-write-fields'] && await g.matches(pendingChange.finalDocumentContext, context)))) {
       authLog.debug("approved field write for %s because grant %s applies to final document", this.id, grant.id);
     } else {
       // Denied

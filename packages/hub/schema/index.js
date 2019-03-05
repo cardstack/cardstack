@@ -232,13 +232,13 @@ class Schema {
       return;
     }
 
-    return userType.hasLoginAuthorization(userRealms);
+    return await userType.hasLoginAuthorization(userRealms);
   }
 
-  authorizedReadRealms(type, resource) {
+  async authorizedReadRealms(type, documentContext) {
     let contentType = this.types.get(type);
     if (contentType) {
-      return contentType.authorizedReadRealms(resource);
+      return await contentType.authorizedReadRealms(documentContext);
     } else {
       return [];
     }

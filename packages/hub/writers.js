@@ -63,7 +63,6 @@ class Writers {
       );
     }
 
-    let pristine;
     let context;
     try {
       let newSchema = await schema.validate(pending, { type, session });
@@ -75,13 +74,11 @@ class Writers {
       let batch = this.pgSearchClient.beginBatch(this.schema, this.searchers);
       await batch.saveDocument(context);
       await batch.done();
-
-      pristine = await context.pristineDoc();
     } finally {
       if (pending) { await pending.abort();  }
     }
 
-    return context.applyReadAuthorization(pristine, { session });
+    return await context.applyReadAuthorization({ session });
   }
 
   async update(branch, session, type, id, document) {
@@ -104,7 +101,6 @@ class Writers {
       schema.withOnlyRealFields(document.data),
       isSchema
     );
-    let pristine;
     let context;
     try {
       let newSchema = await schema.validate(pending, { type, id, session });
@@ -116,13 +112,11 @@ class Writers {
       let batch = this.pgSearchClient.beginBatch(this.schema, this.searchers);
       await batch.saveDocument(context);
       await batch.done();
-
-      pristine = await context.pristineDoc();
     } finally {
       if (pending) { await pending.abort();  }
     }
 
-    return context.applyReadAuthorization(pristine, { session });
+    return await context.applyReadAuthorization({ session });
   }
 
   async delete(branch, session, version, type, id) {
@@ -151,18 +145,21 @@ class Writers {
 
   async _finalize(pending, branch, type, schema, sourceId, id) {
     let meta = await pending.finalize();
-    let finalDocument = pending.finalDocument;
-    if (finalDocument) {
-      finalDocument.meta = meta;
+    let { finalDocumentContext } = pending;
+
+    if (finalDocumentContext) {
+      await finalDocumentContext.updateDocumentMeta(meta);
+      return finalDocumentContext;
     }
 
+    // This is the scenario where the document is being deleted
     return this.searchers.createDocumentContext({
+      id,
       type,
       branch,
       schema,
       sourceId,
-      id: id || finalDocument.id,
-      upstreamDoc: finalDocument ? { data: finalDocument } : null
+      upstreamDoc: null
     });
   }
 

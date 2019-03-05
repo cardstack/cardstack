@@ -283,11 +283,19 @@ class Batch {
   async _recalcuateRealms() {
     let branch = this.client.controllingBranch.name;
     await this.client._iterateThroughRows(
-      'select id, type, upstream_doc from documents where branch=$1',
+      'select id, type, source, upstream_doc from documents where branch=$1',
       [branch],
-      async ({ id, upstream_doc:upstreamDoc, type }) => {
+      async ({ id, upstream_doc:upstreamDoc, type, source:sourceId }) => {
         let schema = await this._schema.forControllingBranch();
-        let realms = schema.authorizedReadRealms(type, upstreamDoc.data);
+        let context = this._searchers.createDocumentContext({
+          schema,
+          branch,
+          type,
+          id,
+          sourceId,
+          upstreamDoc
+        });
+        let realms = await schema.authorizedReadRealms(type, context);
         const sql = 'update documents set realms=$1 where id=$2 and type=$3 and branch=$4';
         await this.client.query(sql, [realms, id, type, branch]);
       });

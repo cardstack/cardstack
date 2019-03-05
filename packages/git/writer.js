@@ -14,18 +14,25 @@ const { promisify } = require('util');
 const temp = require('temp').track();
 const Gitchain = require('@cardstack/gitchain');
 const log = require('@cardstack/logger')('cardstack/git');
+const { declareInjections } = require('@cardstack/di');
 
 const mkdir = promisify(temp.mkdir);
 
 const pendingChanges = new WeakMap();
 
-module.exports = class Writer {
-  static create(params) {
-    return new this(params);
+module.exports = declareInjections({
+  searchers: 'hub:searchers',
+  currentSchema: 'hub:current-schema',
+}, class Writer {
+  static create(...args) {
+    return new this(...args);
   }
-  constructor({ repo, idGenerator, basePath, branchPrefix, remote, hyperledger }) {
+  constructor({ repo, idGenerator, basePath, branchPrefix, remote, hyperledger, searchers, currentSchema, dataSource }) {
     this.repoPath = repo;
     this.basePath = basePath;
+    this.dataSourceId = dataSource.id;
+    this.searchers = searchers;
+    this.currentSchema = currentSchema;
     this.branchPrefix = branchPrefix || "";
     this.repo = null;
     let hostname = os.hostname();
@@ -83,7 +90,8 @@ module.exports = class Writer {
         gitDocument.relationships = document.relationships;
       }
 
-      let pending = new PendingChange(null, gitDocument, finalizer.bind(this));
+      let schema = await this.currentSchema.forBranch(branch);
+      let pending = new PendingChange({ finalDocument: gitDocument, finalizer: finalizer.bind(this), searchers: this.searchers, sourceId: this.dataSourceId, branch, schema });
       let signature = await this._commitOptions('create', document.type, id, session);
       pendingChanges.set(pending, { type: document.type, id, signature, change, file });
       return pending;
@@ -113,7 +121,8 @@ module.exports = class Writer {
       after.id = document.id;
       after.type = document.type;
       let signature = await this._commitOptions('update', type, id, session);
-      let pending = new PendingChange(before, after, finalizer.bind(this));
+      let schema = await this.currentSchema.forBranch(branch);
+      let pending = new PendingChange({ originalDocument: before, finalDocument: after, finalizer: finalizer.bind(this), searchers: this.searchers, sourceId: this.dataSourceId, branch, schema });
       pendingChanges.set(pending, { type, id, signature, change, file });
       return pending;
     });
@@ -135,7 +144,8 @@ module.exports = class Writer {
       file.delete();
       before.id = id;
       before.type = type;
-      let pending = new PendingChange(before, null, finalizer.bind(this));
+      let schema = await this.currentSchema.forBranch(branch);
+      let pending = new PendingChange({ originalDocument: before, finalizer: finalizer.bind(this), searchers: this.searchers, sourceId: this.dataSourceId, branch, schema });
       let signature = await this._commitOptions('delete', type, id, session);
       pendingChanges.set(pending, { type, id, signature, change });
       return pending;
@@ -209,7 +219,7 @@ module.exports = class Writer {
       );
     }
   }
-};
+});
 
 
 // TODO: we only need to do this here because the Hub has no generic

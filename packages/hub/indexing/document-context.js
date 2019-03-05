@@ -2,7 +2,7 @@ const authLog = require('@cardstack/logger')('cardstack/auth');
 const log = require('@cardstack/logger')('cardstack/indexing/document-context');
 const Model = require('../model');
 const { getPath } = require('@cardstack/routing/cardstack/path');
-const { get, uniqBy } = require('lodash');
+const { merge, get, uniqBy } = require('lodash');
 const Session = require('@cardstack/plugin-utils/session');
 
 module.exports = class DocumentContext {
@@ -30,6 +30,7 @@ module.exports = class DocumentContext {
     this.cache = {};
     this.isCollection = upstreamDoc && upstreamDoc.data && Array.isArray(upstreamDoc.data);
     this.suppliedIncluded = upstreamDoc && upstreamDoc.included;
+    this._model = null;
 
     // included resources that we actually found
     this.pristineIncludes = [];
@@ -45,6 +46,19 @@ module.exports = class DocumentContext {
     if (type === 'user-realms' && user) {
       this._references.push(`${user.type}/${user.id}`);
     }
+  }
+
+  get model() {
+    if (this.isCollection) { return null; }
+    if (this._model) { return this._model; }
+
+    let contentType = this.schema.types.get(this.type);
+    if (!contentType) {
+      throw new Error(`Unknown content type=${this.type} id=${this.id}`);
+    }
+
+    this._model = new Model(contentType, this.upstreamDoc.data, this.schema, this.read.bind(this));
+    return this._model;
   }
 
   async searchDoc() {
@@ -75,6 +89,13 @@ module.exports = class DocumentContext {
     return this._references;
   }
 
+  async updateDocumentMeta(meta) {
+    await this.pristineDoc();
+    if (!this._pristine || !this._pristine.data) { return; }
+
+    this._pristine.data.meta = merge({}, this._pristine.data.meta, meta);
+  }
+
   async read(type, id) {
     log.debug(`Reading record ${type}/${id}`);
 
@@ -95,7 +116,6 @@ module.exports = class DocumentContext {
       return await cached;
     }
 
-    // Remove this trap after we have figured out the root cause of the DocumentContext.read out-of-control recursion
     if (this._pendingReads.includes(key)) {
       throw new Error(`Cycle encountered in DocumentContext.read for ${this.type}/${this.id}. Pending resource reads are ${JSON.stringify(this._pendingReads)}`);
     }
@@ -108,7 +128,7 @@ module.exports = class DocumentContext {
     return resource;
   }
 
-  // This takes an arbitrary JSON:API document and makes it safe to
+  // Makes the pristineDoc safe to
   // show within the given context. If it can't be shown at all
   // (because the primary resource is not readable), we return
   // undefined.
@@ -117,20 +137,16 @@ module.exports = class DocumentContext {
   // ensure there are valid grants for them. We return a new sanitized
   // document that strips out any included resources or fields that
   // were lacking grants.
-  async applyReadAuthorization(document, context={}) {
-    // `context` here is not a DocumentContext object but extra
-    // but a POJO of attributes (for example, { id, type, session })
-    if (!document.data) {
-      return;
-    }
-
+  async applyReadAuthorization(context={}) {
     let session = context.session || Session.EVERYONE;
     let userRealms = await session.realms();
+    let document = await this.pristineDoc();
+    if (!document) { return; }
 
     let authorizedResource;
     let types = this.schema.types;
     if (Array.isArray(document.data)) {
-      authorizedResource = document.data.map(resource => {
+      authorizedResource = await Promise.all(document.data.map(async resource => {
         if (resource.id == null || resource.type == null) {
           return;
         }
@@ -139,8 +155,10 @@ module.exports = class DocumentContext {
         if (!type) {
           return;
         }
-        return type.applyReadAuthorization(resource, userRealms);
-      }).filter(Boolean);
+        let readAuthorizedResource = await type.applyReadAuthorization(this._deriveDocumentContextForResource(resource), userRealms);
+        return readAuthorizedResource;
+      }));
+      authorizedResource = authorizedResource.filter(Boolean);
     } else {
       if (document.data.id == null || document.data.type == null) {
         return;
@@ -151,9 +169,9 @@ module.exports = class DocumentContext {
         return;
       }
       if (document.data.type === 'permissions') {
-        authorizedResource = await this._readAuthorizationForPermissions(document, session, context);
+        authorizedResource = await this._readAuthorizationForPermissions(session, context);
       } else {
-        authorizedResource = primaryType.applyReadAuthorization(document.data, userRealms);
+        authorizedResource = await primaryType.applyReadAuthorization(this, userRealms);
         if (!authorizedResource) {
           return;
         }
@@ -172,7 +190,7 @@ module.exports = class DocumentContext {
     }
 
     if (document.included) {
-      let safeIncluded = this._readAuthIncluded(document.included, userRealms);
+      let safeIncluded = await this._readAuthIncluded(document.included, userRealms);
       if (safeIncluded === document.included) {
         // the include list didn't need to be modified. If our output
         // is a modified copy, we need to bring the original included
@@ -257,18 +275,18 @@ module.exports = class DocumentContext {
     return output;
   }
 
-  _readAuthIncluded(included, userRealms) {
+  async _readAuthIncluded(included, userRealms) {
     let modified = false;
-    let safeIncluded = included.map(resource => {
+    let safeIncluded = await Promise.all(included.map(async resource => {
       let contentType = this.schema.types.get(resource.type);
       if (contentType) {
-        let authorized = contentType.applyReadAuthorization(resource, userRealms);
+        let authorized = await contentType.applyReadAuthorization(this._deriveDocumentContextForResource(resource), userRealms);
         if (authorized !== resource) {
           modified = true;
         }
         return authorized;
       }
-    });
+    }));
     if (modified) {
       return safeIncluded.filter(Boolean);
     } else {
@@ -276,35 +294,57 @@ module.exports = class DocumentContext {
     }
   }
 
-  async _readAuthorizationForPermissions(document, session, context) {
+  // DocumentContexts created here should derive from `this` and be able to leverage
+  // the cache and routing context from `this`'s DocumentContext
+  _deriveDocumentContextForResource(resource) {
+    let context = new DocumentContext({
+      type: resource.type,
+      id: resource.id,
+      upstreamDoc: { data: resource },
+      schema: this.schema,
+      branch: this.branch,
+      read: this._read,
+      routers: this.routers,
+    });
+    context.cache = this.cache;
+    context._routeStack = this._routeStack;
+
+    return context;
+  }
+
+  async _readAuthorizationForPermissions(session, context) {
     // Applying read authorization for permission resources is a special case
     // a permission resource can be read if the subject of the permission object can be read
-    if (document.data.type === 'permissions') {
-      let [ queryType, queryId ] = document.data.id.split('/');
-      let permissionsSubjectType = this.schema.types.get(queryType);
-      let permissionsSubject = {};
-      if (!queryId) {
-        // Checking grants should always happen on a document
-        // so in the case we don't have one to check, we need to
-        // to assemble a document from what we know about the fields
-        permissionsSubject = {
-          data: {
-            type: queryType
-          }
-        };
-      } else {
-        permissionsSubject = { data: await this.read(queryType, queryId) };
-      }
-      try {
-        await permissionsSubjectType._assertGrant([permissionsSubject.data], context, 'may-read-resource', 'read');
-        return document.data;
-      } catch(error) {
-        if (!error.isCardstackError) {
-          throw error;
+    if (this.type !== 'permissions') { return; }
+
+    let document = await this.pristineDoc();
+    if (!document) { return; }
+
+    let [queryType, queryId] = document.data.id.split('/');
+    let permissionsSubjectType = this.schema.types.get(queryType);
+    let permissionsSubject = {};
+    if (!queryId) {
+      // Checking grants should always happen on a document
+      // so in the case we don't have one to check, we need to
+      // to assemble a document from what we know about the fields
+      permissionsSubject = {
+        data: {
+          type: queryType
         }
+      };
+    } else {
+      permissionsSubject = { data: await this.read(queryType, queryId) };
+    }
+    try {
+      await permissionsSubjectType._assertGrant([permissionsSubject.data], context, 'may-read-resource', 'read');
+      return document.data;
+    } catch (error) {
+      if (!error.isCardstackError) {
+        throw error;
       }
     }
   }
+
   // TODO come up with a better way to cache (use Model)
   async _buildCachedResponse() {
     let searchTree;
@@ -317,7 +357,7 @@ module.exports = class DocumentContext {
 
     if (!this._searchDoc) {
       log.debug(`Building ${this.type}/${this.id}`);
-      this._searchDoc = await this._build(this.type, this.id, this.upstreamDoc, searchTree, 0);
+      this._searchDoc = this.upstreamDoc ? await this._build(this.type, this.id, this.upstreamDoc, searchTree, 0) : {};
     }
     if (this._searchDoc) {
       return Object.assign({}, this._searchDoc);
@@ -522,7 +562,7 @@ module.exports = class DocumentContext {
         if (this.sourceId != null) {
           this._pristine.data.meta.source = this.sourceId;
         }
-        this._realms = this.schema.authorizedReadRealms(type, jsonapiDoc);
+        this._realms = await this.schema.authorizedReadRealms(type, this);
         authLog.trace("setting resource_realms for %s %s: %j", type, id, this._realms);
       }
     }

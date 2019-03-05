@@ -3,12 +3,14 @@ const PendingChange = require('@cardstack/plugin-utils/pending-change');
 const bootstrapSchema = require('../bootstrap-schema');
 const {
   createDefaultEnvironment,
-  destroyDefaultEnvironment
+  destroyDefaultEnvironment,
+  defaultDataSourceId:sourceId,
 } = require('../../../tests/stub-project/node_modules/@cardstack/test-support/env');
 
 describe('schema/validation', function() {
 
-  let schema, ephemeralDataSource, env;
+  const branch = 'master';
+  let schema, ephemeralDataSource, env, searchers;
 
   before(async function() {
     let factory = new JSONAPIFactory();
@@ -156,6 +158,7 @@ describe('schema/validation', function() {
     env = await createDefaultEnvironment(`${__dirname}/../../../tests/stub-project`);
     let loader = env.lookup('hub:schema-loader');
     schema = await loader.loadFrom(factory.getModels());
+    searchers = env.lookup('hub:searchers');
   });
 
   after(async function() {
@@ -417,19 +420,26 @@ describe('schema/validation', function() {
 
   it("applies update default at update", async function() {
     let pending = new PendingChange({
-      type: 'things-with-defaults',
-      id: '1',
-      attributes: {
-        timestamp: '2017-03-14T13:49:30Z',
-        karma: 10
-      }
-    }, {
-      type: 'things-with-defaults',
-      id: '1',
-      attributes: {
-        timestamp: '2017-03-14T13:49:30Z',
-        karma: 10
-      }
+      originalDocument: {
+        type: 'things-with-defaults',
+        id: '1',
+        attributes: {
+          timestamp: '2017-03-14T13:49:30Z',
+          karma: 10
+        }
+      },
+      finalDocument: {
+        type: 'things-with-defaults',
+        id: '1',
+        attributes: {
+          timestamp: '2017-03-14T13:49:30Z',
+          karma: 10
+        }
+      },
+      branch,
+      searchers,
+      schema,
+      sourceId
     });
     await schema.validate(pending);
     expect(pending.serverProvidedValues.has('timestamp')).is.ok;
@@ -439,11 +449,17 @@ describe('schema/validation', function() {
   });
 
   it("does not apply creation default when user provides a value", async function() {
-    let pending = new PendingChange(null, {
-      type: 'things-with-defaults',
-      attributes: {
-        karma: 10
-      }
+    let pending = new PendingChange({
+      finalDocument: {
+        type: 'things-with-defaults',
+        attributes: {
+          karma: 10
+        }
+      },
+      branch,
+      searchers,
+      schema,
+      sourceId
     });
     await schema.validate(pending);
     expect(pending.finalDocument.attributes.karma).equals(10);
@@ -451,12 +467,18 @@ describe('schema/validation', function() {
 
   it("will not accept a schema change that results in a dangling field reference", async function() {
     let pending = new PendingChange({
-      type: 'fields',
-      id: 'primary-image',
-      attributes: {
-        'field-type': '@cardstack/core-types::belongs-to'
-      }
-    }, null, null);
+      originalDocument: {
+        type: 'fields',
+        id: 'primary-image',
+        attributes: {
+          'field-type': '@cardstack/core-types::belongs-to'
+        }
+      },
+      branch,
+      searchers,
+      schema,
+      sourceId
+    });
     let errors = await schema.validationErrors(pending);
     expect(errors).collectionContains({
       status: 400,
@@ -467,28 +489,38 @@ describe('schema/validation', function() {
 
   it("does not apply update default when user is altering value", async function() {
     let pending = new PendingChange({
-      type: 'things-with-defaults',
-      attributes: {
-        timestamp: '2017-03-14T13:49:30Z'
-      }
-    }, {
-      type: 'things-with-defaults',
-      attributes: {
-        timestamp: '2017-03-14T14:50:00Z'
-      }
+      originalDocument: {
+        type: 'things-with-defaults',
+        attributes: {
+          timestamp: '2017-03-14T13:49:30Z'
+        }
+      },
+      finalDocument: {
+        type: 'things-with-defaults',
+        attributes: {
+          timestamp: '2017-03-14T14:50:00Z'
+        }
+      },
+      branch,
+      searchers,
+      schema,
+      sourceId
     });
     await schema.validate(pending);
     expect(pending.finalDocument.attributes.timestamp).equals('2017-03-14T14:50:00Z');
   });
 
   it("returns modified schema when validating a schema change", async function() {
-    let pending = new PendingChange(null, {
-      type: 'fields',
-      id: 'extra-field',
-      attributes: {
-        'field-type': '@cardstack/core-types::belongs-to'
-      }
-    }, null);
+    let pending = new PendingChange({
+      finalDocument: {
+        type: 'fields',
+        id: 'extra-field',
+        attributes: {
+          'field-type': '@cardstack/core-types::belongs-to'
+        }
+      },
+      branch, searchers, schema, sourceId
+    });
     let newSchema = await schema.validate(pending);
     expect(newSchema).is.ok;
     expect([...newSchema.realFields.keys()]).contains('extra-field');
@@ -610,8 +642,7 @@ describe('schema/validation', function() {
     await schema.validationErrors(pending);
   });
 
+  function create(document) {
+    return new PendingChange({ finalDocument: document, branch, searchers, schema, sourceId });
+  }
 });
-
-function create(document) {
-  return new PendingChange(null, document, null);
-}

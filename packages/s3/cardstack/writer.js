@@ -6,15 +6,21 @@ const moment = require("moment");
 const { makeS3Client } = require('./s3');
 const log = require('@cardstack/logger')('cardstack/image');
 const { extension } = require('mime-types');
+const { declareInjections } = require('@cardstack/di');
 
-module.exports = class Writer {
+module.exports = declareInjections({
+  searchers: 'hub:searchers',
+  currentSchema: 'hub:current-schema',
+}, class Writer {
   static create(params) {
     return new this(params);
   }
 
-  constructor({ dataSource, branches }) {
-    this.dataSource         = dataSource;
-    this.branches           = branches;
+  constructor({ dataSource, branches, searchers, currentSchema }) {
+    this.dataSource    = dataSource;
+    this.branches      = branches;
+    this.searchers     = searchers;
+    this.currentSchema = currentSchema;
   }
 
   async s3Upload(branch, options) {
@@ -50,8 +56,9 @@ module.exports = class Writer {
       }
     };
 
-    let change = new PendingChange(null, document, finalizer);
+    let schema = await this.currentSchema.forBranch(branch);
+    let change = new PendingChange({ finalDocument: document, finalizer, searchers: this.searchers, sourceId: this.dataSource.id, branch, schema });
     return change;
   }
 
-};
+});

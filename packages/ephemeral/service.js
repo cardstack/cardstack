@@ -20,6 +20,8 @@ let generationCounter = 0;
 module.exports = declareInjections({
   indexers: 'hub:indexers',
   writers: 'hub:writers',
+  searchers: 'hub:searchers',
+  controllingBranch: 'hub:controlling-branch',
   schemaLoader: 'hub:schema-loader'
 }, class EphemeralStorageService {
   constructor() {
@@ -92,7 +94,13 @@ module.exports = declareInjections({
     let [schemaModels, dataModels] = partition(models, model => schemaTypes.includes(model.type));
     let schema = await this.schemaLoader.loadFrom(schemaModels);
     for (let model of dataModels) {
-      await schema.validate(new PendingChange(null, model, () => {}), { session: INTERNAL_PRIVILEGED });
+      await schema.validate(new PendingChange({
+        finalDocument: model,
+        finalizer: () => { },
+        branch: this.controllingBranch.name,
+        searchers: this.searchers,
+        schema,
+      }), { session: INTERNAL_PRIVILEGED });
     }
   }
 });
