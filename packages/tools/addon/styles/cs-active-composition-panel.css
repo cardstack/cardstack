@@ -1,8 +1,9 @@
 .cs-active-composition-panel {
+    --tools-panel-height: 34rem;
+
     box-sizing: border-box;
     width: 100%;
-    min-height: 25rem;
-    max-height: 85%;
+    height: var(--tools-panel-height);
     background-color: var(--normal-background);
     color: var(--bright-foreground);
     border: 1px solid var(--light05);
@@ -10,8 +11,14 @@
     box-shadow: 0 2px 15px 0 var(--dark50);
 }
 
+.cs-active-composition-panel--main.header-expanded {
+  --tools-scrollable-panel-height: 17rem;
+}
+.cs-active-composition-panel--main.header-collapsed {
+  --tools-scrollable-panel-height: 23rem;
+}
 .cs-active-composition-panel--main {
-    padding-bottom: 5em;
+    height: var(--tools-scrollable-panel-height);
     overflow-y: scroll;
 }
 
