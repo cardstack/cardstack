@@ -25,7 +25,6 @@ const featureTypes = [
   'static-models',
   'authenticators',
   'middleware',
-  'routers',
   'messengers',
   'code-generators'
 ];
