@@ -50,8 +50,8 @@ describe('hub/searchers/basics', function() {
   }
 
   async function teardown() {
-    await searchers._cachingPromise;
     if (env) {
+      await searchers._cachingPromise;
       await destroyDefaultEnvironment(env);
     }
   }
@@ -119,7 +119,7 @@ describe('hub/searchers/basics', function() {
     after(teardown);
 
     it("a plugin's searcher#get can run after the internal searcher", async function() {
-      let response = searchers.get(env.session, 'master', 'examples', '10000');
+      let response = await searchers.get(env.session, 'master', 'examples', '10000');
       expect(response.data.attributes['example-flavor']).to.equal('vanilla');
     });
   });
