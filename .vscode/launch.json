@@ -117,8 +117,8 @@
                 "packages/test-support/bin/run.js",
                 "--timeout",
                 "200000",
-                // "--grep",
-                // "does not return expired searcher#get included resources"
+                "--grep",
+                "a plugin's searcher#get can run after the internal searcher"
             ]
         },
         {
