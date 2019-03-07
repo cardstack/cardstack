@@ -1,6 +1,6 @@
 {
   "name": "@cardstack/tools",
-  "version": "0.13.52",
+  "version": "0.13.53",
   "description": "The default blueprint for ember-cli addons.",
   "keywords": [
     "ember-addon",
@@ -22,10 +22,10 @@
     "test:all": "ember try:each"
   },
   "dependencies": {
-    "@cardstack/data": "0.13.52",
-    "@cardstack/edges": "0.13.52",
-    "@cardstack/plugin-utils": "0.13.52",
-    "@cardstack/rendering": "0.13.52",
+    "@cardstack/data": "0.13.53",
+    "@cardstack/edges": "0.13.53",
+    "@cardstack/plugin-utils": "0.13.53",
+    "@cardstack/rendering": "0.13.53",
     "ember-cli-babel": "^6.16.0",
     "ember-cli-htmlbars": "^2.0.1",
     "ember-cli-is-component": "^0.5.0",
@@ -44,14 +44,14 @@
     "postcss-import": "^9.1.0"
   },
   "devDependencies": {
-    "@cardstack/authentication": "0.13.52",
-    "@cardstack/ephemeral": "0.13.52",
-    "@cardstack/eslint-config": "0.13.52",
-    "@cardstack/jsonapi": "0.13.52",
-    "@cardstack/mock-auth": "0.13.52",
-    "@cardstack/models": "0.13.52",
-    "@cardstack/routing": "0.13.52",
-    "@cardstack/test-support": "0.13.52",
+    "@cardstack/authentication": "0.13.53",
+    "@cardstack/ephemeral": "0.13.53",
+    "@cardstack/eslint-config": "0.13.53",
+    "@cardstack/jsonapi": "0.13.53",
+    "@cardstack/mock-auth": "0.13.53",
+    "@cardstack/models": "0.13.53",
+    "@cardstack/routing": "0.13.53",
+    "@cardstack/test-support": "0.13.53",
     "@ember/optional-features": "^0.6.3",
     "broccoli-asset-rev": "^2.7.0",
     "ember-cli": "~3.4.3",
