@@ -46,11 +46,12 @@ describe('hub/searchers/basics', function() {
 
     env = await createDefaultEnvironment(`${__dirname}/../../../tests/stub-searcher`, factory.getModels());
     searchers = env.lookup('hub:searchers');
+    await searchers._cachingPromise;
   }
 
   async function teardown() {
+    await searchers._cachingPromise;
     if (env) {
-      await searchers._cachingPromise;
       await destroyDefaultEnvironment(env);
     }
   }
