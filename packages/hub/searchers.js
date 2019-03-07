@@ -11,12 +11,15 @@ module.exports = declareInjections({
   internalSearcher: `plugin-searchers:${require.resolve('@cardstack/pgsearch/searcher')}`,
   client: `plugin-client:${require.resolve('@cardstack/pgsearch/client')}`,
   currentSchema: 'hub:current-schema',
+  jobQueue: 'hub:queues'
 },
 
 class Searchers {
   constructor() {
     this._lastActiveSources = null;
     this._sources = null;
+    this._cachingPromise; // use this promise to handle the async for testing document caching
+    this._workersSetup = false;
   }
 
   async _lookupSources() {
@@ -62,14 +65,7 @@ class Searchers {
     let { data, meta, included } = result || {};
     let maxAge = get(result, 'meta.cardstack-cache-control.max-age');
     if (data && maxAge != null) {
-      let schema = await this.currentSchema.forBranch(branch);
-      await this._updateCache(maxAge, this.createDocumentContext({
-        id,
-        type,
-        branch,
-        schema,
-        upstreamDoc: { data, meta, included }
-      }));
+      await this._startCacheJob(branch, { data, meta, included }, maxAge);
     }
     return { resource: data, meta, included };
   }
@@ -245,7 +241,37 @@ class Searchers {
     };
   }
 
-  async _updateCache(maxAge, documentContext) {
+  async _setupWorkers() {
+    if (this._workersSetup) { return; }
+
+    this._workersSetup = true;
+    await this.jobQueue.subscribe("hub/searchers/cache", async ({ data: { branch, maxAge, upstreamDoc } }) => {
+      this._cachingPromise = Promise.resolve(this._cachingPromise)
+        .then(() => this._cacheDocument(branch, upstreamDoc, maxAge));
+      return await this._cachingPromise;
+    });
+  }
+
+  async _startCacheJob(branch, upstreamDoc, maxAge) {
+    await this._setupWorkers();
+
+    await this.jobQueue.publishAndWait('hub/searchers/cache',
+      { branch, upstreamDoc, maxAge },
+      { singletonKey: 'hub/searchers/cache', singletonNextSlot: true }
+    );
+  }
+
+  async _cacheDocument(branch, upstreamDoc, maxAge) {
+    let { data: { id, type } } = upstreamDoc;
+    let schema = await this.currentSchema.forBranch(branch);
+    let documentContext = this.createDocumentContext({
+      id,
+      type,
+      branch,
+      schema,
+      upstreamDoc: upstreamDoc
+    });
+
     let batch = this.client.beginBatch(this.currentSchema, this);
     try {
       await batch.saveDocument(documentContext, { maxAge });
