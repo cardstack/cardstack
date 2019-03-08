@@ -4,6 +4,7 @@
   background-image: url(/@cardstack/image/placeholder.png);
   background-repeat: no-repeat;
   background-position: center;
+  background-size: contain;
 }
 
 .cardstack-image-editor {
