@@ -1,7 +1,7 @@
 import { helper } from '@ember/component/helper';
 import { hubURL } from "@cardstack/plugin-utils/environment";
 
-export function csImageUrl([imageOrFile]) {
+export function csImageUrl(imageOrFile) {
   let id;
   if (imageOrFile.constructor.modelName === 'cardstack-file') {
     id = imageOrFile.get('id');
@@ -11,4 +11,6 @@ export function csImageUrl([imageOrFile]) {
   return `${hubURL}/api/cardstack-files/${id}`;
 }
 
-export default helper(csImageUrl);
+export default helper(function([imageOrFile]) {
+  return csImageUrl(imageOrFile);
+});
