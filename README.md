@@ -3,7 +3,7 @@ Cardstack Application Framework
 
 This is the main repo for [Cardstack](https://www.cardstack.com/), an open source application architecture for building cohesive experiences on open, decentralized infrastructure.
 
-Join the discussion around developing on the Cardstack framework on Slack at [https://join.cardstack.com](https://join.cardstack.com).
+Join the discussion around developing on the Cardstack framework on [Discord](https://discord.gg/apepFje).
 
 ## Orientation
 
