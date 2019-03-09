@@ -31,6 +31,10 @@
     width: auto;
 }
 
+.cs-field-editor .ember-power-select-selected-item {
+    color: var(--dark-foreground);
+}
+
 .cs-field-editor-button {
     width: 100%;
     padding: 0.7rem;
