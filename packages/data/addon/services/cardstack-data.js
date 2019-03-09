@@ -31,7 +31,7 @@ export default Service.extend({
     let branch = opts.branch || defaultBranch;
     let contentType = await this._getContentType(type);
     let fieldset = contentType.get(`fieldsets.${format}`);
-    let _opts = Object.assign({ branch }, opts);
+    let _opts = Object.assign({ adapterOptions: { branch } }, opts);
 
     if (!fieldset) {
       return await store.findRecord(singularize(type), id, _opts);
@@ -50,9 +50,9 @@ export default Service.extend({
     let store = this.get('store');
     let branch = opts.branch || defaultBranch;
     let type = opts.type || 'cardstack-card';
-    let _opts = Object.assign({ branch, modelName: type }, opts);
+    let _opts = Object.assign({ modelName: type }, opts);
 
-    let result = await store.query(type, _opts);
+    let result = await store.query(type, _opts, { adapterOptions: { branch }});
 
     let recordLoadPromises = [];
     for (let record of result.toArray()) {
@@ -237,7 +237,7 @@ export default Service.extend({
     // we need to specify `reload` in order to allow the included resources to be added to the store.
     // otherwise, if the primary resource is already in the store, ember data is skipping adding the
     // included resources into the store.
-    this._loadedRecordsCache[cacheKey] = store.findRecord(type, id, { include, reload: true, branch });
+    this._loadedRecordsCache[cacheKey] = store.findRecord(type, id, { include, reload: true, adapterOptions: { branch } });
 
     return await this._loadedRecordsCache[cacheKey];
   }

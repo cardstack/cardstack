@@ -40,9 +40,12 @@ export default DS.JSONAPIAdapter.extend(AdapterMixin, {
   buildURL(modelName, id, snapshot, requestType, query) {
     let actualModelName = snapshot && snapshot.modelName || query && query.modelName;
     let url = this._super(actualModelName || modelName, id, snapshot, requestType, query);
+    let branchFromSnapshot = snapshot && get(snapshot, 'adapterOptions.branch');
+    let branchFromQuery = query && get(query, 'adapterOptions.branch');
+    let branch = branchFromSnapshot || branchFromQuery;
 
-    if(snapshot && snapshot.adapterOptions && snapshot.adapterOptions.branch) {
-      url += `?branch=${snapshot.adapterOptions.branch}`;
+    if (branch) {
+      url += `?branch=${branch}`;
     }
 
     return url;
