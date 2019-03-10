@@ -15,6 +15,7 @@ export default Component.extend({
 
   data: service('cardstack-data'),
   router: service(),
+  cardstackRouting: service(), // this is used in the `urlForModel` helper (since it has no container)
 
   didReceiveAttrs() {
     this._super(...arguments);

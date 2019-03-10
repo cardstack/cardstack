@@ -13,21 +13,12 @@ export default DS.JSONAPISerializer.extend(SerializerMixin, {
     return this._super.apply(this, arguments);
   },
 
-  _normalizeSave(store, primaryModelClass, payload) {
+  normalizeCreateRecordResponse(store, primaryModelClass, payload) {
     let selfLink;
     if ((selfLink = get(payload, 'data.links.self'))) {
       payload.data.attributes = payload.data.attributes || {};
       payload.data.attributes['self-link'] = selfLink;
     }
-  },
-
-  normalizeCreateRecordResponse(store, primaryModelClass, payload) {
-    this._normalizeSave(store, primaryModelClass, payload);
-    return this._super.apply(this, arguments);
-  },
-
-  normalizeUpdateRecordResponse(store, primaryModelClass, payload) {
-    this._normalizeSave(store, primaryModelClass, payload);
     return this._super.apply(this, arguments);
   },
 
