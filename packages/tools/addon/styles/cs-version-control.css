@@ -1,3 +1,25 @@
+.cs-version-control-header-fields .cs-field-editor-section {
+    padding: 0;
+}
+
+.cs-version-control-header-fields .cs-field-editor {
+    padding-bottom: 0;
+}
+
+.cs-version-control-header-fields--top-fields {
+    margin-top: .5rem;
+}
+
+.cs-version-control-header-fields .cs-field-editor > .field-editor > input[type="number"] {
+    width: 100%;
+}
+
+.cs-version-control-header-fields .cs-field-editor > .field-editor > input {
+    margin-bottom: .5rem;
+    padding-left: .5rem;
+    padding-right: .5rem;
+}
+
 .cs-version-control-dropdown {
     position: relative;
     display: flex;

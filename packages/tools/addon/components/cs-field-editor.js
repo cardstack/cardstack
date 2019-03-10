@@ -19,7 +19,7 @@ export default Component.extend({
     this._super(...arguments);
     if (!this.permissions) {
       let permissions = await this.fetchPermissions();
-      this.set('permissions', permissions);
+      // this.set('permissions', permissions); //TODO figure out why this throws...
     }
   },
 

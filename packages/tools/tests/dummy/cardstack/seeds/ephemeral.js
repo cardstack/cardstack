@@ -130,6 +130,18 @@ function initialModels() {
       initial.addResource('fields', 'title').withAttributes({
         fieldType: '@cardstack/core-types::string'
       }),
+      initial.addResource('fields', 'keywords').withAttributes({
+        editorOptions: { headerSection: true, sortOrder: 10 },
+        fieldType: '@cardstack/core-types::string'
+      }),
+      initial.addResource('fields', 'rating').withAttributes({
+        editorOptions: { headerSection: true, sortOrder: 20 },
+        fieldType: '@cardstack/core-types::integer'
+      }),
+      initial.addResource('fields', 'created-at').withAttributes({
+        editorOptions: { headerSection: true, sortOrder: 101 },
+        fieldType: '@cardstack/core-types::date'
+      }),
       initial.addResource('fields', 'published-at').withAttributes({
         caption: 'Publish Date',
         fieldType: '@cardstack/core-types::date'
@@ -265,6 +277,9 @@ function initialModels() {
     .withAttributes({
       title: '10 steps to becoming a fearsome pirate',
       publishedAt: new Date(2017, 3, 24),
+      createdAt: new Date(2017, 1, 24),
+      keywords: 'pirates, matey, bacardi',
+      rating: 2,
       archived: false,
       readingTimeValue: 8,
       hiddenFieldFromEditor: 'This field is hidden from the editor'
@@ -278,6 +293,9 @@ function initialModels() {
     .withAttributes({
       title: 'second',
       publishedAt: new Date(2017, 9, 20),
+      createdAt: new Date(2017, 1, 24),
+      keywords: 'dos, ni, futatsu',
+      rating: 5,
       archived: true,
       readingTimeValue: 2
     })

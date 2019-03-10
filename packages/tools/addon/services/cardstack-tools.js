@@ -11,6 +11,7 @@ import injectOptional from 'ember-inject-optional';
 import { defaultBranch } from '@cardstack/plugin-utils/environment';
 import { guidFor } from '@ember/object/internals';
 import { get, set } from '@ember/object';
+import { sortBy } from 'lodash';
 
 export default Service.extend({
   overlays: service('ember-overlays'),
@@ -27,6 +28,22 @@ export default Service.extend({
       let { grouped, name } = fieldMark.model;
       return fieldNames.concat(grouped ? grouped : name);
     }, []);
+  }),
+
+  headerSectionFields: computed('activeContentItem.model', function() {
+    let model = this.get('activeContentItem.model');
+    if (!model) { return []; }
+
+    let fields = [];
+    model.eachAttribute((attribute, meta) => {
+      if (meta.name !== 'selfLink' && get(meta, 'options.editorOptions.headerSection')) {
+        let fieldInfo = meta;
+        set(fieldInfo, 'id', guidFor(fieldInfo));
+        set(fieldInfo, 'model', model);
+        fields.push(fieldInfo);
+      }
+    });
+    return sortBy(fields, ['options.editorOptions.sortOrder']);
   }),
 
   modelFields: computed('_renderedFieldNames', 'activeContentItem.model', function() {

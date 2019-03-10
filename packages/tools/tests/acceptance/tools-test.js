@@ -120,6 +120,14 @@ module('Acceptance | tools', function(hooks) {
     assert.equal(titleSections.length, 1, "Rendered fields only appear once");
   });
 
+  test('it shows fields in the header section', async function(assert) {
+    await visit('/hub/posts/1');
+    await login();
+    await click('.cardstack-tools-launcher');
+
+    debugger;
+  });
+
   test('it does not collapse sections for right edge input fields that are not rendered in the template when you type in the field', async function(assert) {
     await visit('/hub/posts/1');
     await login();

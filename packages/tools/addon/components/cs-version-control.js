@@ -4,7 +4,8 @@ import layout from '../templates/components/cs-version-control';
 import { task } from 'ember-concurrency';
 import { modelType } from '@cardstack/rendering/helpers/cs-model-type';
 import { defaultBranch } from '@cardstack/plugin-utils/environment';
-import { computed } from "@ember/object";
+import { camelize } from '@ember/string';
+import { get, computed } from "@ember/object";
 import { or } from '@ember/object/computed';
 
 export default Component.extend({
@@ -18,6 +19,7 @@ export default Component.extend({
   router: service(),
   data: service('cardstack-data'),
   tools: service('cardstack-tools'),
+  validationErrors: null,
 
   modelMeta: computed('model', function() {
     return this.get('resourceMetadata').read(this.get('model'));
@@ -37,6 +39,35 @@ export default Component.extend({
     if (upstream) {
       return this.get('resourceMetadata').read(upstream);
     }
+  }),
+
+  fieldsAboveFooter: computed('headerSectionFields.[]', function() {
+    return (this.get('headerSectionFields') || []).filter(field => {
+      let sortOrder = get(field, 'options.editorOptions.sortOrder');
+      if (typeof sortOrder !== 'number') { return; }
+      return sortOrder < 100;
+    });
+  }),
+
+  fieldsBelowFooter: computed('headerSectionFields.[]', function() {
+    return (this.get('headerSectionFields') || []).filter(field => {
+      let sortOrder = get(field, 'options.editorOptions.sortOrder');
+      if (typeof sortOrder !== 'number') { return true; }
+      return sortOrder >= 100;
+    });
+  }),
+
+  fetchPermissionsFor: task(function * (record) {
+    return yield this.get('data').fetchPermissionsFor(record);
+  }),
+
+  validateTask: task(function * () {
+    let errors = yield this.get('data').validate(this.model);
+    let errorsForFieldNames = {};
+    for (let key in errors) {
+      errorsForFieldNames[camelize(key)] = errors[key];
+    }
+    this.set('validationErrors', errorsForFieldNames);
   }),
 
   fetchUpstreamModel: task(function * () {
@@ -185,6 +216,9 @@ export default Component.extend({
     },
     close() {
       this.set('opened', false);
+    },
+    validate() {
+      return this.get('validateTask').perform();
     }
   }
 });

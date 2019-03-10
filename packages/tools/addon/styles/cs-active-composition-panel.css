@@ -1,25 +1,42 @@
 .cs-active-composition-panel {
-    --tools-panel-height: 34rem;
-
     box-sizing: border-box;
     width: 100%;
-    height: var(--tools-panel-height);
     background-color: var(--normal-background);
     color: var(--bright-foreground);
     border: 1px solid var(--light05);
     border-radius: 20px;
     box-shadow: 0 2px 15px 0 var(--dark50);
+    margin-bottom: 65px;
+
+    display: flex;
+    flex-wrap: wrap;
+    flex-direction: column;
+    flex-grow: 2;
+}
+.cs-active-composition-panel--flex-slot {
+    position: relative;
+    display: flex;
+    flex-wrap: wrap;
+    flex-direction: column;
+    flex-grow: 1;
+}
+.cs-active-composition-panel--scroll-wrapper {
+    flex-grow: 1;
+    width: 100%;
+    overflow-y: scroll;
+    -webkit-overflow-scrolling: touch;
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right :0;
 }
 
-.cs-active-composition-panel--main.header-expanded {
-  --tools-scrollable-panel-height: 17rem;
-}
-.cs-active-composition-panel--main.header-collapsed {
-  --tools-scrollable-panel-height: 23rem;
-}
-.cs-active-composition-panel--main {
-    height: var(--tools-scrollable-panel-height);
-    overflow-y: scroll;
+.cs-active-composition-panel--main:after {
+    content: ' ';
+    display: block;
+    width: 100%;
+    height: 20px;
 }
 
 .cs-content-info {
@@ -69,7 +86,7 @@
 }
 
 .cs-toolbox-section:last-of-type {
-    border-bottom: 1px solid var(--light25);
+    border-bottom: none;
 }
 
 .cs-toolbox-section.opened {

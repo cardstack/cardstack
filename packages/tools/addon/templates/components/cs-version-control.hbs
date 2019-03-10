@@ -12,50 +12,105 @@
   </button>
 </div>
 
-{{#liquid-if
-  enabled
-  rules=animationRules
-  growDuration=250
-  growPixelsPerSecond=1
-}}
-  <div class="cs-version-control-footer">
-    <div class="cs-version-control-footer--button-area">
-      {{#if update.isRunning}}
-        <span
-          class="cs-version-control--loading"
-          aria-label="Loading"
-          data-test-cs-version-control-loading
-        ></span>
-      {{/if}}
+<div class="cs-version-control-header-fields">
+  <div class="cs-version-control-header-fields--top-fields">
+    {{#each fieldsAboveFooter key="id" as |field|}}
+      {{#let
+        (get permissions (cs-uid field.model))
+        (eq field.model model)
+        (cs-field-editor-options-for field.model field.name)
+      as |fieldModelPermissions isPageModelField editorOptions|}}
+        <div class="cs-field-editor-section">
+          <div class="cs-field-editor-section--title">
+            {{cs-card-meta-caption field.model field.options.caption isPageModelField}}
+          </div>
+          {{cs-field-editor
+            content=field.model
+            field=field.name
+            editorOptions=editorOptions
+            enabled=editingEnabled
+            permissions=fieldModelPermissions
+            fetchPermissions=(perform fetchPermissionsFor field.model)
+            onchange=(action "validate")
+            errors=(get validationErrors field.name)
+          }}
+        </div>
+      {{/let}}
+    {{/each}}
+  </div>
+
+  {{#liquid-if
+    enabled
+    rules=animationRules
+    growDuration=250
+    growPixelsPerSecond=1
+  }}
+    <div class="cs-version-control-footer">
+      <div class="cs-version-control-footer--button-area">
+        {{#if update.isRunning}}
+          <span
+            class="cs-version-control--loading"
+            aria-label="Loading"
+            data-test-cs-version-control-loading
+          ></span>
+        {{/if}}
+
+        <button
+          class="cs-version-control--button cs-version-control--button-save {{if disabled "disabled" "enabled"}}"
+          disabled={{disabled}}
+          {{action (perform update)}}
+          data-test-cs-version-control-button-save="{{disabled}}"
+        >
+          Save
+        </button>
+        <button
+          class="cs-version-control--button cs-version-control--button-cancel"
+          {{action (perform cancel)}}
+          data-test-cs-version-control-button-cancel
+        >
+          Cancel
+        </button>
+      </div>
+      {{#with (concat modelType "-action-buttons") as |buttonsComponent|}}
+        {{#if (is-component buttonsComponent)}}
+          {{component buttonsComponent model=model modificationState=modificationState}}
+        {{/if}}
+      {{/with}}
 
       <button
-        class="cs-version-control--button cs-version-control--button-save {{if disabled "disabled" "enabled"}}"
-        disabled={{disabled}}
-        {{action (perform update)}}
-        data-test-cs-version-control-button-save="{{disabled}}"
+        class="cs-version-control--delete-button"
+        {{action (perform delete)}}
+        data-test-cs-version-control-delete-button
       >
-        Save
-      </button>
-      <button
-        class="cs-version-control--button cs-version-control--button-cancel"
-        {{action (perform cancel)}}
-        data-test-cs-version-control-button-cancel
-      >
-        Cancel
+        Delete
       </button>
     </div>
-    {{#with (concat modelType "-action-buttons") as |buttonsComponent|}}
-      {{#if (is-component buttonsComponent)}}
-        {{component buttonsComponent model=model modificationState=modificationState}}
-      {{/if}}
-    {{/with}}
+  {{/liquid-if}}
 
-    <button
-      class="cs-version-control--delete-button"
-      {{action (perform delete)}}
-      data-test-cs-version-control-delete-button
-    >
-      Delete
-    </button>
+  <div class="cs-version-control-header-fields--bottom-fields">
+    {{#each fieldsBelowFooter key="id" as |field|}}
+      {{#let
+        (get permissions (cs-uid field.model))
+        (eq field.model model)
+        (cs-field-editor-options-for field.model field.name)
+      as |fieldModelPermissions isPageModelField editorOptions|}}
+        <div class="cs-field-editor-section">
+          <div class="cs-field-editor-section--title">
+            {{cs-card-meta-caption field.model field.options.caption isPageModelField}}
+          </div>
+          {{cs-field-editor
+            content=field.model
+            field=field.name
+            editorOptions=editorOptions
+            enabled=editingEnabled
+            permissions=fieldModelPermissions
+            fetchPermissions=(perform fetchPermissionsFor field.model)
+            onchange=(action "validate")
+            errors=(get validationErrors field.name)
+          }}
+        </div>
+      {{/let}}
+    {{/each}}
+
   </div>
-{{/liquid-if}}
+</div>

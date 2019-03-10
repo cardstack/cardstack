@@ -2,6 +2,10 @@
     padding-bottom: 0.5rem;
 }
 
+.cs-field-editor-section--title {
+    font-size: .75rem;
+}
+
 .cs-field-editor input,
 .cs-field-editor select,
 .cs-field-editor button {
