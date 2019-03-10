@@ -152,11 +152,17 @@ export default Component.extend({
 
   update: task(function * () {
     let model = this.get('model');
+    let afterModelSaved = this.get('afterModelSaved');
     let errors = yield this.get('data').validate(model);
     if (Object.keys(errors).length > 0) {
       return this['on-error'](errors);
     }
     yield model.save();
+
+    if (typeof afterModelSaved === 'function') {
+      let branch = this.get('modelMeta').branch || defaultBranch;
+      afterModelSaved(model, branch);
+    }
   }).keepLatest(),
 
   cancel: task(function * () {
