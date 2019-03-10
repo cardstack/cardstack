@@ -398,16 +398,21 @@ module.exports = class DocumentContext {
     return searchTree;
   }
 
-  // We can only resolve self links for spaces documents because they have the necessary routing card
-  // context which is required to resolve the resource links
+  // If a routing card is not provided to the DocumentContext, then leverage the application card
+  // to determine the context in which to resolve the canonical URL for the card.
   async _addSelfLink(jsonapiDoc) {
-    if (!this.routers || !Array.isArray(this._routeStack)) { return; }
+    if (!this.routers) { return; }
 
     let routeStackCards = [];
-    for (let routingCardIdentifier of this._routeStack) {
-      let [ type, id ] = routingCardIdentifier.split('/');
-      routeStackCards.push({ data: await this.read(type, id) });
+    if (this._routeStack && this._routeStack.length) {
+      for (let routingCardIdentifier of this._routeStack) {
+        let [type, id] = routingCardIdentifier.split('/');
+        routeStackCards.push({ data: await this.read(type, id) });
+      }
+    } else if (this.routers.applicationCard) {
+      routeStackCards.push(this.routers.applicationCard);
     }
+    if (!routeStackCards.length) { return; }
 
     let path = await getPath(routeStackCards,
       { data: jsonapiDoc },
@@ -507,11 +512,11 @@ module.exports = class DocumentContext {
         .filter(r => !(r.type == type && r.id == id));
     }
 
-    await this._addSelfLink(jsonapiDoc);
-
     if (depth > 0) {
+      await this._addSelfLink(jsonapiDoc);
       this.pristineIncludes.push(jsonapiDoc);
     } else {
+      await this._addSelfLink(pristine.data);
       this._pristine = pristine;
       if (!isCollection) {
         if (this.sourceId != null) {

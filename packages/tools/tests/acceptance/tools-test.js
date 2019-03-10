@@ -2,6 +2,28 @@ import { module, test } from 'qunit';
 import { setupApplicationTest } from 'ember-qunit';
 import { visit, click, fillIn, triggerEvent, waitFor } from '@ember/test-helpers';
 import { login } from '../helpers/login';
+import { ciSessionId } from '@cardstack/test-support/environment';
+import { hubURL } from '@cardstack/plugin-utils/environment';
+
+let nonce = 0;
+
+// use the main:router location API to get the current URL the currentURL test helper
+// is not actually aware of the location
+function currentURL(owner) {
+  let router = owner.lookup('router:main');
+  return router.get('location').getURL();
+}
+
+async function getDocuments(type) {
+  let url = `${hubURL}/api/${type}`;
+  let response = await fetch(url, {
+    headers: {
+      authorization: `Bearer ${ciSessionId}`,
+      "content-type": 'application/vnd.api+json'
+    }
+  });
+  return (await response.json()).data;
+}
 
 function findTriggerElementWithLabel(labelRegex) {
   return [...this.element.querySelectorAll('.cs-toolbox-section label')].find(element => labelRegex.test(element.textContent));
@@ -232,5 +254,34 @@ module('Acceptance | tools', function(hooks) {
     await click(titleSectionTrigger);
 
     assert.dom('.field-editor > input').isNotDisabled();
+  });
+
+  test('saving a new document changes the URL to the canonical path of the saved document', async function(assert) {
+    await visit('/hub/posts/1');
+    await login();
+    await click('.cardstack-tools-launcher');
+    await waitFor('.cs-editor-switch')
+    await click('.cs-editor-switch');
+
+    await click('.cs-create-button');
+
+    let newPostButton = findAddNewButtonWithLabel.call(this, /Posts/);
+    await click(newPostButton);
+
+    let titleSectionTrigger = findTriggerElementWithLabel.call(this, /Title/);
+    await click(titleSectionTrigger);
+
+    let titleSection = titleSectionTrigger.closest('section');
+    let titleInput = titleSection.querySelector('input');
+    let title = `document ${Date.now()}-${nonce++}`;
+    await fillIn(titleInput, title);
+
+    await click('[data-test-cs-version-control-button-save="false"]');
+    await waitFor('[data-test-cs-version-control-button-save="true"]');
+
+    let posts = await getDocuments('posts');
+    let { type, id } = posts.find(p => p.attributes.title === title);
+
+    assert.equal(currentURL(this.owner), `/hub/${type}/${id}`);
   });
 });

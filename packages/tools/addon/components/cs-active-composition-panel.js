@@ -4,6 +4,7 @@ import { task, timeout } from 'ember-concurrency';
 import scrollToBounds from '../scroll-to-bounds';
 import { inject as service } from '@ember/service';
 import { camelize } from '@ember/string';
+import { urlForModel } from '@cardstack/routing/helpers/cardstack-url';
 
 export default Component.extend({
   layout,
@@ -13,6 +14,8 @@ export default Component.extend({
   permissions: null,
 
   data: service('cardstack-data'),
+  router: service(),
+  cardstackRouting: service(), // this is used in the `urlForModel` helper (since it has no container)
 
   didReceiveAttrs() {
     this._super(...arguments);
@@ -66,6 +69,12 @@ export default Component.extend({
       scrollToBounds(field.bounds());
     }
   }).restartable(),
+
+  afterModelSaved(model, branch) {
+    let location = this.get('router.location');
+    let url = urlForModel(this, model, { branch });
+    location.setURL(url);
+  },
 
   actions: {
     validate() {
