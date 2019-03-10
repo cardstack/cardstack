@@ -21,12 +21,12 @@ export default DS.JSONAPISerializer.extend(SerializerMixin, {
     }
   },
 
-  normalizeCreateRecordResponse (store, primaryModelClass, payload) {
+  normalizeCreateRecordResponse(store, primaryModelClass, payload) {
     this._normalizeSave(store, primaryModelClass, payload);
     return this._super.apply(this, arguments);
   },
 
-  normalizeSaveResponse (store, primaryModelClass, payload) {
+  normalizeUpdateRecordResponse(store, primaryModelClass, payload) {
     this._normalizeSave(store, primaryModelClass, payload);
     return this._super.apply(this, arguments);
   },
