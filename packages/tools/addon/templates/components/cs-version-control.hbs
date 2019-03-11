@@ -20,7 +20,7 @@
         (eq field.model model)
         (cs-field-editor-options-for field.model field.name)
       as |fieldModelPermissions isPageModelField editorOptions|}}
-        <div class="cs-field-editor-section">
+        <div class="cs-field-editor-section cs-field-{{field.name}}">
           {{#unless editorOptions.hideTitle}}
             <div class="cs-field-editor-section--title">
               {{cs-card-meta-caption field.model field.options.caption isPageModelField}}
@@ -95,7 +95,7 @@
         (eq field.model model)
         (cs-field-editor-options-for field.model field.name)
       as |fieldModelPermissions isPageModelField editorOptions|}}
-        <div class="cs-field-editor-section">
+        <div class="cs-field-editor-section cs-field-{{field.name}}">
           {{#unless editorOptions.hideTitle}}
             <div class="cs-field-editor-section--title">
               {{cs-card-meta-caption field.model field.options.caption isPageModelField}}
