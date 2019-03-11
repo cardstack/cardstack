@@ -99,7 +99,7 @@ module('Acceptance | tools', function(hooks) {
     await fillIn(titleEditor, '');
     await triggerEvent(titleEditor, 'blur');
     await waitFor('[data-test-validation-error=title]')
-    assert.dom('[data-test-validation-error=title]').hasText('title must not be empty');
+    assert.dom('[data-test-validation-error=title]').hasText('Title must not be empty');
 
     element = findTriggerElementWithLabel.call(this, /Body/);
     await click(element);
@@ -107,7 +107,7 @@ module('Acceptance | tools', function(hooks) {
     await fillIn(commentBodyEditor, '');
     await triggerEvent(commentBodyEditor, 'blur');
     await waitFor('[data-test-validation-error=body]')
-    assert.dom('[data-test-validation-error=body]').hasText('body must not be empty');
+    assert.dom('[data-test-validation-error=body]').hasText('Body must not be empty');
   });
 
   test('show all fields, not just those rendered from template', async function(assert) {
