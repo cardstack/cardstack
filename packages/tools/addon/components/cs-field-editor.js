@@ -5,6 +5,7 @@ import layout from '../templates/components/cs-field-editor';
 export default Component.extend({
   layout,
   classNames: ['cs-field-editor'],
+  attributeBindings: ['field:data-test-cs-field-editor'],
 
   // @args
   content: null,

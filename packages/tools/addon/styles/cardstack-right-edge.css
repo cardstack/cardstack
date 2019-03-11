@@ -13,6 +13,10 @@
 
 .cardstack-right-edge {
   --right-edge-width: 22rem;
+  display: flex;
+  align-content: flex-start;
+  flex-wrap: wrap;
+  flex-direction: column;
 
   position: relative;
   width: var(--right-edge-width);

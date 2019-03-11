@@ -1,5 +1,6 @@
 .cs-composition-panel-header {
     position: relative;
+    width: 100%;
     padding: 1em;
     color: var(--bright-foreground);
     border-top-left-radius: 20px;
