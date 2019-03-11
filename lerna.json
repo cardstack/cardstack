@@ -3,7 +3,7 @@
   "packages": [
     "packages/*"
   ],
-  "version": "0.13.59",
+  "version": "0.13.60",
   "npmClient": "yarn",
   "npmClientArgs": [
     "--ignore-engines"
