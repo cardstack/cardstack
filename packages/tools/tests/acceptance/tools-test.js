@@ -57,7 +57,7 @@ module('Acceptance | tools', function(hooks) {
     await visit('/hub/posts/1');
     await login();
     await click('.cardstack-tools-launcher');
-    await waitFor('.cs-active-composition-panel');
+    await waitFor('.cs-active-composition-panel--main');
 
     let element = findTriggerElementWithLabel.call(this, /Title/);
     await click(element);
@@ -79,6 +79,7 @@ module('Acceptance | tools', function(hooks) {
     await visit('/hub/posts/1');
     await login();
     await click('.cardstack-tools-launcher');
+    await waitFor('.cs-active-composition-panel--main');
 
     assert.dom('[data-test=reading-time]').containsText('8 minutes');
     assert.dom('[data-test=karma-0]').containsText('10 Good');
@@ -89,6 +90,7 @@ module('Acceptance | tools', function(hooks) {
     await visit('/hub/posts/1');
     await login();
     await click('.cardstack-tools-launcher');
+    await waitFor('.cs-active-composition-panel--main');
 
     let element = findTriggerElementWithLabel.call(this, /Title/);
     await click(element);
@@ -112,6 +114,7 @@ module('Acceptance | tools', function(hooks) {
     await visit('/hub/posts/1');
     await login();
     await click('.cardstack-tools-launcher');
+    await waitFor('.cs-active-composition-panel--main');
 
     let archivedSection = findTriggerElementWithLabel.call(this, /Archived/);
     assert.ok(archivedSection, "Unrendered field appears in editor");
@@ -120,18 +123,60 @@ module('Acceptance | tools', function(hooks) {
     assert.equal(titleSections.length, 1, "Rendered fields only appear once");
   });
 
-  test('it shows fields in the header section', async function(assert) {
+  test('it shows fields in the header section before the save button when sort order is less than 100', async function(assert) {
     await visit('/hub/posts/1');
     await login();
     await click('.cardstack-tools-launcher');
+    await waitFor('.cs-active-composition-panel--main');
 
-    debugger;
+    assert.dom('.cs-version-control-header-fields--top-fields [data-test-cs-field-editor="keywords"]').exists();
+    assert.dom('.cs-version-control-header-fields--top-fields [data-test-cs-field-editor="rating"]').exists();
+    assert.dom('.cs-version-control-header-fields--top-fields [data-test-cs-field-editor="createdAt"]').doesNotExist();
+  });
+
+  test('it shows fields in the header section after the save button when sort order is greater than 100', async function(assert) {
+    await visit('/hub/posts/1');
+    await login();
+    await click('.cardstack-tools-launcher');
+    await waitFor('.cs-active-composition-panel--main');
+
+    assert.dom('.cs-version-control-header-fields--bottom-fields [data-test-cs-field-editor="keywords"]').doesNotExist();
+    assert.dom('.cs-version-control-header-fields--bottom-fields [data-test-cs-field-editor="rating"]').doesNotExist();
+    assert.dom('.cs-version-control-header-fields--bottom-fields [data-test-cs-field-editor="createdAt"]').exists();
+  });
+
+  test('it can hide the title of fields in the header section', async function(assert) {
+    await visit('/hub/posts/1');
+    await login();
+    await click('.cardstack-tools-launcher');
+    await waitFor('.cs-active-composition-panel--main');
+
+    let ratingSection = document.querySelector('[data-test-cs-field-editor="rating"]').closest('.cs-field-editor-section');
+    assert.notOk(ratingSection.querySelector('.cs-field-editor-section--title'));
+    let keywordsSection = document.querySelector('[data-test-cs-field-editor="keywords"]').closest('.cs-field-editor-section');
+    assert.ok(keywordsSection.querySelector('.cs-field-editor-section--title'));
+  });
+
+  test('fields shown in the header section are not shown in the non-header section (main section)', async function(assert) {
+    await visit('/hub/posts/1');
+    await login();
+    await click('.cardstack-tools-launcher');
+    await waitFor('.cs-active-composition-panel--main');
+
+    let ratingFields = document.querySelectorAll('[data-test-cs-field-editor="rating"]');
+    let keywordsFields = document.querySelectorAll('[data-test-cs-field-editor="keywords"]');
+    let createdAtFields = document.querySelectorAll('[data-test-cs-field-editor="createdAt"]');
+
+    assert.equal(ratingFields.length, 1);
+    assert.equal(keywordsFields.length, 1);
+    assert.equal(createdAtFields.length, 1);
   });
 
   test('it does not collapse sections for right edge input fields that are not rendered in the template when you type in the field', async function(assert) {
     await visit('/hub/posts/1');
     await login();
     await click('.cardstack-tools-launcher');
+    await waitFor('.cs-active-composition-panel--main');
 
     let slugLabel = findTriggerElementWithLabel.call(this, /Slug/);
     await click(slugLabel);
@@ -148,6 +193,7 @@ module('Acceptance | tools', function(hooks) {
     await visit('/hub/posts/1');
     await login();
     await click('.cardstack-tools-launcher');
+    await waitFor('.cs-active-composition-panel--main');
 
     assert.ok(findTriggerElementWithLabel.call(this, /Comment #1: Review Status/));
     assert.ok(findTriggerElementWithLabel.call(this, /Comment #2: Review Status/));
@@ -158,6 +204,7 @@ module('Acceptance | tools', function(hooks) {
     await visit('/hub/posts/1');
     await login();
     await click('.cardstack-tools-launcher');
+    await waitFor('.cs-active-composition-panel--main');
 
     assert.ok(findTriggerElementWithLabel.call(this, /Comment #1: Body/));
     assert.ok(findTriggerElementWithLabel.call(this, /Comment #1: Karma/));
@@ -169,6 +216,7 @@ module('Acceptance | tools', function(hooks) {
     await visit('/hub/posts/1');
     await login();
     await click('.cardstack-tools-launcher');
+    await waitFor('.cs-active-composition-panel--main');
 
     let authorNameSectionTrigger = findTriggerElementWithLabel.call(this, /Author Name/);
     await click(authorNameSectionTrigger);
@@ -181,6 +229,7 @@ module('Acceptance | tools', function(hooks) {
     await visit('/hub/posts/1');
     await login();
     await click('.cardstack-tools-launcher');
+    await waitFor('.cs-active-composition-panel--main');
     await waitFor('.cs-editor-switch')
     await click('.cs-editor-switch');
 
@@ -201,6 +250,7 @@ module('Acceptance | tools', function(hooks) {
     await visit('/hub/posts/1');
     await login();
     await click('.cardstack-tools-launcher');
+    await waitFor('.cs-active-composition-panel--main');
     await waitFor('.cs-editor-switch')
     await click('.cs-editor-switch');
 
@@ -221,6 +271,7 @@ module('Acceptance | tools', function(hooks) {
     await visit('/hub/posts/1');
     await login();
     await click('.cardstack-tools-launcher');
+    await waitFor('.cs-active-composition-panel--main');
     await waitFor('.cs-editor-switch')
     await click('.cs-editor-switch');
 
@@ -238,6 +289,7 @@ module('Acceptance | tools', function(hooks) {
     await visit('/hub/posts/1');
     await login();
     await click('.cardstack-tools-launcher');
+    await waitFor('.cs-active-composition-panel--main');
     await waitFor('.cs-editor-switch')
     await click('.cs-editor-switch');
 
@@ -250,6 +302,7 @@ module('Acceptance | tools', function(hooks) {
     await visit('/hub/posts/1');
     await login();
     await click('.cardstack-tools-launcher');
+    await waitFor('.cs-active-composition-panel--main');
     await waitFor('.cs-editor-switch')
     await click('.cs-editor-switch');
 
@@ -268,6 +321,7 @@ module('Acceptance | tools', function(hooks) {
     await visit('/hub/posts/1');
     await login();
     await click('.cardstack-tools-launcher');
+    await waitFor('.cs-active-composition-panel--main');
     await waitFor('.cs-editor-switch')
     await click('.cs-editor-switch');
 

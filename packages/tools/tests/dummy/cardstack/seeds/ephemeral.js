@@ -34,7 +34,10 @@ function initialModels() {
       { type: 'content-types', id: 'comments' },
       { type: 'content-types', id: 'karma-types' },
       { type: 'content-types', id: 'posts' },
-      { type: 'content-types', id: 'time-units' }
+      { type: 'content-types', id: 'time-units' },
+      { type: 'content-types', id: 'created-at' },
+      { type: 'content-types', id: 'keywords' },
+      { type: 'content-types', id: 'rating' }
     ])
     .withAttributes({
       'may-create-resource': true,
@@ -135,7 +138,7 @@ function initialModels() {
         fieldType: '@cardstack/core-types::string'
       }),
       initial.addResource('fields', 'rating').withAttributes({
-        editorOptions: { headerSection: true, sortOrder: 20 },
+        editorOptions: { headerSection: true, sortOrder: 20, hideTitle: true },
         fieldType: '@cardstack/core-types::integer'
       }),
       initial.addResource('fields', 'created-at').withAttributes({

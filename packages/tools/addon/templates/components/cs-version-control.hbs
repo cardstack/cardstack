@@ -21,16 +21,17 @@
         (cs-field-editor-options-for field.model field.name)
       as |fieldModelPermissions isPageModelField editorOptions|}}
         <div class="cs-field-editor-section">
-          <div class="cs-field-editor-section--title">
-            {{cs-card-meta-caption field.model field.options.caption isPageModelField}}
-          </div>
+          {{#unless editorOptions.hideTitle}}
+            <div class="cs-field-editor-section--title">
+              {{cs-card-meta-caption field.model field.options.caption isPageModelField}}
+            </div>
+          {{/unless}}
           {{cs-field-editor
             content=field.model
             field=field.name
             editorOptions=editorOptions
-            enabled=editingEnabled
+            enabled=enabled
             permissions=fieldModelPermissions
-            fetchPermissions=(perform fetchPermissionsFor field.model)
             onchange=(action "validate")
             errors=(get validationErrors field.name)
           }}
@@ -95,16 +96,17 @@
         (cs-field-editor-options-for field.model field.name)
       as |fieldModelPermissions isPageModelField editorOptions|}}
         <div class="cs-field-editor-section">
-          <div class="cs-field-editor-section--title">
-            {{cs-card-meta-caption field.model field.options.caption isPageModelField}}
-          </div>
+          {{#unless editorOptions.hideTitle}}
+            <div class="cs-field-editor-section--title">
+              {{cs-card-meta-caption field.model field.options.caption isPageModelField}}
+            </div>
+          {{/unless}}
           {{cs-field-editor
             content=field.model
             field=field.name
             editorOptions=editorOptions
-            enabled=editingEnabled
+            enabled=enabled
             permissions=fieldModelPermissions
-            fetchPermissions=(perform fetchPermissionsFor field.model)
             onchange=(action "validate")
             errors=(get validationErrors field.name)
           }}

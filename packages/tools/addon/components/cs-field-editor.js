@@ -5,6 +5,7 @@ import layout from '../templates/components/cs-field-editor';
 export default Component.extend({
   layout,
   classNames: ['cs-field-editor'],
+  attributeBindings: ['field:data-test-cs-field-editor'],
 
   // @args
   content: null,
@@ -19,7 +20,7 @@ export default Component.extend({
     this._super(...arguments);
     if (!this.permissions) {
       let permissions = await this.fetchPermissions();
-      // this.set('permissions', permissions); //TODO figure out why this throws...
+      this.set('permissions', permissions);
     }
   },
 
