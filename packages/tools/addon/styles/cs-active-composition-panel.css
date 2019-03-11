@@ -86,7 +86,7 @@
 }
 
 .cs-toolbox-section:last-of-type {
-    border-bottom: none;
+    border-bottom: 1px solid var(--light25);
 }
 
 .cs-toolbox-section.opened {
