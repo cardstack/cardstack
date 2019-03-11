@@ -5,12 +5,14 @@ const {
   destroyDefaultEnvironment,
   defaultDataSourceId
 } = require('../../../tests/stub-project/node_modules/@cardstack/test-support/env');
+const { createReadStream, readdirSync } = require('fs');
+const path = require('path');
 
 describe('hub/indexers', function() {
   let env;
 
-  async function setup () {
-    env = await createDefaultEnvironment(`${__dirname}/../../../tests/stub-project`);
+  async function setup (models = []) {
+    env = await createDefaultEnvironment(`${__dirname}/../../../tests/stub-project`, models);
   }
 
   async function teardown() {
@@ -86,6 +88,48 @@ describe('hub/indexers', function() {
       doc = await env.lookup('hub:searchers').get(env.session, 'master', 'plugins', 'sample-plugin-one');
       expect(doc).has.deep.property('data.attributes.plugin-enabled', false);
     });
+  });
+
+
+  describe('binary data', function() {
+    before(async function() {
+      let factory = new JSONAPIFactory();
+
+      factory.addResource('content-types', 'cardstack-files')
+        .withRelated('fields', [
+          factory.addResource('fields', 'created-at').withAttributes({fieldType: '@cardstack/core-types::date'}),
+          factory.addResource('fields', 'content-type').withAttributes({fieldType: '@cardstack/core-types::string'}),
+          factory.addResource('fields', 'sha-sum').withAttributes({fieldType: '@cardstack/core-types::string'}),
+          factory.addResource('fields', 'file-name').withAttributes({fieldType: '@cardstack/core-types::string'}),
+          factory.addResource('fields', 'size').withAttributes({fieldType: '@cardstack/core-types::integer'})
+        ]);
+
+      let models = factory.getModels();
+
+      await setup(models);
+    });
+
+    after(teardown);
+
+    it("indexes ephemeral binary data", async function() {
+      let writers = env.lookup('hub:writers');
+
+      await Promise.all(readdirSync(path.join(__dirname, './images')).map(async filename => {
+        let readStream = createReadStream(path.join(__dirname, 'images', filename));
+        readStream.type = 'cardstack-files';
+        readStream.id = filename.replace(/\..+/, '');
+        await writers.createBinary('master', Session.INTERNAL_PRIVILEGED, 'cardstack-files', readStream);
+      }));
+
+      let response = await env.lookup('hub:searchers').search(env.session, 'master', { filter: { type: 'cardstack-files' }});
+      expect(response.data.map(m => m.type)).includes('cardstack-files');
+      expect(response.data).has.length(2);
+      expect(response.data[0]).has.property('id').equal('cardstack-logo');
+      expect(response.data[0].attributes).has.property('file-name').includes('cardstack-logo.png');
+      expect(response.data[1]).has.property('id').equal('snalc');
+      expect(response.data[1].attributes).has.property('file-name').includes('snalc.gif');
+    });
+
   });
 
   describe("nested data sources", function() {

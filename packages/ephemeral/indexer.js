@@ -54,6 +54,14 @@ class Updater {
       }
     }
 
+    for (let entry of this.storage.blobsNewerThan(generation)) {
+      if (entry.model) {
+        await ops.save(entry.type, entry.id, { data: Object.assign({}, entry.model, { meta: { version: String(entry.generation) } }) });
+      } else {
+        await ops.delete(entry.type, entry.id);
+      }
+    }
+
     if (identity !== this.storage.identity) {
       await ops.finishReplaceAll();
     }
