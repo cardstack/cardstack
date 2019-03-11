@@ -348,7 +348,7 @@ describe('jsonapi/middleware', function() {
       });
       expect(response.body.errors).collectionContains({
         title: 'Validation error',
-        detail: 'body must be present',
+        detail: 'Body must be present',
         source: { pointer: '/data/attributes/body' }
       });
     });

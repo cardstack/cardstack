@@ -303,7 +303,7 @@ describe('schema/validation', function() {
       }
     }));
     expect(errors).collectionContains({
-      detail: 'title can be at most 40 characters long, it was 59',
+      detail: 'Title can be at most 40 characters long, it was 59',
       status: 422,
       source: { pointer: '/data/attributes/title' }
     });
@@ -317,7 +317,7 @@ describe('schema/validation', function() {
         title: "very long very long very long very long very long very long"
       }
     }));
-    expect(errors).includes.something.with.property('detail', 'published-date must be present');
+    expect(errors).includes.something.with.property('detail', 'Published Date must be present');
   });
 
   it("applies constraints to empty fields", async function() {
@@ -328,7 +328,7 @@ describe('schema/validation', function() {
         "event-title": "   "
       }
     }));
-    expect(errors).includes.something.with.property('detail', 'event-title must not be empty');
+    expect(errors).includes.something.with.property('detail', 'Event Title must not be empty');
   });
 
   it("applies constraints to mutually exclusive fields", async function() {
@@ -342,7 +342,7 @@ describe('schema/validation', function() {
     }));
 
     expect(errors).collectionContains({
-      detail: 'Only either cover-image or cover-video can have a value, not both.',
+      detail: 'Only either Cover Image or Cover Video can have a value, not both.',
       status: 422,
       source: { pointer: '/data/attributes/cover-video' }
     });
@@ -369,7 +369,7 @@ describe('schema/validation', function() {
         title: 4000 // we're not going to run the max-length constraint because this is nonsense input
       }
     }));
-    expect(errors).includes.something.with.property('detail', 'published-date must be present');
+    expect(errors).includes.something.with.property('detail', 'Published Date must be present');
   });
 
 
