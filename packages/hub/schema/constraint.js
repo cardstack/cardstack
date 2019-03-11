@@ -61,7 +61,7 @@ module.exports = class Constraint {
     let inputs = Object.assign({}, this.constantInputs);
     for (let [inputName, field] of Object.entries(this.fieldInputs)) {
       inputs[inputName] = {
-        name: field.id,
+        name: field.caption || field.id,
         value: field.valueFrom(pendingChange, 'finalDocument'),
         oldValue: field.valueFrom(pendingChange, 'originalDocument')
       };
