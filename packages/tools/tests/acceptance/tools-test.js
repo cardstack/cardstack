@@ -346,4 +346,38 @@ module('Acceptance | tools', function(hooks) {
 
     assert.equal(currentURL(this.owner), `/hub/${type}/${id}`);
   });
+
+  test('fields can be edited after new document has been saved', async function(assert) {
+    await visit('/hub/posts/1');
+    await login();
+    await click('.cardstack-tools-launcher');
+    await waitFor('.cs-active-composition-panel--main');
+    await waitFor('.cs-editor-switch')
+    await click('.cs-editor-switch');
+
+    await click('.cs-create-button');
+
+    let newPostButton = findAddNewButtonWithLabel.call(this, /Posts/);
+    await click(newPostButton);
+
+    let titleSectionTrigger = findTriggerElementWithLabel.call(this, /Title/);
+    await click(titleSectionTrigger);
+
+    let titleSection = titleSectionTrigger.closest('section');
+    let titleInput = titleSection.querySelector('input');
+    await fillIn(titleInput, 'Title 1');
+
+    await click('[data-test-cs-version-control-button-save="false"]');
+    await waitFor('[data-test-cs-version-control-button-save="true"]');
+
+    let keywordField = document.querySelector('[data-test-cs-field-editor="keywords"] input');
+    await fillIn(keywordField, 'important');
+    assert.dom(keywordField).hasValue('important');
+
+    titleSectionTrigger = findTriggerElementWithLabel.call(this, /Title/);
+    titleSection = titleSectionTrigger.closest('section');
+    titleInput = titleSection.querySelector('input');
+    await fillIn(titleInput, 'Title 2');
+    assert.dom(titleInput).hasValue('Title 2');
+  });
 });
