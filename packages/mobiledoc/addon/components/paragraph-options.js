@@ -4,10 +4,22 @@ import { currentTransform } from '../lib/matrix';
 import Range from 'mobiledoc-kit/utils/cursor/range';
 import { containsNode } from 'mobiledoc-kit/utils/dom-utils';
 import layout from '../templates/components/paragraph-options';
+import { inject as service } from '@ember/service';
 import { NEW_LINE_HREF } from './-priv-mobiledoc-editor';
+import { task } from 'ember-concurrency';
+
+const cardPickerOptions = {
+  'cardstack-image': {
+    sort: '-image-created-at',
+    searchFields: ['image-file-name'],
+    searchType: 'prefix'
+  }
+};
 
 export default Component.extend({
   layout,
+  resourceMetadata: service(),
+  cardPicker: service('cardstack-card-picker'),
 
   didReceiveAttrs() {
     let activeSection = this.get('cursor.activeSection');
@@ -101,6 +113,29 @@ export default Component.extend({
     });
   },
 
+  pickCard: task(function * (type) {
+    let card;
+    try {
+      card = yield this.get('cardPicker').pickCard(type, cardPickerOptions[type]);
+    } catch (e) {
+      if (e !== 'no card selected') { throw e; }
+    }
+    if (!card) {
+      this.notifyPropertyChange('_lastActiveSection');
+      this.send('toggleMenu');
+      return;
+    }
+
+    let payload = { card: { id: card.id, type: card.type } };
+    let editor = this.editor.editor;
+    editor.run(postEditor => {
+      let card = editor.builder.createCardSection('cs-mobiledoc-card', payload);
+      postEditor.insertSectionBefore(editor.post.sections, card, this._lastActiveSection.next);
+    });
+    this.notifyPropertyChange('_lastActiveSection');
+    this.send('toggleMenu');
+  }).drop(),
+
   actions: {
     toggleMenu() {
       this.set('blockMenu', !this.get('blockMenu'));
@@ -137,6 +172,9 @@ export default Component.extend({
         this.set('isExternalLink', isExternal);
         this.updateLinkMarkup();
       }
+    },
+    addCard(type) {
+      this.get('pickCard').perform(type);
     },
     setLinkUrl(link) {
       if (this.get('linkUrl') !== link) {

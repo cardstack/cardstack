@@ -18,7 +18,7 @@ describe('pgsearch/searcher', function() {
   let searcher, env, factory;
 
   before(async function() {
-    this.timeout(2500);
+    this.timeout(5000);
     factory = new Factory();
 
     factory.addResource('content-types', 'people').withRelated('fields', [

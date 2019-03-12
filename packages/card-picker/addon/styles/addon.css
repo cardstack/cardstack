@@ -1,19 +1,26 @@
 @import "base";
 @import "cardstack-card-picker";
 @import "cardstack-cards-editor";
+@import "card-picker-image-item";
 
 :root {
     --deep-background: #01002C;
+    --tray-background: #151529;
     --normal-background: #343356;
     --active-background: #252440;
+    --highlight-background: #4d4c6b;
     --light-background: #fff;
 
     --bright-foreground: #fff;
     --rising-foreground: #aaa;
+    --bright-blue-foreground: #00e1f9;
+    --faded-foreground: rgba(255,255,255,.5);
 
     --tools-highlight: #63a9fa;
     --deep-tools-highlight: #032c5b;
     --faded-tools-highlight: #032c5b77;
+
+    --light-outline: rgba(255,255,255,.2);
 }
 
 

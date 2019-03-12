@@ -114,12 +114,15 @@
             "program": "${workspaceRoot}/node_modules/.bin/_mocha",
             "console": "integratedTerminal",
             "cwd": "${workspaceRoot}",
+            "env": {
+                "HUB_ENVIRONMENT": "test",
+            },
             "args": [
                 "packages/test-support/bin/run.js",
                 "--timeout",
                 "200000",
-                "--grep",
-                "a plugin's searcher#get can run after the internal searcher"
+                // "--grep",
+                // "can derive relationships to cards embedded within mobiledoc"
             ]
         },
         {

@@ -9,7 +9,13 @@ export default Service.extend({
     this.get('cardstackEdges').registerTopLevelComponent('card-picker-edges');
   },
 
-  pickCard() {
+  pickCard(type, opts={}) {
+    let { sort, searchFields, searchType } = opts;
+    this.set('requestedType', type);
+    this.set('initialSort', sort);
+    this.set('searchType', searchType);
+    this.set('searchFields', searchFields);
+
     return new Promise((resolve, reject) => {
       this.setProperties({ resolve, reject });
       this.set('active', true);
@@ -22,7 +28,7 @@ export default Service.extend({
   },
 
   closePicker() {
-    this.get('reject')();
+    this.get('reject')('no card selected');
     this.set('active', false);
   }
 });
