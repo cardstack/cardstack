@@ -1,9 +1,12 @@
 const Error = require('@cardstack/plugin-utils/error');
 const log = require('@cardstack/logger')('cardstack/ephemeral');
+const crypto = require('crypto');
 const { declareInjections } = require('@cardstack/di');
 const { partition } = require('lodash');
 const PendingChange = require('@cardstack/plugin-utils/pending-change');
 const { INTERNAL_PRIVILEGED } = require('@cardstack/plugin-utils/session');
+const streamToPromise = require('stream-to-promise');
+const { statSync } = require("fs");
 
 // When we first load, we establish an identity. This allows us to
 // distinguish any older content leftover in the search index from our
@@ -48,7 +51,27 @@ module.exports = declareInjections({
         let schemaTypes = this.schemaLoader.ownTypes();
         for (let model of initialModels) {
           let isSchema = schemaTypes.includes(model.type);
-          storage.store(model.type, model.id, model, isSchema);
+          if (model.readable) {
+            // store binary data
+            let id = model.id || crypto.randomBytes(20).toString('hex'); // if model has id, use it, otherwise generate one
+            let blob = await streamToPromise(model);
+            let storedDocument = {
+              type: 'cardstack-files',
+              id,
+              attributes: {
+                'created-at':   statSync(model.path).ctime,
+                'size':         statSync(model.path).size,
+                'content-type': model.mimeType,
+                'file-name':    model.filename || model.path
+              }
+            };
+
+            log.debug('storing document for binary data %j', storedDocument);
+
+            storage.storeBinary(model.type, id, storedDocument, blob);
+          } else {
+            storage.store(model.type, model.id, model, isSchema);
+          }
         }
       }
     }
@@ -163,6 +186,13 @@ class EphemeralStorage {
     return [...this.models.values()].filter(entry => entry.generation > generation);
   }
 
+  blobsNewerThan(generation) {
+    if (generation == null) {
+      generation = -Infinity;
+    }
+    return [...this.blobs.values()].filter(entry => entry.generation > generation);
+  }
+
   lookup(type, id) {
     let entry = this.models.get(`${type}/${id}`);
     if (entry) {
@@ -201,7 +231,7 @@ class EphemeralStorage {
     return generationCounter;
   }
 
-  storeBinary(type, id, blob) {
+  storeBinary(type, id, model, blob) {
     generationCounter++;
     let key = `${type}/${id}`;
 
@@ -210,6 +240,8 @@ class EphemeralStorage {
     this.blobs.set(key, {
       type,
       id,
+      model,
+      generation: generationCounter,
       blob
     });
 

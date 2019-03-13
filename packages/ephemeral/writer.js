@@ -53,7 +53,7 @@ module.exports = declareInjections({
       throw new Error("ephemeral storage only supports branch master");
     }
 
-    let id = this._generateId();
+    let id = stream.id || this._generateId();
 
     let storedDocument = {
       type: 'cardstack-files',
@@ -62,7 +62,7 @@ module.exports = declareInjections({
         'created-at':   new Date().toISOString(),
         'size':         statSync(stream.path).size,
         'content-type': stream.mimeType,
-        'file-name':    stream.filename
+        'file-name':    stream.filename || stream.path
       }
     };
 
@@ -70,7 +70,7 @@ module.exports = declareInjections({
       let { storage, type, id } = pendingChanges.get(pendingChange);
       let blob = await streamToPromise(stream);
 
-      return { version: storage.storeBinary(type, id, blob) };
+      return { version: storage.storeBinary(type, id, storedDocument, blob) };
     };
 
     let pending = new PendingChange(null, storedDocument, binaryFinalizer);
