@@ -1,3 +1,9 @@
-<label>
-  Search terms: {{input value=internalQuery.q key-up=(action "update") }}
+<label class="cs-query-editor-label">
+  {{input
+    class="cs-query-editor-input"
+    placeholder=placeholder
+    value=searchTerm
+    key-up=(action "update")
+  }}
+  <button class="cs-query-editor-clear" {{action "clear"}}>×</button>
 </label>

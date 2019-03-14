@@ -1,0 +1,18 @@
+<div class="cs-mobiledoc-card {{if env.isInEditor 'cs-mobiledoc-card__editing'}}" onclick={{action "setCursor"}}>
+  {{cardstack-content content=card format="embedded"}}
+
+  {{#if env.isInEditor}}
+    <p class="cs-mobiledoc-card--caption cs-mobiledoc-card--caption__editing">
+      {{cs-one-way-input class="cs-mobiledoc-card--caption-input"
+                        value=payload.caption
+                        placeholder="Enter caption"
+                        update=(action "setCaption")}}
+    </p>
+  {{else}}
+    {{#if payload.caption}}
+      <p class="cs-mobiledoc-card--caption">
+        {{payload.caption}}
+      </p>
+    {{/if}}
+  {{/if}}
+</div>

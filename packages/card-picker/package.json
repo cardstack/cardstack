@@ -28,7 +28,9 @@
     "ember-sortable": "^1.11.2"
   },
   "devDependencies": {
+    "@cardstack/authentication": "0.13.61",
     "@cardstack/eslint-config": "0.13.61",
+    "@cardstack/image": "0.13.61",
     "@cardstack/rendering": "0.13.61",
     "@cardstack/test-support": "0.13.61",
     "@ember/optional-features": "^0.6.3",
@@ -56,6 +58,7 @@
     "eslint-plugin-mocha": "^5.2.0",
     "eslint-plugin-node": "^7.0.1",
     "loader.js": "^4.7.0",
+    "lodash": "^4.17.11",
     "qunit-dom": "^0.8.0"
   },
   "engines": {

@@ -1,26 +1,20 @@
 <div class="cardstack-image-editor">
-  <button {{action (mut showUploader) true}} disabled={{disabled}}>
-    {{#if (get content field "base64")}}
-      Update image
-    {{else}}
-      Upload image
-    {{/if}}
+  {{#if (get content field "base64")}}
+    <div class="cardstack-image-editor-filename">
+      Selected image: {{get (get content field) 'imageFileName'}}
+    </div>
+  {{/if}}
+  <button class="cardstack-image-editor-button
+                 cardstack-image-editor-button--choose"
+          {{action (perform chooseImage)}}
+          disabled={{disabled}}>
+    Choose {{#if (get content field 'base64')}}Another{{/if}} Image
   </button>
   {{#if (get content field "base64")}}
-    <button onclick={{action "removeImage"}} disabled={{disabled}}>
+    <button class="cardstack-image-editor-button
+                   cardstack-image-editor-button--remove"
+            {{action "removeImage"}} disabled={{disabled}}>
       Remove image
     </button>
   {{/if}}
 </div>
-
-{{#if showUploader}}
-  {{to-elsewhere named="cardstack-modal"
-               send=(hash
-                      content=(component "field-editors/image-upload-modal"
-                        updateImage=(perform updateImage)
-                        cancel=(action (mut showUploader) false)
-                        content=content
-                        field=field
-                      )
-                      outsideClick=(action (mut showUploader) false))}}
-{{/if}}

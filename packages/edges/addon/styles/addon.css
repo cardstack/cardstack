@@ -1,9 +1,12 @@
+body {
+    margin: 0;
+}
 .cardstack-modal-backdrop {
     position: fixed;
     top: 0;
     width: 100vw;
     height: 100vh;
-    background-color: black;
+    background-color: var(--tray-background);
     opacity: 0.8;
     z-index: 999;
 }
@@ -18,8 +21,7 @@
     justify-content: center;
 }
 .cardstack-modal-dialog {
-    background-color: white;
-    border-radius: 4px;
+    /* dont set a background color here--not all modals want to be white or opaque */
     max-height: 100vh;
     overflow-y: auto;
 }

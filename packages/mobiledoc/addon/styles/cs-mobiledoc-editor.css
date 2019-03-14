@@ -44,7 +44,7 @@
   margin-left: -15px;
 }
 
-.block-options button, .paragraph-options button, .current-block {
+div.block-options button, div.paragraph-options button, div.current-block {
   box-sizing: border-box;
   background-color: white;
   font-size: 16px;
@@ -56,7 +56,7 @@
   width: 30px;
   height: 30px;
   margin: 0 6px 6px 0;
-  padding: 7px 7px;
+  padding: 6px 6px;
   cursor: pointer;
 }
 
@@ -64,9 +64,9 @@
   margin-right: 0;
 }
 
-.block-options button svg, .paragraph-options button svg, .current-block svg {
-  width: 15px;
-  height: 13px;
+div.block-options button svg, div.paragraph-options button svg, div.current-block svg {
+  width: 16px;
+  height: 16px;
 }
 
 .block-options button.active, .paragraph-options button.active,

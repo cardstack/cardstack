@@ -1,0 +1,62 @@
+.cardstack-image-editor {
+  padding: 0 0.25rem;
+}
+
+.cardstack-image-editor-filename {
+  font-size: .75rem;
+  color: var(--faded-foreground);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  margin-bottom: .5rem;
+  width: 100%;
+}
+
+.cardstack-image-editor-button {
+  display: block;
+  position: relative;
+  width: 100%;
+  padding: 12px 40px 12px 70px;
+  margin: 0 auto .5rem;
+  border: 1px solid var(--light-outline);
+  border-radius: 4px;
+  font-size: .8rem;
+  background-color: var(--tray-background);
+  color: var(--bright-foreground);
+  cursor: pointer;
+}
+
+.cardstack-image-editor-button:last-of-type {
+  margin-bottom: 0;
+}
+
+.cardstack-image-editor-button:hover {
+  background-color: var(--highlight-background);
+  color: var(--bright-blue-foreground);
+}
+
+.cardstack-image-editor-button[disabled] {
+  opacity: .5;
+  cursor: default;
+}
+.cardstack-image-editor-button[disabled]:hover {
+  background-color: var(--tray-background);
+  color: var(--bright-foreground);
+}
+
+.cardstack-image-editor-button:before {
+  content: ' ';
+  display: block;
+  position: absolute;
+  top: 10px;
+  left: 30px;
+  height: 20px;
+  width: 20px;
+  background-repeat: no-repeat;
+  background-size: contain;
+}
+.cardstack-image-editor-button--choose:before {
+  background-image: url('/@cardstack/image/image.svg');
+}
+.cardstack-image-editor-button--remove:before {
+  background-image: url('/@cardstack/image/trash.svg');
+}

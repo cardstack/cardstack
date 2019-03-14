@@ -68,5 +68,7 @@
 }
 
 .cst-bottom {
-  z-index: 150;
+  z-index: 200;
+  width: 100%;
+  left: -50px;
 }

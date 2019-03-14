@@ -16,7 +16,7 @@ describe('pgsearch/indexer', function() {
   let env, factory, writer, indexer, searcher, currentSchema, changedModels;
 
   before(async function() {
-    this.timeout(2500);
+    this.timeout(5000);
     factory = new Factory();
 
     factory.addResource('content-types', 'puppies')

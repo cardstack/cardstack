@@ -4,21 +4,32 @@ import layout from '../../templates/components/field-editors/cardstack-image-edi
 import { task } from "ember-concurrency";
 import { inject as service } from '@ember/service';
 
+const cardPickerOptions = {
+  sort: '-image-created-at',
+  searchFields: ['image-file-name'],
+  searchType: 'prefix'
+};
+
 export default Component.extend({
   layout,
-  store: service(),
+  cardPicker: service('cardstack-card-picker'),
 
   disabled: not('enabled'),
 
-  updateImage: task(function * (file) {
-    let image = this.get('store').createRecord('cardstack-image', { file });
-    yield image.save();
+  chooseImage: task(function * () {
+    let image;
+    try {
+      image = yield this.get('cardPicker').pickCard('cardstack-image', cardPickerOptions);
+    } catch (e) {
+      if (e !== 'no card selected') { throw e; }
+    }
+    if (!image) { return; }
+
     let field = this.field;
     this.content.watchRelationship(field, () => {
       this.set(`content.${field}`, image);
     });
-    this.set('showUploader', false);
-  }).restartable(),
+  }).drop(),
 
   actions: {
     removeImage() {

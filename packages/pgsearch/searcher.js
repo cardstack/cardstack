@@ -234,6 +234,7 @@ module.exports = declareInjections({
     }
 
     if (value.prefix) {
+      // Hassan there looks like a problem with this when the search string is over 8 chars, also we should support chars that commonly appear in filenames like "_"
       let param = value.prefix.replace(/[^a-zA-Z0-9]/g, '') + ":*";
       return [`to_tsvector('english',`, ...expression, `) @@ to_tsquery('english',`, ...leafField.buildValueExpression(param), `)` ];
     }

@@ -1,4 +1,6 @@
-{{#toolbar-manager topRightCornerBelongsTo=topRightCornerBelongsTo}}
+{{#toolbar-manager topRightCornerBelongsTo=topRightCornerBelongsTo
+                   bottomLeftCornerBelongsTo='left'
+                   bottomRightCornerBelongsTo='right'}}
   {{#each cardstackEdges.topLevelComponents as |componentName|}}
     {{component componentName edges=(hash
        launcher = (component 'fixed-within-toolbars' top=0 right=0)

@@ -24,7 +24,7 @@
     "@cardstack/edges": "0.13.61",
     "@cardstack/plugin-utils": "0.13.61",
     "@cardstack/rendering": "0.13.61",
-    "ember-auto-import": "^1.2.15",
+    "ember-auto-import": "^1.2.16",
     "ember-cli-babel": "^6.16.0",
     "ember-cli-head": "^0.4.1",
     "ember-cli-htmlbars": "^3.0.0",
