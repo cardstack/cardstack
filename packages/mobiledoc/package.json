@@ -26,9 +26,9 @@
     "test-node": "mocha ../test-support/bin/run.js"
   },
   "dependencies": {
-    "@cardstack/card-picker": "0.13.63",
+    "@cardstack/card-picker": "0.13.64",
     "@cardstack/data": "0.13.63",
-    "@cardstack/image": "0.13.63",
+    "@cardstack/image": "0.13.64",
     "ember-cli-babel": "^6.8.2",
     "ember-cli-htmlbars": "^2.0.1",
     "ember-concurrency": "^0.8.27",
