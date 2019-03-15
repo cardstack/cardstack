@@ -1,6 +1,6 @@
 {
   "name": "@cardstack/image",
-  "version": "0.13.63",
+  "version": "0.13.64",
   "description": "Image field plugin for cardstack",
   "keywords": [
     "ember-addon",
@@ -24,7 +24,7 @@
     "test": "ember try:each"
   },
   "dependencies": {
-    "@cardstack/card-picker": "0.13.63",
+    "@cardstack/card-picker": "0.13.64",
     "@cardstack/files": "0.13.63",
     "@cardstack/plugin-utils": "0.13.63",
     "@cardstack/test-support": "0.13.63",

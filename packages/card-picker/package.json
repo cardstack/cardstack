@@ -1,6 +1,6 @@
 {
   "name": "@cardstack/card-picker",
-  "version": "0.13.63",
+  "version": "0.13.64",
   "description": "Card-Picker system for cardstack",
   "keywords": [
     "ember-addon"
@@ -30,7 +30,7 @@
   "devDependencies": {
     "@cardstack/authentication": "0.13.63",
     "@cardstack/eslint-config": "0.13.63",
-    "@cardstack/image": "0.13.63",
+    "@cardstack/image": "0.13.64",
     "@cardstack/rendering": "0.13.63",
     "@cardstack/test-support": "0.13.63",
     "@ember/optional-features": "^0.6.3",
