@@ -3,7 +3,6 @@
 /dist
 /tests
 /tmp
-/cardstack
 **/.gitkeep
 .bowerrc
 .editorconfig
