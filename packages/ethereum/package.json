@@ -1,6 +1,6 @@
 {
   "name": "@cardstack/ethereum",
-  "version": "0.13.63",
+  "version": "0.13.65",
   "description": "ethereum plugin for Cardstack",
   "keywords": [
     "ember-addon",
@@ -25,12 +25,12 @@
     "private-blockchain": "../../node_modules/.bin/truffle develop"
   },
   "dependencies": {
-    "@cardstack/di": "0.13.63",
-    "@cardstack/hub": "0.13.63",
+    "@cardstack/di": "0.13.65",
+    "@cardstack/hub": "0.13.65",
     "@cardstack/logger": "^0.1.0",
-    "@cardstack/pgsearch": "0.13.63",
-    "@cardstack/plugin-utils": "0.13.63",
-    "@cardstack/queue": "0.13.63",
+    "@cardstack/pgsearch": "0.13.65",
+    "@cardstack/plugin-utils": "0.13.65",
+    "@cardstack/queue": "0.13.65",
     "command-line-args": "^5.0.2",
     "command-line-usage": "^5.0.5",
     "ember-source": "~2.18.2",
@@ -44,10 +44,10 @@
     "web3": "^1.0.0-beta.37"
   },
   "devDependencies": {
-    "@cardstack/eslint-config": "0.13.63",
-    "@cardstack/jsonapi": "0.13.63",
-    "@cardstack/models": "0.13.63",
-    "@cardstack/test-support": "0.13.63",
+    "@cardstack/eslint-config": "0.13.65",
+    "@cardstack/jsonapi": "0.13.65",
+    "@cardstack/models": "0.13.65",
+    "@cardstack/test-support": "0.13.65",
     "eslint": "^5.8.0",
     "eslint-plugin-ember": "^5.0.0",
     "eslint-plugin-mocha": "^5.2.0",
