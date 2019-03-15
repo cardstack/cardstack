@@ -2,17 +2,17 @@
   {{cardstack-content content=card format="embedded"}}
 
   {{#if env.isInEditor}}
-    <p class="cs-mobiledoc-card--caption cs-mobiledoc-card--caption__editing">
+    <div class="cs-mobiledoc-card--caption cs-mobiledoc-card--caption__editing">
       {{cs-one-way-input class="cs-mobiledoc-card--caption-input"
                         value=payload.caption
                         placeholder="Enter caption"
                         update=(action "setCaption")}}
-    </p>
+    </div>
   {{else}}
     {{#if payload.caption}}
-      <p class="cs-mobiledoc-card--caption">
+      <div class="cs-mobiledoc-card--caption">
         {{payload.caption}}
-      </p>
+      </div>
     {{/if}}
   {{/if}}
 </div>
