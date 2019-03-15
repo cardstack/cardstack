@@ -27,6 +27,7 @@
     "@cardstack/card-picker": "0.13.63",
     "@cardstack/files": "0.13.63",
     "@cardstack/plugin-utils": "0.13.63",
+    "@cardstack/test-support": "0.13.63",
     "ember-cli-babel": "^6.8.2",
     "ember-cli-htmlbars": "^2.0.1"
   },
@@ -39,7 +40,6 @@
     "@cardstack/models": "0.13.63",
     "@cardstack/rendering": "0.13.63",
     "@cardstack/routing": "0.13.63",
-    "@cardstack/test-support": "0.13.63",
     "@cardstack/tools": "0.13.63",
     "broccoli-asset-rev": "^2.4.5",
     "ember-cli": "^3.0.0",
