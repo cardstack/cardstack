@@ -1,6 +1,6 @@
 {
   "name": "@cardstack/files",
-  "version": "0.13.66",
+  "version": "0.13.67",
   "description": "The default blueprint for ember-cli addons.",
   "keywords": [
     "ember-addon",
@@ -24,12 +24,12 @@
     "test": "ember try:each"
   },
   "dependencies": {
-    "@cardstack/di": "0.13.66",
-    "@cardstack/hub": "0.13.66",
-    "@cardstack/jsonapi": "0.13.66",
+    "@cardstack/di": "0.13.67",
+    "@cardstack/hub": "0.13.67",
+    "@cardstack/jsonapi": "0.13.67",
     "@cardstack/logger": "^0.1.0",
-    "@cardstack/plugin-utils": "0.13.66",
-    "@cardstack/test-support": "0.13.66",
+    "@cardstack/plugin-utils": "0.13.67",
+    "@cardstack/test-support": "0.13.67",
     "ember-cli-babel": "^6.6.0",
     "lodash": "^4.17.11",
     "moment": "^2.22.2",
@@ -39,7 +39,7 @@
     "uuid": "^3.3.2"
   },
   "devDependencies": {
-    "@cardstack/test-support-authenticator": "0.13.66",
+    "@cardstack/test-support-authenticator": "0.13.67",
     "broccoli-asset-rev": "^2.4.5",
     "ember-ajax": "^3.0.0",
     "ember-cli": "~3.0.2",
