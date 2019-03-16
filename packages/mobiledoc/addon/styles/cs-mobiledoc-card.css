@@ -6,6 +6,7 @@
   text-align: center;
   font-style: italic;
   margin: 1rem 0 2rem;
+  min-height: 20px;
 }
 
 .cs-mobiledoc-card--caption-input {
