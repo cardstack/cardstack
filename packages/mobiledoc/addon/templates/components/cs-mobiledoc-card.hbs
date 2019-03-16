@@ -9,10 +9,10 @@
                         update=(action "setCaption")}}
     </div>
   {{else}}
-    {{#if payload.caption}}
-      <div class="cs-mobiledoc-card--caption">
+    <div class="cs-mobiledoc-card--caption">
+      {{#if payload.caption}}
         {{payload.caption}}
-      </div>
-    {{/if}}
+      {{/if}}
+    </div>
   {{/if}}
 </div>
