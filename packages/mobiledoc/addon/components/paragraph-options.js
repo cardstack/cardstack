@@ -45,7 +45,7 @@ export default Component.extend({
   },
 
   currentIcon: computed('cursor', function () {
-    switch(this.get('_lastActiveSection.tagName')) {
+    switch (this.get('_lastActiveSection.tagName')) {
     case 'blockquote':
       return 'EditorQuote';
     case 'p':
