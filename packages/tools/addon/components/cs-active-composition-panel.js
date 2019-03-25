@@ -78,7 +78,7 @@ export default Component.extend({
 
   actions: {
     validate() {
-      return this.get('validateTask').perform();
+      return this.validateTask.perform();
     }
   }
 });
