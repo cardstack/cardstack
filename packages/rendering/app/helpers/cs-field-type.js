@@ -1,1 +1,1 @@
-export { default, fieldType } from '@cardstack/tools/helpers/cs-field-type';
+export { default, fieldType } from '@cardstack/rendering/helpers/cs-field-type';
