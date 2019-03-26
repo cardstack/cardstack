@@ -66,18 +66,10 @@ function initialModels() {
 
   initial.addResource('content-types', 'comments')
     .withAttributes({
-      defaultIncludes: [
-        'poster',
-        'karma-type',
-      ],
       fieldsets: {
         embedded: [
-          { field: 'poster', format: 'embedded'},
-          { field: 'karma-type', format: 'embedded'},
-        ],
-        isolated: [
-          { field: 'poster', format: 'embedded'},
-          { field: 'karma-type', format: 'embedded'},
+          { field: 'poster', format: 'embedded' },
+          { field: 'karma-type', format: 'embedded' },
         ]
       }
     })
@@ -112,20 +104,14 @@ function initialModels() {
 
   initial.addResource('content-types', 'posts')
     .withAttributes({
-      defaultIncludes: [
-        'author',
-        'categories',
-        'reading-time-unit',
-        'comments',
-        'comments.poster',
-        'comments.karma-type',
-      ],
       fieldsets: {
         isolated: [
-          { field: 'author', format: 'embedded'},
-          { field: 'categories', format: 'embedded'},
-          { field: 'reading-time-unit', format: 'embedded'},
-          { field: 'comments', format: 'embedded'},
+          { field: 'author', format: 'embedded' },
+          { field: 'categories', format: 'embedded' },
+          { field: 'reading-time-unit', format: 'embedded' },
+          { field: 'comments', format: 'embedded' },
+          { field: 'comments.poster', format: 'embedded' },
+          { field: 'comments.karma-type', format: 'embedded' },
         ]
       }
     })

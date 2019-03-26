@@ -1,6 +1,6 @@
 import { module, test } from 'qunit';
 import { setupApplicationTest } from 'ember-qunit';
-import { visit, click, fillIn, triggerEvent, waitFor } from '@ember/test-helpers';
+import { visit, click, fillIn, triggerEvent, waitFor, settled } from '@ember/test-helpers';
 import { login } from '../helpers/login';
 import { ciSessionId } from '@cardstack/test-support/environment';
 import { hubURL } from '@cardstack/plugin-utils/environment';
@@ -108,6 +108,21 @@ module('Acceptance | tools', function(hooks) {
     await triggerEvent(commentBodyEditor, 'blur');
     await waitFor('[data-test-validation-error=body]')
     assert.dom('[data-test-validation-error=body]').hasText('Body must not be empty');
+  });
+
+  test('show validation error for new resource', async function(assert) {
+    await visit('/hub/posts/new');
+    await login();
+    await click('.cardstack-tools-launcher');
+    await click('[data-test-cs-editor-switch]');
+    await click('[data-test-cs-version-control-button-save]');
+    await settled();
+
+    assert.dom('[data-test-field-name=title]').hasClass('invalid');
+
+    let element = findTriggerElementWithLabel.call(this, /Title/);
+    await click(element);
+    assert.dom('[data-test-validation-error=title]').hasText('Title must not be empty');
   });
 
   test('show all fields, not just those rendered from template', async function(assert) {

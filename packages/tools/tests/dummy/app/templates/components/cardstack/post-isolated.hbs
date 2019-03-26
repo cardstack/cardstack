@@ -1,5 +1,9 @@
 <div class="post-page">
-  <div>{{#link-to "posts"}}Back to posts{{/link-to}}</div>
+  <div>
+    <a href={{cardstack-url '/posts'}}>
+      Back to posts
+    </a>
+  </div>
   <h1>
     {{cs-field content "title"}} by {{cs-field content.author "name"}}
   </h1>
