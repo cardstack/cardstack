@@ -89,7 +89,7 @@ export default Base.extend({
 
       localStorage.setItem('cardstack-authentication-source', authenticationSource);
 
-      if(response.headers.get("content-type") &&
+      if (response.headers.get("content-type") &&
          response.headers.get("content-type").toLowerCase().indexOf("application/json") >= 0) {
         return response.json()
       } else {

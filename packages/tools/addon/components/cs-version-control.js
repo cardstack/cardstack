@@ -136,13 +136,13 @@ export default Component.extend({
   }),
 
   title: computed('modificationState', 'upstreamState', function() {
-    switch(this.get('modificationState')) {
+    switch (this.get('modificationState')) {
     case 'new':
       return 'Drafted'
     case 'changed':
       return 'Changed';
     case 'saved':
-      switch(this.get('upstreamState')) {
+      switch (this.get('upstreamState')) {
       case 'pending':
         return '...';
       case 'self':
