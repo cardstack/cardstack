@@ -1,19 +1,34 @@
-{{#mark-overlay id=id model=fieldInfo group="cardstack-fields" ~}}
-  {{#with
-      (cs-placeholder
-        value=(get content fieldName)
-        fieldName=fieldName
-        fieldCaption=fieldInfo.caption
-        fieldConfig=fieldConfig
-        active=tools.requestedEditing) as |value| ~}}
-  {{#if hasBlock ~}}
-    {{yield value ~}}
-  {{else ~}}
-    {{#if (is-component defaultRenderer) ~}}
-      {{component defaultRenderer value=value content=content fieldName=fieldName ~}}
+{{#let
+  (if
+    (is-helper "cs-field-editor-options-for")
+    (get (helper "cs-field-editor-options-for" content fieldName) "hideFromEditor"))
+  (cs-placeholder
+    value=(get content fieldName)
+    fieldName=fieldName
+    fieldCaption=fieldInfo.caption
+    fieldConfig=fieldConfig
+    active=tools.requestedEditing) as |hideFromEditor value|}}
+  {{#if hideFromEditor}}
+    {{#if hasBlock ~}}
+      {{yield value ~}}
     {{else ~}}
-      {{value ~}}
+      {{#if (is-component defaultRenderer) ~}}
+        {{component defaultRenderer value=value content=content fieldName=fieldName ~}}
+      {{else ~}}
+        {{value ~}}
+      {{/if ~}}
     {{/if ~}}
-  {{/if ~}}
-  {{/with ~}}
-{{/mark-overlay ~}}
+  {{else}}
+    {{#mark-overlay id=id model=fieldInfo group="cardstack-fields" ~}}
+      {{#if hasBlock ~}}
+        {{yield value ~}}
+      {{else ~}}
+        {{#if (is-component defaultRenderer) ~}}
+          {{component defaultRenderer value=value content=content fieldName=fieldName ~}}
+        {{else ~}}
+          {{value ~}}
+        {{/if ~}}
+      {{/if ~}}
+    {{/mark-overlay ~}}
+  {{/if}}
+{{/let ~}}
