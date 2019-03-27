@@ -817,6 +817,7 @@ describe('git/writer/hyperledger', function() {
           hyperledger: {
             privateKey: "Here is a private key",
             apiBase: "http://example.com/1234",
+            tag: 'test-tag',
             blobStorage: {
               type: 'tmpfile',
               path: 'tmp/blobs'
@@ -852,7 +853,7 @@ describe('git/writer/hyperledger', function() {
 
     replace(gitChain, 'push', fakePush);
 
-    let { data:record } = await writers.create('master', env.session, 'articles', {
+    await writers.create('master', env.session, 'articles', {
       data: {
         type: 'articles',
         attributes: {
@@ -867,10 +868,9 @@ describe('git/writer/hyperledger', function() {
     expect(gitChain.apiBase).to.equal("http://example.com/1234");
 
 
-    // push is called with the correct sha
-    let version = record.meta.version;
+    // push is called with the correct tag
     expect(fakePush.callCount).to.equal(1);
-    expect(fakePush.calledWith(version)).to.be.ok;
+    expect(fakePush.calledWith('test-tag')).to.be.ok;
   });
 
 });
