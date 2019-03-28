@@ -196,14 +196,14 @@ module.exports = class Writer {
     }
   }
 
-  async _pushToHyperledger(sha) {
+  async _pushToHyperledger() {
     await this._ensureGitchain();
 
     if(this.gitChain) {
       // make sure only one push is ongoing at a time, by creating a chain of
       // promises here
       this._gitChainPromise = Promise.resolve(this._gitChainPromise).then(() =>
-        this.gitChain.push(sha)
+        this.gitChain.push(this.hyperledgerConfig.tag)
       );
     }
   }
@@ -265,7 +265,7 @@ async function finalizer(pendingChange) {
       }
     }
     let version = await change.finalize(signature, this.remote, this.fetchOpts);
-    await this._pushToHyperledger(version);
+    await this._pushToHyperledger();
     return { version, hash: (file ? file.savedId() : null) };
   });
 }

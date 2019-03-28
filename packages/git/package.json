@@ -13,7 +13,7 @@
     "test": "mocha ../test-support/bin/run.js"
   },
   "dependencies": {
-    "@cardstack/gitchain": "0.1.1",
+    "@cardstack/gitchain": "0.2.1",
     "@cardstack/logger": "^0.1.0",
     "@cardstack/plugin-utils": "0.13.67",
     "delay": "^4.1.0",
