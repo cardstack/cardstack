@@ -49,15 +49,22 @@ module.exports = class DocumentContext {
   }
 
   get model() {
-    if (this.isCollection) { return null; }
     if (this._model) { return this._model; }
 
-    let contentType = this.schema.types.get(this.type);
-    if (!contentType) {
-      throw new Error(`Unknown content type=${this.type} id=${this.id}`);
+    if (this.isCollection) {
+      this._model = this.upstreamDoc.data.map(doc => {
+        let contentType = this.schema.types.get(doc.type);
+        if (!contentType) { throw new Error(`Unknown content type=${doc.type} id=${doc.id}`); }
+
+        return new Model(contentType, doc, this.schema, this.read.bind(this));
+      });
+    } else {
+      let contentType = this.schema.types.get(this.type);
+      if (!contentType) { throw new Error(`Unknown content type=${this.type} id=${this.id}`); }
+
+      this._model = new Model(contentType, this.upstreamDoc.data, this.schema, this.read.bind(this));
     }
 
-    this._model = new Model(contentType, this.upstreamDoc.data, this.schema, this.read.bind(this));
     return this._model;
   }
 

@@ -276,7 +276,7 @@ module.exports = class Grant {
     }
 
     let model = documentContext.model;
-    if (!model) { return []; }
+    if (!model || Array.isArray(model)) { return []; } // currently only handles single resource documents
 
     let contentType = model.getContentType();
     if (!contentType.realAndComputedFields.get(fieldName)) { return []; }
