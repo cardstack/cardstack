@@ -352,7 +352,6 @@ module.exports = class DocumentContext {
     }
   }
 
-  // TODO come up with a better way to cache (use Model)
   async _buildCachedResponse() {
     let searchTree;
     if (!this.isCollection) {
