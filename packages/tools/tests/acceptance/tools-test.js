@@ -261,6 +261,19 @@ module('Acceptance | tools', function(hooks) {
     assert.dom(reviewStatusInput).isNotDisabled();
   });
 
+  test('fields with the same name but belonging to a different type are rendered in editor', async function(assert) {
+    await visit('/hub/posts/1');
+    await login();
+    await click('.cardstack-tools-launcher');
+    await waitFor('.cs-active-composition-panel--main');
+    await waitFor('.cs-editor-switch')
+    await click('.cs-editor-switch');
+
+    let categoryPopularity = findTriggerElementWithLabel.call(this, /Category #1: Popularity/);
+    assert.ok(categoryPopularity, 'field is rendered in editor');
+
+  });
+
   test('track field dirtiness in owned, related records', async function(assert) {
     await visit('/hub/posts/1');
     await login();
@@ -395,4 +408,5 @@ module('Acceptance | tools', function(hooks) {
     await fillIn(titleInput, 'Title 2');
     assert.dom(titleInput).hasValue('Title 2');
   });
+
 });

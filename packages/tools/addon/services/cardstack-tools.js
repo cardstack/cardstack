@@ -11,22 +11,39 @@ import injectOptional from 'ember-inject-optional';
 import { defaultBranch } from '@cardstack/plugin-utils/environment';
 import { guidFor } from '@ember/object/internals';
 import { get, set } from '@ember/object';
-import { sortBy } from 'lodash';
+import { sortBy, flatten } from 'lodash';
 
 export default Service.extend({
   overlays: service('ember-overlays'),
   resourceMetadata: service(),
   marks: alias('overlays.marks'),
   cardstackEdges: service(),
+  data: service('cardstack-data'),
 
   renderedFields: computed('marks', function() {
     return this.get('marks').filter(m => m.group === 'cardstack-fields');
   }),
 
-  _renderedFieldNames: computed('renderedFields', function() {
-    return this.get('renderedFields').reduce((fieldNames, fieldMark) => {
-      let { grouped, name } = fieldMark.model;
-      return fieldNames.concat(grouped ? grouped : name);
+  _renderedFieldIdentifiers: computed('renderedFields', function() {
+    return this.get('renderedFields').reduce((fieldIdentifiers, fieldMark) => {
+      let { grouped, name, content } = fieldMark.model;
+      // This can be a case for showing a field of a relationship
+      // that doesn't exist yet
+      if (!content) {
+        return fieldIdentifiers;
+      }
+      // {{cs-field group property}} can be written in the template
+      // in which case `content` will be a POJO (the group representation)
+      // We need to be guard against that
+      if (!content.type) {
+        return fieldIdentifiers;
+      }
+      let uid = this.data.getCardMeta(content, 'uid');
+      if (grouped) {
+        return fieldIdentifiers.concat(grouped.map(fieldName => `${uid}/${fieldName}`));
+      } else {
+        return fieldIdentifiers.concat(`${uid}/${name}`);
+      }
     }, []);
   }),
 
@@ -46,15 +63,16 @@ export default Service.extend({
     return sortBy(fields, ['options.editorOptions.sortOrder']);
   }),
 
-  modelFields: computed('_renderedFieldNames', 'activeContentItem.model', function() {
-    let renderedFieldNames = this.get('_renderedFieldNames');
+  modelFields: computed('_renderedFieldIdentifiers', 'activeContentItem.model', function() {
+    let renderedFieldIdentifiers = this.get('_renderedFieldIdentifiers');
     let model = this.get('activeContentItem.model');
     if (!model) { return []; }
 
     let modelFields = [];
     model.eachAttribute((attribute, meta) => {
+      let fieldIdentifier = `${this.data.getCardMeta(model, 'uid')}/${meta.name}`;
       // Prevent rendering a field that's already explicitly rendered
-      if (!renderedFieldNames.includes(meta.name) && meta.name !== 'selfLink') {
+      if (!renderedFieldIdentifiers.includes(fieldIdentifier) && meta.name !== 'selfLink') {
         let fieldInfo = meta;
         set(fieldInfo, 'id', guidFor(fieldInfo));
         set(fieldInfo, 'model', model);
@@ -65,8 +83,9 @@ export default Service.extend({
     let ownedRelationshipFields = model.relatedOwnedRecords().map((record) => {
       let fields = [];
       record.eachAttribute((attribute, meta) => {
+        let fieldIdentifier = `${this.data.getCardMeta(record, 'uid')}/${meta.name}`;
         // Prevent rendering a field that's already explicitly rendered
-        if (!renderedFieldNames.includes(meta.name) && meta.name !== 'selfLink') {
+        if (!renderedFieldIdentifiers.includes(fieldIdentifier) && meta.name !== 'selfLink') {
           let fieldInfo = Object.assign({}, meta);
           fieldInfo.id = guidFor(fieldInfo);
           fieldInfo.model = record;
@@ -75,9 +94,7 @@ export default Service.extend({
       });
       return fields;
     });
-    return modelFields.concat(ownedRelationshipFields.reduce((flattened, fields) => {
-      return flattened.concat(fields);
-    }, []));
+    return modelFields.concat(flatten(ownedRelationshipFields));
   }),
 
   contentPages: computed('marks', function() {

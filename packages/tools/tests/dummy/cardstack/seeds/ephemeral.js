@@ -191,6 +191,9 @@ function initialModels() {
           aliasPath: 'author-name',
         }
       }),
+      initial.addResource('fields', 'popularity').withAttributes({
+        fieldType: '@cardstack/core-types::integer'
+      }),
     ]);
 
     addConstraint(initial, '@cardstack/core-types::not-empty', 'title');
@@ -271,7 +274,8 @@ function initialModels() {
       rating: 2,
       archived: false,
       readingTimeValue: 8,
-      hiddenFieldFromEditor: 'This field is hidden from the editor'
+      hiddenFieldFromEditor: 'This field is hidden from the editor',
+      popularity: 42,
     })
     .withRelated('reading-time-unit', { type: 'time-units', id: '1' })
     .withRelated('author', lechuck)
@@ -286,7 +290,8 @@ function initialModels() {
       keywords: 'dos, ni, futatsu',
       rating: 5,
       archived: true,
-      readingTimeValue: 2
+      readingTimeValue: 2,
+      popularity: 24,
     })
     .withRelated('reading-time-unit', { type: 'time-units', id: '2' })
     .withRelated('author', lechuck)
