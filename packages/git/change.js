@@ -85,27 +85,38 @@ class Change {
 
     let delayTime = 500;
     let mergeCommit;
+    let needsFetchAll = false;
+
     while (delayTime <= 5000) {
       mergeCommit = await this._makeMergeCommit(newCommit, commitOpts);
 
       try {
-        if(this.fetchOpts) {
+        if (this.fetchOpts) {
+          // needsFetchAll only gets set to true if the retry block has failed once
+          if(needsFetchAll) {
+            // pull remote before allowing process to continue, allowing us to
+            // (hopefully) recover from upstream getting out of sync
+            await this.repo.fetchAll(this.fetchOpts);
+          }
           await this._pushCommit(mergeCommit);
         } else {
           await this._applyCommit(mergeCommit);
         }
       } catch (err) {
-        await delay(delayTime);
         log.warn('Failed to finalize commit "%s"', err);
+        needsFetchAll = true;
 
+        await delay(delayTime);
         delayTime *= 2;
+
+        continue;
       }
 
-    return mergeCommit.id().tostrS();
-  }
+      return mergeCommit.id().tostrS();
+    }
 
-  throw new Error('Failed to finalise commit and could not recover');
-}
+    throw new Error('Failed to finalise commit and could not recover. ');
+  }
 
   async _makeCommit(commitOpts) {
     let treeOid = await this.root.write(true);
