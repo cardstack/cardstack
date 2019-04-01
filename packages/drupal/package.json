@@ -24,7 +24,7 @@
     "api-version": 1
   },
   "dependencies": {
-    "@cardstack/di": "0.13.68",
+    "@cardstack/di": "0.13.69",
     "@cardstack/logger": "^0.1.0",
     "@cardstack/plugin-utils": "0.13.71",
     "ember-source": "~2.18.2",
