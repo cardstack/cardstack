@@ -12,6 +12,7 @@ module.exports = declareInjections({
   searchers: 'hub:searchers',
   currentSchema: 'hub:current-schema',
 }, class Writer {
+
   static create(params) {
     return new this(params);
   }
