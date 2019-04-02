@@ -136,9 +136,9 @@ function createHasDirtyOwned(model, ownedRelationships, properties) {
       dependentKeys.push(`'${relationName}.@each.hasDirtyOwned'`);
     }
     return dependentKeys;
-  }, []).join(',');
+  }, []);
 
-  defineProperty(model, 'hasDirtyOwned', computed('hasDirtyOwnedRelationships', dependentKeys, function() {
+  defineProperty(model, 'hasDirtyOwned', computed('hasDirtyOwnedRelationships', ...dependentKeys, function() {
     if (model.hasDirtyOwnedRelationships) {
       return true;
     }
