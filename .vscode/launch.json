@@ -122,7 +122,7 @@
                 "--timeout",
                 "200000",
                 // "--grep",
-                // "can derive relationships to cards embedded within mobiledoc"
+                // "can filter by boolean field with false value"
             ]
         },
         {

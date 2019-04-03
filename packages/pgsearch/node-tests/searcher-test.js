@@ -18,7 +18,7 @@ describe('pgsearch/searcher', function() {
   let searcher, env, factory;
 
   before(async function() {
-    this.timeout(5000);
+    this.timeout(10000);
     factory = new Factory();
 
     factory.addResource('content-types', 'people').withRelated('fields', [
@@ -40,6 +40,10 @@ describe('pgsearch/searcher', function() {
       factory.addResource('fields', 'description').withAttributes({
         fieldType: '@cardstack/mobiledoc'
       }),
+      factory.addResource('fields', 'is-confused-by-doors').withAttributes({
+        fieldType: '@cardstack/core-types::boolean'
+      }),
+
     ]);
 
 
@@ -92,6 +96,7 @@ describe('pgsearch/searcher', function() {
       firstName: 'Quint',
       lastName: 'Faulkner',
       age: 10,
+      'is-confused-by-doors': true,
       favoriteShapes: ['pentagon', 'rhombus', 'circle'],
       description: {
         version: "0.3.1",
@@ -110,6 +115,7 @@ describe('pgsearch/searcher', function() {
       firstName: 'Arthur',
       lastName: 'Faulkner',
       age: 5,
+      'is-confused-by-doors': false,
       favoriteShapes: ['square', 'triangle', 'circle'],
       favoriteColor: 'red'
     });
@@ -180,6 +186,7 @@ describe('pgsearch/searcher', function() {
         'first-name': 'Quint',
         'last-name': 'Faulkner',
         age: 10,
+        'is-confused-by-doors': true,
         'favorite-shapes': ['pentagon', 'rhombus', 'circle'],
         description: {
           version: "0.3.1",
@@ -379,6 +386,28 @@ describe('pgsearch/searcher', function() {
     });
     expect(models).to.have.length(1);
     expect(models).includes.something.with.deep.property('attributes.first-name', 'Arthur');
+  });
+
+  it('can filter by boolean field with true value', async function() {
+    let { data: models } = await searcher.search(env.session, 'master', {
+      filter: {
+        'is-confused-by-doors': true,
+        type: 'people'
+      }
+    });
+    expect(models).to.have.length(1);
+    expect(models).includes.something.with.deep.property('attributes.first-name', 'Quint' );
+  });
+
+  it('can filter by boolean field with false value', async function() {
+    let { data: models } = await searcher.search(env.session, 'master', {
+      filter: {
+        'is-confused-by-doors': false,
+        type: 'people'
+      }
+    });
+    expect(models).to.have.length(1);
+    expect(models).includes.something.with.deep.property('attributes.first-name', 'Arthur' );
   });
 
   it('can filter by field nonexistence (string)', async function() {

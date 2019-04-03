@@ -233,6 +233,14 @@ module.exports = declareInjections({
       }
     }
 
+    if (typeof value === 'boolean'){
+      if (!value) {
+        return [`(`, ...expression, `)::boolean is false`];
+      } else {
+        return [`(`, ...expression, `)::boolean is true`];
+      }
+    }
+
     if (value.prefix) {
       // Hassan there looks like a problem with this when the search string is over 8 chars, also we should support chars that commonly appear in filenames like "_"
       let param = value.prefix.replace(/[^a-zA-Z0-9]/g, '') + ":*";
