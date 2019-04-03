@@ -1,13 +1,14 @@
 const authLog = require('@cardstack/logger')('cardstack/auth');
 const log = require('@cardstack/logger')('cardstack/indexing/document-context');
-const Model = require('../model');
+const { Model, privateModels } = require('../model');
 const { getPath } = require('@cardstack/routing/cardstack/path');
 const { merge, get, uniqBy } = require('lodash');
 const Session = require('@cardstack/plugin-utils/session');
+const qs = require('qs');
 
 module.exports = class DocumentContext {
 
-  constructor({ read, routers, schema, type, id, sourceId, generation, upstreamDoc, includePaths }) {
+  constructor({ read, search, routers, schema, type, id, sourceId, generation, upstreamDoc, includePaths }) {
     if (upstreamDoc && !upstreamDoc.data) {
       throw new Error('The upstreamDoc must have a top-level "data" property', {
         status: 400
@@ -22,6 +23,7 @@ module.exports = class DocumentContext {
     this.upstreamDoc = upstreamDoc;
     this.includePaths = includePaths ? includePaths.map(part => part ? part.split('.') : null).filter(i => Boolean(i)) : [];
     this._read = read;
+    this._search = search;
     this._realms = [];
     this._pendingReads = [];
     this._followedRelationships = {};
@@ -55,13 +57,13 @@ module.exports = class DocumentContext {
         let contentType = this.schema.types.get(doc.type);
         if (!contentType) { throw new Error(`Unknown content type=${doc.type} id=${doc.id}`); }
 
-        return new Model(contentType, doc, this.schema, this.read.bind(this));
+        return new Model(contentType, doc, this.schema, this.read.bind(this), this.search.bind(this));
       });
     } else {
       let contentType = this.schema.types.get(this.type);
       if (!contentType) { throw new Error(`Unknown content type=${this.type} id=${this.id}`); }
 
-      this._model = new Model(contentType, this.upstreamDoc.data, this.schema, this.read.bind(this));
+      this._model = new Model(contentType, this.upstreamDoc.data, this.schema, this.read.bind(this), this.search.bind(this));
     }
 
     return this._model;
@@ -119,6 +121,7 @@ module.exports = class DocumentContext {
 
     let cached = this.cache[key];
     if (cached) {
+      log.debug(`document with key ${key} is in cache, fetching...`);
       return await cached;
     }
 
@@ -128,6 +131,40 @@ module.exports = class DocumentContext {
     this._pendingReads.push(key);
 
     this.cache[key] = this._read(type, id);
+    let resource = await this.cache[key];
+
+    this._pendingReads = this._pendingReads.filter(i => i !== key);
+    return resource;
+  }
+
+  async search(query) {
+    let key = `/api?${qs.stringify(query)}`;
+
+    log.debug(`Searching for records via ${key}`);
+
+    this._references.push(`${key}`);
+
+    // if (get(this, 'upstreamDoc.data.id') === id && get(this, 'upstreamDoc.data.type') === type) {
+    //   return this.upstreamDoc.data;
+    // }
+
+    // let includedResource = this.suppliedIncluded ? this.suppliedIncluded.find(i => key === `${i.type}/${i.id}`) : null;
+    // if (includedResource) {
+    //   return includedResource;
+    // }
+
+    let cached = this.cache[key];
+    if (cached) {
+      log.debug(`document with key ${key} is in cache, fetching...`);
+      return await cached;
+    }
+
+    if (this._pendingReads.includes(key)) {
+      throw new Error(`Cycle encountered in DocumentContext.search for ${key}. Pending resource searches are ${JSON.stringify(this._pendingReads)}`);
+    }
+    this._pendingReads.push(key);
+
+    this.cache[key] = this._search(query);
     let resource = await this.cache[key];
 
     this._pendingReads = this._pendingReads.filter(i => i !== key);
@@ -309,7 +346,8 @@ module.exports = class DocumentContext {
       upstreamDoc: { data: resource },
       schema: this.schema,
       read: this._read,
-      routers: this.routers,
+      search: this._search,
+      routers: this.routers
     });
     context.cache = this.cache;
     context._routeStack = this._routeStack;
@@ -397,39 +435,36 @@ module.exports = class DocumentContext {
       }
       if (contentType.computedFields.has(field.id) ||
           (jsonapiDoc.relationships && jsonapiDoc.relationships.hasOwnProperty(field.id))) {
-        let value = { data: await userModel.getField(field.id) };
+
         let fieldset = fieldsets && fieldsets.find(f => f.field === field.id);
-        await this._buildRelationship(field, value, pristineDocOut, searchDocOut, searchTree, depth, get(fieldset, 'format'));
+        await this._buildRelationship(field, pristineDocOut, searchDocOut, searchTree, depth, get(fieldset, 'format'), userModel);
       }
     }
   }
 
-  async _buildRelationship(field, value, pristineDocOut, searchDocOut, searchTree, depth, format) {
-    if (!value || !value.hasOwnProperty('data')) {
-      return;
-    }
+  async _buildRelationship(field, pristineDocOut, searchDocOut, searchTree, depth, format, userModel) {
+    let relObj = await userModel.getField(field.id);
     let related;
-    if (value.data && searchTree[field.id]) {
-      if (Array.isArray(value.data)) {
-        related = await Promise.all(value.data.map(async ({ type, id }) => {
-          let resource = await this.read(type, id);
-          if (resource) {
-            return this._build(type, id, resource, searchTree[field.id], depth + 1, format);
-          }
+    if (searchTree[field.id]) {
+      let models = await userModel.getRelated(field.id);
+      if (Array.isArray(models)) {
+        related = await Promise.all(models.map(async (model) => {
+          return this._build(model.type, model.id, privateModels.get(model).jsonapiDoc, searchTree[field.id], depth + 1, format);
         }));
-        related = related.filter(Boolean);
-        ensure(pristineDocOut, 'relationships')[field.id] = Object.assign({}, value, { data: related.map(r => ({ type: r.type, id: r.id })) });
+        ensure(pristineDocOut, 'relationships')[field.id] = Object.assign({}, relObj, { data: related.map(r => ({ type: r.type, id: r.id })) });
       } else {
-        let resource = await this.read(value.data.type, value.data.id);
-        if (resource) {
-          related = await this._build(resource.type, resource.id, resource, searchTree[field.id], depth + 1, format);
+        let model = models;
+        if (model) {
+          related = await this._build(model.type, model.id, privateModels.get(model).jsonapiDoc, searchTree[field.id], depth + 1, format);
         }
         let data = related ? { type: related.type, id: related.id } : null;
-        ensure(pristineDocOut, 'relationships')[field.id] = Object.assign({}, value, { data });
+        ensure(pristineDocOut, 'relationships')[field.id] = Object.assign({}, relObj, { data });
       }
     } else {
-      related = value.data;
-      ensure(pristineDocOut, 'relationships')[field.id] = Object.assign({}, value);
+      if (relObj.data) {
+        related = relObj.data;
+      }
+      ensure(pristineDocOut, 'relationships')[field.id] = Object.assign({}, relObj);
     }
     searchDocOut[field.id] = related;
   }
@@ -528,7 +563,7 @@ module.exports = class DocumentContext {
       } else {
         jsonapiDoc = jsonapiDoc.data;
       }
-      let userModel = new Model(contentType, jsonapiDoc, this.schema, this.read.bind(this));
+      let userModel = new Model(contentType, jsonapiDoc, this.schema, this.read.bind(this), this.search.bind(this));
       await this._buildAttributes(contentType, jsonapiDoc, userModel, pristine, searchDoc);
 
       if (!this._followedRelationships[`${type}/${id}`]) {

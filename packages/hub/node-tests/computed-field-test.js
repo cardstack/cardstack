@@ -4,9 +4,10 @@ const {
   createDefaultEnvironment,
   destroyDefaultEnvironment
 } = require('../../../tests/sample-computed-fields/node_modules/@cardstack/test-support/env');
+const qs = require('qs');
 
 describe('hub/computed-fields', function() {
-  let env, apple, banana, chocolate, meatloaf, cream, sugar, icecream;
+  let env, apple, banana, chocolate, meatloaf, cream, sugar, icecream, hamburger;
 
   async function setup () {
     let factory = new JSONAPIFactory();
@@ -53,8 +54,13 @@ describe('hub/computed-fields', function() {
       title: 'Meatloaf',
       color: 'brown',
       'ingredients-label': 'hamburger, egg, ketchup, salt, pepper'
-    });
-    factory.addResource('foods', 'hamburger').withAttributes({
+    }).withRelatedLink('grocery-list', `/api?${qs.stringify({
+      filter: {
+        type: { exact: 'foods' }
+      },
+      sort: 'title'
+    })}`);
+    hamburger = factory.addResource('foods', 'hamburger').withAttributes({
       title: 'Hamburger',
       color: 'brown',
     });
@@ -85,6 +91,9 @@ describe('hub/computed-fields', function() {
         }),
         factory.addResource('fields', 'weight-in-ounces').withAttributes({
           fieldType: '@cardstack/core-types::integer'
+        }),
+        factory.addResource('fields', 'grocery-list').withAttributes({
+          fieldType: '@cardstack/core-types::has-many'
         }),
         factory.addResource('computed-fields', 'ingredients').withAttributes({
           computedFieldType: 'sample-computed-fields::ingredients-from-label',
@@ -126,6 +135,9 @@ describe('hub/computed-fields', function() {
           params: {
             color: 'red'
           }
+        }),
+        factory.addResource('computed-fields', 'same-color-foods').withAttributes({
+          computedFieldType: 'sample-computed-fields::same-color-foods'
         }),
         factory.addResource('computed-fields', 'auto-chocolate').withAttributes({
           computedFieldType: 'sample-computed-fields::chocolate',
@@ -229,6 +241,37 @@ describe('hub/computed-fields', function() {
           { type: 'foods', id: cream.id },
           { type: 'foods', id: sugar.id },
           { type: 'foods', id: chocolate.id },
+        ]
+      });
+    });
+
+    it("updates computed based on query relationship when related record is added", async function() {
+      let model = await env.lookup('hub:searchers').get(env.session, 'local-hub', 'foods', meatloaf.id);
+      expect(model.data).has.deep.property('relationships.same-color-foods');
+      expect(model.data.relationships['same-color-foods']).deep.equals({
+        data: [
+          { type: 'foods', id: chocolate.id },
+          { type: 'foods', id: hamburger.id }
+        ]
+      });
+
+      await env.lookup('hub:writers').create(env.session, 'foods', {
+        data: {
+          type: 'foods',
+          id: 'molasses',
+          attributes: {
+            title: 'Molasses',
+            color: 'brown'
+          }
+        }
+      });
+
+      model = await env.lookup('hub:searchers').get(env.session, 'local-hub', 'foods', meatloaf.id);
+      expect(model.data.relationships['same-color-foods']).deep.equals({
+        data: [
+          { type: 'foods', id: chocolate.id },
+          { type: 'foods', id: hamburger.id },
+          { type: 'foods', id: 'molasses' }
         ]
       });
     });

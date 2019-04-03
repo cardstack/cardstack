@@ -3,6 +3,7 @@ const {
   createDefaultEnvironment,
   destroyDefaultEnvironment
 } = require('../../../tests/stub-searcher/node_modules/@cardstack/test-support/env');
+const qs = require('qs');
 
 describe('hub/searchers/basics', function() {
   let env, chocolate, source, searchers;
@@ -226,4 +227,286 @@ describe('hub/searchers/basics', function() {
     });
   });
 
+  describe('related resource links search', async function() {
+    let seeds;
+
+    beforeEach(async function() {
+      seeds = new JSONAPIFactory();
+
+      seeds.addResource('content-types', 'treats')
+        .withRelated('fields', [
+          seeds.addResource('fields', 'crunchiness').withAttributes({
+            fieldType: '@cardstack/core-types::integer'
+          })
+        ]);
+
+      seeds.addResource('content-types', 'puppies')
+        .withRelated('fields', [
+          seeds.addResource('fields', 'treats').withAttributes({
+            fieldType: '@cardstack/core-types::has-many'
+          }),
+          seeds.addResource('fields', 'favorite-treat').withAttributes({
+            fieldType: '@cardstack/core-types::belongs-to'
+          }),
+          seeds.addResource('fields', 'worst-treat').withAttributes({
+            fieldType: '@cardstack/core-types::belongs-to'
+          }),
+          seeds.addResource('fields', 'soggy-treats').withAttributes({
+            fieldType: '@cardstack/core-types::has-many'
+          }),
+          seeds.addResource('fields', 'crunchiest-treat').withAttributes({
+            fieldType: '@cardstack/core-types::belongs-to'
+          })
+        ]);
+
+      seeds.addResource('treats', 'milkBiscuit').withAttributes({ crunchiness: 9 });
+      seeds.addResource('treats', 'banana').withAttributes({ crunchiness: 1 });
+      seeds.addResource('treats', 'carrot').withAttributes({ crunchiness: 8 });
+
+    });
+
+    afterEach(teardown);
+
+    it("gets related resources without data for has-many relationships", async function() {
+      let query = {
+        filter: {
+          type: { exact: 'treats' },
+          crunchiness: { range: { gt: 5 } }
+        },
+        sort: 'crunchiness'
+      };
+
+      seeds.addResource('puppies', 'vanGogh')
+      .withRelatedLink('treats', `/api?${qs.stringify(query)}`);
+
+      env = await createDefaultEnvironment(__dirname + '/../../../tests/ephemeral-test-app', seeds.getModels());
+      searchers = env.lookup('hub:searchers');
+      let { data:resource } = await searchers.get(env.session, 'local-hub', 'puppies', 'vanGogh');
+      expect(resource.relationships.treats.links.related).to.equal(`/api?${qs.stringify(query)}`);
+      expect(resource.relationships.treats).not.to.have.property('data');
+    });
+
+    it("gets related resources without data for belongs-to relationships", async function() {
+      let query = {
+        filter: {
+          type: { exact: 'treats' }
+        },
+        sort: '-crunchiness',
+        page: {
+          size: 1
+        }
+      };
+
+      seeds.addResource('puppies', 'vanGogh')
+      .withRelatedLink('favorite-treat', `/api?${qs.stringify(query)}`);
+
+      env = await createDefaultEnvironment(__dirname + '/../../../tests/ephemeral-test-app', seeds.getModels());
+      searchers = env.lookup('hub:searchers');
+      let { data:resource } = await searchers.get(env.session, 'local-hub', 'puppies', 'vanGogh');
+      expect(resource.relationships['favorite-treat'].links.related).to.equal(`/api?${qs.stringify(query)}`);
+      expect(resource.relationships['favorite-treat']).not.to.have.property('data');
+    });
+
+    it("gets related resources with data for has-many relationships", async function() {
+      let query = {
+        filter: {
+          type: { exact: 'treats' },
+          crunchiness: { range: { gt: 5 } }
+        },
+        sort: 'crunchiness'
+      };
+
+      seeds.addResource('puppies', 'vanGogh')
+      .withRelatedLink('treats', `/api?${qs.stringify(query)}`);
+
+      env = await createDefaultEnvironment(__dirname + '/../../../tests/ephemeral-test-app', seeds.getModels());
+      searchers = env.lookup('hub:searchers');
+      let { data:resource } = await searchers.get(env.session, 'local-hub', 'puppies', 'vanGogh', { includePaths: ['treats'] });
+      expect(resource.relationships.treats.links.related).to.equal(`/api?${qs.stringify(query)}`);
+      expect(resource.relationships.treats.data).to.eql([
+        { type: 'treats', id: 'carrot' },
+        { type: 'treats', id: 'milkBiscuit' }
+      ]);
+    });
+
+    it("gets related resources with data for belongs-to relationships", async function() {
+      let query = {
+        filter: {
+          type: { exact: 'treats' }
+        },
+        sort: '-crunchiness',
+        page: {
+          size: 1
+        }
+      };
+
+      seeds.addResource('puppies', 'vanGogh')
+      .withRelatedLink('favorite-treat', `/api?${qs.stringify(query)}`);
+
+      env = await createDefaultEnvironment(__dirname + '/../../../tests/ephemeral-test-app', seeds.getModels());
+      searchers = env.lookup('hub:searchers');
+      let { data:resource } = await searchers.get(env.session, 'local-hub', 'puppies', 'vanGogh', { includePaths: ['favorite-treat'] });
+      expect(resource.relationships['favorite-treat'].links.related).to.equal(`/api?${qs.stringify(query)}`);
+      expect(resource.relationships['favorite-treat'].data).to.eql({ type: 'treats', id: 'milkBiscuit' });
+    });
+
+
+    it("gets related resources with data for multiple relationships", async function() {
+      let treatsQuery = {
+        filter: {
+          type: { exact: 'treats' },
+          crunchiness: { range: { gt: 5 } }
+        },
+        sort: 'crunchiness'
+      };
+
+      let worstTreatQuery = {
+        filter: {
+          type: { exact: 'treats' }
+        },
+        sort: 'crunchiness',
+        page: {
+          size: 1
+        }
+      };
+
+      seeds.addResource('puppies', 'vanGogh')
+      .withRelatedLink('treats', `/api?${qs.stringify(treatsQuery)}`)
+      .withRelatedLink('worst-treat', `/api?${qs.stringify(worstTreatQuery)}`);
+
+      env = await createDefaultEnvironment(__dirname + '/../../../tests/ephemeral-test-app', seeds.getModels());
+      searchers = env.lookup('hub:searchers');
+      let { included, data:resource } = await searchers.get(env.session, 'local-hub', 'puppies', 'vanGogh', { includePaths: ['treats', 'worst-treat'] });
+      expect(resource.relationships.treats.data).to.eql([
+        { type: 'treats', id: 'carrot' },
+        { type: 'treats', id: 'milkBiscuit' }
+      ]);
+      expect(resource.relationships['worst-treat'].data).to.eql({ type: 'treats', id: 'banana' });
+      expect(included.length).to.eql(3);
+      expect(included.map(item => item.type).filter((v, i, a) => a.indexOf(v) === i)).to.eql(['treats']);
+      expect(included.map(item => item.id)).to.eql(['carrot', 'milkBiscuit', 'banana']);
+    });
+
+    it("searches related resources", async function() {
+      let query = {
+        filter: {
+          type: { exact: 'treats' },
+          crunchiness: { range: { gt: 5 } }
+        },
+        sort: 'crunchiness'
+      };
+
+      seeds.addResource('puppies', 'vanGogh')
+      .withRelatedLink('treats', `/api?${qs.stringify(query)}`);
+
+      env = await createDefaultEnvironment(__dirname + '/../../../tests/ephemeral-test-app', seeds.getModels());
+      searchers = env.lookup('hub:searchers');
+      let { data:resource } = await searchers.search(env.session, { filter: { 'type': { exact: 'puppies' } } });
+      expect(resource[0].relationships.treats.links.related).to.equal(`/api?${qs.stringify(query)}`);
+      expect(resource[0].relationships.treats).not.to.have.property('data');
+    });
+
+    it("searches related resources with included data", async function() {
+      let query = {
+        filter: {
+          type: { exact: 'treats' },
+          crunchiness: { range: { gt: 5 } }
+        },
+        sort: 'crunchiness'
+      };
+
+      seeds.addResource('puppies', 'vanGogh')
+      .withRelatedLink('treats', `/api?${qs.stringify(query)}`);
+
+      env = await createDefaultEnvironment(__dirname + '/../../../tests/ephemeral-test-app', seeds.getModels());
+      searchers = env.lookup('hub:searchers');
+      let { data:resource } = await searchers.search(env.session, { filter: { 'type': { exact: 'puppies' } }, include: 'treats' });
+      expect(resource[0].relationships.treats.links.related).to.equal(`/api?${qs.stringify(query)}`);
+      expect(resource[0].relationships.treats.data).to.eql([
+        { type: 'treats', id: 'carrot' },
+        { type: 'treats', id: 'milkBiscuit' }
+      ]);
+    });
+
+    it("can return latest result of relationship query when the result of a query changes", async function() {
+      let query = {
+        filter: {
+          type: { exact: 'treats' },
+          crunchiness: { range: { gt: 5 } }
+        },
+        sort: 'crunchiness'
+      };
+
+      seeds.addResource('puppies', 'vanGogh')
+      .withRelatedLink('treats', `/api?${qs.stringify(query)}`);
+
+      env = await createDefaultEnvironment(__dirname + '/../../../tests/ephemeral-test-app', seeds.getModels());
+      searchers = env.lookup('hub:searchers');
+      let { data:resource } = await searchers.get(env.session, 'local-hub', 'puppies', 'vanGogh', { includePaths: ['treats'] });
+      expect(resource.relationships.treats.links.related).to.equal(`/api?${qs.stringify(query)}`);
+      expect(resource.relationships.treats.data).to.eql([
+        { type: 'treats', id: 'carrot' },
+        { type: 'treats', id: 'milkBiscuit' }
+      ]);
+
+      // add another crunchy treat
+      await env.lookup('hub:writers').create(env.session, 'treats', {
+        data: {
+          type: 'treats',
+          id: 'broccoli',
+          attributes: {
+            crunchiness: 6
+          }
+        }
+      });
+
+      let { data:updatedResource } = await searchers.get(env.session, 'local-hub', 'puppies', 'vanGogh', { includePaths: ['treats'] });
+      expect(updatedResource.relationships.treats.links.related).to.equal(`/api?${qs.stringify(query)}`);
+      expect(updatedResource.relationships.treats.data).to.eql([
+        { type: 'treats', id: 'broccoli' },
+        { type: 'treats', id: 'carrot' },
+        { type: 'treats', id: 'milkBiscuit' }
+      ]);
+    });
+
+    it("indexes models with related resource links for empty has-many relationships", async function() {
+      let query = {
+        filter: {
+          type: { exact: 'treats' },
+          crunchiness: { exact: 0 }
+        },
+        sort: 'crunchiness'
+      };
+
+      seeds.addResource('puppies', 'vanGogh')
+      .withRelatedLink('soggy-treats', `/api?${qs.stringify(query)}`);
+
+      env = await createDefaultEnvironment(__dirname + '/../../../tests/ephemeral-test-app', seeds.getModels());
+      searchers = env.lookup('hub:searchers');
+      let { data:resource } = await searchers.get(env.session, 'local-hub', 'puppies', 'vanGogh', { includePaths: ['soggy-treats'] });
+      expect(resource.relationships['soggy-treats'].links.related).to.equal(`/api?${qs.stringify(query)}`);
+      expect(resource.relationships['soggy-treats'].data).to.eql([]);
+    });
+
+    it("indexes models with related resource links for empty belongs-to relationships", async function() {
+      let query = {
+        filter: {
+          type: { exact: 'treats' },
+          crunchiness: { exact: 10 }
+        },
+        page: {
+          size: 1
+        }
+      };
+
+      seeds.addResource('puppies', 'vanGogh')
+      .withRelatedLink('crunchiest-treat', `/api?${qs.stringify(query)}`);
+
+      env = await createDefaultEnvironment(__dirname + '/../../../tests/ephemeral-test-app', seeds.getModels());
+      searchers = env.lookup('hub:searchers');
+      let { data:resource } = await searchers.get(env.session, 'local-hub', 'puppies', 'vanGogh', { includePaths: ['crunchiest-treat'] });
+      expect(resource.relationships['crunchiest-treat'].links.related).to.equal(`/api?${qs.stringify(query)}`);
+      expect(resource.relationships['crunchiest-treat'].data).to.eql(null);
+    });
+  });
 });

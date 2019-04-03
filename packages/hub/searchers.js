@@ -138,26 +138,10 @@ class Searchers {
       throw new Error(`Searchers.get() expects parameters: 'session', 'query'`);
     }
 
-    let sources = await this._lookupSources();
     let schemaPromise = this.currentSchema.getSchema();
-    let index = 0;
     let sessionOrEveryone = session || Session.EVERYONE;
-    let next = async () => {
-      let source = sources[index++];
-      if (source) {
-        let response = await source.searcher.search(sessionOrEveryone, query, next);
-        response.data.forEach(resource => {
-          if (!resource.meta) {
-            resource.meta = {};
-          }
-          if (resource.meta.source == null) {
-            resource.meta.source = source.id;
-          }
-        });
-        return response;
-      }
-    };
-    let result = await next();
+
+    let result = await this._search(sessionOrEveryone)(query);
     if (result) {
       let schema = await schemaPromise;
       let includePaths = (get(query, 'include') || '').split(',');
@@ -190,7 +174,8 @@ class Searchers {
       upstreamDoc,
       includePaths,
       routers: this._getRouters(),
-      read: this._read()
+      read: this._read(),
+      search: this._search(Session.INTERNAL_PRIVILEGED)
     });
   }
 
@@ -203,6 +188,31 @@ class Searchers {
         if (err.status !== 404) { throw err; }
       }
       return resource;
+    };
+  }
+
+
+  _search(session) {
+    return async (query) => {
+      let sources = await this._lookupSources();
+      let index = 0;
+
+      let next = async () => {
+        let source = sources[index++];
+        if (source) {
+          let response = await source.searcher.search(session, query, next);
+          response.data.forEach(resource => {
+            if (!resource.meta) {
+              resource.meta = {};
+            }
+            if (resource.meta.source == null) {
+              resource.meta.source = source.id;
+            }
+          });
+          return response;
+        }
+      };
+      return next();
     };
   }
 
