@@ -14,6 +14,7 @@ const { promisify } = require('util');
 const temp = require('temp').track();
 const Gitchain = require('@cardstack/gitchain');
 const log = require('@cardstack/logger')('cardstack/git');
+const stringify = require('json-stable-stringify-without-jsonify');
 
 const mkdir = promisify(temp.mkdir);
 
@@ -256,7 +257,9 @@ async function finalizer(pendingChange) {
   return withErrorHandling(id, type, async () => {
     if (file) {
       if (pendingChange.finalDocument) {
-        file.setContent(JSON.stringify({
+        // use stringify library instead of JSON.stringify, since JSON's method
+        // is non-deterministic and could produce unnecessary diffs
+        file.setContent(stringify({
           attributes: pendingChange.finalDocument.attributes,
           relationships: pendingChange.finalDocument.relationships
         }, null, 2));
