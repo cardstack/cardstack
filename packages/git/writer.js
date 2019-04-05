@@ -203,7 +203,9 @@ module.exports = class Writer {
       // make sure only one push is ongoing at a time, by creating a chain of
       // promises here
       this._gitChainPromise = Promise.resolve(this._gitChainPromise).then(() =>
-        this.gitChain.push(this.hyperledgerConfig.tag)
+        this.gitChain.push(this.hyperledgerConfig.tag).catch(e => {
+          log.error("Error pushing to hyperledger:", e, e.stack);
+        })
       );
     }
   }
