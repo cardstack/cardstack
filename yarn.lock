@@ -588,10 +588,10 @@
     lodash "^4.17.10"
     to-fast-properties "^2.0.0"
 
-"@cardstack/gitchain@0.2.1":
-  version "0.2.1"
-  resolved "https://registry.yarnpkg.com/@cardstack/gitchain/-/gitchain-0.2.1.tgz#e0e68c5f846ed5f6000493b80dceeb17fedd9d86"
-  integrity sha512-6f6K6ndj9zW98Mor0xEpRfI3ufHq6YjOq76SUjrknTxhvWHPr02WfvLq7PcVn1FopxsTLM9y447Q/IQbTHCAAQ==
+"@cardstack/gitchain@0.2.2":
+  version "0.2.2"
+  resolved "https://registry.yarnpkg.com/@cardstack/gitchain/-/gitchain-0.2.2.tgz#1eab5dc6bca9886a430af6c15b7f365d7324d466"
+  integrity sha512-EWmh5rGnyaFCHVsAxMzgB9aeYOlRdcOnNBD4t6gn6pXTpHj7yu1NW/BQf0DR7EuzRA7ix0nEamIuDqyoujreAw==
   dependencies:
     archiver "^3.0.0"
     await-delay "^1.0.0"
