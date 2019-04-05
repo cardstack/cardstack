@@ -3,7 +3,6 @@ const log = require('@cardstack/logger')('cardstack/ephemeral');
 const crypto = require('crypto');
 const { declareInjections } = require('@cardstack/di');
 const { partition } = require('lodash');
-const PendingChange = require('@cardstack/plugin-utils/pending-change');
 const { INTERNAL_PRIVILEGED } = require('@cardstack/plugin-utils/session');
 const streamToPromise = require('stream-to-promise');
 const { statSync } = require("fs");
@@ -20,8 +19,6 @@ let generationCounter = 0;
 module.exports = declareInjections({
   indexers: 'hub:indexers',
   writers: 'hub:writers',
-  searchers: 'hub:searchers',
-  controllingBranch: 'hub:controlling-branch',
   schemaLoader: 'hub:schema-loader'
 }, class EphemeralStorageService {
   constructor() {
@@ -94,12 +91,9 @@ module.exports = declareInjections({
     let [schemaModels, dataModels] = partition(models, model => schemaTypes.includes(model.type));
     let schema = await this.schemaLoader.loadFrom(schemaModels);
     for (let model of dataModels) {
-      await schema.validate(new PendingChange({
+      await schema.validate(await this.writers.createPendingChange({
         finalDocument: model,
         finalizer: () => { },
-        branch: this.controllingBranch.name,
-        searchers: this.searchers,
-        schema,
       }), { session: INTERNAL_PRIVILEGED });
     }
   }

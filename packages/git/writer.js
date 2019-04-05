@@ -9,7 +9,6 @@ const Change = require('./change');
 const os = require('os');
 const process = require('process');
 const Error = require('@cardstack/plugin-utils/error');
-const PendingChange = require('@cardstack/plugin-utils/pending-change');
 const { promisify } = require('util');
 const temp = require('temp').track();
 const Gitchain = require('@cardstack/gitchain');
@@ -21,18 +20,15 @@ const mkdir = promisify(temp.mkdir);
 const pendingChanges = new WeakMap();
 
 module.exports = declareInjections({
-  searchers: 'hub:searchers',
-  currentSchema: 'hub:current-schema',
+  writers: 'hub:writers',
 }, class Writer {
   static create(...args) {
     return new this(...args);
   }
-  constructor({ repo, idGenerator, basePath, branchPrefix, remote, hyperledger, searchers, currentSchema, dataSource }) {
+  constructor({ repo, idGenerator, basePath, branchPrefix, remote, hyperledger, writers }) {
     this.repoPath = repo;
     this.basePath = basePath;
-    this.dataSourceId = dataSource.id;
-    this.searchers = searchers;
-    this.currentSchema = currentSchema;
+    this.writers = writers;
     this.branchPrefix = branchPrefix || "";
     this.repo = null;
     let hostname = os.hostname();
@@ -90,8 +86,7 @@ module.exports = declareInjections({
         gitDocument.relationships = document.relationships;
       }
 
-      let schema = await this.currentSchema.forBranch(branch);
-      let pending = new PendingChange({ finalDocument: gitDocument, finalizer: finalizer.bind(this), searchers: this.searchers, sourceId: this.dataSourceId, branch, schema });
+      let pending = await this.writers.createPendingChange({ finalDocument: gitDocument, finalizer: finalizer.bind(this), branch });
       let signature = await this._commitOptions('create', document.type, id, session);
       pendingChanges.set(pending, { type: document.type, id, signature, change, file });
       return pending;
@@ -121,8 +116,7 @@ module.exports = declareInjections({
       after.id = document.id;
       after.type = document.type;
       let signature = await this._commitOptions('update', type, id, session);
-      let schema = await this.currentSchema.forBranch(branch);
-      let pending = new PendingChange({ originalDocument: before, finalDocument: after, finalizer: finalizer.bind(this), searchers: this.searchers, sourceId: this.dataSourceId, branch, schema });
+      let pending = await this.writers.createPendingChange({ originalDocument: before, finalDocument: after, finalizer: finalizer.bind(this), branch });
       pendingChanges.set(pending, { type, id, signature, change, file });
       return pending;
     });
@@ -144,8 +138,7 @@ module.exports = declareInjections({
       file.delete();
       before.id = id;
       before.type = type;
-      let schema = await this.currentSchema.forBranch(branch);
-      let pending = new PendingChange({ originalDocument: before, finalizer: finalizer.bind(this), searchers: this.searchers, sourceId: this.dataSourceId, branch, schema });
+      let pending = await this.writers.createPendingChange({ originalDocument: before, finalizer: finalizer.bind(this), branch });
       let signature = await this._commitOptions('delete', type, id, session);
       pendingChanges.set(pending, { type, id, signature, change });
       return pending;

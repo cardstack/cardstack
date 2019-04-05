@@ -1,11 +1,13 @@
 const Error = require('@cardstack/plugin-utils/error');
 const log = require('@cardstack/logger')('cardstack/writers');
+const { get } = require('lodash');
 const { declareInjections } = require('@cardstack/di');
 
 module.exports = declareInjections({
   schema: 'hub:current-schema',
   schemaLoader: 'hub:schema-loader',
   searchers: 'hub:searchers',
+  controllingBranch: 'hub:controlling-branch',
   pgSearchClient: `plugin-client:${require.resolve('@cardstack/pgsearch/client')}`
 },
 
@@ -143,6 +145,28 @@ class Writers {
     }
   }
 
+  async createPendingChange({ originalDocument, finalDocument, finalizer, aborter, branch }) {
+    branch = branch || this.controllingBranch.name;
+    let schema = await this.schema.forBranch(branch);
+    let type = originalDocument ? originalDocument.type : finalDocument.type;
+    let contentType = schema.types.get(type);
+    let sourceId;
+    if (contentType) {
+      sourceId = get(contentType, 'dataSource.id');
+    }
+
+    return new PendingChange({
+      originalDocument,
+      finalDocument,
+      finalizer,
+      aborter,
+      branch,
+      sourceId,
+      schema,
+      searchers: this.searchers,
+    });
+  }
+
   async _finalize(pending, branch, type, schema, sourceId, id) {
     let meta = await pending.finalize();
     let { finalDocumentContext } = pending;
@@ -183,3 +207,67 @@ class Writers {
     return { writer, sourceId };
   }
 });
+
+class PendingChange {
+  constructor({
+    originalDocument,
+    finalDocument,
+    finalizer,
+    aborter,
+    searchers,
+    branch,
+    sourceId,
+    schema
+  }) {
+    if (!branch || !searchers || !schema) {
+      throw new Error(`PendingChange requires 'branch', 'searchers', and 'schema' arguments.`);
+    }
+
+    this.originalDocument = originalDocument;
+    this.finalDocument = finalDocument;
+    this.serverProvidedValues = new Map();
+    this._finalizer = finalizer;
+    this._aborter = aborter;
+
+    if (branch && schema && searchers) {
+      if (originalDocument) {
+        this.originalDocumentContext = searchers.createDocumentContext({
+          type: originalDocument.type,
+          branch,
+          schema,
+          sourceId,
+          id: originalDocument.id,
+          upstreamDoc: originalDocument ? { data: originalDocument } : null
+        });
+      }
+      if (finalDocument) {
+        this.finalDocumentContext = searchers.createDocumentContext({
+          type: finalDocument.type,
+          branch,
+          schema,
+          sourceId,
+          id: finalDocument.id,
+          upstreamDoc: finalDocument ? { data: finalDocument } : null
+        });
+      }
+    }
+  }
+
+  async finalize() {
+    let finalizer = this._finalizer;
+    this._finalizer = null;
+    this._aborter = null;
+    if (finalizer) {
+      return finalizer.call(null, this);
+    }
+  }
+
+  async abort() {
+    let aborter = this._aborter;
+    this._finalizer = null;
+    this._aborter = null;
+    if (aborter) {
+      return aborter.call(null, this);
+    }
+  }
+}

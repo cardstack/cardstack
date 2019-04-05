@@ -1,4 +1,3 @@
-const PendingChange = require('@cardstack/plugin-utils/pending-change');
 const uuidv4 = require('uuid/v4');
 const { statSync } = require("fs");
 const sha1File = require('sha1-file');
@@ -9,18 +8,16 @@ const { extension } = require('mime-types');
 const { declareInjections } = require('@cardstack/di');
 
 module.exports = declareInjections({
-  searchers: 'hub:searchers',
-  currentSchema: 'hub:current-schema',
+  writers: 'hub:writers',
 }, class Writer {
   static create(params) {
     return new this(params);
   }
 
-  constructor({ dataSource, branches, searchers, currentSchema }) {
+  constructor({ dataSource, branches, writers }) {
     this.dataSource    = dataSource;
     this.branches      = branches;
-    this.searchers     = searchers;
-    this.currentSchema = currentSchema;
+    this.writers       = writers;
   }
 
   async s3Upload(branch, options) {
@@ -56,8 +53,7 @@ module.exports = declareInjections({
       }
     };
 
-    let schema = await this.currentSchema.forBranch(branch);
-    let change = new PendingChange({ finalDocument: document, finalizer, searchers: this.searchers, sourceId: this.dataSource.id, branch, schema });
+    let change = await this.writers.createPendingChange({ finalDocument: document, finalizer, branch });
     return change;
   }
 

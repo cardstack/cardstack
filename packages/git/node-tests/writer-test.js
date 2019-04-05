@@ -162,12 +162,8 @@ describe('git/writer', function() {
 
     it('retries on id collision', async function () {
       let ids = ['1', '1', '2'];
-      let dataSources = await env.lookup('hub:data-sources').active();
-      let [,dataSource] = [...dataSources.entries()].find(([,i]) => i.sourceType === '@cardstack/git');
       let writer = new Writer({
-        searchers: env.lookup('hub:searchers'),
-        currentSchema: env.lookup('hub:current-schema'),
-        dataSource,
+        writers: env.lookup('hub:writers'),
         repo: repoPath,
         idGenerator() {
           return ids.shift();

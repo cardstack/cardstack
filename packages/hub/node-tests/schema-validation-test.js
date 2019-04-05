@@ -1,16 +1,13 @@
 const JSONAPIFactory = require('../../../tests/stub-project/node_modules/@cardstack/test-support/jsonapi-factory');
-const PendingChange = require('@cardstack/plugin-utils/pending-change');
 const bootstrapSchema = require('../bootstrap-schema');
 const {
   createDefaultEnvironment,
   destroyDefaultEnvironment,
-  defaultDataSourceId:sourceId,
 } = require('../../../tests/stub-project/node_modules/@cardstack/test-support/env');
 
 describe('schema/validation', function() {
 
-  const branch = 'master';
-  let schema, ephemeralDataSource, env, searchers;
+  let schema, ephemeralDataSource, env, writers;
 
   before(async function() {
     let factory = new JSONAPIFactory();
@@ -158,7 +155,7 @@ describe('schema/validation', function() {
     env = await createDefaultEnvironment(`${__dirname}/../../../tests/stub-project`);
     let loader = env.lookup('hub:schema-loader');
     schema = await loader.loadFrom(factory.getModels());
-    searchers = env.lookup('hub:searchers');
+    writers = env.lookup('hub:writers');
   });
 
   after(async function() {
@@ -166,14 +163,14 @@ describe('schema/validation', function() {
   });
 
   it("rejects unknown type", async function() {
-    expect(await schema.validationErrors(create({
+    expect(await schema.validationErrors(await create({
       type: 'unicorns',
       id: '1'
     }))).includes.something.with.property('detail', '"unicorns" is not a valid type');
   });
 
   it("rejects mismatched type", async function() {
-    expect(await schema.validationErrors(create({
+    expect(await schema.validationErrors(await create({
       type: 'articles',
       id: '1'
     }), {
@@ -182,7 +179,7 @@ describe('schema/validation', function() {
   });
 
   it("rejects mismatched id", async function() {
-    expect(await schema.validationErrors(create({
+    expect(await schema.validationErrors(await create({
       type: 'articles',
       id: '1'
     }), {
@@ -196,7 +193,7 @@ describe('schema/validation', function() {
 
 
   it("accepts known types", async function() {
-    expect(await schema.validationErrors(create({
+    expect(await schema.validationErrors(await create({
       type: 'articles',
       id: '1',
       attributes: {
@@ -208,7 +205,7 @@ describe('schema/validation', function() {
   });
 
   it("rejects unknown fields", async function() {
-    let errors = await schema.validationErrors(create({
+    let errors = await schema.validationErrors(await create({
       type: 'articles',
       id: '1',
       attributes: {
@@ -229,7 +226,7 @@ describe('schema/validation', function() {
   });
 
   it("rejects attribute in relationships", async function() {
-    let errors = await schema.validationErrors(create({
+    let errors = await schema.validationErrors(await create({
       type: 'articles',
       id: '1',
       relationships: {
@@ -244,7 +241,7 @@ describe('schema/validation', function() {
   });
 
   it("rejects relationship in attribute", async function() {
-    let errors = await schema.validationErrors(create({
+    let errors = await schema.validationErrors(await create({
       type: 'articles',
       id: '1',
       attributes: {
@@ -259,7 +256,7 @@ describe('schema/validation', function() {
   });
 
   it("accepts known fields", async function() {
-    expect(await schema.validationErrors(create({
+    expect(await schema.validationErrors(await create({
       type: 'articles',
       id: '1',
       attributes: {
@@ -271,7 +268,7 @@ describe('schema/validation', function() {
   });
 
   it("rejects badly formatted fields", async function() {
-    let errors = await schema.validationErrors(create({
+    let errors = await schema.validationErrors(await create({
       type: 'articles',
       id: '1',
       attributes: {
@@ -298,7 +295,7 @@ describe('schema/validation', function() {
   });
 
   it("applies constraints to present fields", async function() {
-    let errors = await schema.validationErrors(create({
+    let errors = await schema.validationErrors(await create({
       type: 'articles',
       id: '1',
       attributes: {
@@ -313,7 +310,7 @@ describe('schema/validation', function() {
   });
 
   it("applies constraints to missing fields", async function() {
-    let errors = await schema.validationErrors(create({
+    let errors = await schema.validationErrors(await create({
       type: 'articles',
       id: '1',
       attributes: {
@@ -324,7 +321,7 @@ describe('schema/validation', function() {
   });
 
   it("applies constraints to empty fields", async function() {
-    let errors = await schema.validationErrors(create({
+    let errors = await schema.validationErrors(await create({
       type: 'events',
       id: '1',
       attributes: {
@@ -335,7 +332,7 @@ describe('schema/validation', function() {
   });
 
   it("applies constraints to mutually exclusive fields", async function() {
-    let errors = await schema.validationErrors(create({
+    let errors = await schema.validationErrors(await create({
       type: 'articles',
       id: '1',
       attributes: {
@@ -352,7 +349,7 @@ describe('schema/validation', function() {
   });
 
   it("does not run a constraint whose input has already failed format validation", async function() {
-    let errors = await schema.validationErrors(create({
+    let errors = await schema.validationErrors(await create({
       type: 'articles',
       id: '1',
       attributes: {
@@ -365,7 +362,7 @@ describe('schema/validation', function() {
   });
 
   it("runs constraints with valid inputs even when unrelated fields are invalid", async function() {
-    let errors = await schema.validationErrors(create({
+    let errors = await schema.validationErrors(await create({
       type: 'articles',
       id: '1',
       attributes: {
@@ -400,7 +397,7 @@ describe('schema/validation', function() {
   });
 
   it("applies creation default", async function() {
-    let pending = create({
+    let pending = await create({
       type: 'things-with-defaults'
     });
     await schema.validate(pending);
@@ -409,7 +406,7 @@ describe('schema/validation', function() {
   });
 
   it("applies update default at creation", async function() {
-    let pending = create({
+    let pending = await create({
       type: 'things-with-defaults'
     });
     await schema.validate(pending);
@@ -419,7 +416,7 @@ describe('schema/validation', function() {
   });
 
   it("applies update default at update", async function() {
-    let pending = new PendingChange({
+    let pending = await writers.createPendingChange({
       originalDocument: {
         type: 'things-with-defaults',
         id: '1',
@@ -435,11 +432,7 @@ describe('schema/validation', function() {
           timestamp: '2017-03-14T13:49:30Z',
           karma: 10
         }
-      },
-      branch,
-      searchers,
-      schema,
-      sourceId
+      }
     });
     await schema.validate(pending);
     expect(pending.serverProvidedValues.has('timestamp')).is.ok;
@@ -449,35 +442,27 @@ describe('schema/validation', function() {
   });
 
   it("does not apply creation default when user provides a value", async function() {
-    let pending = new PendingChange({
+    let pending = await writers.createPendingChange({
       finalDocument: {
         type: 'things-with-defaults',
         attributes: {
           karma: 10
         }
-      },
-      branch,
-      searchers,
-      schema,
-      sourceId
+      }
     });
     await schema.validate(pending);
     expect(pending.finalDocument.attributes.karma).equals(10);
   });
 
   it("will not accept a schema change that results in a dangling field reference", async function() {
-    let pending = new PendingChange({
+    let pending = await writers.createPendingChange({
       originalDocument: {
         type: 'fields',
         id: 'primary-image',
         attributes: {
           'field-type': '@cardstack/core-types::belongs-to'
         }
-      },
-      branch,
-      searchers,
-      schema,
-      sourceId
+      }
     });
     let errors = await schema.validationErrors(pending);
     expect(errors).collectionContains({
@@ -488,7 +473,7 @@ describe('schema/validation', function() {
   });
 
   it("does not apply update default when user is altering value", async function() {
-    let pending = new PendingChange({
+    let pending = await writers.createPendingChange({
       originalDocument: {
         type: 'things-with-defaults',
         attributes: {
@@ -500,26 +485,21 @@ describe('schema/validation', function() {
         attributes: {
           timestamp: '2017-03-14T14:50:00Z'
         }
-      },
-      branch,
-      searchers,
-      schema,
-      sourceId
+      }
     });
     await schema.validate(pending);
     expect(pending.finalDocument.attributes.timestamp).equals('2017-03-14T14:50:00Z');
   });
 
   it("returns modified schema when validating a schema change", async function() {
-    let pending = new PendingChange({
+    let pending = await writers.createPendingChange({
       finalDocument: {
         type: 'fields',
         id: 'extra-field',
         attributes: {
           'field-type': '@cardstack/core-types::belongs-to'
         }
-      },
-      branch, searchers, schema, sourceId
+      }
     });
     let newSchema = await schema.validate(pending);
     expect(newSchema).is.ok;
@@ -527,7 +507,7 @@ describe('schema/validation', function() {
   });
 
   it("applies related-types validation in belongs-to", async function() {
-    let pending = create({
+    let pending = await create({
       type: 'articles',
       attributes: {
         title: "hello world",
@@ -548,7 +528,7 @@ describe('schema/validation', function() {
   });
 
   it("applies related-types validation in has-many", async function() {
-    let pending = create({
+    let pending = await create({
       type: 'articles',
       attributes: {
         title: "hello world",
@@ -569,7 +549,7 @@ describe('schema/validation', function() {
   });
 
   it("applies belongs-to arity validation (failure case)", async function() {
-    let pending = create({
+    let pending = await create({
       type: 'articles',
       attributes: {
         title: "hello world",
@@ -590,7 +570,7 @@ describe('schema/validation', function() {
   });
 
   it("applies succeeding belongs-to arity validation (success case)", async function() {
-    let pending = create({
+    let pending = await create({
       type: 'articles',
       attributes: {
         title: "hello world",
@@ -606,7 +586,7 @@ describe('schema/validation', function() {
   });
 
   it("applies has-many arity validation (failure case)", async function() {
-    let pending = create({
+    let pending = await create({
       type: 'articles',
       attributes: {
         title: "hello world",
@@ -627,7 +607,7 @@ describe('schema/validation', function() {
   });
 
   it("applies has-many arity validation (success case)", async function() {
-    let pending = create({
+    let pending = await create({
       type: 'articles',
       attributes: {
         title: "hello world",
@@ -642,7 +622,7 @@ describe('schema/validation', function() {
     await schema.validationErrors(pending);
   });
 
-  function create(document) {
-    return new PendingChange({ finalDocument: document, branch, searchers, schema, sourceId });
+  async function create(document) {
+    return await writers.createPendingChange({ finalDocument: document });
   }
 });

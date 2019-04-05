@@ -1,6 +1,5 @@
 const crypto = require('crypto');
 const Error = require('@cardstack/plugin-utils/error');
-const PendingChange = require('@cardstack/plugin-utils/pending-change');
 const { declareInjections } = require('@cardstack/di');
 const { statSync } = require("fs");
 const streamToPromise = require('stream-to-promise');
@@ -9,8 +8,7 @@ const pendingChanges = new WeakMap();
 
 module.exports = declareInjections({
   indexers: 'hub:indexers',
-  searchers: 'hub:searchers',
-  currentSchema: 'hub:current-schema',
+  writers: 'hub:writers',
   service: `plugin-services:${require.resolve('./service')}`
 }, class Writer {
 
@@ -45,13 +43,10 @@ module.exports = declareInjections({
       storedDocument.relationships = document.relationships;
     }
 
-    let pending = new PendingChange({
+    let pending = await this.writers.createPendingChange({
       finalDocument: storedDocument,
       finalizer,
       branch,
-      searchers: this.searchers,
-      sourceId: this.dataSource.id,
-      schema: await this.currentSchema.forBranch(branch)
     });
     pendingChanges.set(pending, { type, id, storage: this.storage, isSchema: isSchema });
     return pending;
@@ -82,13 +77,10 @@ module.exports = declareInjections({
       return { version: storage.storeBinary(type, id, storedDocument, blob) };
     };
 
-    let pending = new PendingChange({
+    let pending = await this.writers.createPendingChange({
       finalDocument: storedDocument,
       finalizer: binaryFinalizer,
-      searchers: this.searchers,
       branch,
-      sourceId: this.dataSource.id,
-      schema: await this.currentSchema.forBranch(branch)
     });
     pendingChanges.set(pending, { type, id, storage: this.storage });
     return pending;
@@ -110,14 +102,11 @@ module.exports = declareInjections({
       });
     }
     let after = patch(before, document);
-    let pending = new PendingChange({
+    let pending = await this.writers.createPendingChange({
       originalDocument: before,
       finalDocument: after,
       finalizer,
       branch,
-      sourceId: this.dataSource.id,
-      searchers: this.searchers,
-      schema: await this.currentSchema.forBranch(branch)
     });
     pendingChanges.set(pending, { type, id, storage: this.storage, isSchema, ifMatch: document.meta.version });
     return pending;
@@ -138,13 +127,10 @@ module.exports = declareInjections({
         source: { pointer: '/data/id' }
       });
     }
-    let pending = new PendingChange({
+    let pending = await this.writers.createPendingChange({
       originalDocument: before,
       finalizer,
       branch,
-      searchers: this.searchers,
-      sourceId: this.dataSource.id,
-      schema: await this.currentSchema.forBranch(branch)
     });
     pendingChanges.set(pending, { type, id, storage: this.storage, isSchema, ifMatch: version });
     return pending;
