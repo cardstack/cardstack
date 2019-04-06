@@ -200,7 +200,11 @@ module.exports = class ContentType {
       return documentMatches.every(Boolean);
     });
     if (grant) {
-      authLog.debug("approved %s of %s %s because of grant %s", description, documentContexts[0].type, documentContexts[0].id, grant.id);
+      authLog.debug("approved %s of %s %s because of grant %s",
+        description,
+        documentContexts[0] ? documentContexts[0].type : '-undefined-',
+        documentContexts[0] ? documentContexts[0].id : '-undefined-',
+        grant.id);
       authLog.trace("grant %s = %j", grant.id, grant);
     } else {
       authLog.trace("no matching %s grant for %j in %j", description, context, this.grants);
