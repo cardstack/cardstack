@@ -5,19 +5,15 @@ const moment = require("moment");
 const { makeS3Client } = require('./s3');
 const log = require('@cardstack/logger')('cardstack/image');
 const { extension } = require('mime-types');
-const { declareInjections } = require('@cardstack/di');
 
-module.exports = declareInjections({
-  writers: 'hub:writers',
-}, class Writer {
-  static create(params) {
-    return new this(params);
+module.exports = class Writer {
+  static create(...args) {
+    return new this(...args);
   }
 
-  constructor({ dataSource, branches, writers }) {
+  constructor({ dataSource, branches }) {
     this.dataSource    = dataSource;
     this.branches      = branches;
-    this.writers       = writers;
   }
 
   async s3Upload(branch, options) {
@@ -53,8 +49,8 @@ module.exports = declareInjections({
       }
     };
 
-    let change = await this.writers.createPendingChange({ finalDocument: document, finalizer, branch });
+    let change = { finalDocument: document, finalizer };
     return change;
   }
 
-});
+};

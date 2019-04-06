@@ -4,11 +4,8 @@ const { declareInjections } = require('@cardstack/di');
 const { statSync } = require("fs");
 const streamToPromise = require('stream-to-promise');
 
-const pendingChanges = new WeakMap();
-
 module.exports = declareInjections({
   indexers: 'hub:indexers',
-  writers: 'hub:writers',
   service: `plugin-services:${require.resolve('./service')}`
 }, class Writer {
 
@@ -43,12 +40,15 @@ module.exports = declareInjections({
       storedDocument.relationships = document.relationships;
     }
 
-    let pending = await this.writers.createPendingChange({
+    let pending = {
       finalDocument: storedDocument,
       finalizer,
-      branch,
-    });
-    pendingChanges.set(pending, { type, id, storage: this.storage, isSchema: isSchema });
+      type,
+      id,
+      storage: this.storage,
+      isSchema
+    };
+
     return pending;
   }
 
@@ -71,18 +71,19 @@ module.exports = declareInjections({
     };
 
     let binaryFinalizer = async (pendingChange) => {
-      let { storage, type, id } = pendingChanges.get(pendingChange);
+      let { storage, type, id } = pendingChange;
       let blob = await streamToPromise(stream);
 
       return { version: storage.storeBinary(type, id, storedDocument, blob) };
     };
 
-    let pending = await this.writers.createPendingChange({
+    let pending = {
       finalDocument: storedDocument,
       finalizer: binaryFinalizer,
-      branch,
-    });
-    pendingChanges.set(pending, { type, id, storage: this.storage });
+      type,
+      id,
+      storage: this.storage
+    };
     return pending;
   }
 
@@ -102,13 +103,16 @@ module.exports = declareInjections({
       });
     }
     let after = patch(before, document);
-    let pending = await this.writers.createPendingChange({
+    let pending = {
       originalDocument: before,
       finalDocument: after,
       finalizer,
-      branch,
-    });
-    pendingChanges.set(pending, { type, id, storage: this.storage, isSchema, ifMatch: document.meta.version });
+      type,
+      id,
+      storage: this.storage,
+      isSchema,
+      ifMatch: document.meta.version
+    };
     return pending;
   }
 
@@ -127,12 +131,15 @@ module.exports = declareInjections({
         source: { pointer: '/data/id' }
       });
     }
-    let pending = await this.writers.createPendingChange({
+    let pending = {
       originalDocument: before,
       finalizer,
-      branch,
-    });
-    pendingChanges.set(pending, { type, id, storage: this.storage, isSchema, ifMatch: version });
+      type,
+      id,
+      storage: this.storage,
+      isSchema,
+      ifMatch: version
+    };
     return pending;
   }
 
@@ -157,7 +164,7 @@ function patch(before, diffDocument) {
 }
 
 async function finalizer(pendingChange) {
-  let { storage, isSchema, ifMatch, type, id } = pendingChanges.get(pendingChange);
+  let { storage, isSchema, ifMatch, type, id } = pendingChange;
 
   if (type === 'checkpoints') {
     return { version: storage.makeCheckpoint(id) };

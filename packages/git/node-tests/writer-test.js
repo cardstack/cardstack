@@ -163,7 +163,6 @@ describe('git/writer', function() {
     it('retries on id collision', async function () {
       let ids = ['1', '1', '2'];
       let writer = new Writer({
-        writers: env.lookup('hub:writers'),
         repo: repoPath,
         idGenerator() {
           return ids.shift();

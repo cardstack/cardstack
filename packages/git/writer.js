@@ -13,22 +13,17 @@ const { promisify } = require('util');
 const temp = require('temp').track();
 const Gitchain = require('@cardstack/gitchain');
 const log = require('@cardstack/logger')('cardstack/git');
-const { declareInjections } = require('@cardstack/di');
 
 const mkdir = promisify(temp.mkdir);
 
-const pendingChanges = new WeakMap();
-
-module.exports = declareInjections({
-  writers: 'hub:writers',
-}, class Writer {
+module.exports = class Writer {
   static create(...args) {
     return new this(...args);
   }
-  constructor({ repo, idGenerator, basePath, branchPrefix, remote, hyperledger, writers }) {
+
+  constructor({ repo, idGenerator, basePath, branchPrefix, remote, hyperledger }) {
     this.repoPath = repo;
     this.basePath = basePath;
-    this.writers = writers;
     this.branchPrefix = branchPrefix || "";
     this.repo = null;
     let hostname = os.hostname();
@@ -86,9 +81,16 @@ module.exports = declareInjections({
         gitDocument.relationships = document.relationships;
       }
 
-      let pending = await this.writers.createPendingChange({ finalDocument: gitDocument, finalizer: finalizer.bind(this), branch });
       let signature = await this._commitOptions('create', document.type, id, session);
-      pendingChanges.set(pending, { type: document.type, id, signature, change, file });
+      let pending = {
+        finalDocument: gitDocument,
+        finalizer: finalizer.bind(this),
+        type: document.type,
+        id,
+        signature,
+        change,
+        file
+      };
       return pending;
     });
   }
@@ -116,8 +118,16 @@ module.exports = declareInjections({
       after.id = document.id;
       after.type = document.type;
       let signature = await this._commitOptions('update', type, id, session);
-      let pending = await this.writers.createPendingChange({ originalDocument: before, finalDocument: after, finalizer: finalizer.bind(this), branch });
-      pendingChanges.set(pending, { type, id, signature, change, file });
+      let pending = {
+        originalDocument: before,
+        finalDocument: after,
+        finalizer: finalizer.bind(this),
+        type,
+        id,
+        signature,
+        change,
+        file
+      };
       return pending;
     });
   }
@@ -138,9 +148,15 @@ module.exports = declareInjections({
       file.delete();
       before.id = id;
       before.type = type;
-      let pending = await this.writers.createPendingChange({ originalDocument: before, finalizer: finalizer.bind(this), branch });
       let signature = await this._commitOptions('delete', type, id, session);
-      pendingChanges.set(pending, { type, id, signature, change });
+      let pending = {
+        originalDocument: before,
+        finalizer: finalizer.bind(this),
+        type,
+        id,
+        signature,
+        change
+      };
       return pending;
     });
   }
@@ -212,7 +228,7 @@ module.exports = declareInjections({
       );
     }
   }
-});
+};
 
 
 // TODO: we only need to do this here because the Hub has no generic
@@ -257,7 +273,7 @@ async function withErrorHandling(id, type, fn) {
 
 
 async function finalizer(pendingChange) {
-  let { id, type, change, file, signature } = pendingChanges.get(pendingChange);
+  let { id, type, change, file, signature } = pendingChange;
   return withErrorHandling(id, type, async () => {
     if (file) {
       if (pendingChange.finalDocument) {

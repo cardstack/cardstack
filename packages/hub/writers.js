@@ -48,21 +48,25 @@ class Writers {
     let pending;
 
     if (isBinary) {
-      pending = await writer.prepareBinaryCreate(
+      let opts = await writer.prepareBinaryCreate(
         branch,
         session,
         type,
         documentOrStream
       );
+      let { originalDocument, finalDocument, finalizer, aborter } = opts;
+      pending = await this.createPendingChange({ originalDocument, finalDocument, finalizer, aborter, branch, opts});
     } else {
       let isSchema = this.schemaTypes.includes(type);
-      pending = await writer.prepareCreate(
+      let opts = await writer.prepareCreate(
         branch,
         session,
         type,
         schema.withOnlyRealFields(documentOrStream.data),
         isSchema
       );
+      let { originalDocument, finalDocument, finalizer, aborter } = opts;
+      pending = await this.createPendingChange({ originalDocument, finalDocument, finalizer, aborter, branch, opts});
     }
 
     let context;
@@ -95,7 +99,7 @@ class Writers {
     let schema = await this.schema.forBranch(branch);
     let { writer, sourceId } = this._getSchemaDetailsForType(schema, type);
     let isSchema = this.schemaTypes.includes(type);
-    let pending = await writer.prepareUpdate(
+    let opts = await writer.prepareUpdate(
       branch,
       session,
       type,
@@ -103,6 +107,8 @@ class Writers {
       schema.withOnlyRealFields(document.data),
       isSchema
     );
+    let { originalDocument, finalDocument, finalizer, aborter } = opts;
+    let pending = await this.createPendingChange({ originalDocument, finalDocument, finalizer, aborter, branch, opts });
     let context;
     try {
       let newSchema = await schema.validate(pending, { type, id, session });
@@ -128,7 +134,9 @@ class Writers {
     let schema = await this.schema.forBranch(branch);
     let { writer, sourceId } = this._getSchemaDetailsForType(schema, type);
     let isSchema = this.schemaTypes.includes(type);
-    let pending = await writer.prepareDelete(branch, session, version, type, id, isSchema);
+    let opts = await writer.prepareDelete(branch, session, version, type, id, isSchema);
+    let { originalDocument, finalDocument, finalizer, aborter } = opts;
+    let pending = await this.createPendingChange({ originalDocument, finalDocument, finalizer, aborter, branch, opts });
     try {
       let newSchema = await schema.validate(pending, { session });
       let context = await this._finalize(pending, branch, type, newSchema || schema, sourceId, id);
@@ -145,7 +153,7 @@ class Writers {
     }
   }
 
-  async createPendingChange({ originalDocument, finalDocument, finalizer, aborter, branch }) {
+  async createPendingChange({ originalDocument, finalDocument, finalizer, aborter, branch, opts }) {
     branch = branch || this.controllingBranch.name;
     let schema = await this.schema.forBranch(branch);
     let type = originalDocument ? originalDocument.type : finalDocument.type;
@@ -163,6 +171,7 @@ class Writers {
       branch,
       sourceId,
       schema,
+      opts,
       searchers: this.searchers,
     });
   }
@@ -217,7 +226,8 @@ class PendingChange {
     searchers,
     branch,
     sourceId,
-    schema
+    schema,
+    opts
   }) {
     if (!branch || !searchers || !schema) {
       throw new Error(`PendingChange requires 'branch', 'searchers', and 'schema' arguments.`);
@@ -250,6 +260,11 @@ class PendingChange {
           upstreamDoc: finalDocument ? { data: finalDocument } : null
         });
       }
+    }
+
+    for (let prop of Object.keys(opts || {})) {
+      if (this[prop] != null) { continue; }
+      this[prop] = opts[prop];
     }
   }
 

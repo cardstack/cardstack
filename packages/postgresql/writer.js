@@ -3,20 +3,15 @@ const { Pool } = require('pg');
 const { range }  = require('lodash');
 const rowToDocument = require('./row-to-doc');
 const NameMapper = require('./name-mapper');
-const { declareInjections } = require('@cardstack/di');
 
 const safeIdentifier = /^[a-zA-Z0-9._]+$/;
-const pendingChanges = new WeakMap();
 
-module.exports = declareInjections({
-  writers: 'hub:writers',
-}, class Writer {
-  static create(params) {
-    return new this(params);
+module.exports = class Writer {
+  static create(...args) {
+    return new this(...args);
   }
-  constructor({ branches, dataSource, renameColumns, renameTables, writers }) {
+  constructor({ branches, dataSource, renameColumns, renameTables }) {
     this.branchConfig = branches;
-    this.writers = writers;
     this.pools = Object.create(null);
     this.schemas = Object.create(null);
     this.dataSource = dataSource;
@@ -67,13 +62,12 @@ module.exports = declareInjections({
       await client.query('begin');
       let result = await client.query(`insert into ${schema}.${table} (${columns.join(',')}) values (${placeholders}) returning *`, args);
       let finalDocument = rowToDocument(this.mapper, await this._getSchema(branch), type, result.rows[0]);
-      let change = await this.writers.createPendingChange({
+      let change = {
         finalDocument,
         finalizer: finalize,
         aborter: abort,
-        branch,
-      });
-      pendingChanges.set(change, { client });
+        client
+      };
       return change;
     } catch (err) {
       await client.release();
@@ -95,14 +89,13 @@ module.exports = declareInjections({
       let initialDocument = rowToDocument(this.mapper, schema, type, result.rows[0]);
       result = await client.query(`update ${dbschema}.${table} set ${columns.map((name,index) => `${name}=$${index+1}`).join(',')} where id=$${args.length} returning *`, args);
       let finalDocument = rowToDocument(this.mapper, schema, type, result.rows[0]);
-      let change = await this.writers.createPendingChange({
+      let change = {
         originalDocument: initialDocument,
         finalDocument,
         finalizer: finalize,
         aborter: abort,
-        branch,
-      });
-      pendingChanges.set(change, { client });
+        client
+      };
       return change;
     } catch (err) {
       await client.release();
@@ -117,13 +110,12 @@ module.exports = declareInjections({
       await client.query('begin');
       let initialDocument = rowToDocument(this.mapper, await this._getSchema(branch), type, await client.query(`select * from ${schema}.${table} where id=$1`, [ id ]));
       await client.query(`delete from ${schema}.${table} where id=$1`, [id]);
-      let change = await this.writers.createPendingChange({
+      let change = {
         originalDocument: initialDocument,
         finalizer: finalize,
         aborter: abort,
-        branch,
-      });
-      pendingChanges.set(change, { client });
+        client
+      };
       return change;
     } catch (err) {
       await client.release();
@@ -173,20 +165,20 @@ module.exports = declareInjections({
     });
     return { table, schema, args, columns };
   }
-});
+};
 
 function quoteKey(key) {
   return `"${key}"`;
 }
 
 async function finalize(pendingChange) {
-  let { client } = pendingChanges.get(pendingChange);
+  let { client } = pendingChange;
   await client.query('commit');
   await client.release();
 }
 
 async function abort(pendingChange) {
-  let { client } = pendingChanges.get(pendingChange);
+  let { client } = pendingChange;
   await client.query('rollback');
   await client.release();
 }
