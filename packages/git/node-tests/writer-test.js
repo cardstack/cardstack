@@ -848,8 +848,8 @@ describe('git/writer/hyperledger', function() {
     await destroyDefaultEnvironment(env);
   });
 
-  it('writes to hyperledger if configured when writing', async function () {
-    let fakePush = fake();
+  it('writes to hyperledger if configured when writing', async function () { let
+  fakePush = fake.returns(new Promise(resolve => resolve()));
 
     replace(gitChain, 'push', fakePush);
 
