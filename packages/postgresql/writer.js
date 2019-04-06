@@ -62,13 +62,12 @@ module.exports = class Writer {
       await client.query('begin');
       let result = await client.query(`insert into ${schema}.${table} (${columns.join(',')}) values (${placeholders}) returning *`, args);
       let finalDocument = rowToDocument(this.mapper, await this._getSchema(branch), type, result.rows[0]);
-      let change = {
+      return {
         finalDocument,
         finalizer: finalize,
         aborter: abort,
         client
       };
-      return change;
     } catch (err) {
       await client.release();
       rethrowNicerError(err);
@@ -89,14 +88,13 @@ module.exports = class Writer {
       let initialDocument = rowToDocument(this.mapper, schema, type, result.rows[0]);
       result = await client.query(`update ${dbschema}.${table} set ${columns.map((name,index) => `${name}=$${index+1}`).join(',')} where id=$${args.length} returning *`, args);
       let finalDocument = rowToDocument(this.mapper, schema, type, result.rows[0]);
-      let change = {
+      return {
         originalDocument: initialDocument,
         finalDocument,
         finalizer: finalize,
         aborter: abort,
         client
       };
-      return change;
     } catch (err) {
       await client.release();
       rethrowNicerError(err);
@@ -110,13 +108,12 @@ module.exports = class Writer {
       await client.query('begin');
       let initialDocument = rowToDocument(this.mapper, await this._getSchema(branch), type, await client.query(`select * from ${schema}.${table} where id=$1`, [ id ]));
       await client.query(`delete from ${schema}.${table} where id=$1`, [id]);
-      let change = {
+      return {
         originalDocument: initialDocument,
         finalizer: finalize,
         aborter: abort,
         client
       };
-      return change;
     } catch (err) {
       await client.release();
       rethrowNicerError(err);

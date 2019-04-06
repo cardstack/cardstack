@@ -40,7 +40,7 @@ module.exports = declareInjections({
       storedDocument.relationships = document.relationships;
     }
 
-    let pending = {
+    return {
       finalDocument: storedDocument,
       finalizer,
       type,
@@ -48,8 +48,6 @@ module.exports = declareInjections({
       storage: this.storage,
       isSchema
     };
-
-    return pending;
   }
 
   async prepareBinaryCreate(branch, session, type, stream) {
@@ -77,14 +75,13 @@ module.exports = declareInjections({
       return { version: storage.storeBinary(type, id, storedDocument, blob) };
     };
 
-    let pending = {
+    return {
       finalDocument: storedDocument,
       finalizer: binaryFinalizer,
       type,
       id,
       storage: this.storage
     };
-    return pending;
   }
 
   async prepareUpdate(branch, session, type, id, document, isSchema) {
@@ -103,7 +100,7 @@ module.exports = declareInjections({
       });
     }
     let after = patch(before, document);
-    let pending = {
+    return {
       originalDocument: before,
       finalDocument: after,
       finalizer,
@@ -113,7 +110,6 @@ module.exports = declareInjections({
       isSchema,
       ifMatch: document.meta.version
     };
-    return pending;
   }
 
   async prepareDelete(branch, session, version, type, id, isSchema) {
@@ -131,7 +127,7 @@ module.exports = declareInjections({
         source: { pointer: '/data/id' }
       });
     }
-    let pending = {
+    return {
       originalDocument: before,
       finalizer,
       type,
@@ -140,7 +136,6 @@ module.exports = declareInjections({
       isSchema,
       ifMatch: version
     };
-    return pending;
   }
 
   _generateId() {

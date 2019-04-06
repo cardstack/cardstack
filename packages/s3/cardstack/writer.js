@@ -49,8 +49,7 @@ module.exports = class Writer {
       }
     };
 
-    let change = { finalDocument: document, finalizer };
-    return change;
+    return { finalDocument: document, finalizer };
   }
 
 };

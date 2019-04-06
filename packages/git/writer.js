@@ -82,7 +82,7 @@ module.exports = class Writer {
       }
 
       let signature = await this._commitOptions('create', document.type, id, session);
-      let pending = {
+      return {
         finalDocument: gitDocument,
         finalizer: finalizer.bind(this),
         type: document.type,
@@ -91,7 +91,6 @@ module.exports = class Writer {
         change,
         file
       };
-      return pending;
     });
   }
 
@@ -118,7 +117,7 @@ module.exports = class Writer {
       after.id = document.id;
       after.type = document.type;
       let signature = await this._commitOptions('update', type, id, session);
-      let pending = {
+      return {
         originalDocument: before,
         finalDocument: after,
         finalizer: finalizer.bind(this),
@@ -128,7 +127,6 @@ module.exports = class Writer {
         change,
         file
       };
-      return pending;
     });
   }
 
@@ -149,7 +147,7 @@ module.exports = class Writer {
       before.id = id;
       before.type = type;
       let signature = await this._commitOptions('delete', type, id, session);
-      let pending = {
+      return {
         originalDocument: before,
         finalizer: finalizer.bind(this),
         type,
@@ -157,7 +155,6 @@ module.exports = class Writer {
         signature,
         change
       };
-      return pending;
     });
   }
 
