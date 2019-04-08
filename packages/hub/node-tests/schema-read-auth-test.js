@@ -24,7 +24,7 @@ async function find(type, id) {
 }
 
 async function findAll(type) {
-  return searchers.search(Session.INTERNAL_PRIVILEGED, 'master', { filter: { type } });
+  return searchers.searchForCard(Session.INTERNAL_PRIVILEGED, 'master', { filter: { type } });
 }
 
 function makeSession(schema, { type, id }) {

@@ -88,7 +88,7 @@ describe('git/config', function() {
 
     env = await createDefaultEnvironment(`${__dirname}/..`, factory.getModels());
 
-    let response = await env.lookup('hub:searchers').search(env.session, 'master', { filter: { type: 'articles' } });
+    let response = await env.lookup('hub:searchers').searchForCard(env.session, 'master', { filter: { type: 'articles' } });
     expect(response.data.map(m => m.id)).deep.equals(['2']);
   });
 
@@ -158,7 +158,7 @@ describe('git/config', function() {
 
     env = await createDefaultEnvironment(`${__dirname}/..`, factory.getModels());
 
-    let response = await env.lookup('hub:searchers').search(env.session, 'master', { filter: { type: 'articles' } });
+    let response = await env.lookup('hub:searchers').searchForCard(env.session, 'master', { filter: { type: 'articles' } });
     expect(response.data.map(m => m.id)).deep.equals(['2']);
   });
 

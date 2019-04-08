@@ -1907,7 +1907,7 @@ contract('Token Indexing', function (accounts) {
         let accountTwoLedgerEntry = await env.lookup('hub:searchers').getCard(env.session, 'master', 'sample-token-balance-ofs', accountTwo.toLowerCase());
         let accountThreeLedgerEntry = await env.lookup('hub:searchers').getCard(env.session, 'master', 'sample-token-balance-ofs', accountThree.toLowerCase());
         let tokenRecord = await env.lookup('hub:searchers').getCard(env.session, 'master', 'sample-tokens', token.address);
-        let events = await env.lookup('hub:searchers').search(env.session, 'master', { page: { size: 5000 }, filter: { type: 'sample-token-white-list-events' } });
+        let events = await env.lookup('hub:searchers').searchForCard(env.session, 'master', { page: { size: 5000 }, filter: { type: 'sample-token-white-list-events' } });
 
         expect(tokenRecord.data.attributes["sample-token-buyer-count"]).to.equal("1000", "the buyer count is correct");
         expect(accountOneLedgerEntry.data.attributes["mapping-number-value"]).to.equal("50", "the token balance is correct");

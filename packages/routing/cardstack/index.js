@@ -94,7 +94,7 @@ async function buildRoutingCardsCache({ searchers, branch, resolvedPath, context
         if (query.includes(':card:')) {
           query = resolveRoutingCardReplacementTags(get(routingCards, `antecedantResolution.${route.contentType}`), query, routingCards);
         }
-        let { data: cards } = await searchers.search(Session.INTERNAL_PRIVILEGED, branch, JSON.parse(query));
+        let { data: cards } = await searchers.searchForCard(Session.INTERNAL_PRIVILEGED, branch, JSON.parse(query));
         if (cards.length) {
           if (route === cardRoute) {
             routingCards.antecedantResolution[type] = { data: cards[0] };
@@ -153,7 +153,7 @@ async function getRoutingCardForRoute(searchers, route, branch, path, routingCar
     let query = resolveReplacementTagsFromPath(parentRoute, path, JSON.stringify(parentRoute.query));
     let routingCardType = route.routeStack.length ? route.routeStack[0].contentType : null;
     query = resolveRoutingCardReplacementTags(get(routingCardsCache, `antecedantResolution.${routingCardType}`), query, routingCardsCache);
-    let { data:routingCards } = await searchers.search(Session.INTERNAL_PRIVILEGED, branch, JSON.parse(query));
+    let { data:routingCards } = await searchers.searchForCard(Session.INTERNAL_PRIVILEGED, branch, JSON.parse(query));
     return routingCards.length ? { data: routingCards[0] } : null;
   }
 }

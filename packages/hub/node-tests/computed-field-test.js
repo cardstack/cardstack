@@ -234,14 +234,14 @@ describe('hub/computed-fields', function() {
     });
 
     it("can search a computed belongs-to relationship's included attributes", async function() {
-      let response = await env.lookup('hub:searchers').search(env.session, 'master', { filter: { 'auto-chocolate.title': 'Chocolate' }});
+      let response = await env.lookup('hub:searchers').searchForCard(env.session, 'master', { filter: { 'auto-chocolate.title': 'Chocolate' }});
       expect(response.data).has.length(1);
       expect(response.data[0]).has.property('id', '1');
       expect(response.data[0]).has.property('type', 'only-computed');
     });
 
     it("can search a computed has-many relationship's included attributes", async function() {
-      let response = await env.lookup('hub:searchers').search(env.session, 'master', { filter: { 'ingredients.title': 'Ketchup' }});
+      let response = await env.lookup('hub:searchers').searchForCard(env.session, 'master', { filter: { 'ingredients.title': 'Ketchup' }});
       expect(response.data).has.length(1);
       expect(response.data[0]).has.property('id', meatloaf.id);
       expect(response.data[0]).has.property('type', meatloaf.type);
@@ -297,7 +297,7 @@ describe('hub/computed-fields', function() {
     });
 
     it("adds computed fields to custom searcher's search response", async function() {
-      let response = await env.lookup('hub:searchers').search(env.session, 'master', { filter: { type: 'sample-searcher-models' } });
+      let response = await env.lookup('hub:searchers').searchForCard(env.session, 'master', { filter: { type: 'sample-searcher-models' } });
       expect(response.data).has.length(1);
       expect(response.data[0]).has.deep.property('attributes.double-height', 2);
     });

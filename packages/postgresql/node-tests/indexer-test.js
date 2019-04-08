@@ -166,7 +166,7 @@ describe('postgresql/indexer', function() {
     });
 
     it('can use type hints', async function() {
-      let response = await env.lookup('hub:searchers').search(env.session, 'master', { filter: { 'toy-name': { exact: 'SQueAkY sNakE' } } });
+      let response = await env.lookup('hub:searchers').searchForCard(env.session, 'master', { filter: { 'toy-name': { exact: 'SQueAkY sNakE' } } });
       expect(response.data).length(1);
       expect(response.data[0].attributes['toy-name']).to.equal('Squeaky Snake');
     });

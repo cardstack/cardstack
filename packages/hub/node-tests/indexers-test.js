@@ -26,12 +26,12 @@ describe('hub/indexers', function() {
 
     it("indexes seed models", async function() {
       // this seed model comes from createDefaultEnvironment
-      let response = await env.lookup('hub:searchers').search(env.session, 'master', { filter: { type: 'plugin-configs' }});
+      let response = await env.lookup('hub:searchers').searchForCard(env.session, 'master', { filter: { type: 'plugin-configs' }});
       expect(response.data.map(m => m.id)).includes('@cardstack/hub');
     });
 
     it("indexes bootstrap models", async function() {
-      let response = await env.lookup('hub:searchers').search(env.session, 'master', {
+      let response = await env.lookup('hub:searchers').searchForCard(env.session, 'master', {
         filter: { type: 'content-types' },
         page: { size: 100 }
       });
@@ -121,7 +121,7 @@ describe('hub/indexers', function() {
         await writers.createBinary('master', Session.INTERNAL_PRIVILEGED, 'cardstack-files', readStream);
       }));
 
-      let response = await env.lookup('hub:searchers').search(env.session, 'master', { filter: { type: 'cardstack-files' }});
+      let response = await env.lookup('hub:searchers').searchForCard(env.session, 'master', { filter: { type: 'cardstack-files' }});
       expect(response.data.map(m => m.type)).includes('cardstack-files');
       expect(response.data).has.length(2);
       expect(response.data[0]).has.property('id').equal('cardstack-logo');
@@ -312,7 +312,7 @@ describe('hub/indexers', function() {
     });
 
     it("does not allow unknown document types into search index", async function() {
-      let response = await env.lookup('hub:searchers').search(env.session, 'master', { filter: { type: 'not-a-thing' }});
+      let response = await env.lookup('hub:searchers').searchForCard(env.session, 'master', { filter: { type: 'not-a-thing' }});
       expect(response.data).has.length(0);
     });
 

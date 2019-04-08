@@ -39,7 +39,7 @@ class Authentication {
         return this.searcher.getCard(Session.INTERNAL_PRIVILEGED, this.controllingBranch.name, type, userId);
       },
       search: (params) => {
-        return this.searcher.search(Session.INTERNAL_PRIVILEGED, this.controllingBranch.name, params);
+        return this.searcher.searchForCard(Session.INTERNAL_PRIVILEGED, this.controllingBranch.name, params);
       }
     };
   }

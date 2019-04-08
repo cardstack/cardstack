@@ -75,13 +75,13 @@ describe('hub/searchers/basics', function() {
     });
 
     it("searchers#search finds record via internal searcher", async function() {
-      let response = await searchers.search(env.session, 'master', { filter: { 'example-flavor': { exact: 'chocolate' } } });
+      let response = await searchers.searchForCard(env.session, 'master', { filter: { 'example-flavor': { exact: 'chocolate' } } });
       expect(response.data).length(1);
       expect(response.data[0].attributes['example-flavor']).to.equal('chocolate');
     });
 
     it("searchers#search finds record via internal searcher with custom analyzer", async function() {
-      let response = await searchers.search(env.session, 'master', { filter: { 'topping': { exact: 'SPriNkLeS' } } });
+      let response = await searchers.searchForCard(env.session, 'master', { filter: { 'topping': { exact: 'SPriNkLeS' } } });
       expect(response.data).length(1);
       expect(response.data[0].attributes['topping']).to.equal('sprinkles');
     });
@@ -97,7 +97,7 @@ describe('hub/searchers/basics', function() {
     });
 
     it("a plugin's searchers#search can run before the internal searcher", async function() {
-      let response = await searchers.search(env.session, 'master', { filter: { 'example-flavor': { exact: 'chocolate' } } });
+      let response = await searchers.searchForCard(env.session, 'master', { filter: { 'example-flavor': { exact: 'chocolate' } } });
       expect(response.data).length(1);
       expect(response.data[0].attributes['example-flavor']).to.equal('vanilla');
     });
@@ -108,7 +108,7 @@ describe('hub/searchers/basics', function() {
     });
 
     it("adds source id to model when using searcher#search", async function() {
-      let response = await searchers.search(env.session, 'master', {});
+      let response = await searchers.searchForCard(env.session, 'master', {});
       expect(response.data[0]).has.deep.property('meta.source', source.id);
     });
 
@@ -220,7 +220,7 @@ describe('hub/searchers/basics', function() {
       await searchers.getCard(env.session, 'master', 'examples', '1000');
       await searchers._cachingPromise;
       await alterExpiration('master', 'examples', '1000', '-301 seconds');
-      let response = await searchers.search(env.session, 'master', { filter: { type: 'examples', id: '1000' }});
+      let response = await searchers.searchForCard(env.session, 'master', { filter: { type: 'examples', id: '1000' }});
       await searchers._cachingPromise;
       expect(response.data).length(0);
     });

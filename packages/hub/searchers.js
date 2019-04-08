@@ -130,6 +130,7 @@ class Searchers {
   }
 
   // TODO eventually we'll require that you can only get binary within your card context
+  // This is akin to getting a model...
   async getBinary(session, branch, type, id, includePaths) {
     // look up authorized result to check read is authorized by going through
     // the default auth stack for the JSON representation. Error will be thrown
@@ -154,16 +155,7 @@ class Searchers {
   }
 
   async getFromControllingBranch() {
-    throw new Error(`Searchers.getFromControllingBranch() has been deprecated. Use Searchers.getCurrentCard() or Searchers.getCurrentModel() instead.`);
-  }
-
-  // TODO eventually we'll require that you can only get Models within your card context
-  // Depending on how this refactor shakes out--we might end up removing this entirely...
-  async getCurrentModel(session, type, id, includePaths) {
-    if (arguments.length < 3) {
-      throw new Error(`session is a required argument to searchers.getCurrentModel`);
-    }
-    return await this.getModel(session, this.controllingBranch.name, type, id, includePaths);
+    throw new Error(`Searchers.getFromControllingBranch() has been deprecated. Use Searchers.getCurrentCard() instead.`);
   }
 
   async getCurrentCard(session, type, id, includePaths) {
@@ -173,7 +165,17 @@ class Searchers {
     return await this.getCard(session, this.controllingBranch.name, type, id, includePaths);
   }
 
-  async search(session, branchRequest, query) {
+  async search() {
+    throw new Error(`Searchers.search() has been deprecated. Use Searchers.searchForCard() or Searchers.searchForModel() instead.`);
+  }
+
+  // TODO eventually we'll require that you can only get Models within your card context
+  // Depending on how this refactor shakes out--we might end up removing this entirely...
+  async searchForModel(session, branchRequest, query) {
+    return await this.searchForCard(session, branchRequest, query);
+  }
+
+  async searchForCard(session, branchRequest, query) {
     if (arguments.length < 3) {
       throw new Error(`session is now a required argument to searchers.search`);
     }
@@ -228,8 +230,12 @@ class Searchers {
     }
   }
 
-  async searchFromControllingBranch(session, query) {
-    return this.search(session, this.controllingBranch.name, query);
+  async searchFromControllingBranch() {
+    throw new Error(`Searchers.searchFromControllingBranch() has been deprecated. Use Searchers.searchForCurrentCard() instead.`);
+  }
+
+  async searchForCurrentCard(session, query) {
+    return await this.search(session, this.controllingBranch.name, query);
   }
 
   createDocumentContext({ schema, type, id, branch, sourceId, generation, upstreamDoc, includePaths }) {

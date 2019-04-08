@@ -49,7 +49,7 @@ class Routers {
       primaryCard = await this._getNotFoundErrorCard(schema);
     } else {
       let { data: cards, included } = query ?
-        await this.searchers.search(Session.INTERNAL_PRIVILEGED, branch, query) :
+        await this.searchers.searchForCard(Session.INTERNAL_PRIVILEGED, branch, query) :
         { data: [routingCard.data], included: routingCard.included };
 
       if (!cards || !cards.length) {

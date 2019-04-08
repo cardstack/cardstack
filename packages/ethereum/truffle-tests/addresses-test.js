@@ -800,10 +800,10 @@ contract('ethereum-addresses indexing', function (_accounts) {
         await sendTransaction({ from, to, value, gasPrice });
         await waitForEthereumEvents(transactionIndexer);
 
-        let { data: indexedAddresses } = await searchers.searchFromControllingBranch(env.session, {
+        let { data: indexedAddresses } = await searchers.searchForCurrentCard(env.session, {
           filter: { type: { exact: 'ethereum-addresses' } }
         });
-        let { data: indexedTransactions } = await searchers.searchFromControllingBranch(env.session, {
+        let { data: indexedTransactions } = await searchers.searchForCurrentCard(env.session, {
           filter: { type: { exact: 'ethereum-transactions' } }
         });
 

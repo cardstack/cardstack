@@ -95,7 +95,7 @@ class TransactionIndexer {
       page: { size }
     };
 
-    let { data:results } = await this.searchers.searchFromControllingBranch(Session.INTERNAL_PRIVILEGED, addressQuery);
+    let { data:results } = await this.searchers.searchForCurrentCard(Session.INTERNAL_PRIVILEGED, addressQuery);
     if (results.length === size) {
       throw new Error(`There are more tracked-ethereum-addresses than the system is configured to return (${size} addresses). Increase the max number of tracked addresses in 'params.addressIndexing.maxAddressesTracked' for data source configuration'.`);
     }
@@ -108,7 +108,7 @@ class TransactionIndexer {
 
   async _getIndexedAddresses() {
     let size = get(this, 'addressIndexing.maxAddressesTracked') || DEFAULT_MAX_ADDRESSES_TRACKED;
-    let { data: indexedAddresses } = await this.searchers.searchFromControllingBranch(Session.INTERNAL_PRIVILEGED, {
+    let { data: indexedAddresses } = await this.searchers.searchForCurrentCard(Session.INTERNAL_PRIVILEGED, {
       filter: { type: { exact: 'ethereum-addresses' } },
       page: { size }
     });
@@ -235,7 +235,7 @@ class TransactionIndexer {
 
     batch = this.pgsearchClient.beginBatch(this.schema, this.searchers);
     for (let address of trackedAddresses) {
-      let { data:newTransactions } = await this.searchers.searchFromControllingBranch(Session.INTERNAL_PRIVILEGED, {
+      let { data:newTransactions } = await this.searchers.searchForCurrentCard(Session.INTERNAL_PRIVILEGED, {
         filter: {
           or: [{
             type: { exact: 'ethereum-transactions' },
