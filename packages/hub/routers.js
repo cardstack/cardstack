@@ -205,7 +205,8 @@ class Routers {
   async _getApplicationCard() {
     let id, type, config;
     try {
-      config = (await this.searchers.getFromControllingBranch(Session.INTERNAL_PRIVILEGED, 'plugin-configs', '@cardstack/hub')).data;
+      // TODO assume schema models are cards
+      config = (await this.searchers.getCurrentCard(Session.INTERNAL_PRIVILEGED, 'plugin-configs', '@cardstack/hub')).data;
     } catch (err) {
       if (err.status !== 404) { throw err; }
     }
@@ -216,7 +217,7 @@ class Routers {
     }
 
     if (id && type) {
-      let appCard = await this.searchers.getFromControllingBranch(Session.INTERNAL_PRIVILEGED, type, id);
+      let appCard = await this.searchers.getCurrentCard(Session.INTERNAL_PRIVILEGED, type, id);
       if (appCard) {
         return appCard;
       }
@@ -238,7 +239,7 @@ class Routers {
         } else {
           let errorCard;
           try {
-            errorCard = await this.searchers.getFromControllingBranch(Session.INTERNAL_PRIVILEGED, errorType, errorCardId);
+            errorCard = await this.searchers.getCurrentCard(Session.INTERNAL_PRIVILEGED, errorType, errorCardId);
           } catch (err) {
             if (err.status !== 404) { throw err; }
           }

@@ -47,7 +47,7 @@ class PermissionsSearcher {
         },
       };
     } else {
-      document = await this.searchers.get(session, branch, queryType, queryId);
+      document = await this.searchers.getCard(session, branch, queryType, queryId);
       if (!document) { return; } // we don't have it or don't have permission to read it
     }
 

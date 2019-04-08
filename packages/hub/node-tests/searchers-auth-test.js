@@ -71,7 +71,7 @@ describe('hub/searchers/auth', function() {
   it("returns 404 when user has no grant", async function() {
     await setup();
     try {
-      await searchers.get(Session.EVERYONE, 'master', 'posts', '1');
+      await searchers.getCard(Session.EVERYONE, 'master', 'posts', '1');
     } catch (err) {
       expect(err).has.property('status', 404);
       return;
@@ -85,7 +85,7 @@ describe('hub/searchers/auth', function() {
         .withAttributes({ mayReadResource: true, mayReadFields: true })
         .withRelated('who', [everyone]);
     });
-    let doc = await searchers.get(Session.EVERYONE, 'master', 'posts', '1');
+    let doc = await searchers.getCard(Session.EVERYONE, 'master', 'posts', '1');
     expect(doc).has.deep.property('data.attributes.title', 'First Post');
   });
 
@@ -96,7 +96,7 @@ describe('hub/searchers/auth', function() {
         .withRelated('who', [everyone])
         .withRelated('types', [{ type: 'content-types', id: 'posts' }]);
     });
-    let doc = await searchers.get(Session.EVERYONE, 'master', 'posts', '1');
+    let doc = await searchers.getCard(Session.EVERYONE, 'master', 'posts', '1');
     expect(doc).has.deep.property('data.attributes.title', 'First Post');
   });
 
@@ -108,7 +108,7 @@ describe('hub/searchers/auth', function() {
         .withRelated('types', [{ type: 'content-types', id: 'fields' }]);
     });
     try {
-      await searchers.get(Session.EVERYONE, 'master', 'posts', '1');
+      await searchers.getCard(Session.EVERYONE, 'master', 'posts', '1');
     } catch (err) {
       expect(err).has.property('status', 404);
       return;
@@ -140,7 +140,7 @@ describe('hub/searchers/auth', function() {
         .withRelated('who', [everyone])
         .withRelated('fields', [{ type: 'fields', id: 'title' }]);
     });
-    let doc = await searchers.get(Session.EVERYONE, 'master', 'posts', '1');
+    let doc = await searchers.getCard(Session.EVERYONE, 'master', 'posts', '1');
     expect(doc).not.has.deep.property('data.attributes.subtitle');
   });
 
@@ -151,7 +151,7 @@ describe('hub/searchers/auth', function() {
         .withRelated('who', [everyone])
         .withRelated('fields', [{ type: 'fields', id: 'title' }]);
     });
-    let doc = await searchers.get(Session.EVERYONE, 'master', 'posts', '1');
+    let doc = await searchers.getCard(Session.EVERYONE, 'master', 'posts', '1');
     expect(doc).has.deep.property('data.attributes.title');
   });
 
@@ -184,7 +184,7 @@ describe('hub/searchers/auth', function() {
         .withRelated('who', [everyone])
         .withRelated('fields', [{ type: 'fields', id: 'title' }]);
     });
-    let doc = await searchers.get(Session.EVERYONE, 'master', 'posts', '1');
+    let doc = await searchers.getCard(Session.EVERYONE, 'master', 'posts', '1');
     expect(doc).not.has.deep.property('data.relationships.author');
   });
 
@@ -198,7 +198,7 @@ describe('hub/searchers/auth', function() {
           { type: 'fields', id: 'author' }
         ]);
     });
-    let doc = await searchers.get(Session.EVERYONE, 'master', 'posts', '1');
+    let doc = await searchers.getCard(Session.EVERYONE, 'master', 'posts', '1');
     expect(doc).has.deep.property('data.relationships.author');
   });
 
@@ -362,7 +362,7 @@ describe('hub/searchers/auth', function() {
     });
 
     let session = sessions.create('authors', 'arthur');
-    let user = await searchers.get(Session.INTERNAL_PRIVILEGED, 'master', 'authors', 'arthur');
+    let user = await searchers.getCard(Session.INTERNAL_PRIVILEGED, 'master', 'authors', 'arthur');
     await env.lookup('hub:writers').delete('master', Session.INTERNAL_PRIVILEGED, user.data.meta.version, user.data.type, user.data.id);
     await env.lookup('hub:indexers').update({ forceRefresh: true });
     let doc = await searchers.search(session, 'master', { filter: { type: 'posts' } });
@@ -381,7 +381,7 @@ describe('hub/searchers/auth', function() {
     });
 
     let session = sessions.create('authors', 'arthur');
-    let user = await searchers.get(Session.INTERNAL_PRIVILEGED, 'master', 'authors', 'arthur');
+    let user = await searchers.getCard(Session.INTERNAL_PRIVILEGED, 'master', 'authors', 'arthur');
     user.data.attributes.name = 'Updated name';
     await env.lookup('hub:writers').update('master', Session.INTERNAL_PRIVILEGED, user.data.type, user.data.id, user);
     await env.lookup('hub:indexers').update({ forceRefresh: true });
@@ -401,7 +401,7 @@ describe('hub/searchers/auth', function() {
     });
 
     let session = sessions.create('authors', 'arthur');
-    let user = await searchers.get(Session.INTERNAL_PRIVILEGED, 'master', 'authors', 'arthur');
+    let user = await searchers.getCard(Session.INTERNAL_PRIVILEGED, 'master', 'authors', 'arthur');
     user.data.attributes.name = 'Updated name';
     await env.lookup('hub:writers').update('master', Session.INTERNAL_PRIVILEGED, user.data.type, user.data.id, user);
     await env.lookup('hub:indexers').update({ forceRefresh: true });
@@ -455,7 +455,7 @@ describe('hub/searchers/auth', function() {
 
     let writers = env.lookup('hub:writers');
     let searchers = env.lookup('hub:searchers');
-    let grant = await searchers.get(Session.INTERNAL_PRIVILEGED, 'master', 'grants', 'test-grant');
+    let grant = await searchers.getCard(Session.INTERNAL_PRIVILEGED, 'master', 'grants', 'test-grant');
 
     grant.data.relationships.who.data = [{ id: 'cool-kids', type: 'groups' }];
     await writers.update('master', Session.INTERNAL_PRIVILEGED, 'grants', 'test-grant', grant);
@@ -479,7 +479,7 @@ describe('hub/searchers/auth', function() {
 
     let writers = env.lookup('hub:writers');
     let searchers = env.lookup('hub:searchers');
-    let grant = await searchers.get(Session.INTERNAL_PRIVILEGED, 'master', 'grants', 'test-grant');
+    let grant = await searchers.getCard(Session.INTERNAL_PRIVILEGED, 'master', 'grants', 'test-grant');
 
     await writers.delete('master', Session.INTERNAL_PRIVILEGED, grant.data.meta.version, 'grants', 'test-grant');
 

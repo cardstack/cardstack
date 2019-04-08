@@ -78,7 +78,7 @@ exports.createDefaultEnvironment = async function(projectDir, initialModels = []
     await ephemeralStorage.validateModels(models, async(type, id) => {
       let result;
       try {
-        result = await searchers.getFromControllingBranch(Session.INTERNAL_PRIVILEGED, type, id);
+        result = await searchers.getCurrentCard(Session.INTERNAL_PRIVILEGED, type, id);
       } catch (err) {
         if (err.status !== 404) { throw err; }
       }

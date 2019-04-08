@@ -78,7 +78,21 @@ class Searchers {
     return this.routers;
   }
 
-  async get(session, branchRequest, type, id, includePaths) {
+  async get() {
+    throw new Error(`Searchers.get() has been deprecated. Use either Searchers.getModel() or Searchers.getCard()`);
+  }
+
+  // TODO eventually we'll require that you can only get Models within your card context
+  // Depending on how this refactor shakes out--we might end up removing this entirely...
+  async getModel(session, branchRequest, type, id, includePaths) {
+    return await this.getCard(session, branchRequest, type, id, includePaths);
+  }
+
+  async getSpace(session, path) {
+    return await this.getCurrentCard(session, 'spaces', path);
+  }
+
+  async getCard(session, branchRequest, type, id, includePaths) {
     if (arguments.length < 4) {
       throw new Error(`session is now a required argument to searchers.get`);
     }
@@ -115,11 +129,12 @@ class Searchers {
     return authorizedResult;
   }
 
+  // TODO eventually we'll require that you can only get binary within your card context
   async getBinary(session, branch, type, id, includePaths) {
     // look up authorized result to check read is authorized by going through
     // the default auth stack for the JSON representation. Error will be thrown
     // if authorization is not correct.
-    let document = await this.get(session, branch, type, id, includePaths);
+    let document = await this.getModel(session, branch, type, id, includePaths);
 
     let sourceId = document.data.meta.source;
 
@@ -138,11 +153,24 @@ class Searchers {
     return [result, document];
   }
 
-  async getFromControllingBranch(session, type, id, includePaths) {
+  async getFromControllingBranch() {
+    throw new Error(`Searchers.getFromControllingBranch() has been deprecated. Use Searchers.getCurrentCard() or Searchers.getCurrentModel() instead.`);
+  }
+
+  // TODO eventually we'll require that you can only get Models within your card context
+  // Depending on how this refactor shakes out--we might end up removing this entirely...
+  async getCurrentModel(session, type, id, includePaths) {
     if (arguments.length < 3) {
-      throw new Error(`session is now a required argument to searchers.getFromControllingBranch`);
+      throw new Error(`session is a required argument to searchers.getCurrentModel`);
     }
-    return this.get(session, this.controllingBranch.name, type, id, includePaths);
+    return await this.getModel(session, this.controllingBranch.name, type, id, includePaths);
+  }
+
+  async getCurrentCard(session, type, id, includePaths) {
+    if (arguments.length < 3) {
+      throw new Error(`session is a required argument to searchers.getCurrentCard`);
+    }
+    return await this.getCard(session, this.controllingBranch.name, type, id, includePaths);
   }
 
   async search(session, branchRequest, query) {

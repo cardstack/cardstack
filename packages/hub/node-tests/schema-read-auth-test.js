@@ -20,7 +20,7 @@ async function update(session, document) {
 }
 
 async function find(type, id) {
-  return searchers.get(Session.INTERNAL_PRIVILEGED, 'master', type, id);
+  return searchers.getCard(Session.INTERNAL_PRIVILEGED, 'master', type, id);
 }
 
 async function findAll(type) {

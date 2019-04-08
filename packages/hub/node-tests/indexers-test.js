@@ -39,25 +39,25 @@ describe('hub/indexers', function() {
     });
 
     it("indexes plugins", async function() {
-      let doc = await env.lookup('hub:searchers').get(env.session, 'master', 'plugins', 'sample-plugin-one');
+      let doc = await env.lookup('hub:searchers').getCard(env.session, 'master', 'plugins', 'sample-plugin-one');
       expect(doc).is.ok;
     });
 
     it("includes the data source on each resource", async function() {
-      let doc = await env.lookup('hub:searchers').get(env.session, 'master', 'plugins', 'sample-plugin-one');
+      let doc = await env.lookup('hub:searchers').getCard(env.session, 'master', 'plugins', 'sample-plugin-one');
       expect(doc).has.deep.property('data.meta.source', 'plugins');
-      doc = await env.lookup('hub:searchers').get(env.session, 'master', 'content-types', 'fields');
+      doc = await env.lookup('hub:searchers').getCard(env.session, 'master', 'content-types', 'fields');
       expect(doc).has.deep.property('data.meta.source', 'static-models');
     });
 
     it("includes features within plugins", async function() {
-      let doc = await env.lookup('hub:searchers').get(env.session, 'master', 'plugins', 'sample-plugin-one');
+      let doc = await env.lookup('hub:searchers').getCard(env.session, 'master', 'plugins', 'sample-plugin-one');
       expect(doc).has.property('included');
       expect(doc.included.map(r => r.id)).deep.equals(['sample-plugin-one::x']);
     });
 
     it("indexes plugin features", async function() {
-      let doc = await env.lookup('hub:searchers').get(env.session, 'master', 'field-types', 'sample-plugin-one::x');
+      let doc = await env.lookup('hub:searchers').getCard(env.session, 'master', 'field-types', 'sample-plugin-one::x');
       expect(doc).is.ok;
     });
 
@@ -71,7 +71,7 @@ describe('hub/indexers', function() {
       // this test is deliberately writing directly to the ephemeral
       // backend instead of going through hub:writers. That ensures
       // we aren't relying on side-effects from the writers.
-      let doc = await env.lookup('hub:searchers').get(env.session, 'master', 'plugins', 'sample-plugin-one');
+      let doc = await env.lookup('hub:searchers').getCard(env.session, 'master', 'plugins', 'sample-plugin-one');
       expect(doc).has.deep.property('data.attributes.plugin-enabled', true);
       let config = {
         id: 'sample-plugin-one',
@@ -85,7 +85,7 @@ describe('hub/indexers', function() {
       let storage = await source.writer.storage;
       storage.store(config.type, config.id, config, false, null);
       await env.lookup('hub:indexers').update({ forceRefresh: true });
-      doc = await env.lookup('hub:searchers').get(env.session, 'master', 'plugins', 'sample-plugin-one');
+      doc = await env.lookup('hub:searchers').getCard(env.session, 'master', 'plugins', 'sample-plugin-one');
       expect(doc).has.deep.property('data.attributes.plugin-enabled', false);
     });
   });
@@ -166,9 +166,9 @@ describe('hub/indexers', function() {
 
       env = await createDefaultEnvironment(__dirname + '/../../../tests/ephemeral-test-app', seeds.getModels());
 
-      let response = await env.lookup('hub:searchers').get(env.session, 'master', 'posts', '1');
+      let response = await env.lookup('hub:searchers').getCard(env.session, 'master', 'posts', '1');
       expect(response).is.ok;
-      response = await env.lookup('hub:searchers').get(env.session, 'master', 'comments', '1');
+      response = await env.lookup('hub:searchers').getCard(env.session, 'master', 'comments', '1');
       expect(response).is.ok;
 
     });
@@ -298,14 +298,14 @@ describe('hub/indexers', function() {
 
 
     it("does not allow unknown attributes into search index", async function() {
-      let doc = await env.lookup('hub:searchers').get(env.session, 'master', 'samples', 'has-bogus-attribute');
+      let doc = await env.lookup('hub:searchers').getCard(env.session, 'master', 'samples', 'has-bogus-attribute');
       expect(doc).has.deep.property('data.attributes');
       expect(doc.data.attributes).has.property('real-field');
       expect(doc.data.attributes).not.has.property('fake-field');
     });
 
     it("does not allow unknown relationships into search index", async function() {
-      let doc = await env.lookup('hub:searchers').get(env.session, 'master', 'samples', 'has-bogus-relationship');
+      let doc = await env.lookup('hub:searchers').getCard(env.session, 'master', 'samples', 'has-bogus-relationship');
       expect(doc).has.deep.property('data.relationships');
       expect(doc.data.relationships).has.property('real-relationship');
       expect(doc.data.relationships).not.has.property('fake-relationship');
