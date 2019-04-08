@@ -201,7 +201,7 @@ const actions = [
 ];
 const log = require('@cardstack/logger')('cardstack/auth');
 const Session = require('@cardstack/plugin-utils/session');
-const { uniq } = require('lodash');
+const { get, uniq } = require('lodash');
 
 module.exports = class Grant {
   constructor(document) {
@@ -254,34 +254,39 @@ module.exports = class Grant {
     }
   }
 
-  async matches(resource, context) {
+  async matches(documentContext, context) {
     let userRealms = await (context.session || Session.EVERYONE).realms();
 
-    let approvedRealm = uniq(this.who.map(({ staticRealm, realmField }) => {
-      if (resource && realmField) {
-        return Grant.readRealmsFromField(resource, realmField);
+    let approvedRealm = uniq(await Promise.all(this.who.map(async ({ staticRealm, realmField }) => {
+      if (documentContext && realmField) {
+        return await Grant.readRealmsFromField(documentContext, realmField);
       } else {
         return [staticRealm];
       }
-    })).sort().join('/');
+    }))).sort().join('/');
 
     let matches = userRealms.includes(approvedRealm);
-    log.trace('testing grant id=%s approvedRealm=%s resource=%j userRealms=%j matches=%s', this.id, approvedRealm, resource, userRealms, !!matches);
+    log.trace('testing grant id=%s approvedRealm=%s resource=%j userRealms=%j matches=%s', this.id, approvedRealm, documentContext ? get(documentContext, 'upstreamDoc.data') : '[no resource]', userRealms, !!matches);
     return matches;
   }
 
-  static readRealmsFromField(resource, fieldName) {
+  static async readRealmsFromField(documentContext, fieldName) {
     if (fieldName === 'id') {
-      return [Session.encodeBaseRealm(resource.type, resource.id)];
+      return [Session.encodeBaseRealm(documentContext.type, documentContext.id)];
     }
-    if (resource.relationships && resource.relationships.hasOwnProperty(fieldName)) {
-      let fieldValue = resource.relationships[fieldName];
-      if (fieldValue.data) {
-        if (Array.isArray(fieldValue.data)) {
-          return fieldValue.data.map(({ type, id }) => Session.encodeBaseRealm(type, id));
-        } else {
-          return [Session.encodeBaseRealm(fieldValue.data.type, fieldValue.data.id)];
-        }
+
+    let model = documentContext.model;
+    if (!model || Array.isArray(model)) { return []; } // currently only handles single resource documents
+
+    let contentType = model.getContentType();
+    if (!contentType.realAndComputedFields.get(fieldName)) { return []; }
+
+    let related = await documentContext.model.getRelated(fieldName);
+    if (related) {
+      if (Array.isArray(related)) {
+        return related.map(relatedModel => Session.encodeBaseRealm(relatedModel.type, relatedModel.id));
+      } else {
+        return [Session.encodeBaseRealm(related.type, related.id)];
       }
     }
     return [];

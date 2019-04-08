@@ -3,7 +3,6 @@ const log = require('@cardstack/logger')('cardstack/ephemeral');
 const crypto = require('crypto');
 const { declareInjections } = require('@cardstack/di');
 const { partition } = require('lodash');
-const PendingChange = require('@cardstack/plugin-utils/pending-change');
 const { INTERNAL_PRIVILEGED } = require('@cardstack/plugin-utils/session');
 const streamToPromise = require('stream-to-promise');
 const { statSync } = require("fs");
@@ -92,7 +91,10 @@ module.exports = declareInjections({
     let [schemaModels, dataModels] = partition(models, model => schemaTypes.includes(model.type));
     let schema = await this.schemaLoader.loadFrom(schemaModels);
     for (let model of dataModels) {
-      await schema.validate(new PendingChange(null, model, () => {}), { session: INTERNAL_PRIVILEGED });
+      await schema.validate(await this.writers.createPendingChange({
+        finalDocument: model,
+        finalizer: () => { },
+      }), { session: INTERNAL_PRIVILEGED });
     }
   }
 });

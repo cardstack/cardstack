@@ -1,4 +1,3 @@
-const PendingChange = require('@cardstack/plugin-utils/pending-change');
 const uuidv4 = require('uuid/v4');
 const { statSync } = require("fs");
 const sha1File = require('sha1-file');
@@ -8,13 +7,13 @@ const log = require('@cardstack/logger')('cardstack/image');
 const { extension } = require('mime-types');
 
 module.exports = class Writer {
-  static create(params) {
-    return new this(params);
+  static create(...args) {
+    return new this(...args);
   }
 
   constructor({ dataSource, branches }) {
-    this.dataSource         = dataSource;
-    this.branches           = branches;
+    this.dataSource    = dataSource;
+    this.branches      = branches;
   }
 
   async s3Upload(branch, options) {
@@ -50,8 +49,7 @@ module.exports = class Writer {
       }
     };
 
-    let change = new PendingChange(null, document, finalizer);
-    return change;
+    return { finalDocument: document, finalizer };
   }
 
 };

@@ -103,10 +103,7 @@ class Searchers {
         includePaths,
         upstreamDoc: { data: resource, meta, included }
       });
-      let pristineResult = await documentContext.pristineDoc();
-      if (pristineResult) {
-        authorizedResult = await documentContext.applyReadAuthorization(pristineResult, { session, type, id });
-      }
+      authorizedResult = await documentContext.applyReadAuthorization({ session, type, id });
     }
 
     if (!authorizedResult) {
@@ -189,9 +186,9 @@ class Searchers {
         includePaths,
         upstreamDoc: result,
       });
-      let pristineResult = await documentContext.pristineDoc();
 
-      let authorizedResult = await documentContext.applyReadAuthorization(pristineResult, { session });
+      let authorizedResult = await documentContext.applyReadAuthorization({ session });
+      let pristineResult = await documentContext.pristineDoc();
       if (authorizedResult.data.length !== pristineResult.data.length) {
         // We can eventually make this more of just a warning, but for
         // now it's cleaner to just force the searchers to implement

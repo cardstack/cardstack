@@ -233,7 +233,7 @@ class Routers {
       if (errorContentType) {
         // we check that the error card has an open grant, otherwise revert to system error card
         // we dont want to potentially swallow errors due to restrive grant settings, so err on the side of caution
-        if (!errorContentType.authorizedReadRealms().includes('groups/everyone')) {
+        if (!(await errorContentType.authorizedReadRealms()).includes('groups/everyone')) {
           log.warn(`The error card content-type '${errorType}' does not have a read grant for groups/everyone. Not using this error card.`);
         } else {
           let errorCard;

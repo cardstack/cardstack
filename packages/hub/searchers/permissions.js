@@ -59,19 +59,28 @@ class PermissionsSearcher {
       }
       mayUpdateResource = false;
     }
+    let sourceId = contentType.dataSource.id;
+    let documentContext = this.searchers.createDocumentContext({
+      id: document.data.id,
+      type: document.data.type,
+      branch,
+      sourceId,
+      schema: await this.schema.forBranch(branch),
+      upstreamDoc: document
+    });
 
     let writableFields = await Promise.all([...contentType.realFields.values()].map(async field => {
       // there has to be a grant that gives both reading and writing perm
       // on the field for it to be considered writable
       let readGrant = await find(field.grants, async g => {
-        return g['may-read-fields'] && await g.matches(document.data, context);
+        return g['may-read-fields'] && await g.matches(documentContext, context);
       });
       if (!readGrant) {
         return;
       }
 
       let writeGrant = await find(field.grants, async g => {
-        return g['may-write-fields'] && await g.matches(document.data, context);
+        return g['may-write-fields'] && await g.matches(documentContext, context);
       });
       if (writeGrant) {
         return field;
