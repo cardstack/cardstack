@@ -28,12 +28,12 @@ export default Component.extend({
       event.stopPropagation();
       event.preventDefault()
 
-      this.cardPicker.resolveCard(model);
+      this.get('cardPicker').resolveCard(model);
       return false;
     },
 
     closePicker() {
-      this.cardPicker.closePicker();
+      this.get('cardPicker').closePicker();
     }
   }
 });
