@@ -199,8 +199,8 @@ class Handler {
 
   // TODO how can we tel if the client wants to get a Card or Model?
   async handleIndividualGET(type, id) {
-    let include = (this.query.include || '').split(',');
-    let body = await this.searcher.getCard(this.session, this.branch, type, id, include);
+    let includePaths = (this.query.include || '').split(',');
+    let body = await this.searcher.getCard(this.session, type, id, { version: this.branch, includePaths });
     if (this.query.include === '') {
       delete body.included;
     }

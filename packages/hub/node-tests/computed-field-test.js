@@ -177,22 +177,22 @@ describe('hub/computed-fields', function() {
     after(teardown);
 
     it("can depend on params", async function() {
-      let model = await env.lookup('hub:searchers').getCard(env.session, 'master', 'foods', apple.id);
+      let model = await env.lookup('hub:searchers').getCard(env.session, 'foods', apple.id);
       expect(model.data).has.deep.property('attributes.weight-in-grams', 448);
     });
 
     it("can depend on another computed field", async function() {
-      let model = await env.lookup('hub:searchers').getCard(env.session, 'master', 'foods', apple.id);
+      let model = await env.lookup('hub:searchers').getCard(env.session, 'foods', apple.id);
       expect(model.data).has.deep.property('attributes.weight-in-milligrams', 448000);
     });
 
     it("can depend on an attribute", async function() {
-      let model = await env.lookup('hub:searchers').getCard(env.session, 'master', 'foods', apple.id);
+      let model = await env.lookup('hub:searchers').getCard(env.session, 'foods', apple.id);
       expect(model.data).has.deep.property('attributes.echo-title', 'Apple');
     });
 
     it("can depend on id", async function() {
-      let model = await env.lookup('hub:searchers').getCard(env.session, 'master', 'foods', apple.id);
+      let model = await env.lookup('hub:searchers').getCard(env.session, 'foods', apple.id);
       expect(model.data).has.deep.property('attributes.echo-id');
       expect(model.data.attributes['echo-id']).to.equal(model.data.id);
     });
@@ -202,27 +202,27 @@ describe('hub/computed-fields', function() {
     // elasticsearch to blow up unless the dynamic type support is
     // working.
     it("can determine its type dynamically", async function() {
-      let model = await env.lookup('hub:searchers').getCard(env.session, 'master', 'foods', apple.id);
+      let model = await env.lookup('hub:searchers').getCard(env.session, 'foods', apple.id);
       expect(model.data).has.deep.property('attributes.echo-nutrients');
       expect(model.data.attributes['echo-nutrients']).to.deep.equal(model.data.attributes.nutrients);
     });
 
     it("can depend on fields on a related resource", async function() {
-      let model = await env.lookup('hub:searchers').getCard(env.session, 'master', 'foods', apple.id);
+      let model = await env.lookup('hub:searchers').getCard(env.session, 'foods', apple.id);
       expect(model.data).has.deep.property('attributes.good-with-red', false);
-      model = await env.lookup('hub:searchers').getCard(env.session, 'master', 'foods', banana.id);
+      model = await env.lookup('hub:searchers').getCard(env.session, 'foods', banana.id);
       expect(model.data).has.deep.property('attributes.good-with-red', true);
 
     });
 
     it("can compute a belongs-to relationship", async function() {
-      let model = await env.lookup('hub:searchers').getCard(env.session, 'master', 'foods', apple.id);
+      let model = await env.lookup('hub:searchers').getCard(env.session, 'foods', apple.id);
       expect(model.data).has.deep.property('relationships.auto-chocolate');
       expect(model.data.relationships['auto-chocolate']).deep.equals({ data: { type: 'foods', id: chocolate.id } });
     });
 
     it("can compute a has-many relationship", async function() {
-      let model = await env.lookup('hub:searchers').getCard(env.session, 'master', 'foods', icecream.id);
+      let model = await env.lookup('hub:searchers').getCard(env.session, 'foods', icecream.id);
       expect(model.data).has.deep.property('relationships.ingredients');
       expect(model.data.relationships['ingredients']).deep.equals({
         data: [
@@ -248,12 +248,12 @@ describe('hub/computed-fields', function() {
     });
 
     it("can compute an attribute even when there are no real attributes", async function() {
-      let model = await env.lookup('hub:searchers').getCard(env.session, 'master', 'only-computed', '1');
+      let model = await env.lookup('hub:searchers').getCard(env.session, 'only-computed', '1');
       expect(model.data).has.deep.property('attributes.always-42', 42);
     });
 
     it("can compute a relationship even when there are no real relationships", async function() {
-      let model = await env.lookup('hub:searchers').getCard(env.session, 'master', 'only-computed', '1');
+      let model = await env.lookup('hub:searchers').getCard(env.session, 'only-computed', '1');
       expect(model.data).has.deep.property('relationships.auto-chocolate.data.id', chocolate.id);
     });
   });
@@ -276,23 +276,23 @@ describe('hub/computed-fields', function() {
     });
 
     it("includes computed field in update response", async function() {
-      let model = await env.lookup('hub:searchers').getCard(env.session, 'master', 'foods', banana.id);
+      let model = await env.lookup('hub:searchers').getCard(env.session, 'foods', banana.id);
       model.data.attributes['weight-in-ounces'] = 1;
       let response = await env.lookup('hub:writers').update('master', env.session, 'foods', banana.id, model);
       expect(response.data).has.deep.property('attributes.weight-in-grams', 28);
     });
 
     it("updates computed field in response to a dependent model changing", async function() {
-      let model = await env.lookup('hub:searchers').getCard(env.session, 'master', 'foods', apple.id);
+      let model = await env.lookup('hub:searchers').getCard(env.session, 'foods', apple.id);
       model.data.attributes['color'] = 'blue';
       await env.lookup('hub:writers').update('master', env.session, 'foods', apple.id, model);
       await env.lookup('hub:indexers').update({ forceRefresh: true });
-      model = await env.lookup('hub:searchers').getCard(env.session, 'master', 'foods', banana.id);
+      model = await env.lookup('hub:searchers').getCard(env.session, 'foods', banana.id);
       expect(model.data).has.deep.property('attributes.good-with-red', false);
     });
 
     it("adds computed fields to custom searcher's get response", async function() {
-      let model = await env.lookup('hub:searchers').getCard(env.session, 'master', 'sample-searcher-models', '1');
+      let model = await env.lookup('hub:searchers').getCard(env.session, 'sample-searcher-models', '1');
       expect(model).has.deep.property('data.attributes.double-height', 2);
     });
 

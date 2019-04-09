@@ -16,7 +16,7 @@ class Sessions {
     if (!this._userSearcher) {
       this._userSearcher = {
         get: (type, userId) => {
-          return this.searcher.getCard(Session.INTERNAL_PRIVILEGED, this.controllingBranch.name, type, userId);
+          return this.searcher.getCard(Session.INTERNAL_PRIVILEGED, type, userId, { version: this.controllingBranch.name });
         },
         search: (params) => {
           return this.searcher.searchForCard(Session.INTERNAL_PRIVILEGED, this.controllingBranch.name, params);

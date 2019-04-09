@@ -84,45 +84,44 @@ class Searchers {
 
   // TODO eventually we'll require that you can only get Models within your card context
   // Depending on how this refactor shakes out--we might end up removing this entirely...
-  async getModel(session, branchRequest, type, id, includePaths) {
-    return await this.getCard(session, branchRequest, type, id, includePaths);
+  async getModel(session, type, id, opts) {
+    return await this.getCard(session, type, id, opts);
   }
 
+  // TODO we dont really need this--just overload Searchers.get
   async getSpace(session, path) {
-    return await this.getCurrentCard(session, 'spaces', path);
+    return await this.getCard(session, 'spaces', path);
   }
 
-  async getCard(session, package, id, opts) {
-  // async getCard(session, branchRequest, type, id, includePaths) {
+  async getCard(session, packageName, id, opts={}) {
     if (arguments.length === 4 && typeof opts !== 'object') {
       throw new Error(`Searchers.get() expects parameters: 'session', 'package', 'id', and 'opts'. The 'branch' parameter has been deprecated, instead specify 'opts.version'`);
     }
 
-    let branch = branchRequest;
-
+    let { version, includePaths } = opts;
     // only ever get the branches off the controlling branch
-    if (type === 'branches') {
-      branch = this.controllingBranch.name;
+    if (packageName === 'branches' || !version) {
+      version = this.controllingBranch.name;
     }
 
-    let { resource, meta, included } = await this.getResourceAndMeta(session, branch, type, id);
+    let { resource, meta, included } = await this.getResourceAndMeta(session, version, packageName, id);
     let authorizedResult;
     let documentContext;
     if (resource) {
-      let schema = await this.currentSchema.forBranch(branch);
+      let schema = await this.currentSchema.forBranch(version);
       documentContext = this.createDocumentContext({
         id,
-        type,
-        branch,
+        type: packageName,
+        branch: version,
         schema,
         includePaths,
         upstreamDoc: { data: resource, meta, included }
       });
-      authorizedResult = await documentContext.applyReadAuthorization({ session, type, id });
+      authorizedResult = await documentContext.applyReadAuthorization({ session, packageName, id });
     }
 
     if (!authorizedResult) {
-      throw new Error(`No such resource ${branch}/${type}/${id}`, {
+      throw new Error(`No such resource ${version}/${packageName}/${id}`, {
         status: 404
       });
     }
@@ -136,7 +135,7 @@ class Searchers {
     // look up authorized result to check read is authorized by going through
     // the default auth stack for the JSON representation. Error will be thrown
     // if authorization is not correct.
-    let document = await this.getModel(session, branch, type, id, includePaths);
+    let document = await this.getModel(session, type, id, { includePaths, version: branch });
 
     let sourceId = document.data.meta.source;
 
@@ -156,29 +155,17 @@ class Searchers {
   }
 
   async getFromControllingBranch() {
-    throw new Error(`Searchers.getFromControllingBranch() has been deprecated. Use Searchers.getCurrentCard() instead.`);
-  }
-
-  async getCurrentCard(session, type, id, includePaths) {
-    if (arguments.length < 3) {
-      throw new Error(`session is a required argument to searchers.getCurrentCard`);
-    }
-    return await this.getCard(session, this.controllingBranch.name, type, id, includePaths);
+    throw new Error(`Searchers.getFromControllingBranch() has been deprecated. Use Searchers.getCard() instead.`);
   }
 
   async search() {
     throw new Error(`Searchers.search() has been deprecated. Use Searchers.searchForCard() or Searchers.searchForModel() instead.`);
   }
 
-  // TODO eventually we'll require that you can only get Models within your card context
-  // Depending on how this refactor shakes out--we might end up removing this entirely...
-  async searchForModel(session, branchRequest, query) {
-    return await this.searchForCard(session, branchRequest, query);
-  }
-
+  // TODO assert default version if none is specifed?
   async searchForCard(session, branchRequest, query) {
-    if (arguments.length < 3) {
-      throw new Error(`session is now a required argument to searchers.search`);
+    if (typeof query !== 'object') {
+      throw new Error(`Searchers.search() expects parameters: 'session', and 'query'. If you want to search for a particular version (aka branch) of content it must be part of your query.`);
     }
 
     let branch = branchRequest;
@@ -235,6 +222,7 @@ class Searchers {
     throw new Error(`Searchers.searchFromControllingBranch() has been deprecated. Use Searchers.searchForCurrentCard() instead.`);
   }
 
+  // TODO remove this
   async searchForCurrentCard(session, query) {
     return await this.search(session, this.controllingBranch.name, query);
   }

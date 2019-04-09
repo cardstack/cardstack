@@ -71,7 +71,7 @@ async function startIndexing(environment, container) {
       await ephemeralStorage.validateModels(models, async (type, id) => {
         let result;
         try {
-          result = await searchers.getCurrentCard(Session.INTERNAL_PRIVILEGED, type, id);
+          result = await searchers.getCard(Session.INTERNAL_PRIVILEGED, type, id);
         } catch (err) {
           if (err.status !== 404) { throw err; }
         }

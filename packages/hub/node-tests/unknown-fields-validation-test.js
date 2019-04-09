@@ -74,7 +74,7 @@ describe('unknown fields validation', function() {
    * Changes the `articles` content type from having a `title` field to having a `header` field.
    */
   async function changeArticleField() {
-    let articleContentType = await env.lookup('hub:searchers').getCard(env.session, 'master', 'content-types', 'articles');
+    let articleContentType = await env.lookup('hub:searchers').getCard(env.session, 'content-types', 'articles');
 
     await env.lookup('hub:writers').update('master', env.session, 'content-types', 'articles', {
       data: {
@@ -99,7 +99,7 @@ describe('unknown fields validation', function() {
   }
 
   async function readArticle(id) {
-    return await env.lookup('hub:searchers').getCard(env.session, 'master', 'articles', id);
+    return await env.lookup('hub:searchers').getCard(env.session, 'articles', id);
   }
 
   async function updateArticle(id, attributes) {
