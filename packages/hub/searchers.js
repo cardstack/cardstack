@@ -92,9 +92,10 @@ class Searchers {
     return await this.getCurrentCard(session, 'spaces', path);
   }
 
-  async getCard(session, branchRequest, type, id, includePaths) {
-    if (arguments.length < 4) {
-      throw new Error(`session is now a required argument to searchers.get`);
+  async getCard(session, package, id, opts) {
+  // async getCard(session, branchRequest, type, id, includePaths) {
+    if (arguments.length === 4 && typeof opts !== 'object') {
+      throw new Error(`Searchers.get() expects parameters: 'session', 'package', 'id', and 'opts'. The 'branch' parameter has been deprecated, instead specify 'opts.version'`);
     }
 
     let branch = branchRequest;
