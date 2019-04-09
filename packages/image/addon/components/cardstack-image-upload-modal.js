@@ -17,7 +17,7 @@ export default Component.extend({
   }),
 
   uploadFile: task(function * (event) {
-    let token = this.get('cardstackSession.token');
+    let token = this.cardstackSession.token;
     let file = event.target.files[0];
     let body = new FormData();
     body.append('file', file);
@@ -29,10 +29,10 @@ export default Component.extend({
     });
     let jsonApiDocument = yield response.json();
 
-    this.get('store').pushPayload(jsonApiDocument);
+    this.store.pushPayload(jsonApiDocument);
     let { type, id } = jsonApiDocument.data;
-    let fileRecord = this.get('store').peekRecord(type, id);
+    let fileRecord = this.store.peekRecord(type, id);
 
-    this.get('updateImage')(fileRecord);
+    this.updateImage(fileRecord);
   }).drop(),
 });
