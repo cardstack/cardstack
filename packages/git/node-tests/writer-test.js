@@ -40,6 +40,13 @@ describe('git/writer', function() {
         factory.addResource('fields', 'last-name').withAttributes({ fieldType: '@cardstack/core-types::string' }),
         factory.addResource('fields', 'age').withAttributes({ fieldType: '@cardstack/core-types::integer' })
       ]).withRelated('data-source', source);
+    
+    factory.addResource('content-types', 'musicians')
+      .withRelated('fields', [
+        factory.addResource('fields', 'group-name').withAttributes({ fieldType: '@cardstack/core-types::string' }),
+        factory.addResource('fields', 'albums').withAttributes({ fieldType: '@cardstack/core-types::string-array' }),
+
+      ]).withRelated('data-source', source);
 
     factory.addResource('content-types', 'images');
 
@@ -60,6 +67,12 @@ describe('git/writer', function() {
         firstName: 'Arthur',
         lastName: 'Faulkner',
         age: 1
+      });
+
+    factory.addResource('musicians', 1)
+      .withAttributes({
+        'group-name': 'Teresa Carreno',
+        albums: ['Polka de concert', 'Ballade']
       });
 
     factory.addResource('content-types', 'things-with-defaults')
@@ -115,6 +128,39 @@ describe('git/writer', function() {
           'primary-image': { data: null }
         }
       });
+    });
+
+    it('sorts previously saved, unsorted records', async function () {
+      let saved = await inRepo(repoPath).getJSONContents('master', `contents/musicians/1.json`);
+      expect(JSON.stringify(saved)).to.equal(
+        JSON.stringify({
+          attributes: {
+            albums: ['Polka de concert', 'Ballade'],
+            'group-name': 'Teresa Carreno'
+          }
+        })
+      );
+    });
+
+    it('sorts record attributes deterministically, but not arrays', async function () {
+      let { data:record } = await writers.create('master', env.session, 'musicians', {
+        data: {
+          type: 'musicians',
+          attributes: {
+            'group-name': 'Mozart',
+            albums: ['Jupiter', 'Don Giovanni']
+          }
+        }
+      });
+      let saved = await inRepo(repoPath).getJSONContents('master', `contents/musicians/${record.id}.json`);
+      expect(JSON.stringify(saved)).to.equal(
+        JSON.stringify({
+          attributes: {
+            albums: ['Jupiter', 'Don Giovanni'],
+            'group-name': 'Mozart'
+          }
+        })
+      );
     });
 
     it('saves default attribute', async function() {
