@@ -65,17 +65,17 @@ describe('mobiledoc/read-time-computed-field', function() {
     after(teardown);
 
     it("can report a reasonable read time for a short article", async function() {
-      let model = await env.lookup('hub:searchers').getCard(env.session, 'articles', article1.id);
+      let model = await env.lookup('hub:searchers').get(env.session, 'articles', article1.id);
       expect(model.data).has.deep.property('attributes.read-time', 2);
     });
 
     it("can report a significantly longer time for a much longer article", async function() {
-      let model = await env.lookup('hub:searchers').getCard(env.session, 'articles', article2.id);
+      let model = await env.lookup('hub:searchers').get(env.session, 'articles', article2.id);
       expect(model.data).has.deep.property('attributes.read-time', 26);
     });
 
     it("reports 0 read-time for an article that has undefined sourceField", async function() {
-      let model = await env.lookup('hub:searchers').getCard(env.session, 'articles', article3.id);
+      let model = await env.lookup('hub:searchers').get(env.session, 'articles', article3.id);
       expect(model.data).has.deep.property('attributes.read-time', 0);
     });
   });

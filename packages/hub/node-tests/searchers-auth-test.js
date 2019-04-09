@@ -71,7 +71,7 @@ describe('hub/searchers/auth', function() {
   it("returns 404 when user has no grant", async function() {
     await setup();
     try {
-      await searchers.getCard(Session.EVERYONE, 'posts', '1');
+      await searchers.get(Session.EVERYONE, 'posts', '1');
     } catch (err) {
       expect(err).has.property('status', 404);
       return;
@@ -85,7 +85,7 @@ describe('hub/searchers/auth', function() {
         .withAttributes({ mayReadResource: true, mayReadFields: true })
         .withRelated('who', [everyone]);
     });
-    let doc = await searchers.getCard(Session.EVERYONE, 'posts', '1');
+    let doc = await searchers.get(Session.EVERYONE, 'posts', '1');
     expect(doc).has.deep.property('data.attributes.title', 'First Post');
   });
 
@@ -96,7 +96,7 @@ describe('hub/searchers/auth', function() {
         .withRelated('who', [everyone])
         .withRelated('types', [{ type: 'content-types', id: 'posts' }]);
     });
-    let doc = await searchers.getCard(Session.EVERYONE, 'posts', '1');
+    let doc = await searchers.get(Session.EVERYONE, 'posts', '1');
     expect(doc).has.deep.property('data.attributes.title', 'First Post');
   });
 
@@ -108,7 +108,7 @@ describe('hub/searchers/auth', function() {
         .withRelated('types', [{ type: 'content-types', id: 'fields' }]);
     });
     try {
-      await searchers.getCard(Session.EVERYONE, 'posts', '1');
+      await searchers.get(Session.EVERYONE, 'posts', '1');
     } catch (err) {
       expect(err).has.property('status', 404);
       return;
@@ -118,7 +118,7 @@ describe('hub/searchers/auth', function() {
 
   it("filters unauthorized resources from searches", async function() {
     await setup();
-    let response = await searchers.searchForCard(Session.EVERYONE, 'master', { filter: { type: 'posts' } });
+    let response = await searchers.search(Session.EVERYONE, { filter: { type: 'posts' } });
     expect(response.data).has.length(0);
   });
 
@@ -129,7 +129,7 @@ describe('hub/searchers/auth', function() {
         .withRelated('who', [everyone])
         .withRelated('types', [{ type: 'content-types', id: 'posts' }]);
     });
-    let response = await searchers.searchForCard(Session.EVERYONE, 'master', { filter: { type: 'posts' } });
+    let response = await searchers.search(Session.EVERYONE, { filter: { type: 'posts' } });
     expect(response.data).has.length(1);
   });
 
@@ -140,7 +140,7 @@ describe('hub/searchers/auth', function() {
         .withRelated('who', [everyone])
         .withRelated('fields', [{ type: 'fields', id: 'title' }]);
     });
-    let doc = await searchers.getCard(Session.EVERYONE, 'posts', '1');
+    let doc = await searchers.get(Session.EVERYONE, 'posts', '1');
     expect(doc).not.has.deep.property('data.attributes.subtitle');
   });
 
@@ -151,7 +151,7 @@ describe('hub/searchers/auth', function() {
         .withRelated('who', [everyone])
         .withRelated('fields', [{ type: 'fields', id: 'title' }]);
     });
-    let doc = await searchers.getCard(Session.EVERYONE, 'posts', '1');
+    let doc = await searchers.get(Session.EVERYONE, 'posts', '1');
     expect(doc).has.deep.property('data.attributes.title');
   });
 
@@ -162,7 +162,7 @@ describe('hub/searchers/auth', function() {
         .withRelated('who', [everyone])
         .withRelated('fields', [{ type: 'fields', id: 'title' }]);
     });
-    let doc = await searchers.searchForCard(Session.EVERYONE, 'master', { filter: { type: 'posts' } });
+    let doc = await searchers.search(Session.EVERYONE, { filter: { type: 'posts' } });
     expect(doc.data[0]).not.has.deep.property('attributes.subtitle');
   });
 
@@ -173,7 +173,7 @@ describe('hub/searchers/auth', function() {
         .withRelated('who', [everyone])
         .withRelated('fields', [{ type: 'fields', id: 'title' }]);
     });
-    let doc = await searchers.searchForCard(Session.EVERYONE, 'master', { filter: { type: 'posts' } });
+    let doc = await searchers.search(Session.EVERYONE, { filter: { type: 'posts' } });
     expect(doc.data[0]).has.deep.property('attributes.title');
   });
 
@@ -184,7 +184,7 @@ describe('hub/searchers/auth', function() {
         .withRelated('who', [everyone])
         .withRelated('fields', [{ type: 'fields', id: 'title' }]);
     });
-    let doc = await searchers.getCard(Session.EVERYONE, 'posts', '1');
+    let doc = await searchers.get(Session.EVERYONE, 'posts', '1');
     expect(doc).not.has.deep.property('data.relationships.author');
   });
 
@@ -198,7 +198,7 @@ describe('hub/searchers/auth', function() {
           { type: 'fields', id: 'author' }
         ]);
     });
-    let doc = await searchers.getCard(Session.EVERYONE, 'posts', '1');
+    let doc = await searchers.get(Session.EVERYONE, 'posts', '1');
     expect(doc).has.deep.property('data.relationships.author');
   });
 
@@ -208,7 +208,7 @@ describe('hub/searchers/auth', function() {
         .withAttributes({ mayReadResource: true, mayReadFields: true })
         .withRelated('who', [{ type: 'fields', id: 'author' }]);
     });
-    let doc = await searchers.searchForCard(sessions.create('authors', 'arthur'), 'master', { filter: { type: 'posts' } });
+    let doc = await searchers.search(sessions.create('authors', 'arthur'), { filter: { type: 'posts' } });
     expect(doc.data).has.length(1);
     expect(doc.data[0]).has.deep.property('attributes.title', 'First Post');
     expect(doc.meta).has.deep.property('page.total', 1);
@@ -220,7 +220,7 @@ describe('hub/searchers/auth', function() {
         .withAttributes({ mayReadResource: true, mayReadFields: true })
         .withRelated('who', [{ type: 'fields', id: 'author' }]);
     });
-    let doc = await searchers.searchForCard(sessions.create('authors', 'other'), 'master', { filter: { type: 'posts' } });
+    let doc = await searchers.search(sessions.create('authors', 'other'), { filter: { type: 'posts' } });
     expect(doc.data).has.length(0);
   });
 
@@ -234,7 +234,7 @@ describe('hub/searchers/auth', function() {
           searchQuery: { filter: { type: { exact: 'authors' }, name: { exact: 'Arthur Faulkner' } } }
         });
     });
-    let doc = await searchers.searchForCard(sessions.create('authors', 'arthur'), 'master', { filter: { type: 'posts' } });
+    let doc = await searchers.search(sessions.create('authors', 'arthur'), { filter: { type: 'posts' } });
     expect(doc.data).has.length(1);
     expect(doc.data[0]).has.deep.property('attributes.title', 'First Post');
     expect(doc.meta).has.deep.property('page.total', 1);
@@ -250,7 +250,7 @@ describe('hub/searchers/auth', function() {
           searchQuery: { filter: { type: { exact: 'authors' }, name: { exact: 'Somebody Else' } } }
         });
     });
-    let doc = await searchers.searchForCard(sessions.create('authors', 'arthur'), 'master', { filter: { type: 'posts' } });
+    let doc = await searchers.search(sessions.create('authors', 'arthur'), { filter: { type: 'posts' } });
     expect(doc.data).has.length(0);
   });
 
@@ -268,7 +268,7 @@ describe('hub/searchers/auth', function() {
           searchQuery: { filter: { type: { exact: 'authors' }, name: { exact: 'Arthur Faulkner' } } }
         });
     });
-    let doc = await searchers.searchForCard(sessions.create('authors', 'arthur'), 'master', { filter: { type: 'posts' } });
+    let doc = await searchers.search(sessions.create('authors', 'arthur'), { filter: { type: 'posts' } });
     expect(doc.data).has.length(1);
     expect(doc.data[0]).has.deep.property('attributes.title', 'First Post');
     expect(doc.meta).has.deep.property('page.total', 1);
@@ -288,7 +288,7 @@ describe('hub/searchers/auth', function() {
           searchQuery: { filter: { type: { exact: 'authors' }, name: { exact: 'Arthur Faulkner' } } }
         });
     });
-    let doc = await searchers.searchForCard(sessions.create('authors', 'arthur'), 'master', { filter: { type: 'posts' } });
+    let doc = await searchers.search(sessions.create('authors', 'arthur'), { filter: { type: 'posts' } });
     expect(doc.data).has.length(0);
   });
 
@@ -302,7 +302,7 @@ describe('hub/searchers/auth', function() {
           searchQuery: { filter: { type: { exact: 'authors' }, name: { exact: 'Arthur Faulkner' } } }
         });
     });
-    let doc = await searchers.searchForCard(sessions.create('authors', 'arthur'), 'master', { filter: { type: 'posts' } });
+    let doc = await searchers.search(sessions.create('authors', 'arthur'), { filter: { type: 'posts' } });
     expect(doc.data).has.length(1);
     expect(doc.data[0]).has.deep.property('attributes.title', 'First Post');
     expect(doc.meta).has.deep.property('page.total', 1);
@@ -318,7 +318,7 @@ describe('hub/searchers/auth', function() {
           searchQuery: { filter: { type: { exact: 'authors' }, name: { exact: 'other' } } }
         });
     });
-    let doc = await searchers.searchForCard(sessions.create('authors', 'arthur'), 'master', { filter: { type: 'posts' } });
+    let doc = await searchers.search(sessions.create('authors', 'arthur'), { filter: { type: 'posts' } });
     expect(doc.data).has.length(0);
   });
 
@@ -332,7 +332,7 @@ describe('hub/searchers/auth', function() {
           searchQuery: { filter: { type: { exact: 'authors' }, name: { exact: 'Quint Faulkner' } } }
         });
     });
-    let doc = await searchers.searchForCard(sessions.create('authors', 'quint'), 'master', { filter: { type: 'posts' } });
+    let doc = await searchers.search(sessions.create('authors', 'quint'), { filter: { type: 'posts' } });
     expect(doc.data).has.length(0);
   });
 
@@ -346,7 +346,7 @@ describe('hub/searchers/auth', function() {
           searchQuery: { filter: { type: { exact: 'authors' }, name: { exact: 'Quint Faulkner' } } }
         });
     });
-    let doc = await searchers.searchForCard(sessions.create('authors', 'arthur'), 'master', { filter: { type: 'posts' } });
+    let doc = await searchers.search(sessions.create('authors', 'arthur'), { filter: { type: 'posts' } });
     expect(doc.data).has.length(0);
   });
 
@@ -362,10 +362,10 @@ describe('hub/searchers/auth', function() {
     });
 
     let session = sessions.create('authors', 'arthur');
-    let user = await searchers.getCard(Session.INTERNAL_PRIVILEGED, 'authors', 'arthur');
+    let user = await searchers.get(Session.INTERNAL_PRIVILEGED, 'authors', 'arthur');
     await env.lookup('hub:writers').delete('master', Session.INTERNAL_PRIVILEGED, user.data.meta.version, user.data.type, user.data.id);
     await env.lookup('hub:indexers').update({ forceRefresh: true });
-    let doc = await searchers.searchForCard(session, 'master', { filter: { type: 'posts' } });
+    let doc = await searchers.search(session, { filter: { type: 'posts' } });
     expect(doc.data).has.length(0);
   });
 
@@ -381,11 +381,11 @@ describe('hub/searchers/auth', function() {
     });
 
     let session = sessions.create('authors', 'arthur');
-    let user = await searchers.getCard(Session.INTERNAL_PRIVILEGED, 'authors', 'arthur');
+    let user = await searchers.get(Session.INTERNAL_PRIVILEGED, 'authors', 'arthur');
     user.data.attributes.name = 'Updated name';
     await env.lookup('hub:writers').update('master', Session.INTERNAL_PRIVILEGED, user.data.type, user.data.id, user);
     await env.lookup('hub:indexers').update({ forceRefresh: true });
-    let doc = await searchers.searchForCard(session, 'master', { filter: { type: 'posts' } });
+    let doc = await searchers.search(session, { filter: { type: 'posts' } });
     expect(doc.data).has.length(0);
   });
 
@@ -401,11 +401,11 @@ describe('hub/searchers/auth', function() {
     });
 
     let session = sessions.create('authors', 'arthur');
-    let user = await searchers.getCard(Session.INTERNAL_PRIVILEGED, 'authors', 'arthur');
+    let user = await searchers.get(Session.INTERNAL_PRIVILEGED, 'authors', 'arthur');
     user.data.attributes.name = 'Updated name';
     await env.lookup('hub:writers').update('master', Session.INTERNAL_PRIVILEGED, user.data.type, user.data.id, user);
     await env.lookup('hub:indexers').update({ forceRefresh: true });
-    let doc = await searchers.searchForCard(session, 'master', { filter: { type: 'posts' } });
+    let doc = await searchers.search(session, { filter: { type: 'posts' } });
     expect(doc.data).has.length(1);
     expect(doc.data[0]).has.deep.property('attributes.title', 'First Post');
     expect(doc.meta).has.deep.property('page.total', 1);
@@ -432,7 +432,7 @@ describe('hub/searchers/auth', function() {
       await writers.create('master', Session.INTERNAL_PRIVILEGED, type, { data: model });
     }
 
-    let doc = await searchers.searchForCard(sessions.create('authors', 'arthur'), 'master', { filter: { type: 'posts' } });
+    let doc = await searchers.search(sessions.create('authors', 'arthur'), { filter: { type: 'posts' } });
     expect(doc.data).has.length(1);
     expect(doc.data[0]).has.deep.property('attributes.title', 'First Post');
     expect(doc.meta).has.deep.property('page.total', 1);
@@ -455,12 +455,12 @@ describe('hub/searchers/auth', function() {
 
     let writers = env.lookup('hub:writers');
     let searchers = env.lookup('hub:searchers');
-    let grant = await searchers.getCard(Session.INTERNAL_PRIVILEGED, 'grants', 'test-grant');
+    let grant = await searchers.get(Session.INTERNAL_PRIVILEGED, 'grants', 'test-grant');
 
     grant.data.relationships.who.data = [{ id: 'cool-kids', type: 'groups' }];
     await writers.update('master', Session.INTERNAL_PRIVILEGED, 'grants', 'test-grant', grant);
 
-    let doc = await searchers.searchForCard(sessions.create('authors', 'arthur'), 'master', { filter: { type: 'posts' } });
+    let doc = await searchers.search(sessions.create('authors', 'arthur'), { filter: { type: 'posts' } });
     expect(doc.data).has.length(1);
     expect(doc.data[0]).has.deep.property('attributes.title', 'First Post');
     expect(doc.meta).has.deep.property('page.total', 1);
@@ -479,11 +479,11 @@ describe('hub/searchers/auth', function() {
 
     let writers = env.lookup('hub:writers');
     let searchers = env.lookup('hub:searchers');
-    let grant = await searchers.getCard(Session.INTERNAL_PRIVILEGED, 'grants', 'test-grant');
+    let grant = await searchers.get(Session.INTERNAL_PRIVILEGED, 'grants', 'test-grant');
 
     await writers.delete('master', Session.INTERNAL_PRIVILEGED, grant.data.meta.version, 'grants', 'test-grant');
 
-    let doc = await searchers.searchForCard(sessions.create('authors', 'arthur'), 'master', { filter: { type: 'posts' } });
+    let doc = await searchers.search(sessions.create('authors', 'arthur'), { filter: { type: 'posts' } });
     expect(doc.data).has.length(0);
   });
 });

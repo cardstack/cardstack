@@ -49,7 +49,7 @@ class Routers {
       primaryCard = await this._getNotFoundErrorCard(schema);
     } else {
       let { data: cards, included } = query ?
-        await this.searchers.searchForCard(Session.INTERNAL_PRIVILEGED, branch, query) :
+        await this.searchers.search(Session.INTERNAL_PRIVILEGED, query, branch) :
         { data: [routingCard.data], included: routingCard.included };
 
       if (!cards || !cards.length) {
@@ -206,7 +206,7 @@ class Routers {
     let id, type, config;
     try {
       // TODO assume schema models are cards
-      config = (await this.searchers.getCard(Session.INTERNAL_PRIVILEGED, 'plugin-configs', '@cardstack/hub')).data;
+      config = (await this.searchers.get(Session.INTERNAL_PRIVILEGED, 'plugin-configs', '@cardstack/hub')).data;
     } catch (err) {
       if (err.status !== 404) { throw err; }
     }
@@ -217,7 +217,7 @@ class Routers {
     }
 
     if (id && type) {
-      let appCard = await this.searchers.getCard(Session.INTERNAL_PRIVILEGED, type, id);
+      let appCard = await this.searchers.get(Session.INTERNAL_PRIVILEGED, type, id);
       if (appCard) {
         return appCard;
       }
@@ -239,7 +239,7 @@ class Routers {
         } else {
           let errorCard;
           try {
-            errorCard = await this.searchers.getCard(Session.INTERNAL_PRIVILEGED, errorType, errorCardId);
+            errorCard = await this.searchers.get(Session.INTERNAL_PRIVILEGED, errorType, errorCardId);
           } catch (err) {
             if (err.status !== 404) { throw err; }
           }

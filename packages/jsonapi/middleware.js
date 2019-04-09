@@ -197,10 +197,14 @@ class Handler {
     this.ctxt.status = 200;
   }
 
-  // TODO how can we tel if the client wants to get a Card or Model?
   async handleIndividualGET(type, id) {
     let includePaths = (this.query.include || '').split(',');
-    let body = await this.searcher.getCard(this.session, type, id, { version: this.branch, includePaths });
+    let body;
+    if (type === 'spaces') {
+      body = await this.searcher.getSpace(this.session, id);
+    } else {
+      body = await this.searcher.get(this.session, type, id, { version: this.branch, includePaths });
+    }
     if (this.query.include === '') {
       delete body.included;
     }
@@ -238,7 +242,7 @@ class Handler {
   }
 
   async handleCollectionGET(type) {
-    let { data: models, meta: { page }, included } = await this.searcher.searchForCard(this.session, this.branch, {
+    let { data: models, meta: { page }, included } = await this.searcher.search(this.session, {
       filter: this.filterExpression(type),
       sort: this.query.sort,
       page: this.query.page,

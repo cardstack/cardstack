@@ -36,10 +36,10 @@ class Authentication {
   get userSearcher() {
     return {
       get: (type, userId) => {
-        return this.searcher.getCard(Session.INTERNAL_PRIVILEGED, type, userId, { version: this.controllingBranch.name });
+        return this.searcher.get(Session.INTERNAL_PRIVILEGED, type, userId);
       },
       search: (params) => {
-        return this.searcher.searchForCard(Session.INTERNAL_PRIVILEGED, this.controllingBranch.name, params);
+        return this.searcher.search(Session.INTERNAL_PRIVILEGED, params);
       }
     };
   }
@@ -166,7 +166,7 @@ class Authentication {
     let config, ip;
 
     try {
-       config = await this.searcher.getCard(Session.INTERNAL_PRIVILEGED, 'plugin-configs', '@cardstack/authentication');
+       config = await this.searcher.get(Session.INTERNAL_PRIVILEGED, 'plugin-configs', '@cardstack/authentication');
     } catch (e) {
       // no config for the authentication plugin, assume header should not be respected
     }

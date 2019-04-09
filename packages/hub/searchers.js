@@ -78,22 +78,11 @@ class Searchers {
     return this.routers;
   }
 
-  async get() {
-    throw new Error(`Searchers.get() has been deprecated. Use either Searchers.getModel() or Searchers.getCard()`);
-  }
-
-  // TODO eventually we'll require that you can only get Models within your card context
-  // Depending on how this refactor shakes out--we might end up removing this entirely...
-  async getModel(session, type, id, opts) {
-    return await this.getCard(session, type, id, opts);
-  }
-
-  // TODO we dont really need this--just overload Searchers.get
   async getSpace(session, path) {
-    return await this.getCard(session, 'spaces', path);
+    return await this.get(session, 'spaces', path);
   }
 
-  async getCard(session, packageName, id, opts={}) {
+  async get(session, packageName, id, opts={}) {
     if (arguments.length === 4 && typeof opts !== 'object') {
       throw new Error(`Searchers.get() expects parameters: 'session', 'package', 'id', and 'opts'. The 'branch' parameter has been deprecated, instead specify 'opts.version'`);
     }
@@ -129,13 +118,12 @@ class Searchers {
     return authorizedResult;
   }
 
-  // TODO eventually we'll require that you can only get binary within your card context
-  // This is akin to getting a model...
+  // TODO need to work thru what this means from the perspective of model-based encapsulation
   async getBinary(session, branch, type, id, includePaths) {
     // look up authorized result to check read is authorized by going through
     // the default auth stack for the JSON representation. Error will be thrown
     // if authorization is not correct.
-    let document = await this.getModel(session, type, id, { includePaths, version: branch });
+    let document = await this.get(session, type, id, { includePaths, version: branch });
 
     let sourceId = document.data.meta.source;
 
@@ -155,34 +143,26 @@ class Searchers {
   }
 
   async getFromControllingBranch() {
-    throw new Error(`Searchers.getFromControllingBranch() has been deprecated. Use Searchers.getCard() instead.`);
+    throw new Error(`Searchers.getFromControllingBranch() has been deprecated. Use Searchers.get() instead.`);
   }
 
-  async search() {
-    throw new Error(`Searchers.search() has been deprecated. Use Searchers.searchForCard() or Searchers.searchForModel() instead.`);
-  }
-
-  // TODO assert default version if none is specifed?
-  async searchForCard(session, branchRequest, query) {
+  async search(session, query, version) {
     if (typeof query !== 'object') {
-      throw new Error(`Searchers.search() expects parameters: 'session', and 'query'. If you want to search for a particular version (aka branch) of content it must be part of your query.`);
+      throw new Error(`Searchers.get() expects parameters: 'session', 'query', and 'version' (aka branch)`);
     }
-
-    let branch = branchRequest;
-
     // only ever get the branches off the controlling branch
-    if (get(query,'filter.type.exact') === "branches") {
-      branch = this.controllingBranch.name;
+    if (get(query,'filter.type.exact') === "branches" || !version) {
+      version = this.controllingBranch.name;
     }
 
     let sources = await this._lookupSources();
-    let schemaPromise = this.currentSchema.forBranch(branch);
+    let schemaPromise = this.currentSchema.forBranch(version);
     let index = 0;
     let sessionOrEveryone = session || Session.EVERYONE;
     let next = async () => {
       let source = sources[index++];
       if (source) {
-        let response = await source.searcher.search(sessionOrEveryone, branch, query, next);
+        let response = await source.searcher.search(sessionOrEveryone, version, query, next);
         response.data.forEach(resource => {
           if (!resource.meta) {
             resource.meta = {};
@@ -199,7 +179,7 @@ class Searchers {
       let schema = await schemaPromise;
       let includePaths = (get(query, 'include') || '').split(',');
       let documentContext = this.createDocumentContext({
-        branch,
+        branch: version,
         schema,
         includePaths,
         upstreamDoc: result,
@@ -219,12 +199,7 @@ class Searchers {
   }
 
   async searchFromControllingBranch() {
-    throw new Error(`Searchers.searchFromControllingBranch() has been deprecated. Use Searchers.searchForCurrentCard() instead.`);
-  }
-
-  // TODO remove this
-  async searchForCurrentCard(session, query) {
-    return await this.search(session, this.controllingBranch.name, query);
+    throw new Error(`Searchers.searchFromControllingBranch() has been deprecated. Use Searchers.search() instead.`);
   }
 
   createDocumentContext({ schema, type, id, branch, sourceId, generation, upstreamDoc, includePaths }) {
@@ -240,13 +215,6 @@ class Searchers {
       routers: this._getRouters(),
       read: this._read(branch)
     });
-  }
-
-  async searchInControllingBranch(session, query) {
-    if (arguments.length < 2) {
-      throw new Error(`session is now a required argument to searchers.searchInControllingBranch`);
-    }
-    return this.search(session, this.controllingBranch.name, query);
   }
 
   _read(branch) {
