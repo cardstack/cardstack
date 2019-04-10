@@ -274,6 +274,7 @@ class TransactionIndexer {
     let batch = this.pgsearchClient.beginBatch(this.schema, this.searchers);
     for (let address of addresses) {
       let document = await this.searchers.get(Session.INTERNAL_PRIVILEGED,
+        'local-hub',
         'ethereum-addresses',
         address,
         ['transactions.from-address', 'transactions.to-address']);
@@ -313,7 +314,7 @@ class TransactionIndexer {
 
     let addressResource;
     try {
-      addressResource = await this.searchers.get(Session.INTERNAL_PRIVILEGED, 'ethereum-addresses', address.toLowerCase());
+      addressResource = await this.searchers.get(Session.INTERNAL_PRIVILEGED, 'local-hub', 'ethereum-addresses', address.toLowerCase());
     } catch (err) {
       if (err.status !== 404) { throw err; }
     }

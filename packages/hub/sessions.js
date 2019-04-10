@@ -16,7 +16,7 @@ class Sessions {
     if (!this._userSearcher) {
       this._userSearcher = {
         get: (type, userId) => {
-          return this.searcher.get(Session.INTERNAL_PRIVILEGED, type, userId, { version: this.controllingBranch.name });
+          return this.searcher.get(Session.INTERNAL_PRIVILEGED, 'local-hub', type, userId, { version: this.controllingBranch.name });
         },
         search: (params) => {
           return this.searcher.search(Session.INTERNAL_PRIVILEGED, params);

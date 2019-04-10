@@ -5,6 +5,8 @@ const Session = require('@cardstack/plugin-utils/session');
 const DocumentContext = require('./indexing/document-context');
 const { get } = require('lodash');
 
+const localHubSource = 'local-hub';
+
 module.exports = declareInjections({
   controllingBranch: 'hub:controlling-branch',
   sources: 'hub:data-sources',
@@ -79,12 +81,15 @@ class Searchers {
   }
 
   async getSpace(session, path) {
-    return await this.get(session, 'spaces', path);
+    return await this.get(session, localHubSource, 'spaces', path);
   }
 
-  async get(session, packageName, id, opts={}) {
-    if (arguments.length === 4 && typeof opts !== 'object') {
-      throw new Error(`Searchers.get() expects parameters: 'session', 'package', 'id', and 'opts'. The 'branch' parameter has been deprecated, instead specify 'opts.version'`);
+  async get(session, source, packageName, cardId, opts={}) {
+    if (source !== localHubSource) {
+      throw new Error(`You specified the source: '${source}' in Searchers.get(). Currently the cardstack hub does not support non-local hub sources.`);
+    }
+    if (arguments.length === 5 && typeof opts !== 'object') {
+      throw new Error(`Searchers.get() expects parameters: 'session', 'source', packageName', 'cardId', and 'opts'. The 'branch' parameter has been deprecated, instead specify 'opts.version'`);
     }
 
     let { version, includePaths } = opts;
@@ -93,24 +98,24 @@ class Searchers {
       version = this.controllingBranch.name;
     }
 
-    let { resource, meta, included } = await this.getResourceAndMeta(session, version, packageName, id);
+    let { resource, meta, included } = await this.getResourceAndMeta(session, version, packageName, cardId);
     let authorizedResult;
     let documentContext;
     if (resource) {
       let schema = await this.currentSchema.forBranch(version);
       documentContext = this.createDocumentContext({
-        id,
+        id: cardId,
         type: packageName,
         branch: version,
         schema,
         includePaths,
         upstreamDoc: { data: resource, meta, included }
       });
-      authorizedResult = await documentContext.applyReadAuthorization({ session, packageName, id });
+      authorizedResult = await documentContext.applyReadAuthorization({ session, packageName, cardId });
     }
 
     if (!authorizedResult) {
-      throw new Error(`No such resource ${version}/${packageName}/${id}`, {
+      throw new Error(`No such resource ${version}/${packageName}/${cardId}`, {
         status: 404
       });
     }
@@ -118,26 +123,28 @@ class Searchers {
     return authorizedResult;
   }
 
-  // TODO need to work thru what this means from the perspective of model-based encapsulation
-  async getBinary(session, branch, type, id, includePaths) {
+  async getBinary(session, source, packageName, cardId, type, modelId, opts) {
     // look up authorized result to check read is authorized by going through
     // the default auth stack for the JSON representation. Error will be thrown
     // if authorization is not correct.
-    let document = await this.get(session, type, id, { includePaths, version: branch });
+    let { version:branch } = opts;
 
+    // TODO this needs to get the card's internal model that backs the binary data.
+    // this.get() will ultimately be the incorrect place to retrieve this from...
+    let document = await this.get(session, source, type, modelId, { version: branch });
+
+    // TODO ultimately there will be no need to look up the source as it is being provided
+    // as an argument to this method.
     let sourceId = document.data.meta.source;
-
     let sources = await this._lookupSources();
-
-    let sessionOrEveryone = session || Session.EVERYONE;
-
 
     // we don't need to take a middleware-like approach here because we already
     // searched for the json representation, so we know exactly what data source
     // to get the binary blob from
-    let source = sources.find(s => s.id === sourceId);
+    let dataSource = sources.find(s => s.id === sourceId);
 
-    let result = await source.searcher.getBinary(sessionOrEveryone, branch, type, id);
+    let sessionOrEveryone = session || Session.EVERYONE;
+    let result = await dataSource.searcher.getBinary(sessionOrEveryone, branch, type, modelId);
 
     return [result, document];
   }

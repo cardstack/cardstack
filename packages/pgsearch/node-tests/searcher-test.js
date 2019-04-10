@@ -169,7 +169,7 @@ describe('pgsearch/searcher', function() {
   });
 
   it('returns properly formatted records', async function() {
-    let model = (await searcher.get(env.session, 'people', '1')).data;
+    let model = (await searcher.get(env.session, 'local-hub', 'people', '1')).data;
     let meta = model.meta;
     expect(Object.keys(meta).sort()).deep.equals(['source', 'version']);
     delete model.meta;
@@ -610,7 +610,7 @@ describe('pgsearch/searcher', function() {
   });
 
   it('can get an individual record', async function() {
-    let model = await searcher.get(env.session, 'articles', '1');
+    let model = await searcher.get(env.session, 'local-hub', 'articles', '1');
     expect(model).has.deep.property('data.attributes.hello', 'magic words');
   });
 

@@ -55,7 +55,7 @@ describe('github-auth/searcher', function() {
         .get(`/users/${id}`)
         .reply(200, userMock);
 
-      let user = await searchers.get(env.session, 'github-users', id);
+      let user = await searchers.get(env.session, 'local-hub', 'github-users', id);
       expect(user.data.attributes.permissions.length).to.equal(0);
     });
   });
@@ -110,7 +110,7 @@ describe('github-auth/searcher', function() {
         .get(`/repos/cardstack/repo3/collaborators/${id}/permission`)
         .reply(200, permissionMock);
 
-      let user = await searchers.get(env.session, 'github-users', id);
+      let user = await searchers.get(env.session, 'local-hub', 'github-users', id);
       expect(user.data.attributes.permissions.length).to.equal(0);
     });
 
@@ -135,7 +135,7 @@ describe('github-auth/searcher', function() {
         .get(`/repos/cardstack/repo3/collaborators/${id}/permission`)
         .reply(200, permissionMock);
 
-      let user = await searchers.get(env.session, 'github-users', id);
+      let user = await searchers.get(env.session, 'local-hub', 'github-users', id);
 
       expect(user.data.attributes.permissions).to.include('cardstack/repo1:read');
       expect(user.data.attributes.permissions).to.not.include('cardstack/repo1:write');
@@ -171,7 +171,7 @@ describe('github-auth/searcher', function() {
         .get(`/repos/cardstack/repo3/collaborators/${id}/permission`)
         .reply(200, permissionMock);
 
-      let user = await searchers.get(env.session, 'github-users', id);
+      let user = await searchers.get(env.session, 'local-hub', 'github-users', id);
 
       expect(user.data.attributes.permissions).to.include('cardstack/repo1:read');
       expect(user.data.attributes.permissions).to.include('cardstack/repo1:write');
@@ -207,7 +207,7 @@ describe('github-auth/searcher', function() {
         .get(`/repos/cardstack/repo3/collaborators/${id}/permission`)
         .reply(200, permissionMock);
 
-      let user = await searchers.get(env.session, 'github-users', id);
+      let user = await searchers.get(env.session, 'local-hub', 'github-users', id);
 
       expect(user.data.attributes.permissions).to.include('cardstack/repo1:read');
       expect(user.data.attributes.permissions).to.include('cardstack/repo1:write');
@@ -255,7 +255,7 @@ describe('github-auth/searcher', function() {
           }];
         });
 
-      let user = await searchers.get(env.session, 'github-users', id);
+      let user = await searchers.get(env.session, 'local-hub', 'github-users', id);
 
       expect(user).has.deep.property('data.id', id);
       expect(user).has.deep.property('data.type', 'github-users');
@@ -276,10 +276,10 @@ describe('github-auth/searcher', function() {
           }];
         });
 
-      await searchers.get(env.session, 'github-users', id);
+      await searchers.get(env.session, 'local-hub', 'github-users', id);
       mock.name = "Van Gogh";
 
-      let user = await searchers.get(env.session, 'github-users', id);
+      let user = await searchers.get(env.session, 'local-hub', 'github-users', id);
       expect(user).has.deep.property('data.attributes.name', "Hassan Abdel-Rahman");
     });
 
@@ -296,17 +296,17 @@ describe('github-auth/searcher', function() {
           }];
         });
 
-      await searchers.get(env.session, 'github-users', id);
+      await searchers.get(env.session, 'local-hub', 'github-users', id);
       mock.name = "Van Gogh";
 
       await alterExpiration('master', 'github-users', id, '-30 seconds');
 
-      let user = await searchers.get(env.session, 'github-users', id);
+      let user = await searchers.get(env.session, 'local-hub', 'github-users', id);
       expect(user).has.deep.property('data.attributes.name', "Hassan Abdel-Rahman");
 
       await alterExpiration('master', 'github-users', id, '-31 seconds');
 
-      user = await searchers.get(env.session, 'github-users', id);
+      user = await searchers.get(env.session, 'local-hub', 'github-users', id);
       expect(user).has.deep.property('data.attributes.name', "Van Gogh");
     });
   });
@@ -345,16 +345,16 @@ describe('github-auth/searcher', function() {
           }];
         });
 
-      await searchers.get(env.session, 'github-users', id);
+      await searchers.get(env.session, 'local-hub', 'github-users', id);
       mock.name = "Van Gogh";
 
       await alterExpiration('master', 'github-users', id, '-61 seconds');
 
-      let user = await searchers.get(env.session, 'github-users', id);
+      let user = await searchers.get(env.session, 'local-hub', 'github-users', id);
       expect(user).has.deep.property('data.attributes.name', "Hassan Abdel-Rahman");
 
       await alterExpiration('master', 'github-users', id, '-240 seconds');
-      user = await searchers.get(env.session, 'github-users', id);
+      user = await searchers.get(env.session, 'local-hub', 'github-users', id);
       expect(user).has.deep.property('data.attributes.name', "Van Gogh");
     });
   });
@@ -393,10 +393,10 @@ describe('github-auth/searcher', function() {
           }];
         });
 
-      await searchers.get(env.session, 'github-users', id);
+      await searchers.get(env.session, 'local-hub', 'github-users', id);
       mock.name = "Van Gogh";
 
-      let user = await searchers.get(env.session, 'github-users', id);
+      let user = await searchers.get(env.session, 'local-hub', 'github-users', id);
       expect(user).has.deep.property('data.attributes.name', "Van Gogh");
     });
   });

@@ -62,7 +62,7 @@ describe('hub/searchers/basics', function() {
 
     it("throws when no searcher#get has it", async function() {
       try {
-        await searchers.get(env.session, 'examples', 'nonexistent');
+        await searchers.get(env.session, 'local-hub', 'examples', 'nonexistent');
         throw new Error("should not get here");
       } catch (err) {
         expect(err.message).to.match(/No such resource master\/examples\/nonexist/);
@@ -70,7 +70,7 @@ describe('hub/searchers/basics', function() {
     });
 
     it("searchers#get finds record via internal searcher", async function() {
-      let response = await searchers.get(env.session, 'examples', chocolate.id);
+      let response = await searchers.get(env.session, 'local-hub', 'examples', chocolate.id);
       expect(response.data.attributes['example-flavor']).to.equal('chocolate');
     });
 
@@ -92,7 +92,7 @@ describe('hub/searchers/basics', function() {
     after(teardown);
 
     it("a plugin's searcher#get can run before the internal searcher", async function() {
-      let response = await searchers.get(env.session, 'examples', chocolate.id);
+      let response = await searchers.get(env.session, 'local-hub', 'examples', chocolate.id);
       expect(response.data.attributes['example-flavor']).to.equal('vanilla');
     });
 
@@ -103,7 +103,7 @@ describe('hub/searchers/basics', function() {
     });
 
     it("adds source id to model when using searcher#get", async function() {
-      let response = await searchers.get(env.session, 'examples', 'anything');
+      let response = await searchers.get(env.session, 'local-hub', 'examples', 'anything');
       expect(response.data).has.deep.property('meta.source', source.id);
     });
 
@@ -119,7 +119,7 @@ describe('hub/searchers/basics', function() {
     after(teardown);
 
     it("a plugin's searcher#get can run after the internal searcher", async function() {
-      let response = await searchers.get(env.session, 'examples', '10000');
+      let response = await searchers.get(env.session, 'local-hub', 'examples', '10000');
       expect(response.data.attributes['example-flavor']).to.equal('vanilla');
     });
   });
@@ -151,11 +151,11 @@ describe('hub/searchers/basics', function() {
     }
 
     it("can cache searcher#get responses", async function() {
-      let response = await searchers.get(env.session, 'examples', '1000');
+      let response = await searchers.get(env.session, 'local-hub', 'examples', '1000');
       await searchers._cachingPromise;
       expect(response).has.deep.property('data.attributes.example-counter');
       let firstCounter = response.data.attributes['example-counter'];
-      response = await searchers.get(env.session, 'examples', '1000');
+      response = await searchers.get(env.session, 'local-hub', 'examples', '1000');
       await searchers._cachingPromise;
       let secondCounter = response.data.attributes['example-counter'];
       expect(firstCounter).to.equal(secondCounter);
@@ -170,25 +170,25 @@ describe('hub/searchers/basics', function() {
           }
         }
       });
-      let response = (await searchers.get(env.session, type, id, { includePaths: ['example'] })).included[0];
+      let response = (await searchers.get(env.session, 'local-hub', type, id, { includePaths: ['example'] })).included[0];
       await searchers._cachingPromise;
       expect(response).has.deep.property('attributes.example-counter');
       let firstCounter = response.attributes['example-counter'];
-      response = (await searchers.get(env.session, type, id, { includePaths: ['example'] })).included[0];
+      response = (await searchers.get(env.session, 'local-hub', type, id, { includePaths: ['example'] })).included[0];
       await searchers._cachingPromise;
       let secondCounter = response.attributes['example-counter'];
       expect(firstCounter).to.equal(secondCounter);
     });
 
     it("does not return expired searcher#get responses", async function() {
-      let response = await searchers.get(env.session, 'examples', '1000');
+      let response = await searchers.get(env.session, 'local-hub', 'examples', '1000');
       await searchers._cachingPromise;
       expect(response).has.deep.property('data.attributes.example-counter');
       let firstCounter = response.data.attributes['example-counter'];
 
       await alterExpiration('master', 'examples', '1000', '-301 seconds');
 
-      response = await searchers.get(env.session, 'examples', '1000');
+      response = await searchers.get(env.session, 'local-hub', 'examples', '1000');
       await searchers._cachingPromise;
       let secondCounter = response.data.attributes['example-counter'];
       expect(firstCounter).to.not.equal(secondCounter);
@@ -203,21 +203,21 @@ describe('hub/searchers/basics', function() {
           }
         }
       });
-      let response = (await searchers.get(env.session, type, id, { includePaths: ['example'] })).included[0];
+      let response = (await searchers.get(env.session, 'local-hub', type, id, { includePaths: ['example'] })).included[0];
       await searchers._cachingPromise;
       expect(response).has.deep.property('attributes.example-counter');
       let firstCounter = response.attributes['example-counter'];
 
       await alterExpiration('master', 'examples', '1000', '-301 seconds');
 
-      response = (await searchers.get(env.session, type, id, { includePaths: ['example'] })).included[0];
+      response = (await searchers.get(env.session, 'local-hub', type, id, { includePaths: ['example'] })).included[0];
       await searchers._cachingPromise;
       let secondCounter = response.attributes['example-counter'];
       expect(firstCounter).to.not.equal(secondCounter);
     });
 
     it("does not return expired documents in searcher#search", async function() {
-      await searchers.get(env.session, 'examples', '1000');
+      await searchers.get(env.session, 'local-hub', 'examples', '1000');
       await searchers._cachingPromise;
       await alterExpiration('master', 'examples', '1000', '-301 seconds');
       let response = await searchers.search(env.session, { filter: { type: 'examples', id: '1000' }});

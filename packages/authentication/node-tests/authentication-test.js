@@ -522,7 +522,7 @@ describe('authentication/middleware', function() {
 
       it('can return updated user info when getting token status', async function() {
         let { token } = await auth.createToken({ id: quint.id, type: 'test-users' }, 30);
-        let { data:updatedQuint } = await env.lookup('hub:searchers').get(env.session, 'test-users', quint.id);
+        let { data:updatedQuint } = await env.lookup('hub:searchers').get(env.session, 'local-hub', 'test-users', quint.id);
         updatedQuint.attributes.email = 'updated@example.com';
 
         await env.lookup('hub:writers').update('master', env.session, 'test-users', quint.id, { data: updatedQuint });

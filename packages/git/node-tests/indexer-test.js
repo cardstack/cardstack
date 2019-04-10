@@ -66,7 +66,7 @@ describe('git/indexer', function() {
 
     assertNoDocument = async function(version, type, id) {
       try {
-        await searcher.get(env.session, type, id, { version });
+        await searcher.get(env.session, 'local-hub', type, id, { version });
       } catch(err) {
         expect(err.status).to.equal(404);
         return;
@@ -104,7 +104,7 @@ describe('git/indexer', function() {
     let indexerState = await client.loadMeta({ branch: 'master', id: dataSource.id });
     expect(indexerState.commit).to.equal(head);
 
-    let contents = await searcher.get(env.session, 'articles', 'hello-world');
+    let contents = await searcher.get(env.session, 'local-hub', 'articles', 'hello-world');
     let jsonapi = toResource(contents);
     expect(jsonapi).has.deep.property('attributes.title', 'world');
   });
@@ -176,7 +176,7 @@ describe('git/indexer', function() {
     let indexerState = await client.loadMeta({ branch: 'master', id: dataSource.id });
     expect(indexerState.commit).to.equal(head);
 
-    let contents = await searcher.get(env.session, 'articles', 'hello-world');
+    let contents = await searcher.get(env.session, 'local-hub', 'articles', 'hello-world');
     expect(contents).to.have.deep.property('data.attributes.title', 'somebody else');
   });
 
@@ -244,13 +244,13 @@ describe('git/indexer', function() {
     await start();
 
     {
-      let both = toResource(await searcher.get(env.session, 'articles', 'both'));
+      let both = toResource(await searcher.get(env.session, 'local-hub', 'articles', 'both'));
       expect(both).has.deep.property('attributes.title', 'article from both repos, left version');
 
-      let left = toResource(await searcher.get(env.session, 'articles', 'left'));
+      let left = toResource(await searcher.get(env.session, 'local-hub', 'articles', 'left'));
       expect(left).has.deep.property('attributes.title', 'article from left repo');
 
-      let upstream = toResource(await searcher.get(env.session, 'articles', 'upstream'));
+      let upstream = toResource(await searcher.get(env.session, 'local-hub', 'articles', 'upstream'));
       expect(upstream).has.deep.property('attributes.title', 'article from upstream');
 
       await assertNoDocument('master', 'articles', 'right');
@@ -273,15 +273,15 @@ describe('git/indexer', function() {
 
     {
       // Update
-      let both = toResource(await searcher.get(env.session, 'articles', 'both'));
+      let both = toResource(await searcher.get(env.session, 'local-hub', 'articles', 'both'));
       expect(both).has.deep.property('attributes.title', 'article from both repos, right version');
 
       // Create
-      let right = toResource(await searcher.get(env.session, 'articles', 'right'));
+      let right = toResource(await searcher.get(env.session, 'local-hub', 'articles', 'right'));
       expect(right).has.deep.property('attributes.title', 'article from right repo');
 
       // Leave other data sources alone
-      let upstream = toResource(await searcher.get(env.session, 'articles', 'upstream'));
+      let upstream = toResource(await searcher.get(env.session, 'local-hub', 'articles', 'upstream'));
       expect(upstream).has.deep.property('attributes.title', 'article from upstream');
 
       // Delete
@@ -310,7 +310,7 @@ describe('git/indexer', function() {
 
     await start();
 
-    let contents = await searcher.get(env.session, 'articles', 'hello-world');
+    let contents = await searcher.get(env.session, 'local-hub', 'articles', 'hello-world');
     expect(contents).has.deep.property('included');
     expect(contents.included).has.length(1);
     expect(contents.included[0]).has.deep.property('attributes.name', 'Q');

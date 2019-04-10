@@ -47,7 +47,7 @@ class PermissionsSearcher {
         },
       };
     } else {
-      document = await this.searchers.get(session, queryType, queryId, { version: branch });
+      document = await this.searchers.get(session, 'local-hub', queryType, queryId, { version: branch });
       if (!document) { return; } // we don't have it or don't have permission to read it
     }
 

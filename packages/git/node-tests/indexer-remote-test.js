@@ -201,7 +201,7 @@ describe('git/indexer cloning', function() {
     await start();
     await indexer.update();
 
-    let contents = await searcher.get(env.session, 'events', 'event-1');
+    let contents = await searcher.get(env.session, 'local-hub', 'events', 'event-1');
     let jsonapi = toResource(contents);
     expect(jsonapi).has.deep.property('attributes.title', 'This is a test event');
   });

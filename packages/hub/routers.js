@@ -206,7 +206,7 @@ class Routers {
     let id, type, config;
     try {
       // TODO assume schema models are cards
-      config = (await this.searchers.get(Session.INTERNAL_PRIVILEGED, 'plugin-configs', '@cardstack/hub')).data;
+      config = (await this.searchers.get(Session.INTERNAL_PRIVILEGED, 'local-hub', 'plugin-configs', '@cardstack/hub')).data;
     } catch (err) {
       if (err.status !== 404) { throw err; }
     }
@@ -217,7 +217,7 @@ class Routers {
     }
 
     if (id && type) {
-      let appCard = await this.searchers.get(Session.INTERNAL_PRIVILEGED, type, id);
+      let appCard = await this.searchers.get(Session.INTERNAL_PRIVILEGED, 'local-hub', type, id);
       if (appCard) {
         return appCard;
       }
@@ -239,7 +239,7 @@ class Routers {
         } else {
           let errorCard;
           try {
-            errorCard = await this.searchers.get(Session.INTERNAL_PRIVILEGED, errorType, errorCardId);
+            errorCard = await this.searchers.get(Session.INTERNAL_PRIVILEGED, 'local-hub', errorType, errorCardId);
           } catch (err) {
             if (err.status !== 404) { throw err; }
           }
