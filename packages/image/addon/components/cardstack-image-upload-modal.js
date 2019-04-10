@@ -12,27 +12,66 @@ export default Component.extend({
   cardstackSession: service(),
   layout,
 
+  uploaded: 0,
+  totalToUpload: null,
+
+  uploadPercentage: computed('uploaded', 'totalToUpload', function() {
+    if (!this.totalToUpload) {
+      return 0;
+    }
+    return Math.round(100 * this.uploaded / this.totalToUpload);
+  }),
+
   endpointUrl: computed('typeName', function() {
     return `${hubURL}/api/cardstack-files`;
   }),
 
-  uploadFile: task(function * (event) {
-    let token = this.get('cardstackSession.token');
+  uploadRequest(event) {
+    let token = this.cardstackSession.token;
     let file = event.target.files[0];
     let body = new FormData();
     body.append('file', file);
 
-    let response = yield fetch(this.get('endpointUrl'), {
-      method: 'POST',
-      body,
-      headers: { 'authorization': `Bearer ${token}` }
+    let xhr = new XMLHttpRequest();
+    xhr.open('POST', this.get('endpointUrl'));
+    xhr.setRequestHeader('Authorization', `Bearer ${token}`);
+    xhr.upload.addEventListener('progress', (event) => {
+      if (event.lengthComputable) {
+        let { loaded, total } = event;
+        this.setProperties({
+          uploaded: loaded,
+          totalToUpload: total
+        });
+      }
     });
-    let jsonApiDocument = yield response.json();
+    xhr.send(body);
 
-    this.get('store').pushPayload(jsonApiDocument);
+    return new Promise((resolve, reject) => {
+      xhr.onreadystatechange = () => {
+        if (xhr.readyState !== 4) {
+          return;
+        }
+
+        let { status } = xhr;
+        if (status >= 200 && status < 300) {
+          resolve(JSON.parse(xhr.responseText));
+        } else {
+          reject({
+            status: xhr.status,
+            statusText: xhr.statusText
+          });
+        }
+      }
+    });
+  },
+
+  uploadFile: task(function * (event) {
+    let jsonApiDocument = yield this.uploadRequest(event);
+
+    this.store.pushPayload(jsonApiDocument);
     let { type, id } = jsonApiDocument.data;
-    let fileRecord = this.get('store').peekRecord(type, id);
+    let fileRecord = this.store.peekRecord(type, id);
 
-    this.get('updateImage')(fileRecord);
+    this.updateImage(fileRecord);
   }).drop(),
 });

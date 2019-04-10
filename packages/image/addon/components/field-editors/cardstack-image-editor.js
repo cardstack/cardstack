@@ -19,7 +19,7 @@ export default Component.extend({
   chooseImage: task(function * () {
     let image;
     try {
-      image = yield this.get('cardPicker').pickCard('cardstack-image', cardPickerOptions);
+      image = yield this.cardPicker.pickCard('cardstack-image', cardPickerOptions);
     } catch (e) {
       if (e !== 'no card selected') { throw e; }
     }

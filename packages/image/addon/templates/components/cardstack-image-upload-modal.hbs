@@ -10,7 +10,10 @@
               {{action cancel}}>Cancel</button>
     </div>
   {{else}}
-    <div class="cardstack-image-upload-modal--message__loading">Uploading File...</div>
+    <div class="cardstack-image-upload-modal--message__loading">
+      Uploading File...
+      {{this.uploadPercentage}}%
+    </div>
   {{/if}}
 </div>
 

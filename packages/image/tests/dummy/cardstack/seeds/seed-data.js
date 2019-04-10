@@ -23,7 +23,11 @@ readdirSync(path.join(__dirname, './images')).forEach(filename => {
 
 factory.addResource('content-types', 'articles')
   .withAttributes({
-    defaultIncludes: ['cover-image']
+    fieldsets: {
+      isolated: [
+        { field: 'cover-image' , format: 'embedded' }
+      ]
+    }
   })
   .withRelated('fields', [
     factory.addResource('fields', 'name').withAttributes({fieldType: '@cardstack/core-types::string'}),

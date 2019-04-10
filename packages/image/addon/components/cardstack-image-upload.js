@@ -9,13 +9,12 @@ export default Component.extend({
   store: service(),
 
   updateImage: task(function * (file) {
-    let image = this.get('store').createRecord('cardstack-image', { file });
+    let image = this.store.createRecord('cardstack-image', { file });
     yield image.save();
     this.set('showUploader', false);
 
-    let uploadedImage = this.get('uploadedImage');
-    if (typeof uploadedImage === 'function') {
-      uploadedImage(image);
+    if (typeof this.uploadedImage === 'function') {
+      this.uploadedImage(image);
     }
   }).restartable(),
 });
