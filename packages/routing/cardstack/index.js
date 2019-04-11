@@ -270,13 +270,6 @@ async function routeThatMatchesPath(searchers, router, branch, path, application
     }
   }
 
-  // do some extra chcking to make sure this is really the case
-  if (matchedRoute.path === '/') {
-
-  }
-
-      // We have matched your route here, and now we are just loading data from the router map....
-
   return { route: matchedRoute, remainingPath, params, allowedQueryParams, routingCard, routingCardsCache };
 }
 

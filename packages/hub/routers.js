@@ -269,8 +269,11 @@ class Routers {
 function hasUnconsumedPath(path, cardContext) {
   if (path.charAt(0) === '/') { return true; }
 
+  let { data: { type } } = cardContext;
+  if (path.length && path.charAt(0) !== '?' && type === 'application-cards') { return true; }
+
   return path.charAt(0) === '?' &&
-         decodeURI(path).match(new RegExp(`${cardContext.data.type}\\[[^\\]]+\\]=`));
+         decodeURI(path).match(new RegExp(`${type}\\[[^\\]]+\\]=`));
 }
 
 function buildPathFromRouteStack(routeStack) {
