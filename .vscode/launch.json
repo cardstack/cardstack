@@ -115,7 +115,7 @@
             "console": "integratedTerminal",
             "cwd": "${workspaceRoot}",
             "env": {
-                "HUB_ENVIRONMENT": "test",
+                "HUB_ENVIRONMENT": "test"
             },
             "args": [
                 "packages/test-support/bin/run.js",

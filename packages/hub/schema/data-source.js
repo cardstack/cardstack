@@ -2,6 +2,7 @@ const Error = require('@cardstack/plugin-utils/error');
 const authLog = require('@cardstack/logger')('cardstack/auth');
 const util = require('util');
 const resolve = util.promisify(require('resolve'));
+const bootstrapSchema = require('../bootstrap-schema');
 
 module.exports = class DataSource {
   constructor(model, plugins, projectPath) {
@@ -18,6 +19,9 @@ module.exports = class DataSource {
     this._authenticator = null;
     this._StaticModels = plugins.lookupFeatureFactory('static-models', this.sourceType);
     this._staticModels = null;
+    this._StaticSchemaModels = plugins.lookupFeatureFactory('schemas', this.sourceType);
+    this._staticSchemaModels = null;
+    this._schemaContentTypes = bootstrapSchema.filter(i => i.type === 'content-types' && i.attributes['is-built-in']).map(i => i.id);
     if (!this._Writer && !this._Indexer && !this._Searcher && !this._Authenticator && !this._StaticModels) {
       throw new Error(`${this.sourceType} is either missing or does not appear to be a valid data source plugin`);
     }
@@ -33,6 +37,7 @@ module.exports = class DataSource {
     this._userCorrelationQueryFunc = null;
     this.tokenExpirySeconds = model.attributes['token-expiry-seconds'] || 86400;
   }
+
   get writer() {
     if (!this._writer && this._Writer) {
       this._writer = this._Writer.create(this._params);
@@ -65,7 +70,25 @@ module.exports = class DataSource {
         this._staticModels = [];
       }
     }
+    let schemaModels = this._staticModels.filter(i => this._schemaContentTypes.includes(i.type)).map(i => `${i.type}/${i.id}`);
+    if (schemaModels.length) {
+      throw new Error(`The datasource '${this.id}' defines static-models that includes schema. Schema is not allowed in static-models. Found schema models: ${JSON.stringify(schemaModels)}`);
+    }
     return this._staticModels;
+  }
+  get staticSchemaModels() {
+    if (!this._staticSchemaModels) {
+      if (this._StaticSchemaModels) {
+        this._staticSchemaModels = this._StaticSchemaModels.class.call(null, this._params);
+      } else {
+        this._staticSchemaModels = [];
+      }
+    }
+    let nonSchemaModels = this._staticSchemaModels.filter(i => !this._schemaContentTypes.includes(i.type)).map(i => `${i.type}/${i.id}`);
+    if (nonSchemaModels.length) {
+      throw new Error(`The datasource '${this.id}' defines schema that includes non-schema models. Non-schema models are not allowed in schemas. Found non-schema models: ${JSON.stringify(nonSchemaModels)}`);
+    }
+    return this._staticSchemaModels;
   }
   async teardown() {
     if (this._writer && typeof this._writer.teardown === 'function') {

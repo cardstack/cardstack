@@ -5,7 +5,9 @@
     "api-version": 1
   },
   "dependencies": {
-    "data-source-with-static" : "*"
+    "data-source-with-static" : "*",
+    "data-source-with-schema-in-static-models" : "*",
+    "data-source-with-non-schema-in-schemas" : "*"
   },
   "devDependencies": {
     "@cardstack/test-support": "*"

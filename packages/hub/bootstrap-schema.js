@@ -727,6 +727,13 @@ const models = [
   },
   {
     type: 'data-sources',
+    id: 'schemas',
+    attributes: {
+      'source-type': '@cardstack/hub::schemas'
+    }
+  },
+  {
+    type: 'data-sources',
     id: 'static-models',
     attributes: {
       'source-type': '@cardstack/hub::static-models'

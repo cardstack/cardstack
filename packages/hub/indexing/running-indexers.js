@@ -59,9 +59,10 @@ module.exports = class RunningIndexers {
     }));
     let newSchemaModels = [];
 
-    let staticModelsDataSources = dataSources.filter(ds => ds.sourceType === '@cardstack/hub::static-models');
+    let staticModelsDataSources = dataSources.filter(ds => ds.sourceType === '@cardstack/hub::static-models' || ds.sourceType === '@cardstack/hub::schemas');
 
-    await Promise.all(dataSources.filter(ds => ds.sourceType !== '@cardstack/hub::static-models').map(async source => {
+    await Promise.all(dataSources.filter(ds => ds.sourceType !== '@cardstack/hub::schemas' &&
+                                               ds.sourceType !== '@cardstack/hub::static-models').map(async source => {
       let indexer = source.indexer;
       if (indexer) {
         await Promise.all(staticModelsDataSources.map(async staticSource => {
@@ -69,7 +70,7 @@ module.exports = class RunningIndexers {
         }));
         newSchemaModels.push(await this.sourcesUpdater.addDataSource(source));
       }
-      let staticModels = source.staticModels;
+      let staticModels = source.staticModels.concat(source.staticSchemaModels);
       if (staticModels.length > 0) {
         // this ensures that static models can contain more data
         // sources and they will actually get crawled correctly.
