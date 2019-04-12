@@ -59,7 +59,8 @@ module.exports = class RunningIndexers {
     }));
     let newSchemaModels = [];
 
-    let staticModelsDataSources = dataSources.filter(ds => ds.sourceType === '@cardstack/hub::static-models' || ds.sourceType === '@cardstack/hub::schemas');
+    let staticModelsDataSources = dataSources.filter(ds => ds.sourceType === '@cardstack/hub::static-models' ||
+                                                           ds.sourceType === '@cardstack/hub::schemas');
 
     await Promise.all(dataSources.filter(ds => ds.sourceType !== '@cardstack/hub::schemas' &&
                                                ds.sourceType !== '@cardstack/hub::static-models').map(async source => {

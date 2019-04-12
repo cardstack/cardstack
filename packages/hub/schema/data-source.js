@@ -22,7 +22,7 @@ module.exports = class DataSource {
     this._StaticSchemaModels = plugins.lookupFeatureFactory('schemas', this.sourceType);
     this._staticSchemaModels = null;
     this._schemaContentTypes = bootstrapSchema.filter(i => i.type === 'content-types' && i.attributes['is-built-in']).map(i => i.id);
-    if (!this._Writer && !this._Indexer && !this._Searcher && !this._Authenticator && !this._StaticModels) {
+    if (!this._Writer && !this._Indexer && !this._Searcher && !this._Authenticator && !this._StaticSchemaModels && !this._StaticModels) {
       throw new Error(`${this.sourceType} is either missing or does not appear to be a valid data source plugin`);
     }
     this.mayCreateUser = !!model.attributes['may-create-user'];

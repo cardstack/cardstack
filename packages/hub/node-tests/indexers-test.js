@@ -47,7 +47,7 @@ describe('hub/indexers', function() {
       let doc = await env.lookup('hub:searchers').get(env.session, 'local-hub', 'plugins', 'sample-plugin-one');
       expect(doc).has.deep.property('data.meta.source', 'plugins');
       doc = await env.lookup('hub:searchers').get(env.session, 'local-hub', 'content-types', 'fields');
-      expect(doc).has.deep.property('data.meta.source', 'static-models');
+      expect(doc).has.deep.property('data.meta.source', 'schemas');
     });
 
     it("includes features within plugins", async function() {
