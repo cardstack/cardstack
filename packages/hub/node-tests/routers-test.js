@@ -241,7 +241,7 @@ describe('hub/routers', function () {
       expect(included[0]).has.deep.property('links.self', '/puppies/vanGogh');
     });
 
-    it('doesnt route a single segment path (e.g. /sadfdfsdfs) to the index route, rather it returns an error card', async function() {
+    it('doesnt route a non-existant single segment path (e.g. /sadfdfsdfs) to the index route, rather it returns an error card', async function() {
       let { data: space } = await searchers.getSpace(env.session, '/sadfdfsdfs');
       expect(space.relationships['primary-card'].data).to.eql({ type: 'error-cards', id: 'not-found' });
     });
