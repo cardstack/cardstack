@@ -242,7 +242,7 @@ describe('hub/routers', function () {
     });
 
     it('doesnt route a single segment path (e.g. /sadfdfsdfs) to the index route, rather it returns an error card', async function() {
-      let { data: space } = await searchers.get(env.session, 'master', 'spaces', '/sadfdfsdfs');
+      let { data: space } = await searchers.getSpace(env.session, '/sadfdfsdfs');
       expect(space.relationships['primary-card'].data).to.eql({ type: 'error-cards', id: 'not-found' });
     });
   });
