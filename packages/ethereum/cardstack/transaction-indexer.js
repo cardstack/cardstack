@@ -95,7 +95,7 @@ class TransactionIndexer {
       page: { size }
     };
 
-    let { data:results } = await this.searchers.searchFromControllingBranch(Session.INTERNAL_PRIVILEGED, addressQuery);
+    let { data:results } = await this.searchers.search(Session.INTERNAL_PRIVILEGED, addressQuery);
     if (results.length === size) {
       throw new Error(`There are more tracked-ethereum-addresses than the system is configured to return (${size} addresses). Increase the max number of tracked addresses in 'params.addressIndexing.maxAddressesTracked' for data source configuration'.`);
     }
@@ -108,7 +108,7 @@ class TransactionIndexer {
 
   async _getIndexedAddresses() {
     let size = get(this, 'addressIndexing.maxAddressesTracked') || DEFAULT_MAX_ADDRESSES_TRACKED;
-    let { data: indexedAddresses } = await this.searchers.searchFromControllingBranch(Session.INTERNAL_PRIVILEGED, {
+    let { data: indexedAddresses } = await this.searchers.search(Session.INTERNAL_PRIVILEGED, {
       filter: { type: { exact: 'ethereum-addresses' } },
       page: { size }
     });
@@ -235,7 +235,7 @@ class TransactionIndexer {
 
     batch = this.pgsearchClient.beginBatch(this.schema, this.searchers);
     for (let address of trackedAddresses) {
-      let { data:newTransactions } = await this.searchers.searchFromControllingBranch(Session.INTERNAL_PRIVILEGED, {
+      let { data:newTransactions } = await this.searchers.search(Session.INTERNAL_PRIVILEGED, {
         filter: {
           or: [{
             type: { exact: 'ethereum-transactions' },
@@ -273,7 +273,8 @@ class TransactionIndexer {
 
     let batch = this.pgsearchClient.beginBatch(this.schema, this.searchers);
     for (let address of addresses) {
-      let document = await this.searchers.getFromControllingBranch(Session.INTERNAL_PRIVILEGED,
+      let document = await this.searchers.get(Session.INTERNAL_PRIVILEGED,
+        'local-hub',
         'ethereum-addresses',
         address,
         ['transactions.from-address', 'transactions.to-address']);
@@ -313,7 +314,7 @@ class TransactionIndexer {
 
     let addressResource;
     try {
-      addressResource = await this.searchers.getFromControllingBranch(Session.INTERNAL_PRIVILEGED, 'ethereum-addresses', address.toLowerCase());
+      addressResource = await this.searchers.get(Session.INTERNAL_PRIVILEGED, 'local-hub', 'ethereum-addresses', address.toLowerCase());
     } catch (err) {
       if (err.status !== 404) { throw err; }
     }

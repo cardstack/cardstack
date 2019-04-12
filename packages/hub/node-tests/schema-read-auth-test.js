@@ -20,11 +20,11 @@ async function update(session, document) {
 }
 
 async function find(type, id) {
-  return searchers.get(Session.INTERNAL_PRIVILEGED, 'master', type, id);
+  return searchers.get(Session.INTERNAL_PRIVILEGED, 'local-hub', type, id);
 }
 
 async function findAll(type) {
-  return searchers.search(Session.INTERNAL_PRIVILEGED, 'master', { filter: { type } });
+  return searchers.search(Session.INTERNAL_PRIVILEGED, { filter: { type } });
 }
 
 function makeSession(schema, { type, id }) {

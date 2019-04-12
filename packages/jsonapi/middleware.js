@@ -198,8 +198,13 @@ class Handler {
   }
 
   async handleIndividualGET(type, id) {
-    let include = (this.query.include || '').split(',');
-    let body = await this.searcher.get(this.session, this.branch, type, id, include);
+    let includePaths = (this.query.include || '').split(',');
+    let body;
+    if (type === 'spaces') {
+      body = await this.searcher.getSpace(this.session, id);
+    } else {
+      body = await this.searcher.get(this.session, 'local-hub', type, id, { version: this.branch, includePaths });
+    }
     if (this.query.include === '') {
       delete body.included;
     }
@@ -207,7 +212,9 @@ class Handler {
   }
 
   async handleIndividualGETBinary(type, id) {
-    let [buffer, json] = await this.searcher.getBinary(this.session, this.branch, type, id);
+    // TODO requests for binary need to be made in a card context, e.g. GET /api/${source}/${package}/${cardId}/${modelType}/${modelId}
+    // stubbing the context out for now...
+    let [buffer, json] = await this.searcher.getBinary(this.session, 'local-hub', null, null, type, id, { version: this.branch });
     this.ctxt.set('content-type', json.data.attributes['content-type']);
     this.ctxt.body = buffer;
   }
@@ -237,7 +244,7 @@ class Handler {
   }
 
   async handleCollectionGET(type) {
-    let { data: models, meta: { page }, included } = await this.searcher.search(this.session, this.branch, {
+    let { data: models, meta: { page }, included } = await this.searcher.search(this.session, {
       filter: this.filterExpression(type),
       sort: this.query.sort,
       page: this.query.page,

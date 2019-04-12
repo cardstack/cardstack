@@ -5,6 +5,8 @@ const Session = require('@cardstack/plugin-utils/session');
 const DocumentContext = require('./indexing/document-context');
 const { get } = require('lodash');
 
+const localHubSource = 'local-hub';
+
 module.exports = declareInjections({
   controllingBranch: 'hub:controlling-branch',
   sources: 'hub:data-sources',
@@ -78,36 +80,42 @@ class Searchers {
     return this.routers;
   }
 
-  async get(session, branchRequest, type, id, includePaths) {
-    if (arguments.length < 4) {
-      throw new Error(`session is now a required argument to searchers.get`);
+  async getSpace(session, path) {
+    return await this.get(session, localHubSource, 'spaces', path);
+  }
+
+  async get(session, source, packageName, cardId, opts={}) {
+    if (source !== localHubSource) {
+      throw new Error(`You specified the source: '${source}' in Searchers.get(). Currently the cardstack hub does not support non-local hub sources.`);
+    }
+    if (arguments.length === 5 && typeof opts !== 'object') {
+      throw new Error(`Searchers.get() expects parameters: 'session', 'source', packageName', 'cardId', and 'opts'. The 'branch' parameter has been deprecated, instead specify 'opts.version'`);
     }
 
-    let branch = branchRequest;
-
+    let { version, includePaths } = opts;
     // only ever get the branches off the controlling branch
-    if (type === 'branches') {
-      branch = this.controllingBranch.name;
+    if (packageName === 'branches' || !version) {
+      version = this.controllingBranch.name;
     }
 
-    let { resource, meta, included } = await this.getResourceAndMeta(session, branch, type, id);
+    let { resource, meta, included } = await this.getResourceAndMeta(session, version, packageName, cardId);
     let authorizedResult;
     let documentContext;
     if (resource) {
-      let schema = await this.currentSchema.forBranch(branch);
+      let schema = await this.currentSchema.forBranch(version);
       documentContext = this.createDocumentContext({
-        id,
-        type,
-        branch,
+        id: cardId,
+        type: packageName,
+        branch: version,
         schema,
         includePaths,
         upstreamDoc: { data: resource, meta, included }
       });
-      authorizedResult = await documentContext.applyReadAuthorization({ session, type, id });
+      authorizedResult = await documentContext.applyReadAuthorization({ session, packageName, cardId });
     }
 
     if (!authorizedResult) {
-      throw new Error(`No such resource ${branch}/${type}/${id}`, {
+      throw new Error(`No such resource ${version}/${packageName}/${cardId}`, {
         status: 404
       });
     }
@@ -115,56 +123,53 @@ class Searchers {
     return authorizedResult;
   }
 
-  async getBinary(session, branch, type, id, includePaths) {
+  async getBinary(session, source, packageName, cardId, type, modelId, opts) {
     // look up authorized result to check read is authorized by going through
     // the default auth stack for the JSON representation. Error will be thrown
     // if authorization is not correct.
-    let document = await this.get(session, branch, type, id, includePaths);
+    let { version:branch } = opts;
 
+    // TODO this needs to get the card's internal model that backs the binary data.
+    // this.get() will ultimately be the incorrect place to retrieve this from...
+    let document = await this.get(session, source, type, modelId, { version: branch });
+
+    // TODO ultimately there will be no need to look up the source as it is being provided
+    // as an argument to this method.
     let sourceId = document.data.meta.source;
-
     let sources = await this._lookupSources();
-
-    let sessionOrEveryone = session || Session.EVERYONE;
-
 
     // we don't need to take a middleware-like approach here because we already
     // searched for the json representation, so we know exactly what data source
     // to get the binary blob from
-    let source = sources.find(s => s.id === sourceId);
+    let dataSource = sources.find(s => s.id === sourceId);
 
-    let result = await source.searcher.getBinary(sessionOrEveryone, branch, type, id);
+    let sessionOrEveryone = session || Session.EVERYONE;
+    let result = await dataSource.searcher.getBinary(sessionOrEveryone, branch, type, modelId);
 
     return [result, document];
   }
 
-  async getFromControllingBranch(session, type, id, includePaths) {
-    if (arguments.length < 3) {
-      throw new Error(`session is now a required argument to searchers.getFromControllingBranch`);
-    }
-    return this.get(session, this.controllingBranch.name, type, id, includePaths);
+  async getFromControllingBranch() {
+    throw new Error(`Searchers.getFromControllingBranch() has been deprecated. Use Searchers.get() instead.`);
   }
 
-  async search(session, branchRequest, query) {
-    if (arguments.length < 3) {
-      throw new Error(`session is now a required argument to searchers.search`);
+  async search(session, query, version) {
+    if (typeof query !== 'object') {
+      throw new Error(`Searchers.get() expects parameters: 'session', 'query', and 'version' (aka branch)`);
     }
-
-    let branch = branchRequest;
-
     // only ever get the branches off the controlling branch
-    if (get(query,'filter.type.exact') === "branches") {
-      branch = this.controllingBranch.name;
+    if (get(query,'filter.type.exact') === "branches" || !version) {
+      version = this.controllingBranch.name;
     }
 
     let sources = await this._lookupSources();
-    let schemaPromise = this.currentSchema.forBranch(branch);
+    let schemaPromise = this.currentSchema.forBranch(version);
     let index = 0;
     let sessionOrEveryone = session || Session.EVERYONE;
     let next = async () => {
       let source = sources[index++];
       if (source) {
-        let response = await source.searcher.search(sessionOrEveryone, branch, query, next);
+        let response = await source.searcher.search(sessionOrEveryone, version, query, next);
         response.data.forEach(resource => {
           if (!resource.meta) {
             resource.meta = {};
@@ -181,7 +186,7 @@ class Searchers {
       let schema = await schemaPromise;
       let includePaths = (get(query, 'include') || '').split(',');
       let documentContext = this.createDocumentContext({
-        branch,
+        branch: version,
         schema,
         includePaths,
         upstreamDoc: result,
@@ -200,8 +205,8 @@ class Searchers {
     }
   }
 
-  async searchFromControllingBranch(session, query) {
-    return this.search(session, this.controllingBranch.name, query);
+  async searchFromControllingBranch() {
+    throw new Error(`Searchers.searchFromControllingBranch() has been deprecated. Use Searchers.search() instead.`);
   }
 
   createDocumentContext({ schema, type, id, branch, sourceId, generation, upstreamDoc, includePaths }) {
@@ -217,13 +222,6 @@ class Searchers {
       routers: this._getRouters(),
       read: this._read(branch)
     });
-  }
-
-  async searchInControllingBranch(session, query) {
-    if (arguments.length < 2) {
-      throw new Error(`session is now a required argument to searchers.searchInControllingBranch`);
-    }
-    return this.search(session, this.controllingBranch.name, query);
   }
 
   _read(branch) {

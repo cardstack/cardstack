@@ -2,22 +2,21 @@ const { declareInjections }   = require('@cardstack/di');
 const SftpClient = require('ssh2-sftp-client');
 const { dirname, basename } = require('path');
 const moment = require('moment');
-const { get } = require('lodash');
 const { lookup } = require('mime-types');
 
 module.exports = declareInjections({
-  searcher: 'hub:searchers'
+  currentSchema: 'hub:current-schema'
 },
 
 class SftpSearcher {
   static create(...args) {
     return new this(...args);
   }
-  constructor({ dataSource, config, searcher, branches }) {
-    this.config       = config;
-    this.branches     = branches;
-    this.dataSource   = dataSource;
-    this.searcher     = searcher;
+  constructor({ dataSource, config, currentSchema, branches }) {
+    this.config        = config;
+    this.branches      = branches;
+    this.dataSource    = dataSource;
+    this.currentSchema = currentSchema;
   }
 
   async get(session, branch, type, id, next) {
@@ -28,15 +27,14 @@ class SftpSearcher {
 
     if (type === 'content-types') { return next(); }
 
-    let contentType = await this.searcher.get(session, branch, 'content-types', type);
-
-    let dataSourceId = get(contentType, 'data.relationships.data-source.data.id');
+    let schema = await this.currentSchema.forBranch(branch);
+    let contentType = schema.types.get(type);
+    if (!contentType) { return result; }
 
     // only look for files on the server if the content type is actually stored
     // in this data source
-    if (dataSourceId !== this.dataSource.id) {
-      return result;
-    }
+    let dataSource = contentType.dataSource;
+    if (!dataSource || dataSource.id !== this.dataSource.id) { return result; }
 
     let client = await this.makeClient(branch);
     let list = await client.list(dirname(id));
@@ -45,14 +43,14 @@ class SftpSearcher {
     let entry = list.find(e => e.name === name );
 
     if (entry) {
-      let contentType = lookup(name) || 'application/octet-stream';
+      let mimeContentType = lookup(name) || 'application/octet-stream';
 
       let attributes = {
         'access-time':  moment(entry.accessTime).format(),
         'modify-time':  moment(entry.modifyTime).format(),
         'size':         entry.size,
         'file-name':    name,
-        'content-type': contentType
+        'content-type': mimeContentType
       };
 
       let data = {

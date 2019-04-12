@@ -105,7 +105,7 @@ describe('pgsearch/indexer', function() {
     });
     expect(article).has.deep.property('id');
     await indexer.update({ forceRefresh: true });
-    let found = await searcher.get(env.session, 'master', 'articles', article.id);
+    let found = await searcher.get(env.session, 'local-hub', 'articles', article.id);
     expect(found).is.ok;
     expect(found).has.deep.property('data.attributes.title');
   });
@@ -133,7 +133,7 @@ describe('pgsearch/indexer', function() {
     });
     expect(article).has.deep.property('id');
     await indexer.update({ forceRefresh: true });
-    let found = await searcher.get(env.session, 'master', 'articles', article.id);
+    let found = await searcher.get(env.session, 'local-hub', 'articles', article.id);
     expect(found).is.ok;
     expect(found).has.deep.property('data.attributes.title');
     expect(found).has.deep.property('data.relationships.author.data.id', person.id);
@@ -156,7 +156,7 @@ describe('pgsearch/indexer', function() {
       }
     });
 
-    let found = await searcher.get(env.session, 'master', 'people', person.id);
+    let found = await searcher.get(env.session, 'local-hub', 'people', person.id);
     expect(found).is.ok;
     expect(found).has.deep.property('data.attributes.name');
     expect(found.data.relationships).deep.equals({ friends: { data: [{ type: 'people', id: person.id }]}});
@@ -190,7 +190,7 @@ describe('pgsearch/indexer', function() {
       }
     });
 
-    let found = await searcher.get(env.session, 'master', 'people', person.id);
+    let found = await searcher.get(env.session, 'local-hub', 'people', person.id);
     expect(found).is.ok;
     expect(found).has.deep.property('data.attributes.name');
     expect(found.data.relationships).deep.equals({ friends: { data: [{ type: 'people', id: circularPerson.id }]}});
@@ -226,7 +226,7 @@ describe('pgsearch/indexer', function() {
       }
     });
 
-    let found = await searcher.get(env.session, 'master', 'people', person1.id);
+    let found = await searcher.get(env.session, 'local-hub', 'people', person1.id);
     expect(found).is.ok;
     expect(found).has.deep.property('data.attributes.name');
     expect(found.data.relationships).deep.equals({ friends: { data: [{ type: 'people', id: person2.id }]}});
@@ -263,7 +263,7 @@ describe('pgsearch/indexer', function() {
       }
     });
 
-    let found = await searcher.get(env.session, 'master', 'puppies', puppy1.id);
+    let found = await searcher.get(env.session, 'local-hub', 'puppies', puppy1.id);
     expect(found).is.ok;
     expect(found).has.deep.property('data.attributes.name');
     expect(found.data.relationships).deep.equals({ 'puppy-friends': { data: [{ type: 'puppies', id: puppy2.id }]}});
@@ -288,7 +288,7 @@ describe('pgsearch/indexer', function() {
       }
     });
 
-    let found = await searcher.get(env.session, 'master', 'puppies', puppy.id);
+    let found = await searcher.get(env.session, 'local-hub', 'puppies', puppy.id);
     expect(found).is.ok;
     expect(found).has.deep.property('data.attributes.name');
     expect(found.data.relationships).deep.equals({ 'puppy-friends': { data: [{ type: 'puppies', id: puppy.id }]}});
@@ -322,7 +322,7 @@ describe('pgsearch/indexer', function() {
       }
     });
 
-    let found = await searcher.get(env.session, 'master', 'puppies', puppy.id);
+    let found = await searcher.get(env.session, 'local-hub', 'puppies', puppy.id);
     expect(found).is.ok;
     expect(found).has.deep.property('data.attributes.name');
     expect(found.data.relationships).deep.equals({ 'puppy-friends': { data: [{ type: 'puppies', id: circularPuppy.id }]}});
@@ -380,7 +380,7 @@ describe('pgsearch/indexer', function() {
       }
     });
 
-    let found = await searcher.get(env.session, 'master', 'puppies', puppy.id);
+    let found = await searcher.get(env.session, 'local-hub', 'puppies', puppy.id);
     expect(found).is.ok;
     expect(found).has.deep.property('data.attributes.name');
     expect(found.data.relationships).deep.equals({ 'puppy-friends': { data: [{ type: 'puppies', id: puppy1.id }]}});
@@ -404,7 +404,7 @@ describe('pgsearch/indexer', function() {
       documentFetchCount++;
       let result;
       try {
-        result = await searcher.get(env.session, branch, type, id);
+        result = await searcher.get(env.session, 'local-hub', type, id);
       } catch (err) {
         if (err.status !== 404) { throw err; }
       }
@@ -435,7 +435,7 @@ describe('pgsearch/indexer', function() {
     });
 
     let { id, type } = article;
-    let { data:resource, included } = await searcher.get(env.session, branch, type, id);
+    let { data:resource, included } = await searcher.get(env.session, 'local-hub', type, id);
 
     let pristineDoc = await (new DocumentContext({ id, type, branch, schema, read,
       upstreamDoc: { data: resource },
@@ -482,7 +482,7 @@ describe('pgsearch/indexer', function() {
     await writer.update('master', env.session, 'people', person.id, { data: person });
     await indexer.update({ forceRefresh: true });
 
-    let found = await searcher.get(env.session, 'master', 'articles', article.id);
+    let found = await searcher.get(env.session, 'local-hub', 'articles', article.id);
     expect(found).is.ok;
     expect(found).has.deep.property('data.attributes.title');
     expect(found).has.deep.property('data.relationships.author.data.id', person.id);
@@ -521,7 +521,7 @@ describe('pgsearch/indexer', function() {
     await writer.update('master', env.session, 'articles', article.id, { data: article });
     await indexer.update({ forceRefresh: true });
 
-    let found = await searcher.get(env.session, 'master', 'articles', article.id);
+    let found = await searcher.get(env.session, 'local-hub', 'articles', article.id);
     expect(found).is.ok;
     expect(found).has.deep.property('data.attributes.title', 'A Better Title');
     expect(found).has.deep.property('data.relationships.author.data.id', person.id);
@@ -561,7 +561,7 @@ describe('pgsearch/indexer', function() {
 
     await indexer.update({ forceRefresh: true });
 
-    let found = await searcher.get(env.session, 'master', 'articles', article.id);
+    let found = await searcher.get(env.session, 'local-hub', 'articles', article.id);
     expect(found).is.ok;
     expect(found).has.deep.property('data.attributes.title', 'A Better Title');
     expect(found).has.deep.property('data.relationships.author.data.id', person.id);
@@ -601,7 +601,7 @@ describe('pgsearch/indexer', function() {
 
     await indexer.update({ forceRefresh: true });
 
-    let found = await searcher.get(env.session, 'master', 'articles', article.id);
+    let found = await searcher.get(env.session, 'local-hub', 'articles', article.id);
     expect(found).is.ok;
     expect(found).has.deep.property('data.attributes.title', 'A Better Title');
     expect(found).has.deep.property('data.relationships.author.data.id', person.id);
@@ -638,7 +638,7 @@ describe('pgsearch/indexer', function() {
 
     // note that indexer.update() is not called -- invalidation happens as a direct result of updating the doc
 
-    let found = await searcher.get(env.session, 'master', 'articles', article.id);
+    let found = await searcher.get(env.session, 'local-hub', 'articles', article.id);
     expect(found).is.ok;
     expect(found).has.deep.property('data.attributes.title');
     expect(found).has.deep.property('data.relationships.author.data.id', person.id);
@@ -670,7 +670,7 @@ describe('pgsearch/indexer', function() {
       }
     });
 
-    let found = await searcher.get(env.session, 'master', 'articles', article.id);
+    let found = await searcher.get(env.session, 'local-hub', 'articles', article.id);
     expect(found).has.deep.property('data.relationships.author.data.id', person.id);
     expect(found.included[0].attributes.name).to.equal('Quint');
 
@@ -678,7 +678,7 @@ describe('pgsearch/indexer', function() {
     // just need to touch any document to trigger expired resource invalidation
     await writer.update('master', env.session, 'articles', article.id, { data: article });
 
-    found = await searcher.get(env.session, 'master', 'articles', article.id);
+    found = await searcher.get(env.session, 'local-hub', 'articles', article.id);
     expect(found).to.not.have.property('included');
     expect(found).to.have.deep.property('data.relationships.author.data', null);
   });
@@ -697,7 +697,7 @@ describe('pgsearch/indexer', function() {
     });
     expect(article).has.deep.property('id');
     await indexer.update({ forceRefresh: true });
-    let found = await searcher.get(env.session, 'master', 'articles', article.id);
+    let found = await searcher.get(env.session, 'local-hub', 'articles', article.id);
     expect(found).is.ok;
     expect(found).has.deep.property('data.relationships.author.data', null);
   });
@@ -726,7 +726,7 @@ describe('pgsearch/indexer', function() {
     });
     expect(article).has.deep.property('id');
     await indexer.update({ forceRefresh: true });
-    let found = await searcher.get(env.session, 'master', 'articles', article.id);
+    let found = await searcher.get(env.session, 'local-hub', 'articles', article.id);
     expect(found).is.ok;
     expect(found).has.deep.property('data.relationships.reviewers.data');
     expect(found.data.relationships.reviewers.data).length(1);
@@ -749,7 +749,7 @@ describe('pgsearch/indexer', function() {
     expect(article).has.deep.property('id');
     await indexer.update({ forceRefresh: true });
 
-    let found = await searcher.get(env.session, 'master', 'articles', article.id);
+    let found = await searcher.get(env.session, 'local-hub', 'articles', article.id);
     expect(found).is.ok;
     expect(found).has.deep.property('data.attributes.title', 'Hello World');
     expect(found).has.deep.property('data.relationships.author.data', null);
@@ -766,7 +766,7 @@ describe('pgsearch/indexer', function() {
 
     await indexer.update({ forceRefresh: true });
 
-    found = await searcher.get(env.session, 'master', 'articles', article.id);
+    found = await searcher.get(env.session, 'local-hub', 'articles', article.id);
     expect(found).is.ok;
     expect(found).has.deep.property('data.relationships.author.data.id', 'x');
     expect(found).has.property('included');

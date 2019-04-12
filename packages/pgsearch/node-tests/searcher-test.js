@@ -160,7 +160,7 @@ describe('pgsearch/searcher', function() {
   });
 
   it('can be searched for all content', async function() {
-    let { data: models } = await searcher.search(env.session, 'master', {
+    let { data: models } = await searcher.search(env.session, {
       page: { size: 1000 }
     });
     expect(models.filter(m => m.type === 'comments')).to.have.length(20);
@@ -169,7 +169,7 @@ describe('pgsearch/searcher', function() {
   });
 
   it('returns properly formatted records', async function() {
-    let model = (await searcher.get(env.session, 'master', 'people', '1')).data;
+    let model = (await searcher.get(env.session, 'local-hub', 'people', '1')).data;
     let meta = model.meta;
     expect(Object.keys(meta).sort()).deep.equals(['source', 'version']);
     delete model.meta;
@@ -197,7 +197,7 @@ describe('pgsearch/searcher', function() {
   });
 
   it('can be searched via queryString', async function() {
-    let { data: models } = await searcher.search(env.session, 'master', {
+    let { data: models } = await searcher.search(env.session, {
       queryString: 'magic'
     });
     expect(models.filter(m => m.type === 'articles')).to.have.length(1);
@@ -206,14 +206,14 @@ describe('pgsearch/searcher', function() {
   });
 
   it('can be searched via queryString, negative result', async function() {
-    let { data: models } = await searcher.search(env.session, 'master', {
+    let { data: models } = await searcher.search(env.session, {
       queryString: 'thisisanunusedterm'
     });
     expect(models).to.have.length(0);
   });
 
   it('can filter by type', async function() {
-    let { data: models } = await searcher.search(env.session, 'master', {
+    let { data: models } = await searcher.search(env.session, {
       filter: {
         type: 'articles'
       }
@@ -223,7 +223,7 @@ describe('pgsearch/searcher', function() {
   });
 
   it('can sort by type', async function() {
-    let { data: models } = await searcher.search(env.session, 'master', {
+    let { data: models } = await searcher.search(env.session, {
       filter: {
         type: ['articles', 'people']
       },
@@ -234,7 +234,7 @@ describe('pgsearch/searcher', function() {
   });
 
   it('can sort by type in reverse', async function() {
-    let { data: models } = await searcher.search(env.session, 'master', {
+    let { data: models } = await searcher.search(env.session, {
       filter: {
         type: ['articles', 'people']
       },
@@ -246,7 +246,7 @@ describe('pgsearch/searcher', function() {
 
 
   it('can filter by id', async function() {
-    let { data: models } = await searcher.search(env.session, 'master', {
+    let { data: models } = await searcher.search(env.session, {
       filter: {
         id: '1',
         type: ['articles', 'people']
@@ -258,7 +258,7 @@ describe('pgsearch/searcher', function() {
   });
 
   it('can filter a string-array field by terms', async function() {
-    let { data: models } = await searcher.search(env.session, 'master', {
+    let { data: models } = await searcher.search(env.session, {
       filter: {
         'favorite-shapes': ['hexagon', 'square']
       }
@@ -267,7 +267,7 @@ describe('pgsearch/searcher', function() {
   });
 
   it('can filter a string-array field one term', async function() {
-    let { data: models } = await searcher.search(env.session, 'master', {
+    let { data: models } = await searcher.search(env.session, {
       filter: {
         'favorite-shapes': 'pentagon'
       }
@@ -276,7 +276,7 @@ describe('pgsearch/searcher', function() {
   });
 
   it('can sort by id', async function() {
-    let { data: models } = await searcher.search(env.session, 'master', {
+    let { data: models } = await searcher.search(env.session, {
       filter: {
         type: ['articles', 'people']
       },
@@ -286,7 +286,7 @@ describe('pgsearch/searcher', function() {
   });
 
   it('can sort by id in reverse', async function() {
-    let { data: models } = await searcher.search(env.session, 'master', {
+    let { data: models } = await searcher.search(env.session, {
       filter: {
         type: ['articles', 'people']
       },
@@ -297,7 +297,7 @@ describe('pgsearch/searcher', function() {
 
 
   it('can filter a field by one term', async function() {
-    let { data: models } = await searcher.search(env.session, 'master', {
+    let { data: models } = await searcher.search(env.session, {
       filter: {
         'first-name': 'Quint'
       }
@@ -307,7 +307,7 @@ describe('pgsearch/searcher', function() {
   });
 
   it('can filter a field by multiple terms', async function() {
-    let { data: models } = await searcher.search(env.session, 'master', {
+    let { data: models } = await searcher.search(env.session, {
       filter: {
         'first-name': ['Quint', 'Arthur']
       }
@@ -316,7 +316,7 @@ describe('pgsearch/searcher', function() {
   });
 
   it('can use OR expressions in filters', async function() {
-    let { data: models } = await searcher.search(env.session, 'master', {
+    let { data: models } = await searcher.search(env.session, {
       filter: {
         or: [
           { 'first-name': ['Quint'], type: 'people' },
@@ -330,7 +330,7 @@ describe('pgsearch/searcher', function() {
   });
 
   it('can use AND expressions in filters', async function() {
-    let { data: models } = await searcher.search(env.session, 'master', {
+    let { data: models } = await searcher.search(env.session, {
       filter: {
         and: [
           { 'favorite-color': 'red' },
@@ -343,7 +343,7 @@ describe('pgsearch/searcher', function() {
   });
 
   it('can use NOT expressions in filters', async function() {
-    let { data: models } = await searcher.search(env.session, 'master', {
+    let { data: models } = await searcher.search(env.session, {
       filter: {
         type: 'people',
         not: { 'first-name': 'Quint' }
@@ -355,7 +355,7 @@ describe('pgsearch/searcher', function() {
 
 
   it('can filter by range', async function() {
-    let { data: models } = await searcher.search(env.session, 'master', {
+    let { data: models } = await searcher.search(env.session, {
       filter: {
         age: {
           range: {
@@ -369,7 +369,7 @@ describe('pgsearch/searcher', function() {
   });
 
   it('can filter by field existence (string)', async function() {
-    let { data: models } = await searcher.search(env.session, 'master', {
+    let { data: models } = await searcher.search(env.session, {
       filter: {
         'favorite-color': {
           exists: 'true'
@@ -382,7 +382,7 @@ describe('pgsearch/searcher', function() {
   });
 
   it('can filter by field nonexistence (string)', async function() {
-    let { data: models } = await searcher.search(env.session, 'master', {
+    let { data: models } = await searcher.search(env.session, {
       filter: {
         'favorite-color': {
           exists: 'false'
@@ -395,7 +395,7 @@ describe('pgsearch/searcher', function() {
   });
 
   it('can filter by field existence (bool)', async function() {
-    let { data: models } = await searcher.search(env.session, 'master', {
+    let { data: models } = await searcher.search(env.session, {
       filter: {
         'favorite-color': {
           exists: true
@@ -408,7 +408,7 @@ describe('pgsearch/searcher', function() {
   });
 
   it('can filter by field nonexistence (bool)', async function() {
-    let { data: models } = await searcher.search(env.session, 'master', {
+    let { data: models } = await searcher.search(env.session, {
       filter: {
         'favorite-color': {
           exists: false
@@ -421,7 +421,7 @@ describe('pgsearch/searcher', function() {
   });
 
   it('can search within a field with custom indexing behavior', async function() {
-    let { data: models } = await searcher.search(env.session, 'master', {
+    let { data: models } = await searcher.search(env.session, {
       filter: {
         description: 'atoms'
       }
@@ -431,7 +431,7 @@ describe('pgsearch/searcher', function() {
 
   it('gives helpful error when filtering unknown field', async function() {
     try {
-      await searcher.search(env.session, 'master', {
+      await searcher.search(env.session, {
         filter: {
           flavor: 'chocolate'
         }
@@ -447,7 +447,7 @@ describe('pgsearch/searcher', function() {
   });
 
   it('can sort', async function() {
-    let { data: models } = await searcher.search(env.session, 'master', {
+    let { data: models } = await searcher.search(env.session, {
       filter: {
         type: 'people'
       },
@@ -458,7 +458,7 @@ describe('pgsearch/searcher', function() {
 
 
   it('can sort reverse', async function() {
-    let { data: models } = await searcher.search(env.session, 'master', {
+    let { data: models } = await searcher.search(env.session, {
       filter: {
         type: 'people'
       },
@@ -471,7 +471,7 @@ describe('pgsearch/searcher', function() {
     // string fields are only sortable because of the sortFieldName
     // in @cardstack/core-field-types/string. So this is a test that
     // we're using that capability.
-    let { data: models } = await searcher.search(env.session, 'master', {
+    let { data: models } = await searcher.search(env.session, {
       filter: {
         type: 'people'
       },
@@ -485,7 +485,7 @@ describe('pgsearch/searcher', function() {
     // string fields are only sortable because of the sortFieldName
     // in @cardstack/core-field-types/string. So this is a test that
     // we're using that capability.
-    let { data: models } = await searcher.search(env.session, 'master', {
+    let { data: models } = await searcher.search(env.session, {
       filter: {
         type: 'people'
       },
@@ -496,7 +496,7 @@ describe('pgsearch/searcher', function() {
 
   it('has helpful error when sorting by nonexistent field', async function() {
     try {
-      await searcher.search(env.session, 'master', {
+      await searcher.search(env.session, {
         sort: 'something-that-does-not-exist'
       });
       throw new Error("should not get here");
@@ -510,7 +510,7 @@ describe('pgsearch/searcher', function() {
   });
 
   it('can paginate', async function() {
-    let response = await searcher.search(env.session, 'master', {
+    let response = await searcher.search(env.session, {
       filter: { type: 'comments' },
       page: {
         size: 7
@@ -522,7 +522,7 @@ describe('pgsearch/searcher', function() {
 
     let allModels = response.data;
 
-    response = await searcher.search(env.session, 'master', {
+    response = await searcher.search(env.session, {
       filter: { type: 'comments' },
       page: {
         size: 7,
@@ -536,7 +536,7 @@ describe('pgsearch/searcher', function() {
 
     allModels = allModels.concat(response.data);
 
-    response = await searcher.search(env.session, 'master', {
+    response = await searcher.search(env.session, {
       filter: { type: 'comments' },
       page: {
         size: 7,
@@ -554,7 +554,7 @@ describe('pgsearch/searcher', function() {
   });
 
   it('can paginate when results exactly fill final page', async function() {
-    let response = await searcher.search(env.session, 'master', {
+    let response = await searcher.search(env.session, {
       filter: { type: 'comments' },
       page: {
         size: 10
@@ -566,7 +566,7 @@ describe('pgsearch/searcher', function() {
 
     let allModels = response.data;
 
-    response = await searcher.search(env.session, 'master', {
+    response = await searcher.search(env.session, {
       filter: { type: 'comments' },
       page: {
         size: 10,
@@ -583,7 +583,7 @@ describe('pgsearch/searcher', function() {
   });
 
   it('can paginate when sorting by custom field', async function() {
-    let response = await searcher.search(env.session, 'master', {
+    let response = await searcher.search(env.session, {
       filter: { type: 'comments' },
       sort: 'score',
       page: {
@@ -596,7 +596,7 @@ describe('pgsearch/searcher', function() {
     expect(response.data[1].id).to.equal('11'); // this relies on knowing that the fallback sort order is branch/type/id
     expect(response.data[2].id).to.equal('9');
 
-    response = await searcher.search(env.session, 'master', {
+    response = await searcher.search(env.session, {
       filter: { type: 'comments' },
       sort: 'score',
       page: {
@@ -610,12 +610,12 @@ describe('pgsearch/searcher', function() {
   });
 
   it('can get an individual record', async function() {
-    let model = await searcher.get(env.session, 'master', 'articles', '1');
+    let model = await searcher.get(env.session, 'local-hub', 'articles', '1');
     expect(model).has.deep.property('data.attributes.hello', 'magic words');
   });
 
   it('can do analyzed term matching', async function() {
-    let response = await searcher.search(env.session, 'master', {
+    let response = await searcher.search(env.session, {
       filter: {
         hello: 'magic'
       }
@@ -625,7 +625,7 @@ describe('pgsearch/searcher', function() {
   });
 
   it('matches reordered phrase when using analyzed field', async function() {
-    let response = await searcher.search(env.session, 'master', {
+    let response = await searcher.search(env.session, {
       filter: {
         hello: 'words magic'
       }
@@ -634,7 +634,7 @@ describe('pgsearch/searcher', function() {
   });
 
   it('does not match reordered phrase when using exact field', async function() {
-    let response = await searcher.search(env.session, 'master', {
+    let response = await searcher.search(env.session, {
       filter: {
         hello: { exact: 'words magic' }
       }
@@ -644,7 +644,7 @@ describe('pgsearch/searcher', function() {
 
 
   it('can do exact term matching with a phrase', async function() {
-    let response = await searcher.search(env.session, 'master', {
+    let response = await searcher.search(env.session, {
       filter: {
         hello: { exact: 'magic words' }
       }
@@ -654,7 +654,7 @@ describe('pgsearch/searcher', function() {
   });
 
   it('can do exact term matching with a field that contains a capital letter', async function() {
-    let response = await searcher.search(env.session, 'master', {
+    let response = await searcher.search(env.session, {
       filter: {
         'favorite-toy': { exact: 'Sneaky Snake' }
       }
@@ -662,7 +662,7 @@ describe('pgsearch/searcher', function() {
     expect(response.data).length(1);
     expect(response.data[0]).has.deep.property('attributes.favorite-toy', 'Sneaky Snake');
 
-    response = await searcher.search(env.session, 'master', {
+    response = await searcher.search(env.session, {
       filter: {
         'favorite-toy': { exact: ['Sneaky Snake', 'boisterous baboon'] }
       }
@@ -673,7 +673,7 @@ describe('pgsearch/searcher', function() {
   });
 
   it('can ignore case when doing exact term matching for a case insensitive field', async function() {
-    let response = await searcher.search(env.session, 'master', {
+    let response = await searcher.search(env.session, {
       filter: {
         'email-address': { exact: 'HASSAN@EXAMPLE.COM' }
       }
@@ -683,7 +683,7 @@ describe('pgsearch/searcher', function() {
   });
 
   it('incomplete phrase does not match', async function() {
-    let response = await searcher.search(env.session, 'master', {
+    let response = await searcher.search(env.session, {
       filter: {
         hello: { exact: 'magic words extra' }
       }
@@ -692,7 +692,7 @@ describe('pgsearch/searcher', function() {
   });
 
   it('can do exact term matching with multiple phrases', async function() {
-    let response = await searcher.search(env.session, 'master', {
+    let response = await searcher.search(env.session, {
       filter: {
         hello: { exact: ['something else', 'magic words'] }
       }
@@ -702,7 +702,7 @@ describe('pgsearch/searcher', function() {
   });
 
   it('can filter non-searchable belongsTo by id', async function() {
-    let response = await searcher.search(env.session, 'master', {
+    let response = await searcher.search(env.session, {
       filter: {
         'article.id': { exact: '1' }
       }
@@ -711,7 +711,7 @@ describe('pgsearch/searcher', function() {
   });
 
   it('can filter searchable belongsTo by id', async function() {
-    let response = await searcher.search(env.session, 'master', {
+    let response = await searcher.search(env.session, {
       filter: {
         'searchable-article.id': { exact: '1' }
       }
@@ -720,7 +720,7 @@ describe('pgsearch/searcher', function() {
   });
 
   it('can filter non-searchable belongsTo by multiple ids', async function() {
-    let response = await searcher.search(env.session, 'master', {
+    let response = await searcher.search(env.session, {
       filter: {
         'article.id': { exact: ['1', '2'] }
       }
@@ -729,7 +729,7 @@ describe('pgsearch/searcher', function() {
   });
 
   it('can filter searchable belongsTo by multiple ids', async function() {
-    let response = await searcher.search(env.session, 'master', {
+    let response = await searcher.search(env.session, {
       filter: {
         'searchable-article.id': { exact: ['1', '2'] }
       }
@@ -739,7 +739,7 @@ describe('pgsearch/searcher', function() {
 
   it('can filter non-searchable hasMany by id', async function() {
     // todo: select array(select jsonb_array_elements(search_doc->'members')->>'id') from documents;
-    let response = await searcher.search(env.session, 'master', {
+    let response = await searcher.search(env.session, {
       filter: {
         'members.id': { exact: '1' }
       }
@@ -748,7 +748,7 @@ describe('pgsearch/searcher', function() {
   });
 
   it('can filter searchable hasMany by id', async function() {
-    let response = await searcher.search(env.session, 'master', {
+    let response = await searcher.search(env.session, {
       filter: {
         'searchable-members.id': { exact: '1' }
       }
@@ -757,7 +757,7 @@ describe('pgsearch/searcher', function() {
   });
 
   it('can filter non-searchable hasMany by multiple id', async function() {
-    let response = await searcher.search(env.session, 'master', {
+    let response = await searcher.search(env.session, {
       filter: {
         'members.id': { exact: ['1', 'bogus'] }
       }
@@ -766,7 +766,7 @@ describe('pgsearch/searcher', function() {
   });
 
   it('can filter searchable hasMany by multiple id', async function() {
-    let response = await searcher.search(env.session, 'master', {
+    let response = await searcher.search(env.session, {
       filter: {
         'searchable-members.id': { exact: ['1', 'bogus'] }
       }
@@ -775,7 +775,7 @@ describe('pgsearch/searcher', function() {
   });
 
   it('belongs-to attributes are not indexed by default', async function() {
-    let response = await searcher.search(env.session, 'master', {
+    let response = await searcher.search(env.session, {
       filter: {
         'article.hello': 'magic'
       }
@@ -784,7 +784,7 @@ describe('pgsearch/searcher', function() {
   });
 
   it('can filter searchable belongs-to by an attribute', async function() {
-    let response = await searcher.search(env.session, 'master', {
+    let response = await searcher.search(env.session, {
       filter: {
         'searchable-article.hello': 'magic'
       }
@@ -793,7 +793,7 @@ describe('pgsearch/searcher', function() {
   });
 
   it('hasMany attributes are not indexed by default', async function() {
-    let response = await searcher.search(env.session, 'master', {
+    let response = await searcher.search(env.session, {
       filter: {
         'members.first-name': 'Quint'
       }
@@ -802,7 +802,7 @@ describe('pgsearch/searcher', function() {
   });
 
   it('can filter searchable has-many by an attribute', async function() {
-    let response = await searcher.search(env.session, 'master', {
+    let response = await searcher.search(env.session, {
       filter: {
         'searchable-members.first-name': 'Quint'
       }
@@ -811,7 +811,7 @@ describe('pgsearch/searcher', function() {
   });
 
   it('can do prefix matching', async function() {
-    let { data: models } = await searcher.search(env.session, 'master', {
+    let { data: models } = await searcher.search(env.session, {
       filter: {
         'last-name': {
           prefix: 'Faulk'

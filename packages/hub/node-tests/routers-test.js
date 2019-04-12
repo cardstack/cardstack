@@ -205,7 +205,7 @@ describe('hub/routers', function () {
     });
 
     it('can get the default "getting started" application card when no application card has been specified in the plugin-config', async function () {
-      let { included, data: space } = await searchers.get(env.session, 'master', 'spaces', '/');
+      let { included, data: space } = await searchers.getSpace(env.session, '/');
 
       expect(space).has.property('type', 'spaces');
       expect(space).has.property('id', '/');
@@ -222,7 +222,7 @@ describe('hub/routers', function () {
     });
 
     it('uses statically mapped routing for the application card when no routing has been specified', async function() {
-      let { included, data: space } = await searchers.get(env.session, 'master', 'spaces', '/puppies/vanGogh');
+      let { included, data: space } = await searchers.getSpace(env.session, '/puppies/vanGogh');
 
       expect(space).has.property('type', 'spaces');
       expect(space).has.property('id', '/puppies/vanGogh');
@@ -292,7 +292,7 @@ describe('hub/routers', function () {
     });
 
     it('can get the space of a route using a session based query', async function() {
-      let result = await searchers.get(session, 'master', 'spaces', '/puppy');
+      let result = await searchers.getSpace(session, '/puppy');
       let { included, data: space } = result;
 
       expect(space).has.property('type', 'spaces');
@@ -315,7 +315,7 @@ describe('hub/routers', function () {
     });
 
     it('can get the space of a route whose primary card is the session object', async function() {
-      let { included, data: space } = await searchers.get(session, 'master', 'spaces', '/');
+      let { included, data: space } = await searchers.getSpace(session, '/');
 
       expect(space).has.property('type', 'spaces');
       expect(space).has.property('id', '/');
@@ -425,7 +425,7 @@ describe('hub/routers', function () {
     });
 
     it('can return the routing card as the primary card when no query exists for the route', async function () {
-      let { included, data: space } = await searchers.get(env.session, 'master', 'spaces', '/forward/rats/pizza-rat');
+      let { included, data: space } = await searchers.getSpace(env.session, '/forward/rats/pizza-rat');
 
       expect(space).has.property('type', 'spaces');
       expect(space).has.property('id', '/forward/rats/pizza-rat');
@@ -443,7 +443,7 @@ describe('hub/routers', function () {
     });
 
     it('can return the routing card as the primary card when primary card has query param based routes', async function () {
-      let { included, data: space } = await searchers.get(env.session, 'master', 'spaces', '/forward/kitties/sally?kitties[foo]=bar&kitties[bee]=bop&ignore-me=true');
+      let { included, data: space } = await searchers.getSpace(env.session, '/forward/kitties/sally?kitties[foo]=bar&kitties[bee]=bop&ignore-me=true');
 
       expect(space).has.property('type', 'spaces');
       expect(space).has.property('id', '/forward/kitties/sally?kitties[foo]=bar&kitties[bee]=bop&ignore-me=true');
@@ -461,7 +461,7 @@ describe('hub/routers', function () {
     });
 
     it('can return the routing card as the primary card when no query exists for the route with query param', async function () {
-      let { included, data: space } = await searchers.get(env.session, 'master', 'spaces', '/forward/kitties/sally');
+      let { included, data: space } = await searchers.getSpace(env.session, '/forward/kitties/sally');
 
       expect(space).has.property('type', 'spaces');
       expect(space).has.property('id', '/forward/kitties/sally');
@@ -479,7 +479,7 @@ describe('hub/routers', function () {
     });
 
     it('can return an error card when the path does not match any routes', async function () {
-      let { included, data: space } = await searchers.get(env.session, 'master', 'spaces', '/route-that-doesnt-exist');
+      let { included, data: space } = await searchers.getSpace(env.session, '/route-that-doesnt-exist');
 
       expect(space).has.property('type', 'spaces');
       expect(space).has.property('id', '/route-that-doesnt-exist');
@@ -495,7 +495,7 @@ describe('hub/routers', function () {
     });
 
     it('can return an error card when the path does not correspond to a card that exists', async function () {
-      let { included, data: space } = await searchers.get(env.session, 'master', 'spaces', '/forward/cards/route-that-doesnt-exist');
+      let { included, data: space } = await searchers.getSpace(env.session, '/forward/cards/route-that-doesnt-exist');
 
       expect(space).has.property('type', 'spaces');
       expect(space).has.property('id', '/forward/cards/route-that-doesnt-exist');
@@ -510,7 +510,7 @@ describe('hub/routers', function () {
     });
 
     it('can return error card if the router identifies a primary card and the path part of the URL has not been fully consumed', async function () {
-      let { included, data: space } = await searchers.get(env.session, 'master', 'spaces', '/favorite-puppy/blah');
+      let { included, data: space } = await searchers.getSpace(env.session, '/favorite-puppy/blah');
 
       expect(space).has.property('type', 'spaces');
       expect(space).has.property('id', '/favorite-puppy/blah');
@@ -525,7 +525,7 @@ describe('hub/routers', function () {
     });
 
     it('can override the system error card with an error card specific to the routing card', async function () {
-      let { included, data: space } = await searchers.get(env.session, 'master', 'spaces', '/forward/kitties/sally/whaaa');
+      let { included, data: space } = await searchers.getSpace(env.session, '/forward/kitties/sally/whaaa');
 
       expect(space).has.property('type', 'spaces');
       expect(space).has.property('id', '/forward/kitties/sally/whaaa');
@@ -540,7 +540,7 @@ describe('hub/routers', function () {
     });
 
     it('uses system error card if the custom error card doesnt have an instance with the id of "not-found"', async function() {
-      let { included, data: space } = await searchers.get(env.session, 'master', 'spaces', '/forward/rats/pizza-rat/blah');
+      let { included, data: space } = await searchers.getSpace(env.session, '/forward/rats/pizza-rat/blah');
 
       expect(space).has.property('type', 'spaces');
       expect(space).has.property('id', '/forward/rats/pizza-rat/blah');
@@ -555,7 +555,7 @@ describe('hub/routers', function () {
     });
 
     it('uses system error card if the custom error card doesnt have an open grant', async function() {
-      let { included, data: space } = await searchers.get(env.session, 'master', 'spaces', '/forward/fishes/nemo/blah');
+      let { included, data: space } = await searchers.getSpace(env.session, '/forward/fishes/nemo/blah');
 
       expect(space).has.property('type', 'spaces');
       expect(space).has.property('id', '/forward/fishes/nemo/blah');
@@ -570,17 +570,17 @@ describe('hub/routers', function () {
     });
 
     it('can return an http-status of 404 for the `not-found` error card', async function() {
-      let { data: space } = await searchers.get(env.session, 'master', 'spaces', '/non-existant-card');
+      let { data: space } = await searchers.getSpace(env.session, '/non-existant-card');
       expect(space).has.deep.property('attributes.http-status', 404);
     });
 
     it('can return an http-status of 200 for a card that is not an error card', async function() {
-      let { data: space } = await searchers.get(env.session, 'master', 'spaces', '/favorite-puppy');
+      let { data: space } = await searchers.getSpace(env.session, '/favorite-puppy');
       expect(space).has.deep.property('attributes.http-status', 200);
     });
 
     it('can get the space using a route that is static', async function () {
-      let { included, data: space } = await searchers.get(env.session, 'master', 'spaces', '/favorite-puppy');
+      let { included, data: space } = await searchers.getSpace(env.session, '/favorite-puppy');
 
       expect(space).has.property('type', 'spaces');
       expect(space).has.property('id', '/favorite-puppy');
@@ -600,7 +600,7 @@ describe('hub/routers', function () {
     });
 
     it('can get the space using a route that has dynamic segments and additional-parameters', async function () {
-      let { included, data: space } = await searchers.get(env.session, 'master', 'spaces', '/buddy/Ringo');
+      let { included, data: space } = await searchers.getSpace(env.session, '/buddy/Ringo');
 
       expect(space).has.property('type', 'spaces');
       expect(space).has.property('id', '/buddy/Ringo');
@@ -627,7 +627,7 @@ describe('hub/routers', function () {
     });
 
     it('can get the space using a route that uses contextual card data', async function () {
-      let {included, data: space } = await searchers.get(env.session, 'master', 'spaces', '/contextual-favorite-toy/squeaky-snake');
+      let {included, data: space } = await searchers.getSpace(env.session, '/contextual-favorite-toy/squeaky-snake');
 
       expect(space).has.property('type', 'spaces');
       expect(space).has.property('id', '/contextual-favorite-toy/squeaky-snake');
@@ -647,7 +647,7 @@ describe('hub/routers', function () {
     });
 
     it('can get the space using a route that uses a query param', async function () {
-      let { included, data: space } = await searchers.get(env.session, 'master', 'spaces', '/sorted?cards[sort]=favorite-toy&foo=bar&bee=bop');
+      let { included, data: space } = await searchers.getSpace(env.session, '/sorted?cards[sort]=favorite-toy&foo=bar&bee=bop');
 
       expect(space).has.property('type', 'spaces');
       expect(space).has.property('id', '/sorted?cards[sort]=favorite-toy&foo=bar&bee=bop');
@@ -667,7 +667,7 @@ describe('hub/routers', function () {
     });
 
     it('does not include query params that were not consumed', async function () {
-      let { data: space } = await searchers.get(env.session, 'master', 'spaces', '/favorite-puppy?foo=bar');
+      let { data: space } = await searchers.getSpace(env.session, '/favorite-puppy?foo=bar');
 
       expect(space).has.property('type', 'spaces');
       expect(space).has.property('id', '/favorite-puppy?foo=bar');
@@ -679,7 +679,7 @@ describe('hub/routers', function () {
     });
 
     it('can route to a path that includes routing card data', async function() {
-      let { included, data: space } = await searchers.get(env.session, 'master', 'spaces', '/kitty-breeds/dalmatian/sally');
+      let { included, data: space } = await searchers.getSpace(env.session, '/kitty-breeds/dalmatian/sally');
 
       expect(space).has.property('type', 'spaces');
       expect(space).has.property('id', '/kitty-breeds/dalmatian/sally');
@@ -697,7 +697,7 @@ describe('hub/routers', function () {
     });
 
     it('can route to a path that includes routing card data in multiple nested routes', async function() {
-      let { included, data: space } = await searchers.get(env.session, 'master', 'spaces', '/kitty-breeds/dalmatian/sally/Sally/puppy-friends/vanGogh');
+      let { included, data: space } = await searchers.getSpace(env.session, '/kitty-breeds/dalmatian/sally/Sally/puppy-friends/vanGogh');
 
       expect(space).has.property('type', 'spaces');
       expect(space).has.property('id', '/kitty-breeds/dalmatian/sally/Sally/puppy-friends/vanGogh');
@@ -715,7 +715,7 @@ describe('hub/routers', function () {
     });
 
     it('can route to a path that includes routing card data in multiple nested routes that terminates in query-less route', async function() {
-      let { included, data: space } = await searchers.get(env.session, 'master', 'spaces', '/kitty-breeds/dalmatian/sally/Sally/fish-friend/nemo');
+      let { included, data: space } = await searchers.getSpace(env.session, '/kitty-breeds/dalmatian/sally/Sally/fish-friend/nemo');
 
       expect(space).has.property('type', 'spaces');
       expect(space).has.property('id', '/kitty-breeds/dalmatian/sally/Sally/fish-friend/nemo');
@@ -733,7 +733,7 @@ describe('hub/routers', function () {
     });
 
     it('can route to a path that includes routing card data whose routing card`s query uses card data', async function() {
-      let { included, data: space } = await searchers.get(env.session, 'master', 'spaces', '/forward/rats/pizza-rat/Pizza%20Rat/fish-friend');
+      let { included, data: space } = await searchers.getSpace(env.session, '/forward/rats/pizza-rat/Pizza%20Rat/fish-friend');
 
       expect(space).has.property('type', 'spaces');
       expect(space).has.property('id', '/forward/rats/pizza-rat/Pizza%20Rat/fish-friend');
@@ -751,7 +751,7 @@ describe('hub/routers', function () {
     });
 
     it('can route to a path that includes routing card that is retrieved via upstream routing card data', async function() {
-      let { included, data: space } = await searchers.get(env.session, 'master', 'spaces', '/forward/rats/pizza-rat/Pizza%20Rat/fish-friend/Nemo/dinner-for');
+      let { included, data: space } = await searchers.getSpace(env.session, '/forward/rats/pizza-rat/Pizza%20Rat/fish-friend/Nemo/dinner-for');
 
       expect(space).has.property('type', 'spaces');
       expect(space).has.property('id', '/forward/rats/pizza-rat/Pizza%20Rat/fish-friend/Nemo/dinner-for');
@@ -804,7 +804,7 @@ describe('hub/routers', function () {
     it('throws an error when it encounters a route that is missing a path', async function () {
       let error;
       try {
-        await searchers.get(env.session, 'master', 'spaces', '/');
+        await searchers.getSpace(env.session, '/');
       } catch (err) { error = err.message; }
 
       expect(error).to.equal(`The router for content type 'cards' has a route that is missing a path.`);
@@ -845,7 +845,7 @@ describe('hub/routers', function () {
     it('throws an error when it encounters a path definied in a route that does not start with "/"', async function () {
       let error;
       try {
-        await searchers.get(env.session, 'master', 'spaces', '/');
+        await searchers.getSpace(env.session, '/');
       } catch (err) { error = err.message; }
 
       expect(error).to.equal(`The path of the route for content type 'cards' at path 'app-card' does not begin with '/'.`);
@@ -902,7 +902,7 @@ describe('hub/routers', function () {
     it('throws an error maximum route stack size is exceeded while building router map', async function () {
       let error;
       try {
-        await searchers.get(env.session, 'master', 'spaces', '/deep');
+        await searchers.getSpace(env.session, '/deep');
       } catch (err) { error = err.message; }
 
       expect(error).to.match(/^Recursed through more than 50 routers when building routing map/);
@@ -962,7 +962,7 @@ describe('hub/routers', function () {
     });
 
     it('returns error card when a route has been matched, but its antecedant routing card does not exist', async function() {
-      let { included, data: space } = await searchers.get(env.session, 'master', 'spaces', '/router/puppy');
+      let { included, data: space } = await searchers.getSpace(env.session, '/router/puppy');
 
       expect(space).has.property('type', 'spaces');
       expect(space).has.property('id', '/router/puppy');
