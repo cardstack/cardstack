@@ -15,9 +15,9 @@ const {
 describe('github-auth/searcher', function() {
   let env, searchers;
 
-  async function alterExpiration(branch, type, id, interval) {
+  async function alterExpiration(type, id, interval) {
     let client = env.lookup(`plugin-client:${require.resolve('@cardstack/pgsearch/client')}`);
-    let result = await client.query('update documents set expires = expires + $1 where branch=$2 and type=$3 and id=$4', [interval, branch, type, id]);
+    let result = await client.query('update documents set expires = expires + $1 where type=$2 and id=$3', [interval, type, id]);
     if (result.rowCount !== 1) {
       throw new Error(`test was unable to alter expiration`);
     }
@@ -299,12 +299,12 @@ describe('github-auth/searcher', function() {
       await searchers.get(env.session, 'local-hub', 'github-users', id);
       mock.name = "Van Gogh";
 
-      await alterExpiration('master', 'github-users', id, '-30 seconds');
+      await alterExpiration('github-users', id, '-30 seconds');
 
       let user = await searchers.get(env.session, 'local-hub', 'github-users', id);
       expect(user).has.deep.property('data.attributes.name', "Hassan Abdel-Rahman");
 
-      await alterExpiration('master', 'github-users', id, '-31 seconds');
+      await alterExpiration('github-users', id, '-31 seconds');
 
       user = await searchers.get(env.session, 'local-hub', 'github-users', id);
       expect(user).has.deep.property('data.attributes.name', "Van Gogh");
@@ -348,12 +348,12 @@ describe('github-auth/searcher', function() {
       await searchers.get(env.session, 'local-hub', 'github-users', id);
       mock.name = "Van Gogh";
 
-      await alterExpiration('master', 'github-users', id, '-61 seconds');
+      await alterExpiration('github-users', id, '-61 seconds');
 
       let user = await searchers.get(env.session, 'local-hub', 'github-users', id);
       expect(user).has.deep.property('data.attributes.name', "Hassan Abdel-Rahman");
 
-      await alterExpiration('master', 'github-users', id, '-240 seconds');
+      await alterExpiration('github-users', id, '-240 seconds');
       user = await searchers.get(env.session, 'local-hub', 'github-users', id);
       expect(user).has.deep.property('data.attributes.name', "Van Gogh");
     });

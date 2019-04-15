@@ -1394,14 +1394,14 @@ contract('Token Indexing', function (accounts) {
           await env.lookup('hub:searchers').get(env.session, 'local-hub', 'sample-token-balance-ofs', accountOne);
           throw new Error("balance-of record should not exist for this address");
         } catch (err) {
-          expect(err.message).to.equal(`No such resource master/sample-token-balance-ofs/${accountOne}`);
+          expect(err.message).to.equal(`No such resource local-hub/sample-token-balance-ofs/${accountOne}`);
         }
 
         try {
           await env.lookup('hub:searchers').get(env.session, 'local-hub', 'sample-token-balance-ofs', accountTwo);
           throw new Error("balance-of record should not exist for this address");
         } catch (err) {
-          expect(err.message).to.equal(`No such resource master/sample-token-balance-ofs/${accountTwo}`);
+          expect(err.message).to.equal(`No such resource local-hub/sample-token-balance-ofs/${accountTwo}`);
         }
 
         let { logs: mintEvents } = await token.mint(accountOne, 100);
@@ -1490,28 +1490,28 @@ contract('Token Indexing', function (accounts) {
           await env.lookup('hub:searchers').get(env.session, 'local-hub', 'sample-token-custom-buyer-limits', accountOne);
           throw new Error("sample-token-custom-buyer-limits record should not exist for this address");
         } catch (err) {
-          expect(err.message).to.equal(`No such resource master/sample-token-custom-buyer-limits/${accountOne}`);
+          expect(err.message).to.equal(`No such resource local-hub/sample-token-custom-buyer-limits/${accountOne}`);
         }
 
         try {
           await env.lookup('hub:searchers').get(env.session, 'local-hub', 'sample-token-approved-buyers', accountOne);
           throw new Error("sample-token-approved-buyers record should not exist for this address");
         } catch (err) {
-          expect(err.message).to.equal(`No such resource master/sample-token-approved-buyers/${accountOne}`);
+          expect(err.message).to.equal(`No such resource local-hub/sample-token-approved-buyers/${accountOne}`);
         }
 
         try {
           await env.lookup('hub:searchers').get(env.session, 'local-hub', 'sample-token-custom-buyer-limits', accountTwo);
           throw new Error("sample-token-custom-buyer-limits record should not exist for this address");
         } catch (err) {
-          expect(err.message).to.equal(`No such resource master/sample-token-custom-buyer-limits/${accountTwo}`);
+          expect(err.message).to.equal(`No such resource local-hub/sample-token-custom-buyer-limits/${accountTwo}`);
         }
 
         try {
           await env.lookup('hub:searchers').get(env.session, 'local-hub', 'sample-token-approved-buyers', accountTwo);
           throw new Error("sample-token-approved-buyers record should not exist for this address");
         } catch (err) {
-          expect(err.message).to.equal(`No such resource master/sample-token-approved-buyers/${accountTwo}`);
+          expect(err.message).to.equal(`No such resource local-hub/sample-token-approved-buyers/${accountTwo}`);
         }
 
         let { logs: events } = await token.addBuyer(accountOne);

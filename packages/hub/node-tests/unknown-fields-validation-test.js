@@ -76,7 +76,7 @@ describe('unknown fields validation', function() {
   async function changeArticleField() {
     let articleContentType = await env.lookup('hub:searchers').get(env.session, 'local-hub', 'content-types', 'articles');
 
-    await env.lookup('hub:writers').update('master', env.session, 'content-types', 'articles', {
+    await env.lookup('hub:writers').update(env.session, 'content-types', 'articles', {
       data: {
         type: 'content-types',
         meta: {
@@ -90,7 +90,7 @@ describe('unknown fields validation', function() {
   }
 
   async function createArticle(attributes) {
-    return await env.lookup('hub:writers').create('master', env.session, 'articles', {
+    return await env.lookup('hub:writers').create(env.session, 'articles', {
       data: {
         type: 'articles',
         attributes
@@ -105,7 +105,7 @@ describe('unknown fields validation', function() {
   async function updateArticle(id, attributes) {
     let article = await readArticle(id);
 
-    await env.lookup('hub:writers').update('master', env.session, 'articles', id, {
+    await env.lookup('hub:writers').update(env.session, 'articles', id, {
       data: {
         type: 'articles',
         meta: {

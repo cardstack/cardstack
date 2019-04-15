@@ -23,7 +23,7 @@ class Routers {
       return { routerMap: this.routerMap, applicationCard: this.applicationCard, routerMapByDepth: this.routerMapByDepth };
     }
 
-    let schema = await this.currentSchema.forControllingBranch();
+    let schema = await this.currentSchema.getSchema();
     let applicationCard = await this._getApplicationCard();
 
     this.routerMap = this._discoverRouters(schema, applicationCard.data.type);
@@ -35,13 +35,13 @@ class Routers {
     return { routerMap: this.routerMap, applicationCard: this.applicationCard, routerMapByDepth: this.routerMapByDepth };
   }
 
-  async getSpace(branch, path, session={}) {
+  async getSpace(path, session={}) {
     await this.getRoutersInfo();
 
-    let schema = await this.currentSchema.forBranch(branch);
+    let schema = await this.currentSchema.getSchema();
 
     let primaryCard, errorReason;
-    let routeInfo = await getRoute(this.searchers, this.routerMap, branch, path, this.applicationCard, session);
+    let routeInfo = await getRoute(this.searchers, this.routerMap, path, this.applicationCard, session);
     let { params={}, allowedQueryParams=[], routingCard, matchedRoute, remainingPath, query, routeStack=[] } = routeInfo || {};
 
     if (!routeInfo) {
@@ -49,7 +49,7 @@ class Routers {
       primaryCard = await this._getNotFoundErrorCard(schema);
     } else {
       let { data: cards, included } = query ?
-        await this.searchers.search(Session.INTERNAL_PRIVILEGED, query, branch) :
+        await this.searchers.search(Session.INTERNAL_PRIVILEGED, query) :
         { data: [routingCard.data], included: routingCard.included };
 
       if (!cards || !cards.length) {
@@ -89,7 +89,7 @@ class Routers {
       included
     };
 
-    log.debug(`Routing path '${path}' for branch '${branch}' for session '${session.type}/${session.id}' to space: ${JSON.stringify(space, null, 2)}`);
+    log.debug(`Routing path '${path}' for session '${session.type}/${session.id}' to space: ${JSON.stringify(space, null, 2)}`);
     if (errorReason) {
       log.debug(`Routing to path '${path}' for session '${session.type}/${session.id}' resulted in error card. Reason: ${errorReason}`);
     }

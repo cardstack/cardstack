@@ -8,7 +8,6 @@
 @import "cs-version-control";
 @import "cs-field-editor";
 @import "cs-collapsible-section";
-@import "cs-branch-control";
 @import "cs-placeholder-create";
 
 .cardstack-right-edge {

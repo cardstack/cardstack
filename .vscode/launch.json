@@ -122,7 +122,7 @@
                 "--timeout",
                 "200000",
                 // "--grep",
-                // "retries on id collision"
+                // "can delete a record"
             ]
         },
         {

@@ -70,9 +70,9 @@ export default Component.extend({
     }
   }).restartable(),
 
-  afterModelSaved(model, branch) {
+  afterModelSaved(model) {
     let location = this.get('router.location');
-    let url = urlForModel(this, model, { branch });
+    let url = urlForModel(this, model);
     location.setURL(url);
   },
 

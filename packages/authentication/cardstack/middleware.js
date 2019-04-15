@@ -26,7 +26,6 @@ module.exports = declareInjections({
   writer: 'hub:writers',
   indexers: 'hub:indexers',
   sources: 'hub:data-sources',
-  controllingBranch: 'hub:controlling-branch',
   ciSession: 'config:ci-session',
   currentSchema: 'hub:current-schema'
 },
@@ -185,7 +184,7 @@ class Authentication {
     let sessionMeta = await this._sessionMeta();
     let session = this.sessions.create(sessionPayload.type, sessionPayload.id, sessionMeta);
 
-    let schema = await this.currentSchema.forControllingBranch();
+    let schema = await this.currentSchema.getSchema();
     let canLogin = await schema.hasLoginAuthorization(session);
     let creatableTypes = await schema.authorizedCreatableContentTypes(session);
 
@@ -262,12 +261,10 @@ class Authentication {
   }
 
   async _applyReadAuthorization(session, user) {
-    let branch = this.controllingBranch.name;
-    let schema = await this.currentSchema.forControllingBranch();
+    let schema = await this.currentSchema.getSchema();
     let documentContext = this.searcher.createDocumentContext({
       type: user.data.type,
       id: user.data.id,
-      branch,
       schema,
       upstreamDoc: user
     });
@@ -309,11 +306,11 @@ class Authentication {
     }
 
     if (!have && source.mayCreateUser) {
-      have = await this.writer.create(this.controllingBranch.name, Session.INTERNAL_PRIVILEGED, user.data.type, user);
+      have = await this.writer.create(Session.INTERNAL_PRIVILEGED, user.data.type, user);
     }
     if (have && source.mayUpdateUser) {
       user.data.meta = have.data.meta;
-      have = await this.writer.update(this.controllingBranch.name, Session.INTERNAL_PRIVILEGED, user.data.type, have.data.id, user);
+      have = await this.writer.update(Session.INTERNAL_PRIVILEGED, user.data.type, have.data.id, user);
     }
 
     return have;

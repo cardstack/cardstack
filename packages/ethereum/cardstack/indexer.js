@@ -7,11 +7,8 @@ const { declareInjections } = require('@cardstack/di');
 const { fieldTypeFor } = require('./abi-utils');
 const { apply_patch } = require('jsonpatch');
 
-const defaultBranch = 'master';
-
 module.exports = declareInjections({
   searchers: 'hub:searchers',
-  controllingBranch: 'hub:controlling-branch',
   ethereumClient: `plugin-services:${require.resolve('./client')}`,
   eventIndexer: `plugin-services:${require.resolve('./event-indexer')}`,
   transactionIndexer: `plugin-services:${require.resolve('./transaction-indexer')}`
@@ -25,21 +22,16 @@ module.exports = declareInjections({
       return new this(...args);
     }
 
-    constructor({ ethereumClient, dataSource, jsonRpcUrls, controllingBranch, contract, addressIndexing, patch, searchers, eventIndexer, transactionIndexer }) {
+    constructor({ ethereumClient, dataSource, jsonRpcUrls, contract, addressIndexing, patch, searchers, eventIndexer, transactionIndexer }) {
       this.dataSourceId = dataSource.id;
       this.contract = contract;
       this.addressIndexing = addressIndexing;
       this.searchers = searchers;
       this.eventIndexer = eventIndexer;
       this.transactionIndexer = transactionIndexer;
-      this.controllingBranch = controllingBranch;
       this.patch = patch || Object.create(null);
       this.jsonRpcUrls = jsonRpcUrls;
       this.ethereumClient = ethereumClient;
-    }
-
-    async branches() {
-      return [this.controllingBranch.name];
     }
 
     async beginUpdate() {
@@ -399,7 +391,7 @@ class Updater {
 
     if (this.contract) {
       log.debug(`starting updateContent() indexing of contract events`);
-      let shouldSkip = await this.eventIndexer.shouldSkipIndexing(this.dataSourceId, defaultBranch);
+      let shouldSkip = await this.eventIndexer.shouldSkipIndexing(this.dataSourceId);
       blockHeight = lastBlockHeight;
       if (!shouldSkip) {
         let eventBlockHeight = await this.eventIndexer.getBlockHeight();

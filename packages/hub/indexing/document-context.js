@@ -7,7 +7,7 @@ const Session = require('@cardstack/plugin-utils/session');
 
 module.exports = class DocumentContext {
 
-  constructor({ read, routers, schema, type, id, branch, sourceId, generation, upstreamDoc, includePaths }) {
+  constructor({ read, routers, schema, type, id, sourceId, generation, upstreamDoc, includePaths }) {
     if (upstreamDoc && !upstreamDoc.data) {
       throw new Error('The upstreamDoc must have a top-level "data" property', {
         status: 400
@@ -17,7 +17,6 @@ module.exports = class DocumentContext {
     this.routers = routers;
     this.type = type;
     this.id = id;
-    this.branch = branch;
     this.sourceId = sourceId;
     this.generation = generation;
     this.upstreamDoc = upstreamDoc;
@@ -309,7 +308,6 @@ module.exports = class DocumentContext {
       id: resource.id,
       upstreamDoc: { data: resource },
       schema: this.schema,
-      branch: this.branch,
       read: this._read,
       routers: this.routers,
     });
@@ -471,12 +469,6 @@ module.exports = class DocumentContext {
 
   async _build(type, id, jsonapiDoc, searchTree, depth, fieldsetFormat) {
     let isCollection = this.isCollection && depth === 0;
-    // we store the id as a regular field in elasticsearch here, because
-    // we use elasticsearch's own built-in _id for our own composite key
-    // that takes into account branches.
-    //
-    // we don't store the type as a regular field in elasticsearch,
-    // because we're keeping it in the built in _type field.
     let searchDoc = isCollection ? {} : { ['id']: id };
 
     // this is the copy of the document we will return to anybody who

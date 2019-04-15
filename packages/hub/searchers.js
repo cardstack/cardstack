@@ -8,7 +8,6 @@ const { get } = require('lodash');
 const localHubSource = 'local-hub';
 
 module.exports = declareInjections({
-  controllingBranch: 'hub:controlling-branch',
   sources: 'hub:data-sources',
   internalSearcher: `plugin-searchers:${require.resolve('@cardstack/pgsearch/searcher')}`,
   client: `plugin-client:${require.resolve('@cardstack/pgsearch/client')}`,
@@ -35,21 +34,14 @@ class Searchers {
     return this._sources;
   }
 
-  async getResourceAndMeta(session, branchRequest, type, id) {
-    let branch = branchRequest;
-
-    // only ever get the branches off the controlling branch
-    if (type === 'branches') {
-      branch = this.controllingBranch.name;
-    }
-
+  async getResourceAndMeta(session, type, id) {
     let sources = await this._lookupSources();
     let index = 0;
     let sessionOrEveryone = session || Session.EVERYONE;
     let next = async () => {
       let source = sources[index++];
       if (source) {
-        let response = await source.searcher.get(sessionOrEveryone, branch, type, id, next);
+        let response = await source.searcher.get(sessionOrEveryone, type, id, next);
         if (source.id != null && response && response.data) {
           if (!response.data.meta) {
             response.data.meta = {};
@@ -67,7 +59,7 @@ class Searchers {
     let { data, meta, included } = result || {};
     let maxAge = get(result, 'meta.cardstack-cache-control.max-age');
     if (data && maxAge != null) {
-      await this._startCacheJob(branch, { data, meta, included }, maxAge);
+      await this._startCacheJob({ data, meta, included }, maxAge);
     }
     return { resource: data, meta, included };
   }
@@ -88,25 +80,17 @@ class Searchers {
     if (source !== localHubSource) {
       throw new Error(`You specified the source: '${source}' in Searchers.get(). Currently the cardstack hub does not support non-local hub sources.`);
     }
-    if (arguments.length === 5 && typeof opts !== 'object') {
-      throw new Error(`Searchers.get() expects parameters: 'session', 'source', packageName', 'cardId', and 'opts'. The 'branch' parameter has been deprecated, instead specify 'opts.version'`);
-    }
 
-    let { version, includePaths } = opts;
-    // only ever get the branches off the controlling branch
-    if (packageName === 'branches' || !version) {
-      version = this.controllingBranch.name;
-    }
+    let { /*version,*/ includePaths } = opts; // TODO eventually we will handle "version" in the opts to getting a snapshot of a resource
 
-    let { resource, meta, included } = await this.getResourceAndMeta(session, version, packageName, cardId);
+    let { resource, meta, included } = await this.getResourceAndMeta(session, packageName, cardId);
     let authorizedResult;
     let documentContext;
     if (resource) {
-      let schema = await this.currentSchema.forBranch(version);
+      let schema = await this.currentSchema.getSchema();
       documentContext = this.createDocumentContext({
         id: cardId,
         type: packageName,
-        branch: version,
         schema,
         includePaths,
         upstreamDoc: { data: resource, meta, included }
@@ -115,7 +99,7 @@ class Searchers {
     }
 
     if (!authorizedResult) {
-      throw new Error(`No such resource ${version}/${packageName}/${cardId}`, {
+      throw new Error(`No such resource ${source}/${packageName}/${cardId}`, {
         status: 404
       });
     }
@@ -123,15 +107,15 @@ class Searchers {
     return authorizedResult;
   }
 
-  async getBinary(session, source, packageName, cardId, type, modelId, opts) {
+  async getBinary(session, source, packageName, cardId, type, modelId, opts={}) {
     // look up authorized result to check read is authorized by going through
     // the default auth stack for the JSON representation. Error will be thrown
     // if authorization is not correct.
-    let { version:branch } = opts;
+    let { version } = opts;
 
     // TODO this needs to get the card's internal model that backs the binary data.
     // this.get() will ultimately be the incorrect place to retrieve this from...
-    let document = await this.get(session, source, type, modelId, { version: branch });
+    let document = await this.get(session, source, type, modelId, { version });
 
     // TODO ultimately there will be no need to look up the source as it is being provided
     // as an argument to this method.
@@ -144,32 +128,24 @@ class Searchers {
     let dataSource = sources.find(s => s.id === sourceId);
 
     let sessionOrEveryone = session || Session.EVERYONE;
-    let result = await dataSource.searcher.getBinary(sessionOrEveryone, branch, type, modelId);
+    let result = await dataSource.searcher.getBinary(sessionOrEveryone, type, modelId);
 
     return [result, document];
   }
 
-  async getFromControllingBranch() {
-    throw new Error(`Searchers.getFromControllingBranch() has been deprecated. Use Searchers.get() instead.`);
-  }
-
-  async search(session, query, version) {
+  async search(session, query) {
     if (typeof query !== 'object') {
-      throw new Error(`Searchers.get() expects parameters: 'session', 'query', and 'version' (aka branch)`);
-    }
-    // only ever get the branches off the controlling branch
-    if (get(query,'filter.type.exact') === "branches" || !version) {
-      version = this.controllingBranch.name;
+      throw new Error(`Searchers.get() expects parameters: 'session', 'query'`);
     }
 
     let sources = await this._lookupSources();
-    let schemaPromise = this.currentSchema.forBranch(version);
+    let schemaPromise = this.currentSchema.getSchema();
     let index = 0;
     let sessionOrEveryone = session || Session.EVERYONE;
     let next = async () => {
       let source = sources[index++];
       if (source) {
-        let response = await source.searcher.search(sessionOrEveryone, version, query, next);
+        let response = await source.searcher.search(sessionOrEveryone, query, next);
         response.data.forEach(resource => {
           if (!resource.meta) {
             resource.meta = {};
@@ -186,7 +162,6 @@ class Searchers {
       let schema = await schemaPromise;
       let includePaths = (get(query, 'include') || '').split(',');
       let documentContext = this.createDocumentContext({
-        branch: version,
         schema,
         includePaths,
         upstreamDoc: result,
@@ -205,30 +180,25 @@ class Searchers {
     }
   }
 
-  async searchFromControllingBranch() {
-    throw new Error(`Searchers.searchFromControllingBranch() has been deprecated. Use Searchers.search() instead.`);
-  }
-
-  createDocumentContext({ schema, type, id, branch, sourceId, generation, upstreamDoc, includePaths }) {
+  createDocumentContext({ schema, type, id, sourceId, generation, upstreamDoc, includePaths }) {
     return new DocumentContext({
       schema,
       type,
       id,
-      branch,
       sourceId,
       generation,
       upstreamDoc,
       includePaths,
       routers: this._getRouters(),
-      read: this._read(branch)
+      read: this._read()
     });
   }
 
-  _read(branch) {
+  _read() {
     return async (type, id) => {
       let resource;
       try {
-        resource = (await this.getResourceAndMeta(Session.INTERNAL_PRIVILEGED, branch, type, id)).resource;
+        resource = (await this.getResourceAndMeta(Session.INTERNAL_PRIVILEGED, type, id)).resource;
       } catch (err) {
         if (err.status !== 404) { throw err; }
       }
@@ -240,29 +210,28 @@ class Searchers {
     if (this._workersSetup) { return; }
 
     this._workersSetup = true;
-    await this.jobQueue.subscribe("hub/searchers/cache", async ({ data: { branch, maxAge, upstreamDoc } }) => {
+    await this.jobQueue.subscribe("hub/searchers/cache", async ({ data: { maxAge, upstreamDoc } }) => {
       this._cachingPromise = Promise.resolve(this._cachingPromise)
-        .then(() => this._cacheDocument(branch, upstreamDoc, maxAge));
+        .then(() => this._cacheDocument(upstreamDoc, maxAge));
       return await this._cachingPromise;
     });
   }
 
-  async _startCacheJob(branch, upstreamDoc, maxAge) {
+  async _startCacheJob(upstreamDoc, maxAge) {
     await this._setupWorkers();
 
     await this.jobQueue.publishAndWait('hub/searchers/cache',
-      { branch, upstreamDoc, maxAge },
+      { upstreamDoc, maxAge },
       { singletonKey: 'hub/searchers/cache', singletonNextSlot: true }
     );
   }
 
-  async _cacheDocument(branch, upstreamDoc, maxAge) {
+  async _cacheDocument(upstreamDoc, maxAge) {
     let { data: { id, type } } = upstreamDoc;
-    let schema = await this.currentSchema.forBranch(branch);
+    let schema = await this.currentSchema.getSchema();
     let documentContext = this.createDocumentContext({
       id,
       type,
-      branch,
       schema,
       upstreamDoc: upstreamDoc
     });

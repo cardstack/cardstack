@@ -1,5 +1,4 @@
 import { inject as service } from '@ember/service';
-import { defaultBranch } from '@cardstack/plugin-utils/environment';
 import { modelType } from '@cardstack/rendering/helpers/cs-model-type';
 import { urlForModel } from '@cardstack/routing/helpers/cardstack-url';
 import { warn } from '@ember/debug';
@@ -24,8 +23,7 @@ export default Component.extend({
     navigateToCard(model) {
       let path = urlForModel(this, model);
       if (path) {
-        // TODO: I don't know why the defaultBranch is not working here
-        let { name, params, queryParams } = this.get('cardstackRouting').routeFor(path, defaultBranch || 'master');
+        let { name, params, queryParams } = this.get('cardstackRouting').routeFor(path);
 
         this.get('router').transitionTo(name, ...params.map(p => {
           if (p[1].charAt('0') === '/') {

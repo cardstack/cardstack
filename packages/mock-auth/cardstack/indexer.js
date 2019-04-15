@@ -17,10 +17,6 @@ module.exports = class Indexer {
     }
   }
 
-  async branches() {
-    return ['master'];
-  }
-
   async beginUpdate() {
     return new Updater(this.disabled);
   }

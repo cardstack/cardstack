@@ -3,7 +3,7 @@ const { declareInjections } = require('@cardstack/di');
 const find = require('../async-find');
 
 module.exports = declareInjections({
-  schema: 'hub:current-schema',
+  currentSchema: 'hub:current-schema',
   searchers: 'hub:searchers'
 },
 
@@ -11,13 +11,13 @@ class PermissionsSearcher {
   static create(...args) {
     return new this(...args);
   }
-  constructor({ dataSource, schema, searchers}) {
+  constructor({ dataSource, currentSchema, searchers}) {
     this.dataSource = dataSource;
-    this.schema = schema;
+    this.currentSchema = currentSchema;
     this.searchers = searchers;
   }
 
-  async get(session, branch, type, id, next) {
+  async get(session, type, id, next) {
     if (type !== 'permissions') {
       return next();
     }
@@ -26,7 +26,7 @@ class PermissionsSearcher {
 
     let context = { session, type: queryType };
 
-    let contentType = (await this.schema.forBranch(branch)).types.get(queryType);
+    let contentType = (await this.currentSchema.getSchema()).types.get(queryType);
     if (!contentType) {
       throw new Error(`content type "${queryType}" not found`, {
         status: 404,
@@ -47,7 +47,7 @@ class PermissionsSearcher {
         },
       };
     } else {
-      document = await this.searchers.get(session, 'local-hub', queryType, queryId, { version: branch });
+      document = await this.searchers.get(session, 'local-hub', queryType, queryId);
       if (!document) { return; } // we don't have it or don't have permission to read it
     }
 
@@ -63,9 +63,8 @@ class PermissionsSearcher {
     let documentContext = this.searchers.createDocumentContext({
       id: document.data.id,
       type: document.data.type,
-      branch,
       sourceId,
-      schema: await this.schema.forBranch(branch),
+      schema: await this.currentSchema.getSchema(),
       upstreamDoc: document
     });
 
@@ -104,7 +103,7 @@ class PermissionsSearcher {
     };
   }
 
-  async search(session, branch, query, next) {
+  async search(session, query, next) {
     return next();
   }
 

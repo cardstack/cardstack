@@ -10,7 +10,7 @@
         refresh to happen (the default Elasticsearch refresh_interval
         is once per second). Defaults to false.
 
-      - hints: can contain a list of `{ branch, id, type }`
+      - hints: can contain a list of `{ id, type }`
         references. This is intended as an optimization hint when we
         know that certain resources are the ones that likely need to be
         indexed right away. Indexers are responsible for discovering and
@@ -18,9 +18,9 @@
         the hint can make it easier to keep the search index nearly
         real-time fresh.
 
-    `schemaForBranch(branch)`: retrieves the Schema for a given
-      branch. A Schema instance is computed from all the schema models
-      that are discovered on a branch. Schema models are things like
+    `schema()`: retrieves the Schema.
+      A Schema instance is computed from all the schema models
+      that are discovered. Schema models are things like
       `content-types`, `fields`, `data-sources`, `plugin-configs`,
       etc. They are pieces of content, but special pieces of content
       that can alter how other content gets indexed.
@@ -46,7 +46,6 @@ const RunningIndexers = require('./indexing/running-indexers');
 module.exports = declareInjections({
   schemaLoader: 'hub:schema-loader',
   dataSources: 'config:data-sources',
-  controllingBranch: 'hub:controlling-branch',
   client: `plugin-client:${require.resolve('@cardstack/pgsearch/client')}`,
   jobQueue: 'hub:queues'
 },
@@ -61,10 +60,11 @@ class Indexers extends EventEmitter {
     this._schemaCache = null;
   }
 
-  async schemaForBranch(branch) {
+  // TODO rename this to `schema` and update docs above
+  async schema() {
     if (!this._schemaCache) {
       this._schemaCache = (async () => {
-        let running = new RunningIndexers(await this._seedSchema(), this.client, this.emit.bind(this), this.schemaLoader.ownTypes(), this.controllingBranch.name, getOwner(this));
+        let running = new RunningIndexers(await this._seedSchema(), this.client, this.emit.bind(this), this.schemaLoader.ownTypes(), getOwner(this));
         try {
           return await running.schemas();
         } finally {
@@ -72,15 +72,13 @@ class Indexers extends EventEmitter {
         }
       })();
     }
-    return (await this._schemaCache)[branch];
+    return await this._schemaCache;
   }
 
   async invalidateSchemaCache() {
     if (this._schemaCache) {
-      let cache = await this._schemaCache;
-      for (let schema of Object.values(cache)) {
-        await schema.teardown();
-      }
+      let schema = await this._schemaCache;
+      await schema.teardown();
     }
     this._schemaCache = null;
   }
@@ -132,35 +130,29 @@ class Indexers extends EventEmitter {
   async _doUpdate(forceRefresh, hints) {
     log.debug('begin update, forceRefresh=%s', forceRefresh);
     let priorCache = this._schemaCache;
-    let running = new RunningIndexers(await this._seedSchema(), this.client, this.emit.bind(this), this.schemaLoader.ownTypes(), this.controllingBranch.name, getOwner(this));
+    let running = new RunningIndexers(await this._seedSchema(), this.client, this.emit.bind(this), this.schemaLoader.ownTypes(), getOwner(this));
     try {
-      let schemas = await running.update(forceRefresh, hints);
+      let newSchema = await running.update(forceRefresh, hints);
       if (this._schemaCache === priorCache) {
         // nobody else has done a more recent update of the schema
         // cache than us, so we can try to update it.
         if (priorCache) {
-          // Compare each branch, so we don't invalidate the schemas
-          // unnecessarily
-          for (let [branch, newSchema] of Object.entries(schemas)) {
-            let oldSchema = (await priorCache)[branch];
-            if (!newSchema.equalTo(oldSchema)) {
-              log.info('schema for branch %s was changed', branch);
-              (await priorCache)[branch] = newSchema;
-              if (oldSchema) {
-                await oldSchema.teardown();
-              }
+          let oldSchema = await priorCache;
+          if (!newSchema.equalTo(oldSchema)) {
+            log.info('schema was changed');
+            this._schemaCache = newSchema;
+            if (oldSchema) {
+              await oldSchema.teardown();
             }
           }
         } else {
-          this._schemaCache = Promise.resolve(schemas);
+          this._schemaCache = newSchema;
         }
       } else {
         // somebody else has updated the cache in the time since we
         // started running, so just drop the schemas we computed
         // during indexing
-        for (let schema of Object.values(schemas)) {
-          await schema.teardown();
-        }
+        await newSchema.teardown();
       }
     } finally {
       await running.destroy();

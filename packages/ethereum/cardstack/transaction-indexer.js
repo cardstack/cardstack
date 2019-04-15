@@ -11,9 +11,8 @@ let indexJobNumber = 0;
 
 module.exports = declareInjections({
   indexer: 'hub:indexers',
-  controllingBranch: 'hub:controlling-branch',
   searchers: 'hub:searchers',
-  schema: 'hub:current-schema',
+  currentSchema: 'hub:current-schema',
   pgsearchClient: `plugin-client:${require.resolve('@cardstack/pgsearch/client')}`,
   transactionIndex: `plugin-client:${require.resolve('./transaction-index')}`
 },
@@ -23,15 +22,14 @@ class TransactionIndexer {
     return new this(...args);
   }
 
-  constructor({ indexer, transactionIndex, pgsearchClient, schema, searchers, controllingBranch }) {
+  constructor({ indexer, transactionIndex, pgsearchClient, currentSchema, searchers }) {
     this.ethereumClient = null;
     this.addressIndexing = null;
     this.indexer = indexer;
     this.searchers = searchers;
-    this.schema = schema;
+    this.currentSchema = currentSchema;
     this.transactionIndex = transactionIndex;
     this.pgsearchClient = pgsearchClient;
-    this.controllingBranch = controllingBranch;
     this._indexingPromise = null; // this is exposed to the tests to deal with indexing event async
     this._eventProcessingPromise = null; // this is exposed to the tests to deal with indexing event async
     this._transactionIndexPromise = null;
@@ -227,13 +225,13 @@ class TransactionIndexer {
     currentBlockNumber = currentBlockNumber || this.transactionIndex.blockHeight;
     let indexedAddresses = await this._getIndexedAddresses();
     let notYetIndexedAddresses = difference(trackedAddresses, indexedAddresses);
-    let batch = this.pgsearchClient.beginBatch(this.schema, this.searchers);
+    let batch = this.pgsearchClient.beginBatch(this.currentSchema, this.searchers);
     for (let address of notYetIndexedAddresses) {
       await this._prepopulateAddressResource(batch, address, currentBlockNumber);
     }
     await batch.done();
 
-    batch = this.pgsearchClient.beginBatch(this.schema, this.searchers);
+    batch = this.pgsearchClient.beginBatch(this.currentSchema, this.searchers);
     for (let address of trackedAddresses) {
       let { data:newTransactions } = await this.searchers.search(Session.INTERNAL_PRIVILEGED, {
         filter: {
@@ -271,7 +269,7 @@ class TransactionIndexer {
   async _stopIndexingAddresses(addresses) {
     if (!addresses || !addresses.length) { return; }
 
-    let batch = this.pgsearchClient.beginBatch(this.schema, this.searchers);
+    let batch = this.pgsearchClient.beginBatch(this.currentSchema, this.searchers);
     for (let address of addresses) {
       let document = await this.searchers.get(Session.INTERNAL_PRIVILEGED,
         'local-hub',
@@ -363,13 +361,12 @@ class TransactionIndexer {
 
   async _createDocumentContext(record) {
     let { id, type } = record;
-    let schema = await this.schema.forControllingBranch();
+    let schema = await this.currentSchema.getSchema();
     let contentType = schema.types.get(type);
     let sourceId = contentType.dataSource.id;
     return this.searchers.createDocumentContext({
       id,
       type,
-      branch: this.controllingBranch.name,
       schema,
       sourceId,
       upstreamDoc: { data: record }

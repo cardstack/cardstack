@@ -89,17 +89,16 @@ async function startIndexing(environment, container) {
   setInterval(() => container.lookup('hub:indexers').update({ dontWaitForJob: true }), 600000);
 }
 
-async function loadSeeds(container, seedModels, opts) {
+async function loadSeeds(container, seedModels) {
   if (!container) { return; }
 
-  let branch = opts && opts.branch || 'master';
   let writers = container.lookup('hub:writers');
 
   for (let model of seedModels) {
     if (model.readable) {
-      await writers.createBinary(branch, Session.INTERNAL_PRIVILEGED, 'cardstack-files', model);
+      await writers.createBinary(Session.INTERNAL_PRIVILEGED, 'cardstack-files', model);
     } else {
-      await writers.create(branch, Session.INTERNAL_PRIVILEGED, model.type, { data: model });
+      await writers.create(Session.INTERNAL_PRIVILEGED, model.type, { data: model });
     }
   }
 

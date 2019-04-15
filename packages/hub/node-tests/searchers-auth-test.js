@@ -363,7 +363,7 @@ describe('hub/searchers/auth', function() {
 
     let session = sessions.create('authors', 'arthur');
     let user = await searchers.get(Session.INTERNAL_PRIVILEGED, 'local-hub', 'authors', 'arthur');
-    await env.lookup('hub:writers').delete('master', Session.INTERNAL_PRIVILEGED, user.data.meta.version, user.data.type, user.data.id);
+    await env.lookup('hub:writers').delete(Session.INTERNAL_PRIVILEGED, user.data.meta.version, user.data.type, user.data.id);
     await env.lookup('hub:indexers').update({ forceRefresh: true });
     let doc = await searchers.search(session, { filter: { type: 'posts' } });
     expect(doc.data).has.length(0);
@@ -383,7 +383,7 @@ describe('hub/searchers/auth', function() {
     let session = sessions.create('authors', 'arthur');
     let user = await searchers.get(Session.INTERNAL_PRIVILEGED, 'local-hub', 'authors', 'arthur');
     user.data.attributes.name = 'Updated name';
-    await env.lookup('hub:writers').update('master', Session.INTERNAL_PRIVILEGED, user.data.type, user.data.id, user);
+    await env.lookup('hub:writers').update(Session.INTERNAL_PRIVILEGED, user.data.type, user.data.id, user);
     await env.lookup('hub:indexers').update({ forceRefresh: true });
     let doc = await searchers.search(session, { filter: { type: 'posts' } });
     expect(doc.data).has.length(0);
@@ -403,7 +403,7 @@ describe('hub/searchers/auth', function() {
     let session = sessions.create('authors', 'arthur');
     let user = await searchers.get(Session.INTERNAL_PRIVILEGED, 'local-hub', 'authors', 'arthur');
     user.data.attributes.name = 'Updated name';
-    await env.lookup('hub:writers').update('master', Session.INTERNAL_PRIVILEGED, user.data.type, user.data.id, user);
+    await env.lookup('hub:writers').update(Session.INTERNAL_PRIVILEGED, user.data.type, user.data.id, user);
     await env.lookup('hub:indexers').update({ forceRefresh: true });
     let doc = await searchers.search(session, { filter: { type: 'posts' } });
     expect(doc.data).has.length(1);
@@ -429,7 +429,7 @@ describe('hub/searchers/auth', function() {
     let writers = env.lookup('hub:writers');
     for (let model of factory.getModels()) {
       let { type } = model;
-      await writers.create('master', Session.INTERNAL_PRIVILEGED, type, { data: model });
+      await writers.create(Session.INTERNAL_PRIVILEGED, type, { data: model });
     }
 
     let doc = await searchers.search(sessions.create('authors', 'arthur'), { filter: { type: 'posts' } });
@@ -458,7 +458,7 @@ describe('hub/searchers/auth', function() {
     let grant = await searchers.get(Session.INTERNAL_PRIVILEGED, 'local-hub', 'grants', 'test-grant');
 
     grant.data.relationships.who.data = [{ id: 'cool-kids', type: 'groups' }];
-    await writers.update('master', Session.INTERNAL_PRIVILEGED, 'grants', 'test-grant', grant);
+    await writers.update(Session.INTERNAL_PRIVILEGED, 'grants', 'test-grant', grant);
 
     let doc = await searchers.search(sessions.create('authors', 'arthur'), { filter: { type: 'posts' } });
     expect(doc.data).has.length(1);
@@ -481,7 +481,7 @@ describe('hub/searchers/auth', function() {
     let searchers = env.lookup('hub:searchers');
     let grant = await searchers.get(Session.INTERNAL_PRIVILEGED, 'local-hub', 'grants', 'test-grant');
 
-    await writers.delete('master', Session.INTERNAL_PRIVILEGED, grant.data.meta.version, 'grants', 'test-grant');
+    await writers.delete(Session.INTERNAL_PRIVILEGED, grant.data.meta.version, 'grants', 'test-grant');
 
     let doc = await searchers.search(sessions.create('authors', 'arthur'), { filter: { type: 'posts' } });
     expect(doc.data).has.length(0);

@@ -13,8 +13,7 @@ export default Route.extend({
 
   model({ type }, transition) {
     let { routingId } = transition.to ? transition.to.queryParams : transition.queryParams;
-    let branch = this.modelFor('cardstack').branch;
-    let modelType = this.get('service').modelType(type, branch);
+    let modelType = this.get('service').modelType(type);
 
     if (routingId == null) {
       return this.store.createRecord(modelType);

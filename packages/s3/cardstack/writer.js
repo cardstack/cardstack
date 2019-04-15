@@ -11,20 +11,20 @@ module.exports = class Writer {
     return new this(...args);
   }
 
-  constructor({ dataSource, branches }) {
-    this.dataSource    = dataSource;
-    this.branches      = branches;
+  constructor({ dataSource, config }) {
+    this.dataSource = dataSource;
+    this.config     = config;
   }
 
-  async s3Upload(branch, options) {
-    let config = this.branches[branch];
+  async s3Upload(options) {
+    let config = this.config;
     log.debug(`Uploading file to S3 key ${options.Key}`);
 
     await makeS3Client(config).upload(options).promise();
     log.debug(`Upload of ${options.Key} successful`);
   }
 
-  async prepareBinaryCreate(branch, session, type, stream) {
+  async prepareBinaryCreate(session, type, stream) {
     let finalizer = async (pendingChange) => {
       let Key = `${pendingChange.finalDocument.id}`;
 
@@ -32,7 +32,7 @@ module.exports = class Writer {
         "sha-sum": pendingChange.finalDocument.attributes['sha-sum']
       };
 
-      await this.s3Upload(branch, { Key, Body: stream, Metadata });
+      await this.s3Upload({ Key, Body: stream, Metadata });
     };
 
     let id = `${uuidv4()}.${extension(stream.mimeType)}`;

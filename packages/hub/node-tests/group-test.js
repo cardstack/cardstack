@@ -65,7 +65,7 @@ describe('schema/group', function() {
     });
 
     env = await createDefaultEnvironment(`${__dirname}/../../../tests/stub-project`, factory.getModels());
-    schema = await env.lookup('hub:current-schema').forBranch('master');
+    schema = await env.lookup('hub:current-schema').getSchema();
   });
 
   afterEach(async function() {

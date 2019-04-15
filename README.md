@@ -24,7 +24,7 @@ A Cardstack Plugin is any npm package with "cardstack-plugin" in its `package.js
 | indexer                   | Indexes content from some arbitrary external data source into Cardstack Hub's fast cache. Examples: @cardstack/git, @cardstack/postgresql, @cardstack/drupal |
 | messenger                 | Implements a way to send messages out to some arbitrary data sink. Example: @cardstack/email |
 | middleware                | Allows a plugin to install arbitrary server-side middleware. This is a fairly low-level feature -- often you can implement more specific feature types instead, relying on standard middleware like @cardstack/jsonapi. Examples: @cardstack/jsonapi, @cardstack/authentication |
-| searcher                  | Provides deep searches in some data source (as opposed to an indexer, which pre-indexes external data sources for fast local searches). An example is the @cardstack/elasticsearch searcher, which is the default searcher used internally by Cardstack Hub.
+| searcher                  | Provides deep searches in some data source (as opposed to an indexer, which pre-indexes external data sources for fast local searches). An example is the @cardstack/pgsearch searcher, which is the default searcher used internally by Cardstack Hub.
 | writers                   | Writes content back out to some arbitrary external data source. Works in tandem with an indexer or searcher to provide full round-trip integration. Examples: @cardstack/git, @cardstack/postgresql. |
 
 
@@ -38,9 +38,6 @@ While third-party Cardstack plugins are heartily encouraged, the plugins in this
 | @cardstack/codegen        | ./packages/codegen        | Core infrastructure for injecting dynamically generated Javascript into applications. Used by packages like @cardstack/models |
 | @cardstack/core-types     | ./packages/core-types     | A family of field types and constraints that almost any app will need.|
 | @cardstack/di             | ./packages/di             | Dependency injection library, based on [@glimmer/di](https://github.com/glimmerjs/glimmer-di), used within the Cardstack Hub server.|
-| @cardstack/drupal         | ./packages/drupal         | Data source plugin for reading and writing to a Drupal 8 backend. |
-| @cardstack/drupal-auth    | ./packages/drupal-auth    | Authentication plugin for Drupal via Drupal's OAuth2 support.|
-| @cardstack/elasticsearch  | ./packages/elasticsearch  | Adapter for connecting [Elasticsearch](https://www.elastic.co/products/elasticsearch) to Cardstack Hub.|
 | @cardstack/email          | ./packages/email          | Messenger plugin for sending email via direct SMTP, sendmail, or Amazon SES.|
 | @cardstack/email-auth     | ./packages/email-auth     | User authentication via email (or any other messenger plugin) verification. |
 | @cardstack/ephemeral      | ./packages/ephemeral      | An in-memory data source that is very useful in testing and development. Implements both indexer and writer features.|
@@ -71,14 +68,13 @@ In development, we use `lerna` to manage the inter-dependencies of all the packa
  1. Install node >= 8.
  2. Install yarn >= 0.28 (earlier versions work but will not benefit from [Workspaces](https://yarnpkg.com/blog/2017/08/02/introducing-workspaces/)).
  3. `yarn global add lerna` (use >= 2.0.0 for yarn workspaces integration)
- 4. `lerna bootstrap` 
+ 4. `lerna bootstrap`
 
 
 ### Test Suite Dependencies
 
 There is work-in-progress to make Cardstack Hub automatically manage docker-based microservices, but for the present you need to start these things up manually to run the full test suite:
 
-    docker run -d -p 9200:9200 --rm cardstack/elasticsearch:dev
     docker run -d -p 5432:5432 --rm cardstack/pg-test
     docker run -d -p 9022:22 --rm cardstack/git-test
 

@@ -11,15 +11,13 @@ export default Route.extend({
   service: service('cardstack-routing'),
 
   _commonModelHook(path, transition) {
-    let { branch } = this.modelFor('cardstack');
-
     let cleansedQueryParams = ''
     let queryParams = transition.to ? transition.to.queryParams : transition.queryParams;
     if (Object.keys(queryParams).length) {
       cleansedQueryParams = `?${qs.stringify(queryParams, { encodeValuesOnly: true })}`;
     }
 
-    return this.get('store').findRecord('space', `${path.charAt(0) !== '/' ? '/' : ''}${path}${cleansedQueryParams}`, { adapterOptions: { branch }, reload: true })
+    return this.get('store').findRecord('space', `${path.charAt(0) !== '/' ? '/' : ''}${path}${cleansedQueryParams}`, { reload: true })
       .catch(err => {
         if (!is404(err)) {
           throw err;
