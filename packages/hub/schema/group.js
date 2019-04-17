@@ -42,6 +42,7 @@ module.exports = class Group {
     return [...this._fieldFilters.entries()].every(([fieldName, allowedValues]) => {
       let field = this._allFields.get(fieldName);
       // TODO: update this to use Model.getField() as we do in Grant.readRealmsFromField
+      // https://github.com/cardstack/cardstack/issues/745
       let haveValue = field.valueFrom(change);
       if (Array.isArray(haveValue) && field.fieldType === '@cardstack/core-types::string-array') {
         return Boolean(intersection(allowedValues, haveValue).length);

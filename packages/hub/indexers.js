@@ -60,7 +60,6 @@ class Indexers extends EventEmitter {
     this._schemaCache = null;
   }
 
-  // TODO rename this to `schema` and update docs above
   async schema() {
     if (!this._schemaCache) {
       this._schemaCache = (async () => {
