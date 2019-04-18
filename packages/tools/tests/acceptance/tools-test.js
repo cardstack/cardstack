@@ -4,6 +4,7 @@ import { visit, click, fillIn, triggerEvent, waitFor, settled } from '@ember/tes
 import { login } from '../helpers/login';
 import { ciSessionId } from '@cardstack/test-support/environment';
 import { hubURL } from '@cardstack/plugin-utils/environment';
+import { findInputWithValue, findTriggerElementWithLabel } from '../helpers/query-selectors';
 
 let nonce = 0;
 
@@ -25,21 +26,12 @@ async function getDocuments(type) {
   return (await response.json()).data;
 }
 
-function findTriggerElementWithLabel(labelRegex) {
-  return [...this.element.querySelectorAll('.cs-toolbox-section label')].find(element => labelRegex.test(element.textContent));
-}
-
 function findAddNewButtonWithLabel(buttonTextRegex) {
   return [...this.element.querySelectorAll('.cs-create-menu ul li')].find(element => buttonTextRegex.test(element.textContent));
 }
 
 function findSectionLabels(label) {
   return [...this.element.querySelectorAll('.cs-toolbox-section label')].filter(element => label === element.textContent);
-}
-
-function findInputWithValue(value) {
-  return Array.from(this.element.querySelectorAll('input'))
-    .find(element => element.value === value);
 }
 
 module('Acceptance | tools', function(hooks) {
@@ -259,30 +251,6 @@ module('Acceptance | tools', function(hooks) {
 
     reviewStatusInput = findInputWithValue.call(this, 'pending');
     assert.dom(reviewStatusInput).isNotDisabled();
-  });
-
-  test('track field dirtiness in owned, related records', async function(assert) {
-    await visit('/hub/posts/1');
-    await login();
-    await click('.cardstack-tools-launcher');
-    await waitFor('.cs-active-composition-panel--main');
-    await waitFor('.cs-editor-switch')
-    await click('.cs-editor-switch');
-
-    assert.dom('[data-test-cs-version-control-button-save="true"]').exists('Save button is disabled');
-    assert.dom('[data-test-cs-version-control-button-cancel="true"]').exists('Cancel button is disabled');
-
-    let reviewStatusActionTrigger = findTriggerElementWithLabel.call(this, /Comment #1: Karma/);
-    await click(reviewStatusActionTrigger);
-
-    let karmaInput = findInputWithValue.call(this, '10');
-    await fillIn(karmaInput, '9');
-    assert.dom('[data-test-cs-version-control-button-save="false"]').exists('Save button is enabled');
-    assert.dom('[data-test-cs-version-control-button-cancel="false"]').exists('Cancel button is enabled');
-
-    await fillIn(karmaInput, '10');
-    assert.dom('[data-test-cs-version-control-button-save="true"]').exists('Save button is disabled');
-    assert.dom('[data-test-cs-version-control-button-cancel="true"]').exists('Cancel button is disabled');
   });
 
   test('allow editing fields of newly added, owned records', async function(assert) {
