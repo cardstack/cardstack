@@ -3,10 +3,12 @@ const Error = require('@cardstack/plugin-utils/error');
 const { declareInjections } = require('@cardstack/di');
 const { statSync } = require("fs");
 const streamToPromise = require('stream-to-promise');
+const { cardContextToId, cardContextFromId } = require('@cardstack/plugin-utils/card-context');
 
 module.exports = declareInjections({
   indexers: 'hub:indexers',
-  service: `plugin-services:${require.resolve('./service')}`
+  service: `plugin-services:${require.resolve('./service')}`,
+  currentSchema: 'hub:current-schema'
 }, class Writer {
 
   get storage() {
@@ -16,12 +18,23 @@ module.exports = declareInjections({
     return this._storage;
   }
 
-  async prepareCreate(session, type, document, isSchema) {
+  // TODO seems awkward that an upstream data source writer needs to know about how card ID's work.
+  // probbaly it would be better if an id generator function could be provided to the writer
+  // or is there a way we can keep id's that have card context completely outside of these writers?
+  async prepareCreate(session, type, cardInstanceId, document, isSchema) {
+    let modelId, cardId;
+    let { sourceId, packageName } = cardContextFromId(type);
     let id = document.id;
     if (id == null) {
       id = this._generateId();
     }
-
+    if (cardInstanceId == null) {
+      cardId = id;
+    } else {
+      cardId = cardContextFromId(cardInstanceId).cardId;
+      modelId = id;
+    }
+    id = cardContextToId({ sourceId, packageName, cardId, modelId });
 
     if (this.storage.lookup(type, id)) {
       throw new Error(`id ${id} is already in use`, { status: 409, source: { pointer: '/data/id'}});

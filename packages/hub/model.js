@@ -28,6 +28,21 @@ exports.Model = class Model {
     return priv.get(this).jsonapiDoc.type;
   }
 
+  // derive source ID from the Model.id
+  get sourceId() {
+    return priv.get(this).sourceId;
+  }
+
+  // derive package name from the content type
+  get packageName() {
+    return priv.get(this).sourceId;
+  }
+
+  // derive card ID from the Model.id
+  get cardId() {
+    return priv.get(this).sourceId;
+  }
+
   getContentType() {
     return priv.get(this).contentType;
   }
@@ -45,7 +60,7 @@ exports.Model = class Model {
     if (!field) {
       throw new Error(`tried to access nonexistent field ${fieldName}`);
     }
-    let computedField = contentType.computedFields.get(field.id);
+    let computedField = contentType.computedFields.get(field.name);
     if (computedField) {
       let userValue = await computedField.compute(this);
       if (field.isRelationship && !isRelationshipObject(userValue)) {
@@ -54,12 +69,12 @@ exports.Model = class Model {
       return userValue;
     } else if (field.isRelationship) {
       if (jsonapiDoc.relationships) {
-        return jsonapiDoc.relationships[field.id];
+        return jsonapiDoc.relationships[field.name];
       }
     } else if (field.id === 'id' || field.id === 'type') {
-      return jsonapiDoc[field.id];
+      return jsonapiDoc[field.name];
     } else {
-      return jsonapiDoc.attributes && jsonapiDoc.attributes[field.id];
+      return jsonapiDoc.attributes && jsonapiDoc.attributes[field.name];
     }
   }
 

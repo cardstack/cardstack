@@ -7,7 +7,8 @@ module.exports = class StubSearcher {
     this.params = params;
   }
 
-  async get(session, type, id, next) {
+  //TODO rename 'type'
+  async get({ session, sourceId, type, id, snapshotVersion, next }) {
     if (type === 'sample-searcher-models' && id === '1') {
       return {
         data: makeModel(type, id)
@@ -16,7 +17,7 @@ module.exports = class StubSearcher {
     return next();
   }
 
-  async search(session, query, next) {
+  async search({ session, query, next }) {
     if (query.filter && query.filter.type && query.filter.type === 'sample-searcher-models') {
       return {
         data: [ makeModel('sample-searcher-models', '1') ],

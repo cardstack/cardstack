@@ -17,7 +17,8 @@ class PermissionsSearcher {
     this.searchers = searchers;
   }
 
-  async get(session, type, id, next) {
+  //TODO rename 'type'
+  async get({ session, sourceId, type, id, snapshotVersion, next }) {
     if (type !== 'permissions') {
       return next();
     }
@@ -59,7 +60,7 @@ class PermissionsSearcher {
       }
       mayUpdateResource = false;
     }
-    let sourceId = contentType.dataSource.id;
+    // let sourceId = contentType.dataSource.id;
     let documentContext = this.searchers.createDocumentContext({
       id: document.data.id,
       type: document.data.type,
@@ -103,7 +104,7 @@ class PermissionsSearcher {
     };
   }
 
-  async search(session, query, next) {
+  async search({ session, query, next }) {
     return next();
   }
 

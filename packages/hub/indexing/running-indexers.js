@@ -2,7 +2,7 @@ const SourcesUpdate = require('./sources-update');
 const DataSource = require('../schema/data-source');
 const log = require('@cardstack/logger')('cardstack/indexers');
 const { get, flatten } = require('lodash');
-const { cardContextFromId, cardContextToId } = require('@cardstack/plugin-utils/card-context');
+const { addContextForCardDefinition, cardContextFromId, modelsOf } = require('@cardstack/plugin-utils/card-context');
 
 log.registerFormatter('t', require('../table-log-formatter'));
 
@@ -74,7 +74,7 @@ module.exports = class RunningIndexers {
         throw new Error(`No schema document returned from schema feature for package: '${packageName}'`);
       }
 
-      addCardDefinitionContext(sourceId, packageName, schemaDocument);
+      addContextForCardDefinition(sourceId, packageName, schemaDocument);
       validateCardSchema(this.schemaTypes, sourceId, packageName, schemaDocument);
 
       schemas = schemas.concat(modelsOf(schemaDocument));
@@ -124,26 +124,6 @@ module.exports = class RunningIndexers {
   }
 };
 
-function addCardDefinitionContext(sourceId, packageName, schemaDocument) {
-  let { data: cardDefinition, included = [] } = schemaDocument;
-  let idMap = {};
-
-  if (cardDefinition.type !== 'card-definitions') {
-    throw new Error(`The schema feature for the package '${packageName}' defines a schema document that is not of type 'card-definitions', found ${cardDefinition.type}.`);
-  }
-  idMap[`card-definitions/${cardDefinition.id}`] = cardContextToId({ sourceId, packageName });
-  for (let resource of included) {
-    // schema models are treated as cards
-    let cardId = ['content-types', 'fields'].includes(resource.type) ? get(resource, 'attributes.name') : resource.id;
-    idMap[`${resource.type}/${resource.id}`] = cardContextToId({ sourceId, packageName, cardId });
-  }
-
-  replaceIdsForResource(cardDefinition, idMap);
-  for (let resource of included) {
-    replaceIdsForResource(resource, idMap);
-  }
-}
-
 function validateCardSchema(schemaTypes, sourceId, packageName, schemaDocument = {}) {
   let { included = [], data: cardDefinition } = schemaDocument;
   let nonSchemaModels = included.filter(i => !schemaTypes.includes(i.type)).map(i => `${i.type}/${i.id}`);
@@ -164,28 +144,4 @@ function validateCardSchema(schemaTypes, sourceId, packageName, schemaDocument =
   if (unscopedModels.length) {
     throw new Error(`The schema for package '${packageName}' has schema models that are not scoped to this data source and package ${JSON.stringify(unscopedModels)}`);
   }
-}
-
-function replaceIdsForResource(resource, idMap) {
-  resource.id = idMap[`${resource.type}/${resource.id}`] || resource.id;
-  if (!resource.relationships) { return; }
-
-  for (let relationship of Object.keys(resource.relationships)) {
-    if (resource.relationships[relationship].data && Array.isArray(resource.relationships[relationship].data)) {
-      resource.relationships[relationship].data.forEach(ref => {
-        ref.id = idMap[`${ref.type}/${ref.id}`] || ref.id;
-      });
-    } else if (resource.relationships[relationship].data) {
-      let ref = resource.relationships[relationship].data;
-      ref.id = idMap[`${ref.type}/${ref.id}`] || ref.id;
-    }
-  }
-}
-
-function modelsOf(document = {}) {
-  let { data, included = [] } = document;
-  if (!data) { return []; }
-
-  let models = [data];
-  return models.concat(included);
 }

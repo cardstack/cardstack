@@ -4,6 +4,7 @@ const JSONAPIFactory = require('./jsonapi-factory');
 const Session = require('@cardstack/plugin-utils/session');
 const crypto = require('crypto');
 const { wireItUp, loadSeeds } = require('@cardstack/hub/main');
+const bootstrapSchema = require('@cardstack/hub/bootstrap-schema');
 const { partition } = require('lodash');
 const defaultDataSourceId = 'default-data-source';
 
@@ -75,7 +76,7 @@ exports.createDefaultEnvironment = async function(projectDir, initialModels = []
 
     let ephemeralStorage = await container.lookup(`plugin-services:${require.resolve('@cardstack/ephemeral/service')}`);
     let searchers = await container.lookup(`hub:searchers`);
-    await ephemeralStorage.validateModels(models, async(type, id) => {
+    await ephemeralStorage.validateModels(bootstrapSchema.concat(models), async(type, id) => {
       let result;
       try {
         result = await searchers.get(Session.INTERNAL_PRIVILEGED, 'local-hub', type, id);

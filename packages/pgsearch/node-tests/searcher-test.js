@@ -10,85 +10,178 @@ const {
 } = require('../../../tests/pgsearch-test-app/node_modules/@cardstack/test-support/env');
 
 const Factory = require('../../../tests/pgsearch-test-app/node_modules/@cardstack/test-support/jsonapi-factory');
+const { cardContextFromId, addContextForCardDefinition, modelsOf, currentVersionLabel } = require('@cardstack/plugin-utils/card-context');
+const sourceId = 'local-hub';
 
 const { uniq } = require('lodash');
 
 describe('pgsearch/searcher', function() {
 
-  let searcher, env, factory;
+  let searcher, env;
 
   before(async function() {
-    this.timeout(5000);
+    // TODO MAKE SURE TO UNCOMMENT THIS!!!
+    // this.timeout(5000);
+
+    let cards = [];
+    let factory = new Factory();
+
+    cards.push(addContextForCardDefinition(sourceId, 'person-card', factory.getDocumentFor(
+      factory.addResource('card-definitions')
+        .withRelated('model', factory.addResource('content-types')
+          .withAttributes({ name: 'people' })
+          .withRelated('fields', [
+            factory.addResource('fields').withAttributes({
+              name: 'first-name',
+              'is-metadata': true,
+              'needed-when-embedded': true,
+              fieldType: '@cardstack/core-types::string'
+            }),
+            factory.addResource('fields').withAttributes({
+              name: 'last-name',
+              'is-metadata': true,
+              'needed-when-embedded': true,
+              fieldType: '@cardstack/core-types::string'
+            }),
+            factory.addResource('fields').withAttributes({
+              name: 'age',
+              'is-metadata': true,
+              'needed-when-embedded': true,
+              fieldType: '@cardstack/core-types::integer'
+            }),
+            factory.addResource('fields').withAttributes({
+              name: 'favorite-shapes',
+              'is-metadata': true,
+              'needed-when-embedded': true,
+              fieldType: '@cardstack/core-types::string-array'
+            }),
+            factory.addResource('fields').withAttributes({
+              name: 'favorite-color',
+              'is-metadata': true,
+              'needed-when-embedded': true,
+              fieldType: '@cardstack/core-types::string'
+            }),
+            factory.addResource('fields').withAttributes({
+              name: 'description',
+              'is-metadata': true,
+              'needed-when-embedded': true,
+              fieldType: '@cardstack/mobiledoc'
+            }),
+          ]))
+    )));
+
     factory = new Factory();
+    cards.push(addContextForCardDefinition(sourceId, 'article-card', factory.getDocumentFor(
+      factory.addResource('card-definitions')
+        .withRelated('model', factory.addResource('content-types')
+          .withAttributes({ name: 'articles' })
+          .withRelated('fields', [
+            factory.addResource('fields').withAttributes({
+              name: 'title',
+              'is-metadata': true,
+              'needed-when-embedded': true,
+              fieldType: '@cardstack/core-types::string'
+            }),
+            factory.addResource('fields').withAttributes({
+              name: 'favorite-color',
+              'is-metadata': true,
+              'needed-when-embedded': true,
+              fieldType: '@cardstack/core-types::string'
+            }),
+            factory.addResource('fields').withAttributes({
+              name: 'favorite-toy',
+              'is-metadata': true,
+              'needed-when-embedded': true,
+              fieldType: '@cardstack/core-types::string'
+            }),
+            factory.addResource('fields').withAttributes({
+              name: 'email-address',
+              'is-metadata': true,
+              'needed-when-embedded': true,
+              fieldType: '@cardstack/core-types::case-insensitive'
+            }),
+            factory.addResource('fields').withAttributes({
+              name: 'hello',
+              'is-metadata': true,
+              'needed-when-embedded': true,
+              fieldType: '@cardstack/core-types::string'
+            })
+          ]))
+    )));
 
-    factory.addResource('content-types', 'people').withRelated('fields', [
-      factory.addResource('fields', 'first-name').withAttributes({
-        fieldType: '@cardstack/core-types::string'
-      }),
-      factory.addResource('fields', 'last-name').withAttributes({
-        fieldType: '@cardstack/core-types::string'
-      }),
-      factory.addResource('fields', 'age').withAttributes({
-        fieldType: '@cardstack/core-types::integer'
-      }),
-      factory.addResource('fields', 'favorite-shapes').withAttributes({
-        fieldType: '@cardstack/core-types::string-array'
-      }),
-      factory.addResource('fields', 'favorite-color').withAttributes({
-        fieldType: '@cardstack/core-types::string'
-      }),
-      factory.addResource('fields', 'description').withAttributes({
-        fieldType: '@cardstack/mobiledoc'
-      }),
-    ]);
+    factory = new Factory();
+    cards.push(addContextForCardDefinition(sourceId, 'comment-card', factory.getDocumentFor(
+      factory.addResource('card-definitions')
+        .withRelated('model', factory.addResource('content-types')
+          .withAttributes({
+            name: 'comments',
+            defaultIncludes: ['searchable-article']
+          })
+          .withRelated('fields', [
+            factory.addResource('fields').withAttributes({
+              name: 'body',
+              'is-metadata': true,
+              'needed-when-embedded': true,
+              fieldType: '@cardstack/core-types::string'
+            }),
+            factory.addResource('fields').withAttributes({
+              name: 'score',
+              'is-metadata': true,
+              'needed-when-embedded': true,
+              fieldType: '@cardstack/core-types::integer'
+            }),
+            factory.addResource('fields').withAttributes({
+              name: 'article',
+              'is-metadata': true,
+              'needed-when-embedded': true, // TODO if this is not searchable, perhaps we should not be adding it when its embedded?
+              fieldType: '@cardstack/core-types::belongs-to'
+            }).withRelated('related-types', [{ type: 'content-types', id: 'cards'}]),
+            factory.addResource('fields').withAttributes({
+              name: 'searchable-article',
+              'is-metadata': true,
+              'needed-when-embedded': true,
+              fieldType: '@cardstack/core-types::belongs-to'
+            }).withRelated('related-types', [{ type: 'content-types', id: 'cards'}]),
+          ]))
+    )));
 
+    factory = new Factory();
+    cards.push(addContextForCardDefinition(sourceId, 'team-card', factory.getDocumentFor(
+      factory.addResource('card-definitions')
+        .withRelated('model', factory.addResource('content-types')
+          .withAttributes({
+            name: 'teams',
+            defaultIncludes: ['searchable-members']
+          })
+          .withRelated('fields', [
+            factory.addResource('fields').withAttributes({
+              name: 'members',
+              'is-metadata': true,
+              'needed-when-embedded': true, // TODO if this is not searchable, perhaps we should not be adding it when its embedded?
+              fieldType: '@cardstack/core-types::has-many'
+            }).withRelated('related-types', [{ type: 'content-types', id: 'cards' }]),
+            factory.addResource('fields').withAttributes({
+              name: 'searchable-members',
+              'is-metadata': true,
+              'needed-when-embedded': true,
+              fieldType: '@cardstack/core-types::has-many'
+            }).withRelated('related-types', [{ type: 'content-types', id: 'cards' }]),
+          ]))
+    )));
 
-    factory.addResource('content-types', 'articles').withRelated('fields', [
-      factory.addResource('fields', 'title').withAttributes({
-        fieldType: '@cardstack/core-types::string'
-      }),
-      factory.getResource('fields', 'favorite-color'),
-      factory.addResource('fields', 'favorite-toy').withAttributes({
-        fieldType: '@cardstack/core-types::string'
-      }),
-      factory.addResource('fields', 'email-address').withAttributes({
-        fieldType: '@cardstack/core-types::case-insensitive'
-      }),
-      factory.addResource('fields', 'hello').withAttributes({
-        fieldType: '@cardstack/core-types::string'
-      })
-    ]);
-
-    factory.addResource('content-types', 'comments').withRelated('fields', [
-      factory.addResource('fields', 'body').withAttributes({
-        fieldType: '@cardstack/core-types::string'
-      }),
-      factory.addResource('fields', 'score').withAttributes({
-        fieldType: '@cardstack/core-types::integer'
-      }),
-      factory.addResource('fields', 'article').withAttributes({
-        fieldType: '@cardstack/core-types::belongs-to'
-      }).withRelated('related-types', [ factory.getResource('content-types', 'articles') ]),
-      factory.addResource('fields', 'searchable-article').withAttributes({
-        fieldType: '@cardstack/core-types::belongs-to'
-      }).withRelated('related-types', [ factory.getResource('content-types', 'articles') ])
-    ]).withAttributes({
-      defaultIncludes: ['searchable-article']
-    });
-
-    factory.addResource('articles', '1').withAttributes({
+    factory = new Factory();
+    factory.addResource(`${sourceId}::article-card::articles`, `${sourceId}::article-card::1`).withAttributes({
       hello: 'magic words',
       favoriteToy: 'Sneaky Snake',
       favoriteColor: 'red',
       'email-address': 'hassan@example.com'
     });
 
-    factory.addResource('articles', '2').withAttributes({
+    factory.addResource(`${sourceId}::article-card::articles`, `${sourceId}::article-card::2`).withAttributes({
       hello: 'this is article two'
     });
 
-
-    factory.addResource('people', '1').withAttributes({
+    factory.addResource(`${sourceId}::person-card::people`, `${sourceId}::person-card::1`).withAttributes({
       firstName: 'Quint',
       lastName: 'Faulkner',
       age: 10,
@@ -106,7 +199,7 @@ describe('pgsearch/searcher', function() {
       }
     });
 
-    factory.addResource('people', '2').withAttributes({
+    factory.addResource(`${sourceId}::person-card::people`, `${sourceId}::person-card::2`).withAttributes({
       firstName: 'Arthur',
       lastName: 'Faulkner',
       age: 5,
@@ -115,43 +208,35 @@ describe('pgsearch/searcher', function() {
     });
 
     for (let i = 0; i < 20; i++) {
-      let comment = factory.addResource('comments', String(i));
+      let comment = factory.addResource(`${sourceId}::comment-card::comments`, `${sourceId}::comment-card::${String(i)}`);
       comment.withAttributes({
         body: `comment ${comment.id}`,
         score: Math.abs(10 - i)
       });
       if (i < 4) {
         comment
-          .withRelated('article', factory.getResource('articles', '1'))
-          .withRelated('searchable-article', factory.getResource('articles', '1'));
+          .withRelated('article', { type: 'cards', id: `${sourceId}::article-card::1`})
+          .withRelated('searchable-article', { type: 'cards', id: `${sourceId}::article-card::1`});
       }
       if (i >=4 && i < 6) {
         comment
-          .withRelated('article', factory.getResource('articles', '2'))
-          .withRelated('searchable-article', factory.getResource('articles', '2'));
+          .withRelated('article', { type: 'cards', id: `${sourceId}::article-card::2`})
+          .withRelated('searchable-article', { type: 'cards', id: `${sourceId}::article-card::2`});
       }
     }
 
-    factory.addResource('content-types', 'teams').withRelated('fields', [
-      factory.addResource('fields', 'members').withAttributes({
-        fieldType: '@cardstack/core-types::has-many'
-      }).withRelated('related-types', [factory.getResource('content-types', 'people')]),
-      factory.addResource('fields', 'searchable-members').withAttributes({
-        fieldType: '@cardstack/core-types::has-many'
-      }).withRelated('related-types', [factory.getResource('content-types', 'people')])
-    ]).withAttributes({
-      defaultIncludes: ['searchable-members']
-    });
-
-    factory.addResource('teams').withRelated('members', [
-      factory.getResource('people', '1'),
-      factory.getResource('people', '2')
+    factory.addResource(`${sourceId}::team-card::teams`, `${sourceId}::team-card::1`).withRelated('members', [
+      { type: 'cards', id: `${sourceId}::person-card::1`},
+      { type: 'cards', id: `${sourceId}::person-card::2`},
     ]).withRelated('searchable-members', [
-      factory.getResource('people', '1'),
-      factory.getResource('people', '2')
+      { type: 'cards', id: `${sourceId}::person-card::1`},
+      { type: 'cards', id: `${sourceId}::person-card::2`},
     ]);
 
-    env = await createDefaultEnvironment(`${__dirname}/../../../tests/pgsearch-test-app`, factory.getModels());
+    let cardModels = [];
+    cards.forEach(card => cardModels = cardModels.concat(modelsOf(card)));
+
+    env = await createDefaultEnvironment(`${__dirname}/../../../tests/pgsearch-test-app`, cardModels.concat(factory.getModels()));
     searcher = env.lookup('hub:searchers');
   });
 

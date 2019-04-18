@@ -38,6 +38,8 @@ module.exports = class ComputedField {
         attributes: {
           'field-type': type,
           'name': model.attributes['name'],
+          'is-metadata': model.attributes['is-metadata'],
+          'needed-when-embedded': model.attributes['needed-when-embedded'],
           caption: model.attributes.caption,
           searchable: model.attributes.searchable,
           'editor-options': model.attributes['editor-options']

@@ -102,7 +102,8 @@ class EthereumEventIndexer {
         if (!contractDefinition.eventContentTriggers[eventModel.attributes['event-name']].length) {
           let contract;
           try {
-            contract = (await this.searchers.getResourceAndMeta(Session.INTERNAL_PRIVILEGED, pluralize(contractName), contractAddress)).resource;
+            // TODO need to pass in the sourceId here
+            contract = (await this.searchers.getResourceAndMeta(Session.INTERNAL_PRIVILEGED, null, pluralize(contractName), contractAddress)).resource;
           } catch (err) {
             if (err.status !== 404) { throw err; }
           }
@@ -155,7 +156,8 @@ class EthereumEventIndexer {
 
         let existingRecord;
         try {
-          existingRecord = (await this.searchers.getResourceAndMeta(Session.INTERNAL_PRIVILEGED, type, id.toLowerCase())).resource;
+          // TODO need to pass in the sourceId here
+          existingRecord = (await this.searchers.getResourceAndMeta(Session.INTERNAL_PRIVILEGED, null, type, id.toLowerCase())).resource;
         } catch (err) {
           if (err.status !== 404) { throw err; }
         }

@@ -4,9 +4,31 @@
 */
 
 const Error = require('./error');
+const { get } = require('lodash');
+
 const cardContextDelim = '::';
 const cardVersionDelim = ':::';
 const currentVersionLabel = '_current_';
+
+function cardDefinitionIdFromId(id) {
+  let { sourceId, packageName } = cardContextFromId(id);
+  return cardContextToId({ sourceId, packageName });
+}
+
+function cardIdFromId(id) {
+  let { sourceId, packageName, cardId } = cardContextFromId(id);
+  return cardContextToId({ sourceId, packageName, cardId });
+}
+
+function isCard(id) {
+  let { cardId } = cardContextFromId(id);
+  return cardId != null;
+}
+
+function hasCardDefinition(id) {
+  let { packageName } = cardContextFromId(id);
+  return packageName != null;
+}
 
 function cardContextFromId(id) {
   let [ idPart='', snapshotVersion ] = id.split(cardVersionDelim);
@@ -28,19 +50,97 @@ function cardContextToId({
   modelId,
   snapshotVersion
 }) {
-  if (sourceId == null) {
-    throw new Error(`Not enough card context provided to build id. Missing sourceId for ${sourceId}/${packageName}/${cardId}`);
-  }
-  if (packageName == null) {
-    throw new Error(`Not enough card context provided to build id. Missing packageName for ${sourceId}/${packageName}/${cardId}`);
-  }
-
   let idPart = [ sourceId, packageName, cardId, modelId ].filter(i => i != null).join(cardContextDelim);
   return [ idPart, snapshotVersion ].filter(i => i != null).join(cardVersionDelim);
 }
+
+function addContextForCardDefinition(sourceId, packageName, schemaDocument) {
+  let { data: cardDefinition, included = [] } = schemaDocument;
+  let idMap = {};
+
+  if (cardDefinition.type !== 'card-definitions') {
+    throw new Error(`The schema feature for the package '${packageName}' defines a schema document that is not of type 'card-definitions', found ${cardDefinition.type}.`);
+  }
+  idMap[`card-definitions/${cardDefinition.id}`] = cardContextToId({ sourceId, packageName });
+  let idSet = {};
+  for (let resource of included) {
+    // schema models are treated as cards
+    let cardId = [
+      'content-types',
+      'fields',
+      'computed-fields'
+    ].includes(resource.type) ? get(resource, 'attributes.name') : resource.id;
+    let contextualId = cardContextToId({ sourceId, packageName, cardId });
+    if (idSet[`${resource.type}/${contextualId}`]) {
+      throw new Error(`The schema feature for the package '${packageName}' defines duplicatively named schema elements: ${resource.type}/${contextualId}`);
+    }
+    idSet[`${resource.type}/${contextualId}`] = true;
+    idMap[`${resource.type}/${resource.id}`] = contextualId;
+  }
+
+  replaceIdsForResource(cardDefinition, idMap);
+  for (let resource of included) {
+    replaceIdsForResource(resource, idMap);
+  }
+
+  let cardModelType = get(cardDefinition, 'relationships.model.data.type');
+  let cardModelId = get(cardDefinition, 'relationships.model.data.id');
+  if (cardModelId == null || !cardModelType) { return; }
+
+  let cardModelSchema = included.find(i => `${i.type}/${i.id}` === `${cardModelType}/${cardModelId}`);
+  if (!cardModelSchema) { return; }
+
+  cardModelSchema.attributes = cardModelSchema.attributes || {};
+  cardModelSchema.attributes['is-card-model'] = true;
+
+  included.filter(i => i.type === 'content-types').forEach(modelSchema => {
+    modelSchema.relationships = modelSchema.relationships || {};
+    modelSchema.relationships.fields = modelSchema.relationships.fields || {};
+    modelSchema.relationships.fields.data = modelSchema.relationships.fields.data || [];
+    modelSchema.relationships.fields.data.push({ type: 'computed-fields', id: 'card-context' });
+    modelSchema.attributes = modelSchema.attributes || {};
+    modelSchema.attributes['default-includes'] = modelSchema.attributes['default-includes'] || [];
+    modelSchema.attributes['default-includes'].push('card-context');
+  });
+
+  // TODO what about card's router? do we need to do special things there in terms of adding the context to the card queries in the router?
+
+  return schemaDocument;
+}
+
+function modelsOf(document = {}) {
+  let { data, included = [] } = document;
+  if (!data) { return []; }
+
+  let models = [data];
+  return models.concat(included);
+}
+
+function replaceIdsForResource(resource, idMap) {
+  resource.id = idMap[`${resource.type}/${resource.id}`] || resource.id;
+  if (!resource.relationships) { return; }
+
+  for (let relationship of Object.keys(resource.relationships)) {
+    if (resource.relationships[relationship].data && Array.isArray(resource.relationships[relationship].data)) {
+      resource.relationships[relationship].data.forEach(ref => {
+        ref.id = idMap[`${ref.type}/${ref.id}`] || ref.id;
+      });
+    } else if (resource.relationships[relationship].data) {
+      let ref = resource.relationships[relationship].data;
+      ref.id = idMap[`${ref.type}/${ref.id}`] || ref.id;
+    }
+  }
+}
+
 module.exports = {
+  addContextForCardDefinition,
   currentVersionLabel,
   cardContextFromId,
   cardContextToId,
-  cardContextDelim
+  cardContextDelim,
+  cardIdFromId,
+  cardDefinitionIdFromId,
+  isCard,
+  hasCardDefinition,
+  modelsOf
 };

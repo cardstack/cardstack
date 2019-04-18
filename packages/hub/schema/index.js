@@ -2,6 +2,7 @@ const Error = require('@cardstack/plugin-utils/error');
 const Session = require('@cardstack/plugin-utils/session');
 const { declareInjections } = require('@cardstack/di');
 const { partition, uniqWith, isEqual, uniq } = require('lodash');
+const { cardDefinitionIdFromId, hasCardDefinition, cardContextToId, cardContextFromId } = require('@cardstack/plugin-utils/card-context');
 
 module.exports = declareInjections({
   schemaLoader: 'hub:schema-loader',
@@ -13,7 +14,8 @@ class Schema {
     return new this(opts);
   }
 
-  constructor({ types, fields, computedFields, dataSources, inputModels, plugins, schemaLoader, searchers, grants }) {
+  constructor({ cardDefinitions, types, fields, computedFields, dataSources, inputModels, plugins, schemaLoader, searchers, grants }) {
+    this.cardDefinitions = cardDefinitions;
     this.types = types;
     this.realFields = fields;
     this.computedFields = computedFields;
@@ -62,12 +64,14 @@ class Schema {
 
   withOnlyRealFields(doc) {
     let activeDoc = doc;
+    let { sourceId, packageName } = cardContextFromId(doc.type);
     for (let section of ['attributes', 'relationships']) {
       if (!doc[section]) {
         continue;
       }
       for (let fieldName of Object.keys(doc[section])) {
-        if (!this.realFields.has(fieldName)) {
+        let scopedFieldId = hasCardDefinition(doc.type) ? cardContextToId({ sourceId, packageName, cardId: fieldName }) : null;
+        if (!this.realFields.has(fieldName) && !this.realFields.has(scopedFieldId)) {
           if (activeDoc === doc) {
             activeDoc = Object.assign({}, doc);
           }
@@ -79,6 +83,11 @@ class Schema {
       }
     }
     return activeDoc;
+  }
+
+  getCardDefinition(documentId) {
+    let cardDefinitionId = cardDefinitionIdFromId(documentId);
+    return this.cardDefinitions.get(cardDefinitionId);
   }
 
   async authorizedCreatableContentTypes(session=Session.EVERYONE) {

@@ -4,11 +4,12 @@ const { get, flatten } = require('lodash');
 const Realms = require('./realms');
 const authLog = require('@cardstack/logger')('cardstack/auth');
 const Session = require('@cardstack/plugin-utils/session');
-const { cardContextFromId } = require('@cardstack/plugin-utils/card-context');
+const { hasCardDefinition, cardDefinitionIdFromId } = require('@cardstack/plugin-utils/card-context');
 
 module.exports = class ContentType {
   constructor(model, allFields, allComputedFields, allConstraints, dataSources, defaultDataSource, allGrants, allGroups) {
-    let { sourceId, packageName } = cardContextFromId(model.id);
+    let isContentTypeFromCardSchema = hasCardDefinition(model.id);
+    let cardDefinitionId = cardDefinitionIdFromId(model.id);
 
     let realFields = new Map();
     let computedFields = new Map();
@@ -17,23 +18,20 @@ module.exports = class ContentType {
     if (model.relationships && model.relationships.fields) {
       for (let fieldRef of model.relationships.fields.data) {
         let field;
-        let { sourceId:fieldSourceId, packageName:fieldPackageName } = cardContextFromId(fieldRef.id);
-        if (sourceId != null &&
-          packageName != null &&
-          fieldSourceId != null &&
-          fieldPackageName != null &&
-          (sourceId !== fieldSourceId || packageName !== fieldPackageName)) {
+        let isFieldFromCardSchema = hasCardDefinition(fieldRef.id);
+        let fieldCardDefinitionId = cardDefinitionIdFromId(fieldRef.id);
+        if (isContentTypeFromCardSchema && isFieldFromCardSchema && cardDefinitionId !== fieldCardDefinitionId) {
           throw new Error(`content type "${model.id}" refers to field defined in foreign schema ${fieldRef.id}`, {
             status: 400,
             title: 'Broken field reference'
           });
         }
         if ((field = allFields.get(fieldRef.id))) {
-          realFields.set(fieldRef.id, field);
-          realAndComputedFields.set(fieldRef.id, field);
+          realFields.set(field.name, field);
+          realAndComputedFields.set(field.name, field);
         } else if ((field = allComputedFields.get(fieldRef.id))) {
-          computedFields.set(fieldRef.id, field);
-          realAndComputedFields.set(fieldRef.id, field.virtualField);
+          computedFields.set(field.virtualField.name, field);
+          realAndComputedFields.set(field.virtualField.name, field.virtualField);
         } else {
           throw new Error(`content type "${model.id}" refers to missing field "${fieldRef.id}"`, {
             status: 400,
@@ -90,12 +88,14 @@ module.exports = class ContentType {
     this.routingField = model.attributes && model.attributes['routing-field'];
 
     if (model.attributes && model.attributes['default-includes']) {
+      this.defaultIncludes = model.attributes['default-includes'];
       this.includesTree = buildSearchTree(model.attributes['default-includes']);
     } else {
       this.includesTree = Object.create(null);
     }
 
     this.router = model.attributes && model.attributes.router;
+    this.isCardModel = Boolean(get(model, 'attributes.is-card-model'));
 
     if (model.attributes && model.attributes['fieldsets']) {
       let fieldsets = model.attributes['fieldsets'];
@@ -281,6 +281,9 @@ module.exports = class ContentType {
     if (resource.meta) {
       output.meta = resource.meta;
     }
+
+    // TODO need to apply read authorization to card metadata (use the underlying metadata's field's grants)
+
     for (let section of ['attributes', 'relationships']) {
       if (resource[section]) {
         for (let [fieldName, value] of Object.entries(resource[section])) {

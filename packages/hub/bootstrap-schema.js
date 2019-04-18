@@ -17,8 +17,9 @@ const models = [
           { type: 'fields', id: 'is-built-in' },
           { type: 'fields', id: 'routing-field' },
           { type: 'fields', id: 'default-includes' },
-          { type: 'fields', id: 'fieldsets' },
-          { type: 'fields', id: 'fieldset-expansion-format' },
+          { type: 'fields', id: 'is-card-model' },
+          { type: 'fields', id: 'fieldsets' }, // TODO we should be able to remove this now...
+          { type: 'fields', id: 'fieldset-expansion-format' }, // TODO we might be able to get rid of this now...
           { type: 'fields', id: 'router' }
         ]
       }
@@ -42,12 +43,13 @@ const models = [
     type: 'content-types',
     id: 'cards',
     attributes: {
-      'is-built-in': true
+      'is-built-in': true,
     },
     relationships: {
       fields: {
         data: [
           { type: 'fields', id: 'model' },
+          { type: 'fields', id: 'all-models' },
         ]
       }
     }
@@ -94,6 +96,8 @@ const models = [
           { type: 'fields', id: 'computed-field-type' },
           { type: 'fields', id: 'caption' },
           { type: 'fields', id: 'searchable' },
+          { type: 'fields', id: 'is-metadata'},
+          { type: 'fields', id: 'needed-when-embedded'},
           { type: 'fields', id: 'params' }
         ]
       }
@@ -351,6 +355,13 @@ const models = [
     id: 'model',
     attributes: {
       'field-type': '@cardstack/core-types::belongs-to'
+    }
+  },
+  {
+    type: 'fields',
+    id: 'all-models',
+    attributes: {
+      'field-type': '@cardstack/core-types::has-many'
     }
   },
   {
@@ -755,6 +766,13 @@ const models = [
     }
   },
   {
+    type: 'fields',
+    id: 'is-card-model',
+    attributes: {
+      'field-type': '@cardstack/core-types::boolean'
+    }
+  },
+  {
     type: 'computed-fields',
     id: 'plugin-enabled',
     attributes: {
@@ -763,6 +781,13 @@ const models = [
         'aliasPath': 'config.enabled',
         'defaultValue': true
       }
+    }
+  },
+  {
+    type: 'computed-fields',
+    id: 'card-context',
+    attributes: {
+      'computed-field-type': '@cardstack/core-types::card-context',
     }
   },
   {

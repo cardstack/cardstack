@@ -3,6 +3,7 @@ const Field = require('./schema/field');
 const ComputedField = require('./schema/computed-field');
 const Constraint = require('./schema/constraint');
 const ContentType = require('./schema/content-type');
+const CardDefinition = require('./schema/card-definition');
 const DataSource = require('./schema/data-source');
 const Grant = require('./schema/grant');
 const Group = require('./schema/group');
@@ -12,7 +13,7 @@ const {
   getOwner
 } = require('@cardstack/di');
 
-const ownTypes = Object.freeze(['content-types', 'fields', 'computed-fields', 'constraints', 'input-assignments', 'data-sources', 'grants', 'groups', 'plugin-configs', 'default-values']);
+const ownTypes = Object.freeze(['card-definitions', 'content-types', 'fields', 'computed-fields', 'constraints', 'input-assignments', 'data-sources', 'grants', 'groups', 'plugin-configs', 'default-values']);
 
 module.exports = declareInjections({
   pluginLoader: 'hub:plugin-loader',
@@ -49,10 +50,11 @@ class SchemaLoader {
     log.trace('default data source %j', defaultDataSource);
     let groups = findGroups(models, fields);
     let types = findTypes(models, fields, computedFields, constraints, dataSources, defaultDataSource, grants, groups);
+    let cardDefinitions = findCardDefinitions(models, types);
     validateRelatedTypes(types, fields);
     log.debug(`SchemaLoader.loadFrom completed loading schema`);
 
-    return getOwner(this).factoryFor('hub:schema').create({ types, fields, computedFields, dataSources, inputModels, plugins, grants });
+    return getOwner(this).factoryFor('hub:schema').create({ cardDefinitions, types, fields, computedFields, dataSources, inputModels, plugins, grants });
   }
 });
 
@@ -150,6 +152,16 @@ function findTypes(models, fields, computedFields, constraints, dataSources, def
     }
   }
   return types;
+}
+
+function findCardDefinitions(models, contentTypes) {
+  let cardDefinitions = new Map();
+  for (let model of models) {
+    if (model.type === 'card-definitions') {
+      cardDefinitions.set(model.id, new CardDefinition(model, contentTypes));
+    }
+  }
+  return cardDefinitions;
 }
 
 function findGroups(models, allFields) {

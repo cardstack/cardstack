@@ -17,18 +17,19 @@ module.exports = class Field {
       throw new Error(`${fieldName} is not a valid field name. We follow JSON:API spec for valid member names, see http://jsonapi.org/format/#document-member-names`);
     }
 
-    // TODO need to update DocumentContext, codegen, et. al. to deal with the field name being different than the field id
     this.name = fieldName;
     this.id = model.id;
     if (!model.attributes || !model.attributes['field-type']) {
       throw new Error(`field ${model.id} has no field-type attribute`);
     }
     this.fieldType = model.attributes['field-type'];
-    this.caption = model.attributes.caption || humanize(model.id);
+    this.caption = model.attributes.caption || humanize(this.name);
     this.editorComponent = model.attributes['editor-component'];
     this.editorOptions = model.attributes['editor-options'] || {};
     this.inlineEditorComponent = model.attributes['inline-editor-component'];
     this.inlineEditorOptions = model.attributes['inline-editor-options'];
+    this.isMetadata = model.attributes['is-metadata'];
+    this.neededWhenEmbedded = model.attributes['needed-when-embedded'];
     this.searchable = model.attributes.searchable == null ? true : model.attributes.searchable;
     let owned = model.attributes.owned;
     this.owned = typeof owned === 'undefined' ? false : owned;
@@ -99,9 +100,9 @@ module.exports = class Field {
     if (document) {
       let section = this._sectionName();
       if (section === 'top') {
-        return document[this.id];
+        return document[this.name];
       } else if (document[section]) {
-        return document[section][this.id];
+        return document[section][this.name];
       }
     }
   }
@@ -109,19 +110,19 @@ module.exports = class Field {
   pointer() {
     let sectionName = this._sectionName();
     if (sectionName === 'top') {
-      return `/data/${this.id}`;
+      return `/data/${this.name}`;
     } else {
-      return `/data/${sectionName}/${this.id}`;
+      return `/data/${sectionName}/${this.name}`;
     }
   }
 
   _checkInWrongSection(pendingChange, errors) {
     let sectionName = this.isRelationship ? 'attributes' : 'relationships';
     let section = pendingChange.finalDocument[sectionName];
-    if (section && section[this.id]) {
-      errors.push(new Error(`field "${this.id}" should be in ${this._sectionName()}, not ${sectionName}`, {
+    if (section && section[this.name]) {
+      errors.push(new Error(`field "${this.name}" should be in ${this._sectionName()}, not ${sectionName}`, {
         status: 400,
-        source: { pointer: `/data/${sectionName}/${this.id}` }
+        source: { pointer: `/data/${sectionName}/${this.name}` }
       }));
     }
   }
@@ -134,9 +135,9 @@ module.exports = class Field {
 
     let result = this.plugin.valid(value, { relatedTypes: this.relatedTypes });
     if (!result) {
-      result = `${JSON.stringify(value)} is not a valid value for field "${this.id}"`;
+      result = `${JSON.stringify(value)} is not a valid value for field "${this.name}"`;
     } else if (typeof result === 'string') {
-      result = `field "${this.id}" ${result}`;
+      result = `field "${this.name}" ${result}`;
     }
     if (typeof result === 'string') {
       errors.push(new Error(result, {
@@ -183,7 +184,7 @@ module.exports = class Field {
   async applyDefault(pendingChange,  context) {
     let defaultValue = await this._defaultValueFor(pendingChange, context);
     if (defaultValue) {
-      pendingChange.serverProvidedValues.set(this.id,defaultValue.value);
+      pendingChange.serverProvidedValues.set(this.name,defaultValue.value);
       if (!pendingChange.originalDocument) {
         if (this.valueFrom(pendingChange, 'finalDocument') !== undefined) {
           // The user provided a value at creation, so defaults do not
@@ -201,12 +202,12 @@ module.exports = class Field {
 
       let section = this._sectionName();
       if (section === 'top') {
-        pendingChange.finalDocument[this.id] = defaultValue.value;
+        pendingChange.finalDocument[this.name] = defaultValue.value;
       } else {
         if (!pendingChange.finalDocument[section]) {
           pendingChange.finalDocument[section] = {};
         }
-        pendingChange.finalDocument[section][this.id] = defaultValue.value;
+        pendingChange.finalDocument[section][this.name] = defaultValue.value;
       }
     }
   }
@@ -215,6 +216,7 @@ module.exports = class Field {
     let value = this.valueFrom(pendingChange, 'finalDocument');
     let grant;
 
+    // TODO probably need to deal with field.name below instead of field.id
     if (pendingChange.serverProvidedValues.has(this.id) && isEqual(pendingChange.serverProvidedValues.get(this.id), value)) {
       authLog.debug("approved field write for %s because it matches server provided default", this.id);
     } else if (pendingChange.originalDocument && isEqual(value, this.valueFrom(pendingChange, 'originalDocument'))) {

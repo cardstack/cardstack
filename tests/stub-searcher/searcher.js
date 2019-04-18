@@ -11,7 +11,9 @@ module.exports = class StubSearcher {
     this.counter = 0;
   }
 
-  async get(session, type, id, next) {
+  //TODO rename 'type'
+  async get({ session, sourceId, type, id, snapshotVersion, next }) {
+
     if (bootstrapSchema.concat(systemModels).find(m => m.type === type && m.id === id)) {
       return await next();
     }
@@ -29,7 +31,7 @@ module.exports = class StubSearcher {
     }
   }
 
-  async search(session, query, next) {
+  async search({ session, query, next }) {
     if (this.params.injectFirst) {
       return {
         data: [ this.makeModel('examples', '2', this.params.injectFirst) ],

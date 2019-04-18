@@ -19,7 +19,8 @@ class SftpSearcher {
     this.currentSchema = currentSchema;
   }
 
-  async get(session, type, id, next) {
+  //TODO rename 'type'
+  async get({ session, sourceId, type, id, snapshotVersion, next }) {
 
     let result = await next();
 
@@ -66,7 +67,7 @@ class SftpSearcher {
 
   }
 
-  async search(session, query, next) {
+  async search({ session, query, next }) {
     return next();
   }
 

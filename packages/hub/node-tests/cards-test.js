@@ -19,6 +19,7 @@ describe('hub/cards', function () {
     describe('valid schema scenarios', function () {
       afterEach(teardown);
 
+      // TODO assert the card-context field and the is-card-model attr on the card's model content-type
       it('can define a card schema', async function () {
         env = await createDefaultEnvironment(`${__dirname}/../../../tests/stub-cards/valid-cards`);
         searchers = env.lookup('hub:searchers');
@@ -160,6 +161,29 @@ describe('hub/cards', function () {
 
         expect(error.message).to.match(/has a related type that refers to a content type defined in a foreign schema/);
       });
+    });
+  });
+
+  describe('card read', function() {
+    it.skip('get of card internal model includes card', async function() {
+      // TODO (this test lives in the pgsearch indexer right now, it should be moved out...)
+    });
+
+    describe ('card metadata', function() {
+    });
+  });
+
+  describe('card write', function() {
+    it.skip('does not allow card models to reference foreign models', async function() {
+      // TODO
+    });
+    it.skip('does not allow card to expose internal model as a has-many relationship in metadata', async function() {
+      // TODO
+    });
+    it.skip('does not allow card to expose internal model as a belongs-to relationship in metadata', async function() {
+      // TODO
+    });
+    it.skip('TODO cannot create an internal card model that is not the primary card model before the card instance exists', async function () {
     });
   });
 });

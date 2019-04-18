@@ -15,18 +15,18 @@ class Writers {
     return this.schemaLoader.ownTypes();
   }
 
-  async create(session, type, document) {
-    log.info("creating type=%s", type);
+  async create(session, type, document, cardIdForNewModel) {
+    log.info("creating type=%s for card-id=%s", type, cardIdForNewModel);
     if (!document.data) {
       throw new Error('The document must have a top-level "data" property', {
         status: 400
       });
     }
 
-    return await this.handleCreate(false, session, type, document);
+    return await this.handleCreate(false, session, type, cardIdForNewModel, document);
   }
 
-  async createBinary(session, type, stream) {
+  async createBinary(session, type, cardInstanceId, stream) {
     log.info("creating type=%s from binary stream", type);
     if (!stream.read) {
       throw new Error('The passed stream must be a readable binary stream', {
@@ -34,11 +34,10 @@ class Writers {
       });
     }
 
-    return await this.handleCreate(true, session, type, stream);
-
+    return await this.handleCreate(true, session, type, cardInstanceId, stream);
   }
 
-  async handleCreate(isBinary, session, type, documentOrStream) {
+  async handleCreate(isBinary, session, type, id, documentOrStream) {
     await this.pgSearchClient.ensureDatabaseSetup();
 
     let schema = await this.currentSchema.getSchema();
@@ -56,9 +55,11 @@ class Writers {
       pending = await this.createPendingChange({ originalDocument, finalDocument, finalizer, aborter, opts});
     } else {
       let isSchema = this.schemaTypes.includes(type);
+      // TODO UPDATE ALL CALLERS!
       let opts = await writer.prepareCreate(
         session,
         type,
+        id,
         this._cleanupBodyData(schema, documentOrStream.data),
         isSchema
       );
@@ -130,7 +131,9 @@ class Writers {
     let schema = await this.currentSchema.getSchema();
     let { writer, sourceId } = this._getSchemaDetailsForType(schema, type);
     let isSchema = this.schemaTypes.includes(type);
-    let opts = await writer.prepareDelete(session, version, type, id, isSchema);
+    // cards are a construct that we manufacture in the hub--upstream data sources don't reason using cards
+    let upstreamType = type === 'cards' ? schema.getCardDefinition(id).modelContentType.id : type;
+    let opts = await writer.prepareDelete(session, version, upstreamType, id, isSchema);
     let { originalDocument, finalDocument, finalizer, aborter } = opts;
     let pending = await this.createPendingChange({ originalDocument, finalDocument, finalizer, aborter, opts });
     try {
