@@ -25,10 +25,7 @@ class StaticModelsIndexer {
     this.schemaModels = schemaModels;
   }
 
-  async branches() {
-    return ['master'];
-  }
-  async beginUpdate(/* branch */) {
+  async beginUpdate() {
     return new Updater(this.schemaModels);
   }
 });
