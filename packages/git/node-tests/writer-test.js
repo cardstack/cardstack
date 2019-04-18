@@ -40,7 +40,7 @@ describe('git/writer', function() {
         factory.addResource('fields', 'last-name').withAttributes({ fieldType: '@cardstack/core-types::string' }),
         factory.addResource('fields', 'age').withAttributes({ fieldType: '@cardstack/core-types::integer' })
       ]).withRelated('data-source', source);
-    
+
     factory.addResource('content-types', 'musicians')
       .withRelated('fields', [
         factory.addResource('fields', 'group-name').withAttributes({ fieldType: '@cardstack/core-types::string' }),
@@ -111,7 +111,7 @@ describe('git/writer', function() {
 
   describe('create', function() {
     it('saves attributes', async function () {
-      let { data:record } = await writers.create('master', env.session, 'articles', {
+      let { data:record } = await writers.create(env.session, 'articles', {
         data: {
           type: 'articles',
           attributes: {
@@ -143,7 +143,7 @@ describe('git/writer', function() {
     });
 
     it('sorts record attributes deterministically, but not arrays', async function () {
-      let { data:record } = await writers.create('master', env.session, 'musicians', {
+      let { data:record } = await writers.create(env.session, 'musicians', {
         data: {
           type: 'musicians',
           attributes: {
@@ -164,7 +164,7 @@ describe('git/writer', function() {
     });
 
     it('saves default attribute', async function() {
-      await writers.create('master', env.session, 'things-with-defaults', {
+      await writers.create(env.session, 'things-with-defaults', {
         data: {
           id: '1',
           type: 'things-with-defaults',
@@ -176,7 +176,7 @@ describe('git/writer', function() {
 
 
     it('returns correct document', async function () {
-      let { data:record } = await writers.create('master', env.session, 'articles', {
+      let { data:record } = await writers.create(env.session, 'articles', {
         data: {
           type: 'articles',
           attributes: {
@@ -194,7 +194,7 @@ describe('git/writer', function() {
     });
 
     it('returns default attribute', async function() {
-      let { data:record } = await writers.create('master', env.session, 'things-with-defaults', {
+      let { data:record } = await writers.create(env.session, 'things-with-defaults', {
         data: {
           id: '1',
           type: 'things-with-defaults',
@@ -215,7 +215,7 @@ describe('git/writer', function() {
         }
       });
 
-      let pending = await writer.prepareCreate('master', env.session, 'articles', {
+      let pending = await writer.prepareCreate(env.session, 'articles', {
         type: 'articles',
         attributes: {
           title: 'Second Article'
@@ -226,7 +226,7 @@ describe('git/writer', function() {
     });
 
     it('allows optional clientside id', async function() {
-      let { data:record } = await writers.create('master', env.session, 'articles', {
+      let { data:record } = await writers.create(env.session, 'articles', {
         data: {
           id: 'special',
           type: 'articles',
@@ -242,7 +242,7 @@ describe('git/writer', function() {
 
     it('rejects conflicting clientside id', async function() {
       try {
-        await writers.create('master', env.session, 'articles', {
+        await writers.create(env.session, 'articles', {
           data: {
             id: '1',
             type: 'articles',
@@ -264,7 +264,7 @@ describe('git/writer', function() {
 
     it('requires type in body', async function() {
       try {
-        await writers.create('master', env.session, 'articles', {
+        await writers.create(env.session, 'articles', {
           data: {
             id: '1',
             attributes: {
@@ -286,7 +286,7 @@ describe('git/writer', function() {
 
     it('rejects mismatched type', async function() {
       try {
-        await writers.create('master', env.session, 'articles', {
+        await writers.create(env.session, 'articles', {
           data: {
             id: '1',
             type: 'events',
@@ -311,7 +311,7 @@ describe('git/writer', function() {
 
     it('requires id in body', async function() {
       try {
-        await writers.update('master', env.session, 'articles', '1', {
+        await writers.update(env.session, 'articles', '1', {
           data: {
             type: 'articles',
             attributes: {
@@ -333,7 +333,7 @@ describe('git/writer', function() {
 
     it('requires type in body', async function() {
       try {
-        await writers.update('master', env.session, 'articles', '1', {
+        await writers.update(env.session, 'articles', '1', {
           data: {
             id: '1',
             attributes: {
@@ -357,7 +357,7 @@ describe('git/writer', function() {
 
     it('rejects mismatched type', async function() {
       try {
-        await writers.update('master', env.session, 'articles', '1', {
+        await writers.update(env.session, 'articles', '1', {
           data: {
             id: '1',
             type: 'events',
@@ -382,7 +382,7 @@ describe('git/writer', function() {
 
     it('rejects update of missing document', async function() {
       try {
-        await writers.update('master', env.session, 'articles', '10', {
+        await writers.update(env.session, 'articles', '10', {
           data: {
             id: '10',
             type: 'articles',
@@ -423,7 +423,7 @@ describe('git/writer', function() {
           if (meta !== undefined) {
             doc.data.meta = meta;
           }
-          await writers.update('master', env.session, 'articles', '1', doc);
+          await writers.update(env.session, 'articles', '1', doc);
           throw new Error("should not get here");
         } catch (err) {
           expect(err.status).to.equal(400);
@@ -438,7 +438,7 @@ describe('git/writer', function() {
     for (let version of badVersions) {
       it(`rejects invalid version ${version}`, async function() {
         try {
-          await writers.update('master', env.session, 'articles', '1', {
+          await writers.update(env.session, 'articles', '1', {
             data: {
               id: '1',
               type: 'articles',
@@ -462,7 +462,7 @@ describe('git/writer', function() {
     }
 
     it('returns updated document', async function() {
-      let { data:record } = await writers.update('master', env.session, 'articles', '1', {
+      let { data:record } = await writers.update(env.session, 'articles', '1', {
         data: {
           id: '1',
           type: 'articles',
@@ -480,7 +480,7 @@ describe('git/writer', function() {
 
 
     it('returns unchanged field', async function() {
-      let { data:record } = await writers.update('master', env.session, 'people', '1', {
+      let { data:record } = await writers.update(env.session, 'people', '1', {
         data:{
           id: '1',
           type: 'people',
@@ -496,7 +496,7 @@ describe('git/writer', function() {
     });
 
     it('returns default attribute value', async function() {
-      let { data:record } = await writers.update('master', env.session, 'things-with-defaults', '4', {
+      let { data:record } = await writers.update(env.session, 'things-with-defaults', '4', {
         data: {
           id: '4',
           type: 'things-with-defaults',
@@ -511,7 +511,7 @@ describe('git/writer', function() {
     });
 
     it('stores unchanged field', async function() {
-      await writers.update('master', env.session, 'people', '1', {
+      await writers.update(env.session, 'people', '1', {
         data: {
           id: '1',
           type: 'people',
@@ -528,7 +528,7 @@ describe('git/writer', function() {
     });
 
     it('stores updated attribute', async function() {
-      await writers.update('master', env.session, 'articles', '1', {
+      await writers.update(env.session, 'articles', '1', {
         data: {
           id: '1',
           type: 'articles',
@@ -545,7 +545,7 @@ describe('git/writer', function() {
     });
 
     it('stores default attribute', async function() {
-      await writers.update('master', env.session, 'things-with-defaults', '4', {
+      await writers.update(env.session, 'things-with-defaults', '4', {
         data: {
           id: '4',
           type: 'things-with-defaults',
@@ -561,7 +561,7 @@ describe('git/writer', function() {
     });
 
     it('reports merge conflict', async function() {
-      await writers.update('master', env.session, 'articles', '1', {
+      await writers.update(env.session, 'articles', '1', {
         data: {
           id: '1',
           type: 'articles',
@@ -575,7 +575,7 @@ describe('git/writer', function() {
       });
 
       try {
-        await writers.update('master', env.session, 'articles', '1', {
+        await writers.update(env.session, 'articles', '1', {
           data: {
             id: '1',
             type: 'articles',
@@ -599,7 +599,7 @@ describe('git/writer', function() {
 
     it('refuses to update id', async function() {
       try {
-        await writers.update('master', env.session, 'articles', '1', {
+        await writers.update(env.session, 'articles', '1', {
           data: {
             id: '12',
             type: 'articles',
@@ -621,7 +621,7 @@ describe('git/writer', function() {
 
     it('refuses to update type', async function() {
       try {
-        await writers.update('master', env.session, 'articles', '1', {
+        await writers.update(env.session, 'articles', '1', {
           data: {
             id: '1',
             type: 'articles2',
@@ -641,7 +641,7 @@ describe('git/writer', function() {
     });
 
     it('can null out a field', async function() {
-      await writers.update('master', env.session, 'articles', '1', {
+      await writers.update(env.session, 'articles', '1', {
         data: {
           id: '1',
           type: 'articles',
@@ -664,7 +664,7 @@ describe('git/writer', function() {
 
     it('rejects missing document', async function() {
       try {
-        await writers.delete('master', env.session, head, 'articles', '10');
+        await writers.delete(env.session, head, 'articles', '10');
         throw new Error("should not get here");
       } catch (err) {
         if (!err.status) {
@@ -677,7 +677,7 @@ describe('git/writer', function() {
 
     it('requires version', async function() {
       try {
-        await writers.delete('master', env.session, null, 'articles', '1');
+        await writers.delete(env.session, null, 'articles', '1');
         throw new Error("should not get here");
       } catch (err) {
         if (!err.status) {
@@ -692,7 +692,7 @@ describe('git/writer', function() {
     for (let version of badVersions) {
       it(`rejects invalid version ${version}`, async function() {
         try {
-          await writers.delete('master', env.session, version, 'articles', '1');
+          await writers.delete(env.session, version, 'articles', '1');
           throw new Error("should not get here");
         } catch (err) {
           if (err.status == null) {
@@ -705,13 +705,13 @@ describe('git/writer', function() {
     }
 
     it('deletes document', async function() {
-      await writers.delete('master', env.session, head, 'people', '1');
+      await writers.delete(env.session, head, 'people', '1');
       let articles = (await inRepo(repoPath).listTree('master', 'contents/people')).map(a => a.name);
       expect(articles).to.not.contain('1.json');
     });
 
     it('reports merge conflict', async function() {
-      await writers.update('master', env.session, 'articles', '1', {
+      await writers.update(env.session, 'articles', '1', {
         data: {
           id: '1',
           type: 'articles',
@@ -725,7 +725,7 @@ describe('git/writer', function() {
       });
 
       try {
-        await writers.delete('master', env.session, head, 'articles', '1');
+        await writers.delete(env.session, head, 'articles', '1');
         throw new Error("should not get here");
       } catch (err) {
         if (!err.status) {
@@ -739,7 +739,7 @@ describe('git/writer', function() {
 
   describe('belongsTo', function() {
     it('saves at creation', async function() {
-      let { data:record } = await writers.create('master', env.session, 'articles', {
+      let { data:record } = await writers.create(env.session, 'articles', {
         data: {
           type: 'articles',
           relationships: {
@@ -769,7 +769,7 @@ describe('git/writer', function() {
     });
 
     it('echos at creation', async function() {
-      let { data:record } = await writers.create('master', env.session, 'articles', {
+      let { data:record } = await writers.create(env.session, 'articles', {
         data: {
           type: 'articles',
           relationships: {
@@ -787,7 +787,7 @@ describe('git/writer', function() {
     });
 
     it('saves at update', async function() {
-      await writers.update('master', env.session, 'articles', '1', {
+      await writers.update(env.session, 'articles', '1', {
         data: {
           id: '1',
           type: 'articles',
@@ -821,7 +821,7 @@ describe('git/writer', function() {
     });
 
     it('echos at update', async function() {
-      let { data:record } = await writers.update('master', env.session, 'articles', '1', {
+      let { data:record } = await writers.update(env.session, 'articles', '1', {
         data: {
           id: '1',
           type: 'articles',
@@ -882,7 +882,7 @@ describe('git/writer/hyperledger', function() {
     env = await createDefaultEnvironment(`${__dirname}/..`, factory.getModels());
     writers = env.lookup('hub:writers');
 
-    let schema = await writers.schema.forBranch('master');
+    let schema = await writers.currentSchema.getSchema();
     writer = schema.dataSources.get('git').writer;
     await writer._ensureGitchain();
     gitChain = writer.gitChain;
@@ -899,7 +899,7 @@ describe('git/writer/hyperledger', function() {
 
     replace(gitChain, 'push', fakePush);
 
-    await writers.create('master', env.session, 'articles', {
+    await writers.create(env.session, 'articles', {
       data: {
         type: 'articles',
         attributes: {

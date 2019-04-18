@@ -40,9 +40,7 @@ describe('postgresql/indexer', function() {
       .withAttributes({
         'source-type': '@cardstack/postgresql',
         params: {
-          branches: {
-            master: postgresConfig({ database: 'test1'})
-          },
+          config: postgresConfig({ database: 'test1'}),
           renameTables: {
             editors: 'real-editors',
           },

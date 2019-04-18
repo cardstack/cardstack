@@ -593,7 +593,7 @@ describe('pgsearch/searcher', function() {
     expect(response.data).length(10);
     expect(response.meta.page).has.property('cursor');
     expect(response.data[0].id).to.equal('10');
-    expect(response.data[1].id).to.equal('11'); // this relies on knowing that the fallback sort order is branch/type/id
+    expect(response.data[1].id).to.equal('11'); // this relies on knowing that the fallback sort order is type/id
     expect(response.data[2].id).to.equal('9');
 
     response = await searcher.search(env.session, {

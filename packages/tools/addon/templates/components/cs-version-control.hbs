@@ -1,17 +1,3 @@
-<div class="cs-version-control-dropdown">
-  <div class="cs-version-control-dropdown-option">
-    <div class="cs-version-control-dropdown-option--status {{currentState}}" data-test-cs-version-control-dropdown-option-status>
-      {{currentState}}
-    </div>
-    {{!-- TODO figure out how to derive date published here --}}
-    <div class="cs-version-control-dropdown-option--timestamp"></div>
-  </div>
-
-  <button class="cs-version-control-dropdown--button">
-    {{cs-svg "dropdown-buttons" width="20px" height="20px"}}
-  </button>
-</div>
-
 <div class="cs-version-control-header-fields">
   <div class="cs-version-control-header-fields--top-fields">
     {{#each fieldsAboveFooter key="id" as |field|}}
@@ -66,8 +52,9 @@
         </button>
         <button
           class="cs-version-control--button cs-version-control--button-cancel"
+          disabled={{not canCancel}}
           {{action (perform cancel)}}
-          data-test-cs-version-control-button-cancel
+          data-test-cs-version-control-button-cancel="{{not canCancel}}"
         >
           Cancel
         </button>

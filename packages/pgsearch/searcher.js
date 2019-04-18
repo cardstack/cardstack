@@ -17,35 +17,34 @@ const RANGE_OPERATORS = {
   gt: '>'
 };
 
-const PRIMARY_KEY = Object.freeze(['branch', 'type', 'id']);
+const PRIMARY_KEY = Object.freeze(['type', 'id']);
 
 module.exports = declareInjections({
-  schema: 'hub:current-schema',
+  currentSchema: 'hub:current-schema',
   client: `plugin-client:${require.resolve('./client')}`
 }, class Searcher {
   constructor() {
     log.debug("constructed pgsearch searcher");
    }
 
-  async get(session, branch, type, id) {
-    let response = await this.client.query('select pristine_doc from documents where branch=$1 and type=$2 and id=$3 and (expires is null or expires > now())', [branch, type, id]);
+  async get(session, type, id) {
+    let response = await this.client.query('select pristine_doc from documents where type=$1 and id=$2 and (expires is null or expires > now())', [type, id]);
     if (response.rowCount > 0){
       return response.rows[0].pristine_doc;
     }
   }
 
-  async search(session, branch, { filter, sort, page, queryString } ) {
+  async search(session, { filter, sort, page, queryString } ) {
     let realms = await session.realms();
-    let schema = await this.schema.forBranch(branch);
+    let schema = await this.currentSchema.getSchema();
 
     let conditions = [
-      ['branch = ', param(branch) ],
       ['realms && ', param(realms) ],
       ['expires is null or expires > now()']
     ];
 
     if (filter) {
-      conditions.push(this.filterCondition(branch, schema, filter));
+      conditions.push(this.filterCondition(schema, filter));
     }
 
     if (queryString) {
@@ -107,31 +106,31 @@ module.exports = declareInjections({
     return [`q @@ plainto_tsquery('english', `, param(value), `)` ];
   }
 
-  filterCondition(branch, schema, filter){
+  filterCondition(schema, filter){
     return every(Object.entries(filter).map(([key, value]) => {
       switch(key){
       case 'not':
-        return ['NOT', ...addExplicitParens(this.filterCondition(branch, schema, value))];
+        return ['NOT', ...addExplicitParens(this.filterCondition(schema, value))];
       case 'and':
         // 'and' is not strictly needed, since we already conjoin all
         // top-level conditions. But for completeness, it works.
         if (!Array.isArray(value)) {
           throw new Error(`the "and" operator must receive an array of other filters`, { status: 400 });
         }
-        return every(value.map(item => this.filterCondition(branch, schema, item)));
+        return every(value.map(item => this.filterCondition(schema, item)));
       case 'or':
         if (!Array.isArray(value)) {
           throw new Error(`the "or" operator must receive an array of other filters`, { status: 400 });
         }
-        return any(value.map(item => this.filterCondition(branch, schema, item)));
+        return any(value.map(item => this.filterCondition(schema, item)));
       default:
-        return this.fieldFilter(branch, schema, key, value);
+        return this.fieldFilter(schema, key, value);
       }
     }));
   }
 
   buildQueryExpression(schema, key, errorHint){
-    if (key === 'branch' || key === 'type' || key === 'id'){
+    if (key === 'type' || key === 'id'){
       return { isPlural: false, expression: [key], leafField: { buildValueExpression(value) { return [{ param: value }]; } } };
     }
     let segments = key.split('.');
@@ -180,9 +179,9 @@ module.exports = declareInjections({
     }
   }
 
-  fieldFilter(branch, schema, key, value) {
+  fieldFilter(schema, key, value) {
     if (Array.isArray(value)){
-      return any(value.map(item => this.fieldFilter(branch, schema, key, item)));
+      return any(value.map(item => this.fieldFilter(schema, key, item)));
     }
 
     let { isPlural, expression, leafField } = this.buildQueryExpression(schema, key, 'filter');
@@ -203,7 +202,7 @@ module.exports = declareInjections({
         // by using an array above this point. And it's inconsistent with the
         // other operators that don't necessarily support arrays. We should
         // either make them all work or none work.
-        return any(value.exact.map(item => this.fieldFilter(branch, schema, key, { exact: item })));
+        return any(value.exact.map(item => this.fieldFilter(schema, key, { exact: item })));
       } else {
         if (isPlural){
           return [...expression, '&&', 'array[', ...leafField.buildValueExpression(value.exact), ']'];

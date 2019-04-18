@@ -65,7 +65,7 @@ describe('hub/searchers/basics', function() {
         await searchers.get(env.session, 'local-hub', 'examples', 'nonexistent');
         throw new Error("should not get here");
       } catch (err) {
-        expect(err.message).to.match(/No such resource master\/examples\/nonexist/);
+        expect(err.message).to.match(/No such resource local-hub\/examples\/nonexist/);
       }
     });
 
@@ -142,9 +142,9 @@ describe('hub/searchers/basics', function() {
     // for expiration, and I don't want to wait around, so instead we'll do
     // something fast that will fail loudly if the implementation changes out
     // from under us.
-    async function alterExpiration(branch, type, id, interval) {
+    async function alterExpiration(type, id, interval) {
       let client = env.lookup(`plugin-client:${require.resolve('@cardstack/pgsearch/client')}`);
-      let result = await client.query('update documents set expires = expires + $1 where branch=$2 and type=$3 and id=$4', [interval, branch, type, id]);
+      let result = await client.query('update documents set expires = expires + $1 where type=$2 and id=$3', [interval, type, id]);
       if (result.rowCount !== 1) {
         throw new Error(`test was unable to alter expiration`);
       }
@@ -162,7 +162,7 @@ describe('hub/searchers/basics', function() {
     });
 
     it("can cache searcher#get included resources", async function() {
-      let { data: { id, type }} = await env.lookup('hub:writers').create('master', env.session, 'puppies', {
+      let { data: { id, type }} = await env.lookup('hub:writers').create(env.session, 'puppies', {
         data: {
           type: 'puppies',
           relationships: {
@@ -186,7 +186,7 @@ describe('hub/searchers/basics', function() {
       expect(response).has.deep.property('data.attributes.example-counter');
       let firstCounter = response.data.attributes['example-counter'];
 
-      await alterExpiration('master', 'examples', '1000', '-301 seconds');
+      await alterExpiration('examples', '1000', '-301 seconds');
 
       response = await searchers.get(env.session, 'local-hub', 'examples', '1000');
       await searchers._cachingPromise;
@@ -195,7 +195,7 @@ describe('hub/searchers/basics', function() {
     });
 
     it("does not return expired searcher#get included resources", async function() {
-      let { data: { id, type }} = await env.lookup('hub:writers').create('master', env.session, 'puppies', {
+      let { data: { id, type }} = await env.lookup('hub:writers').create(env.session, 'puppies', {
         data: {
           type: 'puppies',
           relationships: {
@@ -208,7 +208,7 @@ describe('hub/searchers/basics', function() {
       expect(response).has.deep.property('attributes.example-counter');
       let firstCounter = response.attributes['example-counter'];
 
-      await alterExpiration('master', 'examples', '1000', '-301 seconds');
+      await alterExpiration('examples', '1000', '-301 seconds');
 
       response = (await searchers.get(env.session, 'local-hub', type, id, { includePaths: ['example'] })).included[0];
       await searchers._cachingPromise;
@@ -219,7 +219,7 @@ describe('hub/searchers/basics', function() {
     it("does not return expired documents in searcher#search", async function() {
       await searchers.get(env.session, 'local-hub', 'examples', '1000');
       await searchers._cachingPromise;
-      await alterExpiration('master', 'examples', '1000', '-301 seconds');
+      await alterExpiration('examples', '1000', '-301 seconds');
       let response = await searchers.search(env.session, { filter: { type: 'examples', id: '1000' }});
       await searchers._cachingPromise;
       expect(response.data).length(0);

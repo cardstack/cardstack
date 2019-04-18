@@ -74,7 +74,7 @@ async function waitForEthereumEvents(indexer) {
 }
 
 async function createTrackedEthereumAddress(address) {
-  let trackedAddress = await env.lookup('hub:writers').create('master', env.session, 'tracked-ethereum-addresses', {
+  let trackedAddress = await env.lookup('hub:writers').create(env.session, 'tracked-ethereum-addresses', {
     data: { id: address, type: 'tracked-ethereum-addresses' }
   });
   await waitForEthereumEvents(transactionIndexer);
@@ -83,7 +83,7 @@ async function createTrackedEthereumAddress(address) {
 }
 
 async function createTrackedEthereumAddresses(addresses) {
-  let trackedAddresses = await env.lookup('hub:writers').create('master', env.session, 'tracked-ethereum-addresses', {
+  let trackedAddresses = await env.lookup('hub:writers').create(env.session, 'tracked-ethereum-addresses', {
     data: {
       type: 'tracked-ethereum-addresses',
       attributes: {
@@ -426,7 +426,7 @@ contract('ethereum-addresses indexing', function (_accounts) {
         await waitForEthereumEvents(transactionIndexer);
 
         await searchers.get(env.session, 'local-hub', 'ethereum-transactions', txn.hash);
-        await env.lookup('hub:writers').delete('master', env.session, version, 'tracked-ethereum-addresses', sender);
+        await env.lookup('hub:writers').delete(env.session, version, 'tracked-ethereum-addresses', sender);
         await waitForEthereumEvents(transactionIndexer);
 
         let error = null;
@@ -595,9 +595,9 @@ contract('ethereum-addresses indexing', function (_accounts) {
 
         await waitForEthereumEvents(transactionIndexer);
 
-        let sql = 'delete from documents where branch=$1 and type=$2 and id=$3';
+        let sql = 'delete from documents where type=$1 and id=$2';
         for (let id of [from, to]) {
-          await pgclient.query(sql, ['master', 'ethereum-addresses', id]);
+          await pgclient.query(sql, ['ethereum-addresses', id]);
 
           let error;
           try {
@@ -735,7 +735,7 @@ contract('ethereum-addresses indexing', function (_accounts) {
         let txnHash = await sendTransaction({ from: sender, to: recipient, value, gasPrice });
         let txn1 = await getTransaction(txnHash);
 
-        await env.lookup('hub:writers').create('master', env.session, 'tracked-ethereum-addresses', {
+        await env.lookup('hub:writers').create(env.session, 'tracked-ethereum-addresses', {
           data: { id: sender, type: 'tracked-ethereum-addresses' }
         });
         // intentionally not awaiting ethereum events while hub looks for txns to index
@@ -792,7 +792,7 @@ contract('ethereum-addresses indexing', function (_accounts) {
         const { address: from } = await newAddress(accounts[1], web3.toWei(txnTestEthValueWithGasFee, 'ether'));
         const { address: to } = await newAddress();
 
-        await env.lookup('hub:writers').create('master', env.session, 'tracked-ethereum-addresses', {
+        await env.lookup('hub:writers').create(env.session, 'tracked-ethereum-addresses', {
           data: { type: 'tracked-ethereum-addresses' }
         });
         await waitForEthereumEvents(transactionIndexer);
@@ -930,7 +930,7 @@ contract('ethereum-addresses indexing', function (_accounts) {
         await sendTransaction({ from: sender, to: recipient, value, gasPrice });
         await waitForEthereumEvents(transactionIndexer);
 
-        await env.lookup('hub:writers').delete('master', env.session, version, 'tracked-ethereum-addresses', id);
+        await env.lookup('hub:writers').delete(env.session, version, 'tracked-ethereum-addresses', id);
 
         await waitForEthereumEvents(transactionIndexer);
 
@@ -967,7 +967,7 @@ contract('ethereum-addresses indexing', function (_accounts) {
 
         await waitForEthereumEvents(transactionIndexer);
 
-        await env.lookup('hub:writers').delete('master', env.session, version, 'tracked-ethereum-addresses', id);
+        await env.lookup('hub:writers').delete(env.session, version, 'tracked-ethereum-addresses', id);
 
         await waitForEthereumEvents(transactionIndexer);
 

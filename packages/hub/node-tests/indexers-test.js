@@ -118,7 +118,7 @@ describe('hub/indexers', function() {
         let readStream = createReadStream(path.join(__dirname, 'images', filename));
         readStream.type = 'cardstack-files';
         readStream.id = filename.replace(/\..+/, '');
-        await writers.createBinary('master', Session.INTERNAL_PRIVILEGED, 'cardstack-files', readStream);
+        await writers.createBinary(Session.INTERNAL_PRIVILEGED, 'cardstack-files', readStream);
       }));
 
       let response = await env.lookup('hub:searchers').search(env.session, { filter: { type: 'cardstack-files' }});
@@ -198,14 +198,6 @@ describe('hub/indexers', function() {
       });
 
       indexers.on('add', model => {
-        if(model.type === 'branches') {
-          // this test is written to check the dog model and was originally structured
-          // to exect only one object to be created. Now branch models are automatically
-          // created during a run. This is not a change in behaviour it is just a limitation
-          // of how this test was originally written
-          return;
-        }
-
         addCount++;
 
         expect(model.id).to.be.ok;
@@ -228,7 +220,7 @@ describe('hub/indexers', function() {
         });
       });
 
-      await env.lookup('hub:writers').create('master', Session.INTERNAL_PRIVILEGED, 'dogs', {
+      await env.lookup('hub:writers').create(Session.INTERNAL_PRIVILEGED, 'dogs', {
         data: {
           type: 'dogs',
           attributes: {

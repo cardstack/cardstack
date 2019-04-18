@@ -5,11 +5,7 @@ module.exports = declareInjections({
   loadInitialModels: 'config:initial-models'
 }, class Indexer {
 
-  async branches() {
-    return ['master'];
-  }
-
-  async beginUpdate(/* branch */) {
+  async beginUpdate() {
     if (this.initialModels) {
       throw new Error("The ephemeral data source no longer accepts params.initialModels. Use the new general-purpose seed model support instead.");
     }

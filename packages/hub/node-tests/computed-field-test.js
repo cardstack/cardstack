@@ -263,7 +263,7 @@ describe('hub/computed-fields', function() {
     afterEach(teardown);
 
     it("includes computed field in create response", async function() {
-      let model = await env.lookup('hub:writers').create('master', env.session, 'foods', {
+      let model = await env.lookup('hub:writers').create(env.session, 'foods', {
         data: {
           type: 'foods',
           attributes: {
@@ -278,14 +278,14 @@ describe('hub/computed-fields', function() {
     it("includes computed field in update response", async function() {
       let model = await env.lookup('hub:searchers').get(env.session, 'local-hub', 'foods', banana.id);
       model.data.attributes['weight-in-ounces'] = 1;
-      let response = await env.lookup('hub:writers').update('master', env.session, 'foods', banana.id, model);
+      let response = await env.lookup('hub:writers').update(env.session, 'foods', banana.id, model);
       expect(response.data).has.deep.property('attributes.weight-in-grams', 28);
     });
 
     it("updates computed field in response to a dependent model changing", async function() {
       let model = await env.lookup('hub:searchers').get(env.session, 'local-hub', 'foods', apple.id);
       model.data.attributes['color'] = 'blue';
-      await env.lookup('hub:writers').update('master', env.session, 'foods', apple.id, model);
+      await env.lookup('hub:writers').update(env.session, 'foods', apple.id, model);
       await env.lookup('hub:indexers').update({ forceRefresh: true });
       model = await env.lookup('hub:searchers').get(env.session, 'local-hub', 'foods', banana.id);
       expect(model.data).has.deep.property('attributes.good-with-red', false);

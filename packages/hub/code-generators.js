@@ -6,14 +6,14 @@ module.exports = declareInjections({
 },
 
 class CodeGenerators {
-  async generateCodeForBranch(branch, modulePrefix) {
-    log.debug(`Running code generators on branch %s`, branch);
+  async generateCode(modulePrefix) {
+    log.debug(`Running code generators`);
     let results = [];
     let activePlugins = await this.plugins.active();
     for (let feature of activePlugins.featuresOfType('code-generators')) {
-      log.debug(`Running code generator %s on branch %s`, feature.id, branch);
+      log.debug(`Running code generator %s `, feature.id);
       let codeGenerator = activePlugins.lookupFeatureAndAssert('code-generators', feature.id);
-      results.push(await codeGenerator.generateCode(modulePrefix, branch));
+      results.push(await codeGenerator.generateCode(modulePrefix));
     }
     return results.join("");
   }

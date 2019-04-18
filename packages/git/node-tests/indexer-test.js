@@ -64,14 +64,14 @@ describe('git/indexer', function() {
       client = env.lookup(`plugin-client:${require.resolve('@cardstack/pgsearch/client')}`);
     };
 
-    assertNoDocument = async function(version, type, id) {
+    assertNoDocument = async function(type, id) {
       try {
-        await searcher.get(env.session, 'local-hub', type, id, { version });
+        await searcher.get(env.session, 'local-hub', type, id);
       } catch(err) {
         expect(err.status).to.equal(404);
         return;
       }
-      throw new Error(`expected not to find document version=${version} type=${type} id=${id}`);
+      throw new Error(`expected not to find document type=${type} id=${id}`);
     };
   });
 
@@ -125,7 +125,7 @@ describe('git/indexer', function() {
 
     let indexerState = await client.loadMeta({ branch: 'master', id: dataSource.id });
     expect(indexerState.commit).to.equal(head);
-    await assertNoDocument('master', 'articles', 'hello-world');
+    await assertNoDocument('articles', 'hello-world');
   });
 
   it('ignores newly added document with malformed json', async function() {
@@ -144,7 +144,7 @@ describe('git/indexer', function() {
 
     let indexerState = await client.loadMeta({ branch: 'master', id: dataSource.id });
     expect(indexerState.commit).to.equal(head);
-    await assertNoDocument('master', 'articles', 'hello-world');
+    await assertNoDocument('articles', 'hello-world');
   });
 
   it('does not reindex unchanged content', async function() {
@@ -159,10 +159,10 @@ describe('git/indexer', function() {
     // Here we manually reach into postgres to dirty a cached
     // document in order to see whether the indexer will leave it
     // alone
-    let row = await client.query(`select pristine_doc from documents where branch=$1 and type=$2 and id=$3`, ['master', 'articles', 'hello-world']);
+    let row = await client.query(`select pristine_doc from documents where type=$1 and id=$2`, ['articles', 'hello-world']);
     let editedDoc = Object.assign({}, row.rows[0].pristine_doc);
     editedDoc.data.attributes.title = 'somebody else';
-    await client.query(`update documents set pristine_doc=$1 where branch=$2 and type=$3 and id=$4`, [editedDoc, 'master', 'articles', 'hello-world']);
+    await client.query(`update documents set pristine_doc=$1 where type=$2 and id=$3`, [editedDoc, 'articles', 'hello-world']);
 
     let change = await Change.create(repo, head, 'master');
     let file = await change.get('contents/articles/second.json', { allowCreate: true });
@@ -195,7 +195,7 @@ describe('git/indexer', function() {
     file.delete();
     await change.finalize(commitOpts());
     await indexer.update();
-    await assertNoDocument('master', 'articles', 'hello-world');
+    await assertNoDocument('articles', 'hello-world');
   });
 
   it('replaces unrelated content it finds in the search index', async function() {
@@ -253,7 +253,7 @@ describe('git/indexer', function() {
       let upstream = toResource(await searcher.get(env.session, 'local-hub', 'articles', 'upstream'));
       expect(upstream).has.deep.property('attributes.title', 'article from upstream');
 
-      await assertNoDocument('master', 'articles', 'right');
+      await assertNoDocument('articles', 'right');
     }
 
     let change = await Change.create(repo, head, 'master');
@@ -285,7 +285,7 @@ describe('git/indexer', function() {
       expect(upstream).has.deep.property('attributes.title', 'article from upstream');
 
       // Delete
-      await assertNoDocument('master', 'articles', 'left');
+      await assertNoDocument('articles', 'left');
     }
   });
 

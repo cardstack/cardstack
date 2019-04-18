@@ -5,14 +5,12 @@ const log = require('@cardstack/logger')('cardstack/indexers');
 
 const FINALIZED = {};
 
-class BranchUpdate {
-  constructor(branch, seedSchema, client, emitEvent, isControllingBranch, owner) {
-    this.branch = branch;
+module.exports = class SourcesUpdate {
+  constructor(seedSchema, client, emitEvent, owner) {
     this.seedSchema = seedSchema;
     this.client = client;
     this.updaters = Object.create(null);
     this.emitEvent = emitEvent;
-    this.isControllingBranch = isControllingBranch;
     this.searchers = owner.lookup('hub:searchers');
     this.currentSchema = owner.lookup('hub:current-schema');
     this.schemaModels = [];
@@ -28,7 +26,7 @@ class BranchUpdate {
     if (!indexer) {
       return [];
     }
-    let updater = this.updaters[dataSource.id] = await indexer.beginUpdate(this.branch);
+    let updater = this.updaters[dataSource.id] = await indexer.beginUpdate();
     owningDataSource.set(updater, dataSource);
     let newModels = await updater.schema();
     this.schemaModels.push(newModels);
@@ -42,7 +40,7 @@ class BranchUpdate {
 
   async schema() {
     if (this._schema === FINALIZED) {
-      throw new Error("Bug: the schema has already been taken away from this branch update");
+      throw new Error("Bug: the schema has already been taken away from this sources update");
     }
     if (!this._schema) {
       this._schema = await this.seedSchema.applyChanges(flatten(this.schemaModels).map(model => ({ type: model.type, id: model.id, document: model })));
@@ -70,7 +68,7 @@ class BranchUpdate {
   }
 
   async update(forceRefresh, hints) {
-    await this.client.accomodateSchema(this.branch, await this.schema());
+    await this.client.accomodateSchema(await this.schema());
     await this._updateContent(hints);
   }
 
@@ -103,7 +101,6 @@ class BranchUpdate {
 
   async _loadMeta(updater) {
     return this.client.loadMeta({
-      branch: this.branch,
       id: owningDataSource.get(updater).id,
     });
   }
@@ -114,7 +111,6 @@ class BranchUpdate {
     // it. We don't want inconsistent types across plugins to cause
     // mapping errors.
     return this.client.saveMeta({
-        branch: this.branch,
         id: owningDataSource.get(updater).id,
         params: newMeta
     });
@@ -129,7 +125,6 @@ class BranchUpdate {
       sourceId,
       generation: nonce,
       upstreamDoc: doc,
-      branch: this.branch
     });
 
     let searchDoc = await context.searchDoc();
@@ -151,7 +146,6 @@ class BranchUpdate {
       schema,
       type,
       id,
-      branch: this.branch
     });
 
     await this._batch.deleteDocument(context);
@@ -161,10 +155,9 @@ class BranchUpdate {
   }
 
   async deleteAllWithoutNonce(sourceId, nonce) {
-    await this.client.deleteOlderGenerations(this.branch, sourceId, nonce);
+    await this.client.deleteOlderGenerations(sourceId, nonce);
     this.emitEvent('delete_all_without_nonce', { sourceId, nonce });
     log.debug("bulk delete older content for data source %s", sourceId);
   }
-}
+};
 
-exports.BranchUpdate = BranchUpdate;

@@ -38,9 +38,9 @@ module('Integration | Component | cs version control', function(hooks) {
     });
     this.set('model', model);
     this.meta = this.owner.lookup('service:resource-metadata');
-    this.get('meta').write(model, { branch: 'master' });
+    this.get('meta').write(model, {});
     this.owner.register('config:enviroment', {
-      cardstack: { defaultBranch: 'master' }
+      cardstack: { }
     });
     this.owner.lookup('router:main').setupRouter();
   });
@@ -50,6 +50,7 @@ module('Integration | Component | cs version control', function(hooks) {
     this.model.set('isNew', false);
     await render(hbs`{{cs-version-control model=model enabled=true}}`);
     assert.dom('[data-test-cs-version-control-button-save="true"]').hasText('Save');
+    assert.dom('[data-test-cs-version-control-button-cancel="true"]').hasText('Cancel');
   });
 
   test('render with dirty content', async function(assert) {
@@ -60,10 +61,20 @@ module('Integration | Component | cs version control', function(hooks) {
     assert.dom('[data-test-cs-version-control-button-save="false"]').hasText('Save');
   });
 
-  test('clicking on cancel exits edit mode', async function (assert) {
+  test('clicking on cancel exits edit mode for new model', async function (assert) {
+    this.tools = this.owner.lookup('service:cardstack-tools');
+    this.tools.setEditing(true);
+    this.model.set('isNew', true);
+    await render(hbs`{{cs-version-control model=model enabled=true}}`);
+    await click('[data-test-cs-version-control-button-cancel]');
+    assert.equal(this.tools.get('editing'), false);
+  });
+
+  test('clicking on cancel exits edit mode for dirty model', async function (assert) {
     this.tools = this.owner.lookup('service:cardstack-tools');
     this.tools.setEditing(true);
     this.model.set('isNew', false);
+    this.model.set('hasDirtyFields', true);
     await render(hbs`{{cs-version-control model=model enabled=true}}`);
     await click('[data-test-cs-version-control-button-cancel]');
     assert.equal(this.tools.get('editing'), false);
@@ -124,23 +135,4 @@ module('Integration | Component | cs version control', function(hooks) {
     await click('[data-test-cs-version-control-delete-button]');
   });
 
-  test('"draft" status is displayed for new model', async function (assert) {
-    this.model.set('isNew', true);
-    await render(hbs`{{cs-version-control model=model enabled=true}}`);
-    assert.dom('[data-test-cs-version-control-dropdown-option-status]').hasText('draft');
-  });
-
-  test('"published" status is displayed for clean model', async function (assert) {
-    this.model.set('hasDirtyFields', false);
-    this.model.set('isNew', false);
-    await render(hbs`{{cs-version-control model=model enabled=true}}`);
-    assert.dom('[data-test-cs-version-control-dropdown-option-status]').hasText('published');
-  });
-
-  test('"edited" status is displayed for dirty model', async function (assert) {
-    this.model.set('hasDirtyFields', true);
-    this.model.set('isNew', false);
-    await render(hbs`{{cs-version-control model=model enabled=true}}`);
-    assert.dom('[data-test-cs-version-control-dropdown-option-status]').hasText('edited');
-  });
 });

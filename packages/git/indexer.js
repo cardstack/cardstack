@@ -14,18 +14,11 @@
     source-type-specific configuration (in this case, `repo`,
     `basePath`, and `branchPrefix`).
 
-  - the indexer must implement `branches`, which returns a list of
-    branch names. In the case of Git, branch literally means
-    branch. But other indexers can also make use of the concept of
-    branches to support multiple environments (like produciton vs
-    staging databases). It's up to the indexer to discover branches
-    because they may be as dynamic as desired.
-
   - branch names may span across data sources. For example, both Git
     and Postgres may have "proudction" branches, and both may define
     both schema and content.
 
-  - an indexer must implement beginUpdate(branch), which returns an
+  - an indexer must implement beginUpdate(), which returns an
     updater. The updater represents a running update action, and it's
     appropriate that it can be more stateful than an indexer.
 
@@ -46,7 +39,7 @@
         you return from updateContent() will be passed into the next
         call to updateContent() as `meta`.
 
-      - `hints` can contain a list of `{ branch, id, type }`
+      - `hints` can contain a list of `{ id, type }`
         references. This is intended as an optimization hint when we
         know that certain resources are the ones that likely need to
         be indexed right away. Indexers are responsible for
@@ -70,28 +63,20 @@
     instantiated and running at a given time. You don't need to
     implement locking in the indexer.
 
-  - multiple updaters may run in parallel (one for each branch
-    name). The Hub guarantees it will call `beginUpdate` for every
-    branch before it calls `updateContent` on any of them -- this
-    allows you to implement your own coordination if there are
-    inter-branch ordering concerns.
-
 */
 
 const {
   Repository,
-  Reference,
   Branch,
   Commit,
 } = require('nodegit');
 
 const Change = require("./change");
-
 const { safeEntryByName } = require('./mutable-tree');
-
 const log = require('@cardstack/logger')('cardstack/git');
-
 const service = require('./service');
+
+const defaultBranch = 'master';
 
 module.exports = class Indexer {
   static create(params) { return new this(params); }
@@ -136,37 +121,11 @@ module.exports = class Indexer {
     }
   }
 
-  async branches() {
-    await this._ensureRepo();
-
-    if (this.remote) {
-      await service.fetchAllFromRemote(this.remote.url);
-    }
-
-    // nodegit docs show a Branch.iteratorNew method that would be
-    // more appropriate than this, but as far as I can tell it is not
-    // fully implemented
-    const allBranches = await Reference.list(this.repo);
-
-    let pattern = new RegExp(`^refs/heads/${this.branchPrefix}(.*)`);
-
-    if(this.remote) {
-      pattern = new RegExp(`^refs/remotes/origin/${this.branchPrefix}(.*)`);
-    }
-
-    return (allBranches).map(entry => {
-      let m = pattern.exec(entry);
-      if (m) {
-        return m[1];
-      }
-    }).filter(Boolean);
-  }
-
-  async beginUpdate(branch) {
+  async beginUpdate() {
     log.debug(`starting beginUpdate()`);
     await this._ensureRepo();
 
-    let targetBranch = this.branchPrefix + branch;
+    let targetBranch = this.branchPrefix + defaultBranch;
 
     if (this.remote) {
       await service.pullRepo(this.remote.url, targetBranch);

@@ -14,21 +14,20 @@ class S3Searcher {
   static create(...args) {
     return new this(...args);
   }
-  constructor({ dataSource, config, currentSchema, branches }) {
+  constructor({ dataSource, config, currentSchema }) {
     this.config        = config;
-    this.branches      = branches;
     this.dataSource    = dataSource;
     this.currentSchema = currentSchema;
   }
 
-  async get(session, branch, type, id, next) {
+  async get(session, type, id, next) {
     let result = await next();
 
     if (result) { return result; }
 
     if (type === 'content-types') { return next(); }
 
-    let schema = await this.currentSchema.forBranch(branch);
+    let schema = await this.currentSchema.getSchema();
     let contentType = schema.types.get(type);
     if (!contentType) { return result; }
 
@@ -39,7 +38,7 @@ class S3Searcher {
 
     try {
       let name = basename(id);
-      let result = await this.getObject(branch, { Key: id });
+      let result = await this.getObject({ Key: id });
       let mimeContentType = lookup(name) || 'application/octet-stream';
 
 
@@ -63,19 +62,19 @@ class S3Searcher {
     }
   }
 
-  async search(session, branch, query, next) {
+  async search(session, query, next) {
     return next();
   }
 
-  async getObject(branch, options) {
-    let config = this.branches[branch];
+  async getObject(options) {
+    let config = this.config;
     log.debug(`Attempting to read ${options.Key} from bucket ${config.bucket}`);
 
     return await makeS3Client(config).getObject(options).promise();
   }
 
-  async getBinary(session, branch, type, id) {
-    let result = await this.getObject(branch, { Key: id });
+  async getBinary(session, type, id) {
+    let result = await this.getObject({ Key: id });
     return result.Body;
   }
 });

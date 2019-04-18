@@ -3,7 +3,6 @@ const { camelize } = Ember.String;
 const Handlebars = require('handlebars');
 const { declareInjections } = require('@cardstack/di');
 
-const defaultBranch = 'master';
 const template = Handlebars.compile(`
 define("@cardstack/ethereum/environment", ["exports"], function (exports) {
   "use strict";
@@ -31,11 +30,11 @@ class EthereumCodeGenerator {
     let sourceConfigs = [];
     for (let source of ethereumSources) {
       if (source._params.contract) {
-        let { id, _params: { contract: { addresses } } } = source;
+        let { id, _params: { contract: { address } } } = source;
 
         sourceConfigs.push({
           contract: id,
-          address: addresses[defaultBranch]
+          address
         });
       }
     }

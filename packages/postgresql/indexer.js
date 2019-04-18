@@ -28,46 +28,39 @@ module.exports = declareInjections({
     return new this(params);
   }
 
-  constructor({ branches, dataSource, renameTables, renameColumns, typeHints, patch, projectConfig }) {
-    this.branchConfig = branches;
+  constructor({ config, dataSource, renameTables, renameColumns, typeHints, patch, projectConfig }) {
+    this.config = config;
     this.dataSourceId = dataSource.id;
-    this.pools = Object.create(null);
+    this.pool = null;
     this.mapper = new NameMapper(renameTables, renameColumns);
     this.patch = patch || Object.create(null);
     this.projectPath = projectConfig.path;
     this.typeHints = typeHints;
   }
 
-  async branches() {
-    return Object.keys(this.branchConfig);
-  }
-
-  async beginUpdate(branch) {
-
-    if (!this.pools[branch]) {
-      let config = this.branchConfig[branch];
-      this.pools[branch] = new Pool({
-        user: config.user,
-        host: config.host,
-        database: config.database,
-        password: config.password,
-        port: config.port
+  async beginUpdate() {
+    if (!this.pool) {
+      let { user, host, database, password, port } = this.config;
+      this.pool = new Pool({
+        user,
+        host,
+        database,
+        password,
+        port
       });
-      await this._runMigrations(branch);
+      await this._runMigrations();
     }
 
-    let client = await this.pools[branch].connect();
+    let client = await this.pool.connect();
     return new Updater(client, this.dataSourceId, this.mapper, this.patch, this.typeHints);
   }
 
   async teardown() {
-    for (let pool of Object.values(this.pools)) {
-      await pool.end();
-    }
+    await this.pool.end();
   }
 
-  async _runMigrations(branch) {
-    let config = this.branchConfig[branch];
+  async _runMigrations() {
+    let config = this.config;
     if (!config.migrationsDir) {
       return;
     }

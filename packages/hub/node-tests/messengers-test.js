@@ -28,7 +28,7 @@ describe('hub/messengers', function() {
       await messengers.send('not-an-id', { hello: 'world' });
       throw new Error("should not get here");
     } catch(err) {
-      expect(err.message).to.match(/No such resource master\/message-sinks\/not-an-id/);
+      expect(err.message).to.match(/No such resource local-hub\/message-sinks\/not-an-id/);
     }
   });
 

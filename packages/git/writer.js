@@ -16,6 +16,7 @@ const log = require('@cardstack/logger')('cardstack/git');
 const stringify = require('json-stable-stringify-without-jsonify');
 
 const mkdir = promisify(temp.mkdir);
+const defaultBranch = 'master';
 
 module.exports = class Writer {
   static create(...args) {
@@ -54,10 +55,10 @@ module.exports = class Writer {
     }
   }
 
-  async prepareCreate(branch, session, type, document, isSchema) {
+  async prepareCreate(session, type, document, isSchema) {
     return withErrorHandling(document.id, type, async () => {
       await this._ensureRepo();
-      let change = await Change.create(this.repo, null, this.branchPrefix + branch, this.fetchOpts);
+      let change = await Change.create(this.repo, null, this.branchPrefix + defaultBranch, this.fetchOpts);
 
       let id = document.id;
       let file;
@@ -95,7 +96,7 @@ module.exports = class Writer {
     });
   }
 
-  async prepareUpdate(branch, session, type, id, document, isSchema) {
+  async prepareUpdate(session, type, id, document, isSchema) {
     if (!document.meta || !document.meta.version) {
       throw new Error('missing required field "meta.version"', {
         status: 400,
@@ -105,7 +106,7 @@ module.exports = class Writer {
 
     await this._ensureRepo();
     return withErrorHandling(id, type, async () => {
-      let change = await Change.create(this.repo, document.meta.version, this.branchPrefix + branch, this.fetchOpts);
+      let change = await Change.create(this.repo, document.meta.version, this.branchPrefix + defaultBranch, this.fetchOpts);
 
       let file = await change.get(this._filenameFor(type, id, isSchema), { allowUpdate: true });
       let before = JSON.parse(await file.getBuffer());
@@ -131,7 +132,7 @@ module.exports = class Writer {
     });
   }
 
-  async prepareDelete(branch, session, version, type, id, isSchema) {
+  async prepareDelete(session, version, type, id, isSchema) {
     if (!version) {
       throw new Error('version is required', {
         status: 400,
@@ -140,7 +141,7 @@ module.exports = class Writer {
     }
     await this._ensureRepo();
     return withErrorHandling(id, type, async () => {
-      let change = await Change.create(this.repo, version, this.branchPrefix + branch, this.fetchOpts);
+      let change = await Change.create(this.repo, version, this.branchPrefix + defaultBranch, this.fetchOpts);
 
       let file = await change.get(this._filenameFor(type, id, isSchema));
       let before = JSON.parse(await file.getBuffer());

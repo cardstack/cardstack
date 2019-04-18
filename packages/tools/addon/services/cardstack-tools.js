@@ -1,23 +1,64 @@
-import { getOwner } from '@ember/application';
 import { computed } from '@ember/object';
-import { alias } from '@ember/object/computed';
-import { urlForModel } from '@cardstack/routing/helpers/cardstack-url';
-import { pluralize } from 'ember-inflector';
-import { warn } from '@ember/debug';
 import Service, { inject as service } from '@ember/service';
-import { transitionTo } from '../private-api';
-import { modelType } from '@cardstack/rendering/helpers/cs-model-type';
 import injectOptional from 'ember-inject-optional';
-import { defaultBranch } from '@cardstack/plugin-utils/environment';
 import { guidFor } from '@ember/object/internals';
 import { get, set } from '@ember/object';
 import { sortBy } from 'lodash';
 
+const { readOnly } = computed;
+
 export default Service.extend({
   overlays: service('ember-overlays'),
   resourceMetadata: service(),
-  marks: alias('overlays.marks'),
   cardstackEdges: service(),
+  sessionService: injectOptional.service('cardstack-session'),
+
+  // Tools are active when the user has hit the launcher button and
+  // revealed the toolbars.
+  active: false,
+
+  // Are we viewing the current URL as a normal page in its own right,
+  // or in one of its other forms (like a preview card)?
+  previewFormat: 'isolated',
+
+  // Which tab are we showing in the toolbox?
+  activePanel: 'cs-composition-panel',
+
+  requestedEditing: false,
+
+  init() {
+    this._super();
+    let priorState;
+    try {
+      let item = localStorage.getItem('cardstack-tools');
+      if (item) {
+        priorState = JSON.parse(item);
+        for (let key in priorState) {
+          this.set(key, priorState[key]);
+        }
+      }
+    } catch (err) {
+      // Ignored
+    }
+    this.persistentState = priorState || {};
+
+    /* --  Ephemeral state -- */
+
+    // a field is highlighted when we're drawing a blue border around it
+    this.highlightedFieldId = null;
+
+    // a field is opened when the user is actively editing it
+    this.openedFieldId = null;
+
+    // Register items for edges
+    this.get('cardstackEdges').registerTopLevelComponent('cardstack-tools-edges');
+  },
+
+  editing: readOnly('requestedEditing'),
+
+  creatableTypes: readOnly('sessionService.creatableTypes'),
+
+  marks: readOnly('overlays.marks'),
 
   renderedFields: computed('marks', function() {
     return this.get('marks').filter(m => m.group === 'cardstack-fields');
@@ -95,8 +136,6 @@ export default Service.extend({
     }
   }),
 
-  branch: alias('_activeItemMeta.branch'),
-
   activeFields: computed('activeContentItem', 'renderedFields', function() {
     let item = this.get('activeContentItem');
     if (!item) { return []; }
@@ -127,16 +166,6 @@ export default Service.extend({
     return !this.get('sessionService') || this.get('sessionService.session.isAuthenticated');
   }),
 
-  creatableTypes: alias('sessionService.creatableTypes'),
-
-  sessionService: injectOptional.service('cardstack-session'),
-
-  // Tools are active when the user has hit the launcher button and
-  // revealed the toolbars.
-  active: false,
-
-  // Which tab are we showing in the toolbox?
-  activePanel: 'cs-composition-panel',
   activePanelChoices: computed(function() {
     return [
       {
@@ -150,9 +179,6 @@ export default Service.extend({
     ];
   }),
 
-  // Are we viewing the current URL as a normal page in its own right,
-  // or in one of its other forms (like a preview card)?
-  previewFormat: 'isolated',
   previewFormatChoices: computed(function() {
     return [
       {
@@ -176,53 +202,6 @@ export default Service.extend({
     ];
   }),
 
-  requestedEditing: false,
-
-  // This is a placeholder until I integrate the auth system here.
-  mayEditLive: computed(function() {
-    let { cardstack } = getOwner(this).resolveRegistration('config:environment');
-    if (cardstack && typeof cardstack.mayEditLive === 'boolean') {
-      return cardstack.mayEditLive;
-    } else {
-      return true;
-    }
-  }),
-
-  editing: computed('requestedEditing', 'branch', function() {
-    return this.get('requestedEditing') &&
-      (this.get('mayEditLive') ||
-       this.get('branch') !== defaultBranch);
-  }),
-
-  init() {
-    this._super();
-    let priorState;
-    try {
-      let item = localStorage.getItem('cardstack-tools');
-      if (item) {
-        priorState = JSON.parse(item);
-        for (let key in priorState) {
-          this.set(key, priorState[key]);
-        }
-      }
-    } catch (err) {
-      // Ignored
-    }
-    this.persistentState = priorState || {};
-
-
-    /* --  Ephemeral state -- */
-
-    // a field is highlighted when we're drawing a blue border around it
-    this.highlightedFieldId = null;
-
-    // a field is opened when the user is actively editing it
-    this.openedFieldId = null;
-
-    // Register items for edges
-    this.get('cardstackEdges').registerTopLevelComponent('cardstack-tools-edges');
-  },
-
   _updatePersistent(key, value) {
     this.persistentState[key] = value;
     localStorage.setItem('cardstack-tools', JSON.stringify(this.persistentState));
@@ -239,34 +218,10 @@ export default Service.extend({
 
   setActivePanel(which) {
     this._updatePersistent('activePanel', which);
-    if (which === 'cs-create-menu') {
-      if (!this.get('mayEditLive') && this.get('branch') === defaultBranch) {
-        this.setBranch('draft');
-      }
-    }
   },
 
-  setEditing(which) {
-    this._updatePersistent('requestedEditing', which);
-    if (!this.get('mayEditLive') && this.get('branch') === defaultBranch) {
-      this.setBranch('draft');
-    }
-  },
-
-  setBranch(which) {
-    let model = this.get('activeContentItem.model');
-    let path = urlForModel(model);
-    if (path) {
-      let {
-        name,
-        args,
-        queryParams
-      } = this.get('cardstackRouting').routeFor(path, which);
-      transitionTo(getOwner(this), name, args, queryParams);
-    } else {
-        let type = pluralize(modelType(model));
-        warn(`The model ${pluralize(type)}/${get(model, 'id')} is not routable, there is no links.self for this model from the API.`);
-    }
+  setEditing(isEditing) {
+    this._updatePersistent('requestedEditing', isEditing);
   },
 
   openField(which) {

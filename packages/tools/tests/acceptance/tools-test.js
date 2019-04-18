@@ -269,17 +269,20 @@ module('Acceptance | tools', function(hooks) {
     await waitFor('.cs-editor-switch')
     await click('.cs-editor-switch');
 
-    assert.dom('[data-test-cs-version-control-dropdown-option-status]').hasText('published');
+    assert.dom('[data-test-cs-version-control-button-save="true"]').exists('Save button is disabled');
+    assert.dom('[data-test-cs-version-control-button-cancel="true"]').exists('Cancel button is disabled');
 
     let reviewStatusActionTrigger = findTriggerElementWithLabel.call(this, /Comment #1: Karma/);
     await click(reviewStatusActionTrigger);
 
     let karmaInput = findInputWithValue.call(this, '10');
     await fillIn(karmaInput, '9');
-    assert.dom('[data-test-cs-version-control-dropdown-option-status]').hasText('edited');
+    assert.dom('[data-test-cs-version-control-button-save="false"]').exists('Save button is enabled');
+    assert.dom('[data-test-cs-version-control-button-cancel="false"]').exists('Cancel button is enabled');
 
     await fillIn(karmaInput, '10');
-    assert.dom('[data-test-cs-version-control-dropdown-option-status]').hasText('published');
+    assert.dom('[data-test-cs-version-control-button-save="true"]').exists('Save button is disabled');
+    assert.dom('[data-test-cs-version-control-button-cancel="true"]').exists('Cancel button is disabled');
   });
 
   test('allow editing fields of newly added, owned records', async function(assert) {

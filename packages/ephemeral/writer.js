@@ -16,11 +16,7 @@ module.exports = declareInjections({
     return this._storage;
   }
 
-  async prepareCreate(branch, session, type, document, isSchema) {
-    if (branch !== 'master') {
-      throw new Error("ephemeral storage only supports branch master");
-    }
-
+  async prepareCreate(session, type, document, isSchema) {
     let id = document.id;
     if (id == null) {
       id = this._generateId();
@@ -50,11 +46,7 @@ module.exports = declareInjections({
     };
   }
 
-  async prepareBinaryCreate(branch, session, type, stream) {
-    if (branch !== 'master') {
-      throw new Error("ephemeral storage only supports branch master");
-    }
-
+  async prepareBinaryCreate(session, type, stream) {
     let id = stream.id || this._generateId();
 
     let storedDocument = {
@@ -84,7 +76,7 @@ module.exports = declareInjections({
     };
   }
 
-  async prepareUpdate(branch, session, type, id, document, isSchema) {
+  async prepareUpdate(session, type, id, document, isSchema) {
     if (!document.meta || !document.meta.version) {
       throw new Error('missing required field "meta.version"', {
         status: 400,
@@ -112,7 +104,7 @@ module.exports = declareInjections({
     };
   }
 
-  async prepareDelete(branch, session, version, type, id, isSchema) {
+  async prepareDelete(session, version, type, id, isSchema) {
     if (!version) {
       throw new Error('version is required', {
         status: 400,

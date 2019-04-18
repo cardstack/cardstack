@@ -12,14 +12,14 @@ class SftpSearcher {
   static create(...args) {
     return new this(...args);
   }
-  constructor({ dataSource, config, currentSchema, branches }) {
+  constructor({ dataSource, config, currentSchema, connection }) {
     this.config        = config;
-    this.branches      = branches;
     this.dataSource    = dataSource;
+    this.connection    = connection;
     this.currentSchema = currentSchema;
   }
 
-  async get(session, branch, type, id, next) {
+  async get(session, type, id, next) {
 
     let result = await next();
 
@@ -27,7 +27,7 @@ class SftpSearcher {
 
     if (type === 'content-types') { return next(); }
 
-    let schema = await this.currentSchema.forBranch(branch);
+    let schema = await this.currentSchema.getSchema();
     let contentType = schema.types.get(type);
     if (!contentType) { return result; }
 
@@ -36,7 +36,7 @@ class SftpSearcher {
     let dataSource = contentType.dataSource;
     if (!dataSource || dataSource.id !== this.dataSource.id) { return result; }
 
-    let client = await this.makeClient(branch);
+    let client = await this.makeClient();
     let list = await client.list(dirname(id));
     let name = basename(id);
 
@@ -66,19 +66,19 @@ class SftpSearcher {
 
   }
 
-  async search(session, branch, query, next) {
+  async search(session, query, next) {
     return next();
   }
 
-  async getBinary(session, branch, type, id) {
-    let client = await this.makeClient(branch);
+  async getBinary(session, type, id) {
+    let client = await this.makeClient();
     return client.get(id, true, null);
   }
 
-  async makeClient(branch) {
+  async makeClient() {
     let client = new SftpClient();
 
-    await client.connect(this.branches[branch]);
+    await client.connect(this.connection);
 
     return client;
   }

@@ -13,9 +13,8 @@ function attachMeta(model, meta) {
 
 module.exports = declareInjections({
   indexer: 'hub:indexers',
-  controllingBranch: 'hub:controlling-branch',
   searchers: 'hub:searchers',
-  schema: 'hub:current-schema',
+  currentSchema: 'hub:current-schema',
   pgsearchClient: `plugin-client:${require.resolve('@cardstack/pgsearch/client')}`
 },
 
@@ -25,13 +24,12 @@ class EthereumEventIndexer {
     return new this(...args);
   }
 
-  constructor({ indexer, pgsearchClient, schema, searchers, controllingBranch}) {
+  constructor({ indexer, pgsearchClient, currentSchema, searchers }) {
     this.ethereumClient = null;
     this.indexer = indexer;
     this.searchers = searchers;
-    this.schema = schema;
+    this.currentSchema = currentSchema;
     this.pgsearchClient = pgsearchClient;
-    this.controllingBranch = controllingBranch;
     this.contractDefinitions = {};
     this.contractName = null;
     this._indexingPromise = null; // this is exposed to the tests as web3 has poor support for async in event handlers
@@ -64,13 +62,12 @@ class EthereumEventIndexer {
   async _indexRecord(batch, record) {
     log.debug('indexing model in pgsearch %j', record);
     let { id, type } = record;
-    let schema = await this.schema.forControllingBranch();
+    let schema = await this.currentSchema.getSchema();
     let contentType = schema.types.get(type);
     let sourceId = contentType.dataSource.id;
     let context = this.searchers.createDocumentContext({
       id,
       type,
-      branch: this.controllingBranch.name,
       schema,
       sourceId,
       upstreamDoc: { data: record }
@@ -84,7 +81,7 @@ class EthereumEventIndexer {
     let contractDefinition = this.contractDefinitions[contractName];
     if (!contractDefinition) { return; }
 
-    let batch = this.pgsearchClient.beginBatch(this.schema, this.searchers);
+    let batch = this.pgsearchClient.beginBatch(this.currentSchema, this.searchers);
 
     let blockheight = await this.ethereumClient.getBlockHeight();
     await this._indexRecord(batch, attachMeta(await this.ethereumClient.getContractInfo({ contract: contractName }), { blockheight, contractName }));
@@ -105,7 +102,7 @@ class EthereumEventIndexer {
         if (!contractDefinition.eventContentTriggers[eventModel.attributes['event-name']].length) {
           let contract;
           try {
-            contract = (await this.searchers.getResourceAndMeta(Session.INTERNAL_PRIVILEGED, this.controllingBranch.name, pluralize(contractName), contractAddress)).resource;
+            contract = (await this.searchers.getResourceAndMeta(Session.INTERNAL_PRIVILEGED, pluralize(contractName), contractAddress)).resource;
           } catch (err) {
             if (err.status !== 404) { throw err; }
           }
@@ -158,7 +155,7 @@ class EthereumEventIndexer {
 
         let existingRecord;
         try {
-          existingRecord = (await this.searchers.getResourceAndMeta(Session.INTERNAL_PRIVILEGED, this.controllingBranch.name, type, id.toLowerCase())).resource;
+          existingRecord = (await this.searchers.getResourceAndMeta(Session.INTERNAL_PRIVILEGED, type, id.toLowerCase())).resource;
         } catch (err) {
           if (err.status !== 404) { throw err; }
         }
