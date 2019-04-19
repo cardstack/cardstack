@@ -11,6 +11,7 @@ const models = [
     relationships: {
       fields: {
         data: [
+          { type: 'fields', id: 'name' },
           { type: 'fields', id: 'data-source' },
           { type: 'fields', id: 'fields' },
           { type: 'fields', id: 'is-built-in' },
@@ -25,6 +26,34 @@ const models = [
   },
   {
     type: 'content-types',
+    id: 'card-definitions',
+    attributes: {
+      'is-built-in': true
+    },
+    relationships: {
+      fields: {
+        data: [
+          { type: 'fields', id: 'model' },
+        ]
+      }
+    }
+  },
+  {
+    type: 'content-types',
+    id: 'cards',
+    attributes: {
+      'is-built-in': true
+    },
+    relationships: {
+      fields: {
+        data: [
+          { type: 'fields', id: 'model' },
+        ]
+      }
+    }
+  },
+  {
+    type: 'content-types',
     id: 'fields',
     attributes: {
       'is-built-in': true
@@ -32,6 +61,7 @@ const models = [
     relationships: {
       fields: {
         data: [
+          { type: 'fields', id: 'name' },
           { type: 'fields', id: 'field-type' },
           { type: 'fields', id: 'related-types' },
           { type: 'fields', id: 'default-at-create' },
@@ -41,10 +71,49 @@ const models = [
           { type: 'fields', id: 'editor-component'},
           { type: 'fields', id: 'editor-options'},
           { type: 'fields', id: 'inline-editor-component'},
-          { type: 'fields', id: 'inline-editor-options'}
+          { type: 'fields', id: 'inline-editor-options'},
+          { type: 'fields', id: 'is-metadata'},
+          { type: 'fields', id: 'needed-when-embedded'},
+          { type: 'fields', id: 'instructions'},
+          { type: 'fields', id: 'constraints'},
+          { type: 'fields', id: 'placeholder'},
         ]
       }
     }
+  },
+  {
+    type: 'content-types',
+    id: 'spaces',
+    attributes: {
+      'is-built-in': true,
+      'default-includes': ['primary-card'],
+      'fieldset-expansion-format': 'isolated',
+      fieldsets: {
+        isolated: [{
+          field: 'primary-card', format: 'isolated'
+        }],
+      }
+    },
+    relationships: {
+      fields: {
+        data: [
+          { type: 'fields', id: 'primary-card' },
+          { type: 'fields', id: 'params' },
+          { type: 'fields', id: 'allowed-query-params' },
+          { type: 'fields', id: 'route-stack' },
+          { type: 'computed-fields', id: 'http-status' }
+        ]
+      }
+    }
+  },
+  // TODO I belive these actually go into card-definitions in a schema file
+  {
+    type: 'content-types',
+    id: 'application-cards',
+  },
+  {
+    type: 'content-types',
+    id: 'error-cards',
   },
   {
     type: 'content-types',
@@ -55,6 +124,7 @@ const models = [
     relationships: {
       fields: {
         data: [
+          { type: 'fields', id: 'name' },
           { type: 'fields', id: 'computed-field-type' },
           { type: 'fields', id: 'caption' },
           { type: 'fields', id: 'searchable' },
@@ -307,6 +377,48 @@ const models = [
     id: 'router',
     attributes: {
       'field-type': '@cardstack/core-types::object'
+    }
+  },
+  {
+    type: 'fields',
+    id: 'model',
+    attributes: {
+      'field-type': '@cardstack/core-types::belongs-to'
+    }
+  },
+  {
+    type: 'fields',
+    id: 'is-metadata',
+    attributes: {
+      'field-type': '@cardstack/core-types::boolean'
+    }
+  },
+  {
+    type: 'fields',
+    id: 'needed-when-embedded',
+    attributes: {
+      'field-type': '@cardstack/core-types::boolean'
+    }
+  },
+  {
+    type: 'fields',
+    id: 'instructions',
+    attributes: {
+      'field-type': '@cardstack/core-types::string'
+    }
+  },
+  {
+    type: 'fields',
+    id: 'placeholder',
+    attributes: {
+      'field-type': '@cardstack/core-types::string'
+    }
+  },
+  {
+    type: 'fields',
+    id: 'constraints',
+    attributes: {
+      'field-type': '@cardstack/core-types::has-many'
     }
   },
   {
@@ -694,6 +806,55 @@ const models = [
     }
   },
   {
+    type: 'fields',
+    id: 'name',
+    attributes: {
+      'field-type': '@cardstack/core-types::string'
+    }
+  },
+  {
+    type: 'fields',
+    id: 'status-code',
+    attributes: {
+      'field-type': '@cardstack/core-types::integer'
+    }
+  },
+  {
+    type: 'fields',
+    id: 'message',
+    attributes: {
+      'field-type': '@cardstack/core-types::string'
+    }
+  },
+  {
+    type: 'fields',
+    id: 'primary-card',
+    attributes: {
+      'field-type': '@cardstack/core-types::belongs-to'
+    }
+  },
+  {
+    type: 'fields',
+    id: 'allowed-query-params',
+    attributes: {
+      'field-type': '@cardstack/core-types::object'
+    }
+  },
+  {
+    type: 'fields',
+    id: 'route-stack',
+    attributes: {
+      'field-type': '@cardstack/core-types::string-array'
+    }
+  },
+  {
+    type: 'computed-fields',
+    id: 'http-status',
+    attributes: {
+      'computed-field-type': '@cardstack/routing::http-status',
+    }
+  },
+  {
     type: 'grants',
     id: 'hub-internal-grant',
     attributes: {
@@ -712,6 +873,26 @@ const models = [
     }
   },
   {
+    type: 'grants',
+    id: 'routing-grant',
+    attributes: {
+      'may-read-fields': true,
+      'may-read-resource': true,
+    },
+    relationships: {
+      who: {
+        data: [{ type: 'groups', id: 'everyone' }]
+      },
+      types: {
+        data: [
+          { type: "content-types", id: 'spaces' },
+          { type: "content-types", id: 'application-cards' },
+          { type: "content-types", id: 'error-cards' }
+        ]
+      }
+    }
+  },
+  {
     type: 'data-sources',
     id: 'plugins',
     attributes: {
@@ -724,7 +905,8 @@ const models = [
     attributes: {
       'source-type': '@cardstack/hub::permissions',
     }
-  },
+  }
+  ,
   {
     type: 'data-sources',
     id: 'schemas',

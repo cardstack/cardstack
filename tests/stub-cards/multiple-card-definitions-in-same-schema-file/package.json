@@ -1,0 +1,12 @@
+{
+  "name": "multiple-card-definitions-in-same-schema-file",
+  "dependencies": {
+    "person-card": "*"
+  },
+  "devDependencies": {
+    "@cardstack/test-support": "*"
+  },
+  "engines": {
+    "node": ">= 8"
+  }
+}

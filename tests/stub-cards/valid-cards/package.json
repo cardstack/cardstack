@@ -1,0 +1,13 @@
+{
+  "name": "valid-cards",
+  "dependencies": {
+    "article-card": "*",
+    "person-card": "*"
+  },
+  "devDependencies": {
+    "@cardstack/test-support": "*"
+  },
+  "engines": {
+    "node": ">= 8"
+  }
+}

@@ -115,14 +115,14 @@
             "console": "integratedTerminal",
             "cwd": "${workspaceRoot}",
             "env": {
-                "HUB_ENVIRONMENT": "test"
+                "HUB_ENVIRONMENT": "test",
             },
             "args": [
                 "packages/test-support/bin/run.js",
                 "--timeout",
                 "200000",
                 // "--grep",
-                // "includes the data source on each resource"
+                // "throws when there are mulitple card definitions in schema file"
             ]
         },
         {

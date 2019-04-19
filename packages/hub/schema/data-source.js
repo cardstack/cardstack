@@ -3,6 +3,8 @@ const authLog = require('@cardstack/logger')('cardstack/auth');
 const util = require('util');
 const resolve = util.promisify(require('resolve'));
 const bootstrapSchema = require('../bootstrap-schema');
+const { get, partition } = require('lodash');
+const { cardContextFromId } = require('@cardstack/plugin-utils/card-context');
 
 module.exports = class DataSource {
   constructor(model, plugins, projectPath) {
@@ -21,7 +23,9 @@ module.exports = class DataSource {
     this._staticModels = null;
     this._StaticSchemaModels = plugins.lookupFeatureFactory('schemas', this.sourceType);
     this._staticSchemaModels = null;
-    this._schemaContentTypes = bootstrapSchema.filter(i => i.type === 'content-types' && i.attributes['is-built-in']).map(i => i.id);
+    this._schemaFeature = plugins.describeFeature('schemas', this.sourceType);
+
+    this._schemaContentTypes = bootstrapSchema.filter(i => i.type === 'content-types' && get(i, 'attributes.is-built-in')).map(i => i.id);
     if (!this._Writer && !this._Indexer && !this._Searcher && !this._Authenticator && !this._StaticSchemaModels && !this._StaticModels) {
       throw new Error(`${this.sourceType} is either missing or does not appear to be a valid data source plugin`);
     }
@@ -72,22 +76,35 @@ module.exports = class DataSource {
     }
     let schemaModels = this._staticModels.filter(i => this._schemaContentTypes.includes(i.type)).map(i => `${i.type}/${i.id}`);
     if (schemaModels.length) {
+    /*
+      TODO: We need to grandfather in the current static-model ability to specify schema if we want to limit this PR to
+      reasoning about being able to specify the new card schema only--otherwise we'll need to also implement the new
+      card indexing at the same time as well. The next step here is to remove this grandfathering so that everything uses
+      the new schema feature and as a result, everything is forced to use the new card boundaries. This can be done byr
+      uncommenting the line below and unskipping the unit test that goes along with this.
+
       throw new Error(`The datasource '${this.id}' defines static-models that includes schema. Schema is not allowed in static-models. Found schema models: ${JSON.stringify(schemaModels)}`);
+    */
     }
     return this._staticModels;
   }
   get staticSchemaModels() {
     if (!this._staticSchemaModels) {
+      let staticSchemaModels;
       if (this._StaticSchemaModels) {
-        this._staticSchemaModels = this._StaticSchemaModels.class.call(null, this._params);
+        let packageName = get(this._schemaFeature, 'relationships.plugin.data.id');
+        // TODO we need to replace 'local-hub' with this.id after we do the work to deal with multi-hub
+        staticSchemaModels = this._StaticSchemaModels.class.call(null, Object.assign({ sourceId: 'local-hub', packageName }, this._params));
       } else {
-        this._staticSchemaModels = [];
+        staticSchemaModels = [];
       }
+
+      if (staticSchemaModels.length) {
+        this._validateCardSchema(staticSchemaModels);
+      }
+      this._staticSchemaModels = staticSchemaModels;
     }
-    let nonSchemaModels = this._staticSchemaModels.filter(i => !this._schemaContentTypes.includes(i.type)).map(i => `${i.type}/${i.id}`);
-    if (nonSchemaModels.length) {
-      throw new Error(`The datasource '${this.id}' defines schema that includes non-schema models. Non-schema models are not allowed in schemas. Found non-schema models: ${JSON.stringify(nonSchemaModels)}`);
-    }
+
     return this._staticSchemaModels;
   }
   async teardown() {
@@ -104,8 +121,6 @@ module.exports = class DataSource {
       await this._authenticator.teardown();
     }
   }
-
-
 
   async rewriteExternalUser(externalUser) {
     if (!this._userRewriterFunc) {
@@ -134,5 +149,42 @@ module.exports = class DataSource {
     return this._userCorrelationQueryFunc(externalUser);
   }
 
+  _validateCardSchema(schemaModels) {
+    if (!this._schemaFeature) {
+      throw new Error(`Cannot validate schema for data-source ${this.id} of source-type ${this.sourceType}, no schema feature exists.`);
+    }
+
+    let nonSchemaModels = schemaModels.filter(i => !this._schemaContentTypes.includes(i.type)).map(i => `${i.type}/${i.id}`);
+    if (nonSchemaModels.length) {
+      throw new Error(`The datasource '${this.id}' defines schema that includes non-schema models. Non-schema models are not allowed in schemas. Found non-schema models: ${JSON.stringify(nonSchemaModels)}`);
+    }
+
+    let packageName = get(this._schemaFeature, 'relationships.plugin.data.id');
+    let [ cardDefinitions, nonCardDefinitions ] = partition(schemaModels, i => i.type === 'card-definitions');
+
+    if (!cardDefinitions.length) {
+      throw new Error(`Schema for ${packageName} in datasource ${this.id} has no card-definitions model. A card-definitions model must be specified in the schema file.`);
+    }
+    if (cardDefinitions.length > 1) {
+      throw new Error(`Schema for ${packageName} in datasource ${this.id} has more than one card-definitions model: ${JSON.stringify(cardDefinitions.map(i => `${i.type}/${i.id}`))}. There can only be one card-definitions model in the schema file.`);
+    }
+
+    // TODO we need to replace 'local-hub' with this.id after we do the work to deal with multi-hub
+    let sourceId = 'local-hub';
+    let [ cardDefinition ] = cardDefinitions;
+    let {
+      sourceId: cardDefinitionSourceId,
+      packageName: cardDefinitionPackageName
+    } = cardContextFromId(cardDefinition.id);
+    if (sourceId !== cardDefinitionSourceId || packageName !== cardDefinitionPackageName) {
+      throw new Error(`Schema for ${packageName} in datasource ${this.id} is has a card-definitions model id, '${cardDefinition.id}', that is not scoped for this source::package, "${sourceId}::${packageName}".`);
+    }
+
+    let cardScopeRegex = new RegExp(`^${sourceId}::${packageName}::`);
+    let unscopedModels = nonCardDefinitions.filter(i => !i.id.match(cardScopeRegex)).map(i => `${i.type}/${i.id}`);
+    if (unscopedModels.length) {
+      throw new Error(`Schema for ${packageName} in datasource ${this.id} has schema models that are not scoped to this data source and package ${JSON.stringify(unscopedModels)}`);
+    }
+  }
 
 };

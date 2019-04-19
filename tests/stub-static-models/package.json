@@ -6,8 +6,7 @@
   },
   "dependencies": {
     "data-source-with-static" : "*",
-    "data-source-with-schema-in-static-models" : "*",
-    "data-source-with-non-schema-in-schemas" : "*"
+    "data-source-with-schema-in-static-models" : "*"
   },
   "devDependencies": {
     "@cardstack/test-support": "*"

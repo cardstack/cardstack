@@ -1,15 +1,25 @@
 import DAGMap from 'dag-map';
 
 let idGenerator = 0;
+const DELIM = '::';
 
 export default class JSONAPIFactory {
-  constructor() {
+  constructor(sourceId, packageName) {
     this.data = [];
+    this.sourceId = sourceId;
+    this.packageName = packageName;
   }
 
   addResource(type, id=null) {
-    if (id == null) {
-      id = idGenerator++;
+    if (type === 'card-definitions' && this.sourceId != null && this.packageName != null) {
+      id = [ this.sourceId, this.packageName ].join(DELIM);
+    } else {
+      if (id == null) {
+        id = idGenerator++;
+      }
+      if (this.sourceId != null && this.packageName != null) {
+        id = [this.sourceId, this.packageName, id].join(DELIM);
+      }
     }
     let resource = { type, id: String(id) };
     this.data.push(resource);
@@ -25,39 +35,49 @@ export default class JSONAPIFactory {
     return new ResourceFactory(resource);
   }
 
+
+  getModelsFor(type, id) {
+    let model;
+    if (type === 'card-definitions' && this.sourceId != null && this.packageName != null) {
+      id = [ this.sourceId, this.packageName ].join(DELIM);
+    }
+    if (type != null && id != null) {
+      model = this.data.find(i => i.id === id && i.type === type);
+    }
+    if (!model) { return []; }
+
+    let dag = new DAGMap();
+    this._getModelsRelatedTo(model, dag);
+    let output = [];
+    dag.each((key, value) => {
+      if (value) {
+        output.push(value);
+      }
+    });
+    return output;
+  }
+
+  _getModelsRelatedTo(model, dag, relatedModels=[]) {
+    relatedModels.push(model);
+    let modelRefs = getModelDependencies(model, dag);
+    for (let relatedModelRef of modelRefs) {
+      if ([
+        'content-types/content-types',
+        'content-types/fields',
+        'fields/fields'
+      ].includes(relatedModelRef)) { continue; }
+
+      let relatedModel = this.data.find(i => `${i.type}/${i.id}` === relatedModelRef);
+      if (!relatedModel) { continue; }
+
+      this._getModelsRelatedTo(relatedModel, dag, relatedModels);
+    }
+  }
+
   getModels() {
     let dag = new DAGMap();
-    this.data.forEach(model => {
-      let dependsOn = [];
-      if (model.relationships) {
-        Object.keys(model.relationships).forEach(rel => {
-          let { data/*, links*/ } = model.relationships[rel];
+    this.data.forEach(model => getModelDependencies(model, dag));
 
-
-          if (data) {
-            if (Array.isArray(data)) {
-              dependsOn = dependsOn.concat(data.map(ref => `${ref.type}/${ref.id}`));
-            } else {
-              dependsOn.push(`${data.type}/${data.id}`);
-            }
-          }
-        });
-      }
-
-      dependsOn.push(`content-types/${model.type}`);
-
-      // These are all bootstrap schema and we need to not include them
-      // here to avoid circularity.
-      dependsOn = dependsOn.filter(dep => {
-        return ![
-          'content-types/content-types',
-          'content-types/fields',
-          'fields/fields'
-        ].includes(dep);
-      });
-
-      dag.add(`${model.type}/${model.id}`, model, [], dependsOn);
-    });
     let output = [];
     dag.each((key, value) => {
       if (value) {
@@ -70,7 +90,38 @@ export default class JSONAPIFactory {
   importModels(models) {
     this.data = this.data.concat(models);
   }
+}
 
+function getModelDependencies(model, dag) {
+  let dependsOn = [];
+  if (model.relationships) {
+    Object.keys(model.relationships).forEach(rel => {
+      let { data/*, links*/ } = model.relationships[rel];
+
+      if (data) {
+        if (Array.isArray(data)) {
+          dependsOn = dependsOn.concat(data.map(ref => `${ref.type}/${ref.id}`));
+        } else {
+          dependsOn.push(`${data.type}/${data.id}`);
+        }
+      }
+    });
+  }
+
+  dependsOn.push(`content-types/${model.type}`);
+
+  // These are all bootstrap schema and we need to not include them
+  // here to avoid circularity.
+  dependsOn = dependsOn.filter(dep => {
+    return ![
+      'content-types/content-types',
+      'content-types/fields',
+      'fields/fields'
+    ].includes(dep);
+  });
+
+  dag.add(`${model.type}/${model.id}`, model, [], dependsOn);
+  return dependsOn;
 }
 
 class ResourceFactory {

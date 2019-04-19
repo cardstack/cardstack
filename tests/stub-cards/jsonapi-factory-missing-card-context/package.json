@@ -1,0 +1,12 @@
+{
+  "name": "jsonapi-factory-missing-card-context",
+  "dependencies": {
+    "person-card": "*"
+  },
+  "devDependencies": {
+    "@cardstack/test-support": "*"
+  },
+  "engines": {
+    "node": ">= 8"
+  }
+}

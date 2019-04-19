@@ -88,7 +88,7 @@ module('Integration | @cardstack/data service load()', function (hooks) {
       }]);
 
       assert.deepEqual(author.toJSON(), {
-        name: 'Van Gogh',
+        nickname: 'Van Gogh',
         bio: 'A cute puppy that loves to play with his squeaky snake',
         selfLink: undefined,
         location: 'nyc'

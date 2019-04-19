@@ -1,12 +1,15 @@
 const Error = require('@cardstack/plugin-utils/error');
 const find = require('../async-find');
-const { flatten } = require('lodash');
+const { get, flatten } = require('lodash');
 const Realms = require('./realms');
 const authLog = require('@cardstack/logger')('cardstack/auth');
 const Session = require('@cardstack/plugin-utils/session');
+const { cardContextFromId } = require('@cardstack/plugin-utils/card-context');
 
 module.exports = class ContentType {
   constructor(model, allFields, allComputedFields, allConstraints, dataSources, defaultDataSource, allGrants, allGroups) {
+    let { sourceId, packageName } = cardContextFromId(model.id);
+
     let realFields = new Map();
     let computedFields = new Map();
     let realAndComputedFields = new Map();
@@ -14,6 +17,17 @@ module.exports = class ContentType {
     if (model.relationships && model.relationships.fields) {
       for (let fieldRef of model.relationships.fields.data) {
         let field;
+        let { sourceId:fieldSourceId, packageName:fieldPackageName } = cardContextFromId(fieldRef.id);
+        if (sourceId != null &&
+          packageName != null &&
+          fieldSourceId != null &&
+          fieldPackageName != null &&
+          (sourceId !== fieldSourceId || packageName !== fieldPackageName)) {
+          throw new Error(`content type "${model.id}" refers to field defined in foreign schema ${fieldRef.id}`, {
+            status: 400,
+            title: 'Broken field reference'
+          });
+        }
         if ((field = allFields.get(fieldRef.id))) {
           realFields.set(fieldRef.id, field);
           realAndComputedFields.set(fieldRef.id, field);
@@ -47,6 +61,9 @@ module.exports = class ContentType {
     // instances of Field -- each ComputedField knows how to represent
     // itself as a Field too.
     this.realAndComputedFields = realAndComputedFields;
+
+    // TODO need to upate DocumentContext, codegen, et al to deal with the content-type name being different than the content type id
+    this.name = get(model, 'attributes.name') || model.id;
 
     this.id = model.id;
     if (model.relationships && model.relationships['data-source'] && model.relationships['data-source'].data) {

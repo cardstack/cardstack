@@ -1,0 +1,12 @@
+{
+  "name": "card-definition-id-does-not-match-package-name",
+  "dependencies": {
+    "person-card": "*"
+  },
+  "devDependencies": {
+    "@cardstack/test-support": "*"
+  },
+  "engines": {
+    "node": ">= 8"
+  }
+}

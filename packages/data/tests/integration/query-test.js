@@ -89,7 +89,7 @@ module('Integration | @cardstack/data service query()', function (hooks) {
       }]);
 
       assert.deepEqual(author.toJSON(), {
-        name: 'Van Gogh',
+        nickname: 'Van Gogh',
         bio: 'A cute puppy that loves to play with his squeaky snake',
         selfLink: undefined,
         location: 'nyc'
@@ -138,7 +138,7 @@ module('Integration | @cardstack/data service query()', function (hooks) {
       }]);
 
       assert.deepEqual(author.toJSON(), {
-        name: 'Van Gogh',
+        nickname: 'Van Gogh',
         bio: 'A cute puppy that loves to play with his squeaky snake',
         selfLink: undefined,
         location: 'nyc'
