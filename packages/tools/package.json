@@ -78,6 +78,7 @@
     "eslint-plugin-mocha": "^5.2.0",
     "eslint-plugin-node": "^7.0.1",
     "loader.js": "^4.7.0",
+    "qs": "^6.6.0",
     "qunit-dom": "^0.8.0",
     "squishable-container": "^0.1.0"
   },
