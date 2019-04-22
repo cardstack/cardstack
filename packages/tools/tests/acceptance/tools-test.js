@@ -303,6 +303,46 @@ module('Acceptance | tools', function(hooks) {
     assert.dom('.field-editor > input').isNotDisabled();
   });
 
+  test('adding new record updates the query-based relationship', async function(assert) {
+    await visit('/hub/catalogs/1');
+
+    assert.dom('.popular-posts .post-embedded').exists({ count: 1 });
+    assert.dom('.popular-posts .post-embedded:nth-of-type(1)').hasText('Second Post');
+    assert.dom('.top-post .post-embedded').exists({ count: 1 });
+    assert.dom('.top-post .post-embedded').hasText('Second Post');
+
+    await login();
+    await click('.cardstack-tools-launcher');
+    await waitFor('.cs-active-composition-panel--main');
+    await waitFor('.cs-editor-switch')
+    await click('.cs-editor-switch');
+
+    await click('.cs-create-button');
+
+    let newPostButton = findAddNewButtonWithLabel.call(this, /Posts/);
+    await click(newPostButton);
+
+    let titleSectionTrigger = findTriggerElementWithLabel.call(this, /Title/);
+    await click(titleSectionTrigger);
+
+    let titleSection = titleSectionTrigger.closest('section');
+    let titleInput = titleSection.querySelector('input');
+    await fillIn(titleInput, 'Adventures in Pirating');
+
+    let ratingInput = document.querySelector('[data-test-cs-field-editor="rating"] input');
+    await fillIn(ratingInput, 5);
+
+    await click('[data-test-cs-version-control-button-save="false"]');
+    await waitFor('[data-test-cs-version-control-button-save="true"]');
+    await visit('/hub/catalogs/1');
+
+    assert.dom('.popular-posts .post-embedded').exists({ count: 2 });
+    assert.dom('.popular-posts .post-embedded:nth-of-type(1)').hasText('Adventures in Pirating');
+    assert.dom('.popular-posts .post-embedded:nth-of-type(2)').hasText('Second Post');
+    assert.dom('.top-post .post-embedded').exists({ count: 1 });
+    assert.dom('.top-post .post-embedded').hasText('Adventures in Pirating');
+  });
+
   test('saving a new document changes the URL to the canonical path of the saved document', async function(assert) {
     await visit('/hub/posts/1');
     await login();

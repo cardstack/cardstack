@@ -1,6 +1,7 @@
 /* eslint-env node */
 
 const JSONAPIFactory = require('@cardstack/test-support/jsonapi-factory');
+const qs = require('qs');
 
 function addConstraint(factory, constraint, field) {
   factory.addResource('constraints')
@@ -193,6 +194,28 @@ function initialModels() {
       }),
     ]);
 
+  initial.addResource('content-types', 'catalogs')
+  .withAttributes({
+    defaultIncludes: ['popular-posts', 'top-post'],
+    fieldsets: {
+      isolated: [
+        { field: 'popular-posts', format: 'embedded' },
+        { field: 'top-post', format: 'embedded' }
+      ]
+    }
+  })
+  .withRelated('fields', [
+    initial.addResource('fields', 'title').withAttributes({
+      fieldType: '@cardstack/core-types::string'
+    }),
+    initial.addResource('fields', 'popular-posts').withAttributes({
+      fieldType: '@cardstack/core-types::has-many'
+    }),
+    initial.addResource('fields', 'top-post').withAttributes({
+      fieldType: '@cardstack/core-types::belongs-to'
+    })
+  ]);
+
     addConstraint(initial, '@cardstack/core-types::not-empty', 'title');
     addConstraint(initial, '@cardstack/core-types::not-empty', 'body');
 
@@ -280,11 +303,11 @@ function initialModels() {
 
   initial.addResource('posts', '2')
     .withAttributes({
-      title: 'second',
+      title: 'Second Post',
       publishedAt: new Date(2017, 9, 20),
       createdAt: new Date(2017, 1, 24),
       keywords: 'dos, ni, futatsu',
-      rating: 5,
+      rating: 4,
       archived: true,
       readingTimeValue: 2
     })
@@ -292,6 +315,27 @@ function initialModels() {
     .withRelated('author', lechuck)
     .withRelated('categories', [ career ])
     .withRelated('comments', [ doorstop, brains ]);
+
+  initial.addResource('catalogs', '1')
+    .withAttributes({
+      title: 'Posts Catalog'
+    })
+    .withRelatedLink('popular-posts', `/api?${qs.stringify({
+      filter: {
+        type: { exact: 'posts' },
+        rating: { range: { gt: 3 } }
+      },
+      sort: '-rating'
+    })}`)
+    .withRelatedLink('top-post', `/api?${qs.stringify({
+      filter: {
+        type: { exact: 'posts' }
+      },
+      sort: '-rating',
+      page: {
+        size: 1
+      }
+    })}`);
 
   return initial.getModels();
 }
