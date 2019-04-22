@@ -144,15 +144,6 @@ module.exports = class DocumentContext {
 
     this._references.push(`${key}`);
 
-    // if (get(this, 'upstreamDoc.data.id') === id && get(this, 'upstreamDoc.data.type') === type) {
-    //   return this.upstreamDoc.data;
-    // }
-
-    // let includedResource = this.suppliedIncluded ? this.suppliedIncluded.find(i => key === `${i.type}/${i.id}`) : null;
-    // if (includedResource) {
-    //   return includedResource;
-    // }
-
     let cached = this.cache[key];
     if (cached) {
       log.debug(`document with key ${key} is in cache, fetching...`);
