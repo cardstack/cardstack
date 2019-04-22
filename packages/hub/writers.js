@@ -59,7 +59,7 @@ class Writers {
       let opts = await writer.prepareCreate(
         session,
         type,
-        schema.withOnlyRealFields(documentOrStream.data),
+        this._cleanupBodyData(schema, documentOrStream.data),
         isSchema
       );
       let { originalDocument, finalDocument, finalizer, aborter } = opts;
@@ -100,7 +100,7 @@ class Writers {
       session,
       type,
       id,
-      schema.withOnlyRealFields(document.data),
+      this._cleanupBodyData(schema, document.data),
       isSchema
     );
     let { originalDocument, finalDocument, finalizer, aborter } = opts;
@@ -207,6 +207,41 @@ class Writers {
     let writer = contentType.dataSource.writer;
     let sourceId = contentType.dataSource.id;
     return { writer, sourceId };
+  }
+
+  _cleanupBodyData(schema, data) {
+    let doc = schema.withOnlyRealFields(data);  // remove computed fields
+    return this._createQueryLinks(doc);         // convert `cardstack-queries` relationships to links.related
+  }
+
+  _createQueryLinks(doc) {
+    if (!doc.relationships) {
+      return doc;
+    }
+
+    let activeDoc = doc;
+
+    for (let fieldName of Object.keys(doc.relationships)) {
+      let relationshipData = doc.relationships[fieldName] && doc.relationships[fieldName].data;
+
+      if ( relationshipData &&
+        ((relationshipData.length && relationshipData[0].type === 'cardstack-queries') ||
+        relationshipData.type === 'cardstack-queries')
+      ) {
+        if (activeDoc === doc) {
+          activeDoc = Object.assign({}, doc);
+        }
+        if (activeDoc.relationships === doc.relationships) {
+          activeDoc.relationships = Object.assign({}, doc.relationships);
+        }
+        activeDoc.relationships[fieldName].links = {
+          related: Array.isArray(relationshipData) ? relationshipData[0].id : relationshipData.id
+        };
+        delete activeDoc.relationships[fieldName].data;
+      }
+    }
+
+    return activeDoc;
   }
 });
 
