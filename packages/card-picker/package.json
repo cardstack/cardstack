@@ -33,6 +33,7 @@
     "@cardstack/image": "0.13.71",
     "@cardstack/rendering": "0.13.71",
     "@cardstack/test-support": "0.13.71",
+    "@cardstack/tools": "0.13.71",
     "@ember/optional-features": "^0.6.3",
     "broccoli-asset-rev": "^2.7.0",
     "ember-ajax": "^3.1.0",

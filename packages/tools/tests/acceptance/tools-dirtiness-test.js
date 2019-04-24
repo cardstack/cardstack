@@ -3,8 +3,6 @@ import { setupApplicationTest } from 'ember-qunit';
 import { visit, click, fillIn, waitFor } from '@ember/test-helpers';
 import { login } from '../helpers/login';
 import Service from '@ember/service';
-import { findInputWithValue, findTriggerElementWithLabel } from '../helpers/query-selectors';
-
 
 let StubCardstackDataService = Service.extend({
   validate() {
@@ -36,25 +34,20 @@ module('Acceptance | tools dirtiness', function(hooks) {
   test('track field dirtiness in owned, related records', async function(assert) {
     await visit('/hub/posts/1');
     await login();
-    await click('.cardstack-tools-launcher');
-    await waitFor('.cs-active-composition-panel--main');
-    await waitFor('.cs-editor-switch')
-    await click('.cs-editor-switch');
+    await click('[data-test-cardstack-tools-launcher]');
+    await waitFor('[data-test-cs-editor-panel]');
 
     assert.dom('[data-test-cs-version-control-button-save="true"]').exists('Save button is disabled');
-    assert.dom('[data-test-cs-version-control-button-cancel="true"]').exists('Cancel button is disabled');
+    assert.dom('[data-test-cs-version-control-button-cancel]').exists('Cancel button exists');
+    assert.dom('[data-test-cs-version-control-status]').hasText('saved');
 
-    let reviewStatusActionTrigger = findTriggerElementWithLabel.call(this, /Comment #1: Karma/);
-    await click(reviewStatusActionTrigger);
-
-    let karmaInput = findInputWithValue.call(this, '10');
+    let karmaInput = '[data-test-cs-collapsible-section=comment-1-karma] input'
     await fillIn(karmaInput, '9');
     assert.dom('[data-test-cs-version-control-button-save="false"]').exists('Save button is enabled');
-    assert.dom('[data-test-cs-version-control-button-cancel="false"]').exists('Cancel button is enabled');
+    assert.dom('[data-test-cs-version-control-status]').hasText('editing');
 
     await fillIn(karmaInput, '10');
     assert.dom('[data-test-cs-version-control-button-save="true"]').exists('Save button is disabled');
-    assert.dom('[data-test-cs-version-control-button-cancel="true"]').exists('Cancel button is disabled');
+    assert.dom('[data-test-cs-version-control-status]').hasText('saved');
   });
 });
-

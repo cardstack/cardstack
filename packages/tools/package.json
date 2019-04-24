@@ -14,6 +14,10 @@
     "test": "tests"
   },
   "scripts": {
+    "start-prereqs": "docker run -d -p 5432:5432 --rm --name cardstack-pg cardstack/pg-test",
+    "stop-prereqs": "docker stop cardstack-pg",
+    "start-hub": "ember hub:start",
+    "start-ember": "HUB_URL=http://localhost:3000 ember serve",
     "build": "ember build",
     "lint:hbs": "ember-template-lint .",
     "lint:js": "eslint .",

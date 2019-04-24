@@ -51,7 +51,7 @@ export default Service.extend({
     this.openedFieldId = null;
 
     // Register items for edges
-    this.get('cardstackEdges').registerTopLevelComponent('cardstack-tools-edges');
+    this.get('cardstackEdges').registerTopLevelComponent('cs-tools');
   },
 
   editing: readOnly('requestedEditing'),
@@ -171,7 +171,7 @@ export default Service.extend({
       {
         id: 'cs-composition-panel',
         icon: {
-          name: 'remove-this',
+          name: 'edit',
           width: 20,
           height: 20
         }

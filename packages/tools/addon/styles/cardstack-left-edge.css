@@ -1,7 +1,0 @@
-.cardstack-left-edge {
-  --left-edge-width: 50px;
-
-  width: var(--left-edge-width);
-  min-height: 100vh;
-  padding-right: var(--edges-gutter);
-}

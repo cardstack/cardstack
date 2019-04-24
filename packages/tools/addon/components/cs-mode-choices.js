@@ -18,5 +18,4 @@ export default Component.extend({
       this.get('tools')[`set${capitalize(this.get('for'))}`](modeId);
     }
   }
-
 });

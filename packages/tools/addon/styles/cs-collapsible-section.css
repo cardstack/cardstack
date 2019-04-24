@@ -1,51 +1,16 @@
-.cs-collapsible-section-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
+.cs-collapsible-section {
     margin: 0;
-    padding: 0.75em 1em 0.5em;
+    padding-bottom: 0.5rem;
+}
+
+.cs-collapsible-section.invalid {
+    border: 2px solid var(--error-border);
+}
+
+.cs-collapsible-section--title {
+    padding-bottom: 0.5rem;
     font-family: 'Open Sans';
-    overflow: hidden;
-    cursor: pointer;
-    user-select: none;
-}
-
-.cs-collapsible-section-header:hover {
-    background-color: var(--active-background);
-}
-
-.cs-collapsible-section-header--label {
-    float: left;
-    cursor: pointer;
-}
-
-.cs-collapsible-section-header--button {
-    height: 16px;
-    width: 16px;
-    margin-top: 2px;
-    border-radius: 2px;
-    background: none;
-    float: right;
-    border: none;
-    padding: 0;
-    cursor: pointer;
-}
-
-.cs-collapsible-section-header--button > svg {
-    color: var(--bright-foreground);
-    fill: var(--bright-foreground);
-    transition: transform 250ms ease;
-}
-
-.cs-collapsible-section-header--button:focus {
-    outline: none;
-}
-
-.cs-collapsible-section-header--button:focus > svg {
-    color: var(--active-foreground);
-    fill: var(--active-foreground);
-}
-
-.cs-collapsible-section-header.closed > button > svg {
-    transform: rotate(-90deg);
+    font-size: 12px;
+    letter-spacing: 0.3px;
+    line-height: 15px;
 }

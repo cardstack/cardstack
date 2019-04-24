@@ -5280,15 +5280,6 @@ ee-first@1.1.1:
   version "1.1.1"
   resolved "https://registry.yarnpkg.com/ee-first/-/ee-first-1.1.1.tgz#590c61156b0ae2f4f0255732a158b266bc56b21d"
 
-elasticsearch@^12.1.3:
-  version "12.1.3"
-  resolved "https://registry.yarnpkg.com/elasticsearch/-/elasticsearch-12.1.3.tgz#5108e67ae5d83e5e7f30d3d294fd7017df0e3771"
-  dependencies:
-    chalk "^1.0.0"
-    forever-agent "^0.6.0"
-    lodash "^4.12.0"
-    promise "^7.1.1"
-
 electron-to-chromium@^1.2.7, electron-to-chromium@^1.3.27:
   version "1.3.27"
   resolved "https://registry.yarnpkg.com/electron-to-chromium/-/electron-to-chromium-1.3.27.tgz#78ecb8a399066187bb374eede35d9c70565a803d"
@@ -6147,7 +6138,7 @@ ember-composable-helpers@DockYard/ember-composable-helpers:
   resolved "https://codeload.github.com/DockYard/ember-composable-helpers/tar.gz/09a6b938105519c26d2e4afa6223f7df2db1ab07"
   dependencies:
     broccoli-funnel "^1.0.1"
-    ember-cli-babel "^6.6.0"
+    ember-cli-babel "^7.1.0"
 
 ember-concurrency@^0.8.14, ember-concurrency@^0.8.19, ember-concurrency@^0.8.27:
   version "0.8.27"
@@ -7816,7 +7807,7 @@ for-own@^0.1.4:
   dependencies:
     for-in "^1.0.1"
 
-forever-agent@^0.6.0, forever-agent@~0.6.1:
+forever-agent@~0.6.1:
   version "0.6.1"
   resolved "https://registry.yarnpkg.com/forever-agent/-/forever-agent-0.6.1.tgz#fbc71f0c41adeb37f96c577ad1ed42d8fdacca91"
 
@@ -9546,12 +9537,6 @@ json5@^2.1.0:
   dependencies:
     minimist "^1.2.0"
 
-jsondiffpatch@^0.2.5:
-  version "0.2.5"
-  resolved "https://registry.yarnpkg.com/jsondiffpatch/-/jsondiffpatch-0.2.5.tgz#50361d995cf8c86137e8d5589f20fa5220db3511"
-  dependencies:
-    chalk "^0.5.1"
-
 jsonfile@^2.1.0:
   version "2.4.0"
   resolved "https://registry.yarnpkg.com/jsonfile/-/jsonfile-2.4.0.tgz#3736a2b428b87bbda0cc83b53fa3d633a35c2ae8"
@@ -10378,7 +10363,7 @@ lodash@^3.10.1:
   version "3.10.1"
   resolved "https://registry.yarnpkg.com/lodash/-/lodash-3.10.1.tgz#5bf45e8e49ba4189e17d482789dfd15bd140b7b6"
 
-lodash@^4.12.0, lodash@^4.13.1, lodash@^4.14.0, lodash@^4.17.4, lodash@^4.2.1, lodash@^4.3.0, lodash@^4.6.1:
+lodash@^4.13.1, lodash@^4.14.0, lodash@^4.17.4, lodash@^4.2.1, lodash@^4.3.0, lodash@^4.6.1:
   version "4.17.4"
   resolved "https://registry.yarnpkg.com/lodash/-/lodash-4.17.4.tgz#78203a4d1c328ae1d86dca6460e369b57f4055ae"
 
@@ -12560,12 +12545,6 @@ promise-retry@^1.1.1:
   dependencies:
     err-code "^1.0.0"
     retry "^0.10.0"
-
-promise@^7.1.1:
-  version "7.3.1"
-  resolved "https://registry.yarnpkg.com/promise/-/promise-7.3.1.tgz#064b72602b18f90f29192b8b1bc418ffd1ebd3bf"
-  dependencies:
-    asap "~2.0.3"
 
 promisepipe@^3.0.0:
   version "3.0.0"

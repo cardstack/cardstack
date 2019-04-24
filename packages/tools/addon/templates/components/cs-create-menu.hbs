@@ -3,9 +3,9 @@
 <ul>
   {{#each availableTypes as |type|}}
     {{! template-lint-disable no-invalid-interactive }}
-    <li onclick={{action "create" type}}>
+    <li data-test-cs-create-menu-item={{type.id}}>
       {{cs-humanize type.id}}
-      <button>Add +</button>
+      <button onclick={{action "create" type}}>Add +</button>
     </li>
   {{/each}}
 </ul>

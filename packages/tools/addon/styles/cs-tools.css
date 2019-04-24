@@ -1,9 +1,9 @@
-.cardstack-tools-edges-launcher > div {
+.cs-tools--launcher > div {
     /* this is for the edges launcher button */
     /* sets z-index on 'fixed-withing-toolbars' component
       which belongs to ember-toolbars package */
 
     /* there are items that need higher z-indexes than this, like the bottom edge and
     the modal overlay--so lets not go too crazy with this one */
-    z-index: 150;
+    z-index: 2;
 }
