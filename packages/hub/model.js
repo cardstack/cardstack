@@ -50,7 +50,6 @@ exports.Model = class Model {
     if (computedField) {
       let userValue = await computedField.compute(this);
       if (field.isRelationship && !isRelationshipObject(userValue)) {
-        log.warn('computed relationship returned not a relationship object');
         userValue = { data: userValue };
       }
       return userValue;
