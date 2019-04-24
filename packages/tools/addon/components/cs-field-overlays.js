@@ -9,7 +9,7 @@ import layout from '../templates/components/cs-field-overlays';
 
 export default Component.extend({
   layout,
-  classNames: ['cardstack-tools'],
+  classNames: ['cardstack-tools', 'cs-field-overlays'],
 
   tools: service('cardstack-tools'),
   cardstackRouting: service(),

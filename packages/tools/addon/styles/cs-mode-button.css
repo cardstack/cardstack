@@ -1,13 +1,18 @@
 .cs-mode-button {
     position: absolute;
-    right: 74px;
-    bottom: 14px;
-    box-sizing: border-box;
+    right: 1rem;
+    bottom: calc(var(--cs-header-height) + 1rem);
     display: flex;
     justify-content: flex-end;
     align-items: center;
+    padding: 0;
+
+    background: none;
+    border: none;
     color: var(--bright-foreground);
+
     cursor: pointer;
+    user-select: none;
 }
 
 .cs-mode-label {
@@ -24,8 +29,8 @@
     align-items: center;
     margin: 0;
     padding: 0;
-    width: 3em;
-    height: 3em;
+    width: var(--cs-mode-button-size);
+    height: var(--cs-mode-button-size);
     background: var(--normal-background);
     color: var(--bright-foreground);
     fill: var(--bright-foreground);

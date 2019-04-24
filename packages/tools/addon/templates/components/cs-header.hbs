@@ -1,0 +1,23 @@
+{{#let tools.activeContentItem.model as |model|}}
+  <div class="cs-article-header">
+    <div class="cs-article-header--title">
+      {{cs-svg
+        "article"
+        width="22px"
+        height="16px"
+      }}
+
+      {{or model.title model.name "Untitled"}}
+    </div>
+    {{!-- TO DO: Publish functionality --}}
+    {{!--
+    <button
+      class="cs-article-header--publish-button {{if disabled "disabled"}}"
+      disabled={{disabled}}
+      data-test-cs-header-publish-button
+    >
+      Publish
+    </button>
+    --}}
+  </div>
+{{/let}}

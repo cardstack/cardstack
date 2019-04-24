@@ -4,6 +4,7 @@ import layout from '../templates/components/cs-mode-button';
 
 export default Component.extend({
   layout,
+  tagName: 'button',
   classNames: ['cs-mode-button'],
   classNameBindings: ['active', 'iconOnly'],
   iconOnly: not('mode.description'),

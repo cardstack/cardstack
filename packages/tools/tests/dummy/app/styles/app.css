@@ -1,13 +1,14 @@
 body {
-    padding: 0;
-    margin: 0;
+  margin: 0;
+  padding: 0;
 }
 
 .post-card {
-    margin: 4em;
-    display: block;
+  margin: 4em;
+  display: block;
 }
 
 .post-page {
-    margin: 4em;
+  width: 100vw;
+  margin: 4em;
 }

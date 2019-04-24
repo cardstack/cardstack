@@ -4,19 +4,21 @@
       (hash
         active=active
         setActive=(action "setActive")
-        toggleActive=(action "toggleActive"))
+        toggleActive=(action "toggleActive")
+      )
     }}
   {{else}}
     {{! template-lint-disable no-invalid-interactive }}
     <button
-      class="cardstack-tools-launcher {{if active "active"}}"
-      {{action "toggleActive"}}
-      data-test-cardstack-tools-launcher-button
+      class="cardstack-tools-launcher {{if active "active" "inactive"}}"
+      onclick={{action "toggleActive"}}
+      aria-label="Edit"
+      data-test-cardstack-tools-launcher
     >
       {{cs-svg
-        "cardstack-icon"
-        width="26px"
-        height="26px"
+        "cs-tools-launcher-icon"
+        width="16px"
+        height="16px"
         data-test-cardstack-tools-launcher-icon=active
       }}
     </button>

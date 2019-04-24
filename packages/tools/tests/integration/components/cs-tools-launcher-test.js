@@ -1,11 +1,10 @@
-import { run } from '@ember/runloop';
 import Service from '@ember/service';
 import { module, test } from 'qunit';
 import { setupRenderingTest } from 'ember-qunit';
-import { render } from '@ember/test-helpers';
+import { render, click } from '@ember/test-helpers';
 import hbs from 'htmlbars-inline-precompile';
 
-module('Integration | Component | cardstack tools launcher', function(hooks) {
+module('Integration | Component | cs tools launcher', function(hooks) {
   setupRenderingTest(hooks);
 
   hooks.beforeEach(function() {
@@ -19,45 +18,48 @@ module('Integration | Component | cardstack tools launcher', function(hooks) {
       sessionService: this.owner.lookup('service:cardstack-session'),
       available: true,
       active: false,
+      requestedEditing: false,
       setActive(value) {
         this.set('active', value);
+      },
+      setEditing(value) {
+        this.set('requestedEditing', value);
       }
     }));
     this.tools = this.owner.lookup('service:cardstack-tools');
   });
 
   test('it renders with default implementation', async function(assert) {
-    await render(hbs`{{cardstack-tools-launcher}}`);
-    assert.dom('[data-test-cardstack-tools-launcher-button]').exists('found button');
-    assert.dom('[data-test-cardstack-tools-launcher-icon="false"]').exists('button is not active');
+    await render(hbs`{{cs-tools-launcher}}`);
+    assert.dom('[data-test-cardstack-tools-launcher]').exists();
+    assert.dom('[data-test-cardstack-tools-launcher-icon="false"]').exists();
   });
 
   test('it renders with custom implementation', async function(assert) {
-    await render(hbs`git
-      {{#cardstack-tools-launcher as |launcher|}}
+    await render(hbs`
+      {{#cs-tools-launcher as |launcher|}}
         <div class="outer {{if launcher.active 'active'}}" data-test-cardstack-tools-launcher-block>
           <button {{action launcher.setActive true}}>Open</button>
           <button {{action launcher.setActive false}}>Close</button>
           <button {{action launcher.toggleActive}}>Toggle</button>
         </div>
-      {{/cardstack-tools-launcher}}
+      {{/cs-tools-launcher}}
     `);
-    assert.dom('[data-test-cardstack-tools-launcher-block]').exists('found provided element');
+    assert.dom('[data-test-cardstack-tools-launcher-block] button').exists();
   });
 
   test('it does not render when tools are not available', async function(assert) {
-    await render(hbs`{{cardstack-tools-edges}}`);
+    await render(hbs`{{cs-tools}}`);
     this.get('tools').set('available', false);
-
-    assert.dom('[data-test-cardstack-tools-launcher-icon="false"]').doesNotExist('no icon');
-    assert.dom('[data-test-cardstack-tools-launcher-icon="true"]').doesNotExist('no icon');
+    assert.dom('[data-test-cardstack-tools-launcher]').doesNotExist();
   });
 
   test('clicking icon toggles tools', async function(assert) {
-    await render(hbs`{{cardstack-tools-launcher}}`);
-    run(() => {
-      this.$('[data-test-cardstack-tools-launcher-button]').click();
-    });
-    assert.dom('[data-test-cardstack-tools-launcher-icon="true"]').exists('found active button');
+    await render(hbs`{{cs-tools-launcher}}`);
+    await click('[data-test-cardstack-tools-launcher]');
+    assert.dom('[data-test-cardstack-tools-launcher-icon="true"]').exists();
+
+    await click('[data-test-cardstack-tools-launcher]');
+    assert.dom('[data-test-cardstack-tools-launcher-icon="false"]').exists();
   });
 });
