@@ -73,7 +73,7 @@
     "supertest": "^2.0.1"
   },
   "engines": {
-    "node": "6.* || 8.* || >= 10.*"
+    "node": ">= 8"
   },
   "ember-addon": {
     "configPath": "tests/dummy/config"
