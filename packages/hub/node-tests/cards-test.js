@@ -222,8 +222,7 @@ describe('hub/cards', function () {
         expect(error.message).to.match(/refers to field defined in foreign schema/);
       });
 
-
-      it(`throws when a content-type's field's related-types refers to a content-type within a different card-definition namespace`, async function () {
+      it(`throws when a content-type's field's related-types refers to a content-type that comes from a different card schema`, async function () {
         let factory = new JSONAPIFactory();
         factory.addResource('data-sources').withAttributes({ 'source-type': 'person-card' });
         factory.addResource('data-sources').withAttributes({ 'source-type': 'article-card' });
