@@ -10,7 +10,8 @@ export default class JSONAPIFactory {
     this.packageName = packageName;
   }
 
-  addResource(type, id=null) {
+  addResource(type, _id=null) {
+    let id = _id;
     if (type === 'card-definitions' && this.sourceId != null && this.packageName != null) {
       id = [ this.sourceId, this.packageName ].join(DELIM);
     } else {
@@ -24,7 +25,13 @@ export default class JSONAPIFactory {
     let resource = { type, id: String(id) };
     this.data.push(resource);
     resource.type = type;
-    return new ResourceFactory(resource);
+
+    let _resource = new ResourceFactory(resource);
+    if (this.sourceId != null && this.packageName != null && _id != null &&
+      (type === 'content-types' || 'fields')) {
+      _resource.withAttributes({ name: _id });
+    }
+    return _resource;
   }
 
   getResource(type, id) {
