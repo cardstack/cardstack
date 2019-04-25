@@ -22,7 +22,7 @@ module('Integration | Models', function(hooks) {
             fieldType: '@cardstack/core-types::belongs-to'
           }).withRelated('related-types', [
             factory.addResource('content-types', 'authors').withRelated('fields', [
-              factory.addResource('fields', 'nickname').withAttributes({
+              factory.addResource('fields', 'name').withAttributes({
                 fieldType: '@cardstack/core-types::string'
               })
             ])
@@ -37,7 +37,7 @@ module('Integration | Models', function(hooks) {
           title: 'second'
         }).withRelated(
           'author',
-          factory.addResource('authors').withAttributes({ nickname: 'Author of Second' })
+          factory.addResource('authors').withAttributes({ name: 'Author of Second' })
         );
       factory.addResource('content-types', 'pages')
         .withAttributes({
@@ -167,7 +167,7 @@ module('Integration | Models', function(hooks) {
     let post = await run(() => this.store.findRecord('post', '1'));
     let author = await run(() => this.store.createRecord('author'));
     await run(() => {
-      author.set('nickname', 'Pat Smith');
+      author.set('name', 'Pat Smith');
       post.set('author', author);
       return post.save();
     });
@@ -175,7 +175,7 @@ module('Integration | Models', function(hooks) {
     post = await run(() => this.store.findRecord('post', '1', { include: 'author' }));
     author = await run(() => post.get('author'));
 
-    assert.equal(author.get('nickname'), 'Pat Smith');
+    assert.equal(author.get('name'), 'Pat Smith');
   });
 
   test('it can delete', async function(assert) {
@@ -195,7 +195,7 @@ module('Integration | Models', function(hooks) {
   test('it can get a belongs-to relationship', async function(assert) {
     let post = await run(() => this.store.findRecord('post', '2', { include: 'author' }));
     let author = await run(() => post.get('author'));
-    assert.equal(author.get('nickname'), 'Author of Second');
+    assert.equal(author.get('name'), 'Author of Second');
   });
 
   test('it sets no routingField by default', async function(assert) {

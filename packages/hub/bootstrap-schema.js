@@ -11,7 +11,7 @@ const models = [
     relationships: {
       fields: {
         data: [
-          { type: 'fields', id: 'name' },
+          { type: 'fields', id: 'member-name' },
           { type: 'fields', id: 'data-source' },
           { type: 'fields', id: 'fields' },
           { type: 'fields', id: 'is-built-in' },
@@ -61,7 +61,7 @@ const models = [
     relationships: {
       fields: {
         data: [
-          { type: 'fields', id: 'name' },
+          { type: 'fields', id: 'member-name' },
           { type: 'fields', id: 'field-type' },
           { type: 'fields', id: 'related-types' },
           { type: 'fields', id: 'default-at-create' },
@@ -124,7 +124,7 @@ const models = [
     relationships: {
       fields: {
         data: [
-          { type: 'fields', id: 'name' },
+          { type: 'fields', id: 'member-name' },
           { type: 'fields', id: 'computed-field-type' },
           { type: 'fields', id: 'caption' },
           { type: 'fields', id: 'searchable' },
@@ -815,7 +815,7 @@ const models = [
   },
   {
     type: 'fields',
-    id: 'name',
+    id: 'member-name',
     attributes: {
       'field-type': '@cardstack/core-types::string'
     }

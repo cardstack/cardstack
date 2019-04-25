@@ -29,7 +29,7 @@ export default class JSONAPIFactory {
     let _resource = new ResourceFactory(resource);
     if (this.sourceId != null && this.packageName != null && _id != null &&
       (type === 'content-types' || 'fields')) {
-      _resource.withAttributes({ name: _id });
+      _resource.withAttributes({ 'member-name': _id });
     }
     return _resource;
   }

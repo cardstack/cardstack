@@ -12,7 +12,7 @@ module.exports = class Field {
   }
 
   constructor(model, plugins, allGrants, defaultValues) {
-    let fieldName = get(model, 'attributes.name') || model.id;
+    let fieldName = get(model, 'attributes.member-name') || model.id;
     if (!Field.isValidName(fieldName)) {
       throw new Error(`${fieldName} is not a valid field name. We follow JSON:API spec for valid member names, see http://jsonapi.org/format/#document-member-names`);
     }

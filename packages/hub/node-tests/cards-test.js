@@ -34,7 +34,7 @@ describe('hub/cards', function () {
         expect(schema.data.relationships.model.data).to.eql({ type: 'content-types', id: 'local-hub::person-card::people' });
 
         schema = await searchers.get(env.session, 'local-hub', 'content-types', 'local-hub::person-card::people');
-        expect(schema.data.attributes).to.eql({ name: 'people' });
+        expect(schema.data.attributes).to.eql({ 'member-name': 'people' });
         expect(schema.data.relationships.fields.data).to.eql([
           { type: 'fields', id: 'local-hub::person-card::name' },
           { type: 'fields', id: 'local-hub::person-card::password' },
@@ -42,7 +42,7 @@ describe('hub/cards', function () {
 
         schema = await searchers.get(env.session, 'local-hub', 'fields', 'local-hub::person-card::name');
         expect(schema.data.attributes).to.eql({
-          name: 'name',
+          'member-name': 'name',
           'is-metadata': true,
           'needed-when-embedded': true,
           'field-type': '@cardstack/core-types::string'
@@ -50,7 +50,7 @@ describe('hub/cards', function () {
 
         schema = await searchers.get(env.session, 'local-hub', 'fields', 'local-hub::person-card::password');
         expect(schema.data.attributes).to.eql({
-          name: 'password',
+          'member-name': 'password',
           'field-type': '@cardstack/core-types::string'
         });
 
@@ -58,7 +58,7 @@ describe('hub/cards', function () {
         expect(schema.data.relationships.model.data).to.eql({ type: 'content-types', id: 'local-hub::article-card::articles' });
 
         schema = await searchers.get(env.session, 'local-hub', 'content-types', 'local-hub::article-card::articles');
-        expect(schema.data.attributes).to.eql({ name: 'articles' });
+        expect(schema.data.attributes).to.eql({ 'member-name': 'articles' });
         expect(schema.data.relationships.fields.data).to.eql([
           { type: 'fields', id: 'local-hub::article-card::title' },
           { type: 'fields', id: 'local-hub::article-card::body' },
@@ -67,12 +67,12 @@ describe('hub/cards', function () {
         ]);
 
         schema = await searchers.get(env.session, 'local-hub', 'content-types', 'local-hub::article-card::categories');
-        expect(schema.data.attributes).to.eql({ name: 'categories' });
+        expect(schema.data.attributes).to.eql({ 'member-name': 'categories' });
         expect(schema.data.relationships).to.be.notOk;
 
         schema = await searchers.get(env.session, 'local-hub', 'fields', 'local-hub::article-card::title');
         expect(schema.data.attributes).to.eql({
-          name: 'title',
+          'member-name': 'title',
           'is-metadata': true,
           'needed-when-embedded': true,
           'placeholder': 'Placeholder Title',
@@ -88,14 +88,14 @@ describe('hub/cards', function () {
 
         schema = await searchers.get(env.session, 'local-hub', 'fields', 'local-hub::article-card::body');
         expect(schema.data.attributes).to.eql({
-          name: 'body',
+          'member-name': 'body',
           'is-metadata': true,
           'field-type': '@cardstack/core-types::string'
         });
 
         schema = await searchers.get(env.session, 'local-hub', 'fields', 'local-hub::article-card::categories');
         expect(schema.data.attributes).to.eql({
-          name: 'categories',
+          'member-name': 'categories',
           'is-metadata': true,
           'needed-when-embedded': true,
           'field-type': '@cardstack/core-types::has-many'
@@ -103,7 +103,7 @@ describe('hub/cards', function () {
 
         schema = await searchers.get(env.session, 'local-hub', 'fields', 'local-hub::article-card::author');
         expect(schema.data.attributes).to.eql({
-          name: 'author',
+          'member-name': 'author',
           'is-metadata': true,
           'needed-when-embedded': true,
           'field-type': '@cardstack/core-types::belongs-to'
