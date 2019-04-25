@@ -62,7 +62,7 @@ module.exports = class ContentType {
     // itself as a Field too.
     this.realAndComputedFields = realAndComputedFields;
 
-    // TODO need to upate DocumentContext, codegen, et al to deal with the content-type name being different than the content type id
+    // TODO need to update DocumentContext, codegen, et. al. to deal with the content-type name being different than the content type id
     this.name = get(model, 'attributes.name') || model.id;
 
     this.id = model.id;

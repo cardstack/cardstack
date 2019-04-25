@@ -17,7 +17,7 @@ module.exports = class Field {
       throw new Error(`${fieldName} is not a valid field name. We follow JSON:API spec for valid member names, see http://jsonapi.org/format/#document-member-names`);
     }
 
-    // TODO need to upate DocumentContext, codegen, et al to deal with the field name being different than the field id
+    // TODO need to update DocumentContext, codegen, et. al. to deal with the field name being different than the field id
     this.name = fieldName;
     this.id = model.id;
     if (!model.attributes || !model.attributes['field-type']) {

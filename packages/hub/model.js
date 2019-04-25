@@ -2,7 +2,6 @@
 // (like computed fields) to access models.
 const priv = new WeakMap();
 const qs = require('qs');
-const log = require('@cardstack/logger')('cardstack/hub/model');
 
 exports.privateModels = priv;
 

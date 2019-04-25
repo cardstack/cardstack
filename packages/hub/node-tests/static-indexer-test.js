@@ -6,49 +6,53 @@ const {
 const project = __dirname + '/../../../tests/stub-static-models';
 
 describe('static-models indexers', function () {
-  it('can rely on static content', async function () {
-    let factory = new JSONAPIFactory();
-    factory.addResource('data-sources').withAttributes({
-      'source-type': 'data-source-with-static',
-      params: {
-        otherThing2Title: 'chocolate cake'
-      }
+  // TODO this test eventually goes away after schema defined in scmea feature is able to be used
+  describe('valid schema', function () {
+    let env, factory;
+
+    beforeEach(async function() {
+      factory = new JSONAPIFactory();
+      factory.addResource('data-sources').withAttributes({
+        'source-type': 'data-source-with-static',
+        params: {
+          otherThing2Title: 'chocolate cake'
+        }
+      });
     });
-    factory.addResource('content-types', 'my-things');
-    factory.addResource('content-types', 'other-things')
-      .withRelated('fields', [
-        factory.addResource('fields', 'title-of-thing')
-          .withAttributes({
-            'field-type': '@cardstack/core-types::string'
-          })
-      ]);
-    let env = await createDefaultEnvironment(project, factory.getModels());
-    await env.lookup('hub:searchers').get(env.session, 'local-hub', 'other-things', '2');
 
-    await destroyDefaultEnvironment(env);
-  });
-
-  it('has access to data source params', async function () {
-    let factory = new JSONAPIFactory();
-    factory.addResource('data-sources').withAttributes({
-      'source-type': 'data-source-with-static',
-      params: {
-        otherThing2Title: 'chocolate cake'
-      }
+    afterEach(async function() {
+      await destroyDefaultEnvironment(env);
     });
-    factory.addResource('content-types', 'my-things');
-    factory.addResource('content-types', 'other-things')
-      .withRelated('fields', [
-        factory.addResource('fields', 'title-of-thing')
-          .withAttributes({
-            'field-type': '@cardstack/core-types::string'
-          })
-      ]);
-    let env = await createDefaultEnvironment(project, factory.getModels());
-    let thing = await env.lookup('hub:searchers').get(env.session, 'local-hub', 'other-things', '2');
-    expect(thing).has.deep.property('data.attributes.title-of-thing', 'chocolate cake');
 
-    await destroyDefaultEnvironment(env);
+    it('can rely on schema from static content', async function () {
+      factory.addResource('my-things', '1');
+      env = await createDefaultEnvironment(project, factory.getModels());
+    });
+
+    it('can rely on static content', async function () {
+      factory.addResource('content-types', 'other-things')
+        .withRelated('fields', [
+          factory.addResource('fields', 'title-of-thing')
+            .withAttributes({
+              'field-type': '@cardstack/core-types::string'
+            })
+        ]);
+      env = await createDefaultEnvironment(project, factory.getModels());
+      await env.lookup('hub:searchers').get(env.session, 'local-hub', 'other-things', '2');
+    });
+
+    it('has access to data source params', async function () {
+      factory.addResource('content-types', 'other-things')
+        .withRelated('fields', [
+          factory.addResource('fields', 'title-of-thing')
+            .withAttributes({
+              'field-type': '@cardstack/core-types::string'
+            })
+        ]);
+      env = await createDefaultEnvironment(project, factory.getModels());
+      let thing = await env.lookup('hub:searchers').get(env.session, 'local-hub', 'other-things', '2');
+      expect(thing).has.deep.property('data.attributes.title-of-thing', 'chocolate cake');
+    });
   });
 
   // TODO: We need to grandfather in the current static-model ability to specify schema if we want to limit this PR to
