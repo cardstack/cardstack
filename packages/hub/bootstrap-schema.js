@@ -144,7 +144,8 @@ const models = [
         data: [
           { type: 'fields', id: 'constraint-type' },
           { type: 'fields', id: 'inputs' },
-          { type: 'fields', id: 'input-assignments' }
+          { type: 'fields', id: 'input-assignments' },
+          { type: 'fields', id: 'error-message' }
         ]
       }
     }
@@ -535,6 +536,13 @@ const models = [
   {
     type: 'fields',
     id: 'constraint-type',
+    attributes: {
+      'field-type': '@cardstack/core-types::string'
+    }
+  },
+  {
+    type: 'fields',
+    id: 'error-message',
     attributes: {
       'field-type': '@cardstack/core-types::string'
     }

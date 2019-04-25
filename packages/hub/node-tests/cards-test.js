@@ -16,7 +16,6 @@ describe('hub/cards', function () {
 
   describe('card schema', function () {
     let searchers;
-    //TODO also test: field instructions, field placeholder, field constraints
 
     describe('valid schema scenarios', function () {
       afterEach(teardown);
@@ -71,14 +70,21 @@ describe('hub/cards', function () {
         expect(schema.data.attributes).to.eql({ name: 'categories' });
         expect(schema.data.relationships).to.be.notOk;
 
-
         schema = await searchers.get(env.session, 'local-hub', 'fields', 'local-hub::article-card::title');
         expect(schema.data.attributes).to.eql({
           name: 'title',
           'is-metadata': true,
           'needed-when-embedded': true,
+          'placeholder': 'Placeholder Title',
+          'instructions': 'Choose a title that evokes feelings of harmony',
           'field-type': '@cardstack/core-types::string'
         });
+        expect(schema.data.relationships.constraints.data).to.be.ok;
+        let constraintId = schema.data.relationships.constraints.data[0].id;
+        expect(constraintId).to.match(/^local-hub::article-card::/);
+
+        schema = await searchers.get(env.session, 'local-hub', 'constraints', constraintId);
+        expect(schema.data.attributes['error-message']).to.equal('The title must not be empty.');
 
         schema = await searchers.get(env.session, 'local-hub', 'fields', 'local-hub::article-card::body');
         expect(schema.data.attributes).to.eql({
