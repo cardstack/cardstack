@@ -3,11 +3,10 @@ import DS from 'ember-data';
 
 export default DS.JSONAPIAdapter.extend({
   findRecord(store, type, id /*, snapshot */) {
-    let [branch, realType, realId] = id.split('/');
+    let [realType, realId] = id.split('/');
     let adapter = store.adapterFor(realType);
     return adapter.queryRecord(store, store.modelFor(realType), {
       filter: { id: realId },
-      branch,
       disableResourceMetadata: true
     }).then(response => {
       return {

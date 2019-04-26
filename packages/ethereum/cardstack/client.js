@@ -56,7 +56,6 @@ module.exports = class EthereumClient {
     await this.stopAll();
     await timeout(10 * 1000); // cool down period before we start issuing requests again
 
-    this._hasConnected = false;
     this._contracts = {};
     this._provider = null;
     this._eventListeners = {};
@@ -76,6 +75,7 @@ module.exports = class EthereumClient {
   }
 
   async stopAll() {
+    this._hasConnected = false;
     for (let name of Object.keys(this._eventListeners)) {
       await this.stop(name);
     }
@@ -168,7 +168,7 @@ module.exports = class EthereumClient {
     return balance;
   }
 
-  async startNewBlockListening(transactionIndexer) {
+  async startNewBlockListening(listener) {
     if (this._hasStartedListeningForNewBlocks) { return; }
 
     log.info(`starting listening for new blocks - first disconnecting any lingering listeners`);
@@ -182,16 +182,14 @@ module.exports = class EthereumClient {
         if (error.type === 'close') {
           await this._reconnect();
         }
-      } else {
+      } else if (listener) {
         log.debug(`Received new block #${event.number}`);
         log.trace(`Received new block header event: ${JSON.stringify(event, null, 2)}`);
 
         let blockNumber = event.number;
-        if (transactionIndexer) {
-          // Note that this is an async function call, but that the web3 event handler doesnt support awaiting async function invocations.
-          // Make sure to await the transactionIndexer's indexing promise when testing so that async is not leaked.
-          transactionIndexer.index({ onlyBlockNumber: blockNumber });
-        }
+        // Note that this is an async function call, but that the web3 event handler doesnt support awaiting async function invocations.
+        // Make sure to await the transactionIndexer's indexing promise when testing so that async is not leaked.
+        listener.onNewBlockReceived(blockNumber);
       }
     });
     log.debug(`completed startup for new block event listeners`);

@@ -1,0 +1,27 @@
+.cs-article-header {
+  display: flex;
+  flex-flow: row nowrap;
+  justify-content: center;
+  align-items: center;
+
+  width: 100%;
+  height: var(--cs-header-height, 60px);
+  background-color: var(--deep-background);
+}
+
+.cs-article-header--title {
+  flex: 0.75;
+
+  color: var(--bright-foreground);
+  fill: var(--active-foreground);
+  text-align: center;
+}
+
+.cs-article-header--publish-button {
+  padding: 0.5em 2em;
+  background: none;
+  border: 1px solid var(--active-foreground);
+  border-radius: 3px;
+  color: var(--active-foreground);
+  font-size: 16px;
+}

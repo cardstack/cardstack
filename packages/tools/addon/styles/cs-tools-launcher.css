@@ -1,0 +1,59 @@
+.cardstack-tools-launcher {
+  display: flex;
+  flex-flow: row nowrap;
+  justify-content: center;
+  align-items: center;
+
+  position: relative;
+  right: 1.5rem;
+  top: 1.5rem;
+  padding: 1.5em;
+
+  background-color: var(--normal-background);
+  border: none;
+  border-radius: 5px;
+  box-shadow: 0 5px 15px 0 var(--dark50);
+  color: var(--bright-foreground);
+  fill: var(--bright-foreground);
+  font-size: 14px;
+
+  cursor: pointer;
+  user-select: none;
+  transition: transform 500ms ease-in;
+}
+
+.cardstack-tools-launcher.inactive:hover {
+  background-color: var(--deep-background);
+  color: var(--bright-foreground);
+  fill: var(--active-foreground);
+}
+
+.cardstack-tools-launcher.inactive:hover::before {
+  display: block;
+  clear: both;
+  content: 'Edit Page';
+  fill: var(--active-foreground);
+  white-space: nowrap;
+  margin-right: 1em;
+}
+
+.cardstack-tools-launcher.active {
+  box-shadow: none;
+}
+
+.cardstack-tools-launcher.active:hover {
+  fill: var(--active-foreground);
+}
+
+.cardstack-tools-launcher.active::before {
+  display: block;
+  clear: both;
+  content: 'Done';
+  fill: var(--active-foreground);
+  white-space: nowrap;
+  margin-right: 1em;
+}
+
+.cardstack-tools-launcher.active svg {
+  transform: rotate(0.5turn);
+}

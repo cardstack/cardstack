@@ -22,13 +22,11 @@ describe('cardstack/sftp/searcher', function() {
         'source-type': '@cardstack/sftp',
         params: {
           contentType: 'sftp-files',
-          branches: {
-            master: {
-              host: '1.2.3.4',
-              port: 22,
-              username: 'someuser',
-              privateKey: "a private key string"
-            }
+          connection: {
+            host: '1.2.3.4',
+            port: 22,
+            username: 'someuser',
+            privateKey: "a private key string"
           }
         }
       });

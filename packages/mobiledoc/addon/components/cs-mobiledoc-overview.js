@@ -30,8 +30,8 @@ export default Component.extend({
           // Card section
           let cardIndex = section[1];
           let card = doc.cards[cardIndex];
-          let cardName = card[0];
-          return this.summaryForCard(cardName);
+          let [ cardName, payload ] = card;
+          return this.summaryForCard(cardName, payload.card);
         }
       }
     });
@@ -56,7 +56,11 @@ export default Component.extend({
       return { text: tag };
     }
   },
-  summaryForCard(cardName) {
+  summaryForCard(cardName, payload) {
+    // TODO probably we should show a thumbnail for cardstack-image cards
+    if (cardName === 'cs-mobiledoc-card') {
+      return { text: capitalize(payload.type.replace(/^cardstack-/, '')) };
+    }
     return { text: capitalize(cardName.replace(/-card$/, '')) };
   }
 

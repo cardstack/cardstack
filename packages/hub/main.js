@@ -2,6 +2,7 @@ const Koa = require('koa');
 const Session = require('@cardstack/plugin-utils/session');
 const { Registry, Container } = require('@cardstack/di');
 const postgresConfig = require('@cardstack/plugin-utils/postgres-config');
+const { writeSnapshot } = require('heapdump');
 // lazy load only in container mode, since they uses node 8 features
 let EmberConnection;
 let Orchestrator;
@@ -33,6 +34,10 @@ async function wireItUp(projectDir, encryptionKeys, dataSources, opts = {}) {
     registry.register('config:initial-models', () => []);
   }
 
+  if (process.env.PROFILE_MEMORY_SEC) {
+    setInterval(() => writeSnapshot((err, filename) => log.info(`heap dump written to ${filename}`)), process.env.PROFILE_MEMORY_SEC * 1000);
+  }
+
   let container = new Container(registry);
 
   // in the test suite we want more deterministic control of when
@@ -53,7 +58,9 @@ async function wireItUp(projectDir, encryptionKeys, dataSources, opts = {}) {
 
 async function startIndexing(environment, container) {
   // some datasources are dependent upon a sync at boot for index of pristine system
-  await container.lookup('hub:indexers').update();
+  await container.lookup('hub:indexers').update({
+    dontWaitForJob: environment === 'production'
+  });
 
   let ephemeralStorage = await container.lookup(`plugin-services:${require.resolve('@cardstack/ephemeral/service')}`);
   if (environment !== 'production' && ephemeralStorage) {
@@ -64,7 +71,7 @@ async function startIndexing(environment, container) {
       await ephemeralStorage.validateModels(models, async (type, id) => {
         let result;
         try {
-          result = await searchers.getFromControllingBranch(Session.INTERNAL_PRIVILEGED, type, id);
+          result = await searchers.get(Session.INTERNAL_PRIVILEGED, 'local-hub', type, id);
         } catch (err) {
           if (err.status !== 404) { throw err; }
         }
@@ -79,17 +86,20 @@ async function startIndexing(environment, container) {
     }
   }
 
-  setInterval(() => container.lookup('hub:indexers').update(), 600000);
+  setInterval(() => container.lookup('hub:indexers').update({ dontWaitForJob: true }), 600000);
 }
 
-async function loadSeeds(container, seedModels, opts) {
+async function loadSeeds(container, seedModels) {
   if (!container) { return; }
 
-  let branch = opts && opts.branch || 'master';
   let writers = container.lookup('hub:writers');
 
   for (let model of seedModels) {
-    await writers.create(branch, Session.INTERNAL_PRIVILEGED, model.type, { data: model });
+    if (model.readable) {
+      await writers.createBinary(Session.INTERNAL_PRIVILEGED, 'cardstack-files', model);
+    } else {
+      await writers.create(Session.INTERNAL_PRIVILEGED, model.type, { data: model });
+    }
   }
 
   await container.lookup('hub:indexers').update({ forceRefresh: true });

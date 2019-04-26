@@ -1,71 +1,37 @@
-.cs-version-control-dropdown {
-    position: relative;
+.cs-version-control--header {
     display: flex;
+    flex-flow: row nowrap;
     justify-content: space-between;
     align-items: center;
-    padding: 0.6rem;
+    padding-bottom: 1.5rem;
+}
+
+.cs-version-control--status {
+    padding: 3px 1.5rem;
     background-color: var(--deep-background);
-    border-radius: 5px;
-    cursor: pointer;
-    user-select: none;
-}
-
-.cs-version-control-dropdown-option {
-    color: var(--bright-foreground);
-    font-size: 0.8em;
-    text-transform: uppercase;
-}
-
-.cs-version-control-dropdown-option--status {
-    display: inline-block;
-    padding-right: 0.5em;
-    font-family: 'Open Sans Bold';
-    font-weight: bold;
-}
-
-.cs-version-control-dropdown-option--status.draft,
-.cs-version-control-dropdown-option--status.edited {
+    border: none;
+    border-radius: 11.5px;
     color: var(--hot-pink-foreground);
+    font-size: 14px;
+    font-weight: 600;
+    text-transform: capitalize;
 }
 
-.cs-version-control-dropdown-option--status.published {
+.cs-version-control--status.saved {
     color: var(--green-foreground);
 }
 
-.cs-version-control-dropdown-option--timestamp {
-    display: inline-block;
-    padding-right: 0.5em;
-}
-
-.cs-version-control-dropdown--button {
-    width: 20px;
-    height: 20px;
-    padding: 0;
-    border: none;
-    background: none;
-    fill: var(--bright-foreground);
-}
-
-.cs-version-control-dropdown--button:hover,
-.cs-version-control-dropdown--button:focus {
-    outline: none;
-    fill: var(--active-foreground);
-}
-
-.cs-version-control-footer {
+.cs-version-control--footer {
+    display: flex;
+    flex-flow: row nowrap;
+    flex: 1;
+    align-items: center;
+    justify-content: space-between;
     text-align: right;
 }
 
-.cs-version-control-footer--button-area {
-    display: flex;
-    flex-flow: row nowrap;
-    align-items: center;
-    justify-content: space-between;
-    padding: 1em 0;
-}
-
 .cs-version-control--button {
-    width: 47%;
+    flex: 0.45;
     height: 2.5rem;
     padding: 0.7rem;
     color: var(--bright-foreground);
@@ -129,8 +95,8 @@
     height: 16px;
     margin: 1px;
     border-radius: 50%;
-    border: 3px solid var(--tools-highlight);
-    border-color: var(--tools-highlight) transparent var(--tools-highlight) transparent;
+    border: 3px solid var(--active-foreground);
+    border-color: var(--active-foreground) transparent var(--active-foreground) transparent;
     animation: lds-dual-ring 1.2s linear infinite;
 }
 

@@ -40,9 +40,7 @@ describe('postgresql/indexer', function() {
       .withAttributes({
         'source-type': '@cardstack/postgresql',
         params: {
-          branches: {
-            master: postgresConfig({ database: 'test1'})
-          },
+          config: postgresConfig({ database: 'test1'}),
           renameTables: {
             editors: 'real-editors',
           },
@@ -96,7 +94,7 @@ describe('postgresql/indexer', function() {
     });
 
     it('discovers content types', async function() {
-      let doc = await env.lookup('hub:searchers').get(env.session, 'master', 'content-types', 'articles');
+      let doc = await env.lookup('hub:searchers').get(env.session, 'local-hub', 'content-types', 'articles');
       expect(doc).is.ok;
       let model = doc.data;
       expect(model).is.ok;
@@ -107,7 +105,7 @@ describe('postgresql/indexer', function() {
     });
 
     it('handles relationships with underscored names', async function() {
-      let doc = await env.lookup('hub:searchers').get(env.session, 'master', 'content-types', 'doggies');
+      let doc = await env.lookup('hub:searchers').get(env.session, 'local-hub', 'content-types', 'doggies');
       expect(doc).is.ok;
       let model = doc.data;
 
@@ -119,7 +117,7 @@ describe('postgresql/indexer', function() {
     });
 
     it('discovers initial records', async function() {
-      let doc = await env.lookup('hub:searchers').get(env.session, 'master', 'articles', '0');
+      let doc = await env.lookup('hub:searchers').get(env.session, 'local-hub', 'articles', '0');
       expect(doc).is.ok;
       let model = doc.data;
       expect(model).is.ok;
@@ -127,65 +125,65 @@ describe('postgresql/indexer', function() {
     });
 
     it('can read an integer column', async function() {
-      let doc = await env.lookup('hub:searchers').get(env.session, 'master', 'articles', '0');
+      let doc = await env.lookup('hub:searchers').get(env.session, 'local-hub', 'articles', '0');
       expect(doc).is.ok;
       let model = doc.data;
       expect(model).has.deep.property('attributes.length', 100);
     });
 
     it('can read a boolean column', async function() {
-      let doc = await env.lookup('hub:searchers').get(env.session, 'master', 'articles', '1');
+      let doc = await env.lookup('hub:searchers').get(env.session, 'local-hub', 'articles', '1');
       expect(doc).is.ok;
       let model = doc.data;
       expect(model).has.deep.property('attributes.published', false);
     });
 
     it('can read null string', async function() {
-      let doc = await env.lookup('hub:searchers').get(env.session, 'master', 'articles', '1');
+      let doc = await env.lookup('hub:searchers').get(env.session, 'local-hub', 'articles', '1');
       expect(doc).is.ok;
       let model = doc.data;
       expect(model).has.deep.property('attributes.title', null);
     });
 
     it('can read null integer', async function() {
-      let doc = await env.lookup('hub:searchers').get(env.session, 'master', 'articles', '1');
+      let doc = await env.lookup('hub:searchers').get(env.session, 'local-hub', 'articles', '1');
       expect(doc).is.ok;
       let model = doc.data;
       expect(model).has.deep.property('attributes.length', null);
     });
 
     it('can rename tables', async function() {
-      let doc = await env.lookup('hub:searchers').get(env.session, 'master', 'content-types', 'real-editors');
+      let doc = await env.lookup('hub:searchers').get(env.session, 'local-hub', 'content-types', 'real-editors');
       expect(doc).is.ok;
     });
 
     it('can rename columns', async function() {
-      let doc = await env.lookup('hub:searchers').get(env.session, 'master', 'content-types', 'articles');
+      let doc = await env.lookup('hub:searchers').get(env.session, 'local-hub', 'content-types', 'articles');
       expect(doc).is.ok;
       expect(doc.data.relationships.fields.data.map(f => f.id)).contains('real-topic');
     });
 
     it('can use type hints', async function() {
-      let response = await env.lookup('hub:searchers').search(env.session, 'master', { filter: { 'toy-name': { exact: 'SQueAkY sNakE' } } });
+      let response = await env.lookup('hub:searchers').search(env.session, { filter: { 'toy-name': { exact: 'SQueAkY sNakE' } } });
       expect(response.data).length(1);
       expect(response.data[0].attributes['toy-name']).to.equal('Squeaky Snake');
     });
 
     it('can customize discovered schema', async function() {
-      let doc = await env.lookup('hub:searchers').get(env.session, 'master', 'content-types', 'articles');
+      let doc = await env.lookup('hub:searchers').get(env.session, 'local-hub', 'content-types', 'articles');
       expect(doc.data.attributes).has.property('default-includes');
       expect(doc.data.attributes['default-includes']).deep.equals(['editor']);
     });
 
     it('supports default includes', async function() {
-      let doc = await env.lookup('hub:searchers').get(env.session, 'master', 'articles', '0');
+      let doc = await env.lookup('hub:searchers').get(env.session, 'local-hub', 'articles', '0');
       expect(doc).has.property('included');
       expect(doc.included).has.length(1);
       expect(doc.included[0]).has.deep.property('attributes.name', 'Some Editor');
     });
 
     it('can use type hints to make a relationship into an attribute', async function() {
-      let doc = await env.lookup('hub:searchers').get(env.session, 'master', 'report-cards', '0');
+      let doc = await env.lookup('hub:searchers').get(env.session, 'local-hub', 'report-cards', '0');
       expect(doc.data.attributes).has.property('history-grade', 'A');
     });
 
@@ -198,7 +196,7 @@ describe('postgresql/indexer', function() {
     it('discovers new records', async function() {
       await client.query('insert into articles values ($1, $2)', ['2', 'second article']);
       await env.lookup('hub:indexers').update({ forceRefresh: true });
-      let doc = await env.lookup('hub:searchers').get(env.session, 'master', 'articles', '2');
+      let doc = await env.lookup('hub:searchers').get(env.session, 'local-hub', 'articles', '2');
       expect(doc).is.ok;
       let model = doc.data;
       expect(model).is.ok;
@@ -209,7 +207,7 @@ describe('postgresql/indexer', function() {
     it('updates records', async function() {
       await client.query('update articles set title=$1 where id=$2', ['I was updated', '0']);
       await env.lookup('hub:indexers').update({ forceRefresh: true });
-      let doc = await env.lookup('hub:searchers').get(env.session, 'master', 'articles', '0');
+      let doc = await env.lookup('hub:searchers').get(env.session, 'local-hub', 'articles', '0');
       expect(doc).is.ok;
       let model = doc.data;
       expect(model).is.ok;
@@ -220,7 +218,7 @@ describe('postgresql/indexer', function() {
       await client.query('delete from articles where id=$1', ['0']);
       await env.lookup('hub:indexers').update({ forceRefresh: true });
       try {
-        await env.lookup('hub:searchers').get(env.session, 'master', 'articles', '0');
+        await env.lookup('hub:searchers').get(env.session, 'local-hub', 'articles', '0');
         throw new Error("should not get here");
       } catch (err) {
         expect(err.status).to.equal(404);
@@ -230,7 +228,7 @@ describe('postgresql/indexer', function() {
     it('discovers newly added content type', async function() {
       await client.query('create table humans (id varchar primary key, name varchar)');
       await env.lookup('hub:indexers').update({ forceRefresh: true });
-      let doc = await env.lookup('hub:searchers').get(env.session, 'master', 'content-types', 'humans');
+      let doc = await env.lookup('hub:searchers').get(env.session, 'local-hub', 'content-types', 'humans');
       expect(doc).is.ok;
       let model = doc.data;
       expect(model).is.ok;
@@ -242,7 +240,7 @@ describe('postgresql/indexer', function() {
       await client.query('drop table articles');
       await env.lookup('hub:indexers').update({ forceRefresh: true });
       try {
-        await env.lookup('hub:searchers').get(env.session, 'master', 'content-types', 'articles');
+        await env.lookup('hub:searchers').get(env.session, 'local-hub', 'content-types', 'articles');
         throw new Error("should not get here");
       } catch (err) {
         expect(err.status).to.equal(404);
@@ -253,12 +251,12 @@ describe('postgresql/indexer', function() {
       await client.query('alter table articles add column author varchar');
       await client.query('update articles set author=$1 where id=$2', ['Arthur', '0']);
       await env.lookup('hub:indexers').update({ forceRefresh: true });
-      let doc = await env.lookup('hub:searchers').get(env.session, 'master', 'content-types', 'articles');
+      let doc = await env.lookup('hub:searchers').get(env.session, 'local-hub', 'content-types', 'articles');
       expect(doc).is.ok;
       let model = doc.data;
       expect(model).has.deep.property('relationships.fields.data');
       expect(model.relationships.fields.data).collectionContains({ id: 'author' });
-      doc = await env.lookup('hub:searchers').get(env.session, 'master', 'articles', '0');
+      doc = await env.lookup('hub:searchers').get(env.session, 'local-hub', 'articles', '0');
       expect(doc).has.deep.property('data.attributes.author', 'Arthur');
     });
 

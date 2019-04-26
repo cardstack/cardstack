@@ -16,7 +16,7 @@ describe('pgsearch/indexer', function() {
   let env, factory, writer, indexer, searcher, currentSchema, changedModels;
 
   before(async function() {
-    this.timeout(2500);
+    this.timeout(5000);
     factory = new Factory();
 
     factory.addResource('content-types', 'puppies')
@@ -82,9 +82,9 @@ describe('pgsearch/indexer', function() {
     await destroyDefaultEnvironment(env);
   });
 
-  async function alterExpiration(branch, type, id, interval) {
+  async function alterExpiration(type, id, interval) {
     let client = env.lookup(`plugin-client:${require.resolve('@cardstack/pgsearch/client')}`);
-    let result = await client.query(`update documents set expires = now() + $1 where branch=$2 and type=$3 and id=$4`, [interval, branch, type, id]);
+    let result = await client.query(`update documents set expires = now() + $1 where type=$2 and id=$3`, [interval, type, id]);
     if (result.rowCount !== 1) {
       throw new Error(`test was unable to alter expiration`);
     }
@@ -92,7 +92,7 @@ describe('pgsearch/indexer', function() {
 
   // this scenario technically violates jsonapi spec, but our indexer needs to be tolerant of it
   it('tolerates missing relationship', async function() {
-    let { data:article } = await writer.create('master', env.session, 'articles', {
+    let { data:article } = await writer.create(env.session, 'articles', {
       data: {
         type: 'articles',
         attributes: {
@@ -105,13 +105,13 @@ describe('pgsearch/indexer', function() {
     });
     expect(article).has.deep.property('id');
     await indexer.update({ forceRefresh: true });
-    let found = await searcher.get(env.session, 'master', 'articles', article.id);
+    let found = await searcher.get(env.session, 'local-hub', 'articles', article.id);
     expect(found).is.ok;
     expect(found).has.deep.property('data.attributes.title');
   });
 
   it('indexes a belongs-to', async function() {
-    let { data:person } = await writer.create('master', env.session, 'people', {
+    let { data:person } = await writer.create(env.session, 'people', {
       data: {
         type: 'people',
         attributes: {
@@ -120,7 +120,7 @@ describe('pgsearch/indexer', function() {
       }
     });
     expect(person).has.deep.property('id');
-    let { data:article } = await writer.create('master', env.session, 'articles', {
+    let { data:article } = await writer.create(env.session, 'articles', {
       data: {
         type: 'articles',
         attributes: {
@@ -133,7 +133,7 @@ describe('pgsearch/indexer', function() {
     });
     expect(article).has.deep.property('id');
     await indexer.update({ forceRefresh: true });
-    let found = await searcher.get(env.session, 'master', 'articles', article.id);
+    let found = await searcher.get(env.session, 'local-hub', 'articles', article.id);
     expect(found).is.ok;
     expect(found).has.deep.property('data.attributes.title');
     expect(found).has.deep.property('data.relationships.author.data.id', person.id);
@@ -143,7 +143,7 @@ describe('pgsearch/indexer', function() {
   });
 
   it('indexes a resource that is related to itself', async function() {
-    let { data:person } = await writer.create('master', env.session, 'people', {
+    let { data:person } = await writer.create(env.session, 'people', {
       data: {
         id: 'vanGogh',
         type: 'people',
@@ -156,7 +156,7 @@ describe('pgsearch/indexer', function() {
       }
     });
 
-    let found = await searcher.get(env.session, 'master', 'people', person.id);
+    let found = await searcher.get(env.session, 'local-hub', 'people', person.id);
     expect(found).is.ok;
     expect(found).has.deep.property('data.attributes.name');
     expect(found.data.relationships).deep.equals({ friends: { data: [{ type: 'people', id: person.id }]}});
@@ -165,7 +165,7 @@ describe('pgsearch/indexer', function() {
   });
 
   it('indexes a resource that includes a resource which has a relation to itself', async function() {
-    let { data:circularPerson } = await writer.create('master', env.session, 'people', {
+    let { data:circularPerson } = await writer.create(env.session, 'people', {
       data: {
         id: 'vanGogh2',
         type: 'people',
@@ -177,7 +177,7 @@ describe('pgsearch/indexer', function() {
         }
       }
     });
-    let { data:person } = await writer.create('master', env.session, 'people', {
+    let { data:person } = await writer.create(env.session, 'people', {
       data: {
         id: 'ringo',
         type: 'people',
@@ -190,7 +190,7 @@ describe('pgsearch/indexer', function() {
       }
     });
 
-    let found = await searcher.get(env.session, 'master', 'people', person.id);
+    let found = await searcher.get(env.session, 'local-hub', 'people', person.id);
     expect(found).is.ok;
     expect(found).has.deep.property('data.attributes.name');
     expect(found.data.relationships).deep.equals({ friends: { data: [{ type: 'people', id: circularPerson.id }]}});
@@ -201,7 +201,7 @@ describe('pgsearch/indexer', function() {
   });
 
   it('indexes a circular relationship', async function() {
-    let { data:person1 } = await writer.create('master', env.session, 'people', {
+    let { data:person1 } = await writer.create(env.session, 'people', {
       data: {
         id: 'hassan',
         type: 'people',
@@ -213,7 +213,7 @@ describe('pgsearch/indexer', function() {
         }
       }
     });
-    let { data:person2 } = await writer.create('master', env.session, 'people', {
+    let { data:person2 } = await writer.create(env.session, 'people', {
       data: {
         id: 'vanGogh3',
         type: 'people',
@@ -226,7 +226,7 @@ describe('pgsearch/indexer', function() {
       }
     });
 
-    let found = await searcher.get(env.session, 'master', 'people', person1.id);
+    let found = await searcher.get(env.session, 'local-hub', 'people', person1.id);
     expect(found).is.ok;
     expect(found).has.deep.property('data.attributes.name');
     expect(found.data.relationships).deep.equals({ friends: { data: [{ type: 'people', id: person2.id }]}});
@@ -238,7 +238,7 @@ describe('pgsearch/indexer', function() {
   });
 
   it('indexes a circular relationship by following fieldset paths', async function() {
-    let { data:puppy1 } = await writer.create('master', env.session, 'puppies', {
+    let { data:puppy1 } = await writer.create(env.session, 'puppies', {
       data: {
         id: 'ringo',
         type: 'puppies',
@@ -250,7 +250,7 @@ describe('pgsearch/indexer', function() {
         }
       }
     });
-    let { data:puppy2 } = await writer.create('master', env.session, 'puppies', {
+    let { data:puppy2 } = await writer.create(env.session, 'puppies', {
       data: {
         id: 'vanGogh',
         type: 'puppies',
@@ -263,7 +263,7 @@ describe('pgsearch/indexer', function() {
       }
     });
 
-    let found = await searcher.get(env.session, 'master', 'puppies', puppy1.id);
+    let found = await searcher.get(env.session, 'local-hub', 'puppies', puppy1.id);
     expect(found).is.ok;
     expect(found).has.deep.property('data.attributes.name');
     expect(found.data.relationships).deep.equals({ 'puppy-friends': { data: [{ type: 'puppies', id: puppy2.id }]}});
@@ -275,7 +275,7 @@ describe('pgsearch/indexer', function() {
   });
 
   it('indexes a resource that is related to itself by following fieldset paths', async function() {
-    let { data:puppy } = await writer.create('master', env.session, 'puppies', {
+    let { data:puppy } = await writer.create(env.session, 'puppies', {
       data: {
         id: 'vanGogh2',
         type: 'puppies',
@@ -288,7 +288,7 @@ describe('pgsearch/indexer', function() {
       }
     });
 
-    let found = await searcher.get(env.session, 'master', 'puppies', puppy.id);
+    let found = await searcher.get(env.session, 'local-hub', 'puppies', puppy.id);
     expect(found).is.ok;
     expect(found).has.deep.property('data.attributes.name');
     expect(found.data.relationships).deep.equals({ 'puppy-friends': { data: [{ type: 'puppies', id: puppy.id }]}});
@@ -297,7 +297,7 @@ describe('pgsearch/indexer', function() {
   });
 
   it('indexes a resource that includes a resource which has a relation to itself by following fieldset paths', async function() {
-    let { data:circularPuppy } = await writer.create('master', env.session, 'puppies', {
+    let { data:circularPuppy } = await writer.create(env.session, 'puppies', {
       data: {
         id: 'vanGogh3',
         type: 'puppies',
@@ -309,7 +309,7 @@ describe('pgsearch/indexer', function() {
         }
       }
     });
-    let { data:puppy } = await writer.create('master', env.session, 'puppies', {
+    let { data:puppy } = await writer.create(env.session, 'puppies', {
       data: {
         id: 'ringo2',
         type: 'puppies',
@@ -322,7 +322,7 @@ describe('pgsearch/indexer', function() {
       }
     });
 
-    let found = await searcher.get(env.session, 'master', 'puppies', puppy.id);
+    let found = await searcher.get(env.session, 'local-hub', 'puppies', puppy.id);
     expect(found).is.ok;
     expect(found).has.deep.property('data.attributes.name');
     expect(found.data.relationships).deep.equals({ 'puppy-friends': { data: [{ type: 'puppies', id: circularPuppy.id }]}});
@@ -344,7 +344,7 @@ describe('pgsearch/indexer', function() {
     case where the invalidation should actually trigger another invalidation.
   */
   it.skip('indexes a resource that includes resources that have a circular relationship by following fieldset paths', async function() {
-    let { data:puppy } = await writer.create('master', env.session, 'puppies', {
+    let { data:puppy } = await writer.create(env.session, 'puppies', {
       data: {
         type: 'puppies',
         attributes: {
@@ -355,7 +355,7 @@ describe('pgsearch/indexer', function() {
         }
       }
     });
-    let { data:puppy1 } = await writer.create('master', env.session, 'puppies', {
+    let { data:puppy1 } = await writer.create(env.session, 'puppies', {
       data: {
         id: 'ringo3',
         type: 'puppies',
@@ -367,7 +367,7 @@ describe('pgsearch/indexer', function() {
         }
       }
     });
-    let { data:puppy2 } = await writer.create('master', env.session, 'puppies', {
+    let { data:puppy2 } = await writer.create(env.session, 'puppies', {
       data: {
         id: 'vanGogh4',
         type: 'puppies',
@@ -380,7 +380,7 @@ describe('pgsearch/indexer', function() {
       }
     });
 
-    let found = await searcher.get(env.session, 'master', 'puppies', puppy.id);
+    let found = await searcher.get(env.session, 'local-hub', 'puppies', puppy.id);
     expect(found).is.ok;
     expect(found).has.deep.property('data.attributes.name');
     expect(found.data.relationships).deep.equals({ 'puppy-friends': { data: [{ type: 'puppies', id: puppy1.id }]}});
@@ -396,15 +396,14 @@ describe('pgsearch/indexer', function() {
   });
 
   it('reuses included resources when building pristine document when upstreamDoc has includes', async function() {
-    const branch = 'master';
-    const schema = await currentSchema.forBranch(branch);
+    const schema = await currentSchema.getSchema();
 
     let documentFetchCount = 0;
     let read = async (type, id) => {
       documentFetchCount++;
       let result;
       try {
-        result = await searcher.get(env.session, branch, type, id);
+        result = await searcher.get(env.session, 'local-hub', type, id);
       } catch (err) {
         if (err.status !== 404) { throw err; }
       }
@@ -414,7 +413,7 @@ describe('pgsearch/indexer', function() {
       }
     };
 
-    let { data:person } = await writer.create(branch, env.session, 'people', {
+    let { data:person } = await writer.create(env.session, 'people', {
       data: {
         type: 'people',
         attributes: {
@@ -422,7 +421,7 @@ describe('pgsearch/indexer', function() {
         }
       }
     });
-    let { data:article } = await writer.create(branch, env.session, 'articles', {
+    let { data:article } = await writer.create(env.session, 'articles', {
       data: {
         type: 'articles',
         attributes: {
@@ -435,9 +434,9 @@ describe('pgsearch/indexer', function() {
     });
 
     let { id, type } = article;
-    let { data:resource, included } = await searcher.get(env.session, branch, type, id);
+    let { data:resource, included } = await searcher.get(env.session, 'local-hub', type, id);
 
-    let pristineDoc = await (new DocumentContext({ id, type, branch, schema, read,
+    let pristineDoc = await (new DocumentContext({ id, type, schema, read,
       upstreamDoc: { data: resource },
     })).pristineDoc();
 
@@ -446,7 +445,7 @@ describe('pgsearch/indexer', function() {
 
     documentFetchCount = 0;
 
-    pristineDoc = await (new DocumentContext({ id, type, branch, schema, read,
+    pristineDoc = await (new DocumentContext({ id, type, schema, read,
       upstreamDoc: { data: resource, included },
     })).pristineDoc();
 
@@ -455,7 +454,7 @@ describe('pgsearch/indexer', function() {
   });
 
   it('reindexes included resources', async function() {
-    let { data:person } = await writer.create('master', env.session, 'people', {
+    let { data:person } = await writer.create(env.session, 'people', {
       data: {
         type: 'people',
         attributes: {
@@ -464,7 +463,7 @@ describe('pgsearch/indexer', function() {
       }
     });
     expect(person).has.deep.property('id');
-    let { data:article } = await writer.create('master', env.session, 'articles', {
+    let { data:article } = await writer.create(env.session, 'articles', {
       data: {
         type: 'articles',
         attributes: {
@@ -479,10 +478,10 @@ describe('pgsearch/indexer', function() {
     await indexer.update({ forceRefresh: true });
 
     person.attributes.name = 'Edward V';
-    await writer.update('master', env.session, 'people', person.id, { data: person });
+    await writer.update(env.session, 'people', person.id, { data: person });
     await indexer.update({ forceRefresh: true });
 
-    let found = await searcher.get(env.session, 'master', 'articles', article.id);
+    let found = await searcher.get(env.session, 'local-hub', 'articles', article.id);
     expect(found).is.ok;
     expect(found).has.deep.property('data.attributes.title');
     expect(found).has.deep.property('data.relationships.author.data.id', person.id);
@@ -492,7 +491,7 @@ describe('pgsearch/indexer', function() {
   });
 
   it('reindexes included resources when both docs are already changing', async function() {
-    let { data:person } = await writer.create('master', env.session, 'people', {
+    let { data:person } = await writer.create(env.session, 'people', {
       data: {
         type: 'people',
         attributes: {
@@ -501,7 +500,7 @@ describe('pgsearch/indexer', function() {
       }
     });
     expect(person).has.deep.property('id');
-    let { data:article } = await writer.create('master', env.session, 'articles', {
+    let { data:article } = await writer.create(env.session, 'articles', {
       data: {
         type: 'articles',
         attributes: {
@@ -517,11 +516,11 @@ describe('pgsearch/indexer', function() {
 
     person.attributes.name = 'Edward V';
     article.attributes.title = 'A Better Title';
-    await writer.update('master', env.session, 'people', person.id, { data: person });
-    await writer.update('master', env.session, 'articles', article.id, { data: article });
+    await writer.update(env.session, 'people', person.id, { data: person });
+    await writer.update(env.session, 'articles', article.id, { data: article });
     await indexer.update({ forceRefresh: true });
 
-    let found = await searcher.get(env.session, 'master', 'articles', article.id);
+    let found = await searcher.get(env.session, 'local-hub', 'articles', article.id);
     expect(found).is.ok;
     expect(found).has.deep.property('data.attributes.title', 'A Better Title');
     expect(found).has.deep.property('data.relationships.author.data.id', person.id);
@@ -531,7 +530,7 @@ describe('pgsearch/indexer', function() {
   });
 
   it('reindexes correctly when related resource is saved before own resource', async function() {
-    let { data:person } = await writer.create('master', env.session, 'people', {
+    let { data:person } = await writer.create(env.session, 'people', {
       data: {
         type: 'people',
         attributes: {
@@ -540,7 +539,7 @@ describe('pgsearch/indexer', function() {
       }
     });
     expect(person).has.deep.property('id');
-    let { data:article } = await writer.create('master', env.session, 'articles', {
+    let { data:article } = await writer.create(env.session, 'articles', {
       data: {
         type: 'articles',
         attributes: {
@@ -561,7 +560,7 @@ describe('pgsearch/indexer', function() {
 
     await indexer.update({ forceRefresh: true });
 
-    let found = await searcher.get(env.session, 'master', 'articles', article.id);
+    let found = await searcher.get(env.session, 'local-hub', 'articles', article.id);
     expect(found).is.ok;
     expect(found).has.deep.property('data.attributes.title', 'A Better Title');
     expect(found).has.deep.property('data.relationships.author.data.id', person.id);
@@ -571,7 +570,7 @@ describe('pgsearch/indexer', function() {
   });
 
   it('reindexes correctly when related resource is saved after own resource', async function() {
-    let { data:person } = await writer.create('master', env.session, 'people', {
+    let { data:person } = await writer.create(env.session, 'people', {
       data: {
         type: 'people',
         attributes: {
@@ -580,7 +579,7 @@ describe('pgsearch/indexer', function() {
       }
     });
     expect(person).has.deep.property('id');
-    let { data:article } = await writer.create('master', env.session, 'articles', {
+    let { data:article } = await writer.create(env.session, 'articles', {
       data: {
         type: 'articles',
         attributes: {
@@ -601,7 +600,7 @@ describe('pgsearch/indexer', function() {
 
     await indexer.update({ forceRefresh: true });
 
-    let found = await searcher.get(env.session, 'master', 'articles', article.id);
+    let found = await searcher.get(env.session, 'local-hub', 'articles', article.id);
     expect(found).is.ok;
     expect(found).has.deep.property('data.attributes.title', 'A Better Title');
     expect(found).has.deep.property('data.relationships.author.data.id', person.id);
@@ -611,7 +610,7 @@ describe('pgsearch/indexer', function() {
   });
 
   it('invalidates resource that contains included resource that was updated', async function() {
-    let { data:person } = await writer.create('master', env.session, 'people', {
+    let { data:person } = await writer.create(env.session, 'people', {
       data: {
         type: 'people',
         attributes: {
@@ -620,7 +619,7 @@ describe('pgsearch/indexer', function() {
       }
     });
     expect(person).has.deep.property('id');
-    let { data:article } = await writer.create('master', env.session, 'articles', {
+    let { data:article } = await writer.create(env.session, 'articles', {
       data: {
         type: 'articles',
         attributes: {
@@ -634,11 +633,11 @@ describe('pgsearch/indexer', function() {
     expect(article).has.deep.property('id');
 
     person.attributes.name = 'Edward V';
-    await writer.update('master', env.session, 'people', person.id, { data: person });
+    await writer.update(env.session, 'people', person.id, { data: person });
 
     // note that indexer.update() is not called -- invalidation happens as a direct result of updating the doc
 
-    let found = await searcher.get(env.session, 'master', 'articles', article.id);
+    let found = await searcher.get(env.session, 'local-hub', 'articles', article.id);
     expect(found).is.ok;
     expect(found).has.deep.property('data.attributes.title');
     expect(found).has.deep.property('data.relationships.author.data.id', person.id);
@@ -648,7 +647,7 @@ describe('pgsearch/indexer', function() {
   });
 
   it('invalidates expired resources', async function() {
-    let { data:person } = await writer.create('master', env.session, 'people', {
+    let { data:person } = await writer.create(env.session, 'people', {
       data: {
         type: 'people',
         attributes: {
@@ -656,9 +655,9 @@ describe('pgsearch/indexer', function() {
         }
       }
     });
-    await alterExpiration('master', 'people', person.id, '300 seconds');
+    await alterExpiration('people', person.id, '300 seconds');
 
-    let { data:article } = await writer.create('master', env.session, 'articles', {
+    let { data:article } = await writer.create(env.session, 'articles', {
       data: {
         type: 'articles',
         attributes: {
@@ -670,21 +669,21 @@ describe('pgsearch/indexer', function() {
       }
     });
 
-    let found = await searcher.get(env.session, 'master', 'articles', article.id);
+    let found = await searcher.get(env.session, 'local-hub', 'articles', article.id);
     expect(found).has.deep.property('data.relationships.author.data.id', person.id);
     expect(found.included[0].attributes.name).to.equal('Quint');
 
-    await alterExpiration('master', 'people', person.id, '-300 seconds');
+    await alterExpiration('people', person.id, '-300 seconds');
     // just need to touch any document to trigger expired resource invalidation
-    await writer.update('master', env.session, 'articles', article.id, { data: article });
+    await writer.update(env.session, 'articles', article.id, { data: article });
 
-    found = await searcher.get(env.session, 'master', 'articles', article.id);
+    found = await searcher.get(env.session, 'local-hub', 'articles', article.id);
     expect(found).to.not.have.property('included');
     expect(found).to.have.deep.property('data.relationships.author.data', null);
   });
 
   it('ignores a broken belongs-to', async function() {
-    let { data:article } = await writer.create('master', env.session, 'articles', {
+    let { data:article } = await writer.create(env.session, 'articles', {
       data: {
         type: 'articles',
         attributes: {
@@ -697,13 +696,13 @@ describe('pgsearch/indexer', function() {
     });
     expect(article).has.deep.property('id');
     await indexer.update({ forceRefresh: true });
-    let found = await searcher.get(env.session, 'master', 'articles', article.id);
+    let found = await searcher.get(env.session, 'local-hub', 'articles', article.id);
     expect(found).is.ok;
     expect(found).has.deep.property('data.relationships.author.data', null);
   });
 
   it('ignores a broken has-many', async function() {
-    let { data:person } = await writer.create('master', env.session, 'people', {
+    let { data:person } = await writer.create(env.session, 'people', {
       data: {
         type: 'people',
         attributes: {
@@ -713,7 +712,7 @@ describe('pgsearch/indexer', function() {
     });
     expect(person).has.deep.property('id');
 
-    let { data:article } = await writer.create('master', env.session, 'articles', {
+    let { data:article } = await writer.create(env.session, 'articles', {
       data: {
         type: 'articles',
         attributes: {
@@ -726,7 +725,7 @@ describe('pgsearch/indexer', function() {
     });
     expect(article).has.deep.property('id');
     await indexer.update({ forceRefresh: true });
-    let found = await searcher.get(env.session, 'master', 'articles', article.id);
+    let found = await searcher.get(env.session, 'local-hub', 'articles', article.id);
     expect(found).is.ok;
     expect(found).has.deep.property('data.relationships.reviewers.data');
     expect(found.data.relationships.reviewers.data).length(1);
@@ -735,7 +734,7 @@ describe('pgsearch/indexer', function() {
 
 
   it('can fix broken relationship when it is later fixed', async function() {
-    let { data:article } = await writer.create('master', env.session, 'articles', {
+    let { data:article } = await writer.create(env.session, 'articles', {
       data: {
         type: 'articles',
         attributes: {
@@ -749,12 +748,12 @@ describe('pgsearch/indexer', function() {
     expect(article).has.deep.property('id');
     await indexer.update({ forceRefresh: true });
 
-    let found = await searcher.get(env.session, 'master', 'articles', article.id);
+    let found = await searcher.get(env.session, 'local-hub', 'articles', article.id);
     expect(found).is.ok;
     expect(found).has.deep.property('data.attributes.title', 'Hello World');
     expect(found).has.deep.property('data.relationships.author.data', null);
 
-    await writer.create('master', env.session, 'people', {
+    await writer.create(env.session, 'people', {
       data: {
         id: 'x',
         type: 'people',
@@ -766,7 +765,7 @@ describe('pgsearch/indexer', function() {
 
     await indexer.update({ forceRefresh: true });
 
-    found = await searcher.get(env.session, 'master', 'articles', article.id);
+    found = await searcher.get(env.session, 'local-hub', 'articles', article.id);
     expect(found).is.ok;
     expect(found).has.deep.property('data.relationships.author.data.id', 'x');
     expect(found).has.property('included');

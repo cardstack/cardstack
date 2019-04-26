@@ -2,7 +2,6 @@ import Service from '@ember/service';
 import { inject } from '@ember/service';
 import injectOptional from 'ember-inject-optional';
 import { camelize } from '@ember/string';
-import { defaultBranch } from '@cardstack/plugin-utils/environment';
 import { singularize, pluralize } from 'ember-inflector';
 import { capitalize } from '@ember/string';
 import { hubURL } from '@cardstack/plugin-utils/environment';
@@ -18,7 +17,7 @@ function getType(record) {
 
 export default Service.extend({
   store: inject(),
-  session: injectOptional.service(),
+  cardstackSession: injectOptional.service(),
 
   init() {
     this._super();
@@ -28,10 +27,9 @@ export default Service.extend({
 
   async load(type, id, format, opts={}) {
     let store = this.get('store');
-    let branch = opts.branch || defaultBranch;
     let contentType = await this._getContentType(type);
     let fieldset = contentType.get(`fieldsets.${format}`);
-    let _opts = Object.assign({ branch }, opts);
+    let _opts = Object.assign({}, opts);
 
     if (!fieldset) {
       return await store.findRecord(singularize(type), id, _opts);
@@ -41,22 +39,21 @@ export default Service.extend({
     _opts.include = include;
     let record = await store.findRecord(type, id, _opts);
 
-    await this._loadRelatedRecords(branch, record, format);
+    await this._loadRelatedRecords(record, format);
 
     return record;
   },
 
   async query(format, opts={}) {
     let store = this.get('store');
-    let branch = opts.branch || defaultBranch;
     let type = opts.type || 'cardstack-card';
-    let _opts = Object.assign({ branch, modelName: type }, opts);
+    let _opts = Object.assign({ modelName: type }, opts);
 
     let result = await store.query(type, _opts);
 
     let recordLoadPromises = [];
     for (let record of result.toArray()) {
-      recordLoadPromises.push(this.load(getType(record), record.id, format, { branch, reload: true }));
+      recordLoadPromises.push(this.load(getType(record), record.id, format, { reload: true }));
     }
 
     await Promise.all(recordLoadPromises);
@@ -117,10 +114,6 @@ export default Service.extend({
     }
   },
 
-  branches() {
-    return this.store.findAll('branch');
-  },
-
   getCardMeta(card, attribute) {
     if (attribute === 'human-id') {
       let humanType = getType(card)
@@ -143,16 +136,13 @@ export default Service.extend({
   _headers() {
     let headers = {
       'Content-Type': 'application/vnd.api+json',
+      'Accept': 'application/vnd.api+json',
     };
-    let token = this._sessionToken();
+    let token = this.get('cardstackSession.token');
     if (token) {
       headers['Authorization'] = `Bearer ${token}`;
     }
     return headers;
-  },
-
-  _sessionToken() {
-    return this.get('session.data.authenticated.data.meta.token');
   },
 
   _errorsByField(body) {
@@ -191,7 +181,7 @@ export default Service.extend({
     return await this._contentTypeCache[type];
   },
 
-  async _loadRelatedRecords(branch, record, format) {
+  async _loadRelatedRecords(record, format) {
     if (!record || !getType(record)) { return; }
 
     let contentType = await this._getContentType(getType(record));
@@ -206,23 +196,23 @@ export default Service.extend({
 
       if (fieldRecord instanceof DS.ManyArray) {
         for (let fieldRecordItem of fieldRecord.toArray()) {
-          recordLoadPromises.push(this._recurseRecord(branch, fieldRecordItem, fieldItem.format));
+          recordLoadPromises.push(this._recurseRecord(fieldRecordItem, fieldItem.format));
         }
       } else {
-        recordLoadPromises.push(this._recurseRecord(branch, fieldRecord, fieldItem.format));
+        recordLoadPromises.push(this._recurseRecord(fieldRecord, fieldItem.format));
       }
     }
 
     await Promise.all(recordLoadPromises);
   },
 
-  async _recurseRecord(branch, record, format) {
-    let loadedRecord = await this._loadRecord(branch, getType(record), record.id, format);
+  async _recurseRecord(record, format) {
+    let loadedRecord = await this._loadRecord(getType(record), record.id, format);
     if (!loadedRecord) { return; }
-    await this._loadRelatedRecords(branch, loadedRecord, format);
+    await this._loadRelatedRecords(loadedRecord, format);
   },
 
-  async _loadRecord(branch, type, id, format) {
+  async _loadRecord(type, id, format) {
     let store = this.get('store');
     let fieldRecordType = await this._getContentType(type);
     let fieldset = fieldRecordType.get(`fieldsets.${format}`);
@@ -230,7 +220,7 @@ export default Service.extend({
     if (!fieldset) { return; }
 
     let include = fieldset.map(i => i.field).join(',') || noFields; // note that ember data ignores an empty string includes, so setting to nonsense field
-    let cacheKey = `${branch}/${type}/${id}:${include}`;
+    let cacheKey = `${type}/${id}:${include}`;
 
     if (this._loadedRecordsCache[cacheKey]) {
       await this._loadedRecordsCache[cacheKey];
@@ -240,7 +230,7 @@ export default Service.extend({
     // we need to specify `reload` in order to allow the included resources to be added to the store.
     // otherwise, if the primary resource is already in the store, ember data is skipping adding the
     // included resources into the store.
-    this._loadedRecordsCache[cacheKey] = store.findRecord(type, id, { include, reload: true, branch });
+    this._loadedRecordsCache[cacheKey] = store.findRecord(type, id, { include, reload: true });
 
     return await this._loadedRecordsCache[cacheKey];
   }

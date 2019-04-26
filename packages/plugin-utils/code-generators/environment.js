@@ -18,13 +18,12 @@ module.exports = declareInjections({
 },
 
 class {
-  async generateCode(appModulePrefix, branch) {
-    let env = Object.assign(this._content(), { appModulePrefix, branch });
+  async generateCode(appModulePrefix) {
+    let env = Object.assign(this._content(), { appModulePrefix });
     return template({ properties: Object.entries(env).map(([name, value]) => ({ name, value })) });
   }
   _content() {
     return {
-      defaultBranch: 'master',
       hubURL: this.publicURL.url,
       compiledAt: new Date().toISOString()
     };

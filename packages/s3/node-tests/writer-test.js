@@ -25,11 +25,9 @@ describe('cardstack/s3/writer', function() {
     factory.addResource('data-sources', 's3').withAttributes({
       'source-type': '@cardstack/s3',
       params: {
-        branches: {
-          master: {
-            bucket: 'testbucket',
-            region: 'testregion'
-          }
+        config: {
+          bucket: 'testbucket',
+          region: 'testregion'
         }
       }
     });

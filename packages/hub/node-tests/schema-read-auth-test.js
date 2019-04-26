@@ -12,19 +12,19 @@ let searchers;
 let writers;
 
 async function create(session, document) {
-  return writers.create('master', session, document.data.type, document);
+  return writers.create(session, document.data.type, document);
 }
 
 async function update(session, document) {
-  return writers.update('master', session, document.data.type, document.data.id, document);
+  return writers.update(session, document.data.type, document.data.id, document);
 }
 
 async function find(type, id) {
-  return searchers.get(Session.INTERNAL_PRIVILEGED, 'master', type, id);
+  return searchers.get(Session.INTERNAL_PRIVILEGED, 'local-hub', type, id);
 }
 
 async function findAll(type) {
-  return searchers.search(Session.INTERNAL_PRIVILEGED, 'master', { filter: { type } });
+  return searchers.search(Session.INTERNAL_PRIVILEGED, { filter: { type } });
 }
 
 function makeSession(schema, { type, id }) {
@@ -69,6 +69,16 @@ function createSchema(factory) {
       factory.addResource('fields', 'subtitle').withAttributes({
         fieldType: '@cardstack/core-types::string'
       }),
+      factory.addResource('computed-fields', 'creators')
+        .withAttributes({
+          computedFieldType: 'sample-computed-fields::authorized-user',
+          params: { type: 'authors', id: 'vanGogh' }
+        }),
+      factory.addResource('fields', 'tags').withAttributes({
+        fieldType: '@cardstack/core-types::has-many'
+      }).withRelated('related-types', [
+        factory.addResource('content-types', 'tags')
+      ]),
       factory.addResource('fields', 'author').withAttributes({
         fieldType: '@cardstack/core-types::belongs-to'
       }).withRelated('related-types', [
@@ -83,33 +93,31 @@ function createSchema(factory) {
           ])
         ])
       ]),
-      factory.addResource('fields', 'tags').withAttributes({
-        fieldType: '@cardstack/core-types::has-many'
-      }).withRelated('related-types', [
-        factory.addResource('content-types', 'tags')
-      ]),
       factory.addResource('fields', 'collaborators').withAttributes({
         fieldType: '@cardstack/core-types::has-many'
-      }).withRelated('related-types', [ factory.getResource('content-types', 'authors') ])
+      }).withRelated('related-types', [factory.getResource('content-types', 'authors')]),
     ]);
 }
 
 describe('schema/auth/read', function() {
 
-  before(async function() {
+  before(async function () {
     let factory = new JSONAPIFactory();
 
     createSchema(factory);
+
+    factory.addResource('authors', 'vanGogh').withAttributes({ name: 'Van Gogh' });
+    factory.addResource('authors', 'jojo').withAttributes({ name: 'Jojo' });
 
     factory.addResource('posts', '1').withAttributes({
       title: 'First Post',
       subtitle: 'It is the best'
     }).withRelated('author',
-                   factory.addResource('authors', '1').withAttributes({
-                     name: 'Arthur Faulkner'
-                   }).withRelated('flavor',
-                                  factory.addResource('flavors', 'vanilla'))
-                  )
+      factory.addResource('authors', '1').withAttributes({
+        name: 'Arthur Faulkner'
+      }).withRelated('flavor',
+        factory.addResource('flavors', 'vanilla'))
+    )
       .withRelated('tags', [
         factory.addResource('tags', 'one'),
         factory.addResource('tags', 'two')
@@ -124,7 +132,6 @@ describe('schema/auth/read', function() {
       title: 'Second Post',
       subtitle: 'This one has no author'
     });
-
 
     {
       let user = factory.addResource('test-users').withAttributes({
@@ -184,8 +191,8 @@ describe('schema/auth/read', function() {
         });
     }
 
-    env = await createDefaultEnvironment(`${__dirname}/../../../tests/stub-project`, factory.getModels());
-    baseSchema = await env.lookup('hub:current-schema').forControllingBranch();
+    env = await createDefaultEnvironment(`${__dirname}/../../../tests/sample-computed-fields`, factory.getModels());
+    baseSchema = await env.lookup('hub:current-schema').getSchema();
     searchers = env.lookup('hub:searchers');
     writers = env.lookup('hub:writers');
   });
@@ -198,8 +205,8 @@ describe('schema/auth/read', function() {
 
   it("returns nothing when user has no grant", async function() {
     let model = await find('posts', '1');
-    let documentContext = searchers.createDocumentContext({ schema: baseSchema });
-    let approved = await documentContext.applyReadAuthorization(model, { session: Session.EVERYONE });
+    let documentContext = searchers.createDocumentContext({ type: model.data.type, id: model.data.id, upstreamDoc: model, schema: baseSchema });
+    let approved = await documentContext.applyReadAuthorization({ session: Session.EVERYONE });
     expect(approved).to.be.undefined;
   });
 
@@ -211,8 +218,8 @@ describe('schema/auth/read', function() {
           mayReadResource: true
         });
     });
-    let documentContext = searchers.createDocumentContext({ schema: schema });
-    let approved = await documentContext.applyReadAuthorization(model, { session });
+    let documentContext = searchers.createDocumentContext({ type: model.data.type, id: model.data.id, upstreamDoc: model, schema: schema });
+    let approved = await documentContext.applyReadAuthorization({ session });
     expect(approved).has.deep.property('data.id', '1');
   });
 
@@ -227,8 +234,8 @@ describe('schema/auth/read', function() {
           mayReadResource: true
         });
     });
-    let documentContext = searchers.createDocumentContext({ schema: schema });
-    let approved = await documentContext.applyReadAuthorization(model, { session });
+    let documentContext = searchers.createDocumentContext({ type: model.data.type, id: model.data.id, upstreamDoc: model, schema: schema });
+    let approved = await documentContext.applyReadAuthorization({ session });
     expect(approved).has.deep.property('data.id', '1');
   });
 
@@ -244,8 +251,8 @@ describe('schema/auth/read', function() {
           mayReadResource: true
         });
     });
-    let documentContext = searchers.createDocumentContext({ schema: schema });
-    let approved = await documentContext.applyReadAuthorization(model);
+    let documentContext = searchers.createDocumentContext({ type: model.data.type, id: model.data.id, upstreamDoc: model, schema: schema });
+    let approved = await documentContext.applyReadAuthorization();
     expect(approved).has.deep.property('data.id', '1');
   });
 
@@ -260,8 +267,8 @@ describe('schema/auth/read', function() {
           mayReadResource: true
         });
     });
-    let documentContext = searchers.createDocumentContext({ schema: schema });
-    let approved = await documentContext.applyReadAuthorization(model, { session });
+    let documentContext = searchers.createDocumentContext({ type: model.data.type, id: model.data.id, upstreamDoc: model, schema: schema });
+    let approved = await documentContext.applyReadAuthorization({ session });
     expect(approved).to.be.undefined;
   });
 
@@ -276,8 +283,8 @@ describe('schema/auth/read', function() {
           mayReadResource: true
         });
     });
-    let documentContext = searchers.createDocumentContext({ schema: schema });
-    let approved = await documentContext.applyReadAuthorization(model, { session });
+    let documentContext = searchers.createDocumentContext({ type: model.data.type, id: model.data.id, upstreamDoc: model, schema: schema });
+    let approved = await documentContext.applyReadAuthorization({ session });
     expect(approved).not.has.deep.property('data.attributes.title');
   });
 
@@ -296,8 +303,8 @@ describe('schema/auth/read', function() {
           mayReadFields: true
         });
     });
-    let documentContext = searchers.createDocumentContext({ schema: schema });
-    let approved = await documentContext.applyReadAuthorization(model, { session });
+    let documentContext = searchers.createDocumentContext({ type: model.data.type, id: model.data.id, upstreamDoc: model, schema: schema });
+    let approved = await documentContext.applyReadAuthorization({ session });
     expect(approved).not.has.deep.property('data.attributes.subtitle');
   });
 
@@ -313,8 +320,8 @@ describe('schema/auth/read', function() {
           mayReadFields: true
         });
     });
-    let documentContext = searchers.createDocumentContext({ schema: schema });
-    let approved = await documentContext.applyReadAuthorization(model, { session });
+    let documentContext = searchers.createDocumentContext({ type: model.data.type, id: model.data.id, upstreamDoc: model, schema: schema });
+    let approved = await documentContext.applyReadAuthorization({ session });
     expect(approved).has.deep.property('data.attributes.subtitle', 'It is the best');
   });
 
@@ -333,8 +340,8 @@ describe('schema/auth/read', function() {
           mayReadFields: true
         });
     });
-    let documentContext = searchers.createDocumentContext({ schema: schema });
-    let approved = await documentContext.applyReadAuthorization(model, { session });
+    let documentContext = searchers.createDocumentContext({ type: model.data.type, id: model.data.id, upstreamDoc: model, schema: schema });
+    let approved = await documentContext.applyReadAuthorization({ session });
     expect(approved).has.deep.property('data.attributes.title', 'First Post');
   });
 
@@ -353,8 +360,8 @@ describe('schema/auth/read', function() {
           mayReadFields: true
         });
     });
-    let documentContext = searchers.createDocumentContext({ schema: schema });
-    let approved = await documentContext.applyReadAuthorization(model, { session });
+    let documentContext = searchers.createDocumentContext({ type: model.data.type, id: model.data.id, upstreamDoc: model, schema: schema });
+    let approved = await documentContext.applyReadAuthorization({ session });
     expect(approved.data[0]).not.has.deep.property('attributes.subtitle');
   });
 
@@ -374,8 +381,8 @@ describe('schema/auth/read', function() {
           mayReadFields: true
         });
     });
-    let documentContext = searchers.createDocumentContext({ schema: schema });
-    let approved = await documentContext.applyReadAuthorization(model, { session });
+    let documentContext = searchers.createDocumentContext({ type: model.data.type, id: model.data.id, upstreamDoc: model, schema: schema });
+    let approved = await documentContext.applyReadAuthorization({ session });
     expect(approved.data[0]).has.deep.property('attributes.title');
   });
 
@@ -395,8 +402,8 @@ describe('schema/auth/read', function() {
           mayReadFields: true
         });
     });
-    let documentContext = searchers.createDocumentContext({ schema: schema });
-    let approved = await documentContext.applyReadAuthorization(model, { session });
+    let documentContext = searchers.createDocumentContext({ type: model.data.type, id: model.data.id, upstreamDoc: model, schema: schema });
+    let approved = await documentContext.applyReadAuthorization({ session });
     expect(approved.included).collectionContains({ type: 'authors' });
   });
 
@@ -415,8 +422,8 @@ describe('schema/auth/read', function() {
           mayReadFields: true
         });
     });
-    let documentContext = searchers.createDocumentContext({ schema: schema });
-    let approved = await documentContext.applyReadAuthorization(model, { session });
+    let documentContext = searchers.createDocumentContext({ type: model.data.type, id: model.data.id, upstreamDoc: model, schema: schema });
+    let approved = await documentContext.applyReadAuthorization({ session });
     expect(approved.included).not.collectionContains({ type: 'authors' });
   });
 
@@ -432,8 +439,8 @@ describe('schema/auth/read', function() {
           mayReadResource: true
         });
     });
-    let documentContext = searchers.createDocumentContext({ schema: schema });
-    let approved = await documentContext.applyReadAuthorization(model, { session });
+    let documentContext = searchers.createDocumentContext({ type: model.data.type, id: model.data.id, upstreamDoc: model, schema: schema });
+    let approved = await documentContext.applyReadAuthorization({ session });
     expect(approved).not.has.deep.property('data.relationships.author');
   });
 
@@ -452,8 +459,8 @@ describe('schema/auth/read', function() {
           mayReadFields: true
         });
     });
-    let documentContext = searchers.createDocumentContext({ schema: schema });
-    let approved = await documentContext.applyReadAuthorization(model, { session });
+    let documentContext = searchers.createDocumentContext({ type: model.data.type, id: model.data.id, upstreamDoc: model, schema: schema });
+    let approved = await documentContext.applyReadAuthorization({ session });
     expect(approved).not.has.deep.property('data.relationships.author');
   });
 
@@ -469,8 +476,8 @@ describe('schema/auth/read', function() {
           mayReadFields: true
         });
     });
-    let documentContext = searchers.createDocumentContext({ schema: schema });
-    let approved = await documentContext.applyReadAuthorization(model, { session });
+    let documentContext = searchers.createDocumentContext({ type: model.data.type, id: model.data.id, upstreamDoc: model, schema: schema });
+    let approved = await documentContext.applyReadAuthorization({ session });
     expect(approved).has.deep.property('data.relationships.author.data.id', '1');
   });
 
@@ -489,8 +496,8 @@ describe('schema/auth/read', function() {
           mayReadFields: true
         });
     });
-    let documentContext = searchers.createDocumentContext({ schema: schema });
-    let approved = await documentContext.applyReadAuthorization(model, { session });
+    let documentContext = searchers.createDocumentContext({ type: model.data.type, id: model.data.id, upstreamDoc: model, schema: schema });
+    let approved = await documentContext.applyReadAuthorization({ session });
     expect(approved).has.deep.property('data.relationships.author.data.id', '1');
   });
 
@@ -511,8 +518,8 @@ describe('schema/auth/read', function() {
           mayReadFields: true
         });
     });
-    let documentContext = searchers.createDocumentContext({ schema: schema });
-    let approved = await documentContext.applyReadAuthorization(model, { session });
+    let documentContext = searchers.createDocumentContext({ type: model.data.type, id: model.data.id, upstreamDoc: model, schema: schema });
+    let approved = await documentContext.applyReadAuthorization({ session });
     expect(approved.included).not.collectionContains({ type: 'tags' });
   });
 
@@ -534,8 +541,8 @@ describe('schema/auth/read', function() {
           mayReadFields: true
         });
     });
-    let documentContext = searchers.createDocumentContext({ schema: schema });
-    let approved = await documentContext.applyReadAuthorization(model, { session });
+    let documentContext = searchers.createDocumentContext({ type: model.data.type, id: model.data.id, upstreamDoc: model, schema: schema });
+    let approved = await documentContext.applyReadAuthorization({ session });
     expect(approved.included).collectionContains({ type: 'authors' });
   });
 
@@ -556,8 +563,8 @@ describe('schema/auth/read', function() {
           mayReadFields: true
         });
     });
-    let documentContext = searchers.createDocumentContext({ schema: schema });
-    let approved = await documentContext.applyReadAuthorization(model, { session });
+    let documentContext = searchers.createDocumentContext({ type: model.data.type, id: model.data.id, upstreamDoc: model, schema: schema });
+    let approved = await documentContext.applyReadAuthorization({ session });
     expect(approved.included).collectionContains({ type: 'tags' });
   });
 
@@ -575,8 +582,8 @@ describe('schema/auth/read', function() {
           mayReadFields: true
         });
     });
-    let documentContext = searchers.createDocumentContext({ schema: schema });
-    let approved = await documentContext.applyReadAuthorization(model, { session });
+    let documentContext = searchers.createDocumentContext({ type: model.data.type, id: model.data.id, upstreamDoc: model, schema: schema });
+    let approved = await documentContext.applyReadAuthorization({ session });
     expect(approved.included).collectionContains({ type: 'authors', id: '1' });
   });
 
@@ -596,8 +603,8 @@ describe('schema/auth/read', function() {
           mayReadFields: true
         });
     });
-    let documentContext = searchers.createDocumentContext({ schema: schema });
-    let approved = await documentContext.applyReadAuthorization(model, { session });
+    let documentContext = searchers.createDocumentContext({ type: model.data.type, id: model.data.id, upstreamDoc: model, schema: schema });
+    let approved = await documentContext.applyReadAuthorization({ session });
     expect(approved.included).collectionContains({ type: 'authors' });
   });
 
@@ -617,8 +624,8 @@ describe('schema/auth/read', function() {
           mayReadFields: true
         });
     });
-    let documentContext = searchers.createDocumentContext({ schema: schema });
-    let approved = await documentContext.applyReadAuthorization(model, { session });
+    let documentContext = searchers.createDocumentContext({ type: model.data.type, id: model.data.id, upstreamDoc: model, schema: schema });
+    let approved = await documentContext.applyReadAuthorization({ session });
     expect(approved.included).not.collectionContains({ type: 'tags' });
   });
 
@@ -639,8 +646,8 @@ describe('schema/auth/read', function() {
           mayReadFields: true
         });
     });
-    let documentContext = searchers.createDocumentContext({ schema: schema });
-    let approved = await documentContext.applyReadAuthorization(model, { session });
+    let documentContext = searchers.createDocumentContext({ type: model.data.type, id: model.data.id, upstreamDoc: model, schema: schema });
+    let approved = await documentContext.applyReadAuthorization({ session });
     expect(approved.included).not.collectionContains({ type: 'tags' });
   });
 
@@ -657,8 +664,8 @@ describe('schema/auth/read', function() {
           mayReadFields: true
         });
     });
-    let documentContext = searchers.createDocumentContext({ schema: schema });
-    let approved = await documentContext.applyReadAuthorization(model, { session });
+    let documentContext = searchers.createDocumentContext({ type: model.data.type, id: model.data.id, upstreamDoc: model, schema: schema });
+    let approved = await documentContext.applyReadAuthorization({ session });
     expect(approved.included).not.collectionContains({ type: 'tags' });
   });
 
@@ -681,8 +688,8 @@ describe('schema/auth/read', function() {
           mayReadFields: true
         });
     });
-    let documentContext = searchers.createDocumentContext({ schema: schema });
-    let approved = await documentContext.applyReadAuthorization(model, { session });
+    let documentContext = searchers.createDocumentContext({ type: model.data.type, id: model.data.id, upstreamDoc: model, schema: schema });
+    let approved = await documentContext.applyReadAuthorization({ session });
     expect(approved.included).collectionContains({ type: 'flavors' });
   });
 
@@ -704,8 +711,8 @@ describe('schema/auth/read', function() {
           mayReadFields: true
         });
     });
-    let documentContext = searchers.createDocumentContext({ schema: schema });
-    let approved = await documentContext.applyReadAuthorization(model, { session });
+    let documentContext = searchers.createDocumentContext({ type: model.data.type, id: model.data.id, upstreamDoc: model, schema: schema });
+    let approved = await documentContext.applyReadAuthorization({ session });
     expect(approved.included).not.collectionContains({ type: 'flavors' });
   });
 
@@ -725,8 +732,8 @@ describe('schema/auth/read', function() {
           mayReadFields: true
         });
     });
-    let documentContext = searchers.createDocumentContext({ schema: schema });
-    let approved = await documentContext.applyReadAuthorization(model, { session });
+    let documentContext = searchers.createDocumentContext({ type: model.data.type, id: model.data.id, upstreamDoc: model, schema: schema });
+    let approved = await documentContext.applyReadAuthorization({ session });
     expect(approved.included).has.length(1);
     expect(approved.included[0]).has.deep.property('type', 'authors');
     expect(approved.included[0]).not.has.deep.property('attributes.name');
@@ -749,8 +756,8 @@ describe('schema/auth/read', function() {
           mayReadFields: true
         });
     });
-    let documentContext = searchers.createDocumentContext({ schema: schema });
-    let approved = await documentContext.applyReadAuthorization(model, { session });
+    let documentContext = searchers.createDocumentContext({ type: model.data.type, id: model.data.id, upstreamDoc: model, schema: schema });
+    let approved = await documentContext.applyReadAuthorization({ session });
     expect(approved.included).has.length(1);
     expect(approved.included[0]).has.deep.property('type', 'authors');
     expect(approved.included[0]).has.deep.property('attributes.name');
@@ -772,8 +779,8 @@ describe('schema/auth/read', function() {
 
     let schema = await baseSchema.applyChanges(factory.getModels().map(model => ({ type: model.type, id: model.id, document: model })));
     let session = makeSession(schema, { type: 'authors', id: '1' });
-    let documentContext = searchers.createDocumentContext({ schema: schema });
-    let approved = await documentContext.applyReadAuthorization(model, { session });
+    let documentContext = searchers.createDocumentContext({ type: model.data.type, id: model.data.id, upstreamDoc: model, schema: schema });
+    let approved = await documentContext.applyReadAuthorization({ session });
     expect(approved).is.not.undefined;
   });
 
@@ -793,8 +800,8 @@ describe('schema/auth/read', function() {
 
     let schema = await baseSchema.applyChanges(factory.getModels().map(model => ({ type: model.type, id: model.id, document: model })));
     let session = makeSession(schema, { type: 'authors', id: '2' });
-    let documentContext = searchers.createDocumentContext({ schema: schema });
-    let approved = await documentContext.applyReadAuthorization(model, { session });
+    let documentContext = searchers.createDocumentContext({ type: model.data.type, id: model.data.id, upstreamDoc: model, schema: schema });
+    let approved = await documentContext.applyReadAuthorization({ session });
     expect(approved).is.undefined;
   });
 
@@ -814,8 +821,8 @@ describe('schema/auth/read', function() {
 
     let schema = await baseSchema.applyChanges(factory.getModels().map(model => ({ type: model.type, id: model.id, document: model })));
     let session = makeSession(schema, { type: 'test-users', id: '1' });
-    let documentContext = searchers.createDocumentContext({ schema: schema });
-    let approved = await documentContext.applyReadAuthorization(model, { session });
+    let documentContext = searchers.createDocumentContext({ type: model.data.type, id: model.data.id, upstreamDoc: model, schema: schema });
+    let approved = await documentContext.applyReadAuthorization({ session });
     expect(approved).is.undefined;
   });
 
@@ -835,8 +842,8 @@ describe('schema/auth/read', function() {
 
     let schema = await baseSchema.applyChanges(factory.getModels().map(model => ({ type: model.type, id: model.id, document: model })));
     let session = makeSession(schema, { type: 'authors', id: '1' });
-    let documentContext = searchers.createDocumentContext({ schema: schema });
-    let approved = await documentContext.applyReadAuthorization(model, { session });
+    let documentContext = searchers.createDocumentContext({ type: model.data.type, id: model.data.id, upstreamDoc: model, schema: schema });
+    let approved = await documentContext.applyReadAuthorization({ session });
     expect(approved).is.undefined;
   });
 
@@ -859,8 +866,8 @@ describe('schema/auth/read', function() {
 
     let schema = await baseSchema.applyChanges(factory.getModels().map(model => ({ type: model.type, id: model.id, document: model })));
     let session = makeSession(schema, { type: 'authors', id: '1' });
-    let documentContext = searchers.createDocumentContext({ schema: schema });
-    let approved = await documentContext.applyReadAuthorization(model, { session });
+    let documentContext = searchers.createDocumentContext({ type: model.data.type, id: model.data.id, upstreamDoc: model, schema: schema });
+    let approved = await documentContext.applyReadAuthorization({ session });
     expect(approved).has.deep.property('data.attributes.title');
   });
 
@@ -882,8 +889,8 @@ describe('schema/auth/read', function() {
 
     let schema = await baseSchema.applyChanges(factory.getModels().map(model => ({ type: model.type, id: model.id, document: model })));
     let session = makeSession(schema, { type: 'authors', id: '2' });
-    let documentContext = searchers.createDocumentContext({ schema: schema });
-    let approved = await documentContext.applyReadAuthorization(model, { session });
+    let documentContext = searchers.createDocumentContext({ type: model.data.type, id: model.data.id, upstreamDoc: model, schema: schema });
+    let approved = await documentContext.applyReadAuthorization({ session });
     expect(approved).not.has.deep.property('data.attributes.title');
   });
 
@@ -908,8 +915,8 @@ describe('schema/auth/read', function() {
 
     let schema = await baseSchema.applyChanges(factory.getModels().map(model => ({ type: model.type, id: model.id, document: model })));
     let session = makeSession(schema, { type: 'authors', id: '1' });
-    let documentContext = searchers.createDocumentContext({ schema: schema });
-    let approved = await documentContext.applyReadAuthorization(model, { session });
+    let documentContext = searchers.createDocumentContext({ type: model.data.type, id: model.data.id, upstreamDoc: model, schema: schema });
+    let approved = await documentContext.applyReadAuthorization({ session });
     expect(approved).has.deep.property('data.attributes.title');
   });
 
@@ -934,9 +941,43 @@ describe('schema/auth/read', function() {
 
     let schema = await baseSchema.applyChanges(factory.getModels().map(model => ({ type: model.type, id: model.id, document: model })));
     let session = makeSession(schema, { type: 'authors', id: '2' });
-    let documentContext = searchers.createDocumentContext({ schema: schema });
-    let approved = await documentContext.applyReadAuthorization(model, { session });
+    let documentContext = searchers.createDocumentContext({ type: model.data.type, id: model.data.id, upstreamDoc: model, schema: schema });
+    let approved = await documentContext.applyReadAuthorization({ session });
     expect(approved).not.has.deep.property('data.attributes.title');
+  });
+
+  it("approves field-dependent grant for computed field", async function() {
+    let model = await find('posts', '1');
+    let factory = new JSONAPIFactory();
+
+    factory.addResource('grants')
+      .withRelated('who', [{ type: 'fields', id: 'creators' }])
+      .withAttributes({
+        mayReadResource: true
+      });
+
+    let schema = await baseSchema.applyChanges(factory.getModels().map(model => ({ type: model.type, id: model.id, document: model })));
+    let session = makeSession(schema, { type: 'authors', id: 'vanGogh' });
+    let documentContext = searchers.createDocumentContext({ type: model.data.type, id: model.data.id, upstreamDoc: model, schema: schema });
+    let approved = await documentContext.applyReadAuthorization({ session });
+    expect(approved).has.deep.property('data.id', '1');
+  });
+
+  it("rejects field-dependent grant for computed field", async function() {
+    let model = await find('posts', '1');
+    let factory = new JSONAPIFactory();
+
+    factory.addResource('grants')
+      .withRelated('who', [{ type: 'fields', id: 'creators' }])
+      .withAttributes({
+        mayReadResource: true
+      });
+
+    let schema = await baseSchema.applyChanges(factory.getModels().map(model => ({ type: model.type, id: model.id, document: model })));
+    let session = makeSession(schema, { type: 'authors', id: 'jojo' });
+    let documentContext = searchers.createDocumentContext({ type: model.data.type, id: model.data.id, upstreamDoc: model, schema: schema });
+    let approved = await documentContext.applyReadAuthorization({ session });
+    expect(approved).to.be.undefined;
   });
 
   it("approves hasMany field-dependent grant", async function() {
@@ -951,8 +992,8 @@ describe('schema/auth/read', function() {
 
     let schema = await baseSchema.applyChanges(factory.getModels().map(model => ({ type: model.type, id: model.id, document: model })));
     let session = makeSession(schema, { type: 'authors', id: '2' });
-    let documentContext = searchers.createDocumentContext({ schema: schema });
-    let approved = await documentContext.applyReadAuthorization(model, { session });
+    let documentContext = searchers.createDocumentContext({ type: model.data.type, id: model.data.id, upstreamDoc: model, schema: schema });
+    let approved = await documentContext.applyReadAuthorization({ session });
     expect(approved).has.deep.property('data.id', '1');
   });
 
@@ -968,8 +1009,8 @@ describe('schema/auth/read', function() {
 
     let schema = await baseSchema.applyChanges(factory.getModels().map(model => ({ type: model.type, id: model.id, document: model })));
     let session = makeSession(schema, { type: 'authors', id: '1' });
-    let documentContext = searchers.createDocumentContext({ schema: schema });
-    let approved = await documentContext.applyReadAuthorization(model, { session });
+    let documentContext = searchers.createDocumentContext({ type: model.data.type, id: model.data.id, upstreamDoc: model, schema: schema });
+    let approved = await documentContext.applyReadAuthorization({ session });
     expect(approved).to.be.undefined;
   });
 
@@ -1003,8 +1044,8 @@ describe('with grants for resource creation/update', function() {
         mayReadResource: true,
       });
 
-    env = await createDefaultEnvironment(`${__dirname}/../../../tests/stub-project`, factory.getModels());
-    baseSchema = await env.lookup('hub:current-schema').forControllingBranch();
+    env = await createDefaultEnvironment(`${__dirname}/../../../tests/sample-computed-fields`, factory.getModels());
+    baseSchema = await env.lookup('hub:current-schema').getSchema();
     searchers = env.lookup('hub:searchers');
     writers = env.lookup('hub:writers');
   });

@@ -15,7 +15,7 @@ describe('authentication/middleware/ip', function() {
     let factory = new JSONAPIFactory();
 
 
-    if(callback) {
+    if (callback) {
       await callback(factory);
     }
 

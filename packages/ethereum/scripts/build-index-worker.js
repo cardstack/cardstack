@@ -1,10 +1,10 @@
 /* eslint-disable no-console */
 const commandLineArgs = require('command-line-args');
 const getUsage = require('command-line-usage');
-const TransactionIndex = require('../cardstack/transaction-index');
+const IndexBuilder = require('../cardstack/transaction-index-builder');
 
 const optionDefs = [
-  { name: 'jsonRpcURL', alias: 'j', type: String, description: 'The URL of the Ethereum JSON RPC API.' },
+  { name: 'jsonRpcUrl', alias: 'j', type: String, description: 'The URL of the Ethereum JSON RPC API.' },
   { name: 'start', alias: 's', type: Number, description: '(Optional) The block number to start building the index from. Defaults to "0".' },
   { name: 'end', alias: 'e', type: String, description: '(Optional) The block number to finish building the index from. Defaults to "latest".' },
   { name: 'jobName', alias: 'n', type: String, description: '(Optional) The worker job name (useful for logging)'},
@@ -20,8 +20,8 @@ const usage = [{
   optionList: optionDefs
 }];
 
-const { start, end, jobName, progressFrequency, jsonRpcURL, help } = commandLineArgs(optionDefs);
-if (!jsonRpcURL) {
+const { start, end, jobName, progressFrequency, jsonRpcUrl, help } = commandLineArgs(optionDefs);
+if (!jsonRpcUrl) {
   console.error("Missing JSON RPC URL specification.");
   console.log(getUsage(usage));
   process.exit(1);
@@ -34,14 +34,11 @@ if (help) {
 const fromBlockHeight = start || 0;
 const toBlockHeight = end || 'latest';
 const workerAttribution = jobName ? `Worker ${jobName} - ` : '';
-let index = new TransactionIndex(jsonRpcURL);
+let index = new IndexBuilder(jsonRpcUrl);
 
 console.log(`${workerAttribution}Building transaction index from block ${fromBlockHeight} to ${toBlockHeight}`);
 
-index.ensureDatabaseSetup()
-  .then(() => {
-    return index.buildIndex({ fromBlockHeight, toBlockHeight, jobName, progressFrequency });
-  })
+index.buildIndex({ fromBlockHeight, toBlockHeight, jobName, progressFrequency })
   .catch(err => {
     console.error(`${workerAttribution}${err.message}`, err);
     process.exit(1);

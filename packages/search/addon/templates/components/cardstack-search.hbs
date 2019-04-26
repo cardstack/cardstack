@@ -1,13 +1,1 @@
-{{#each items as |item|}}
-  {{yield item}}
-{{else}}
-  {{yield to="inverse"}}
-{{/each}}
-
-{{#if search.isRunning}}
-  <div class="cardstack-email-loading">Loading...</div>
-{{/if}}
-
-{{#if cursor}}
-  <button class="load-more" {{action (perform search cursor) }}>Load More</button>
-{{/if}}
+{{yield items search.isRunning cursor (perform search cursor)}}

@@ -1,4 +1,4 @@
-import { hubURL, defaultBranch } from '@cardstack/plugin-utils/environment';
+import { hubURL } from '@cardstack/plugin-utils/environment';
 import fetch from 'fetch';
 import Service from '@ember/service';
 import { computed } from '@ember/object';
@@ -9,9 +9,9 @@ export default Service.extend({
   config: computed(function() {
     return getOwner(this).resolveRegistration('config:environment');
   }),
-  refreshCode(branch=defaultBranch) {
+  refreshCode() {
     let modulePrefix = this.get('config.modulePrefix');
-    return fetch(`${hubURL}/codegen/${branch}/${modulePrefix}`)
+    return fetch(`${hubURL}/codegen/${modulePrefix}`)
       .then(response => response.text())
       .then(source => load(source, modulePrefix, getOwner(this)));
   }

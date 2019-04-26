@@ -5,12 +5,14 @@ const {
   destroyDefaultEnvironment,
   defaultDataSourceId
 } = require('../../../tests/stub-project/node_modules/@cardstack/test-support/env');
+const { createReadStream, readdirSync } = require('fs');
+const path = require('path');
 
 describe('hub/indexers', function() {
   let env;
 
-  async function setup () {
-    env = await createDefaultEnvironment(`${__dirname}/../../../tests/stub-project`);
+  async function setup (models = []) {
+    env = await createDefaultEnvironment(`${__dirname}/../../../tests/stub-project`, models);
   }
 
   async function teardown() {
@@ -24,12 +26,12 @@ describe('hub/indexers', function() {
 
     it("indexes seed models", async function() {
       // this seed model comes from createDefaultEnvironment
-      let response = await env.lookup('hub:searchers').search(env.session, 'master', { filter: { type: 'plugin-configs' }});
+      let response = await env.lookup('hub:searchers').search(env.session, { filter: { type: 'plugin-configs' }});
       expect(response.data.map(m => m.id)).includes('@cardstack/hub');
     });
 
     it("indexes bootstrap models", async function() {
-      let response = await env.lookup('hub:searchers').search(env.session, 'master', {
+      let response = await env.lookup('hub:searchers').search(env.session, {
         filter: { type: 'content-types' },
         page: { size: 100 }
       });
@@ -37,25 +39,25 @@ describe('hub/indexers', function() {
     });
 
     it("indexes plugins", async function() {
-      let doc = await env.lookup('hub:searchers').get(env.session, 'master', 'plugins', 'sample-plugin-one');
+      let doc = await env.lookup('hub:searchers').get(env.session, 'local-hub', 'plugins', 'sample-plugin-one');
       expect(doc).is.ok;
     });
 
     it("includes the data source on each resource", async function() {
-      let doc = await env.lookup('hub:searchers').get(env.session, 'master', 'plugins', 'sample-plugin-one');
+      let doc = await env.lookup('hub:searchers').get(env.session, 'local-hub', 'plugins', 'sample-plugin-one');
       expect(doc).has.deep.property('data.meta.source', 'plugins');
-      doc = await env.lookup('hub:searchers').get(env.session, 'master', 'content-types', 'fields');
+      doc = await env.lookup('hub:searchers').get(env.session, 'local-hub', 'content-types', 'fields');
       expect(doc).has.deep.property('data.meta.source', 'static-models');
     });
 
     it("includes features within plugins", async function() {
-      let doc = await env.lookup('hub:searchers').get(env.session, 'master', 'plugins', 'sample-plugin-one');
+      let doc = await env.lookup('hub:searchers').get(env.session, 'local-hub', 'plugins', 'sample-plugin-one');
       expect(doc).has.property('included');
       expect(doc.included.map(r => r.id)).deep.equals(['sample-plugin-one::x']);
     });
 
     it("indexes plugin features", async function() {
-      let doc = await env.lookup('hub:searchers').get(env.session, 'master', 'field-types', 'sample-plugin-one::x');
+      let doc = await env.lookup('hub:searchers').get(env.session, 'local-hub', 'field-types', 'sample-plugin-one::x');
       expect(doc).is.ok;
     });
 
@@ -69,7 +71,7 @@ describe('hub/indexers', function() {
       // this test is deliberately writing directly to the ephemeral
       // backend instead of going through hub:writers. That ensures
       // we aren't relying on side-effects from the writers.
-      let doc = await env.lookup('hub:searchers').get(env.session, 'master', 'plugins', 'sample-plugin-one');
+      let doc = await env.lookup('hub:searchers').get(env.session, 'local-hub', 'plugins', 'sample-plugin-one');
       expect(doc).has.deep.property('data.attributes.plugin-enabled', true);
       let config = {
         id: 'sample-plugin-one',
@@ -83,9 +85,51 @@ describe('hub/indexers', function() {
       let storage = await source.writer.storage;
       storage.store(config.type, config.id, config, false, null);
       await env.lookup('hub:indexers').update({ forceRefresh: true });
-      doc = await env.lookup('hub:searchers').get(env.session, 'master', 'plugins', 'sample-plugin-one');
+      doc = await env.lookup('hub:searchers').get(env.session, 'local-hub', 'plugins', 'sample-plugin-one');
       expect(doc).has.deep.property('data.attributes.plugin-enabled', false);
     });
+  });
+
+
+  describe('binary data', function() {
+    before(async function() {
+      let factory = new JSONAPIFactory();
+
+      factory.addResource('content-types', 'cardstack-files')
+        .withRelated('fields', [
+          factory.addResource('fields', 'created-at').withAttributes({fieldType: '@cardstack/core-types::date'}),
+          factory.addResource('fields', 'content-type').withAttributes({fieldType: '@cardstack/core-types::string'}),
+          factory.addResource('fields', 'sha-sum').withAttributes({fieldType: '@cardstack/core-types::string'}),
+          factory.addResource('fields', 'file-name').withAttributes({fieldType: '@cardstack/core-types::string'}),
+          factory.addResource('fields', 'size').withAttributes({fieldType: '@cardstack/core-types::integer'})
+        ]);
+
+      let models = factory.getModels();
+
+      await setup(models);
+    });
+
+    after(teardown);
+
+    it("indexes ephemeral binary data", async function() {
+      let writers = env.lookup('hub:writers');
+
+      await Promise.all(readdirSync(path.join(__dirname, './images')).map(async filename => {
+        let readStream = createReadStream(path.join(__dirname, 'images', filename));
+        readStream.type = 'cardstack-files';
+        readStream.id = filename.replace(/\..+/, '');
+        await writers.createBinary(Session.INTERNAL_PRIVILEGED, 'cardstack-files', readStream);
+      }));
+
+      let response = await env.lookup('hub:searchers').search(env.session, { filter: { type: 'cardstack-files' }});
+      expect(response.data.map(m => m.type)).includes('cardstack-files');
+      expect(response.data).has.length(2);
+      expect(response.data[0]).has.property('id').equal('cardstack-logo');
+      expect(response.data[0].attributes).has.property('file-name').includes('cardstack-logo.png');
+      expect(response.data[1]).has.property('id').equal('snalc');
+      expect(response.data[1].attributes).has.property('file-name').includes('snalc.gif');
+    });
+
   });
 
   describe("nested data sources", function() {
@@ -122,9 +166,9 @@ describe('hub/indexers', function() {
 
       env = await createDefaultEnvironment(__dirname + '/../../../tests/ephemeral-test-app', seeds.getModels());
 
-      let response = await env.lookup('hub:searchers').get(env.session, 'master', 'posts', '1');
+      let response = await env.lookup('hub:searchers').get(env.session, 'local-hub', 'posts', '1');
       expect(response).is.ok;
-      response = await env.lookup('hub:searchers').get(env.session, 'master', 'comments', '1');
+      response = await env.lookup('hub:searchers').get(env.session, 'local-hub', 'comments', '1');
       expect(response).is.ok;
 
     });
@@ -154,14 +198,6 @@ describe('hub/indexers', function() {
       });
 
       indexers.on('add', model => {
-        if(model.type === 'branches') {
-          // this test is written to check the dog model and was originally structured
-          // to exect only one object to be created. Now branch models are automatically
-          // created during a run. This is not a change in behaviour it is just a limitation
-          // of how this test was originally written
-          return;
-        }
-
         addCount++;
 
         expect(model.id).to.be.ok;
@@ -184,7 +220,7 @@ describe('hub/indexers', function() {
         });
       });
 
-      await env.lookup('hub:writers').create('master', Session.INTERNAL_PRIVILEGED, 'dogs', {
+      await env.lookup('hub:writers').create(Session.INTERNAL_PRIVILEGED, 'dogs', {
         data: {
           type: 'dogs',
           attributes: {
@@ -254,21 +290,21 @@ describe('hub/indexers', function() {
 
 
     it("does not allow unknown attributes into search index", async function() {
-      let doc = await env.lookup('hub:searchers').get(env.session, 'master', 'samples', 'has-bogus-attribute');
+      let doc = await env.lookup('hub:searchers').get(env.session, 'local-hub', 'samples', 'has-bogus-attribute');
       expect(doc).has.deep.property('data.attributes');
       expect(doc.data.attributes).has.property('real-field');
       expect(doc.data.attributes).not.has.property('fake-field');
     });
 
     it("does not allow unknown relationships into search index", async function() {
-      let doc = await env.lookup('hub:searchers').get(env.session, 'master', 'samples', 'has-bogus-relationship');
+      let doc = await env.lookup('hub:searchers').get(env.session, 'local-hub', 'samples', 'has-bogus-relationship');
       expect(doc).has.deep.property('data.relationships');
       expect(doc.data.relationships).has.property('real-relationship');
       expect(doc.data.relationships).not.has.property('fake-relationship');
     });
 
     it("does not allow unknown document types into search index", async function() {
-      let response = await env.lookup('hub:searchers').search(env.session, 'master', { filter: { type: 'not-a-thing' }});
+      let response = await env.lookup('hub:searchers').search(env.session, { filter: { type: 'not-a-thing' }});
       expect(response.data).has.length(0);
     });
 

@@ -15,11 +15,9 @@ describe('postgresql/migrations', function() {
       .withAttributes({
         'source-type': '@cardstack/postgresql',
         params: {
-          branches: {
-            master: Object.assign(postgresConfig({ database: 'test1' }), {
-              migrationsDir: migrationScenario ? `node-tests/migrations/${migrationScenario}` : null
-            })
-          }
+          config: Object.assign(postgresConfig({ database: 'test1' }), {
+            migrationsDir: migrationScenario ? `node-tests/migrations/${migrationScenario}` : null
+          })
         }
       });
     return createDefaultEnvironment(`${__dirname}/..`, factory.getModels());
@@ -40,18 +38,18 @@ describe('postgresql/migrations', function() {
 
   it('can run a simple migration', async function() {
     env = await setup('good-scenario');
-    let type = await env.lookup('hub:searchers').get(env.session, 'master', 'content-types', 'posts');
+    let type = await env.lookup('hub:searchers').get(env.session, 'local-hub', 'content-types', 'posts');
     expect(type).has.deep.property('data.relationships.fields.data');
     expect(type.data.relationships.fields.data).collectionContains({ id: 'title'});
   });
 
   it('migrations are idempotent', async function() {
     env = await setup('good-scenario');
-    await env.lookup('hub:searchers').get(env.session, 'master', 'content-types', 'posts');
+    await env.lookup('hub:searchers').get(env.session, 'local-hub', 'content-types', 'posts');
     await destroyDefaultEnvironment(env);
     await pgClient.query(`select pg_drop_replication_slot(slot_name) from pg_replication_slots;`);
     env = await setup('good-scenario');
-    let type = await env.lookup('hub:searchers').get(env.session, 'master', 'content-types', 'posts');
+    let type = await env.lookup('hub:searchers').get(env.session, 'local-hub', 'content-types', 'posts');
     expect(type).has.deep.property('data.relationships.fields.data');
     expect(type.data.relationships.fields.data).collectionContains({ id: 'title'});
   });
@@ -67,18 +65,18 @@ describe('postgresql/migrations', function() {
     env = await setup();
 
     try {
-      await env.lookup('hub:searchers').get(env.session, 'master', 'content-types', 'comments');
+      await env.lookup('hub:searchers').get(env.session, 'local-hub', 'content-types', 'comments');
       throw new Error("earlier statements in the failing migration were not rolled back");
     } catch (err) {
-      expect(err.message).to.match(/No such resource master\/content-types\/comments/);
+      expect(err.message).to.match(/No such resource local-hub\/content-types\/comments/);
     }
 
 
     try {
-      await env.lookup('hub:searchers').get(env.session, 'master', 'content-types', 'posts');
+      await env.lookup('hub:searchers').get(env.session, 'local-hub', 'content-types', 'posts');
       throw new Error("other concurrent migrations were not rolled back");
     } catch (err) {
-      expect(err.message).to.match(/No such resource master\/content-types\/posts/);
+      expect(err.message).to.match(/No such resource local-hub\/content-types\/posts/);
     }
   });
 

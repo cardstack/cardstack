@@ -16,7 +16,7 @@ export default Component.extend({
   }),
 
   onChange: task(function * (doc) {
-    this.propertyDidChange('cursorState');
+    this.notifyPropertyChange('cursorState');
     this._nextDoc = doc;
     yield timeout(500); // this debounces changes so that we're not
                         // propagating things up to the model on every

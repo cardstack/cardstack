@@ -1,25 +1,16 @@
-.cs-field-editor {
-    padding-bottom: 0.5rem;
+.cs-field-editor-section--title {
+    font-size: .75rem;
 }
 
 .cs-field-editor input,
 .cs-field-editor select,
 .cs-field-editor button {
-  font-family: 'Open Sans';
+    font-family: 'Open Sans';
 }
 
 .cs-field-editor > .field-editor > input {
     width: 100%;
     box-sizing: border-box;
-    margin-bottom: 1rem;
-    padding: 0.5rem 1rem;
-    border: 1px solid var(--light25);
-    border-radius: 3px;
-    background-color: var(--light-background);
-    color: var(--dark-foreground);
-    font-size: 0.8rem;
-    letter-spacing: 0.3px;
-    line-height: 1.375;
 }
 
 .cs-field-editor > .field-editor > input:focus {
@@ -29,6 +20,10 @@
 
 .cs-field-editor > .field-editor > input[type="number"] {
     width: auto;
+}
+
+.cs-field-editor .ember-power-select-selected-item {
+    color: var(--dark-foreground);
 }
 
 .cs-field-editor-button {

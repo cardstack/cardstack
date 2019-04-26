@@ -3,9 +3,6 @@ const NewBroccoliConnector = require('./docker-host/broccoli-connector');
 const path = require('path');
 const fs = require('fs');
 
-// TODO: move into configuration
-const defaultBranch = 'master';
-
 let addon = {
   name: '@cardstack/hub',
 
@@ -87,7 +84,7 @@ let addon = {
     }
     let codeGenUrlPromise = this._hub.then(url => {
       if (url) {
-        return `${url}/codegen/${defaultBranch}/${this._modulePrefix}`;
+        return `${url}/codegen/${this._modulePrefix}`;
       }
     });
     return new NewBroccoliConnector(codeGenUrlPromise).tree;

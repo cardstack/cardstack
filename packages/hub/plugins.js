@@ -7,7 +7,7 @@ module.exports = declareInjections({
 
 class Plugins {
   async active() {
-    let schema = await this.currentSchema.forControllingBranch();
+    let schema = await this.currentSchema.getSchema();
     return schema.plugins;
   }
 });

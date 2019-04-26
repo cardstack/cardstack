@@ -1,157 +1,177 @@
-const { Pool, Client } = require('pg');
-const migrate = require('node-pg-migrate').default;
-const { join } = require('path');
+const { Client, types } = require('pg');
 const postgresConfig = require('@cardstack/plugin-utils/postgres-config');
-const log = require('@cardstack/logger')('cardstack/ethereum/index');
-const EthereumClient = require('./client');
-const Queue = require('@cardstack/queue');
-const { upsert, queryToSQL, param } = require('@cardstack/pgsearch/util');
-const { promisify } = require('util');
-const sleep = promisify(setTimeout);
-
+const TransactionIndexBase = require('./transaction-index-base');
+const { declareInjections } = require('@cardstack/di');
+const log = require('@cardstack/logger')('cardstack/ethereum/transaction-index');
 const config = postgresConfig({ database: `ethereum_index` });
-const pgbossConfig = postgresConfig({ database: `pgboss_${process.env.HUB_ENVIRONMENT}` });
-const defaultProgressFrequency = 100;
 
-module.exports = class TransactionIndex {
-  constructor(jsonRpcUrl='ws://localhost:8546') {
-    this.pool = new Pool({
-      user: config.user,
-      host: config.host,
-      database: config.database,
-      password: config.password,
-      port: config.port
-    });
+// This prevents pg from returning icky types, like 't' for boolean true or string integers.
+// This comes from https://github.com/brianc/node-pg-types
+// postgres OIDs are revealed by executing: select typname, oid, typarray from pg_type order by oid
+const BOOL_OID = 16;
+const INT8_OID = 20;
+const INT4_OID = 23;
+const INT2_OID = 21;
+types.setTypeParser(BOOL_OID, function(val) {
+  return ['true', 't'].includes(val);
+});
+types.setTypeParser(INT2_OID, function(val) {
+  return parseInt(val, 10);
+});
+types.setTypeParser(INT4_OID, function(val) {
+  return parseInt(val, 10);
+});
+types.setTypeParser(INT8_OID, function(val) {
+  return parseInt(val, 10);
+});
 
-    this._migrateDbPromise = null;
-    this._didEnsureDatabaseSetup = false;
-    this.ethereumClient = EthereumClient.create();
-    this.ethereumClient.connect(jsonRpcUrl);
-    this.jobQueue = new Queue(pgbossConfig);
-    this._setupPromise = this.jobQueue.subscribe("ethereum/transaction-index/migrate-db", async () => {
+module.exports = declareInjections({
+  jobQueue: 'hub:queues'
+},
+
+class TransactionIndex extends TransactionIndexBase {
+  static create(...args) {
+    return new this(...args);
+  }
+
+  constructor({ jobQueue }) {
+    super();
+
+    this.jobQueue = jobQueue;
+    this._indexingPromise = null;
+    this._blockHeight = 0;
+  }
+
+  async _setupMigrate() {
+    await this.jobQueue.subscribe("ethereum/transaction-index/migrate-db", async () => {
       await this._migrateDb();
     });
+    await this.jobQueue.publishAndWait('ethereum/transaction-index/migrate-db', {}, {
+      singletonKey: 'ethereum/transaction-index/migrate-db',
+      singletonNextSlot: true
+    });
   }
 
-  async ensureDatabaseSetup() {
-    await this._setupPromise;
-
-    if (this._didEnsureDatabaseSetup) { return; }
-
-    if (!this._migrateDbPromise) {
-      this._migrateDbPromise = this.jobQueue.publishAndWait('ethereum/transaction-index/migrate-db', {}, {
-        singletonKey: 'ethereum/transaction-index/migrate-db',
-        singletonMinutes: 10,
-      });
-    }
-    let { jobCancelled } = await this._migrateDbPromise || {};
-    if (jobCancelled) {
-      log.info('Another node process is running db-migrate. wait a little bit for the the migration to complete.');
-      await sleep(10000);
-    }
-
-    this._didEnsureDatabaseSetup = true;
+  get blockHeight() {
+    return this._blockHeight;
   }
 
-  async _migrateDb() {
+  get currentJsonRpcUrl() {
+    return this.jsonRpcUrls[this.urlIndex];
+  }
+
+  get canFailoverEthereumClient() {
+    return true;
+  }
+
+  get numFailoverClients() {
+    return this.jsonRpcUrls.length;
+  }
+
+  async _failoverEthereumClient() {
+    log.warn(`Failing over ethereum client ${this.currentJsonRpcUrl}`);
+
+    await this.ethereumClient.stopAll();
+    if (this.urlIndex >= this.jsonRpcUrls.length - 1) {
+      this.urlIndex = 0;
+    } else {
+      this.urlIndex++;
+    }
+
+    this.ethereumClient.connect(this.currentJsonRpcUrl);
+    await this.ensureDatabaseSetup();
+    await this.ethereumClient.startNewBlockListening(this);
+
+    log.info(`Now using ethereum client ${this.currentJsonRpcUrl}`);
+  }
+
+  async start(ethereumClient, jsonRpcUrls) {
+    this.urlIndex = 0;
+    this.jsonRpcUrls = jsonRpcUrls;
+    this.ethereumClient = ethereumClient;
+
+    await this.ensureDatabaseSetup();
+    this._index(); // dont await the block downloading as the first time index will block until all blocks downloaded (which may cause health checks to fail)
+    await this.ethereumClient.startNewBlockListening(this);
+  }
+
+  async getTransaction(txnHash) {
+    await this.ensureDatabaseSetup();
+    await this._indexingPromise;
+
+    let { rows } = await this.query(`select * from transactions where transaction_hash = '${txnHash}'`);
+    let [ row ] = rows;
+    return row;
+  }
+
+  async getTransactionsForAddress(address, { onlySuccessfulTransactions, sinceBlockNumber, toBlockNumber, limit }) {
+    await this.ensureDatabaseSetup();
+    await this._indexingPromise;
+
+    let query = `select * from transactions where (lower(from_address) = lower('${address}') OR lower(to_address) = lower('${address}'))`;
+    if (sinceBlockNumber != null) {
+      query += ` and block_number >= ${sinceBlockNumber}`;
+    }
+    if (toBlockNumber != null) {
+      query += ` and block_number <= ${toBlockNumber}`;
+    }
+    if (onlySuccessfulTransactions) {
+      query += ` and transaction_successful = TRUE`;
+    }
+    query += ` order by block_number, transaction_index`;
+    if (limit != null) {
+      query += ` limit ${limit}`;
+    }
+
+    log.trace(`getting transactions for address '${address}' since block '${sinceBlockNumber || 0}' to block '${toBlockNumber || 'latest'}' with sql: ${query}`);
+    let start = Date.now();
+    let { rows } = await this.query(query);
+    log.debug(`transaction query for address '${address}' since block '${sinceBlockNumber || 0}' to block '${toBlockNumber || 'latest'}' returned ${rows.length} transactions in ${Date.now() - start}ms`);
+
+    return rows;
+  }
+
+  // This is an event listener which is only executed as a synchronous call
+  onNewBlockReceived(blockNumber) {
+    log.debug(`new block received from geth #${blockNumber}`);
+    this._index();
+  }
+
+  async _index() {
+    this._indexingPromise = Promise.resolve(this._indexingPromise)
+      .then(() => this._loadNewBlocks());
+
+    return this._indexingPromise;
+  }
+
+  async _loadNewBlocks() {
+    let fromBlockHeight = await this._getHighestIndexedBlockNumber();
+    log.info(`loading new blocks starting from block #${fromBlockHeight}`);
+    let toBlockHeight = await this.buildIndex({ fromBlockHeight });
+    log.info(`completed loading blocks from #${fromBlockHeight} to #${toBlockHeight}`);
+
+    this._blockHeight = toBlockHeight;
+    this.emit('blocks-indexed', { fromBlockHeight, toBlockHeight });
+  }
+
+  async _getHighestIndexedBlockNumber() {
+    let { rows } = await this.query(`select block_number from transactions order by block_number desc limit 1`);
+
+    if (!rows.length) { return 0; }
+
+    let [ { block_number } ] = rows;
+    return parseInt(block_number, 10);
+  }
+
+  // this is only ever to be used for the test cleanup
+  async __deleteIndex() {
+    await this.pool.end();
     let client = new Client(Object.assign({}, config, { database: 'postgres' }));
     try {
       await client.connect();
-      let response = await client.query(`select count(*)=1 as has_database from pg_database where datname=$1`, [config.database]);
-      if (!response.rows[0].has_database) {
-        await client.query(`create database ${safeDatabaseName(config.database)}`);
-      }
+      await client.query(`drop database if exists ${config.database}`);
     } finally {
       client.end();
     }
-
-    await migrate({
-      direction: 'up',
-      migrationsTable: 'migrations',
-      singleTransaction: true,
-      checkOrder: false,
-      databaseUrl: {
-        user: config.user,
-        host: config.host,
-        database: config.database,
-        password: config.password,
-        port: config.port
-      },
-      dir: join(__dirname, 'migrations'),
-      log: (...args) => log.debug(...args)
-    });
   }
-
-  async buildIndex({ fromBlockHeight=0, toBlockHeight='latest', jobName, progressFrequency }) {
-    let endHeight = toBlockHeight === 'latest' ? await this.ethereumClient.getBlockHeight() : toBlockHeight;
-    let currentBlockNumber = fromBlockHeight;
-    let workerAttribution = jobName ? `Worker ${jobName} - ` : '';
-    let totalNumBlocks = endHeight - fromBlockHeight;
-    while (currentBlockNumber <= endHeight) {
-      let block;
-      let retries = 0;
-      while (!block) {
-        block = await this.ethereumClient.getBlock(currentBlockNumber);
-        if (block && retries) {
-          log.info(`${workerAttribution}successfully retrieved block #${currentBlockNumber} after ${retries} retries.`);
-        }
-        if (!block) {
-          log.error(`${workerAttribution}Unable to retrieve block #${currentBlockNumber}, trying again (retries: ${retries})`);
-          await sleep(5000);
-        }
-        retries++;
-      }
-      let currentNumBlocks = currentBlockNumber - fromBlockHeight;
-      if (currentNumBlocks % (progressFrequency || defaultProgressFrequency) === 0) {
-        let percentageComplete = Math.round(100 * (currentNumBlocks/totalNumBlocks));
-        log.info(`${workerAttribution}Percent complete ${percentageComplete}%. ${currentNumBlocks} of ${totalNumBlocks} blocks. Processing block #${block.number}`);
-      }
-      log.debug(`${workerAttribution}Processing block #${block.number}, contains ${block.transactions.length} transactions`);
-      for (let transaction of block.transactions) {
-        log.trace(`  - ${workerAttribution}processing transaction #${transaction.transactionIndex}`);
-        let receipt = await this.ethereumClient.getTransactionReceipt(transaction.hash);
-        if (!receipt) {
-          throw new Error(`${workerAttribution}No transaction reciept exists for txn hash ${transaction.hash}`);
-        }
-
-        let status = typeof receipt.status === 'boolean' ? receipt.status : Boolean(parseInt(receipt.status, 16));
-
-        await this.query(queryToSQL(upsert('transactions', 'transactions_pkey', {
-          transaction_hash:       param(transaction.hash),
-          block_number:           param(block.number),
-          block_hash:             param(block.hash),
-          from_address:           param(transaction.from),
-          to_address:             param(transaction.to),
-          transaction_value:      param(transaction.value),
-          timestamp:              param(block.timestamp),
-          transaction_nonce:      param(transaction.nonce),
-          transaction_index:      param(transaction.transactionIndex),
-          gas:                    param(transaction.gas),
-          gas_price:              param(transaction.gasPrice),
-          gas_used:               param(receipt.gasUsed),
-          cumulative_gas_used:    param(receipt.cumulativeGasUsed),
-          transaction_successful: param(status),
-        })));
-      }
-      endHeight = toBlockHeight === 'latest' ? await this.ethereumClient.getBlockHeight() : toBlockHeight;
-      currentBlockNumber++;
-    }
-  }
-
-  async query(...args) {
-    let client = await this.pool.connect();
-    try {
-      return await client.query(...args);
-    }
-    finally {
-      client.release();
-    }
-  }
-};
-
-function safeDatabaseName(name){
-  if (!/^[a-zA-Z_0-9]+$/.test(name)){
-    throw new Error(`unsure if db name ${name} is safe`);
-  }
-  return name;
-}
+});

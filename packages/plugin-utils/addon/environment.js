@@ -9,8 +9,6 @@
 // If you find yourself wanting to customize the values in this file,
 // you should really just configure the hub and add some seed models
 // so it runs.
-export const defaultBrach = 'master';
 export const hubURL = 'http://localhost:3000';
 export const compiledAt = null;
 export const appModulePrefix = 'dummy';
-export const branch = 'master';

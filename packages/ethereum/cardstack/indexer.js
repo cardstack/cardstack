@@ -7,11 +7,8 @@ const { declareInjections } = require('@cardstack/di');
 const { fieldTypeFor } = require('./abi-utils');
 const { apply_patch } = require('jsonpatch');
 
-const defaultBranch = 'master';
-
 module.exports = declareInjections({
   searchers: 'hub:searchers',
-  controllingBranch: 'hub:controlling-branch',
   ethereumClient: `plugin-services:${require.resolve('./client')}`,
   eventIndexer: `plugin-services:${require.resolve('./event-indexer')}`,
   transactionIndexer: `plugin-services:${require.resolve('./transaction-indexer')}`
@@ -20,26 +17,21 @@ module.exports = declareInjections({
   class EthereumIndexer {
 
     static create(...args) {
-      let [{ ethereumClient, jsonRpcUrl }] = args;
-      ethereumClient.connect(jsonRpcUrl);
+      let [{ ethereumClient, jsonRpcUrls }] = args;
+      ethereumClient.connect(jsonRpcUrls[0]);
       return new this(...args);
     }
 
-    constructor({ ethereumClient, dataSource, jsonRpcUrl, controllingBranch, contract, addressIndexing, patch, searchers, eventIndexer, transactionIndexer }) {
+    constructor({ ethereumClient, dataSource, jsonRpcUrls, contract, addressIndexing, patch, searchers, eventIndexer, transactionIndexer }) {
       this.dataSourceId = dataSource.id;
       this.contract = contract;
       this.addressIndexing = addressIndexing;
       this.searchers = searchers;
       this.eventIndexer = eventIndexer;
       this.transactionIndexer = transactionIndexer;
-      this.controllingBranch = controllingBranch;
       this.patch = patch || Object.create(null);
-      this._jsonRpcUrl = jsonRpcUrl;
+      this.jsonRpcUrls = jsonRpcUrls;
       this.ethereumClient = ethereumClient;
-    }
-
-    async branches() {
-      return [this.controllingBranch.name];
     }
 
     async beginUpdate() {
@@ -53,7 +45,7 @@ module.exports = declareInjections({
       }
 
       if (this.addressIndexing) {
-        await this.transactionIndexer.start(this.addressIndexing, this.ethereumClient);
+        await this.transactionIndexer.start(this.addressIndexing, this.ethereumClient, this.jsonRpcUrls);
       }
 
       log.debug(`ending beginUpdate()`);
@@ -399,7 +391,7 @@ class Updater {
 
     if (this.contract) {
       log.debug(`starting updateContent() indexing of contract events`);
-      let shouldSkip = await this.eventIndexer.shouldSkipIndexing(this.dataSourceId, defaultBranch);
+      let shouldSkip = await this.eventIndexer.shouldSkipIndexing(this.dataSourceId);
       blockHeight = lastBlockHeight;
       if (!shouldSkip) {
         let eventBlockHeight = await this.eventIndexer.getBlockHeight();
@@ -414,7 +406,7 @@ class Updater {
 
     if (this.addressIndexing) {
       log.debug(`starting updateContent() indexing of new blocks`);
-      await this.transactionIndexer.index();
+      blockHeight = await this.transactionIndexer.index({ lastBlockHeight });
       log.debug(`completed updateContent() indexing of new blocks`);
     }
 
