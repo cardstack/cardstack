@@ -205,6 +205,14 @@ module('Acceptance | tools', function(hooks) {
     assert.dom(reviewStatusInput).isNotDisabled();
   });
 
+  test('fields with the same name but belonging to a different type are rendered in editor', async function(assert) {
+    await visit('/hub/posts/1');
+    await login();
+    await click('[data-test-cardstack-tools-launcher]');
+    await waitFor('[data-test-cs-active-composition-panel-main]');
+    assert.dom('[data-test-cs-collapsible-section=category-1-popularity] [data-test-cs-collapsible-section-title]').hasText('Category #1: Popularity');
+  });
+
   test('allow editing fields of newly added, owned records', async function(assert) {
     await visit('/hub/posts/1');
     await login();
@@ -319,4 +327,5 @@ module('Acceptance | tools', function(hooks) {
     await fillIn(titleInput, 'Title 2');
     assert.dom(titleInput).hasValue('Title 2');
   });
+
 });
