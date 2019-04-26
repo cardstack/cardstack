@@ -17,7 +17,7 @@ export default function(factory, opts) {
 
   let puppies = factory.addResource('content-types', 'puppies')
     .withRelated('fields', [
-      factory.addResource('fields', 'name').withAttributes({
+      factory.addResource('fields', 'nickname').withAttributes({
         fieldType: '@cardstack/core-types::string'
       }),
       factory.addResource('fields', 'bio').withAttributes({
@@ -37,7 +37,7 @@ export default function(factory, opts) {
 
   let doggies = factory.addResource('content-types', 'doggies')
     .withRelated('fields', [
-      factory.addResource('fields', 'name').withAttributes({
+      factory.addResource('fields', 'nickname').withAttributes({
         fieldType: '@cardstack/core-types::string'
       }),
     ]);
@@ -116,13 +116,13 @@ export default function(factory, opts) {
 
   let vanGogh = factory.addResource('puppies', 'vanGogh')
     .withAttributes({
-      name: 'Van Gogh',
+      nickname: 'Van Gogh',
       bio: 'A cute puppy that loves to play with his squeaky snake',
     }).withRelated('location', nyc);
 
   let ringo = factory.addResource('doggies', 'ringo')
     .withAttributes({
-      name: 'Ringo',
+      nickname: 'Ringo',
     });
 
   let article1 = factory.addResource('puppy-articles', 'bones')

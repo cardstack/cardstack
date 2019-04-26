@@ -63,7 +63,7 @@ module.exports = class ContentType {
     this.realAndComputedFields = realAndComputedFields;
 
     // TODO need to update DocumentContext, codegen, et. al. to deal with the content-type name being different than the content type id
-    this.name = get(model, 'attributes.member-name') || model.id;
+    this.name = get(model, 'attributes.name') || model.id;
 
     this.id = model.id;
     if (model.relationships && model.relationships['data-source'] && model.relationships['data-source'].data) {

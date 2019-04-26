@@ -11,7 +11,7 @@ const models = [
     relationships: {
       fields: {
         data: [
-          { type: 'fields', id: 'member-name' },
+          { type: 'fields', id: 'name' },
           { type: 'fields', id: 'data-source' },
           { type: 'fields', id: 'fields' },
           { type: 'fields', id: 'is-built-in' },
@@ -61,7 +61,7 @@ const models = [
     relationships: {
       fields: {
         data: [
-          { type: 'fields', id: 'member-name' },
+          { type: 'fields', id: 'name' },
           { type: 'fields', id: 'field-type' },
           { type: 'fields', id: 'related-types' },
           { type: 'fields', id: 'default-at-create' },
@@ -83,40 +83,6 @@ const models = [
   },
   {
     type: 'content-types',
-    id: 'spaces',
-    attributes: {
-      'is-built-in': true,
-      'default-includes': ['primary-card'],
-      'fieldset-expansion-format': 'isolated',
-      fieldsets: {
-        isolated: [{
-          field: 'primary-card', format: 'isolated'
-        }],
-      }
-    },
-    relationships: {
-      fields: {
-        data: [
-          { type: 'fields', id: 'primary-card' },
-          { type: 'fields', id: 'params' },
-          { type: 'fields', id: 'allowed-query-params' },
-          { type: 'fields', id: 'route-stack' },
-          { type: 'computed-fields', id: 'http-status' }
-        ]
-      }
-    }
-  },
-  // TODO I belive these actually go into card-definitions in a schema file
-  {
-    type: 'content-types',
-    id: 'application-cards',
-  },
-  {
-    type: 'content-types',
-    id: 'error-cards',
-  },
-  {
-    type: 'content-types',
     id: 'computed-fields',
     attributes: {
       'is-built-in': true
@@ -124,7 +90,7 @@ const models = [
     relationships: {
       fields: {
         data: [
-          { type: 'fields', id: 'member-name' },
+          { type: 'fields', id: 'name' },
           { type: 'fields', id: 'computed-field-type' },
           { type: 'fields', id: 'caption' },
           { type: 'fields', id: 'searchable' },
@@ -815,51 +781,9 @@ const models = [
   },
   {
     type: 'fields',
-    id: 'member-name',
+    id: 'name',
     attributes: {
       'field-type': '@cardstack/core-types::string'
-    }
-  },
-  {
-    type: 'fields',
-    id: 'status-code',
-    attributes: {
-      'field-type': '@cardstack/core-types::integer'
-    }
-  },
-  {
-    type: 'fields',
-    id: 'message',
-    attributes: {
-      'field-type': '@cardstack/core-types::string'
-    }
-  },
-  {
-    type: 'fields',
-    id: 'primary-card',
-    attributes: {
-      'field-type': '@cardstack/core-types::belongs-to'
-    }
-  },
-  {
-    type: 'fields',
-    id: 'allowed-query-params',
-    attributes: {
-      'field-type': '@cardstack/core-types::object'
-    }
-  },
-  {
-    type: 'fields',
-    id: 'route-stack',
-    attributes: {
-      'field-type': '@cardstack/core-types::string-array'
-    }
-  },
-  {
-    type: 'computed-fields',
-    id: 'http-status',
-    attributes: {
-      'computed-field-type': '@cardstack/routing::http-status',
     }
   },
   {
@@ -877,26 +801,6 @@ const models = [
     relationships: {
       who: {
         data: [{ type: 'groups', id: '@cardstack/hub' }]
-      }
-    }
-  },
-  {
-    type: 'grants',
-    id: 'routing-grant',
-    attributes: {
-      'may-read-fields': true,
-      'may-read-resource': true,
-    },
-    relationships: {
-      who: {
-        data: [{ type: 'groups', id: 'everyone' }]
-      },
-      types: {
-        data: [
-          { type: "content-types", id: 'spaces' },
-          { type: "content-types", id: 'application-cards' },
-          { type: "content-types", id: 'error-cards' }
-        ]
       }
     }
   },
