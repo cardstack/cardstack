@@ -4,7 +4,6 @@ import { visit, click, fillIn, triggerEvent, waitFor, settled } from '@ember/tes
 import { login } from '../helpers/login';
 import { ciSessionId } from '@cardstack/test-support/environment';
 import { hubURL } from '@cardstack/plugin-utils/environment';
-import { findTriggerElementWithLabel } from '../helpers/query-selectors';
 
 let nonce = 0;
 
@@ -209,13 +208,9 @@ module('Acceptance | tools', function(hooks) {
   test('fields with the same name but belonging to a different type are rendered in editor', async function(assert) {
     await visit('/hub/posts/1');
     await login();
-    await click('.cardstack-tools-launcher');
-    await waitFor('.cs-active-composition-panel--main');
-    await waitFor('.cs-editor-switch')
-    await click('.cs-editor-switch');
-
-    let categoryPopularity = findTriggerElementWithLabel.call(this, /Category #1: Popularity/);
-    assert.ok(categoryPopularity, 'field is rendered in editor');
+    await click('[data-test-cardstack-tools-launcher]');
+    await waitFor('[data-test-cs-active-composition-panel-main]');
+    assert.dom('[data-test-cs-collapsible-section=category-1-popularity] [data-test-cs-collapsible-section-title]').hasText('Category #1: Popularity');
   });
 
   test('allow editing fields of newly added, owned records', async function(assert) {
