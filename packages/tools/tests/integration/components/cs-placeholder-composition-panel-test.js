@@ -12,7 +12,6 @@ module('Integration | Component | cs placeholder composition panel', function(ho
       isCardstackPlaceholder: true,
       type: 'page',
       slug: 'somewhere',
-      branch: 'x'
     });
   });
 

@@ -64,14 +64,14 @@ describe('git/indexer', function() {
       client = env.lookup(`plugin-client:${require.resolve('@cardstack/pgsearch/client')}`);
     };
 
-    assertNoDocument = async function(branch, type, id) {
+    assertNoDocument = async function(type, id) {
       try {
-        await searcher.get(env.session, branch, type, id);
+        await searcher.get(env.session, 'local-hub', type, id);
       } catch(err) {
         expect(err.status).to.equal(404);
         return;
       }
-      throw new Error(`expected not to find document branch=${branch} type=${type} id=${id}`);
+      throw new Error(`expected not to find document type=${type} id=${id}`);
     };
   });
 
@@ -104,7 +104,7 @@ describe('git/indexer', function() {
     let indexerState = await client.loadMeta({ branch: 'master', id: dataSource.id });
     expect(indexerState.commit).to.equal(head);
 
-    let contents = await searcher.get(env.session, 'master', 'articles', 'hello-world');
+    let contents = await searcher.get(env.session, 'local-hub', 'articles', 'hello-world');
     let jsonapi = toResource(contents);
     expect(jsonapi).has.deep.property('attributes.title', 'world');
   });
@@ -125,7 +125,7 @@ describe('git/indexer', function() {
 
     let indexerState = await client.loadMeta({ branch: 'master', id: dataSource.id });
     expect(indexerState.commit).to.equal(head);
-    await assertNoDocument('master', 'articles', 'hello-world');
+    await assertNoDocument('articles', 'hello-world');
   });
 
   it('ignores newly added document with malformed json', async function() {
@@ -144,7 +144,7 @@ describe('git/indexer', function() {
 
     let indexerState = await client.loadMeta({ branch: 'master', id: dataSource.id });
     expect(indexerState.commit).to.equal(head);
-    await assertNoDocument('master', 'articles', 'hello-world');
+    await assertNoDocument('articles', 'hello-world');
   });
 
   it('does not reindex unchanged content', async function() {
@@ -159,10 +159,10 @@ describe('git/indexer', function() {
     // Here we manually reach into postgres to dirty a cached
     // document in order to see whether the indexer will leave it
     // alone
-    let row = await client.query(`select pristine_doc from documents where branch=$1 and type=$2 and id=$3`, ['master', 'articles', 'hello-world']);
+    let row = await client.query(`select pristine_doc from documents where type=$1 and id=$2`, ['articles', 'hello-world']);
     let editedDoc = Object.assign({}, row.rows[0].pristine_doc);
     editedDoc.data.attributes.title = 'somebody else';
-    await client.query(`update documents set pristine_doc=$1 where branch=$2 and type=$3 and id=$4`, [editedDoc, 'master', 'articles', 'hello-world']);
+    await client.query(`update documents set pristine_doc=$1 where type=$2 and id=$3`, [editedDoc, 'articles', 'hello-world']);
 
     let change = await Change.create(repo, head, 'master');
     let file = await change.get('contents/articles/second.json', { allowCreate: true });
@@ -176,7 +176,7 @@ describe('git/indexer', function() {
     let indexerState = await client.loadMeta({ branch: 'master', id: dataSource.id });
     expect(indexerState.commit).to.equal(head);
 
-    let contents = await searcher.get(env.session, 'master', 'articles', 'hello-world');
+    let contents = await searcher.get(env.session, 'local-hub', 'articles', 'hello-world');
     expect(contents).to.have.deep.property('data.attributes.title', 'somebody else');
   });
 
@@ -195,7 +195,7 @@ describe('git/indexer', function() {
     file.delete();
     await change.finalize(commitOpts());
     await indexer.update();
-    await assertNoDocument('master', 'articles', 'hello-world');
+    await assertNoDocument('articles', 'hello-world');
   });
 
   it('replaces unrelated content it finds in the search index', async function() {
@@ -244,16 +244,16 @@ describe('git/indexer', function() {
     await start();
 
     {
-      let both = toResource(await searcher.get(env.session, 'master', 'articles', 'both'));
+      let both = toResource(await searcher.get(env.session, 'local-hub', 'articles', 'both'));
       expect(both).has.deep.property('attributes.title', 'article from both repos, left version');
 
-      let left = toResource(await searcher.get(env.session, 'master', 'articles', 'left'));
+      let left = toResource(await searcher.get(env.session, 'local-hub', 'articles', 'left'));
       expect(left).has.deep.property('attributes.title', 'article from left repo');
 
-      let upstream = toResource(await searcher.get(env.session, 'master', 'articles', 'upstream'));
+      let upstream = toResource(await searcher.get(env.session, 'local-hub', 'articles', 'upstream'));
       expect(upstream).has.deep.property('attributes.title', 'article from upstream');
 
-      await assertNoDocument('master', 'articles', 'right');
+      await assertNoDocument('articles', 'right');
     }
 
     let change = await Change.create(repo, head, 'master');
@@ -273,19 +273,19 @@ describe('git/indexer', function() {
 
     {
       // Update
-      let both = toResource(await searcher.get(env.session, 'master', 'articles', 'both'));
+      let both = toResource(await searcher.get(env.session, 'local-hub', 'articles', 'both'));
       expect(both).has.deep.property('attributes.title', 'article from both repos, right version');
 
       // Create
-      let right = toResource(await searcher.get(env.session, 'master', 'articles', 'right'));
+      let right = toResource(await searcher.get(env.session, 'local-hub', 'articles', 'right'));
       expect(right).has.deep.property('attributes.title', 'article from right repo');
 
       // Leave other data sources alone
-      let upstream = toResource(await searcher.get(env.session, 'master', 'articles', 'upstream'));
+      let upstream = toResource(await searcher.get(env.session, 'local-hub', 'articles', 'upstream'));
       expect(upstream).has.deep.property('attributes.title', 'article from upstream');
 
       // Delete
-      await assertNoDocument('master', 'articles', 'left');
+      await assertNoDocument('articles', 'left');
     }
   });
 
@@ -310,7 +310,7 @@ describe('git/indexer', function() {
 
     await start();
 
-    let contents = await searcher.get(env.session, 'master', 'articles', 'hello-world');
+    let contents = await searcher.get(env.session, 'local-hub', 'articles', 'hello-world');
     expect(contents).has.deep.property('included');
     expect(contents.included).has.length(1);
     expect(contents.included[0]).has.deep.property('attributes.name', 'Q');

@@ -4,32 +4,37 @@ import { task, timeout } from 'ember-concurrency';
 import scrollToBounds from '../scroll-to-bounds';
 import { inject as service } from '@ember/service';
 import { camelize } from '@ember/string';
+import { urlForModel } from '@cardstack/routing/helpers/cardstack-url';
 
 export default Component.extend({
   layout,
   classNames: ['cs-active-composition-panel'],
+  attributeBindings: ['dataTestName:data-test-cs-active-composition-panel'],
+  dataTestName: '',
 
   validationErrors: null,
   permissions: null,
 
   data: service('cardstack-data'),
+  router: service(),
+  cardstackRouting: service(), // this is used in the `urlForModel` helper (since it has no container)
 
   didReceiveAttrs() {
     this._super(...arguments);
-    this._fetchPermissionsIfModelChanged();
+    this._fetchPermissionsIfModelChanged.perform();
   },
 
   didUpdateAttrs() {
     this._super(...arguments);
-    this._fetchPermissionsIfModelChanged();
+    this._fetchPermissionsIfModelChanged.perform();
   },
 
-  _fetchPermissionsIfModelChanged() {
+  _fetchPermissionsIfModelChanged: task(function * () {
     if (this.previousModel !== this.model) {
-      this.get('fetchPermissions').perform();
+      yield this.get('fetchPermissions').perform();
       this.set('previousModel', this.model);
     }
-  },
+  }),
 
   fetchPermissions: task(function * () {
     let records = [this.model, ...this.model.relatedOwnedRecords()];
@@ -44,7 +49,7 @@ export default Component.extend({
       return hash;
     }, {});
     this.set('permissions', permissions);
-  }).drop(),
+  }).restartable(),
 
   fetchPermissionsFor: task(function * (record) {
     return yield this.get('data').fetchPermissionsFor(record);
@@ -61,15 +66,21 @@ export default Component.extend({
 
   highlightAndScrollToField: task(function * (field) {
     this.get('highlightField')(field);
-    if (field) {
+    if (field && field.bounds) {
       yield timeout(500);
       scrollToBounds(field.bounds());
     }
   }).restartable(),
 
+  afterModelSaved(model) {
+    let location = this.get('router.location');
+    let url = urlForModel(this, model);
+    location.setURL(url);
+  },
+
   actions: {
     validate() {
-      return this.get('validateTask').perform();
+      return this.validateTask.perform();
     }
   }
 });

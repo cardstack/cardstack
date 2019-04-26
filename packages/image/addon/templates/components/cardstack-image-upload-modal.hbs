@@ -1,0 +1,20 @@
+<div class="cardstack-image-upload-modal--message">
+  {{#if uploadFile.isIdle}}
+    <div class="cardstack-image-upload-modal--message__upload">Drag & Drop to Upload</div>
+    <div class="cardstack-image-upload-modal--button-container">
+      <label for="cardstack-image-upload-input"
+            class="cardstack-image-upload-modal--button
+                   cardstack-image-upload-modal--upload-button">Choose File</label>
+      <button class="cardstack-image-upload-modal--button
+                     cardstack-image-upload-modal--cancel-button"
+              {{action cancel}}>Cancel</button>
+    </div>
+  {{else}}
+    <div class="cardstack-image-upload-modal--message__loading">
+      Uploading File...
+      {{this.uploadPercentage}}%
+    </div>
+  {{/if}}
+</div>
+
+<input id="cardstack-image-upload-input" type='file' accept="image/*" onchange={{perform uploadFile}}>

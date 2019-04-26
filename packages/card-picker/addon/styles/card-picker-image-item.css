@@ -1,0 +1,44 @@
+.cs-card-picker-image-item {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-wrap: wrap;
+  align-content: space-between;
+}
+
+.cs-card-picker-image-item--header {
+  width: 100%;
+  background-color: powderblue;
+}
+
+.cs-card-picker-image-item--image {
+  max-height: calc(100% - 60px);
+  max-width: 100%;
+  display: block;
+  width: auto;
+  height: auto;
+  margin: 0 auto;
+  border-radius: 4px;
+  border: 1px solid var(--light-outline);
+  box-shadow: 0 1px 3px 0 rgba(0,0,0,.4);
+}
+
+.cs-card-picker-image-item--meta {
+  width: 100%;
+  text-align: center;
+  font-size: .75rem;
+}
+
+.cs-card-picker-image-item--filename {
+  text-overflow: ellipsis;
+  overflow-x: hidden;
+  white-space: nowrap;
+}
+
+.cs-card-picker-image-item--type {
+  text-transform: uppercase;
+  color: var(--faded-foreground);
+}

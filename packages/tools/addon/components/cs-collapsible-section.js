@@ -4,8 +4,9 @@ import layout from '../templates/components/cs-collapsible-section';
 export default Component.extend({
   layout,
   tagName: 'section',
-  classNameBindings: ['opened:opened:closed'],
-  animationRules,
+  classNames: ['cs-collapsible-section'],
+  attributeBindings: ['dataTestName:data-test-cs-collapsible-section'],
+  dataTestName: '',
 
   mouseEnter(event) {
     let hovered = this.get('hovered');
@@ -13,6 +14,7 @@ export default Component.extend({
       hovered(event);
     }
   },
+
   mouseLeave(event) {
     let unhovered = this.get('unhovered');
     if (unhovered) {
@@ -20,22 +22,10 @@ export default Component.extend({
     }
   },
 
-  actions: {
-    toggle() {
-      if (this.get('opened')) {
-        this.get('close')();
-      } else {
-        this.get('open')();
-      }
+  click(event) {
+    let selected = this.get('selected');
+    if (selected) {
+      selected(event);
     }
   }
 });
-
-function animationRules() {
-  this.transition(
-    this.fromValue(false),
-    this.toValue(true),
-    this.use('to-down', { duration: 250 }),
-    this.reverse('to-up', { duration: 250 })
-  );
-}

@@ -1,86 +1,79 @@
 .cs-active-composition-panel {
     box-sizing: border-box;
-    position: absolute;
-    right: 15px;
-    top: 100px;
+    width: 100%;
+    background-color: var(--deep-background);
+    color: var(--bright-foreground);
+    border-radius: 5px;
+    margin-bottom: 65px;
+
     display: flex;
+    flex-wrap: wrap;
     flex-direction: column;
-    width: 80%;
-    min-height: 25rem;
-    max-height: 85%;
+    flex-grow: 2;
+}
+
+.cs-active-composition-panel--header {
+    position: relative;
+    width: 100%;
+    padding: 1em;
     background-color: var(--normal-background);
     color: var(--bright-foreground);
-    border: 1px solid var(--light05);
-    border-radius: 20px;
-    box-shadow: 0 2px 15px 0 var(--dark50);
+    border: none;
+    border-top-left-radius: 5px;
+    border-top-right-radius: 5px;
+    font-size: 16px;
+}
+
+.cs-active-composition-panel--parameters {
+    padding: 1.25rem 1.25rem 0;
+}
+
+.cs-active-composition-panel--title {
+    margin: 0;
+    padding-bottom: 1em;
+    color: var(--bright-foreground);
+    font-size: 12px;
+    font-weight: 600;
+    line-height: 17px;
+    text-transform: capitalize;
+}
+
+.cs-active-composition-panel--title svg {
+    margin-right: 5px;
+    display: inline-block;
+    vertical-align: text-top;
+    fill: var(--active-foreground);
+}
+
+.cs-active-composition-panel--flex-slot {
+    position: relative;
+    display: flex;
+    flex-wrap: wrap;
+    flex-direction: column;
+    flex-grow: 1;
+}
+
+.cs-active-composition-panel--scroll-wrapper {
+    flex-grow: 1;
+    width: 100%;
+    overflow-y: scroll;
+    -webkit-overflow-scrolling: touch;
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right :0;
 }
 
 .cs-active-composition-panel--main {
-    padding-bottom: 5em;
-    overflow-y: scroll;
+    padding: 1.25rem;
 }
 
-.cs-content-info {
-    display: flex;
-    padding: 2em 1em;
-    border-top-left-radius: 20px;
-    border-top-right-radius: 20px;
-}
-
-.cs-content-info > svg {
-    width: 1.4em;
-    margin-right: 1em;
-    fill: var(--bright-foreground);
-}
-
-.cs-content-info > div {
-    max-width: 16em;
-}
-
-.cs-content-info .content-type {
-    font-size: 0.69em;
-    line-height: 1.36;
-    letter-spacing: 1px;
-    opacity: 0.5;
-    text-transform: uppercase;
-    margin: 0 0 2px;
-    font-family: 'Open Sans Bold';
-    font-weight: bold;
-}
-
-.cs-content-info .content-title {
-    margin: 0;
-    font-size: 0.9em;
-    line-height: 1.38;
-    letter-spacing: 0.1px;
-}
-
-.cs-toolbox-section {
-    margin: 0;
-    border-top: 1px solid var(--light25);
-    color: var(--bright-foreground);
-    font-size: 0.9em;
-}
-
-.cs-toolbox-section:first-of-type {
-    border-top: none;
-}
-
-.cs-toolbox-section:last-of-type {
-    border-bottom: 1px solid var(--light25);
-}
-
-.cs-toolbox-section.opened {
-    background-color: var(--active-background);
-}
-
-.cs-toolbox-section.invalid > header {
-    border: 2px solid var(--error-border);
-}
-
-.cs-field-editor-section {
-    margin: 0;
-    padding: 0.5rem 0.75em;
+.cs-active-composition-panel--main:after {
+    content: ' ';
+    display: block;
+    width: 100%;
+    height: 20px;
 }
 
 .cs-field-editor-section--label {
@@ -88,6 +81,18 @@
     padding-bottom: 0.5rem;
     color: var(--light50);
     font-size: 0.9rem;
+    letter-spacing: 0.3px;
+    line-height: 1.375;
+}
+
+.cs-active-composition-panel--field-editor > .field-editor > input {
+    margin-bottom: 1rem;
+    padding: 0.5rem 1rem;
+    border: 1px solid var(--light25);
+    border-radius: 3px;
+    background-color: var(--light-background);
+    color: var(--dark-foreground);
+    font-size: 0.8rem;
     letter-spacing: 0.3px;
     line-height: 1.375;
 }

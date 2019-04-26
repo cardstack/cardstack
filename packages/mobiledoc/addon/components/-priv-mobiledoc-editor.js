@@ -1,10 +1,14 @@
 import MobiledocEditor from 'ember-mobiledoc-editor/components/mobiledoc-editor/component';
+import createComponentCard from 'ember-mobiledoc-editor/utils/create-component-card';
 import Range from 'mobiledoc-kit/utils/cursor/range';
 import { run } from '@ember/runloop';
+import { mobiledocCardNames } from './field-renderers/mobiledoc-renderer';
 
 export const NEW_LINE_HREF = 'new-line';
 
 export default MobiledocEditor.extend({
+  cards: mobiledocCardNames.map(createComponentCard),
+
   init() {
     this._super();
     this._lastSelectionBounds = null;
@@ -22,7 +26,6 @@ export default MobiledocEditor.extend({
         if (editor.cursor.selection.rangeCount > 0) {
           bounds = editor.cursor.selection.getRangeAt(0).getBoundingClientRect();
         }
-
 
         let activeSection = editor.activeSection;
 
@@ -48,7 +51,7 @@ export default MobiledocEditor.extend({
            editor.range.focusedPosition.offset === 0) {
           let prevSection = editor.range.focusedPosition.section.prev;
           let range = new Range(prevSection.headPosition(), prevSection.tailPosition());
-          let markups = prevSection.markupsInRange(range);
+          let markups = typeof prevSection.markupsInRange === 'function' ? prevSection.markupsInRange(range) : [];
           let markup = markups.find(item => {
             return item.attributes && item.attributes.href === NEW_LINE_HREF;
           });
@@ -69,7 +72,7 @@ export default MobiledocEditor.extend({
       run(editor) {
         let section = editor.range.focusedPosition.section;
         let range = new Range(section.headPosition(), section.tailPosition());
-        let markups = section.markupsInRange(range);
+        let markups = typeof section.markupsInRange === 'function' ? section.markupsInRange(range) : [];
         let markup = markups.find(item => {
           return item.attributes && item.attributes.href === NEW_LINE_HREF;
         });

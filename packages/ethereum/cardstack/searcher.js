@@ -13,7 +13,7 @@ class TransactionSearcher {
     this.transactionIndex = transactionIndex;
   }
 
-  async get(session, branch, type, id, next) {
+  async get(session, type, id, next) {
     if (type === 'ethereum-transactions') {
       return await this._getTransaction(id);
     }
@@ -33,7 +33,7 @@ class TransactionSearcher {
   //     }]
   //   }
   // }
-  async search(session, branch, query, next) {
+  async search(session, query, next) {
     if (Array.isArray(get(query, 'filter.or')) &&
       query.filter.or.every(i => get(i, 'type.exact') === 'ethereum-transactions' ||
                                  get(i, 'type') === 'ethereum-transactions')) {
@@ -50,6 +50,7 @@ class TransactionSearcher {
   }
 
   async _queryTransactions(query) {
+    let limit = get(query, 'page.size');
     let orClause = get(query, 'filter.or[0]'); // assumes all OR clauses are identical except the 'transaction-to'/'transaction-from' clause
     let address = get(orClause, 'transaction-from.exact') ||
                   get(orClause, 'transaction-from') ||
@@ -69,7 +70,16 @@ class TransactionSearcher {
       toBlockNumber = get(orClause, 'block-number.range.lte');
     }
 
-    let txns = await this.transactionIndex.getTransactionsForAddress(address, { sinceBlockNumber, toBlockNumber });
+    let onlySuccessfulTransactions = Boolean(get(orClause, 'transaction-successful.exact') ||
+                                             get(orClause, 'transaction-successful'));
+
+    let txns = await this.transactionIndex.getTransactionsForAddress(
+      address, {
+        onlySuccessfulTransactions,
+        sinceBlockNumber,
+        toBlockNumber,
+        limit
+      });
     if (!txns) { return { data: [] }; }
 
     return { data: txns.map(t => rawTransactionToResource(t)) };

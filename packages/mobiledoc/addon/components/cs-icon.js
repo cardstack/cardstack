@@ -6,6 +6,7 @@ import EditorList from '../templates/icons/editor/List';
 import EditorNumberList from '../templates/icons/editor/number-list';
 import EditorP from '../templates/icons/editor/P';
 import EditorQuote from '../templates/icons/editor/Quote';
+import EditorImage from '../templates/icons/editor/Image';
 
 import EditorBold from '../templates/icons/editor/Bold';
 import EditorSuperscript from '../templates/icons/editor/superscript';
@@ -22,6 +23,7 @@ const icons = {
   'EditorNumberList' : EditorNumberList,
   'EditorP' : EditorP,
   'EditorQuote' : EditorQuote,
+  'EditorImage': EditorImage,
 
   'EditorBold' : EditorBold,
   'EditorSuperscript' : EditorSuperscript,

@@ -9,20 +9,20 @@ const Change = require('./change');
 const os = require('os');
 const process = require('process');
 const Error = require('@cardstack/plugin-utils/error');
-const PendingChange = require('@cardstack/plugin-utils/pending-change');
 const { promisify } = require('util');
 const temp = require('temp').track();
 const Gitchain = require('@cardstack/gitchain');
 const log = require('@cardstack/logger')('cardstack/git');
+const stringify = require('json-stable-stringify-without-jsonify');
 
 const mkdir = promisify(temp.mkdir);
-
-const pendingChanges = new WeakMap();
+const defaultBranch = 'master';
 
 module.exports = class Writer {
-  static create(params) {
-    return new this(params);
+  static create(...args) {
+    return new this(...args);
   }
+
   constructor({ repo, idGenerator, basePath, branchPrefix, remote, hyperledger }) {
     this.repoPath = repo;
     this.basePath = basePath;
@@ -55,10 +55,10 @@ module.exports = class Writer {
     }
   }
 
-  async prepareCreate(branch, session, type, document, isSchema) {
+  async prepareCreate(session, type, document, isSchema) {
     return withErrorHandling(document.id, type, async () => {
       await this._ensureRepo();
-      let change = await Change.create(this.repo, null, this.branchPrefix + branch, this.fetchOpts);
+      let change = await Change.create(this.repo, null, this.branchPrefix + defaultBranch, this.fetchOpts);
 
       let id = document.id;
       let file;
@@ -83,14 +83,20 @@ module.exports = class Writer {
         gitDocument.relationships = document.relationships;
       }
 
-      let pending = new PendingChange(null, gitDocument, finalizer.bind(this));
       let signature = await this._commitOptions('create', document.type, id, session);
-      pendingChanges.set(pending, { type: document.type, id, signature, change, file });
-      return pending;
+      return {
+        finalDocument: gitDocument,
+        finalizer: finalizer.bind(this),
+        type: document.type,
+        id,
+        signature,
+        change,
+        file
+      };
     });
   }
 
-  async prepareUpdate(branch, session, type, id, document, isSchema) {
+  async prepareUpdate(session, type, id, document, isSchema) {
     if (!document.meta || !document.meta.version) {
       throw new Error('missing required field "meta.version"', {
         status: 400,
@@ -100,7 +106,7 @@ module.exports = class Writer {
 
     await this._ensureRepo();
     return withErrorHandling(id, type, async () => {
-      let change = await Change.create(this.repo, document.meta.version, this.branchPrefix + branch, this.fetchOpts);
+      let change = await Change.create(this.repo, document.meta.version, this.branchPrefix + defaultBranch, this.fetchOpts);
 
       let file = await change.get(this._filenameFor(type, id, isSchema), { allowUpdate: true });
       let before = JSON.parse(await file.getBuffer());
@@ -113,13 +119,20 @@ module.exports = class Writer {
       after.id = document.id;
       after.type = document.type;
       let signature = await this._commitOptions('update', type, id, session);
-      let pending = new PendingChange(before, after, finalizer.bind(this));
-      pendingChanges.set(pending, { type, id, signature, change, file });
-      return pending;
+      return {
+        originalDocument: before,
+        finalDocument: after,
+        finalizer: finalizer.bind(this),
+        type,
+        id,
+        signature,
+        change,
+        file
+      };
     });
   }
 
-  async prepareDelete(branch, session, version, type, id, isSchema) {
+  async prepareDelete(session, version, type, id, isSchema) {
     if (!version) {
       throw new Error('version is required', {
         status: 400,
@@ -128,17 +141,22 @@ module.exports = class Writer {
     }
     await this._ensureRepo();
     return withErrorHandling(id, type, async () => {
-      let change = await Change.create(this.repo, version, this.branchPrefix + branch, this.fetchOpts);
+      let change = await Change.create(this.repo, version, this.branchPrefix + defaultBranch, this.fetchOpts);
 
       let file = await change.get(this._filenameFor(type, id, isSchema));
       let before = JSON.parse(await file.getBuffer());
       file.delete();
       before.id = id;
       before.type = type;
-      let pending = new PendingChange(before, null, finalizer.bind(this));
       let signature = await this._commitOptions('delete', type, id, session);
-      pendingChanges.set(pending, { type, id, signature, change });
-      return pending;
+      return {
+        originalDocument: before,
+        finalizer: finalizer.bind(this),
+        type,
+        id,
+        signature,
+        change
+      };
     });
   }
 
@@ -196,14 +214,16 @@ module.exports = class Writer {
     }
   }
 
-  async _pushToHyperledger(sha) {
+  async _pushToHyperledger() {
     await this._ensureGitchain();
 
     if(this.gitChain) {
       // make sure only one push is ongoing at a time, by creating a chain of
       // promises here
       this._gitChainPromise = Promise.resolve(this._gitChainPromise).then(() =>
-        this.gitChain.push(sha)
+        this.gitChain.push(this.hyperledgerConfig.tag).catch(e => {
+          log.error("Error pushing to hyperledger:", e, e.stack);
+        })
       );
     }
   }
@@ -252,11 +272,13 @@ async function withErrorHandling(id, type, fn) {
 
 
 async function finalizer(pendingChange) {
-  let { id, type, change, file, signature } = pendingChanges.get(pendingChange);
+  let { id, type, change, file, signature } = pendingChange;
   return withErrorHandling(id, type, async () => {
     if (file) {
       if (pendingChange.finalDocument) {
-        file.setContent(JSON.stringify({
+        // use stringify library instead of JSON.stringify, since JSON's method
+        // is non-deterministic and could produce unnecessary diffs
+        file.setContent(stringify({
           attributes: pendingChange.finalDocument.attributes,
           relationships: pendingChange.finalDocument.relationships
         }, null, 2));
@@ -265,7 +287,7 @@ async function finalizer(pendingChange) {
       }
     }
     let version = await change.finalize(signature, this.remote, this.fetchOpts);
-    await this._pushToHyperledger(version);
+    await this._pushToHyperledger();
     return { version, hash: (file ? file.savedId() : null) };
   });
 }

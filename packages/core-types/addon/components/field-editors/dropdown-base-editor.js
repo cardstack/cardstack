@@ -35,7 +35,7 @@ export default Component.extend({
     let options;
     try {
       options = yield store.findAll(contentType);
-    } catch(e) {
+    } catch (e) {
       set(this, 'missingContentType', true);
     }
 
@@ -57,7 +57,7 @@ export default Component.extend({
 
     let displayFieldName = get(this, 'displayFieldName');
 
-    switch(get(this, 'matchBy')) {
+    switch (get(this, 'matchBy')) {
       case 'exact':
         query.filter[displayFieldName] = { exact: value };
         break;

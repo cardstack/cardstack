@@ -1,0 +1,15 @@
+<div class="cs-tools--launcher">
+  {{#edges.launcher}}
+    {{cs-tools-launcher}}
+  {{/edges.launcher}}
+</div>
+
+{{!-- do not display edges if user is not logged in but toggle was left on --}}
+{{#if (and tools.active tools.available)}}
+  {{cardstack-edge "top" (component "cs-header") tagName=""}}
+  {{cardstack-edge "right" (component "cs-editor-panel") tagName=""}}
+{{/if}}
+
+{{cs-field-overlays}}
+
+{{from-elsewhere name="paragraph-tools"}}

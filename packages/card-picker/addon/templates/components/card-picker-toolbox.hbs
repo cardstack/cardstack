@@ -1,21 +1,70 @@
-<div class="heading" data-card-picker-toolbox-header>
-  {{cardstack-query-editor query=query update=(action (mut query))}}
-  <button
-    onclick={{action "closePicker"}}
-    class="cardstack-card-picker--close-button"
-    data-test-card-picker-close-button
-  >
-    Close
-  </button>
+<div class="cardstack-card-picker--heading" data-card-picker-toolbox-header>
+  {{cardstack-query-editor
+    searchFields=cardPicker.searchFields
+    searchType=cardPicker.searchType
+    update=(action (mut query))
+  }}
+  <div class="cardstack-card-picker--button-container">
+    <button
+      onclick={{action "closePicker"}}
+      class="cardstack-card-picker--close-button"
+      data-test-card-picker-close-button
+    >
+      Close
+    </button>
+  </div>
 </div>
 
-<div class="cards-list">
-  {{#cardstack-search query=query as |content|}}
-    <div
-      role="button"
-      onclick={{action "select" content}}
-    >
-      {{cardstack-content format="embedded" content=content}}
+{{#cardstack-search
+  type=cardPicker.requestedType
+  sort=sort
+  pageSize=pageSize
+  query=query
+as |results isSearching cursor loadNext|
+}}
+  <div class="cardstack-card-picker--list-wrapper">
+    <div class="cardstack-card-picker--cards-list">
+      {{#each results as |content index|}}
+        <div
+          class="cardstack-card-picker--card"
+          data-card-picker-card={{index}}
+          role="button"
+          onclick={{action "select" content}}
+        >
+          {{!-- our visual designs have a very prescribed layout for images in
+                the card picker, so we use our own template for these.
+                we should really use the data service metadata service to grab the correct
+                fields to build these components instead of rendering cards in their embedded
+                format --}}
+          {{#if (eq content.type "cardstack-image")}}
+            {{card-picker-image-item content=content}}
+          {{else}}
+            {{cardstack-content format="embedded" content=content}}
+          {{/if}}
+        </div>
+      {{/each}}
     </div>
-  {{/cardstack-search}}
-</div>
+    {{#if isSearching}}
+      <div class="cardstack-card-picker--loading">Loading...</div>
+    {{/if}}
+
+    <div class="cardstack-card-picker--load-more-wapper">
+      {{#if cursor}}
+        <button class="cardstack-card-picker--load-more-button" {{action loadNext}}>Load More</button>
+      {{/if}}
+    </div>
+  </div>
+{{/cardstack-search}}
+
+{{!-- TODO need to figure out how to generalize this to work for all types of content types --}}
+{{#if (eq cardPicker.requestedType "cardstack-image")}}
+  <div class="cardstack-card-picker--footer">
+    {{#cardstack-image-upload uploadedImage=(action uploadedFile) as |uploadImage|}}
+      <button
+        class="cardstack-card-picker--upload-file-button" {{action uploadImage}}
+      >
+        Upload File
+      </button>
+    {{/cardstack-image-upload}}
+  </div>
+{{/if}}

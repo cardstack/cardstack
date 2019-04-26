@@ -1,4 +1,3 @@
-const PendingChange = require('@cardstack/plugin-utils/pending-change');
 const Error = require('@cardstack/plugin-utils/error');
 const { Pool } = require('pg');
 const { range }  = require('lodash');
@@ -6,77 +5,77 @@ const rowToDocument = require('./row-to-doc');
 const NameMapper = require('./name-mapper');
 
 const safeIdentifier = /^[a-zA-Z0-9._]+$/;
-const pendingChanges = new WeakMap();
 
 module.exports = class Writer {
-  static create(params) {
-    return new this(params);
+  static create(...args) {
+    return new this(...args);
   }
-  constructor({ branches, dataSource, renameColumns, renameTables }) {
-    this.branchConfig = branches;
-    this.pools = Object.create(null);
-    this.schemas = Object.create(null);
+  constructor({ config, dataSource, renameColumns, renameTables }) {
+    this.config = config;
+    this.pool = null;
+    this.schema = null;
     this.dataSource = dataSource;
     this.mapper = new NameMapper(renameTables, renameColumns);
   }
 
-  _getPool(branch) {
-    if (!this.pools[branch]) {
-      let config = this.branchConfig[branch];
-      this.pools[branch] = new Pool({
-        user: config.user,
-        host: config.host,
-        database: config.database,
-        password: config.password,
-        port: config.port
+  _getPool() {
+    if (!this.pool) {
+      let { user, host, database, password, port } = this.config;
+      this.pool = new Pool({
+        user,
+        host,
+        database,
+        password,
+        port
       });
     }
-    return this.pools[branch];
+    return this.pool;
   }
 
-  async _getSchema(branch) {
-    if (!this.schemas[branch]) {
-      let updater = await this.dataSource.indexer.beginUpdate(branch);
+  async _getSchema() {
+    if (!this.schema) {
+      let updater = await this.dataSource.indexer.beginUpdate();
       try {
-        this.schemas[branch] = await updater.schema();
+        this.schema = await updater.schema();
       } finally {
         await updater.destroy();
       }
     }
-    return this.schemas[branch];
+    return this.schema;
   }
 
   async teardown() {
-    for (let pool of Object.values(this.pools)) {
-      await pool.end();
-    }
+    await this.pool.end();
   }
 
-  async prepareCreate(branch, session, type, document, isSchema) {
-    let { schema, table, args, columns } = this._prepareQuery(isSchema, branch, type, document);
+  async prepareCreate(session, type, document, isSchema) {
+    let { schema, table, args, columns } = this._prepareQuery(isSchema, type, document);
     if (document.id != null) {
       args.push(document.id);
       columns.push('id');
     }
     let placeholders = range(1, args.length + 1).map(n => `$${n}`).join(',');
-    let client = await this._getPool(branch).connect();
+    let client = await this._getPool().connect();
     try {
       await client.query('begin');
       let result = await client.query(`insert into ${schema}.${table} (${columns.join(',')}) values (${placeholders}) returning *`, args);
-      let finalDocument = rowToDocument(this.mapper, await this._getSchema(branch), type, result.rows[0]);
-      let change = new PendingChange(null, finalDocument, finalize, abort);
-      pendingChanges.set(change, { client });
-      return change;
+      let finalDocument = rowToDocument(this.mapper, await this._getSchema(), type, result.rows[0]);
+      return {
+        finalDocument,
+        finalizer: finalize,
+        aborter: abort,
+        client
+      };
     } catch (err) {
       await client.release();
       rethrowNicerError(err);
     }
   }
 
-  async prepareUpdate(branch, session, type, id, document, isSchema) {
-    let { schema: dbschema, table, args, columns } = this._prepareQuery(isSchema, branch, type, document);
-    let client = await this._getPool(branch).connect();
-    let schema = await this._getSchema(branch);
+  async prepareUpdate(session, type, id, document, isSchema) {
+    let { schema: dbschema, table, args, columns } = this._prepareQuery(isSchema, type, document);
+    let client = await this._getPool().connect();
+    let schema = await this._getSchema();
     args.push(id);
     try {
       await client.query('begin');
@@ -87,25 +86,32 @@ module.exports = class Writer {
       let initialDocument = rowToDocument(this.mapper, schema, type, result.rows[0]);
       result = await client.query(`update ${dbschema}.${table} set ${columns.map((name,index) => `${name}=$${index+1}`).join(',')} where id=$${args.length} returning *`, args);
       let finalDocument = rowToDocument(this.mapper, schema, type, result.rows[0]);
-      let change = new PendingChange(initialDocument, finalDocument, finalize, abort);
-      pendingChanges.set(change, { client });
-      return change;
+      return {
+        originalDocument: initialDocument,
+        finalDocument,
+        finalizer: finalize,
+        aborter: abort,
+        client
+      };
     } catch (err) {
       await client.release();
       rethrowNicerError(err);
     }
   }
 
-  async prepareDelete(branch, session, version, type, id, isSchema) {
-    let { schema, table } = this._prepareQuery(isSchema, branch, type);
-    let client = await this._getPool(branch).connect();
+  async prepareDelete(session, version, type, id, isSchema) {
+    let { schema, table } = this._prepareQuery(isSchema, type);
+    let client = await this._getPool().connect();
     try {
       await client.query('begin');
-      let initialDocument = rowToDocument(this.mapper, await this._getSchema(branch), type, await client.query(`select * from ${schema}.${table} where id=$1`, [ id ]));
+      let initialDocument = rowToDocument(this.mapper, await this._getSchema(), type, await client.query(`select * from ${schema}.${table} where id=$1`, [ id ]));
       await client.query(`delete from ${schema}.${table} where id=$1`, [id]);
-      let change = new PendingChange(initialDocument, null, finalize, abort);
-      pendingChanges.set(change, { client });
-      return change;
+      return {
+        originalDocument: initialDocument,
+        finalizer: finalize,
+        aborter: abort,
+        client
+      };
     } catch (err) {
       await client.release();
       rethrowNicerError(err);
@@ -113,12 +119,12 @@ module.exports = class Writer {
 
   }
 
-  _prepareQuery(isSchema, branch, type, document) {
+  _prepareQuery(isSchema, type, document) {
     if (isSchema) {
       throw new Error("The @cardstack/postgresql data source does not support schema creation", { status: 400 });
     }
-    if (!this.branchConfig[branch]) {
-      throw new Error(`No such configured branch ${branch}`, { status: 400 });
+    if (!this.config) {
+      throw new Error(`No db configuration`);
     }
 
     let { schema, table } = this.mapper.tableForType(type);
@@ -161,13 +167,13 @@ function quoteKey(key) {
 }
 
 async function finalize(pendingChange) {
-  let { client } = pendingChanges.get(pendingChange);
+  let { client } = pendingChange;
   await client.query('commit');
   await client.release();
 }
 
 async function abort(pendingChange) {
-  let { client } = pendingChanges.get(pendingChange);
+  let { client } = pendingChange;
   await client.query('rollback');
   await client.release();
 }

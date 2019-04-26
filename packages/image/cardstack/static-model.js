@@ -9,6 +9,34 @@ module.exports = function({ storeImageMetadataIn }) {
     })
     .withRelated('fields', [
       factory.addResource('fields', 'alt-text').withAttributes({fieldType: '@cardstack/core-types::string'}),
+      factory.addResource('computed-fields', 'image-file-name').withAttributes({
+        editorOptions: { hideFromEditor: true },
+        'computed-field-type': '@cardstack/core-types::alias',
+        params: {
+          'aliasPath': 'file.file-name',
+        }
+      }),
+      factory.addResource('computed-fields', 'image-created-at').withAttributes({
+        editorOptions: { hideFromEditor: true },
+        'computed-field-type': '@cardstack/core-types::alias',
+        params: {
+          'aliasPath': 'file.created-at',
+        }
+      }),
+      factory.addResource('computed-fields', 'image-size').withAttributes({
+        editorOptions: { hideFromEditor: true },
+        'computed-field-type': '@cardstack/core-types::alias',
+        params: {
+          'aliasPath': 'file.size',
+        }
+      }),
+      factory.addResource('computed-fields', 'image-content-type').withAttributes({
+        editorOptions: { hideFromEditor: true },
+        'computed-field-type': '@cardstack/core-types::alias',
+        params: {
+          'aliasPath': 'file.content-type',
+        }
+      }),
       factory.addResource('fields', 'file')
         .withAttributes({
           'field-type': '@cardstack/core-types::belongs-to',

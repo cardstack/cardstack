@@ -1,36 +1,3 @@
-@import "base";
 @import "cardstack-card-picker";
 @import "cardstack-cards-editor";
-
-:root {
-    --deep-background: #01002C;
-    --normal-background: #343356;
-    --active-background: #252440;
-    --light-background: #fff;
-
-    --bright-foreground: #fff;
-    --rising-foreground: #aaa;
-
-    --tools-highlight: #63a9fa;
-    --deep-tools-highlight: #032c5b;
-    --faded-tools-highlight: #032c5b77;
-}
-
-
-@font-face {
-    font-family: 'Open Sans';
-    src: url('../@cardstack/tools/OpenSans-Regular.ttf');
-}
-
-@font-face {
-    font-family: 'Open Sans Bold';
-    src: url('../@cardstack/tools/OpenSans-Bold.ttf');
-}
-
-
-/* these classes comes from the ember-sidebars addon. We need to
-   increase the z-indices of the sidebars so they stay on top of the
-   scrims provided by ember-overlays. */
-.cst-bottom {
-    z-index: 150;
-}
+@import "card-picker-image-item";

@@ -26,7 +26,7 @@ export default DS.JSONAPIAdapter.extend(AdapterMixin, {
     upstreamQuery.page = { size: 1 };
     let response = await this._super(store, type, upstreamQuery);
     if (!response.data || !Array.isArray(response.data) || response.data.length < 1) {
-      throw new DS.AdapterError([ { code: 404, title: 'Not Found', detail: 'branch-adapter queryRecord got less than one record back' } ]);
+      throw new DS.AdapterError([ { code: 404, title: 'Not Found', detail: 'queryRecord got less than one record back' } ]);
     }
     let returnValue = {
       data: response.data[0],
@@ -39,13 +39,7 @@ export default DS.JSONAPIAdapter.extend(AdapterMixin, {
 
   buildURL(modelName, id, snapshot, requestType, query) {
     let actualModelName = snapshot && snapshot.modelName || query && query.modelName;
-    let url = this._super(actualModelName || modelName, id, snapshot, requestType, query);
-
-    if(snapshot && snapshot.adapterOptions && snapshot.adapterOptions.branch) {
-      url += `?branch=${snapshot.adapterOptions.branch}`;
-    }
-
-    return url;
+    return this._super(actualModelName || modelName, id, snapshot, requestType, query);
   },
 
   deleteRecord(store, type, snapshot) {

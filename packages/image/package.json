@@ -1,6 +1,6 @@
 {
   "name": "@cardstack/image",
-  "version": "0.13.39",
+  "version": "0.13.71",
   "description": "Image field plugin for cardstack",
   "keywords": [
     "ember-addon",
@@ -24,22 +24,23 @@
     "test": "ember try:each"
   },
   "dependencies": {
-    "@cardstack/plugin-utils": "0.13.39",
-    "@cardstack/test-support": "0.13.39",
+    "@cardstack/card-picker": "0.13.71",
+    "@cardstack/files": "0.13.71",
+    "@cardstack/plugin-utils": "0.13.71",
+    "@cardstack/test-support": "0.13.71",
     "ember-cli-babel": "^6.8.2",
     "ember-cli-htmlbars": "^2.0.1"
   },
   "devDependencies": {
-    "@cardstack/authentication": "0.13.39",
-    "@cardstack/ephemeral": "0.13.39",
-    "@cardstack/eslint-config": "0.13.39",
-    "@cardstack/files": "0.13.39",
-    "@cardstack/jsonapi": "0.13.39",
-    "@cardstack/mock-auth": "0.13.39",
-    "@cardstack/models": "0.13.39",
-    "@cardstack/rendering": "0.13.39",
-    "@cardstack/routing": "0.13.39",
-    "@cardstack/tools": "0.13.39",
+    "@cardstack/authentication": "0.13.71",
+    "@cardstack/ephemeral": "0.13.71",
+    "@cardstack/eslint-config": "0.13.71",
+    "@cardstack/jsonapi": "0.13.71",
+    "@cardstack/mock-auth": "0.13.71",
+    "@cardstack/models": "0.13.71",
+    "@cardstack/rendering": "0.13.71",
+    "@cardstack/routing": "0.13.71",
+    "@cardstack/tools": "0.13.71",
     "broccoli-asset-rev": "^2.4.5",
     "ember-cli": "^3.0.0",
     "ember-cli-dependency-checker": "^2.1.0",
@@ -48,12 +49,13 @@
     "ember-cli-qunit": "^4.1.0",
     "ember-cli-sri": "^2.1.0",
     "ember-cli-uglify": "^2.0.0",
-    "ember-data": "~3.2.0",
+    "ember-data": "^3.5.0",
     "ember-disable-prototype-extensions": "^1.1.2",
     "ember-export-application-global": "^2.0.0",
     "ember-fetch": "^6.4.0",
     "ember-load-initializers": "^1.0.0",
     "ember-maybe-import-regenerator": "^0.1.6",
+    "ember-qunit": "^4.1.2",
     "ember-resolver": "^4.0.0",
     "ember-source": "~3.2.0",
     "ember-source-channel-url": "^1.0.1",
@@ -62,7 +64,8 @@
     "eslint-plugin-ember": "^5.0.0",
     "eslint-plugin-mocha": "^5.2.0",
     "eslint-plugin-node": "^5.2.1",
-    "loader.js": "^4.2.3"
+    "loader.js": "^4.2.3",
+    "qunit-dom": "^0.8.0"
   },
   "engines": {
     "node": ">= 8"

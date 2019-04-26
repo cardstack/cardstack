@@ -6,14 +6,46 @@
    It's the first file we import into our main stylesheet because
    everything else should have higher priority.
 */
+:root {
+  --deep-background: #01002c;
+  --normal-background: #343356;
+  --active-background: #252440;
+  --light-background: #fff;
+
+  --dark-foreground: #01002c;
+  --normal-foreground: #343356;
+  --active-foreground: #00e1f9;
+  --bright-foreground: #fff;
+  --green-foreground: #6aca25;
+  --hot-pink-foreground: #ff0054;
+
+  --light50: rgba(255,255,255,0.5);
+  --light25: rgba(255,255,255,0.25);
+  --light05: rgba(255,255,255,0.05);
+  --dark50: rgba(0,0,0,0.5);
+
+  /* Overlays */
+  --overlays-highlight: #02dbf3;
+  --overlays-foreground: #000;
+
+  /* From previous color scheme - in use */
+  --light-foreground: #F2F2F2;
+  --tools-highlight: #63a9fa;
+  --deep-tools-highlight: #032c5b;
+  --tools-preview: #860404;
+  --error-border: #860404;
+
+  --cs-header-height: 60px;
+  --cs-editor-panel-width: 22rem;
+  --cs-mode-button-size: 3rem;
+}
+
 .cardstack-tools {
-    box-sizing: border-box;
-    background-color: var(--deep-background);
-    color: var(--bright-foreground);
-    font-family: 'Open Sans', 'helvetica', sans-serif;
-    font-size: 16px;
-    font-weight: normal;
-    letter-spacing: 0.1px;
-    line-height: 1.375em;
-    -webkit-font-smoothing: antialiased;
+  box-sizing: border-box;
+  font-family: 'Open Sans', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+  font-size: 16px;
+  font-weight: normal;
+  letter-spacing: 0.1px;
+  line-height: 1.375;
+  -webkit-font-smoothing: antialiased;
 }

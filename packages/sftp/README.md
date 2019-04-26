@@ -13,13 +13,11 @@ factory.addResource('data-sources', 'sftp')
     'source-type': '@cardstack/sftp',
     params: {
       contentType: 'sftp-files',
-      branches: {
-        master: {
-          host: '1.2.3.4',
-          port: 22,
-          username: 'someuser',
-          privateKey: require('fs').readFileSync('/path/to/private/key')
-        }
+      connection: {
+        host: '1.2.3.4',
+        port: 22,
+        username: 'someuser',
+        privateKey: require('fs').readFileSync('/path/to/private/key')
       }
     }
   });

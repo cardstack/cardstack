@@ -19,7 +19,7 @@ module.exports = class GitHubSearcher {
     this.cacheMaxAge = opts['cache-max-age'];
   }
 
-  async get(session, branch, type, id, next) {
+  async get(session, type, id, next) {
     let result = await next();
     if (result) {
       return result;
@@ -30,7 +30,7 @@ module.exports = class GitHubSearcher {
     }
   }
 
-  async search(session, branch, query, next) {
+  async search(session, query, next) {
     return next();
   }
 

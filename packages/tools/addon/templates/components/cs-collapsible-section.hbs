@@ -1,18 +1,6 @@
 {{! template-lint-disable no-invalid-interactive }}
-<header
-  class="cs-collapsible-section-header {{if opened "opened" "closed"}}"
-  onclick={{action "toggle"}}
->
-  <label class="cs-collapsible-section-header--label">{{title}}</label>
-  <button class="cs-collapsible-section-header--button">
-    {{cs-svg "toggle-arrow" width="16px" height="10px"}}
-  </button>
-</header>
-{{#liquid-if
-  opened
-  rules=animationRules
-  growDuration=250
-  growPixelsPerSecond=1
-}}
-  {{yield}}
-{{/liquid-if}}
+<div class="cs-collapsible-section--title" data-test-cs-collapsible-section-title>
+  {{title}}
+</div>
+
+{{yield}}

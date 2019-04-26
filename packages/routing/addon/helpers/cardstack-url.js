@@ -1,11 +1,10 @@
 import { inject as service } from '@ember/service';
 import Helper from '@ember/component/helper';
 import { get } from '@ember/object';
-import { defaultBranch } from '@cardstack/plugin-utils/environment';
 import { hrefTo } from 'ember-href-to/helpers/href-to';
 import { pluralize } from 'ember-inflector';
 
-export function urlForModel(context, model, { branch } = {}) {
+export function urlForModel(context, model, opts={})  {
   if (model) {
     let path = get(model, 'selfLink');
 
@@ -17,18 +16,18 @@ export function urlForModel(context, model, { branch } = {}) {
     if (path !== '/' && path.charAt(0) === '/') {
       path = path.replace('/', ''); // looks like ember router prepends an extra '/' to the path
     }
-    return urlForParams(context, path, { branch });
+    return urlForParams(context, path, opts);
   }
 }
 
-export function urlForParams(context, path, { branch } = {}) {
+export function urlForParams(context, path, /*opts={}*/) {
   if (!path) { return; }
 
   if (path !== '/' && path.charAt(0) === '/') {
     path = path.replace('/', ''); // looks like ember router prepends an extra '/' to the path
   }
   path = encodeURI(path);
-  let { name, params, queryParams } = get(context, 'cardstackRouting').routeFor(path, branch || defaultBranch);
+  let { name, params, queryParams } = get(context, 'cardstackRouting').routeFor(path);
   return hrefTo(context, name, ...params.map(p => p[1]), { isQueryParams: true, values: queryParams });
 }
 

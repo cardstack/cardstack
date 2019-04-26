@@ -204,7 +204,7 @@ describe('jsonapi/middleware', function() {
     it('returns 404 for missing individual resource', async function() {
       let response = await request.get('/api/articles/98766');
       expect(response).hasStatus(404);
-      expect(response.body).to.have.deep.property('errors[0].detail', 'No such resource master/articles/98766');
+      expect(response.body).to.have.deep.property('errors[0].detail', 'No such resource local-hub/articles/98766');
     });
 
     it('can get a collection resource', async function() {
@@ -348,7 +348,7 @@ describe('jsonapi/middleware', function() {
       });
       expect(response.body.errors).collectionContains({
         title: 'Validation error',
-        detail: 'body must be present',
+        detail: 'Body must be present',
         source: { pointer: '/data/attributes/body' }
       });
     });
@@ -704,7 +704,7 @@ describe('jsonapi/middleware', function() {
       await env.setUserId(null);
       let response = await request.get('/api/articles/0');
       expect(response).hasStatus(404);
-      expect(response.body).to.have.deep.property('errors[0].detail', 'No such resource master/articles/0');
+      expect(response.body).to.have.deep.property('errors[0].detail', 'No such resource local-hub/articles/0');
     });
 
     it('applies authorization during collection get', async function() {

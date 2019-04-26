@@ -1,17 +1,28 @@
+import Component from '@ember/component';
 import { observer, computed } from '@ember/object';
 import { inject as service } from '@ember/service';
-import Component from '@ember/component';
-import layout from '../templates/components/cardstack-search';
-import { task } from 'ember-concurrency';
-import { singularize } from 'ember-inflector';
-import { timeout } from 'ember-concurrency';
+import { task, timeout } from 'ember-concurrency';
+import { pluralize, singularize } from 'ember-inflector';
+import { A } from '@ember/array';
+import { resolve } from 'rsvp';
 import qs from 'qs';
+import layout from '../templates/components/cardstack-search';
 
 export default Component.extend({
   layout,
   tagName: '',
   store: service(),
   ajax: service(),
+  cardstackSession: service(),
+  liquidFireTransitions: service(),
+
+  init() {
+    this._super(...arguments);
+
+    if (this.get('type')) {
+      this.get('search').perform();
+    }
+  },
 
   search: task(function * (cursor, debounce) {
     if (debounce) {
@@ -19,25 +30,33 @@ export default Component.extend({
     }
 
     let query = this.get('query');
-
-    if (!query) {
-      this.set('items', []);
-      this.set('links', null);
-      this.set('meta', null);
-      return;
-    }
-
     let restQuery = Object.assign({}, query);
+
+    let token = this.get('cardstackSession.token');
+    let sort = this.get('sort');
+    if (sort) {
+      restQuery.sort = sort;
+    }
+    let pageSize = this.get('pageSize');
+    if (pageSize) {
+      restQuery.page = { size: pageSize };
+    }
 
     if (cursor) {
       restQuery.page = { cursor };
     }
 
-    let adapter = this.get('store').adapterFor('article');
+    // TODO how to handle the scenario where no this.type is specified?
+    let adapter = this.get('store').adapterFor(this.type);
 
-    let response = yield this.get('ajax').request(`/${this.type || ''}?${qs.stringify(restQuery)}`, {
+    // searching while animating results in lots of jank...
+    yield resolve(this.get('liquidFireTransitions').waitUntilIdle());
+
+    let response = yield this.get('ajax').request(`/${pluralize(this.type) || ''}?${qs.stringify(restQuery)}`, {
       host: adapter.host,
       namespace: adapter.namespace,
+      contentType: 'application/vnd.api+json',
+      headers: { 'authorization': `Bearer ${token}` }
     });
 
     let models = pushMixedPayload(this.get('store'), response);
@@ -68,7 +87,7 @@ export default Component.extend({
 function pushMixedPayload(store, rawPayload) {
   let serializer = store.serializerFor('application');
 
-  return rawPayload.data.map(model => {
+  return A(rawPayload.data.map(model => {
     let ModelClass = store.modelFor(singularize(model.type));
 
     let jsonApiPayload = serializer.normalizeResponse(store, ModelClass, Object.assign({}, rawPayload, {
@@ -76,5 +95,5 @@ function pushMixedPayload(store, rawPayload) {
     }), null, 'query');
 
     return store.push(jsonApiPayload);
-  });
+  }));
 }

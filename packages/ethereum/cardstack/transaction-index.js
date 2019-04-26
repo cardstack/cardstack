@@ -72,7 +72,7 @@ class TransactionIndex extends TransactionIndexBase {
     log.warn(`Failing over ethereum client ${this.currentJsonRpcUrl}`);
 
     await this.ethereumClient.stopAll();
-    if (this.urlIndex > this.jsonRpcUrls.length - 1) {
+    if (this.urlIndex >= this.jsonRpcUrls.length - 1) {
       this.urlIndex = 0;
     } else {
       this.urlIndex++;
@@ -104,7 +104,7 @@ class TransactionIndex extends TransactionIndexBase {
     return row;
   }
 
-  async getTransactionsForAddress(address, { sinceBlockNumber, toBlockNumber }) {
+  async getTransactionsForAddress(address, { onlySuccessfulTransactions, sinceBlockNumber, toBlockNumber, limit }) {
     await this.ensureDatabaseSetup();
     await this._indexingPromise;
 
@@ -115,7 +115,13 @@ class TransactionIndex extends TransactionIndexBase {
     if (toBlockNumber != null) {
       query += ` and block_number <= ${toBlockNumber}`;
     }
+    if (onlySuccessfulTransactions) {
+      query += ` and transaction_successful = TRUE`;
+    }
     query += ` order by block_number, transaction_index`;
+    if (limit != null) {
+      query += ` limit ${limit}`;
+    }
 
     log.trace(`getting transactions for address '${address}' since block '${sinceBlockNumber || 0}' to block '${toBlockNumber || 'latest'}' with sql: ${query}`);
     let start = Date.now();

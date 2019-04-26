@@ -5,11 +5,7 @@ module.exports = declareInjections({
   loadInitialModels: 'config:initial-models'
 }, class Indexer {
 
-  async branches() {
-    return ['master'];
-  }
-
-  async beginUpdate(/* branch */) {
+  async beginUpdate() {
     if (this.initialModels) {
       throw new Error("The ephemeral data source no longer accepts params.initialModels. Use the new general-purpose seed model support instead.");
     }
@@ -47,6 +43,14 @@ class Updater {
     }
 
     for (let entry of this.storage.modelsNewerThan(generation)) {
+      if (entry.model) {
+        await ops.save(entry.type, entry.id, { data: Object.assign({}, entry.model, { meta: { version: String(entry.generation) } }) });
+      } else {
+        await ops.delete(entry.type, entry.id);
+      }
+    }
+
+    for (let entry of this.storage.blobsNewerThan(generation)) {
       if (entry.model) {
         await ops.save(entry.type, entry.id, { data: Object.assign({}, entry.model, { meta: { version: String(entry.generation) } }) });
       } else {

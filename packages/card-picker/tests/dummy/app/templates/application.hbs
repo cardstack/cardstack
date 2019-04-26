@@ -1,10 +1,15 @@
 {{#cardstack-edges}}
-  {{outlet}}
-
   <button
     onclick={{action "openButton"}}
     data-test-open-bottom-edge
   >
     Open Bottom edge
   </button>
+
+  {{#if card}}
+    <div class="selected-image">
+      {{card-picker-image-item content=card}}
+    </div>
+  {{/if}}
+  {{outlet}}
 {{/cardstack-edges}}

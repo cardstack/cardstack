@@ -2,6 +2,9 @@
 
 This README outlines the details of collaborating on this Ember addon.
 
+Note that this addon provides an Ember component implementation for the embedded form of the
+ `cardstack-images` card, so that `cardstack-images` cards can be used in mobiledoc documents.
+
 ## Installation
 
 * `git clone <repository-url>` this repository

@@ -19,6 +19,22 @@ module.exports = [
   },
   {
     type: 'data-sources',
+    id: 'mock-auth',
+    attributes: {
+      'source-type': '@cardstack/mock-auth',
+      params: {
+        users: {
+          user1: {
+            name: 'Carl Stack',
+            email: 'carlstack@cardstack.com',
+            verified: true
+          }
+        }
+      }
+    }
+  },
+  {
+    type: 'data-sources',
     id: '@cardstack/files',
     attributes: {
       'source-type': '@cardstack/files',

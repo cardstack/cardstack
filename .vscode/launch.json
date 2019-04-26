@@ -74,6 +74,7 @@
               "CARDSTACK_SESSIONS_KEY":"OQUQi8NH0asrYgeoE10ijOFBhd/P1BU8HZP/rNqO5nw=",
               "PGSEARCH_NAMESPACE":"cardstack_data_development",
               "INITIAL_DATA_DIR":"${workspaceFolder}/packages/tools/tests/dummy/cardstack",
+              "HUB_ENVIRONMENT":"test",
               "PORT":"3000"
           },
           "args": [
@@ -113,12 +114,15 @@
             "program": "${workspaceRoot}/node_modules/.bin/_mocha",
             "console": "integratedTerminal",
             "cwd": "${workspaceRoot}",
+            "env": {
+                "HUB_ENVIRONMENT": "test",
+            },
             "args": [
                 "packages/test-support/bin/run.js",
                 "--timeout",
                 "200000",
                 // "--grep",
-                // "does not return expired searcher#get included resources"
+                // "can delete a record"
             ]
         },
         {

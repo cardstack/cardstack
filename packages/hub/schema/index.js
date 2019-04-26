@@ -6,7 +6,6 @@ const { partition, uniqWith, isEqual, uniq } = require('lodash');
 module.exports = declareInjections({
   schemaLoader: 'hub:schema-loader',
   searchers: 'hub:searchers',
-  controllingBranch: 'hub:controlling-branch'
 },
 
 class Schema {
@@ -14,7 +13,7 @@ class Schema {
     return new this(opts);
   }
 
-  constructor({ types, fields, computedFields, dataSources, inputModels, plugins, schemaLoader, searchers, controllingBranch, grants }) {
+  constructor({ types, fields, computedFields, dataSources, inputModels, plugins, schemaLoader, searchers, grants }) {
     this.types = types;
     this.realFields = fields;
     this.computedFields = computedFields;
@@ -28,7 +27,6 @@ class Schema {
     this._abstractRealms = null;
     this.schemaLoader = schemaLoader;
     this.searchers = searchers;
-    this.controllingBranch = controllingBranch;
   }
 
   get realAndComputedFields() {
@@ -232,13 +230,13 @@ class Schema {
       return;
     }
 
-    return userType.hasLoginAuthorization(userRealms);
+    return await userType.hasLoginAuthorization(userRealms);
   }
 
-  authorizedReadRealms(type, resource) {
+  async authorizedReadRealms(type, documentContext) {
     let contentType = this.types.get(type);
     if (contentType) {
-      return contentType.authorizedReadRealms(resource);
+      return await contentType.authorizedReadRealms(documentContext);
     } else {
       return [];
     }

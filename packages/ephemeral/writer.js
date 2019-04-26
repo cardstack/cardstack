@@ -1,11 +1,8 @@
 const crypto = require('crypto');
 const Error = require('@cardstack/plugin-utils/error');
-const PendingChange = require('@cardstack/plugin-utils/pending-change');
 const { declareInjections } = require('@cardstack/di');
 const { statSync } = require("fs");
 const streamToPromise = require('stream-to-promise');
-
-const pendingChanges = new WeakMap();
 
 module.exports = declareInjections({
   indexers: 'hub:indexers',
@@ -19,11 +16,7 @@ module.exports = declareInjections({
     return this._storage;
   }
 
-  async prepareCreate(branch, session, type, document, isSchema) {
-    if (branch !== 'master') {
-      throw new Error("ephemeral storage only supports branch master");
-    }
-
+  async prepareCreate(session, type, document, isSchema) {
     let id = document.id;
     if (id == null) {
       id = this._generateId();
@@ -43,17 +36,18 @@ module.exports = declareInjections({
       storedDocument.relationships = document.relationships;
     }
 
-    let pending = new PendingChange(null, storedDocument, finalizer);
-    pendingChanges.set(pending, { type, id, storage: this.storage, isSchema: isSchema });
-    return pending;
+    return {
+      finalDocument: storedDocument,
+      finalizer,
+      type,
+      id,
+      storage: this.storage,
+      isSchema
+    };
   }
 
-  async prepareBinaryCreate(branch, session, type, stream) {
-    if (branch !== 'master') {
-      throw new Error("ephemeral storage only supports branch master");
-    }
-
-    let id = this._generateId();
+  async prepareBinaryCreate(session, type, stream) {
+    let id = stream.id || this._generateId();
 
     let storedDocument = {
       type: 'cardstack-files',
@@ -62,23 +56,27 @@ module.exports = declareInjections({
         'created-at':   new Date().toISOString(),
         'size':         statSync(stream.path).size,
         'content-type': stream.mimeType,
-        'file-name':    stream.filename
+        'file-name':    stream.filename || stream.path
       }
     };
 
     let binaryFinalizer = async (pendingChange) => {
-      let { storage, type, id } = pendingChanges.get(pendingChange);
+      let { storage, type, id } = pendingChange;
       let blob = await streamToPromise(stream);
 
-      return { version: storage.storeBinary(type, id, blob) };
+      return { version: storage.storeBinary(type, id, storedDocument, blob) };
     };
 
-    let pending = new PendingChange(null, storedDocument, binaryFinalizer);
-    pendingChanges.set(pending, { type, id, storage: this.storage });
-    return pending;
+    return {
+      finalDocument: storedDocument,
+      finalizer: binaryFinalizer,
+      type,
+      id,
+      storage: this.storage
+    };
   }
 
-  async prepareUpdate(branch, session, type, id, document, isSchema) {
+  async prepareUpdate(session, type, id, document, isSchema) {
     if (!document.meta || !document.meta.version) {
       throw new Error('missing required field "meta.version"', {
         status: 400,
@@ -94,12 +92,19 @@ module.exports = declareInjections({
       });
     }
     let after = patch(before, document);
-    let pending = new PendingChange(before, after, finalizer);
-    pendingChanges.set(pending, { type, id, storage: this.storage, isSchema, ifMatch: document.meta.version });
-    return pending;
+    return {
+      originalDocument: before,
+      finalDocument: after,
+      finalizer,
+      type,
+      id,
+      storage: this.storage,
+      isSchema,
+      ifMatch: document.meta.version
+    };
   }
 
-  async prepareDelete(branch, session, version, type, id, isSchema) {
+  async prepareDelete(session, version, type, id, isSchema) {
     if (!version) {
       throw new Error('version is required', {
         status: 400,
@@ -114,9 +119,15 @@ module.exports = declareInjections({
         source: { pointer: '/data/id' }
       });
     }
-    let pending = new PendingChange(before, null, finalizer);
-    pendingChanges.set(pending, { type, id, storage: this.storage, isSchema, ifMatch: version });
-    return pending;
+    return {
+      originalDocument: before,
+      finalizer,
+      type,
+      id,
+      storage: this.storage,
+      isSchema,
+      ifMatch: version
+    };
   }
 
   _generateId() {
@@ -140,7 +151,7 @@ function patch(before, diffDocument) {
 }
 
 async function finalizer(pendingChange) {
-  let { storage, isSchema, ifMatch, type, id } = pendingChanges.get(pendingChange);
+  let { storage, isSchema, ifMatch, type, id } = pendingChange;
 
   if (type === 'checkpoints') {
     return { version: storage.makeCheckpoint(id) };

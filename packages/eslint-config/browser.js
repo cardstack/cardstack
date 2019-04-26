@@ -14,7 +14,8 @@ module.exports = {
     es6: true
   },
   rules: {
-    'no-restricted-globals': [2, 'find']
+    'no-restricted-globals': [2, 'find'],
+    'keyword-spacing': [2],
   },
   overrides: [
     // This loads our node rules
