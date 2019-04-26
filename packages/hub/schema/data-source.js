@@ -3,7 +3,7 @@ const authLog = require('@cardstack/logger')('cardstack/auth');
 const util = require('util');
 const resolve = util.promisify(require('resolve'));
 const bootstrapSchema = require('../bootstrap-schema');
-const { get, partition } = require('lodash');
+const { get } = require('lodash');
 const { cardContextFromId, cardContextToId } = require('@cardstack/plugin-utils/card-context');
 
 module.exports = class DataSource {
