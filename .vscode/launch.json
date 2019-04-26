@@ -121,8 +121,8 @@
                 "packages/test-support/bin/run.js",
                 "--timeout",
                 "200000",
-                "--grep",
-                "hub/cards"
+                // "--grep",
+                // "hub/cards"
             ]
         },
         {
