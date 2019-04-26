@@ -1,37 +1,21 @@
 import DAGMap from 'dag-map';
 
 let idGenerator = 0;
-const DELIM = '::';
 
 export default class JSONAPIFactory {
-  constructor(sourceId, packageName) {
+  constructor() {
     this.data = [];
-    this.sourceId = sourceId;
-    this.packageName = packageName;
   }
 
-  addResource(type, _id=null) {
-    let id = _id;
-    if (type === 'card-definitions' && this.sourceId != null && this.packageName != null) {
-      id = [ this.sourceId, this.packageName ].join(DELIM);
-    } else {
-      if (id == null) {
-        id = idGenerator++;
-      }
-      if (this.sourceId != null && this.packageName != null) {
-        id = [this.sourceId, this.packageName, id].join(DELIM);
-      }
+  addResource(type, id=null) {
+    if (id == null) {
+      id = idGenerator++;
     }
     let resource = { type, id: String(id) };
     this.data.push(resource);
     resource.type = type;
 
-    let _resource = new ResourceFactory(resource);
-    if (this.sourceId != null && this.packageName != null && _id != null &&
-      (type === 'content-types' || 'fields')) {
-      _resource.withAttributes({ 'name': _id });
-    }
-    return _resource;
+    return new ResourceFactory(resource);
   }
 
   getResource(type, id) {
@@ -43,29 +27,30 @@ export default class JSONAPIFactory {
   }
 
 
-  getModelsFor(type, id) {
+  getDocumentFor({type, id}) {
     let model;
-    if (type === 'card-definitions' && this.sourceId != null && this.packageName != null) {
-      id = [ this.sourceId, this.packageName ].join(DELIM);
-    }
     if (type != null && id != null) {
       model = this.data.find(i => i.id === id && i.type === type);
     }
-    if (!model) { return []; }
+    if (!model) { return; }
 
     let dag = new DAGMap();
     this._getModelsRelatedTo(model, dag);
-    let output = [];
+    let output = { data: model };
+    let included = [];
     dag.each((key, value) => {
-      if (value) {
-        output.push(value);
+      if (value && !(value.type === type && value.id === id)) {
+        included.push(value);
       }
     });
+    if (included.length) {
+      output.included = included;
+    }
+
     return output;
   }
 
   _getModelsRelatedTo(model, dag, relatedModels=[]) {
-    relatedModels.push(model);
     let modelRefs = getModelDependencies(model, dag);
     for (let relatedModelRef of modelRefs) {
       if ([
@@ -77,6 +62,7 @@ export default class JSONAPIFactory {
       let relatedModel = this.data.find(i => `${i.type}/${i.id}` === relatedModelRef);
       if (!relatedModel) { continue; }
 
+      relatedModels.push(relatedModel);
       this._getModelsRelatedTo(relatedModel, dag, relatedModels);
     }
   }

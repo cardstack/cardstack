@@ -143,74 +143,18 @@ describe('hub/cards', function () {
     describe('invalid schema scenarios', function () {
       // no need to teardown() since env is never created in these scenarios
 
-      it('throws when card schema create non-schema models', async function () {
+      it('throws when card schema does not return a card-definitions document', async function() {
         let factory = new JSONAPIFactory();
         factory.addResource('data-sources').withAttributes({ 'source-type': 'person-card' });
 
         let error;
         try {
-          await createDefaultEnvironment(`${__dirname}/../../../tests/stub-cards/non-schema-models-in-schema-file`, factory.getModels());
+          await createDefaultEnvironment(`${__dirname}/../../../tests/stub-cards/schema-returns-non-card-definitions-document`, factory.getModels());
         } catch (e) {
           error = e;
         }
 
-        expect(error.message).to.match(/Non-schema models are not allowed in schemas/);
-      });
-
-      it('throws when card schema models are not scoped to the source and package that they originate from (which can happen when JSONAPIFactory is not given source and package context)', async function () {
-        let factory = new JSONAPIFactory();
-        factory.addResource('data-sources').withAttributes({ 'source-type': 'person-card' });
-
-        let error;
-        try {
-          await createDefaultEnvironment(`${__dirname}/../../../tests/stub-cards/jsonapi-factory-missing-card-context`, factory.getModels());
-        } catch (e) {
-          error = e;
-        }
-
-        expect(error.message).to.match(/has schema models that are not scoped to this data source and package/);
-      });
-
-      it('throws when card-defintions id does not match source::package of the schema file name', async function () {
-        let factory = new JSONAPIFactory();
-        factory.addResource('data-sources').withAttributes({ 'source-type': 'person-card' });
-
-        let error;
-        try {
-          await createDefaultEnvironment(`${__dirname}/../../../tests/stub-cards/card-definition-id-does-not-match-package-name`, factory.getModels());
-        } catch (e) {
-          error = e;
-        }
-
-        expect(error.message).to.match(/that is not scoped for this source::package/);
-      });
-
-      it('throws when there are mulitple card definitions in schema file', async function () {
-        let factory = new JSONAPIFactory();
-        factory.addResource('data-sources').withAttributes({ 'source-type': 'person-card' });
-
-        let error;
-        try {
-          await createDefaultEnvironment(`${__dirname}/../../../tests/stub-cards/multiple-card-definitions-in-same-schema-file`, factory.getModels());
-        } catch (e) {
-          error = e;
-        }
-
-        expect(error.message).to.match(/has more than one card-definitions model/);
-      });
-
-      it('throws when there are no card definitions in schema file', async function () {
-        let factory = new JSONAPIFactory();
-        factory.addResource('data-sources').withAttributes({ 'source-type': 'person-card' });
-
-        let error;
-        try {
-          await createDefaultEnvironment(`${__dirname}/../../../tests/stub-cards/no-card-definitions-in-schema-file`, factory.getModels());
-        } catch (e) {
-          error = e;
-        }
-
-        expect(error.message).to.match(/has no card-definitions model/);
+        expect(error.message).to.match(/defines schema document that is not of type 'card-definitions'/);
       });
 
       it('throws when content type defined in the card schema uses a field not contained within the card schema', async function () {

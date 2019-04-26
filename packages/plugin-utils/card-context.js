@@ -34,9 +34,6 @@ function cardContextToId({
   if (packageName == null) {
     throw new Error(`Not enough card context provided to build id. Missing packageName for ${sourceId}/${packageName}/${cardId}`);
   }
-  if (cardId == null) {
-    throw new Error(`Not enough card context provided to build id. Missing cardId for ${sourceId}/${packageName}/${cardId}`);
-  }
 
   let idPart = [ sourceId, packageName, cardId, modelId ].filter(i => i != null).join(cardContextDelim);
   return [ idPart, snapshotVersion ].filter(i => i != null).join(cardVersionDelim);

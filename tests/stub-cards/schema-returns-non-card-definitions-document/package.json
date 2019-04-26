@@ -1,5 +1,5 @@
 {
-  "name": "multiple-card-definitions-in-same-schema-file",
+  "name": "schema-returns-non-card-definitions-document",
   "dependencies": {
     "person-card": "*"
   },

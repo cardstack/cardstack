@@ -121,8 +121,8 @@
                 "packages/test-support/bin/run.js",
                 "--timeout",
                 "200000",
-                // "--grep",
-                // "throws when there are mulitple card definitions in schema file"
+                "--grep",
+                "hub/cards"
             ]
         },
         {
