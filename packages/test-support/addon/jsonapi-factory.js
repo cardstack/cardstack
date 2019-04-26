@@ -31,11 +31,15 @@ export default class JSONAPIFactory {
       let dependsOn = [];
       if (model.relationships) {
         Object.keys(model.relationships).forEach(rel => {
-          let data = model.relationships[rel].data;
-          if (Array.isArray(data)) {
-            dependsOn = dependsOn.concat(data.map(ref => `${ref.type}/${ref.id}`));
-          } else {
-            dependsOn.push(`${data.type}/${data.id}`);
+          let { data/*, links*/ } = model.relationships[rel];
+
+
+          if (data) {
+            if (Array.isArray(data)) {
+              dependsOn = dependsOn.concat(data.map(ref => `${ref.type}/${ref.id}`));
+            } else {
+              dependsOn.push(`${data.type}/${data.id}`);
+            }
           }
         });
       }
@@ -89,15 +93,28 @@ class ResourceFactory {
       throw new Error(`No value for ${fieldName}`);
     }
     if (!this.data.relationships) {
-        this.data.relationships = {};
+      this.data.relationships = {};
     }
     let data;
     if (Array.isArray(value)) {
-      data = value.map(entry => ({ type: entry.type, id: entry.id}));
+      data = value.map(entry => ({ type: entry.type, id: entry.id }));
     } else {
-      data ={ type: value.type, id: value.id};
+      data = { type: value.type, id: value.id };
     }
     this.data.relationships[dasherize(fieldName)] = { data };
+    return this;
+  }
+  withRelatedLink(fieldName, link) {
+    if (!link) {
+      throw new Error(`No link for ${fieldName}`);
+    }
+    if (typeof link !== 'string') {
+      throw new Error(`Link must be a string: link is ${JSON.stringify(link, null, 2)}`);
+    }
+    if (!this.data.relationships) {
+      this.data.relationships = {};
+    }
+    this.data.relationships[dasherize(fieldName)] = { links: { related: link } };
     return this;
   }
   asDocument() {

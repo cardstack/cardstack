@@ -4,7 +4,6 @@ import { inject as service } from '@ember/service';
 
 export default Component.extend({
   cardstackEdges: service(),
-  topRightCornerBelongsTo: "right",
   layout,
   tagName: ''
 });

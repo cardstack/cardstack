@@ -238,19 +238,6 @@ module('Integration | Models', function(hooks) {
     assert.deepEqual(model.constructor.metaForProperty('title').options.inlineEditorOptions, { style: 'extra-fancy-inline' });
   });
 
-  test('it sends the branch query param correctly', async function(assert) {
-    let adapter = this.owner.lookup('adapter:post');
-
-    let snapshot = {
-      adapterOptions: {
-        branch: 'master'
-      }
-    };
-    let builtUrl = adapter.buildURL('test', 'id', snapshot, 'findRecord');
-
-    assert.equal(builtUrl, 'http://localhost:3000/api/tests/id?branch=master');
-  });
-
   // Ember runloop.
   function run(fn) {
     return RSVP.resolve().then(() => fn.apply(this, arguments));

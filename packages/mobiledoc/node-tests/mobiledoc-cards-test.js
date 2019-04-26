@@ -77,7 +77,7 @@ describe('mobiledoc/mobiledoc-cards computed tests', function () {
     after(teardown);
 
     it('can derive relationships to cards embedded within mobiledoc', async function () {
-      let { data: model } = await env.lookup('hub:searchers').get(env.session, 'master', 'articles', article.id);
+      let { data: model } = await env.lookup('hub:searchers').get(env.session, 'local-hub', 'articles', article.id);
       expect(model.relationships['mobiledoc-cards'].data).to.eql([
         { type: 'cardstack-images', id: 'e252cbe3d8181bb14f68c7a78c776bdc494d7b37'},
         { type: 'cardstack-images', id: '627a28a74fe9d2aaf44ebeaa689ecba46dd44079'},

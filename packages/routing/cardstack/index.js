@@ -1,14 +1,14 @@
 const Session = require('@cardstack/plugin-utils/session');
 const { get, uniq } = require('lodash');
 
-async function getRoute(searchers, router, branch, path, applicationCard, session) {
+async function getRoute(searchers, router, path, applicationCard, session) {
   let query;
   let { route: matchedRoute,
     remainingPath,
     params,
     routingCard,
     routingCardsCache,
-    allowedQueryParams } = await routeThatMatchesPath(searchers, router, branch, path, applicationCard);
+    allowedQueryParams } = await routeThatMatchesPath(searchers, router, path, applicationCard);
 
   if (!matchedRoute) { return; }
 
@@ -66,8 +66,8 @@ function isCanonicalRoute(route) {
   return uniqueFieldName.exact === ':friendly_id';
 }
 
-async function buildRoutingCardsCache({ searchers, branch, resolvedPath, context, applicationCard, routeStack=[] }) {
-  if (!searchers || !branch) { return {}; }
+async function buildRoutingCardsCache({ searchers, resolvedPath, context, applicationCard, routeStack=[] }) {
+  if (!searchers) { return {}; }
 
   let routingCards = { antecedantResolution: {}, cardResolution: {} };
   let typeRegex = /:(?!card:)[\w-]+\[([^\]]+)\]/g;
@@ -94,7 +94,7 @@ async function buildRoutingCardsCache({ searchers, branch, resolvedPath, context
         if (query.includes(':card:')) {
           query = resolveRoutingCardReplacementTags(get(routingCards, `antecedantResolution.${route.contentType}`), query, routingCards);
         }
-        let { data: cards } = await searchers.search(Session.INTERNAL_PRIVILEGED, branch, JSON.parse(query));
+        let { data: cards } = await searchers.search(Session.INTERNAL_PRIVILEGED, JSON.parse(query));
         if (cards.length) {
           if (route === cardRoute) {
             routingCards.antecedantResolution[type] = { data: cards[0] };
@@ -146,14 +146,14 @@ function resolveReplacementTagsFromPath(route, path, string, session) {
   return result;
 }
 
-async function getRoutingCardForRoute(searchers, route, branch, path, routingCardsCache={}) {
+async function getRoutingCardForRoute(searchers, route, path, routingCardsCache={}) {
   for (let parentRoute of route.routeStack) {
     if (!parentRoute.query) { continue; }
 
     let query = resolveReplacementTagsFromPath(parentRoute, path, JSON.stringify(parentRoute.query));
     let routingCardType = route.routeStack.length ? route.routeStack[0].contentType : null;
     query = resolveRoutingCardReplacementTags(get(routingCardsCache, `antecedantResolution.${routingCardType}`), query, routingCardsCache);
-    let { data:routingCards } = await searchers.search(Session.INTERNAL_PRIVILEGED, branch, JSON.parse(query));
+    let { data:routingCards } = await searchers.search(Session.INTERNAL_PRIVILEGED, JSON.parse(query));
     return routingCards.length ? { data: routingCards[0] } : null;
   }
 }
@@ -200,7 +200,7 @@ function buildSubstitutionDictionary(route, path, session) {
   return dictionary;
 }
 
-async function routeThatMatchesPath(searchers, router, branch, path, applicationCard) {
+async function routeThatMatchesPath(searchers, router, path, applicationCard) {
   let matchedRoute, routingCard, routingCardsCache;
   let remainingPath = path.split('?')[0];
   let params = {};
@@ -213,12 +213,11 @@ async function routeThatMatchesPath(searchers, router, branch, path, application
       routingCardsCache = await buildRoutingCardsCache({
         context: route.namespacedPath,
         resolvedPath: path,
-        branch,
         searchers,
         routeStack: route.routeStack,
         applicationCard,
       });
-      routingCard = await getRoutingCardForRoute(searchers, route, branch, path, routingCardsCache);
+      routingCard = await getRoutingCardForRoute(searchers, route, path, routingCardsCache);
 
       if (routePath.includes(':card')) {
         routePath = resolveRoutingCardReplacementTags(

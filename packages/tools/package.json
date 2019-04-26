@@ -1,6 +1,6 @@
 {
   "name": "@cardstack/tools",
-  "version": "0.13.68",
+  "version": "0.13.71",
   "description": "The default blueprint for ember-cli addons.",
   "keywords": [
     "ember-addon",
@@ -14,6 +14,10 @@
     "test": "tests"
   },
   "scripts": {
+    "start-prereqs": "docker run -d -p 5432:5432 --rm --name cardstack-pg cardstack/pg-test",
+    "stop-prereqs": "docker stop cardstack-pg",
+    "start-hub": "ember hub:start",
+    "start-ember": "HUB_URL=http://localhost:3000 ember serve",
     "build": "ember build",
     "lint:hbs": "ember-template-lint .",
     "lint:js": "eslint .",
@@ -22,10 +26,10 @@
     "test:all": "ember try:each"
   },
   "dependencies": {
-    "@cardstack/data": "0.13.68",
-    "@cardstack/edges": "0.13.68",
-    "@cardstack/plugin-utils": "0.13.68",
-    "@cardstack/rendering": "0.13.68",
+    "@cardstack/data": "0.13.71",
+    "@cardstack/edges": "0.13.71",
+    "@cardstack/plugin-utils": "0.13.71",
+    "@cardstack/rendering": "0.13.71",
     "ember-cli-babel": "^6.16.0",
     "ember-cli-htmlbars": "^2.0.1",
     "ember-cli-is-component": "^0.5.0",
@@ -44,14 +48,14 @@
     "postcss-import": "^9.1.0"
   },
   "devDependencies": {
-    "@cardstack/authentication": "0.13.68",
-    "@cardstack/ephemeral": "0.13.68",
-    "@cardstack/eslint-config": "0.13.68",
-    "@cardstack/jsonapi": "0.13.68",
-    "@cardstack/mock-auth": "0.13.68",
-    "@cardstack/models": "0.13.68",
-    "@cardstack/routing": "0.13.68",
-    "@cardstack/test-support": "0.13.68",
+    "@cardstack/authentication": "0.13.71",
+    "@cardstack/ephemeral": "0.13.71",
+    "@cardstack/eslint-config": "0.13.71",
+    "@cardstack/jsonapi": "0.13.71",
+    "@cardstack/mock-auth": "0.13.71",
+    "@cardstack/models": "0.13.71",
+    "@cardstack/routing": "0.13.71",
+    "@cardstack/test-support": "0.13.71",
     "@ember/optional-features": "^0.6.3",
     "broccoli-asset-rev": "^2.7.0",
     "ember-cli": "~3.4.3",
@@ -78,6 +82,7 @@
     "eslint-plugin-mocha": "^5.2.0",
     "eslint-plugin-node": "^7.0.1",
     "loader.js": "^4.7.0",
+    "qs": "^6.6.0",
     "qunit-dom": "^0.8.0",
     "squishable-container": "^0.1.0"
   },

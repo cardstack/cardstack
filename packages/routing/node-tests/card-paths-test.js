@@ -167,7 +167,7 @@ describe('routing/paths', function () {
     });
 
     it('doesnt get a path for "spaces" content-type', async function() {
-      let space = await (await env.lookup('hub:searchers')).getFromControllingBranch(env.session, 'spaces', '/');
+      let space = await (await env.lookup('hub:searchers')).getSpace(env.session, '/');
       let path = await getCardPath(space);
       expect(path).is.not.ok;
     });

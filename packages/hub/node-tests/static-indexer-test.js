@@ -29,12 +29,12 @@ describe('static-indexer', function() {
 
   it('can rely on static content', async function() {
     env = await createDefaultEnvironment(project, factory.getModels());
-    await env.lookup('hub:searchers').get(env.session, 'master', 'other-things', '2');
+    await env.lookup('hub:searchers').get(env.session, 'local-hub', 'other-things', '2');
   });
 
   it('has access to data source params', async function() {
     env = await createDefaultEnvironment(project, factory.getModels());
-    let thing = await env.lookup('hub:searchers').get(env.session, 'master', 'other-things', '2');
+    let thing = await env.lookup('hub:searchers').get(env.session, 'local-hub', 'other-things', '2');
     expect(thing).has.deep.property('data.attributes.title-of-thing', 'chocolate cake');
   });
 

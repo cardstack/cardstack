@@ -13,7 +13,7 @@ class TransactionSearcher {
     this.transactionIndex = transactionIndex;
   }
 
-  async get(session, branch, type, id, next) {
+  async get(session, type, id, next) {
     if (type === 'ethereum-transactions') {
       return await this._getTransaction(id);
     }
@@ -33,7 +33,7 @@ class TransactionSearcher {
   //     }]
   //   }
   // }
-  async search(session, branch, query, next) {
+  async search(session, query, next) {
     if (Array.isArray(get(query, 'filter.or')) &&
       query.filter.or.every(i => get(i, 'type.exact') === 'ethereum-transactions' ||
                                  get(i, 'type') === 'ethereum-transactions')) {

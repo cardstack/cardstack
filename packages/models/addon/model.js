@@ -39,7 +39,7 @@ export default DS.Model.extend(RelationshipTracker, {
     let modelSave = this._super.bind(this);
 
     if (Object.keys(this.ownedRelationships).length > 0) {
-      await this.saveRelated();
+      await this.saveRelated(...arguments);
     }
 
     await modelSave(...arguments);
@@ -51,7 +51,7 @@ export default DS.Model.extend(RelationshipTracker, {
       if (isRelationDirty) {
         let relatedRecords = relatedRecordsFor(this, relationName);
         let dirtyRecords = relatedRecords.filter(record => record.hasDirtyFields);
-        return Promise.all(dirtyRecords.map(record => record.save()));
+        return Promise.all(dirtyRecords.map(record => record.save(...arguments)));
       }
     });
     return Promise.all(flatten(relatedSaves));
@@ -136,9 +136,9 @@ function createHasDirtyOwned(model, ownedRelationships, properties) {
       dependentKeys.push(`'${relationName}.@each.hasDirtyOwned'`);
     }
     return dependentKeys;
-  }, []).join(',');
+  }, []);
 
-  defineProperty(model, 'hasDirtyOwned', computed('hasDirtyOwnedRelationships', dependentKeys, function() {
+  defineProperty(model, 'hasDirtyOwned', computed('hasDirtyOwnedRelationships', ...dependentKeys, function() {
     if (model.hasDirtyOwnedRelationships) {
       return true;
     }

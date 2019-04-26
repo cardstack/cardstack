@@ -1,7 +1,6 @@
 import Component from '@ember/component';
 import { inject as service } from '@ember/service';
 import layout from '../templates/components/cs-mobiledoc-card';
-import { defaultBranch } from '@cardstack/plugin-utils/environment';
 
 export default Component.extend({
   layout,
@@ -11,11 +10,9 @@ export default Component.extend({
   async init() {
     this._super(...arguments);
     let { card: { type, id } } = this.get('payload') || { card: {} }; // this is the mobiledoc card, not to be confused with the cardstack card
-    // TODO need to get the branch context for this mobiledoc card, maybe it's available from query params?
-    let branch = defaultBranch;
 
     // Need to defer Fastboot rendering here?
-    let card = await this.get('cardstackData').load(type, id, 'embedded', { branch });
+    let card = await this.get('cardstackData').load(type, id, 'embedded');
     this.set('card', card);
   },
 

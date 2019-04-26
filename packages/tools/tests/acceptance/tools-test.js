@@ -4,6 +4,7 @@ import { visit, click, fillIn, triggerEvent, waitFor, settled } from '@ember/tes
 import { login } from '../helpers/login';
 import { ciSessionId } from '@cardstack/test-support/environment';
 import { hubURL } from '@cardstack/plugin-utils/environment';
+import { findTriggerElementWithLabel } from '../helpers/query-selectors';
 
 let nonce = 0;
 
@@ -25,23 +26,6 @@ async function getDocuments(type) {
   return (await response.json()).data;
 }
 
-function findTriggerElementWithLabel(labelRegex) {
-  return [...this.element.querySelectorAll('.cs-toolbox-section label')].find(element => labelRegex.test(element.textContent));
-}
-
-function findAddNewButtonWithLabel(buttonTextRegex) {
-  return [...this.element.querySelectorAll('.cs-create-menu ul li')].find(element => buttonTextRegex.test(element.textContent));
-}
-
-function findSectionLabels(label) {
-  return [...this.element.querySelectorAll('.cs-toolbox-section label')].filter(element => label === element.textContent);
-}
-
-function findInputWithValue(value) {
-  return Array.from(this.element.querySelectorAll('input'))
-    .find(element => element.value === value);
-}
-
 module('Acceptance | tools', function(hooks) {
   setupApplicationTest(hooks);
 
@@ -53,33 +37,39 @@ module('Acceptance | tools', function(hooks) {
     delete localStorage['cardstack-tools'];
   });
 
-  test('activate tools', async function(assert) {
+  test('activating tools on a post page displays header and editor panel', async function(assert) {
     await visit('/hub/posts/1');
     await login();
-    await click('.cardstack-tools-launcher');
-    await waitFor('.cs-active-composition-panel--main');
+    await click('[data-test-cardstack-tools-launcher]');
 
-    let element = findTriggerElementWithLabel.call(this, /Title/);
-    await click(element);
-    let matching = findInputWithValue.call(this, '10 steps to becoming a fearsome pirate');
-    assert.ok(matching, 'found field editor for title');
+    assert.dom('[data-test-cs-header]').exists();
+    assert.dom('[data-test-cs-editor-panel]').exists();
+  });
 
-    element = findTriggerElementWithLabel.call(this, /Comment #1: Body/);
-    await click(element);
-    matching = findInputWithValue.call(this, 'Look behind you, a Three-Headed Monkey!');
-    assert.ok(matching, 'found field editor for comment body');
+  test('editor main panel can display all field types', async function (assert) {
+    await visit('/hub/posts/1');
+    await login();
+    await click('[data-test-cardstack-tools-launcher]');
+    await waitFor('[data-test-cs-active-composition-panel-main]');
 
-    element = findTriggerElementWithLabel.call(this, /Author Name/);
-    await click(element);
-    matching = findInputWithValue.call(this, 'LeChuck');
-    assert.ok(matching, 'found field editor for comment poster name');
+    assert.dom('[data-test-cs-collapsible-section=post-1-title]').exists('post-title section exists');
+    assert.dom('[data-test-cs-collapsible-section=post-1-title] [data-test-cs-collapsible-section-title]').hasText('Title');
+    assert.dom('[data-test-cs-collapsible-section=post-1-title] [data-test-cs-field-editor=title] input').hasValue('10 steps to becoming a fearsome pirate');
+
+    assert.dom('[data-test-cs-collapsible-section=comment-1-body]').exists('comment-body section exists');
+    assert.dom('[data-test-cs-collapsible-section=comment-1-body] [data-test-cs-collapsible-section-title]').hasText('Comment #1: Body');
+    assert.dom('[data-test-cs-collapsible-section=comment-1-body] [data-test-cs-field-editor=body] input').hasValue('Look behind you, a Three-Headed Monkey!');
+
+    assert.dom('[data-test-cs-collapsible-section=post-1-author-name]').exists('author-name section exists');
+    assert.dom('[data-test-cs-collapsible-section=post-1-author-name] [data-test-cs-collapsible-section-title]').hasText('Author Name');
+    assert.dom('[data-test-cs-collapsible-section=post-1-author-name] [data-test-cs-field-editor=author-name] input').hasValue('LeChuck');
   });
 
   test('field groups for related types are rendered correctly', async function(assert) {
     await visit('/hub/posts/1');
     await login();
-    await click('.cardstack-tools-launcher');
-    await waitFor('.cs-active-composition-panel--main');
+    await click('[data-test-cardstack-tools-launcher]');
+    await waitFor('[data-test-cs-active-composition-panel-main]');
 
     assert.dom('[data-test=reading-time]').containsText('8 minutes');
     assert.dom('[data-test=karma-0]').containsText('10 Good');
@@ -89,175 +79,130 @@ module('Acceptance | tools', function(hooks) {
   test('show validation error', async function(assert) {
     await visit('/hub/posts/1');
     await login();
-    await click('.cardstack-tools-launcher');
-    await waitFor('.cs-active-composition-panel--main');
+    await click('[data-test-cardstack-tools-launcher]');
+    await waitFor('[data-test-cs-active-composition-panel-main]');
 
-    let element = findTriggerElementWithLabel.call(this, /Title/);
-    await click(element);
-
-    let titleEditor = findInputWithValue.call(this, '10 steps to becoming a fearsome pirate');
+    let titleEditor = '[data-test-cs-collapsible-section=post-1-title] [data-test-cs-field-editor=title] input';
     await fillIn(titleEditor, '');
     await triggerEvent(titleEditor, 'blur');
-    await waitFor('[data-test-validation-error=title]')
+    await waitFor('[data-test-validation-error=title]');
     assert.dom('[data-test-validation-error=title]').hasText('Title must not be empty');
 
-    element = findTriggerElementWithLabel.call(this, /Body/);
-    await click(element);
-    let commentBodyEditor = findInputWithValue.call(this, 'Look behind you, a Three-Headed Monkey!');
+    let commentBodyEditor = '[data-test-cs-collapsible-section=comment-1-body] [data-test-cs-field-editor=body] input';
     await fillIn(commentBodyEditor, '');
     await triggerEvent(commentBodyEditor, 'blur');
-    await waitFor('[data-test-validation-error=body]')
+    await waitFor('[data-test-validation-error=body]');
     assert.dom('[data-test-validation-error=body]').hasText('Body must not be empty');
   });
 
-  test('show validation error for new resource', async function(assert) {
+  test('show validation error for new resource', async function (assert) {
     await visit('/hub/posts/new');
     await login();
-    await click('.cardstack-tools-launcher');
-    await click('[data-test-cs-editor-switch]');
-    await click('[data-test-cs-version-control-button-save]');
+    await click('[data-test-cardstack-tools-launcher]');
+    await click('[data-test-cs-version-control-button-save="false"]');
     await settled();
 
-    assert.dom('[data-test-field-name=title]').hasClass('invalid');
-
-    let element = findTriggerElementWithLabel.call(this, /Title/);
-    await click(element);
+    assert.dom('[data-test-cs-collapsible-section=post--title]').hasClass('invalid');
     assert.dom('[data-test-validation-error=title]').hasText('Title must not be empty');
   });
 
   test('show all fields, not just those rendered from template', async function(assert) {
     await visit('/hub/posts/1');
     await login();
-    await click('.cardstack-tools-launcher');
-    await waitFor('.cs-active-composition-panel--main');
+    await click('[data-test-cardstack-tools-launcher]');
+    await waitFor('[data-test-cs-active-composition-panel-main]');
 
-    let archivedSection = findTriggerElementWithLabel.call(this, /Archived/);
-    assert.ok(archivedSection, "Unrendered field appears in editor");
-
-    let titleSections = findSectionLabels.call(this, "Title");
-    assert.equal(titleSections.length, 1, "Rendered fields only appear once");
+    assert.dom('[data-test-cs-collapsible-section=post-1-archived]').exists("Unrendered field appears in editor");
+    assert.dom('[data-test-cs-collapsible-section=post-1-title]').exists({ count: 1 }, "Rendered fields only appear once");
   });
 
-  test('it shows fields in the header section before the save button when sort order is less than 100', async function(assert) {
+  test('it shows fields in the header section', async function(assert) {
     await visit('/hub/posts/1');
     await login();
-    await click('.cardstack-tools-launcher');
-    await waitFor('.cs-active-composition-panel--main');
+    await click('[data-test-cardstack-tools-launcher]');
+    await waitFor('[data-test-cs-active-composition-panel-header]');
 
-    assert.dom('.cs-version-control-header-fields--top-fields [data-test-cs-field-editor="keywords"]').exists();
-    assert.dom('.cs-version-control-header-fields--top-fields [data-test-cs-field-editor="rating"]').exists();
-    assert.dom('.cs-version-control-header-fields--top-fields [data-test-cs-field-editor="createdAt"]').doesNotExist();
-  });
-
-  test('it shows fields in the header section after the save button when sort order is greater than 100', async function(assert) {
-    await visit('/hub/posts/1');
-    await login();
-    await click('.cardstack-tools-launcher');
-    await waitFor('.cs-active-composition-panel--main');
-
-    assert.dom('.cs-version-control-header-fields--bottom-fields [data-test-cs-field-editor="keywords"]').doesNotExist();
-    assert.dom('.cs-version-control-header-fields--bottom-fields [data-test-cs-field-editor="rating"]').doesNotExist();
-    assert.dom('.cs-version-control-header-fields--bottom-fields [data-test-cs-field-editor="createdAt"]').exists();
+    assert.dom('[data-test-cs-active-composition-panel-top-fields] [data-test-cs-field-editor="keywords"]').exists();
+    assert.dom('[data-test-cs-active-composition-panel-top-fields] [data-test-cs-field-editor="rating"]').exists();
+    assert.dom('[data-test-cs-active-composition-panel-top-fields] [data-test-cs-field-editor="created-at"]').exists();
   });
 
   test('it can hide the title of fields in the header section', async function(assert) {
     await visit('/hub/posts/1');
     await login();
-    await click('.cardstack-tools-launcher');
-    await waitFor('.cs-active-composition-panel--main');
+    await click('[data-test-cardstack-tools-launcher]');
+    await waitFor('[data-test-cs-active-composition-panel-header]');
 
-    let ratingSection = document.querySelector('[data-test-cs-field-editor="rating"]').closest('.cs-field-editor-section');
-    assert.notOk(ratingSection.querySelector('.cs-field-editor-section--title'));
-    let keywordsSection = document.querySelector('[data-test-cs-field-editor="keywords"]').closest('.cs-field-editor-section');
-    assert.ok(keywordsSection.querySelector('.cs-field-editor-section--title'));
+    assert.dom('[cs-field-editor-section-title="rating"]').doesNotExist();
+    assert.dom('[cs-field-editor-section-title="keywords"]').exists();
   });
 
   test('fields shown in the header section are not shown in the non-header section (main section)', async function(assert) {
     await visit('/hub/posts/1');
     await login();
-    await click('.cardstack-tools-launcher');
-    await waitFor('.cs-active-composition-panel--main');
+    await click('[data-test-cardstack-tools-launcher]');
+    await waitFor('[data-test-cs-active-composition-panel-main]');
 
-    let ratingFields = document.querySelectorAll('[data-test-cs-field-editor="rating"]');
-    let keywordsFields = document.querySelectorAll('[data-test-cs-field-editor="keywords"]');
-    let createdAtFields = document.querySelectorAll('[data-test-cs-field-editor="createdAt"]');
-
-    assert.equal(ratingFields.length, 1);
-    assert.equal(keywordsFields.length, 1);
-    assert.equal(createdAtFields.length, 1);
+    assert.dom('[data-test-cs-field-editor="rating"]').exists({ count: 1 });
+    assert.dom('[data-test-cs-field-editor="keywords"]').exists({ count: 1 });
+    assert.dom('[data-test-cs-field-editor="created-at"]').exists({ count: 1 });
   });
 
   test('it does not collapse sections for right edge input fields that are not rendered in the template when you type in the field', async function(assert) {
     await visit('/hub/posts/1');
     await login();
-    await click('.cardstack-tools-launcher');
-    await waitFor('.cs-active-composition-panel--main');
+    await click('[data-test-cardstack-tools-launcher]');
+    await waitFor('[data-test-cs-active-composition-panel-main]');
 
-    let slugLabel = findTriggerElementWithLabel.call(this, /Slug/);
-    await click(slugLabel);
-    let slugSection = slugLabel.closest('section');
-
-    let slugInput = slugSection.querySelector('input');
+    let slugInput = '[data-test-cs-collapsible-section=post-1-slug] [data-test-cs-field-editor=slug] input';
     await fillIn(slugInput, 'h');
 
-    slugInput = slugSection.querySelector('input');
     assert.dom(slugInput).isVisible();
   });
 
   test('show unrendered fields from related, owned records', async function(assert) {
     await visit('/hub/posts/1');
     await login();
-    await click('.cardstack-tools-launcher');
-    await waitFor('.cs-active-composition-panel--main');
+    await click('[data-test-cardstack-tools-launcher]');
+    await waitFor('[data-test-cs-active-composition-panel-main]');
 
-    assert.ok(findTriggerElementWithLabel.call(this, /Comment #1: Review Status/));
-    assert.ok(findTriggerElementWithLabel.call(this, /Comment #2: Review Status/));
+    assert.dom('[data-test-cs-collapsible-section=comment-1-review-status] [data-test-cs-collapsible-section-title]').hasText('Comment #1: Review Status');
+    assert.dom('[data-test-cs-collapsible-section=comment-2-review-status] [data-test-cs-collapsible-section-title]').hasText('Comment #2: Review Status');
   });
 
 
-  test('collapsible panel captions are unambiguous', async function(assert) {
+  test('panel captions of field groups are unambiguous', async function(assert) {
     await visit('/hub/posts/1');
     await login();
-    await click('.cardstack-tools-launcher');
-    await waitFor('.cs-active-composition-panel--main');
+    await click('[data-test-cardstack-tools-launcher]');
+    await waitFor('[data-test-cs-active-composition-panel-main]');
 
-    assert.ok(findTriggerElementWithLabel.call(this, /Comment #1: Body/));
-    assert.ok(findTriggerElementWithLabel.call(this, /Comment #1: Karma/));
-    assert.ok(findTriggerElementWithLabel.call(this, /Comment #2: Body/));
-    assert.ok(findTriggerElementWithLabel.call(this, /Comment #2: Karma/));
+    assert.dom('[data-test-cs-collapsible-section=comment-1-body] [data-test-cs-collapsible-section-title]').hasText('Comment #1: Body');
+    assert.dom('[data-test-cs-collapsible-section=comment-1-karma] [data-test-cs-collapsible-section-title]').hasText('Comment #1: Karma');
+    assert.dom('[data-test-cs-collapsible-section=comment-2-body] [data-test-cs-collapsible-section-title]').hasText('Comment #2: Body');
+    assert.dom('[data-test-cs-collapsible-section=comment-2-karma] [data-test-cs-collapsible-section-title]').hasText('Comment #2: Karma');
   });
 
   test('disable inputs for computed fields', async function(assert) {
     await visit('/hub/posts/1');
     await login();
-    await click('.cardstack-tools-launcher');
-    await waitFor('.cs-active-composition-panel--main');
+    await click('[data-test-cardstack-tools-launcher]');
+    await waitFor('[data-test-cs-active-composition-panel-main]');
 
-    let authorNameSectionTrigger = findTriggerElementWithLabel.call(this, /Author Name/);
-    await click(authorNameSectionTrigger);
-
-    let nameInput = findInputWithValue.call(this, 'LeChuck');
+    let nameInput = '[data-test-cs-collapsible-section=post-1-author-name] [data-test-cs-field-editor=author-name] input';
     assert.dom(nameInput).isDisabled('Computed field is disabled');
   });
 
   test('allow editing fields for related, owned records', async function(assert) {
     await visit('/hub/posts/1');
     await login();
-    await click('.cardstack-tools-launcher');
-    await waitFor('.cs-active-composition-panel--main');
-    await waitFor('.cs-editor-switch')
-    await click('.cs-editor-switch');
+    await click('[data-test-cardstack-tools-launcher]');
+    await waitFor('[data-test-cs-active-composition-panel-main]');
 
-    let reviewStatusActionTrigger = findTriggerElementWithLabel.call(this, /Comment #1: Review Status/);
-    await click(reviewStatusActionTrigger);
-
-    let reviewStatusInput = findInputWithValue.call(this, 'approved');
+    let reviewStatusInput = '[data-test-cs-collapsible-section=comment-1-review-status] [data-test-cs-field-editor=review-status] input';
     assert.dom(reviewStatusInput).isNotDisabled();
 
-    reviewStatusActionTrigger = findTriggerElementWithLabel.call(this, /Comment #2: Review Status/);
-    await click(reviewStatusActionTrigger);
-
-    reviewStatusInput = findInputWithValue.call(this, 'pending');
+    reviewStatusInput = '[data-test-cs-collapsible-section=comment-2-review-status] [data-test-cs-field-editor=review-status] input';
     assert.dom(reviewStatusInput).isNotDisabled();
   });
 
@@ -271,55 +216,26 @@ module('Acceptance | tools', function(hooks) {
 
     let categoryPopularity = findTriggerElementWithLabel.call(this, /Category #1: Popularity/);
     assert.ok(categoryPopularity, 'field is rendered in editor');
-
-  });
-
-  test('track field dirtiness in owned, related records', async function(assert) {
-    await visit('/hub/posts/1');
-    await login();
-    await click('.cardstack-tools-launcher');
-    await waitFor('.cs-active-composition-panel--main');
-    await waitFor('.cs-editor-switch')
-    await click('.cs-editor-switch');
-
-    assert.dom('[data-test-cs-version-control-dropdown-option-status]').hasText('published');
-
-    let reviewStatusActionTrigger = findTriggerElementWithLabel.call(this, /Comment #1: Karma/);
-    await click(reviewStatusActionTrigger);
-
-    let karmaInput = findInputWithValue.call(this, '10');
-    await fillIn(karmaInput, '9');
-    assert.dom('[data-test-cs-version-control-dropdown-option-status]').hasText('edited');
-
-    await fillIn(karmaInput, '10');
-    assert.dom('[data-test-cs-version-control-dropdown-option-status]').hasText('published');
   });
 
   test('allow editing fields of newly added, owned records', async function(assert) {
     await visit('/hub/posts/1');
     await login();
-    await click('.cardstack-tools-launcher');
-    await waitFor('.cs-active-composition-panel--main');
-    await waitFor('.cs-editor-switch')
-    await click('.cs-editor-switch');
+    await click('[data-test-cardstack-tools-launcher]');
+    await waitFor('[data-test-cs-active-composition-panel-main]');
 
-    let categoryPanel = findTriggerElementWithLabel.call(this, /Categories/);
-    await click(categoryPanel);
-    await click('[data-test-add-category-button]');
+    await click('[data-test-cs-collapsible-section=post-1-categories] [data-test-add-category-button]');
     await fillIn('.category-editor:last-of-type > input', 'Pirating');
 
-    let popularityPanel = findTriggerElementWithLabel.call(this, /Category #: Popularity/);
-    await click(popularityPanel);
-    assert.dom('.field-editor > input').isNotDisabled();
+    let popularityInput = '[data-test-cs-collapsible-section=category-1-popularity] [data-test-cs-field-editor=popularity] input';
+    assert.dom(popularityInput).isNotDisabled();
   });
 
   test('can hide fields from editor', async function (assert) {
     await visit('/hub/posts/1');
     await login();
-    await click('.cardstack-tools-launcher');
-    await waitFor('.cs-active-composition-panel--main');
-    await waitFor('.cs-editor-switch')
-    await click('.cs-editor-switch');
+    await click('[data-test-cardstack-tools-launcher]');
+    await waitFor('[data-test-cs-active-composition-panel-main]');
 
     assert.dom('[data-test-field-name="hidden-field-from-editor"]').doesNotExist();
     assert.dom('[data-test-dummy-hidden-field-from-editor]').hasText('This field is hidden from the editor');
@@ -329,40 +245,58 @@ module('Acceptance | tools', function(hooks) {
   test('allow editing fields of newly added record', async function(assert) {
     await visit('/hub/posts/1');
     await login();
-    await click('.cardstack-tools-launcher');
-    await waitFor('.cs-active-composition-panel--main');
-    await waitFor('.cs-editor-switch')
-    await click('.cs-editor-switch');
+    await click('[data-test-cardstack-tools-launcher]');
+    await waitFor('[data-test-cs-active-composition-panel-main]');
 
-    await click('.cs-create-button');
+    await click('[data-test-cs-create-button]');
+    await click('[data-test-cs-create-menu-item=posts] button');
+    await waitFor('[data-test-cs-active-composition-panel-main]');
 
-    let newPostButton = findAddNewButtonWithLabel.call(this, /Posts/);
-    await click(newPostButton);
+    assert.dom('[data-test-cs-collapsible-section=post--title] [data-test-cs-field-editor=title] input').isNotDisabled();
+  });
 
-    let titleSectionTrigger = findTriggerElementWithLabel.call(this, /Title/);
-    await click(titleSectionTrigger);
+  test('adding new record updates the query-based relationship', async function(assert) {
+    await visit('/hub/catalogs/1');
 
-    assert.dom('.field-editor > input').isNotDisabled();
+    assert.dom('.popular-posts .post-embedded').exists({ count: 1 });
+    assert.dom('.popular-posts .post-embedded:nth-of-type(1)').hasText('Second Post');
+    assert.dom('.top-post .post-embedded').exists({ count: 1 });
+    assert.dom('.top-post .post-embedded').hasText('Second Post');
+
+    await login();
+    await click('[data-test-cardstack-tools-launcher]');
+    await waitFor('[data-test-cs-editor-panel]');
+
+    await click('[data-test-cs-create-button]');
+    await click('[data-test-cs-create-menu-item="posts"] button');
+
+    let titleInput = '[data-test-cs-collapsible-section=post--title] input';
+    await fillIn(titleInput, 'Adventures in Pirating');
+
+    let ratingInput = '[data-test-cs-field-editor="rating"] input';
+    await fillIn(ratingInput, 5);
+
+    await click('[data-test-cs-version-control-button-save="false"]');
+    await waitFor('[data-test-cs-version-control-button-save="true"]');
+    await visit('/hub/catalogs/1');
+
+    assert.dom('.popular-posts .post-embedded').exists({ count: 2 });
+    assert.dom('.popular-posts .post-embedded:nth-of-type(1)').hasText('Adventures in Pirating');
+    assert.dom('.popular-posts .post-embedded:nth-of-type(2)').hasText('Second Post');
+    assert.dom('.top-post .post-embedded').exists({ count: 1 });
+    assert.dom('.top-post .post-embedded').hasText('Adventures in Pirating');
   });
 
   test('saving a new document changes the URL to the canonical path of the saved document', async function(assert) {
     await visit('/hub/posts/1');
     await login();
-    await click('.cardstack-tools-launcher');
-    await waitFor('.cs-active-composition-panel--main');
-    await waitFor('.cs-editor-switch')
-    await click('.cs-editor-switch');
+    await click('[data-test-cardstack-tools-launcher]');
+    await waitFor('[data-test-cs-active-composition-panel-main]');
 
-    await click('.cs-create-button');
+    await click('[data-test-cs-create-button]');
+    await click('[data-test-cs-create-menu-item=posts] button');
 
-    let newPostButton = findAddNewButtonWithLabel.call(this, /Posts/);
-    await click(newPostButton);
-
-    let titleSectionTrigger = findTriggerElementWithLabel.call(this, /Title/);
-    await click(titleSectionTrigger);
-
-    let titleSection = titleSectionTrigger.closest('section');
-    let titleInput = titleSection.querySelector('input');
+    let titleInput = '[data-test-cs-collapsible-section=post--title] input';
     let title = `document ${Date.now()}-${nonce++}`;
     await fillIn(titleInput, title);
 
@@ -378,33 +312,23 @@ module('Acceptance | tools', function(hooks) {
   test('fields can be edited after new document has been saved', async function(assert) {
     await visit('/hub/posts/1');
     await login();
-    await click('.cardstack-tools-launcher');
-    await waitFor('.cs-active-composition-panel--main');
-    await waitFor('.cs-editor-switch')
-    await click('.cs-editor-switch');
+    await click('[data-test-cardstack-tools-launcher]');
+    await waitFor('[data-test-cs-editor-panel]');
 
-    await click('.cs-create-button');
+    await click('[data-test-cs-create-button]');
+    await click('[data-test-cs-create-menu-item="posts"] button');
+    await waitFor('[data-test-cs-active-composition-panel-main]');
 
-    let newPostButton = findAddNewButtonWithLabel.call(this, /Posts/);
-    await click(newPostButton);
-
-    let titleSectionTrigger = findTriggerElementWithLabel.call(this, /Title/);
-    await click(titleSectionTrigger);
-
-    let titleSection = titleSectionTrigger.closest('section');
-    let titleInput = titleSection.querySelector('input');
+    let titleInput = '[data-test-cs-field-editor="title"] input';
     await fillIn(titleInput, 'Title 1');
 
     await click('[data-test-cs-version-control-button-save="false"]');
     await waitFor('[data-test-cs-version-control-button-save="true"]');
 
-    let keywordField = document.querySelector('[data-test-cs-field-editor="keywords"] input');
+    let keywordField = '[data-test-cs-field-editor="keywords"] input';
     await fillIn(keywordField, 'important');
     assert.dom(keywordField).hasValue('important');
 
-    titleSectionTrigger = findTriggerElementWithLabel.call(this, /Title/);
-    titleSection = titleSectionTrigger.closest('section');
-    titleInput = titleSection.querySelector('input');
     await fillIn(titleInput, 'Title 2');
     assert.dom(titleInput).hasValue('Title 2');
   });

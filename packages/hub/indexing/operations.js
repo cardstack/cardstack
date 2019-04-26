@@ -1,33 +1,33 @@
 const opsPrivate = new WeakMap();
 
 module.exports = class Operations {
-  static create(branchUpdate, sourceId) {
-    return new this(branchUpdate, sourceId);
+  static create(sourcesUpdate, sourceId) {
+    return new this(sourcesUpdate, sourceId);
   }
 
-  constructor(branchUpdate, sourceId) {
+  constructor(sourcesUpdate, sourceId) {
     opsPrivate.set(this, {
       sourceId,
-      branchUpdate,
+      sourcesUpdate,
       nonce: null
     });
   }
   async save(type, id, doc){
-    let { sourceId, branchUpdate, nonce } = opsPrivate.get(this);
-    await branchUpdate.add(type, id, doc, sourceId, nonce);
+    let { sourceId, sourcesUpdate, nonce } = opsPrivate.get(this);
+    await sourcesUpdate.add(type, id, doc, sourceId, nonce);
   }
   async delete(type, id) {
-    let { branchUpdate } = opsPrivate.get(this);
-    await branchUpdate.delete(type, id);
+    let { sourcesUpdate } = opsPrivate.get(this);
+    await sourcesUpdate.delete(type, id);
   }
   async beginReplaceAll() {
     opsPrivate.get(this).nonce = Math.floor(Number.MAX_SAFE_INTEGER * Math.random());
   }
   async finishReplaceAll() {
-    let { branchUpdate, sourceId, nonce } = opsPrivate.get(this);
+    let { sourcesUpdate, sourceId, nonce } = opsPrivate.get(this);
     if (!nonce) {
       throw new Error("tried to finishReplaceAll when there was no beginReplaceAll");
     }
-    await branchUpdate.deleteAllWithoutNonce(sourceId, nonce);
+    await sourcesUpdate.deleteAllWithoutNonce(sourceId, nonce);
   }
 };

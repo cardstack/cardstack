@@ -6,9 +6,6 @@ module.exports = declareInjections({
 },
 
 class PluginIndexer {
-  async branches() {
-    return ['master'];
-  }
   async beginUpdate() {
     return new Updater(this.pluginLoader);
   }

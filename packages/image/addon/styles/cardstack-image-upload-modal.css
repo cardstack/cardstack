@@ -2,7 +2,7 @@
   position: relative;
   height: 100vh;
   width: 100vw;
-  background-color: transparent;
+  background-color: var(--normal-background, #343356);
 }
 
 .cardstack-image-upload-modal input[type=file] {

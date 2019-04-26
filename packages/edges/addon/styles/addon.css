@@ -1,6 +1,24 @@
 body {
     margin: 0;
 }
+
+.cardstack-edges {
+    width: 100vw;
+}
+
+/* these classes comes from the ember-sidebars addon. We need to
+   increase the z-indices of the sidebars so they stay on top of the
+   scrims provided by ember-overlays. */
+.cst-right,
+.cst-left,
+.cst-top {
+    z-index: 1;
+}
+
+.cst-bottom {
+    z-index: 3;
+}
+
 .cardstack-modal-backdrop {
     position: fixed;
     top: 0;

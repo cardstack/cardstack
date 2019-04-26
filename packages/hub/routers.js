@@ -23,7 +23,7 @@ class Routers {
       return { routerMap: this.routerMap, applicationCard: this.applicationCard, routerMapByDepth: this.routerMapByDepth };
     }
 
-    let schema = await this.currentSchema.forControllingBranch();
+    let schema = await this.currentSchema.getSchema();
     let applicationCard = await this._getApplicationCard();
 
     this.routerMap = this._discoverRouters(schema, applicationCard.data.type);
@@ -35,13 +35,13 @@ class Routers {
     return { routerMap: this.routerMap, applicationCard: this.applicationCard, routerMapByDepth: this.routerMapByDepth };
   }
 
-  async getSpace(branch, path, session={}) {
+  async getSpace(path, session={}) {
     await this.getRoutersInfo();
 
-    let schema = await this.currentSchema.forBranch(branch);
+    let schema = await this.currentSchema.getSchema();
 
     let primaryCard, errorReason;
-    let routeInfo = await getRoute(this.searchers, this.routerMap, branch, path, this.applicationCard, session);
+    let routeInfo = await getRoute(this.searchers, this.routerMap, path, this.applicationCard, session);
     let { params={}, allowedQueryParams=[], routingCard, matchedRoute, remainingPath, query, routeStack=[] } = routeInfo || {};
 
     if (!routeInfo) {
@@ -49,7 +49,7 @@ class Routers {
       primaryCard = await this._getNotFoundErrorCard(schema);
     } else {
       let { data: cards, included } = query ?
-        await this.searchers.search(Session.INTERNAL_PRIVILEGED, branch, query) :
+        await this.searchers.search(Session.INTERNAL_PRIVILEGED, query) :
         { data: [routingCard.data], included: routingCard.included };
 
       if (!cards || !cards.length) {
@@ -89,7 +89,7 @@ class Routers {
       included
     };
 
-    log.debug(`Routing path '${path}' for branch '${branch}' for session '${session.type}/${session.id}' to space: ${JSON.stringify(space, null, 2)}`);
+    log.debug(`Routing path '${path}' for session '${session.type}/${session.id}' to space: ${JSON.stringify(space, null, 2)}`);
     if (errorReason) {
       log.debug(`Routing to path '${path}' for session '${session.type}/${session.id}' resulted in error card. Reason: ${errorReason}`);
     }
@@ -205,7 +205,8 @@ class Routers {
   async _getApplicationCard() {
     let id, type, config;
     try {
-      config = (await this.searchers.getFromControllingBranch(Session.INTERNAL_PRIVILEGED, 'plugin-configs', '@cardstack/hub')).data;
+      // TODO assume schema models are cards
+      config = (await this.searchers.get(Session.INTERNAL_PRIVILEGED, 'local-hub', 'plugin-configs', '@cardstack/hub')).data;
     } catch (err) {
       if (err.status !== 404) { throw err; }
     }
@@ -216,7 +217,7 @@ class Routers {
     }
 
     if (id && type) {
-      let appCard = await this.searchers.getFromControllingBranch(Session.INTERNAL_PRIVILEGED, type, id);
+      let appCard = await this.searchers.get(Session.INTERNAL_PRIVILEGED, 'local-hub', type, id);
       if (appCard) {
         return appCard;
       }
@@ -233,12 +234,12 @@ class Routers {
       if (errorContentType) {
         // we check that the error card has an open grant, otherwise revert to system error card
         // we dont want to potentially swallow errors due to restrive grant settings, so err on the side of caution
-        if (!errorContentType.authorizedReadRealms().includes('groups/everyone')) {
+        if (!(await errorContentType.authorizedReadRealms()).includes('groups/everyone')) {
           log.warn(`The error card content-type '${errorType}' does not have a read grant for groups/everyone. Not using this error card.`);
         } else {
           let errorCard;
           try {
-            errorCard = await this.searchers.getFromControllingBranch(Session.INTERNAL_PRIVILEGED, errorType, errorCardId);
+            errorCard = await this.searchers.get(Session.INTERNAL_PRIVILEGED, 'local-hub', errorType, errorCardId);
           } catch (err) {
             if (err.status !== 404) { throw err; }
           }
@@ -269,8 +270,11 @@ class Routers {
 function hasUnconsumedPath(path, cardContext) {
   if (path.charAt(0) === '/') { return true; }
 
+  let { data: { type } } = cardContext;
+  if (path.length && path.charAt(0) !== '?' && type === 'application-cards') { return true; }
+
   return path.charAt(0) === '?' &&
-         decodeURI(path).match(new RegExp(`${cardContext.data.type}\\[[^\\]]+\\]=`));
+         decodeURI(path).match(new RegExp(`${type}\\[[^\\]]+\\]=`));
 }
 
 function buildPathFromRouteStack(routeStack) {

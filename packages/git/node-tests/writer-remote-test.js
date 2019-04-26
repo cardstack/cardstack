@@ -107,7 +107,7 @@ describe('git/writer with remote', function() {
 
   describe('create', function() {
     it('saves attributes', async function () {
-      let { data:record } = await writers.create('master', env.session, 'events', {
+      let { data:record } = await writers.create(env.session, 'events', {
         data: {
           type: 'events',
           attributes: {
@@ -129,7 +129,7 @@ describe('git/writer with remote', function() {
 
   describe('update', function() {
     it('returns updated document', async function() {
-      let { data:record } = await writers.update('master', env.session, 'events', 'event-1', {
+      let { data:record } = await writers.update(env.session, 'events', 'event-1', {
         data: {
           id: 'event-1',
           type: 'events',
@@ -179,7 +179,7 @@ describe('git/writer with remote', function() {
       let remote = await remoteRepo.getRemote('origin');
       await remote.push(["refs/heads/master:refs/heads/master"], fetchOpts);
 
-      let { data:record } = await writers.update('master', env.session, 'events', 'event-1', {
+      let { data:record } = await writers.update(env.session, 'events', 'event-1', {
         data: {
           id: 'event-1',
           type: 'events',
@@ -229,7 +229,7 @@ describe('git/writer with remote', function() {
       let remote = await remoteRepo.getRemote('origin');
       await remote.push(["refs/heads/master:refs/heads/master"], fetchOpts);
 
-      let { data:record } = await writers.update('master', env.session, 'events', 'event-1', {
+      let { data:record } = await writers.update(env.session, 'events', 'event-1', {
         data: {
           id: 'event-1',
           type: 'events',
@@ -259,7 +259,7 @@ describe('git/writer with remote', function() {
 
   describe('delete', function() {
     it('deletes document', async function() {
-      await writers.delete('master', env.session, head, 'events', 'event-1');
+      await writers.delete(env.session, head, 'events', 'event-1');
 
       await repo.fetch('origin', fetchOpts);
 
@@ -327,7 +327,7 @@ describe('git/writer with empty remote', function() {
 
   describe('create', function() {
     it('allows you to create a record in an empty git repo', async function () {
-      let { data:record } = await writers.create('master', env.session, 'events', {
+      let { data:record } = await writers.create(env.session, 'events', {
         data: {
           type: 'events',
           attributes: {

@@ -79,9 +79,9 @@ describe('middleware-stack', function() {
     afterEach(teardown);
 
     it('can dynamically mount more middleware', async function() {
-      let config = await env.lookup('hub:searchers').get(env.session, 'master', 'plugin-configs', 'stub-middleware-extra');
+      let config = await env.lookup('hub:searchers').get(env.session, 'local-hub', 'plugin-configs', 'stub-middleware-extra');
       config.data.attributes.enabled = true;
-      await env.lookup('hub:writers').update('master', env.session, config.data.type, config.data.id, config);
+      await env.lookup('hub:writers').update(env.session, config.data.type, config.data.id, config);
       await env.lookup('hub:indexers').update({ forceRefresh: true });
       let response = await request.get('/extra');
       expect(response).hasStatus(200);
@@ -89,7 +89,7 @@ describe('middleware-stack', function() {
     });
 
     it('can dynamically remove middleware', async function() {
-      await env.lookup('hub:writers').create('master', env.session, 'plugin-configs', {
+      await env.lookup('hub:writers').create(env.session, 'plugin-configs', {
         data: {
           id: 'stub-middleware',
           type: 'plugin-configs',
@@ -120,7 +120,7 @@ describe('middleware-stack', function() {
       let response = await request.get('/first');
       expect(response).hasStatus(200);
 
-      await env.lookup('hub:writers').create('master', env.session, 'plugin-configs', {
+      await env.lookup('hub:writers').create(env.session, 'plugin-configs', {
         data: {
           id: 'stub-middleware',
           type: 'plugin-configs',

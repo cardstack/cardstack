@@ -13,25 +13,21 @@ module.exports = declareInjections({
   searcher: 'hub:searchers',
   writers: 'hub:writers',
   indexers: 'hub:indexers',
-  controllingBranch: 'hub:controlling-branch',
 }, {
-  create({ searcher, writers, indexers, controllingBranch }) {
+  create({ searcher, writers, indexers }) {
     return {
       category: 'api',
       after: 'authentication',
       middleware() {
-        return jsonapiMiddleware(searcher, writers, indexers, controllingBranch.name);
+        return jsonapiMiddleware(searcher, writers, indexers);
       }
     };
   }
 });
 
-function jsonapiMiddleware(searcher, writers, indexers, defaultBranch) {
+function jsonapiMiddleware(searcher, writers, indexers ) {
   // TODO move into config
-  let options = {
-    defaultBranch,
-    servedPrefixes: 'api-validate|api'
-  };
+  let options = { servedPrefixes: 'api-validate|api' };
 
   let prefixPattern;
   if (options.servedPrefixes) {
@@ -97,7 +93,6 @@ class Handler {
     this.indexers = indexers;
     this.ctxt = ctxt;
     this.query = qs.parse(this.ctxt.request.querystring, { plainObjects: true });
-    this.branch = this.query.branch || options.defaultBranch;
     this.prefix = options.prefix || '';
   }
 
@@ -172,35 +167,23 @@ class Handler {
 
   async handleCollectionValidate(type) {
     let session = this.session;
-    let data = this._mandatoryBodyData();
-    let schema = await this.writers.schema.forBranch(this.branch);
-    let { writer } = this.writers._getSchemaDetailsForType(schema, type);
-    let isSchema = this.writers.schemaTypes.includes(type);
-    let pendingChange = await writer.prepareCreate(
-      this.branch,
-      session,
-      type,
-      schema.withOnlyRealFields(data.data),
-      isSchema
-    );
+    let { data:finalDocument } = this._mandatoryBodyData();
+    let schema = await this.writers.currentSchema.getSchema();
+    let pendingChange = await this.writers.createPendingChange({
+      finalDocument,
+    });
     await schema.validate(pendingChange, { type, session });
     this.ctxt.status = 200;
   }
 
   async handleIndividualValidate(type, id) {
     let session = this.session;
-    let data = this._mandatoryBodyData();
-    let schema = await this.writers.schema.forBranch(this.branch);
-    let { writer } = this.writers._getSchemaDetailsForType(schema, type);
-    let isSchema = this.writers.schemaTypes.includes(type);
-    let pendingChange = await writer.prepareUpdate(
-      this.branch,
-      session,
-      type,
-      id,
-      schema.withOnlyRealFields(data.data),
-      isSchema
-    );
+    let { data:finalDocument } = this._mandatoryBodyData();
+    finalDocument.id = id;
+    let schema = await this.writers.currentSchema.getSchema();
+    let pendingChange = await this.writers.createPendingChange({
+      finalDocument,
+    });
     await schema.validate(pendingChange, { type, id, session });
     // NOTE: We don't want validation to change the document in any way
     // this.ctxt.body = data;
@@ -208,8 +191,13 @@ class Handler {
   }
 
   async handleIndividualGET(type, id) {
-    let include = (this.query.include || '').split(',');
-    let body = await this.searcher.get(this.session, this.branch, type, id, include);
+    let includePaths = (this.query.include || '').split(',');
+    let body;
+    if (type === 'spaces') {
+      body = await this.searcher.getSpace(this.session, id);
+    } else {
+      body = await this.searcher.get(this.session, 'local-hub', type, id, { includePaths });
+    }
     if (this.query.include === '') {
       delete body.included;
     }
@@ -217,14 +205,16 @@ class Handler {
   }
 
   async handleIndividualGETBinary(type, id) {
-    let [buffer, json] = await this.searcher.getBinary(this.session, this.branch, type, id);
+    // TODO requests for binary need to be made in a card context, e.g. GET /api/${source}/${package}/${cardId}/${modelType}/${modelId}
+    // stubbing the context out for now...
+    let [buffer, json] = await this.searcher.getBinary(this.session, 'local-hub', null, null, type, id);
     this.ctxt.set('content-type', json.data.attributes['content-type']);
     this.ctxt.body = buffer;
   }
 
   async handleIndividualPATCH(type, id) {
     let data = this._mandatoryBodyData();
-    let record = await this.writers.update(this.branch, this.session, type, id, data);
+    let record = await this.writers.update(this.session, type, id, data);
     this.ctxt.body = record;
     this.ctxt.status = 200;
   }
@@ -232,7 +222,7 @@ class Handler {
   async handleIndividualDELETE(type, id) {
     try {
       let version = this.ctxt.header['if-match'];
-      await this.writers.delete(this.branch, this.session, version, type, id);
+      await this.writers.delete(this.session, version, type, id);
       this.ctxt.status = 204;
     } catch (err) {
       // By convention, the writer always refers to the version as
@@ -247,7 +237,7 @@ class Handler {
   }
 
   async handleCollectionGET(type) {
-    let { data: models, meta: { page }, included } = await this.searcher.search(this.session, this.branch, {
+    let { data: models, meta: { page }, included } = await this.searcher.search(this.session, {
       filter: this.filterExpression(type),
       sort: this.query.sort,
       page: this.query.page,
@@ -268,7 +258,7 @@ class Handler {
 
   async handleCollectionPOST(type) {
     let data = this._mandatoryBodyData();
-    let record = await this.writers.create(this.branch, this.session, type, data);
+    let record = await this.writers.create(this.session, type, data);
     this.ctxt.body = record;
     this.ctxt.status = 201;
     let origin = this.ctxt.request.origin;
@@ -285,7 +275,7 @@ class Handler {
       throw new Error("A file was not included in your post request. If you are not trying to upload a file, make sure to set your request content type to application/vnd.api+json", {status: 400});
     }
 
-    let record = await this.writers.createBinary(this.branch, this.session, type, files[0]);
+    let record = await this.writers.createBinary(this.session, type, files[0]);
     this.ctxt.body = record;
     this.ctxt.status = 201;
     let origin = this.ctxt.request.origin;

@@ -9,7 +9,7 @@ import injectOptional from 'ember-inject-optional';
 
 export default Component.extend({
   layout,
-  classNames: ['cs-create-menu'],
+  classNames: ['cardstack-tools', 'cs-create-menu'],
   tools: service('cardstack-tools'),
   store: service(),
   cardstackRouting: injectOptional.service(),
@@ -26,10 +26,9 @@ export default Component.extend({
 
   actions: {
     create(which) {
-      let { name, params, queryParams } = this.get('cardstackRouting').routeForNew(which.id, this.get('tools.branch'));
+      let { name, params, queryParams } = this.get('cardstackRouting').routeForNew(which.id);
       transitionTo(getOwner(this), name, params.map(p => p[1]), queryParams);
       this.get('tools').setActivePanel('cs-composition-panel');
-      this.get('tools').setEditing(true);
     }
   }
 });

@@ -9,6 +9,8 @@ import { urlForModel } from '@cardstack/routing/helpers/cardstack-url';
 export default Component.extend({
   layout,
   classNames: ['cs-active-composition-panel'],
+  attributeBindings: ['dataTestName:data-test-cs-active-composition-panel'],
+  dataTestName: '',
 
   validationErrors: null,
   permissions: null,
@@ -64,15 +66,15 @@ export default Component.extend({
 
   highlightAndScrollToField: task(function * (field) {
     this.get('highlightField')(field);
-    if (field) {
+    if (field && field.bounds) {
       yield timeout(500);
       scrollToBounds(field.bounds());
     }
   }).restartable(),
 
-  afterModelSaved(model, branch) {
+  afterModelSaved(model) {
     let location = this.get('router.location');
-    let url = urlForModel(this, model, { branch });
+    let url = urlForModel(this, model);
     location.setURL(url);
   },
 

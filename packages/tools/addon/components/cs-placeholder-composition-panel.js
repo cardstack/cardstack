@@ -11,7 +11,7 @@ export default Component.extend({
   tools: service('cardstack-tools'),
   actions: {
     create() {
-      let { name, params, queryParams } = this.get('cardstackRouting').routeForNew(this.get('model.type'), this.get('tools.branch'));
+      let { name, params, queryParams } = this.get('cardstackRouting').routeForNew(this.get('model.type'));
       queryParams.routingId = this.get('model.slug');
       transitionTo(getOwner(this), name, params.map(p => p[1]), queryParams);
       this.get('tools').setActivePanel('cs-composition-panel');

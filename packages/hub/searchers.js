@@ -5,8 +5,9 @@ const Session = require('@cardstack/plugin-utils/session');
 const DocumentContext = require('./indexing/document-context');
 const { get } = require('lodash');
 
+const localHubSource = 'local-hub';
+
 module.exports = declareInjections({
-  controllingBranch: 'hub:controlling-branch',
   sources: 'hub:data-sources',
   internalSearcher: `plugin-searchers:${require.resolve('@cardstack/pgsearch/searcher')}`,
   client: `plugin-client:${require.resolve('@cardstack/pgsearch/client')}`,
@@ -33,21 +34,14 @@ class Searchers {
     return this._sources;
   }
 
-  async getResourceAndMeta(session, branchRequest, type, id) {
-    let branch = branchRequest;
-
-    // only ever get the branches off the controlling branch
-    if (type === 'branches') {
-      branch = this.controllingBranch.name;
-    }
-
+  async getResourceAndMeta(session, type, id) {
     let sources = await this._lookupSources();
     let index = 0;
     let sessionOrEveryone = session || Session.EVERYONE;
     let next = async () => {
       let source = sources[index++];
       if (source) {
-        let response = await source.searcher.get(sessionOrEveryone, branch, type, id, next);
+        let response = await source.searcher.get(sessionOrEveryone, type, id, next);
         if (source.id != null && response && response.data) {
           if (!response.data.meta) {
             response.data.meta = {};
@@ -65,7 +59,7 @@ class Searchers {
     let { data, meta, included } = result || {};
     let maxAge = get(result, 'meta.cardstack-cache-control.max-age');
     if (data && maxAge != null) {
-      await this._startCacheJob(branch, { data, meta, included }, maxAge);
+      await this._startCacheJob({ data, meta, included }, maxAge);
     }
     return { resource: data, meta, included };
   }
@@ -78,39 +72,34 @@ class Searchers {
     return this.routers;
   }
 
-  async get(session, branchRequest, type, id, includePaths) {
-    if (arguments.length < 4) {
-      throw new Error(`session is now a required argument to searchers.get`);
+  async getSpace(session, path) {
+    return await this.get(session, localHubSource, 'spaces', path);
+  }
+
+  async get(session, source, packageName, cardId, opts={}) {
+    if (source !== localHubSource) {
+      throw new Error(`You specified the source: '${source}' in Searchers.get(). Currently the cardstack hub does not support non-local hub sources.`);
     }
 
-    let branch = branchRequest;
+    let { /*version,*/ includePaths } = opts; // TODO eventually we will handle "version" in the opts to getting a snapshot of a resource
 
-    // only ever get the branches off the controlling branch
-    if (type === 'branches') {
-      branch = this.controllingBranch.name;
-    }
-
-    let { resource, meta, included } = await this.getResourceAndMeta(session, branch, type, id);
+    let { resource, meta, included } = await this.getResourceAndMeta(session, packageName, cardId);
     let authorizedResult;
     let documentContext;
     if (resource) {
-      let schema = await this.currentSchema.forBranch(branch);
+      let schema = await this.currentSchema.getSchema();
       documentContext = this.createDocumentContext({
-        id,
-        type,
-        branch,
+        id: cardId,
+        type: packageName,
         schema,
         includePaths,
         upstreamDoc: { data: resource, meta, included }
       });
-      let pristineResult = await documentContext.pristineDoc();
-      if (pristineResult) {
-        authorizedResult = await documentContext.applyReadAuthorization(pristineResult, { session, type, id });
-      }
+      authorizedResult = await documentContext.applyReadAuthorization({ session, packageName, cardId });
     }
 
     if (!authorizedResult) {
-      throw new Error(`No such resource ${branch}/${type}/${id}`, {
+      throw new Error(`No such resource ${source}/${packageName}/${cardId}`, {
         status: 404
       });
     }
@@ -118,80 +107,52 @@ class Searchers {
     return authorizedResult;
   }
 
-  async getBinary(session, branch, type, id, includePaths) {
+  async getBinary(session, source, packageName, cardId, type, modelId, opts={}) {
     // look up authorized result to check read is authorized by going through
     // the default auth stack for the JSON representation. Error will be thrown
     // if authorization is not correct.
-    let document = await this.get(session, branch, type, id, includePaths);
+    let { version } = opts;
 
+    // TODO this needs to get the card's internal model that backs the binary data.
+    // this.get() will ultimately be the incorrect place to retrieve this from...
+    let document = await this.get(session, source, type, modelId, { version });
+
+    // TODO ultimately there will be no need to look up the source as it is being provided
+    // as an argument to this method.
     let sourceId = document.data.meta.source;
-
     let sources = await this._lookupSources();
-
-    let sessionOrEveryone = session || Session.EVERYONE;
-
 
     // we don't need to take a middleware-like approach here because we already
     // searched for the json representation, so we know exactly what data source
     // to get the binary blob from
-    let source = sources.find(s => s.id === sourceId);
+    let dataSource = sources.find(s => s.id === sourceId);
 
-    let result = await source.searcher.getBinary(sessionOrEveryone, branch, type, id);
+    let sessionOrEveryone = session || Session.EVERYONE;
+    let result = await dataSource.searcher.getBinary(sessionOrEveryone, type, modelId);
 
     return [result, document];
   }
 
-  async getFromControllingBranch(session, type, id, includePaths) {
-    if (arguments.length < 3) {
-      throw new Error(`session is now a required argument to searchers.getFromControllingBranch`);
-    }
-    return this.get(session, this.controllingBranch.name, type, id, includePaths);
-  }
-
-  async search(session, branchRequest, query) {
-    if (arguments.length < 3) {
-      throw new Error(`session is now a required argument to searchers.search`);
+  async search(session, query) {
+    if (typeof query !== 'object') {
+      throw new Error(`Searchers.get() expects parameters: 'session', 'query'`);
     }
 
-    let branch = branchRequest;
-
-    // only ever get the branches off the controlling branch
-    if (get(query,'filter.type.exact') === "branches") {
-      branch = this.controllingBranch.name;
-    }
-
-    let sources = await this._lookupSources();
-    let schemaPromise = this.currentSchema.forBranch(branch);
-    let index = 0;
+    let schemaPromise = this.currentSchema.getSchema();
     let sessionOrEveryone = session || Session.EVERYONE;
-    let next = async () => {
-      let source = sources[index++];
-      if (source) {
-        let response = await source.searcher.search(sessionOrEveryone, branch, query, next);
-        response.data.forEach(resource => {
-          if (!resource.meta) {
-            resource.meta = {};
-          }
-          if (resource.meta.source == null) {
-            resource.meta.source = source.id;
-          }
-        });
-        return response;
-      }
-    };
-    let result = await next();
+
+    let result = await this._search(sessionOrEveryone)(query);
     if (result) {
       let schema = await schemaPromise;
       let includePaths = (get(query, 'include') || '').split(',');
       let documentContext = this.createDocumentContext({
-        branch,
         schema,
         includePaths,
         upstreamDoc: result,
       });
-      let pristineResult = await documentContext.pristineDoc();
 
-      let authorizedResult = await documentContext.applyReadAuthorization(pristineResult, { session });
+      let authorizedResult = await documentContext.applyReadAuthorization({ session });
+      let pristineResult = await documentContext.pristineDoc();
       if (authorizedResult.data.length !== pristineResult.data.length) {
         // We can eventually make this more of just a warning, but for
         // now it's cleaner to just force the searchers to implement
@@ -203,37 +164,26 @@ class Searchers {
     }
   }
 
-  async searchFromControllingBranch(session, query) {
-    return this.search(session, this.controllingBranch.name, query);
-  }
-
-  createDocumentContext({ schema, type, id, branch, sourceId, generation, upstreamDoc, includePaths }) {
+  createDocumentContext({ schema, type, id, sourceId, generation, upstreamDoc, includePaths }) {
     return new DocumentContext({
       schema,
       type,
       id,
-      branch,
       sourceId,
       generation,
       upstreamDoc,
       includePaths,
       routers: this._getRouters(),
-      read: this._read(branch)
+      read: this._read(),
+      search: this._search(Session.INTERNAL_PRIVILEGED)
     });
   }
 
-  async searchInControllingBranch(session, query) {
-    if (arguments.length < 2) {
-      throw new Error(`session is now a required argument to searchers.searchInControllingBranch`);
-    }
-    return this.search(session, this.controllingBranch.name, query);
-  }
-
-  _read(branch) {
+  _read() {
     return async (type, id) => {
       let resource;
       try {
-        resource = (await this.getResourceAndMeta(Session.INTERNAL_PRIVILEGED, branch, type, id)).resource;
+        resource = (await this.getResourceAndMeta(Session.INTERNAL_PRIVILEGED, type, id)).resource;
       } catch (err) {
         if (err.status !== 404) { throw err; }
       }
@@ -241,33 +191,57 @@ class Searchers {
     };
   }
 
+
+  _search(session) {
+    return async (query) => {
+      let sources = await this._lookupSources();
+      let index = 0;
+
+      let next = async () => {
+        let source = sources[index++];
+        if (source) {
+          let response = await source.searcher.search(session, query, next);
+          response.data.forEach(resource => {
+            if (!resource.meta) {
+              resource.meta = {};
+            }
+            if (resource.meta.source == null) {
+              resource.meta.source = source.id;
+            }
+          });
+          return response;
+        }
+      };
+      return next();
+    };
+  }
+
   async _setupWorkers() {
     if (this._workersSetup) { return; }
 
     this._workersSetup = true;
-    await this.jobQueue.subscribe("hub/searchers/cache", async ({ data: { branch, maxAge, upstreamDoc } }) => {
+    await this.jobQueue.subscribe("hub/searchers/cache", async ({ data: { maxAge, upstreamDoc } }) => {
       this._cachingPromise = Promise.resolve(this._cachingPromise)
-        .then(() => this._cacheDocument(branch, upstreamDoc, maxAge));
+        .then(() => this._cacheDocument(upstreamDoc, maxAge));
       return await this._cachingPromise;
     });
   }
 
-  async _startCacheJob(branch, upstreamDoc, maxAge) {
+  async _startCacheJob(upstreamDoc, maxAge) {
     await this._setupWorkers();
 
     await this.jobQueue.publishAndWait('hub/searchers/cache',
-      { branch, upstreamDoc, maxAge },
+      { upstreamDoc, maxAge },
       { singletonKey: 'hub/searchers/cache', singletonNextSlot: true }
     );
   }
 
-  async _cacheDocument(branch, upstreamDoc, maxAge) {
+  async _cacheDocument(upstreamDoc, maxAge) {
     let { data: { id, type } } = upstreamDoc;
-    let schema = await this.currentSchema.forBranch(branch);
+    let schema = await this.currentSchema.getSchema();
     let documentContext = this.createDocumentContext({
       id,
       type,
-      branch,
       schema,
       upstreamDoc: upstreamDoc
     });

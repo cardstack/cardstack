@@ -11,16 +11,14 @@
       renderedFields=tools.activeFields
       modelFields=tools.modelFields
       openedFieldId=tools.openedFieldId
-      highlightedFieldId=tool.highlightedFieldId
+      highlightedFieldId=tools.highlightedFieldId
       openField=(action "openField")
       highlightField=(action "highlightField")
       editingEnabled=tools.editing
     }}
   {{/if}}
 {{else}}
-  <section class="cs-content-info">
-    <p class="content-title">
-      No editable content
-    </p>
+  <section>
+    <p>No editable content.</p>
   </section>
 {{/if}}

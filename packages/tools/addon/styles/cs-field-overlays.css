@@ -4,26 +4,29 @@
 
 .cs-field-overlay .overlay-label,
 .cs-content-overlay .overlay-label {
-  font-size: 10px;
-  text-transform: uppercase;
-  background-color: var(--deep-tools-highlight);
+  display: none;
 }
 
 .cs-field-overlay .overlay-border,
 .cs-content-overlay .overlay-border {
-  border-color: var(--deep-tools-highlight);
-  background-color: var(--faded-tools-highlight);
+  border: 2px dotted var(--overlays-highlight);
 }
 
 .cs-field-overlay.with-inline-editor .overlay-label,
 .cs-field-overlay.passthrough .overlay-label {
-  background-color: var(--tools-highlight);
+  display: inline-block;
+  padding: 0.4em 0.7em;
+  background-color: var(--overlays-highlight);
+  color: var(--overlays-foreground);
+  font-size: 12px;
+  font-weight: 600;
+  line-height: 17px;
+  text-transform: capitalize;
 }
 
 .cs-field-overlay.with-inline-editor .overlay-border,
 .cs-field-overlay.passthrough .overlay-border {
-  border-color: var(--tools-highlight);
-  background-color: transparent;
+  border-style: solid;
 }
 
 .cs-field-overlay.passthrough,

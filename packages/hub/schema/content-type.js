@@ -111,7 +111,7 @@ module.exports = class ContentType {
     let errors = [];
     let badFields = Object.create(null);
 
-    this._validateFieldReadAuth(pendingChange, context, errors, badFields);
+    await this._validateFieldReadAuth(pendingChange, context, errors, badFields);
 
     for (let field of this.realFields.values()) {
       await field.applyDefault(pendingChange, context);
@@ -191,16 +191,20 @@ module.exports = class ContentType {
     }
   }
 
-  async _assertGrant(documents, context, permission, description) {
+  async _assertGrant(documentContexts, context, permission, description) {
     let grant = await find(this.grants, async g => {
       if (!g[permission]) {
         return false;
       }
-      let documentMatches = await Promise.all(documents.map(document => g.matches(document, context)));
+      let documentMatches = await Promise.all(documentContexts.map(documentContext => g.matches(documentContext, context)));
       return documentMatches.every(Boolean);
     });
     if (grant) {
-      authLog.debug("approved %s of %s %s because of grant %s", description, documents[0].type, documents[0].id, grant.id);
+      authLog.debug("approved %s of %s %s because of grant %s",
+        description,
+        documentContexts[0] ? documentContexts[0].type : '-undefined-',
+        documentContexts[0] ? documentContexts[0].id : '-undefined-',
+        grant.id);
       authLog.trace("grant %s = %j", grant.id, grant);
     } else {
       authLog.trace("no matching %s grant for %j in %j", description, context, this.grants);
@@ -213,15 +217,15 @@ module.exports = class ContentType {
   }
 
   async _validateResourceLevelAuthorization(pendingChange, context) {
-    let { originalDocument, finalDocument } = pendingChange;
-    if (!finalDocument) {
-      await this._assertGrant([originalDocument], context, 'may-delete-resource', 'delete');
-    } else if (!originalDocument) {
-      await this._assertGrant([finalDocument], context, 'may-read-resource', 'read (during create)');
-      await this._assertGrant([finalDocument], context, 'may-create-resource', 'create');
+    let { originalDocumentContext, finalDocumentContext } = pendingChange;
+    if (!finalDocumentContext) {
+      await this._assertGrant([originalDocumentContext], context, 'may-delete-resource', 'delete');
+    } else if (!originalDocumentContext) {
+      await this._assertGrant([finalDocumentContext], context, 'may-read-resource', 'read (during create)');
+      await this._assertGrant([finalDocumentContext], context, 'may-create-resource', 'create');
     } else {
-      await this._assertGrant([finalDocument, originalDocument], context, 'may-read-resource', 'read (during update)');
-      await this._assertGrant([originalDocument], context, 'may-update-resource', 'update');
+      await this._assertGrant([finalDocumentContext, originalDocumentContext], context, 'may-read-resource', 'read (during update)');
+      await this._assertGrant([originalDocumentContext], context, 'may-update-resource', 'update');
     }
   }
 
@@ -240,19 +244,20 @@ module.exports = class ContentType {
     return this._realms;
   }
 
-  authorizedReadRealms(resource) {
-    return this.realms.authorizedReadRealms(resource);
+  async authorizedReadRealms(documentContext) {
+    return await this.realms.authorizedReadRealms(documentContext);
   }
 
-  hasLoginAuthorization(userRealms) {
-    return this.realms.mayLogin(userRealms);
+  async hasLoginAuthorization(userRealms) {
+    return await this.realms.mayLogin(userRealms);
   }
 
-  applyReadAuthorization(resource, userRealms) {
-    if (!this.realms.mayReadResource(resource, userRealms)) {
+  async applyReadAuthorization(documentContext, userRealms) {
+    if (!await this.realms.mayReadResource(documentContext, userRealms)) {
       return;
     }
-    if (this.realms.mayReadAllFields(resource, userRealms)) {
+    let resource = (await documentContext.pristineDoc()).data;
+    if (await this.realms.mayReadAllFields(documentContext, userRealms)) {
       return resource;
     }
     let output = { type: resource.type, id: resource.id };
@@ -262,7 +267,7 @@ module.exports = class ContentType {
     for (let section of ['attributes', 'relationships']) {
       if (resource[section]) {
         for (let [fieldName, value] of Object.entries(resource[section])) {
-          if (this.realms.hasExplicitFieldGrant(resource, userRealms, fieldName)) {
+          if (await this.realms.hasExplicitFieldGrant(documentContext, userRealms, fieldName)) {
             if (!output[section]) {
               output[section] = {};
             }
@@ -276,18 +281,18 @@ module.exports = class ContentType {
 
   // this is for internal use during validation of create and update
   async _validateFieldReadAuth(pendingChange, context, errors, badFields) {
-    let resource = pendingChange.finalDocument;
     let session = context.session || Session.EVERYONE;
     let userRealms = await session.realms();
 
-    if (this.realms.mayReadAllFields(resource, userRealms)) {
+    if (await this.realms.mayReadAllFields(pendingChange.finalDocumentContext, userRealms)) {
       return;
     }
 
+    let resource = pendingChange.finalDocument;
     for (let section of ['attributes', 'relationships']) {
       if (resource[section]) {
         for (let fieldName of Object.keys(resource[section])) {
-          if (!this.realms.hasExplicitFieldGrant(resource, userRealms, fieldName)) {
+          if (!await this.realms.hasExplicitFieldGrant(pendingChange.finalDocumentContext, userRealms, fieldName)) {
             errors.push(this._unknownFieldError(fieldName, section));
             badFields[fieldName] = true;
           }

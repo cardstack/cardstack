@@ -4,13 +4,7 @@ import { visit, currentURL, click, find, waitFor, waitUntil } from '@ember/test-
 
 async function login() {
   await click('[data-test-cardstack=login-button]');
-  return waitFor('.cardstack-tools-launcher');
-}
-
-async function openCoverImageField() {
-  let element =  [...document.querySelectorAll('.cs-toolbox-section label')].find(element => /Cover Image/.test(element.textContent));
-  await click(element);
-  return element.closest('section');
+  return waitFor('[data-test-cardstack-tools-launcher]');
 }
 
 module('Acceptance | image field editor', function(hooks) {
@@ -28,12 +22,10 @@ module('Acceptance | image field editor', function(hooks) {
     await visit('/hub/articles/new');
     assert.equal(currentURL(), '/hub/articles/new');
     await login();
-    await click('.cardstack-tools-launcher');
-    await waitFor('.cs-active-composition-panel--main');
-    await click('[data-test-cs-editor-switch]');
+    await click('[data-test-cardstack-tools-launcher]');
+    await waitFor('[data-test-cs-editor-panel]');
 
-    await openCoverImageField();
-    await click('.cardstack-image-editor-button--choose');
+    await click('[data-test-cs-field-editor="cover-image"] .cardstack-image-editor-button--choose');
     await waitFor('[data-card-picker-toolbox-header]');
     await waitUntil(() => !find('.cardstack-card-picker--loading'));
 
@@ -51,12 +43,10 @@ module('Acceptance | image field editor', function(hooks) {
   test('removing an image', async function (assert) {
     await visit('/hub/articles/new');
     await login();
-    await click('.cardstack-tools-launcher');
-    await waitFor('.cs-active-composition-panel--main');
-    await click('[data-test-cs-editor-switch]');
+    await click('[data-test-cardstack-tools-launcher]');
+    await waitFor('[data-test-cs-editor-panel]');
 
-    await openCoverImageField();
-    await click('.cardstack-image-editor-button--choose');
+    await click('[data-test-cs-field-editor="cover-image"] .cardstack-image-editor-button--choose');
     await waitFor('[data-card-picker-toolbox-header]');
     await waitUntil(() => !find('.cardstack-card-picker--loading'));
 

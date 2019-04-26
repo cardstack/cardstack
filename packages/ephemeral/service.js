@@ -3,7 +3,6 @@ const log = require('@cardstack/logger')('cardstack/ephemeral');
 const crypto = require('crypto');
 const { declareInjections } = require('@cardstack/di');
 const { partition } = require('lodash');
-const PendingChange = require('@cardstack/plugin-utils/pending-change');
 const { INTERNAL_PRIVILEGED } = require('@cardstack/plugin-utils/session');
 const streamToPromise = require('stream-to-promise');
 const { statSync } = require("fs");
@@ -41,11 +40,7 @@ module.exports = declareInjections({
   async findOrCreateStorage(dataSourceId, initialModels) {
     let storage = this._dataSources.get(dataSourceId);
     if (!storage) {
-      let validator;
-      if (initialModels) {
-        validator = this.validateModels.bind(this, initialModels);
-      }
-      storage = new EphemeralStorage(this.indexers, validator);
+      storage = new EphemeralStorage(this.indexers);
       this._dataSources.set(dataSourceId, storage);
       if (initialModels) {
         let schemaTypes = this.schemaLoader.ownTypes();
@@ -92,7 +87,10 @@ module.exports = declareInjections({
     let [schemaModels, dataModels] = partition(models, model => schemaTypes.includes(model.type));
     let schema = await this.schemaLoader.loadFrom(schemaModels);
     for (let model of dataModels) {
-      await schema.validate(new PendingChange(null, model, () => {}), { session: INTERNAL_PRIVILEGED });
+      await schema.validate(await this.writers.createPendingChange({
+        finalDocument: model,
+        finalizer: () => { },
+      }), { session: INTERNAL_PRIVILEGED });
     }
   }
 });
@@ -155,7 +153,7 @@ function references(model) {
 }
 
 class EphemeralStorage {
-  constructor(indexers, validatorHook) {
+  constructor(indexers) {
     // map from `${type}/${id}` to { model, isSchema, generation, type, id }
     // if model == null, that's a tombstone
     this.models = new Map();
@@ -163,12 +161,6 @@ class EphemeralStorage {
     this.indexers = indexers;
 
     this.checkpoints = new Map();
-
-    // We can't validate right at startup, because we need to let all
-    // the indexers reach a working state before we can tell if our
-    // models are consistent with all the rest. So we allow a hook for
-    // delayed validation.
-    this.validatorHook = validatorHook;
   }
 
   get identity() {

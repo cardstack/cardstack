@@ -90,39 +90,39 @@ module.exports = class Realms {
     this._allowedToLogin = canLogin;
   }
 
-  mayLogin(userRealms) {
+  async mayLogin(userRealms) {
     return Boolean(userRealms.find(realm => this._allowedToLogin.has(realm)));
   }
 
-  mayReadResource(resource, userRealms) {
+  async mayReadResource(documentContext, userRealms) {
     let matchingRealm = userRealms.find(realm => this._resourceReaders.has(realm));
     if (matchingRealm) {
-      log.debug('approved resource read for type=%s id=%s with static realm=%s', resource.type, resource.id, matchingRealm);
+      log.debug('approved resource read for type=%s id=%s with static realm=%s', documentContext.type, documentContext.id, matchingRealm);
       return true;
     }
-    let dynamicRealms = this._dynamicRealms(this._dynamicResourceReaders, resource);
+    let dynamicRealms = await this._dynamicRealms(this._dynamicResourceReaders, documentContext);
     matchingRealm = userRealms.find(realm => dynamicRealms.includes(realm));
     if (matchingRealm) {
-      log.debug('approved resource read for type=%s id=%s wtih dynamic realm=%s', resource.type, resource.id, matchingRealm);
+      log.debug('approved resource read for type=%s id=%s wtih dynamic realm=%s', documentContext.type, documentContext.id, matchingRealm);
       return true;
     }
-    log.debug('rejected resource read for type=%s id=%s userRealms=%j dynamicRealms=%j staticRealms=%j', resource.type, resource.id, userRealms, dynamicRealms, [...this._resourceReaders.keys()]);
+    log.debug('rejected resource read for type=%s id=%s userRealms=%j dynamicRealms=%j staticRealms=%j', documentContext.type, documentContext.id, userRealms, dynamicRealms, [...this._resourceReaders.keys()]);
     return false;
   }
 
-  mayReadAllFields(resource, userRealms) {
+  async mayReadAllFields(documentContext, userRealms) {
     if (userRealms.find(realm => this._allFieldReaders.has(realm))) {
       return true;
     }
-    let dynamicRealms = this._dynamicRealms(this._dynamicAllFieldReaders, resource);
+    let dynamicRealms = await this._dynamicRealms(this._dynamicAllFieldReaders, documentContext);
     return Boolean(userRealms.find(realm => dynamicRealms.includes(realm)));
   }
 
-  mayReadField(resource, userRealms, fieldName) {
-    return this.mayReadAllFields(resource, userRealms) || this.hasExplicitFieldGrant(resource, userRealms, fieldName);
+  async mayReadField(documentContext, userRealms, fieldName) {
+    return await this.mayReadAllFields(documentContext, userRealms) || await this.hasExplicitFieldGrant(documentContext, userRealms, fieldName);
   }
 
-  hasExplicitFieldGrant(resource, userRealms, fieldName) {
+  async hasExplicitFieldGrant(documentContext, userRealms, fieldName) {
     let allowedRealms = this._fieldReaders.get(fieldName);
     if (allowedRealms) {
       if (userRealms.find(realm => allowedRealms.has(realm))) {
@@ -131,22 +131,22 @@ module.exports = class Realms {
     }
     allowedRealms = this._dynamicFieldReaders.get(fieldName);
     if (allowedRealms) {
-      let dynamicRealms = this._dynamicRealms(allowedRealms, resource);
+      let dynamicRealms = await this._dynamicRealms(allowedRealms, documentContext);
       return Boolean(userRealms.find(realm => dynamicRealms.includes(realm)));
     }
   }
 
-  _dynamicRealms(lists, resource) {
-    return flatten(lists.map(who => this._dynamicRealm(who, resource)));
+  async _dynamicRealms(lists, documentContext) {
+    return flatten(await Promise.all(lists.map(who => this._dynamicRealm(who, documentContext))));
   }
 
-  _dynamicRealm(who, resource) {
+  async _dynamicRealm(who, documentContext) {
     let singleRealms = [];
     let choiceRealms = [];
 
     for (let { realmField, staticRealm } of who) {
       if (realmField) {
-        let baseRealms = Grant.readRealmsFromField(resource, realmField);
+        let baseRealms = await Grant.readRealmsFromField(documentContext, realmField);
         if (baseRealms.length === 0) {
           // One of our required conditions has no valid choices, so
           // we can short-circuit.
@@ -164,8 +164,8 @@ module.exports = class Realms {
     return realmIntersections(choiceRealms, singleRealms).map(list => uniq(list).sort().join('/'));
   }
 
-  authorizedReadRealms(resource) {
-    let dynamicRealms = this._dynamicRealms(this._dynamicResourceReaders, resource);
+  async authorizedReadRealms(documentContext) {
+    let dynamicRealms = await this._dynamicRealms(this._dynamicResourceReaders, documentContext);
     return [...this._resourceReaders].concat(dynamicRealms);
   }
 
