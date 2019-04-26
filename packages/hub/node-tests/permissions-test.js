@@ -71,7 +71,7 @@ describe('permissions', function() {
 
   it("attempting to fetch permissions for a resource the user doesn't have access to", async function() {
     try {
-      await searchers.get(env.session, 'master', 'permissions', `articles/improve-chess`);
+      await searchers.get(env.session, 'local-hub', 'permissions', `articles/improve-chess`);
     } catch (err) {
       expect(err.message).to.match(/No such resource master\/articles\/improve-chess/);
     }
@@ -79,7 +79,7 @@ describe('permissions', function() {
 
   it("attempting to fetch permissions for a resource the user has access to", async function() {
     allReadable();
-    let response = await searchers.get(env.session, 'master', 'permissions', `articles/improve-chess`);
+    let response = await searchers.get(env.session, 'local-hub', 'permissions', `articles/improve-chess`);
     expect(response).is.ok;
 
     let { data } = response;
