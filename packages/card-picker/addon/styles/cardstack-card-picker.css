@@ -2,6 +2,7 @@
   height: 100vh;
   width: 100%;
   background-color: var(--tray-background);
+  color: var(--bright-foreground);
   overflow-y: scroll;
   display: flex;
   justify-content: flex-start;
@@ -21,8 +22,8 @@
   border: 1px solid transparent;
 }
 .cardstack-card-picker--card:hover {
-  background-color: var(--highlight-background);
-  border-color: var(--light-outline);
+  background-color: var(--tray-highlight-medium);
+  border-color: var(--light20);
   box-shadow: 0 2px 15px 0 rgba(0,0,0,.3);
 }
 
@@ -67,7 +68,7 @@
   margin: 0 auto;
   display: block;
   padding: 12px 30px;
-  border: 1px solid var(--light-outline);
+  border: 1px solid var(--light20);
   border-radius: 4px;
   font-size: .8rem;
   background-color: var(--tray-background);
@@ -75,8 +76,8 @@
   cursor: pointer;
 }
 .cardstack-card-picker--load-more-button:hover {
-  background-color: var(--highlight-background);
-  color: var(--bright-blue-foreground);
+  background-color: var(--tray-highlight-medium);
+  color: var(--active-foreground);
 }
 
 .cardstack-card-picker--button-container {
@@ -89,7 +90,7 @@
   position: relative;
   width: 30px;
   height: 30px;
-  border: 1px solid var(--light-outline);
+  border: 1px solid var(--light20);
   border-radius: 4px;
   color: transparent;
   background-color: transparent;
@@ -114,7 +115,7 @@
 .cardstack-card-picker--upload-file-button {
   position: relative;
   padding: 12px 40px 12px 70px;
-  border: 1px solid var(--light-outline);
+  border: 1px solid var(--light20);
   border-radius: 4px;
   font-size: .8rem;
   background-color: var(--tray-background);
@@ -122,8 +123,8 @@
   cursor: pointer;
 }
 .cardstack-card-picker--upload-file-button:hover {
-  background-color: var(--highlight-background);
-  color: var(--bright-blue-foreground);
+  background-color: var(--tray-highlight-medium);
+  color: var(--active-foreground);
 }
 .cardstack-card-picker--upload-file-button:before {
   content: ' ';

@@ -4,7 +4,7 @@
 
 .cardstack-image-editor-filename {
   font-size: .75rem;
-  color: var(--faded-foreground);
+  color: var(--light50);
   overflow: hidden;
   text-overflow: ellipsis;
   margin-bottom: .5rem;
@@ -17,7 +17,7 @@
   width: 100%;
   padding: 12px 40px 12px 70px;
   margin: 0 auto .5rem;
-  border: 1px solid var(--light-outline);
+  border: 1px solid var(--light20);
   border-radius: 4px;
   font-size: .8rem;
   background-color: var(--tray-background);
@@ -30,8 +30,8 @@
 }
 
 .cardstack-image-editor-button:hover {
-  background-color: var(--highlight-background);
-  color: var(--bright-blue-foreground);
+  background-color: var(--tray-highlight-medium);
+  color: var(--active-foreground);
 }
 
 .cardstack-image-editor-button[disabled] {

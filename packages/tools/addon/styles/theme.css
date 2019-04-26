@@ -36,8 +36,8 @@
 }
 
 .cs-mobiledoc-overview > ol > li:hover {
-    background-color: var(--tools-highlight);
-    border-color: var(--tools-highlight);
+    background-color: #02dbf3;
+    border-color: #02dbf3;
     color: var(--bright-foreground);
     fill:  var(--bright-foreground);
 }

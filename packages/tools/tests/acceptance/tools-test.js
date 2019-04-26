@@ -147,7 +147,7 @@ module('Acceptance | tools', function(hooks) {
     assert.dom('[data-test-cs-field-editor="created-at"]').exists({ count: 1 });
   });
 
-  test('it does not collapse sections for right edge input fields that are not rendered in the template when you type in the field', async function(assert) {
+  test('fields that are not rendered in the template are still editable in right edge', async function(assert) {
     await visit('/hub/posts/1');
     await login();
     await click('[data-test-cardstack-tools-launcher]');
@@ -168,7 +168,6 @@ module('Acceptance | tools', function(hooks) {
     assert.dom('[data-test-cs-collapsible-section=comment-1-review-status] [data-test-cs-collapsible-section-title]').hasText('Comment #1: Review Status');
     assert.dom('[data-test-cs-collapsible-section=comment-2-review-status] [data-test-cs-collapsible-section-title]').hasText('Comment #2: Review Status');
   });
-
 
   test('panel captions of field groups are unambiguous', async function(assert) {
     await visit('/hub/posts/1');

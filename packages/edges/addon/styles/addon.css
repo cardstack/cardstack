@@ -12,11 +12,11 @@ body {
 .cst-right,
 .cst-left,
 .cst-top {
-    z-index: 1;
+    z-index: 3;
 }
 
 .cst-bottom {
-    z-index: 3;
+    z-index: 5;
 }
 
 .cardstack-modal-backdrop {

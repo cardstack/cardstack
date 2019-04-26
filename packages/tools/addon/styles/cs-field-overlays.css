@@ -1,5 +1,12 @@
+.cs-field-overlays,
+.cs-content-overlays {
+  --overlays-highlight: #02dbf3;
+  --overlays-foreground: #000;
+}
+
 .cs-field-overlay.show-overlay {
-  z-index: 1;
+  z-index: 2;
+  /* This sets field overlays above the scrim */
 }
 
 .cs-field-overlay .overlay-label,
@@ -7,13 +14,12 @@
   display: none;
 }
 
-.cs-field-overlay .overlay-border,
-.cs-content-overlay .overlay-border {
+.cs-field-overlay.hoverable > .overlay-border,
+.cs-content-overlay.hoverable > .overlay-border {
   border: 2px dotted var(--overlays-highlight);
 }
 
-.cs-field-overlay.with-inline-editor .overlay-label,
-.cs-field-overlay.passthrough .overlay-label {
+.cs-field-overlay.focused > .overlay-label {
   display: inline-block;
   padding: 0.4em 0.7em;
   background-color: var(--overlays-highlight);
@@ -24,8 +30,7 @@
   text-transform: capitalize;
 }
 
-.cs-field-overlay.with-inline-editor .overlay-border,
-.cs-field-overlay.passthrough .overlay-border {
+.cs-field-overlay.focused > .overlay-border {
   border-style: solid;
 }
 
@@ -36,4 +41,16 @@
 
 .cs-field-overlay.passthrough > * {
   pointer-events: auto;
+}
+
+/* Overriding style attribute that sets `visibility` to `hidden`.
+   This is so that when user can exit focus on field by
+   clicking elsewhere on the page */
+.cs-field-overlay.focused > .liquid-child {
+  visibility: visible !important;
+}
+
+/* Override scrims to be transparent */
+.overlay-scrim {
+  background-color: transparent !important;
 }

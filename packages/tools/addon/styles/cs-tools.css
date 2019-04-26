@@ -1,9 +1,9 @@
 .cs-tools--launcher > div {
-    /* this is for the edges launcher button */
-    /* sets z-index on 'fixed-withing-toolbars' component
+    /* This is for the edges launcher button */
+    /* Sets z-index on 'fixed-withing-toolbars' component
       which belongs to ember-toolbars package */
 
-    /* there are items that need higher z-indexes than this, like the bottom edge and
-    the modal overlay--so lets not go too crazy with this one */
-    z-index: 2;
+    /* Above field overlays, and the left, right, and top edges,
+       below the bottom edge */
+    z-index: 4;
 }

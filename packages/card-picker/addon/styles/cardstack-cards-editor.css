@@ -26,12 +26,12 @@
   -moz-user-select: none;
   user-select: none;
   text-decoration: underline;
-  color: var(--rising-foreground);
+  color: var(--tray-foreground);
   flex: 0 0 auto;
 }
 .cards-editor--button-panel > button {
-  background-color: var(--tools-highlight);
-  border: 1px solid var(--deep-tools-highlight);
+  background-color: var(--tray-highlight);
+  border: 1px solid var(--tray-highlight-deep);
   color: var(--bright-foreground);
   padding: .5em 2.5em;
   border-radius: 3px;

@@ -50,7 +50,7 @@
   margin: 4rem .75rem;
   min-width: 10rem;
   line-height: 1.5rem;
-  border: 1px solid var(--light-outline);
+  border: 1px solid var(--light20);
   border-radius: 4px;
   font-size: .75rem;
   opacity: .85;
@@ -62,10 +62,10 @@
 }
 
 .cardstack-image-upload-modal--button:hover {
-  background-color: var(--highlight-background);
-  color: var(--bright-blue-foreground);
+  background-color: var(--tray-highlight-medium);
+  color: var(--active-foreground);
 }
 
 .cardstack-image-upload-modal--upload-button {
-  color: var(--bright-blue-foreground);
+  color: var(--active-foreground);
 }

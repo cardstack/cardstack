@@ -16,25 +16,26 @@
   --normal-foreground: #343356;
   --active-foreground: #00e1f9;
   --bright-foreground: #fff;
+  --light-foreground: #f2f2f2;
   --green-foreground: #6aca25;
   --hot-pink-foreground: #ff0054;
 
+  --error-border: #860404;
+
   --light50: rgba(255,255,255,0.5);
   --light25: rgba(255,255,255,0.25);
+  --light20: rgba(255,255,255,0.2);
   --light05: rgba(255,255,255,0.05);
   --dark50: rgba(0,0,0,0.5);
 
-  /* Overlays */
-  --overlays-highlight: #02dbf3;
-  --overlays-foreground: #000;
+  /* Tray colors (ie. card-picker tool, image-picker tool) */
+  --tray-background: #151529;
+  --tray-foreground: #aaa;
+  --tray-highlight: #63a9fa;
+  --tray-highlight-medium: #4d4c6b;
+  --tray-highlight-deep: #032c5b;
 
-  /* From previous color scheme - in use */
-  --light-foreground: #F2F2F2;
-  --tools-highlight: #63a9fa;
-  --deep-tools-highlight: #032c5b;
-  --tools-preview: #860404;
-  --error-border: #860404;
-
+  /* Sizes */
   --cs-header-height: 60px;
   --cs-editor-panel-width: 22rem;
   --cs-mode-button-size: 3rem;
