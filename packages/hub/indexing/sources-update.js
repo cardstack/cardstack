@@ -35,7 +35,6 @@ module.exports = class SourcesUpdate {
 
   addStaticModels(schemaModels, allModels) {
     this.schemaModels = this.schemaModels.concat(schemaModels);
-    this.updaters['schemas'].staticModels = allModels;
     this.updaters['static-models'].staticModels = allModels;
   }
 

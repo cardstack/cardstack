@@ -6,28 +6,35 @@
 
 const { declareInjections } = require('@cardstack/di');
 const { isEqual } = require('lodash');
+const bootstrapSchema = require('../bootstrap-schema');
 
 module.exports = declareInjections({
   dataSources: 'config:data-sources',
+  schemaLoader: 'hub:schema-loader'
 },
 
 class StaticModelsIndexer {
-  static create({ dataSources }) {
-    return new this(dataSources);
+  static create({ dataSources, schemaLoader }) {
+    let models = bootstrapSchema.concat(dataSources);
+    let schemaTypes = schemaLoader.ownTypes();
+    let schemaModels = models.filter(m => schemaTypes.includes(m.type));
+    return new this(models, schemaModels);
   }
 
-  constructor(models) {
+  constructor(models, schemaModels) {
     this.models = models;
+    this.schemaModels = schemaModels;
   }
 
   async beginUpdate() {
-    return new Updater(this.models);
+    return new Updater(this.models, this.schemaModels);
   }
 });
 
 class Updater {
-  constructor(models) {
+  constructor(models, schemaModels) {
     this.models = models;
+    this.schemaModels = schemaModels;
 
     // because we are special and built into the hub, this gets set
     // magically for us after the schema() hook but before the
@@ -39,7 +46,7 @@ class Updater {
   }
 
   async schema() {
-    return [];
+    return this.schemaModels;
   }
 
   async updateContent(meta, hints, ops) {

@@ -4,7 +4,6 @@ const util = require('util');
 const resolve = util.promisify(require('resolve'));
 const bootstrapSchema = require('../bootstrap-schema');
 const { get } = require('lodash');
-const { cardContextFromId, cardContextToId } = require('@cardstack/plugin-utils/card-context');
 
 module.exports = class DataSource {
   constructor(model, plugins, projectPath) {
@@ -21,12 +20,9 @@ module.exports = class DataSource {
     this._authenticator = null;
     this._StaticModels = plugins.lookupFeatureFactory('static-models', this.sourceType);
     this._staticModels = null;
-    this._StaticSchemaModels = plugins.lookupFeatureFactory('schemas', this.sourceType);
-    this._staticSchemaModels = null;
-    this._schemaFeature = plugins.describeFeature('schemas', this.sourceType);
 
     this._schemaContentTypes = bootstrapSchema.filter(i => i.type === 'content-types' && get(i, 'attributes.is-built-in')).map(i => i.id);
-    if (!this._Writer && !this._Indexer && !this._Searcher && !this._Authenticator && !this._StaticSchemaModels && !this._StaticModels) {
+    if (!this._Writer && !this._Indexer && !this._Searcher && !this._Authenticator && !this._StaticModels) {
       throw new Error(`${this.sourceType} is either missing or does not appear to be a valid data source plugin`);
     }
     this.mayCreateUser = !!model.attributes['may-create-user'];
@@ -88,20 +84,6 @@ module.exports = class DataSource {
     }
     return this._staticModels;
   }
-  get staticSchemaModels() {
-    if (!this._staticSchemaModels) {
-      let schemaDocument;
-      if (this._StaticSchemaModels) {
-        schemaDocument = this._StaticSchemaModels.class.call(null, this._params);
-        this._addCardDefinitionContext(schemaDocument);
-        this._validateCardSchema(schemaDocument);
-      }
-
-      this._staticSchemaModels = modelsOf(schemaDocument);
-    }
-
-    return this._staticSchemaModels;
-  }
   async teardown() {
     if (this._writer && typeof this._writer.teardown === 'function') {
       await this._writer.teardown();
@@ -143,81 +125,4 @@ module.exports = class DataSource {
     }
     return this._userCorrelationQueryFunc(externalUser);
   }
-
-  _addCardDefinitionContext(schemaDocument) {
-    let { data:cardDefinition, included=[] } = schemaDocument;
-    // TODO we need to replace 'local-hub' with this.id after we do the work to deal with multi-hub
-    let sourceId = 'local-hub';
-    let packageName = get(this._schemaFeature, 'relationships.plugin.data.id');
-    let idMap = {};
-
-    if (cardDefinition.type !== 'card-definitions') {
-      throw new Error(`The datasource '${this.id}' defines schema document that is not of type 'card-definitions', found ${cardDefinition.type}.`);
-    }
-    idMap[`card-definitions/${cardDefinition.id}`] = cardContextToId({ sourceId, packageName });
-    for (let resource of included) {
-      // schema models are treated as cards
-      let cardId = ['content-types', 'fields'].includes(resource.type) ? get(resource, 'attributes.name') : resource.id;
-      idMap[`${resource.type}/${resource.id}`] = cardContextToId({ sourceId, packageName, cardId });
-    }
-
-    replaceIdsForResource(cardDefinition, idMap);
-    for (let resource of included) {
-      replaceIdsForResource(resource, idMap);
-    }
-  }
-
-  _validateCardSchema(schemaDocument={}) {
-    if (!this._schemaFeature) {
-      throw new Error(`Cannot validate schema for data-source ${this.id} of source-type ${this.sourceType}, no schema feature exists.`);
-    }
-
-    let { included=[], data:cardDefinition } = schemaDocument;
-    let nonSchemaModels = included.filter(i => !this._schemaContentTypes.includes(i.type)).map(i => `${i.type}/${i.id}`);
-    if (nonSchemaModels.length) {
-      throw new Error(`The datasource '${this.id}' defines schema that includes non-schema models. Non-schema models are not allowed in schemas. Found non-schema models: ${JSON.stringify(nonSchemaModels)}`);
-    }
-
-    let packageName = get(this._schemaFeature, 'relationships.plugin.data.id');
-
-    // TODO we need to replace 'local-hub' with this.id after we do the work to deal with multi-hub
-    let sourceId = 'local-hub';
-    let {
-      sourceId: cardDefinitionSourceId,
-      packageName: cardDefinitionPackageName
-    } = cardContextFromId(cardDefinition.id);
-    if (sourceId !== cardDefinitionSourceId || packageName !== cardDefinitionPackageName) {
-      throw new Error(`Schema for ${packageName} in datasource ${this.id} is has a card-definitions model id, '${cardDefinition.id}', that is not scoped for this source::package, "${sourceId}::${packageName}".`);
-    }
-
-    let cardScopeRegex = new RegExp(`^${sourceId}::${packageName}::`);
-    let unscopedModels = included.filter(i => !i.id.match(cardScopeRegex)).map(i => `${i.type}/${i.id}`);
-    if (unscopedModels.length) {
-      throw new Error(`Schema for ${packageName} in datasource ${this.id} has schema models that are not scoped to this data source and package ${JSON.stringify(unscopedModels)}`);
-    }
-  }
 };
-
-function replaceIdsForResource(resource, idMap) {
-  resource.id = idMap[`${resource.type}/${resource.id}`] || resource.id;
-  if (!resource.relationships) { return; }
-
-  for (let relationship of Object.keys(resource.relationships)) {
-    if (resource.relationships[relationship].data && Array.isArray(resource.relationships[relationship].data)) {
-      resource.relationships[relationship].data.forEach(ref => {
-        ref.id = idMap[`${ref.type}/${ref.id}`] || ref.id;
-      });
-    } else if (resource.relationships[relationship].data) {
-      let ref = resource.relationships[relationship].data;
-      ref.id = idMap[`${ref.type}/${ref.id}`] || ref.id;
-    }
-  }
-}
-
-function modelsOf(document={}) {
-  let { data, included=[] } = document;
-  if (!data) { return []; }
-
-  let models = [ data ];
-  return models.concat(included);
-}

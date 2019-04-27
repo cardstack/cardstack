@@ -1,5 +1,4 @@
 
-const JSONAPIFactory = require('../../../tests/stub-searcher/node_modules/@cardstack/test-support/jsonapi-factory');
 const {
   createDefaultEnvironment,
   destroyDefaultEnvironment
@@ -21,13 +20,7 @@ describe('hub/cards', function () {
       afterEach(teardown);
 
       it('can define a card schema', async function () {
-        let factory = new JSONAPIFactory();
-
-        // TODO should we still require that you specifically set a card package as a data source type in order to activate it?
-        factory.addResource('data-sources').withAttributes({ 'source-type': 'person-card' });
-        factory.addResource('data-sources').withAttributes({ 'source-type': 'article-card' });
-
-        env = await createDefaultEnvironment(`${__dirname}/../../../tests/stub-cards/valid-cards`, factory.getModels());
+        env = await createDefaultEnvironment(`${__dirname}/../../../tests/stub-cards/valid-cards`);
         searchers = env.lookup('hub:searchers');
 
         let schema = await searchers.get(env.session, 'local-hub', 'card-definitions', 'local-hub::person-card');
@@ -111,11 +104,7 @@ describe('hub/cards', function () {
       });
 
       it(`allows for a content-type's field to specify a related-types that refer to another card`, async function () {
-        let factory = new JSONAPIFactory();
-        factory.addResource('data-sources').withAttributes({ 'source-type': 'person-card' });
-        factory.addResource('data-sources').withAttributes({ 'source-type': 'article-card' });
-
-        env = await createDefaultEnvironment(`${__dirname}/../../../tests/stub-cards/valid-cards`, factory.getModels());
+        env = await createDefaultEnvironment(`${__dirname}/../../../tests/stub-cards/valid-cards`);
         searchers = env.lookup('hub:searchers');
 
         let schema = await searchers.get(env.session, 'local-hub', 'fields', 'local-hub::article-card::author');
@@ -125,11 +114,7 @@ describe('hub/cards', function () {
       });
 
       it(`allows for a content-type's field to specify a related-types that refer to a content-type within the card schema`, async function () {
-        let factory = new JSONAPIFactory();
-        factory.addResource('data-sources').withAttributes({ 'source-type': 'person-card' });
-        factory.addResource('data-sources').withAttributes({ 'source-type': 'article-card' });
-
-        env = await createDefaultEnvironment(`${__dirname}/../../../tests/stub-cards/valid-cards`, factory.getModels());
+        env = await createDefaultEnvironment(`${__dirname}/../../../tests/stub-cards/valid-cards`);
         searchers = env.lookup('hub:searchers');
 
         let schema = await searchers.get(env.session, 'local-hub', 'fields', 'local-hub::article-card::categories');
@@ -144,27 +129,20 @@ describe('hub/cards', function () {
       // no need to teardown() since env is never created in these scenarios
 
       it('throws when card schema does not return a card-definitions document', async function() {
-        let factory = new JSONAPIFactory();
-        factory.addResource('data-sources').withAttributes({ 'source-type': 'person-card' });
-
         let error;
         try {
-          await createDefaultEnvironment(`${__dirname}/../../../tests/stub-cards/schema-returns-non-card-definitions-document`, factory.getModels());
+          await createDefaultEnvironment(`${__dirname}/../../../tests/stub-cards/schema-returns-non-card-definitions-document`);
         } catch (e) {
           error = e;
         }
 
-        expect(error.message).to.match(/defines schema document that is not of type 'card-definitions'/);
+        expect(error.message).to.match(/defines a schema document that is not of type 'card-definitions'/);
       });
 
       it('throws when content type defined in the card schema uses a field not contained within the card schema', async function () {
-        let factory = new JSONAPIFactory();
-        factory.addResource('data-sources').withAttributes({ 'source-type': 'person-card' });
-        factory.addResource('data-sources').withAttributes({ 'source-type': 'article-card' });
-
         let error;
         try {
-          await createDefaultEnvironment(`${__dirname}/../../../tests/stub-cards/content-type-uses-foreign-field`, factory.getModels());
+          await createDefaultEnvironment(`${__dirname}/../../../tests/stub-cards/content-type-uses-foreign-field`);
         } catch (e) {
           error = e;
         }
@@ -173,13 +151,9 @@ describe('hub/cards', function () {
       });
 
       it(`throws when a content-type's field's related-types refers to a content-type that comes from a different card schema`, async function () {
-        let factory = new JSONAPIFactory();
-        factory.addResource('data-sources').withAttributes({ 'source-type': 'person-card' });
-        factory.addResource('data-sources').withAttributes({ 'source-type': 'article-card' });
-
         let error;
         try {
-          await createDefaultEnvironment(`${__dirname}/../../../tests/stub-cards/field-uses-related-types-with-foreign-content-type`, factory.getModels());
+          await createDefaultEnvironment(`${__dirname}/../../../tests/stub-cards/field-uses-related-types-with-foreign-content-type`);
         } catch (e) {
           error = e;
         }

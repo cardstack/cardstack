@@ -817,14 +817,6 @@ const models = [
     attributes: {
       'source-type': '@cardstack/hub::permissions',
     }
-  }
-  ,
-  {
-    type: 'data-sources',
-    id: 'schemas',
-    attributes: {
-      'source-type': '@cardstack/hub::schemas'
-    }
   },
   {
     type: 'data-sources',
