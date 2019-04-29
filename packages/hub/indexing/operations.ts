@@ -6,7 +6,7 @@ const opsPrivate: WeakMap<Operations, PrivateOperations> = new WeakMap();
 interface PrivateOperations {
   sourceId: string;
   sourcesUpdate: todo;
-  nonce: Number | null;
+  nonce: number | null;
 }
 
 function getPriv(instance: Operations): PrivateOperations {
@@ -15,7 +15,8 @@ function getPriv(instance: Operations): PrivateOperations {
 }
 
 class Operations {
-  static create(sourcesUpdate: todo, sourceId: string) {
+
+  static create(sourcesUpdate: todo, sourceId: string): Operations {
     return new this(sourcesUpdate, sourceId);
   }
 
@@ -26,7 +27,7 @@ class Operations {
       nonce: null
     });
   }
-  async save(type: string, id: string, doc: Document){
+  async save(type: string, id: string, doc: Document) {
     let { sourceId, sourcesUpdate, nonce } = getPriv(this);
     await sourcesUpdate.add(type, id, doc, sourceId, nonce);
   }
@@ -44,6 +45,6 @@ class Operations {
     }
     await sourcesUpdate.deleteAllWithoutNonce(sourceId, nonce);
   }
-};
+}
 
 export = Operations;

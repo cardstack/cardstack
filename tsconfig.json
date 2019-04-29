@@ -6,8 +6,6 @@
     "declaration": true,
     "typeRoots": ["node_modules/@types", "types"],
     "esModuleInterop": true,
-    "noUnusedLocals": true,
-    "noUnusedParameters": true,
     "sourceMap": true,
     "experimentalDecorators": true,
     "allowUnreachableCode": false,
