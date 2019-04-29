@@ -2,6 +2,8 @@ const Error = require('@cardstack/plugin-utils/error');
 const authLog = require('@cardstack/logger')('cardstack/auth');
 const util = require('util');
 const resolve = util.promisify(require('resolve'));
+const bootstrapSchema = require('../bootstrap-schema');
+const { get } = require('lodash');
 
 module.exports = class DataSource {
   constructor(model, plugins, projectPath) {
@@ -18,6 +20,8 @@ module.exports = class DataSource {
     this._authenticator = null;
     this._StaticModels = plugins.lookupFeatureFactory('static-models', this.sourceType);
     this._staticModels = null;
+
+    this._schemaContentTypes = bootstrapSchema.filter(i => i.type === 'content-types' && get(i, 'attributes.is-built-in')).map(i => i.id);
     if (!this._Writer && !this._Indexer && !this._Searcher && !this._Authenticator && !this._StaticModels) {
       throw new Error(`${this.sourceType} is either missing or does not appear to be a valid data source plugin`);
     }
@@ -33,6 +37,7 @@ module.exports = class DataSource {
     this._userCorrelationQueryFunc = null;
     this.tokenExpirySeconds = model.attributes['token-expiry-seconds'] || 86400;
   }
+
   get writer() {
     if (!this._writer && this._Writer) {
       this._writer = this._Writer.create(this._params);
@@ -65,6 +70,18 @@ module.exports = class DataSource {
         this._staticModels = [];
       }
     }
+    let schemaModels = this._staticModels.filter(i => this._schemaContentTypes.includes(i.type)).map(i => `${i.type}/${i.id}`);
+    if (schemaModels.length) {
+    /*
+      TODO: We need to grandfather in the current static-model ability to specify schema if we want to limit this PR to
+      reasoning about being able to specify the new card schema only--otherwise we'll need to also implement the new
+      card indexing at the same time as well. The next step here is to remove this grandfathering so that everything uses
+      the new schema feature and as a result, everything is forced to use the new card boundaries. This can be done byr
+      uncommenting the line below and unskipping the unit test that goes along with this.
+
+      throw new Error(`The datasource '${this.id}' defines static-models that includes schema. Schema is not allowed in static-models. Found schema models: ${JSON.stringify(schemaModels)}`);
+    */
+    }
     return this._staticModels;
   }
   async teardown() {
@@ -81,8 +98,6 @@ module.exports = class DataSource {
       await this._authenticator.teardown();
     }
   }
-
-
 
   async rewriteExternalUser(externalUser) {
     if (!this._userRewriterFunc) {
@@ -110,6 +125,4 @@ module.exports = class DataSource {
     }
     return this._userCorrelationQueryFunc(externalUser);
   }
-
-
 };

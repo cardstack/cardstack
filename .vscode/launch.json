@@ -122,7 +122,7 @@
                 "--timeout",
                 "200000",
                 // "--grep",
-                // "can delete a record"
+                // "hub/cards"
             ]
         },
         {

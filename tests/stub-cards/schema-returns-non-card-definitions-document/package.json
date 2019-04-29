@@ -1,0 +1,12 @@
+{
+  "name": "schema-returns-non-card-definitions-document",
+  "dependencies": {
+    "person-card": "*"
+  },
+  "devDependencies": {
+    "@cardstack/test-support": "*"
+  },
+  "engines": {
+    "node": ">= 8"
+  }
+}

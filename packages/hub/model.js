@@ -2,7 +2,6 @@
 // (like computed fields) to access models.
 const priv = new WeakMap();
 const qs = require('qs');
-const log = require('@cardstack/logger')('cardstack/hub/model');
 
 exports.privateModels = priv;
 
@@ -50,7 +49,6 @@ exports.Model = class Model {
     if (computedField) {
       let userValue = await computedField.compute(this);
       if (field.isRelationship && !isRelationshipObject(userValue)) {
-        log.warn('computed relationship returned not a relationship object');
         userValue = { data: userValue };
       }
       return userValue;

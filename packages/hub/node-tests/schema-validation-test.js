@@ -372,6 +372,13 @@ describe('schema/validation', function() {
     expect(errors).includes.something.with.property('detail', 'Published Date must be present');
   });
 
+  it.skip('runs constraint for a field that uses a contraints relationship', async function() {
+    // TODO
+  });
+
+  it.skip('can show the contraint error message', async function() {
+    // TODO
+  });
 
   it("can lookup up a writer for a content type", async function() {
     expect(schema.types.get('articles').dataSource).is.ok;

@@ -37,6 +37,7 @@ module.exports = class ComputedField {
         type: 'fields',
         attributes: {
           'field-type': type,
+          'name': model.attributes['name'],
           caption: model.attributes.caption,
           searchable: model.attributes.searchable,
           'editor-options': model.attributes['editor-options']

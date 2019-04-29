@@ -21,6 +21,7 @@ const featureTypes = [
   'computed-field-types',
   'writers',
   'searchers',
+  'schemas',
   'indexers',
   'static-models',
   'authenticators',

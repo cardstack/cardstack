@@ -1,0 +1,13 @@
+{
+  "name": "field-uses-related-types-with-foreign-content-type",
+  "dependencies": {
+    "article-card": "*",
+    "person-card": "*"
+  },
+  "devDependencies": {
+    "@cardstack/test-support": "*"
+  },
+  "engines": {
+    "node": ">= 8"
+  }
+}

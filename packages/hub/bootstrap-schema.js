@@ -11,6 +11,7 @@ const models = [
     relationships: {
       fields: {
         data: [
+          { type: 'fields', id: 'name' },
           { type: 'fields', id: 'data-source' },
           { type: 'fields', id: 'fields' },
           { type: 'fields', id: 'is-built-in' },
@@ -25,6 +26,34 @@ const models = [
   },
   {
     type: 'content-types',
+    id: 'card-definitions',
+    attributes: {
+      'is-built-in': true
+    },
+    relationships: {
+      fields: {
+        data: [
+          { type: 'fields', id: 'model' },
+        ]
+      }
+    }
+  },
+  {
+    type: 'content-types',
+    id: 'cards',
+    attributes: {
+      'is-built-in': true
+    },
+    relationships: {
+      fields: {
+        data: [
+          { type: 'fields', id: 'model' },
+        ]
+      }
+    }
+  },
+  {
+    type: 'content-types',
     id: 'fields',
     attributes: {
       'is-built-in': true
@@ -32,6 +61,7 @@ const models = [
     relationships: {
       fields: {
         data: [
+          { type: 'fields', id: 'name' },
           { type: 'fields', id: 'field-type' },
           { type: 'fields', id: 'related-types' },
           { type: 'fields', id: 'default-at-create' },
@@ -41,7 +71,12 @@ const models = [
           { type: 'fields', id: 'editor-component'},
           { type: 'fields', id: 'editor-options'},
           { type: 'fields', id: 'inline-editor-component'},
-          { type: 'fields', id: 'inline-editor-options'}
+          { type: 'fields', id: 'inline-editor-options'},
+          { type: 'fields', id: 'is-metadata'},
+          { type: 'fields', id: 'needed-when-embedded'},
+          { type: 'fields', id: 'instructions'},
+          { type: 'fields', id: 'constraints'},
+          { type: 'fields', id: 'placeholder'},
         ]
       }
     }
@@ -55,6 +90,7 @@ const models = [
     relationships: {
       fields: {
         data: [
+          { type: 'fields', id: 'name' },
           { type: 'fields', id: 'computed-field-type' },
           { type: 'fields', id: 'caption' },
           { type: 'fields', id: 'searchable' },
@@ -74,7 +110,8 @@ const models = [
         data: [
           { type: 'fields', id: 'constraint-type' },
           { type: 'fields', id: 'inputs' },
-          { type: 'fields', id: 'input-assignments' }
+          { type: 'fields', id: 'input-assignments' },
+          { type: 'fields', id: 'error-message' }
         ]
       }
     }
@@ -311,6 +348,48 @@ const models = [
   },
   {
     type: 'fields',
+    id: 'model',
+    attributes: {
+      'field-type': '@cardstack/core-types::belongs-to'
+    }
+  },
+  {
+    type: 'fields',
+    id: 'is-metadata',
+    attributes: {
+      'field-type': '@cardstack/core-types::boolean'
+    }
+  },
+  {
+    type: 'fields',
+    id: 'needed-when-embedded',
+    attributes: {
+      'field-type': '@cardstack/core-types::boolean'
+    }
+  },
+  {
+    type: 'fields',
+    id: 'instructions',
+    attributes: {
+      'field-type': '@cardstack/core-types::string'
+    }
+  },
+  {
+    type: 'fields',
+    id: 'placeholder',
+    attributes: {
+      'field-type': '@cardstack/core-types::string'
+    }
+  },
+  {
+    type: 'fields',
+    id: 'constraints',
+    attributes: {
+      'field-type': '@cardstack/core-types::has-many'
+    }
+  },
+  {
+    type: 'fields',
     id: 'may-create-user',
     attributes: {
       'field-type': '@cardstack/core-types::boolean'
@@ -423,6 +502,13 @@ const models = [
   {
     type: 'fields',
     id: 'constraint-type',
+    attributes: {
+      'field-type': '@cardstack/core-types::string'
+    }
+  },
+  {
+    type: 'fields',
+    id: 'error-message',
     attributes: {
       'field-type': '@cardstack/core-types::string'
     }
@@ -691,6 +777,13 @@ const models = [
     id: 'plugin-config',
     attributes: {
       'field-type': '@cardstack/core-types::object'
+    }
+  },
+  {
+    type: 'fields',
+    id: 'name',
+    attributes: {
+      'field-type': '@cardstack/core-types::string'
     }
   },
   {
