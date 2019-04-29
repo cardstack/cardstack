@@ -37,7 +37,6 @@ before_install:
 install:
   - yarn install
   - travis_wait ./node_modules/.bin/lerna bootstrap
-  - yarn compile
 
 before_script:
  - yarn run blockchain &
