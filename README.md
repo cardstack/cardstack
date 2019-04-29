@@ -69,6 +69,7 @@ In development, we use `lerna` to manage the inter-dependencies of all the packa
  2. Install yarn >= 0.28 (earlier versions work but will not benefit from [Workspaces](https://yarnpkg.com/blog/2017/08/02/introducing-workspaces/)).
  3. `yarn global add lerna` (use >= 2.0.0 for yarn workspaces integration)
  4. `lerna bootstrap`
+ 5. Launch the typescript compiler with `yarn compile --watch`
 
 
 ### Test Suite Dependencies
