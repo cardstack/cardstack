@@ -105,6 +105,10 @@ export default Service.extend({
     let response = await fetch(url, {
       headers: this._headers()
     });
+    if (response.status !== 200) {
+      let permissionsSubject = model.id ? `${modelName}/${model.id}` : modelName;
+      throw new Error(`Couldn't fetch permissions for ${permissionsSubject}`)
+    }
     let { data } = await response.json();
     let { attributes, relationships } = data;
     return {
