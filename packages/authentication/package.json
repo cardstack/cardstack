@@ -59,10 +59,6 @@
     "ember-source-channel-url": "^1.0.1",
     "ember-toolbars": "^0.4.1",
     "ember-try": "^0.2.23",
-    "eslint": "^5.8.0",
-    "eslint-plugin-ember": "^5.0.0",
-    "eslint-plugin-mocha": "^5.2.0",
-    "eslint-plugin-node": "^5.2.1",
     "koa": "2",
     "loader.js": "^4.2.3",
     "supertest": "^2.0.1"

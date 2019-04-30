@@ -20,10 +20,6 @@
   },
   "devDependencies": {
     "@cardstack/eslint-config": "0.13.71",
-    "eslint": "^5.8.0",
-    "eslint-plugin-ember": "^5.0.0",
-    "eslint-plugin-mocha": "^5.2.0",
-    "eslint-plugin-node": "^5.2.1",
     "lodash": "^4.17.11"
   },
   "scripts": {
