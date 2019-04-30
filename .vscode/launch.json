@@ -151,9 +151,9 @@
       "name": "cardstack run first-card",
       "cwd": "${workspaceRoot}/packages/cli",
       "program": "${workspaceRoot}/packages/cli/bin/cardstack",
-      "args": ["run", "./node-tests/first-card"],
+      "args": ["run"],
       "env": {
-        "XCARDSTACK_DEV_NOCACHE": "true"
+        "CARDSTACK_DEV_NOCACHE": "true"
       }
     }
   ]
