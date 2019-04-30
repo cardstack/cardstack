@@ -28,6 +28,7 @@ module.exports = {
     "@typescript-eslint/prefer-interface": "error",
     "@typescript-eslint/prefer-namespace-keyword": "error",
     "@typescript-eslint/type-annotation-spacing": "error",
-    "@typescript-eslint/no-require-imports": "error"
+    "@typescript-eslint/no-require-imports": "error",
+    "@typescript-eslint/no-for-in-array": "error"
   }
 };
