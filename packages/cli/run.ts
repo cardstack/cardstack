@@ -4,11 +4,16 @@ import { tmpdir } from "os";
 import hashForDep from "hash-for-dep";
 import UI from "console-ui";
 import { execFileSync } from "child_process";
-import { ensureDirSync, pathExistsSync, writeFileSync, mkdirpSync } from "fs-extra";
+import {
+  ensureDirSync,
+  pathExistsSync,
+  writeFileSync,
+  mkdirpSync,
+} from "fs-extra";
 
 const appName = "cardstack-standard-app";
 
-const ephemeralConfig =  `
+const ephemeralConfig = `
 module.exports = [
   {
     type: 'data-sources',
@@ -44,7 +49,6 @@ Router.map(cardstackRoutes);
 export default Router;
 `;
 
-
 interface Options {
   dir: string;
   ui: UI;
@@ -55,7 +59,7 @@ function getWorkDir(cardDir: string): string {
   hash.update(
     cardDir +
       "\0" +
-      (process.env.CARDSTACK_DEV_NOCACHE ? "nocache" : hashForDep(__dirname))
+      (process.env.CARDSTACK_DEV ? "nocache" : hashForDep(__dirname))
   );
   return join(tmpdir(), "cardstack", hash.digest("hex").slice(0, 6));
 }
@@ -70,9 +74,7 @@ export default async function run({ dir, ui }: Options) {
     generateEmberApp(workDir);
     installDependencies(appDir);
     enhanceApp(appDir);
-
   }
-
 }
 
 function generateEmberApp(workDir: string) {
@@ -87,23 +89,28 @@ function generateEmberApp(workDir: string) {
   );
 }
 
+const cardstackDeps = [
+  "hub",
+  "jsonapi",
+  "ephemeral",
+];
+
 function installDependencies(appDir: string) {
   let yarn = require.resolve("yarn/bin/yarn");
-  execFileSync(
-    yarn,
-    [
-      "add",
-      "--dev",
-      "@cardstack/hub",
-      "@cardstack/jsonapi",
-      "@cardstack/ephemeral",
-    ],
-    { cwd: appDir }
-  );
+  if (process.env.CARDSTACK_DEV) {
+    for (let pkgName of cardstackDeps) {
+      execFileSync(yarn, ["link"], { cwd: join(__dirname, '..', pkgName) });
+    }
+    execFileSync(yarn, ["link", ...cardstackDeps.map(d => `@cardstack/${d}`)], { cwd: appDir });
+  }
+  execFileSync(yarn, ["add", "--dev", ...cardstackDeps.map(d => `@cardstack/${d}`)], { cwd: appDir });
 }
 
 function enhanceApp(appDir: string) {
   mkdirpSync(join(appDir, "cardstack", "data-sources"));
-  writeFileSync(join(appDir, "cardstack", "data-sources", "ephemeral.js"), ephemeralConfig);
-  writeFileSync(join(appDir, 'app', 'router.js'), routerJS);
+  writeFileSync(
+    join(appDir, "cardstack", "data-sources", "ephemeral.js"),
+    ephemeralConfig
+  );
+  writeFileSync(join(appDir, "app", "router.js"), routerJS);
 }
