@@ -8,6 +8,43 @@ import { ensureDirSync, pathExistsSync, writeFileSync, mkdirpSync } from "fs-ext
 
 const appName = "cardstack-standard-app";
 
+const ephemeralConfig =  `
+module.exports = [
+  {
+    type: 'data-sources',
+    id: 'default',
+    attributes: {
+      'source-type': '@cardstack/ephemeral'
+    }
+  },
+  {
+    type: 'plugin-configs',
+    id: '@cardstack/hub',
+    relationships: {
+      'default-data-source': {
+        data: { type: 'data-sources', id: 'default' }
+      }
+    }
+  }
+];
+`;
+
+const routerJS = `
+import EmberRouter from "@ember/routing/router";
+import config from "./config/environment";
+import { cardstackRoutes } from '@cardstack/routing';
+
+const Router = EmberRouter.extend({
+  location: config.locationType,
+  rootURL: config.rootURL
+});
+
+Router.map(cardstackRoutes);
+
+export default Router;
+`;
+
+
 interface Options {
   dir: string;
   ui: UI;
@@ -33,7 +70,9 @@ export default async function run({ dir, ui }: Options) {
     generateEmberApp(workDir);
     installDependencies(appDir);
     enhanceApp(appDir);
+
   }
+
 }
 
 function generateEmberApp(workDir: string) {
@@ -65,27 +104,6 @@ function installDependencies(appDir: string) {
 
 function enhanceApp(appDir: string) {
   mkdirpSync(join(appDir, "cardstack", "data-sources"));
-  writeFileSync(
-    join(appDir, "cardstack", "data-sources", "ephemeral.js"),
-    `
-  module.exports = [
-    {
-      type: 'data-sources',
-      id: 'default',
-      attributes: {
-        'source-type': '@cardstack/ephemeral'
-      }
-    },
-    {
-      type: 'plugin-configs',
-      id: '@cardstack/hub',
-      relationships: {
-        'default-data-source': {
-          data: { type: 'data-sources', id: 'default' }
-        }
-      }
-    }
-  ];
-  `, 'utf8'
-  );
+  writeFileSync(join(appDir, "cardstack", "data-sources", "ephemeral.js"), ephemeralConfig);
+  writeFileSync(join(appDir, 'app', 'router.js'), routerJS);
 }
