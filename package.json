@@ -9,6 +9,7 @@
     "node": ">= 7.7"
   },
   "dependencies": {
+    "@types/node": "11.13.8",
     "@typescript-eslint/eslint-plugin": "^1.7.0",
     "@typescript-eslint/parser": "^1.7.0",
     "eslint-plugin-ember": "^5.0.0",
