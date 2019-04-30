@@ -22,6 +22,7 @@
     "typescript": "3.4.5"
   },
   "scripts": {
+    "clean": "git clean -x -f",
     "compile": "tsc",
     "prepare": "npm run compile",
     "test": "npm run lint:deps && npm run lint:js && npm run node-tests && npm run ember-tests && npm run truffle-tests",
