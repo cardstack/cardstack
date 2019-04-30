@@ -144,6 +144,7 @@ class Authentication {
 
           let m = bearerTokenPattern.exec(ctxt.header['authorization']);
           if (m) {
+            ctxt.body.data.meta = ctxt.body.data.meta || {};
             ctxt.body.data.meta['prevToken'] = m[1];
           }
         });
