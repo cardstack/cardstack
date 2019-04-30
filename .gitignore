@@ -20,6 +20,9 @@ package-lock.json
 /packages/plugin-utils/todo-any.d.ts
 /packages/plugin-utils/todo-any.js
 /packages/plugin-utils/todo-any.js.map
+/packages/cli/**/*.js
+/packages/cli/**/*.js.map
+/packages/cli/**/*.d.ts
 
 
 

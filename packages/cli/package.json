@@ -12,6 +12,8 @@
   "repository": "https://github.com/cardstack/cardstack",
   "description": "Command line tools for Cardstack.",
   "dependencies": {
+    "@types/yargs": "^13.0.0",
+    "yargs": "^13.2.2"
   },
   "devDependencies": {
     "@cardstack/eslint-config": "0.13.71"
