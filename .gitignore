@@ -1,5 +1,8 @@
 /node_modules
 /packages/*/node_modules
+/packages/*/dist
+/packages/*/tmp
+/packages/*/vendor
 .eslintcache
 .vagrant
 .nvmrc
@@ -8,3 +11,15 @@ lerna-debug.log
 tmp
 .DS_Store
 package-lock.json
+
+
+# Needed during incremental conversion to typescript
+/packages/hub/indexing/operations.d.ts
+/packages/hub/indexing/operations.js
+/packages/hub/indexing/operations.js.map
+/packages/plugin-utils/todo-any.d.ts
+/packages/plugin-utils/todo-any.js
+/packages/plugin-utils/todo-any.js.map
+
+
+

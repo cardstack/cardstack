@@ -1,6 +1,9 @@
 module.exports = {
+  parser: '@typescript-eslint/parser',
   parserOptions: {
-    ecmaVersion: 8
+    project: './tsconfig.json',
+    ecmaVersion: 2017,
+    sourceType: 'module',
   },
   env: {
     'node': true,
@@ -20,8 +23,11 @@ module.exports = {
       'node/no-extraneous-require': ['error', {
         'allowModules': []
       }],
+      'node/no-extraneous-import': ['error', {
+        'allowModules': []
+      }],
       'node/no-missing-require': ['error'],
-      'no-undef': 'error'
+      'no-undef': 'error',
     }),
-  plugins: ['node']
+  plugins: ['node', '@typescript-eslint']
 };

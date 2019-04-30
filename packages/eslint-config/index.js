@@ -1,11 +1,17 @@
 let node = require('./-node');
 let test = require('./test');
+let ts = require('./-ts');
 
 module.exports = Object.assign({}, node, {
   overrides: [
     Object.assign({}, test, {
       files: [
         'node-tests/**/*.js'
+      ]
+    }),
+    Object.assign({}, ts, {
+      files: [
+        '**/*.ts'
       ]
     })
   ]

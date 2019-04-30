@@ -10,10 +10,6 @@
     "@cardstack/eslint-config": "0.13.71",
     "broccoli-builder": "^0.18.10",
     "denodeify": "^1.2.1",
-    "eslint": "^5.8.0",
-    "eslint-plugin-ember": "^5.0.0",
-    "eslint-plugin-mocha": "^5.2.0",
-    "eslint-plugin-node": "^5.2.1",
     "fixturify": "^0.3.4",
     "fs-extra": "^4.0.2",
     "walk-sync": "^0.3.2"

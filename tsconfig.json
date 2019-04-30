@@ -1,0 +1,20 @@
+{
+  "include": ["./packages/**/*.ts"],
+  "compilerOptions": {
+    "target": "es2017",
+    "module": "commonjs",
+    "declaration": true,
+    "typeRoots": ["node_modules/@types", "types"],
+    "esModuleInterop": true,
+    "sourceMap": true,
+    "experimentalDecorators": true,
+    "allowUnreachableCode": false,
+    "strict": true
+  },
+  "exclude": [
+    "node_modules",
+    "packages/*/tmp",
+    "packages/*/dist",
+    "tmp"
+  ]
+}
