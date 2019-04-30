@@ -5,6 +5,8 @@
 /* eslint-disable node/shebang */
 
 import yargs from 'yargs';
+import UI from 'console-ui';
+const ui = new UI();
 
 yargs
   .scriptName("cardstack")
@@ -17,7 +19,7 @@ yargs
     });
   }, async function (argv) {
     let run = await import('../run');
-    await run.default(argv);
+    await run.default(Object.assign({ ui }, argv));
   })
   .demandCommand(1, 'Use any of the commands above.')
   .help()

@@ -12,7 +12,11 @@
   "repository": "https://github.com/cardstack/cardstack",
   "description": "Command line tools for Cardstack.",
   "dependencies": {
+    "@types/console-ui": "^2.2.0",
+    "@types/node": "^11.13.8",
     "@types/yargs": "^13.0.0",
+    "console-ui": "^3.0.2",
+    "hash-for-dep": "^1.5.1",
     "yargs": "^13.2.2"
   },
   "devDependencies": {
