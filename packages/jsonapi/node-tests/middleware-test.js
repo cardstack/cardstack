@@ -8,6 +8,7 @@ const { currentVersion } = require('./support');
 const JSONAPIFactory = require('@cardstack/test-support/jsonapi-factory');
 const log = require('@cardstack/logger')('jsonapi-test');
 const defaults = require('superagent-defaults');
+const qs = require('qs');
 
 describe('jsonapi/middleware', function() {
 
@@ -43,6 +44,20 @@ describe('jsonapi/middleware', function() {
         factory.addResource('input-assignments')
           .withAttributes({ inputName: 'target'})
           .withRelated('field', { type: 'fields', id: 'body' })
+      ]);
+
+    factory.addResource('content-types', 'catalogs')
+      .withAttributes({
+        defaultIncludes: ['favorite-articles', 'featured-article']
+      })
+      .withRelated('fields', [
+        factory.getResource('fields', 'title'),
+        factory.addResource('fields', 'favorite-articles').withAttributes({
+          fieldType: '@cardstack/core-types::has-many'
+        }),
+        factory.addResource('fields', 'featured-article').withAttributes({
+          fieldType: '@cardstack/core-types::belongs-to'
+        })
       ]);
 
     factory.addResource('content-types', 'events')
@@ -119,6 +134,29 @@ describe('jsonapi/middleware', function() {
         'author',
         factory.getResource('authors', 'q')
       );
+
+    factory.addResource('articles', 4).withAttributes({ title: "Space is cool", body: "This is the fourth article" });
+    factory.addResource('articles', 5).withAttributes({ title: "Rube Goldberg machines", body: "This is the fifth article" });
+    factory.addResource('articles', 6).withAttributes({ title: "Look ma, I'm going to space!", body: "This is the sixth article" });
+    factory.addResource('articles', 7).withAttributes({ title: "Black body radiators", body: "This is the seventh article" });
+    factory.addResource('articles', 8).withAttributes({ title: "How to mend a space suit", body: "This is the eighth article" });
+
+    factory.addResource('catalogs', 1)
+      .withAttributes({ title: "Article Catalog" })
+      .withRelatedLink('favorite-articles', `/api?${qs.stringify({
+        filter: {
+          type: { exact: 'articles' }
+        },
+        sort: 'title',
+        page: { size: 3 }
+      })}`)
+      .withRelatedLink('featured-article', `/api?${qs.stringify({
+        filter: {
+          type: { exact: 'articles' },
+          title: 'goldberg'
+        },
+        page: { size: 1 }
+      })}`);
 
     factory.addResource('authors').withAttributes({
       name: 'Lycia'
@@ -211,27 +249,26 @@ describe('jsonapi/middleware', function() {
       let response = await request.get('/api/articles');
       expect(response).hasStatus(200);
       expect(response.body).to.have.property('data');
-      expect(response.body).to.have.deep.property('meta.total', 3);
-      expect(response.body.data).length(3);
-      expect(response.body.data).collectionContains({ type: 'articles', id: '0' });
-      expect(response.body.data).collectionContains({ type: 'articles', id: '1' });
-      expect(response.body.data).collectionContains({ type: 'articles', id: '3' });
+      expect(response.body).to.have.deep.property('meta.total', 8);
+      expect(response.body.data).length(8);
+      expect(response.body.data.map(item => item.type).filter((v, i, a) => a.indexOf(v) === i)).to.eql(['articles']);
+      expect(response.body.data.map(item => item.id)).to.eql(['0', '1', '3', '4', '5', '6', '7', '8']);
     });
 
     it('can sort a collection resource', async function() {
       let response = await request.get('/api/articles?sort=title');
       expect(response).hasStatus(200);
       expect(response.body).to.have.property('data');
-      expect(response.body).has.deep.property('data[0].attributes.title', 'Hello world');
-      expect(response.body).has.deep.property('data[1].attributes.title', 'Second');
+      expect(response.body).has.deep.property('data[0].attributes.title', 'Black body radiators');
+      expect(response.body).has.deep.property('data[1].attributes.title', 'Hello world');
     });
 
     it('can reverse sort a collection resource', async function() {
       let response = await request.get('/api/articles?sort=-title&filter[id][]=0&filter[id][]=1');
       expect(response).hasStatus(200);
       expect(response.body).has.property('data');
-      expect(response.body).has.deep.property('data[1].attributes.title', 'Hello world');
       expect(response.body).has.deep.property('data[0].attributes.title', 'Second');
+      expect(response.body).has.deep.property('data[1].attributes.title', 'Hello world');
     });
 
     it('can filter a collection resource', async function() {
@@ -264,14 +301,14 @@ describe('jsonapi/middleware', function() {
       let response = await request.get('/api/articles?page[size]=1&sort=title');
       expect(response).hasStatus(200, 'first request');
       expect(response.body.data).length(1);
-      expect(response.body).has.deep.property('data[0].attributes.title', 'Hello world');
+      expect(response.body).has.deep.property('data[0].attributes.title', 'Black body radiators');
       expect(response.body).has.deep.property('links.next');
 
       let nextLink = makeRelativeLink(response, response.body.links.next);
 
       response = await request.get(nextLink);
       expect(response).hasStatus(200, 'second request');
-      expect(response.body).has.deep.property('data[0].attributes.title', 'Second');
+      expect(response.body).has.deep.property('data[0].attributes.title', 'Hello world');
       expect(response.body.data).length(1);
     });
 
@@ -460,6 +497,26 @@ describe('jsonapi/middleware', function() {
       expect(articleIds).to.include('1');
     });
 
+    it('can get an individual resource with a query relationship', async function() {
+      let response = await request.get('/api/catalogs/1');
+      expect(response).hasStatus(200);
+      expect(response.body).has.deep.property('data.id', '1');
+      expect(response.body).has.deep.property('data.attributes.title', 'Article Catalog');
+      expect(response.body).has.deep.property('data.relationships.favorite-articles.links.related', '/api?filter%5Btype%5D%5Bexact%5D=articles&sort=title&page%5Bsize%5D=3');
+      expect(response.body.data.relationships['favorite-articles'].data.map(item => item.id)).to.eql(["7", "0", "8"]);
+      expect(response.body).has.deep.property('data.relationships.featured-article.links.related', '/api?filter%5Btype%5D%5Bexact%5D=articles&filter%5Btitle%5D=goldberg&page%5Bsize%5D=1');
+      expect(response.body.data.relationships['featured-article'].data.id).to.equal("5");
+      expect(response.body).has.deep.property('data.meta.version');
+      expect(response.body).has.property('included');
+
+      let articleTitles = response.body.included.filter(r => r.type === 'articles').map(r => r.attributes.title);
+      expect(articleTitles).length(4);
+      expect(articleTitles).to.include('Black body radiators');
+      expect(articleTitles).to.include('Hello world');
+      expect(articleTitles).to.include('How to mend a space suit');
+      expect(articleTitles).to.include('Rube Goldberg machines');
+    });
+
     it('can override default includes with no includes', async function() {
       let response = await request.get('/api/events/1?include=');
       expect(response).hasStatus(200);
@@ -615,7 +672,83 @@ describe('jsonapi/middleware', function() {
       response = await request.get(makeRelativeLink(response, response.headers.location));
       expect(response).hasStatus(200);
       expect(response.body).has.deep.property('data.attributes.title', 'I am new', 'second time');
+    });
 
+    it('can create a new resource with a has-many query relationships', async function() {
+      let query = {
+        filter: {
+          type: { exact: 'articles' },
+          title: 'space'
+        }
+      };
+
+      let response = await request.post('/api/catalogs').send({
+        data: {
+          type: 'catalogs',
+          attributes: {
+            title: 'Articles about Space'
+          },
+          relationships: {
+            'favorite-articles': {
+              data: [{
+                type: 'cardstack-queries',
+                id: `/api?${qs.stringify(query)}`
+              }]
+            }
+          }
+        }
+      });
+
+      expect(response).hasStatus(201);
+      expect(response.headers).has.property('location');
+      expect(response.body).has.deep.property('data.id');
+      expect(response.body).has.deep.property('data.attributes.title', 'Articles about Space');
+      expect(response.body).has.deep.property('data.relationships.favorite-articles.links.related', '/api?filter%5Btype%5D%5Bexact%5D=articles&filter%5Btitle%5D=space');
+      expect(response.body).has.deep.property('data.meta.version');
+
+      response = await request.get(makeRelativeLink(response, response.headers.location));
+      expect(response).hasStatus(200);
+      expect(response.body.data.relationships['favorite-articles'].data).length(3);
+      expect(response.body.data.relationships['favorite-articles'].data.map(item => item.id)).to.eql(["4", "6", "8"]);
+    });
+
+    it('can create a new resource with a belongs-to query relationships', async function() {
+      let query = {
+        filter: {
+          type: { exact: 'articles' },
+          title: 'goldberg'
+        },
+        page: { size: 1 }
+      };
+
+      let response = await request.post('/api/catalogs').send({
+        data: {
+          type: 'catalogs',
+          attributes: {
+            title: 'Curious Machines'
+          },
+          relationships: {
+            'featured-article': {
+              data: {
+                type: 'cardstack-queries',
+                id: `/api?${qs.stringify(query)}`
+              }
+            }
+          }
+        }
+      });
+
+      expect(response).hasStatus(201);
+      expect(response.headers).has.property('location');
+      expect(response.body).has.deep.property('data.id');
+      expect(response.body).has.deep.property('data.attributes.title', 'Curious Machines');
+      expect(response.body).has.deep.property('data.relationships.featured-article.links.related', '/api?filter%5Btype%5D%5Bexact%5D=articles&filter%5Btitle%5D=goldberg&page%5Bsize%5D=1');
+      expect(response.body).has.deep.property('data.meta.version');
+
+      response = await request.get(makeRelativeLink(response, response.headers.location));
+      expect(response).hasStatus(200);
+      expect(response.body.data.relationships['featured-article'].data.id).to.equal('5');
+      expect(response.body.data.relationships['featured-article'].data.type).to.equal("articles");
     });
 
     it('can update an existing resource', async function() {
@@ -641,6 +774,43 @@ describe('jsonapi/middleware', function() {
       expect(response).has.deep.property('body.data.attributes.title', 'Updated title', 'second time');
       expect(response).has.deep.property('body.data.attributes.body', "This is the first article", 'second time');
 
+    });
+
+    it('can update an existing resource with a has-many query relationships', async function() {
+      let version = await currentVersion(request, '/api/catalogs/1');
+      let query = {
+        filter: {
+          type: { exact: 'articles' },
+          title: 'space'
+        }
+      };
+
+      let response = await request.patch('/api/catalogs/1').send({
+        data: {
+          type: 'catalogs',
+          id: '1',
+          attributes: {
+            title: 'Articles about Space'
+          },
+          relationships: {
+            'favorite-articles': {
+              data: [{
+                type: 'cardstack-queries',
+                id: `/api?${qs.stringify(query)}`
+              }]
+            }
+          },
+          meta: { version }
+        }
+      });
+
+      expect(response).hasStatus(200);
+      expect(response.body).has.deep.property('data.id');
+      expect(response.body).has.deep.property('data.attributes.title', 'Articles about Space');
+      expect(response.body).has.deep.property('data.relationships.favorite-articles.links.related', '/api?filter%5Btype%5D%5Bexact%5D=articles&filter%5Btitle%5D=space');
+      expect(response.body).has.deep.property('data.meta.version');
+      expect(response.body.data.relationships['favorite-articles'].data).length(3);
+      expect(response.body.data.relationships['favorite-articles'].data.map(item => item.id)).to.eql(["4", "6", "8"]);
     });
 
     it('can delete a resource', async function() {
