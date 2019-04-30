@@ -23,8 +23,11 @@ module.exports = {
       'node/no-extraneous-require': ['error', {
         'allowModules': []
       }],
+      'node/no-extraneous-import': ['error', {
+        'allowModules': []
+      }],
       'node/no-missing-require': ['error'],
-      'no-undef': 'error'
+      'no-undef': 'error',
     }),
   plugins: ['node', '@typescript-eslint']
 };
