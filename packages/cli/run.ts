@@ -15,7 +15,7 @@ interface Options {
 
 function getWorkDir(cardDir: string): string {
   let hash = createHash("md5");
-  hash.update(cardDir + "\0" + hashForDep(__dirname));
+  hash.update(cardDir + "\0" + (process.env.CARDSTACK_DEV_NOCACHE ? 'nocache' : hashForDep(__dirname)));
   return join(tmpdir(), "cardstack", hash.digest("hex").slice(0, 6));
 }
 
