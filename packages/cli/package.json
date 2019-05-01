@@ -21,6 +21,7 @@
     "ember-cli": "git+https://github.com/ember-cli/ember-cli#807f56e2e434f716757de02fd1f2c3251dadaf6f",
     "fs-extra": "^7.0.1",
     "hash-for-dep": "^1.5.1",
+    "recast": "^0.17.6",
     "typescript-memoize": "^1.0.0-alpha.3",
     "yargs": "^13.2.2",
     "yarn": "^1.15.2"

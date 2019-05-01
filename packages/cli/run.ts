@@ -3,7 +3,7 @@ import { join, dirname } from "path";
 import { tmpdir } from "os";
 import hashForDep from "hash-for-dep";
 import UI from "console-ui";
-import { Memoize } from 'typescript-memoize';
+import { Memoize } from "typescript-memoize";
 import { spawnSync, SpawnSyncOptions } from "child_process";
 import {
   ensureDirSync,
@@ -11,7 +11,9 @@ import {
   writeFileSync,
   mkdirpSync,
   removeSync,
+  readFileSync,
 } from "fs-extra";
+import { rewriteEmberCLIBuild } from "./rewriters";
 
 const appName = "cardstack-standard-app";
 
@@ -51,12 +53,17 @@ Router.map(cardstackRoutes);
 export default Router;
 `;
 
+const cardstackDeps = ["hub", "jsonapi", "ephemeral"];
+const otherDeps = [
+  "@embroider/core",
+  "@embroider/compat",
+  "@embroider/webpack",
+];
+
 interface Options {
   dir: string;
   ui: UI;
 }
-
-const cardstackDeps = ["hub", "jsonapi", "ephemeral"];
 
 export default async function run(options: Options) {
   let runner = new Runner(options);
@@ -113,7 +120,16 @@ class Runner {
     );
     this.exec(
       ember,
-      ["new", appName, "--blueprint", blueprint, "--skip-npm", "--skip-git", "--welcome", "false"],
+      [
+        "new",
+        appName,
+        "--blueprint",
+        blueprint,
+        "--skip-npm",
+        "--skip-git",
+        "--welcome",
+        "false",
+      ],
       { cwd: this.workDir }
     );
   }
@@ -128,9 +144,18 @@ class Runner {
         cwd: this.appDir,
       });
     }
-    this.exec(yarn, ["add", "--dev", ...cardstackDeps.map(d => `@cardstack/${d}`)], {
-      cwd: this.appDir,
-    });
+    this.exec(
+      yarn,
+      [
+        "add",
+        "--dev",
+        ...cardstackDeps.map(d => `@cardstack/${d}`),
+        ...otherDeps,
+      ],
+      {
+        cwd: this.appDir,
+      }
+    );
   }
 
   private enhanceApp() {
@@ -142,18 +167,20 @@ class Runner {
     writeFileSync(join(this.appDir, "app", "router.js"), routerJS);
 
     // workaround for https://github.com/ember-cli/ember-octane-blueprint/issues/100
-    writeFileSync(join(this.appDir, "app", "templates", "application.hbs"), "{{outlet}}");
+    writeFileSync(
+      join(this.appDir, "app", "templates", "application.hbs"),
+      "{{outlet}}"
+    );
+
+    let buildFilePath = join(this.appDir, "ember-cli-build.js");
+    writeFileSync(buildFilePath, rewriteEmberCLIBuild(readFileSync(buildFilePath, 'utf8')));
   }
 
-  private exec(
-    command: string,
-    args: string[],
-    options: SpawnSyncOptions
-  ) {
+  private exec(command: string, args: string[], options: SpawnSyncOptions) {
     let child = spawnSync(command, args, options);
     if (child.status !== 0) {
-      this.ui.write(child.stdout.toString('utf8'), 'INFO');
-      this.ui.write(child.stderr.toString('utf8'), 'ERROR');
+      this.ui.write(child.stdout.toString("utf8"), "INFO");
+      this.ui.write(child.stderr.toString("utf8"), "ERROR");
       throw new Error(`${command} failed`);
     }
   }

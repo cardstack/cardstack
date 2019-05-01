@@ -9,13 +9,16 @@
     "node": ">= 7.7"
   },
   "dependencies": {
+    "@types/chai": "^4.1.7",
+    "@types/mocha": "^5.2.6",
     "@types/node": "11.13.8",
     "@typescript-eslint/eslint-plugin": "^1.7.0",
     "@typescript-eslint/parser": "^1.7.0",
+    "chai": "^3.5.0",
+    "eslint": "^5.8.0",
     "eslint-plugin-ember": "^5.0.0",
     "eslint-plugin-mocha": "^5.2.0",
     "eslint-plugin-node": "^5.2.1",
-    "eslint": "^5.8.0",
     "glob": "^7.1.2",
     "lerna": "^3.4.3",
     "mocha": "^5.2.0",
@@ -34,6 +37,8 @@
     "server": "node packages/hub/bin/server.js",
     "blockchain": "truffle develop"
   },
-  "workspaces": ["packages/*"],
+  "workspaces": [
+    "packages/*"
+  ],
   "private": true
 }

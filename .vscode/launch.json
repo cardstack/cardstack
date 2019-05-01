@@ -108,9 +108,9 @@
       "args": [
         "packages/test-support/bin/run.js",
         "--timeout",
-        "200000"
-        // "--grep",
-        // "hub/cards"
+        "200000",
+         "--grep",
+         "cli app rewriting"
       ]
     },
     {
