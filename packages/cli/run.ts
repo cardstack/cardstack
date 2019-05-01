@@ -113,7 +113,7 @@ class Runner {
     );
     this.exec(
       ember,
-      ["new", appName, "--blueprint", blueprint, "--skip-npm", "--skip-git"],
+      ["new", appName, "--blueprint", blueprint, "--skip-npm", "--skip-git", "--welcome", "false"],
       { cwd: this.workDir }
     );
   }
@@ -140,6 +140,9 @@ class Runner {
       ephemeralConfig
     );
     writeFileSync(join(this.appDir, "app", "router.js"), routerJS);
+
+    // workaround for https://github.com/ember-cli/ember-octane-blueprint/issues/100
+    writeFileSync(join(this.appDir, "app", "templates", "application.hbs"), "{{outlet}}");
   }
 
   private exec(
