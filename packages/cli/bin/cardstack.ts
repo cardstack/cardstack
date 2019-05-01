@@ -21,7 +21,18 @@ yargs
     let run = await import('../run');
     await run.default(Object.assign({ ui }, argv));
   })
-  .demandCommand(1, 'Use any of the commands above.')
-  .help()
+  .demandCommand(1, 'Use any of the commands below.\n')
+  .strict()
+  .fail((msg, err) => {
+    if (msg) {
+      ui.write(msg+"\n", 'ERROR');
+    }
+    if (err) {
+      ui.writeError(err);
+    } else {
+      yargs.showHelp();
+    }
+    process.exit(-1);
+  })
   .argv;
 
