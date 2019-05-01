@@ -9,11 +9,10 @@ import { urlForModel } from '@cardstack/routing/helpers/cardstack-url';
 export default Component.extend({
   layout,
   classNames: ['cs-active-composition-panel'],
-  attributeBindings: ['dataTestName:data-test-cs-active-composition-panel'],
-  dataTestName: '',
 
   validationErrors: null,
   permissions: null,
+  selectedField: null,
 
   data: service('cardstack-data'),
   router: service(),

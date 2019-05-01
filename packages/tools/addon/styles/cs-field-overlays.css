@@ -4,23 +4,25 @@
   --overlays-foreground: #000;
 }
 
-.cs-field-overlay.show-overlay {
+.cs-field-overlay.hoverable {
+  /* Don't let focused overlay block other highlights
+     from being visible. Focused overlay has z-index 1. */
   z-index: 2;
-  /* This sets field overlays above the scrim */
+}
+
+.cs-field-overlay .overlay-scrim {
+  visibility: visible;
+  background-color: transparent;
 }
 
 .cs-field-overlay .overlay-label,
 .cs-content-overlay .overlay-label {
-  display: none;
-}
-
-.cs-field-overlay.hoverable > .overlay-border,
-.cs-content-overlay.hoverable > .overlay-border {
-  border: 2px dotted var(--overlays-highlight);
+  visibility: hidden;
 }
 
 .cs-field-overlay.focused > .overlay-label {
-  display: inline-block;
+  visibility: initial;
+
   padding: 0.4em 0.7em;
   background-color: var(--overlays-highlight);
   color: var(--overlays-foreground);
@@ -30,27 +32,23 @@
   text-transform: capitalize;
 }
 
+.cs-field-overlay > .overlay-border,
+.cs-content-overlay > .overlay-border {
+  border: 2px dotted var(--overlays-highlight);
+}
+
 .cs-field-overlay.focused > .overlay-border {
   border-style: solid;
 }
 
+/*
+Commenting this out to allow clicking on overlays.
 .cs-field-overlay.passthrough,
 .cs-field-overlay.passthrough > .overlay-border {
   pointer-events: none;
 }
+*/
 
 .cs-field-overlay.passthrough > * {
   pointer-events: auto;
-}
-
-/* Overriding style attribute that sets `visibility` to `hidden`.
-   This is so that when user can exit focus on field by
-   clicking elsewhere on the page */
-.cs-field-overlay.focused > .liquid-child {
-  visibility: visible !important;
-}
-
-/* Override scrims to be transparent */
-.overlay-scrim {
-  background-color: transparent !important;
 }

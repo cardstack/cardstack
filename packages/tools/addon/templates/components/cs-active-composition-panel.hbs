@@ -1,3 +1,4 @@
+{{! template-lint-disable attribute-indentation }}
 {{#if (or (not model.id) permissions)}}
   <div class="cs-active-composition-panel--header" data-test-cs-active-composition-panel-header>
     {{cs-version-control
@@ -9,192 +10,93 @@
     }}
   </div>
 
-  {{#if openedFieldId}}
-    <div class="cs-active-composition-panel--parameters">
+  {{#if detailedViewFieldId}}
+  {{!-- Detailed view will display additional editor options, such as style variations selection,
+        depending on field selected --}}
+    <div class="cs-active-composition-panel--parameters" data-test-cs-active-composition-panel-parameters>
       {{#each renderedFields key="id" as |fieldMark|}}
-        {{! template-lint-disable attribute-indentation }}
-        {{#if (eq openedFieldId fieldMark.id)}}
-          {{#let
-            fieldMark.model
-            (eq fieldMark.model.content model)
-            (cs-field-editor-options-for fieldMark.model.content fieldMark.model.name)
-          as |fieldModel isPageModelField editorOptions|}}
-            {{#unless editorOptions.hideFromEditor}}
-              <div class="cs-active-composition-panel--title">
-                {{!-- Change icon and type depending on overlay selected --}}
-                {{cs-svg "global-attributes-icon" width="14px" height="14px"}}
-                {{cs-card-meta-caption fieldModel.content fieldModel.caption isPageModelField}}
-              </div>
-              {{#cs-collapsible-section
-                class=(cs-error-class validationErrors fieldModel "invalid")
-                editorOptions=editorOptions
-                hovered=(perform highlightAndScrollToField fieldMark)
-                unhovered=(perform highlightAndScrollToField null)
-                dataTestName=(concat fieldModel.content.type "-" fieldModel.content.id "-" (dasherize fieldModel.name))
-              }}
-                {{#let
-                  fieldModel.content
-                  (get permissions (cs-uid fieldModel.content))
-                as |content fieldModelPermissions|}}
-                  {{#if fieldModel.grouped}}
-                    {{#each fieldModel.grouped as |fieldName|}}
-                      <div class="cs-field-editor-section--label" data-test-cs-field-editor-section-label>
-                        {{cs-field-caption content fieldName}}
-                      </div>
-                      {{cs-field-editor
-                        content=content
-                        field=fieldName
-                        editorOptions=editorOptions
-                        enabled=editingEnabled
-                        permissions=fieldModelPermissions
-                        onchange=(action "validate")
-                        class="cs-active-composition-panel--field-editor"
-                        errors=(get validationErrors fieldName)
-                        dataTestName=(dasherize fieldName)
-                      }}
-                    {{/each}}
-                  {{else}}
-                    {{cs-field-editor
-                      content=content
-                      field=fieldModel.name
-                      editorOptions=editorOptions
-                      enabled=editingEnabled
-                      permissions=fieldModelPermissions
-                      onchange=(action "validate")
-                      class="cs-active-composition-panel--field-editor"
-                      errors=(get validationErrors fieldModel.name)
-                      dataTestName=(dasherize fieldModel.name)
-                    }}
-                  {{/if}}
-                {{/let}}
-              {{/cs-collapsible-section}}
-            {{/unless}}
+        {{#if (eq detailedViewFieldId fieldMark.id)}}
+          {{#let fieldMark.model as |field|}}
+            {{cs-field-section
+              field=field
+              content=field.content
+              caption=field.caption
+              isPageModelField=(eq field.content model)
+              permissions=(get permissions (cs-uid field.content))
+              validate=(action "validate")
+              errors=(get validationErrors field.name)
+              class=(cs-error-class validationErrors field "invalid")
+              hovered=(perform highlightAndScrollToField fieldMark)
+              unhovered=(perform highlightAndScrollToField null)
+              selected=(action openField fieldMark)
+              data-test-cs-field-section=(concat field.content.type "-" field.content.id "-" (dasherize field.name))
+              detailField=true
+            }}
           {{/let}}
         {{/if}}
       {{/each}}
     </div>
   {{else}}
-    <div class="cs-active-composition-panel--parameters">
-      <div class="cs-active-composition-panel--title">
-        {{cs-svg "global-attributes-icon" width="14px" height="14px"}}
-        Global Attributes
-      </div>
+    <div class="cs-active-composition-panel--flex-title">
+      {{cs-editor-panel-title title="Global Attributes"}}
     </div>
 
     <div class="cs-active-composition-panel--flex-slot">
       <div class="cs-active-composition-panel--scroll-wrapper">
         <div class="cs-active-composition-panel--main" data-test-cs-active-composition-panel-main>
-          <div data-test-cs-active-composition-panel-top-fields>
-            {{#each headerSectionFields key="id" as |field|}}
-              {{#let
-                (get permissions (cs-uid field.model))
-                (eq field.model model)
-                (cs-field-editor-options-for field.model field.name)
-              as |fieldModelPermissions isPageModelField editorOptions|}}
-                <div class="cs-field-editor-section cs-field-{{dasherize field.name}}">
-                  {{#unless editorOptions.hideTitle}}
-                    <div class="cs-field-editor-section--title" cs-field-editor-section-title={{dasherize field.name}}>
-                      {{cs-card-meta-caption field.model field.options.caption isPageModelField}}
-                    </div>
-                  {{/unless}}
-                  {{cs-field-editor
-                    content=field.model
-                    field=field.name
-                    editorOptions=editorOptions
-                    enabled=editingEnabled
-                    permissions=fieldModelPermissions
-                    onchange=(action "validate")
-                    class="cs-active-composition-panel--field-editor"
-                    errors=(get validationErrors field.name)
-                    dataTestName=(dasherize field.name)
-                  }}
-                </div>
-              {{/let}}
-            {{/each}}
-          </div>
+          {{#each headerSectionFields key="id" as |field|}}
+            {{cs-field-section
+              field=field
+              content=field.model
+              caption=field.options.caption
+              isPageModelField=(eq field.model model)
+              permissions=(get permissions (cs-uid field.model))
+              validate=(action "validate")
+              errors=(get validationErrors field.name)
+              class=(cs-error-class validationErrors field "invalid")
+              data-test-cs-field-section=(concat field.model.type "-" field.model.id "-" (dasherize field.name))
+            }}
+          {{/each}}
 
           {{#each renderedFields key="id" as |fieldMark|}}
-            {{! template-lint-disable attribute-indentation }}
             {{#let
               fieldMark.model
-              (eq fieldMark.model.content model)
-              (cs-field-editor-options-for fieldMark.model.content fieldMark.model.name)
-            as |fieldModel isPageModelField editorOptions|}}
+              (cs-field-editor-options-for field.content field.caption)
+            as |field editorOptions|}}
               {{#unless (or editorOptions.hideFromEditor editorOptions.headerSection)}}
-                {{#cs-collapsible-section
-                  class=(cs-error-class validationErrors fieldModel "invalid")
-                  title=(cs-card-meta-caption fieldModel.content fieldModel.caption isPageModelField)
-                  editorOptions=editorOptions
+                {{cs-field-section
+                  field=field
+                  content=field.content
+                  caption=field.caption
+                  isPageModelField=(eq field.content model)
+                  permissions=(get permissions (cs-uid field.content))
+                  validate=(action "validate")
+                  errors=(get validationErrors field.name)
+                  class=(cs-error-class validationErrors field "invalid")
                   hovered=(perform highlightAndScrollToField fieldMark)
                   unhovered=(perform highlightAndScrollToField null)
-                  dataTestName=(concat fieldModel.content.type "-" fieldModel.content.id "-" (dasherize fieldModel.name))
+                  selected=(action openField fieldMark)
+                  data-test-cs-field-section=(concat field.content.type "-" field.content.id "-" (dasherize field.name))
                 }}
-                  {{#let
-                    fieldModel.content
-                    (get permissions (cs-uid fieldModel.content))
-                  as |content fieldModelPermissions|}}
-                    {{#if fieldModel.grouped}}
-                      {{#each fieldModel.grouped as |fieldName|}}
-                        <div class="cs-field-editor-section--label" data-test-cs-field-editor-section-label>
-                          {{cs-field-caption content fieldName}}
-                        </div>
-                        {{cs-field-editor
-                          content=content
-                          field=fieldName
-                          editorOptions=editorOptions
-                          enabled=editingEnabled
-                          permissions=fieldModelPermissions
-                          onchange=(action "validate")
-                          class="cs-active-composition-panel--field-editor"
-                          errors=(get validationErrors fieldName)
-                          dataTestName=(dasherize fieldName)
-                        }}
-                      {{/each}}
-                    {{else}}
-                      {{cs-field-editor
-                        content=content
-                        field=fieldModel.name
-                        editorOptions=editorOptions
-                        enabled=editingEnabled
-                        permissions=fieldModelPermissions
-                        onchange=(action "validate")
-                        class="cs-active-composition-panel--field-editor"
-                        errors=(get validationErrors fieldModel.name)
-                        dataTestName=(dasherize fieldModel.name)
-                      }}
-                    {{/if}}
-                  {{/let}}
-                {{/cs-collapsible-section}}
               {{/unless}}
             {{/let}}
           {{/each}}
 
           {{#each modelFields as |field|}}
-            {{#let
-              (get permissions (cs-uid field.model))
-              (eq field.model model)
-              (cs-field-editor-options-for field.model field.name)
-            as |fieldModelPermissions isPageModelField editorOptions|}}
+            {{#let (cs-field-editor-options-for field.model field.options.caption)
+            as |editorOptions|}}
               {{#unless (or editorOptions.hideFromEditor editorOptions.headerSection)}}
-                {{#cs-collapsible-section
-                  class=(cs-error-class validationErrors field.model "invalid")
-                  title=(cs-card-meta-caption field.model field.options.caption isPageModelField)
-                  editorOptions=editorOptions
-
-                  dataTestName=(concat field.model.type "-" field.model.id "-" (dasherize field.name))
+                {{cs-field-section
+                  field=field
+                  content=field.model
+                  caption=field.options.caption
+                  isPageModelField=(eq field.model model)
+                  permissions=(get permissions (cs-uid field.model))
+                  validate=(action "validate")
+                  errors=(get validationErrors field.name)
+                  class=(cs-error-class validationErrors field "invalid")
+                  data-test-cs-field-section=(concat field.model.type "-" field.model.id "-" (dasherize field.name))
                 }}
-                  {{cs-field-editor
-                    content=field.model
-                    field=field.name
-                    editorOptions=editorOptions
-                    enabled=editingEnabled
-                    permissions=fieldModelPermissions
-                    onchange=(action "validate")
-                    class="cs-active-composition-panel--field-editor"
-                    errors=(get validationErrors field.name)
-                    dataTestName=(dasherize field.name)
-                  }}
-                {{/cs-collapsible-section}}
               {{/unless}}
             {{/let}}
           {{/each}}

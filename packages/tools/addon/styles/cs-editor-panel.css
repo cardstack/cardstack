@@ -4,8 +4,9 @@
 @import "cs-insert-button";
 @import "cs-active-composition-panel";
 @import "cs-version-control";
+@import "cs-editor-panel-title";
+@import "cs-field-section";
 @import "cs-field-editor";
-@import "cs-collapsible-section";
 @import "cs-placeholder-create";
 
 .cs-editor-panel {

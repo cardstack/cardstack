@@ -1,12 +1,9 @@
 import Component from '@ember/component';
-import layout from '../templates/components/cs-collapsible-section';
+import layout from '../templates/components/cs-field-section';
 
 export default Component.extend({
   layout,
-  tagName: 'section',
-  classNames: ['cs-collapsible-section'],
-  attributeBindings: ['dataTestName:data-test-cs-collapsible-section'],
-  dataTestName: '',
+  classNames: ['cs-field-section'],
 
   mouseEnter(event) {
     let hovered = this.get('hovered');

@@ -1,0 +1,40 @@
+.cs-field-section {
+    margin: 0;
+    padding-bottom: 0.5rem;
+}
+
+.cs-field-section.invalid {
+    border: 2px solid var(--error-border);
+}
+
+.cs-field-section--label {
+    padding-bottom: 0.5rem;
+    font-family: 'Open Sans';
+    font-size: 12px;
+    letter-spacing: 0.3px;
+    line-height: 15px;
+}
+
+.cs-field-section--group-item-label {
+    display: inline-block;
+    padding-bottom: 0.5rem;
+    color: var(--light50);
+    font-size: 0.9rem;
+    letter-spacing: 0.3px;
+    line-height: 1.375;
+}
+
+.cs-field-section--field-editor {
+    padding-bottom: 1rem;
+}
+
+.cs-field-section--field-editor > .field-editor > input {
+    padding: 0.5rem 1rem;
+    border: 1px solid var(--light25);
+    border-radius: 3px;
+    background-color: var(--light-background);
+    color: var(--dark-foreground);
+    font-size: 0.8rem;
+    letter-spacing: 0.3px;
+    line-height: 1.375;
+}

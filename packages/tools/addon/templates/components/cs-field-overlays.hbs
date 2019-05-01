@@ -6,20 +6,25 @@
       mark.model.content
       mark.model.caption
       (eq mark.id tools.openedFieldId)
+      (eq mark.id tools.detailedViewFieldId)
       (cs-field-editor-for mark.model.content mark.model.name variant="inline")
-    as |fieldName content caption isOpenedField editorName|}}
+    as |fieldName content caption isOpenedField isDetailedViewField editorName|}}
       {{#let (is-component editorName) as |hasInlineEditor|}}
+        <div hidden=true onclick={{action "openField" mark}} data-test-overlay-button={{dasherize fieldName}}>
+          {{!-- This is here for testing --}}
+        </div>
         {{#create-overlay
           at=mark
           label=caption
           highlighted=(eq mark.id tools.highlightedFieldId)
-          hoverable=tools.editing
+          hoverable=tools.active
           class=(concat "cs-field-overlay "
             (if hasInlineEditor "with-inline-editor ")
             (if (and isOpenedField (not hasInlineEditor)) "passthrough"))
-          focused=isOpenedField
+          focused=(or isOpenedField isDetailedViewField)
           onclick=(action "openField" mark)
           dismiss=(action "openField" null)
+          data-test-cs-field-overlay=(dasherize fieldName)
         }}
           {{#if (and isOpenedField (not mark.model.grouped)) }}
             {{#if hasInlineEditor}}
@@ -36,7 +41,7 @@
       at=mark
       label=(cs-humanize (cs-model-type mark.model))
       highlighted=false
-      hoverable=tools.editing
+      hoverable=tools.active
       class="cs-content-overlay"
       onclick=(action "navigateToCard" mark.model)
     }}

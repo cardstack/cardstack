@@ -41,7 +41,7 @@ module('Acceptance | tools dirtiness', function(hooks) {
     assert.dom('[data-test-cs-version-control-button-cancel]').exists('Cancel button exists');
     assert.dom('[data-test-cs-version-control-status]').hasText('saved');
 
-    let karmaInput = '[data-test-cs-collapsible-section=comment-1-karma] input'
+    let karmaInput = '[data-test-cs-field-section=comment-1-karma] input'
     await fillIn(karmaInput, '9');
     assert.dom('[data-test-cs-version-control-button-save="false"]').exists('Save button is enabled');
     assert.dom('[data-test-cs-version-control-status]').hasText('editing');

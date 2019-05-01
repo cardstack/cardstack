@@ -1,5 +1,5 @@
 {{#let (get content field "base64") as |hasImage|}}
-  <div class="cardstack-image-editor">
+  <div class="cardstack-image-editor" data-test-cardstack-image-editor>
     {{#if hasImage}}
       <div class="cardstack-image-editor-filename">
         Selected image: {{get (get content field) 'imageFileName'}}
@@ -8,13 +8,16 @@
     <button class="cardstack-image-editor-button
                   cardstack-image-editor-button--choose"
             {{action (perform chooseImage)}}
-            disabled={{disabled}}>
+            disabled={{disabled}}
+            data-test-cardstack-image-editor-button-choose>
       Choose {{#if hasImage}}Another{{/if}} Image
     </button>
     {{#if hasImage}}
       <button class="cardstack-image-editor-button
                     cardstack-image-editor-button--remove"
-              {{action "removeImage"}} disabled={{disabled}}>
+              {{action "removeImage"}}
+              disabled={{disabled}}
+              data-test-cardstack-image-editor-button-remove>
         Remove image
       </button>
     {{/if}}

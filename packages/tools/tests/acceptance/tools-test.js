@@ -36,13 +36,23 @@ module('Acceptance | tools', function(hooks) {
     delete localStorage['cardstack-tools'];
   });
 
-  test('activating tools on a post page displays header and editor panel', async function(assert) {
-    await visit('/hub/posts/1');
+  test('activating tools enables header and editor panel', async function(assert) {
+    await visit('/');
     await login();
     await click('[data-test-cardstack-tools-launcher]');
 
     assert.dom('[data-test-cs-header]').exists();
     assert.dom('[data-test-cs-editor-panel]').exists();
+  });
+
+  test('field overlays are not visible on a page without an active content item', async function (assert) {
+    await visit('/');
+    await login();
+    await click('[data-test-cardstack-tools-launcher]');
+    assert.dom('[data-test-cs-field-overlay]').doesNotExist();
+
+    await visit('/hub/posts/1');
+    assert.dom('[data-test-cs-field-overlay]').exists();
   });
 
   test('editor main panel can display all field types', async function (assert) {
@@ -51,17 +61,17 @@ module('Acceptance | tools', function(hooks) {
     await click('[data-test-cardstack-tools-launcher]');
     await waitFor('[data-test-cs-active-composition-panel-main]');
 
-    assert.dom('[data-test-cs-collapsible-section=post-1-title]').exists('post-title section exists');
-    assert.dom('[data-test-cs-collapsible-section=post-1-title] [data-test-cs-collapsible-section-title]').hasText('Title');
-    assert.dom('[data-test-cs-collapsible-section=post-1-title] [data-test-cs-field-editor=title] input').hasValue('10 steps to becoming a fearsome pirate');
+    assert.dom('[data-test-cs-field-section=post-1-title]').exists('post-title section exists');
+    assert.dom('[data-test-cs-field-section=post-1-title] [data-test-cs-field-section-title]').hasText('Title');
+    assert.dom('[data-test-cs-field-section=post-1-title] input').hasValue('10 steps to becoming a fearsome pirate');
 
-    assert.dom('[data-test-cs-collapsible-section=comment-1-body]').exists('comment-body section exists');
-    assert.dom('[data-test-cs-collapsible-section=comment-1-body] [data-test-cs-collapsible-section-title]').hasText('Comment #1: Body');
-    assert.dom('[data-test-cs-collapsible-section=comment-1-body] [data-test-cs-field-editor=body] input').hasValue('Look behind you, a Three-Headed Monkey!');
+    assert.dom('[data-test-cs-field-section=comment-1-body]').exists('comment-body section exists');
+    assert.dom('[data-test-cs-field-section=comment-1-body] [data-test-cs-field-section-title]').hasText('Comment #1: Body');
+    assert.dom('[data-test-cs-field-section=comment-1-body] input').hasValue('Look behind you, a Three-Headed Monkey!');
 
-    assert.dom('[data-test-cs-collapsible-section=post-1-author-name]').exists('author-name section exists');
-    assert.dom('[data-test-cs-collapsible-section=post-1-author-name] [data-test-cs-collapsible-section-title]').hasText('Author Name');
-    assert.dom('[data-test-cs-collapsible-section=post-1-author-name] [data-test-cs-field-editor=author-name] input').hasValue('LeChuck');
+    assert.dom('[data-test-cs-field-section=post-1-author-name]').exists('author-name section exists');
+    assert.dom('[data-test-cs-field-section=post-1-author-name] [data-test-cs-field-section-title]').hasText('Author Name');
+    assert.dom('[data-test-cs-field-section=post-1-author-name] input').hasValue('LeChuck');
   });
 
   test('field groups for related types are rendered correctly', async function(assert) {
@@ -81,13 +91,13 @@ module('Acceptance | tools', function(hooks) {
     await click('[data-test-cardstack-tools-launcher]');
     await waitFor('[data-test-cs-active-composition-panel-main]');
 
-    let titleEditor = '[data-test-cs-collapsible-section=post-1-title] [data-test-cs-field-editor=title] input';
+    let titleEditor = '[data-test-cs-field-section=post-1-title] [data-test-cs-field-editor=title] input';
     await fillIn(titleEditor, '');
     await triggerEvent(titleEditor, 'blur');
     await waitFor('[data-test-validation-error=title]');
     assert.dom('[data-test-validation-error=title]').hasText('Title must not be empty');
 
-    let commentBodyEditor = '[data-test-cs-collapsible-section=comment-1-body] [data-test-cs-field-editor=body] input';
+    let commentBodyEditor = '[data-test-cs-field-section=comment-1-body] [data-test-cs-field-editor=body] input';
     await fillIn(commentBodyEditor, '');
     await triggerEvent(commentBodyEditor, 'blur');
     await waitFor('[data-test-validation-error=body]');
@@ -101,7 +111,7 @@ module('Acceptance | tools', function(hooks) {
     await click('[data-test-cs-version-control-button-save="false"]');
     await settled();
 
-    assert.dom('[data-test-cs-collapsible-section=post--title]').hasClass('invalid');
+    assert.dom('[data-test-cs-field-section=post--title]').hasClass('invalid');
     assert.dom('[data-test-validation-error=title]').hasText('Title must not be empty');
   });
 
@@ -111,29 +121,29 @@ module('Acceptance | tools', function(hooks) {
     await click('[data-test-cardstack-tools-launcher]');
     await waitFor('[data-test-cs-active-composition-panel-main]');
 
-    assert.dom('[data-test-cs-collapsible-section=post-1-archived]').exists("Unrendered field appears in editor");
-    assert.dom('[data-test-cs-collapsible-section=post-1-title]').exists({ count: 1 }, "Rendered fields only appear once");
+    assert.dom('[data-test-cs-field-section=post-1-archived]').exists("Unrendered field appears in editor");
+    assert.dom('[data-test-cs-field-section=post-1-title]').exists({ count: 1 }, "Rendered fields only appear once");
   });
 
   test('it shows fields in the header section', async function(assert) {
     await visit('/hub/posts/1');
     await login();
     await click('[data-test-cardstack-tools-launcher]');
-    await waitFor('[data-test-cs-active-composition-panel-header]');
+    await waitFor('[data-test-cs-active-composition-panel-main]');
 
-    assert.dom('[data-test-cs-active-composition-panel-top-fields] [data-test-cs-field-editor="keywords"]').exists();
-    assert.dom('[data-test-cs-active-composition-panel-top-fields] [data-test-cs-field-editor="rating"]').exists();
-    assert.dom('[data-test-cs-active-composition-panel-top-fields] [data-test-cs-field-editor="created-at"]').exists();
+    assert.dom('[data-test-cs-field-editor="keywords"]').exists();
+    assert.dom('[data-test-cs-field-editor="rating"]').exists();
+    assert.dom('[data-test-cs-field-editor="created-at"]').exists();
   });
 
   test('it can hide the title of fields in the header section', async function(assert) {
     await visit('/hub/posts/1');
     await login();
     await click('[data-test-cardstack-tools-launcher]');
-    await waitFor('[data-test-cs-active-composition-panel-header]');
+    await waitFor('[data-test-cs-active-composition-panel-main]');
 
-    assert.dom('[cs-field-editor-section-title="rating"]').doesNotExist();
-    assert.dom('[cs-field-editor-section-title="keywords"]').exists();
+    assert.dom('[data-test-cs-field-section-title="rating"]').doesNotExist();
+    assert.dom('[data-test-cs-field-section-title="keywords"]').exists();
   });
 
   test('fields shown in the header section are not shown in the non-header section (main section)', async function(assert) {
@@ -153,7 +163,7 @@ module('Acceptance | tools', function(hooks) {
     await click('[data-test-cardstack-tools-launcher]');
     await waitFor('[data-test-cs-active-composition-panel-main]');
 
-    let slugInput = '[data-test-cs-collapsible-section=post-1-slug] [data-test-cs-field-editor=slug] input';
+    let slugInput = '[data-test-cs-field-section=post-1-slug] [data-test-cs-field-editor=slug] input';
     await fillIn(slugInput, 'h');
 
     assert.dom(slugInput).isVisible();
@@ -165,8 +175,8 @@ module('Acceptance | tools', function(hooks) {
     await click('[data-test-cardstack-tools-launcher]');
     await waitFor('[data-test-cs-active-composition-panel-main]');
 
-    assert.dom('[data-test-cs-collapsible-section=comment-1-review-status] [data-test-cs-collapsible-section-title]').hasText('Comment #1: Review Status');
-    assert.dom('[data-test-cs-collapsible-section=comment-2-review-status] [data-test-cs-collapsible-section-title]').hasText('Comment #2: Review Status');
+    assert.dom('[data-test-cs-field-section=comment-1-review-status] [data-test-cs-field-section-title]').hasText('Comment #1: Review Status');
+    assert.dom('[data-test-cs-field-section=comment-2-review-status] [data-test-cs-field-section-title]').hasText('Comment #2: Review Status');
   });
 
   test('panel captions of field groups are unambiguous', async function(assert) {
@@ -175,10 +185,10 @@ module('Acceptance | tools', function(hooks) {
     await click('[data-test-cardstack-tools-launcher]');
     await waitFor('[data-test-cs-active-composition-panel-main]');
 
-    assert.dom('[data-test-cs-collapsible-section=comment-1-body] [data-test-cs-collapsible-section-title]').hasText('Comment #1: Body');
-    assert.dom('[data-test-cs-collapsible-section=comment-1-karma] [data-test-cs-collapsible-section-title]').hasText('Comment #1: Karma');
-    assert.dom('[data-test-cs-collapsible-section=comment-2-body] [data-test-cs-collapsible-section-title]').hasText('Comment #2: Body');
-    assert.dom('[data-test-cs-collapsible-section=comment-2-karma] [data-test-cs-collapsible-section-title]').hasText('Comment #2: Karma');
+    assert.dom('[data-test-cs-field-section=comment-1-body] [data-test-cs-field-section-title]').hasText('Comment #1: Body');
+    assert.dom('[data-test-cs-field-section=comment-1-karma] [data-test-cs-field-section-title]').hasText('Comment #1: Karma');
+    assert.dom('[data-test-cs-field-section=comment-2-body] [data-test-cs-field-section-title]').hasText('Comment #2: Body');
+    assert.dom('[data-test-cs-field-section=comment-2-karma] [data-test-cs-field-section-title]').hasText('Comment #2: Karma');
   });
 
   test('disable inputs for computed fields', async function(assert) {
@@ -187,7 +197,7 @@ module('Acceptance | tools', function(hooks) {
     await click('[data-test-cardstack-tools-launcher]');
     await waitFor('[data-test-cs-active-composition-panel-main]');
 
-    let nameInput = '[data-test-cs-collapsible-section=post-1-author-name] [data-test-cs-field-editor=author-name] input';
+    let nameInput = '[data-test-cs-field-section=post-1-author-name] [data-test-cs-field-editor=author-name] input';
     assert.dom(nameInput).isDisabled('Computed field is disabled');
   });
 
@@ -197,10 +207,10 @@ module('Acceptance | tools', function(hooks) {
     await click('[data-test-cardstack-tools-launcher]');
     await waitFor('[data-test-cs-active-composition-panel-main]');
 
-    let reviewStatusInput = '[data-test-cs-collapsible-section=comment-1-review-status] [data-test-cs-field-editor=review-status] input';
+    let reviewStatusInput = '[data-test-cs-field-section=comment-1-review-status] [data-test-cs-field-editor=review-status] input';
     assert.dom(reviewStatusInput).isNotDisabled();
 
-    reviewStatusInput = '[data-test-cs-collapsible-section=comment-2-review-status] [data-test-cs-field-editor=review-status] input';
+    reviewStatusInput = '[data-test-cs-field-section=comment-2-review-status] [data-test-cs-field-editor=review-status] input';
     assert.dom(reviewStatusInput).isNotDisabled();
   });
 
@@ -209,7 +219,7 @@ module('Acceptance | tools', function(hooks) {
     await login();
     await click('[data-test-cardstack-tools-launcher]');
     await waitFor('[data-test-cs-active-composition-panel-main]');
-    assert.dom('[data-test-cs-collapsible-section=category-1-popularity] [data-test-cs-collapsible-section-title]').hasText('Category #1: Popularity');
+    assert.dom('[data-test-cs-field-section=category-1-popularity] [data-test-cs-field-section-title]').hasText('Category #1: Popularity');
   });
 
   test('allow editing fields of newly added, owned records', async function(assert) {
@@ -218,10 +228,10 @@ module('Acceptance | tools', function(hooks) {
     await click('[data-test-cardstack-tools-launcher]');
     await waitFor('[data-test-cs-active-composition-panel-main]');
 
-    await click('[data-test-cs-collapsible-section=post-1-categories] [data-test-add-category-button]');
+    await click('[data-test-cs-field-section=post-1-categories] [data-test-add-category-button]');
     await fillIn('.category-editor:last-of-type > input', 'Pirating');
 
-    let popularityInput = '[data-test-cs-collapsible-section=category-1-popularity] [data-test-cs-field-editor=popularity] input';
+    let popularityInput = '[data-test-cs-field-section=category-1-popularity] [data-test-cs-field-editor=popularity] input';
     assert.dom(popularityInput).isNotDisabled();
   });
 
@@ -236,6 +246,50 @@ module('Acceptance | tools', function(hooks) {
     assert.dom('[data-test-field-name="hidden-computed-field-from-editor"]').doesNotExist();
   });
 
+  test('change editor panel dynamically depending on field overlay selected', async function (assert) {
+    await visit('/hub/posts/1');
+    await login();
+    await click('[data-test-cardstack-tools-launcher]');
+    await waitFor('[data-test-cs-active-composition-panel-main]');
+
+    await click('[data-test-overlay-button="title"]:nth-of-type(1)');
+    await waitFor('[data-test-cs-active-composition-panel-parameters]');
+
+    assert.dom('[data-test-cs-field-overlay].focused').exists({ count: 1 });
+    assert.dom('[data-test-cs-field-section="post-1-title"]').exists('Selected field appears on editor');
+    assert.dom('[data-test-cs-field-section="post-1-published-at"]').doesNotExist('Unselected field does not appear on editor');
+
+    await click('[data-test-overlay-button="reading-time"]');
+    assert.dom('[data-test-cs-field-overlay].focused').exists({ count: 1 });
+    assert.dom('[data-test-cs-field-section="post-1-reading-time"]').exists();
+    assert.dom('[data-test-cs-field-section="post-1-title"]').doesNotExist();
+
+    await click('.overlay-scrim.bottom');
+    await waitFor('[data-test-cs-active-composition-panel-main]');
+
+    assert.dom('[data-test-cs-field-overlay].focused').doesNotExist();
+    assert.dom('[data-test-cs-active-composition-panel-parameters]').doesNotExist();
+    assert.dom('[data-test-cs-field-section="post-1-title"]').exists();
+    assert.dom('[data-test-cs-field-section="post-1-published-at"]').exists();
+    assert.dom('[data-test-cs-field-section="post-1-reading-time"]').exists();
+  });
+
+  test('editor overlay is focused when a rendered field is selected on editor panel', async function (assert) {
+    await visit('/hub/posts/1');
+    await login();
+    await click('[data-test-cardstack-tools-launcher]');
+    await waitFor('[data-test-cs-active-composition-panel-main]');
+    assert.dom('[data-test-cs-field-overlay].focused').doesNotExist();
+
+    await click('[data-test-cs-field-section="post-1-title"]');
+    assert.dom('[data-test-cs-field-overlay].focused').exists({ count: 1 });
+    assert.dom('[data-test-cs-field-overlay].focused label').hasText("Title");
+
+    await click('[data-test-cs-field-section="post-1-reading-time"]');
+    assert.dom('[data-test-cs-field-overlay].focused').exists({ count: 1 });
+    assert.dom('[data-test-cs-field-overlay].focused label').hasText("Underestimated Read Time");
+  });
+
   test('allow editing fields of newly added record', async function(assert) {
     await visit('/hub/posts/1');
     await login();
@@ -246,7 +300,7 @@ module('Acceptance | tools', function(hooks) {
     await click('[data-test-cs-create-menu-item=posts] button');
     await waitFor('[data-test-cs-active-composition-panel-main]');
 
-    assert.dom('[data-test-cs-collapsible-section=post--title] [data-test-cs-field-editor=title] input').isNotDisabled();
+    assert.dom('[data-test-cs-field-section=post--title] [data-test-cs-field-editor=title] input').isNotDisabled();
   });
 
   test('adding new record updates the query-based relationship', async function(assert) {
@@ -264,7 +318,7 @@ module('Acceptance | tools', function(hooks) {
     await click('[data-test-cs-create-button]');
     await click('[data-test-cs-create-menu-item="posts"] button');
 
-    let titleInput = '[data-test-cs-collapsible-section=post--title] input';
+    let titleInput = '[data-test-cs-field-section=post--title] input';
     await fillIn(titleInput, 'Adventures in Pirating');
 
     let ratingInput = '[data-test-cs-field-editor="rating"] input';
@@ -290,7 +344,7 @@ module('Acceptance | tools', function(hooks) {
     await click('[data-test-cs-create-button]');
     await click('[data-test-cs-create-menu-item=posts] button');
 
-    let titleInput = '[data-test-cs-collapsible-section=post--title] input';
+    let titleInput = '[data-test-cs-field-section=post--title] input';
     let title = `document ${Date.now()}-${nonce++}`;
     await fillIn(titleInput, title);
 

@@ -23,9 +23,9 @@ module('Acceptance | image field editor', function(hooks) {
     assert.equal(currentURL(), '/hub/articles/new');
     await login();
     await click('[data-test-cardstack-tools-launcher]');
-    await waitFor('[data-test-cs-editor-panel]');
+    await waitFor('[data-test-cardstack-image-editor]');
 
-    await click('[data-test-cs-field-editor="cover-image"] .cardstack-image-editor-button--choose');
+    await click('[data-test-cardstack-image-editor-button-choose]');
     await waitFor('[data-card-picker-toolbox-header]');
     await waitUntil(() => !find('.cardstack-card-picker--loading'));
 
@@ -44,16 +44,16 @@ module('Acceptance | image field editor', function(hooks) {
     await visit('/hub/articles/new');
     await login();
     await click('[data-test-cardstack-tools-launcher]');
-    await waitFor('[data-test-cs-editor-panel]');
+    await waitFor('[data-test-cardstack-image-editor]');
 
-    await click('[data-test-cs-field-editor="cover-image"] .cardstack-image-editor-button--choose');
+    await click('[data-test-cardstack-image-editor-button-choose]');
     await waitFor('[data-card-picker-toolbox-header]');
     await waitUntil(() => !find('.cardstack-card-picker--loading'));
 
     await click('[data-card-picker-card="0"]');
     await waitUntil(() => !find('[data-card-picker-toolbox-header]'));
 
-    await click('.cardstack-image-editor-button--remove');
+    await click('[data-test-cardstack-image-editor-button-remove]');
     assert.dom('img.cs-image').doesNotExist();
 
     // wait until no animation is happening before ending the test to prevent

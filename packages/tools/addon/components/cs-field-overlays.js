@@ -18,6 +18,7 @@ export default Component.extend({
   actions: {
     openField(which) {
       this.get('tools').openField(which);
+      this.get('tools').detailField(which);
     },
 
     navigateToCard(model) {

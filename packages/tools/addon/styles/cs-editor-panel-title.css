@@ -1,0 +1,16 @@
+.cs-editor-panel-title {
+    margin: 0;
+    padding-bottom: 1em;
+    color: var(--bright-foreground);
+    font-size: 12px;
+    font-weight: 600;
+    line-height: 17px;
+    text-transform: capitalize;
+}
+
+.cs-editor-panel-title svg {
+    margin-right: 5px;
+    display: inline-block;
+    vertical-align: text-top;
+    fill: var(--active-foreground);
+}

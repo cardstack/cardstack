@@ -24,25 +24,9 @@
     font-size: 16px;
 }
 
-.cs-active-composition-panel--parameters {
+.cs-active-composition-panel--parameters,
+.cs-active-composition-panel--flex-title {
     padding: 1.25rem 1.25rem 0;
-}
-
-.cs-active-composition-panel--title {
-    margin: 0;
-    padding-bottom: 1em;
-    color: var(--bright-foreground);
-    font-size: 12px;
-    font-weight: 600;
-    line-height: 17px;
-    text-transform: capitalize;
-}
-
-.cs-active-composition-panel--title svg {
-    margin-right: 5px;
-    display: inline-block;
-    vertical-align: text-top;
-    fill: var(--active-foreground);
 }
 
 .cs-active-composition-panel--flex-slot {
@@ -74,25 +58,4 @@
     display: block;
     width: 100%;
     height: 20px;
-}
-
-.cs-field-editor-section--label {
-    display: inline-block;
-    padding-bottom: 0.5rem;
-    color: var(--light50);
-    font-size: 0.9rem;
-    letter-spacing: 0.3px;
-    line-height: 1.375;
-}
-
-.cs-active-composition-panel--field-editor > .field-editor > input {
-    margin-bottom: 1rem;
-    padding: 0.5rem 1rem;
-    border: 1px solid var(--light25);
-    border-radius: 3px;
-    background-color: var(--light-background);
-    color: var(--dark-foreground);
-    font-size: 0.8rem;
-    letter-spacing: 0.3px;
-    line-height: 1.375;
 }

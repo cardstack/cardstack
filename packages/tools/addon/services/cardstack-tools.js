@@ -46,11 +46,15 @@ export default Service.extend({
 
     /* --  Ephemeral state -- */
 
-    // a field is highlighted when we're drawing a blue border around it
+    // a field is highlighted when we're drawing a (dotted) blue border around it
     this.highlightedFieldId = null;
 
     // a field is opened when the user is actively editing it
     this.openedFieldId = null;
+
+    // a field is a detailed-view field when we the user selects it in the overlays
+    // to see its editor options in the dynamic right-edge panel
+    this.detailedViewFieldId = null;
 
     // Register items for edges
     this.get('cardstackEdges').registerTopLevelComponent('cs-tools');
@@ -248,6 +252,9 @@ export default Service.extend({
 
   highlightField(which) {
     this.set('highlightedFieldId', which ? which.id : null);
-  }
+  },
 
+  detailField(which) {
+    this.set('detailedViewFieldId', which ? which.id : null);
+  }
 });

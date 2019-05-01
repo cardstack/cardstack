@@ -1,0 +1,43 @@
+{{#let
+  (cs-card-meta-caption content caption isPageModelField)
+  (cs-field-editor-options-for content caption)
+as |title editorOptions|}}
+  {{#if detailField}}
+    {{cs-editor-panel-title title=title}}
+  {{else}}
+    {{#unless editorOptions.hideTitle}}
+      <div class="cs-field-section--label" data-test-cs-field-section-title={{field.name}}>
+        {{title}}
+      </div>
+    {{/unless}}
+  {{/if}}
+
+  {{!-- TO DO: uneditable fields (computed) should be rendered separately, and not as field editors.
+        They should not go through the field validation process. --}}
+  {{#if field.grouped}}
+    {{#each field.grouped as |groupName|}}
+      <div class="cs-field-section--group-item-label" data-test-cs-field-editor-section-label>
+        {{cs-field-caption content groupName}}
+      </div>
+      {{cs-field-editor
+        content=content
+        field=groupName
+        permissions=permissions
+        onchange=validate
+        errors=(get errors groupName)
+        class="cs-field-section--field-editor"
+        data-test-cs-field-editor=(dasherize groupName)
+      }}
+    {{/each}}
+  {{else}}
+    {{cs-field-editor
+      content=content
+      field=field.name
+      permissions=permissions
+      onchange=validate
+      errors=errors
+      class="cs-field-section--field-editor"
+      data-test-cs-field-editor=(dasherize field.name)
+    }}
+  {{/if}}
+{{/let}}
