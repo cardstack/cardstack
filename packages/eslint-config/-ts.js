@@ -24,10 +24,11 @@ module.exports = {
     "@typescript-eslint/no-triple-slash-reference": "error",
     "no-unused-vars": "off",
     "@typescript-eslint/no-unused-vars": "error",
-    "@typescript-eslint/no-use-before-define": "error",
     "@typescript-eslint/no-var-requires": "error",
     "@typescript-eslint/prefer-interface": "error",
     "@typescript-eslint/prefer-namespace-keyword": "error",
-    "@typescript-eslint/type-annotation-spacing": "error"
+    "@typescript-eslint/type-annotation-spacing": "error",
+    "@typescript-eslint/no-require-imports": "error",
+    "@typescript-eslint/no-for-in-array": "error"
   }
 };

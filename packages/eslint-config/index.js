@@ -6,7 +6,8 @@ module.exports = Object.assign({}, node, {
   overrides: [
     Object.assign({}, test, {
       files: [
-        'node-tests/**/*.js'
+        'node-tests/**/*.js',
+        'node-tests/**/*.ts'
       ]
     }),
     Object.assign({}, ts, {
