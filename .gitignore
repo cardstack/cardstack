@@ -23,6 +23,10 @@ package-lock.json
 /packages/cli/**/*.js
 /packages/cli/**/*.js.map
 /packages/cli/**/*.d.ts
+/packages/di/**/*.js
+/packages/di/**/*.js.map
+/packages/di/**/*.d.ts
+
 
 
 
