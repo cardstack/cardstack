@@ -6,7 +6,7 @@
     "ember-addon",
     "cardstack-plugin"
   ],
-  "repository": "",
+  "repository": "https://github.com/cardstack/cardstack",
   "license": "MIT",
   "author": "",
   "directories": {
