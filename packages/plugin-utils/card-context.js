@@ -11,26 +11,36 @@ const cardVersionDelim = ':::';
 const currentVersionLabel = '_current_';
 
 function cardDefinitionIdFromId(id) {
+  if (id == null) { return; }
+
   let { sourceId, packageName } = cardContextFromId(id);
   return cardContextToId({ sourceId, packageName });
 }
 
 function cardIdFromId(id) {
+  if (id == null) { return; }
+
   let { sourceId, packageName, upstreamId } = cardContextFromId(id);
   return cardContextToId({ sourceId, packageName, upstreamId });
 }
 
 function isCard(id) {
+  if (id == null) { return false; }
+
   let { upstreamId } = cardContextFromId(id);
   return upstreamId != null;
 }
 
 function hasCardDefinition(id) {
+  if (id == null) { return false; }
+
   let { packageName } = cardContextFromId(id);
   return packageName != null;
 }
 
 function cardContextFromId(id) {
+  if (id == null) { return {}; }
+
   let [ idPart='', snapshotVersion ] = id.split(cardVersionDelim);
   let [ sourceId, packageName, upstreamId, modelId ] = idPart.split(cardContextDelim);
 

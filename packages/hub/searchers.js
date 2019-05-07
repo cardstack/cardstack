@@ -108,7 +108,7 @@ class Searchers {
     // If callers want things more fine grained then cards, they should provide an includePath that can load
     // the internal models they are interested in, starting at the ['model'] path, which is the primary model
     // for the card.
-    if (id != null && isCard(id)) {
+    if (isCard(id)) {
       type = 'cards';
     }
 

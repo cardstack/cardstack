@@ -64,7 +64,7 @@ class Schema {
 
   withOnlyRealFields(doc) {
     let activeDoc = doc;
-    let { sourceId, packageName } = cardContextFromId(doc.type);
+    let { sourceId, packageName } = doc ? cardContextFromId(doc.type) : {};
     for (let section of ['attributes', 'relationships']) {
       if (!doc[section]) {
         continue;
