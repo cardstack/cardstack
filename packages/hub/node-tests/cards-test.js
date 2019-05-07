@@ -27,10 +27,14 @@ describe('hub/cards', function () {
         expect(schema.data.relationships.model.data).to.eql({ type: 'content-types', id: 'local-hub::person-card::people' });
 
         schema = await searchers.get(env.session, 'local-hub', 'content-types', 'local-hub::person-card::people');
-        expect(schema.data.attributes).to.eql({ 'name': 'people' });
+        expect(schema.data.attributes).to.eql({
+          'default-includes': ['card-context'],
+          'name': 'people'
+        });
         expect(schema.data.relationships.fields.data).to.eql([
           { type: 'fields', id: 'local-hub::person-card::name' },
           { type: 'fields', id: 'local-hub::person-card::password' },
+          { type: 'computed-fields', id: 'card-context' },
         ]);
 
         schema = await searchers.get(env.session, 'local-hub', 'fields', 'local-hub::person-card::name');
@@ -51,17 +55,26 @@ describe('hub/cards', function () {
         expect(schema.data.relationships.model.data).to.eql({ type: 'content-types', id: 'local-hub::article-card::articles' });
 
         schema = await searchers.get(env.session, 'local-hub', 'content-types', 'local-hub::article-card::articles');
-        expect(schema.data.attributes).to.eql({ 'name': 'articles' });
+        expect(schema.data.attributes).to.eql({
+          'default-includes': ['card-context'],
+          'name': 'articles'
+        });
         expect(schema.data.relationships.fields.data).to.eql([
           { type: 'fields', id: 'local-hub::article-card::title' },
           { type: 'fields', id: 'local-hub::article-card::body' },
           { type: 'fields', id: 'local-hub::article-card::categories' },
           { type: 'fields', id: 'local-hub::article-card::author' },
+          { type: 'computed-fields', id: 'card-context' },
         ]);
 
         schema = await searchers.get(env.session, 'local-hub', 'content-types', 'local-hub::article-card::categories');
-        expect(schema.data.attributes).to.eql({ 'name': 'categories' });
-        expect(schema.data.relationships).to.be.notOk;
+        expect(schema.data.attributes).to.eql({
+          'default-includes': ['card-context'],
+          'name': 'categories'
+        });
+        expect(schema.data.relationships.fields.data).to.eql([
+          { type: 'computed-fields', id: 'card-context' },
+        ]);
 
         schema = await searchers.get(env.session, 'local-hub', 'fields', 'local-hub::article-card::title');
         expect(schema.data.attributes).to.eql({

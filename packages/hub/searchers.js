@@ -45,11 +45,20 @@ class Searchers {
     }
     return this._sources;
   }
+
   async _getSources(sourceId) {
     let activeSources = await this._resolveActiveSources();
     let sources = [ activeSources.find(i => i.id === sourceId) ].filter(Boolean);
     sources.push({ searcher: this.internalSearcher });
     return sources;
+  }
+
+  get ownTypes() {
+    if (this._ownTypes) { this._ownTypes; }
+
+    let schemaLoader = this.__owner__.lookup('hub:schema-loader');
+    this._ownTypes = schemaLoader.ownTypes();
+    return this._ownTypes;
   }
 
   // TODO this API changed, make sure to update all callers (including @cardstack/ethereum)
@@ -108,7 +117,7 @@ class Searchers {
     // If callers want things more fine grained then cards, they should provide an includePath that can load
     // the internal models they are interested in, starting at the ['model'] path, which is the primary model
     // for the card.
-    if (isCard(id)) {
+    if (!this.ownTypes.includes(type) && isCard(id)) {
       type = 'cards';
     }
 

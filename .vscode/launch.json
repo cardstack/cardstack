@@ -110,7 +110,7 @@
         "--timeout",
         "200000",
          "--grep",
-         "pgsearch/indexer"
+         "can define a card schema"
       ]
     },
     {
