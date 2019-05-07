@@ -196,7 +196,7 @@ module.exports = class DocumentContext {
 
     // this is specifically for the scenario where the card's primary model is being created, and we need to be
     // able to reason about the card that wraps the primary model before it exists in the index.
-    if (type === 'cards' && !resource && this.id === id && this.type !== type) {
+    if (type === 'cards' && isCard(id) && !resource && this.id === id && this.type !== type) {
       return {
         id,
         type: 'cards',
@@ -578,7 +578,7 @@ module.exports = class DocumentContext {
       let models = await userModel.getRelated(field.name);
       if (Array.isArray(models)) {
         related = await Promise.all(models.map(async (model) => {
-          if (model && model.type === 'cards' && model.id === this.cardId) {
+          if (model && model.type === 'cards' && model.id === this.cardId && isCard(model.id)) {
             // TODO we might be able to get rid of this "own card" logic now that we are
             // using the native hub invalidation....
             // dont serialize a relationship from an internal model to its outer card until after
@@ -593,7 +593,7 @@ module.exports = class DocumentContext {
         set(pristineDocOut, `data.relationships.${field.name}`, Object.assign({}, relObj, { data: related.map(r => ({ type: r.type, id: r.id })) }));
       } else {
         let model = models;
-        if (model && model.type === 'cards' && model.id === this.cardId) {
+        if (model && model.type === 'cards' && model.id === this.cardId && isCard(model.id)) {
           // TODO we might be able to get rid of this "own card" logic now that we are
           // using the native hub invalidation....
           related = { type: model.type, id: model.id };
@@ -720,7 +720,7 @@ module.exports = class DocumentContext {
       // TODO we need to change how we build card metadata so that metadata relationships
       // are written as relationships on the card. this will look much closer to how we currently
       // build model attribtues and relationships.
-      if (type === 'cards') {
+      if (type === 'cards' && isCard(id)) {
         let metadata = await this._getCardMetadata(id);
         searchDoc = merge({}, searchDoc, metadata);
         pristine.data.attributes = metadata;
