@@ -59,11 +59,9 @@ class PermissionsSearcher {
       }
       mayUpdateResource = false;
     }
-    // let sourceId = contentType.dataSource.id;
     let documentContext = this.searchers.createDocumentContext({
       id: document.data.id,
       type: document.data.type,
-      sourceId,
       schema: await this.currentSchema.getSchema(),
       upstreamDoc: document
     });
