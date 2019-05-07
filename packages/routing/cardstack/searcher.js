@@ -12,15 +12,14 @@ class RoutingSearcher {
     this.routers = routers;
   }
 
-  //TODO rename 'type'
-  async get({ session, sourceId, type, id, snapshotVersion, next }) {
+  async get(session, type, id, next) {
     if (type === 'spaces') {
       return await this.routers.getSpace(id, session);
     }
     return next();
   }
 
-  async search({ session, query, next }) {
+  async search(session, query, next) {
     return next();
   }
 });

@@ -53,6 +53,7 @@ module.exports = class Field {
             title: "Non-type in related-types"
           });
         }
+        // TODO this is a convoluted way to check the relationships are inter-card. clean this up
         let { sourceId:relatedTypeSourceId, packageName:relatedTypePackageName } = cardContextFromId(typeRef.id);
         if (sourceId != null &&
           packageName != null &&

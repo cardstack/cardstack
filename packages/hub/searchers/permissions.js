@@ -17,8 +17,7 @@ class PermissionsSearcher {
     this.searchers = searchers;
   }
 
-  //TODO rename 'type'
-  async get({ session, sourceId, type, id, snapshotVersion, next }) {
+  async get(session, type, id, next) {
     if (type !== 'permissions') {
       return next();
     }
@@ -104,7 +103,7 @@ class PermissionsSearcher {
     };
   }
 
-  async search({ session, query, next }) {
+  async search(session, query, next) {
     return next();
   }
 

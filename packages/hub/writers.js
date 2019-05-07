@@ -1,4 +1,5 @@
 const Error = require('@cardstack/plugin-utils/error');
+const { hasCardDefinition, cardContextToId, cardContextFromId, isCard } = require('@cardstack/plugin-utils/card-context');
 const log = require('@cardstack/logger')('cardstack/writers');
 const { get } = require('lodash');
 const { declareInjections } = require('@cardstack/di');
@@ -15,18 +16,20 @@ class Writers {
     return this.schemaLoader.ownTypes();
   }
 
-  async create(session, type, document, cardIdForNewModel) {
-    log.info("creating type=%s for card-id=%s", type, cardIdForNewModel);
+  // TODO don't pass in cardIdForNewModel, and instead allow
+  // caller to pass in id in document
+  async create(session, type, document) {
+    log.info("creating type=%s", type);
     if (!document.data) {
       throw new Error('The document must have a top-level "data" property', {
         status: 400
       });
     }
 
-    return await this.handleCreate(false, session, type, cardIdForNewModel, document);
+    return await this.handleCreate(false, session, type, document);
   }
 
-  async createBinary(session, type, cardInstanceId, stream) {
+  async createBinary(session, type, stream) {
     log.info("creating type=%s from binary stream", type);
     if (!stream.read) {
       throw new Error('The passed stream must be a readable binary stream', {
@@ -34,10 +37,10 @@ class Writers {
       });
     }
 
-    return await this.handleCreate(true, session, type, cardInstanceId, stream);
+    return await this.handleCreate(true, session, type, stream);
   }
 
-  async handleCreate(isBinary, session, type, id, documentOrStream) {
+  async handleCreate(isBinary, session, type, documentOrStream) {
     await this.pgSearchClient.ensureDatabaseSetup();
 
     let schema = await this.currentSchema.getSchema();
@@ -55,11 +58,9 @@ class Writers {
       pending = await this.createPendingChange({ originalDocument, finalDocument, finalizer, aborter, opts});
     } else {
       let isSchema = this.schemaTypes.includes(type);
-      // TODO UPDATE ALL CALLERS!
       let opts = await writer.prepareCreate(
         session,
         type,
-        id,
         this._cleanupBodyData(schema, documentOrStream.data),
         isSchema
       );
@@ -100,7 +101,7 @@ class Writers {
     let opts = await writer.prepareUpdate(
       session,
       type,
-      id,
+      isCard(id) && cardContextFromId(id).modelId == null ? cardContextFromId(id).upstreamId : id, // see note in this._cleanupBodyData() around why we do this, the reason is deep and important
       this._cleanupBodyData(schema, document.data),
       isSchema
     );
@@ -129,11 +130,20 @@ class Writers {
     await this.pgSearchClient.ensureDatabaseSetup();
 
     let schema = await this.currentSchema.getSchema();
+    let cardDefinition = schema.getCardDefinition(id);
+    if (type === 'cards' && cardDefinition) {
+      type = cardDefinition.modelContentType.id;
+    }
+
     let { writer, sourceId } = this._getSchemaDetailsForType(schema, type);
     let isSchema = this.schemaTypes.includes(type);
-    // cards are a construct that we manufacture in the hub--upstream data sources don't reason using cards
-    let upstreamType = type === 'cards' ? schema.getCardDefinition(id).modelContentType.id : type;
-    let opts = await writer.prepareDelete(session, version, upstreamType, id, isSchema);
+    let opts = await writer.prepareDelete(
+      session,
+      version,
+      type,
+      isCard(id) && cardContextFromId(id).modelId == null ? cardContextFromId(id).upstreamId : id, // see note in this._cleanupBodyData() around why we do this, the reason is deep and important
+      isSchema
+    );
     let { originalDocument, finalDocument, finalizer, aborter } = opts;
     let pending = await this.createPendingChange({ originalDocument, finalDocument, finalizer, aborter, opts });
     try {
@@ -214,7 +224,23 @@ class Writers {
 
   _cleanupBodyData(schema, data) {
     let doc = schema.withOnlyRealFields(data);  // remove computed fields
-    return this._createQueryLinks(doc);         // convert `cardstack-queries` relationships to links.related
+    doc = this._createQueryLinks(doc);         // convert `cardstack-queries` relationships to links.related
+
+    // Note that is is important that when coverting the composite ID's to upstream ID's, if the
+    // ID you are dealing with is an internal model ID that is not the primary model, we'll need to
+    // retain the card context in which the internal model lives--otherwise we loose the ability to
+    // relate the internal model back to its card instance when we are getting the model from the
+    // upstream source. Another way to think of this is that the client actually set the model id for
+    // for the internal model in the document when they saved the model. So the composite ID was actually
+    // asserted by the client and the upstream source should just honor that ID. Ultimately this might
+    // mean that when creating a wroter for a data source, we might have to provide a hook for the card developer
+    // to inform the hub how to relate the internal model to it's card instance if the client is unable
+    // to assert the ID in the document when its created.
+    if (doc.id != null && isCard(doc.id) && cardContextFromId(doc.id).modelId == null){
+      let { modelId, upstreamId } = cardContextFromId(doc.id);
+      doc.id = modelId != null ? modelId : upstreamId;
+    }
+    return doc;
   }
 
   _createQueryLinks(doc) {
@@ -270,21 +296,26 @@ class PendingChange {
     this._aborter = aborter;
 
     if (schema && searchers) {
+      let id;
       if (originalDocument) {
+        id = scopedIdFromUpstreamResource(originalDocument);
+        originalDocument.id = id;
         this.originalDocumentContext = searchers.createDocumentContext({
           type: originalDocument.type,
           schema,
           sourceId,
-          id: originalDocument.id,
+          id,
           upstreamDoc: originalDocument ? { data: originalDocument } : null
         });
       }
       if (finalDocument) {
+        id = scopedIdFromUpstreamResource(finalDocument);
+        finalDocument.id = id;
         this.finalDocumentContext = searchers.createDocumentContext({
           type: finalDocument.type,
           schema,
           sourceId,
-          id: finalDocument.id,
+          id,
           upstreamDoc: finalDocument ? { data: finalDocument } : null
         });
       }
@@ -313,4 +344,18 @@ class PendingChange {
       return aborter.call(null, this);
     }
   }
+}
+
+function scopedIdFromUpstreamResource(resource) {
+  if (!resource) { return; }
+
+  if (hasCardDefinition(resource.type)) {
+    if (isCard(resource.id)) {
+      return resource.id;
+    }
+    let { sourceId, packageName } = cardContextFromId(resource.type);
+    let upstreamId = resource.id;
+    return cardContextToId({ sourceId, packageName, upstreamId });
+  }
+  return resource.id;
 }

@@ -16,13 +16,13 @@ function cardDefinitionIdFromId(id) {
 }
 
 function cardIdFromId(id) {
-  let { sourceId, packageName, cardId } = cardContextFromId(id);
-  return cardContextToId({ sourceId, packageName, cardId });
+  let { sourceId, packageName, upstreamId } = cardContextFromId(id);
+  return cardContextToId({ sourceId, packageName, upstreamId });
 }
 
 function isCard(id) {
-  let { cardId } = cardContextFromId(id);
-  return cardId != null;
+  let { upstreamId } = cardContextFromId(id);
+  return upstreamId != null;
 }
 
 function hasCardDefinition(id) {
@@ -32,12 +32,12 @@ function hasCardDefinition(id) {
 
 function cardContextFromId(id) {
   let [ idPart='', snapshotVersion ] = id.split(cardVersionDelim);
-  let [ sourceId, packageName, cardId, modelId ] = idPart.split(cardContextDelim);
+  let [ sourceId, packageName, upstreamId, modelId ] = idPart.split(cardContextDelim);
 
   return {
     sourceId,
     packageName,
-    cardId,
+    upstreamId,
     modelId,
     snapshotVersion
   };
@@ -46,11 +46,11 @@ function cardContextFromId(id) {
 function cardContextToId({
   sourceId,
   packageName,
-  cardId,
+  upstreamId,
   modelId,
   snapshotVersion
 }) {
-  let idPart = [ sourceId, packageName, cardId, modelId ].filter(i => i != null).join(cardContextDelim);
+  let idPart = [ sourceId, packageName, upstreamId, modelId ].filter(i => i != null).join(cardContextDelim);
   return [ idPart, snapshotVersion ].filter(i => i != null).join(cardVersionDelim);
 }
 
@@ -65,12 +65,12 @@ function addContextForCardDefinition(sourceId, packageName, schemaDocument) {
   let idSet = {};
   for (let resource of included) {
     // schema models are treated as cards
-    let cardId = [
+    let upstreamId = [
       'content-types',
       'fields',
       'computed-fields'
     ].includes(resource.type) ? get(resource, 'attributes.name') : resource.id;
-    let contextualId = cardContextToId({ sourceId, packageName, cardId });
+    let contextualId = cardContextToId({ sourceId, packageName, upstreamId });
     if (idSet[`${resource.type}/${contextualId}`]) {
       throw new Error(`The schema feature for the package '${packageName}' defines duplicatively named schema elements: ${resource.type}/${contextualId}`);
     }
@@ -91,7 +91,6 @@ function addContextForCardDefinition(sourceId, packageName, schemaDocument) {
   if (!cardModelSchema) { return; }
 
   cardModelSchema.attributes = cardModelSchema.attributes || {};
-  cardModelSchema.attributes['is-card-model'] = true;
 
   included.filter(i => i.type === 'content-types').forEach(modelSchema => {
     modelSchema.relationships = modelSchema.relationships || {};

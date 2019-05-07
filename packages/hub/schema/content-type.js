@@ -95,7 +95,6 @@ module.exports = class ContentType {
     }
 
     this.router = model.attributes && model.attributes.router;
-    this.isCardModel = Boolean(get(model, 'attributes.is-card-model'));
 
     if (model.attributes && model.attributes['fieldsets']) {
       let fieldsets = model.attributes['fieldsets'];

@@ -2,7 +2,7 @@ const { declareInjections } = require('@cardstack/di');
 const log = require('@cardstack/logger')('cardstack/searchers');
 const Error = require('@cardstack/plugin-utils/error');
 const Session = require('@cardstack/plugin-utils/session');
-const { isCard, cardIdFromId, cardContextFromId } = require('@cardstack/plugin-utils/card-context');
+const { isCard } = require('@cardstack/plugin-utils/card-context');
 const DocumentContext = require('./indexing/document-context');
 const { get } = require('lodash');
 
@@ -24,12 +24,15 @@ class Searchers {
     this._workersSetup = false;
   }
 
-  get ownTypes() {
-    if (this._ownTypes) { this._ownTypes; }
-
-    let schemaLoader = this.__owner__.lookup('hub:schema-loader');
-    this._ownTypes = schemaLoader.ownTypes();
-    return this._ownTypes;
+  async _lookupSources() {
+    let activeSources = await this.sources.active();
+    if (activeSources !== this._lastActiveSources) {
+      this._lastActiveSources = activeSources;
+      this._sources = [...activeSources.values()].filter(v => v.searcher);
+      this._sources.push({ searcher: this.internalSearcher });
+      log.debug('found %s searchers', this._sources.length);
+    }
+    return this._sources;
   }
 
   async _resolveActiveSources() {
@@ -50,20 +53,20 @@ class Searchers {
   }
 
   // TODO this API changed, make sure to update all callers (including @cardstack/ethereum)
-  async getResourceAndMeta({ session, sourceId, packageName, cardId, type, modelId, snapshotVersion }) {
-    let sources = await this._getSources(sourceId);
+  async getResourceAndMeta(session, type, id) {
+    let sources = await this._lookupSources();
     let index = 0;
     let sessionOrEveryone = session || Session.EVERYONE;
     let next = async () => {
       let source = sources[index++];
       if (source) {
-        let response = await source.searcher.get({ session:sessionOrEveryone, sourceId, packageName, cardId, type, modelId, snapshotVersion, next });
-        if (response && response.data) {
+        let response = await source.searcher.get(sessionOrEveryone, type, id, next);
+        if (source.id != null && response && response.data) {
           if (!response.data.meta) {
             response.data.meta = {};
           }
           if (response.data.meta.source == null) {
-            response.data.meta.source = sourceId;
+            response.data.meta.source = source.id;
           }
         }
         return response;
@@ -92,10 +95,26 @@ class Searchers {
     return await this.get(session, localHubSource, 'spaces', path);
   }
 
-  async get(session, sourceId, packageName, cardId, opts={}) {
-    let { version:snapshotVersion, includePaths } = opts;
+  // Note we are transitioning to a new API here.  During this transition
+  // the legacy models can provide their type in place of packageName. But if you
+  // are requesting a card, dont supply 'cards' as the packageName, provide the
+  // package name of the card you wish to retrieve.
+  async get(session, sourceId, packageName, id, opts={}) {
+    let { includePaths } = opts;
 
-    let { resource, meta, included } = await this.getResourceAndMeta({ session, sourceId, packageName, cardId, snapshotVersion });
+    let type = packageName;
+    // Since 'packageName' is part of our API here, that actually limits callers getting documents
+    // below the level of a card, as callers are not actually specifying the 'type' of the thing they want.
+    // If callers want things more fine grained then cards, they should provide an includePath that can load
+    // the internal models they are interested in, starting at the ['model'] path, which is the primary model
+    // for the card.
+    if (isCard(id)) {
+      type = 'cards';
+    }
+
+    // note we need to convert packageNames to types when you cross this boundary
+    let { resource, meta, included } = await this.getResourceAndMeta(session, type, id);
+
     let authorizedResult;
     let documentContext;
     if (resource) {
@@ -112,7 +131,7 @@ class Searchers {
     }
 
     if (!authorizedResult) {
-      throw new Error(`No such resource ${sourceId}/${packageName}/${cardId}`, {
+      throw new Error(`No such resource ${sourceId}/${packageName}/${id}`, {
         status: 404
       });
     }
@@ -120,8 +139,7 @@ class Searchers {
     return authorizedResult;
   }
 
-  // TODO make sure to update callers to pass in the source ID for realz
-  async getBinary(session, source, packageName, cardId, type, modelId, opts={}) {
+  async getBinary(session, source, type, id, opts={}) {
     // look up authorized result to check read is authorized by going through
     // the default auth stack for the JSON representation. Error will be thrown
     // if authorization is not correct.
@@ -129,18 +147,24 @@ class Searchers {
 
     // TODO this needs to get the card's internal model that backs the binary data.
     // this.get() will ultimately be the incorrect place to retrieve this from...
-    let document = await this.get(session, source, type, modelId, { version });
+    let document = await this.get(session, source, type, id, { version });
 
     // TODO ultimately there will be no need to look up the source as it is being provided
     // as an argument to this method.
     let sourceId = document.data.meta.source;
-    let [ dataSource ] = await this._getSources(sourceId);
+    let sources = await this._lookupSources();
+
+    // we don't need to take a middleware-like approach here because we already
+    // searched for the json representation, so we know exactly what data source
+    // to get the binary blob from
+    let dataSource = sources.find(s => s.id === sourceId);
 
     let sessionOrEveryone = session || Session.EVERYONE;
-    let result = await dataSource.searcher.getBinary({ session: sessionOrEveryone, type, modelId });
+    let result = await dataSource.searcher.getBinary(sessionOrEveryone, type, id);
 
     return [result, document];
   }
+
 
   async search(session, query) {
     if (typeof query !== 'object') {
@@ -191,50 +215,21 @@ class Searchers {
 
   _read() {
     return async (type, id) => {
-      let {
-        sourceId,
-        packageName,
-        modelId,
-        snapshotVersion
-      } = cardContextFromId(id);
-
-      let document;
+      let resource;
       try {
-        document = await this.getResourceAndMeta({
-          session: Session.INTERNAL_PRIVILEGED,
-          sourceId,
-          packageName,
-          cardId: cardIdFromId(id),
-          type,
-          modelId,
-          snapshotVersion
-        });
+        resource = (await this.getResourceAndMeta(Session.INTERNAL_PRIVILEGED, type, id)).resource;
       } catch (err) {
         if (err.status !== 404) { throw err; }
       }
-
-      let { included=[], resource } = document || {};
-
-      if (!isCard(type)) {
-        return resource;
-      }
-
-      // This assumes we are using the strategy storing a card for each row in our index.
-      // if an internal model was being requested, we need to pluck that out of the card's includeds
-
-      return included.find(i => i.type === type && i.id === id);
+      return resource;
     };
   }
 
   _readUpstreamCard() {
     return async (id) => {
-      let {
-        sourceId,
-        packageName,
-      } = cardContextFromId(id);
       let card;
       try {
-        card = await this.client.readUpstreamDocument({ sourceId, packageName, id });
+        card = await this.client.readUpstreamDocument('cards', id);
       } catch (err) {
         if (err.status !== 404) { throw err; }
       }
@@ -250,7 +245,7 @@ class Searchers {
       let next = async () => {
         let source = sources[index++];
         if (source) {
-          let response = await source.searcher.search({ session, query, next });
+          let response = await source.searcher.search(session, query, next);
           response.data.forEach(resource => {
             if (!resource.meta) {
               resource.meta = {};

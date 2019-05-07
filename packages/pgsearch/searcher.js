@@ -1,7 +1,6 @@
 const log = require('@cardstack/logger')('cardstack/pgsearch');
 const Error = require('@cardstack/plugin-utils/error');
 const { declareInjections } = require('@cardstack/di');
-const { currentVersionLabel } = require('@cardstack/plugin-utils/card-context');
 const {
   queryToSQL,
   param,
@@ -28,24 +27,18 @@ module.exports = declareInjections({
     log.debug("constructed pgsearch searcher");
    }
 
-  async get({ sourceId, packageName, cardId, snapshotVersion }) {
-    let response;
-    if (snapshotVersion != null) {
-      response = await this.client.query('select pristine_doc from documents where source=$1 and package_name=$2 and id=$3 and snapshot_version=$4 and (expires is null or expires > now())', [sourceId, packageName, cardId, snapshotVersion]);
-    } else {
-      response = await this.client.query(`select pristine_doc from documents where source=$1 and package_name=$2 and id=$3 and snapshot_version='${currentVersionLabel}' and (expires is null or expires > now())`, [sourceId, packageName, cardId ]);
-    }
+  async get(session, type, id) {
+    let response = await this.client.query(`select pristine_doc from documents where type=$1 and id=$2 and (expires is null or expires > now())`, [type, id]);
     if (response.rowCount > 0){
       return response.rows[0].pristine_doc;
     }
   }
 
-  async search({ session, query: { filter, sort, page, queryString }}) {
+  async search(session, { filter, sort, page, queryString }) {
     let realms = await session.realms();
     let schema = await this.currentSchema.getSchema();
 
     let conditions = [
-      [{ snapshot_version: param(currentVersionLabel) }],
       ['realms && ', param(realms) ],
       ['expires is null or expires > now()']
     ];
@@ -81,8 +74,8 @@ module.exports = declareInjections({
     return this.assembleResponse(response, totalResponse, size, sorts);
   }
 
-  async getUpstreamCard(sourceId, packageName, cardId) {
-    let response = await this.client.query(`select upstream_doc from documents where source=$1 and package_name=$2 and id=$3 and snapshot_version='${currentVersionLabel}' and (expires is null or expires > now())`, [sourceId, packageName, cardId ]);
+  async getUpstreamCard(type, id) {
+    let response = await this.client.query(`select upstream_doc from documents where type=$1 and id=$2 and (expires is null or expires > now())`, [ type, id ]);
     if (response.rowCount > 0){
       return response.rows[0].upstream_doc;
     }
@@ -144,11 +137,7 @@ module.exports = declareInjections({
   }
 
   buildQueryExpression(schema, key, errorHint){
-    // TODO do we want to expose the column 'package_name' as part of our query DSL? (this might be kind of awkward on the browser client)
-    if (key === 'type' || key === 'package') {
-      key = 'package_name';
-    }
-    if (key === 'package_name' || key === 'id'){
+    if (key === 'type' || key === 'id'){
       return { isPlural: false, expression: [key], leafField: { buildValueExpression(value) { return [{ param: value }]; } } };
     }
     let segments = key.split('.');

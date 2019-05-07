@@ -9,15 +9,14 @@ module.exports = class MockSearcher {
     this.mockedTypes = ['mock-users'].concat(mockedTypes || []);
   }
 
-  //TODO rename 'type'
-  async get({ session, sourceId, type, id, snapshotVersion, next }) {
+  async get(session, type, id, next) {
     if (this.mockedTypes.includes(type)) {
       return this._getUser(id);
     }
     return next();
   }
 
-  async search({ session, query, next }) {
+  async search(session, query, next) {
     return next();
   }
 

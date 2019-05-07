@@ -5,6 +5,8 @@ const { get } = require('lodash');
 module.exports = class CardDefinition {
   constructor(model, allContentTypes) {
     this.id = model.id;
+    this.defaultMetadataIncludes = get(model, 'attributes.default-metadata-includes');
+    //TODO probably have to build an `includesTree` like we do for ContentType's default includes
 
     let metadataFields = new Map();
     let embeddedMetadataFields = new Map();

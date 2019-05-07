@@ -14,7 +14,7 @@ class EphemeralSearcher {
     this.service     = service;
   }
 
-  async get({ next }) {
+  async get(session, type, id, next) {
     return next();
   }
 

@@ -19,7 +19,6 @@ describe('hub/cards', function () {
     describe('valid schema scenarios', function () {
       afterEach(teardown);
 
-      // TODO assert the card-context field and the is-card-model attr on the card's model content-type
       it('can define a card schema', async function () {
         env = await createDefaultEnvironment(`${__dirname}/../../../tests/stub-cards/valid-cards`);
         searchers = env.lookup('hub:searchers');
@@ -167,6 +166,9 @@ describe('hub/cards', function () {
   describe('card read', function() {
     it.skip('get of card internal model includes card', async function() {
       // TODO (this test lives in the pgsearch indexer right now, it should be moved out...)
+    });
+
+    it.skip('honors default-metadata-includes set on card-definitions when retreiving a card (probably need to split think into a bunch of tests)', async function() {
     });
 
     describe ('card metadata', function() {

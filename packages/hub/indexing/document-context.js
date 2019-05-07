@@ -90,41 +90,35 @@ module.exports = class DocumentContext {
     return searchDoc;
   }
 
-  async upstreamCard() {
+  async getOwnCardDocumentContext() {
     if (!isCard(this.id) || this.type === 'cards' || this.type === 'card-definitions') { return this.upstreamDoc; }
 
     let attributes;
     let primaryModelId = cardIdFromId(this.id);
     let primaryModelType = this.schema.getCardDefinition(this.id).modelContentType.id;
-    let { data: card, included=[] } = (await this._readUpstreamCard(primaryModelId)) || {};
+    let { data: card } = (await this._readUpstreamCard(primaryModelId)) || {};
 
+    // TODO card metadata relationships will actually appear as relationships on upstream doc
     if (!card) {
       card = await this.read('cards', primaryModelId);
       attributes = card.attributes;
     } else {
       attributes = await this._getCardMetadata(this.cardId);
     }
-    let allModels = get(card, 'relationships.all-models.data') || [];
-    if (!allModels.find(i => `${i.type}/${i.id}` === `${this.type}/${this.id}`)) {
-      allModels.push({ type: this.type, id: this.id });
-    }
-    if (this.upstreamDoc) {
-      included = included.filter(i => `${i.type}/${i.id}` !== `${this.type}/${this.id}`);
-      included.push(this.upstreamDoc.data);
-    }
 
-    return {
-      data: {
-        id: primaryModelId,
-        type: 'cards',
-        attributes,
-        relationships: {
-          model: { data: { type: primaryModelType, id: primaryModelId } },
-          'all-models': { data: allModels }
-        }
-      },
-      included
+    let upstreamCard = {
+      id: primaryModelId,
+      type: 'cards',
+      attributes,
+      relationships: {
+        model: { data: { type: primaryModelType, id: primaryModelId } },
+      }
     };
+
+    let context = await this._deriveDocumentContextForResource(upstreamCard);
+    // make sure that the read that we performed to load the primary model for the upstream card is part of the new context's references
+    context._references.push(`${this.type}/${this.id}`);
+    return context;
   }
 
   async pristineDoc() {
@@ -156,8 +150,14 @@ module.exports = class DocumentContext {
   async read(type, id) {
     log.debug(`Reading record ${type}/${id}`);
 
-    let { modelId } = cardContextFromId(id);
-    if (modelId != null && cardIdFromId(id) !== this.cardId) {
+    let { modelId/*, upstreamId*/ } = cardContextFromId(id);
+    if (modelId != null && cardIdFromId(id) !== this.cardId
+
+    // TODO This clause below is wrong--it means that the upstream ID is not getting processed correctly when getting the doc from the upstream data source
+    // This was added from the test pgsearch/node-tests/indexer-test.js: reindexes correctly when related card's models are saved before own card's models
+    // if you can get that test passing (which itself has other probs besides this clause), it'd be great to delete this commented out code.
+    // && upstreamId !== this.id
+    ) {
       throw new Error(`The card 'cards/${this.cardId}' attempted to read the internal model of a foreign card '${type}/${id}'`);
     }
 
@@ -165,9 +165,6 @@ module.exports = class DocumentContext {
 
     let key = `${type}/${id}`;
     if (get(this, 'upstreamDoc.data.id') === id && get(this, 'upstreamDoc.data.type') === type) {
-      if (this._pristine) {
-        return this._pristine.data;
-      }
       return this.upstreamDoc.data;
     }
 
@@ -197,14 +194,6 @@ module.exports = class DocumentContext {
   async _readOrMakeCard(type, id) {
     let resource = await this._read(type, id);
 
-    if (type === 'cards' && resource && id === this.cardId && this.type !== 'cards') {
-      let allModels = get(resource, 'relationships.all-models.data') || [];
-      // make sure card has internal model for this DocumentContext (in the case the internal model is being created)
-      if (!allModels.find(i => `${i.type}/${i.id}` === `${this.type}/${this.id}`)) {
-        allModels.push({ type: this.type, id: this.id });
-        set(resource, 'relationships.all-models.data', allModels);
-      }
-    }
     // this is specifically for the scenario where the card's primary model is being created, and we need to be
     // able to reason about the card that wraps the primary model before it exists in the index.
     if (type === 'cards' && !resource && this.id === id && this.type !== type) {
@@ -214,7 +203,6 @@ module.exports = class DocumentContext {
         attributes: await this._getCardMetadata(this.cardId),
         relationships: {
           model: { data: { type: this.type, id } },
-          'all-models': { data: [{ type: this.type, id }]}
         }
       };
     }
@@ -272,7 +260,7 @@ module.exports = class DocumentContext {
         if (!type) {
           return;
         }
-        let readAuthorizedResource = await type.applyReadAuthorization(await this.deriveDocumentContextForResource(resource), userRealms);
+        let readAuthorizedResource = await type.applyReadAuthorization(await this._deriveDocumentContextForResource(resource), userRealms);
         return readAuthorizedResource;
       }));
       authorizedResource = authorizedResource.filter(Boolean);
@@ -397,7 +385,7 @@ module.exports = class DocumentContext {
     let safeIncluded = await Promise.all(included.map(async resource => {
       let contentType = this.schema.types.get(resource.type);
       if (contentType) {
-        let authorized = await contentType.applyReadAuthorization(await this.deriveDocumentContextForResource(resource), userRealms);
+        let authorized = await contentType.applyReadAuthorization(await this._deriveDocumentContextForResource(resource), userRealms);
         if (authorized !== resource) {
           modified = true;
         }
@@ -411,31 +399,22 @@ module.exports = class DocumentContext {
     }
   }
 
-  // DocumentContexts created here should derive from `this` and be able to leverage
-  // the cache and routing context from `this`'s DocumentContext
-  async deriveDocumentContextForResource(resource, includePaths) {
-    return await this.deriveDocumentContextForDocument({ data: resource }, includePaths);
-  }
+  async _deriveDocumentContextForResource(resource) {
+    await this.pristineDoc(); // Need to build up the references and cache
 
-  async deriveDocumentContextForDocument(document, includePaths) {
-    let { data: pristine, included=[] } = await this.pristineDoc() || {};
     let context = new DocumentContext({
-      type: document.data.type,
-      id: document.data.id,
-      upstreamDoc: document,
+      type: resource.type,
+      id: resource.id,
+      upstreamDoc: { data: resource },
       schema: this.schema,
       read: this._read,
       search: this._search,
       routers: this.routers,
-      includePaths
     });
 
-    let includedCache = included
-      .filter(i => `${i.type}/${i.id}` !== `${this.type}/${this.id}`)
-      .concat([pristine]);
     context._derivedFrom = this.id;
     context.cache = this.cache;
-    context.suppliedIncluded = (context.suppliedIncluded || []).concat(includedCache).filter(Boolean);
+    context.suppliedIncluded = this.suppliedIncluded;
     context._routeStack = this._routeStack;
     context._references = this._references;
 
@@ -481,6 +460,7 @@ module.exports = class DocumentContext {
       let contentType = this.schema.types.get(this.type);
       if (!contentType) { return; }
 
+      // TODO make sure to consider the CardDefinitions.defaultMetadataIncludes when dealing with a this.type === 'cards'
       searchTree = contentType.includesTree;
     }
 
@@ -513,6 +493,10 @@ module.exports = class DocumentContext {
     let metadata = {};
     for (let field of cardDefinition.metadataFields.values()) {
       if (field.isRelationship) {
+        // TODO this logic is not quite correct. what we need to do is to detect if you
+        // cross a card boundary. that does not necessary happen just by merit of following a relationship
+        // (i.e. depth > 0) we should compare the cardId between this.cardId and the card ID of the relationship
+        // we are following.
         if (depth > 0 && !field.neededWhenEmbedded) { continue; }
 
         let relatedModel = await userModel.getRelated(field.name);
@@ -570,7 +554,7 @@ module.exports = class DocumentContext {
 
   async _buildAttribute(field, value, pristineDocOut, searchDocOut) {
     searchDocOut[field.name] = field.searchIndexFormat(value);
-    ensure(pristineDocOut, 'attributes')[field.name] = value;
+    set(pristineDocOut, `data.attributes.${field.name}`, value);
   }
 
   async _buildRelationships(contentType, jsonapiDoc, userModel, pristineDocOut, searchDocOut, searchTree, depth, fieldsets) {
@@ -595,6 +579,8 @@ module.exports = class DocumentContext {
       if (Array.isArray(models)) {
         related = await Promise.all(models.map(async (model) => {
           if (model && model.type === 'cards' && model.id === this.cardId) {
+            // TODO we might be able to get rid of this "own card" logic now that we are
+            // using the native hub invalidation....
             // dont serialize a relationship from an internal model to its outer card until after
             // you know what the pristinedoc is for this internal model, as the card may have metadata
             // that depends on this pristinedoc
@@ -604,24 +590,25 @@ module.exports = class DocumentContext {
             return await this._build(model.type, model.id, privateModels.get(model).jsonapiDoc, searchTree[field.name], depth + 1, format);
           }
         }));
-        ensure(pristineDocOut, 'relationships')[field.name] = Object.assign({}, relObj, { data: related.map(r => ({ type: r.type, id: r.id })) });
+        set(pristineDocOut, `data.relationships.${field.name}`, Object.assign({}, relObj, { data: related.map(r => ({ type: r.type, id: r.id })) }));
       } else {
         let model = models;
         if (model && model.type === 'cards' && model.id === this.cardId) {
-          // same as above, don't serialize outer card until after we know the pristine doc
+          // TODO we might be able to get rid of this "own card" logic now that we are
+          // using the native hub invalidation....
           related = { type: model.type, id: model.id };
           this._includeOwnCard = true;
         } else if (model) {
           related = await this._build(model.type, model.id, privateModels.get(model).jsonapiDoc, searchTree[field.name], depth + 1, format);
         }
         let data = related ? { type: related.type, id: related.id } : null;
-        ensure(pristineDocOut, 'relationships')[field.name] = Object.assign({}, relObj, { data });
+        set(pristineDocOut, `data.relationships.${field.name}`, Object.assign({}, relObj, { data }));
       }
     } else {
       if (relObj && relObj.data) {
         related = relObj.data;
       }
-      ensure(pristineDocOut, 'relationships')[field.name] = Object.assign({}, relObj);
+      set(pristineDocOut, `data.relationships.${field.name}`, Object.assign({}, relObj));
     }
     searchDocOut[field.name] = related;
   }
@@ -682,6 +669,7 @@ module.exports = class DocumentContext {
             this._buildSearchTree(includesTree, segments);
           }
         } else {
+          // TODO make sure to consider the CardDefinitions.defaultMetadataIncludes when dealing with a cards content-type
           includesTree = Object.assign({}, contentType.includesTree);
         }
 
@@ -729,6 +717,9 @@ module.exports = class DocumentContext {
       }
 
       assignMeta(pristine.data, jsonapiDoc);
+      // TODO we need to change how we build card metadata so that metadata relationships
+      // are written as relationships on the card. this will look much closer to how we currently
+      // build model attribtues and relationships.
       if (type === 'cards') {
         let metadata = await this._getCardMetadata(id);
         searchDoc = merge({}, searchDoc, metadata);
@@ -748,6 +739,7 @@ module.exports = class DocumentContext {
 
     if (depth > 0) {
       await this._addSelfLink(pristine.data);
+      this.pristineIncludes = this.pristineIncludes.filter(i => `${i.type}/${i.id}` !== `${pristine.data.type}/${pristine.data.id}`);
       this.pristineIncludes.push(pristine.data);
     } else {
       await this._addSelfLink(pristine.data);
@@ -783,11 +775,4 @@ function assignMeta(pristine, resource) {
   } else {
     pristine.meta = {};
   }
-}
-
-function ensure(obj, section) {
-  if (!obj.data[section]) {
-    obj.data[section] = {};
-  }
-  return obj.data[section];
 }

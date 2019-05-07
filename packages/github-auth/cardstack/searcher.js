@@ -19,8 +19,7 @@ module.exports = class GitHubSearcher {
     this.cacheMaxAge = opts['cache-max-age'];
   }
 
-  //TODO rename 'type'
-  async get({ session, sourceId, type, id, snapshotVersion, next }) {
+  async get(session, type, id, next) {
     let result = await next();
     if (result) {
       return result;

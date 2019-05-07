@@ -70,7 +70,7 @@ class Schema {
         continue;
       }
       for (let fieldName of Object.keys(doc[section])) {
-        let scopedFieldId = hasCardDefinition(doc.type) ? cardContextToId({ sourceId, packageName, cardId: fieldName }) : null;
+        let scopedFieldId = hasCardDefinition(doc.type) ? cardContextToId({ sourceId, packageName, upstreamId: fieldName }) : null;
         if (!this.realFields.has(fieldName) && !this.realFields.has(scopedFieldId)) {
           if (activeDoc === doc) {
             activeDoc = Object.assign({}, doc);

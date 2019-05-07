@@ -28,21 +28,6 @@ exports.Model = class Model {
     return priv.get(this).jsonapiDoc.type;
   }
 
-  // derive source ID from the Model.id
-  get sourceId() {
-    return priv.get(this).sourceId;
-  }
-
-  // derive package name from the content type
-  get packageName() {
-    return priv.get(this).sourceId;
-  }
-
-  // derive card ID from the Model.id
-  get cardId() {
-    return priv.get(this).sourceId;
-  }
-
   getContentType() {
     return priv.get(this).contentType;
   }

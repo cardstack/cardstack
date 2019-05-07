@@ -6,9 +6,7 @@ const log = require('@cardstack/logger')('cardstack/pgsearch');
 const Session = require('@cardstack/plugin-utils/session');
 const EventEmitter = require('events');
 const postgresConfig = require('@cardstack/plugin-utils/postgres-config');
-const { currentVersionLabel, cardContextFromId, isCard, cardIdFromId } = require('@cardstack/plugin-utils/card-context');
 const { join } = require('path');
-const { get } = require('lodash');
 const { upsert, queryToSQL, param } = require('./util');
 
 const config = postgresConfig({ database: `pgsearch_${process.env.PGSEARCH_NAMESPACE}` });
@@ -111,9 +109,9 @@ module.exports = class PgClient extends EventEmitter {
     }
   }
 
-  async readUpstreamDocument({ sourceId, packageName, id }) {
-    let sql = `select upstream_doc from documents where source=$1 and package_name=$2 and id=$3 and snapshot_version='${currentVersionLabel}'`;
-    let response = await this.query(sql, [sourceId, packageName, id]);
+  async readUpstreamDocument(type, id) {
+    let sql = `select upstream_doc from documents where type=$1 and id=$2`;
+    let response = await this.query(sql, [type, id]);
     if (response.rowCount > 0) {
       return response.rows[0].upstream_doc;
     }
@@ -124,7 +122,7 @@ module.exports = class PgClient extends EventEmitter {
   }
 
   async deleteOlderGenerations(sourceId, nonce) {
-    let sql = `delete from documents where (generation != $1 or generation is null) and source=$2 and snapshot_version='${currentVersionLabel}'`;
+    let sql = `delete from documents where (generation != $1 or generation is null) and source=$2`;
     await this.query(sql, [nonce, sourceId ]);
   }
 
@@ -149,9 +147,9 @@ module.exports = class PgClient extends EventEmitter {
     for (let i = 0; i < refs.length; i += queryBatchSize) {
       let queryRefs = refs.slice(i, i + queryBatchSize);
       await this._iterateThroughRows(
-        `select source, upstream_doc, refs from documents where refs && $1 and snapshot_version='${currentVersionLabel}'`,
+        `select upstream_doc, refs from documents where refs && $1`,
         [queryRefs],
-        async (row) => await fn(row.source, row.upstream_doc, row.refs)
+        async (row) => await fn(row.upstream_doc, row.refs)
       );
     }
   }
@@ -187,28 +185,20 @@ class Batch {
     this._cache = [];
   }
 
-  async saveDocument(context, opts = {}) {
+  async saveDocument(context, opts={}) {
     let {
       type,
       id,
       generation,
       upstreamDoc,
-      packageVersion
+      sourceId,
+      schema
     } = context;
-    let { packageName, sourceId } = cardContextFromId(id);
-
-    // TODO stop hard coding this
-    packageVersion = 'x.x.x';
+    // let { sourceId } = cardContextFromId(id);
 
     if (id == null) {
       log.warn(`pgsearch cannot save document without id ${JSON.stringify(context.upstreamDoc)}`);
       return;
-    }
-
-    if (isCard(id) && type !== 'cards' && !this._searchers.ownTypes.includes(type)) {
-      id = context.cardId;
-      upstreamDoc = await context.upstreamCard();
-      context = await context.deriveDocumentContextForDocument(upstreamDoc, ['all-models']);
     }
 
     let pristineDoc = await context.pristineDoc();
@@ -216,16 +206,14 @@ class Batch {
     let refs = await context.references();
     let realms = await context.realms();
 
-    this._touched[`${isCard(id) ? 'cards' : type}/${context.cardId}`] = this._touchCounter++;
+    this._touched[`${type}/${id}`] = this._touchCounter++;
 
     if (!searchDoc) { return; }
 
     let currentDocument = {
       source: param(sourceId),
-      package_name: param(packageName || type),
+      type: param(type),
       id: param(id),
-      snapshot_version: param(currentVersionLabel),
-      package_version: param(packageVersion),
       search_doc: param(searchDoc),
       q: [`to_tsvector('english',`, param(searchDoc), ')'],
       pristine_doc: param(pristineDoc),
@@ -241,53 +229,43 @@ class Batch {
 
     await this.client.query(queryToSQL(upsert('documents', 'documents_pkey', currentDocument)));
 
-    // TODO create snapshot record of card
+    let cardDefinition = schema.getCardDefinition(id);
+    if (cardDefinition && type === cardDefinition.modelContentType.id) {
+      let ownCard = await this.client.readUpstreamDocument('cards', context.cardId);
+      if (!ownCard) {
+        let cardContext = await context.getOwnCardDocumentContext();
+        await this.saveDocument(cardContext, opts); // note that we pass opts so that if the primary model for a card has an expiration, the card will inherit that
+      }
+    }
 
     await this.client.emitEvent('add', context);
-    log.debug("save %s %s %s", sourceId, packageName, id);
+    log.debug("save %s %s", type, id);
 
     await this._handleGrantOrGroupsTouched(context);
   }
 
-  // Note this only eliminates the current version of document, snapshot versions are untouched
   async deleteDocument(context) {
     let { type, id, schema } = context;
-    let { sourceId, packageName } = cardContextFromId(id);
-
-    if (isCard(id) && type !== 'cards' && type !== schema.getCardDefinition(id).modelContentType.id) {
-      // This is an internal model that is being deleted, which is not actually a deletion of a row in the documents table
-      let upstreamDoc = await context.upstreamCard();
-      let allModels = get(upstreamDoc, 'data.relationships.all-models.data');
-      allModels = allModels.filter(i => `${i.type}/${i.id}` !== `${type}/${id}`);
-      let included = upstreamDoc.included;
-      included = included.filter(i => `${i.type}/${i.id}` !== `${type}/${id}`);
-      upstreamDoc.data.relationships['all-models'].data = allModels;
-      removeReferenceFromRelationships(included, type, id);
-      upstreamDoc.included = included;
-
-      return await this.saveDocument(this._searchers.createDocumentContext({
-        type: 'cards',
-        id: context.cardId,
-        sourceId,
-        upstreamDoc,
-        schema,
-        includePaths: [ 'all-models' ]
-      }));
-    }
-
-    let { rows } = await this.client.query(`select package_name, id, source, generation, upstream_doc as "upstreamDoc" from documents where source=$1 and package_name=$2 and id=$3 and snapshot_version='${currentVersionLabel}'`, [sourceId, packageName, id]);
+    let { rows } = await this.client.query('select type, id, source, generation, upstream_doc as "upstreamDoc" from documents where type=$1 and id=$2', [type, id]);
     let [ row={} ] = rows;
     let { upstreamDoc } = row;
 
-    this._touched[`${isCard(id) ? 'cards' : type}/${context.cardId}`] = this._touchCounter++;
-    let sql = `delete from documents where source=$1 and package_name=$2 and id=$3 and snapshot_version='${currentVersionLabel}'`;
+    let cardDefinition = schema.getCardDefinition(id);
+    if (cardDefinition && type === cardDefinition.modelContentType.id) {
+      let cardContext = await context.getOwnCardDocumentContext();
+      await this.deleteDocument(cardContext);
+    }
 
-    await this.client.query(sql, [sourceId, packageName, id]);
-    await this.client.emitEvent('delete', { sourceId, packageName, id, type, upstreamDoc }); // TODO make sure to find and update all listeners of this event (I think @cardstack/ethereum is one example)
-    log.debug("delete %s %s %s %s", sourceId, type, packageName, id);
+    this._touched[`${type}/${id}`] = this._touchCounter++;
+    let sql = 'delete from documents where type=$1 and id=$2';
+
+    await this.client.query(sql, [type, id]);
+    await this.client.emitEvent('delete', { id, type, upstreamDoc });
+    log.debug("delete %s %s", type, id);
 
     await this._handleGrantOrGroupsTouched(context);
   }
+
 
   async done() {
     await this._invalidations();
@@ -313,29 +291,29 @@ class Batch {
 
   async _recalcuateRealms() {
     await this.client._iterateThroughRows(
-      `select id, package_name, source, upstream_doc from documents where snapshot_version='${currentVersionLabel}'`, [],
-      async ({ id, upstream_doc:upstreamDoc, package_name:packageName, source:sourceId }) => {
+      `select id, type, upstream_doc from documents`, [],
+      async ({ id, upstream_doc:upstreamDoc, type, source:sourceId }) => {
         let schema = await this._currentSchema.getSchema();
         let context = this._searchers.createDocumentContext({
           schema,
-          type:packageName,
+          type,
           id,
           sourceId,
           upstreamDoc
         });
-        let realms = await schema.authorizedReadRealms(packageName, context); //TODO we'll probably need to include source in the authorized read realms params (?)...
-        const sql = `update documents set realms=$1 where source=$2 and package_name=$3 and id=$4 and snapshot_version='${currentVersionLabel}'`;
-        await this.client.query(sql, [realms, sourceId, packageName, id]);
+        let realms = await schema.authorizedReadRealms(type, context);
+        const sql = `update documents set realms=$1 where type=$2 and id=$3`;
+        await this.client.query(sql, [realms, type, id]);
       });
     }
 
   async _recalculateUserRealms() {
     let schema = await this._currentSchema.getSchema();
     await this.client._iterateThroughRows(
-      `select id, package_name, source, upstream_doc, generation from documents where package_name != 'user-realms' and snapshot_version='${currentVersionLabel}'`, [],
-      async ({ id, package_name:packageName, source:sourceId, upstream_doc:upstreamDoc, generation }) => {
+      `select id, type, source, upstream_doc, generation from documents where type != 'user-realms'`, [],
+      async ({ id, type, source:sourceId, upstream_doc:upstreamDoc, generation }) => {
           let context = this._searchers.createDocumentContext({
-            type:packageName,
+            type,
             id,
             sourceId,
             generation,
@@ -354,18 +332,15 @@ class Batch {
   // model invalidates the entire card.
   async _invalidations() {
     await this.client._iterateThroughRows(
-      `select source, package_name, id from documents where expires < now() and snapshot_version='${currentVersionLabel}'`, [], async({ package_name:packageName, id }) => {
-        let type = isCard(id) ? 'cards' : packageName;
-        this._touched[`${type}/${cardIdFromId(id)}`] = this._touchCounter++;
+      `select type, id from documents where expires < now()`, [], async({ type, id }) => {
+        this._touched[`${type}/${id}`] = this._touchCounter++;
       });
-    await this.client.query(`delete from documents where expires < now() and snapshot_version='${currentVersionLabel}'`);
-    await this.client.docsThatReference(Object.keys(this._touched), async (sourceId, doc, refs) => {
+    await this.client.query(`delete from documents where expires < now()`);
+    await this.client.docsThatReference(Object.keys(this._touched), async (doc, refs) => {
       let { type, id } = doc.data;
-      let { packageName } = cardContextFromId(id);
-
       if (this._isInvalidated(type, id, refs)) {
         let schema = await this._currentSchema.getSchema();
-        let _sourceId = schema.types.get(type).dataSource.id; // TODO need to reconcile this after we support multi-hub
+        let sourceId = schema.types.get(type).dataSource.id;
 
         // intentionally not setting the 'generation', as we dont want external data source
         // triggered invalidation to effect the nonce, which is an internal data source consideration
@@ -373,15 +348,12 @@ class Batch {
           schema,
           type,
           id,
-          sourceId: _sourceId,
+          sourceId,
           upstreamDoc: doc,
         };
-        if (type === 'cards') {
-          contextArgs.includePaths = ['all-models'];
-        }
         let context = this._searchers.createDocumentContext(contextArgs);
 
-        if (packageName === 'user-realms') {
+        if (type === 'user-realms') {
           // if we have an invalidated user-realms and it hasn't
           // already been touched, that's because the corresponding
           // user was delete, so we should also delete the
@@ -479,23 +451,5 @@ function expirationExpression(maxAge) {
     // this has string mangling of a potentially-user-provided argument but it's
     // safe because we're doing that _inside_ of param().
     return ['now() + cast(', param(maxAge + ' seconds'), 'as interval)'];
-  }
-}
-
-function removeReferenceFromRelationships(resources, type, id) {
-  for (let resource of resources) {
-    if (!resource.relationships) { continue; }
-    for (let relationship of Object.keys(resource.relationships)) {
-      if (!resource.relationships[relationship].data) { continue; }
-
-      if (Array.isArray(resource.relationships[relationship].data)) {
-        resource.relationships[relationship].data = resource.relationships[relationship].data.filter(i => `${i.type}/${i.id}` !== `${type}/${id}`);
-      } else {
-        let relObj = resource.relationships[relationship].data;
-        if (relObj.type === type && relObj.id === id) {
-          resource.relationships[relationship].data = null;
-        }
-      }
-    }
   }
 }
