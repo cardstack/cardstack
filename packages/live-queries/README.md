@@ -29,7 +29,6 @@ export default Component.extend({
 });
 ```
 
-<<<<<<< HEAD
 `items` is now a computed property for an Ember Data query – it returns
 a Promise for an [`AdapterPopulatedRecordArray`][RecordArray], just
 like [`Store#query`][Store#query]. When events come in that require
@@ -65,19 +64,6 @@ module.exports = {
 - Document event-only (doesn't query for you - for when you want to do
   something besides just update the record array)
 - Extract @cardstack/socket
-=======
-Usage
-------------------------------------------------------------------------------
-
-[Longer description of how to use the addon in apps.]
-
-
-Contributing
-------------------------------------------------------------------------------
-
-See the [Contributing](CONTRIBUTING.md) guide for details.
-
->>>>>>> 367d8ed7f... message
 
 
 [RecordArray]: https://emberjs.com/api/ember-data/2.16/classes/DS.AdapterPopulatedRecordArray
