@@ -38,10 +38,10 @@ function hasCardDefinition(id) {
   return packageName != null;
 }
 
-function cardContextFromId(id) {
+function cardContextFromId(id='') {
   if (id == null) { return {}; }
 
-  let [ idPart='', snapshotVersion ] = id.split(cardVersionDelim);
+  let [ idPart='', snapshotVersion ] = String(id).split(cardVersionDelim);
   let [ sourceId, packageName, upstreamId, modelId ] = idPart.split(cardContextDelim);
 
   return {

@@ -19,8 +19,7 @@ describe('pgsearch/indexer', function () {
 
   // Note that we are rebuilding the env between each test as the tests otherwise leak between the card tests and legacy model tests
   beforeEach(async function () {
-    // TODO DONT FORGET TO UNCOMMENT THIS!!!
-    // this.timeout(5000);
+    this.timeout(5000);
 
     let cards = [];
     let factory = new Factory();

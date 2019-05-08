@@ -12,7 +12,8 @@ describe('cardstack/s3/searcher', function() {
   let env, request, s3Options, uploadStub;
 
   beforeEach(async function() {
-    this.timeout(10000);
+    // TODO make sure to uncomment this!!
+    // this.timeout(10000);
     let factory = new JSONAPIFactory();
 
     factory.addResource('data-sources', 's3').withAttributes({

@@ -152,11 +152,7 @@ class Searchers {
     // look up authorized result to check read is authorized by going through
     // the default auth stack for the JSON representation. Error will be thrown
     // if authorization is not correct.
-    let { version } = opts;
-
-    // TODO this needs to get the card's internal model that backs the binary data.
-    // this.get() will ultimately be the incorrect place to retrieve this from...
-    let document = await this.get(session, source, type, id, { version });
+    let document = await this.get(session, source, type, id);
 
     // TODO ultimately there will be no need to look up the source as it is being provided
     // as an argument to this method.

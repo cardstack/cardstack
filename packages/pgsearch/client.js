@@ -250,7 +250,7 @@ class Batch {
     let [ row={} ] = rows;
     let { upstreamDoc } = row;
 
-    let cardDefinition = schema.getCardDefinition(id);
+    let cardDefinition = schema ? schema.getCardDefinition(id) : null;
     if (cardDefinition && type === cardDefinition.modelContentType.id) {
       let cardContext = await context.getOwnCardDocumentContext();
       await this.deleteDocument(cardContext);

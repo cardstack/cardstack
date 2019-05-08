@@ -207,7 +207,7 @@ class Handler {
   async handleIndividualGETBinary(type, id) {
     // TODO requests for binary need to be made in a card context, e.g. GET /api/${source}/${package}/${cardId}/${modelType}/${modelId}
     // stubbing the context out for now...
-    let [buffer, json] = await this.searcher.getBinary(this.session, 'local-hub', null, null, type, id);
+    let [buffer, json] = await this.searcher.getBinary(this.session, 'local-hub', type, id);
     this.ctxt.set('content-type', json.data.attributes['content-type']);
     this.ctxt.body = buffer;
   }

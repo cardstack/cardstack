@@ -86,6 +86,8 @@ class Schema {
   }
 
   getCardDefinition(documentId) {
+    if (documentId == null) { return; }
+
     let cardDefinitionId = cardDefinitionIdFromId(documentId);
     return this.cardDefinitions.get(cardDefinitionId);
   }

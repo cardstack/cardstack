@@ -110,7 +110,7 @@
         "--timeout",
         "200000",
          "--grep",
-         "can define a card schema"
+         "de-duplicates when there are multiple paths to an included resource \\(without default includes\\)"
       ]
     },
     {

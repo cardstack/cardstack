@@ -739,8 +739,7 @@ module.exports = class DocumentContext {
 
     if (depth > 0) {
       await this._addSelfLink(pristine.data);
-      this.pristineIncludes = this.pristineIncludes.filter(i => `${i.type}/${i.id}` !== `${pristine.data.type}/${pristine.data.id}`);
-      this.pristineIncludes.push(pristine.data);
+      this.pristineIncludes.push(jsonapiDoc);
     } else {
       await this._addSelfLink(pristine.data);
       this._pristine = pristine;
