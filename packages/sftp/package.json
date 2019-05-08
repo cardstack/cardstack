@@ -28,7 +28,7 @@
     "@cardstack/files": "0.13.71",
     "@cardstack/hub": "0.13.71",
     "@cardstack/jsonapi": "0.13.71",
-    "@cardstack/logger": "^0.1.0",
+    "@cardstack/logger": "^0.2.0",
     "@cardstack/plugin-utils": "0.13.71",
     "@cardstack/test-support": "0.13.71",
     "ember-cli-babel": "^6.6.0",

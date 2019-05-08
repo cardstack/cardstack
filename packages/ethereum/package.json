@@ -27,7 +27,7 @@
   "dependencies": {
     "@cardstack/di": "0.13.71",
     "@cardstack/hub": "0.13.71",
-    "@cardstack/logger": "^0.1.0",
+    "@cardstack/logger": "^0.2.0",
     "@cardstack/pgsearch": "0.13.71",
     "@cardstack/plugin-utils": "0.13.71",
     "@cardstack/queue": "0.13.71",

@@ -18,7 +18,7 @@
   },
   "dependencies": {
     "@cardstack/di": "0.13.71",
-    "@cardstack/logger": "^0.1.0",
+    "@cardstack/logger": "^0.2.0",
     "@cardstack/plugin-utils": "0.13.71",
     "async-busboy": "^0.7.0",
     "koa-json-body": "^5.3.0",

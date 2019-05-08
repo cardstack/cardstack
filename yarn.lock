@@ -856,10 +856,13 @@
     tmp "^0.0.33"
     tmp-promise "^1.0.5"
 
-"@cardstack/logger@^0.1.0":
-  version "0.1.0"
-  resolved "https://registry.yarnpkg.com/@cardstack/logger/-/logger-0.1.0.tgz#50107d5738079f10913158f86bdcec7c7242c784"
+"@cardstack/logger@^0.2.0":
+  version "0.2.0"
+  resolved "https://registry.yarnpkg.com/@cardstack/logger/-/logger-0.2.0.tgz#aa964da93eb8e2a374607bba14546c7146689f37"
+  integrity sha512-osz1VeJi/4UkyGSPcEJVhTNJZfv1nwoKDquPzdj1sof78HrEzEKgxH7sLMtIooCkDVn1lLPxPrsmW9C12i5+Yg==
   dependencies:
+    "@types/ms" "^0.7.30"
+    "@types/node" "^11.13.8"
     ms "2.0.0"
 
 "@cnakazawa/watch@^1.0.3":
@@ -1702,6 +1705,11 @@
   version "5.2.6"
   resolved "https://registry.yarnpkg.com/@types/mocha/-/mocha-5.2.6.tgz#b8622d50557dd155e9f2f634b7d68fd38de5e94b"
   integrity sha512-1axi39YdtBI7z957vdqXI4Ac25e7YihYQtJa+Clnxg1zTJEaIRbndt71O3sP4GAMgiAm0pY26/b9BrY4MR/PMw==
+
+"@types/ms@^0.7.30":
+  version "0.7.30"
+  resolved "https://registry.yarnpkg.com/@types/ms/-/ms-0.7.30.tgz#f6c38b7ecbbf698b0bbd138315a0f0f18954f85f"
+  integrity sha512-OftRLCgAzJP7vmKn9by/GVjnf4hloz/pXNOwPo0vKGAfXI7GqWXJi9N2kRar4cP5s1dGwuwcagWqO6iHBTq1Mg==
 
 "@types/node@*":
   version "9.6.0"

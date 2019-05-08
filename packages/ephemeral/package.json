@@ -9,7 +9,7 @@
   },
   "dependencies": {
     "@cardstack/di": "0.13.71",
-    "@cardstack/logger": "^0.1.0",
+    "@cardstack/logger": "^0.2.0",
     "@cardstack/plugin-utils": "0.13.71",
     "lodash": "^4.17.11",
     "stream-to-promise": "2.2.0"
