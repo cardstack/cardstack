@@ -16,7 +16,7 @@ module('Acceptance | login', function(hooks) {
 
     await waitFor('#logout-button');
 
-    assert.equal(this.element.querySelector('#auth-message').textContent.trim(), 'Has authenticated session: true');
-    assert.equal(this.element.querySelector('#test-message').textContent.trim(), 'Did you login? yes');
+    assert.dom(this.element.querySelector('#auth-message')).hasText('Has authenticated session: true');
+    assert.dom(this.element.querySelector('#test-message')).hasText('Did you login? yes');
   });
 });
