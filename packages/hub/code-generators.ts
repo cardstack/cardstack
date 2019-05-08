@@ -1,15 +1,17 @@
-const { declareInjections } = require('@cardstack/di');
-const log = require('@cardstack/logger')('cardstack/code-gen');
+import { declareInjections }  from '@cardstack/di';
+import createLog from '@cardstack/logger';
+import { todo } from '@cardstack/plugin-utils/todo-any';
+const log = createLog('cardstack/code-gen');
 
-module.exports = declareInjections({
+export = declareInjections({
   plugins: 'hub:plugins'
 },
 
 class CodeGenerators {
-  async generateCode(modulePrefix) {
+  async generateCode(modulePrefix: string) {
     log.debug(`Running code generators`);
     let results = [];
-    let activePlugins = await this.plugins.active();
+    let activePlugins = await (this as todo).plugins.active();
     for (let feature of activePlugins.featuresOfType('code-generators')) {
       log.debug(`Running code generator %s `, feature.id);
       let codeGenerator = activePlugins.lookupFeatureAndAssert('code-generators', feature.id);

@@ -26,6 +26,9 @@ package-lock.json
 /packages/di/**/*.js
 /packages/di/**/*.js.map
 /packages/di/**/*.d.ts
+/packages/hub/code-generators.js
+/packages/hub/code-generators.js.map
+/packages/hub/code-generators.d.ts
 
 
 
