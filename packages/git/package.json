@@ -14,7 +14,7 @@
   },
   "dependencies": {
     "@cardstack/gitchain": "0.2.2",
-    "@cardstack/logger": "^0.1.0",
+    "@cardstack/logger": "^0.2.0",
     "@cardstack/plugin-utils": "0.13.71",
     "delay": "^4.1.0",
     "filenamify-url": "^1.0.0",

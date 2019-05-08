@@ -11,7 +11,7 @@
   },
   "description": "Email sending plugin for Cardstack",
   "dependencies": {
-    "@cardstack/logger": "^0.1.0",
+    "@cardstack/logger": "^0.2.0",
     "@cardstack/plugin-utils": "0.13.71",
     "nodemailer": "^4.0.1"
   },
