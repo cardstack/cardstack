@@ -1,5 +1,13 @@
 import { module, test } from 'qunit';
-import { currentURL, fillIn, visit, find, click, waitFor, waitUntil } from '@ember/test-helpers';
+import {
+  currentURL,
+  fillIn,
+  visit,
+  find,
+  click,
+  waitFor,
+  waitUntil
+} from '@ember/test-helpers';
 import { setupApplicationTest } from 'ember-qunit';
 import { insertText } from '../helpers/ember-mobiledoc-editor';
 
@@ -41,7 +49,7 @@ module('Acceptance | mobiledoc markup', function(hooks) {
     await click('[data-card-picker-card="0"]');
     await waitUntil(() => !find('[data-card-picker-toolbox-header]'));
 
-    assert.equal(find('.mobiledoc-editor .cs-mobiledoc-card img').getAttribute('src'), imgSrc);
+    assert.dom('.mobiledoc-editor .cs-mobiledoc-card img').hasAttribute('src', imgSrc);
 
     await fillIn('.cs-mobiledoc-card--caption-input', 'Are you ready for me guys?');
     assert.dom('.cs-mobiledoc-card--caption-input').hasValue('Are you ready for me guys?');
