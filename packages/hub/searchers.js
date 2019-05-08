@@ -148,7 +148,7 @@ class Searchers {
     return authorizedResult;
   }
 
-  async getBinary(session, source, type, id, opts={}) {
+  async getBinary(session, source, type, id) {
     // look up authorized result to check read is authorized by going through
     // the default auth stack for the JSON representation. Error will be thrown
     // if authorization is not correct.
