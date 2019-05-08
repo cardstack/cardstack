@@ -1,5 +1,13 @@
 import { module, test, skip } from 'qunit';
-import { visit, click, waitFor, fillIn, triggerEvent, waitUntil, find} from '@ember/test-helpers';
+import {
+  visit,
+  click,
+  waitFor,
+  fillIn,
+  triggerEvent,
+  waitUntil,
+  find
+} from '@ember/test-helpers';
 import { setupApplicationTest } from 'ember-qunit';
 import { ciSessionId } from '@cardstack/test-support/environment';
 import { hubURL } from '@cardstack/plugin-utils/environment';
@@ -63,7 +71,9 @@ module('Acceptance | close button', function(hooks) {
     await waitUntil(() => !find('[data-card-picker-toolbox-header]'));
 
     assert.equal(document.querySelector('.selected-image img').getAttribute('src'), imgSrc);
-    assert.equal(document.querySelector('.selected-image .cs-card-picker-image-item--filename').textContent, filename);
+    assert.dom(
+      document.querySelector('.selected-image .cs-card-picker-image-item--filename')
+    ).hasText(filename);
   });
 
   test('Card picker can filter displayed search results', async function(assert) {
