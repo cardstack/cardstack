@@ -31,58 +31,43 @@ Handlebars.registerHelper('json', function(obj) {
 });
 
 const modelTemplate = Handlebars.compile(`
-define('@cardstack/models/generated/{{modelName}}', ['exports', '@cardstack/models/model', 'ember-data'], function (exports, _model, _emberData) {
-  'use strict';
-   Object.defineProperty(exports, "__esModule", {
-     value: true
-   });
-   exports.default = _model.default.extend({
-     type: "{{modelName}}",
-     selfLink: _emberData.default.attr(),
-     {{#each fields as |field|}}
-       {{#if field.isRelationship}}
-         {{#with (related-type field ../modelName) as |type|}}
-           {{camelize field.id}}:  _emberData.default.{{relationship-method field}}("{{type}}", {
-             async: false,
-             polymorphic: true,
-             inverse: null,
-             caption: "{{field.caption}}",
-             editorComponent: "{{field.editorComponent}}",
-             inlineEditorComponent: "{{field.inlineEditorComponent}}",
-             editorOptions: {{{json field.editorOptions}}},
-             inlineEditorOptions: {{{json field.inlineEditorOptions}}},
-             owned: {{field.owned}}
-            }),
-          {{/with}}
-        {{else}}
-          {{camelize field.id}}: _emberData.default.attr({
-            fieldType: "{{field.fieldType}}",
-            caption: "{{field.caption}}",
-            editorComponent: "{{field.editorComponent}}",
-            inlineEditorComponent: "{{field.inlineEditorComponent}}",
-            editorOptions: {{{json field.editorOptions}}},
-            inlineEditorOptions: {{{json field.inlineEditorOptions}}}
-          }),
-       {{/if}}
-     {{/each}}
-   }){{#if routingField}}.reopenClass({ routingField: "{{routingField}}" }){{/if}};
-});
+import Model from '@cardstack/models/model';
+import DS from 'ember-data';
+
+export default Model.extend({
+  type: "{{modelName}}",
+  selfLink: DS.attr(),
+  {{#each fields as |field|}}
+    {{#if field.isRelationship}}
+      {{#with (related-type field ../modelName) as |type|}}
+        {{camelize field.id}}:  DS.{{relationship-method field}}("{{type}}", {
+          async: false,
+          polymorphic: true,
+          inverse: null,
+          caption: "{{field.caption}}",
+          editorComponent: "{{field.editorComponent}}",
+          inlineEditorComponent: "{{field.inlineEditorComponent}}",
+          editorOptions: {{{json field.editorOptions}}},
+          inlineEditorOptions: {{{json field.inlineEditorOptions}}},
+          owned: {{field.owned}}
+        }),
+      {{/with}}
+    {{else}}
+      {{camelize field.id}}: DS.attr({
+        fieldType: "{{field.fieldType}}",
+        caption: "{{field.caption}}",
+        editorComponent: "{{field.editorComponent}}",
+        inlineEditorComponent: "{{field.inlineEditorComponent}}",
+        editorOptions: {{{json field.editorOptions}}},
+        inlineEditorOptions: {{{json field.inlineEditorOptions}}}
+      }),
+    {{/if}}
+  {{/each}}
+ }){{#if routingField}}.reopenClass({ routingField: "{{routingField}}" }){{/if}};
 `);
 
 const reexportTemplate = Handlebars.compile(`
-define('{{target}}', ['exports', '{{source}}'], function (exports, _source) {
-  'use strict';
-
-  Object.defineProperty(exports, "__esModule", {
-    value: true
-  });
-  Object.defineProperty(exports, 'default', {
-    enumerable: true,
-    get: function () {
-      return _source.default;
-    }
-  });
-});
+export { default } from "{{source}}";
 `);
 
 module.exports = declareInjections({
@@ -90,35 +75,35 @@ module.exports = declareInjections({
 },
 
 class CodeGenerator {
-  async generateCode(appModulePrefix) {
+
+  async generateAppModules() {
     let schema = await this.currentSchema.getSchema();
-    let modules = [];
+    let modules = new Map();
 
     for (let type of schema.types.values()) {
       let modelName = inflection.singularize(type.id);
-
-      modules.push(this._generatedModel(modelName, type));
-
-      modules.push(
-        reexportTemplate({ target: `${appModulePrefix}/models/${modelName}`, source: `@cardstack/models/generated/${modelName}` })
-      );
-
-      modules.push(
-        reexportTemplate({ target: `${appModulePrefix}/adapters/${modelName}`, source: `@cardstack/models/adapter` })
-      );
-
-      modules.push(
-        reexportTemplate({ target: `${appModulePrefix}/serializers/${modelName}`, source: `@cardstack/models/serializer` })
-      );
+      modules.set(`models/${modelName}`, reexportTemplate({ source: `@cardstack/models/generated/${modelName}` }));
+      modules.set(`adapters/${modelName}`,reexportTemplate({ source: `@cardstack/models/adapter`}));
+      modules.set(`serializers/${modelName}`, reexportTemplate({ source: `@cardstack/models/serializer` }));
     }
 
     // define an adapter for the cardstack-card base type as well to allow for polymorphic queries
-    modules.push(
-      reexportTemplate({ target: `${appModulePrefix}/adapters/cardstack-card`, source: `@cardstack/models/adapter` })
-    );
+    modules.set(`adapters/cardstack-card`, reexportTemplate({ source: `@cardstack/models/adapter` }));
 
-    return modules.join("");
+    return modules;
   }
+
+  async generateModules() {
+    let schema = await this.currentSchema.getSchema();
+    let modules = new Map();
+
+    for (let type of schema.types.values()) {
+      let modelName = inflection.singularize(type.id);
+      modules.set(`generated/${modelName}`, this._generatedModel(modelName, type));
+    }
+    return modules;
+  }
+
   _generatedModel(modelName, type) {
     return modelTemplate({
       modelName,

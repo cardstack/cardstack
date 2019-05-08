@@ -14,7 +14,7 @@ module.exports = declareInjections({
 class {
   async generateModules() {
     return new Map([[
-      '@cardstack/plugin-utils/environment', 
+      'environment', 
       template({ properties: Object.entries(this._content()).map(([name, value]) => ({ name, value })) }) 
     ]]);
   }

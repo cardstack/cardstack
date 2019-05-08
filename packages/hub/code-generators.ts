@@ -16,21 +16,35 @@ class CodeGenerators {
     for (let feature of activePlugins.featuresOfType('code-generators')) {
       log.debug(`Running code generator %s `, feature.id);
       let codeGenerator = activePlugins.lookupFeatureAndAssert('code-generators', feature.id);
+
       if (typeof codeGenerator.generateModules === 'function') {
         let namedModules = await codeGenerator.generateModules();
-        for (let [name, code] of namedModules) {
-          results.push(
-            transform(code, {
-              plugins: ['@babel/plugin-transform-modules-amd'],
-              moduleId: name
-            })!.code
-          );
-        }
-      } else {
+        results.push(compileModules(namedModules, feature.relationships.plugin.data.id));
+      }
+
+      if (typeof codeGenerator.generateAppModules === 'function') {
+        let appModules = await codeGenerator.generateAppModules();
+        results.push(compileModules(appModules, modulePrefix));
+      }
+
+      if (typeof codeGenerator.generateCode === 'function') {
         results.push(await codeGenerator.generateCode(modulePrefix));
       }
     }
-    return results.join("");
+    return results.join("\n");
   }
 
 });
+
+function compileModules(modules: Map<string, string>, packageName: string) {
+  let results = [];
+  for (let [name, code] of modules) {
+    results.push(
+      transform(code, {
+        plugins: ['@babel/plugin-transform-modules-amd'],
+        moduleId: `${packageName}/${name}`
+      })!.code
+    );
+  }
+  return results.join("\n");
+}
