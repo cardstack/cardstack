@@ -6706,7 +6706,7 @@ ember-cli@^3.0.0:
     watch-detector "^0.1.0"
     yam "0.0.22"
 
-ember-cli@^3.4.3, ember-cli@~3.4.3:
+ember-cli@^3.4.3:
   version "3.4.3"
   resolved "https://registry.yarnpkg.com/ember-cli/-/ember-cli-3.4.3.tgz#33560c6416612bd8dc56858cffb2c81897ec8822"
   dependencies:
