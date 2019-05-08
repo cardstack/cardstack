@@ -1,7 +1,11 @@
 import { module, test } from 'qunit';
 import { setupApplicationTest } from 'ember-qunit';
 import { visit, currentURL, fillIn, click } from '@ember/test-helpers';
-import { selectChoose, selectSearch, removeMultipleOption } from 'ember-power-select/test-support/helpers';
+import {
+  selectChoose,
+  selectSearch,
+  removeMultipleOption
+} from 'ember-power-select/test-support/helpers';
 import RSVP from 'rsvp';
 
 function run(fn) {
