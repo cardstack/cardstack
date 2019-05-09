@@ -26,10 +26,6 @@ class CodeGenerators {
         let appModules = await codeGenerator.generateAppModules();
         results.push(compileModules(appModules, modulePrefix));
       }
-
-      if (typeof codeGenerator.generateCode === 'function') {
-        results.push(await codeGenerator.generateCode(modulePrefix));
-      }
     }
     return results.join("\n");
   }
