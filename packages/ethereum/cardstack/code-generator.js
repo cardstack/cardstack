@@ -4,15 +4,9 @@ const Handlebars = require('handlebars');
 const { declareInjections } = require('@cardstack/di');
 
 const template = Handlebars.compile(`
-define("@cardstack/ethereum/environment", ["exports"], function (exports) {
-  "use strict";
-  Object.defineProperty(exports, "__esModule", {
-    value: true
-  });
   {{#each properties as |property|}}
-    exports.{{property.name}} = "{{property.value}}";
+    export const {{property.name}} = "{{property.value}}";
   {{/each}}
-});
 `);
 
 module.exports = declareInjections({
@@ -22,7 +16,7 @@ module.exports = declareInjections({
 
 class EthereumCodeGenerator {
 
-  async generateCode() {
+  async generateModules() {
     let activeSources = await this.sources.active();
     let ethereumSources = [...activeSources.values()].filter(s => s.sourceType === '@cardstack/ethereum');
     if (!ethereumSources || !ethereumSources.length) { return; }
@@ -40,14 +34,17 @@ class EthereumCodeGenerator {
     }
 
     if (sourceConfigs.length) {
-      return template({
-        properties: sourceConfigs.map(config => {
-          return {
-            name: camelize(config.contract + '-address'),
-            value: config.address
-          };
+      return new Map([['environment', template({
+          properties: sourceConfigs.map(config => {
+            return {
+              name: camelize(config.contract + '-address'),
+              value: config.address
+            };
+          })
         })
-      });
+      ]]);
+    } else {
+      return new Map();
     }
   }
 });
