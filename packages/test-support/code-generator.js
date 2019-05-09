@@ -16,15 +16,13 @@ class LiveQueryCodeGenerator {
     const name = 'ciSessionId';
     let value = this.ciSessionId && this.ciSessionId.id;
     if (value) {
-      return new Map([[
-        'environment', 
-        template({
-          properties: [{
-            name,
-            value
-          }]
-        }) 
-      ]]);
+      let compiled = template({
+        properties: [{
+          name,
+          value
+        }]
+      });
+      return new Map([['environment', compiled]]);
     } else {
       return new Map();
     }

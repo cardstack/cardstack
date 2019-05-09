@@ -27,21 +27,19 @@ class LiveQueryCodeGenerator {
 
     socketIoUrl.port = port;
     socketIoUrl.pathname = '';
-
-    return new Map([['environment', 
-      template({ 
-        properties: [
-          {
-            name: 'host',
-            value: socketIoUrl.toString()
-          },
-          {
-            name: 'path',
-            value: socketPath
-          }
-        ]
-      })
-    ]]);
+    let compiled = template({ 
+      properties: [
+        {
+          name: 'host',
+          value: socketIoUrl.toString()
+        },
+        {
+          name: 'path',
+          value: socketPath
+        }
+      ]
+    });
+    return new Map([['environment', compiled]]);
   }
 }
 );

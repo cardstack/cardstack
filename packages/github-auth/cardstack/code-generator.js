@@ -20,15 +20,13 @@ class GithubAuthCodeGenerator {
       return new Map(); 
     } else {
       let { clientId } = source.authenticator;
-      return new Map([[
-        'environment',
-        template({
-          properties: [{
-            name: 'clientId',
-            value: clientId,
-          }]
-        })
-      ]]);
+      let compiled = template({
+        properties: [{
+          name: 'clientId',
+          value: clientId,
+        }]
+      });
+      return new Map([['environment', compiled]]);
     }
   }
 });

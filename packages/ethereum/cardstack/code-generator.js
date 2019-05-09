@@ -34,15 +34,15 @@ class EthereumCodeGenerator {
     }
 
     if (sourceConfigs.length) {
-      return new Map([['environment', template({
-          properties: sourceConfigs.map(config => {
-            return {
-              name: camelize(config.contract + '-address'),
-              value: config.address
-            };
-          })
+      let compiled = template({
+        properties: sourceConfigs.map(config => {
+          return {
+            name: camelize(config.contract + '-address'),
+            value: config.address
+          };
         })
-      ]]);
+      });
+      return new Map([['environment', compiled]]);
     } else {
       return new Map();
     }
