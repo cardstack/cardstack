@@ -2,15 +2,9 @@ const Handlebars = require('handlebars');
 const { declareInjections } = require('@cardstack/di');
 
 const template = Handlebars.compile(`
-define("@cardstack/test-support/environment", ["exports"], function (exports) {
-  "use strict";
-  Object.defineProperty(exports, "__esModule", {
-    value: true
-  });
   {{#each properties as |property|}}
-    exports.{{property.name}} = "{{property.value}}";
+    export const {{property.name}} = "{{property.value}}";
   {{/each}}
-});
 `);
 
 module.exports = declareInjections({
@@ -18,15 +12,23 @@ module.exports = declareInjections({
 },
 
 class LiveQueryCodeGenerator {
-
-  async generateCode() {
+  generateModules() {
+    const name = 'ciSessionId';
     let value = this.ciSessionId && this.ciSessionId.id;
-
-    return value ? template({ properties: [
-      {
-        name: 'ciSessionId',
-        value
-      }
-    ]}) : null;
+    if (value) {
+      return new Map([[
+        'environment', 
+        template({
+          properties: [{
+            name,
+            value
+          }]
+        }) 
+      ]]);
+    } else {
+      return new Map();
+    }
   }
 });
+
+
