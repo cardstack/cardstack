@@ -45,6 +45,6 @@ module('Acceptance | show post', function(hooks) {
   test('visiting /show-post', async function(assert) {
     await visit('/posts/1');
     assert.equal(currentURL(), '/posts/1');
-    assert.equal(this.element.querySelector('h1').textContent.trim(), 'hello world');
+    assert.dom(this.element.querySelector('h1')).hasText('hello world');
   });
 });
