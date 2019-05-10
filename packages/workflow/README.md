@@ -24,6 +24,7 @@ workflows work with messages under the hood) and is supported by the
 
 (We'll probably need a 3rd method to get the thread for a given card model).
 
+<<<<<<< HEAD
 Let's see an example.
 
 Assume you have a rental model in your application and the corresponding card
@@ -60,6 +61,10 @@ For a detailed example, see the dummy app in this package.
 * `yarn install`
 
 ## Running
+=======
+See the [Contributing](CONTRIBUTING.md) guide for details.
+
+>>>>>>> 92e39829c... message
 
 * `DEBUG=cardstack/* DEBUG_LEVEL=info ember s
 * Visit your app at [http://localhost:4200](http://localhost:4200).
