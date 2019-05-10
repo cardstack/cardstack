@@ -6066,7 +6066,7 @@ ember-ajax@^3.0.0:
   dependencies:
     ember-cli-babel "^6.6.0"
 
-ember-ajax@^3.1.0, ember-ajax@^3.1.1:
+ember-ajax@^3.1.0:
   version "3.1.1"
   resolved "https://registry.yarnpkg.com/ember-ajax/-/ember-ajax-3.1.1.tgz#dcb55aaf1a9fe8b2ce04206863384709ebc2358b"
   dependencies:
