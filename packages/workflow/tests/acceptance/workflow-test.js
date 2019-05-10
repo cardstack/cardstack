@@ -1,6 +1,6 @@
 import { module, skip } from 'qunit';
 import { setupApplicationTest } from 'ember-qunit';
-import { visit, click } from '@ember/test-helpers';
+import { visit, click, findAll } from '@ember/test-helpers';
 
 module('Acceptance | Workflow', function(hooks) {
   setupApplicationTest(hooks);
@@ -60,10 +60,18 @@ module('Acceptance | Workflow', function(hooks) {
     await click('.cardstack-workflow-header');
     await click('[data-test-group-counter="Need Response::License Request"]');
     assert.cardCountInThreadList(3, "All threads having the clicked tag are shown");
-    assert.equal(find(".cardstack-workflow-label-with-count-wrapper.active:contains(License Request)").length, 1, "The selected group is marked as active");
-    assert.equal(find("[data-test-thread-list-card]:contains(This is going to be tough, my friend.)").length, 1)
-    assert.equal(find("[data-test-thread-list-card]:contains(License request for Caspian's Sycamore, please?)").length, 1)
-    assert.equal(find("[data-test-thread-list-card]:contains(License request for Chris Cornell's Seasons)").length, 1)
+    assert.equal(findAll(
+      ".cardstack-workflow-label-with-count-wrapper.active:contains(License Request)"
+    ).length, 1, "The selected group is marked as active");
+    assert.equal(findAll(
+      "[data-test-thread-list-card]:contains(This is going to be tough, my friend.)"
+    ).length, 1)
+    assert.equal(findAll(
+      "[data-test-thread-list-card]:contains(License request for Caspian's Sycamore, please?)"
+    ).length, 1)
+    assert.equal(findAll(
+      "[data-test-thread-list-card]:contains(License request for Chris Cornell's Seasons)"
+    ).length, 1)
   });
 
   skip('List threads that match the Today date range', async function(assert) {
@@ -71,7 +79,7 @@ module('Acceptance | Workflow', function(hooks) {
     await click('.cardstack-workflow-header');
     await click('[data-test-group-counter="Today"]');
     assert.cardCountInThreadList(3);
-    assert.equal(find(".cardstack-workflow-label-with-count-wrapper.active:contains(Today)").length, 1, "The selected group is marked as active");
+    assert.equal(findAll(".cardstack-workflow-label-with-count-wrapper.active:contains(Today)").length, 1, "The selected group is marked as active");
   });
 
   skip('Switch between thread lists and an individual thread view', async function(assert) {
@@ -80,13 +88,17 @@ module('Acceptance | Workflow', function(hooks) {
     await click('[data-test-group-counter="Delegated::Song Change Request"]');
     await click('[data-test-thread-list-card]:first');
     // There is the summary card on top and the "normal" card in the thread
-    assert.equal(find('[data-test-message-card]:contains("Could we add yet more guitars to this Caspian song?")').length, 2);
+    assert.equal(findAll(
+      '[data-test-message-card]:contains("Could we add yet more guitars to this Caspian song?")'
+    ).length, 2);
 
     await click('[data-test-group-counter="Need Response::Request to Publish Live"]');
     assert.cardCountInThreadList(1);
 
     await click('[data-test-thread-list-card]:first');
-    assert.equal(find('[data-test-message-card]:contains("Could we change our previous cover of Pearl Jam\'s Daughter?")').length, 2);
+    assert.equal(findAll(
+      '[data-test-message-card]:contains("Could we change our previous cover of Pearl Jam\'s Daughter?")'
+    ).length, 2);
 
     await click('[data-test-group-counter="Today"]');
     assert.cardCountInThreadList(3);
