@@ -1,6 +1,6 @@
 import { module, skip } from 'qunit';
 import { setupRenderingTest } from 'ember-qunit';
-import '@ember/test-helpers';
+import { find } from '@ember/test-helpers';
 import hbs from 'htmlbars-inline-precompile';
 
 module('Integration | Component | cardstack search', function(hooks) {
@@ -13,7 +13,7 @@ module('Integration | Component | cardstack search', function(hooks) {
 
     this.render(hbs`{{cardstack-search}}`);
 
-    assert.equal(this.$().text().trim(), '');
+    assert.dom('*').hasText('');
 
     // Template block usage:
     this.render(hbs`
@@ -22,6 +22,6 @@ module('Integration | Component | cardstack search', function(hooks) {
       {{/cardstack-search}}
     `);
 
-    assert.equal(this.$().text().trim(), 'template block text');
+    assert.dom('*').hasText('template block text');
   });
 });
