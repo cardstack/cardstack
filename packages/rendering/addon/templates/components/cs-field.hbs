@@ -7,17 +7,25 @@
     fieldName=fieldName
     fieldCaption=fieldInfo.caption
     fieldConfig=fieldConfig
-    active=tools.requestedEditing) as |hideFromEditor value|}}
+    active=tools.requestedEditing
+  ) 
+as |hideFromEditor value|
+}}
 
-  {{#mark-overlay-unless-hidden hide=hideFromEditor id=id model=fieldInfo group="cardstack-fields" ~}}
-    {{#if hasBlock ~}}
-      {{yield value ~}}
-    {{else ~}}
-      {{#if (is-component defaultRenderer) ~}}
-        {{component defaultRenderer value=value content=content fieldName=fieldName ~}}
-      {{else ~}}
-        {{value ~}}
-      {{/if ~}}
-    {{/if ~}}
-  {{/mark-overlay-unless-hidden ~}}
-{{/let ~}}
+  {{#mark-overlay-unless-hidden
+    hide=hideFromEditor
+    id=id
+    model=fieldInfo
+    group="cardstack-fields" 
+  }}
+    {{#if hasBlock}}
+      {{yield value}}
+    {{else}}
+      {{#if (is-component defaultRenderer)}}
+        {{component defaultRenderer value=value content=content fieldName=fieldName}}
+      {{else}}
+        {{value}}
+      {{/if}}
+    {{/if}}
+  {{/mark-overlay-unless-hidden}}
+{{/let}}
