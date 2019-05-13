@@ -30,6 +30,7 @@ package-lock.json
 /packages/hub/code-generators.js.map
 /packages/hub/code-generators.d.ts
 /tests/ephemeral-test-app/node_modules/@cardstack/hub/**/*
+/tests/elasticsearch-test-app/node_modules/@cardstack/hub/**/*
 
 
 
