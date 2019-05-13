@@ -1,4 +1,4 @@
-/**/node_modules
+/node_modules
 /packages/*/node_modules
 /packages/*/dist
 /packages/*/tmp
@@ -29,6 +29,7 @@ package-lock.json
 /packages/hub/code-generators.js
 /packages/hub/code-generators.js.map
 /packages/hub/code-generators.d.ts
+/tests/ephemeral-test-app/node_modules/@cardstack/hub/**/*
 
 
 
