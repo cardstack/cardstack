@@ -12,7 +12,7 @@
     "strict": true
   },
   "exclude": [
-    "**/node_modules",
+    "node_modules",
     "packages/*/tmp",
     "packages/*/dist",
     "tmp"
