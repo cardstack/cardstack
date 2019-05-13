@@ -91,4 +91,13 @@ describe('github-auth/authenticator', function() {
     expect(response.body.data.meta.token).is.ok;
     expect(response.body.data.meta.validUntil).is.ok;
   });
+
+  it('browser code has access to config', async function() {
+    const plugins = env.lookup('hub:plugins')
+    const activePlugins = await plugins.active();
+    const gitHubAuth = activePlugins.lookupFeatureAndAssert('code-generators', '@cardstack/github-auth');
+    const generatedModules = await gitHubAuth.generateModules();
+    expect(generatedModules.has('environment')).to.equal(true);
+    expect(generatedModules.get('environment')).to.match(/export const clientId = "mock-github-client-id"/);
+  })
 });
