@@ -1,6 +1,7 @@
-const { declareInjections } = require('@cardstack/di');
-const route = require('koa-better-route');
-const { transform } = require('@babel/core');
+const { declareInjections } = require("@cardstack/di");
+const route = require("koa-better-route");
+const compose = require("koa-compose");
+const { transform } = require("@babel/core");
 
 module.exports = declareInjections(
   {
@@ -16,26 +17,44 @@ module.exports = declareInjections(
       this.before = "authentication";
     }
 
-  middleware() {
-    return route.get('/codegen/:module_prefix', async (ctxt) => {
-      let { appModules, modules } = await this.service.generateCode();
-      let modulePrefix = ctxt.routeParams.module_prefix;
-      ctxt.body = compileModules(appModules, modulePrefix) + compileModules(modules);
-      ctxt.response.set('Access-Control-Allow-Origin', '*');
-      ctxt.response.set('Content-Type', 'application/javascript');
-      ctxt.status = 200;
-    });
+    middleware() {
+      return compose([this._scriptRoute(), this._modulesRoute()]);
+    }
+
+    _scriptRoute() {
+      return route.get("/codegen/:module_prefix", async ctxt => {
+        let { appModules, modules } = await this.service.generateCode();
+        let modulePrefix = ctxt.routeParams.module_prefix;
+        ctxt.body =
+          compileModules(appModules, modulePrefix) + compileModules(modules);
+        ctxt.response.set("Access-Control-Allow-Origin", "*");
+        ctxt.response.set("Content-Type", "application/javascript");
+        ctxt.status = 200;
+      });
+    }
+
+    _modulesRoute() {
+      return route.get("/codegen-modules", async ctxt => {
+        let { appModules, modules } = await this.service.generateCode();
+        ctxt.body = JSON.stringify({
+          modules: [...modules],
+          appModules: [...appModules],
+        });
+        ctxt.response.set("Access-Control-Allow-Origin", "*");
+        ctxt.response.set("Content-Type", "application/json");
+        ctxt.status = 200;
+      });
+    }
   }
+);
 
-});
-
-function compileModules(modules, packagePrefix=null) {
+function compileModules(modules, packagePrefix = null) {
   let results = [];
   for (let [name, code] of modules) {
     results.push(
       transform(code, {
-        plugins: ['@babel/plugin-transform-modules-amd'],
-        moduleId: packagePrefix ? `${packagePrefix}/${name}` : name
+        plugins: ["@babel/plugin-transform-modules-amd"],
+        moduleId: packagePrefix ? `${packagePrefix}/${name}` : name,
       }).code
     );
   }
