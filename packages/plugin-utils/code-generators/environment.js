@@ -2,15 +2,9 @@ const Handlebars = require('handlebars');
 const { declareInjections } = require('@cardstack/di');
 
 const template = Handlebars.compile(`
-define("@cardstack/plugin-utils/environment", ["exports"], function (exports) {
-  "use strict";
-  Object.defineProperty(exports, "__esModule", {
-    value: true
-  });
-  {{#each properties as |property|}}
-    exports.{{property.name}} = "{{property.value}}";
-  {{/each}}
-});
+{{#each properties as |property|}}
+  export const {{property.name}} = "{{property.value}}";
+{{/each}}
 `);
 
 module.exports = declareInjections({
@@ -18,9 +12,11 @@ module.exports = declareInjections({
 },
 
 class {
-  async generateCode(appModulePrefix) {
-    let env = Object.assign(this._content(), { appModulePrefix });
-    return template({ properties: Object.entries(env).map(([name, value]) => ({ name, value })) });
+  async generateModules() {
+    return new Map([[
+      'environment', 
+      template({ properties: Object.entries(this._content()).map(([name, value]) => ({ name, value })) }) 
+    ]]);
   }
   _content() {
     return {

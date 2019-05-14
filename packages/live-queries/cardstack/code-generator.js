@@ -6,15 +6,9 @@ const DEFAULT_SOCKET_IO_PORT = 3100;
 const DEFAULT_SOCKET_IO_PATH = '/';
 
 const template = Handlebars.compile(`
-define("@cardstack/live-queries/environment", ["exports"], function (exports) {
-  "use strict";
-  Object.defineProperty(exports, "__esModule", {
-    value: true
-  });
   {{#each properties as |property|}}
-    exports.{{property.name}} = "{{property.value}}";
+    export const {{property.name}} = "{{property.value}}";
   {{/each}}
-});
 `);
 
 module.exports = declareInjections({
@@ -23,8 +17,7 @@ module.exports = declareInjections({
 },
 
 class LiveQueryCodeGenerator {
-
-  async generateCode() {
+  async generateModules() {
     let configured = await this.plugins.active();
     let pluginConfig = configured.describe('@cardstack/live-queries');
 
@@ -34,16 +27,19 @@ class LiveQueryCodeGenerator {
 
     socketIoUrl.port = port;
     socketIoUrl.pathname = '';
-
-    return template({ properties: [
-      {
-        name: 'host',
-        value: socketIoUrl.toString()
-      },
-      {
-        name: 'path',
-        value: socketPath
-      }
-    ]});
+    let compiled = template({ 
+      properties: [
+        {
+          name: 'host',
+          value: socketIoUrl.toString()
+        },
+        {
+          name: 'path',
+          value: socketPath
+        }
+      ]
+    });
+    return new Map([['environment', compiled]]);
   }
-});
+}
+);

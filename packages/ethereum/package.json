@@ -18,9 +18,7 @@
     "test": "tests"
   },
   "scripts": {
-    "build": "ember build",
-    "start": "ember serve",
-    "test": "ember try:each",
+    "test": "npm run ethereum-tests",
     "ethereum-tests": "../../node_modules/.bin/truffle test",
     "private-blockchain": "../../node_modules/.bin/truffle develop"
   },
