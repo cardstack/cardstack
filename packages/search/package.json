@@ -25,6 +25,7 @@
     "test:all": "ember try:each"
   },
   "dependencies": {
+    "ember-ajax": "^3.1.1",
     "ember-auto-import": "^1.2.16",
     "ember-cli-babel": "^7.1.2",
     "ember-cli-htmlbars": "^3.0.0",
