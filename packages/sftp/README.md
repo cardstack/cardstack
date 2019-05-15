@@ -38,14 +38,6 @@ Use url encoding to access non-root-level files, e.g. if you want to access `foo
 `/api/sftp-files/foo%2fbar.jpg`
 
 
-
-Compatibility
-------------------------------------------------------------------------------
-
-* Ember.js v2.18 or above
-* Ember CLI v2.13 or above
-
-
 Installation
 ------------------------------------------------------------------------------
 
