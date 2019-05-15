@@ -5,10 +5,6 @@ import { visit, click, findAll } from '@ember/test-helpers';
 module('Acceptance | Workflow', function(hooks) {
   setupApplicationTest(hooks);
 
-  function find() {
-    throw new Error('these tests need to be refactored away from "find", but they are skipped right now so I\'m leaving them alone');
-  }
-
   hooks.beforeEach(function(assert) {
     assert.trimmedText = (selector, text, errorMessage) => {
       let element = this.element.querySelector(selector);
