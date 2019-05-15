@@ -1,23 +1,23 @@
 {{#cardstack-edges}}
-  {{#cardstack-session as |session|}}
-    {{#if session.isAuthenticated }}
-      <button
-        id="logout-button"
-        onclick={{action session.logout}}
-      >
-        Logout {{session.user.name}}
-      </button>
-    {{else}}
-      {{#mock-login as |login|}}
+    {{#cardstack-session as |session|}}
+      {{#if session.isAuthenticated }}
         <button
-          id="login-button"
-          onclick={{action login "user1"}}
-          data-test-cardstack="login-button"
+          id="logout-button"
+          onclick={{action session.logout}}
         >
-          Login
+          Logout {{session.user.name}}
         </button>
-      {{/mock-login}}
-    {{/if}}
-  {{/cardstack-session}}
+      {{else}}
+        {{#mock-login as |login|}}
+          <button
+            id="login-button"
+            onclick={{action login "user1"}}
+            data-test-cardstack="login-button"
+          >
+            Login
+          </button>
+        {{/mock-login}}
+      {{/if}}
+    {{/cardstack-session}}
   {{outlet}}
 {{/cardstack-edges}}
