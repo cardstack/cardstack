@@ -26,11 +26,14 @@
     "test:all": "ember try:each"
   },
   "dependencies": {
+    "@babel/core": "^7.4.4",
     "@cardstack/di": "0.13.71",
     "@cardstack/plugin-utils": "0.13.71",
+    "@types/babel__core": "^7.1.1",
     "ember-cli-babel": "^7.1.2",
     "ember-fetch": "^6.4.0",
-    "koa-better-route": "^0.1.0"
+    "koa-better-route": "^0.1.0",
+    "koa-compose": "^3.2.1"
   },
   "devDependencies": {
     "@cardstack/eslint-config": "0.13.71",

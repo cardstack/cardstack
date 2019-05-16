@@ -1,46 +1,43 @@
 import { declareInjections }  from '@cardstack/di';
 import createLog from '@cardstack/logger';
 import { todo } from '@cardstack/plugin-utils/todo-any';
-import { transform } from '@babel/core';
 const log = createLog('cardstack/code-gen');
+
+interface CodeGenerator {
+  generateModules(): Promise<Map<string, string>>;
+  generateAppModules(): Promise<Map<string, string>>;
+}
 
 export = declareInjections({
   plugins: 'hub:plugins'
 },
 
 class CodeGenerators {
-  async generateCode(modulePrefix: string) {
+  async generateCode() {
     log.debug(`Running code generators`);
-    let results = [];
+
+    let modules = new Map();
+    let appModules = new Map();
+
     let activePlugins = await (this as todo).plugins.active();
     for (let feature of activePlugins.featuresOfType('code-generators')) {
       log.debug(`Running code generator %s `, feature.id);
-      let codeGenerator = activePlugins.lookupFeatureAndAssert('code-generators', feature.id);
+      let codeGenerator = activePlugins.lookupFeatureAndAssert('code-generators', feature.id) as CodeGenerator;
 
       if (typeof codeGenerator.generateModules === 'function') {
-        let namedModules = await codeGenerator.generateModules();
-        results.push(compileModules(namedModules, feature.relationships.plugin.data.id));
+        for (let [moduleName, source] of await codeGenerator.generateModules()) {
+          let packageName = feature.relationships.plugin.data.id;
+          modules.set(`${packageName}/${moduleName}`, source);
+        }
       }
 
       if (typeof codeGenerator.generateAppModules === 'function') {
-        let appModules = await codeGenerator.generateAppModules();
-        results.push(compileModules(appModules, modulePrefix));
+        for (let item of await codeGenerator.generateAppModules()) {
+          appModules.set(...item);
+        }
       }
     }
-    return results.join("\n");
+    return { modules, appModules };
   }
-
 });
 
-function compileModules(modules: Map<string, string>, packageName: string) {
-  let results = [];
-  for (let [name, code] of modules) {
-    results.push(
-      transform(code, {
-        plugins: ['@babel/plugin-transform-modules-amd'],
-        moduleId: `${packageName}/${name}`
-      })!.code
-    );
-  }
-  return results.join("\n");
-}
