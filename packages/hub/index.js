@@ -1,23 +1,23 @@
 const CONTAINER_MODE = process.env.CONTAINERIZED_HUB != null;
-const NewBroccoliConnector = require('./docker-host/broccoli-connector');
-const path = require('path');
-const fs = require('fs');
+const NewBroccoliConnector = require("./docker-host/broccoli-connector");
+const path = require("path");
+const fs = require("fs");
 
 let addon = {
-  name: '@cardstack/hub',
+  name: "@cardstack/hub",
 
   includedCommands() {
     if (CONTAINER_MODE) {
       return {
-        'hub:build': require('./commands/build'),
-        'hub:start': require('./commands/start'),
-        'hub:stop': require('./commands/stop'),
-        'hub:prune': require('./commands/prune')
+        "hub:build": require("./commands/build"),
+        "hub:start": require("./commands/start"),
+        "hub:stop": require("./commands/stop"),
+        "hub:prune": require("./commands/prune"),
       };
     } else {
       return {
-        'hub:start': require('./commands/start-native'),
-        'hub:seed': require('./commands/seed')
+        "hub:start": require("./commands/start-native"),
+        "hub:seed": require("./commands/seed"),
       };
     }
   },
@@ -30,7 +30,9 @@ let addon = {
     // coordination here and only the first instance takes effect.
     if (global.__cardstack_hub_running_in_ember_cli) {
       if (global.__cardstack_hub_running_in_ember_cli.isLocatorDummy) {
-        throw new Error(`A plugin tried to use @cardstack/plugin-utils/locate-hub too early. It's only allowed after ember addon's have finished 'init'`);
+        throw new Error(
+          `A plugin tried to use @cardstack/plugin-utils/locate-hub too early. It's only allowed after ember addon's have finished 'init'`
+        );
       }
       this._active = false;
       return;
@@ -42,8 +44,17 @@ let addon = {
 
   async url() {
     if (!this._hub) {
-      this._env = process.env.EMBER_ENV || 'development';
-      if (fs.existsSync(path.join(path.dirname(this.project.configPath()), '..', 'cardstack', 'data-sources'))) {
+      this._env = process.env.EMBER_ENV || "development";
+      if (
+        fs.existsSync(
+          path.join(
+            path.dirname(this.project.configPath()),
+            "..",
+            "cardstack",
+            "data-sources"
+          )
+        )
+      ) {
         this._hub = this._startHub();
       } else {
         this._hub = Promise.resolve(null);
@@ -53,12 +64,16 @@ let addon = {
     return url;
   },
 
-  included(){
+  included() {
     this._super.apply(this, arguments);
-    if (!this._active){ return; }
-    this.import('vendor/cardstack-generated.js');
+    if (!this._active) {
+      return;
+    }
+    this.import("vendor/cardstack-generated.js");
     this.url(); // kicks off the actual hub as needed
-    this._modulePrefix = require(this.project.configPath())(this._env).modulePrefix;
+    this._modulePrefix = require(this.project.configPath())(
+      this._env
+    ).modulePrefix;
   },
 
   async _startHub() {
@@ -67,18 +82,25 @@ let addon = {
       return process.env.HUB_URL;
     }
     if (CONTAINER_MODE) {
-      throw new Error("TODO: automatically start containerized hub here. This code should block until the hub is actually listening, and it should return the URL at which the hub is listening.");
+      throw new Error(
+        "TODO: automatically start containerized hub here. This code should block until the hub is actually listening, and it should return the URL at which the hub is listening."
+      );
     } else {
       // we wait until here to require this because in the
       // containerized case, "main" and its recursive dependencies
       // never need to load on the host environment.
-      let StartNative = require('./commands/start-native');
-      return StartNative.spawnHub(this.project.pkg.name, this.project.configPath(), this._env, process.env.HUB_PORT || 3000);
+      let StartNative = require("./commands/start-native");
+      return StartNative.spawnHub(
+        this.project.pkg.name,
+        this.project.configPath(),
+        this._env,
+        process.env.HUB_PORT || 3000
+      );
     }
   },
 
   treeForVendor() {
-    if (!this._active){
+    if (!this._active) {
       this._super.apply(this, arguments);
       return;
     }
@@ -88,7 +110,6 @@ let addon = {
       }
     });
     return new NewBroccoliConnector(codeGenUrlPromise).tree;
-  }
-
+  },
 };
 module.exports = addon;
