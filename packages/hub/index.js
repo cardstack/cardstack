@@ -1,5 +1,5 @@
 const CONTAINER_MODE = process.env.CONTAINERIZED_HUB != null;
-const NewBroccoliConnector = require("./docker-host/broccoli-connector");
+const BroccoliConnector = require("./docker-host/broccoli-connector");
 const path = require("path");
 const fs = require("fs");
 
@@ -69,7 +69,6 @@ let addon = {
     if (!this._active) {
       return;
     }
-    this.import("vendor/cardstack-generated.js");
     this.url(); // kicks off the actual hub as needed
     this._modulePrefix = require(this.project.configPath())(
       this._env
@@ -99,17 +98,20 @@ let addon = {
     }
   },
 
-  treeForVendor() {
+  treeForAddon() {
     if (!this._active) {
       this._super.apply(this, arguments);
       return;
     }
     let codeGenUrlPromise = this._hub.then(url => {
       if (url) {
-        return `${url}/codegen/${this._modulePrefix}`;
+        return `${url}/codegen-modules`;
       }
     });
-    return new NewBroccoliConnector(codeGenUrlPromise).tree;
+    let tree = new BroccoliConnector(codeGenUrlPromise, this._modulePrefix).tree;
+    return this.preprocessJs(tree, '/', this.name, {
+      registry: this.registry,
+    });
   },
 };
 module.exports = addon;
