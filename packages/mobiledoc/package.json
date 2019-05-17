@@ -31,7 +31,7 @@
     "@cardstack/image": "0.13.71",
     "ember-cli-babel": "^6.8.2",
     "ember-cli-htmlbars": "^2.0.1",
-    "ember-concurrency": "^0.8.27",
+    "ember-concurrency": "^0.10.0",
     "ember-elsewhere": "^1.0.3",
     "ember-mobiledoc-dom-renderer": "^0.6.0",
     "ember-mobiledoc-editor": "backspace/ember-mobiledoc-editor#closure-actions",
