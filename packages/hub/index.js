@@ -114,7 +114,7 @@ let addon = {
       return;
     }
 
-    return this._super.call(this, new Funnel(this._broccoliConnector().tree, { srcDir: 'app' }));
+    return this._super.call(this, new Funnel(this._broccoliConnector().tree, { srcDir: 'app', allowEmpty: true }));
   },
 
   treeForAddon() {
@@ -123,7 +123,7 @@ let addon = {
       return;
     }
 
-    let tree = new Funnel(this._broccoliConnector().tree, { srcDir: 'addon' });
+    let tree = new Funnel(this._broccoliConnector().tree, { srcDir: 'addon', allowEmpty: true });
     return this.preprocessJs(tree, '/', this.name, {
       registry: this.registry,
     });
