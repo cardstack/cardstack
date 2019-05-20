@@ -46,6 +46,7 @@
   },
   "devDependencies": {
     "@cardstack/test-support-authenticator": "0.13.71",
+    "@ember/jquery": "^0.6.0",
     "@ember/optional-features": "^0.6.3",
     "broccoli-asset-rev": "^2.7.0",
     "ember-cli": "~3.8.1",
