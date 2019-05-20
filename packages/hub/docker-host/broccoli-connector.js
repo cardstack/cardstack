@@ -8,10 +8,9 @@ const Plugin = require("broccoli-plugin");
 const { WatchedDir } = require("broccoli-source");
 
 class CodeWriter extends Plugin {
-  constructor(codeGenUrlPromise, appModulePrefix, trigger) {
+  constructor(codeGenUrlPromise, trigger) {
     super([trigger], { name: "@cardstack/hub", needsCache: false });
     this.codeGenUrlPromise = codeGenUrlPromise;
-    this.appModulePrefix = appModulePrefix;
   }
 
   async build() {
@@ -23,12 +22,12 @@ class CodeWriter extends Plugin {
     try {
       let response = (await request.get(url).buffer(true)).body;
       for (let [name, source] of response.modules) {
-        let target = join(this.outputPath, name + ".js");
+        let target = join(this.outputPath, 'addon', name + ".js");
         ensureDirSync(dirname(target));
         writeFileSync(target, source);
       }
       for (let [name, source] of response.appModules) {
-        let target = join(this.outputPath, this.appModulePrefix, name + ".js");
+        let target = join(this.outputPath, 'app', name + ".js");
         ensureDirSync(dirname(target));
         writeFileSync(target, source);
       }
@@ -53,12 +52,12 @@ class CodeWriter extends Plugin {
 }
 
 module.exports = class BroccoliConnector {
-  constructor(codeGenUrl, appModulePrefix) {
+  constructor(codeGenUrl) {
     quickTemp.makeOrRemake(this, "_triggerDir", "cardstack-hub");
     this._trigger = new WatchedDir(this._triggerDir, {
       annotation: "@cardstack/hub",
     });
-    this.tree = new CodeWriter(codeGenUrl, appModulePrefix, this._trigger);
+    this.tree = new CodeWriter(codeGenUrl, this._trigger);
     this._buildCounter = 0;
   }
   triggerRebuild() {

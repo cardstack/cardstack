@@ -2,6 +2,7 @@ const CONTAINER_MODE = process.env.CONTAINERIZED_HUB != null;
 const BroccoliConnector = require("./docker-host/broccoli-connector");
 const path = require("path");
 const fs = require("fs");
+const Funnel = require('broccoli-funnel');
 
 let addon = {
   name: "@cardstack/hub",
@@ -70,9 +71,6 @@ let addon = {
       return;
     }
     this.url(); // kicks off the actual hub as needed
-    this._modulePrefix = require(this.project.configPath())(
-      this._env
-    ).modulePrefix;
   },
 
   async _startHub() {
@@ -98,17 +96,34 @@ let addon = {
     }
   },
 
+  _broccoliConnector() {
+    if (!this._cachedBroccoliConnector) {
+      let codeGenUrlPromise = this._hub.then(url => {
+        if (url) {
+          return `${url}/codegen-modules`;
+        }
+      });
+      this._cachedBroccoliConnector = new BroccoliConnector(codeGenUrlPromise);
+    }
+    return this._cachedBroccoliConnector;
+  },
+
+  treeForApp() {
+    if (!this._active) {
+      this._super.apply(this, arguments);
+      return;
+    }
+
+    return this._super.call(this, new Funnel(this._broccoliConnector().tree, { srcDir: 'app', allowEmpty: true }));
+  },
+
   treeForAddon() {
     if (!this._active) {
       this._super.apply(this, arguments);
       return;
     }
-    let codeGenUrlPromise = this._hub.then(url => {
-      if (url) {
-        return `${url}/codegen-modules`;
-      }
-    });
-    let tree = new BroccoliConnector(codeGenUrlPromise, this._modulePrefix).tree;
+
+    let tree = new Funnel(this._broccoliConnector().tree, { srcDir: 'addon', allowEmpty: true });
     return this.preprocessJs(tree, '/', this.name, {
       registry: this.registry,
     });
