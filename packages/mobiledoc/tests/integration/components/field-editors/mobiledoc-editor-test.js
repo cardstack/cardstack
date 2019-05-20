@@ -1,6 +1,5 @@
 import { module, skip } from 'qunit';
 import { setupRenderingTest } from 'ember-qunit';
-import '@ember/test-helpers';
 import hbs from 'htmlbars-inline-precompile';
 
 module('Integration | Component | field editors/mobiledoc editor', function(hooks) {
@@ -13,7 +12,7 @@ module('Integration | Component | field editors/mobiledoc editor', function(hook
 
     this.render(hbs`{{field-editors/mobiledoc-editor}}`);
 
-    assert.equal(this.$().text().trim(), '');
+    assert.dom('*').hasText('');
 
     // Template block usage:
     this.render(hbs`
@@ -22,6 +21,6 @@ module('Integration | Component | field editors/mobiledoc editor', function(hook
       {{/field-editors/mobiledoc-editor}}
     `);
 
-    assert.equal(this.$().text().trim(), 'template block text');
+    assert.dom('*').hasText('template block text');
   });
 });

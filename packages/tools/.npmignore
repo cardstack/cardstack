@@ -9,11 +9,13 @@
 /.bowerrc
 /.editorconfig
 /.ember-cli
+/.env*
 /.eslintignore
 /.eslintrc.js
 /.gitignore
-/.watchmanconfig
+/.template-lintrc.js
 /.travis.yml
+/.watchmanconfig
 /bower.json
 /config/ember-try.js
 /dist
@@ -28,6 +30,7 @@
 .watchmanconfig
 .travis.yml
 bower.json
+/CONTRIBUTING.md
 /ember-cli-build.js
 /testem.js
 /yarn.lock

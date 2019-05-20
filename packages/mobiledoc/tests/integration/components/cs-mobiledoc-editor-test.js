@@ -30,7 +30,7 @@ module('Integration | Component | cs mobiledoc editor', function(hooks) {
       ]
     });
     await render(hbs`{{cs-mobiledoc-editor mobiledoc=sample}}`);
-    assert.equal(this.$().text().trim(), 'First paragraph.');
+    assert.dom('*').hasText('First paragraph.');
   });
 
   test('mobiledoc is updated', async function(assert) {
@@ -63,12 +63,12 @@ module('Integration | Component | cs mobiledoc editor', function(hooks) {
     };
 
     await render(hbs`{{cs-mobiledoc-editor on-change=(action 'onChange')}}`);
-    assert.equal(this.$().text().trim(), '');
+    assert.dom('*').hasText('');
 
     await insertText(this.element.querySelector('.mobiledoc-editor__editor'), 'I am a paragraph.');
     await sleep(1000); // wait for debounce
 
-    assert.equal(this.$().text().trim(), 'I am a paragraph.');
+    assert.dom('*').hasText('I am a paragraph.');
     assert.deepEqual(actualDoc, expectedDoc, 'mobiledoc is updated');
   });
 });

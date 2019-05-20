@@ -1,6 +1,5 @@
 import { module, skip } from 'qunit';
 import { setupRenderingTest } from 'ember-qunit';
-import '@ember/test-helpers';
 import hbs from 'htmlbars-inline-precompile';
 
 module('Integration | Component | cs mobiledoc overview', function(hooks) {
@@ -28,6 +27,6 @@ module('Integration | Component | cs mobiledoc overview', function(hooks) {
       ]
     });
     this.render(hbs`{{cs-mobiledoc-overview mobiledoc=sample}}`);
-    assert.equal(this.$('li').length, 1);
+    assert.dom('li').exists({ count: 1 });
   });
 });
