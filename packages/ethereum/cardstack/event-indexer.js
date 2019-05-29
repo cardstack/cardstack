@@ -5,6 +5,7 @@ const { declareInjections } = require('@cardstack/di');
 const Session = require('@cardstack/plugin-utils/session');
 const log = require('@cardstack/logger')('cardstack/ethereum/event-indexer');
 const { fieldTypeFor } = require('./abi-utils');
+const { get } = require('lodash');
 
 function attachMeta(model, meta) {
   model.meta = Object.assign(model.meta || {}, meta);
@@ -76,6 +77,16 @@ class EthereumEventIndexer {
     await batch.saveDocument(context);
   }
 
+  _getContractNameForEvent(event) {
+    let eventName = event.event;
+    for (let contractName of Object.keys(this.contractDefinitions)) {
+      let events = get(this.contractDefinitions, `${contractName}.eventContentTriggers`);
+      if (Object.keys(events).includes(eventName)) {
+        return contractName;
+      }
+    }
+  }
+
   async _processRecords({ contractName, blockHeight, history }) {
     log.debug('processing records for ethereum with last indexed blockheight %j, history: %j', blockHeight, history);
     let contractDefinition = this.contractDefinitions[contractName];
@@ -92,28 +103,33 @@ class EthereumEventIndexer {
     }
 
     for (let { event, identifiers } of history) {
-      let contractAddress = contractDefinition.address;
+      // The history includes the combined events from all contracts--need to get the specific contract context for the event
+      let contractNameForEvent = this._getContractNameForEvent(event);
+      if (!contractNameForEvent) { continue; }
 
-      let eventModel = event ? generateEventModel(contractName, contractAddress, event) : null;
+      let contractDefinitionForEvent = this.contractDefinitions[contractNameForEvent];
+      let contractAddress = contractDefinitionForEvent.address;
+
+      let eventModel = event ? generateEventModel(contractNameForEvent, contractAddress, event) : null;
       if (eventModel) {
         let blockheight = await this.ethereumClient.getBlockHeight();
-        await this._indexRecord(batch, attachMeta(eventModel, { blockheight, contractName }));
+        await this._indexRecord(batch, attachMeta(eventModel, { blockheight, contractNameForEvent }));
 
-        if (!contractDefinition.eventContentTriggers[eventModel.attributes['event-name']].length) {
+        if (!contractDefinitionForEvent.eventContentTriggers[eventModel.attributes['event-name']].length) {
           let contract;
           try {
-            contract = (await this.searchers.getResourceAndMeta(Session.INTERNAL_PRIVILEGED, pluralize(contractName), contractAddress)).resource;
+            contract = (await this.searchers.getResourceAndMeta(Session.INTERNAL_PRIVILEGED, pluralize(contractNameForEvent), contractAddress)).resource;
           } catch (err) {
             if (err.status !== 404) { throw err; }
           }
           if (!contract) {
-            log.error(`Cannot find contract ${pluralize(contractName)}/${contractAddress} from index when trying to associate event to contract ${JSON.stringify(eventModel)}`);
+            log.error(`Cannot find contract ${pluralize(contractNameForEvent)}/${contractAddress} from index when trying to associate event to contract ${JSON.stringify(eventModel)}`);
             continue;
           }
 
           addEventRelationship(contract, eventModel);
           let blockheight = await this.ethereumClient.getBlockHeight();
-          await this._indexRecord(batch, attachMeta(contract, { blockheight, contractName }));
+          await this._indexRecord(batch, attachMeta(contract, { blockheight, contractNameForEvent }));
         }
       }
 
