@@ -78,10 +78,10 @@ class EthereumEventIndexer {
   }
 
   _getContractNameForEvent(event) {
-    let eventName = event.event;
+    let eventAddress = event.address;
     for (let contractName of Object.keys(this.contractDefinitions)) {
-      let events = get(this.contractDefinitions, `${contractName}.eventContentTriggers`);
-      if (Object.keys(events).includes(eventName)) {
+      let contractAddress = get(this.contractDefinitions, `${contractName}.address`);
+      if (contractAddress.toLowerCase() === eventAddress.toLowerCase()) {
         return contractName;
       }
     }

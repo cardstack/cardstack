@@ -1689,7 +1689,6 @@ contract('Token Indexing', function (accounts) {
 
       it('can capture events documents from events that were fired before hub started', async function () {
         let { logs: mintEvents } = await token.mint(accountOne, 100);
-
         let mintEventId = `${mintEvents[0].transactionHash}_${mintEvents[0].logIndex}`;
         let transferEventId = `${mintEvents[1].transactionHash}_${mintEvents[1].logIndex}`;
 
