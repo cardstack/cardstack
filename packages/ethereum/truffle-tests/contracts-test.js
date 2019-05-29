@@ -1,4 +1,6 @@
 const SampleToken = artifacts.require("./SampleToken.sol");
+const Oracle = artifacts.require("./TokenOracle.sol");
+const Web3 = require('web3');
 const {
   createDefaultEnvironment,
   destroyDefaultEnvironment
@@ -1784,6 +1786,157 @@ contract('Token Indexing', function (accounts) {
       });
 
     });
+
+    describe('ethereum-indexer multiple contracts with past events', function () {
+      let token, oracle, tokenEvents, oracleEvents;
+
+      async function setup() {
+        let factory = new JSONAPIFactory();
+        token = await SampleToken.new();
+        oracle = await Oracle.new();
+
+        tokenEvents = (await token.mint(accountOne, 100)).logs;
+        oracleEvents = (await oracle.addToken(token.address, 'TOK', 1000)).logs;
+
+        factory.addResource('data-sources', contractName)
+          .withAttributes({
+            'source-type': '@cardstack/ethereum',
+            params: {
+              jsonRpcUrls: [ "ws://localhost:7545" ],
+              contract: {
+                abi: token.abi,
+                address: token.address,
+                eventContentTriggers: {
+                  Mint: ["sample-token-balance-ofs"],
+                  Transfer: ["sample-token-balance-ofs"],
+                }
+              }
+            },
+          });
+
+        factory.addResource('data-sources', 'oracle')
+          .withAttributes({
+            'source-type': '@cardstack/ethereum',
+            params: {
+              jsonRpcUrls: [ "ws://localhost:7545" ],
+              contract: {
+                abi: oracle.abi,
+                address: oracle.address,
+                eventContentTriggers: {
+                  TokenAdded: ['oracle-tokens']
+                }
+              }
+            },
+          });
+
+        env = await createDefaultEnvironment(`${__dirname}/..`, factory.getModels());
+        eventIndexer = env.lookup(`plugin-services:${require.resolve('../cardstack/event-indexer')}`);
+        ethereumClient = eventIndexer.ethereumClient;
+
+        await waitForEthereumEvents(eventIndexer);
+      }
+
+      beforeEach(setup);
+      afterEach(teardown);
+
+      it('can index multiple contracts with past events', async function() {
+        let { data: accountOneLedgerEntry } = await env.lookup('hub:searchers').get(env.session, 'local-hub', 'sample-token-balance-ofs', accountOne);
+        expect(accountOneLedgerEntry.attributes['mapping-number-value']).to.equal('100');
+
+        let [ { transactionHash:mintEventId }, { transactionHash:transferEventId } ]  = tokenEvents;
+        let [ { transactionHash:tokenAddedEventId } ]  = oracleEvents;
+
+        let { data: mintEvent } = await env.lookup('hub:searchers').get(env.session, 'local-hub', 'sample-token-mint-events', `${mintEventId}_0`);
+        expect(mintEvent.attributes['mint-event-amount']).to.equal('100');
+        let { data: transferEvent } = await env.lookup('hub:searchers').get(env.session, 'local-hub', 'sample-token-transfer-events', `${transferEventId}_1`);
+        expect(transferEvent.attributes['transfer-event-value']).to.equal('100');
+
+        let { data: tokenAddedEvent } = await env.lookup('hub:searchers').get(env.session, 'local-hub', 'oracle-token-added-events', `${tokenAddedEventId}_0`);
+        expect(tokenAddedEvent.attributes['token-added-event-rate']).to.equal('1000');
+
+        let { data: oracleToken } = await env.lookup('hub:searchers').get(env.session, 'local-hub', 'oracle-tokens', token.address);
+        expect(oracleToken.attributes['tokens-token-address']).to.equal(Web3.utils.toChecksumAddress(token.address));
+        expect(oracleToken.attributes['tokens-token-symbol']).to.equal('TOK');
+        expect(oracleToken.attributes['tokens-rate']).to.equal('1000');
+      });
+    });
+
+    describe('ethereum-indexer multiple contracts with incremental indexing', function () {
+      let token, oracle;
+
+      async function setup() {
+        let factory = new JSONAPIFactory();
+        token = await SampleToken.new();
+        oracle = await Oracle.new();
+
+        factory.addResource('data-sources', contractName)
+          .withAttributes({
+            'source-type': '@cardstack/ethereum',
+            params: {
+              jsonRpcUrls: [ "ws://localhost:7545" ],
+              contract: {
+                abi: token.abi,
+                address: token.address,
+                eventContentTriggers: {
+                  Mint: ["sample-token-balance-ofs"],
+                  Transfer: ["sample-token-balance-ofs"],
+                }
+              }
+            },
+          });
+
+        factory.addResource('data-sources', 'oracle')
+          .withAttributes({
+            'source-type': '@cardstack/ethereum',
+            params: {
+              jsonRpcUrls: [ "ws://localhost:7545" ],
+              contract: {
+                abi: oracle.abi,
+                address: oracle.address,
+                eventContentTriggers: {
+                  TokenAdded: ['oracle-tokens']
+                }
+              }
+            },
+          });
+
+        env = await createDefaultEnvironment(`${__dirname}/..`, factory.getModels());
+        eventIndexer = env.lookup(`plugin-services:${require.resolve('../cardstack/event-indexer')}`);
+        ethereumClient = eventIndexer.ethereumClient;
+
+        await waitForEthereumEvents(eventIndexer);
+      }
+
+      beforeEach(setup);
+      afterEach(teardown);
+
+      it('can index multiple contracts with past events', async function() {
+        let tokenEvents = (await token.mint(accountOne, 100)).logs;
+        let oracleEvents = (await oracle.addToken(token.address, 'TOK', 1000)).logs;
+
+        await waitForEthereumEvents(eventIndexer);
+
+        let { data: accountOneLedgerEntry } = await env.lookup('hub:searchers').get(env.session, 'local-hub', 'sample-token-balance-ofs', accountOne);
+        expect(accountOneLedgerEntry.attributes['mapping-number-value']).to.equal('100');
+
+        let [ { transactionHash:mintEventId }, { transactionHash:transferEventId } ]  = tokenEvents;
+        let [ { transactionHash:tokenAddedEventId } ]  = oracleEvents;
+
+        let { data: mintEvent } = await env.lookup('hub:searchers').get(env.session, 'local-hub', 'sample-token-mint-events', `${mintEventId}_0`);
+        expect(mintEvent.attributes['mint-event-amount']).to.equal('100');
+        let { data: transferEvent } = await env.lookup('hub:searchers').get(env.session, 'local-hub', 'sample-token-transfer-events', `${transferEventId}_1`);
+        expect(transferEvent.attributes['transfer-event-value']).to.equal('100');
+
+        let { data: tokenAddedEvent } = await env.lookup('hub:searchers').get(env.session, 'local-hub', 'oracle-token-added-events', `${tokenAddedEventId}_0`);
+        expect(tokenAddedEvent.attributes['token-added-event-rate']).to.equal('1000');
+
+        let { data: oracleToken } = await env.lookup('hub:searchers').get(env.session, 'local-hub', 'oracle-tokens', token.address);
+        expect(oracleToken.attributes['tokens-token-address']).to.equal(Web3.utils.toChecksumAddress(token.address));
+        expect(oracleToken.attributes['tokens-token-symbol']).to.equal('TOK');
+        expect(oracleToken.attributes['tokens-rate']).to.equal('1000');
+      });
+    });
+
 
     describe('ethereum-indexer can patch schema', function () {
       let token;
