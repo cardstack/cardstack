@@ -57,10 +57,11 @@ function fieldTypeFor(contractName, abiItem) {
       case 'bool':
         return { fields: [{ type: '@cardstack/core-types::boolean' }]};
     }
-  // deal with just mappings that use address as a key for now
-  } else if (abiItem.inputs.length === 1 && abiItem.inputs[0].type === "address") {
+  // deal with just mappings that use address and bytes32 as a key for now
+  } else if (abiItem.inputs.length === 1 && ['address', 'bytes32'].includes(abiItem.inputs[0].type)) {
     return {
       isMapping: true,
+      mappingKeyType: abiItem.inputs[0].type,
       fields: abiItem.outputs.map(output => {
         let name, isNamedField;
         let type = solidityTypeToInternalType(output.type);

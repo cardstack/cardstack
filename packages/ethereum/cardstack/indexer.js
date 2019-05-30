@@ -473,14 +473,13 @@ class Updater {
     };
   }
 
-  _mappingContentTypeFor(contractName, mappingName, fields) {
-    return {
+  _mappingContentTypeFor(contractName, mappingName, fields, mappingKeyType) {
+    let mapping = {
       type: "content-types",
       id: pluralize(`${contractName}-${dasherize(mappingName)}`),
       relationships: {
         fields: {
           data: [
-            { type: "fields", id: "ethereum-address" },
             { type: "fields", id: contractName + "-contract" }
           ].concat(fields.map(field => {
             return { type: "fields", id: field.name };
@@ -491,6 +490,11 @@ class Updater {
         }
       }
     };
+
+    if (mappingKeyType === 'address') {
+      mapping.relationships.fields.data.unshift({ type: "fields", id: "ethereum-address" });
+    }
+    return mapping;
   }
 
   _eventContentTypeFor(contractName, eventName, fields) {
@@ -543,7 +547,7 @@ class Updater {
         let fieldInfo = fieldTypeFor(contractName, item);
         if (!fieldInfo) { return; }
 
-        let { isEvent, isMapping, fields } = fieldInfo;
+        let { isEvent, isMapping, fields, mappingKeyType } = fieldInfo;
         if (!isMapping && !isEvent && fields.length === 1) {
           contractFields.push({
             type: "fields",
@@ -564,7 +568,7 @@ class Updater {
         }
 
         if (isMapping) {
-          let mappingContentType = this._mappingContentTypeFor(contractName, item.name, fields);
+          let mappingContentType = this._mappingContentTypeFor(contractName, item.name, fields, mappingKeyType);
           if (!schemaItems.find(i => i.id === mappingContentType.id && i.type === 'content-types')) {
             schemaItems.push(mappingContentType);
             schemaItems.push(this._openGrantForContentType(`${contractName}-${dasherize(item.name)}`));

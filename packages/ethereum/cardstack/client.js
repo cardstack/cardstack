@@ -8,6 +8,7 @@ const { promisify } = require('util');
 const timeout = promisify(setTimeout);
 
 const NULL_ADDRESS = '0x0000000000000000000000000000000000000000';
+const NULL_BYTES32 = '0x0000000000000000000000000000000000000000000000000000000000000000';
 const MAX_WS_MESSAGE_SIZE_BYTES = 20000000;
 
 module.exports = class EthereumClient {
@@ -311,18 +312,15 @@ module.exports = class EthereumClient {
     return model;
   }
 
-  async getContractInfoForIdentifier({ id, type, contractName}) {
-    log.debug(`getting contract data for id: ${id}, type: ${type}, contractName: ${contractName}`);
-    if (!type || !id) { return; }
-
-    await this._reconnectPromise;
+  contentTypeToContractMethod(contentType, contractName) {
+    if (!contentType) { return; }
 
     let contractNameRegex = new RegExp(`^${contractName}-`);
-    let dasherizedMethod = type.replace(contractNameRegex, '');
+    let dasherizedMethod = contentType.replace(contractNameRegex, '');
     let method = camelize(dasherizedMethod);
 
     if (!this._contracts[contractName]) {
-      throw new Error(`cannot find contract provider with contractName: ${contractName} that will be used to access data for ${type}`);
+      throw new Error(`cannot find contract provider with contractName: ${contractName} that will be used to access data for ${contentType}`);
     }
 
     let aContract = this._contracts[contractName];
@@ -337,6 +335,18 @@ module.exports = class EthereumClient {
       methodName = singularize(capitalize(method));
     }
 
+    return methodName;
+  }
+
+  async getContractInfoForIdentifier({ id, type, contractName}) {
+    log.debug(`getting contract data for id: ${id}, type: ${type}, contractName: ${contractName}`);
+    if (!type || !id) { return; }
+
+    await this._reconnectPromise;
+
+    let methodName = this.contentTypeToContractMethod(type, contractName);
+
+    let aContract = this._contracts[contractName];
     let data = await this.callContractMethod(aContract, methodName, id);
     log.debug(`retrieved contract data for contract ${contractName}.${methodName}(${id || ''}): ${data}`);
     return { data, methodName };
@@ -375,7 +385,9 @@ module.exports = class EthereumClient {
   _generateHistoryDataFromEvent({ contract, event }) {
     let contractIdentifier = { type: pluralize(contract), id: this._contractDefinitions[contract].address, isContractType: true };
     let addressParams = this._eventDefinitions[contract][event.event].inputs.filter(input => input.type === 'address');
+    let bytes32Params = this._eventDefinitions[contract][event.event].inputs.filter(input => input.type === 'bytes32');
     let addresses = addressParams.map(param => event.returnValues[param.name]).filter(address => address !== NULL_ADDRESS);
+    let bytes32s = bytes32Params.map(param => event.returnValues[param.name]).filter(bytes32 => bytes32 !== NULL_BYTES32);
     let contentTypes = this._contractDefinitions[contract].eventContentTriggers ? this._contractDefinitions[contract].eventContentTriggers[event.event] : null;
 
     let identifiers = [ contractIdentifier ];
@@ -385,7 +397,10 @@ module.exports = class EthereumClient {
 
     for (let type of contentTypes) {
       for (let id of addresses) {
-        identifiers.push({ type, id, contract });
+        identifiers.push({ type, id, contract, idEthereumType: 'address' });
+      }
+      for (let id of bytes32s) {
+        identifiers.push({ type, id, contract, idEthereumType: 'bytes32' });
       }
     }
 
