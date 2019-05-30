@@ -135,29 +135,32 @@ class EthereumEventIndexer {
 
       if (!identifiers) { continue; }
 
-      for (let { id, type, isContractType } of identifiers) {
+      for (let { id, type, isContractType, idEthereumType } of identifiers) {
         if (!type || !id || isContractType) { continue; }
 
         let contractAddress = contractDefinition.address;
         let blockheight = await this.ethereumClient.getBlockHeight();
-        let { data, methodName } = await this.ethereumClient.getContractInfoForIdentifier({ id, type, contractName });
+        let methodName = this.ethereumClient.contentTypeToContractMethod(type, contractName);
         let methodAbiEntry = contractDefinition["abi"].find(item => item.type === 'function' &&
           item.constant &&
           item.name === methodName);
         let fieldInfo = fieldTypeFor(contractName, methodAbiEntry);
         if (!fieldInfo) { continue; }
 
-        let { isMapping, fields } = fieldInfo;
-        if (!isMapping || !fields.length) { continue; }
+        let { isMapping, fields, mappingKeyType } = fieldInfo;
+        if (!isMapping || !fields.length || mappingKeyType !== idEthereumType) { continue; }
 
+        let { data } = await this.ethereumClient.getContractInfoForIdentifier({ id, type, contractName });
         let model = {
           id: id.toLowerCase(),
           type,
-          attributes: {
-            'ethereum-address': id // preserve the case of the ID here to faithfully represent EIP-55 encoding
-          },
+          attributes: {},
           relationships: {}
         };
+
+        if (mappingKeyType === 'address') {
+          model.attributes['ethereum-address'] = id; // preserve the case of the ID here to faithfully represent EIP-55 encoding
+        }
 
         if (typeof data === "object") {
           for (let returnName of Object.keys(data)) {

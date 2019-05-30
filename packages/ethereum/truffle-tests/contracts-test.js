@@ -10,6 +10,7 @@ const JSONAPIFactory = require('@cardstack/test-support/jsonapi-factory');
 const { set, get } = require('lodash');
 
 const contractName = 'sample-token';
+const oracleContractName = 'oracle';
 const NULL_ADDRESS = '0x0000000000000000000000000000000000000000';
 let eventIndexer, ethereumClient, env;
 
@@ -69,11 +70,12 @@ contract('Token Indexing', function (accounts) {
 
   describe('@cardstack/ethereum - contracts', function () {
     describe('ethereum-indexer', function () {
-      let dataSource, token;
+      let dataSource, token, oracle, oracleDataSource;
 
       async function setup() {
         let factory = new JSONAPIFactory();
         token = await SampleToken.new();
+        oracle = await Oracle.new();
         await token.fund({ value: web3.toWei(0.01, 'ether'), from: accountOne });
 
         dataSource = factory.addResource('data-sources', contractName)
@@ -90,6 +92,21 @@ contract('Token Indexing', function (accounts) {
                   Mint: ["sample-token-balance-ofs"],
                   WhiteList: ["sample-token-approved-buyers", "sample-token-custom-buyer-limits"],
                   VestedTokenGrant: ["sample-token-vesting-schedules"]
+                }
+              }
+            },
+          });
+
+        oracleDataSource = factory.addResource('data-sources', oracleContractName)
+          .withAttributes({
+            'source-type': '@cardstack/ethereum',
+            params: {
+              jsonRpcUrls: [ "ws://localhost:7545" ],
+              contract: {
+                abi: oracle.abi,
+                address: oracle.address,
+                eventContentTriggers: {
+                  TokenAdded: ['oracle-tokens', 'oracle-tokens-by-symbols'],
                 }
               }
             },
@@ -1341,7 +1358,258 @@ contract('Token Indexing', function (accounts) {
         });
       });
 
-      it("indexes mapping entry that contains multiple return values", async function () {
+      it('can generate schema from contracts that leverage struct mappings', async function () {
+        let schema = await env.lookup('hub:searchers').get(env.session, 'local-hub', 'content-types', 'oracle-tokens');
+        expect(schema).to.deep.equal({
+          "data": {
+            "type": "content-types",
+            "id": "oracle-tokens",
+            "relationships": {
+              "fields": {
+                "data": [
+                  {
+                    "type": "fields",
+                    "id": "ethereum-address"
+                  },
+                  {
+                    "type": "fields",
+                    "id": "oracle-contract"
+                  },
+                  {
+                    "type": "fields",
+                    "id": "tokens-id"
+                  },
+                  {
+                    "type": "fields",
+                    "id": "tokens-token-address"
+                  },
+                  {
+                    "type": "fields",
+                    "id": "tokens-token-symbol"
+                  },
+                  {
+                    "type": "fields",
+                    "id": "tokens-rate"
+                  },
+                  {
+                    "type": "fields",
+                    "id": "oracle-token-added-events",
+                  },
+                ]
+              },
+              "data-source": {
+                "data": {
+                  "type": "data-sources",
+                  "id": oracleDataSource.id
+                }
+              }
+            },
+            "meta": {
+              "source": oracleContractName
+            }
+          }
+        });
+
+        schema = await env.lookup('hub:searchers').get(env.session, 'local-hub', 'fields', 'tokens-id');
+        expect(schema).to.deep.equal({
+          "data": {
+            "type": "fields",
+            "id": "tokens-id",
+            "attributes": {
+              "field-type": "@cardstack/core-types::string"
+            },
+            "meta": {
+              "source": oracleContractName
+            }
+          }
+        });
+
+        schema = await env.lookup('hub:searchers').get(env.session, 'local-hub', 'fields', 'tokens-token-address');
+        expect(schema).to.deep.equal({
+          "data": {
+            "type": "fields",
+            "id": "tokens-token-address",
+            "attributes": {
+              "field-type": "@cardstack/core-types::case-insensitive"
+            },
+            "meta": {
+              "source": oracleContractName
+            }
+          }
+        });
+
+        schema = await env.lookup('hub:searchers').get(env.session, 'local-hub', 'fields', 'tokens-token-symbol');
+        expect(schema).to.deep.equal({
+          "data": {
+            "type": "fields",
+            "id": "tokens-token-symbol",
+            "attributes": {
+              "field-type": "@cardstack/core-types::string"
+            },
+            "meta": {
+              "source": oracleContractName
+            }
+          }
+        });
+
+        schema = await env.lookup('hub:searchers').get(env.session, 'local-hub', 'fields', 'tokens-rate');
+        expect(schema).to.deep.equal({
+          "data": {
+            "type": "fields",
+            "id": "tokens-rate",
+            "attributes": {
+              "field-type": "@cardstack/core-types::string"
+            },
+            "meta": {
+              "source": oracleContractName
+            }
+          }
+        });
+
+        schema = await env.lookup('hub:searchers').get(env.session, 'local-hub', 'fields', 'oracle-token-added-events');
+        expect(schema).to.deep.equal({
+          "data": {
+            "type": "fields",
+            "id": "oracle-token-added-events",
+            "attributes": {
+              "field-type": "@cardstack/core-types::has-many"
+            },
+            "meta": {
+              "source": oracleContractName
+            }
+          }
+        });
+
+        schema = await env.lookup('hub:searchers').get(env.session, 'local-hub', 'fields', 'oracle-contract');
+        expect(schema).to.deep.equal({
+          "data": {
+            "type": "fields",
+            "id": "oracle-contract",
+            "attributes": {
+              "field-type": "@cardstack/core-types::belongs-to"
+            },
+            "relationships": {
+              "related-types": {
+                "data": [
+                  {
+                    "id": "oracles",
+                    "type": "content-types"
+                  }
+                ]
+              }
+            },
+            "meta": {
+              "source": oracleContractName
+            }
+          }
+        });
+
+        schema = await env.lookup('hub:searchers').get(env.session, 'local-hub', 'content-types', 'oracle-tokens-by-symbols');
+        expect(schema).to.deep.equal({
+          "data": {
+            "type": "content-types",
+            "id": "oracle-tokens-by-symbols",
+            "relationships": {
+              "fields": {
+                "data": [
+                  {
+                    "type": "fields",
+                    "id": "oracle-contract"
+                  },
+                  {
+                    "type": "fields",
+                    "id": "tokens-by-symbols-id"
+                  },
+                  {
+                    "type": "fields",
+                    "id": "tokens-by-symbols-token-address"
+                  },
+                  {
+                    "type": "fields",
+                    "id": "tokens-by-symbols-token-symbol"
+                  },
+                  {
+                    "type": "fields",
+                    "id": "tokens-by-symbols-rate"
+                  },
+                  {
+                    "type": "fields",
+                    "id": "oracle-token-added-events",
+                  },
+                ]
+              },
+              "data-source": {
+                "data": {
+                  "type": "data-sources",
+                  "id": oracleDataSource.id
+                }
+              }
+            },
+            "meta": {
+              "source": oracleContractName
+            }
+          }
+        });
+
+        schema = await env.lookup('hub:searchers').get(env.session, 'local-hub', 'fields', 'tokens-by-symbols-id');
+        expect(schema).to.deep.equal({
+          "data": {
+            "type": "fields",
+            "id": "tokens-by-symbols-id",
+            "attributes": {
+              "field-type": "@cardstack/core-types::string"
+            },
+            "meta": {
+              "source": oracleContractName
+            }
+          }
+        });
+
+        schema = await env.lookup('hub:searchers').get(env.session, 'local-hub', 'fields', 'tokens-by-symbols-token-address');
+        expect(schema).to.deep.equal({
+          "data": {
+            "type": "fields",
+            "id": "tokens-by-symbols-token-address",
+            "attributes": {
+              "field-type": "@cardstack/core-types::case-insensitive"
+            },
+            "meta": {
+              "source": oracleContractName
+            }
+          }
+        });
+
+        schema = await env.lookup('hub:searchers').get(env.session, 'local-hub', 'fields', 'tokens-by-symbols-token-symbol');
+        expect(schema).to.deep.equal({
+          "data": {
+            "type": "fields",
+            "id": "tokens-by-symbols-token-symbol",
+            "attributes": {
+              "field-type": "@cardstack/core-types::string"
+            },
+            "meta": {
+              "source": oracleContractName
+            }
+          }
+        });
+
+        schema = await env.lookup('hub:searchers').get(env.session, 'local-hub', 'fields', 'tokens-by-symbols-rate');
+        expect(schema).to.deep.equal({
+          "data": {
+            "type": "fields",
+            "id": "tokens-by-symbols-rate",
+            "attributes": {
+              "field-type": "@cardstack/core-types::string"
+            },
+            "meta": {
+              "source": oracleContractName
+            }
+          }
+        });
+
+      });
+
+      it("indexes mapping entry, keyed by address, that contains multiple return values", async function () {
         let { logs: events } = await token.grantVestedTokens(accountOne,
           100,
           1000000000,
@@ -1391,7 +1659,7 @@ contract('Token Indexing', function (accounts) {
         });
       });
 
-      it("indexes mapping entry content types when a contract fires an ethereum event", async function () {
+      it("indexes mapping entry, keyed by address, content types when a contract fires an ethereum event", async function () {
         try {
           await env.lookup('hub:searchers').get(env.session, 'local-hub', 'sample-token-balance-ofs', accountOne);
           throw new Error("balance-of record should not exist for this address");
@@ -1589,6 +1857,56 @@ contract('Token Indexing', function (accounts) {
 
         let accountTwoCustomBuyerLimit = await env.lookup('hub:searchers').get(env.session, 'local-hub', 'sample-token-custom-buyer-limits', accountTwo);
         expect(accountTwoCustomBuyerLimit.data.attributes["mapping-number-value"]).to.equal("10", "the mapping-number-value is correct");
+      });
+
+      it("indexes mapping entry, keyed by bytes32", async function() {
+        let { tx, logs:[{ args, logIndex }] } = await oracle.addToken(token.address, 'TOK', 1000);
+        let { id, tokenAddress, tokenSymbol, rate } = args;
+        await waitForEthereumEvents(eventIndexer);
+
+        let document = await env.lookup('hub:searchers').get(env.session, 'local-hub', 'oracle-tokens-by-symbols', id);
+        delete document.data.meta;
+        expect(document).to.deep.equal({
+          "data": {
+            "id": id,
+            "type": "oracle-tokens-by-symbols",
+            "attributes": {
+              "tokens-by-symbols-token-address": Web3.utils.toChecksumAddress(tokenAddress),
+              "tokens-by-symbols-id": id,
+              "tokens-by-symbols-token-symbol": tokenSymbol,
+              "tokens-by-symbols-rate": rate.toString()
+            },
+            "relationships": {
+              "oracle-contract": {
+                "data": {
+                  "id": oracle.address,
+                  "type": "oracles"
+                }
+              },
+              "oracle-token-added-events": {
+                "data": [
+                  {
+                    "id": `${tx}_${logIndex}`,
+                    "type": "oracle-token-added-events"
+                  }
+                ]
+              }
+            },
+          }
+        });
+
+      });
+
+      it('can index mappings keyed by different types from a single ethereum event', async function() {
+        let { logs:[{ args }] } = await oracle.addToken(token.address, 'TOK', 1000);
+        let { id, tokenAddress } = args;
+        await waitForEthereumEvents(eventIndexer);
+
+        let document = await env.lookup('hub:searchers').get(env.session, 'local-hub', 'oracle-tokens-by-symbols', id);
+        expect(document.data.id).to.be.ok;
+
+        document = await env.lookup('hub:searchers').get(env.session, 'local-hub', 'oracle-tokens', tokenAddress);
+        expect(document.data.id).to.be.ok;
       });
     });
 
@@ -1814,7 +2132,7 @@ contract('Token Indexing', function (accounts) {
             },
           });
 
-        factory.addResource('data-sources', 'oracle')
+        factory.addResource('data-sources', oracleContractName)
           .withAttributes({
             'source-type': '@cardstack/ethereum',
             params: {
@@ -1885,7 +2203,7 @@ contract('Token Indexing', function (accounts) {
             },
           });
 
-        factory.addResource('data-sources', 'oracle')
+        factory.addResource('data-sources', oracleContractName)
           .withAttributes({
             'source-type': '@cardstack/ethereum',
             params: {

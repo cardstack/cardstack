@@ -4,19 +4,24 @@ import "./zeppelin/ownership/Ownable.sol";
 
 contract TokenOracle is Ownable {
   struct Token {
+    bytes32 id;
     address tokenAddress;
     string tokenSymbol;
     uint256 rate;
   }
 
   mapping (address => Token) public tokens;
+  mapping (bytes32 => Token) public tokensBySymbols;
 
-  event TokenAdded(address tokenAddress, string tokenSymbol, uint256 rate);
+  event TokenAdded(bytes32 id, address tokenAddress, string tokenSymbol, uint256 rate);
 
   function addToken(address tokenAddress, string memory tokenSymbol, uint256 rate) public onlyOwner {
-    Token memory token = Token(tokenAddress, tokenSymbol, rate);
+    bytes32 id = keccak256(abi.encode(tokenSymbol));
+    Token memory token = Token(id, tokenAddress, tokenSymbol, rate);
     tokens[tokenAddress] = token;
 
-    emit TokenAdded(tokenAddress, tokenSymbol, rate);
+    tokensBySymbols[id] = token;
+
+    emit TokenAdded(id, tokenAddress, tokenSymbol, rate);
   }
 }
