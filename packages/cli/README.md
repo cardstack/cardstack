@@ -1,13 +1,46 @@
 # Cardstack CLI
 
+The Cardstack CLI is a work-in-progress project to
+create a smooth quickstart experience for new developers and
+a straightforward way to use the Card SDK.
+It handles tasks like creating new Cards, starting the Hub,
+installing dependencies, and generating code from templates.
+
+Under the hood, the CLI uses [Embroider](https://github.com/embroider-build/embroider)
+for the build and [yargs](https://github.com/yargs/yargs) to manage user inputs.
+
+## Using the CLI
+
 To run the CLI:
 
 ```sh
-node ./bin/cardstack.js run
+yarn compile --watch
+node ./bin/cardstack.js <command>
 ```
 
-To disable rebuilds of the Ember App:
+To see a list of commands:
 
 ```sh
-CARDSTACK_DEV=true node ./bin/cardstack.js run
+yarn compile --watch
+node ./bin/cardstack.js --help
 ```
+
+Apps are served from `localhost:4200`.
+
+## Contributing to the CLI
+
+The CLI codebase uses [TypeScript](https://www.typescriptlang.org/),
+so make sure you always have a compiler running while you work:
+
+```sh
+yarn compile --watch
+```
+
+To disable rebuilds of the Ember App as you make changes:
+
+```sh
+CARDSTACK_DEV=true node ./bin/cardstack.js start
+```
+
+To view the built app, follow the path printed in the console
+by Embroider.
