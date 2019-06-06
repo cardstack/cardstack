@@ -150,6 +150,7 @@ count could be made to stay on the same line
 
 .cardstack-workflow-label-with-count.high-priority > .count {
   background-color: #F70221;
+  display: block;
 }
 
 .cardstack-workflow-label-with-count.low-priority > .count {
@@ -171,6 +172,7 @@ count could be made to stay on the same line
 
 .cardstack-thread-list-card {
   cursor: pointer;
+  display: block;
 }
 
 .cardstack-message-card > .main-content {
@@ -224,5 +226,13 @@ count could be made to stay on the same line
   border: 1px solid var(--lighter-background);
   color: var(--light-background);
   cursor: default;
+}
+/* css for <span> tags nested inside the changed <div> tag */
+.name {
+  display: block;
+}
+
+.count {
+  display: block;
 }
 

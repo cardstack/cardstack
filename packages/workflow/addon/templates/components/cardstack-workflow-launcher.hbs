@@ -1,9 +1,10 @@
-<div class="cardstack-workflow-header" role="button" {{action onClick}}>
-  <div
+{{!--left its css as 'inline-block' since it was set to inline-block as a <div> --}}
+<span class="cardstack-workflow-header" role="button" {{action onClick}}> 
+  <span
     class={{concat "cardstack-workflow-alert " (if notificationCount "show-alert")}}
     data-test-alert-notification
   >
     <span class="cardstack-workflow-bell-icon"></span>
-  </div>
-</div>
+  </span>
+</span>
 

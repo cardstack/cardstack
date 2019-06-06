@@ -13,23 +13,23 @@
             (if (eq selectedDate "today") "active")
           }}
         >
-          <div 
+          <span 
             class="cardstack-workflow-label-with-count high-priority"
             role="button"
             onclick={{action "selectDate" "today"}}
           >
-            <div class="name">
+            <span class="name">
               Today
-            </div>
+            </span>
             {{#if todaysNotificationCount}}
-              <div
+              <span
                 class="count"
                 data-test-group-counter="Today"
               >
                 {{todaysNotificationCount}}
-              </div>
+              </span>
             {{/if}}
-          </div>
+          </span>
         </div>
       </div>
 
