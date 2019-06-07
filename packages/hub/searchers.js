@@ -135,7 +135,7 @@ class Searchers {
 
   async search(session, query) {
     if (typeof query !== 'object') {
-      throw new Error(`Searchers.get() expects parameters: 'session', 'query'`);
+      throw new Error(`Searchers.search() expects parameters: 'session', 'query'`);
     }
 
     let schemaPromise = this.currentSchema.getSchema();
