@@ -7361,12 +7361,14 @@ ember-elsewhere@^1.0.3:
     ember-cli-babel "^6.3.0"
     ember-cli-htmlbars "^2.0.1"
 
-ember-elsewhere@^1.0.5:
-  version "1.0.5"
-  resolved "https://registry.yarnpkg.com/ember-elsewhere/-/ember-elsewhere-1.0.5.tgz#7ec292b03930765f021b51c51802b84f82f0c56c"
+ember-elsewhere@^1.1.0:
+  version "1.1.0"
+  resolved "https://registry.yarnpkg.com/ember-elsewhere/-/ember-elsewhere-1.1.0.tgz#8663727e95b0b2491fe76a74ed89197e26dd95f0"
+  integrity sha512-lxRsI7zCYwZbJPchkogz2uMpDZRbqzDhove3E6IFrl/kecSlQSOXXRgcC8blfyJ5LwM637frmhlyARHVGFoZ2Q==
   dependencies:
     ember-cli-babel "^6.16.0"
     ember-cli-htmlbars "^3.0.0"
+    ember-let-polyfill "^0.1.0"
 
 ember-export-application-global@^2.0.0:
   version "2.0.0"
@@ -7444,6 +7446,14 @@ ember-jquery@^1.0.5:
     broccoli-funnel "^1.0.0"
     broccoli-merge-trees "^2.0.0"
     jquery "^3.0.0"
+
+ember-let-polyfill@^0.1.0:
+  version "0.1.0"
+  resolved "https://registry.yarnpkg.com/ember-let-polyfill/-/ember-let-polyfill-0.1.0.tgz#9d37c610441eb41eaaea3a6782bbd4203f5cf0a9"
+  integrity sha512-olLHpS7JnqZcfyYRXcdLATYwDIopKA+ZzI8xswzCIcBYoRgoUJY7E/eW84Unu8ea1jtr/Unx+dQrsU+NrNSoBg==
+  dependencies:
+    ember-cli-babel "^6.16.0"
+    ember-cli-version-checker "^2.1.2"
 
 ember-let@^0.7.1:
   version "0.7.1"

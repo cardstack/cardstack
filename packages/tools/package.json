@@ -37,7 +37,7 @@
     "ember-cli-postcss": "^4.1.1",
     "ember-composable-helpers": "DockYard/ember-composable-helpers",
     "ember-concurrency": "^0.10.0",
-    "ember-elsewhere": "^1.0.5",
+    "ember-elsewhere": "^1.1.0",
     "ember-inject-optional": "^0.1.0",
     "ember-moment": "^7.3.0",
     "ember-power-select": "^2.3.2",
