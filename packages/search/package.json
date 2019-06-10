@@ -31,7 +31,7 @@
     "ember-cli-htmlbars": "^3.0.0",
     "ember-concurrency": "^0.10.0",
     "ember-inflector": "^3.0.0",
-    "liquid-fire": "^0.29.5",
+    "liquid-fire": "^0.30.0",
     "qs": "^6.6.0"
   },
   "devDependencies": {
