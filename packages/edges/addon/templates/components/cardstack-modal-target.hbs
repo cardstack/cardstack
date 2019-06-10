@@ -4,7 +4,9 @@
     <div 
       role="button" 
       class="cardstack-modal-container"
-      onclick={{action (cs-exact-target ".cardstack-modal-container" outsideParams.outsideClick) }}
+      onclick={{action 
+        (cs-exact-target ".cardstack-modal-container" outsideParams.outsideClick)
+      }}
     >
       <div class="cardstack-modal-dialog" >
         {{component args}}
