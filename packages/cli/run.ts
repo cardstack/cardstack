@@ -38,6 +38,14 @@ module.exports = [
 ];
 `;
 
+const optionalFeatures = `
+{
+  "application-template-wrapper": false,
+  "jquery-integration": true,
+  "template-only-glimmer-components": true
+}
+`;
+
 const routerJS = `
 import EmberRouter from "@ember/routing/router";
 import config from "./config/environment";
@@ -58,6 +66,7 @@ const otherDeps = [
   "@embroider/core",
   "@embroider/compat",
   "@embroider/webpack",
+  "@ember/jquery"
 ];
 
 interface Options {
@@ -174,6 +183,10 @@ class Runner {
 
     let buildFilePath = join(this.appDir, "ember-cli-build.js");
     writeFileSync(buildFilePath, rewriteEmberCLIBuild(readFileSync(buildFilePath, 'utf8')));
+
+    mkdirpSync(join(this.appDir, "config"));
+    let optionalConfigPath = join(this.appDir, "config", "optional-features.json");
+    writeFileSync(optionalConfigPath, optionalFeatures);
   }
 
   private exec(command: string, args: string[], options: SpawnSyncOptions) {
