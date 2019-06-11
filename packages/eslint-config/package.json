@@ -1,6 +1,6 @@
 {
   "name": "@cardstack/eslint-config",
-  "version": "0.14.2",
+  "version": "0.14.3",
   "description": "Shared eslint config for cardstack packages.",
   "main": "index.js",
   "scripts": {
@@ -30,5 +30,6 @@
   },
   "engines": {
     "node": ">= 8"
-  }
+  },
+  "gitHead": "e02d1070724ae50332c18a5eb552db8435c9ecd2"
 }
