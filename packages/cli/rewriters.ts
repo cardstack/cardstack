@@ -3,8 +3,42 @@ import recast from "recast";
 const embroiderSnippet = `
 (function(){
   const Webpack = require('@embroider/webpack').Webpack;
-  return require('@embroider/compat').compatBuild(app, Webpack);
-})()
+  return require("@embroider/compat").compatBuild(app, Webpack, {
+    staticAddonTestSupportTrees: true,
+    staticAddonTrees: true,
+    staticHelpers: true,
+    staticComponents: true,
+    packageRules: [
+      {
+        package: "@cardstack/routing",
+        addonModules: {
+          "routes/cardstack/common.js": {
+            dependsOnComponents: ["<HeadLayout/>"],
+          },
+        },
+      },
+      {
+        package: "ember-elsewhere",
+        components: {
+          "<ToElsewhere/>": {
+            acceptsComponentArguments: ["send"],
+          },
+          "<FromElsewhere/>": {
+            yieldsSafeComponents: [true],
+          },
+        },
+      },
+      {
+        package: "liquid-fire",
+        components: {
+          "{{liquid-bind}}": {
+            yieldsArguments: ["value"],
+          },
+        },
+      },
+    ],
+  });
+})();
 `;
 
 const embroiderAST = recast.parse(embroiderSnippet).program.body[0];
