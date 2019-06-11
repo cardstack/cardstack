@@ -1,6 +1,6 @@
 {
   "name": "@cardstack/queue",
-  "version": "0.14.4",
+  "version": "0.14.5",
   "description": "Job queueing plugin for @cardstack/hub.",
   "repository": "https://github.com/cardstack/cardstack",
   "author": "Alex Speller <alex@alexspeller.com>",
@@ -9,14 +9,14 @@
     "node": ">= 7.7"
   },
   "devDependencies": {
-    "@cardstack/eslint-config": "0.14.4",
-    "@cardstack/test-support": "0.14.4",
+    "@cardstack/eslint-config": "0.14.5",
+    "@cardstack/test-support": "0.14.5",
     "delay": "2.0.0"
   },
   "dependencies": {
-    "@cardstack/di": "0.14.4",
+    "@cardstack/di": "0.14.5",
     "@cardstack/logger": "^0.2.0",
-    "@cardstack/plugin-utils": "0.14.4",
+    "@cardstack/plugin-utils": "0.14.5",
     "pg": "^7.0.3",
     "pg-boss": "^2.5.1"
   },
