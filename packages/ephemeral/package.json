@@ -26,5 +26,5 @@
   "scripts": {
     "test": "mocha ../test-support/bin/run.js"
   },
-  "gitHead": "88a31d32e2bf3bcf1b506f08fafb0fcf184fb3a7"
+  "gitHead": "9a426738c0534794b18dc7c449dd084e6f953799"
 }
