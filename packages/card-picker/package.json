@@ -1,6 +1,6 @@
 {
   "name": "@cardstack/card-picker",
-  "version": "0.14.5",
+  "version": "0.14.6",
   "description": "Card-Picker system for cardstack",
   "keywords": [
     "ember-addon"
@@ -21,19 +21,19 @@
     "test:all": "ember try:each"
   },
   "dependencies": {
-    "@cardstack/edges": "0.14.5",
-    "@cardstack/search": "0.14.5",
+    "@cardstack/edges": "0.14.6",
+    "@cardstack/search": "0.14.6",
     "ember-cli-babel": "^6.16.0",
     "ember-cli-htmlbars": "^3.0.0",
     "ember-sortable": "^1.11.2"
   },
   "devDependencies": {
-    "@cardstack/authentication": "0.14.5",
-    "@cardstack/eslint-config": "0.14.5",
-    "@cardstack/image": "0.14.5",
-    "@cardstack/rendering": "0.14.5",
-    "@cardstack/test-support": "0.14.5",
-    "@cardstack/tools": "0.14.5",
+    "@cardstack/authentication": "0.14.6",
+    "@cardstack/eslint-config": "0.14.6",
+    "@cardstack/image": "0.14.6",
+    "@cardstack/rendering": "0.14.6",
+    "@cardstack/test-support": "0.14.6",
+    "@cardstack/tools": "0.14.6",
     "@ember/jquery": "^0.6.0",
     "@ember/optional-features": "^0.6.3",
     "broccoli-asset-rev": "^2.7.0",
@@ -65,5 +65,5 @@
   "ember-addon": {
     "configPath": "tests/dummy/config"
   },
-  "gitHead": "e47bc8184339c4826f8d723c9d1d737e922a0a68"
+  "gitHead": "88a31d32e2bf3bcf1b506f08fafb0fcf184fb3a7"
 }
