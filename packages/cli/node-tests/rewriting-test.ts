@@ -9,6 +9,6 @@ describe("cli app rewriting", function() {
       return app.toTree();
     };
     `);
-    expect(output).to.match(/const EmberApp.*module\.exports = function\(defaults\) {.*return require\('@embroider\/compat'\).*}/s);
+    expect(output).to.match(/const EmberApp.*module\.exports = function\(defaults\) {.*packageRules.*}/s);
   });
 });
