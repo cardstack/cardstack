@@ -2,12 +2,14 @@
 
 {{#if showUploader}}
   {{to-elsewhere named="cardstack-modal"
-               send=(hash
-                      content=(component "cardstack-image-upload-modal"
+              send=(component "cardstack-image-upload-modal"
                         updateImage=(perform updateImage)
                         cancel=(action (mut showUploader) false)
                         content=content
                         field=field
                       )
-                      outsideClick=(action (mut showUploader) false))}}
+              outsideParams=(hash
+                      outsideClick=(action (mut showUploader) false)
+              )
+  }}
 {{/if}}
