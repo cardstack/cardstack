@@ -62,7 +62,7 @@
     "ember-resolver": "^5.0.1",
     "ember-source": "~3.8.0",
     "ember-source-channel-url": "^1.1.0",
-    "ember-toolbars": "^0.4.1",
+    "ember-toolbars": "^0.5.1",
     "ember-try": "^1.0.0",
     "eslint": "^5.8.0",
     "eslint-plugin-ember": "^5.2.0",

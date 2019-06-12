@@ -4226,7 +4226,7 @@ broccoli-sri-hash@^2.1.0:
     sri-toolbox "^0.2.0"
     symlink-or-copy "^1.0.1"
 
-broccoli-stew@^1.2.0, broccoli-stew@^1.3.3, broccoli-stew@^1.4.0, broccoli-stew@^1.4.2:
+broccoli-stew@^1.2.0, broccoli-stew@^1.3.3, broccoli-stew@^1.4.0:
   version "1.5.0"
   resolved "https://registry.yarnpkg.com/broccoli-stew/-/broccoli-stew-1.5.0.tgz#d7af8c18511dce510e49d308a62e5977f461883c"
   dependencies:
@@ -6858,12 +6858,6 @@ ember-cli-valid-component-name@^1.0.0:
   dependencies:
     silent-error "^1.0.0"
 
-ember-cli-version-checker@^1.2.0:
-  version "1.3.1"
-  resolved "https://registry.yarnpkg.com/ember-cli-version-checker/-/ember-cli-version-checker-1.3.1.tgz#0bc2d134c830142da64bf9627a0eded10b61ae72"
-  dependencies:
-    semver "^5.3.0"
-
 ember-cli-version-checker@^2.0.0, ember-cli-version-checker@^2.1.0:
   version "2.1.0"
   resolved "https://registry.yarnpkg.com/ember-cli-version-checker/-/ember-cli-version-checker-2.1.0.tgz#fc79a56032f3717cf844ada7cbdec1a06fedb604"
@@ -7354,19 +7348,21 @@ ember-disable-prototype-extensions@^1.1.2, ember-disable-prototype-extensions@^1
   version "1.1.3"
   resolved "https://registry.yarnpkg.com/ember-disable-prototype-extensions/-/ember-disable-prototype-extensions-1.1.3.tgz#1969135217654b5e278f9fe2d9d4e49b5720329e"
 
-ember-elsewhere@^1.0.3:
-  version "1.0.3"
-  resolved "https://registry.yarnpkg.com/ember-elsewhere/-/ember-elsewhere-1.0.3.tgz#6477c31c1574d27a818d92590fddedfd5761a325"
-  dependencies:
-    ember-cli-babel "^6.3.0"
-    ember-cli-htmlbars "^2.0.1"
-
 ember-elsewhere@^1.0.5:
   version "1.0.5"
   resolved "https://registry.yarnpkg.com/ember-elsewhere/-/ember-elsewhere-1.0.5.tgz#7ec292b03930765f021b51c51802b84f82f0c56c"
   dependencies:
     ember-cli-babel "^6.16.0"
     ember-cli-htmlbars "^3.0.0"
+
+ember-elsewhere@^1.1.0:
+  version "1.1.0"
+  resolved "https://registry.yarnpkg.com/ember-elsewhere/-/ember-elsewhere-1.1.0.tgz#8663727e95b0b2491fe76a74ed89197e26dd95f0"
+  integrity sha512-lxRsI7zCYwZbJPchkogz2uMpDZRbqzDhove3E6IFrl/kecSlQSOXXRgcC8blfyJ5LwM637frmhlyARHVGFoZ2Q==
+  dependencies:
+    ember-cli-babel "^6.16.0"
+    ember-cli-htmlbars "^3.0.0"
+    ember-let-polyfill "^0.1.0"
 
 ember-export-application-global@^2.0.0:
   version "2.0.0"
@@ -7404,13 +7400,6 @@ ember-factory-for-polyfill@^1.3.1:
     ember-cli-version-checker "^2.1.0"
     ember-factory-for-polyfill "^1.3.1"
 
-ember-hash-helper-polyfill@^0.2.0:
-  version "0.2.0"
-  resolved "https://registry.yarnpkg.com/ember-hash-helper-polyfill/-/ember-hash-helper-polyfill-0.2.0.tgz#0913a06ad59147f345dff0edda04b112deba0f7e"
-  dependencies:
-    ember-cli-babel "^6.8.2"
-    ember-cli-version-checker "^1.2.0"
-
 ember-href-to@^1.13.0:
   version "1.15.1"
   resolved "https://registry.yarnpkg.com/ember-href-to/-/ember-href-to-1.15.1.tgz#1ba20ec201245c7cae7e2aa3eec50eb2aa25b729"
@@ -7444,6 +7433,14 @@ ember-jquery@^1.0.5:
     broccoli-funnel "^1.0.0"
     broccoli-merge-trees "^2.0.0"
     jquery "^3.0.0"
+
+ember-let-polyfill@^0.1.0:
+  version "0.1.0"
+  resolved "https://registry.yarnpkg.com/ember-let-polyfill/-/ember-let-polyfill-0.1.0.tgz#9d37c610441eb41eaaea3a6782bbd4203f5cf0a9"
+  integrity sha512-olLHpS7JnqZcfyYRXcdLATYwDIopKA+ZzI8xswzCIcBYoRgoUJY7E/eW84Unu8ea1jtr/Unx+dQrsU+NrNSoBg==
+  dependencies:
+    ember-cli-babel "^6.16.0"
+    ember-cli-version-checker "^2.1.2"
 
 ember-let@^0.7.1:
   version "0.7.1"
@@ -7824,23 +7821,15 @@ ember-text-measurer@^0.5.0:
   dependencies:
     ember-cli-babel "^7.1.0"
 
-ember-toolbars@^0.4.1:
-  version "0.4.2"
-  resolved "https://registry.yarnpkg.com/ember-toolbars/-/ember-toolbars-0.4.2.tgz#30fda5b29937e28556a639af444808b7f3433691"
+ember-toolbars@^0.5.1:
+  version "0.5.1"
+  resolved "https://registry.yarnpkg.com/ember-toolbars/-/ember-toolbars-0.5.1.tgz#353017c2b69f49dc9d858b01ebdeacaffd3aaf71"
+  integrity sha512-hJJhAhiVL5hMY8aljnRWcD5rhk5Hwn7RoBFfuEi2z8VYsOTxMAp1Iz/BXSZfE+QHioY6ZfALfxDsXltrDlpJxQ==
   dependencies:
-    ember-cli-babel "^6.9.0"
-    ember-cli-htmlbars "^2.0.3"
-    ember-elsewhere "^1.0.3"
-    liquid-fire "^0.29.0"
-
-ember-toolbars@^0.5.0:
-  version "0.5.0"
-  resolved "https://registry.yarnpkg.com/ember-toolbars/-/ember-toolbars-0.5.0.tgz#0f9d31af50c316344e02f3f5c87fa37304df95a2"
-  dependencies:
-    ember-cli-babel "^6.9.0"
-    ember-cli-htmlbars "^2.0.3"
-    ember-elsewhere "^1.0.3"
-    liquid-fire "^0.29.0"
+    ember-cli-babel "^7.7.3"
+    ember-cli-htmlbars "^3.0.1"
+    ember-elsewhere "^1.1.0"
+    liquid-fire "^0.30.0"
 
 ember-truth-helpers@^2.0.0:
   version "2.0.0"
@@ -11284,21 +11273,6 @@ linkify-it@^2.0.0:
   resolved "https://registry.yarnpkg.com/linkify-it/-/linkify-it-2.0.3.tgz#d94a4648f9b1c179d64fa97291268bdb6ce9434f"
   dependencies:
     uc.micro "^1.0.1"
-
-liquid-fire@^0.29.0:
-  version "0.29.1"
-  resolved "https://registry.yarnpkg.com/liquid-fire/-/liquid-fire-0.29.1.tgz#bcfea12db65799def263721a2b9dd6142d426bdf"
-  dependencies:
-    broccoli-funnel "^1.0.1"
-    broccoli-merge-trees "^1.0.0"
-    broccoli-stew "^1.4.2"
-    ember-cli-babel "^6.6.0"
-    ember-cli-htmlbars "^2.0.1"
-    ember-cli-version-checker "^2.0.0"
-    ember-getowner-polyfill "^2.0.1"
-    ember-hash-helper-polyfill "^0.2.0"
-    match-media "^0.2.0"
-    velocity-animate ">= 0.11.8"
 
 liquid-fire@^0.30.0:
   version "0.30.0"
@@ -17383,10 +17357,6 @@ varint@0.0.3:
 vary@^1, vary@^1.0.0, vary@^1.1.2, vary@~1.1.2:
   version "1.1.2"
   resolved "https://registry.yarnpkg.com/vary/-/vary-1.1.2.tgz#2299f02c6ded30d4a5961b0b9f74524a18f634fc"
-
-"velocity-animate@>= 0.11.8":
-  version "1.5.0"
-  resolved "https://registry.yarnpkg.com/velocity-animate/-/velocity-animate-1.5.0.tgz#fc8771d8dfe1136ff02a707e10fbb0957c4b030f"
 
 velocity-animate@^1.5.2:
   version "1.5.2"
