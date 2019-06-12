@@ -178,7 +178,7 @@ class Runner {
     // workaround for https://github.com/ember-cli/ember-octane-blueprint/issues/100
     writeFileSync(
       join(this.appDir, "app", "templates", "application.hbs"),
-      "{{outlet}}"
+      "{{#cardstack-edges}}{{outlet}}{{/cardstack-edges}}"
     );
 
     let buildFilePath = join(this.appDir, "ember-cli-build.js");
