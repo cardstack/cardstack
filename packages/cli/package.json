@@ -1,6 +1,6 @@
 {
   "name": "@cardstack/cli",
-  "version": "0.14.14",
+  "version": "0.14.15",
   "bin": {
     "cardstack": "./bin/cardstack.js"
   },
@@ -27,7 +27,7 @@
     "yarn": "^1.15.2"
   },
   "devDependencies": {
-    "@cardstack/eslint-config": "0.14.14"
+    "@cardstack/eslint-config": "0.14.15"
   },
   "engines": {
     "node": ">= 8"
