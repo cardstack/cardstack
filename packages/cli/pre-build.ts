@@ -4,7 +4,6 @@ import { tmpdir } from "os";
 import hashForDep from "hash-for-dep";
 import UI from "console-ui";
 import { Memoize } from "typescript-memoize";
-import { spawnSync, SpawnSyncOptions } from "child_process";
 import {
   ensureDirSync,
   pathExistsSync,
@@ -15,6 +14,7 @@ import {
   copySync,
 } from "fs-extra";
 import { rewriteEmberCLIBuild } from "./rewriters";
+import exec from "./utils/exec";
 
 const appName = "cardstack-standard-app";
 
@@ -129,7 +129,7 @@ class PreBuilder {
     this.createFiles();
   }
 
-  // create all files in a tmp directory, and copy them into the cwd/blueprints on success
+  // generate all app files in a tmp directory, and copy them into the cwd/blueprints on success
   private createFiles() {
     let readyMarker = join(this.appDir, ".cardstack-ready");
     if (!pathExistsSync(readyMarker)) {
@@ -147,7 +147,7 @@ class PreBuilder {
     let blueprint = dirname(
       require.resolve("@ember/octane-app-blueprint/package.json")
     );
-    this.exec(
+    exec(
       ember,
       [
         "new",
@@ -159,21 +159,14 @@ class PreBuilder {
         "--welcome",
         "false",
       ],
-      { cwd: this.workDir }
+      { cwd: this.workDir },
+      this.ui
     );
   }
 
   private installDependencies() {
     let yarn = require.resolve("yarn/bin/yarn");
-    if (process.env.CARDSTACK_DEV) {
-      for (let pkgName of cardstackDeps) {
-        this.exec(yarn, ["link"], { cwd: join(__dirname, "..", pkgName) });
-      }
-      this.exec(yarn, ["link", ...cardstackDeps.map(d => `@cardstack/${d}`)], {
-        cwd: this.appDir,
-      });
-    }
-    this.exec(
+    exec(
       yarn,
       [
         "add",
@@ -183,7 +176,8 @@ class PreBuilder {
       ],
       {
         cwd: this.appDir,
-      }
+      },
+      this.ui
     );
   }
 
@@ -207,15 +201,6 @@ class PreBuilder {
     mkdirpSync(join(this.appDir, "config"));
     let optionalConfigPath = join(this.appDir, "config", "optional-features.json");
     writeFileSync(optionalConfigPath, optionalFeatures);
-  }
-
-  private exec(command: string, args: string[], options: SpawnSyncOptions) {
-    let child = spawnSync(command, args, options);
-    if (child.status !== 0) {
-      this.ui.write(child.stdout.toString("utf8"), "INFO");
-      this.ui.write(child.stderr.toString("utf8"), "ERROR");
-      throw new Error(`${command} failed`);
-    }
   }
 }
 

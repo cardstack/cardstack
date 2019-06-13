@@ -38,7 +38,7 @@ const embroiderSnippet = `
       },
     ],
   });
-})();
+})()
 `;
 
 const embroiderAST = recast.parse(embroiderSnippet).program.body[0];
