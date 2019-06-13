@@ -38,6 +38,9 @@ class TransactionSearcher {
       query.filter.or.every(i => get(i, 'type.exact') === 'ethereum-transactions' ||
                                  get(i, 'type') === 'ethereum-transactions')) {
       return await this._queryTransactions(query);
+    } else if (get(query, 'filter.id.exact') && get(query, 'filter.type.exact') === 'ethereum-transactions') {
+      let transaction = await this._getTransaction(query.filter.id.exact);
+      return { data: [transaction.data] };
     }
     return next();
   }

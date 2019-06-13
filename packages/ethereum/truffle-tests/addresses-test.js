@@ -182,6 +182,15 @@ contract('ethereum-addresses indexing', function (_accounts) {
         await assertTxnResourceMatchesEthTxn(transaction, txn, block);
         expect(transaction.relationships['to-address'].data).to.eql({ type: 'ethereum-addresses', id: to });
         expect(transaction.relationships['from-address'].data).to.eql({ type: 'ethereum-addresses', id: from });
+
+        let searcher = await searchers.search(env.session, {
+          filter: {
+            type: { exact: "ethereum-transactions" },
+            id: { exact: transaction.id }
+          }
+        });
+
+        expect(searcher.data.length).to.equal(1);
       });
 
       it('can index address for receipt of ethers', async function () {
