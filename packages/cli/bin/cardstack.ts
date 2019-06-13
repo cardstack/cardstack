@@ -21,6 +21,17 @@ yargs
     let run = await import('../run');
     await run.default(Object.assign({ ui }, argv));
   })
+  .command('pre-build', 'Generate new blueprints', (args) => {
+    return args.option('dir', {
+      alias: 'd',
+      describe: 'destination directory for the blueprints',
+      type: 'string',
+      default: process.cwd()
+    });
+  }, async function (argv) {
+    let preBuild = await import('../pre-build');
+    await preBuild.default(Object.assign({ ui }, argv));
+  })
   .demandCommand(1, 'Use any of the commands below.\n')
   .strict()
   .fail((msg, err) => {
