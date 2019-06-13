@@ -39,8 +39,8 @@ class TransactionSearcher {
                                  get(i, 'type') === 'ethereum-transactions')) {
       return await this._queryTransactions(query);
     } else if (get(query, 'filter.id.exact') && get(query, 'filter.type.exact') === 'ethereum-transactions') {
-      let transaction = await this._getTransaction(query.filter.id.exact);
-      return { data: [transaction.data] };
+      let { data: transaction } = await this._getTransaction(query.filter.id.exact) || {};
+      return { data: transaction ? [ transaction ] : [] };
     }
     return next();
   }
