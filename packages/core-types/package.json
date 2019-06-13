@@ -1,6 +1,6 @@
 {
   "name": "@cardstack/core-types",
-  "version": "0.14.0",
+  "version": "0.14.10",
   "description": "The default blueprint for ember-cli addons.",
   "keywords": [
     "ember-addon",
@@ -24,8 +24,8 @@
     "test": "ember try:each"
   },
   "dependencies": {
-    "@cardstack/di": "0.14.0",
-    "@cardstack/edges": "0.14.0",
+    "@cardstack/di": "0.14.10",
+    "@cardstack/edges": "0.14.10",
     "ember-cli-babel": "^6.8.2",
     "ember-cli-htmlbars": "^2.0.1",
     "ember-cli-postcss": "^4.1.1",
@@ -74,5 +74,5 @@
   "ember-addon": {
     "configPath": "tests/dummy/config"
   },
-  "gitHead": "e47bc8184339c4826f8d723c9d1d737e922a0a68"
+  "gitHead": "9a426738c0534794b18dc7c449dd084e6f953799"
 }

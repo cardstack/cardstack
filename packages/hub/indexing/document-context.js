@@ -98,6 +98,7 @@ module.exports = class DocumentContext {
   }
 
   async updateDocumentMeta(meta) {
+    this.upstreamDoc.data.meta = merge({}, this.upstreamDoc.data.meta, meta);
     await this.pristineDoc();
     if (!this._pristine || !this._pristine.data) { return; }
 

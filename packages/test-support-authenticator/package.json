@@ -6,13 +6,13 @@
   "cardstack-plugin": {
     "api-version": 1
   },
-  "version": "0.14.0",
+  "version": "0.14.10",
   "dependencies": {
-    "@cardstack/di": "0.14.0",
-    "@cardstack/plugin-utils": "0.14.0"
+    "@cardstack/di": "0.14.10",
+    "@cardstack/plugin-utils": "0.14.10"
   },
   "devDependencies": {
-    "@cardstack/eslint-config": "0.14.0"
+    "@cardstack/eslint-config": "0.14.10"
   },
   "author": "Edward Faulkner <edward@eaf4.com>",
   "license": "MIT",
@@ -26,5 +26,6 @@
   "homepage": "https://github.com/cardstack/cardstack#readme",
   "engines": {
     "node": ">= 8"
-  }
+  },
+  "gitHead": "9a426738c0534794b18dc7c449dd084e6f953799"
 }

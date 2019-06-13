@@ -1,6 +1,6 @@
 {
   "name": "@cardstack/live-queries",
-  "version": "0.14.0",
+  "version": "0.14.10",
   "description": "Smart Ember Data queries that are re-run whenever they may have changed",
   "keywords": [
     "ember-addon",
@@ -26,7 +26,7 @@
     "test:all": "ember try:each"
   },
   "dependencies": {
-    "@cardstack/di": "0.14.0",
+    "@cardstack/di": "0.14.10",
     "@cardstack/logger": "^0.2.0",
     "ember-cli-babel": "^7.1.2",
     "ember-cli-htmlbars": "^3.0.0",
@@ -36,10 +36,10 @@
     "socket.io": "^2.0.4"
   },
   "devDependencies": {
-    "@cardstack/eslint-config": "0.14.0",
-    "@cardstack/jsonapi": "0.14.0",
-    "@cardstack/models": "0.14.0",
-    "@cardstack/test-support": "0.14.0",
+    "@cardstack/eslint-config": "0.14.10",
+    "@cardstack/jsonapi": "0.14.10",
+    "@cardstack/models": "0.14.10",
+    "@cardstack/test-support": "0.14.10",
     "@ember/jquery": "^0.6.0",
     "@ember/optional-features": "^0.6.3",
     "broccoli-asset-rev": "^2.7.0",
@@ -71,5 +71,5 @@
   "ember-addon": {
     "configPath": "tests/dummy/config"
   },
-  "gitHead": "e47bc8184339c4826f8d723c9d1d737e922a0a68"
+  "gitHead": "9a426738c0534794b18dc7c449dd084e6f953799"
 }
