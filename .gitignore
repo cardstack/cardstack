@@ -21,6 +21,8 @@ package-lock.json
 /packages/plugin-utils/todo-any.js
 /packages/plugin-utils/todo-any.js.map
 /packages/cli/**/*.js
+# do not ignore js files in the blueprints directory
+!packages/cli/blueprints/**/*.js
 /packages/cli/**/*.js.map
 /packages/cli/**/*.d.ts
 /packages/di/**/*.js
