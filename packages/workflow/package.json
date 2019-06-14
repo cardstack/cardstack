@@ -56,10 +56,10 @@
     "ember-source": "~3.8.0",
     "ember-source-channel-url": "^1.1.0",
     "ember-test-selectors": "^0.3.7",
-    "ember-toolbars": "^0.4.1",
+    "ember-toolbars": "^0.5.1",
     "ember-truth-helpers": "^2.0.0",
     "ember-try": "^1.0.0",
-    "liquid-fire": "^0.29.0",
+    "liquid-fire": "^0.30.0",
     "loader.js": "^4.7.0",
     "moment-timezone": "^0.5.11",
     "qunit-dom": "^0.8.0"

@@ -43,7 +43,7 @@
     "ember-power-select": "^2.3.2",
     "ember-resource-metadata": "^0.4.0",
     "ember-truth-helpers": "^2.0.0",
-    "liquid-fire": "^0.29.5",
+    "liquid-fire": "^0.30.0",
     "postcss-cssnext": "^2.10.0",
     "postcss-import": "^9.1.0"
   },
