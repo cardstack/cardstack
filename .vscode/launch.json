@@ -109,8 +109,8 @@
         "packages/test-support/bin/run.js",
         "--timeout",
         "200000",
-         "--grep",
-         "cli app rewriting"
+        //  "--grep",
+        //  "doesn't reuse included upstream resource if it has been invalidated"
       ]
     },
     {

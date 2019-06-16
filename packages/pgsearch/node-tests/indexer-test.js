@@ -6,7 +6,8 @@
 
 const {
   createDefaultEnvironment,
-  destroyDefaultEnvironment
+  destroyDefaultEnvironment,
+  defaultDataSourceId
 } = require('../../../tests/pgsearch-test-app/node_modules/@cardstack/test-support/env');
 const Factory = require('../../../tests/pgsearch-test-app/node_modules/@cardstack/test-support/jsonapi-factory');
 const DocumentContext = require('@cardstack/hub/indexing/document-context');
@@ -482,6 +483,58 @@ describe('pgsearch/indexer', function() {
     await indexer.update({ forceRefresh: true });
 
     let found = await searcher.get(env.session, 'local-hub', 'articles', article.id);
+    expect(found).is.ok;
+    expect(found).has.deep.property('data.attributes.title');
+    expect(found).has.deep.property('data.relationships.author.data.id', person.id);
+    expect(found).has.property('included');
+    expect(found.included).length(1);
+    expect(found.included[0].attributes.name).to.equal('Edward V');
+  });
+
+  it("doesn't reuse included upstream resource if it has been invalidated", async function() {
+    let { data:person } = await writer.create(env.session, 'people', {
+      data: {
+        type: 'people',
+        attributes: {
+          name: 'Quint'
+        }
+      }
+    });
+    expect(person).has.deep.property('id');
+
+    // Need to use pgsearch client to add this document directly to the index, as the
+    // hub:writers.create API strips out the included resources that are provided in the upstream doc
+    const articleId = '1';
+    let client = env.lookup(`plugin-client:${require.resolve('@cardstack/pgsearch/client')}`);
+    let schema = await currentSchema.getSchema();
+    let batch = client.beginBatch(schema, searcher);
+    await batch.saveDocument(searcher.createDocumentContext({
+      schema,
+      type: 'articles',
+      id: articleId,
+      sourceId: defaultDataSourceId,
+      upstreamDoc: {
+        data: {
+          id: articleId,
+          type: 'articles',
+          attributes: {
+            title: 'Hello World'
+          },
+          relationships: {
+            author: { data: { type: 'people', id: person.id } }
+          }
+        },
+        included: [person]
+      }
+    }));
+    await batch.done();
+    await indexer.update({ forceRefresh: true });
+
+    person.attributes.name = 'Edward V';
+    await writer.update(env.session, 'people', person.id, { data: person });
+    await indexer.update({ forceRefresh: true });
+
+    let found = await searcher.get(env.session, 'local-hub', 'articles', articleId);
     expect(found).is.ok;
     expect(found).has.deep.property('data.attributes.title');
     expect(found).has.deep.property('data.relationships.author.data.id', person.id);
