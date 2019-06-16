@@ -314,6 +314,11 @@ class Batch {
         let schema = await this._currentSchema.getSchema();
         let sourceId = schema.types.get(type).dataSource.id;
 
+        // Need to filter out any includeds that were invalidated as those need to be re-read
+        if (Array.isArray(doc.included)) {
+          doc.included = doc.included.filter(i => !Object.keys(this._touched).includes(`${i.type}/${i.id}`));
+        }
+
         // intentionally not setting the 'generation', as we dont want external data source
         // triggered invalidation to effect the nonce, which is an internal data source consideration
         let context = this._searchers.createDocumentContext({
