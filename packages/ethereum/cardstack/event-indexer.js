@@ -110,6 +110,9 @@ class EthereumEventIndexer {
       let contractDefinitionForEvent = this.contractDefinitions[contractNameForEvent];
       let contractAddress = contractDefinitionForEvent.address;
 
+      if (event) {
+        event.timestamp = (await this.ethereumClient.getBlock(event.blockNumber, true) || {}).timestamp;
+      }
       let eventModel = event ? generateEventModel(contractNameForEvent, contractAddress, event) : null;
       if (eventModel) {
         let blockheight = await this.ethereumClient.getBlockHeight();
@@ -225,6 +228,7 @@ function generateEventModel(contractName, contractAddress, event) {
   }
   attributes['event-name'] = event.event;
   attributes['block-number'] = event.blockNumber;
+  attributes['timestamp'] = event.timestamp;
   attributes['transaction-hash'] = event.transactionHash;
 
   return {

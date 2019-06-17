@@ -505,6 +505,7 @@ class Updater {
         fields: {
           data: [
             { type: "fields", id: "block-number" },
+            { type: "fields", id: "timestamp" },
             { type: "fields", id: "transaction-hash" },
             { type: "fields", id: "event-name" },
             { type: "fields", id: contractName + "-contract" }

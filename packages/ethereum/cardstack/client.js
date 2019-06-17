@@ -117,12 +117,12 @@ module.exports = class EthereumClient {
     return result;
   }
 
-  async getBlock(blockHeight) {
+  async getBlock(blockHeight, suppressTxns) {
     await this._reconnectPromise;
 
     let result;
     try {
-      result = await this._provider.eth.getBlock(blockHeight, true);
+      result = await this._provider.eth.getBlock(blockHeight, !suppressTxns);
     } catch (err) {
       log.error(`Encountered error trying to get block #${blockHeight}: ${err}`);
       await this._reconnect();
