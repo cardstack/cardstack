@@ -657,6 +657,10 @@ contract('Token Indexing', function (accounts) {
                   },
                   {
                     "type": "fields",
+                    "id": "timestamp"
+                  },
+                  {
+                    "type": "fields",
                     "id": "transaction-hash"
                   },
                   {
@@ -792,6 +796,10 @@ contract('Token Indexing', function (accounts) {
                   {
                     "type": "fields",
                     "id": "block-number"
+                  },
+                  {
+                    "type": "fields",
+                    "id": "timestamp"
                   },
                   {
                     "type": "fields",
@@ -1721,7 +1729,9 @@ contract('Token Indexing', function (accounts) {
         expect(accountTwoLedgerEntry.data.attributes["mapping-number-value"]).to.equal("10", "the token balance is correct");
 
         let transferEvent1 = await env.lookup('hub:searchers').get(env.session, 'local-hub', 'sample-token-transfer-events', transferEvent1Id);
+        expect(transferEvent1.data.attributes.timestamp).to.be.ok;
         delete transferEvent1.data.meta;
+        delete transferEvent1.data.attributes.timestamp;
         toLowercase(transferEvent1, 'data.attributes.transfer-event-from');
         toLowercase(transferEvent1, 'data.attributes.transfer-event-to');
         expect(transferEvent1).to.deep.equal({
