@@ -905,6 +905,10 @@ contract('Token Indexing', function (accounts) {
                   },
                   {
                     "type": "fields",
+                    "id": "timestamp"
+                  },
+                  {
+                    "type": "fields",
                     "id": "transaction-hash"
                   },
                   {
@@ -1025,6 +1029,10 @@ contract('Token Indexing', function (accounts) {
                   },
                   {
                     "type": "fields",
+                    "id": "timestamp"
+                  },
+                  {
+                    "type": "fields",
                     "id": "transaction-hash"
                   },
                   {
@@ -1142,6 +1150,10 @@ contract('Token Indexing', function (accounts) {
                   {
                     "type": "fields",
                     "id": "block-number"
+                  },
+                  {
+                    "type": "fields",
+                    "id": "timestamp"
                   },
                   {
                     "type": "fields",
