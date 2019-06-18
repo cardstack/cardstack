@@ -1,73 +1,21 @@
 import { createHash } from "crypto";
-import { join, dirname } from "path";
+import { join } from "path";
 import { tmpdir } from "os";
 import hashForDep from "hash-for-dep";
 import UI from "console-ui";
 import { Memoize } from "typescript-memoize";
-import { spawnSync, SpawnSyncOptions } from "child_process";
 import {
   ensureDirSync,
   pathExistsSync,
   writeFileSync,
-  mkdirpSync,
   removeSync,
-  readFileSync,
+  copySync
 } from "fs-extra";
-import { rewriteEmberCLIBuild } from "./rewriters";
+import exec from "./utils/exec";
 
 const appName = "cardstack-standard-app";
 
-const ephemeralConfig = `
-module.exports = [
-  {
-    type: 'data-sources',
-    id: 'default',
-    attributes: {
-      'source-type': '@cardstack/ephemeral'
-    }
-  },
-  {
-    type: 'plugin-configs',
-    id: '@cardstack/hub',
-    relationships: {
-      'default-data-source': {
-        data: { type: 'data-sources', id: 'default' }
-      }
-    }
-  }
-];
-`;
-
-const optionalFeatures = `
-{
-  "application-template-wrapper": false,
-  "jquery-integration": true,
-  "template-only-glimmer-components": true
-}
-`;
-
-const routerJS = `
-import EmberRouter from "@ember/routing/router";
-import config from "./config/environment";
-import { cardstackRoutes } from '@cardstack/routing';
-
-const Router = EmberRouter.extend({
-  location: config.locationType,
-  rootURL: config.rootURL
-});
-
-Router.map(cardstackRoutes);
-
-export default Router;
-`;
-
 const cardstackDeps = ["hub", "jsonapi", "ephemeral"];
-const otherDeps = [
-  "@embroider/core",
-  "@embroider/compat",
-  "@embroider/webpack",
-  "@ember/jquery"
-];
 
 interface Options {
   dir: string;
@@ -111,90 +59,45 @@ class Runner {
     this.ensureAppReady();
   }
 
+  // if no app exists yet, copy it from blueprints into temp, and yarn install
   private ensureAppReady() {
     let readyMarker = join(this.appDir, ".cardstack-ready");
     if (!pathExistsSync(readyMarker)) {
       removeSync(this.appDir);
-      this.generateEmberApp();
+      this.applyBlueprints();
       this.installDependencies();
-      this.enhanceApp();
       writeFileSync(readyMarker, "");
     }
   }
 
-  private generateEmberApp() {
-    let ember = require.resolve("ember-cli/bin/ember");
-    let blueprint = dirname(
-      require.resolve("@ember/octane-app-blueprint/package.json")
-    );
-    this.exec(
-      ember,
-      [
-        "new",
-        appName,
-        "--blueprint",
-        blueprint,
-        "--skip-npm",
-        "--skip-git",
-        "--welcome",
-        "false",
-      ],
-      { cwd: this.workDir }
-    );
+  private applyBlueprints() {
+    let blueprints = join(__dirname, "blueprints");
+    copySync(blueprints, this.appDir);
   }
 
   private installDependencies() {
     let yarn = require.resolve("yarn/bin/yarn");
+    // when CARDSTACK_DEV is true, yarn link the Card SDK locally instead of using the published packages
     if (process.env.CARDSTACK_DEV) {
       for (let pkgName of cardstackDeps) {
-        this.exec(yarn, ["link"], { cwd: join(__dirname, "..", pkgName) });
+        exec(yarn, ["link"], { cwd: join(__dirname, "..", pkgName) }, this.ui);
       }
-      this.exec(yarn, ["link", ...cardstackDeps.map(d => `@cardstack/${d}`)], {
-        cwd: this.appDir,
-      });
+      exec(
+        yarn,
+        ["link", ...cardstackDeps.map(d => `@cardstack/${d}`)],
+        {
+          cwd: this.appDir
+        },
+        this.ui
+      );
     }
-    this.exec(
+    exec(
       yarn,
-      [
-        "add",
-        "--dev",
-        ...cardstackDeps.map(d => `@cardstack/${d}`),
-        ...otherDeps,
-      ],
+      ["install"],
       {
-        cwd: this.appDir,
-      }
+        cwd: this.appDir
+      },
+      this.ui
     );
-  }
-
-  private enhanceApp() {
-    mkdirpSync(join(this.appDir, "cardstack", "data-sources"));
-    writeFileSync(
-      join(this.appDir, "cardstack", "data-sources", "ephemeral.js"),
-      ephemeralConfig
-    );
-    writeFileSync(join(this.appDir, "app", "router.js"), routerJS);
-
-    // workaround for https://github.com/ember-cli/ember-octane-blueprint/issues/100
-    writeFileSync(
-      join(this.appDir, "app", "templates", "application.hbs"),
-      "{{#cardstack-edges}}{{outlet}}{{/cardstack-edges}}"
-    );
-
-    let buildFilePath = join(this.appDir, "ember-cli-build.js");
-    writeFileSync(buildFilePath, rewriteEmberCLIBuild(readFileSync(buildFilePath, 'utf8')));
-
-    mkdirpSync(join(this.appDir, "config"));
-    let optionalConfigPath = join(this.appDir, "config", "optional-features.json");
-    writeFileSync(optionalConfigPath, optionalFeatures);
-  }
-
-  private exec(command: string, args: string[], options: SpawnSyncOptions) {
-    let child = spawnSync(command, args, options);
-    if (child.status !== 0) {
-      this.ui.write(child.stdout.toString("utf8"), "INFO");
-      this.ui.write(child.stderr.toString("utf8"), "ERROR");
-      throw new Error(`${command} failed`);
-    }
   }
 }
