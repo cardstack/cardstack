@@ -9,7 +9,7 @@ import {
   pathExistsSync,
   writeFileSync,
   removeSync,
-  copySync,
+  copySync
 } from "fs-extra";
 import exec from "./utils/exec";
 
@@ -82,18 +82,20 @@ class Runner {
       for (let pkgName of cardstackDeps) {
         exec(yarn, ["link"], { cwd: join(__dirname, "..", pkgName) }, this.ui);
       }
-      exec(yarn, ["link", ...cardstackDeps.map(d => `@cardstack/${d}`)], {
-        cwd: this.appDir,
-      },
-      this.ui);
+      exec(
+        yarn,
+        ["link", ...cardstackDeps.map(d => `@cardstack/${d}`)],
+        {
+          cwd: this.appDir
+        },
+        this.ui
+      );
     }
     exec(
       yarn,
-      [
-        "install",
-      ],
+      ["install"],
       {
-        cwd: this.appDir,
+        cwd: this.appDir
       },
       this.ui
     );

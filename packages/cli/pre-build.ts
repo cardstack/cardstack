@@ -11,7 +11,7 @@ import {
   mkdirpSync,
   removeSync,
   readFileSync,
-  copySync,
+  copySync
 } from "fs-extra";
 import { rewriteEmberCLIBuild } from "./rewriters";
 import exec from "./utils/exec";
@@ -109,9 +109,9 @@ class PreBuilder {
   }
 
   private exclude(filepath: string) {
-    if (filepath.includes('node_modules')) {
+    if (filepath.includes("node_modules")) {
       return false;
-    } else if (filepath.includes('.cardstack-ready')) {
+    } else if (filepath.includes(".cardstack-ready")) {
       return false;
     } else {
       return true;
@@ -119,10 +119,12 @@ class PreBuilder {
   }
 
   private copyToBlueprint() {
-    let blueprintsDir = join(this.destDir, 'blueprints');
+    let blueprintsDir = join(this.destDir, "blueprints");
     ensureDirSync(blueprintsDir);
-    copySync(this.appDir, blueprintsDir, {filter: this.exclude});
-    this.ui.writeInfoLine(`Blueprints are now ready for review in ${this.destDir}/blueprints`);
+    copySync(this.appDir, blueprintsDir, { filter: this.exclude });
+    this.ui.writeInfoLine(
+      `Blueprints are now ready for review in ${this.destDir}/blueprints`
+    );
   }
 
   async preBuild() {
@@ -157,7 +159,7 @@ class PreBuilder {
         "--skip-npm",
         "--skip-git",
         "--welcome",
-        "false",
+        "false"
       ],
       { cwd: this.workDir },
       this.ui
@@ -172,10 +174,10 @@ class PreBuilder {
         "add",
         "--dev",
         ...cardstackDeps.map(d => `@cardstack/${d}`),
-        ...otherDeps,
+        ...otherDeps
       ],
       {
-        cwd: this.appDir,
+        cwd: this.appDir
       },
       this.ui
     );
@@ -196,11 +198,17 @@ class PreBuilder {
     );
 
     let buildFilePath = join(this.appDir, "ember-cli-build.js");
-    writeFileSync(buildFilePath, rewriteEmberCLIBuild(readFileSync(buildFilePath, 'utf8')));
+    writeFileSync(
+      buildFilePath,
+      rewriteEmberCLIBuild(readFileSync(buildFilePath, "utf8"))
+    );
 
     mkdirpSync(join(this.appDir, "config"));
-    let optionalConfigPath = join(this.appDir, "config", "optional-features.json");
+    let optionalConfigPath = join(
+      this.appDir,
+      "config",
+      "optional-features.json"
+    );
     writeFileSync(optionalConfigPath, optionalFeatures);
   }
 }
-
