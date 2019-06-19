@@ -1,5 +1,6 @@
 const SampleToken = artifacts.require("./SampleToken.sol");
 const Oracle = artifacts.require("./TokenOracle.sol");
+const ServiceRegistry = artifacts.require("./ServiceRegistry.sol");
 const Web3 = require('web3');
 const {
   createDefaultEnvironment,
@@ -11,6 +12,7 @@ const { set, get } = require('lodash');
 
 const contractName = 'sample-token';
 const oracleContractName = 'oracle';
+const serviceRegistryName = 'service-registry';
 const NULL_ADDRESS = '0x0000000000000000000000000000000000000000';
 let eventIndexer, ethereumClient, env;
 
@@ -24,7 +26,7 @@ async function waitForEthereumEvents(indexer) {
   await indexer._indexingPromise;
 }
 
-contract('Token Indexing', function (accounts) {
+contract.only('Token Indexing', function (accounts) {
   let accountOne = accounts[0].toLowerCase();
   let accountTwo = accounts[1].toLowerCase();
   let accountThree = accounts[2].toLowerCase();
@@ -70,12 +72,13 @@ contract('Token Indexing', function (accounts) {
 
   describe('@cardstack/ethereum - contracts', function () {
     describe('ethereum-indexer', function () {
-      let dataSource, token, oracle, oracleDataSource;
+      let dataSource, token, oracle, oracleDataSource, serviceRegistry, serviceRegistryDataSource;
 
       async function setup() {
         let factory = new JSONAPIFactory();
         token = await SampleToken.new();
         oracle = await Oracle.new();
+        serviceRegistry = await ServiceRegistry.new();
         await token.fund({ value: web3.toWei(0.01, 'ether'), from: accountOne });
 
         dataSource = factory.addResource('data-sources', contractName)
@@ -107,6 +110,28 @@ contract('Token Indexing', function (accounts) {
                 address: oracle.address,
                 eventContentTriggers: {
                   TokenAdded: ['oracle-tokens', 'oracle-tokens-by-symbols'],
+                }
+              }
+            },
+          });
+
+        serviceRegistryDataSource = factory.addResource('data-sources', serviceRegistryName)
+          .withAttributes({
+            'source-type': '@cardstack/ethereum',
+            params: {
+              jsonRpcUrls: [ "ws://localhost:7545" ],
+              contract: {
+                abi: serviceRegistry.abi,
+                address: serviceRegistry.address,
+                eventContentTriggers: {
+                  Registered: [
+                    'service-registry-is-active-service-provider-by-userids',
+                    'service-registry-is-active-service-provider-by-service-providers'
+                  ],
+                  Unregistered: [
+                    'service-registry-is-active-service-provider-by-userids',
+                    'service-registry-is-active-service-provider-by-service-providers'
+                  ]
                 }
               }
             },
@@ -1623,6 +1648,201 @@ contract('Token Indexing', function (accounts) {
             },
             "meta": {
               "source": oracleContractName
+            }
+          }
+        });
+
+      });
+
+      it('generates schema for contracts that have 2 dimensional mappings (view functions with 2 params)', async function() {
+        let schema = await env.lookup('hub:searchers').get(env.session, 'local-hub', 'content-types', 'service-registry-is-active-service-provider-by-userids');
+        expect(schema).to.deep.equal({
+          "data": {
+            "type": "content-types",
+            "id": "service-registry-is-active-service-provider-by-userids",
+            "relationships": {
+              "fields": {
+                "data": [
+                  {
+                    "id": "service-registry-contract",
+                    "type": "fields"
+                  },
+                  {
+                    "type": "fields",
+                    "id": "is-active-service-provider-service-providers"
+                  },
+                  {
+                    "type": "fields",
+                    "id": "service-registry-registered-events",
+                  },
+                  {
+                    "type": "fields",
+                    "id": "service-registry-unregistered-events",
+                  },
+                ]
+              },
+              "data-source": {
+                "data": {
+                  "type": "data-sources",
+                  "id": serviceRegistryDataSource.id
+                }
+              }
+            },
+            "meta": {
+              "source": serviceRegistryName
+            }
+          }
+        });
+
+        schema = await env.lookup('hub:searchers').get(env.session, 'local-hub', 'content-types', 'service-registry-is-active-service-provider-service-providers');
+        expect(schema).to.deep.equal({
+          "data": {
+            "type": "content-types",
+            "id": "service-registry-is-active-service-provider-service-providers",
+            "relationships": {
+              "fields": {
+                "data": [
+                  {
+                    "type": "fields",
+                    "id": "ethereum-address"
+                  },
+                  {
+                    "id": "service-registry-contract",
+                    "type": "fields"
+                  },
+                  {
+                    "type": "fields",
+                    "id": "mapping-boolean-value"
+                  },
+                  {
+                    "type": "fields",
+                    "id": "service-registry-registered-events",
+                  },
+                  {
+                    "type": "fields",
+                    "id": "service-registry-unregistered-events",
+                  },
+                ]
+              },
+              "data-source": {
+                "data": {
+                  "type": "data-sources",
+                  "id": serviceRegistryDataSource.id
+                }
+              }
+            },
+            "meta": {
+              "source": serviceRegistryName
+            }
+          }
+        });
+
+        schema = await env.lookup('hub:searchers').get(env.session, 'local-hub', 'content-types', 'service-registry-is-active-service-provider-by-service-providers');
+        expect(schema).to.deep.equal({
+          "data": {
+            "type": "content-types",
+            "id": "service-registry-is-active-service-provider-by-service-providers",
+            "relationships": {
+              "fields": {
+                "data": [
+                  {
+                    "type": "fields",
+                    "id": "ethereum-address"
+                  },
+                  {
+                    "id": "service-registry-contract",
+                    "type": "fields"
+                  },
+                  {
+                    "type": "fields",
+                    "id": "is-active-service-provider-userids"
+                  },
+                  {
+                    "type": "fields",
+                    "id": "service-registry-registered-events",
+                  },
+                  {
+                    "type": "fields",
+                    "id": "service-registry-unregistered-events",
+                  },
+                ]
+              },
+              "data-source": {
+                "data": {
+                  "type": "data-sources",
+                  "id": serviceRegistryDataSource.id
+                }
+              }
+            },
+            "meta": {
+              "source": serviceRegistryName
+            }
+          }
+        });
+
+        schema = await env.lookup('hub:searchers').get(env.session, 'local-hub', 'content-types', 'service-registry-is-active-service-provider-userids');
+        expect(schema).to.deep.equal({
+          "data": {
+            "type": "content-types",
+            "id": "service-registry-is-active-service-provider-userids",
+            "relationships": {
+              "fields": {
+                "data": [
+                  {
+                    "id": "service-registry-contract",
+                    "type": "fields"
+                  },
+                  {
+                    "type": "fields",
+                    "id": "mapping-boolean-value"
+                  },
+                  {
+                    "type": "fields",
+                    "id": "service-registry-registered-events",
+                  },
+                  {
+                    "type": "fields",
+                    "id": "service-registry-unregistered-events",
+                  },
+                ]
+              },
+              "data-source": {
+                "data": {
+                  "type": "data-sources",
+                  "id": serviceRegistryDataSource.id
+                }
+              }
+            },
+            "meta": {
+              "source": serviceRegistryName
+            }
+          }
+        });
+
+        schema = await env.lookup('hub:searchers').get(env.session, 'local-hub', 'fields', 'is-active-service-provider-service-providers');
+        expect(schema).to.deep.equal({
+          "data": {
+            "type": "fields",
+            "id": "is-active-service-provider-service-providers",
+            "attributes": {
+              "field-type": "@cardstack/core-types::has-many"
+            },
+            "meta": {
+              "source": serviceRegistryName
+            }
+          }
+        });
+
+        schema = await env.lookup('hub:searchers').get(env.session, 'local-hub', 'fields', 'is-active-service-provider-userids');
+        expect(schema).to.deep.equal({
+          "data": {
+            "type": "fields",
+            "id": "is-active-service-provider-userids",
+            "attributes": {
+              "field-type": "@cardstack/core-types::has-many"
+            },
+            "meta": {
+              "source": serviceRegistryName
             }
           }
         });

@@ -147,7 +147,7 @@ class EthereumEventIndexer {
         let methodAbiEntry = contractDefinition["abi"].find(item => item.type === 'function' &&
           item.constant &&
           item.name === methodName);
-        let fieldInfo = fieldTypeFor(contractName, methodAbiEntry);
+        let fieldInfo = fieldTypeFor(methodAbiEntry);
         if (!fieldInfo) { continue; }
 
         let { isMapping, fields, mappingKeyType } = fieldInfo;
