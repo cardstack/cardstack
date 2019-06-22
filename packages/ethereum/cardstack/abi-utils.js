@@ -1,6 +1,6 @@
 const Ember = require('ember-source/dist/ember.debug');
 const { dasherize } = Ember.String;
-const { pluralize } = require('inflection');
+const { pluralize, singularize } = require('inflection');
 
 function solidityTypeToInternalType(type) {
   switch(type) {
@@ -27,18 +27,19 @@ function fieldTypeFor(abiItem) {
       (abiItem.type === 'function' && !abiItem.outputs) ||
       (abiItem.type === 'function' && !abiItem.outputs.length)) { return; }
 
+  let { inputs } = abiItem;
   if (abiItem.type === 'event') {
     let isNamedField = true;
     return {
       isEvent: true,
-      fields: abiItem.inputs.map(input => {
+      fields: inputs.map(input => {
         let type = solidityTypeToInternalType(input.type);
         let name = `${dasherize(abiItem.name)}-event-${dasherize(input.name.replace(/^_/, ''))}`;
 
         return { name, type, isNamedField };
       })
     };
-  } else if (!abiItem.inputs.length) {
+  } else if (!inputs.length) {
     // We are not handling multiple return types for non-mapping functions
     // unclear what that would actually look like in the schema...
     switch(abiItem.outputs[0].type) {
@@ -59,36 +60,43 @@ function fieldTypeFor(abiItem) {
         return { fields: [{ type: '@cardstack/core-types::boolean' }]};
     }
   // deal with just mappings that use address and bytes32 as a key for now
-  } else if (abiItem.inputs.length === 1 && ['address', 'bytes32'].includes(abiItem.inputs[0].type)) {
+  } else if (inputs.length === 1 && ['address', 'bytes32'].includes(inputs[0].type)) {
     return {
       isMapping: true,
-      mappingKeyType: abiItem.inputs[0].type,
+      mappingKeyType: inputs[0].type,
       fields: fieldsForMapping(abiItem)
     };
   // deal with only indexing has-many type relationships when there are 2 inputs and they have different types for now
-  } else if (abiItem.inputs.length === 2 &&
-    abiItem.inputs[0].type !== abiItem.inputs[1].type &&
-    abiItem.inputs.map(i => i.type).every(i => ['address', 'bytes32'].includes(i))) {
-    let fieldInfo = { hasMany: {} };
+  } else if (inputs.length === 2 &&
+    inputs[0].type !== inputs[1].type &&
+    inputs.map(i => i.type).every(i => ['address', 'bytes32'].includes(i))) {
+    let inputNames = inputs.map(i => i.name || i.type);
+    let childContentType = `${dasherize(abiItem.name)}-${dasherize(inputNames[0].replace(/^_/, ''))}-${dasherize(inputNames[1].replace(/^_/, ''))}-entries`;
+    let fieldInfo = {
+      hasMany: {},
+      childField: {
+        contentType: childContentType,
+        fields: fieldsForMapping(abiItem)
+      }
+    };
 
-    for (let index = 0; index < 2; index++) {
-      let input = abiItem.inputs[index];
+    for (let input of inputs) {
       let inputName = input.name || input.type;
-      let otherField = abiItem.inputs[(index + 1) % 2];
-      let otherName = otherField.name || otherField.type;
-      let otherChildContentType = `${dasherize(abiItem.name)}-${pluralize(dasherize(otherName.replace(/^_/, '')))}`;
       let inputContentType = `${dasherize(abiItem.name)}-by-${pluralize(dasherize(inputName.replace(/^_/, '')))}`;
-
       fieldInfo.hasMany[inputName] = {
         mappingKeyType: input.type,
-        thisContentType: inputContentType,
-        fields: fieldsForMapping(abiItem).concat([{
-          mappingKeyType: otherField.type,
-          name: otherChildContentType,
+        contentType: inputContentType,
+        fields: [{
+          name: childContentType,
           type: 'has-many',
           isNamedField: true
-        }])
+        }]
       };
+      fieldInfo.childField.fields.push({
+        name: singularize(inputContentType),
+        type: 'belongs-to',
+        isNamedField: true
+      });
     }
     return fieldInfo;
   }

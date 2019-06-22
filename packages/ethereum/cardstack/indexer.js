@@ -439,6 +439,9 @@ class Updater {
       case 'has-many':
         fieldType = '@cardstack/core-types::has-many';
         break;
+      case 'belongs-to':
+        fieldType = '@cardstack/core-types::belongs-to';
+        break;
       case 'address':
         fieldType = '@cardstack/core-types::case-insensitive';
         break;
@@ -497,67 +500,60 @@ class Updater {
     return mapping;
   }
 
-  _hasManyContentTypesFor(contractName, hasManyInfo, eventContentTriggers) {
-    let types = [];
-    for (let key of Object.keys(hasManyInfo)){
-      let { fields, mappingKeyType, thisContentType } = hasManyInfo[key];
+  _hasManyContentTypesFor(contractName, hasManyInfo, childField, eventContentTriggers) {
+    let { fields:childsFields, contentType: childTypeName } = childField;
+    let childContentType = pluralize(`${contractName}-${childTypeName}`);
+    let types = [{
+      type: "content-types",
+      id: childContentType,
+      relationships: {
+        fields: {
+          data: [
+            { type: "fields", id: contractName + "-contract" }
+          ].concat(childsFields.map(field => {
+            return { type: "fields", id: field.name };
+          }))
+        },
+        'data-source': {
+          data: { type: 'data-sources', id: this.dataSourceId.toString() }
+        }
+      }
+    }];
 
-      let parentsFields = fields.filter(f => f.type === 'has-many');
-      let parentContentType = pluralize(`${contractName}-${thisContentType}`);
+    for (let key of Object.keys(hasManyInfo)){
+      let { fields, mappingKeyType, contentType } = hasManyInfo[key];
+      let [ childRelationship ] = fields;
+      let parentContentType = pluralize(`${contractName}-${contentType}`);
       let parentType = {
         type: "content-types",
         id: parentContentType,
         relationships: {
           fields: {
             data: [
-              { type: "fields", id: contractName + "-contract" }
-            ].concat(parentsFields.map(field => {
-              return { type: "fields", id: field.name };
-            }))
+              { type: "fields", id: contractName + "-contract" },
+              { type: "fields", id: childRelationship.name }
+            ]
           },
           'data-source': {
             data: { type: 'data-sources', id: this.dataSourceId.toString() }
           }
         }
       };
+
       if (mappingKeyType === 'address') {
         parentType.relationships.fields.data.unshift({ type: "fields", id: "ethereum-address" });
       }
-      types.push(parentType);
-
-      let { name:childName, mappingKeyType:childMappingKeyType } = fields.find(f => f.type === 'has-many');
-      let childsFields = fields.filter(f => f.type !== 'has-many');
-      let childContentType = pluralize(`${contractName}-${childName}`);
-      let childType = {
-        type: "content-types",
-        id: childContentType,
-        relationships: {
-          fields: {
-            data: [
-              { type: "fields", id: contractName + "-contract" }
-            ].concat(childsFields.map(field => {
-              return { type: "fields", id: field.name };
-            }))
-          },
-          'data-source': {
-            data: { type: 'data-sources', id: this.dataSourceId.toString() }
-          }
-        }
-      };
-
-      if (childMappingKeyType === 'address') {
-        childType.relationships.fields.data.unshift({ type: "fields", id: "ethereum-address" });
-      }
-      types.push(childType);
 
       for (let event of Object.keys(eventContentTriggers)) {
         let eventContentTypes = eventContentTriggers[event];
-        if (eventContentTypes.includes(parentContentType)) {
+        if (eventContentTypes.includes(parentContentType) &&
+          !eventContentTypes.includes(childContentType)) {
           eventContentTypes.push(childContentType);
         }
       }
-
+      types.push(parentType);
     }
+
     return types;
   }
 
@@ -613,7 +609,7 @@ class Updater {
         let fieldInfo = fieldTypeFor(item);
         if (!fieldInfo) { return; }
 
-        let { isEvent, hasMany, isMapping, fields, mappingKeyType } = fieldInfo;
+        let { isEvent, hasMany, isMapping, fields, mappingKeyType, childField } = fieldInfo;
         if (!isMapping && !isEvent && !hasMany && fields.length === 1) {
           contractFields.push({
             type: "fields",
@@ -624,13 +620,14 @@ class Updater {
         }
 
         if (hasMany) {
-          let schemaModels = this._hasManyContentTypesFor(contractName, fieldInfo.hasMany, eventContentTriggers);
+          let schemaModels = this._hasManyContentTypesFor(contractName, fieldInfo.hasMany, childField, eventContentTriggers);
           schemaItems = schemaItems.concat(schemaModels);
 
           fields = [];
           for (let key of Object.keys(hasMany)) {
             fields = fields.concat(hasMany[key].fields);
           }
+          fields = fields.concat(childField.fields);
           fields = uniqBy(fields, 'name');
         }
 

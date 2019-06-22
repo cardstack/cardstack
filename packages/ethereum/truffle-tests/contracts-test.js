@@ -26,7 +26,7 @@ async function waitForEthereumEvents(indexer) {
   await indexer._indexingPromise;
 }
 
-contract.only('Token Indexing', function (accounts) {
+contract('Token Indexing', function (accounts) {
   let accountOne = accounts[0].toLowerCase();
   let accountTwo = accounts[1].toLowerCase();
   let accountThree = accounts[2].toLowerCase();
@@ -1669,7 +1669,7 @@ contract.only('Token Indexing', function (accounts) {
                   },
                   {
                     "type": "fields",
-                    "id": "is-active-service-provider-service-providers"
+                    "id": "is-active-service-provider-userid-service-provider-entries"
                   },
                   {
                     "type": "fields",
@@ -1694,18 +1694,14 @@ contract.only('Token Indexing', function (accounts) {
           }
         });
 
-        schema = await env.lookup('hub:searchers').get(env.session, 'local-hub', 'content-types', 'service-registry-is-active-service-provider-service-providers');
+        schema = await env.lookup('hub:searchers').get(env.session, 'local-hub', 'content-types', 'service-registry-is-active-service-provider-userid-service-provider-entries');
         expect(schema).to.deep.equal({
           "data": {
             "type": "content-types",
-            "id": "service-registry-is-active-service-provider-service-providers",
+            "id": "service-registry-is-active-service-provider-userid-service-provider-entries",
             "relationships": {
               "fields": {
                 "data": [
-                  {
-                    "type": "fields",
-                    "id": "ethereum-address"
-                  },
                   {
                     "id": "service-registry-contract",
                     "type": "fields"
@@ -1713,6 +1709,14 @@ contract.only('Token Indexing', function (accounts) {
                   {
                     "type": "fields",
                     "id": "mapping-boolean-value"
+                  },
+                  {
+                    "type": "fields",
+                    "id": "is-active-service-provider-by-userid"
+                  },
+                  {
+                    "type": "fields",
+                    "id": "is-active-service-provider-by-service-provider"
                   },
                   {
                     "type": "fields",
@@ -1755,7 +1759,7 @@ contract.only('Token Indexing', function (accounts) {
                   },
                   {
                     "type": "fields",
-                    "id": "is-active-service-provider-userids"
+                    "id": "is-active-service-provider-userid-service-provider-entries"
                   },
                   {
                     "type": "fields",
@@ -1780,50 +1784,11 @@ contract.only('Token Indexing', function (accounts) {
           }
         });
 
-        schema = await env.lookup('hub:searchers').get(env.session, 'local-hub', 'content-types', 'service-registry-is-active-service-provider-userids');
-        expect(schema).to.deep.equal({
-          "data": {
-            "type": "content-types",
-            "id": "service-registry-is-active-service-provider-userids",
-            "relationships": {
-              "fields": {
-                "data": [
-                  {
-                    "id": "service-registry-contract",
-                    "type": "fields"
-                  },
-                  {
-                    "type": "fields",
-                    "id": "mapping-boolean-value"
-                  },
-                  {
-                    "type": "fields",
-                    "id": "service-registry-registered-events",
-                  },
-                  {
-                    "type": "fields",
-                    "id": "service-registry-unregistered-events",
-                  },
-                ]
-              },
-              "data-source": {
-                "data": {
-                  "type": "data-sources",
-                  "id": serviceRegistryDataSource.id
-                }
-              }
-            },
-            "meta": {
-              "source": serviceRegistryName
-            }
-          }
-        });
-
-        schema = await env.lookup('hub:searchers').get(env.session, 'local-hub', 'fields', 'is-active-service-provider-service-providers');
+        schema = await env.lookup('hub:searchers').get(env.session, 'local-hub', 'fields', 'is-active-service-provider-userid-service-provider-entries');
         expect(schema).to.deep.equal({
           "data": {
             "type": "fields",
-            "id": "is-active-service-provider-service-providers",
+            "id": "is-active-service-provider-userid-service-provider-entries",
             "attributes": {
               "field-type": "@cardstack/core-types::has-many"
             },
@@ -1833,13 +1798,27 @@ contract.only('Token Indexing', function (accounts) {
           }
         });
 
-        schema = await env.lookup('hub:searchers').get(env.session, 'local-hub', 'fields', 'is-active-service-provider-userids');
+        schema = await env.lookup('hub:searchers').get(env.session, 'local-hub', 'fields', 'is-active-service-provider-by-userid');
         expect(schema).to.deep.equal({
           "data": {
             "type": "fields",
-            "id": "is-active-service-provider-userids",
+            "id": "is-active-service-provider-by-userid",
             "attributes": {
-              "field-type": "@cardstack/core-types::has-many"
+              "field-type": "@cardstack/core-types::belongs-to"
+            },
+            "meta": {
+              "source": serviceRegistryName
+            }
+          }
+        });
+
+        schema = await env.lookup('hub:searchers').get(env.session, 'local-hub', 'fields', 'is-active-service-provider-by-service-provider');
+        expect(schema).to.deep.equal({
+          "data": {
+            "type": "fields",
+            "id": "is-active-service-provider-by-service-provider",
+            "attributes": {
+              "field-type": "@cardstack/core-types::belongs-to"
             },
             "meta": {
               "source": serviceRegistryName
@@ -2150,6 +2129,315 @@ contract.only('Token Indexing', function (accounts) {
         document = await env.lookup('hub:searchers').get(env.session, 'local-hub', 'oracle-tokens', tokenAddress);
         expect(document.data.id).to.be.ok;
       });
+
+      it('can index a 2 dimensional mapping -- a view function with a bytes32 param and an address param', async function() {
+        const userid1 = '0x92cda58b6a66c31402cd29c65c4965c45a9cd9060dd7ada86fda6b11f2f68d06';
+        const userid2 = '0xb71c4078a716d234ca51cc21361202a017824277d9dbeaef79320d39f5acfbbe';
+        const serviceProvider1 = '0x0F4F2Ac550A1b4e2280d04c21cEa7EBD822934b5';
+        const serviceProvider2 = '0xa4A8C40CF200e548305001B9Af9965722c70C6AD';
+        const serviceProvider3 = '0xA4f7E95205ac2e79b85528a0B63587bD1d5Eff78';
+
+        let { tx:tx1, logs:[{ logIndex:logIndex1 }] } = await serviceRegistry.registerServiceProvider(userid1, serviceProvider1);
+        let { tx:tx2, logs:[{ logIndex:logIndex2 }] } = await serviceRegistry.registerServiceProvider(userid1, serviceProvider2);
+        let { tx:tx3, logs:[{ logIndex:logIndex3 }] } = await serviceRegistry.registerServiceProvider(userid1, serviceProvider3);
+        let { tx:tx4, logs:[{ logIndex:logIndex4 }] } = await serviceRegistry.unregisterServiceProvider(userid1, serviceProvider3);
+        let { tx:tx5, logs:[{ logIndex:logIndex5 }] } = await serviceRegistry.registerServiceProvider(userid2, serviceProvider1);
+
+        await waitForEthereumEvents(eventIndexer);
+
+        let document = await env.lookup('hub:searchers').get(env.session, 'local-hub', 'service-registry-is-active-service-provider-by-userids', userid1);
+        expect(document.data.meta.blockheight).to.be.ok;
+        delete document.data.meta.blockheight;
+        expect(document).to.deep.equal({
+          "data": {
+            "id": userid1,
+            "type": "service-registry-is-active-service-provider-by-userids",
+            "relationships": {
+              "is-active-service-provider-userid-service-provider-entries": {
+                "data": [
+                  {
+                    "type": "service-registry-is-active-service-provider-userid-service-provider-entries",
+                    "id": `${userid1}_${serviceProvider1}`.toLowerCase()
+                  },
+                  {
+                    "type": "service-registry-is-active-service-provider-userid-service-provider-entries",
+                    "id": `${userid1}_${serviceProvider2}`.toLowerCase()
+                  },
+                  {
+                    "type": "service-registry-is-active-service-provider-userid-service-provider-entries",
+                    "id": `${userid1}_${serviceProvider3}`.toLowerCase()
+                  },
+                ]
+              },
+              "service-registry-contract": {
+                "data": {
+                  "id": serviceRegistry.address,
+                  "type": "service-registries"
+                }
+              },
+              "service-registry-registered-events": {
+                "data": [
+                  {
+                    "id": `${tx1}_${logIndex1}`,
+                    "type": "service-registry-registered-events"
+                  },
+                  {
+                    "id": `${tx2}_${logIndex2}`,
+                    "type": "service-registry-registered-events"
+                  },
+                  {
+                    "id": `${tx3}_${logIndex3}`,
+                    "type": "service-registry-registered-events"
+                  }
+                ]
+              },
+              "service-registry-unregistered-events": {
+                "data": [
+                  {
+                    "id": `${tx4}_${logIndex4}`,
+                    "type": "service-registry-unregistered-events"
+                  }
+                ]
+              }
+            },
+            "meta": {
+              "contractName": serviceRegistryName,
+              "source": serviceRegistryName
+            },
+          }
+        });
+
+        document = await env.lookup('hub:searchers').get(env.session, 'local-hub', 'service-registry-is-active-service-provider-by-userids', userid2);
+        expect(document.data.meta.blockheight).to.be.ok;
+        delete document.data.meta.blockheight;
+        expect(document).to.deep.equal({
+          "data": {
+            "id": userid2,
+            "type": "service-registry-is-active-service-provider-by-userids",
+            "relationships": {
+              "is-active-service-provider-userid-service-provider-entries": {
+                "data": [
+                  {
+                    "type": "service-registry-is-active-service-provider-userid-service-provider-entries",
+                    "id": `${userid2}_${serviceProvider1}`.toLowerCase()
+                  },
+                ]
+              },
+              "service-registry-contract": {
+                "data": {
+                  "id": serviceRegistry.address,
+                  "type": "service-registries"
+                }
+              },
+              "service-registry-registered-events": {
+                "data": [
+                  {
+                    "id": `${tx5}_${logIndex5}`,
+                    "type": "service-registry-registered-events"
+                  },
+                ]
+              },
+            },
+            "meta": {
+              "contractName": serviceRegistryName,
+              "source": serviceRegistryName
+            },
+          }
+        });
+
+        document = await env.lookup('hub:searchers').get(env.session, 'local-hub', 'service-registry-is-active-service-provider-by-service-providers', serviceProvider1.toLowerCase());
+        expect(document.data.meta.blockheight).to.be.ok;
+        delete document.data.meta.blockheight;
+        expect(document).to.deep.equal({
+          "data": {
+            "id": serviceProvider1.toLowerCase(),
+            "type": "service-registry-is-active-service-provider-by-service-providers",
+            "attributes": {
+              "ethereum-address": serviceProvider1
+            },
+            "relationships": {
+              "is-active-service-provider-userid-service-provider-entries": {
+                "data": [
+                  {
+                    "type": "service-registry-is-active-service-provider-userid-service-provider-entries",
+                    "id": `${userid1}_${serviceProvider1}`.toLowerCase()
+                  },
+                  {
+                    "type": "service-registry-is-active-service-provider-userid-service-provider-entries",
+                    "id": `${userid2}_${serviceProvider1}`.toLowerCase()
+                  },
+                ]
+              },
+              "service-registry-contract": {
+                "data": {
+                  "id": serviceRegistry.address,
+                  "type": "service-registries"
+                }
+              },
+              "service-registry-registered-events": {
+                "data": [
+                  {
+                    "id": `${tx1}_${logIndex1}`,
+                    "type": "service-registry-registered-events"
+                  },
+                  {
+                    "id": `${tx5}_${logIndex5}`,
+                    "type": "service-registry-registered-events"
+                  },
+                ]
+              },
+            },
+            "meta": {
+              "contractName": serviceRegistryName,
+              "source": serviceRegistryName
+            },
+          }
+        });
+
+        document = await env.lookup('hub:searchers').get(env.session, 'local-hub', "service-registry-is-active-service-provider-userid-service-provider-entries", `${userid1}_${serviceProvider3}`.toLowerCase(), userid1);
+        expect(document.data.meta.blockheight).to.be.ok;
+        delete document.data.meta.blockheight;
+        expect(document).to.deep.equal({
+          "data": {
+            "id": `${userid1}_${serviceProvider3}`.toLowerCase(),
+            "type": "service-registry-is-active-service-provider-userid-service-provider-entries",
+            "attributes": {
+              "mapping-boolean-value": false
+            },
+            "relationships": {
+              "is-active-service-provider-by-service-provider": {
+                "data": {
+                  "type": "service-registry-is-active-service-provider-by-service-providers",
+                  "id": serviceProvider3.toLowerCase()
+                },
+              },
+              "is-active-service-provider-by-userid": {
+                "data": {
+                  "type": "service-registry-is-active-service-provider-by-userids",
+                  "id": userid1
+                },
+              },
+              "service-registry-contract": {
+                "data": {
+                  "id": serviceRegistry.address,
+                  "type": "service-registries"
+                }
+              },
+              "service-registry-registered-events": {
+                "data": [
+                  {
+                    "id": `${tx3}_${logIndex3}`,
+                    "type": "service-registry-registered-events"
+                  },
+                ]
+              },
+              "service-registry-unregistered-events": {
+                "data": [
+                  {
+                    "id": `${tx4}_${logIndex4}`,
+                    "type": "service-registry-unregistered-events"
+                  },
+                ]
+              },
+            },
+            "meta": {
+              "contractName": serviceRegistryName,
+              "source": serviceRegistryName
+            },
+          }
+        });
+
+        document = await env.lookup('hub:searchers').get(env.session, 'local-hub', "service-registry-is-active-service-provider-userid-service-provider-entries", `${userid1}_${serviceProvider1}`.toLowerCase(), userid1);
+        expect(document.data.meta.blockheight).to.be.ok;
+        delete document.data.meta.blockheight;
+        expect(document).to.deep.equal({
+          "data": {
+            "id": `${userid1}_${serviceProvider1}`.toLowerCase(),
+            "type": "service-registry-is-active-service-provider-userid-service-provider-entries",
+            "attributes": {
+              "mapping-boolean-value": true
+            },
+            "relationships": {
+              "is-active-service-provider-by-service-provider": {
+                "data": {
+                  "type": "service-registry-is-active-service-provider-by-service-providers",
+                  "id": serviceProvider1.toLowerCase()
+                },
+              },
+              "is-active-service-provider-by-userid": {
+                "data": {
+                  "type": "service-registry-is-active-service-provider-by-userids",
+                  "id": userid1
+                },
+              },
+              "service-registry-contract": {
+                "data": {
+                  "id": serviceRegistry.address,
+                  "type": "service-registries"
+                }
+              },
+              "service-registry-registered-events": {
+                "data": [
+                  {
+                    "id": `${tx1}_${logIndex1}`,
+                    "type": "service-registry-registered-events"
+                  },
+                ]
+              },
+            },
+            "meta": {
+              "contractName": serviceRegistryName,
+              "source": serviceRegistryName
+            },
+          }
+        });
+
+        document = await env.lookup('hub:searchers').get(env.session, 'local-hub', "service-registry-is-active-service-provider-userid-service-provider-entries", `${userid2}_${serviceProvider1}`.toLowerCase(), userid1);
+        expect(document.data.meta.blockheight).to.be.ok;
+        delete document.data.meta.blockheight;
+        expect(document).to.deep.equal({
+          "data": {
+            "id": `${userid2}_${serviceProvider1}`.toLowerCase(),
+            "type": "service-registry-is-active-service-provider-userid-service-provider-entries",
+            "attributes": {
+              "mapping-boolean-value": true
+            },
+            "relationships": {
+              "is-active-service-provider-by-service-provider": {
+                "data": {
+                  "type": "service-registry-is-active-service-provider-by-service-providers",
+                  "id": serviceProvider1.toLowerCase()
+                },
+              },
+              "is-active-service-provider-by-userid": {
+                "data": {
+                  "type": "service-registry-is-active-service-provider-by-userids",
+                  "id": userid2
+                },
+              },
+              "service-registry-contract": {
+                "data": {
+                  "id": serviceRegistry.address,
+                  "type": "service-registries"
+                }
+              },
+              "service-registry-registered-events": {
+                "data": [
+                  {
+                    "id": `${tx5}_${logIndex5}`,
+                    "type": "service-registry-registered-events"
+                  },
+                ]
+              },
+            },
+            "meta": {
+              "contractName": serviceRegistryName,
+              "source": serviceRegistryName
+            },
+          }
+        });
+      });
+
     });
 
     describe('ethereum-indexer event triggers', function () {

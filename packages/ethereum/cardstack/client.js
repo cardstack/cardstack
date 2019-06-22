@@ -238,15 +238,14 @@ module.exports = class EthereumClient {
     });
   }
 
-  async callContractMethod(contract, methodName, arg) {
+  async callContractMethod(contract, methodName, ...args) {
     let result;
     if (!contract || !methodName || typeof contract.methods[methodName] !== 'function') { return; }
 
     try {
-      result = arg == null ? await contract.methods[methodName]().call() :
-                             await contract.methods[methodName](arg).call();
+      result = await contract.methods[methodName](...args).call();
     } catch (err) {
-      log.error(`Encountered error invoking contract method name '${methodName}'${arg != null ? " with parameter '" + arg + "'" : ''}. ${err}`);
+      log.error(`Encountered error invoking contract method name '${methodName}'${args.length ? " with args '" + args.join(',') + "'" : ''}. ${err}`);
       await this._reconnect();
     }
     return result;
@@ -316,39 +315,38 @@ module.exports = class EthereumClient {
     if (!contentType) { return; }
 
     let contractNameRegex = new RegExp(`^${contractName}-`);
-    let dasherizedMethod = contentType.replace(contractNameRegex, '');
-    let method = camelize(dasherizedMethod);
+    let contentTypesToTry = [contentType, contentType.split('-by-')[0]];
+    for (let type of contentTypesToTry) {
+      let dasherizedMethod = type.replace(contractNameRegex, '');
+      let method = camelize(dasherizedMethod);
 
-    if (!this._contracts[contractName]) {
-      throw new Error(`cannot find contract provider with contractName: ${contractName} that will be used to access data for ${contentType}`);
+      if (!this._contracts[contractName]) {
+        throw new Error(`cannot find contract provider with contractName: ${contractName} that will be used to access data for ${type}`);
+      }
+
+      let aContract = this._contracts[contractName];
+      if (typeof aContract.methods[method] === 'function') {
+        return method;
+      } else if (typeof aContract.methods[singularize(method)] === 'function') {
+        return singularize(method);
+      } else if (typeof aContract.methods[capitalize(method)] === 'function') {
+        return capitalize(method);
+      } else if (typeof aContract.methods[singularize(capitalize(method))] === 'function') {
+        return singularize(capitalize(method));
+      }
     }
-
-    let aContract = this._contracts[contractName];
-    let methodName;
-    if (typeof aContract.methods[method] === 'function') {
-      methodName = method;
-    } else if (typeof aContract.methods[singularize(method)] === 'function') {
-      methodName = singularize(method);
-    } else if (typeof aContract.methods[capitalize(method)] === 'function') {
-      methodName = capitalize(method);
-    } else if (typeof aContract.methods[singularize(capitalize(method))] === 'function') {
-      methodName = singularize(capitalize(method));
-    }
-
-    return methodName;
   }
 
-  async getContractInfoForIdentifier({ id, type, contractName}) {
-    log.debug(`getting contract data for id: ${id}, type: ${type}, contractName: ${contractName}`);
-    if (!type || !id) { return; }
+  async getContractInfoForArgs(contractName, type, ...args) {
+    log.debug(`getting contract data for args: ${args.join(',')}, type: ${type}, contractName: ${contractName}`);
+    if (!type || !args.length) { return; }
 
     await this._reconnectPromise;
 
     let methodName = this.contentTypeToContractMethod(type, contractName);
-
     let aContract = this._contracts[contractName];
-    let data = await this.callContractMethod(aContract, methodName, id);
-    log.debug(`retrieved contract data for contract ${contractName}.${methodName}(${id || ''}): ${data}`);
+    let data = await this.callContractMethod(aContract, methodName, ...args);
+    log.debug(`retrieved contract data for contract ${contractName}.${methodName}(${args.join(',')}): ${data}`);
     return { data, methodName };
   }
 
@@ -392,15 +390,15 @@ module.exports = class EthereumClient {
 
     let identifiers = [ contractIdentifier ];
     if (!contentTypes || !contentTypes.length ) {
-      return { event, identifiers };
+      return { event, identifiers, addresses, bytes32s };
     }
 
     for (let type of contentTypes) {
       for (let id of addresses) {
-        identifiers.push({ type, id, contract, idEthereumType: 'address' });
+        identifiers.push({ type, id, contract, idEthereumType: 'address', addresses, bytes32s });
       }
       for (let id of bytes32s) {
-        identifiers.push({ type, id, contract, idEthereumType: 'bytes32' });
+        identifiers.push({ type, id, contract, idEthereumType: 'bytes32', addresses, bytes32s });
       }
     }
 
