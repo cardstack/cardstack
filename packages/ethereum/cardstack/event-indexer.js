@@ -1,11 +1,11 @@
 const Ember = require('ember-source/dist/ember.debug');
 const { dasherize } = Ember.String;
-const { pluralize } = require('inflection');
+const { pluralize, singularize } = require('inflection');
 const { declareInjections } = require('@cardstack/di');
 const Session = require('@cardstack/plugin-utils/session');
 const log = require('@cardstack/logger')('cardstack/ethereum/event-indexer');
 const { fieldTypeFor } = require('./abi-utils');
-const { get } = require('lodash');
+const { get, set, uniqBy, merge } = require('lodash');
 
 function attachMeta(model, meta) {
   model.meta = Object.assign(model.meta || {}, meta);
@@ -138,7 +138,7 @@ class EthereumEventIndexer {
 
       if (!identifiers) { continue; }
 
-      for (let { id, type, isContractType, idEthereumType } of identifiers) {
+      for (let { id, type, isContractType, idEthereumType, addresses, bytes32s } of identifiers) {
         if (!type || !id || isContractType) { continue; }
 
         let contractAddress = contractDefinition.address;
@@ -147,13 +147,21 @@ class EthereumEventIndexer {
         let methodAbiEntry = contractDefinition["abi"].find(item => item.type === 'function' &&
           item.constant &&
           item.name === methodName);
-        let fieldInfo = fieldTypeFor(contractName, methodAbiEntry);
+        let fieldInfo = fieldTypeFor(methodAbiEntry);
         if (!fieldInfo) { continue; }
 
-        let { isMapping, fields, mappingKeyType } = fieldInfo;
-        if (!isMapping || !fields.length || mappingKeyType !== idEthereumType) { continue; }
+        let { isMapping, fields, mappingKeyType, hasMany, childField } = fieldInfo;
+        if (!hasMany && (!isMapping || !fields.length || mappingKeyType !== idEthereumType)) { continue; }
 
-        let { data } = await this.ethereumClient.getContractInfoForIdentifier({ id, type, contractName });
+        let args = [ id ];
+        if (hasMany && childField) {
+          if (addresses.length !== 1 || bytes32s.length !== 1 || !methodName) { continue; }
+          let methodSignature = methodAbiEntry.inputs.map(i => i.type);
+          args = methodSignature.map(type => type === 'address' ? addresses[0] : bytes32s[0]);
+        }
+
+        let { data } = await this.ethereumClient.getContractInfoForArgs(contractName, type, ...args);
+
         let model = {
           id: id.toLowerCase(),
           type,
@@ -163,6 +171,61 @@ class EthereumEventIndexer {
 
         if (mappingKeyType === 'address') {
           model.attributes['ethereum-address'] = id; // preserve the case of the ID here to faithfully represent EIP-55 encoding
+        }
+
+        if (hasMany && childField) {
+          let { contentType: childTypeName } = childField;
+          model.type = type = pluralize(`${contractName}-${childTypeName}`);
+          model.id = id = args.join('_').toLowerCase();
+          fields = [];
+          for (let key of Object.keys(hasMany)) {
+            fields = fields.concat(hasMany[key].fields.filter(i => i.type !== 'has-many'));
+          }
+          fields = fields.concat(childField.fields);
+          fields = uniqBy(fields, 'name');
+
+          for (let key of Object.keys(hasMany)) {
+            let { fields, mappingKeyType, contentType } = hasMany[key];
+            let [{ name:childRelationship }] = fields;
+            let parentContentType = pluralize(`${contractName}-${contentType}`);
+            let parentIdOriginalCase = mappingKeyType === 'address' ? addresses[0] : bytes32s[0];
+            let parentId = parentIdOriginalCase.toLowerCase();
+
+            set(model, `relationships.${singularize(contentType)}.data`, { type: parentContentType, id: parentId });
+
+            let parentModel;
+            try {
+              parentModel = (await this.searchers.getResourceAndMeta(Session.INTERNAL_PRIVILEGED, parentContentType, parentId.toLowerCase())).resource;
+            } catch (err) {
+              if (err.status !== 404) { throw err; }
+            }
+            if (!parentModel) {
+              parentModel = {
+                id: parentId.toLowerCase(),
+                type: parentContentType,
+                attributes: {},
+                relationships: {
+                  [childRelationship]: { data: [] },
+                  [`${contractName}-contract`]: {
+                    data: { id: contractAddress, type: pluralize(contractName) }
+                  }
+                }
+              };
+            }
+            let childModels = get(parentModel, `relationships.${childRelationship}.data`) || [];
+            if (!childModels.find(i => `${i.type}/${i.id}` === `${type}/${id}`)) {
+              childModels.push({ type, id });
+            }
+            set(parentModel, `relationships.${childRelationship}.data`, childModels);
+
+            if (mappingKeyType === 'address') {
+              parentModel.attributes['ethereum-address'] = parentIdOriginalCase; // preserve the case of the ID here to faithfully represent EIP-55 encoding
+            }
+            if (eventModel) {
+              addEventRelationship(parentModel, eventModel);
+            }
+            await this._indexRecord(batch, attachMeta(parentModel, { blockheight, contractName }));
+          }
         }
 
         if (typeof data === "object") {
@@ -182,7 +245,7 @@ class EthereumEventIndexer {
           if (err.status !== 404) { throw err; }
         }
         if (existingRecord) {
-          model.relationships = existingRecord.relationships;
+          model.relationships = merge(model.relationships, existingRecord.relationships);
         } else {
           model.relationships[`${contractName}-contract`] = {
             data: { id: contractAddress, type: pluralize(contractName) }
@@ -192,7 +255,6 @@ class EthereumEventIndexer {
         if (eventModel) {
           addEventRelationship(model, eventModel);
         }
-
         await this._indexRecord(batch, attachMeta(model, { blockheight, contractName }));
       }
     }
@@ -204,18 +266,11 @@ class EthereumEventIndexer {
 });
 
 function addEventRelationship(model, event) {
-  if (!model.relationships) {
-    model.relationships = {};
-  }
-
-  let eventRelationships = model.relationships[event.type];
-  if (!eventRelationships || !eventRelationships.data || !Array.isArray(eventRelationships.data)) {
-    eventRelationships = { data: [] };
-    model.relationships[event.type] = eventRelationships;
-  }
-
-  if (!eventRelationships.data.find(r => r.id === event.id && r.type === event.type)) {
-    eventRelationships.data.push({ type: event.type, id: event.id });
+  let currentEventRelationships = get(model, `relationships.${event.type}.data`) || [];
+  if (!currentEventRelationships.find(i => `${i.type}/${i.id}` === `${event.type}/${event.id}`)) {
+    set(model, `relationships.${event.type}.data`, currentEventRelationships.concat([
+      { type: event.type, id: event.id }
+    ]));
   }
 }
 

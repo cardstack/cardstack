@@ -1,7 +1,7 @@
 const Ember = require('ember-source/dist/ember.debug');
 const { dasherize } = Ember.String;
 const { pluralize } = require('inflection');
-const { isEqual, get } = require('lodash');
+const { isEqual, get, uniqBy } = require('lodash');
 const log = require('@cardstack/logger')('cardstack/ethereum/indexer');
 const { declareInjections } = require('@cardstack/di');
 const { fieldTypeFor } = require('./abi-utils');
@@ -439,6 +439,9 @@ class Updater {
       case 'has-many':
         fieldType = '@cardstack/core-types::has-many';
         break;
+      case 'belongs-to':
+        fieldType = '@cardstack/core-types::belongs-to';
+        break;
       case 'address':
         fieldType = '@cardstack/core-types::case-insensitive';
         break;
@@ -497,6 +500,63 @@ class Updater {
     return mapping;
   }
 
+  _hasManyContentTypesFor(contractName, hasManyInfo, childField, eventContentTriggers) {
+    let { fields:childsFields, contentType: childTypeName } = childField;
+    let childContentType = pluralize(`${contractName}-${childTypeName}`);
+    let types = [{
+      type: "content-types",
+      id: childContentType,
+      relationships: {
+        fields: {
+          data: [
+            { type: "fields", id: contractName + "-contract" }
+          ].concat(childsFields.map(field => {
+            return { type: "fields", id: field.name };
+          }))
+        },
+        'data-source': {
+          data: { type: 'data-sources', id: this.dataSourceId.toString() }
+        }
+      }
+    }];
+
+    for (let key of Object.keys(hasManyInfo)){
+      let { fields, mappingKeyType, contentType } = hasManyInfo[key];
+      let [ childRelationship ] = fields;
+      let parentContentType = pluralize(`${contractName}-${contentType}`);
+      let parentType = {
+        type: "content-types",
+        id: parentContentType,
+        relationships: {
+          fields: {
+            data: [
+              { type: "fields", id: contractName + "-contract" },
+              { type: "fields", id: childRelationship.name }
+            ]
+          },
+          'data-source': {
+            data: { type: 'data-sources', id: this.dataSourceId.toString() }
+          }
+        }
+      };
+
+      if (mappingKeyType === 'address') {
+        parentType.relationships.fields.data.unshift({ type: "fields", id: "ethereum-address" });
+      }
+
+      for (let event of Object.keys(eventContentTriggers)) {
+        let eventContentTypes = eventContentTriggers[event];
+        if (eventContentTypes.includes(parentContentType) &&
+          !eventContentTypes.includes(childContentType)) {
+          eventContentTypes.push(childContentType);
+        }
+      }
+      types.push(parentType);
+    }
+
+    return types;
+  }
+
   _eventContentTypeFor(contractName, eventName, fields) {
     return {
       type: "content-types",
@@ -543,19 +603,32 @@ class Updater {
 
   _getSchemaFromAbi(contractName, abi) {
     let contractFields = [], schemaItems = [];
+    let eventContentTriggers = this.contract.eventContentTriggers || {};
     abi.forEach(item => {
       if (item.type === "event" || (item.type === "function" && item.constant)) {
-        let fieldInfo = fieldTypeFor(contractName, item);
+        let fieldInfo = fieldTypeFor(item);
         if (!fieldInfo) { return; }
 
-        let { isEvent, isMapping, fields, mappingKeyType } = fieldInfo;
-        if (!isMapping && !isEvent && fields.length === 1) {
+        let { isEvent, hasMany, isMapping, fields, mappingKeyType, childField } = fieldInfo;
+        if (!isMapping && !isEvent && !hasMany && fields.length === 1) {
           contractFields.push({
             type: "fields",
             id: `${contractName}-${dasherize(item.name)}`,
             attributes: { "field-type": fields[0]["type"] },
           });
           return;
+        }
+
+        if (hasMany) {
+          let schemaModels = this._hasManyContentTypesFor(contractName, fieldInfo.hasMany, childField, eventContentTriggers);
+          schemaItems = schemaItems.concat(schemaModels);
+
+          fields = [];
+          for (let key of Object.keys(hasMany)) {
+            fields = fields.concat(hasMany[key].fields);
+          }
+          fields = fields.concat(childField.fields);
+          fields = uniqBy(fields, 'name');
         }
 
         for (let field of fields) {
@@ -586,7 +659,6 @@ class Updater {
       }
     });
 
-    let eventContentTriggers = this.contract.eventContentTriggers || {};
     for (let event of Object.keys(eventContentTriggers)) {
       let eventField = `${contractName}-${dasherize(event)}-events`;
       let contentTypesToUpdate = eventContentTriggers[event];
