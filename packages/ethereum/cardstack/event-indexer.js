@@ -98,7 +98,7 @@ class EthereumEventIndexer {
     await this._indexRecord(batch, attachMeta(await this.ethereumClient.getContractInfo({ contract: contractName }), { blockheight, contractName }));
 
     if (!history || !history.length) {
-      log.info(`Retreving full history for contract ${contractName} address: ${JSON.stringify((contractDefinition.addresses))} since blockheight ${blockHeight}`);
+      log.info(`Retrieving full history for contract ${contractName} address: ${JSON.stringify((contractDefinition.address))} since blockheight ${blockHeight || 0 }`);
       history = await this.ethereumClient.getContractHistorySince(blockHeight);
     }
 
