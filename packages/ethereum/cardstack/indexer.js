@@ -621,6 +621,9 @@ class Updater {
 
         if (hasMany) {
           let schemaModels = this._hasManyContentTypesFor(contractName, fieldInfo.hasMany, childField, eventContentTriggers);
+          for (let contentTypeSchema of schemaModels) {
+            schemaItems.push(this._openGrantForContentType(contentTypeSchema.id));
+          }
           schemaItems = schemaItems.concat(schemaModels);
 
           fields = [];
