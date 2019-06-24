@@ -258,7 +258,7 @@ async function withErrorHandling(id, type, fn) {
       throw new Error("Merge conflict", { status: 409 });
     }
     if (err instanceof Change.OverwriteRejected) {
-      throw new Error(`id ${id} is already in use`, { status: 409, source: { pointer: '/data/id'}});
+      throw new Error(`id ${id} is already in use for type ${type}`, { status: 409, source: { pointer: '/data/id'}});
     }
     if (err instanceof Change.NotFound) {
       throw new Error(`${type} with id ${id} does not exist`, {

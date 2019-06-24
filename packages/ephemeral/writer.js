@@ -24,7 +24,7 @@ module.exports = declareInjections({
 
 
     if (this.storage.lookup(type, id)) {
-      throw new Error(`id ${id} is already in use`, { status: 409, source: { pointer: '/data/id'}});
+      throw new Error(`id ${id} is already in use for type ${type}`, { status: 409, source: { pointer: '/data/id'}});
     }
 
 

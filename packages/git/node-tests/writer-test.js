@@ -257,7 +257,7 @@ describe('git/writer', function() {
           throw err;
         }
         expect(err.status).to.equal(409);
-        expect(err.detail).to.match(/id 1 is already in use/);
+        expect(err.detail).to.match(/id 1 is already in use for type articles/);
         expect(err.source).to.deep.equal({ pointer: '/data/id' });
       }
     });
