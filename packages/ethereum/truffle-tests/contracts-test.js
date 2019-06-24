@@ -1784,6 +1784,99 @@ contract('Token Indexing', function (accounts) {
           }
         });
 
+        schema = await env.lookup('hub:searchers').get(env.session, 'local-hub', 'grants', 'service-registry-is-active-service-provider-by-service-providers-grant');
+        expect(schema).to.deep.equal({
+          "data": {
+            "type": "grants",
+            "id": "service-registry-is-active-service-provider-by-service-providers-grant",
+            "attributes": {
+              "may-read-fields": true,
+              "may-read-resource": true
+            },
+            "relationships": {
+              "who": {
+                "data": [{
+                  "id": "everyone",
+                  "type": "groups"
+                }]
+              },
+              "types": {
+                "data": [
+                  {
+                    "id": "service-registry-is-active-service-provider-by-service-providers",
+                    "type": "content-types"
+                  }
+                ]
+              }
+            },
+            "meta": {
+              "source": serviceRegistryName
+            }
+          }
+        });
+
+        schema = await env.lookup('hub:searchers').get(env.session, 'local-hub', 'grants', 'service-registry-is-active-service-provider-by-userids-grant');
+        expect(schema).to.deep.equal({
+          "data": {
+            "type": "grants",
+            "id": "service-registry-is-active-service-provider-by-userids-grant",
+            "attributes": {
+              "may-read-fields": true,
+              "may-read-resource": true
+            },
+            "relationships": {
+              "who": {
+                "data": [{
+                  "id": "everyone",
+                  "type": "groups"
+                }]
+              },
+              "types": {
+                "data": [
+                  {
+                    "id": "service-registry-is-active-service-provider-by-userids",
+                    "type": "content-types"
+                  }
+                ]
+              }
+            },
+            "meta": {
+              "source": serviceRegistryName
+            }
+          }
+        });
+
+        schema = await env.lookup('hub:searchers').get(env.session, 'local-hub', 'grants', 'service-registry-is-active-service-provider-userid-service-provider-entries-grant');
+        expect(schema).to.deep.equal({
+          "data": {
+            "type": "grants",
+            "id": "service-registry-is-active-service-provider-userid-service-provider-entries-grant",
+            "attributes": {
+              "may-read-fields": true,
+              "may-read-resource": true
+            },
+            "relationships": {
+              "who": {
+                "data": [{
+                  "id": "everyone",
+                  "type": "groups"
+                }]
+              },
+              "types": {
+                "data": [
+                  {
+                    "id": "service-registry-is-active-service-provider-userid-service-provider-entries",
+                    "type": "content-types"
+                  }
+                ]
+              }
+            },
+            "meta": {
+              "source": serviceRegistryName
+            }
+          }
+        });
+
         schema = await env.lookup('hub:searchers').get(env.session, 'local-hub', 'fields', 'is-active-service-provider-userid-service-provider-entries');
         expect(schema).to.deep.equal({
           "data": {
