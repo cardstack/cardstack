@@ -375,7 +375,7 @@ module.exports = class EthereumClient {
         }
       }
     }
-    log.info(`Gathered ${history.length} events from contract history since blockheight ${blockHeight}`);
+    log.info(`Gathered ${history.length} events from contract history since blockheight ${blockHeight || 0}`);
     log.debug(`Discovered contract history data: ${JSON.stringify(history, null, 2)}`);
     return history;
   }
