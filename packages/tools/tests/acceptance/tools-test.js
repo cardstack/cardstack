@@ -282,6 +282,15 @@ module('Acceptance | tools', function(hooks) {
     assert.dom('.top-post .post-embedded').hasText('Adventures in Pirating');
   });
 
+  test('header sections strings are editable', async function(assert) {
+    await visit('/hub/posts/1');
+    await login();
+    await click('[data-test-cardstack-tools-launcher]');
+    await waitFor('[data-test-cs-active-composition-panel-main]');
+    let keywords = '[data-test-cs-field-editor="keywords"] input';
+    assert.dom(keywords).isNotDisabled();
+  })
+
   test('saving a new document changes the URL to the canonical path of the saved document', async function(assert) {
     await visit('/hub/posts/1');
     await login();
