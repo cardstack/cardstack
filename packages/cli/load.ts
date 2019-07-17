@@ -21,12 +21,13 @@ const resolvableExtensions = ['js'];
 export default async function loadCard({ ui, "hub-dir": hubDir, "card-dir": cardDir }: Options) {
   // we want an absolute path to the card so that imports are handled correctly
   cardDir = resolve(cardDir);
-  let cardPkg = await createEntrypoints(ui, hubDir, cardDir);
+
+  let cardPkg: CardPkg = await import(join(cardDir, 'package.json'));
   await linkPeerDeps(ui, hubDir, cardDir, cardPkg);
+  await createEntrypoints(ui, hubDir, cardDir, cardPkg);
 }
 
-async function createEntrypoints(ui: UI, hubDir: string, cardDir: string) {
-  let cardPkg: CardPkg = await import(join(cardDir, 'package.json'));
+async function createEntrypoints(ui: UI, hubDir: string, cardDir: string, cardPkg: CardPkg) {
   for (let format of ['isolated', 'embedded']) {
     let componentFile;
     for (let extension of resolvableExtensions) {
@@ -60,7 +61,6 @@ async function createEntrypoints(ui: UI, hubDir: string, cardDir: string) {
       writeFileSync(entrypoint, sourceLines.join("\n"), 'utf8');
     }
   }
-  return cardPkg;
 }
 
 async function linkPeerDeps(ui: UI, hubDir: string, cardDir: string, cardPkg: CardPkg) {
