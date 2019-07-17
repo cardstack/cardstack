@@ -44,3 +44,17 @@ CARDSTACK_DEV=true node ./bin/cardstack.js start
 
 To view the built app, follow the path printed in the console
 by Embroider.
+
+# WIP: Current Quickstart Example for while we're developing this
+
+Launching hub from inside the blueprint (you need a local cardstack and embroider checkout that is built and available for yarn linking):
+ - `cd packages/cli/blueprints`
+ - `yarn install`
+ - `yarn link @cardstack/ephemeral @cardstack/hub @cardstack/jsonapi @embroider/core @embroider/compat @embroider/webpack`
+ - `ember s`
+
+Loading the first-card example:
+ - `cd packages/cli/blueprints`
+ - `node ../bin/cardstack.js load -c ../node-tests/sample-cards/first-card -d .`
+
+
