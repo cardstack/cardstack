@@ -1,6 +1,7 @@
 import UI from "console-ui";
-import { pathExistsSync, writeFileSync } from "fs-extra";
-import { join, resolve } from "path";
+import { pathExistsSync, writeFileSync, readFileSync, ensureSymlinkSync } from "fs-extra";
+import { join, resolve, dirname } from "path";
+import { sync as resolveSync } from 'resolve';
 
 interface Options {
   "hub-dir": string;
@@ -8,12 +9,24 @@ interface Options {
   ui: UI;
 }
 
+interface CardPkg {
+  name: string;
+  peerDependencies?: {
+    [name: string]: string;
+  };
+}
+
 const resolvableExtensions = ['js'];
 
 export default async function loadCard({ ui, "hub-dir": hubDir, "card-dir": cardDir }: Options) {
   // we want an absolute path to the card so that imports are handled correctly
   cardDir = resolve(cardDir);
-  let cardPkg = await import(join(cardDir, 'package.json'));
+  let cardPkg = await createEntrypoints(ui, hubDir, cardDir);
+  await linkPeerDeps(ui, hubDir, cardDir, cardPkg);
+}
+
+async function createEntrypoints(ui: UI, hubDir: string, cardDir: string) {
+  let cardPkg: CardPkg = await import(join(cardDir, 'package.json'));
   for (let format of ['isolated', 'embedded']) {
     let componentFile;
     for (let extension of resolvableExtensions) {
@@ -45,6 +58,36 @@ export default async function loadCard({ ui, "hub-dir": hubDir, "card-dir": card
       }
       ui.writeLine(`emitting entrypoint ${entrypoint}`);
       writeFileSync(entrypoint, sourceLines.join("\n"), 'utf8');
+    }
+  }
+  return cardPkg;
+}
+
+async function linkPeerDeps(ui: UI, hubDir: string, cardDir: string, cardPkg: CardPkg) {
+  let filename = join(hubDir, '.embroider-app-path');
+  let appPath;
+  try {
+    appPath = readFileSync(filename, 'utf8');
+  } catch(err) {
+    if (err.code !== 'ENOENT') {
+      throw err;
+    }
+    ui.writeLine(`Your cardstack hub does not appear to be running (couldn't read ${filename})`, 'ERROR');
+    process.exit(-1);
+  }
+  if (!cardPkg.peerDependencies) {
+    return;
+  }
+  for (let pkgName of Object.keys(cardPkg.peerDependencies)) {
+    try {
+      let target = resolveSync(`${pkgName}/package.json`, { basedir: appPath });
+      ensureSymlinkSync(dirname(target), join(cardDir, 'node_modules', pkgName), 'dir');
+    } catch (err) {
+      if (err.code !== 'MODULE_NOT_FOUND') {
+        throw err;
+      }
+      ui.writeLine(`The card ${cardPkg.name} has a peerDependency on ${pkgName}, which is not available in the Hub`, 'ERROR');
+      process.exit(-1);
     }
   }
 }

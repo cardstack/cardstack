@@ -22,11 +22,17 @@ module.exports = function(defaults) {
 
   return (function(){
     const Webpack = require('@embroider/webpack').Webpack;
+    const { join } = require('path');
+    const { writeFileSync } = require('fs');
+
     return require("@embroider/compat").compatBuild(app, Webpack, {
       staticAddonTestSupportTrees: true,
       staticAddonTrees: true,
       staticHelpers: true,
       staticComponents: true,
+      onOutputPath(outputPath) {
+        writeFileSync(join(__dirname, '.embroider-app-path'), outputPath, 'utf8');
+      },
       packageRules: [
         {
           package: "@cardstack/routing",
