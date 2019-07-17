@@ -1,0 +1,7 @@
+{
+  "name": "first-card",
+  "version": "0.0.0",
+  "peerDependencies": {
+    "@glimmer/component": "*"
+  }
+}
