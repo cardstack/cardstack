@@ -148,13 +148,11 @@
     {
       "type": "node",
       "request": "launch",
-      "name": "cardstack run first-card",
+      "name": "load first-card",
       "cwd": "${workspaceRoot}/packages/cli",
-      "program": "${workspaceRoot}/packages/cli/bin/cardstack",
-      "args": ["run"],
-      "env": {
-        "CARDSTACK_DEV_NOCACHE": "true"
-      }
+      "program": "${workspaceRoot}/packages/cli/bin/cardstack.js",
+      "args": ["load", "-c", "./node-tests/sample-cards/first-card", "-d", "./blueprints"],
+      "outputCapture": "std"
     }
   ]
 }

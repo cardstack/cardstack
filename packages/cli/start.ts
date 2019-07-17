@@ -15,7 +15,7 @@ const appName = "cardhost";
 const cardstackDeps = ["hub", "jsonapi", "ephemeral"];
 
 interface Options {
-  dir: string;
+  "hub-dir": string;
   ui: UI;
 }
 
@@ -28,8 +28,8 @@ class Runner {
   private runningDir: string;
   private ui: UI;
 
-  constructor({ dir, ui }: Options) {
-    this.runningDir = dir;
+  constructor({ "hub-dir": hubDir, ui }: Options) {
+    this.runningDir = hubDir;
     this.ui = ui;
     ensureDirSync(this.runningDir);
   }

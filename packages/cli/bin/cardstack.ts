@@ -14,17 +14,17 @@ yargs
   .scriptName("cardstack")
   .command(
     "start",
-    "Start the Cardstack environment",
+    "Start your local Cardstack Hub",
     args => {
-      return args.option("dir", {
+      return args.option("hub-dir", {
         alias: "d",
-        describe: "path to your local running cardstack",
+        describe: "path to your local running cardstack hub",
         type: "string",
         default: join(homedir(), ".cardstack"),
       });
     },
     async function(argv) {
-      let run = await import("../run");
+      let run = await import("../start");
       await run.default(Object.assign({ ui }, argv));
     }
   )
@@ -56,15 +56,22 @@ yargs
     let newCard = await import('../new-card');
     await newCard.default(Object.assign({ ui }, argv));
   })
-  .command('play <card-name>', 'Choose a card to render', (args) => {
-    return args.positional('card-name', {
-      describe: 'the name of an existing card',
+  .command('load', 'Load a card into your Cardstack Hub', (args) => {
+    return args.option('card-dir', {
+      alias: "c",
+      describe: 'The path to the card you want to load',
       type: 'string',
-      demandOption: true,
-      normalize: true
+      normalize: true,
+      default: process.cwd(),
+    }).option("hub-dir", {
+      alias: "d",
+      describe: "The location of your running hub",
+      type: "string",
+      default: join(homedir(), ".cardstack"),
     });
-  }, async function () {
-    ui.write('coming soon!');
+  }, async function (argv) {
+    let load = await import('../load');
+    return load.default(Object.assign({ ui }, argv));
   })
   .demandCommand(1, 'Use any of the commands below.\n')
   .strict()
