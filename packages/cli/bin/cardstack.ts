@@ -6,6 +6,8 @@
 
 import yargs from "yargs";
 import UI from "console-ui";
+import { homedir } from "os";
+import { join } from "path";
 const ui = new UI();
 
 yargs
@@ -16,9 +18,9 @@ yargs
     args => {
       return args.option("dir", {
         alias: "d",
-        describe: "path to your .cardstack local data storage directory",
+        describe: "path to your local running cardstack",
         type: "string",
-        default: process.cwd()
+        default: join(homedir(), ".cardstack"),
       });
     },
     async function(argv) {
