@@ -47,14 +47,13 @@ by Embroider.
 
 # WIP: Current Quickstart Example for while we're developing this
 
-Launching hub from inside the blueprint (you need a local cardstack and embroider checkout that is built and available for yarn linking):
- - `cd packages/cli/blueprints`
- - `yarn install`
- - `yarn link @cardstack/ephemeral @cardstack/hub @cardstack/jsonapi @embroider/core @embroider/compat @embroider/webpack`
+Launching hub from inside the blueprint (you need a local embroider checkout that is built and available for yarn linking):
+ - `cd packages/cardhost`
+ - `yarn link @embroider/core @embroider/compat @embroider/webpack`
  - `ember s`
 
 Loading the first-card example:
- - `cd packages/cli/blueprints`
- - `node ../bin/cardstack.js load -c ../node-tests/sample-cards/first-card -d .`
+ - `cd packages/cli`
+ - `node ./bin/cardstack.js load -c ./node-tests/sample-cards/first-card -d ../cardhost`
 
 

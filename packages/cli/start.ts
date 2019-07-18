@@ -1,4 +1,4 @@
-import { join } from "path";
+import { join, dirname } from "path";
 import UI from "console-ui";
 import { Memoize } from "typescript-memoize";
 import {
@@ -55,7 +55,7 @@ class Runner {
   }
 
   private applyBlueprints() {
-    let blueprints = join(__dirname, "blueprints");
+    let blueprints = dirname(require.resolve('@cardstack/cardhost/package.json'));
     copySync(blueprints, this.appDir);
   }
 
