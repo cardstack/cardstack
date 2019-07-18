@@ -17,10 +17,10 @@
     "test": "ember test"
   },
   "devDependencies": {
-    "@cardstack/ephemeral": "^0.14.16",
-    "@cardstack/eslint-config": "^0.14.21",
-    "@cardstack/hub": "^0.14.16",
-    "@cardstack/jsonapi": "^0.14.16",
+    "@cardstack/ephemeral": "0.14.21",
+    "@cardstack/eslint-config": "0.14.21",
+    "@cardstack/hub": "0.14.21",
+    "@cardstack/jsonapi": "0.14.21",
     "@ember/jquery": "^0.6.1",
     "@ember/optional-features": "^0.7.0",
     "@embroider/compat": "^0.3.5",
