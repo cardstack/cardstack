@@ -2,7 +2,7 @@
 
 module.exports = function(environment) {
   let ENV = {
-    modulePrefix: 'cardstack-standard-app',
+    modulePrefix: '@cardstack/cardhost',
     environment,
     rootURL: '/',
     locationType: 'auto',
