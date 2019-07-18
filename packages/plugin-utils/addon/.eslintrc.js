@@ -1,4 +1,4 @@
 module.exports = {
   root: true,
-  "extends": require.resolve('@cardstack/eslint-config/browser')
+  "extends": require.resolve('@cardstack/eslint-config/ember-addon')
 };
