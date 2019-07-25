@@ -831,7 +831,20 @@ const models = [
     attributes: {
       'source-type': '@cardstack/routing'
     }
-  }
+  },
+  /* 
+  The `everyone` group handles users who do not get assigned a role, so they
+  default to everyone. Use this grant for things like universal, anonymous
+  read of public info. An entry here is required so that the searcher runs.
+  Also see everyone-group.js.
+  */
+  {
+    type: 'data-sources',
+    id: 'everyone-group',
+    attributes: {
+      'source-type': '@cardstack/hub::everyone-group',
+    }
+  },
 
 ];
 
