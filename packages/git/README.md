@@ -1,7 +1,109 @@
-This is a Cardstack data source plugin for reading and writing to Git.
+# @cardstack/git
 
-Building native nodegit dep on osx
---------------------------------
+This is a Cardstack data source plugin for reading and writing to Git.
+Always have access to see how data has changed across time.
+
+Features:
+
+- Just like using git for code, your data is versioned. A deleted or changed record can be retrieved!
+- Card data can be saved to either local or remote git repositories
+- Data can be stored in either the same repository as the project code,
+or a separate repository
+- Data for multiple projects can be saved to the same repository
+
+## Installing in a Cardstack project
+
+To use a git as a data source, include `@cardstack/git` in the `devDependencies`
+of `cardhost/package.json`
+
+```bash
+yarn add --dev @cardstack/git
+yarn install
+```
+
+See the "Troubleshooting" section of this README if you encounter any issues installing.
+
+## Configuration
+
+Data plugins are configured in `cardhost/data-sources`.
+The only required configuration is to set either the `repo` or `remote`.
+
+| Parameter | Type |  Description |
+|-----------|------|-------------|
+| `remote` | object |  Use a remote git repository, such as one hosted on Github. The object should contain a `url` and `privateKey` as strings. Example: `remote: { url: 'some-url', privateKey: process.env.GIT_PRIVATE_KEY}`|
+| `repo` | string | The path to a local git repository that already exists on disk |
+| `branchPrefix` | string | optional - a prefix to prepend to the git branch when saving data. This is especially useful when you are storing data in the same repository as your project, or you have one repository that holds code for multiple projects. Example: if you set `basePath: 'cs-'`, data will be stored at `cs-master`|
+| `basePath` | string | optional - specify the directory within a repository where the data should be stored. Example: if you set `basePath` to `my/base` and you save an `article` Card, data will be stored at `my/base/contents/articles/`|
+
+### Example configuration
+
+For example, the configuration below is set in `cardhost/data-sources/default.js`.
+It would use a local git repository for local development,
+and point to a repository on GitHub once it is deployed to production.
+Remember, keep your private keys safe and do not commit them!
+
+```js
+let sources = [
+  {
+    type: 'plugin-configs',
+    id: '@cardstack/hub',
+    attributes: {
+      'plugin-config': {
+        'application-card': { type: 'app-cards', id: 'cardhost' }
+      }
+    },
+    relationships: {
+      'default-data-source': {
+        data: { type: 'data-sources', id: 'default' }
+      }
+    }
+  }
+];
+
+if (process.env.HUB_ENVIRONMENT === 'production') {
+  sources.push({
+    type: 'data-sources',
+    id: 'default',
+    attributes: {
+      'source-type': '@cardstack/git',
+      params: {
+        branchPrefix: 'cs-',
+        remote: {
+          url: 'git@github.com:cardstack/some-git-repo.git',
+          privateKey: process.env.GIT_PRIVATE_KEY,
+        }
+      }
+    }
+  });
+} else {
+  sources.push({
+    type: 'data-sources',
+    id: 'default',
+    attributes: {
+      'source-type': '@cardstack/git',
+      params: {
+        repo: '/path/to/some-git-repo'
+      }
+    },
+  });
+}
+
+module.exports = sources;
+```
+
+## Learn more
+
+To learn more about how it can be used in your project,
+see the [Cardstack Guides about git](https://docs.cardstack.com/release/data/git/).
+
+## Troubleshooting
+
+### Windows installation - Building native nodegit dep
+
+Windows users should install [windows-build-tools](https://github.com/felixrieseberg/windows-build-tools),
+which are needed in order to build the `nodegit` dependency.
+
+### OSX installation - Building native nodegit dep
 
 You need the latest Xcode *and* you need to manually tell it to get the latest CLI tools via
 
