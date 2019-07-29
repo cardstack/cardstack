@@ -16,7 +16,7 @@ import {
 import { rewriteEmberCLIBuild } from "./rewriters";
 import exec from "./utils/exec";
 
-const appName = "cardstack-standard-app";
+const appName = "@cardstack/cardhost";
 
 const ephemeralConfig = `
 module.exports = [

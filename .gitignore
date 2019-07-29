@@ -21,8 +21,7 @@ package-lock.json
 /packages/plugin-utils/todo-any.js
 /packages/plugin-utils/todo-any.js.map
 /packages/cli/**/*.js
-# do not ignore js files in the blueprints directory
-!packages/cli/blueprints/**/*.js
+!packages/cli/node-tests/sample-cards/**/*.js
 /packages/cli/**/*.js.map
 /packages/cli/**/*.d.ts
 /packages/di/**/*.js
@@ -34,6 +33,5 @@ package-lock.json
 /tests/ephemeral-test-app/node_modules/@cardstack/hub/**/*
 /tests/elasticsearch-test-app/node_modules/@cardstack/hub/**/*
 
-
-
-
+# generated files you may end up with if you run the cli blueprint directly
+packages/cli/node-tests/sample-cards/*/node_modules/**/*

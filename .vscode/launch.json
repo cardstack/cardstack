@@ -148,13 +148,23 @@
     {
       "type": "node",
       "request": "launch",
-      "name": "cardstack run first-card",
+      "name": "load first-card",
       "cwd": "${workspaceRoot}/packages/cli",
-      "program": "${workspaceRoot}/packages/cli/bin/cardstack",
-      "args": ["run"],
+      "program": "${workspaceRoot}/packages/cli/bin/cardstack.js",
+      "args": ["load", "-c", "./node-tests/sample-cards/first-card", "-d", "./blueprints"],
+      "outputCapture": "std"
+    },
+    {
+      "type": "node",
+      "request": "launch",
+      "name": "Build cardhost",
+      "program": "${workspaceFolder}/node_modules/.bin/ember",
+      "cwd": "${workspaceRoot}/packages/cardhost",
+      "args": ["b"],
       "env": {
-        "CARDSTACK_DEV_NOCACHE": "true"
-      }
-    }
+        "JOBS": "1"
+      },
+      "outputCapture": "std"
+    },
   ]
 }

@@ -1,7 +1,4 @@
-import { createHash } from "crypto";
-import { join } from "path";
-import { tmpdir } from "os";
-import hashForDep from "hash-for-dep";
+import { join, dirname } from "path";
 import UI from "console-ui";
 import { Memoize } from "typescript-memoize";
 import {
@@ -13,12 +10,12 @@ import {
 } from "fs-extra";
 import exec from "./utils/exec";
 
-const appName = "cardstack-standard-app";
+const appName = "cardhost";
 
 const cardstackDeps = ["hub", "jsonapi", "ephemeral"];
 
 interface Options {
-  dir: string;
+  "hub-dir": string;
   ui: UI;
 }
 
@@ -28,31 +25,18 @@ export default async function run(options: Options) {
 }
 
 class Runner {
-  private cardDir: string;
+  private runningDir: string;
   private ui: UI;
 
-  constructor({ dir, ui }: Options) {
-    this.cardDir = dir;
+  constructor({ "hub-dir": hubDir, ui }: Options) {
+    this.runningDir = hubDir;
     this.ui = ui;
-    ensureDirSync(this.workDir);
-    ui.writeInfoLine(`running the card in ${this.cardDir}`);
-    ui.writeInfoLine(`using temp dir ${this.workDir}`);
-  }
-
-  @Memoize()
-  private get workDir(): string {
-    let hash = createHash("md5");
-    hash.update(
-      this.cardDir +
-        "\0" +
-        (process.env.CARDSTACK_DEV ? "nocache" : hashForDep(__dirname))
-    );
-    return join(tmpdir(), "cardstack", hash.digest("hex").slice(0, 6));
+    ensureDirSync(this.runningDir);
   }
 
   @Memoize()
   private get appDir(): string {
-    return join(this.workDir, appName);
+    return join(this.runningDir, appName);
   }
 
   async run() {
@@ -71,7 +55,7 @@ class Runner {
   }
 
   private applyBlueprints() {
-    let blueprints = join(__dirname, "blueprints");
+    let blueprints = dirname(require.resolve('@cardstack/cardhost/package.json'));
     copySync(blueprints, this.appDir);
   }
 

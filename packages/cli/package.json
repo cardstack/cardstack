@@ -12,6 +12,7 @@
   "repository": "https://github.com/cardstack/cardstack",
   "description": "Command line tools for Cardstack.",
   "dependencies": {
+    "@cardstack/cardhost": "0.14.21",
     "@cardstack/plugin-utils": "0.14.21",
     "@ember/octane-app-blueprint": "0.20.0",
     "@types/console-ui": "^2.2.0",
@@ -23,6 +24,7 @@
     "fs-extra": "^7.0.1",
     "hash-for-dep": "^1.5.1",
     "recast": "^0.17.6",
+    "resolve": "^1.3.3",
     "typescript-memoize": "^1.0.0-alpha.3",
     "yargs": "^13.2.2",
     "yarn": "^1.15.2"

@@ -2257,9 +2257,9 @@ babel-plugin-ember-modules-api-polyfill@^2.6.0, babel-plugin-ember-modules-api-p
   dependencies:
     ember-rfc176-data "^0.3.9"
 
-"babel-plugin-ember-modules-api-polyfill@git+https://github.com/ember-cli/babel-plugin-ember-modules-api-polyfill.git#d0c7772bc9f995f83641a4292afd5e05e7e9bbba":
+"babel-plugin-ember-modules-api-polyfill@git+https://github.com/ember-cli/babel-plugin-ember-modules-api-polyfill#d0c7772bc9f995f83641a4292afd5e05e7e9bbba":
   version "2.6.0"
-  resolved "git+https://github.com/ember-cli/babel-plugin-ember-modules-api-polyfill.git#d0c7772bc9f995f83641a4292afd5e05e7e9bbba"
+  resolved "git+https://github.com/ember-cli/babel-plugin-ember-modules-api-polyfill#d0c7772bc9f995f83641a4292afd5e05e7e9bbba"
   dependencies:
     ember-rfc176-data "^0.3.6"
 
