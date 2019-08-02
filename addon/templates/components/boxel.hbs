@@ -1,0 +1,11 @@
+<div class="boxel boxel">
+  {{#if (has-block)}}
+    {{yield}}
+  {{else if content}}
+    {{#if (is-component contentType)}}
+      {{component contentType content=content}}
+    {{else}}
+      A {{contentType}} component/template must be provided
+    {{/if}}
+  {{/if}}
+</div>
