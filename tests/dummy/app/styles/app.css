@@ -1,0 +1,9 @@
+.card-catalog {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+}
+
+.article-image img {
+  width: 320px;
+  height: 240px;
+}

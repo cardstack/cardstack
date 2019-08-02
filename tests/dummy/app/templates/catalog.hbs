@@ -1,3 +1,7 @@
-{{#each model as |article|}}
-  <Boxel @content={{article}} />
-{{/each}}
+<div class="card-catalog">
+  {{#each model as |article|}}
+    <Boxel @content={{article}} @clickAction={{action "createNew" article}}/>
+  {{/each}}
+</div>
+
+{{outlet}}

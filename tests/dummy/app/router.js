@@ -7,7 +7,9 @@ const Router = EmberRouter.extend({
 });
 
 Router.map(function() {
-  this.route('catalog');
+  this.route('catalog', function() {
+    this.route('create', { path: '/:model/create' });
+  });
 });
 
 export default Router;

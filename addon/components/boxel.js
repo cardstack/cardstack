@@ -7,5 +7,7 @@ export default Component.extend({
   layout,
   tagName: '',
 
-  contentType: readOnly('content.constructor.modelName')
+  contentType: readOnly('content.constructor.modelName'),
+
+  clickAction() {}
 });
