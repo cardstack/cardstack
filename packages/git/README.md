@@ -26,12 +26,12 @@ See the "Troubleshooting" section of this README if you encounter any issues ins
 ## Configuration
 
 Data plugins are configured in `cardhost/data-sources`.
-The only required configuration is to set either the `repo` or `remote`.
+The only required configuration is to set either `repo` or `remote`.
 
 | Parameter | Type |  Description |
 |-----------|------|-------------|
 | `remote` | object |  Use a remote git repository, such as one hosted on Github. The object should contain a `url` string and the absolute path to your `privateKey` as a string. Example: `remote: { url: 'some-url', privateKey: process.env.GIT_PRIVATE_KEY}`|
-| `repo` | string | The path to a local git repository that already exists on disk |
+| `repo` | string | The path to a local git repository that already exists on disk, and has an initial commit |
 | `branchPrefix` | string | optional - a prefix to prepend to the git branch when saving data. This is especially useful when you are storing data in the same repository as your project, or you have one repository that holds code for multiple projects. Example: if you set `basePath: 'cs-'`, data will be stored at `cs-master`|
 | `basePath` | string | optional - specify the directory within a repository where the data should be stored. Example: if you set `basePath` to `my/base` and you save an `article` Card, data will be stored at `my/base/contents/articles/`|
 
@@ -44,9 +44,8 @@ GIT_PRIVATE_KEY="/path/to/your/key/id_rsa"
 ### Example configuration
 
 For example, the configuration below is set in `cardhost/data-sources/default.js`.
-It would use a local git repository for local development,
-and point to a repository on GitHub once it is deployed to production.
-Remember, keep your private keys safe and do not commit them!
+The Hub has a `default-data-source` relationship that points to `@cardstack/git`.
+The result for this example is that Cards will use a local git repository by default.
 
 ```js
 let sources = [
@@ -63,26 +62,8 @@ let sources = [
         data: { type: 'data-sources', id: 'default' }
       }
     }
-  }
-];
-
-if (process.env.HUB_ENVIRONMENT === 'production') {
-  sources.push({
-    type: 'data-sources',
-    id: 'default',
-    attributes: {
-      'source-type': '@cardstack/git',
-      params: {
-        branchPrefix: 'cs-',
-        remote: {
-          url: 'git@github.com:cardstack/some-git-repo.git',
-          privateKey: process.env.GIT_PRIVATE_KEY,
-        }
-      }
-    }
-  });
-} else {
-  sources.push({
+  },
+  {
     type: 'data-sources',
     id: 'default',
     attributes: {
@@ -90,9 +71,9 @@ if (process.env.HUB_ENVIRONMENT === 'production') {
       params: {
         repo: '/path/to/some-git-repo'
       }
-    },
-  });
-}
+    }
+  }
+];
 
 module.exports = sources;
 ```
