@@ -22,7 +22,7 @@ describe('routing/paths', function () {
     beforeEach(async function () {
       let factory = new JSONAPIFactory();
 
-      factory.addResource('content-types', 'cards')
+      factory.addResource('content-types', 'docs')
         .withAttributes({
           router: [{
             path: '/buddy/:friendly_id',
@@ -57,7 +57,7 @@ describe('routing/paths', function () {
             fieldType: '@cardstack/core-types::string'
           }),
         ]);
-      applicationCard = factory.addResource('cards', 'app');
+      applicationCard = factory.addResource('docs', 'app');
 
       factory.addResource('content-types', 'puppies')
         .withRelated('fields', [
@@ -101,7 +101,7 @@ describe('routing/paths', function () {
     beforeEach(async function () {
       let factory = new JSONAPIFactory();
 
-      factory.addResource('content-types', 'cards')
+      factory.addResource('content-types', 'docs')
         .withAttributes({
           router: [{
             path: '/:type/:id',
@@ -128,7 +128,7 @@ describe('routing/paths', function () {
           }),
         ]);
 
-      applicationCard = factory.addResource('cards', 'app');
+      applicationCard = factory.addResource('docs', 'app');
 
       factory.addResource('content-types', 'puppies')
         .withRelated('fields', [
@@ -178,7 +178,7 @@ describe('routing/paths', function () {
     beforeEach(async function () {
       let factory = new JSONAPIFactory();
 
-      factory.addResource('content-types', 'cards')
+      factory.addResource('content-types', 'docs')
         .withAttributes({
           router: [{
             path: '/contextual-favorite-toy/:toy',
@@ -206,7 +206,7 @@ describe('routing/paths', function () {
           }),
         ]);
 
-      applicationCard = factory.addResource('cards', 'app')
+      applicationCard = factory.addResource('docs', 'app')
         .withAttributes({
           'dog-breed': 'dalmatian',
         });
@@ -247,7 +247,7 @@ describe('routing/paths', function () {
     beforeEach(async function () {
       let factory = new JSONAPIFactory();
 
-      factory.addResource('content-types', 'cards')
+      factory.addResource('content-types', 'docs')
         .withAttributes({
           router: [{
             path: '/routing/:router-id',
@@ -260,7 +260,7 @@ describe('routing/paths', function () {
           }]
         });
 
-      applicationCard = factory.addResource('cards', 'app');
+      applicationCard = factory.addResource('docs', 'app');
 
       factory.addResource('content-types', 'routing-cards')
         .withAttributes({
@@ -319,7 +319,7 @@ describe('routing/paths', function () {
     beforeEach(async function () {
       let factory = new JSONAPIFactory();
 
-      factory.addResource('content-types', 'cards')
+      factory.addResource('content-types', 'docs')
         .withAttributes({
           router: [{
             path: '/routing/:router-id',
@@ -332,7 +332,7 @@ describe('routing/paths', function () {
           }]
         });
 
-      applicationCard = factory.addResource('cards', 'app');
+      applicationCard = factory.addResource('docs', 'app');
 
       factory.addResource('content-types', 'routing-cards')
         .withAttributes({
@@ -393,7 +393,7 @@ describe('routing/paths', function () {
     beforeEach(async function () {
       let factory = new JSONAPIFactory();
 
-      factory.addResource('content-types', 'cards')
+      factory.addResource('content-types', 'docs')
         .withAttributes({
           router: [{
             path: '/deep-routing/:router-id',
@@ -406,7 +406,7 @@ describe('routing/paths', function () {
           }]
         });
 
-      applicationCard = factory.addResource('cards', 'app');
+      applicationCard = factory.addResource('docs', 'app');
 
       factory.addResource('content-types', 'routing-cards')
         .withAttributes({
