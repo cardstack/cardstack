@@ -31,5 +31,5 @@ $ perl -p -e 's/\n/\\n/' ~/.ssh/my-private-key_id_rsa
 
 Then in Travis you can specify the env var in the following in manner within the Travis env var text field for the newlines to be converted correctly. Note that the `"` and `'` characters are very critical:
 ```
-"$(echo -e ' -----BEGIN RSA PRIVATE KEY-----\nMKOQ1zYTmd\nzkRpTFq4xu\n-----END RSA PRIVATE KEY-----\n')"
+"$(echo -e '-----BEGIN RSA PRIVATE KEY-----\nMKOQ1zYTmd\nzkRpTFq4xu\n-----END RSA PRIVATE KEY-----\n')"
 ```
