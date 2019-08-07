@@ -107,6 +107,12 @@ class Indexers extends EventEmitter {
     }
   }
 
+  // not using DI to prevent circular dependency
+  _getCardServices() {
+    if (this.cardServices) { return this.cardServices; }
+    return this.cardServices = this.__owner__.lookup('hub:card-services');
+  }
+
   async _setupWorkers() {
     if (!this._workersSetup) {
       await this.jobQueue.subscribe("hub/indexers/update", async ({data: { forceRefresh, hints }}) => {
@@ -131,7 +137,13 @@ class Indexers extends EventEmitter {
     let priorCache = this._schemaCache;
     let running = new RunningIndexers(await this._seedSchema(), this.client, this.emit.bind(this), this.schemaLoader.ownTypes(), getOwner(this));
     try {
-      let newSchema = await running.update(forceRefresh, hints);
+      let { schema:newSchema, cards:newCards } = await running.update(forceRefresh, hints);
+      if (Array.isArray(newCards) && newCards.length) {
+        for (let card of newCards) {
+          await this._getCardServices().loadCard(card);
+        }
+      }
+
       if (this._schemaCache === priorCache) {
         // nobody else has done a more recent update of the schema
         // cache than us, so we can try to update it.

@@ -14,6 +14,7 @@ module.exports = class SourcesUpdate {
     this.searchers = owner.lookup('hub:searchers');
     this.currentSchema = owner.lookup('hub:current-schema');
     this.schemaModels = [];
+    this.cards = [];
     this._schema = null;
     this._batch = client.beginBatch(this.currentSchema, this.searchers);
   }
@@ -117,6 +118,10 @@ module.exports = class SourcesUpdate {
   }
 
   async add(type, id, doc, sourceId, nonce) {
+    if (type === 'cards') {
+      this.cards.push(doc);
+      return; // we'll use card-services to load cards into the index
+    }
     let schema = await this.schema();
     let context = this.searchers.createDocumentContext({
       schema,

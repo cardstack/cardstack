@@ -56,6 +56,10 @@ class Searchers {
 
     let result = await next();
 
+    if (result && result.data.type === 'cards') {
+      await this._getCardServices().loadCard(result);
+    }
+
     let { data, meta, included } = result || {};
     let maxAge = get(result, 'meta.cardstack-cache-control.max-age');
     if (data && maxAge != null) {
@@ -66,40 +70,44 @@ class Searchers {
 
   // not using DI to prevent circular dependency
   _getRouters() {
-    if (this.routers) { this.routers; }
+    if (this.routers) { return this.routers; }
+    return this.routers = this.__owner__.lookup('hub:routers');
+  }
 
-    this.routers = this.__owner__.lookup('hub:routers');
-    return this.routers;
+  // not using DI to prevent circular dependency
+  _getCardServices() {
+    if (this.cardServices) { return this.cardServices; }
+    return this.cardServices = this.__owner__.lookup('hub:card-services');
   }
 
   async getSpace(session, path) {
     return await this.get(session, localHubSource, 'spaces', path);
   }
 
-  async get(session, source, packageName, cardId, opts={}) {
+  async get(session, source, type, id, opts={}) {
     if (source !== localHubSource) {
       throw new Error(`You specified the source: '${source}' in Searchers.get(). Currently the cardstack hub does not support non-local hub sources.`);
     }
 
     let { /*version,*/ includePaths } = opts; // TODO eventually we will handle "version" in the opts to getting a snapshot of a resource
 
-    let { resource, meta, included } = await this.getResourceAndMeta(session, packageName, cardId);
+    let { resource, meta, included } = await this.getResourceAndMeta(session, type, id);
     let authorizedResult;
     let documentContext;
     if (resource) {
       let schema = await this.currentSchema.getSchema();
       documentContext = this.createDocumentContext({
-        id: cardId,
-        type: packageName,
+        id,
+        type,
         schema,
         includePaths,
         upstreamDoc: { data: resource, meta, included }
       });
-      authorizedResult = await documentContext.applyReadAuthorization({ session, packageName, cardId });
+      authorizedResult = await documentContext.applyReadAuthorization({ session, type, id });
     }
 
     if (!authorizedResult) {
-      throw new Error(`No such resource ${source}/${packageName}/${cardId}`, {
+      throw new Error(`No such resource ${source}/${type}/${id}`, {
         status: 404
       });
     }
@@ -134,16 +142,30 @@ class Searchers {
   }
 
   async search(session, query) {
+    let cardServices = this._getCardServices();
+    let { cardContextFromId, cardContextToId } = cardServices;
     if (typeof query !== 'object') {
       throw new Error(`Searchers.search() expects parameters: 'session', 'query'`);
     }
 
-    let schemaPromise = this.currentSchema.getSchema();
+    let schema = await this.currentSchema.getSchema();
     let sessionOrEveryone = session || Session.EVERYONE;
 
     let result = await this._search(sessionOrEveryone)(query);
     if (result) {
-      let schema = await schemaPromise;
+      let cards = result.data ? result.data.filter(i => i.type === 'cards') : [];
+      if (cards.length) {
+        for (let card of cards) {
+          let { repository, packageName } = cardContextFromId(card.id);
+          let cardContext = cardContextToId({ repository, packageName });
+          let included = Array.isArray(result.included) ? result.included.filter(i =>
+            i.id.includes(card.id) ||
+            (schema.isSchemaType(i.type) && i.id.includes(cardContext))
+          ) : [];
+          await cardServices.loadCard({ data: card, included });
+        }
+        schema = await this.currentSchema.getSchema();// card loading may have changed the schema--reload it.
+      }
       let includePaths = (get(query, 'include') || '').split(',');
       let documentContext = this.createDocumentContext({
         schema,

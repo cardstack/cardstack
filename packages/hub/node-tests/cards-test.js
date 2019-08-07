@@ -1,165 +1,350 @@
-
+const JSONAPIFactory = require('@cardstack/test-support/jsonapi-factory');
 const {
   createDefaultEnvironment,
   destroyDefaultEnvironment
 } = require('../../../tests/stub-searcher/node_modules/@cardstack/test-support/env');
+let factory = new JSONAPIFactory();
 
-describe('hub/cards', function () {
-  let env;
+let articleCard = factory.getDocumentFor(
+  factory.addResource('cards', 'local-hub::article-card::millenial-puppies')
+    .withAttributes({
+      'isolated-template': `
+        <h1>{{this.title}}</h1>
+        <h3>By {{this.author}}</h3>
+        <ul>
+          {{#each this.tags as |tag|}}
+            <li>{{tag.id}}</li>
+          {{/each}}
+        </ul>
+        <div>{{this.body}}</div>
+      `,
+      'isolated-js': `
+        import Component from '@glimmer/component';
+        export default class ArticleIsolatedComponent extends Component {};
+      `,
+      'isolated-css': `
+        .article-card-isolated {}
+      `,
+      'embedded-template': `
+        <h3>{{this.title}}</h3>
+        <p>By {{this.author}}</p>
+      `,
+      'embedded-js': `
+        import Component from '@glimmer/component';
+        export default class ArticleEmbeddedComponent extends Component {};
+      `,
+      'embedded-css': `
+        .article-card-embedded {}
+      `,
+      // Note that we're not explicitly specifying the card metadata. The card should be able
+      // generate its metadata based on the fields that we have defined for the card and
+      // the model data that we have specified for the card.
+    })
+    .withRelated('fields', [
+      factory.addResource('fields', 'local-hub::article-card::title').withAttributes({
+        'is-metadata': true,
+        'needed-when-embedded': true,
+        'field-type': '@cardstack/core-types::string' //TODO rework for fields-as-cards
+      }).withRelated('constraints', [
+        factory.addResource('constraints', 'local-hub::article-card::title-not-null')
+          .withAttributes({
+            'constraint-type': '@cardstack/core-types::not-null',
+            'error-message': 'The title must not be empty.'
+          })
+      ]),
+      factory.addResource('fields', 'local-hub::article-card::author').withAttributes({
+        'is-metadata': true,
+        'needed-when-embedded': true,
+        'field-type': '@cardstack/core-types::string'
+      }),
+      factory.addResource('fields', 'local-hub::article-card::body').withAttributes({
+        'is-metadata': true,
+        'field-type': '@cardstack/core-types::string'
+      }),
+      factory.addResource('fields', 'local-hub::article-card::internal-field').withAttributes({
+        'field-type': '@cardstack/core-types::string'
+      }),
 
-  async function teardown() {
+      // TODO is this a legit scenario where a card has a metadata relationship field
+      // to an internal model? Maybe instead, cards' metadata relationships can only be to other cards?
+      // Maybe a better test involving relationships to internal models would be to consume
+      // this relationship in a computed that is a metadata field (and probably we
+      // should have a test that involves a card that has a relationship to another card).
+      factory.addResource('fields', 'local-hub::article-card::tags').withAttributes({
+        'is-metadata': true,
+        'field-type': '@cardstack/core-types::has-many'
+      }).withRelated('related-types', [
+        // this is modeling an enumeration using a private model.
+        // this content type name will be prefixed with the card's
+        // package and card name, such that other cards can also
+        // have their own 'tags' internal content types.
+        factory.addResource('content-types', 'local-hub::article-card::tags')
+      ]),
+    ])
+
+    .withRelated('model', factory.addResource('local-hub::article-card', 'local-hub::article-card::millenial-puppies')
+      .withAttributes({
+        // TODO need to update how the hub serializes fields so that we do not
+        // introduce "::" in the field name which is technically invalid JSON:API
+        'local-hub::article-card::internal-field': 'this is internal data',
+        'local-hub::article-card::title': 'The Millenial Puppy',
+        'local-hub::article-card::author': 'Van Gogh',
+        'local-hub::article-card::body': `
+            It can be difficult these days to deal with the
+            discerning tastes of the millenial puppy. In this
+            article we probe the needs and desires of millenial
+            puppies and why they love belly rubs so much.
+          `
+      })
+
+      // TODO need to update how the hub serializes fields so that we do not
+      // introduce "::" in the field name which is technically invalid JSON:API
+      .withRelated('local-hub::article-card::tags', [
+        // Note that the tags models will be prefixed with this card's ID
+        // such that you will never run into model collisions for tags
+        // of different article cards
+        factory.addResource('local-hub::article-card::tags', 'local-hub::article-card::millenial-puppies::millenials'),
+        factory.addResource('local-hub::article-card::tags', 'local-hub::article-card::millenial-puppies::puppies'),
+        factory.addResource('local-hub::article-card::tags', 'local-hub::article-card::millenial-puppies::belly-rubs'),
+      ])
+    )
+  );
+
+describe('hub/card-services', function () {
+  let env, cardServices;
+
+  afterEach(async function () {
     if (env) {
       await destroyDefaultEnvironment(env);
     }
-  }
+  });
 
-  describe('card schema', function () {
-    let searchers;
-
-    describe('valid schema scenarios', function () {
-      afterEach(teardown);
-
-      it('can define a card schema', async function () {
-        env = await createDefaultEnvironment(`${__dirname}/../../../tests/stub-cards/valid-cards`);
-        searchers = env.lookup('hub:searchers');
-
-        let schema = await searchers.get(env.session, 'local-hub', 'card-definitions', 'local-hub::person-card');
-        expect(schema.data.relationships.model.data).to.eql({ type: 'content-types', id: 'local-hub::person-card::people' });
-
-        schema = await searchers.get(env.session, 'local-hub', 'content-types', 'local-hub::person-card::people');
-        expect(schema.data.attributes).to.eql({ 'name': 'people' });
-        expect(schema.data.relationships.fields.data).to.eql([
-          { type: 'fields', id: 'local-hub::person-card::name' },
-          { type: 'fields', id: 'local-hub::person-card::password' },
-        ]);
-
-        schema = await searchers.get(env.session, 'local-hub', 'fields', 'local-hub::person-card::name');
-        expect(schema.data.attributes).to.eql({
-          'name': 'name',
-          'is-metadata': true,
-          'needed-when-embedded': true,
-          'field-type': '@cardstack/core-types::string'
-        });
-
-        schema = await searchers.get(env.session, 'local-hub', 'fields', 'local-hub::person-card::password');
-        expect(schema.data.attributes).to.eql({
-          'name': 'password',
-          'field-type': '@cardstack/core-types::string'
-        });
-
-        schema = await searchers.get(env.session, 'local-hub', 'card-definitions', 'local-hub::article-card');
-        expect(schema.data.relationships.model.data).to.eql({ type: 'content-types', id: 'local-hub::article-card::articles' });
-
-        schema = await searchers.get(env.session, 'local-hub', 'content-types', 'local-hub::article-card::articles');
-        expect(schema.data.attributes).to.eql({ 'name': 'articles' });
-        expect(schema.data.relationships.fields.data).to.eql([
-          { type: 'fields', id: 'local-hub::article-card::title' },
-          { type: 'fields', id: 'local-hub::article-card::body' },
-          { type: 'fields', id: 'local-hub::article-card::categories' },
-          { type: 'fields', id: 'local-hub::article-card::author' },
-        ]);
-
-        schema = await searchers.get(env.session, 'local-hub', 'content-types', 'local-hub::article-card::categories');
-        expect(schema.data.attributes).to.eql({ 'name': 'categories' });
-        expect(schema.data.relationships).to.be.notOk;
-
-        schema = await searchers.get(env.session, 'local-hub', 'fields', 'local-hub::article-card::title');
-        expect(schema.data.attributes).to.eql({
-          'name': 'title',
-          'is-metadata': true,
-          'needed-when-embedded': true,
-          'placeholder': 'Placeholder Title',
-          'instructions': 'Choose a title that evokes feelings of harmony',
-          'field-type': '@cardstack/core-types::string'
-        });
-        expect(schema.data.relationships.constraints.data).to.be.ok;
-        let constraintId = schema.data.relationships.constraints.data[0].id;
-        expect(constraintId).to.match(/^local-hub::article-card::/);
-
-        schema = await searchers.get(env.session, 'local-hub', 'constraints', constraintId);
-        expect(schema.data.attributes['error-message']).to.equal('The title must not be empty.');
-
-        schema = await searchers.get(env.session, 'local-hub', 'fields', 'local-hub::article-card::body');
-        expect(schema.data.attributes).to.eql({
-          'name': 'body',
-          'is-metadata': true,
-          'field-type': '@cardstack/core-types::string'
-        });
-
-        schema = await searchers.get(env.session, 'local-hub', 'fields', 'local-hub::article-card::categories');
-        expect(schema.data.attributes).to.eql({
-          'name': 'categories',
-          'is-metadata': true,
-          'needed-when-embedded': true,
-          'field-type': '@cardstack/core-types::has-many'
-        });
-
-        schema = await searchers.get(env.session, 'local-hub', 'fields', 'local-hub::article-card::author');
-        expect(schema.data.attributes).to.eql({
-          'name': 'author',
-          'is-metadata': true,
-          'needed-when-embedded': true,
-          'field-type': '@cardstack/core-types::belongs-to'
-        });
+  describe("loads card", function() {
+    describe("validation", function() {
+      beforeEach(async function () {
+        env = await createDefaultEnvironment(`${__dirname}/../../../tests/stub-project`);
+        cardServices = env.lookup('hub:card-services');
       });
 
-      it(`allows for a content-type's field to specify a related-types that refer to another card`, async function () {
-        env = await createDefaultEnvironment(`${__dirname}/../../../tests/stub-cards/valid-cards`);
-        searchers = env.lookup('hub:searchers');
-
-        let schema = await searchers.get(env.session, 'local-hub', 'fields', 'local-hub::article-card::author');
-        expect(schema.data.relationships['related-types'].data).to.eql([
-          { type: 'content-types', id: 'cards' }
-        ]);
+      it.skip("validates that the card's internal models belong to the card--no funny business", async function () {
       });
 
-      it(`allows for a content-type's field to specify a related-types that refer to a content-type within the card schema`, async function () {
-        env = await createDefaultEnvironment(`${__dirname}/../../../tests/stub-cards/valid-cards`);
-        searchers = env.lookup('hub:searchers');
+      it.skip("validates that the card's internal models don't fashion relationships to the internal models of foreign cards", async function () {
+      });
+    });
 
-        let schema = await searchers.get(env.session, 'local-hub', 'fields', 'local-hub::article-card::categories');
-        expect(schema.data.relationships['related-types'].data).to.eql([
-          { type: 'content-types', id: 'local-hub::article-card::categories'
-         }
+    describe("via indexer", function() {
+      let indexers, changedCards = [];
+
+      beforeEach(async function () {
+        let initialFactory = new JSONAPIFactory();
+
+        initialFactory.addResource('data-sources', 'stub-card-indexer')
+          .withAttributes({
+            sourceType: 'stub-card-indexer',
+            params: { changedCards }
+          });
+
+        env = await createDefaultEnvironment(`${__dirname}/../../../tests/stub-card-indexer`, initialFactory.getModels());
+        cardServices = env.lookup('hub:card-services');
+        indexers = env.lookup('hub:indexers');
+      });
+
+      it("will load a card implicitly when an indexer processes a card document", async function () {
+        changedCards.push(articleCard);
+
+        await indexers.update();
+
+        let article = await cardServices.get(env.session, 'local-hub::article-card::millenial-puppies', 'isolated');
+        let { data } = article;
+
+        expect(data.attributes.title).to.equal('The Millenial Puppy');
+        expect(data.attributes.body).to.match(/discerning tastes of the millenial puppy/);
+        expect(data.attributes.author).to.equal('Van Gogh');
+        expect(data.relationships.tags.data).to.eql([
+          { type: 'local-hub::article-card::tags', id: 'local-hub::article-card::millenial-puppies::millenials' },
+          { type: 'local-hub::article-card::tags', id: 'local-hub::article-card::millenial-puppies::puppies' },
+          { type: 'local-hub::article-card::tags', id: 'local-hub::article-card::millenial-puppies::belly-rubs' },
         ]);
       });
     });
 
-    describe('invalid schema scenarios', function () {
-      // no need to teardown() since env is never created in these scenarios
+    describe("via searcher", function() {
+      beforeEach(async function () {
+        let initialFactory = new JSONAPIFactory();
 
-      it('throws when card schema does not return a card-definitions document', async function() {
-        let error;
-        try {
-          await createDefaultEnvironment(`${__dirname}/../../../tests/stub-cards/schema-returns-non-card-definitions-document`);
-        } catch (e) {
-          error = e;
-        }
+        initialFactory.addResource('data-sources', 'stub-card-searcher')
+          .withAttributes({
+            sourceType: 'stub-card-searcher',
+            params: {
+              cardSearchResults: [articleCard]
+            }
+          });
 
-        expect(error.message).to.match(/defines a schema document that is not of type 'card-definitions'/);
+        env = await createDefaultEnvironment(`${__dirname}/../../../tests/stub-card-searcher`, initialFactory.getModels());
+        cardServices = env.lookup('hub:card-services');
       });
 
-      it('throws when content type defined in the card schema uses a field not contained within the card schema', async function () {
-        let error;
-        try {
-          await createDefaultEnvironment(`${__dirname}/../../../tests/stub-cards/content-type-uses-foreign-field`);
-        } catch (e) {
-          error = e;
-        }
+      it("will load a card implicitly when a searcher's get() hook returns a card document", async function () {
+        // The underlying searchers#get will encounter a card that has not been loaded into the index.
+        // The hub should be able to load cards that it discovers from searchers into the index.
+        let article = await cardServices.get(env.session, 'local-hub::article-card::millenial-puppies', 'isolated');
+        let { data } = article;
 
-        expect(error.message).to.match(/refers to field defined in foreign schema/);
+        expect(data.attributes.title).to.equal('The Millenial Puppy');
+        expect(data.attributes.body).to.match(/discerning tastes of the millenial puppy/);
+        expect(data.attributes.author).to.equal('Van Gogh');
+        expect(data.relationships.tags.data).to.eql([
+          { type: 'local-hub::article-card::tags', id: 'local-hub::article-card::millenial-puppies::millenials' },
+          { type: 'local-hub::article-card::tags', id: 'local-hub::article-card::millenial-puppies::puppies' },
+          { type: 'local-hub::article-card::tags', id: 'local-hub::article-card::millenial-puppies::belly-rubs' },
+        ]);
       });
 
-      it(`throws when a content-type's field's related-types refers to a content-type that comes from a different card schema`, async function () {
-        let error;
-        try {
-          await createDefaultEnvironment(`${__dirname}/../../../tests/stub-cards/field-uses-related-types-with-foreign-content-type`);
-        } catch (e) {
-          error = e;
-        }
+      it("will load a card implicitly when a searcher's search() hook returns a card document", async function () {
+        let { data: [article] } = await cardServices.search(env.session, 'isolated', {
+          filter: {
+            type: { exact: 'cards' }
+          }
+        });
 
-        expect(error.message).to.match(/has a related type that refers to a content type defined in a foreign schema/);
+        expect(article.attributes.title).to.equal('The Millenial Puppy');
+        expect(article.attributes.body).to.match(/discerning tastes of the millenial puppy/);
+        expect(article.attributes.author).to.equal('Van Gogh');
+        expect(article.relationships.tags.data).to.eql([
+          { type: 'local-hub::article-card::tags', id: 'local-hub::article-card::millenial-puppies::millenials' },
+          { type: 'local-hub::article-card::tags', id: 'local-hub::article-card::millenial-puppies::puppies' },
+          { type: 'local-hub::article-card::tags', id: 'local-hub::article-card::millenial-puppies::belly-rubs' },
+        ]);
       });
+    });
+  });
+
+  describe('get card', function () {
+    beforeEach(async function () {
+      env = await createDefaultEnvironment(`${__dirname}/../../../tests/stub-project`);
+      cardServices = env.lookup('hub:card-services');
+    });
+
+    it("has card metadata for isolated format", async function () {
+      await cardServices.loadCard(articleCard);
+
+      let article = await cardServices.get(env.session, 'local-hub::article-card::millenial-puppies', 'isolated');
+      let { data } = article;
+
+      expect(data.attributes.title).to.equal('The Millenial Puppy');
+      expect(data.attributes.body).to.match(/discerning tastes of the millenial puppy/);
+      expect(data.attributes.author).to.equal('Van Gogh');
+      expect(data.relationships.tags.data).to.eql([
+        { type: 'local-hub::article-card::tags', id: 'local-hub::article-card::millenial-puppies::millenials' },
+        { type: 'local-hub::article-card::tags', id: 'local-hub::article-card::millenial-puppies::puppies' },
+        { type: 'local-hub::article-card::tags', id: 'local-hub::article-card::millenial-puppies::belly-rubs' },
+      ]);
+      expect(data.attributes['internal-field']).to.be.undefined;
+    });
+
+    it("has card metadata for embedded format", async function () {
+      await cardServices.loadCard(articleCard);
+
+      let article = await cardServices.get(env.session, 'local-hub::article-card::millenial-puppies', 'embedded');
+      let { data, included } = article;
+      let includedIdentifiers = included.map(i => `${i.type}/${i.id}`);
+
+      expect(data.attributes.title).to.equal('The Millenial Puppy');
+      expect(data.attributes.author).to.equal('Van Gogh');
+      expect(data.relationships.tags).to.be.undefined;
+      expect(data.attributes.body).to.be.undefined;
+      expect(data.attributes['internal-field']).to.be.undefined;
+
+      expect(includedIdentifiers).to.not.include.members([
+        'local-hub::article-card::tags/local-hub::article-card::millenial-puppies::millenials',
+        'local-hub::article-card::tags/local-hub::article-card::millenial-puppies::puppies',
+        'local-hub::article-card::tags/local-hub::article-card::millenial-puppies::belly-rubs',
+      ]);
+    });
+
+    it("has card models", async function () {
+      await cardServices.loadCard(articleCard);
+
+      let article = await cardServices.get(env.session, 'local-hub::article-card::millenial-puppies', 'isolated');
+      let { data, included } = article;
+      let includedIdentifiers = included.map(i => `${i.type}/${i.id}`);
+
+      // Card includes backing internal models that are allowed to be included based on metadata visibility
+      expect(data.relationships.model.data).to.eql({ type: 'local-hub::article-card', id: 'local-hub::article-card::millenial-puppies' });
+      expect(includedIdentifiers).to.include.members(['local-hub::article-card/local-hub::article-card::millenial-puppies']);
+      expect(includedIdentifiers).to.include.members([
+        'local-hub::article-card::tags/local-hub::article-card::millenial-puppies::millenials',
+        'local-hub::article-card::tags/local-hub::article-card::millenial-puppies::puppies',
+        'local-hub::article-card::tags/local-hub::article-card::millenial-puppies::belly-rubs',
+      ]);
+    });
+
+    it("has card schema", async function () {
+      await cardServices.loadCard(articleCard);
+
+      let article = await cardServices.get(env.session, 'local-hub::article-card::millenial-puppies', 'isolated');
+      let { data, included } = article;
+      let includedIdentifiers = included.map(i => `${i.type}/${i.id}`);
+
+      expect(data.relationships.fields.data).to.eql([
+        { type: 'fields', id: 'local-hub::article-card::title' },
+        { type: 'fields', id: 'local-hub::article-card::author' },
+        { type: 'fields', id: 'local-hub::article-card::body' },
+        { type: 'fields', id: 'local-hub::article-card::internal-field' },
+        { type: 'fields', id: 'local-hub::article-card::tags' },
+      ]);
+      expect(includedIdentifiers).to.include.members([
+        'fields/local-hub::article-card::title',
+        'fields/local-hub::article-card::body',
+        'fields/local-hub::article-card::author',
+        'fields/local-hub::article-card::internal-field',
+        'fields/local-hub::article-card::tags',
+        'content-types/local-hub::article-card::tags',
+        'constraints/local-hub::article-card::title-not-null'
+      ]);
+
+      // Card does not include the primary model content type schema--as that is derived by the hub,
+      // and there is really nothing that explicitly references it, so it wouldn't really make sense
+      // to include anyways...
+      expect(includedIdentifiers).to.not.include.members([
+        'content-types/local-hub::article-card'
+      ]);
+    });
+
+    it("has card browser assets", async function () {
+      await cardServices.loadCard(articleCard);
+
+      let article = await cardServices.get(env.session, 'local-hub::article-card::millenial-puppies', 'isolated');
+      let { data } = article;
+
+      // Note that the browser assets not defined in the card will inherit from the adopted card, or ultimately the genesis card
+      expect(data.attributes['isolated-template']).to.match(/<div>\{\{this\.body\}\}<\/div>/);
+      expect(data.attributes['isolated-js']).to.match(/ArticleIsolatedComponent/);
+      expect(data.attributes['isolated-css']).to.match(/\.article-card-isolated \{\}/);
+      expect(data.attributes['embedded-template']).to.match(/<h3>\{\{this\.title\}\}<\/h3>/);
+      expect(data.attributes['embedded-js']).to.match(/ArticleEmbeddedComponent/);
+      expect(data.attributes['embedded-css']).to.match(/\.article-card-embedded \{\}/);
+    });
+
+    it.skip("has card metadata computed fields", async function() {
+    });
+
+    it.skip("has card metadata relationship to another card", async function() {
+    });
+  });
+
+  describe.skip('search for card', function () {
+    it("can search for a card", async function () {
+      // TODO we should be able to leverage the card metadata as fields we can search against for a card
+    });
+  });
+
+  describe.skip('read authorization', function() {
+    it('does not return card metadata that the session does not have read authorization for', async function() {
+    });
+
+    it('does not contain included resource for card metadata relationship that the session does not have read authorization for', async function() {
     });
   });
 });

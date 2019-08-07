@@ -11,7 +11,6 @@ const models = [
     relationships: {
       fields: {
         data: [
-          { type: 'fields', id: 'name' },
           { type: 'fields', id: 'data-source' },
           { type: 'fields', id: 'fields' },
           { type: 'fields', id: 'is-built-in' },
@@ -26,28 +25,36 @@ const models = [
   },
   {
     type: 'content-types',
-    id: 'card-definitions',
-    attributes: {
-      'is-built-in': true
-    },
-    relationships: {
-      fields: {
-        data: [
-          { type: 'fields', id: 'model' },
-        ]
-      }
-    }
-  },
-  {
-    type: 'content-types',
     id: 'cards',
     attributes: {
-      'is-built-in': true
+      'is-built-in': true,
+      'default-includes': [
+        'fields',
+        'fields.related-types',
+        'fields.constraints',
+        'model',
+      ]
     },
     relationships: {
       fields: {
         data: [
+          { type: 'fields', id: 'edit-template' },
+          { type: 'fields', id: 'isolated-template' },
+          { type: 'fields', id: 'embedded-template' },
+          { type: 'fields', id: 'edit-js' },
+          { type: 'fields', id: 'isolated-js' },
+          { type: 'fields', id: 'embedded-js' },
+          { type: 'fields', id: 'edit-css' },
+          { type: 'fields', id: 'isolated-css' },
+          { type: 'fields', id: 'embedded-css' },
+          // This relationship is used to define the metadata fields that the card contains,
+          // internal fields can be defined on the model's content type.
+          // maybe 'metadata' is a better name for this relationship,
+          // so we dont conflate this with the content-type's 'fields' relationship?
+          { type: 'fields', id: 'fields' },
           { type: 'fields', id: 'model' },
+
+          // TODO add 'adopts' and 'implments' relationships
         ]
       }
     }
@@ -61,7 +68,6 @@ const models = [
     relationships: {
       fields: {
         data: [
-          { type: 'fields', id: 'name' },
           { type: 'fields', id: 'field-type' },
           { type: 'fields', id: 'related-types' },
           { type: 'fields', id: 'default-at-create' },
@@ -281,6 +287,69 @@ const models = [
           { type: 'fields', id: 'field' }
         ]
       }
+    }
+  },
+  {
+    type: 'fields',
+    id: 'edit-template',
+    attributes: {
+      'field-type': '@cardstack/core-types::string'
+    }
+  },
+  {
+    type: 'fields',
+    id: 'isolated-template',
+    attributes: {
+      'field-type': '@cardstack/core-types::string'
+    }
+  },
+  {
+    type: 'fields',
+    id: 'embedded-template',
+    attributes: {
+      'field-type': '@cardstack/core-types::string'
+    }
+  },
+  {
+    type: 'fields',
+    id: 'edit-js',
+    attributes: {
+      'field-type': '@cardstack/core-types::string'
+    }
+  },
+  {
+    type: 'fields',
+    id: 'isolated-js',
+    attributes: {
+      'field-type': '@cardstack/core-types::string'
+    }
+  },
+  {
+    type: 'fields',
+    id: 'embedded-js',
+    attributes: {
+      'field-type': '@cardstack/core-types::string'
+    }
+  },
+  {
+    type: 'fields',
+    id: 'edit-css',
+    attributes: {
+      'field-type': '@cardstack/core-types::string'
+    }
+  },
+  {
+    type: 'fields',
+    id: 'isolated-css',
+    attributes: {
+      'field-type': '@cardstack/core-types::string'
+    }
+  },
+  {
+    type: 'fields',
+    id: 'embedded-css',
+    attributes: {
+      'field-type': '@cardstack/core-types::string'
     }
   },
   {
