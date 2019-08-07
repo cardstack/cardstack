@@ -44,8 +44,9 @@ GIT_PRIVATE_KEY="/path/to/your/key/id_rsa"
 ### Example configuration
 
 For example, the configuration below is set in `cardhost/data-sources/default.js`.
-The Hub has a `default-data-source` relationship that points to `@cardstack/git`.
-The result for this example is that Cards will use a local git repository by default.
+This config creates a `@cardstack/git` data source named `default` and configures it 
+as the Hub's `default-data-source`.
+Now, if a Card does not have its own data source defined, it will use git.
 
 ```js
 let sources = [
