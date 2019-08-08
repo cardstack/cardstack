@@ -30,7 +30,7 @@ The only required configuration is to set either `repo` or `remote`.
 
 | Parameter | Type |  Description |
 |-----------|------|-------------|
-| `remote` | object |  Use a remote git repository, such as one hosted on Github. The object should contain a `url` string and the absolute path to your `privateKey` as a string. Example: `remote: { url: 'some-url', privateKey: process.env.GIT_PRIVATE_KEY}`|
+| `remote` | object |  Use a remote git repository, such as one hosted on Github. The object should contain `url` and `privateKey` with type string. Example: `remote: { url: 'some-url', privateKey: process.env.GIT_PRIVATE_KEY}`|
 | `repo` | string | The path to a local git repository that already exists on disk, and has an initial commit |
 | `branchPrefix` | string | optional - a prefix to prepend to the git branch when saving data. This is especially useful when you are storing data in the same repository as your project, or you have one repository that holds code for multiple projects. Example: if you set `basePath: 'cs-'`, data will be stored at `cs-master`|
 | `basePath` | string | optional - specify the directory within a repository where the data should be stored. Example: if you set `basePath` to `my/base` and you save an `article` Card, data will be stored at `my/base/contents/articles/`|
@@ -38,7 +38,7 @@ The only required configuration is to set either `repo` or `remote`.
 You can set variables such as `process.env.GIT_PRIVATE_KEY` from the command line. For the example below, substitute your own path to the key:
 
 ```bash
-GIT_PRIVATE_KEY="/path/to/your/key/id_rsa"
+GIT_PRIVATE_KEY="your private key here"
 ```
 
 ### Example configuration
