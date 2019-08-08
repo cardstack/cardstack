@@ -3,7 +3,9 @@ import { action } from '@ember/object';
 
 export default class EditController extends Controller {
   @action
-  save() {
-    return this.model.save();
+  async save() {
+    await this.model.save();
+
+    this.transitionToRoute('articles', this.model);
   }
 }
