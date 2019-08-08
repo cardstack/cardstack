@@ -6,5 +6,6 @@ export default function(server) {
   */
 
   server.createList('article', 10);
+  server.createList('event', 10);
   // server.loadFixtures();
 }

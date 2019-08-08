@@ -1,4 +1,4 @@
-<div class="boxel {{if contentType (concat "boxel-" contentType)}}" role="button" {{action clickAction}}>
+<div class="boxel {{if contentType (concat "boxel-" contentType)}} {{@variant}}" role="button" {{action clickAction}}>
   {{#if (has-block)}}
     {{yield}}
   {{else if content}}

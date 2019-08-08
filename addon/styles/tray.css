@@ -1,0 +1,17 @@
+.boxel-tray {
+  width: 100%;
+  background-color: transparent;
+  transition: background-color 0.5s ease-out;
+}
+
+.boxel-tray.expanded {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: #373741;
+}

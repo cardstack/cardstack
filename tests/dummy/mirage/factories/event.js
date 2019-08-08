@@ -5,7 +5,7 @@ const imageTypes = ["animals", "business", "cats", "city", "food", "nightlife", 
 
 export default Factory.extend({
   title(i) {
-    return `Article ${i + 1} - ${faker.random.words(3)}`;
+    return `Event ${i + 1} - ${faker.random.words(3)}`;
   },
 
   description() {
@@ -24,9 +24,9 @@ export default Factory.extend({
     return faker.image.imageUrl(640, 480, imageTypes[Math.floor(Math.random()*imageTypes.length)], true, true);
   },
 
-  afterCreate(article, server) {
-    if (!article.author) {
-      article.update({
+  afterCreate(event, server) {
+    if (!event.author) {
+      event.update({
         author: server.create('person')
       });
     }
