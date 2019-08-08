@@ -1,5 +1,6 @@
 export default function() {
   this.namespace = 'api';
-  this.get('/articles');
-  this.get('/events');
+  this.resource('articles');
+  this.resource('events');
+  this.resource('people');
 }

@@ -1,4 +1,14 @@
+import faker from 'faker';
+
+const imageTypes = ["animals", "business", "cats", "city", "food", "nightlife", "fashion", "people", "nature", "sports", "technics", "transport"];
+
 export default [
-  { id: 1, title: 'My Awesome Article', description: 'Article I wrote for the NY Times', publishedDate: '2018-09-22' },
-  { id: 2, title: 'Another Article', description: 'It\'s not so good', publishedDate: '2018-10-22' }
+  {
+    id: 'sample',
+    title: `Sample Article`,
+    description: faker.random.words(5),
+    publishedDate: faker.date.past().toLocaleDateString(),
+    imageUrl: faker.image.imageUrl(640, 480, imageTypes[Math.floor(Math.random()*imageTypes.length)], true, true),
+    authorId: '1'
+  }
 ]
