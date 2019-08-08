@@ -41,11 +41,19 @@ body {
 
 .catalog-item--isolated {
   display: grid;
-  grid-template-columns: 1fr 250px;
   max-width: 900px;
   max-height: 500px;
   width: 100%;
   height: 100%;
+}
+
+.catalog-item--isolated--preview {
+  grid-template-columns: 1fr 250px;
+}
+
+.catalog-item--isolated--edit {
+  padding: 30px;
+  grid-template-columns: 1fr;
 }
 
 .catalog-item--isolated > div {
