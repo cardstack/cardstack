@@ -11,7 +11,10 @@ Router.map(function() {
     this.route('preview', { path: '/:model/preview' });
     this.route('edit', { path: '/:model/edit' });
   });
-  this.route('articles', { path: '/articles/:id'});
+  this.route('articles', { path: '/articles/:id'}, function() {
+    this.route('preview', { path: '/preview' });
+    this.route('edit', { path: '/edit' });
+  });
   this.route('events', { path: '/events/:id'});
 });
 

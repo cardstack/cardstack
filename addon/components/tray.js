@@ -4,6 +4,7 @@ import layout from '../templates/components/tray';
 export default Component.extend({
   layout,
   tagName: '',
+  expanded: false,
 
   trayAction() {},
 
