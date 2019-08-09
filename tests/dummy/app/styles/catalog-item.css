@@ -1,0 +1,44 @@
+.catalog-item {
+  background-color: white;
+}
+
+.catalog-item--preview {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 200px;
+  background-color: var(--catalog-light-purple);
+}
+
+.catalog-item--info {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100px;
+  overflow: hidden;
+}
+
+.catalog-item--isolated {
+  display: grid;
+  max-width: 900px;
+  max-height: 500px;
+  width: 100%;
+  height: 100%;
+}
+
+.catalog-item--isolated--preview {
+  grid-template-columns: 1fr 250px;
+}
+
+.catalog-item--isolated--edit {
+  padding: 30px;
+  grid-template-columns: 1fr;
+}
+
+.catalog-item--isolated > div {
+  height: 100%;
+}
+
+.catalog-item--isolated > .catalog-item--info {
+  display: block;
+}

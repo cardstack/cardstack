@@ -1,0 +1,18 @@
+<div class="card-catalog">
+  {{#each model as |item|}}
+    <AnimatedContainer>
+      <Tray>
+        <div role="button" class="catalog-item" onclick={{action "preview" item.constructor.modelName}}>
+          <div class="catalog-item--preview">
+            {{#animated-value item duration="1000"}}
+              <Boxel @content={{item}} @variant="small" />
+            {{/animated-value}}
+          </div>
+          <div class="catalog-item--info">
+            <h3>{{item.title}}</h3>
+          </div>
+        </div>
+      </Tray>
+    </AnimatedContainer>
+  {{/each}}
+</div>

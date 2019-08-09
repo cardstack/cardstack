@@ -1,16 +1,5 @@
-<div class="card-catalog">
-  {{#each model as |item|}}
-    <Tray>
-      <div class="catalog-item">
-        <div class="catalog-item--preview">
-          <Boxel @content={{item}} @variant="small" @clickAction={{action "preview" item.constructor.modelName}}/>
-        </div>
-        <div class="catalog-item--info">
-          <h3>{{item.title}}</h3>
-        </div>
-      </div>
-    </Tray>
-  {{/each}}
-
-  {{outlet}}
+<div style="position: absolute; top: 0; left: 0;">
+  {{animated-orphans}}
 </div>
+
+{{outlet}}
