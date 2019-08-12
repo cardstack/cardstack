@@ -1,13 +1,11 @@
 import Controller from '@ember/controller';
-import move, { continuePrior } from 'ember-animated/motions/move';
-import scale from 'ember-animated/motions/scale';
-import opacity from 'ember-animated/motions/opacity';
+import move from 'ember-animated/motions/move';
 import { parallel, printSprites, wait } from 'ember-animated';
 
 export default Controller.extend({
   preserveScrollPosition: true,
 
-  transition: function * ({ receivedSprites, sentSprites, removedSprites, insertedSprites }) {
+  transition: function * ({ receivedSprites, sentSprites }) {
     try {
       printSprites(arguments[0]);
 
@@ -17,18 +15,8 @@ export default Controller.extend({
         });
       });
 
-      receivedSprites.forEach(parallel(move, scale));
-      sentSprites.forEach(parallel(move, scale));
-
-      removedSprites.forEach(sprite => {
-        sprite.endTranslatedBy(0, 0);
-        continuePrior(sprite);
-        opacity(sprite, { to: 0 });
-      });
-
-      insertedSprites.forEach(sprite => {
-        opacity(sprite, { from: 0, to: 1 });
-      });
+      receivedSprites.forEach(parallel(move));
+      sentSprites.forEach(parallel(move));
     }
 
     catch (err) {

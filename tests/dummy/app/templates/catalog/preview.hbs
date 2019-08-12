@@ -1,20 +1,16 @@
-{{#animated-value "preview-route" initialInsertion=true finalRemoval=true use=transition duration=1000}}
-  <div>
-    <AnimatedContainer>
-      <Tray @expanded={{true}}>
-        <div class="catalog-item catalog-item--isolated catalog-item--isolated--preview">
-          <div class="catalog-item--preview">
-            {{#animated-value model use=transition duration=700 as |m|}}
-              <Boxel @content={{m}} @variant="small" />
-            {{/animated-value}}
-          </div>
-          <div class="catalog-item--info">
-            <h3>{{model.constructor.modelName}} template</h3>
-            <p>{{model.constructor.modelName}} metadata...</p>
-            <LinkTo @route="catalog.edit" @tagName="button" @model={{model.constructor.modelName}}>Start Editing</LinkTo>
-          </div>
-        </div>
-      </Tray>
-    </AnimatedContainer>
+<Tray @expanded={{true}}>
+  <div class="catalog-item catalog-item--isolated catalog-item--isolated--preview">
+    <div class="catalog-item--preview">
+      <AnimatedContainer>
+        {{#animated-value model use=transition duration="700" as |m|}}
+          <Boxel @content={{m}} @variant="small" />
+        {{/animated-value}}
+      </AnimatedContainer>
+    </div>
+    <div class="catalog-item--info">
+      <h3>{{model.constructor.modelName}} template</h3>
+      <p>{{model.constructor.modelName}} metadata...</p>
+      <LinkTo @route="catalog.edit" @tagName="button" @model={{model.constructor.modelName}}>Start Editing</LinkTo>
+    </div>
   </div>
-{{/animated-value}}
+</Tray>
