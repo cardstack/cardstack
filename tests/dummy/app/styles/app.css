@@ -35,3 +35,9 @@ a {
 a:hover {
   color: var(--catalog-dark-purple);
 }
+
+.catalog-animated {
+  position: absolute;
+  top: 0;
+  left: 0;
+}
