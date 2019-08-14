@@ -1,5 +1,6 @@
 @import 'card-catalog.css';
 @import 'catalog-item.css';
+@import 'tools.css';
 
 :root {
   --catalog-light-gray: #f2f2f4;

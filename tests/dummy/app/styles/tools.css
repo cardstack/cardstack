@@ -1,0 +1,20 @@
+.tools-header {
+  z-index: 10;
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 50px;
+  background-color: var(--catalog-dark-purple);
+  text-align: center;
+}
+
+.tools-header > button {
+  background-color: var(--catalog-light-purple);
+  color: white;
+  border: none;
+  border-radius: 10px;
+  padding: 10px 20px;
+  font-size: 14px;
+  margin: 5px;
+}

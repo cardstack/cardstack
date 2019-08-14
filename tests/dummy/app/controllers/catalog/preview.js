@@ -1,8 +1,10 @@
 import Controller from '@ember/controller';
 import move from 'ember-animated/motions/move';
 import { parallel, printSprites, wait } from 'ember-animated';
+import { inject as service } from '@ember/service';
 
 export default Controller.extend({
+  boxel: service(),
   preserveScrollPosition: true,
 
   transition: function * ({ receivedSprites, sentSprites }) {
@@ -22,6 +24,14 @@ export default Controller.extend({
     catch (err) {
       yield wait(500);
       throw new Error(err);
+    }
+  },
+
+  actions: {
+    editModel(modelType) {
+      this.boxel.set('currentPlane', 'tools');
+
+      this.transitionToRoute('tools.edit', modelType);
     }
   }
 });

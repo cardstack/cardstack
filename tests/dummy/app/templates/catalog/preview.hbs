@@ -8,9 +8,11 @@
       </AnimatedContainer>
     </div>
     <div class="catalog-item--info">
-      <h3>{{model.constructor.modelName}} template</h3>
-      <p>{{model.constructor.modelName}} metadata...</p>
-      <LinkTo @route="catalog.edit" @tagName="button" @model={{model.constructor.modelName}}>Start Editing</LinkTo>
+      <h2>{{model.title}}</h2>
+      <div class="catalog-item--author-name">{{model.author.fullName}}</div>
+      <h3>{{model.description}}</h3>
+      <p>{{model.body}}</p>
+      <button {{action "editModel" model.constructor.modelName}} class="catalog-item--button-edit">Start Editing</button>
     </div>
   </div>
 </Tray>
