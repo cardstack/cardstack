@@ -1,16 +1,16 @@
+import { action } from '@ember/object';
+import { tagName, layout as templateLayout } from '@ember-decorators/component';
 import Component from '@ember/component';
 import layout from '../templates/components/tray';
 
-export default Component.extend({
-  layout,
-  tagName: '',
-  expanded: false,
+@templateLayout(layout)
+@tagName('')
+export default class TrayComponent extends Component {
+  expanded = false;
+  trayAction() {}
 
-  trayAction() {},
-
-  actions: {
-    isolate() {
-      this.set('expanded', true);
-    }
+  @action
+  isolate() {
+    this.set('expanded', true);
   }
-});
+}

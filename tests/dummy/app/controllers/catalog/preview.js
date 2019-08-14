@@ -2,12 +2,16 @@ import Controller from '@ember/controller';
 import move from 'ember-animated/motions/move';
 import { parallel, printSprites, wait } from 'ember-animated';
 import { inject as service } from '@ember/service';
+import { action } from '@ember/object';
+import { task } from 'ember-concurrency-decorators';
 
-export default Controller.extend({
-  boxel: service(),
-  preserveScrollPosition: true,
+export default class CatalogPreviewController extends Controller {
+  @service boxel;
+  
+  preserveScrollPosition = true;
 
-  transition: function * ({ receivedSprites, sentSprites }) {
+  @task
+  transition = function*({ receivedSprites, sentSprites }) {
     try {
       printSprites(arguments[0]);
 
@@ -25,13 +29,12 @@ export default Controller.extend({
       yield wait(500);
       throw new Error(err);
     }
-  },
-
-  actions: {
-    editModel(modelType) {
-      this.boxel.set('currentPlane', 'tools');
-
-      this.transitionToRoute('tools.edit', modelType);
-    }
   }
-});
+
+  @action
+  editModel(modelType) {
+    this.boxel.set('currentPlane', 'tools');
+
+    this.transitionToRoute('tools.edit', modelType);
+  }
+}

@@ -1,31 +1,38 @@
 import Component from '@ember/component';
-import { computed } from '@ember/object';
+import { computed, action } from '@ember/object';
 import { inject as service } from '@ember/service';
-import layout from '../templates/components/boxel';
+import template from '../templates/components/boxel';
+import { layout, tagName } from '@ember-decorators/component';
 
-const { readOnly } = computed;
-export default Component.extend({
-  layout,
-  tagName: '',
-  boxel: service(),
+@layout(template)
+@tagName('')
+export default class BoxelComponent extends Component {
+  @service boxel;
 
-  contentType: readOnly('content.constructor.modelName'),
+  @computed('content')
+  get contentType() {
+    if (this.content) {
+      return this.content.constructor.modelName;
+    }
+
+    return null;
+  }
 
   init() {
-    this._super(...arguments);
+    super.init(...arguments);
 
     this.boxel.registerBoxel(this);
-  },
-
-  name: computed('elementId', function() {
-    return `boxel-${this.elementId}`;
-  }),
-
-  clickAction() {},
-
-  actions: {
-    moveToPlane(planeId) {
-      this.set('plane', planeId);
-    }
   }
-});
+
+  @computed('elementId')
+  get name() {
+    return `boxel-${this.elementId}`;
+  }
+
+  clickAction() {}
+
+  @action
+  moveToPlane(planeId) {
+    this.set('plane', planeId);
+  }
+}
