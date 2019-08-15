@@ -13,7 +13,7 @@
     "test": "mocha ../test-support/bin/run.js"
   },
   "dependencies": {
-    "@cardstack/gitchain": "0.2.2",
+    "githereum": "0.0.1",
     "@cardstack/logger": "^0.2.0",
     "@cardstack/plugin-utils": "0.14.23",
     "delay": "^4.1.0",
@@ -23,7 +23,8 @@
     "moment-timezone": "^0.5.11",
     "nodegit": "^0.23.0",
     "rimraf": "^2.6.2",
-    "temp": "^0.8.3"
+    "temp": "^0.8.3",
+    "truffle-contract": "^4.0.30"
   },
   "devDependencies": {
     "@cardstack/di": "0.14.23",

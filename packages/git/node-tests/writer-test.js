@@ -846,8 +846,8 @@ describe('git/writer', function() {
   });
 });
 
-describe('git/writer/hyperledger', function() {
-  let env, writers, repoPath, writer, gitChain;
+describe('git/writer/githereum', function() {
+  let env, writers, repoPath, writer, githereum, fakeContract;
 
   beforeEach(async function() {
     repoPath = await temp.mkdir('git-writer-test');
@@ -860,14 +860,10 @@ describe('git/writer/hyperledger', function() {
         'source-type': '@cardstack/git',
         params: {
           repo: repoPath,
-          hyperledger: {
-            privateKey: "Here is a private key",
-            apiBase: "http://example.com/1234",
+          githereum: {
+            contractAddress: '0xD8B92BE4420Fe70b62FF5e5F8eE5CF87871952e1',
             tag: 'test-tag',
-            blobStorage: {
-              type: 'tmpfile',
-              path: 'tmp/blobs'
-            }
+            repoName: 'githereum-repo'
           }
         }
       });
@@ -884,8 +880,12 @@ describe('git/writer/hyperledger', function() {
 
     let schema = await writers.currentSchema.getSchema();
     writer = schema.getDataSource('git').writer;
-    await writer._ensureGitchain();
-    gitChain = writer.gitChain;
+
+
+    fakeContract = {};
+    replace(writer, '_getGithereumContract', fake.returns(fakeContract));
+    await writer._ensureGithereum();
+    githereum = writer.githereum;
 
   });
 
@@ -894,10 +894,10 @@ describe('git/writer/hyperledger', function() {
     await destroyDefaultEnvironment(env);
   });
 
-  it('writes to hyperledger if configured when writing', async function () { let
-  fakePush = fake.returns(new Promise(resolve => resolve()));
+  it('writes to githereum if configured when writing', async function () {
+    let fakePush = fake.returns(new Promise(resolve => resolve()));
 
-    replace(gitChain, 'push', fakePush);
+    replace(githereum, 'push', fakePush);
 
     await writers.create(env.session, 'articles', {
       data: {
@@ -908,10 +908,11 @@ describe('git/writer/hyperledger', function() {
       }
     });
 
-    // correct config is passed in to gitChain
-    expect(await realpathPromise(gitChain.repoPath)).to.equal(await realpathPromise(repoPath));
-    expect(gitChain.readPrivateKey()).to.equal("Here is a private key");
-    expect(gitChain.apiBase).to.equal("http://example.com/1234");
+    // correct config is passed in to githereum
+    expect(await realpathPromise(githereum.repoPath)).to.equal(await realpathPromise(repoPath));
+
+    expect(githereum.contract).to.equal(fakeContract);
+    expect(githereum.repoName).to.equal("githereum-repo");
 
 
     // push is called with the correct tag
