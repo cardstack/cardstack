@@ -3,14 +3,12 @@ import move from 'ember-animated/motions/move';
 import { parallel, printSprites, wait } from 'ember-animated';
 import { inject as service } from '@ember/service';
 import { action } from '@ember/object';
-import { task } from 'ember-concurrency-decorators';
 
 export default class CatalogPreviewController extends Controller {
   @service boxel;
-  
+
   preserveScrollPosition = true;
 
-  @task
   transition = function*({ receivedSprites, sentSprites }) {
     try {
       printSprites(arguments[0]);
