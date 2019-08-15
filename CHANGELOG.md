@@ -7,6 +7,19 @@ and features, and is not intended to be an exhaustive list.
 
 ## [Unreleased]
 
+## [v0.14.22] - 2019-08-15
+
+### Added
+
+- Commits for the WIP Cardstack CLI
+
+### Changed
+
+- Bugfix for tools package - enable string field editor #813
+- error logging
+- docs for git plugins
+- more linting configuration to support using TypeScript
+
 ## [v0.14.21] - 2019-07-18
 
 This is a summary of breaking changes and new features since `v0.13`.
