@@ -1,6 +1,6 @@
 {
   "name": "@cardstack/cardhost",
-  "version": "0.14.21",
+  "version": "0.14.22",
   "description": "The stock Ember app blueprint that hosts Cardstack Cards.",
   "repository": "",
   "license": "MIT",
@@ -17,10 +17,10 @@
     "test": "ember test"
   },
   "devDependencies": {
-    "@cardstack/ephemeral": "0.14.21",
-    "@cardstack/eslint-config": "0.14.21",
-    "@cardstack/hub": "0.14.21",
-    "@cardstack/jsonapi": "0.14.21",
+    "@cardstack/ephemeral": "0.14.22",
+    "@cardstack/eslint-config": "0.14.22",
+    "@cardstack/hub": "0.14.22",
+    "@cardstack/jsonapi": "0.14.22",
     "@ember/jquery": "^0.6.1",
     "@ember/optional-features": "^0.7.0",
     "@embroider/compat": "^0.6.0",
