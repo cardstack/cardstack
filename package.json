@@ -43,7 +43,6 @@
     "ember-cli-sri": "^2.1.1",
     "ember-cli-template-lint": "^1.0.0-beta.1",
     "ember-cli-uglify": "^2.1.0",
-    "ember-concurrency-decorators": "^0.6.0",
     "ember-data": "^3.11.4",
     "ember-decorators-polyfill": "^1.0.6",
     "ember-disable-prototype-extensions": "^1.1.3",
