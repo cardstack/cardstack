@@ -3,6 +3,7 @@ const log = require('@cardstack/logger')('cardstack/searchers');
 const Error = require('@cardstack/plugin-utils/error');
 const Session = require('@cardstack/plugin-utils/session');
 const DocumentContext = require('./indexing/document-context');
+const { cardContextFromId, cardContextToId } = require('@cardstack/plugin-utils/card-context');
 const { get } = require('lodash');
 
 const localHubSource = 'local-hub';
@@ -143,7 +144,6 @@ class Searchers {
 
   async search(session, query) {
     let cardServices = this._getCardServices();
-    let { cardContextFromId, cardContextToId } = cardServices;
     if (typeof query !== 'object') {
       throw new Error(`Searchers.search() expects parameters: 'session', 'query'`);
     }

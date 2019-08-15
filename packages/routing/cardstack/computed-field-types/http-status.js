@@ -6,7 +6,7 @@ const errorCardMapping = {
 
 exports.compute = async function(model) {
   let primaryCard = await model.getRelated('primary-card');
-  let meta = primaryCard.getMeta();
+  let meta = primaryCard.meta;
 
   if (meta && meta['is-error-card']) {
     return errorCardMapping[await primaryCard.getField('id')] || 500;

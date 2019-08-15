@@ -4,6 +4,7 @@ const authLog = require('@cardstack/logger')('cardstack/auth');
 const { isEqual } = require('lodash');
 
 const legalFieldName = /^[a-zA-Z0-9](?:[-_a-zA-Z0-9]*[a-zA-Z0-9])?$/;
+const { cardIdDelimiter } = require('@cardstack/plugin-utils/card-context');
 
 module.exports = class Field {
   static isValidName(name) {
@@ -11,12 +12,13 @@ module.exports = class Field {
   }
 
   constructor(model, plugins, allGrants, defaultValues) {
-    let fieldName = model.id.split('::').pop();
+    let fieldName = model.id.split(cardIdDelimiter).pop();
     if (!Field.isValidName(fieldName)) {
       throw new Error(`${fieldName} is not a valid field name. We follow JSON:API spec for valid member names, see http://jsonapi.org/format/#document-member-names`);
     }
 
     this.id = model.id;
+    this.name = fieldName;
     if (!model.attributes || !model.attributes['field-type']) {
       throw new Error(`field ${model.id} has no field-type attribute`);
     }
@@ -86,9 +88,9 @@ module.exports = class Field {
     if (document) {
       let section = this._sectionName();
       if (section === 'top') {
-        return document[this.id];
+        return document[this.name];
       } else if (document[section]) {
-        return document[section][this.id];
+        return document[section][this.name];
       }
     }
   }
@@ -96,19 +98,19 @@ module.exports = class Field {
   pointer() {
     let sectionName = this._sectionName();
     if (sectionName === 'top') {
-      return `/data/${this.id}`;
+      return `/data/${this.name}`;
     } else {
-      return `/data/${sectionName}/${this.id}`;
+      return `/data/${sectionName}/${this.name}`;
     }
   }
 
   _checkInWrongSection(pendingChange, errors) {
     let sectionName = this.isRelationship ? 'attributes' : 'relationships';
     let section = pendingChange.finalDocument[sectionName];
-    if (section && section[this.id]) {
-      errors.push(new Error(`field "${this.id}" should be in ${this._sectionName()}, not ${sectionName}`, {
+    if (section && section[this.name]) {
+      errors.push(new Error(`field "${this.name}" should be in ${this._sectionName()}, not ${sectionName}`, {
         status: 400,
-        source: { pointer: `/data/${sectionName}/${this.id}` }
+        source: { pointer: `/data/${sectionName}/${this.name}` }
       }));
     }
   }
@@ -188,12 +190,12 @@ module.exports = class Field {
 
       let section = this._sectionName();
       if (section === 'top') {
-        pendingChange.finalDocument[this.id] = defaultValue.value;
+        pendingChange.finalDocument[this.name] = defaultValue.value;
       } else {
         if (!pendingChange.finalDocument[section]) {
           pendingChange.finalDocument[section] = {};
         }
-        pendingChange.finalDocument[section][this.id] = defaultValue.value;
+        pendingChange.finalDocument[section][this.name] = defaultValue.value;
       }
     }
   }

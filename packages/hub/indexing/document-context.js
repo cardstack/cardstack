@@ -406,8 +406,8 @@ module.exports = class DocumentContext {
         continue;
       }
       if (contentType.computedFields.has(field.id) ||
-          (jsonapiDoc.attributes && jsonapiDoc.attributes.hasOwnProperty(field.id))) {
-        let value = await userModel.getField(field.id);
+          (jsonapiDoc.attributes && jsonapiDoc.attributes.hasOwnProperty(field.name))) {
+        let value = await userModel.getField(field.name);
         await this._buildAttribute(field, value, pristineDocOut, searchDocOut);
       }
      }
@@ -415,9 +415,9 @@ module.exports = class DocumentContext {
 
   async _buildAttribute(field, value, pristineDocOut, searchDocOut) {
     // Write our value into the search doc
-    searchDocOut[field.id] = field.searchIndexFormat(value);
+    searchDocOut[field.name] = field.searchIndexFormat(value);
     // Write our value into the pristine doc
-    ensure(pristineDocOut, 'attributes')[field.id] = value;
+    ensure(pristineDocOut, 'attributes')[field.name] = value;
   }
 
   async _buildRelationships(contentType, jsonapiDoc, userModel, pristineDocOut, searchDocOut, searchTree, depth, fieldsets) {
@@ -426,7 +426,7 @@ module.exports = class DocumentContext {
         continue;
       }
       if (contentType.computedFields.has(field.id) ||
-          (jsonapiDoc.relationships && jsonapiDoc.relationships.hasOwnProperty(field.id))) {
+          (jsonapiDoc.relationships && jsonapiDoc.relationships.hasOwnProperty(field.name))) {
 
         let fieldset = fieldsets && fieldsets.find(f => f.field === field.id);
         await this._buildRelationship(field, pristineDocOut, searchDocOut, searchTree, depth, get(fieldset, 'format'), userModel);
@@ -435,30 +435,30 @@ module.exports = class DocumentContext {
   }
 
   async _buildRelationship(field, pristineDocOut, searchDocOut, searchTree, depth, format, userModel) {
-    let relObj = await userModel.getField(field.id);
+    let relObj = await userModel.getField(field.name);
     let related;
-    if (searchTree[field.id]) {
-      let models = await userModel.getRelated(field.id);
+    if (searchTree[field.name]) {
+      let models = await userModel.getRelated(field.name);
       if (Array.isArray(models)) {
         related = await Promise.all(models.map(async (model) => {
-          return this._build(model.type, model.id, privateModels.get(model).jsonapiDoc, searchTree[field.id], depth + 1, format);
+          return this._build(model.type, model.id, privateModels.get(model).jsonapiDoc, searchTree[field.name], depth + 1, format);
         }));
-        ensure(pristineDocOut, 'relationships')[field.id] = Object.assign({}, relObj, { data: related.map(r => ({ type: r.type, id: r.id })) });
+        ensure(pristineDocOut, 'relationships')[field.name] = Object.assign({}, relObj, { data: related.map(r => ({ type: r.type, id: r.id })) });
       } else {
         let model = models;
         if (model) {
-          related = await this._build(model.type, model.id, privateModels.get(model).jsonapiDoc, searchTree[field.id], depth + 1, format);
+          related = await this._build(model.type, model.id, privateModels.get(model).jsonapiDoc, searchTree[field.name], depth + 1, format);
         }
         let data = related ? { type: related.type, id: related.id } : null;
-        ensure(pristineDocOut, 'relationships')[field.id] = Object.assign({}, relObj, { data });
+        ensure(pristineDocOut, 'relationships')[field.name] = Object.assign({}, relObj, { data });
       }
     } else {
       if (relObj.data) {
         related = relObj.data;
       }
-      ensure(pristineDocOut, 'relationships')[field.id] = Object.assign({}, relObj);
+      ensure(pristineDocOut, 'relationships')[field.name] = Object.assign({}, relObj);
     }
-    searchDocOut[field.id] = related;
+    searchDocOut[field.name] = related;
   }
 
   _buildSearchTree(searchTree, segments) {

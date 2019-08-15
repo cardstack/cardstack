@@ -1,5 +1,6 @@
 const Error = require('@cardstack/plugin-utils/error');
 const Session = require('@cardstack/plugin-utils/session');
+const { cardContextFromId, cardContextToId } = require('@cardstack/plugin-utils/card-context');
 const { declareInjections } = require('@cardstack/di');
 const { partition, uniqWith, isEqual, uniq } = require('lodash');
 
@@ -62,12 +63,14 @@ class Schema {
 
   withOnlyRealFields(doc) {
     let activeDoc = doc;
+    let { repository, packageName } = cardContextFromId(doc.type);
     for (let section of ['attributes', 'relationships']) {
       if (!doc[section]) {
         continue;
       }
       for (let fieldName of Object.keys(doc[section])) {
-        if (!this.realFields.has(fieldName)) {
+        let fieldId = cardContextToId({ repository, packageName, cardId: fieldName });
+        if (!this.realFields.has(fieldId)) {
           if (activeDoc === doc) {
             activeDoc = Object.assign({}, doc);
           }

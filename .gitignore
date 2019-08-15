@@ -24,6 +24,9 @@ package-lock.json
 /packages/hub/indexing/operations.js
 /packages/hub/indexing/operations.js.map
 
+/packages/plugin-utils/card-context.d.ts
+/packages/plugin-utils/card-context.js
+/packages/plugin-utils/card-context.js.map
 /packages/plugin-utils/session.d.ts
 /packages/plugin-utils/session.js
 /packages/plugin-utils/session.js.map
@@ -39,7 +42,14 @@ package-lock.json
 /packages/di/**/*.js.map
 /packages/di/**/*.d.ts
 /tests/ephemeral-test-app/node_modules/@cardstack/hub/**/*
-/tests/elasticsearch-test-app/node_modules/@cardstack/hub/**/*
+
+# this is more for eslint to ignore, which is also using this file as a list of things to not lint
+/tests/**/node_modules/@cardstack/**/*.js
+/tests/**/node_modules/@cardstack/**/*.js.map
+/tests/**/node_modules/@cardstack/**/*.d.ts
+/packages/**/node_modules/@cardstack/**/*.js
+/packages/**/node_modules/@cardstack/**/*.js.map
+/packages/**/node_modules/@cardstack/**/*.d.ts
 
 # generated files you may end up with if you run the cli blueprint directly
 packages/cli/node-tests/sample-cards/*/node_modules/**/*

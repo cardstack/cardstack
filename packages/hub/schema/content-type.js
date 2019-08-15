@@ -4,6 +4,7 @@ const { flatten } = require('lodash');
 const Realms = require('./realms');
 const authLog = require('@cardstack/logger')('cardstack/auth');
 const Session = require('@cardstack/plugin-utils/session');
+const { cardContextFromId, cardContextToId } = require('@cardstack/plugin-utils/card-context');
 
 module.exports = class ContentType {
   constructor(model, allFields, allComputedFields, allConstraints, dataSources, defaultDataSource, allGrants, allGroups) {
@@ -50,6 +51,7 @@ module.exports = class ContentType {
     this.realAndComputedFields = realAndComputedFields;
 
     this.id = model.id;
+    this.cardContext = cardContextFromId(model.id);
     if (model.relationships && model.relationships['data-source'] && model.relationships['data-source'].data) {
       this.dataSource = dataSources.get(model.relationships['data-source'].data.id);
       if (!this.dataSource) {
@@ -168,13 +170,15 @@ module.exports = class ContentType {
 
   _validateUnknownFields(pending, errors) {
     let { finalDocument, originalDocument } = pending;
+    let { repository, packageName } = this.cardContext;
 
     if (finalDocument.attributes) {
       let originalFields = originalDocument && originalDocument.attributes
         ? Object.keys(originalDocument.attributes) : [];
 
       for (let fieldName of Object.keys(finalDocument.attributes)) {
-        if (!this.realFields.has(fieldName) && !originalFields.includes(fieldName)) {
+        let fieldId = cardContextToId({ repository, packageName, cardId: fieldName });
+        if (!this.realFields.has(fieldId) && !originalFields.includes(fieldName)) {
           errors.push(this._unknownFieldError(fieldName, 'attributes'));
         }
       }
@@ -185,7 +189,8 @@ module.exports = class ContentType {
         ? Object.keys(originalDocument.relationships) : [];
 
       for (let fieldName of Object.keys(finalDocument.relationships)) {
-        if (!this.realFields.has(fieldName) && !originalFields.includes(fieldName)) {
+        let fieldId = cardContextToId({ repository, packageName, cardId: fieldName });
+        if (!this.realFields.has(fieldId) && !originalFields.includes(fieldName)) {
           errors.push(this._unknownFieldError(fieldName, 'relationships'));
         }
       }

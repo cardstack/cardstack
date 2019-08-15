@@ -1,3 +1,5 @@
+const { cardContextFromId, cardContextToId } = require('@cardstack/plugin-utils/card-context');
+
 // This implements the public interface that allows user-provided code
 // (like computed fields) to access models.
 const priv = new WeakMap();
@@ -28,22 +30,29 @@ exports.Model = class Model {
     return priv.get(this).jsonapiDoc.type;
   }
 
-  getContentType() {
+  get cardContext() {
+    return cardContextFromId(this.type);
+  }
+
+  get contentType() {
     return priv.get(this).contentType;
   }
 
-  getMeta() {
+  get meta() {
     let { jsonapiDoc } = priv.get(this);
     if (jsonapiDoc) {
       return jsonapiDoc.meta;
     }
+    return null;
   }
 
   async getField(fieldName) {
     let { contentType, jsonapiDoc } = priv.get(this);
-    let field = contentType.realAndComputedFields.get(fieldName);
+    let { repository, packageName } = this.cardContext;
+    let fieldId = cardContextToId({ repository, packageName, cardId: fieldName });
+    let field = contentType.realAndComputedFields.get(fieldId);
     if (!field) {
-      throw new Error(`tried to access nonexistent field ${fieldName}`);
+      throw new Error(`tried to access nonexistent field ${fieldId}`);
     }
     let computedField = contentType.computedFields.get(field.id);
     if (computedField) {
@@ -54,19 +63,21 @@ exports.Model = class Model {
       return userValue;
     } else if (field.isRelationship) {
       if (jsonapiDoc.relationships) {
-        return jsonapiDoc.relationships[field.id];
+        return jsonapiDoc.relationships[fieldName];
       }
     } else if (field.id === 'id' || field.id === 'type') {
       return jsonapiDoc[field.id];
     } else {
-      return jsonapiDoc.attributes && jsonapiDoc.attributes[field.id];
+      return jsonapiDoc.attributes && jsonapiDoc.attributes[fieldName];
     }
   }
 
   async getRelated(fieldName) {
     let relObj = await this.getField(fieldName);
     let { contentType } = priv.get(this);
-    let field = contentType.realAndComputedFields.get(fieldName);
+    let { repository, packageName } = this.cardContext;
+    let fieldId = cardContextToId({ repository, packageName, cardId: fieldName });
+    let field = contentType.realAndComputedFields.get(fieldId);
     let isCollection = field.fieldType === '@cardstack/core-types::has-many';
 
     if (relObj && relObj.hasOwnProperty('links') && relObj.links.related) {

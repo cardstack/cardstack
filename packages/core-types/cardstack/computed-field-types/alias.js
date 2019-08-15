@@ -5,7 +5,7 @@ async function resolvePath(model, pathSegments) {
 
   if (pathSegments.length === 1) {
     let field = pathSegments[0];
-    let contentType = model.getContentType();
+    let contentType = model.contentType;
     let isRelationship = contentType.realAndComputedFields.get(field).isRelationship;
     return isRelationship ? await model.getRelated(field) : await model.getField(field);
   }

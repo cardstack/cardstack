@@ -1,10 +1,10 @@
 import Session from '@cardstack/plugin-utils/session';
+import { cardContextFromId, cardContextToId, cardIdDelimiter } from '@cardstack/plugin-utils/card-context';
 import { declareInjections } from '@cardstack/di';
 import { todo } from '@cardstack/plugin-utils/todo-any';
 import { SingleResourceDoc, ResourceObject, ResourceIdentifierObject, CollectionResourceDoc } from 'jsonapi-typescript';
 import { get, uniqBy } from 'lodash';
 
-const cardIdDelim = '::';
 const cardBrowserAssetFields = [
   'isolated-template',
   'isolated-js',
@@ -16,12 +16,6 @@ const cardBrowserAssetFields = [
   'edit-js',
   'edit-css',
 ];
-interface CardContext {
-  repository: string;
-  packageName: string;
-  cardId?: string;
-  modelId?: string;
-}
 
 export = declareInjections({
   writers: 'hub:writers',
@@ -36,29 +30,14 @@ class CardServices {
   searchers: todo;
   currentSchema: todo;
 
-  cardContextFromId(id: string) {
-    let [repository, packageName, cardId, modelId] = id.split(cardIdDelim);
-
-    return {
-      repository,
-      packageName,
-      cardId,
-      modelId,
-    };
-  }
-
-  cardContextToId({ repository, packageName, cardId, modelId }: CardContext) {
-    return [repository, packageName, cardId, modelId].filter(i => i != null).join(cardIdDelim);
-  }
-
   // TODO should we care about the session of the caller who is requesting to load the card?
   async loadCard(card: SingleResourceDoc) {
     if (!card.data.id) { throw new Error(`Cannot load card with missing id.`); }
     let cardId = card.data.id;
 
     let existingCardModel;
-    let { repository, packageName } = this.cardContextFromId(cardId);
-    let cardModelType = this.cardContextToId({ repository, packageName });
+    let { repository, packageName } = cardContextFromId(cardId);
+    let cardModelType = cardContextToId({ repository, packageName });
     try {
       // use the card's model to check for presence of a card, as checking for the presence using
       // the card itself will result in cycle as the act of searching for a card here will
@@ -91,8 +70,8 @@ class CardServices {
 
   async get(session: Session, id: string, format: string) {
     let rawCard = await this.searchers.get(session, 'local-hub', 'cards', id);
-    let { repository, packageName } = this.cardContextFromId(id);
-    let cardModelType = this.cardContextToId({ repository, packageName });
+    let { repository, packageName } = cardContextFromId(id);
+    let cardModelType = cardContextToId({ repository, packageName });
     let model = await this.searchers.get(session, 'local-hub', cardModelType, id);
 
     let card = await this.adaptCardToFormat(rawCard, model, format);
@@ -161,14 +140,13 @@ class CardServices {
       let field = schema.realAndComputedFields.get(fieldId);
 
       if (this.formatHasField(field, format)) {
-        let { cardId: fieldName } = this.cardContextFromId(fieldId);
-        let fieldAttrValue = get(model, `data.attributes.${fieldId}`);
-        let fieldRelValue = get(model, `data.relationships.${fieldId}`);
+        let fieldAttrValue = get(model, `data.attributes.${field.name}`);
+        let fieldRelValue = get(model, `data.relationships.${field.name}`);
 
         if (!field.isRelationship && fieldAttrValue !== undefined && result.data.attributes) {
-          result.data.attributes[fieldName] = fieldAttrValue;
+          result.data.attributes[field.name] = fieldAttrValue;
         } else if (field.isRelationship && fieldRelValue !== undefined && result.data.relationships && result.included) {
-          result.data.relationships[fieldName] = Object.assign({}, fieldRelValue);
+          result.data.relationships[field.name] = Object.assign({}, fieldRelValue);
           let includedResources: ResourceObject[] = [];
           if (Array.isArray(fieldRelValue.data)) {
             let relRefs = fieldRelValue.data.map((i: ResourceIdentifierObject) => `${i.type}/${i.id}`);
@@ -205,18 +183,18 @@ class CardServices {
       cardModelSchema.push(resource);
     }
 
-    let { repository, packageName } = this.cardContextFromId(card.data.id);
+    let { repository, packageName } = cardContextFromId(card.data.id);
     let defaultIncludes = (card.included || []).filter(i =>
       // field is not yet in the schema, so we'll need to introspect the field document for this
       (i.type === 'fields' || i.type === 'computed-fields') &&
       get(i, 'attributes.is-metadata')
       // not checking field-type, as that precludes using computed relationships for meta
       // which should be allowed. this will result in adding attr fields here, but that should be harmless
-    ).map(i => i.id) as string[];
+    ).map(i => (i.id || '').split(cardIdDelimiter).pop()) as string[];
 
     let modelContentType: ResourceObject = {
       type: 'content-types',
-      id: this.cardContextToId({ repository, packageName }),
+      id: cardContextToId({ repository, packageName }),
       attributes: {
         // we'll default includes all the metadata fields, and let adoptCardToFormat()
         // control presence of included resources based on requested format

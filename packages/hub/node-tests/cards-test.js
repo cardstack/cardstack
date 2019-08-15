@@ -84,22 +84,17 @@ let articleCard = factory.getDocumentFor(
 
     .withRelated('model', factory.addResource('local-hub::article-card', 'local-hub::article-card::millenial-puppies')
       .withAttributes({
-        // TODO need to update how the hub serializes fields so that we do not
-        // introduce "::" in the field name which is technically invalid JSON:API
-        'local-hub::article-card::internal-field': 'this is internal data',
-        'local-hub::article-card::title': 'The Millenial Puppy',
-        'local-hub::article-card::author': 'Van Gogh',
-        'local-hub::article-card::body': `
+        'internal-field': 'this is internal data',
+        'title': 'The Millenial Puppy',
+        'author': 'Van Gogh',
+        'body': `
             It can be difficult these days to deal with the
             discerning tastes of the millenial puppy. In this
             article we probe the needs and desires of millenial
             puppies and why they love belly rubs so much.
           `
       })
-
-      // TODO need to update how the hub serializes fields so that we do not
-      // introduce "::" in the field name which is technically invalid JSON:API
-      .withRelated('local-hub::article-card::tags', [
+      .withRelated('tags', [
         // Note that the tags models will be prefixed with this card's ID
         // such that you will never run into model collisions for tags
         // of different article cards
