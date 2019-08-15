@@ -3,10 +3,12 @@ import { computed } from '@ember/object';
 
 const { Model, attr } = DS;
 
-export default Model.extend({
-  firstName: attr(),
-  lastName: attr(),
-  fullName: computed('firstName', 'lastName', function() {
+export default class Person extends Model {
+  @attr() firstName;
+  @attr() lastName;
+
+  @computed('firstName', 'lastName')
+  get fullName() {
     return `${this.firstName} ${this.lastName}`;
-  })
-});
+  }
+}

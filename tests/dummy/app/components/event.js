@@ -1,5 +1,6 @@
 import Component from '@ember/component';
+import { tagName } from '@ember-decorators/component';
 
-export default Component.extend({
-  tagName: ''
-});
+@tagName('')
+export default class EventComponent extends Component {
+}
