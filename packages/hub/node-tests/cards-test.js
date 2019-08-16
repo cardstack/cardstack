@@ -64,12 +64,14 @@ let articleCard = factory.getDocumentFor(
       factory.addResource('fields', 'local-hub::article-card::internal-field').withAttributes({
         'field-type': '@cardstack/core-types::string'
       }),
+      factory.addResource('computed-fields', 'local-hub::article-card::tag-names').withAttributes({
+        'is-metadata': true,
+        'needed-when-embedded': true,
+        'computed-field-type': 'stub-card-project::tags'
+      }),
 
       // TODO is this a legit scenario where a card has a metadata relationship field
       // to an internal model? Maybe instead, cards' metadata relationships can only be to other cards?
-      // Maybe a better test involving relationships to internal models would be to consume
-      // this relationship in a computed that is a metadata field (and probably we
-      // should have a test that involves a card that has a relationship to another card).
       factory.addResource('fields', 'local-hub::article-card::tags').withAttributes({
         'is-metadata': true,
         'field-type': '@cardstack/core-types::has-many'
@@ -117,7 +119,7 @@ describe('hub/card-services', function () {
   describe("loads card", function() {
     describe("validation", function() {
       beforeEach(async function () {
-        env = await createDefaultEnvironment(`${__dirname}/../../../tests/stub-project`);
+        env = await createDefaultEnvironment(`${__dirname}/../../../tests/stub-card-project`);
         cardServices = env.lookup('hub:card-services');
       });
 
@@ -136,11 +138,11 @@ describe('hub/card-services', function () {
 
         initialFactory.addResource('data-sources', 'stub-card-indexer')
           .withAttributes({
-            sourceType: 'stub-card-indexer',
+            sourceType: 'stub-card-project',
             params: { changedCards }
           });
 
-        env = await createDefaultEnvironment(`${__dirname}/../../../tests/stub-card-indexer`, initialFactory.getModels());
+        env = await createDefaultEnvironment(`${__dirname}/../../../tests/stub-card-project`, initialFactory.getModels());
         cardServices = env.lookup('hub:card-services');
         indexers = env.lookup('hub:indexers');
       });
@@ -155,12 +157,6 @@ describe('hub/card-services', function () {
 
         expect(data.attributes.title).to.equal('The Millenial Puppy');
         expect(data.attributes.body).to.match(/discerning tastes of the millenial puppy/);
-        expect(data.attributes.author).to.equal('Van Gogh');
-        expect(data.relationships.tags.data).to.eql([
-          { type: 'local-hub::article-card::tags', id: 'local-hub::article-card::millenial-puppies::millenials' },
-          { type: 'local-hub::article-card::tags', id: 'local-hub::article-card::millenial-puppies::puppies' },
-          { type: 'local-hub::article-card::tags', id: 'local-hub::article-card::millenial-puppies::belly-rubs' },
-        ]);
       });
     });
 
@@ -170,13 +166,13 @@ describe('hub/card-services', function () {
 
         initialFactory.addResource('data-sources', 'stub-card-searcher')
           .withAttributes({
-            sourceType: 'stub-card-searcher',
+            sourceType: 'stub-card-project',
             params: {
               cardSearchResults: [articleCard]
             }
           });
 
-        env = await createDefaultEnvironment(`${__dirname}/../../../tests/stub-card-searcher`, initialFactory.getModels());
+        env = await createDefaultEnvironment(`${__dirname}/../../../tests/stub-card-project`, initialFactory.getModels());
         cardServices = env.lookup('hub:card-services');
       });
 
@@ -188,12 +184,6 @@ describe('hub/card-services', function () {
 
         expect(data.attributes.title).to.equal('The Millenial Puppy');
         expect(data.attributes.body).to.match(/discerning tastes of the millenial puppy/);
-        expect(data.attributes.author).to.equal('Van Gogh');
-        expect(data.relationships.tags.data).to.eql([
-          { type: 'local-hub::article-card::tags', id: 'local-hub::article-card::millenial-puppies::millenials' },
-          { type: 'local-hub::article-card::tags', id: 'local-hub::article-card::millenial-puppies::puppies' },
-          { type: 'local-hub::article-card::tags', id: 'local-hub::article-card::millenial-puppies::belly-rubs' },
-        ]);
       });
 
       it("will load a card implicitly when a searcher's search() hook returns a card document", async function () {
@@ -205,19 +195,13 @@ describe('hub/card-services', function () {
 
         expect(article.attributes.title).to.equal('The Millenial Puppy');
         expect(article.attributes.body).to.match(/discerning tastes of the millenial puppy/);
-        expect(article.attributes.author).to.equal('Van Gogh');
-        expect(article.relationships.tags.data).to.eql([
-          { type: 'local-hub::article-card::tags', id: 'local-hub::article-card::millenial-puppies::millenials' },
-          { type: 'local-hub::article-card::tags', id: 'local-hub::article-card::millenial-puppies::puppies' },
-          { type: 'local-hub::article-card::tags', id: 'local-hub::article-card::millenial-puppies::belly-rubs' },
-        ]);
       });
     });
   });
 
   describe('get card', function () {
     beforeEach(async function () {
-      env = await createDefaultEnvironment(`${__dirname}/../../../tests/stub-project`);
+      env = await createDefaultEnvironment(`${__dirname}/../../../tests/stub-card-project`);
       cardServices = env.lookup('hub:card-services');
     });
 
@@ -230,6 +214,7 @@ describe('hub/card-services', function () {
       expect(data.attributes.title).to.equal('The Millenial Puppy');
       expect(data.attributes.body).to.match(/discerning tastes of the millenial puppy/);
       expect(data.attributes.author).to.equal('Van Gogh');
+      expect(data.attributes['tag-names']).to.eql(['millenials', 'puppies', 'belly-rubs']);
       expect(data.relationships.tags.data).to.eql([
         { type: 'local-hub::article-card::tags', id: 'local-hub::article-card::millenial-puppies::millenials' },
         { type: 'local-hub::article-card::tags', id: 'local-hub::article-card::millenial-puppies::puppies' },
@@ -247,6 +232,7 @@ describe('hub/card-services', function () {
 
       expect(data.attributes.title).to.equal('The Millenial Puppy');
       expect(data.attributes.author).to.equal('Van Gogh');
+      expect(data.attributes['tag-names']).to.eql(['millenials', 'puppies', 'belly-rubs']);
       expect(data.relationships.tags).to.be.undefined;
       expect(data.attributes.body).to.be.undefined;
       expect(data.attributes['internal-field']).to.be.undefined;
@@ -282,11 +268,12 @@ describe('hub/card-services', function () {
       let { data, included } = article;
       let includedIdentifiers = included.map(i => `${i.type}/${i.id}`);
 
-      expect(data.relationships.fields.data).to.eql([
+      expect(data.relationships['fields'].data).to.eql([
         { type: 'fields', id: 'local-hub::article-card::title' },
         { type: 'fields', id: 'local-hub::article-card::author' },
         { type: 'fields', id: 'local-hub::article-card::body' },
         { type: 'fields', id: 'local-hub::article-card::internal-field' },
+        { type: 'computed-fields', id: 'local-hub::article-card::tag-names' },
         { type: 'fields', id: 'local-hub::article-card::tags' },
       ]);
       expect(includedIdentifiers).to.include.members([
@@ -295,6 +282,7 @@ describe('hub/card-services', function () {
         'fields/local-hub::article-card::author',
         'fields/local-hub::article-card::internal-field',
         'fields/local-hub::article-card::tags',
+        'computed-fields/local-hub::article-card::tag-names',
         'content-types/local-hub::article-card::tags',
         'constraints/local-hub::article-card::title-not-null'
       ]);
@@ -320,9 +308,6 @@ describe('hub/card-services', function () {
       expect(data.attributes['embedded-template']).to.match(/<h3>\{\{this\.title\}\}<\/h3>/);
       expect(data.attributes['embedded-js']).to.match(/ArticleEmbeddedComponent/);
       expect(data.attributes['embedded-css']).to.match(/\.article-card-embedded \{\}/);
-    });
-
-    it.skip("has card metadata computed fields", async function() {
     });
 
     it.skip("has card metadata relationship to another card", async function() {

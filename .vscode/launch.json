@@ -110,7 +110,7 @@
         "--timeout",
         "200000",
         //  "--grep",
-        //  "ephemeral-storage"
+        //  "get card"
       ]
     },
     {

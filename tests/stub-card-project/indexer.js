@@ -19,6 +19,7 @@ class Updater {
   }
 
   async updateContent(meta, hints, ops) {
+    if (!this.changedCards) { return; }
     for (let card of this.changedCards) {
       if (card) {
         await ops.save(card.data.type, card.data.id, card);

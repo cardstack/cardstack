@@ -80,9 +80,7 @@ const models = [
           { type: 'fields', id: 'inline-editor-options'},
           { type: 'fields', id: 'is-metadata'},
           { type: 'fields', id: 'needed-when-embedded'},
-          { type: 'fields', id: 'instructions'},
           { type: 'fields', id: 'constraints'},
-          { type: 'fields', id: 'placeholder'},
         ]
       }
     }
@@ -100,7 +98,9 @@ const models = [
           { type: 'fields', id: 'computed-field-type' },
           { type: 'fields', id: 'caption' },
           { type: 'fields', id: 'searchable' },
-          { type: 'fields', id: 'params' }
+          { type: 'fields', id: 'params' },
+          { type: 'fields', id: 'is-metadata'},
+          { type: 'fields', id: 'needed-when-embedded'}
         ]
       }
     }
@@ -670,7 +670,7 @@ const models = [
     },
     relationships: {
       'related-types': {
-        data: [{ type: 'content-types', id: 'fields' }]
+        data: [{ type: 'content-types', id: 'fields' }, { type: 'content-types', id: 'computed-fields'}]
       }
     }
   },

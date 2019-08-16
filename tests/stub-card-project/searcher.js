@@ -6,10 +6,12 @@ module.exports = class StubCardSearcher {
 
   constructor(params) {
     this.cards = params.cardSearchResults;
-    this.cardIds = this.cards.map(i => i.data.id);
+    this.cardIds = this.cards ? this.cards.map(i => i.data.id) : [];
   }
 
   async get(session, type, id, next) {
+    if (!this.cards || !this.cards.length) { return next(); }
+
     if (type === 'cards' && this.cardIds.includes(id)) {
       return this.cards.find(i => i.data.id === id);
     }
@@ -17,6 +19,8 @@ module.exports = class StubCardSearcher {
   }
 
   async search(session, query, next) {
+    if (!this.cards || !this.cards.length) { return next(); }
+
     if (query && query.filter && (query.filter.type === 'cards' || query.filter.type.exact === 'cards')) {
       let included = [];
       let data = [];
