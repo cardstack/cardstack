@@ -3,109 +3,13 @@ const {
   createDefaultEnvironment,
   destroyDefaultEnvironment
 } = require('../../../tests/stub-searcher/node_modules/@cardstack/test-support/env');
-let factory = new JSONAPIFactory();
 
-let articleCard = factory.getDocumentFor(
-  factory.addResource('cards', 'local-hub::article-card::millenial-puppies')
-    .withAttributes({
-      'isolated-template': `
-        <h1>{{this.title}}</h1>
-        <h3>By {{this.author}}</h3>
-        <ul>
-          {{#each this.tags as |tag|}}
-            <li>{{tag.id}}</li>
-          {{/each}}
-        </ul>
-        <div>{{this.body}}</div>
-      `,
-      'isolated-js': `
-        import Component from '@glimmer/component';
-        export default class ArticleIsolatedComponent extends Component {};
-      `,
-      'isolated-css': `
-        .article-card-isolated {}
-      `,
-      'embedded-template': `
-        <h3>{{this.title}}</h3>
-        <p>By {{this.author}}</p>
-      `,
-      'embedded-js': `
-        import Component from '@glimmer/component';
-        export default class ArticleEmbeddedComponent extends Component {};
-      `,
-      'embedded-css': `
-        .article-card-embedded {}
-      `,
-      // Note that we're not explicitly specifying the card metadata. The card should be able
-      // generate its metadata based on the fields that we have defined for the card and
-      // the model data that we have specified for the card.
-    })
-    .withRelated('fields', [
-      factory.addResource('fields', 'local-hub::article-card::title').withAttributes({
-        'is-metadata': true,
-        'needed-when-embedded': true,
-        'field-type': '@cardstack/core-types::string' //TODO rework for fields-as-cards
-      }).withRelated('constraints', [
-        factory.addResource('constraints', 'local-hub::article-card::title-not-null')
-          .withAttributes({
-            'constraint-type': '@cardstack/core-types::not-null',
-            'error-message': 'The title must not be empty.'
-          })
-      ]),
-      factory.addResource('fields', 'local-hub::article-card::author').withAttributes({
-        'is-metadata': true,
-        'needed-when-embedded': true,
-        'field-type': '@cardstack/core-types::string'
-      }),
-      factory.addResource('fields', 'local-hub::article-card::body').withAttributes({
-        'is-metadata': true,
-        'field-type': '@cardstack/core-types::string'
-      }),
-      factory.addResource('fields', 'local-hub::article-card::internal-field').withAttributes({
-        'field-type': '@cardstack/core-types::string'
-      }),
-      factory.addResource('computed-fields', 'local-hub::article-card::tag-names').withAttributes({
-        'is-metadata': true,
-        'needed-when-embedded': true,
-        'computed-field-type': 'stub-card-project::tags'
-      }),
-
-      // TODO is this a legit scenario where a card has a metadata relationship field
-      // to an internal model? Maybe instead, cards' metadata relationships can only be to other cards?
-      factory.addResource('fields', 'local-hub::article-card::tags').withAttributes({
-        'is-metadata': true,
-        'field-type': '@cardstack/core-types::has-many'
-      }).withRelated('related-types', [
-        // this is modeling an enumeration using a private model.
-        // this content type name will be prefixed with the card's
-        // package and card name, such that other cards can also
-        // have their own 'tags' internal content types.
-        factory.addResource('content-types', 'local-hub::article-card::tags')
-      ]),
-    ])
-
-    .withRelated('model', factory.addResource('local-hub::article-card', 'local-hub::article-card::millenial-puppies')
-      .withAttributes({
-        'internal-field': 'this is internal data',
-        'title': 'The Millenial Puppy',
-        'author': 'Van Gogh',
-        'body': `
-            It can be difficult these days to deal with the
-            discerning tastes of the millenial puppy. In this
-            article we probe the needs and desires of millenial
-            puppies and why they love belly rubs so much.
-          `
-      })
-      .withRelated('tags', [
-        // Note that the tags models will be prefixed with this card's ID
-        // such that you will never run into model collisions for tags
-        // of different article cards
-        factory.addResource('local-hub::article-card::tags', 'local-hub::article-card::millenial-puppies::millenials'),
-        factory.addResource('local-hub::article-card::tags', 'local-hub::article-card::millenial-puppies::puppies'),
-        factory.addResource('local-hub::article-card::tags', 'local-hub::article-card::millenial-puppies::belly-rubs'),
-      ])
-    )
-  );
+const articleCard = require('./cards/article-card');
+const foreignSchema = require('./cards/card-with-foreign-schema');
+const foreignModelType = require('./cards/card-with-foreign-model-type');
+const foreignModelId = require('./cards/card-with-foreign-model-id');
+const mismatchedModelId = require('./cards/card-with-mismatched-model-id');
+const foreignInternalRelationship = require('./cards/card-with-foreign-internal-relationship');
 
 describe('hub/card-services', function () {
   let env, cardServices;
@@ -117,16 +21,72 @@ describe('hub/card-services', function () {
   });
 
   describe("loads card", function() {
-    describe("validation", function() {
+    describe("card validation", function() {
       beforeEach(async function () {
         env = await createDefaultEnvironment(`${__dirname}/../../../tests/stub-card-project`);
         cardServices = env.lookup('hub:card-services');
       });
 
-      it.skip("validates that the card's internal models belong to the card--no funny business", async function () {
+      it("does not allow card with foreign schema to be loaded", async function () {
+        let error;
+        try {
+          await cardServices.loadCard(foreignSchema);
+        } catch (e) {
+          error = e;
+        }
+        expect(error.status).to.equal(400);
+        expect(error.message).to.match(/foreign schema/);
+        expect(error.source).to.eql({ pointer: 'data/relationships/fields'});
       });
 
-      it.skip("validates that the card's internal models don't fashion relationships to the internal models of foreign cards", async function () {
+      it("does not allow card with foreign model content-type to be loaded", async function () {
+        let error;
+        try {
+          await cardServices.loadCard(foreignModelType);
+        } catch (e) {
+          error = e;
+        }
+        expect(error.status).to.equal(400);
+        expect(error.message).to.match(/foreign schema/);
+        expect(error.source).to.eql({ pointer: 'data/relationships/model'});
+      });
+
+      it("does not allow card with foreign model id to be loaded", async function () {
+        let error;
+        try {
+          await cardServices.loadCard(foreignModelId);
+        } catch (e) {
+          error = e;
+        }
+        expect(error.status).to.equal(400);
+        expect(error.message).to.match(/foreign model/);
+        expect(error.source).to.eql({ pointer: 'data/relationships/model'});
+      });
+
+      it("does not allow card with id that does not match card id to be loadeed", async function () {
+        let error;
+        try {
+          await cardServices.loadCard(mismatchedModelId);
+        } catch (e) {
+          error = e;
+        }
+        expect(error.status).to.equal(400);
+        expect(error.message).to.match(/foreign model/);
+        expect(error.source).to.eql({ pointer: 'data/relationships/model'});
+      });
+
+      // TODO should we allow internal model relationships between cards within the same package?
+      // like can article-card A point to an internal model in article-card B?
+      it("does not allow a card to have a relationship to another card's internal model to be loaded", async function () {
+        let error;
+        try {
+          await cardServices.loadCard(foreignInternalRelationship);
+        } catch (e) {
+          error = e;
+        }
+        expect(error.status).to.equal(400);
+        expect(error.message).to.match(/internal model of foreign card/);
+        expect(error.source).to.eql({ pointer: 'included/[local-hub::foreign-internal-relationship/local-hub::foreign-internal-relationship::bad]/relationships/related-thing'});
       });
     });
 
@@ -134,15 +94,15 @@ describe('hub/card-services', function () {
       let indexers, changedCards = [];
 
       beforeEach(async function () {
-        let initialFactory = new JSONAPIFactory();
+        let factory = new JSONAPIFactory();
 
-        initialFactory.addResource('data-sources', 'stub-card-indexer')
+        factory.addResource('data-sources', 'stub-card-indexer')
           .withAttributes({
             sourceType: 'stub-card-project',
             params: { changedCards }
           });
 
-        env = await createDefaultEnvironment(`${__dirname}/../../../tests/stub-card-project`, initialFactory.getModels());
+        env = await createDefaultEnvironment(`${__dirname}/../../../tests/stub-card-project`, factory.getModels());
         cardServices = env.lookup('hub:card-services');
         indexers = env.lookup('hub:indexers');
       });
@@ -162,9 +122,9 @@ describe('hub/card-services', function () {
 
     describe("via searcher", function() {
       beforeEach(async function () {
-        let initialFactory = new JSONAPIFactory();
+        let factory = new JSONAPIFactory();
 
-        initialFactory.addResource('data-sources', 'stub-card-searcher')
+        factory.addResource('data-sources', 'stub-card-searcher')
           .withAttributes({
             sourceType: 'stub-card-project',
             params: {
@@ -172,7 +132,7 @@ describe('hub/card-services', function () {
             }
           });
 
-        env = await createDefaultEnvironment(`${__dirname}/../../../tests/stub-card-project`, initialFactory.getModels());
+        env = await createDefaultEnvironment(`${__dirname}/../../../tests/stub-card-project`, factory.getModels());
         cardServices = env.lookup('hub:card-services');
       });
 
@@ -213,8 +173,8 @@ describe('hub/card-services', function () {
 
       expect(data.attributes.title).to.equal('The Millenial Puppy');
       expect(data.attributes.body).to.match(/discerning tastes of the millenial puppy/);
-      expect(data.attributes.author).to.equal('Van Gogh');
       expect(data.attributes['tag-names']).to.eql(['millenials', 'puppies', 'belly-rubs']);
+      expect(data.relationships.author.data).to.eql({ type: 'cards', id: 'local-hub::user-card::van-gogh'});
       expect(data.relationships.tags.data).to.eql([
         { type: 'local-hub::article-card::tags', id: 'local-hub::article-card::millenial-puppies::millenials' },
         { type: 'local-hub::article-card::tags', id: 'local-hub::article-card::millenial-puppies::puppies' },
@@ -231,7 +191,7 @@ describe('hub/card-services', function () {
       let includedIdentifiers = included.map(i => `${i.type}/${i.id}`);
 
       expect(data.attributes.title).to.equal('The Millenial Puppy');
-      expect(data.attributes.author).to.equal('Van Gogh');
+      expect(data.relationships.author.data).to.eql({ type: 'cards', id: 'local-hub::user-card::van-gogh'});
       expect(data.attributes['tag-names']).to.eql(['millenials', 'puppies', 'belly-rubs']);
       expect(data.relationships.tags).to.be.undefined;
       expect(data.attributes.body).to.be.undefined;
@@ -261,6 +221,7 @@ describe('hub/card-services', function () {
       ]);
     });
 
+    // TODO should we include the schema for embedded cards as well in the card document?
     it("has card schema", async function () {
       await cardServices.loadCard(articleCard);
 
@@ -295,6 +256,26 @@ describe('hub/card-services', function () {
       ]);
     });
 
+    it('has included related embedded cards', async function() {
+      await cardServices.loadCard(articleCard);
+
+      let article = await cardServices.get(env.session, 'local-hub::article-card::millenial-puppies', 'isolated');
+      let { included } = article;
+      let includedIdentifiers = included.map(i => `${i.type}/${i.id}`);
+      expect(includedIdentifiers).to.include.members([
+        'cards/local-hub::user-card::van-gogh',
+      ]);
+
+      expect(includedIdentifiers).to.not.include.members([
+        'local-hub::user-card/local-hub::user-card::van-gogh',
+        'fields/local-hub::user-card::name',
+        'fields/local-hub::user-card::email',
+      ]);
+      let card = included.find(i => `${i.type}/${i.id}` === 'cards/local-hub::user-card::van-gogh');
+      expect(card.attributes.name).to.equal('Van Gogh');
+      expect(card.attributes.email).to.be.notOk;
+    });
+
     it("has card browser assets", async function () {
       await cardServices.loadCard(articleCard);
 
@@ -310,21 +291,34 @@ describe('hub/card-services', function () {
       expect(data.attributes['embedded-css']).to.match(/\.article-card-embedded \{\}/);
     });
 
-    it.skip("has card metadata relationship to another card", async function() {
+    it('has card browser assets for related embedded cards', async function() {
+      await cardServices.loadCard(articleCard);
+
+      let article = await cardServices.get(env.session, 'local-hub::article-card::millenial-puppies', 'isolated');
+      let { included } = article;
+      let card = included.find(i => `${i.type}/${i.id}` === 'cards/local-hub::user-card::van-gogh');
+      expect(card.attributes['isolated-template']).to.match(/<div>\{\{this\.email\}\}<\/div>/);
+      expect(card.attributes['embedded-template']).to.match(/<div>\{\{this\.name\}\}<\/div>/);
+    });
+
+    it.skip('can support a card that has no model', async function() {
     });
   });
 
-  describe.skip('search for card', function () {
-    it("can search for a card", async function () {
+  describe('search for card', function () {
+    it.skip("can search for a card", async function () {
       // TODO we should be able to leverage the card metadata as fields we can search against for a card
     });
+
+    it.skip("can not find a card when you search against its internal field", async function() {
+    });
   });
 
-  describe.skip('read authorization', function() {
-    it('does not return card metadata that the session does not have read authorization for', async function() {
+  describe('read authorization', function() {
+    it.skip('does not return card metadata that the session does not have read authorization for', async function() {
     });
 
-    it('does not contain included resource for card metadata relationship that the session does not have read authorization for', async function() {
+    it.skip('does not contain included resource for card metadata relationship that the session does not have read authorization for', async function() {
     });
   });
 });

@@ -140,6 +140,9 @@ class Indexers extends EventEmitter {
       let { schema:newSchema, cards:newCards } = await running.update(forceRefresh, hints);
       if (Array.isArray(newCards) && newCards.length) {
         for (let card of newCards) {
+          // This will throw if the card is invalid which could break all indexing.
+          // Perhaps we should catch the invalid cards and log instead of throwing
+          // so that a bad card doesn't break all indexing.
           await this._getCardServices().loadCard(card);
         }
       }
