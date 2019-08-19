@@ -14,7 +14,7 @@ database query. See bootstrap-schema and group.js for
 special handling of "everyone" groups.
 */
 
-class EveryoneGroupsSearcher {
+class EveryoneGroupSearcher {
   static create(...args) {
     return new this(...args);
   }
