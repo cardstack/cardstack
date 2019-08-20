@@ -1,7 +1,7 @@
 {{!-- TODO: Refactor tools header --}}
 <header class="tools-header">
-  <button {{on "click" this.edit}}>Edit</button>
-  <button {{on "click" this.preview}}>Preview</button>
+  <button {{action "edit"}} class="btn-edit" data-test-tools-button-edit>Edit</button>
+  <button {{action "preview"}} class="btn-preview" data-test-tools-button-preview>Preview</button>
 </header>
 
 <div class="articles">

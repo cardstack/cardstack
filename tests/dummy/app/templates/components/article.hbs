@@ -2,11 +2,11 @@
   <article class="article-isolated">
     <div class="article-isolated--image"><img src={{content.imageUrl}} alt="Article Image"></div>
     <section class="article-isolated--content">
-      <h2 class="article-isolated--title">{{content.title}}</h2>
-      <div class="article-isolated--description">{{content.description}}</div>
-      <div class="article-isolated--author">By {{content.author.fullName}}</div>
-      <div class="article-isolated--published-date">{{content.publishedDate}}</div>
-      <div class="article-isolated--body">{{content.body}}</div>
+      <h2 class="article-isolated--title" data-test-boxel-title>{{content.title}}</h2>
+      <div class="article-isolated--description" data-test-boxel-description>{{content.description}}</div>
+      <div class="article-isolated--author" data-test-boxel-author>By {{content.author.fullName}}</div>
+      <div class="article-isolated--published-date" data-test-boxel-published-date>{{content.publishedDate}}</div>
+      <div class="article-isolated--body" data-test-boxel-body>{{content.body}}</div>
     </section>
   </article>
 {{else}}

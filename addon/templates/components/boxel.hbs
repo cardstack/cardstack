@@ -1,6 +1,6 @@
 {{#if @content}}
   {{#if (eq @format "thumbnail")}}
-    <article class="boxel boxel-thumbnail">
+    <article class="boxel boxel-thumbnail" data-test-boxel>
       <div class="boxel-thumbnail--image">
         <img src={{@content.imageUrl}} alt={{@content.altText}}>
       </div>
@@ -10,7 +10,7 @@
       </section>
     </article>
   {{else}}
-    <div class="boxel {{if contentType (concat "boxel-" contentType "-" @format)}}" ...attributes>
+    <div class="boxel {{if contentType (concat "boxel-" contentType "-" @format)}}" ...attributes data-test-boxel>
       {{#if (is-component contentType)}}
         {{component contentType content=@content format=@format}}
       {{else}}
@@ -19,7 +19,7 @@
     </div>
   {{/if}}
 {{else}}
-  <div class="boxel boxel-default" ...attributes>
+  <div class="boxel boxel-default" ...attributes data-test-boxel>
     {{yield}}
   </div>
 {{/if}}
