@@ -90,14 +90,17 @@ class CardServices {
   }
 
   async get(session: Session, id: string, format: string) {
-    let rawCard = await this.searchers.get(session, 'local-hub', 'cards', id);
+    let rawCard: SingleResourceDoc = await this.searchers.get(Session.INTERNAL_PRIVILEGED, 'local-hub', 'cards', id);
     let { repository, packageName } = cardContextFromId(id);
     let cardModelType = cardContextToId({ repository, packageName });
-    let model = await this.searchers.get(session, 'local-hub', cardModelType, id, { format });
+    let model: SingleResourceDoc = await this.searchers.get(session, 'local-hub', cardModelType, id, { format });
+
+    if (!model) {
+      throw new Error(`No such resource cards/${id}`, { status: 404 });
+    }
 
     let card = await this.adaptCardToFormat(rawCard, model, format, session);
     card.included = uniqBy(card.included, i => `${i.type}/${i.id}`);
-    // TODO need to run this through read authorization for the session used to request card
 
     return card;
   }

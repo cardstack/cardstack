@@ -270,10 +270,12 @@ module.exports = class ContentType {
     if (resource.meta) {
       output.meta = resource.meta;
     }
+    let { repository, packageName } = this.cardContext;
     for (let section of ['attributes', 'relationships']) {
       if (resource[section]) {
         for (let [fieldName, value] of Object.entries(resource[section])) {
-          if (await this.realms.hasExplicitFieldGrant(documentContext, userRealms, fieldName)) {
+          let fieldId = cardContextToId({ repository, packageName, cardId: fieldName });
+          if (await this.realms.hasExplicitFieldGrant(documentContext, userRealms, fieldId)) {
             if (!output[section]) {
               output[section] = {};
             }
@@ -295,10 +297,12 @@ module.exports = class ContentType {
     }
 
     let resource = pendingChange.finalDocument;
+    let { repository, packageName } = this.cardContext;
     for (let section of ['attributes', 'relationships']) {
       if (resource[section]) {
         for (let fieldName of Object.keys(resource[section])) {
-          if (!await this.realms.hasExplicitFieldGrant(pendingChange.finalDocumentContext, userRealms, fieldName)) {
+          let fieldId = cardContextToId({ repository, packageName, cardId: fieldName });
+          if (!await this.realms.hasExplicitFieldGrant(pendingChange.finalDocumentContext, userRealms, fieldId)) {
             errors.push(this._unknownFieldError(fieldName, section));
             badFields[fieldName] = true;
           }

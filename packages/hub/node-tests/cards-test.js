@@ -363,10 +363,142 @@ describe('hub/card-services', function () {
   });
 
   describe('read authorization', function() {
-    it.skip('does not return card metadata that the session does not have read authorization for', async function() {
+    let allowedUser, restrictedUser;
+    beforeEach(async function () {
+      let factory = new JSONAPIFactory();
+
+      // Grants are set against the model content type, as that
+      // is where the meta fields actually live
+      factory.addResource('grants')
+        .withRelated('who', [{ type: 'groups', id: 'everyone'} ])
+        .withRelated('types', [
+          { type: 'content-types', id: 'local-hub::article-card' }
+        ])
+        .withRelated('fields', [
+          { type: 'fields', id: 'local-hub::article-card::title' },
+        ])
+        .withAttributes({
+          mayReadResource: true,
+          mayReadFields: true
+        });
+
+      factory.addResource('grants')
+        .withRelated('who', [ { type: 'test-users', id: 'allowed-user'} ])
+        .withRelated('types', [
+          { type: 'content-types', id: 'local-hub::article-card' }
+        ])
+        .withRelated('fields', [
+          { type: 'fields', id: 'local-hub::article-card::author' },
+          { type: 'fields', id: 'local-hub::article-card::body' },
+          { type: 'fields', id: 'local-hub::article-card::tag-names' },
+          { type: 'fields', id: 'local-hub::article-card::tags' },
+        ])
+        .withAttributes({
+          mayReadResource: true,
+          mayReadFields: true
+        });
+
+      factory.addResource('grants')
+        .withRelated('who', [ { type: 'test-users', id: 'allowed-user'} ])
+        .withRelated('types', [
+          { type: 'content-types', id: 'local-hub::user-card' }
+        ])
+        .withAttributes({
+          mayReadResource: true,
+          mayReadFields: true
+        });
+
+      factory.addResource('test-users', 'allowed-user');
+      factory.addResource('test-users', 'restricted-user');
+
+      env = await createDefaultEnvironment(`${__dirname}/../../../tests/stub-card-project`, factory.getModels());
+      cardServices = env.lookup('hub:card-services');
+      restrictedUser = env.lookup('hub:sessions').create('test-users', 'restricted-user');
+      allowedUser = env.lookup('hub:sessions').create('test-users', 'allowed-user');
+
+      await cardServices.loadCard(articleCard);
     });
 
-    it.skip('does not contain included resource for card metadata relationship that the session does not have read authorization for', async function() {
+    describe('get()', function () {
+      it('does not return card whose model content type the session does not have read authorization for', async function () {
+        let error;
+        try {
+          await cardServices.get(restrictedUser, 'local-hub::user-card::van-gogh', 'isolated');
+        } catch (e) {
+          error = e;
+        }
+        expect(error.status).to.equal(404);
+      });
+
+      it('does return card whose model content type the session has read authorization for', async function () {
+        let { data } = await cardServices.get(allowedUser, 'local-hub::user-card::van-gogh', 'isolated');
+
+        expect(data.id).to.equal('local-hub::user-card::van-gogh');
+        expect(data.type).to.equal('cards');
+      });
+
+      it('does not return card metadata that the session does not have read authorization for', async function () {
+        let { data } = await cardServices.get(restrictedUser, 'local-hub::article-card::millenial-puppies', 'isolated');
+
+        expect(data.attributes.title).to.equal('The Millenial Puppy');
+        expect(data.relationships.author).to.be.undefined;
+        expect(data.attributes['tag-names']).to.be.undefined;
+        expect(data.relationships.tags).to.be.undefined;
+        expect(data.attributes.body).to.be.undefined;
+        expect(data.attributes['internal-field']).to.be.undefined;
+      });
+
+      it('does return card metadata that the session has read authorization for', async function () {
+        let { data } = await cardServices.get(allowedUser, 'local-hub::article-card::millenial-puppies', 'isolated');
+
+        expect(data.attributes.title).to.equal('The Millenial Puppy');
+        expect(data.attributes.body).to.match(/discerning tastes of the millenial puppy/);
+        expect(data.attributes['tag-names']).to.eql(['millenials', 'puppies', 'belly-rubs']);
+        expect(data.relationships.author.data).to.eql({ type: 'cards', id: 'local-hub::user-card::van-gogh' });
+        expect(data.relationships.tags.data).to.eql([
+          { type: 'local-hub::article-card::tags', id: 'local-hub::article-card::millenial-puppies::millenials' },
+          { type: 'local-hub::article-card::tags', id: 'local-hub::article-card::millenial-puppies::puppies' },
+          { type: 'local-hub::article-card::tags', id: 'local-hub::article-card::millenial-puppies::belly-rubs' },
+        ]);
+        expect(data.attributes['internal-field']).to.be.undefined;
+      });
+
+      it('does not contain included resource for card metadata relationship that the session does not have read authorization for', async function () {
+        let { included } = await cardServices.get(restrictedUser, 'local-hub::article-card::millenial-puppies', 'isolated');
+
+        let includedIdentifiers = included.map(i => `${i.type}/${i.id}`);
+        expect(includedIdentifiers).to.not.include.members([
+          'cards/local-hub::user-card::van-gogh',
+        ]);
+      });
+
+      it('does contain included resource for card metadata relationship that the session does has read authorization for', async function () {
+        let { included } = await cardServices.get(allowedUser, 'local-hub::article-card::millenial-puppies', 'isolated');
+
+        let includedIdentifiers = included.map(i => `${i.type}/${i.id}`);
+        expect(includedIdentifiers).to.include.members([
+          'cards/local-hub::user-card::van-gogh',
+        ]);
+
+        expect(includedIdentifiers).to.not.include.members([
+          'local-hub::user-card/local-hub::user-card::van-gogh',
+          'fields/local-hub::user-card::name',
+          'fields/local-hub::user-card::email',
+        ]);
+        let card = included.find(i => `${i.type}/${i.id}` === 'cards/local-hub::user-card::van-gogh');
+        expect(card.attributes.name).to.equal('Van Gogh');
+        expect(card.attributes.email).to.be.undefined;
+      });
+    });
+    describe('search()', function () {
+      it.skip('applies read authorization to card meta fields returned from search', async function() {
+      });
+
+      it.skip('does not include cards for which the session does not have read-resource permissions', async function() {
+      });
+
+      it.skip('does not include included resources for relationships fields that the session does not have read access to', async function() {
+      });
     });
   });
 });
