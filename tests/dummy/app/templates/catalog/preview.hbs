@@ -3,7 +3,7 @@
     <div class="catalog-preview--boxel-container">
       <AnimatedContainer>
         {{#animated-value this.model use=transition duration="700" as |m|}}
-          <Boxel @content={{m}} @variant="medium" />
+          <Boxel @content={{m}} @format="embedded" />
         {{/animated-value}}
       </AnimatedContainer>
     </div>
