@@ -5,6 +5,8 @@ const {
 } = require('../../../tests/stub-searcher/node_modules/@cardstack/test-support/env');
 
 const articleCard = require('./cards/article-card');
+const anotherArticleCard = require('./cards/another-article-card');
+const emptyArticleCard = require('./cards/no-model-article-card');
 const foreignSchema = require('./cards/card-with-foreign-schema');
 const foreignModelType = require('./cards/card-with-foreign-model-type');
 const foreignModelId = require('./cards/card-with-foreign-model-id');
@@ -273,7 +275,7 @@ describe('hub/card-services', function () {
       ]);
       let card = included.find(i => `${i.type}/${i.id}` === 'cards/local-hub::user-card::van-gogh');
       expect(card.attributes.name).to.equal('Van Gogh');
-      expect(card.attributes.email).to.be.notOk;
+      expect(card.attributes.email).to.be.undefined;
     });
 
     it("has card browser assets", async function () {
@@ -301,7 +303,53 @@ describe('hub/card-services', function () {
       expect(card.attributes['embedded-template']).to.match(/<div>\{\{this\.name\}\}<\/div>/);
     });
 
-    it.skip('can support a card that has no model', async function() {
+    it('can load mulitple cards from the same package that have differing models', async function() {
+      await cardServices.loadCard(articleCard);
+      await cardServices.loadCard(anotherArticleCard);
+
+      let article = await cardServices.get(env.session, 'local-hub::article-card::millenial-puppies', 'isolated');
+      let { data } = article;
+
+      expect(data.attributes.title).to.equal('The Millenial Puppy');
+      expect(data.attributes.body).to.match(/discerning tastes of the millenial puppy/);
+      expect(data.attributes['tag-names']).to.eql(['millenials', 'puppies', 'belly-rubs']);
+      expect(data.relationships.author.data).to.eql({ type: 'cards', id: 'local-hub::user-card::van-gogh'});
+      expect(data.relationships.tags.data).to.eql([
+        { type: 'local-hub::article-card::tags', id: 'local-hub::article-card::millenial-puppies::millenials' },
+        { type: 'local-hub::article-card::tags', id: 'local-hub::article-card::millenial-puppies::puppies' },
+        { type: 'local-hub::article-card::tags', id: 'local-hub::article-card::millenial-puppies::belly-rubs' },
+      ]);
+
+      article = await cardServices.get(env.session, 'local-hub::article-card::plumber-blues', 'isolated');
+      data = article.data;
+
+      expect(data.attributes.title).to.equal('The Plumber Blues');
+      expect(data.attributes.body).to.match(/Woe! Woe! Woe is me!/);
+      expect(data.attributes['tag-names']).to.eql(['plumber', 'leaky-pipes', 'waiting']);
+      expect(data.relationships.author.data).to.eql({ type: 'cards', id: 'local-hub::user-card::van-gogh'});
+      expect(data.relationships.tags.data).to.eql([
+        { type: 'local-hub::article-card::tags', id: 'local-hub::article-card::plumber-blues::plumber' },
+        { type: 'local-hub::article-card::tags', id: 'local-hub::article-card::plumber-blues::leaky-pipes' },
+        { type: 'local-hub::article-card::tags', id: 'local-hub::article-card::plumber-blues::waiting' },
+      ]);
+    });
+
+    it('can support a card that has no model relationship explicitely specified (model is inferred)', async function() {
+      await cardServices.loadCard(emptyArticleCard);
+
+      let article = await cardServices.get(env.session, 'local-hub::article-card::empty-article', 'isolated');
+      let { data, included } = article;
+      let includedIdentifiers = included.map(i => `${i.type}/${i.id}`);
+
+      expect(data.attributes.title).to.be.null;
+      expect(data.relationships.author.data).to.be.notOk;
+      expect(data.attributes['tag-names']).to.eql([]);
+      expect(data.relationships.tags.data).to.eql([]);
+      expect(data.attributes.body).to.be.null;
+      expect(data.attributes['internal-field']).to.be.undefined;
+
+      expect(data.relationships.model.data).to.eql({ type: 'local-hub::article-card', id: 'local-hub::article-card::empty-article' });
+      expect(includedIdentifiers).to.include.members(['local-hub::article-card/local-hub::article-card::empty-article']);
     });
   });
 

@@ -69,8 +69,18 @@ class CardServices {
     if (!schemaModels) { return; }
 
     for (let model of schemaModels) {
-      await this.writers.create(Session.INTERNAL_PRIVILEGED, model.type, { data: model });
+      let existingSchemaModel: SingleResourceDoc | undefined;
+      try {
+        existingSchemaModel = await this.searchers.get(Session.INTERNAL_PRIVILEGED, 'local-hub', model.type, model.id);
+      } catch (e) {
+        if (e.status !== 404) { throw e; }
+      }
+      if (!existingSchemaModel) {
+        await this.writers.create(Session.INTERNAL_PRIVILEGED, model.type, { data: model });
+      }
     }
+    // make sure we always have a model, even if it's empty
+    set(card, 'data.relationships.model.data', { type: cardModelType, id: cardId });
     await this.writers.create(Session.INTERNAL_PRIVILEGED, 'cards', card);
 
     let internalCardModels = await this.getInternalCardModels(card) || [];
@@ -135,12 +145,11 @@ class CardServices {
       if (modelRef.id !== card.data.id) {
         throw new Error(`Invalid card 'cards/${card.data.id}', card contains foreign model '${modelRef.type}/${modelRef.id}'`, { status: 400, source: { pointer: `data/relationships/model`} });
       }
-    }
-
-    let schema = await this.currentSchema.getSchema();
-    let model = (card.included || []).find(i => `${modelRef.type}/${modelRef.id}` === `${i.type}/${i.id}`);
-    if (model) {
-      this.validateResource(schema, card, model); // TODO we should guard for cycles in relationships in included resources
+      let schema = await this.currentSchema.getSchema();
+      let model = (card.included || []).find(i => `${modelRef.type}/${modelRef.id}` === `${i.type}/${i.id}`);
+      if (model) {
+        this.validateResource(schema, card, model); // TODO we should guard for cycles in relationships in included resources
+      }
     }
   }
 
@@ -213,7 +222,8 @@ class CardServices {
 
   private async getInternalCardModels(card: SingleResourceDoc) {
     if (!card.data.id) { return; }
-    let { repository, packageName } = cardContextFromId(card.data.id);
+    let id: string = card.data.id;
+    let { repository, packageName } = cardContextFromId(id);
     let cardModels: ResourceObject[] = [];
     let schema = await this.currentSchema.getSchema();
 
@@ -226,6 +236,10 @@ class CardServices {
       }
     }
 
+    let type = cardContextToId({ repository, packageName });
+    if (!(card.included || []).find(i => `${i.type}/${i.id}` === `${type}/${id}`)) {
+      cardModels.push({ id, type });
+    }
     return cardModels;
   }
 
