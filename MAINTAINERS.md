@@ -2,7 +2,7 @@
 
 This document is for project maintainers who are doing versioning, releases, and publishing for the cardstack mono-repo.
 
-## Updating package versions
+## Updating package versions (with safeguards)
 
 The versions of all packages in the mono-repo are updated at the same time, to the same version number.
 
@@ -19,6 +19,16 @@ For breaking releases, include upgrade instructions in the changelog.
 8. Check out master and pull again. `git checkout master`, `git pull origin master`
 9. `lerna publish from-git` will update all packages that don't yet have the new version published. You can safely re-run this command if publishing is interrupted.
 10. Make sure all the packages made it up to npm
+
+## Updating packages yolo-style
+
+If you are very confident in what you are doing, you can accomplish all of the above by running this command from an up-to-date version of `master`. It is recommended to pair this, since it skips over safety checks.
+
+```sh
+lerna publish from-git --force-publish="*" --exact
+```
+
+Remember to do the Changelog and create tags.
 
 ## Pitfalls to look out for
 
