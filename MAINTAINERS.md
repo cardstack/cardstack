@@ -25,7 +25,7 @@ For breaking releases, include upgrade instructions in the changelog.
 If you are very confident in what you are doing, you can accomplish all of the above by running this command from an up-to-date version of `master`. It is recommended to pair this, since it skips over safety checks.
 
 ```sh
-lerna publish from-git --force-publish="*" --exact
+npx lerna publish from-git --force-publish="*" --exact
 ```
 
 Remember to do the Changelog and create tags.
