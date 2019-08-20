@@ -19,7 +19,7 @@
     <div class="card-catalog--grid">
       {{#each model as |item|}}
         <Tray>
-          <article class="catalog-item" role="button" {{on "click" (fn this.preview item.constructor.modelName)}}>
+          <article class="catalog-item" role="button" {{action "preview" item.constructor.modelName}}>
             <div class="catalog-item--boxel-container">
               <AnimatedContainer>
                 {{#animated-value item duration="700"}}
