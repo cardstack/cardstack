@@ -1,4 +1,9 @@
-<LinkTo @route="articles.edit" @model={{this.model}} @role="button">Edit</LinkTo>
-<LinkTo @route="articles.preview" @model={{this.model}} @role="button">Preview</LinkTo>
+{{!-- TODO: Refactor tools header --}}
+<header class="tools-header">
+  <button {{on "click" this.edit}}>Edit</button>
+  <button {{on "click" this.preview}}>Preview</button>
+</header>
 
-<Article @content={{this.model}} />
+<div class="articles">
+  <Boxel @content={{this.model}} @format="isolated" />
+</div>

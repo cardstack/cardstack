@@ -1,13 +1,20 @@
 import Route from '@ember/routing/route';
+import { inject as service } from '@ember/service';
 
 export default class ToolsEditRoute extends Route {
-  async model(params) {
-    let { title, description, body, imageUrl } = await this.store.findRecord(params.model, 'sample');
-    return this.store.createRecord(params.model, {
-      title,
-      description,
-      body,
-      imageUrl
-    });
+  @service boxel;
+
+  model({ model, id }) {
+    if (!id || id === 'sample') {
+      let { title, description, body, imageUrl } = this.store.peekRecord(model, 'sample');
+      return this.store.createRecord(model, {
+        title,
+        description,
+        body,
+        imageUrl
+      });
+    }
+
+    return this.store.peekRecord(model, id);
   }
 }

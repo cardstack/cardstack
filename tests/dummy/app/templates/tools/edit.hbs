@@ -1,12 +1,18 @@
-<Tray @expanded={{true}}>
-  <Boxel @name={{concat model.constructor.modelName "-new"}}>
-    <div class="catalog-item catalog-item--isolated catalog-item--isolated--edit ">
+<header class="tools-header">
+  <button {{on "click" this.preview}}>Preview</button>
+  <button {{on "click" this.save}}>Save</button>
+</header>
+
+<div class="tools-edit">
+  <Boxel @name="{{model.constructor.modelName}}-new" @variant="large">
+    <div class="tools-edit--image-preview">
       {{! template-lint-configure no-inline-styles {"allowDynamicStyles": true} }}
-      <div class="catalog-item--isolated--image-url" style={{backgroundImageUrl}}></div>
+      <div class="tools-edit--image-url" style={{backgroundImageUrl}} />
+    </div>
+    <div class="tools-edit--fields">
       <TextField @value={{model.title}} @label="Title" /><br>
       <TextField @value={{model.description}} @label="Description" /><br>
       <TextArea @value={{model.body}} @label="Body" /><br>
-      <Cta @handleClick={{action save}}>Save</Cta>
     </div>
   </Boxel>
-</Tray>
+</div>

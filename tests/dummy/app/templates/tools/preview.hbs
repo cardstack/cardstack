@@ -1,0 +1,14 @@
+<div class="tools-preview">
+  <header class="tools-preview--header">
+    <h1 class="tools-preview--title">Syndication View</h1>
+    <button {{on "click" this.edit}} class="tools-preview--exit-button">
+      Exit Preview
+    </button>
+  </header>
+
+  <div class="tools-preview--grid">
+    <Boxel @content={{this.model}} @variant="small" />
+    <Boxel @content={{this.model}} @format="embedded" />
+    <Boxel @content={{this.model}} @format="isolated" />
+  </div>
+</div>

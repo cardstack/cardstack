@@ -1,17 +1,21 @@
 .boxel-tray {
+  box-sizing: border-box;
   width: 100%;
   background-color: transparent;
   transition: background-color 0.5s ease-out;
 }
 
 .boxel-tray.expanded {
-  position: fixed;
+  position: absolute;
   top: 0;
   left: 0;
   right: 0;
-  bottom: 0;
+  height: 100%;
+  min-height: 100vh;
   display: flex;
   justify-content: center;
   align-items: center;
-  background-color: #373741;
+  padding: 50px 20px;
+  background-color: #151529;
+  overflow-x: scroll;
 }

@@ -9,6 +9,13 @@ export default class ToolsEditController extends Controller {
   }
 
   @action
+  async preview() {
+    await this.model.save();
+
+    return await this.transitionToRoute('tools.preview', this.model.constructor.modelName, this.model.id);
+  }
+
+  @action
   async save() {
     await this.model.save();
 

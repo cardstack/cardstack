@@ -4,11 +4,11 @@ import { inject as service } from '@ember/service';
 export default class CatalogRoute extends Route {
   @service boxel;
 
-  async model() {
-    return await Promise.all([
-      this.store.findRecord('article', 'sample'),
-      this.store.findRecord('event', 'sample')
-    ]);
+  model() {
+    return [
+      this.store.peekRecord('article', 'sample'),
+      this.store.peekRecord('event', 'sample')
+    ];
   }
 
   renderTemplate(/*controller, model*/) {

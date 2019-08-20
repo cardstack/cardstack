@@ -1,8 +1,11 @@
 import Route from '@ember/routing/route';
+import { inject as service } from '@ember/service';
 
-export default class ArticlesRoute extends Route {
+export default class CatalogRoute extends Route {
+  @service boxel;
+
   model({ id }) {
-    return this.store.findRecord('article', id);
+    return this.store.peekRecord('article', id);
   }
 
   renderTemplate(/*controller, model*/) {

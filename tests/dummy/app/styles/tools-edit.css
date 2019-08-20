@@ -1,0 +1,34 @@
+.tools-edit {
+  box-sizing: border-box;
+  position: relative;
+  top: 0;
+  left: 0;
+  right: 0;
+  width: 100%;
+  height: 100%;
+  min-height: 100vh;
+  padding: 100px 20px;
+  background-color: var(--catalog-dark-purple);
+}
+
+.tools-edit--image-preview {
+  box-sizing: border-box;
+  width: 100%;
+  height: 450px;
+  padding: 30px;
+  background-color: black;
+  border-top-right-radius: 10px;
+  border-top-left-radius: 10px;
+}
+
+.tools-edit--image-url {
+  width: 100%;
+  height: 100%;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: contain;
+}
+
+.tools-edit--fields {
+  padding: 30px;
+}

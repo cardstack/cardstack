@@ -1,5 +1,6 @@
 import Controller from '@ember/controller';
 import move from 'ember-animated/motions/move';
+import scale from 'ember-animated/motions/scale';
 import { parallel, printSprites, wait } from 'ember-animated';
 import { inject as service } from '@ember/service';
 import { action } from '@ember/object';
@@ -19,8 +20,8 @@ export default class CatalogPreviewController extends Controller {
         });
       });
 
-      receivedSprites.forEach(parallel(move));
-      sentSprites.forEach(parallel(move));
+      receivedSprites.forEach(parallel(scale, move));
+      sentSprites.forEach(parallel(scale, move));
     }
 
     catch (err) {
@@ -30,9 +31,9 @@ export default class CatalogPreviewController extends Controller {
   }
 
   @action
-  editModel(modelType) {
+  editModel() {
     this.boxel.set('currentPlane', 'tools');
 
-    this.transitionToRoute('tools.edit', modelType);
+    this.transitionToRoute('tools.edit', this.model.constructor.modelName, this.model.id);
   }
 }

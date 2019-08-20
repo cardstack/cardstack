@@ -1,18 +1,27 @@
 <Tray @expanded={{true}}>
-  <div class="catalog-item catalog-item--isolated catalog-item--isolated--preview">
-    <div class="catalog-item--preview">
+  <div class="catalog-preview">
+    <div class="catalog-preview--boxel-container">
       <AnimatedContainer>
-        {{#animated-value model use=transition duration="700" as |m|}}
-          <Boxel @content={{m}} @variant="small" />
+        {{#animated-value this.model use=transition duration="700" as |m|}}
+          <Boxel @content={{m}} @variant="medium" />
         {{/animated-value}}
       </AnimatedContainer>
     </div>
-    <div class="catalog-item--info">
-      <h2>{{model.title}}</h2>
-      <div class="catalog-item--author-name">{{model.author.fullName}}</div>
-      <h3>{{model.description}}</h3>
-      <p>{{model.body}}</p>
-      <button {{action "editModel" model.constructor.modelName}} class="catalog-item--button-edit">Start Editing</button>
-    </div>
+    <section class="catalog-preview--info-panel">
+      <header>
+        <h2 class="catalog-preview--info-panel-title">Responsive {{this.model.constructor.modelName}} template</h2>
+        <span class="catalog-preview--info-panel-sub-title">By Felix Erland</span>
+      </header>
+
+      <div class="catalog-preview--info-panel-data">
+        <p>This is a beautiful, clean powerful blog template for people who want tell stories, share important thoughts. This template was designed with great attention to more...</p>
+      </div>
+
+      <footer class="catalog-preview--footer">
+        <button {{on "click" this.editModel}} class="catalog-preview--edit-button">
+          Start Editing
+        </button>
+      </footer>
+    </section>
   </div>
 </Tray>

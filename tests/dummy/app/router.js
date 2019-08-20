@@ -11,10 +11,10 @@ Router.map(function() {
     this.route('preview', { path: '/:model/preview' });
   });
   this.route('tools', function() {
-    this.route('edit', { path: '/:model/edit' });
+    this.route('edit', { path: '/:model/:id/edit' });
+    this.route('preview', { path: '/:model/:id/preview' });
   });
-  this.route('articles', { path: '/articles/:id'}, function() {
-    this.route('preview', { path: '/preview' });
+  this.route('articles', { path: '/articles/:id' }, function() {
     this.route('edit', { path: '/edit' });
   });
   this.route('events', { path: '/events/:id'});
