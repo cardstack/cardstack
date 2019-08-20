@@ -1,27 +1,25 @@
-{{#if content}}
-  {{#if (eq @variant "xs")}}
-    {{!-- TBD... could be badge, button, text link, icon, etc... --}}
-  {{else if (eq @variant "small")}}
-    <article class="boxel boxel-sm">
-      <div class="boxel-sm--image">
-        <img src={{content.imageUrl}} alt={{content.altText}}>
+{{#if @content}}
+  {{#if (eq @format "thumbnail")}}
+    <article class="boxel boxel-thumbnail">
+      <div class="boxel-thumbnail--image">
+        <img src={{@content.imageUrl}} alt={{@content.altText}}>
       </div>
-      <section class="boxel-sm--content">
-        <h3>{{content.title}}</h3>
-        <p>{{content.description}}</p>
+      <section class="boxel-thumbnail--text">
+        <h3>{{@content.title}}</h3>
+        <p>{{@content.description}}</p>
       </section>
     </article>
   {{else}}
-    <div class="boxel {{if contentType (concat "boxel-" contentType "-" format)}} {{@className}}">
+    <div class="boxel {{if contentType (concat "boxel-" contentType "-" @format)}}" ...attributes>
       {{#if (is-component contentType)}}
-        {{component contentType content=content format=format}}
+        {{component contentType content=@content format=@format}}
       {{else}}
         A {{contentType}} component/template must be provided
       {{/if}}
     </div>
   {{/if}}
 {{else}}
-  <div class="boxel boxel-default {{if contentType (concat "boxel-" contentType)}} boxel--{{@variant}} {{@className}}">
+  <div class="boxel boxel-default" ...attributes>
     {{yield}}
   </div>
 {{/if}}

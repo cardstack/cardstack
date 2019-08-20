@@ -4,12 +4,12 @@
 </header>
 
 <div class="tools-edit">
-  <Boxel @name="{{model.constructor.modelName}}-new" @variant="large">
-    <div class="tools-edit--image-preview">
+  <Boxel @name="{{model.constructor.modelName}}-new" class="tools-edit--boxel">
+    <div class="tools-edit--image-container">
       {{! template-lint-configure no-inline-styles {"allowDynamicStyles": true} }}
-      <div class="tools-edit--image-url" style={{backgroundImageUrl}} />
+      <div class="tools-edit--image" style={{backgroundImageUrl}} />
     </div>
-    <div class="tools-edit--fields">
+    <div class="tools-edit--fields-container">
       <TextField @value={{model.title}} @label="Title" /><br>
       <TextField @value={{model.description}} @label="Description" /><br>
       <TextArea @value={{model.body}} @label="Body" /><br>
