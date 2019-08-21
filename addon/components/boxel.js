@@ -18,15 +18,22 @@ export default class BoxelComponent extends Component {
     return null;
   }
 
-  init() {
-    super.init(...arguments);
+  constructor() {
+    super(...arguments);
 
     this.boxel.registerBoxel(this);
   }
 
-  @computed('elementId')
   get name() {
+    if (this._name) {
+      return this._name;
+    }
+
     return `boxel-${this.elementId}`;
+  }
+
+  set name(name) {
+    this._name = name;
   }
 
   clickAction() {}

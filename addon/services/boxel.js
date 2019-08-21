@@ -1,15 +1,9 @@
 import Service from '@ember/service';
 
 export default class BoxelService extends Service {
-  boxels = null;
-  planes = null;
+  boxels = {};
+  planes = {};
   currentPlane = 'space';
-
-  init() {
-    super.init(...arguments);
-    this.set('boxels', {});
-    this.set('planes', {});
-  }
 
   getBoxelById(boxelId) {
     return this.boxels[boxelId];
