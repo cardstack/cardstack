@@ -9,6 +9,10 @@
         <p>{{@content.description}}</p>
       </div>
     </div>
+  {{else if @component}}
+    <div class="boxel boxel-component" ...attributes data-test-boxel>
+      {{component @component}}
+    </div>
   {{else}}
     <div class="boxel {{if contentType (concat "boxel-" contentType "-" @format) "boxel-default"}}" ...attributes data-test-boxel>
       {{#if @content}}

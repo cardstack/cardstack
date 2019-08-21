@@ -10,9 +10,9 @@
       <div class="tools-edit--image" style={{backgroundImageUrl}} />
     </div>
     <div class="tools-edit--fields-container">
-      <TextField @value={{model.title}} @label="Title" /><br>
-      <TextField @value={{model.description}} @label="Description" /><br>
-      <TextArea @value={{model.body}} @label="Body" /><br>
+      <Boxel @component={{component "text-field" value=model.title label="Title"}} />
+      <Boxel @component={{component "text-field" value=model.description label="Description"}} />
+      <Boxel @component={{component "text-area" value=model.body label="Body"}} />
     </div>
   </Boxel>
 </div>

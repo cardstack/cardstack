@@ -19,8 +19,8 @@ export default class BoxelComponent extends Component {
   @tracked content;
 
   get contentType() {
-    if (this.content) {
-      return this.content.constructor.modelName;
+    if (this.args && this.args.content) {
+      return this.args.content.constructor.modelName;
     }
 
     return null;
