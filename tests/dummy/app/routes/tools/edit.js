@@ -12,7 +12,8 @@ export default class ToolsEditRoute extends Route {
         description,
         body,
         imageUrl,
-        author
+        author,
+        publishedDate: new Date()
       });
     }
 
