@@ -8,8 +8,8 @@ import layout from '../templates/components/plane';
 export default class PlaneComponent extends Component {
   @service boxel;
 
-  init() {
-    super.init(...arguments);
+  constructor() {
+    super(...arguments);
 
     this.boxel.registerPlane(this);
   }
