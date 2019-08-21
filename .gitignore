@@ -20,6 +20,9 @@ package-lock.json
 /packages/hub/code-generators.js
 /packages/hub/code-generators.js.map
 /packages/hub/code-generators.d.ts
+/packages/hub/indexing/card-schema-utils.d.ts
+/packages/hub/indexing/card-schema-utils.js
+/packages/hub/indexing/card-schema-utils.js.map
 /packages/hub/indexing/operations.d.ts
 /packages/hub/indexing/operations.js
 /packages/hub/indexing/operations.js.map

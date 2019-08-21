@@ -85,9 +85,7 @@ module.exports = class RunningIndexers {
     await this._loadSchemaModels();
 
     await this.sourcesUpdater.update(forceRefresh, hints);
-    let schema = await this.sourcesUpdater.takeSchema();
-    let cards = this.sourcesUpdater.cards;
-    return { schema, cards };
+    return await this.sourcesUpdater.takeSchema();
   }
 
   async schemas() {

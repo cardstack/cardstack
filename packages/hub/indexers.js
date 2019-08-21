@@ -42,6 +42,8 @@ const log = require('@cardstack/logger')('cardstack/indexers');
 const { declareInjections, getOwner } = require('@cardstack/di');
 const bootstrapSchema = require('./bootstrap-schema');
 const RunningIndexers = require('./indexing/running-indexers');
+const { schemaModelsForCard } = require('./indexing/card-schema-utils');
+const { uniqBy } = require('lodash');
 
 module.exports = declareInjections({
   schemaLoader: 'hub:schema-loader',
@@ -58,6 +60,7 @@ class Indexers extends EventEmitter {
     this._forceRefreshQueue = [];
     this._dataSourcesMemo = null;
     this._schemaCache = null;
+    this._discoveredCardSchema = [];
   }
 
   async schema() {
@@ -65,13 +68,24 @@ class Indexers extends EventEmitter {
       this._schemaCache = (async () => {
         let running = new RunningIndexers(await this._seedSchema(), this.client, this.emit.bind(this), this.schemaLoader.ownTypes(), getOwner(this));
         try {
-          return await running.schemas();
+          let schema = await running.schemas();
+          return await schema.applyChanges(this._discoveredCardSchema);
         } finally {
           await running.destroy();
         }
       })();
     }
     return await this._schemaCache;
+  }
+
+  async accomodateCard(card) {
+    let cardSchema = schemaModelsForCard(await this.schema(), card);
+    this._discoveredCardSchema = uniqBy(this._discoveredCardSchema.concat(cardSchema.map(document => {
+      let { type, id } = document;
+      return { type, id, document };
+    })), i => `${i.type}/${i.id}`);
+
+    await this.invalidateSchemaCache();
   }
 
   async invalidateSchemaCache() {
@@ -107,12 +121,6 @@ class Indexers extends EventEmitter {
     }
   }
 
-  // not using DI to prevent circular dependency
-  _getCardServices() {
-    if (this.cardServices) { return this.cardServices; }
-    return this.cardServices = this.__owner__.lookup('hub:card-services');
-  }
-
   async _setupWorkers() {
     if (!this._workersSetup) {
       await this.jobQueue.subscribe("hub/indexers/update", async ({data: { forceRefresh, hints }}) => {
@@ -137,12 +145,7 @@ class Indexers extends EventEmitter {
     let priorCache = this._schemaCache;
     let running = new RunningIndexers(await this._seedSchema(), this.client, this.emit.bind(this), this.schemaLoader.ownTypes(), getOwner(this));
     try {
-      let { schema:newSchema, cards:newCards } = await running.update(forceRefresh, hints);
-      if (Array.isArray(newCards) && newCards.length) {
-        for (let card of newCards) {
-          await this._getCardServices().loadCard(card);
-        }
-      }
+      let newSchema = await running.update(forceRefresh, hints);
 
       if (this._schemaCache === priorCache) {
         // nobody else has done a more recent update of the schema

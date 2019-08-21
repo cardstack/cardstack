@@ -36,66 +36,11 @@ class CardServices {
   searchers: todo;
   currentSchema: todo;
 
-  cardContextFromId(id: string) {
-    let [repository, packageName, cardId, modelId] = id.split(cardIdDelim);
-
-    return {
-      repository,
-      packageName,
-      cardId,
-      modelId,
-    };
-  }
-
-  cardContextToId({ repository, packageName, cardId, modelId }: CardContext) {
-    return [repository, packageName, cardId, modelId].filter(i => i != null).join(cardIdDelim);
-  }
-
-  // TODO should we care about the session of the caller who is requesting to load the card?
-  async loadCard(card: SingleResourceDoc) {
-    if (!card.data.id) { throw new Error(`Cannot load card with missing id.`); }
-    let cardId = card.data.id;
-
-    let existingCardModel;
-    let { repository, packageName } = this.cardContextFromId(cardId);
-    let cardModelType = this.cardContextToId({ repository, packageName });
-    try {
-      // use the card's model to check for presence of a card, as checking for the presence using
-      // the card itself will result in cycle as the act of searching for a card here will
-      // trigger a card to be loaded if it does not exist in the index.
-      existingCardModel = await this.searchers.get(Session.INTERNAL_PRIVILEGED, 'local-hub', cardModelType, cardId);
-    } catch (e) { if (e.status !== 404) { throw e; } }
-
-    if (existingCardModel) {
-      // we've already loaded this card so just stop. maybe in
-      // the future we can pay attention to the card version and
-      // reload if version has changed...
-      return;
-    }
-
-    let schemaModels = await this.buildCardModelSchema(card);
-    if (!schemaModels) { return; }
-
-    for (let model of schemaModels) {
-      await this.writers.create(Session.INTERNAL_PRIVILEGED, model.type, { data: model });
-    }
-    await this.writers.create(Session.INTERNAL_PRIVILEGED, 'cards', card);
-
-    let internalCardModels = await this.getInternalCardModels(card);
-    for (let model of internalCardModels) {
-      await this.writers.create(Session.INTERNAL_PRIVILEGED, model.type, { data: model });
-    }
-
-    // TODO how should we handle included resources that are other cards? recusively call into this function?
-  }
-
   async get(session: Session, id: string, format: string) {
-    let rawCard = await this.searchers.get(session, 'local-hub', 'cards', id);
-    let { repository, packageName } = this.cardContextFromId(id);
-    let cardModelType = this.cardContextToId({ repository, packageName });
-    let model = await this.searchers.get(session, 'local-hub', cardModelType, id);
+    let includePaths = await this.getCardIncludePaths(id, format);
+    let rawCard = await this.searchers.get(session, 'local-hub', 'cards', id, { includePaths });
 
-    let card = await this.adaptCardToFormat(rawCard, model, format);
+    let card = await this.adaptCardToFormat(rawCard, format);
     // TODO need to run this through read authorization for the session used to request card
 
     return card;
@@ -120,32 +65,55 @@ class CardServices {
     return results;
   }
 
-  private async getInternalCardModels(card: SingleResourceDoc) {
-    let cardModels: ResourceObject[] = [];
+  private async getCardIncludePaths(id: string, format: string) {
+    let card: SingleResourceDoc = await this.searchers.get(Session.INTERNAL_PRIVILEGED, 'local-hub', 'cards', id);
+    // make sure to get the schema *after* getting the card, as getting the card may trigger
+    // newly discovered card schema to be loaded
     let schema = await this.currentSchema.getSchema();
+    let includePaths: string[] = [
+      'fields',
+      'fields.related-types',
+      'fields.constraints',
+      'model',
+    ];
 
-    for (let resource of (card.included || [])) {
-      if (resource.type === 'cards' || schema.isSchemaType(resource.type)) { continue; }
-      cardModels.push(resource);
+    for (let { id: fieldId } of (get(card, 'data.relationships.fields.data') || [])) {
+      let field = schema.realAndComputedFields.get(fieldId);
+      if (!field) { continue; }
+
+      // TODO if field is a card relation (we should have "related-cards" in the future)
+      // when we'll need to recursively look up the embedded fields for the related card and
+      // make sure that is included in our resulting array of include paths
+      if (this.formatHasField(field, format)) {
+        // not checking field-type, as that precludes using computed relationships for meta
+        // which should be allowed. this will result in adding attr fields here, but that should be harmless
+        includePaths.push(`model.${fieldId}`);
+      }
     }
-
-    return cardModels;
+    return includePaths;
   }
 
-  private async adaptCardToFormat(card: SingleResourceDoc, model: SingleResourceDoc, format: string) {
-    if (!model.data.type || !model.data.id) { throw new Error(`Card model is missing type and/or id '${model.data.type}/${model.data.id}'`); }
+  private async adaptCardToFormat(card: SingleResourceDoc, format: string) {
+    if (!card.data.id) { throw new Error(`Cannot load card with missing id.`); }
+    let id = card.data.id;
     if (!card.data.attributes) { throw new Error(`Card is missing attributes '${card.data.type}/${card.data.id}`); }
+
+    let { repository, packageName } = cardContextFromId(card.data.id);
+    let cardModelType = cardContextToId({ repository, packageName });
+    let model = (card.included || []).find(i => `${i.type}/${i.id}` === `${cardModelType}/${id}`);
+    if (!model) { throw new Error(`Card model is missing for card 'cards/${id}'`); }
+    if (!model.type || !model.id) { throw new Error(`Card model is missing type and/or id '${model.type}/${model.id}' for card 'cards/${id}`); }
 
     let schema = await this.currentSchema.getSchema();
     let result: SingleResourceDoc = {
       data: {
+        id,
         type: 'cards',
-        id: card.data.id,
         attributes: {},
         relationships: {
           fields: get(card, 'data.relationships.fields'),
           model: {
-            data: { type: model.data.type, id: model.data.id }
+            data: { type: model.type, id: model.id }
           }
         }
       }
@@ -155,15 +123,15 @@ class CardServices {
       if (!cardBrowserAssetFields.includes(attr) || !result.data.attributes) { continue; }
       result.data.attributes[attr] = card.data.attributes[attr];
     }
-    result.included = [model.data].concat((card.included || []).filter(i => schema.isSchemaType(i.type)));
+    result.included = [model].concat((card.included || []).filter(i => schema.isSchemaType(i.type)));
 
     for (let { id: fieldId } of (get(card, 'data.relationships.fields.data') || [])) {
       let field = schema.realAndComputedFields.get(fieldId);
 
       if (this.formatHasField(field, format)) {
-        let { cardId: fieldName } = this.cardContextFromId(fieldId);
-        let fieldAttrValue = get(model, `data.attributes.${fieldId}`);
-        let fieldRelValue = get(model, `data.relationships.${fieldId}`);
+        let { cardId: fieldName } = cardContextFromId(fieldId);
+        let fieldAttrValue = get(model, `attributes.${fieldId}`);
+        let fieldRelValue = get(model, `relationships.${fieldId}`);
 
         if (!field.isRelationship && fieldAttrValue !== undefined && result.data.attributes) {
           result.data.attributes[fieldName] = fieldAttrValue;
@@ -172,9 +140,9 @@ class CardServices {
           let includedResources: ResourceObject[] = [];
           if (Array.isArray(fieldRelValue.data)) {
             let relRefs = fieldRelValue.data.map((i: ResourceIdentifierObject) => `${i.type}/${i.id}`);
-            includedResources = model.included ? model.included.filter(i => relRefs.includes(`${i.type}/${i.id}`)) : [];
+            includedResources = card.included ? card.included.filter(i => relRefs.includes(`${i.type}/${i.id}`)) : [];
           } else {
-            let includedResource = model.included && model.included.find(i => `${i.type}/${i.id}` === `${fieldId}/${fieldRelValue.data.id}`);
+            let includedResource = card.included && card.included.find(i => `${i.type}/${i.id}` === `${fieldId}/${fieldRelValue.data.id}`);
             if (includedResource) {
               includedResources = [includedResource];
             }
@@ -193,41 +161,19 @@ class CardServices {
 
     return true;
   }
-
-  private async buildCardModelSchema(card: SingleResourceDoc) {
-    if (!card.data.id) { return; }
-
-    let cardModelSchema: ResourceObject[] = [];
-    let schema = await this.currentSchema.getSchema();
-
-    for (let resource of (card.included || [])) {
-      if (resource.type === 'cards' || !schema.isSchemaType(resource.type)) { continue; }
-      cardModelSchema.push(resource);
-    }
-
-    let { repository, packageName } = this.cardContextFromId(card.data.id);
-    let defaultIncludes = (card.included || []).filter(i =>
-      // field is not yet in the schema, so we'll need to introspect the field document for this
-      (i.type === 'fields' || i.type === 'computed-fields') &&
-      get(i, 'attributes.is-metadata')
-      // not checking field-type, as that precludes using computed relationships for meta
-      // which should be allowed. this will result in adding attr fields here, but that should be harmless
-    ).map(i => i.id) as string[];
-
-    let modelContentType: ResourceObject = {
-      type: 'content-types',
-      id: this.cardContextToId({ repository, packageName }),
-      attributes: {
-        // we'll default includes all the metadata fields, and let adoptCardToFormat()
-        // control presence of included resources based on requested format
-        'default-includes': defaultIncludes
-      },
-      relationships: {
-        fields: get(card, 'data.relationships.fields') || []
-      }
-    };
-    cardModelSchema.push(modelContentType);
-
-    return cardModelSchema;
-  }
 });
+
+function cardContextFromId(id: string) {
+  let [repository, packageName, cardId, modelId] = id.split(cardIdDelim);
+
+  return {
+    repository,
+    packageName,
+    cardId,
+    modelId,
+  };
+}
+
+function cardContextToId({ repository, packageName, cardId, modelId }: CardContext) {
+  return [repository, packageName, cardId, modelId].filter(i => i != null).join(cardIdDelim);
+}

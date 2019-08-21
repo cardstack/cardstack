@@ -6,13 +6,15 @@ const DocumentContext = require('./indexing/document-context');
 const { get } = require('lodash');
 
 const localHubSource = 'local-hub';
+const cardIdDelim = '::'; // it would be nice to figure out how to get rid of this...
 
 module.exports = declareInjections({
   sources: 'hub:data-sources',
   internalSearcher: `plugin-searchers:${require.resolve('@cardstack/pgsearch/searcher')}`,
   client: `plugin-client:${require.resolve('@cardstack/pgsearch/client')}`,
   currentSchema: 'hub:current-schema',
-  jobQueue: 'hub:queues'
+  jobQueue: 'hub:queues',
+  indexers: 'hub:indexers'
 },
 
 class Searchers {
@@ -57,7 +59,7 @@ class Searchers {
     let result = await next();
 
     if (result && result.data.type === 'cards') {
-      await this._getCardServices().loadCard(result);
+      await this.indexers.accomodateCard(result);
     }
 
     let { data, meta, included } = result || {};
@@ -72,12 +74,6 @@ class Searchers {
   _getRouters() {
     if (this.routers) { return this.routers; }
     return this.routers = this.__owner__.lookup('hub:routers');
-  }
-
-  // not using DI to prevent circular dependency
-  _getCardServices() {
-    if (this.cardServices) { return this.cardServices; }
-    return this.cardServices = this.__owner__.lookup('hub:card-services');
   }
 
   async getSpace(session, path) {
@@ -142,8 +138,6 @@ class Searchers {
   }
 
   async search(session, query) {
-    let cardServices = this._getCardServices();
-    let { cardContextFromId, cardContextToId } = cardServices;
     if (typeof query !== 'object') {
       throw new Error(`Searchers.search() expects parameters: 'session', 'query'`);
     }
@@ -156,15 +150,16 @@ class Searchers {
       let cards = result.data ? result.data.filter(i => i.type === 'cards') : [];
       if (cards.length) {
         for (let card of cards) {
-          let { repository, packageName } = cardContextFromId(card.id);
-          let cardContext = cardContextToId({ repository, packageName });
-          let included = Array.isArray(result.included) ? result.included.filter(i =>
-            i.id.includes(card.id) ||
-            (schema.isSchemaType(i.type) && i.id.includes(cardContext))
+          let included = Array.isArray(result.included) ? result.included.filter(i => {
+            let [repository, packageName] = card.id.split(cardIdDelim);
+            let cardContext = [repository, packageName].join(cardIdDelim);
+            return i.id.includes(card.id) ||
+              (schema.isSchemaType(i.type) && i.id.includes(cardContext));
+          }
           ) : [];
-          await cardServices.loadCard({ data: card, included });
+          await this.indexers.accomodateCard({ data: card, included });
         }
-        schema = await this.currentSchema.getSchema();// card loading may have changed the schema--reload it.
+        schema = await this.currentSchema.getSchema(); // card loading may have changed the schema--reload it.
       }
       let includePaths = (get(query, 'include') || '').split(',');
       let documentContext = this.createDocumentContext({
