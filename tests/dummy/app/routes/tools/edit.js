@@ -6,12 +6,13 @@ export default class ToolsEditRoute extends Route {
 
   model({ model, id }) {
     if (!id || id === 'sample') {
-      let { title, description, body, imageUrl } = this.store.peekRecord(model, 'sample');
+      let { title, description, body, imageUrl, author } = this.store.peekRecord(model, 'sample');
       return this.store.createRecord(model, {
         title,
         description,
         body,
-        imageUrl
+        imageUrl,
+        author
       });
     }
 
