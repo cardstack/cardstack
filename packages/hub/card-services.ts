@@ -78,7 +78,7 @@ class CardServices {
     ];
 
     for (let { id: fieldId } of (get(card, 'data.relationships.fields.data') || [])) {
-      let field = schema.realAndComputedFields.get(fieldId);
+      let field = schema.getRealAndComputedField(fieldId);
       if (!field) { continue; }
 
       // TODO if field is a card relation (we should have "related-cards" in the future)
@@ -126,7 +126,7 @@ class CardServices {
     result.included = [model].concat((card.included || []).filter(i => schema.isSchemaType(i.type)));
 
     for (let { id: fieldId } of (get(card, 'data.relationships.fields.data') || [])) {
-      let field = schema.realAndComputedFields.get(fieldId);
+      let field = schema.getRealAndComputedField(fieldId);
 
       if (this.formatHasField(field, format)) {
         let { cardId: fieldName } = cardContextFromId(fieldId);
