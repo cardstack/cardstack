@@ -343,6 +343,7 @@ module.exports = class DocumentContext {
     });
     context.cache = this.cache;
     context._routeStack = this._routeStack;
+    context.suppliedIncluded = this.suppliedIncluded;
 
     return context;
   }
@@ -464,7 +465,8 @@ module.exports = class DocumentContext {
   _buildSearchTree(searchTree, segments) {
     if (!segments.length) { return {}; }
 
-    searchTree[segments[0]] = this._buildSearchTree(Object.assign({}, searchTree), segments.slice(1));
+    let childNode = searchTree[segments[0]] || {};
+    searchTree[segments[0]] = merge(childNode, this._buildSearchTree(Object.assign({}, childNode), segments.slice(1)));
 
     return searchTree;
   }
