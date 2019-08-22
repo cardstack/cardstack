@@ -33,7 +33,7 @@ module.exports = class RunningIndexers {
   }
 
   async _loadSchemaModels() {
-    let newDataSources = [...this.seedSchema.dataSources.values()]
+    let newDataSources = [...this.seedSchema.getDataSources().values()]
         .map(this._sawDataSource.bind(this));
 
     log.debug(`RunningIndexers._loadSchemaModels() found ${newDataSources.length} newDataSources`);

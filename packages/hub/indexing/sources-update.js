@@ -78,7 +78,7 @@ module.exports = class SourcesUpdate {
     let updaters = Object.entries(this.updaters);
 
     let dataSourceIds = types.map(type => {
-      let contentType = schema.types.get(type);
+      let contentType = schema.getType(type);
       if (!contentType) { return; }
       let dataSource = contentType.dataSource;
       if (!dataSource) { return; }

@@ -28,7 +28,7 @@ class S3Searcher {
     if (type === 'content-types') { return next(); }
 
     let schema = await this.currentSchema.getSchema();
-    let contentType = schema.types.get(type);
+    let contentType = schema.getType(type);
     if (!contentType) { return result; }
 
     // only look for files on the server if the content type is actually stored

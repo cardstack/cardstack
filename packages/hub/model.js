@@ -97,7 +97,7 @@ exports.Model = class Model {
 
   async getModel(type, id) {
     let { schema, read, search, jsonapiDoc } = priv.get(this);
-    let contentType = schema.types.get(type);
+    let contentType = schema.getType(type);
     if (!contentType) {
       throw new Error(`${jsonapiDoc.type} ${jsonapiDoc.id} tried to getModel nonexistent type ${type} `);
     }
@@ -113,6 +113,6 @@ exports.Model = class Model {
     let models = await search(query);
     if (!models) { return; }
 
-    return models.data.map(model => new Model(schema.types.get(model.type), model, schema, read, search));
+    return models.data.map(model => new Model(schema.getType(model.type), model, schema, read, search));
   }
 };

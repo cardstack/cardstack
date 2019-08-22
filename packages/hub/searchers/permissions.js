@@ -26,7 +26,7 @@ class PermissionsSearcher {
 
     let context = { session, type: queryType };
 
-    let contentType = (await this.currentSchema.getSchema()).types.get(queryType);
+    let contentType = (await this.currentSchema.getSchema()).getType(queryType);
     if (!contentType) {
       throw new Error(`content type "${queryType}" not found`, {
         status: 404,

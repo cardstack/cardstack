@@ -883,7 +883,7 @@ describe('git/writer/hyperledger', function() {
     writers = env.lookup('hub:writers');
 
     let schema = await writers.currentSchema.getSchema();
-    writer = schema.dataSources.get('git').writer;
+    writer = schema.getDataSource('git').writer;
     await writer._ensureGitchain();
     gitChain = writer.gitChain;
 

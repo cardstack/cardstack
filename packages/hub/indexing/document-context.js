@@ -54,13 +54,13 @@ module.exports = class DocumentContext {
 
     if (this.isCollection) {
       this._model = this.upstreamDoc.data.map(doc => {
-        let contentType = this.schema.types.get(doc.type);
+        let contentType = this.schema.getType(doc.type);
         if (!contentType) { throw new Error(`Unknown content type=${doc.type} id=${doc.id}`); }
 
         return new Model(contentType, doc, this.schema, this.read.bind(this), this.search.bind(this));
       });
     } else {
-      let contentType = this.schema.types.get(this.type);
+      let contentType = this.schema.getType(this.type);
       if (!contentType) { throw new Error(`Unknown content type=${this.type} id=${this.id}`); }
 
       this._model = new Model(contentType, this.upstreamDoc.data, this.schema, this.read.bind(this), this.search.bind(this));
@@ -179,7 +179,7 @@ module.exports = class DocumentContext {
     if (!document) { return; }
 
     let authorizedResource;
-    let types = this.schema.types;
+    let types = this.schema.getTypes();
     if (Array.isArray(document.data)) {
       authorizedResource = await Promise.all(document.data.map(async resource => {
         if (resource.id == null || resource.type == null) {
@@ -313,7 +313,7 @@ module.exports = class DocumentContext {
   async _readAuthIncluded(included, userRealms) {
     let modified = false;
     let safeIncluded = await Promise.all(included.map(async resource => {
-      let contentType = this.schema.types.get(resource.type);
+      let contentType = this.schema.getType(resource.type);
       if (contentType) {
         let authorized = await contentType.applyReadAuthorization(this._deriveDocumentContextForResource(resource), userRealms);
         if (authorized !== resource) {
@@ -356,7 +356,7 @@ module.exports = class DocumentContext {
     if (!document) { return; }
 
     let [queryType, queryId] = document.data.id.split('/');
-    let permissionsSubjectType = this.schema.types.get(queryType);
+    let permissionsSubjectType = this.schema.getType(queryType);
     let permissionsSubject = {};
     if (!queryId) {
       // Checking grants should always happen on a document
@@ -383,7 +383,7 @@ module.exports = class DocumentContext {
   async _buildCachedResponse() {
     let searchTree;
     if (!this.isCollection) {
-      let contentType = this.schema.types.get(this.type);
+      let contentType = this.schema.getType(this.type);
       if (!contentType) { return; }
 
       searchTree = contentType.includesTree;
@@ -507,7 +507,7 @@ module.exports = class DocumentContext {
 
     if (isCollection) {
       for (let [index, resource] of jsonapiDoc.data.entries()) {
-        let contentType = this.schema.types.get(resource.type);
+        let contentType = this.schema.getType(resource.type);
         if (!contentType) { continue; }
 
         let includesTree;
@@ -528,7 +528,7 @@ module.exports = class DocumentContext {
       }
       assignMeta(pristine, jsonapiDoc);
     } else {
-      let contentType = this.schema.types.get(type);
+      let contentType = this.schema.getType(type);
       if (!contentType) {
         log.warn("ignoring unknown document type=%s id=%s", type, id);
         return;
