@@ -312,7 +312,7 @@ class Batch {
 
       if (this._isInvalidated(type, id, refs)) {
         let schema = await this._currentSchema.getSchema();
-        let sourceId = schema.types.get(type).dataSource.id;
+        let sourceId = schema.getType(type).dataSource.id;
 
         // Need to filter out any includeds that were invalidated as those need to be re-read
         if (Array.isArray(doc.included)) {

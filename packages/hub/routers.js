@@ -133,7 +133,8 @@ class Routers {
       throw new Error(`Recursed through more than ${maxRouteDepth} routers when building routing map. Router stack: ${JSON.stringify(routeStack, null, 2)}`);
     }
 
-    let router = schema.types.get(routingCardType).router;
+    let type = schema.getType(routingCardType);
+    let router = type && type.router;
     if (!router && routeStack.length === 0) {
       router = defaultRouter;
     } else if (!router) {
@@ -155,7 +156,7 @@ class Routers {
 
       if (routingCardTypeQueryValue && routingCardTypeQueryValue.charAt(0) === ':') {
         let parentTypes = childRouteStack.map(i => i.contentType);
-        for (let contentType of schema.types.keys()) {
+        for (let contentType of schema.getTypes().keys()) {
           // dont crawl any types that are in the route stack, or you'll get trapped in a cycle
           if (parentTypes.includes(contentType)) { continue; }
 
@@ -230,7 +231,7 @@ class Routers {
     let typeStack = route && route.routeStack ? [ route.contentType ].concat(route.routeStack.map(r => r.contentType)) : [];
     for (let type of typeStack) {
       let errorType = `${type}-errors`;
-      let errorContentType = schema.types.get(errorType);
+      let errorContentType = schema.getType(errorType);
       if (errorContentType) {
         // we check that the error card has an open grant, otherwise revert to system error card
         // we dont want to potentially swallow errors due to restrive grant settings, so err on the side of caution

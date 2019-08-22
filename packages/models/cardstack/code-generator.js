@@ -80,7 +80,7 @@ class CodeGenerator {
     let schema = await this.currentSchema.getSchema();
     let modules = new Map();
 
-    for (let type of schema.types.values()) {
+    for (let type of schema.getTypes().values()) {
       let modelName = inflection.singularize(type.id);
       modules.set(`models/${modelName}`, reexportTemplate({ source: `@cardstack/models/generated/${modelName}` }));
       modules.set(`adapters/${modelName}`,reexportTemplate({ source: `@cardstack/models/adapter`}));
@@ -97,7 +97,7 @@ class CodeGenerator {
     let schema = await this.currentSchema.getSchema();
     let modules = new Map();
 
-    for (let type of schema.types.values()) {
+    for (let type of schema.getTypes().values()) {
       let modelName = inflection.singularize(type.id);
       modules.set(`generated/${modelName}`, this._generatedModel(modelName, type));
     }

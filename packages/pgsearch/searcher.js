@@ -142,7 +142,7 @@ module.exports = declareInjections({
   _buildQueryExpression(schema, segments, errorHint, partialPath, currentContext, insideHasMany) {
     let [ first, ...rest ] = segments;
     let fieldName = segments.shift();
-    let field = schema.realAndComputedFields.get(fieldName);
+    let field = schema.getRealAndComputedField(fieldName);
     if (!field) {
       throw new Error(`Cannot ${errorHint} by unknown field "${partialPath}${fieldName}"`, {
         status: 400,

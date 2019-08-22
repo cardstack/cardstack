@@ -152,7 +152,7 @@ class Writers {
   async createPendingChange({ originalDocument, finalDocument, finalizer, aborter, opts }) {
     let schema = await this.currentSchema.getSchema();
     let type = originalDocument ? originalDocument.type : finalDocument.type;
-    let contentType = schema.types.get(type);
+    let contentType = schema.getType(type);
     let sourceId;
     if (contentType) {
       sourceId = get(contentType, 'dataSource.id');
@@ -190,7 +190,7 @@ class Writers {
   }
 
   _getSchemaDetailsForType(schema, type) {
-    let contentType = schema.types.get(type);
+    let contentType = schema.getType(type);
     if (!contentType || !contentType.dataSource || !contentType.dataSource.writer) {
       log.debug('non-writeable type %s: exists=%s hasDataSource=%s hasWriter=%s',
         type,

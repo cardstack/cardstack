@@ -64,7 +64,7 @@ class EthereumEventIndexer {
     log.debug('indexing model in pgsearch %j', record);
     let { id, type } = record;
     let schema = await this.currentSchema.getSchema();
-    let contentType = schema.types.get(type);
+    let contentType = schema.getType(type);
     let sourceId = contentType.dataSource.id;
     let context = this.searchers.createDocumentContext({
       id,

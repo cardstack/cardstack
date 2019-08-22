@@ -14,33 +14,67 @@ class Schema {
   }
 
   constructor({ types, fields, computedFields, dataSources, inputModels, plugins, schemaLoader, searchers, grants }) {
-    this.types = types;
-    this.realFields = fields;
-    this.computedFields = computedFields;
-    this._realAndComputedFields = null;
-    this.dataSources = dataSources;
-    this.plugins = plugins;
+    this._types = types;
+    this._realFields = fields;
+    this._computedFields = computedFields;
+    this.__realAndComputedFields = null;
+    this._dataSources = dataSources;
     this._mapping = null;
     this._customAnalyzers = null;
     this._originalModels = inputModels;
     this._allGrants = grants;
     this._abstractRealms = null;
+    this.plugins = plugins;
     this.schemaLoader = schemaLoader;
     this.searchers = searchers;
   }
 
-  get realAndComputedFields() {
-    if (!this._realAndComputedFields) {
+  get _realAndComputedFields() {
+    if (!this.__realAndComputedFields) {
       let m = new Map();
-      for (let [id, field] of this.realFields) {
+      for (let [id, field] of this._realFields) {
         m.set(id, field);
       }
-      for (let [id, computed] of this.computedFields) {
+      for (let [id, computed] of this._computedFields) {
         m.set(id, computed.virtualField);
       }
-      this._realAndComputedFields = m;
+      this.__realAndComputedFields = m;
     }
+    return this.__realAndComputedFields;
+  }
+
+  // Ultimately I think we'll want these getters to be async,
+  // let's tackle that in a future refactor...
+  getRealAndComputedFields() {
     return this._realAndComputedFields;
+  }
+
+  getRealAndComputedField(id) {
+    return this._realAndComputedFields.get(id);
+  }
+
+  getTypes() {
+    return this._types;
+  }
+
+  getType(id) {
+    return this._types.get(id);
+  }
+
+  getRealFields() {
+    return this._realFields;
+  }
+
+  getRealField(id) {
+    return this._realFields.get(id);
+  }
+
+  getDataSources() {
+    return this._dataSources;
+  }
+
+  getDataSource(id) {
+    return this._dataSources.get(id);
   }
 
   equalTo(otherSchema) {
@@ -51,7 +85,7 @@ class Schema {
   }
 
   async teardown() {
-    for (let source of this.dataSources.values()) {
+    for (let source of this.getDataSources().values()) {
       await source.teardown();
     }
   }
@@ -67,7 +101,7 @@ class Schema {
         continue;
       }
       for (let fieldName of Object.keys(doc[section])) {
-        if (!this.realFields.has(fieldName)) {
+        if (!this.getRealFields().has(fieldName)) {
           if (activeDoc === doc) {
             activeDoc = Object.assign({}, doc);
           }
@@ -83,7 +117,7 @@ class Schema {
 
   async authorizedCreatableContentTypes(session=Session.EVERYONE) {
     let authorizedTypes = [];
-    for (let [ typeName, contentType ] of this.types.entries()) {
+    for (let [ typeName, contentType ] of this.getTypes().entries()) {
       let canCreate = await contentType.authorizedToCreateResource({ session });
       if (canCreate) {
         authorizedTypes.push(typeName);
@@ -142,7 +176,7 @@ class Schema {
       id = pendingChange.originalDocument.id;
     }
 
-    let contentType = this.types.get(type);
+    let contentType = this.getType(type);
     if (!contentType) {
       throw new Error(`"${type}" is not a valid type`, {
         status: 400,
@@ -200,7 +234,7 @@ class Schema {
     if (!this._customAnalyzers) {
 
       let allAnalyzers;
-      for (let contentType of this.types.values()) {
+      for (let contentType of this.getTypes().values()) {
         let analyzers = contentType.customAnalyzers();
         if (analyzers) {
           if (!allAnalyzers) {
@@ -225,7 +259,7 @@ class Schema {
       return;
     }
 
-    let userType = this.types.get(potentialSession.type);
+    let userType = this.getType(potentialSession.type);
     if (!userType) {
       return;
     }
@@ -234,7 +268,7 @@ class Schema {
   }
 
   async authorizedReadRealms(type, documentContext) {
-    let contentType = this.types.get(type);
+    let contentType = this.getType(type);
     if (contentType) {
       return await contentType.authorizedReadRealms(documentContext);
     } else {
@@ -258,7 +292,7 @@ class Schema {
   }
 
   userRealms(userDoc) {
-    let contentType = this.types.get(userDoc.type);
+    let contentType = this.getType(userDoc.type);
     if (!contentType || !contentType.isGroupable()) {
       return;
     }

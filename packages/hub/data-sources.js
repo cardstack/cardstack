@@ -8,6 +8,6 @@ module.exports = declareInjections({
 class DataSources {
   async active() {
     let schema = await this.currentSchema.getSchema();
-    return schema.dataSources;
+    return schema.getDataSources();
   }
 });

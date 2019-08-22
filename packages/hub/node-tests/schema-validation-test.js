@@ -381,26 +381,26 @@ describe('schema/validation', function() {
   });
 
   it("can lookup up a writer for a content type", async function() {
-    expect(schema.types.get('articles').dataSource).is.ok;
-    expect(schema.types.get('articles').dataSource.writer).is.ok;
+    expect(schema.getType('articles').dataSource).is.ok;
+    expect(schema.getType('articles').dataSource.writer).is.ok;
 
-    expect(schema.types.get('articles').dataSource).has.property('id', ephemeralDataSource.id);
+    expect(schema.getType('articles').dataSource).has.property('id', ephemeralDataSource.id);
     // this relies on knowing a tiny bit of writer's internals. When
     // we have a more complete plugin system we should just inject a
     // fake writer plugin for this test to avoid the coupling.
-    expect(schema.types.get('articles').dataSource.writer).has.property('initialModels');
-    expect(schema.types.get('articles').dataSource.writer.initialModels).deep.equals([{ type: 'hello', id: 'world' }]);
+    expect(schema.getType('articles').dataSource.writer).has.property('initialModels');
+    expect(schema.getType('articles').dataSource.writer.initialModels).deep.equals([{ type: 'hello', id: 'world' }]);
   });
 
   it("can lookup up an indexer on a data source", async function() {
-    let source = schema.dataSources.get(ephemeralDataSource.id);
+    let source = schema.getDataSource(ephemeralDataSource.id);
     expect(source).ok;
     expect(source.indexer).ok;
   });
 
   it("uses default data source", async function() {
-    expect(schema.types.get('things-with-defaults').dataSource).is.ok;
-    expect(schema.types.get('things-with-defaults').dataSource).has.property('id', ephemeralDataSource.id);
+    expect(schema.getType('things-with-defaults').dataSource).is.ok;
+    expect(schema.getType('things-with-defaults').dataSource).has.property('id', ephemeralDataSource.id);
   });
 
   it("applies creation default", async function() {
@@ -510,7 +510,7 @@ describe('schema/validation', function() {
     });
     let newSchema = await schema.validate(pending);
     expect(newSchema).is.ok;
-    expect([...newSchema.realFields.keys()]).contains('extra-field');
+    expect([...newSchema.getRealFields().keys()]).contains('extra-field');
   });
 
   it("applies related-types validation in belongs-to", async function() {
