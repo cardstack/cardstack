@@ -220,6 +220,7 @@ describe('hub/card-services', function () {
 
       it("will persist discovered card schema in the index after other indexers have emitted new schema", async function() {
         await cardServices.get(env.session, 'local-hub::article-card::millenial-puppies', 'isolated');
+        await env.lookup('hub:indexers').invalidateSchemaCache();
         await env.lookup('hub:indexers').update();
 
         let article = await cardServices.get(env.session, 'local-hub::article-card::millenial-puppies', 'isolated');
