@@ -76,30 +76,30 @@ class Searchers {
     return await this.get(session, localHubSource, 'spaces', path);
   }
 
-  async get(session, source, packageName, cardId, opts={}) {
+  async get(session, source, type, id, opts={}) {
     if (source !== localHubSource) {
       throw new Error(`You specified the source: '${source}' in Searchers.get(). Currently the cardstack hub does not support non-local hub sources.`);
     }
 
     let { /*version,*/ includePaths } = opts; // TODO eventually we will handle "version" in the opts to getting a snapshot of a resource
 
-    let { resource, meta, included } = await this.getResourceAndMeta(session, packageName, cardId);
+    let { resource, meta, included } = await this.getResourceAndMeta(session, type, id);
     let authorizedResult;
     let documentContext;
     if (resource) {
       let schema = await this.currentSchema.getSchema();
       documentContext = this.createDocumentContext({
-        id: cardId,
-        type: packageName,
+        id,
+        type,
         schema,
         includePaths,
         upstreamDoc: { data: resource, meta, included }
       });
-      authorizedResult = await documentContext.applyReadAuthorization({ session, packageName, cardId });
+      authorizedResult = await documentContext.applyReadAuthorization({ session, type, id });
     }
 
     if (!authorizedResult) {
-      throw new Error(`No such resource ${source}/${packageName}/${cardId}`, {
+      throw new Error(`No such resource ${source}/${type}/${id}`, {
         status: 404
       });
     }

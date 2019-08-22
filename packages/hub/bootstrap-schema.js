@@ -11,7 +11,6 @@ const models = [
     relationships: {
       fields: {
         data: [
-          { type: 'fields', id: 'name' },
           { type: 'fields', id: 'data-source' },
           { type: 'fields', id: 'fields' },
           { type: 'fields', id: 'is-built-in' },
@@ -20,20 +19,6 @@ const models = [
           { type: 'fields', id: 'fieldsets' },
           { type: 'fields', id: 'fieldset-expansion-format' },
           { type: 'fields', id: 'router' }
-        ]
-      }
-    }
-  },
-  {
-    type: 'content-types',
-    id: 'card-definitions',
-    attributes: {
-      'is-built-in': true
-    },
-    relationships: {
-      fields: {
-        data: [
-          { type: 'fields', id: 'model' },
         ]
       }
     }
@@ -61,7 +46,6 @@ const models = [
     relationships: {
       fields: {
         data: [
-          { type: 'fields', id: 'name' },
           { type: 'fields', id: 'field-type' },
           { type: 'fields', id: 'related-types' },
           { type: 'fields', id: 'default-at-create' },
@@ -90,7 +74,6 @@ const models = [
     relationships: {
       fields: {
         data: [
-          { type: 'fields', id: 'name' },
           { type: 'fields', id: 'computed-field-type' },
           { type: 'fields', id: 'caption' },
           { type: 'fields', id: 'searchable' },
@@ -832,7 +815,7 @@ const models = [
       'source-type': '@cardstack/routing'
     }
   },
-  /* 
+  /*
   The `everyone` group handles users who do not get assigned a role, so they
   default to everyone. Use this grant for things like universal, anonymous
   read of public info. An entry here is required so that the searcher runs.
