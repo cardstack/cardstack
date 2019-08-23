@@ -4,11 +4,20 @@ const { Model, privateModels } = require('../model');
 const { getPath } = require('@cardstack/routing/cardstack/path');
 const { merge, get, uniqBy } = require('lodash');
 const Session = require('@cardstack/plugin-utils/session');
+const {
+  cardIdDelim,
+  cardContextToId,
+  cardContextFromId,
+  schemaModelsForCard,
+  adaptCardToFormat,
+  adaptCardCollectionToFormat,
+  getCardIncludePaths
+} = require('./card-utils');
 const qs = require('qs');
 
 module.exports = class DocumentContext {
 
-  constructor({ read, search, routers, schema, type, id, sourceId, generation, upstreamDoc, includePaths }) {
+  constructor({ read, search, routers, schema, type, id, sourceId, generation, upstreamDoc, format, includePaths }) {
     if (upstreamDoc && !upstreamDoc.data) {
       throw new Error('The upstreamDoc must have a top-level "data" property', {
         status: 400
@@ -17,6 +26,7 @@ module.exports = class DocumentContext {
     this.schema = schema;
     this.routers = routers;
     this.type = type;
+    this.format = format;
     this.id = id;
     this.sourceId = sourceId;
     this.generation = generation;
@@ -29,6 +39,7 @@ module.exports = class DocumentContext {
     this._followedRelationships = {};
     this._routeStack = get(upstreamDoc, 'data.attributes.route-stack');
     this.cache = {};
+    this._cardCache = {};
     this.isCollection = upstreamDoc && upstreamDoc.data && Array.isArray(upstreamDoc.data);
     this.suppliedIncluded = upstreamDoc && upstreamDoc.included;
     this._model = null;
@@ -123,7 +134,8 @@ module.exports = class DocumentContext {
     let cached = this.cache[key];
     if (cached) {
       log.debug(`document with key ${key} is in cache, fetching...`);
-      return await cached;
+      let document = await cached;
+      return document && document.data;
     }
 
     if (this._pendingReads.includes(key)) {
@@ -132,7 +144,8 @@ module.exports = class DocumentContext {
     this._pendingReads.push(key);
 
     this.cache[key] = this._read(type, id);
-    let resource = await this.cache[key];
+    let document = await this.cache[key];
+    let resource = document && document.data;
 
     this._pendingReads = this._pendingReads.filter(i => i !== key);
     return resource;
@@ -338,10 +351,12 @@ module.exports = class DocumentContext {
       upstreamDoc: { data: resource },
       schema: this.schema,
       read: this._read,
+      format: this.format,
       search: this._search,
       routers: this.routers
     });
     context.cache = this.cache;
+    context._cardCache = this._cardCache;
     context._routeStack = this._routeStack;
     context.suppliedIncluded = this.suppliedIncluded;
 
@@ -379,6 +394,60 @@ module.exports = class DocumentContext {
         throw error;
       }
     }
+  }
+
+  // Treating this separately from the read() function because we need
+  // cards as JSON:API documents in order to derive the card schema,
+  // and read() only returns resources.
+  async _getCard(id) {
+    let cardResource;
+    if (get(this, 'upstreamDoc.data.id') === id && get(this, 'upstreamDoc.data.type') === 'cards') {
+      return this.upstreamDoc;
+    } else if (this.upstreamDoc &&
+      this.upstreamDoc.data &&
+      Array.isArray(this.upstreamDoc.data) &&
+      (cardResource = this.upstreamDoc.data.find(i => `cards/${i.id}`))
+    ) {
+      let { repository, packageName, } = cardContextFromId(id);
+      let typePrefix = cardContextToId({ repository, packageName });
+      let card = {
+        data: cardResource,
+        included: (this.upstreamDoc.included || []).filter(i => i.type.includes(typePrefix) || i.id.includes(typePrefix))
+      };
+      this._cardCache[id] = card;
+      return card;
+    }
+    let cached = this._cardCache[id];
+    if (cached) {
+      return await this._cardCache[id];
+    }
+    this._cardCache[id] = this._read('cards', id);
+    return await this._cardCache[id];
+  }
+
+  // TODO eventually we'll want to load the card types and fields from the schema getters
+  // themselves when a card based type/field is being requested. Reminder to chat with Ed
+  // around how the schema can find the card document when a caller wants a card type/field schema--
+  // unsure how we would use a searchers.get() within the Schema class; I think that would
+  // result in a cycle as searchers.get() needs to use a schema itself in order to process results.
+  async _loadCardSchemaForResource(resourceType, resourceId) {
+    if (!resourceType ||
+      (resourceType !== 'cards' && resourceType.split(cardIdDelim).length < 2)) { return; }
+
+    let { repository, packageName, cardId } = cardContextFromId(resourceId);
+    let id = cardContextToId({ repository, packageName, cardId });
+    if (!id) { return; }
+
+    if (this._cardCache[id]) {
+      await this._cardCache[id];
+      await this._loadingCardSchema;
+      return;
+    }
+
+    let card = await this._getCard(id);
+    let cardSchema = schemaModelsForCard(this.schema, card);
+    let schema = this._loadingCardSchema = this.schema.applyChanges(cardSchema.map(document => ({ id:document.id, type:document.type, document })));
+    this.schema = await schema;
   }
 
   async _buildCachedResponse() {
@@ -444,7 +513,7 @@ module.exports = class DocumentContext {
         related = await Promise.all(models.map(async (model) => {
           return this._build(model.type, model.id, privateModels.get(model).jsonapiDoc, searchTree[field.id], depth + 1, format);
         }));
-        ensure(pristineDocOut, 'relationships')[field.id] = Object.assign({}, relObj, { data: related.map(r => ({ type: r.type, id: r.id })) });
+        ensure(pristineDocOut, 'relationships')[field.id] = Object.assign({}, relObj, { data: related.filter(Boolean).map(r => ({ type: r.type, id: r.id })) });
       } else {
         let model = models;
         if (model) {
@@ -509,13 +578,20 @@ module.exports = class DocumentContext {
 
     if (isCollection) {
       for (let [index, resource] of jsonapiDoc.data.entries()) {
+        await this._loadCardSchemaForResource(resource.type, resource.id);
         let contentType = this.schema.getType(resource.type);
         if (!contentType) { continue; }
 
         let includesTree;
-        if (this.includePaths.length) {
+        let includePaths = this.includePaths;
+        if (resource.type === 'cards') {
+          let cardIncludePaths = getCardIncludePaths(this.schema, await this._getCard(resource.id), this.format)
+            .map(part => part ? part.split('.') : null).filter(Boolean);
+          includePaths = includePaths.concat(cardIncludePaths);
+        }
+        if (includePaths.length) {
           includesTree = {};
-          for (let segments of this.includePaths) {
+          for (let segments of includePaths) {
             this._buildSearchTree(includesTree, segments);
           }
         } else {
@@ -528,15 +604,26 @@ module.exports = class DocumentContext {
         pristine.data.push(pristineItem);
         rootItems.push(`${resource.type}/${resource.id}`);
       }
+      pristine = await adaptCardCollectionToFormat(this.schema, merge({ included: this.pristineIncludes }, pristine), this.format);
       assignMeta(pristine, jsonapiDoc);
     } else {
+      // I think processing relationships that use `link` are not working right--as
+      // we are not resolving the link queries to type/id before _build() is called.
+      if (!type) { return; }
+
+      await this._loadCardSchemaForResource(type, id);
       let contentType = this.schema.getType(type);
       if (!contentType) {
         log.warn("ignoring unknown document type=%s id=%s", type, id);
         return;
       }
 
-      if (depth === 0 && this.includePaths.length){
+      if (depth === 0 && (this.includePaths.length || this.type === 'cards')) {
+        if (type === 'cards') {
+          let cardIncludePaths = getCardIncludePaths(this.schema, this.upstreamDoc, this.format)
+            .map(part => part ? part.split('.') : null).filter(Boolean);
+          this.includePaths = this.includePaths.concat(cardIncludePaths);
+        }
         searchTree = {};
         for (let segments of this.includePaths) {
           this._buildSearchTree(searchTree, segments);
@@ -584,6 +671,9 @@ module.exports = class DocumentContext {
       this.pristineIncludes.push(jsonapiDoc);
     } else {
       await this._addSelfLink(pristine.data);
+      if (type === 'cards') {
+        pristine = await adaptCardToFormat(this.schema, pristine, this.format);
+      }
       this._pristine = pristine;
       if (!isCollection) {
         if (this.sourceId != null) {

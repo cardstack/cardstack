@@ -6,7 +6,6 @@ const DocumentContext = require('./indexing/document-context');
 const { get } = require('lodash');
 
 const localHubSource = 'local-hub';
-const cardIdDelim = '::'; // it would be nice to figure out how to get rid of this...
 
 module.exports = declareInjections({
   sources: 'hub:data-sources',
@@ -58,10 +57,6 @@ class Searchers {
 
     let result = await next();
 
-    if (result && result.data.type === 'cards') {
-      await this.indexers.accomodateCard(result);
-    }
-
     let { data, meta, included } = result || {};
     let maxAge = get(result, 'meta.cardstack-cache-control.max-age');
     if (data && maxAge != null) {
@@ -85,7 +80,7 @@ class Searchers {
       throw new Error(`You specified the source: '${source}' in Searchers.get(). Currently the cardstack hub does not support non-local hub sources.`);
     }
 
-    let { /*version,*/ includePaths } = opts; // TODO eventually we will handle "version" in the opts to getting a snapshot of a resource
+    let { includePaths, format } = opts;
 
     let { resource, meta, included } = await this.getResourceAndMeta(session, type, id);
     let authorizedResult;
@@ -96,6 +91,7 @@ class Searchers {
         id,
         type,
         schema,
+        format,
         includePaths,
         upstreamDoc: { data: resource, meta, included }
       });
@@ -137,33 +133,22 @@ class Searchers {
     return [result, document];
   }
 
-  async search(session, query) {
+  async search(session, query, opts={}) {
     if (typeof query !== 'object') {
       throw new Error(`Searchers.search() expects parameters: 'session', 'query'`);
     }
 
-    let schema = await this.currentSchema.getSchema();
+    let schemaPromise = this.currentSchema.getSchema();
     let sessionOrEveryone = session || Session.EVERYONE;
 
+    let { format } = opts;
     let result = await this._search(sessionOrEveryone)(query);
     if (result) {
-      let cards = result.data ? result.data.filter(i => i.type === 'cards') : [];
-      if (cards.length) {
-        for (let card of cards) {
-          let included = Array.isArray(result.included) ? result.included.filter(i => {
-            let [repository, packageName] = card.id.split(cardIdDelim);
-            let cardContext = [repository, packageName].join(cardIdDelim);
-            return i.id.includes(card.id) ||
-              (schema.isSchemaType(i.type) && i.id.includes(cardContext));
-          }
-          ) : [];
-          await this.indexers.accomodateCard({ data: card, included });
-        }
-        schema = await this.currentSchema.getSchema(); // card loading may have changed the schema--reload it.
-      }
+      let schema = await schemaPromise;
       let includePaths = (get(query, 'include') || '').split(',');
       let documentContext = this.createDocumentContext({
         schema,
+        format,
         includePaths,
         upstreamDoc: result,
       });
@@ -181,12 +166,13 @@ class Searchers {
     }
   }
 
-  createDocumentContext({ schema, type, id, sourceId, generation, upstreamDoc, includePaths }) {
+  createDocumentContext({ schema, type, id, sourceId, generation, upstreamDoc, format, includePaths }) {
     return new DocumentContext({
       schema,
       type,
       id,
       sourceId,
+      format,
       generation,
       upstreamDoc,
       includePaths,
@@ -198,13 +184,14 @@ class Searchers {
 
   _read() {
     return async (type, id) => {
-      let resource;
+      let document;
       try {
-        resource = (await this.getResourceAndMeta(Session.INTERNAL_PRIVILEGED, type, id)).resource;
+        let { resource:data, included } = (await this.getResourceAndMeta(Session.INTERNAL_PRIVILEGED, type, id));
+        document = { data, included };
       } catch (err) {
         if (err.status !== 404) { throw err; }
       }
-      return resource;
+      return document;
     };
   }
 

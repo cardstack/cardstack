@@ -409,8 +409,8 @@ describe('pgsearch/indexer', function() {
         if (err.status !== 404) { throw err; }
       }
 
-      if (result && result.data) {
-        return result.data;
+      if (result) {
+        return result;
       }
     };
 

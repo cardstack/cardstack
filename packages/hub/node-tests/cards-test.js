@@ -201,7 +201,7 @@ describe('hub/card-services', function () {
         ]);
       });
 
-      it("will load a card implicitly when a searcher's search() hook returns a card document", async function () {
+      it("will load a card implicitly when a searcher's search() hook returns a card document in isolated format", async function () {
         let { data: [article] } = await cardServices.search(env.session, 'isolated', {
           filter: {
             type: { exact: 'cards' }
@@ -218,21 +218,26 @@ describe('hub/card-services', function () {
         ]);
       });
 
-      it("will persist discovered card schema in the index after other indexers have emitted new schema", async function() {
-        await cardServices.get(env.session, 'local-hub::article-card::millenial-puppies', 'isolated');
-        await env.lookup('hub:indexers').invalidateSchemaCache();
-        await env.lookup('hub:indexers').update();
+      // TODO move this into the search() tests after that is implemented
+      it("will load a card implicitly when a searcher's search() hook returns a card document in embedded format", async function () {
+        let { data: [article], included } = await cardServices.search(env.session, 'embedded', {
+          filter: {
+            type: { exact: 'cards' }
+          }
+        });
 
-        let article = await cardServices.get(env.session, 'local-hub::article-card::millenial-puppies', 'isolated');
-        let { data } = article;
+        let includedIdentifiers = included.map(i => `${i.type}/${i.id}`);
 
-        expect(data.attributes.title).to.equal('The Millenial Puppy');
-        expect(data.attributes.body).to.match(/discerning tastes of the millenial puppy/);
-        expect(data.attributes.author).to.equal('Van Gogh');
-        expect(data.relationships.tags.data).to.eql([
-          { type: 'local-hub::article-card::tags', id: 'local-hub::article-card::millenial-puppies::millenials' },
-          { type: 'local-hub::article-card::tags', id: 'local-hub::article-card::millenial-puppies::puppies' },
-          { type: 'local-hub::article-card::tags', id: 'local-hub::article-card::millenial-puppies::belly-rubs' },
+        expect(article.attributes.title).to.equal('The Millenial Puppy');
+        expect(article.attributes.author).to.equal('Van Gogh');
+        expect(article.attributes.body).to.be.undefined;
+        expect(article.relationships.tags).to.be.undefined;
+        expect(article.attributes['internal-field']).to.be.undefined;
+
+        expect(includedIdentifiers).to.not.include.members([
+          'local-hub::article-card::tags/local-hub::article-card::millenial-puppies::millenials',
+          'local-hub::article-card::tags/local-hub::article-card::millenial-puppies::puppies',
+          'local-hub::article-card::tags/local-hub::article-card::millenial-puppies::belly-rubs',
         ]);
       });
     });

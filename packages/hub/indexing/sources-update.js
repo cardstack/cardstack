@@ -2,8 +2,6 @@ const Operations = require('./operations');
 const owningDataSource = new WeakMap();
 const { flatten } = require('lodash');
 const log = require('@cardstack/logger')('cardstack/indexers');
-const { schemaModelsForCard } = require('./card-schema-utils');
-const { uniqBy } = require('lodash');
 
 const FINALIZED = {};
 
@@ -48,12 +46,6 @@ module.exports = class SourcesUpdate {
       this._schema = await this.seedSchema.applyChanges(flatten(this.schemaModels).map(model => ({ type: model.type, id: model.id, document: model })));
     }
     return this._schema;
-  }
-
-  async accomodateCard(card) {
-    let cardSchema = schemaModelsForCard(await this.schema(), card);
-    this.schemaModels = uniqBy(this.schemaModels.concat(cardSchema), i => `${i.type}/${i.id}`);
-    this._schema = null;
   }
 
   async takeSchema() {
@@ -125,9 +117,6 @@ module.exports = class SourcesUpdate {
   }
 
   async add(type, id, doc, sourceId, nonce) {
-    if (type === 'cards') {
-      await this.accomodateCard(doc);
-    }
     let schema = await this.schema();
     let context = this.searchers.createDocumentContext({
       schema,

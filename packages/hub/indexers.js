@@ -42,8 +42,6 @@ const log = require('@cardstack/logger')('cardstack/indexers');
 const { declareInjections, getOwner } = require('@cardstack/di');
 const bootstrapSchema = require('./bootstrap-schema');
 const RunningIndexers = require('./indexing/running-indexers');
-const { schemaModelsForCard } = require('./indexing/card-schema-utils');
-const { uniqBy } = require('lodash');
 
 module.exports = declareInjections({
   schemaLoader: 'hub:schema-loader',
@@ -60,7 +58,6 @@ class Indexers extends EventEmitter {
     this._forceRefreshQueue = [];
     this._dataSourcesMemo = null;
     this._schemaCache = null;
-    this._discoveredCardSchema = [];
   }
 
   async schema() {
@@ -68,24 +65,13 @@ class Indexers extends EventEmitter {
       this._schemaCache = (async () => {
         let running = new RunningIndexers(await this._seedSchema(), this.client, this.emit.bind(this), this.schemaLoader.ownTypes(), getOwner(this));
         try {
-          let schema = await running.schemas();
-          return await schema.applyChanges(this._discoveredCardSchema);
+          return await running.schemas();
         } finally {
           await running.destroy();
         }
       })();
     }
     return await this._schemaCache;
-  }
-
-  async accomodateCard(card) {
-    let cardSchema = schemaModelsForCard(await this.schema(), card);
-    this._discoveredCardSchema = uniqBy(this._discoveredCardSchema.concat(cardSchema.map(document => {
-      let { type, id } = document;
-      return { type, id, document };
-    })), i => `${i.type}/${i.id}`);
-
-    await this.invalidateSchemaCache();
   }
 
   async invalidateSchemaCache() {
@@ -146,7 +132,6 @@ class Indexers extends EventEmitter {
     let running = new RunningIndexers(await this._seedSchema(), this.client, this.emit.bind(this), this.schemaLoader.ownTypes(), getOwner(this));
     try {
       let newSchema = await running.update(forceRefresh, hints);
-
       if (this._schemaCache === priorCache) {
         // nobody else has done a more recent update of the schema
         // cache than us, so we can try to update it.
