@@ -1,11 +1,20 @@
+import { todo } from './todo-any';
+
 class Session {
+  static INTERNAL_PRIVILEGED: todo;
+  static EVERYONE: todo;
+  payload: todo;
+  userSearcher: todo;
+  _user: todo;
+  _realms: todo;
+  meta: todo;
 
   // payload must have at least `id` and `type` (which together are
   // the jsonapi reference to the current user's resource.
   //
   // optionalUser can be a jsonapi document representing that user (a
   // full document, including the top-level `data` property)
-  constructor(payload, userSearcher, optionalUser, optionalRealms, meta) {
+  constructor(payload: todo, userSearcher: todo, optionalUser: todo, optionalRealms: todo, meta?: todo) {
     this.payload = payload;
     this.userSearcher = userSearcher;
     this._user = optionalUser;
@@ -58,7 +67,7 @@ class Session {
     return this._realms;
   }
 
-  static encodeBaseRealm(type, id) {
+  static encodeBaseRealm(type: string, id: string) {
     return `${encodeURIComponent(type)}/${encodeURIComponent(id)}`;
   }
 
@@ -67,12 +76,12 @@ class Session {
 const everyoneRealm = Session.encodeBaseRealm('groups', 'everyone');
 
 
-module.exports = Session;
+export = Session;
 
 // This is the session that Hub uses when taking its own actions in
 // the system.  The user id "@cardstack/hub" is special -- it has a
 // grant to do all the things (see bootstrap-schema.js)
-let privilegedSession;
+let privilegedSession: todo;
 Object.defineProperty(Session, 'INTERNAL_PRIVILEGED', {
   get() {
     if (!privilegedSession) {
@@ -95,7 +104,7 @@ Object.defineProperty(Session, 'INTERNAL_PRIVILEGED', {
 });
 
 // This is the default lowest-privileged session
-let everyoneSession;
+let everyoneSession: todo;
 Object.defineProperty(Session, 'EVERYONE', {
   get() {
     if (!everyoneSession) {

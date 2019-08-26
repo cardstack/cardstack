@@ -12,7 +12,8 @@ module.exports = declareInjections({
   internalSearcher: `plugin-searchers:${require.resolve('@cardstack/pgsearch/searcher')}`,
   client: `plugin-client:${require.resolve('@cardstack/pgsearch/client')}`,
   currentSchema: 'hub:current-schema',
-  jobQueue: 'hub:queues'
+  jobQueue: 'hub:queues',
+  indexers: 'hub:indexers'
 },
 
 class Searchers {
@@ -66,10 +67,8 @@ class Searchers {
 
   // not using DI to prevent circular dependency
   _getRouters() {
-    if (this.routers) { this.routers; }
-
-    this.routers = this.__owner__.lookup('hub:routers');
-    return this.routers;
+    if (this.routers) { return this.routers; }
+    return this.routers = this.__owner__.lookup('hub:routers');
   }
 
   async getSpace(session, path) {
@@ -81,7 +80,7 @@ class Searchers {
       throw new Error(`You specified the source: '${source}' in Searchers.get(). Currently the cardstack hub does not support non-local hub sources.`);
     }
 
-    let { /*version,*/ includePaths } = opts; // TODO eventually we will handle "version" in the opts to getting a snapshot of a resource
+    let { includePaths, format } = opts;
 
     let { resource, meta, included } = await this.getResourceAndMeta(session, type, id);
     let authorizedResult;
@@ -92,6 +91,7 @@ class Searchers {
         id,
         type,
         schema,
+        format,
         includePaths,
         upstreamDoc: { data: resource, meta, included }
       });
@@ -133,7 +133,7 @@ class Searchers {
     return [result, document];
   }
 
-  async search(session, query) {
+  async search(session, query, opts={}) {
     if (typeof query !== 'object') {
       throw new Error(`Searchers.search() expects parameters: 'session', 'query'`);
     }
@@ -141,12 +141,14 @@ class Searchers {
     let schemaPromise = this.currentSchema.getSchema();
     let sessionOrEveryone = session || Session.EVERYONE;
 
+    let { format } = opts;
     let result = await this._search(sessionOrEveryone)(query);
     if (result) {
       let schema = await schemaPromise;
       let includePaths = (get(query, 'include') || '').split(',');
       let documentContext = this.createDocumentContext({
         schema,
+        format,
         includePaths,
         upstreamDoc: result,
       });
@@ -164,12 +166,13 @@ class Searchers {
     }
   }
 
-  createDocumentContext({ schema, type, id, sourceId, generation, upstreamDoc, includePaths }) {
+  createDocumentContext({ schema, type, id, sourceId, generation, upstreamDoc, format, includePaths }) {
     return new DocumentContext({
       schema,
       type,
       id,
       sourceId,
+      format,
       generation,
       upstreamDoc,
       includePaths,
@@ -181,13 +184,14 @@ class Searchers {
 
   _read() {
     return async (type, id) => {
-      let resource;
+      let document;
       try {
-        resource = (await this.getResourceAndMeta(Session.INTERNAL_PRIVILEGED, type, id)).resource;
+        let { resource:data, included } = (await this.getResourceAndMeta(Session.INTERNAL_PRIVILEGED, type, id));
+        document = { data, included };
       } catch (err) {
         if (err.status !== 404) { throw err; }
       }
-      return resource;
+      return document;
     };
   }
 

@@ -56,6 +56,7 @@
   },
   "devDependencies": {
     "@cardstack/eslint-config": "0.14.22",
+    "@cardstack/test-support": "0.14.22",
     "koa-better-route": "^0.1.0",
     "supertest": "^2.0.1"
   },

@@ -14,12 +14,26 @@ package-lock.json
 
 
 # Needed during incremental conversion to typescript
+/packages/hub/card-services.d.ts
+/packages/hub/card-services.js
+/packages/hub/card-services.js.map
+/packages/hub/code-generators.js
+/packages/hub/code-generators.js.map
+/packages/hub/code-generators.d.ts
+/packages/hub/indexing/card-utils.d.ts
+/packages/hub/indexing/card-utils.js
+/packages/hub/indexing/card-utils.js.map
 /packages/hub/indexing/operations.d.ts
 /packages/hub/indexing/operations.js
 /packages/hub/indexing/operations.js.map
+
+/packages/plugin-utils/session.d.ts
+/packages/plugin-utils/session.js
+/packages/plugin-utils/session.js.map
 /packages/plugin-utils/todo-any.d.ts
 /packages/plugin-utils/todo-any.js
 /packages/plugin-utils/todo-any.js.map
+
 /packages/cli/**/*.js
 !packages/cli/node-tests/sample-cards/**/*.js
 /packages/cli/**/*.js.map
@@ -27,9 +41,6 @@ package-lock.json
 /packages/di/**/*.js
 /packages/di/**/*.js.map
 /packages/di/**/*.d.ts
-/packages/hub/code-generators.js
-/packages/hub/code-generators.js.map
-/packages/hub/code-generators.d.ts
 /tests/ephemeral-test-app/node_modules/@cardstack/hub/**/*
 /tests/elasticsearch-test-app/node_modules/@cardstack/hub/**/*
 

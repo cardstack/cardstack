@@ -11,11 +11,6 @@ module.exports = class Field {
   }
 
   constructor(model, plugins, allGrants, defaultValues) {
-    let fieldName = model.id;
-    if (!Field.isValidName(fieldName)) {
-      throw new Error(`${fieldName} is not a valid field name. We follow JSON:API spec for valid member names, see http://jsonapi.org/format/#document-member-names`);
-    }
-
     this.id = model.id;
     if (!model.attributes || !model.attributes['field-type']) {
       throw new Error(`field ${model.id} has no field-type attribute`);
@@ -26,6 +21,8 @@ module.exports = class Field {
     this.editorOptions = model.attributes['editor-options'] || {};
     this.inlineEditorComponent = model.attributes['inline-editor-component'];
     this.inlineEditorOptions = model.attributes['inline-editor-options'];
+    this.isMetadata = model.attributes['is-metadata'];
+    this.neededWhenEmbedded = model.attributes['needed-when-embedded'];
     this.searchable = model.attributes.searchable == null ? true : model.attributes.searchable;
     let owned = model.attributes.owned;
     this.owned = typeof owned === 'undefined' ? false : owned;
