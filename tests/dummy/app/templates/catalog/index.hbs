@@ -22,9 +22,7 @@
           <article class="catalog-item" role="button" {{action "preview" item.constructor.modelName}}>
             <div class="catalog-item--boxel-container">
               <AnimatedContainer>
-                {{#animated-value item duration="700"}}
-                  <Boxel @content={{item}} @format="thumbnail" />
-                {{/animated-value}}
+                <Boxel @name="{{item.constructor.modelName}}-{{item.id}}" @content={{item}} @format="thumbnail" />
               </AnimatedContainer>
             </div>
             <section class="catalog-item--info-panel">
