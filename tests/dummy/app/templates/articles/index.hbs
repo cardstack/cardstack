@@ -5,5 +5,7 @@
 </header>
 
 <div class="articles">
-  <Boxel @content={{this.model}} @format="isolated" />
+  <AnimatedContainer>
+    <Boxel @name="{{model.constructor.modelName}}-{{model.id}}" @content={{this.model}} @format="isolated" />
+  </AnimatedContainer>
 </div>

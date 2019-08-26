@@ -2,9 +2,7 @@
   <div class="catalog-preview">
     <div class="catalog-preview--boxel-container">
       <AnimatedContainer>
-        {{#animated-value this.model use=transition duration="700" as |m|}}
-          <Boxel @content={{m}} @format="embedded" />
-        {{/animated-value}}
+        <Boxel @name="{{model.constructor.modelName}}-{{model.id}}" @content={{model}} @format="embedded" />
       </AnimatedContainer>
     </div>
     <section class="catalog-preview--info-panel">
