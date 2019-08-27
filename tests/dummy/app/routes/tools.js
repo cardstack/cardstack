@@ -1,13 +1,5 @@
-import Route from '@ember/routing/route';
-import { inject as service } from '@ember/service';
+import BoxelizedRoute from 'boxel/routes/boxelized';
 
-export default class ToolsRoute extends Route {
-  @service boxel;
-
-  renderTemplate(/*controller, model*/) {
-    this.render('tools', {
-      into: 'application',
-      outlet: 'tools'
-    });
-  }
+export default class ToolsRoute extends BoxelizedRoute {
+  boxelPlane = 'tools';
 }
