@@ -1,5 +1,5 @@
 import DS from 'ember-data';
-import { computed } from '@ember/object';
+import { tracked } from '@glimmer/tracking';
 
 const { Model, attr } = DS;
 
@@ -7,7 +7,9 @@ export default class Person extends Model {
   @attr() firstName;
   @attr() lastName;
 
-  @computed('firstName', 'lastName')
+  @tracked firstName;
+  @tracked lastName;
+
   get fullName() {
     return `${this.firstName} ${this.lastName}`;
   }

@@ -1,9 +1,11 @@
 import Controller from '@ember/controller';
-import { action, computed } from '@ember/object';
+import { tracked } from '@glimmer/tracking';
+import { action } from '@ember/object';
 import { htmlSafe } from '@ember/template';
 
 export default class ToolsEditController extends Controller {
-  @computed('model', 'model.imageUrl')
+  @tracked model;
+
   get backgroundImageUrl() {
     return htmlSafe(`background-image: url(${this.model.imageUrl})`);
   }
