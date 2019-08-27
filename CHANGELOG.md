@@ -19,6 +19,7 @@ and features, and is not intended to be an exhaustive list.
 - error logging
 - docs for git plugins
 - more linting configuration to support using TypeScript
+- eslint plugin rules have changed filepaths for imports. `@cardstack/eslint-config/browser` should become `@cardstack/eslint-config/-browser`, with a dash before `browser` #824
 
 ## [v0.14.21] - 2019-07-18
 
