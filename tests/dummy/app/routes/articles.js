@@ -1,17 +1,9 @@
-import Route from '@ember/routing/route';
-import { inject as service } from '@ember/service';
+import BoxelizedRoute from 'boxel/routes/boxelized';
 
-export default class CatalogRoute extends Route {
-  @service boxel;
+export default class ArticlesRoute extends BoxelizedRoute {
+  boxelPlane = 'space';
 
   model({ id }) {
     return this.store.peekRecord('article', id);
-  }
-
-  renderTemplate(/*controller, model*/) {
-    this.render('articles', {
-      into: 'application',
-      outlet: 'space'
-    });
   }
 }
