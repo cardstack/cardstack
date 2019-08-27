@@ -45,9 +45,9 @@ module('Acceptance | navigation', function (hooks) {
 
     assert.equal(currentURL(), '/tools/article/sample/edit');
 
-    await fillIn('[data-test-cs-component="text-field"]:nth-of-type(1) input', 'What is the meaning of this?');
-    await fillIn('[data-test-cs-component="text-field"]:nth-of-type(2) input', 'Who are all you people and what are you doing in my house?');
-    await fillIn('[data-test-cs-component="text-area"] textarea', 'Lorem ipsum dolor amet gluten-free iPhone humblebrag seitan XOXO deep v kickstarter disrupt banjo salvia lumbersexual trust fund microdosing actually.');
+    await fillIn('.boxel-component:nth-of-type(1) [data-test-cs-component="text-field"] input', 'What is the meaning of this?');
+    await fillIn('.boxel-component:nth-of-type(2) [data-test-cs-component="text-field"] input', 'Who are all you people and what are you doing in my house?');
+    await fillIn('.boxel-component:nth-of-type(3) [data-test-cs-component="text-area"] textarea', 'Lorem ipsum dolor amet gluten-free iPhone humblebrag seitan XOXO deep v kickstarter disrupt banjo salvia lumbersexual trust fund microdosing actually.');
     await click('[data-test-tools-button-save]');
 
     assert.equal(currentURL(), '/articles/1');
