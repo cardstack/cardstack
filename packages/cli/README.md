@@ -47,7 +47,7 @@ by Embroider.
 
 # WIP: Current Quickstart Example for while we're developing this
 
-Launching hub from inside the blueprint (you need a local embroider checkout that is built and available for yarn linking):
+Launching hub from inside the blueprint (you need a local embroider checkout that is built (`yarn compile`) and available for yarn linking):
  - `cd packages/cardhost`
  - `yarn link @embroider/core @embroider/compat @embroider/webpack`
  - `ember s`
