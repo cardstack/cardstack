@@ -1,0 +1,27 @@
+<h1>Load Card</h1>
+
+<div>
+  Card name:
+  <Input @value={{this.cardName}} />
+</div>
+<div>
+  Format:
+  <Input @value={{this.format}} />
+</div>
+<div>
+  <button {{on "click" this.load}}>Load</button>
+</div>
+
+{{#if this.errorMsg}}
+  Error loading card {{this.cardName}}: {{this.errorMsg}}
+{{/if}}
+
+{{! eslint is confused about indentation for else-if }}
+{{! template-lint-disable block-indentation}}
+{{#if this.loadCard.isRunning}}
+  Loading card {{this.cardName}}...
+{{else if
+  (and this.loadedCard this.cardComponent (eq this.loadedCard this.cardName))
+}}
+  {{component this.cardComponent}}
+{{/if}}
