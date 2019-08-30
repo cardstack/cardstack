@@ -33,7 +33,7 @@
   opacity: 0.99;
 }
 
-.card.faded {
+.fadeCards > .thumbnail {
   opacity: 0.22;
 }
 
