@@ -16,6 +16,7 @@ module.exports = {
     browser: true
   },
   rules: {
+    'require-yield': 0,
   },
   overrides: [
     // node files

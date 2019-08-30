@@ -18,6 +18,7 @@ Router.map(function() {
     this.route('edit', { path: '/edit' });
   });
   this.route('events', { path: '/events/:id'});
+  this.route('cards');
 });
 
 export default Router;

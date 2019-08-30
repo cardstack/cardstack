@@ -1,0 +1,8 @@
+<div class="cards-page">
+  <AnimatedContainer class="cards-list triplet">
+    {{#animated-each model use=this.transition watch="expanded" as |card|}}
+      <div class="card {{if card.expanded "expanded" "thumbnail"}} {{if card.faded "faded"}} card-{{card.id}}" role="button" onclick={{action "toggle" card.id}} >
+      </div>
+    {{/animated-each}}
+  </AnimatedContainer>
+</div>
