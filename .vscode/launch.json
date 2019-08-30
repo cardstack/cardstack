@@ -103,14 +103,15 @@
       "console": "integratedTerminal",
       "cwd": "${workspaceRoot}",
       "env": {
-        "HUB_ENVIRONMENT": "test"
+        "HUB_ENVIRONMENT": "test",
+        // "LOG_LEVELS": "cardstack/card-utils=debug"
       },
       "args": [
         "packages/test-support/bin/run.js",
         "--timeout",
         "200000",
         //  "--grep",
-        //  "reuses included resources"
+        //  "hub/card-services"
       ]
     },
     {

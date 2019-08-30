@@ -38,13 +38,10 @@ const models = [
     relationships: {
       fields: {
         data: [
-          { type: 'fields', id: 'edit-template' },
           { type: 'fields', id: 'isolated-template' },
           { type: 'fields', id: 'embedded-template' },
-          { type: 'fields', id: 'edit-js' },
           { type: 'fields', id: 'isolated-js' },
           { type: 'fields', id: 'embedded-js' },
-          { type: 'fields', id: 'edit-css' },
           { type: 'fields', id: 'isolated-css' },
           { type: 'fields', id: 'embedded-css' },
           // This relationship is used to define the metadata fields that the card contains,

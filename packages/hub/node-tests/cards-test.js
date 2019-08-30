@@ -3,7 +3,17 @@ const {
   createDefaultEnvironment,
   destroyDefaultEnvironment
 } = require('../../../tests/stub-searcher/node_modules/@cardstack/test-support/env');
+const { removeSync, pathExistsSync } = require('fs-extra');
+const { readFileSync } = require('fs');
+const { join } = require('path');
+const { sortBy } = require('lodash');
 let factory = new JSONAPIFactory();
+
+const cardsDir = join(process.cwd(), 'card_modules');
+
+function cleanup() {
+  removeSync(cardsDir);
+}
 
 let articleCard = factory.getDocumentFor(
   factory.addResource('cards', 'local-hub::article-card::millenial-puppies')
@@ -110,6 +120,46 @@ let articleCard = factory.getDocumentFor(
     )
   );
 
+function assertCardOnDisk() {
+  let browserAssets = [
+    'embedded.css',
+    'embedded.js',
+    'embedded.hbs',
+    'isolated.css',
+    'isolated.js',
+    'isolated.hbs',
+  ];
+
+  [
+    'card.js',
+    'package.json',
+  ].concat(browserAssets).map(file => expect(pathExistsSync(join(cardsDir, 'local-hub', 'article-card', file))).to.equal(true, `${file} exists`));
+
+  let cardOnDisk = require(join(cardsDir, 'local-hub', 'article-card', 'card.js'));
+  delete articleCard.data.meta;
+  cardOnDisk.included = sortBy(cardOnDisk.included, i => `${i.type}/${i.id}`);
+  articleCard.included = sortBy(articleCard.included, i => `${i.type}/${i.id}`);
+
+  expect(cardOnDisk).to.eql(articleCard, 'card on disk is correct');
+
+  let pkgJson = require(join(cardsDir, 'local-hub', 'article-card', 'package.json'));
+  expect(pkgJson).to.eql({
+    name: 'article-card',
+    version: '0.0.0',
+    peerDependencies: {
+      '@glimmer/component': '*'
+    }
+  }, 'package.json is correct');
+
+  browserAssets.map(file => {
+    let [ format, type ] = file.split('.');
+    type = type === 'hbs' ? 'template' : type;
+    let contents = readFileSync(join(cardsDir, 'local-hub', 'article-card', file), 'utf-8');
+    let fieldValue = articleCard.data.attributes[`${format}-${type}`].trim();
+    expect(contents).to.equal(fieldValue, `file contents are correct for ${file}`);
+  });
+}
+
 describe('hub/card-services', function () {
   let env, cardServices;
 
@@ -137,6 +187,7 @@ describe('hub/card-services', function () {
       let indexers, changedCards = [];
 
       beforeEach(async function () {
+        cleanup();
         let initialFactory = new JSONAPIFactory();
 
         initialFactory.addResource('data-sources', 'stub-card-indexer')
@@ -166,11 +217,14 @@ describe('hub/card-services', function () {
           { type: 'local-hub::article-card::tags', id: 'local-hub::article-card::millenial-puppies::puppies' },
           { type: 'local-hub::article-card::tags', id: 'local-hub::article-card::millenial-puppies::belly-rubs' },
         ]);
+
+        assertCardOnDisk();
       });
     });
 
     describe("via searcher", function() {
       beforeEach(async function () {
+        cleanup();
         let initialFactory = new JSONAPIFactory();
 
         initialFactory.addResource('data-sources', 'stub-card-searcher')
@@ -199,6 +253,8 @@ describe('hub/card-services', function () {
           { type: 'local-hub::article-card::tags', id: 'local-hub::article-card::millenial-puppies::puppies' },
           { type: 'local-hub::article-card::tags', id: 'local-hub::article-card::millenial-puppies::belly-rubs' },
         ]);
+
+        assertCardOnDisk();
       });
 
       it("will load a card implicitly when a searcher's search() hook returns a card document in isolated format", async function () {
@@ -216,6 +272,8 @@ describe('hub/card-services', function () {
           { type: 'local-hub::article-card::tags', id: 'local-hub::article-card::millenial-puppies::puppies' },
           { type: 'local-hub::article-card::tags', id: 'local-hub::article-card::millenial-puppies::belly-rubs' },
         ]);
+
+        assertCardOnDisk();
       });
 
       // TODO move this into the search() tests after that is implemented
@@ -239,12 +297,15 @@ describe('hub/card-services', function () {
           'local-hub::article-card::tags/local-hub::article-card::millenial-puppies::puppies',
           'local-hub::article-card::tags/local-hub::article-card::millenial-puppies::belly-rubs',
         ]);
+
+        assertCardOnDisk();
       });
     });
   });
 
   describe('get card', function () {
     beforeEach(async function () {
+      cleanup();
       let initialFactory = new JSONAPIFactory();
 
       initialFactory.addResource('data-sources', 'stub-card-searcher')

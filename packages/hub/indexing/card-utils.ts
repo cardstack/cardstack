@@ -1,6 +1,19 @@
+import Error from '@cardstack/plugin-utils/error';
 import { todo } from '@cardstack/plugin-utils/todo-any';
 import { SingleResourceDoc, ResourceObject, ResourceIdentifierObject, CollectionResourceDoc } from "jsonapi-typescript";
-import { get, uniqBy } from 'lodash';
+import { get, uniqBy, isEqual, sortBy } from 'lodash';
+import logger from '@cardstack/logger';
+import { join } from "path";
+import {
+  ensureDirSync,
+  pathExistsSync,
+  writeFileSync,
+  removeSync,
+} from "fs-extra";
+
+const cardsDir: string = join(process.cwd(), 'card_modules');
+const cardFileName = 'card.js';
+const log = logger('cardstack/card-utils');
 
 interface CardContext {
   repository?: string;
@@ -17,9 +30,6 @@ const cardBrowserAssetFields = [
   'embedded-template',
   'embedded-js',
   'embedded-css',
-  'edit-template',
-  'edit-js',
-  'edit-css',
 ];
 
 function cardContextFromId(id: string) {
@@ -43,7 +53,120 @@ function cardContextToId({ repository, packageName, cardId, modelId }: CardConte
   return [repository, packageName, cardId, modelId].filter(i => i != null).join(cardIdDelim);
 }
 
-function schemaModelsForCard(schema: todo, card: SingleResourceDoc) {
+async function loadCard(schema: todo, card: SingleResourceDoc) {
+  await generateCardModule(card);
+  return getCardSchemas(schema, card);
+}
+
+async function generateCardModule(card: SingleResourceDoc) {
+  if (!card.data.id) { return; }
+
+  let { repository, packageName } = cardContextFromId(card.data.id);
+  if (!repository || !packageName) { return; }
+
+  let bareCard: SingleResourceDoc = removeCardMetadata(card);
+  let cardFolder: string = join(cardsDir, repository, packageName);
+  let cardFile: string = join(cardFolder, cardFileName);
+  ensureDirSync(cardFolder);
+
+  if (pathExistsSync(cardFile)) {
+    let cardOnDisk: SingleResourceDoc = (await import(cardFile)).default;
+    if (cardOnDisk.included) {
+      cardOnDisk.included = sortBy(cardOnDisk.included, i => `${i.type}/${i.id}`);
+    }
+    if (isEqual(bareCard, cardOnDisk)) { return; }
+  }
+
+  log.info(`generating on-disk card artifacts for cards/${card.data.id} in ${cardFolder}`);
+
+  createPkgFile(bareCard, cardFolder);
+  createBrowserAssets(bareCard, cardFolder);
+
+  // TODO link peer deps and create entry points.
+  // I'm punting on this for now, as custom card components are not a
+  // top priority at the moment. Linking peer deps and creating
+  // entry points makes assumptions around a shared file system between
+  // ember-cli's node and the hub, as well as it requires that the cardhost
+  // ember-cli build actually occur before this function is called (in
+  // order to link peer deps), as we leverage the embroider app dir from
+  // the build in order to link peer deps. For the node-tests this will
+  // be a bit tricky. I think the easiest thing would be to mock an
+  // ember-cli build of the card host for node-tests by creating an
+  // .embroider-build-path file that just points to the root project
+  // folder (which would be the parent of the yarn workspace's
+  // node_modules folder).
+
+  // TODO in the future `yarn install` this package
+  writeFileSync(cardFile, `module.exports = ${JSON.stringify(bareCard, null, 2)};`, 'utf8');
+
+  // TODO in the future we should await until webpack finishes compiling
+  // the browser assets however we determine to manage that...
+}
+
+function removeCardMetadata(card: SingleResourceDoc) {
+  let bareCard: SingleResourceDoc = {
+    data: {
+      type: card.data.type,
+      id: card.data.id,
+      attributes: Object.assign({}, card.data.attributes),
+      relationships: Object.assign({}, card.data.relationships)
+    },
+    included: (card.included || []).concat([])
+  };
+  bareCard.included = sortBy(bareCard.included, i => `${i.type}/${i.id}`);
+
+  for (let field of Object.keys(bareCard.data.attributes || {})) {
+    if (!cardBrowserAssetFields.includes(field) && bareCard.data.attributes) {
+      delete bareCard.data.attributes[field];
+    }
+  }
+  for (let field of Object.keys(bareCard.data.relationships || {})) {
+    if (!['fields', 'model'].includes(field) && bareCard.data.relationships) {
+      delete bareCard.data.relationships[field];
+    }
+  }
+  return bareCard;
+}
+
+function createBrowserAssets(card: SingleResourceDoc, cardFolder: string) {
+  if (!card.data.attributes) { return; }
+
+  for (let field of cardBrowserAssetFields) {
+    let content: string = card.data.attributes[field] as string;
+    content = (content || '').trim();
+    let [ assetType, extension ] = field.split('-');
+    extension = extension === 'template' ? 'hbs' : extension;
+    let file = join(cardFolder, `${assetType}.${extension}`);
+    if (!content) {
+      log.debug(`ensuring browser asset doesn't exist for cards/${card.data.id} at ${file}`);
+      removeSync(file);
+    } else {
+      log.debug(`generating browser asset for cards/${card.data.id} at ${file}`);
+      writeFileSync(file, content, 'utf8');
+    }
+  }
+}
+
+function createPkgFile(card: SingleResourceDoc, cardFolder: string) {
+  if (!card.data.id) { return; }
+
+  let { packageName:name } = cardContextFromId(card.data.id);
+  let version = '0.0.0'; // TODO deal with version numbers
+
+  log.debug(`generating package.json for cards/${card.data.id} at ${join(cardFolder, 'package.json')}`);
+  let pkg: todo = {
+    name,
+    version,
+    // TODO grab peer deps from the card document instead of hard coding here
+    "peerDependencies": {
+      "@glimmer/component": "*"
+    }
+  };
+  writeFileSync(join(cardFolder, 'package.json'), JSON.stringify(pkg, null, 2), 'utf8');
+  return pkg;
+}
+
+function getCardSchemas(schema: todo, card: SingleResourceDoc) {
   if (!card) { return; }
   if (!card.data.id) { return; }
 
@@ -195,7 +318,7 @@ export = {
   cardIdDelim,
   cardContextFromId,
   cardContextToId,
-  schemaModelsForCard,
+  loadCard,
   getCardIncludePaths,
   adaptCardToFormat,
   adaptCardCollectionToFormat,
