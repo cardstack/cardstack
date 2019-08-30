@@ -46,3 +46,11 @@ package-lock.json
 
 # generated files you may end up with if you run the cli blueprint directly
 packages/cli/node-tests/sample-cards/*/node_modules/**/*
+
+# this is for eslint ignore, which is also using this file as a list of things to not lint
+/tests/**/node_modules/@cardstack/**/*.js
+/tests/**/node_modules/@cardstack/**/*.js.map
+/tests/**/node_modules/@cardstack/**/*.d.ts
+/packages/**/node_modules/@cardstack/**/*.js
+/packages/**/node_modules/@cardstack/**/*.js.map
+/packages/**/node_modules/@cardstack/**/*.d.ts
