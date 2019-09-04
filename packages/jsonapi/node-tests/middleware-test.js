@@ -767,6 +767,9 @@ describe('jsonapi/middleware', function() {
           ])
           .withRelated('model', factory.addResource('local-hub::article-card::millenial-puppies', 'local-hub::article-card::millenial-puppies')
             .withAttributes({
+              // TODO we need to address the issue where were are including "::" characters in the field names
+              // for attributes and relationships as this is technically invalid JSON:API. I think
+              // we'll probably want to address this issue in the jsonapi package.
               'local-hub::article-card::millenial-puppies::title': 'The Millenial Puppy',
               'local-hub::article-card::millenial-puppies::body': 'It can be difficult these days to deal with the discerning tastes of the millenial puppy.'
             })
