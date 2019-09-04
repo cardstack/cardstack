@@ -52,27 +52,27 @@ let articleCard = factory.getDocumentFor(
       // the model data that we have specified for the card.
     })
     .withRelated('fields', [
-      factory.addResource('fields', 'local-hub::article-card::title').withAttributes({
+      factory.addResource('fields', 'local-hub::article-card::millenial-puppies::title').withAttributes({
         'is-metadata': true,
         'needed-when-embedded': true,
         'field-type': '@cardstack/core-types::string' //TODO rework for fields-as-cards
       }).withRelated('constraints', [
-        factory.addResource('constraints', 'local-hub::article-card::title-not-null')
+        factory.addResource('constraints', 'local-hub::article-card::millenial-puppies::title-not-null')
           .withAttributes({
             'constraint-type': '@cardstack/core-types::not-null',
             'error-message': 'The title must not be empty.'
           })
       ]),
-      factory.addResource('fields', 'local-hub::article-card::author').withAttributes({
+      factory.addResource('fields', 'local-hub::article-card::millenial-puppies::author').withAttributes({
         'is-metadata': true,
         'needed-when-embedded': true,
         'field-type': '@cardstack/core-types::string'
       }),
-      factory.addResource('fields', 'local-hub::article-card::body').withAttributes({
+      factory.addResource('fields', 'local-hub::article-card::millenial-puppies::body').withAttributes({
         'is-metadata': true,
         'field-type': '@cardstack/core-types::string'
       }),
-      factory.addResource('fields', 'local-hub::article-card::internal-field').withAttributes({
+      factory.addResource('fields', 'local-hub::article-card::millenial-puppies::internal-field').withAttributes({
         'field-type': '@cardstack/core-types::string'
       }),
 
@@ -81,7 +81,7 @@ let articleCard = factory.getDocumentFor(
       // Maybe a better test involving relationships to internal models would be to consume
       // this relationship in a computed that is a metadata field (and probably we
       // should have a test that involves a card that has a relationship to another card).
-      factory.addResource('fields', 'local-hub::article-card::tags').withAttributes({
+      factory.addResource('fields', 'local-hub::article-card::millenial-puppies::tags').withAttributes({
         'is-metadata': true,
         'field-type': '@cardstack/core-types::has-many'
       }).withRelated('related-types', [
@@ -89,18 +89,18 @@ let articleCard = factory.getDocumentFor(
         // this content type name will be prefixed with the card's
         // package and card name, such that other cards can also
         // have their own 'tags' internal content types.
-        factory.addResource('content-types', 'local-hub::article-card::tags')
+        factory.addResource('content-types', 'local-hub::article-card::millenial-puppies::tags')
       ]),
     ])
 
-    .withRelated('model', factory.addResource('local-hub::article-card', 'local-hub::article-card::millenial-puppies')
+    .withRelated('model', factory.addResource('local-hub::article-card::millenial-puppies', 'local-hub::article-card::millenial-puppies')
       .withAttributes({
         // TODO need to update how the hub serializes fields so that we do not
         // introduce "::" in the field name which is technically invalid JSON:API
-        'local-hub::article-card::internal-field': 'this is internal data',
-        'local-hub::article-card::title': 'The Millenial Puppy',
-        'local-hub::article-card::author': 'Van Gogh',
-        'local-hub::article-card::body': `
+        'local-hub::article-card::millenial-puppies::internal-field': 'this is internal data',
+        'local-hub::article-card::millenial-puppies::title': 'The Millenial Puppy',
+        'local-hub::article-card::millenial-puppies::author': 'Van Gogh',
+        'local-hub::article-card::millenial-puppies::body': `
             It can be difficult these days to deal with the
             discerning tastes of the millenial puppy. In this
             article we probe the needs and desires of millenial
@@ -110,13 +110,13 @@ let articleCard = factory.getDocumentFor(
 
       // TODO need to update how the hub serializes fields so that we do not
       // introduce "::" in the field name which is technically invalid JSON:API
-      .withRelated('local-hub::article-card::tags', [
+      .withRelated('local-hub::article-card::millenial-puppies::tags', [
         // Note that the tags models will be prefixed with this card's ID
         // such that you will never run into model collisions for tags
         // of different article cards
-        factory.addResource('local-hub::article-card::tags', 'local-hub::article-card::millenial-puppies::millenials'),
-        factory.addResource('local-hub::article-card::tags', 'local-hub::article-card::millenial-puppies::puppies'),
-        factory.addResource('local-hub::article-card::tags', 'local-hub::article-card::millenial-puppies::belly-rubs'),
+        factory.addResource('local-hub::article-card::millenial-puppies::tags', 'local-hub::article-card::millenial-puppies::millenials'),
+        factory.addResource('local-hub::article-card::millenial-puppies::tags', 'local-hub::article-card::millenial-puppies::puppies'),
+        factory.addResource('local-hub::article-card::millenial-puppies::tags', 'local-hub::article-card::millenial-puppies::belly-rubs'),
       ])
     )
   );
@@ -161,7 +161,78 @@ function assertCardOnDisk() {
   });
 }
 
-describe('hub/card-services', function () {
+function assertIsolatedCardMetadata(card) {
+  let { data } = card;
+  expect(data.attributes.title).to.equal('The Millenial Puppy');
+  expect(data.attributes.body).to.match(/discerning tastes of the millenial puppy/);
+  expect(data.attributes.author).to.equal('Van Gogh');
+  expect(data.relationships.tags.data).to.eql([
+    { type: 'local-hub::article-card::millenial-puppies::tags', id: 'local-hub::article-card::millenial-puppies::millenials' },
+    { type: 'local-hub::article-card::millenial-puppies::tags', id: 'local-hub::article-card::millenial-puppies::puppies' },
+    { type: 'local-hub::article-card::millenial-puppies::tags', id: 'local-hub::article-card::millenial-puppies::belly-rubs' },
+  ]);
+  expect(data.attributes['internal-field']).to.be.undefined;
+}
+
+function assertEmbeddedCardMetadata(card) {
+  let { data, included } = card;
+  let includedIdentifiers = included.map(i => `${i.type}/${i.id}`);
+
+  expect(data.attributes.title).to.equal('The Millenial Puppy');
+  expect(data.attributes.author).to.equal('Van Gogh');
+  expect(data.relationships.tags).to.be.undefined;
+  expect(data.attributes.body).to.be.undefined;
+  expect(data.attributes['internal-field']).to.be.undefined;
+
+  expect(includedIdentifiers).to.not.include.members([
+    'local-hub::article-card::millenial-puppies::tags/local-hub::article-card::millenial-puppies::millenials',
+    'local-hub::article-card::millenial-puppies::tags/local-hub::article-card::millenial-puppies::puppies',
+    'local-hub::article-card::millenial-puppies::tags/local-hub::article-card::millenial-puppies::belly-rubs',
+  ]);
+}
+
+function assertCardModels(card) {
+  let { data, included } = card;
+  let includedIdentifiers = included.map(i => `${i.type}/${i.id}`);
+  expect(data.relationships.model.data).to.eql({ type: 'local-hub::article-card::millenial-puppies', id: 'local-hub::article-card::millenial-puppies' });
+  expect(includedIdentifiers).to.include.members(['local-hub::article-card::millenial-puppies/local-hub::article-card::millenial-puppies']);
+  expect(includedIdentifiers).to.include.members([
+    'local-hub::article-card::millenial-puppies::tags/local-hub::article-card::millenial-puppies::millenials',
+    'local-hub::article-card::millenial-puppies::tags/local-hub::article-card::millenial-puppies::puppies',
+    'local-hub::article-card::millenial-puppies::tags/local-hub::article-card::millenial-puppies::belly-rubs',
+  ]);
+}
+
+function assertCardSchema(card) {
+  let { data, included } = card;
+  let includedIdentifiers = included.map(i => `${i.type}/${i.id}`);
+
+  expect(data.relationships.fields.data).to.eql([
+    { type: 'fields', id: 'local-hub::article-card::millenial-puppies::title' },
+    { type: 'fields', id: 'local-hub::article-card::millenial-puppies::author' },
+    { type: 'fields', id: 'local-hub::article-card::millenial-puppies::body' },
+    { type: 'fields', id: 'local-hub::article-card::millenial-puppies::internal-field' },
+    { type: 'fields', id: 'local-hub::article-card::millenial-puppies::tags' },
+  ]);
+  expect(includedIdentifiers).to.include.members([
+    'fields/local-hub::article-card::millenial-puppies::title',
+    'fields/local-hub::article-card::millenial-puppies::body',
+    'fields/local-hub::article-card::millenial-puppies::author',
+    'fields/local-hub::article-card::millenial-puppies::internal-field',
+    'fields/local-hub::article-card::millenial-puppies::tags',
+    'content-types/local-hub::article-card::millenial-puppies::tags',
+    'constraints/local-hub::article-card::millenial-puppies::title-not-null'
+  ]);
+
+  // Card does not include the primary model content type schema--as that is derived by the hub,
+  // and there is really nothing that explicitly references it, so it wouldn't really make sense
+  // to include anyways...
+  expect(includedIdentifiers).to.not.include.members([
+    'content-types/local-hub::article-card::millenial-puppies'
+  ]);
+}
+
+describe('card tests', function () {
   let env, cardServices;
 
   afterEach(async function () {
@@ -208,17 +279,7 @@ describe('hub/card-services', function () {
         await indexers.update();
 
         let article = await cardServices.get(env.session, 'local-hub::article-card::millenial-puppies', 'isolated');
-        let { data } = article;
-
-        expect(data.attributes.title).to.equal('The Millenial Puppy');
-        expect(data.attributes.body).to.match(/discerning tastes of the millenial puppy/);
-        expect(data.attributes.author).to.equal('Van Gogh');
-        expect(data.relationships.tags.data).to.eql([
-          { type: 'local-hub::article-card::tags', id: 'local-hub::article-card::millenial-puppies::millenials' },
-          { type: 'local-hub::article-card::tags', id: 'local-hub::article-card::millenial-puppies::puppies' },
-          { type: 'local-hub::article-card::tags', id: 'local-hub::article-card::millenial-puppies::belly-rubs' },
-        ]);
-
+        assertIsolatedCardMetadata(article);
         assertCardOnDisk();
       });
     });
@@ -244,17 +305,7 @@ describe('hub/card-services', function () {
         // The underlying searchers#get will encounter a card that has not been loaded into the index.
         // The hub should be able to load cards that it discovers from searchers into the index.
         let article = await cardServices.get(env.session, 'local-hub::article-card::millenial-puppies', 'isolated');
-        let { data } = article;
-
-        expect(data.attributes.title).to.equal('The Millenial Puppy');
-        expect(data.attributes.body).to.match(/discerning tastes of the millenial puppy/);
-        expect(data.attributes.author).to.equal('Van Gogh');
-        expect(data.relationships.tags.data).to.eql([
-          { type: 'local-hub::article-card::tags', id: 'local-hub::article-card::millenial-puppies::millenials' },
-          { type: 'local-hub::article-card::tags', id: 'local-hub::article-card::millenial-puppies::puppies' },
-          { type: 'local-hub::article-card::tags', id: 'local-hub::article-card::millenial-puppies::belly-rubs' },
-        ]);
-
+        assertIsolatedCardMetadata(article);
         assertCardOnDisk();
       });
 
@@ -265,15 +316,7 @@ describe('hub/card-services', function () {
           }
         });
 
-        expect(article.attributes.title).to.equal('The Millenial Puppy');
-        expect(article.attributes.body).to.match(/discerning tastes of the millenial puppy/);
-        expect(article.attributes.author).to.equal('Van Gogh');
-        expect(article.relationships.tags.data).to.eql([
-          { type: 'local-hub::article-card::tags', id: 'local-hub::article-card::millenial-puppies::millenials' },
-          { type: 'local-hub::article-card::tags', id: 'local-hub::article-card::millenial-puppies::puppies' },
-          { type: 'local-hub::article-card::tags', id: 'local-hub::article-card::millenial-puppies::belly-rubs' },
-        ]);
-
+        assertIsolatedCardMetadata({ data: article });
         assertCardOnDisk();
       });
 
@@ -294,13 +337,45 @@ describe('hub/card-services', function () {
         expect(article.attributes['internal-field']).to.be.undefined;
 
         expect(includedIdentifiers).to.not.include.members([
-          'local-hub::article-card::tags/local-hub::article-card::millenial-puppies::millenials',
-          'local-hub::article-card::tags/local-hub::article-card::millenial-puppies::puppies',
-          'local-hub::article-card::tags/local-hub::article-card::millenial-puppies::belly-rubs',
+          'local-hub::article-card::millenial-puppies::tags/local-hub::article-card::millenial-puppies::millenials',
+          'local-hub::article-card::millenial-puppies::tags/local-hub::article-card::millenial-puppies::puppies',
+          'local-hub::article-card::millenial-puppies::tags/local-hub::article-card::millenial-puppies::belly-rubs',
         ]);
 
         assertCardOnDisk();
       });
+    });
+  });
+
+  describe('writing cards', function() {
+    let writers;
+    beforeEach(async function () {
+      cleanup();
+
+      env = await createDefaultEnvironment(`${__dirname}/../../../tests/stub-card-searcher`);
+      cardServices = env.lookup('hub:card-services');
+      writers = env.lookup('hub:writers');
+    });
+
+    it('can add a new card', async function() {
+      let card = await writers.create(env.session, 'cards', articleCard);
+
+      assertCardOnDisk();
+      assertIsolatedCardMetadata(card);
+      assertCardModels(card);
+      assertCardSchema(card);
+
+      let article = await cardServices.get(env.session, 'local-hub::article-card::millenial-puppies', 'isolated');
+      assertIsolatedCardMetadata(article);
+    });
+
+    it.skip('can update card data', async function() {
+    });
+
+    it.skip('can update card schema', async function() {
+    });
+
+    it.skip('can update card schema and data', async function() {
     });
   });
 
@@ -323,80 +398,22 @@ describe('hub/card-services', function () {
 
     it("has card metadata for isolated format", async function () {
       let article = await cardServices.get(env.session, 'local-hub::article-card::millenial-puppies', 'isolated');
-      let { data } = article;
-
-      expect(data.attributes.title).to.equal('The Millenial Puppy');
-      expect(data.attributes.body).to.match(/discerning tastes of the millenial puppy/);
-      expect(data.attributes.author).to.equal('Van Gogh');
-      expect(data.relationships.tags.data).to.eql([
-        { type: 'local-hub::article-card::tags', id: 'local-hub::article-card::millenial-puppies::millenials' },
-        { type: 'local-hub::article-card::tags', id: 'local-hub::article-card::millenial-puppies::puppies' },
-        { type: 'local-hub::article-card::tags', id: 'local-hub::article-card::millenial-puppies::belly-rubs' },
-      ]);
-      expect(data.attributes['internal-field']).to.be.undefined;
+      assertIsolatedCardMetadata(article);
     });
 
     it("has card metadata for embedded format", async function () {
       let article = await cardServices.get(env.session, 'local-hub::article-card::millenial-puppies', 'embedded');
-      let { data, included } = article;
-      let includedIdentifiers = included.map(i => `${i.type}/${i.id}`);
-
-      expect(data.attributes.title).to.equal('The Millenial Puppy');
-      expect(data.attributes.author).to.equal('Van Gogh');
-      expect(data.relationships.tags).to.be.undefined;
-      expect(data.attributes.body).to.be.undefined;
-      expect(data.attributes['internal-field']).to.be.undefined;
-
-      expect(includedIdentifiers).to.not.include.members([
-        'local-hub::article-card::tags/local-hub::article-card::millenial-puppies::millenials',
-        'local-hub::article-card::tags/local-hub::article-card::millenial-puppies::puppies',
-        'local-hub::article-card::tags/local-hub::article-card::millenial-puppies::belly-rubs',
-      ]);
+      assertEmbeddedCardMetadata(article);
     });
 
     it("has card models", async function () {
       let article = await cardServices.get(env.session, 'local-hub::article-card::millenial-puppies', 'isolated');
-      let { data, included } = article;
-      let includedIdentifiers = included.map(i => `${i.type}/${i.id}`);
-
-      // Card includes backing internal models that are allowed to be included based on metadata visibility
-      expect(data.relationships.model.data).to.eql({ type: 'local-hub::article-card', id: 'local-hub::article-card::millenial-puppies' });
-      expect(includedIdentifiers).to.include.members(['local-hub::article-card/local-hub::article-card::millenial-puppies']);
-      expect(includedIdentifiers).to.include.members([
-        'local-hub::article-card::tags/local-hub::article-card::millenial-puppies::millenials',
-        'local-hub::article-card::tags/local-hub::article-card::millenial-puppies::puppies',
-        'local-hub::article-card::tags/local-hub::article-card::millenial-puppies::belly-rubs',
-      ]);
+      assertCardModels(article);
     });
 
     it("has card schema", async function () {
       let article = await cardServices.get(env.session, 'local-hub::article-card::millenial-puppies', 'isolated');
-      let { data, included } = article;
-      let includedIdentifiers = included.map(i => `${i.type}/${i.id}`);
-
-      expect(data.relationships.fields.data).to.eql([
-        { type: 'fields', id: 'local-hub::article-card::title' },
-        { type: 'fields', id: 'local-hub::article-card::author' },
-        { type: 'fields', id: 'local-hub::article-card::body' },
-        { type: 'fields', id: 'local-hub::article-card::internal-field' },
-        { type: 'fields', id: 'local-hub::article-card::tags' },
-      ]);
-      expect(includedIdentifiers).to.include.members([
-        'fields/local-hub::article-card::title',
-        'fields/local-hub::article-card::body',
-        'fields/local-hub::article-card::author',
-        'fields/local-hub::article-card::internal-field',
-        'fields/local-hub::article-card::tags',
-        'content-types/local-hub::article-card::tags',
-        'constraints/local-hub::article-card::title-not-null'
-      ]);
-
-      // Card does not include the primary model content type schema--as that is derived by the hub,
-      // and there is really nothing that explicitly references it, so it wouldn't really make sense
-      // to include anyways...
-      expect(includedIdentifiers).to.not.include.members([
-        'content-types/local-hub::article-card'
-      ]);
+      assertCardSchema(article);
     });
 
     it("has card browser assets", async function () {

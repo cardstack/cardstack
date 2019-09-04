@@ -751,6 +751,41 @@ describe('jsonapi/middleware', function() {
       expect(response.body.data.relationships['featured-article'].data.type).to.equal("articles");
     });
 
+    it('can create a new card', async function() {
+      let factory = new JSONAPIFactory();
+      let card = factory.getDocumentFor(
+        factory.addResource('cards', 'local-hub::article-card::millenial-puppies')
+          .withRelated('fields', [
+            factory.addResource('fields', 'local-hub::article-card::millenial-puppies::title').withAttributes({
+              'is-metadata': true,
+              'field-type': '@cardstack/core-types::string'
+            }),
+            factory.addResource('fields', 'local-hub::article-card::millenial-puppies::body').withAttributes({
+              'is-metadata': true,
+              'field-type': '@cardstack/core-types::string'
+            }),
+          ])
+          .withRelated('model', factory.addResource('local-hub::article-card::millenial-puppies', 'local-hub::article-card::millenial-puppies')
+            .withAttributes({
+              'local-hub::article-card::millenial-puppies::title': 'The Millenial Puppy',
+              'local-hub::article-card::millenial-puppies::body': 'It can be difficult these days to deal with the discerning tastes of the millenial puppy.'
+            })
+          )
+      );
+      let response = await request.post('/api/cards').send(card);
+      expect(response).hasStatus(201);
+      expect(response).has.deep.property('body.data.attributes.title', 'The Millenial Puppy');
+      expect(response).has.deep.property('body.data.attributes.body', 'It can be difficult these days to deal with the discerning tastes of the millenial puppy.');
+
+      response = await request.get('/api/cards/local-hub::article-card::millenial-puppies');
+      expect(response).hasStatus(200);
+      expect(response).has.deep.property('body.data.attributes.title', 'The Millenial Puppy');
+      expect(response).has.deep.property('body.data.attributes.body', 'It can be difficult these days to deal with the discerning tastes of the millenial puppy.');
+    });
+
+    it.skip('can update a card', async function() {
+    });
+
     it('can update an existing resource', async function() {
       let version = await currentVersion(request, '/api/articles/0');
 

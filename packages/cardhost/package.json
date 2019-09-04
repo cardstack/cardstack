@@ -17,10 +17,12 @@
     "test": "ember test"
   },
   "devDependencies": {
+    "@cardstack/authentication": "0.14.23",
     "@cardstack/ephemeral": "0.14.23",
     "@cardstack/eslint-config": "0.14.23",
     "@cardstack/hub": "0.14.23",
     "@cardstack/jsonapi": "0.14.23",
+    "@cardstack/test-support": "0.14.23",
     "@ember/jquery": "^0.6.1",
     "@ember/optional-features": "^0.7.0",
     "@embroider/compat": "^0.6.0",
@@ -52,6 +54,7 @@
     "eslint-plugin-ember": "^5.0.0",
     "eslint-plugin-mocha": "^5.2.0",
     "eslint-plugin-node": "^5.2.1",
+    "ivy-codemirror": "^2.1.0",
     "loader.js": "^4.7.0",
     "qunit-dom": "^0.8.0"
   },

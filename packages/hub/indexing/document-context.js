@@ -17,7 +17,7 @@ const qs = require('qs');
 
 module.exports = class DocumentContext {
 
-  constructor({ read, search, routers, schema, type, id, sourceId, generation, upstreamDoc, format, includePaths }) {
+  constructor({ read, search, routers, schema, type, id, sourceId, generation, upstreamDoc, included, format, includePaths }) {
     if (upstreamDoc && !upstreamDoc.data) {
       throw new Error('The upstreamDoc must have a top-level "data" property', {
         status: 400
@@ -41,7 +41,7 @@ module.exports = class DocumentContext {
     this.cache = {};
     this._cardCache = {};
     this.isCollection = upstreamDoc && upstreamDoc.data && Array.isArray(upstreamDoc.data);
-    this.suppliedIncluded = upstreamDoc && upstreamDoc.included;
+    this.suppliedIncluded = upstreamDoc && upstreamDoc.included || included;
     this._model = null;
 
     // included resources that we actually found
@@ -402,14 +402,23 @@ module.exports = class DocumentContext {
   async _getCard(id) {
     let cardResource;
     if (get(this, 'upstreamDoc.data.id') === id && get(this, 'upstreamDoc.data.type') === 'cards') {
+      if ((!this.upstreamDoc.included || !this.upstreamDoc.included.length) && this.suppliedIncluded && this.suppliedIncluded.length) {
+        // writers don't pass thru includeds as part of their upstream doc
+        // so in the interest of not making a breaking API change, we'll help
+        // things along in this layer if the DocumentContext has included models
+        return {
+          data: this.upstreamDoc.data,
+          included: this.suppliedIncluded
+        };
+      }
       return this.upstreamDoc;
     } else if (this.upstreamDoc &&
       this.upstreamDoc.data &&
       Array.isArray(this.upstreamDoc.data) &&
       (cardResource = this.upstreamDoc.data.find(i => `cards/${i.id}`))
     ) {
-      let { repository, packageName, } = cardContextFromId(id);
-      let typePrefix = cardContextToId({ repository, packageName });
+      let { repository, packageName, cardId } = cardContextFromId(id);
+      let typePrefix = cardContextToId({ repository, packageName, cardId });
       let card = {
         data: cardResource,
         included: (this.upstreamDoc.included || []).filter(i => i.type.includes(typePrefix) || i.id.includes(typePrefix))
@@ -432,7 +441,7 @@ module.exports = class DocumentContext {
   // result in a cycle as searchers.get() needs to use a schema itself in order to process results.
   async _loadCardSchemaForResource(resourceType, resourceId) {
     if (!resourceType ||
-      (resourceType !== 'cards' && resourceType.split(cardIdDelim).length < 2)) { return; }
+      (resourceType !== 'cards' && resourceType.split(cardIdDelim).length < 3)) { return; }
 
     let { repository, packageName, cardId } = cardContextFromId(resourceId);
     let id = cardContextToId({ repository, packageName, cardId });

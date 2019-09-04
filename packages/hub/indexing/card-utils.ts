@@ -59,6 +59,13 @@ async function loadCard(schema: todo, card: SingleResourceDoc) {
   return getCardSchemas(schema, card);
 }
 
+// TODO it's possible for cards originating from the same package to have different templates/components
+// as a specific card instance could have its schema altered. need to think through how we would represent
+// cards that have different components/templates but originate from the same package, or cards
+// from the same package but different repositories that have been altered between the different repos.
+// Ideally we can leverage the "card adoption" to make simplifying assumptions around cards that share
+// similar components/templates, but will also need to be flexible enough to disambiguate cards that have
+// differing components/templates that originate from the same package.
 async function generateCardModule(card: SingleResourceDoc) {
   if (!card.data.id) { return; }
 
@@ -187,10 +194,10 @@ function getCardSchemas(schema: todo, card: SingleResourceDoc) {
 function deriveCardModelContentType(card: SingleResourceDoc) {
   if (!card.data.id) { return; }
 
-  let { repository, packageName } = cardContextFromId(card.data.id);
+  let { repository, packageName, cardId } = cardContextFromId(card.data.id);
   let modelContentType: ResourceObject = {
     type: 'content-types',
-    id: cardContextToId({ repository, packageName }),
+    id: cardContextToId({ repository, packageName, cardId }),
     relationships: {
       fields: get(card, 'data.relationships.fields') || []
     }
@@ -246,10 +253,10 @@ async function adaptCardCollectionToFormat(schema: todo, collection: CollectionR
 async function adaptCardToFormat(schema: todo, card: SingleResourceDoc, format: string) {
   if (!card.data.id) { throw new Error(`Cannot load card with missing id.`); }
   let id = card.data.id;
-  if (!card.data.attributes) { throw new Error(`Card is missing attributes '${card.data.type}/${card.data.id}`); }
+  card.data.attributes = card.data.attributes || {};
 
-  let { repository, packageName } = cardContextFromId(card.data.id);
-  let cardModelType = cardContextToId({ repository, packageName });
+  let { repository, packageName, cardId } = cardContextFromId(card.data.id);
+  let cardModelType = cardContextToId({ repository, packageName, cardId });
   let model = (card.included || []).find(i => `${i.type}/${i.id}` === `${cardModelType}/${id}`);
   if (!model) { throw new Error(`Card model is missing for card 'cards/${id}'`); }
   if (!model.type || !model.id) { throw new Error(`Card model is missing type and/or id '${model.type}/${model.id}' for card 'cards/${id}`); }
@@ -278,7 +285,7 @@ async function adaptCardToFormat(schema: todo, card: SingleResourceDoc, format: 
   result.included = [model].concat((card.included || []).filter(i => schema.isSchemaType(i.type)));
 
   for (let { id: fieldId } of (get(card, 'data.relationships.fields.data') || [])) {
-    let { cardId: fieldName } = cardContextFromId(fieldId);
+    let { modelId: fieldName } = cardContextFromId(fieldId);
     if (!fieldName) { continue; }
     let field = schema.getRealAndComputedField(fieldId);
 

@@ -56,25 +56,33 @@ class Writers {
       pending = await this.createPendingChange({ originalDocument, finalDocument, finalizer, aborter, opts});
     } else {
       let isSchema = this.schemaTypes.includes(type);
+      let included = documentOrStream.included;
       let opts = await writer.prepareCreate(
         session,
         type,
         this._cleanupBodyData(schema, documentOrStream.data),
         isSchema
       );
+      opts.included = included;
       let { originalDocument, finalDocument, finalizer, aborter } = opts;
       pending = await this.createPendingChange({ originalDocument, finalDocument, finalizer, aborter, opts});
     }
 
     let context;
     try {
+      // accomodate the schema for any new cards being created
+      await pending.finalDocumentContext.pristineDoc();
+      schema = pending.finalDocumentContext.schema;
+
       let newSchema = await schema.validate(pending, { type, session });
-      context = await this._finalize(pending, type, newSchema || schema, sourceId);
+      schema = newSchema || schema;
+
+      context = await this._finalize(pending, type, schema, sourceId);
       if (newSchema) {
         this.currentSchema.invalidateCache();
       }
 
-      let batch = this.pgSearchClient.beginBatch(this.currentSchema, this.searchers);
+      let batch = this.pgSearchClient.beginBatch(schema, this.searchers);
       await batch.saveDocument(context);
       await batch.done();
     } finally {
@@ -106,6 +114,8 @@ class Writers {
     let { originalDocument, finalDocument, finalizer, aborter } = opts;
     let pending = await this.createPendingChange({ originalDocument, finalDocument, finalizer, aborter, opts });
     let context;
+
+    // TODO make sure to use the schema from the pending's document context to pick up discovered card schema
     try {
       let newSchema = await schema.validate(pending, { type, id, session });
       context = await this._finalize(pending, type, newSchema || schema, sourceId);
@@ -254,7 +264,7 @@ class PendingChange {
     searchers,
     sourceId,
     schema,
-    opts
+    opts={}
   }) {
     if (!searchers || !schema) {
       throw new Error(`PendingChange requires 'searchers' and 'schema' arguments.`);
@@ -265,6 +275,7 @@ class PendingChange {
     this.serverProvidedValues = new Map();
     this._finalizer = finalizer;
     this._aborter = aborter;
+    let { included } = opts;
 
     if (schema && searchers) {
       if (originalDocument) {
@@ -273,7 +284,8 @@ class PendingChange {
           schema,
           sourceId,
           id: originalDocument.id,
-          upstreamDoc: originalDocument ? { data: originalDocument } : null
+          upstreamDoc: originalDocument ? { data: originalDocument } : null,
+          // Not sure how we want to handle includeds here, lets cross this bridge when we get to updating cards...
         });
       }
       if (finalDocument) {
@@ -282,12 +294,13 @@ class PendingChange {
           schema,
           sourceId,
           id: finalDocument.id,
-          upstreamDoc: finalDocument ? { data: finalDocument } : null
+          upstreamDoc: finalDocument ? { data: finalDocument } : null,
+          included
         });
       }
     }
 
-    for (let prop of Object.keys(opts || {})) {
+    for (let prop of Object.keys(opts)) {
       if (this[prop] != null) { continue; }
       this[prop] = opts[prop];
     }

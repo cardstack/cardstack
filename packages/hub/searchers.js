@@ -166,7 +166,7 @@ class Searchers {
     }
   }
 
-  createDocumentContext({ schema, type, id, sourceId, generation, upstreamDoc, format, includePaths }) {
+  createDocumentContext({ schema, type, id, sourceId, generation, upstreamDoc, format, includePaths, included }) {
     return new DocumentContext({
       schema,
       type,
@@ -176,6 +176,7 @@ class Searchers {
       generation,
       upstreamDoc,
       includePaths,
+      included,
       routers: this._getRouters(),
       read: this._read(),
       search: this._search(Session.INTERNAL_PRIVILEGED)

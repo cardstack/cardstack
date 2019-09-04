@@ -287,13 +287,12 @@ class Handler {
 
 
   _mandatoryBodyData() {
-    let data;
-    if (!this.ctxt.request.body || !(data = this.ctxt.request.body.data)) {
+    if (!this.ctxt.request.body || !this.ctxt.request.body.data) {
       throw new Error('A body with a top-level "data" property is required', {
         status: 400
       });
     }
-    return { data };
+    return this.ctxt.request.body;
   }
 
   _urlWithUpdatedParams(params) {
