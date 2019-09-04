@@ -75,15 +75,15 @@ class Writers {
 
       let newSchema = await schema.validate(pending, { type, session });
       schema = newSchema || schema;
-
       context = await this._finalize(pending, type, schema, sourceId);
-      if (newSchema) {
-        this.currentSchema.invalidateCache();
-      }
 
       let batch = this.pgSearchClient.beginBatch(schema, this.searchers);
       await batch.saveDocument(context);
       await batch.done();
+
+      if (newSchema) {
+        this.currentSchema.invalidateCache();
+      }
     } finally {
       if (pending) { await pending.abort();  }
     }
@@ -117,14 +117,16 @@ class Writers {
     // TODO make sure to use the schema from the pending's document context to pick up discovered card schema
     try {
       let newSchema = await schema.validate(pending, { type, id, session });
-      context = await this._finalize(pending, type, newSchema || schema, sourceId);
+      schema = newSchema || schema;
+      context = await this._finalize(pending, type, schema, sourceId);
+
+      let batch = this.pgSearchClient.beginBatch(schema, this.searchers);
+      await batch.saveDocument(context);
+      await batch.done();
+
       if (newSchema) {
         this.currentSchema.invalidateCache();
       }
-
-      let batch = this.pgSearchClient.beginBatch(await this.currentSchema.getSchema(), this.searchers);
-      await batch.saveDocument(context);
-      await batch.done();
     } finally {
       if (pending) { await pending.abort();  }
     }
