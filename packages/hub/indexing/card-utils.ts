@@ -4,6 +4,7 @@ import { SingleResourceDoc, ResourceObject, ResourceIdentifierObject, Collection
 import { get, uniqBy, isEqual, sortBy } from 'lodash';
 import logger from '@cardstack/logger';
 import { join } from "path";
+import { tmpdir } from 'os';
 import {
   ensureDirSync,
   pathExistsSync,
@@ -11,7 +12,7 @@ import {
   removeSync,
 } from "fs-extra";
 
-const cardsDir: string = join(process.cwd(), 'card_modules');
+const cardsDir: string = join(tmpdir(), 'card_modules');
 const cardFileName = 'card.js';
 const log = logger('cardstack/card-utils');
 

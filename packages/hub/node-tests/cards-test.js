@@ -6,10 +6,11 @@ const {
 const { removeSync, pathExistsSync } = require('fs-extra');
 const { readFileSync } = require('fs');
 const { join } = require('path');
+const { tmpdir } = require('os');
 const { sortBy } = require('lodash');
 let factory = new JSONAPIFactory();
 
-const cardsDir = join(process.cwd(), 'card_modules');
+const cardsDir = join(tmpdir(), 'card_modules');
 
 function cleanup() {
   removeSync(cardsDir);

@@ -3,7 +3,6 @@
 /packages/*/dist
 /packages/*/tmp
 /packages/*/vendor
-/card_modules
 .eslintcache
 .vagrant
 .nvmrc
