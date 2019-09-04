@@ -71,7 +71,6 @@ class Writers {
     let context;
     try {
       // accomodate the schema for any new cards being created
-      await pending.finalDocumentContext.pristineDoc();
       schema = pending.finalDocumentContext.schema;
 
       let newSchema = await schema.validate(pending, { type, session });
@@ -123,7 +122,7 @@ class Writers {
         this.currentSchema.invalidateCache();
       }
 
-      let batch = this.pgSearchClient.beginBatch(this.currentSchema, this.searchers);
+      let batch = this.pgSearchClient.beginBatch(await this.currentSchema.getSchema(), this.searchers);
       await batch.saveDocument(context);
       await batch.done();
     } finally {
@@ -151,7 +150,7 @@ class Writers {
         this.currentSchema.invalidateCache();
       }
 
-      let batch = this.pgSearchClient.beginBatch(this.currentSchema, this.searchers);
+      let batch = this.pgSearchClient.beginBatch(await this.currentSchema.getSchema(), this.searchers);
       await batch.deleteDocument(context);
       await batch.done();
     } finally {

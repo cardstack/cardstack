@@ -92,7 +92,7 @@ class EthereumEventIndexer {
     let contractDefinition = this.contractDefinitions[contractName];
     if (!contractDefinition) { return; }
 
-    let batch = this.pgsearchClient.beginBatch(this.currentSchema, this.searchers);
+    let batch = this.pgsearchClient.beginBatch(await this.currentSchema.getSchema(), this.searchers);
 
     let blockheight = await this.ethereumClient.getBlockHeight();
     await this._indexRecord(batch, attachMeta(await this.ethereumClient.getContractInfo({ contract: contractName }), { blockheight, contractName }));

@@ -225,13 +225,13 @@ class TransactionIndexer {
     currentBlockNumber = currentBlockNumber || this.transactionIndex.blockHeight;
     let indexedAddresses = await this._getIndexedAddresses();
     let notYetIndexedAddresses = difference(trackedAddresses, indexedAddresses);
-    let batch = this.pgsearchClient.beginBatch(this.currentSchema, this.searchers);
+    let batch = this.pgsearchClient.beginBatch(await this.currentSchema.getSchema(), this.searchers);
     for (let address of notYetIndexedAddresses) {
       await this._prepopulateAddressResource(batch, address, currentBlockNumber);
     }
     await batch.done();
 
-    batch = this.pgsearchClient.beginBatch(this.currentSchema, this.searchers);
+    batch = this.pgsearchClient.beginBatch(await this.currentSchema.getSchema(), this.searchers);
     for (let address of trackedAddresses) {
       let { data:newTransactions } = await this.searchers.search(Session.INTERNAL_PRIVILEGED, {
         filter: {
@@ -269,7 +269,7 @@ class TransactionIndexer {
   async _stopIndexingAddresses(addresses) {
     if (!addresses || !addresses.length) { return; }
 
-    let batch = this.pgsearchClient.beginBatch(this.currentSchema, this.searchers);
+    let batch = this.pgsearchClient.beginBatch(await this.currentSchema.getSchema(), this.searchers);
     for (let address of addresses) {
       let document = await this.searchers.get(Session.INTERNAL_PRIVILEGED,
         'local-hub',

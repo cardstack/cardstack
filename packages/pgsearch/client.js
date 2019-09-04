@@ -174,10 +174,10 @@ module.exports = class PgClient extends EventEmitter {
 };
 
 class Batch {
-  constructor(client, currentSchema, searchers) {
+  constructor(client, schema, searchers) {
     this.client = client;
     this._searchers = searchers;
-    this._currentSchema = currentSchema;
+    this._schema = schema;
     this._touched = Object.create(null);
     this._touchCounter = 0;
     this._grantsTouched = false;
@@ -267,7 +267,7 @@ class Batch {
     await this.client._iterateThroughRows(
       'select id, type, source, upstream_doc from documents', [],
       async ({ id, upstream_doc:upstreamDoc, type, source:sourceId }) => {
-        let schema = await this._currentSchema.getSchema();
+        let schema = this._schema;
         let context = this._searchers.createDocumentContext({
           schema,
           type,
@@ -282,7 +282,7 @@ class Batch {
     }
 
   async _recalculateUserRealms() {
-    let schema = await this._currentSchema.getSchema();
+    let schema = this._schema;
     await this.client._iterateThroughRows(
       `select id, type, source, upstream_doc, generation from documents where type != 'user-realms'`, [],
       async ({ id, type, source:sourceId, upstream_doc:upstreamDoc, generation }) => {
@@ -311,7 +311,7 @@ class Batch {
       let { type, id } = doc.data;
 
       if (this._isInvalidated(type, id, refs)) {
-        let schema = await this._currentSchema.getSchema();
+        let schema = await this._schema;
         let sourceId = schema.getType(type).dataSource.id;
 
         // Need to filter out any includeds that were invalidated as those need to be re-read
