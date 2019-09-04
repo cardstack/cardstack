@@ -8,7 +8,7 @@ const {
   cardIdDelim,
   cardContextToId,
   cardContextFromId,
-  schemaModelsForCard,
+  loadCard,
   adaptCardToFormat,
   adaptCardCollectionToFormat,
   getCardIncludePaths
@@ -440,14 +440,17 @@ module.exports = class DocumentContext {
 
     if (this._cardCache[id]) {
       await this._cardCache[id];
-      await this._loadingCardSchema;
       return;
     }
 
-    let card = await this._getCard(id);
-    let cardSchema = schemaModelsForCard(this.schema, card);
-    let schema = this._loadingCardSchema = this.schema.applyChanges(cardSchema.map(document => ({ id:document.id, type:document.type, document })));
-    this.schema = await schema;
+    this._cardCache[id] = this._updateSchema(id);
+    await this._cardCache[id];
+  }
+
+  async _updateSchema(cardId) {
+    let card = await this._getCard(cardId);
+    let cardSchema = await loadCard(this.schema, card);
+    this.schema = await this.schema.applyChanges(cardSchema.map(document => ({ id:document.id, type:document.type, document })));
   }
 
   async _buildCachedResponse() {

@@ -27,6 +27,9 @@ package-lock.json
 /packages/hub/indexing/operations.js
 /packages/hub/indexing/operations.js.map
 
+/packages/plugin-utils/error.d.ts
+/packages/plugin-utils/error.js
+/packages/plugin-utils/error.js.map
 /packages/plugin-utils/session.d.ts
 /packages/plugin-utils/session.js
 /packages/plugin-utils/session.js.map

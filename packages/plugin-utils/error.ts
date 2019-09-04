@@ -7,14 +7,28 @@
 
 */
 
-const { STATUS_CODES } = require('http');
+import { todo } from './todo-any';
+import { STATUS_CODES } from 'http';
+
+interface ErrorDetails {
+  status?: number;
+  title?: string;
+  source?: todo;
+}
 
 class E extends Error {
-  constructor(detail, { status, title, source} = {}) {
+  detail: string;
+  status: number;
+  title?: string;
+  source?: todo;
+  isCardstackError: boolean;
+  additionalErrors: todo;
+
+  constructor(detail: todo, { status, title, source}: ErrorDetails = {}) {
     super(detail);
     this.detail = detail;
     this.status = status || 500;
-    this.title = title || STATUS_CODES[status];
+    this.title = title || STATUS_CODES[this.status];
     this.source = source;
     this.isCardstackError = true;
     this.additionalErrors = null;
@@ -28,7 +42,7 @@ class E extends Error {
     };
   }
 
-  static async withJsonErrorHandling(ctxt, fn) {
+  static async withJsonErrorHandling(ctxt: todo, fn: todo) {
     try {
       return await fn();
     } catch (err) {
@@ -44,4 +58,5 @@ class E extends Error {
     }
   }
 }
-module.exports = E;
+
+export = E;
