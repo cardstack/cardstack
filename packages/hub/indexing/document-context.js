@@ -15,7 +15,7 @@ const qs = require('qs');
 
 module.exports = class DocumentContext {
 
-  constructor({ read, search, routers, schema, type, id, sourceId, generation, upstreamDoc, format, includePaths }) {
+  constructor({ read, search, routers, schema, type, id, sourceId, generation, upstreamDoc, included, format, includePaths }) {
     if (upstreamDoc && !upstreamDoc.data) {
       throw new Error('The upstreamDoc must have a top-level "data" property', {
         status: 400

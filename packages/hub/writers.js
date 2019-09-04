@@ -88,18 +88,24 @@ class Writers {
       pending = await this.createPendingChange({ originalDocument, finalDocument, finalizer, aborter, opts});
     } else {
       let isSchema = this.schemaTypes.includes(type);
+      let included = documentOrStream.included;
       let opts = await writer.prepareCreate(
         session,
         type,
         this._cleanupBodyData(schema, documentOrStream.data),
         isSchema
       );
+      opts.included = included;
       let { originalDocument, finalDocument, finalizer, aborter } = opts;
       pending = await this.createPendingChange({ originalDocument, finalDocument, finalizer, aborter, schema, opts});
     }
 
     let context;
     try {
+      // accomodate the schema for any new cards being created
+      await pending.finalDocumentContext.pristineDoc();
+      schema = pending.finalDocumentContext.schema;
+
       let newSchema = await schema.validate(pending, { type, session });
       schema = newSchema || schema;
       context = await this._finalize(pending, type, schema, sourceId);
@@ -308,6 +314,7 @@ class PendingChange {
     this.serverProvidedValues = new Map();
     this._finalizer = finalizer;
     this._aborter = aborter;
+    let { included } = opts;
 
     if (schema && searchers) {
       if (originalDocument) {
