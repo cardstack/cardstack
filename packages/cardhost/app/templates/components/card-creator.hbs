@@ -16,10 +16,11 @@
 <br>
 
 <IvyCodemirror
-  @value={{card}}
-  @valueUpdated={{action (mut card)}}
+  @value={{this.card}}
+  @valueUpdated={{action (mut this.card)}}
   @options={{hash
     lineNumbers=true
     mode="javascript"
   }}
-></IvyCodemirror>
+>
+</IvyCodemirror>
