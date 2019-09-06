@@ -22,7 +22,24 @@
   color: black;
   text-align: center;
   margin: 15px;
-  opacity: 0.99;
+  opacity: .7;
+}
+
+.card-contents {
+  position: relative;
+}
+
+.card-title {
+  font-size: 18px;
+  opacity: 0.3;
+  white-space: nowrap;
+  /* width: 100px; */
+}
+
+.card-title.expanded {
+  font-size: 48px;
+  opacity: 1;
+  /* width: 400px; */
 }
 
 .card.expanded {
@@ -30,11 +47,11 @@
   height: 300px;
   padding: 50px;
   border-radius: 0;
-  opacity: 0.99;
+  opacity: 1;
 }
 
-.fadeCards > .thumbnail {
-  opacity: 0.22;
+.thumbnail.faded {
+  opacity: 0.3;
 }
 
 .card-2 {
