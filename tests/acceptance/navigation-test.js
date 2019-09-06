@@ -1,21 +1,7 @@
 import { module, test } from 'qunit';
-import { visit as dangerousVisit, settled, currentURL, click, fillIn } from '@ember/test-helpers';
+import { visit, currentURL, click, fillIn } from '@ember/test-helpers';
 import { setupApplicationTest } from 'ember-qunit';
 import { setupMirage } from 'ember-cli-mirage/test-support';
-
-// visit() throws a 'TransitionAborted' error when redirecting
-// https://github.com/emberjs/ember-test-helpers/issues/332
-async function visit(url) {
-  try {
-    await dangerousVisit(url);
-  } catch (e) {
-    if (e.message !== 'TransitionAborted') {
-      throw e;
-    }
-  }
-
-  await settled();
-}
 
 module('Acceptance | navigation', function (hooks) {
   setupApplicationTest(hooks);
@@ -25,10 +11,11 @@ module('Acceptance | navigation', function (hooks) {
     this.server.loadFixtures();
   });
 
-  test('index route redirects to /catalog', async function (assert) {
+  test('index route works', async function (assert) {
     await visit(`/`);
 
-    assert.equal(currentURL(), '/catalog');
+    assert.dom('h1').hasText('Boxel Demo')
+    assert.equal(currentURL(), '/');
   });
 
   test('can create and preview a new article', async function (assert) {
