@@ -1,8 +1,21 @@
+<p>
+  <em><code>HUB_ENVIRONMENT=test</code> environment variable must be set on the hub instance in order to provide session that allows this test to write to the hub.</em>
+</p>
 <ul>
   <li>
     <LinkTo @route="render">Render Card</LinkTo>
   </li>
   <li>
-    <LinkTo @route="add">Add a Card</LinkTo>
+    <LinkTo @route="cards.add">Add a Card</LinkTo>
+  </li>
+  <li>
+    <Input
+      @value={{this.cardId}}
+      @placeholder="Card ID to Update"
+      @enter={{action this.updateCard this.cardId}}
+    />
+    {{#if this.cardId}}
+      <LinkTo @route="cards.update" @model={{this.cardId}}>Update Card</LinkTo>
+    {{/if}}
   </li>
 </ul>

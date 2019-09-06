@@ -8,7 +8,10 @@
 */
 
 import { todo } from './todo-any';
+import Logger from '@cardstack/logger';
 import { STATUS_CODES } from 'http';
+
+const log: todo = Logger('cardstack/error');
 
 interface ErrorDetails {
   status?: number;
@@ -48,6 +51,9 @@ class E extends Error {
     } catch (err) {
       if (!err.isCardstackError) {
         throw err;
+      }
+      if (err.status === 500) {
+        log.error(`Unexpected error: ${err.status} - ${err.message}\n${err.stack}`);
       }
       let errors = [err];
       if (err.additionalErrors) {

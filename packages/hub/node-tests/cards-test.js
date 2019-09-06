@@ -363,13 +363,126 @@ describe('hub/card-services', function () {
       assertIsolatedCardMetadata(article);
     });
 
-    it.skip('can update card data', async function() {
+    it("can add field to a card's schema", async function() {
+      let card = await cardServices.create(env.session, externalArticleCard);
+      card.data.relationships.fields.data.push({ type: 'fields', id: 'local-hub::article-card::millenial-puppies::editor'});
+      card.included.push({
+        type: 'fields',
+        id: 'local-hub::article-card::millenial-puppies::editor',
+        attributes: {
+          'is-metadata': true,
+          'needed-when-embedded': true,
+          'field-type': '@cardstack/core-types::string'
+        }
+      });
+
+      card = await cardServices.update(env.session, 'local-hub::article-card::millenial-puppies', card);
+      let { data, included } = card;
+      let includedIdentifiers = included.map(i => `${i.type}/${i.id}`);
+      let fieldRelationships = data.relationships.fields.data.map(i => `${i.type}/${i.id}`);
+
+      expect(includedIdentifiers).to.include('fields/local-hub::article-card::millenial-puppies::editor');
+      expect(fieldRelationships).to.include('fields/local-hub::article-card::millenial-puppies::editor');
+
+      card = await cardServices.get(env.session, 'local-hub::article-card::millenial-puppies', 'isolated');
+      data = card.data;
+      included = card.included;
+      includedIdentifiers = included.map(i => `${i.type}/${i.id}`);
+      fieldRelationships = data.relationships.fields.data.map(i => `${i.type}/${i.id}`);
+      expect(includedIdentifiers).to.include('fields/local-hub::article-card::millenial-puppies::editor');
+      expect(fieldRelationships).to.include('fields/local-hub::article-card::millenial-puppies::editor');
     });
 
-    it.skip('can update card schema', async function() {
+    it("can remove a field from the card's schema", async function() {
+      let card = await cardServices.create(env.session, externalArticleCard);
+      card.data.relationships.fields.data = card.data.relationships.fields.data.filter(i => i.id !== 'local-hub::article-card::millenial-puppies::body');
+      card.included = card.included.filter(i => i.id !== 'local-hub::article-card::millenial-puppies::body');
+
+      card = await cardServices.update(env.session, 'local-hub::article-card::millenial-puppies', card);
+      let { data, included } = card;
+      let includedIdentifiers = included.map(i => `${i.type}/${i.id}`);
+      let fieldRelationships = data.relationships.fields.data.map(i => `${i.type}/${i.id}`);
+
+      expect(card.data.attributes.body).to.be.undefined;
+      expect(includedIdentifiers).to.not.include('fields/local-hub::article-card::millenial-puppies::body');
+      expect(fieldRelationships).to.not.include('fields/local-hub::article-card::millenial-puppies::body');
+
+      card = await cardServices.get(env.session, 'local-hub::article-card::millenial-puppies', 'isolated');
+      data = card.data;
+      included = card.included;
+      includedIdentifiers = included.map(i => `${i.type}/${i.id}`);
+      fieldRelationships = data.relationships.fields.data.map(i => `${i.type}/${i.id}`);
+      expect(card.data.attributes.body).to.be.undefined;
+      expect(includedIdentifiers).to.not.include('fields/local-hub::article-card::millenial-puppies::body');
+      expect(fieldRelationships).to.not.include('fields/local-hub::article-card::millenial-puppies::body');
     });
 
-    it.skip('can update card schema and data', async function() {
+    it("can update a card's internal model", async function() {
+      let card = await cardServices.create(env.session, externalArticleCard);
+      let internalModel = card.included.find(i => i.type = 'local-hub::article-card::millenial-puppies');
+      internalModel.attributes['local-hub::article-card::millenial-puppies::body'] = 'updated body';
+
+      card = await cardServices.update(env.session, 'local-hub::article-card::millenial-puppies', card);
+      internalModel = card.included.find(i => i.type = 'local-hub::article-card::millenial-puppies');
+
+      assertCardSchema(card);
+      expect(card.data.attributes.body).to.equal('updated body');
+      expect(internalModel.attributes['local-hub::article-card::millenial-puppies::body']).to.equal('updated body');
+
+      card = await cardServices.get(env.session, 'local-hub::article-card::millenial-puppies', 'isolated');
+      internalModel = card.included.find(i => i.type = 'local-hub::article-card::millenial-puppies');
+      expect(card.data.attributes.body).to.equal('updated body');
+      expect(internalModel.attributes['local-hub::article-card::millenial-puppies::body']).to.equal('updated body');
+    });
+
+    it("can update a card's schema and a card model at the same time", async function() {
+      let card = await cardServices.create(env.session, externalArticleCard);
+      let internalModel = card.included.find(i => i.type = 'local-hub::article-card::millenial-puppies');
+      internalModel.attributes['local-hub::article-card::millenial-puppies::editor'] = 'Hassan';
+      card.data.relationships.fields.data.push({ type: 'fields', id: 'local-hub::article-card::millenial-puppies::editor'});
+      card.included.push({
+        type: 'fields',
+        id: 'local-hub::article-card::millenial-puppies::editor',
+        attributes: {
+          'is-metadata': true,
+          'needed-when-embedded': true,
+          'field-type': '@cardstack/core-types::string'
+        }
+      });
+
+      card = await cardServices.update(env.session, 'local-hub::article-card::millenial-puppies', card);
+      let { data, included } = card;
+      let includedIdentifiers = included.map(i => `${i.type}/${i.id}`);
+      let fieldRelationships = data.relationships.fields.data.map(i => `${i.type}/${i.id}`);
+
+      expect(includedIdentifiers).to.include('fields/local-hub::article-card::millenial-puppies::editor');
+      expect(fieldRelationships).to.include('fields/local-hub::article-card::millenial-puppies::editor');
+      expect(card.data.attributes.editor).to.equal('Hassan');
+      expect(internalModel.attributes['local-hub::article-card::millenial-puppies::editor']).to.equal('Hassan');
+
+      card = await cardServices.get(env.session, 'local-hub::article-card::millenial-puppies', 'isolated');
+      data = card.data;
+      included = card.included;
+      includedIdentifiers = included.map(i => `${i.type}/${i.id}`);
+      fieldRelationships = data.relationships.fields.data.map(i => `${i.type}/${i.id}`);
+      expect(includedIdentifiers).to.include('fields/local-hub::article-card::millenial-puppies::editor');
+      expect(fieldRelationships).to.include('fields/local-hub::article-card::millenial-puppies::editor');
+      expect(card.data.attributes.editor).to.equal('Hassan');
+      expect(internalModel.attributes['local-hub::article-card::millenial-puppies::editor']).to.equal('Hassan');
+    });
+
+    it('can delete a card', async function() {
+      let card = await cardServices.create(env.session, externalArticleCard);
+      let { data: { meta: { version } } } = card;
+      await cardServices.delete(env.session, 'local-hub::article-card::millenial-puppies', version);
+
+      let error;
+      try {
+        await cardServices.get(env.session, 'local-hub::article-card::millenial-puppies', 'isolated');
+      } catch (e) {
+        error = e;
+      }
+      expect(error.status).to.equal(404);
     });
   });
 

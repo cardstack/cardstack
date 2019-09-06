@@ -1,10 +1,12 @@
 const Error = require('@cardstack/plugin-utils/error');
+const Session = require('@cardstack/plugin-utils/session');
 const log = require('@cardstack/logger')('cardstack/writers');
-const { get } = require('lodash');
+const { set, get, differenceBy, intersectionBy, partition } = require('lodash');
 const { declareInjections } = require('@cardstack/di');
 const {
   isCard,
   loadCard,
+  getCardId,
   adaptCardToFormat,
   generateInternalCardFormat
 } = require('./indexing/card-utils');
@@ -41,26 +43,6 @@ class Writers {
     }
 
     return await this.handleCreate(true, session, type, stream);
-
-  }
-
-  async _handleCreateForCard(session, card) {
-    let id = card.data.id;
-    if (!id) { throw new Error(`The card ID must be supplied in the card document in order to create the card.`); }
-
-    let internalCard = generateInternalCardFormat(card);
-    let schema = await loadCard(await this.currentSchema.getSchema(), internalCard);
-    schema = await (await this.currentSchema.getSchema()).applyChanges(schema.map(document => ({ id: document.id, type: document.type, document })));
-
-    for (let resource of (internalCard.included || [])) {
-      // This assumes that the session used to create cards also posseses permissions to create schema models and internal card models
-      await this.handleCreate(false, session, resource.type, {
-        data: resource,
-        included: [ internalCard.data ].concat(internalCard.included || [])
-      }, schema);
-    }
-
-    return { schema, card: internalCard };
   }
 
   async handleCreate(isBinary, session, type, documentOrStream, schema) {
@@ -68,7 +50,7 @@ class Writers {
 
     schema = schema || await this.currentSchema.getSchema();
     if (type === 'cards') {
-      let internalCardAndSchema = await this._handleCreateForCard(session, documentOrStream);
+      let internalCardAndSchema = await this._loadInternalCard(documentOrStream);
       schema = internalCardAndSchema.schema;
       documentOrStream = internalCardAndSchema.card;
       type = documentOrStream.data.type;
@@ -77,7 +59,6 @@ class Writers {
     let { writer, sourceId } = this._getSchemaDetailsForType(schema, type);
 
     let pending;
-
     if (isBinary) {
       let opts = await writer.prepareBinaryCreate(
         session,
@@ -88,26 +69,31 @@ class Writers {
       pending = await this.createPendingChange({ originalDocument, finalDocument, finalizer, aborter, opts});
     } else {
       let isSchema = this.schemaTypes.includes(type);
-      let included = documentOrStream.included;
       let opts = await writer.prepareCreate(
         session,
         type,
         this._cleanupBodyData(schema, documentOrStream.data),
         isSchema
       );
-      opts.included = included;
       let { originalDocument, finalDocument, finalizer, aborter } = opts;
       pending = await this.createPendingChange({ originalDocument, finalDocument, finalizer, aborter, schema, opts});
     }
 
     let context;
     try {
-      // accomodate the schema for any new cards being created
-      await pending.finalDocumentContext.pristineDoc();
-      schema = pending.finalDocumentContext.schema;
-
       let newSchema = await schema.validate(pending, { type, session });
       schema = newSchema || schema;
+
+      if (isCard(type, documentOrStream.data.id)) {
+        // This assumes that the session used to create cards also posseses permissions to create schema models and internal card models
+        for (let resource of documentOrStream.included || []) {
+          await this.handleCreate(false, session, resource.type, {
+            data: resource,
+            included: [documentOrStream.data].concat(documentOrStream.included || [])
+          }, schema);
+        }
+      }
+
       context = await this._finalize(pending, type, schema, sourceId);
 
       let batch = this.pgSearchClient.beginBatch(schema, this.searchers);
@@ -121,15 +107,14 @@ class Writers {
       if (pending) { await pending.abort();  }
     }
 
-    let document = await context.applyReadAuthorization({ session });
-    if (isCard(document.data.type, document.data.id)) {
-      return await adaptCardToFormat(schema, document, 'isolated');
-    } else {
-      return document;
+    let authorizedDocument = await context.applyReadAuthorization({ session });
+    if (isCard(authorizedDocument.data.type, authorizedDocument.data.id)) {
+      return await adaptCardToFormat(schema, authorizedDocument, 'isolated');
     }
+    return authorizedDocument;
   }
 
-  async update(session, type, id, document) {
+  async update(session, type, id, document, schema) {
     log.info("updating type=%s id=%s", type, id);
     if (!document.data) {
       throw new Error('The document must have a top-level "data" property', {
@@ -138,7 +123,22 @@ class Writers {
     }
     await this.pgSearchClient.ensureDatabaseSetup();
 
-    let schema = await this.currentSchema.getSchema();
+    let addedModels = [];
+    let deletedModels = [];
+    let changedModels = [];
+    schema = schema || await this.currentSchema.getSchema();
+    if (type === 'cards') {
+      let internalCardAndSchema = await this._loadInternalCard(document);
+      schema = internalCardAndSchema.schema;
+      document = internalCardAndSchema.card;
+      type = document.data.type;
+
+      let oldCard = await this.searchers.get(Session.INTERNAL_PRIVILEGED, 'local-hub', document.data.type, id);
+      changedModels = intersectionBy(document.included || [], oldCard.included || [], i => `${i.type}/${i.id}`);
+      addedModels = differenceBy(document.included || [], oldCard.included || [], i => `${i.type}/${i.id}`);
+      deletedModels = differenceBy(oldCard.included || [], document.included || [], i => `${i.type}/${i.id}`);
+    }
+
     let { writer, sourceId } = this._getSchemaDetailsForType(schema, type);
     let isSchema = this.schemaTypes.includes(type);
     let opts = await writer.prepareUpdate(
@@ -149,19 +149,35 @@ class Writers {
       isSchema
     );
     let { originalDocument, finalDocument, finalizer, aborter } = opts;
-    let pending = await this.createPendingChange({ originalDocument, finalDocument, finalizer, aborter, opts });
-    let context;
+    let pending = await this.createPendingChange({ originalDocument, finalDocument, finalizer, aborter, schema, opts });
 
-    // TODO make sure to use the schema from the pending's document context to pick up discovered card schema
+    let context;
     try {
       let newSchema = await schema.validate(pending, { type, id, session });
       schema = newSchema || schema;
+
+      // This assumes that the session used to update cards also posseses permissions to CRUD schema models and internal card models
+      for (let resource of addedModels) {
+        await this.handleCreate(false, session, resource.type, {
+          data: resource,
+          included: [document.data].concat(document.included || [])
+        }, schema);
+      }
+      for (let resource of changedModels) {
+        await this.update(session, resource.type, resource.id, {
+          data: resource,
+          included: [document.data].concat(document.included || [])
+        }, schema);
+      }
       context = await this._finalize(pending, type, schema, sourceId);
 
       let batch = this.pgSearchClient.beginBatch(schema, this.searchers);
       await batch.saveDocument(context);
       await batch.done();
 
+      // Don't delete schema until after the card model has been updated so that
+      // you don't end up with a content type referring to a missing field
+      schema = await this._deleteInternalCardResources(session, schema, deletedModels);
       if (newSchema) {
         this.currentSchema.invalidateCache();
       }
@@ -169,30 +185,54 @@ class Writers {
       if (pending) { await pending.abort();  }
     }
 
-    return await context.applyReadAuthorization({ session });
+    let authorizedDocument = await context.applyReadAuthorization({ session });
+    if (isCard(authorizedDocument.data.type, authorizedDocument.data.id)) {
+      return await adaptCardToFormat(schema, authorizedDocument, 'isolated');
+    }
+    return authorizedDocument;
   }
 
-  async delete(session, version, type, id) {
+  async delete(session, version, type, id, schema) {
     log.info("deleting type=%s id=%s", type, id);
     await this.pgSearchClient.ensureDatabaseSetup();
 
-    let schema = await this.currentSchema.getSchema();
+    schema = schema || await this.currentSchema.getSchema();
+
+    let internalCard;
+    if (type == 'cards') {
+      try {
+        internalCard = await this.searchers.get(Session.INTERNAL_PRIVILEGED, 'local-hub', id, id);
+      } catch (e) {
+        if (e.status !== 404) { throw e; }
+      }
+      if (!internalCard) { return; }
+
+      let cardSchema = await loadCard(schema, internalCard);
+      schema = await schema.applyChanges(cardSchema.map(document => ({ id: document.id, type: document.type, document })));
+      type = internalCard.data.type;
+      version = get(internalCard, 'data.meta.version');
+    }
+
     let { writer, sourceId } = this._getSchemaDetailsForType(schema, type);
     let isSchema = this.schemaTypes.includes(type);
     let opts = await writer.prepareDelete(session, version, type, id, isSchema);
     let { originalDocument, finalDocument, finalizer, aborter } = opts;
-    let pending = await this.createPendingChange({ originalDocument, finalDocument, finalizer, aborter, opts });
+    let pending = await this.createPendingChange({ originalDocument, finalDocument, finalizer, aborter, schema, opts });
     try {
       let newSchema = await schema.validate(pending, { session });
-      let context = await this._finalize(pending, type, newSchema || schema, sourceId, id);
+      schema = newSchema || schema;
+      let context = await this._finalize(pending, type, schema, sourceId, id);
 
+      let batch = this.pgSearchClient.beginBatch(schema, this.searchers);
+      await batch.deleteDocument(context);
+      await batch.done();
+
+      if (internalCard) {
+        await this._deleteInternalCardResources(session, schema, [internalCard.data].concat(internalCard.included || []));
+      }
       if (newSchema) {
         this.currentSchema.invalidateCache();
       }
-
-      let batch = this.pgSearchClient.beginBatch(await this.currentSchema.getSchema(), this.searchers);
-      await batch.deleteDocument(context);
-      await batch.done();
     } finally {
       if (pending) { await pending.abort();  }
     }
@@ -236,6 +276,46 @@ class Writers {
       sourceId,
       upstreamDoc: null
     });
+  }
+
+  // if any primary card models are included in the deletedResources when we'll
+  // update the schema to remove those card model's content types. But the onus
+  // will be on the caller to delete the primary card model--which is the signal
+  // to the hub to delete the externally facing card itself.
+  async _deleteInternalCardResources(session, schema, deletedResources) {
+    if (!deletedResources.length) { return schema; }
+
+    let [ modelsToDelete, schemaToDelete] = partition(deletedResources, i => getCardId(i.type));
+    let [ cardModels, internalModels ] = partition(modelsToDelete, i => isCard(i.type, i.id));
+    for (let resource of internalModels) {
+      await this.delete(session, resource.meta.version, resource.type, resource.id, schema);
+    }
+    let fieldsWithRelatedTypes = schemaToDelete.filter(i => i.type === 'fields' && (get(i, 'relationships.related-types.data.length') || 0) > 0);
+    // remove any related types so we wont be tripped up by deleting an internal card
+    // content type that has a field with an internal card related type
+    for (let resource of fieldsWithRelatedTypes) {
+      set(resource, 'relationships.related-types.data', []);
+      let { data: updatedResource } = await this.update(session, resource.type, resource.id, { data: resource }, schema);
+      let index = schemaToDelete.findIndex(i => `${i.type}/${i.id}` === `${resource.type}/${resource.id}`);
+      schemaToDelete[index] = updatedResource;
+    }
+
+    if (cardModels.length) {
+      schema = await schema.applyChanges(cardModels.map(i => ({ type: 'content-types', id: i.id, document: null })));
+    }
+    schemaToDelete.sort(sortSchemaForDelete);
+    for (let resource of schemaToDelete) {
+      await this.delete(session, resource.meta.version, resource.type, resource.id, schema);
+    }
+
+    return schema;
+  }
+
+  async _loadInternalCard(card) {
+    let internalCard = generateInternalCardFormat(card);
+    let schema = await loadCard(await this.currentSchema.getSchema(), internalCard);
+    schema = await (await this.currentSchema.getSchema()).applyChanges(schema.map(document => ({ id: document.id, type: document.type, document })));
+    return { schema, card: internalCard };
   }
 
   _getSchemaDetailsForType(schema, type) {
@@ -314,7 +394,6 @@ class PendingChange {
     this.serverProvidedValues = new Map();
     this._finalizer = finalizer;
     this._aborter = aborter;
-    let { included } = opts;
 
     if (schema && searchers) {
       if (originalDocument) {
@@ -360,4 +439,23 @@ class PendingChange {
       return aborter.call(null, this);
     }
   }
+}
+
+// TODO Probably a better idea would be to refactor JSONAPIFactory to outside of test-support
+// and then use that to get the resources ordered by dependency in order to safely delete.
+function sortSchemaForDelete({ type:typeA }, { type:typeB }) {
+  if (typeA === 'computed-fields') {
+    typeA = 'fields';
+  }
+  if (typeB === 'computed-fields') {
+    typeB = 'fields';
+  }
+
+  if (typeA === 'content-types' && typeB === 'fields') {
+    return -1;
+  }
+  if (typeA === 'fields' && typeB === 'content-types') {
+    return 1;
+  }
+  return 0;
 }

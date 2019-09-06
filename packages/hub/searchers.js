@@ -75,6 +75,7 @@ class Searchers {
     return await this.get(session, localHubSource, 'spaces', path);
   }
 
+  // TODO the source id is actually baked into the id via '::' convention. I don't think we actually need this as a separate parm
   async get(session, source, type, id, opts={}) {
     if (source !== localHubSource) {
       throw new Error(`You specified the source: '${source}' in Searchers.get(). Currently the cardstack hub does not support non-local hub sources.`);
@@ -99,7 +100,7 @@ class Searchers {
     }
 
     if (!authorizedResult) {
-      throw new Error(`No such resource ${source}/${type}/${id}`, {
+      throw new Error(`No such resource ${type}/${id}`, {
         status: 404
       });
     }
@@ -166,7 +167,7 @@ class Searchers {
     }
   }
 
-  createDocumentContext({ schema, type, id, sourceId, generation, upstreamDoc, format, includePaths, included }) {
+  createDocumentContext({ schema, type, id, sourceId, generation, upstreamDoc, format, includePaths }) {
     return new DocumentContext({
       schema,
       type,
@@ -176,7 +177,6 @@ class Searchers {
       generation,
       upstreamDoc,
       includePaths,
-      included,
       routers: this._getRouters(),
       read: this._read(),
       search: this._search(Session.INTERNAL_PRIVILEGED)

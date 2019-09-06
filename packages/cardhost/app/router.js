@@ -9,7 +9,10 @@ const Router = EmberRouter.extend({
 
 Router.map(function() {
   this.route('render');
-  this.route('add');
+  this.route('cards', function() {
+    this.route('add', { path: '/new'});
+    this.route('update', { path: '/:id'});
+  });
 });
 
 export default Router;

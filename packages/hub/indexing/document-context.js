@@ -5,9 +5,7 @@ const { getPath } = require('@cardstack/routing/cardstack/path');
 const { merge, get, uniqBy } = require('lodash');
 const Session = require('@cardstack/plugin-utils/session');
 const {
-  cardIdDelim,
-  cardContextToId,
-  cardContextFromId,
+  getCardId,
   isCard,
   loadCard,
 } = require('./card-utils');
@@ -15,7 +13,7 @@ const qs = require('qs');
 
 module.exports = class DocumentContext {
 
-  constructor({ read, search, routers, schema, type, id, sourceId, generation, upstreamDoc, included, format, includePaths }) {
+  constructor({ read, search, routers, schema, type, id, sourceId, generation, upstreamDoc, format, includePaths }) {
     if (upstreamDoc && !upstreamDoc.data) {
       throw new Error('The upstreamDoc must have a top-level "data" property', {
         status: 400
@@ -438,11 +436,8 @@ module.exports = class DocumentContext {
   // unsure how we would use a searchers.get() within the Schema class; I think that would
   // result in a cycle as searchers.get() needs to use a schema itself in order to process results.
   async _loadCardSchemaForResource(resourceType, resourceId) {
-    if (!resourceType || resourceType.split(cardIdDelim).length < 3) { return; }
-
-    let { repository, packageName, cardId } = cardContextFromId(resourceId);
-    let id = cardContextToId({ repository, packageName, cardId });
-    if (!id) { return; }
+    let id;
+    if (!resourceType || !(id = getCardId(resourceId))) { return; }
 
     if (this._cardCache[id]) {
       await this._cardCache[id];
