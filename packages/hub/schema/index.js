@@ -291,13 +291,13 @@ class Schema {
     return this._abstractRealms;
   }
 
-  userRealms(userDoc) {
-    let contentType = this.getType(userDoc.type);
+  async userRealms(documentContext) {
+    let contentType = this.getType(documentContext.type);
     if (!contentType || !contentType.isGroupable()) {
       return;
     }
-    let groups = contentType.groups(userDoc).map(group => Session.encodeBaseRealm('groups', group.id));
-    let ownBaseRealm = Session.encodeBaseRealm(userDoc.type, userDoc.id);
+    let groups = (await contentType.groups(documentContext)).map(group => Session.encodeBaseRealm('groups', group.id));
+    let ownBaseRealm = Session.encodeBaseRealm(documentContext.type, documentContext.id);
     if (groups.length === 0) {
       // if you're not in any groups, only your own base realm matters
       return [ownBaseRealm];

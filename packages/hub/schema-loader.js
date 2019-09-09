@@ -47,7 +47,7 @@ class SchemaLoader {
     let dataSources = findDataSources(models, plugins, this.projectPath);
     let defaultDataSource = findDefaultDataSource(plugins);
     log.trace('default data source %j', defaultDataSource);
-    let groups = findGroups(models, fields);
+    let groups = findGroups(models, fields, computedFields);
     let types = findTypes(models, fields, computedFields, constraints, dataSources, defaultDataSource, grants, groups);
     validateRelatedTypes(types, fields);
     log.debug(`SchemaLoader.loadFrom completed loading schema`);
@@ -152,8 +152,8 @@ function findTypes(models, fields, computedFields, constraints, dataSources, def
   return types;
 }
 
-function findGroups(models, allFields) {
-  return models.filter(m => m.type === 'groups').map(m => new Group(m, allFields));
+function findGroups(models, allFields, allComputedFields) {
+  return models.filter(m => m.type === 'groups').map(m => new Group(m, allFields, allComputedFields));
 }
 
 function validateRelatedTypes(types, fields) {

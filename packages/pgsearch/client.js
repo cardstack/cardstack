@@ -370,7 +370,7 @@ class Batch {
     let { id, type, sourceId, generation, schema, upstreamDoc:doc } = context;
     if (!doc) { return; }
 
-    let realms = await schema.userRealms(doc.data);
+    let realms = await schema.userRealms(context);
     if (realms) {
       let userRealmsId = Session.encodeBaseRealm(type, id);
       let userRealmContext = this._searchers.createDocumentContext({

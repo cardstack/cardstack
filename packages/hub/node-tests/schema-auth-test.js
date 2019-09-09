@@ -93,9 +93,9 @@ describe('schema/auth/write', function() {
   function makeSession(schema, { type, id }) {
     let ownRealm = Session.encodeBaseRealm(type, id);
     return new Session({ type, id }, {
-      get(type, id) {
+      async get(type, id) {
         if (type === 'user-realms' && id === ownRealm) {
-          return schema.userRealms({ type, id });
+          return await schema.userRealms({ type, id });
         }
       }
     });
