@@ -234,8 +234,8 @@ module.exports = class ContentType {
     return this._groups.length > 0;
   }
 
-  groups(document) {
-    return this._groups.filter(g => g.test(document));
+  async groups(documentContext) {
+    return (await Promise.all(this._groups.map(async g => (await g.test(documentContext)) && g))).filter(Boolean);
   }
 
   get realms() {

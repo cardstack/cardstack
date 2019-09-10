@@ -5,7 +5,7 @@ const {
 } = require('lodash');
 
 module.exports = class Group {
-  constructor(model, allFields) {
+  constructor(model, allFields, allComputedFields) {
     if (model.type === 'groups' && model.id === 'everyone') {
       // Skip validation for the `everyone` group. All users get assigned this group.
       // See also bootstrap-schema.js and everyone-group.js for special handling.
@@ -14,27 +14,23 @@ module.exports = class Group {
     } else {
       let searchQuery = get(model, 'attributes.search-query');
       this.types = validatedTypes(searchQuery, model);
-      this._fieldFilters = validatedFieldFilters(allFields,  searchQuery, model);
-      this._allFields = allFields;
+      this._allFields = new Map([...allFields, ...allComputedFields]);
+      this._fieldFilters = validatedFieldFilters(this._allFields,  searchQuery, model);
       this.id = model.id;
     }
   }
 
-  test(document) {
-    let change = {
-      finalDocument: document
-    };
-    return [...this._fieldFilters.entries()].every(([fieldName, allowedValues]) => {
+  async test(documentContext) {
+    let model = documentContext.model;
+    return (await Promise.all([...this._fieldFilters.entries()].map(async ([fieldName, allowedValues]) => {
       let field = this._allFields.get(fieldName);
-      // TODO: update this to use Model.getField() as we do in Grant.readRealmsFromField
-      // https://github.com/cardstack/cardstack/issues/745
-      let haveValue = field.valueFrom(change);
+      let haveValue = await model.getField(fieldName);
       if (Array.isArray(haveValue) && field.fieldType === '@cardstack/core-types::string-array') {
         return Boolean(intersection(allowedValues, haveValue).length);
       } else {
         return allowedValues.find(v => isEqual(v, haveValue));
       }
-    });
+    }))).every(Boolean);
   }
 };
 
