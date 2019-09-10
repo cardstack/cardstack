@@ -1,5 +1,4 @@
-Cardstack Application Framework
-===============================
+# Cardstack Application Framework
 
 This is the main repo for [Cardstack](https://www.cardstack.com/), an open source application architecture for building cohesive experiences on open, decentralized infrastructure.
 
