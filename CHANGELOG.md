@@ -9,6 +9,10 @@ and features, and is not intended to be an exhaustive list.
 
 ## [v0.14.22] - 2019-08-15
 
+When upgrading, `@cardstack/eslint-config/browser` should become `@cardstack/eslint-config/ember-addon`
+throughout a project. Then, `babel-eslint` should be added as a peer dependency in the top level 
+`package.json` with `yarn add -D -W babel-eslint`
+
 ### Added
 
 - Commits for the WIP Cardstack CLI
@@ -19,7 +23,7 @@ and features, and is not intended to be an exhaustive list.
 - error logging
 - docs for git plugins
 - more linting configuration to support using TypeScript
-- eslint plugin rules have changed filepaths for imports. `@cardstack/eslint-config/browser` should become `@cardstack/eslint-config/-browser`, with a dash before `browser` #824
+- Breaking - eslint plugin rules have changed filepaths for imports. See migration instructions above. #824
 
 ## [v0.14.21] - 2019-07-18
 
