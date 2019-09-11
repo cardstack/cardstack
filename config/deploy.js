@@ -9,7 +9,7 @@ module.exports = function(/* deployTarget */) {
       environment: 'production'
     },
     git: {
-      worktreePath: `${os.tmpdir()}/deploy-box`
+      worktreePath: `${os.tmpdir()}/deploy-boxel`
     }
   };
   return ENV;
