@@ -4,10 +4,12 @@ import { action } from '@ember/object';
 import { inject as service } from '@ember/service';
 import template from '../templates/components/boxel';
 import { layout, tagName } from '@ember-decorators/component';
+
 import resize from 'ember-animated/motions/resize';
 import move from 'ember-animated/motions/move';
 import scale from 'ember-animated/motions/scale';
-import { parallel, printSprites, wait } from 'ember-animated';
+import { parallel, wait } from 'ember-animated';
+
 
 @layout(template)
 @tagName('')
@@ -17,20 +19,25 @@ export default class BoxelComponent extends Component {
   duration = 1000;
   preserveScrollPosition = true;
 
-  @tracked content;
+  constructor() {
+    super(...arguments);
 
+    this.plane = this.boxel.currentPlane;
+  }
+
+  didInsertElement() {
+    this._super(...arguments);
+
+    this.boxel.registerBoxel(this);
+  }
+
+  @tracked content;
   get contentType() {
     if (this.content) {
       return this.content.constructor.modelName;
     }
 
     return null;
-  }
-
-  constructor() {
-    super(...arguments);
-
-    this.boxel.registerBoxel(this);
   }
 
   get name() {
@@ -49,7 +56,7 @@ export default class BoxelComponent extends Component {
 
   transition = function*({ sentSprites, receivedSprites }) {
     try {
-      printSprites(arguments[0]);
+      // printSprites(arguments[0]);
 
       receivedSprites.concat(sentSprites).forEach(sprite => {
         sprite.applyStyles({
@@ -69,7 +76,7 @@ export default class BoxelComponent extends Component {
 
   resize = function*({ insertedSprites, removedSprites, keptSprites }) {
     try {
-      printSprites(arguments[0]);
+      // printSprites(arguments[0]);
 
       let insertedSprite = insertedSprites[0];
       let removedSprite = removedSprites[0];

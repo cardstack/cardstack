@@ -1,0 +1,11 @@
+{{#animated-value "form-cards-edit-route" initialInsertion=true finalRemoval=true use=(if this.model.expanded this.backgroundTransition)}}
+  <div class="form-cards-page edit">
+    <AnimatedContainer class="form-cards-list">
+      {{#animated-value model key="id" group="moving-box" use=this.boxTransition as |card|}}
+        <Boxel @name="boxel-{{card.id}}" @formCards={{true}}
+          class="form-card form-card-{{card.id}} isolated" role="button" onclick={{action "backToList" card}}>
+        </Boxel>
+      {{/animated-value}}
+    </AnimatedContainer>
+  </div>
+{{/animated-value}}

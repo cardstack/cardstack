@@ -1,0 +1,69 @@
+.form-cards-page {
+  box-sizing: border-box;
+  width: 100%;
+  height: 100%;
+  min-height: 100vh;
+  margin: 0 auto;
+  padding: 100px 20px;
+  background-color: #352250;
+}
+
+.form-cards-list {
+  display: flex;
+  justify-content: center;
+}
+
+.form-card {
+  box-sizing: border-box;
+  width: 270px;
+  height: 306px;
+  border: none;
+  border-radius: 30px;
+  background-color: #65e7ff;
+  color: black;
+  text-align: center;
+  margin: 15px;
+  box-shadow: 0 5px 15px 10px rgba(0, 0, 0, 0);
+  opacity: 0.99;
+}
+
+.form-card.focused {
+  width: 396px;
+  height: 596px;
+  margin: 15px 70px;
+}
+
+.form-card.expanded {
+  opacity: 0.22;
+}
+
+.form-card-2 {
+  background-color: #d23ade;
+}
+
+.form-card-3 {
+  background-color: #d0ff65;
+}
+
+
+/* edit page */
+.form-cards-page.edit {
+  position: absolute;
+  top: 0;
+  background-color: #eeeeee;
+}
+
+.form-card.isolated {
+  width: 556px;
+  height: 838px;
+  box-shadow: 0 5px 15px 10px rgba(0, 0, 0, 0.3);
+  opacity: 0.99;
+}
+
+#boxel-plane-space {
+  z-index: 0;
+}
+
+#boxel-plane-tools {
+  z-index: 1;
+}

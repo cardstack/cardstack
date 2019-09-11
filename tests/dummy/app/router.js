@@ -21,6 +21,9 @@ Router.map(function() {
   this.route('cards', function() {
     this.route('card', { path: '/:id' });
   });
+  this.route('form-cards', function() {
+    this.route('edit', { path: '/:id/edit' });
+  });
 });
 
 export default Router;

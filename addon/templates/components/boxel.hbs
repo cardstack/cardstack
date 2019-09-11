@@ -1,29 +1,37 @@
-{{#animated-value @content group=@name use=transition duration=this.duration}}
-  {{#if (eq @format "thumbnail")}}
-    <div class="boxel boxel-thumbnail" data-test-boxel>
-      <div class="boxel-thumbnail--image">
-        <img src={{@content.imageUrl}} alt={{@content.altText}}>
+{{#unless @formCards}}
+  {{#animated-value @content group=@name use=transition duration=this.duration}}
+    {{#if (eq @format "thumbnail")}}
+      <div class="boxel boxel-thumbnail" data-test-boxel>
+        <div class="boxel-thumbnail--image">
+          <img src={{@content.imageUrl}} alt={{@content.altText}}>
+        </div>
+        <div class="boxel-thumbnail--text">
+          <h3>{{@content.title}}</h3>
+          <p>{{@content.description}}</p>
+        </div>
       </div>
-      <div class="boxel-thumbnail--text">
-        <h3>{{@content.title}}</h3>
-        <p>{{@content.description}}</p>
+    {{else if @component}}
+      <div class="boxel boxel-component" ...attributes data-test-boxel>
+        {{component @component}}
       </div>
-    </div>
-  {{else if @component}}
-    <div class="boxel boxel-component" ...attributes data-test-boxel>
-      {{component @component}}
-    </div>
-  {{else}}
-    <div class="boxel {{if contentType (concat "boxel-" contentType "-" @format) "boxel-default"}}" ...attributes data-test-boxel>
-      {{#if @content}}
-        {{#if (is-component contentType)}}
-          {{component contentType content=@content format=@format}}
+    {{else}}
+      <div class="boxel {{if contentType (concat "boxel-" contentType "-" @format) "boxel-default"}}" ...attributes data-test-boxel>
+        {{#if @content}}
+          {{#if (is-component contentType)}}
+            {{component contentType content=@content format=@format}}
+          {{else}}
+            A {{contentType}} component/template must be provided
+          {{/if}}
         {{else}}
-          A {{contentType}} component/template must be provided
+          {{yield}}
         {{/if}}
-      {{else}}
-        {{yield}}
-      {{/if}}
-    </div>
-  {{/if}}
-{{/animated-value}}
+      </div>
+    {{/if}}
+  {{/animated-value}}
+{{/unless}}
+
+{{#if @formCards}}
+  <div data-test-boxel ...attributes>
+    {{yield}}
+  </div>
+{{/if}}
