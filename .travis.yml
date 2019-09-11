@@ -53,7 +53,7 @@ jobs:
     - stage: "Deploy"
       name: "Deploy"
       if: (branch = master or tag is present) and type = push
-      script: node_modules/.bin/ember deploy production
+      script: node_modules/.bin/ember deploy production --verbose
 
 script:
   - node_modules/.bin/ember try:one $EMBER_TRY_SCENARIO
