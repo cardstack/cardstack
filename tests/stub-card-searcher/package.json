@@ -8,8 +8,10 @@
     "lodash": "^4.17.11"
   },
   "devDependencies": {
+    "@cardstack/jsonapi": "*",
     "@cardstack/hub": "*",
-    "@cardstack/test-support": "*"
+    "@cardstack/test-support": "*",
+    "@cardstack/test-support-authenticator": "*"
   },
   "engines": {
     "node": ">= 8"

@@ -7,17 +7,14 @@ const { removeSync, pathExistsSync } = require('fs-extra');
 const { readFileSync } = require('fs');
 const { join } = require('path');
 const { tmpdir } = require('os');
-const { sortBy } = require('lodash');
-let factory = new JSONAPIFactory();
+const { adaptCardToFormat, cardBrowserAssetFields } = require('../indexing/card-utils');
 
-const cardsDir = join(tmpdir(), 'card_modules');
-
-function cleanup() {
-  removeSync(cardsDir);
-}
-
-let articleCard = factory.getDocumentFor(
-  factory.addResource('cards', 'local-hub::article-card::millenial-puppies')
+let cardFactory = new JSONAPIFactory();
+// This is the internal representation of a card. Browser clients do not
+// encounter this form of a card. Look at the jsonapi tests and browser
+// tests for the structure of a card as it is known externally.
+let internalArticleCard = cardFactory.getDocumentFor(
+  cardFactory.addResource('local-hub::article-card::millenial-puppies', 'local-hub::article-card::millenial-puppies')
     .withAttributes({
       'isolated-template': `
         <h1>{{this.title}}</h1>
@@ -47,32 +44,38 @@ let articleCard = factory.getDocumentFor(
       'embedded-css': `
         .article-card-embedded {}
       `,
-      // Note that we're not explicitly specifying the card metadata. The card should be able
-      // generate its metadata based on the fields that we have defined for the card and
-      // the model data that we have specified for the card.
+      'local-hub::article-card::millenial-puppies::internal-field': 'this is internal data',
+      'local-hub::article-card::millenial-puppies::title': 'The Millenial Puppy',
+      'local-hub::article-card::millenial-puppies::author': 'Van Gogh',
+      'local-hub::article-card::millenial-puppies::body': `
+        It can be difficult these days to deal with the
+        discerning tastes of the millenial puppy. In this
+        article we probe the needs and desires of millenial
+        puppies and why they love belly rubs so much.
+      `
     })
     .withRelated('fields', [
-      factory.addResource('fields', 'local-hub::article-card::millenial-puppies::title').withAttributes({
+      cardFactory.addResource('fields', 'local-hub::article-card::millenial-puppies::title').withAttributes({
         'is-metadata': true,
         'needed-when-embedded': true,
         'field-type': '@cardstack/core-types::string' //TODO rework for fields-as-cards
       }).withRelated('constraints', [
-        factory.addResource('constraints', 'local-hub::article-card::millenial-puppies::title-not-null')
+        cardFactory.addResource('constraints', 'local-hub::article-card::millenial-puppies::title-not-null')
           .withAttributes({
             'constraint-type': '@cardstack/core-types::not-null',
             'error-message': 'The title must not be empty.'
           })
       ]),
-      factory.addResource('fields', 'local-hub::article-card::millenial-puppies::author').withAttributes({
+      cardFactory.addResource('fields', 'local-hub::article-card::millenial-puppies::author').withAttributes({
         'is-metadata': true,
         'needed-when-embedded': true,
         'field-type': '@cardstack/core-types::string'
       }),
-      factory.addResource('fields', 'local-hub::article-card::millenial-puppies::body').withAttributes({
+      cardFactory.addResource('fields', 'local-hub::article-card::millenial-puppies::body').withAttributes({
         'is-metadata': true,
         'field-type': '@cardstack/core-types::string'
       }),
-      factory.addResource('fields', 'local-hub::article-card::millenial-puppies::internal-field').withAttributes({
+      cardFactory.addResource('fields', 'local-hub::article-card::millenial-puppies::internal-field').withAttributes({
         'field-type': '@cardstack/core-types::string'
       }),
 
@@ -81,7 +84,7 @@ let articleCard = factory.getDocumentFor(
       // Maybe a better test involving relationships to internal models would be to consume
       // this relationship in a computed that is a metadata field (and probably we
       // should have a test that involves a card that has a relationship to another card).
-      factory.addResource('fields', 'local-hub::article-card::millenial-puppies::tags').withAttributes({
+      cardFactory.addResource('fields', 'local-hub::article-card::millenial-puppies::tags').withAttributes({
         'is-metadata': true,
         'field-type': '@cardstack/core-types::has-many'
       }).withRelated('related-types', [
@@ -89,37 +92,24 @@ let articleCard = factory.getDocumentFor(
         // this content type name will be prefixed with the card's
         // package and card name, such that other cards can also
         // have their own 'tags' internal content types.
-        factory.addResource('content-types', 'local-hub::article-card::millenial-puppies::tags')
+        cardFactory.addResource('content-types', 'local-hub::article-card::millenial-puppies::tags')
       ]),
     ])
+    .withRelated('local-hub::article-card::millenial-puppies::tags', [
+      // Note that the tags models will be prefixed with this card's ID
+      // such that you will never run into model collisions for tags
+      // of different article cards
+      cardFactory.addResource('local-hub::article-card::millenial-puppies::tags', 'local-hub::article-card::millenial-puppies::millenials'),
+      cardFactory.addResource('local-hub::article-card::millenial-puppies::tags', 'local-hub::article-card::millenial-puppies::puppies'),
+      cardFactory.addResource('local-hub::article-card::millenial-puppies::tags', 'local-hub::article-card::millenial-puppies::belly-rubs'),
+    ])
+);
 
-    .withRelated('model', factory.addResource('local-hub::article-card::millenial-puppies', 'local-hub::article-card::millenial-puppies')
-      .withAttributes({
-        // TODO need to update how the hub serializes fields so that we do not
-        // introduce "::" in the field name which is technically invalid JSON:API
-        'local-hub::article-card::millenial-puppies::internal-field': 'this is internal data',
-        'local-hub::article-card::millenial-puppies::title': 'The Millenial Puppy',
-        'local-hub::article-card::millenial-puppies::author': 'Van Gogh',
-        'local-hub::article-card::millenial-puppies::body': `
-            It can be difficult these days to deal with the
-            discerning tastes of the millenial puppy. In this
-            article we probe the needs and desires of millenial
-            puppies and why they love belly rubs so much.
-          `
-      })
+const cardsDir = join(tmpdir(), 'card_modules');
 
-      // TODO need to update how the hub serializes fields so that we do not
-      // introduce "::" in the field name which is technically invalid JSON:API
-      .withRelated('local-hub::article-card::millenial-puppies::tags', [
-        // Note that the tags models will be prefixed with this card's ID
-        // such that you will never run into model collisions for tags
-        // of different article cards
-        factory.addResource('local-hub::article-card::millenial-puppies::tags', 'local-hub::article-card::millenial-puppies::millenials'),
-        factory.addResource('local-hub::article-card::millenial-puppies::tags', 'local-hub::article-card::millenial-puppies::puppies'),
-        factory.addResource('local-hub::article-card::millenial-puppies::tags', 'local-hub::article-card::millenial-puppies::belly-rubs'),
-      ])
-    )
-  );
+function cleanup() {
+  removeSync(cardsDir);
+}
 
 function assertCardOnDisk() {
   let browserAssets = [
@@ -137,11 +127,8 @@ function assertCardOnDisk() {
   ].concat(browserAssets).map(file => expect(pathExistsSync(join(cardsDir, 'local-hub', 'article-card', file))).to.equal(true, `${file} exists`));
 
   let cardOnDisk = require(join(cardsDir, 'local-hub', 'article-card', 'card.js'));
-  delete articleCard.data.meta;
-  cardOnDisk.included = sortBy(cardOnDisk.included, i => `${i.type}/${i.id}`);
-  articleCard.included = sortBy(articleCard.included, i => `${i.type}/${i.id}`);
-
-  expect(cardOnDisk).to.eql(articleCard, 'card on disk is correct');
+  delete internalArticleCard.data.meta;
+  expect(cardOnDisk.data).to.eql(internalArticleCard.data, 'card on disk is correct');
 
   let pkgJson = require(join(cardsDir, 'local-hub', 'article-card', 'package.json'));
   expect(pkgJson).to.eql({
@@ -156,7 +143,7 @@ function assertCardOnDisk() {
     let [ format, type ] = file.split('.');
     type = type === 'hbs' ? 'template' : type;
     let contents = readFileSync(join(cardsDir, 'local-hub', 'article-card', file), 'utf-8');
-    let fieldValue = articleCard.data.attributes[`${format}-${type}`].trim();
+    let fieldValue = internalArticleCard.data.attributes[`${format}-${type}`].trim();
     expect(contents).to.equal(fieldValue, `file contents are correct for ${file}`);
   });
 }
@@ -232,13 +219,14 @@ function assertCardSchema(card) {
   ]);
 }
 
-describe('card tests', function () {
+describe('hub/card-services', function () {
   let env, cardServices;
 
   afterEach(async function () {
     if (env) {
       await destroyDefaultEnvironment(env);
     }
+    cleanup();
   });
 
   describe("loads card", function() {
@@ -274,7 +262,7 @@ describe('card tests', function () {
       });
 
       it("will load a card implicitly when an indexer processes a card document", async function () {
-        changedCards.push(articleCard);
+        changedCards.push(internalArticleCard);
 
         await indexers.update();
 
@@ -293,7 +281,7 @@ describe('card tests', function () {
           .withAttributes({
             sourceType: 'stub-card-searcher',
             params: {
-              cardSearchResults: [articleCard]
+              cardSearchResults: [internalArticleCard]
             }
           });
 
@@ -348,17 +336,23 @@ describe('card tests', function () {
   });
 
   describe('writing cards', function() {
-    let writers;
+    let externalArticleCard;
     beforeEach(async function () {
       cleanup();
 
-      env = await createDefaultEnvironment(`${__dirname}/../../../tests/stub-card-searcher`);
+      env = await createDefaultEnvironment(`${__dirname}/../../../tests/stub-project`);
       cardServices = env.lookup('hub:card-services');
-      writers = env.lookup('hub:writers');
+      externalArticleCard = await adaptCardToFormat(await env.lookup('hub:current-schema').getSchema(), internalArticleCard, 'isolated');
+
+      // remove the card metadata to make this as real as possible...
+      for (let field of Object.keys(externalArticleCard.data.attributes)) {
+        if (cardBrowserAssetFields.includes(field)) { continue; }
+        delete externalArticleCard.data.attributes[field];
+      }
     });
 
     it('can add a new card', async function() {
-      let card = await writers.create(env.session, 'cards', articleCard);
+      let card = await cardServices.create(env.session, externalArticleCard);
 
       assertCardOnDisk();
       assertIsolatedCardMetadata(card);
@@ -388,7 +382,7 @@ describe('card tests', function () {
         .withAttributes({
           sourceType: 'stub-card-searcher',
           params: {
-            cardSearchResults: [articleCard]
+            cardSearchResults: [internalArticleCard]
           }
         });
 

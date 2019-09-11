@@ -126,7 +126,7 @@
         "--timeout",
         "200000",
         //  "--grep",
-        //  "reacts when a grant is updated"
+        //  "can create a new card"
       ]
     },
     {

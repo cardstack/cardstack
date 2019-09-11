@@ -166,7 +166,7 @@ class Searchers {
     }
   }
 
-  createDocumentContext({ schema, type, id, sourceId, generation, upstreamDoc, format, includePaths, included }) {
+  createDocumentContext({ schema, type, id, sourceId, generation, upstreamDoc, format, includePaths }) {
     return new DocumentContext({
       schema,
       type,
@@ -176,7 +176,6 @@ class Searchers {
       generation,
       upstreamDoc,
       includePaths,
-      included,
       routers: this._getRouters(),
       read: this._read(),
       search: this._search(Session.INTERNAL_PRIVILEGED)
@@ -192,7 +191,7 @@ class Searchers {
       } catch (err) {
         if (err.status !== 404) { throw err; }
       }
-      return document;
+      return document.data ? document : null;
     };
   }
 

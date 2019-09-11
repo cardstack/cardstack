@@ -9,10 +9,42 @@ const JSONAPIFactory = require('@cardstack/test-support/jsonapi-factory');
 const log = require('@cardstack/logger')('jsonapi-test');
 const defaults = require('superagent-defaults');
 const qs = require('qs');
+const { removeSync } = require('fs-extra');
+const { join } = require('path');
+const { tmpdir } = require('os');
+const { adaptCardToFormat } = require('@cardstack/test-support/card-utils');
+
+const cardsDir = join(tmpdir(), 'card_modules');
+let cardFactory = new JSONAPIFactory();
+// This is the internal representation of a card. Browser clients do not
+// encounter this form of a card. Look at the jsonapi tests and browser
+// tests for the structure of a card as it is known externally.
+let internalArticleCard = cardFactory.getDocumentFor(
+  cardFactory.addResource('local-hub::article-card::millenial-puppies', 'local-hub::article-card::millenial-puppies')
+    .withAttributes({
+      'local-hub::article-card::millenial-puppies::title': 'The Millenial Puppy',
+      'local-hub::article-card::millenial-puppies::body': `It can be difficult these days to deal with the discerning tastes of the millenial puppy.`
+    })
+    .withRelated('fields', [
+      cardFactory.addResource('fields', 'local-hub::article-card::millenial-puppies::title').withAttributes({
+        'is-metadata': true,
+        'needed-when-embedded': true,
+        'field-type': '@cardstack/core-types::string' //TODO rework for fields-as-cards
+      }),
+      cardFactory.addResource('fields', 'local-hub::article-card::millenial-puppies::body').withAttributes({
+        'is-metadata': true,
+        'field-type': '@cardstack/core-types::string'
+      }),
+    ])
+);
 
 describe('jsonapi/middleware', function() {
 
   let request, env, app;
+
+  function cleanup() {
+    removeSync(cardsDir);
+  }
 
   async function sharedSetup() {
     let factory = new JSONAPIFactory();
@@ -220,6 +252,7 @@ describe('jsonapi/middleware', function() {
   }
 
   async function sharedTeardown() {
+    cleanup();
     await destroyDefaultEnvironment(env);
   }
 
@@ -751,44 +784,6 @@ describe('jsonapi/middleware', function() {
       expect(response.body.data.relationships['featured-article'].data.type).to.equal("articles");
     });
 
-    it('can create a new card', async function() {
-      let factory = new JSONAPIFactory();
-      let card = factory.getDocumentFor(
-        factory.addResource('cards', 'local-hub::article-card::millenial-puppies')
-          .withRelated('fields', [
-            factory.addResource('fields', 'local-hub::article-card::millenial-puppies::title').withAttributes({
-              'is-metadata': true,
-              'field-type': '@cardstack/core-types::string'
-            }),
-            factory.addResource('fields', 'local-hub::article-card::millenial-puppies::body').withAttributes({
-              'is-metadata': true,
-              'field-type': '@cardstack/core-types::string'
-            }),
-          ])
-          .withRelated('model', factory.addResource('local-hub::article-card::millenial-puppies', 'local-hub::article-card::millenial-puppies')
-            .withAttributes({
-              // TODO we need to address the issue where were are including "::" characters in the field names
-              // for attributes and relationships as this is technically invalid JSON:API. I think
-              // we'll probably want to address this issue in the jsonapi package.
-              'local-hub::article-card::millenial-puppies::title': 'The Millenial Puppy',
-              'local-hub::article-card::millenial-puppies::body': 'It can be difficult these days to deal with the discerning tastes of the millenial puppy.'
-            })
-          )
-      );
-      let response = await request.post('/api/cards').send(card);
-      expect(response).hasStatus(201);
-      expect(response).has.deep.property('body.data.attributes.title', 'The Millenial Puppy');
-      expect(response).has.deep.property('body.data.attributes.body', 'It can be difficult these days to deal with the discerning tastes of the millenial puppy.');
-
-      response = await request.get('/api/cards/local-hub::article-card::millenial-puppies');
-      expect(response).hasStatus(200);
-      expect(response).has.deep.property('body.data.attributes.title', 'The Millenial Puppy');
-      expect(response).has.deep.property('body.data.attributes.body', 'It can be difficult these days to deal with the discerning tastes of the millenial puppy.');
-    });
-
-    it.skip('can update a card', async function() {
-    });
-
     it('can update an existing resource', async function() {
       let version = await currentVersion(request, '/api/articles/0');
 
@@ -925,6 +920,83 @@ describe('jsonapi/middleware', function() {
     });
 
   });
+
+  describe('non-mutating card tests', function() {
+    beforeEach(async function() {
+      cleanup();
+      let factory = new JSONAPIFactory();
+      factory.addResource('data-sources', 'stub-card-searcher')
+        .withAttributes({
+          sourceType: 'stub-card-searcher',
+          params: {
+            cardSearchResults: [internalArticleCard]
+          }
+        });
+
+      app = new Koa();
+      env = await createDefaultEnvironment(`${__dirname}/../../../tests/stub-card-searcher`, factory.getModels());
+      app.use(async function (ctxt, next) {
+        await next();
+        log.info('%s %s %s', ctxt.request.method, ctxt.request.originalUrl, ctxt.response.status);
+      });
+      app.use(env.lookup('hub:middleware-stack').middleware());
+      request = defaults(supertest(app.callback()));
+      request.set('Accept', 'application/vnd.api+json');
+    });
+
+    afterEach(sharedTeardown);
+
+    it("has card metadata for isolated format", async function () {
+      let response = await request.get('/api/cards/local-hub::article-card::millenial-puppies?format=isolated');
+      expect(response).hasStatus(200);
+      assertIsolatedCardMetadata(response.body);
+    });
+
+    it("has card metadata for embedded format", async function () {
+      let response = await request.get('/api/cards/local-hub::article-card::millenial-puppies?format=embedded');
+      expect(response).hasStatus(200);
+      assertEmbeddedCardMetadata(response.body);
+    });
+
+    it("when no format is specifed, the default format is 'embedded'", async function () {
+      let response = await request.get('/api/cards/local-hub::article-card::millenial-puppies');
+      expect(response).hasStatus(200);
+      assertEmbeddedCardMetadata(response.body);
+    });
+  });
+
+  describe('mutating card tests', async function() {
+    let schema;
+
+    beforeEach(async function() {
+      app = new Koa();
+      env = await createDefaultEnvironment(__dirname + '/../');
+      app.use(async function (ctxt, next) {
+        await next();
+        log.info('%s %s %s', ctxt.request.method, ctxt.request.originalUrl, ctxt.response.status);
+      });
+      app.use(env.lookup('hub:middleware-stack').middleware());
+      request = defaults(supertest(app.callback()));
+      request.set('Accept', 'application/vnd.api+json');
+      schema = await env.lookup('hub:current-schema').getSchema();
+    });
+
+    afterEach(sharedTeardown);
+
+    it('can create a new card', async function() {
+      let card = await adaptCardToFormat(schema, internalArticleCard, 'isolated');
+      let response = await request.post('/api/cards').send(card);
+      expect(response).hasStatus(201);
+      assertIsolatedCardMetadata(response.body);
+
+      response = await request.get('/api/cards/local-hub::article-card::millenial-puppies?format=isolated');
+      expect(response).hasStatus(200);
+      assertIsolatedCardMetadata(response.body);
+    });
+
+    it.skip('can update a card', async function() {
+    });
+  });
 });
 
 function makeRelativeLink(response, url) {
@@ -934,4 +1006,17 @@ function makeRelativeLink(response, url) {
     throw new Error(`expected ${url} to have origin ${origin}`);
   }
   return url.replace(origin, '');
+}
+
+function assertIsolatedCardMetadata(card) {
+  let { data } = card;
+  expect(data.attributes.title).to.equal('The Millenial Puppy');
+  expect(data.attributes.body).to.match(/discerning tastes of the millenial puppy/);
+}
+
+function assertEmbeddedCardMetadata(card) {
+  let { data } = card;
+
+  expect(data.attributes.title).to.equal('The Millenial Puppy');
+  expect(data.attributes.body).to.be.undefined;
 }
