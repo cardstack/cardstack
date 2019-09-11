@@ -12,7 +12,11 @@ module.exports = function(defaults) {
     vendorFiles: { 'jquery.js': null, 'app-shims.js': null },
 
     // our dummy app always uses faker, even in production
-    'ember-faker': { enabled: true }
+    'ember-faker': { enabled: true },
+
+    fingerprint: {
+      extensions: ['js', 'css', 'map']
+    }
 
     // Add options here
   });
