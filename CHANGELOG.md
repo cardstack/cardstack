@@ -9,8 +9,6 @@ and features, and is not intended to be an exhaustive list.
 
 ## [v0.14.22] - 2019-08-15
 
-`yarn upgrade-interactive --exact 0.14.22 --scope @cardstack`
-
 When upgrading, `@cardstack/eslint-config/browser` should become `@cardstack/eslint-config/ember-addon`
 throughout a project. Then, `babel-eslint` should be added as a peer dependency in the top level 
 `package.json` with `yarn add -D -W babel-eslint`
