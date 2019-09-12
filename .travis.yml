@@ -54,7 +54,6 @@ jobs:
       name: "Deploy"
       if: (branch = master or tag is present) and type = push
       script:
-       - echo $DEPLOY_KEY > $HOME/.ssh/id_rsa
        - node_modules/.bin/ember deploy production --verbose
 
 script:
