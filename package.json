@@ -39,7 +39,7 @@
     "ember-cli-dependency-checker": "^3.1.0",
     "ember-cli-deploy": "^1.0.2",
     "ember-cli-deploy-build": "^2.0.0",
-    "ember-cli-deploy-git": "git+https://github.com/ef4/ember-cli-deploy-git#6f9f16786baebd5fd740a28affe29a82a746a75e",
+    "ember-cli-deploy-git": "git+https://github.com/ef4/ember-cli-deploy-git#f6cecfa3f63d7a4bee4165bf3167cfd741bad557",
     "ember-cli-eslint": "^5.1.0",
     "ember-cli-inject-live-reload": "^1.8.2",
     "ember-cli-mirage": "^1.1.0",
