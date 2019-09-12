@@ -54,6 +54,7 @@ jobs:
       name: "Deploy"
       if: (branch = master or tag is present) and type = push
       script:
+       - git fetch # travis's initial clone doesn't necessarily grab our gh-pages branch
        - node_modules/.bin/ember deploy production --verbose
 
 script:
