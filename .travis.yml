@@ -63,6 +63,7 @@ jobs:
        # switch from HTTP to SSH and load our deploy key
        - git remote set-url origin git@github.com:cardstack/boxel
        - cat <<< "$DEPLOY_KEY" > ~/.ssh/boxel_key
+       - chmod 600 ~/.ssh/boxel_key
        - ssh-add ~/.ssh/boxel_key
        - node_modules/.bin/ember deploy production --verbose
 
