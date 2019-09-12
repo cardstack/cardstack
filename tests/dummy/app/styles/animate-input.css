@@ -1,0 +1,73 @@
+.animate-input-page {
+  box-sizing: border-box;
+  height: 100%;
+  min-height: 100vh;
+  margin: 0 auto;
+  padding: 60px 20px;
+  background-color: var(--catalog-light-purple);
+}
+
+.animate-input-card {
+  box-sizing: border-box;
+  width: 400px;
+  padding: 0;
+  border: solid 2px var(--catalog-dark-purple);
+  color: black;
+  text-align: left;
+  margin: auto;
+  position: relative;
+}
+
+.animate-input-card-header {
+  background-color: var(--catalog-dark-purple);
+  position: relative;
+  height: 60px;
+  box-sizing: border-box;
+  padding: 20px;
+}
+
+.header-title {
+  font-size: 16px;
+  font-weight: bold;
+  color: white;
+}
+
+
+.animate-input-card-content {
+  padding: 20px;
+  background-color: var(--catalog-light-gray);
+}
+
+
+.animate-input-card-text-field {
+  height: 100px;
+  text-align: center;
+}
+
+.animate-input-card-text-area {
+  height: 200px;
+}
+
+.animate-input-card-title {
+  font-size: 28px;
+  line-height: 36px;
+  text-align: center;
+}
+
+.animate-input-card-description {
+  font-size: 22px;
+  line-height: 30px;
+  text-align: center;
+}
+
+.animate-input-card-body {
+  font-size: 16px;
+  line-height: 22px;
+}
+
+.btn-edit-toggle {
+  position: absolute;
+  top: 10px;
+  right: 20px;
+  width: 80px;
+}

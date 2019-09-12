@@ -1,0 +1,33 @@
+<div class="animate-input-page">
+  <div class="animate-input-card {{model.mode}} card-{{model.id}}">
+    <header class="animate-input-card-header {{model.mode}}">
+      <AnimatedContainer class="header-container">
+        {{#animated-if (eq model.mode "view") group="header-name" use=fade}}
+          <div class="header-title">View Card</div>
+        {{else}}
+          <div class="header-title">Edit Card</div>
+        {{/animated-if}}
+      </AnimatedContainer>
+      <button class="btn-edit-toggle" {{action "setMode" (if (eq model.mode "view") "edit" "view")}}>{{if (eq model.mode "view") "Edit" "View"}}</button>
+    </header>
+    <AnimatedContainer class="body-container">
+      {{#animated-value model watch="mode" use=this.bodyTransition}}
+        <div class="animate-input-card-content {{model.mode}}">
+          <AnimatedContainer class="body-container">
+            <div class="animate-input-card-field animate-input-card-text-field">
+              <EditableField @value={{model.title}} @fieldName="title" @label="Title" @mode={{model.mode}} @transition={{this.transition}}/>
+            </div>
+            {{!-- <div class="animate-input-card-field animate-input-card-text-field">
+              <EditableField @value={{model.description}} @fieldName="description" @label="Description"
+                @mode={{model.mode}} />
+            </div>
+            <div class="animate-input-card-field animate-input-card-text-area">
+              <EditableField @value={{model.body}} @fieldName="body" @label="Body" @mode={{model.mode}}
+                @componentName="text-area" />
+            </div> --}}
+          </AnimatedContainer>
+        </div>
+      {{/animated-value}}
+    </AnimatedContainer>
+  </div>
+</div>

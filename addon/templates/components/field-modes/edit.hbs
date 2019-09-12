@@ -1,0 +1,11 @@
+{{#if @componentName}}
+  {{component componentName value=value label=label required=true }}
+{{else}}
+  <TextField @value={{@value}} @label={{@label}} @required={{true}}>
+    {{#animated-beacon name=(concat "input-text-" @fieldName)}}
+      <div class="demo-card-{{@fieldName}} field-beacon">
+        {{@value}}
+      </div>
+    {{/animated-beacon}}
+  </TextField>
+{{/if}}
