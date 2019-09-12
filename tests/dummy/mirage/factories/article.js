@@ -24,6 +24,10 @@ export default class ArticleFactory extends Factory  {
     return faker.image.imageUrl(640, 480, imageTypes[Math.floor(Math.random()*imageTypes.length)], true, true);
   }
 
+  mode() {
+    return 'view';
+  }
+
   afterCreate(article, server) {
     if (!article.author) {
       article.update({

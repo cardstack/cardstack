@@ -1,0 +1,43 @@
+<AnimatedContainer class="tray-container">
+  {{#animated-value model watch="mode" use=this.trayTransition}}
+    <div class="edit-demo-page {{model.mode}}">
+      <AnimatedContainer class="card-container">
+        {{#animated-value model watch="mode" use=this.cardTransition}}
+          <div class="demo-card {{model.mode}} card-{{model.id}}">
+            <AnimatedContainer class="header-container">
+              {{#animated-value model watch="mode" use=this.headerTransition}}
+                <header class="demo-card-header {{model.mode}}">
+                  {{#animated-if (eq model.mode "view") group="header-name" use=fade}}
+                    <div class="header-title">View Card</div>
+                  {{else}}
+                    <div class="header-title">Edit Card</div>
+                  {{/animated-if}}
+                  <button class="btn-edit-toggle" {{action "setMode" (if (eq model.mode "view") "edit" "view")}}>{{if (eq model.mode "view") "Edit" "View"}}</button>
+                </header>
+              {{/animated-value}}
+            </AnimatedContainer>
+            <AnimatedContainer class="body-container">
+              {{#animated-value model watch="mode" use=this.bodyTransition}}
+                <div class="demo-card-content {{model.mode}}">
+                  <AnimatedContainer class="body-container">
+                    <div class="demo-card-field demo-card-text-field">
+                      <EditableField @value={{model.title}} @fieldName="title" @label="Title" @mode={{model.mode}} />
+                    </div>
+                    <div class="demo-card-field demo-card-text-field">
+                      <EditableField @value={{model.description}} @fieldName="description" @label="Description"
+                        @mode={{model.mode}} />
+                    </div>
+                    <div class="demo-card-field demo-card-text-area">
+                      <EditableField @value={{model.body}} @fieldName="body" @label="Body" @mode={{model.mode}}
+                        @componentName="text-area" />
+                    </div>
+                  </AnimatedContainer>
+                </div>
+              {{/animated-value}}
+            </AnimatedContainer>
+          </div>
+        {{/animated-value}}
+      </AnimatedContainer>
+    </div>
+  {{/animated-value}}
+</AnimatedContainer>

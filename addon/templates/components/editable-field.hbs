@@ -1,0 +1,11 @@
+{{#animated-if (eq @mode "edit") group="field-{{@fieldName}}" use=fade}}
+  {{#if @componentName}}
+    {{component componentName value=value label=label required=true }}
+  {{else}}
+    <TextField @value={{@value}} @label={{@label}} @required={{true}} />
+  {{/if}}
+{{else}}
+  <div class="demo-card-{{@fieldName}}">
+    {{@value}}
+  </div>
+{{/animated-if}}

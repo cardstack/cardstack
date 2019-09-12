@@ -8,4 +8,5 @@ export default class Article extends Model {
   @belongsTo('person') author;
   @attr('date') publishedDate;
   @attr() imageUrl;
+  @attr() mode;
 }
