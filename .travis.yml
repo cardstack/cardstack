@@ -59,6 +59,7 @@ jobs:
       # with the gh-pages branch.
        - git config --replace-all "remote.origin.fetch" "+refs/heads/*:refs/remotes/origin/*"
        - git fetch
+       - git branch --track gh-pages origin/gh-pages
        - node_modules/.bin/ember deploy production --verbose
 
 script:
