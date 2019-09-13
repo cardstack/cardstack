@@ -84,7 +84,7 @@ class Writers {
       let newSchema = await schema.validate(pending, { type, session });
       schema = newSchema || schema;
 
-      if (isCard(type, documentOrStream.data.id)) {
+      if (!isBinary && isCard(type, documentOrStream.data.id)) {
         // This assumes that the session used to create cards also posseses permissions to create schema models and internal card models
         for (let resource of documentOrStream.included || []) {
           await this.handleCreate(false, session, resource.type, {

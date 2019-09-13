@@ -44,11 +44,11 @@ const cardBrowserAssetFields = [
   'embedded-css',
 ];
 
-function cardContextFromId(id: string) {
+function cardContextFromId(id: string | number) {
   let noContext: CardContext = {};
   if (id == null) { return noContext; }
 
-  let idSplit = id.split(cardIdDelim);
+  let idSplit = String(id).split(cardIdDelim);
   if (idSplit.length < 2) { return noContext; }
 
   let [repository, packageName, cardId, modelId] = idSplit;
@@ -275,7 +275,6 @@ function deriveCardModelContentType(card: SingleResourceDoc) {
   let modelContentType: ResourceObject = {
     id,
     type: 'content-types',
-    id: cardContextToId({ repository, packageName, cardId }),
     attributes: { 'default-includes': defaultIncludes },
     relationships: { fields }
   };
