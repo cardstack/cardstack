@@ -225,47 +225,28 @@ function deriveCardModelContentType(card: SingleResourceDoc) {
       get(card, 'data.relationships.fields.data') || []
     )
   };
+
+  // not checking field-type, as that precludes using computed relationships for meta
+  // which should be allowed. this will result in adding attr fields here, but that should be harmless
+  let defaultIncludes = [
+    'fields',
+    'fields.related-types',
+    'fields.constraints',
+  ].concat((get(card, 'data.relationships.fields.data') || [])
+    .map((i: ResourceIdentifierObject) => i.id));
+
   let modelContentType: ResourceObject = {
     type: 'content-types',
     id: cardContextToId({ repository, packageName, cardId }),
-    attributes: {
-      'default-includes': [
-        'fields',
-        'fields.related-types',
-        'fields.constraints',
-      ]
-    },
+    attributes: { 'default-includes': defaultIncludes },
     relationships: { fields }
   };
   return modelContentType;
 }
 
-function getCardIncludePaths(schema: todo, card: SingleResourceDoc, format: string) {
-  let includePaths: string[] = [
-    'fields',
-    'fields.related-types',
-    'fields.constraints',
-  ];
-
-  for (let { id: fieldId } of (get(card, 'data.relationships.fields.data') || [])) {
-    let field = schema.getRealAndComputedField(fieldId);
-    if (!field) { continue; }
-
-    // TODO if field is a card relation (we should have "related-cards" in the future)
-    // when we'll need to recursively look up the embedded fields for the related card and
-    // make sure that is included in our resulting array of include paths
-    if (formatHasField(field, format)) {
-      // not checking field-type, as that precludes using computed relationships for meta
-      // which should be allowed. this will result in adding attr fields here, but that should be harmless
-      includePaths.push(`${fieldId}`);
-    }
-  }
-  return includePaths;
-}
-
 async function adaptCardCollectionToFormat(schema: todo, collection: CollectionResourceDoc, format: string) {
-  let included = collection.included || [];
-  let data = [];
+  let included: ResourceObject[] = [];
+  let data: ResourceObject[] = [];
   for (let resource of collection.data) {
     if (!isCard(resource.type, resource.id)) {
       data.push(resource);
@@ -377,7 +358,6 @@ export = {
   isCard,
   loadCard,
   generateInternalCardFormat,
-  getCardIncludePaths,
   adaptCardToFormat,
   adaptCardCollectionToFormat,
 }
