@@ -1,11 +1,9 @@
-{{#animated-if (eq @mode "edit") group="field-{{@fieldName}}" use=fade}}
-  {{#if @componentName}}
-    {{component componentName value=value label=label required=true }}
-  {{else}}
-    <TextField @value={{@value}} @label={{@label}} @required={{true}} />
-  {{/if}}
-{{else}}
-  <div class="demo-card-{{@fieldName}}">
-    {{@value}}
-  </div>
-{{/animated-if}}
+{{#animated-value @mode initialInsertion=true finalRemoval=true use=this.defaultTransition as |mode|}}
+  {{component
+      (concat "field-modes/" this.mode)
+      componentName=componentName
+      fieldName=fieldName
+      value=value
+      label=label
+  }}
+{{/animated-value}}
