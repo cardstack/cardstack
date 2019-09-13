@@ -25,39 +25,6 @@ const models = [
   },
   {
     type: 'content-types',
-    id: 'cards',
-    attributes: {
-      'is-built-in': true,
-      'default-includes': [
-        'fields',
-        'fields.related-types',
-        'fields.constraints',
-        'model',
-      ]
-    },
-    relationships: {
-      fields: {
-        data: [
-          { type: 'fields', id: 'isolated-template' },
-          { type: 'fields', id: 'embedded-template' },
-          { type: 'fields', id: 'isolated-js' },
-          { type: 'fields', id: 'embedded-js' },
-          { type: 'fields', id: 'isolated-css' },
-          { type: 'fields', id: 'embedded-css' },
-          // This relationship is used to define the metadata fields that the card contains,
-          // internal fields can be defined on the model's content type.
-          // maybe 'metadata' is a better name for this relationship,
-          // so we dont conflate this with the content-type's 'fields' relationship?
-          { type: 'fields', id: 'fields' },
-          { type: 'fields', id: 'model' },
-
-          // TODO add 'adopts' and 'implments' relationships
-        ]
-      }
-    }
-  },
-  {
-    type: 'content-types',
     id: 'fields',
     attributes: {
       'is-built-in': true

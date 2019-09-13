@@ -1,11 +1,11 @@
-<h1>Load Card</h1>
+<h2>Render Card</h2>
 
 <div>
   Card name:
   <Input @value={{this.cardName}} />
 </div>
 <div>
-  Format:
+  Render Format:
   <Input @value={{this.format}} />
 </div>
 <div>
@@ -13,7 +13,7 @@
 </div>
 
 {{#if this.errorMsg}}
-  Error loading card {{this.cardName}}: {{this.errorMsg}}
+  Error rendering card {{this.cardName}}: {{this.errorMsg}}
 {{/if}}
 
 {{! eslint is confused about indentation for else-if }}

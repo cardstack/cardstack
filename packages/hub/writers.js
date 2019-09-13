@@ -2,6 +2,12 @@ const Error = require('@cardstack/plugin-utils/error');
 const log = require('@cardstack/logger')('cardstack/writers');
 const { get } = require('lodash');
 const { declareInjections } = require('@cardstack/di');
+const {
+  isCard,
+  loadCard,
+  adaptCardToFormat,
+  generateInternalCardFormat
+} = require('./indexing/card-utils');
 
 module.exports = declareInjections({
   currentSchema: 'hub:current-schema',
@@ -38,10 +44,36 @@ class Writers {
 
   }
 
-  async handleCreate(isBinary, session, type, documentOrStream) {
+  async _handleCreateForCard(session, card) {
+    let id = card.data.id;
+    if (!id) { throw new Error(`The card ID must be supplied in the card document in order to create the card.`); }
+
+    let internalCard = generateInternalCardFormat(card);
+    let schema = await loadCard(await this.currentSchema.getSchema(), internalCard);
+    schema = await (await this.currentSchema.getSchema()).applyChanges(schema.map(document => ({ id: document.id, type: document.type, document })));
+
+    for (let resource of (internalCard.included || [])) {
+      // This assumes that the session used to create cards also posseses permissions to create schema models and internal card models
+      await this.handleCreate(false, session, resource.type, {
+        data: resource,
+        included: [ internalCard.data ].concat(internalCard.included || [])
+      }, schema);
+    }
+
+    return { schema, card: internalCard };
+  }
+
+  async handleCreate(isBinary, session, type, documentOrStream, schema) {
     await this.pgSearchClient.ensureDatabaseSetup();
 
-    let schema = await this.currentSchema.getSchema();
+    schema = schema || await this.currentSchema.getSchema();
+    if (type === 'cards') {
+      let internalCardAndSchema = await this._handleCreateForCard(session, documentOrStream);
+      schema = internalCardAndSchema.schema;
+      documentOrStream = internalCardAndSchema.card;
+      type = documentOrStream.data.type;
+    }
+
     let { writer, sourceId } = this._getSchemaDetailsForType(schema, type);
 
     let pending;
@@ -63,25 +95,32 @@ class Writers {
         isSchema
       );
       let { originalDocument, finalDocument, finalizer, aborter } = opts;
-      pending = await this.createPendingChange({ originalDocument, finalDocument, finalizer, aborter, opts});
+      pending = await this.createPendingChange({ originalDocument, finalDocument, finalizer, aborter, schema, opts});
     }
 
     let context;
     try {
       let newSchema = await schema.validate(pending, { type, session });
-      context = await this._finalize(pending, type, newSchema || schema, sourceId);
+      schema = newSchema || schema;
+      context = await this._finalize(pending, type, schema, sourceId);
+
+      let batch = this.pgSearchClient.beginBatch(schema, this.searchers);
+      await batch.saveDocument(context);
+      await batch.done();
+
       if (newSchema) {
         this.currentSchema.invalidateCache();
       }
-
-      let batch = this.pgSearchClient.beginBatch(this.currentSchema, this.searchers);
-      await batch.saveDocument(context);
-      await batch.done();
     } finally {
       if (pending) { await pending.abort();  }
     }
 
-    return await context.applyReadAuthorization({ session });
+    let document = await context.applyReadAuthorization({ session });
+    if (isCard(document.data.type, document.data.id)) {
+      return await adaptCardToFormat(schema, document, 'isolated');
+    } else {
+      return document;
+    }
   }
 
   async update(session, type, id, document) {
@@ -106,16 +145,20 @@ class Writers {
     let { originalDocument, finalDocument, finalizer, aborter } = opts;
     let pending = await this.createPendingChange({ originalDocument, finalDocument, finalizer, aborter, opts });
     let context;
+
+    // TODO make sure to use the schema from the pending's document context to pick up discovered card schema
     try {
       let newSchema = await schema.validate(pending, { type, id, session });
-      context = await this._finalize(pending, type, newSchema || schema, sourceId);
+      schema = newSchema || schema;
+      context = await this._finalize(pending, type, schema, sourceId);
+
+      let batch = this.pgSearchClient.beginBatch(schema, this.searchers);
+      await batch.saveDocument(context);
+      await batch.done();
+
       if (newSchema) {
         this.currentSchema.invalidateCache();
       }
-
-      let batch = this.pgSearchClient.beginBatch(this.currentSchema, this.searchers);
-      await batch.saveDocument(context);
-      await batch.done();
     } finally {
       if (pending) { await pending.abort();  }
     }
@@ -141,7 +184,7 @@ class Writers {
         this.currentSchema.invalidateCache();
       }
 
-      let batch = this.pgSearchClient.beginBatch(this.currentSchema, this.searchers);
+      let batch = this.pgSearchClient.beginBatch(await this.currentSchema.getSchema(), this.searchers);
       await batch.deleteDocument(context);
       await batch.done();
     } finally {
@@ -149,8 +192,8 @@ class Writers {
     }
   }
 
-  async createPendingChange({ originalDocument, finalDocument, finalizer, aborter, opts }) {
-    let schema = await this.currentSchema.getSchema();
+  async createPendingChange({ originalDocument, finalDocument, finalizer, aborter, schema, opts }) {
+    schema = schema || await this.currentSchema.getSchema();
     let type = originalDocument ? originalDocument.type : finalDocument.type;
     let contentType = schema.getType(type);
     let sourceId;
@@ -254,7 +297,7 @@ class PendingChange {
     searchers,
     sourceId,
     schema,
-    opts
+    opts={}
   }) {
     if (!searchers || !schema) {
       throw new Error(`PendingChange requires 'searchers' and 'schema' arguments.`);
@@ -273,7 +316,7 @@ class PendingChange {
           schema,
           sourceId,
           id: originalDocument.id,
-          upstreamDoc: originalDocument ? { data: originalDocument } : null
+          upstreamDoc: originalDocument ? { data: originalDocument } : null,
         });
       }
       if (finalDocument) {
@@ -282,12 +325,12 @@ class PendingChange {
           schema,
           sourceId,
           id: finalDocument.id,
-          upstreamDoc: finalDocument ? { data: finalDocument } : null
+          upstreamDoc: finalDocument ? { data: finalDocument } : null,
         });
       }
     }
 
-    for (let prop of Object.keys(opts || {})) {
+    for (let prop of Object.keys(opts)) {
       if (this[prop] != null) { continue; }
       this[prop] = opts[prop];
     }

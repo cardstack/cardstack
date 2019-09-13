@@ -1,0 +1,26 @@
+<h2>Add Card:</h2>
+<p>
+  <em><code>HUB_ENVIRONMENT=test</code> environment variable must be set on the hub instance in order to provide session that allows this test to write to the hub.</em>
+</p>
+
+[[TODO add controls to set card package name and card id]]<br>
+[[TODO add controls to add/remove metadata fields...]]<br>
+
+{{#if this.statusMsg}}
+  <div><strong>{{this.statusMsg}}</strong></div>
+{{/if}}
+
+<div>
+  <button {{on "click" this.create}}>Add Card</button>
+</div>
+<br>
+
+<IvyCodemirror
+  @value={{this.card}}
+  @valueUpdated={{action (mut this.card)}}
+  @options={{hash
+    lineNumbers=true
+    mode="javascript"
+  }}
+>
+</IvyCodemirror>

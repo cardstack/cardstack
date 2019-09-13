@@ -15,7 +15,6 @@ module.exports = class SourcesUpdate {
     this.currentSchema = owner.lookup('hub:current-schema');
     this.schemaModels = [];
     this._schema = null;
-    this._batch = client.beginBatch(this.currentSchema, this.searchers);
   }
 
   async addDataSource(dataSource) {
@@ -69,6 +68,7 @@ module.exports = class SourcesUpdate {
 
   async update(forceRefresh, hints) {
     await this.client.accomodateSchema(await this.schema());
+    this._batch = this.client.beginBatch(await this.schema(), this.searchers);
     await this._updateContent(hints);
   }
 

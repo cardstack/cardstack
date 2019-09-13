@@ -24,6 +24,7 @@ export default class CardLoader extends Component {
     } catch (e) {
       console.error(e); // eslint-disable-line no-console
       this.errorMsg = e.message;
+      return;
     }
     this.loadedCard = this.cardName;
   }) loadCard;

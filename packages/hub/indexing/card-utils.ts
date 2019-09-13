@@ -1,7 +1,15 @@
 import Error from '@cardstack/plugin-utils/error';
 import { todo } from '@cardstack/plugin-utils/todo-any';
-import { SingleResourceDoc, ResourceObject, ResourceIdentifierObject, CollectionResourceDoc } from "jsonapi-typescript";
-import { get, uniqBy, isEqual, sortBy } from 'lodash';
+import {
+  SingleResourceDoc,
+  ResourceObject,
+  ResourceIdentifierObject,
+  CollectionResourceDoc,
+  AttributesObject,
+  RelationshipsObject,
+  RelationshipsWithData
+} from "jsonapi-typescript";
+import { set, get, uniqBy, isEqual, sortBy } from 'lodash';
 import logger from '@cardstack/logger';
 import { join } from "path";
 import { tmpdir } from 'os';
@@ -54,34 +62,82 @@ function cardContextToId({ repository, packageName, cardId, modelId }: CardConte
   return [repository, packageName, cardId, modelId].filter(i => i != null).join(cardIdDelim);
 }
 
+function isCard(type: string = '', id: string = '') {
+  return id && type === id && id.split(cardIdDelim).length > 2;
+}
+
 async function loadCard(schema: todo, card: SingleResourceDoc) {
+  if (!card || !card.data || !card.data.id) { return; }
+
   await generateCardModule(card);
   return getCardSchemas(schema, card);
 }
 
+function generateInternalCardFormat(card: SingleResourceDoc) {
+  let id = card.data.id as string;
+  if (!id) { throw new Error(`The card ID must be supplied in the card document in order to create the card.`); }
+
+  let model: ResourceObject | undefined = (card.included || []).find(i => `${i.type}/${i.id}` === `${id}/${id}`);
+  if (!model) { throw new Error(`The card document 'cards/${id}' is missing its card model '${id}/${id}'.`); }
+
+  let fields: ResourceIdentifierObject[]  = get(card, 'data.relationships.fields.data') || [];
+  set(model, 'relationships.fields.data', fields);
+  for (let field of cardBrowserAssetFields) {
+    let value = get(card, `data.attributes.${field}`) as string;
+    if (!value) { continue; }
+    set(model, `attributes.${field}`, value);
+  }
+
+  let nonModelCardResources = (card.included || [])
+    .filter(i => model &&
+      `${i.type}/${i.id}` !== `${model.type}/${model.id}` &&
+      (i.id || '').includes(id));
+
+  return { data: model, included: nonModelCardResources };
+}
+
+// TODO it's possible for cards originating from the same package to have different templates/components
+// as a specific card instance could have its schema altered. need to think through how we would represent
+// cards that have different components/templates but originate from the same package, or cards
+// from the same package but different repositories that have been altered between the different repos.
+// Ideally we can leverage the "card adoption" to make simplifying assumptions around cards that share
+// similar components/templates, but will also need to be flexible enough to disambiguate cards that have
+// differing components/templates that originate from the same package.
 async function generateCardModule(card: SingleResourceDoc) {
-  if (!card.data.id) { return; }
+  if (!card || !card.data || !card.data.id) { return; }
 
   let { repository, packageName } = cardContextFromId(card.data.id);
   if (!repository || !packageName) { return; }
 
-  let bareCard: SingleResourceDoc = removeCardMetadata(card);
+  let cleanCard: SingleResourceDoc = {
+    data: { ...card.data },
+    included: sortBy(card.included, i => `${i.type}/${i.id}`)
+  };
+  delete cleanCard.data.meta;
   let cardFolder: string = join(cardsDir, repository, packageName);
   let cardFile: string = join(cardFolder, cardFileName);
   ensureDirSync(cardFolder);
 
   if (pathExistsSync(cardFile)) {
     let cardOnDisk: SingleResourceDoc = (await import(cardFile)).default;
-    if (cardOnDisk.included) {
-      cardOnDisk.included = sortBy(cardOnDisk.included, i => `${i.type}/${i.id}`);
+    // cleanup default value field artifacts
+    for (let field of Object.keys(cardOnDisk.data.attributes || {})) {
+      if (cardOnDisk.data.attributes && cardOnDisk.data.attributes[field] == null) {
+        delete cardOnDisk.data.attributes[field];
+      }
     }
-    if (isEqual(bareCard, cardOnDisk)) { return; }
+    for (let field of Object.keys(cleanCard.data.attributes || {})) {
+      if (cleanCard.data.attributes && cleanCard.data.attributes[field] == null) {
+        delete cleanCard.data.attributes[field];
+      }
+    }
+    if (isEqual(cleanCard.data, cardOnDisk.data)) { return; }
   }
 
   log.info(`generating on-disk card artifacts for cards/${card.data.id} in ${cardFolder}`);
 
-  createPkgFile(bareCard, cardFolder);
-  createBrowserAssets(bareCard, cardFolder);
+  createPkgFile(cleanCard, cardFolder);
+  createBrowserAssets(cleanCard, cardFolder);
 
   // TODO link peer deps and create entry points.
   // I'm punting on this for now, as custom card components are not a
@@ -98,35 +154,10 @@ async function generateCardModule(card: SingleResourceDoc) {
   // node_modules folder).
 
   // TODO in the future `yarn install` this package
-  writeFileSync(cardFile, `module.exports = ${JSON.stringify(bareCard, null, 2)};`, 'utf8');
+  writeFileSync(cardFile, `module.exports = ${JSON.stringify(cleanCard, null, 2)};`, 'utf8');
 
   // TODO in the future we should await until webpack finishes compiling
   // the browser assets however we determine to manage that...
-}
-
-function removeCardMetadata(card: SingleResourceDoc) {
-  let bareCard: SingleResourceDoc = {
-    data: {
-      type: card.data.type,
-      id: card.data.id,
-      attributes: Object.assign({}, card.data.attributes),
-      relationships: Object.assign({}, card.data.relationships)
-    },
-    included: (card.included || []).concat([])
-  };
-  bareCard.included = sortBy(bareCard.included, i => `${i.type}/${i.id}`);
-
-  for (let field of Object.keys(bareCard.data.attributes || {})) {
-    if (!cardBrowserAssetFields.includes(field) && bareCard.data.attributes) {
-      delete bareCard.data.attributes[field];
-    }
-  }
-  for (let field of Object.keys(bareCard.data.relationships || {})) {
-    if (!['fields', 'model'].includes(field) && bareCard.data.relationships) {
-      delete bareCard.data.relationships[field];
-    }
-  }
-  return bareCard;
 }
 
 function createBrowserAssets(card: SingleResourceDoc, cardFolder: string) {
@@ -174,7 +205,7 @@ function getCardSchemas(schema: todo, card: SingleResourceDoc) {
   let schemaModels: ResourceObject[] = [];
 
   for (let resource of (card.included || [])) {
-    if (resource.type === 'cards' || !schema.isSchemaType(resource.type)) { continue; }
+    if (!schema.isSchemaType(resource.type)) { continue; }
     schemaModels.push(resource);
   }
   let cardModelSchema = deriveCardModelContentType(card);
@@ -187,13 +218,24 @@ function getCardSchemas(schema: todo, card: SingleResourceDoc) {
 function deriveCardModelContentType(card: SingleResourceDoc) {
   if (!card.data.id) { return; }
 
-  let { repository, packageName } = cardContextFromId(card.data.id);
+  let { repository, packageName, cardId } = cardContextFromId(card.data.id);
+  let fields: RelationshipsWithData = {
+    data: [{ type: 'fields', id: 'fields' }].concat(
+      cardBrowserAssetFields.map(i => ({ type: 'fields', id: i})),
+      get(card, 'data.relationships.fields.data') || []
+    )
+  };
   let modelContentType: ResourceObject = {
     type: 'content-types',
-    id: cardContextToId({ repository, packageName }),
-    relationships: {
-      fields: get(card, 'data.relationships.fields') || []
-    }
+    id: cardContextToId({ repository, packageName, cardId }),
+    attributes: {
+      'default-includes': [
+        'fields',
+        'fields.related-types',
+        'fields.constraints',
+      ]
+    },
+    relationships: { fields }
   };
   return modelContentType;
 }
@@ -203,7 +245,6 @@ function getCardIncludePaths(schema: todo, card: SingleResourceDoc, format: stri
     'fields',
     'fields.related-types',
     'fields.constraints',
-    'model',
   ];
 
   for (let { id: fieldId } of (get(card, 'data.relationships.fields.data') || [])) {
@@ -216,7 +257,7 @@ function getCardIncludePaths(schema: todo, card: SingleResourceDoc, format: stri
     if (formatHasField(field, format)) {
       // not checking field-type, as that precludes using computed relationships for meta
       // which should be allowed. this will result in adding attr fields here, but that should be harmless
-      includePaths.push(`model.${fieldId}`);
+      includePaths.push(`${fieldId}`);
     }
   }
   return includePaths;
@@ -226,7 +267,7 @@ async function adaptCardCollectionToFormat(schema: todo, collection: CollectionR
   let included = collection.included || [];
   let data = [];
   for (let resource of collection.data) {
-    if (resource.type !== 'cards') {
+    if (!isCard(resource.type, resource.id)) {
       data.push(resource);
       continue;
     }
@@ -243,16 +284,14 @@ async function adaptCardCollectionToFormat(schema: todo, collection: CollectionR
   return document;
 }
 
-async function adaptCardToFormat(schema: todo, card: SingleResourceDoc, format: string) {
-  if (!card.data.id) { throw new Error(`Cannot load card with missing id.`); }
-  let id = card.data.id;
-  if (!card.data.attributes) { throw new Error(`Card is missing attributes '${card.data.type}/${card.data.id}`); }
+async function adaptCardToFormat(schema: todo, cardModel: SingleResourceDoc, format: string) {
+  if (!cardModel.data.id) { throw new Error(`Cannot load card with missing id.`); }
 
-  let { repository, packageName } = cardContextFromId(card.data.id);
-  let cardModelType = cardContextToId({ repository, packageName });
-  let model = (card.included || []).find(i => `${i.type}/${i.id}` === `${cardModelType}/${id}`);
-  if (!model) { throw new Error(`Card model is missing for card 'cards/${id}'`); }
-  if (!model.type || !model.id) { throw new Error(`Card model is missing type and/or id '${model.type}/${model.id}' for card 'cards/${id}`); }
+  let id = cardModel.data.id;
+  cardModel.data.attributes = cardModel.data.attributes || {};
+
+  let cardSchema = getCardSchemas(schema, cardModel) || [];
+  schema = await schema.applyChanges(cardSchema.map(document => ({ id:document.id, type:document.type, document })));
 
   let result: SingleResourceDoc = {
     data: {
@@ -260,31 +299,46 @@ async function adaptCardToFormat(schema: todo, card: SingleResourceDoc, format: 
       type: 'cards',
       attributes: {},
       relationships: {
-        fields: get(card, 'data.relationships.fields'),
+        fields: get(cardModel, 'data.relationships.fields'),
         model: {
-          data: { type: model.type, id: model.id }
+          data: { type: cardModel.data.type, id: cardModel.data.id }
         }
       }
     }
   };
-  if (card.data.meta) {
-    result.data.meta = card.data.meta;
+  if (cardModel.data.meta) {
+    result.data.meta = cardModel.data.meta;
   }
 
-  for (let attr of Object.keys(card.data.attributes)) {
-    if (!cardBrowserAssetFields.includes(attr) || !result.data.attributes) { continue; }
-    result.data.attributes[attr] = card.data.attributes[attr];
+  let attributes: AttributesObject = {};
+  for (let attr of Object.keys(cardModel.data.attributes)) {
+    if (cardBrowserAssetFields.includes(attr) && result.data.attributes) {
+      result.data.attributes[attr] = cardModel.data.attributes[attr];
+    } else {
+      attributes[attr] = cardModel.data.attributes[attr];
+    }
   }
-  result.included = [model].concat((card.included || []).filter(i => schema.isSchemaType(i.type)));
+  let relationships: RelationshipsObject = {};
+  for (let rel of Object.keys(cardModel.data.relationships || {})) {
+    if (rel === 'fields' || !cardModel.data.relationships) { continue; }
+    relationships[rel] = cardModel.data.relationships[rel];
+  }
+  let model: ResourceObject = {
+    id,
+    type: id,
+    attributes,
+    relationships
+  };
+  result.included = [model].concat((cardModel.included || []).filter(i => schema.isSchemaType(i.type)));
 
-  for (let { id: fieldId } of (get(card, 'data.relationships.fields.data') || [])) {
-    let { cardId: fieldName } = cardContextFromId(fieldId);
+  for (let { id: fieldId } of (get(cardModel, 'data.relationships.fields.data') || [])) {
+    let { modelId: fieldName } = cardContextFromId(fieldId);
     if (!fieldName) { continue; }
     let field = schema.getRealAndComputedField(fieldId);
 
     if (formatHasField(field, format)) {
-      let fieldAttrValue = get(model, `attributes.${fieldId}`);
-      let fieldRelValue = get(model, `relationships.${fieldId}`);
+      let fieldAttrValue = get(cardModel, `data.attributes.${fieldId}`);
+      let fieldRelValue = get(cardModel, `data.relationships.${fieldId}`);
 
       if (!field.isRelationship && fieldAttrValue !== undefined && result.data.attributes) {
         result.data.attributes[fieldName] = fieldAttrValue;
@@ -293,9 +347,9 @@ async function adaptCardToFormat(schema: todo, card: SingleResourceDoc, format: 
         let includedResources: ResourceObject[] = [];
         if (Array.isArray(fieldRelValue.data)) {
           let relRefs = fieldRelValue.data.map((i: ResourceIdentifierObject) => `${i.type}/${i.id}`);
-          includedResources = card.included ? card.included.filter(i => relRefs.includes(`${i.type}/${i.id}`)) : [];
+          includedResources = cardModel.included ? cardModel.included.filter(i => relRefs.includes(`${i.type}/${i.id}`)) : [];
         } else {
-          let includedResource = card.included && card.included.find(i => `${i.type}/${i.id}` === `${fieldId}/${fieldRelValue.data.id}`);
+          let includedResource = cardModel.included && cardModel.included.find(i => `${i.type}/${i.id}` === `${fieldId}/${fieldRelValue.data.id}`);
           if (includedResource) {
             includedResources = [includedResource];
           }
@@ -319,7 +373,10 @@ export = {
   cardIdDelim,
   cardContextFromId,
   cardContextToId,
+  cardBrowserAssetFields,
+  isCard,
   loadCard,
+  generateInternalCardFormat,
   getCardIncludePaths,
   adaptCardToFormat,
   adaptCardCollectionToFormat,

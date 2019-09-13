@@ -13,19 +13,20 @@ module.exports = declareInjections({
   searcher: 'hub:searchers',
   writers: 'hub:writers',
   indexers: 'hub:indexers',
+  cardServices: 'hub:card-services'
 }, {
-  create({ searcher, writers, indexers }) {
+  create({ searcher, writers, indexers, cardServices }) {
     return {
       category: 'api',
       after: 'authentication',
       middleware() {
-        return jsonapiMiddleware(searcher, writers, indexers);
+        return jsonapiMiddleware(searcher, writers, indexers, cardServices);
       }
     };
   }
 });
 
-function jsonapiMiddleware(searcher, writers, indexers ) {
+function jsonapiMiddleware(searcher, writers, indexers, cardServices ) {
   // TODO move into config
   let options = { servedPrefixes: 'api-validate|api' };
 
@@ -54,7 +55,7 @@ function jsonapiMiddleware(searcher, writers, indexers ) {
       return;
     }
 
-    let handler = new Handler(searcher, writers, indexers, ctxt, options);
+    let handler = new Handler(searcher, writers, indexers, cardServices, ctxt, options);
 
     let contentType = ctxt.request.headers['content-type'];
     let isJsonApi = contentType && contentType.includes('application/vnd.api+json');
@@ -87,10 +88,11 @@ function jsonapiMiddleware(searcher, writers, indexers ) {
 }
 
 class Handler {
-  constructor(searcher, writers, indexers, ctxt, options) {
+  constructor(searcher, writers, indexers, cardServices, ctxt, options) {
     this.searcher = searcher;
     this.writers = writers;
     this.indexers = indexers;
+    this.cardServices = cardServices;
     this.ctxt = ctxt;
     this.query = qs.parse(this.ctxt.request.querystring, { plainObjects: true });
     this.prefix = options.prefix || '';
@@ -195,6 +197,8 @@ class Handler {
     let body;
     if (type === 'spaces') {
       body = await this.searcher.getSpace(this.session, id);
+    } else if (type === 'cards') {
+      body = await this.cardServices.get(this.session, id, this.query.format || 'embedded');
     } else {
       body = await this.searcher.get(this.session, 'local-hub', type, id, { includePaths });
     }
@@ -236,6 +240,7 @@ class Handler {
     }
   }
 
+  // TODO handle card collection formatting
   async handleCollectionGET(type) {
     let { data: models, meta: { page }, included } = await this.searcher.search(this.session, {
       filter: this.filterExpression(type),
@@ -258,7 +263,12 @@ class Handler {
 
   async handleCollectionPOST(type) {
     let data = this._mandatoryBodyData();
-    let record = await this.writers.create(this.session, type, data);
+    let record;
+    if (type === 'cards') {
+      record = await this.cardServices.create(this.session, data);
+    } else {
+      record = await this.writers.create(this.session, type, data);
+    }
     this.ctxt.body = record;
     this.ctxt.status = 201;
     let origin = this.ctxt.request.origin;
@@ -287,13 +297,12 @@ class Handler {
 
 
   _mandatoryBodyData() {
-    let data;
-    if (!this.ctxt.request.body || !(data = this.ctxt.request.body.data)) {
+    if (!this.ctxt.request.body || !this.ctxt.request.body.data) {
       throw new Error('A body with a top-level "data" property is required', {
         status: 400
       });
     }
-    return { data };
+    return this.ctxt.request.body;
   }
 
   _urlWithUpdatedParams(params) {

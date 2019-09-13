@@ -37,6 +37,10 @@ package-lock.json
 /packages/plugin-utils/todo-any.js
 /packages/plugin-utils/todo-any.js.map
 
+/packages/test-support/card-utils.d.ts
+/packages/test-support/card-utils.js
+/packages/test-support/card-utils.js.map
+
 /packages/cli/**/*.js
 !packages/cli/node-tests/sample-cards/**/*.js
 /packages/cli/**/*.js.map

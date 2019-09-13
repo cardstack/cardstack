@@ -12,6 +12,7 @@
     "@cardstack/eslint-config": "0.14.23",
     "@cardstack/test-support": "0.14.23",
     "@cardstack/test-support-authenticator": "0.14.23",
+    "fs-extra": "^7.0.1",
     "koa": "2",
     "superagent-defaults": "0.1.14",
     "supertest": "^2.0.1"

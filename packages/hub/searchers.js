@@ -191,7 +191,7 @@ class Searchers {
       } catch (err) {
         if (err.status !== 404) { throw err; }
       }
-      return document;
+      return document.data ? document : null;
     };
   }
 
@@ -250,7 +250,7 @@ class Searchers {
       upstreamDoc: upstreamDoc
     });
 
-    let batch = this.client.beginBatch(this.currentSchema, this);
+    let batch = this.client.beginBatch(await this.currentSchema.getSchema(), this);
     try {
       await batch.saveDocument(documentContext, { maxAge });
     } finally {

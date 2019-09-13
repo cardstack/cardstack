@@ -10,7 +10,7 @@ module.exports = class StubCardSearcher {
   }
 
   async get(session, type, id, next) {
-    if (type === 'cards' && this.cardIds.includes(id)) {
+    if (type === id && id.split('::').length === 3 && this.cardIds.includes(id)) {
       return this.cards.find(i => i.data.id === id);
     }
     return await next();
