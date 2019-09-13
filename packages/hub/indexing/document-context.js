@@ -10,7 +10,6 @@ const {
   cardContextFromId,
   isCard,
   loadCard,
-  getCardIncludePaths
 } = require('./card-utils');
 const qs = require('qs');
 
@@ -596,18 +595,18 @@ module.exports = class DocumentContext {
 
         let includesTree;
         let includePaths = this.includePaths;
-        if (isCard(resource.type, resource.id)) {
-          let cardIncludePaths = getCardIncludePaths(this.schema, await this._getCard(resource.id), this.format)
-            .map(part => part ? part.split('.') : null).filter(Boolean);
-          includePaths = includePaths.concat(cardIncludePaths);
-        }
+        includesTree = {};
         if (includePaths.length) {
-          includesTree = {};
           for (let segments of includePaths) {
             this._buildSearchTree(includesTree, segments);
           }
         } else {
-          includesTree = Object.assign({}, contentType.includesTree);
+          if (isCard(resource.type, resource.id)) {
+            let contentType = this.schema.getType(resource.type);
+            includesTree = Object.assign({}, contentType.includesTree);
+          } else {
+            includesTree = Object.assign({}, contentType.includesTree);
+          }
         }
 
         let pristineItem = await this._build(resource.type, resource.id, resource, includesTree, depth + 1);
@@ -630,12 +629,11 @@ module.exports = class DocumentContext {
       }
 
       if (depth === 0 && (this.includePaths.length || isCard(type, id))) {
-        if (isCard(type, id)) {
-          let cardIncludePaths = getCardIncludePaths(this.schema, this.upstreamDoc, this.format)
-            .map(part => part ? part.split('.') : null).filter(Boolean);
-          this.includePaths = this.includePaths.concat(cardIncludePaths);
-        }
         searchTree = {};
+        if (isCard(type, id)) {
+          let contentType = this.schema.getType(type);
+          searchTree = contentType.includesTree;
+        }
         for (let segments of this.includePaths) {
           this._buildSearchTree(searchTree, segments);
         }
