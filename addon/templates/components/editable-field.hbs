@@ -1,6 +1,6 @@
-{{#animated-value @mode initialInsertion=true finalRemoval=true use=this.defaultTransition as |mode|}}
+{{#animated-value this.mode initialInsertion=true finalRemoval=true use=this.defaultTransition as |mode|}}
   {{component
-      (concat "field-modes/" this.mode)
+      (concat "field-modes/" mode)
       componentName=componentName
       fieldName=fieldName
       value=value
