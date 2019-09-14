@@ -448,7 +448,6 @@ contract('ethereum-addresses indexing', function (_accounts) {
       });
 
       it('can search for transactions for a tracked address only in blocks that have not yet been processed (e.g. hub stops and restarts during which transactions have occurred)', async function () {
-        const pgclient = await env.lookup(`plugin-client:${require.resolve('@cardstack/pgsearch/client')}`);
         const value = web3.toWei(txnTestEthValue, 'ether');
         const { from, to, txn: setupTxn } = await setupTrackedAddresses(accounts[0], web3.toWei(4 * txnTestEthValueWithGasFee, 'ether'));
         const { address: ignoredSender } = await newAddress(accounts[1], web3.toWei(txnTestEthValueWithGasFee, 'ether'));
@@ -462,21 +461,18 @@ contract('ethereum-addresses indexing', function (_accounts) {
         await env.lookup('hub:indexers').update({ forceRefresh: true });
         await ethereumClient.stopAll();
 
-        let addressIndexingCount = 0;
-
-        pgclient.on('add', ({ type }) => {
-          if (type === 'ethereum-addresses') {
-            addressIndexingCount++;
-          }
-        });
-
         await sendTransaction({ from: ignoredSender, to: ignoredRecipient, value, gasPrice });
 
         await transactionIndexer.transactionIndex.start(ethereumClient);
         await waitForEthereumEvents(transactionIndexer);
 
         // no transactions occurred involving addesses we are tracking
-        expect(addressIndexingCount).to.equal(0);
+        let { data: addresses } = await searchers.search(env.session, {
+          filter: {
+            type: { exact: 'ethereum-addresses' }
+          }
+        });
+        expect(addresses.length).to.equal(0);
 
         await waitForEthereumEvents(transactionIndexer);
         await ethereumClient.stopAll();
@@ -494,9 +490,6 @@ contract('ethereum-addresses indexing', function (_accounts) {
 
         await transactionIndexer.transactionIndex.start(ethereumClient);
         await waitForEthereumEvents(transactionIndexer);
-
-        // 2 events for update of the 2 addresses
-        expect(addressIndexingCount).to.equal(2);
 
         let { data: sender } = await searchers.get(env.session, 'local-hub', 'ethereum-addresses', from);
         expect(sender).has.deep.property('attributes.balance', senderBalance.toString());
@@ -547,9 +540,6 @@ contract('ethereum-addresses indexing', function (_accounts) {
 
         await transactionIndexer.transactionIndex.start(ethereumClient);
         await waitForEthereumEvents(transactionIndexer);
-
-        // 2 events for update of the 2 addresses
-        expect(addressIndexingCount).to.equal(4);
 
         let { data: senderUpdated } = await searchers.get(env.session, 'local-hub', 'ethereum-addresses', from);
         expect(senderUpdated).has.deep.property('attributes.balance', senderBalance.toString());
