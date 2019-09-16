@@ -11,7 +11,10 @@ const process = require('process');
 const Error = require('@cardstack/plugin-utils/error');
 const { promisify } = require('util');
 const temp = require('temp').track();
-const Gitchain = require('@cardstack/gitchain');
+const Githereum = require('githereum/githereum');
+const GithereumContract = require("githereum/build/contracts/Githereum.json");
+const TruffleContract = require("truffle-contract");
+
 const log = require('@cardstack/logger')('cardstack/git');
 const stringify = require('json-stable-stringify-without-jsonify');
 
@@ -23,7 +26,7 @@ module.exports = class Writer {
     return new this(...args);
   }
 
-  constructor({ repo, idGenerator, basePath, branchPrefix, remote, hyperledger }) {
+  constructor({ repo, idGenerator, basePath, branchPrefix, remote, githereum }) {
     this.repoPath = repo;
     this.basePath = basePath;
     this.branchPrefix = branchPrefix || "";
@@ -34,10 +37,10 @@ module.exports = class Writer {
     this.idGenerator = idGenerator;
     this.remote = remote;
 
-    if (hyperledger) {
-      let config = Object.assign({}, hyperledger);
-      config.logger = log.info.bind(log); // TODO fix logger so we don't have to bind
-      this.hyperledgerConfig = config;
+    if (githereum) {
+      let config = Object.assign({}, githereum);
+      config.log = log.info.bind(log);
+      this.githereumConfig = config;
     }
 
 
@@ -193,12 +196,28 @@ module.exports = class Writer {
     }
   }
 
-  async _ensureGitchain() {
+  async _ensureGithereum() {
     await this._ensureRepo();
 
-    if (!this.gitChain && this.hyperledgerConfig) {
-      this.gitChain = new Gitchain(this.repo.path(), this.hyperledgerConfig);
+    if (!this.githereum && this.githereumConfig) {
+      let contract = await this._getGithereumContract();
+
+      this.githereum = new Githereum(
+        this.repo.path(),
+        this.githereumConfig.repoName,
+        contract,
+        this.githereumConfig.from,
+        {log: log.info.bind(log)}
+      );
     }
+  }
+
+  async _getGithereumContract() {
+    let providerUrl = this.githereumConfig.providerUrl || "http://localhost:9545";
+
+    let GithereumTruffleContract = TruffleContract(GithereumContract);
+    GithereumTruffleContract.setProvider(providerUrl);
+    return await GithereumTruffleContract.at(this.githereumConfig.contractAddress);
   }
 
   _generateId() {
@@ -214,15 +233,15 @@ module.exports = class Writer {
     }
   }
 
-  async _pushToHyperledger() {
-    await this._ensureGitchain();
+  async _pushToGithereum() {
+    await this._ensureGithereum();
 
-    if(this.gitChain) {
+    if(this.githereum) {
       // make sure only one push is ongoing at a time, by creating a chain of
       // promises here
-      this._gitChainPromise = Promise.resolve(this._gitChainPromise).then(() =>
-        this.gitChain.push(this.hyperledgerConfig.tag).catch(e => {
-          log.error("Error pushing to hyperledger:", e, e.stack);
+      this._githereumPromise = Promise.resolve(this._githereumPromise).then(() =>
+        this.githereum.push(this.githereumConfig.tag).catch(e => {
+          log.error("Error pushing to githereum:", e, e.stack);
         })
       );
     }
@@ -287,7 +306,7 @@ async function finalizer(pendingChange) {
       }
     }
     let version = await change.finalize(signature, this.remote, this.fetchOpts);
-    await this._pushToHyperledger();
+    await this._pushToGithereum();
     return { version, hash: (file ? file.savedId() : null) };
   });
 }
