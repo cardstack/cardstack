@@ -33,18 +33,16 @@ export default class CardInspector extends Component {
     let model = (card.included || []).find(i => `${i.type}/${i.id}` === `${card.data.id}/${card.data.id}`);
     let modelFields = model ? model.attributes : {};
     for (let field of Object.keys(modelFields || {})) {
-      let [, , , fieldName] = field.split('::');
       let value = modelFields[field];
       if (typeof value === 'object') {
         value = JSON.stringify(value, null, 2);
       }
-      result[fieldName] = value;
+      result[field] = value;
     }
 
     modelFields = model ? model.relationships : {};
     for (let field of Object.keys(modelFields || {})) {
-      let [, , , fieldName] = field.split('::');
-      result[fieldName] = JSON.stringify(modelFields[field].data, null, 2);
+      result[field] = JSON.stringify(modelFields[field].data, null, 2);
     }
 
     return result;

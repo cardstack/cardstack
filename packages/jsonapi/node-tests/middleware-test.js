@@ -998,7 +998,7 @@ describe('jsonapi/middleware', function() {
       let externalArticleCard = await adaptCardToFormat(schema, internalArticleCard, 'isolated');
       let { body:card } = await request.post('/api/cards').send(externalArticleCard);
       let internalModel = card.included.find(i => i.type = 'local-hub::article-card::millenial-puppies');
-      internalModel.attributes['local-hub::article-card::millenial-puppies::author'] = 'Van Gogh';
+      internalModel.attributes.author = 'Van Gogh';
       card.data.relationships.fields.data.push({ type: 'fields', id: 'local-hub::article-card::millenial-puppies::author'});
       card.included.push({
         type: 'fields',

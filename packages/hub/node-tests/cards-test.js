@@ -188,6 +188,17 @@ function assertCardModels(card) {
     'local-hub::article-card::millenial-puppies::tags/local-hub::article-card::millenial-puppies::puppies',
     'local-hub::article-card::millenial-puppies::tags/local-hub::article-card::millenial-puppies::belly-rubs',
   ]);
+
+  let model = included.find(i => `${i.type}/${i.id}` === 'local-hub::article-card::millenial-puppies/local-hub::article-card::millenial-puppies');
+  expect(model.attributes.title).to.equal('The Millenial Puppy');
+  expect(model.attributes.body).to.match(/discerning tastes of the millenial puppy/);
+  expect(model.attributes.author).to.equal('Van Gogh');
+  expect(model.relationships.tags.data).to.eql([
+    { type: 'local-hub::article-card::millenial-puppies::tags', id: 'local-hub::article-card::millenial-puppies::millenials' },
+    { type: 'local-hub::article-card::millenial-puppies::tags', id: 'local-hub::article-card::millenial-puppies::puppies' },
+    { type: 'local-hub::article-card::millenial-puppies::tags', id: 'local-hub::article-card::millenial-puppies::belly-rubs' },
+  ]);
+  expect(model.attributes['internal-field']).to.equal('this is internal data');
 }
 
 function assertCardSchema(card) {
@@ -420,25 +431,25 @@ describe('hub/card-services', function () {
     it("can update a card's internal model", async function() {
       let card = await cardServices.create(env.session, externalArticleCard);
       let internalModel = card.included.find(i => i.type = 'local-hub::article-card::millenial-puppies');
-      internalModel.attributes['local-hub::article-card::millenial-puppies::body'] = 'updated body';
+      internalModel.attributes.body = 'updated body';
 
       card = await cardServices.update(env.session, 'local-hub::article-card::millenial-puppies', card);
       internalModel = card.included.find(i => i.type = 'local-hub::article-card::millenial-puppies');
 
       assertCardSchema(card);
       expect(card.data.attributes.body).to.equal('updated body');
-      expect(internalModel.attributes['local-hub::article-card::millenial-puppies::body']).to.equal('updated body');
+      expect(internalModel.attributes.body).to.equal('updated body');
 
       card = await cardServices.get(env.session, 'local-hub::article-card::millenial-puppies', 'isolated');
       internalModel = card.included.find(i => i.type = 'local-hub::article-card::millenial-puppies');
       expect(card.data.attributes.body).to.equal('updated body');
-      expect(internalModel.attributes['local-hub::article-card::millenial-puppies::body']).to.equal('updated body');
+      expect(internalModel.attributes.body).to.equal('updated body');
     });
 
     it("can update a card's schema and a card model at the same time", async function() {
       let card = await cardServices.create(env.session, externalArticleCard);
       let internalModel = card.included.find(i => i.type = 'local-hub::article-card::millenial-puppies');
-      internalModel.attributes['local-hub::article-card::millenial-puppies::editor'] = 'Hassan';
+      internalModel.attributes.editor = 'Hassan';
       card.data.relationships.fields.data.push({ type: 'fields', id: 'local-hub::article-card::millenial-puppies::editor'});
       card.included.push({
         type: 'fields',
@@ -458,7 +469,7 @@ describe('hub/card-services', function () {
       expect(includedIdentifiers).to.include('fields/local-hub::article-card::millenial-puppies::editor');
       expect(fieldRelationships).to.include('fields/local-hub::article-card::millenial-puppies::editor');
       expect(card.data.attributes.editor).to.equal('Hassan');
-      expect(internalModel.attributes['local-hub::article-card::millenial-puppies::editor']).to.equal('Hassan');
+      expect(internalModel.attributes.editor).to.equal('Hassan');
 
       card = await cardServices.get(env.session, 'local-hub::article-card::millenial-puppies', 'isolated');
       data = card.data;
@@ -468,7 +479,7 @@ describe('hub/card-services', function () {
       expect(includedIdentifiers).to.include('fields/local-hub::article-card::millenial-puppies::editor');
       expect(fieldRelationships).to.include('fields/local-hub::article-card::millenial-puppies::editor');
       expect(card.data.attributes.editor).to.equal('Hassan');
-      expect(internalModel.attributes['local-hub::article-card::millenial-puppies::editor']).to.equal('Hassan');
+      expect(internalModel.attributes.editor).to.equal('Hassan');
     });
 
     it('can delete a card', async function() {

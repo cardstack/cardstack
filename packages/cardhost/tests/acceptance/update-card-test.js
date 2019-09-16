@@ -17,7 +17,7 @@ let articleCard = factory.getDocumentFor(
     ])
     .withRelated('model', factory.addResource('local-hub::article-card::millenial-puppies', 'local-hub::article-card::millenial-puppies')
       .withAttributes({
-        'local-hub::article-card::millenial-puppies::body': 'It can be difficult these days to deal with the discerning tastes of the millenial puppy.'
+        body: 'It can be difficult these days to deal with the discerning tastes of the millenial puppy.'
       })
     )
 );
@@ -51,7 +51,7 @@ module('Acceptance | updating a card', function(hooks) {
     let cardStr = getCodeMirrorValue();
     let card = JSON.parse(cardStr);
     let internalModel = card.included.find(i => i.type = 'local-hub::article-card::millenial-puppies');
-    internalModel.attributes['local-hub::article-card::millenial-puppies::body'] = 'updated body';
+    internalModel.attributes.body = 'updated body';
     setCodeMirrorValue(JSON.stringify(card, null, 2));
 
     await click('[data-test-card-updator-update-btn]');
@@ -115,7 +115,7 @@ module('Acceptance | updating a card', function(hooks) {
     let cardStr = getCodeMirrorValue();
     let card = JSON.parse(cardStr);
     let internalModel = card.included.find(i => i.type = 'local-hub::article-card::millenial-puppies');
-    internalModel.attributes['local-hub::article-card::millenial-puppies::title'] = 'Millenial Puppies';
+    internalModel.attributes.title = 'Millenial Puppies';
     card.data.relationships.fields.data.push({ type: 'fields', id: 'local-hub::article-card::millenial-puppies::title' });
     card.included.push({
       type: 'fields',

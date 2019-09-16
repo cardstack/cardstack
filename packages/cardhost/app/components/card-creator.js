@@ -48,10 +48,10 @@ export default class CardCreator extends Component {
         type: 'local-hub::article-card::millenial-puppies',
         id: 'local-hub::article-card::millenial-puppies',
         attributes: {
-          'local-hub::article-card::millenial-puppies::internal-field': 'this is internal data',
-          'local-hub::article-card::millenial-puppies::title': 'The Millenial Puppy',
-          'local-hub::article-card::millenial-puppies::author': 'Van Gogh',
-          'local-hub::article-card::millenial-puppies::body': `It can be difficult these days to deal with the discerning tastes of the millenial puppy.`
+          'internal-field': 'this is internal data',
+          'title': 'The Millenial Puppy',
+          'author': 'Van Gogh',
+          'body': `It can be difficult these days to deal with the discerning tastes of the millenial puppy.`
         },
       },
       {

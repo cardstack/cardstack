@@ -9,7 +9,7 @@ import {
   RelationshipsObject,
   RelationshipsWithData
 } from "jsonapi-typescript";
-import { set, get, uniqBy, isEqual, sortBy } from 'lodash';
+import { set, get, uniqBy, isEqual, sortBy, cloneDeep } from 'lodash';
 import logger from '@cardstack/logger';
 import { join } from "path";
 import { tmpdir } from 'os';
@@ -85,6 +85,7 @@ function generateInternalCardFormat(card: SingleResourceDoc) {
   let id = card.data.id as string;
   if (!id) { throw new Error(`The card ID must be supplied in the card document in order to create the card.`); }
 
+  card = addCardContextToIncludedFields(card) as SingleResourceDoc;
   let model: ResourceObject | undefined = (card.included || []).find(i => `${i.type}/${i.id}` === `${id}/${id}`);
   if (!model) { throw new Error(`The card document 'cards/${id}' is missing its card model '${id}/${id}'.`); }
 
@@ -377,7 +378,55 @@ async function adaptCardToFormat(schema: todo, cardModel: SingleResourceDoc, for
     }
   }
 
-  return result;
+  return removeCardContextFromIncludedFields(result) as SingleResourceDoc;
+}
+
+function removeCardContextFromIncludedFields(card: SingleResourceDoc) {
+  let id = card.data.id as string;
+  if (!id) { return; }
+
+  card = cloneDeep(card) as SingleResourceDoc;
+  let included = (card.included || []).filter(({ type }) => type.includes(id));
+  for (let resource of included) {
+    for (let field of Object.keys(resource.attributes || {})) {
+      let { modelId:fieldName } = cardContextFromId(field);
+      if (!fieldName || !resource.attributes) { continue; }
+      resource.attributes[fieldName] = resource.attributes[field];
+      delete resource.attributes[field];
+    }
+    for (let field of Object.keys(resource.relationships || {})) {
+      let { modelId:fieldName } = cardContextFromId(field);
+      if (!fieldName || !resource.relationships) { continue; }
+      resource.relationships[fieldName] = resource.relationships[field];
+      delete resource.relationships[field];
+    }
+  }
+
+  return card;
+}
+
+function addCardContextToIncludedFields(card: SingleResourceDoc) {
+  let id = getCardId(card.data.id as string);
+  if (!id) { return; }
+
+  card = cloneDeep(card) as SingleResourceDoc;
+  let included = (card.included || []).filter(({ type }) => type.includes(id));
+  for (let resource of included) {
+    for (let field of Object.keys(resource.attributes || {})) {
+      if (!resource.attributes) { continue; }
+      let fieldName = `${id}${cardIdDelim}${field}`;
+      resource.attributes[fieldName] = resource.attributes[field];
+      delete resource.attributes[field];
+    }
+    for (let field of Object.keys(resource.relationships || {})) {
+      if (!resource.relationships) { continue; }
+      let fieldName = `${id}${cardIdDelim}${field}`;
+      resource.relationships[fieldName] = resource.relationships[field];
+      delete resource.relationships[field];
+    }
+  }
+
+  return card;
 }
 
 function formatHasField(field: todo, format: string) {
