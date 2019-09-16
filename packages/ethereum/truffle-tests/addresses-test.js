@@ -447,16 +447,11 @@ contract('ethereum-addresses indexing', function (_accounts) {
         expect(error.status).to.equal(404);
       });
 
-      it('can search for transactions for a tracked address only in blocks that have not yet been processed (e.g. hub stops and restarts during which transactions have occurred)', async function () {
+      it('does not index transactions for addresses that are not tracked', async function() {
         const pgclient = await env.lookup(`plugin-client:${require.resolve('@cardstack/pgsearch/client')}`);
         const value = web3.toWei(txnTestEthValue, 'ether');
-        const { from, to, txn: setupTxn } = await setupTrackedAddresses(accounts[0], web3.toWei(4 * txnTestEthValueWithGasFee, 'ether'));
         const { address: ignoredSender } = await newAddress(accounts[1], web3.toWei(txnTestEthValueWithGasFee, 'ether'));
         const { address: ignoredRecipient } = await newAddress();
-
-        let txnHash = await sendTransaction({ from, to, value, gasPrice });
-        let txn1 = await getTransaction(txnHash);
-        let block1 = await getBlock(txn1.blockNumber);
 
         await waitForEthereumEvents(transactionIndexer);
         await env.lookup('hub:indexers').update({ forceRefresh: true });
@@ -479,7 +474,28 @@ contract('ethereum-addresses indexing', function (_accounts) {
         expect(addressIndexingCount).to.equal(0);
 
         await waitForEthereumEvents(transactionIndexer);
+      });
+
+      it('can search for transactions for a tracked address only in blocks that have not yet been processed (e.g. hub stops and restarts during which transactions have occurred)', async function () {
+        const pgclient = await env.lookup(`plugin-client:${require.resolve('@cardstack/pgsearch/client')}`);
+        const value = web3.toWei(txnTestEthValue, 'ether');
+        const { from, to, txn: setupTxn } = await setupTrackedAddresses(accounts[0], web3.toWei(4 * txnTestEthValueWithGasFee, 'ether'));
+
+        let txnHash = await sendTransaction({ from, to, value, gasPrice });
+        let txn1 = await getTransaction(txnHash);
+        let block1 = await getBlock(txn1.blockNumber);
+
+        await waitForEthereumEvents(transactionIndexer);
+        await env.lookup('hub:indexers').update({ forceRefresh: true });
         await ethereumClient.stopAll();
+
+        let addressIndexingCount = 0;
+
+        pgclient.on('add', ({ type }) => {
+          if (type === 'ethereum-addresses') {
+            addressIndexingCount++;
+          }
+        });
 
         txnHash = await sendTransaction({ from, to, value, gasPrice });
         let txn2 = await getTransaction(txnHash);
