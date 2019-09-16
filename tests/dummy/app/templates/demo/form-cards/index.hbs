@@ -1,16 +1,19 @@
-{{#animated-value "form-cards-index-route" initialInsertion=true finalRemoval=true use=this.wait}}
-  <div class="form-cards-page">
-    <AnimatedContainer>
-      {{#animated-value "form-cards-index-route-inner" initialInsertion=true finalRemoval=true use=this.backgroundTransition}}
-        <div class="form-cards-list">
-          {{#animated-each model key="id" watch="expanded" group="moving-box" use=this.boxTransition as |card|}}
-            <Boxel @name="boxel-{{card.id}}" @formCards={{true}}
-              class="form-card form-card-{{card.id}} {{if card.selected "focused"}} {{if this.expandedCards.length "expanded"}}"
-              role="button" onclick={{action "edit" card}}>
-            </Boxel>
-          {{/animated-each}}
-        </div>
-      {{/animated-value}}
-    </AnimatedContainer>
-  </div>
-{{/animated-value}}
+<AnimatedContainer>
+  {{#animated-value "form-cards-route" initialInsertion=true finalRemoval=true use=this.wait}}
+    <div class="form-cards-page">
+      <AnimatedContainer>
+        {{#animated-value "form-cards-index-route" initialInsertion=true finalRemoval=true use=this.backgroundTransition}}
+          <div class="form-cards-list">
+            {{#animated-each model key="id" group="form-card" as |card|}}
+              <div role="button" {{action "edit" card}} class="form-card form-card-{{card.id}}">
+                {{#animated-value card key="id" group="form-card--shadow" use=this.shadowTransition}}
+                  <div class="form-card--shadow" />
+                {{/animated-value}}
+              </div>
+            {{/animated-each}}
+          </div>
+        {{/animated-value}}
+      </AnimatedContainer>
+    </div>
+  {{/animated-value}}
+</AnimatedContainer>

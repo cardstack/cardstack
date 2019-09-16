@@ -1,4 +1,3 @@
-// import Route from '@ember/routing/route';
 import BoxelizedRoute from 'boxel/routes/boxelized';
 
 export default class DemoFormCardsRoute extends BoxelizedRoute {

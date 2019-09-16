@@ -1,11 +1,22 @@
-{{#animated-value "form-cards-edit-route" initialInsertion=true finalRemoval=true use=(if this.model.expanded this.backgroundTransition)}}
-  <div class="form-cards-page edit">
-    <AnimatedContainer class="form-cards-list">
-      {{#animated-value model key="id" group="moving-box" use=this.boxTransition as |card|}}
-        <Boxel @name="boxel-{{card.id}}" @formCards={{true}}
-          class="form-card form-card-{{card.id}} isolated" role="button" onclick={{action "backToList" card}}>
-        </Boxel>
+{{!-- This container slides down to become the background --}}
+<AnimatedContainer>
+  {{#if this.model.expanded}}
+    {{#animated-value "form-cards-edit-route" initialInsertion=true finalRemoval=true use=this.backgroundTransition}}
+      <div class="form-cards-page edit"></div>
+    {{/animated-value}}
+  {{else}}
+    {{#animated-value "form-cards-edit-route" finalRemoval=true use=this.backgroundTransition}}
+      <div class="form-cards-page edit"></div>
+    {{/animated-value}}
+  {{/if}}
+</AnimatedContainer>
+
+<AnimatedContainer class="form-cards-list">
+  {{#animated-value model key="id" group="form-card" use=this.boxTransition as |card|}}
+    <div role="button" onclick={{action "backToList" card}} class="form-card form-card-{{card.id}} expanded">
+      {{#animated-value card key="id" group="form-card--shadow" use=this.shadowTransition}}
+        <div class="form-card--shadow expanded" />
       {{/animated-value}}
-    </AnimatedContainer>
-  </div>
-{{/animated-value}}
+    </div>
+  {{/animated-value}}
+</AnimatedContainer>
