@@ -5,7 +5,7 @@ module.exports = class StubCardSearcher {
   }
 
   constructor(params) {
-    this.cards = params.cardSearchResults;
+    this.cards = params.cardSearchResults || [];
     this.cardIds = this.cards.map(i => i.data.id);
   }
 
