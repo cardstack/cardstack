@@ -255,10 +255,6 @@ describe('hub/card-services', function () {
     });
   });
 
-
-
-
-
   describe("loads card", function () {
     describe("via indexer", function () {
       let indexers, changedCards = [];
