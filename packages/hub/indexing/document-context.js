@@ -64,13 +64,13 @@ module.exports = class DocumentContext {
         let contentType = this.schema.getType(doc.type);
         if (!contentType) { throw new Error(`Unknown content type=${doc.type} id=${doc.id}`); }
 
-        return new Model(contentType, doc, this.schema, this.read.bind(this), this.search.bind(this));
+        return new Model(contentType, doc, this.schema, this.read.bind(this), this._getCard.bind(this), this.search.bind(this));
       });
     } else {
       let contentType = this.schema.getType(this.type);
       if (!contentType) { throw new Error(`Unknown content type=${this.type} id=${this.id}`); }
 
-      this._model = new Model(contentType, this.upstreamDoc.data, this.schema, this.read.bind(this), this.search.bind(this));
+      this._model = new Model(contentType, this.upstreamDoc.data, this.schema, this.read.bind(this), this._getCard.bind(this), this.search.bind(this));
     }
 
     return this._model;
@@ -401,15 +401,6 @@ module.exports = class DocumentContext {
     let docType = get(this, 'upstreamDoc.data.type');
     if (isCard(docId, docType) && docId === id) {
       return this.upstreamDoc;
-    } else if ((cardResource = this.suppliedIncluded.find(i => isCard(i.type, i.id) && i.id === id))) {
-      let card = {
-        data: cardResource,
-        included: (this.suppliedIncluded || [])
-          .filter(i => `${i.type}/${i.id}` !== `${cardResource.type}/${cardResource.id}` &&
-            (i.type.includes(id) || i.id.includes(id)))
-      };
-      this._cardCache[id] = card;
-      return card;
     } else if (this.upstreamDoc &&
       this.upstreamDoc.data &&
       Array.isArray(this.upstreamDoc.data) &&
@@ -515,6 +506,7 @@ module.exports = class DocumentContext {
     let related;
     if (searchTree[field.id]) {
       let models = await userModel.getRelated(field.id);
+      this.schema = userModel.schema; // this will incorporate any discovered card schema as a result of traversing the relationship
       if (Array.isArray(models)) {
         related = await Promise.all(models.map(async (model) => {
           return this._build(model.type, model.id, privateModels.get(model).jsonapiDoc, searchTree[field.id], depth + 1, format);
@@ -648,7 +640,7 @@ module.exports = class DocumentContext {
       } else {
         jsonapiDoc = jsonapiDoc.data;
       }
-      let userModel = new Model(contentType, jsonapiDoc, this.schema, this.read.bind(this), this.search.bind(this));
+      let userModel = new Model(contentType, jsonapiDoc, this.schema, this.read.bind(this), this._getCard.bind(this), this.search.bind(this));
       await this._buildAttributes(contentType, jsonapiDoc, userModel, pristine, searchDoc);
 
       if (!this._followedRelationships[`${type}/${id}`]) {

@@ -921,114 +921,117 @@ describe('jsonapi/middleware', function() {
 
   });
 
-  describe('non-mutating card tests', function() {
-    beforeEach(async function() {
-      cleanup();
-      let factory = new JSONAPIFactory();
-      factory.addResource('data-sources', 'stub-card-project')
-        .withAttributes({
-          sourceType: 'stub-card-project',
-          params: {
-            cardSearchResults: [internalArticleCard]
+  describe('card tests', function () {
+    describe('non-mutating card tests', function () {
+      beforeEach(async function () {
+        cleanup();
+        let factory = new JSONAPIFactory();
+        factory.addResource('data-sources', 'stub-card-project')
+          .withAttributes({
+            sourceType: 'stub-card-project',
+            params: {
+              cardSearchResults: [internalArticleCard]
+            }
+          });
+
+        app = new Koa();
+        env = await createDefaultEnvironment(`${__dirname}/../../../tests/stub-card-project`, factory.getModels());
+        app.use(async function (ctxt, next) {
+          await next();
+          log.info('%s %s %s', ctxt.request.method, ctxt.request.originalUrl, ctxt.response.status);
+        });
+        app.use(env.lookup('hub:middleware-stack').middleware());
+        request = defaults(supertest(app.callback()));
+        request.set('Accept', 'application/vnd.api+json');
+      });
+
+      afterEach(sharedTeardown);
+
+      it("has card metadata for isolated format", async function () {
+        let response = await request.get('/api/cards/local-hub::article-card::millenial-puppies?format=isolated');
+        expect(response).hasStatus(200);
+        assertIsolatedCardMetadata(response.body);
+      });
+
+      it("has card metadata for embedded format", async function () {
+        let response = await request.get('/api/cards/local-hub::article-card::millenial-puppies?format=embedded');
+        expect(response).hasStatus(200);
+        assertEmbeddedCardMetadata(response.body);
+      });
+
+      it("when no format is specifed, the default format is 'embedded'", async function () {
+        let response = await request.get('/api/cards/local-hub::article-card::millenial-puppies');
+        expect(response).hasStatus(200);
+        assertEmbeddedCardMetadata(response.body);
+      });
+    });
+
+    describe('mutating card tests', async function () {
+      let schema, cardServices;
+
+      beforeEach(async function () {
+        app = new Koa();
+        env = await createDefaultEnvironment(__dirname + '/../');
+        app.use(async function (ctxt, next) {
+          await next();
+          log.info('%s %s %s', ctxt.request.method, ctxt.request.originalUrl, ctxt.response.status);
+        });
+        app.use(env.lookup('hub:middleware-stack').middleware());
+        request = defaults(supertest(app.callback()));
+        request.set('Accept', 'application/vnd.api+json');
+        schema = await env.lookup('hub:current-schema').getSchema();
+        cardServices = env.lookup('hub:card-services');
+      });
+
+      afterEach(sharedTeardown);
+
+      it('can create a new card', async function () {
+        let card = await adaptCardToFormat(schema, env.session, internalArticleCard, 'isolated', cardServices);
+        let response = await request.post('/api/cards').send(card);
+        expect(response).hasStatus(201);
+        assertIsolatedCardMetadata(response.body);
+
+        response = await request.get('/api/cards/local-hub::article-card::millenial-puppies?format=isolated');
+        expect(response).hasStatus(200);
+        assertIsolatedCardMetadata(response.body);
+      });
+
+      it("can update a card", async function () {
+        let externalArticleCard = await adaptCardToFormat(schema, env.session, internalArticleCard, 'isolated', cardServices);
+        let { body: card } = await request.post('/api/cards').send(externalArticleCard);
+        let internalModel = card.included.find(i => i.type = 'local-hub::article-card::millenial-puppies');
+        internalModel.attributes.author = 'Van Gogh';
+        card.data.relationships.fields.data.push({ type: 'fields', id: 'local-hub::article-card::millenial-puppies::author' });
+        card.included.push({
+          type: 'fields',
+          id: 'local-hub::article-card::millenial-puppies::author',
+          attributes: {
+            'is-metadata': true,
+            'needed-when-embedded': true,
+            'field-type': '@cardstack/core-types::string'
           }
         });
 
-      app = new Koa();
-      env = await createDefaultEnvironment(`${__dirname}/../../../tests/stub-card-project`, factory.getModels());
-      app.use(async function (ctxt, next) {
-        await next();
-        log.info('%s %s %s', ctxt.request.method, ctxt.request.originalUrl, ctxt.response.status);
-      });
-      app.use(env.lookup('hub:middleware-stack').middleware());
-      request = defaults(supertest(app.callback()));
-      request.set('Accept', 'application/vnd.api+json');
-    });
+        let response = await request.patch('/api/cards/local-hub::article-card::millenial-puppies').send(card);
+        expect(response).hasStatus(200);
+        expect(response).has.deep.property('body.data.attributes.author', 'Van Gogh');
 
-    afterEach(sharedTeardown);
-
-    it("has card metadata for isolated format", async function () {
-      let response = await request.get('/api/cards/local-hub::article-card::millenial-puppies?format=isolated');
-      expect(response).hasStatus(200);
-      assertIsolatedCardMetadata(response.body);
-    });
-
-    it("has card metadata for embedded format", async function () {
-      let response = await request.get('/api/cards/local-hub::article-card::millenial-puppies?format=embedded');
-      expect(response).hasStatus(200);
-      assertEmbeddedCardMetadata(response.body);
-    });
-
-    it("when no format is specifed, the default format is 'embedded'", async function () {
-      let response = await request.get('/api/cards/local-hub::article-card::millenial-puppies');
-      expect(response).hasStatus(200);
-      assertEmbeddedCardMetadata(response.body);
-    });
-  });
-
-  describe('mutating card tests', async function() {
-    let schema;
-
-    beforeEach(async function() {
-      app = new Koa();
-      env = await createDefaultEnvironment(__dirname + '/../');
-      app.use(async function (ctxt, next) {
-        await next();
-        log.info('%s %s %s', ctxt.request.method, ctxt.request.originalUrl, ctxt.response.status);
-      });
-      app.use(env.lookup('hub:middleware-stack').middleware());
-      request = defaults(supertest(app.callback()));
-      request.set('Accept', 'application/vnd.api+json');
-      schema = await env.lookup('hub:current-schema').getSchema();
-    });
-
-    afterEach(sharedTeardown);
-
-    it('can create a new card', async function() {
-      let card = await adaptCardToFormat(schema, internalArticleCard, 'isolated');
-      let response = await request.post('/api/cards').send(card);
-      expect(response).hasStatus(201);
-      assertIsolatedCardMetadata(response.body);
-
-      response = await request.get('/api/cards/local-hub::article-card::millenial-puppies?format=isolated');
-      expect(response).hasStatus(200);
-      assertIsolatedCardMetadata(response.body);
-    });
-
-    it("can update a card", async function() {
-      let externalArticleCard = await adaptCardToFormat(schema, internalArticleCard, 'isolated');
-      let { body:card } = await request.post('/api/cards').send(externalArticleCard);
-      let internalModel = card.included.find(i => i.type = 'local-hub::article-card::millenial-puppies');
-      internalModel.attributes.author = 'Van Gogh';
-      card.data.relationships.fields.data.push({ type: 'fields', id: 'local-hub::article-card::millenial-puppies::author'});
-      card.included.push({
-        type: 'fields',
-        id: 'local-hub::article-card::millenial-puppies::author',
-        attributes: {
-          'is-metadata': true,
-          'needed-when-embedded': true,
-          'field-type': '@cardstack/core-types::string'
-        }
+        response = await request.get('/api/cards/local-hub::article-card::millenial-puppies');
+        expect(response).hasStatus(200);
+        expect(response).has.deep.property('body.data.attributes.author', 'Van Gogh');
       });
 
-      let response = await request.patch('/api/cards/local-hub::article-card::millenial-puppies').send(card);
-      expect(response).hasStatus(200);
-      expect(response).has.deep.property('body.data.attributes.author', 'Van Gogh');
+      it('can delete a card', async function () {
+        let externalArticleCard = await adaptCardToFormat(schema, env.session, internalArticleCard, 'isolated', cardServices);
+        let { body: card } = await request.post('/api/cards').send(externalArticleCard);
+        let { data: { meta: { version } } } = card;
 
-      response = await request.get('/api/cards/local-hub::article-card::millenial-puppies');
-      expect(response).hasStatus(200);
-      expect(response).has.deep.property('body.data.attributes.author', 'Van Gogh');
-    });
+        let response = await request.delete('/api/cards/local-hub::article-card::millenial-puppies').set('If-Match', version);
+        expect(response).hasStatus(204);
 
-    it('can delete a card', async function () {
-      let externalArticleCard = await adaptCardToFormat(schema, internalArticleCard, 'isolated');
-      let { body: card } = await request.post('/api/cards').send(externalArticleCard);
-      let { data: { meta: { version } } } = card;
-
-      let response = await request.delete('/api/cards/local-hub::article-card::millenial-puppies').set('If-Match', version);
-      expect(response).hasStatus(204);
-
-      response = await request.get('/api/cards/local-hub::article-card::millenial-puppies');
-      expect(response).hasStatus(404);
+        response = await request.get('/api/cards/local-hub::article-card::millenial-puppies');
+        expect(response).hasStatus(404);
+      });
     });
   });
 });

@@ -110,6 +110,7 @@ export default class CardCreator extends Component {
       json = yield response.json();
       if (!response.ok) {
         this.statusMsg = `Error creating card: ${response.status}: ${response.statusText} - ${JSON.stringify(json)}`;
+        return;
       }
     } catch (e) {
       console.error(e); // eslint-disable-line no-console

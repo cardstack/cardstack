@@ -23,6 +23,11 @@ class Writers {
     return this.schemaLoader.ownTypes();
   }
 
+  // not using DI to prevent circular dependency
+  _getCardServices() {
+    if (this.cardServices) { return this.cardServices; }
+    return this.cardServices = this.__owner__.lookup('hub:card-services');
+  }
   async create(session, type, document) {
     log.info("creating type=%s", type);
     if (!document.data) {
@@ -168,7 +173,7 @@ class Writers {
 
     let authorizedDocument = await context.applyReadAuthorization({ session });
     if (isCard(authorizedDocument.data.type, authorizedDocument.data.id)) {
-      return await adaptCardToFormat(schema, authorizedDocument, 'isolated');
+      return await adaptCardToFormat(schema, session, authorizedDocument, 'isolated', this._getCardServices());
     }
     return authorizedDocument;
   }
@@ -228,7 +233,7 @@ class Writers {
 
     let authorizedDocument = await context.applyReadAuthorization({ session });
     if (isCard(authorizedDocument.data.type, authorizedDocument.data.id)) {
-      return await adaptCardToFormat(schema, authorizedDocument, 'isolated');
+      return await adaptCardToFormat(schema, session, authorizedDocument, 'isolated', this._getCardServices());
     }
     return authorizedDocument;
   }
