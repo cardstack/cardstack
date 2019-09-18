@@ -208,9 +208,19 @@ async function generateCardModule(card: SingleResourceDoc) {
   if (!repository || !packageName) { return; }
 
   let cleanCard: SingleResourceDoc = {
-    data: { ...card.data },
+    data: cloneDeep(card.data),
     included: sortBy(card.included, i => `${i.type}/${i.id}`)
   };
+  let computedFields = ((get(cleanCard, 'data.relationships.fields.data') || []) as ResourceIdentifierObject[])
+    .filter(i => i.type === 'computed-fields').map(i => i.id);
+  for (let field of Object.keys(cleanCard.data.attributes || {})) {
+    if (!computedFields.includes(field) || !cleanCard.data.attributes) { continue; }
+    delete cleanCard.data.attributes[field];
+  }
+  for (let field of Object.keys(cleanCard.data.relationships || {})) {
+    if (!computedFields.includes(field) || !cleanCard.data.relationships) { continue; }
+    delete cleanCard.data.relationships[field];
+  }
   let version: string = get(cleanCard, 'data.meta.version');
   let cardFolder: string = join(cardsDir, repository, packageName);
   let cardFile: string = join(cardFolder, cardFileName);
@@ -400,7 +410,17 @@ async function adaptCardToFormat(schema: todo, session: Session, cardModel: Sing
   let id = cardModel.data.id;
   cardModel.data.attributes = cardModel.data.attributes || {};
 
-  let cardSchema = getCardSchemas(schema, cardModel) || [];
+  // we need to make sure that grants don't interfere with our ability to get the card schema
+  let priviledgedCard: SingleResourceDoc = cardModel;
+  if (session !== Session.INTERNAL_PRIVILEGED) {
+    try {
+      priviledgedCard = await cardServices.get(Session.INTERNAL_PRIVILEGED, id, 'isolated');
+    } catch (e) {
+      if (e.status !== 404) { throw e; }
+    }
+  }
+
+  let cardSchema = getCardSchemas(schema, priviledgedCard) || [];
   schema = await schema.applyChanges(cardSchema.map(document => ({ id:document.id, type:document.type, document })));
 
   let result: SingleResourceDoc = {
@@ -452,7 +472,7 @@ async function adaptCardToFormat(schema: todo, session: Session, cardModel: Sing
   };
   result.included = [model].concat((cardModel.included || []).filter(i => schema.isSchemaType(i.type)));
 
-  for (let { id: fieldId } of (get(cardModel, 'data.relationships.fields.data') || [])) {
+  for (let { id: fieldId } of (get(priviledgedCard, 'data.relationships.fields.data') || [])) {
     let { modelId: fieldName } = cardContextFromId(fieldId);
     if (!fieldName) { continue; }
     let field = schema.getRealAndComputedField(fieldId);
