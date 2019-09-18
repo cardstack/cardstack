@@ -28,8 +28,6 @@ export default class EditDemoController extends Controller {
     let { insertedSprites, removedSprites } = context;
     let insertedSprite = insertedSprites[0];
 
-    printSprites(context, 'fieldTransition');
-
     insertedSprites.forEach(sprite => {
       fadeIn(sprite);
     });

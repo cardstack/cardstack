@@ -1,0 +1,41 @@
+<AnimatedContainer class="tray-container">
+  {{#animated-value model watch="mode" use=this.trayTransition}}
+    <div class="field-types-demo-page {{model.mode}}">
+      <AnimatedContainer class="card-container">
+        {{#animated-value model watch="mode" use=this.cardTransition}}
+          <div class="field-types-demo-card {{model.mode}} card-{{model.id}}">
+            <AnimatedContainer class="header-container">
+              {{#animated-value model watch="mode" use=this.headerTransition}}
+                <header class="field-types-demo-card-header {{model.mode}}">
+                  {{#animated-if (eq model.mode "schema") group="header-name" use=fade}}
+                    <div class="header-title">Customize Fields</div>
+                  {{else}}
+                    <div class="header-title">Edit Card</div>
+                  {{/animated-if}}
+                  <button class="btn-edit-toggle" {{action "setMode" (if (eq model.mode "edit") "schema" "edit")}}>{{if (eq model.mode "edit") "Schema" "Edit"}}</button>
+                </header>
+              {{/animated-value}}
+            </AnimatedContainer>
+            <AnimatedContainer class="body-container">
+              {{#animated-value model watch="mode" use=this.bodyTransition}}
+                <div class="field-types-demo-card-content {{model.mode}}">
+                  <div class="field-types-demo-card-field demo-card-text-field">
+                    <EditableField @value={{model.title}} @fieldName="title" @label="Title" @model={{model}} @mode={{model.mode}} @transition={{this.fieldTransition}}/>
+                  </div>
+                  <div class="field-types-demo-card-field demo-card-text-field">
+                    <EditableField @value={{model.description}} @fieldName="description" @label="Description"
+                      @model={{model}} @mode={{model.mode}} @transition={{this.fieldTransition}}/>
+                  </div>
+                  <div class="field-types-demo-card-field demo-card-text-area">
+                    <EditableField @value={{model.body}} @fieldName="body" @label="Body" @model={{model}}
+                      @mode={{model.mode}} @componentName="text-area" @transition={{this.fieldTransition}}/>
+                  </div>
+                </div>
+              {{/animated-value}}
+            </AnimatedContainer>
+          </div>
+        {{/animated-value}}
+      </AnimatedContainer>
+    </div>
+  {{/animated-value}}
+</AnimatedContainer>

@@ -21,14 +21,14 @@
                 <div class="demo-card-content {{model.mode}}">
                   <AnimatedContainer class="body-container">
                     <div class="demo-card-field demo-card-text-field">
-                      <EditableField @value={{model.title}} @fieldName="title" @label="Title" @mode={{model.mode}} />
+                      <EditableField @value={{model.title}} @fieldName="title" @label="Title" @model={{model}}/>
                     </div>
                     <div class="demo-card-field demo-card-text-field">
                       <EditableField @value={{model.description}} @fieldName="description" @label="Description"
-                        @mode={{model.mode}} />
+                        @model={{model}} />
                     </div>
                     <div class="demo-card-field demo-card-text-area">
-                      <EditableField @value={{model.body}} @fieldName="body" @label="Body" @mode={{model.mode}}
+                      <EditableField @value={{model.body}} @fieldName="body" @label="Body" @model={{model}}
                         @componentName="text-area" />
                     </div>
                   </AnimatedContainer>

@@ -3,23 +3,14 @@ import { computed } from '@ember/object';
 import template from '../templates/components/editable-field';
 import { layout, tagName } from '@ember-decorators/component';
 import fade from 'ember-animated/transitions/fade';
+import { toUp, toDown } from 'ember-animated/transitions/move-over';
 
 @layout(template)
 @tagName('')
 export default class EditableFieldComponent extends Component {
   fade = fade;
-
-  get mode() {
-    if (this._mode) {
-      return this._mode;
-    }
-
-    return 'view';
-  }
-
-  set mode(mode) {
-    this._mode = mode;
-  }
+  toUp = toUp;
+  toDown = toDown;
 
   @computed('transition')
   get defaultTransition() {
@@ -28,5 +19,24 @@ export default class EditableFieldComponent extends Component {
     }
 
     return this.fade;
+  }
+
+  @computed('model.mode')
+  get mode() {
+    if (this.model) {
+      return this.model.mode;
+    }
+
+    if (this._mode) {
+      return this._mode;
+    }
+
+    return 'view';
+  }
+
+  set mode(mode) {
+    this.set('_mode', mode);
+
+    return mode;
   }
 }

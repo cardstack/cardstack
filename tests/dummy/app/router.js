@@ -25,6 +25,7 @@ Router.map(function() {
     this.route('edit', { path: '/:id/edit' });
   });
   this.route('edit-demo');
+  this.route('field-types-demo');
   this.route('animate-input');
 });
 

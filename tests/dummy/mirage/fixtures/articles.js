@@ -13,5 +13,15 @@ export default [
     authorId: '1',
     body: 'Zombie ipsum reversus ab viral inferno, nam rick grimes malum cerebro. De carne lumbering animata corpora quaeritis. Summus brains sit , morbo vel maleficia? De apocalypsi gorger omero undead survivor dictum mauris. Hi mindless mortuis soulless creaturas, imo evil stalking monstra adventus resi dentevil vultus comedat cerebella viventium.',
     mode: 'view'
+  },
+  {
+    id: 'sample2',
+    title: `Sample Article With More Text`,
+    description: faker.random.words(7),
+    publishedDate: faker.date.past().toLocaleDateString(),
+    imageUrl: `${ENV.rootURL}images/${imageTypes[Math.floor(Math.random()*imageTypes.length)]}-${Math.ceil(Math.random()*4)}.png`,
+    authorId: '1',
+    body: 'Zombie ipsum reversus ab viral inferno, nam rick grimes malum cerebro. De carne lumbering animata corpora quaeritis. Summus brains sit , morbo vel maleficia? De apocalypsi gorger omero undead survivor dictum mauris. Hi mindless mortuis soulless creaturas, imo evil stalking monstra adventus resi dentevil vultus comedat cerebella viventium.',
+    mode: 'edit'
   }
 ]
