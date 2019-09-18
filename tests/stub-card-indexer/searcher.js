@@ -1,4 +1,4 @@
-const { uniqBy } = require('lodash');
+const { get, uniqBy } = require('lodash');
 module.exports = class StubCardSearcher {
   static create(params) {
     return new this(params);
@@ -17,9 +17,18 @@ module.exports = class StubCardSearcher {
   }
 
   async search(session, query, next) {
-    if (query && query.filter && (query.filter.type === 'cards' || query.filter.type.exact === 'cards')) {
+    if (get(query, 'filter.type.exact') === 'cards') {
+      let id = get(query, 'filter.id.exact');
       let included = [];
       let data = [];
+      if (id != null) {
+        let result = this.cards.find(i => i.data.id === id);
+        if (!result) {
+          return { data, included };
+        } else {
+          return { data: [result.data], included: result.included };
+        }
+      }
       for (let card of this.cards) {
         data.push(card.data);
         included = included.concat(card.included);

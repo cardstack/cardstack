@@ -126,7 +126,7 @@
         "--timeout",
         "200000",
         //  "--grep",
-        //  "migration"
+        //  "card tests"
       ]
     },
     {
