@@ -15,14 +15,14 @@
         <div class="animate-input-card-content {{model.mode}}">
           <AnimatedContainer class="body-container">
             <div class="animate-input-card-field animate-input-card-text-field">
-              <EditableField @value={{model.title}} @fieldName="title" @label="Title" @mode={{model.mode}} @transition={{this.transition}}/>
+              <BoxelField @value={{model.title}} @fieldName="title" @label="Title" @mode={{model.mode}} @transition={{this.transition}}/>
             </div>
             {{!-- <div class="animate-input-card-field animate-input-card-text-field">
-              <EditableField @value={{model.description}} @fieldName="description" @label="Description"
+              <BoxelField @value={{model.description}} @fieldName="description" @label="Description"
                 @mode={{model.mode}} />
             </div>
             <div class="animate-input-card-field animate-input-card-text-area">
-              <EditableField @value={{model.body}} @fieldName="body" @label="Body" @mode={{model.mode}}
+              <BoxelField @value={{model.body}} @fieldName="body" @label="Body" @mode={{model.mode}}
                 @componentName="text-area" />
             </div> --}}
           </AnimatedContainer>
