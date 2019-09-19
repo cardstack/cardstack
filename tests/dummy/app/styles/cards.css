@@ -3,7 +3,7 @@
   height: 100%;
   min-height: 100vh;
   margin: 0 auto;
-  padding: 60px 20px;
+  padding: 100px 20px;
   background-color: var(--catalog-light-purple);
 }
 
@@ -16,7 +16,7 @@
   box-sizing: border-box;
   width: 150px;
   height: 150px;
-  padding: 20px;
+  border: none;
   border-radius: 65px;
   background-color: mediumpurple;
   color: black;
@@ -54,10 +54,10 @@
   opacity: 0.3;
 }
 
-.card-2 {
-  background-color: yellow;
-}
-
 .card-3 {
   background-color: red;
+}
+
+.card-2 {
+  background-color: yellow;
 }

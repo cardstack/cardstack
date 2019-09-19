@@ -27,6 +27,10 @@ Router.map(function() {
   this.route('edit-demo');
   this.route('field-types-demo');
   this.route('animate-input');
+  this.route('cards');
+  this.route('image-cards', function() {
+    this.route('image-card', { path: '/:id' });
+  });
 });
 
 export default Router;
