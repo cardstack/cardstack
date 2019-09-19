@@ -1,24 +1,49 @@
 # @cardstack/github-auth
 
-This README outlines the details of collaborating on this Ember addon.
+The `github-auth` plugin is a feature of the Card SDK that enables GitHub OAuth for authenticating users.
+It is one of the easiest ways to add real login functionality to a Cardstack project, as well as creating a way to track who has made changes to data over time.
 
 ## Installation
 
-* `git clone <repository-url>` this repository
-* `cd @cardstack/github-auth`
-* `npm install`
-* `bower install`
+* `cd your-cardstack-project-name/cardhost`
+* `yarn add @cardstack/github-auth`
 
-## Running
+## Configuration
 
-To run the demo app and interact with GitHub, you need to register your app via https://github.com/settings/developers and get a client ID & secret. Set them via the environment variables `GITHUB_CLIENT_ID` and `GITHUB_CLIENT_SECRET`. This allows this plugin to act as an OAuth2 client that speaks to GitHub on behalf of users who authorize it.
+1. Using the `@cardstack/git` plugin, set up a GitHub repository to hold your Card data
+2. Register a new OAuth app via https://github.com/settings/developers, which will get you a client ID and secret. You will use these as environment variables `GITHUB_CLIENT_ID` and `GITHUB_CLIENT_SECRET`. If you are developing locally, use `http://localhost:4200/` for the callback URL.
+3. Create a [Personal Access Token](https://github.com/settings/tokens) on GitHub. Check the boxes that allow `repo` and `user` scope. You will use this token as `GITHUB_TOKEN` in environment variables. Also make sure that your account has push permissions for the GitHub repos that are hosting your Card data. Note that in order to get access to a github user's email address, the GitHub user *must* set a public email address in their GitHub profile settings. By default, new users do not have a public email address.
 
-For the present, you also need a user token that the Hub can use to represent itself. You can use a [Personal Access Token](https://github.com/settings/tokens). Make sure that this token has `repo` and `user` scope, as well as push permissions on the GitHub repos that you configure to use with the github-auth plugin datasource. This allows the plugin to have sufficient privileges to be able to query the repo for collaborator permissions. Set is via the environment variable `GITHUB_TOKEN`.
+## Sample configuration
 
-Note that in order to get access to a github user's email address, the github user *must* set a public email address in their github profile settings. GitHub allows people to opt-in to having a public email, so that means by default, github users do not have a public email address.
+Here is an example of how to use the plugin, in `project-name/cardstack/data-sources/github.js`:
 
-* `ember serve`
-* Visit your app at [http://localhost:4200](http://localhost:4200).
+```js
+const JSONAPIFactory = require('@cardstack/test-support/jsonapi-factory');
+
+let factory = new JSONAPIFactory();
+
+factory.addResource('data-sources', 'github').withAttributes({
+  sourceType: '@cardstack/github-auth',
+  params: {
+    'client-id': process.env.GITHUB_CLIENT_ID,
+    'client-secret': process.env.GITHUB_CLIENT_SECRET,
+    token: process.env.GITHUB_TOKEN,
+    permissions: [
+      { repo: 'myusername/my-project-data', permission: 'read' },
+      { repo: 'myusername/my-project-data', permission: 'write' },
+    ]
+  }
+});
+
+module.exports = factory.getModels();
+```
+
+Then, if you want to run the project locally, you can pass in the environment variables through the command line when you start the server:
+
+```sh
+GITHUB_CLIENT_ID=abc GITHUB_CLIENT_SECRET=123 GITHUB_TOKEN=xyz yarn start
+```
 
 ## Running Tests
 
