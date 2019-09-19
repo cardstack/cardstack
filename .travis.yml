@@ -1,7 +1,9 @@
 ---
+matrix:
+  fast_finish: true
+
 language: node_js
 node_js:
-  - "8"
   - "10"
 
 sudo: required
@@ -26,6 +28,20 @@ cache:
   directories:
     - node_modules
 
+jobs:
+  include:
+    - script: npm run lint:deps && npm run lint:js
+      name: 'Linting'
+    - script: npm run ember-tests
+      name: 'Ember tests'
+      node_js: "10"
+    - script: npm run node-tests && npm run truffle-tests
+      name: 'Node tests (node ver 8)'
+      node_js: "8"
+    - script: npm run node-tests && npm run truffle-tests
+      name: 'Node tests (node ver 10)'
+      node_js: "10"
+
 before_install:
   - docker run -d --rm -p 9200:9200 --name elasticsearch cardstack/elasticsearch:dev
   - docker run -d --rm -p 5444:5432 --name postgres cardstack/pg-test
@@ -40,6 +56,7 @@ install:
 
 before_script:
  - yarn run blockchain &
+ - sleep 10
  - wget -q --waitretry=1 --retry-connrefused -T 1 -O - http://127.0.0.1:9200
  - node packages/postgresql/node-tests/pg-server/wait-for-db.js
 
