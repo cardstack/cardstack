@@ -45,14 +45,80 @@ class Writers {
     return await this.handleCreate(true, session, type, stream);
   }
 
+  async handleCardDeleteOperation(session, id) {
+    let internalCard;
+    try {
+      internalCard = await this.searchers.get(Session.INTERNAL_PRIVILEGED, 'local-hub', id, id);
+    } catch (e) {
+      if (e.status !== 404) { throw e; }
+    }
+    if (!internalCard) { return {}; }
+
+    return await this.handleCardOperations(session, internalCard, true);
+  }
+
+  async handleCardOperations(session, card, isDeletion) {
+    let schema, internalCard, oldCard;
+    let id = card.data.id;
+    if (isDeletion) {
+      internalCard = card;
+      schema = await this._loadInternalCardSchema(internalCard);
+    } else {
+      ({ schema, internalCard } = await this._loadInternalCard(card));
+      try {
+        oldCard = await this.searchers.get(Session.INTERNAL_PRIVILEGED, 'local-hub', id, id);
+      } catch (e) {
+        if (e.status !== 404) { throw e; }
+      }
+    }
+
+    let addedModels = [];
+    let deletedModels = [];
+    let changedModels = [];
+    if (isDeletion) {
+      deletedModels = [internalCard.data].concat(internalCard.included || []);
+    } else if (oldCard) {
+      changedModels = intersectionBy(internalCard.included || [], oldCard.included || [], i => `${i.type}/${i.id}`);
+      addedModels = differenceBy(internalCard.included || [], oldCard.included || [], i => `${i.type}/${i.id}`);
+      deletedModels = differenceBy(oldCard.included || [], internalCard.included || [], i => `${i.type}/${i.id}`);
+    } else {
+      addedModels = internalCard.included || [];
+    }
+
+    let beforeFinalize = async () => {
+      // This assumes that the session used to update cards also posseses permissions to CRUD schema models and internal card models
+      for (let resource of addedModels) {
+        await this.handleCreate(false, session, resource.type, {
+          data: resource,
+          included: [internalCard.data].concat(internalCard.included || [])
+        }, schema);
+      }
+      for (let resource of changedModels) {
+        await this.update(session, resource.type, resource.id, {
+          data: resource,
+          included: [internalCard.data].concat(internalCard.included || [])
+        }, schema);
+      }
+    };
+
+    // Don't delete schema until after the card model has been updated so that
+    // you don't end up with a content type referring to a missing field
+    let afterFinalize = async () => {
+      let updatedSchema = await this._deleteInternalCardResources(session, schema, deletedModels);
+      // deleting card schema can result in deleted schema resource which will need to be shared with the outside world
+      return updatedSchema;
+    };
+
+    return { internalCard, schema, beforeFinalize, afterFinalize };
+  }
+
   async handleCreate(isBinary, session, type, documentOrStream, schema) {
     await this.pgSearchClient.ensureDatabaseSetup();
 
     schema = schema || await this.currentSchema.getSchema();
+    let beforeFinalize;
     if (type === 'cards') {
-      let internalCardAndSchema = await this._loadInternalCard(documentOrStream);
-      schema = internalCardAndSchema.schema;
-      documentOrStream = internalCardAndSchema.card;
+      ({ schema, internalCard: documentOrStream, beforeFinalize } = await this.handleCardOperations(session, documentOrStream));
       type = documentOrStream.data.type;
     }
 
@@ -84,16 +150,9 @@ class Writers {
       let newSchema = await schema.validate(pending, { type, session });
       schema = newSchema || schema;
 
-      if (!isBinary && isCard(type, documentOrStream.data.id)) {
-        // This assumes that the session used to create cards also posseses permissions to create schema models and internal card models
-        for (let resource of documentOrStream.included || []) {
-          await this.handleCreate(false, session, resource.type, {
-            data: resource,
-            included: [documentOrStream.data].concat(documentOrStream.included || [])
-          }, schema);
-        }
+      if (typeof beforeFinalize === 'function') {
+        await beforeFinalize();
       }
-
       context = await this._finalize(pending, type, schema, sourceId);
 
       let batch = this.pgSearchClient.beginBatch(schema, this.searchers);
@@ -122,21 +181,13 @@ class Writers {
       });
     }
     await this.pgSearchClient.ensureDatabaseSetup();
-
-    let addedModels = [];
-    let deletedModels = [];
-    let changedModels = [];
     schema = schema || await this.currentSchema.getSchema();
-    if (type === 'cards') {
-      let internalCardAndSchema = await this._loadInternalCard(document);
-      schema = internalCardAndSchema.schema;
-      document = internalCardAndSchema.card;
-      type = document.data.type;
 
-      let oldCard = await this.searchers.get(Session.INTERNAL_PRIVILEGED, 'local-hub', document.data.type, id);
-      changedModels = intersectionBy(document.included || [], oldCard.included || [], i => `${i.type}/${i.id}`);
-      addedModels = differenceBy(document.included || [], oldCard.included || [], i => `${i.type}/${i.id}`);
-      deletedModels = differenceBy(oldCard.included || [], document.included || [], i => `${i.type}/${i.id}`);
+    let beforeFinalize;
+    let afterFinalize;
+    if (type === 'cards') {
+      ({ schema, internalCard:document, beforeFinalize, afterFinalize } = await this.handleCardOperations(session, document));
+      type = document.data.type;
     }
 
     let { writer, sourceId } = this._getSchemaDetailsForType(schema, type);
@@ -156,18 +207,8 @@ class Writers {
       let newSchema = await schema.validate(pending, { type, id, session });
       schema = newSchema || schema;
 
-      // This assumes that the session used to update cards also posseses permissions to CRUD schema models and internal card models
-      for (let resource of addedModels) {
-        await this.handleCreate(false, session, resource.type, {
-          data: resource,
-          included: [document.data].concat(document.included || [])
-        }, schema);
-      }
-      for (let resource of changedModels) {
-        await this.update(session, resource.type, resource.id, {
-          data: resource,
-          included: [document.data].concat(document.included || [])
-        }, schema);
+      if (typeof beforeFinalize === 'function') {
+        await beforeFinalize();
       }
       context = await this._finalize(pending, type, schema, sourceId);
 
@@ -175,9 +216,9 @@ class Writers {
       await batch.saveDocument(context);
       await batch.done();
 
-      // Don't delete schema until after the card model has been updated so that
-      // you don't end up with a content type referring to a missing field
-      schema = await this._deleteInternalCardResources(session, schema, deletedModels);
+      if (typeof afterFinalize === 'function') {
+        schema = await afterFinalize();
+      }
       if (newSchema) {
         this.currentSchema.invalidateCache();
       }
@@ -198,17 +239,11 @@ class Writers {
 
     schema = schema || await this.currentSchema.getSchema();
 
-    let internalCard;
-    if (type == 'cards') {
-      try {
-        internalCard = await this.searchers.get(Session.INTERNAL_PRIVILEGED, 'local-hub', id, id);
-      } catch (e) {
-        if (e.status !== 404) { throw e; }
-      }
+    let afterFinalize;
+    if (type === 'cards') {
+      let internalCard;
+      ({ schema, internalCard, afterFinalize } = await this.handleCardDeleteOperation(session, id));
       if (!internalCard) { return; }
-
-      let cardSchema = await loadCard(schema, internalCard);
-      schema = await schema.applyChanges(cardSchema.map(document => ({ id: document.id, type: document.type, document })));
       type = internalCard.data.type;
       version = get(internalCard, 'data.meta.version');
     }
@@ -227,8 +262,8 @@ class Writers {
       await batch.deleteDocument(context);
       await batch.done();
 
-      if (internalCard) {
-        await this._deleteInternalCardResources(session, schema, [internalCard.data].concat(internalCard.included || []));
+      if (typeof afterFinalize === 'function') {
+        schema = await afterFinalize();
       }
       if (newSchema) {
         this.currentSchema.invalidateCache();
@@ -313,9 +348,12 @@ class Writers {
 
   async _loadInternalCard(card) {
     let internalCard = generateInternalCardFormat(card);
+    return { internalCard, schema: await this._loadInternalCardSchema(internalCard) };
+  }
+
+  async _loadInternalCardSchema(internalCard) {
     let schema = await loadCard(await this.currentSchema.getSchema(), internalCard);
-    schema = await (await this.currentSchema.getSchema()).applyChanges(schema.map(document => ({ id: document.id, type: document.type, document })));
-    return { schema, card: internalCard };
+    return await (await this.currentSchema.getSchema()).applyChanges(schema.map(document => ({ id: document.id, type: document.type, document })));
   }
 
   _getSchemaDetailsForType(schema, type) {

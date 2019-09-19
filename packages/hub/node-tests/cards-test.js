@@ -374,7 +374,7 @@ describe('hub/card-services', function () {
       assertIsolatedCardMetadata(article);
     });
 
-    it("can add field to a card's schema", async function() {
+    it("can add a field to a card's schema", async function() {
       let card = await cardServices.create(env.session, externalArticleCard);
       card.data.relationships.fields.data.push({ type: 'fields', id: 'local-hub::article-card::millenial-puppies::editor'});
       card.included.push({
