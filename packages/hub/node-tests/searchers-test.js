@@ -66,7 +66,7 @@ describe('hub/searchers/basics', function() {
         await searchers.get(env.session, 'local-hub', 'examples', 'nonexistent');
         throw new Error("should not get here");
       } catch (err) {
-        expect(err.message).to.match(/No such resource local-hub\/examples\/nonexist/);
+        expect(err.message).to.match(/No such resource examples\/nonexist/);
       }
     });
 

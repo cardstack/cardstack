@@ -1,15 +1,19 @@
 import Component from '@glimmer/component';
 import { action } from '@ember/object';
 import { tracked } from '@glimmer/tracking';
+import { inject as service } from '@ember/service';
 import { task } from "ember-concurrency";
 import { hubURL } from '@cardstack/plugin-utils/environment';
 import { ciSessionId } from '@cardstack/test-support/environment';
 
 export default class CardCreator extends Component {
+  @service router;
+
+  @tracked repository = 'local-hub';
+  @tracked packageName = 'article-card';
+  @tracked cardId = 'millenial-puppies';
   @tracked statusMsg;
   @tracked card;
-  @tracked id;
-  @tracked packageName;
 
   constructor(...args) {
     super(...args);
@@ -33,7 +37,6 @@ export default class CardCreator extends Component {
               { type: 'fields', id: 'local-hub::article-card::millenial-puppies::author' },
               { type: 'fields', id: 'local-hub::article-card::millenial-puppies::body' },
               { type: 'fields', id: 'local-hub::article-card::millenial-puppies::internal-field' },
-              { type: 'fields', id: 'local-hub::article-card::millenial-puppies::tags' },
             ]
           },
           model: {
@@ -45,20 +48,11 @@ export default class CardCreator extends Component {
         type: 'local-hub::article-card::millenial-puppies',
         id: 'local-hub::article-card::millenial-puppies',
         attributes: {
-          'local-hub::article-card::millenial-puppies::internal-field': 'this is internal data',
-          'local-hub::article-card::millenial-puppies::title': 'The Millenial Puppy',
-          'local-hub::article-card::millenial-puppies::author': 'Van Gogh',
-          'local-hub::article-card::millenial-puppies::body': `It can be difficult these days to deal with the discerning tastes of the millenial puppy.`
+          'internal-field': 'this is internal data',
+          'title': 'The Millenial Puppy',
+          'author': 'Van Gogh',
+          'body': `It can be difficult these days to deal with the discerning tastes of the millenial puppy.`
         },
-        relationships: {
-          'local-hub::article-card::millenial-puppies::tags': {
-            data: [
-              { type: 'local-hub::article-card::millenial-puppies::tags', id: 'local-hub::article-card::millenial-puppies::millenials' },
-              { type: 'local-hub::article-card::millenial-puppies::tags', id: 'local-hub::article-card::millenial-puppies::puppies' },
-              { type: 'local-hub::article-card::millenial-puppies::tags', id: 'local-hub::article-card::millenial-puppies::belly-rubs' },
-            ]
-          }
-        }
       },
       {
         type: 'fields',
@@ -68,13 +62,6 @@ export default class CardCreator extends Component {
           'needed-when-embedded': true,
           'field-type': '@cardstack/core-types::string'
         },
-        relationships: {
-          contraints: {
-            data: [
-              { type: 'constraints', id: 'local-hub::article-card::millenial-puppies::title-not-null' }
-            ]
-          }
-        }
       },
       {
         type: 'fields',
@@ -100,31 +87,6 @@ export default class CardCreator extends Component {
           'field-type': '@cardstack/core-types::string'
         }
       },
-      {
-        type: 'fields',
-        id: 'local-hub::article-card::millenial-puppies::tags',
-        attributes: {
-          'is-metadata': true,
-          'field-type': '@cardstack/core-types::has-many'
-        },
-        relationships: {
-          'related-types': {
-            data: [{ type: 'content-types', id: 'local-hub::article-card::millenial-puppies::tags'} ]
-          }
-        }
-      },
-      {
-        type: 'content-types',
-        id: 'local-hub::article-card::millenial-puppies::tags'
-      },
-      {
-        type: 'constaints',
-        id: 'local-hub::article-card::millenial-puppies::title-not-null',
-        attributes: {
-          'constraint-type': '@cardstack/core-types::not-null',
-          'error-message': 'The title must not be empty.'
-        }
-      }
       ]
     }, null, 2);
   }
@@ -157,10 +119,9 @@ export default class CardCreator extends Component {
 
     let cardData = JSON.parse(this.card);
     if (json.data.id === cardData.data.id && json.data.type === 'cards') {
-      this.statusMsg `card ${json.data.id} was successfully created`
-      // TODO transition to the "card update" route with the new card
+      this.router.transitionTo('cards.update', json.data.id);
     } else {
-      this.statusMsg `card ${cardData.data.id} was NOT successfully created`
+      this.statusMsg = `card ${cardData.data.id} was NOT successfully created`;
     }
   }) createCard;
 

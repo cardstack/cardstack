@@ -275,7 +275,7 @@ describe('jsonapi/middleware', function() {
     it('returns 404 for missing individual resource', async function() {
       let response = await request.get('/api/articles/98766');
       expect(response).hasStatus(404);
-      expect(response.body).to.have.deep.property('errors[0].detail', 'No such resource local-hub/articles/98766');
+      expect(response.body).to.have.deep.property('errors[0].detail', 'No such resource articles/98766');
     });
 
     it('can get a collection resource', async function() {
@@ -907,7 +907,7 @@ describe('jsonapi/middleware', function() {
       await env.setUserId(null);
       let response = await request.get('/api/articles/0');
       expect(response).hasStatus(404);
-      expect(response.body).to.have.deep.property('errors[0].detail', 'No such resource local-hub/articles/0');
+      expect(response.body).to.have.deep.property('errors[0].detail', 'No such resource articles/0');
     });
 
     it('applies authorization during collection get', async function() {
@@ -994,7 +994,41 @@ describe('jsonapi/middleware', function() {
       assertIsolatedCardMetadata(response.body);
     });
 
-    it.skip('can update a card', async function() {
+    it("can update a card", async function() {
+      let externalArticleCard = await adaptCardToFormat(schema, internalArticleCard, 'isolated');
+      let { body:card } = await request.post('/api/cards').send(externalArticleCard);
+      let internalModel = card.included.find(i => i.type = 'local-hub::article-card::millenial-puppies');
+      internalModel.attributes.author = 'Van Gogh';
+      card.data.relationships.fields.data.push({ type: 'fields', id: 'local-hub::article-card::millenial-puppies::author'});
+      card.included.push({
+        type: 'fields',
+        id: 'local-hub::article-card::millenial-puppies::author',
+        attributes: {
+          'is-metadata': true,
+          'needed-when-embedded': true,
+          'field-type': '@cardstack/core-types::string'
+        }
+      });
+
+      let response = await request.patch('/api/cards/local-hub::article-card::millenial-puppies').send(card);
+      expect(response).hasStatus(200);
+      expect(response).has.deep.property('body.data.attributes.author', 'Van Gogh');
+
+      response = await request.get('/api/cards/local-hub::article-card::millenial-puppies');
+      expect(response).hasStatus(200);
+      expect(response).has.deep.property('body.data.attributes.author', 'Van Gogh');
+    });
+
+    it('can delete a card', async function () {
+      let externalArticleCard = await adaptCardToFormat(schema, internalArticleCard, 'isolated');
+      let { body: card } = await request.post('/api/cards').send(externalArticleCard);
+      let { data: { meta: { version } } } = card;
+
+      let response = await request.delete('/api/cards/local-hub::article-card::millenial-puppies').set('If-Match', version);
+      expect(response).hasStatus(204);
+
+      response = await request.get('/api/cards/local-hub::article-card::millenial-puppies');
+      expect(response).hasStatus(404);
     });
   });
 });

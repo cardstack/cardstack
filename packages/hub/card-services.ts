@@ -36,4 +36,12 @@ class CardServices {
   async create(session: Session, card: SingleResourceDoc) {
     return await this.writers.create(session, 'cards', card);
   }
+
+  async update(session: Session, id: string, card: SingleResourceDoc) {
+    return await this.writers.update(session, 'cards', id, card);
+  }
+
+  async delete(session: Session, id: string, version: string) {
+    return await this.writers.delete(session, version, 'cards', id);
+  }
 });

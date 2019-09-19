@@ -218,7 +218,12 @@ class Handler {
 
   async handleIndividualPATCH(type, id) {
     let data = this._mandatoryBodyData();
-    let record = await this.writers.update(this.session, type, id, data);
+    let record;
+    if (type === 'cards') {
+      record = await this.cardServices.update(this.session, id, data);
+    } else {
+      record = await this.writers.update(this.session, type, id, data);
+    }
     this.ctxt.body = record;
     this.ctxt.status = 200;
   }
@@ -226,7 +231,11 @@ class Handler {
   async handleIndividualDELETE(type, id) {
     try {
       let version = this.ctxt.header['if-match'];
-      await this.writers.delete(this.session, version, type, id);
+      if (type === 'cards') {
+        await this.cardServices.delete(this.session, id, version);
+      } else {
+        await this.writers.delete(this.session, version, type, id);
+      }
       this.ctxt.status = 204;
     } catch (err) {
       // By convention, the writer always refers to the version as

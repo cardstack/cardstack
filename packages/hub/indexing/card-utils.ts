@@ -9,7 +9,7 @@ import {
   RelationshipsObject,
   RelationshipsWithData
 } from "jsonapi-typescript";
-import { set, get, uniqBy, isEqual, sortBy } from 'lodash';
+import { set, get, uniqBy, isEqual, sortBy, cloneDeep } from 'lodash';
 import logger from '@cardstack/logger';
 import { join } from "path";
 import { tmpdir } from 'os';
@@ -18,10 +18,13 @@ import {
   pathExistsSync,
   writeFileSync,
   removeSync,
+  writeJSONSync,
+  readJSONSync
 } from "fs-extra";
 
 const cardsDir: string = join(tmpdir(), 'card_modules');
 const cardFileName = 'card.js';
+const seenVersionsFile = '.seen_versions.json';
 const log = logger('cardstack/card-utils');
 
 interface CardContext {
@@ -41,11 +44,11 @@ const cardBrowserAssetFields = [
   'embedded-css',
 ];
 
-function cardContextFromId(id: string) {
+function cardContextFromId(id: string | number) {
   let noContext: CardContext = {};
   if (id == null) { return noContext; }
 
-  let idSplit = id.split(cardIdDelim);
+  let idSplit = String(id).split(cardIdDelim);
   if (idSplit.length < 2) { return noContext; }
 
   let [repository, packageName, cardId, modelId] = idSplit;
@@ -73,15 +76,25 @@ async function loadCard(schema: todo, card: SingleResourceDoc) {
   return getCardSchemas(schema, card);
 }
 
+function getCardId(id: string) {
+  let { repository, packageName, cardId } = cardContextFromId(id);
+  return cardContextToId({ repository, packageName, cardId });
+}
+
 function generateInternalCardFormat(card: SingleResourceDoc) {
   let id = card.data.id as string;
   if (!id) { throw new Error(`The card ID must be supplied in the card document in order to create the card.`); }
 
+  card = addCardContextToIncludedFields(card) as SingleResourceDoc;
   let model: ResourceObject | undefined = (card.included || []).find(i => `${i.type}/${i.id}` === `${id}/${id}`);
   if (!model) { throw new Error(`The card document 'cards/${id}' is missing its card model '${id}/${id}'.`); }
 
   let fields: ResourceIdentifierObject[]  = get(card, 'data.relationships.fields.data') || [];
   set(model, 'relationships.fields.data', fields);
+  let version = get(card, 'data.meta.version');
+  if (version != null) {
+    set(model, 'meta.version', version);
+  }
   for (let field of cardBrowserAssetFields) {
     let value = get(card, `data.attributes.${field}`) as string;
     if (!value) { continue; }
@@ -113,12 +126,20 @@ async function generateCardModule(card: SingleResourceDoc) {
     data: { ...card.data },
     included: sortBy(card.included, i => `${i.type}/${i.id}`)
   };
-  delete cleanCard.data.meta;
+  let version: string = get(cleanCard, 'data.meta.version');
   let cardFolder: string = join(cardsDir, repository, packageName);
   let cardFile: string = join(cardFolder, cardFileName);
+  let seenVersions: string[] = [];
   ensureDirSync(cardFolder);
+  delete cleanCard.data.meta;
 
+  // need to make sure we aren't using cached card module since we use
+  // import to load the card.
   if (pathExistsSync(cardFile)) {
+    for (let cacheKey of Object.keys(require.cache)) {
+      if (!cacheKey.includes(cardFile)) { continue; }
+      delete require.cache[cacheKey];
+    }
     let cardOnDisk: SingleResourceDoc = (await import(cardFile)).default;
     // cleanup default value field artifacts
     for (let field of Object.keys(cardOnDisk.data.attributes || {})) {
@@ -132,6 +153,19 @@ async function generateCardModule(card: SingleResourceDoc) {
       }
     }
     if (isEqual(cleanCard.data, cardOnDisk.data)) { return; }
+
+    try {
+      seenVersions = readJSONSync(join(cardFolder, seenVersionsFile));
+    } catch(e) {
+      if (e.code !== 'ENOENT') { throw e; } // ignore file not found errors
+    }
+    // the PendingChange class will actually create DocumentContext for the old
+    // and new versions of the document when it is being updated, and we dont want
+    // to inadvertantly clobber the latest card on disk with an older version of
+    // the card as a result of processing an older card as part of what PendingChange
+    // needs to do, so we keep track of the versions of the card that we've seen and
+    // only write to disk if the version of the card is not one we have encountered yet.
+    if (version != null && seenVersions.includes(version)) { return; }
   }
 
   log.info(`generating on-disk card artifacts for cards/${card.data.id} in ${cardFolder}`);
@@ -155,6 +189,10 @@ async function generateCardModule(card: SingleResourceDoc) {
 
   // TODO in the future `yarn install` this package
   writeFileSync(cardFile, `module.exports = ${JSON.stringify(cleanCard, null, 2)};`, 'utf8');
+  if (version != null) {
+    seenVersions.push(version);
+    writeJSONSync(join(cardFolder, seenVersionsFile), seenVersions);
+  }
 
   // TODO in the future we should await until webpack finishes compiling
   // the browser assets however we determine to manage that...
@@ -217,8 +255,8 @@ function getCardSchemas(schema: todo, card: SingleResourceDoc) {
 
 function deriveCardModelContentType(card: SingleResourceDoc) {
   if (!card.data.id) { return; }
+  let id = getCardId(card.data.id);
 
-  let { repository, packageName, cardId } = cardContextFromId(card.data.id);
   let fields: RelationshipsWithData = {
     data: [{ type: 'fields', id: 'fields' }].concat(
       cardBrowserAssetFields.map(i => ({ type: 'fields', id: i})),
@@ -236,8 +274,8 @@ function deriveCardModelContentType(card: SingleResourceDoc) {
     .map((i: ResourceIdentifierObject) => i.id));
 
   let modelContentType: ResourceObject = {
+    id,
     type: 'content-types',
-    id: cardContextToId({ repository, packageName, cardId }),
     attributes: { 'default-includes': defaultIncludes },
     relationships: { fields }
   };
@@ -340,7 +378,55 @@ async function adaptCardToFormat(schema: todo, cardModel: SingleResourceDoc, for
     }
   }
 
-  return result;
+  return removeCardContextFromIncludedFields(result) as SingleResourceDoc;
+}
+
+function removeCardContextFromIncludedFields(card: SingleResourceDoc) {
+  let id = card.data.id as string;
+  if (!id) { return; }
+
+  card = cloneDeep(card) as SingleResourceDoc;
+  let included = (card.included || []).filter(({ type }) => type.includes(id));
+  for (let resource of included) {
+    for (let field of Object.keys(resource.attributes || {})) {
+      let { modelId:fieldName } = cardContextFromId(field);
+      if (!fieldName || !resource.attributes) { continue; }
+      resource.attributes[fieldName] = resource.attributes[field];
+      delete resource.attributes[field];
+    }
+    for (let field of Object.keys(resource.relationships || {})) {
+      let { modelId:fieldName } = cardContextFromId(field);
+      if (!fieldName || !resource.relationships) { continue; }
+      resource.relationships[fieldName] = resource.relationships[field];
+      delete resource.relationships[field];
+    }
+  }
+
+  return card;
+}
+
+function addCardContextToIncludedFields(card: SingleResourceDoc) {
+  let id = getCardId(card.data.id as string);
+  if (!id) { return; }
+
+  card = cloneDeep(card) as SingleResourceDoc;
+  let included = (card.included || []).filter(({ type }) => type.includes(id));
+  for (let resource of included) {
+    for (let field of Object.keys(resource.attributes || {})) {
+      if (!resource.attributes) { continue; }
+      let fieldName = `${id}${cardIdDelim}${field}`;
+      resource.attributes[fieldName] = resource.attributes[field];
+      delete resource.attributes[field];
+    }
+    for (let field of Object.keys(resource.relationships || {})) {
+      if (!resource.relationships) { continue; }
+      let fieldName = `${id}${cardIdDelim}${field}`;
+      resource.relationships[fieldName] = resource.relationships[field];
+      delete resource.relationships[field];
+    }
+  }
+
+  return card;
 }
 
 function formatHasField(field: todo, format: string) {
@@ -351,13 +437,11 @@ function formatHasField(field: todo, format: string) {
 }
 
 export = {
-  cardIdDelim,
-  cardContextFromId,
-  cardContextToId,
-  cardBrowserAssetFields,
   isCard,
   loadCard,
-  generateInternalCardFormat,
+  getCardId,
   adaptCardToFormat,
+  cardBrowserAssetFields,
+  generateInternalCardFormat,
   adaptCardCollectionToFormat,
 }
