@@ -78,6 +78,11 @@ let internalArticleCard = cardFactory.getDocumentFor(
       cardFactory.addResource('fields', 'local-hub::article-card::millenial-puppies::internal-field').withAttributes({
         'field-type': '@cardstack/core-types::string'
       }),
+      cardFactory.addResource('computed-fields', 'local-hub::article-card::millenial-puppies::tag-names').withAttributes({
+        'is-metadata': true,
+        'needed-when-embedded': true,
+        'computed-field-type': 'stub-card-project::tags'
+      }),
 
       // TODO is this a legit scenario where a card has a metadata relationship field
       // to an internal model? Maybe instead, cards' metadata relationships can only be to other cards?
@@ -153,6 +158,7 @@ function assertIsolatedCardMetadata(card) {
   expect(data.attributes.title).to.equal('The Millenial Puppy');
   expect(data.attributes.body).to.match(/discerning tastes of the millenial puppy/);
   expect(data.attributes.author).to.equal('Van Gogh');
+  expect(data.attributes['tag-names']).to.eql(['millenials', 'puppies', 'belly-rubs']);
   expect(data.relationships.tags.data).to.eql([
     { type: 'local-hub::article-card::millenial-puppies::tags', id: 'local-hub::article-card::millenial-puppies::millenials' },
     { type: 'local-hub::article-card::millenial-puppies::tags', id: 'local-hub::article-card::millenial-puppies::puppies' },
@@ -167,6 +173,7 @@ function assertEmbeddedCardMetadata(card) {
 
   expect(data.attributes.title).to.equal('The Millenial Puppy');
   expect(data.attributes.author).to.equal('Van Gogh');
+  expect(data.attributes['tag-names']).to.eql(['millenials', 'puppies', 'belly-rubs']);
   expect(data.relationships.tags).to.be.undefined;
   expect(data.attributes.body).to.be.undefined;
   expect(data.attributes['internal-field']).to.be.undefined;
@@ -193,6 +200,7 @@ function assertCardModels(card) {
   expect(model.attributes.title).to.equal('The Millenial Puppy');
   expect(model.attributes.body).to.match(/discerning tastes of the millenial puppy/);
   expect(model.attributes.author).to.equal('Van Gogh');
+  expect(model.attributes['tag-names']).to.eql(['millenials', 'puppies', 'belly-rubs']);
   expect(model.relationships.tags.data).to.eql([
     { type: 'local-hub::article-card::millenial-puppies::tags', id: 'local-hub::article-card::millenial-puppies::millenials' },
     { type: 'local-hub::article-card::millenial-puppies::tags', id: 'local-hub::article-card::millenial-puppies::puppies' },
@@ -210,6 +218,7 @@ function assertCardSchema(card) {
     { type: 'fields', id: 'local-hub::article-card::millenial-puppies::author' },
     { type: 'fields', id: 'local-hub::article-card::millenial-puppies::body' },
     { type: 'fields', id: 'local-hub::article-card::millenial-puppies::internal-field' },
+    { type: 'computed-fields', id: 'local-hub::article-card::millenial-puppies::tag-names' },
     { type: 'fields', id: 'local-hub::article-card::millenial-puppies::tags' },
   ]);
   expect(includedIdentifiers).to.include.members([
@@ -218,6 +227,7 @@ function assertCardSchema(card) {
     'fields/local-hub::article-card::millenial-puppies::author',
     'fields/local-hub::article-card::millenial-puppies::internal-field',
     'fields/local-hub::article-card::millenial-puppies::tags',
+    'computed-fields/local-hub::article-card::millenial-puppies::tag-names',
     'content-types/local-hub::article-card::millenial-puppies::tags',
     'constraints/local-hub::article-card::millenial-puppies::title-not-null'
   ]);
@@ -261,13 +271,13 @@ describe('hub/card-services', function () {
         cleanup();
         let initialFactory = new JSONAPIFactory();
 
-        initialFactory.addResource('data-sources', 'stub-card-indexer')
+        initialFactory.addResource('data-sources', 'stub-card-project')
           .withAttributes({
-            sourceType: 'stub-card-indexer',
+            sourceType: 'stub-card-project',
             params: { changedCards }
           });
 
-        env = await createDefaultEnvironment(`${__dirname}/../../../tests/stub-card-indexer`, initialFactory.getModels());
+        env = await createDefaultEnvironment(`${__dirname}/../../../tests/stub-card-project`, initialFactory.getModels());
         cardServices = env.lookup('hub:card-services');
         indexers = env.lookup('hub:indexers');
       });
@@ -288,15 +298,15 @@ describe('hub/card-services', function () {
         cleanup();
         let initialFactory = new JSONAPIFactory();
 
-        initialFactory.addResource('data-sources', 'stub-card-searcher')
+        initialFactory.addResource('data-sources', 'stub-card-project')
           .withAttributes({
-            sourceType: 'stub-card-searcher',
+            sourceType: 'stub-card-project',
             params: {
               cardSearchResults: [internalArticleCard]
             }
           });
 
-        env = await createDefaultEnvironment(`${__dirname}/../../../tests/stub-card-searcher`, initialFactory.getModels());
+        env = await createDefaultEnvironment(`${__dirname}/../../../tests/stub-card-project`, initialFactory.getModels());
         cardServices = env.lookup('hub:card-services');
       });
 
@@ -351,7 +361,7 @@ describe('hub/card-services', function () {
     beforeEach(async function () {
       cleanup();
 
-      env = await createDefaultEnvironment(`${__dirname}/../../../tests/stub-project`);
+      env = await createDefaultEnvironment(`${__dirname}/../../../tests/stub-card-project`);
       cardServices = env.lookup('hub:card-services');
       externalArticleCard = await adaptCardToFormat(await env.lookup('hub:current-schema').getSchema(), internalArticleCard, 'isolated');
 
@@ -502,15 +512,15 @@ describe('hub/card-services', function () {
       cleanup();
       let initialFactory = new JSONAPIFactory();
 
-      initialFactory.addResource('data-sources', 'stub-card-searcher')
+      initialFactory.addResource('data-sources', 'stub-card-project')
         .withAttributes({
-          sourceType: 'stub-card-searcher',
+          sourceType: 'stub-card-project',
           params: {
             cardSearchResults: [internalArticleCard]
           }
         });
 
-      env = await createDefaultEnvironment(`${__dirname}/../../../tests/stub-card-searcher`, initialFactory.getModels());
+      env = await createDefaultEnvironment(`${__dirname}/../../../tests/stub-card-project`, initialFactory.getModels());
       cardServices = env.lookup('hub:card-services');
     });
 
@@ -545,9 +555,6 @@ describe('hub/card-services', function () {
       expect(data.attributes['embedded-template']).to.match(/<h3>\{\{this\.title\}\}<\/h3>/);
       expect(data.attributes['embedded-js']).to.match(/ArticleEmbeddedComponent/);
       expect(data.attributes['embedded-css']).to.match(/\.article-card-embedded \{\}/);
-    });
-
-    it.skip("has card metadata computed fields", async function() {
     });
 
     it.skip("has card metadata relationship to another card", async function() {

@@ -925,16 +925,16 @@ describe('jsonapi/middleware', function() {
     beforeEach(async function() {
       cleanup();
       let factory = new JSONAPIFactory();
-      factory.addResource('data-sources', 'stub-card-searcher')
+      factory.addResource('data-sources', 'stub-card-project')
         .withAttributes({
-          sourceType: 'stub-card-searcher',
+          sourceType: 'stub-card-project',
           params: {
             cardSearchResults: [internalArticleCard]
           }
         });
 
       app = new Koa();
-      env = await createDefaultEnvironment(`${__dirname}/../../../tests/stub-card-searcher`, factory.getModels());
+      env = await createDefaultEnvironment(`${__dirname}/../../../tests/stub-card-project`, factory.getModels());
       app.use(async function (ctxt, next) {
         await next();
         log.info('%s %s %s', ctxt.request.method, ctxt.request.originalUrl, ctxt.response.status);

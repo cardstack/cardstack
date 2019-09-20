@@ -1,5 +1,5 @@
 {
-  "name": "stub-card-searcher",
+  "name": "stub-card-project",
   "keywords": ["cardstack-plugin"],
   "cardstack-plugin": {
     "api-version": 1
@@ -9,7 +9,6 @@
   },
   "devDependencies": {
     "@cardstack/jsonapi": "*",
-    "@cardstack/hub": "*",
     "@cardstack/test-support": "*",
     "@cardstack/test-support-authenticator": "*"
   },

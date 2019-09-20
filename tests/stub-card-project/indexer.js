@@ -12,7 +12,7 @@ module.exports = class FakeIndexer {
 
 class Updater {
   constructor(changedCards) {
-    this.changedCards = changedCards;
+    this.changedCards = changedCards || [];
   }
   async schema() {
     return [];
