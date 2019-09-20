@@ -1,0 +1,33 @@
+<div class="drag-drop-page {{if model.isDraggingObject "dragging"}}">
+  <div class="tray-container">
+    <div class="tray tray-1">
+      {{#draggable-object content=model}}
+        {{#unless draggedCard}}
+          <div class="draggable-card">
+            <div class="draggable-card-contents">
+              <div class="draggable-card-title">
+                {{model.title}}
+              </div>
+            </div>
+          </div>
+        {{/unless}}
+      {{/draggable-object}}
+    </div>
+
+    <div class="tray tray-2">
+      {{#draggable-object-target action=(action copyCard)}}
+        {{#if (or draggedCard model.isDraggingObject)}}
+          <div class="draggable-card">
+            <div class="draggable-card-contents">
+              <div class="draggable-card-title">
+                {{model.title}}
+              </div>
+            </div>
+          </div>
+        {{else}}
+          <div class="drop-zone-text">Drop here</div>
+        {{/if}}
+      {{/draggable-object-target}}
+    </div>
+  </div>
+</div>
