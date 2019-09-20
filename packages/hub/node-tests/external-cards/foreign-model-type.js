@@ -4,7 +4,7 @@ let factory = new JSONAPIFactory();
 module.exports = factory.getDocumentFor(
   factory.addResource('cards', 'local-hub::foreign-model-type-card::bad')
     .withRelated('fields', [
-      factory.addResource('fields', 'local-hub::foreign-model-type-card::bad::title').withAttributes({
+      factory.addResource('fields', 'title').withAttributes({
         'is-metadata': true,
         'field-type': '@cardstack/core-types::string'
       }),

@@ -10,7 +10,7 @@ let factory = new JSONAPIFactory();
 let articleCard = factory.getDocumentFor(
   factory.addResource('cards', 'local-hub::article-card::millenial-puppies')
     .withRelated('fields', [
-      factory.addResource('fields', 'local-hub::article-card::millenial-puppies::body').withAttributes({
+      factory.addResource('fields', 'body').withAttributes({
         'is-metadata': true,
         'field-type': '@cardstack/core-types::string'
       }),
@@ -60,10 +60,10 @@ module('Acceptance | updating a card', function(hooks) {
 
     let cardStr = getCodeMirrorValue();
     let card = JSON.parse(cardStr);
-    card.data.relationships.fields.data.push({ type: 'fields', id: 'local-hub::article-card::millenial-puppies::title' });
+    card.data.relationships.fields.data.push({ type: 'fields', id: 'title' });
     card.included.push({
       type: 'fields',
-      id: 'local-hub::article-card::millenial-puppies::title',
+      id: 'title',
       attributes: {
         'is-metadata': true,
         'needed-when-embedded': true,
@@ -87,8 +87,8 @@ module('Acceptance | updating a card', function(hooks) {
 
     let cardStr = getCodeMirrorValue();
     let card = JSON.parse(cardStr);
-    card.data.relationships.fields.data = card.data.relationships.fields.data.filter(i => i.id !== 'local-hub::article-card::millenial-puppies::body');
-    card.included = card.included.filter(i => i.id !== 'local-hub::article-card::millenial-puppies::body');
+    card.data.relationships.fields.data = card.data.relationships.fields.data.filter(i => i.id !== 'body');
+    card.included = card.included.filter(i => i.id !== 'body');
     setCodeMirrorValue(JSON.stringify(card, null, 2));
 
     await click('[data-test-card-updator-update-btn]');
@@ -107,10 +107,10 @@ module('Acceptance | updating a card', function(hooks) {
     let card = JSON.parse(cardStr);
     let internalModel = card.included.find(i => i.type = 'local-hub::article-card::millenial-puppies');
     internalModel.attributes.title = 'Millenial Puppies';
-    card.data.relationships.fields.data.push({ type: 'fields', id: 'local-hub::article-card::millenial-puppies::title' });
+    card.data.relationships.fields.data.push({ type: 'fields', id: 'title' });
     card.included.push({
       type: 'fields',
-      id: 'local-hub::article-card::millenial-puppies::title',
+      id: 'title',
       attributes: {
         'is-metadata': true,
         'needed-when-embedded': true,
