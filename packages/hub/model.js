@@ -2,6 +2,10 @@
 // (like computed fields) to access models.
 const priv = new WeakMap();
 const qs = require('qs');
+const {
+  isCard,
+  loadCard,
+} = require('./indexing/card-utils');
 
 exports.privateModels = priv;
 
@@ -16,8 +20,8 @@ function isRelationshipObject(obj) {
 }
 
 exports.Model = class Model {
-  constructor(contentType, jsonapiDoc, schema, read, search) {
-    priv.set(this, { contentType, jsonapiDoc, schema, read, search });
+  constructor(contentType, jsonapiDoc, schema, read, getCard, search) {
+    priv.set(this, { contentType, jsonapiDoc, schema, read, getCard, search });
   }
 
   get id() {
@@ -26,6 +30,10 @@ exports.Model = class Model {
 
   get type() {
     return priv.get(this).jsonapiDoc.type;
+  }
+
+  get schema() {
+    return priv.get(this).schema;
   }
 
   getContentType() {
@@ -96,23 +104,40 @@ exports.Model = class Model {
   }
 
   async getModel(type, id) {
-    let { schema, read, search, jsonapiDoc } = priv.get(this);
-    let contentType = schema.getType(type);
-    if (!contentType) {
-      throw new Error(`${jsonapiDoc.type} ${jsonapiDoc.id} tried to getModel nonexistent type ${type} `);
+    let contentType;
+    let model;
+    let { schema, read, search, jsonapiDoc, getCard } = priv.get(this);
+    if (isCard(type, id)) {
+      let card = await getCard(id);
+      if (!card) { return; }
+
+      let cardSchema = await loadCard(schema, card);
+      schema = await schema.applyChanges(cardSchema.map(document => ({ id: document.id, type: document.type, document })));
+      priv.get(this).schema = schema;
+
+      contentType = schema.getType(type);
+      if (!contentType) {
+        throw new Error(`${jsonapiDoc.type} ${jsonapiDoc.id} tried to getModel nonexistent type ${type}`);
+      }
+      model = card.data;
+    } else {
+      contentType = schema.getType(type);
+      if (!contentType) {
+        throw new Error(`${jsonapiDoc.type} ${jsonapiDoc.id} tried to getModel nonexistent type ${type}`);
+      }
+      model = await read(type, id);
     }
-    let model = await read(type, id);
     if (!model) { return; }
 
-    return new Model(contentType, model, schema, read, search);
+    return new Model(contentType, model, schema, read, getCard, search);
   }
 
   async getModels(query) {
-    let { schema, search, read } = priv.get(this);
+    let { schema, search, read, getCard } = priv.get(this);
 
     let models = await search(query);
     if (!models) { return; }
 
-    return models.data.map(model => new Model(schema.getType(model.type), model, schema, read, search));
+    return models.data.map(model => new Model(schema.getType(model.type), model, schema, read, getCard, search));
   }
 };

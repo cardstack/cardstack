@@ -1,10 +1,10 @@
-
 import { module, test } from 'qunit';
 import { click, visit, currentURL, waitFor } from '@ember/test-helpers';
 import { setupApplicationTest } from 'ember-qunit';
 import JSONAPIFactory from '@cardstack/test-support/jsonapi-factory';
 import Fixtures from '@cardstack/test-support/fixtures'
 import { setCodeMirrorValue, getCodeMirrorValue } from '../helpers/code-mirror';
+import { createCard } from '../helpers/card-helpers';
 
 let factory = new JSONAPIFactory();
 let articleCard = factory.getDocumentFor(
@@ -21,15 +21,6 @@ let articleCard = factory.getDocumentFor(
       })
     )
 );
-
-async function createCard(card) {
-  await visit('/cards/new');
-  if (card) {
-    setCodeMirrorValue(JSON.stringify(card, null, 2));
-  }
-  await click('[data-test-card-creator-add-btn]');
-  await waitFor('[data-test-card-updator="local-hub::article-card::millenial-puppies"]');
-}
 
 const scenario = new Fixtures({
   destroy() {
