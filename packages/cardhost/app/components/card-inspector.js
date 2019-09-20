@@ -11,7 +11,7 @@ export default class CardInspector extends Component {
       let field = (card.included || []).find(i => `${i.type}/${i.id}` === `${fieldRef.type}/${fieldRef.id}`);
       if (!field) { continue; }
 
-      let [, , , fieldName] = fieldRef.id.split('::');
+      let fieldName = fieldRef.id;
       let { attributes:fieldSchema } = field;
       let fieldValue = this.modelFields[fieldName];
 

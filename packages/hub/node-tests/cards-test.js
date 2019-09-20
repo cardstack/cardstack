@@ -71,9 +71,9 @@ function assertIsolatedCardMetadata(card) {
   expect(data.relationships.author.data).to.eql({ type: 'cards', id: 'local-hub::user-card::van-gogh' });
   expect(data.attributes['tag-names']).to.eql(['millenials', 'puppies', 'belly-rubs']);
   expect(data.relationships.tags.data).to.eql([
-    { type: 'local-hub::article-card::millenial-puppies::tags', id: 'local-hub::article-card::millenial-puppies::millenials' },
-    { type: 'local-hub::article-card::millenial-puppies::tags', id: 'local-hub::article-card::millenial-puppies::puppies' },
-    { type: 'local-hub::article-card::millenial-puppies::tags', id: 'local-hub::article-card::millenial-puppies::belly-rubs' },
+    { type: 'tags', id: 'millenials' },
+    { type: 'tags', id: 'puppies' },
+    { type: 'tags', id: 'belly-rubs' },
   ]);
   expect(data.attributes['internal-field']).to.be.undefined;
 }
@@ -90,9 +90,9 @@ function assertEmbeddedCardMetadata(card) {
   expect(data.attributes['internal-field']).to.be.undefined;
 
   expect(includedIdentifiers).to.not.include.members([
-    'local-hub::article-card::millenial-puppies::tags/local-hub::article-card::millenial-puppies::millenials',
-    'local-hub::article-card::millenial-puppies::tags/local-hub::article-card::millenial-puppies::puppies',
-    'local-hub::article-card::millenial-puppies::tags/local-hub::article-card::millenial-puppies::belly-rubs',
+    'tags/millenials',
+    'tags/puppies',
+    'tags/belly-rubs',
   ]);
   expect(includedIdentifiers).to.include.members([
     'cards/local-hub::user-card::van-gogh',
@@ -109,19 +109,19 @@ function assertCardModels(card) {
   expect(includedIdentifiers).to.include.members(['local-hub::article-card::millenial-puppies/local-hub::article-card::millenial-puppies']);
   expect(includedIdentifiers).to.include.members([
     'cards/local-hub::user-card::van-gogh',
-    'local-hub::article-card::millenial-puppies::tags/local-hub::article-card::millenial-puppies::millenials',
-    'local-hub::article-card::millenial-puppies::tags/local-hub::article-card::millenial-puppies::puppies',
-    'local-hub::article-card::millenial-puppies::tags/local-hub::article-card::millenial-puppies::belly-rubs',
+    'tags/millenials',
+    'tags/puppies',
+    'tags/belly-rubs',
   ]);
 
   let model = included.find(i => `${i.type}/${i.id}` === 'local-hub::article-card::millenial-puppies/local-hub::article-card::millenial-puppies');
   expect(model.attributes.title).to.equal('The Millenial Puppy');
   expect(model.attributes.body).to.match(/discerning tastes of the millenial puppy/);
- expect(model.attributes['tag-names']).to.eql(['millenials', 'puppies', 'belly-rubs']);
+  expect(model.attributes['tag-names']).to.eql(['millenials', 'puppies', 'belly-rubs']);
   expect(model.relationships.tags.data).to.eql([
-    { type: 'local-hub::article-card::millenial-puppies::tags', id: 'local-hub::article-card::millenial-puppies::millenials' },
-    { type: 'local-hub::article-card::millenial-puppies::tags', id: 'local-hub::article-card::millenial-puppies::puppies' },
-    { type: 'local-hub::article-card::millenial-puppies::tags', id: 'local-hub::article-card::millenial-puppies::belly-rubs' },
+    { type: 'tags', id: 'millenials' },
+    { type: 'tags', id: 'puppies' },
+    { type: 'tags', id: 'belly-rubs' },
   ]);
   expect(model.attributes['internal-field']).to.equal('this is internal data');
 
@@ -135,22 +135,22 @@ function assertCardSchema(card) {
   let includedIdentifiers = included.map(i => `${i.type}/${i.id}`);
 
   expect(data.relationships.fields.data).to.eql([
-    { type: 'fields', id: 'local-hub::article-card::millenial-puppies::title' },
-    { type: 'fields', id: 'local-hub::article-card::millenial-puppies::author' },
-    { type: 'fields', id: 'local-hub::article-card::millenial-puppies::body' },
-    { type: 'fields', id: 'local-hub::article-card::millenial-puppies::internal-field' },
-    { type: 'computed-fields', id: 'local-hub::article-card::millenial-puppies::tag-names' },
-    { type: 'fields', id: 'local-hub::article-card::millenial-puppies::tags' },
+    { type: 'fields', id: 'title' },
+    { type: 'fields', id: 'author' },
+    { type: 'fields', id: 'body' },
+    { type: 'fields', id: 'internal-field' },
+    { type: 'computed-fields', id: 'tag-names' },
+    { type: 'fields', id: 'tags' },
   ]);
   expect(includedIdentifiers).to.include.members([
-    'fields/local-hub::article-card::millenial-puppies::title',
-    'fields/local-hub::article-card::millenial-puppies::body',
-    'fields/local-hub::article-card::millenial-puppies::author',
-    'fields/local-hub::article-card::millenial-puppies::internal-field',
-    'fields/local-hub::article-card::millenial-puppies::tags',
-    'computed-fields/local-hub::article-card::millenial-puppies::tag-names',
-    'content-types/local-hub::article-card::millenial-puppies::tags',
-    'constraints/local-hub::article-card::millenial-puppies::title-not-null'
+    'fields/title',
+    'fields/body',
+    'fields/author',
+    'fields/internal-field',
+    'fields/tags',
+    'computed-fields/tag-names',
+    'content-types/tags',
+    'constraints/title-not-null'
   ]);
 
   // Card does not include the primary model content type schema--as that is derived by the hub,
@@ -319,6 +319,7 @@ describe('hub/card-services', function () {
         assertCardOnDisk();
       });
 
+      // Hassan: I'm skeptical we want to be able to return search results in the isolated format...
       it("will load a card implicitly when a searcher's search() hook returns a card document in isolated format", async function () {
         let { data: [article] } = await cardServices.search(env.session, 'isolated', {
           filter: {
@@ -348,9 +349,9 @@ describe('hub/card-services', function () {
 
         expect(includedIdentifiers).to.include.members([ 'cards/local-hub::user-card::van-gogh' ]);
         expect(includedIdentifiers).to.not.include.members([
-          'local-hub::article-card::millenial-puppies::tags/local-hub::article-card::millenial-puppies::millenials',
-          'local-hub::article-card::millenial-puppies::tags/local-hub::article-card::millenial-puppies::puppies',
-          'local-hub::article-card::millenial-puppies::tags/local-hub::article-card::millenial-puppies::belly-rubs',
+          'tags/millenials',
+          'tags/puppies',
+          'tags/belly-rubs',
         ]);
 
         assertCardOnDisk();
@@ -455,10 +456,10 @@ describe('hub/card-services', function () {
 
     it("can add a field to a card's schema", async function() {
       let card = await cardServices.create(env.session, externalArticleCard);
-      card.data.relationships.fields.data.push({ type: 'fields', id: 'local-hub::article-card::millenial-puppies::editor'});
+      card.data.relationships.fields.data.push({ type: 'fields', id: 'editor'});
       card.included.push({
         type: 'fields',
-        id: 'local-hub::article-card::millenial-puppies::editor',
+        id: 'editor',
         attributes: {
           'is-metadata': true,
           'needed-when-embedded': true,
@@ -471,22 +472,22 @@ describe('hub/card-services', function () {
       let includedIdentifiers = included.map(i => `${i.type}/${i.id}`);
       let fieldRelationships = data.relationships.fields.data.map(i => `${i.type}/${i.id}`);
 
-      expect(includedIdentifiers).to.include('fields/local-hub::article-card::millenial-puppies::editor');
-      expect(fieldRelationships).to.include('fields/local-hub::article-card::millenial-puppies::editor');
+      expect(includedIdentifiers).to.include('fields/editor');
+      expect(fieldRelationships).to.include('fields/editor');
 
       card = await cardServices.get(env.session, 'local-hub::article-card::millenial-puppies', 'isolated');
       data = card.data;
       included = card.included;
       includedIdentifiers = included.map(i => `${i.type}/${i.id}`);
       fieldRelationships = data.relationships.fields.data.map(i => `${i.type}/${i.id}`);
-      expect(includedIdentifiers).to.include('fields/local-hub::article-card::millenial-puppies::editor');
-      expect(fieldRelationships).to.include('fields/local-hub::article-card::millenial-puppies::editor');
+      expect(includedIdentifiers).to.include('fields/editor');
+      expect(fieldRelationships).to.include('fields/editor');
     });
 
     it("can remove a field from the card's schema", async function() {
       let card = await cardServices.create(env.session, externalArticleCard);
-      card.data.relationships.fields.data = card.data.relationships.fields.data.filter(i => i.id !== 'local-hub::article-card::millenial-puppies::body');
-      card.included = card.included.filter(i => i.id !== 'local-hub::article-card::millenial-puppies::body');
+      card.data.relationships.fields.data = card.data.relationships.fields.data.filter(i => i.id !== 'body');
+      card.included = card.included.filter(i => i.id !== 'body');
 
       card = await cardServices.update(env.session, 'local-hub::article-card::millenial-puppies', card);
       let { data, included } = card;
@@ -494,8 +495,8 @@ describe('hub/card-services', function () {
       let fieldRelationships = data.relationships.fields.data.map(i => `${i.type}/${i.id}`);
 
       expect(card.data.attributes.body).to.be.undefined;
-      expect(includedIdentifiers).to.not.include('fields/local-hub::article-card::millenial-puppies::body');
-      expect(fieldRelationships).to.not.include('fields/local-hub::article-card::millenial-puppies::body');
+      expect(includedIdentifiers).to.not.include('fields/body');
+      expect(fieldRelationships).to.not.include('fields/body');
 
       card = await cardServices.get(env.session, 'local-hub::article-card::millenial-puppies', 'isolated');
       data = card.data;
@@ -503,8 +504,8 @@ describe('hub/card-services', function () {
       includedIdentifiers = included.map(i => `${i.type}/${i.id}`);
       fieldRelationships = data.relationships.fields.data.map(i => `${i.type}/${i.id}`);
       expect(card.data.attributes.body).to.be.undefined;
-      expect(includedIdentifiers).to.not.include('fields/local-hub::article-card::millenial-puppies::body');
-      expect(fieldRelationships).to.not.include('fields/local-hub::article-card::millenial-puppies::body');
+      expect(includedIdentifiers).to.not.include('fields/body');
+      expect(fieldRelationships).to.not.include('fields/body');
     });
 
     it("can update a card's internal model", async function() {
@@ -546,10 +547,10 @@ describe('hub/card-services', function () {
       let card = await cardServices.create(env.session, externalArticleCard);
       let internalModel = card.included.find(i => i.type = 'local-hub::article-card::millenial-puppies');
       internalModel.attributes.editor = 'Hassan';
-      card.data.relationships.fields.data.push({ type: 'fields', id: 'local-hub::article-card::millenial-puppies::editor'});
+      card.data.relationships.fields.data.push({ type: 'fields', id: 'editor'});
       card.included.push({
         type: 'fields',
-        id: 'local-hub::article-card::millenial-puppies::editor',
+        id: 'editor',
         attributes: {
           'is-metadata': true,
           'needed-when-embedded': true,
@@ -562,8 +563,8 @@ describe('hub/card-services', function () {
       let includedIdentifiers = included.map(i => `${i.type}/${i.id}`);
       let fieldRelationships = data.relationships.fields.data.map(i => `${i.type}/${i.id}`);
 
-      expect(includedIdentifiers).to.include('fields/local-hub::article-card::millenial-puppies::editor');
-      expect(fieldRelationships).to.include('fields/local-hub::article-card::millenial-puppies::editor');
+      expect(includedIdentifiers).to.include('fields/editor');
+      expect(fieldRelationships).to.include('fields/editor');
       expect(card.data.attributes.editor).to.equal('Hassan');
       expect(internalModel.attributes.editor).to.equal('Hassan');
 
@@ -572,8 +573,8 @@ describe('hub/card-services', function () {
       included = card.included;
       includedIdentifiers = included.map(i => `${i.type}/${i.id}`);
       fieldRelationships = data.relationships.fields.data.map(i => `${i.type}/${i.id}`);
-      expect(includedIdentifiers).to.include('fields/local-hub::article-card::millenial-puppies::editor');
-      expect(fieldRelationships).to.include('fields/local-hub::article-card::millenial-puppies::editor');
+      expect(includedIdentifiers).to.include('fields/editor');
+      expect(fieldRelationships).to.include('fields/editor');
       expect(card.data.attributes.editor).to.equal('Hassan');
       expect(internalModel.attributes.editor).to.equal('Hassan');
     });
@@ -793,9 +794,9 @@ describe('hub/card-services', function () {
         expect(data.attributes.body).to.match(/discerning tastes of the millenial puppy/);
         expect(data.relationships.author.data).to.eql({ type: 'cards', id: 'local-hub::user-card::van-gogh' });
         expect(data.relationships.tags.data).to.eql([
-          { type: 'local-hub::article-card::millenial-puppies::tags', id: 'local-hub::article-card::millenial-puppies::millenials' },
-          { type: 'local-hub::article-card::millenial-puppies::tags', id: 'local-hub::article-card::millenial-puppies::puppies' },
-          { type: 'local-hub::article-card::millenial-puppies::tags', id: 'local-hub::article-card::millenial-puppies::belly-rubs' },
+          { type: 'tags', id: 'millenials' },
+          { type: 'tags', id: 'puppies' },
+          { type: 'tags', id: 'belly-rubs' },
         ]);
         expect(data.attributes['internal-field']).to.be.undefined;
 
@@ -804,9 +805,9 @@ describe('hub/card-services', function () {
         expect(model.attributes.body).to.match(/discerning tastes of the millenial puppy/);
         expect(model.relationships.author.data).to.eql({ type: 'cards', id: 'local-hub::user-card::van-gogh' });
         expect(model.relationships.tags.data).to.eql([
-          { type: 'local-hub::article-card::millenial-puppies::tags', id: 'local-hub::article-card::millenial-puppies::millenials' },
-          { type: 'local-hub::article-card::millenial-puppies::tags', id: 'local-hub::article-card::millenial-puppies::puppies' },
-          { type: 'local-hub::article-card::millenial-puppies::tags', id: 'local-hub::article-card::millenial-puppies::belly-rubs' },
+          { type: 'tags', id: 'millenials' },
+          { type: 'tags', id: 'puppies' },
+          { type: 'tags', id: 'belly-rubs' },
         ]);
         expect(model.attributes['internal-field']).to.be.undefined;
       });
@@ -830,8 +831,11 @@ describe('hub/card-services', function () {
 
         expect(includedIdentifiers).to.not.include.members([
           'local-hub::user-card::van-gogh/local-hub::user-card::van-gogh',
+          // intentionally asserting both the namespaced schema elements and non-namespaced schema elements dont exist
           'fields/local-hub::user-card::van-gogh::name',
           'fields/local-hub::user-card::van-gogh::email',
+          'fields/name',
+          'fields/email',
         ]);
         let card = included.find(i => `${i.type}/${i.id}` === 'cards/local-hub::user-card::van-gogh');
         expect(card.attributes.name).to.equal('Van Gogh');
@@ -877,9 +881,9 @@ describe('hub/card-services', function () {
         expect(card.attributes.body).to.match(/discerning tastes of the millenial puppy/);
         expect(card.relationships.author.data).to.eql({ type: 'cards', id: 'local-hub::user-card::van-gogh' });
         expect(card.relationships.tags.data).to.eql([
-          { type: 'local-hub::article-card::millenial-puppies::tags', id: 'local-hub::article-card::millenial-puppies::millenials' },
-          { type: 'local-hub::article-card::millenial-puppies::tags', id: 'local-hub::article-card::millenial-puppies::puppies' },
-          { type: 'local-hub::article-card::millenial-puppies::tags', id: 'local-hub::article-card::millenial-puppies::belly-rubs' },
+          { type: 'tags', id: 'millenials' },
+          { type: 'tags', id: 'puppies' },
+          { type: 'tags', id: 'belly-rubs' },
         ]);
         expect(card.attributes['internal-field']).to.be.undefined;
 
@@ -887,9 +891,9 @@ describe('hub/card-services', function () {
         expect(model.attributes.body).to.match(/discerning tastes of the millenial puppy/);
         expect(model.relationships.author.data).to.eql({ type: 'cards', id: 'local-hub::user-card::van-gogh' });
         expect(model.relationships.tags.data).to.eql([
-          { type: 'local-hub::article-card::millenial-puppies::tags', id: 'local-hub::article-card::millenial-puppies::millenials' },
-          { type: 'local-hub::article-card::millenial-puppies::tags', id: 'local-hub::article-card::millenial-puppies::puppies' },
-          { type: 'local-hub::article-card::millenial-puppies::tags', id: 'local-hub::article-card::millenial-puppies::belly-rubs' },
+          { type: 'tags', id: 'millenials' },
+          { type: 'tags', id: 'puppies' },
+          { type: 'tags', id: 'belly-rubs' },
         ]);
         expect(model.attributes['internal-field']).to.be.undefined;
       });
@@ -923,8 +927,11 @@ describe('hub/card-services', function () {
 
         expect(includedIdentifiers).to.not.include.members([
           'local-hub::user-card::van-gogh/local-hub::user-card::van-gogh',
+          // intentionally asserting both the namespaced schema elements and non-namespaced schema elements dont exist
           'fields/local-hub::user-card::van-gogh::name',
           'fields/local-hub::user-card::van-gogh::email',
+          'fields/name',
+          'fields/email',
         ]);
         let card = included.find(i => `${i.type}/${i.id}` === 'cards/local-hub::user-card::van-gogh');
         expect(card.attributes.name).to.equal('Van Gogh');

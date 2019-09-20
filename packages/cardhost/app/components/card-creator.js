@@ -33,10 +33,10 @@ export default class CardCreator extends Component {
         relationships: {
           fields: {
             data: [
-              { type: 'fields', id: 'local-hub::article-card::millenial-puppies::title' },
-              { type: 'fields', id: 'local-hub::article-card::millenial-puppies::author' },
-              { type: 'fields', id: 'local-hub::article-card::millenial-puppies::body' },
-              { type: 'fields', id: 'local-hub::article-card::millenial-puppies::internal-field' },
+              { type: 'fields', id: 'title' },
+              { type: 'fields', id: 'author' },
+              { type: 'fields', id: 'body' },
+              { type: 'fields', id: 'internal-field' },
             ]
           },
           model: {
@@ -56,7 +56,7 @@ export default class CardCreator extends Component {
       },
       {
         type: 'fields',
-        id: 'local-hub::article-card::millenial-puppies::title',
+        id: 'title',
         attributes: {
           'is-metadata': true,
           'needed-when-embedded': true,
@@ -65,7 +65,7 @@ export default class CardCreator extends Component {
       },
       {
         type: 'fields',
-        id: 'local-hub::article-card::millenial-puppies::author',
+        id: 'author',
         attributes: {
           'is-metadata': true,
           'needed-when-embedded': true,
@@ -74,7 +74,7 @@ export default class CardCreator extends Component {
       },
       {
         type: 'fields',
-        id: 'local-hub::article-card::millenial-puppies::body',
+        id: 'body',
         attributes: {
           'is-metadata': true,
           'field-type': '@cardstack/core-types::string'
@@ -82,7 +82,7 @@ export default class CardCreator extends Component {
       },
       {
         type: 'fields',
-        id: 'local-hub::article-card::millenial-puppies::internal-field',
+        id: 'internal-field',
         attributes: {
           'field-type': '@cardstack/core-types::string'
         }

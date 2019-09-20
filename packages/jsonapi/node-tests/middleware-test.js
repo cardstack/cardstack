@@ -1001,10 +1001,10 @@ describe('jsonapi/middleware', function() {
         let { body: card } = await request.post('/api/cards').send(externalArticleCard);
         let internalModel = card.included.find(i => i.type = 'local-hub::article-card::millenial-puppies');
         internalModel.attributes.author = 'Van Gogh';
-        card.data.relationships.fields.data.push({ type: 'fields', id: 'local-hub::article-card::millenial-puppies::author' });
+        card.data.relationships.fields.data.push({ type: 'fields', id: 'author' });
         card.included.push({
           type: 'fields',
-          id: 'local-hub::article-card::millenial-puppies::author',
+          id: 'author',
           attributes: {
             'is-metadata': true,
             'needed-when-embedded': true,

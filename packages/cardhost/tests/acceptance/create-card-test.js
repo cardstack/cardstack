@@ -88,12 +88,12 @@ module('Acceptance | create card', function(hooks) {
     await createCard(factory.getDocumentFor(
       factory.addResource('cards', 'local-hub::user-card::van-gogh')
         .withRelated('fields', [
-          factory.addResource('fields', 'local-hub::user-card::van-gogh::name').withAttributes({
+          factory.addResource('fields', 'name').withAttributes({
             'is-metadata': true,
             'needed-when-embedded': true,
             'field-type': '@cardstack/core-types::string'
           }),
-          factory.addResource('fields', 'local-hub::user-card::van-gogh::email').withAttributes({
+          factory.addResource('fields', 'email').withAttributes({
             'is-metadata': true,
             'field-type': '@cardstack/core-types::case-insensitive'
           }),
@@ -110,11 +110,11 @@ module('Acceptance | create card', function(hooks) {
     await createCard(factory.getDocumentFor(
       factory.addResource('cards', 'local-hub::article-card::millenial-puppies')
         .withRelated('fields', [
-          factory.addResource('fields', 'local-hub::article-card::millenial-puppies::body').withAttributes({
+          factory.addResource('fields', 'body').withAttributes({
             'is-metadata': true,
             'field-type': '@cardstack/core-types::string'
           }),
-          factory.addResource('fields', 'local-hub::article-card::millenial-puppies::author').withAttributes({
+          factory.addResource('fields', 'author').withAttributes({
             'is-metadata': true,
             'needed-when-embedded': true,
             'field-type': '@cardstack/core-types::belongs-to'
