@@ -1,37 +1,22 @@
-<main class="card-catalog">
-  <header>
-    <h1 class="card-catalog--title">Card Catalog</h1>
-  </header>
+<section>
+  <h2 class="card-catalog--grid-title">Content Creation</h2>
+  <p class="card-catalog--grid-description">Lorem ipsum dolor sit amet, consectetur adipiscing elit.</p>
 
-  <nav>
-    <ul class="card-catalog--nav-list">
-      <li><a href="#">Featured</a></li>
-      <li class="selected"><a href="#">Content Creation</a></li>
-      <li><a href="#">Creative</a></li>
-      <li><a href="#">Event Planning</a></li>
-    </ul>
-  </nav>
-
-  <section>
-    <h2 class="card-catalog--grid-title">Content Creation</h2>
-    <p class="card-catalog--grid-description">Lorem ipsum dolor sit amet, consectetur adipiscing elit.</p>
-
-    <div class="card-catalog--grid">
-      {{#each model as |item|}}
-        <Tray>
-          <article class="catalog-item" role="button" {{action "preview" item.constructor.modelName}}>
-            <div class="catalog-item--boxel-container">
-              <AnimatedContainer>
-                <Boxel @name="{{item.constructor.modelName}}-{{item.id}}" @content={{item}} @format="thumbnail" />
-              </AnimatedContainer>
-            </div>
-            <section class="catalog-item--info-panel">
-              <h3 class="catalog-item--title">{{item.constructor.modelName}} template</h3>
-              <div class="catalog-item--sub-title">By Felix Erland</div>
-            </section>
-          </article>
-        </Tray>
-      {{/each}}
-    </div>
-  </section>
-</main>
+  <div class="card-catalog--grid">
+    {{#each model as |item|}}
+      <div class="catalog-item-tray">
+        <article class="catalog-item" role="button" {{action "preview" item.constructor.modelName}}>
+          <div class="catalog-item--boxel-container">
+            <AnimatedContainer>
+              <Boxel @name="{{item.constructor.modelName}}-{{item.id}}" @content={{item}} @format="thumbnail" />
+            </AnimatedContainer>
+          </div>
+          <section class="catalog-item--info-panel">
+            <h3 class="catalog-item--title">{{item.constructor.modelName}} template</h3>
+            <div class="catalog-item--sub-title">By Felix Erland</div>
+          </section>
+        </article>
+      </div>
+    {{/each}}
+  </div>
+</section>

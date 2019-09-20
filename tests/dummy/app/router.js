@@ -9,6 +9,7 @@ class Router extends EmberRouter {
 Router.map(function() {
   this.route('catalog', function() {
     this.route('preview', { path: '/:model/preview' });
+    this.route('events');
   });
   this.route('tools', function() {
     this.route('edit', { path: '/:model/:id/edit' });

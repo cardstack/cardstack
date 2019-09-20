@@ -1,1 +1,14 @@
-{{outlet}}
+<main class="card-catalog">
+  <header>
+    <h1 class="card-catalog--title">Card Catalog</h1>
+  </header>
+
+  <nav>
+    <ul class="card-catalog--nav-list">
+      <li><LinkTo @route="catalog.index">Content Creation</LinkTo></li>
+      <li><LinkTo @route="catalog.events">Events</LinkTo></li>
+    </ul>
+  </nav>
+
+  {{outlet}}
+</main>

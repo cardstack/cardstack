@@ -1,13 +1,13 @@
 .card-catalog {
-  --grid-col-width: 244px;
-  --grid-row-height: 374px;
+  --grid-col-width: 275px;
+  --grid-row-height: 360px;
 
   box-sizing: border-box;
   width: 100vw;
   height: 100%;
   min-height: 100vh;
   display: grid;
-  grid-template-columns: 250px 1fr;
+  grid-template-columns: 200px 1fr;
   grid-template-rows: 70px 1fr;
 }
 
@@ -53,12 +53,15 @@
 
 .card-catalog--nav-list > li {
   padding-bottom: 10px;
+}
+
+.card-catalog--nav-list > li > a {
   color: var(--catalog-darkest-purple);
   font-size: 13px;
   opacity: 0.6;
 }
 
-.card-catalog--nav-list > li.selected {
+.card-catalog--nav-list > li > a.active {
   opacity: 1;
 }
 
@@ -83,6 +86,10 @@
   font-size: 16px;
 }
 
+.catalog-item-tray {
+  padding: 50px 15px 15px 15px;
+}
+
 .catalog-item {
   width: 100%;
   height: 100%;
@@ -102,7 +109,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  height: 66%;
+  height: 150px;
   padding: 20px;
   background-color: var(--catalog-light-purple);
   border-top-right-radius: 10px;
@@ -111,7 +118,6 @@
 
 .catalog-item--info-panel {
   box-sizing: border-box;
-  height: 34%;
   padding: 30px;
   overflow: hidden;
 }
