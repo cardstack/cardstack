@@ -45,8 +45,8 @@
 }
 
 .event-view-title {
-  font-size: 30px;
-  /* font-weight: 600; */
+  font-size: 16px;
+  font-weight: 600;
 }
 
 .event-view-location {

@@ -1,6 +1,8 @@
-import Route from '@ember/routing/route';
+import BoxelizedRoute from 'boxel/routes/boxelized';
 
-export default class EventsViewRoute extends Route {
+export default class EventsViewRoute extends BoxelizedRoute {
+  boxelPlane = 'space';
+
   model({ id }) {
     return this.store.findRecord('event', id);
   }

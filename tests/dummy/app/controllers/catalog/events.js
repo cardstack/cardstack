@@ -18,12 +18,14 @@ export default class CatalogEventsController extends Controller {
   }
 
   @action
-  viewDetailPage(id) {
-    this.transitionToRoute('events.view', id);
+  viewDetailPage(card) {
+    set(card, 'selected', false);
+    this.transitionToRoute('events.view', card.id);
   }
 
   * trayAnimation({ keptSprites }) {
-    // printSprites(arguments[0]);
+    // printSprites(arguments[0], 'events tray animation');
+
     keptSprites.forEach(sprite => {
       move(sprite);
       resize(sprite);
@@ -32,9 +34,36 @@ export default class CatalogEventsController extends Controller {
   }
 
   * holdContent({ keptSprites }) {
-    // printSprites(arguments[0]);
+    // printSprites(arguments[0], 'events content');
+
     keptSprites.forEach(sprite => {
       move(sprite);
+    });
+  }
+
+  * cardTransition({ sentSprites }) {
+    sentSprites.forEach(sprite => {
+      move(sprite);
+      resize(sprite);
+      sprite.applyStyles({ 'z-index': 2 });
+    });
+  }
+
+  * imageTransition({ sentSprites }) {
+    // printSprites(arguments[0], 'events image transition');
+
+    sentSprites.forEach(sprite => {
+      move(sprite);
+      resize(sprite);
+      sprite.applyStyles({ 'z-index': 3 });
+    });
+  }
+
+  * headerTransition({ sentSprites }) {
+    sentSprites.forEach(sprite => {
+      move(sprite);
+      resize(sprite);
+      sprite.applyStyles({ 'z-index': 3 });
     });
   }
 }
