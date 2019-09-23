@@ -18,7 +18,9 @@ Router.map(function() {
   this.route('articles', { path: '/articles/:id' }, function() {
     this.route('edit', { path: '/edit' });
   });
-  this.route('events', { path: '/events/:id'});
+  this.route('events', function() {
+    this.route('view', { path: '/:id' });
+  });
   this.route('cards', function() {
     this.route('card', { path: '/:id' });
   });

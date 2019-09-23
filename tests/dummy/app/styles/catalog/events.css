@@ -64,7 +64,12 @@
   color: black;
   font-weight: 700;
 }
-
+.event-card-container--content > button:hover,
+.event-card-container--content > button:focus {
+  background: white;
+  color: black;
+  outline: 0;
+}
 
 
 /* Content */

@@ -10,7 +10,7 @@
           <div class="event-card-container {{if card.selected "selected"}}">
             <div class="event-card-container--content">
               <div>{{card.constructor.modelName}} Card</div>
-              <button>Edit</button>
+              <button {{action "viewDetailPage" card.id}}>Edit</button>
             </div>
             {{#animated-value card watch="selected" use=this.holdContent}}
               <div class="event-card-wrapper {{if card.selected "selected"}}" role="button" {{action "select" card.id}}>

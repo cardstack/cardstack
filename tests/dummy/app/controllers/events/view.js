@@ -4,22 +4,15 @@ import resize from 'ember-animated/motions/resize';
 import move from 'ember-animated/motions/move';
 // import { printSprites } from 'ember-animated';
 
-export default class CatalogEventsController extends Controller {
+export default class EventsViewController extends Controller {
   @action
-  select(id) {
-    for (let card of this.model) {
-      if (card.id === id) {
-        set(card, 'selected', !card.selected);
-      }
-      else {
-        set(card, 'selected', false);
-      }
-    }
+  select() {
+    set(this.model, 'selected', !this.model.selected);
   }
 
   @action
-  viewDetailPage(id) {
-    this.transitionToRoute('events.view', id);
+  viewGridPage() {
+    this.transitionToRoute('catalog.events');
   }
 
   * trayAnimation({ keptSprites }) {
