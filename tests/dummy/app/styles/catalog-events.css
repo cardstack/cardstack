@@ -1,54 +1,51 @@
 /* Container */
+
+/* Note: important that this is wrapped in an animated container */
 .event-card-container {
-  box-sizing: border-box;
-  position: relative;
-  padding: 50px 15px 15px 15px;
+  position: absolute;
+  top: 50px;
+  left: 15px;
+  bottom: 15px;
+  /* Either the content card or the wrapper card inside should have the same width & height */
+  height: 300px;
+  width: 245px;
+
+  background-color: aquamarine;
+  border-radius: 20px;
 }
 
 .event-card-container.selected {
-  /* padding: 0; */
-}
-
-.event-card-inner-container {
-  position: absolute;
-  top: 50px;
-  left: 30px;
-  bottom: 15px;
-  box-sizing: border-box;
-  background-color: aquamarine;
-  border-radius: 20px;
-  /* padding: 50px 15px 15px 15px; */
-  height: 300px;
-  width: 245px;
-}
-
-.event-card-inner-container.selected {
   top: 0;
-  left: 15px;
+  left: 0;
   bottom: 0;
-  padding: 50px 15px 15px 15px;
-  height: 360px;
+  height: 365px;
   width: 275px;
 }
 
-/* Content */
-.event-card {
+.event-card-wrapper {
   position: absolute;
   top: 0;
   right: 0;
   bottom: 0;
-  box-sizing: border-box;
-  background-color: white;
   height: 300px;
   width: 245px;
-  overflow: hidden;
 }
 
-.event-card.selected {
+.event-card-wrapper.selected {
   top: 50px;
   bottom: 15px;
   left: 15px;
   right: 15px;
+}
+
+
+/* Content */
+.event-card {
+  box-sizing: border-box;
+  height: 100%;
+  width: 100%;
+  background-color: white;
+  overflow: hidden;
 }
 
 .event-image {

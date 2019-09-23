@@ -5,27 +5,29 @@
   <div class="card-catalog--grid">
     {{#each this.model as |card|}}
       {{!-- Card container --}}
-      <AnimatedContainer class="event-card-container {{if card.selected "selected"}}" role="button" {{action "select" card.id}}>
-        {{#animated-value card watch="selected" use=this.trayAnimation as |card|}}
-          <div class="event-card-inner-container {{if card.selected "selected"}}">
-            {{!-- Card content --}}
-            {{#animated-value card watch="selected" use=this.contentAnimation}}
-            <div class="event-card event-card-{{card.id}} {{if card.selected "selected"}}">
-              {{! template-lint-configure no-inline-styles {"allowDynamicStyles": true} }}
-              <div class="event-image" style={{css-url "background-image" card.imageUrl}}></div>
-              <div class="event-details">
-                <div class="event-details--header">
-                  <div class="event-date">{{card.date}}</div>
-                  <div class="event-title">{{card.title}}</div>
+      <AnimatedContainer>
+        {{#animated-value card watch="selected" use=this.trayAnimation}}
+          <div class="event-card-container {{if card.selected "selected"}}" role="button" {{action "select" card.id}}>
+            {{#animated-value card watch="selected" use=this.holdContent}}
+              <div class="event-card-wrapper {{if card.selected "selected"}}">
+                {{!-- Card content --}}
+                <div class="event-card event-card-{{card.id}}">
+                  {{! template-lint-configure no-inline-styles {"allowDynamicStyles": true} }}
+                  <div class="event-image" style={{css-url "background-image" card.imageUrl}}></div>
+                  <div class="event-details">
+                    <div class="event-details--header">
+                      <div class="event-date">{{card.date}}</div>
+                      <div class="event-title">{{card.title}}</div>
+                    </div>
+                    <div class="event-details--other">
+                      <div class="event-location">{{card.location}}</div>
+                      <div class="event-price">{{card.price}}</div>
+                    </div>
+                  </div>
                 </div>
-                <div class="event-details--other">
-                  <div class="event-location">{{card.location}}</div>
-                  <div class="event-price">{{card.price}}</div>
-                </div>
+                {{!-- End of card content --}}
               </div>
-            </div>
             {{/animated-value}}
-            {{!-- End of card content --}}
           </div>
         {{/animated-value}}
       </AnimatedContainer>
