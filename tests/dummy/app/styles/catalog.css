@@ -86,10 +86,6 @@
   font-size: 16px;
 }
 
-.catalog-item-tray {
-  padding: 50px 15px 15px 15px;
-}
-
 .catalog-item {
   width: 100%;
   height: 100%;
@@ -109,7 +105,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  height: 150px;
+  height: 200px;
   padding: 20px;
   background-color: var(--catalog-light-purple);
   border-top-right-radius: 10px;

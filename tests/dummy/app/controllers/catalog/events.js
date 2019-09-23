@@ -22,6 +22,7 @@ export default class CatalogEventsController extends Controller {
     keptSprites.forEach(sprite => {
       move(sprite);
       resize(sprite);
+      sprite.applyStyles({ 'z-index': 1 }); // in case it's overlapping other content
     });
   }
 

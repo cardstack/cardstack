@@ -7,9 +7,13 @@
       {{!-- Card container --}}
       <AnimatedContainer>
         {{#animated-value card watch="selected" use=this.trayAnimation}}
-          <div class="event-card-container {{if card.selected "selected"}}" role="button" {{action "select" card.id}}>
+          <div class="event-card-container {{if card.selected "selected"}}">
+            <div class="event-card-container--content">
+              <div>{{card.constructor.modelName}} Card</div>
+              <button>Edit</button>
+            </div>
             {{#animated-value card watch="selected" use=this.holdContent}}
-              <div class="event-card-wrapper {{if card.selected "selected"}}">
+              <div class="event-card-wrapper {{if card.selected "selected"}}" role="button" {{action "select" card.id}}>
                 {{!-- Card content --}}
                 <div class="event-card event-card-{{card.id}}">
                   {{! template-lint-configure no-inline-styles {"allowDynamicStyles": true} }}

@@ -4,7 +4,7 @@
 
   <div class="card-catalog--grid">
     {{#each model as |item|}}
-      <div class="catalog-item-tray">
+      <Tray>
         <article class="catalog-item" role="button" {{action "preview" item.constructor.modelName}}>
           <div class="catalog-item--boxel-container">
             <AnimatedContainer>
@@ -16,7 +16,7 @@
             <div class="catalog-item--sub-title">By Felix Erland</div>
           </section>
         </article>
-      </div>
+      </Tray>
     {{/each}}
   </div>
 </section>
