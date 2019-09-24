@@ -2,9 +2,14 @@ import Controller from '@ember/controller';
 import { action, set } from '@ember/object';
 import resize from 'ember-animated/motions/resize';
 import move from 'ember-animated/motions/move';
-// import { printSprites } from 'ember-animated';
+import { printSprites, wait } from 'ember-animated';
+
+import { animationDelay } from '../catalog/events';
+import { duration } from '../catalog/events';
 
 export default class EventsViewController extends Controller {
+  duration = duration;
+
   @action
   select() {
     set(this.model, 'selected', true);
@@ -20,21 +25,25 @@ export default class EventsViewController extends Controller {
     this.transitionToRoute('catalog.events');
   }
 
-  * trayAnimation({ keptSprites }) {
-    // printSprites(arguments[0], 'view tray animation');
+  * trayAnimation({ keptSprites, duration }) {
+    printSprites(arguments[0], 'view tray animation');
+
+    yield wait(animationDelay);
 
     keptSprites.forEach(sprite => {
-      move(sprite);
-      resize(sprite);
+      move(sprite, { duration });
+      resize(sprite, { duration });
       sprite.applyStyles({ 'z-index': 1 }); // in case it's overlapping other content
     });
   }
 
-  * holdContent({ keptSprites }) {
+  * holdContent({ keptSprites, duration }) {
     // printSprites(arguments[0], 'view content');
 
+    yield wait(animationDelay);
+
     keptSprites.forEach(sprite => {
-      move(sprite);
+      move(sprite, { duration });
     });
   }
 

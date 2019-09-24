@@ -5,14 +5,14 @@
   <div class="card-catalog--grid">
     {{#each this.model as |card|}}
       <AnimatedContainer>
-        {{#animated-value card watch="selected" use=this.trayAnimation as |card|}}
+        {{#animated-value card watch="selected" use=this.trayAnimation duration=this.duration as |card|}}
           <div class="event-card-container {{if card.selected "selected"}}">
             <div class="event-card-container--content">
               <div>{{card.constructor.modelName}} Card</div>
               <button {{action "viewDetailPage" card}}>Edit</button>
             </div>
             <AnimatedContainer>
-              {{#animated-value card watch="selected" key="id" group="content" use=this.holdContent as |card|}}
+              {{#animated-value card watch="selected" key="id" group="content" use=this.holdContent duration=this.duration as |card|}}
                 <div class="event-card-wrapper {{if card.selected "selected"}}" role="button" onMouseEnter={{action "select" card.id}} onMouseLeave={{action "unselect" card.id}} {{action "viewDetailPage" card.id}}>
                   {{#animated-value card key="id" group="card-{{card.id}}" use=this.cardTransition as |card|}}
                     {{!-- Card content --}}

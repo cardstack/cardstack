@@ -2,9 +2,14 @@ import Controller from '@ember/controller';
 import { action, set } from '@ember/object';
 import resize from 'ember-animated/motions/resize';
 import move from 'ember-animated/motions/move';
-// import { printSprites } from 'ember-animated';
+import { printSprites, wait } from 'ember-animated';
+
+export let animationDelay = 350;
+export let duration = 150;
 
 export default class CatalogEventsController extends Controller {
+  duration = duration;
+
   @action
   select(id) {
     for (let card of this.model) {
@@ -31,21 +36,25 @@ export default class CatalogEventsController extends Controller {
     this.transitionToRoute('events.view', id);
   }
 
-  * trayAnimation({ keptSprites }) {
-    // printSprites(arguments[0], 'events tray animation');
+  * trayAnimation({ keptSprites, duration }) {
+    printSprites(arguments[0], 'events tray animation');
+
+    yield wait(animationDelay);
 
     keptSprites.forEach(sprite => {
-      move(sprite);
-      resize(sprite);
+      move(sprite, { duration });
+      resize(sprite, { duration });
       sprite.applyStyles({ 'z-index': 1 }); // in case it's overlapping other content
     });
   }
 
-  * holdContent({ keptSprites }) {
+  * holdContent({ keptSprites, duration }) {
     // printSprites(arguments[0], 'events content');
 
+    yield wait(animationDelay);
+
     keptSprites.forEach(sprite => {
-      move(sprite);
+      move(sprite, { duration });
     });
   }
 
