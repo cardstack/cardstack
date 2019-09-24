@@ -3,14 +3,13 @@ import { action, set } from '@ember/object';
 import resize from 'ember-animated/motions/resize';
 import move from 'ember-animated/motions/move';
 import adjustCSS from 'ember-animated/motions/adjust-css';
+import { default as opacity } from 'ember-animated/motions/opacity';
 import { printSprites, wait } from 'ember-animated';
 
 import { animationDelay } from '../catalog/events';
-import { duration } from '../catalog/events';
+import { highlightDuration } from '../catalog/events';
 
 export default class EventsViewController extends Controller {
-  duration = duration;
-
   @action
   select() {
     set(this.model, 'selected', true);
@@ -23,32 +22,45 @@ export default class EventsViewController extends Controller {
 
   @action
   viewGridPage() {
+    set(this.model, 'selected', false);
     this.transitionToRoute('catalog.events');
   }
 
-  * trayAnimation({ keptSprites, duration }) {
-    printSprites(arguments[0], 'view tray animation');
+  * trayAnimation({ keptSprites, sentSprites }) {
+    // printSprites(arguments[0], 'view tray animation');
 
-    yield wait(animationDelay);
+    if (keptSprites.length) {
+      yield wait(animationDelay);
+    }
 
     keptSprites.forEach(sprite => {
-      move(sprite, { duration });
-      resize(sprite, { duration });
+      move(sprite, { duration: highlightDuration });
+      resize(sprite, { duration: highlightDuration });
       sprite.applyStyles({ 'z-index': 1 }); // in case it's overlapping other content
+    });
+
+    sentSprites.forEach(sprite => {
+      move(sprite);
+      resize(sprite);
     });
   }
 
-  * holdContent({ keptSprites, duration }) {
+  * holdContent({ keptSprites }) {
     // printSprites(arguments[0], 'view content');
 
-    yield wait(animationDelay);
+    if (keptSprites.length) {
+      yield wait(animationDelay);
+    }
 
     keptSprites.forEach(sprite => {
-      move(sprite, { duration });
+      move(sprite, { duration: highlightDuration });
+      sprite.applyStyles({ 'z-index': 1 });
     });
   }
 
   * cardTransition({ sentSprites }) {
+    // printSprites(arguments[0], 'view - card transition');
+
     sentSprites.forEach(sprite => {
       move(sprite);
       resize(sprite);
@@ -73,13 +85,44 @@ export default class EventsViewController extends Controller {
     });
   }
 
+  * bodyTransition({ sentSprites, receivedSprites, insertedSprites, duration }) {
+    printSprites(arguments[0], 'view body transition');
+
+    sentSprites.forEach(sprite => {
+      move(sprite);
+      resize(sprite);
+      opacity(sprite, { to: 0,  duration: duration / 2 });
+      sprite.applyStyles({ 'z-index': 3 });
+    });
+
+    // receivedSprites.forEach(sprite => {
+    //   move(sprite);
+    //   resize(sprite);
+    //   opacity(sprite, { from: 0 });
+    //   sprite.applyStyles({ 'z-index': 3 });
+    // });
+
+    // insertedSprites.forEach(sprite => {
+    //   opacity(sprite, { from: 0 });
+    //   sprite.applyStyles({ 'z-index': 4 });
+    // });
+  }
+
   * tweenTitle({ sentSprites }) {
     sentSprites.forEach(sprite => {
       move(sprite);
       resize(sprite);
       adjustCSS('font-size', sprite);
-      adjustCSS('line-height', sprite);
       sprite.applyStyles({ 'z-index': 4 });
     })
+  }
+
+  * fadeContent({ insertedSprites }) {
+    printSprites(arguments[0], 'fade contents');
+
+    insertedSprites.forEach(sprite => {
+      opacity(sprite, { from: 0 });
+      sprite.applyStyles({ 'z-index': 4 });
+    });
   }
 }

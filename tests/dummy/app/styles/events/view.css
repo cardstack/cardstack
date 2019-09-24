@@ -8,8 +8,8 @@
 }
 
 .event-view .event-card-container {
-  --content-height: calc(var(--height) - var(--tray-top) - var(--tray-bottom));
-  --content-width: calc(var(--width) - var(--tray-left) - var(--tray-right));
+  --content-height: 1000px;
+  --content-width: 830px;
 }
 
 
@@ -36,6 +36,8 @@
 }
 
 .event-view-details--header {
+  box-sizing: border-box;
+  min-height: 70px;
   padding-bottom: 30px;
 }
 
@@ -47,6 +49,7 @@
 .event-view-title {
   font-size: 24px;
   font-weight: 600;
+  line-height: 24px;
 }
 
 .event-view-location {

@@ -6,11 +6,9 @@ import adjustCSS from 'ember-animated/motions/adjust-css';
 import { printSprites, wait } from 'ember-animated';
 
 export let animationDelay = 350;
-export let duration = 150;
+export let highlightDuration = 150;
 
 export default class CatalogEventsController extends Controller {
-  duration = duration;
-
   @action
   select(id) {
     for (let card of this.model) {
@@ -33,33 +31,46 @@ export default class CatalogEventsController extends Controller {
   }
 
   @action
-  viewDetailPage(id) {
-    this.transitionToRoute('events.view', id);
+  viewDetailPage(card) {
+    set(card, 'selected', false);
+    this.transitionToRoute('events.view', card);
   }
 
-  * trayAnimation({ keptSprites, duration }) {
-    printSprites(arguments[0], 'events tray animation');
+  * trayAnimation({ keptSprites, sentSprites }) {
+    // printSprites(arguments[0], 'events tray animation');
 
-    yield wait(animationDelay);
+    if (keptSprites.length) {
+      yield wait(animationDelay);
+    }
 
     keptSprites.forEach(sprite => {
-      move(sprite, { duration });
-      resize(sprite, { duration });
+      move(sprite, { duration: highlightDuration });
+      resize(sprite, { duration: highlightDuration });
       sprite.applyStyles({ 'z-index': 1 }); // in case it's overlapping other content
+    });
+
+    sentSprites.forEach(sprite => {
+      move(sprite);
+      resize(sprite);
     });
   }
 
-  * holdContent({ keptSprites, duration }) {
+  * holdContent({ keptSprites }) {
     // printSprites(arguments[0], 'events content');
 
-    yield wait(animationDelay);
+    if (keptSprites.length) {
+      yield wait(animationDelay);
+    }
 
     keptSprites.forEach(sprite => {
-      move(sprite, { duration });
+      move(sprite, { duration: highlightDuration });
+      sprite.applyStyles({ 'z-index': 1 });
     });
   }
 
   * cardTransition({ sentSprites }) {
+    // printSprites(arguments[0], 'events card transition');
+
     sentSprites.forEach(sprite => {
       move(sprite);
       resize(sprite);
@@ -89,7 +100,6 @@ export default class CatalogEventsController extends Controller {
       move(sprite);
       resize(sprite);
       adjustCSS('font-size', sprite);
-      adjustCSS('line-height', sprite);
       sprite.applyStyles({ 'z-index': 4 });
     })
   }

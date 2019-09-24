@@ -1,24 +1,24 @@
 <AnimatedContainer>
   <div class="event-view">
     <AnimatedContainer>
-      {{#animated-value this.model watch="selected" use=this.trayAnimation duration=this.duration as |card|}}
+      {{#animated-value this.model watch="selected" use=this.trayAnimation key="id" group="tray" as |card|}}
         <div class="event-card-container {{if card.selected "selected"}}" role="button" onMouseEnter={{action "select"}} onMouseLeave={{action "unselect"}} {{action "viewGridPage"}}>
           <div class="event-card-container--content">
             <div>{{card.constructor.modelName}} Card</div>
-            <div>Done</div>
+            <button {{action "viewGridPage"}}>Done</button>
           </div>
 
-          {{#animated-value this.model watch="selected" key="id" group="content" use=this.holdContent duration=this.duration as |card|}}
+          {{#animated-value this.model watch="selected" key="id" group="content" use=this.holdContent as |card|}}
             <div class="event-card-wrapper {{if card.selected "selected"}}">
-              {{#animated-value card key="id" group="card-{{card.id}}" use=this.cardTransition as |card|}}
+              {{#animated-value card key="id" group=(concat "card-" card.id) use=this.cardTransition as |card|}}
                 {{!-- Card content --}}
                 <div class="event-view-card event-view-card-{{card.id}}">
-                  {{#animated-value card key="id" group="image-{{card.id}}" use=this.imageTransition as |card|}}
+                  {{#animated-value card key="id" group=(concat "image-" card.id) use=this.imageTransition as |card|}}
                     {{! template-lint-configure no-inline-styles {"allowDynamicStyles": true} }}
                     <div class="event-view-image" style={{css-url "background-image" card.imageUrl}}></div>
                   {{/animated-value}}
                   <div class="event-view-details">
-                    {{#animated-value card key="id" group="header-{{card.id}}" use=this.headerTransition}}
+                    {{#animated-value card key="id" group=(concat "header-" card.id) use=this.headerTransition}}
                       <div>
                         <div class="event-view-details--header">
                           <div class="event-view-date">{{card.date}}</div>
@@ -33,21 +33,24 @@
                       </div>
                     {{/animated-value}}
                   </div>
+                  {{#animated-value card key="id" group=(concat "body-" card.id) use=this.bodyTransition}}
+                    <div class="event-view--main">
 
-                  <div class="event-view--main">
-                    <div class="event-view--info-group">
-                      <div class="label">Date & Time</div>
-                      <div>September 26, 2019 7PM</div>
+                      <div class="event-view--info-group">
+                        <div class="label">Date & Time</div>
+                        <div>{{card.datetime}}</div>
+                      </div>
+                      <div class="event-view--info-group">
+                        <div class="label">Location</div>
+                        <div>{{card.address}}</div>
+                      </div>
+                      <div class="event-view--info-group">
+                        <div class="label">Description</div>
+                        <div>{{card.description}}</div>
+                      </div>
+
                     </div>
-                    <div class="event-view--info-group">
-                      <div class="label">Location</div>
-                      <div>One World Trade Center</div>
-                    </div>
-                    <div class="event-view--info-group">
-                      <div class="label">Description</div>
-                      <div>Lorem ipsum</div>
-                    </div>
-                  </div>
+                  {{/animated-value}}
                 </div>
                 {{!-- End of card content --}}
               {{/animated-value}}
