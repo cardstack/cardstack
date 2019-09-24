@@ -8,4 +8,7 @@ export default class Event extends Model {
   @belongsTo('person') author;
   @attr('date') publishedDate;
   @attr() imageUrl;
+  @attr() date;
+  @attr() location;
+  @attr() price;
 }
