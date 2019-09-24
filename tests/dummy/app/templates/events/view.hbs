@@ -2,56 +2,57 @@
   <div class="event-view">
     <AnimatedContainer>
       {{#animated-value this.model watch="selected" use=this.trayAnimation duration=this.duration as |card|}}
-        <div class="event-card-container {{if card.selected "selected"}}" role="button" onMouseEnter={{action "select"}} onMouseLeave={{action "unselect"}}>
+        <div class="event-card-container {{if card.selected "selected"}}" role="button" onMouseEnter={{action "select"}} onMouseLeave={{action "unselect"}} {{action "viewGridPage"}}>
           <div class="event-card-container--content">
             <div>{{card.constructor.modelName}} Card</div>
-            <button {{action "viewGridPage"}}>Done</button>
+            <div>Done</div>
           </div>
-          <AnimatedContainer>
-            {{#animated-value this.model watch="selected" key="id" group="content" use=this.holdContent duration=this.duration as |card|}}
-              <div class="event-card-wrapper {{if card.selected "selected"}}">
-                {{#animated-value card key="id" group="card-{{card.id}}" use=this.cardTransition as |card|}}
-                  {{!-- Card content --}}
-                  <div class="event-view-card event-view-card-{{card.id}}">
-                    {{#animated-value card key="id" group="image-{{card.id}}" use=this.imageTransition as |card|}}
-                      {{! template-lint-configure no-inline-styles {"allowDynamicStyles": true} }}
-                      <div class="event-view-image" style={{css-url "background-image" card.imageUrl}}></div>
-                    {{/animated-value}}
-                    <AnimatedContainer class="event-view-details">
-                      {{#animated-value card key="id" group="header-{{card.id}}" use=this.headerTransition}}
-                        <div>
-                          <div class="event-view-details--header">
-                            <div class="event-view-date">{{card.date}}</div>
-                            <div class="event-view-title">{{card.title}}</div>
-                          </div>
-                          <div class="event-view-details--other">
-                            <div class="event-view-location">{{card.location}}</div>
-                            <div class="event-view-price">{{card.price}}</div>
-                          </div>
-                        </div>
-                      {{/animated-value}}
-                    </AnimatedContainer>
 
-                    <div class="event-view--main">
-                      <div class="event-view--info-group">
-                        <div class="label">Date & Time</div>
-                        <div>September 26, 2019 7PM</div>
+          {{#animated-value this.model watch="selected" key="id" group="content" use=this.holdContent duration=this.duration as |card|}}
+            <div class="event-card-wrapper {{if card.selected "selected"}}">
+              {{#animated-value card key="id" group="card-{{card.id}}" use=this.cardTransition as |card|}}
+                {{!-- Card content --}}
+                <div class="event-view-card event-view-card-{{card.id}}">
+                  {{#animated-value card key="id" group="image-{{card.id}}" use=this.imageTransition as |card|}}
+                    {{! template-lint-configure no-inline-styles {"allowDynamicStyles": true} }}
+                    <div class="event-view-image" style={{css-url "background-image" card.imageUrl}}></div>
+                  {{/animated-value}}
+                  <div class="event-view-details">
+                    {{#animated-value card key="id" group="header-{{card.id}}" use=this.headerTransition}}
+                      <div>
+                        <div class="event-view-details--header">
+                          <div class="event-view-date">{{card.date}}</div>
+                          {{#animated-value card group="title" use=this.tweenTitle}}
+                            <div class="event-view-title">{{card.title}}</div>
+                          {{/animated-value}}
+                        </div>
+                        <div>
+                          <div class="event-view-location">{{card.location}}</div>
+                          <div class="event-view-price">{{card.price}}</div>
+                        </div>
                       </div>
-                      <div class="event-view--info-group">
-                        <div class="label">Location</div>
-                        <div>One World Trade Center</div>
-                      </div>
-                      <div class="event-view--info-group">
-                        <div class="label">Description</div>
-                        <div>Lorem ipsum</div>
-                      </div>
+                    {{/animated-value}}
+                  </div>
+
+                  <div class="event-view--main">
+                    <div class="event-view--info-group">
+                      <div class="label">Date & Time</div>
+                      <div>September 26, 2019 7PM</div>
+                    </div>
+                    <div class="event-view--info-group">
+                      <div class="label">Location</div>
+                      <div>One World Trade Center</div>
+                    </div>
+                    <div class="event-view--info-group">
+                      <div class="label">Description</div>
+                      <div>Lorem ipsum</div>
                     </div>
                   </div>
-                  {{!-- End of card content --}}
-                {{/animated-value}}
-              </div>
-            {{/animated-value}}
-          </AnimatedContainer>
+                </div>
+                {{!-- End of card content --}}
+              {{/animated-value}}
+            </div>
+          {{/animated-value}}
         </div>
       {{/animated-value}}
     </AnimatedContainer>

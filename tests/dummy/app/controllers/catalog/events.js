@@ -2,6 +2,7 @@ import Controller from '@ember/controller';
 import { action, set } from '@ember/object';
 import resize from 'ember-animated/motions/resize';
 import move from 'ember-animated/motions/move';
+import adjustCSS from 'ember-animated/motions/adjust-css';
 import { printSprites, wait } from 'ember-animated';
 
 export let animationDelay = 350;
@@ -79,8 +80,17 @@ export default class CatalogEventsController extends Controller {
   * headerTransition({ sentSprites }) {
     sentSprites.forEach(sprite => {
       move(sprite);
-      resize(sprite);
       sprite.applyStyles({ 'z-index': 3 });
     });
+  }
+
+  * tweenTitle({ sentSprites }) {
+    sentSprites.forEach(sprite => {
+      move(sprite);
+      resize(sprite);
+      adjustCSS('font-size', sprite);
+      adjustCSS('line-height', sprite);
+      sprite.applyStyles({ 'z-index': 4 });
+    })
   }
 }

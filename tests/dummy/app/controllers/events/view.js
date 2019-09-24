@@ -2,6 +2,7 @@ import Controller from '@ember/controller';
 import { action, set } from '@ember/object';
 import resize from 'ember-animated/motions/resize';
 import move from 'ember-animated/motions/move';
+import adjustCSS from 'ember-animated/motions/adjust-css';
 import { printSprites, wait } from 'ember-animated';
 
 import { animationDelay } from '../catalog/events';
@@ -66,12 +67,19 @@ export default class EventsViewController extends Controller {
   }
 
   * headerTransition({ sentSprites }) {
-    // printSprites(arguments[0], 'view image transition');
+    sentSprites.forEach(sprite => {
+      move(sprite);
+      sprite.applyStyles({ 'z-index': 3 });
+    });
+  }
 
+  * tweenTitle({ sentSprites }) {
     sentSprites.forEach(sprite => {
       move(sprite);
       resize(sprite);
-      sprite.applyStyles({ 'z-index': 3 });
-    });
+      adjustCSS('font-size', sprite);
+      adjustCSS('line-height', sprite);
+      sprite.applyStyles({ 'z-index': 4 });
+    })
   }
 }
