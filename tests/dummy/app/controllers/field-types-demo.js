@@ -50,7 +50,7 @@ export default class EditDemoController extends Controller {
     receivedSprites.forEach(sprite => {
       let { y: y1 } = sprite._offsetSprite.initialBounds;
       let { y: y2 } = sprite._offsetSprite.finalBounds;
-      sprite.startTranslatedBy(0, Math.sign(y2 - y1) * 65);
+      sprite.startTranslatedBy(0, y2 - y1);
       move(sprite);
       adjustCSS('border-top-left-radius', sprite, { easing: easeInAndOut });
       adjustCSS('border-top-right-radius', sprite, { easing: easeInAndOut });
