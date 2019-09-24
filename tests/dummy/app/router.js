@@ -32,6 +32,7 @@ Router.map(function() {
     this.route('image-card', { path: '/:id' });
   });
   this.route('drag-drop');
+  this.route('drag-drop-animation');
 });
 
 export default Router;
