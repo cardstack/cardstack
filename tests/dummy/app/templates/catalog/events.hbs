@@ -13,7 +13,7 @@
             </div>
             <AnimatedContainer>
               {{#animated-value card watch="selected" key="id" group="content" use=this.holdContent as |card|}}
-                <div class="event-card-wrapper {{if card.selected "selected"}}" role="button" {{action "select" card.id}}>
+                <div class="event-card-wrapper {{if card.selected "selected"}}" role="button" onMouseEnter={{action "select" card.id}} onMouseLeave={{action "unselect" card.id}} {{action "viewDetailPage" card.id}}>
                   {{#animated-value card key="id" group="card-{{card.id}}" use=this.cardTransition as |card|}}
                     {{!-- Card content --}}
                     <div class="event-card event-card-{{card.id}}">

@@ -7,12 +7,16 @@ import move from 'ember-animated/motions/move';
 export default class EventsViewController extends Controller {
   @action
   select() {
-    set(this.model, 'selected', !this.model.selected);
+    set(this.model, 'selected', true);
+  }
+
+  @action
+  unselect() {
+    set(this.model, 'selected', false);
   }
 
   @action
   viewGridPage() {
-    set(this.model, 'selected', false);
     this.transitionToRoute('catalog.events');
   }
 

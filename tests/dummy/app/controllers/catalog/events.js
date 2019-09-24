@@ -9,7 +9,7 @@ export default class CatalogEventsController extends Controller {
   select(id) {
     for (let card of this.model) {
       if (card.id === id) {
-        set(card, 'selected', !card.selected);
+        set(card, 'selected', true);
       }
       else {
         set(card, 'selected', false);
@@ -18,9 +18,17 @@ export default class CatalogEventsController extends Controller {
   }
 
   @action
-  viewDetailPage(card) {
-    set(card, 'selected', false);
-    this.transitionToRoute('events.view', card.id);
+  unselect(id) {
+    for (let card of this.model) {
+      if (card.id === id) {
+        set(card, 'selected', false);
+      }
+    }
+  }
+
+  @action
+  viewDetailPage(id) {
+    this.transitionToRoute('events.view', id);
   }
 
   * trayAnimation({ keptSprites }) {

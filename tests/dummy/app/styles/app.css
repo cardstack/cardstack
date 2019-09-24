@@ -93,12 +93,6 @@ button:focus {
   background-color: var(--catalog-dark-purple);
 }
 
-*[role="button"]:hover,
-*[role="button"]:focus {
-  cursor: pointer;
-}
-
-
 /* for ember animated */
 .animated-orphans {
   position: absolute;
