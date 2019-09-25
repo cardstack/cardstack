@@ -35,6 +35,7 @@ Router.map(function() {
   this.route('drag-drop');
   this.route('drag-drop-animation');
   this.route('tic-tac-toe');
+  this.route('tic-tac-toe-enhanced');
 });
 
 export default Router;

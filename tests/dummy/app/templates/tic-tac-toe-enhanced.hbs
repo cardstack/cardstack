@@ -1,0 +1,33 @@
+<div class="tic-tac-toe-enhanced-page">
+  <div class="tic-tac-toe-enhanced-pieces {{if isDragging isDragging}}">
+    <AnimatedContainer class="pieces-container">
+      {{#animated-value pieceX use=dragTransition duration=200 watch="dragState" as |piece|}}
+        <div class="tic-tac-toe-enhanced-piece {{piece.name}}" role="button" draggable="true" onmousedown={{action beginDragging piece}}>
+          {{svg-jar piece.name width="120px" height="120px"}}
+        </div>
+      {{/animated-value}}
+    </AnimatedContainer>
+    <AnimatedContainer class="pieces-container">
+      {{#animated-value pieceO use=dragTransition duration=200 watch="dragState" as |piece|}}
+        <div class="tic-tac-toe-enhanced-piece {{piece.name}}" role="button" draggable="true" onmousedown={{action beginDragging piece}}>
+          {{svg-jar piece.name width="120px" height="120px"}}
+        </div>
+      {{/animated-value}}
+    </AnimatedContainer>
+  </div>
+  <div class="tic-tac-toe-enhanced-board-container">
+    <div class="tic-tac-toe-enhanced-board {{if isDragging "dragging"}}">
+      {{#each-in ticTacToeCells as |cellName cellValue|}}
+        <div class="tic-tac-toe-enhanced-cell-tray {{if cellValue.length "" "draggable"}} {{if (eq this.activeCell cellName) "active"}}" role="button" ondrop={{action dropPiece}} ondragover={{action foo}} ondragenter={{action setActiveCell cellName}} ondragleave={{action setActiveCell null}}>
+          <AnimatedContainer class="tic-tac-toe-enhanced-cell {{concat "cell-" cellName}}">
+            {{#animated-each cellValue use=dragTransition duration=200 as |piece|}}
+              <div class="tic-tac-toe-enhanced-piece {{piece.name}}">
+                {{svg-jar piece.name width="120px" height="120px"}}
+              </div>
+            {{/animated-each}}
+          </AnimatedContainer>
+        </div>
+      {{/each-in}}
+    </div>
+  </div>
+</div>
