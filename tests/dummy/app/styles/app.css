@@ -13,6 +13,7 @@
 @import 'image-cards.css';
 @import 'drag-drop.css';
 @import 'catalog-events.css';
+@import 'tic-tac-toe.css';
 
 @import 'components/article.css';
 @import 'components/event.css';

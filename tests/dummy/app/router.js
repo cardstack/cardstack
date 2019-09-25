@@ -34,6 +34,7 @@ Router.map(function() {
   });
   this.route('drag-drop');
   this.route('drag-drop-animation');
+  this.route('tic-tac-toe');
 });
 
 export default Router;
