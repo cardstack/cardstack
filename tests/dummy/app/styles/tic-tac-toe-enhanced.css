@@ -59,7 +59,13 @@
 }
 
 .tic-tac-toe-enhanced-board.dragging .tic-tac-toe-enhanced-cell-tray.draggable.active {
-  background-color: mediumpurple;
+  background-color: var(--catalog-dark-blue);
+  border: solid 3px var(--catalog-cyan);
+}
+
+.tic-tac-toe-enhanced-board.dragging .tic-tac-toe-enhanced-cell-tray.draggable.active .tic-tac-toe-enhanced-piece {
+  background-color: #919191;
+  opacity: 0.5;
 }
 
 .tic-tac-toe-enhanced-piece {
@@ -69,12 +75,12 @@
   margin: 0;
   padding-top: 47px;
   border: none;
-  border-radius: 20px;
-  color: black;
+  border-radius: 45px;
   text-align: center;
   font-size: 96px;
 }
 
+.tic-tac-toe-enhanced-board .tic-tac-toe-enhanced-piece,
 .tic-tac-toe-enhanced-piece svg {
   pointer-events: none;
 }

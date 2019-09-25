@@ -1,5 +1,5 @@
 <div class="tic-tac-toe-enhanced-page">
-  <div class="tic-tac-toe-enhanced-pieces {{if isDragging isDragging}}">
+  <div class="tic-tac-toe-enhanced-pieces {{if isDragging isDragging.name}}">
     <AnimatedContainer class="pieces-container">
       {{#animated-value pieceX use=dragTransition duration=200 watch="dragState" as |piece|}}
         <div class="tic-tac-toe-enhanced-piece {{piece.name}}" role="button" draggable="true" onmousedown={{action beginDragging piece}}>
@@ -18,7 +18,14 @@
   <div class="tic-tac-toe-enhanced-board-container">
     <div class="tic-tac-toe-enhanced-board {{if isDragging "dragging"}}">
       {{#each-in ticTacToeCells as |cellName cellValue|}}
-        <div class="tic-tac-toe-enhanced-cell-tray {{if cellValue.length "" "draggable"}} {{if (eq this.activeCell cellName) "active"}}" role="button" ondrop={{action dropPiece}} ondragover={{action foo}} ondragenter={{action setActiveCell cellName}} ondragleave={{action setActiveCell null}}>
+        <div  class="tic-tac-toe-enhanced-cell-tray
+                    {{if (and cellValue.length (not-eq this.activeCell cellName)) "" "draggable"}}
+                    {{if (eq this.activeCell cellName) "active"}}"
+              role="button"
+              ondrop={{action dropPiece}}
+              ondragover={{action dragOver}}
+              ondragenter={{action setActiveCell cellName cellValue}}
+              ondragleave={{action unsetActiveCell cellName cellValue}}>
           <AnimatedContainer class="tic-tac-toe-enhanced-cell {{concat "cell-" cellName}}">
             {{#animated-each cellValue use=dragTransition duration=200 as |piece|}}
               <div class="tic-tac-toe-enhanced-piece {{piece.name}}">
@@ -26,6 +33,11 @@
               </div>
             {{/animated-each}}
           </AnimatedContainer>
+          {{!-- {{#if (eq this.activeCell cellName)}}
+            <div class="tic-tac-toe-enhanced-piece preview {{this.isDragging.name}}">
+              {{svg-jar this.isDragging.name width="120px" height="120px"}}
+            </div>
+          {{/if}} --}}
         </div>
       {{/each-in}}
     </div>

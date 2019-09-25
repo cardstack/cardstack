@@ -3,6 +3,7 @@ import { action, set } from '@ember/object';
 import move from 'ember-animated/motions/move';
 import drag from '../motions/drag';
 import { printSprites } from 'ember-animated';
+import { fadeOut } from 'ember-animated/motions/opacity';
 
 export default class TicTacToeEnhancedController extends Controller {
   ticTacToeCells = {
@@ -20,13 +21,13 @@ export default class TicTacToeEnhancedController extends Controller {
   pieceX = { symbol: '❌', name: 'piece-x' };
   pieceO = { symbol: '⭕', name: 'piece-o' };
 
-  @action beginDragging(piece, dragEvent) {
+  @action beginDragging(piece, mousedownEvent) {
     let dragState;
 
     this.set('finishDrag', (dropEvent) => {
       if (this.activeCell) {
         let { x, y } = dropEvent;
-        let { offsetX, offsetY } = dragEvent;
+        let { offsetX, offsetY } = mousedownEvent;
         set(piece, 'dropCoords', { x: x - offsetX, y: y - offsetY });
         this.set(`ticTacToeCells.${this.activeCell}`, [piece]);
         this.set('activeCell', null);
@@ -38,22 +39,32 @@ export default class TicTacToeEnhancedController extends Controller {
 
     dragState = {
       usingKeyboard: false,
-      initialPointerX: dragEvent.x,
-      initialPointerY: dragEvent.y,
-      latestPointerX: dragEvent.x,
-      latestPointerY: dragEvent.y
+      initialPointerX: mousedownEvent.x,
+      initialPointerY: mousedownEvent.y,
+      latestPointerX: mousedownEvent.x,
+      latestPointerY: mousedownEvent.y
     };
 
     window.addEventListener('dragend', () => this.set('isDragging', false));
-    this.set('isDragging', piece.name)
+    this.set('isDragging', piece);
     set(piece, 'dragState', dragState);
   }
 
-  @action setActiveCell(cell) {
-    this.set('activeCell', cell);
+  @action setActiveCell(cellName, cellValue) {
+    if (!cellValue.length) {
+      this.set('activeCell', cellName);
+      this.set(`ticTacToeCells.${cellName}`, [this.isDragging]);
+    }
   }
 
-  @action foo(event) {
+  @action unsetActiveCell(cellName, cellValue) {
+    if (!cellValue.length) {
+      this.set('activeCell', null);
+      this.set(`ticTacToeCells.${cellName}`, []);
+    }
+  }
+
+  @action dragOver(event) {
     event.preventDefault();
   }
 
@@ -61,7 +72,7 @@ export default class TicTacToeEnhancedController extends Controller {
     this.finishDrag(event);
   }
 
-  * dragTransition ({ insertedSprites, keptSprites }) {
+  * dragTransition ({ insertedSprites, removedSprites, keptSprites }) {
     printSprites(arguments[0], 'transition');
 
     keptSprites.forEach(sprite => {
@@ -69,9 +80,15 @@ export default class TicTacToeEnhancedController extends Controller {
     });
 
     insertedSprites.forEach(sprite => {
-      let dropCoords = sprite.owner.value.dropCoords;
-      sprite.startAtPixel(dropCoords);
-      move(sprite);
-    })
+      if (sprite.owner.value.dropCoords) {
+        let dropCoords = sprite.owner.value.dropCoords;
+        sprite.startAtPixel(dropCoords);
+        move(sprite);
+      } else {
+        sprite.moveToFinalPosition();
+      }
+    });
+
+    removedSprites.forEach(fadeOut);
   }
 }
