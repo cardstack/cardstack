@@ -2,7 +2,7 @@
   <div class="event-view">
     <AnimatedContainer>
       {{#animated-value this.model watch="selected" use=this.trayAnimation key="id" group="tray" as |card|}}
-        <div class="event-card-container {{if card.selected "selected"}}" role="button" onMouseEnter={{action "select"}} onMouseLeave={{action "unselect"}} {{action "viewGridPage"}}>
+        <div class="event-card-container {{if card.selected "selected"}}" role="button" {{action "viewGridPage"}}>
           <div class="event-card-container--content">
             <div>{{card.constructor.modelName}} Card</div>
             <button {{action "viewGridPage"}}>Done</button>
@@ -33,24 +33,6 @@
                       </div>
                     {{/animated-value}}
                   </div>
-                  {{#animated-value card key="id" group=(concat "body-" card.id) use=this.bodyTransition}}
-                    <div class="event-view--main">
-
-                      <div class="event-view--info-group">
-                        <div class="label">Date & Time</div>
-                        <div>{{card.datetime}}</div>
-                      </div>
-                      <div class="event-view--info-group">
-                        <div class="label">Location</div>
-                        <div>{{card.address}}</div>
-                      </div>
-                      <div class="event-view--info-group">
-                        <div class="label">Description</div>
-                        <div>{{card.description}}</div>
-                      </div>
-
-                    </div>
-                  {{/animated-value}}
                 </div>
                 {{!-- End of card content --}}
               {{/animated-value}}
@@ -58,6 +40,24 @@
           {{/animated-value}}
         </div>
       {{/animated-value}}
+      <div class="event-card-wrapper">
+        {{#animated-value this.model group=(concat "body-" this.model.id) use=this.bodyTransition as |card|}}
+          <div class="event-view--main">
+            <div class="event-view--info-group">
+              <div class="label">Date & Time</div>
+              <div>{{card.datetime}}</div>
+            </div>
+            <div class="event-view--info-group">
+              <div class="label">Location</div>
+              <div>{{card.address}}</div>
+            </div>
+            <div class="event-view--info-group">
+              <div class="label">Description</div>
+              <div>{{card.description}}</div>
+            </div>
+          </div>
+        {{/animated-value}}
+      </div>
     </AnimatedContainer>
   </div>
 </AnimatedContainer>

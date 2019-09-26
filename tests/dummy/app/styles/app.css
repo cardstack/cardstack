@@ -94,7 +94,7 @@ button:focus {
 }
 
 /* for ember animated */
-.animated-orphans {
+.boxel-animated-orphans {
   position: absolute;
   top: 0;
   left: 0;

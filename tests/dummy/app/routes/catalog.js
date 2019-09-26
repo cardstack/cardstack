@@ -1,7 +1,7 @@
-import BoxelizedRoute from 'boxel/routes/boxelized';
+import Route from '@ember/routing/route';
 import RSVP from 'rsvp';
 
-export default class CatalogRoute extends BoxelizedRoute {
+export default class CatalogRoute extends Route {
   boxelPlane = 'space';
 
   model() {

@@ -3,6 +3,7 @@ import { action, set } from '@ember/object';
 import resize from 'ember-animated/motions/resize';
 import move from 'ember-animated/motions/move';
 import adjustCSS from 'ember-animated/motions/adjust-css';
+import { default as opacity } from 'ember-animated/motions/opacity';
 import { printSprites, wait } from 'ember-animated';
 
 export let animationDelay = 350;
@@ -36,7 +37,7 @@ export default class CatalogEventsController extends Controller {
     this.transitionToRoute('events.view', card);
   }
 
-  * trayAnimation({ keptSprites, sentSprites }) {
+  * trayAnimation({ keptSprites, sentSprites, receivedSprites }) {
     // printSprites(arguments[0], 'events tray animation');
 
     if (keptSprites.length) {
@@ -52,6 +53,15 @@ export default class CatalogEventsController extends Controller {
     sentSprites.forEach(sprite => {
       move(sprite);
       resize(sprite);
+      opacity(sprite, { to: 0 });
+      sprite.applyStyles({ 'z-index': 1 });
+    });
+
+    receivedSprites.forEach(sprite => {
+      move(sprite);
+      resize(sprite);
+      opacity(sprite, { from: 0 });
+      sprite.applyStyles({ 'z-index': 1 });
     });
   }
 

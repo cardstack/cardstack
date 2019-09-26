@@ -22,11 +22,11 @@ export default class EventsViewController extends Controller {
 
   @action
   viewGridPage() {
-    set(this.model, 'selected', false);
+    set(this.model, 'selected', true);
     this.transitionToRoute('catalog.events');
   }
 
-  * trayAnimation({ keptSprites, sentSprites }) {
+  * trayAnimation({ keptSprites, receivedSprites, duration }) {
     // printSprites(arguments[0], 'view tray animation');
 
     if (keptSprites.length) {
@@ -39,10 +39,9 @@ export default class EventsViewController extends Controller {
       sprite.applyStyles({ 'z-index': 1 }); // in case it's overlapping other content
     });
 
-    sentSprites.forEach(sprite => {
-      move(sprite);
-      resize(sprite);
-    });
+    if (receivedSprites.length) {
+      yield wait(duration);
+    }
   }
 
   * holdContent({ keptSprites }) {
@@ -85,27 +84,22 @@ export default class EventsViewController extends Controller {
     });
   }
 
-  * bodyTransition({ sentSprites, receivedSprites, insertedSprites, duration }) {
+  * bodyTransition({ sentSprites, receivedSprites, duration }) {
     printSprites(arguments[0], 'view body transition');
 
     sentSprites.forEach(sprite => {
       move(sprite);
       resize(sprite);
       opacity(sprite, { to: 0,  duration: duration / 2 });
-      sprite.applyStyles({ 'z-index': 3 });
+      sprite.applyStyles({ 'z-index': 4 });
     });
 
-    // receivedSprites.forEach(sprite => {
-    //   move(sprite);
-    //   resize(sprite);
-    //   opacity(sprite, { from: 0 });
-    //   sprite.applyStyles({ 'z-index': 3 });
-    // });
-
-    // insertedSprites.forEach(sprite => {
-    //   opacity(sprite, { from: 0 });
-    //   sprite.applyStyles({ 'z-index': 4 });
-    // });
+    receivedSprites.forEach(sprite => {
+      move(sprite);
+      resize(sprite);
+      opacity(sprite, { from: 0 });
+      sprite.applyStyles({ 'z-index': 4 });
+    });
   }
 
   * tweenTitle({ sentSprites }) {
@@ -115,14 +109,5 @@ export default class EventsViewController extends Controller {
       adjustCSS('font-size', sprite);
       sprite.applyStyles({ 'z-index': 4 });
     })
-  }
-
-  * fadeContent({ insertedSprites }) {
-    printSprites(arguments[0], 'fade contents');
-
-    insertedSprites.forEach(sprite => {
-      opacity(sprite, { from: 0 });
-      sprite.applyStyles({ 'z-index': 4 });
-    });
   }
 }
