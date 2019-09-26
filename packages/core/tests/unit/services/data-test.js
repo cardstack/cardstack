@@ -218,7 +218,7 @@ module("Unit | Service | data", function(hooks) {
     assert.equal(card.isDirty, true, 'the dirtiness is correct for a modified card');
   });
 
-  test("it can set a belongs-to relationship field on an isolated card", async function(assert) {
+  test("it can set a belongs-to relationship field on an isolated card by card id", async function(assert) {
     let service = this.owner.lookup('service:data');
     let card = service.createCard(card1Id);
     card.addField(authorField);
@@ -252,11 +252,81 @@ module("Unit | Service | data", function(hooks) {
     assert.equal(card.isDirty, true, 'the dirtiness is correct for a modified card');
   });
 
-  test("it can set a has-many relationship field on an isolated card", async function(assert) {
+  test("it can set a belongs-to relationship field on an isolated card by card instance", async function(assert) {
+    let service = this.owner.lookup('service:data');
+    let person = service.createCard(card2Id);
+    let card = service.createCard(card1Id);
+    card.addField(authorField);
+    card.setField('author', person);
+    assert.deepEqual(JSON.parse(card.json), {
+      data: {
+        id: card1Id,
+        type: 'cards',
+        relationships: {
+          fields: {
+            data: [ { type: 'fields', id: 'author' } ],
+          },
+          model: {
+            data: { type: card1Id, id: card1Id }
+          }
+        }
+      },
+      included: [
+        {
+          type: card1Id,
+          id: card1Id,
+          relationships: {
+            author: {
+              data: { type: 'cards', id: card2Id }
+            }
+          }
+        },
+        authorField.data
+      ]
+    }, 'the card JSON is correct for adding a string field');
+    assert.equal(card.isDirty, true, 'the dirtiness is correct for a modified card');
+  });
+
+  test("it can set a has-many relationship field on an isolated card by card id's", async function(assert) {
     let service = this.owner.lookup('service:data');
     let card = service.createCard(card1Id);
     card.addField(reviewersField);
     card.setField('reviewers', [card2Id]);
+    assert.deepEqual(JSON.parse(card.json), {
+      data: {
+        id: card1Id,
+        type: 'cards',
+        relationships: {
+          fields: {
+            data: [ { type: 'fields', id: 'reviewers' } ],
+          },
+          model: {
+            data: { type: card1Id, id: card1Id }
+          }
+        }
+      },
+      included: [
+        {
+          type: card1Id,
+          id: card1Id,
+          relationships: {
+            reviewers: {
+              data: [{ type: 'cards', id: card2Id }]
+            }
+          }
+        },
+        reviewersField.data
+      ]
+    }, 'the card JSON is correct for adding a string field');
+    assert.equal(card.isDirty, true, 'the dirtiness is correct for a modified card');
+  });
+
+  test("it can set a has-many relationship field on an isolated card by card instances", async function(assert) {
+    let service = this.owner.lookup('service:data');
+    let person = service.createCard(card2Id);
+    let card = service.createCard(card1Id);
+    card.addField(reviewersField);
+    card.setField('reviewers', [person]);
     assert.deepEqual(JSON.parse(card.json), {
       data: {
         id: card1Id,

@@ -83,9 +83,14 @@ class Card {
 
     // Note that the only kind of relationships that you can fashion are to other cards
     if (fieldType === '@cardstack/core-types::belongs-to') {
+      if (value instanceof Card) {
+        value = value.id;
+      }
       set(this.isolatedData, `included[${index}].relationships.${field}.data`, { type: 'cards', id: value });
     } else if (fieldType === '@cardstack/core-types::has-many') {
       if (!Array.isArray(value)) { throw new Error(`Cannot set cards relationships on card id '${this.id}' from value '${JSON.stringify(value)}'. The value must be an array of card ID's.`); }
+
+      value = [].concat(value.map(i => i instanceof Card ? i.id : i));
       set(this.isolatedData, `included[${index}].relationships.${field}.data`, value.map(id => ({ type: 'cards', id })));
     } else {
       set(this.isolatedData, `included[${index}].attributes.${field}`, value);
