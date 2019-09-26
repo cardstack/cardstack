@@ -51,8 +51,10 @@ export default class TicTacToeEnhancedController extends Controller {
     set(piece, 'dragState', dragState);
   }
 
-  @action setActiveCell(cellName) {
-    this.set('activeCell', cellName);
+  @action setActiveCell(cellName, cellValue) {
+    if (!cellValue.length || !cellName) {
+      this.set('activeCell', cellName);
+    }
   }
 
   @action dragOver(event) {

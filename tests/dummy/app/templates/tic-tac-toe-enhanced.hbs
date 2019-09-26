@@ -20,12 +20,12 @@
       {{#each-in ticTacToeCells as |cellName cellValue|}}
         <div  class="tic-tac-toe-enhanced-cell-tray
                     {{if (and cellValue.length (not-eq this.activeCell cellName)) "" "draggable"}}
-                    {{if (eq this.activeCell cellName) "active"}}"
+                    {{if (and (eq this.activeCell cellName) (not cellValue.length)) "active"}}"
               role="button"
               ondrop={{action dropPiece}}
               ondragover={{action dragOver}}
-              ondragenter={{action setActiveCell cellName}}
-              ondragleave={{action setActiveCell []}}>
+              ondragenter={{action setActiveCell cellName cellValue}}
+              ondragleave={{action setActiveCell null cellValue}}>
           <AnimatedContainer class="tic-tac-toe-enhanced-cell {{concat "cell-" cellName}}">
             {{#animated-each cellValue use=dragTransition duration=200 as |piece|}}
               <div class="tic-tac-toe-enhanced-piece {{piece.name}}">
