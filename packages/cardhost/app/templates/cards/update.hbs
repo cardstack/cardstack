@@ -1,8 +1,7 @@
-<LinkTo @route="index">Back</LinkTo>
+<LinkTo @route="index">Home</LinkTo>
 
 <CardUpdator
-  @cardId={{this.model.id}}
-  @card={{this.model.card}}
+  @card={{this.model}}
   @onCardUpdate={{action "cardUpdated"}}
 >
 </CardUpdator>

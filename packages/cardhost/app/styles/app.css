@@ -1,3 +1,15 @@
-div.CodeMirror {
-  min-height: 65vh;
+.card-creator--field-btn-wrapper {
+  text-align: right;
+}
+
+.card-updator--field-btn-wrapper {
+  text-align: right;
+}
+
+.card-renderer--field-btn-wrapper {
+  text-align: right;
+}
+
+pre.code-block {
+  font-size: 10px;
 }

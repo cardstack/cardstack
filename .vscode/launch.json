@@ -38,7 +38,22 @@
     {
       "type": "node",
       "request": "launch",
-      "name": "Launch Authentcation Test Suite",
+      "name": "Launch Dummy Core Hub",
+      "cwd": "${workspaceRoot}/packages/core",
+      "console": "integratedTerminal",
+      "program": "${workspaceFolder}/packages/hub/bin/cardstack-hub.js",
+      "env": {
+        "CARDSTACK_SESSIONS_KEY": "OQUQi8NH0asrYgeoE10ijOFBhd/P1BU8HZP/rNqO5nw=",
+        "PGSEARCH_NAMESPACE": "cardstack_data_development",
+        "INITIAL_DATA_DIR": "${workspaceFolder}/packages/core/tests/dummy/cardstack",
+        "HUB_ENVIRONMENT": "test",
+        "PORT": "3000"
+      }
+    },
+    {
+      "type": "node",
+      "request": "launch",
+      "name": "Launch Authentication Test Suite",
       "cwd": "${workspaceRoot}/packages/authentication",
       "program": "${workspaceRoot}/packages/authentication/node_modules/ember-cli/bin/ember",
       "args": ["test"]

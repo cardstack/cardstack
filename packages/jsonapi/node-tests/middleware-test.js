@@ -957,6 +957,7 @@ describe('jsonapi/middleware', function() {
         let response = await request.get('/api/cards/local-hub::article-card::millenial-puppies?format=embedded');
         expect(response).hasStatus(200);
         assertEmbeddedCardMetadata(response.body);
+        expect(response.body.included.length).to.equal(0);
       });
 
       it("when no format is specifed, the default format is 'embedded'", async function () {

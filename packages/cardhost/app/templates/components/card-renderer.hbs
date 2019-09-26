@@ -1,0 +1,72 @@
+{{#if @card}}
+  <fieldset>
+    <legend><strong><code>{{this.args.card.id}}</code></strong></legend>
+
+    {{yield}}
+
+    <dl>
+      {{#each this.fields key="fieldName" as | field |}}
+        <fieldset data-test-card-renderer-field={{field.fieldName}}>
+          <legend><strong><code>{{field.fieldName}}</code></strong></legend>
+
+          {{!-- TODO we'll need an actual field renderer here --}}
+          {{#if (eq field.fieldType "@cardstack/core-types::boolean")}}
+            <pre data-test-card-renderer-value>{{#if field.fieldValue}}true{{else}}false{{/if}}</pre>
+          {{else if (not field.fieldValue)}}
+            <pre data-test-card-renderer-value>&lt;no value&gt;</pre>
+          {{else}}
+            <pre data-test-card-renderer-value>{{field.fieldValue}}</pre>
+          {{/if}}
+
+          {{#if @setField}}
+            <div>
+              <label
+                for={{concat "edit-" field.fieldName "-field-value"}}
+              >
+                Edit Value:
+              </label>
+            </div>
+            <FieldEditor
+              @id={{concat "edit-" field.fieldName "-field-value"}}
+              @field={{field}}
+              @onUpdate={{fn @setField field.fieldName}}
+              @inputSize="60"
+            />
+            <br>
+          {{/if}}
+          <dd>
+            field type:
+            <code data-test-card-renderer-field-type>
+              {{field.fieldSchema.field-type}}
+            </code>
+          </dd>
+          <dd>
+            is metadata field:
+            <code data-test-card-renderer-is-meta>
+              {{if field.fieldSchema.is-metadata "true" "false"}}
+            </code>
+          </dd>
+          <dd>
+            needed when embedded:
+            <code
+              data-test-card-renderer-embedded
+            >
+              {{if field.fieldSchema.needed-when-embedded "true" "false"}}
+            </code>
+          </dd>
+
+          {{#if @removeField}}
+            <div class="card-renderer--field-btn-wrapper">
+              <button {{on "click" (fn @removeField field.fieldName)}}
+                data-test-card-renderer-remove-btn
+              >
+                Remove
+              </button>
+            </div>
+          {{/if}}
+        </fieldset>
+        <br>
+      {{/each}}
+    </dl>
+  </fieldset>
+{{/if}}
