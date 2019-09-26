@@ -61,6 +61,7 @@
 .tic-tac-toe-enhanced-board.dragging .tic-tac-toe-enhanced-cell-tray.draggable.active {
   background-color: var(--catalog-dark-blue);
   border: solid 3px var(--catalog-cyan);
+  padding: 9px;
 }
 
 .tic-tac-toe-enhanced-board.dragging .tic-tac-toe-enhanced-cell-tray.draggable.active .tic-tac-toe-enhanced-piece {

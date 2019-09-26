@@ -4,6 +4,7 @@ import move from 'ember-animated/motions/move';
 import drag from '../motions/drag';
 import { printSprites } from 'ember-animated';
 import { fadeOut } from 'ember-animated/motions/opacity';
+import opacity from 'ember-animated/motions/opacity';
 
 export default class TicTacToeEnhancedController extends Controller {
   ticTacToeCells = {
@@ -50,18 +51,8 @@ export default class TicTacToeEnhancedController extends Controller {
     set(piece, 'dragState', dragState);
   }
 
-  @action setActiveCell(cellName, cellValue) {
-    if (!cellValue.length) {
-      this.set('activeCell', cellName);
-      this.set(`ticTacToeCells.${cellName}`, [this.isDragging]);
-    }
-  }
-
-  @action unsetActiveCell(cellName, cellValue) {
-    if (!cellValue.length) {
-      this.set('activeCell', null);
-      this.set(`ticTacToeCells.${cellName}`, []);
-    }
+  @action setActiveCell(cellName) {
+    this.set('activeCell', cellName);
   }
 
   @action dragOver(event) {
@@ -70,6 +61,13 @@ export default class TicTacToeEnhancedController extends Controller {
 
   @action dropPiece(event) {
     this.finishDrag(event);
+  }
+
+  * previewTransition ({ insertedSprites, removedSprites }) {
+    printSprites(arguments[0], 'transition');
+
+    insertedSprites.forEach(opacity);
+    removedSprites.forEach(fadeOut);
   }
 
   * dragTransition ({ insertedSprites, removedSprites, keptSprites }) {
