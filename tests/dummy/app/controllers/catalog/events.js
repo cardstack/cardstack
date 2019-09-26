@@ -79,7 +79,7 @@ export default class CatalogEventsController extends Controller {
   }
 
   * cardTransition({ sentSprites }) {
-    // printSprites(arguments[0], 'events card transition');
+    printSprites(arguments[0], 'events card transition');
 
     sentSprites.forEach(sprite => {
       move(sprite);
