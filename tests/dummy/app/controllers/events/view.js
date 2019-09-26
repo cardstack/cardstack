@@ -6,39 +6,28 @@ import adjustCSS from 'ember-animated/motions/adjust-css';
 import { default as opacity } from 'ember-animated/motions/opacity';
 import { printSprites, wait } from 'ember-animated';
 
-export let animationDelay = 350;
-export let highlightDuration = 150;
+import { animationDelay } from '../catalog/events';
+import { highlightDuration } from '../catalog/events';
 
-export default class CatalogEventsController extends Controller {
+export default class EventsViewController extends Controller {
   @action
-  select(id) {
-    for (let card of this.model) {
-      if (card.id === id) {
-        set(card, 'selected', true);
-      }
-      else {
-        set(card, 'selected', false);
-      }
-    }
+  select() {
+    set(this.model, 'selected', true);
   }
 
   @action
-  unselect(id) {
-    for (let card of this.model) {
-      if (card.id === id) {
-        set(card, 'selected', false);
-      }
-    }
+  unselect() {
+    set(this.model, 'selected', false);
   }
 
   @action
-  viewDetailPage(card) {
-    set(card, 'selected', false);
-    this.transitionToRoute('events.view', card);
+  viewGridPage() {
+    set(this.model, 'selected', true);
+    this.transitionToRoute('catalog.events');
   }
 
-  * trayAnimation({ keptSprites, sentSprites, receivedSprites }) {
-    // printSprites(arguments[0], 'events tray animation');
+  * trayAnimation({ keptSprites, receivedSprites, duration }) {
+    // printSprites(arguments[0], 'view tray animation');
 
     if (keptSprites.length) {
       yield wait(animationDelay);
@@ -50,23 +39,13 @@ export default class CatalogEventsController extends Controller {
       sprite.applyStyles({ 'z-index': 1 }); // in case it's overlapping other content
     });
 
-    sentSprites.forEach(sprite => {
-      move(sprite);
-      resize(sprite);
-      opacity(sprite, { to: 0 });
-      sprite.applyStyles({ 'z-index': 1 });
-    });
-
-    receivedSprites.forEach(sprite => {
-      move(sprite);
-      resize(sprite);
-      opacity(sprite, { from: 0 });
-      sprite.applyStyles({ 'z-index': 1 });
-    });
+    if (receivedSprites.length) {
+      yield wait(duration);
+    }
   }
 
   * holdContent({ keptSprites }) {
-    // printSprites(arguments[0], 'events content');
+    // printSprites(arguments[0], 'view content');
 
     if (keptSprites.length) {
       yield wait(animationDelay);
@@ -79,7 +58,7 @@ export default class CatalogEventsController extends Controller {
   }
 
   * cardTransition({ sentSprites }) {
-    printSprites(arguments[0], 'events card transition');
+    // printSprites(arguments[0], 'view - card transition');
 
     sentSprites.forEach(sprite => {
       move(sprite);
@@ -89,7 +68,7 @@ export default class CatalogEventsController extends Controller {
   }
 
   * imageTransition({ sentSprites }) {
-    // printSprites(arguments[0], 'events image transition');
+    // printSprites(arguments[0], 'view image transition');
 
     sentSprites.forEach(sprite => {
       move(sprite);
@@ -102,6 +81,24 @@ export default class CatalogEventsController extends Controller {
     sentSprites.forEach(sprite => {
       move(sprite);
       sprite.applyStyles({ 'z-index': 3 });
+    });
+  }
+
+  * bodyTransition({ sentSprites, receivedSprites, duration }) {
+    printSprites(arguments[0], 'view body transition');
+
+    sentSprites.forEach(sprite => {
+      move(sprite);
+      resize(sprite);
+      opacity(sprite, { to: 0,  duration: duration / 2 });
+      sprite.applyStyles({ 'z-index': 4 });
+    });
+
+    receivedSprites.forEach(sprite => {
+      move(sprite);
+      resize(sprite);
+      opacity(sprite, { from: 0 });
+      sprite.applyStyles({ 'z-index': 4 });
     });
   }
 

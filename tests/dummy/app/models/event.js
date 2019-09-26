@@ -9,6 +9,8 @@ export default class Event extends Model {
   @attr('date') publishedDate;
   @attr() imageUrl;
   @attr() date;
+  @attr() datetime;
   @attr() location;
   @attr() price;
+  @attr() address;
 }

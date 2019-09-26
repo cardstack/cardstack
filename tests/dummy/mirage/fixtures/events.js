@@ -16,17 +16,23 @@ export default [
   {
     id: '1',
     title: 'Ember Meetup NYC',
-    date: 'SEPT 20',
+    date: 'SEPT 26',
     imageUrl: '/images/haunted-castle.jpg',
     location: 'New York, NY',
-    price: 'Free Admission'
+    price: 'Free Admission',
+    address: 'One World Trade Center',
+    datetime: 'September 26, 2019 7PM',
+    description: 'Zombie ipsum reversus ab viral inferno, nam rick grimes malum cerebro. De carne lumbering animata corpora quaeritis. Summus brains sit , morbo vel maleficia? De apocalypsi gorger omero undead survivor dictum mauris. Hi mindless mortuis soulless creaturas, imo evil stalking monstra adventus resi dentevil vultus comedat cerebella viventium.'
   },
   {
     id: '2',
     title: 'Ember Meetup London',
-    date: 'SEPT 21',
+    date: 'OCT 21',
     imageUrl: `${ENV.rootURL}images/${imageTypes[Math.floor(Math.random()*imageTypes.length)]}-${Math.ceil(Math.random()*4)}.png`,
     location: 'London, UK',
-    price: 'Free Admission'
+    price: 'Free Admission',
+    address: 'Somewhere in London',
+    datetime: 'October 21, 2019 7PM',
+    description: 'Zombie ipsum reversus ab viral inferno, nam rick grimes malum cerebro. De carne lumbering animata corpora quaeritis. Summus brains sit , morbo vel maleficia? De apocalypsi gorger omero undead survivor dictum mauris. Hi mindless mortuis soulless creaturas, imo evil stalking monstra adventus resi dentevil vultus comedat cerebella viventium.'
   }
 ]

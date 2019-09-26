@@ -12,9 +12,11 @@
 @import 'drag-drop-animation.css';
 @import 'image-cards.css';
 @import 'drag-drop.css';
-@import 'catalog-events.css';
 @import 'tic-tac-toe.css';
 @import 'tic-tac-toe-enhanced.css';
+
+@import 'catalog/events.css';
+@import 'events/view.css';
 
 @import 'components/article.css';
 @import 'components/event.css';
@@ -91,14 +93,8 @@ button:focus {
   background-color: var(--catalog-dark-purple);
 }
 
-*[role="button"]:hover,
-*[role="button"]:focus {
-  cursor: pointer;
-}
-
-
 /* for ember animated */
-.animated-orphans {
+.boxel-animated-orphans {
   position: absolute;
   top: 0;
   left: 0;
