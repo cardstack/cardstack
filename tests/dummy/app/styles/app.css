@@ -14,6 +14,7 @@
 @import 'drag-drop.css';
 @import 'catalog-events.css';
 @import 'tic-tac-toe.css';
+@import 'tic-tac-toe-enhanced.css';
 
 @import 'components/article.css';
 @import 'components/event.css';
@@ -24,11 +25,16 @@
   --catalog-darker-light-gray: #9f9f9f;
   --catalog-darker-gray: #4a4a4a;
   --catalog-dark-gray: #373741;
+  --catalog-light-purple: #5c5a6f;
+  --catalog-bright-purple: #281e78;
+  --catalog-brighter-purple: #6638FF;
   --catalog-dark-purple: #343356;
   --catalog-darker-purple: #382870;
-  --catalog-light-purple: #5c5a6f;
+  --catalog-darkerest-purple: #27264C;
   --catalog-darkest-purple: #010027;
-  --catalog-bright-purple: #281e78;
+  --catalog-dark-blue: #02002C;
+  --catalog-bright-blue: #0069F9;
+  --catalog-cyan: #00ECE5;
 }
 
 body {
