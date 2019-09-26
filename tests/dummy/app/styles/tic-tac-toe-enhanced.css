@@ -81,6 +81,7 @@
   font-size: 96px;
 }
 
+.tic-tac-toe-enhanced-board .animated-container,
 .tic-tac-toe-enhanced-board .tic-tac-toe-enhanced-piece,
 .tic-tac-toe-enhanced-piece svg {
   pointer-events: none;
