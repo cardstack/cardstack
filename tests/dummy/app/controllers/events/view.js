@@ -2,7 +2,6 @@ import Controller from '@ember/controller';
 import { action, set } from '@ember/object';
 import resize from 'ember-animated/motions/resize';
 import move from 'ember-animated/motions/move';
-import scale from 'ember-animated/motions/scale';
 import adjustCSS from 'ember-animated/motions/adjust-css';
 import { default as opacity } from 'ember-animated/motions/opacity';
 import { printSprites, wait } from 'ember-animated';
@@ -27,18 +26,18 @@ export default class EventsViewController extends Controller {
     this.transitionToRoute('catalog.events');
   }
 
-  * trayAnimation({ /* keptSprites, */receivedSprites }) {
+  * trayAnimation({ keptSprites, receivedSprites }) {
     // printSprites(arguments[0], 'view tray animation');
 
-    // Uncomment to enable highlighting
-    // if (keptSprites.length) {
-    //   yield wait(animationDelay);
-    // }
-    // keptSprites.forEach(sprite => {
-    //   move(sprite, { duration: highlightDuration });
-    //   resize(sprite, { duration: highlightDuration });
-    //   sprite.applyStyles({ 'z-index': 1 }); // in case it's overlapping other content
-    // });
+    if (keptSprites.length) {
+      yield wait(animationDelay);
+    }
+
+    keptSprites.forEach(sprite => {
+      move(sprite, { duration: highlightDuration });
+      resize(sprite, { duration: highlightDuration });
+      sprite.applyStyles({ 'z-index': 1 }); // in case it's overlapping other content
+    });
 
     // This element moves the card
     receivedSprites.forEach(sprite => {
@@ -113,18 +112,10 @@ export default class EventsViewController extends Controller {
 
     receivedSprites.forEach(sprite => {
       sprite.moveToFinalPosition();
-      scale(sprite);
-      sprite.applyStyles({ 'z-index': 4, 'opacity': 0 });
+      resize(sprite);
+      opacity(sprite, { from: 0 });
+      sprite.applyStyles({ 'z-index': 4 });
     });
-
-    if (receivedSprites.length) {
-      yield wait(duration * 0.6);
-
-      // Only reveal towards the end of animation
-      receivedSprites.forEach(sprite => {
-        opacity(sprite, { from: 0, duration: duration * 0.4 });
-      });
-    }
   }
 
   * tweenTitle({ sentSprites }) {

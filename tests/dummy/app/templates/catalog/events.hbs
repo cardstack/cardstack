@@ -38,12 +38,10 @@
                         </div>
                       {{/animated-value}}
                     </div>
-                    <AnimatedContainer>
-                      {{#animated-value card group=(concat "body-" card.id)}}
-                        <div class="event--main">
-                        </div>
-                      {{/animated-value}}
-                    </AnimatedContainer>
+                    {{#animated-value card group=(concat "body-" card.id)}}
+                      <div class="event--main">
+                      </div>
+                    {{/animated-value}}
                   </div>
                   {{!-- End of card content --}}
                 {{/animated-value}}

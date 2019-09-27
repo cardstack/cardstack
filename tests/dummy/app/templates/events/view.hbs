@@ -2,7 +2,7 @@
   <div class="event-view">
     <AnimatedContainer>
       {{#animated-value this.model watch="selected" use=this.trayAnimation key="id" group="tray" as |card|}}
-        <div class="event-card-container {{if card.selected "selected"}}" role="button" {{action "viewGridPage"}}>
+        <div class="event-card-container {{if card.selected "selected"}}" role="button" onMouseEnter={{action "select" card.id}} onMouseLeave={{action "unselect" card.id}} {{action "viewGridPage"}}>
           <div class="event-card-container--content">
             <div>{{card.constructor.modelName}} Card</div>
             {{! template-lint-configure no-nested-interactive false}}
