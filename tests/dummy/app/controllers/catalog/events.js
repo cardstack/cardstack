@@ -37,7 +37,7 @@ export default class CatalogEventsController extends Controller {
     this.transitionToRoute('events.view', card);
   }
 
-  * trayAnimation({ keptSprites, sentSprites, receivedSprites }) {
+  * trayAnimation({ keptSprites, receivedSprites }) {
     // printSprites(arguments[0], 'events tray animation');
 
     if (keptSprites.length) {
@@ -48,13 +48,6 @@ export default class CatalogEventsController extends Controller {
       move(sprite, { duration: highlightDuration });
       resize(sprite, { duration: highlightDuration });
       sprite.applyStyles({ 'z-index': 1 }); // in case it's overlapping other content
-    });
-
-    sentSprites.forEach(sprite => {
-      move(sprite);
-      resize(sprite);
-      opacity(sprite, { to: 0 });
-      sprite.applyStyles({ 'z-index': 1 });
     });
 
     receivedSprites.forEach(sprite => {
@@ -75,16 +68,6 @@ export default class CatalogEventsController extends Controller {
     keptSprites.forEach(sprite => {
       move(sprite, { duration: highlightDuration });
       sprite.applyStyles({ 'z-index': 1 });
-    });
-  }
-
-  * cardTransition({ sentSprites }) {
-    printSprites(arguments[0], 'events card transition');
-
-    sentSprites.forEach(sprite => {
-      move(sprite);
-      resize(sprite);
-      sprite.applyStyles({ 'z-index': 2 });
     });
   }
 
@@ -111,6 +94,6 @@ export default class CatalogEventsController extends Controller {
       resize(sprite);
       adjustCSS('font-size', sprite);
       sprite.applyStyles({ 'z-index': 4 });
-    })
+    });
   }
 }

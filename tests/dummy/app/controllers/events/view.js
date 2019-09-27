@@ -2,6 +2,7 @@ import Controller from '@ember/controller';
 import { action, set } from '@ember/object';
 import resize from 'ember-animated/motions/resize';
 import move from 'ember-animated/motions/move';
+import scale from 'ember-animated/motions/scale';
 import adjustCSS from 'ember-animated/motions/adjust-css';
 import { default as opacity } from 'ember-animated/motions/opacity';
 import { printSprites, wait } from 'ember-animated';
@@ -26,25 +27,28 @@ export default class EventsViewController extends Controller {
     this.transitionToRoute('catalog.events');
   }
 
-  * trayAnimation({ keptSprites, receivedSprites, duration }) {
+  * trayAnimation({ /* keptSprites, */receivedSprites }) {
     // printSprites(arguments[0], 'view tray animation');
 
-    if (keptSprites.length) {
-      yield wait(animationDelay);
-    }
+    // Uncomment to enable highlighting
+    // if (keptSprites.length) {
+    //   yield wait(animationDelay);
+    // }
+    // keptSprites.forEach(sprite => {
+    //   move(sprite, { duration: highlightDuration });
+    //   resize(sprite, { duration: highlightDuration });
+    //   sprite.applyStyles({ 'z-index': 1 }); // in case it's overlapping other content
+    // });
 
-    keptSprites.forEach(sprite => {
-      move(sprite, { duration: highlightDuration });
-      resize(sprite, { duration: highlightDuration });
-      sprite.applyStyles({ 'z-index': 1 }); // in case it's overlapping other content
+    // This element moves the card
+    receivedSprites.forEach(sprite => {
+      move(sprite);
+      resize(sprite);
+      sprite.applyStyles({ 'z-index': 1 });
     });
-
-    if (receivedSprites.length) {
-      yield wait(duration);
-    }
   }
 
-  * holdContent({ keptSprites }) {
+  * holdContent({ keptSprites, receivedSprites }) {
     // printSprites(arguments[0], 'view content');
 
     if (keptSprites.length) {
@@ -55,13 +59,26 @@ export default class EventsViewController extends Controller {
       move(sprite, { duration: highlightDuration });
       sprite.applyStyles({ 'z-index': 1 });
     });
+
+    // Need `moveToFinalPosition` to adjust for overshooting
+    receivedSprites.forEach(sprite => {
+      sprite.moveToFinalPosition();
+      resize(sprite);
+      sprite.applyStyles({ 'z-index': 1 });
+    });
   }
 
-  * cardTransition({ sentSprites }) {
+  * cardTransition({ sentSprites, receivedSprites }) {
     // printSprites(arguments[0], 'view - card transition');
 
     sentSprites.forEach(sprite => {
       move(sprite);
+      resize(sprite);
+      sprite.applyStyles({ 'z-index': 2 });
+    });
+
+    receivedSprites.forEach(sprite => {
+      sprite.moveToFinalPosition();
       resize(sprite);
       sprite.applyStyles({ 'z-index': 2 });
     });
@@ -95,11 +112,19 @@ export default class EventsViewController extends Controller {
     });
 
     receivedSprites.forEach(sprite => {
-      move(sprite);
-      resize(sprite);
-      opacity(sprite, { from: 0 });
-      sprite.applyStyles({ 'z-index': 4 });
+      sprite.moveToFinalPosition();
+      scale(sprite);
+      sprite.applyStyles({ 'z-index': 4, 'opacity': 0 });
     });
+
+    if (receivedSprites.length) {
+      yield wait(duration * 0.6);
+
+      // Only reveal towards the end of animation
+      receivedSprites.forEach(sprite => {
+        opacity(sprite, { from: 0, duration: duration * 0.4 });
+      });
+    }
   }
 
   * tweenTitle({ sentSprites }) {

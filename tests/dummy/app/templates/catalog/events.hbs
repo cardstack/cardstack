@@ -15,7 +15,7 @@
 
             {{#animated-value card watch="selected" key="id" group="content" use=this.holdContent as |card|}}
               <div class="event-card-wrapper {{if card.selected "selected"}}">
-                {{#animated-value card key="id" group=(concat "card-" card.id) use=this.cardTransition as |card|}}
+                {{#animated-value card key="id" group=(concat "card-" card.id) as |card|}}
                   {{!-- Card content --}}
                   <div class="event-card event-card-{{card.id}}">
                     {{#animated-value card key="id" group=(concat "image-" card.id) use=this.imageTransition as |card|}}
