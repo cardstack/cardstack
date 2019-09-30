@@ -8,7 +8,7 @@ import fade from 'ember-animated/transitions/fade';
 import { fadeIn, fadeOut } from 'ember-animated/motions/opacity';
 import move from 'ember-animated/motions/move';
 
-export default class EditDemoController extends Controller {
+export default class DemoAnimateInputController extends Controller {
   mode = 'view';
   fade = fade;
 

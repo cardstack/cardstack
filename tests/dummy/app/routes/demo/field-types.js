@@ -1,6 +1,6 @@
 import BoxelizedRoute from 'boxel/routes/boxelized';
 
-export default class FieldTypesDemoRoute extends BoxelizedRoute {
+export default class DemoFieldTypesRoute extends BoxelizedRoute {
   boxelPlane = 'space';
 
   async model() {

@@ -1,6 +1,6 @@
 import BoxelizedRoute from 'boxel/routes/boxelized';
 
-export default class FormCardsEditRoute extends BoxelizedRoute {
+export default class DemoFormCardsEditRoute extends BoxelizedRoute {
   boxelPlane = 'tools';
 
   model({ id }) {

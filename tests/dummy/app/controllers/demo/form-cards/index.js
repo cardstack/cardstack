@@ -6,15 +6,15 @@ import { filterBy } from '@ember/object/computed';
 // import { printSprites } from 'ember-animated';
 import move from 'ember-animated/motions/move';
 import opacity from 'ember-animated/motions/opacity';
-import scale from '../../motions/scale';
-import keep from '../../motions/keep';
+import scale from '../../../motions/scale';
+import keep from '../../../motions/keep';
 import resize from 'ember-animated/motions/resize';
 import adjustCSS from 'ember-animated/motions/adjust-css';
 import { easeInAndOut } from 'ember-animated/easings/cosine';
 
 export let duration = 1000;
 
-export default class FormCardsIndexController extends Controller {
+export default class DemoFormCardsIndexController extends Controller {
   @service boxel;
 
   @filterBy('model', 'expanded', true) expandedCards;

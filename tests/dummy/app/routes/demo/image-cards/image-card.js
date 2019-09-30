@@ -1,6 +1,6 @@
 import BoxelizedRoute from 'boxel/routes/boxelized';
 
-export default class ImageCardsImageCardRoute extends BoxelizedRoute {
+export default class DemoImageCardsImageCardRoute extends BoxelizedRoute {
   boxelPlane = 'space';
 
   model({ id }) {
