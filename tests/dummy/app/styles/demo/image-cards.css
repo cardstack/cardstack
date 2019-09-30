@@ -4,7 +4,7 @@
   min-height: 100vh;
   margin: 0 auto;
   padding: 100px 20px;
-  background-color: var(--catalog-light-purple);
+  background-color: var(--boxel-light-purple);
 }
 
 .image-cards-list {

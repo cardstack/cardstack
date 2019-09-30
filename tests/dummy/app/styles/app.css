@@ -22,27 +22,27 @@
 @import 'components/event.css';
 
 :root {
-  --catalog-light-gray: #f8f8f8;
-  --catalog-light-gray-d5: #d5d5d5;
-  --catalog-darker-light-gray: #9f9f9f;
-  --catalog-darker-gray: #4a4a4a;
-  --catalog-dark-gray: #373741;
-  --catalog-light-purple: #5c5a6f;
-  --catalog-bright-purple: #281e78;
-  --catalog-brighter-purple: #6638FF;
-  --catalog-dark-purple: #343356;
-  --catalog-darker-purple: #382870;
-  --catalog-darkerest-purple: #27264C;
-  --catalog-darkest-purple: #010027;
-  --catalog-dark-blue: #02002C;
-  --catalog-bright-blue: #0069F9;
-  --catalog-cyan: #00ECE5;
+  --boxel-light-gray: #f8f8f8;
+  --boxel-light-gray-d5: #d5d5d5;
+  --boxel-darker-light-gray: #9f9f9f;
+  --boxel-darker-gray: #4a4a4a;
+  --boxel-dark-gray: #373741;
+  --boxel-light-purple: #5c5a6f;
+  --boxel-bright-purple: #281e78;
+  --boxel-brighter-purple: #6638FF;
+  --boxel-dark-purple: #343356;
+  --boxel-darker-purple: #382870;
+  --boxel-darkerest-purple: #27264C;
+  --boxel-darkest-purple: #010027;
+  --boxel-dark-blue: #02002C;
+  --boxel-bright-blue: #0069F9;
+  --boxel-cyan: #00ECE5;
 }
 
 body {
   position: relative;
   margin: 0;
-  background-color: var(--catalog-light-gray);
+  background-color: var(--boxel-light-gray);
   color: black;
   font-family: "Open Sans", Roboto, "Helvetica Neue", Helvetica, Arial, sans-serif;
   font-size: 13px;
@@ -73,14 +73,14 @@ a {
 
 a:hover,
 a:focus {
-  color: var(--catalog-dark-purple);
+  color: var(--boxel-dark-purple);
 }
 
 button {
   padding: 10px 30px;
   border: none;
   border-radius: 10px;
-  background-color: var(--catalog-light-purple);
+  background-color: var(--boxel-light-purple);
   color: white;
   font-family: 'Open Sans';
   font-size: 12px;
@@ -90,7 +90,7 @@ button {
 button:hover,
 button:focus {
   cursor: pointer;
-  background-color: var(--catalog-dark-purple);
+  background-color: var(--boxel-dark-purple);
 }
 
 /* for ember animated */
