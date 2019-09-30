@@ -13,7 +13,7 @@
   align-items: center;
   justify-content: center;
   padding: 30px;
-  background-color: var(--catalog-light-purple);
+  background-color: var(--boxel-light-purple);
   border-top-left-radius: 10px;
   border-bottom-left-radius: 10px;
 }
@@ -50,14 +50,14 @@
   padding-bottom: 50px;
   font-size: 13px;
   line-height: 19px;
-  color: var(--catalog-darker-gray);
+  color: var(--boxel-darker-gray);
 }
 
 .catalog-preview--edit-button {
   width: 100%;
   height: 40px;
   padding: 10px 30px;
-  background-color: var(--catalog-bright-purple);
+  background-color: var(--boxel-bright-purple);
   border: none;
   border-radius: 5px;
   color: white;

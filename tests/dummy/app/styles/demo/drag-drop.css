@@ -4,7 +4,7 @@
   min-height: 100vh;
   margin: 0 auto;
   padding: 100px 20px;
-  background-color: var(--catalog-light-purple);
+  background-color: var(--boxel-light-purple);
 }
 
 .tray-container {
@@ -21,7 +21,7 @@
   height: 200px;
   padding: 10px;
   border-radius: 30px;
-  background-color: var(--catalog-darker-gray);
+  background-color: var(--boxel-darker-gray);
   text-align: center;
 }
 
@@ -60,7 +60,7 @@
   border-radius: 20px;
 }
 .dragging .draggable-object-target {
-  background-color: var(--catalog-darker-purple);
+  background-color: var(--boxel-darker-purple);
 }
 
 .drop-zone-text {

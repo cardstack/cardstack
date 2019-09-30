@@ -4,14 +4,14 @@
   min-height: 100vh;
   margin: 0 auto;
   padding: 60px 20px;
-  background-color: var(--catalog-light-purple);
+  background-color: var(--boxel-light-purple);
 }
 
 .animate-input-card {
   box-sizing: border-box;
   width: 400px;
   padding: 0;
-  border: solid 2px var(--catalog-dark-purple);
+  border: solid 2px var(--boxel-dark-purple);
   color: black;
   text-align: left;
   margin: auto;
@@ -19,7 +19,7 @@
 }
 
 .animate-input-card-header {
-  background-color: var(--catalog-dark-purple);
+  background-color: var(--boxel-dark-purple);
   position: relative;
   height: 60px;
   box-sizing: border-box;
@@ -35,7 +35,7 @@
 
 .animate-input-card-content {
   padding: 20px;
-  background-color: var(--catalog-light-gray);
+  background-color: var(--boxel-light-gray);
 }
 
 
