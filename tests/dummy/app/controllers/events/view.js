@@ -26,7 +26,7 @@ export default class EventsViewController extends Controller {
     this.transitionToRoute('catalog.events');
   }
 
-  * trayAnimation({ keptSprites, receivedSprites, duration }) {
+  * trayAnimation({ keptSprites, receivedSprites }) {
     // printSprites(arguments[0], 'view tray animation');
 
     if (keptSprites.length) {
@@ -39,12 +39,15 @@ export default class EventsViewController extends Controller {
       sprite.applyStyles({ 'z-index': 1 }); // in case it's overlapping other content
     });
 
-    if (receivedSprites.length) {
-      yield wait(duration);
-    }
+    // This element moves the card
+    receivedSprites.forEach(sprite => {
+      move(sprite);
+      resize(sprite);
+      sprite.applyStyles({ 'z-index': 1 });
+    });
   }
 
-  * holdContent({ keptSprites }) {
+  * holdContent({ keptSprites, receivedSprites }) {
     // printSprites(arguments[0], 'view content');
 
     if (keptSprites.length) {
@@ -55,13 +58,26 @@ export default class EventsViewController extends Controller {
       move(sprite, { duration: highlightDuration });
       sprite.applyStyles({ 'z-index': 1 });
     });
+
+    // Need `moveToFinalPosition` to adjust for overshooting
+    receivedSprites.forEach(sprite => {
+      sprite.moveToFinalPosition();
+      resize(sprite);
+      sprite.applyStyles({ 'z-index': 1 });
+    });
   }
 
-  * cardTransition({ sentSprites }) {
+  * cardTransition({ sentSprites, receivedSprites }) {
     // printSprites(arguments[0], 'view - card transition');
 
     sentSprites.forEach(sprite => {
       move(sprite);
+      resize(sprite);
+      sprite.applyStyles({ 'z-index': 2 });
+    });
+
+    receivedSprites.forEach(sprite => {
+      sprite.moveToFinalPosition();
       resize(sprite);
       sprite.applyStyles({ 'z-index': 2 });
     });
@@ -95,7 +111,7 @@ export default class EventsViewController extends Controller {
     });
 
     receivedSprites.forEach(sprite => {
-      move(sprite);
+      sprite.moveToFinalPosition();
       resize(sprite);
       opacity(sprite, { from: 0 });
       sprite.applyStyles({ 'z-index': 4 });

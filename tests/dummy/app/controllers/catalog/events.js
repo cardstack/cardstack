@@ -3,7 +3,7 @@ import { action, set } from '@ember/object';
 import resize from 'ember-animated/motions/resize';
 import move from 'ember-animated/motions/move';
 import adjustCSS from 'ember-animated/motions/adjust-css';
-import { default as opacity } from 'ember-animated/motions/opacity';
+// import { default as opacity } from 'ember-animated/motions/opacity';
 import { printSprites, wait } from 'ember-animated';
 
 export let animationDelay = 350;
@@ -33,12 +33,11 @@ export default class CatalogEventsController extends Controller {
 
   @action
   viewDetailPage(card) {
-    set(card, 'selected', false);
     this.transitionToRoute('events.view', card);
   }
 
-  * trayAnimation({ keptSprites, sentSprites, receivedSprites }) {
-    // printSprites(arguments[0], 'events tray animation');
+  * trayAnimation({ keptSprites, receivedSprites }) {
+    printSprites(arguments[0], 'events tray animation');
 
     if (keptSprites.length) {
       yield wait(animationDelay);
@@ -50,17 +49,9 @@ export default class CatalogEventsController extends Controller {
       sprite.applyStyles({ 'z-index': 1 }); // in case it's overlapping other content
     });
 
-    sentSprites.forEach(sprite => {
-      move(sprite);
-      resize(sprite);
-      opacity(sprite, { to: 0 });
-      sprite.applyStyles({ 'z-index': 1 });
-    });
-
     receivedSprites.forEach(sprite => {
       move(sprite);
       resize(sprite);
-      opacity(sprite, { from: 0 });
       sprite.applyStyles({ 'z-index': 1 });
     });
   }
@@ -75,16 +66,6 @@ export default class CatalogEventsController extends Controller {
     keptSprites.forEach(sprite => {
       move(sprite, { duration: highlightDuration });
       sprite.applyStyles({ 'z-index': 1 });
-    });
-  }
-
-  * cardTransition({ sentSprites }) {
-    printSprites(arguments[0], 'events card transition');
-
-    sentSprites.forEach(sprite => {
-      move(sprite);
-      resize(sprite);
-      sprite.applyStyles({ 'z-index': 2 });
     });
   }
 
@@ -111,6 +92,6 @@ export default class CatalogEventsController extends Controller {
       resize(sprite);
       adjustCSS('font-size', sprite);
       sprite.applyStyles({ 'z-index': 4 });
-    })
+    });
   }
 }
