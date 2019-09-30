@@ -7,7 +7,7 @@ export default class CardRenderer extends Component {
     let fields = [];
     if (!this.args.card) { return fields; }
 
-    let card = this.args.card.isolatedData;
+    let card = this.args.card.json;
     for (let fieldRef of get(card, 'data.relationships.fields.data') || []) {
       let field = (card.included || []).find(i => `${i.type}/${i.id}` === `${fieldRef.type}/${fieldRef.id}`);
       if (!field) { continue; }
@@ -31,7 +31,7 @@ export default class CardRenderer extends Component {
   get modelFields() {
     let result = {};
     if (!this.args.card) { return result; }
-    let card = this.args.card.isolatedData;
+    let card = this.args.card.json;
 
     let model = (card.included || []).find(i => `${i.type}/${i.id}` === `${card.data.id}/${card.data.id}`);
     let modelFields = model ? model.attributes : {};
