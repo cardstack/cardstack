@@ -1,22 +1,11 @@
-{{!-- This container slides down to become the background --}}
 <AnimatedContainer>
-  {{#if this.model.expanded}}
-    {{#animated-value "form-cards-edit-route" initialInsertion=true finalRemoval=true use=this.backgroundTransition}}
-      <div class="form-cards-page edit"></div>
-    {{/animated-value}}
-  {{else}}
-    {{#animated-value "form-cards-edit-route" finalRemoval=true use=this.backgroundTransition}}
-      <div class="form-cards-page edit"></div>
-    {{/animated-value}}
-  {{/if}}
+  {{#animated-value "form-cards-edit-route" finalRemoval=true initialInsertion=true use=this.backgroundTransition}}
+    <div class="form-cards-page edit"></div>
+  {{/animated-value}}
 </AnimatedContainer>
-
 <AnimatedContainer class="form-cards-list">
   {{#animated-value model key="id" group="form-card" use=this.boxTransition as |card|}}
     <div role="button" onclick={{action "backToList" card}} class="form-card form-card-{{card.id}} expanded">
-      {{#animated-value card key="id" group="form-card--shadow" use=this.shadowTransition}}
-        <div class="form-card--shadow expanded" />
-      {{/animated-value}}
     </div>
   {{/animated-value}}
 </AnimatedContainer>
