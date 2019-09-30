@@ -333,26 +333,17 @@ describe('hub/card-services', function () {
 
       // TODO move this into the search() tests after that is implemented
       it("will load a card implicitly when a searcher's search() hook returns a card document in embedded format", async function () {
-        let { data: [article], included } = await cardServices.search(env.session, 'embedded', {
+        let { data: [article] } = await cardServices.search(env.session, 'embedded', {
           filter: {
             type: { exact: 'cards' }
           }
         });
-
-        let includedIdentifiers = included.map(i => `${i.type}/${i.id}`);
 
         expect(article.attributes.title).to.equal('The Millenial Puppy');
         expect(article.relationships.author.data).to.eql({ type: 'cards', id: 'local-hub::user-card::van-gogh'});
         expect(article.attributes.body).to.be.undefined;
         expect(article.relationships.tags).to.be.undefined;
         expect(article.attributes['internal-field']).to.be.undefined;
-
-        expect(includedIdentifiers).to.include.members([ 'cards/local-hub::user-card::van-gogh' ]);
-        expect(includedIdentifiers).to.not.include.members([
-          'tags/millenials',
-          'tags/puppies',
-          'tags/belly-rubs',
-        ]);
 
         assertCardOnDisk();
       });

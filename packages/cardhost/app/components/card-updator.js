@@ -1,6 +1,3 @@
-// import { inject as service } from '@ember/service';
-// import { action } from '@ember/object';
-// import { tracked } from '@glimmer/tracking';
 import CardManipulator from "./card-manipulator";
 
 export default class CardUpdator extends CardManipulator {
