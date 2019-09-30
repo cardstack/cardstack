@@ -1,5 +1,5 @@
 import BoxelizedRoute from 'boxel/routes/boxelized';
 
-export default class FormCardsIndexRoute extends BoxelizedRoute {
+export default class DemoFormCardsIndexRoute extends BoxelizedRoute {
   boxelPlane = 'space';
 }

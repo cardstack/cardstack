@@ -9,7 +9,7 @@ import adjustCSS from 'ember-animated/motions/adjust-css';
 import { easeOut, easeIn } from 'ember-animated/easings/cosine';
 import { duration } from './index';
 
-export default class ImageCardsImageCardController extends Controller {
+export default class DemoImageCardsImageCardController extends Controller {
   @action toggle() {
     this.transitionToRoute('image-cards');
   }

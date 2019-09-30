@@ -1,10 +1,10 @@
 import Controller from '@ember/controller';
 import { action, set } from '@ember/object';
 import move from 'ember-animated/motions/move';
-import drag from '../motions/drag';
+import drag from '../../motions/drag';
 import { printSprites } from 'ember-animated';
 
-export default class TicTacToeController extends Controller {
+export default class DemoTicTacToeController extends Controller {
   ticTacToeCells = {
     topLeft: [],
     topCenter: [],

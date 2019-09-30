@@ -1,5 +1,5 @@
 import BoxelizedRoute from 'boxel/routes/boxelized';
 
-export default class TicTacToeEnhancedRoute extends BoxelizedRoute {
+export default class DemoTicTacToeRoute extends BoxelizedRoute {
   boxelPlane = 'space';
 }

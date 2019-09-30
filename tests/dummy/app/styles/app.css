@@ -5,15 +5,15 @@
 @import 'tools-preview.css';
 @import 'articles.css';
 @import 'cards.css';
-@import 'form-cards.css';
-@import 'edit-demo.css';
-@import 'field-types-demo.css';
-@import 'animate-input.css';
-@import 'drag-drop-animation.css';
-@import 'image-cards.css';
-@import 'drag-drop.css';
-@import 'tic-tac-toe.css';
-@import 'tic-tac-toe-enhanced.css';
+@import 'demo/form-cards.css';
+@import 'demo/edit-card.css';
+@import 'demo/field-types.css';
+@import 'demo/animate-input.css';
+@import 'demo/drag-drop-animation.css';
+@import 'demo/image-cards.css';
+@import 'demo/drag-drop.css';
+@import 'demo/tic-tac-toe.css';
+@import 'demo/tic-tac-toe-enhanced.css';
 
 @import 'catalog/events.css';
 @import 'events/view.css';

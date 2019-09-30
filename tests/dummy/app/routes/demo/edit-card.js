@@ -1,6 +1,6 @@
 import BoxelizedRoute from 'boxel/routes/boxelized';
 
-export default class DragDropRoute extends BoxelizedRoute {
+export default class DemoEditCardRoute extends BoxelizedRoute {
   boxelPlane = 'space';
 
   async model() {

@@ -1,6 +1,6 @@
 import BoxelizedRoute from 'boxel/routes/boxelized';
 
-export default class EditDemoRoute extends BoxelizedRoute {
+export default class DemoAnimateInputRoute extends BoxelizedRoute {
   boxelPlane = 'space';
 
   async model() {

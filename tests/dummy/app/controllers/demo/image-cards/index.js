@@ -10,7 +10,7 @@ import { easeOut } from 'ember-animated/easings/cosine';
 
 export let duration = 700;
 
-export default class ImageCardsIndexController extends Controller {
+export default class DemoImageCardsIndexController extends Controller {
 
   @action toggle(card) {
     this.transitionToRoute('image-cards.image-card', card);

@@ -24,20 +24,21 @@ Router.map(function() {
   this.route('cards', function() {
     this.route('card', { path: '/:id' });
   });
-  this.route('form-cards', function() {
-    this.route('edit', { path: '/:id/edit' });
+  this.route('demo', function() {
+    this.route('form-cards', function() {
+      this.route('edit', { path: '/:id/edit' });
+    });
+    this.route('edit-card');
+    this.route('field-types');
+    this.route('animate-input');
+    this.route('image-cards', function() {
+      this.route('image-card', { path: '/:id' });
+    });
+    this.route('drag-drop');
+    this.route('drag-drop-animation');
+    this.route('tic-tac-toe');
+    this.route('tic-tac-toe-enhanced');
   });
-  this.route('edit-demo');
-  this.route('field-types-demo');
-  this.route('animate-input');
-  this.route('cards');
-  this.route('image-cards', function() {
-    this.route('image-card', { path: '/:id' });
-  });
-  this.route('drag-drop');
-  this.route('drag-drop-animation');
-  this.route('tic-tac-toe');
-  this.route('tic-tac-toe-enhanced');
 });
 
 export default Router;

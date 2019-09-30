@@ -9,7 +9,7 @@ import adjustCSS from 'ember-animated/motions/adjust-css';
 import { easeInAndOut } from 'ember-animated/easings/cosine';
 import { duration } from './index';
 
-export default class FormCardsEditController extends Controller {
+export default class DemoFormCardsEditController extends Controller {
   @service boxel;
 
   @action backToList() {

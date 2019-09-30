@@ -8,7 +8,7 @@ import { printSprites } from 'ember-animated';
 import { easeInAndOut } from 'ember-animated/easings/cosine';
 import fade from 'ember-animated/transitions/fade';
 
-export default class EditDemoController extends Controller {
+export default class DemoFieldTypesController extends Controller {
   mode = 'view';
   fade = fade;
 
