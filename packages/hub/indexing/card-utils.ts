@@ -438,7 +438,8 @@ async function adaptCardToFormat(schema: todo, session: Session, cardModel: Sing
           data: { type: cardModel.data.type, id: cardModel.data.id }
         }
       }
-    }
+    },
+    included: []
   };
   if (cardModel.data.meta) {
     result.data.meta = cardModel.data.meta;
@@ -474,7 +475,10 @@ async function adaptCardToFormat(schema: todo, session: Session, cardModel: Sing
     attributes,
     relationships
   };
-  result.included = [model].concat((cardModel.included || []).filter(i => schema.isSchemaType(i.type)));
+
+  if (format === 'isolated') {
+    result.included = [model].concat((cardModel.included || []).filter(i => schema.isSchemaType(i.type)));
+  }
 
   for (let { id: fieldId } of (get(priviledgedCard, 'data.relationships.fields.data') || [])) {
     let { modelId: fieldName } = cardContextFromId(fieldId);

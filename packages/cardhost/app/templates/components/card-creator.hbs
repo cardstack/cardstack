@@ -1,36 +1,54 @@
-<h2 data-test-card-creator>Add Card:</h2>
-<p>
-  <em><code>HUB_ENVIRONMENT=test</code> environment variable must be set on the hub instance in order to provide session that allows this test to write to the hub.</em>
-</p>
-
-[[TODO add controls to add/remove metadata fields...]]<br>
+<h2 data-test-card-creator>Add Card</h2>
 
 {{#if this.statusMsg}}
   <div data-test-card-creator-msg><strong>{{this.statusMsg}}</strong></div>
 {{/if}}
 
-<CardInspector @card={{this.cardData}}></CardInspector>
+<fieldset class="card-creator--new-card">
+  <legend>New Card</legend>
+  <label for="card__id">Card ID:</label>
+  <Input
+    @id="card__id"
+    @size="60"
+    @placeholder="e.g. local-hub::article-card::millenial-puppies"
+    @value={{this.cardId}}
+    @key-up={{action this.updateCardId}}
+  />
+  <p>(Note that updating the card id will remove any fields that you have created. This is just a scaffolding limitation.)</p>
+</fieldset>
 
-<div>
-  <button {{on "click" this.create}} data-test-card-creator-add-btn>Add Card</button>
-</div>
 <br>
 
-<div>
-  Card package name:
-  <Input @value={{this.packageName}}></Input>
-</div>
-<div>
-  Card instance identifier:
-  <Input @value={{this.cardId}}></Input>
-</div>
-
-<IvyCodemirror
-  @value={{this.card}}
-  @valueUpdated={{action (mut this.card)}}
-  @options={{hash
-    lineNumbers=true
-    mode="javascript"
-  }}
+<CardRenderer
+  @card={{this.card}}
+  @setField={{action this.setField}}
+  @removeField={{action this.removeField}}
 >
-</IvyCodemirror>
+  <div class="card-creator--field-btn-wrapper">
+    {{#unless this.cardstackSession.isAuthenticated}}
+      (Must be logged in to save the card.)
+    {{/unless}}
+    <button {{on "click" this.save}}
+      data-test-card-creator-save-btn
+      disabled={{not this.cardstackSession.isAuthenticated}}
+    >
+      Save Card
+    </button>
+  </div>
+  <br>
+
+  <FieldCreator
+    @fieldTypeMappings={{this.fieldTypeMappings}}
+    @addField={{action this.addField}}
+  />
+</CardRenderer>
+
+<br>
+
+{{#if this.card}}
+  <h3>Card Document:</h3>
+  <CodeBlock
+    @code={{this.cardJson}}
+    @language="javascript"
+  />
+{{/if}}

@@ -1,12 +1,13 @@
 import Component from '@glimmer/component';
 import { get } from 'lodash';
 
-export default class CardInspector extends Component {
+export default class CardRenderer extends Component {
+  // TODO use Card class data service to get fields
   get fields() {
     let fields = [];
     if (!this.args.card) { return fields; }
 
-    let card = this.args.card;
+    let card = this.args.card.json;
     for (let fieldRef of get(card, 'data.relationships.fields.data') || []) {
       let field = (card.included || []).find(i => `${i.type}/${i.id}` === `${fieldRef.type}/${fieldRef.id}`);
       if (!field) { continue; }
@@ -14,21 +15,23 @@ export default class CardInspector extends Component {
       let fieldName = fieldRef.id;
       let { attributes:fieldSchema } = field;
       let fieldValue = this.modelFields[fieldName];
+      let { 'field-type': fieldType } = fieldSchema || {};
 
       fields.push({
         fieldName,
+        fieldType,
         fieldSchema,
         fieldValue
       });
     }
-
     return fields;
   }
 
+  // TODO use Card class data service to get fields
   get modelFields() {
-    let card = this.args.card;
     let result = {};
-    if (!card) { return result; }
+    if (!this.args.card) { return result; }
+    let card = this.args.card.json;
 
     let model = (card.included || []).find(i => `${i.type}/${i.id}` === `${card.data.id}/${card.data.id}`);
     let modelFields = model ? model.attributes : {};
@@ -44,7 +47,6 @@ export default class CardInspector extends Component {
     for (let field of Object.keys(modelFields || {})) {
       result[field] = JSON.stringify(modelFields[field].data, null, 2);
     }
-
     return result;
   }
 }
