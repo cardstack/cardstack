@@ -9,39 +9,41 @@
         </div>
 
         {{#animated-value this.model watch="selected" use=this.trayAnimation key="id" group="tray" as |card|}}
-          <div class="event-edit--inner">
-            {{!-- Card content --}}
-            <div class="event-view-card event-view-card-{{card.id}}">
-              {{! template-lint-configure no-inline-styles {"allowDynamicStyles": true} }}
-              <div class="event-view-image" style={{css-url "background-image" card.imageUrl}}></div>
-              <div class="event-view-details">
-                <div>
-                  <div class="event-view-details--header">
-                    <div class="event-view-date">{{card.date}}</div>
-                    <div class="event-view-title">{{card.title}}</div>
-                  </div>
+          <div class="event-edit--tray {{if card.selected "selected"}}">
+            <div class="event-edit--inner">
+              {{!-- Card --}}
+              <div class="event-edit-card event-edit-card-{{card.id}}">
+                {{! template-lint-configure no-inline-styles {"allowDynamicStyles": true} }}
+                <div class="event-edit-image" style={{css-url "background-image" card.imageUrl}}></div>
+                <div class="event-edit-details">
                   <div>
-                    <div class="event-view-location">{{card.location}}</div>
-                    <div class="event-view-price">{{card.price}}</div>
+                    <div class="event-edit-details--header">
+                      <div class="event-edit-date">{{card.date}}</div>
+                      <div class="event-edit-title">{{card.title}}</div>
+                    </div>
+                    <div>
+                      <div class="event-edit-location">{{card.location}}</div>
+                      <div class="event-edit-price">{{card.price}}</div>
+                    </div>
+                  </div>
+                </div>
+                <div class="event-edit--main">
+                  <div class="event-edit--info-group">
+                    <div class="label">Date & Time</div>
+                    <div>{{card.datetime}}</div>
+                  </div>
+                  <div class="event-edit--info-group">
+                    <div class="label">Location</div>
+                    <div>{{card.address}}</div>
+                  </div>
+                  <div class="event-edit--info-group">
+                    <div class="label">Description</div>
+                    <div>{{card.description}}</div>
                   </div>
                 </div>
               </div>
-              <div class="event-view--main">
-                <div class="event-view--info-group">
-                  <div class="label">Date & Time</div>
-                  <div>{{card.datetime}}</div>
-                </div>
-                <div class="event-view--info-group">
-                  <div class="label">Location</div>
-                  <div>{{card.address}}</div>
-                </div>
-                <div class="event-view--info-group">
-                  <div class="label">Description</div>
-                  <div>{{card.description}}</div>
-                </div>
-              </div>
+              {{!-- End of Card --}}
             </div>
-            {{!-- End of card content --}}
           </div>
         {{/animated-value}}
       </div>

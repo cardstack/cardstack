@@ -10,6 +10,8 @@
 .event-edit--container {
   box-sizing: border-box;
   position: relative;
+  min-height: 100%;
+  height: 100vh;
   padding: 0 0 100px;
   background-color: var(--boxel-light-purple);
 }
@@ -48,11 +50,20 @@
   overflow: hidden;
 }
 
+.event-edit--tray {
+  width: 100%;
+  padding: 0;
 
+  background-color: var(--boxel-cyan);
+  border-radius: 20px;
+}
+
+.event-edit--tray.selected {
+  padding: 50px 15px 15px;
+}
 
 
 /* Right Edge */
-
 .right-edge--container {
   position: fixed;
   top: 30px;
@@ -101,3 +112,71 @@
   color: gray;
   font-size: 12px;
 }
+/* End of Right Edge */
+
+
+/* Card */
+.event-edit-card {
+  box-sizing: border-box;
+  width: 100%;
+  height: 100%;
+  margin: 0 auto;
+  padding-bottom: 100px;
+  background-color: white;
+  overflow: hidden;
+}
+
+.event-edit-image {
+  height: 300px;
+  background-color: darkslateblue;
+  background-size: cover;
+  background-repeat: no-repeat;
+  background-position: center 40%;
+}
+
+.event-edit-details {
+  box-sizing: border-box;
+  padding: 60px 60px 30px;
+}
+
+.event-edit-details--header {
+  box-sizing: border-box;
+  min-height: 70px;
+  padding-bottom: 30px;
+}
+
+.event-edit-date {
+  color: firebrick;
+  font-weight: 700;
+}
+
+.event-edit-title {
+  font-size: 24px;
+  font-weight: 600;
+  line-height: 24px;
+}
+
+.event-edit-location {
+  color: dimgray;
+}
+
+.event-edit-price {
+  font-weight: 700;
+}
+
+.event-edit--main {
+  margin: 0 60px;
+  padding: 30px 0;
+  border-top: 1px solid lightgrey;
+  font-size: 16px;
+}
+
+.event-edit--info-group {
+  padding-bottom: 30px;
+}
+
+.event-edit--info-group > .label {
+  font-size: 13px;
+  color: dimgray;
+}
+/* End of Card */

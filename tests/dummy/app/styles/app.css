@@ -16,7 +16,9 @@
 @import 'demo/tic-tac-toe-enhanced.css';
 
 @import 'catalog/events.css';
+@import 'catalog/events-v2.css';
 @import 'events/view.css';
+@import 'events-v2/view.css';
 
 @import 'components/article.css';
 @import 'components/event.css';
