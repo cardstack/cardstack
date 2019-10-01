@@ -30,6 +30,21 @@
     {
       "type": "node",
       "request": "launch",
+      "name": "Launch Dummy Models Hub",
+      "cwd": "${workspaceRoot}/packages/models",
+      "console": "integratedTerminal",
+      "env": {
+        "CARDSTACK_SESSIONS_KEY": "OQUQi8NH0asrYgeoE10ijOFBhd/P1BU8HZP/rNqO5nw=",
+        "PGSEARCH_NAMESPACE": "cardstack_data_development",
+        "INITIAL_DATA_DIR": "${workspaceFolder}/packages/models/tests/dummy/cardstack",
+        "HUB_ENVIRONMENT": "test",
+        "PORT": "3000"
+      },
+      "args": ["${workspaceFolder}/packages/hub/bin/cardstack-hub.js"]
+    },
+    {
+      "type": "node",
+      "request": "launch",
       "name": "Launch CodeGen Dummy App",
       "cwd": "${workspaceRoot}/packages/codegen",
       "program": "${workspaceRoot}/packages/codegen/node_modules/ember-cli/bin/ember",
