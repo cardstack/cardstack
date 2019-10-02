@@ -48,6 +48,8 @@
   border: 5px solid var(--boxel-cyan);
   border-radius: 20px;
   overflow: hidden;
+  height: 100%;
+  background-color: white;
 }
 
 .event-edit--tray {
