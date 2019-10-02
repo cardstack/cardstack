@@ -1,4 +1,4 @@
-@import "./events/edit.css";
+@import "./events-v2/edit.css";
 
 .events-catalog {
   --tray-top: 50px;
@@ -8,6 +8,7 @@
   --content-height: 300px;
   --content-width: 245px;
 }
+
 
 /* Tray */
 .events-tray {
@@ -23,7 +24,6 @@
   background-color: var(--boxel-cyan);
   border-radius: 20px;
   overflow: hidden;
-  z-index: 0;
 }
 
 .events-tray.selected {
@@ -71,7 +71,6 @@
   top: var(--tray-top);
   left: var(--tray-left);
   width: calc(100% - var(--tray-right) - var(--tray-left));
-  z-index: 1;
 }
 /* End of Card Container */
 

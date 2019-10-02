@@ -2,7 +2,7 @@
   <AnimatedContainer class="events-view--container" {{action "viewGridPage"}}>
 
     {{!-- Tray --}}
-    {{#animated-value this.model key="id" group="tray" as |card|}}
+    {{#animated-value this.model key="id" group="card-tray" as |card|}}
       <div class="events-tray {{if card.selected "selected"}}">
         <div class="events-tray--content">
           <div>{{card.constructor.modelName}} Card</div>

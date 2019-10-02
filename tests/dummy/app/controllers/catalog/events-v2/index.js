@@ -8,7 +8,7 @@ import { printSprites, wait } from 'ember-animated';
 export let animationDelay = 350;
 export let highlightDuration = 150;
 
-export default class CatalogEventsV2Controller extends Controller {
+export default class CatalogEventsV2IndexController extends Controller {
   // TODO: Do not do select/unselect actions while other animation is running
   @action
   select(id) {
@@ -33,14 +33,12 @@ export default class CatalogEventsV2Controller extends Controller {
 
   @action
   viewDetailPage(card) {
-    // set(card, 'selected', false);
     this.transitionToRoute('events-v2.view', card);
   }
 
   @action
   viewEditPage(card) {
-    set(card, 'selected', false);
-    this.transitionToRoute('catalog.events.edit', card);
+    this.transitionToRoute('catalog.events-v2.edit', card);
   }
 
   * trayAnimation({ keptSprites, receivedSprites, sentSprites }) {
