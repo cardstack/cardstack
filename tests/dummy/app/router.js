@@ -12,6 +12,9 @@ Router.map(function() {
     this.route('events', function() {
       this.route('edit', { path: '/:id/edit' });
     });
+    this.route('events-v2', function() {
+      this.route('edit', { path: '/:id/edit' });
+    });
   });
   this.route('tools', function() {
     this.route('edit', { path: '/:model/:id/edit' });
@@ -21,6 +24,9 @@ Router.map(function() {
     this.route('edit', { path: '/edit' });
   });
   this.route('events', function() {
+    this.route('view', { path: '/:id' });
+  });
+  this.route('events-v2', function() {
     this.route('view', { path: '/:id' });
   });
   this.route('cards', function() {

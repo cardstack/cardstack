@@ -1,4 +1,4 @@
-.event-edit {
+.events-edit-page {
   position: absolute;
   width: 100vw;
   height: 100vh;
@@ -7,16 +7,33 @@
   left: 0;
 }
 
-.event-edit--container {
+.events-edit {
+  --content-width: 630px;
+  --content-min-height: 1000px;
+
   box-sizing: border-box;
-  position: relative;
-  min-height: 100%;
+  display: flex;
+  flex-flow: column nowrap;
+  align-items: center;
+  width: 100%;
   height: 100vh;
-  padding: 0 0 100px;
+  min-height: 100%;
+  padding: 80px 0;
   background-color: var(--boxel-light-purple);
 }
 
-.event-edit--container-content {
+.events-edit--container {
+  box-sizing: border-box;
+  width: var(--content-width);
+  min-height: var(--content-min-height);
+}
+
+.events-edit--outer {
+  width: 630px;
+  margin: 0 auto;
+}
+
+.events-edit--container-content {
   box-sizing: border-box;
   padding: 30px 0;
   display: flex;
@@ -27,7 +44,7 @@
   text-transform: capitalize;
 }
 
-.event-edit--container-content button {
+.events-edit--container-content button {
   padding: 6px 12px;
   border-radius: 5px;
   background-color: white;
@@ -35,34 +52,18 @@
   font-weight: bold;
 }
 
-.event-edit--container-content span {
+.events-edit--container-content span {
   color: var(--boxel-cyan);
 }
 
-.event-edit--outer {
-  width: 630px;
-  margin: 0 auto;
+
+.events-tray.selected.edit {
+  top: 85px;
 }
 
-.event-edit--inner {
-  border: 5px solid var(--boxel-cyan);
-  border-radius: 20px;
-  overflow: hidden;
-  height: 100%;
-  background-color: white;
-}
+/* Other tray styles: See catalog/events-v2.css */
 
-.event-edit--tray {
-  width: 100%;
-  padding: 0;
-
-  background-color: var(--boxel-cyan);
-  border-radius: 20px;
-}
-
-.event-edit--tray.selected {
-  padding: 50px 15px 15px;
-}
+/* Card + Card Container styles: See catalog/events-v2.css */
 
 
 /* Right Edge */
@@ -118,7 +119,7 @@
 
 
 /* Card */
-.event-edit-card {
+.events-edit-card {
   box-sizing: border-box;
   width: 100%;
   height: 100%;
@@ -128,7 +129,7 @@
   overflow: hidden;
 }
 
-.event-edit-image {
+.events-edit-image {
   height: 300px;
   background-color: darkslateblue;
   background-size: cover;
@@ -136,48 +137,48 @@
   background-position: center 40%;
 }
 
-.event-edit-details {
+.events-edit-details {
   box-sizing: border-box;
   padding: 60px 60px 30px;
 }
 
-.event-edit-details--header {
+.events-edit-details--header {
   box-sizing: border-box;
   min-height: 70px;
   padding-bottom: 30px;
 }
 
-.event-edit-date {
+.events-edit-date {
   color: firebrick;
   font-weight: 700;
 }
 
-.event-edit-title {
+.events-edit-title {
   font-size: 24px;
   font-weight: 600;
   line-height: 24px;
 }
 
-.event-edit-location {
+.events-edit-location {
   color: dimgray;
 }
 
-.event-edit-price {
+.events-edit-price {
   font-weight: 700;
 }
 
-.event-edit--main {
+.events-edit--main {
   margin: 0 60px;
   padding: 30px 0;
   border-top: 1px solid lightgrey;
   font-size: 16px;
 }
 
-.event-edit--info-group {
+.events-edit--info-group {
   padding-bottom: 30px;
 }
 
-.event-edit--info-group > .label {
+.events-edit--info-group > .label {
   font-size: 13px;
   color: dimgray;
 }

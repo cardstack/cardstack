@@ -6,22 +6,16 @@ import adjustCSS from 'ember-animated/motions/adjust-css';
 import { default as opacity } from 'ember-animated/motions/opacity';
 // import { printSprites } from 'ember-animated';
 
-export default class CatalogEventsEditController extends Controller {
+export default class CatalogEventsV2EditController extends Controller {
   @action
   viewGridPage() {
     set(this.model, 'selected', true);
-    this.transitionToRoute('catalog.events');
-  }
-
-  * trayAnimation({ receivedSprites }) {
-    receivedSprites.forEach(sprite => {
-      move(sprite);
-      resize(sprite);
-      sprite.applyStyles({ 'z-index': 1 });
-    });
+    this.transitionToRoute('catalog.events-v2');
   }
 
   * cardTransition({ sentSprites, receivedSprites }) {
+    // printSprites(arguments[0], 'view - card transition');
+
     sentSprites.forEach(sprite => {
       move(sprite);
       resize(sprite);
@@ -36,7 +30,8 @@ export default class CatalogEventsEditController extends Controller {
   }
 
   * imageTransition({ sentSprites }) {
-    // printSprites(arguments[0], 'image transition');
+    // printSprites(arguments[0], 'view image transition');
+
     sentSprites.forEach(sprite => {
       move(sprite);
       resize(sprite);
@@ -51,28 +46,31 @@ export default class CatalogEventsEditController extends Controller {
     });
   }
 
-  * bodyTransition({ sentSprites, receivedSprites, duration }) {
-    sentSprites.forEach(sprite => {
-      move(sprite);
-      resize(sprite);
-      opacity(sprite, { to: 0,  duration: duration / 3 });
-      sprite.applyStyles({ 'z-index': 4 });
-    });
-
-    receivedSprites.forEach(sprite => {
-      move(sprite);
-      resize(sprite);
-      opacity(sprite, { from: 0 });
-      sprite.applyStyles({ 'z-index': 4 });
-    });
-  }
-
-  * tweenTitle({ sentSprites }) {
+  * titleTransition({ sentSprites }) {
     sentSprites.forEach(sprite => {
       move(sprite);
       resize(sprite);
       adjustCSS('font-size', sprite);
       sprite.applyStyles({ 'z-index': 4 });
     })
+  }
+
+  * bodyTransition({ sentSprites, receivedSprites, duration }) {
+    // printSprites(arguments[0], 'view body transition');
+
+    sentSprites.forEach(sprite => {
+      move(sprite);
+      resize(sprite);
+      opacity(sprite, { to: 0,  duration: duration / 2 });
+      sprite.applyStyles({ 'z-index': 3 });
+    });
+
+    receivedSprites.forEach(sprite => {
+      sprite.moveToFinalPosition();
+      // move(sprite);
+      resize(sprite);
+      opacity(sprite, { from: 0 });
+      sprite.applyStyles({ 'z-index': 3 });
+    });
   }
 }
