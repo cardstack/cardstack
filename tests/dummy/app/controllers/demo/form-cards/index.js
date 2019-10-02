@@ -7,14 +7,14 @@ import opacity from 'ember-animated/motions/opacity';
 import scale from 'ember-animated/motions/scale';
 import { easeInAndOut } from 'ember-animated/easings/cosine';
 
-import keep from '../../motions/keep';
-import scaleBy from '../../motions/scale';
+import keep from '../../../motions/keep';
+import scaleBy from '../../../motions/scale';
 
 export let duration = 600;
 
 export default class DemoFormCardsIndexController extends Controller {
   @action edit(card) {
-    this.transitionToRoute('form-cards.edit', card.id);
+    this.transitionToRoute('demo.form-cards.edit', card.id);
   }
 
   * wait({ removedSprites, receivedSprites }) {

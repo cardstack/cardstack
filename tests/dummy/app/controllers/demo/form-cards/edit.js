@@ -1,7 +1,7 @@
 import Controller from '@ember/controller';
-import { action, set } from '@ember/object';
+import { action } from '@ember/object';
 
-// import { printSprites } from 'ember-animated';
+import { printSprites } from 'ember-animated';
 import move from 'ember-animated/motions/move';
 import resize from 'ember-animated/motions/resize';
 import { easeInAndOut } from 'ember-animated/easings/cosine';
@@ -11,12 +11,11 @@ import { duration } from './index';
 
 export default class DemoFormCardsEditController extends Controller {
   @action backToList() {
-    set(this.model, 'expanded', false);
-    this.transitionToRoute('form-cards');
+    this.transitionToRoute('demo.form-cards');
   }
 
   * backgroundTransition ({ insertedSprites, removedSprites, receivedSprites }) {
-    // printSprites(arguments[0], 'edit background transition');
+    printSprites(arguments[0], 'edit background transition');
 
     insertedSprites.forEach(sprite => {
       sprite.startAtPixel({ y: -1.5 * window.innerHeight });
@@ -58,7 +57,6 @@ export default class DemoFormCardsEditController extends Controller {
       });
     });
 
-    // TODO: ideally there wouldn't be removedSprites, only sentSprites
     removedSprites.forEach(sprite => {
       sprite.endAtPixel({
         x: sprite.initialBounds.left,
