@@ -17,7 +17,7 @@ export default class FieldEditor extends Component {
     super(...args);
     this.nonce = nonce++;
     if (this.initialValue != null) {
-      this.fieldValue[this.fieldName] = this.initialValue;
+      this.fieldValue[this.args.field.name] = this.initialValue;
     }
   }
 
@@ -25,23 +25,13 @@ export default class FieldEditor extends Component {
     return this.args.inputSize || 30;
   }
 
-  get fieldName() {
-    if (!this.args.field) { return null; }
-    return this.args.field.fieldName;
-  }
-
-  get fieldType() {
-    if (!this.args.field) { return null; }
-    return this.args.field.fieldType;
-  }
-
   get initialValue() {
     if (!this.args.field) { return null; }
-    return this.args.field.fieldValue;
+    return this.args.field.value;
   }
 
   get displayType() {
-    let type = this.args.field.fieldType.split('::').pop();
+    let type = (this.args.field.type || '').split('::').pop();
     switch (type) {
       case 'case-insensitive':
         return 'case-insensitive string';
@@ -55,27 +45,27 @@ export default class FieldEditor extends Component {
 
   @action
   updateFieldValue(value) {
-    set(this.fieldValue, this.fieldName, value);
+    set(this.fieldValue, this.args.field.name, value);
     this.args.onUpdate(value);
   }
 
   @action
   updateDateFieldValue({ target: { value }}) {
-    set(this.fieldValue, this.fieldName, value);
+    set(this.fieldValue, this.args.field.name, value);
     this.args.onUpdate(value);
   }
 
   @action
   updateBooleanFieldValue({ target: { id }}) {
     let value = id.includes('true');
-    set(this.fieldValue, this.fieldName, value);
+    set(this.fieldValue, this.args.field.name, value);
     this.args.onUpdate(value);
   }
 
   @action
   updateCardsFieldValue(value) {
     value = value.split(',');
-    set(this.fieldValue, this.fieldName, value);
+    set(this.fieldValue, this.args.field.name, value);
     this.args.onUpdate(value);
   }
 }

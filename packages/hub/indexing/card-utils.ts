@@ -11,7 +11,7 @@ import {
   RelationshipsWithData,
   ResourceLinkage
 } from "jsonapi-typescript";
-import { set, get, uniqBy, isEqual, sortBy, cloneDeep } from 'lodash';
+import { set, get, uniqBy, isEqual, sortBy, cloneDeep, unset } from 'lodash';
 import logger from '@cardstack/logger';
 import { join } from "path";
 import { tmpdir } from 'os';
@@ -45,6 +45,7 @@ const cardBrowserAssetFields = [
   'embedded-js',
   'embedded-css',
 ];
+const metadataFieldTypesField = 'metadata-field-types';
 
 function cardContextFromId(id: string | number) {
   let noContext: CardContext = {};
@@ -221,6 +222,7 @@ async function generateCardModule(card: SingleResourceDoc) {
     if (!computedFields.includes(field) || !cleanCard.data.relationships) { continue; }
     delete cleanCard.data.relationships[field];
   }
+  unset(cleanCard, 'data.attributes.metadata-field-types');
   let version: string = get(cleanCard, 'data.meta.version');
   let cardFolder: string = join(cardsDir, repository, packageName);
   let cardFile: string = join(cardFolder, cardFileName);
@@ -355,7 +357,8 @@ function deriveCardModelContentType(card: SingleResourceDoc) {
   let fields: RelationshipsWithData = {
     data: [{ type: 'fields', id: 'fields' }].concat(
       cardBrowserAssetFields.map(i => ({ type: 'fields', id: i})),
-      get(card, 'data.relationships.fields.data') || []
+      get(card, 'data.relationships.fields.data') || [],
+      [{ type: 'computed-fields', id: 'metadata-field-types' }]
     )
   };
 
@@ -447,7 +450,7 @@ async function adaptCardToFormat(schema: todo, session: Session, cardModel: Sing
 
   let attributes: AttributesObject = {};
   for (let attr of Object.keys(cardModel.data.attributes)) {
-    if (cardBrowserAssetFields.includes(attr) && result.data.attributes) {
+    if (cardBrowserAssetFields.concat([metadataFieldTypesField]).includes(attr) && result.data.attributes) {
       result.data.attributes[attr] = cardModel.data.attributes[attr];
     } else {
       attributes[attr] = cardModel.data.attributes[attr];
@@ -519,6 +522,8 @@ async function adaptCardToFormat(schema: todo, session: Session, cardModel: Sing
 
         result.included = result.included.concat(resolvedIncluded);
       }
+    } else {
+      unset(result, `data.attributes.${metadataFieldTypesField}.${fieldName}`);
     }
   }
   result.included = uniqBy(result.included, i => `${i.type}/${i.id}`);

@@ -6,7 +6,7 @@
 }}
   <Input
     @id={{@id}}
-    @value={{get this.fieldValue this.fieldName}}
+    @value={{get this.fieldValue @field.name}}
     @size={{this.size}}
     @key-up={{action this.updateFieldValue}}
   />
@@ -15,7 +15,7 @@
   <Input
     @id={{@id}}
     @type="number"
-    @value={{get this.fieldValue this.fieldName}}
+    @value={{get this.fieldValue @field.name}}
     @key-up={{action this.updateFieldValue}}
   />
   <br>
@@ -23,7 +23,7 @@
   <Input
     @id={{@id}}
     @type="date"
-    @value={{get this.fieldValue this.fieldName}}
+    @value={{get this.fieldValue @field.name}}
     @change={{action this.updateDateFieldValue}}
   />
   <br>
@@ -32,7 +32,7 @@
     @id={{concat "field_" this.nonce "_field_value_true"}}
     @class="field-value-true"
     @name={{concat "field" this.nonce "-boolean-field-value"}}
-    @checked={{get this.fieldValue this.fieldName}}
+    @checked={{get this.fieldValue @field.name}}
     @type="radio"
     @data-test-field-creator--true-radio="true"
     @click={{action this.updateBooleanFieldValue}}
@@ -42,7 +42,7 @@
     @id={{concat "field_" this.nonce "_field_value_false"}}
     @class="field-value-false"
     @name={{concat "field" this.nonce "-boolean-field-value"}}
-    @checked={{not (get this.fieldValue this.fieldName)}}
+    @checked={{not (get this.fieldValue @field.name)}}
     @type="radio"
     @data-test-field-creator--true-radio="false"
     @click={{action this.updateBooleanFieldValue}}
@@ -54,7 +54,7 @@
     @id={{@id}}
     @placeholder="Card ID"
     @size={{this.size}}
-    @value={{get this.fieldValue this.fieldName}}
+    @value={{get this.fieldValue @field.name}}
     @key-up={{action this.updateFieldValue}}
   />
   <br>
@@ -63,7 +63,7 @@
     @id={{@id}}
     @size={{this.size}}
     @placeholder="Comma separated Card ID's"
-    @value={{get this.fieldValue this.fieldName}}
+    @value={{get this.fieldValue @field.name}}
     @key-up={{action this.updateCardsFieldValue}}
   />
   <br>

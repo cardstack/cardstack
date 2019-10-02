@@ -62,35 +62,29 @@ export default class CardManipulator extends Component {
   removeField(field) {
     if (!field || !this.card) { return; }
 
-    this.card.removeField(field);
+    this.card.getField(field).remove();
   }
 
   @action
-  addField(type, name, isEmbedded, value) {
-    let fieldType = type ? fieldTypeMappings[type] : null;
-    if (!this.card || !fieldType || !name) { return; }
-    let field = dasherize(name).toLowerCase();
-    this.card.addField({
-      data: {
-        id: field,
-        type: 'fields',
-        attributes: {
-          'is-metadata': true,
-          'needed-when-embedded': Boolean(isEmbedded),
-          'field-type': fieldType
-        },
-      },
+  addField(displayType, name, isEmbedded, value) {
+    let type = displayType ? fieldTypeMappings[displayType] : null;
+    if (!this.card || !type || !name) { return; }
+
+    let field = this.card.addField({
+      type,
+      name: dasherize(name).toLowerCase(),
+      neededWhenEmbedded: isEmbedded
     });
 
     if (value != null) {
-      this.card.setFieldValue(field, value);
+      field.setValue(value);
     }
   }
 
   @action
   setField(field, value) {
     if (!field || !this.card) { return; }
-    this.card.setFieldValue(field, value);
+    this.card.getField(field).setValue(value);
   }
 
   @action

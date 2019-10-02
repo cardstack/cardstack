@@ -1,35 +1,35 @@
 {{#if @card}}
   <fieldset>
-    <legend><strong><code>{{this.args.card.id}}</code></strong></legend>
+    <legend><strong><code>{{@card.id}}</code></strong></legend>
 
     {{yield}}
 
     <dl>
-      {{#each this.fields key="fieldName" as | field |}}
-        <fieldset data-test-card-renderer-field={{field.fieldName}}>
-          <legend><strong><code>{{field.fieldName}}</code></strong></legend>
+      {{#each @card.fields key="name" as | field |}}
+        <fieldset data-test-card-renderer-field={{field.name}}>
+          <legend><strong><code>{{field.name}}</code></strong></legend>
 
           {{!-- TODO we'll need an actual field renderer here --}}
-          {{#if (eq field.fieldType "@cardstack/core-types::boolean")}}
-            <pre data-test-card-renderer-value>{{#if field.fieldValue}}true{{else}}false{{/if}}</pre>
-          {{else if (not field.fieldValue)}}
+          {{#if (eq field.type "@cardstack/core-types::boolean")}}
+            <pre data-test-card-renderer-value>{{#if field.value}}true{{else}}false{{/if}}</pre>
+          {{else if (not field.value)}}
             <pre data-test-card-renderer-value>&lt;no value&gt;</pre>
           {{else}}
-            <pre data-test-card-renderer-value>{{field.fieldValue}}</pre>
+            <pre data-test-card-renderer-value>{{field.value}}</pre>
           {{/if}}
 
           {{#if @setField}}
             <div>
               <label
-                for={{concat "edit-" field.fieldName "-field-value"}}
+                for={{concat "edit-" field.name "-field-value"}}
               >
                 Edit Value:
               </label>
             </div>
             <FieldEditor
-              @id={{concat "edit-" field.fieldName "-field-value"}}
+              @id={{concat "edit-" field.name "-field-value"}}
               @field={{field}}
-              @onUpdate={{fn @setField field.fieldName}}
+              @onUpdate={{fn @setField field.name}}
               @inputSize="60"
             />
             <br>
@@ -37,13 +37,13 @@
           <dd>
             field type:
             <code data-test-card-renderer-field-type>
-              {{field.fieldSchema.field-type}}
+              {{field.type}}
             </code>
           </dd>
           <dd>
             is metadata field:
             <code data-test-card-renderer-is-meta>
-              {{if field.fieldSchema.is-metadata "true" "false"}}
+              {{if field.json.data.attributes.is-metadata "true" "false"}}
             </code>
           </dd>
           <dd>
@@ -51,13 +51,13 @@
             <code
               data-test-card-renderer-embedded
             >
-              {{if field.fieldSchema.needed-when-embedded "true" "false"}}
+              {{if field.neededWhenEmbedded "true" "false"}}
             </code>
           </dd>
 
           {{#if @removeField}}
             <div class="card-renderer--field-btn-wrapper">
-              <button {{on "click" (fn @removeField field.fieldName)}}
+              <button {{on "click" (fn @removeField field.name)}}
                 data-test-card-renderer-remove-btn
               >
                 Remove

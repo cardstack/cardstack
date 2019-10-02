@@ -70,6 +70,12 @@ function assertIsolatedCardMetadata(card) {
   expect(data.attributes.body).to.match(/discerning tastes of the millenial puppy/);
   expect(data.relationships.author.data).to.eql({ type: 'cards', id: 'local-hub::user-card::van-gogh' });
   expect(data.attributes['tag-names']).to.eql(['millenials', 'puppies', 'belly-rubs']);
+  expect(data.attributes['metadata-field-types']).to.eql({
+    title: '@cardstack/core-types::string',
+    body: '@cardstack/core-types::string',
+    author: '@cardstack/core-types::belongs-to',
+    tags: '@cardstack/core-types::has-many',
+  });
   expect(data.relationships.tags.data).to.eql([
     { type: 'tags', id: 'millenials' },
     { type: 'tags', id: 'puppies' },
@@ -88,6 +94,10 @@ function assertEmbeddedCardMetadata(card) {
   expect(data.relationships.tags).to.be.undefined;
   expect(data.attributes.body).to.be.undefined;
   expect(data.attributes['internal-field']).to.be.undefined;
+  expect(data.attributes['metadata-field-types']).to.eql({
+    title: '@cardstack/core-types::string',
+    author: '@cardstack/core-types::belongs-to',
+  });
 
   expect(includedIdentifiers).to.not.include.members([
     'tags/millenials',
