@@ -3,6 +3,12 @@ import { ciSessionId } from '@cardstack/test-support/environment'
 import { get } from 'lodash';
 
 export function cleanupDefaulValueArtifacts(document) {
+  if (!Object.keys(document.data.attributes).length) {
+    delete document.data.attributes;
+  }
+  if (!Object.keys(document.data.relationships).length) {
+    delete document.data.relationships;
+  }
   for (let field of Object.keys(document.data.attributes || {})) {
     if (document.data.attributes && document.data.attributes[field] == null) {
       delete document.data.attributes[field];
@@ -19,6 +25,12 @@ export function cleanupDefaulValueArtifacts(document) {
       if (linkage == null || (Array.isArray(linkage) && !linkage.length)) {
         delete resource.relationships[field];
       }
+    }
+    if (!Object.keys(resource.attributes || {}).length) {
+      delete resource.attributes;
+    }
+    if (!Object.keys(resource.relationships || {}).length) {
+      delete resource.relationships;
     }
     delete resource.meta;
   }

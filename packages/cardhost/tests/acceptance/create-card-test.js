@@ -83,7 +83,7 @@ module('Acceptance | create card', function(hooks) {
     assert.dom('[data-test-card-renderer-field="body"] [data-test-card-renderer-is-meta]').hasText('true');
     assert.dom('[data-test-card-renderer-field="body"] [data-test-card-renderer-embedded]').hasText('false');
 
-    assert.dom('[data-test-card-renderer-field="author"] [data-test-card-renderer-value]').includesText('{ "type": "cards", "id": "local-hub::user-card::van-gogh" }');
+    assert.dom('[data-test-card-renderer-field="author"] [data-test-card-renderer-value]').includesText(`<card ${card2Id}>`);
     assert.dom('[data-test-card-renderer-field="author"] [data-test-card-renderer-field-type]').hasText('@cardstack/core-types::belongs-to');
     assert.dom('[data-test-card-renderer-field="author"] [data-test-card-renderer-is-meta]').hasText('true');
     assert.dom('[data-test-card-renderer-field="author"] [data-test-card-renderer-embedded]').hasText('true');

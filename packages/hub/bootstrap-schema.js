@@ -400,6 +400,13 @@ const models = [
     }
   },
   {
+    type: 'computed-fields',
+    id: 'metadata-field-types',
+    attributes: {
+      'computed-field-type': '@cardstack/core-types::field-types'
+    }
+  },
+  {
     type: 'fields',
     id: 'instructions',
     attributes: {
