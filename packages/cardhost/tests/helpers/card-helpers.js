@@ -1,11 +1,31 @@
-import { click, find, triggerEvent, fillIn } from '@ember/test-helpers';
+import { click, find, triggerEvent, fillIn, visit, waitFor } from '@ember/test-helpers';
 
 export async function setCardId(id) {
   await fillIn('#card__id', id);
   await triggerEvent('#card__id', 'keyup');
 }
 
-export async function addField(name, type, isEmbedded, value) {
+export async function createCards(args) {
+  for (let id of Object.keys(args)) {
+    await visit('/cards/new');
+    await setCardId(id);
+    for (let [name, type, neededWhenEmbedded] of args[id]) {
+      await addField(name, type, neededWhenEmbedded);
+    }
+    await click('[data-test-card-creator-save-btn]');
+    await waitFor(`[data-test-card-view="${id}"]`);
+
+    await visit(`/cards/${id}/edit`);
+    for (let [name, , , value] of args[id]) {
+      if (value == null) { continue; }
+      await setFieldValue(name, value);
+    }
+    await click('[data-test-card-editor-save-btn]');
+    await waitFor(`[data-test-card-view="${id}"]`);
+  }
+}
+
+export async function addField(name, type, isEmbedded) {
   let typeEl = find('#new_field_type');
   typeEl.value = type;
   await triggerEvent(typeEl, 'input');
@@ -16,23 +36,7 @@ export async function addField(name, type, isEmbedded, value) {
     await click('#new_field_embedded');
   }
 
-  if (value != null) {
-    if (type === 'boolean') {
-      if (value) {
-        await click('.card-creator--add-field .field-value-true');
-      } else {
-        await click('.card-creator--add-field .field-value-false');
-      }
-    } else if (type === 'related cards' && Array.isArray(value)) {
-      await fillIn('#new_field_value', value.join(','));
-      await triggerEvent('#new_field_value', 'keyup');
-    } else {
-      await fillIn('#new_field_value', value);
-      await triggerEvent('#new_field_value', 'keyup');
-    }
-  }
-
-  await click('[data-test-card-creator-add-field-btn]');
+  await click('[data-test-field-creator-add-field-btn]');
 }
 
 export async function setFieldValue(name, value) {
@@ -43,7 +47,7 @@ export async function setFieldValue(name, value) {
       } else {
         await click(`[data-test-card-renderer-field="${name}"] .field-value-false`);
       }
-    } else if (type === 'related cards' && Array.isArray(value)) {
+    } else if (type === '@cardstack/core-types::has-many' && Array.isArray(value)) {
       await fillIn(`#edit-${name}-field-value`, value.join(','));
       await triggerEvent(`#edit-${name}-field-value`, 'keyup');
     } else {

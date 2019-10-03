@@ -1,5 +1,3 @@
-<h2 data-test-card-updator={{this.card.id}}>Update Card</h2>
-
 {{#if this.statusMsg}}
   <div><strong>{{this.statusMsg}}</strong></div>
 {{/if}}
@@ -9,27 +7,27 @@
 <CardRenderer
   @card={{this.card}}
   @setField={{action this.setField}}
-  @removeField={{action this.removeField}}
 >
-  <div class="card-updator--field-btn-wrapper">
+  <div class="card-editor--field-btn-wrapper">
     {{#unless this.cardstackSession.isAuthenticated}}
-      (Must be logged in to save the card.)
+      (Must be logged in to modify the card.)
     {{/unless}}
-    <span data-test-card-updator-is-dirty={{this.isDirtyStr}}>
+    <span data-test-card-editor-is-dirty={{this.isDirtyStr}}>
       {{#if this.card.isDirty}}(unsaved){{/if}}
     </span>
+    <button {{on "click" this.delete}}
+      data-test-card-editor-delete-btn
+      disabled={{not this.cardstackSession.isAuthenticated}}
+    >
+      Delete Card
+    </button>
     <button {{on "click" this.save}}
-      data-test-card-updator-save-btn
+      data-test-card-editor-save-btn
       disabled={{not this.cardstackSession.isAuthenticated}}
     >
       Save Card
     </button>
   </div>
-
-  <FieldCreator
-    @fieldTypeMappings={{this.fieldTypeMappings}}
-    @addField={{action this.addField}}
-  />
 </CardRenderer>
 
 <br>

@@ -1,0 +1,10 @@
+<div>
+  <LinkTo @route="index">Home</LinkTo>
+</div>
+<div>
+  <LinkTo @route="cards.view" @model={{this.model}}>View</LinkTo>
+</div>
+
+<h2 data-test-card-edit={{this.model.id}}>Edit Card</h2>
+
+<CardEditor @card={{this.model}}/>
