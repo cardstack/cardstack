@@ -24,6 +24,7 @@ export default class CardManipulator extends Component {
   fieldTypeMappings = fieldTypeMappings;
 
   @service data;
+  @service router;
   @service cardstackSession;
 
   @tracked statusMsg;
@@ -38,6 +39,14 @@ export default class CardManipulator extends Component {
   get cardJson() {
     if (!this.card) { return null; }
     return JSON.stringify(this.card.json, null, 2);
+  }
+
+  get isDirtyStr() {
+    return this.card.isDirty.toString();
+  }
+
+  async afterUpdate(id) {
+    this.router.transitionTo('cards.view', id);
   }
 
   @(task(function * () {
@@ -57,6 +66,23 @@ export default class CardManipulator extends Component {
       yield this.afterUpdate(this.card.id);
     }
   })) saveCard;
+
+  @(task(function * () {
+    this.statusMsg = null;
+    let id = this.card.id;
+    try {
+      yield this.card.delete();
+    } catch (e) {
+      console.error(e); // eslint-disable-line no-console
+      this.statusMsg = `card ${this.card.id} was NOT successfully deleted: ${e.message}`;
+      return;
+    }
+    if (typeof this.afterDelete === 'function') {
+      yield this.afterDelete(id);
+    } else {
+      this.router.transitionTo('index');
+    }
+  })) deleteCard;
 
   @action
   removeField(field) {
@@ -90,5 +116,10 @@ export default class CardManipulator extends Component {
   @action
   save() {
     this.saveCard.perform();
+  }
+
+  @action
+  delete() {
+    this.deleteCard.perform();
   }
 }

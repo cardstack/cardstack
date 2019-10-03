@@ -2,7 +2,11 @@
   text-align: right;
 }
 
-.card-updator--field-btn-wrapper {
+.card-editor--field-btn-wrapper {
+  text-align: right;
+}
+
+.card-schema--field-btn-wrapper {
   text-align: right;
 }
 

@@ -8,11 +8,11 @@
   <li>
     <Input
       @value={{this.cardId}}
-      @placeholder="Card ID to Update"
-      @enter={{action this.updateCard this.cardId}}
+      @placeholder="Card ID to View"
+      @enter={{action this.viewCard this.cardId}}
     />
     {{#if this.cardId}}
-      <LinkTo @route="cards.update" @model={{this.cardId}}>Update Card</LinkTo>
+      <LinkTo @route="cards.view" @model={{this.cardId}}>View Card</LinkTo>
     {{/if}}
   </li>
 </ul>

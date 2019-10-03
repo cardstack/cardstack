@@ -6,7 +6,7 @@ export default class CardCreator extends CardManipulator {
   @service router;
 
   afterCreate(id) {
-    this.router.transitionTo('cards.update', id);
+    this.router.transitionTo('cards.view', id);
   }
 
   @action

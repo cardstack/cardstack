@@ -5,7 +5,7 @@ export default class IndexController extends Controller {
   @service router;
 
   @action
-  updateCard(id) {
-    this.router.transitionTo('cards.update', id);
+  viewCard(id) {
+    this.router.transitionTo('cards.view', id);
   }
 }

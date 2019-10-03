@@ -1,0 +1,23 @@
+<LinkTo @route="index">Home</LinkTo>
+
+<h2 data-test-card-view={{this.model.id}}>View Card</h2>
+
+<CardRenderer @card={{this.model}}>
+  <div>
+    <LinkTo @route="cards.schema" @model={{this.model}}>
+      Update Schema
+    </LinkTo>
+  </div>
+  <div>
+    <LinkTo @route="cards.edit" @model={{this.model}}>
+      Edit Card
+    </LinkTo>
+  </div>
+</CardRenderer>
+<br>
+
+<h3>Card Document:</h3>
+<CodeBlock
+  @code={{this.cardJson}}
+  @language="javascript"
+/>
