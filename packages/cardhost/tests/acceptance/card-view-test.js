@@ -68,6 +68,7 @@ module('Acceptance | card view', function(hooks) {
     await waitFor(`[data-test-card-edit="${card1Id}"]`);
 
     assert.equal(currentURL(), `/cards/${card1Id}/edit`);
+    assert.dom(`[data-test-card-edit="${card1Id}"]`).exists();
   });
 
   test('can navigate to card schema', async function(assert) {
@@ -85,5 +86,6 @@ module('Acceptance | card view', function(hooks) {
     await waitFor(`[data-test-card-schema="${card1Id}"]`);
 
     assert.equal(currentURL(), `/cards/${card1Id}/schema`);
+    assert.dom(`[data-test-card-schema="${card1Id}"]`).exists();
   });
 });

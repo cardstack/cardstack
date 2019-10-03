@@ -45,13 +45,8 @@ export default class CardManipulator extends Component {
     return this.card.isDirty.toString();
   }
 
-  async afterUpdate(id) {
-    this.router.transitionTo('cards.view', id);
-  }
-
   @(task(function * () {
     this.statusMsg = null;
-    let isNew = this.card.isNew;
     try {
       yield this.card.save();
     } catch (e) {
@@ -59,17 +54,11 @@ export default class CardManipulator extends Component {
       this.statusMsg = `card ${this.card.id} was NOT successfully created: ${e.message}`;
       return;
     }
-    if (isNew && typeof this.afterCreate === 'function') {
-      yield this.afterCreate(this.card.id);
-    }
-    if (!isNew && typeof this.afterUpdate === 'function') {
-      yield this.afterUpdate(this.card.id);
-    }
+    this.router.transitionTo('cards.view', this.card.id);
   })) saveCard;
 
   @(task(function * () {
     this.statusMsg = null;
-    let id = this.card.id;
     try {
       yield this.card.delete();
     } catch (e) {
@@ -77,11 +66,7 @@ export default class CardManipulator extends Component {
       this.statusMsg = `card ${this.card.id} was NOT successfully deleted: ${e.message}`;
       return;
     }
-    if (typeof this.afterDelete === 'function') {
-      yield this.afterDelete(id);
-    } else {
-      this.router.transitionTo('index');
-    }
+    this.router.transitionTo('index');
   })) deleteCard;
 
   @action

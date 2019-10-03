@@ -6,7 +6,7 @@ import { tracked } from '@glimmer/tracking';
 import { assert } from '@ember/debug';
 
 let priv = new WeakMap();
-let cache = {
+let store = {
   isolated: new Map(),
   embedded: new Map()
 }
@@ -17,12 +17,12 @@ export default class DataService extends Service {
   async getCard(id, format) {
     if (!['isolated', 'embedded'].includes(format)) { throw new Error(`unknown format specified when getting card '${id}': '${format}'`); }
 
-    if (cache[format].has(id)) {
+    if (store[format].has(id)) {
       return new Card({
         id,
         format,
         session: this.cardstackSession,
-        data: await cache[format].get(id)
+        data: await store[format].get(id)
       });
     } else {
       let card = new Card({
@@ -45,8 +45,8 @@ export default class DataService extends Service {
 
   // used for tests
   _clearCache() {
-    cache.isolated = new Map();
-    cache.embedded = new Map();
+    store.isolated = new Map();
+    store.embedded = new Map();
   }
 }
 
@@ -172,10 +172,10 @@ class Card {
     if (!this.isDirty) { return this; }
 
     let internal = priv.get(this);
-    cache.isolated.set(this.id, this._saveCard());
-    internal.serverIsolatedData = await cache.isolated.get(this.id);
+    store.isolated.set(this.id, this._saveCard());
+    internal.serverIsolatedData = await store.isolated.get(this.id);
     for (let card of (internal.serverIsolatedData.included || []).filter(i => i.type === 'cards')) {
-      cache.embedded.set(card.id, new Promise(res => res({ data: card })));
+      store.embedded.set(card.id, new Promise(res => res({ data: card })));
     }
 
     reifyFieldsFromCardMetadata(this);
@@ -199,16 +199,16 @@ class Card {
       },
     });
     if (response.ok) {
-      cache[format].set(this.id, response.json());
+      store[format].set(this.id, response.json());
       if (format === 'isolated') {
-        internal.serverIsolatedData = await cache[format].get(this.id);
+        internal.serverIsolatedData = await store[format].get(this.id);
         for (let card of (internal.serverIsolatedData.included || []).filter(i => i.type === 'cards')) {
-          cache.embedded.set(card.id, new Promise(res => res({ data: card })));
+          store.embedded.set(card.id, new Promise(res => res({ data: card })));
         }
       } else {
-        internal.serverEmbeddedData = await cache[format].get(this.id);
+        internal.serverEmbeddedData = await store[format].get(this.id);
         for (let card of (internal.serverEmbeddedData.included || []).filter(i => i.type === 'cards')) {
-          cache.embedded.set(card.id, new Promise(res => res({ data: card })));
+          store.embedded.set(card.id, new Promise(res => res({ data: card })));
         }
       }
 
@@ -250,8 +250,8 @@ class Card {
       priv.get(field).isDestroyed = true;
     }
     internal.isDestroyed = true;
-    cache.isolated.delete(this.id);
-    cache.embedded.delete(this.id);
+    store.isolated.delete(this.id);
+    store.embedded.delete(this.id);
   }
 
   async _saveCard() {
