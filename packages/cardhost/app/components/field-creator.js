@@ -8,6 +8,12 @@ export default class FieldCreator extends Component {
   @tracked newFieldName;
   @tracked newFieldEmbedded;
   @tracked newFieldValue;
+  @tracked newFieldPosition;
+
+  constructor(...args) {
+    super(...args);
+    this.resetAddField();
+  }
 
   get fieldTypes() {
     return Object.keys(this.args.fieldTypeMappings);
@@ -18,6 +24,7 @@ export default class FieldCreator extends Component {
     this.newFieldValue = null;
     this.newFieldEmbedded = false;
     this.newFieldName = null;
+    this.newFieldPosition = this.args.numFields;
   }
 
   @action
@@ -35,7 +42,8 @@ export default class FieldCreator extends Component {
       this.newFieldType,
       this.newFieldName,
       this.newFieldEmbedded,
-      this.newFieldValue
+      this.newFieldValue,
+      Math.min(this.newFieldPosition, this.args.numFields)
     );
 
     this.resetAddField();

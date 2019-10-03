@@ -64,4 +64,31 @@ module('Acceptance | card create', function(hooks) {
     assert.equal(card.data.relationships.author, undefined);
     assert.deepEqual(card.data.relationships.reviewers.data, []);
   });
+
+  test('can add a field at a particular position', async function(assert) {
+    await login();
+    await visit('/cards/new');
+
+    assert.equal(currentURL(), '/cards/new');
+
+    await setCardId(card1Id);
+    await addField('title', 'string', true);
+    await addField('body', 'string', false);
+    await addField('author', 'string', false, 1);
+
+    assert.deepEqual([...document.querySelectorAll('[data-test-card-renderer-field]')].map(i => i.getAttribute('data-test-card-renderer-field')),
+      ['title', 'author', 'body']);
+
+    await click('[data-test-card-creator-save-btn]');
+    await waitFor(`[data-test-card-view="${card1Id}"]`);
+
+    assert.deepEqual([...document.querySelectorAll('[data-test-card-renderer-field]')].map(i => i.getAttribute('data-test-card-renderer-field')),
+      ['title', 'author', 'body']);
+    let card = JSON.parse(find('.code-block').textContent);
+    assert.deepEqual(card.data.relationships.fields.data, [
+      { type: 'fields', id: 'title' },
+      { type: 'fields', id: 'author' },
+      { type: 'fields', id: 'body' },
+    ]);
+  });
 });

@@ -77,12 +77,13 @@ export default class CardManipulator extends Component {
   }
 
   @action
-  addField(displayType, name, isEmbedded, value) {
+  addField(displayType, name, isEmbedded, value, position) {
     let type = displayType ? fieldTypeMappings[displayType] : null;
     if (!this.card || !type || !name) { return; }
 
     let field = this.card.addField({
       type,
+      position,
       name: dasherize(name).toLowerCase(),
       neededWhenEmbedded: isEmbedded
     });
@@ -93,9 +94,22 @@ export default class CardManipulator extends Component {
   }
 
   @action
-  setField(field, value) {
-    if (!field || !this.card) { return; }
-    this.card.getField(field).setValue(value);
+  setPosition(fieldName, position) {
+    if (!fieldName || !this.card || position == null) { return; }
+
+    let card = this.card;
+    card.moveField(card.getField(fieldName), position);
+  }
+
+  @action
+  setNeededWhenEmbedded(fieldName, { target: { checked:neededWhenEmbedded } }) {
+    this.card.getField(fieldName).setNeededWhenEmbedded(neededWhenEmbedded);
+  }
+
+  @action
+  setFieldValue(fieldName, value) {
+    if (!fieldName || !this.card) { return; }
+    this.card.getField(fieldName).setValue(value);
   }
 
   @action
