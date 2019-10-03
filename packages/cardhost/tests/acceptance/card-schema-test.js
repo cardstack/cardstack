@@ -1,4 +1,4 @@
-import { module, test, skip } from 'qunit';
+import { module, test } from 'qunit';
 import { click, find, visit, currentURL, waitFor } from '@ember/test-helpers';
 import { setupApplicationTest } from 'ember-qunit';
 import Fixtures from '@cardstack/test-support/fixtures'
@@ -102,22 +102,7 @@ module('Acceptance | card schema', function(hooks) {
     ]);
   });
 
-  // I'm seeing an unusual glimmer error when running this test. None of the assertions
-  // fail for this test, however, this exception is thrown:
-  //
-  // index.js:824 Uncaught TypeError: Cannot set property neededWhenEmbedded of [object Object] which has only a getter
-  //   at setWithMandatorySetter (index.js:824)
-  //   at set (index.js:2835)
-  //   at NestedPropertyReference.__UPDATE__ember1570141884913996736264373__ (index.js:469)
-  //   at Class.__PROPERTY_DID_CHANGE__ember15701418849131069086207798__ (index.js:1527)
-  //   at notifyPropertyChange (index.js:2307)
-  //   at set (index.js:2842)
-  //   at Class.change (index.js:1865)
-  //   at Class.trigger (core_view.js:70)
-  //   at Class.superWrapper [as trigger] (index.js:367)
-  //   at Backburner._join (backburner.js:995)
-  //
-  skip(`change a field's needed-when-embedded value to true`, async function (assert) {
+  test(`change a field's needed-when-embedded value to true`, async function (assert) {
     await login();
     await createCards({
       [card1Id]: [
@@ -143,22 +128,7 @@ module('Acceptance | card schema', function(hooks) {
     assert.equal(field.attributes['needed-when-embedded'], true);
   });
 
-  // I'm seeing an unusual glimmer error when running this test. None of the assertions
-  // fail for this test, however, this exception is thrown:
-  //
-  // index.js:824 Uncaught TypeError: Cannot set property neededWhenEmbedded of [object Object] which has only a getter
-  //   at setWithMandatorySetter (index.js:824)
-  //   at set (index.js:2835)
-  //   at NestedPropertyReference.__UPDATE__ember1570141884913996736264373__ (index.js:469)
-  //   at Class.__PROPERTY_DID_CHANGE__ember15701418849131069086207798__ (index.js:1527)
-  //   at notifyPropertyChange (index.js:2307)
-  //   at set (index.js:2842)
-  //   at Class.change (index.js:1865)
-  //   at Class.trigger (core_view.js:70)
-  //   at Class.superWrapper [as trigger] (index.js:367)
-  //   at Backburner._join (backburner.js:995)
-  //
-  skip(`change a field's needed-when-embedded value to false`, async function (assert) {
+  test(`change a field's needed-when-embedded value to false`, async function (assert) {
     await login();
     await createCards({
       [card1Id]: [
