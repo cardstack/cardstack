@@ -13,7 +13,7 @@ export let duration = 700;
 export default class DemoImageCardsIndexController extends Controller {
 
   @action toggle(card) {
-    this.transitionToRoute('image-cards.image-card', card);
+    this.transitionToRoute('demo.image-cards.image-card', card);
   }
 
   * transition({ sentSprites }) {

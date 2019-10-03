@@ -1,9 +1,6 @@
-// import Route from '@ember/routing/route';
-import BoxelizedRoute from 'boxel/routes/boxelized';
+import Route from '@ember/routing/route';
 
-export default class DemoFormCardsRoute extends BoxelizedRoute {
-  boxelPlane = 'space';
-
+export default class DemoFormCardsRoute extends Route {
   model() {
     return [
       { id : "1", title: 'Card 1' },

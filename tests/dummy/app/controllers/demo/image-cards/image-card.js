@@ -11,7 +11,7 @@ import { duration } from './index';
 
 export default class DemoImageCardsImageCardController extends Controller {
   @action toggle() {
-    this.transitionToRoute('image-cards');
+    this.transitionToRoute('demo.image-cards');
   }
 
   * transition ({ sentSprites }) {
