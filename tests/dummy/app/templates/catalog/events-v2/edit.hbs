@@ -1,7 +1,7 @@
 <div class="events-edit-page">
   <div class="events-edit">
     <AnimatedContainer class="events-edit--container">
-      <div class="events-edit--outer {{if this.model.selected "selected"}}">
+      <div class="events-edit--outer">
         <div class="events-edit--container-content">
           <div><span>Editing:</span> {{this.model.constructor.modelName}} Card</div>
           {{! template-lint-configure no-nested-interactive false}}
@@ -10,7 +10,7 @@
 
         {{!-- Tray --}}
         {{#animated-value this.model key="id" group="card-tray" as |card|}}
-          <div class="events-tray {{if card.selected "selected"}} edit">
+          <div class="events-tray selected edit">
             <div class="events-tray--content">
               <div>{{card.constructor.modelName}} Card</div>
               <button {{action "viewEditPage" card}}>Edit</button>
@@ -21,13 +21,13 @@
 
         {{!-- Card Container --}}
         {{#animated-value this.model key="id" group="card" use=this.cardTransition as |card|}}
-          <div class="events-view-card--container">
+          <div class="events-view-card--container edit">
             {{!-- Card --}}
             <div class="events-view-card events-view-card-{{card.id}}">
               <AnimatedContainer>
                 {{#animated-value card key="id" group="image" use=this.imageTransition}}
                   {{! template-lint-configure no-inline-styles {"allowDynamicStyles": true} }}
-                  <div class="events-view-image" style={{css-url "background-image" card.imageUrl}}></div>
+                  <div class="events-view-image edit" style={{css-url "background-image" card.imageUrl}}></div>
                 {{/animated-value}}
               </AnimatedContainer>
               <AnimatedContainer class="events-view-details">
@@ -73,12 +73,12 @@
     </AnimatedContainer>
 
     {{!-- Right Edge --}}
-    <div class="right-edge--container">
-      <div class="right-edge">
-        <div class="right-edge--title">
+    <div class="events-right-edge--container">
+      <div class="events-right-edge">
+        <div class="events-right-edge--title">
           {{this.model.constructor.modelName}} Card
         </div>
-        <div class="right-edge--properties">
+        <div class="events-right-edge--properties">
           <div>Properties:</div>
           <div>
             <label>Configure</label>

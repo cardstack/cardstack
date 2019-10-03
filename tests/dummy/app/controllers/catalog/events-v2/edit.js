@@ -25,6 +25,7 @@ export default class CatalogEventsV2EditController extends Controller {
     receivedSprites.forEach(sprite => {
       move(sprite);
       resize(sprite);
+      adjustCSS('border-radius', sprite);
       sprite.applyStyles({ 'z-index': 2 });
     });
   }
@@ -35,6 +36,7 @@ export default class CatalogEventsV2EditController extends Controller {
     sentSprites.forEach(sprite => {
       move(sprite);
       resize(sprite);
+      adjustCSS('border-radius', sprite);
       sprite.applyStyles({ 'z-index': 3 });
     });
   }

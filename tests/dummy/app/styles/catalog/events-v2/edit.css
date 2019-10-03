@@ -1,23 +1,19 @@
 .events-edit-page {
+  --content-width: 630px;
+  --edit-right-edge-width: 275px;
+
   position: absolute;
   width: 100vw;
-  height: 100vh;
-  min-height: 100%;
   top: 0;
   left: 0;
 }
 
 .events-edit {
-  --content-width: 630px;
-  --content-min-height: 1000px;
-
   box-sizing: border-box;
-  display: flex;
-  flex-flow: column nowrap;
-  align-items: center;
+  display: grid;
+  grid-template-columns: 1fr 300px;
+  justify-items: center;
   width: 100%;
-  height: 100vh;
-  min-height: 100%;
   padding: 80px 0;
   background-color: var(--boxel-light-purple);
 }
@@ -25,11 +21,11 @@
 .events-edit--container {
   box-sizing: border-box;
   width: var(--content-width);
-  min-height: var(--content-min-height);
 }
 
 .events-edit--outer {
-  width: 630px;
+  box-sizing: border-box;
+  width: var(--content-width);
   margin: 0 auto;
 }
 
@@ -58,49 +54,60 @@
 
 
 .events-tray.selected.edit {
+  height: auto;
   top: 85px;
 }
 
 /* Other tray styles: See catalog/events-v2.css */
 
 /* Card + Card Container styles: See catalog/events-v2.css */
+.events-view-card--container.edit {
+  border-radius: 20px;
+  border: 5px solid transparent;
+  overflow: hidden;
+}
+
+.events-view-image.edit {
+  border-top-right-radius: 15px;
+  border-top-left-radius: 15px;
+}
 
 
 /* Right Edge */
-.right-edge--container {
+.events-right-edge--container {
   position: fixed;
-  top: 30px;
+  top: 175px;
   right: 30px;
 }
 
-.right-edge {
+.events-right-edge {
   box-sizing: border-box;
   position: relative;
-  width: 275px;
+  width: var(--edit-right-edge-width);
   padding: 25px;
   background-color: var(--boxel-dark-purple);
   border-radius: 20px;
   color: white;
 }
 
-.right-edge--title {
+.events-right-edge--title {
   box-sizing: border-box;
   text-transform: capitalize;
   padding: 10px 0 25px;
   font-size: 16px;
 }
 
-.right-edge--properties {
+.events-right-edge--properties {
   box-sizing: border-box;
   padding: 15px 0;
   border-top: 1px solid gray;
 }
 
-.right-edge--properties > div + div {
+.events-right-edge--properties > div + div {
   padding-top: 15px;
 }
 
-.right-edge--properties input {
+.events-right-edge--properties input {
   box-sizing: border-box;
   display: block;
   width: 100%;
@@ -108,7 +115,7 @@
   border-radius: 5px;
 }
 
-.right-edge--properties label {
+.events-right-edge--properties label {
   box-sizing: border-box;
   display: block;
   padding-bottom: 6px;

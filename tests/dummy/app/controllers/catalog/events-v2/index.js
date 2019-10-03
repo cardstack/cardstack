@@ -42,7 +42,7 @@ export default class CatalogEventsV2IndexController extends Controller {
   }
 
   * trayAnimation({ keptSprites, receivedSprites, sentSprites }) {
-    printSprites(arguments[0], 'index tray animation');
+    printSprites(arguments[0], 'tray animation');
 
     if (keptSprites.length) {
       yield wait(animationDelay);
@@ -66,27 +66,52 @@ export default class CatalogEventsV2IndexController extends Controller {
     });
   }
 
-  * imageTransition({ sentSprites }) {
+  * cardTransition({ receivedSprites }) {
+    printSprites(arguments[0], 'card animation');
+
+    receivedSprites.forEach(sprite => {
+      sprite.moveToFinalPosition();
+      sprite.applyStyles({ 'z-index': 3 });
+    });
+  }
+
+  * imageTransition({ sentSprites, receivedSprites }) {
     sentSprites.forEach(sprite => {
       move(sprite);
       resize(sprite);
+      adjustCSS('border-radius', sprite);
       sprite.applyStyles({ 'z-index': 3 });
+    });
+
+    receivedSprites.forEach(sprite => {
+      sprite.moveToFinalPosition();
+      sprite.applyStyles({ 'z-index': 4 });
     });
   }
 
-  * headerTransition({ sentSprites }) {
+  * headerTransition({ sentSprites, receivedSprites }) {
     sentSprites.forEach(sprite => {
       move(sprite);
       sprite.applyStyles({ 'z-index': 3 });
     });
+
+    receivedSprites.forEach(sprite => {
+      sprite.moveToFinalPosition();
+      sprite.applyStyles({ 'z-index': 4 });
+    });
   }
 
-  * titleTransition({ sentSprites }) {
+  * titleTransition({ sentSprites, receivedSprites }) {
     sentSprites.forEach(sprite => {
       move(sprite);
       resize(sprite);
       adjustCSS('font-size', sprite);
       sprite.applyStyles({ 'z-index': 4 });
+    });
+
+    receivedSprites.forEach(sprite => {
+      sprite.moveToFinalPosition();
+      sprite.applyStyles({ 'z-index': 5 });
     });
   }
 }

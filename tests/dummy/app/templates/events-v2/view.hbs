@@ -28,9 +28,11 @@
               <div>
                 <div class="events-view-details--header">
                   <div class="events-view-date">{{card.date}}</div>
-                  {{#animated-value card group="title" use=this.titleTransition}}
-                    <div class="events-view-title">{{card.title}}</div>
-                  {{/animated-value}}
+                  <AnimatedContainer>
+                    {{#animated-value card group="title" use=this.titleTransition}}
+                      <div class="events-view-title">{{card.title}}</div>
+                    {{/animated-value}}
+                  </AnimatedContainer>
                 </div>
                 <div>
                   <div class="events-view-location">{{card.location}}</div>
