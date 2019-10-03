@@ -1,4 +1,4 @@
-import { module, test, skip } from 'qunit';
+import { module, test } from 'qunit';
 import Fixtures from '@cardstack/test-support/fixtures'
 import { setupTest } from 'ember-qunit';
 import {
@@ -286,23 +286,79 @@ module("Unit | Service | data", function () {
       assert.equal(card.isDirty, true, 'the dirtiness is correct for a modified card');
     });
 
+    test("it can add a new field to an isolated card at the first position", async function (assert) {
+      let service = this.owner.lookup('service:data');
+      let card = service.createCard(card1Id);
+      card.addField({ name: 'body', type: '@cardstack/core-types::string' });
+      card.addField({ name: 'name', type: '@cardstack/core-types::string', neededWhenEmbedded: true });
+      card.addField({ name: 'title', type: '@cardstack/core-types::string', neededWhenEmbedded: true, position: 0 });
+
+      assert.deepEqual(card.fields.map(i => i.name), ['title', 'body', 'name']);
+      assert.deepEqual(card.json.data.relationships.fields.data, [
+        { type: 'fields', id: 'title' },
+        { type: 'fields', id: 'body' },
+        { type: 'fields', id: 'name' }
+      ]);
+      assert.equal(card.isDirty, true, 'the dirtiness is correct for a modified card');
+    });
+
+    test("it can add a new field to an isolated card at the last position", async function (assert) {
+      let service = this.owner.lookup('service:data');
+      let card = service.createCard(card1Id);
+      card.addField({ name: 'body', type: '@cardstack/core-types::string' });
+      card.addField({ name: 'name', type: '@cardstack/core-types::string', neededWhenEmbedded: true });
+      card.addField({ name: 'title', type: '@cardstack/core-types::string', neededWhenEmbedded: true, position: 2 });
+
+      assert.deepEqual(card.fields.map(i => i.name), ['body', 'name', 'title']);
+      assert.deepEqual(card.json.data.relationships.fields.data, [
+        { type: 'fields', id: 'body' },
+        { type: 'fields', id: 'name' },
+        { type: 'fields', id: 'title' }
+      ]);
+      assert.equal(card.isDirty, true, 'the dirtiness is correct for a modified card');
+    });
+
+    test("it can add a new field to an isolated card at a position in the middle", async function (assert) {
+      let service = this.owner.lookup('service:data');
+      let card = service.createCard(card1Id);
+      card.addField({ name: 'body', type: '@cardstack/core-types::string' });
+      card.addField({ name: 'name', type: '@cardstack/core-types::string', neededWhenEmbedded: true });
+      card.addField({ name: 'title', type: '@cardstack/core-types::string', neededWhenEmbedded: true, position: 1 });
+
+      assert.deepEqual(card.fields.map(i => i.name), ['body', 'title', 'name']);
+      assert.deepEqual(card.json.data.relationships.fields.data, [
+        { type: 'fields', id: 'body' },
+        { type: 'fields', id: 'title' },
+        { type: 'fields', id: 'name' }
+      ]);
+      assert.equal(card.isDirty, true, 'the dirtiness is correct for a modified card');
+    });
+
+    test("it throws when adding a new field with a position that is larger than the number of fields", async function(assert) {
+      let service = this.owner.lookup('service:data');
+      let card = service.createCard(card1Id);
+      card.addField({ name: 'body', type: '@cardstack/core-types::string' });
+      card.addField({ name: 'name', type: '@cardstack/core-types::string', neededWhenEmbedded: true });
+      assert.throws(() => card.addField({ name: 'title', type: '@cardstack/core-types::string', neededWhenEmbedded: true, position: 3 }), /beyond the bounds of the field positions for this card/);
+    });
+
     test("it throws an error when you try to add a new field with missing name", async function (assert) {
       let service = this.owner.lookup('service:data');
       let card = service.createCard(card1Id);
-      assert.throws(() => card.addField({ type: '@cardstack/core-types::string' }), `missing 'name'`);
+      assert.throws(() => card.addField({ type: '@cardstack/core-types::string' }), /missing 'name'/);
     });
 
     test("it throws an error when you try to add a new field with missing type", async function (assert) {
       let service = this.owner.lookup('service:data');
       let card = service.createCard(card1Id);
-      assert.throws(() => card.addField({ name: 'title' }), `missing 'type'`);
+      assert.throws(() => card.addField({ name: 'title' }), /missing 'type'/);
     });
 
     test("it throws an error when you try to add a new field that has a duplicate type and id of an existing field", async function (assert) {
       let service = this.owner.lookup('service:data');
       let card = service.createCard(card1Id);
       card.addField({ name: 'title', type: '@cardstack/core-types::string' });
-      assert.throws(() => card.addField({ name: 'title', type: '@cardstack/core-types::string' }), `field 'fields/title' which already exists for this card`);
+      assert.throws(() => card.addField({ name: 'title', type: '@cardstack/core-types::string' }), /field 'fields\/title' which already exists for this card/);
     });
 
     test("it can set an attribute field value on an isolated card", async function (assert) {
@@ -481,7 +537,7 @@ module("Unit | Service | data", function () {
       let service = this.owner.lookup('service:data');
       let card = service.createCard(card1Id);
       let field = card.addField({ name: 'reviewers', type: '@cardstack/core-types::has-many', neededWhenEmbedded: true });
-      assert.throws(() => field.setValue(card2Id), `value must be an array of Cards`);
+      assert.throws(() => field.setValue(card2Id), /value must be an array of Cards/);
     });
 
     test("it can remove an attribute type field from an isolated card", async function (assert) {
@@ -573,9 +629,6 @@ module("Unit | Service | data", function () {
       assert.equal(article.isNew, false, 'the newness state is correct for a saved card');
       assert.equal(article.isLoaded, true, 'the loaded state is correct for a saved card');
     });
-
-    skip("it can change the position of a field for an isolated card", async function (/*assert*/) {
-    });
   });
 
   module("get card", function (hooks) {
@@ -657,18 +710,18 @@ module("Unit | Service | data", function () {
 
     test("it throws an error when you try to get a card in an unknown format", async function (assert) {
       let service = this.owner.lookup('service:data');
-      await assert.rejects(service.getCard(card1Id, 'foo'), 'unknown format specified');
+      await assert.rejects(service.getCard(card1Id, 'foo'), /unknown format specified/);
     });
 
     test("it throws an error when you try to get a card that does not exist", async function (assert) {
       let service = this.owner.lookup('service:data');
-      await assert.rejects(service.getCard('local-hub::article-card::does-not-exist', 'isolated'), 'Not Found');
+      await assert.rejects(service.getCard('local-hub::article-card::does-not-exist', 'isolated'), /Not Found/);
     });
 
     test("it throws an error when you try to load a card in an unknown format", async function (assert) {
       let service = this.owner.lookup('service:data');
       let card = await service.getCard(card1Id, 'embedded');
-      await assert.rejects(card.load('foo'), 'unknown format specified');
+      await assert.rejects(card.load('foo'), /unknown format specified/);
     });
 
     test("load() will update card with any updated field values", async function (assert) {
@@ -926,44 +979,210 @@ module("Unit | Service | data", function () {
       assert.equal(cardDoc.data.attributes.title, 'updated title');
     });
 
-    skip("it can change a needed-when-embedded field to be an isolated-only field", async function (/*assert*/) {
-    });
-
-    skip("it can change an isolated-only field to be a needed-when-embedded field", async function (/*assert*/) {
-    });
-
-
-    test("it throws an error when a card saved in an embedded format", async function (assert) {
+    test("it can save an updated card when it is an embedded format", async function (assert) {
       let service = this.owner.lookup('service:data');
       let card = await service.getCard(card1Id, 'embedded');
-      await assert.rejects(card.save(), 'card is in the embedded format');
+      card.getField('title').setValue('updated title');
+      await card.save();
+
+      let cardDoc = cleanupDefaulValueArtifacts(card.json);
+      assert.equal(card.format, 'embedded');
+      assert.equal(card.getField('title').value, 'updated title');
+      assert.equal(cardDoc.data.attributes.title, 'updated title');
+      assert.equal(card.getField('body'), undefined);
+      assert.equal(cardDoc.data.attributes.body, undefined);
+
+      await card.load('isolated');
+      cardDoc = cleanupDefaulValueArtifacts(card.json);
+      assert.equal(card.getField('title').value, 'updated title');
+      assert.equal(cardDoc.data.attributes.title, 'updated title');
+      assert.equal(card.getField('body').value, 'test body');
+      assert.equal(cardDoc.data.attributes.body, 'test body');
     });
 
-    test("it throws an error if you try to set a field value on an embedded card", async function (assert) {
+    test("it can change a needed-when-embedded field to be an isolated-only field", async function (assert) {
       let service = this.owner.lookup('service:data');
-      let card = await service.getCard(card1Id, 'embedded');
+      let card = await service.getCard(card1Id, 'isolated');
       let field = card.getField('title');
-      assert.throws(() => field.setValue('test'), 'card is in the embedded format');
+      assert.equal(field.neededWhenEmbedded, true);
+      assert.equal(card.isDirty, false, 'the dirtiness is correct for a modified card');
+
+      field.setNeededWhenEmbedded(false);
+      assert.equal(card.isDirty, true, 'the dirtiness is correct for a modified card');
+      assert.equal(field.neededWhenEmbedded, false);
+      let fieldResource = card.json.included.find(i => `${i.type}/${i.id}` === 'fields/title');
+      assert.equal(fieldResource.attributes['needed-when-embedded'], false);
+      await card.save();
+
+      assert.equal(card.getField('title').neededWhenEmbedded, false);
+      assert.equal(card.isDirty, false, 'the dirtiness is correct for a modified card');
+      fieldResource = card.json.included.find(i => `${i.type}/${i.id}` === 'fields/title');
+      assert.equal(fieldResource.attributes['needed-when-embedded'], false);
+    });
+
+    test("it can change an isolated-only field to be a needed-when-embedded field", async function (assert) {
+      let service = this.owner.lookup('service:data');
+      let card = await service.getCard(card1Id, 'isolated');
+      let field = card.getField('body');
+      assert.equal(field.neededWhenEmbedded, false);
+      assert.equal(card.isDirty, false, 'the dirtiness is correct for a modified card');
+
+      field.setNeededWhenEmbedded(true);
+      assert.equal(card.isDirty, true, 'the dirtiness is correct for a modified card');
+      assert.equal(field.neededWhenEmbedded, true);
+      let fieldResource = card.json.included.find(i => `${i.type}/${i.id}` === 'fields/body');
+      assert.equal(fieldResource.attributes['needed-when-embedded'], true);
+      await card.save();
+
+      assert.equal(card.getField('body').neededWhenEmbedded, true);
+      assert.equal(card.isDirty, false, 'the dirtiness is correct for a modified card');
+      fieldResource = card.json.included.find(i => `${i.type}/${i.id}` === 'fields/body');
+      assert.equal(fieldResource.attributes['needed-when-embedded'], true);
+    });
+
+    test("it sets needed to embedded to the same value it already is", async function (assert) {
+      let service = this.owner.lookup('service:data');
+      let card = await service.getCard(card1Id, 'isolated');
+      let field = card.getField('body');
+
+      field.setNeededWhenEmbedded(false);
+      assert.equal(card.isDirty, false, 'the dirtiness is correct');
+      assert.equal(field.neededWhenEmbedded, false);
+      let fieldResource = card.json.included.find(i => `${i.type}/${i.id}` === 'fields/body');
+      assert.equal(fieldResource.attributes['needed-when-embedded'], false);
+    });
+
+    test("it can move the position of a field for an isolated card to the beginning", async function (assert) {
+      let service = this.owner.lookup('service:data');
+      let card = await service.getCard(card1Id, 'isolated');
+      assert.equal(card.isDirty, false, 'the dirtiness is correct for a modified card');
+      card.moveField(card.getField('author'), 0);
+
+      assert.equal(card.isDirty, true, 'the dirtiness is correct for a modified card');
+      assert.deepEqual(card.fields.map(i => i.name), [ 'author', 'title', 'body' ]);
+      assert.deepEqual(card.json.data.relationships.fields.data, [
+        { type: 'fields', id: 'author' },
+        { type: 'fields', id: 'title' },
+        { type: 'fields', id: 'body' }
+      ]);
+      await card.save();
+
+      assert.equal(card.isDirty, false, 'the dirtiness is correct for a modified card');
+      assert.deepEqual(card.fields.map(i => i.name), [ 'author', 'title', 'body' ]);
+      assert.deepEqual(card.json.data.relationships.fields.data, [
+        { type: 'fields', id: 'author' },
+        { type: 'fields', id: 'title' },
+        { type: 'fields', id: 'body' }
+      ]);
+    });
+
+    test("it can move the position of a field for an isolated card to the end", async function (assert) {
+      let service = this.owner.lookup('service:data');
+      let card = await service.getCard(card1Id, 'isolated');
+      assert.equal(card.isDirty, false, 'the dirtiness is correct for a modified card');
+      card.moveField(card.getField('title'), 2);
+
+      assert.equal(card.isDirty, true, 'the dirtiness is correct for a modified card');
+      assert.deepEqual(card.fields.map(i => i.name), [ 'body', 'author', 'title' ]);
+      assert.deepEqual(card.json.data.relationships.fields.data, [
+        { type: 'fields', id: 'body' },
+        { type: 'fields', id: 'author' },
+        { type: 'fields', id: 'title' }
+      ]);
+      await card.save();
+
+      assert.equal(card.isDirty, false, 'the dirtiness is correct for a modified card');
+      assert.deepEqual(card.fields.map(i => i.name), [ 'body', 'author', 'title' ]);
+      assert.deepEqual(card.json.data.relationships.fields.data, [
+        { type: 'fields', id: 'body' },
+        { type: 'fields', id: 'author' },
+        { type: 'fields', id: 'title' }
+      ]);
+    });
+
+    test("it can move the position of a field for an isolated card to somewhere in the middle", async function (assert) {
+      let service = this.owner.lookup('service:data');
+      let card = await service.getCard(card1Id, 'isolated');
+      assert.equal(card.isDirty, false, 'the dirtiness is correct for a modified card');
+      card.moveField(card.getField('title'), 1);
+
+      assert.equal(card.isDirty, true, 'the dirtiness is correct for a modified card');
+      assert.deepEqual(card.fields.map(i => i.name), [ 'body', 'title', 'author' ]);
+      assert.deepEqual(card.json.data.relationships.fields.data, [
+        { type: 'fields', id: 'body' },
+        { type: 'fields', id: 'title' },
+        { type: 'fields', id: 'author' }
+      ]);
+      await card.save();
+
+      assert.equal(card.isDirty, false, 'the dirtiness is correct for a modified card');
+      assert.deepEqual(card.fields.map(i => i.name), [ 'body', 'title', 'author' ]);
+      assert.deepEqual(card.json.data.relationships.fields.data, [
+        { type: 'fields', id: 'body' },
+        { type: 'fields', id: 'title' },
+        { type: 'fields', id: 'author' }
+      ]);
+    });
+
+    test("it can move the position of a field to where it already exists", async function (assert) {
+      let service = this.owner.lookup('service:data');
+      let card = await service.getCard(card1Id, 'isolated');
+      assert.equal(card.isDirty, false, 'the dirtiness is correct for a modified card');
+      card.moveField(card.getField('title'), 0);
+
+      assert.equal(card.isDirty, false, 'the dirtiness is correct for a modified card');
+      assert.deepEqual(card.fields.map(i => i.name), [ 'title', 'body', 'author' ]);
+      assert.deepEqual(card.json.data.relationships.fields.data, [
+        { type: 'fields', id: 'title' },
+        { type: 'fields', id: 'body' },
+        { type: 'fields', id: 'author' }
+      ]);
+    });
+
+    test("it throws when field specified by moveField is not an instance of Field", async function(assert) {
+      let service = this.owner.lookup('service:data');
+      let card = await service.getCard(card1Id, 'isolated');
+      assert.throws(() => card.moveField('title', 0), /not an instance of the Field class/);
+    });
+
+    test("it throws when field specified by moveField is a field of a different card", async function(assert) {
+      let service = this.owner.lookup('service:data');
+      let differentCard = await service.getCard(card2Id, 'isolated');
+      let card = await service.getCard(card1Id, 'isolated');
+      assert.throws(() => card.moveField(differentCard.getField('name'), 0) , /is not a field of the card/);
+    });
+
+    test("it throws when the new position specified in moveField is larger than last position (positions are 0-based)", async function(assert) {
+      let service = this.owner.lookup('service:data');
+      let card = await service.getCard(card1Id, 'isolated');
+      assert.throws(() => card.moveField(card.getField('title'), 3) , /beyond the bounds of the field positions for this card/);
     });
 
     test("it throws an error if you try to add a new field to an embedded card", async function (assert) {
       let service = this.owner.lookup('service:data');
       let card = await service.getCard(card1Id, 'embedded');
-      assert.throws(() => card.addField({ name: 'name', type: '@cardstack/core-types::string' }), 'card is in the embedded format');
+      assert.throws(() => card.addField({ name: 'name', type: '@cardstack/core-types::string' }), /card is in the embedded format/);
     });
 
     test("it throws an error if you try to add a remove a field to an embedded card", async function (assert) {
       let service = this.owner.lookup('service:data');
       let card = await service.getCard(card1Id, 'embedded');
       let field = card.getField('title');
-      assert.throws(() => field.remove(), 'card is in the embedded format');
+      assert.throws(() => field.remove(), /card is in the embedded format/);
     });
 
-    skip("it throws an error if you try to add a move a field to an embedded card", async function (assert) {
+    test("it throws an error if you try to add a move a field to an embedded card", async function (assert) {
       let service = this.owner.lookup('service:data');
       let card = await service.getCard(card1Id, 'embedded');
       let field = card.getField('author');
-      assert.throws(() => card.moveField(field, 0), 'card is in the embedded format');
+      assert.throws(() => card.moveField(field, 0), /card is in the embedded format/);
+    });
+
+    test("it throws an error if you try to setNeededWhenEmbedded on an embedded card", async function (assert) {
+      let service = this.owner.lookup('service:data');
+      let card = await service.getCard(card1Id, 'embedded');
+      let field = card.getField('author');
+      assert.throws(() => field.setNeededWhenEmbedded(false), /card is in the embedded format/);
     });
   });
 
@@ -995,7 +1214,7 @@ module("Unit | Service | data", function () {
 
       assert.equal(card.isDestroyed, true, 'card destroyed state is correct');
       assert.equal(fields.every(i => i.isDestroyed), true, 'fields destroyed state is correct');
-      await assert.rejects(service.getCard(card1Id, 'isolated'), 'Not Found:');
+      await assert.rejects(service.getCard(card1Id, 'isolated'), /Not Found/);
     });
 
     test('throws when you call addField from deleted Card instance', async function (assert) {
@@ -1003,7 +1222,7 @@ module("Unit | Service | data", function () {
       let card = await service.getCard(card1Id, 'isolated');
       await card.delete();
 
-      assert.throws(() => card.addField(nameField), 'destroyed card');
+      assert.throws(() => card.addField(nameField), /destroyed card/);
     });
 
     test('throws when you call fields from deleted Card instance', async function (assert) {
@@ -1019,7 +1238,7 @@ module("Unit | Service | data", function () {
       let card = await service.getCard(card1Id, 'isolated');
       await card.delete();
 
-      assert.throws(() => card.format, 'destroyed card');
+      assert.throws(() => card.format, /destroyed card/);
     });
 
     test('throws when you call isNew from deleted Card instance', async function (assert) {
@@ -1027,7 +1246,7 @@ module("Unit | Service | data", function () {
       let card = await service.getCard(card1Id, 'isolated');
       await card.delete();
 
-      assert.throws(() => card.isNew, 'destroyed card');
+      assert.throws(() => card.isNew, /destroyed card/);
     });
 
     test('throws when you call isDirty from deleted Card instance', async function (assert) {
@@ -1035,7 +1254,7 @@ module("Unit | Service | data", function () {
       let card = await service.getCard(card1Id, 'isolated');
       await card.delete();
 
-      assert.throws(() => card.isDirty, 'destroyed card');
+      assert.throws(() => card.isDirty, /destroyed card/);
     });
 
     test('throws when you call isLoaded from deleted Card instance', async function (assert) {
@@ -1043,7 +1262,7 @@ module("Unit | Service | data", function () {
       let card = await service.getCard(card1Id, 'isolated');
       await card.delete();
 
-      assert.throws(() => card.isLoaded, 'destroyed card');
+      assert.throws(() => card.isLoaded, /destroyed card/);
     });
 
     test('throws when you call getField from deleted Card instance', async function (assert) {
@@ -1051,10 +1270,7 @@ module("Unit | Service | data", function () {
       let card = await service.getCard(card1Id, 'isolated');
       await card.delete();
 
-      assert.throws(() => card.getField('title'), 'destroyed card');
-    });
-
-    skip('throws when you call moveField from deleted Card instance', async function (/*assert*/) {
+      assert.throws(() => card.getField('title'), /destroyed card/);
     });
 
     test('throws when you call save from deleted Card instance', async function (assert) {
@@ -1062,7 +1278,7 @@ module("Unit | Service | data", function () {
       let card = await service.getCard(card1Id, 'isolated');
       await card.delete();
 
-      await assert.rejects(card.save(), 'destroyed card');
+      await assert.rejects(card.save(), /destroyed card/);
     });
 
     test('throws when you call load from deleted Card instance', async function (assert) {
@@ -1070,7 +1286,7 @@ module("Unit | Service | data", function () {
       let card = await service.getCard(card1Id, 'isolated');
       await card.delete();
 
-      await assert.rejects(card.load('embedded'), 'destroyed card');
+      await assert.rejects(card.load('embedded'), /destroyed card/);
     });
 
     test('throws when you call delete from deleted Card instance', async function (assert) {
@@ -1078,7 +1294,7 @@ module("Unit | Service | data", function () {
       let card = await service.getCard(card1Id, 'isolated');
       await card.delete();
 
-      await assert.rejects(card.delete(), 'destroyed card');
+      await assert.rejects(card.delete(), /destroyed card/);
     });
 
     test('throws when you get json from deleted Card instance', async function (assert) {
@@ -1086,7 +1302,7 @@ module("Unit | Service | data", function () {
       let card = await service.getCard(card1Id, 'isolated');
       await card.delete();
 
-      assert.throws(() => card.json, 'destroyed card');
+      assert.throws(() => card.json, /destroyed card/);
     });
 
     test('throws when you get the card from deleted Field instance', async function (assert) {
@@ -1095,7 +1311,7 @@ module("Unit | Service | data", function () {
       let field = card.getField('title');
       await card.delete();
 
-      assert.throws(() => field.card, 'destroyed field');
+      assert.throws(() => field.card, /destroyed field/);
     });
 
     test('throws when you get the name from deleted Field instance', async function (assert) {
@@ -1104,7 +1320,7 @@ module("Unit | Service | data", function () {
       let field = card.getField('title');
       await card.delete();
 
-      assert.throws(() => field.name, 'destroyed field');
+      assert.throws(() => field.name, /destroyed field/);
     });
 
     test('throws when you get the neededWhenEmbedded value from deleted Field instance', async function (assert) {
@@ -1113,7 +1329,7 @@ module("Unit | Service | data", function () {
       let field = card.getField('title');
       await card.delete();
 
-      assert.throws(() => field.neededWhenEmbedded, 'destroyed field');
+      assert.throws(() => field.neededWhenEmbedded, /destroyed field/);
     });
 
     test('throws when you get the value from deleted Field instance', async function (assert) {
@@ -1122,7 +1338,7 @@ module("Unit | Service | data", function () {
       let field = card.getField('title');
       await card.delete();
 
-      assert.throws(() => field.value, 'destroyed field');
+      assert.throws(() => field.value, /destroyed field/);
     });
 
     test('throws when you get the json from deleted Field instance', async function (assert) {
@@ -1131,7 +1347,7 @@ module("Unit | Service | data", function () {
       let field = card.getField('title');
       await card.delete();
 
-      assert.throws(() => field.json, 'destroyed field');
+      assert.throws(() => field.json, /destroyed field/);
     });
 
     test('throws when you set the value from deleted Field instance', async function (assert) {
@@ -1140,7 +1356,7 @@ module("Unit | Service | data", function () {
       let field = card.getField('title');
       await card.delete();
 
-      assert.throws(() => field.setValue('update'), 'destroyed field');
+      assert.throws(() => field.setValue('update'), /destroyed field/);
     });
 
     test('throws when you call remove from deleted Field instance', async function (assert) {
@@ -1149,10 +1365,25 @@ module("Unit | Service | data", function () {
       let field = card.getField('title');
       await card.delete();
 
-      assert.throws(() => field.remove(), 'destroyed field');
+      assert.throws(() => field.remove(), /destroyed field/);
     });
 
-    skip('throws when you call setNeededWhenEmbedded from deleted Field instance', async function (/*assert*/) {
+    test('throws when you call setNeededWhenEmbedded from deleted Field instance', async function (assert) {
+      let service = this.owner.lookup('service:data');
+      let card = await service.getCard(card1Id, 'isolated');
+      let field = card.getField('title');
+      await card.delete();
+
+      assert.throws(() => field.setNeededWhenEmbedded(false), /destroyed field/);
+    });
+
+    test('throws when you call moveField from deleted Card instance', async function (assert) {
+      let service = this.owner.lookup('service:data');
+      let card = await service.getCard(card1Id, 'isolated');
+      let field = card.getField('title');
+      await card.delete();
+
+      assert.throws(() => card.moveField(field, 2), /destroyed card/);
     });
   });
 });
