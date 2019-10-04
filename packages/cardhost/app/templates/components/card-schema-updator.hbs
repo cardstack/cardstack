@@ -7,6 +7,8 @@
 <CardRenderer
   @card={{this.card}}
   @removeField={{action this.removeField}}
+  @setNeededWhenEmbedded={{action this.setNeededWhenEmbedded}}
+  @setPosition={{action this.setPosition}}
 >
   <div class="card-schema--field-btn-wrapper">
     {{#unless this.cardstackSession.isAuthenticated}}
@@ -24,6 +26,7 @@
   </div>
 
   <FieldCreator
+    @numFields={{this.card.fields}}
     @fieldTypeMappings={{this.fieldTypeMappings}}
     @addField={{action this.addField}}
   />

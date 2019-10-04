@@ -62,4 +62,95 @@ module('Acceptance | card schema', function(hooks) {
     let card = JSON.parse(find('.code-block').textContent);
     assert.equal(card.data.attributes.body, undefined);
   });
+
+  test(`move a field's position`, async function (assert) {
+    await login();
+    await createCards({
+      [card1Id]: [
+        ['title', 'string', false, 'test title'],
+        ['author', 'string', false, 'test author'],
+        ['body', 'string', false, 'test body'],
+      ]
+    });
+    await visit(`/cards/${card1Id}/schema`);
+
+    assert.deepEqual([...document.querySelectorAll('[data-test-card-renderer-field]')].map(i => i.getAttribute('data-test-card-renderer-field')),
+      ['title', 'author', 'body']);
+
+    await click('[data-test-card-renderer-field="title"] [data-test-card-renderer-move-down-btn');
+    assert.deepEqual([...document.querySelectorAll('[data-test-card-renderer-field]')].map(i => i.getAttribute('data-test-card-renderer-field')),
+      ['author', 'title', 'body']);
+
+    await click('[data-test-card-renderer-field="title"] [data-test-card-renderer-move-down-btn');
+    assert.deepEqual([...document.querySelectorAll('[data-test-card-renderer-field]')].map(i => i.getAttribute('data-test-card-renderer-field')),
+      ['author', 'body', 'title']);
+
+    await click('[data-test-card-renderer-field="body"] [data-test-card-renderer-move-up-btn');
+    assert.deepEqual([...document.querySelectorAll('[data-test-card-renderer-field]')].map(i => i.getAttribute('data-test-card-renderer-field')),
+      ['body', 'author', 'title']);
+
+    await click('[data-test-card-schema-save-btn]');
+    await waitFor(`[data-test-card-view="${card1Id}"]`);
+
+    assert.deepEqual([...document.querySelectorAll('[data-test-card-renderer-field]')].map(i => i.getAttribute('data-test-card-renderer-field')),
+      ['body', 'author', 'title']);
+    let card = JSON.parse(find('.code-block').textContent);
+    assert.deepEqual(card.data.relationships.fields.data, [
+      { type: 'fields', id: 'body' },
+      { type: 'fields', id: 'author' },
+      { type: 'fields', id: 'title' },
+    ]);
+  });
+
+  test(`change a field's needed-when-embedded value to true`, async function (assert) {
+    await login();
+    await createCards({
+      [card1Id]: [
+        ['title', 'string', false, 'test title'],
+      ]
+    });
+    await visit(`/cards/${card1Id}/schema`);
+
+    assert.dom('#edit_title_embedded').isNotChecked();
+
+    await click('#edit_title_embedded');
+    assert.dom('#edit_title_embedded').isChecked();
+    let card = JSON.parse(find('.code-block').textContent);
+    let field = card.included.find(i => `${i.type}/${i.id}` === 'fields/title');
+    assert.equal(field.attributes['needed-when-embedded'], true);
+
+    await click('[data-test-card-schema-save-btn]');
+    await waitFor(`[data-test-card-view="${card1Id}"]`);
+
+    assert.dom('[data-test-card-renderer-field="title"] [data-test-card-renderer-embedded]').hasText('true');
+    card = JSON.parse(find('.code-block').textContent);
+    field = card.included.find(i => `${i.type}/${i.id}` === 'fields/title');
+    assert.equal(field.attributes['needed-when-embedded'], true);
+  });
+
+  test(`change a field's needed-when-embedded value to false`, async function (assert) {
+    await login();
+    await createCards({
+      [card1Id]: [
+        ['title', 'string', true, 'test title'],
+      ]
+    });
+    await visit(`/cards/${card1Id}/schema`);
+
+    assert.dom('#edit_title_embedded').isChecked();
+
+    await click('#edit_title_embedded');
+    assert.dom('#edit_title_embedded').isNotChecked();
+    let card = JSON.parse(find('.code-block').textContent);
+    let field = card.included.find(i => `${i.type}/${i.id}` === 'fields/title');
+    assert.equal(field.attributes['needed-when-embedded'], false);
+
+    await click('[data-test-card-schema-save-btn]');
+    await waitFor(`[data-test-card-view="${card1Id}"]`);
+
+    assert.dom('[data-test-card-renderer-field="title"] [data-test-card-renderer-embedded]').hasText('false');
+    card = JSON.parse(find('.code-block').textContent);
+    field = card.included.find(i => `${i.type}/${i.id}` === 'fields/title');
+    assert.equal(field.attributes['needed-when-embedded'], false);
+  });
 });

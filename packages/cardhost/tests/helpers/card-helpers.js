@@ -25,7 +25,7 @@ export async function createCards(args) {
   }
 }
 
-export async function addField(name, type, isEmbedded) {
+export async function addField(name, type, isEmbedded, position) {
   let typeEl = find('#new_field_type');
   typeEl.value = type;
   await triggerEvent(typeEl, 'input');
@@ -34,6 +34,10 @@ export async function addField(name, type, isEmbedded) {
 
   if (isEmbedded) {
     await click('#new_field_embedded');
+  }
+
+  if (position != null) {
+    await fillIn('#new_field_pos', position);
   }
 
   await click('[data-test-field-creator-add-field-btn]');
