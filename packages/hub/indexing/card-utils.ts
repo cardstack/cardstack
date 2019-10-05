@@ -499,7 +499,10 @@ async function adaptCardToFormat(schema: todo, session: Session, cardModel: Sing
         let includedResources: ResourceObject[] = [];
         if (Array.isArray(fieldRelValue)) {
           let relRefs = (fieldRelValue as ResourceIdentifierObject[]).map((i: ResourceIdentifierObject) => `${i.type}/${i.id}`);
-          includedResources = cardModel.included ? cardModel.included.filter(i => relRefs.includes(`${i.type}/${i.id}`)) : [];
+          includedResources = cardModel.included ?
+            cardModel.included.filter(i =>
+              (isCard(i.type, i.id) ? relRefs.includes(`cards/${i.id}`) : relRefs.includes(`${i.type}/${i.id}`))
+            ) : [];
         } else {
           let includedResource = cardModel.included && cardModel.included.find(i =>
             fieldRelValue != null &&
@@ -515,8 +518,8 @@ async function adaptCardToFormat(schema: todo, session: Session, cardModel: Sing
           if (!isCard(resource.type, resource.id)) {
             resolvedIncluded.push(resource);
           } else {
-            let { data: cardResource } = await cardServices.get(session, resource.id, 'embedded');
-            resolvedIncluded.push(cardResource);
+            let { data: cardResource, included=[] } = await cardServices.get(session, resource.id, 'embedded');
+            resolvedIncluded.push(cardResource, ...included.filter((i: ResourceObject) => i.type === 'cards'));
           }
         }
 

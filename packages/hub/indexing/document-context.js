@@ -399,6 +399,8 @@ module.exports = class DocumentContext {
     let cardResource;
     let docId = get(this, 'upstreamDoc.data.id');
     let docType = get(this, 'upstreamDoc.data.type');
+    this._references.push(`${id}/${id}`);
+
     if (isCard(docId, docType) && docId === id) {
       return this.upstreamDoc;
     } else if (this.upstreamDoc &&

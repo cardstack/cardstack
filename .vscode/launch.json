@@ -156,7 +156,7 @@
         "--timeout",
         "200000",
         //  "--grep",
-        //  "card tests"
+        //  "hub/card-services"
       ]
     },
     {
