@@ -20,6 +20,9 @@ const userCard = require('./internal-cards/user-card');
 
 const foreignModelType = require('./external-cards/foreign-model-type');
 const foreignModelId = require('./external-cards/foreign-model-id');
+const user1Card = require('./external-cards/user1-card');
+const user2Card = require('./external-cards/user2-card');
+const doorsArticleCard = require('./external-cards/article-card');
 
 const cardsDir = join(tmpdir(), 'card_modules');
 
@@ -683,6 +686,46 @@ describe('hub/card-services', function () {
       expect(data.attributes['embedded-template']).to.match(/<h3>\{\{this\.title\}\}<\/h3>/);
       expect(data.attributes['embedded-js']).to.match(/ArticleEmbeddedComponent/);
       expect(data.attributes['embedded-css']).to.match(/\.article-card-embedded \{\}/);
+    });
+  });
+
+  describe('card nesting', function () {
+    beforeEach(async function () {
+      cleanup();
+      let factory = new JSONAPIFactory();
+      env = await createDefaultEnvironment(`${__dirname}/../../../tests/stub-card-project`, factory.getModels());
+      cardServices = env.lookup('hub:card-services');
+    });
+
+    it(`can fashion relationship to card that didn't originally exist at the time the card was created`, async function() {
+      let user1 = await cardServices.create(env.session, user1Card);
+      let model = user1.included.find(({ type, id}) => `${type}/${id}` === `${user1.data.id}/${user1.data.id}`);
+      expect(user1.data.relationships.friends.data).to.eql([]);
+      expect(model.relationships.friends.data).to.eql([]);
+
+      await cardServices.create(env.session, user2Card);
+      user1 = await cardServices.get(env.session, user1Card.data.id, 'isolated');
+      model = user1.included.find(({ type, id}) => `${type}/${id}` === `${user1Card.data.id}/${user1Card.data.id}`);
+      expect(user1.data.relationships.friends.data).to.eql([{ type: 'cards', id: user2Card.data.id }]);
+      expect(model.relationships.friends.data).to.eql([{ type: 'cards', id: user2Card.data.id }]);
+    });
+
+    it(`can include embedded cards that are embedded relationships of a directly related embedded card`, async function() {
+      let user1 = await cardServices.create(env.session, user1Card);
+      let user2 = await cardServices.create(env.session, user2Card);
+      let article = await cardServices.create(env.session, doorsArticleCard);
+
+      let includedRefs = article.included.map(({ type, id }) => `${type}/${id}`);
+      expect(includedRefs).to.include(`cards/${user1.data.id}`);
+      expect(includedRefs).to.include(`cards/${user2.data.id}`);
+
+      let user1Resource = article.included.find(({ type, id}) => `${type}/${id}` === `cards/${user1.data.id}`);
+      let user2Resource = article.included.find(({ type, id}) => `${type}/${id}` === `cards/${user2.data.id}`);
+
+      expect(user1Resource.attributes.name).to.equal('Van Gogh');
+      expect(user1Resource.attributes.email).to.be.undefined;
+      expect(user2Resource.attributes.name).to.equal('Hassan');
+      expect(user2Resource.attributes.email).to.be.undefined;
     });
   });
 
