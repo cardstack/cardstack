@@ -3,13 +3,13 @@ import { ciSessionId } from '@cardstack/test-support/environment'
 import { get } from 'lodash';
 
 export function cleanupDefaulValueArtifacts(document) {
-  if (!Object.keys(document.data.attributes).length) {
+  if (!Object.keys(get(document, 'data.attributes') || {}).length) {
     delete document.data.attributes;
   }
-  if (!Object.keys(document.data.relationships).length) {
+  if (!Object.keys(get(document, 'data.relationships') || {}).length) {
     delete document.data.relationships;
   }
-  for (let field of Object.keys(document.data.attributes || {})) {
+  for (let field of Object.keys(get(document, 'data.attributes') || {})) {
     if (document.data.attributes && document.data.attributes[field] == null) {
       delete document.data.attributes[field];
     }

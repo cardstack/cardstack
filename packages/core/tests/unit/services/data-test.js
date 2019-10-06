@@ -19,15 +19,6 @@ const titleField = {
     'field-type': '@cardstack/core-types::string'
   },
 };
-const bodyField = {
-  type: 'fields',
-  id: 'body',
-  attributes: {
-    'is-metadata': true,
-    'needed-when-embedded': false,
-    'field-type': '@cardstack/core-types::string'
-  },
-};
 const nameField = {
   type: 'fields',
   id: 'name',
@@ -89,140 +80,38 @@ const scenario = new Fixtures({
   }
 });
 
-function assertCardIsIsolated(assert, card) {
-  assert.equal(card.format, 'isolated', 'the card format is correct');
+function assertCardHasIsolatedFields(assert, card) {
+  assert.equal(card.loadedFormat, 'isolated', 'the card format is correct');
+  let fields = card.isolatedFields;
+  assert.equal(fields.length, 3);
+  assert.equal(fields[0].name, 'title');
+  assert.equal(fields[0].value, 'test title');
+  assert.equal(fields[0].type, '@cardstack/core-types::string');
+  assert.equal(fields[0].neededWhenEmbedded, true);
 
-  let cardDoc = cleanupDefaulValueArtifacts(card.json);
-  assert.ok(cardDoc.data.meta.version);
-  delete cardDoc.data.meta;
+  assert.equal(fields[1].name, 'body');
+  assert.equal(fields[1].value, 'test body');
+  assert.equal(fields[1].type, '@cardstack/core-types::string');
+  assert.equal(fields[1].neededWhenEmbedded, false);
 
-  assert.deepEqual(cardDoc, {
-    data: {
-      id: card1Id,
-      type: 'cards',
-      attributes: {
-        title: 'test title',
-        body: 'test body',
-        'metadata-field-types': {
-          author: "@cardstack/core-types::belongs-to",
-          body: "@cardstack/core-types::string",
-          title: "@cardstack/core-types::string"
-        },
-      },
-      relationships: {
-        fields: {
-          data: [
-            { type: 'fields', id: 'title' },
-            { type: 'fields', id: 'body' },
-            { type: 'fields', id: 'author' }
-          ],
-        },
-        model: {
-          data: { type: card1Id, id: card1Id }
-        },
-        author: {
-          data: { type: 'cards', id: card2Id }
-        }
-      }
-    },
-    included: [
-      {
-        type: card1Id,
-        id: card1Id,
-        attributes: {
-          title: 'test title',
-          body: 'test body'
-        },
-        relationships: {
-          author: {
-            data: { type: 'cards', id: card2Id }
-          }
-        }
-      },
-      titleField,
-      bodyField,
-      authorField,
-      {
-        type: 'cards',
-        id: card2Id,
-        attributes: {
-          name: 'Van Gogh',
-          'metadata-field-types': {
-            name: "@cardstack/core-types::string",
-          },
-        },
-        relationships: {
-          fields: {
-            data: [
-              { type: 'fields', id: 'name' },
-              { type: 'fields', id: 'email' },
-            ],
-          },
-          model: {
-            data: { type: card2Id, id: card2Id }
-          }
-        }
-      }
-    ]
-  }, 'the card JSON is correct');
+  assert.equal(fields[2].name, 'author');
+  assert.equal(fields[2].value.id, card2Id);
+  assert.equal(fields[2].type, '@cardstack/core-types::belongs-to');
+  assert.equal(fields[2].neededWhenEmbedded, true);
 }
 
-function assertCardIsEmbedded(assert, card) {
-  assert.equal(card.format, 'embedded', 'the card format is correct');
+function assertCardHasEmbeddedFields(assert, card) {
+  let fields = card.embeddedFields;
+  assert.equal(fields.length, 2);
+  assert.equal(fields[0].name, 'title');
+  assert.equal(fields[0].value, 'test title');
+  assert.equal(fields[0].type, '@cardstack/core-types::string');
+  assert.equal(fields[0].neededWhenEmbedded, true);
 
-  let cardDoc = cleanupDefaulValueArtifacts(card.json);
-  assert.ok(cardDoc.data.meta.version);
-  delete cardDoc.data.meta;
-  assert.deepEqual(cardDoc, {
-    data: {
-      id: card1Id,
-      type: 'cards',
-      attributes: {
-        title: 'test title',
-        'metadata-field-types': {
-          author: "@cardstack/core-types::belongs-to",
-          title: "@cardstack/core-types::string"
-        },
-      },
-      relationships: {
-        fields: {
-          data: [
-            { type: 'fields', id: 'title' },
-            { type: 'fields', id: 'author' }
-          ],
-        },
-        model: {
-          data: { type: card1Id, id: card1Id }
-        },
-        author: {
-          data: { type: 'cards', id: card2Id }
-        }
-      }
-    },
-    included: [
-      {
-        type: 'cards',
-        id: card2Id,
-        attributes: {
-          name: 'Van Gogh',
-          'metadata-field-types': {
-            name: "@cardstack/core-types::string",
-          },
-        },
-        relationships: {
-          fields: {
-            data: [
-              { type: 'fields', id: 'name' },
-              { type: 'fields', id: 'email' },
-            ],
-          },
-          model: {
-            data: { type: card2Id, id: card2Id }
-          }
-        }
-      }
-    ]
-  }, 'the card JSON is correct');
+  assert.equal(fields[1].name, 'author');
+  assert.equal(fields[1].value.id, card2Id);
+  assert.equal(fields[1].type, '@cardstack/core-types::belongs-to');
+  assert.equal(fields[1].neededWhenEmbedded, true);
 }
 
 module("Unit | Service | data", function () {
@@ -255,9 +144,8 @@ module("Unit | Service | data", function () {
           { type: card1Id, id: card1Id }
         ]
       }, 'the card JSON is correct for a new card');
-      assert.equal(card.format, 'isolated', 'the card format is correct for new card');
       assert.equal(card.isDirty, true, 'the dirtiness is correct for a new card');
-      assert.equal(card.isLoaded, false, 'the loaded state is correct for a new card');
+      assert.equal(card.loadedFormat, 'isolated', 'the loaded state is correct for a new card');
       assert.equal(card.isNew, true, 'the isNew state is correct for a new card');
     });
 
@@ -624,10 +512,10 @@ module("Unit | Service | data", function () {
       assert.equal(article.getField('title').value, 'test title');
       assert.equal(article.getField('body').value, 'test body');
 
-      assertCardIsIsolated(assert, article);
+      assertCardHasIsolatedFields(assert, article);
       assert.equal(article.isDirty, false, 'the dirtiness is correct for a saved card');
       assert.equal(article.isNew, false, 'the newness state is correct for a saved card');
-      assert.equal(article.isLoaded, true, 'the loaded state is correct for a saved card');
+      assert.equal(article.loadedFormat, 'isolated', 'the loaded state is correct for a saved card');
     });
   });
 
@@ -662,10 +550,11 @@ module("Unit | Service | data", function () {
       let service = this.owner.lookup('service:data');
       let card = await service.getCard(card1Id, 'isolated');
 
-      assertCardIsIsolated(assert, card);
+      assertCardHasIsolatedFields(assert, card);
+      assert.deepEqual(card.fields.map(i => i.name), [ 'title', 'body', 'author' ]);
       assert.equal(card.isDirty, false, 'the dirtiness is correct for a saved card');
       assert.equal(card.isNew, false, 'the newness state is correct for a saved card');
-      assert.equal(card.isLoaded, true, 'the loaded state is correct for a saved card');
+      assert.equal(card.loadedFormat, 'isolated', 'the loaded state is correct for a saved card');
     });
 
     test("it can load field values of included embedded cards synchronously", async function (assert) {
@@ -680,10 +569,11 @@ module("Unit | Service | data", function () {
       let service = this.owner.lookup('service:data');
       let card = await service.getCard(card1Id, 'embedded');
 
-      assertCardIsEmbedded(assert, card);
+      assertCardHasEmbeddedFields(assert, card);
+      assert.deepEqual(card.fields.map(i => i.name), [ 'title', 'author' ]);
       assert.equal(card.isDirty, false, 'the dirtiness is correct for a saved card');
       assert.equal(card.isNew, false, 'the newness state is correct for a saved card');
-      assert.equal(card.isLoaded, true, 'the loaded state is correct for a saved card');
+      assert.equal(card.loadedFormat, 'embedded', 'the loaded state is correct for a saved card');
     });
 
     test("it can load the isolated format of an embedded card", async function (assert) {
@@ -691,21 +581,75 @@ module("Unit | Service | data", function () {
       let card = await service.getCard(card1Id, 'embedded');
       await card.load('isolated');
 
-      assertCardIsIsolated(assert, card);
+      assertCardHasIsolatedFields(assert, card);
+      assert.deepEqual(card.fields.map(i => i.name), [ 'title', 'body', 'author' ]);
       assert.equal(card.isDirty, false, 'the dirtiness is correct for a saved card');
       assert.equal(card.isNew, false, 'the newness state is correct for a saved card');
-      assert.equal(card.isLoaded, true, 'the loaded state is correct for a saved card');
+      assert.equal(card.loadedFormat, 'isolated', 'the loaded state is correct for a saved card');
     });
 
-    test("it can load the embedded format of an isolated card", async function (assert) {
+    test("it can load the embedded format of an isolated card which does not alter the fields that have been loaded", async function (assert) {
       let service = this.owner.lookup('service:data');
       let card = await service.getCard(card1Id, 'isolated');
       await card.load('embedded');
 
-      assertCardIsEmbedded(assert, card);
+      assertCardHasEmbeddedFields(assert, card);
+      assert.deepEqual(card.fields.map(i => i.name), [ 'title', 'body', 'author' ]);
       assert.equal(card.isDirty, false, 'the dirtiness is correct for a saved card');
       assert.equal(card.isNew, false, 'the newness state is correct for a saved card');
-      assert.equal(card.isLoaded, true, 'the loaded state is correct for a saved card');
+      assert.equal(card.loadedFormat, 'isolated', 'the loaded state is correct for a saved card');
+    });
+
+    test("it returns the embedded fields of the card when the card has retrieved in the embedded format", async function(assert) {
+      let service = this.owner.lookup('service:data');
+      let card = await service.getCard(card1Id, 'embedded');
+
+      assert.deepEqual(card.embeddedFields.map(i => i.name), [ 'title', 'author' ]);
+    });
+
+    test("it returns the embedded fields of the card when the card has loaded the embedded format", async function(assert) {
+      let service = this.owner.lookup('service:data');
+      let card = await service.getCard(card1Id, 'embedded');
+      await card.load('embedded');
+
+      assert.deepEqual(card.embeddedFields.map(i => i.name), [ 'title', 'author' ]);
+    });
+
+    test("it returns the isolated fields of the card when the card has retreived in the isolated format", async function(assert) {
+      let service = this.owner.lookup('service:data');
+      let card = await service.getCard(card1Id, 'isolated');
+
+      assert.deepEqual(card.isolatedFields.map(i => i.name), [ 'title', 'body', 'author' ]);
+    });
+
+    test("it returns the isolated fields of the card when the card has loaded the isolated format", async function(assert) {
+      let service = this.owner.lookup('service:data');
+      let card = await service.getCard(card1Id, 'embedded');
+      await card.load('isolated');
+
+      assert.deepEqual(card.isolatedFields.map(i => i.name), [ 'title', 'body', 'author' ]);
+    });
+
+    test("it returns the embedded fields of the card when the card has been retrieved in the isolated format", async function(assert) {
+      let service = this.owner.lookup('service:data');
+      let card = await service.getCard(card1Id, 'isolated');
+
+      assert.deepEqual(card.embeddedFields.map(i => i.name), [ 'title', 'author' ]);
+    });
+
+    test("it returns the embedded fields of the card when the card has loaded the isolated format", async function(assert) {
+      let service = this.owner.lookup('service:data');
+      let card = await service.getCard(card1Id, 'embedded');
+      await card.load('isolated');
+
+      assert.deepEqual(card.embeddedFields.map(i => i.name), [ 'title', 'author' ]);
+    });
+
+    test("it throws an error when you try to get the isolated fields of the card when the card has only loaded the embedded format", async function(assert) {
+      let service = this.owner.lookup('service:data');
+      let card = await service.getCard(card1Id, 'embedded');
+
+      assert.throws(() => card.isolatedFields, /card has not loaded isolated format/);
     });
 
     test("it throws an error when you try to get a card in an unknown format", async function (assert) {
@@ -742,8 +686,7 @@ module("Unit | Service | data", function () {
 
       let card = await service.getCard(card2Id, 'embedded');
       assert.equal(card.id, card2Id, 'the card id is correct');
-      assert.equal(card.format, 'embedded', 'the card format is correct');
-      assert.equal(card.isLoaded, true, 'the card loaded state is correct');
+      assert.equal(card.loadedFormat, 'embedded', 'the card loaded state is correct');
       assert.equal(card.isNew, false, 'the card new state is correct');
       assert.equal(card.isDirty, false, 'the card dirty state is correct');
       assert.equal(card.getField('name').value, 'Van Gogh', 'the embedded card value is correct');
@@ -763,8 +706,7 @@ module("Unit | Service | data", function () {
 
       assert.equal(authorCard.constructor.name, 'Card', 'the card instance is the correct class');
       assert.equal(authorCard.id, card2Id, 'the card id is correct');
-      assert.equal(authorCard.format, 'embedded', 'the card format is correct');
-      assert.equal(authorCard.isLoaded, true, 'the card loaded state is correct');
+      assert.equal(authorCard.loadedFormat, 'embedded', 'the card loaded state is correct');
       assert.equal(authorCard.isNew, false, 'the card new state is correct');
       assert.equal(authorCard.isDirty, false, 'the card dirty state is correct');
     });
@@ -783,8 +725,7 @@ module("Unit | Service | data", function () {
       let [reviewerCard] = cards;
       assert.equal(reviewerCard.constructor.name, 'Card', 'the card instance is the correct class');
       assert.equal(reviewerCard.id, card2Id, 'the card id is correct');
-      assert.equal(reviewerCard.format, 'embedded', 'the card format is correct');
-      assert.equal(reviewerCard.isLoaded, true, 'the card loaded state is correct');
+      assert.equal(reviewerCard.loadedFormat, 'embedded', 'the card loaded state is correct');
       assert.equal(reviewerCard.isNew, false, 'the card new state is correct');
       assert.equal(reviewerCard.isDirty, false, 'the card dirty state is correct');
     });
@@ -825,18 +766,18 @@ module("Unit | Service | data", function () {
       assert.equal(card.getField('body'), undefined, 'the field does not exist when the card is in the embedded format');
     });
 
-    test("it updates the field availability when an embedded card loads in isolated format", async function (assert) {
+    test("it can return an isolated only field after loading an embedded card as an isolated card", async function (assert) {
       let service = this.owner.lookup('service:data');
       let card = await service.getCard(card1Id, 'embedded');
       await card.load('isolated');
       assert.equal(card.getField('body').value, 'test body', 'the field value is correct');
     });
 
-    test("it updates the field availability when an isolated card loads in an embedded format", async function (assert) {
+    test("it still returns isolated-only fields if a card loaded as an isolated card was requested to be loaded as an embedded card", async function (assert) {
       let service = this.owner.lookup('service:data');
-      let card = await service.getCard(card1Id, 'embedded');
+      let card = await service.getCard(card1Id, 'isolated');
       await card.load('embedded');
-      assert.equal(card.getField('body'), undefined, 'the field value is correct');
+      assert.equal(card.getField('body').value, 'test body', 'the field value is correct');
     });
 
     test("it returns undefined when you get a field that doesn't exist", async function (assert) {
@@ -985,19 +926,29 @@ module("Unit | Service | data", function () {
       card.getField('title').setValue('updated title');
       await card.save();
 
-      let cardDoc = cleanupDefaulValueArtifacts(card.json);
-      assert.equal(card.format, 'embedded');
-      assert.equal(card.getField('title').value, 'updated title');
-      assert.equal(cardDoc.data.attributes.title, 'updated title');
-      assert.equal(card.getField('body'), undefined);
-      assert.equal(cardDoc.data.attributes.body, undefined);
+      let fields = card.embeddedFields;
+      assert.equal(fields.length, 2);
+      assert.equal(fields[0].name, 'title');
+      assert.equal(fields[0].value, 'updated title');
+      assert.equal(fields[1].name, 'author');
+      assert.equal(fields[1].value.id, card2Id);
 
       await card.load('isolated');
-      cardDoc = cleanupDefaulValueArtifacts(card.json);
-      assert.equal(card.getField('title').value, 'updated title');
-      assert.equal(cardDoc.data.attributes.title, 'updated title');
-      assert.equal(card.getField('body').value, 'test body');
-      assert.equal(cardDoc.data.attributes.body, 'test body');
+      fields = card.embeddedFields;
+      assert.equal(fields.length, 2);
+      assert.equal(fields[0].name, 'title');
+      assert.equal(fields[0].value, 'updated title');
+      assert.equal(fields[1].name, 'author');
+      assert.equal(fields[1].value.id, card2Id);
+
+      fields = card.isolatedFields;
+      assert.equal(fields.length, 3);
+      assert.equal(fields[0].name, 'title');
+      assert.equal(fields[0].value, 'updated title');
+      assert.equal(fields[1].name, 'author');
+      assert.equal(fields[1].value.id, card2Id);
+      assert.equal(fields[2].name, 'body');
+      assert.equal(fields[2].value, 'test body');
     });
 
     test("it can change a needed-when-embedded field to be an isolated-only field", async function (assert) {
@@ -1233,12 +1184,20 @@ module("Unit | Service | data", function () {
       assert.throws(() => card.fields, 'destroyed card');
     });
 
-    test('throws when you call format from deleted Card instance', async function (assert) {
+    test('throws when you call isolatedFields from deleted Card instance', async function (assert) {
       let service = this.owner.lookup('service:data');
       let card = await service.getCard(card1Id, 'isolated');
       await card.delete();
 
-      assert.throws(() => card.format, /destroyed card/);
+      assert.throws(() => card.isolatedFields, 'destroyed card');
+    });
+
+    test('throws when you call embeddedFields from deleted Card instance', async function (assert) {
+      let service = this.owner.lookup('service:data');
+      let card = await service.getCard(card1Id, 'isolated');
+      await card.delete();
+
+      assert.throws(() => card.embeddedFields, 'destroyed card');
     });
 
     test('throws when you call isNew from deleted Card instance', async function (assert) {
@@ -1257,12 +1216,12 @@ module("Unit | Service | data", function () {
       assert.throws(() => card.isDirty, /destroyed card/);
     });
 
-    test('throws when you call isLoaded from deleted Card instance', async function (assert) {
+    test('throws when you call loadedFormat from deleted Card instance', async function (assert) {
       let service = this.owner.lookup('service:data');
       let card = await service.getCard(card1Id, 'isolated');
       await card.delete();
 
-      assert.throws(() => card.isLoaded, /destroyed card/);
+      assert.throws(() => card.loadedFormat, /destroyed card/);
     });
 
     test('throws when you call getField from deleted Card instance', async function (assert) {

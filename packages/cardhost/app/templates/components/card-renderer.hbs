@@ -5,7 +5,7 @@
     {{yield}}
 
     <dl>
-      {{#each @card.fields key="name" as | field index |}}
+      {{#each @card.isolatedFields key="name" as | field index |}}
         <fieldset data-test-card-renderer-field={{field.name}}>
           <legend><strong><code>{{field.name}}</code></strong></legend>
 
@@ -72,7 +72,7 @@
                   <strong>▲</strong>
                 </button>
               {{/if}}
-              {{#if (lt index (dec @card.fields.length))}}
+              {{#if (lt index (dec @card.isolatedFields.length))}}
                 <button {{on "click" (fn @setPosition field.name (inc index))}}
                   data-test-card-renderer-move-down-btn
                 >
