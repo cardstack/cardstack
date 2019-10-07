@@ -79,7 +79,8 @@ export default class CatalogEventsV2IndexController extends Controller {
     sentSprites.forEach(sprite => {
       move(sprite);
       resize(sprite);
-      adjustCSS('border-radius', sprite);
+      adjustCSS('border-top-right-radius', sprite);
+      adjustCSS('border-top-left-radius', sprite);
       sprite.applyStyles({ 'z-index': 3 });
     });
 

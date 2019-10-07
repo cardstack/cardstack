@@ -1,8 +1,11 @@
 .event-edit {
   position: absolute;
   width: 100vw;
+  height: 100vh;
+  min-height: 100%;
   top: 0;
   left: 0;
+  background-color: var(--boxel-light-purple);
 }
 
 .event-edit--container {
