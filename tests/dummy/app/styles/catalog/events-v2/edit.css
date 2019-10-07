@@ -4,8 +4,11 @@
 
   position: absolute;
   width: 100vw;
+  height: 100vh;
+  min-height: 100%;
   top: 0;
   left: 0;
+  background-color: var(--boxel-light-purple);
 }
 
 .events-edit {
@@ -14,7 +17,7 @@
   grid-template-columns: 1fr 300px;
   justify-items: center;
   width: 100%;
-  padding: 80px 0;
+  padding: 80px 30px;
   background-color: var(--boxel-light-purple);
 }
 
@@ -63,13 +66,17 @@
 /* Card + Card Container styles: See catalog/events-v2.css */
 .events-view-card--container.edit {
   border-radius: 20px;
-  border: 5px solid transparent;
+  padding: 10px;
   overflow: hidden;
 }
 
 .events-view-image.edit {
-  border-top-right-radius: 15px;
-  border-top-left-radius: 15px;
+  border-top-right-radius: 20px;
+  border-top-left-radius: 20px;
+}
+
+.events-view-card--container.edit > * {
+  border-radius: inherit;
 }
 
 
