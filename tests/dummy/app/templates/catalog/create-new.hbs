@@ -1,0 +1,101 @@
+{{!-- TODO: Replace hardcoded content with dynamic data --}}
+<div class="create-new">
+  {{!-- Left edge with form items catalog --}}
+  <div class="create-new--left-edge">
+    <div class="create-new--left-edge--profile">
+      <div class="profile icon"></div>
+      <div class="settings icon active"></div>
+      <div class="search icon"></div>
+    </div>
+
+    <div class="create-new--left-edge--catalog">
+      <div class="title">Card Catalog</div>
+
+      <div class="create-new--left-edge--catalog-field">
+        <div class="field-icon text-field"></div>
+        <div class="field-content">
+          <div class="field-content--title">Text Field</div>
+          <div class="field-content--description">Description</div>
+          <button {{action "displayDetails" this.model.id}} class="field-content--info-icon"></button>
+        </div>
+      </div>
+
+      <div class="create-new--left-edge--catalog-field">
+        <div class="field-icon cta"></div>
+        <div class="field-content">
+          <div class="field-content--title">CTA</div>
+          <div class="field-content--description">Description</div>
+          <button {{action "displayDetails" this.model.id}} class="field-content--info-icon"></button>
+        </div>
+      </div>
+
+      <div class="create-new--left-edge--catalog-field">
+        <div class="field-icon phone-number-field"></div>
+        <div class="field-content">
+          <div class="field-content--title">Phone Number Field</div>
+          <div class="field-content--description">Description</div>
+          <button {{action "displayDetails" this.model.id}} class="field-content--info-icon"></button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  {{!-- Card --}}
+  <div class="create-new--main">
+    <div class="create-new--card">
+      <div class="create-new--card-header">
+        <div class="title">Event Card</div>
+        <button class="done-btn">Done</button>
+        <div class="id">ID 1234567…</div>
+      </div>
+
+      <div class="create-new--card--field-box text-field">
+        <div class="handle-icon"></div>
+        <div class="field-data">
+          <div class="field-data--type">Text Field</div>
+          <div class="field-data--content">
+            <div class="field-data--title">Event name</div>
+            <div><TextField @label="Enter text" @required={{true}} /></div>
+          </div>
+        </div>
+        <button class="remove-btn">Remove</button>
+      </div>
+
+      <div class="create-new--card--field-box cta">
+        <div class="handle-icon"></div>
+        <div class="field-data">
+          <div class="field-data--type">CTA</div>
+          <div class="field-data--content">
+            <div class="field-data--title">CTA</div>
+            <div>
+              <TextField @label="Enter CTA text" @value={{this.value}} />
+              <Cta>{{or this.value "RSVP"}}</Cta>
+            </div>
+          </div>
+        </div>
+        <button class="remove-btn">Remove</button>
+      </div>
+
+      <div class="create-new--card--field-box location">
+        <div class="handle-icon"></div>
+        <div class="field-data">
+          <div class="field-data--type">Location</div>
+          <div class="field-data--content">
+            <div class="field-data--title">Location</div>
+            <div><StreetAddress></StreetAddress></div>
+          </div>
+        </div>
+        <button class="remove-btn">Remove</button>
+      </div>
+    </div>
+  </div>
+
+  {{!-- Right edge --}}
+  <div class="create-new--right-edge">
+    <div class="title">Event Card</div>
+    <div>
+      <label>Card ID</label>
+      <input readonly value="1234567...">
+    </div>
+  </div>
+</div>

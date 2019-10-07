@@ -67,14 +67,14 @@
   border-bottom-right-radius: 0;
 }
 
-.header-image {
+.image-card .header-image {
   height: 100%;
   background-size: cover;
   background-repeat: no-repeat;
   background-position: center 40%;
 }
 
-.header {
+.image-card .header {
   box-sizing: border-box;
   width: 100%;
   margin: 0;
@@ -89,7 +89,7 @@
   z-index: -1;
 }
 
-.header.expanded {
+.image-card .header.expanded {
   transform: translateY(0);
   z-index: 1;
   border-bottom-left-radius: 20px;
@@ -97,12 +97,12 @@
   background-color: white;
 }
 
-.title {
+.image-card .title {
   font-size: 18px;
   font-weight: 600;
 }
 
-.credit {
+.image-card .credit {
   color: #717171;
 }
 
