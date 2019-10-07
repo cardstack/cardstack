@@ -5,6 +5,7 @@ import Fixtures from '@cardstack/test-support/fixtures'
 import { addField, setCardId } from '../helpers/card-helpers';
 import { setupMockUser, login } from '../helpers/login';
 
+const timeout = 5000;
 const card1Id = 'local-hub::article-card::millenial-puppies';
 
 const scenario = new Fixtures({
@@ -35,28 +36,26 @@ module('Acceptance | card create', function(hooks) {
     await addField('reviewers', 'related cards', true);
 
     await click('[data-test-card-creator-save-btn]');
-    await waitFor(`[data-test-card-view="${card1Id}"]`);
+    await waitFor(`[data-test-card-view="${card1Id}"]`, { timeout });
 
     assert.equal(currentURL(), `/cards/${card1Id}`);
-    assert.dom('[data-test-card-renderer-field="title"] [data-test-card-renderer-value]').hasText('<no value>');
-    assert.dom('[data-test-card-renderer-field="title"] [data-test-card-renderer-field-type]').hasText('@cardstack/core-types::string');
-    assert.dom('[data-test-card-renderer-field="title"] [data-test-card-renderer-is-meta]').hasText('true');
-    assert.dom('[data-test-card-renderer-field="title"] [data-test-card-renderer-embedded]').hasText('true');
+    await visit(`/cards/${card1Id}/schema`);
 
-    assert.dom('[data-test-card-renderer-field="body"] [data-test-card-renderer-value]').hasText(`<no value>`);
-    assert.dom('[data-test-card-renderer-field="body"] [data-test-card-renderer-field-type]').hasText('@cardstack/core-types::string');
-    assert.dom('[data-test-card-renderer-field="body"] [data-test-card-renderer-is-meta]').hasText('true');
-    assert.dom('[data-test-card-renderer-field="body"] [data-test-card-renderer-embedded]').hasText('false');
+    assert.dom('[data-test-field="title"] [data-test-field-renderer-field-type]').hasText('@cardstack/core-types::string');
+    assert.dom('[data-test-field="title"] [data-test-field-renderer-is-meta]').hasText('true');
+    assert.dom('[data-test-field="title"] .field-renderer--needed-when-embedded-chbx').isChecked();
 
-    assert.dom('[data-test-card-renderer-field="author"] [data-test-card-renderer-value]').includesText(`<no value>`);
-    assert.dom('[data-test-card-renderer-field="author"] [data-test-card-renderer-field-type]').hasText('@cardstack/core-types::belongs-to');
-    assert.dom('[data-test-card-renderer-field="author"] [data-test-card-renderer-is-meta]').hasText('true');
-    assert.dom('[data-test-card-renderer-field="author"] [data-test-card-renderer-embedded]').hasText('true');
+    assert.dom('[data-test-field="body"] [data-test-field-renderer-field-type]').hasText('@cardstack/core-types::string');
+    assert.dom('[data-test-field="body"] [data-test-field-renderer-is-meta]').hasText('true');
+    assert.dom('[data-test-field="body"] .field-renderer--needed-when-embedded-chbx').isNotChecked();
 
-    assert.dom('[data-test-card-renderer-field="reviewers"] [data-test-card-renderer-value]').includesText(`<no value>`);
-    assert.dom('[data-test-card-renderer-field="reviewers"] [data-test-card-renderer-field-type]').hasText('@cardstack/core-types::has-many');
-    assert.dom('[data-test-card-renderer-field="reviewers"] [data-test-card-renderer-is-meta]').hasText('true');
-    assert.dom('[data-test-card-renderer-field="reviewers"] [data-test-card-renderer-embedded]').hasText('true');
+    assert.dom('[data-test-field="author"] [data-test-field-renderer-field-type]').hasText('@cardstack/core-types::belongs-to');
+    assert.dom('[data-test-field="author"] [data-test-field-renderer-is-meta]').hasText('true');
+    assert.dom('[data-test-field="author"] .field-renderer--needed-when-embedded-chbx').isChecked();
+
+    assert.dom('[data-test-field="reviewers"] [data-test-field-renderer-field-type]').hasText('@cardstack/core-types::has-many');
+    assert.dom('[data-test-field="reviewers"] [data-test-field-renderer-is-meta]').hasText('true');
+    assert.dom('[data-test-field="reviewers"] .field-renderer--needed-when-embedded-chbx').isChecked();
 
     let card = JSON.parse(find('.code-block').textContent);
     assert.equal(card.data.attributes.title, undefined);
@@ -76,13 +75,13 @@ module('Acceptance | card create', function(hooks) {
     await addField('body', 'string', false);
     await addField('author', 'string', false, 1);
 
-    assert.deepEqual([...document.querySelectorAll('[data-test-card-renderer-field]')].map(i => i.getAttribute('data-test-card-renderer-field')),
+    assert.deepEqual([...document.querySelectorAll('[data-test-field]')].map(i => i.getAttribute('data-test-field')),
       ['title', 'author', 'body']);
 
     await click('[data-test-card-creator-save-btn]');
     await waitFor(`[data-test-card-view="${card1Id}"]`);
 
-    assert.deepEqual([...document.querySelectorAll('[data-test-card-renderer-field]')].map(i => i.getAttribute('data-test-card-renderer-field')),
+    assert.deepEqual([...document.querySelectorAll('[data-test-field]')].map(i => i.getAttribute('data-test-field')),
       ['title', 'author', 'body']);
     let card = JSON.parse(find('.code-block').textContent);
     assert.deepEqual(card.data.relationships.fields.data, [

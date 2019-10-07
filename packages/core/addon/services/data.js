@@ -92,7 +92,7 @@ class Card {
   }
 
   toString() {
-    return `<card ${this.id}>`;
+    return this.id;
   }
 
   get id() {

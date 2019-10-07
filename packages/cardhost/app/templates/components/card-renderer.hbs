@@ -1,96 +1,34 @@
-{{#if @card}}
-  <fieldset>
-    <legend><strong><code>{{@card.id}}</code></strong></legend>
+{{!--
+This stuff that is wrapping the card components is just throw-away scaffolding.
+Feel free to get rid of it as soon as it no longer makes sense.
+--}}
+<fieldset>
+  <legend><strong><code>card: {{@card.id}}</code></strong></legend>
 
-    {{yield}}
+  {{!-- TODO let's work on moving this yield out of this component--it's only here for scaffolding --}}
+  {{yield}}
 
-    <dl>
-      {{#each @card.isolatedFields key="name" as | field index |}}
-        <fieldset data-test-card-renderer-field={{field.name}}>
-          <legend><strong><code>{{field.name}}</code></strong></legend>
-
-          {{!-- TODO we'll need an actual field renderer here --}}
-          {{#if (eq field.type "@cardstack/core-types::boolean")}}
-            <pre data-test-card-renderer-value>{{#if field.value}}true{{else}}false{{/if}}</pre>
-          {{else if (not field.value)}}
-            <pre data-test-card-renderer-value>&lt;no value&gt;</pre>
-          {{else}}
-            <pre data-test-card-renderer-value>{{field.value}}</pre>
-          {{/if}}
-
-          {{#if @setFieldValue}}
-            <div>
-              <label
-                for={{concat "edit-" field.name "-field-value"}}
-              >
-                Edit Value:
-              </label>
-            </div>
-            <FieldEditor
-              @id={{concat "edit-" field.name "-field-value"}}
-              @field={{field}}
-              @onUpdate={{fn @setFieldValue field.name}}
-              @inputSize="60"
-            />
-            <br>
-          {{/if}}
-          <dd>
-            field type:
-            <code data-test-card-renderer-field-type>
-              {{field.type}}
-            </code>
-          </dd>
-          <dd>
-            is metadata field:
-            <code data-test-card-renderer-is-meta>
-              {{if field.json.data.attributes.is-metadata "true" "false"}}
-            </code>
-          </dd>
-          <dd>
-            {{#if @setNeededWhenEmbedded}}
-              <Input
-                @checked={{field.neededWhenEmbedded}}
-                @type="checkbox"
-                @id={{concat "edit_" field.name "_embedded"}}
-                @click={{fn @setNeededWhenEmbedded field.name}}
-              />
-              <label for="new_field_embedded">Needed when Embedded</label>
-            {{else}}
-              needed when embedded
-              <code data-test-card-renderer-embedded >
-                {{if field.neededWhenEmbedded "true" "false"}}
-              </code>
-            {{/if}}
-          </dd>
-
-          <div class="card-renderer--field-btn-wrapper">
-            {{#if @setPosition}}
-              {{#if (gt index 0)}}
-                <button {{on "click" (fn @setPosition field.name (dec index))}}
-                  data-test-card-renderer-move-up-btn
-                >
-                  <strong>▲</strong>
-                </button>
-              {{/if}}
-              {{#if (lt index (dec @card.isolatedFields.length))}}
-                <button {{on "click" (fn @setPosition field.name (inc index))}}
-                  data-test-card-renderer-move-down-btn
-                >
-                  <strong>▼</strong>
-                </button>
-              {{/if}}
-            {{/if}}
-            {{#if @removeField}}
-              <button {{on "click" (fn @removeField field.name)}}
-                data-test-card-renderer-remove-btn
-              >
-                Remove
-              </button>
-            {{/if}}
-          </div>
-        </fieldset>
-        <br>
-      {{/each}}
-    </dl>
-  </fieldset>
-{{/if}}
+  <dl>
+    {{!--
+    TODO this component should be responsible for deciding which format of the card to render.
+    The process of rendering a card is fundamentally async as we'll need to load the card data,
+    as well as waiting for the card component to be compiled by embroider. Make sure to build in
+    Ember Concurrency into the rendering of the card component here.
+    --}}
+    {{#if (eq @format "isolated")}}
+      {{#let (component this.isolatedComponentName) as | Isolated |}}
+        <Isolated
+          @card={{@card}}
+          @setFieldValue={{@setFieldValue}}
+          @removeField={{@removeField}}
+          @setNeededWhenEmbedded={{@setNeededWhenEmbedded}}
+          @setPosition={{@setPosition}}
+        />
+      {{/let}}
+    {{else if (eq @format "embedded")}}
+      {{#let (component this.embeddedComponentName) as | Embedded |}}
+        <Embedded @card={{@card}} />
+      {{/let}}
+    {{/if}}
+  </dl>
+</fieldset>

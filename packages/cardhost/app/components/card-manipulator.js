@@ -137,6 +137,11 @@ export default class CardManipulator extends Component {
   }
 
   @action
+  cancel() {
+    this.router.transitionTo('cards.view', this.card.id);
+  }
+
+  @action
   delete() {
     this.deleteCard.perform();
   }

@@ -2,7 +2,7 @@
 
 <h2 data-test-card-view={{this.model.id}}>View Card</h2>
 
-<CardRenderer @card={{this.model}}>
+<CardRenderer @card={{this.model}} @format="isolated">
   <div>
     <LinkTo @route="cards.schema" @model={{this.model}}>
       Update Schema
