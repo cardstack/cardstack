@@ -1,13 +1,11 @@
 .events-view {
   --content-width: 830px;
-  --content-min-height: 1000px;
 
   box-sizing: border-box;
   display: flex;
   flex-flow: column nowrap;
   align-items: center;
   width: 100%;
-  height: 100vh;
   min-height: 100%;
   padding: 80px 0;
 }
@@ -15,7 +13,6 @@
 .events-view--container {
   box-sizing: border-box;
   width: var(--content-width);
-  min-height: var(--content-min-height);
 }
 
 
@@ -25,7 +22,7 @@
 /* Card Container */
 .events-view-card--container {
   box-sizing: border-box;
-  position: absolute;
+  position: relative;
   height: 100%;
   width: 100%;
 }

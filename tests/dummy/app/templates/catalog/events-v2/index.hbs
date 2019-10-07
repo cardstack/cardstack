@@ -4,8 +4,7 @@
 
   <div class="card-catalog--grid">
     {{#each this.model as |card|}}
-      <AnimatedContainer onMouseEnter={{action "select" card.id}}>
-
+      <AnimatedContainer {{on "mouseenter" (action "select" card.id)}} {{on "mouseleave" (action "unselect" card.id)}}>
         {{!-- Tray --}}
         {{#animated-value card watch="selected" key="id" group="card-tray" use=this.trayAnimation}}
           <div class="events-tray {{if card.selected "selected"}}">
@@ -18,42 +17,46 @@
         {{!-- End of Tray --}}
 
         {{!-- Card Container --}}
-        {{#animated-value card key="id" group="card"}}
-          <div class="events-card--container" role="button" {{action "viewDetailPage" card}}>
-            {{!-- Card --}}
-            <div class="events-card events-card-{{card.id}}">
-              <AnimatedContainer>
-                {{#animated-value card key="id" group="image" use=this.imageTransition}}
-                  {{! template-lint-configure no-inline-styles {"allowDynamicStyles": true} }}
-                  <div class="events-image" style={{css-url "background-image" card.imageUrl}}></div>
-                {{/animated-value}}
-              </AnimatedContainer>
-              <AnimatedContainer class="events-details">
-                {{#animated-value card key="id" group="header" use=this.headerTransition}}
-                  <div>
-                    <div class="events-details--header">
-                      <div class="events-date">{{card.date}}</div>
-                      {{#animated-value card group="title" use=this.titleTransition}}
-                        <div class="events-title">{{card.title}}</div>
-                      {{/animated-value}}
-                    </div>
+        <AnimatedContainer>
+          {{#animated-value card key="id" group="card" use=this.cardTransition}}
+            <div class="events-card--container" role="button" {{action "viewDetailPage" card}}>
+              {{!-- Card --}}
+              <div class="events-card events-card-{{card.id}}">
+                <AnimatedContainer>
+                  {{#animated-value card key="id" group="image" use=this.imageTransition}}
+                    {{! template-lint-configure no-inline-styles {"allowDynamicStyles": true} }}
+                    <div class="events-image" style={{css-url "background-image" card.imageUrl}}></div>
+                  {{/animated-value}}
+                </AnimatedContainer>
+                <AnimatedContainer class="events-details">
+                  {{#animated-value card key="id" group="header" use=this.headerTransition}}
                     <div>
-                      <div class="events-location">{{card.location}}</div>
-                      <div class="events-price">{{card.price}}</div>
+                      <div class="events-details--header">
+                        <div class="events-date">{{card.date}}</div>
+                        <AnimatedContainer>
+                          {{#animated-value card group="title" use=this.titleTransition}}
+                            <div class="events-title">{{card.title}}</div>
+                          {{/animated-value}}
+                        </AnimatedContainer>
+                      </div>
+                      <div>
+                        <div class="events-location">{{card.location}}</div>
+                        <div class="events-price">{{card.price}}</div>
+                      </div>
                     </div>
-                  </div>
-                {{/animated-value}}
-              </AnimatedContainer>
-              <AnimatedContainer>
-                {{#animated-value card group="body"}}
-                  <div class="events--main">
-                  </div>
-                {{/animated-value}}
-              </AnimatedContainer>
+                  {{/animated-value}}
+                </AnimatedContainer>
+                <AnimatedContainer>
+                  {{#animated-value card group="body"}}
+                    <div class="events--main">
+                    </div>
+                  {{/animated-value}}
+                </AnimatedContainer>
+              </div>
+              {{!-- End of Card --}}
             </div>
-            {{!-- End of Card --}}
-          </div>
-        {{/animated-value}}
+          {{/animated-value}}
+        </AnimatedContainer>
         {{!-- End of Card Container--}}
 
       </AnimatedContainer>

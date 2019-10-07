@@ -6,7 +6,7 @@
     {{#each this.model as |card|}}
       <AnimatedContainer>
         {{#animated-value card watch="selected" use=this.trayAnimation key="id" group="tray" as |card|}}
-          <div class="event-card-container {{if card.selected "selected"}}" role="button" onMouseEnter={{action "select" card.id}} onMouseLeave={{action "unselect" card.id}}>
+          <div class="event-card-container {{if card.selected "selected"}}" role="button" {{on "mouseenter" (action "select" card.id)}} {{on "mouseleave" (action "unselect" card.id)}}>
             <div class="event-card-container--content">
               <div>{{card.constructor.modelName}} Card</div>
               {{! template-lint-configure no-nested-interactive false}}

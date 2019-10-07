@@ -13,7 +13,7 @@ export default class EventsV2ViewController extends Controller {
     this.transitionToRoute('catalog.events-v2');
   }
 
-  * cardTransition({ sentSprites, receivedSprites }) {
+  * cardTransition({ sentSprites, receivedSprites, removedSprites }) {
     // printSprites(arguments[0], 'view - card transition');
 
     sentSprites.forEach(sprite => {
@@ -27,9 +27,13 @@ export default class EventsV2ViewController extends Controller {
       resize(sprite);
       sprite.applyStyles({ 'z-index': 2 });
     });
+
+    removedSprites.forEach(sprite => {
+      sprite.hide();
+    });
   }
 
-  * imageTransition({ sentSprites }) {
+  * imageTransition({ sentSprites, removedSprites }) {
     // printSprites(arguments[0], 'view image transition');
 
     sentSprites.forEach(sprite => {
@@ -37,25 +41,37 @@ export default class EventsV2ViewController extends Controller {
       resize(sprite);
       sprite.applyStyles({ 'z-index': 3 });
     });
+
+    removedSprites.forEach(sprite => {
+      sprite.hide();
+    });
   }
 
-  * headerTransition({ sentSprites }) {
+  * headerTransition({ sentSprites, removedSprites }) {
     sentSprites.forEach(sprite => {
       move(sprite);
       sprite.applyStyles({ 'z-index': 3 });
     });
+
+    removedSprites.forEach(sprite => {
+      sprite.hide();
+    });
   }
 
-  * titleTransition({ sentSprites }) {
+  * titleTransition({ sentSprites, removedSprites }) {
     sentSprites.forEach(sprite => {
       move(sprite);
       resize(sprite);
       adjustCSS('font-size', sprite);
       sprite.applyStyles({ 'z-index': 4 });
-    })
+    });
+
+    removedSprites.forEach(sprite => {
+      sprite.hide();
+    });
   }
 
-  * bodyTransition({ sentSprites, receivedSprites, duration }) {
+  * bodyTransition({ sentSprites, receivedSprites, removedSprites, duration }) {
     // printSprites(arguments[0], 'view body transition');
 
     sentSprites.forEach(sprite => {
@@ -71,6 +87,10 @@ export default class EventsV2ViewController extends Controller {
       resize(sprite);
       opacity(sprite, { from: 0 });
       sprite.applyStyles({ 'z-index': 3 });
+    });
+
+    removedSprites.forEach(sprite => {
+      sprite.hide();
     });
   }
 }

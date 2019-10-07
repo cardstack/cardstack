@@ -11,7 +11,7 @@
   --content-height: 300px;
   --content-width: 245px;
 
-  position: absolute;
+  position: relative;
   top: var(--tray-top);
   left: var(--tray-left);
   right: var(--tray-right);
@@ -19,7 +19,7 @@
   height: var(--content-height);
   width: var(--content-width);
 
-  background-color: aquamarine;
+  background-color: var(--boxel-cyan);
   border-radius: 20px;
 }
 
