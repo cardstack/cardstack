@@ -18,7 +18,7 @@
           <div class="field-content">
             <div class="field-content--title">{{field.title}}</div>
             <div class="field-content--description">{{field.description}}</div>
-            <button {{action "displayDetails" field.id}} class="field-content--info-icon"></button>
+            <button class="field-content--info-icon"></button>
           </div>
         </div>
       {{/each}}
@@ -31,8 +31,8 @@
       {{!-- Card --}}
       <div class="create-new--card">
         <div class="create-new--card-header">
-          <div class="title">{{card.type}} Card</div>
-          <button {{action "create" card}} class="done-btn">Done</button>
+          <div class="title">{{card.constructor.modelName}} Card</div>
+          <button class="done-btn">Done</button>
         </div>
 
         <div class="create-new--card--field-box">
@@ -75,7 +75,7 @@
       <div class="title">{{card.type}} Card</div>
       <div>
         <label>Card ID</label>
-        <input readonly value={{this.model.events.length}}>
+        <input readonly value={{card.id}}>
       </div>
     </div>
   {{/let}}
