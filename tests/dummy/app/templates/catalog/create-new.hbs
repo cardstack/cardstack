@@ -1,0 +1,82 @@
+{{! template-lint-configure no-inline-styles {"allowDynamicStyles": true} }}
+<div class="create-new">
+  {{!-- Left edge --}}
+  <div class="create-new--left-edge">
+    {{!-- Profile sidebar --}}
+    <div class="create-new--left-edge--profile">
+      <div class="profile icon"></div>
+      <div class="settings icon active"></div>
+      <div class="search icon"></div>
+    </div>
+    {{!-- Catalog fields list --}}
+    <div class="create-new--left-edge--catalog">
+      <div class="title">Card Catalog</div>
+
+      {{#each this.model.fieldTypes as |field|}}
+        <div class="create-new--left-edge--catalog-field">
+          <div class="field-icon" style={{css-url "background-image" field.icon}}></div>
+          <div class="field-content">
+            <div class="field-content--title">{{field.title}}</div>
+            <div class="field-content--description">{{field.description}}</div>
+            <button class="field-content--info-icon"></button>
+          </div>
+        </div>
+      {{/each}}
+    </div>
+  </div>
+
+  {{#let this.model.sampleEvent as |card|}}
+    {{!-- Stage --}}
+    <div class="create-new--main">
+      {{!-- Card --}}
+      <div class="create-new--card">
+        <div class="create-new--card-header">
+          <div class="title">{{card.constructor.modelName}} Card</div>
+          <button class="done-btn">Done</button>
+        </div>
+
+        <div class="create-new--card--field-box">
+          <div class="handle-icon"></div>
+          <div class="field-data">
+            <div class="field-data--type">Text Field</div>
+            <div class="field-data--content">
+              <BoxelField @value={{card.title}} @fieldName="title" @label="Event name" @model={{card}} @mode="edit" />
+            </div>
+          </div>
+          <button class="remove-btn">Remove</button>
+        </div>
+
+        <div class="create-new--card--field-box">
+          <div class="handle-icon"></div>
+          <div class="field-data">
+            <div class="field-data--type">CTA</div>
+            <div class="field-data--content">
+              <BoxelField @componentName="cta" @fieldName="cta" @label="RSVP" @model={{card}} @mode="edit" />
+            </div>
+          </div>
+          <button class="remove-btn">Remove</button>
+        </div>
+
+        <div class="create-new--card--field-box">
+          <div class="handle-icon"></div>
+          <div class="field-data">
+            <div class="field-data--type">Text Field</div>
+            <div class="field-data--content">
+              <BoxelField @value={{card.location}} @fieldName="location" @label="Location" @model={{card}} @mode="edit" />
+            </div>
+          </div>
+          <button class="remove-btn">Remove</button>
+        </div>
+      </div>
+    </div>
+
+    {{!-- Right edge --}}
+    <div class="create-new--right-edge">
+      <div class="title">{{card.type}} Card</div>
+      <div>
+        <label>Card ID</label>
+        <input readonly value={{card.id}}>
+      </div>
+    </div>
+  {{/let}}
+</div>
