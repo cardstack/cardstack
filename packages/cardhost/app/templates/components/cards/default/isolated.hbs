@@ -1,0 +1,26 @@
+<div
+  data-test-isolated-card={{@card.id}}
+  class="isolated-card default-card"
+>
+  {{#each @card.isolatedFields key="name" as | field index |}}
+    {{#if @setFieldValue}}
+      <FieldRenderer
+        @field={{field}}
+        @mode="edit"
+        @setFieldValue={{fn @setFieldValue field.name}}
+      />
+    {{else if (or @setNeededWhenEmbedded @setPosition @removeField)}}
+      <FieldRenderer
+        @field={{field}}
+        @mode="schema"
+        @position={{index}}
+        @removeField={{@removeField}}
+        @setPosition={{@setPosition}}
+        @setNeededWhenEmbedded={{@setNeededWhenEmbedded}}
+      />
+    {{else}}
+      <FieldRenderer @field={{field}} @mode="view"/>
+    {{/if}}
+    <br>
+  {{/each}}
+</div>

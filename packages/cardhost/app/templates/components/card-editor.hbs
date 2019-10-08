@@ -7,6 +7,7 @@
 <CardRenderer
   @card={{this.card}}
   @setFieldValue={{action this.setFieldValue}}
+  @format="isolated"
 >
   <div class="card-editor--field-btn-wrapper">
     {{#unless this.cardstackSession.isAuthenticated}}
@@ -20,6 +21,12 @@
       disabled={{not this.cardstackSession.isAuthenticated}}
     >
       Delete Card
+    </button>
+    <button {{on "click" this.cancel}}
+      data-test-card-editor-canel-btn
+      disabled={{not this.cardstackSession.isAuthenticated}}
+    >
+      Cancel
     </button>
     <button {{on "click" this.save}}
       data-test-card-editor-save-btn

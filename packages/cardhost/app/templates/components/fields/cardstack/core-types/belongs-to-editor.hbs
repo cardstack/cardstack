@@ -1,0 +1,12 @@
+<label
+  data-test-belongs-to-field-viewer-label
+  for={{concat "edit-" @field.name "-field-value"}}
+>
+  {{@field.name}}:
+</label>
+<Input
+  @id={{concat "edit-" @field.name "-field-value"}}
+  @placeholder="Card ID"
+  @value={{this.fieldValue}}
+  @key-up={{action this.updateFieldValue}}
+/>

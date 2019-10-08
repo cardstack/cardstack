@@ -19,31 +19,34 @@
 
 <br>
 
-<CardRenderer
-  @card={{this.card}}
-  @removeField={{action this.removeField}}
-  @setNeededWhenEmbedded={{action this.setNeededWhenEmbedded}}
-  @setPosition={{action this.setPosition}}
->
-  <div class="card-creator--field-btn-wrapper">
-    {{#unless this.cardstackSession.isAuthenticated}}
-      (Must be logged in to save the card.)
-    {{/unless}}
-    <button {{on "click" this.save}}
-      data-test-card-creator-save-btn
-      disabled={{not this.cardstackSession.isAuthenticated}}
-    >
-      Save Card
-    </button>
-  </div>
-  <br>
+{{#if this.card}}
+  <CardRenderer
+    @card={{this.card}}
+    @format="isolated"
+    @removeField={{action this.removeField}}
+    @setNeededWhenEmbedded={{action this.setNeededWhenEmbedded}}
+    @setPosition={{action this.setPosition}}
+  >
+    <div class="card-creator--field-btn-wrapper">
+      {{#unless this.cardstackSession.isAuthenticated}}
+        (Must be logged in to save the card.)
+      {{/unless}}
+      <button {{on "click" this.save}}
+        data-test-card-creator-save-btn
+        disabled={{not this.cardstackSession.isAuthenticated}}
+      >
+        Save Card
+      </button>
+    </div>
+    <br>
 
-  <FieldCreator
-    @numFields={{this.card.isolatedFields.length}}
-    @fieldTypeMappings={{this.fieldTypeMappings}}
-    @addField={{action this.addField}}
-  />
-</CardRenderer>
+    <FieldCreator
+      @numFields={{this.card.isolatedFields.length}}
+      @fieldTypeMappings={{this.fieldTypeMappings}}
+      @addField={{action this.addField}}
+    />
+  </CardRenderer>
+{{/if}}
 
 <br>
 

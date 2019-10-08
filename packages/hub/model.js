@@ -89,7 +89,11 @@ exports.Model = class Model {
     if (relObj && relObj.data) {
       let refs = relObj.data;
       if (Array.isArray(refs)) {
-        return (await Promise.all(refs.map(ref => this.getModel(ref.type, ref.id)))).filter(Boolean);
+        let models = [];
+        for (let ref of refs) {
+          models.push(await this.getModel(ref.type, ref.id)); // Not using Promise.all as each retrival may need to alter the Model's schema
+        }
+        return models.filter(Boolean);
       } else {
         return this.getModel(refs.type, refs.id);
       }

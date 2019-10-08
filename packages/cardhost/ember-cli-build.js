@@ -35,6 +35,35 @@ module.exports = function(defaults) {
       },
       packageRules: [
         {
+          package: "@cardstack/cardhost",
+          appModules: {
+            "components/card-renderer.js": {
+              dependsOnComponents: [
+                '<Cards::Default::Isolated/>',
+                '<Cards::Default::Embedded/>',
+              ]
+            },
+            "components/field-renderer.js": {
+              dependsOnComponents: [
+                '<Fields::Cardstack::CoreTypes::StringViewer/>',
+                '<Fields::Cardstack::CoreTypes::StringEditor/>',
+                '<Fields::Cardstack::CoreTypes::IntegerViewer/>',
+                '<Fields::Cardstack::CoreTypes::IntegerEditor/>',
+                '<Fields::Cardstack::CoreTypes::DateViewer/>',
+                '<Fields::Cardstack::CoreTypes::DateEditor/>',
+                '<Fields::Cardstack::CoreTypes::BooleanViewer/>',
+                '<Fields::Cardstack::CoreTypes::BooleanEditor/>',
+                '<Fields::Cardstack::CoreTypes::CaseInsensitiveViewer/>',
+                '<Fields::Cardstack::CoreTypes::CaseInsensitiveEditor/>',
+                '<Fields::Cardstack::CoreTypes::BelongsToViewer/>',
+                '<Fields::Cardstack::CoreTypes::BelongsToEditor/>',
+                '<Fields::Cardstack::CoreTypes::HasManyViewer/>',
+                '<Fields::Cardstack::CoreTypes::HasManyEditor/>',
+              ]
+            },
+          }
+        },
+        {
           package: "@cardstack/routing",
           addonModules: {
             "routes/cardstack/common.js": {

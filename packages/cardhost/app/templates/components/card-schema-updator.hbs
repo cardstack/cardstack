@@ -6,6 +6,7 @@
 
 <CardRenderer
   @card={{this.card}}
+  @format="isolated"
   @removeField={{action this.removeField}}
   @setNeededWhenEmbedded={{action this.setNeededWhenEmbedded}}
   @setPosition={{action this.setPosition}}
@@ -17,6 +18,12 @@
     <span data-test-card-schema-is-dirty={{this.isDirtyStr}}>
       {{#if this.card.isDirty}}(unsaved){{/if}}
     </span>
+    <button {{on "click" this.cancel}}
+      data-test-card-schema-canel-btn
+      disabled={{not this.cardstackSession.isAuthenticated}}
+    >
+      Cancel
+    </button>
     <button {{on "click" this.save}}
       data-test-card-schema-save-btn
       disabled={{not this.cardstackSession.isAuthenticated}}
@@ -26,7 +33,7 @@
   </div>
 
   <FieldCreator
-    @numFields={{this.card.isolatedFields}}
+    @numFields={{this.card.isolatedFields.length}}
     @fieldTypeMappings={{this.fieldTypeMappings}}
     @addField={{action this.addField}}
   />
