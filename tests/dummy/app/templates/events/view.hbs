@@ -22,7 +22,7 @@
                     {{#animated-value card key="id" group=(concat "header-" card.id) use=this.headerTransition}}
                       <div>
                         <div class="event-view-details--header">
-                          <div class="event-view-date">{{card.date}}</div>
+                          <div class="event-view-date">{{moment-format card.datetime "ddd, MMM Do ha"}}</div>
                           {{#animated-value card group="title" use=this.tweenTitle}}
                             <div class="event-view-title">{{card.title}}</div>
                           {{/animated-value}}
@@ -42,7 +42,7 @@
                       </div>
                       <div class="event-view--info-group">
                         <div class="label">Location</div>
-                        <div>{{card.address}}</div>
+                        <div>{{card.location}}</div>
                       </div>
                       <div class="event-view--info-group">
                         <div class="label">Description</div>

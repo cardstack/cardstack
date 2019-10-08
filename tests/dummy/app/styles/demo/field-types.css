@@ -104,17 +104,17 @@
   padding: 5px 10px;
 }
 
-.cs-component-text-field .cs-component-text-area--container {
+.field-types-demo-card-content .cs-component-text-field .cs-component-text-area--container {
   border: none;
   border-radius: 15px;
   background-color: transparent;
 }
-.cs-component-text-field.schema .cs-component-text-area--container {
+.field-types-demo-card-content .cs-component-text-field.schema .cs-component-text-area--container {
   border-top-left-radius: 0;
   border-top-right-radius: 0;
 }
 
-.cs-component-text-field {
+.field-types-demo-card-content .cs-component-text-field {
   padding-top: 0;
   border: 1px solid var(--cs-text-field-border-color);
   border-radius: 15px;
@@ -123,30 +123,30 @@
   background-color: white;
 }
 
-.cs-component-text-field.schema {
+.field-types-demo-card-content .cs-component-text-field.schema {
   border-top-left-radius: 0;
   border-top-right-radius: 0;
 }
 
-.cs-component-text-field .cs-component-text-field--label.active > .label,
-.cs-component-text-field .cs-component-text-field--input:focus + .cs-component-text-field--label > .label {
+.field-types-demo-card-content .cs-component-text-field .cs-component-text-field--label.active > .label,
+.field-types-demo-card-content .cs-component-text-field .cs-component-text-field--input:focus + .cs-component-text-field--label > .label {
   top: 0.5rem;
 }
 
-.cs-component-text-field .cs-component-text-field--label > .label {
+.field-types-demo-card-content .cs-component-text-field .cs-component-text-field--label > .label {
   top: 2.0rem;
 }
 
-.cs-component-text-field .cs-component-text-field--input {
+.field-types-demo-card-content .cs-component-text-field .cs-component-text-field--input {
   background-color: transparent;
   border: none;
 }
 
-.cs-component-text-field.schema .cs-component-text-field--input {
+.field-types-demo-card-content .cs-component-text-field.schema .cs-component-text-field--input {
   border-top-left-radius: 0;
   border-top-right-radius: 0;
 }
 
-.cs-component-text-area .cs-component-text-field--input {
+.field-types-demo-card-content .cs-component-text-area .cs-component-text-field--input {
   background-image: none;
 }

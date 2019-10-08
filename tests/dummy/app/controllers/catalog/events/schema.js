@@ -7,7 +7,7 @@ import { default as opacity } from 'ember-animated/motions/opacity';
 import { printSprites } from 'ember-animated';
 import { easeInAndOut } from 'ember-animated/easings/cosine';
 
-export default class CatalogEventsEditController extends Controller {
+export default class CatalogEventsSchemaController extends Controller {
   showModeMenu = false;
 
   @action
@@ -21,13 +21,14 @@ export default class CatalogEventsEditController extends Controller {
     set(this, 'showModeMenu', !this.showModeMenu);
   }
 
-  * trayAnimation({ receivedSprites }) {
-    receivedSprites.forEach(sprite => {
-      move(sprite);
-      resize(sprite);
-      sprite.applyStyles({ 'z-index': 1 });
-    });
-  }
+  // * trayAnimation({ receivedSprites }) {
+  //   printSprites(arguments[0], 'tray transition');
+  //   receivedSprites.forEach(sprite => {
+  //     move(sprite);
+  //     resize(sprite);
+  //     sprite.applyStyles({ 'z-index': 1 });
+  //   });
+  // }
 
   * cardTransition({ sentSprites, receivedSprites }) {
     sentSprites.forEach(sprite => {
@@ -94,7 +95,6 @@ export default class CatalogEventsEditController extends Controller {
       move(sprite);
       adjustCSS('border-top-left-radius', sprite, { easing: easeInAndOut });
       adjustCSS('border-top-right-radius', sprite, { easing: easeInAndOut });
-      sprite.applyStyles({ 'z-index': 5 });
     });
   }
 }

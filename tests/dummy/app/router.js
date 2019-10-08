@@ -10,7 +10,9 @@ Router.map(function() {
   this.route('catalog', function() {
     this.route('preview', { path: '/:model/preview' });
     this.route('events', function() {
+      this.route('view', { path: '/:id/view' });
       this.route('edit', { path: '/:id/edit' });
+      this.route('schema', { path: '/:id/schema' });
     });
     this.route('events-v2', function() {
       this.route('edit', { path: '/:id/edit' });

@@ -1,7 +1,7 @@
 <AnimatedContainer class="boxel-field-container {{model.mode}}">
   {{#animated-value "boxel-field" group=(concat "field-" @fieldName) use=@defaultTransition}}
     {{#if @componentName}}
-      {{component componentName value=value label=label required=true class=mode}}
+      {{component componentName value=value label=label required=true disabled=true class=mode}}
     {{else}}
       <TextField @value={{@value}} @label={{@label}} @required={{true}} @disabled={{true}} class={{@mode}}>
         <div class="demo-card-{{@fieldName}}">

@@ -1,6 +1,6 @@
 <AnimatedContainer class="boxel-field-schema-container {{model.mode}}">
   {{#animated-if (eq @mode "schema") use=fade}}
-    <div class="field-type">Text Field</div>
+    <div class="{{model.constructor.modelName}}--{{@mode}}--field-type field-type">Text Field</div>
   {{/animated-if}}
 </AnimatedContainer>
 {{component
