@@ -237,13 +237,19 @@ module.exports = class Writer {
     await this._ensureGithereum();
 
     if(this.githereum) {
+      log.info("Githereum is enabled, triggering push");
       // make sure only one push is ongoing at a time, by creating a chain of
       // promises here
-      this._githereumPromise = Promise.resolve(this._githereumPromise).then(() =>
-        this.githereum.push(this.githereumConfig.tag).catch(e => {
+      this._githereumPromise = Promise.resolve(this._githereumPromise).then(() => {
+        log.info("Starting githereum push");
+        return this.githereum.push(this.githereumConfig.tag).then(() =>
+          log.info("Githereum push complete")
+        ).catch(e => {
           log.error("Error pushing to githereum:", e, e.stack);
-        })
-      );
+        });
+      });
+    } else {
+      log.info("Githereum is disabled");
     }
   }
 };
