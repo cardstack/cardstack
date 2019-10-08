@@ -18,7 +18,7 @@ export default [
   {
     id: '1',
     title: 'Ember Meetup NYC',
-    imageUrl: '/images/haunted-castle.jpg',
+    imageUrl: `${ENV.rootURL}images/haunted-castle.jpg`,
     location: 'New York, NY',
     price: 'Free Admission',
     address: 'One World Trade Center',

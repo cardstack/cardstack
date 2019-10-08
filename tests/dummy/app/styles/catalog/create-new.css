@@ -1,3 +1,10 @@
+/* Adjustments to UI components */
+.create-new--card--field-box .cs-component-text-field .optional,
+.create-new--card--field-box .cs-component-text-field--validation {
+  display: none;
+}
+
+
 .create-new {
   position: absolute;
   width: 100vw;
@@ -113,18 +120,6 @@
   background-repeat: no-repeat;
 }
 
-.create-new--left-edge--catalog-field .field-icon.text-field {
-  background-image: url('/images/text-field-icon@2x.png');
-}
-
-.create-new--left-edge--catalog-field .field-icon.cta {
-  background-image: url('/images/cta-icon@2x.png');
-}
-
-.create-new--left-edge--catalog-field .field-icon.phone-number-field {
-  background-image: url('/images/phone-icon@2x.png');
-}
-
 .create-new--left-edge--catalog-field .field-content {
   width: 100%;
   padding: 15px;
@@ -181,6 +176,7 @@
   font-size: 26px;
   font-weight: 600;
   line-height: 1;
+  text-transform: capitalize;
 }
 
 .create-new--card-header > .id {
@@ -274,25 +270,6 @@
 }
 
 
-/* Adjustments to UI components */
-.create-new--card--field-box .cs-component-text-field {
-  display: inline-block;
-}
-
-.create-new--card--field-box .cs-component-text-field .optional,
-.create-new--card--field-box .cs-component-text-field--validation {
-  display: none;
-}
-
-.create-new--card--field-box.text-field .cs-component-text-field {
-  display: block;
-}
-
-.create-new--card--field-box .cs-component-street-address {
-  padding-top: 1rem;
-}
-
-
 /* Right edge */
 .create-new--right-edge {
   box-sizing: border-box;
@@ -308,16 +285,17 @@
 }
 
 .create-new--right-edge > .title {
+  padding-bottom: 40px;
   color: white;
   font-size: 18px;
   font-weight: 600;
   line-height: 1;
-  padding-bottom: 40px;
+  text-transform: capitalize;
 }
 
 .create-new--right-edge label {
   display: block;
-  color: rgba(255,255,255,0.6);
+  color: rgba(255, 255, 255, 0.6);
   font-size: 13px;
   padding-bottom: 5px;
 }

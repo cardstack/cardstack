@@ -1,101 +1,82 @@
-{{!-- TODO: Replace hardcoded content with dynamic data --}}
+{{! template-lint-configure no-inline-styles {"allowDynamicStyles": true} }}
 <div class="create-new">
-  {{!-- Left edge with form items catalog --}}
+  {{!-- Left edge --}}
   <div class="create-new--left-edge">
+    {{!-- Profile sidebar --}}
     <div class="create-new--left-edge--profile">
       <div class="profile icon"></div>
       <div class="settings icon active"></div>
       <div class="search icon"></div>
     </div>
-
+    {{!-- Catalog fields list --}}
     <div class="create-new--left-edge--catalog">
       <div class="title">Card Catalog</div>
 
-      <div class="create-new--left-edge--catalog-field">
-        <div class="field-icon text-field"></div>
-        <div class="field-content">
-          <div class="field-content--title">Text Field</div>
-          <div class="field-content--description">Description</div>
-          <button {{action "displayDetails" this.model.id}} class="field-content--info-icon"></button>
+      {{#each this.model.fieldTypes as |field|}}
+        <div class="create-new--left-edge--catalog-field">
+          <div class="field-icon" style={{css-url "background-image" field.icon}}></div>
+          <div class="field-content">
+            <div class="field-content--title">{{field.title}}</div>
+            <div class="field-content--description">{{field.description}}</div>
+            <button {{action "displayDetails" field.id}} class="field-content--info-icon"></button>
+          </div>
         </div>
-      </div>
-
-      <div class="create-new--left-edge--catalog-field">
-        <div class="field-icon cta"></div>
-        <div class="field-content">
-          <div class="field-content--title">CTA</div>
-          <div class="field-content--description">Description</div>
-          <button {{action "displayDetails" this.model.id}} class="field-content--info-icon"></button>
-        </div>
-      </div>
-
-      <div class="create-new--left-edge--catalog-field">
-        <div class="field-icon phone-number-field"></div>
-        <div class="field-content">
-          <div class="field-content--title">Phone Number Field</div>
-          <div class="field-content--description">Description</div>
-          <button {{action "displayDetails" this.model.id}} class="field-content--info-icon"></button>
-        </div>
-      </div>
+      {{/each}}
     </div>
   </div>
 
-  {{!-- Card --}}
-  <div class="create-new--main">
-    <div class="create-new--card">
-      <div class="create-new--card-header">
-        <div class="title">Event Card</div>
-        <button class="done-btn">Done</button>
-        <div class="id">ID 1234567…</div>
-      </div>
-
-      <div class="create-new--card--field-box text-field">
-        <div class="handle-icon"></div>
-        <div class="field-data">
-          <div class="field-data--type">Text Field</div>
-          <div class="field-data--content">
-            <div class="field-data--title">Event name</div>
-            <div><TextField @label="Enter text" @required={{true}} /></div>
-          </div>
+  {{#let this.model.sampleEvent as |card|}}
+    {{!-- Stage --}}
+    <div class="create-new--main">
+      {{!-- Card --}}
+      <div class="create-new--card">
+        <div class="create-new--card-header">
+          <div class="title">{{card.type}} Card</div>
+          <button {{action "create" card}} class="done-btn">Done</button>
         </div>
-        <button class="remove-btn">Remove</button>
-      </div>
 
-      <div class="create-new--card--field-box cta">
-        <div class="handle-icon"></div>
-        <div class="field-data">
-          <div class="field-data--type">CTA</div>
-          <div class="field-data--content">
-            <div class="field-data--title">CTA</div>
-            <div>
-              <TextField @label="Enter CTA text" @value={{this.value}} />
-              <Cta>{{or this.value "RSVP"}}</Cta>
+        <div class="create-new--card--field-box">
+          <div class="handle-icon"></div>
+          <div class="field-data">
+            <div class="field-data--type">Text Field</div>
+            <div class="field-data--content">
+              <BoxelField @value={{card.title}} @fieldName="title" @label="Event name" @model={{card}} @mode="edit" />
             </div>
           </div>
+          <button class="remove-btn">Remove</button>
         </div>
-        <button class="remove-btn">Remove</button>
-      </div>
 
-      <div class="create-new--card--field-box location">
-        <div class="handle-icon"></div>
-        <div class="field-data">
-          <div class="field-data--type">Location</div>
-          <div class="field-data--content">
-            <div class="field-data--title">Location</div>
-            <div><StreetAddress></StreetAddress></div>
+        <div class="create-new--card--field-box">
+          <div class="handle-icon"></div>
+          <div class="field-data">
+            <div class="field-data--type">CTA</div>
+            <div class="field-data--content">
+              <BoxelField @componentName="cta" @fieldName="cta" @label="RSVP" @model={{card}} @mode="edit" />
+            </div>
           </div>
+          <button class="remove-btn">Remove</button>
         </div>
-        <button class="remove-btn">Remove</button>
+
+        <div class="create-new--card--field-box">
+          <div class="handle-icon"></div>
+          <div class="field-data">
+            <div class="field-data--type">Text Field</div>
+            <div class="field-data--content">
+              <BoxelField @value={{card.location}} @fieldName="location" @label="Location" @model={{card}} @mode="edit" />
+            </div>
+          </div>
+          <button class="remove-btn">Remove</button>
+        </div>
       </div>
     </div>
-  </div>
 
-  {{!-- Right edge --}}
-  <div class="create-new--right-edge">
-    <div class="title">Event Card</div>
-    <div>
-      <label>Card ID</label>
-      <input readonly value="1234567...">
+    {{!-- Right edge --}}
+    <div class="create-new--right-edge">
+      <div class="title">{{card.type}} Card</div>
+      <div>
+        <label>Card ID</label>
+        <input readonly value={{this.model.events.length}}>
+      </div>
     </div>
-  </div>
+  {{/let}}
 </div>
