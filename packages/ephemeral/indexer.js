@@ -1,3 +1,4 @@
+const { get } = require('lodash');
 const { declareInjections } = require('@cardstack/di');
 
 module.exports = declareInjections({
@@ -13,6 +14,7 @@ module.exports = declareInjections({
     if (typeof this.loadInitialModels === 'function') {
       initialModels = initialModels.concat(await this.loadInitialModels());
     }
+    initialModels = initialModels.filter(Boolean).filter(i => get(i, 'data.type') !== 'cards');
     let storage = await this.service.findOrCreateStorage(this.dataSource.id, initialModels);
     return new Updater(storage, this.dataSource.id);
   }

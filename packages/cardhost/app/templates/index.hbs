@@ -7,6 +7,7 @@
   </li>
   <li>
     <Input
+      @size="60"
       @value={{this.cardId}}
       @placeholder="Card ID to View"
       @enter={{action this.viewCard this.cardId}}
@@ -16,3 +17,22 @@
     {{/if}}
   </li>
 </ul>
+
+<div>
+  <h2>Catalog</h2>
+  <p>
+    Right now we are emulating a catalog by just listing out all the cards in
+    the local store. Any card that you create or view will be added to the list below.
+  </p>
+
+  <div>
+    <button data-test-refresh-catalog-btn {{on "click" this.refreshCatalog}}>
+      Refresh Catalog
+    </button>
+  </div>
+  <div class="card-catalog">
+    {{#each this.model as |card|}}
+      <CardRenderer @card={{card}} @format="embedded"/>
+    {{/each}}
+  </div>
+</div>

@@ -1,5 +1,5 @@
 import Service from '@ember/service';
-import { get, set, uniqBy, merge, cloneDeep, unionBy } from 'lodash';
+import { get, set, uniqBy, merge, cloneDeep, unionBy, difference } from 'lodash';
 import { hubURL } from '@cardstack/plugin-utils/environment';
 import { inject as service } from '@ember/service';
 import { tracked } from '@glimmer/tracking';
@@ -41,6 +41,23 @@ export default class DataService extends Service {
       loadedFormat: 'isolated',
       session: this.cardstackSession
     });
+  }
+
+  async allCardsInStore() {
+    let isolatedCards = await Promise.all([...store.isolated.keys()].map(async id => new Card({
+        id,
+        loadedFormat: 'isolated',
+        session: this.cardstackSession,
+        data: await store.isolated.get(id)
+      })));
+    let embeddedCards = await Promise.all(difference([...store.embedded.keys()], [...store.isolated.keys()]).map(async id => new Card({
+        id,
+        loadedFormat: 'embedded',
+        session: this.cardstackSession,
+        data: await store.embedded.get(id)
+      })));
+
+    return isolatedCards.concat(embeddedCards);
   }
 
   // used for tests
@@ -100,17 +117,14 @@ class Card {
   }
 
   get loadedFormat() {
-    if (this.isDestroyed) { throw new Error('Cannot get loadedFormat from destroyed card'); }
     return priv.get(this).loadedFormat;
   }
 
   get isNew() {
-    if (this.isDestroyed) { throw new Error('Cannot get isNew from destroyed card'); }
     return priv.get(this).isNew;
   }
 
   get isDirty() {
-    if (this.isDestroyed) { throw new Error('Cannot get isDirty from destroyed card'); }
     return priv.get(this).isDirty;
   }
 
@@ -119,7 +133,6 @@ class Card {
   }
 
   get fields() {
-    if (this.isDestroyed) { throw new Error('Cannot get fields from destroyed card'); } // TODO test this
     return priv.get(this).fields;
   }
 
@@ -135,7 +148,6 @@ class Card {
   }
 
   get json() {
-    if (this.isDestroyed) { throw new Error('Cannot get json from destroyed card'); }
     return getCardDocument(this);
   }
 
@@ -339,27 +351,22 @@ class Field {
   }
 
   get card() {
-    if (this.isDestroyed) { throw new Error('Cannot get card from destroyed field'); }
     return priv.get(this).card;
   }
 
   get name() {
-    if (this.isDestroyed) { throw new Error('Cannot get name from destroyed field'); }
     return priv.get(this).name;
   }
 
   get type() {
-    if (this.isDestroyed) { throw new Error('Cannot get type from destroyed field'); }
     return priv.get(this).type;
   }
 
   get neededWhenEmbedded() {
-    if (this.isDestroyed) { throw new Error('Cannot get neededWhenEmbedded from destroyed field'); }
     return priv.get(this).neededWhenEmbedded;
   }
 
   get value() {
-    if (this.isDestroyed) { throw new Error('Cannot get value from destroyed field'); }
     return priv.get(this).value;
   }
 
@@ -368,7 +375,6 @@ class Field {
   }
 
   get json() {
-    if (this.isDestroyed) { throw new Error('Cannot get json from destroyed field'); }
     let { name:id, type, neededWhenEmbedded, serverData } = priv.get(this);
     // We're returning a JSON:API document here (as opposed to a resource) since eventually
     // a field may encapsulate constraints as included resources within its document

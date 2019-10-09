@@ -2,6 +2,7 @@ const Koa = require('koa');
 const Session = require('@cardstack/plugin-utils/session');
 const { Registry, Container } = require('@cardstack/di');
 const postgresConfig = require('@cardstack/plugin-utils/postgres-config');
+const { get, partition } = require('lodash');
 const { writeSnapshot } = require('heapdump');
 // lazy load only in container mode, since they uses node 8 features
 let EmberConnection;
@@ -66,9 +67,10 @@ async function startIndexing(environment, container) {
   if (environment !== 'production' && ephemeralStorage) {
     let searchers = await container.lookup(`hub:searchers`);
     let models = await (await container.lookup('config:initial-models'))();
+    let [ cards, nonCardModels ] = partition(models, i => get(i, 'data.type') === 'cards');
 
     try {
-      await ephemeralStorage.validateModels(models, async (type, id) => {
+      await ephemeralStorage.validateModels(nonCardModels, async (type, id) => {
         let result;
         try {
           result = await searchers.get(Session.INTERNAL_PRIVILEGED, 'local-hub', type, id);
@@ -84,6 +86,16 @@ async function startIndexing(environment, container) {
       log.error(`Shutting down hub due to invalid model(s): ${err.message}`);
       process.exit(1);
     }
+
+    let cardServices = await container.lookup(`hub:card-services`);
+    await Promise.all(cards.map(async card => {
+      try {
+        await cardServices.get(Session.INTERNAL_PRIVILEGED, card.data.id, 'embedded');
+      } catch (err) {
+        if (err.status !== 404) { throw err; }
+        await cardServices.create(Session.INTERNAL_PRIVILEGED, card);
+      }
+    }));
   }
 
   setInterval(() => container.lookup('hub:indexers').update({ dontWaitForJob: true }), 600000);

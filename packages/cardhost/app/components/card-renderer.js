@@ -9,6 +9,7 @@ import { tracked } from '@glimmer/tracking';
 // TODO This will be part of the official API. Move this into core as it solidifies
 export default class CardRenderer extends Component {
   @tracked componentName;
+  @tracked mode;
 
   constructor(...args) {
     super(...args);
@@ -16,6 +17,7 @@ export default class CardRenderer extends Component {
     // TODO eventually this will be derived based on the presence of a card's
     // custom template/component assets.
     this.componentName = 'default';
+    this.mode = this.args.mode || 'view';
   }
 
   get embeddedComponentName() {

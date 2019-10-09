@@ -6,20 +6,20 @@
     {{#if @setFieldValue}}
       <FieldRenderer
         @field={{field}}
-        @mode="edit"
+        @mode={{@mode}}
         @setFieldValue={{fn @setFieldValue field.name}}
       />
     {{else if (or @setNeededWhenEmbedded @setPosition @removeField)}}
       <FieldRenderer
         @field={{field}}
-        @mode="schema"
+        @mode={{@mode}}
         @position={{index}}
         @removeField={{@removeField}}
         @setPosition={{@setPosition}}
         @setNeededWhenEmbedded={{@setNeededWhenEmbedded}}
       />
     {{else}}
-      <FieldRenderer @field={{field}} @mode="view"/>
+      <FieldRenderer @field={{field}} @mode={{@mode}}/>
     {{/if}}
     <br>
   {{/each}}
