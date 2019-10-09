@@ -5,6 +5,7 @@ import Fixtures from '@cardstack/test-support/fixtures'
 import { createCards } from '../helpers/card-helpers';
 import { setupMockUser, login } from '../helpers/login';
 
+const timeout = 5000;
 const card1Id = 'local-hub::article-card::millenial-puppies';
 const card2Id = 'local-hub::user-card::van-gogh';
 const card3Id = 'local-hub::user-card::hassan';
@@ -82,7 +83,7 @@ module('Acceptance | card view', function(hooks) {
     await visit(`/cards/${card1Id}`);
 
     await click(`a[href="/cards/${card1Id}/edit"]`);
-    await waitFor(`[data-test-card-edit="${card1Id}"]`);
+    await waitFor(`[data-test-card-edit="${card1Id}"]`, { timeout });
 
     assert.equal(currentURL(), `/cards/${card1Id}/edit`);
     assert.dom(`[data-test-card-edit="${card1Id}"]`).exists();
@@ -100,7 +101,7 @@ module('Acceptance | card view', function(hooks) {
     await visit(`/cards/${card1Id}`);
 
     await click(`a[href="/cards/${card1Id}/schema"]`);
-    await waitFor(`[data-test-card-schema="${card1Id}"]`);
+    await waitFor(`[data-test-card-schema="${card1Id}"]`, { timeout });
 
     assert.equal(currentURL(), `/cards/${card1Id}/schema`);
     assert.dom(`[data-test-card-schema="${card1Id}"]`).exists();

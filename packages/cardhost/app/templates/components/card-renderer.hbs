@@ -1,34 +1,56 @@
 {{!--
-This stuff that is wrapping the card components is just throw-away scaffolding.
+This fieldset stuff that is wrapping the card components is just throw-away scaffolding.
 Feel free to get rid of it as soon as it no longer makes sense.
 --}}
-<fieldset>
-  <legend><strong><code>card: {{@card.id}}</code></strong></legend>
 
-  {{!-- TODO let's work on moving this yield out of this component--it's only here for scaffolding --}}
-  {{yield}}
+{{!--
+TODO this component should be responsible for deciding which format of the card to render.
+The process of rendering a card is fundamentally async as we'll need to load the card data,
+as well as waiting for the card component to be compiled by embroider. Make sure to build in
+Ember Concurrency into the rendering of the card component here.
+--}}
+{{#if (eq @format "isolated")}}
+  {{#let (component this.isolatedComponentName) as | Isolated |}}
+    <fieldset>
+      <legend><strong><code>card: {{@card.id}}</code></strong></legend>
 
-  <dl>
-    {{!--
-    TODO this component should be responsible for deciding which format of the card to render.
-    The process of rendering a card is fundamentally async as we'll need to load the card data,
-    as well as waiting for the card component to be compiled by embroider. Make sure to build in
-    Ember Concurrency into the rendering of the card component here.
-    --}}
-    {{#if (eq @format "isolated")}}
-      {{#let (component this.isolatedComponentName) as | Isolated |}}
+      {{!-- TODO let's work on moving this yield out of this component--it's only here for scaffolding --}}
+      {{yield}}
+
+      <dl>
         <Isolated
           @card={{@card}}
+          @mode={{this.mode}}
           @setFieldValue={{@setFieldValue}}
           @removeField={{@removeField}}
           @setNeededWhenEmbedded={{@setNeededWhenEmbedded}}
           @setPosition={{@setPosition}}
         />
-      {{/let}}
-    {{else if (eq @format "embedded")}}
-      {{#let (component this.embeddedComponentName) as | Embedded |}}
-        <Embedded @card={{@card}} />
-      {{/let}}
+      </dl>
+    </fieldset>
+  {{/let}}
+{{else if (eq @format "embedded")}}
+  {{#let (component this.embeddedComponentName) as | Embedded |}}
+    {{#if (eq this.mode "view")}}
+      <LinkTo
+        @class="card-renderer--embedded-card-link"
+        @route="cards.view"
+        @model={{@card.id}}
+      >
+        <fieldset>
+          <legend><strong><code>card: {{@card.id}}</code></strong></legend>
+          <dl>
+            <Embedded @card={{@card}} @mode={{this.mode}}/>
+          </dl>
+        </fieldset>
+      </LinkTo>
+    {{else}}
+      <fieldset>
+        <legend><strong><code>card: {{@card.id}}</code></strong></legend>
+        <dl>
+          <Embedded @card={{@card}} @mode={{this.mode}}/>
+        </dl>
+      </fieldset>
     {{/if}}
-  </dl>
-</fieldset>
+  {{/let}}
+{{/if}}
