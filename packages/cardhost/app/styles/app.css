@@ -1,3 +1,5 @@
+@import '/assets/components/card-creator.css';
+
 .card-creator--field-btn-wrapper {
   text-align: right;
 }

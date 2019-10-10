@@ -20,33 +20,97 @@
 <br>
 
 {{#if this.card}}
-  <CardRenderer
-    @card={{this.card}}
-    @format="isolated"
-    @mode="schema"
-    @removeField={{action this.removeField}}
-    @setNeededWhenEmbedded={{action this.setNeededWhenEmbedded}}
-    @setPosition={{action this.setPosition}}
-  >
-    <div class="card-creator--field-btn-wrapper">
-      {{#unless this.cardstackSession.isAuthenticated}}
-        (Must be logged in to save the card.)
-      {{/unless}}
-      <button {{on "click" this.save}}
-        data-test-card-creator-save-btn
-        disabled={{not this.cardstackSession.isAuthenticated}}
-      >
-        Save Card
-      </button>
-    </div>
-    <br>
 
-    <FieldCreator
-      @numFields={{this.card.isolatedFields.length}}
-      @fieldTypeMappings={{this.fieldTypeMappings}}
-      @addField={{action this.addField}}
-    />
-  </CardRenderer>
+  {{!-- Left edge --}}
+  <div class="create-new--left-edge">
+    {{!-- Profile sidebar --}}
+    <div class="create-new--left-edge--profile">
+      <div class="profile icon"></div>
+      <div class="settings icon active"></div>
+      <div class="search icon"></div>
+    </div>
+    {{!-- Catalog fields list --}}
+    <div class="create-new--left-edge--catalog">
+      <div class="title">Card Catalog</div>
+
+      {{#each this.fieldTypes as |field|}}
+        {{!-- FOO
+        <AnimatedContainer class="pieces-container">
+          {{#animated-value
+            field
+            use=this.dragTransition
+            duration=200
+            watch="dragState"
+          }} --}}
+            <div
+              class="create-new--left-edge--catalog-field"
+              role="button"
+              draggable="true"
+              onmousedown={{action this.beginDragging field}}
+            >
+              <div class="field-icon" style={{css-url "background-image" field.icon}}></div>
+              <div class="field-content">
+                <div class="field-content--title">{{field.title}}</div>
+                <div class="field-content--description">{{field.description}}</div>
+                <div class="field-content--type">Type: <code>{{field.type}}</code></div>
+                <button class="field-content--info-icon"></button>
+              </div>
+            </div>
+          {{!-- {{/animated-value}}
+        </AnimatedContainer> --}}
+      {{/each}}
+    </div>
+  </div>
+  <div class="create-new--main">
+    {{!-- Card --}}
+    <div class="create-new--card">
+      <div class="create-new--card-header">
+        <div class="title">New Card</div>
+        <code class="id">{{@card.id}}</code>
+        {{#unless this.cardstackSession.isAuthenticated}}
+          (Must be logged in to save the card.)
+        {{/unless}}
+        <button class="done-btn" {{on "click" this.save}}
+            data-test-card-creator-save-btn
+            disabled={{not this.cardstackSession.isAuthenticated}}
+          >
+          Save Card
+        </button>
+      </div>
+      <CardRenderer
+        @card={{this.card}}
+        @format="isolated"
+        @mode="schema"
+        @removeField={{action this.removeField}}
+        @setNeededWhenEmbedded={{action this.setNeededWhenEmbedded}}
+        @setPosition={{action this.setPosition}}
+      >
+
+        <div
+          class="create-new--card--field--drop-zone"
+          role="button"
+          ondrop={{action this.dropField}}
+          ondragover={{action this.dragOver}}
+          ondragenter={{action this.toggleOverDropZone true}}
+          ondragleave={{action this.toggleOverDropZone false}}
+        >
+          Drop fields here to edit/add
+        </div>
+
+        {{!-- <AnimatedContainer> --}}
+          {{!-- {{#if isEditingSchema use=this.editSchemaTransition}} --}}
+          {{#if this.isEditingSchema}}
+            <FieldCreator
+              @numFields={{this.card.isolatedFields.length}}
+              @fieldTypeMappings={{this.fieldTypeMappings}}
+              @addField={{action this.addField}}
+              @field={{this.isEditingSchema}}
+            />
+          {{/if}}
+        {{!-- </AnimatedContainer> --}}
+      </CardRenderer>
+    </div>
+  </div>
 {{/if}}
 
 <br>
