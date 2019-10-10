@@ -1,12 +1,5 @@
 
-module.exports = [
-  {
-    type: 'data-sources',
-    id: 'default',
-    attributes: {
-      'source-type': '@cardstack/ephemeral'
-    }
-  },
+let sources = [
   {
     type: 'plugin-configs',
     id: '@cardstack/hub',
@@ -16,7 +9,6 @@ module.exports = [
       }
     }
   },
-
 
   // TODO this is for testing only--eventually we should
   // only use mock-auth in the development and test environments
@@ -37,3 +29,30 @@ module.exports = [
     }
   }
 ];
+
+if (process.env.HUB_ENVIRONMENT === 'production') {
+  sources.push({
+    type: 'data-sources',
+    id: 'default',
+    attributes: {
+      'source-type': '@cardstack/git',
+      params: {
+        branchPrefix: process.env.GIT_BRANCH_PREFIX,
+        remote: {
+          url: 'git@github.com:cardstack/builder-data.git',
+          privateKey: process.env.GIT_PRIVATE_KEY,
+        }
+      }
+    }
+  });
+} else {
+  sources.push({
+    type: 'data-sources',
+    id: 'default',
+    attributes: {
+      'source-type': '@cardstack/ephemeral'
+    }
+  });
+}
+
+module.exports = sources;
