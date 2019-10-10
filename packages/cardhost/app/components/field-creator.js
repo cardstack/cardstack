@@ -1,10 +1,10 @@
 import Component from '@glimmer/component';
 import { tracked } from '@glimmer/tracking';
-import { action } from '@ember/object';
+import { action, get } from '@ember/object';
 
 
 export default class FieldCreator extends Component {
-  @tracked newFieldType = 'string';
+  @tracked newFieldType;
   @tracked newFieldName;
   @tracked newFieldEmbedded;
   @tracked newFieldValue;
@@ -12,19 +12,15 @@ export default class FieldCreator extends Component {
 
   constructor(...args) {
     super(...args);
-    this.resetAddField();
-  }
-
-  get fieldTypes() {
-    return Object.keys(this.args.fieldTypeMappings);
-  }
-
-  resetAddField() {
-    this.newFieldType = 'string';
+    this.newFieldType = get(this, 'args.field.type') || 'string';
     this.newFieldValue = null;
     this.newFieldEmbedded = false;
     this.newFieldName = null;
     this.newFieldPosition = this.args.numFields;
+  }
+
+  get fieldTypes() {
+    return Object.keys(this.args.fieldTypeMappings);
   }
 
   @action
@@ -45,7 +41,5 @@ export default class FieldCreator extends Component {
       this.newFieldValue,
       Math.min(this.newFieldPosition, this.args.numFields)
     );
-
-    this.resetAddField();
   }
 }
