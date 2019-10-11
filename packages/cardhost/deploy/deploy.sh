@@ -42,7 +42,7 @@ if [ "$TRAVIS_PULL_REQUEST" == 'false' ]; then
 
   export TARGET_ENV="builder-$target_env"
 
-  export INITIAL_DATA_DIR=/srv/hub/cardhost/cardstack
+  export INITIAL_DATA_DIR=/srv/hub/cardstack
 
   docker tag cardhost $ECR_ENDPOINT:$docker_image_label
 
