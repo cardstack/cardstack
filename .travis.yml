@@ -27,6 +27,12 @@ cache:
   directories:
     - node_modules
 
+# TODO remove this after finished debugging deployments
+# setting this stage order in order to expedite testing
+stages:
+  - deploy
+  - test
+
 jobs:
   include:
     - stage: test

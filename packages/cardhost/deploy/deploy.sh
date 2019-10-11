@@ -1,4 +1,5 @@
 #!/bin/bash
+set -x
 
 if [ "$TRAVIS_PULL_REQUEST" == 'false' ]; then
   set -e
@@ -42,7 +43,7 @@ if [ "$TRAVIS_PULL_REQUEST" == 'false' ]; then
 
   export TARGET_ENV="builder-$target_env"
 
-  export INITIAL_DATA_DIR=/srv/hub/cardstack
+  export INITIAL_DATA_DIR=/srv/hub/cardhost/cardstack
 
   docker tag cardhost $ECR_ENDPOINT:$docker_image_label
 
@@ -54,7 +55,9 @@ if [ "$TRAVIS_PULL_REQUEST" == 'false' ]; then
 
   export HUB_ENVIRONMENT="production" # all builds that we deploy are prod builds
 
-  cat >> ~/.ssh/known_hosts < deploy/known_hosts
+  echo "deploy.sh current working directory is $(pwd)"
+  echo "dir listing for CWD is: $(ls -la)"
+  cat >> ~/.ssh/known_hosts < ./deploy/known_hosts
   socat "UNIX-LISTEN:/tmp/cardstack-remote-docker-$target_env,reuseaddr,fork" EXEC:"ssh -T docker-control@$SWARM_CONTROLLER" &
   remote=unix:///tmp/cardstack-remote-docker-$target_env
   docker -H $remote stack deploy --with-registry-auth -c deploy/docker-compose.yml hub
@@ -69,6 +72,6 @@ if [ "$TRAVIS_PULL_REQUEST" == 'false' ]; then
             --env TRAVIS_COMMIT \
             --env WEBHOOK_URL \
             --env TARGET_NAME \
-            --workdir /srv/hub \
+            --workdir /srv/hub/cardhost \
             cardhost ./node_modules/.bin/ember deploy $target_env --verbose
 fi
