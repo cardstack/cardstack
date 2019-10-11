@@ -55,17 +55,13 @@ if [ "$TRAVIS_PULL_REQUEST" == 'false' ]; then
   export HUB_ENVIRONMENT="production" # all builds that we deploy are prod builds
 
   cat >> ~/.ssh/known_hosts < ./deploy/known_hosts
-  echo "CWD: $(pwd)"
-  echo "HOME DIR: $(dirname ~)"
-  echo "Current known hosts: $(cat ~/.ssh/known_hosts)"
   socat "UNIX-LISTEN:/tmp/cardstack-remote-docker-$target_env,reuseaddr,fork" EXEC:"ssh -T docker-control@$SWARM_CONTROLLER" &
   remote=unix:///tmp/cardstack-remote-docker-$target_env
-  echo "Starting stack deploy of '${ECR_ENDPOINT}@${DIGEST}' for travis build id: '${TRAVIS_BUILD_ID}'"
   docker -H $remote stack deploy --with-registry-auth -c ./deploy/docker-compose.yml hub
-  echo "completed stack deploy"
 
   DOCKER_HOST=$remote node deploy/watch-docker.js $TRAVIS_BUILD_ID
 
+  docker run cardhost echo "CWD: `pwd`" && ls -la
   # only include env vars necessary for ember deploy
   docker run --rm --network cardstack \
             --env HUB_URL=$PUBLIC_HUB_URL \
