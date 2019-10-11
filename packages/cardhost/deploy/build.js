@@ -8,7 +8,13 @@ const { execSync } = require('child_process');
 const root = resolve(join(__dirname, '..'));
 const context = join(root, 'deploy/context');
 const depLayerFiles = [ 'package.json' ];
-const codeLayerFiles = [ 'cardstack', 'config' ];
+const codeLayerFiles = [
+  'cardstack',
+  'config',
+  'public',
+  'ember-cli-build.js',
+  '.ember-cli.js'
+];
 
 emptyDirSync(context);
 copySync(join(root, 'deploy/Dockerfile'), join(context, 'Dockerfile'));
