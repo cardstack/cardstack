@@ -1,78 +1,78 @@
 ---
 matrix:
-	fast_finish: true
+  fast_finish: true
 
 language: node_js
 node_js:
-	- "10"
+  - "10"
 
 sudo: required
 services:
- - docker
+  - docker
 
 addons:
-	apt:
-		sources:
-			- ubuntu-toolchain-r-test
-		packages:
-			- libstdc++-4.9-dev
+  apt:
+    sources:
+      - ubuntu-toolchain-r-test
+    packages:
+      - libstdc++-4.9-dev
 
 env:
-	global:
-		- PGHOST=localhost
-		- PGPORT=5444
-		- PGUSER=postgres
+  global:
+    - PGHOST=localhost
+    - PGPORT=5444
+    - PGUSER=postgres
 
 cache:
-	directories:
-		- node_modules
+  directories:
+    - node_modules
 
 # TODO remove this after finished debugging deployments
 # setting this stage order in order to expedite testing
 stages:
-	- deploy
-	- test
+  - deploy
+  - test
 
 jobs:
-	include:
-		- stage: test
-			script: npm run lint:deps && npm run lint:js
-			name: 'Linting'
-		- stage: test
-			script: npm run node-tests && npm run truffle-tests
-			name: 'Node tests (node ver 8)'
-			node_js: "8"
-		- stage: test
-			script: npm run node-tests && npm run truffle-tests
-			name: 'Node tests (node ver 10)'
-			node_js: "10"
-		- stage: test
-			script: npm run ember-tests
-			name: 'Ember tests'
-			node_js: "10"
-		- stage: deploy
-			name: 'deploy cardhost'
-			if: branch = master
-			script:
-				- echo "$SSH_PRIVATE_KEY" > $HOME/.ssh/id_rsa && chmod 400 $HOME/.ssh/id_rsa
-				- pip install --user awscli
-				- aws ecr --region us-east-1 get-login --no-include-email | bash
-				- yarn --cwd ./packages/cardhost/deploy install
-				- cd ./packages/cardhost
-				- node ./deploy/build.js
-				- TARGET_NAME='builder.stack.cards' ./deploy/deploy.sh demo $TRAVIS_BRANCH
-				- cd ../..
+  include:
+    - stage: test
+      script: npm run lint:deps && npm run lint:js
+      name: 'Linting'
+    - stage: test
+      script: npm run node-tests && npm run truffle-tests
+      name: 'Node tests (node ver 8)'
+      node_js: "8"
+    - stage: test
+      script: npm run node-tests && npm run truffle-tests
+      name: 'Node tests (node ver 10)'
+      node_js: "10"
+    - stage: test
+      script: npm run ember-tests
+      name: 'Ember tests'
+      node_js: "10"
+    - stage: deploy
+      name: 'deploy cardhost'
+      if: branch = master
+      script:
+        - echo "$SSH_PRIVATE_KEY" > $HOME/.ssh/id_rsa && chmod 400 $HOME/.ssh/id_rsa
+        - pip install --user awscli
+        - aws ecr --region us-east-1 get-login --no-include-email | bash
+        - yarn --cwd ./packages/cardhost/deploy install
+        - cd ./packages/cardhost
+        - node ./deploy/build.js
+        - TARGET_NAME='builder.stack.cards' ./deploy/deploy.sh demo $TRAVIS_BRANCH
+        - cd ../..
 
 before_install:
-	- docker network create cardstack
-	- docker run -d --rm --network cardstack -p 5444:5432 --name postgres cardstack/pg-test
-	- docker run -d --rm --network cardstack -p 9022:22 --name git-ssh cardstack/git-test;
-	- ssh-keyscan -p 9022 -t rsa,ecdsa-sha2-nistp256 localhost >> $HOME/.ssh/known_hosts
-	- chmod 600 packages/git/node-tests/git-ssh-server/cardstack-test-key
-	- export PATH=$HOME/.yarn/bin:$PATH
+  - docker network create cardstack
+  - docker run -d --rm --network cardstack -p 5444:5432 --name postgres cardstack/pg-test
+  - docker run -d --rm --network cardstack -p 9022:22 --name git-ssh cardstack/git-test;
+  - ssh-keyscan -p 9022 -t rsa,ecdsa-sha2-nistp256 localhost >> $HOME/.ssh/known_hosts
+  - chmod 600 packages/git/node-tests/git-ssh-server/cardstack-test-key
+  - export PATH=$HOME/.yarn/bin:$PATH
 
 install:
-	- yarn install
+  - yarn install
 
 before_script:
  - yarn run blockchain &
