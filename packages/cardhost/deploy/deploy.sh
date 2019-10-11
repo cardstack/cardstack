@@ -58,8 +58,8 @@ if [ "$TRAVIS_PULL_REQUEST" == 'false' ]; then
   cat >> ~/.ssh/known_hosts < ./deploy/known_hosts
   socat "UNIX-LISTEN:/tmp/cardstack-remote-docker-$target_env,reuseaddr,fork" EXEC:"ssh -T docker-control@$SWARM_CONTROLLER" &
   remote=unix:///tmp/cardstack-remote-docker-$target_env
-  echo "Starting stack deploy"
-  docker -H $remote stack deploy --with-registry-auth -c deploy/docker-compose.yml hub
+  echo "Starting stack deploy of '${CONTAINER_REPO}@${DIGEST}' for travis build id: '${TRAVIS_BUILD_ID}'"
+  docker -H $remote stack deploy --with-registry-auth -c ./deploy/docker-compose.yml hub
   echo "completed stack deploy"
 
   DOCKER_HOST=$remote node deploy/watch-docker.js $TRAVIS_BUILD_ID
