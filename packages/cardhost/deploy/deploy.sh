@@ -55,7 +55,7 @@ if [ "$TRAVIS_PULL_REQUEST" == 'false' ]; then
 
   export HUB_ENVIRONMENT="production" # all builds that we deploy are prod builds
 
-  echo "deploy.sh current working directory is $(pwd)"
+  echo "deploy.sh current working directory is: $(pwd)"
   echo "dir listing for CWD is: $(ls -la)"
   cat >> ~/.ssh/known_hosts < ./deploy/known_hosts
   socat "UNIX-LISTEN:/tmp/cardstack-remote-docker-$target_env,reuseaddr,fork" EXEC:"ssh -T docker-control@$SWARM_CONTROLLER" &
