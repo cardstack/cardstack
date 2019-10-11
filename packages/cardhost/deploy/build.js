@@ -8,7 +8,7 @@ const { execSync } = require('child_process');
 const root = resolve(join(__dirname, '..'));
 const context = join(root, 'deploy/context');
 const depLayerFiles = [ 'package.json' ];
-const codeLayerFiles = [ 'cardstack' ];
+const codeLayerFiles = [ 'cardstack', 'config' ];
 
 emptyDirSync(context);
 copySync(join(root, 'deploy/Dockerfile'), join(context, 'Dockerfile'));

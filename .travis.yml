@@ -53,6 +53,7 @@ jobs:
     - stage: deploy
       name: 'deploy cardhost'
       if: branch = master
+      install: skip
       script:
         - echo "$SSH_PRIVATE_KEY" > $HOME/.ssh/id_rsa && chmod 400 $HOME/.ssh/id_rsa
         - sudo apt-get install socat

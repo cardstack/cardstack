@@ -25,6 +25,7 @@
     "@cardstack/core": "0.14.24",
     "@cardstack/ephemeral": "0.14.24",
     "@cardstack/eslint-config": "0.14.24",
+    "@cardstack/git": "0.14.24",
     "@cardstack/hub": "0.14.24",
     "@cardstack/jsonapi": "0.14.24",
     "@cardstack/mock-auth": "0.14.24",
