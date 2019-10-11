@@ -32,6 +32,7 @@ codeLayerFiles.forEach(serverFile => {
   });
 });
 
+/*
 let dockerImageLabel = specialBranches.includes(process.env.TRAVIS_BRANCH) ? process.env.TRAVIS_BRANCH : process.env.TRAVIS_BUILD_ID || 'latest';
 try {
   process.stdout.write(`Retrieving docker build from ${process.env.ECR_ENDPOINT}:${dockerImageLabel} ...`);
@@ -43,3 +44,5 @@ try {
   process.stdout.write(`No build cache found for cardhost:${dockerImageLabel}, building from scratch.`);
 }
 execSync(`docker build -f ${join(context, 'Dockerfile')} --cache-from ${process.env.ECR_ENDPOINT}:${dockerImageLabel} -t cardhost ${context}`, { stdio: 'inherit' });
+*/
+execSync(`docker build -f ${join(context, 'Dockerfile')} -t cardhost ${context}`, { stdio: 'inherit' });

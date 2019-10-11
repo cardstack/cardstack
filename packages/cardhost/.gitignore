@@ -8,6 +8,7 @@
 /bower_components/
 /node_modules/
 /deploy/node_modules/
+/deploy/context
 
 # misc
 /.sass-cache
