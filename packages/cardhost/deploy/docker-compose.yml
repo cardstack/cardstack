@@ -1,0 +1,44 @@
+version: "3.4"
+
+services:
+  hub:
+    image: ${CONTAINER_REPO}@${DIGEST}
+    deploy:
+      labels:
+        cardstack_travis_build: ${TRAVIS_BUILD_ID}
+      replicas: 1
+      update_config:
+        order: start-first
+        failure_action: rollback
+    ports:
+      - "3000:3000"
+    environment:
+      - PGHOST
+      - PGPORT
+      - PGUSER
+      - PGPASSWORD
+      - LOG_LEVELS
+      - TARGET_ENV
+      - TARGET_NAME
+      - TEST
+      - NODE_OPTIONS
+      - HUB_ENVIRONMENT
+      - PUBLIC_HUB_URL
+      - CARDSTACK_SESSIONS_KEY
+      - INITIAL_DATA_DIR
+      - TRAVIS_BRANCH
+      - S3_IMAGE_BUCKET
+      - S3_IMAGE_UPLOAD_ACCESS_KEY_ID
+      - S3_IMAGE_UPLOAD_SECRET_ACCESS_KEY
+      - GIT_PRIVATE_KEY
+      - GIT_BRANCH_PREFIX
+      - GITHUB_CLIENT_ID
+      - GITHUB_CLIENT_SECRET
+      - GITHUB_TOKEN
+      - WEBHOOK_URL
+
+networks:
+  default:
+    ipam:
+      config:
+        - subnet: 172.28.0.0/16

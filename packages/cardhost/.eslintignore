@@ -9,6 +9,7 @@
 # dependencies
 /bower_components/
 /node_modules/
+/deploy/node_modules/
 
 # misc
 /coverage/

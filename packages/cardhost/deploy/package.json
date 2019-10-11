@@ -1,0 +1,19 @@
+{
+  "name": "deploy",
+  "version": "1.0.0",
+  "description": "",
+  "main": "build.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "fs-extra": "^7.0.0",
+    "glob": "^7.1.2",
+    "js-yaml": "^3.12.0"
+  },
+  "engines": {
+    "node": ">= 8"
+  }
+}
