@@ -61,7 +61,6 @@ if [ "$TRAVIS_PULL_REQUEST" == 'false' ]; then
 
   DOCKER_HOST=$remote node deploy/watch-docker.js $TRAVIS_BUILD_ID
 
-  docker run cardhost echo "CWD: `pwd`" && ls -la
   # only include env vars necessary for ember deploy
   docker run --rm --network cardstack \
             --env HUB_URL=$PUBLIC_HUB_URL \
@@ -70,6 +69,5 @@ if [ "$TRAVIS_PULL_REQUEST" == 'false' ]; then
             --env TRAVIS_COMMIT \
             --env WEBHOOK_URL \
             --env TARGET_NAME \
-            # --workdir /srv/hub/cardhost \
             cardhost ./node_modules/.bin/ember deploy $target_env --verbose
 fi

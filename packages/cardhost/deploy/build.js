@@ -7,7 +7,6 @@ const { execSync } = require('child_process');
 
 const root = resolve(join(__dirname, '..'));
 const context = join(root, 'deploy/context');
-const specialBranches = [ 'master' ];
 const depLayerFiles = [ 'package.json' ];
 const codeLayerFiles = [ 'cardstack' ];
 
@@ -32,7 +31,7 @@ codeLayerFiles.forEach(serverFile => {
   });
 });
 
-let dockerImageLabel = specialBranches.includes(process.env.TRAVIS_BRANCH) ? process.env.TRAVIS_BRANCH : process.env.TRAVIS_BUILD_ID || 'latest';
+let dockerImageLabel = process.env.TRAVIS_BUILD_ID;
 try {
   process.stdout.write(`Retrieving docker build from ${process.env.ECR_ENDPOINT}:${dockerImageLabel} ...`);
   execSync(`docker pull ${process.env.ECR_ENDPOINT}:${dockerImageLabel}`);
