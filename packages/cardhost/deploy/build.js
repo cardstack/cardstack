@@ -11,6 +11,7 @@ const depLayerFiles = [ 'package.json' ];
 const codeLayerFiles = [
   'cardstack',
   'config',
+  'app',
   'public',
   'ember-cli-build.js',
   '.ember-cli.js'
