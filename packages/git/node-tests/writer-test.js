@@ -921,3 +921,78 @@ describe('git/writer/githereum', function() {
   });
 
 });
+
+describe('git/writer/hyperledger', function() {
+  let env, writers, repoPath, writer, gitChain;
+
+  beforeEach(async function() {
+    repoPath = await temp.mkdir('git-writer-test');
+    await makeRepo(repoPath);
+
+    let factory = new JSONAPIFactory();
+
+    let source = factory.addResource('data-sources', 'git')
+      .withAttributes({
+        'source-type': '@cardstack/git',
+        params: {
+          repo: repoPath,
+          hyperledger: {
+            privateKey: "Here is a private key",
+            apiBase: "http://example.com/1234",
+            tag: 'test-tag',
+            blobStorage: {
+              type: 'tmpfile',
+              path: 'tmp/blobs'
+            }
+          }
+        }
+      });
+
+    factory.addResource('content-types', 'articles')
+      .withRelated('fields', [
+        factory.addResource('fields', 'title').withAttributes({ fieldType: '@cardstack/core-types::string' }),
+        factory.addResource('fields', 'primary-image').withAttributes({ fieldType: '@cardstack/core-types::belongs-to' })
+      ]).withRelated('data-source', source);
+
+
+    env = await createDefaultEnvironment(`${__dirname}/..`, factory.getModels());
+    writers = env.lookup('hub:writers');
+
+    let schema = await writers.currentSchema.getSchema();
+    writer = schema.getDataSource('git').writer;
+    await writer._ensureGitchain();
+    gitChain = writer.gitChain;
+
+  });
+
+  afterEach(async function() {
+    await temp.cleanup();
+    await destroyDefaultEnvironment(env);
+  });
+
+  it('writes to hyperledger if configured when writing', async function () { let
+  fakePush = fake.returns(new Promise(resolve => resolve()));
+
+    replace(gitChain, 'push', fakePush);
+
+    await writers.create(env.session, 'articles', {
+      data: {
+        type: 'articles',
+        attributes: {
+          title: 'An article'
+        }
+      }
+    });
+
+    // correct config is passed in to gitChain
+    expect(await realpathPromise(gitChain.repoPath)).to.equal(await realpathPromise(repoPath));
+    expect(gitChain.readPrivateKey()).to.equal("Here is a private key");
+    expect(gitChain.apiBase).to.equal("http://example.com/1234");
+
+
+    // push is called with the correct tag
+    expect(fakePush.callCount).to.equal(1);
+    expect(fakePush.calledWith('test-tag')).to.be.ok;
+  });
+
+});

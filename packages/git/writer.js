@@ -14,6 +14,7 @@ const temp = require('temp').track();
 const Githereum = require('githereum/githereum');
 const GithereumContract = require("githereum/build/contracts/Githereum.json");
 const TruffleContract = require("truffle-contract");
+const Gitchain = require('@cardstack/gitchain');
 
 const log = require('@cardstack/logger')('cardstack/git');
 const stringify = require('json-stable-stringify-without-jsonify');
@@ -26,7 +27,7 @@ module.exports = class Writer {
     return new this(...args);
   }
 
-  constructor({ repo, idGenerator, basePath, branchPrefix, remote, githereum }) {
+  constructor({ repo, idGenerator, basePath, branchPrefix, remote, hyperledger, githereum }) {
     this.repoPath = repo;
     this.basePath = basePath;
     this.branchPrefix = branchPrefix || "";
@@ -37,6 +38,11 @@ module.exports = class Writer {
     this.idGenerator = idGenerator;
     this.remote = remote;
 
+    if (hyperledger) {
+      let config = Object.assign({}, hyperledger);
+      config.logger = log.info.bind(log);
+      this.hyperledgerConfig = config;
+    }
     if (githereum) {
       let config = Object.assign({}, githereum);
       config.log = log.info.bind(log);
@@ -196,6 +202,14 @@ module.exports = class Writer {
     }
   }
 
+  async _ensureGitchain() {
+    await this._ensureRepo();
+
+    if (!this.gitChain && this.hyperledgerConfig) {
+      this.gitChain = new Gitchain(this.repo.path(), this.hyperledgerConfig);
+    }
+  }
+
   async _ensureGithereum() {
     await this._ensureRepo();
 
@@ -230,6 +244,20 @@ module.exports = class Writer {
       // the id is already in use (so we can really only collide
       // with things that have not yet merged into our branch).
       return crypto.randomBytes(20).toString('hex');
+    }
+  }
+
+  async _pushToHyperledger() {
+    await this._ensureGitchain();
+
+    if(this.gitChain) {
+      // make sure only one push is ongoing at a time, by creating a chain of
+      // promises here
+      this._gitChainPromise = Promise.resolve(this._gitChainPromise).then(() =>
+        this.gitChain.push(this.hyperledgerConfig.tag).catch(e => {
+          log.error("Error pushing to hyperledger:", e, e.stack);
+        })
+      );
     }
   }
 
@@ -312,6 +340,7 @@ async function finalizer(pendingChange) {
       }
     }
     let version = await change.finalize(signature, this.remote, this.fetchOpts);
+    await this._pushToHyperledger();
     await this._pushToGithereum();
     return { version, hash: (file ? file.savedId() : null) };
   });
