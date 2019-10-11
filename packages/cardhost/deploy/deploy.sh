@@ -41,7 +41,6 @@ if [ "$TRAVIS_PULL_REQUEST" == 'false' ]; then
   done
 
   export TARGET_ENV="builder-$target_env"
-  export CONTAINER_REPO="$ECR_ENDPOINT"
 
   export INITIAL_DATA_DIR=/srv/hub/cardhost/cardstack
 
@@ -56,9 +55,10 @@ if [ "$TRAVIS_PULL_REQUEST" == 'false' ]; then
   export HUB_ENVIRONMENT="production" # all builds that we deploy are prod builds
 
   cat >> ~/.ssh/known_hosts < ./deploy/known_hosts
+  echo "Current known hosts: $(cat ~/.ssh/known_hosts)"
   socat "UNIX-LISTEN:/tmp/cardstack-remote-docker-$target_env,reuseaddr,fork" EXEC:"ssh -T docker-control@$SWARM_CONTROLLER" &
   remote=unix:///tmp/cardstack-remote-docker-$target_env
-  echo "Starting stack deploy of '${CONTAINER_REPO}@${DIGEST}' for travis build id: '${TRAVIS_BUILD_ID}'"
+  echo "Starting stack deploy of '${ECR_ENDPOINT}@${DIGEST}' for travis build id: '${TRAVIS_BUILD_ID}'"
   docker -H $remote stack deploy --with-registry-auth -c ./deploy/docker-compose.yml hub
   echo "completed stack deploy"
 

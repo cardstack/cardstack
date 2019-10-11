@@ -2,7 +2,7 @@ version: "3.4"
 
 services:
   hub:
-    image: ${CONTAINER_REPO}@${DIGEST}
+    image: ${ECR_ENDPOINT}@${DIGEST}
     deploy:
       labels:
         cardstack_travis_build: ${TRAVIS_BUILD_ID}
