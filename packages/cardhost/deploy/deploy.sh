@@ -70,6 +70,6 @@ if [ "$TRAVIS_PULL_REQUEST" == 'false' ]; then
             --env TRAVIS_COMMIT \
             --env WEBHOOK_URL \
             --env TARGET_NAME \
-            --workdir /srv/hub/cardhost \
+            # --workdir /srv/hub/cardhost \
             cardhost ./node_modules/.bin/ember deploy $target_env --verbose
 fi
