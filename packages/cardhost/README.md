@@ -1,7 +1,7 @@
 # cardhost
 
 This README outlines the details of collaborating on this Ember application.
-A short introduction of this app could easily go here.
+The cardhost is an application container that hosts cards. The cardhost is deployed as a stand-alone ember application outside of the mono repo. Because the cardhost is deployed as an isolated module outside of the mono repo, if any of it's mono repo peer modules change, you'll need to rev the mono repo in order for the deployed cardhost to pick up the changed.
 
 ## Prerequisites
 
