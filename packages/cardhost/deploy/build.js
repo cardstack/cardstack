@@ -4,8 +4,8 @@ const glob = require('glob');
 const { join, resolve } = require('path');
 const { emptyDirSync, copySync } = require('fs-extra');
 const { execSync } = require('child_process');
-
 const root = resolve(join(__dirname, '..'));
+const specialBranches = [ 'master' ];
 const context = join(root, 'deploy/context');
 const depLayerFiles = [ 'package.json' ];
 const codeLayerFiles = [
@@ -38,7 +38,8 @@ codeLayerFiles.forEach(serverFile => {
   });
 });
 
-let dockerImageLabel = process.env.TRAVIS_BUILD_ID;
+let dockerImageLabel = specialBranches.includes(process.env.TRAVIS_BRANCH) ? process.env.TRAVIS_BRANCH : process.env.TRAVIS_BUILD_ID || 'latest';
+
 try {
   process.stdout.write(`Retrieving docker build from ${process.env.ECR_ENDPOINT}:${dockerImageLabel} ...`);
   execSync(`docker pull ${process.env.ECR_ENDPOINT}:${dockerImageLabel}`);
