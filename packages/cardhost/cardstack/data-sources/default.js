@@ -1,4 +1,3 @@
-
 let sources = [
   {
     type: 'plugin-configs',
