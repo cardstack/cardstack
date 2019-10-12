@@ -9,6 +9,13 @@
     "doc": "doc",
     "test": "tests"
   },
+  "keywords": [
+    "cardstack-plugin"
+  ],
+  "cardstack-plugin": {
+    "api-version": 1,
+    "src": "cardstack"
+  },
   "scripts": {
     "build": "ember build",
     "lint:hbs": "ember-template-lint .",
