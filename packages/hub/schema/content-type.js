@@ -4,6 +4,7 @@ const { flatten } = require('lodash');
 const Realms = require('./realms');
 const authLog = require('@cardstack/logger')('cardstack/auth');
 const Session = require('@cardstack/plugin-utils/session');
+const log = require('@cardstack/logger')('cardstack/schema/content-type');
 
 module.exports = class ContentType {
   constructor(model, allFields, allComputedFields, allConstraints, dataSources, defaultDataSource, allGrants, allGroups) {
@@ -22,6 +23,7 @@ module.exports = class ContentType {
           computedFields.set(fieldRef.id, field);
           realAndComputedFields.set(fieldRef.id, field.virtualField);
         } else {
+          log.error(`Error broken field:`, console.trace()); //eslint-disable-line no-console
           throw new Error(`content type "${model.id}" refers to missing field "${fieldRef.id}"`, {
             status: 400,
             title: 'Broken field reference'
