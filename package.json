@@ -68,13 +68,31 @@
     "eslint-plugin-ember": "^6.2.0",
     "eslint-plugin-node": "^9.0.1",
     "loader.js": "^4.7.0",
-    "qunit-dom": "^0.8.4"
+    "qunit-dom": "^0.8.4",
+    "release-it": "^12.2.1",
+    "release-it-lerna-changelog": "^1.0.3"
   },
   "engines": {
     "node": "8.* || >= 10.*"
   },
+  "publishConfig": {
+    "registry": "https://registry.npmjs.org"
+  },
   "ember-addon": {
     "configPath": "tests/dummy/config",
     "demoURL": "https://cardstack.github.io/boxel"
+  },
+  "release-it": {
+    "plugins": {
+      "release-it-lerna-changelog": {
+        "infile": "CHANGELOG.md"
+      }
+    },
+    "git": {
+      "tagName": "v${version}"
+    },
+    "github": {
+      "release": true
+    }
   }
 }
