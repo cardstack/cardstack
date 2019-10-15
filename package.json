@@ -1,6 +1,6 @@
 {
   "name": "@cardstack/boxel",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "The default blueprint for ember-cli addons.",
   "keywords": [
     "ember-addon"
