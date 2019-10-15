@@ -710,9 +710,10 @@
     lodash "^4.17.13"
     to-fast-properties "^2.0.0"
 
-"@cardstack/ui-components@^0.1.11":
-  version "0.1.11"
-  resolved "https://registry.yarnpkg.com/@cardstack/ui-components/-/ui-components-0.1.11.tgz#21b0a905294d8753ce76d514fe1c95688dce2892"
+"@cardstack/ui-components@^0.1.12":
+  version "0.1.12"
+  resolved "https://registry.yarnpkg.com/@cardstack/ui-components/-/ui-components-0.1.12.tgz#e1d7dbcc8f4a7bd86f01d91bbcd5ddd1504330d2"
+  integrity sha512-h5eJY35LSez/ZaXDFK4p+Y3cGYkTKau52ayWZKDRcwP52tLk4qjp1AInOb18i7b2vz4gHWI3nVxLrBgtirRoXg==
   dependencies:
     broccoli-funnel "^2.0.2"
     broccoli-merge-trees "^3.0.2"

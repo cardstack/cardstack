@@ -1,1 +1,1 @@
-export { default } from 'boxel/routes/boxelized';
+export { default } from '@cardstack/boxel/routes/boxelized';

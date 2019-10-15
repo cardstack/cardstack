@@ -1,4 +1,4 @@
-import BoxelizedRoute from 'boxel/routes/boxelized';
+import BoxelizedRoute from '@cardstack/boxel/routes/boxelized';
 
 export default class DemoDragDropRoute extends BoxelizedRoute {
   boxelPlane = 'space';

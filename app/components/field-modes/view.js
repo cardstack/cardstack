@@ -1,1 +1,1 @@
-export { default } from 'boxel/components/field-modes/view';
+export { default } from '@cardstack/boxel/components/field-modes/view';
