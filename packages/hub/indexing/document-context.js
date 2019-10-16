@@ -64,16 +64,20 @@ module.exports = class DocumentContext {
         let contentType = this.schema.getType(doc.type);
         if (!contentType) { throw new Error(`Unknown content type=${doc.type} id=${doc.id}`); }
 
-        return new Model(contentType, doc, this.schema, this.read.bind(this), this._getCard.bind(this), this.search.bind(this));
+        return new Model(contentType, doc, this.schema, this.read.bind(this), this._getCard.bind(this), this.search.bind(this), this.cardIdContext);
       });
     } else {
       let contentType = this.schema.getType(this.type);
       if (!contentType) { throw new Error(`Unknown content type=${this.type} id=${this.id}`); }
 
-      this._model = new Model(contentType, this.upstreamDoc.data, this.schema, this.read.bind(this), this._getCard.bind(this), this.search.bind(this));
+      this._model = new Model(contentType, this.upstreamDoc.data, this.schema, this.read.bind(this), this._getCard.bind(this), this.search.bind(this), this.cardIdContext);
     }
 
     return this._model;
+  }
+
+  get cardIdContext() {
+    return isCard(this.type, this.id) ? this.id : null;
   }
 
   async searchDoc() {
@@ -671,7 +675,7 @@ module.exports = class DocumentContext {
       } else {
         jsonapiDoc = jsonapiDoc.data;
       }
-      let userModel = new Model(contentType, jsonapiDoc, this.schema, this.read.bind(this), this._getCard.bind(this), this.search.bind(this));
+      let userModel = new Model(contentType, jsonapiDoc, this.schema, this.read.bind(this), this._getCard.bind(this), this.search.bind(this), this.cardIdContext);
       await this._buildAttributes(contentType, jsonapiDoc, userModel, pristine, searchDoc);
 
       if (!this._followedRelationships[`${type}/${id}`]) {

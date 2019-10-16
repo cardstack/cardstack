@@ -2,9 +2,11 @@
 // (like computed fields) to access models.
 const priv = new WeakMap();
 const qs = require('qs');
+const { difference, unset, get } = require('lodash');
 const {
   isCard,
   loadCard,
+  cardIdDelim
 } = require('./indexing/card-utils');
 
 exports.privateModels = priv;
@@ -20,8 +22,8 @@ function isRelationshipObject(obj) {
 }
 
 exports.Model = class Model {
-  constructor(contentType, jsonapiDoc, schema, read, getCard, search) {
-    priv.set(this, { contentType, jsonapiDoc, schema, read, getCard, search });
+  constructor(contentType, jsonapiDoc, schema, read, getCard, search, cardIdContext) {
+    priv.set(this, { contentType, jsonapiDoc, schema, read, getCard, search, cardIdContext });
   }
 
   get id() {
@@ -110,7 +112,7 @@ exports.Model = class Model {
   async getModel(type, id) {
     let contentType;
     let model;
-    let { schema, read, search, jsonapiDoc, getCard } = priv.get(this);
+    let { schema, read, search, jsonapiDoc, getCard, cardIdContext } = priv.get(this);
     if (isCard(type, id)) {
       let card = await getCard(id);
       if (!card) { return; }
@@ -124,6 +126,16 @@ exports.Model = class Model {
         throw new Error(`${jsonapiDoc.type} ${jsonapiDoc.id} tried to getModel nonexistent type ${type}`);
       }
       model = card.data;
+      if (id !== cardIdContext) {
+        let fieldsToDelete = difference(
+          Object.keys(get(model, 'attributes.metadata-field-types') || {}),
+          Object.keys(get(model, 'attributes.embedded-metadata-field-types') || {})
+        );
+        for (let field of fieldsToDelete) {
+          unset(model, `attributes.${id}${cardIdDelim}${field}`);
+          unset(model, `relationships.${id}${cardIdDelim}${field}`);
+        }
+      }
     } else {
       contentType = schema.getType(type);
       if (!contentType) {
