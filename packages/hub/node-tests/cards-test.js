@@ -364,28 +364,25 @@ describe('hub/card-services', function () {
   });
 
   describe('writing cards', function() {
-    let externalArticleCard;
+    let externalArticleCard, externalUserCard;
     beforeEach(async function () {
       cleanup();
       let factory = new JSONAPIFactory();
-      factory.addResource('data-sources', 'stub-card-project')
-        .withAttributes({
-          sourceType: 'stub-card-project',
-          params: {
-            cardSearchResults: [
-              userCard,
-            ]
-          }
-        });
       env = await createDefaultEnvironment(`${__dirname}/../../../tests/stub-card-project`, factory.getModels());
       cardServices = env.lookup('hub:card-services');
       externalArticleCard = await adaptCardToFormat(await env.lookup('hub:current-schema').getSchema(), env.session, internalArticleCard, 'isolated', cardServices);
+      externalUserCard = await adaptCardToFormat(await env.lookup('hub:current-schema').getSchema(), env.session, userCard, 'isolated', cardServices);
 
       // remove the card metadata to make this as real as possible...
       for (let field of Object.keys(externalArticleCard.data.attributes)) {
         if (cardBrowserAssetFields.includes(field)) { continue; }
         delete externalArticleCard.data.attributes[field];
       }
+      for (let field of Object.keys(externalUserCard.data.attributes)) {
+        if (cardBrowserAssetFields.includes(field)) { continue; }
+        delete externalUserCard.data.attributes[field];
+      }
+      await cardServices.create(env.session, externalUserCard);
     });
 
     it('can add a new card', async function() {
@@ -726,6 +723,25 @@ describe('hub/card-services', function () {
       expect(user1Resource.attributes.email).to.be.undefined;
       expect(user2Resource.attributes.name).to.equal('Hassan');
       expect(user2Resource.attributes.email).to.be.undefined;
+    });
+
+    it("can invalidate a card that has a relationship to an updated card", async function() {
+      await cardServices.create(env.session, user1Card);
+      let user2 = await cardServices.create(env.session, user2Card);
+      await cardServices.create(env.session, doorsArticleCard);
+
+      let article = await cardServices.get(env.session, doorsArticleCard.data.id, 'isolated');
+      let embeddedUser2 = article.included.find(i => `${i.type}/${i.id}` === `cards/${user2Card.data.id}`);
+      expect(embeddedUser2.attributes.name).to.equal('Hassan');
+
+      let internalModel = user2.included.find(i => i.type = 'local-hub::user-card::hassan');
+      internalModel.attributes.name = 'Babikir';
+      user2 = await cardServices.update(env.session, user2Card.data.id, user2);
+
+      expect(user2.data.attributes.name).to.equal('Babikir');
+      article = await cardServices.get(env.session, doorsArticleCard.data.id, 'isolated');
+      embeddedUser2 = article.included.find(i => `${i.type}/${i.id}` === `cards/${user2Card.data.id}`);
+      expect(embeddedUser2.attributes.name).to.equal('Babikir');
     });
   });
 
