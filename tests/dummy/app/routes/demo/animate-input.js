@@ -1,4 +1,4 @@
-import BoxelizedRoute from 'boxel/routes/boxelized';
+import BoxelizedRoute from '@cardstack/boxel/routes/boxelized';
 
 export default class DemoAnimateInputRoute extends BoxelizedRoute {
   boxelPlane = 'space';

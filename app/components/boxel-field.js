@@ -1,1 +1,1 @@
-export { default } from 'boxel/components/boxel-field';
+export { default } from '@cardstack/boxel/components/boxel-field';

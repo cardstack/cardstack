@@ -1,1 +1,1 @@
-export { default } from 'boxel/services/boxel';
+export { default } from '@cardstack/boxel/services/boxel';

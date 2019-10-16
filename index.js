@@ -1,5 +1,5 @@
 'use strict';
 
 module.exports = {
-  name: 'boxel'
+  name: '@cardstack/boxel'
 };

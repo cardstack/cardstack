@@ -1,1 +1,1 @@
-export { default } from 'boxel/components/field-modes/schema';
+export { default } from '@cardstack/boxel/components/field-modes/schema';
