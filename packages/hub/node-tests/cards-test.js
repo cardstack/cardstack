@@ -270,11 +270,6 @@ describe('hub/card-services', function () {
     });
   });
 
-  describe("loads card", function () {
-    describe("via searcher", function() {
-    });
-  });
-
   describe('writing cards', function() {
     let externalArticleCard, externalUserCard;
     beforeEach(async function () {

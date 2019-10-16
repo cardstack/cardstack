@@ -2,7 +2,7 @@ const authLog = require('@cardstack/logger')('cardstack/auth');
 const log = require('@cardstack/logger')('cardstack/indexing/document-context');
 const { Model, privateModels } = require('../model');
 const { getPath } = require('@cardstack/routing/cardstack/path');
-const { merge, get, uniqBy } = require('lodash');
+const { merge, get, uniqBy, uniq } = require('lodash');
 const Session = require('@cardstack/plugin-utils/session');
 const {
   getCardId,
@@ -13,7 +13,7 @@ const qs = require('qs');
 
 module.exports = class DocumentContext {
 
-  constructor({ read, search, routers, schema, type, id, sourceId, generation, upstreamDoc, format, references, includePaths }) {
+  constructor({ read, search, routers, schema, type, id, sourceId, generation, upstreamDoc, format, includePaths }) {
     if (upstreamDoc && !upstreamDoc.data) {
       throw new Error('The upstreamDoc must have a top-level "data" property', {
         status: 400
@@ -46,7 +46,7 @@ module.exports = class DocumentContext {
     // references to included resource that were both found or
     // missing. We track the missing ones so that if they later appear
     // in the data we can invalidate to pick them up.
-    this._references = references || [];
+    this._references = [];
 
     // special case for the built-in implicit relationship between
     // user-realms and the underlying user record it is tracking
@@ -105,7 +105,7 @@ module.exports = class DocumentContext {
     if (this.isCollection) { return; }
 
     await this._buildCachedResponse();
-    return this._references;
+    return uniq(this._references);
   }
 
   async updateDocumentMeta(meta) {
