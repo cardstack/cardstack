@@ -11,7 +11,7 @@ import {
   RelationshipsWithData,
   ResourceLinkage
 } from "jsonapi-typescript";
-import { set, get, uniqBy, isEqual, sortBy, cloneDeep, unset } from 'lodash';
+import { set, get, uniq, uniqBy, isEqual, sortBy, cloneDeep, unset } from 'lodash';
 import logger from '@cardstack/logger';
 import { join } from "path";
 import { tmpdir } from 'os';
@@ -72,7 +72,7 @@ function isCard(type: string = '', id: string = '') {
   return id && type === id && id.split(cardIdDelim).length > 2;
 }
 
-async function loadCard(schema: todo, card: SingleResourceDoc) {
+async function loadCard(schema: todo, card: SingleResourceDoc, getInternalCard: todo) {
   if (!card || !card.data || !card.data.id) { return; }
 
   // a searcher or indexer may be returning invalid cards, so we
@@ -80,7 +80,7 @@ async function loadCard(schema: todo, card: SingleResourceDoc) {
   validateInternalCardFormat(schema, card);
 
   await generateCardModule(card);
-  return getCardSchemas(schema, card);
+  return await getCardSchemas(schema, card, getInternalCard);
 }
 
 function getCardId(id: string | number | undefined) {
@@ -333,7 +333,7 @@ function createPkgFile(card: SingleResourceDoc, cardFolder: string) {
   return pkg;
 }
 
-function getCardSchemas(schema: todo, card: SingleResourceDoc) {
+async function getCardSchemas(schema: todo, card: SingleResourceDoc, getInternalCard?: todo) {
   if (!card) { return; }
   if (!card.data.id) { return; }
 
@@ -343,14 +343,14 @@ function getCardSchemas(schema: todo, card: SingleResourceDoc) {
     if (!schema.isSchemaType(resource.type)) { continue; }
     schemaModels.push(resource);
   }
-  let cardModelSchema = deriveCardModelContentType(card);
+  let cardModelSchema = await deriveCardModelContentType(card, getInternalCard);
   if (cardModelSchema) {
     schemaModels.push(cardModelSchema);
   }
   return schemaModels;
 }
 
-function deriveCardModelContentType(card: SingleResourceDoc) {
+async function deriveCardModelContentType(card: SingleResourceDoc, getInternalCard?: todo) {
   if (!card.data.id) { return; }
   let id = getCardId(card.data.id);
 
@@ -368,8 +368,15 @@ function deriveCardModelContentType(card: SingleResourceDoc) {
     'fields',
     'fields.related-types',
     'fields.constraints',
-  ].concat((get(card, 'data.relationships.fields.data') || [])
-    .map((i: ResourceIdentifierObject) => i.id));
+  ];
+
+  // We only need to ponder default includes when writing documents to the index, so that the
+  // index has the correct default includes. when returning docs (aka running them through adaptToFormat)
+  // there is no need to worry about default includes, as that will already have been taken into account.
+  // The scnearios when you are writing to the index you'll always have a getInteralCard function.
+  if (typeof getInternalCard === 'function') {
+    defaultIncludes = defaultIncludes.concat(await traversableRelationships(card, getInternalCard, 'isolated'));
+  }
 
   let modelContentType: ResourceObject = {
     id,
@@ -378,6 +385,42 @@ function deriveCardModelContentType(card: SingleResourceDoc) {
     relationships: { fields }
   };
   return modelContentType;
+}
+
+async function traversableRelationships(internalCard: SingleResourceDoc, getInternalCard: todo, format: string, allRelationships: string[] = [], parentRelationship: string = '') {
+  let fields: ResourceIdentifierObject[] = (get(internalCard, 'data.relationships.fields.data') || [] as ResourceIdentifierObject[]).filter((i: ResourceIdentifierObject) => {
+    let field = (internalCard.included || []).find(j => `${j.type}/${j.id}` === `${i.type}/${i.id}`);
+    if (!field) { return; }
+    return format === 'isolated' ||
+           getCardId(field.id) === internalCard.data.id ||
+           (get(field, 'attributes.needed-when-embedded'));
+  });
+
+  let recurse = async (cardId: string, field: string) => {
+    let relatedCard: SingleResourceDoc | undefined;
+    try {
+      relatedCard = await getInternalCard(cardId);
+    } catch (e) {
+      if (e.status !== 404) { throw e; }
+    }
+    if (!relatedCard) { return; }
+    await (traversableRelationships(relatedCard, getInternalCard, 'embedded', allRelationships, field));
+  };
+
+  for (let { id:field } of fields) {
+    let linkage: ResourceLinkage = get(internalCard, `data.relationships.${field}.data`);
+    if (!linkage) { continue; }
+    allRelationships.push(parentRelationship ? `${parentRelationship}.${field}` : field);
+    if (Array.isArray(linkage)) {
+      for (let { id: relatedCardId } of linkage) {
+        await recurse(relatedCardId, field);
+      }
+    } else if (linkage.id) {
+      await recurse(linkage.id, field);
+    }
+  }
+
+  return uniq(allRelationships);
 }
 
 async function adaptCardCollectionToFormat(schema: todo, session: Session, collection: CollectionResourceDoc, format: string, cardServices: todo) {
@@ -427,7 +470,7 @@ async function adaptCardToFormat(schema: todo, session: Session, cardModel: Sing
   }
   priviledgedCard = priviledgedCard || cardModel;
 
-  let cardSchema = getCardSchemas(schema, priviledgedCard) || [];
+  let cardSchema = await getCardSchemas(schema, priviledgedCard) || [];
   schema = await schema.applyChanges(cardSchema.map(document => ({ id:document.id, type:document.type, document })));
 
   let result: SingleResourceDoc = {
@@ -518,6 +561,15 @@ async function adaptCardToFormat(schema: todo, session: Session, cardModel: Sing
           if (!isCard(resource.type, resource.id)) {
             resolvedIncluded.push(resource);
           } else {
+            // we use cardServices.get() to get a resource that we
+            // actually already have in our cardModel.included. We're
+            // doing this because this will force the resource to be adapted
+            // to the embedded format--as the resources that we have in cardModel.included
+            // actually contain all the isolated metadata. A good refactor would
+            // be to write the embedded format of the resource into pristine's included so we
+            // dont need to make another trip to the DB when calling cardServices.get()--however,
+            // that kind of refactor may mean that knowledge about the card external format may bleed
+            // out from the layer in which we are trying to contain it.
             let { data: cardResource, included=[] } = await cardServices.get(session, resource.id, 'embedded');
             resolvedIncluded.push(cardResource, ...included.filter((i: ResourceObject) => i.type === 'cards'));
           }
@@ -544,6 +596,9 @@ function removeCardNamespacing(card: SingleResourceDoc) {
     if (resource.type !== 'cards' && !isCard(resource.type, resource.id)) {
       resource.type = getCardId(resource.type) ? cardContextFromId(resource.type).modelId as string : resource.type;
       resource.id = getCardId(resource.id) && resource.id != null ? cardContextFromId(resource.id).modelId as string : resource.id;
+    }
+    if (isCard(resource.type, resource.id) && resource.id !== id) {
+      resource.type = 'cards';
     }
     for (let field of Object.keys(resource.attributes || {})) {
       let { modelId:fieldName } = cardContextFromId(field);

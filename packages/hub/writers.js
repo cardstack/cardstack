@@ -63,13 +63,13 @@ class Writers {
   }
 
   async handleCardOperations(session, card, isDeletion) {
-    let schema, internalCard, oldCard;
+    let schema, context, internalCard, oldCard;
     let id = card.data.id;
     if (isDeletion) {
       internalCard = card;
-      schema = await this._loadInternalCardSchema(internalCard);
+      ({ context, schema } = await this._loadInternalCardSchema(internalCard));
     } else {
-      ({ schema, internalCard } = await this._loadInternalCard(card));
+      ({ schema, context, internalCard } = await this._loadInternalCard(card));
       try {
         oldCard = await this.searchers.get(Session.INTERNAL_PRIVILEGED, 'local-hub', id, id);
       } catch (e) {
@@ -114,16 +114,16 @@ class Writers {
       return updatedSchema;
     };
 
-    return { internalCard, schema, beforeFinalize, afterFinalize };
+    return { internalCard, schema, beforeFinalize, afterFinalize, context };
   }
 
   async handleCreate(isBinary, session, type, documentOrStream, schema) {
     await this.pgSearchClient.ensureDatabaseSetup();
 
     schema = schema || await this.currentSchema.getSchema();
-    let beforeFinalize;
+    let initialContext, beforeFinalize;
     if (type === 'cards') {
-      ({ schema, internalCard: documentOrStream, beforeFinalize } = await this.handleCardOperations(session, documentOrStream));
+      ({ context: initialContext, schema, internalCard: documentOrStream, beforeFinalize } = await this.handleCardOperations(session, documentOrStream));
       type = documentOrStream.data.type;
     }
 
@@ -147,6 +147,7 @@ class Writers {
         isSchema
       );
       let { originalDocument, finalDocument, finalizer, aborter } = opts;
+      opts.initialContext = initialContext;
       pending = await this.createPendingChange({ originalDocument, finalDocument, finalizer, aborter, schema, opts});
     }
 
@@ -188,10 +189,9 @@ class Writers {
     await this.pgSearchClient.ensureDatabaseSetup();
     schema = schema || await this.currentSchema.getSchema();
 
-    let beforeFinalize;
-    let afterFinalize;
+    let beforeFinalize, afterFinalize, initialContext;
     if (type === 'cards') {
-      ({ schema, internalCard:document, beforeFinalize, afterFinalize } = await this.handleCardOperations(session, document));
+      ({ schema, context:initialContext, internalCard:document, beforeFinalize, afterFinalize } = await this.handleCardOperations(session, document));
       type = document.data.type;
     }
 
@@ -205,6 +205,7 @@ class Writers {
       isSchema
     );
     let { originalDocument, finalDocument, finalizer, aborter } = opts;
+    opts.initialContext = initialContext;
     let pending = await this.createPendingChange({ originalDocument, finalDocument, finalizer, aborter, schema, opts });
 
     let context;
@@ -244,10 +245,10 @@ class Writers {
 
     schema = schema || await this.currentSchema.getSchema();
 
-    let afterFinalize;
+    let afterFinalize, initialContext;
     if (type === 'cards') {
       let internalCard;
-      ({ schema, internalCard, afterFinalize } = await this.handleCardDeleteOperation(session, id));
+      ({ schema, context:initialContext, internalCard, afterFinalize } = await this.handleCardDeleteOperation(session, id));
       if (!internalCard) { return; }
       type = internalCard.data.type;
       version = get(internalCard, 'data.meta.version');
@@ -257,6 +258,7 @@ class Writers {
     let isSchema = this.schemaTypes.includes(type);
     let opts = await writer.prepareDelete(session, version, type, id, isSchema);
     let { originalDocument, finalDocument, finalizer, aborter } = opts;
+    opts.initialContext = initialContext;
     let pending = await this.createPendingChange({ originalDocument, finalDocument, finalizer, aborter, schema, opts });
     try {
       let newSchema = await schema.validate(pending, { session });
@@ -353,12 +355,27 @@ class Writers {
 
   async _loadInternalCard(card) {
     let internalCard = generateInternalCardFormat(await this.currentSchema.getSchema(), card);
-    return { internalCard, schema: await this._loadInternalCardSchema(internalCard) };
+    let { schema, context } = await this._loadInternalCardSchema(internalCard);
+    return { internalCard, schema, context };
   }
 
   async _loadInternalCardSchema(internalCard) {
-    let schema = await loadCard(await this.currentSchema.getSchema(), internalCard);
-    return await (await this.currentSchema.getSchema()).applyChanges(schema.map(document => ({ id: document.id, type: document.type, document })));
+    // The act of deriving a schema may require reads in order to derive the schema
+    // the card (which needs to happen *before* the writer is finalized with the
+    // backing store). These reads are signals that there are a resource dependencies
+    // we need to keep track of in order to support invalidations correctly. We are
+    // using this document context to keep track of the reads necessary to derive
+    // the schema for the card, and then we merge these read references with the
+    // document context emittd by the writer finalizers for the overall read references
+    // necessary for the created/updated card.
+    let context = this.searchers.createDocumentContext({
+      id: internalCard.data.id,
+      type: internalCard.data.type,
+      schema: await this.currentSchema.getSchema(),
+      upstreamDoc: internalCard
+    });
+    let schema = await loadCard(await this.currentSchema.getSchema(), internalCard, context._getCard.bind(context));
+    return { context, schema: await (await this.currentSchema.getSchema()).applyChanges(schema.map(document => ({ id: document.id, type: document.type, document }))) };
   }
 
   _getSchemaDetailsForType(schema, type) {
@@ -455,6 +472,7 @@ class PendingChange {
           sourceId,
           id: finalDocument.id,
           upstreamDoc: finalDocument ? { data: finalDocument } : null,
+          references: opts && opts.initialContext && opts.initialContext._references
         });
       }
     }

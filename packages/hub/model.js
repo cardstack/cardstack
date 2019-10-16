@@ -115,7 +115,7 @@ exports.Model = class Model {
       let card = await getCard(id);
       if (!card) { return; }
 
-      let cardSchema = await loadCard(schema, card);
+      let cardSchema = await loadCard(schema, card, getCard);
       schema = await schema.applyChanges(cardSchema.map(document => ({ id: document.id, type: document.type, document })));
       priv.get(this).schema = schema;
 

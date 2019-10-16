@@ -13,7 +13,7 @@ const qs = require('qs');
 
 module.exports = class DocumentContext {
 
-  constructor({ read, search, routers, schema, type, id, sourceId, generation, upstreamDoc, format, includePaths }) {
+  constructor({ read, search, routers, schema, type, id, sourceId, generation, upstreamDoc, format, references, includePaths }) {
     if (upstreamDoc && !upstreamDoc.data) {
       throw new Error('The upstreamDoc must have a top-level "data" property', {
         status: 400
@@ -46,7 +46,7 @@ module.exports = class DocumentContext {
     // references to included resource that were both found or
     // missing. We track the missing ones so that if they later appear
     // in the data we can invalidate to pick them up.
-    this._references = [];
+    this._references = references || [];
 
     // special case for the built-in implicit relationship between
     // user-realms and the underlying user record it is tracking
@@ -401,8 +401,15 @@ module.exports = class DocumentContext {
     let docType = get(this, 'upstreamDoc.data.type');
     this._references.push(`${id}/${id}`);
 
-    if (isCard(docId, docType) && docId === id) {
+    if (isCard(docId, docType) && docId === id && this.upstreamDoc.included) {
       return this.upstreamDoc;
+    } else if (isCard(docId, docType) && docId === id) {
+      let card = {
+        data: this.upstreamDoc.data,
+        included: await this.crawlInternalModels(this.upstreamDoc.data)
+      };
+      this._cardCache[id] = card;
+      return card;
     } else if (this.upstreamDoc &&
       this.upstreamDoc.data &&
       Array.isArray(this.upstreamDoc.data) &&
@@ -421,6 +428,28 @@ module.exports = class DocumentContext {
     }
     this._cardCache[id] = this._read(id, id);
     return await this._cardCache[id];
+  }
+
+  async crawlInternalModels(resource, models = []) {
+    if (isCard(resource.type, resource.id) && this.id !== resource.id) { return models; }
+
+    for (let relationship of Object.keys(resource.relationships || {})) {
+      let linkage = get(resource, `relationships.${relationship}.data`);
+      if (!linkage) { continue; }
+      if (Array.isArray(linkage)) {
+        for (let fieldRef of linkage) {
+          let related = await this.read(fieldRef.type, fieldRef.id);
+          if (!related) { continue; }
+          models.push(related);
+          await this.crawlInternalModels(related, models);
+        }
+      } else {
+        let related = await this.read(linkage.type, linkage.id);
+        models.push(related);
+        await this.crawlInternalModels(related, models);
+      }
+    }
+    return models;
   }
 
   // TODO eventually we'll want to load the card types and fields from the schema getters
@@ -445,7 +474,7 @@ module.exports = class DocumentContext {
     let card = await this._getCard(cardId);
     if (!card) { return; } // assume that the caller has provided the card schema already;
 
-    let cardSchema = await loadCard(this.schema, card);
+    let cardSchema = await loadCard(this.schema, card, this._getCard.bind(this));
     this.schema = await this.schema.applyChanges(cardSchema.map(document => ({ id:document.id, type:document.type, document })));
   }
 
