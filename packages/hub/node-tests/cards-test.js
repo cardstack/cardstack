@@ -133,6 +133,8 @@ function assertCardModels(card) {
   expect(model.attributes.title).to.equal('The Millenial Puppy');
   expect(model.attributes.body).to.match(/discerning tastes of the millenial puppy/);
   expect(model.attributes['tag-names']).to.eql(['millenials', 'puppies', 'belly-rubs']);
+  expect(model.attributes['embedded-metadata-field-types']).to.be.undefined; // this one shouldn't leak into the model
+  expect(model.attributes['metadata-field-types']).to.be.undefined; // this one shouldn't leak into the external model
   expect(model.relationships.tags.data).to.eql([
     { type: 'tags', id: 'millenials' },
     { type: 'tags', id: 'puppies' },
@@ -143,6 +145,10 @@ function assertCardModels(card) {
   let relatedCard = included.find(i => `${i.type}/${i.id}` === 'cards/local-hub::user-card::van-gogh');
   expect(relatedCard.attributes.name).to.equal('Van Gogh');
   expect(relatedCard.attributes.email).to.be.undefined;
+  expect(relatedCard.attributes['embedded-metadata-field-types']).to.be.undefined; // this one shouldn't leak into the external format
+  expect(relatedCard.attributes['metadata-field-types']).to.eql({
+    name: '@cardstack/core-types::string'
+  });
 }
 
 function assertCardSchema(card) {

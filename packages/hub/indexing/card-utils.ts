@@ -49,6 +49,7 @@ const cardBrowserAssetFields = [
   'embedded-css',
 ];
 const metadataFieldTypesField = 'metadata-field-types';
+const embeddedMetadataFieldTypesField = 'embedded-metadata-field-types';
 
 function cardContextFromId(id: string | number) {
   let noContext: CardContext = {};
@@ -506,6 +507,8 @@ async function adaptCardToFormat(schema: todo, session: Session, internalCard: S
       attributes[attr] = internalCard.data.attributes[attr];
     }
   }
+  unset(attributes, metadataFieldTypesField);
+  unset(attributes, embeddedMetadataFieldTypesField);
   let relationships: RelationshipsObject = {};
   for (let rel of Object.keys(internalCard.data.relationships || {})) {
     if (rel === 'fields' || !internalCard.data.relationships) { continue; }
@@ -568,7 +571,14 @@ async function adaptCardToFormat(schema: todo, session: Session, internalCard: S
           if (!isCard(resource.type, resource.id)) {
             resolvedIncluded.push(resource);
           } else {
-            resolvedIncluded.push(...crawlEmbeddedCards(internalCard, resource.id));
+            resolvedIncluded.push(...crawlEmbeddedCards(internalCard, resource.id).map((included: ResourceObject) => {
+              let embeddedFieldTypes = get(included, `attributes.${embeddedMetadataFieldTypesField}`);
+              if (!embeddedFieldTypes) { return included; } // if this is the case you have already dealt with it--just move along
+
+              set(included, `attributes.${metadataFieldTypesField}`, embeddedFieldTypes);
+              unset(included, `attributes.${embeddedMetadataFieldTypesField}`);
+              return included;
+            }));
           }
         }
 
@@ -600,7 +610,7 @@ function crawlEmbeddedCards(internalCard: SingleResourceDoc, embeddedCardId: str
       crawlEmbeddedCards(internalCard, linkage.id, embeddedCards);
     }
   }
-  return embeddedCards;
+  return uniqBy(embeddedCards, i => `${i.type}/${i.id}`);
 }
 
 // TODO in the future as part of supporting card adoption, we'll likely need to
