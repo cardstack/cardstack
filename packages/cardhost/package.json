@@ -30,11 +30,13 @@
   "devDependencies": {
     "@cardstack/authentication": "0.14.26",
     "@cardstack/core": "0.14.26",
+    "@cardstack/di": "0.14.26",
     "@cardstack/ephemeral": "0.14.26",
     "@cardstack/eslint-config": "0.14.26",
     "@cardstack/git": "0.14.26",
     "@cardstack/hub": "0.14.26",
     "@cardstack/jsonapi": "0.14.26",
+    "@cardstack/logger": "0.2.0",
     "@cardstack/mock-auth": "0.14.26",
     "@cardstack/test-support": "0.14.26",
     "@ember/jquery": "^0.6.1",
@@ -81,6 +83,6 @@
     "qunit-dom": "^0.8.0"
   },
   "engines": {
-    "node": "6.* || 8.* || >= 10.*"
+    "node": "8.* || >= 10.*"
   }
 }

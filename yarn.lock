@@ -1590,7 +1590,7 @@
     lodash "^4.17.13"
     to-fast-properties "^2.0.0"
 
-"@cardstack/logger@^0.2.0":
+"@cardstack/logger@0.2.0", "@cardstack/logger@^0.2.0":
   version "0.2.0"
   resolved "https://registry.yarnpkg.com/@cardstack/logger/-/logger-0.2.0.tgz#aa964da93eb8e2a374607bba14546c7146689f37"
   integrity sha512-osz1VeJi/4UkyGSPcEJVhTNJZfv1nwoKDquPzdj1sof78HrEzEKgxH7sLMtIooCkDVn1lLPxPrsmW9C12i5+Yg==
