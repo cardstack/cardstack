@@ -75,8 +75,7 @@ const scenario = new Fixtures({
   destroy() {
     return [
       { type: 'cards', id: card1Id },
-      { type: 'cards', id: card2Id },
-      { type: 'cards', id: card3Id }
+      { type: 'cards', id: card2Id }
     ];
   }
 });
@@ -1057,22 +1056,6 @@ module("Unit | Service | data", function () {
       assert.equal(article.getField('author').value.getField('name').value, 'updated name');
     });
 
-    test("it invalidates cards that contained the deleted card", async function(assert) {
-      let service = this.owner.lookup('service:data');
-      let article = await service.getCard(card1Id, 'embedded'); // load the card to be invalidated into the store
-      assert.equal(article.getField('author').value.getField('name').value, 'Van Gogh');
-      article = await service.getCard(card1Id, 'isolated'); // load the card to be invalidated into the store
-      assert.equal(article.getField('author').value.getField('name').value, 'Van Gogh');
-
-      let person = await service.getCard(card2Id, 'isolated');
-      await person.delete();
-
-      article = await service.getCard(card1Id, 'embedded');
-      assert.equal(article.getField('author').value, undefined);
-      article = await service.getCard(card1Id, 'isolated');
-      assert.equal(article.getField('author').value, undefined);
-    });
-
     test("it can change a needed-when-embedded field to be an isolated-only field", async function (assert) {
       let service = this.owner.lookup('service:data');
       let card = await service.getCard(card1Id, 'isolated');
@@ -1266,9 +1249,15 @@ module("Unit | Service | data", function () {
     hooks.beforeEach(async function () {
       await this.owner.lookup('service:mock-login').get('login').perform('sample-user');
       let service = this.owner.lookup('service:data');
+      let person = service.createCard(card2Id);
+      person.addField({ name: 'name', type: '@cardstack/core-types::string', neededWhenEmbedded: true, value: 'Van Gogh' });
+      person.addField({ name: 'email', type: '@cardstack/core-types::string', value: 'vangogh@nowhere.dog' });
+      await person.save();
+
       let article = service.createCard(card1Id);
       article.addField({ name: 'title', type: '@cardstack/core-types::string', neededWhenEmbedded: true, value: 'test title' });
       article.addField({ name: 'body', type: '@cardstack/core-types::string', value: 'test body' });
+      article.addField({ name: 'author', type: '@cardstack/core-types::belongs-to', neededWhenEmbedded: true, value: person });
       await article.save();
 
       service._clearCache();
@@ -1286,6 +1275,23 @@ module("Unit | Service | data", function () {
       assert.equal(fields.every(i => i.isDestroyed), true, 'fields destroyed state is correct');
       await assert.rejects(service.getCard(card1Id, 'isolated'), /Not Found/);
     });
+
+    test("it invalidates cards that contained the deleted card", async function(assert) {
+      let service = this.owner.lookup('service:data');
+      let article = await service.getCard(card1Id, 'embedded'); // load the card to be invalidated into the store
+      assert.equal(article.getField('author').value.getField('name').value, 'Van Gogh');
+      article = await service.getCard(card1Id, 'isolated'); // load the card to be invalidated into the store
+      assert.equal(article.getField('author').value.getField('name').value, 'Van Gogh');
+
+      let person = await service.getCard(card2Id, 'isolated');
+      await person.delete();
+
+      article = await service.getCard(card1Id, 'embedded');
+      assert.equal(article.getField('author').value, undefined);
+      article = await service.getCard(card1Id, 'isolated');
+      assert.equal(article.getField('author').value, undefined);
+    });
+
 
     test('throws when you call addField from deleted Card instance', async function (assert) {
       let service = this.owner.lookup('service:data');

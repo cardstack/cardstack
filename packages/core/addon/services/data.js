@@ -213,7 +213,9 @@ class Card {
 
     store.isolated.set(this.id, save(internal.session, this.json, this.isNew));
     internal.serverIsolatedData = await store.isolated.get(this.id);
-    await invalidate(this.id);
+    if (!this.isNew) {
+      await invalidate(this.id);
+    }
     for (let card of (internal.serverIsolatedData.included || []).filter(i => i.type === 'cards')) {
       store.embedded.set(card.id, new Promise(res => res({ data: card })));
     }
@@ -286,10 +288,10 @@ class Card {
     for (let field of this.fields) {
       priv.get(field).isDestroyed = true;
     }
+    await invalidate(this.id);
     internal.isDestroyed = true;
     store.isolated.delete(this.id);
     store.embedded.delete(this.id);
-    await invalidate(this.id);
   }
 }
 
