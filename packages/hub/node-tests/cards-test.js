@@ -7,7 +7,7 @@ const { removeSync, pathExistsSync } = require('fs-extra');
 const { readFileSync } = require('fs');
 const { join } = require('path');
 const { tmpdir } = require('os');
-const { cloneDeep } = require('lodash');
+const { cloneDeep, set } = require('lodash');
 const { adaptCardToFormat, cardBrowserAssetFields } = require('../indexing/card-utils');
 
 const internalArticleCard = require('./internal-cards/article-card');
@@ -73,6 +73,7 @@ function assertIsolatedCardMetadata(card) {
   expect(data.attributes.body).to.match(/discerning tastes of the millenial puppy/);
   expect(data.relationships.author.data).to.eql({ type: 'cards', id: 'local-hub::user-card::van-gogh' });
   expect(data.attributes['tag-names']).to.eql(['millenials', 'puppies', 'belly-rubs']);
+  expect(data.attributes['embedded-metadata-field-types']).to.be.undefined; // this one shouldn't leak into the external format
   expect(data.attributes['metadata-field-types']).to.eql({
     title: '@cardstack/core-types::string',
     body: '@cardstack/core-types::string',
@@ -97,6 +98,7 @@ function assertEmbeddedCardMetadata(card) {
   expect(data.relationships.tags).to.be.undefined;
   expect(data.attributes.body).to.be.undefined;
   expect(data.attributes['internal-field']).to.be.undefined;
+  expect(data.attributes['embedded-metadata-field-types']).to.be.undefined; // this one shouldn't leak into the external format
   expect(data.attributes['metadata-field-types']).to.eql({
     title: '@cardstack/core-types::string',
     author: '@cardstack/core-types::belongs-to',
@@ -131,6 +133,8 @@ function assertCardModels(card) {
   expect(model.attributes.title).to.equal('The Millenial Puppy');
   expect(model.attributes.body).to.match(/discerning tastes of the millenial puppy/);
   expect(model.attributes['tag-names']).to.eql(['millenials', 'puppies', 'belly-rubs']);
+  expect(model.attributes['embedded-metadata-field-types']).to.be.undefined; // this one shouldn't leak into the model
+  expect(model.attributes['metadata-field-types']).to.be.undefined; // this one shouldn't leak into the external model
   expect(model.relationships.tags.data).to.eql([
     { type: 'tags', id: 'millenials' },
     { type: 'tags', id: 'puppies' },
@@ -141,6 +145,10 @@ function assertCardModels(card) {
   let relatedCard = included.find(i => `${i.type}/${i.id}` === 'cards/local-hub::user-card::van-gogh');
   expect(relatedCard.attributes.name).to.equal('Van Gogh');
   expect(relatedCard.attributes.email).to.be.undefined;
+  expect(relatedCard.attributes['embedded-metadata-field-types']).to.be.undefined; // this one shouldn't leak into the external format
+  expect(relatedCard.attributes['metadata-field-types']).to.eql({
+    name: '@cardstack/core-types::string'
+  });
 }
 
 function assertCardSchema(card) {
@@ -268,101 +276,6 @@ describe('hub/card-services', function () {
     });
   });
 
-  describe("loads card", function () {
-    describe("via indexer", function () {
-      let indexers, changedCards = [];
-
-      beforeEach(async function () {
-        cleanup();
-        let factory = new JSONAPIFactory();
-        factory.addResource('data-sources', 'stub-card-project')
-          .withAttributes({
-            sourceType: 'stub-card-project',
-            params: {
-              changedCards,
-              cardSearchResults: [
-                userCard,
-              ]
-            }
-          });
-
-        env = await createDefaultEnvironment(`${__dirname}/../../../tests/stub-card-project`, factory.getModels());
-        cardServices = env.lookup('hub:card-services');
-        indexers = env.lookup('hub:indexers');
-      });
-
-      it("will load a card implicitly when an indexer processes a card document", async function () {
-        changedCards.push(internalArticleCard);
-
-        await indexers.update();
-
-        let article = await cardServices.get(env.session, 'local-hub::article-card::millenial-puppies', 'isolated');
-        assertIsolatedCardMetadata(article);
-        assertCardModels(article);
-        assertCardOnDisk();
-      });
-    });
-
-    describe("via searcher", function() {
-      beforeEach(async function () {
-        cleanup();
-        let factory = new JSONAPIFactory();
-
-        factory.addResource('data-sources', 'stub-card-project')
-          .withAttributes({
-            sourceType: 'stub-card-project',
-            params: {
-              cardSearchResults: [
-                internalArticleCard,
-                userCard,
-              ]
-            }
-          });
-
-        env = await createDefaultEnvironment(`${__dirname}/../../../tests/stub-card-project`, factory.getModels());
-        cardServices = env.lookup('hub:card-services');
-      });
-
-      it("will load a card implicitly when a searcher's get() hook returns a card document", async function () {
-        // The underlying searchers#get will encounter a card that has not been loaded into the index.
-        // The hub should be able to load cards that it discovers from searchers into the index.
-        let article = await cardServices.get(env.session, 'local-hub::article-card::millenial-puppies', 'isolated');
-        assertIsolatedCardMetadata(article);
-        assertCardModels(article);
-        assertCardOnDisk();
-      });
-
-      // Hassan: I'm skeptical we want to be able to return search results in the isolated format...
-      it("will load a card implicitly when a searcher's search() hook returns a card document in isolated format", async function () {
-        let { data: [article] } = await cardServices.search(env.session, 'isolated', {
-          filter: {
-            type: { exact: 'cards' }
-          }
-        });
-
-        assertIsolatedCardMetadata({ data: article });
-        assertCardOnDisk();
-      });
-
-      // TODO move this into the search() tests after that is implemented
-      it("will load a card implicitly when a searcher's search() hook returns a card document in embedded format", async function () {
-        let { data: [article] } = await cardServices.search(env.session, 'embedded', {
-          filter: {
-            type: { exact: 'cards' }
-          }
-        });
-
-        expect(article.attributes.title).to.equal('The Millenial Puppy');
-        expect(article.relationships.author.data).to.eql({ type: 'cards', id: 'local-hub::user-card::van-gogh'});
-        expect(article.attributes.body).to.be.undefined;
-        expect(article.relationships.tags).to.be.undefined;
-        expect(article.attributes['internal-field']).to.be.undefined;
-
-        assertCardOnDisk();
-      });
-    });
-  });
-
   describe('writing cards', function() {
     let externalArticleCard, externalUserCard;
     beforeEach(async function () {
@@ -485,6 +398,51 @@ describe('hub/card-services', function () {
       expect(fieldRelationships).to.include('fields/editor');
     });
 
+    it('can add a new related card field', async function () {
+      let card = await cardServices.create(env.session, externalArticleCard);
+      card.data.relationships.fields.data.push({ type: 'fields', id: 'editor'});
+      card.included.push({
+        type: 'fields',
+        id: 'editor',
+        attributes: {
+          'is-metadata': true,
+          'needed-when-embedded': true,
+          'field-type': '@cardstack/core-types::belongs-to'
+        }
+      });
+      let internalModel = card.included.find(i => i.type = 'local-hub::article-card::millenial-puppies');
+      set(internalModel, 'relationships.editor.data', { type: 'cards', id: externalUserCard.data.id });
+
+      card = await cardServices.update(env.session, 'local-hub::article-card::millenial-puppies', card);
+      let { data, included } = card;
+      let includedIdentifiers = included.map(i => `${i.type}/${i.id}`);
+      let fieldRelationships = data.relationships.fields.data.map(i => `${i.type}/${i.id}`);
+      internalModel = card.included.find(i => i.type = 'local-hub::article-card::millenial-puppies');
+      let editor = card.included.find(i => i.id === externalUserCard.data.id);
+
+      expect(includedIdentifiers).to.include('fields/editor');
+      expect(fieldRelationships).to.include('fields/editor');
+      expect(data.relationships.editor.data).to.eql({ type: 'cards', id: externalUserCard.data.id });
+      expect(internalModel.relationships.editor.data).to.eql({ type: 'cards', id: externalUserCard.data.id });
+      expect(editor.attributes.name).to.equal('Van Gogh');
+      expect(editor.attributes.email).to.be.undefined;
+
+      card = await cardServices.get(env.session, 'local-hub::article-card::millenial-puppies', 'isolated');
+      data = card.data;
+      included = card.included;
+      includedIdentifiers = included.map(i => `${i.type}/${i.id}`);
+      fieldRelationships = data.relationships.fields.data.map(i => `${i.type}/${i.id}`);
+      internalModel = card.included.find(i => i.type = 'local-hub::article-card::millenial-puppies');
+      editor = card.included.find(i => i.id === externalUserCard.data.id);
+      expect(includedIdentifiers).to.include('fields/editor');
+      expect(fieldRelationships).to.include('fields/editor');
+      expect(data.relationships.editor.data).to.eql({ type: 'cards', id: externalUserCard.data.id });
+      expect(internalModel.relationships.editor.data).to.eql({ type: 'cards', id: externalUserCard.data.id });
+      expect(editor.attributes.name).to.equal('Van Gogh');
+      expect(editor.attributes.email).to.be.undefined;
+    });
+
+
     it("can remove a field from the card's schema", async function() {
       let card = await cardServices.create(env.session, externalArticleCard);
       card.data.relationships.fields.data = card.data.relationships.fields.data.filter(i => i.id !== 'body');
@@ -594,9 +552,6 @@ describe('hub/card-services', function () {
       expect(error.status).to.equal(404);
     });
 
-    it.skip('can add a new related card field', async function () {
-    });
-
     it("does not allow a card to be updated with a model whose type does not match the card id", async function() {
       let card = await cardServices.create(env.session, externalArticleCard);
       card.data.relationships.model.data.type = 'local-hub::article-card::bad';
@@ -636,20 +591,22 @@ describe('hub/card-services', function () {
     beforeEach(async function () {
       cleanup();
       let factory = new JSONAPIFactory();
-
-      factory.addResource('data-sources', 'stub-card-project')
-        .withAttributes({
-          sourceType: 'stub-card-project',
-          params: {
-            cardSearchResults: [
-              userCard,
-              internalArticleCard
-            ]
-          }
-        });
-
       env = await createDefaultEnvironment(`${__dirname}/../../../tests/stub-card-project`, factory.getModels());
       cardServices = env.lookup('hub:card-services');
+      let externalArticleCard = await adaptCardToFormat(await env.lookup('hub:current-schema').getSchema(), env.session, internalArticleCard, 'isolated', cardServices);
+      let externalUserCard = await adaptCardToFormat(await env.lookup('hub:current-schema').getSchema(), env.session, userCard, 'isolated', cardServices);
+
+      // remove the card metadata to make this as real as possible...
+      for (let field of Object.keys(externalArticleCard.data.attributes)) {
+        if (cardBrowserAssetFields.includes(field)) { continue; }
+        delete externalArticleCard.data.attributes[field];
+      }
+      for (let field of Object.keys(externalUserCard.data.attributes)) {
+        if (cardBrowserAssetFields.includes(field)) { continue; }
+        delete externalUserCard.data.attributes[field];
+      }
+      await cardServices.create(env.session, externalUserCard);
+      await cardServices.create(env.session, externalArticleCard);
     });
 
     it("has card metadata for isolated format", async function () {
@@ -795,21 +752,24 @@ describe('hub/card-services', function () {
       factory.addResource('test-users', 'allowed-user');
       factory.addResource('test-users', 'restricted-user');
 
-      factory.addResource('data-sources', 'stub-card-project')
-        .withAttributes({
-          sourceType: 'stub-card-project',
-          params: {
-            cardSearchResults: [
-              userCard,
-              internalArticleCard
-            ]
-          }
-        });
-
       env = await createDefaultEnvironment(`${__dirname}/../../../tests/stub-card-project`, factory.getModels());
       cardServices = env.lookup('hub:card-services');
       restrictedUser = env.lookup('hub:sessions').create('test-users', 'restricted-user');
       allowedUser = env.lookup('hub:sessions').create('test-users', 'allowed-user');
+      let externalArticleCard = await adaptCardToFormat(await env.lookup('hub:current-schema').getSchema(), env.session, internalArticleCard, 'isolated', cardServices);
+      let externalUserCard = await adaptCardToFormat(await env.lookup('hub:current-schema').getSchema(), env.session, userCard, 'isolated', cardServices);
+
+      // remove the card metadata to make this as real as possible...
+      for (let field of Object.keys(externalArticleCard.data.attributes)) {
+        if (cardBrowserAssetFields.includes(field)) { continue; }
+        delete externalArticleCard.data.attributes[field];
+      }
+      for (let field of Object.keys(externalUserCard.data.attributes)) {
+        if (cardBrowserAssetFields.includes(field)) { continue; }
+        delete externalUserCard.data.attributes[field];
+      }
+      await cardServices.create(env.session, externalUserCard);
+      await cardServices.create(env.session, externalArticleCard);
     });
 
     describe('get()', function () {
@@ -903,7 +863,8 @@ describe('hub/card-services', function () {
       });
     });
 
-    describe('search()', function () {
+    // Using a custom searcher for these tests is problematic. Unskip this after we have searching for real.
+    describe.skip('TODO search()', function () {
       it.skip('does not return card whose model content type the session does not have read authorization', async function () {
         // TODO implement this after we have pgsearch support for searching for cards,
         // otherwise we'll just be testing the test, as custom searchers (i.e. our stub-card-project's searcher)
@@ -1001,8 +962,55 @@ describe('hub/card-services', function () {
   });
 
   describe.skip('search for card', function () {
-    it("can search for a card", async function () {
-      // TODO we should be able to leverage the card metadata as fields we can search against for a card
+    beforeEach(async function () {
+      cleanup();
+      let factory = new JSONAPIFactory();
+
+      factory.addResource('data-sources', 'stub-card-project')
+        .withAttributes({
+          sourceType: 'stub-card-project',
+          params: {
+            cardSearchResults: [
+              internalArticleCard,
+              userCard,
+            ]
+          }
+        });
+
+      env = await createDefaultEnvironment(`${__dirname}/../../../tests/stub-card-project`, factory.getModels());
+      cardServices = env.lookup('hub:card-services');
+    });
+
+    it.skip("can search for a card by an adopted field", async function() {
+    });
+
+    // Hassan: I'm skeptical we want to be able to return search results in the isolated format...
+    it("will load a card implicitly when a searcher's search() hook returns a card document in isolated format", async function () {
+      let { data: [article] } = await cardServices.search(env.session, 'isolated', {
+        filter: {
+          type: { exact: 'cards' }
+        }
+      });
+
+      assertIsolatedCardMetadata({ data: article });
+      assertCardOnDisk();
+    });
+
+    // TODO get rid of the custom searcher and use pgsearch (custom search is totally just temporary until we have the real thing)
+    it("will load a card implicitly when a searcher's search() hook returns a card document in embedded format", async function () {
+      let { data: [article] } = await cardServices.search(env.session, 'embedded', {
+        filter: {
+          type: { exact: 'cards' }
+        }
+      });
+
+      expect(article.attributes.title).to.equal('The Millenial Puppy');
+      expect(article.relationships.author.data).to.eql({ type: 'cards', id: 'local-hub::user-card::van-gogh' });
+      expect(article.attributes.body).to.be.undefined;
+      expect(article.relationships.tags).to.be.undefined;
+      expect(article.attributes['internal-field']).to.be.undefined;
+
+      assertCardOnDisk();
     });
   });
 });

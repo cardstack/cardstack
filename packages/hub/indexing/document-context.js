@@ -2,7 +2,7 @@ const authLog = require('@cardstack/logger')('cardstack/auth');
 const log = require('@cardstack/logger')('cardstack/indexing/document-context');
 const { Model, privateModels } = require('../model');
 const { getPath } = require('@cardstack/routing/cardstack/path');
-const { merge, get, uniqBy } = require('lodash');
+const { merge, get, uniqBy, uniq } = require('lodash');
 const Session = require('@cardstack/plugin-utils/session');
 const {
   getCardId,
@@ -13,7 +13,7 @@ const qs = require('qs');
 
 module.exports = class DocumentContext {
 
-  constructor({ read, search, routers, schema, type, id, sourceId, generation, upstreamDoc, format, references, includePaths }) {
+  constructor({ read, search, routers, schema, type, id, sourceId, generation, upstreamDoc, format, includePaths }) {
     if (upstreamDoc && !upstreamDoc.data) {
       throw new Error('The upstreamDoc must have a top-level "data" property', {
         status: 400
@@ -46,7 +46,7 @@ module.exports = class DocumentContext {
     // references to included resource that were both found or
     // missing. We track the missing ones so that if they later appear
     // in the data we can invalidate to pick them up.
-    this._references = references || [];
+    this._references = [];
 
     // special case for the built-in implicit relationship between
     // user-realms and the underlying user record it is tracking
@@ -64,16 +64,20 @@ module.exports = class DocumentContext {
         let contentType = this.schema.getType(doc.type);
         if (!contentType) { throw new Error(`Unknown content type=${doc.type} id=${doc.id}`); }
 
-        return new Model(contentType, doc, this.schema, this.read.bind(this), this._getCard.bind(this), this.search.bind(this));
+        return new Model(contentType, doc, this.schema, this.read.bind(this), this._getCard.bind(this), this.search.bind(this), this.cardIdContext);
       });
     } else {
       let contentType = this.schema.getType(this.type);
       if (!contentType) { throw new Error(`Unknown content type=${this.type} id=${this.id}`); }
 
-      this._model = new Model(contentType, this.upstreamDoc.data, this.schema, this.read.bind(this), this._getCard.bind(this), this.search.bind(this));
+      this._model = new Model(contentType, this.upstreamDoc.data, this.schema, this.read.bind(this), this._getCard.bind(this), this.search.bind(this), this.cardIdContext);
     }
 
     return this._model;
+  }
+
+  get cardIdContext() {
+    return isCard(this.type, this.id) ? this.id : null;
   }
 
   async searchDoc() {
@@ -101,7 +105,7 @@ module.exports = class DocumentContext {
     if (this.isCollection) { return; }
 
     await this._buildCachedResponse();
-    return this._references;
+    return uniq(this._references);
   }
 
   async updateDocumentMeta(meta) {
@@ -671,7 +675,7 @@ module.exports = class DocumentContext {
       } else {
         jsonapiDoc = jsonapiDoc.data;
       }
-      let userModel = new Model(contentType, jsonapiDoc, this.schema, this.read.bind(this), this._getCard.bind(this), this.search.bind(this));
+      let userModel = new Model(contentType, jsonapiDoc, this.schema, this.read.bind(this), this._getCard.bind(this), this.search.bind(this), this.cardIdContext);
       await this._buildAttributes(contentType, jsonapiDoc, userModel, pristine, searchDoc);
 
       if (!this._followedRelationships[`${type}/${id}`]) {

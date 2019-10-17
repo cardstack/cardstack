@@ -403,7 +403,16 @@ const models = [
     type: 'computed-fields',
     id: 'metadata-field-types',
     attributes: {
-      'computed-field-type': '@cardstack/core-types::field-types'
+      'computed-field-type': '@cardstack/core-types::field-types',
+      params: { 'format': 'isolated' }
+    }
+  },
+  {
+    type: 'computed-fields',
+    id: 'embedded-metadata-field-types',
+    attributes: {
+      'computed-field-type': '@cardstack/core-types::field-types',
+      params: { 'format': 'embedded' }
     }
   },
   {
