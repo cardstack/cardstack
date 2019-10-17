@@ -1,6 +1,5 @@
 import Component from '@glimmer/component';
 import { dasherize } from '@ember/string';
-import { inject as service } from '@ember/service';
 import { tracked } from '@glimmer/tracking';
 
 // TODO we'll need to use EC in order to be able to isolate cards
@@ -9,7 +8,6 @@ import { tracked } from '@glimmer/tracking';
 
 // TODO This will be part of the official API. Move this into core as it solidifies
 export default class CardRenderer extends Component {
-  @service cardstackSession;
   @tracked componentName;
   @tracked mode;
 
