@@ -211,8 +211,9 @@ class Card {
       internal.fields = unionBy(updatedFields, internal.fields, i => i.name);
     }
 
-    store.isolated.set(this.id, this._saveCard(this.json));
+    store.isolated.set(this.id, save(internal.session, this.json, this.isNew));
     internal.serverIsolatedData = await store.isolated.get(this.id);
+    await invalidate(this.id);
     for (let card of (internal.serverIsolatedData.included || []).filter(i => i.type === 'cards')) {
       store.embedded.set(card.id, new Promise(res => res({ data: card })));
     }
@@ -228,19 +229,26 @@ class Card {
   async load(format = 'isolated') {
     if (this.isDestroyed) { throw new Error('Cannot load from destroyed card'); }
     if (!['isolated', 'embedded'].includes(format)) { throw new Error(`unknown format specified in 'load()' for card '${this.id}': '${format}'`); }
+
+    // It's really kind of odd to explicitly load the embedded format for a Card, as the embedded format should have been loaded
+    // via another card's relationships to this card. I wonder if we should just only ever load the isolated format in this method...
     if (format === 'embedded' && this.loadedFormat === 'isolated') { return this; } // the embedded format has already been loaded
 
     let internal = priv.get(this);
     internal.loadedFormat = format;
-    store[format].set(this.id, this._loadCard(format));
+    store[format].set(this.id, load(internal.session, this.id, format));
     if (format === 'isolated') {
       internal.serverIsolatedData = await store[format].get(this.id);
+      await invalidate(this.id, get(internal.serverIsolatedData, 'data.meta.version'));
       for (let card of (internal.serverIsolatedData.included || []).filter(i => i.type === 'cards')) {
+        await invalidate(card.id, get(card, 'meta.version'));
         store.embedded.set(card.id, new Promise(res => res({ data: card })));
       }
     } else {
       internal.serverEmbeddedData = await store[format].get(this.id);
+      await invalidate(this.id, get(internal.serverEmbeddedData, 'data.meta.version'));
       for (let card of (internal.serverEmbeddedData.included || []).filter(i => i.type === 'cards')) {
+        await invalidate(card.id, get(card, 'meta.version'));
         store.embedded.set(card.id, new Promise(res => res({ data: card })));
       }
     }
@@ -281,46 +289,7 @@ class Card {
     internal.isDestroyed = true;
     store.isolated.delete(this.id);
     store.embedded.delete(this.id);
-  }
-
-  async _saveCard(cardDocument) {
-    if (this.isDestroyed) { throw new Error('Cannot _saveCard from destroyed card'); }
-    let { session } = priv.get(this);
-    let url = this.isNew ? `${hubURL}/api/cards` : `${hubURL}/api/cards/${this.id}`;
-    let response = await fetch(url, {
-      method: this.isNew ? 'POST' : 'PATCH',
-      headers: {
-        'Content-Type': 'application/vnd.api+json',
-        'Authorization': `Bearer ${session.token}`
-      },
-      body: JSON.stringify(cardDocument)
-    });
-
-    let json = await response.json();
-
-    if (!response.ok) {
-      throw new Error(`Cannot save card ${response.status}: ${response.statusText}`, json);
-    }
-
-    return json;
-  }
-
-  async _loadCard(format) {
-    if (this.isDestroyed) { throw new Error('Cannot _loadCard from destroyed card'); }
-
-    let { session } = priv.get(this);
-    let response = await fetch(`${hubURL}/api/cards/${this.id}?format=${format}`, {
-      headers: {
-        'Content-Type': 'application/vnd.api+json',
-        'Authorization': `Bearer ${session.token}`
-      },
-    });
-
-    let json = await response.json();
-    if (!response.ok) {
-      throw new Error(`Cannot load card ${response.status}: ${response.statusText}`, json);
-    }
-    return json;
+    await invalidate(this.id);
   }
 }
 
@@ -606,4 +575,71 @@ function reifyFieldsFromCardMetadata(card) {
     fields.push(new Field({ card: card, name, type, neededWhenEmbedded, value }));
   }
   priv.get(card).fields = fields;
+}
+
+async function invalidate(cardId, latestVersion) {
+  for (let format of ['isolated', 'embedded']) {
+    for (let [id, entry] of store[format].entries()) {
+      let card = await entry;
+      for (let relationship of Object.keys(get(card, 'data.relationships') || {})) {
+        let linkage = get(card, `data.relationships.${relationship}.data`);
+        if (!linkage) { continue; }
+        if (latestVersion == null &&
+          Array.isArray(linkage) &&
+          linkage.map(i => `${i.type}/${i.id}`).includes(`cards/${cardId}`)) {
+          store[format].delete(id);
+          break;
+        } else if (latestVersion == null && `${linkage.type}/${linkage.id}` === `cards/${cardId}`) {
+          store[format].delete(id);
+          break;
+        }
+      }
+      if (Array.isArray(card.included) && store[format].has(id)) {
+        if (latestVersion == null && card.included.map(i => `${i.type}/${i.id}`).includes(`cards/${cardId}`)) {
+          store[format].delete(id);
+        } else if (latestVersion != null &&
+          card.included
+            .filter(i => `${i.type}/${i.id}` === `cards/${cardId}`)
+            .some(i => get(i, 'meta.version') !== latestVersion)) {
+          store[format].delete(id);
+        }
+      }
+    }
+  }
+}
+
+async function save(session, cardDocument, isNew) {
+  let id = cardDocument.data.id;
+  let url = isNew ? `${hubURL}/api/cards` : `${hubURL}/api/cards/${id}`;
+  let response = await fetch(url, {
+    method: isNew ? 'POST' : 'PATCH',
+    headers: {
+      'Content-Type': 'application/vnd.api+json',
+      'Authorization': `Bearer ${session.token}`
+    },
+    body: JSON.stringify(cardDocument)
+  });
+
+  let json = await response.json();
+
+  if (!response.ok) {
+    throw new Error(`Cannot save card ${response.status}: ${response.statusText}`, json);
+  }
+
+  return json;
+}
+
+async function load(session, id, format) {
+  let response = await fetch(`${hubURL}/api/cards/${id}?format=${format}`, {
+    headers: {
+      'Content-Type': 'application/vnd.api+json',
+      'Authorization': `Bearer ${session.token}`
+    },
+  });
+
+  let json = await response.json();
+  if (!response.ok) {
+    throw new Error(`Cannot load card ${response.status}: ${response.statusText}`, json);
+  }
+  return json;
 }

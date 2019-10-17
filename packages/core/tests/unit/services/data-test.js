@@ -75,7 +75,8 @@ const scenario = new Fixtures({
   destroy() {
     return [
       { type: 'cards', id: card1Id },
-      { type: 'cards', id: card2Id }
+      { type: 'cards', id: card2Id },
+      { type: 'cards', id: card3Id }
     ];
   }
 });
@@ -528,19 +529,14 @@ module("Unit | Service | data", function () {
 
       let service = this.owner.lookup('service:data');
       let person = service.createCard(card2Id);
-      let name = person.addField({ name: 'name', type: '@cardstack/core-types::string', neededWhenEmbedded: true });
-      let email = person.addField({ name: 'email', type: '@cardstack/core-types::string' });
-      name.setValue('Van Gogh');
-      email.setValue('vangogh@nowhere.dog');
+      person.addField({ name: 'name', type: '@cardstack/core-types::string', neededWhenEmbedded: true, value: 'Van Gogh' });
+      person.addField({ name: 'email', type: '@cardstack/core-types::string', value: 'vangogh@nowhere.dog' });
       await person.save();
 
       let article = service.createCard(card1Id);
-      let title = article.addField({ name: 'title', type: '@cardstack/core-types::string', neededWhenEmbedded: true });
-      let body = article.addField({ name: 'body', type: '@cardstack/core-types::string' });
-      let author = article.addField({ name: 'author', type: '@cardstack/core-types::belongs-to', neededWhenEmbedded: true });
-      title.setValue('test title');
-      body.setValue('test body');
-      author.setValue(person);
+      article.addField({ name: 'title', type: '@cardstack/core-types::string', neededWhenEmbedded: true, value: 'test title' });
+      article.addField({ name: 'body', type: '@cardstack/core-types::string', value: 'test body' });
+      article.addField({ name: 'author', type: '@cardstack/core-types::belongs-to', neededWhenEmbedded: true, value: person });
       await article.save();
 
       service._clearCache();
@@ -841,19 +837,14 @@ module("Unit | Service | data", function () {
 
       let service = this.owner.lookup('service:data');
       let person = service.createCard(card2Id);
-      let name = person.addField({ name: 'name', type: '@cardstack/core-types::string', neededWhenEmbedded: true });
-      let email = person.addField({ name: 'email', type: '@cardstack/core-types::string' });
-      name.setValue('Van Gogh');
-      email.setValue('vangogh@nowhere.dog');
+      person.addField({ name: 'name', type: '@cardstack/core-types::string', neededWhenEmbedded: true, value: 'Van Gogh' });
+      person.addField({ name: 'email', type: '@cardstack/core-types::string', value: 'vangogh@nowhere.dog' });
       await person.save();
 
       let article = service.createCard(card1Id);
-      let title = article.addField({ name: 'title', type: '@cardstack/core-types::string', neededWhenEmbedded: true });
-      let body = article.addField({ name: 'body', type: '@cardstack/core-types::string' });
-      let author = article.addField({ name: 'author', type: '@cardstack/core-types::belongs-to', neededWhenEmbedded: true });
-      title.setValue('test title');
-      body.setValue('test body');
-      author.setValue(person);
+      article.addField({ name: 'title', type: '@cardstack/core-types::string', neededWhenEmbedded: true, value: 'test title' });
+      article.addField({ name: 'body', type: '@cardstack/core-types::string', value: 'test body' });
+      article.addField({ name: 'author', type: '@cardstack/core-types::belongs-to', neededWhenEmbedded: true, value: person });
       await article.save();
 
       service._clearCache();
@@ -982,6 +973,104 @@ module("Unit | Service | data", function () {
       assert.equal(fields[1].value.id, card2Id);
       assert.equal(fields[2].name, 'body');
       assert.equal(fields[2].value, 'test body');
+    });
+
+    test("it invalidates cards that contain the updated card as a belongs-to relationship", async function(assert) {
+      let service = this.owner.lookup('service:data');
+      let article = await service.getCard(card1Id, 'embedded'); // load the card to be invalidated into the store
+      assert.equal(article.getField('author').value.getField('name').value, 'Van Gogh');
+      article = await service.getCard(card1Id, 'isolated'); // load the card to be invalidated into the store
+      assert.equal(article.getField('author').value.getField('name').value, 'Van Gogh');
+
+      let person = await service.getCard(card2Id, 'isolated');
+      person.getField('name').setValue('updated name');
+      await person.save();
+
+      article = await service.getCard(card1Id, 'embedded');
+      assert.equal(article.getField('author').value.getField('name').value, 'updated name');
+      article = await service.getCard(card1Id, 'isolated');
+      assert.equal(article.getField('author').value.getField('name').value, 'updated name');
+    });
+
+    test("it invalidates cards that contain the updated card as a has-many relationship", async function(assert) {
+      let service = this.owner.lookup('service:data');
+      let anotherPerson = service.createCard(card3Id);
+      anotherPerson.addField({ name: 'name', type: '@cardstack/core-types::string', neededWhenEmbedded: true, value: 'Hassan' });
+      anotherPerson.addField({ name: 'email', type: '@cardstack/core-types::string', value: 'hassan@nowhere.dog' });
+      await anotherPerson.save();
+
+      let person = await service.getCard(card2Id, 'isolated');
+      let article = await service.getCard(card1Id, 'isolated');
+      article.addField({ name: 'reviewers', type: '@cardstack/core-types::has-many', neededWhenEmbedded: true, value: [person, anotherPerson] });
+      await article.save();
+      service._clearCache();
+
+      article = await service.getCard(card1Id, 'embedded'); // load the card to be invalidated into the store
+      assert.equal(article.getField('reviewers').value[0].getField('name').value, 'Van Gogh');
+      article = await service.getCard(card1Id, 'isolated'); // load the card to be invalidated into the store
+      assert.equal(article.getField('reviewers').value[0].getField('name').value, 'Van Gogh');
+
+      person = await service.getCard(card2Id, 'isolated');
+      person.getField('name').setValue('updated name');
+      await person.save();
+
+      article = await service.getCard(card1Id, 'embedded');
+      assert.equal(article.getField('reviewers').value[0].getField('name').value, 'updated name');
+      article = await service.getCard(card1Id, 'isolated');
+      assert.equal(article.getField('reviewers').value[0].getField('name').value, 'updated name');
+    });
+
+    test("it invalidates cards that contain the updated card when card is updated as owned relationships (aka embedded card update)", async function(assert) {
+      let service = this.owner.lookup('service:data');
+      let article = await service.getCard(card1Id, 'embedded'); // load the card to be invalidated into the store
+      assert.equal(article.getField('author').value.getField('name').value, 'Van Gogh');
+      article = await service.getCard(card1Id, 'isolated'); // load the card to be invalidated into the store
+      assert.equal(article.getField('author').value.getField('name').value, 'Van Gogh');
+
+      let person = await service.getCard(card2Id, 'embedded');
+      person.getField('name').setValue('updated name');
+      await person.save();
+
+      article = await service.getCard(card1Id, 'embedded');
+      assert.equal(article.getField('author').value.getField('name').value, 'updated name');
+      article = await service.getCard(card1Id, 'isolated');
+      assert.equal(article.getField('author').value.getField('name').value, 'updated name');
+    });
+
+    test("it invalidates cards that contain a card that was updated on the server since the last time it was loaded", async function(assert) {
+      let service = this.owner.lookup('service:data');
+      let article = await service.getCard(card1Id, 'embedded'); // load the card to be invalidated into the store
+      assert.equal(article.getField('author').value.getField('name').value, 'Van Gogh');
+      article = await service.getCard(card1Id, 'isolated'); // load the card to be invalidated into the store
+      assert.equal(article.getField('author').value.getField('name').value, 'Van Gogh');
+
+      let person = await service.getCard(card2Id, 'isolated');
+      let cardDoc = person.json;
+      let index = cardDoc.included.findIndex(i => `${i.type}/${i.id}` === `${card2Id}/${card2Id}`);
+      cardDoc.included[index].attributes.name = 'updated name'
+      await updateCard(card2Id, cardDoc);
+      await person.load('isolated');
+
+      article = await service.getCard(card1Id, 'embedded');
+      assert.equal(article.getField('author').value.getField('name').value, 'updated name');
+      article = await service.getCard(card1Id, 'isolated');
+      assert.equal(article.getField('author').value.getField('name').value, 'updated name');
+    });
+
+    test("it invalidates cards that contained the deleted card", async function(assert) {
+      let service = this.owner.lookup('service:data');
+      let article = await service.getCard(card1Id, 'embedded'); // load the card to be invalidated into the store
+      assert.equal(article.getField('author').value.getField('name').value, 'Van Gogh');
+      article = await service.getCard(card1Id, 'isolated'); // load the card to be invalidated into the store
+      assert.equal(article.getField('author').value.getField('name').value, 'Van Gogh');
+
+      let person = await service.getCard(card2Id, 'isolated');
+      await person.delete();
+
+      article = await service.getCard(card1Id, 'embedded');
+      assert.equal(article.getField('author').value, undefined);
+      article = await service.getCard(card1Id, 'isolated');
+      assert.equal(article.getField('author').value, undefined);
     });
 
     test("it can change a needed-when-embedded field to be an isolated-only field", async function (assert) {
@@ -1177,16 +1266,13 @@ module("Unit | Service | data", function () {
     hooks.beforeEach(async function () {
       await this.owner.lookup('service:mock-login').get('login').perform('sample-user');
       let service = this.owner.lookup('service:data');
-
       let article = service.createCard(card1Id);
-      let title = article.addField({ name: 'title', type: '@cardstack/core-types::string', neededWhenEmbedded: true });
-      let body = article.addField({ name: 'body', type: '@cardstack/core-types::string' });
-      title.setValue('test title');
-      body.setValue('test body');
+      article.addField({ name: 'title', type: '@cardstack/core-types::string', neededWhenEmbedded: true, value: 'test title' });
+      article.addField({ name: 'body', type: '@cardstack/core-types::string', value: 'test body' });
       await article.save();
+
       service._clearCache();
     });
-
 
     test("it can delete a card", async function (assert) {
       let service = this.owner.lookup('service:data');
