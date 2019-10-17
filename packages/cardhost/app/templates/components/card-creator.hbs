@@ -41,12 +41,13 @@
           onmousedown={{action this.beginDragging field}}
           data-test-card-add-field-draggable={{index}}
         >
+          {{! template-lint-disable no-inline-styles}}
           <div class="field-icon" style={{css-url "background-image" field.icon}}></div>
           <div class="field-content">
             <div class="field-content--title">{{field.title}}</div>
             <div class="field-content--description">{{field.description}}</div>
             <div class="field-content--type">Type: <code>{{field.type}}</code></div>
-            <button class="field-content--info-icon"></button>
+            <div class="field-content--info-icon"></div>
           </div>
         </div>
       {{/each}}
@@ -61,10 +62,14 @@
         {{#unless this.cardstackSession.isAuthenticated}}
           (Must be logged in to save the card.)
         {{/unless}}
-        <button class="done-btn" {{on "click" this.save}}
-            data-test-card-creator-save-btn
-            disabled={{not this.cardstackSession.isAuthenticated}}
-          >
+        {{! eslint is confused by on helper }}
+        {{! template-lint-disable attribute-indentation}}
+        <button
+          {{on "click" this.save}}
+          class="done-btn"
+          data-test-card-creator-save-btn
+          disabled={{not this.cardstackSession.isAuthenticated}}
+        >
           Save Card
         </button>
       </div>

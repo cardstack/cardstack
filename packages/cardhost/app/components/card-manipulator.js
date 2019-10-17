@@ -4,10 +4,6 @@ import { tracked } from '@glimmer/tracking';
 import { inject as service } from '@ember/service';
 import { dasherize } from '@ember/string';
 import { task } from "ember-concurrency";
-import drag from '../motions/drag';
-import { printSprites } from 'ember-animated';
-import { fadeOut } from 'ember-animated/motions/opacity';
-import move from 'ember-animated/motions/move';
 import ENV from '@cardstack/cardhost/config/environment'
 
 const { environment } = ENV;
@@ -229,25 +225,5 @@ export default class CardManipulator extends Component {
 
   @action dropField(event) {
     this.finishDrag(event);
-  }
-
-  * dragTransition ({ insertedSprites, removedSprites, keptSprites }) {
-    printSprites(arguments[0], 'transition');
-
-    keptSprites.forEach(sprite => {
-      drag(sprite, { others: [] });
-    });
-
-    insertedSprites.forEach(sprite => {
-      if (sprite.owner.value.dropCoords) {
-        let dropCoords = sprite.owner.value.dropCoords;
-        sprite.startAtPixel(dropCoords);
-        move(sprite);
-      } else {
-        sprite.moveToFinalPosition();
-      }
-    });
-
-    removedSprites.forEach(fadeOut);
   }
 }
