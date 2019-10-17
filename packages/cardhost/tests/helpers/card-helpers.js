@@ -7,6 +7,11 @@ export async function setCardId(id) {
   await triggerEvent('#card__id', 'keyup');
 }
 
+export async function dragAndDropField(index) {
+  await triggerEvent(`[data-test-card-add-field-draggable="${index}"]`, 'mousedown');
+  await triggerEvent(`[data-test-card-add-field-drop-zone]`, 'drop');
+}
+
 export async function createCards(args) {
   for (let id of Object.keys(args)) {
     await visit('/cards/new');
@@ -28,6 +33,7 @@ export async function createCards(args) {
 }
 
 export async function addField(name, type, isEmbedded, position) {
+  await dragAndDropField(0);
   let typeEl = find('#new_field_type');
   typeEl.value = type;
   await triggerEvent(typeEl, 'input');

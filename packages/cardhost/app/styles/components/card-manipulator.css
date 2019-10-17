@@ -1,4 +1,4 @@
-.create-new--main {
+.card-manipulator--main {
   box-sizing: border-box;
   width: 100vw;
   height: 100vh;
@@ -10,7 +10,7 @@
 }
 
 /* Left edge with form items catalog */
-.create-new--left-edge {
+.card-manipulator--left-edge {
   position: fixed;
   display: flex;
   flex-flow: row nowrap;
@@ -20,7 +20,7 @@
   opacity: 0.96;
 }
 
-.create-new--left-edge--profile {
+.card-manipulator--left-edge--profile {
   display: flex;
   flex-flow: column nowrap;
   justify-content: space-between;
@@ -31,7 +31,7 @@
   background-color: #343355;
 }
 
-.create-new--left-edge--profile .icon {
+.card-manipulator--left-edge--profile .icon {
   width: 40px;
   height: 40px;
   border-radius: 50%;
@@ -43,25 +43,25 @@
   fill: black;
 }
 
-.create-new--left-edge--profile .icon.active {
+.card-manipulator--left-edge--profile .icon.active {
   border: 4px solid #00eae4;
 }
 
-.create-new--left-edge--profile .icon.profile {
+.card-manipulator--left-edge--profile .icon.profile {
   background-image: url('/assets/images/profile-icon.svg');
 }
 
-.create-new--left-edge--profile .icon.settings {
+.card-manipulator--left-edge--profile .icon.settings {
   background-image: url('/assets/images/settings-icon.svg');
   border-radius: 5px;
 }
 
-.create-new--left-edge--profile .icon.search {
+.card-manipulator--left-edge--profile .icon.search {
   background-image: url('/assets/images/search-icon.svg');
 }
 
 
-.create-new--left-edge--catalog {
+.card-manipulator--left-edge--catalog {
   box-sizing: border-box;
   width: 100%;
   padding: 30px 20px;
@@ -69,14 +69,14 @@
   overflow-y: scroll;
 }
 
-.create-new--left-edge--catalog .title {
+.card-manipulator--left-edge--catalog .title {
   padding-bottom: 50px;
   font-size: 20px;
   font-weight: 600;
   line-height: 1;
 }
 
-.create-new--left-edge--catalog-field {
+.card-manipulator--left-edge--catalog-field {
   position: relative;
   display: flex;
   border: 1px solid #ddd;
@@ -84,11 +84,11 @@
   background-color: white;
 }
 
-.create-new--left-edge--catalog-field + .create-new--left-edge--catalog-field {
+.card-manipulator--left-edge--catalog-field + .card-manipulator--left-edge--catalog-field {
   margin-top: 15px;
 }
 
-.create-new--left-edge--catalog-field .field-icon {
+.card-manipulator--left-edge--catalog-field .field-icon {
   box-sizing: border-box;
   width: 100%;
   max-width: 80px;
@@ -102,25 +102,25 @@
   background-repeat: no-repeat;
 }
 
-.create-new--left-edge--catalog-field .field-content {
+.card-manipulator--left-edge--catalog-field .field-content {
   width: 100%;
   padding: 15px;
   margin: auto 0;
 }
 
-.create-new--left-edge--catalog-field .field-content--title {
+.card-manipulator--left-edge--catalog-field .field-content--title {
   padding-bottom: 5px;
   font-size: 16px;
   font-weight: 600;
   line-height: 1;
 }
 
-.create-new--left-edge--catalog-field .field-content-description {
+.card-manipulator--left-edge--catalog-field .field-content-description {
   font-size: 11px;
   color: rgba(0, 0, 0, 0.5);
 }
 
-.create-new--left-edge--catalog-field .field-content--info-icon {
+.card-manipulator--left-edge--catalog-field .field-content--info-icon {
   position: absolute;
   top: 0;
   right: 0;
@@ -136,7 +136,7 @@
 
 
 /* Card */
-.create-new--card {
+.card-manipulator--card {
   box-sizing: border-box;
   position: relative;
   max-width: 500px;
@@ -148,12 +148,12 @@
   overflow: hidden;
 }
 
-.create-new--card-header {
+.card-manipulator--card-header {
   padding: 20px;
   background-color: #00eae4;
 }
 
-.create-new--card-header > .title {
+.card-manipulator--card-header > .title {
   padding-bottom: 10px;
   font-size: 26px;
   font-weight: 600;
@@ -161,16 +161,13 @@
   text-transform: capitalize;
 }
 
-.create-new--card-header > .id {
+.card-manipulator--card-header > .id {
   font-size: 18px;
   font-weight: 600;
   line-height: 1;
 }
 
-.create-new--card-header > button.done-btn {
-  position: absolute;
-  top: 40px;
-  right: 20px;
+.card-manipulator--card-header > button {
   width: 70px;
   height: 32px;
   padding: 0;
@@ -181,13 +178,24 @@
   color: black;
 }
 
-.create-new--card-header > button.done-btn:hover {
+.card-manipulator--card-header > button:hover {
   background-color: white;
   color: black;
 }
 
+.card-manipulator--card-header > button.done-btn {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+}
 
-.create-new--card--field-box {
+.card-manipulator--card-header > button.cancel-btn {
+  position: absolute;
+  top: 50px;
+  right: 20px;
+}
+
+.card-manipulator--card--field-box {
   box-sizing: border-box;
   position: relative;
   display: flex;
@@ -199,11 +207,11 @@
   font-size: 16px;
 }
 
-.create-new--card--field-box + .create-new--card--field-box {
+.card-manipulator--card--field-box + .card-manipulator--card--field-box {
   border-top: 1px solid rgba(255, 255, 255, 0.15);
 }
 
-.create-new--card--field-box .handle-icon {
+.card-manipulator--card--field-box .handle-icon {
   height: 18px;
   width: 14px;
   background-image: url('/assets/images/grabber-handle.svg');
@@ -212,7 +220,7 @@
   background-size: contain;
 }
 
-.create-new--card--field-box .field-data {
+.card-manipulator--card--field-box .field-data {
   box-sizing: border-box;
   width: 384px;
   min-height: 112px;
@@ -222,22 +230,22 @@
   overflow: hidden;
 }
 
-.create-new--card--field-box .field-data--content {
+.card-manipulator--card--field-box .field-data--content {
   padding: 10px;
 }
 
-.create-new--card--field-box .field-data--type {
+.card-manipulator--card--field-box .field-data--type {
   padding: 10px;
   background-color: #24242e;
   color: white;
 }
 
-.create-new--card--field-box .field-data--title {
+.card-manipulator--card--field-box .field-data--title {
   color: rgba(0, 0, 0, 0.5);
   font-size: 11px;
 }
 
-.create-new--card--field-box > button.remove-btn {
+.card-manipulator--card--field-box > button.remove-btn {
   position: absolute;
   bottom: 10px;
   right: 20px;
@@ -247,11 +255,11 @@
   outline: 0;
 }
 
-.create-new--card--field-box > button.remove-btn:hover {
+.card-manipulator--card--field-box > button.remove-btn:hover {
   background: none;
 }
 
-.create-new--card--field--drop-zone {
+.card-manipulator--card--field--drop-zone {
   margin: 30px;
   border: dashed 3px #ddd;
   color: #ddd;
