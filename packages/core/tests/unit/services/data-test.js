@@ -178,10 +178,13 @@ module("Unit | Service | data", function () {
     test("it can add a new field to an isolated card at the first position", async function (assert) {
       let service = this.owner.lookup('service:data');
       let card = service.createCard(card1Id);
-      card.addField({ name: 'body', type: '@cardstack/core-types::string' });
-      card.addField({ name: 'name', type: '@cardstack/core-types::string', neededWhenEmbedded: true });
-      card.addField({ name: 'title', type: '@cardstack/core-types::string', neededWhenEmbedded: true, position: 0 });
+      let field1 = card.addField({ name: 'body', type: '@cardstack/core-types::string' });
+      let field2 = card.addField({ name: 'name', type: '@cardstack/core-types::string', neededWhenEmbedded: true });
+      let field3 = card.addField({ name: 'title', type: '@cardstack/core-types::string', neededWhenEmbedded: true, position: 0 });
 
+      assert.equal(field1.position, 1);
+      assert.equal(field2.position, 2);
+      assert.equal(field3.position, 0);
       assert.deepEqual(card.fields.map(i => i.name), ['title', 'body', 'name']);
       assert.deepEqual(card.json.data.relationships.fields.data, [
         { type: 'fields', id: 'title' },
@@ -194,10 +197,13 @@ module("Unit | Service | data", function () {
     test("it can add a new field to an isolated card at the last position", async function (assert) {
       let service = this.owner.lookup('service:data');
       let card = service.createCard(card1Id);
-      card.addField({ name: 'body', type: '@cardstack/core-types::string' });
-      card.addField({ name: 'name', type: '@cardstack/core-types::string', neededWhenEmbedded: true });
-      card.addField({ name: 'title', type: '@cardstack/core-types::string', neededWhenEmbedded: true, position: 2 });
+      let field1 = card.addField({ name: 'body', type: '@cardstack/core-types::string' });
+      let field2 = card.addField({ name: 'name', type: '@cardstack/core-types::string', neededWhenEmbedded: true });
+      let field3 = card.addField({ name: 'title', type: '@cardstack/core-types::string', neededWhenEmbedded: true, position: 2 });
 
+      assert.equal(field1.position, 0);
+      assert.equal(field2.position, 1);
+      assert.equal(field3.position, 2);
       assert.deepEqual(card.fields.map(i => i.name), ['body', 'name', 'title']);
       assert.deepEqual(card.json.data.relationships.fields.data, [
         { type: 'fields', id: 'body' },
@@ -210,10 +216,13 @@ module("Unit | Service | data", function () {
     test("it can add a new field to an isolated card at a position in the middle", async function (assert) {
       let service = this.owner.lookup('service:data');
       let card = service.createCard(card1Id);
-      card.addField({ name: 'body', type: '@cardstack/core-types::string' });
-      card.addField({ name: 'name', type: '@cardstack/core-types::string', neededWhenEmbedded: true });
-      card.addField({ name: 'title', type: '@cardstack/core-types::string', neededWhenEmbedded: true, position: 1 });
+      let field1 = card.addField({ name: 'body', type: '@cardstack/core-types::string' });
+      let field2 = card.addField({ name: 'name', type: '@cardstack/core-types::string', neededWhenEmbedded: true });
+      let field3 = card.addField({ name: 'title', type: '@cardstack/core-types::string', neededWhenEmbedded: true, position: 1 });
 
+      assert.equal(field1.position, 0);
+      assert.equal(field2.position, 2);
+      assert.equal(field3.position, 1);
       assert.deepEqual(card.fields.map(i => i.name), ['body', 'title', 'name']);
       assert.deepEqual(card.json.data.relationships.fields.data, [
         { type: 'fields', id: 'body' },
@@ -1189,8 +1198,10 @@ module("Unit | Service | data", function () {
       let service = this.owner.lookup('service:data');
       let card = await service.getCard(card1Id, 'isolated');
       assert.equal(card.isDirty, false, 'the dirtiness is correct for a modified card');
+      assert.equal(card.getField('title').position, 0);
       card.moveField(card.getField('title'), 2);
 
+      assert.equal(card.getField('title').position, 2);
       assert.equal(card.isDirty, true, 'the dirtiness is correct for a modified card');
       assert.deepEqual(card.fields.map(i => i.name), [ 'body', 'author', 'title' ]);
       assert.deepEqual(card.json.data.relationships.fields.data, [
@@ -1213,8 +1224,10 @@ module("Unit | Service | data", function () {
       let service = this.owner.lookup('service:data');
       let card = await service.getCard(card1Id, 'isolated');
       assert.equal(card.isDirty, false, 'the dirtiness is correct for a modified card');
+      assert.equal(card.getField('title').position, 0);
       card.moveField(card.getField('title'), 1);
 
+      assert.equal(card.getField('title').position, 1);
       assert.equal(card.isDirty, true, 'the dirtiness is correct for a modified card');
       assert.deepEqual(card.fields.map(i => i.name), [ 'body', 'title', 'author' ]);
       assert.deepEqual(card.json.data.relationships.fields.data, [
@@ -1237,8 +1250,10 @@ module("Unit | Service | data", function () {
       let service = this.owner.lookup('service:data');
       let card = await service.getCard(card1Id, 'isolated');
       assert.equal(card.isDirty, false, 'the dirtiness is correct for a modified card');
+      assert.equal(card.getField('title').position, 0);
       card.moveField(card.getField('title'), 0);
 
+      assert.equal(card.getField('title').position, 0);
       assert.equal(card.isDirty, false, 'the dirtiness is correct for a modified card');
       assert.deepEqual(card.fields.map(i => i.name), [ 'title', 'body', 'author' ]);
       assert.deepEqual(card.json.data.relationships.fields.data, [

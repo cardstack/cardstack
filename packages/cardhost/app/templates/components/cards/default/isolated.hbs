@@ -2,7 +2,7 @@
   data-test-isolated-card={{@card.id}}
   class="isolated-card default-card"
 >
-  {{#each @card.isolatedFields key="nonce" as | field index |}}
+  {{#each @card.isolatedFields key="nonce" as | field |}}
     {{#if @setFieldValue}}
       <FieldRenderer
         @field={{field}}
@@ -13,7 +13,6 @@
       <FieldRenderer
         @field={{field}}
         @mode={{@mode}}
-        @position={{index}}
         @removeField={{@removeField}}
         @setPosition={{@setPosition}}
         @setNeededWhenEmbedded={{@setNeededWhenEmbedded}}

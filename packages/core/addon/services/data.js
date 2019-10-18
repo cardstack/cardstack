@@ -338,6 +338,10 @@ class Field {
     return priv.get(this).type;
   }
 
+  get position() {
+    return this.card.fields.findIndex(i => i.name === this.name);
+  }
+
   get neededWhenEmbedded() {
     return priv.get(this).neededWhenEmbedded;
   }

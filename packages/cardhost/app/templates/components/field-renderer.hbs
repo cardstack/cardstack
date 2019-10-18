@@ -72,15 +72,15 @@
 
     <div class="field-renderer--field-btn-wrapper">
       {{#if @setPosition}}
-        {{#if (gt @position 0)}}
-          <button {{on "click" (fn @setPosition @field.name (dec @position))}}
+        {{#if (gt @field.position 0)}}
+          <button {{on "click" (fn @setPosition @field.name (dec @field.position))}}
             data-test-field-renderer-move-up-btn
           >
             <strong>▲</strong>
           </button>
         {{/if}}
-        {{#if (lt @position (dec @field.card.isolatedFields.length))}}
-          <button {{on "click" (fn @setPosition @field.name (inc @position))}}
+        {{#if (lt @field.position (dec @field.card.isolatedFields.length))}}
+          <button {{on "click" (fn @setPosition @field.name (inc @field.position))}}
             data-test-field-renderer-move-down-btn
           >
             <strong>▼</strong>
