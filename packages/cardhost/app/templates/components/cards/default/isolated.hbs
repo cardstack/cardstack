@@ -2,14 +2,14 @@
   data-test-isolated-card={{@card.id}}
   class="isolated-card default-card"
 >
-  {{#each @card.isolatedFields key="name" as | field index |}}
+  {{#each @card.isolatedFields key="nonce" as | field index |}}
     {{#if @setFieldValue}}
       <FieldRenderer
         @field={{field}}
         @mode={{@mode}}
         @setFieldValue={{fn @setFieldValue field.name}}
       />
-    {{else if (or @setNeededWhenEmbedded @setPosition @removeField)}}
+    {{else if (or @setNeededWhenEmbedded @setPosition @removeField @setFieldName)}}
       <FieldRenderer
         @field={{field}}
         @mode={{@mode}}
@@ -17,6 +17,7 @@
         @removeField={{@removeField}}
         @setPosition={{@setPosition}}
         @setNeededWhenEmbedded={{@setNeededWhenEmbedded}}
+        @setFieldName={{@setFieldName}}
       />
     {{else}}
       <FieldRenderer @field={{field}} @mode={{@mode}}/>

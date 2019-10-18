@@ -132,6 +132,11 @@ export default class CardManipulator extends Component {
   }
 
   @action
+  setFieldName(oldFieldName, newFieldName) {
+    this.card.getField(oldFieldName).setName(newFieldName);
+  }
+
+  @action
   save() {
     this.saveCard.perform();
   }

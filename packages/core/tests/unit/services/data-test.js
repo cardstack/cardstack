@@ -75,7 +75,8 @@ const scenario = new Fixtures({
   destroy() {
     return [
       { type: 'cards', id: card1Id },
-      { type: 'cards', id: card2Id }
+      { type: 'cards', id: card2Id },
+      { type: 'cards', id: card3Id }
     ];
   }
 });
@@ -867,6 +868,58 @@ module("Unit | Service | data", function () {
       assert.equal(card.isDirty, true, 'the dirtiness is correct for a modified card');
     });
 
+    test("it can change the name of a field", async function (assert) {
+      let service = this.owner.lookup('service:data');
+      let card = await service.getCard(card1Id, 'isolated');
+      let field = card.getField('title');
+
+      field.setName('subtitle');
+
+      assert.equal(card.isDirty, true, 'the dirtiness is correct for card');
+      assert.equal(field.name, 'subtitle');
+      assert.equal(field.value, 'test title');
+      assert.equal(card.getField('title'), undefined);
+      assert.equal(card.getField('subtitle').name, 'subtitle');
+      assert.equal(card.getField('subtitle').value, 'test title');
+      assert.equal(Boolean(card.json.data.relationships.fields.data.find(i => `${i.type}/${i.id}` === 'fields/subtitle')), true, 'updated field schema reference exists');
+      assert.equal(!(card.json.data.relationships.fields.data.find(i => `${i.type}/${i.id}` === 'fields/title')), true, 'old field schema reference doesnt exist');
+      assert.equal(Boolean(card.json.included.find(i => `${i.type}/${i.id}` === 'fields/subtitle')), true, 'updated field included resources exists');
+      assert.equal(!(card.json.included.find(i => `${i.type}/${i.id}` === 'fields/title')), true, 'old field included resource does not exist');
+      let model = card.json.included.find(i => `${i.type}/${i.id}` === `${card1Id}/${card1Id}`);
+      assert.equal(model.attributes.subtitle, 'test title');
+      assert.equal(model.attributes.title, undefined);
+
+      await card.save();
+      assert.equal(card.isDirty, false, 'the dirtiness is correct saved card');
+      field = card.getField('subtitle');
+
+      assert.equal(field.name, 'subtitle');
+      assert.equal(field.value, 'test title');
+      assert.equal(card.getField('title'), undefined);
+      assert.equal(card.getField('subtitle').name, 'subtitle');
+      assert.equal(card.getField('subtitle').value, 'test title');
+      assert.equal(Boolean(card.json.data.relationships.fields.data.find(i => `${i.type}/${i.id}` === 'fields/subtitle')), true, 'updated field schema reference exists');
+      assert.equal(!(card.json.data.relationships.fields.data.find(i => `${i.type}/${i.id}` === 'fields/title')), true, 'old field schema reference doesnt exist');
+      assert.equal(Boolean(card.json.included.find(i => `${i.type}/${i.id}` === 'fields/subtitle')), true, 'updated field included resources exists');
+      assert.equal(!(card.json.included.find(i => `${i.type}/${i.id}` === 'fields/title')), true, 'old field included resource does not exist');
+      model = card.json.included.find(i => `${i.type}/${i.id}` === `${card1Id}/${card1Id}`);
+      assert.equal(model.attributes.subtitle, 'test title');
+      assert.equal(model.attributes.title, undefined);
+    });
+
+    test("it does nothing if the field name is changed to the same name that it currently is", async function(assert) {
+      let service = this.owner.lookup('service:data');
+      let card = await service.getCard(card1Id, 'isolated');
+      let field = card.getField('title');
+
+      field.setName('title');
+      assert.equal(card.isDirty, false, 'the dirtiness is correct saved card');
+      assert.equal(field.name, 'title');
+      assert.equal(field.value, 'test title');
+      assert.equal(card.getField('title').name, 'title');
+      assert.equal(card.getField('title').value, 'test title');
+    });
+
     test("it can remove a field from an existing card", async function (assert) {
       let service = this.owner.lookup('service:data');
       let card = await service.getCard(card1Id, 'isolated');
@@ -1234,6 +1287,13 @@ module("Unit | Service | data", function () {
       assert.throws(() => card.moveField(field, 0), /card is in the embedded format/);
     });
 
+    test("it throws an error if you name a field with the same name as another field in the card", async function (assert) {
+      let service = this.owner.lookup('service:data');
+      let card = await service.getCard(card1Id, 'isolated');
+      let author = card.getField('author');
+      assert.throws(() => author.setName('title'), /field with the name 'title' already exists/);
+    });
+
     test("it throws an error if you try to setNeededWhenEmbedded on an embedded card", async function (assert) {
       let service = this.owner.lookup('service:data');
       let card = await service.getCard(card1Id, 'embedded');
@@ -1358,6 +1418,15 @@ module("Unit | Service | data", function () {
       await card.delete();
 
       assert.throws(() => field.setNeededWhenEmbedded(false), /destroyed field/);
+    });
+
+    test('throws when you call setName from deleted Field instance', async function (assert) {
+      let service = this.owner.lookup('service:data');
+      let card = await service.getCard(card1Id, 'isolated');
+      let field = card.getField('title');
+      await card.delete();
+
+      assert.throws(() => field.setName(false), /destroyed field/);
     });
 
     test('throws when you call moveField from deleted Card instance', async function (assert) {

@@ -37,6 +37,22 @@
       </code>
     </dd>
     <dd>
+      {{#if @setFieldName}}
+        <label
+          data-test-string-field-renderer-field-name-label
+          for={{concat "edit-field-name-" @field.nonce}}
+        >
+          Field name:
+        </label>
+        <Input
+          @id={{concat "edit-field-name-" @field.nonce}}
+          @class="field-renderer-field-name-input"
+          @value={{this.newFieldName}}
+          @key-up={{action this.updateFieldName}}
+        />
+      {{/if}}
+    </dd>
+    <dd>
       {{#if @setNeededWhenEmbedded}}
         <Input
           @checked={{@field.neededWhenEmbedded}}

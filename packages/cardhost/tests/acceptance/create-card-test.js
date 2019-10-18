@@ -1,5 +1,5 @@
 import { module, test } from 'qunit';
-import { click, find, visit, currentURL, waitFor } from '@ember/test-helpers';
+import { click, fillIn, find, visit, currentURL, waitFor, triggerEvent } from '@ember/test-helpers';
 import { setupApplicationTest } from 'ember-qunit';
 import Fixtures from '@cardstack/test-support/fixtures'
 import { addField, setCardId } from '../helpers/card-helpers';
@@ -62,6 +62,26 @@ module('Acceptance | card create', function(hooks) {
     assert.equal(card.data.attributes.body, undefined);
     assert.equal(card.data.relationships.author, undefined);
     assert.deepEqual(card.data.relationships.reviewers.data, []);
+  });
+
+  test(`renaming a card's field`, async function(assert) {
+    await login();
+    await visit('/cards/new');
+
+    await setCardId(card1Id);
+    await addField('title', 'string', true);
+    await addField('body', 'string', false);
+
+    assert.dom('[data-test-field="title"] .field-renderer-field-name-input').hasValue('title');
+    await fillIn('[data-test-field="title"] .field-renderer-field-name-input', 'subtitle');
+    await triggerEvent(`[data-test-field="title"] .field-renderer-field-name-input`, 'keyup');
+
+    await click('[data-test-card-creator-save-btn]');
+    await waitFor(`[data-test-card-view="${card1Id}"]`, { timeout });
+
+    assert.equal(currentURL(), `/cards/${card1Id}`);
+    assert.dom('[data-test-field="subtitle"]').exists();
+    assert.dom('[data-test-field="title"]').doesNotExist();
   });
 
   test('can add a field at a particular position', async function(assert) {
