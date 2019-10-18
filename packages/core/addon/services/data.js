@@ -5,6 +5,7 @@ import { inject as service } from '@ember/service';
 import { tracked } from '@glimmer/tracking';
 import { assert } from '@ember/debug';
 
+let fieldNonce = 0;
 let priv = new WeakMap();
 let store = {
   isolated: new Map(),
@@ -321,6 +322,10 @@ class Field {
     return `<field ${internal.name} (of ${internal.card})>`;
   }
 
+  get nonce() {
+    return priv.get(this).nonce;
+  }
+
   get card() {
     return priv.get(this).card;
   }
@@ -360,6 +365,26 @@ class Field {
         }
       })
     };
+  }
+
+  setName(name) {
+    if (this.isDestroyed) { throw new Error('Cannot setName from destroyed field'); }
+
+    let internal = priv.get(this);
+    let internalCard = priv.get(this.card);
+    let oldName = internal.name;
+    if (name === oldName) { return this; } // nothing is changing, so do nothing
+    if (this.card.getField(name)) { throw new Error(`Cannot change the field name from '${this.name}' to '${name}'. A field with the name '${name}' already exists in this card '${this.card.id}'.`); }
+
+    internal.name = name;
+    internalCard.fields = internalCard.fields.filter(i => i.name !== oldName);
+    internalCard.serverIsolatedData.included = (internalCard.serverIsolatedData.included || []).filter(i => `${i.type}/${i.id}` !== `fields/${oldName}`);
+
+    // eslint-disable-next-line no-self-assign
+    internalCard.fields = internalCard.fields; // oh glimmer, you so silly...
+    internalCard.isDirty = true;
+
+    return this;
   }
 
   setValue(value) {
@@ -461,6 +486,7 @@ class CardInternals {
 }
 
 class FieldInternals {
+  @tracked nonce;
   @tracked card;
   @tracked name;
   @tracked type;
@@ -485,6 +511,7 @@ class FieldInternals {
     this.value = value;
     this.serverData = serverData;
     this.isDestroyed = false;
+    this.nonce = fieldNonce++;
   }
 }
 

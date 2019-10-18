@@ -1,5 +1,5 @@
 import { module, test } from 'qunit';
-import { click, find, visit, currentURL, waitFor } from '@ember/test-helpers';
+import { click, find, visit, currentURL, waitFor, fillIn, triggerEvent } from '@ember/test-helpers';
 import { setupApplicationTest } from 'ember-qunit';
 import Fixtures from '@cardstack/test-support/fixtures'
 import { addField, createCards, removeField } from '../helpers/card-helpers';
@@ -44,6 +44,39 @@ module('Acceptance | card schema', function(hooks) {
     let card = JSON.parse(find('.code-block').textContent);
     assert.equal(card.data.attributes.title, undefined);
   });
+
+  test(`renaming a card's field`, async function(assert) {
+    await login();
+    await createCards({
+      [card1Id]: [
+        ['title', 'string', false, 'test title']
+      ]
+    });
+    await visit(`/cards/${card1Id}/schema`);
+    assert.equal(currentURL(), `/cards/${card1Id}/schema`);
+
+    assert.dom('[data-test-field="title"] .field-renderer-field-name-input').hasValue('title');
+    await fillIn('[data-test-field="title"] .field-renderer-field-name-input', 'subtitle');
+    await triggerEvent(`[data-test-field="title"] .field-renderer-field-name-input`, 'keyup');
+
+    await click('[data-test-card-schema-save-btn]');
+    await waitFor(`[data-test-card-view="${card1Id}"]`, { timeout });
+    await visit(`/cards/${card1Id}/schema`);
+
+    assert.dom('[data-test-field="title"]').doesNotExist();
+
+    let card = JSON.parse(find('.code-block').textContent);
+    assert.equal(card.data.attributes.subtitle, 'test title');
+    assert.equal(card.data.attributes.title, undefined);
+
+    await visit(`/cards/${card1Id}`);
+    assert.dom('[data-test-field="subtitle"] [data-test-string-field-viewer-value]').hasText('test title');
+    assert.dom('[data-test-field="title"]').doesNotExist();
+
+    await visit(`/cards/${card1Id}/schema`);
+    assert.dom('[data-test-field="subtitle"] .field-renderer-field-name-input').hasValue('subtitle');
+  });
+
 
   test(`removing a field from a card`, async function(assert) {
     await login();
