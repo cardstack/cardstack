@@ -49,15 +49,15 @@ jobs:
       if: branch = master
       install: skip
       script:
-        - 'if [ "$TRAVIS_PULL_REQUEST" = "false" ]; echo "$SSH_PRIVATE_KEY" > $HOME/.ssh/id_rsa && chmod 400 $HOME/.ssh/id_rsa; fi'
-        - 'if [ "$TRAVIS_PULL_REQUEST" = "false" ]; sudo apt-get install socat; fi'
-        - 'if [ "$TRAVIS_PULL_REQUEST" = "false" ]; pip install --user awscli; fi'
-        - 'if [ "$TRAVIS_PULL_REQUEST" = "false" ]; aws ecr --region us-east-1 get-login --no-include-email | bash; fi'
-        - 'if [ "$TRAVIS_PULL_REQUEST" = "false" ]; yarn --cwd ./packages/cardhost/deploy install; fi'
-        - 'if [ "$TRAVIS_PULL_REQUEST" = "false" ]; cd ./packages/cardhost; fi'
+        - 'if [ "$TRAVIS_PULL_REQUEST" = "false" ]; then echo "$SSH_PRIVATE_KEY" > $HOME/.ssh/id_rsa && chmod 400 $HOME/.ssh/id_rsa; fi'
+        - 'if [ "$TRAVIS_PULL_REQUEST" = "false" ]; then sudo apt-get install socat; fi'
+        - 'if [ "$TRAVIS_PULL_REQUEST" = "false" ]; then pip install --user awscli; fi'
+        - 'if [ "$TRAVIS_PULL_REQUEST" = "false" ]; then aws ecr --region us-east-1 get-login --no-include-email | bash; fi'
+        - 'if [ "$TRAVIS_PULL_REQUEST" = "false" ]; then yarn --cwd ./packages/cardhost/deploy install; fi'
+        - 'if [ "$TRAVIS_PULL_REQUEST" = "false" ]; then cd ./packages/cardhost; fi'
         - 'if [ "$TRAVIS_PULL_REQUEST" = "false" ]; then node ./deploy/build.js; fi'
-        - 'if [ "$TRAVIS_PULL_REQUEST" = "false" ]; then TARGET_NAME='builder.stack.cards' ./deploy/deploy.sh demo $TRAVIS_BRANCH; fi'
-        - 'if [ "$TRAVIS_PULL_REQUEST" = "false" ]; cd ../..; fi'
+        - 'if [ "$TRAVIS_PULL_REQUEST" = "false" ]; then TARGET_NAME="builder.stack.cards" ./deploy/deploy.sh demo $TRAVIS_BRANCH; fi'
+        - 'if [ "$TRAVIS_PULL_REQUEST" = "false" ]; then cd ../..; fi'
 
 before_install:
   - docker network create cardstack
