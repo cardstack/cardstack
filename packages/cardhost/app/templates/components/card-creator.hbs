@@ -20,90 +20,99 @@
 <br>
 
 {{#if this.card}}
-
-  {{!-- Left edge --}}
-  <div class="card-manipulator--left-edge">
-    {{!-- Profile sidebar --}}
-    <div class="card-manipulator--left-edge--profile">
-      <div class="profile icon"></div>
-      <div class="settings icon active"></div>
-      <div class="search icon"></div>
-    </div>
-    {{!-- Catalog fields list --}}
-    <div class="card-manipulator--left-edge--catalog">
-      <div class="title">Card Catalog</div>
-
-      {{#each this.componentTypes as |field index|}}
-        <div
-          class="card-manipulator--left-edge--catalog-field"
-          role="button"
-          draggable="true"
-          onmousedown={{action this.beginDragging field}}
-          data-test-card-add-field-draggable={{index}}
-        >
-          {{! template-lint-disable no-inline-styles}}
-          <div class="field-icon" style={{css-url "background-image" field.icon}}></div>
-          <div class="field-content">
-            <div class="field-content--title">{{field.title}}</div>
-            <div class="field-content--description">{{field.description}}</div>
-            <div class="field-content--type">Type: <code>{{field.type}}</code></div>
-            <div class="field-content--info-icon"></div>
-          </div>
-        </div>
-      {{/each}}
-    </div>
-  </div>
-  <div class="card-manipulator--main">
-    {{!-- Card --}}
-    <div class="card-manipulator--card">
-      <div class="card-manipulator--card-header">
-        <div class="title">New Card</div>
-        <code class="id">{{@card.id}}</code>
-        {{#unless this.cardstackSession.isAuthenticated}}
-          (Must be logged in to save the card.)
-        {{/unless}}
-        {{! eslint is confused by on helper }}
-        {{! template-lint-disable attribute-indentation}}
-        <button
-          {{on "click" this.save}}
-          class="done-btn"
-          data-test-card-creator-save-btn
-          disabled={{not this.cardstackSession.isAuthenticated}}
-        >
-          Save Card
-        </button>
+  <div class="card-manipulator--container">
+    {{!-- Left edge --}}
+    <div class="card-manipulator--left-edge">
+      {{!-- Profile sidebar --}}
+      <div class="card-manipulator--left-edge--profile">
+        <div class="profile icon"></div>
+        <div class="settings icon active"></div>
+        <div class="search icon"></div>
       </div>
-      <CardRenderer
-        @card={{this.card}}
-        @format="isolated"
-        @mode="schema"
-        @removeField={{action this.removeField}}
-        @setNeededWhenEmbedded={{action this.setNeededWhenEmbedded}}
-        @setFieldName={{action this.setFieldName}}
-        @setPosition={{action this.setPosition}}
-      >
+      {{!-- Catalog fields list --}}
+      <div class="card-manipulator--left-edge--catalog">
+        <div class="title">Card Catalog</div>
 
-        <div
-          class="card-manipulator--card--field--drop-zone"
-          role="button"
-          ondrop={{action this.dropField}}
-          ondragover={{action this.dragOver}}
-          ondragenter={{action this.toggleOverDropZone true}}
-          ondragleave={{action this.toggleOverDropZone false}}
-          data-test-card-add-field-drop-zone
-        >
-          Drop fields here to edit/add
+        {{#each this.fieldComponents as |field|}}
+          <div
+            class="card-manipulator--left-edge--catalog-field"
+            role="button"
+            draggable="true"
+            onmousedown={{action this.beginDragging field}}
+            data-test-card-add-field-draggable={{field.type}}
+          >
+            {{! template-lint-disable no-inline-styles}}
+            <div class="field-icon" style={{css-url "background-image" field.icon}}></div>
+            <div class="field-content">
+              <div class="field-content--title">{{field.title}}</div>
+              <div class="field-content--description">{{field.description}}</div>
+              <div class="field-content--type">Type: <code>{{field.type}}</code></div>
+              <div class="field-content--info-icon"></div>
+            </div>
+          </div>
+        {{/each}}
+      </div>
+    </div>
+    <div class="card-manipulator--main">
+      {{!-- Card --}}
+      <div class="card-manipulator--card">
+        <div class="card-manipulator--card-header">
+          <div class="title">New Card</div>
+          <code class="id">{{@card.id}}</code>
+          {{#unless this.cardstackSession.isAuthenticated}}
+            (Must be logged in to save the card.)
+          {{/unless}}
+          {{! eslint is confused by on helper }}
+          {{! template-lint-disable attribute-indentation}}
+          <button
+            {{on "click" this.save}}
+            class="done-btn"
+            data-test-card-creator-save-btn
+            disabled={{not this.cardstackSession.isAuthenticated}}
+          >
+            Save Card
+          </button>
         </div>
+        <CardRenderer
+          @card={{this.card}}
+          @format="isolated"
+          @mode="schema"
+          @removeField={{action this.removeField}}
+          @setNeededWhenEmbedded={{action this.setNeededWhenEmbedded}}
+          @setFieldName={{action this.setFieldName}}
+          @setPosition={{action this.setPosition}}
+        >
 
-        {{#if this.isEditingSchema}}
-          <FieldCreator
-            @numFields={{this.card.isolatedFields.length}}
-            @fieldTypeMappings={{this.fieldTypeMappings}}
-            @addField={{action this.addField}}
-            @field={{this.isEditingSchema}}
+          <div
+            class="card-manipulator--card--field--drop-zone"
+            role="button"
+            ondrop={{action this.dropField}}
+            ondragover={{action this.dragOver}}
+            ondragenter={{action this.toggleOverDropZone true}}
+            ondragleave={{action this.toggleOverDropZone false}}
+            data-test-card-add-field-drop-zone
+          >
+            Drop fields here to edit/add
+          </div>
+
+        </CardRenderer>
+      </div>
+    </div>
+    <div class="card-manipulator--right-edge">
+      <div class="card-manipulator--right-edge--field">
+        <div class="card-manipulator--right-edge--field-header">
+          Edit Field Schema
+        </div>
+        {{#if this.selectedField}}
+          <FieldRenderer
+            @field={{this.selectedField}}
+            @mode="schema"
+            @position={{this.selectedField.position}}
+            @setNeededWhenEmbedded={{action this.setNeededWhenEmbedded}}
+            @setPosition={{action this.setPosition}}
           />
         {{/if}}
-      </CardRenderer>
+      </div>
     </div>
   </div>
 {{/if}}

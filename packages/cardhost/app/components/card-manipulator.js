@@ -23,7 +23,7 @@ const fieldTypeMappings = {
   // '@cardstack/core-types::object',
 };
 
-const componentTypes = [
+const fieldComponents = [
   {
     id: 'text-field',
     title: 'Text',
@@ -32,31 +32,67 @@ const componentTypes = [
     icon: `/assets/images/field-types/text.png`
   },
   {
-    id: 'text-area',
-    title: 'Text Area',
-    description: 'Multi-line text field',
-    type: 'string',
-    icon: `/assets/images/field-types/textarea.png`
+    id: 'text-field-case-insensitive',
+    title: 'Text (case-insensitive)',
+    description: 'Case-insensitive text field',
+    type: 'case-insensitive string',
+    icon: `/assets/images/field-types/text.png`
   },
   {
     id: 'checkbox',
     title: 'Checkbox',
-    description: 'Description',
+    description: 'True/false (boolean) values',
     type: 'boolean',
     icon: `/assets/images/field-types/checkbox.png`
   },
   {
-    id: 'phone-number-field',
-    title: 'Phone Number',
-    description: 'Description',
-    type: 'string',
-    icon: `/assets/images/field-types/phone-number.png`
+    id: 'date-field',
+    title: 'Date',
+    description: 'Date field',
+    type: 'date',
+    icon: `/assets/images/field-types/date.png`
   },
+  {
+    id: 'number',
+    title: 'Number',
+    description: 'Integer number field',
+    type: 'integer',
+    icon: `/assets/images/field-types/number.png`
+  },
+  {
+    id: 'dropdown',
+    title: 'Dropdown',
+    description: 'Single select dropdown',
+    type: 'related card',
+    icon: `/assets/images/field-types/dropdown.png`
+  },
+  {
+    id: 'dropdown-multi',
+    title: 'Dropdown (Multi-select)',
+    description: 'Multiple select dropdown',
+    type: 'related cards',
+    icon: `/assets/images/field-types/dropdown.png`
+  },
+  // We'll need to figure out how to deal with the other types of ui-components, ex:
+  // {
+  //   id: 'text-area',
+  //   title: 'Text Area',
+  //   description: 'Multi-line text field',
+  //   type: 'string',
+  //   icon: `/assets/images/field-types/textarea.png`
+  // },
+  // {
+  //   id: 'phone-number-field',
+  //   title: 'Phone Number',
+  //   description: 'Description',
+  //   type: 'string',
+  //   icon: `/assets/images/field-types/phone-number.png`
+  // },
 ];
 
 export default class CardManipulator extends Component {
   fieldTypeMappings = fieldTypeMappings;
-  componentTypes = componentTypes;
+  fieldComponents = fieldComponents;
 
   @service data;
   @service router;
@@ -78,6 +114,10 @@ export default class CardManipulator extends Component {
 
   get isDirtyStr() {
     return this.card.isDirty.toString();
+  }
+
+  get newFieldName() {
+    return `new-field-${this.card.isolatedFields.length}`;
   }
 
   @(task(function * () {
@@ -126,8 +166,6 @@ export default class CardManipulator extends Component {
     if (value != null) {
       field.setValue(value);
     }
-
-    set(this, 'isEditingSchema', null);
   }
 
   @action
@@ -186,23 +224,8 @@ export default class CardManipulator extends Component {
   }
 
   @action
-  beginDragging(field, mousedownEvent) {
-    let dragState;
-
-    set(this, 'finishDrag', (dropEvent) => {
-      if (this.isOverDropZone) {
-        let { x, y } = dropEvent;
-        let { offsetX, offsetY } = mousedownEvent;
-        set(field, 'dropCoords', { x: x - offsetX, y: y - offsetY });
-        set(this, 'isOverDropZone', false);
-      }
-
-      set(this, 'isDragging', false);
-      set(this, 'isEditingSchema', field);
-      set(field, 'dragState', null);
-    });
-
-    dragState = {
+  beginDragging(fieldComponent, mousedownEvent) {
+    let dragState = {
       usingKeyboard: false,
       initialPointerX: mousedownEvent.x,
       initialPointerY: mousedownEvent.y,
@@ -211,8 +234,8 @@ export default class CardManipulator extends Component {
     };
 
     window.addEventListener('dragend', () => set(this, 'isDragging', false));
-    set(this, 'isDragging', field);
-    set(field, 'dragState', dragState);
+    set(this, 'isDragging', fieldComponent);
+    set(fieldComponent, 'dragState', dragState);
   }
 
   @action toggleOverDropZone(value) {
@@ -223,7 +246,20 @@ export default class CardManipulator extends Component {
     event.preventDefault();
   }
 
-  @action dropField(event) {
-    this.finishDrag(event);
+  @action dropField(/* event */) {
+    if (this.isOverDropZone) {
+      set(this, 'isOverDropZone', false);
+    }
+
+    let fieldComponent = this.isDragging;
+    let field = this.card.addField({
+      type: this.fieldTypeMappings[fieldComponent.type],
+      position: this.card.isolatedFields.length,
+      name: this.newFieldName,
+      neededWhenEmbedded: false
+    });
+    set(this, 'isDragging', false);
+    set(this, 'selectedField', field);
+    set(fieldComponent, 'dragState', null);
   }
 }

@@ -1,17 +1,17 @@
+.card-manipulator--container {
+  display: grid;
+  grid-template-columns: 390px auto 390px;
+}
+
 .card-manipulator--main {
   box-sizing: border-box;
-  width: 100vw;
-  height: 100vh;
-  min-height: 100%;
-  min-width: 800px;
-  padding: 80px 100px 80px 200px;
+  padding: 80px;
   background-color: #201f27;
   overflow: scroll;
 }
 
 /* Left edge with form items catalog */
 .card-manipulator--left-edge {
-  position: fixed;
   display: flex;
   flex-flow: row nowrap;
   width: 390px;
@@ -266,4 +266,35 @@
   font-size: 28px;
   padding: 20px;
   text-align: center;
+}
+
+/* Right Edge */
+.card-manipulator--right-edge {
+  box-sizing: border-box;
+  width: 390px;
+
+  padding: 80px 20px;
+  background-color: #201f27;
+}
+
+.card-manipulator--right-edge--field {
+  box-sizing: border-box;
+  position: relative;
+  padding: 25px;
+  background-color: #402eb8;
+  border-radius: 20px;
+  color: white;
+}
+
+.card-manipulator--right-edge--field-header {
+  box-sizing: border-box;
+  text-transform: capitalize;
+  padding: 10px 0 25px;
+  font-size: 16px;
+}
+
+.events-right-edge--properties {
+  box-sizing: border-box;
+  padding: 15px 0;
+  border-top: 1px solid gray;
 }
