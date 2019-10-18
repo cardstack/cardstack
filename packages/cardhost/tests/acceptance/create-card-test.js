@@ -1,4 +1,4 @@
-import { module, test } from 'qunit';
+import { module, test, skip } from 'qunit';
 import { click, fillIn, find, visit, currentURL, waitFor, triggerEvent } from '@ember/test-helpers';
 import { setupApplicationTest } from 'ember-qunit';
 import Fixtures from '@cardstack/test-support/fixtures'
@@ -70,7 +70,6 @@ module('Acceptance | card create', function(hooks) {
 
     await setCardId(card1Id);
     await addField('title', 'string', true);
-    await addField('body', 'string', false);
 
     assert.dom('[data-test-field="title"] .field-renderer-field-name-input').hasValue('title');
     await fillIn('[data-test-field="title"] .field-renderer-field-name-input', 'subtitle');
@@ -84,7 +83,8 @@ module('Acceptance | card create', function(hooks) {
     assert.dom('[data-test-field="title"]').doesNotExist();
   });
 
-  test('can add a field at a particular position', async function(assert) {
+  // TODO: un-skip when we add multiple drop zones
+  skip('can add a field at a particular position', async function(assert) {
     await login();
     await visit('/cards/new');
 

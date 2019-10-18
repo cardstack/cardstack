@@ -32,18 +32,19 @@ export async function createCards(args) {
   }
 }
 
-export async function addField(name, type, isEmbedded, position) {
+export async function addField(name, type, isEmbedded, /* position */) {
   await dragAndDropField(type);
 
-  await fillIn('#new_field_name', name);
+  await fillIn('[data-test-field^="new-field"] .field-renderer-field-name-input', name);
+  await triggerEvent('[data-test-field^="new-field"] .field-renderer-field-name-input', 'keyup');
 
   if (isEmbedded) {
-    await click('#new_field_embedded');
+    await click(`[data-test-field="${name}"] .field-renderer--needed-when-embedded-chbx`);
   }
 
-  if (position != null) {
-    await fillIn('#new_field_pos', position);
-  }
+  // if (position != null) {
+  //   await fillIn('#new_field_pos', position);
+  // }
 }
 
 export async function setFieldValue(name, value) {

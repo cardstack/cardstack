@@ -78,8 +78,6 @@
           @format="isolated"
           @mode="schema"
           @removeField={{action this.removeField}}
-          @setNeededWhenEmbedded={{action this.setNeededWhenEmbedded}}
-          @setFieldName={{action this.setFieldName}}
           @setPosition={{action this.setPosition}}
         >
 
@@ -109,6 +107,7 @@
             @mode="schema"
             @position={{this.selectedField.position}}
             @setNeededWhenEmbedded={{action this.setNeededWhenEmbedded}}
+            @setFieldName={{action this.setFieldName}}
             @setPosition={{action this.setPosition}}
           />
         {{/if}}
