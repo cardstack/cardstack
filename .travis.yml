@@ -44,20 +44,22 @@ jobs:
       script: npm run ember-tests
       name: 'Ember tests'
       node_js: "10"
-    - stage: deploy
-      name: 'deploy cardhost'
-      if: branch = master
-      install: skip
-      script:
-        - echo "$SSH_PRIVATE_KEY" > $HOME/.ssh/id_rsa && chmod 400 $HOME/.ssh/id_rsa
-        - sudo apt-get install socat
-        - pip install --user awscli
-        - aws ecr --region us-east-1 get-login --no-include-email | bash
-        - yarn --cwd ./packages/cardhost/deploy install
-        - cd ./packages/cardhost
-        - node ./deploy/build.js
-        - TARGET_NAME='builder.stack.cards' ./deploy/deploy.sh demo $TRAVIS_BRANCH
-        - cd ../..
+
+deploy:
+  - provider: script
+    skip_cleanup: true
+    on:
+      branch: master
+    script:
+      - echo "$SSH_PRIVATE_KEY" > $HOME/.ssh/id_rsa && chmod 400 $HOME/.ssh/id_rsa
+      - sudo apt-get install socat
+      - pip install --user awscli
+      - aws ecr --region us-east-1 get-login --no-include-email | bash
+      - yarn --cwd ./packages/cardhost/deploy install
+      - cd ./packages/cardhost
+      - node ./deploy/build.js
+      - TARGET_NAME='builder.stack.cards' ./deploy/deploy.sh demo $TRAVIS_BRANCH
+      - cd ../..
 
 before_install:
   - docker network create cardstack
