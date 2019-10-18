@@ -1234,6 +1234,12 @@ module("Unit | Service | data", function () {
       assert.throws(() => card.moveField(field, 0), /card is in the embedded format/);
     });
 
+    test("it throws an error if you name a field with the same name as another field in the card", async function (assert) {
+      let service = this.owner.lookup('service:data');
+      let card = await service.getCard(card1Id, 'isolated');
+      assert.throws(() => card.addField({ name: 'title', type: '@cardstack/core-types::string' }), /field 'fields\/title' which already exists for this card/);
+    });
+
     test("it throws an error if you try to setNeededWhenEmbedded on an embedded card", async function (assert) {
       let service = this.owner.lookup('service:data');
       let card = await service.getCard(card1Id, 'embedded');
