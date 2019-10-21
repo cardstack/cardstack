@@ -237,9 +237,7 @@ export default class CardManipulator extends Component {
     set(fieldComponent, 'dragState', dragState);
   }
 
-  @action dropField(position /*, event */) {
-    set(this, 'isOverDropZone', false);
-
+  @action dropField(position, finishDropFn /*, event */) {
     let fieldComponent = this.isDragging;
     let field = this.card.addField({
       type: this.fieldTypeMappings[fieldComponent.type],
@@ -250,6 +248,10 @@ export default class CardManipulator extends Component {
     set(this, 'isDragging', false);
     set(this, 'selectedField', field);
     set(fieldComponent, 'dragState', null);
+
+    if (typeof finishDropFn === 'function') {
+      finishDropFn();
+    }
   }
 
   @action selectField(field) {
