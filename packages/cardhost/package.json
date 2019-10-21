@@ -80,6 +80,7 @@
     "eslint-plugin-mocha": "^5.2.0",
     "eslint-plugin-node": "^5.2.1",
     "loader.js": "^4.7.0",
+    "prember": "^1.0.0",
     "qunit-dom": "^0.8.0"
   },
   "engines": {
