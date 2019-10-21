@@ -449,6 +449,7 @@ module.exports = class DocumentContext {
         }
       } else {
         let related = await this.read(linkage.type, linkage.id);
+        if (!related) { continue; }
         models.push(related);
         await this.crawlInternalModels(related, models);
       }
