@@ -7,6 +7,11 @@ export async function setCardId(id) {
   await triggerEvent('#card__id', 'keyup');
 }
 
+export async function dragAndDropField(type) {
+  await triggerEvent(`[data-test-card-add-field-draggable="${type}"]`, 'mousedown');
+  await triggerEvent(`[data-test-card-add-field-drop-zone]`, 'drop');
+}
+
 export async function createCards(args) {
   for (let id of Object.keys(args)) {
     await visit('/cards/new');
@@ -27,22 +32,19 @@ export async function createCards(args) {
   }
 }
 
-export async function addField(name, type, isEmbedded, position) {
-  let typeEl = find('#new_field_type');
-  typeEl.value = type;
-  await triggerEvent(typeEl, 'input');
+export async function addField(name, type, isEmbedded, /* position */) {
+  await dragAndDropField(type);
 
-  await fillIn('#new_field_name', name);
+  await fillIn('[data-test-field^="new-field"] .field-renderer-field-name-input', name);
+  await triggerEvent('[data-test-field^="new-field"] .field-renderer-field-name-input', 'keyup');
 
   if (isEmbedded) {
-    await click('#new_field_embedded');
+    await click(`[data-test-field="${name}"] .field-renderer--needed-when-embedded-chbx`);
   }
 
-  if (position != null) {
-    await fillIn('#new_field_pos', position);
-  }
-
-  await click('[data-test-field-creator-add-field-btn]');
+  // if (position != null) {
+  //   await fillIn('#new_field_pos', position);
+  // }
 }
 
 export async function setFieldValue(name, value) {

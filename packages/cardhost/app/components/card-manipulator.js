@@ -1,5 +1,5 @@
 import Component from '@glimmer/component';
-import { action } from '@ember/object';
+import { action, set } from '@ember/object';
 import { tracked } from '@glimmer/tracking';
 import { inject as service } from '@ember/service';
 import { dasherize } from '@ember/string';
@@ -23,8 +23,76 @@ const fieldTypeMappings = {
   // '@cardstack/core-types::object',
 };
 
+const fieldComponents = [
+  {
+    id: 'text-field',
+    title: 'Text',
+    description: 'All-purpose text field',
+    type: 'string',
+    icon: `/assets/images/field-types/text.png`
+  },
+  {
+    id: 'text-field-case-insensitive',
+    title: 'Text (case-insensitive)',
+    description: 'Case-insensitive text field',
+    type: 'case-insensitive string',
+    icon: `/assets/images/field-types/text.png`
+  },
+  {
+    id: 'checkbox',
+    title: 'Checkbox',
+    description: 'True/false (boolean) values',
+    type: 'boolean',
+    icon: `/assets/images/field-types/checkbox.png`
+  },
+  {
+    id: 'date-field',
+    title: 'Date',
+    description: 'Date field',
+    type: 'date',
+    icon: `/assets/images/field-types/date.png`
+  },
+  {
+    id: 'number',
+    title: 'Number',
+    description: 'Integer number field',
+    type: 'integer',
+    icon: `/assets/images/field-types/number.png`
+  },
+  {
+    id: 'dropdown',
+    title: 'Dropdown',
+    description: 'Single select dropdown',
+    type: 'related card',
+    icon: `/assets/images/field-types/dropdown.png`
+  },
+  {
+    id: 'dropdown-multi',
+    title: 'Dropdown (Multi-select)',
+    description: 'Multiple select dropdown',
+    type: 'related cards',
+    icon: `/assets/images/field-types/dropdown.png`
+  },
+  // We'll need to figure out how to deal with the other types of ui-components, ex:
+  // {
+  //   id: 'text-area',
+  //   title: 'Text Area',
+  //   description: 'Multi-line text field',
+  //   type: 'string',
+  //   icon: `/assets/images/field-types/textarea.png`
+  // },
+  // {
+  //   id: 'phone-number-field',
+  //   title: 'Phone Number',
+  //   description: 'Description',
+  //   type: 'string',
+  //   icon: `/assets/images/field-types/phone-number.png`
+  // },
+];
+
 export default class CardManipulator extends Component {
   fieldTypeMappings = fieldTypeMappings;
+  fieldComponents = fieldComponents;
 
   @service data;
   @service router;
@@ -46,6 +114,10 @@ export default class CardManipulator extends Component {
 
   get isDirtyStr() {
     return this.card.isDirty.toString();
+  }
+
+  get newFieldName() {
+    return `new-field-${this.card.isolatedFields.length}`;
   }
 
   @(task(function * () {
@@ -149,5 +221,42 @@ export default class CardManipulator extends Component {
   @action
   delete() {
     this.deleteCard.perform();
+  }
+
+  @action
+  beginDragging(fieldComponent, mousedownEvent) {
+    let dragState = {
+      usingKeyboard: false,
+      initialPointerX: mousedownEvent.x,
+      initialPointerY: mousedownEvent.y,
+      latestPointerX: mousedownEvent.x,
+      latestPointerY: mousedownEvent.y
+    };
+
+    set(this, 'isDragging', fieldComponent);
+    set(fieldComponent, 'dragState', dragState);
+  }
+
+  @action dragOver(event) {
+    event.preventDefault();
+  }
+
+  @action dropField(/* event */) {
+    set(this, 'isOverDropZone', false);
+
+    let fieldComponent = this.isDragging;
+    let field = this.card.addField({
+      type: this.fieldTypeMappings[fieldComponent.type],
+      position: this.card.isolatedFields.length,
+      name: this.newFieldName,
+      neededWhenEmbedded: false
+    });
+    set(this, 'isDragging', false);
+    set(this, 'selectedField', field);
+    set(fieldComponent, 'dragState', null);
+  }
+
+  @action selectField(field) {
+    set(this, 'selectedField', field);
   }
 }

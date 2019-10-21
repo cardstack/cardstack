@@ -4,42 +4,99 @@
 
 <br>
 
-<CardRenderer
-  @card={{this.card}}
-  @format="isolated"
-  @mode="schema"
-  @removeField={{action this.removeField}}
-  @setFieldName={{action this.setFieldName}}
-  @setNeededWhenEmbedded={{action this.setNeededWhenEmbedded}}
-  @setPosition={{action this.setPosition}}
->
-  <div class="card-schema--field-btn-wrapper">
-    {{#unless this.cardstackSession.isAuthenticated}}
-      (Must be logged in to save the card.)
-    {{/unless}}
-    <span data-test-card-schema-is-dirty={{this.isDirtyStr}}>
-      {{#if this.card.isDirty}}(unsaved){{/if}}
-    </span>
-    <button {{on "click" this.cancel}}
-      data-test-card-schema-canel-btn
-      disabled={{not this.cardstackSession.isAuthenticated}}
-    >
-      Cancel
-    </button>
-    <button {{on "click" this.save}}
-      data-test-card-schema-save-btn
-      disabled={{not this.cardstackSession.isAuthenticated}}
-    >
-      Save Card
-    </button>
-  </div>
+<div class="card-manipulator--container">
 
-  <FieldCreator
-    @numFields={{this.card.isolatedFields.length}}
-    @fieldTypeMappings={{this.fieldTypeMappings}}
-    @addField={{action this.addField}}
-  />
-</CardRenderer>
+  {{!-- Left edge --}}
+  <div class="card-manipulator--left-edge">
+    {{!-- Profile sidebar --}}
+    <div class="card-manipulator--left-edge--profile">
+      <div class="profile icon"></div>
+      <div class="settings icon active"></div>
+      <div class="search icon"></div>
+    </div>
+    {{!-- Catalog fields list --}}
+    <div class="card-manipulator--left-edge--catalog">
+      <div class="title">Card Catalog</div>
+
+      {{#each this.fieldComponents as |field|}}
+        {{! eslint is confused by on helper }}
+        {{! template-lint-disable attribute-indentation}}
+        <div
+          class="card-manipulator--left-edge--catalog-field"
+          role="button"
+          draggable="true"
+          {{on "mousedown" (action this.beginDragging field)}}
+          {{on "dragend" (action (mut this.isDragging) false)}}
+          data-test-card-add-field-draggable={{field.type}}
+        >
+          {{! template-lint-disable no-inline-styles}}
+          <div class="field-icon" style={{css-url "background-image" field.icon}}></div>
+          <div class="field-content">
+            <div class="field-content--title">{{field.title}}</div>
+            <div class="field-content--description">{{field.description}}</div>
+            <div class="field-content--type">Type: <code>{{field.type}}</code></div>
+            <div class="field-content--info-icon"></div>
+          </div>
+        </div>
+      {{/each}}
+    </div>
+  </div>
+  <div class="card-manipulator--main">
+    {{!-- Card --}}
+    <div class="card-manipulator--card">
+      <div class="card-manipulator--card-header">
+        <div class="title">Card Schema</div>
+        <code class="id">{{@card.id}}</code>
+        {{#unless this.cardstackSession.isAuthenticated}}
+          (Must be logged in to save the card.)
+        {{/unless}}
+        <span data-test-card-schema-is-dirty={{this.isDirtyStr}}>
+          {{#if this.card.isDirty}}(unsaved){{/if}}
+        </span>
+        {{! eslint is confused by on helper }}
+        {{! template-lint-disable attribute-indentation}}
+        <button
+          {{on "click" this.save}}
+          class="done-btn"
+          data-test-card-schema-save-btn
+          disabled={{not this.cardstackSession.isAuthenticated}}
+        >
+          Cancel
+        </button>
+        <button {{on "click" this.save}}
+          data-test-card-schema-save-btn
+          disabled={{not this.cardstackSession.isAuthenticated}}
+        >
+          Save Card
+        </button>
+      </div>
+      <CardRenderer
+        @card={{this.card}}
+        @format="isolated"
+        @mode="schema"
+        @removeField={{action this.removeField}}
+        @setFieldName={{action this.setFieldName}}
+        @setNeededWhenEmbedded={{action this.setNeededWhenEmbedded}}
+        @setPosition={{action this.setPosition}}
+      >
+        {{! eslint is confused by on helper }}
+        {{! template-lint-disable attribute-indentation}}
+        <div
+          class="card-manipulator--card--field--drop-zone"
+          role="button"
+          {{on "drop" (action this.dropField)}}
+          {{on "dragover" (action this.dragOver)}}
+          {{on "dragenter" (action (mut this.isOverDropZone) true)}}
+          {{on "dragleave" (action (mut this.isOverDropZone) false)}}
+          data-test-card-add-field-drop-zone
+        >
+          Drop fields here to edit/add
+        </div>
+      </CardRenderer>
+    </div>
+  </div>
+  <div class="card-manipulator--right-edge"></div>
+</div>
 
 <br>
 
