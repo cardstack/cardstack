@@ -113,7 +113,7 @@ module('Acceptance | card create', function(hooks) {
     await addField('body', 'string', false, 1);
     await addField('author', 'string', false, 1);
 
-    assert.deepEqual([...document.querySelectorAll('[data-test-isolated-card="local-hub::article-card::millenial-puppies"] [data-test-field]')].map(i => i.getAttribute('data-test-field')),
+    assert.deepEqual([...document.querySelectorAll(`[data-test-isolated-card="${card1Id}"] [data-test-field]`)].map(i => i.getAttribute('data-test-field')),
       ['title', 'author', 'body']);
 
     await click('[data-test-card-creator-save-btn]');

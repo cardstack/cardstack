@@ -3,7 +3,7 @@
 <div
   class="card-manipulator--card--field--drop-zone"
   role="button"
-  {{on "drop" (action @dropField (fn (mut this.isOverDropZone) false))}}
+  {{on "drop" (action @dropField @position (fn (mut this.isOverDropZone) false))}}
   {{on "dragover" (action this.dragOver)}}
   {{on "dragenter" (action (mut this.isOverDropZone) true)}}
   {{on "dragleave" (action (mut this.isOverDropZone) false)}}
