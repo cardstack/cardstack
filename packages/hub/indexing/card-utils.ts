@@ -166,7 +166,7 @@ function generateInternalCardFormat(schema: todo, externalCard: SingleResourceDo
   if (version != null) {
     set(model, 'meta.version', version);
   }
-  for (let field of cardBrowserAssetFields) {
+  for (let field of cardBrowserAssetFields.concat([metadataFieldTypesField])) {
     let value = get(externalCard, `data.attributes.${field}`) as string;
     if (!value) { continue; }
     set(model, `attributes.${field}`, value);
@@ -500,12 +500,18 @@ async function adaptCardToFormat(schema: todo, session: Session, internalCard: S
   }
 
   let attributes: AttributesObject = {};
-  for (let attr of Object.keys(internalCard.data.attributes)) {
+  for (let attr of Object.keys(get(priviledgedCard, 'data.attributes') || {})) {
     if (cardBrowserAssetFields.concat([metadataFieldTypesField]).includes(attr) && result.data.attributes) {
-      result.data.attributes[attr] = internalCard.data.attributes[attr];
-    } else {
-      attributes[attr] = internalCard.data.attributes[attr];
+      result.data.attributes[attr] = get(priviledgedCard, `data.attributes.${attr}`);
     }
+  }
+  for (let attr of
+    Object.keys(internalCard.data.attributes)
+      .filter(i => !cardBrowserAssetFields.concat([
+        metadataFieldTypesField,
+        embeddedMetadataFieldTypesField
+      ]).includes(i))) {
+    attributes[attr] = internalCard.data.attributes[attr];
   }
   unset(attributes, metadataFieldTypesField);
   unset(attributes, embeddedMetadataFieldTypesField);
@@ -629,6 +635,7 @@ function removeCardNamespacing(internalCard: SingleResourceDoc) {
       resource.type = 'cards';
     }
     for (let field of Object.keys(resource.attributes || {})) {
+      if (cardBrowserAssetFields.concat([metadataFieldTypesField]).includes(field)) { continue; }
       let { modelId:fieldName } = cardContextFromId(field);
       if (!fieldName || !resource.attributes) { continue; }
       resource.attributes[fieldName] = resource.attributes[field];
