@@ -1,11 +1,11 @@
 .card-manipulator--container {
   display: grid;
-  grid-template-columns: 390px auto 390px;
+  grid-template-columns: 390px auto 300px;
 }
 
 .card-manipulator--main {
   box-sizing: border-box;
-  padding: 80px;
+  padding: 80px 30px;
   background-color: #201f27;
   overflow: scroll;
 }
@@ -271,7 +271,7 @@
 /* Right Edge */
 .card-manipulator--right-edge {
   box-sizing: border-box;
-  width: 390px;
+  width: 300px;
 
   padding: 80px 20px;
   background-color: #201f27;

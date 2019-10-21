@@ -83,6 +83,25 @@ module('Acceptance | card create', function(hooks) {
     assert.dom('[data-test-field="title"]').doesNotExist();
   });
 
+  test('can select a field to edit its properties', async function(assert) {
+    await login();
+    await visit('/cards/new');
+
+    assert.equal(currentURL(), '/cards/new');
+
+    await setCardId(card1Id);
+    await addField('title', 'string', true);
+    await addField('body', 'string', false);
+
+    assert.dom('.card-manipulator--right-edge--field .schema-field').exists({ count: 1 });
+    assert.dom('.card-manipulator--right-edge--field .schema-field code').hasText("field: body");
+
+    await click('[data-test-isolated-card="local-hub::article-card::millenial-puppies"] [data-test-field="title"]');
+
+    assert.dom('.card-manipulator--right-edge--field .schema-field').exists({ count: 1 });
+    assert.dom('.card-manipulator--right-edge--field .schema-field code').hasText("field: title");
+  });
+
   // TODO: un-skip when we add multiple drop zones
   skip('can add a field at a particular position', async function(assert) {
     await login();

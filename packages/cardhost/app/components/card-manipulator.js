@@ -233,13 +233,8 @@ export default class CardManipulator extends Component {
       latestPointerY: mousedownEvent.y
     };
 
-    window.addEventListener('dragend', () => set(this, 'isDragging', false));
     set(this, 'isDragging', fieldComponent);
     set(fieldComponent, 'dragState', dragState);
-  }
-
-  @action toggleOverDropZone(value) {
-    set(this, 'isOverDropZone', value);
   }
 
   @action dragOver(event) {
@@ -247,9 +242,7 @@ export default class CardManipulator extends Component {
   }
 
   @action dropField(/* event */) {
-    if (this.isOverDropZone) {
-      set(this, 'isOverDropZone', false);
-    }
+    set(this, 'isOverDropZone', false);
 
     let fieldComponent = this.isDragging;
     let field = this.card.addField({
@@ -261,5 +254,9 @@ export default class CardManipulator extends Component {
     set(this, 'isDragging', false);
     set(this, 'selectedField', field);
     set(fieldComponent, 'dragState', null);
+  }
+
+  @action selectField(field) {
+    set(this, 'selectedField', field);
   }
 }

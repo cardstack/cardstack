@@ -34,11 +34,14 @@
         <div class="title">Card Catalog</div>
 
         {{#each this.fieldComponents as |field|}}
+          {{! eslint is confused by on helper }}
+          {{! template-lint-disable attribute-indentation}}
           <div
             class="card-manipulator--left-edge--catalog-field"
             role="button"
             draggable="true"
-            onmousedown={{action this.beginDragging field}}
+            {{on "mousedown" (action this.beginDragging field)}}
+            {{on "dragend" (action (mut this.isDragging) false)}}
             data-test-card-add-field-draggable={{field.type}}
           >
             {{! template-lint-disable no-inline-styles}}
@@ -79,15 +82,18 @@
           @mode="schema"
           @removeField={{action this.removeField}}
           @setPosition={{action this.setPosition}}
+          @selectField={{action this.selectField}}
         >
 
+          {{! eslint is confused by on helper }}
+          {{! template-lint-disable attribute-indentation}}
           <div
             class="card-manipulator--card--field--drop-zone"
             role="button"
-            ondrop={{action this.dropField}}
-            ondragover={{action this.dragOver}}
-            ondragenter={{action this.toggleOverDropZone true}}
-            ondragleave={{action this.toggleOverDropZone false}}
+            {{on "drop" (action this.dropField)}}
+            {{on "dragover" (action this.dragOver)}}
+            {{on "dragenter" (action (mut this.isOverDropZone) true)}}
+            {{on "dragleave" (action (mut this.isOverDropZone) false)}}
             data-test-card-add-field-drop-zone
           >
             Drop fields here to edit/add

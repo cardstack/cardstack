@@ -1,3 +1,5 @@
+{{! eslint is confused by on helper }}
+{{! template-lint-disable attribute-indentation}}
 <fieldset
   class={{concat
     @mode
@@ -10,6 +12,7 @@
   data-test-field={{@field.name}}
   data-test-field-type={{@field.type}}
   data-test-field-mode={{@mode}}
+  {{on "click" (fn this.selectField @field)}}
 >
   <legend><strong><code>field: {{@field.name}}</code></strong></legend>
   {{#if (eq @mode "view")}}

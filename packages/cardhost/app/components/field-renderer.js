@@ -33,4 +33,12 @@ export default class FieldRenderer extends Component {
     this.newFieldName = newName;
     this.args.setFieldName(this.args.field.name, this.newFieldName);
   }
+
+  get selectField() {
+    if (this.args.selectField) {
+      return this.args.selectField;
+    }
+
+    return () => {};
+  }
 }
