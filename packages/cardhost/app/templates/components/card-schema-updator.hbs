@@ -78,21 +78,8 @@
         @setFieldName={{action this.setFieldName}}
         @setNeededWhenEmbedded={{action this.setNeededWhenEmbedded}}
         @setPosition={{action this.setPosition}}
-      >
-        {{! eslint is confused by on helper }}
-        {{! template-lint-disable attribute-indentation}}
-        <div
-          class="card-manipulator--card--field--drop-zone"
-          role="button"
-          {{on "drop" (action this.dropField)}}
-          {{on "dragover" (action this.dragOver)}}
-          {{on "dragenter" (action (mut this.isOverDropZone) true)}}
-          {{on "dragleave" (action (mut this.isOverDropZone) false)}}
-          data-test-card-add-field-drop-zone
-        >
-          Drop fields here to edit/add
-        </div>
-      </CardRenderer>
+        @dropField={{action this.dropField}}
+      />
     </div>
   </div>
   <div class="card-manipulator--right-edge"></div>

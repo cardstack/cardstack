@@ -2,18 +2,19 @@
 
 <h2 data-test-card-view={{this.model.id}}>View Card</h2>
 
-<CardRenderer @card={{this.model}} @format="isolated">
-  <div>
-    <LinkTo @route="cards.schema" @model={{this.model}}>
-      Update Schema
-    </LinkTo>
-  </div>
-  <div>
-    <LinkTo @route="cards.edit" @model={{this.model}}>
-      Edit Card
-    </LinkTo>
-  </div>
-</CardRenderer>
+<div>
+  <LinkTo @route="cards.schema" @model={{this.model}}>
+    Update Schema
+  </LinkTo>
+</div>
+<div>
+  <LinkTo @route="cards.edit" @model={{this.model}}>
+    Edit Card
+  </LinkTo>
+</div>
+
+<CardRenderer @card={{this.model}} @format="isolated"/>
+
 <br>
 
 <h3>Card Document:</h3>

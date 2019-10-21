@@ -2,7 +2,7 @@
   data-test-isolated-card={{@card.id}}
   class="isolated-card default-card"
 >
-  {{#each @card.isolatedFields key="nonce" as | field |}}
+  {{#each @card.isolatedFields key="nonce" as |field index|}}
     {{#if @setFieldValue}}
       <FieldRenderer
         @field={{field}}
@@ -10,6 +10,9 @@
         @setFieldValue={{fn @setFieldValue field.name}}
       />
     {{else if (or @setNeededWhenEmbedded @setPosition @removeField @setFieldName)}}
+      {{#if @dropField}}
+        <DropZone @dropField={{fn @dropField index}} @position={{index}} />
+      {{/if}}
       <FieldRenderer
         @field={{field}}
         @mode={{@mode}}
@@ -24,4 +27,10 @@
     {{/if}}
     <br>
   {{/each}}
+  {{#if @dropField}}
+    <DropZone
+      @dropField={{fn @dropField @card.isolatedFields.length}}
+      @position={{@card.isolatedFields.length}}
+    />
+  {{/if}}
 </div>
