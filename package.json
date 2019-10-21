@@ -41,5 +41,8 @@
   "workspaces": [
     "packages/*"
   ],
-  "private": true
+  "private": true,
+  "volta": {
+    "node": "10.16.3"
+  }
 }
