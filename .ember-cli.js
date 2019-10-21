@@ -1,4 +1,13 @@
-{
+/* eslint-disable */
+'use strict';
+
+process.env.EMBER_VERSION = "OCTANE";
+
+const { setEdition } = require('@ember/edition-utils');
+
+setEdition('octane');
+
+module.exports = {
   /**
     Ember CLI sends analytics information by default. The data is completely
     anonymous, but there are times when you might want to disable this behavior.

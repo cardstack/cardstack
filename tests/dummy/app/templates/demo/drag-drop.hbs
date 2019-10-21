@@ -1,12 +1,12 @@
-<div class="drag-drop-page {{if model.isDraggingObject "dragging"}}">
+<div class="drag-drop-page {{if this.model.isDraggingObject "dragging"}}">
   <div class="tray-container">
     <div class="tray tray-1">
-      {{#draggable-object content=model}}
-        {{#unless draggedCard}}
+      {{#draggable-object content=this.model}}
+        {{#unless this.draggedCard}}
           <div class="draggable-card">
             <div class="draggable-card-contents">
               <div class="draggable-card-title">
-                {{model.title}}
+                {{this.model.title}}
               </div>
             </div>
           </div>
@@ -15,12 +15,12 @@
     </div>
 
     <div class="tray tray-2">
-      {{#draggable-object-target action=(action copyCard)}}
-        {{#if (or draggedCard model.isDraggingObject)}}
+      {{#draggable-object-target action=(action this.copyCard)}}
+        {{#if (or this.draggedCard this.model.isDraggingObject)}}
           <div class="draggable-card">
             <div class="draggable-card-contents">
               <div class="draggable-card-title">
-                {{model.title}}
+                {{this.model.title}}
               </div>
             </div>
           </div>

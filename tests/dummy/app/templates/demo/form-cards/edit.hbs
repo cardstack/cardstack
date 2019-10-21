@@ -4,7 +4,7 @@
   {{/animated-value}}
 </AnimatedContainer>
 <AnimatedContainer class="form-cards-list">
-  {{#animated-value model key="id" group="form-card" use=this.boxTransition as |card|}}
+  {{#animated-value this.model key="id" group="form-card" use=this.boxTransition as |card|}}
     <div role="button" onclick={{action "backToList" card}} class="form-card form-card-{{card.id}} expanded">
     </div>
   {{/animated-value}}

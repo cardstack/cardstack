@@ -4,15 +4,15 @@
 </header>
 
 <div class="tools-edit">
-  <Boxel @name="{{model.constructor.modelName}}-new" class="tools-edit--boxel">
+  <Boxel @name="{{this.model.constructor.modelName}}-new" class="tools-edit--boxel">
     <div class="tools-edit--image-container">
       {{! template-lint-configure no-inline-styles {"allowDynamicStyles": true} }}
-      <div class="tools-edit--image" style={{backgroundImageUrl}} />
+      <div class="tools-edit--image" style={{this.backgroundImageUrl}} />
     </div>
     <div class="tools-edit--fields-container">
-      <Boxel @component={{component "text-field" value=model.title label="Title"}} />
-      <Boxel @component={{component "text-field" value=model.description label="Description"}} />
-      <Boxel @component={{component "text-area" value=model.body label="Body"}} />
+      <Boxel @component={{component "text-field" value=this.model.title label="Title"}} />
+      <Boxel @component={{component "text-field" value=this.model.description label="Description"}} />
+      <Boxel @component={{component "text-area" value=this.model.body label="Body"}} />
     </div>
   </Boxel>
 </div>

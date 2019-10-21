@@ -1,18 +1,13 @@
-import Component from '@ember/component';
+import Component from '@glimmer/component';
 import { tracked } from '@glimmer/tracking';
 import { action } from '@ember/object';
 import { inject as service } from '@ember/service';
-import template from '../templates/components/boxel';
-import { layout, tagName } from '@ember-decorators/component';
-
 import resize from 'ember-animated/motions/resize';
 import move from 'ember-animated/motions/move';
 import scale from 'ember-animated/motions/scale';
 import { parallel, wait } from 'ember-animated';
 
 
-@layout(template)
-@tagName('')
 export default class BoxelComponent extends Component {
   @service boxel;
 
@@ -23,33 +18,25 @@ export default class BoxelComponent extends Component {
     super(...arguments);
 
     this.plane = this.boxel.currentPlane;
-  }
-
-  didInsertElement() {
-    this._super(...arguments);
-
     this.boxel.registerBoxel(this);
   }
 
   @tracked content;
+
   get contentType() {
-    if (this.content) {
-      return this.content.constructor.modelName;
+    if (this.args.content) {
+      return this.args.content.constructor.modelName;
     }
 
     return null;
   }
 
   get name() {
-    if (this._name) {
-      return this._name;
+    if (this.args.name) {
+      return this.args.name;
     }
 
-    return `boxel-${this.elementId}`;
-  }
-
-  set name(name) {
-    this._name = name;
+    return 'boxel-default';
   }
 
   clickAction() {}
@@ -100,6 +87,6 @@ export default class BoxelComponent extends Component {
 
   @action
   moveToPlane(planeId) {
-    this.set('plane', planeId);
+    this.plane = planeId;
   }
 }

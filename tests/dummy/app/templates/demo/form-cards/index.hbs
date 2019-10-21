@@ -4,7 +4,7 @@
       <AnimatedContainer>
         {{#animated-value "form-cards-index-route" initialInsertion=true finalRemoval=true use=this.backgroundTransition}}
           <div class="form-cards-list">
-            {{#animated-each model key="id" group="form-card" as |card|}}
+            {{#animated-each this.model key="id" group="form-card" as |card|}}
               <div role="button" {{action "edit" card}} class="form-card form-card-{{card.id}}">
               </div>
             {{/animated-each}}

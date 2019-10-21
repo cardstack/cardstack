@@ -2,7 +2,7 @@
   <div class="catalog-preview">
     <div class="catalog-preview--boxel-container">
       <AnimatedContainer>
-        <Boxel @name="{{model.constructor.modelName}}-{{model.id}}" @content={{model}} @format="embedded" />
+        <Boxel @name="{{this.model.constructor.modelName}}-{{this.model.id}}" @content={{this.model}} @format="embedded" />
       </AnimatedContainer>
     </div>
     <section class="catalog-preview--info-panel">

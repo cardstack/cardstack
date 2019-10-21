@@ -5,7 +5,7 @@
         <div class="event-edit--container-content">
           <div><span>Editing:</span> {{this.model.constructor.modelName}} Card</div>
           {{! template-lint-configure no-nested-interactive false}}
-          <ViewModeNav @model={{model}} @viewGridPage={{action this.viewGridPage}}/>
+          <ViewModeNav @model={{this.model}} @viewGridPage={{action this.viewGridPage}}/>
         </div>
 
         {{#animated-value this.model use=this.trayAnimation key="id" group="tray" as |card|}}

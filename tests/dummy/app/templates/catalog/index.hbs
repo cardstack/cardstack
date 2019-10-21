@@ -3,7 +3,7 @@
   <p class="card-catalog--grid-description">Lorem ipsum dolor sit amet, consectetur adipiscing elit.</p>
 
   <div class="card-catalog--grid">
-    {{#each model as |item|}}
+    {{#each this.model as |item|}}
       <Tray>
         <article class="catalog-item" role="button" {{action "preview" item.constructor.modelName}}>
           <div class="catalog-item--boxel-container">

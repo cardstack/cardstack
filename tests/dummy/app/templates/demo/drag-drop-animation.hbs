@@ -2,8 +2,8 @@
   <div class="tray-container">
     <AnimatedContainer class="draggable-card-container">
       <div class="tray tray-1">
-        {{#animated-each leftWell use=dragTransition duration=200 watch="dragState" as |card|}}
-          <div class="draggable-card zone-1" role="button" onmousedown={{action beginDragging card "right"}}>
+        {{#animated-each this.leftWell use=this.dragTransition duration=200 watch="dragState" as |card|}}
+          <div class="draggable-card zone-1" role="button" onmousedown={{action this.beginDragging card "right"}}>
             <div class="draggable-card-contents">
               <div class="draggable-card-title">
                 {{card.title}}
@@ -15,8 +15,8 @@
     </AnimatedContainer>
     <AnimatedContainer class="dragged-card-container">
       <div class="tray tray-2">
-        {{#animated-each rightWell use=dragTransition duration=200 watch="dragState" as |card|}}
-          <div class="draggable-card zone-2" role="button" onmousedown={{action beginDragging card "left"}}>
+        {{#animated-each this.rightWell use=this.dragTransition duration=200 watch="dragState" as |card|}}
+          <div class="draggable-card zone-2" role="button" onmousedown={{action this.beginDragging card "left"}}>
             <div class="draggable-card-contents">
               <div class="draggable-card-title">
                 {{card.title}}
