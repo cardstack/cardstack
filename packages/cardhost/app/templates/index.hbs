@@ -23,13 +23,10 @@
   <p>
     Right now we are emulating a catalog by just listing out all the cards in
     the local store. Any card that you create or view will be added to the list below.
+    (Store invalidation as a result of editing cards will actually clear cards from the store,
+    in which case you may need to revisit cards again to reinsert entries back into the store.)
   </p>
 
-  <div>
-    <button data-test-refresh-catalog-btn {{on "click" this.refreshCatalog}}>
-      Refresh Catalog
-    </button>
-  </div>
   <div class="card-catalog">
     {{#each this.model as |card|}}
       <CardRenderer @card={{card}} @format="embedded"/>

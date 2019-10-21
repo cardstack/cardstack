@@ -9,8 +9,4 @@ export default class IndexController extends Controller {
     this.router.transitionTo('cards.view', id);
   }
 
-  @action
-  refreshCatalog() {
-    this.send('refreshModel');
-  }
 }
