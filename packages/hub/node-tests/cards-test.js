@@ -819,6 +819,12 @@ describe('hub/card-services', function () {
           { type: 'tags', id: 'belly-rubs' },
         ]);
         expect(data.attributes['internal-field']).to.be.undefined;
+        expect(data.attributes['metadata-field-types']).to.eql({
+          title: '@cardstack/core-types::string',
+          body: '@cardstack/core-types::string',
+          author: '@cardstack/core-types::belongs-to',
+          tags: '@cardstack/core-types::has-many',
+        });
 
         let model = included.find(i => `${i.type}/${i.id}` === 'local-hub::article-card::millenial-puppies/local-hub::article-card::millenial-puppies');
         expect(model.attributes.title).to.equal('The Millenial Puppy');
@@ -830,6 +836,13 @@ describe('hub/card-services', function () {
           { type: 'tags', id: 'belly-rubs' },
         ]);
         expect(model.attributes['internal-field']).to.be.undefined;
+
+        let embedded = included.find(i => `${i.type}/${i.id}` === 'cards/local-hub::user-card::van-gogh');
+        expect(embedded.attributes.name).to.equal('Van Gogh');
+        expect(embedded.attributes.email).to.be.undefined;
+        expect(embedded.attributes['metadata-field-types']).to.eql({
+          name: '@cardstack/core-types::string',
+        });
       });
 
       it('does not contain included resource for card metadata relationship that the session does not have read authorization', async function () {
