@@ -13,10 +13,6 @@ Ember Concurrency into the rendering of the card component here.
   {{#let (component this.isolatedComponentName) as | Isolated |}}
     <fieldset>
       <legend><strong><code>card: {{@card.id}}</code></strong></legend>
-
-      {{!-- TODO let's work on moving this yield out of this component--it's only here for scaffolding --}}
-      {{yield}}
-
       <dl>
         <Isolated
           @card={{@card}}
@@ -27,6 +23,7 @@ Ember Concurrency into the rendering of the card component here.
           @setNeededWhenEmbedded={{@setNeededWhenEmbedded}}
           @setPosition={{@setPosition}}
           @selectField={{@selectField}}
+          @dropField={{@dropField}}
         />
       </dl>
     </fieldset>

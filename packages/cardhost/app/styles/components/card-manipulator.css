@@ -1,3 +1,7 @@
+:root {
+  --transition-time: 250ms;
+}
+
 .card-manipulator--container {
   display: grid;
   grid-template-columns: 390px auto 300px;
@@ -260,12 +264,24 @@
 }
 
 .card-manipulator--card--field--drop-zone {
-  margin: 30px;
+  margin: 10px;
+  text-align: center;
+}
+
+.card-manipulator--card--field--drop-zone .drop-zone-text {
+  box-sizing: border-box;
   border: dashed 3px #ddd;
-  color: #ddd;
+  color: transparent;
   font-size: 28px;
   padding: 20px;
-  text-align: center;
+  height: 20px;
+  transition: height var(--transition-time);
+}
+
+.card-manipulator--card--field--drop-zone .drop-zone-text.active {
+  color: yellow;
+  border-color: yellow;
+  height: 80px;
 }
 
 /* Right Edge */
