@@ -1,8 +1,8 @@
-import { module, test, skip } from 'qunit';
+import { module, test } from 'qunit';
 import { click, fillIn, find, visit, currentURL, waitFor, triggerEvent } from '@ember/test-helpers';
 import { setupApplicationTest } from 'ember-qunit';
 import Fixtures from '@cardstack/test-support/fixtures'
-import { addField, setCardId } from '../helpers/card-helpers';
+import { addField, setCardId, createCards, dragAndDropField } from '../helpers/card-helpers';
 import { setupMockUser, login } from '../helpers/login';
 
 const timeout = 5000;
@@ -29,14 +29,14 @@ module('Acceptance | card create', function(hooks) {
 
     assert.equal(currentURL(), '/cards/new');
 
-    await setCardId(card1Id);
-    await addField('title', 'string', true);
-    await addField('body', 'string', false);
-    await addField('author', 'related card', true);
-    await addField('reviewers', 'related cards', true);
-
-    await click('[data-test-card-creator-save-btn]');
-    await waitFor(`[data-test-card-view="${card1Id}"]`, { timeout });
+    await createCards({
+      [card1Id]: [
+        ['title', 'string', true],
+        ['body', 'string', false],
+        ['author', 'related card', true],
+        ['reviewers', 'related cards', true]
+      ]
+    });
 
     assert.equal(currentURL(), `/cards/${card1Id}`);
     await visit(`/cards/${card1Id}/schema`);
@@ -62,6 +62,31 @@ module('Acceptance | card create', function(hooks) {
     assert.equal(card.data.attributes.body, undefined);
     assert.equal(card.data.relationships.author, undefined);
     assert.deepEqual(card.data.relationships.reviewers.data, []);
+  });
+
+  test(`selecting a field`, async function(assert) {
+    await login();
+    await visit('/cards/new');
+
+    await setCardId(card1Id);
+    await addField('title', 'string', true);
+    await addField('body', 'string', false);
+
+    await click('[data-test-field="title"]');
+    assert.dom('.card-manipulator--right-edge--field [data-test-field] .field-renderer-field-name-input').hasValue('title');
+
+    await fillIn('[data-test-field="title"] .field-renderer-field-name-input', 'subtitle');
+    await triggerEvent(`[data-test-field="title"] .field-renderer-field-name-input`, 'keyup');
+    assert.dom('.card-manipulator--right-edge--field [data-test-field] .field-renderer-field-name-input').hasValue('subtitle');
+
+    await click('[data-test-field="body"]');
+    assert.dom('.card-manipulator--right-edge--field [data-test-field] .field-renderer-field-name-input').hasValue('body');
+
+    await click('[data-test-field="subtitle"]');
+    assert.dom('.card-manipulator--right-edge--field [data-test-field] .field-renderer-field-name-input').hasValue('subtitle');
+
+    await dragAndDropField('string');
+    assert.dom('.card-manipulator--right-edge--field [data-test-field] .field-renderer-field-name-input').hasValue('new-field-2');
   });
 
   test(`renaming a card's field`, async function(assert) {
@@ -102,8 +127,7 @@ module('Acceptance | card create', function(hooks) {
     assert.dom('.card-manipulator--right-edge--field .schema-field code').hasText("field: title");
   });
 
-  // TODO: un-skip when we add multiple drop zones
-  skip('can add a field at a particular position', async function(assert) {
+  test('can add a field at a particular position', async function(assert) {
     await login();
     await visit('/cards/new');
 
@@ -111,10 +135,10 @@ module('Acceptance | card create', function(hooks) {
 
     await setCardId(card1Id);
     await addField('title', 'string', true);
-    await addField('body', 'string', false);
+    await addField('body', 'string', false, 1);
     await addField('author', 'string', false, 1);
 
-    assert.deepEqual([...document.querySelectorAll('[data-test-field]')].map(i => i.getAttribute('data-test-field')),
+    assert.deepEqual([...document.querySelectorAll(`[data-test-isolated-card="${card1Id}"] [data-test-field]`)].map(i => i.getAttribute('data-test-field')),
       ['title', 'author', 'body']);
 
     await click('[data-test-card-creator-save-btn]');

@@ -1,0 +1,13 @@
+{{! eslint is confused by on helper }}
+{{! template-lint-disable attribute-indentation}}
+<div
+  class="card-manipulator--card--field--drop-zone"
+  role="button"
+  {{on "drop" (action @dropField @position (fn (mut this.isOverDropZone) false))}}
+  {{on "dragover" (action this.dragOver)}}
+  {{on "dragenter" (action (mut this.isOverDropZone) true)}}
+  {{on "dragleave" (action (mut this.isOverDropZone) false)}}
+  data-test-card-add-field-drop-zone={{@position}}
+>
+  <div class="drop-zone-text {{if this.isOverDropZone "active"}}">Drop fields here to edit/add</div>
+</div>

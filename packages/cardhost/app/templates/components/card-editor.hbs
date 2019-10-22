@@ -4,39 +4,39 @@
 
 <br>
 
+<div class="card-editor--field-btn-wrapper">
+  {{#unless this.cardstackSession.isAuthenticated}}
+    (Must be logged in to modify the card.)
+  {{/unless}}
+  <span data-test-card-editor-is-dirty={{this.isDirtyStr}}>
+    {{#if this.card.isDirty}}(unsaved){{/if}}
+  </span>
+  <button {{on "click" this.delete}}
+    data-test-card-editor-delete-btn
+    disabled={{not this.cardstackSession.isAuthenticated}}
+  >
+    Delete Card
+  </button>
+  <button {{on "click" this.cancel}}
+    data-test-card-editor-cancel-btn
+    disabled={{not this.cardstackSession.isAuthenticated}}
+  >
+    Cancel
+  </button>
+  <button {{on "click" this.save}}
+    data-test-card-editor-save-btn
+    disabled={{not this.cardstackSession.isAuthenticated}}
+  >
+    Save Card
+  </button>
+</div>
 <CardRenderer
   @card={{this.card}}
   @mode="edit"
   @setFieldValue={{action this.setFieldValue}}
   @format="isolated"
->
-  <div class="card-editor--field-btn-wrapper">
-    {{#unless this.cardstackSession.isAuthenticated}}
-      (Must be logged in to modify the card.)
-    {{/unless}}
-    <span data-test-card-editor-is-dirty={{this.isDirtyStr}}>
-      {{#if this.card.isDirty}}(unsaved){{/if}}
-    </span>
-    <button {{on "click" this.delete}}
-      data-test-card-editor-delete-btn
-      disabled={{not this.cardstackSession.isAuthenticated}}
-    >
-      Delete Card
-    </button>
-    <button {{on "click" this.cancel}}
-      data-test-card-editor-cancel-btn
-      disabled={{not this.cardstackSession.isAuthenticated}}
-    >
-      Cancel
-    </button>
-    <button {{on "click" this.save}}
-      data-test-card-editor-save-btn
-      disabled={{not this.cardstackSession.isAuthenticated}}
-    >
-      Save Card
-    </button>
-  </div>
-</CardRenderer>
+/>
+
 
 <br>
 
