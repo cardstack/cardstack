@@ -1,8 +1,8 @@
-{{! eslint is confused by on helper }}
-{{! template-lint-disable attribute-indentation}}
 {{this.onFieldUpdated}}
 
-<fieldset
+{{!-- TODO: let's think of a more accessible solution here, consider making this a button--}}
+{{!-- TODO: also we should also turn on a11y linting --}}
+<div {{on "click" (fn this.selectField @field)}}
   class={{concat
     @mode
     "-field "
@@ -14,12 +14,7 @@
   data-test-field={{@field.name}}
   data-test-field-type={{@field.type}}
   data-test-field-mode={{@mode}}
-
-  {{!-- TODO: let's think of a more accessible solution here--}}
-  {{!-- TODO: also we should also turn on a11y linting --}}
-  {{on "click" (fn this.selectField @field)}}
 >
-  <legend><strong><code>field: {{@field.name}}</code></strong></legend>
   {{#if (eq @mode "view")}}
     {{#let (component this.fieldViewer) as | FieldViewer |}}
       <FieldViewer @field={{@field}}/>
@@ -32,22 +27,22 @@
       />
     {{/let}}
   {{else if (eq @mode "schema")}}
-    <dd>
+    <div>
       field type:
-      <code data-test-field-renderer-field-type>
+      <span data-test-field-renderer-field-type>
         {{@field.type}}
-      </code>
-    </dd>
-    <dd>
+      </span>
+    </div>
+    <div>
       is metadata field:
-      <code data-test-field-renderer-is-meta>
+      <span data-test-field-renderer-is-meta>
         {{if @field.json.data.attributes.is-metadata "true" "false"}}
-      </code>
-    </dd>
-    <dd>
+      </span>
+    </div>
+    <div>
       {{#if @setFieldName}}
         <label
-          data-test-string-field-renderer-field-name-label
+          data-test-field-renderer-field-name-label
           for={{concat "edit-field-name-" @field.nonce}}
         >
           Field name:
@@ -59,8 +54,8 @@
           @key-up={{action this.updateFieldName}}
         />
       {{/if}}
-    </dd>
-    <dd>
+    </div>
+    <div>
       {{#if @setNeededWhenEmbedded}}
         <Input
           @checked={{@field.neededWhenEmbedded}}
@@ -71,12 +66,12 @@
         />
         <label for="new_field_embedded">Needed when Embedded</label>
       {{else}}
-        needed when embedded
-        <code data-test-field-renderer-embedded >
+        needed when embedded:
+        <span data-test-field-renderer-embedded >
           {{if @field.neededWhenEmbedded "true" "false"}}
-        </code>
+        </span>
       {{/if}}
-    </dd>
+    </div>
 
     <div class="field-renderer--field-btn-wrapper">
       {{#if @setPosition}}
@@ -104,4 +99,4 @@
       {{/if}}
     </div>
   {{/if}}
-</fieldset>
+</div>

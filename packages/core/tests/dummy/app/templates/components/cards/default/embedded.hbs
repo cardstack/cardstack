@@ -1,0 +1,13 @@
+<div
+  data-test-embedded-card={{@card.id}}
+  data-test-embedded-card-mode={{@mode}}
+  class="embedded-card default-card"
+>
+  {{#each @card.embeddedFields key="nonce" as | field |}}
+    {{#if (eq @mode "schema")}}
+      <FieldRenderer @field={{field}} @mode="view"/>
+    {{else}}
+      <FieldRenderer @field={{field}} @mode={{@mode}}/>
+    {{/if}}
+  {{/each}}
+</div>
