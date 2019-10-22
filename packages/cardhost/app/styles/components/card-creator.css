@@ -134,6 +134,102 @@
   background-repeat: no-repeat;
 }
 
+.create-new--right-edge {
+  box-sizing: border-box;
+  position: fixed;
+  right: 30px;
+  width: 250px;
+  background-color: #2c2b41;
+  border-radius: 10px;
+  z-index: 2;
+  opacity: .96;
+  margin-top: 80px;
+}
+
+.create-new--right-edge--section {
+  border-top: 2px solid #22212b;
+  padding: 12px 20px;
+}
+
+.create-new--right-edge--section .section-header {
+  color: white;
+  margin-bottom: 25px;
+}
+
+.create-new--right-edge--attribute {
+  margin-bottom: 15px;
+}
+
+.create-new--right-edge--attribute .attribute-title {
+  color: #a3a1a7;
+  white-space: nowrap; 
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.create-new--right-edge--attribute .attribute-value {
+  color: #fafafa;
+}
+
+.create-new--right-edge--pill-selector {
+  border: 1px solid #22212b;
+  border-radius: 20px;
+  margin: 20px;
+  display: flex;
+  background: #22212b;
+  overflow: hidden;
+}
+
+.create-new--right-edge--pill-option {
+  flex: 1;
+  padding: 10px 20px;
+  color: white;
+}
+
+.create-new--right-edge--pill-option.selected {
+  background: #454556;
+  color: #00eae4;
+  border-radius: 20px;
+  border: 2px solid #454556;
+}
+
+.create-new--right-edge--section .adopted-card {
+  border: 1px solid #22212b;
+  border-radius: 10px;
+  padding: 5px;
+  background: #484556;
+  display: flex;
+}
+
+.create-new--right-edge--section .adopted-card .card-image {
+  width: 50px;
+  height: 50px;
+  border: 1px solid #22212b;
+  border-radius: 10px;
+  flex: 1;
+}
+
+.create-new--right-edge--section .adopted-card .card-info-container {
+  flex: 3;
+}
+
+.create-new--right-edge--section .adopted-card .card-info {
+  padding: 5px 12px;
+}
+
+.adopted-card .title {
+  color: white;
+}
+
+.adopted-card .action {
+  color: #a3a1a7;
+}
+
+.create-new--right-edge--section .remove-adopted-card {
+  text-align: right;
+  color: #a3a1a7;
+}
+
 
 /* Card */
 .create-new--card {
