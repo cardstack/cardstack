@@ -8,5 +8,4 @@ export default class IndexController extends Controller {
   viewCard(id) {
     this.router.transitionTo('cards.view', id);
   }
-
 }
