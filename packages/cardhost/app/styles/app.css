@@ -1,4 +1,61 @@
+@import '/assets/fonts.css';
+@import '/assets/palette.css';
 @import '/assets/components/card-manipulator.css';
+
+:root {
+  --cardhost-font-family: 'Open Sans', Arial, Helvetica, sans-serif;
+}
+
+body {
+  font-family: var(--cardhost-font-family);
+  background-color: var(--cardhost-dark-blue-gray);
+  color: white;
+  margin: 0;
+}
+
+.cardhost--header {
+  position: relative;
+  background-color: var(--cardhost-darkest-blue-gray);
+  color: white;
+  padding: 20px;
+}
+
+.cardhost--header h1 {
+  margin: 0;
+  padding: 0;
+}
+
+.cardhost--header button {
+  position: absolute;
+  top: 20px;
+  right: 30px;
+  background-color: transparent;
+  border-radius: 10px;
+  border: solid 2px var(--cardhost-light-gray-d6);
+  color: white;
+}
+
+a {
+  color: white;
+}
+
+.cardhost--topnav ul {
+  list-style-type: none;
+  padding-left: 0;
+}
+
+.cardhost--topnav ul li {
+  display: inline-block;
+}
+
+.cardhost--topnav ul li a::after {
+  display: inline-block;
+  color: var(--cardhost-light-gray);
+  content: '|';
+  font-size: 80%;
+  font-weight: bold;
+  padding: 0 3px;
+}
 
 .card-creator--field-btn-wrapper {
   text-align: right;

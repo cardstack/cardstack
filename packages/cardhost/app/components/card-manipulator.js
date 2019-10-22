@@ -29,28 +29,28 @@ const fieldComponents = [
     title: 'Text',
     description: 'All-purpose text field',
     type: 'string',
-    icon: `/assets/images/field-types/text.png`
+    icon: `/assets/images/field-types/text.svg`
   },
   {
     id: 'text-field-case-insensitive',
     title: 'Text (case-insensitive)',
     description: 'Case-insensitive text field',
     type: 'case-insensitive string',
-    icon: `/assets/images/field-types/text.png`
+    icon: `/assets/images/field-types/text.svg`
   },
   {
     id: 'checkbox',
     title: 'Checkbox',
     description: 'True/false (boolean) values',
     type: 'boolean',
-    icon: `/assets/images/field-types/checkbox.png`
+    icon: `/assets/images/field-types/checkbox.svg`
   },
   {
     id: 'date-field',
     title: 'Date',
     description: 'Date field',
     type: 'date',
-    icon: `/assets/images/field-types/date.png`
+    icon: `/assets/images/field-types/calendar.svg`
   },
   {
     id: 'number',
@@ -64,14 +64,14 @@ const fieldComponents = [
     title: 'Dropdown',
     description: 'Single select dropdown',
     type: 'related card',
-    icon: `/assets/images/field-types/dropdown.png`
+    icon: `/assets/images/field-types/dropdown.svg`
   },
   {
     id: 'dropdown-multi',
     title: 'Dropdown (Multi-select)',
     description: 'Multiple select dropdown',
     type: 'related cards',
-    icon: `/assets/images/field-types/dropdown.png`
+    icon: `/assets/images/field-types/dropdown.svg`
   },
   // We'll need to figure out how to deal with the other types of ui-components, ex:
   // {

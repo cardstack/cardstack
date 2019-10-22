@@ -9,8 +9,8 @@
 
 .card-manipulator--main {
   box-sizing: border-box;
-  padding: 80px 30px;
-  background-color: #201f27;
+  padding: 0 30px;
+  background-color: var(--cardhost-dark-blue-gray);
   overflow: scroll;
 }
 
@@ -32,36 +32,30 @@
   width: 100%;
   max-width: 60px;
   padding: 20px 0;
-  background-color: #343355;
+  background-color: var(--cardhost-darkest-blue-gray);
 }
 
 .card-manipulator--left-edge--profile .icon {
   width: 40px;
   height: 40px;
-  border-radius: 50%;
-  background-color: #bebbce;
-  background-size: 20px 20px;
+  background-size: 40px 40px;
   background-position: center;
   background-repeat: no-repeat;
   box-shadow: 0 3px 6px rgba(0, 0, 0, 0.15);
-  fill: black;
-}
-
-.card-manipulator--left-edge--profile .icon.active {
-  border: 4px solid #00eae4;
+  fill: var(--cardhost-cyan);
 }
 
 .card-manipulator--left-edge--profile .icon.profile {
-  background-image: url('/assets/images/profile-icon.svg');
+  background-image: url('/assets/images/icon-profile.svg');
 }
 
-.card-manipulator--left-edge--profile .icon.settings {
-  background-image: url('/assets/images/settings-icon.svg');
+.card-manipulator--left-edge--profile .icon.catalog {
+  background-image: url('/assets/images/icon-catalog.svg');
   border-radius: 5px;
 }
 
-.card-manipulator--left-edge--profile .icon.search {
-  background-image: url('/assets/images/search-icon.svg');
+.card-manipulator--left-edge--profile .icon.library {
+  background-image: url('/assets/images/icon-library.svg');
 }
 
 
@@ -69,7 +63,8 @@
   box-sizing: border-box;
   width: 100%;
   padding: 30px 20px;
-  background-color: #f2f2f2;
+  background-color: var(--cardhost-light-gray);
+  color: black;
   overflow-y: scroll;
 }
 
@@ -83,7 +78,7 @@
 .card-manipulator--left-edge--catalog-field {
   position: relative;
   display: flex;
-  border: 1px solid #ddd;
+  border: 1px solid var(--cardhost-light-gray-d6);
   border-radius: 10px;
   background-color: white;
 }
@@ -98,10 +93,8 @@
   max-width: 80px;
   height: 80px;
   padding: 20px;
-  background-color: #fafafa;
   border-top-left-radius: inherit;
   border-bottom-left-radius: inherit;
-  border-right: 1px solid #ddd;
   background-position: center;
   background-repeat: no-repeat;
 }
@@ -138,6 +131,32 @@
   background-repeat: no-repeat;
 }
 
+.card-manipulator--mode-chooser {
+  box-sizing: border-box;
+  width: 324px;
+  height: 40px;
+  margin: 0 auto 30px;
+  text-align: center;
+  position: relative;
+  background-color: var(--cardhost-dark-blue-gray);
+  border-radius: 20px;
+  border: solid 1px var(--cardhost-medium-blue-gray);
+  line-height: 40px;
+  background-image: url('/assets/images/icon-carrot.svg');
+  background-position: right 20px center;
+  background-size: 8px 8px;
+  background-repeat: no-repeat;
+}
+
+.card-manipulator--mode--schema {
+  background-position: 20px center;
+  background-size: 20px 20px;
+  background-repeat: no-repeat;
+}
+
+.card-manipulator--mode--schema {
+  background-image: url('/assets/images/icon-schema.svg');
+}
 
 /* Card */
 .card-manipulator--card {
@@ -146,15 +165,16 @@
   max-width: 500px;
   min-width: 460px;
   margin: 0 auto;
-  background-color: #383849;
-  border: 2px solid #00eae4;
+  background-color: var(--cardhost-medium-darker-blue-gray);
+  border: 2px solid var(--cardhost-cyan);
   border-radius: 10px;
   overflow: hidden;
 }
 
 .card-manipulator--card-header {
   padding: 20px;
-  background-color: #00eae4;
+  background-color: var(--cardhost-cyan);
+  color: black;
 }
 
 .card-manipulator--card-header > .title {
@@ -270,7 +290,7 @@
 
 .card-manipulator--card--field--drop-zone .drop-zone-text {
   box-sizing: border-box;
-  border: dashed 3px #ddd;
+  border: dashed 3px var(--cardhost-light-gray-d6);
   color: transparent;
   font-size: 28px;
   padding: 20px;
@@ -289,15 +309,15 @@
   box-sizing: border-box;
   width: 300px;
 
-  padding: 80px 20px;
-  background-color: #201f27;
+  padding: 0 20px;
+  background-color: var(--cardhost-dark-blue-gray);
 }
 
 .card-manipulator--right-edge--field {
   box-sizing: border-box;
   position: relative;
   padding: 25px;
-  background-color: #402eb8;
+  background-color: var(--cardhost-medium-dark-blue-gray);
   border-radius: 20px;
   color: white;
 }

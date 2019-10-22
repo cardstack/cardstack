@@ -1,0 +1,11 @@
+:root {
+  --cardhost-light-gray: #F2F2F2;
+  --cardhost-light-gray-d6: #D6D6D6;
+  --cardhost-medium-blue-gray: #5B596E;
+  --cardhost-medium-dark-blue-gray: #41404D;
+  --cardhost-medium-darker-blue-gray: #383849;
+  --cardhost-dark-blue-gray: #2E2D38;
+  --cardhost-darker-blue-gray: #201F27;
+  --cardhost-darkest-blue-gray: #141428;
+  --cardhost-cyan: #00ECE5;
+}
