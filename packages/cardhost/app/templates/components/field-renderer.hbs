@@ -1,5 +1,7 @@
 {{! eslint is confused by on helper }}
 {{! template-lint-disable attribute-indentation}}
+{{this.onFieldUpdated}}
+
 <fieldset
   class={{concat
     @mode
@@ -12,6 +14,9 @@
   data-test-field={{@field.name}}
   data-test-field-type={{@field.type}}
   data-test-field-mode={{@mode}}
+
+  {{!-- TODO: let's think of a more accessible solution here--}}
+  {{!-- TODO: also we should also turn on a11y linting --}}
   {{on "click" (fn this.selectField @field)}}
 >
   <legend><strong><code>field: {{@field.name}}</code></strong></legend>

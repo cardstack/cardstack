@@ -2,7 +2,7 @@ import { module, test } from 'qunit';
 import { click, fillIn, find, visit, currentURL, waitFor, triggerEvent } from '@ember/test-helpers';
 import { setupApplicationTest } from 'ember-qunit';
 import Fixtures from '@cardstack/test-support/fixtures'
-import { addField, setCardId, createCards } from '../helpers/card-helpers';
+import { addField, setCardId, createCards, dragAndDropField } from '../helpers/card-helpers';
 import { setupMockUser, login } from '../helpers/login';
 
 const timeout = 5000;
@@ -62,6 +62,31 @@ module('Acceptance | card create', function(hooks) {
     assert.equal(card.data.attributes.body, undefined);
     assert.equal(card.data.relationships.author, undefined);
     assert.deepEqual(card.data.relationships.reviewers.data, []);
+  });
+
+  test(`selecting a field`, async function(assert) {
+    await login();
+    await visit('/cards/new');
+
+    await setCardId(card1Id);
+    await addField('title', 'string', true);
+    await addField('body', 'string', false);
+
+    await click('[data-test-field="title"]');
+    assert.dom('.card-manipulator--right-edge--field [data-test-field] .field-renderer-field-name-input').hasValue('title');
+
+    await fillIn('[data-test-field="title"] .field-renderer-field-name-input', 'subtitle');
+    await triggerEvent(`[data-test-field="title"] .field-renderer-field-name-input`, 'keyup');
+    assert.dom('.card-manipulator--right-edge--field [data-test-field] .field-renderer-field-name-input').hasValue('subtitle');
+
+    await click('[data-test-field="body"]');
+    assert.dom('.card-manipulator--right-edge--field [data-test-field] .field-renderer-field-name-input').hasValue('body');
+
+    await click('[data-test-field="subtitle"]');
+    assert.dom('.card-manipulator--right-edge--field [data-test-field] .field-renderer-field-name-input').hasValue('subtitle');
+
+    await dragAndDropField('string');
+    assert.dom('.card-manipulator--right-edge--field [data-test-field] .field-renderer-field-name-input').hasValue('new-field-2');
   });
 
   test(`renaming a card's field`, async function(assert) {
