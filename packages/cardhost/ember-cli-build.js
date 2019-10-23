@@ -41,7 +41,7 @@ module.exports = function(defaults) {
       packageRules: [
         {
           package: "@cardstack/core",
-          addonModules: {
+          appModules: {
             "components/card-renderer.js": {
               dependsOnComponents: [
                 '<Cards::Default::Isolated/>',
