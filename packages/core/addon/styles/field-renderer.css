@@ -1,0 +1,139 @@
+.field-renderer {
+  --field-renderer-header-bg: #24242e;
+  --field-renderer-max-width: 495px;
+  --field-renderer-inner-max-width: 385px;
+}
+
+.field-renderer.schema-field,
+.field-renderer.edit-field {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: var(--field-renderer-max-width);
+  max-width: 100%;
+  padding: 20px 20px 30px;
+  background-color: var(--cardhost-medium-darker-blue-gray);
+  color: black;
+  font-size: 16px;
+}
+
+.field-renderer.edit-field + .field-renderer.edit-field {
+  border-top: 1px solid rgba(255, 255, 255, 0.15);
+}
+
+.field-renderer--move-btn {
+  height: 18px;
+  width: 14px;
+  background: none;
+  /* background-image: url('/images/drag-handle-icon.svg'); */
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: contain;
+  border: none;
+  color: white;
+}
+
+.field-renderer--remove-btn {
+  height: 20px;
+  width: 20px;
+  background: none;
+  background-image: url('/images/trash-icon.svg');
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: contain;
+  border: none;
+}
+
+
+/* Schema Field Renderer */
+.schema-field-renderer {
+  width: var(--field-renderer-inner-max-width);
+  max-width: 100%;
+  margin: 0 auto;
+  padding: 0;
+  background-color: white;
+  border: none;
+  border-radius: 5px;
+  overflow: hidden;
+}
+
+.schema-field-renderer--header {
+  width: 100%;
+  padding: 0.5em 1em;
+  background-color: var(--field-renderer-header-bg);
+  color: white;
+  font-size: 16px;
+  font-weight: 600;
+  letter-spacing: 0.24px;
+  line-height: 22px;
+  text-transform: capitalize;
+}
+
+.schema-field-renderer--attributes {
+  padding: 1em;
+}
+
+.schema-field-renderer--attribute + .schema-field-renderer--attribute {
+  padding-top: 1em;
+}
+
+.schema-field-renderer--label,
+.schema-field-renderer--attribute-name {
+  display: block;
+  padding-bottom: 0.5em;
+  color: rgba(0, 0, 0, 0.5);
+  font-size: 11px;
+  letter-spacing: 0.35px;
+  line-height: 1;
+  text-transform: capitalize;
+}
+
+.schema-field-renderer--attribute-value {
+  margin: 0;
+  font-size: 16px;
+  letter-spacing: 0.15px;
+  line-height: 22px;
+}
+
+.schema-field-renderer--input {
+  width: calc(100% - 20px);
+  margin: 0;
+  padding: 10px;
+  border-radius: 5px;
+  font-size: 16px;
+}
+
+
+/* Edit Field Renderer */
+/* Similar to Schema Field Renderer for now. */
+.edit-field-renderer {
+  width: var(--field-renderer-inner-max-width);
+  max-width: 100%;
+  margin: 0 auto;
+  padding: 0;
+  background-color: white;
+  border: none;
+  border-radius: 5px;
+  overflow: hidden;
+}
+
+.edit-field-renderer > label {
+  display: block;
+  width: 100%;
+  padding: 0.5em 1em;
+  background-color: var(--field-renderer-header-bg);
+  color: white;
+  font-size: 16px;
+  font-weight: 600;
+  letter-spacing: 0.24px;
+  line-height: 22px;
+  text-transform: capitalize;
+}
+
+.edit-field-renderer > input {
+  width: calc(100% - 40px);
+  margin: 1em;
+  padding: 10px;
+  border-radius: 5px;
+  font-size: 16px;
+}

@@ -2,25 +2,50 @@
 @import '/assets/palette.css';
 @import '/assets/components/card-manipulator.css';
 
-/* Move to `@cardstack/core` package?? */
-@import "/assets/components/card-renderer.css";
-@import "/assets/components/field-renderer.css";
-
 :root {
-  --cardhost-font-family: 'Open Sans', Arial, Helvetica, sans-serif;
+  --cardhost-font-family: "Open Sans", Roboto, "Helvetica Neue", Helvetica, Arial, sans-serif;
 }
 
-body {
-  font-family: var(--cardhost-font-family);
-  background-color: var(--cardhost-dark-blue-gray);
-  color: white;
-  margin: 0;
-}
-
-.cardhost * {
+* {
   box-sizing: border-box;
 }
 
+body {
+  position: relative;
+  min-width: 100%;
+  min-height: 100%;
+  width: 100%;
+  height: auto;
+  margin: 0;
+  background-color: var(--cardhost-dark-blue-gray);
+  color: white;
+  font-family: var(--cardhost-font-family);
+  font-size: 13px;
+  letter-spacing: 0;
+  line-height: 1.2;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+a:hover {
+  cursor: pointer;
+  color: inherit;
+}
+
+button {
+  font-family: inherit;
+}
+
+button:not(:disabled):hover {
+  cursor: pointer;
+  color: inherit;
+}
+
+
+/* To Be Refactored Out: */
 .cardhost--header {
   position: relative;
   background-color: var(--cardhost-darkest-blue-gray);
@@ -40,10 +65,6 @@ body {
   background-color: transparent;
   border-radius: 10px;
   border: solid 2px var(--cardhost-light-gray-d6);
-  color: white;
-}
-
-a {
   color: white;
 }
 

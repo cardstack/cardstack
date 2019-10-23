@@ -50,47 +50,49 @@
     {{/let}}
   {{else if (eq @mode "edit")}}
     {{#let (component this.fieldEditor) as | FieldEditor |}}
-      <FieldEditor
-        @field={{@field}}
-        @setFieldValue={{@setFieldValue}}
-      />
+      <div class="edit-field-renderer">
+        <FieldEditor
+          @field={{@field}}
+          @setFieldValue={{@setFieldValue}}
+        />
+      </div>
     {{/let}}
   {{else if (eq @mode "schema")}}
-    <div class="field-renderer--field-box">
-      <header class="field-renderer--field-box-title" data-test-field-renderer-header>
-        {{@field.name}} Field
+    <div class="schema-field-renderer">
+      <header class="schema-field-renderer--header" data-test-field-renderer-header>
+        {{@field.name}}
       </header>
-      <ul class="field-renderer--field-attributes-list">
-        <li class="field-renderer--field-attribute">
-          <span class="field-renderer--field-attribute-name">Field Type</span>
-          <span class="field-renderer--field-attribute-data" data-test-field-renderer-field-type>
+      <div class="schema-field-renderer--attributes">
+        <div class="schema-field-renderer--attribute">
+          <span class="schema-field-renderer--attribute-name">Field Type</span>
+          <span class="schema-field-renderer--attribute-value" data-test-field-renderer-field-type>
             {{@field.type}}
           </span>
-        </li>
-        <li class="field-renderer--field-attribute">
-          <span class="field-renderer--field-attribute-name">Is Metadata Field</span>
-          <span class="field-renderer--field-attribute-data" data-test-field-renderer-is-meta>
+        </div>
+        <div class="schema-field-renderer--attribute">
+          <span class="schema-field-renderer--attribute-name">Is Metadata Field</span>
+          <span class="" data-test-field-renderer-is-meta>
             {{if @field.json.data.attributes.is-metadata "true" "false"}}
           </span>
-        </li>
-        <li class="field-renderer--field-attribute">
-          {{#if @setFieldName}}
+        </div>
+        {{#if @setFieldName}}
+          <div class="schema-field-renderer--attribute">
             <label
               for={{concat "edit-field-name-" @field.nonce}}
-              class="field-renderer--field-attribute-label"
+              class="schema-field-renderer--label"
               data-test-field-renderer-field-name-label
             >
               Field Name
             </label>
             <Input
               @id={{concat "edit-field-name-" @field.nonce}}
-              @class="field-renderer-field-name-input field-renderer--field-attribute-input"
+              @class="field-renderer-field-name-input schema-field-renderer--input"
               @value={{this.newFieldName}}
               @key-up={{action this.updateFieldName}}
             />
-          {{/if}}
-        </li>
-        <li class="field-renderer--field-attribute">
+          </div>
+        {{/if}}
+        <div class="schema-field-renderer--attribute">
           {{#if @setNeededWhenEmbedded}}
             <Input
               @checked={{@field.neededWhenEmbedded}}
@@ -103,13 +105,13 @@
               Needed When Embedded
             </label>
           {{else}}
-            <span class="field-renderer--field-attribute-name">Needed When Embedded</span>
-            <span class="field-renderer--field-attribute-data" data-test-field-renderer-embedded>
+            <span class="schema-field-renderer--attribute-name">Needed When Embedded</span>
+            <span class="schema-field-renderer--attribute-value" data-test-field-renderer-embedded>
               {{if @field.neededWhenEmbedded "true" "false"}}
             </span>
           {{/if}}
-        </li>
-      </ul>
+        </div>
+      </div>
     </div>
   {{/if}}
 
