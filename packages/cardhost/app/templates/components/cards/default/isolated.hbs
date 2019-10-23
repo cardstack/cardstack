@@ -10,12 +10,10 @@
         @setFieldValue={{fn @setFieldValue field.name}}
       />
     {{else if (or @setNeededWhenEmbedded @setPosition @removeField @setFieldName)}}
-      {{#if @dropField}}
-        <DropZone @dropField={{@dropField}} @position={{field.position}} />
-      {{/if}}
       <FieldRenderer
         @field={{field}}
         @mode={{@mode}}
+        @dropField={{@dropField}}
         @removeField={{@removeField}}
         @setPosition={{@setPosition}}
         @setNeededWhenEmbedded={{@setNeededWhenEmbedded}}
@@ -25,12 +23,5 @@
     {{else}}
       <FieldRenderer @field={{field}} @mode={{@mode}}/>
     {{/if}}
-    <br>
   {{/each}}
-  {{#if @dropField}}
-    <DropZone
-      @dropField={{@dropField}}
-      @position={{@card.isolatedFields.length}}
-    />
-  {{/if}}
 </div>

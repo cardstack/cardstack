@@ -140,6 +140,7 @@ module('Integration | Component | field-renderer', function(hooks) {
     <FieldRenderer
       @field={{field}}
       @mode="schema"
+      @dropField={{action noop}}
       @setFieldName={{action noop}}
       @setNeededWhenEmbedded={{action noop}}
       @setPosition={{action noop}}
@@ -149,8 +150,9 @@ module('Integration | Component | field-renderer', function(hooks) {
 
     assert.dom('.field-renderer-field-name-input').hasValue('title');
     assert.dom('.field-renderer--needed-when-embedded-chbx').isChecked();
-    assert.dom('[data-test-field-renderer-move-up-btn]').exists(); // TODO update to assert for drop zones
-    assert.dom('[data-test-field-renderer-move-down-btn]').exists(); // TODO update to assert for drop zones
+    assert.dom('[data-test-field-renderer-move-up-btn]').exists();
+    assert.dom('[data-test-field-renderer-move-down-btn]').exists();
+    assert.dom('[data-test-drop-zone="1"]').exists();
 
     assert.dom('.edit-title-field-value').doesNotExist();
     assert.dom('[data-test-string-field-viewer-value]').doesNotExist();
@@ -168,6 +170,7 @@ module('Integration | Component | field-renderer', function(hooks) {
     <FieldRenderer
       @field={{field}}
       @mode="schema"
+      @dropField={{action noop}}
       @setFieldName={{action setFieldName}}
       @setNeededWhenEmbedded={{action noop}}
       @setPosition={{action noop}}
@@ -198,6 +201,7 @@ module('Integration | Component | field-renderer', function(hooks) {
     <FieldRenderer
       @field={{field}}
       @mode="schema"
+      @dropField={{action noop}}
       @setFieldName={{action noop}}
       @setNeededWhenEmbedded={{action setNeededWhenEmbedded}}
       @setPosition={{action noop}}
@@ -226,6 +230,7 @@ module('Integration | Component | field-renderer', function(hooks) {
     <FieldRenderer
       @field={{field}}
       @mode="schema"
+      @dropField={{action noop}}
       @setFieldName={{action noop}}
       @setNeededWhenEmbedded={{action noop}}
       @setPosition={{action setPosition}}
@@ -257,6 +262,7 @@ module('Integration | Component | field-renderer', function(hooks) {
     <FieldRenderer
       @field={{field}}
       @mode="schema"
+      @dropField={{action noop}}
       @setFieldName={{action noop}}
       @setNeededWhenEmbedded={{action noop}}
       @setPosition={{action noop}}
@@ -267,5 +273,33 @@ module('Integration | Component | field-renderer', function(hooks) {
     await click('[data-test-field-renderer-remove-btn]');
 
     assert.notOk(card.getField('title'), 'field does not exist on card');
+  });
+
+  test('it can perform an action when an item is dropped into the drop zone', async function(assert) {
+    assert.expect(2);
+
+    let service = this.owner.lookup('service:data');
+    let card = service.createCard(card1Id);
+    let field = card.addField({ name: 'title', type: '@cardstack/core-types::string', neededWhenEmbedded: true, value: 'test title' });
+    this.set('field', field);
+    this.set('noop', () => {});
+    this.set('dropField', (position, callback) => {
+      assert.equal(position, 0);
+      assert.equal(typeof callback, 'function');
+    });
+
+    await render(hbs`
+    <FieldRenderer
+      @field={{field}}
+      @mode="schema"
+      @dropField={{action dropField}}
+      @setFieldName={{action noop}}
+      @setNeededWhenEmbedded={{action noop}}
+      @setPosition={{action noop}}
+      @removeField={{action noop}}
+    />
+    `);
+
+    await triggerEvent(`[data-test-drop-zone="0"]`, 'drop');
   });
 });

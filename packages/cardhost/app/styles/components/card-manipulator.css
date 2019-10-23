@@ -283,12 +283,12 @@
   background: none;
 }
 
-.card-manipulator--card--field--drop-zone {
+.drop-zone {
   margin: 10px;
   text-align: center;
 }
 
-.card-manipulator--card--field--drop-zone .drop-zone-text {
+.drop-zone .drop-zone-text {
   box-sizing: border-box;
   border: dashed 3px var(--cardhost-light-gray-d6);
   color: transparent;
@@ -298,7 +298,7 @@
   transition: height var(--transition-time);
 }
 
-.card-manipulator--card--field--drop-zone .drop-zone-text.active {
+.drop-zone .drop-zone-text.active {
   color: yellow;
   border-color: yellow;
   height: 80px;

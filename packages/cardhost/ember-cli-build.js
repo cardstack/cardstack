@@ -40,8 +40,8 @@ module.exports = function(defaults) {
       },
       packageRules: [
         {
-          package: "@cardstack/cardhost",
-          appModules: {
+          package: "@cardstack/core",
+          addonModules: {
             "components/card-renderer.js": {
               dependsOnComponents: [
                 '<Cards::Default::Isolated/>',
