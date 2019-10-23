@@ -2,6 +2,10 @@
 @import '/assets/palette.css';
 @import '/assets/components/card-manipulator.css';
 
+/* Move to `@cardstack/core` package?? */
+@import "/assets/components/card-renderer.css";
+@import "/assets/components/field-renderer.css";
+
 :root {
   --cardhost-font-family: 'Open Sans', Arial, Helvetica, sans-serif;
 }
@@ -11,6 +15,10 @@ body {
   background-color: var(--cardhost-dark-blue-gray);
   color: white;
   margin: 0;
+}
+
+.cardhost * {
+  box-sizing: border-box;
 }
 
 .cardhost--header {

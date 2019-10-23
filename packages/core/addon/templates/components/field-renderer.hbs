@@ -8,6 +8,7 @@
 {{!-- TODO: also we should also turn on a11y linting --}}
 <div {{on "click" (fn this.selectField @field)}}
   class={{concat
+    "field-renderer "
     @mode
     "-field "
     "field-"
@@ -19,6 +20,30 @@
   data-test-field-type={{@field.type}}
   data-test-field-mode={{@mode}}
 >
+  {{#if @setPosition}}
+    {{!-- TODO: Use dragger handle icon to drag fields around instead of up/down --}}
+    <div class="field-renderer--move-btn">
+      {{#if (gt @field.position 0)}}
+        <button {{on "click" (fn @setPosition @field.name (dec @field.position))}}
+          class="field-renderer--move-btn"
+          aria-label="Move up"
+          data-test-field-renderer-move-up-btn
+        >
+          <strong>▲</strong>
+        </button>
+      {{/if}}
+      {{#if (lt @field.position (dec @field.card.isolatedFields.length))}}
+        <button {{on "click" (fn @setPosition @field.name (inc @field.position))}}
+          class="field-renderer--move-btn"
+          aria-label="Move down"
+          data-test-field-renderer-move-down-btn
+        >
+          <strong>▼</strong>
+        </button>
+      {{/if}}
+    </div>
+  {{/if}}
+
   {{#if (eq @mode "view")}}
     {{#let (component this.fieldViewer) as | FieldViewer |}}
       <FieldViewer @field={{@field}}/>
@@ -31,76 +56,69 @@
       />
     {{/let}}
   {{else if (eq @mode "schema")}}
-    <div>
-      field type:
-      <span data-test-field-renderer-field-type>
-        {{@field.type}}
-      </span>
+    <div class="field-renderer--field-box">
+      <header class="field-renderer--field-box-title" data-test-field-renderer-header>
+        {{@field.name}} Field
+      </header>
+      <ul class="field-renderer--field-attributes-list">
+        <li class="field-renderer--field-attribute">
+          <span class="field-renderer--field-attribute-name">Field Type</span>
+          <span class="field-renderer--field-attribute-data" data-test-field-renderer-field-type>
+            {{@field.type}}
+          </span>
+        </li>
+        <li class="field-renderer--field-attribute">
+          <span class="field-renderer--field-attribute-name">Is Metadata Field</span>
+          <span class="field-renderer--field-attribute-data" data-test-field-renderer-is-meta>
+            {{if @field.json.data.attributes.is-metadata "true" "false"}}
+          </span>
+        </li>
+        <li class="field-renderer--field-attribute">
+          {{#if @setFieldName}}
+            <label
+              for={{concat "edit-field-name-" @field.nonce}}
+              class="field-renderer--field-attribute-label"
+              data-test-field-renderer-field-name-label
+            >
+              Field Name
+            </label>
+            <Input
+              @id={{concat "edit-field-name-" @field.nonce}}
+              @class="field-renderer-field-name-input field-renderer--field-attribute-input"
+              @value={{this.newFieldName}}
+              @key-up={{action this.updateFieldName}}
+            />
+          {{/if}}
+        </li>
+        <li class="field-renderer--field-attribute">
+          {{#if @setNeededWhenEmbedded}}
+            <Input
+              @checked={{@field.neededWhenEmbedded}}
+              @class="field-renderer--needed-when-embedded-chbx"
+              @type="checkbox"
+              @id={{concat "edit_" @field.name "_embedded"}}
+              @click={{fn @setNeededWhenEmbedded @field.name}}
+            />
+            <label for="new_field_embedded">
+              Needed When Embedded
+            </label>
+          {{else}}
+            <span class="field-renderer--field-attribute-name">Needed When Embedded</span>
+            <span class="field-renderer--field-attribute-data" data-test-field-renderer-embedded>
+              {{if @field.neededWhenEmbedded "true" "false"}}
+            </span>
+          {{/if}}
+        </li>
+      </ul>
     </div>
-    <div>
-      is metadata field:
-      <span data-test-field-renderer-is-meta>
-        {{if @field.json.data.attributes.is-metadata "true" "false"}}
-      </span>
-    </div>
-    <div>
-      {{#if @setFieldName}}
-        <label
-          data-test-field-renderer-field-name-label
-          for={{concat "edit-field-name-" @field.nonce}}
-        >
-          Field name:
-        </label>
-        <Input
-          @id={{concat "edit-field-name-" @field.nonce}}
-          @class="field-renderer-field-name-input"
-          @value={{this.newFieldName}}
-          @key-up={{action this.updateFieldName}}
-        />
-      {{/if}}
-    </div>
-    <div>
-      {{#if @setNeededWhenEmbedded}}
-        <Input
-          @checked={{@field.neededWhenEmbedded}}
-          @class="field-renderer--needed-when-embedded-chbx"
-          @type="checkbox"
-          @id={{concat "edit_" @field.name "_embedded"}}
-          @click={{fn @setNeededWhenEmbedded @field.name}}
-        />
-        <label for="new_field_embedded">Needed when Embedded</label>
-      {{else}}
-        needed when embedded:
-        <span data-test-field-renderer-embedded >
-          {{if @field.neededWhenEmbedded "true" "false"}}
-        </span>
-      {{/if}}
-    </div>
+  {{/if}}
 
-    <div class="field-renderer--field-btn-wrapper">
-      {{#if @setPosition}}
-        {{#if (gt @field.position 0)}}
-          <button {{on "click" (fn @setPosition @field.name (dec @field.position))}}
-            data-test-field-renderer-move-up-btn
-          >
-            <strong>▲</strong>
-          </button>
-        {{/if}}
-        {{#if (lt @field.position (dec @field.card.isolatedFields.length))}}
-          <button {{on "click" (fn @setPosition @field.name (inc @field.position))}}
-            data-test-field-renderer-move-down-btn
-          >
-            <strong>▼</strong>
-          </button>
-        {{/if}}
-      {{/if}}
-      {{#if @removeField}}
-        <button {{on "click" (fn @removeField @field.name)}}
-          data-test-field-renderer-remove-btn
-        >
-          Remove
-        </button>
-      {{/if}}
-    </div>
+  {{#if @removeField}}
+    <button {{on "click" (fn @removeField @field.name)}}
+      class="field-renderer--remove-btn"
+      aria-label="Remove"
+      data-test-field-renderer-remove-btn
+    >
+    </button>
   {{/if}}
 </div>

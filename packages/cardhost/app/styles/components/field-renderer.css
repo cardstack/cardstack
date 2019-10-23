@@ -1,0 +1,101 @@
+.field-renderer.schema-field,
+.field-renderer.edit-field {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  min-height: 162px;
+  width: 100%;
+  padding: 20px 20px 30px;
+  background-color: var(--cardhost-medium-darker-blue-gray);
+  color: black;
+  font-size: 16px;
+}
+
+.field-renderer.view-field {
+  color: black;
+}
+
+.field-renderer.edit-field + .field-renderer.edit-field {
+  border-top: 1px solid rgba(255, 255, 255, 0.15);
+}
+
+.field-renderer--move-btn {
+  height: 18px;
+  width: 14px;
+  background: none;
+  /* background-image: url('/assets/images/drag-handle-icon.svg'); */
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: contain;
+  border: none;
+  color: white;
+}
+
+.field-renderer--remove-btn {
+  height: 20px;
+  width: 20px;
+  background: none;
+  background-image: url('/assets/images/trash-icon.svg');
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: contain;
+  border: none;
+}
+
+.field-renderer--field-box {
+  width: 385px;
+  min-height: 110px;
+  margin: 0;
+  padding: 0;
+  background-color: white;
+  border: none;
+  border-radius: 5px;
+  overflow: hidden;
+}
+
+.field-renderer--field-box-title {
+  width: 100%;
+  padding: 0.5em 1em;
+  background-color: #24242e;
+  color: white;
+  font-size: 16px;
+  font-weight: 600;
+  letter-spacing: 0.24px;
+  line-height: 22px;
+  text-transform: capitalize;
+}
+
+.field-renderer--field-attributes-list {
+  list-style-type: none;
+  margin: 0;
+  padding: 1em;
+}
+
+.field-renderer--field-attribute + .field-renderer--field-attribute {
+  padding-top: 1em;
+}
+
+.field-renderer--field-attribute-label,
+.field-renderer--field-attribute-name {
+  display: block;
+  padding-bottom: 0.5em;
+  color: rgba(0, 0, 0, 0.5);
+  font-size: 13px;
+  line-height: 1;
+  text-transform: capitalize;
+}
+
+.field-renderer--field-attribute-data {
+  margin: 0;
+  font-size: 16px;
+  letter-spacing: 0.24px;
+  line-height: 22px;
+}
+
+.field-renderer--field-attribute-input {
+  width: calc(100% - 20px);
+  margin: 0;
+  padding: 10px;
+  border-radius: 5px;
+  font-size: 16px;
+}
