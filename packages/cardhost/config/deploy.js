@@ -32,7 +32,7 @@ module.exports = function(deployTarget) {
       cacheControl: 'max-age=600, public'
     },
     cloudfront: {
-      objectPaths: ['/', '/*', '/*/*', '/index.html', '/dashboard']
+      objectPaths: ['/', '/*', '/*/*', '/index.html']
     }
   };
 

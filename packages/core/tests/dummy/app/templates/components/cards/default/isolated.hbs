@@ -1,0 +1,37 @@
+<div
+  data-test-isolated-card={{@card.id}}
+  data-test-isolated-card-mode={{@mode}}
+  class="isolated-card default-card"
+>
+  {{#each @card.isolatedFields key="nonce" as |field|}}
+    {{#if @setFieldValue}}
+      <FieldRenderer
+        @field={{field}}
+        @mode={{@mode}}
+        @setFieldValue={{fn @setFieldValue field.name}}
+      />
+    {{else if (or @setNeededWhenEmbedded @setPosition @removeField @setFieldName)}}
+      {{#if @dropField}}
+        <DropZone @dropField={{@dropField}} @position={{field.position}} />
+      {{/if}}
+      <FieldRenderer
+        @field={{field}}
+        @mode={{@mode}}
+        @removeField={{@removeField}}
+        @setPosition={{@setPosition}}
+        @setNeededWhenEmbedded={{@setNeededWhenEmbedded}}
+        @setFieldName={{@setFieldName}}
+        @selectField={{@selectField}}
+      />
+    {{else}}
+      <FieldRenderer @field={{field}} @mode={{@mode}}/>
+    {{/if}}
+    <br>
+  {{/each}}
+  {{#if @dropField}}
+    <DropZone
+      @dropField={{@dropField}}
+      @position={{@card.isolatedFields.length}}
+    />
+  {{/if}}
+</div>
