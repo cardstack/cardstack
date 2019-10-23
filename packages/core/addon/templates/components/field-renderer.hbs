@@ -1,5 +1,9 @@
 {{this.onFieldUpdated}}
 
+{{#if (and (eq @mode "schema") @dropField)}}
+  <DropZone @dropField={{@dropField}} @position={{@field.position}} />
+{{/if}}
+
 {{!-- TODO: let's think of a more accessible solution here, consider making this a button--}}
 {{!-- TODO: also we should also turn on a11y linting --}}
 <div {{on "click" (fn this.selectField @field)}}

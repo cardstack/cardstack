@@ -204,7 +204,6 @@ class Card {
     // if the card is embedded, let's load the isolated card data and merge the updated card with the isolated data
     // we don't want to indavertantly clear fields of the card just because the embedded format does not
     // use a field. The use case for this is the ability of a user to edit owned relationships that are cards
-    // let cardDocument;
     let internal = priv.get(this);
     if (this.loadedFormat === 'embedded') {
       let updatedFields = this.fields;

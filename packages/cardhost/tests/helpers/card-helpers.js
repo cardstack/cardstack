@@ -9,7 +9,7 @@ export async function setCardId(id) {
 
 export async function dragAndDropField(type, position = 0) {
   await triggerEvent(`[data-test-card-add-field-draggable="${type}"]`, 'mousedown');
-  await triggerEvent(`[data-test-card-add-field-drop-zone="${position}"]`, 'drop');
+  await triggerEvent(`[data-test-drop-zone="${position}"]`, 'drop');
 }
 
 export async function createCards(args) {

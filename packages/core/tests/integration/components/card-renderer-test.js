@@ -1,7 +1,7 @@
 import { module, test } from 'qunit';
 import Fixtures from '@cardstack/test-support/fixtures'
 import { setupRenderingTest } from 'ember-qunit';
-import { render } from '@ember/test-helpers';
+import { render, triggerEvent } from '@ember/test-helpers';
 import hbs from 'htmlbars-inline-precompile';
 
 const card1Id = 'local-hub::article-card::millenial-puppies';
@@ -190,6 +190,7 @@ module('Integration | Component | card-renderer', function(hooks) {
       <CardRenderer
         @card={{card}}
         @format="isolated"
+        @dropField={{action noop}}
         @setFieldName={{action noop}}
         @mode="schema"
       />
@@ -199,6 +200,32 @@ module('Integration | Component | card-renderer', function(hooks) {
     assert.dom(`input[type="text"]`).exists({ count: 3 });
     assert.deepEqual([...this.element.querySelectorAll('[data-test-field]')].map(i => i.getAttribute('data-test-field')),
       ['title', 'author', 'body']);
+    assert.dom('[data-test-drop-zone="3"]').exists();
+  });
+
+  test('renders an isolated card with a drop zone when no fields exist', async function(assert) {
+    assert.expect(3);
+    let service = this.owner.lookup('service:data');
+    let card = service.createCard(card1Id);
+    this.set('card', card);
+    this.set('noop', () => {});
+    this.set('dropField', (position, callback) => {
+      assert.equal(position, 0);
+      assert.equal(typeof callback, 'function');
+    });
+
+    await render(hbs`
+      <CardRenderer
+        @card={{card}}
+        @format="isolated"
+        @dropField={{action dropField}}
+        @setFieldName={{action noop}}
+        @mode="schema"
+      />
+    `);
+
+    assert.dom('[data-test-drop-zone="0"]').exists();
+    await triggerEvent(`[data-test-drop-zone="0"]`, 'drop');
   });
 
   test('renders an embedded card in schema mode', async function(assert) {
@@ -208,12 +235,14 @@ module('Integration | Component | card-renderer', function(hooks) {
     card.addField({ name: 'author', type: '@cardstack/core-types::string', neededWhenEmbedded: true, value: 'test author' });
     card.addField({ name: 'body', type: '@cardstack/core-types::string', neededWhenEmbedded: false, value: 'test body' });
     this.set('card', card);
+    this.set('noop', () => {});
 
     await render(hbs`
       <CardRenderer
         @card={{card}}
         @format="embedded"
         @mode="schema"
+        @dropField={{action noop}}
       />
     `);
 
