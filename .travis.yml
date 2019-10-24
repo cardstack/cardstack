@@ -34,16 +34,10 @@ jobs:
       name: 'Linting'
     - stage: test
       script: npm run node-tests && npm run truffle-tests
-      name: 'Node tests (node ver 8)'
-      node_js: "8"
-    - stage: test
-      script: npm run node-tests && npm run truffle-tests
-      name: 'Node tests (node ver 10)'
-      node_js: "10"
+      name: 'Node tests'
     - stage: test
       script: npm run ember-tests
       name: 'Ember tests'
-      node_js: "10"
     - stage: deploy
       name: 'deploy cardhost'
       if: branch = master
