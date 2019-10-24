@@ -1026,4 +1026,171 @@ describe('hub/card-services', function () {
       assertCardOnDisk();
     });
   });
+
+
+  describe('card adoption', function() {
+    let externalArticleCard, externalUserCard;
+    beforeEach(async function () {
+      cleanup();
+      let factory = new JSONAPIFactory();
+
+      env = await createDefaultEnvironment(`${__dirname}/../../../tests/stub-card-project`, factory.getModels());
+      cardServices = env.lookup('hub:card-services');
+      externalArticleCard = await adaptCardToFormat(await env.lookup('hub:current-schema').getSchema(), env.session, internalArticleCard, 'isolated', cardServices);
+
+      // remove the card metadata to make this as real as possible...
+      for (let field of Object.keys(externalArticleCard.data.attributes)) {
+        if (cardBrowserAssetFields.includes(field)) { continue; }
+        delete externalArticleCard.data.attributes[field];
+      }
+
+
+      externalUserCard = await adaptCardToFormat(await env.lookup('hub:current-schema').getSchema(), env.session, userCard, 'isolated', cardServices);
+
+      for (let field of Object.keys(externalUserCard.data.attributes)) {
+        if (cardBrowserAssetFields.includes(field)) { continue; }
+        delete externalUserCard.data.attributes[field];
+      }
+      await cardServices.create(env.session, externalUserCard);
+
+    });
+
+
+    it('can adopt a card', async function() {
+      // console.log(JSON.stringify(externalArticleCard, null, 2))
+      let articleCard = await cardServices.create(env.session, externalArticleCard);
+
+
+
+      let externalAdoptedCard = {
+        "data": {
+          "id": "local-hub::adopted-card::genx-kittens",
+          "type": "cards",
+          "attributes": {
+          },
+          "relationships": {
+            "adopted-from": {
+              "data": {
+                "type": "cards",
+                "id": "local-hub::article-card::millenial-puppies"
+              }
+            },
+            "fields": {
+              "data": [
+                {
+                  "type": "fields",
+                  "id": "yarn"
+                }
+              ]
+            },
+            "model": {
+              "data": {
+                "type": "local-hub::adopted-card::genx-kittens",
+                "id": "local-hub::adopted-card::genx-kittens"
+              }
+            }
+          }
+        },
+        "included": [
+          {
+            "id": "local-hub::adopted-card::genx-kittens",
+            "type": "local-hub::adopted-card::genx-kittens",
+            "attributes": {
+              "yarn": "wool",
+              "title": "GenX Kittens",
+              "body": "Here is the body"
+            },
+            "relationships": {
+              "author": {
+                "data": {
+                  type: 'cards', id: externalUserCard.data.id
+                }
+              },
+              "adopted-from": {
+                "data": [
+                  {
+                    "type": "cards",
+                    "id": "local-hub::article-card::millenial-puppies"
+                  }
+                ]
+              },
+            }
+          },
+          {
+            "type": "fields",
+            "id": "yarn",
+            "attributes": {
+              "is-metadata": true,
+              "needed-when-embedded": true,
+              "field-type": "@cardstack/core-types::string"
+            },
+            "relationships": {
+            }
+          },
+        ]
+      }
+
+      let adoptedCard = await cardServices.create(env.session, externalAdoptedCard);
+
+      let adopted = await cardServices.get(env.session, 'local-hub::adopted-card::genx-kittens', 'isolated');
+
+      let fieldSpecs = adopted.data.relationships.fields.data.map(f => `${f.type}/${f.id}`);
+      // console.log(JSON.stringify(adopted, null, 2));
+      expect(fieldSpecs).to.include("fields/yarn");
+      expect(fieldSpecs).to.include("fields/title");
+      expect(fieldSpecs).to.include("fields/author");
+      expect(fieldSpecs).to.include("fields/body");
+
+      let includedSpecs = adopted.included.map(i => `${i.type}/${i.id}`);
+
+      expect(includedSpecs).length.to.equal(2);
+      expect(includedSpecs).to.include("local-hub::adopted-card::genx-kittens/local-hub::adopted-card::genx-kittens");
+      expect(includedSpecs).to.include("fields/yarn");
+      expect(includedSpecs).to.not.include("fields/title");
+      expect(includedSpecs).to.not.include("fields/author");
+      expect(includedSpecs).to.not.include("fields/body");
+
+      let fieldMeta = adopted.data.attributes['metadata-field-types'];
+
+      expect(fieldMeta.yarn).to.equal("@cardstack/core-types::string");
+      expect(fieldMeta.title).to.equal("@cardstack/core-types::string");
+      expect(fieldMeta.author).to.equal("@cardstack/core-types::belongs-to");
+      expect(fieldMeta.body).to.equal("@cardstack/core-types::string");
+
+
+      expect(adoptedCard.data.attributes.yarn).to.equal("wool");
+      expect(adoptedCard.data.attributes.title).to.equal("GenX Kittens");
+      expect(adoptedCard.data.attributes.body).to.equal("Here is the body");
+
+      expect(adoptedCard.data.relationships.author.data).to.deepEqual({
+        type: 'cards',
+        id: externalUserCard.data.id
+      })
+
+      let model = adoptedCard.included.find(i => i.type === "local-hub::adopted-card::genx-kittens" && i.id === "local-hub::adopted-card::genx-kittens");
+
+      expect(model.attributes.yarn).to.equal("wool");
+      expect(model.attributes.title).to.equal("GenX Kittens");
+      expect(model.attributes.body).to.equal("Here is the body");
+
+      expect(model.relationships.author.data).to.deepEqual({
+        type: 'cards',
+        id: externalUserCard.data.id
+      })
+
+
+      // assertCardOnDisk();
+      // assertIsolatedCardMetadata(articleCard);
+      // assertCardModels(articleCard);
+      // assertCardSchema(articleCard);
+
+      // let article = await cardServices.get(env.session, 'local-hub::article-card::millenial-puppies', 'isolated');
+      // assertIsolatedCardMetadata(article);
+
+
+
+    });
+
+  })
 });
+

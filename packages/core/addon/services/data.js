@@ -148,6 +148,7 @@ class Card {
     return this.fields.filter(i => i.neededWhenEmbedded);
   }
 
+  // This returns the most deeply loaded version of the card you have, so isolated if loaded, embedded if not
   get json() {
     return getCardDocument(this);
   }

@@ -77,7 +77,6 @@ function isCard(type: string = '', id: string = '') {
 }
 
 async function loadCard(schema: todo, internalCard: SingleResourceDoc, getInternalCard: todo) {
-  if (!internalCard || !internalCard.data || !internalCard.data.id) { return; }
 
   // a searcher or indexer may be returning invalid cards, so we
   // need to make sure to validate the internal card format.
@@ -154,6 +153,10 @@ function generateInternalCardFormat(schema: todo, externalCard: SingleResourceDo
   let id = externalCard.data.id as string;
   if (!id) { throw new Error(`The card ID must be supplied in the card document in order to create the card.`); }
 
+  // console.log("HERE", externalCard.data.id);
+  if (externalCard.data.id === 'local-hub::adopted-card::genx-kittens') {
+    console.log("generateInternalCardFormat", JSON.stringify(externalCard, null, 2));
+  }
   validateExternalCardFormat(externalCard);
 
   externalCard = addCardNamespacing(schema, externalCard) as SingleResourceDoc;
@@ -163,6 +166,17 @@ function generateInternalCardFormat(schema: todo, externalCard: SingleResourceDo
   let fields: ResourceIdentifierObject[] = get(externalCard, 'data.relationships.fields.data') || [];
   set(model, 'relationships.fields.data', fields);
   let version = get(externalCard, 'data.meta.version');
+
+  // if (externalCard.data.id.includes('genx-kittens')) {
+  //   debugger
+  // }
+
+
+  let adoptedFrom: ResourceIdentifierObject = get(externalCard, 'data.relationships.adopted-from.data');
+  if (adoptedFrom) {
+    set(model, 'relationships.adopted-from.data', adoptedFrom);
+  }
+
   if (version != null) {
     set(model, 'meta.version', version);
   }
@@ -195,6 +209,8 @@ function generateInternalCardFormat(schema: todo, externalCard: SingleResourceDo
       }
     }
   }
+
+  // console.log('model-is', JSON.stringify(model, null, 2));
 
   return { data: model, included: nonModelCardResources };
 }
@@ -359,7 +375,13 @@ async function deriveCardModelContentType(cardInInternalOrExternalFormat: Single
   if (!cardInInternalOrExternalFormat.data.id) { return; }
   let id = getCardId(cardInInternalOrExternalFormat.data.id);
 
+  // console.log("deriveCardModelContentType", JSON.stringify(cardInInternalOrExternalFormat, null, 2));
+
   let fields: RelationshipsWithData = {
+    // add here fields from adopted card
+    // maybe internal session here
+    // combine fields, e.g. unionBy, to keep adopted card
+     // cardServices.get(session, cardId)
     data: [{ type: 'fields', id: 'fields' }].concat(
       cardBrowserAssetFields.map(i => ({ type: 'fields', id: i})),
       get(cardInInternalOrExternalFormat, 'data.relationships.fields.data') || [],
@@ -372,6 +394,7 @@ async function deriveCardModelContentType(cardInInternalOrExternalFormat: Single
 
   // not checking field-type, as that precludes using computed relationships for meta
   // which should be allowed. this will result in adding attr fields here, but that should be harmless
+  // get includes here so fields are included todo
   let defaultIncludes = [
     'fields',
     'fields.related-types',
@@ -430,7 +453,11 @@ async function traversableRelationships(internalCard: SingleResourceDoc, getInte
 
   return uniq(allRelationships);
 }
+// Internal and external cards should have a type, even if they have the same structure, for ease of using
+// external cards have the primary content type of the json-api resource of content-type card
+// internal cards never have primary content type of type card - see isCard for example
 
+// deals with cards exiting the system, so deals with external format
 async function adaptCardCollectionToFormat(schema: todo, session: Session, internalCollection: CollectionResourceDoc, format: string, cardServices: todo) {
   let included: ResourceObject[] = [];
   let data: ResourceObject[] = [];
@@ -460,6 +487,11 @@ async function adaptCardCollectionToFormat(schema: todo, session: Session, inter
 
 async function adaptCardToFormat(schema: todo, session: Session, internalCard: SingleResourceDoc, format: string, cardServices: todo) {
   if (!internalCard.data || !internalCard.data.id) { throw new Error(`Cannot load card with missing id.`); }
+  // if (cardModel.data.id == 'local-hub::adopted-card::genx-kittens') {
+  //   debugger
+  // }
+
+  // console.log("TEST1", JSON.stringify(cardModel, null, 2));
 
   let id = internalCard.data.id;
   internalCard.data.attributes = internalCard.data.attributes || {};
@@ -673,13 +705,19 @@ function addCardNamespacing(schema: todo, externalCard: SingleResourceDoc) {
   if (!id) { return; }
 
   let resultingCard = cloneDeep(externalCard) as SingleResourceDoc;
+  if (resultingCard.data.id === 'local-hub::adopted-card::genx-kittens') {
+    console.log('addCardNamespacing before', JSON.stringify(resultingCard, null, 2));
+  }
   for (let resource of [resultingCard.data].concat(resultingCard.included || [])) {
     let isSchemaModel = schema.isSchemaType(resource.type);
+    
+    let isLikeSchema = isSchemaModel || (resource.id === 'adopted-from');
+
     if (resource.type !== 'cards' && !isCard(resource.type, resource.id)) {
       resource.type = schema.isSchemaType(resource.type) ? resource.type : `${id}${cardIdDelim}${resource.type}`;
       resource.id = `${id}${cardIdDelim}${resource.id}`;
     }
-    if (!isSchemaModel && resource.type !== 'cards') {
+    if (!isLikeSchema && resource.type !== 'cards') {
       for (let field of Object.keys(resource.attributes || {})) {
         if (!resource.attributes) { continue; }
         let fieldName = `${id}${cardIdDelim}${field}`;
@@ -689,8 +727,8 @@ function addCardNamespacing(schema: todo, externalCard: SingleResourceDoc) {
     }
     for (let field of Object.keys(resource.relationships || {})) {
       if (!resource.relationships || (resource.type === 'cards' && field === 'model')) { continue; }
-      let fieldName = isSchemaModel || resource.type === 'cards' ? field : `${id}${cardIdDelim}${field}`;
-      if (!isSchemaModel && resource.type !== 'cards') {
+      let fieldName = isLikeSchema || resource.type === 'cards' ? field : `${id}${cardIdDelim}${field}`;
+      if (!isLikeSchema && resource.type !== 'cards') {
         resource.relationships[fieldName] = resource.relationships[field];
         delete resource.relationships[field];
       }
@@ -707,6 +745,11 @@ function addCardNamespacing(schema: todo, externalCard: SingleResourceDoc) {
       }
     }
   }
+  if (resultingCard.data.id === 'local-hub::adopted-card::genx-kittens') {
+    console.log('addCardNamespacing after', JSON.stringify(resultingCard, null, 2));
+  }
+
+
 
   return resultingCard;
 }

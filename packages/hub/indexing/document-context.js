@@ -612,6 +612,7 @@ module.exports = class DocumentContext {
 
     if (isCollection) {
       for (let [index, resource] of jsonapiDoc.data.entries()) {
+
         await this._loadCardSchemaForResource(resource.type, resource.id);
         let contentType = this.schema.getType(resource.type);
         if (!contentType) { continue; }
@@ -643,6 +644,9 @@ module.exports = class DocumentContext {
       // I think processing relationships that use `link` are not working right--as
       // we are not resolving the link queries to type/id before _build() is called.
       if (!type) { return; }
+
+
+      // console.log("_build" + id, JSON.stringify(jsonapiDoc, null, 2));
 
       await this._loadCardSchemaForResource(type, id);
       let contentType = this.schema.getType(type);

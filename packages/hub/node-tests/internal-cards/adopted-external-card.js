@@ -1,52 +1,80 @@
 const JSONAPIFactory = require('@cardstack/test-support/jsonapi-factory');
 let factory = new JSONAPIFactory();
 
+
+
+
+
+{
+  "data": {
+    "id": "local-hub::adopted-card::genx-kittens",
+    "type": "cards",
+    "attributes": {
+    },
+    "relationships": {
+      "adopted-from": {
+        "data": [
+          {
+            "type": "cards",
+            "id": "local-hub::article-card::millenial-puppies"
+          }
+        ]
+      },
+      "fields": {
+        "data": [
+          {
+            "type": "fields",
+            "id": "yarn"
+          }
+        ]
+      },
+      "model": {
+        "data": {
+          "type": "local-hub::adopted-card::genx-kittens",
+          "id": "local-hub::adopted-card::genx-kittens"
+        }
+      }
+    }
+  },
+  "included": [
+    {
+      "id": "local-hub::adopted-card::genx-kittens",
+      "type": "local-hub::adopted-card::genx-kittens",
+      "attributes": {
+      },
+      "relationships": {
+        "adopted-from": {
+          "data": [
+            {
+              "type": "cards",
+              "id": "local-hub::article-card::millenial-puppies"
+            }
+          ]
+        },
+      }
+    },
+    {
+      "type": "fields",
+      "id": "yarn",
+      "attributes": {
+        "is-metadata": true,
+        "needed-when-embedded": true,
+        "field-type": "@cardstack/core-types::string"
+      },
+      "relationships": {
+      }
+    },
+  ]
+}
+
+
 // This is the internal representation of a card. Browser clients do not
 // encounter this form of a card. Look at the jsonapi tests and browser
 // tests for the structure of a card as it is known externally.
 let card = factory.getDocumentFor(
-  factory.addResource('local-hub::article-card::millenial-puppies', 'local-hub::article-card::millenial-puppies')
-    .withAttributes({
-      'isolated-template': `
-        <h1>{{this.title}}</h1>
-        <h3>By {{this.author}}</h3>
-        <ul>
-          {{#each this.tags as |tag|}}
-            <li>{{tag.id}}</li>
-          {{/each}}
-        </ul>
-        <div>{{this.body}}</div>
-      `,
-      'isolated-js': `
-        import Component from '@glimmer/component';
-        export default class ArticleIsolatedComponent extends Component {};
-      `,
-      'isolated-css': `
-        .article-card-isolated {}
-      `,
-      'embedded-template': `
-        <h3>{{this.title}}</h3>
-        <p>By {{this.author}}</p>
-      `,
-      'embedded-js': `
-        import Component from '@glimmer/component';
-        export default class ArticleEmbeddedComponent extends Component {};
-      `,
-      'embedded-css': `
-        .article-card-embedded {}
-      `,
-      'local-hub::article-card::millenial-puppies::internal-field': 'this is internal data',
-      'local-hub::article-card::millenial-puppies::title': 'The Millenial Puppy',
-      'local-hub::article-card::millenial-puppies::body': `
-        It can be difficult these days to deal with the
-        discerning tastes of the millenial puppy. In this
-        article we probe the needs and desires of millenial
-        puppies and why they love belly rubs so much.
-      `
-    })
+  factory.addResource('local-hub::adopted-card::genx-kittens', 'local-hub::adopted-card::genx-kittens')
+    .withAttributes()
     .withRelated('fields', [
-      // adopted fields use original card's id
-      // nocommit
       factory.addResource('fields', 'local-hub::article-card::millenial-puppies::title').withAttributes({
         'is-metadata': true,
         'needed-when-embedded': true,

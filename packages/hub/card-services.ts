@@ -34,7 +34,17 @@ class CardServices {
   }
 
   async create(session: Session, card: SingleResourceDoc) {
-    return await this.writers.create(session, 'cards', card);
+    // console.log("herecreate", JSON.stringify(card, null, 2));
+    let created = await this.writers.create(session, 'cards', card);
+    // console.log('donecreate');
+    let id = card.data.id;
+    let format = 'isolated';
+    let card2: SingleResourceDoc = await this.searchers.get(session, 'local-hub', id, id, { format }) as SingleResourceDoc;
+
+    // console.log("card2", JSON.stringify(card2, null, 2));
+
+
+    return created;
   }
 
   async update(session: Session, id: string, card: SingleResourceDoc) {
