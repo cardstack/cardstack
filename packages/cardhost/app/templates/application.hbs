@@ -1,6 +1,6 @@
-<div>
-  <header class="cardhost--header">
-    <h1>Card Host</h1>
+<header class="cardhost--header">
+  <div>
+    <h1><LinkTo @route="index">Card Host</LinkTo></h1>
 
     {{#cardstack-session as |session|}}
       {{#if session.isAuthenticated }}
@@ -13,6 +13,7 @@
       {{else}}
         {{#mock-login as |login|}}
           <button
+            class="cardhost-button"
             id="login-button"
             onclick={{action login "user1"}}
             data-test-cardstack="login-button"
@@ -22,7 +23,8 @@
         {{/mock-login}}
       {{/if}}
     {{/cardstack-session}}
-  </header>
-
+  </div>
+</header>
+<main class="cardhost--main">
   {{outlet}}
-</div>
+</main>
