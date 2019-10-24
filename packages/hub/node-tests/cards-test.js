@@ -1106,14 +1106,6 @@ describe('hub/card-services', function () {
                   type: 'cards', id: externalUserCard.data.id
                 }
               },
-              "adopted-from": {
-                "data": [
-                  {
-                    "type": "cards",
-                    "id": "local-hub::article-card::millenial-puppies"
-                  }
-                ]
-              },
             }
           },
           {
