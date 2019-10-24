@@ -34,7 +34,7 @@ async function run(cardsDirectory) {
   let inScope = findDependencies('@cardstack/cardhost');
   let packages = glob.sync(path.join(process.cwd(), cardsDirectory, '*', 'ember-cli-build.js')).map(p => path.dirname(p));
   for (let pkg of packages) {
-    if (inScope.find(i => i === `@cardstack/${pkg}`)) {
+    if (inScope.find(i => i === `@cardstack/${path.basename(pkg)}`)) {
       process.stdout.write(`Starting test suite for ${path.basename(pkg)}\n`);
       await testPackage(pkg);
     }
