@@ -355,7 +355,7 @@ async function getCardSchemas(schema: todo, cardInInternalOrExternalFormat: Sing
     if (!schema.isSchemaType(resource.type)) { continue; }
     schemaModels.push(resource);
   }
-  let { contentType: cardModelSchema, adoptedCard } = await deriveCardModelContentType(cardInInternalOrExternalFormat, getInternalCard) || {};
+  let { contentType: cardModelSchema, adoptedCard } = await deriveCardModelContentType(cardInInternalOrExternalFormat, getInternalCard);
   if (cardModelSchema) {
     schemaModels.push(cardModelSchema);
   }
@@ -369,7 +369,7 @@ async function getCardSchemas(schema: todo, cardInInternalOrExternalFormat: Sing
 }
 
 async function deriveCardModelContentType(cardInInternalOrExternalFormat: SingleResourceDoc, getInternalCard?: todo) {
-  if (!cardInInternalOrExternalFormat.data.id) { return; }
+  if (!cardInInternalOrExternalFormat.data.id) { return {}; }
   let id = getCardId(cardInInternalOrExternalFormat.data.id);
 
   let fields: RelationshipsWithData = {

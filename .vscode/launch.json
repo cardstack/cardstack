@@ -145,7 +145,7 @@
       "request": "launch",
       "name": "Launch Test Suite",
       "program": "${workspaceRoot}/node_modules/.bin/_mocha",
-      "console": "integratedTerminal",
+      // "console": "integratedTerminal",
       "cwd": "${workspaceRoot}",
       "env": {
         "HUB_ENVIRONMENT": "test",
