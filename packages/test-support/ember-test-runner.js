@@ -4,6 +4,7 @@ const path = require('path');
 const glob = require('glob');
 const spawn = require('child_process').spawn;
 const resolve = require('resolve');
+const findDependencies = require('./lib/find-dependencies').default;
 
 function testPackage(pkg) {
   return new Promise((res, reject) => {
@@ -30,10 +31,13 @@ function testPackage(pkg) {
 }
 
 async function run(cardsDirectory) {
+  let inScope = findDependencies('@cardstack/cardhost');
   let packages = glob.sync(path.join(process.cwd(), cardsDirectory, '*', 'ember-cli-build.js')).map(p => path.dirname(p));
   for (let pkg of packages) {
-    process.stdout.write(`Starting test suite for ${path.basename(pkg)}\n`);
-    await testPackage(pkg);
+    if (inScope.find(i => i === `@cardstack/${pkg}`)) {
+      process.stdout.write(`Starting test suite for ${path.basename(pkg)}\n`);
+      await testPackage(pkg);
+    }
   }
   process.stdout.write(`Finished all test suites\n`);
 }
