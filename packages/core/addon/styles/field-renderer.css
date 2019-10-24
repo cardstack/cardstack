@@ -11,7 +11,6 @@
   justify-content: space-between;
   width: var(--field-renderer-max-width);
   max-width: 100%;
-  padding: 20px 20px 30px;
   background-color: var(--cardhost-medium-darker-blue-gray);
   color: black;
   font-size: 16px;
@@ -22,20 +21,24 @@
 }
 
 .field-renderer--move-btn {
-  height: 18px;
-  width: 14px;
+  height: 20px;
+  width: 20px;
+  padding: 0;
+  margin: auto;
   background: none;
   /* background-image: url('/images/drag-handle-icon.svg'); */
   background-position: center;
   background-repeat: no-repeat;
-  background-size: contain;
+  background-size: 20px 20px;
   border: none;
   color: white;
 }
 
 .field-renderer--remove-btn {
-  height: 20px;
+  height: 25px;
   width: 20px;
+  padding: 0;
+  margin: auto;
   background: none;
   background-image: url('/images/trash-icon.svg');
   background-position: center;
@@ -49,8 +52,6 @@
 .schema-field-renderer {
   width: var(--field-renderer-inner-max-width);
   max-width: 100%;
-  margin: 0 auto;
-  padding: 0;
   background-color: white;
   border: none;
   border-radius: 5px;
