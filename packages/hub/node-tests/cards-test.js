@@ -1043,25 +1043,18 @@ describe('hub/card-services', function () {
         if (cardBrowserAssetFields.includes(field)) { continue; }
         delete externalArticleCard.data.attributes[field];
       }
-
+      await cardServices.create(env.session, externalArticleCard);
 
       externalUserCard = await adaptCardToFormat(await env.lookup('hub:current-schema').getSchema(), env.session, userCard, 'isolated', cardServices);
-
       for (let field of Object.keys(externalUserCard.data.attributes)) {
         if (cardBrowserAssetFields.includes(field)) { continue; }
         delete externalUserCard.data.attributes[field];
       }
       await cardServices.create(env.session, externalUserCard);
-
     });
 
 
     it('can adopt a card', async function() {
-      // console.log(JSON.stringify(externalArticleCard, null, 2))
-      let articleCard = await cardServices.create(env.session, externalArticleCard);
-
-
-
       let externalAdoptedCard = {
         "data": {
           "id": "local-hub::adopted-card::genx-kittens",
@@ -1072,7 +1065,7 @@ describe('hub/card-services', function () {
             "adopted-from": {
               "data": {
                 "type": "cards",
-                "id": "local-hub::article-card::millenial-puppies"
+                "id": externalArticleCard.data.id
               }
             },
             "fields": {
@@ -1120,14 +1113,19 @@ describe('hub/card-services', function () {
             }
           },
         ]
-      }
+      };
 
       let adoptedCard = await cardServices.create(env.session, externalAdoptedCard);
 
+      // TODO dont forget to also assert the the create response (should exactly match the get response below)
+
       let adopted = await cardServices.get(env.session, 'local-hub::adopted-card::genx-kittens', 'isolated');
+      expect(adoptedCard.data.relationships['adopted-from'].data).to.deepEqual({
+        type: 'cards',
+        id: externalArticleCard.data.id
+      });
 
       let fieldSpecs = adopted.data.relationships.fields.data.map(f => `${f.type}/${f.id}`);
-      // console.log(JSON.stringify(adopted, null, 2));
       expect(fieldSpecs).to.include("fields/yarn");
       expect(fieldSpecs).to.include("fields/title");
       expect(fieldSpecs).to.include("fields/author");
@@ -1157,7 +1155,7 @@ describe('hub/card-services', function () {
       expect(adoptedCard.data.relationships.author.data).to.deepEqual({
         type: 'cards',
         id: externalUserCard.data.id
-      })
+      });
 
       let model = adoptedCard.included.find(i => i.type === "local-hub::adopted-card::genx-kittens" && i.id === "local-hub::adopted-card::genx-kittens");
 
@@ -1168,7 +1166,7 @@ describe('hub/card-services', function () {
       expect(model.relationships.author.data).to.deepEqual({
         type: 'cards',
         id: externalUserCard.data.id
-      })
+      });
 
 
       // assertCardOnDisk();
@@ -1183,6 +1181,6 @@ describe('hub/card-services', function () {
 
     });
 
-  })
+  });
 });
 

@@ -69,13 +69,7 @@ class Writers {
       internalCard = card;
       ({ context, schema } = await this._loadInternalCardSchema(internalCard));
     } else {
-      // console.log("handleCardOperations", JSON.stringify(card, null, 2));
       ({ schema, context, internalCard } = await this._loadInternalCard(card));
-
-      // console.log('handleCardOperations', JSON.stringify(internalCard, null, 2));
-
-
-
       try {
         oldCard = await this.searchers.get(Session.INTERNAL_PRIVILEGED, 'local-hub', id, id);
       } catch (e) {
@@ -184,7 +178,8 @@ class Writers {
 
     let authorizedDocument = await context.applyReadAuthorization({ session });
     if (isCard(authorizedDocument.data.type, authorizedDocument.data.id)) {
-      return await adaptCardToFormat(schema, session, authorizedDocument, 'isolated', this._getCardServices());
+      let card = await adaptCardToFormat(schema, session, authorizedDocument, 'isolated', this._getCardServices());
+      return card;
     }
     return authorizedDocument;
   }
@@ -362,14 +357,7 @@ class Writers {
   }
 
   async _loadInternalCard(card) {
-    if (card.data.id === 'local-hub::adopted-card::genx-kittens') {
-      console.log("_loadInternalCard", JSON.stringify(card, null, 2));
-    }
-
     let internalCard = generateInternalCardFormat(await this.currentSchema.getSchema(), card);
-    if (card.data.id === 'local-hub::adopted-card::genx-kittens') {
-      console.log("_loadInternalCard after", JSON.stringify(internalCard, null, 2));
-    }
     let { schema, context } = await this._loadInternalCardSchema(internalCard);
     return { internalCard, schema, context };
   }

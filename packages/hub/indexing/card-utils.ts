@@ -155,8 +155,6 @@ function generateInternalCardFormat(schema: todo, externalCard: SingleResourceDo
 
   validateExternalCardFormat(externalCard);
 
-  let adoptedFrom: ResourceIdentifierObject = get(externalCard, 'data.relationships.adopted-from.data');
-  unset(externalCard, `data.relationships.adopted-from`);
   externalCard = addCardNamespacing(schema, externalCard) as SingleResourceDoc;
   let model: ResourceObject | undefined = (externalCard.included || []).find(i => `${i.type}/${i.id}` === `${id}/${id}`);
   if (!model) { throw new Error(`The card 'cards/${id}' is missing its card model '${id}/${id}'.`, { status: 400, source: { pointer: '/data/relationships/model/data' }}); }
@@ -165,8 +163,9 @@ function generateInternalCardFormat(schema: todo, externalCard: SingleResourceDo
   set(model, 'relationships.fields.data', fields);
   let version = get(externalCard, 'data.meta.version');
 
-  if (adoptedFrom) {
-    set(model, 'relationships.adopted-from.data', adoptedFrom);
+  let adoptedCardId: string = get(externalCard, 'data.relationships.adopted-from.data.id');
+  if (adoptedCardId) {
+    set(model, 'relationships.adopted-from.data', { type: adoptedCardId, id: adoptedCardId });
   }
 
   if (version != null) {
@@ -366,7 +365,6 @@ async function getCardSchemas(schema: todo, cardInInternalOrExternalFormat: Sing
     schemaModels = schemaModels.concat(adoptedCard.included.filter((i: ResourceObject) => fieldRefs.includes(`${i.type}/${i.id}`)));
   }
 
-  //TODO dont forget to also collect the adopted card's fields' definitions in the overall schema
   return schemaModels;
 }
 
@@ -379,8 +377,11 @@ async function deriveCardModelContentType(cardInInternalOrExternalFormat: Single
     // maybe internal session here
     // combine fields, e.g. unionBy, to keep adopted card
     // cardServices.get(session, cardId)
-    data: [{ type: 'fields', id: 'fields' }, { type: 'fields', id: 'adopted-from'} ].concat(
-      cardBrowserAssetFields.map(i => ({ type: 'fields', id: i})),
+    data: [
+      { type: 'fields', id: 'fields' },
+      { type: 'fields', id: 'adopted-from' }
+    ].concat(
+      cardBrowserAssetFields.map(i => ({ type: 'fields', id: i })),
       get(cardInInternalOrExternalFormat, 'data.relationships.fields.data') || [],
       [
         { type: 'computed-fields', id: 'metadata-field-types' },
@@ -396,6 +397,8 @@ async function deriveCardModelContentType(cardInInternalOrExternalFormat: Single
     'fields',
     'fields.related-types',
     'fields.constraints',
+    'adopted-from',
+    'adopted-from.fields',
   ];
 
   // We only need to ponder default includes when writing documents to the index, so that the
@@ -494,11 +497,6 @@ async function adaptCardCollectionToFormat(schema: todo, session: Session, inter
 
 async function adaptCardToFormat(schema: todo, session: Session, internalCard: SingleResourceDoc, format: string, cardServices: todo) {
   if (!internalCard.data || !internalCard.data.id) { throw new Error(`Cannot load card with missing id.`); }
-  // if (cardModel.data.id == 'local-hub::adopted-card::genx-kittens') {
-  //   debugger
-  // }
-
-  // console.log("TEST1", JSON.stringify(cardModel, null, 2));
 
   let id = internalCard.data.id;
   internalCard.data.attributes = internalCard.data.attributes || {};
@@ -715,13 +713,13 @@ function addCardNamespacing(schema: todo, externalCard: SingleResourceDoc) {
   for (let resource of [resultingCard.data].concat(resultingCard.included || [])) {
     let isSchemaModel = schema.isSchemaType(resource.type);
 
-    let isLikeSchema = isSchemaModel || (resource.id === 'adopted-from');
+    // let isLikeSchema = isSchemaModel || (resource.id === 'adopted-from');
 
     if (resource.type !== 'cards' && !isCard(resource.type, resource.id)) {
       resource.type = schema.isSchemaType(resource.type) ? resource.type : `${id}${cardIdDelim}${resource.type}`;
       resource.id = `${id}${cardIdDelim}${resource.id}`;
     }
-    if (!isLikeSchema && resource.type !== 'cards') {
+    if (!isSchemaModel && resource.type !== 'cards') {
       for (let field of Object.keys(resource.attributes || {})) {
         if (!resource.attributes) { continue; }
         let fieldName = `${id}${cardIdDelim}${field}`;
@@ -731,8 +729,8 @@ function addCardNamespacing(schema: todo, externalCard: SingleResourceDoc) {
     }
     for (let field of Object.keys(resource.relationships || {})) {
       if (!resource.relationships || (resource.type === 'cards' && field === 'model')) { continue; }
-      let fieldName = isLikeSchema || resource.type === 'cards' ? field : `${id}${cardIdDelim}${field}`;
-      if (!isLikeSchema && resource.type !== 'cards') {
+      let fieldName = isSchemaModel || resource.type === 'cards' || field === 'adopted-from' ? field : `${id}${cardIdDelim}${field}`;
+      if (!isSchemaModel && resource.type !== 'cards') {
         resource.relationships[fieldName] = resource.relationships[field];
         delete resource.relationships[field];
       }

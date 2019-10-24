@@ -1,3 +1,5 @@
+const { merge } = require('lodash');
+
 exports.type = '@cardstack/core-types::object';
 
 exports.compute = async function(model, { format }) {
@@ -14,6 +16,12 @@ exports.compute = async function(model, { format }) {
     let fieldName = field.id.split('::').pop();
     let fieldType = await field.getField('field-type');
     fieldTypes[fieldName] = fieldType;
+  }
+
+  let adoptedCard = await model.getRelated('adopted-from');
+  if (adoptedCard) {
+    let adoptedFields = await adoptedCard.getField(format === 'embedded' ? 'embedded-metadata-field-types': 'metadata-field-types') || {};
+    fieldTypes = merge({}, fieldTypes, adoptedFields);
   }
 
   return fieldTypes;
