@@ -1157,6 +1157,12 @@ describe('hub/card-services', function () {
 			});
 		});
 
+		it.skip("can adopt internal fields", async function() {
+		});
+
+		it.skip("can adopt computed-fields", async function() {
+		});
+
 		it.skip("can get an isolated card that uses mulitple levels of adoption", async function () {
 			// this is where a card adopts from a card, that in turn adopts from another card
 		});
