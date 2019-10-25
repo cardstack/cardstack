@@ -1127,13 +1127,16 @@ describe('hub/card-services', function () {
 
       let fieldSpecs = adopted.data.relationships.fields.data.map(f => `${f.type}/${f.id}`);
       expect(fieldSpecs).to.include("fields/yarn");
-      expect(fieldSpecs).to.include("fields/title");
-      expect(fieldSpecs).to.include("fields/author");
-      expect(fieldSpecs).to.include("fields/body");
+
+      // the adopted fields are governed by the card that defines the field's schema, and should not
+      // be present in the fields relationship of the card that is doing the adoption
+      expect(fieldSpecs).to.not.include("fields/title");
+      expect(fieldSpecs).to.not.include("fields/author");
+      expect(fieldSpecs).to.not.include("fields/body");
 
       let includedSpecs = adopted.included.map(i => `${i.type}/${i.id}`);
 
-      expect(includedSpecs).length.to.equal(2);
+      expect(includedSpecs.length).to.equal(2);
       expect(includedSpecs).to.include("local-hub::adopted-card::genx-kittens/local-hub::adopted-card::genx-kittens");
       expect(includedSpecs).to.include("fields/yarn");
       expect(includedSpecs).to.not.include("fields/title");

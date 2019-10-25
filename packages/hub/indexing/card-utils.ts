@@ -11,7 +11,17 @@ import {
   RelationshipsWithData,
   ResourceLinkage
 } from "jsonapi-typescript";
-import { set, get, uniq, uniqBy, isEqual, sortBy, cloneDeep, unset } from 'lodash';
+import {
+  set,
+  get,
+  uniq,
+  uniqBy,
+  isEqual,
+  sortBy,
+  cloneDeep,
+  unset,
+  differenceBy
+} from 'lodash';
 import logger from '@cardstack/logger';
 import { join } from "path";
 import { tmpdir } from 'os';
@@ -535,15 +545,25 @@ async function adaptCardToFormat(schema: todo, session: Session, internalCard: S
   let priviledgedCard: SingleResourceDoc | undefined;
   if (session !== Session.INTERNAL_PRIVILEGED) {
     try {
-      priviledgedCard = await cardServices.get(Session.INTERNAL_PRIVILEGED, id, 'isolated');
+      let card = await cardServices.get(Session.INTERNAL_PRIVILEGED, id, 'isolated');
+      priviledgedCard = await generateInternalCardFormat(schema, card, cardServices);
     } catch (e) {
       if (e.status !== 404) { throw e; }
     }
   }
-  if (priviledgedCard) {
-    priviledgedCard = await generateInternalCardFormat(schema, priviledgedCard, cardServices);
-  }
   priviledgedCard = priviledgedCard || internalCard;
+
+  let priviledgedAdoptedCard: SingleResourceDoc | undefined;
+  //TODO need recurse through the adopted relationships to get the family of adopted cards
+  let adoptedCardId: string = get(internalCard, 'data.relationships.adopted-from.data.id');
+  if (adoptedCardId) {
+    try {
+      let adoptedCard = await cardServices.get(Session.INTERNAL_PRIVILEGED, adoptedCardId, 'isolated');
+      priviledgedAdoptedCard = await generateInternalCardFormat(schema, adoptedCard, cardServices);
+    } catch (e) {
+      if (e.status !== 404) { throw e; }
+    }
+  }
 
   let cardSchema = await getCardSchemas(schema, priviledgedCard) || [];
   schema = await schema.applyChanges(cardSchema.map(document => ({ id:document.id, type:document.type, document })));
@@ -608,9 +628,20 @@ async function adaptCardToFormat(schema: todo, session: Session, internalCard: S
 
   if (format === 'isolated') {
     result.included = [model].concat((internalCard.included || []).filter(i => schema.isSchemaType(i.type)));
+    if (priviledgedAdoptedCard) {
+      result.included = differenceBy(
+        result.included || [],
+        priviledgedAdoptedCard.included || [],
+        (i: ResourceObject) => `${i.type}/${i.id}`
+      );
+    }
   }
 
-  for (let { id: fieldId } of (get(priviledgedCard, 'data.relationships.fields.data') || [])) {
+  // TODO need to make sure this represents the entire graph of adopted cards' fields
+  let allFields: ResourceIdentifierObject[] = (get(priviledgedCard, 'data.relationships.fields.data') || [])
+    .concat(get(priviledgedAdoptedCard, 'data.relationships.fields.data') || []);
+  for (let { id: fieldId } of allFields) {
+    let isAdoptedField = id === getCardId(fieldId)
     let { modelId: fieldName } = cardContextFromId(fieldId);
     if (!fieldName) { continue; }
     let field = schema.getRealAndComputedField(fieldId);
@@ -623,6 +654,8 @@ async function adaptCardToFormat(schema: todo, session: Session, internalCard: S
         result.data.attributes[fieldName] = fieldAttrValue;
       } else if (field.isRelationship && fieldRelValue && result.data.relationships && result.included) {
         result.data.relationships[fieldName] = { data: cloneDeep(fieldRelValue) };
+        if (isAdoptedField) { continue; } // cards are not responsible for including any adopted schema
+
         let includedResources: ResourceObject[] = [];
         if (Array.isArray(fieldRelValue)) {
           let relRefs = (fieldRelValue as ResourceIdentifierObject[]).map((i: ResourceIdentifierObject) => `${i.type}/${i.id}`);
@@ -783,21 +816,24 @@ async function addCardNamespacing(schema: todo, externalCard: SingleResourceDoc,
       // I believe the namespace for the documents that are not cards nor fields (i.e. internal models) for the relationships
       // retain the id of this card, and not the ID of the adopted card--as these internal models, despite using
       // content types that may originate from the adopted card are unique this this card and should be namespaced as such.
+      let prefix = resource.type === 'cards' ? resource.id : id;
       if (Array.isArray(linkage)) {
-        set(resource, `relationships.${fieldName}.data`, (linkage as ResourceIdentifierObject[]).map(i => ({
-          type: schema.isSchemaType(i.type) || i.type === 'cards' ? i.type : `${id}${cardIdDelim}${i.type}`,
-          id: i.type === 'cards' ?
-            i.id :
-            (
-              schema.isSchemaType(i.type) ? namespacedResourceId(cards, i.id, i.type) : `${id}${cardIdDelim}${i.id}`
-            )
-        })));
+        set(resource, `relationships.${fieldName}.data`, (linkage as ResourceIdentifierObject[]).map(i =>
+          ({
+            type: schema.isSchemaType(i.type) || i.type === 'cards' ? i.type : `${prefix}${cardIdDelim}${i.type}`,
+            id: i.type === 'cards' ?
+              i.id :
+              (
+                schema.isSchemaType(i.type) && resource.type !== 'cards' ? namespacedResourceId(cards, i.id, i.type) : `${prefix}${cardIdDelim}${i.id}`
+              )
+          })
+        ));
       } else if (linkage) {
-        let linkageType = schema.isSchemaType(linkage.type) || linkage.type === 'cards' ? linkage.type : `${id}${cardIdDelim}${linkage.type}`;
+        let linkageType = schema.isSchemaType(linkage.type) || linkage.type === 'cards' ? linkage.type : `${prefix}${cardIdDelim}${linkage.type}`;
         let linkageId = linkageType === 'cards' ?
           linkage.id :
           (
-            schema.isSchemaType(linkageType) ? namespacedResourceId(cards, linkage.id, linkageType) : `${id}${cardIdDelim}${linkage.id}`
+            schema.isSchemaType(linkageType) && resource.type !== 'cards' ? namespacedResourceId(cards, linkage.id, linkageType) : `${prefix}${cardIdDelim}${linkage.id}`
           );
         set(resource, `relationships.${fieldName}.data`, { type: linkageType, id: linkageId });
       }
