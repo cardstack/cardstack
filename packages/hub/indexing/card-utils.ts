@@ -80,7 +80,7 @@ async function loadCard(schema: todo, internalCard: SingleResourceDoc, getIntern
 
   // a searcher or indexer may be returning invalid cards, so we
   // need to make sure to validate the internal card format.
-  validateInternalCardFormat(schema, internalCard);
+  await validateInternalCardFormat(schema, internalCard, getInternalCard);
 
   await generateCardModule(internalCard);
   return await getCardSchemas(schema, internalCard, getInternalCard);
@@ -93,7 +93,7 @@ function getCardId(id: string | number | undefined) {
   return cardContextToId({ repository, packageName, cardId });
 }
 
-function validateInternalCardFormat(schema: todo, internalCard: SingleResourceDoc) {
+async function validateInternalCardFormat(schema: todo, internalCard: SingleResourceDoc, getInteralCard: todo) {
   let id = internalCard.data.id as string;
   let type = internalCard.data.type as string;
   if (!id) { throw new Error(`The card ID must be supplied in the card document`, { status: 400, source: { pointer: '/data/id' }}); }
@@ -123,9 +123,36 @@ function validateInternalCardFormat(schema: todo, internalCard: SingleResourceDo
 
   // TODO need validation for included with missing id?
   if (!internalCard.included) { return; }
-  let foreignIncludedIndex = (internalCard.included || []).findIndex(i => !isCard(i.type, i.id) && i.id != null && ((!schema.isSchemaType(i.type) && !i.type.includes(id)) || !i.id.includes(id)));
-  if (foreignIncludedIndex > -1 ) { throw new Error(`The card '${id}' contains included foreign internal models '${internalCard.included[foreignIncludedIndex].type}/${internalCard.included[foreignIncludedIndex].id}`, { status: 400, source: { pointer: `/included/${foreignIncludedIndex}`}}); }
+
+  let chain = await adoptionChain(internalCard, getInteralCard);
+
+  let foreignIncludedIndex = (internalCard.included || []).findIndex(i =>
+    !isCard(i.type, i.id) &&
+    i.id != null && (
+      (!schema.isSchemaType(i.type) && !i.type.includes(id)) ||
+      (
+        !i.id.includes(id) &&
+        !chain.some(aid => i.id != null && i.id.includes(aid))
+      )
+    )
+   );
+
+  if (foreignIncludedIndex > -1 ) {
+    throw new Error(`The card '${id}' contains included foreign internal models '${internalCard.included[foreignIncludedIndex].type}/${internalCard.included[foreignIncludedIndex].id}`, { status: 400, source: { pointer: `/included/${foreignIncludedIndex}`}});
+  }
 }
+
+async function adoptionChain(internalCard: SingleResourceDoc, getInteralCard: todo) {
+  let adoptedFromId;
+  let currentCard = internalCard;
+  let chain = [];
+
+  while (adoptedFromId = get(currentCard, 'data.relationships.adopted-from.data.id')) {
+    chain.push(adoptedFromId);
+    currentCard = await getInteralCard(adoptedFromId);
+  }
+  return chain;
+};
 
 function validateExternalCardFormat(externalCard: SingleResourceDoc) {
   let id = externalCard.data.id as string;
