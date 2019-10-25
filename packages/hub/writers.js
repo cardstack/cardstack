@@ -357,7 +357,7 @@ class Writers {
   }
 
   async _loadInternalCard(card) {
-    let internalCard = generateInternalCardFormat(await this.currentSchema.getSchema(), card);
+    let internalCard = await generateInternalCardFormat(await this.currentSchema.getSchema(), card, this._getCardServices());
     let { schema, context } = await this._loadInternalCardSchema(internalCard);
     return { internalCard, schema, context };
   }

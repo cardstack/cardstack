@@ -1054,7 +1054,7 @@ describe('hub/card-services', function () {
     });
 
 
-    it('can adopt a card', async function() {
+    it("can get a card that uses adoption in an isolated format", async function() {
       let externalAdoptedCard = {
         "data": {
           "id": "local-hub::adopted-card::genx-kittens",
@@ -1120,7 +1120,7 @@ describe('hub/card-services', function () {
       // TODO dont forget to also assert the the create response (should exactly match the get response below)
 
       let adopted = await cardServices.get(env.session, 'local-hub::adopted-card::genx-kittens', 'isolated');
-      expect(adoptedCard.data.relationships['adopted-from'].data).to.deepEqual({
+      expect(adoptedCard.data.relationships['adopted-from'].data).to.eql({
         type: 'cards',
         id: externalArticleCard.data.id
       });
@@ -1152,7 +1152,7 @@ describe('hub/card-services', function () {
       expect(adoptedCard.data.attributes.title).to.equal("GenX Kittens");
       expect(adoptedCard.data.attributes.body).to.equal("Here is the body");
 
-      expect(adoptedCard.data.relationships.author.data).to.deepEqual({
+      expect(adoptedCard.data.relationships.author.data).to.eql({
         type: 'cards',
         id: externalUserCard.data.id
       });
@@ -1163,7 +1163,7 @@ describe('hub/card-services', function () {
       expect(model.attributes.title).to.equal("GenX Kittens");
       expect(model.attributes.body).to.equal("Here is the body");
 
-      expect(model.relationships.author.data).to.deepEqual({
+      expect(model.relationships.author.data).to.eql({
         type: 'cards',
         id: externalUserCard.data.id
       });
@@ -1181,6 +1181,17 @@ describe('hub/card-services', function () {
 
     });
 
+    it.skip("can get a card that uses adoption in an embedded format", async function() {
+      // assert that the adopted fields that are not visible in the embedded format are not displayed in the resulting card
+    });
+
+    it.skip("can get a card that uses mulitple levels of adoption", async function() {
+      // this is where a card adopts from a card, that in turn adopts from another card
+    });
+
+    it.skip("can enforce read authorization on an adopted field when getting a card", async function() {
+      // Probably want to move to the read-auth tests
+    });
   });
 });
 

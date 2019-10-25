@@ -4,6 +4,8 @@
   // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
   "version": "0.2.0",
   "configurations": [
+
+
     {
       "type": "node",
       "request": "launch",
@@ -156,7 +158,7 @@
         "--timeout",
         "200000",
          "--grep",
-         "can adopt a card"
+         "can get a card that uses adoption in an isolated format"
       ]
     },
     {
