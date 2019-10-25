@@ -23,6 +23,7 @@ const foreignModelId = require('./external-cards/foreign-model-id');
 const user1Card = require('./external-cards/user1-card');
 const user2Card = require('./external-cards/user2-card');
 const doorsArticleCard = require('./external-cards/article-card');
+const genXKittens = require('./external-cards/genx-kittens');
 
 const cardsDir = join(tmpdir(), 'card_modules');
 
@@ -59,7 +60,7 @@ function assertCardOnDisk() {
   }, 'package.json is correct');
 
   browserAssets.map(file => {
-    let [ format, type ] = file.split('.');
+    let [format, type] = file.split('.');
     type = type === 'hbs' ? 'template' : type;
     let contents = readFileSync(join(cardsDir, 'local-hub', 'article-card', file), 'utf-8');
     let fieldValue = internalArticleCard.data.attributes[`${format}-${type}`].trim();
@@ -276,7 +277,7 @@ describe('hub/card-services', function () {
     });
   });
 
-  describe('writing cards', function() {
+  describe('writing cards', function () {
     let externalArticleCard, externalUserCard;
     beforeEach(async function () {
       cleanup();
@@ -298,7 +299,7 @@ describe('hub/card-services', function () {
       await cardServices.create(env.session, externalUserCard);
     });
 
-    it('can add a new card', async function() {
+    it('can add a new card', async function () {
       let card = await cardServices.create(env.session, externalArticleCard);
 
       assertCardOnDisk();
@@ -310,7 +311,7 @@ describe('hub/card-services', function () {
       assertIsolatedCardMetadata(article);
     });
 
-    it("does not allow missing card model when creating card", async function() {
+    it("does not allow missing card model when creating card", async function () {
       let missingModel = cloneDeep(externalArticleCard);
       delete missingModel.data.relationships.model;
       missingModel.included = missingModel.included.filter(i => `${i.type}/${i.id}` !== 'local-hub::article-card::millenial-puppies/local-hub::article-card::millenial-puppies');
@@ -327,7 +328,7 @@ describe('hub/card-services', function () {
       expect(error.source).to.eql({ pointer: '/data/relationships/model/data' });
     });
 
-    it("does not allow a card to be created with a model whose type does not match the card id", async function() {
+    it("does not allow a card to be created with a model whose type does not match the card id", async function () {
       let error;
       try {
         await cardServices.create(env.session, foreignModelType);
@@ -340,7 +341,7 @@ describe('hub/card-services', function () {
       expect(error.source).to.eql({ pointer: '/data/relationships/model/data' });
     });
 
-    it("does not allow a card to be created with a model specified but missing in the included resource", async function() {
+    it("does not allow a card to be created with a model specified but missing in the included resource", async function () {
       let error;
       try {
         let badArticle = cloneDeep(externalArticleCard);
@@ -355,7 +356,7 @@ describe('hub/card-services', function () {
       expect(error.source).to.eql({ pointer: '/data/relationships/model/data' });
     });
 
-    it("does not allow a card to be created with a model whose id does not match the card id", async function() {
+    it("does not allow a card to be created with a model whose id does not match the card id", async function () {
       let error;
       try {
         await cardServices.create(env.session, foreignModelId);
@@ -368,9 +369,9 @@ describe('hub/card-services', function () {
       expect(error.source).to.eql({ pointer: '/data/relationships/model/data' });
     });
 
-    it("can add a field to a card's schema", async function() {
+    it("can add a field to a card's schema", async function () {
       let card = await cardServices.create(env.session, externalArticleCard);
-      card.data.relationships.fields.data.push({ type: 'fields', id: 'editor'});
+      card.data.relationships.fields.data.push({ type: 'fields', id: 'editor' });
       card.included.push({
         type: 'fields',
         id: 'editor',
@@ -400,7 +401,7 @@ describe('hub/card-services', function () {
 
     it('can add a new related card field', async function () {
       let card = await cardServices.create(env.session, externalArticleCard);
-      card.data.relationships.fields.data.push({ type: 'fields', id: 'editor'});
+      card.data.relationships.fields.data.push({ type: 'fields', id: 'editor' });
       card.included.push({
         type: 'fields',
         id: 'editor',
@@ -443,7 +444,7 @@ describe('hub/card-services', function () {
     });
 
 
-    it("can remove a field from the card's schema", async function() {
+    it("can remove a field from the card's schema", async function () {
       let card = await cardServices.create(env.session, externalArticleCard);
       card.data.relationships.fields.data = card.data.relationships.fields.data.filter(i => i.id !== 'body');
       card.included = card.included.filter(i => i.id !== 'body');
@@ -467,7 +468,7 @@ describe('hub/card-services', function () {
       expect(fieldRelationships).to.not.include('fields/body');
     });
 
-    it("can update a card's internal model", async function() {
+    it("can update a card's internal model", async function () {
       let card = await cardServices.create(env.session, externalArticleCard);
       let internalModel = card.included.find(i => i.type = 'local-hub::article-card::millenial-puppies');
       internalModel.attributes.body = 'updated body';
@@ -485,7 +486,7 @@ describe('hub/card-services', function () {
       expect(internalModel.attributes.body).to.equal('updated body');
     });
 
-    it("does not allow missing card model when updating card", async function() {
+    it("does not allow missing card model when updating card", async function () {
       let card = await cardServices.create(env.session, externalArticleCard);
       delete card.data.relationships.model;
       card.included = card.included.filter(i => `${i.type}/${i.id}` !== 'local-hub::article-card::millenial-puppies/local-hub::article-card::millenial-puppies');
@@ -502,11 +503,11 @@ describe('hub/card-services', function () {
       expect(error.source).to.eql({ pointer: '/data/relationships/model/data' });
     });
 
-    it("can update a card's schema and a card model at the same time", async function() {
+    it("can update a card's schema and a card model at the same time", async function () {
       let card = await cardServices.create(env.session, externalArticleCard);
       let internalModel = card.included.find(i => i.type = 'local-hub::article-card::millenial-puppies');
       internalModel.attributes.editor = 'Hassan';
-      card.data.relationships.fields.data.push({ type: 'fields', id: 'editor'});
+      card.data.relationships.fields.data.push({ type: 'fields', id: 'editor' });
       card.included.push({
         type: 'fields',
         id: 'editor',
@@ -538,7 +539,7 @@ describe('hub/card-services', function () {
       expect(internalModel.attributes.editor).to.equal('Hassan');
     });
 
-    it('can delete a card', async function() {
+    it('can delete a card', async function () {
       let card = await cardServices.create(env.session, externalArticleCard);
       let { data: { meta: { version } } } = card;
       await cardServices.delete(env.session, 'local-hub::article-card::millenial-puppies', version);
@@ -552,7 +553,7 @@ describe('hub/card-services', function () {
       expect(error.status).to.equal(404);
     });
 
-    it("does not allow a card to be updated with a model whose type does not match the card id", async function() {
+    it("does not allow a card to be updated with a model whose type does not match the card id", async function () {
       let card = await cardServices.create(env.session, externalArticleCard);
       card.data.relationships.model.data.type = 'local-hub::article-card::bad';
       let internalModel = card.included.find(i => i.type = 'local-hub::article-card::millenial-puppies');
@@ -569,7 +570,7 @@ describe('hub/card-services', function () {
       expect(error.source).to.eql({ pointer: '/data/relationships/model/data' });
     });
 
-    it("does not allow a card to be updated with a model whose id does not match the card id", async function() {
+    it("does not allow a card to be updated with a model whose id does not match the card id", async function () {
       let card = await cardServices.create(env.session, externalArticleCard);
       card.data.relationships.model.data.id = 'local-hub::article-card::bad';
       let internalModel = card.included.find(i => i.type = 'local-hub::article-card::millenial-puppies');
@@ -651,20 +652,20 @@ describe('hub/card-services', function () {
       cardServices = env.lookup('hub:card-services');
     });
 
-    it(`can fashion relationship to card that didn't originally exist at the time the card was created`, async function() {
+    it(`can fashion relationship to card that didn't originally exist at the time the card was created`, async function () {
       let user1 = await cardServices.create(env.session, user1Card);
-      let model = user1.included.find(({ type, id}) => `${type}/${id}` === `${user1.data.id}/${user1.data.id}`);
+      let model = user1.included.find(({ type, id }) => `${type}/${id}` === `${user1.data.id}/${user1.data.id}`);
       expect(user1.data.relationships.friends.data).to.eql([]);
       expect(model.relationships.friends.data).to.eql([]);
 
       await cardServices.create(env.session, user2Card);
       user1 = await cardServices.get(env.session, user1Card.data.id, 'isolated');
-      model = user1.included.find(({ type, id}) => `${type}/${id}` === `${user1Card.data.id}/${user1Card.data.id}`);
+      model = user1.included.find(({ type, id }) => `${type}/${id}` === `${user1Card.data.id}/${user1Card.data.id}`);
       expect(user1.data.relationships.friends.data).to.eql([{ type: 'cards', id: user2Card.data.id }]);
       expect(model.relationships.friends.data).to.eql([{ type: 'cards', id: user2Card.data.id }]);
     });
 
-    it(`can include embedded cards that are embedded relationships of a directly related embedded card`, async function() {
+    it(`can include embedded cards that are embedded relationships of a directly related embedded card`, async function () {
       let user1 = await cardServices.create(env.session, user1Card);
       let user2 = await cardServices.create(env.session, user2Card);
       let article = await cardServices.create(env.session, doorsArticleCard);
@@ -673,8 +674,8 @@ describe('hub/card-services', function () {
       expect(includedRefs).to.include(`cards/${user1.data.id}`);
       expect(includedRefs).to.include(`cards/${user2.data.id}`);
 
-      let user1Resource = article.included.find(({ type, id}) => `${type}/${id}` === `cards/${user1.data.id}`);
-      let user2Resource = article.included.find(({ type, id}) => `${type}/${id}` === `cards/${user2.data.id}`);
+      let user1Resource = article.included.find(({ type, id }) => `${type}/${id}` === `cards/${user1.data.id}`);
+      let user2Resource = article.included.find(({ type, id }) => `${type}/${id}` === `cards/${user2.data.id}`);
 
       expect(user1Resource.attributes.name).to.equal('Van Gogh');
       expect(user1Resource.attributes.email).to.be.undefined;
@@ -682,7 +683,7 @@ describe('hub/card-services', function () {
       expect(user2Resource.attributes.email).to.be.undefined;
     });
 
-    it("can invalidate a card that has a relationship to an updated card", async function() {
+    it("can invalidate a card that has a relationship to an updated card", async function () {
       await cardServices.create(env.session, user1Card);
       let user2 = await cardServices.create(env.session, user2Card);
       await cardServices.create(env.session, doorsArticleCard);
@@ -702,7 +703,7 @@ describe('hub/card-services', function () {
     });
   });
 
-  describe('card read authorization', function() {
+  describe('card read authorization', function () {
     let allowedUser, restrictedUser;
 
     beforeEach(async function () {
@@ -711,7 +712,7 @@ describe('hub/card-services', function () {
       // Grants are set against the model content type, as that
       // is where the meta fields actually live
       factory.addResource('grants')
-        .withRelated('who', [{ type: 'groups', id: 'everyone'} ])
+        .withRelated('who', [{ type: 'groups', id: 'everyone' }])
         .withRelated('types', [
           { type: 'content-types', id: 'local-hub::article-card::millenial-puppies' }
         ])
@@ -724,7 +725,7 @@ describe('hub/card-services', function () {
         });
 
       factory.addResource('grants')
-        .withRelated('who', [ { type: 'test-users', id: 'allowed-user'} ])
+        .withRelated('who', [{ type: 'test-users', id: 'allowed-user' }])
         .withRelated('types', [
           { type: 'content-types', id: 'local-hub::article-card::millenial-puppies' }
         ])
@@ -740,7 +741,7 @@ describe('hub/card-services', function () {
         });
 
       factory.addResource('grants')
-        .withRelated('who', [ { type: 'test-users', id: 'allowed-user'} ])
+        .withRelated('who', [{ type: 'test-users', id: 'allowed-user' }])
         .withRelated('types', [
           { type: 'content-types', id: 'local-hub::user-card::van-gogh' }
         ])
@@ -994,7 +995,7 @@ describe('hub/card-services', function () {
       cardServices = env.lookup('hub:card-services');
     });
 
-    it.skip("can search for a card by an adopted field", async function() {
+    it.skip("can search for a card by an adopted field", async function () {
     });
 
     // Hassan: I'm skeptical we want to be able to return search results in the isolated format...
@@ -1028,7 +1029,7 @@ describe('hub/card-services', function () {
   });
 
 
-  describe('card adoption', function() {
+  describe('card adoption', function () {
     let externalArticleCard, externalUserCard;
     beforeEach(async function () {
       cleanup();
@@ -1053,74 +1054,20 @@ describe('hub/card-services', function () {
       await cardServices.create(env.session, externalUserCard);
     });
 
+    it("can get a card that uses adoption in an isolated format", async function () {
+      let adoptedCreateResponse = await cardServices.create(env.session, genXKittens);
+      let adopted = await cardServices.get(env.session, genXKittens.data.id, 'isolated');
+      delete adoptedCreateResponse.data.meta.source;
+      delete adopted.data.meta.source;
 
-    it("can get a card that uses adoption in an isolated format", async function() {
-      let externalAdoptedCard = {
-        "data": {
-          "id": "local-hub::adopted-card::genx-kittens",
-          "type": "cards",
-          "attributes": {
-          },
-          "relationships": {
-            "adopted-from": {
-              "data": {
-                "type": "cards",
-                "id": externalArticleCard.data.id
-              }
-            },
-            "fields": {
-              "data": [
-                {
-                  "type": "fields",
-                  "id": "yarn"
-                }
-              ]
-            },
-            "model": {
-              "data": {
-                "type": "local-hub::adopted-card::genx-kittens",
-                "id": "local-hub::adopted-card::genx-kittens"
-              }
-            }
-          }
-        },
-        "included": [
-          {
-            "id": "local-hub::adopted-card::genx-kittens",
-            "type": "local-hub::adopted-card::genx-kittens",
-            "attributes": {
-              "yarn": "wool",
-              "title": "GenX Kittens",
-              "body": "Here is the body"
-            },
-            "relationships": {
-              "author": {
-                "data": {
-                  type: 'cards', id: externalUserCard.data.id
-                }
-              },
-            }
-          },
-          {
-            "type": "fields",
-            "id": "yarn",
-            "attributes": {
-              "is-metadata": true,
-              "needed-when-embedded": true,
-              "field-type": "@cardstack/core-types::string"
-            },
-            "relationships": {
-            }
-          },
-        ]
-      };
+      // clean up empty relationship default values to make it easier to deep equals
+      for (let resource of adopted.included) {
+        if (resource.type !== 'fields') { continue; }
+        delete resource.relationships;
+      }
 
-      let adoptedCard = await cardServices.create(env.session, externalAdoptedCard);
-
-      // TODO dont forget to also assert the the create response (should exactly match the get response below)
-
-      let adopted = await cardServices.get(env.session, 'local-hub::adopted-card::genx-kittens', 'isolated');
-      expect(adoptedCard.data.relationships['adopted-from'].data).to.eql({
+      expect(adoptedCreateResponse).to.eql(adopted, 'the card returned from the create() is the same as the card returned from get()');
+      expect(adopted.data.relationships['adopted-from'].data).to.eql({
         type: 'cards',
         id: externalArticleCard.data.id
       });
@@ -1136,8 +1083,9 @@ describe('hub/card-services', function () {
 
       let includedSpecs = adopted.included.map(i => `${i.type}/${i.id}`);
 
-      expect(includedSpecs.length).to.equal(2);
-      expect(includedSpecs).to.include("local-hub::adopted-card::genx-kittens/local-hub::adopted-card::genx-kittens");
+      expect(includedSpecs.length).to.equal(3);
+      expect(includedSpecs).to.include(`${genXKittens.data.id}/${genXKittens.data.id}`);
+      expect(includedSpecs).to.include(`cards/${externalUserCard.data.id}`);
       expect(includedSpecs).to.include("fields/yarn");
       expect(includedSpecs).to.not.include("fields/title");
       expect(includedSpecs).to.not.include("fields/author");
@@ -1150,17 +1098,16 @@ describe('hub/card-services', function () {
       expect(fieldMeta.author).to.equal("@cardstack/core-types::belongs-to");
       expect(fieldMeta.body).to.equal("@cardstack/core-types::string");
 
+      expect(adopted.data.attributes.yarn).to.equal("wool");
+      expect(adopted.data.attributes.title).to.equal("GenX Kittens");
+      expect(adopted.data.attributes.body).to.equal("Here is the body");
 
-      expect(adoptedCard.data.attributes.yarn).to.equal("wool");
-      expect(adoptedCard.data.attributes.title).to.equal("GenX Kittens");
-      expect(adoptedCard.data.attributes.body).to.equal("Here is the body");
-
-      expect(adoptedCard.data.relationships.author.data).to.eql({
+      expect(adopted.data.relationships.author.data).to.eql({
         type: 'cards',
         id: externalUserCard.data.id
       });
 
-      let model = adoptedCard.included.find(i => i.type === "local-hub::adopted-card::genx-kittens" && i.id === "local-hub::adopted-card::genx-kittens");
+      let model = adopted.included.find(i => i.type === genXKittens.data.id && i.id == genXKittens.data.id);
 
       expect(model.attributes.yarn).to.equal("wool");
       expect(model.attributes.title).to.equal("GenX Kittens");
@@ -1170,29 +1117,57 @@ describe('hub/card-services', function () {
         type: 'cards',
         id: externalUserCard.data.id
       });
-
-
-      // assertCardOnDisk();
-      // assertIsolatedCardMetadata(articleCard);
-      // assertCardModels(articleCard);
-      // assertCardSchema(articleCard);
-
-      // let article = await cardServices.get(env.session, 'local-hub::article-card::millenial-puppies', 'isolated');
-      // assertIsolatedCardMetadata(article);
-
-
-
     });
 
-    it.skip("can get a card that uses adoption in an embedded format", async function() {
-      // assert that the adopted fields that are not visible in the embedded format are not displayed in the resulting card
+    it("can get a card that uses adoption in an embedded format", async function () {
+      await cardServices.create(env.session, genXKittens);
+      let adopted = await cardServices.get(env.session, genXKittens.data.id, 'embedded');
+      expect(adopted.data.relationships['adopted-from'].data).to.eql({
+        type: 'cards',
+        id: externalArticleCard.data.id
+      });
+
+      let fieldSpecs = adopted.data.relationships.fields.data.map(f => `${f.type}/${f.id}`);
+      expect(fieldSpecs).to.include("fields/yarn");
+
+      // the adopted fields are governed by the card that defines the field's schema, and should not
+      // be present in the fields relationship of the card that is doing the adoption
+      expect(fieldSpecs).to.not.include("fields/title");
+      expect(fieldSpecs).to.not.include("fields/author");
+      expect(fieldSpecs).to.not.include("fields/body");
+
+      let includedSpecs = adopted.included.map(i => `${i.type}/${i.id}`);
+      expect(includedSpecs.length).to.equal(1);
+      expect(includedSpecs).to.include(`cards/${externalUserCard.data.id}`);
+
+      let fieldMeta = adopted.data.attributes['metadata-field-types'];
+
+      expect(fieldMeta.yarn).to.equal("@cardstack/core-types::string");
+      expect(fieldMeta.title).to.equal("@cardstack/core-types::string");
+      expect(fieldMeta.author).to.equal("@cardstack/core-types::belongs-to");
+      expect(fieldMeta.body).to.be.undefined;
+
+      expect(adopted.data.attributes.yarn).to.equal("wool");
+      expect(adopted.data.attributes.title).to.equal("GenX Kittens");
+      expect(adopted.data.attributes.body).to.be.undefined;
+
+      expect(adopted.data.relationships.author.data).to.eql({
+        type: 'cards',
+        id: externalUserCard.data.id
+      });
     });
 
-    it.skip("can get a card that uses mulitple levels of adoption", async function() {
+    it.skip("can get a card that uses mulitple levels of adoption", async function () {
       // this is where a card adopts from a card, that in turn adopts from another card
     });
 
-    it.skip("can enforce read authorization on an adopted field when getting a card", async function() {
+    it.skip("can get a card that has a belongs-to relationship to a card which uses adoption", async function() {
+    });
+
+    it.skip("can get a card that has a has-many relationship to cards which use adoption", async function() {
+    });
+
+    it.skip("can enforce read authorization on an adopted field when getting a card", async function () {
       // Probably want to move to the read-auth tests
     });
   });

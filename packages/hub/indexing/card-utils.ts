@@ -157,7 +157,7 @@ async function adoptionChain(internalCard: SingleResourceDoc, getInteralCard: to
   let currentCard = internalCard;
   let chain = [];
 
-  while (adoptedFromId = get(currentCard, 'data.relationships.adopted-from.data.id')) {
+  while (adoptedFromId = get(currentCard, 'data.relationships.adopted-from.data.id')) { // eslint-disable-line no-cond-assign
     chain.push(adoptedFromId);
     currentCard = await getInteralCard(adoptedFromId);
   }
@@ -445,59 +445,65 @@ async function deriveCardModelContentType(cardInInternalOrExternalFormat: Single
   // The scnearios when you are writing to the index you'll always have a getInteralCard function.
   let adoptedCard: SingleResourceDoc | undefined;
   if (typeof getInternalCard === 'function') {
-    defaultIncludes = defaultIncludes.concat(await traversableRelationships(cardInInternalOrExternalFormat, getInternalCard, 'isolated'));
-
-    // TODO need to also recursively default includes any adopted cards schema that the adopted card uses
+    let cards: SingleResourceDoc[] = [cardInInternalOrExternalFormat];
 
     let adoptedFromCardId = get(cardInInternalOrExternalFormat, 'data.relationships.adopted-from.data.id');
     if (adoptedFromCardId) {
       adoptedCard = await getInternalCard(adoptedFromCardId);
-      if (adoptedCard && fields && Array.isArray(fields.data)) {
-        let adoptedFields = get(adoptedCard, 'data.relationships.fields.data') || [];
-        fields.data = fields.data.concat(adoptedFields);
+      if (adoptedCard) {
+        cards.push(adoptedCard); // TODO this needs to include the recursive adopted card family
+        if (fields && Array.isArray(fields.data)) {
+          let adoptedFields = get(adoptedCard, 'data.relationships.fields.data') || [];
+          fields.data = fields.data.concat(adoptedFields);
+        }
       }
     }
+
+    defaultIncludes = defaultIncludes.concat(await traversableRelationships(cards, getInternalCard, 'isolated'));
   }
 
   let modelContentType: ResourceObject = {
     id,
     type: 'content-types',
-    attributes: { 'default-includes': defaultIncludes },
+    attributes: { 'default-includes': uniq(defaultIncludes) },
     relationships: { fields }
   };
   return { contentType: modelContentType, adoptedCard };
 }
 
-async function traversableRelationships(internalCard: SingleResourceDoc, getInternalCard: todo, format: string, allRelationships: string[] = [], parentRelationship: string = '') {
-  let fields: ResourceIdentifierObject[] = (get(internalCard, 'data.relationships.fields.data') || [] as ResourceIdentifierObject[]).filter((i: ResourceIdentifierObject) => {
-    let field = (internalCard.included || []).find(j => `${j.type}/${j.id}` === `${i.type}/${i.id}`);
-    if (!field) { return; }
-    return format === 'isolated' ||
-           getCardId(field.id) === internalCard.data.id ||
-           (get(field, 'attributes.needed-when-embedded'));
-  });
+async function traversableRelationships(internalCards: SingleResourceDoc[], getInternalCard: todo, format: string, allRelationships: string[] = [], parentRelationship: string = '') {
+  for (let internalCard of internalCards) {
+    let fields: ResourceIdentifierObject[] = (get(internalCard, 'data.relationships.fields.data') || [] as ResourceIdentifierObject[]).filter((i: ResourceIdentifierObject) => {
+      let field = (internalCard.included || []).find(j => `${j.type}/${j.id}` === `${i.type}/${i.id}`);
+      if (!field) { return; }
+      return format === 'isolated' ||
+        getCardId(field.id) === internalCard.data.id ||
+        (get(field, 'attributes.needed-when-embedded'));
+    });
 
-  let recurse = async (cardId: string, field: string) => {
-    let relatedCard: SingleResourceDoc | undefined;
-    try {
-      relatedCard = await getInternalCard(cardId);
-    } catch (e) {
-      if (e.status !== 404) { throw e; }
-    }
-    if (!relatedCard) { return; }
-    await (traversableRelationships(relatedCard, getInternalCard, 'embedded', allRelationships, field));
-  };
-
-  for (let { id:field } of fields) {
-    let linkage: ResourceLinkage = get(internalCard, `data.relationships.${field}.data`);
-    if (!linkage) { continue; }
-    allRelationships.push(parentRelationship ? `${parentRelationship}.${field}` : field);
-    if (Array.isArray(linkage)) {
-      for (let { id: relatedCardId } of linkage) {
-        await recurse(relatedCardId, field);
+    let recurse = async (cardId: string, field: string) => {
+      let relatedCard: SingleResourceDoc | undefined;
+      try {
+        relatedCard = await getInternalCard(cardId);
+      } catch (e) {
+        if (e.status !== 404) { throw e; }
       }
-    } else if (linkage.id) {
-      await recurse(linkage.id, field);
+      if (!relatedCard) { return; }
+      // TODO work through how to recurse thru all the fields that the related card adopts
+      await (traversableRelationships([ relatedCard ], getInternalCard, 'embedded', allRelationships, field));
+    };
+
+    for (let { id: field } of fields) {
+      let linkage: ResourceLinkage = get(internalCard, `data.relationships.${field}.data`);
+      if (!linkage) { continue; }
+      allRelationships.push(parentRelationship ? `${parentRelationship}.${field}` : field);
+      if (Array.isArray(linkage)) {
+        for (let { id: relatedCardId } of linkage) {
+          await recurse(relatedCardId, field);
+        }
+      } else if (linkage.id) {
+        await recurse(linkage.id, field);
+      }
     }
   }
 
@@ -641,7 +647,7 @@ async function adaptCardToFormat(schema: todo, session: Session, internalCard: S
   let allFields: ResourceIdentifierObject[] = (get(priviledgedCard, 'data.relationships.fields.data') || [])
     .concat(get(priviledgedAdoptedCard, 'data.relationships.fields.data') || []);
   for (let { id: fieldId } of allFields) {
-    let isAdoptedField = id === getCardId(fieldId)
+    let isAdoptedField = id !== getCardId(fieldId);
     let { modelId: fieldName } = cardContextFromId(fieldId);
     if (!fieldName) { continue; }
     let field = schema.getRealAndComputedField(fieldId);
@@ -654,16 +660,16 @@ async function adaptCardToFormat(schema: todo, session: Session, internalCard: S
         result.data.attributes[fieldName] = fieldAttrValue;
       } else if (field.isRelationship && fieldRelValue && result.data.relationships && result.included) {
         result.data.relationships[fieldName] = { data: cloneDeep(fieldRelValue) };
-        if (isAdoptedField) { continue; } // cards are not responsible for including any adopted schema
-
         let includedResources: ResourceObject[] = [];
         if (Array.isArray(fieldRelValue)) {
+          if (isAdoptedField && fieldRelValue.some((i: ResourceIdentifierObject) => schema.isSchemaType(i.type))) { continue; } // cards are not responsible for including any adopted schema
           let relRefs = (fieldRelValue as ResourceIdentifierObject[]).map((i: ResourceIdentifierObject) => `${i.type}/${i.id}`);
           includedResources = internalCard.included ?
             internalCard.included.filter(i =>
               (isCard(i.type, i.id) ? relRefs.includes(`cards/${i.id}`) : relRefs.includes(`${i.type}/${i.id}`))
             ) : [];
         } else {
+          if (isAdoptedField && schema.isSchemaType(fieldRelValue.type)) { continue; } // cards are not responsible for including any adopted schema
           let includedResource = internalCard.included && internalCard.included.find(i =>
             fieldRelValue != null &&
             !Array.isArray(fieldRelValue) &&
@@ -720,8 +726,6 @@ function crawlEmbeddedCards(internalCard: SingleResourceDoc, embeddedCardId: str
   return uniqBy(embeddedCards, i => `${i.type}/${i.id}`);
 }
 
-// TODO in the future as part of supporting card adoption, we'll likely need to
-// preserve the namespacing of adopted card fields in the external card document
 function removeCardNamespacing(internalCard: SingleResourceDoc) {
   let id = internalCard.data.id as string;
   if (!id) { return; }
