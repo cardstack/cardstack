@@ -437,6 +437,8 @@ async function deriveCardModelContentType(cardInInternalOrExternalFormat: Single
     'adopted-from.fields',
     'adopted-from.related-types',
     'adopted-from.constraints',
+    // TODO move the adopted-from default includes into the traversable relationships...
+    // 'adopted-from.adopted-from.adopted-from.adopted-from.adopted-from'...
   ];
 
   // We only need to ponder default includes when writing documents to the index, so that the
@@ -459,6 +461,8 @@ async function deriveCardModelContentType(cardInInternalOrExternalFormat: Single
       }
     }
 
+    // TODO I think we can consolidate the reads of adopted cards to happen in the traversable relationships function
+    // consider using that for all your adopted card reading needs...
     defaultIncludes = defaultIncludes.concat(await traversableRelationships(cards, getInternalCard, 'isolated'));
   }
 
@@ -560,7 +564,8 @@ async function adaptCardToFormat(schema: todo, session: Session, internalCard: S
   priviledgedCard = priviledgedCard || internalCard;
 
   let priviledgedAdoptedCard: SingleResourceDoc | undefined;
-  //TODO need recurse through the adopted relationships to get the family of adopted cards
+  // TODO need recurse through the adopted relationships to get the family of adopted cards
+  // TODO let's avoid having to read adopted cards out of the index by default including them (in fact I think we are already doing that)
   let adoptedCardId: string = get(internalCard, 'data.relationships.adopted-from.data.id');
   if (adoptedCardId) {
     try {
