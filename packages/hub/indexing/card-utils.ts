@@ -20,7 +20,6 @@ import {
   sortBy,
   cloneDeep,
   unset,
-  differenceBy
 } from 'lodash';
 import logger from '@cardstack/logger';
 import { join } from "path";
@@ -103,7 +102,7 @@ function getCardId(id: string | number | undefined) {
   return cardContextToId({ repository, packageName, cardId });
 }
 
-async function validateInternalCardFormat(schema: todo, internalCard: SingleResourceDoc, getInteralCard: todo) {
+async function validateInternalCardFormat(schema: todo, internalCard: SingleResourceDoc, getInternalCard: todo) {
   let id = internalCard.data.id as string;
   let type = internalCard.data.type as string;
   if (!id) { throw new Error(`The card ID must be supplied in the card document`, { status: 400, source: { pointer: '/data/id' }}); }
@@ -134,15 +133,14 @@ async function validateInternalCardFormat(schema: todo, internalCard: SingleReso
   // TODO need validation for included with missing id?
   if (!internalCard.included) { return; }
 
-  let chain = await adoptionChain(internalCard, getInteralCard);
-
+  let chain = (await adoptionChain(internalCard, getInternalCard)).map((i: SingleResourceDoc) => i.data.id).filter(Boolean);
   let foreignIncludedIndex = (internalCard.included || []).findIndex(i =>
     !isCard(i.type, i.id) &&
     i.id != null && (
       (!schema.isSchemaType(i.type) && !i.type.includes(id)) ||
       (
         !i.id.includes(id) &&
-        !chain.some(aid => i.id != null && i.id.includes(aid))
+        !chain.some(aid => i.id != null && aid != null && i.id.includes(aid))
       )
     )
   );
@@ -152,14 +150,17 @@ async function validateInternalCardFormat(schema: todo, internalCard: SingleReso
   }
 }
 
-async function adoptionChain(internalCard: SingleResourceDoc, getInteralCard: todo) {
-  let adoptedFromId;
-  let currentCard = internalCard;
-  let chain = [];
+// TODO when we resolve browser assets, traverse the adoption chain from first index to last index
+// searching for a card that specifes a browser asset--the inheritance order is such that the first
+// item is the direct parent, and the last item is the most remote ancestor.
+async function adoptionChain(cardInInternalOrExternalFormat: SingleResourceDoc, getInternalCard: todo) {
+  let adoptedFromId: string;
+  let currentCard = cardInInternalOrExternalFormat;
+  let chain: SingleResourceDoc[] = [];
 
   while (adoptedFromId = get(currentCard, 'data.relationships.adopted-from.data.id')) { // eslint-disable-line no-cond-assign
-    chain.push(adoptedFromId);
-    currentCard = await getInteralCard(adoptedFromId);
+    currentCard = await getInternalCard(adoptedFromId);
+    chain.push(currentCard);
   }
   return chain;
 }
@@ -186,13 +187,13 @@ function validateExternalCardFormat(externalCard: SingleResourceDoc) {
   }
 }
 
-async function generateInternalCardFormat(schema: todo, externalCard: SingleResourceDoc, cardServices: todo) {
+async function generateInternalCardFormat(schema: todo, externalCard: SingleResourceDoc, searchers: todo) {
   let id = externalCard.data.id as string;
   if (!id) { throw new Error(`The card ID must be supplied in the card document in order to create the card.`); }
 
   validateExternalCardFormat(externalCard);
 
-  externalCard = await addCardNamespacing(schema, externalCard, cardServices) as SingleResourceDoc;
+  externalCard = await addCardNamespacing(schema, externalCard, searchers) as SingleResourceDoc;
   let model: ResourceObject | undefined = (externalCard.included || []).find(i => `${i.type}/${i.id}` === `${id}/${id}`);
   if (!model) { throw new Error(`The card 'cards/${id}' is missing its card model '${id}/${id}'.`, { status: 400, source: { pointer: '/data/relationships/model/data' }}); }
 
@@ -237,8 +238,6 @@ async function generateInternalCardFormat(schema: todo, externalCard: SingleReso
       }
     }
   }
-
-  // console.log('model-is', JSON.stringify(model, null, 2));
 
   return { data: model, included: nonModelCardResources };
 }
@@ -392,16 +391,18 @@ async function getCardSchemas(schema: todo, cardInInternalOrExternalFormat: Sing
     if (!schema.isSchemaType(resource.type)) { continue; }
     schemaModels.push(resource);
   }
-  let { contentType: cardModelSchema, adoptedCard } = await deriveCardModelContentType(cardInInternalOrExternalFormat, getInternalCard);
+  let { contentType: cardModelSchema, adoptedCards=[] } = await deriveCardModelContentType(cardInInternalOrExternalFormat, getInternalCard);
   if (cardModelSchema) {
     schemaModels.push(cardModelSchema);
   }
 
-  if (adoptedCard && adoptedCard.included) {
-    schemaModels = schemaModels.concat(adoptedCard.included.filter((i: ResourceObject) => schema.isSchemaType(i.type)));
+  for (let adoptedCard of adoptedCards) {
+    if (adoptedCard && adoptedCard.included) {
+      schemaModels = schemaModels.concat(adoptedCard.included.filter((i: ResourceObject) => schema.isSchemaType(i.type)));
+    }
   }
 
-  return schemaModels;
+  return uniqBy(schemaModels, (i: ResourceObject) => `${i.type}/${i.id}`);
 }
 
 async function deriveCardModelContentType(cardInInternalOrExternalFormat: SingleResourceDoc, getInternalCard?: todo) {
@@ -409,10 +410,6 @@ async function deriveCardModelContentType(cardInInternalOrExternalFormat: Single
   let id = getCardId(cardInInternalOrExternalFormat.data.id);
 
   let fields: RelationshipsWithData = {
-    // add here fields from adopted card
-    // maybe internal session here
-    // combine fields, e.g. unionBy, to keep adopted card
-    // cardServices.get(session, cardId)
     data: [
       { type: 'fields', id: 'fields' },
       { type: 'fields', id: 'adopted-from' }
@@ -430,39 +427,53 @@ async function deriveCardModelContentType(cardInInternalOrExternalFormat: Single
   // which should be allowed. this will result in adding attr fields here, but that should be harmless
   // get includes here so fields are included todo
   let defaultIncludes = [
+    // TODO instead of hardcoding this, let's actually crawl the `fields`
+    // resources to see what all relationships it has, as the related-types
+    // content types may have fields of its own...
     'fields',
-    'fields.related-types',
     'fields.constraints',
-    'adopted-from',
-    'adopted-from.fields',
-    'adopted-from.related-types',
-    'adopted-from.constraints',
-    // TODO move the adopted-from default includes into the traversable relationships...
-    // 'adopted-from.adopted-from.adopted-from.adopted-from.adopted-from'...
+    'fields.related-types',
+    'fields.related-types.fields',
   ];
 
   // We only need to ponder default includes when writing documents to the index, so that the
   // index has the correct default includes. when returning docs (aka running them through adaptToFormat)
   // there is no need to worry about default includes, as that will already have been taken into account.
-  // The scnearios when you are writing to the index you'll always have a getInteralCard function.
-  let adoptedCard: SingleResourceDoc | undefined;
+  // The scnearios when you are writing to the index you'll always have a getInternalCard function.
+  let adoptedCards: SingleResourceDoc[] = [];
   if (typeof getInternalCard === 'function') {
-    let cards: SingleResourceDoc[] = [cardInInternalOrExternalFormat];
-
-    let adoptedFromCardId = get(cardInInternalOrExternalFormat, 'data.relationships.adopted-from.data.id');
-    if (adoptedFromCardId) {
-      adoptedCard = await getInternalCard(adoptedFromCardId);
-      if (adoptedCard) {
-        cards.push(adoptedCard); // TODO this needs to include the recursive adopted card family
-        if (fields && Array.isArray(fields.data)) {
-          let adoptedFields = get(adoptedCard, 'data.relationships.fields.data') || [];
-          fields.data = fields.data.concat(adoptedFields);
-        }
+    adoptedCards = await adoptionChain(cardInInternalOrExternalFormat, getInternalCard);
+    let adoptedCardsIncludesPaths = adoptedCards.reduce((paths: string[]) => {
+      let currentPath: string[] = [];
+      if (paths.length) {
+        currentPath.push(paths[paths.length - 1]);
       }
-    }
+      currentPath.push('adopted-from');
+      if (Array.isArray(paths)) {
+        // TODO instead of hardcoding these paths we should crawl the adopted cards' fields' relationships
+        paths.push(`${currentPath.join('.')}.fields`);
+        paths.push(`${currentPath.join('.')}.fields.contraints`);
+        paths.push(`${currentPath.join('.')}.fields.related-types`);
+        paths.push(`${currentPath.join('.')}.fields.related-types.fields`);
 
-    // TODO I think we can consolidate the reads of adopted cards to happen in the traversable relationships function
-    // consider using that for all your adopted card reading needs...
+        paths.push(currentPath.join('.'));
+      }
+      return paths;
+    }, []);
+    defaultIncludes.push(...adoptedCardsIncludesPaths);
+
+    let cards: SingleResourceDoc[] = [
+      cardInInternalOrExternalFormat,
+      ...adoptedCards
+    ];
+    let inheritedFields = adoptedCards.reduce((adoptedFields: ResourceIdentifierObject[], card: SingleResourceDoc) => {
+      adoptedFields = adoptedFields.concat(get(card, 'data.relationships.fields.data') || []);
+      return adoptedFields;
+    }, []);
+
+    if (fields && Array.isArray(fields.data)) {
+      (fields.data as ResourceIdentifierObject[]).push(...inheritedFields);
+    }
     defaultIncludes = defaultIncludes.concat(await traversableRelationships(cards, getInternalCard, 'isolated'));
   }
 
@@ -472,7 +483,7 @@ async function deriveCardModelContentType(cardInInternalOrExternalFormat: Single
     attributes: { 'default-includes': uniq(defaultIncludes) },
     relationships: { fields }
   };
-  return { contentType: modelContentType, adoptedCard };
+  return { contentType: modelContentType, adoptedCards };
 }
 
 async function traversableRelationships(internalCards: SingleResourceDoc[], getInternalCard: todo, format: string, allRelationships: string[] = [], parentRelationship: string = '') {
@@ -493,8 +504,9 @@ async function traversableRelationships(internalCards: SingleResourceDoc[], getI
         if (e.status !== 404) { throw e; }
       }
       if (!relatedCard) { return; }
-      // TODO work through how to recurse thru all the fields that the related card adopts
-      await (traversableRelationships([ relatedCard ], getInternalCard, 'embedded', allRelationships, field));
+
+      let relatedAdoptionChain = await adoptionChain(relatedCard, getInternalCard);
+      await (traversableRelationships([ relatedCard, ...relatedAdoptionChain ], getInternalCard, 'embedded', allRelationships, field));
     };
 
     for (let { id: field } of fields) {
@@ -518,7 +530,7 @@ async function traversableRelationships(internalCards: SingleResourceDoc[], getI
 // internal cards never have primary content type of type card - see isCard for example
 
 // deals with cards exiting the system, so deals with external format
-async function adaptCardCollectionToFormat(schema: todo, session: Session, internalCollection: CollectionResourceDoc, format: string, cardServices: todo) {
+async function adaptCardCollectionToFormat(schema: todo, session: Session, internalCollection: CollectionResourceDoc, format: string, searchers: todo) {
   let included: ResourceObject[] = [];
   let data: ResourceObject[] = [];
   for (let resource of internalCollection.data) {
@@ -526,7 +538,7 @@ async function adaptCardCollectionToFormat(schema: todo, session: Session, inter
       data.push(resource);
       continue;
     }
-    let { data:cardResource, included:cardIncluded = [] } = await adaptCardToFormat(schema, session, { data: resource, included: internalCollection.included }, format, cardServices);
+    let { data:cardResource, included:cardIncluded = [] } = await adaptCardToFormat(schema, session, { data: resource, included: internalCollection.included }, format, searchers);
     included = included.concat(cardIncluded);
     data.push(cardResource);
   }
@@ -545,7 +557,7 @@ async function adaptCardCollectionToFormat(schema: todo, session: Session, inter
   return document;
 }
 
-async function adaptCardToFormat(schema: todo, session: Session, internalCard: SingleResourceDoc, format: string, cardServices: todo) {
+async function adaptCardToFormat(schema: todo, session: Session, internalCard: SingleResourceDoc, format: string, searchers: todo) {
   if (!internalCard.data || !internalCard.data.id) { throw new Error(`Cannot load card with missing id.`); }
 
   let id = internalCard.data.id;
@@ -555,25 +567,21 @@ async function adaptCardToFormat(schema: todo, session: Session, internalCard: S
   let priviledgedCard: SingleResourceDoc | undefined;
   if (session !== Session.INTERNAL_PRIVILEGED) {
     try {
-      let card = await cardServices.get(Session.INTERNAL_PRIVILEGED, id, 'isolated');
-      priviledgedCard = await generateInternalCardFormat(schema, card, cardServices);
+      priviledgedCard = await searchers.get(Session.INTERNAL_PRIVILEGED, 'local-hub', id, id);
     } catch (e) {
       if (e.status !== 404) { throw e; }
     }
   }
   priviledgedCard = priviledgedCard || internalCard;
 
-  let priviledgedAdoptedCard: SingleResourceDoc | undefined;
-  // TODO need recurse through the adopted relationships to get the family of adopted cards
-  // TODO let's avoid having to read adopted cards out of the index by default including them (in fact I think we are already doing that)
-  let adoptedCardId: string = get(internalCard, 'data.relationships.adopted-from.data.id');
-  if (adoptedCardId) {
-    try {
-      let adoptedCard = await cardServices.get(Session.INTERNAL_PRIVILEGED, adoptedCardId, 'isolated');
-      priviledgedAdoptedCard = await generateInternalCardFormat(schema, adoptedCard, cardServices);
-    } catch (e) {
-      if (e.status !== 404) { throw e; }
-    }
+  let priviledgedAdoptedCardResources: ResourceObject[] = [];
+  let currentAdoptedCardId: string;
+  let currentPriviledgedCardResource: ResourceObject = priviledgedCard.data;
+  while (currentAdoptedCardId = get(currentPriviledgedCardResource, 'relationships.adopted-from.data.id')) { // eslint-disable-line no-cond-assign
+    let adoptedCardResource: ResourceObject | undefined = (priviledgedCard.included || []).find(i => `${i.type}/${i.id}` === `${currentAdoptedCardId}/${currentAdoptedCardId}`);
+    if (!adoptedCardResource) { throw new Error(`Couldn't find adopted card '${currentAdoptedCardId}' in the included resources of the card '${id}'--make sure default-includes is working correctly.`); }
+    priviledgedAdoptedCardResources.push(adoptedCardResource);
+    currentPriviledgedCardResource = adoptedCardResource;
   }
 
   let cardSchema = await getCardSchemas(schema, priviledgedCard) || [];
@@ -638,19 +646,15 @@ async function adaptCardToFormat(schema: todo, session: Session, internalCard: S
   };
 
   if (format === 'isolated') {
-    result.included = [model].concat((internalCard.included || []).filter(i => schema.isSchemaType(i.type)));
-    if (priviledgedAdoptedCard) {
-      result.included = differenceBy(
-        result.included || [],
-        priviledgedAdoptedCard.included || [],
-        (i: ResourceObject) => `${i.type}/${i.id}`
-      );
-    }
+    result.included = [model].concat((internalCard.included || [])
+      .filter(i => schema.isSchemaType(i.type) && getCardId(i.id) === id));
   }
 
-  // TODO need to make sure this represents the entire graph of adopted cards' fields
   let allFields: ResourceIdentifierObject[] = (get(priviledgedCard, 'data.relationships.fields.data') || [])
-    .concat(get(priviledgedAdoptedCard, 'data.relationships.fields.data') || []);
+    .concat(priviledgedAdoptedCardResources.reduce((adoptedFields: ResourceIdentifierObject[], cardResource: ResourceObject ) => {
+      adoptedFields = adoptedFields.concat(get(cardResource, 'relationships.fields.data') || []);
+      return adoptedFields;
+    }, []));
   for (let { id: fieldId } of allFields) {
     let isAdoptedField = id !== getCardId(fieldId);
     let { modelId: fieldName } = cardContextFromId(fieldId);
@@ -782,21 +786,21 @@ function removeCardNamespacing(internalCard: SingleResourceDoc) {
   return resultingCard;
 }
 
-async function addCardNamespacing(schema: todo, externalCard: SingleResourceDoc, cardServices: todo) {
+async function addCardNamespacing(schema: todo, externalCard: SingleResourceDoc, searchers: todo) {
   let id = getCardId(externalCard.data.id);
   if (!id) { return; }
 
-  // TODO ultimately we need a recusive graph of the adopted card heirarchy--not just a single level
-  let cards: SingleResourceDoc[] = [ externalCard ];
-  let adoptedCardId: string = get(externalCard, 'data.relationships.adopted-from.data.id');
-  if (adoptedCardId) {
+  let getInternalCard = async (id: string) => {
+    let internalCard: SingleResourceDoc | undefined;
     try {
-      let adoptedCard: SingleResourceDoc = await cardServices.get(Session.INTERNAL_PRIVILEGED, adoptedCardId, 'isolated');
-      cards.push(adoptedCard);
+      internalCard = await searchers.get(Session.INTERNAL_PRIVILEGED, 'local-hub', id, id);
     } catch (e) {
       if (e.status !== 404) { throw e; }
     }
-  }
+    return internalCard;
+  };
+
+  let cards: SingleResourceDoc[] = [ externalCard, ... await adoptionChain(externalCard, getInternalCard) ];
 
   let resultingCard = cloneDeep(externalCard) as SingleResourceDoc;
   for (let resource of [resultingCard.data].concat(resultingCard.included || [])) {
@@ -809,14 +813,14 @@ async function addCardNamespacing(schema: todo, externalCard: SingleResourceDoc,
     if (!isSchemaModel && resource.type !== 'cards') {
       for (let field of Object.keys(resource.attributes || {})) {
         if (!resource.attributes) { continue; }
-        let fieldName = namespacedResourceId(cards, field);//`${id}${cardIdDelim}${field}`;
+        let fieldName = namespacedResourceId(cards, field);
         resource.attributes[fieldName] = resource.attributes[field];
         delete resource.attributes[field];
       }
     }
     for (let field of Object.keys(resource.relationships || {})) {
       if (!resource.relationships || (resource.type === 'cards' && field === 'model')) { continue; }
-      let fieldName = isSchemaModel || resource.type === 'cards' || field === 'adopted-from' ? field : namespacedResourceId(cards, field); //`${id}${cardIdDelim}${field}`;
+      let fieldName = isSchemaModel || resource.type === 'cards' || field === 'adopted-from' ? field : namespacedResourceId(cards, field);
       if (!isSchemaModel && resource.type !== 'cards') {
         resource.relationships[fieldName] = resource.relationships[field];
         delete resource.relationships[field];
@@ -852,15 +856,22 @@ async function addCardNamespacing(schema: todo, externalCard: SingleResourceDoc,
   return resultingCard;
 }
 
-function namespacedResourceId(externalCards: SingleResourceDoc[], id: string, type?: string) {
-  for (let card of externalCards) {
+function namespacedResourceId(internalAndExternalCards: SingleResourceDoc[], id: string, type?: string) {
+  for (let card of internalAndExternalCards) {
     if (type) {
-      let includedRefs: string[] = (card.included || []).map((i: ResourceObject) => `${i.type}/${i.id}`);
+      let includedRefs: string[] = (card.included || []).map((i: ResourceObject) => {
+        if (!i.id) { return; }
+        let { modelId } = cardContextFromId(i.id);
+        return `${i.type}/${modelId || i.id}`;
+      }).filter(Boolean) as string[];
+
       if (includedRefs.includes(`${type}/${id}`)) {
         return `${card.data.id}${cardIdDelim}${id}`;
       }
     } else {
-      let includedRefs: string[] = (get(card, 'data.relationships.fields.data') || []).map((i: ResourceIdentifierObject) => `${i.id}`);
+      let includedRefs: string[] = (get(card, 'data.relationships.fields.data') || [])
+        .map((i: ResourceIdentifierObject) => cardContextFromId(i.id).modelId || i.id)
+        .filter(Boolean);
       if (includedRefs.includes(id)) {
         return `${card.data.id}${cardIdDelim}${id}`;
       }
@@ -868,9 +879,9 @@ function namespacedResourceId(externalCards: SingleResourceDoc[], id: string, ty
   }
 
   if (type) {
-    throw new Error(`Cannot determine the namespace for the resource '${type}/${id}' using cards: '${externalCards.map(i => i.data.id).join(', ')}'`);
+    throw new Error(`Cannot determine the namespace for the resource '${type}/${id}' using cards: '${internalAndExternalCards.map(i => i.data.id).join(', ')}'`);
   } else {
-    throw new Error(`Cannot determine the namespace for the field '${id}' using cards: '${externalCards.map(i => i.data.id).join(', ')}'`);
+    throw new Error(`Cannot determine the namespace for the field '${id}' using cards: '${internalAndExternalCards.map(i => i.data.id).join(', ')}'`);
   }
 }
 

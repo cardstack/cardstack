@@ -25,26 +25,16 @@ class CardServices {
 
   async get(session: Session, id: string, format: string) {
     let card: SingleResourceDoc = await this.searchers.get(session, 'local-hub', id, id, { format }) as SingleResourceDoc;
-    return await adaptCardToFormat(await this.currentSchema.getSchema(), session, card, format, this);
+    return await adaptCardToFormat(await this.currentSchema.getSchema(), session, card, format, this.searchers);
   }
 
   async search(session: Session, format: string, query: todo) {
     let cards: CollectionResourceDoc = await this.searchers.search(session, query, { format }) as CollectionResourceDoc;
-    return await adaptCardCollectionToFormat(await this.currentSchema.getSchema(), session, cards, format, this);
+    return await adaptCardCollectionToFormat(await this.currentSchema.getSchema(), session, cards, format, this.searchers);
   }
 
   async create(session: Session, card: SingleResourceDoc) {
-    // console.log("herecreate", JSON.stringify(card, null, 2));
-    let created = await this.writers.create(session, 'cards', card);
-    // console.log('donecreate');
-    let id = card.data.id;
-    let format = 'isolated';
-    let card2: SingleResourceDoc = await this.searchers.get(session, 'local-hub', id, id, { format }) as SingleResourceDoc;
-
-    // console.log("card2", JSON.stringify(card2, null, 2));
-
-
-    return created;
+    return await this.writers.create(session, 'cards', card);
   }
 
   async update(session: Session, id: string, card: SingleResourceDoc) {
