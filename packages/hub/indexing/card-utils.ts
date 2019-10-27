@@ -150,9 +150,6 @@ async function validateInternalCardFormat(schema: todo, internalCard: SingleReso
   }
 }
 
-// TODO when we resolve browser assets, traverse the adoption chain from first index to last index
-// searching for a card that specifes a browser asset--the inheritance order is such that the first
-// item is the direct parent, and the last item is the most remote ancestor.
 async function adoptionChain(cardInInternalOrExternalFormat: SingleResourceDoc, getInternalCard: todo) {
   let adoptedFromId: string;
   let currentCard = cardInInternalOrExternalFormat;
@@ -609,7 +606,14 @@ async function adaptCardToFormat(schema: todo, session: Session, internalCard: S
   let attributes: AttributesObject = {};
   for (let attr of Object.keys(get(priviledgedCard, 'data.attributes') || {})) {
     if (cardBrowserAssetFields.concat([metadataFieldTypesField]).includes(attr) && result.data.attributes) {
-      result.data.attributes[attr] = get(priviledgedCard, `data.attributes.${attr}`);
+      let value = get(priviledgedCard, `data.attributes.${attr}`);
+      if (!value && attr !== metadataFieldTypesField) {
+        for (let adoptedCardResource of priviledgedAdoptedCardResources) {
+          value = get(adoptedCardResource, `attributes.${attr}`);
+          if (value) { break; }
+        }
+      }
+      result.data.attributes[attr] = value;
     }
   }
   for (let attr of

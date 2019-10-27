@@ -1138,14 +1138,6 @@ describe('hub/card-services', function () {
       // it's fine to just add this assertion into the existing isolated and embedded tests for adopted cards
     });
 
-    it.skip("can adopt browser assets", async function () {
-      // how we handle browser assets is different than how we handle fields, in that browser assets
-      // (islated-js, isolated-template, isolated-css, embedded-js, etc) follows true inheritance,
-      // where a card is allowed to override a browser asset. If the card specifies no browser asset,
-      // then the nearest adopted card's browser asset (in the chain of adopted cards) should be incuded
-      // in the response for the card.
-    });
-
     it("can get an isolated card that uses mulitple levels of adoption", async function () {
       await cardServices.create(env.session, genXKittens);
       let adoptedCreateResponse = await cardServices.create(env.session, genZHamsters);
@@ -1213,10 +1205,22 @@ describe('hub/card-services', function () {
         id: externalUserCard.data.id
       });
 
+      expect(adopted.data.attributes['isolated-template']).to.match(/<div>{{this.body}}<\/div>/);
+      expect(adopted.data.attributes['isolated-js']).to.match(/export default class ArticleIsolatedComponent/);
+      expect(adopted.data.attributes['isolated-css']).to.match(/\.article-card-isolated {}/);
+      expect(adopted.data.attributes['embedded-template']).to.match(/<h3>{{this.title}}<\/h3>/);
+      expect(adopted.data.attributes['embedded-js']).to.match(/export default class ArticleEmbeddedComponent/);
+      expect(adopted.data.attributes['embedded-css']).to.match(/\.article-card-embedded {}/);
     });
 
     it.skip("can get an embedded card that uses mulitple levels of adoption", async function () {
       // this is where a card adopts from a card, that in turn adopts from another card
+    });
+
+    it.skip("can override adopted browser assets", async function () {
+      // how we handle browser assets is different than how we handle fields, in that browser assets
+      // (islated-js, isolated-template, isolated-css, embedded-js, etc) follows normal inheritance,
+      // where a card is allowed to override a browser asset.
     });
 
     it.skip("can get a card that has a belongs-to relationship to a card which uses adoption", async function () {
