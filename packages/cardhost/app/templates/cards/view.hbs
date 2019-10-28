@@ -1,22 +1,23 @@
-<h2 data-test-card-view={{this.model.id}}>View Card</h2>
-
-<div>
-  <LinkTo @route="cards.schema" @model={{this.model}}>
-    Update Schema
-  </LinkTo>
-</div>
-<div>
-  <LinkTo @route="cards.edit" @model={{this.model}}>
-    Edit Card
-  </LinkTo>
-</div>
+<CardhostTopEdge>
+  <div class="cards-view-header">
+    <h2 data-test-card-view={{this.model.id}}>View Card</h2>
+    <div class="cards-view-header--buttons">
+      <LinkTo @route="cards.schema" @model={{this.model}} @class="cardhost-button secondary">
+        Update Schema
+      </LinkTo>
+      <LinkTo @route="cards.edit" @model={{this.model}} @class="cardhost-button secondary">
+        Edit Card
+      </LinkTo>
+    </div>
+  </div>
+</CardhostTopEdge>
 
 <CardRenderer @card={{this.model}} @format="isolated"/>
 
-<br>
-
-<h3>Card Document:</h3>
-<CodeBlock
-  @code={{this.cardJson}}
-  @language="javascript"
-/>
+<section class="cardhost-card-document">
+  <h3>Card Document</h3>
+  <CodeBlock
+    @code={{this.cardJson}}
+    @language="javascript"
+  />
+</section>

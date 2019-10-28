@@ -2,8 +2,6 @@
   <div><strong>{{this.statusMsg}}</strong></div>
 {{/if}}
 
-<br>
-
 <div class="card-editor--field-btn-wrapper">
   {{#unless this.cardstackSession.isAuthenticated}}
     (Must be logged in to modify the card.)
@@ -30,6 +28,7 @@
     Save Card
   </button>
 </div>
+
 <CardRenderer
   @card={{this.card}}
   @mode="edit"
@@ -37,11 +36,10 @@
   @format="isolated"
 />
 
-
-<br>
-
-<h3>Card Document:</h3>
-<CodeBlock
-  @code={{this.cardJson}}
-  @language="javascript"
-/>
+<section class="cardhost-card-document">
+  <h3>Card Document:</h3>
+  <CodeBlock
+    @code={{this.cardJson}}
+    @language="javascript"
+  />
+</section>

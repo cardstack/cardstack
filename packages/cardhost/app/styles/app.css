@@ -1,13 +1,23 @@
 @import '/assets/fonts.css';
 @import '/assets/palette.css';
+
 @import '/assets/components/card-manipulator.css';
+@import '/assets/components/cardhost-left-edge.css';
+@import '/assets/components/cardhost-top-edge.css';
 
 :root {
   --cardhost-font-family: "Open Sans", Roboto, "Helvetica Neue", Helvetica, Arial, sans-serif;
   --cardhost-container-min-height: 1000px;
   --cardhost-container-max-width: 1440px;
-  --cardhost-left-edge-width: 410px;
-  --cardhost-right-edge-width: 300px;
+
+  --cardhost-left-edge-navbar-width: 80px;
+  --cardhost-left-edge-panel-width: 330px;
+  --cardhost-right-edge-panel-width: 300px;
+  --cardhost-top-edge-height: 80px;
+  --cardhost-header-height: 70px;
+  --cardhost-edges-z-index: 10;
+
+  --cardhost-left-edge-width: var(--cardhost-left-edge-navbar-width);
 }
 
 * {
@@ -47,48 +57,54 @@ button:not(:disabled):hover {
   color: inherit;
 }
 
-.cardhost--main {
-  position: relative;
-  max-width: var(--cardhost-container-max-width);
-}
-
 
 /******* Below here should be refactored *********/
 
+/* TODO: margins are temporary to account for edges */
+.cardhost {
+  position: relative;
+  margin-top: calc(var(--cardhost-top-edge-height) + var(--cardhost-header-height));
+  margin-left: var(--cardhost-left-edge-width);
+  margin-right: 20px;
+}
+
+
+/* Temporary Cardhost App Header */
 .cardhost--header {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  height: var(--cardhost-header-height);
+  padding: 20px;
   background-color: var(--cardhost-darkest-blue-gray);
   color: white;
+  z-index: var(--cardhost-edges-z-index);
 }
 
-.cardhost--header > div {
-  position: relative;
-  max-width: var(--cardhost-container-max-width);
-  padding: 20px;
-}
-
-.cardhost--header h1 {
+.cardhost--header > h1 {
   margin: 0;
   padding: 0;
 }
 
-.cardhost--header button {
-  position: absolute;
-  top: 20px;
-  right: 20px;
+.cardhost--header > button {
   background: none;
   border-radius: 10px;
   border: solid 2px var(--cardhost-light-gray-d6);
   color: white;
 }
 
+
+/* Index - Topnav */
 .cardhost--topnav ul {
   list-style-type: none;
   margin: 0;
-  padding: 20px;
-}
-
-.cardhost--topnav ul li {
-  display: inline-block;
+  padding: 10px 0;
+  display: flex;
+  align-items: center;
 }
 
 .cardhost--topnav ul li a::after {
@@ -97,12 +113,22 @@ button:not(:disabled):hover {
   content: '|';
   font-size: 80%;
   font-weight: bold;
-  padding: 0 3px;
+  padding: 0 10px;
 }
 
-.cardhost-catalog {
-  padding: 20px;
+
+/* Cards - View, Edit */
+.cards-edit-header,
+.cards-view-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
 }
+.cards-view-header--buttons {
+  display: flex;
+}
+
 
 .card-creator--field-btn-wrapper {
   text-align: right;
@@ -127,12 +153,11 @@ button:not(:disabled):hover {
 
 /* Reused buttons */
 .cardhost-button {
-  position: inline-block;
   display: flex;
   justify-content: center;
   align-items: center;
   margin: 0;
-  padding: 0;
+  padding: 0 15px;
   height: 40px;
   min-width: 100px;
   font-size: 13px;
@@ -152,23 +177,35 @@ button:not(:disabled):hover {
   border-color: var(--cardhost-medium-blue-gray);
 }
 
+.cardhost-button + .cardhost-button {
+  margin-left: 15px;
+}
 
-/* JSON card document section */
+/* Temp page title */
+.cards-edit-header > h2,
+.cards-view-header > h2,
+.cardhost-header-title {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 600;
+}
+
+/* Temp section: JSON card document */
 .cardhost-card-document {
   max-width: 100%;
-  padding: 60px;
+  padding: 40px 0;
   font-size: 12px;
   overflow-x: scroll;
 }
 
-
-/* Right Edge */
+/* Temp Right Edge styles */
 .cardhost-right-edge {
-  position: absolute;
-  top: 0;
-  right: 20px;
-  height: 100%;
-  padding: 0;
+  position: fixed;
+  top: calc(var(--cardhost-header-height) + var(--cardhost-top-edge-height));
+  right: 0;
+  margin: 0;
+  padding: 0 20px;
+  z-index: var(--cardhost-edges-z-index);
 }
 
 .cardhost-right-edge--nav ul {
@@ -182,7 +219,9 @@ button:not(:disabled):hover {
 
 .cardhost-right-edge-panel {
   position: relative;
-  width: var(--cardhost-right-edge-width);
+  top: 0;
+  right: 0;
+  width: var(--cardhost-right-edge-panel-width);
   padding: 25px;
   background-color: var(--cardhost-medium-dark-blue-gray);
   border-radius: 20px;
@@ -193,118 +232,4 @@ button:not(:disabled):hover {
   padding: 10px 0 25px;
   font-size: 16px;
   text-transform: capitalize;
-}
-
-
-/* Left edge  */
-.cardhost-left-edge {
-  position: absolute;
-  top: 0;
-  left: 0;
-  display: flex;
-  flex-flow: row nowrap;
-  width: var(--cardhost-left-edge-width);
-  height: 100%;
-  z-index: 2;
-  opacity: 0.96;
-}
-
-.cardhost-left-edge--nav {
-  width: 100%;
-  max-width: 60px;
-  background-color: var(--cardhost-darkest-blue-gray);
-}
-
-.cardhost-left-edge--nav > ul {
-  display: flex;
-  flex-flow: column nowrap;
-  justify-content: space-between;
-  align-items: center;
-  height: 100%;
-  margin: 0;
-  padding: 20px 0;
-  list-style-type: none;
-}
-
-.cardhost-left-edge--nav .icon {
-  width: 40px;
-  height: 40px;
-  background-size: 40px 40px;
-  background-position: center;
-  background-repeat: no-repeat;
-  box-shadow: 0 3px 6px rgba(0, 0, 0, 0.15);
-  fill: var(--cardhost-cyan);
-}
-
-.cardhost-left-edge--nav .icon.profile {
-  background-image: url('/assets/images/icon-profile.svg');
-}
-
-.cardhost-left-edge--nav .icon.catalog {
-  background-image: url('/assets/images/icon-catalog.svg');
-  border-radius: 5px;
-}
-
-.cardhost-left-edge--nav .icon.library {
-  background-image: url('/assets/images/icon-library.svg');
-}
-
-
-.cardhost-left-edge--catalog {
-  min-height: var(--cardhost-container-min-height);
-  width: 100%;
-  padding: 30px 20px;
-  background-color: var(--cardhost-light-gray);
-  color: black;
-  overflow-y: scroll;
-}
-
-.cardhost-left-edge--catalog .title {
-  margin: 0;
-  padding-bottom: 50px;
-  font-size: 20px;
-  font-weight: 600;
-  line-height: 1;
-}
-
-.cardhost-left-edge--catalog-field {
-  position: relative;
-  display: flex;
-  border: 1px solid var(--cardhost-light-gray-d6);
-  border-radius: 10px;
-  background-color: white;
-}
-
-.cardhost-left-edge--catalog-field + .cardhost-left-edge--catalog-field {
-  margin-top: 15px;
-}
-
-.cardhost-left-edge--catalog-field .field-icon {
-  width: 90px;
-  border-top-left-radius: inherit;
-  border-bottom-left-radius: inherit;
-  background-position: center;
-  background-repeat: no-repeat;
-  background-size: 20px 20px;
-}
-
-.cardhost-left-edge--catalog-field .field-content {
-  width: 100%;
-  padding: 15px 15px 15px 0;
-  margin: 0;
-}
-
-.cardhost-left-edge--catalog-field .field-content--title {
-  margin: 0;
-  padding-bottom: 5px;
-  font-size: 16px;
-  font-weight: 600;
-  line-height: 1;
-}
-
-.cardhost-left-edge--catalog-field .field-content--description {
-  margin: 0;
-  padding-bottom: 5px;
-  font-size: 11px;
-  color: rgba(0, 0, 0, 0.5);
 }

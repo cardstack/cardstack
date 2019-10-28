@@ -1,7 +1,8 @@
-<div>
-  <LinkTo @route="cards.view" @model={{this.model}}>View</LinkTo>
-</div>
-
-<h2 data-test-card-edit={{this.model.id}}>Edit Card</h2>
+<CardhostTopEdge>
+  <div class="cards-edit-header">
+    <h2 data-test-card-edit={{this.model.id}}>Edit Card</h2>
+    <LinkTo @route="cards.view" @model={{this.model}} @class="cardhost-button secondary">View</LinkTo>
+  </div>
+</CardhostTopEdge>
 
 <CardEditor @card={{this.model}}/>

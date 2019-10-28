@@ -1,87 +1,89 @@
-{{!-- TODO: Need status message design --}}
-{{#if this.statusMsg}}
-  <div data-test-card-creator-msg><strong>{{this.statusMsg}}</strong></div>
-{{/if}}
+<CardhostTopEdge @mode="schema">
+  <div class="card-creator--top-edge">
+    {{! eslint is confused by on helper }}
+    {{! template-lint-disable attribute-indentation}}
+    <button
+      {{on "click" this.save}}
+      class="cardhost-button primary"
+      data-test-card-creator-save-btn
+      disabled={{not this.cardstackSession.isAuthenticated}}
+    >
+      Save
+    </button>
 
-{{!-- TODO: Where to put this? --}}
-<fieldset class="card-creator--new-card">
-  <legend>New Card</legend>
-  <label for="card__id">Card ID:</label>
-  <Input
-    @id="card__id"
-    @size="60"
-    @placeholder="e.g. local-hub::article-card::millenial-puppies"
-    @value={{this.cardId}}
-    @key-up={{action this.updateCardId}}
-  />
-  <p>(Note that updating the card id will remove any fields that you have created. This is just a scaffolding limitation.)</p>
-</fieldset>
+    {{#unless this.cardstackSession.isAuthenticated}}
+      (Must be logged in to save the card.)
+    {{/unless}}
+  </div>
+</CardhostTopEdge>
 
-{{#if this.card}}
-  <section class="card-manipulator--container">
-    {{!-- Left edge --}}
-    <aside class="cardhost-left-edge">
-      <nav class="cardhost-left-edge--profile">
-        <div class="profile icon"></div>
-        <div class="catalog icon active"></div>
-        <div class="library icon"></div>
-      </nav>
-      <section class="cardhost-left-edge--catalog">
-        <h3 class="title">Card Catalog</h3>
-        {{#each this.fieldComponents as |field|}}
-          {{! eslint is confused by on helper }}
-          {{! template-lint-disable attribute-indentation}}
-          <section
-            class="cardhost-left-edge--catalog-field"
-            role="button"
-            draggable="true"
-            {{on "mousedown" (action this.beginDragging field)}}
-            {{on "dragend" (action (mut this.isDragging) false)}}
-            data-test-card-add-field-draggable={{field.type}}
-          >
-            {{! template-lint-disable no-inline-styles}}
-            <div class="field-icon" style={{css-url "background-image" field.icon}}></div>
-            <div class="field-content">
-              <h4 class="field-content--title">{{field.title}}</h4>
-              {{#if field.description}}
-                <p class="field-content--description">{{field.description}}</p>
-              {{/if}}
-              <div class="field-content--type">Type: <code>{{field.type}}</code></div>
-            </div>
-          </section>
-        {{/each}}
-      </section>
-    </aside>
-
-    <nav class="card-manipulator--mode-nav">
-      <div class="card-manipulator--mode-chooser">
-        <div class="card-manipulator--mode-option schema">
-          Schema View
+<CardhostLeftEdge>
+  <section class="cardhost-left-edge--catalog">
+    <h3 class="title">Card Catalog</h3>
+    {{#each this.fieldComponents as |field|}}
+      {{! eslint is confused by on helper }}
+      {{! template-lint-disable attribute-indentation}}
+      <section
+        class="cardhost-left-edge--catalog-field"
+        role="button"
+        draggable="true"
+        {{on "mousedown" (action this.beginDragging field)}}
+        {{on "dragend" (action (mut this.isDragging) false)}}
+        data-test-card-add-field-draggable={{field.type}}
+      >
+        {{! template-lint-disable no-inline-styles}}
+        <div class="field-icon" style={{css-url "background-image" field.icon}}></div>
+        <div class="field-content">
+          <h4 class="field-content--title">{{field.title}}</h4>
+          {{#if field.description}}
+            <p class="field-content--description">{{field.description}}</p>
+          {{/if}}
+          <div class="field-content--type">Type: <code>{{field.type}}</code></div>
         </div>
-      </div>
-    </nav>
+      </section>
+    {{/each}}
+  </section>
+</CardhostLeftEdge>
 
-    {{!-- Card --}}
-    <section class="card-manipulator--card" data-test-card-creator>
-      <header class="card-manipulator--card-header">
-        <h2 class="title">New Card</h2>
-        <code class="id">{{@card.id}}</code>
+<aside class="cardhost-right-edge" data-test-cardhost-right-edge>
+  <section class="cardhost-right-edge-panel">
+    <h3 class="cardhost-right-edge-panel--header">
+      Edit Field Schema
+    </h3>
+    {{#if this.selectedField}}
+      <FieldRenderer
+        @field={{this.selectedField}}
+        @mode="schema"
+        @setNeededWhenEmbedded={{action this.setNeededWhenEmbedded}}
+        @setFieldName={{action this.setFieldName}}
+      />
+    {{/if}}
+  </section>
+</aside>
 
-        {{!-- TODO: Move these to the right edge area --}}
-        {{#unless this.cardstackSession.isAuthenticated}}
-          (Must be logged in to save the card.)
-        {{/unless}}
-        {{! eslint is confused by on helper }}
-        {{! template-lint-disable attribute-indentation}}
-        <button
-          {{on "click" this.save}}
-          class="done-btn"
-          data-test-card-creator-save-btn
-          disabled={{not this.cardstackSession.isAuthenticated}}
-        >
-          Save Card
-        </button>
-        {{!----}}
+<div class="card-manipulator--container card-creator">
+  {{#if this.statusMsg}}
+    <p data-test-card-creator-msg><strong>{{this.statusMsg}}</strong></p>
+  {{/if}}
+
+  <fieldset class="card-creator--new-card">
+    <legend>New Card</legend>
+    <label for="card__id">Card ID:</label>
+    <Input
+      @id="card__id"
+      @size="60"
+      @placeholder="e.g. local-hub::article-card::millenial-puppies"
+      @value={{this.cardId}}
+      @key-up={{action this.updateCardId}}
+    />
+    <p>(Note that updating the card id will remove any fields that you have created. This is just a scaffolding limitation.)</p>
+  </fieldset>
+
+  {{#if this.card}}
+    <section class="card-manipulator" data-test-card-creator>
+      <header class="card-manipulator--header">
+        <h2>New Card</h2>
+        <code>{{@card.id}}</code>
       </header>
       <CardRenderer
         @card={{this.card}}
@@ -93,33 +95,15 @@
         @dropField={{action this.dropField}}
       />
     </section>
+  {{/if}}
 
-    {{!-- Right edge --}}
-    <aside class="cardhost-right-edge" data-test-cardhost-right-edge>
-      <section class="cardhost-right-edge-panel">
-        <h3 class="cardhost-right-edge-panel--header">
-          Edit Field Schema
-        </h3>
-        {{#if this.selectedField}}
-          <FieldRenderer
-            @field={{this.selectedField}}
-            @mode="schema"
-            @setNeededWhenEmbedded={{action this.setNeededWhenEmbedded}}
-            @setFieldName={{action this.setFieldName}}
-          />
-        {{/if}}
-      </section>
-    </aside>
-  </section>
-{{/if}}
-
-{{!-- TODO: Where to put this + need design --}}
-{{#if this.card}}
-  <section class="cardhost-card-document">
-    <h3>Card Document:</h3>
-    <CodeBlock
-      @code={{this.cardJson}}
-      @language="javascript"
-    />
-  </section>
-{{/if}}
+  {{#if this.card}}
+    <section class="cardhost-card-document">
+      <h3>Card Document</h3>
+      <CodeBlock
+        @code={{this.cardJson}}
+        @language="javascript"
+      />
+    </section>
+  {{/if}}
+</div>
