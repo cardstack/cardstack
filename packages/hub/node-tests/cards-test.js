@@ -1222,6 +1222,12 @@ describe('hub/card-services', function () {
       // where a card is allowed to override a browser asset.
     });
 
+    it.skip("throws an error if you try to create a card that defines a field that as the same name as an adopted field", async function() {
+    });
+
+    it.skip("throws an error if you try to update a card to have a field that as the same name as an adopted field", async function() {
+    });
+
     it.skip("can get a card that has a belongs-to relationship to a card which uses adoption", async function () {
     });
 
