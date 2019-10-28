@@ -1,4 +1,4 @@
-import { module, test } from 'qunit';
+import { module, test, skip } from 'qunit';
 import Fixtures from '@cardstack/test-support/fixtures'
 import { setupTest } from 'ember-qunit';
 import {
@@ -914,6 +914,10 @@ module("Unit | Service | data", function () {
       model = card.json.included.find(i => `${i.type}/${i.id}` === `${card1Id}/${card1Id}`);
       assert.equal(model.attributes.subtitle, 'test title');
       assert.equal(model.attributes.title, undefined);
+    });
+
+    skip("TODO updating a card does not impact any of the card's internal fields", async function (assert) {
+
     });
 
     test("it does nothing if the field name is changed to the same name that it currently is", async function(assert) {

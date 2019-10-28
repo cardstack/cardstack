@@ -2,7 +2,7 @@ import { module, test } from 'qunit';
 import { click, fillIn, find, visit, currentURL, waitFor, triggerEvent } from '@ember/test-helpers';
 import { setupApplicationTest } from 'ember-qunit';
 import Fixtures from '@cardstack/test-support/fixtures'
-import { addField, setCardId, createCards, dragAndDropField } from '../helpers/card-helpers';
+import { addField, setCardId, createCards, dragAndDropField, removeField } from '../helpers/card-helpers';
 import { setupMockUser, login } from '../helpers/login';
 
 const timeout = 5000;
@@ -106,6 +106,18 @@ module('Acceptance | card create', function(hooks) {
     assert.equal(currentURL(), `/cards/${card1Id}`);
     assert.dom('[data-test-field="subtitle"]').exists();
     assert.dom('[data-test-field="title"]').doesNotExist();
+  });
+
+  test(`removing a field from a card`, async function(assert) {
+    await login();
+    await visit('/cards/new');
+
+    await setCardId(card1Id);
+    await addField('title', 'string', true);
+
+    await removeField('title');
+
+    assert.dom('.cardhost-right-edge-panel [data-test-field]').doesNotExist();
   });
 
   test('can add a field at a particular position', async function(assert) {

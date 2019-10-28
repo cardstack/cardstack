@@ -525,6 +525,9 @@ function getCardDocument(card) {
 
   let modelAttributes = {};
   let modelRelationships = {};
+
+  // TODO this is going to strip out internal fields from the card. update this so that
+  // we are respectful of the internal fields (which should exist in the internal.serverIsolatedData)
   for (let field of card.fields) {
     if (field.value === undefined) { continue; }
     if (['@cardstack/core-types::belongs-to', '@cardstack/core-types::has-many'].includes(field.type)) {
