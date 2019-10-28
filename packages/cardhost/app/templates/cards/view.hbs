@@ -1,7 +1,7 @@
 <CardhostTopEdge>
-  <div class="cards-view-header">
-    <h2 data-test-card-view={{this.model.id}}>View Card</h2>
-    <div class="cards-view-header--buttons">
+  <div class="cards-view--top-edge">
+    <h2 class="cards-view--top-edge-title" data-test-card-view={{this.model.id}}>View Card</h2>
+    <div class="cards-view--top-edge-buttons">
       <LinkTo @route="cards.schema" @model={{this.model}} @class="cardhost-button secondary">
         Update Schema
       </LinkTo>
@@ -12,12 +12,16 @@
   </div>
 </CardhostTopEdge>
 
-<CardRenderer @card={{this.model}} @format="isolated"/>
+<CardhostLeftEdge />
 
-<section class="cardhost-card-document">
-  <h3>Card Document</h3>
-  <CodeBlock
-    @code={{this.cardJson}}
-    @language="javascript"
-  />
-</section>
+<div class="cards-view--container">
+  <CardRenderer @card={{this.model}} @format="isolated"/>
+
+  <section class="cardhost-card-document">
+    <h3>Card Document</h3>
+    <CodeBlock
+      @code={{this.cardJson}}
+      @language="javascript"
+    />
+  </section>
+</div>

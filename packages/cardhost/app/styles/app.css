@@ -1,14 +1,12 @@
 @import '/assets/fonts.css';
 @import '/assets/palette.css';
-
+@import '/assets/components/card-editor.css';
 @import '/assets/components/card-manipulator.css';
 @import '/assets/components/cardhost-left-edge.css';
 @import '/assets/components/cardhost-top-edge.css';
 
 :root {
   --cardhost-font-family: "Open Sans", Roboto, "Helvetica Neue", Helvetica, Arial, sans-serif;
-  --cardhost-container-min-height: 1000px;
-  --cardhost-container-max-width: 1440px;
 
   --cardhost-left-edge-navbar-width: 80px;
   --cardhost-left-edge-panel-width: 330px;
@@ -98,7 +96,7 @@ button:not(:disabled):hover {
 }
 
 
-/* Index - Topnav */
+/* Index template */
 .cardhost--topnav ul {
   list-style-type: none;
   margin: 0;
@@ -116,37 +114,48 @@ button:not(:disabled):hover {
   padding: 0 10px;
 }
 
+.cardhost-catalog {
+  padding-left: 20px;
+}
 
-/* Cards - View, Edit */
-.cards-edit-header,
-.cards-view-header {
+.cardhost-catalog--title {
+  margin: 0;
+  padding-right: 20px;
+  font-size: 18px;
+  font-weight: 600;
+}
+
+
+/* Other */
+.card-editor--container,
+.cards-view--container {
+  padding: 20px;
+}
+
+.card-editor--top-edge,
+.cards-view--top-edge {
   display: flex;
   align-items: center;
   justify-content: space-between;
   width: 100%;
+  height: 40px;
 }
-.cards-view-header--buttons {
+
+.card-editor--top-edge-inner-container,
+.cards-view--top-edge-buttons {
   display: flex;
+  align-items: center;
 }
 
-
-.card-creator--field-btn-wrapper {
-  text-align: right;
+.card-editor--top-edge-title,
+.cards-view--top-edge-title {
+  margin: 0;
+  padding-right: 20px;
+  font-size: 18px;
+  font-weight: 600;
 }
 
 .field-creator--field-btn-wrapper {
-  text-align: right;
-}
-
-.card-editor--field-btn-wrapper {
-  text-align: right;
-}
-
-.card-schema--field-btn-wrapper {
-  text-align: right;
-}
-
-.field-renderer--field-btn-wrapper {
   text-align: right;
 }
 
@@ -179,15 +188,6 @@ button:not(:disabled):hover {
 
 .cardhost-button + .cardhost-button {
   margin-left: 15px;
-}
-
-/* Temp page title */
-.cards-edit-header > h2,
-.cards-view-header > h2,
-.cardhost-header-title {
-  margin: 0;
-  font-size: 18px;
-  font-weight: 600;
 }
 
 /* Temp section: JSON card document */

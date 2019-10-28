@@ -1,21 +1,20 @@
 .cardhost-top-edge {
   position: fixed;
-
-  /* TODO: this top and left positioning is temporary */
   top: var(--cardhost-header-height);
   left: var(--cardhost-left-edge-width);
-  right: 20px;
-  padding: 20px 0;
-
+  right: 0;
+  padding: 20px;
   display: flex;
   flex-flow: row nowrap;
   z-index: var(--cardhost-edges-z-index);
 }
 
 .cardhost-top-edge.schema {
-  --cardhost-left-edge-width: 410px;
+  --cardhost-left-edge-width: calc(var(--cardhost-left-edge-navbar-width) + var(--cardhost-left-edge-panel-width));
 }
 
+
+/* TODO: Refactor mode chooser */
 .card-manipulator--mode-chooser {
   position: relative;
   display: flex;
