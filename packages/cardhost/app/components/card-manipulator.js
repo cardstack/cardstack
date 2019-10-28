@@ -1,5 +1,5 @@
 import Component from '@glimmer/component';
-import { action, set } from '@ember/object';
+import { action } from '@ember/object';
 import { tracked } from '@glimmer/tracking';
 import { inject as service } from '@ember/service';
 import { dasherize } from '@ember/string';
@@ -100,6 +100,8 @@ export default class CardManipulator extends Component {
 
   @tracked statusMsg;
   @tracked card;
+  @tracked selectedField;
+  @tracked isDragging;
 
   constructor(...args) {
     super(...args);
@@ -145,10 +147,15 @@ export default class CardManipulator extends Component {
   })) deleteCard;
 
   @action
-  removeField(field) {
-    if (!field || !this.card) { return; }
+  removeField(fieldName) {
+    if (!fieldName || !this.card) { return; }
 
-    this.card.getField(field).remove();
+    let field = this.card.getField(fieldName)
+    field.remove();
+
+    if (field === this.selectedField) {
+      this.selectedField = null;
+    }
   }
 
   @action
@@ -233,8 +240,9 @@ export default class CardManipulator extends Component {
       latestPointerY: mousedownEvent.y
     };
 
-    set(this, 'isDragging', fieldComponent);
-    set(fieldComponent, 'dragState', dragState);
+    this.isDragging = fieldComponent;
+    fieldComponent.dragState = dragState;
+    fieldComponent = fieldComponent; // eslint-disable-line no-self-assign
   }
 
   @action dropField(position, onFinishDrop) {
@@ -245,14 +253,18 @@ export default class CardManipulator extends Component {
       name: this.newFieldName,
       neededWhenEmbedded: false
     });
-    set(this, 'isDragging', false);
-    set(this, 'selectedField', field);
-    set(fieldComponent, 'dragState', null);
+    this.isDragging = false;
+    this.selectedField = field;
+    fieldComponent.dragState = null;
+    fieldComponent = fieldComponent; // eslint-disable-line no-self-assign
+
 
     onFinishDrop();
   }
 
   @action selectField(field) {
-    set(this, 'selectedField', field);
+    if (field.isDestroyed) { return; }
+
+    this.selectedField = field;
   }
 }

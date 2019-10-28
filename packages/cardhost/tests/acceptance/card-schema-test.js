@@ -95,6 +95,8 @@ module('Acceptance | card schema', function(hooks) {
     assert.dom('[data-test-field="body"]').doesNotExist();
     let card = JSON.parse(find('.code-block').textContent);
     assert.equal(card.data.attributes.body, undefined);
+
+    assert.dom('.cardhost-right-edge-panel [data-test-field]').doesNotExist();
   });
 
   test(`move a field's position`, async function (assert) {
