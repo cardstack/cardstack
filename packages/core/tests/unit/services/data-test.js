@@ -916,7 +916,7 @@ module("Unit | Service | data", function () {
       assert.equal(model.attributes.title, undefined);
     });
 
-    skip("TODO updating a card does not impact any of the card's internal fields", async function (assert) {
+    skip("TODO updating a card does not impact any of the card's internal fields", async function (/*assert*/) {
 
     });
 
