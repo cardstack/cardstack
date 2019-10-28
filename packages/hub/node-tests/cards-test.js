@@ -1012,7 +1012,6 @@ describe('hub/card-services', function () {
     });
   });
 
-
   describe('card adoption', function () {
     let externalArticleCard, externalUserCard;
     beforeEach(async function () {

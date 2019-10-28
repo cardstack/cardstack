@@ -289,9 +289,19 @@ async function generateCardModule(internalCard: SingleResourceDoc) {
         delete cardOnDisk.data.attributes[field];
       }
     }
+    for (let field of Object.keys(cardOnDisk.data.relationships || {})) {
+      if (get(cardOnDisk, `data.relationships.${field}.data`) == null) {
+        unset(cardOnDisk, `data.relationships.${field}`);
+      }
+    }
     for (let field of Object.keys(cleanCard.data.attributes || {})) {
       if (cleanCard.data.attributes && cleanCard.data.attributes[field] == null) {
         delete cleanCard.data.attributes[field];
+      }
+    }
+    for (let field of Object.keys(cleanCard.data.relationships || {})) {
+      if (get(cleanCard, `data.relationships.${field}.data`) == null) {
+        unset(cleanCard, `data.relationships.${field}`);
       }
     }
     if (isEqual(cleanCard.data, cardOnDisk.data)) { return; }
@@ -818,7 +828,12 @@ async function addCardNamespacing(schema: todo, externalCard: SingleResourceDoc,
       for (let field of Object.keys(resource.attributes || {})) {
         if (!resource.attributes) { continue; }
         let fieldName = namespacedResourceId(cards, field);
-        resource.attributes[fieldName] = resource.attributes[field];
+        // If there is no fieldName, then that is the scenario where the field has been removed
+        // from the card, but the card's model still has data for the nonexistant field. This
+        // this case remove the field's value
+        if (fieldName) {
+          resource.attributes[fieldName] = resource.attributes[field];
+        }
         delete resource.attributes[field];
       }
     }
@@ -826,8 +841,12 @@ async function addCardNamespacing(schema: todo, externalCard: SingleResourceDoc,
       if (!resource.relationships || (resource.type === 'cards' && field === 'model')) { continue; }
       let fieldName = isSchemaModel || resource.type === 'cards' || field === 'adopted-from' ? field : namespacedResourceId(cards, field);
       if (!isSchemaModel && resource.type !== 'cards') {
-        resource.relationships[fieldName] = resource.relationships[field];
+        if (fieldName) {
+          resource.relationships[fieldName] = resource.relationships[field];
+        }
         delete resource.relationships[field];
+        // Ditto with the above regarding the missing field name
+        if (!fieldName) { continue; }
       }
       let linkage: ResourceLinkage = get(resource, `relationships.${fieldName}.data`);
       // I believe the namespace for the documents that are not cards nor fields (i.e. internal models) for the relationships
@@ -880,12 +899,6 @@ function namespacedResourceId(internalAndExternalCards: SingleResourceDoc[], id:
         return `${card.data.id}${cardIdDelim}${id}`;
       }
     }
-  }
-
-  if (type) {
-    throw new Error(`Cannot determine the namespace for the resource '${type}/${id}' using cards: '${internalAndExternalCards.map(i => i.data.id).join(', ')}'`);
-  } else {
-    throw new Error(`Cannot determine the namespace for the field '${id}' using cards: '${internalAndExternalCards.map(i => i.data.id).join(', ')}'`);
   }
 }
 

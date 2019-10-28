@@ -158,7 +158,7 @@
         "--timeout",
         "200000",
          "--grep",
-         "card adoption"
+         "hub/card-services"
       ]
     },
     {
