@@ -649,9 +649,6 @@ module.exports = class DocumentContext {
       // we are not resolving the link queries to type/id before _build() is called.
       if (!type) { return; }
 
-
-      // console.log("_build" + id, JSON.stringify(jsonapiDoc, null, 2));
-
       await this._loadCardSchemaForResource(type, id);
       let contentType = this.schema.getType(type);
       if (!contentType) {

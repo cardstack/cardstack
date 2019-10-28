@@ -86,10 +86,6 @@ class Searchers {
     let { resource, meta, included } = await this.getResourceAndMeta(session, type, id);
     let authorizedResult;
     let documentContext;
-    // if(id.includes('kitten')) {
-    //     console.log("searcherget", JSON.stringify(resource, null, 2));
-    //   }
-
     if (resource) {
       let schema = await this.currentSchema.getSchema();
       documentContext = this.createDocumentContext({

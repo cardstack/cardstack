@@ -45,8 +45,6 @@ let card = factory.getDocumentFor(
       `
     })
     .withRelated('fields', [
-      // adopted fields use original card's id
-      // nocommit
       factory.addResource('fields', 'local-hub::article-card::millenial-puppies::title').withAttributes({
         'is-metadata': true,
         'needed-when-embedded': true,

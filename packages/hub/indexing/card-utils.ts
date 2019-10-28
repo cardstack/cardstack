@@ -829,7 +829,7 @@ async function addCardNamespacing(schema: todo, externalCard: SingleResourceDoc,
         if (!resource.attributes) { continue; }
         let fieldName = namespacedResourceId(cards, field);
         // If there is no fieldName, then that is the scenario where the field has been removed
-        // from the card, but the card's model still has data for the nonexistant field. This
+        // from the card, but the card's model still has data for the nonexistant field. In
         // this case remove the field's value
         if (fieldName) {
           resource.attributes[fieldName] = resource.attributes[field];
@@ -849,9 +849,6 @@ async function addCardNamespacing(schema: todo, externalCard: SingleResourceDoc,
         if (!fieldName) { continue; }
       }
       let linkage: ResourceLinkage = get(resource, `relationships.${fieldName}.data`);
-      // I believe the namespace for the documents that are not cards nor fields (i.e. internal models) for the relationships
-      // retain the id of this card, and not the ID of the adopted card--as these internal models, despite using
-      // content types that may originate from the adopted card are unique this this card and should be namespaced as such.
       let prefix = resource.type === 'cards' ? resource.id : id;
       if (Array.isArray(linkage)) {
         set(resource, `relationships.${fieldName}.data`, (linkage as ResourceIdentifierObject[]).map(i =>
