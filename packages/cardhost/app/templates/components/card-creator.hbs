@@ -87,22 +87,55 @@
         />
       </div>
     </div>
-    <div class="card-manipulator--right-edge">
-      <div class="card-manipulator--right-edge--field">
-        <div class="card-manipulator--right-edge--field-header">
-          Edit Field Schema
+    <div class="card-manipulator--right-edge" data-test-right-edge>
+      {{#if this.selectedField}}
+        <div class="card-manipulator--right-edge--pill-selector">
+          <div class="card-manipulator--right-edge--pill-option selected">Properties</div>
+          <div class="card-manipulator--right-edge--pill-option">Structure</div>
         </div>
-        {{#if this.selectedField}}
-          <FieldRenderer
-            @field={{this.selectedField}}
-            @mode="schema"
-            @position={{this.selectedField.position}}
-            @setNeededWhenEmbedded={{action this.setNeededWhenEmbedded}}
-            @setFieldName={{action this.setFieldName}}
-            @setPosition={{action this.setPosition}}
-          />
-        {{/if}}
-      </div>
+        <div class="card-manipulator--right-edge--section">
+          <div class="section-header">Text Field</div>
+          <div class="card-manipulator--right-edge--attribute">
+            <div class="attribute-title">Field Name</div>
+            {{#let (component this.fieldEditor) as | FieldEditor |}}
+              <Input
+                data-test-field-name
+                @id={{concat "card-manipulator--right-edge--field-name-" this.selectedField.nonce}}
+                @value={{this.updatedFieldName}}
+                @key-up={{action this.updateFieldName}}
+              />
+            {{/let}}
+          </div>
+          <div class="card-manipulator--right-edge--attribute">
+            <div class="attribute-title">Display Label</div>
+            <Input class="attribute-value" />
+          </div>
+          <div class="card-manipulator--right-edge--attribute">
+            <label class="checkbox-container">Required
+              <Input @type="checkbox" />
+              <span class="checkmark"></span>
+            </label>
+          </div>
+          <div class="card-manipulator--right-edge--attribute">
+            <label class="checkbox-container">Export as Metadata
+              <Input @type="checkbox" />
+              <span class="checkmark"></span>
+            </label>
+          </div>
+          <div class="card-manipulator--right-edge--attribute">
+            <label class="checkbox-container">Available When Embedded
+              <Input
+                @checked={{this.selectedField.neededWhenEmbedded}}
+                @type="checkbox"
+                @click={{fn this.setNeededWhenEmbedded this.selectedField.name}}
+                data-test-needed-when-embedded
+                />
+              <span class="checkmark"></span>
+            </label>
+          </div>
+        </div>
+      {{/if}}
+      
     </div>
   </div>
 {{/if}}

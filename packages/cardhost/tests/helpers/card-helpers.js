@@ -1,4 +1,4 @@
-import { click, find, triggerEvent, fillIn, visit, waitFor } from '@ember/test-helpers';
+import { click, find, triggerEvent, fillIn, visit, waitFor, pauseTest } from '@ember/test-helpers';
 
 const timeout = 5000;
 
@@ -35,11 +35,11 @@ export async function createCards(args) {
 export async function addField(name, type, isEmbedded, position) {
   await dragAndDropField(type, position);
 
-  await fillIn('[data-test-field^="new-field"] .field-renderer-field-name-input', name);
-  await triggerEvent('[data-test-field^="new-field"] .field-renderer-field-name-input', 'keyup');
+  await fillIn('[data-test-field-name]', name);
+  await triggerEvent('[data-test-field-name]', 'keyup');
 
   if (isEmbedded) {
-    await click(`[data-test-field="${name}"] .field-renderer--needed-when-embedded-chbx`);
+    await click(`[data-test-right-edge] [data-test-needed-when-embedded]`);
   }
 }
 

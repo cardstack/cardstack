@@ -73,20 +73,21 @@ module('Acceptance | card create', function(hooks) {
     await addField('body', 'string', false);
 
     await click('[data-test-field="title"]');
-    assert.dom('.card-manipulator--right-edge--field [data-test-field] .field-renderer-field-name-input').hasValue('title');
+    assert.dom('[data-test-right-edge] [data-test-field-name]').hasValue('title');
 
-    await fillIn('[data-test-field="title"] .field-renderer-field-name-input', 'subtitle');
-    await triggerEvent(`[data-test-field="title"] .field-renderer-field-name-input`, 'keyup');
-    assert.dom('.card-manipulator--right-edge--field [data-test-field] .field-renderer-field-name-input').hasValue('subtitle');
+    await fillIn('[data-test-right-edge] [data-test-field-name]', 'subtitle');
+    await triggerEvent(`[data-test-right-edge] [data-test-field-name]`, 'keyup');
+    assert.dom('[data-test-right-edge] [data-test-field-name]').hasValue('subtitle');
 
     await click('[data-test-field="body"]');
-    assert.dom('.card-manipulator--right-edge--field [data-test-field] .field-renderer-field-name-input').hasValue('body');
+    assert.dom('[data-test-right-edge] [data-test-field-name]').hasValue('body');
 
     await click('[data-test-field="subtitle"]');
-    assert.dom('.card-manipulator--right-edge--field [data-test-field] .field-renderer-field-name-input').hasValue('subtitle');
+    assert.dom('[data-test-right-edge] [data-test-field-name]').hasValue('subtitle');
 
     await dragAndDropField('string');
-    assert.dom('.card-manipulator--right-edge--field [data-test-field] .field-renderer-field-name-input').hasValue('new-field-2');
+    await click('[data-test-field="new-field-2"]');
+    assert.dom('[data-test-right-edge] [data-test-field-name]').hasValue('new-field-2');
   });
 
   test(`renaming a card's field`, async function(assert) {
@@ -96,9 +97,9 @@ module('Acceptance | card create', function(hooks) {
     await setCardId(card1Id);
     await addField('title', 'string', true);
 
-    assert.dom('[data-test-field="title"] .field-renderer-field-name-input').hasValue('title');
-    await fillIn('[data-test-field="title"] .field-renderer-field-name-input', 'subtitle');
-    await triggerEvent(`[data-test-field="title"] .field-renderer-field-name-input`, 'keyup');
+    assert.dom('[data-test-right-edge] [data-test-field-name]').hasValue('title');
+    await fillIn('[data-test-right-edge] [data-test-field-name]', 'subtitle');
+    await triggerEvent(`[data-test-right-edge] [data-test-field-name]`, 'keyup');
 
     await click('[data-test-card-creator-save-btn]');
     await waitFor(`[data-test-card-view="${card1Id}"]`, { timeout });

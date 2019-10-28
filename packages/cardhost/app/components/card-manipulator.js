@@ -209,6 +209,12 @@ export default class CardManipulator extends Component {
   }
 
   @action
+  updateFieldName(newName) {
+    set(this, 'updatedFieldName', newName);
+    this.setFieldName(this.selectedField.name, this.updatedFieldName);
+  }
+
+  @action
   save() {
     this.saveCard.perform();
   }
@@ -256,5 +262,6 @@ export default class CardManipulator extends Component {
 
   @action selectField(field) {
     set(this, 'selectedField', field);
+    set(this, 'updatedFieldName', field.name);
   }
 }
