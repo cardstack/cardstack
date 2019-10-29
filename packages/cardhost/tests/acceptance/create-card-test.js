@@ -2,7 +2,7 @@ import { module, test } from 'qunit';
 import { click, fillIn, find, visit, currentURL, waitFor, triggerEvent } from '@ember/test-helpers';
 import { setupApplicationTest } from 'ember-qunit';
 import Fixtures from '@cardstack/test-support/fixtures'
-import { addField, setCardId, createCards, dragAndDropField } from '../helpers/card-helpers';
+import { addField, setCardId, createCards, dragAndDropField, removeField } from '../helpers/card-helpers';
 import { setupMockUser, login } from '../helpers/login';
 
 const timeout = 5000;
@@ -73,6 +73,7 @@ module('Acceptance | card create', function(hooks) {
     await addField('body', 'string', false);
 
     await click('[data-test-field="title"]');
+
     assert.dom('[data-test-right-edge] [data-test-field-name]').hasValue('title');
 
     await fillIn('[data-test-right-edge] [data-test-field-name]', 'subtitle');
@@ -109,23 +110,16 @@ module('Acceptance | card create', function(hooks) {
     assert.dom('[data-test-field="title"]').doesNotExist();
   });
 
-  test('can select a field to edit its properties', async function(assert) {
+  test(`removing a field from a card`, async function(assert) {
     await login();
     await visit('/cards/new');
 
-    assert.equal(currentURL(), '/cards/new');
-
     await setCardId(card1Id);
     await addField('title', 'string', true);
-    await addField('body', 'string', false);
 
-    assert.dom('.card-manipulator--right-edge--field .schema-field').exists({ count: 1 });
-    assert.dom('.card-manipulator--right-edge--field .schema-field code').hasText("field: body");
+    await removeField('title');
 
-    await click('[data-test-isolated-card="local-hub::article-card::millenial-puppies"] [data-test-field="title"]');
-
-    assert.dom('.card-manipulator--right-edge--field .schema-field').exists({ count: 1 });
-    assert.dom('.card-manipulator--right-edge--field .schema-field code').hasText("field: title");
+    assert.dom('.cardhost-right-edge-panel [data-test-field]').doesNotExist();
   });
 
   test('can add a field at a particular position', async function(assert) {

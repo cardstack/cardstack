@@ -1,10 +1,1 @@
-<div>
-  <LinkTo @route="index">Home</LinkTo>
-</div>
-<div>
-  <LinkTo @route="cards.view" @model={{this.model}}>View</LinkTo>
-</div>
-
-<h2 data-test-card-schema={{this.model.id}}>Update Schema</h2>
-
 <CardSchemaUpdator @card={{this.model}}/>

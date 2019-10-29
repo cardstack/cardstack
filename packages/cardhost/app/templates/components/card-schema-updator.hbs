@@ -1,28 +1,25 @@
-{{#if this.statusMsg}}
-  <div><strong>{{this.statusMsg}}</strong></div>
-{{/if}}
-
-<br>
-
-<div class="card-manipulator--container">
+<section class="card-manipulator--container">
+  {{!-- TODO: Need status message design --}}
+  {{#if this.statusMsg}}
+    <div><strong>{{this.statusMsg}}</strong></div>
+  {{/if}}
 
   {{!-- Left edge --}}
-  <div class="card-manipulator--left-edge">
-    {{!-- Profile sidebar --}}
-    <div class="card-manipulator--left-edge--profile">
-      <div class="profile icon"></div>
-      <div class="settings icon active"></div>
-      <div class="search icon"></div>
-    </div>
-    {{!-- Catalog fields list --}}
-    <div class="card-manipulator--left-edge--catalog">
-      <div class="title">Card Catalog</div>
-
+  <aside class="cardhost-left-edge">
+    <nav class="cardhost-left-edge--nav">
+      <ul>
+        <li><div class="profile icon"></div></li>
+        <li><div class="catalog icon active"></div></li>
+        <li><div class="library icon"></div></li>
+      </ul>
+    </nav>
+    <section class="cardhost-left-edge--catalog">
+      <h3 class="title">Card Catalog</h3>
       {{#each this.fieldComponents as |field|}}
         {{! eslint is confused by on helper }}
         {{! template-lint-disable attribute-indentation}}
-        <div
-          class="card-manipulator--left-edge--catalog-field"
+        <section
+          class="cardhost-left-edge--catalog-field"
           role="button"
           draggable="true"
           {{on "mousedown" (action this.beginDragging field)}}
@@ -32,21 +29,32 @@
           {{! template-lint-disable no-inline-styles}}
           <div class="field-icon" style={{css-url "background-image" field.icon}}></div>
           <div class="field-content">
-            <div class="field-content--title">{{field.title}}</div>
-            <div class="field-content--description">{{field.description}}</div>
+            <h4 class="field-content--title">{{field.title}}</h4>
+            {{#if field.description}}
+              <p class="field-content--description">{{field.description}}</p>
+            {{/if}}
             <div class="field-content--type">Type: <code>{{field.type}}</code></div>
-            <div class="field-content--info-icon"></div>
           </div>
-        </div>
+        </section>
       {{/each}}
+    </section>
+  </aside>
+
+  <nav class="card-manipulator--mode-nav">
+    <div class="card-manipulator--mode-chooser">
+      <div class="card-manipulator--mode-option schema">
+        Schema View
+      </div>
     </div>
-  </div>
-  <div class="card-manipulator--main">
-    {{!-- Card --}}
-    <div class="card-manipulator--card">
-      <div class="card-manipulator--card-header">
-        <div class="title">Card Schema</div>
-        <code class="id">{{@card.id}}</code>
+  </nav>
+
+  {{!-- Card --}}
+  <section class="card-manipulator--card" data-test-card-schema={{@card.id}}>
+    <header class="card-manipulator--card-header">
+      <h2 class="title">Card Schema</h2>
+      <code class="id">{{@card.id}}</code>
+      {{!-- TODO: Move these to the right edge area? --}}
+      <div>
         {{#unless this.cardstackSession.isAuthenticated}}
           (Must be logged in to save the card.)
         {{/unless}}
@@ -58,37 +66,52 @@
         <button
           {{on "click" this.save}}
           class="done-btn"
-          data-test-card-schema-save-btn
           disabled={{not this.cardstackSession.isAuthenticated}}
+          data-test-card-schema-save-btn
         >
           Cancel
         </button>
         <button {{on "click" this.save}}
-          data-test-card-schema-save-btn
           disabled={{not this.cardstackSession.isAuthenticated}}
+          data-test-card-schema-save-btn
         >
-          Save Card
+          Save
         </button>
       </div>
-      <CardRenderer
-        @card={{this.card}}
-        @format="isolated"
-        @mode="schema"
-        @removeField={{action this.removeField}}
-        @setFieldName={{action this.setFieldName}}
-        @setNeededWhenEmbedded={{action this.setNeededWhenEmbedded}}
-        @setPosition={{action this.setPosition}}
-        @dropField={{action this.dropField}}
-      />
-    </div>
-  </div>
-  <div class="card-manipulator--right-edge"></div>
-</div>
+      {{!----}}
+    </header>
+    <CardRenderer
+      @card={{this.card}}
+      @format="isolated"
+      @mode="schema"
+      @removeField={{action this.removeField}}
+      @setFieldName={{action this.setFieldName}}
+      @setNeededWhenEmbedded={{action this.setNeededWhenEmbedded}}
+      @setPosition={{action this.setPosition}}
+      @dropField={{action this.dropField}}
+    />
+  </section>
 
-<br>
+  {{!-- Right edge --}}
+  <aside class="cardhost-right-edge">
+    <nav class="cardhost-right-edge--nav">
+      <ul>
+        <li>
+          <LinkTo class="cardhost-button secondary" @route="cards.view" @model={{@card}}>View</LinkTo>
+        </li>
+      </ul>
+    </nav>
+    <section class="cardhost-right-edge-panel">
+      <h3>Update Schema</h3>
+    </section>
+  </aside>
+</section>
 
-<h3>Card Document:</h3>
-<CodeBlock
-  @code={{this.cardJson}}
-  @language="javascript"
-/>
+{{!-- TODO: Where to put this + need design --}}
+<section class="cardhost-card-document">
+  <h3>Card Document:</h3>
+  <CodeBlock
+    @code={{this.cardJson}}
+    @language="javascript"
+  />
+</section>

@@ -204,7 +204,6 @@ class Card {
     // if the card is embedded, let's load the isolated card data and merge the updated card with the isolated data
     // we don't want to indavertantly clear fields of the card just because the embedded format does not
     // use a field. The use case for this is the ability of a user to edit owned relationships that are cards
-    // let cardDocument;
     let internal = priv.get(this);
     if (this.loadedFormat === 'embedded') {
       let updatedFields = this.fields;
@@ -526,6 +525,9 @@ function getCardDocument(card) {
 
   let modelAttributes = {};
   let modelRelationships = {};
+
+  // TODO this is going to strip out internal fields from the card. update this so that
+  // we are respectful of the internal fields (which should exist in the internal.serverIsolatedData)
   for (let field of card.fields) {
     if (field.value === undefined) { continue; }
     if (['@cardstack/core-types::belongs-to', '@cardstack/core-types::has-many'].includes(field.type)) {

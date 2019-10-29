@@ -1,5 +1,5 @@
 import Component from '@glimmer/component';
-import { action, set } from '@ember/object';
+import { action } from '@ember/object';
 import { tracked } from '@glimmer/tracking';
 import { inject as service } from '@ember/service';
 import { dasherize } from '@ember/string';
@@ -29,28 +29,28 @@ const fieldComponents = [
     title: 'Text',
     description: 'All-purpose text field',
     type: 'string',
-    icon: `/assets/images/field-types/text.png`
+    icon: `/assets/images/field-types/text.svg`
   },
   {
     id: 'text-field-case-insensitive',
     title: 'Text (case-insensitive)',
     description: 'Case-insensitive text field',
     type: 'case-insensitive string',
-    icon: `/assets/images/field-types/text.png`
+    icon: `/assets/images/field-types/text.svg`
   },
   {
     id: 'checkbox',
     title: 'Checkbox',
     description: 'True/false (boolean) values',
     type: 'boolean',
-    icon: `/assets/images/field-types/checkbox.png`
+    icon: `/assets/images/field-types/checkbox.svg`
   },
   {
     id: 'date-field',
     title: 'Date',
     description: 'Date field',
     type: 'date',
-    icon: `/assets/images/field-types/date.png`
+    icon: `/assets/images/field-types/calendar.svg`
   },
   {
     id: 'number',
@@ -64,14 +64,14 @@ const fieldComponents = [
     title: 'Dropdown',
     description: 'Single select dropdown',
     type: 'related card',
-    icon: `/assets/images/field-types/dropdown.png`
+    icon: `/assets/images/field-types/dropdown.svg`
   },
   {
     id: 'dropdown-multi',
     title: 'Dropdown (Multi-select)',
     description: 'Multiple select dropdown',
     type: 'related cards',
-    icon: `/assets/images/field-types/dropdown.png`
+    icon: `/assets/images/field-types/dropdown.svg`
   },
   // We'll need to figure out how to deal with the other types of ui-components, ex:
   // {
@@ -100,6 +100,8 @@ export default class CardManipulator extends Component {
 
   @tracked statusMsg;
   @tracked card;
+  @tracked selectedField;
+  @tracked isDragging;
 
   constructor(...args) {
     super(...args);
@@ -145,10 +147,15 @@ export default class CardManipulator extends Component {
   })) deleteCard;
 
   @action
-  removeField(field) {
-    if (!field || !this.card) { return; }
+  removeField(fieldName) {
+    if (!fieldName || !this.card) { return; }
 
-    this.card.getField(field).remove();
+    let field = this.card.getField(fieldName)
+    field.remove();
+
+    if (field === this.selectedField) {
+      this.selectedField = null;
+    }
   }
 
   @action
@@ -210,7 +217,7 @@ export default class CardManipulator extends Component {
 
   @action
   updateFieldName(newName) {
-    set(this, 'updatedFieldName', newName);
+    this.updatedFieldName = newName;
     this.setFieldName(this.selectedField.name, this.updatedFieldName);
   }
 
@@ -239,11 +246,12 @@ export default class CardManipulator extends Component {
       latestPointerY: mousedownEvent.y
     };
 
-    set(this, 'isDragging', fieldComponent);
-    set(fieldComponent, 'dragState', dragState);
+    this.isDragging = fieldComponent;
+    fieldComponent.dragState = dragState;
+    fieldComponent = fieldComponent; // eslint-disable-line no-self-assign
   }
 
-  @action dropField(position, finishDropFn /*, event */) {
+  @action dropField(position, onFinishDrop) {
     let fieldComponent = this.isDragging;
     let field = this.card.addField({
       type: this.fieldTypeMappings[fieldComponent.type],
@@ -251,17 +259,19 @@ export default class CardManipulator extends Component {
       name: this.newFieldName,
       neededWhenEmbedded: false
     });
-    set(this, 'isDragging', false);
-    set(this, 'selectedField', field);
-    set(fieldComponent, 'dragState', null);
+    this.isDragging = false;
+    this.selectedField = field;
+    fieldComponent.dragState = null;
+    fieldComponent = fieldComponent; // eslint-disable-line no-self-assign
 
-    if (typeof finishDropFn === 'function') {
-      finishDropFn();
-    }
+
+    onFinishDrop();
   }
 
   @action selectField(field) {
-    set(this, 'selectedField', field);
-    set(this, 'updatedFieldName', field.name);
+    if (field.isDestroyed) { return; }
+
+    this.selectedField = field;
+    this.updatedFieldName = field.name;
   }
 }

@@ -3,10 +3,10 @@
 module.exports = function(deployTarget) {
 
   // these get less aggressive caching because they exist at stable URLs
-  let s3PagePattern = '**/*.{html,zip,pdf}';
+  let s3PagePattern = '**/*.{html,zip,pdf,css}'; // note that fingerprinting has not been implemented in embroider yet, using less agressive caching for css for now
 
   // these get more aggressive caching because they are sub-resources with fingerprinted URLs
-  let s3AssetPattern = '**/*.{js,css,png,gif,ico,jpg,map,xml,txt,svg,swf,eot,ttf,woff,woff2,ttc,otf}';
+  let s3AssetPattern = '**/*.{js,png,gif,ico,jpg,map,xml,txt,svg,swf,eot,ttf,woff,woff2,ttc,otf}';
 
   let ENV = {
     build: {},
@@ -32,7 +32,16 @@ module.exports = function(deployTarget) {
       cacheControl: 'max-age=600, public'
     },
     cloudfront: {
-      objectPaths: ['/', '/*', '/*/*', '/index.html', '/dashboard']
+      objectPaths: [
+        '/',
+        '/*',
+        '/*/*',
+        '/index.html',
+        '/vendor.css',
+        '/assets/vendor.css',
+        '/@cardstack/cardhost.css',
+        '/assets/@cardstack/cardhost.css'
+      ]
     }
   };
 
