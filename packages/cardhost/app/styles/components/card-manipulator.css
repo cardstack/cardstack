@@ -2,72 +2,43 @@
   --transition-time: 250ms;
 }
 
+.card-schema-updator--top-edge-buttons {
+  display: flex;
+}
+
+.card-creator--new-card {
+  max-width: 500px;
+  margin-bottom: 40px;
+}
+
+
+/* Common classes for cards extending card manipulator component */
+
 .card-manipulator--container {
   position: relative;
-  max-width: var(--cardhost-container-max-width);
-  min-height: var(--cardhost-container-min-height);
-  padding-left: calc(var(--cardhost-left-edge-width) + 20px);
-  padding-right: calc(var(--cardhost-right-edge-width) + 20px);
-  background-color: var(--cardhost-dark-blue-gray);
+  left: var(--ch-left-edge-panel-width);
+  width: calc(100% - var(--ch-left-edge-panel-width));
+  padding-left: 20px;
 }
 
-.card-manipulator--mode-nav {
-  padding: 20px 0;
-}
-
-.card-manipulator--mode-chooser {
-  position: relative;
-  display: flex;
-  align-items: center;
-  width: 325px;
-  height: 40px;
-  margin: 0 auto;
-  background-color: var(--cardhost-dark-blue-gray);
-  background-image: url('/assets/images/icon-carrot.svg');
-  background-position: right 20px center;
-  background-repeat: no-repeat;
-  background-size: 8px 8px;
-  border: solid 1px var(--cardhost-medium-blue-gray);
-  border-radius: 20px;
-  text-align: center;
-}
-
-.card-manipulator--mode-option {
-  width: 100%;
-  padding: 0 60px;
-  background-position: 20px center;
-  background-size: 20px 20px;
-  background-repeat: no-repeat;
-  font-size: 13px;
-  letter-spacing: 0.46px;
-  line-height: 18px;
-  text-align: left;
-}
-
-.card-manipulator--mode-option.schema {
-  background-image: url('/assets/images/icon-schema.svg');
-}
-
-/* Card */
-.card-manipulator--card {
-  box-sizing: border-box;
+.card-manipulator {
   position: relative;
   max-width: 500px;
   min-width: 460px;
-  margin: 0 auto;
-  background-color: var(--cardhost-medium-darker-blue-gray);
-  border: 2px solid var(--cardhost-cyan);
+  margin: 0;
+  background-color: var(--ch-medium-darker-blue-gray);
+  border: 2px solid var(--ch-cyan);
   border-radius: 10px;
   overflow: hidden;
 }
 
-.card-manipulator--card-header {
+.card-manipulator--header {
   padding: 20px;
-  background-color: var(--cardhost-cyan);
+  background-color: var(--ch-cyan);
   color: black;
 }
 
-.card-manipulator--card-header > .title {
+.card-manipulator--header > h2 {
   padding-bottom: 10px;
   font-size: 26px;
   font-weight: 600;
@@ -75,102 +46,10 @@
   text-transform: capitalize;
 }
 
-.card-manipulator--card-header > .id {
+.card-manipulator--header > code {
   font-size: 18px;
   font-weight: 600;
   line-height: 1;
-}
-
-.card-manipulator--card-header > button {
-  width: 70px;
-  height: 32px;
-  padding: 0;
-  background-color: white;
-  border: 1px solid rgba(0, 0, 0, 0.06);
-  border-radius: 5px;
-  font-size: 13px;
-  color: black;
-}
-
-.card-manipulator--card-header > button:hover {
-  background-color: white;
-  color: black;
-}
-
-.card-manipulator--card-header > button.done-btn {
-  position: absolute;
-  top: 20px;
-  right: 20px;
-}
-
-.card-manipulator--card-header > button.cancel-btn {
-  position: absolute;
-  top: 50px;
-  right: 20px;
-}
-
-.card-manipulator--card--field-box {
-  box-sizing: border-box;
-  position: relative;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  min-height: 162px;
-  width: 100%;
-  padding: 20px 20px 30px;
-  font-size: 16px;
-}
-
-.card-manipulator--card--field-box + .card-manipulator--card--field-box {
-  border-top: 1px solid rgba(255, 255, 255, 0.15);
-}
-
-.card-manipulator--card--field-box .handle-icon {
-  height: 18px;
-  width: 14px;
-  background-image: url('/assets/images/grabber-handle.svg');
-  background-position: center;
-  background-repeat: no-repeat;
-  background-size: contain;
-}
-
-.card-manipulator--card--field-box .field-data {
-  box-sizing: border-box;
-  width: 384px;
-  min-height: 112px;
-  margin-left: auto;
-  background-color: white;
-  border-radius: 5px;
-  overflow: hidden;
-}
-
-.card-manipulator--card--field-box .field-data--content {
-  padding: 10px;
-}
-
-.card-manipulator--card--field-box .field-data--type {
-  padding: 10px;
-  background-color: #24242e;
-  color: white;
-}
-
-.card-manipulator--card--field-box .field-data--title {
-  color: rgba(0, 0, 0, 0.5);
-  font-size: 11px;
-}
-
-.card-manipulator--card--field-box > button.remove-btn {
-  position: absolute;
-  bottom: 10px;
-  right: 20px;
-  padding: 0;
-  background: none;
-  color: rgba(255, 255, 255, 0.5);
-  outline: 0;
-}
-
-.card-manipulator--card--field-box > button.remove-btn:hover {
-  background: none;
 }
 
 .drop-zone {
@@ -180,7 +59,7 @@
 
 .drop-zone .drop-zone-text {
   box-sizing: border-box;
-  border: dashed 3px var(--cardhost-light-gray-d6);
+  border: dashed 3px var(--ch-light-gray-d6);
   color: transparent;
   font-size: 28px;
   padding: 20px;

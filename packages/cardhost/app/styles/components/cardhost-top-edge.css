@@ -1,0 +1,50 @@
+.cardhost-top-edge {
+  position: fixed;
+  top: var(--ch-header-height);
+  left: var(--ch-left-edge-width);
+  right: 0;
+  padding: 20px;
+  display: flex;
+  flex-flow: row nowrap;
+  z-index: var(--ch-edges-z-index);
+}
+
+.cardhost-top-edge.schema {
+  --ch-left-edge-width: calc(var(--ch-left-edge-navbar-width) + var(--ch-left-edge-panel-width));
+}
+
+
+/* TODO: Refactor mode chooser */
+.card-manipulator--mode-chooser {
+  position: relative;
+  display: flex;
+  align-items: center;
+  width: 325px;
+  height: 40px;
+  margin: 0 auto;
+  background-color: var(--ch-dark-blue-gray);
+  background-image: url('/assets/images/icon-carrot.svg');
+  background-position: right 20px center;
+  background-repeat: no-repeat;
+  background-size: 8px 8px;
+  border: solid 1px var(--ch-medium-blue-gray);
+  border-radius: 20px;
+  text-align: center;
+}
+
+.card-manipulator--mode {
+  width: 100%;
+  padding: 0 60px;
+  background-position: 20px center;
+  background-size: 20px 20px;
+  background-repeat: no-repeat;
+  font-size: 13px;
+  letter-spacing: 0.46px;
+  line-height: 18px;
+  text-align: left;
+  text-transform: capitalize;
+}
+
+.card-manipulator--mode.schema {
+  background-image: url('/assets/images/icon-schema.svg');
+}

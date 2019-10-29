@@ -1,47 +1,61 @@
-{{#if this.statusMsg}}
-  <div><strong>{{this.statusMsg}}</strong></div>
-{{/if}}
+<CardhostTopEdge>
+  <div class="card-editor--top-edge">
+    <h2 class="card-editor--top-edge-title" data-test-card-edit={{this.card.id}}>Edit Card</h2>
+    <div>
+      <div class="card-editor--top-edge-inner-container">
+        <span data-test-card-editor-is-dirty={{this.isDirtyStr}}>
+          {{#if this.card.isDirty}}(unsaved){{/if}}
+        </span>
 
-<br>
+        <button {{on "click" this.delete}}
+          class="ch-button--secondary"
+          data-test-card-editor-delete-btn
+          disabled={{not this.cardstackSession.isAuthenticated}}
+        >
+          Delete
+        </button>
+        <button {{on "click" this.cancel}}
+          class="ch-button--secondary"
+          data-test-card-editor-cancel-btn
+          disabled={{not this.cardstackSession.isAuthenticated}}
+        >
+          Cancel
+        </button>
+        <button {{on "click" this.save}}
+          data-test-card-editor-save-btn
+          disabled={{not this.cardstackSession.isAuthenticated}}
+        >
+          Save
+        </button>
+      </div>
+      <div>
+        {{#unless this.cardstackSession.isAuthenticated}}
+          (Must be logged in to modify the card.)
+        {{/unless}}
+      </div>
+    </div>
+  </div>
+</CardhostTopEdge>
 
-<div class="card-editor--field-btn-wrapper">
-  {{#unless this.cardstackSession.isAuthenticated}}
-    (Must be logged in to modify the card.)
-  {{/unless}}
-  <span data-test-card-editor-is-dirty={{this.isDirtyStr}}>
-    {{#if this.card.isDirty}}(unsaved){{/if}}
-  </span>
-  <button {{on "click" this.delete}}
-    data-test-card-editor-delete-btn
-    disabled={{not this.cardstackSession.isAuthenticated}}
-  >
-    Delete Card
-  </button>
-  <button {{on "click" this.cancel}}
-    data-test-card-editor-cancel-btn
-    disabled={{not this.cardstackSession.isAuthenticated}}
-  >
-    Cancel
-  </button>
-  <button {{on "click" this.save}}
-    data-test-card-editor-save-btn
-    disabled={{not this.cardstackSession.isAuthenticated}}
-  >
-    Save Card
-  </button>
+<CardhostLeftEdge />
+
+<div class="card-editor--container">
+  {{#if this.statusMsg}}
+    <p><strong>{{this.statusMsg}}</strong></p>
+  {{/if}}
+
+  <CardRenderer
+    @card={{this.card}}
+    @mode="edit"
+    @setFieldValue={{action this.setFieldValue}}
+    @format="isolated"
+  />
+
+  <section class="cardhost-card-document">
+    <h3>Card Document:</h3>
+    <CodeBlock
+      @code={{this.cardJson}}
+      @language="javascript"
+    />
+  </section>
 </div>
-<CardRenderer
-  @card={{this.card}}
-  @mode="edit"
-  @setFieldValue={{action this.setFieldValue}}
-  @format="isolated"
-/>
-
-
-<br>
-
-<h3>Card Document:</h3>
-<CodeBlock
-  @code={{this.cardJson}}
-  @language="javascript"
-/>

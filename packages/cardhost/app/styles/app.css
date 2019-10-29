@@ -1,14 +1,23 @@
 @import '/assets/fonts.css';
 @import '/assets/palette.css';
 @import '/assets/components/card-manipulator.css';
+@import '/assets/components/cardhost-left-edge.css';
+@import '/assets/components/cardhost-top-edge.css';
 
 :root {
-  --cardhost-font-family: "Open Sans", Roboto, "Helvetica Neue", Helvetica, Arial, sans-serif;
-  --cardhost-container-min-height: 1000px;
-  --cardhost-container-max-width: 1440px;
-  --cardhost-left-edge-width: 410px;
-  --cardhost-right-edge-width: 300px;
+  --ch-font-family: "Open Sans", Roboto, "Helvetica Neue", Helvetica, Arial, sans-serif;
+
+  --ch-left-edge-navbar-width: 80px;
+  --ch-left-edge-panel-width: 330px;
+  --ch-right-edge-panel-width: 300px;
+  --ch-top-edge-height: 80px;
+  --ch-header-height: 70px;
+  --ch-edges-z-index: 10;
+
+  --ch-left-edge-width: var(--ch-left-edge-navbar-width);
 }
+
+/* TODO: link and button focus and disabled states styling */
 
 * {
   box-sizing: border-box;
@@ -20,155 +29,193 @@ body {
   width: 100%;
   height: auto;
   margin: 0;
-  background-color: var(--cardhost-dark-blue-gray);
+  background-color: var(--ch-dark-blue-gray);
   color: white;
-  font-family: var(--cardhost-font-family);
+  font-family: var(--ch-font-family);
   font-size: 13px;
   letter-spacing: 0;
   line-height: 1.2;
 }
 
 a {
-  color: inherit;
+  --link: white;
+
+  color: var(--link);
   text-decoration: none;
 }
 
 a:hover {
+  --link: var(--ch-cyan);
+
   cursor: pointer;
-  color: inherit;
 }
 
+/* Can use this class to make links have button styling */
+.ch-button,
 button {
-  font-family: inherit;
+  --margin: 0;
+  --padding: 10px 15px;
+  --width: 100px;
+  --height: 40px;
+  --color: var(--ch-gray-black);
+  --background: var(--ch-cyan);
+  --font: 600 13px/18px "Open Sans";
+  --letter-spacing: 0.46px;
+  --border: 1px solid transparent;
+  --border-radius: 100px;
+
+  margin: var(--margin);
+  padding: var(--padding);
+  height: var(--height);
+  min-width: var(--width);
+  color: var(--color);
+  background: var(--background);
+  font: var(--font);
+  letter-spacing: var(--letter-spacing);
+  border: var(--border);
+  border-radius: var(--border-radius);
+  text-align: center;
 }
 
-button:not(:disabled):hover {
+.ch-button--secondary {
+  --color: var(--ch-cyan);
+  --background: var(--ch-dark-blue-gray);
+  --border: 1px solid var(--ch-medium-blue-gray);
+}
+
+button:hover,
+.ch-button:hover {
+  --color: white;
+
   cursor: pointer;
-  color: inherit;
 }
 
-.cardhost--main {
-  position: relative;
-  max-width: var(--cardhost-container-max-width);
+.ch-button + .ch-button,
+button + button {
+  margin-left: 10px;
 }
 
 
 /******* Below here should be refactored *********/
-
-.cardhost--header {
-  background-color: var(--cardhost-darkest-blue-gray);
-  color: white;
-}
-
-.cardhost--header > div {
+.cardhost {
   position: relative;
-  max-width: var(--cardhost-container-max-width);
-  padding: 20px;
+  margin-top: calc(var(--ch-top-edge-height) + var(--ch-header-height));
+  margin-left: var(--ch-left-edge-width);
+  margin-right: 20px;
 }
 
-.cardhost--header h1 {
+/* Temp app header */
+.cardhost--header {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  height: var(--ch-header-height);
+  padding: 20px;
+  background-color: var(--ch-darkest-blue-gray);
+  color: white;
+  z-index: var(--ch-edges-z-index);
+}
+
+.cardhost--header > h1 {
   margin: 0;
   padding: 0;
 }
 
-.cardhost--header button {
-  position: absolute;
-  top: 20px;
-  right: 20px;
-  background: none;
-  border-radius: 10px;
-  border: solid 2px var(--cardhost-light-gray-d6);
-  color: white;
+.cardhost--header > button {
+  --background: none;
+  --border-radius: 10px;
+  --border: 2px solid var(--ch-light-gray-d6);
+  --color: white;
 }
 
+.cardhost--header > button:hover {
+  --color: var(--ch-cyan);
+}
+
+
+/* Index template */
 .cardhost--topnav ul {
   list-style-type: none;
   margin: 0;
-  padding: 20px;
-}
-
-.cardhost--topnav ul li {
-  display: inline-block;
+  padding: 10px 0;
+  display: flex;
+  align-items: center;
 }
 
 .cardhost--topnav ul li a::after {
   display: inline-block;
-  color: var(--cardhost-light-gray);
+  color: var(--ch-light-gray);
   content: '|';
   font-size: 80%;
   font-weight: bold;
-  padding: 0 3px;
+  padding: 0 10px;
 }
 
 .cardhost-catalog {
+  padding-left: 20px;
+}
+
+.cardhost-catalog--title {
+  margin: 0;
+  padding-right: 20px;
+  font-size: 18px;
+  font-weight: 600;
+}
+
+
+/* Other */
+.card-editor--container,
+.cards-view--container {
   padding: 20px;
 }
 
-.card-creator--field-btn-wrapper {
-  text-align: right;
+.card-editor--top-edge,
+.cards-view--top-edge {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  height: 40px;
+}
+
+.card-editor--top-edge-inner-container,
+.cards-view--top-edge-buttons {
+  display: flex;
+  align-items: center;
+}
+
+.card-editor--top-edge-title,
+.cards-view--top-edge-title {
+  margin: 0;
+  padding-right: 20px;
+  font-size: 18px;
+  font-weight: 600;
 }
 
 .field-creator--field-btn-wrapper {
   text-align: right;
 }
 
-.card-editor--field-btn-wrapper {
-  text-align: right;
-}
-
-.card-schema--field-btn-wrapper {
-  text-align: right;
-}
-
-.field-renderer--field-btn-wrapper {
-  text-align: right;
-}
-
-
-/* Reused buttons */
-.cardhost-button {
-  position: inline-block;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  margin: 0;
-  padding: 0;
-  height: 40px;
-  min-width: 100px;
-  font-size: 13px;
-  font-weight: 600;
-  border: 1px solid transparent;
-  border-radius: 100px;
-}
-
-.cardhost-button.primary {
-  background-color: var(--cardhost-brighter-cyan);
-  color: black;
-}
-
-.cardhost-button.secondary {
-  background-color: var(--cardhost-dark-blue-gray);
-  color: var(--cardhost-brighter-cyan);
-  border-color: var(--cardhost-medium-blue-gray);
-}
-
-
-/* JSON card document section */
+/* Temp JSON card document section */
 .cardhost-card-document {
   max-width: 100%;
-  padding: 60px;
+  padding: 40px 0;
   font-size: 12px;
   overflow-x: scroll;
 }
 
-
-/* Right Edge */
+/* Temp Right Edge styles */
 .cardhost-right-edge {
-  position: absolute;
-  top: 0;
-  right: 20px;
-  height: 100%;
-  padding: 0;
+  position: fixed;
+  top: calc(var(--ch-header-height) + var(--ch-top-edge-height));
+  right: 0;
+  margin: 0;
+  padding: 0 20px;
+  z-index: var(--ch-edges-z-index);
 }
 
 .cardhost-right-edge--nav ul {
@@ -182,9 +229,11 @@ button:not(:disabled):hover {
 
 .cardhost-right-edge-panel {
   position: relative;
-  width: var(--cardhost-right-edge-width);
+  top: 0;
+  right: 0;
+  width: var(--ch-right-edge-panel-width);
   padding: 25px;
-  background-color: var(--cardhost-medium-dark-blue-gray);
+  background-color: var(--ch-medium-dark-blue-gray);
   border-radius: 20px;
   color: white;
 }
@@ -193,118 +242,4 @@ button:not(:disabled):hover {
   padding: 10px 0 25px;
   font-size: 16px;
   text-transform: capitalize;
-}
-
-
-/* Left edge  */
-.cardhost-left-edge {
-  position: absolute;
-  top: 0;
-  left: 0;
-  display: flex;
-  flex-flow: row nowrap;
-  width: var(--cardhost-left-edge-width);
-  height: 100%;
-  z-index: 2;
-  opacity: 0.96;
-}
-
-.cardhost-left-edge--nav {
-  width: 100%;
-  max-width: 60px;
-  background-color: var(--cardhost-darkest-blue-gray);
-}
-
-.cardhost-left-edge--nav > ul {
-  display: flex;
-  flex-flow: column nowrap;
-  justify-content: space-between;
-  align-items: center;
-  height: 100%;
-  margin: 0;
-  padding: 20px 0;
-  list-style-type: none;
-}
-
-.cardhost-left-edge--nav .icon {
-  width: 40px;
-  height: 40px;
-  background-size: 40px 40px;
-  background-position: center;
-  background-repeat: no-repeat;
-  box-shadow: 0 3px 6px rgba(0, 0, 0, 0.15);
-  fill: var(--cardhost-cyan);
-}
-
-.cardhost-left-edge--nav .icon.profile {
-  background-image: url('/assets/images/icon-profile.svg');
-}
-
-.cardhost-left-edge--nav .icon.catalog {
-  background-image: url('/assets/images/icon-catalog.svg');
-  border-radius: 5px;
-}
-
-.cardhost-left-edge--nav .icon.library {
-  background-image: url('/assets/images/icon-library.svg');
-}
-
-
-.cardhost-left-edge--catalog {
-  min-height: var(--cardhost-container-min-height);
-  width: 100%;
-  padding: 30px 20px;
-  background-color: var(--cardhost-light-gray);
-  color: black;
-  overflow-y: scroll;
-}
-
-.cardhost-left-edge--catalog .title {
-  margin: 0;
-  padding-bottom: 50px;
-  font-size: 20px;
-  font-weight: 600;
-  line-height: 1;
-}
-
-.cardhost-left-edge--catalog-field {
-  position: relative;
-  display: flex;
-  border: 1px solid var(--cardhost-light-gray-d6);
-  border-radius: 10px;
-  background-color: white;
-}
-
-.cardhost-left-edge--catalog-field + .cardhost-left-edge--catalog-field {
-  margin-top: 15px;
-}
-
-.cardhost-left-edge--catalog-field .field-icon {
-  width: 90px;
-  border-top-left-radius: inherit;
-  border-bottom-left-radius: inherit;
-  background-position: center;
-  background-repeat: no-repeat;
-  background-size: 20px 20px;
-}
-
-.cardhost-left-edge--catalog-field .field-content {
-  width: 100%;
-  padding: 15px 15px 15px 0;
-  margin: 0;
-}
-
-.cardhost-left-edge--catalog-field .field-content--title {
-  margin: 0;
-  padding-bottom: 5px;
-  font-size: 16px;
-  font-weight: 600;
-  line-height: 1;
-}
-
-.cardhost-left-edge--catalog-field .field-content--description {
-  margin: 0;
-  padding-bottom: 5px;
-  font-size: 11px;
-  color: rgba(0, 0, 0, 0.5);
 }
