@@ -75,10 +75,10 @@ function assertIsolatedCardMetadata(card) {
   expect(data.attributes['tag-names']).to.eql(['millenials', 'puppies', 'belly-rubs']);
   expect(data.attributes['embedded-metadata-field-types']).to.be.undefined; // this one shouldn't leak into the external format
   expect(data.attributes['metadata-field-types']).to.eql({
-    title: '@cardstack/core-types::string',
-    body: '@cardstack/core-types::string',
-    author: '@cardstack/core-types::belongs-to',
-    tags: '@cardstack/core-types::has-many',
+    title: { type: '@cardstack/core-types::string', label: 'title' },
+    body: { type: '@cardstack/core-types::string', label: 'body' },
+    author: { type: '@cardstack/core-types::belongs-to', label: 'author' },
+    tags: { type: '@cardstack/core-types::has-many', label: 'tags' }
   });
   expect(data.relationships.tags.data).to.eql([
     { type: 'tags', id: 'millenials' },
@@ -100,8 +100,8 @@ function assertEmbeddedCardMetadata(card) {
   expect(data.attributes['internal-field']).to.be.undefined;
   expect(data.attributes['embedded-metadata-field-types']).to.be.undefined; // this one shouldn't leak into the external format
   expect(data.attributes['metadata-field-types']).to.eql({
-    title: '@cardstack/core-types::string',
-    author: '@cardstack/core-types::belongs-to',
+    title: { type: '@cardstack/core-types::string', label: 'title' },
+    author: { type: '@cardstack/core-types::belongs-to', label: 'author' }
   });
 
   expect(includedIdentifiers).to.not.include.members([
@@ -147,7 +147,7 @@ function assertCardModels(card) {
   expect(relatedCard.attributes.email).to.be.undefined;
   expect(relatedCard.attributes['embedded-metadata-field-types']).to.be.undefined; // this one shouldn't leak into the external format
   expect(relatedCard.attributes['metadata-field-types']).to.eql({
-    name: '@cardstack/core-types::string'
+    name: { type: '@cardstack/core-types::string', label: 'name' }
   });
 }
 
@@ -820,10 +820,10 @@ describe('hub/card-services', function () {
         ]);
         expect(data.attributes['internal-field']).to.be.undefined;
         expect(data.attributes['metadata-field-types']).to.eql({
-          title: '@cardstack/core-types::string',
-          body: '@cardstack/core-types::string',
-          author: '@cardstack/core-types::belongs-to',
-          tags: '@cardstack/core-types::has-many',
+          title: { type: '@cardstack/core-types::string', label: 'title' },
+          body: { type: '@cardstack/core-types::string', label: 'body' },
+          author: { type: '@cardstack/core-types::belongs-to', label: 'author' },
+          tags: { type: '@cardstack/core-types::has-many', label: 'tags' }
         });
 
         let model = included.find(i => `${i.type}/${i.id}` === 'local-hub::article-card::millenial-puppies/local-hub::article-card::millenial-puppies');
@@ -841,7 +841,7 @@ describe('hub/card-services', function () {
         expect(embedded.attributes.name).to.equal('Van Gogh');
         expect(embedded.attributes.email).to.be.undefined;
         expect(embedded.attributes['metadata-field-types']).to.eql({
-          name: '@cardstack/core-types::string',
+          name: { type: '@cardstack/core-types::string', label: 'name' }
         });
       });
 
