@@ -105,33 +105,27 @@
           <div class="section-header">Text Field</div>
           <div class="card-manipulator--right-edge--attribute">
             <div class="attribute-title">Field Name</div>
-            {{#let (component this.fieldEditor) as | FieldEditor |}}
-              <Input
-                data-test-field-name
-                @id={{concat "card-manipulator--right-edge--field-name-" this.selectedField.nonce}}
-                @value={{this.updatedFieldName}}
-                @key-up={{action this.updateFieldName}}
-              />
-            {{/let}}
+            <Input
+              data-test-field-name
+              @id={{concat "card-manipulator--right-edge--field-name-" this.selectedField.nonce}}
+              @value={{this.updatedFieldName}}
+              @key-up={{action this.updateFieldName}}
+            />
           </div>
           <div class="card-manipulator--right-edge--attribute">
             <div class="attribute-title">Display Label</div>
             <Input class="attribute-value" />
           </div>
           <div class="card-manipulator--right-edge--attribute">
-            <label class="checkbox-container">Required
+            <label class="checkbox-container">
+              Required
               <Input @type="checkbox" />
               <span class="checkmark"></span>
             </label>
           </div>
           <div class="card-manipulator--right-edge--attribute">
-            <label class="checkbox-container">Export as Metadata
-              <Input @type="checkbox" />
-              <span class="checkmark"></span>
-            </label>
-          </div>
-          <div class="card-manipulator--right-edge--attribute">
-            <label class="checkbox-container">Available When Embedded
+            <label class="checkbox-container">
+              Available When Embedded
               <Input
                 @checked={{this.selectedField.neededWhenEmbedded}}
                 @type="checkbox"
