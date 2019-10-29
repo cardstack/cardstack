@@ -3,12 +3,12 @@ const JSONAPIFactory = require('@cardstack/test-support/jsonapi-factory');
 let factory = new JSONAPIFactory();
 
 let card = factory.getDocumentFor(
-  factory.addResource('local-hub::foreign-internal-belongs-to-relationship::bad', 'local-hub::foreign-internal-belongs-to-relationship::bad')
-    .withRelated('local-hub::foreign-internal-belongs-to-relationship::bad::related-thing',
-      { type: 'local-hub::foreign-internal-belongs-to-relationship::bad', id: 'local-hub::foreign-internal-belongs-to-relationship::millenial-puppies::owner' }
+  factory.addResource('local-hub::foreign-internal-belongs-to-relationship', 'local-hub::foreign-internal-belongs-to-relationship')
+    .withRelated('local-hub::foreign-internal-belongs-to-relationship::related-thing',
+      { type: 'local-hub::millenial-puppies::internal', id: 'local-hub::millenial-puppies::internal-item' }
     )
     .withRelated('fields', [
-      factory.addResource('fields', 'local-hub::foreign-internal-belongs-to-relationship::bad::related-thing').withAttributes({
+      factory.addResource('fields', 'local-hub::foreign-internal-belongs-to-relationship::related-thing').withAttributes({
         'is-metadata': true,
         'field-type': '@cardstack/core-types::belongs-to'
       }),

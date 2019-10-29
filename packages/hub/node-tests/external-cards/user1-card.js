@@ -2,7 +2,7 @@ const JSONAPIFactory = require('@cardstack/test-support/jsonapi-factory');
 let factory = new JSONAPIFactory();
 
 module.exports = factory.getDocumentFor(
-  factory.addResource('cards', 'local-hub::user-card::van-gogh')
+  factory.addResource('cards', 'local-hub::van-gogh')
     .withRelated('fields', [
       factory.addResource('fields', 'name').withAttributes({
         'is-metadata': true,
@@ -19,11 +19,11 @@ module.exports = factory.getDocumentFor(
         'field-type': '@cardstack/core-types::has-many',
       }),
     ])
-    .withRelated('model', factory.addResource('local-hub::user-card::van-gogh', 'local-hub::user-card::van-gogh')
+    .withRelated('model', factory.addResource('local-hub::van-gogh', 'local-hub::van-gogh')
       .withAttributes({
         name: "Van Gogh",
         email: "vangogh@nowhere.dog",
       })
-      .withRelated('friends', [{ type: 'cards', id: 'local-hub::user-card::hassan' }])
+      .withRelated('friends', [{ type: 'cards', id: 'local-hub::hassan' }])
     )
 );

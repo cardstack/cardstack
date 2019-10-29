@@ -6,9 +6,9 @@ import {
   cleanupDefaulValueArtifacts
 } from '../../helpers/card-helpers';
 
-const card1Id = 'local-hub::article-card::millenial-puppies';
-const card2Id = 'local-hub::user-card::van-gogh';
-const card3Id = 'local-hub::user-card::hassan';
+const card1Id = 'local-hub::millenial-puppies';
+const card2Id = 'local-hub::van-gogh';
+const card3Id = 'local-hub::hassan';
 
 const titleField = {
   type: 'fields',
@@ -148,6 +148,16 @@ module("Unit | Service | data", function () {
       assert.equal(card.isDirty, true, 'the dirtiness is correct for a new card');
       assert.equal(card.loadedFormat, 'isolated', 'the loaded state is correct for a new card');
       assert.equal(card.isNew, true, 'the isNew state is correct for a new card');
+    });
+
+    test("it throws an error when the card id format has no respository indicator", async function (assert) {
+      let service = this.owner.lookup('service:data');
+      assert.throws(() => service.createCard('article-card'), /format is incorrect/);
+    });
+
+    test("it throws an error when the card id format has 3 parts", async function (assert) {
+      let service = this.owner.lookup('service:data');
+      assert.throws(() => service.createCard('local-hub::foo::bar'), /format is incorrect/);
     });
 
     test("it can add a new field to an isolated card", async function (assert) {
@@ -593,6 +603,8 @@ module("Unit | Service | data", function () {
       assert.equal(card.isDirty, false, 'the dirtiness is correct for a saved card');
       assert.equal(card.isNew, false, 'the newness state is correct for a saved card');
       assert.equal(card.loadedFormat, 'isolated', 'the loaded state is correct for a saved card');
+      assert.equal(card.name, 'millenial-puppies');
+      assert.equal(card.repository, 'local-hub');
     });
 
     test("it can load field values of included embedded cards synchronously", async function (assert) {
@@ -697,7 +709,7 @@ module("Unit | Service | data", function () {
 
     test("it throws an error when you try to get a card that does not exist", async function (assert) {
       let service = this.owner.lookup('service:data');
-      await assert.rejects(service.getCard('local-hub::article-card::does-not-exist', 'isolated'), /Not Found/);
+      await assert.rejects(service.getCard('local-hub::does-not-exist', 'isolated'), /Not Found/);
     });
 
     test("it throws an error when you try to load a card in an unknown format", async function (assert) {

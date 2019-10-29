@@ -4,7 +4,7 @@ import { setupRenderingTest } from 'ember-qunit';
 import { render, fillIn, triggerEvent, click } from '@ember/test-helpers';
 import hbs from 'htmlbars-inline-precompile';
 
-const card1Id = 'local-hub::article-card::millenial-puppies';
+const card1Id = 'local-hub::millenial-puppies';
 
 const scenario = new Fixtures({
   create(factory) {

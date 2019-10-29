@@ -6,9 +6,12 @@ import { setFieldValue, createCards } from '../helpers/card-helpers';
 import { setupMockUser, login } from '../helpers/login';
 
 const timeout = 5000;
-const card1Id = 'local-hub::article-card::millenial-puppies';
-const card2Id = 'local-hub::user-card::van-gogh';
-const card3Id = 'local-hub::user-card::hassan';
+const card1Id = 'millenial-puppies';
+const qualifiedCard1Id = `local-hub::${card1Id}`;
+const card2Id = 'van-gogh';
+const qualifiedCard2Id = `local-hub::${card2Id}`;
+const card3Id = 'hassan';
+const qualifiedCard3Id = `local-hub::${card3Id}`;
 
 const scenario = new Fixtures({
   create(factory) {
@@ -16,9 +19,9 @@ const scenario = new Fixtures({
   },
   destroy() {
     return [
-      { type: 'cards', id: card1Id },
-      { type: 'cards', id: card2Id },
-      { type: 'cards', id: card3Id },
+      { type: 'cards', id: qualifiedCard1Id },
+      { type: 'cards', id: qualifiedCard2Id },
+      { type: 'cards', id: qualifiedCard3Id },
     ];
   }
 });
@@ -167,11 +170,11 @@ module('Acceptance | card edit', function(hooks) {
     assert.dom(`[data-test-field="reviewers"] [data-test-embedded-card="${card3Id}"] [data-test-field="email"]`).doesNotExist();
 
     let card = JSON.parse(find('.code-block').textContent);
-    assert.deepEqual(card.data.relationships.reviewers.data, [{ type: 'cards', id: card2Id }, { type: 'cards', id: card3Id }]);
-    let userCard1 = card.included.find(i => `${i.type}/${i.id}` === `cards/${card2Id}`);
+    assert.deepEqual(card.data.relationships.reviewers.data, [{ type: 'cards', id: qualifiedCard2Id }, { type: 'cards', id: qualifiedCard3Id }]);
+    let userCard1 = card.included.find(i => `${i.type}/${i.id}` === `cards/${qualifiedCard2Id}`);
     assert.equal(userCard1.attributes.name, 'Van Gogh');
     assert.equal(userCard1.attributes.email, undefined);
-    let userCard2 = card.included.find(i => `${i.type}/${i.id}` === `cards/${card3Id}`);
+    let userCard2 = card.included.find(i => `${i.type}/${i.id}` === `cards/${qualifiedCard3Id}`);
     assert.equal(userCard2.attributes.name, 'Hassan Abdel-Rahman');
     assert.equal(userCard2.attributes.email, undefined);
   });
@@ -199,8 +202,8 @@ module('Acceptance | card edit', function(hooks) {
     assert.dom(`[data-test-field="author"] [data-test-embedded-card="${card2Id}"] [data-test-field="email"]`).doesNotExist();
 
     let card = JSON.parse(find('.code-block').textContent);
-    assert.deepEqual(card.data.relationships.author.data, { type: 'cards', id: 'local-hub::user-card::van-gogh' });
-    let userCard = card.included.find(i => `${i.type}/${i.id}` === 'cards/local-hub::user-card::van-gogh');
+    assert.deepEqual(card.data.relationships.author.data, { type: 'cards', id: qualifiedCard2Id });
+    let userCard = card.included.find(i => `${i.type}/${i.id}` === `cards/${qualifiedCard2Id}`);
     assert.equal(userCard.attributes.name, 'Van Gogh');
     assert.equal(userCard.attributes.email, undefined);
   });
