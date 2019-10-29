@@ -15,6 +15,7 @@ const titleField = {
   id: 'title',
   attributes: {
     'is-metadata': true,
+    caption: 'title',
     'needed-when-embedded': true,
     'field-type': '@cardstack/core-types::string'
   },
@@ -24,6 +25,7 @@ const nameField = {
   id: 'name',
   attributes: {
     'is-metadata': true,
+    caption: 'name',
     'needed-when-embedded': true,
     'field-type': '@cardstack/core-types::string'
   },
@@ -33,6 +35,7 @@ const authorField = {
   id: 'author',
   attributes: {
     'is-metadata': true,
+    caption: 'author',
     'needed-when-embedded': true,
     'field-type': '@cardstack/core-types::belongs-to'
   },
@@ -42,6 +45,7 @@ const reviewersField = {
   id: 'reviewers',
   attributes: {
     'is-metadata': true,
+    caption: 'reviewers',
     'needed-when-embedded': true,
     'field-type': '@cardstack/core-types::has-many'
   },
@@ -183,6 +187,22 @@ module("Unit | Service | data", function () {
         ]
       }, 'the card JSON is correct for adding a string field');
       assert.equal(card.isDirty, true, 'the dirtiness is correct for a modified card');
+    });
+
+    test("it can add a new field with a label", async function (assert) {
+      let service = this.owner.lookup('service:data');
+      let card = service.createCard(card1Id);
+      let field = card.addField({ name: 'title', label: 'The Title', type: '@cardstack/core-types::string', neededWhenEmbedded: true });
+
+      assert.equal(field.label, 'The Title');
+      let json = card.json;
+      let fieldJson = json.included.find(i => `${i.type}/${i.id}` === 'fields/title');
+      assert.equal(fieldJson.attributes.caption, 'The Title');
+
+      await card.save();
+
+      card = await service.getCard(card1Id, 'isolated');
+      assert.equal(card.getField('title').label, 'The Title');
     });
 
     test("it can add a new field to an isolated card at the first position", async function (assert) {
@@ -527,10 +547,13 @@ module("Unit | Service | data", function () {
       await article.save();
 
       let field = article.getField('author');
+      assert.equal(field.label, 'author');
       assert.equal(field.value.constructor.name, 'Card');
       assert.equal(field.value.id, person.id);
       assert.equal(article.getField('title').value, 'test title');
+      assert.equal(article.getField('title').label, 'title');
       assert.equal(article.getField('body').value, 'test body');
+      assert.equal(article.getField('body').label, 'body');
 
       assertCardHasIsolatedFields(assert, article);
       assert.equal(article.isDirty, false, 'the dirtiness is correct for a saved card');
@@ -926,6 +949,29 @@ module("Unit | Service | data", function () {
       model = card.json.included.find(i => `${i.type}/${i.id}` === `${card1Id}/${card1Id}`);
       assert.equal(model.attributes.subtitle, 'test title');
       assert.equal(model.attributes.title, undefined);
+    });
+
+
+    test("it can change the name of a field", async function (assert) {
+      let service = this.owner.lookup('service:data');
+      let card = await service.getCard(card1Id, 'isolated');
+      let field = card.getField('title');
+
+      assert.equal(field.label, 'title');
+      assert.equal(card.isDirty, false);
+
+      field.setLabel('The Title');
+      assert.equal(card.isDirty, true);
+      assert.equal(field.label, 'The Title');
+      await card.save();
+
+      assert.equal(card.isDirty, false);
+      field = card.getField('title');
+      assert.equal(field.label, 'The Title');
+    });
+
+    skip('TODO when the field is set to an empty string, the name of the field is returned as the label', async function(/*assert*/) {
+
     });
 
     skip("TODO updating a card does not impact any of the card's internal fields", async function (/*assert*/) {
@@ -1431,6 +1477,15 @@ module("Unit | Service | data", function () {
       await card.delete();
 
       assert.throws(() => field.setValue('update'), /destroyed field/);
+    });
+
+    test('throws when you set the label from deleted Field instance', async function (assert) {
+      let service = this.owner.lookup('service:data');
+      let card = await service.getCard(card1Id, 'isolated');
+      let field = card.getField('title');
+      await card.delete();
+
+      assert.throws(() => field.setLabel('update'), /destroyed field/);
     });
 
     test('throws when you call remove from deleted Field instance', async function (assert) {

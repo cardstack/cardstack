@@ -2,6 +2,7 @@ const { merge } = require('lodash');
 
 exports.type = '@cardstack/core-types::object';
 
+// TODO this contains more info than just "types", consider renaming this to "metadata-summary"?
 exports.compute = async function(model, { format }) {
   let fields = await model.getRelated('fields');
   if (!fields) { return {}; }
@@ -15,7 +16,8 @@ exports.compute = async function(model, { format }) {
 
     let fieldName = field.id.split('::').pop();
     let fieldType = await field.getField('field-type');
-    fieldTypes[fieldName] = fieldType;
+    let label = await field.getField('caption');
+    fieldTypes[fieldName] = { type: fieldType, label };
   }
 
   let adoptedCard = await model.getRelated('adopted-from');
