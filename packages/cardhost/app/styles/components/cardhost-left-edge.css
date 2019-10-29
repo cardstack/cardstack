@@ -1,16 +1,16 @@
 .cardhost-left-edge {
   position: fixed;
-  top: var(--cardhost-header-height);
-  height: calc(100% - var(--cardhost-header-height));
+  top: var(--ch-header-height);
+  height: calc(100% - var(--ch-header-height));
   left: 0;
   display: flex;
   flex-flow: row nowrap;
-  z-index: var(--cardhost-edges-z-index);
+  z-index: var(--ch-edges-z-index);
 }
 
 .cardhost-left-edge--nav {
-  width: var(--cardhost-left-edge-navbar-width);
-  background-color: var(--cardhost-darkest-blue-gray);
+  width: var(--ch-left-edge-navbar-width);
+  background-color: var(--ch-darkest-blue-gray);
 }
 
 .cardhost-left-edge--nav > ul {
@@ -31,7 +31,7 @@
   background-position: center;
   background-repeat: no-repeat;
   box-shadow: 0 3px 6px rgba(0, 0, 0, 0.15);
-  fill: var(--cardhost-cyan);
+  fill: var(--ch-cyan);
 }
 
 .cardhost-left-edge--nav .icon.profile {
@@ -49,10 +49,10 @@
 
 
 .cardhost-left-edge--catalog {
-  /* min-height: var(--cardhost-container-min-height); */
-  width: var(--cardhost-left-edge-panel-width);
+  /* min-height: var(--ch-container-min-height); */
+  width: var(--ch-left-edge-panel-width);
   padding: 30px 20px;
-  background-color: var(--cardhost-light-gray);
+  background-color: var(--ch-light-gray);
   color: black;
   overflow-y: scroll;
 }
@@ -68,7 +68,7 @@
 .cardhost-left-edge--catalog-field {
   position: relative;
   display: flex;
-  border: 1px solid var(--cardhost-light-gray-d6);
+  border: 1px solid var(--ch-light-gray-d6);
   border-radius: 10px;
   background-color: white;
 }

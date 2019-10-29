@@ -1,4 +1,5 @@
 .field-renderer {
+  --field-renderer-bg: #383849;
   --field-renderer-header-bg: #24242e;
   --field-renderer-max-width: 495px;
   --field-renderer-inner-max-width: 385px;
@@ -11,7 +12,7 @@
   justify-content: space-between;
   width: var(--field-renderer-max-width);
   max-width: 100%;
-  background-color: var(--cardhost-medium-darker-blue-gray);
+  background-color: var(--field-renderer-bg);
   color: black;
   font-size: 16px;
 }

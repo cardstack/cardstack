@@ -1,22 +1,23 @@
 @import '/assets/fonts.css';
 @import '/assets/palette.css';
-@import '/assets/components/card-editor.css';
 @import '/assets/components/card-manipulator.css';
 @import '/assets/components/cardhost-left-edge.css';
 @import '/assets/components/cardhost-top-edge.css';
 
 :root {
-  --cardhost-font-family: "Open Sans", Roboto, "Helvetica Neue", Helvetica, Arial, sans-serif;
+  --ch-font-family: "Open Sans", Roboto, "Helvetica Neue", Helvetica, Arial, sans-serif;
 
-  --cardhost-left-edge-navbar-width: 80px;
-  --cardhost-left-edge-panel-width: 330px;
-  --cardhost-right-edge-panel-width: 300px;
-  --cardhost-top-edge-height: 80px;
-  --cardhost-header-height: 70px;
-  --cardhost-edges-z-index: 10;
+  --ch-left-edge-navbar-width: 80px;
+  --ch-left-edge-panel-width: 330px;
+  --ch-right-edge-panel-width: 300px;
+  --ch-top-edge-height: 80px;
+  --ch-header-height: 70px;
+  --ch-edges-z-index: 10;
 
-  --cardhost-left-edge-width: var(--cardhost-left-edge-navbar-width);
+  --ch-left-edge-width: var(--ch-left-edge-navbar-width);
 }
+
+/* TODO: link and button focus and disabled states styling */
 
 * {
   box-sizing: border-box;
@@ -28,46 +29,82 @@ body {
   width: 100%;
   height: auto;
   margin: 0;
-  background-color: var(--cardhost-dark-blue-gray);
+  background-color: var(--ch-dark-blue-gray);
   color: white;
-  font-family: var(--cardhost-font-family);
+  font-family: var(--ch-font-family);
   font-size: 13px;
   letter-spacing: 0;
   line-height: 1.2;
 }
 
 a {
-  color: inherit;
+  --link: white;
+
+  color: var(--link);
   text-decoration: none;
 }
 
 a:hover {
+  --link: var(--ch-cyan);
+
   cursor: pointer;
-  color: inherit;
 }
 
+/* Can use this class to make links have button styling */
+.ch-button,
 button {
-  font-family: inherit;
+  --margin: 0;
+  --padding: 10px 15px;
+  --width: 100px;
+  --height: 40px;
+  --color: var(--ch-gray-black);
+  --background: var(--ch-cyan);
+  --font: 600 13px/18px "Open Sans";
+  --letter-spacing: 0.46px;
+  --border: 1px solid transparent;
+  --border-radius: 100px;
+
+  margin: var(--margin);
+  padding: var(--padding);
+  height: var(--height);
+  min-width: var(--width);
+  color: var(--color);
+  background: var(--background);
+  font: var(--font);
+  letter-spacing: var(--letter-spacing);
+  border: var(--border);
+  border-radius: var(--border-radius);
+  text-align: center;
 }
 
-button:not(:disabled):hover {
+.ch-button--secondary {
+  --color: var(--ch-cyan);
+  --background: var(--ch-dark-blue-gray);
+  --border: 1px solid var(--ch-medium-blue-gray);
+}
+
+button:hover,
+.ch-button:hover {
+  --color: white;
+
   cursor: pointer;
-  color: inherit;
+}
+
+.ch-button + .ch-button,
+button + button {
+  margin-left: 10px;
 }
 
 
 /******* Below here should be refactored *********/
-
-/* TODO: margins are temporary to account for edges */
 .cardhost {
   position: relative;
-  margin-top: calc(var(--cardhost-top-edge-height) + var(--cardhost-header-height));
-  margin-left: var(--cardhost-left-edge-width);
+  margin-top: calc(var(--ch-top-edge-height) + var(--ch-header-height));
+  margin-left: var(--ch-left-edge-width);
   margin-right: 20px;
 }
 
-
-/* Temporary Cardhost App Header */
+/* Temp app header */
 .cardhost--header {
   position: fixed;
   top: 0;
@@ -76,11 +113,11 @@ button:not(:disabled):hover {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  height: var(--cardhost-header-height);
+  height: var(--ch-header-height);
   padding: 20px;
-  background-color: var(--cardhost-darkest-blue-gray);
+  background-color: var(--ch-darkest-blue-gray);
   color: white;
-  z-index: var(--cardhost-edges-z-index);
+  z-index: var(--ch-edges-z-index);
 }
 
 .cardhost--header > h1 {
@@ -89,10 +126,14 @@ button:not(:disabled):hover {
 }
 
 .cardhost--header > button {
-  background: none;
-  border-radius: 10px;
-  border: solid 2px var(--cardhost-light-gray-d6);
-  color: white;
+  --background: none;
+  --border-radius: 10px;
+  --border: 2px solid var(--ch-light-gray-d6);
+  --color: white;
+}
+
+.cardhost--header > button:hover {
+  --color: var(--ch-cyan);
 }
 
 
@@ -107,7 +148,7 @@ button:not(:disabled):hover {
 
 .cardhost--topnav ul li a::after {
   display: inline-block;
-  color: var(--cardhost-light-gray);
+  color: var(--ch-light-gray);
   content: '|';
   font-size: 80%;
   font-weight: bold;
@@ -159,38 +200,7 @@ button:not(:disabled):hover {
   text-align: right;
 }
 
-
-/* Reused buttons */
-.cardhost-button {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  margin: 0;
-  padding: 0 15px;
-  height: 40px;
-  min-width: 100px;
-  font-size: 13px;
-  font-weight: 600;
-  border: 1px solid transparent;
-  border-radius: 100px;
-}
-
-.cardhost-button.primary {
-  background-color: var(--cardhost-brighter-cyan);
-  color: black;
-}
-
-.cardhost-button.secondary {
-  background-color: var(--cardhost-dark-blue-gray);
-  color: var(--cardhost-brighter-cyan);
-  border-color: var(--cardhost-medium-blue-gray);
-}
-
-.cardhost-button + .cardhost-button {
-  margin-left: 15px;
-}
-
-/* Temp section: JSON card document */
+/* Temp JSON card document section */
 .cardhost-card-document {
   max-width: 100%;
   padding: 40px 0;
@@ -201,11 +211,11 @@ button:not(:disabled):hover {
 /* Temp Right Edge styles */
 .cardhost-right-edge {
   position: fixed;
-  top: calc(var(--cardhost-header-height) + var(--cardhost-top-edge-height));
+  top: calc(var(--ch-header-height) + var(--ch-top-edge-height));
   right: 0;
   margin: 0;
   padding: 0 20px;
-  z-index: var(--cardhost-edges-z-index);
+  z-index: var(--ch-edges-z-index);
 }
 
 .cardhost-right-edge--nav ul {
@@ -221,9 +231,9 @@ button:not(:disabled):hover {
   position: relative;
   top: 0;
   right: 0;
-  width: var(--cardhost-right-edge-panel-width);
+  width: var(--ch-right-edge-panel-width);
   padding: 25px;
-  background-color: var(--cardhost-medium-dark-blue-gray);
+  background-color: var(--ch-medium-dark-blue-gray);
   border-radius: 20px;
   color: white;
 }

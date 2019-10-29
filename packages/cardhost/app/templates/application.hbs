@@ -4,7 +4,6 @@
   {{#cardstack-session as |session|}}
     {{#if session.isAuthenticated }}
       <button
-        class="cardhost-button"
         id="logout-button"
         onclick={{action session.logout}}
       >
@@ -13,7 +12,6 @@
     {{else}}
       {{#mock-login as |login|}}
         <button
-          class="cardhost-button"
           id="login-button"
           onclick={{action login "user1"}}
           data-test-cardstack="login-button"

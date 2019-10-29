@@ -2,10 +2,18 @@
   <div class="cards-view--top-edge">
     <h2 class="cards-view--top-edge-title" data-test-card-view={{this.model.id}}>View Card</h2>
     <div class="cards-view--top-edge-buttons">
-      <LinkTo @route="cards.schema" @model={{this.model}} @class="cardhost-button secondary">
+      <LinkTo
+        @route="cards.schema"
+        @model={{this.model}}
+        class="ch-button ch-button--secondary"
+      >
         Update Schema
       </LinkTo>
-      <LinkTo @route="cards.edit" @model={{this.model}} @class="cardhost-button secondary">
+      <LinkTo
+        @route="cards.edit"
+        @model={{this.model}}
+        class="ch-button ch-button--secondary"
+      >
         Edit Card
       </LinkTo>
     </div>

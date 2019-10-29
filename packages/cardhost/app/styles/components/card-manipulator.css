@@ -16,8 +16,8 @@
 
 .card-manipulator--container {
   position: relative;
-  left: var(--cardhost-left-edge-panel-width);
-  width: calc(100% - var(--cardhost-left-edge-panel-width));
+  left: var(--ch-left-edge-panel-width);
+  width: calc(100% - var(--ch-left-edge-panel-width));
   padding-left: 20px;
 }
 
@@ -26,15 +26,15 @@
   max-width: 500px;
   min-width: 460px;
   margin: 0;
-  background-color: var(--cardhost-medium-darker-blue-gray);
-  border: 2px solid var(--cardhost-cyan);
+  background-color: var(--ch-medium-darker-blue-gray);
+  border: 2px solid var(--ch-cyan);
   border-radius: 10px;
   overflow: hidden;
 }
 
 .card-manipulator--header {
   padding: 20px;
-  background-color: var(--cardhost-cyan);
+  background-color: var(--ch-cyan);
   color: black;
 }
 
@@ -59,7 +59,7 @@
 
 .drop-zone .drop-zone-text {
   box-sizing: border-box;
-  border: dashed 3px var(--cardhost-light-gray-d6);
+  border: dashed 3px var(--ch-light-gray-d6);
   color: transparent;
   font-size: 28px;
   padding: 20px;

@@ -1,16 +1,16 @@
 .cardhost-top-edge {
   position: fixed;
-  top: var(--cardhost-header-height);
-  left: var(--cardhost-left-edge-width);
+  top: var(--ch-header-height);
+  left: var(--ch-left-edge-width);
   right: 0;
   padding: 20px;
   display: flex;
   flex-flow: row nowrap;
-  z-index: var(--cardhost-edges-z-index);
+  z-index: var(--ch-edges-z-index);
 }
 
 .cardhost-top-edge.schema {
-  --cardhost-left-edge-width: calc(var(--cardhost-left-edge-navbar-width) + var(--cardhost-left-edge-panel-width));
+  --ch-left-edge-width: calc(var(--ch-left-edge-navbar-width) + var(--ch-left-edge-panel-width));
 }
 
 
@@ -22,12 +22,12 @@
   width: 325px;
   height: 40px;
   margin: 0 auto;
-  background-color: var(--cardhost-dark-blue-gray);
+  background-color: var(--ch-dark-blue-gray);
   background-image: url('/assets/images/icon-carrot.svg');
   background-position: right 20px center;
   background-repeat: no-repeat;
   background-size: 8px 8px;
-  border: solid 1px var(--cardhost-medium-blue-gray);
+  border: solid 1px var(--ch-medium-blue-gray);
   border-radius: 20px;
   text-align: center;
 }

@@ -1,9 +1,6 @@
 <CardhostTopEdge>
   <div class="card-editor--top-edge">
-    <div class="card-editor--top-edge-inner-container">
-      <h2 class="card-editor--top-edge-title" data-test-card-edit={{this.card.id}}>Edit Card</h2>
-      <LinkTo @route="cards.view" @model={{this.card}} @class="cardhost-button secondary">View</LinkTo>
-    </div>
+    <h2 class="card-editor--top-edge-title" data-test-card-edit={{this.card.id}}>Edit Card</h2>
     <div>
       <div class="card-editor--top-edge-inner-container">
         <span data-test-card-editor-is-dirty={{this.isDirtyStr}}>
@@ -11,21 +8,20 @@
         </span>
 
         <button {{on "click" this.delete}}
-          class="cardhost-button secondary"
+          class="ch-button--secondary"
           data-test-card-editor-delete-btn
           disabled={{not this.cardstackSession.isAuthenticated}}
         >
           Delete
         </button>
         <button {{on "click" this.cancel}}
-          class="cardhost-button secondary"
+          class="ch-button--secondary"
           data-test-card-editor-cancel-btn
           disabled={{not this.cardstackSession.isAuthenticated}}
         >
           Cancel
         </button>
         <button {{on "click" this.save}}
-          class="cardhost-button primary"
           data-test-card-editor-save-btn
           disabled={{not this.cardstackSession.isAuthenticated}}
         >

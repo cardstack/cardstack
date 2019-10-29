@@ -1,19 +1,17 @@
 <CardhostTopEdge @mode="schema">
   <div class="card-schema-updator--top-edge">
     <div class="card-schema-updator--top-edge-buttons">
-      <LinkTo class="cardhost-button secondary" @route="cards.view" @model={{this.card}}>View</LinkTo>
       {{! eslint is confused by on helper }}
       {{! template-lint-disable attribute-indentation}}
       <button
         {{on "click" this.save}}
-        class="cardhost-button secondary"
+        class="ch-button--secondary"
         disabled={{not this.cardstackSession.isAuthenticated}}
         data-test-card-schema-cancel-btn
       >
         Cancel
       </button>
       <button {{on "click" this.save}}
-        class="cardhost-button primary"
         disabled={{not this.cardstackSession.isAuthenticated}}
         data-test-card-schema-save-btn
       >
