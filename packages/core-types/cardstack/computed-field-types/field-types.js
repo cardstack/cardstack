@@ -16,7 +16,7 @@ exports.compute = async function(model, { format }) {
 
     let fieldName = field.id.split('::').pop();
     let fieldType = await field.getField('field-type');
-    let label = await field.getField('caption');
+    let label = await field.getField('caption') || fieldName;
     fieldTypes[fieldName] = { type: fieldType, label };
   }
 
