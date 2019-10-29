@@ -4,7 +4,8 @@ import { setupRenderingTest } from 'ember-qunit';
 import { render, fillIn, triggerEvent, click } from '@ember/test-helpers';
 import hbs from 'htmlbars-inline-precompile';
 
-const card1Id = 'local-hub::millenial-puppies';
+const card1Id = 'millenial-puppies';
+const qualifiedCard1Id = `local-hub::${card1Id}`;
 
 const scenario = new Fixtures({
   create(factory) {
@@ -33,7 +34,7 @@ const scenario = new Fixtures({
 
   destroy() {
     return [
-      { type: 'cards', id: card1Id },
+      { type: 'cards', id: qualifiedCard1Id },
     ];
   }
 });
@@ -50,7 +51,7 @@ module('Integration | Component | field-renderer', function(hooks) {
     assert.expect(1);
 
     let service = this.owner.lookup('service:data');
-    let card = service.createCard(card1Id);
+    let card = service.createCard(qualifiedCard1Id);
     card.addField({ name: 'body', type: '@cardstack/core-types::string', neededWhenEmbedded: true, value: 'test body' });
     let field = card.addField({ name: 'title', type: '@cardstack/core-types::string', neededWhenEmbedded: true, value: 'test title' });
     this.set('field', field);
@@ -71,7 +72,7 @@ module('Integration | Component | field-renderer', function(hooks) {
 
   test('it renders field in view mode', async function(assert) {
     let service = this.owner.lookup('service:data');
-    let card = service.createCard(card1Id);
+    let card = service.createCard(qualifiedCard1Id);
     let field = card.addField({ name: 'title', type: '@cardstack/core-types::string', neededWhenEmbedded: true, value: 'test title' });
     this.set('field', field);
 
@@ -85,7 +86,7 @@ module('Integration | Component | field-renderer', function(hooks) {
 
   test('it renders field in edit mode', async function(assert) {
     let service = this.owner.lookup('service:data');
-    let card = service.createCard(card1Id);
+    let card = service.createCard(qualifiedCard1Id);
     let field = card.addField({ name: 'title', type: '@cardstack/core-types::string', neededWhenEmbedded: true, value: 'test title' });
     this.set('field', field);
     this.set('noop', () => {});
@@ -107,7 +108,7 @@ module('Integration | Component | field-renderer', function(hooks) {
 
   test('it can update field value in edit mode', async function(assert) {
     let service = this.owner.lookup('service:data');
-    let card = service.createCard(card1Id);
+    let card = service.createCard(qualifiedCard1Id);
     let field = card.addField({ name: 'title', type: '@cardstack/core-types::string', neededWhenEmbedded: true, value: 'test title' });
     this.set('field', field);
     this.set('setFieldValue', value => field.setValue(value));
@@ -129,7 +130,7 @@ module('Integration | Component | field-renderer', function(hooks) {
 
   test('it renders field in schema mode', async function(assert) {
     let service = this.owner.lookup('service:data');
-    let card = service.createCard(card1Id);
+    let card = service.createCard(qualifiedCard1Id);
     card.addField({ name: 'body', type: '@cardstack/core-types::string', neededWhenEmbedded: true, value: 'test body' });
     let field = card.addField({ name: 'title', type: '@cardstack/core-types::string', neededWhenEmbedded: true, value: 'test title' });
     card.addField({ name: 'author', type: '@cardstack/core-types::string', neededWhenEmbedded: true, value: 'test author' });
@@ -160,7 +161,7 @@ module('Integration | Component | field-renderer', function(hooks) {
 
   test('it can change field name in schema mode', async function(assert) {
     let service = this.owner.lookup('service:data');
-    let card = service.createCard(card1Id);
+    let card = service.createCard(qualifiedCard1Id);
     let field = card.addField({ name: 'title', type: '@cardstack/core-types::string', neededWhenEmbedded: true, value: 'test title' });
     this.set('field', field);
     this.set('noop', () => {});
@@ -187,7 +188,7 @@ module('Integration | Component | field-renderer', function(hooks) {
 
   test('it can change field needed-when-embedded in schema mode', async function(assert) {
     let service = this.owner.lookup('service:data');
-    let card = service.createCard(card1Id);
+    let card = service.createCard(qualifiedCard1Id);
     let field = card.addField({ name: 'title', type: '@cardstack/core-types::string', neededWhenEmbedded: true, value: 'test title' });
     this.set('field', field);
     this.set('noop', () => {});
@@ -215,10 +216,9 @@ module('Integration | Component | field-renderer', function(hooks) {
     assert.equal(field.neededWhenEmbedded, false);
   });
 
-  // TODO update to use drop zones
   test('it can change field position in schema mode', async function(assert) {
     let service = this.owner.lookup('service:data');
-    let card = service.createCard(card1Id);
+    let card = service.createCard(qualifiedCard1Id);
     card.addField({ name: 'body', type: '@cardstack/core-types::string', neededWhenEmbedded: true, value: 'test body' });
     let field = card.addField({ name: 'title', type: '@cardstack/core-types::string', neededWhenEmbedded: true, value: 'test title' });
     card.addField({ name: 'author', type: '@cardstack/core-types::string', neededWhenEmbedded: true, value: 'test author' });
@@ -252,7 +252,7 @@ module('Integration | Component | field-renderer', function(hooks) {
 
   test('it can remove a field in schema mode', async function(assert) {
     let service = this.owner.lookup('service:data');
-    let card = service.createCard(card1Id);
+    let card = service.createCard(qualifiedCard1Id);
     let field = card.addField({ name: 'title', type: '@cardstack/core-types::string', neededWhenEmbedded: true, value: 'test title' });
     this.set('field', field);
     this.set('noop', () => {});
@@ -279,7 +279,7 @@ module('Integration | Component | field-renderer', function(hooks) {
     assert.expect(2);
 
     let service = this.owner.lookup('service:data');
-    let card = service.createCard(card1Id);
+    let card = service.createCard(qualifiedCard1Id);
     let field = card.addField({ name: 'title', type: '@cardstack/core-types::string', neededWhenEmbedded: true, value: 'test title' });
     this.set('field', field);
     this.set('noop', () => {});
