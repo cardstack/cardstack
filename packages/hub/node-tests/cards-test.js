@@ -1137,7 +1137,7 @@ describe('hub/card-services', function () {
       // it's fine to just add this assertion into the existing isolated and embedded tests for adopted cards
     });
 
-    it("can get an isolated card that uses mulitple levels of adoption", async function () {
+    it("can get an isolated card that uses multiple levels of adoption", async function () {
       await cardServices.create(env.session, genXKittens);
       let adoptedCreateResponse = await cardServices.create(env.session, genZHamsters);
       let adopted = await cardServices.get(env.session, genZHamsters.data.id, 'isolated');
@@ -1212,8 +1212,66 @@ describe('hub/card-services', function () {
       expect(adopted.data.attributes['embedded-css']).to.match(/\.article-card-embedded {}/);
     });
 
-    it.skip("can get an embedded card that uses mulitple levels of adoption", async function () {
+    it("can get an embedded card that uses multiple levels of adoption", async function () {
       // this is where a card adopts from a card, that in turn adopts from another card
+      await cardServices.create(env.session, genXKittens);
+      let adoptedCreateResponse = await cardServices.create(env.session, genZHamsters);
+      let adopted = await cardServices.get(env.session, genZHamsters.data.id, 'embedded');
+      delete adoptedCreateResponse.data.meta.source;
+      delete adopted.data.meta.source;
+
+      // clean up empty relationship default values to make it easier to deep equals
+      for (let resource of adopted.included) {
+        if (resource.type !== 'fields') { continue; }
+        delete resource.relationships;
+      }
+
+      expect(adoptedCreateResponse).not.to.eql(adopted, 'the card returned from the create() is the same as the card returned from get()');
+      expect(adopted.data.relationships['adopted-from'].data).to.eql({
+        type: 'cards',
+        id: genXKittens.data.id
+      });
+
+      let fieldSpecs = adopted.data.relationships.fields.data.map(f => `${f.type}/${f.id}`);
+      expect(fieldSpecs).to.include("fields/cuteness");
+      expect(fieldSpecs).to.not.include("fields/title");
+      expect(fieldSpecs).to.not.include("fields/author");
+      expect(fieldSpecs).to.not.include("fields/body");
+      expect(fieldSpecs).to.not.include("fields/yarn");
+
+      let includedSpecs = adopted.included.map(i => `${i.type}/${i.id}`);
+
+      expect(includedSpecs.length).to.equal(1);
+      expect(includedSpecs).not.to.include(`${genZHamsters.data.id}/${genZHamsters.data.id}`);
+      expect(includedSpecs).to.include(`cards/${externalUserCard.data.id}`);
+      expect(includedSpecs).not.to.include("fields/cuteness");
+      expect(includedSpecs).not.to.include("fields/title");
+      expect(includedSpecs).not.to.include("fields/author");
+      expect(includedSpecs).not.to.include("fields/body");
+      expect(includedSpecs).not.to.include("fields/yarn");
+
+      let fieldMeta = adopted.data.attributes['metadata-field-types'];
+
+      expect(fieldMeta.cuteness).to.equal("@cardstack/core-types::integer");
+      expect(fieldMeta.yarn).to.equal("@cardstack/core-types::string");
+      expect(fieldMeta.title).to.equal("@cardstack/core-types::string");
+      expect(fieldMeta.author).to.equal("@cardstack/core-types::belongs-to");
+
+      expect(adopted.data.attributes.yarn).to.equal("cotton");
+      expect(adopted.data.attributes.title).to.equal("GenZ Hamsters");
+      expect(adopted.data.attributes.cuteness).to.equal(10);
+
+      expect(adopted.data.relationships.author.data).to.eql({
+        type: 'cards',
+        id: externalUserCard.data.id
+      });
+
+      expect(adopted.data.attributes['isolated-template']).to.match(/<div>{{this.body}}<\/div>/);
+      expect(adopted.data.attributes['isolated-js']).to.match(/export default class ArticleIsolatedComponent/);
+      expect(adopted.data.attributes['isolated-css']).to.match(/\.article-card-isolated {}/);
+      expect(adopted.data.attributes['embedded-template']).to.match(/<h3>{{this.title}}<\/h3>/);
+      expect(adopted.data.attributes['embedded-js']).to.match(/export default class ArticleEmbeddedComponent/);
+      expect(adopted.data.attributes['embedded-css']).to.match(/\.article-card-embedded {}/);
     });
 
     it.skip("can override adopted browser assets", async function () {
