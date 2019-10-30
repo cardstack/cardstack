@@ -15,10 +15,6 @@ export default class ModeSwitcher extends Component {
     this.mode = this.args.mode;
   }
 
-  get mode() {
-    return this.mode;
-  }
-
   @action
   selectMode(mode) {
     this.mode = mode;

@@ -1,28 +1,32 @@
 <select
   onchange={{action "selectMode" value="target.value"}}
   class="mode-switcher {{@mode}}"
+  data-test-mode-switcher
 >
   {{#unless @mode}}
     <option selected disabled>Please select a view</option>
   {{/unless}}
   <option
-    class="mode-switcher--mode view"
+    class="mode-switcher--mode view {{if (eq this.mode "view") "selected"}}"
     value="view"
-    selected={{if (eq this.mode "view") true}}
+    selected={{eq this.mode "view"}}
+    data-test-mode-switcher-mode="view"
   >
     Layout View
   </option>
   <option
-    class="mode-switcher--mode edit"
+    class="mode-switcher--mode edit {{if (eq this.mode "edit") "selected"}}"
     value="edit"
-    selected={{if (eq this.mode "edit") true}}
+    selected={{eq this.mode "edit"}}
+    data-test-mode-switcher-mode="edit"
   >
     Form View
   </option>
   <option
-    class="mode-switcher--mode schema"
+    class="mode-switcher--mode schema {{if (eq this.mode "schema") "selected"}}"
     value="schema"
-    selected={{if (eq this.mode "schema") true}}
+    selected={{eq this.mode "schema"}}
+    data-test-mode-switcher-mode="schema"
   >
     Schema View
   </option>

@@ -1,5 +1,5 @@
 import { module, test } from 'qunit';
-import { click, find, visit, currentURL, waitFor } from '@ember/test-helpers';
+import { fillIn, find, visit, currentURL, waitFor } from '@ember/test-helpers';
 import { setupApplicationTest } from 'ember-qunit';
 import Fixtures from '@cardstack/test-support/fixtures'
 import { createCards } from '../helpers/card-helpers';
@@ -85,7 +85,7 @@ module('Acceptance | card view', function(hooks) {
     });
     await visit(`/cards/${card1Id}`);
 
-    await click(`a[href="/cards/${card1Id}/edit"]`);
+    await fillIn('[data-test-mode-switcher]', 'edit');
     await waitFor(`[data-test-card-edit="${card1Id}"]`, { timeout });
 
     assert.equal(currentURL(), `/cards/${card1Id}/edit`);
@@ -103,7 +103,7 @@ module('Acceptance | card view', function(hooks) {
     });
     await visit(`/cards/${card1Id}`);
 
-    await click(`a[href="/cards/${card1Id}/schema"]`);
+    await fillIn('[data-test-mode-switcher]', 'schema');
     await waitFor(`[data-test-card-schema="${card1Id}"]`, { timeout });
 
     assert.equal(currentURL(), `/cards/${card1Id}/schema`);
