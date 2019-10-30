@@ -604,6 +604,13 @@ describe('hub/card-services', function () {
       await cardServices.create(env.session, externalArticleCard);
     });
 
+    it("has a base-card", async function() {
+      let { data, included } = await cardServices.get(env.session, 'local-hub::@cardstack/base-card', 'isolated');
+      expect(data).to.be.ok;
+      let model = included.find(i => `${i.type}/${i.id}` === 'local-hub::@cardstack/base-card/local-hub::@cardstack/base-card');
+      expect(model).to.be.ok;
+    });
+
     it("has card metadata for isolated format", async function () {
       let article = await cardServices.get(env.session, 'local-hub::millenial-puppies', 'isolated');
       assertIsolatedCardMetadata(article);

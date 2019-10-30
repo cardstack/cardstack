@@ -109,4 +109,14 @@ module('Acceptance | card view', function(hooks) {
     assert.equal(currentURL(), `/cards/${card1Id}/schema`);
     assert.dom(`[data-test-card-schema="${card1Id}"]`).exists();
   });
+
+  test('can navigate to the base-card', async function(assert) {
+    await login();
+
+    await visit(`/cards/@cardstack%2Fbase-card`);
+    await waitFor(`[data-test-card-view="@cardstack/base-card"]`, { timeout });
+    assert.equal(currentURL(), `/cards/@cardstack%2Fbase-card`);
+
+    assert.dom('[data-test-field]').doesNotExist(); // base-card currenty has no fields
+  });
 });
