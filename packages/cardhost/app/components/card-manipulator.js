@@ -102,6 +102,7 @@ export default class CardManipulator extends Component {
   @tracked card;
   @tracked selectedField;
   @tracked isDragging;
+  @tracked selectedFieldName;
 
   constructor(...args) {
     super(...args);
@@ -217,8 +218,8 @@ export default class CardManipulator extends Component {
 
   @action
   updateFieldName(newName) {
-    this.updatedFieldName = newName;
-    this.setFieldName(this.selectedField.name, this.updatedFieldName);
+    this.selectedFieldName = newName;
+    this.setFieldName(this.selectedField.name, this.selectedFieldName);
   }
 
   @action
@@ -263,7 +264,7 @@ export default class CardManipulator extends Component {
     this.selectedField = field;
     fieldComponent.dragState = null;
     fieldComponent = fieldComponent; // eslint-disable-line no-self-assign
-
+    this.selectField(field);
 
     onFinishDrop();
   }
@@ -272,6 +273,6 @@ export default class CardManipulator extends Component {
     if (field.isDestroyed) { return; }
 
     this.selectedField = field;
-    this.updatedFieldName = field.name;
+    this.selectedFieldName = field.name;
   }
 }

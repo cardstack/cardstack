@@ -193,13 +193,13 @@
   border-color: yellow;
   height: 80px;
 }
-<<<<<<< HEAD
 
 /* Right Edge */
 .card-manipulator--right-edge {
   box-sizing: border-box;
   position: fixed;
   right: 0;
+  top: 240px;
   width: 320px;
   background-color:#41404D;
   border-radius: 10px;
