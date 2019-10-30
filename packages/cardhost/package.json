@@ -40,6 +40,7 @@
     "@cardstack/logger": "0.2.0",
     "@cardstack/mock-auth": "0.14.37",
     "@cardstack/test-support": "0.14.37",
+    "@cardstack/ui-components": "0.1.14",
     "@ember/jquery": "^0.6.1",
     "@ember/optional-features": "^0.7.0",
     "@ember/render-modifiers": "1.0.0",
