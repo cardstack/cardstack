@@ -9,6 +9,7 @@ export default class IndexRoute extends Route {
 
   async model() {
     // prime the store with seed models
+    await this.data.getCard('local-hub::@cardstack/base-card', 'isolated');
     if (environment === 'development') {
       await this.data.getCard('local-hub::why-doors', 'isolated');
     }

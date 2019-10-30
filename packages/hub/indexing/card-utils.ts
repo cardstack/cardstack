@@ -56,8 +56,8 @@ const cardBrowserAssetFields = [
   'embedded-js',
   'embedded-css',
 ];
-const metadataFieldTypesField = 'metadata-field-types';
-const embeddedMetadataFieldTypesField = 'embedded-metadata-field-types';
+const metadataSummaryField = 'metadata-summary';
+const embeddedMetadataSummaryField = `embedded-${metadataSummaryField}`;
 
 function cardContextFromId(id: string | number) {
   let noContext: CardContext = {};
@@ -204,7 +204,7 @@ async function generateInternalCardFormat(schema: todo, externalCard: SingleReso
   if (version != null) {
     set(model, 'meta.version', version);
   }
-  for (let field of cardBrowserAssetFields.concat([metadataFieldTypesField])) {
+  for (let field of cardBrowserAssetFields.concat([metadataSummaryField])) {
     let value = get(externalCard, `data.attributes.${field}`) as string;
     if (!value) { continue; }
     set(model, `attributes.${field}`, value);
@@ -264,8 +264,8 @@ async function generateCardModule(internalCard: SingleResourceDoc) {
     if (!computedFields.includes(field) || !cleanCard.data.relationships) { continue; }
     delete cleanCard.data.relationships[field];
   }
-  unset(cleanCard, 'data.attributes.metadata-field-types');
-  unset(cleanCard, 'data.attributes.embedded-metadata-field-types');
+  unset(cleanCard, `data.attributes.${metadataSummaryField}`);
+  unset(cleanCard, `data.attributes.${embeddedMetadataSummaryField}`);
   let version: string = get(cleanCard, 'data.meta.version');
   let cardFolder: string = join(cardsDir, repository, packageName);
   let cardFile: string = join(cardFolder, cardFileName);
@@ -422,8 +422,8 @@ async function deriveCardModelContentType(cardInInternalOrExternalFormat: Single
       cardBrowserAssetFields.map(i => ({ type: 'fields', id: i })),
       get(cardInInternalOrExternalFormat, 'data.relationships.fields.data') || [],
       [
-        { type: 'computed-fields', id: 'metadata-field-types' },
-        { type: 'computed-fields', id: 'embedded-metadata-field-types' }
+        { type: 'computed-fields', id: metadataSummaryField },
+        { type: 'computed-fields', id: embeddedMetadataSummaryField }
       ]
     )
   };
@@ -613,9 +613,9 @@ async function adaptCardToFormat(schema: todo, session: Session, internalCard: S
 
   let attributes: AttributesObject = {};
   for (let attr of Object.keys(get(priviledgedCard, 'data.attributes') || {})) {
-    if (cardBrowserAssetFields.concat([metadataFieldTypesField]).includes(attr) && result.data.attributes) {
+    if (cardBrowserAssetFields.concat([metadataSummaryField]).includes(attr) && result.data.attributes) {
       let value = get(priviledgedCard, `data.attributes.${attr}`);
-      if (!value && attr !== metadataFieldTypesField) {
+      if (!value && attr !== metadataSummaryField) {
         for (let adoptedCardResource of priviledgedAdoptedCardResources) {
           value = get(adoptedCardResource, `attributes.${attr}`);
           if (value) { break; }
@@ -627,13 +627,13 @@ async function adaptCardToFormat(schema: todo, session: Session, internalCard: S
   for (let attr of
     Object.keys(internalCard.data.attributes)
       .filter(i => !cardBrowserAssetFields.concat([
-        metadataFieldTypesField,
-        embeddedMetadataFieldTypesField
+        metadataSummaryField,
+        embeddedMetadataSummaryField
       ]).includes(i))) {
     attributes[attr] = internalCard.data.attributes[attr];
   }
-  unset(attributes, metadataFieldTypesField);
-  unset(attributes, embeddedMetadataFieldTypesField);
+  unset(attributes, metadataSummaryField);
+  unset(attributes, embeddedMetadataSummaryField);
   let relationships: RelationshipsObject = {};
   for (let rel of Object.keys(internalCard.data.relationships || {})) {
     if (rel === 'fields' || !internalCard.data.relationships) { continue; }
@@ -706,11 +706,11 @@ async function adaptCardToFormat(schema: todo, session: Session, internalCard: S
             resolvedIncluded.push(resource);
           } else {
             resolvedIncluded.push(...crawlEmbeddedCards(internalCard, resource.id).map((included: ResourceObject) => {
-              let embeddedFieldTypes = get(included, `attributes.${embeddedMetadataFieldTypesField}`);
+              let embeddedFieldTypes = get(included, `attributes.${embeddedMetadataSummaryField}`);
               if (!embeddedFieldTypes) { return included; } // if this is the case you have already dealt with it--just move along
 
-              set(included, `attributes.${metadataFieldTypesField}`, embeddedFieldTypes);
-              unset(included, `attributes.${embeddedMetadataFieldTypesField}`);
+              set(included, `attributes.${metadataSummaryField}`, embeddedFieldTypes);
+              unset(included, `attributes.${embeddedMetadataSummaryField}`);
               return included;
             }));
           }
@@ -719,7 +719,7 @@ async function adaptCardToFormat(schema: todo, session: Session, internalCard: S
         result.included = result.included.concat(resolvedIncluded);
       }
     } else {
-      unset(result, `data.attributes.${metadataFieldTypesField}.${fieldName}`);
+      unset(result, `data.attributes.${metadataSummaryField}.${fieldName}`);
     }
   }
   result.included = uniqBy(result.included, i => `${i.type}/${i.id}`);
@@ -761,7 +761,7 @@ function removeCardNamespacing(internalCard: SingleResourceDoc) {
       resource.type = 'cards';
     }
     for (let field of Object.keys(resource.attributes || {})) {
-      if (cardBrowserAssetFields.concat([metadataFieldTypesField]).includes(field)) { continue; }
+      if (cardBrowserAssetFields.concat([metadataSummaryField]).includes(field)) { continue; }
       let { modelId:fieldName } = cardContextFromId(field);
       if (!fieldName || !resource.attributes) { continue; }
       resource.attributes[fieldName] = resource.attributes[field];

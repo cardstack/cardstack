@@ -408,17 +408,17 @@ const models = [
   },
   {
     type: 'computed-fields',
-    id: 'metadata-field-types',
+    id: 'metadata-summary',
     attributes: {
-      'computed-field-type': '@cardstack/core-types::field-types',
+      'computed-field-type': '@cardstack/core-types::metadata-summary',
       params: { 'format': 'isolated' }
     }
   },
   {
     type: 'computed-fields',
-    id: 'embedded-metadata-field-types',
+    id: 'embedded-metadata-summary',
     attributes: {
-      'computed-field-type': '@cardstack/core-types::field-types',
+      'computed-field-type': '@cardstack/core-types::metadata-summary',
       params: { 'format': 'embedded' }
     }
   },
