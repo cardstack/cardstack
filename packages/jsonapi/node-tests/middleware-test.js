@@ -12,7 +12,7 @@ const qs = require('qs');
 const { removeSync } = require('fs-extra');
 const { join } = require('path');
 const { tmpdir } = require('os');
-const { adaptCardToFormat } = require('@cardstack/test-support/card-utils');
+const { adaptCardToFormat, cardBrowserAssetFields } = require('@cardstack/test-support/card-utils');
 
 const cardsDir = join(tmpdir(), 'card_modules');
 let cardFactory = new JSONAPIFactory();
@@ -968,8 +968,6 @@ describe('jsonapi/middleware', function() {
     });
 
     describe('mutating card tests', async function () {
-      let schema, cardServices;
-
       beforeEach(async function () {
         app = new Koa();
         env = await createDefaultEnvironment(__dirname + '/../');
@@ -980,14 +978,12 @@ describe('jsonapi/middleware', function() {
         app.use(env.lookup('hub:middleware-stack').middleware());
         request = defaults(supertest(app.callback()));
         request.set('Accept', 'application/vnd.api+json');
-        schema = await env.lookup('hub:current-schema').getSchema();
-        cardServices = env.lookup('hub:card-services');
       });
 
       afterEach(sharedTeardown);
 
       it('can create a new card', async function () {
-        let card = await adaptCardToFormat(schema, env.session, internalArticleCard, 'isolated', cardServices);
+        let card = await convertToExternalFormat(env, internalArticleCard);
         let response = await request.post('/api/cards').send(card);
         expect(response).hasStatus(201);
         assertIsolatedCardMetadata(response.body);
@@ -998,7 +994,7 @@ describe('jsonapi/middleware', function() {
       });
 
       it("can update a card", async function () {
-        let externalArticleCard = await adaptCardToFormat(schema, env.session, internalArticleCard, 'isolated', cardServices);
+        let externalArticleCard = await convertToExternalFormat(env, internalArticleCard);
         let { body: card } = await request.post('/api/cards').send(externalArticleCard);
         let internalModel = card.included.find(i => i.type = 'local-hub::article-card::millenial-puppies');
         internalModel.attributes.author = 'Van Gogh';
@@ -1023,7 +1019,7 @@ describe('jsonapi/middleware', function() {
       });
 
       it('can delete a card', async function () {
-        let externalArticleCard = await adaptCardToFormat(schema, env.session, internalArticleCard, 'isolated', cardServices);
+        let externalArticleCard = await convertToExternalFormat(env, internalArticleCard);
         let { body: card } = await request.post('/api/cards').send(externalArticleCard);
         let { data: { meta: { version } } } = card;
 
@@ -1057,4 +1053,17 @@ function assertEmbeddedCardMetadata(card) {
 
   expect(data.attributes.title).to.equal('The Millenial Puppy');
   expect(data.attributes.body).to.be.undefined;
+}
+
+async function convertToExternalFormat(env, internalCard) {
+  let searchers = env.lookup('hub:searchers');
+  let externalCard = await adaptCardToFormat(await env.lookup('hub:current-schema').getSchema(), env.session, internalCard, 'isolated', searchers);
+
+  // remove the card metadata to make this as real as possible...
+  for (let field of Object.keys(externalCard.data.attributes)) {
+    if (cardBrowserAssetFields.includes(field)) { continue; }
+    delete externalCard.data.attributes[field];
+  }
+
+  return externalCard;
 }

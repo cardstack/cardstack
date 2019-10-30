@@ -254,6 +254,13 @@ const models = [
   },
   {
     type: 'fields',
+    id: 'adopted-from',
+    attributes: {
+      'field-type': '@cardstack/core-types::belongs-to'
+    }
+  },
+  {
+    type: 'fields',
     id: 'edit-template',
     attributes: {
       'field-type': '@cardstack/core-types::string'
