@@ -2,7 +2,7 @@ const Factory = require('@cardstack/test-support/jsonapi-factory');
 
 let articleFactory = new Factory();
 let articleCard = articleFactory.getDocumentFor(
-  articleFactory.addResource('cards', 'local-hub::article-card::why-doors')
+  articleFactory.addResource('cards', 'local-hub::why-doors')
     .withRelated('fields', [
       articleFactory.addResource('fields', 'title').withAttributes({
         'is-metadata': true,
@@ -19,18 +19,18 @@ let articleCard = articleFactory.getDocumentFor(
         'needed-when-embedded': true
       }),
     ])
-    .withRelated('model', articleFactory.addResource('local-hub::article-card::why-doors', 'local-hub::article-card::why-doors')
+    .withRelated('model', articleFactory.addResource('local-hub::why-doors', 'local-hub::why-doors')
       .withAttributes({
         title: "Why Doors?",
         body: "What is the deal with doors, and how come there are so many of them?",
       })
-      .withRelated('author', { type: 'cards', id: 'local-hub::user-card::ringo' })
+      .withRelated('author', { type: 'cards', id: 'local-hub::ringo' })
     )
 );
 
 let userFactory = new Factory();
 let userCard = userFactory.getDocumentFor(
-  userFactory.addResource('cards', 'local-hub::user-card::ringo')
+  userFactory.addResource('cards', 'local-hub::ringo')
     .withRelated('fields', [
       userFactory.addResource('fields', 'name').withAttributes({
         'is-metadata': true,
@@ -42,7 +42,7 @@ let userCard = userFactory.getDocumentFor(
         'field-type': '@cardstack/core-types::case-insensitive',
       }),
     ])
-    .withRelated('model', userFactory.addResource('local-hub::user-card::ringo', 'local-hub::user-card::ringo')
+    .withRelated('model', userFactory.addResource('local-hub::ringo', 'local-hub::ringo')
       .withAttributes({
         name: "Ringo",
         email: "ringo@nowhere.dog",

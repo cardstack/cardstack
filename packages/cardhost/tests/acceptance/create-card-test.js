@@ -6,7 +6,8 @@ import { addField, setCardId, createCards, dragAndDropField, removeField } from 
 import { setupMockUser, login } from '../helpers/login';
 
 const timeout = 5000;
-const card1Id = 'local-hub::article-card::millenial-puppies';
+const card1Id = 'millenial-puppies';
+const qualifiedCard1Id = `local-hub::${card1Id}`;
 
 const scenario = new Fixtures({
   create(factory) {
@@ -14,7 +15,7 @@ const scenario = new Fixtures({
   },
   destroy() {
     return [
-      { type: 'cards', id: card1Id },
+      { type: 'cards', id: qualifiedCard1Id },
     ];
   }
 });

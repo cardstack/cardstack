@@ -41,7 +41,6 @@ const log = logger('cardstack/card-utils');
 interface CardContext {
   repository?: string;
   packageName?: string;
-  cardId?: string;
   modelId?: string;
 }
 
@@ -65,24 +64,23 @@ function cardContextFromId(id: string | number) {
   if (id == null) { return noContext; }
 
   let idSplit = String(id).split(cardIdDelim);
-  if (idSplit.length < 2) { return noContext; }
+  if (!idSplit.length) { return noContext; }
 
-  let [repository, packageName, cardId, modelId] = idSplit;
+  let [repository, packageName, modelId] = idSplit;
 
   return {
     repository,
     packageName,
-    cardId,
     modelId,
   };
 }
 
-function cardContextToId({ repository, packageName, cardId, modelId }: CardContext) {
-  return [repository, packageName, cardId, modelId].filter(i => i != null).join(cardIdDelim);
+function cardContextToId({ repository, packageName,  modelId }: CardContext) {
+  return [repository, packageName, modelId].filter(i => i != null).join(cardIdDelim);
 }
 
 function isCard(type: string = '', id: string = '') {
-  return id && type === id && id.split(cardIdDelim).length > 2;
+  return id && type === id && id.split(cardIdDelim).length > 1;
 }
 
 async function loadCard(schema: todo, internalCard: SingleResourceDoc, getInternalCard: todo) {
@@ -97,9 +95,9 @@ async function loadCard(schema: todo, internalCard: SingleResourceDoc, getIntern
 
 function getCardId(id: string | number | undefined) {
   if (id == null) { return; }
-  if (String(id).split(cardIdDelim).length < 3) { return; }
-  let { repository, packageName, cardId } = cardContextFromId(id);
-  return cardContextToId({ repository, packageName, cardId });
+  if (String(id).split(cardIdDelim).length < 2) { return; }
+  let { repository, packageName } = cardContextFromId(id);
+  return cardContextToId({ repository, packageName });
 }
 
 async function validateInternalCardFormat(schema: todo, internalCard: SingleResourceDoc, getInternalCard: todo) {

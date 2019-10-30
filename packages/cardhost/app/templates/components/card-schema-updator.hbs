@@ -68,10 +68,10 @@
     <p><strong>{{this.statusMsg}}</strong></p>
   {{/if}}
 
-  <section class="card-manipulator" data-test-card-schema={{@card.id}}>
+  <section class="card-manipulator" data-test-card-schema={{@card.name}}>
     <header class="card-manipulator--header">
       <h2>Card Schema</h2>
-      <code>{{@card.id}}</code>
+      <code>{{@card.name}}</code>
     </header>
     <CardRenderer
       @card={{this.card}}

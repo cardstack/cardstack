@@ -58,15 +58,15 @@ function assertCardOnDisk() {
   [
     'card.js',
     'package.json',
-  ].concat(browserAssets).map(file => expect(pathExistsSync(join(cardsDir, 'local-hub', 'article-card', file))).to.equal(true, `${file} exists`));
+  ].concat(browserAssets).map(file => expect(pathExistsSync(join(cardsDir, 'local-hub', 'millenial-puppies', file))).to.equal(true, `${file} exists`));
 
-  let cardOnDisk = require(join(cardsDir, 'local-hub', 'article-card', 'card.js'));
+  let cardOnDisk = require(join(cardsDir, 'local-hub', 'millenial-puppies', 'card.js'));
   delete internalArticleCard.data.meta;
   expect(cardOnDisk.data).to.eql(internalArticleCard.data, 'card on disk is correct');
 
-  let pkgJson = require(join(cardsDir, 'local-hub', 'article-card', 'package.json'));
+  let pkgJson = require(join(cardsDir, 'local-hub', 'millenial-puppies', 'package.json'));
   expect(pkgJson).to.eql({
-    name: 'article-card',
+    name: 'millenial-puppies',
     version: '0.0.0',
     peerDependencies: {
       '@glimmer/component': '*'
@@ -76,7 +76,7 @@ function assertCardOnDisk() {
   browserAssets.map(file => {
     let [format, type] = file.split('.');
     type = type === 'hbs' ? 'template' : type;
-    let contents = readFileSync(join(cardsDir, 'local-hub', 'article-card', file), 'utf-8');
+    let contents = readFileSync(join(cardsDir, 'local-hub', 'millenial-puppies', file), 'utf-8');
     let fieldValue = internalArticleCard.data.attributes[`${format}-${type}`].trim();
     expect(contents).to.equal(fieldValue, `file contents are correct for ${file}`);
   });
@@ -86,7 +86,7 @@ function assertIsolatedCardMetadata(card) {
   let { data } = card;
   expect(data.attributes.title).to.equal('The Millenial Puppy');
   expect(data.attributes.body).to.match(/discerning tastes of the millenial puppy/);
-  expect(data.relationships.author.data).to.eql({ type: 'cards', id: 'local-hub::user-card::van-gogh' });
+  expect(data.relationships.author.data).to.eql({ type: 'cards', id: 'local-hub::van-gogh' });
   expect(data.attributes['tag-names']).to.eql(['millenials', 'puppies', 'belly-rubs']);
   expect(data.attributes['embedded-metadata-field-types']).to.be.undefined; // this one shouldn't leak into the external format
   expect(data.attributes['metadata-field-types']).to.eql({
@@ -108,7 +108,7 @@ function assertEmbeddedCardMetadata(card) {
   let includedIdentifiers = included.map(i => `${i.type}/${i.id}`);
 
   expect(data.attributes.title).to.equal('The Millenial Puppy');
-  expect(data.relationships.author.data).to.eql({ type: 'cards', id: 'local-hub::user-card::van-gogh' });
+  expect(data.relationships.author.data).to.eql({ type: 'cards', id: 'local-hub::van-gogh' });
   expect(data.attributes['tag-names']).to.eql(['millenials', 'puppies', 'belly-rubs']);
   expect(data.relationships.tags).to.be.undefined;
   expect(data.attributes.body).to.be.undefined;
@@ -125,9 +125,9 @@ function assertEmbeddedCardMetadata(card) {
     'tags/belly-rubs',
   ]);
   expect(includedIdentifiers).to.include.members([
-    'cards/local-hub::user-card::van-gogh',
+    'cards/local-hub::van-gogh',
   ]);
-  let relatedCard = included.find(i => `${i.type}/${i.id}` === 'cards/local-hub::user-card::van-gogh');
+  let relatedCard = included.find(i => `${i.type}/${i.id}` === 'cards/local-hub::van-gogh');
   expect(relatedCard.attributes.name).to.equal('Van Gogh');
   expect(relatedCard.attributes.email).to.be.undefined;
 }
@@ -135,16 +135,16 @@ function assertEmbeddedCardMetadata(card) {
 function assertCardModels(card) {
   let { data, included } = card;
   let includedIdentifiers = included.map(i => `${i.type}/${i.id}`);
-  expect(data.relationships.model.data).to.eql({ type: 'local-hub::article-card::millenial-puppies', id: 'local-hub::article-card::millenial-puppies' });
-  expect(includedIdentifiers).to.include.members(['local-hub::article-card::millenial-puppies/local-hub::article-card::millenial-puppies']);
+  expect(data.relationships.model.data).to.eql({ type: 'local-hub::millenial-puppies', id: 'local-hub::millenial-puppies' });
+  expect(includedIdentifiers).to.include.members(['local-hub::millenial-puppies/local-hub::millenial-puppies']);
   expect(includedIdentifiers).to.include.members([
-    'cards/local-hub::user-card::van-gogh',
+    'cards/local-hub::van-gogh',
     'tags/millenials',
     'tags/puppies',
     'tags/belly-rubs',
   ]);
 
-  let model = included.find(i => `${i.type}/${i.id}` === 'local-hub::article-card::millenial-puppies/local-hub::article-card::millenial-puppies');
+  let model = included.find(i => `${i.type}/${i.id}` === 'local-hub::millenial-puppies/local-hub::millenial-puppies');
   expect(model.attributes.title).to.equal('The Millenial Puppy');
   expect(model.attributes.body).to.match(/discerning tastes of the millenial puppy/);
   expect(model.attributes['tag-names']).to.eql(['millenials', 'puppies', 'belly-rubs']);
@@ -157,7 +157,7 @@ function assertCardModels(card) {
   ]);
   expect(model.attributes['internal-field']).to.equal('this is internal data');
 
-  let relatedCard = included.find(i => `${i.type}/${i.id}` === 'cards/local-hub::user-card::van-gogh');
+  let relatedCard = included.find(i => `${i.type}/${i.id}` === 'cards/local-hub::van-gogh');
   expect(relatedCard.attributes.name).to.equal('Van Gogh');
   expect(relatedCard.attributes.email).to.be.undefined;
   expect(relatedCard.attributes['embedded-metadata-field-types']).to.be.undefined; // this one shouldn't leak into the external format
@@ -193,7 +193,7 @@ function assertCardSchema(card) {
   // and there is really nothing that explicitly references it, so it wouldn't really make sense
   // to include anyways...
   expect(includedIdentifiers).to.not.include.members([
-    'content-types/local-hub::article-card::millenial-puppies'
+    'content-types/local-hub::millenial-puppies'
   ]);
 }
 
@@ -263,7 +263,7 @@ describe('hub/card-services', function () {
       }
       expect(error.status).to.equal(400);
       expect(error.message).to.match(/has a relationship to a foreign internal model/);
-      expect(error.source).to.eql({ pointer: `/data/relationships/local-hub::foreign-internal-belongs-to-relationship::bad::related-thing/data` });
+      expect(error.source).to.eql({ pointer: `/data/relationships/local-hub::foreign-internal-belongs-to-relationship::related-thing/data` });
     });
 
     it("does not allow a card to have a has-many relationship to a foreign internal model", async function () {
@@ -275,7 +275,7 @@ describe('hub/card-services', function () {
       }
       expect(error.status).to.equal(400);
       expect(error.message).to.match(/has a relationship to a foreign internal model/);
-      expect(error.source).to.eql({ pointer: `/data/relationships/local-hub::foreign-internal-has-many-relationship::bad::related-things/data/0` });
+      expect(error.source).to.eql({ pointer: `/data/relationships/local-hub::foreign-internal-has-many-relationship::related-things/data/0` });
     });
 
     it("does not allow a card to have included that contains foreign card internal models", async function () {
@@ -311,14 +311,14 @@ describe('hub/card-services', function () {
       assertCardModels(card);
       assertCardSchema(card);
 
-      let article = await cardServices.get(env.session, 'local-hub::article-card::millenial-puppies', 'isolated');
+      let article = await cardServices.get(env.session, 'local-hub::millenial-puppies', 'isolated');
       assertIsolatedCardMetadata(article);
     });
 
     it("does not allow missing card model when creating card", async function () {
       let missingModel = cloneDeep(externalArticleCard);
       delete missingModel.data.relationships.model;
-      missingModel.included = missingModel.included.filter(i => `${i.type}/${i.id}` !== 'local-hub::article-card::millenial-puppies/local-hub::article-card::millenial-puppies');
+      missingModel.included = missingModel.included.filter(i => `${i.type}/${i.id}` !== 'local-hub::millenial-puppies/local-hub::millenial-puppies');
 
       let error;
       try {
@@ -349,7 +349,7 @@ describe('hub/card-services', function () {
       let error;
       try {
         let badArticle = cloneDeep(externalArticleCard);
-        badArticle.included = badArticle.included.filter(i => `${i.type}/${i.id}` !== 'local-hub::article-card::millenial-puppies/local-hub::article-card::millenial-puppies');
+        badArticle.included = badArticle.included.filter(i => `${i.type}/${i.id}` !== 'local-hub::millenial-puppies/local-hub::millenial-puppies');
         await cardServices.create(env.session, badArticle);
       } catch (e) {
         error = e;
@@ -386,7 +386,7 @@ describe('hub/card-services', function () {
         }
       });
 
-      card = await cardServices.update(env.session, 'local-hub::article-card::millenial-puppies', card);
+      card = await cardServices.update(env.session, 'local-hub::millenial-puppies', card);
       let { data, included } = card;
       let includedIdentifiers = included.map(i => `${i.type}/${i.id}`);
       let fieldRelationships = data.relationships.fields.data.map(i => `${i.type}/${i.id}`);
@@ -394,7 +394,7 @@ describe('hub/card-services', function () {
       expect(includedIdentifiers).to.include('fields/editor');
       expect(fieldRelationships).to.include('fields/editor');
 
-      card = await cardServices.get(env.session, 'local-hub::article-card::millenial-puppies', 'isolated');
+      card = await cardServices.get(env.session, 'local-hub::millenial-puppies', 'isolated');
       data = card.data;
       included = card.included;
       includedIdentifiers = included.map(i => `${i.type}/${i.id}`);
@@ -415,14 +415,14 @@ describe('hub/card-services', function () {
           'field-type': '@cardstack/core-types::belongs-to'
         }
       });
-      let internalModel = card.included.find(i => i.type = 'local-hub::article-card::millenial-puppies');
+      let internalModel = card.included.find(i => i.type = 'local-hub::millenial-puppies');
       set(internalModel, 'relationships.editor.data', { type: 'cards', id: externalUserCard.data.id });
 
-      card = await cardServices.update(env.session, 'local-hub::article-card::millenial-puppies', card);
+      card = await cardServices.update(env.session, 'local-hub::millenial-puppies', card);
       let { data, included } = card;
       let includedIdentifiers = included.map(i => `${i.type}/${i.id}`);
       let fieldRelationships = data.relationships.fields.data.map(i => `${i.type}/${i.id}`);
-      internalModel = card.included.find(i => i.type = 'local-hub::article-card::millenial-puppies');
+      internalModel = card.included.find(i => i.type = 'local-hub::millenial-puppies');
       let editor = card.included.find(i => i.id === externalUserCard.data.id);
 
       expect(includedIdentifiers).to.include('fields/editor');
@@ -432,12 +432,12 @@ describe('hub/card-services', function () {
       expect(editor.attributes.name).to.equal('Van Gogh');
       expect(editor.attributes.email).to.be.undefined;
 
-      card = await cardServices.get(env.session, 'local-hub::article-card::millenial-puppies', 'isolated');
+      card = await cardServices.get(env.session, 'local-hub::millenial-puppies', 'isolated');
       data = card.data;
       included = card.included;
       includedIdentifiers = included.map(i => `${i.type}/${i.id}`);
       fieldRelationships = data.relationships.fields.data.map(i => `${i.type}/${i.id}`);
-      internalModel = card.included.find(i => i.type = 'local-hub::article-card::millenial-puppies');
+      internalModel = card.included.find(i => i.type = 'local-hub::millenial-puppies');
       editor = card.included.find(i => i.id === externalUserCard.data.id);
       expect(includedIdentifiers).to.include('fields/editor');
       expect(fieldRelationships).to.include('fields/editor');
@@ -453,7 +453,7 @@ describe('hub/card-services', function () {
       card.data.relationships.fields.data = card.data.relationships.fields.data.filter(i => i.id !== 'body');
       card.included = card.included.filter(i => i.id !== 'body');
 
-      card = await cardServices.update(env.session, 'local-hub::article-card::millenial-puppies', card);
+      card = await cardServices.update(env.session, 'local-hub::millenial-puppies', card);
       let { data, included } = card;
       let includedIdentifiers = included.map(i => `${i.type}/${i.id}`);
       let fieldRelationships = data.relationships.fields.data.map(i => `${i.type}/${i.id}`);
@@ -462,7 +462,7 @@ describe('hub/card-services', function () {
       expect(includedIdentifiers).to.not.include('fields/body');
       expect(fieldRelationships).to.not.include('fields/body');
 
-      card = await cardServices.get(env.session, 'local-hub::article-card::millenial-puppies', 'isolated');
+      card = await cardServices.get(env.session, 'local-hub::millenial-puppies', 'isolated');
       data = card.data;
       included = card.included;
       includedIdentifiers = included.map(i => `${i.type}/${i.id}`);
@@ -474,18 +474,18 @@ describe('hub/card-services', function () {
 
     it("can update a card's internal model", async function () {
       let card = await cardServices.create(env.session, externalArticleCard);
-      let internalModel = card.included.find(i => i.type = 'local-hub::article-card::millenial-puppies');
+      let internalModel = card.included.find(i => i.type = 'local-hub::millenial-puppies');
       internalModel.attributes.body = 'updated body';
 
-      card = await cardServices.update(env.session, 'local-hub::article-card::millenial-puppies', card);
-      internalModel = card.included.find(i => i.type = 'local-hub::article-card::millenial-puppies');
+      card = await cardServices.update(env.session, 'local-hub::millenial-puppies', card);
+      internalModel = card.included.find(i => i.type = 'local-hub::millenial-puppies');
 
       assertCardSchema(card);
       expect(card.data.attributes.body).to.equal('updated body');
       expect(internalModel.attributes.body).to.equal('updated body');
 
-      card = await cardServices.get(env.session, 'local-hub::article-card::millenial-puppies', 'isolated');
-      internalModel = card.included.find(i => i.type = 'local-hub::article-card::millenial-puppies');
+      card = await cardServices.get(env.session, 'local-hub::millenial-puppies', 'isolated');
+      internalModel = card.included.find(i => i.type = 'local-hub::millenial-puppies');
       expect(card.data.attributes.body).to.equal('updated body');
       expect(internalModel.attributes.body).to.equal('updated body');
     });
@@ -493,11 +493,11 @@ describe('hub/card-services', function () {
     it("does not allow missing card model when updating card", async function () {
       let card = await cardServices.create(env.session, externalArticleCard);
       delete card.data.relationships.model;
-      card.included = card.included.filter(i => `${i.type}/${i.id}` !== 'local-hub::article-card::millenial-puppies/local-hub::article-card::millenial-puppies');
+      card.included = card.included.filter(i => `${i.type}/${i.id}` !== 'local-hub::millenial-puppies/local-hub::millenial-puppies');
 
       let error;
       try {
-        await cardServices.update(env.session, 'local-hub::article-card::millenial-puppies', card);
+        await cardServices.update(env.session, 'local-hub::millenial-puppies', card);
       } catch (e) {
         error = e;
       }
@@ -509,7 +509,7 @@ describe('hub/card-services', function () {
 
     it("can update a card's schema and a card model at the same time", async function () {
       let card = await cardServices.create(env.session, externalArticleCard);
-      let internalModel = card.included.find(i => i.type = 'local-hub::article-card::millenial-puppies');
+      let internalModel = card.included.find(i => i.type = 'local-hub::millenial-puppies');
       internalModel.attributes.editor = 'Hassan';
       card.data.relationships.fields.data.push({ type: 'fields', id: 'editor' });
       card.included.push({
@@ -522,7 +522,7 @@ describe('hub/card-services', function () {
         }
       });
 
-      card = await cardServices.update(env.session, 'local-hub::article-card::millenial-puppies', card);
+      card = await cardServices.update(env.session, 'local-hub::millenial-puppies', card);
       let { data, included } = card;
       let includedIdentifiers = included.map(i => `${i.type}/${i.id}`);
       let fieldRelationships = data.relationships.fields.data.map(i => `${i.type}/${i.id}`);
@@ -532,7 +532,7 @@ describe('hub/card-services', function () {
       expect(card.data.attributes.editor).to.equal('Hassan');
       expect(internalModel.attributes.editor).to.equal('Hassan');
 
-      card = await cardServices.get(env.session, 'local-hub::article-card::millenial-puppies', 'isolated');
+      card = await cardServices.get(env.session, 'local-hub::millenial-puppies', 'isolated');
       data = card.data;
       included = card.included;
       includedIdentifiers = included.map(i => `${i.type}/${i.id}`);
@@ -546,11 +546,11 @@ describe('hub/card-services', function () {
     it('can delete a card', async function () {
       let card = await cardServices.create(env.session, externalArticleCard);
       let { data: { meta: { version } } } = card;
-      await cardServices.delete(env.session, 'local-hub::article-card::millenial-puppies', version);
+      await cardServices.delete(env.session, 'local-hub::millenial-puppies', version);
 
       let error;
       try {
-        await cardServices.get(env.session, 'local-hub::article-card::millenial-puppies', 'isolated');
+        await cardServices.get(env.session, 'local-hub::millenial-puppies', 'isolated');
       } catch (e) {
         error = e;
       }
@@ -559,12 +559,12 @@ describe('hub/card-services', function () {
 
     it("does not allow a card to be updated with a model whose type does not match the card id", async function () {
       let card = await cardServices.create(env.session, externalArticleCard);
-      card.data.relationships.model.data.type = 'local-hub::article-card::bad';
-      let internalModel = card.included.find(i => i.type = 'local-hub::article-card::millenial-puppies');
-      internalModel.type = 'local-hub::article-card::bad';
+      card.data.relationships.model.data.type = 'local-hub::bad';
+      let internalModel = card.included.find(i => i.type = 'local-hub::millenial-puppies');
+      internalModel.type = 'local-hub::bad';
       let error;
       try {
-        await cardServices.update(env.session, 'local-hub::article-card::millenial-puppies', card);
+        await cardServices.update(env.session, 'local-hub::millenial-puppies', card);
       } catch (e) {
         error = e;
       }
@@ -576,12 +576,12 @@ describe('hub/card-services', function () {
 
     it("does not allow a card to be updated with a model whose id does not match the card id", async function () {
       let card = await cardServices.create(env.session, externalArticleCard);
-      card.data.relationships.model.data.id = 'local-hub::article-card::bad';
-      let internalModel = card.included.find(i => i.type = 'local-hub::article-card::millenial-puppies');
-      internalModel.id = 'local-hub::article-card::bad';
+      card.data.relationships.model.data.id = 'local-hub::bad';
+      let internalModel = card.included.find(i => i.type = 'local-hub::millenial-puppies');
+      internalModel.id = 'local-hub::bad';
       let error;
       try {
-        await cardServices.update(env.session, 'local-hub::article-card::millenial-puppies', card);
+        await cardServices.update(env.session, 'local-hub::millenial-puppies', card);
       } catch (e) {
         error = e;
       }
@@ -605,27 +605,27 @@ describe('hub/card-services', function () {
     });
 
     it("has card metadata for isolated format", async function () {
-      let article = await cardServices.get(env.session, 'local-hub::article-card::millenial-puppies', 'isolated');
+      let article = await cardServices.get(env.session, 'local-hub::millenial-puppies', 'isolated');
       assertIsolatedCardMetadata(article);
     });
 
     it("has card metadata for embedded format", async function () {
-      let article = await cardServices.get(env.session, 'local-hub::article-card::millenial-puppies', 'embedded');
+      let article = await cardServices.get(env.session, 'local-hub::millenial-puppies', 'embedded');
       assertEmbeddedCardMetadata(article);
     });
 
     it("has card models", async function () {
-      let article = await cardServices.get(env.session, 'local-hub::article-card::millenial-puppies', 'isolated');
+      let article = await cardServices.get(env.session, 'local-hub::millenial-puppies', 'isolated');
       assertCardModels(article);
     });
 
     it("has card schema", async function () {
-      let article = await cardServices.get(env.session, 'local-hub::article-card::millenial-puppies', 'isolated');
+      let article = await cardServices.get(env.session, 'local-hub::millenial-puppies', 'isolated');
       assertCardSchema(article);
     });
 
     it("has card browser assets", async function () {
-      let article = await cardServices.get(env.session, 'local-hub::article-card::millenial-puppies', 'isolated');
+      let article = await cardServices.get(env.session, 'local-hub::millenial-puppies', 'isolated');
       let { data } = article;
 
       // Note that the browser assets not defined in the card will inherit from the adopted card, or ultimately the genesis card
@@ -686,7 +686,7 @@ describe('hub/card-services', function () {
       let embeddedUser2 = article.included.find(i => `${i.type}/${i.id}` === `cards/${user2Card.data.id}`);
       expect(embeddedUser2.attributes.name).to.equal('Hassan');
 
-      let internalModel = user2.included.find(i => i.type = 'local-hub::user-card::hassan');
+      let internalModel = user2.included.find(i => i.type = 'local-hub::hassan');
       internalModel.attributes.name = 'Babikir';
       user2 = await cardServices.update(env.session, user2Card.data.id, user2);
 
@@ -708,10 +708,10 @@ describe('hub/card-services', function () {
       factory.addResource('grants')
         .withRelated('who', [{ type: 'groups', id: 'everyone' }])
         .withRelated('types', [
-          { type: 'content-types', id: 'local-hub::article-card::millenial-puppies' }
+          { type: 'content-types', id: 'local-hub::millenial-puppies' }
         ])
         .withRelated('fields', [
-          { type: 'fields', id: 'local-hub::article-card::millenial-puppies::title' },
+          { type: 'fields', id: 'local-hub::millenial-puppies::title' },
         ])
         .withAttributes({
           mayReadResource: true,
@@ -721,13 +721,13 @@ describe('hub/card-services', function () {
       factory.addResource('grants')
         .withRelated('who', [{ type: 'test-users', id: 'allowed-user' }])
         .withRelated('types', [
-          { type: 'content-types', id: 'local-hub::article-card::millenial-puppies' }
+          { type: 'content-types', id: 'local-hub::millenial-puppies' }
         ])
         .withRelated('fields', [
-          { type: 'fields', id: 'local-hub::article-card::millenial-puppies::author' },
-          { type: 'fields', id: 'local-hub::article-card::millenial-puppies::body' },
-          { type: 'fields', id: 'local-hub::article-card::millenial-puppies::tag-names' },
-          { type: 'fields', id: 'local-hub::article-card::millenial-puppies::tags' },
+          { type: 'fields', id: 'local-hub::millenial-puppies::author' },
+          { type: 'fields', id: 'local-hub::millenial-puppies::body' },
+          { type: 'fields', id: 'local-hub::millenial-puppies::tag-names' },
+          { type: 'fields', id: 'local-hub::millenial-puppies::tags' },
         ])
         .withAttributes({
           mayReadResource: true,
@@ -737,7 +737,7 @@ describe('hub/card-services', function () {
       factory.addResource('grants')
         .withRelated('who', [{ type: 'test-users', id: 'allowed-user' }])
         .withRelated('types', [
-          { type: 'content-types', id: 'local-hub::user-card::van-gogh' }
+          { type: 'content-types', id: 'local-hub::van-gogh' }
         ])
         .withAttributes({
           mayReadResource: true,
@@ -761,7 +761,7 @@ describe('hub/card-services', function () {
       it('does not return card whose model content type the session does not have read authorization', async function () {
         let error;
         try {
-          await cardServices.get(restrictedUser, 'local-hub::user-card::van-gogh', 'isolated');
+          await cardServices.get(restrictedUser, 'local-hub::van-gogh', 'isolated');
         } catch (e) {
           error = e;
         }
@@ -769,14 +769,14 @@ describe('hub/card-services', function () {
       });
 
       it('does return card whose model content type the session has read authorization', async function () {
-        let { data } = await cardServices.get(allowedUser, 'local-hub::user-card::van-gogh', 'isolated');
+        let { data } = await cardServices.get(allowedUser, 'local-hub::van-gogh', 'isolated');
 
-        expect(data.id).to.equal('local-hub::user-card::van-gogh');
+        expect(data.id).to.equal('local-hub::van-gogh');
         expect(data.type).to.equal('cards');
       });
 
       it('does not return card metadata that the session does not have read authorization', async function () {
-        let { data, included } = await cardServices.get(restrictedUser, 'local-hub::article-card::millenial-puppies', 'isolated');
+        let { data, included } = await cardServices.get(restrictedUser, 'local-hub::millenial-puppies', 'isolated');
 
         expect(data.attributes.title).to.equal('The Millenial Puppy');
         expect(data.relationships.author).to.be.undefined;
@@ -784,7 +784,7 @@ describe('hub/card-services', function () {
         expect(data.attributes.body).to.be.undefined;
         expect(data.attributes['internal-field']).to.be.undefined;
 
-        let model = included.find(i => `${i.type}/${i.id}` === 'local-hub::article-card::millenial-puppies/local-hub::article-card::millenial-puppies');
+        let model = included.find(i => `${i.type}/${i.id}` === 'local-hub::millenial-puppies/local-hub::millenial-puppies');
         expect(model.attributes.title).to.equal('The Millenial Puppy');
         expect(model.relationships.author).to.be.undefined;
         expect(model.relationships.tags).to.be.undefined;
@@ -793,11 +793,11 @@ describe('hub/card-services', function () {
       });
 
       it('does return card metadata that the session has read authorization', async function () {
-        let { data, included } = await cardServices.get(allowedUser, 'local-hub::article-card::millenial-puppies', 'isolated');
+        let { data, included } = await cardServices.get(allowedUser, 'local-hub::millenial-puppies', 'isolated');
 
         expect(data.attributes.title).to.equal('The Millenial Puppy');
         expect(data.attributes.body).to.match(/discerning tastes of the millenial puppy/);
-        expect(data.relationships.author.data).to.eql({ type: 'cards', id: 'local-hub::user-card::van-gogh' });
+        expect(data.relationships.author.data).to.eql({ type: 'cards', id: 'local-hub::van-gogh' });
         expect(data.relationships.tags.data).to.eql([
           { type: 'tags', id: 'millenials' },
           { type: 'tags', id: 'puppies' },
@@ -811,10 +811,10 @@ describe('hub/card-services', function () {
           tags: '@cardstack/core-types::has-many',
         });
 
-        let model = included.find(i => `${i.type}/${i.id}` === 'local-hub::article-card::millenial-puppies/local-hub::article-card::millenial-puppies');
+        let model = included.find(i => `${i.type}/${i.id}` === 'local-hub::millenial-puppies/local-hub::millenial-puppies');
         expect(model.attributes.title).to.equal('The Millenial Puppy');
         expect(model.attributes.body).to.match(/discerning tastes of the millenial puppy/);
-        expect(model.relationships.author.data).to.eql({ type: 'cards', id: 'local-hub::user-card::van-gogh' });
+        expect(model.relationships.author.data).to.eql({ type: 'cards', id: 'local-hub::van-gogh' });
         expect(model.relationships.tags.data).to.eql([
           { type: 'tags', id: 'millenials' },
           { type: 'tags', id: 'puppies' },
@@ -822,7 +822,7 @@ describe('hub/card-services', function () {
         ]);
         expect(model.attributes['internal-field']).to.be.undefined;
 
-        let embedded = included.find(i => `${i.type}/${i.id}` === 'cards/local-hub::user-card::van-gogh');
+        let embedded = included.find(i => `${i.type}/${i.id}` === 'cards/local-hub::van-gogh');
         expect(embedded.attributes.name).to.equal('Van Gogh');
         expect(embedded.attributes.email).to.be.undefined;
         expect(embedded.attributes['metadata-field-types']).to.eql({
@@ -831,31 +831,31 @@ describe('hub/card-services', function () {
       });
 
       it('does not contain included resource for card metadata relationship that the session does not have read authorization', async function () {
-        let { included } = await cardServices.get(restrictedUser, 'local-hub::article-card::millenial-puppies', 'isolated');
+        let { included } = await cardServices.get(restrictedUser, 'local-hub::millenial-puppies', 'isolated');
 
         let includedIdentifiers = included.map(i => `${i.type}/${i.id}`);
         expect(includedIdentifiers).to.not.include.members([
-          'cards/local-hub::user-card::van-gogh',
+          'cards/local-hub::van-gogh',
         ]);
       });
 
       it('does contain included resource for card metadata relationship that the session does has read authorization', async function () {
-        let { included } = await cardServices.get(allowedUser, 'local-hub::article-card::millenial-puppies', 'isolated');
+        let { included } = await cardServices.get(allowedUser, 'local-hub::millenial-puppies', 'isolated');
 
         let includedIdentifiers = included.map(i => `${i.type}/${i.id}`);
         expect(includedIdentifiers).to.include.members([
-          'cards/local-hub::user-card::van-gogh',
+          'cards/local-hub::van-gogh',
         ]);
 
         expect(includedIdentifiers).to.not.include.members([
-          'local-hub::user-card::van-gogh/local-hub::user-card::van-gogh',
+          'local-hub::van-gogh/local-hub::van-gogh',
           // intentionally asserting both the namespaced schema elements and non-namespaced schema elements dont exist
-          'fields/local-hub::user-card::van-gogh::name',
-          'fields/local-hub::user-card::van-gogh::email',
+          'fields/local-hub::van-gogh::name',
+          'fields/local-hub::van-gogh::email',
           'fields/name',
           'fields/email',
         ]);
-        let card = included.find(i => `${i.type}/${i.id}` === 'cards/local-hub::user-card::van-gogh');
+        let card = included.find(i => `${i.type}/${i.id}` === 'cards/local-hub::van-gogh');
         expect(card.attributes.name).to.equal('Van Gogh');
         expect(card.attributes.email).to.be.undefined;
       });
@@ -872,7 +872,7 @@ describe('hub/card-services', function () {
       it('does not return card metadata that the session does not have read authorization', async function () {
         let { data: [card], included: [model] } = await cardServices.search(restrictedUser, 'isolated', {
           filter: {
-            id: { exact: 'local-hub::article-card::millenial-puppies' },
+            id: { exact: 'local-hub::millenial-puppies' },
             type: { exact: 'cards' }
           }
         });
@@ -892,13 +892,13 @@ describe('hub/card-services', function () {
       it('does return card metadata that the session has read authorization', async function () {
         let { data: [card], included: [model] } = await cardServices.search(allowedUser, 'isolated', {
           filter: {
-            id: { exact: 'local-hub::article-card::millenial-puppies' },
+            id: { exact: 'local-hub::millenial-puppies' },
             type: { exact: 'cards' }
           }
         });
         expect(card.attributes.title).to.equal('The Millenial Puppy');
         expect(card.attributes.body).to.match(/discerning tastes of the millenial puppy/);
-        expect(card.relationships.author.data).to.eql({ type: 'cards', id: 'local-hub::user-card::van-gogh' });
+        expect(card.relationships.author.data).to.eql({ type: 'cards', id: 'local-hub::van-gogh' });
         expect(card.relationships.tags.data).to.eql([
           { type: 'tags', id: 'millenials' },
           { type: 'tags', id: 'puppies' },
@@ -908,7 +908,7 @@ describe('hub/card-services', function () {
 
         expect(model.attributes.title).to.equal('The Millenial Puppy');
         expect(model.attributes.body).to.match(/discerning tastes of the millenial puppy/);
-        expect(model.relationships.author.data).to.eql({ type: 'cards', id: 'local-hub::user-card::van-gogh' });
+        expect(model.relationships.author.data).to.eql({ type: 'cards', id: 'local-hub::van-gogh' });
         expect(model.relationships.tags.data).to.eql([
           { type: 'tags', id: 'millenials' },
           { type: 'tags', id: 'puppies' },
@@ -920,39 +920,39 @@ describe('hub/card-services', function () {
       it('does not contain included resource for card metadata relationship that the session does not have read authorization', async function () {
         let { included } = await cardServices.search(restrictedUser, 'isolated', {
           filter: {
-            id: { exact: 'local-hub::article-card::millenial-puppies' },
+            id: { exact: 'local-hub::millenial-puppies' },
             type: { exact: 'cards' }
           }
         });
 
         let includedIdentifiers = included.map(i => `${i.type}/${i.id}`);
         expect(includedIdentifiers).to.not.include.members([
-          'cards/local-hub::user-card::van-gogh',
+          'cards/local-hub::van-gogh',
         ]);
       });
 
       it('does contain included resource for card metadata relationship that the session does has read authorization', async function () {
         let { included } = await cardServices.search(allowedUser, 'isolated', {
           filter: {
-            id: { exact: 'local-hub::article-card::millenial-puppies' },
+            id: { exact: 'local-hub::millenial-puppies' },
             type: { exact: 'cards' }
           }
         });
 
         let includedIdentifiers = included.map(i => `${i.type}/${i.id}`);
         expect(includedIdentifiers).to.include.members([
-          'cards/local-hub::user-card::van-gogh',
+          'cards/local-hub::van-gogh',
         ]);
 
         expect(includedIdentifiers).to.not.include.members([
-          'local-hub::user-card::van-gogh/local-hub::user-card::van-gogh',
+          'local-hub::van-gogh/local-hub::van-gogh',
           // intentionally asserting both the namespaced schema elements and non-namespaced schema elements dont exist
-          'fields/local-hub::user-card::van-gogh::name',
-          'fields/local-hub::user-card::van-gogh::email',
+          'fields/local-hub::van-gogh::name',
+          'fields/local-hub::van-gogh::email',
           'fields/name',
           'fields/email',
         ]);
-        let card = included.find(i => `${i.type}/${i.id}` === 'cards/local-hub::user-card::van-gogh');
+        let card = included.find(i => `${i.type}/${i.id}` === 'cards/local-hub::van-gogh');
         expect(card.attributes.name).to.equal('Van Gogh');
         expect(card.attributes.email).to.be.undefined;
       });
@@ -1003,7 +1003,7 @@ describe('hub/card-services', function () {
       });
 
       expect(article.attributes.title).to.equal('The Millenial Puppy');
-      expect(article.relationships.author.data).to.eql({ type: 'cards', id: 'local-hub::user-card::van-gogh' });
+      expect(article.relationships.author.data).to.eql({ type: 'cards', id: 'local-hub::van-gogh' });
       expect(article.attributes.body).to.be.undefined;
       expect(article.relationships.tags).to.be.undefined;
       expect(article.attributes['internal-field']).to.be.undefined;

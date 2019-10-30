@@ -2,8 +2,8 @@ const JSONAPIFactory = require('@cardstack/test-support/jsonapi-factory');
 let factory = new JSONAPIFactory();
 
 module.exports = factory.getDocumentFor(
-  factory.addResource('cards', 'local-hub::adopted-card::genx-kittens')
-    .withRelated('adopted-from', { type: 'cards', id: 'local-hub::article-card::millenial-puppies'})
+  factory.addResource('cards', 'local-hub::genx-kittens')
+    .withRelated('adopted-from', { type: 'cards', id: 'local-hub::millenial-puppies'})
     .withRelated('fields', [
       factory.addResource('fields', 'yarn').withAttributes({
         'is-metadata': true,
@@ -12,12 +12,12 @@ module.exports = factory.getDocumentFor(
       })
     ])
     .withRelated('model',
-      factory.addResource('local-hub::adopted-card::genx-kittens', 'local-hub::adopted-card::genx-kittens')
+      factory.addResource('local-hub::genx-kittens', 'local-hub::genx-kittens')
         .withAttributes({
           yarn: 'wool',
           title: 'GenX Kittens',
           body: 'Here is the body'
         })
-        .withRelated('author', { type: 'cards', id: 'local-hub::user-card::van-gogh' })
+        .withRelated('author', { type: 'cards', id: 'local-hub::van-gogh' })
     )
 );

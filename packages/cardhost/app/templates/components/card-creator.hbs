@@ -72,7 +72,7 @@
     <Input
       @id="card__id"
       @size="60"
-      @placeholder="e.g. local-hub::article-card::millenial-puppies"
+      @placeholder="e.g. millenial-puppies"
       @value={{this.cardId}}
       @key-up={{action this.updateCardId}}
     />
@@ -83,7 +83,7 @@
     <section class="card-manipulator" data-test-card-creator>
       <header class="card-manipulator--header">
         <h2>New Card</h2>
-        <code>{{@card.id}}</code>
+        <code>{{@card.name}}</code>
       </header>
       <CardRenderer
         @card={{this.card}}
