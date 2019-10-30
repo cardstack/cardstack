@@ -970,8 +970,22 @@ module("Unit | Service | data", function () {
       assert.equal(field.label, 'The Title');
     });
 
-    skip('TODO when the field is set to an empty string, the name of the field is returned as the label', async function(/*assert*/) {
+    test('when the field is set to an empty string, the name of the field is returned as the label', async function(assert) {
+      let service = this.owner.lookup('service:data');
+      let card = await service.getCard(card1Id, 'isolated');
+      let field = card.getField('title');
 
+      assert.equal(field.label, 'title');
+      assert.equal(card.isDirty, false);
+
+      field.setLabel('');
+      assert.equal(card.isDirty, true);
+      assert.equal(field.label, 'title');
+      await card.save();
+
+      assert.equal(card.isDirty, false);
+      field = card.getField('title');
+      assert.equal(field.label, 'title');
     });
 
     skip("TODO updating a card does not impact any of the card's internal fields", async function (/*assert*/) {

@@ -4,6 +4,8 @@ import { hubURL } from '@cardstack/plugin-utils/environment';
 import { inject as service } from '@ember/service';
 import { tracked } from '@glimmer/tracking';
 import { assert } from '@ember/debug';
+import { isEmpty } from '@ember/utils';
+
 const cardIdDelim = '::';
 
 let fieldNonce = 0;
@@ -415,10 +417,13 @@ class Field {
   setLabel(label) {
     if (this.isDestroyed) { throw new Error('Cannot setLabel from destroyed field'); }
 
-    // TODO handle case where label is empty
-
     let internal = priv.get(this);
     let internalCard = priv.get(this.card);
+
+    if (isEmpty(label)) {
+      label = internal.name;
+    }
+
     internal.label = label;
 
     // eslint-disable-next-line no-self-assign
