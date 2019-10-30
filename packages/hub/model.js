@@ -128,8 +128,8 @@ exports.Model = class Model {
       model = card.data;
       if (id !== cardIdContext) {
         let fieldsToDelete = difference(
-          Object.keys(get(model, 'attributes.metadata-field-types') || {}),
-          Object.keys(get(model, 'attributes.embedded-metadata-field-types') || {})
+          Object.keys(get(model, 'attributes.metadata-summary') || {}),
+          Object.keys(get(model, 'attributes.embedded-metadata-summary') || {})
         );
         for (let field of fieldsToDelete) {
           unset(model, `attributes.${id}${cardIdDelim}${field}`);

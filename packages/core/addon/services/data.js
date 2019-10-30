@@ -636,7 +636,7 @@ function getCardMetadata(card, type, fieldName) {
 
 function reifyFieldsFromCardMetadata(card) {
   let fields = [];
-  let fieldSummary = get(card.json, 'data.attributes.metadata-field-types') || {};
+  let fieldSummary = get(card.json, 'data.attributes.metadata-summary') || {};
   for (let name of Object.keys(fieldSummary)) {
     let neededWhenEmbedded;
     if (card.loadedFormat === 'isolated') {

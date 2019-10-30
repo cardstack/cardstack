@@ -88,8 +88,8 @@ function assertIsolatedCardMetadata(card) {
   expect(data.attributes.body).to.match(/discerning tastes of the millenial puppy/);
   expect(data.relationships.author.data).to.eql({ type: 'cards', id: 'local-hub::van-gogh' });
   expect(data.attributes['tag-names']).to.eql(['millenials', 'puppies', 'belly-rubs']);
-  expect(data.attributes['embedded-metadata-field-types']).to.be.undefined; // this one shouldn't leak into the external format
-  expect(data.attributes['metadata-field-types']).to.eql({
+  expect(data.attributes['embedded-metadata-summary']).to.be.undefined; // this one shouldn't leak into the external format
+  expect(data.attributes['metadata-summary']).to.eql({
     title: { type: '@cardstack/core-types::string', label: 'title' },
     body: { type: '@cardstack/core-types::string', label: 'body' },
     author: { type: '@cardstack/core-types::belongs-to', label: 'author' },
@@ -113,8 +113,8 @@ function assertEmbeddedCardMetadata(card) {
   expect(data.relationships.tags).to.be.undefined;
   expect(data.attributes.body).to.be.undefined;
   expect(data.attributes['internal-field']).to.be.undefined;
-  expect(data.attributes['embedded-metadata-field-types']).to.be.undefined; // this one shouldn't leak into the external format
-  expect(data.attributes['metadata-field-types']).to.eql({
+  expect(data.attributes['embedded-metadata-summary']).to.be.undefined; // this one shouldn't leak into the external format
+  expect(data.attributes['metadata-summary']).to.eql({
     title: { type: '@cardstack/core-types::string', label: 'title' },
     author: { type: '@cardstack/core-types::belongs-to', label: 'author' }
   });
@@ -148,8 +148,8 @@ function assertCardModels(card) {
   expect(model.attributes.title).to.equal('The Millenial Puppy');
   expect(model.attributes.body).to.match(/discerning tastes of the millenial puppy/);
   expect(model.attributes['tag-names']).to.eql(['millenials', 'puppies', 'belly-rubs']);
-  expect(model.attributes['embedded-metadata-field-types']).to.be.undefined; // this one shouldn't leak into the model
-  expect(model.attributes['metadata-field-types']).to.be.undefined; // this one shouldn't leak into the external model
+  expect(model.attributes['embedded-metadata-summary']).to.be.undefined; // this one shouldn't leak into the model
+  expect(model.attributes['metadata-summary']).to.be.undefined; // this one shouldn't leak into the external model
   expect(model.relationships.tags.data).to.eql([
     { type: 'tags', id: 'millenials' },
     { type: 'tags', id: 'puppies' },
@@ -160,8 +160,8 @@ function assertCardModels(card) {
   let relatedCard = included.find(i => `${i.type}/${i.id}` === 'cards/local-hub::van-gogh');
   expect(relatedCard.attributes.name).to.equal('Van Gogh');
   expect(relatedCard.attributes.email).to.be.undefined;
-  expect(relatedCard.attributes['embedded-metadata-field-types']).to.be.undefined; // this one shouldn't leak into the external format
-  expect(relatedCard.attributes['metadata-field-types']).to.eql({
+  expect(relatedCard.attributes['embedded-metadata-summary']).to.be.undefined; // this one shouldn't leak into the external format
+  expect(relatedCard.attributes['metadata-summary']).to.eql({
     name: { type: '@cardstack/core-types::string', label: 'name' }
   });
 }
@@ -804,7 +804,7 @@ describe('hub/card-services', function () {
           { type: 'tags', id: 'belly-rubs' },
         ]);
         expect(data.attributes['internal-field']).to.be.undefined;
-        expect(data.attributes['metadata-field-types']).to.eql({
+        expect(data.attributes['metadata-summary']).to.eql({
           title: { type: '@cardstack/core-types::string', label: 'title' },
           body: { type: '@cardstack/core-types::string', label: 'body' },
           author: { type: '@cardstack/core-types::belongs-to', label: 'author' },
@@ -825,7 +825,7 @@ describe('hub/card-services', function () {
         let embedded = included.find(i => `${i.type}/${i.id}` === 'cards/local-hub::van-gogh');
         expect(embedded.attributes.name).to.equal('Van Gogh');
         expect(embedded.attributes.email).to.be.undefined;
-        expect(embedded.attributes['metadata-field-types']).to.eql({
+        expect(embedded.attributes['metadata-summary']).to.eql({
           name: { type: '@cardstack/core-types::string', label: 'name' }
         });
       });
@@ -1063,12 +1063,12 @@ describe('hub/card-services', function () {
       expect(includedSpecs).to.not.include("fields/author");
       expect(includedSpecs).to.not.include("fields/body");
 
-      let fieldMeta = adopted.data.attributes['metadata-field-types'];
+      let fieldMeta = adopted.data.attributes['metadata-summary'];
 
-      expect(fieldMeta.yarn).to.equal("@cardstack/core-types::string");
-      expect(fieldMeta.title).to.equal("@cardstack/core-types::string");
-      expect(fieldMeta.author).to.equal("@cardstack/core-types::belongs-to");
-      expect(fieldMeta.body).to.equal("@cardstack/core-types::string");
+      expect(fieldMeta.yarn).to.eql({ type: "@cardstack/core-types::string", label: 'yarn' });
+      expect(fieldMeta.title).to.eql({ type: "@cardstack/core-types::string", label: 'title' });
+      expect(fieldMeta.author).to.eql({ type: "@cardstack/core-types::belongs-to", label: 'author' });
+      expect(fieldMeta.body).to.eql({ type: "@cardstack/core-types::string", label: 'body' });
 
       expect(adopted.data.attributes.yarn).to.equal("wool");
       expect(adopted.data.attributes.title).to.equal("GenX Kittens");
@@ -1112,11 +1112,11 @@ describe('hub/card-services', function () {
       expect(includedSpecs.length).to.equal(1);
       expect(includedSpecs).to.include(`cards/${externalUserCard.data.id}`);
 
-      let fieldMeta = adopted.data.attributes['metadata-field-types'];
+      let fieldMeta = adopted.data.attributes['metadata-summary'];
 
-      expect(fieldMeta.yarn).to.equal("@cardstack/core-types::string");
-      expect(fieldMeta.title).to.equal("@cardstack/core-types::string");
-      expect(fieldMeta.author).to.equal("@cardstack/core-types::belongs-to");
+      expect(fieldMeta.yarn).to.eql({ type: "@cardstack/core-types::string", label: 'yarn' });
+      expect(fieldMeta.title).to.eql({ type: "@cardstack/core-types::string", label: 'title' });
+      expect(fieldMeta.author).to.eql({ type: "@cardstack/core-types::belongs-to", label: 'author' });
       expect(fieldMeta.body).to.be.undefined;
 
       expect(adopted.data.attributes.yarn).to.equal("wool");
@@ -1174,13 +1174,13 @@ describe('hub/card-services', function () {
       expect(includedSpecs).to.not.include("fields/body");
       expect(includedSpecs).to.not.include("fields/yarn");
 
-      let fieldMeta = adopted.data.attributes['metadata-field-types'];
+      let fieldMeta = adopted.data.attributes['metadata-summary'];
 
-      expect(fieldMeta.cuteness).to.equal("@cardstack/core-types::integer");
-      expect(fieldMeta.yarn).to.equal("@cardstack/core-types::string");
-      expect(fieldMeta.title).to.equal("@cardstack/core-types::string");
-      expect(fieldMeta.author).to.equal("@cardstack/core-types::belongs-to");
-      expect(fieldMeta.body).to.equal("@cardstack/core-types::string");
+      expect(fieldMeta.cuteness).to.eql({ type: "@cardstack/core-types::integer", label: 'cuteness' });
+      expect(fieldMeta.yarn).to.eql({ type: "@cardstack/core-types::string", label: 'yarn' });
+      expect(fieldMeta.title).to.eql({ type: "@cardstack/core-types::string", label: 'title' });
+      expect(fieldMeta.author).to.eql({ type: "@cardstack/core-types::belongs-to", label: 'author' });
+      expect(fieldMeta.body).to.eql({ type: "@cardstack/core-types::string", label: 'body' });
 
       expect(adopted.data.attributes.yarn).to.equal("cotton");
       expect(adopted.data.attributes.title).to.equal("GenZ Hamsters");
@@ -1250,12 +1250,12 @@ describe('hub/card-services', function () {
       expect(includedSpecs).not.to.include("fields/body");
       expect(includedSpecs).not.to.include("fields/yarn");
 
-      let fieldMeta = adopted.data.attributes['metadata-field-types'];
+      let fieldMeta = adopted.data.attributes['metadata-summary'];
 
-      expect(fieldMeta.cuteness).to.equal("@cardstack/core-types::integer");
-      expect(fieldMeta.yarn).to.equal("@cardstack/core-types::string");
-      expect(fieldMeta.title).to.equal("@cardstack/core-types::string");
-      expect(fieldMeta.author).to.equal("@cardstack/core-types::belongs-to");
+      expect(fieldMeta.cuteness).to.eql({ type: "@cardstack/core-types::integer", label: 'cuteness' });
+      expect(fieldMeta.yarn).to.eql({ type: "@cardstack/core-types::string", label: 'yarn' });
+      expect(fieldMeta.title).to.eql({ type: "@cardstack/core-types::string", label: 'title' });
+      expect(fieldMeta.author).to.eql({ type: "@cardstack/core-types::belongs-to", label: 'author' });
 
       expect(adopted.data.attributes.yarn).to.equal("cotton");
       expect(adopted.data.attributes.title).to.equal("GenZ Hamsters");
