@@ -4,6 +4,8 @@ import { hubURL } from '@cardstack/plugin-utils/environment';
 import { inject as service } from '@ember/service';
 import { tracked } from '@glimmer/tracking';
 import { assert } from '@ember/debug';
+import { isEmpty } from '@ember/utils';
+
 const cardIdDelim = '::';
 
 let fieldNonce = 0;
@@ -172,14 +174,15 @@ class Card {
     return (internal.fields || []).find(i => i.name === fieldName);
   }
 
-  addField({ name, type, neededWhenEmbedded=false, value, position }) {
+  addField({ name, label, type, neededWhenEmbedded=false, value, position }) {
     if (this.isDestroyed) { throw new Error('Cannot addField from destroyed card'); }
     if (this.loadedFormat === 'embedded') { throw new Error(`Cannot addField() on card id '${this.id}' because the card is in the embedded format. Use load('isolated') to get the isolated form of the card before adding fields.`) }
     if (!name) { throw new Error(`'addField()' called for card id '${this.id}' is missing 'name'`); }
     if (!type) { throw new Error(`'addField()' called for card id '${this.id}' is missing 'type'`); }
     if (this.fields.find(i => i.name === name)) { throw new Error(`'addField() called for card id '${this.id}' to add a new field 'fields/${name}' which already exists for this card.`); }
 
-    let field = new Field({ card: this, name, type, neededWhenEmbedded, value });
+    label = label || name;
+    let field = new Field({ card: this, name, label, type, neededWhenEmbedded, value });
     let internal = priv.get(this);
     internal.fields.push(field);
     if (position != null) {
@@ -317,6 +320,7 @@ class Field {
     card,
     name,
     type,
+    label,
     neededWhenEmbedded,
     value
   }) {
@@ -325,6 +329,7 @@ class Field {
       card,
       name,
       type,
+      label,
       neededWhenEmbedded,
       value
     }));
@@ -345,6 +350,10 @@ class Field {
 
   get name() {
     return priv.get(this).name;
+  }
+
+  get label() {
+    return priv.get(this).label;
   }
 
   get type() {
@@ -368,7 +377,7 @@ class Field {
   }
 
   get json() {
-    let { name:id, type, neededWhenEmbedded, serverData } = priv.get(this);
+    let { name:id, type, neededWhenEmbedded, serverData, label } = priv.get(this);
     // We're returning a JSON:API document here (as opposed to a resource) since eventually
     // a field may encapsulate constraints as included resources within its document
     return {
@@ -378,7 +387,8 @@ class Field {
         attributes: {
           'is-metadata': true,
           'needed-when-embedded': neededWhenEmbedded,
-          'field-type': type
+          'field-type': type,
+          'caption': label
         }
       })
     };
@@ -396,6 +406,25 @@ class Field {
     internal.name = name;
     internalCard.fields = internalCard.fields.filter(i => i.name !== oldName);
     internalCard.serverIsolatedData.included = (internalCard.serverIsolatedData.included || []).filter(i => `${i.type}/${i.id}` !== `fields/${oldName}`);
+
+    // eslint-disable-next-line no-self-assign
+    internalCard.fields = internalCard.fields; // oh glimmer, you so silly...
+    internalCard.isDirty = true;
+
+    return this;
+  }
+
+  setLabel(label) {
+    if (this.isDestroyed) { throw new Error('Cannot setLabel from destroyed field'); }
+
+    let internal = priv.get(this);
+    let internalCard = priv.get(this.card);
+
+    if (isEmpty(label)) {
+      label = internal.name;
+    }
+
+    internal.label = label;
 
     // eslint-disable-next-line no-self-assign
     internalCard.fields = internalCard.fields; // oh glimmer, you so silly...
@@ -506,6 +535,7 @@ class FieldInternals {
   @tracked nonce;
   @tracked card;
   @tracked name;
+  @tracked label;
   @tracked type;
   @tracked neededWhenEmbedded;
   @tracked value;
@@ -516,6 +546,7 @@ class FieldInternals {
   constructor({
     card,
     name,
+    label,
     type,
     neededWhenEmbedded,
     value,
@@ -523,6 +554,7 @@ class FieldInternals {
   }) {
     this.card = card;
     this.name = name;
+    this.label = label;
     this.type = type;
     this.neededWhenEmbedded = Boolean(neededWhenEmbedded);
     this.value = value;
@@ -609,8 +641,8 @@ function getCardMetadata(card, type, fieldName) {
 
 function reifyFieldsFromCardMetadata(card) {
   let fields = [];
-  let fieldTypes = get(card.json, 'data.attributes.metadata-field-types') || {};
-  for (let name of Object.keys(fieldTypes)) {
+  let fieldSummary = get(card.json, 'data.attributes.metadata-summary') || {};
+  for (let name of Object.keys(fieldSummary)) {
     let neededWhenEmbedded;
     if (card.loadedFormat === 'isolated') {
       let fieldResource = (card.json.included || []).find(i => `${i.type}/${i.id}` === `fields/${name}`);
@@ -619,9 +651,10 @@ function reifyFieldsFromCardMetadata(card) {
     } else {
       neededWhenEmbedded = true; // the only reason you are seeing this field is because it is needed-when-embedded
     }
-    let type = fieldTypes[name];
+    let type = fieldSummary[name].type;
+    let label = fieldSummary[name].label;
     let value = getCardMetadata(card, type, name);
-    fields.push(new Field({ card: card, name, type, neededWhenEmbedded, value }));
+    fields.push(new Field({ card: card, name, label, type, neededWhenEmbedded, value }));
   }
   priv.get(card).fields = fields;
 }
