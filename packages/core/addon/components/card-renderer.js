@@ -15,16 +15,21 @@ export default class CardRenderer extends Component {
     super(...args);
 
     // TODO eventually this will be derived based on the presence of a card's
-    // custom template/component assets.
-    this.componentName = 'default';
+    // custom template/component assets, and we'll use the @card.id for the
+    // component name
+    this.componentName = '@cardstack/base-card';
     this.mode = this.args.mode || 'view';
   }
 
+  get sanitizedName() {
+    return this.componentName.replace(/@/g, '');
+  }
+
   get embeddedComponentName() {
-    return `cards/${dasherize(this.componentName)}/embedded`;
+    return `cards/${dasherize(this.sanitizedName)}/embedded`;
   }
 
   get isolatedComponentName() {
-    return `cards/${dasherize(this.componentName)}/isolated`;
+    return `cards/${dasherize(this.sanitizedName)}/isolated`;
   }
 }

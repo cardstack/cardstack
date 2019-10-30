@@ -1299,6 +1299,12 @@ describe('hub/card-services', function () {
     it.skip("can get a card that has a has-many relationship to cards which use adoption", async function () {
     });
 
+    it.skip("throws an error if a field has the same name as a field that comes from an adopted card", async function() {
+      // test for a child card that is updated/created to have a field that is named the same as a field from a card in the adoption chain
+
+      // what about the scenario where the parent card is modified to have the same field as a field that already exists in a child card??
+    });
+
     it.skip("can enforce read authorization on an adopted field when getting a card", async function () {
       // Probably want to move to the read-auth tests
     });

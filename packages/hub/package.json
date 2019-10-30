@@ -18,6 +18,7 @@
   "description": "Stock API server for the Cardstack tech stack.",
   "dependencies": {
     "@babel/plugin-transform-modules-amd": "^7.2.0",
+    "@cardstack/base-card": "0.14.35",
     "@cardstack/codegen": "0.14.35",
     "@cardstack/core-types": "0.14.35",
     "@cardstack/di": "0.14.35",

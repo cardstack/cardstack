@@ -44,8 +44,8 @@ module.exports = function(defaults) {
           appModules: {
             "components/card-renderer.js": {
               dependsOnComponents: [
-                '<Cards::Default::Isolated/>',
-                '<Cards::Default::Embedded/>',
+                '<Cards::Cardstack::BaseCard::Isolated/>',
+                '<Cards::Cardstack::BaseCard::Embedded/>',
               ]
             },
             "components/field-renderer.js": {
