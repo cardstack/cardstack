@@ -287,7 +287,7 @@ class Card {
     }
 
     let internal = priv.get(this);
-    let response = await fetch(`${hubURL}/api/cards/${this.id}`, {
+    let response = await fetch(`${hubURL}/api/cards/${encodeURIComponent(this.id)}`, {
       method: 'DELETE',
       headers: {
         'Content-Type': 'application/vnd.api+json',
@@ -659,7 +659,7 @@ async function invalidate(cardId, latestVersion) {
 
 async function save(session, cardDocument, isNew) {
   let id = cardDocument.data.id;
-  let url = isNew ? `${hubURL}/api/cards` : `${hubURL}/api/cards/${id}`;
+  let url = isNew ? `${hubURL}/api/cards` : `${hubURL}/api/cards/${encodeURIComponent(id)}`;
   let response = await fetch(url, {
     method: isNew ? 'POST' : 'PATCH',
     headers: {
@@ -679,7 +679,7 @@ async function save(session, cardDocument, isNew) {
 }
 
 async function load(session, id, format) {
-  let response = await fetch(`${hubURL}/api/cards/${id}?format=${format}`, {
+  let response = await fetch(`${hubURL}/api/cards/${encodeURIComponent(id)}?format=${format}`, {
     headers: {
       'Content-Type': 'application/vnd.api+json',
       'Authorization': `Bearer ${session.token}`
