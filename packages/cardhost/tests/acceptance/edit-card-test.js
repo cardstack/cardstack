@@ -226,7 +226,7 @@ module('Acceptance | card edit', function(hooks) {
     assert.equal(currentURL(), `/cards/${card1Id}/schema`);
     assert.dom(`[data-test-card-schema="${card1Id}"]`).exists();
     assert.dom('[data-test-mode-switcher-mode="schema"]').hasClass('selected');
-    assert.dom('[data-test-mode-switcher-mode] .selected').exists({ count: 1 });
+    assert.dom('[data-test-mode-switcher-mode].selected').exists({ count: 1 });
   });
 
   test(`can navigate to card view`, async function(assert) {
@@ -247,7 +247,7 @@ module('Acceptance | card edit', function(hooks) {
     assert.equal(currentURL(), `/cards/${card1Id}`);
     assert.dom(`[data-test-card-view="${card1Id}"]`).exists();
     assert.dom('[data-test-mode-switcher-mode="view"]').hasClass('selected');
-    assert.dom('[data-test-mode-switcher-mode] .selected').exists({ count: 1 });
+    assert.dom('[data-test-mode-switcher-mode].selected').exists({ count: 1 });
   });
 
   test(`deleting a card`, async function(assert) {

@@ -4,30 +4,17 @@
   data-test-mode-switcher
 >
   {{#unless @mode}}
-    <option selected disabled>Please select a view</option>
+    <option selected disabled>Please select a mode</option>
   {{/unless}}
-  <option
-    class="mode-switcher--mode view {{if (eq this.mode "view") "selected"}}"
-    value="view"
-    selected={{eq this.mode "view"}}
-    data-test-mode-switcher-mode="view"
-  >
-    Layout View
-  </option>
-  <option
-    class="mode-switcher--mode edit {{if (eq this.mode "edit") "selected"}}"
-    value="edit"
-    selected={{eq this.mode "edit"}}
-    data-test-mode-switcher-mode="edit"
-  >
-    Form View
-  </option>
-  <option
-    class="mode-switcher--mode schema {{if (eq this.mode "schema") "selected"}}"
-    value="schema"
-    selected={{eq this.mode "schema"}}
-    data-test-mode-switcher-mode="schema"
-  >
-    Schema View
-  </option>
+
+  {{#each this.modes as |mode|}}
+    <option
+      class="mode-switcher--mode {{mode.id}} {{if (eq this.currentMode mode.id) "selected"}}"
+      value={{mode.id}}
+      selected={{eq this.currentMode mode.id}}
+      data-test-mode-switcher-mode={{mode.id}}
+    >
+      {{mode.displayTitle}}
+    </option>
+  {{/each}}
 </select>

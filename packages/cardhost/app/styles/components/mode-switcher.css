@@ -22,6 +22,7 @@
   color: white;
   font: 400 13px/18px var(--ch-font-family);
   letter-spacing: 0.46px;
+  text-transform: capitalize;
   -moz-appearance: none;
   -webkit-appearance: none;
 }
