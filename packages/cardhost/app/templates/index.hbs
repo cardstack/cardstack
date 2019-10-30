@@ -43,8 +43,12 @@
           so just providing a link to the base card instead of rendering it in an embedded
           format.
         --}}
-        <LinkTo @route="cards.view" @model="@cardstack/base-card">
-          <div>
+        <LinkTo
+          @route="cards.view"
+          @model="@cardstack/base-card"
+          @class="card-renderer--embedded-card-link"
+        >
+          <div class="embedded-card default-card">
             Base Card
           </div>
         </LinkTo>
