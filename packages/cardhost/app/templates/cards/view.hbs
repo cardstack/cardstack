@@ -1,28 +1,26 @@
 <CardhostTopEdge>
-  <div class="cards-view--top-edge">
-    <h2 class="cards-view--top-edge-title" data-test-card-view={{this.model.name}}>View Card</h2>
-    <div class="cards-view--top-edge-buttons">
-      <LinkTo
-        @route="cards.schema"
-        @model={{this.model.name}}
-        class="ch-button ch-button--secondary"
-      >
-        Update Schema
-      </LinkTo>
-      <LinkTo
-        @route="cards.edit"
-        @model={{this.model.name}}
-        class="ch-button ch-button--secondary"
-      >
-        Edit Card
-      </LinkTo>
-    </div>
-  </div>
+  <ModeSwitcher @name={{this.model.name}} @mode="view" />
+  {{!-- <div>
+    <LinkTo
+      @route="cards.schema"
+      @model={{this.model.name}}
+      class="ch-button ch-button--secondary"
+    >
+      Update Schema
+    </LinkTo>
+    <LinkTo
+      @route="cards.edit"
+      @model={{this.model.name}}
+      class="ch-button ch-button--secondary"
+    >
+      Edit Card
+    </LinkTo>
+  </div> --}}
 </CardhostTopEdge>
 
 <CardhostLeftEdge />
 
-<div class="cards-view--container">
+<div class="cards-view" data-test-card-view={{this.model.name}}>
   <CardRenderer @card={{this.model}} @format="isolated"/>
 
   <section class="cardhost-card-document">

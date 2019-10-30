@@ -1,19 +1,19 @@
-<CardhostTopEdge @mode="schema">
-  <div class="card-schema-updator--top-edge">
-    <div class="card-schema-updator--top-edge-buttons">
-      {{! eslint is confused by on helper }}
-      {{! template-lint-disable attribute-indentation}}
+<CardhostTopEdge>
+  <ModeSwitcher @name={{this.card.name}} @mode="schema" />
+  <div>
+    <div class="ch-button-group">
       <button
-        {{on "click" this.save}}
         class="ch-button--secondary"
         disabled={{not this.cardstackSession.isAuthenticated}}
         data-test-card-schema-cancel-btn
+        {{on "click" this.cancel}}
       >
         Cancel
       </button>
-      <button {{on "click" this.save}}
+      <button
         disabled={{not this.cardstackSession.isAuthenticated}}
         data-test-card-schema-save-btn
+        {{on "click" this.save}}
       >
         Save
       </button>
@@ -58,11 +58,11 @@
   </section>
 </CardhostLeftEdge>
 
-<aside class="cardhost-right-edge">
+{{!-- <aside class="cardhost-right-edge">
   <section class="cardhost-right-edge-panel">
     <h3>Update Schema</h3>
   </section>
-</aside>
+</aside> --}}
 
 <div class="card-manipulator--container card-schema-updator">
   {{#if this.statusMsg}}

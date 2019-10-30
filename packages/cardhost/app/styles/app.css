@@ -1,5 +1,6 @@
 @import '/assets/fonts.css';
 @import '/assets/palette.css';
+@import '/assets/components/mode-switcher.css';
 @import '/assets/components/card-manipulator.css';
 @import '/assets/components/cardhost-left-edge.css';
 @import '/assets/components/cardhost-top-edge.css';
@@ -64,6 +65,7 @@ button {
   --border: 1px solid transparent;
   --border-radius: 100px;
 
+  display: inline-block;
   margin: var(--margin);
   padding: var(--padding);
   height: var(--height);
@@ -93,6 +95,10 @@ button:hover,
 .ch-button + .ch-button,
 button + button {
   margin-left: 10px;
+}
+
+.ch-button-group {
+  display: flex;
 }
 
 
@@ -166,34 +172,10 @@ button + button {
   font-weight: 600;
 }
 
-
 /* Other */
-.card-editor--container,
-.cards-view--container {
+.card-editor,
+.cards-view {
   padding: 20px;
-}
-
-.card-editor--top-edge,
-.cards-view--top-edge {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  width: 100%;
-  height: 40px;
-}
-
-.card-editor--top-edge-inner-container,
-.cards-view--top-edge-buttons {
-  display: flex;
-  align-items: center;
-}
-
-.card-editor--top-edge-title,
-.cards-view--top-edge-title {
-  margin: 0;
-  padding-right: 20px;
-  font-size: 18px;
-  font-weight: 600;
 }
 
 .field-creator--field-btn-wrapper {

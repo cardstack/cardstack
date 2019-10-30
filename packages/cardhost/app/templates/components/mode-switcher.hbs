@@ -1,0 +1,29 @@
+<select
+  onchange={{action "selectMode" value="target.value"}}
+  class="mode-switcher {{@mode}}"
+>
+  {{#unless @mode}}
+    <option selected disabled>Please select a view</option>
+  {{/unless}}
+  <option
+    class="mode-switcher--mode view"
+    value="view"
+    selected={{if (eq this.mode "view") true}}
+  >
+    Layout View
+  </option>
+  <option
+    class="mode-switcher--mode edit"
+    value="edit"
+    selected={{if (eq this.mode "edit") true}}
+  >
+    Form View
+  </option>
+  <option
+    class="mode-switcher--mode schema"
+    value="schema"
+    selected={{if (eq this.mode "schema") true}}
+  >
+    Schema View
+  </option>
+</select>
