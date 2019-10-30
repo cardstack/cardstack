@@ -129,10 +129,10 @@ export default class CardManipulator extends Component {
       yield this.card.save();
     } catch (e) {
       console.error(e); // eslint-disable-line no-console
-      this.statusMsg = `card ${this.card.id} was NOT successfully created: ${e.message}`;
+      this.statusMsg = `card ${this.card.name} was NOT successfully created: ${e.message}`;
       return;
     }
-    this.router.transitionTo('cards.view', this.card.id);
+    this.router.transitionTo('cards.view', this.card.name);
   })) saveCard;
 
   @(task(function * () {
@@ -141,7 +141,7 @@ export default class CardManipulator extends Component {
       yield this.card.delete();
     } catch (e) {
       console.error(e); // eslint-disable-line no-console
-      this.statusMsg = `card ${this.card.id} was NOT successfully deleted: ${e.message}`;
+      this.statusMsg = `card ${this.card.name} was NOT successfully deleted: ${e.message}`;
       return;
     }
     this.router.transitionTo('index');
@@ -229,7 +229,7 @@ export default class CardManipulator extends Component {
 
   @action
   cancel() {
-    this.router.transitionTo('cards.view', this.card.id);
+    this.router.transitionTo('cards.view', this.card.name);
   }
 
   @action

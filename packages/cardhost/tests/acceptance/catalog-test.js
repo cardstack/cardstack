@@ -7,9 +7,12 @@ import { createCards } from '../helpers/card-helpers';
 import { setupMockUser, login } from '../helpers/login';
 
 const timeout = 5000;
-const card1Id = 'local-hub::article-card::millenial-puppies';
-const card2Id = 'local-hub::user-card::van-gogh';
-const card3Id = 'local-hub::user-card::hassan';
+const card1Id = 'millenial-puppies';
+const qualifiedCard1Id = `local-hub::${card1Id}`;
+const card2Id = 'van-gogh';
+const qualifiedCard2Id = `local-hub::${card2Id}`;
+const card3Id = 'hassan';
+const qualifiedCard3Id = `local-hub::${card3Id}`;
 
 const scenario = new Fixtures({
   create(factory) {
@@ -17,9 +20,9 @@ const scenario = new Fixtures({
   },
   destroy() {
     return [
-      { type: 'cards', id: card1Id },
-      { type: 'cards', id: card2Id },
-      { type: 'cards', id: card3Id }
+      { type: 'cards', id: qualifiedCard1Id },
+      { type: 'cards', id: qualifiedCard2Id },
+      { type: 'cards', id: qualifiedCard3Id }
     ];
   }
 });

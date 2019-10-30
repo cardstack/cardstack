@@ -6,14 +6,15 @@ import { addField, createCards, removeField } from '../helpers/card-helpers';
 import { setupMockUser, login } from '../helpers/login';
 
 const timeout = 5000;
-const card1Id = 'local-hub::article-card::millenial-puppies';
+const card1Id = 'millenial-puppies';
+const qualifiedCard1Id = `local-hub::${card1Id}`;
 
 const scenario = new Fixtures({
   create(factory) {
     setupMockUser(factory);
   },
   destroy() {
-    return [{ type: 'cards', id: card1Id }];
+    return [{ type: 'cards', id: qualifiedCard1Id }];
   }
 });
 

@@ -5,6 +5,6 @@ export default class CardModelRoute extends Route {
   @service data;
 
   async model({ id }) {
-    return await this.data.getCard(id, 'isolated');
+    return await this.data.getCard(`local-hub::${id}`, 'isolated');
   }
 }

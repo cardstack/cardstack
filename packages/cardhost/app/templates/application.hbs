@@ -1,30 +1,28 @@
 <header class="cardhost--header">
-  <div>
-    <h1><LinkTo @route="index">Card Host</LinkTo></h1>
+  <h1><LinkTo @route="index">Card Host</LinkTo></h1>
 
-    {{#cardstack-session as |session|}}
-      {{#if session.isAuthenticated }}
+  {{#cardstack-session as |session|}}
+    {{#if session.isAuthenticated }}
+      <button
+        id="logout-button"
+        onclick={{action session.logout}}
+      >
+        Logout {{session.user.name}}
+      </button>
+    {{else}}
+      {{#mock-login as |login|}}
         <button
-          id="logout-button"
-          onclick={{action session.logout}}
+          id="login-button"
+          onclick={{action login "user1"}}
+          data-test-cardstack="login-button"
         >
-          Logout {{session.user.name}}
+          Login
         </button>
-      {{else}}
-        {{#mock-login as |login|}}
-          <button
-            class="cardhost-button"
-            id="login-button"
-            onclick={{action login "user1"}}
-            data-test-cardstack="login-button"
-          >
-            Login
-          </button>
-        {{/mock-login}}
-      {{/if}}
-    {{/cardstack-session}}
-  </div>
+      {{/mock-login}}
+    {{/if}}
+  {{/cardstack-session}}
 </header>
-<main class="cardhost--main">
+
+<div class="cardhost">
   {{outlet}}
-</main>
+</div>

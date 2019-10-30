@@ -10,7 +10,7 @@ export default class IndexRoute extends Route {
   async model() {
     // prime the store with seed models
     if (environment === 'development') {
-      await this.data.getCard('local-hub::article-card::why-doors', 'isolated');
+      await this.data.getCard('local-hub::why-doors', 'isolated');
     }
     return await this.data.allCardsInStore();
   }

@@ -23,11 +23,6 @@ class Writers {
     return this.schemaLoader.ownTypes();
   }
 
-  // not using DI to prevent circular dependency
-  _getCardServices() {
-    if (this.cardServices) { return this.cardServices; }
-    return this.cardServices = this.__owner__.lookup('hub:card-services');
-  }
   async create(session, type, document) {
     log.info("creating type=%s", type);
     if (!document.data) {
@@ -178,7 +173,8 @@ class Writers {
 
     let authorizedDocument = await context.applyReadAuthorization({ session });
     if (isCard(authorizedDocument.data.type, authorizedDocument.data.id)) {
-      return await adaptCardToFormat(schema, session, authorizedDocument, 'isolated', this._getCardServices());
+      let card = await adaptCardToFormat(schema, session, authorizedDocument, 'isolated', this.searchers);
+      return card;
     }
     return authorizedDocument;
   }
@@ -236,7 +232,7 @@ class Writers {
 
     let authorizedDocument = await context.applyReadAuthorization({ session });
     if (isCard(authorizedDocument.data.type, authorizedDocument.data.id)) {
-      return await adaptCardToFormat(schema, session, authorizedDocument, 'isolated', this._getCardServices());
+      return await adaptCardToFormat(schema, session, authorizedDocument, 'isolated', this.searchers);
     }
     return authorizedDocument;
   }
@@ -356,7 +352,7 @@ class Writers {
   }
 
   async _loadInternalCard(card) {
-    let internalCard = generateInternalCardFormat(await this.currentSchema.getSchema(), card);
+    let internalCard = await generateInternalCardFormat(await this.currentSchema.getSchema(), card, this.searchers);
     let { schema, context } = await this._loadInternalCardSchema(internalCard);
     return { internalCard, schema, context };
   }
@@ -373,7 +369,7 @@ class Writers {
       schema: await this.currentSchema.getSchema(),
       upstreamDoc: internalCard
     });
-    let schema = await loadCard(await this.currentSchema.getSchema(), internalCard, context._getCard.bind(context));
+    let schema = await loadCard(await this.currentSchema.getSchema(), internalCard, context.getCard.bind(context));
     return { context, schema: await (await this.currentSchema.getSchema()).applyChanges(schema.map(document => ({ id: document.id, type: document.type, document }))) };
   }
 

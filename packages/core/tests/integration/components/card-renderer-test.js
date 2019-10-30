@@ -4,7 +4,8 @@ import { setupRenderingTest } from 'ember-qunit';
 import { render, triggerEvent } from '@ember/test-helpers';
 import hbs from 'htmlbars-inline-precompile';
 
-const card1Id = 'local-hub::article-card::millenial-puppies';
+const card1Id = 'millenial-puppies';
+const qualifiedCard1Id = `local-hub::${card1Id}`;
 
 const scenario = new Fixtures({
   create(factory) {
@@ -33,7 +34,7 @@ const scenario = new Fixtures({
 
   destroy() {
     return [
-      { type: 'cards', id: card1Id },
+      { type: 'cards', id: qualifiedCard1Id },
     ];
   }
 });
@@ -48,7 +49,7 @@ module('Integration | Component | card-renderer', function(hooks) {
 
   test('it renders embedded card', async function(assert) {
     let service = this.owner.lookup('service:data');
-    let card = service.createCard(card1Id);
+    let card = service.createCard(qualifiedCard1Id);
     card.addField({ name: 'title', type: '@cardstack/core-types::string', neededWhenEmbedded: true, value: 'test title' });
     card.addField({ name: 'author', type: '@cardstack/core-types::string', neededWhenEmbedded: true, value: 'test author' });
     card.addField({ name: 'body', type: '@cardstack/core-types::string', neededWhenEmbedded: false, value: 'test body' });
@@ -69,7 +70,7 @@ module('Integration | Component | card-renderer', function(hooks) {
 
   test('it renders isolated card', async function(assert) {
     let service = this.owner.lookup('service:data');
-    let card = service.createCard(card1Id);
+    let card = service.createCard(qualifiedCard1Id);
     card.addField({ name: 'title', type: '@cardstack/core-types::string', neededWhenEmbedded: true, value: 'test title' });
     card.addField({ name: 'author', type: '@cardstack/core-types::string', neededWhenEmbedded: true, value: 'test author' });
     card.addField({ name: 'body', type: '@cardstack/core-types::string', neededWhenEmbedded: false, value: 'test body' });
@@ -90,7 +91,7 @@ module('Integration | Component | card-renderer', function(hooks) {
 
   test('embedded card is wrapped with a link in view mode', async function(assert) {
     let service = this.owner.lookup('service:data');
-    let card = service.createCard(card1Id);
+    let card = service.createCard(qualifiedCard1Id);
     this.set('card', card);
 
     await render(hbs`
@@ -105,7 +106,7 @@ module('Integration | Component | card-renderer', function(hooks) {
 
   test('embedded card does not have a link to isolated card route in edit mode', async function(assert) {
     let service = this.owner.lookup('service:data');
-    let card = service.createCard(card1Id);
+    let card = service.createCard(qualifiedCard1Id);
     this.set('card', card);
 
     await render(hbs`
@@ -120,7 +121,7 @@ module('Integration | Component | card-renderer', function(hooks) {
 
   test('embedded card does not have a link to isolated card route in schema mode', async function(assert) {
     let service = this.owner.lookup('service:data');
-    let card = service.createCard(card1Id);
+    let card = service.createCard(qualifiedCard1Id);
     this.set('card', card);
 
     await render(hbs`
@@ -135,7 +136,7 @@ module('Integration | Component | card-renderer', function(hooks) {
 
   test('renders an isolated card in edit mode', async function(assert) {
     let service = this.owner.lookup('service:data');
-    let card = service.createCard(card1Id);
+    let card = service.createCard(qualifiedCard1Id);
     card.addField({ name: 'title', type: '@cardstack/core-types::string', neededWhenEmbedded: true, value: 'test title' });
     card.addField({ name: 'author', type: '@cardstack/core-types::string', neededWhenEmbedded: true, value: 'test author' });
     card.addField({ name: 'body', type: '@cardstack/core-types::string', neededWhenEmbedded: false, value: 'test body' });
@@ -157,7 +158,7 @@ module('Integration | Component | card-renderer', function(hooks) {
 
   test('renders an embedded card in edit mode', async function(assert) {
     let service = this.owner.lookup('service:data');
-    let card = service.createCard(card1Id);
+    let card = service.createCard(qualifiedCard1Id);
     card.addField({ name: 'title', type: '@cardstack/core-types::string', neededWhenEmbedded: true, value: 'test title' });
     card.addField({ name: 'author', type: '@cardstack/core-types::string', neededWhenEmbedded: true, value: 'test author' });
     card.addField({ name: 'body', type: '@cardstack/core-types::string', neededWhenEmbedded: false, value: 'test body' });
@@ -179,7 +180,7 @@ module('Integration | Component | card-renderer', function(hooks) {
 
   test('renders an isolated card in schema mode', async function(assert) {
     let service = this.owner.lookup('service:data');
-    let card = service.createCard(card1Id);
+    let card = service.createCard(qualifiedCard1Id);
     card.addField({ name: 'title', type: '@cardstack/core-types::string', neededWhenEmbedded: true, value: 'test title' });
     card.addField({ name: 'author', type: '@cardstack/core-types::string', neededWhenEmbedded: true, value: 'test author' });
     card.addField({ name: 'body', type: '@cardstack/core-types::string', neededWhenEmbedded: false, value: 'test body' });
@@ -206,7 +207,7 @@ module('Integration | Component | card-renderer', function(hooks) {
   test('renders an isolated card with a drop zone when no fields exist', async function(assert) {
     assert.expect(3);
     let service = this.owner.lookup('service:data');
-    let card = service.createCard(card1Id);
+    let card = service.createCard(qualifiedCard1Id);
     this.set('card', card);
     this.set('noop', () => {});
     this.set('dropField', (position, callback) => {
@@ -230,7 +231,7 @@ module('Integration | Component | card-renderer', function(hooks) {
 
   test('renders an embedded card in schema mode', async function(assert) {
     let service = this.owner.lookup('service:data');
-    let card = service.createCard(card1Id);
+    let card = service.createCard(qualifiedCard1Id);
     card.addField({ name: 'title', type: '@cardstack/core-types::string', neededWhenEmbedded: true, value: 'test title' });
     card.addField({ name: 'author', type: '@cardstack/core-types::string', neededWhenEmbedded: true, value: 'test author' });
     card.addField({ name: 'body', type: '@cardstack/core-types::string', neededWhenEmbedded: false, value: 'test body' });

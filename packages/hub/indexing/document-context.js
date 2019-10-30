@@ -64,13 +64,13 @@ module.exports = class DocumentContext {
         let contentType = this.schema.getType(doc.type);
         if (!contentType) { throw new Error(`Unknown content type=${doc.type} id=${doc.id}`); }
 
-        return new Model(contentType, doc, this.schema, this.read.bind(this), this._getCard.bind(this), this.search.bind(this), this.cardIdContext);
+        return new Model(contentType, doc, this.schema, this.read.bind(this), this.getCard.bind(this), this.search.bind(this), this.cardIdContext);
       });
     } else {
       let contentType = this.schema.getType(this.type);
       if (!contentType) { throw new Error(`Unknown content type=${this.type} id=${this.id}`); }
 
-      this._model = new Model(contentType, this.upstreamDoc.data, this.schema, this.read.bind(this), this._getCard.bind(this), this.search.bind(this), this.cardIdContext);
+      this._model = new Model(contentType, this.upstreamDoc.data, this.schema, this.read.bind(this), this.getCard.bind(this), this.search.bind(this), this.cardIdContext);
     }
 
     return this._model;
@@ -399,7 +399,7 @@ module.exports = class DocumentContext {
   // Treating this separately from the read() function because we need
   // cards as JSON:API documents in order to derive the card schema,
   // and read() only returns resources.
-  async _getCard(id) {
+  async getCard(id) {
     let cardResource;
     let docId = get(this, 'upstreamDoc.data.id');
     let docType = get(this, 'upstreamDoc.data.type');
@@ -476,10 +476,14 @@ module.exports = class DocumentContext {
   }
 
   async _updateSchema(cardId) {
-    let card = await this._getCard(cardId);
+    let card = await this.getCard(cardId);
     if (!card) { return; } // assume that the caller has provided the card schema already;
 
-    let cardSchema = await loadCard(this.schema, card, this._getCard.bind(this));
+    let adoptedFromId = get(card, 'data.relationships.adopted-from.data.id');
+    if (adoptedFromId) {
+      await this._updateSchema(adoptedFromId);
+    }
+    let cardSchema = await loadCard(this.schema, card, this.getCard.bind(this));
     this.schema = await this.schema.applyChanges(cardSchema.map(document => ({ id:document.id, type:document.type, document })));
   }
 
@@ -612,6 +616,7 @@ module.exports = class DocumentContext {
 
     if (isCollection) {
       for (let [index, resource] of jsonapiDoc.data.entries()) {
+
         await this._loadCardSchemaForResource(resource.type, resource.id);
         let contentType = this.schema.getType(resource.type);
         if (!contentType) { continue; }
@@ -676,7 +681,7 @@ module.exports = class DocumentContext {
       } else {
         jsonapiDoc = jsonapiDoc.data;
       }
-      let userModel = new Model(contentType, jsonapiDoc, this.schema, this.read.bind(this), this._getCard.bind(this), this.search.bind(this), this.cardIdContext);
+      let userModel = new Model(contentType, jsonapiDoc, this.schema, this.read.bind(this), this.getCard.bind(this), this.search.bind(this), this.cardIdContext);
       await this._buildAttributes(contentType, jsonapiDoc, userModel, pristine, searchDoc);
 
       if (!this._followedRelationships[`${type}/${id}`]) {

@@ -1,0 +1,12 @@
+<div class="cardhost-top-edge {{@mode}}" data-test-cardhost-top-edge>
+
+  {{#if @mode}}
+    <div class="card-manipulator--mode-chooser">
+      <div class="card-manipulator--mode {{@mode}}">
+        {{@mode}} View
+      </div>
+    </div>
+  {{/if}}
+
+  {{yield}}
+</div>

@@ -7,7 +7,7 @@ export default class HasManyEditor extends BaseEditor {
     super(...args);
 
     if (this.args.field && this.args.field.value) {
-      this.fieldValue = this.args.field.value.map(i => i.id).join(',');
+      this.fieldValue = this.args.field.value.map(i => i.name).join(', ');
     }
   }
 
@@ -15,6 +15,6 @@ export default class HasManyEditor extends BaseEditor {
   updateFieldValue(value) {
     value = value.split(',').map(i => i.trim());
     this.fieldValue = value;
-    this.args.setFieldValue(value);
+    this.args.setFieldValue(value.map(i => `local-hub::${i}`));
   }
 }

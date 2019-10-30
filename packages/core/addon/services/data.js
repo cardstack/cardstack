@@ -4,6 +4,7 @@ import { hubURL } from '@cardstack/plugin-utils/environment';
 import { inject as service } from '@ember/service';
 import { tracked } from '@glimmer/tracking';
 import { assert } from '@ember/debug';
+const cardIdDelim = '::';
 
 let fieldNonce = 0;
 let priv = new WeakMap();
@@ -11,6 +12,7 @@ let store = {
   isolated: new Map(),
   embedded: new Map()
 }
+
 
 export default class DataService extends Service {
   @service cardstackSession;
@@ -76,6 +78,9 @@ class Card {
     session,
     data
   }) {
+    if (id.split(cardIdDelim).length !== 2) {
+      throw new Error(`The card ID '${id}' format is incorrect. The card ID must be formatted as 'repository::card-name'`);
+    }
     // this keeps our internal state private
     priv.set(this, new CardInternals({
       id,
@@ -117,6 +122,14 @@ class Card {
     return priv.get(this).id;
   }
 
+  get repository() {
+    return this.id.split(cardIdDelim)[0];
+  }
+
+  get name() {
+    return this.id.split(cardIdDelim)[1];
+  }
+
   get loadedFormat() {
     return priv.get(this).loadedFormat;
   }
@@ -148,6 +161,7 @@ class Card {
     return this.fields.filter(i => i.neededWhenEmbedded);
   }
 
+  // This returns the most deeply loaded version of the card you have, so isolated if loaded, embedded if not
   get json() {
     return getCardDocument(this);
   }
