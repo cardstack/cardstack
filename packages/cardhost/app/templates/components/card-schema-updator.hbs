@@ -57,11 +57,12 @@
   </section>
 </CardhostLeftEdge>
 
-<aside class="cardhost-right-edge">
-  <section class="cardhost-right-edge-panel">
-    <h3>Update Schema</h3>
-  </section>
-</aside>
+<CardhostRightEdge
+  @selectedField={{this.selectedField}}
+  @selectedFieldName={{this.selectedFieldName}}
+  @selectField={{action this.selectField}}
+  @setNeededWhenEmbedded={{this.setNeededWhenEmbedded}}
+/>
 
 <div class="card-manipulator--container card-schema-updator">
   {{#if this.statusMsg}}
@@ -80,6 +81,7 @@
       @removeField={{action this.removeField}}
       @setFieldName={{action this.setFieldName}}
       @setNeededWhenEmbedded={{action this.setNeededWhenEmbedded}}
+      @selectField={{action this.selectField}}
       @setPosition={{action this.setPosition}}
       @dropField={{action this.dropField}}
     />

@@ -45,49 +45,13 @@
   </section>
 </CardhostLeftEdge>
 
-<div class="card-manipulator--right-edge" data-test-right-edge>
-  {{#if this.selectedField}}
-    <div class="card-manipulator--right-edge--pill-selector">
-      <div class="card-manipulator--right-edge--pill-option selected">Properties</div>
-      <div class="card-manipulator--right-edge--pill-option">Structure</div>
-    </div>
-    <div class="card-manipulator--right-edge--section">
-      <div class="section-header">Text Field</div>
-      <div class="card-manipulator--right-edge--attribute">
-        <div class="attribute-title">Field Name</div>
-        <Input
-          data-test-field-name
-          @id={{concat "card-manipulator--right-edge--field-name-" this.selectedField.nonce}}
-          @value={{this.selectedFieldName}}
-          @key-up={{action this.updateFieldName}}
-        />
-      </div>
-      <div class="card-manipulator--right-edge--attribute">
-        <div class="attribute-title">Display Label</div>
-        <Input class="attribute-value" />
-      </div>
-      <div class="card-manipulator--right-edge--attribute">
-        <label class="checkbox-container">
-          Required
-          <Input @type="checkbox" />
-          <span class="checkmark"></span>
-        </label>
-      </div>
-      <div class="card-manipulator--right-edge--attribute">
-        <label class="checkbox-container">
-          Available When Embedded
-          <Input
-            @checked={{this.selectedField.neededWhenEmbedded}}
-            @type="checkbox"
-            @click={{fn this.setNeededWhenEmbedded this.selectedField.name}}
-            data-test-needed-when-embedded
-            />
-          <span class="checkmark"></span>
-        </label>
-      </div>
-    </div>
-  {{/if}}
-</div>
+<CardhostRightEdge
+  @selectedField={{this.selectedField}}
+  @selectedFieldName={{this.selectedFieldName}}
+  @selectField={{action this.selectField}}
+  @updateFieldName={{action this.updateFieldName}}
+  @setNeededWhenEmbedded={{this.setNeededWhenEmbedded}}
+/>
 
 <div class="card-manipulator--container card-creator">
   {{#if this.statusMsg}}
