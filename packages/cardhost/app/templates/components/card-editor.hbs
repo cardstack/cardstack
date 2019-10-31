@@ -2,26 +2,28 @@
   <ModeSwitcher @name={{this.card.name}} @mode="edit" />
   <div>
     <div class="ch-button-group">
+      {{! eslint is confused by on helper }}
+      {{! template-lint-disable attribute-indentation}}
       <button
+        {{on "click" this.delete}}
         class="ch-button--secondary"
         data-test-card-editor-delete-btn
         disabled={{not this.cardstackSession.isAuthenticated}}
-        {{on "click" this.delete}}
       >
         Delete
       </button>
       <button
+        {{on "click" this.cancel}}
         class="ch-button--secondary"
         data-test-card-editor-cancel-btn
         disabled={{not this.cardstackSession.isAuthenticated}}
-        {{on "click" this.cancel}}
       >
         Cancel
       </button>
       <button
+        {{on "click" this.save}}
         data-test-card-editor-save-btn
         disabled={{not this.cardstackSession.isAuthenticated}}
-        {{on "click" this.save}}
       >
         Save
       </button>

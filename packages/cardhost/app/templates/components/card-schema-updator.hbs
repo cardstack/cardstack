@@ -2,18 +2,20 @@
   <ModeSwitcher @name={{this.card.name}} @mode="schema" />
   <div>
     <div class="ch-button-group">
+      {{! eslint is confused by on helper }}
+      {{! template-lint-disable attribute-indentation}}
       <button
+        {{on "click" this.cancel}}
         class="ch-button--secondary"
         disabled={{not this.cardstackSession.isAuthenticated}}
         data-test-card-schema-cancel-btn
-        {{on "click" this.cancel}}
       >
         Cancel
       </button>
       <button
+        {{on "click" this.save}}
         disabled={{not this.cardstackSession.isAuthenticated}}
         data-test-card-schema-save-btn
-        {{on "click" this.save}}
       >
         Save
       </button>
