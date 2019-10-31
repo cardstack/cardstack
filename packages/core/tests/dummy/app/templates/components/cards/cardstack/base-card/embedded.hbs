@@ -1,7 +1,7 @@
 <div
   data-test-embedded-card={{@card.name}}
   data-test-embedded-card-mode={{@mode}}
-  class="embedded-card default-card"
+  class="embedded-card cardstack_base-card"
 >
   {{#each @card.embeddedFields key="nonce" as | field |}}
     {{#if (eq @mode "schema")}}
