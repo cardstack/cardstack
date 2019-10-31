@@ -95,6 +95,14 @@ module.exports = function(defaults) {
             },
           },
         },
+        // {
+        //   package: "prismjs",
+        //   components: {
+        //     "<CodeBlock/>": {
+        //       acceptsComponentArguments: ["code", "language"],
+        //     },
+        //   }
+        // }
       ],
     });
   })();
