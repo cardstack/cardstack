@@ -18,6 +18,7 @@
     "supertest": "^2.0.1"
   },
   "dependencies": {
+    "@cardstack/base-card": "0.14.35",
     "@cardstack/di": "0.14.35",
     "@cardstack/logger": "^0.2.0",
     "@cardstack/plugin-utils": "0.14.35",
