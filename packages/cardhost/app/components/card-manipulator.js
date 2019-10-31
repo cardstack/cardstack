@@ -223,6 +223,17 @@ export default class CardManipulator extends Component {
   }
 
   @action
+  setFieldLabel(fieldName, label) {
+    this.card.getField(fieldName).setLabel(label);
+  }
+
+  @action
+  updateFieldLabel(label) {
+    this.selectedFieldLabel = label;
+    this.setFieldLabel(this.selectedFieldName, this.selectedFieldLabel);
+  }
+
+  @action
   save() {
     this.saveCard.perform();
   }
