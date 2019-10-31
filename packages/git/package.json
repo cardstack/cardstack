@@ -1,6 +1,6 @@
 {
   "name": "@cardstack/git",
-  "version": "0.14.35",
+  "version": "0.14.36",
   "description": "Git data source plugin for @cardstack/hub.",
   "keywords": [
     "cardstack-plugin",
@@ -14,7 +14,7 @@
   },
   "dependencies": {
     "@cardstack/logger": "^0.2.0",
-    "@cardstack/plugin-utils": "0.14.35",
+    "@cardstack/plugin-utils": "0.14.36",
     "delay": "^4.1.0",
     "filenamify-url": "^1.0.0",
     "githereum": "0.0.1",
@@ -27,9 +27,9 @@
     "truffle-contract": "^4.0.30"
   },
   "devDependencies": {
-    "@cardstack/di": "0.14.35",
-    "@cardstack/eslint-config": "0.14.35",
-    "@cardstack/test-support": "0.14.35",
+    "@cardstack/di": "0.14.36",
+    "@cardstack/eslint-config": "0.14.36",
+    "@cardstack/test-support": "0.14.36",
     "sinon": "7.2.3"
   },
   "engines": {
