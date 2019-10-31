@@ -1,6 +1,9 @@
+{{!-- TODO move this into the @cardstack/base-card package when we support runtime js compilation --}}
+
+{{!-- TODO use a sanitized version of the @card.id in the class name after we have css coming from card documents --}}
 <div
   data-test-isolated-card={{@card.name}}
-  class="isolated-card default-card"
+  class="isolated-card cardstack_base-card"
 >
   {{#each @card.isolatedFields key="nonce" as |field|}}
     {{#if @setFieldValue}}
