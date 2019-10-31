@@ -9,9 +9,9 @@
 
   {{#each this.modes as |mode|}}
     <option
-      class="mode-switcher--mode {{mode.id}} {{if (eq this.currentMode mode.id) "selected"}}"
+      class="mode-switcher--mode {{mode.id}} {{if (eq @mode mode.id) "selected"}}"
       value={{mode.id}}
-      selected={{eq this.currentMode mode.id}}
+      selected={{eq @mode mode.id}}
       data-test-mode-switcher-mode={{mode.id}}
     >
       {{mode.displayTitle}}
