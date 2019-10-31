@@ -8,7 +8,7 @@ interface PackageJSON {
 }
 
 function loadPackages() {
-  let packages = glob.sync("./packages/*/package.json").map(p => {
+  let packages = glob.sync("./@(packages|cards)/*/package.json").map(p => {
     /* eslint-disable-next-line @typescript-eslint/no-require-imports */
     return require(join(process.cwd(), p)) as PackageJSON;
   });

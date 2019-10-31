@@ -36,7 +36,7 @@ async function setupBaseCard(pgsearchClient: todo, searchers: todo, writers: tod
     let schema = await currentSchema.getSchema();
     let dataSource = schema.getDataSource(source);
 
-    if (dataSource.sourceType === '@cardstack/ephemeral') {
+    if (dataSource && dataSource.sourceType === '@cardstack/ephemeral') {
       // the currentBaseCard actually doesn't exist--it's left over from the last time the index was running
       log.info(`Base card doesn't exist yet, creating @cardstack/base-card...`);
       await writers.create(Session.INTERNAL_PRIVILEGED, 'cards', baseCard);

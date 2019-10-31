@@ -9,6 +9,7 @@
     "node": ">= 7.7"
   },
   "devDependencies": {
+    "@cardstack/base-card": "0.14.35",
     "@cardstack/eslint-config": "0.14.35",
     "@cardstack/test-support": "0.14.35",
     "@cardstack/test-support-authenticator": "0.14.35",
@@ -18,7 +19,6 @@
     "supertest": "^2.0.1"
   },
   "dependencies": {
-    "@cardstack/base-card": "0.14.35",
     "@cardstack/di": "0.14.35",
     "@cardstack/logger": "^0.2.0",
     "@cardstack/plugin-utils": "0.14.35",
