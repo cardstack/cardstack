@@ -70,6 +70,12 @@
           </span>
         </div>
         <div class="schema-field-renderer--attribute">
+          <span class="schema-field-renderer--attribute-name">Field Label</span>
+          <span class="schema-field-renderer--attribute-value" data-test-field-renderer-field-label>
+            {{@field.label}}
+          </span>
+        </div>
+        <div class="schema-field-renderer--attribute">
           <span class="schema-field-renderer--attribute-name">Is Metadata Field</span>
           <span class="" data-test-field-renderer-is-meta>
             {{if @field.json.data.attributes.is-metadata "true" "false"}}
