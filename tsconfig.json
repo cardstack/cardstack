@@ -1,5 +1,5 @@
 {
-  "include": ["./packages/**/*.ts", "packages/cards/**/*.ts"],
+  "include": ["./packages/**/*.ts", "./cards/**/*.ts"],
   "compilerOptions": {
     "target": "es2017",
     "module": "commonjs",
