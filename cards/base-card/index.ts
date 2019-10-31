@@ -1,4 +1,3 @@
-// TODO I think we need to move this to it's own node package in the mono repo...
 import { SingleResourceDoc } from 'jsonapi-typescript';
 import { join } from 'path';
 import { readFileSync } from 'fs';
