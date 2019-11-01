@@ -58,6 +58,7 @@ const cardBrowserAssetFields = [
 ];
 const metadataSummaryField = 'metadata-summary';
 const embeddedMetadataSummaryField = `embedded-${metadataSummaryField}`;
+const internalFieldsSummaryField = `internal-fields-summary`;
 
 function cardContextFromId(id: string | number) {
   let noContext: CardContext = {};
@@ -79,7 +80,7 @@ function cardContextToId({ repository, packageName,  modelId }: CardContext) {
   return [repository, packageName, modelId].filter(i => i != null).join(cardIdDelim);
 }
 
-function isCard(type: string = '', id: string = '') {
+function isInternalCard(type: string = '', id: string = '') {
   return id && type === id && id.split(cardIdDelim).length > 1;
 }
 
@@ -117,12 +118,12 @@ async function validateInternalCardFormat(schema: todo, internalCard: SingleReso
     let linkage: ResourceLinkage = get(internalCard, `data.relationships.${rel}.data`);
     if (!linkage) { continue; }
     if (Array.isArray(linkage)) {
-      let foreignLinkageIndex = linkage.findIndex(i => !isCard(i.type, i.id) && ((!schema.isSchemaType(i.type) && !i.type.includes(id)) || !i.id.includes(id)));
+      let foreignLinkageIndex = linkage.findIndex(i => !isInternalCard(i.type, i.id) && ((!schema.isSchemaType(i.type) && !i.type.includes(id)) || !i.id.includes(id)));
       if (foreignLinkageIndex > -1) {
         throw new Error(`The card '${id}' has a relationship to a foreign internal model '${linkage[foreignLinkageIndex].type}/${linkage[foreignLinkageIndex].id}'`, { status: 400, source: { pointer: `/data/relationships/${rel}/data/${foreignLinkageIndex}`}});
       }
     } else {
-      if (!isCard(linkage.type, linkage.id) && ((!schema.isSchemaType(linkage.type) && !linkage.type.includes(id)) || !linkage.id.includes(id))) {
+      if (!isInternalCard(linkage.type, linkage.id) && ((!schema.isSchemaType(linkage.type) && !linkage.type.includes(id)) || !linkage.id.includes(id))) {
         throw new Error(`The card '${id}' has a relationship to a foreign internal model '${linkage.type}/${linkage.id}'`, { status: 400, source: { pointer: `/data/relationships/${rel}/data`}});
       }
     }
@@ -133,7 +134,7 @@ async function validateInternalCardFormat(schema: todo, internalCard: SingleReso
 
   let chain = (await adoptionChain(internalCard, getInternalCard)).map((i: SingleResourceDoc) => i.data.id).filter(Boolean);
   let foreignIncludedIndex = (internalCard.included || []).findIndex(i =>
-    !isCard(i.type, i.id) &&
+    !isInternalCard(i.type, i.id) &&
     i.id != null && (
       (!schema.isSchemaType(i.type) && !i.type.includes(id)) ||
       (
@@ -266,6 +267,7 @@ async function generateCardModule(internalCard: SingleResourceDoc) {
   }
   unset(cleanCard, `data.attributes.${metadataSummaryField}`);
   unset(cleanCard, `data.attributes.${embeddedMetadataSummaryField}`);
+  unset(cleanCard, `data.attributes.${internalFieldsSummaryField}`);
   let version: string = get(cleanCard, 'data.meta.version');
   let cardFolder: string = join(cardsDir, repository, packageName);
   let cardFile: string = join(cardFolder, cardFileName);
@@ -423,7 +425,8 @@ async function deriveCardModelContentType(cardInInternalOrExternalFormat: Single
       get(cardInInternalOrExternalFormat, 'data.relationships.fields.data') || [],
       [
         { type: 'computed-fields', id: metadataSummaryField },
-        { type: 'computed-fields', id: embeddedMetadataSummaryField }
+        { type: 'computed-fields', id: embeddedMetadataSummaryField },
+        { type: 'computed-fields', id: internalFieldsSummaryField },
       ]
     )
   };
@@ -539,7 +542,7 @@ async function adaptCardCollectionToFormat(schema: todo, session: Session, inter
   let included: ResourceObject[] = [];
   let data: ResourceObject[] = [];
   for (let resource of internalCollection.data) {
-    if (!isCard(resource.type, resource.id)) {
+    if (!isInternalCard(resource.type, resource.id)) {
       data.push(resource);
       continue;
     }
@@ -550,7 +553,7 @@ async function adaptCardCollectionToFormat(schema: todo, session: Session, inter
   let rootItems = data.map(i => `${i.type}/${i.id}`);
   included = uniqBy(included.filter(i => !rootItems.includes(`${i.type}/${i.id}`)), j => `${j.type}/${j.id}`)
     .map(i => {
-      if (isCard(i.type, i.id)) {
+      if (isInternalCard(i.type, i.id)) {
         i.type = 'cards';
       }
       return i;
@@ -611,6 +614,7 @@ async function adaptCardToFormat(schema: todo, session: Session, internalCard: S
     result.data.meta = internalCard.data.meta;
   }
 
+  // Construct the attribute type fields that will be hoisted as metadata
   let attributes: AttributesObject = {};
   for (let attr of Object.keys(get(priviledgedCard, 'data.attributes') || {})) {
     if (cardBrowserAssetFields.concat([metadataSummaryField]).includes(attr) && result.data.attributes) {
@@ -628,12 +632,16 @@ async function adaptCardToFormat(schema: todo, session: Session, internalCard: S
     Object.keys(internalCard.data.attributes)
       .filter(i => !cardBrowserAssetFields.concat([
         metadataSummaryField,
+        internalFieldsSummaryField,
         embeddedMetadataSummaryField
       ]).includes(i))) {
     attributes[attr] = internalCard.data.attributes[attr];
   }
   unset(attributes, metadataSummaryField);
   unset(attributes, embeddedMetadataSummaryField);
+  unset(attributes, internalFieldsSummaryField);
+
+  // Construct the relationship type fields that will be hoisted as metadata
   let relationships: RelationshipsObject = {};
   for (let rel of Object.keys(internalCard.data.relationships || {})) {
     if (rel === 'fields' || !internalCard.data.relationships) { continue; }
@@ -641,12 +649,12 @@ async function adaptCardToFormat(schema: todo, session: Session, internalCard: S
     if (Array.isArray(linkage)) {
       relationships[rel] = {
         data: (linkage as ResourceIdentifierObject[]).map(i =>
-          isCard(i.type, i.id) ? ({ type: 'cards', id: i.id }) : ({ type: i.type, id: i.id })
+          isInternalCard(i.type, i.id) ? ({ type: 'cards', id: i.id }) : ({ type: i.type, id: i.id })
         )
       };
     } else if (linkage) {
       relationships[rel] = {
-        data: isCard(linkage.type, linkage.id) ? ({ type: 'cards', id: linkage.id }) : ({ type: linkage.type, id: linkage.id })
+        data: isInternalCard(linkage.type, linkage.id) ? ({ type: 'cards', id: linkage.id }) : ({ type: linkage.type, id: linkage.id })
       };
     }
   }
@@ -657,11 +665,17 @@ async function adaptCardToFormat(schema: todo, session: Session, internalCard: S
     relationships
   };
 
+  // Seed the resulting included with the schema resources, model, and the adopted-from card
+  let adoptedFromId: string | undefined = get(priviledgedCard, 'data.relationships.adopted-from.data.id');
   if (format === 'isolated') {
-    result.included = [model].concat((internalCard.included || [])
-      .filter(i => schema.isSchemaType(i.type) && getCardId(i.id) === id));
+    result.included = [model]
+      .concat(adoptedFromId ? getIncludedResourcesForRelationship(adoptedFromId, adoptedFromId, internalCard) : [])
+      .concat((internalCard.included || [])
+        .filter((i: ResourceObject) => schema.isSchemaType(i.type) && getCardId(i.id) === id));
   }
 
+  // process all the fields of the card (including adopted fields) and include fields in the resulting
+  // response that are allowed to be present in the requested format.
   let allFields: ResourceIdentifierObject[] = (get(priviledgedCard, 'data.relationships.fields.data') || [])
     .concat(priviledgedAdoptedCardResources.reduce((adoptedFields: ResourceIdentifierObject[], cardResource: ResourceObject ) => {
       adoptedFields = adoptedFields.concat(get(cardResource, 'relationships.fields.data') || []);
@@ -681,42 +695,23 @@ async function adaptCardToFormat(schema: todo, session: Session, internalCard: S
         result.data.attributes[fieldName] = fieldAttrValue;
       } else if (field.isRelationship && fieldRelValue && result.data.relationships && result.included) {
         result.data.relationships[fieldName] = { data: cloneDeep(fieldRelValue) };
+
+        // Add related resources to the resulting included as necessary
         let includedResources: ResourceObject[] = [];
         if (Array.isArray(fieldRelValue)) {
           if (isAdoptedField && fieldRelValue.some((i: ResourceIdentifierObject) => schema.isSchemaType(i.type))) { continue; } // cards are not responsible for including any adopted schema
-          let relRefs = (fieldRelValue as ResourceIdentifierObject[]).map((i: ResourceIdentifierObject) => `${i.type}/${i.id}`);
-          includedResources = internalCard.included ?
-            internalCard.included.filter(i =>
-              (isCard(i.type, i.id) ? relRefs.includes(`cards/${i.id}`) : relRefs.includes(`${i.type}/${i.id}`))
-            ) : [];
-        } else {
+          includedResources = (fieldRelValue as ResourceIdentifierObject[]).reduce((resources: ResourceObject[], ref: ResourceIdentifierObject) => {
+            if (ref.id) {
+              resources = resources.concat(getIncludedResourcesForRelationship(ref.type, ref.id, internalCard));
+            }
+            return resources;
+          }, []);
+        } else if (fieldRelValue) {
           if (isAdoptedField && schema.isSchemaType(fieldRelValue.type)) { continue; } // cards are not responsible for including any adopted schema
-          let includedResource = internalCard.included && internalCard.included.find(i =>
-            fieldRelValue != null &&
-            !Array.isArray(fieldRelValue) &&
-            `${i.type}/${i.id}` === `${fieldRelValue.type === 'cards' ? fieldRelValue.id : fieldRelValue.type}/${fieldRelValue.id}`);
-          if (includedResource) {
-            includedResources = [includedResource];
-          }
-        }
-        let resolvedIncluded: ResourceObject[] = [];
-        for (let resource of includedResources) {
-          if (!resource.id) { continue; }
-          if (!isCard(resource.type, resource.id)) {
-            resolvedIncluded.push(resource);
-          } else {
-            resolvedIncluded.push(...crawlEmbeddedCards(internalCard, resource.id).map((included: ResourceObject) => {
-              let embeddedFieldTypes = get(included, `attributes.${embeddedMetadataSummaryField}`);
-              if (!embeddedFieldTypes) { return included; } // if this is the case you have already dealt with it--just move along
-
-              set(included, `attributes.${metadataSummaryField}`, embeddedFieldTypes);
-              unset(included, `attributes.${embeddedMetadataSummaryField}`);
-              return included;
-            }));
-          }
+          includedResources = getIncludedResourcesForRelationship(fieldRelValue.type, fieldRelValue.id, internalCard);
         }
 
-        result.included = result.included.concat(resolvedIncluded);
+        result.included = result.included.concat(includedResources);
       }
     } else {
       unset(result, `data.attributes.${metadataSummaryField}.${fieldName}`);
@@ -726,21 +721,58 @@ async function adaptCardToFormat(schema: todo, session: Session, internalCard: S
   return removeCardNamespacing(result) as SingleResourceDoc;
 }
 
+function getIncludedResourcesForRelationship(type: string, id: string, internalCard: SingleResourceDoc) {
+  let includedResources: ResourceObject[] = [];
+  let includedResource = internalCard.included && internalCard.included.find(i =>
+    `${i.type}/${i.id}` === `${type === 'cards' ? id : type}/${id}`
+  );
+  if (includedResource) {
+    includedResources = [includedResource];
+  }
+
+  let resolvedIncluded: ResourceObject[] = [];
+  for (let resource of includedResources) {
+    if (!resource.id) { continue; }
+    if (!isInternalCard(resource.type, resource.id)) {
+      resolvedIncluded.push(resource);
+    } else {
+      // If we are dealing with a card, we'll need to make sure to traverse the graph of embedded cards to include
+      // the default-includes has already considered all the relationships and the embedded cards recursively--so no additional
+      // read are necessary--rather, we just need to bundle up all the work that the DocumentContext already performed for us.
+      // Note that the DocumentContext via the Model class is actually asserting that all the included cards are in embedded format.
+      resolvedIncluded.push(...crawlEmbeddedCards(internalCard, resource.id).map((included: ResourceObject) => {
+        let embeddedFieldTypes = get(included, `attributes.${embeddedMetadataSummaryField}`);
+        if (!embeddedFieldTypes) { return included; } // if this is the case you have already dealt with it--just move along
+
+        set(included, `attributes.${metadataSummaryField}`, embeddedFieldTypes);
+        unset(included, `attributes.${embeddedMetadataSummaryField}`);
+        unset(included, `attributes.${internalFieldsSummaryField}`);
+        return included;
+      }));
+    }
+  }
+  return resolvedIncluded;
+}
+
 function crawlEmbeddedCards(internalCard: SingleResourceDoc, embeddedCardId: string, embeddedCards: ResourceObject[] = []) {
   let embeddedCard = (internalCard.included || []).find(i => `${i.type}/${i.id}` === `${embeddedCardId}/${embeddedCardId}`);
   if (!embeddedCard) { return embeddedCards; }
 
   embeddedCards.push(embeddedCard);
   for (let relationship of Object.keys(embeddedCard.relationships || {})) {
+    // we only want the immediate parent for the adopted-from relationship (not recursive),
+    // which we handle in the adaptToFormat() directly.
+    if (relationship === 'adopted-from') { continue; }
+
     let linkage: ResourceLinkage = get(embeddedCard, `relationships.${relationship}.data`);
     if (!linkage) { continue; }
     if (Array.isArray(linkage)) {
       for (let ref of linkage) {
-        if (!isCard(ref.type, ref.id)) { continue; }
+        if (!isInternalCard(ref.type, ref.id)) { continue; }
         crawlEmbeddedCards(internalCard, ref.id, embeddedCards);
       }
     } else if (linkage.id) {
-      if (!isCard(linkage.type, linkage.id)) { continue; }
+      if (!isInternalCard(linkage.type, linkage.id)) { continue; }
       crawlEmbeddedCards(internalCard, linkage.id, embeddedCards);
     }
   }
@@ -753,11 +785,11 @@ function removeCardNamespacing(internalCard: SingleResourceDoc) {
 
   let resultingCard = cloneDeep(internalCard) as SingleResourceDoc;
   for (let resource of [resultingCard.data].concat(resultingCard.included || [])) {
-    if (resource.type !== 'cards' && !isCard(resource.type, resource.id)) {
+    if (resource.type !== 'cards' && !isInternalCard(resource.type, resource.id)) {
       resource.type = getCardId(resource.type) ? cardContextFromId(resource.type).modelId as string : resource.type;
       resource.id = getCardId(resource.id) && resource.id != null ? cardContextFromId(resource.id).modelId as string : resource.id;
     }
-    if (isCard(resource.type, resource.id) && resource.id !== id) {
+    if (isInternalCard(resource.type, resource.id) && resource.id !== id) {
       resource.type = 'cards';
     }
     for (let field of Object.keys(resource.attributes || {})) {
@@ -780,14 +812,14 @@ function removeCardNamespacing(internalCard: SingleResourceDoc) {
       let linkage: ResourceLinkage = get(resource, `relationships.${fieldName}.data`);
       if (Array.isArray(linkage)) {
         set(resource, `relationships.${fieldName}.data`, (linkage as ResourceIdentifierObject[]).map(i => {
-          let linkageType: string = isCard(i.type, i.id) ? 'cards' : i.type;
+          let linkageType: string = isInternalCard(i.type, i.id) ? 'cards' : i.type;
           return {
             type: linkageType !== 'cards' && getCardId(linkageType) ? cardContextFromId(linkageType).modelId : linkageType,
             id: linkageType !== 'cards' && getCardId(i.id) ? cardContextFromId(i.id).modelId : i.id,
           };
         }));
       } else if (linkage) {
-        let linkageType: string | undefined = isCard(linkage.type, linkage.id) ? 'cards' : linkage.type;
+        let linkageType: string | undefined = isInternalCard(linkage.type, linkage.id) ? 'cards' : linkage.type;
         linkageType = linkageType !== 'cards' && getCardId(linkageType) ? cardContextFromId(linkageType).modelId : linkageType;
         let linkageId = linkageType !== 'cards' && getCardId(linkage.id) ? cardContextFromId(linkage.id).modelId : linkage.id;
         set(resource, `relationships.${fieldName}.data`, { type: linkageType, id: linkageId });
@@ -818,7 +850,7 @@ async function addCardNamespacing(schema: todo, externalCard: SingleResourceDoc,
   for (let resource of [resultingCard.data].concat(resultingCard.included || [])) {
     let isSchemaModel = schema.isSchemaType(resource.type);
 
-    if (resource.type !== 'cards' && !isCard(resource.type, resource.id)) {
+    if (resource.type !== 'cards' && !isInternalCard(resource.type, resource.id)) {
       resource.type = schema.isSchemaType(resource.type) ? resource.type : `${id}${cardIdDelim}${resource.type}`;
       resource.id = `${id}${cardIdDelim}${resource.id}`;
     }
@@ -905,11 +937,12 @@ function formatHasField(field: todo, format: string) {
 }
 
 export = {
-  isCard,
+  isInternalCard,
   loadCard,
   getCardId,
   cardIdDelim,
   adaptCardToFormat,
+  cardContextFromId,
   cardBrowserAssetFields,
   generateInternalCardFormat,
   adaptCardCollectionToFormat,

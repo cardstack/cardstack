@@ -4,9 +4,9 @@ const priv = new WeakMap();
 const qs = require('qs');
 const { difference, unset, get } = require('lodash');
 const {
-  isCard,
+  isInternalCard,
   loadCard,
-  cardIdDelim
+  cardContextFromId
 } = require('./indexing/card-utils');
 
 exports.privateModels = priv;
@@ -113,7 +113,7 @@ exports.Model = class Model {
     let contentType;
     let model;
     let { schema, read, search, jsonapiDoc, getCard, cardIdContext } = priv.get(this);
-    if (isCard(type, id)) {
+    if (isInternalCard(type, id)) {
       let card = await getCard(id);
       if (!card) { return; }
 
@@ -126,14 +126,22 @@ exports.Model = class Model {
         throw new Error(`${jsonapiDoc.type} ${jsonapiDoc.id} tried to getModel nonexistent type ${type}`);
       }
       model = card.data;
+
+      // Make sure that we get the embedded format of the card unless we are asking for our own card
       if (id !== cardIdContext) {
         let fieldsToDelete = difference(
           Object.keys(get(model, 'attributes.metadata-summary') || {}),
           Object.keys(get(model, 'attributes.embedded-metadata-summary') || {})
         );
+        fieldsToDelete.push(...Object.keys(get(model, 'attributes.internal-fields-summary') || {}));
         for (let field of fieldsToDelete) {
-          unset(model, `attributes.${id}${cardIdDelim}${field}`);
-          unset(model, `relationships.${id}${cardIdDelim}${field}`);
+          let fieldToDelete = Object.keys(model.attributes || {}).find(i => cardContextFromId(i).modelId === field);
+          if (!fieldToDelete) {
+            fieldToDelete = Object.keys(model.relationships || {}).find(i => cardContextFromId(i).modelId === field);
+          }
+          if (!fieldToDelete) { continue; }
+          unset(model, `attributes.${fieldToDelete}`);
+          unset(model, `relationships.${fieldToDelete}`);
         }
       }
     } else {

@@ -410,7 +410,7 @@ const models = [
     type: 'computed-fields',
     id: 'metadata-summary',
     attributes: {
-      'computed-field-type': '@cardstack/core-types::metadata-summary',
+      'computed-field-type': '@cardstack/core-types::fields-summary',
       params: { 'format': 'isolated' }
     }
   },
@@ -418,8 +418,16 @@ const models = [
     type: 'computed-fields',
     id: 'embedded-metadata-summary',
     attributes: {
-      'computed-field-type': '@cardstack/core-types::metadata-summary',
+      'computed-field-type': '@cardstack/core-types::fields-summary',
       params: { 'format': 'embedded' }
+    }
+  },
+  {
+    type: 'computed-fields',
+    id: 'internal-fields-summary',
+    attributes: {
+      'computed-field-type': '@cardstack/core-types::fields-summary',
+      params: { 'format': 'internal' }
     }
   },
   {
