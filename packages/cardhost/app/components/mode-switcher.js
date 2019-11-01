@@ -22,10 +22,6 @@ export default class ModeSwitcher extends Component {
 
   @service router;
 
-  constructor(...args) {
-    super(...args);
-  }
-
   @action
   selectMode(mode) {
     if (!mode || !this.args.name) { return; }
