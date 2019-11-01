@@ -4,7 +4,7 @@ const log = require('@cardstack/logger')('cardstack/writers');
 const { set, get, differenceBy, intersectionBy, partition, merge } = require('lodash');
 const { declareInjections } = require('@cardstack/di');
 const {
-  isCard,
+  isInternalCard,
   loadCard,
   getCardId,
   adaptCardToFormat,
@@ -172,7 +172,7 @@ class Writers {
     }
 
     let authorizedDocument = await context.applyReadAuthorization({ session });
-    if (isCard(authorizedDocument.data.type, authorizedDocument.data.id)) {
+    if (isInternalCard(authorizedDocument.data.type, authorizedDocument.data.id)) {
       let card = await adaptCardToFormat(schema, session, authorizedDocument, 'isolated', this.searchers);
       return card;
     }
@@ -231,7 +231,7 @@ class Writers {
     }
 
     let authorizedDocument = await context.applyReadAuthorization({ session });
-    if (isCard(authorizedDocument.data.type, authorizedDocument.data.id)) {
+    if (isInternalCard(authorizedDocument.data.type, authorizedDocument.data.id)) {
       return await adaptCardToFormat(schema, session, authorizedDocument, 'isolated', this.searchers);
     }
     return authorizedDocument;
@@ -326,7 +326,7 @@ class Writers {
     if (!deletedResources.length) { return schema; }
 
     let [ modelsToDelete, schemaToDelete] = partition(deletedResources, i => getCardId(i.type));
-    let [ cardModels, internalModels ] = partition(modelsToDelete, i => isCard(i.type, i.id));
+    let [ cardModels, internalModels ] = partition(modelsToDelete, i => isInternalCard(i.type, i.id));
     for (let resource of internalModels) {
       await this.delete(session, resource.meta.version, resource.type, resource.id, schema);
     }

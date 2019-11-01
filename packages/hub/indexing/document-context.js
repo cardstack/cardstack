@@ -6,7 +6,7 @@ const { merge, get, uniqBy, uniq } = require('lodash');
 const Session = require('@cardstack/plugin-utils/session');
 const {
   getCardId,
-  isCard,
+  isInternalCard,
   loadCard,
 } = require('./card-utils');
 const qs = require('qs');
@@ -77,7 +77,7 @@ module.exports = class DocumentContext {
   }
 
   get cardIdContext() {
-    return isCard(this.type, this.id) ? this.id : null;
+    return isInternalCard(this.type, this.id) ? this.id : null;
   }
 
   async searchDoc() {
@@ -405,9 +405,9 @@ module.exports = class DocumentContext {
     let docType = get(this, 'upstreamDoc.data.type');
     this._references.push(`${id}/${id}`);
 
-    if (isCard(docId, docType) && docId === id && this.upstreamDoc.included) {
+    if (isInternalCard(docId, docType) && docId === id && this.upstreamDoc.included) {
       return this.upstreamDoc;
-    } else if (isCard(docId, docType) && docId === id) {
+    } else if (isInternalCard(docId, docType) && docId === id) {
       let card = {
         data: this.upstreamDoc.data,
         included: await this.crawlInternalModels(this.upstreamDoc.data)
@@ -417,7 +417,7 @@ module.exports = class DocumentContext {
     } else if (this.upstreamDoc &&
       this.upstreamDoc.data &&
       Array.isArray(this.upstreamDoc.data) &&
-      (cardResource = this.upstreamDoc.data.find(i => isCard(i.type, i.id) && i.id === id))
+      (cardResource = this.upstreamDoc.data.find(i => isInternalCard(i.type, i.id) && i.id === id))
     ) {
       let card = {
         data: cardResource,
@@ -435,7 +435,7 @@ module.exports = class DocumentContext {
   }
 
   async crawlInternalModels(resource, models = []) {
-    if (isCard(resource.type, resource.id) && this.id !== resource.id) { return models; }
+    if (isInternalCard(resource.type, resource.id) && this.id !== resource.id) { return models; }
 
     for (let relationship of Object.keys(resource.relationships || {})) {
       let linkage = get(resource, `relationships.${relationship}.data`);
@@ -489,7 +489,7 @@ module.exports = class DocumentContext {
 
   async _buildCachedResponse() {
     let searchTree;
-    if (!this.isCollection && !isCard(this.type, this.id)) {
+    if (!this.isCollection && !isInternalCard(this.type, this.id)) {
       let contentType = this.schema.getType(this.type);
       if (!contentType) { return; }
 
@@ -629,7 +629,7 @@ module.exports = class DocumentContext {
             this._buildSearchTree(includesTree, segments);
           }
         } else {
-          if (isCard(resource.type, resource.id)) {
+          if (isInternalCard(resource.type, resource.id)) {
             let contentType = this.schema.getType(resource.type);
             includesTree = Object.assign({}, contentType.includesTree);
           } else {
@@ -656,9 +656,9 @@ module.exports = class DocumentContext {
         return;
       }
 
-      if (depth === 0 && (this.includePaths.length || isCard(type, id))) {
+      if (depth === 0 && (this.includePaths.length || isInternalCard(type, id))) {
         searchTree = {};
-        if (isCard(type, id)) {
+        if (isInternalCard(type, id)) {
           let contentType = this.schema.getType(type);
           searchTree = contentType.includesTree;
         }
