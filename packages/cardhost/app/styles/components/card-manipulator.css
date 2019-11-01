@@ -229,6 +229,15 @@
   color: white;
 }
 
+.card-manipulator--right-edge--attribute textarea {
+  background: #22212b 0% 0% no-repeat padding-box;
+  border: none;
+  border-radius: 5px;
+  width: 100%;
+  height: 65px;
+}
+
+
 .adopted-card .title {
   color: white;
 }

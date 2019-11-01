@@ -5,7 +5,7 @@
       <div class="card-manipulator--right-edge--pill-option">Structure</div>
     </div>
     <div class="card-manipulator--right-edge--section">
-      <div class="section-header">Text Field</div>
+      <div class="section-header">{{this.sectionTitle}}</div>
       <div class="card-manipulator--right-edge--attribute">
         <div class="attribute-title">Field Name</div>
         <Input
@@ -22,6 +22,13 @@
           @id={{concat "card-manipulator--right-edge--field-label-" @selectedField.nonce}}
           @value={{@selectedFieldLabel}}
           @key-up={{@updateFieldLabel}}
+        />
+      </div>
+      <div class="card-manipulator--right-edge--attribute">
+        <div class="attribute-title">Helper Text</div>
+        <Textarea
+          data-test-field-helper-text
+          @id={{concat "card-manipulator--right-edge--field-helper-text" @selectedField.nonce}}
         />
       </div>
       <div class="card-manipulator--right-edge--attribute">
