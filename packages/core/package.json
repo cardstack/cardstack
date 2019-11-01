@@ -32,6 +32,7 @@
     "@cardstack/jsonapi": "0.14.36",
     "@cardstack/logger": "^0.2.0",
     "@cardstack/plugin-utils": "0.14.36",
+    "ember-auto-import": "^1.4.0",
     "ember-cli-babel": "^7.1.2",
     "ember-cli-htmlbars": "^3.0.0",
     "ember-concurrency": "^0.10.0",
