@@ -2,6 +2,8 @@ const {
   Cred,
   Clone,
   Remote,
+  Repository,
+  Revwalk
 } = require('nodegit');
 
 const {
@@ -21,6 +23,7 @@ const service = require('../service');
 const mkdir = promisify(temp.mkdir);
 
 const privateKey = readFileSync(join(__dirname, 'git-ssh-server', 'cardstack-test-key'), 'utf8');
+const { fake, replace } = require('sinon');
 
 const fetchOpts = {
   callbacks: {
@@ -159,7 +162,7 @@ describe('git/writer with remote', function() {
     it('successfully merges updates when repo is out of sync', async function() {
       this.timeout(20000);
 
-      let change = await Change.create(remoteRepo, head, 'master');
+      let change = await Change.create(remoteRepo, head, 'master', fetchOpts);
 
       let file = await change.get('contents/events/event-2.json', { allowUpdate: true });
 
@@ -176,8 +179,7 @@ describe('git/writer with remote', function() {
         message: 'I probably shouldnt update this out of sync'
       });
 
-      let remote = await remoteRepo.getRemote('origin');
-      await remote.push(["refs/heads/master:refs/heads/master"], fetchOpts);
+      await remoteRepo.getRemote('origin');
 
       let { data:record } = await writers.update(env.session, 'events', 'event-1', {
         data: {
@@ -209,7 +211,7 @@ describe('git/writer with remote', function() {
     it('successfully merges updates when same file is out of sync', async function() {
       this.timeout(20000);
 
-      let change = await Change.create(remoteRepo, head, 'master');
+      let change = await Change.create(remoteRepo, head, 'master', fetchOpts);
 
       let file = await change.get('contents/events/event-1.json', { allowUpdate: true });
 
@@ -346,4 +348,112 @@ describe('git/writer with empty remote', function() {
       });
     });
   });
+});
+
+
+
+describe('git/writer-remote/githereum', function() {
+  let env, writers, tempRepoPath, tempRemoteRepoPath, githereum, fakeContract, writer;
+  this.timeout(20000);
+
+  beforeEach(async function() {
+
+    await resetRemote();
+
+    let factory = new JSONAPIFactory();
+
+    tempRepoPath = await mkdir('cardstack-temp-test-repo');
+    tempRemoteRepoPath = await mkdir('cardstack-temp-test-remote-repo');
+
+    await Clone('ssh://root@localhost:9022/root/data-test', tempRemoteRepoPath, {
+      fetchOpts,
+    });
+
+    let dataSource = factory.addResource('data-sources', 'git')
+        .withAttributes({
+          'source-type': '@cardstack/git',
+          params: {
+            remote: {
+              url: 'ssh://root@localhost:9022/root/data-test',
+              privateKey,
+              cacheDir: tempRepoPath,
+            },
+            githereum: {
+              contractAddress: '0xD8B92BE4420Fe70b62FF5e5F8eE5CF87871952e1',
+              tag: 'test-tag',
+              repoName: 'githereum-repo'
+            }
+          }
+        });
+
+
+    factory.addResource('content-types', 'articles')
+      .withRelated('fields', [
+        factory.addResource('fields', 'title').withAttributes({ fieldType: '@cardstack/core-types::string' }),
+        factory.addResource('fields', 'primary-image').withAttributes({ fieldType: '@cardstack/core-types::belongs-to' })
+      ]).withRelated('data-source', dataSource);
+
+    factory.addResource('plugin-configs', '@cardstack/hub')
+      .withRelated(
+        'default-data-source',
+        dataSource
+      );
+
+    env = await createDefaultEnvironment(`${__dirname}/..`, factory.getModels());
+    writers = env.lookup('hub:writers');
+
+    let schema = await writers.currentSchema.getSchema();
+    writer = schema.getDataSource('git').writer;
+
+    fakeContract = {};
+    replace(writer, '_getGithereumContract', fake.returns(fakeContract));
+    await writer._ensureGithereum();
+    githereum = writer.githereum;
+
+  });
+
+  afterEach(async function() {
+    await temp.cleanup();
+    await destroyDefaultEnvironment(env);
+    service.clearCache();
+  });
+
+
+  it('writes to githereum if configured when writing', async function () {
+    let fakePush = fake.returns(new Promise(resolve => resolve()));
+
+    replace(githereum, 'push', fakePush);
+
+    await writers.create(env.session, 'articles', {
+      data: {
+        type: 'articles',
+        attributes: {
+          title: 'An article'
+        }
+      }
+    });
+
+    let repo = await Repository.open(githereum.repoPath);
+    let firstCommitOnMaster = await repo.getMasterCommit();
+    let commitCount = 0;
+
+    await new Promise((resolve, reject) => {
+      let history = firstCommitOnMaster.history(Revwalk.SORT.TIME);
+      history.on("commit", () => commitCount += 1);
+      history.on('end', resolve);
+      history.on('error', reject);
+      history.start();
+    });
+
+    expect(commitCount).to.equal(2);
+
+    expect(githereum.contract).to.equal(fakeContract);
+    expect(githereum.repoName).to.equal("githereum-repo");
+
+
+    // push is called with the correct tag
+    expect(fakePush.callCount).to.equal(1);
+    expect(fakePush.calledWith('test-tag')).to.be.ok;
+  });
+
 });
