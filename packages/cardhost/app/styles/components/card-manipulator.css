@@ -2,10 +2,6 @@
   --transition-time: 250ms;
 }
 
-.card-schema-updator--top-edge-buttons {
-  display: flex;
-}
-
 .card-creator--new-card {
   max-width: 500px;
   margin-bottom: 40px;
