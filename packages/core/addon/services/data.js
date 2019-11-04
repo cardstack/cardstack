@@ -659,6 +659,7 @@ function reifyFieldsFromCardMetadata(card) {
   priv.get(card).fields = fields;
 }
 
+// TODO think about how to invalidate cards that use the passed in cardId as part of their adoption chain
 async function invalidate(cardId, latestVersion) {
   for (let format of ['isolated', 'embedded']) {
     for (let [id, entry] of store[format].entries()) {

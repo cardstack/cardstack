@@ -192,4 +192,34 @@ module('Acceptance | card schema', function(hooks) {
     field = card.included.find(i => `${i.type}/${i.id}` === 'fields/title');
     assert.equal(field.attributes['needed-when-embedded'], false);
   });
+
+  test(`can navigate to card editor`, async function(assert) {
+    await login();
+    await createCards({
+      [card1Id]: [
+        ['body', 'string', false, 'test body']
+      ]
+    });
+    await visit(`/cards/${card1Id}/schema`);
+    await fillIn('[data-test-mode-switcher]', 'edit');
+    await waitFor(`[data-test-card-edit="${card1Id}"]`, { timeout });
+
+    assert.equal(currentURL(), `/cards/${card1Id}/edit`);
+    assert.dom(`[data-test-card-edit="${card1Id}"]`).exists();
+  });
+
+  test(`can navigate to card view`, async function(assert) {
+    await login();
+    await createCards({
+      [card1Id]: [
+        ['body', 'string', false, 'test body']
+      ]
+    });
+    await visit(`/cards/${card1Id}/schema`);
+    await fillIn('[data-test-mode-switcher]', 'view');
+    await waitFor(`[data-test-card-view="${card1Id}"]`, { timeout });
+
+    assert.equal(currentURL(), `/cards/${card1Id}`);
+    assert.dom(`[data-test-card-view="${card1Id}"]`).exists();
+  });
 });

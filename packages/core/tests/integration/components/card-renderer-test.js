@@ -1,4 +1,4 @@
-import { module, test } from 'qunit';
+import { module, test, skip } from 'qunit';
 import Fixtures from '@cardstack/test-support/fixtures'
 import { setupRenderingTest } from 'ember-qunit';
 import { render, triggerEvent } from '@ember/test-helpers';
@@ -251,5 +251,20 @@ module('Integration | Component | card-renderer', function(hooks) {
     assert.dom(`input`).doesNotExist();
     assert.deepEqual([...this.element.querySelectorAll('[data-test-field]')].map(i => i.getAttribute('data-test-field')),
       ['title', 'author' ]);
+  });
+
+  skip('TODO it adds isolated css into the page when rendering an isolated card', async function(/*assert*/) {
+  });
+
+  skip('TODO it adds embedded css into the page when rendering an embedded card', async function(/*assert*/) {
+  });
+
+  skip("TODO it removes a card's isolated css when the isolated card is removed from the page", async function(/*assert*/) {
+  });
+
+  skip("TODO it does not remove a card's embedded css when an embedded card is removed from the page, but another instance of the embedded card still remains on teh page", async function(/*assert*/) {
+  });
+
+  skip("TODO it removes an embedded card's css when all instances of the embedded card are removed from the page", async function(/*assert*/) {
   });
 });

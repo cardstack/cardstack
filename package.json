@@ -39,7 +39,8 @@
     "blockchain": "truffle develop"
   },
   "workspaces": [
-    "packages/*"
+    "packages/*",
+    "cards/*"
   ],
   "private": true
 }

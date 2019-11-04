@@ -1,0 +1,68 @@
+/* TODO: Change this element with our Dropdown component when possible */
+
+.mode-switcher {
+  --width: 325px;
+  --mode-icon: url('');
+  --fill: var(--ch-cyan);
+
+  position: relative;
+  display: flex;
+  align-items: center;
+  height: 40px;
+  width: var(--width);
+  margin-left: calc((100% - var(--width)) / 2);
+  padding: 0 60px;
+  background-color: var(--ch-dark-blue-gray);
+  background-image: var(--mode-icon), url('/assets/images/icon-carrot.svg');
+  background-position: 20px center, right 20px center;
+  background-repeat: no-repeat;
+  background-size: 18px 17px, 10px 6px;
+  border-color: var(--ch-medium-blue-gray);
+  border-radius: 20px;
+  color: white;
+  font: 400 13px/18px var(--ch-font-family);
+  letter-spacing: 0.46px;
+  text-transform: capitalize;
+  -moz-appearance: none;
+  -webkit-appearance: none;
+}
+
+.mode-switcher.schema {
+  --mode-icon: url('/assets/images/icon-schema.svg');
+}
+
+.mode-switcher.edit {
+  --mode-icon: url('/assets/images/icon-form.svg');
+}
+
+.mode-switcher.view {
+  --mode-icon: url('/assets/images/icon-layout.svg');
+}
+
+.mode-switcher + * {
+  margin-left: 15px;
+}
+
+.mode-switcher:hover {
+  color: var(--ch-cyan);
+  cursor: pointer;
+}
+
+.mode-switcher::-ms-expand {
+  display: none;
+}
+
+/* TODO: styling for options list */
+/* .mode-switcher--mode {
+  width: 100%;
+  padding: 0 60px;
+  background-image: var(--mode-icon);
+  background-position: 20px center;
+  background-repeat: no-repeat;
+  background-size: 18px 17px;
+  font-size: 13px;
+  letter-spacing: 0.46px;
+  line-height: 18px;
+  text-align: left;
+  text-transform: capitalize;
+} */

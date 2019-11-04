@@ -34,7 +34,7 @@ function cleanup() {
 }
 
 async function convertToExternalFormat(internalCard) {
-  let externalCard = await adaptCardToFormat(await env.lookup('hub:current-schema').getSchema(), env.session, internalCard, 'isolated', env.lookup('hub:searchers'));
+  let externalCard = await adaptCardToFormat(await env.lookup('hub:current-schema').getSchema(), env.session, cloneDeep(internalCard), 'isolated', env.lookup('hub:searchers'));
 
   // remove the card metadata to make this as real as possible...
   for (let field of Object.keys(externalCard.data.attributes)) {
@@ -89,12 +89,14 @@ function assertIsolatedCardMetadata(card) {
   expect(data.relationships.author.data).to.eql({ type: 'cards', id: 'local-hub::van-gogh' });
   expect(data.attributes['tag-names']).to.eql(['millenials', 'puppies', 'belly-rubs']);
   expect(data.attributes['embedded-metadata-summary']).to.be.undefined; // this one shouldn't leak into the external format
-  expect(data.attributes['metadata-summary']).to.eql({
-    title: { type: '@cardstack/core-types::string', label: 'title' },
-    body: { type: '@cardstack/core-types::string', label: 'body' },
-    author: { type: '@cardstack/core-types::belongs-to', label: 'author' },
-    tags: { type: '@cardstack/core-types::has-many', label: 'tags' }
-  });
+  expect(data.attributes['internal-fields-summary']).to.be.undefined; // this one shouldn't leak into the external format
+  expect(Object.keys(data.attributes['metadata-summary'])).to.have.members([
+    'title',
+    'body',
+    'author',
+    'tags',
+    'tag-names'
+  ]);
   expect(data.relationships.tags.data).to.eql([
     { type: 'tags', id: 'millenials' },
     { type: 'tags', id: 'puppies' },
@@ -114,10 +116,12 @@ function assertEmbeddedCardMetadata(card) {
   expect(data.attributes.body).to.be.undefined;
   expect(data.attributes['internal-field']).to.be.undefined;
   expect(data.attributes['embedded-metadata-summary']).to.be.undefined; // this one shouldn't leak into the external format
-  expect(data.attributes['metadata-summary']).to.eql({
-    title: { type: '@cardstack/core-types::string', label: 'title' },
-    author: { type: '@cardstack/core-types::belongs-to', label: 'author' }
-  });
+  expect(data.attributes['internal-fields-summary']).to.be.undefined; // this one shouldn't leak into the external format
+  expect(Object.keys(data.attributes['metadata-summary'])).to.have.members([
+    'title',
+    'author',
+    'tag-names'
+  ]);
 
   expect(includedIdentifiers).to.not.include.members([
     'tags/millenials',
@@ -161,9 +165,8 @@ function assertCardModels(card) {
   expect(relatedCard.attributes.name).to.equal('Van Gogh');
   expect(relatedCard.attributes.email).to.be.undefined;
   expect(relatedCard.attributes['embedded-metadata-summary']).to.be.undefined; // this one shouldn't leak into the external format
-  expect(relatedCard.attributes['metadata-summary']).to.eql({
-    name: { type: '@cardstack/core-types::string', label: 'name' }
-  });
+  expect(relatedCard.attributes['internal-fields-summary']).to.be.undefined; // this one shouldn't leak into the external format
+  expect(Object.keys(relatedCard.attributes['metadata-summary'])).to.eql([ 'name' ]);
 }
 
 function assertCardSchema(card) {
@@ -811,12 +814,13 @@ describe('hub/card-services', function () {
           { type: 'tags', id: 'belly-rubs' },
         ]);
         expect(data.attributes['internal-field']).to.be.undefined;
-        expect(data.attributes['metadata-summary']).to.eql({
-          title: { type: '@cardstack/core-types::string', label: 'title' },
-          body: { type: '@cardstack/core-types::string', label: 'body' },
-          author: { type: '@cardstack/core-types::belongs-to', label: 'author' },
-          tags: { type: '@cardstack/core-types::has-many', label: 'tags' }
-        });
+        expect(Object.keys(data.attributes['metadata-summary'])).to.have.members([
+          'title',
+          'body',
+          'author',
+          'tags',
+          'tag-names',
+        ]);
 
         let model = included.find(i => `${i.type}/${i.id}` === 'local-hub::millenial-puppies/local-hub::millenial-puppies');
         expect(model.attributes.title).to.equal('The Millenial Puppy');
@@ -832,9 +836,7 @@ describe('hub/card-services', function () {
         let embedded = included.find(i => `${i.type}/${i.id}` === 'cards/local-hub::van-gogh');
         expect(embedded.attributes.name).to.equal('Van Gogh');
         expect(embedded.attributes.email).to.be.undefined;
-        expect(embedded.attributes['metadata-summary']).to.eql({
-          name: { type: '@cardstack/core-types::string', label: 'name' }
-        });
+        expect(Object.keys(embedded.attributes['metadata-summary'])).to.eql([ 'name' ]);
       });
 
       it('does not contain included resource for card metadata relationship that the session does not have read authorization', async function () {
@@ -1062,9 +1064,10 @@ describe('hub/card-services', function () {
 
       let includedSpecs = adopted.included.map(i => `${i.type}/${i.id}`);
 
-      expect(includedSpecs.length).to.equal(3);
+      expect(includedSpecs.length).to.equal(4);
       expect(includedSpecs).to.include(`${genXKittens.data.id}/${genXKittens.data.id}`);
       expect(includedSpecs).to.include(`cards/${externalUserCard.data.id}`);
+      expect(includedSpecs).to.include(`cards/${externalArticleCard.data.id}`);
       expect(includedSpecs).to.include("fields/yarn");
       expect(includedSpecs).to.not.include("fields/title");
       expect(includedSpecs).to.not.include("fields/author");
@@ -1072,10 +1075,10 @@ describe('hub/card-services', function () {
 
       let fieldMeta = adopted.data.attributes['metadata-summary'];
 
-      expect(fieldMeta.yarn).to.eql({ type: "@cardstack/core-types::string", label: 'yarn' });
-      expect(fieldMeta.title).to.eql({ type: "@cardstack/core-types::string", label: 'title' });
-      expect(fieldMeta.author).to.eql({ type: "@cardstack/core-types::belongs-to", label: 'author' });
-      expect(fieldMeta.body).to.eql({ type: "@cardstack/core-types::string", label: 'body' });
+      expect(fieldMeta.yarn.type).to.equal("@cardstack/core-types::string");
+      expect(fieldMeta.title.type).to.equal("@cardstack/core-types::string");
+      expect(fieldMeta.author.type).to.equal("@cardstack/core-types::belongs-to");
+      expect(fieldMeta.body.type).to.equal("@cardstack/core-types::string");
 
       expect(adopted.data.attributes.yarn).to.equal("wool");
       expect(adopted.data.attributes.title).to.equal("GenX Kittens");
@@ -1096,6 +1099,22 @@ describe('hub/card-services', function () {
         type: 'cards',
         id: externalUserCard.data.id
       });
+
+      let parent = adopted.included.find(i => `${i.type}/${i.id}` === `cards/${externalArticleCard.data.id}`);
+      expect(parent.attributes.title).to.equal('The Millenial Puppy');
+      expect(parent.relationships.author.data).to.eql({ type: 'cards', id: 'local-hub::van-gogh' });
+      expect(parent.attributes.body).to.be.undefined;
+      expect(parent.relationships.tags).to.be.undefined;
+      expect(parent.attributes['internal-field']).to.be.undefined;
+      expect(parent.attributes['metadata-summary'].title.type).to.equal('@cardstack/core-types::string');
+      expect(parent.attributes['metadata-summary'].author.type).to.equal('@cardstack/core-types::belongs-to');
+      expect(parent.attributes['metadata-summary'].body).to.be.undefined;
+      expect(parent.attributes['metadata-summary'].tags).to.be.undefined;
+
+      // TODO we are ignoring adopted computed-fields right now. on a future pass though this, we'll need
+      // to make sure we can see the computed fields on the related cards -- I was seeing issues with this...
+      //   expect(parent.attributes['tag-names']).to.eql(['millenials', 'puppies', 'belly-rubs']);
+      // which I would ultimately expect to pass in this test.
     });
 
     it("can get a card that uses adoption in an embedded format", async function () {
@@ -1121,9 +1140,9 @@ describe('hub/card-services', function () {
 
       let fieldMeta = adopted.data.attributes['metadata-summary'];
 
-      expect(fieldMeta.yarn).to.eql({ type: "@cardstack/core-types::string", label: 'yarn' });
-      expect(fieldMeta.title).to.eql({ type: "@cardstack/core-types::string", label: 'title' });
-      expect(fieldMeta.author).to.eql({ type: "@cardstack/core-types::belongs-to", label: 'author' });
+      expect(fieldMeta.yarn.type).to.equal("@cardstack/core-types::string");
+      expect(fieldMeta.title.type).to.equal("@cardstack/core-types::string");
+      expect(fieldMeta.author.type).to.equal("@cardstack/core-types::belongs-to");
       expect(fieldMeta.body).to.be.undefined;
 
       expect(adopted.data.attributes.yarn).to.equal("wool");
@@ -1142,6 +1161,7 @@ describe('hub/card-services', function () {
 
     it.skip("can adopt computed-fields", async function () {
       // it's fine to just add this assertion into the existing isolated and embedded tests for adopted cards
+      // Also see the note at the end of the "can get a card that uses adoption in an isolated format" test
     });
 
     it("can get an isolated card that uses multiple levels of adoption", async function () {
@@ -1172,9 +1192,10 @@ describe('hub/card-services', function () {
 
       let includedSpecs = adopted.included.map(i => `${i.type}/${i.id}`);
 
-      expect(includedSpecs.length).to.equal(3);
+      expect(includedSpecs.length).to.equal(4);
       expect(includedSpecs).to.include(`${genZHamsters.data.id}/${genZHamsters.data.id}`);
       expect(includedSpecs).to.include(`cards/${externalUserCard.data.id}`);
+      expect(includedSpecs).to.include(`cards/${genXKittens.data.id}`);
       expect(includedSpecs).to.include("fields/cuteness");
       expect(includedSpecs).to.not.include("fields/title");
       expect(includedSpecs).to.not.include("fields/author");
@@ -1183,11 +1204,11 @@ describe('hub/card-services', function () {
 
       let fieldMeta = adopted.data.attributes['metadata-summary'];
 
-      expect(fieldMeta.cuteness).to.eql({ type: "@cardstack/core-types::integer", label: 'cuteness' });
-      expect(fieldMeta.yarn).to.eql({ type: "@cardstack/core-types::string", label: 'yarn' });
-      expect(fieldMeta.title).to.eql({ type: "@cardstack/core-types::string", label: 'title' });
-      expect(fieldMeta.author).to.eql({ type: "@cardstack/core-types::belongs-to", label: 'author' });
-      expect(fieldMeta.body).to.eql({ type: "@cardstack/core-types::string", label: 'body' });
+      expect(fieldMeta.cuteness.type).to.equal("@cardstack/core-types::integer");
+      expect(fieldMeta.yarn.type).to.equal("@cardstack/core-types::string");
+      expect(fieldMeta.title.type).to.equal("@cardstack/core-types::string");
+      expect(fieldMeta.author.type).to.equal("@cardstack/core-types::belongs-to");
+      expect(fieldMeta.body.type).to.equal("@cardstack/core-types::string");
 
       expect(adopted.data.attributes.yarn).to.equal("cotton");
       expect(adopted.data.attributes.title).to.equal("GenZ Hamsters");
@@ -1217,6 +1238,19 @@ describe('hub/card-services', function () {
       expect(adopted.data.attributes['embedded-template']).to.match(/<h3>{{this.title}}<\/h3>/);
       expect(adopted.data.attributes['embedded-js']).to.match(/export default class ArticleEmbeddedComponent/);
       expect(adopted.data.attributes['embedded-css']).to.match(/\.article-card-embedded {}/);
+
+      let parent = adopted.included.find(i => `${i.type}/${i.id}` === `cards/${genXKittens.data.id}`);
+      expect(parent.attributes.yarn).to.equal("wool");
+      expect(parent.attributes.title).to.equal("GenX Kittens");
+      expect(parent.attributes.body).to.be.undefined;
+      expect(parent.relationships.author.data).to.eql({ type: 'cards', id: externalUserCard.data.id });
+      expect(parent.relationships.tags).to.be.undefined;
+      expect(parent.attributes['internal-field']).to.be.undefined;
+      expect(parent.attributes['metadata-summary'].yarn.type).to.equal('@cardstack/core-types::string');
+      expect(parent.attributes['metadata-summary'].title.type).to.equal('@cardstack/core-types::string');
+      expect(parent.attributes['metadata-summary'].author.type).to.equal('@cardstack/core-types::belongs-to');
+      expect(parent.attributes['metadata-summary'].body).to.be.undefined;
+      expect(parent.attributes['metadata-summary'].tags).to.be.undefined;
     });
 
     it("can get an embedded card that uses multiple levels of adoption", async function () {
@@ -1259,10 +1293,10 @@ describe('hub/card-services', function () {
 
       let fieldMeta = adopted.data.attributes['metadata-summary'];
 
-      expect(fieldMeta.cuteness).to.eql({ type: "@cardstack/core-types::integer", label: 'cuteness' });
-      expect(fieldMeta.yarn).to.eql({ type: "@cardstack/core-types::string", label: 'yarn' });
-      expect(fieldMeta.title).to.eql({ type: "@cardstack/core-types::string", label: 'title' });
-      expect(fieldMeta.author).to.eql({ type: "@cardstack/core-types::belongs-to", label: 'author' });
+      expect(fieldMeta.cuteness.type).to.equal("@cardstack/core-types::integer");
+      expect(fieldMeta.yarn.type).to.equal("@cardstack/core-types::string");
+      expect(fieldMeta.title.type).to.equal("@cardstack/core-types::string");
+      expect(fieldMeta.author.type).to.equal("@cardstack/core-types::belongs-to");
 
       expect(adopted.data.attributes.yarn).to.equal("cotton");
       expect(adopted.data.attributes.title).to.equal("GenZ Hamsters");
@@ -1297,6 +1331,12 @@ describe('hub/card-services', function () {
     });
 
     it.skip("can get a card that has a has-many relationship to cards which use adoption", async function () {
+    });
+
+    it.skip("throws an error if a field has the same name as a field that comes from an adopted card", async function() {
+      // test for a child card that is updated/created to have a field that is named the same as a field from a card in the adoption chain
+
+      // what about the scenario where the parent card is modified to have the same field as a field that already exists in a child card??
     });
 
     it.skip("can enforce read authorization on an adopted field when getting a card", async function () {
