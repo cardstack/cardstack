@@ -2,7 +2,7 @@ import { module, test } from 'qunit';
 import { click, find, visit, currentURL, waitFor, fillIn, triggerEvent } from '@ember/test-helpers';
 import { setupApplicationTest } from 'ember-qunit';
 import Fixtures from '@cardstack/test-support/fixtures'
-import { addField, createCards, removeField, dragAndDropField } from '../helpers/card-helpers';
+import { addField, createCards, removeField, dragAndDropNewField, dragFieldToNewPosition } from '../helpers/card-helpers';
 import { setupMockUser, login } from '../helpers/login';
 
 const timeout = 5000;
@@ -222,10 +222,48 @@ module('Acceptance | card schema', function(hooks) {
     assert.dom('[data-test-right-edge] [data-test-schema-attr="name"] input').hasValue('subtitle');
     assert.dom('[data-test-right-edge] [data-test-schema-attr="label"] input').hasValue('Subtitle');
 
-    await dragAndDropField('string');
+    await dragAndDropNewField('string');
     await click('[data-test-field="new-field-3"]');
     assert.dom('[data-test-right-edge] [data-test-schema-attr="name"] input').hasValue('new-field-3');
     assert.dom('[data-test-right-edge] [data-test-schema-attr="label"] input').hasValue('new-field-3');
+  });
+
+  test(`move a field's position via drag & drop`, async function (assert) {
+    await login();
+    await createCards({
+      [card1Id]: [
+        ['title', 'string', false, 'test title'],
+        ['author', 'string', false, 'test author'],
+        ['body', 'string', false, 'test body'],
+      ]
+    });
+    await visit(`/cards/${card1Id}/schema`);
+    assert.deepEqual([...document.querySelectorAll('[data-test-field]')].map(i => i.getAttribute('data-test-field')),
+      ['title', 'author', 'body']);
+
+    await dragFieldToNewPosition(0, 1);
+    assert.deepEqual([...document.querySelectorAll('[data-test-field]')].map(i => i.getAttribute('data-test-field')),
+    ['author', 'title', 'body']);
+
+    await dragFieldToNewPosition(1, 2);
+    assert.deepEqual([...document.querySelectorAll('[data-test-field]')].map(i => i.getAttribute('data-test-field')),
+    ['author', 'body', 'title']);
+
+    await dragFieldToNewPosition(1, 0);
+    assert.deepEqual([...document.querySelectorAll('[data-test-field]')].map(i => i.getAttribute('data-test-field')),
+      ['body', 'author', 'title']);
+
+    await click('[data-test-card-schema-save-btn]');
+    await waitFor(`[data-test-card-view="${card1Id}"]`, { timeout });
+
+    assert.deepEqual([...document.querySelectorAll('[data-test-field]')].map(i => i.getAttribute('data-test-field')),
+      ['body', 'author', 'title']);
+    let card = JSON.parse(find('.code-block').textContent);
+    assert.deepEqual(card.data.relationships.fields.data, [
+      { type: 'fields', id: 'body' },
+      { type: 'fields', id: 'author' },
+      { type: 'fields', id: 'title' },
+    ]);
   });
 
   test(`change a field's needed-when-embedded value to true`, async function (assert) {

@@ -24,11 +24,18 @@
   data-test-field-mode={{@mode}}
 >
   {{#if @setPosition}}
-    {{!-- TODO: Use dragger handle icon to drag fields around instead of up/down --}}
-    <button class="field-renderer--move-btn" aria-label="Drag field"></button>
-
+    <button
+      class="field-renderer--move-btn"
+      aria-label="Drag field"
+      {{on "mousedown" (action this.beginDragging @field)}}
+      {{on "dragend" (action (mut this.isDragging) false)}}
+      {{on "dragstart" (action this.firefoxDrag)}}
+      data-test-field-renderer-move-btn
+      data-test-field-renderer-move-btn-position={{@field.position}}
+    >
+    </button>
     {{!-- TODO: Remove this block when dragger works --}}
-    <div class="field-renderer--move-btn--hidden">
+    {{!-- <div class="field-renderer--move-btn--hidden">
       {{#if (gt @field.position 0)}}
         <button {{on "click" (fn @setPosition @field.name (dec @field.position))}}
           aria-label="Move up"
@@ -45,7 +52,7 @@
           <strong>▼</strong>
         </button>
       {{/if}}
-    </div>
+    </div> --}}
   {{/if}}
 
   {{#if (eq @mode "view")}}

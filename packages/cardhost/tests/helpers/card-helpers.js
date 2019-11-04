@@ -7,9 +7,18 @@ export async function setCardId(id) {
   await triggerEvent('#card__id', 'keyup');
 }
 
-export async function dragAndDropField(type, position = 0) {
-  await triggerEvent(`[data-test-card-add-field-draggable="${type}"]`, 'mousedown');
-  await triggerEvent(`[data-test-drop-zone="${position}"]`, 'drop');
+export async function dragAndDrop(fieldSelector, dropZoneSelector) {
+  await triggerEvent(fieldSelector, 'mousedown');
+  await triggerEvent(dropZoneSelector, 'drop');
+}
+
+export async function dragAndDropNewField(type, position = 0) {
+  await dragAndDrop(`[data-test-card-add-field-draggable="${type}"]`, `[data-test-drop-zone="${position}"]`);
+}
+
+// NOTE: Position is 0-based
+export async function dragFieldToNewPosition(originalPosition, newPosition) {
+  await dragAndDrop(`[data-test-field-position="${originalPosition}"]`, `[data-test-drop-zone="${newPosition}"]`);
 }
 
 export async function createCards(args) {
@@ -33,7 +42,7 @@ export async function createCards(args) {
 }
 
 export async function addField(name, type, isEmbedded, position) {
-  await dragAndDropField(type, position);
+  await dragAndDropNewField(type, position);
 
   await fillIn('[data-test-schema-attr="name"] input', name);
   await triggerEvent('[data-test-schema-attr="name"] input', 'keyup');

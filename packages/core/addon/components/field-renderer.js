@@ -97,4 +97,15 @@ export default class FieldRenderer extends Component {
       this.args.selectField(field);
     }
   }
+
+  @action beginDragging(field, evt) {
+    evt.target.parentNode.setAttribute('draggable', 'true');
+    this.isDragging = field;
+  }
+
+  @action firefoxDrag(evt) {
+    // Chrome dragging works with just draggable="true",
+    // but Firefox requires extra handling.
+    evt.dataTransfer.setData("text", evt.target.id);
+  }
 }

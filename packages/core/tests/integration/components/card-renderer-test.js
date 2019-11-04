@@ -191,7 +191,7 @@ module('Integration | Component | card-renderer', function(hooks) {
       <CardRenderer
         @card={{card}}
         @format="isolated"
-        @dropField={{action noop}}
+        @dropField={{action noop}}  
         @setFieldName={{action noop}}
         @mode="schema"
       />
