@@ -7,12 +7,4 @@ export default class CardCreator extends CardManipulator {
   updateCardId(id) {
     this.card = this.data.createCard(`local-hub::${id}`);
   }
-
-  get sanitizedType() {
-    return this.selectedField.type.replace(/::/g, '/').replace(/@/g, '');
-  }
-
-  get fieldEditor() {
-    return `fields/${dasherize(this.sanitizedType)}-editor`;
-  }
 }
