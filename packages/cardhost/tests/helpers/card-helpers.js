@@ -38,6 +38,9 @@ export async function addField(name, type, isEmbedded, position) {
   await fillIn('[data-test-field-name]', name);
   await triggerEvent('[data-test-field-name]', 'keyup');
 
+  await fillIn('[data-test-field-label]', name);
+  await triggerEvent('[data-test-field-label]', 'keyup');
+
   if (isEmbedded) {
     await click(`[data-test-right-edge] [data-test-needed-when-embedded]`);
   }

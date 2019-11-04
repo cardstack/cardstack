@@ -81,15 +81,22 @@ module('Acceptance | card create', function(hooks) {
     await triggerEvent(`[data-test-right-edge] [data-test-field-name]`, 'keyup');
     assert.dom('[data-test-right-edge] [data-test-field-name]').hasValue('subtitle');
 
+    await fillIn('[data-test-right-edge] [data-test-field-label]', 'Subtitle');
+    await triggerEvent(`[data-test-right-edge] [data-test-field-label]`, 'keyup');
+    assert.dom('[data-test-right-edge] [data-test-field-label]').hasValue('Subtitle');
+
     await click('[data-test-field="body"]');
     assert.dom('[data-test-right-edge] [data-test-field-name]').hasValue('body');
+    assert.dom('[data-test-right-edge] [data-test-field-label]').hasValue('body');
 
     await click('[data-test-field="subtitle"]');
     assert.dom('[data-test-right-edge] [data-test-field-name]').hasValue('subtitle');
+    assert.dom('[data-test-right-edge] [data-test-field-label]').hasValue('Subtitle');
 
     await dragAndDropField('string');
     await click('[data-test-field="new-field-2"]');
     assert.dom('[data-test-right-edge] [data-test-field-name]').hasValue('new-field-2');
+    assert.dom('[data-test-right-edge] [data-test-field-label]').hasValue('new-field-2');
   });
 
   test(`renaming a card's field`, async function(assert) {

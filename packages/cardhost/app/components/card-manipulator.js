@@ -103,6 +103,7 @@ export default class CardManipulator extends Component {
   @tracked selectedField;
   @tracked isDragging;
   @tracked selectedFieldName;
+  @tracked selectedFieldLabel;
 
   constructor(...args) {
     super(...args);
@@ -285,5 +286,6 @@ export default class CardManipulator extends Component {
 
     this.selectedField = field;
     this.selectedFieldName = field.name;
+    this.selectedFieldLabel = field.label;
   }
 }
