@@ -97,6 +97,9 @@ module('Acceptance | card create', function(hooks) {
     await click('[data-test-field="new-field-2"]');
     assert.dom('[data-test-right-edge] [data-test-field-name]').hasValue('new-field-2');
     assert.dom('[data-test-right-edge] [data-test-field-label]').hasValue('new-field-2');
+
+    await dragAndDropField('related card');
+    assert.dom('[data-test-field-multiselect]').exists();
   });
 
   test(`renaming a card's field`, async function(assert) {

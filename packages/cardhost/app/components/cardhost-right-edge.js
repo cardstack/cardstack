@@ -6,6 +6,7 @@ const typeToInputTypeMap = {
   '@cardstack/core-types::boolean': 'Checkbox',
   '@cardstack/core-types::date': 'Date',
   '@cardstack/core-types::integer': 'Text Field',
+  '@cardstack/core-types::belongs-to': 'Dropdown',
 }
 
 export default class CardhostRightEdge extends Component {

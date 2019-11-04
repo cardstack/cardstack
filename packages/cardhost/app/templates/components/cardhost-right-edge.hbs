@@ -31,6 +31,15 @@
           @id={{concat "card-manipulator--right-edge--field-helper-text" @selectedField.nonce}}
         />
       </div>
+      {{#if (eq this.sectionTitle "Dropdown")}}
+        <div class="card-manipulator--right-edge--attribute" data-test-field-multiselect>
+          <label class="checkbox-container">
+            Multiselect
+            <Input @type="checkbox" />
+            <span class="checkmark"></span>
+          </label>
+        </div>
+      {{/if}}
       <div class="card-manipulator--right-edge--attribute">
         <label class="checkbox-container">
           Required
