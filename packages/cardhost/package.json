@@ -82,7 +82,8 @@
     "eslint-plugin-node": "^5.2.1",
     "loader.js": "^4.7.0",
     "prember": "^1.0.0",
-    "qunit-dom": "^0.8.0"
+    "qunit-dom": "^0.8.0",
+    "webpack-bundle-analyzer": "^3.6.0"
   },
   "engines": {
     "node": "8.* || >= 10.*"
