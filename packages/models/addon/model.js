@@ -4,7 +4,7 @@ import { inject as service } from '@ember/service';
 import { computed, defineProperty, get } from '@ember/object';
 import { readOnly, or } from '@ember/object/computed';
 import { capitalize } from '@ember/string';
-import { uniq } from 'lodash-es';
+import { uniq } from 'lodash';
 
 export default DS.Model.extend(RelationshipTracker, {
   resourceMetadata: service(),

@@ -208,7 +208,8 @@
       "cwd": "${workspaceRoot}/packages/cardhost",
       "args": ["b"],
       "env": {
-        "JOBS": "1"
+        "JOBS": "1",
+        "EMBROIDER_CONCAT_STATS": "true"
       },
       "outputCapture": "std"
     },
