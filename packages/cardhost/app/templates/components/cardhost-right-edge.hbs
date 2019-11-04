@@ -28,11 +28,17 @@
         <div class="attribute-title">Helper Text</div>
         <Textarea
           data-test-field-helper-text
-          @id={{concat "card-manipulator--right-edge--field-helper-text" @selectedField.nonce}}
+          @id={{concat
+            "card-manipulator--right-edge--field-helper-text-"
+            @selectedField.nonce
+          }}
         />
       </div>
       {{#if (eq this.sectionTitle "Dropdown")}}
-        <div class="card-manipulator--right-edge--attribute" data-test-field-multiselect>
+        <div
+          class="card-manipulator--right-edge--attribute"
+          data-test-field-multiselect
+        >
           <label class="checkbox-container">
             Multiselect
             <Input @type="checkbox" />
