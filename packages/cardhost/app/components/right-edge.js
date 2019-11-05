@@ -1,16 +1,9 @@
 import Component from '@glimmer/component';
-
-const typeToInputTypeMap = {
-  '@cardstack/core-types::string': 'Text Field',
-  '@cardstack/core-types::case-insensitive': 'Text Field',
-  '@cardstack/core-types::boolean': 'Checkbox',
-  '@cardstack/core-types::date': 'Date',
-  '@cardstack/core-types::integer': 'Text Field',
-  '@cardstack/core-types::belongs-to': 'Dropdown',
-}
+import { fieldComponents } from './card-manipulator';
 
 export default class RightEdge extends Component {
   get sectionTitle() {
-    return typeToInputTypeMap[this.args.selectedField.type] || 'Text Field';
+    let { title } = fieldComponents.findBy('coreType', this.args.selectedField.type);
+    return title;
   }
 }
