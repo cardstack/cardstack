@@ -53,12 +53,15 @@
       <div class="card-catalog">
         <LinkTo @route="cards.add" @class="card-renderer--embedded-card-link">
           <div class="embedded-card placeholder icon-common-form"></div>
+          <div class="embedded-card-label">Form</div>
         </LinkTo>
         <LinkTo @route="cards.add" @class="card-renderer--embedded-card-link">
           <div class="embedded-card placeholder icon-common-layout"></div>
+          <div class="embedded-card-label">Layout</div>
         </LinkTo>
         <LinkTo @route="cards.add" @class="card-renderer--embedded-card-link">
           <div class="embedded-card placeholder icon-common-collection"></div>
+          <div class="embedded-card-label">Collection</div>
         </LinkTo>
       </div>
     </section>
@@ -73,9 +76,8 @@
           @route="cards.add"
           @class="card-renderer--embedded-card-link"
         >
-          <div class="embedded-card placeholder icon-add-card">
-
-          </div>
+          <div class="embedded-card placeholder icon-add-card"></div>
+          <div class="embedded-card-label">Blank Card</div>
         </LinkTo>
       </div>
     </section>

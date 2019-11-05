@@ -86,7 +86,7 @@
 .cardhost-catalog .card-catalog {
   display: flex;
   justify-content: space-between;
-  margin: 0 40px;
+  margin: 0 20px;
 }
 
 .cardhost-catalog header {
@@ -121,11 +121,11 @@
 }
 
 .card-catalog .card-renderer--embedded-card-link {
-  width: 300px;
+  width: 225px;
 }
 
 .card-catalog > .card-renderer--embedded-card-link > .embedded-card {
-  height: 300px;
+  height: 225px;
 }
 
 .cardhost-section .card-catalog .embedded-card.placeholder {
@@ -146,4 +146,10 @@
 }
 .cardhost-section .card-catalog .embedded-card.placeholder.icon-add-card {
   background-image: url(/assets/images/icon-blank-card.svg);
+}
+
+.cardhost-section .embedded-card-label {
+  font-size: 13px;
+  text-align: center;
+  padding-top: 30px;
 }
