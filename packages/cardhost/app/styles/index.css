@@ -1,0 +1,105 @@
+.cardhost-welcome-page {
+  background-color: var(--ch-darkest-blue-gray);
+  border-radius: 10px;
+  margin: 30px;
+  width: calc(100vw - 200px);
+  height: calc(100vh - 140px);
+  display: flex;
+  box-shadow: 0px 15px 30px 0px rgba(0,0,0,0.25);
+}
+
+/* Left edge */
+.cardhost-welcome-left-edge {
+  background-image: url(/assets/images/cardstack-logo.svg);
+  background-repeat: no-repeat;
+  background-size: 24px 25px;
+  background-position: 40px 40px;
+  width: 250px;
+}
+
+.cardhost-welcome-left-edge--nav {
+  margin-top: 130px;
+}
+
+.cardhost-welcome-left-edge--nav ul {
+  list-style: none;
+  font-size: 13px;
+}
+
+.cardhost-welcome-left-edge--nav ul li {
+  margin-bottom: 15px;
+  line-height: 16px;
+}
+
+.cardhost-welcome-left-edge--nav ul li .left-edge-icon {
+  padding-left: 30px;
+  background-position: top left;
+  background-repeat: no-repeat;
+  background-size: 15px 15px;
+}
+
+.cardhost-welcome-left-edge--nav ul li .left-edge-icon.recent {
+  background-image: url(/assets/images/icon-clock.svg);
+}
+
+.cardhost-welcome-left-edge--nav ul li .left-edge-icon.add-card {
+  background-image: url(/assets/images/icon-add.svg);
+}
+
+/* Catalog */
+.cardhost-catalog {
+  margin: 60px;
+  width: calc(100% - 250px);
+  overflow-y: scroll;
+}
+
+.cardhost-catalog .cardhost-section {
+  padding-bottom: 60px;
+  margin-bottom: 60px;
+  border-bottom: solid 1px var(--ch-medium-dark-blue-gray);
+}
+
+.cardhost-catalog .card-catalog {
+  display: flex;
+  justify-content: space-between;
+  margin: 0 40px;
+}
+
+.cardhost-catalog header {
+  background-position: center left;
+  background-repeat: no-repeat;
+  background-size: 36px 36px;
+  padding-left: 60px;
+  margin-bottom: 60px;
+}
+
+.cardhost-catalog header.cardhost--header--recent-cards {
+  background-image: url(/assets/images/icon-clock.svg);
+}
+
+.cardhost-catalog header.cardhost--header--add-card {
+  background-image: url(/assets/images/icon-add-blue.svg);
+}
+
+.cardhost-catalog .card-catalog .embedded-card {
+  border-radius: 15px;
+  padding: 20px;
+  margin: 0;
+  font-size: 18px;
+}
+
+.card-catalog .card-renderer--embedded-card-link {
+  width: 300px;
+}
+
+.card-catalog > .card-renderer--embedded-card-link > .embedded-card {
+  height: 300px;
+}
+
+.cardhost-section--add-card .card-catalog .embedded-card {
+  background-color: var(--ch-light-blue-gray);
+  background-image: url(/assets/images/icon-blank-card.svg);
+  background-position: center center;
+  background-repeat: no-repeat;
+  background-size: 50px 56px;
+}

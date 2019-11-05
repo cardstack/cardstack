@@ -1,6 +1,7 @@
 @import '/assets/fonts.css';
 @import '/assets/palette.css';
 @import '/assets/components/right-edge.css';
+@import '/assets/index.css';
 @import '/assets/components/mode-switcher.css';
 @import '/assets/components/card-manipulator.css';
 @import '/assets/components/cardhost-left-edge.css';
@@ -31,6 +32,7 @@ Until that work is done we are statically adding this css
   --ch-font-family: "Open Sans", Roboto, "Helvetica Neue", Helvetica, Arial, sans-serif;
 
   --ch-left-edge-navbar-width: 80px;
+  --ch-right-edge-navbar-width: 80px;
   --ch-left-edge-panel-width: 330px;
   --ch-right-edge-panel-width: 300px;
   --ch-top-edge-height: 80px;
@@ -38,6 +40,7 @@ Until that work is done we are statically adding this css
   --ch-edges-z-index: 10;
 
   --ch-left-edge-width: var(--ch-left-edge-navbar-width);
+  --ch-right-edge-width: var(--ch-right-edge-navbar-width);
 }
 
 /* TODO: link and button focus and disabled states styling */
@@ -52,7 +55,7 @@ body {
   width: 100%;
   height: auto;
   margin: 0;
-  background-color: var(--ch-dark-blue-gray);
+  background-color: var(--ch-medium-medium-blue-gray);
   color: white;
   font-family: var(--ch-font-family);
   font-size: 13px;
@@ -127,9 +130,10 @@ button + button {
 /******* Below here should be refactored *********/
 .cardhost {
   position: relative;
-  margin-top: calc(var(--ch-top-edge-height) + var(--ch-header-height));
+  /* margin-top: calc(var(--ch-top-edge-height) + var(--ch-header-height)); */
+  margin-top: var(--ch-header-height);
   margin-left: var(--ch-left-edge-width);
-  margin-right: 20px;
+  margin-right: var(--ch-right-edge-width);
 }
 
 /* Temp app header */
@@ -183,15 +187,10 @@ button + button {
   padding: 0 10px;
 }
 
-.cardhost-catalog {
-  padding-left: 20px;
-}
-
 .cardhost-catalog--title {
   margin: 0;
-  padding-right: 20px;
-  font-size: 18px;
-  font-weight: 600;
+  font-size: 32px;
+  font-weight: 200;
 }
 
 /* Other */
