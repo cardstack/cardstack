@@ -3,16 +3,32 @@ import { dasherize } from '@ember/string';
 import { action } from '@ember/object';
 import { tracked } from '@glimmer/tracking';
 
-// TODO This will be part of the official API. Move this into core as it solidifies
+const defaultSchemaAttrs = [
+  'title',
+  'type',
+  'is-meta',
+  'name',
+  'embedded'
+];
+
+let renderNonce = 0;
 export default class FieldRenderer extends Component {
   @tracked newFieldName;
+  @tracked newFieldLabel;
   @tracked currentNonce;
+  @tracked renderNonce;
 
   constructor(...args) {
     super(...args);
 
     this.newFieldName = this.args.field.name;
+    this.newFieldLabel = this.args.field.label;
     this.currentNonce = this.args.field.nonce;
+    this.renderNonce = renderNonce++;
+  }
+
+  get schemaAttrs() {
+    return this.args.schemaAttrs || defaultSchemaAttrs;
   }
 
   get sanitizedType() {
@@ -23,6 +39,7 @@ export default class FieldRenderer extends Component {
     if (this.args.field.nonce !== this.currentNonce) {
       this.currentNonce = this.args.field.nonce;
       this.newFieldName = this.args.field.name;
+      this.newFieldLabel = this.args.field.label;
     }
     return null;
   }
@@ -43,6 +60,12 @@ export default class FieldRenderer extends Component {
   updateFieldName(newName) {
     this.newFieldName = newName;
     this.args.setFieldName(this.args.field.name, this.newFieldName);
+  }
+
+  @action
+  updateFieldLabel(newLabel) {
+    this.newFieldLabel = newLabel;
+    this.args.setFieldLabel(this.args.field.name, this.newFieldLabel);
   }
 
   @action

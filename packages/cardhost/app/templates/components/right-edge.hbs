@@ -1,70 +1,19 @@
-<div class="card-manipulator--right-edge" data-test-right-edge>
+<div class="right-edge" data-test-right-edge>
   {{#if @selectedField}}
-    <div class="card-manipulator--right-edge--pill-selector">
-      <div class="card-manipulator--right-edge--pill-option selected">Properties</div>
-      <div class="card-manipulator--right-edge--pill-option">Structure</div>
+    <div class="right-edge--pill-selector">
+      <div class="right-edge--pill-option selected">Properties</div>
+      <div class="right-edge--pill-option">Structure</div>
     </div>
-    <div class="card-manipulator--right-edge--section">
+    <div class="right-edge--section">
       <div class="section-header">{{this.sectionTitle}}</div>
-      <div class="card-manipulator--right-edge--attribute">
-        <div class="attribute-title">Field Name</div>
-        <Input
-          data-test-field-name
-          @id={{concat "card-manipulator--right-edge--field-name-" @selectedField.nonce}}
-          @value={{@selectedFieldName}}
-          @key-up={{@updateFieldName}}
-        />
-      </div>
-      <div class="card-manipulator--right-edge--attribute">
-        <div class="attribute-title">Display Label</div>
-        <Input
-          data-test-field-label
-          @id={{concat "card-manipulator--right-edge--field-label-" @selectedField.nonce}}
-          @value={{@selectedFieldLabel}}
-          @key-up={{@updateFieldLabel}}
-        />
-      </div>
-      <div class="card-manipulator--right-edge--attribute">
-        <div class="attribute-title">Helper Text</div>
-        <Textarea
-          data-test-field-helper-text
-          @id={{concat
-            "card-manipulator--right-edge--field-helper-text-"
-            @selectedField.nonce
-          }}
-        />
-      </div>
-      {{#if (eq this.sectionTitle "Dropdown")}}
-        <div
-          class="card-manipulator--right-edge--attribute"
-          data-test-field-multiselect
-        >
-          <label class="checkbox-container">
-            Multiselect
-            <Input @type="checkbox" />
-            <span class="checkmark"></span>
-          </label>
-        </div>
-      {{/if}}
-      <div class="card-manipulator--right-edge--attribute">
-        <label class="checkbox-container">
-          Required
-          <Input @type="checkbox" />
-          <span class="checkmark"></span>
-        </label>
-      </div>
-      <div class="card-manipulator--right-edge--attribute">
-        <label class="checkbox-container">
-          Available When Embedded
-          <Input
-            @checked={{@selectedField.neededWhenEmbedded}}
-            @type="checkbox"
-            @click={{fn @setNeededWhenEmbedded @selectedField.name}}
-            data-test-needed-when-embedded
-          />
-          <span class="checkmark"></span>
-        </label>
-      </div>
+      <FieldRenderer
+        @field={{@selectedField}}
+        @mode="schema"
+        @setNeededWhenEmbedded={{@setNeededWhenEmbedded}}
+        @setFieldName={{@setFieldName}}
+        @setFieldLabel={{@setFieldLabel}}
+        @schemaAttrs={{array "name" "label" "helper-text" "multiselect" "required" "embedded"}}
+      />
     </div>
   {{/if}}
 </div>

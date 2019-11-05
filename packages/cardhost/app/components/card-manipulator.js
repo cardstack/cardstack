@@ -109,8 +109,6 @@ export default class CardManipulator extends Component {
   @tracked card;
   @tracked selectedField;
   @tracked isDragging;
-  @tracked selectedFieldName;
-  @tracked selectedFieldLabel;
 
   constructor(...args) {
     super(...args);
@@ -222,23 +220,12 @@ export default class CardManipulator extends Component {
   @action
   setFieldName(oldFieldName, newFieldName) {
     this.card.getField(oldFieldName).setName(newFieldName);
-  }
-
-  @action
-  updateFieldName(newName) {
-    this.selectedFieldName = newName;
-    this.setFieldName(this.selectedField.name, this.selectedFieldName);
+    this.card.getField(newFieldName).setLabel(newFieldName);
   }
 
   @action
   setFieldLabel(fieldName, label) {
     this.card.getField(fieldName).setLabel(label);
-  }
-
-  @action
-  updateFieldLabel(label) {
-    this.selectedFieldLabel = label;
-    this.setFieldLabel(this.selectedFieldName, this.selectedFieldLabel);
   }
 
   @action
@@ -292,8 +279,6 @@ export default class CardManipulator extends Component {
     if (field.isDestroyed) { return; }
 
     this.selectedField = field;
-    this.selectedFieldName = field.name;
-    this.selectedFieldLabel = field.label;
   }
 
   @action firefoxDrag(evt) {

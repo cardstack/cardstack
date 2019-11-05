@@ -29,6 +29,9 @@ const scenario = new Fixtures({
 module('Acceptance | card edit', function(hooks) {
   setupApplicationTest(hooks);
   scenario.setupTest(hooks);
+  hooks.beforeEach(function () {
+    this.owner.lookup('service:data')._clearCache();
+  });
 
   test(`setting a string field`, async function(assert) {
     await login();

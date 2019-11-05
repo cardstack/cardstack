@@ -32,6 +32,7 @@ module('Acceptance | catalog', function(hooks) {
   scenario.setupTest(hooks);
 
   hooks.beforeEach(async function () {
+    this.owner.lookup('service:data')._clearCache();
     // Until we have searching capabilities, we'll just render the contents of the
     // local store. So the first step is to warm up the store.
     await login();
