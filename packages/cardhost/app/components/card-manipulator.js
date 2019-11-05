@@ -23,9 +23,10 @@ const fieldTypeMappings = {
   // '@cardstack/core-types::object',
 };
 
-const fieldComponents = [
+export const fieldComponents = [
   {
     id: 'text-field',
+    coreType: '@cardstack/core-types::string',
     title: 'Text',
     description: 'All-purpose text field',
     type: 'string',
@@ -33,6 +34,7 @@ const fieldComponents = [
   },
   {
     id: 'text-field-case-insensitive',
+    coreType: '@cardstack/core-types::case-insensitive',
     title: 'Text (case-insensitive)',
     description: 'Case-insensitive text field',
     type: 'case-insensitive string',
@@ -40,6 +42,7 @@ const fieldComponents = [
   },
   {
     id: 'checkbox',
+    coreType: '@cardstack/core-types::boolean',
     title: 'Checkbox',
     description: 'True/false (boolean) values',
     type: 'boolean',
@@ -47,6 +50,7 @@ const fieldComponents = [
   },
   {
     id: 'date-field',
+    coreType: '@cardstack/core-types::date',
     title: 'Date',
     description: 'Date field',
     type: 'date',
@@ -54,6 +58,7 @@ const fieldComponents = [
   },
   {
     id: 'number',
+    coreType: '@cardstack/core-types::integer',
     title: 'Number',
     description: 'Integer number field',
     type: 'integer',
@@ -61,6 +66,7 @@ const fieldComponents = [
   },
   {
     id: 'dropdown',
+    coreType: '@cardstack/core-types::belongs-to',
     title: 'Dropdown',
     description: 'Single select dropdown',
     type: 'related card',
@@ -68,6 +74,7 @@ const fieldComponents = [
   },
   {
     id: 'dropdown-multi',
+    coreType: '@cardstack/core-types::has-many',
     title: 'Dropdown (Multi-select)',
     description: 'Multiple select dropdown',
     type: 'related cards',
@@ -213,6 +220,12 @@ export default class CardManipulator extends Component {
   @action
   setFieldName(oldFieldName, newFieldName) {
     this.card.getField(oldFieldName).setName(newFieldName);
+    this.card.getField(newFieldName).setLabel(newFieldName);
+  }
+
+  @action
+  setFieldLabel(fieldName, label) {
+    this.card.getField(fieldName).setLabel(label);
   }
 
   @action
@@ -257,7 +270,7 @@ export default class CardManipulator extends Component {
     this.selectedField = field;
     fieldComponent.dragState = null;
     fieldComponent = fieldComponent; // eslint-disable-line no-self-assign
-
+    this.selectField(field);
 
     onFinishDrop();
   }

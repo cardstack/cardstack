@@ -23,6 +23,9 @@ const scenario = new Fixtures({
 module('Acceptance | card create', function(hooks) {
   setupApplicationTest(hooks);
   scenario.setupTest(hooks);
+  hooks.beforeEach(function () {
+    this.owner.lookup('service:data')._clearCache();
+  });
 
   test('creating a card', async function(assert) {
     await login();
@@ -74,20 +77,44 @@ module('Acceptance | card create', function(hooks) {
     await addField('body', 'string', false);
 
     await click('[data-test-field="title"]');
-    assert.dom('[data-test-cardhost-right-edge] [data-test-field] .field-renderer-field-name-input').hasValue('title');
 
-    await fillIn('[data-test-field="title"] .field-renderer-field-name-input', 'subtitle');
-    await triggerEvent(`[data-test-field="title"] .field-renderer-field-name-input`, 'keyup');
-    assert.dom('[data-test-cardhost-right-edge] [data-test-field] .field-renderer-field-name-input').hasValue('subtitle');
+    assert.dom('[data-test-right-edge] [data-test-schema-attr="name"] input').hasValue('title');
+
+    await fillIn('[data-test-right-edge] [data-test-schema-attr="name"] input', 'subtitle');
+    await triggerEvent(`[data-test-right-edge] [data-test-schema-attr="name"] input`, 'keyup');
+    assert.dom('[data-test-right-edge] [data-test-schema-attr="name"] input').hasValue('subtitle');
+
+    await fillIn('[data-test-right-edge] [data-test-schema-attr="label"] input', 'Subtitle');
+    await triggerEvent(`[data-test-right-edge] [data-test-schema-attr="label"] input`, 'keyup');
+    assert.dom('[data-test-right-edge] [data-test-schema-attr="label"] input').hasValue('Subtitle');
 
     await click('[data-test-field="body"]');
-    assert.dom('[data-test-cardhost-right-edge] [data-test-field] .field-renderer-field-name-input').hasValue('body');
+    assert.dom('[data-test-right-edge] [data-test-schema-attr="name"] input').hasValue('body');
+    assert.dom('[data-test-right-edge] [data-test-schema-attr="label"] input').hasValue('body');
 
     await click('[data-test-field="subtitle"]');
-    assert.dom('[data-test-cardhost-right-edge] [data-test-field] .field-renderer-field-name-input').hasValue('subtitle');
+    assert.dom('[data-test-right-edge] [data-test-schema-attr="name"] input').hasValue('subtitle');
+    assert.dom('[data-test-right-edge] [data-test-schema-attr="label"] input').hasValue('Subtitle');
 
     await dragAndDropField('string');
-    assert.dom('[data-test-cardhost-right-edge] [data-test-field] .field-renderer-field-name-input').hasValue('new-field-2');
+    await click('[data-test-field="new-field-2"]');
+    assert.dom('[data-test-right-edge] [data-test-schema-attr="name"] input').hasValue('new-field-2');
+    assert.dom('[data-test-right-edge] [data-test-schema-attr="label"] input').hasValue('new-field-2');
+  });
+
+  test(`multiselect button appears for relationship fields`, async function(assert) {
+    await login();
+    await visit('/cards/new');
+
+    await setCardId(card1Id);
+    await dragAndDropField('string');
+    assert.dom('[data-test-schema-attr="multiselect"]').doesNotExist();
+
+    await dragAndDropField('related card');
+    assert.dom('[data-test-schema-attr="multiselect"]').exists();
+
+    await dragAndDropField('related cards');
+    assert.dom('[data-test-schema-attr="multiselect"]').exists();
   });
 
   test(`renaming a card's field`, async function(assert) {
@@ -97,9 +124,9 @@ module('Acceptance | card create', function(hooks) {
     await setCardId(card1Id);
     await addField('title', 'string', true);
 
-    assert.dom('[data-test-field="title"] .field-renderer-field-name-input').hasValue('title');
-    await fillIn('[data-test-field="title"] .field-renderer-field-name-input', 'subtitle');
-    await triggerEvent(`[data-test-field="title"] .field-renderer-field-name-input`, 'keyup');
+    assert.dom('[data-test-right-edge] [data-test-schema-attr="name"] input').hasValue('title');
+    await fillIn('[data-test-schema-attr="name"] input', 'subtitle');
+    await triggerEvent('[data-test-schema-attr="name"] input', 'keyup');
 
     await click('[data-test-card-creator-save-btn]');
     await waitFor(`[data-test-card-view="${card1Id}"]`, { timeout });

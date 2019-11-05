@@ -46,21 +46,13 @@
   </section>
 </CardhostLeftEdge>
 
-<aside class="cardhost-right-edge" data-test-cardhost-right-edge>
-  <section class="cardhost-right-edge-panel">
-    <h3 class="cardhost-right-edge-panel--header">
-      Edit Field Schema
-    </h3>
-    {{#if this.selectedField}}
-      <FieldRenderer
-        @field={{this.selectedField}}
-        @mode="schema"
-        @setNeededWhenEmbedded={{action this.setNeededWhenEmbedded}}
-        @setFieldName={{action this.setFieldName}}
-      />
-    {{/if}}
-  </section>
-</aside>
+<RightEdge
+  @selectedField={{this.selectedField}}
+  @selectField={{action this.selectField}}
+  @setNeededWhenEmbedded={{this.setNeededWhenEmbedded}}
+  @setFieldName={{this.setFieldName}}
+  @setFieldLabel={{this.setFieldLabel}}
+/>
 
 <div class="card-manipulator--container card-creator">
   {{#if this.statusMsg}}

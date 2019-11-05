@@ -35,11 +35,11 @@ export async function createCards(args) {
 export async function addField(name, type, isEmbedded, position) {
   await dragAndDropField(type, position);
 
-  await fillIn('[data-test-field^="new-field"] .field-renderer-field-name-input', name);
-  await triggerEvent('[data-test-field^="new-field"] .field-renderer-field-name-input', 'keyup');
+  await fillIn('[data-test-schema-attr="name"] input', name);
+  await triggerEvent('[data-test-schema-attr="name"] input', 'keyup');
 
   if (isEmbedded) {
-    await click(`[data-test-field="${name}"] .field-renderer--needed-when-embedded-chbx`);
+    await click('[data-test-schema-attr="embedded"] input[type="checkbox"]');
   }
 }
 

@@ -1,0 +1,19 @@
+<div class="right-edge" data-test-right-edge>
+  {{#if @selectedField}}
+    <div class="right-edge--pill-selector">
+      <div class="right-edge--pill-option selected">Properties</div>
+      <div class="right-edge--pill-option">Structure</div>
+    </div>
+    <div class="right-edge--section">
+      <div class="section-header">{{this.sectionTitle}}</div>
+      <FieldRenderer
+        @field={{@selectedField}}
+        @mode="schema"
+        @setNeededWhenEmbedded={{@setNeededWhenEmbedded}}
+        @setFieldName={{@setFieldName}}
+        @setFieldLabel={{@setFieldLabel}}
+        @schemaAttrs={{array "name" "label" "helper-text" "multiselect" "required" "embedded"}}
+      />
+    </div>
+  {{/if}}
+</div>

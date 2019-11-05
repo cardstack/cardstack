@@ -1,3 +1,6 @@
+{{! eslint is confused about indentation for else-if }}
+{{! template-lint-disable block-indentation}}
+
 {{this.onFieldUpdated}}
 
 {{#if (and (eq @mode "schema") @dropField)}}
@@ -58,59 +61,162 @@
       </div>
     {{/let}}
   {{else if (eq @mode "schema")}}
+    {{!-- TODO we should extract the schema editing stuff into a seaprate component --}}
     <div class="schema-field-renderer">
-      <header class="schema-field-renderer--header" data-test-field-renderer-header>
-        {{@field.name}}
-      </header>
+      {{#if (includes schemaAttrs "title")}}
+        <header
+          class="schema-field-renderer--header"
+          data-test-field-renderer-header
+        >
+          {{@field.name}}
+        </header>
+      {{/if}}
       <div class="schema-field-renderer--attributes">
-        <div class="schema-field-renderer--attribute">
-          <span class="schema-field-renderer--attribute-name">Field Type</span>
-          <span class="schema-field-renderer--attribute-value" data-test-field-renderer-field-type>
-            {{@field.type}}
-          </span>
-        </div>
-        <div class="schema-field-renderer--attribute">
-          <span class="schema-field-renderer--attribute-name">Is Metadata Field</span>
-          <span class="" data-test-field-renderer-is-meta>
-            {{if @field.json.data.attributes.is-metadata "true" "false"}}
-          </span>
-        </div>
-        {{#if @setFieldName}}
-          <div class="schema-field-renderer--attribute">
-            <label
-              for={{concat "edit-field-name-" @field.nonce}}
-              class="schema-field-renderer--label"
-              data-test-field-renderer-field-name-label
+        {{#each this.schemaAttrs as |schemaAttr|}}
+          {{#if (eq schemaAttr "type")}}
+            <div
+              class="schema-field-renderer--attribute"
+              data-test-schema-attr={{schemaAttr}}
             >
-              Field Name
-            </label>
-            <Input
-              @id={{concat "edit-field-name-" @field.nonce}}
-              @class="field-renderer-field-name-input schema-field-renderer--input"
-              @value={{this.newFieldName}}
-              @key-up={{action this.updateFieldName}}
-            />
-          </div>
-        {{/if}}
-        <div class="schema-field-renderer--attribute">
-          {{#if @setNeededWhenEmbedded}}
-            <Input
-              @checked={{@field.neededWhenEmbedded}}
-              @class="field-renderer--needed-when-embedded-chbx"
-              @type="checkbox"
-              @id={{concat "edit_" @field.name "_embedded"}}
-              @click={{fn @setNeededWhenEmbedded @field.name}}
-            />
-            <label for="new_field_embedded">
-              Needed When Embedded
-            </label>
-          {{else}}
-            <span class="schema-field-renderer--attribute-name">Needed When Embedded</span>
-            <span class="schema-field-renderer--attribute-value" data-test-field-renderer-embedded>
-              {{if @field.neededWhenEmbedded "true" "false"}}
-            </span>
+              <span class="schema-field-renderer--attribute-name">Field Type</span>
+              <span
+                class="schema-field-renderer--attribute-value"
+                data-test-field-renderer-field-type
+              >
+                {{@field.type}}
+              </span>
+            </div>
+          {{else if (eq schemaAttr "label")}}
+            <div
+              class="schema-field-renderer--attribute"
+              data-test-schema-attr={{schemaAttr}}
+            >
+              {{#if @setFieldLabel}}
+                <label
+                  for={{concat "edit-field-label-" @field.nonce "-" this.renderNonce}}
+                  class="schema-field-renderer--attribute-name"
+                  data-test-field-renderer-field-label-label
+                >
+                  Field Label
+                </label>
+                <Input
+                  @id={{concat "edit-field-label-" @field.nonce "-" this.renderNonce}}
+                  @class="field-renderer-field-label-input schema-field-renderer--input"
+                  @value={{this.newFieldLabel}}
+                  @key-up={{action this.updateFieldLabel}}
+                />
+              {{else}}
+                <span class="schema-field-renderer--attribute-name">Field Label</span>
+                <span
+                  class="schema-field-renderer--attribute-value"
+                  data-test-field-renderer-field-label
+                >
+                  {{@field.label}}
+                </span>
+              {{/if}}
+            </div>
+          {{else if (eq schemaAttr "is-meta")}}
+            <div
+              class="schema-field-renderer--attribute"
+              data-test-schema-attr={{schemaAttr}}
+            >
+              <span class="schema-field-renderer--attribute-name">Is Metadata Field</span>
+              <span data-test-field-renderer-is-meta>
+                {{if @field.json.data.attributes.is-metadata "true" "false"}}
+              </span>
+            </div>
+          {{else if (and (eq schemaAttr "name") @setFieldName)}}
+            <div
+              class="schema-field-renderer--attribute"
+              data-test-schema-attr={{schemaAttr}}
+            >
+              <label
+                for={{concat "edit-field-name-" @field.nonce "-" this.renderNonce}}
+                class="schema-field-renderer--attribute-name"
+                data-test-field-renderer-field-name-label
+              >
+                Field Name
+              </label>
+              <Input
+                @id={{concat "edit-field-name-" @field.nonce "-" this.renderNonce}}
+                @class="field-renderer-field-name-input schema-field-renderer--input"
+                @value={{this.newFieldName}}
+                @key-up={{action this.updateFieldName}}
+              />
+            </div>
+          {{else if (eq schemaAttr "embedded")}}
+            <div
+              class="schema-field-renderer--attribute"
+              data-test-schema-attr={{schemaAttr}}
+            >
+              {{#if @setNeededWhenEmbedded}}
+                <label for="new_field_embedded" class="checkbox-container">
+                  Available When Embedded
+                  <Input
+                    @checked={{@field.neededWhenEmbedded}}
+                    @class="field-renderer--needed-when-embedded-chbx"
+                    @type="checkbox"
+                    @id={{concat "edit_" @field.name "_" this.renderNonce "_embedded"}}
+                    @click={{fn @setNeededWhenEmbedded @field.name}}
+                  />
+                  <span class="checkmark"></span>
+                </label>
+              {{else}}
+                <span class="schema-field-renderer--attribute-name">Available When Embedded</span>
+                <span
+                  class="schema-field-renderer--attribute-value"
+                  data-test-field-renderer-embedded
+                >
+                  {{if @field.neededWhenEmbedded "true" "false"}}
+                </span>
+              {{/if}}
+            </div>
+          {{else if (eq schemaAttr "helper-text")}}
+            <div
+              class="schema-field-renderer--attribute"
+              data-test-schema-attr={{schemaAttr}}
+            >
+              <span class="schema-field-renderer--attribute-name">Helper Text</span>
+              <Textarea
+                data-test-field-helper-text
+                @id={{concat
+                  "right-edge--field-helper-text-"
+                  @selectedField.nonce
+                }}
+              />
+            </div>
+          {{else if
+            (and
+              (eq schemaAttr "multiselect")
+              (or
+                (eq @field.type "@cardstack/core-types::belongs-to")
+                (eq @field.type "@cardstack/core-types::has-many")
+              )
+            )
+          }}
+            <div
+              class="schema-field-renderer--attribute"
+              data-test-schema-attr={{schemaAttr}}
+            >
+              <label class="checkbox-container">
+                Multiselect
+                <Input @type="checkbox" />
+                <span class="checkmark"></span>
+              </label>
+            </div>
+          {{else if (eq schemaAttr "required")}}
+            <div
+              class="schema-field-renderer--attribute"
+              data-test-schema-attr={{schemaAttr}}
+            >
+              <label class="checkbox-container">
+                Required
+                <Input @type="checkbox" />
+                <span class="checkmark"></span>
+              </label>
+            </div>
           {{/if}}
-        </div>
+        {{/each}}
       </div>
     </div>
   {{/if}}
