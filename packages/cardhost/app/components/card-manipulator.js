@@ -250,32 +250,29 @@ export default class CardManipulator extends Component {
   }
 
   @action
-  beginDragging(fieldComponent, mousedownEvent) {
-    let dragState = {
-      usingKeyboard: false,
-      initialPointerX: mousedownEvent.x,
-      initialPointerY: mousedownEvent.y,
-      latestPointerX: mousedownEvent.x,
-      latestPointerY: mousedownEvent.y
-    };
+  beginDragging(/*fieldComponent, mousedownEvent*/) {
+    // let dragState = {
+    //   usingKeyboard: false,
+    //   initialPointerX: mousedownEvent.x,
+    //   initialPointerY: mousedownEvent.y,
+    //   latestPointerX: mousedownEvent.x,
+    //   latestPointerY: mousedownEvent.y
+    // };
 
-    this.isDragging = fieldComponent;
-    fieldComponent.dragState = dragState;
-    fieldComponent = fieldComponent; // eslint-disable-line no-self-assign
+    this.isDragging = true;
+    // fieldComponent.dragState = dragState;
+    // fieldComponent = fieldComponent; // eslint-disable-line no-self-assign
   }
 
-  @action dropField(position, onFinishDrop) {
-    let fieldComponent = this.isDragging;
+  @action dropField(position, onFinishDrop, evt) {
+    let type = evt.dataTransfer.getData('text');
     let field = this.card.addField({
-      type: this.fieldTypeMappings[fieldComponent.type],
+      type: this.fieldTypeMappings[type],
       position: position,
       name: this.newFieldName,
       neededWhenEmbedded: false
     });
     this.isDragging = false;
-    this.selectedField = field;
-    fieldComponent.dragState = null;
-    fieldComponent = fieldComponent; // eslint-disable-line no-self-assign
     this.selectField(field);
 
     onFinishDrop();
@@ -287,9 +284,10 @@ export default class CardManipulator extends Component {
     this.selectedField = field;
   }
 
-  @action firefoxDrag(evt) {
+  @action firefoxDrag(field, evt) {
     // Chrome dragging works with just draggable="true",
     // but Firefox requires extra handling.
-    evt.dataTransfer.setData("text", evt.target.id);
+    evt.dataTransfer.setData("text", field.type);
+    // evt.dataTransfer.setData("field", field);
   }
 }
