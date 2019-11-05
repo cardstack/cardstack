@@ -9,7 +9,7 @@ const typeToInputTypeMap = {
   '@cardstack/core-types::belongs-to': 'Dropdown',
 }
 
-export default class CardhostRightEdge extends Component {
+export default class RightEdge extends Component {
   get sectionTitle() {
     return typeToInputTypeMap[this.args.selectedField.type] || 'Text Field';
   }
