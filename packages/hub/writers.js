@@ -75,6 +75,9 @@ class Writers {
     let addedModels = [];
     let deletedModels = [];
     let changedModels = [];
+    let ignoredModels = (internalCard.included || []).filter(i => getCardId(i.id) !== id)
+      .concat(((oldCard && oldCard.included) || []).filter(i => getCardId(i.id) !== id));
+
     if (isDeletion) {
       deletedModels = [internalCard.data].concat(internalCard.included || []);
     } else if (oldCard) {
@@ -84,6 +87,10 @@ class Writers {
     } else {
       addedModels = internalCard.included || [];
     }
+
+    addedModels = differenceBy(addedModels, ignoredModels, i => `${i.type}/${i.id}`);
+    deletedModels = differenceBy(deletedModels, ignoredModels, i => `${i.type}/${i.id}`);
+    changedModels = differenceBy(changedModels, ignoredModels, i => `${i.type}/${i.id}`);
 
     let beforeFinalize = async () => {
       // This assumes that the session used to update cards also posseses permissions to CRUD schema models and internal card models
@@ -97,7 +104,7 @@ class Writers {
         includedResource.meta = merge({}, includedResource.meta, meta);
       }
       for (let resource of changedModels) {
-        let { data: { meta } } =await this.update(session, resource.type, resource.id, {
+        let { data: { meta } } = await this.update(session, resource.type, resource.id, {
           data: resource,
           included: [internalCard.data].concat(internalCard.included || [])
         }, schema);
@@ -109,8 +116,10 @@ class Writers {
 
     // Don't delete schema until after the card model has been updated so that
     // you don't end up with a content type referring to a missing field
-    let afterFinalize = async () => {
-      let updatedSchema = await this._deleteInternalCardResources(session, schema, deletedModels);
+    let afterFinalize = async (originalDocumentSchema, newDocumentSchema) => {
+      // Any schema that needs to be deleted should leverage the schema derived from the document from before it was updated
+      // as the new schema, by merit of the fact we are deleting it, no longer describes this resource
+      let updatedSchema = await this._deleteInternalCardResources(session, originalDocumentSchema || newDocumentSchema, deletedModels);
       // deleting card schema can result in deleted schema resource which will need to be shared with the outside world
       return updatedSchema;
     };
@@ -221,7 +230,7 @@ class Writers {
       await batch.done();
 
       if (typeof afterFinalize === 'function') {
-        schema = await afterFinalize();
+        schema = await afterFinalize(pending.originalDocumentContext.schema, schema);
       }
       if (newSchema) {
         this.currentSchema.invalidateCache();
@@ -267,7 +276,7 @@ class Writers {
       await batch.done();
 
       if (typeof afterFinalize === 'function') {
-        schema = await afterFinalize();
+        schema = await afterFinalize(schema);
       }
       if (newSchema) {
         this.currentSchema.invalidateCache();

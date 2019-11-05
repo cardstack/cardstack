@@ -88,7 +88,7 @@ async function loadCard(schema: todo, internalCard: SingleResourceDoc, getIntern
 
   // a searcher or indexer may be returning invalid cards, so we
   // need to make sure to validate the internal card format.
-  await validateInternalCardFormat(schema, internalCard, getInternalCard);
+  await validateInternalCardFormat(schema, internalCard);
 
   await generateCardModule(internalCard);
   return await getCardSchemas(schema, internalCard, getInternalCard);
@@ -101,7 +101,7 @@ function getCardId(id: string | number | undefined) {
   return cardContextToId({ repository, packageName });
 }
 
-async function validateInternalCardFormat(schema: todo, internalCard: SingleResourceDoc, getInternalCard: todo) {
+async function validateInternalCardFormat(schema: todo, internalCard: SingleResourceDoc) {
   let id = internalCard.data.id as string;
   let type = internalCard.data.type as string;
   if (!id) { throw new Error(`The card ID must be supplied in the card document`, { status: 400, source: { pointer: '/data/id' }}); }
@@ -131,22 +131,6 @@ async function validateInternalCardFormat(schema: todo, internalCard: SingleReso
 
   // TODO need validation for included with missing id?
   if (!internalCard.included) { return; }
-
-  let chain = (await adoptionChain(internalCard, getInternalCard)).map((i: SingleResourceDoc) => i.data.id).filter(Boolean);
-  let foreignIncludedIndex = (internalCard.included || []).findIndex(i =>
-    !isInternalCard(i.type, i.id) &&
-    i.id != null && (
-      (!schema.isSchemaType(i.type) && !i.type.includes(id)) ||
-      (
-        !i.id.includes(id) &&
-        !chain.some(aid => i.id != null && aid != null && i.id.includes(aid))
-      )
-    )
-  );
-
-  if (foreignIncludedIndex > -1 ) {
-    throw new Error(`The card '${id}' contains included foreign internal models '${internalCard.included[foreignIncludedIndex].type}/${internalCard.included[foreignIncludedIndex].id}`, { status: 400, source: { pointer: `/included/${foreignIncludedIndex}`}});
-  }
 }
 
 async function adoptionChain(cardInInternalOrExternalFormat: SingleResourceDoc, getInternalCard: todo) {
@@ -156,6 +140,7 @@ async function adoptionChain(cardInInternalOrExternalFormat: SingleResourceDoc, 
 
   while (adoptedFromId = get(currentCard, 'data.relationships.adopted-from.data.id')) { // eslint-disable-line no-cond-assign
     currentCard = await getInternalCard(adoptedFromId);
+    if (!currentCard) { break; }
     chain.push(currentCard);
   }
   return chain;
@@ -587,7 +572,10 @@ async function adaptCardToFormat(schema: todo, session: Session, internalCard: S
   let currentPriviledgedCardResource: ResourceObject = priviledgedCard.data;
   while (currentAdoptedCardId = get(currentPriviledgedCardResource, 'relationships.adopted-from.data.id')) { // eslint-disable-line no-cond-assign
     let adoptedCardResource: ResourceObject | undefined = (priviledgedCard.included || []).find(i => `${i.type}/${i.id}` === `${currentAdoptedCardId}/${currentAdoptedCardId}`);
-    if (!adoptedCardResource) { throw new Error(`Couldn't find adopted card '${currentAdoptedCardId}' in the included resources of the card '${id}'--make sure default-includes is working correctly.`); }
+    if (!adoptedCardResource) {
+      log.warn(`Couldn't find adopted card '${currentAdoptedCardId}' in the included resources of the card '${id}'. This is a legitimate scenario if the card we adopt is deleted (i.e. test cleanup); otherwise, make sure default-includes is working correctly.`);
+      throw new Error(`Couldn't find adopted card '${currentAdoptedCardId}' in the included resources of the card '${id}'--make sure default-includes is working correctly.`);
+    }
     priviledgedAdoptedCardResources.push(adoptedCardResource);
     currentPriviledgedCardResource = adoptedCardResource;
   }
@@ -644,7 +632,7 @@ async function adaptCardToFormat(schema: todo, session: Session, internalCard: S
   // Construct the relationship type fields that will be hoisted as metadata
   let relationships: RelationshipsObject = {};
   for (let rel of Object.keys(internalCard.data.relationships || {})) {
-    if (rel === 'fields' || !internalCard.data.relationships) { continue; }
+    if (rel === 'fields' || rel === 'adopted-from' || !internalCard.data.relationships) { continue; }
     let linkage: ResourceLinkage = get(internalCard, `data.relationships.${rel}.data`);
     if (Array.isArray(linkage)) {
       relationships[rel] = {
