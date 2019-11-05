@@ -2,8 +2,10 @@
   <aside class="cardhost-welcome-left-edge" data-test-cardhost-welcome-left-edge>
     <nav class="cardhost-welcome-left-edge--nav">
       <ul>
-        <li><div class="left-edge-icon recent">Recent Cards</div></li>
-        <li><div class="left-edge-icon add-card">Add Card</div></li>
+        <li><div class="left-edge-icon recent active">Recent Cards</div></li>
+        <li><div class="left-edge-icon saved">Saved Templates</div></li>
+        <li><div class="left-edge-icon common">Common Cards</div></li>
+        <li><div class="left-edge-icon add-card">New Blank Card</div></li>
       </ul>
     </nav>
   </aside>
@@ -37,9 +39,33 @@
       </div>
     </section>
 
+    <section class="cardhost-section cardhost-section--saved-templates">
+      <header class="cardhost--header--saved-templates">
+        <h2 class="cardhost-catalog--title">Saved Templates</h2>
+      </header>
+    </section>
+
+    <section class="cardhost-section cardhost-section--common-cards">
+      <header class="cardhost--header--common-cards">
+        <h2 class="cardhost-catalog--title">Common Cards</h2>
+      </header>
+
+      <div class="card-catalog">
+        <LinkTo @route="cards.add" @class="card-renderer--embedded-card-link">
+          <div class="embedded-card placeholder icon-common-form"></div>
+        </LinkTo>
+        <LinkTo @route="cards.add" @class="card-renderer--embedded-card-link">
+          <div class="embedded-card placeholder icon-common-layout"></div>
+        </LinkTo>
+        <LinkTo @route="cards.add" @class="card-renderer--embedded-card-link">
+          <div class="embedded-card placeholder icon-common-collection"></div>
+        </LinkTo>
+      </div>
+    </section>
+
     <section class="cardhost-section cardhost-section--add-card">
       <header class="cardhost--header--add-card">
-        <h2 class="cardhost-catalog--title">Add Card</h2>
+        <h2 class="cardhost-catalog--title">New Blank Card</h2>
       </header>
 
       <div class="card-catalog">
@@ -47,7 +73,7 @@
           @route="cards.add"
           @class="card-renderer--embedded-card-link"
         >
-          <div class="embedded-card">
+          <div class="embedded-card placeholder icon-add-card">
 
           </div>
         </LinkTo>
