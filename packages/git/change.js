@@ -112,6 +112,11 @@ class Change {
         continue;
       }
 
+      if (this.fetchOpts && !this.repo.isBare()) {
+        await this.repo.fetchAll(this.fetchOpts);
+        await this.repo.mergeBranches(this.targetBranch, `origin/${this.targetBranch}`, null, Merge.PREFERENCE.FASTFORWARD_ONLY);
+      }
+
       return mergeCommit.id().tostrS();
     }
 
