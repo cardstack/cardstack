@@ -111,12 +111,6 @@ a:hover {
   padding: 0 10px;
 }
 
-.cardhost-catalog {
-  margin: var(--ch-spacing);
-  padding-top: var(--ch-top-edge-height);
-  padding-left: var(--ch-left-edge-navbar-width);
-}
-
 .cardhost-catalog--title {
   margin: 0;
   font-size: 32px;
