@@ -8,7 +8,4 @@ custom CSS for each card, all cards will inherit the
   /* This is just placeholder CSS to test that everuthing works--please change as necessary */
   background-color: white;
   color: black;
-  margin: 1rem;
-  padding: .5rem;
-  border-radius: 5px;
 }

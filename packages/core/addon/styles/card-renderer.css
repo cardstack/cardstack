@@ -1,0 +1,94 @@
+.card-renderer-isolated {
+  --card-spacing: 20px;
+  --card-header-height: 50px;
+  --card-width: 496px;
+  --card-min-height: 496px;
+  --card-purple: #2e2c38;
+  --card-darker-purple: #3f3d4d;
+  --card-highlight: var(--ch-cyan, #00ebe5);
+
+  height: calc(100vh - 80px);
+}
+
+.card-renderer-isolated--header {
+  position: relative;
+  width: var(--card-width);
+  height: var(--card-header-height);
+  max-width: 100%;
+  margin: 0 auto;
+  padding: 15px var(--card-spacing) 15px 50px;
+  border-radius: 10px 10px 0 0;
+  /* TODO: icon will change depending on card content type */
+  background-image: url('/assets/images/icons/event-faded.svg');
+  background-color: var(--card-darker-purple);
+  background-position: var(--card-spacing) center;
+  background-size: 18px 20px;
+  background-repeat: no-repeat;
+  color: white;
+  font-size: 16px;
+  font-weight: 600;
+  letter-spacing: 0.24px;
+  line-height: 22px;
+  text-transform: capitalize;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  box-shadow: 0 3px 6px rgba(0, 0, 0, 0.15);
+
+  transition: background-color 250ms, color 250ms, background-image 250ms;
+}
+
+.card-renderer-isolated--header-overlay {
+  position: absolute;
+  top: 0;
+  right: 0;
+  left: 0;
+  bottom: 0;
+  background-color: var(--card-purple);
+  opacity: 0.35;
+}
+
+.card-renderer-isolated--main {
+  width: 100%;
+  height: calc(100% - var(--card-header-height));
+  padding-bottom: 80px;
+  overflow: scroll;
+}
+
+.card-renderer-isolated--content {
+  margin: 0 auto;
+  width: var(--card-width);
+  min-height: var(--card-min-height);
+  background-color: white;
+  border: 3px solid transparent;
+  border-radius: 0 0 10px 10px;
+  overflow: hidden;
+
+  transition: border-color 250ms;
+}
+
+.card-renderer-isolated.schema .card-renderer-isolated--content {
+  background-color: var(--card-purple);
+}
+
+.card-renderer-isolated.edit .card-renderer-isolated--content {
+  padding: var(--card-spacing);
+}
+
+.card-renderer-isolated:focus {
+  outline: 0; /* TODO: make this accessible */
+}
+
+.card-renderer-isolated:focus .card-renderer-isolated--header {
+  color: black;
+  background-color: var(--card-highlight);
+  background-image: url('/assets/images/icons/event.svg');
+}
+
+.card-renderer-isolated:focus .card-renderer-isolated--header-overlay {
+  visibility: hidden;
+}
+
+.card-renderer-isolated:focus .card-renderer-isolated--content {
+  border-color: var(--card-highlight);
+}

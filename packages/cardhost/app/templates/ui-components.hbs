@@ -1,0 +1,261 @@
+{{! template-lint-disable }}
+
+<section class="ui-components">
+  <h1>Cardhost UI Components</h1>
+
+  <hr>
+
+  <section class="ui-components--section">
+    <h2>Font</h2>
+    <CodeBlock
+      @code='--ch-font-family: "Open Sans", Roboto, "Helvetica Neue", Helvetica, Arial, sans-serif;'
+      @language="css"
+    />
+  </section>
+
+  <hr>
+
+  <section class="ui-components--section">
+    <h2>Color Palette</h2>
+    <div class="color-palette">
+      <div>
+        <div class="color-palette--block gray-black"></div>
+        <CodeBlock
+          @code='--ch-gray-black'
+          @language="css"
+        />
+      </div>
+      <div>
+        <div class="color-palette--block light-gray"></div>
+        <CodeBlock
+          @code='--ch-light-gray'
+          @language="css"
+        />
+      </div>
+      <div>
+        <div class="color-palette--block light-gray-d6"></div>
+        <CodeBlock
+          @code='--ch-light-gray-d6'
+          @language="css"
+        />
+      </div>
+      <div>
+        <div class="color-palette--block medium-blue-gray"></div>
+        <CodeBlock
+          @code='--ch-medium-blue-gray'
+          @language="css"
+        />
+      </div>
+      <div>
+        <div class="color-palette--block medium-dark-blue-gray"></div>
+        <CodeBlock
+          @code='--ch-medium-dark-blue-gray'
+          @language="css"
+        />
+      </div>
+      <div>
+        <div class="color-palette--block medium-darker-blue-gray"></div>
+        <CodeBlock
+          @code='--ch-medium-darker-blue-gray'
+          @language="css"
+        />
+      </div>
+      <div>
+        <div class="color-palette--block dark-blue-gray"></div>
+        <CodeBlock
+          @code='--ch-dark-blue-gray'
+          @language="css"
+        />
+      </div>
+      <div>
+        <div class="color-palette--block darker-blue-gray"></div>
+        <CodeBlock
+          @code='--ch-darker-blue-gray'
+          @language="css"
+        />
+      </div>
+      <div>
+        <div class="color-palette--block darkest-blue-gray"></div>
+        <CodeBlock
+          @code='--ch-darkest-blue-gray'
+          @language="css"
+        />
+      </div>
+      <div>
+        <div class="color-palette--block cyan"></div>
+        <CodeBlock
+          @code='--ch-cyan'
+          @language="css"
+        />
+      </div>
+      <div>
+        <div class="color-palette--block medium-purple"></div>
+        <CodeBlock
+          @code='--ch-medium-purple'
+          @language="css"
+        />
+      </div>
+    </div>
+  </section>
+
+  <hr>
+
+  <section class="ui-components--section">
+    <h2>Buttons</h2>
+
+    <section class="ui-components--section">
+      <h3>Primary button</h3>
+      <button class="ch-button">Save</button>
+      <CodeBlock
+        @code='<button class="ch-button">Save</button>'
+        @language="html"
+      />
+    </section>
+
+    <section class="ui-components--section">
+      <h3>Secondary button</h3>
+      <button class="ch-button ch-button--secondary">Preview</button>
+      <CodeBlock
+        @code='<button class="ch-button ch-button--secondary">Preview</button>'
+        @language="html"
+      />
+    </section>
+
+    <section class="ui-components--section">
+      <h3>Icon buttons (SVG button)</h3>
+      <button class="ch-button ch-button--icon user" aria-label="User"></button>
+      <button class="ch-button ch-button--icon catalog" aria-label="Catalog"></button>
+      <button class="ch-button ch-button--icon library" aria-label="Library"></button>
+      <button class="ch-button ch-button--icon share" aria-label="Share"></button>
+      <CodeBlock @code='
+        <button class="ch-button ch-button--icon user" aria-label="User"></button>
+        <button class="ch-button ch-button--icon catalog" aria-label="Catalog"></button>
+        <button class="ch-button ch-button--icon library" aria-label="Library"></button>
+        <button class="ch-button ch-button--icon share" aria-label="Share"></button>'
+        @language="html"
+      />
+    </section>
+
+    <section class="ui-components--section">
+      <h3>Secondary Icon button</h3>
+      <button class="ch-button ch-button--icon-secondary delete" aria-label="Delete"></button>
+      <CodeBlock
+        @code='<button class="ch-button ch-button--icon-secondary delete" aria-label="Delete"></button>'
+        @language="html"
+      />
+    </section>
+
+    <section class="ui-components--section">
+      <h3>Blue CTA button on default card</h3>
+      TK
+    </section>
+  </section>
+
+  <hr>
+
+  <section class="ui-components--section">
+    <h2>Dropdowns</h2>
+
+    <section class="ui-components--section">
+      <h3>View Switcher</h3>
+      <ModeSwitcher @name="" @mode="view" />
+      <CodeBlock
+        @code='<ModeSwitcher @name="[card-id-here]" @mode="[mode-here]" />'
+        @language="html"
+      />
+      <div>
+        Available modes:<br>
+        <code>view</code><br>
+        <code>edit</code><br>
+        <code>schema</code>
+      </div>
+    </section>
+
+    <section class="ui-components--section">
+      <h3>Dropdown (right edge)</h3>
+      TK
+    </section>
+  </section>
+
+  <hr>
+
+  <section class="ui-components--section">
+    <h2>Tab Switch (right-edge)</h2>
+    TK
+  </section>
+
+  <hr>
+
+  <section class="ui-components--section">
+    <h2>Search Bar</h2>
+    <div class="ch-search-bar">Search Library</div>
+    <CodeBlock
+      @code='<div class="ch-search-bar">Search Library</div>'
+      @language="html"
+    />
+  </section>
+
+  <hr>
+
+  <section class="ui-components--section">
+    <h2>Filter Bar</h2>
+    <div class="ch-filter-bar">Filter Results</div>
+    <CodeBlock
+      @code='<div class="ch-filter-bar">Filter Results</div>'
+      @language="html"
+    />
+  </section>
+
+  <hr>
+
+  <section class="ui-components--section">
+    <h2>Catalog Field</h2>
+    <div class="ch-catalog-field" role="button" draggable="true">
+      <div class="ch-catalog-field--icon" style={{css-url "background-image" "/assets/images/field-types/text.svg"}}></div>
+      <div>
+        <h4 class="ch-catalog-field--title">Text</h4>
+        <p class="ch-catalog-field--description">All-purpose text field</p>
+      </div>
+    </div>
+  </section>
+
+  <hr>
+
+  <section class="ui-components--section">
+    <h2>Catalog</h2>
+
+    <section class="ch-catalog">
+      <header class="ch-catalog--header">
+        <h3 class="ch-catalog--title">Card Catalog</h3>
+        <div class="ch-catalog--header-btns">
+          <button class="ch-catalog--header-btn sidebar active" aria-label="View as sidebar"></button>
+          <button class="ch-catalog--header-btn grid" aria-label="View as grid"></button>
+        </div>
+        <div class="ch-filter-bar">Filter Results</div>
+      </header>
+      <div class="ch-catalog--fields">
+        <div class="ch-catalog-field" role="button" draggable="true">
+          <div class="ch-catalog-field--icon" style={{css-url "background-image" "/assets/images/field-types/text.svg"}}></div>
+          <div>
+            <h4 class="ch-catalog-field--title">Text</h4>
+            <p class="ch-catalog-field--description">All-purpose text field</p>
+          </div>
+        </div>
+      </div>
+    </section>
+  </section>
+
+  <hr>
+
+  <section>
+    <h2>Card Renderer</h2>
+
+    <CardRenderer
+      @card={{this.model}}
+      @format="isolated"
+      @mode="schema"
+    />
+  </section>
+
+
+</section>

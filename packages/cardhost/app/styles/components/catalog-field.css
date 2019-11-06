@@ -1,0 +1,59 @@
+.ch-catalog-field {
+  width: 290px;
+  height: 80px;
+  display: grid;
+  grid-template-columns: 80px 1fr;
+  align-items: center;
+  border: 1px solid var(--ch-light-gray-d6);
+  border-radius: 10px;
+  background-color: white;
+}
+
+.ch-catalog-field:hover {
+  cursor: move;
+  cursor: grab;
+  cursor: -moz-grab;
+  cursor: -webkit-grab;
+}
+
+.ch-catalog-field:active {
+  cursor: grabbing;
+  cursor: -moz-grabbing;
+  cursor: -webkit-grabbing;
+}
+
+.ch-catalog-field + .ch-catalog-field {
+  margin-top: var(--ch-spacing);
+}
+
+.ch-catalog-field--icon {
+  width: 100%;
+  height: 100%;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: 20px 20px;
+}
+
+.ch-catalog-field--title,
+.ch-catalog-field--description {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.ch-catalog-field--title {
+  margin: 0;
+  color: black;
+  font-size: 16px;
+  font-weight: 600;
+  letter-spacing: 0;
+  line-height: 22px;
+}
+
+.ch-catalog-field--description {
+  margin: 0;
+  color: rgba(0, 0, 0, 0.5);
+  font-size: 11px;
+  letter-spacing: 0;
+  line-height: 15px;
+}

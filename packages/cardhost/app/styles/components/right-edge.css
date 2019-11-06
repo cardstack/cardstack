@@ -2,14 +2,13 @@
 instead use the vars in our palette css */
 
 .right-edge {
-  box-sizing: border-box;
   position: fixed;
-  right: 0;
+  right: var(--ch-spacing);
   top: 240px;
-  width: 320px;
+  width: 300px;
   background-color:#41404D;
   border-radius: 10px;
-  z-index: 2;
+  z-index: var(--ch-edges-z-index);
   opacity: .96;
 }
 
