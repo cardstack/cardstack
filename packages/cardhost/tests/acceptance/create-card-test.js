@@ -7,9 +7,7 @@ import { setupMockUser, login } from '../helpers/login';
 
 const timeout = 5000;
 const card1Id = 'millenial-puppies';
-const defaultCardId = 'default-card-id';
 const qualifiedCard1Id = `local-hub::${card1Id}`;
-const qualifiedDefaultCardId = `local-hub::${defaultCardId}`;
 
 const scenario = new Fixtures({
   create(factory) {
@@ -18,7 +16,6 @@ const scenario = new Fixtures({
   destroy() {
     return [
       { type: 'cards', id: qualifiedCard1Id },
-      { type: 'cards', id: qualifiedDefaultCardId },
     ];
   }
 });
@@ -37,12 +34,9 @@ module('Acceptance | card create', function(hooks) {
     assert.equal(currentURL(), '/cards/new');
 
     await click('[data-test-card-creator-save-btn]');
-    await waitFor(`[data-test-card-view="${defaultCardId}"]`, { timeout });
+    await waitFor('[data-test-card-view^="new-card-"]', { timeout });
 
-    assert.equal(currentURL(), `/cards/${defaultCardId}`);
-    await visit(`/cards/${defaultCardId}/schema`);
-
-    assert.dom(`[data-test-card-schema="${defaultCardId}"]`).exists();
+    assert.ok(currentURL().match(/\/cards\/new-card-[0-9]+/));
   });
 
   test('creating a card', async function(assert) {

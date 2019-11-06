@@ -5,7 +5,7 @@ export default class CardCreator extends CardManipulator {
   constructor(...args) {
     super(...args);
 
-    let defaultCardId = 'default-card-id';
+    let defaultCardId = `new-card-${Math.floor(Math.random() * 1E7)}`;
 
     this.updateCardId(defaultCardId);
     this.cardId = defaultCardId;
