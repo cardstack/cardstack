@@ -1327,6 +1327,17 @@ describe('hub/card-services', function () {
     it.skip("throws an error if you try to update a card to have a field that as the same name as an adopted field", async function() {
     });
 
+    it.skip("can change the adopted-from relationship to adopt from a different parent when there are no field conflicts", async function () {
+    });
+
+    it.skip("when a card changes adopted-from and the new parent defines the same name field as the old parent, the card's data for the field is not retained", async function() {
+      // the field's context is different in the different card, and the current data may not make sense in the new context
+    });
+
+    it.skip("when a card changes adopted-from and the new parent inherits a field from an ancestor card that the old card also inherited, the card's data for the field is retained", async function() {
+      // since both of the parent card's inherited the field from a common ancestor, the context of the field has not changed, and we should retain the data for this field
+    });
+
     it.skip("can get a card that has a belongs-to relationship to a card which uses adoption", async function () {
     });
 
