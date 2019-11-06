@@ -109,6 +109,7 @@ export default class CardManipulator extends Component {
   @tracked card;
   @tracked selectedField;
   @tracked isDragging;
+  @tracked cardId;
 
   constructor(...args) {
     super(...args);

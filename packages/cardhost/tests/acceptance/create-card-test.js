@@ -27,6 +27,18 @@ module('Acceptance | card create', function(hooks) {
     this.owner.lookup('service:data')._clearCache();
   });
 
+  test('new cards get a default id', async function(assert) {
+    await login();
+    await visit('/cards/new');
+
+    assert.equal(currentURL(), '/cards/new');
+
+    await click('[data-test-card-creator-save-btn]');
+    await waitFor('[data-test-card-view^="new-card-"]', { timeout });
+
+    assert.ok(currentURL().match(/\/cards\/new-card-[0-9]+/));
+  });
+
   test('creating a card', async function(assert) {
     await login();
     await visit('/cards/new');
