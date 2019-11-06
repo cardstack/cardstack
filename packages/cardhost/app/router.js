@@ -8,8 +8,8 @@ const Router = EmberRouter.extend({
 });
 
 Router.map(function() {
-  this.route('render');
   this.route('cards', function() {
+    this.route('render');
     this.route('add', { path: '/new'});
     this.route('view', { path: '/:id'});
     this.route('edit', { path: '/:id/edit'});

@@ -12,6 +12,7 @@
 
 .card-manipulator--container {
   position: relative;
+  top: var(--ch-top-edge-height);
   left: var(--ch-left-edge-panel-width);
   width: calc(100% - var(--ch-left-edge-panel-width));
   padding-left: 20px;
