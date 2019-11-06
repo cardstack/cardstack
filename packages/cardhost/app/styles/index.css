@@ -1,0 +1,159 @@
+.cardhost-welcome-page {
+  background-color: var(--ch-darkest-blue-gray);
+  border-radius: 10px;
+  margin: 0 auto;
+  width: calc(100vw - 200px);
+  height: calc(100vh - 140px);
+  min-width: 1100px;
+  max-width: 1400px;
+  display: flex;
+  box-shadow: 0px 15px 30px 0px rgba(0,0,0,0.25);
+}
+
+/* Left edge */
+.cardhost-welcome-left-edge {
+  background-image: url(/assets/images/cardstack-logo.svg);
+  background-repeat: no-repeat;
+  background-size: 24px 25px;
+  background-position: 40px 40px;
+  width: 250px;
+}
+
+.cardhost-welcome-left-edge--nav {
+  margin-top: 130px;
+}
+
+.cardhost-welcome-left-edge--nav ul {
+  list-style: none;
+  font-size: 13px;
+}
+
+.cardhost-welcome-left-edge--nav ul li {
+  margin-bottom: 15px;
+  line-height: 16px;
+}
+
+.cardhost-welcome-left-edge--nav ul li .left-edge-icon {
+  padding-left: 30px;
+  background-position: top left;
+  background-repeat: no-repeat;
+  background-size: 15px 15px;
+}
+
+.cardhost-welcome-left-edge--nav ul li .left-edge-icon.recent {
+  background-image: url(/assets/images/icon-clock-gray.svg);
+}
+
+.cardhost-welcome-left-edge--nav ul li .left-edge-icon.saved {
+  background-image: url(/assets/images/icon-saved-gray.svg);
+}
+
+.cardhost-welcome-left-edge--nav ul li .left-edge-icon.common {
+  background-image: url(/assets/images/icon-common-gray.svg);
+}
+
+.cardhost-welcome-left-edge--nav ul li .left-edge-icon.add-card {
+  background-image: url(/assets/images/icon-add-gray.svg);
+}
+
+.cardhost-welcome-left-edge--nav ul li .left-edge-icon.recent.active {
+  background-image: url(/assets/images/icon-clock.svg);
+}
+
+.cardhost-welcome-left-edge--nav ul li .left-edge-icon.saved.active {
+  background-image: url(/assets/images/icon-saved.svg);
+}
+
+.cardhost-welcome-left-edge--nav ul li .left-edge-icon.common.active {
+  background-image: url(/assets/images/icon-common.svg);
+}
+
+.cardhost-welcome-left-edge--nav ul li .left-edge-icon.add-card.active {
+  background-image: url(/assets/images/icon-add.svg);
+}
+
+/* Catalog */
+.cardhost-catalog {
+  margin: 60px;
+  width: calc(100% - 250px);
+  overflow-y: scroll;
+}
+
+.cardhost-catalog .cardhost-section {
+  padding-bottom: 60px;
+  margin-bottom: 60px;
+  border-bottom: solid 1px var(--ch-medium-dark-blue-gray);
+}
+
+.cardhost-catalog .card-catalog {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  grid-gap: 30px;
+  justify-content: space-between;
+  margin: 0 20px;
+}
+
+.cardhost-catalog header {
+  background-position: center left;
+  background-repeat: no-repeat;
+  background-size: 36px 36px;
+  padding-left: 60px;
+  margin-bottom: 60px;
+}
+
+.cardhost-catalog header.cardhost--header--recent-cards {
+  background-image: url(/assets/images/icon-clock.svg);
+}
+
+.cardhost-catalog header.cardhost--header--saved-templates {
+  background-image: url(/assets/images/icon-saved.svg);
+}
+
+.cardhost-catalog header.cardhost--header--common-cards {
+  background-image: url(/assets/images/icon-common.svg);
+}
+
+.cardhost-catalog header.cardhost--header--add-card {
+  background-image: url(/assets/images/icon-add-cyan.svg);
+}
+
+.cardhost-catalog .card-catalog .embedded-card {
+  border-radius: 15px;
+  padding: 20px;
+  margin: 0;
+  font-size: 18px;
+}
+
+.card-catalog .card-renderer--embedded-card-link {
+  width: 225px;
+}
+
+.card-catalog > .card-renderer--embedded-card-link > .embedded-card {
+  height: 225px;
+}
+
+.cardhost-section .card-catalog .embedded-card.placeholder {
+  background-color: var(--ch-light-blue-gray);
+  background-position: center center;
+  background-repeat: no-repeat;
+  background-size: 50px 56px;
+}
+
+.cardhost-section .card-catalog .embedded-card.placeholder.icon-common-form {
+  background-image: url(/assets/images/icon-common-form.svg);
+}
+.cardhost-section .card-catalog .embedded-card.placeholder.icon-common-layout {
+  background-image: url(/assets/images/icon-common-layout.svg);
+}
+.cardhost-section .card-catalog .embedded-card.placeholder.icon-common-collection {
+  background-image: url(/assets/images/icon-common-collection.svg);
+}
+.cardhost-section .card-catalog .embedded-card.placeholder.icon-add-card {
+  background-image: url(/assets/images/icon-blank-card.svg);
+}
+
+.cardhost-section .embedded-card-label {
+  font-size: 13px;
+  text-align: center;
+  padding-top: 30px;
+}

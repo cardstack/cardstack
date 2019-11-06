@@ -1,60 +1,85 @@
-<CardhostTopEdge>
-  <nav class="cardhost--topnav">
-    <ul>
-      <li>
-        <LinkTo @route="render">Render Card</LinkTo>
-      </li>
-      <li>
-        <LinkTo @route="cards.add">Add a Card</LinkTo>
-      </li>
-      <li>
-        <Input
-          @size="60"
-          @value={{this.cardId}}
-          @placeholder="Card ID to View"
-          @enter={{action this.viewCard this.cardId}}
-        />
-        {{#if this.cardId}}
-          <LinkTo @route="cards.view" @model={{this.cardId}}>View Card</LinkTo>
-        {{/if}}
-      </li>
-    </ul>
-  </nav>
-</CardhostTopEdge>
+<div class="cardhost-welcome-page">
+  <aside class="cardhost-welcome-left-edge" data-test-cardhost-welcome-left-edge>
+    <nav class="cardhost-welcome-left-edge--nav">
+      <ul>
+        <li><div class="left-edge-icon recent active">Recent Cards</div></li>
+        <li><div class="left-edge-icon saved">Saved Templates</div></li>
+        <li><div class="left-edge-icon common">Common Cards</div></li>
+        <li><div class="left-edge-icon add-card">New Blank Card</div></li>
+      </ul>
+    </nav>
+  </aside>
+  <main class="cardhost-catalog">
+    <section class="cardhost-section cardhost-section--recent-cards">
+      <header class="cardhost--header--recent-cards">
+        <h2 class="cardhost-catalog--title">Recent Cards</h2>
+      </header>
 
-<CardhostLeftEdge />
+      <div class="card-catalog">
+        {{#each this.model as |card|}}
+          {{#if (eq card.name "@cardstack/base-card")}}
+            {{!--
+              The template for cards is too terse to really show anything for the base card,
+              so just providing a link to the base card instead of rendering it in an embedded
+              format.
+            --}}
+            <LinkTo
+              @route="cards.view"
+              @model="@cardstack/base-card"
+              @class="card-renderer--embedded-card-link"
+            >
+              <div class="embedded-card cardstack_base-card">
+                Base Card
+              </div>
+            </LinkTo>
+          {{else}}
+            <CardRenderer @card={{card}} @format="embedded"/>
+          {{/if}}
+        {{/each}}
+      </div>
+    </section>
 
-<section class="cardhost-catalog">
-  <header>
-    <h2 class="cardhost-catalog--title">Catalog</h2>
-    <p>
-      Right now we are emulating a catalog by just listing out all the cards in
-      the local store. Any card that you create or view will be added to the list below.
-      (Store invalidation as a result of editing cards will actually clear cards from the store,
-      in which case you may need to revisit cards again to reinsert entries back into the store.)
-    </p>
-  </header>
+    <section class="cardhost-section cardhost-section--saved-templates">
+      <header class="cardhost--header--saved-templates">
+        <h2 class="cardhost-catalog--title">Saved Templates</h2>
+      </header>
+    </section>
 
-  <div class="card-catalog">
-    {{#each this.model as |card|}}
-      {{#if (eq card.name "@cardstack/base-card")}}
-        {{!--
-          The template for cards is too terse to really show anything for the base card,
-          so just providing a link to the base card instead of rendering it in an embedded
-          format.
-        --}}
+    <section class="cardhost-section cardhost-section--common-cards">
+      <header class="cardhost--header--common-cards">
+        <h2 class="cardhost-catalog--title">Common Cards</h2>
+      </header>
+
+      <div class="card-catalog">
+        <LinkTo @route="cards.add" @class="card-renderer--embedded-card-link">
+          <div class="embedded-card placeholder icon-common-form"></div>
+          <div class="embedded-card-label">Form</div>
+        </LinkTo>
+        <LinkTo @route="cards.add" @class="card-renderer--embedded-card-link">
+          <div class="embedded-card placeholder icon-common-layout"></div>
+          <div class="embedded-card-label">Layout</div>
+        </LinkTo>
+        <LinkTo @route="cards.add" @class="card-renderer--embedded-card-link">
+          <div class="embedded-card placeholder icon-common-collection"></div>
+          <div class="embedded-card-label">Collection</div>
+        </LinkTo>
+      </div>
+    </section>
+
+    <section class="cardhost-section cardhost-section--add-card">
+      <header class="cardhost--header--add-card">
+        <h2 class="cardhost-catalog--title">New Blank Card</h2>
+      </header>
+
+      <div class="card-catalog">
         <LinkTo
-          @route="cards.view"
-          @model="@cardstack/base-card"
+          @route="cards.add"
           @class="card-renderer--embedded-card-link"
         >
-          <div class="embedded-card cardstack_base-card">
-            Base Card
-          </div>
+          <div class="embedded-card placeholder icon-add-card"></div>
+          <div class="embedded-card-label">Blank Card</div>
         </LinkTo>
-      {{else}}
-        <CardRenderer @card={{card}} @format="embedded"/>
-      {{/if}}
-    {{/each}}
-  </div>
-</section>
+      </div>
+    </section>
+  </main>
+</div>

@@ -9,7 +9,7 @@ function setMockUser(userId) {
 }
 
 export async function login() {
-  await visit('/');
+  await visit('/cards');
   setMockUser('user1');
   await click('#login-button');
   await waitFor('#logout-button');

@@ -1,0 +1,5 @@
+.cardhost-cards-page {
+  background-color: var(--ch-dark-blue-gray);
+  min-height: 100vh;
+  min-width: 100vw;
+}
