@@ -1,0 +1,15 @@
+.ch-search-bar {
+  width: 227px;
+  height: 40px;
+  padding: 10px 15px 10px 45px;
+  background-color: var(--ch-dark-blue-gray);
+  background-image: url('/assets/images/icons/search-active.svg');
+  background-position: 15px center;
+  background-size: 15px 15px;
+  background-repeat: no-repeat;
+  border: 1px solid var(--ch-medium-blue-gray);
+  border-radius: 100px;
+  color: white;
+  font: 400 13px/18px var(--ch-font-family);
+  letter-spacing: 0.455px;
+}

@@ -10,10 +10,9 @@
   align-items: center;
   height: 40px;
   width: var(--width);
-  margin-left: calc((100% - var(--width)) / 2);
   padding: 0 60px;
   background-color: var(--ch-dark-blue-gray);
-  background-image: var(--mode-icon), url('/assets/images/icon-carrot.svg');
+  background-image: var(--mode-icon), url('/assets/images/icons/carot-down-active.svg');
   background-position: 20px center, right 20px center;
   background-repeat: no-repeat;
   background-size: 18px 17px, 10px 6px;
@@ -28,15 +27,15 @@
 }
 
 .mode-switcher.schema {
-  --mode-icon: url('/assets/images/icon-schema.svg');
+  --mode-icon: url('/assets/images/icons/schema-active.svg');
 }
 
 .mode-switcher.edit {
-  --mode-icon: url('/assets/images/icon-form.svg');
+  --mode-icon: url('/assets/images/icons/form-active.svg');
 }
 
 .mode-switcher.view {
-  --mode-icon: url('/assets/images/icon-layout.svg');
+  --mode-icon: url('/assets/images/icons/layout-active.svg');
 }
 
 .mode-switcher + * {

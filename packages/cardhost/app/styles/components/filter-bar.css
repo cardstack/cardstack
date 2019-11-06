@@ -1,0 +1,11 @@
+.ch-filter-bar {
+  width: 292px;
+  height: 30px;
+  padding: 0.5em 1em;
+  background-color: white;
+  border: 1px solid var(--ch-light-gray-d6);
+  border-radius: 100px;
+  color: rgba(0, 0, 0, 0.5);
+  font: 400 13px/18px var(--ch-font-family);
+  letter-spacing: 0.455px;
+}

@@ -1,7 +1,7 @@
 .cardhost-welcome-page {
   background-color: var(--ch-darkest-blue-gray);
   border-radius: 10px;
-  margin: 0 auto;
+  margin: 60px auto;
   width: calc(100vw - 200px);
   height: calc(100vh - 140px);
   min-width: 1100px;

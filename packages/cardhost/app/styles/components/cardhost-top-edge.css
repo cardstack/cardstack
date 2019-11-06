@@ -1,9 +1,40 @@
 .cardhost-top-edge {
+  --padding-left: var(--ch-left-edge-width);
+  --padding-right: var(--ch-right-edge-width);
+
+  padding-left: var(--padding-left);
+  padding-right: var(--padding-right);
+  height: var(--ch-top-edge-height);
   position: fixed;
-  top: var(--ch-header-height);
+  top: 0;
   right: 0;
   left: 0;
-  padding: 20px 20px 20px 100px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
   text-align: right;
   z-index: var(--ch-edges-z-index);
+}
+
+.cardhost-top-edge.schema {
+  --padding-left: calc(var(--ch-left-edge-panel-width) + var(--ch-left-edge-navbar-width));
+}
+
+
+.login-box {
+  position: fixed;
+  top: var(--ch-spacing);
+  left: calc(var(--padding-left) + var(--ch-spacing));
+  z-index: var(--ch-edges-z-index);
+}
+
+.login-box > button {
+  --background: none;
+  --border-radius: 10px;
+  --border: 2px solid var(--ch-light-gray-d6);
+  --color: white;
+}
+
+.login-box > button:hover {
+  --color: var(--ch-cyan);
 }

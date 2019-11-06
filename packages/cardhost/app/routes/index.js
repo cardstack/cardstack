@@ -12,6 +12,7 @@ export default class IndexRoute extends Route {
     await this.data.getCard('local-hub::@cardstack/base-card', 'isolated');
     if (environment === 'development') {
       await this.data.getCard('local-hub::why-doors', 'isolated');
+      await this.data.getCard('local-hub::event', 'isolated');
     }
     return await this.data.allCardsInStore();
   }

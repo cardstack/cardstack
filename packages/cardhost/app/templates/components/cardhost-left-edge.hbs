@@ -1,9 +1,15 @@
 <aside class="cardhost-left-edge" data-test-cardhost-left-edge>
   <nav class="cardhost-left-edge--nav">
     <ul>
-      <li><div class="profile icon"></div></li>
-      <li><div class="catalog icon active"></div></li>
-      <li><div class="library icon"></div></li>
+      <li><button class="ch-button ch-button--icon user" aria-label="User"></button></li>
+      <li>
+        <button
+          class="ch-button ch-button--icon catalog {{if (eq @mode "schema") "active"}}"
+          aria-label="Catalog"
+        >
+        </button>
+      </li>
+      <li><button class="ch-button ch-button--icon library" aria-label="Library"></button></li>
     </ul>
   </nav>
 

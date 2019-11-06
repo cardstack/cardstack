@@ -1,0 +1,21 @@
+.drop-zone {
+  padding: 20px 0;
+  background-color: var(--ch-medium-darker-blue-gray);
+}
+
+.drop-zone .drop-zone-text {
+  opacity: 0.5;
+  padding: var(--ch-spacing);
+  background-color: var(--ch-medium-purple);
+  color: white;
+  font-size: 16px;
+  line-height: 22px;
+  text-align: center;
+  border-top: 1px solid rgba(255, 255, 255, 0.15);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.15);
+  transition: opacity 250ms;
+}
+
+.drop-zone .drop-zone-text.active {
+  opacity: 1;
+}

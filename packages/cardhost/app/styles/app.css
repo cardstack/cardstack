@@ -1,12 +1,18 @@
 @import '/assets/fonts.css';
 @import '/assets/palette.css';
+@import '/assets/ui-components.css';
+
 @import '/assets/components/right-edge.css';
 @import '/assets/index.css';
 @import '/assets/cards.css';
 @import '/assets/components/mode-switcher.css';
-@import '/assets/components/card-manipulator.css';
 @import '/assets/components/cardhost-left-edge.css';
 @import '/assets/components/cardhost-top-edge.css';
+@import '/assets/components/button.css';
+@import '/assets/components/search-bar.css';
+@import '/assets/components/filter-bar.css';
+@import '/assets/components/catalog.css';
+@import '/assets/components/catalog-field.css';
 
 
 /* TODO eventually these will be dynamically added to the DOM.
@@ -39,12 +45,17 @@ Until that work is done we are statically adding this css
   --ch-top-edge-height: 80px;
   --ch-header-height: 70px;
   --ch-edges-z-index: 10;
+  --ch-spacing: 20px;
 
   --ch-left-edge-width: var(--ch-left-edge-navbar-width);
-  --ch-right-edge-width: var(--ch-right-edge-navbar-width);
+  --ch-right-edge-width: calc(var(--ch-right-edge-panel-width) + var(--ch-spacing));
 }
 
-/* TODO: link and button focus and disabled states styling */
+/*
+  TODO:
+  - better positioning for edges (esp on/off state)
+  - link and button focus and disabled states styling
+*/
 
 * {
   box-sizing: border-box;
@@ -77,100 +88,12 @@ a:hover {
   cursor: pointer;
 }
 
-/* Can use this class to make links have button styling */
-.ch-button,
-button {
-  --margin: 0;
-  --padding: 10px 15px;
-  --width: 100px;
-  --height: 40px;
-  --color: var(--ch-gray-black);
-  --background: var(--ch-cyan);
-  --font: 600 13px/18px "Open Sans";
-  --letter-spacing: 0.46px;
-  --border: 1px solid transparent;
-  --border-radius: 100px;
-
-  display: inline-block;
-  margin: var(--margin);
-  padding: var(--padding);
-  height: var(--height);
-  min-width: var(--width);
-  color: var(--color);
-  background: var(--background);
-  font: var(--font);
-  letter-spacing: var(--letter-spacing);
-  border: var(--border);
-  border-radius: var(--border-radius);
-  text-align: center;
-}
-
-.ch-button--secondary {
-  --color: var(--ch-cyan);
-  --background: var(--ch-dark-blue-gray);
-  --border: 1px solid var(--ch-medium-blue-gray);
-}
-
-button:hover,
-.ch-button:hover {
-  --color: white;
-
-  cursor: pointer;
-}
-
-.ch-button + .ch-button,
-button + button {
-  margin-left: 10px;
-}
-
-.ch-button-group {
-  display: flex;
-}
-
-
-/******* Below here should be refactored *********/
-.cardhost {
-  position: relative;
-  /* margin-top: calc(var(--ch-top-edge-height) + var(--ch-header-height)); */
-  margin-top: var(--ch-header-height);
-  margin-left: var(--ch-left-edge-width);
-  margin-right: var(--ch-right-edge-width);
-}
-
-/* Temp app header */
-.cardhost--header {
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  height: var(--ch-header-height);
-  padding: 20px;
-  background-color: var(--ch-darkest-blue-gray);
-  color: white;
-  z-index: var(--ch-edges-z-index);
-}
-
-.cardhost--header > h1 {
-  margin: 0;
-  padding: 0;
-}
-
-.cardhost--header > button {
-  --background: none;
-  --border-radius: 10px;
-  --border: 2px solid var(--ch-light-gray-d6);
-  --color: white;
-}
-
-.cardhost--header > button:hover {
-  --color: var(--ch-cyan);
-}
-
 
 /* Index template */
+.cardhost--topnav {
+  margin: 0 auto;
+}
+
 .cardhost--topnav ul {
   list-style-type: none;
   margin: 0;
@@ -188,34 +111,90 @@ button + button {
   padding: 0 10px;
 }
 
+.cardhost-catalog {
+  margin: var(--ch-spacing);
+  padding-top: var(--ch-top-edge-height);
+  padding-left: var(--ch-left-edge-navbar-width);
+}
+
 .cardhost-catalog--title {
   margin: 0;
   font-size: 32px;
   font-weight: 200;
 }
 
+
 /* Other */
+.login-button {
+  position: absolute;
+  top: var(--ch-spacing);
+  left: 430px;
+}
+
+.card-renderer--top-edge-buttons {
+  position: fixed;
+  top: var(--ch-spacing);
+  right: var(--ch-spacing);
+}
+
+.card-creator,
+.card-schema-updator,
 .card-editor,
-.cards-view {
-  padding: 20px;
+.card-view {
+  --padding-top: var(--ch-top-edge-height);
+  --padding-left: var(--ch-left-edge-width);
+  --padding-right: var(--ch-right-edge-width);
+
+  height: 100vh;
+  overflow: hidden;
+  padding-top: var(--padding-top);
+  padding-left: var(--padding-left);
+  padding-right: var(--padding-right);
+}
+
+.card-creator,
+.card-schema-updator {
+  --padding-left: calc(var(--ch-left-edge-panel-width) + var(--ch-left-edge-navbar-width));
+
+  width: 100vw;
+  height: 100vh;
+  background-image: url('/assets/images/schema-grid.svg');
+  background-size: 3000px;
+  background-position: center;
+  background-repeat: no-repeat;
+}
+
+.card-schema-updator--search-bar {
+  position: absolute;
+  right: var(--ch-spacing);
+  bottom: var(--ch-spacing);
+}
+
+.card-creator--new-card {
+  width: 300px;
+  margin-bottom: var(--ch-spacing);
 }
 
 .field-creator--field-btn-wrapper {
   text-align: right;
 }
 
-/* Temp JSON card document section */
-.cardhost-card-document {
-  max-width: 100%;
-  padding: 40px 0;
-  font-size: 12px;
-  overflow-x: scroll;
+.status-message-box {
+  position: absolute;
+  top: var(--ch-top-edge-height);
+  left: var(--ch-left-edge-width);
+  padding: var(--ch-spacing);
+  font-weight: 700;
 }
+.status-message-box.schema {
+  --ch-left-edge-width: 410px;
+}
+
 
 /* Temp Right Edge styles */
 .cardhost-right-edge {
   position: fixed;
-  top: calc(var(--ch-header-height) + var(--ch-top-edge-height));
+  top: var(--ch-top-edge-height);
   right: 0;
   margin: 0;
   padding: 0 20px;
@@ -246,4 +225,15 @@ button + button {
   padding: 10px 0 25px;
   font-size: 16px;
   text-transform: capitalize;
+}
+
+
+/* JSON card document */
+.cardhost-card-document {
+  visibility: hidden;
+  height: 0;
+  overflow: hidden;
+}
+.cardhost-card-document--codeblock {
+  height: 0;
 }

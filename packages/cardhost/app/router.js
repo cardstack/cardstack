@@ -15,6 +15,7 @@ Router.map(function() {
     this.route('edit', { path: '/:id/edit'});
     this.route('schema', { path: '/:id/schema'});
   });
+  this.route('ui-components');
 });
 
 export default Router;

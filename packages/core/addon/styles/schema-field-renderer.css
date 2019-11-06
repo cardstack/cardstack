@@ -1,0 +1,65 @@
+.field-renderer.schema-field {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: var(--field-renderer-max-width);
+  max-width: 100%;
+  background-color: var(--field-renderer-bg);
+  color: black;
+  font-size: 16px;
+}
+
+.schema-field-renderer {
+  width: var(--field-renderer-inner-max-width);
+  max-width: 100%;
+  background-color: white;
+  border: none;
+  border-radius: 5px;
+  overflow: hidden;
+}
+
+.schema-field-renderer--header {
+  width: 100%;
+  padding: 0.5em 1em;
+  background-color: var(--field-renderer-header-bg);
+  color: white;
+  font-size: 16px;
+  font-weight: 600;
+  letter-spacing: 0.24px;
+  line-height: 22px;
+  text-transform: capitalize;
+}
+
+.schema-field-renderer--attributes {
+  padding: 1em;
+}
+
+.schema-field-renderer--attribute + .schema-field-renderer--attribute {
+  padding-top: 1em;
+}
+
+.schema-field-renderer--label,
+.schema-field-renderer--attribute-name {
+  display: block;
+  padding-bottom: 0.5em;
+  color: rgba(0, 0, 0, 0.5);
+  font-size: 11px;
+  letter-spacing: 0.35px;
+  line-height: 1;
+  text-transform: capitalize;
+}
+
+.schema-field-renderer--attribute-value {
+  margin: 0;
+  font-size: 16px;
+  letter-spacing: 0.15px;
+  line-height: 22px;
+}
+
+.schema-field-renderer--input {
+  width: calc(100% - 20px);
+  margin: 0;
+  padding: 10px;
+  border-radius: 5px;
+  font-size: 16px;
+}

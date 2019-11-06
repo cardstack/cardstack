@@ -1,0 +1,104 @@
+.ch-button {
+  --margin: 0;
+  --padding: 10px 15px;
+  --width: 100px;
+  --height: 40px;
+  --color: var(--ch-gray-black);
+  --background: var(--ch-cyan);
+  --font: 600 13px/18px "Open Sans";
+  --letter-spacing: 0.46px;
+  --border: 1px solid transparent;
+  --border-radius: 100px;
+  --box-shadow: none;
+
+  display: inline-block;
+  margin: var(--margin);
+  padding: var(--padding);
+  height: var(--height);
+  min-width: var(--width);
+  color: var(--color);
+  background: var(--background);
+  font: var(--font);
+  letter-spacing: var(--letter-spacing);
+  border: var(--border);
+  border-radius: var(--border-radius);
+  box-shadow: var(--box-shadow);
+  text-align: center;
+}
+
+.ch-button--secondary {
+  --color: var(--ch-cyan);
+  --background: var(--ch-dark-blue-gray);
+  --border: 1px solid var(--ch-medium-blue-gray);
+}
+
+.ch-button--icon-secondary {
+  --icon-url: url('');
+  --width: 40px;
+  --height: 40px;
+  --color: var(--ch-cyan);
+  --background: var(--icon-url) center/var(--icon-size) no-repeat;
+  --border: 1px solid var(--ch-medium-blue-gray);
+  --border-radius: 50%;
+
+  background-color: var(--ch-dark-blue-gray);
+}
+
+.ch-button--icon-secondary.delete {
+  --icon-url: url('/assets/images/icons/trash-active.svg');
+  --icon-size: 17px 20px;
+}
+
+
+.ch-button--icon {
+  --width: 40px;
+  --height: 40px;
+  --padding: 0;
+  --border: none;
+  --border-radius: auto;
+  --icon-url: url('');
+  --background: var(--icon-url) center/40px 40px no-repeat;
+  --box-shadow: 0 3px 6px rgba(0, 0, 0, 0.15);
+}
+
+.ch-button--icon.share {
+  --icon-url: url('/assets/images/buttons/share.svg');
+}
+
+.ch-button--icon.user {
+  --icon-url: url('/assets/images/buttons/user.svg');
+}
+.ch-button--icon.user:hover {
+  --icon-url: url('/assets/images/buttons/user-active.svg');
+}
+
+.ch-button--icon.catalog {
+  --icon-url: url('/assets/images/buttons/catalog.svg');
+}
+
+.ch-button--icon.catalog.active,
+.ch-button--icon.catalog:hover,
+.ch-button--icon.catalog:active {
+  --icon-url: url('/assets/images/buttons/catalog-active.svg');
+}
+
+.ch-button--icon.library {
+  --icon-url: url('/assets/images/buttons/library.svg');
+}
+.ch-button--icon.library:hover {
+  --icon-url: url('/assets/images/buttons/library-active.svg');
+}
+
+.ch-button:hover {
+  --color: white;
+
+  cursor: pointer;
+}
+
+.ch-button + .ch-button {
+  margin-left: 10px;
+}
+
+.ch-button-group {
+  display: flex;
+}

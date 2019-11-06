@@ -1,17 +1,19 @@
-<CardhostTopEdge>
+<CardhostTopEdge @mode="view">
   <ModeSwitcher @name={{this.model.name}} @mode="view" />
 </CardhostTopEdge>
 
 <CardhostLeftEdge />
 
-<div class="cards-view" data-test-card-view={{this.model.name}}>
+<section class="card-view" data-test-card-view={{this.model.name}}>
   <CardRenderer @card={{this.model}} @format="isolated"/>
+</section>
 
-  <section class="cardhost-card-document">
-    <h3>Card Document</h3>
-    <CodeBlock
-      @code={{this.cardJson}}
-      @language="javascript"
-    />
-  </section>
-</div>
+{{!-- Hidden --}}
+<section class="cardhost-card-document">
+  <h3>Card Document</h3>
+  <CodeBlock
+    class="cardhost-card-document--codeblock"
+    @code={{this.cardJson}}
+    @language="javascript"
+  />
+</section>

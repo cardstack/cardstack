@@ -1,8 +1,8 @@
 .cardhost-left-edge {
   position: fixed;
-  top: var(--ch-header-height);
-  height: calc(100% - var(--ch-header-height));
+  top: 0;
   left: 0;
+  height: 100%;
   display: flex;
   flex-flow: row nowrap;
   z-index: var(--ch-edges-z-index);
@@ -16,7 +16,7 @@
 .cardhost-left-edge--nav > ul {
   display: flex;
   flex-flow: column nowrap;
-  justify-content: space-between;
+  justify-content: flex-end;
   align-items: center;
   height: 100%;
   margin: 0;
@@ -24,85 +24,10 @@
   list-style-type: none;
 }
 
-.cardhost-left-edge--nav .icon {
-  width: 40px;
-  height: 40px;
-  background-size: 40px 40px;
-  background-position: center;
-  background-repeat: no-repeat;
-  box-shadow: 0 3px 6px rgba(0, 0, 0, 0.15);
-  fill: var(--ch-cyan);
+.cardhost-left-edge--nav li + li {
+  margin-top: 20px;
 }
 
-.cardhost-left-edge--nav .icon.profile {
-  background-image: url('/assets/images/icon-profile.svg');
-}
-
-.cardhost-left-edge--nav .icon.catalog {
-  background-image: url('/assets/images/icon-catalog.svg');
-  border-radius: 5px;
-}
-
-.cardhost-left-edge--nav .icon.library {
-  background-image: url('/assets/images/icon-library.svg');
-}
-
-
-.cardhost-left-edge--catalog {
-  /* min-height: var(--ch-container-min-height); */
-  width: var(--ch-left-edge-panel-width);
-  padding: 30px 20px;
-  background-color: var(--ch-light-gray);
-  color: black;
-  overflow-y: scroll;
-}
-
-.cardhost-left-edge--catalog .title {
-  margin: 0;
-  padding-bottom: 50px;
-  font-size: 20px;
-  font-weight: 600;
-  line-height: 1;
-}
-
-.cardhost-left-edge--catalog-field {
-  position: relative;
-  display: flex;
-  border: 1px solid var(--ch-light-gray-d6);
-  border-radius: 10px;
-  background-color: white;
-}
-
-.cardhost-left-edge--catalog-field + .cardhost-left-edge--catalog-field {
-  margin-top: 15px;
-}
-
-.cardhost-left-edge--catalog-field .field-icon {
-  width: 90px;
-  border-top-left-radius: inherit;
-  border-bottom-left-radius: inherit;
-  background-position: center;
-  background-repeat: no-repeat;
-  background-size: 20px 20px;
-}
-
-.cardhost-left-edge--catalog-field .field-content {
-  width: 100%;
-  padding: 15px 15px 15px 0;
-  margin: 0;
-}
-
-.cardhost-left-edge--catalog-field .field-content--title {
-  margin: 0;
-  padding-bottom: 5px;
-  font-size: 16px;
-  font-weight: 600;
-  line-height: 1;
-}
-
-.cardhost-left-edge--catalog-field .field-content--description {
-  margin: 0;
-  padding-bottom: 5px;
-  font-size: 11px;
-  color: rgba(0, 0, 0, 0.5);
+.cardhost-left-edge--nav li:first-child {
+  margin-bottom: auto;
 }
