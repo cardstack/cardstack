@@ -152,10 +152,7 @@ a:hover {
 
   width: 100vw;
   height: 100vh;
-  background-image: url('/assets/images/schema-grid.svg');
-  background-size: 3000px;
-  background-position: center;
-  background-repeat: no-repeat;
+  background: url("/assets/images/grid-square.png") center/20px repeat;
 }
 
 .card-schema-updator--search-bar {
