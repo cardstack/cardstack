@@ -1065,6 +1065,9 @@ describe('hub/card-services', function () {
         type: 'cards',
         id: externalArticleCard.data.id
       });
+      expect(adopted.data.attributes['adoption-chain']).to.eql([
+        externalArticleCard.data.id
+      ]);
 
       let fieldSpecs = adopted.data.relationships.fields.data.map(f => `${f.type}/${f.id}`);
       expect(fieldSpecs).to.include("fields/yarn");
@@ -1138,6 +1141,9 @@ describe('hub/card-services', function () {
         type: 'cards',
         id: externalArticleCard.data.id
       });
+      expect(adopted.data.attributes['adoption-chain']).to.eql([
+        externalArticleCard.data.id
+      ]);
 
       let fieldSpecs = adopted.data.relationships.fields.data.map(f => `${f.type}/${f.id}`);
       expect(fieldSpecs).to.include("fields/yarn");
@@ -1196,6 +1202,10 @@ describe('hub/card-services', function () {
         type: 'cards',
         id: genXKittens.data.id
       });
+      expect(adopted.data.attributes['adoption-chain']).to.eql([
+        genXKittens.data.id,
+        externalArticleCard.data.id
+      ]);
 
       let fieldSpecs = adopted.data.relationships.fields.data.map(f => `${f.type}/${f.id}`);
       expect(fieldSpecs).to.include("fields/cuteness");
@@ -1286,6 +1296,10 @@ describe('hub/card-services', function () {
         type: 'cards',
         id: genXKittens.data.id
       });
+      expect(adopted.data.attributes['adoption-chain']).to.eql([
+        genXKittens.data.id,
+        externalArticleCard.data.id
+      ]);
 
       let fieldSpecs = adopted.data.relationships.fields.data.map(f => `${f.type}/${f.id}`);
       expect(fieldSpecs).to.include("fields/cuteness");
@@ -1375,6 +1389,7 @@ describe('hub/card-services', function () {
       expect(updatedCard.included.find(i => `${i.type}/${i.id}` === `cards/${externalArticleCard.data.id}`)).to.be.not.ok;
       expect(updatedCard.included.find(i => `${i.type}/${i.id}` === `cards/${externalUserCard.data.id}`)).to.be.ok;
       expect(updatedCard.data.relationships['adopted-from'].data).to.eql({ type: 'cards', id: externalUserCard.data.id });
+      expect(updatedCard.data.attributes['adoption-chain']).to.eql([ externalUserCard.data.id ]);
       expect(updatedCard.data.attributes['favorite-color']).to.equal('purple');
       expect(updatedCard.data.attributes.name).to.equal('Van Gogh');
       expect(updatedCard.data.attributes.title).to.be.undefined;

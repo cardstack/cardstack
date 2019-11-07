@@ -82,7 +82,9 @@ const scenario = new Fixtures({
 
   destroy() {
     return [
-      // TODO delete these in ascending order to prove that nothing bad happens
+      // Deleting these in descending order so we can ensure all artifacts are removed
+      // cleanly and no orphaned card resources are left in the index
+      // (deleting children before parents)
       { type: 'cards', id: card7Id },
       { type: 'cards', id: card6Id },
       { type: 'cards', id: card5Id },
@@ -1787,8 +1789,42 @@ module("Unit | Service | data", function () {
       assert.equal(card.isDirty, false);
     });
 
-    skip("it can invalidate cards that adopt from the updated card", async function(/*assert*/) {
-      // squad goal for getting this one done in first data service PR for adoption
+    test("it can invalidate cards that adopt from the updated card", async function(assert) {
+      let service = this.owner.lookup('service:data');
+      let parent = await service.getCard(card1Id, 'isolated');
+      let card = service.createCard(card3Id, parent);
+      await card.save();
+
+      assert.deepEqual(card.fields.map(i => i.name), [
+        'title',
+        'body',
+        'author'
+      ]);
+      parent.addField({ name: 'favorite-color', type: '@cardstack/core-types::string' });
+      await parent.save();
+
+      card = await service.getCard(card3Id, 'isolated');
+      assert.ok(card.getField('favorite-color'), 'newly added adopted field exists');
+    });
+
+    test("it can invalidate cards that adopt from the updated card one level removed", async function(assert) {
+      let service = this.owner.lookup('service:data');
+      let grandparent = await service.getCard(card1Id, 'isolated');
+      let parent = service.createCard(card3Id, grandparent);
+      await parent.save();
+      let card = service.createCard(card4Id, parent);
+      await card.save();
+
+      assert.deepEqual(card.fields.map(i => i.name), [
+        'title',
+        'body',
+        'author'
+      ]);
+      grandparent.addField({ name: 'favorite-color', type: '@cardstack/core-types::string' });
+      await grandparent.save();
+
+      card = await service.getCard(card4Id, 'isolated');
+      assert.ok(card.getField('favorite-color'), 'newly added adopted field exists');
     });
 
     test("it throws when field specified by moveField is not an instance of Field", async function(assert) {

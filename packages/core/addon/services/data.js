@@ -838,11 +838,17 @@ function reifyCard(card) {
   }
 }
 
-// TODO think about how to invalidate cards that use the passed in cardId as part of their adoption chain
 async function invalidate(cardId, latestVersion) {
   for (let format of ['isolated', 'embedded']) {
     for (let [id, entry] of store[format].entries()) {
       let card = await entry;
+
+      for (let adoptedCardId of get(card, 'data.attributes.adoption-chain') || []) {
+        if (adoptedCardId === cardId) {
+          store[format].delete(id);
+          break;
+        }
+      }
       for (let relationship of Object.keys(get(card, 'data.relationships') || {})) {
         let linkage = get(card, `data.relationships.${relationship}.data`);
         if (!linkage) { continue; }
