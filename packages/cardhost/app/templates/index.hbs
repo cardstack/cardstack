@@ -2,10 +2,11 @@
   <aside class="cardhost-welcome-left-edge" data-test-cardhost-welcome-left-edge>
     <nav class="cardhost-welcome-left-edge--nav">
       <ul>
-        <li><div class="left-edge-icon recent active">Recent Cards</div></li>
-        <li><div class="left-edge-icon saved">Saved Templates</div></li>
-        <li><div class="left-edge-icon common">Common Cards</div></li>
-        <li><div class="left-edge-icon add-card">New Blank Card</div></li>
+        {{! template-lint-disable attribute-indentation}}
+        <li><a {{on "click" (fn this.scrollToSection "recent-cards")}} class="left-edge-icon recent-cards {{if (eq this.selectedSection "recent-cards") "active"}}">Recent Cards</a></li>
+        <li><a {{on "click" (fn this.scrollToSection "saved-templates")}} class="left-edge-icon saved-templates {{if (eq this.selectedSection "saved-templates") "active"}}">Saved Templates</a></li>
+        <li><a {{on "click" (fn this.scrollToSection "common-cards")}} class="left-edge-icon common-cards {{if (eq this.selectedSection "common-cards") "active"}}">Common Cards</a></li>
+        <li><a {{on "click" (fn this.scrollToSection "add-card")}} class="left-edge-icon add-card {{if (eq this.selectedSection "add-card") "active"}}">New Blank Card</a></li>
       </ul>
     </nav>
   </aside>

@@ -40,15 +40,15 @@
   background-size: 15px 15px;
 }
 
-.cardhost-welcome-left-edge--nav ul li .left-edge-icon.recent {
+.cardhost-welcome-left-edge--nav ul li .left-edge-icon.recent-cards {
   background-image: url(/assets/images/icon-clock-gray.svg);
 }
 
-.cardhost-welcome-left-edge--nav ul li .left-edge-icon.saved {
+.cardhost-welcome-left-edge--nav ul li .left-edge-icon.saved-templates {
   background-image: url(/assets/images/icon-saved-gray.svg);
 }
 
-.cardhost-welcome-left-edge--nav ul li .left-edge-icon.common {
+.cardhost-welcome-left-edge--nav ul li .left-edge-icon.common-cards {
   background-image: url(/assets/images/icon-common-gray.svg);
 }
 
@@ -56,15 +56,15 @@
   background-image: url(/assets/images/icon-add-gray.svg);
 }
 
-.cardhost-welcome-left-edge--nav ul li .left-edge-icon.recent.active {
+.cardhost-welcome-left-edge--nav ul li .left-edge-icon.recent-cards.active {
   background-image: url(/assets/images/icon-clock.svg);
 }
 
-.cardhost-welcome-left-edge--nav ul li .left-edge-icon.saved.active {
+.cardhost-welcome-left-edge--nav ul li .left-edge-icon.saved-templates.active {
   background-image: url(/assets/images/icon-saved.svg);
 }
 
-.cardhost-welcome-left-edge--nav ul li .left-edge-icon.common.active {
+.cardhost-welcome-left-edge--nav ul li .left-edge-icon.common-cards.active {
   background-image: url(/assets/images/icon-common.svg);
 }
 
@@ -114,7 +114,7 @@
 }
 
 .cardhost-catalog header.cardhost--header--add-card {
-  background-image: url(/assets/images/icon-add-cyan.svg);
+  background-image: url(/assets/images/icon-add.svg);
 }
 
 .cardhost-catalog .card-catalog .embedded-card {
