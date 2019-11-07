@@ -77,8 +77,12 @@
           @route="cards.add"
           @class="card-renderer--embedded-card-link"
         >
-          <div class="embedded-card placeholder icon-add-card"></div>
-          <div class="embedded-card-label">Blank Card</div>
+          <AnimatedContainer class="embedded-card-container">
+            {{#animated-value "embedded-card" group="new-card" use=this.newCardTransition}}
+              <div class="embedded-card placeholder icon-add-card"></div>
+              <div class="embedded-card-label">Blank Card</div>
+            {{/animated-value}}
+          </AnimatedContainer>
         </LinkTo>
       </div>
     </section>
