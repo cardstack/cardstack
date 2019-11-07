@@ -7,18 +7,37 @@ export async function setCardId(id) {
   await triggerEvent('#card__id', 'keyup');
 }
 
-export async function dragAndDrop(fieldSelector, dropZoneSelector) {
+export async function dragAndDrop(fieldSelector, dropZoneSelector, options) {
   await triggerEvent(fieldSelector, 'mousedown');
-  await triggerEvent(dropZoneSelector, 'drop');
+  await triggerEvent(fieldSelector, 'dragstart', options);
+  await triggerEvent(dropZoneSelector, 'drop', options);
 }
 
 export async function dragAndDropNewField(type, position = 0) {
-  await dragAndDrop(`[data-test-card-add-field-draggable="${type}"]`, `[data-test-drop-zone="${position}"]`);
+  let options = {
+    dataTransfer: {
+      getData: () => type,
+      setData: () => {}
+    }
+  };
+  await dragAndDrop(`[data-test-card-add-field-draggable="${type}"]`, `[data-test-drop-zone="${position}"]`, options);
 }
 
 // NOTE: Position is 0-based
 export async function dragFieldToNewPosition(originalPosition, newPosition) {
-  await dragAndDrop(`[data-test-field-position="${originalPosition}"]`, `[data-test-drop-zone="${newPosition}"]`);
+  newPosition = originalPosition < newPosition ? newPosition + 1 : newPosition;
+  let fieldName;
+  let options = {
+    dataTransfer: {
+      getData: (type) => {
+        if (type === 'text/field-name') {
+          return fieldName;
+        }
+      },
+      setData: (type, name) => fieldName = name
+    }
+  };
+  await dragAndDrop(`[data-test-field-renderer-move-btn-position="${originalPosition}"]`, `[data-test-drop-zone="${newPosition}"]`, options);
 }
 
 export async function createCards(args) {

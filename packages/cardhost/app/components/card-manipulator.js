@@ -250,30 +250,33 @@ export default class CardManipulator extends Component {
   }
 
   @action
-  beginDragging(/*fieldComponent, mousedownEvent*/) {
-    // let dragState = {
-    //   usingKeyboard: false,
-    //   initialPointerX: mousedownEvent.x,
-    //   initialPointerY: mousedownEvent.y,
-    //   latestPointerX: mousedownEvent.x,
-    //   latestPointerY: mousedownEvent.y
-    // };
-
+  initDrag() {
     this.isDragging = true;
-    // fieldComponent.dragState = dragState;
-    // fieldComponent = fieldComponent; // eslint-disable-line no-self-assign
   }
 
   @action dropField(position, onFinishDrop, evt) {
-    let type = evt.dataTransfer.getData('text');
-    let field = this.card.addField({
-      type: this.fieldTypeMappings[type],
-      position: position,
-      name: this.newFieldName,
-      neededWhenEmbedded: false
-    });
+    let field;
+    let type = evt.dataTransfer.getData('text/type');
+    if (type) {
+      field = this.card.addField({
+        type: this.fieldTypeMappings[type],
+        position: position,
+        name: this.newFieldName,
+        neededWhenEmbedded: false
+      });
+    } else {
+      let fieldName = evt.dataTransfer.getData('text/field-name');
+      if (fieldName) {
+        field = this.card.getField(fieldName);
+        let newPosition = field.position < position ? position - 1 : position;
+        this.setPosition(fieldName, newPosition);
+      }
+    }
     this.isDragging = false;
-    this.selectField(field);
+
+    if (field) {
+      this.selectField(field);
+    }
 
     onFinishDrop();
   }
@@ -284,10 +287,10 @@ export default class CardManipulator extends Component {
     this.selectedField = field;
   }
 
-  @action firefoxDrag(field, evt) {
+  @action startDragging(field, evt) {
     // Chrome dragging works with just draggable="true",
     // but Firefox requires extra handling.
-    evt.dataTransfer.setData("text", field.type);
+    evt.dataTransfer.setData("text/type", field.type);
     // evt.dataTransfer.setData("field", field);
   }
 }

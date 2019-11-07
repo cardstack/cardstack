@@ -19,6 +19,7 @@
     " field-type-"
     this.dasherizedType
   }}
+  {{on "dragstart" (action this.startDragging @field)}}
   data-test-field={{@field.name}}
   data-test-field-type={{@field.type}}
   data-test-field-mode={{@mode}}
@@ -27,9 +28,10 @@
     <button
       class="field-renderer--move-btn"
       aria-label="Drag field"
-      {{on "mousedown" (action this.beginDragging @field)}}
+      draggable="true"
+      {{on "mousedown" (action this.initDrag @field)}}
+      {{on "dragstart" (action this.startDragging @field)}}
       {{on "dragend" (action (mut this.isDragging) false)}}
-      {{on "dragstart" (action this.firefoxDrag)}}
       data-test-field-renderer-move-btn
       data-test-field-renderer-move-btn-position={{@field.position}}
     >
