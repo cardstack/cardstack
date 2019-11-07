@@ -18,6 +18,21 @@
   grid-template-columns: repeat(auto-fill, minmax(min-content, 1fr));
 }
 
+.ui-components--triplet-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  padding: 20px;
+}
+
+.ui-components--triplet-grid.dark {
+  background: rgba(0, 0, 0, 0.5);
+}
+
+.ui-components--triplet-grid h3 {
+  text-align: center;
+}
+
+
 .color-palette {
   display: grid;
   grid-template-columns: repeat(auto-fill, 250px);

@@ -4,7 +4,7 @@
   --card-width: 496px;
   --card-min-height: 496px;
   --card-min-width: 400px;
-  --card-purple: #4a4857;
+  --card-purple: #2e2c38;
   --card-darker-purple: #3f3d4d;
   --card-highlight: var(--ch-cyan, #00ebe5);
   --card-transition-time: 250ms;
