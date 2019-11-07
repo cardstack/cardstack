@@ -16,7 +16,8 @@ module.exports = factory.getDocumentFor(
         .withAttributes({
           yarn: 'wool',
           title: 'GenX Kittens',
-          body: 'Here is the body'
+          body: 'Here is the body',
+          'internal-field': 'This is internal'
         })
         .withRelated('author', { type: 'cards', id: 'local-hub::van-gogh' })
     )

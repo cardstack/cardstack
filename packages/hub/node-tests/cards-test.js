@@ -1165,6 +1165,7 @@ describe('hub/card-services', function () {
       expect(fieldSpecs).to.not.include("fields/title");
       expect(fieldSpecs).to.not.include("fields/author");
       expect(fieldSpecs).to.not.include("fields/body");
+      expect(fieldSpecs).to.not.include("fields/internal-field");
 
       let includedSpecs = adopted.included.map(i => `${i.type}/${i.id}`);
 
@@ -1176,6 +1177,7 @@ describe('hub/card-services', function () {
       expect(includedSpecs).to.not.include("fields/title");
       expect(includedSpecs).to.not.include("fields/author");
       expect(includedSpecs).to.not.include("fields/body");
+      expect(includedSpecs).to.not.include("fields/internal-field");
 
       let fieldMeta = adopted.data.attributes['metadata-summary'];
 
@@ -1183,10 +1185,12 @@ describe('hub/card-services', function () {
       expect(fieldMeta.title.type).to.equal("@cardstack/core-types::string");
       expect(fieldMeta.author.type).to.equal("@cardstack/core-types::belongs-to");
       expect(fieldMeta.body.type).to.equal("@cardstack/core-types::string");
+      expect(fieldMeta['internal-field']).to.be.undefined;
 
       expect(adopted.data.attributes.yarn).to.equal("wool");
       expect(adopted.data.attributes.title).to.equal("GenX Kittens");
       expect(adopted.data.attributes.body).to.equal("Here is the body");
+      expect(adopted.data.attributes['internal-fields']).to.be.undefined;
 
       expect(adopted.data.relationships.author.data).to.eql({
         type: 'cards',
@@ -1247,6 +1251,7 @@ describe('hub/card-services', function () {
       expect(fieldSpecs).to.not.include("fields/title");
       expect(fieldSpecs).to.not.include("fields/author");
       expect(fieldSpecs).to.not.include("fields/body");
+      expect(fieldSpecs).to.not.include("fields/internal-field");
 
       let includedSpecs = adopted.included.map(i => `${i.type}/${i.id}`);
       expect(includedSpecs.length).to.equal(1);
@@ -1258,10 +1263,13 @@ describe('hub/card-services', function () {
       expect(fieldMeta.title.type).to.equal("@cardstack/core-types::string");
       expect(fieldMeta.author.type).to.equal("@cardstack/core-types::belongs-to");
       expect(fieldMeta.body).to.be.undefined;
+      expect(fieldMeta['internal-field']).to.be.undefined;
+
 
       expect(adopted.data.attributes.yarn).to.equal("wool");
       expect(adopted.data.attributes.title).to.equal("GenX Kittens");
       expect(adopted.data.attributes.body).to.be.undefined;
+      expect(adopted.data.attributes['internal-fields']).to.be.undefined;
 
       expect(adopted.data.relationships.author.data).to.eql({
         type: 'cards',
@@ -1269,13 +1277,13 @@ describe('hub/card-services', function () {
       });
     });
 
-    it.skip("can adopt internal fields", async function () {
-      // it's fine to just add this assertion into the existing isolated and embedded tests for adopted cards
-    });
 
     it.skip("can adopt computed-fields", async function () {
       // it's fine to just add this assertion into the existing isolated and embedded tests for adopted cards
       // Also see the note at the end of the "can get a card that uses adoption in an isolated format" test
+
+      // same as non-computed - has internal and non-internal behaviour so test both
+      // don't worry about metadata-field-types - don't make assertions
     });
 
     it("can get an isolated card that uses multiple levels of adoption", async function () {
@@ -1435,10 +1443,12 @@ describe('hub/card-services', function () {
       expect(fieldMeta.yarn.type).to.equal("@cardstack/core-types::string");
       expect(fieldMeta.title.type).to.equal("@cardstack/core-types::string");
       expect(fieldMeta.author.type).to.equal("@cardstack/core-types::belongs-to");
+      expect(fieldMeta.body).to.be.undefined;
 
       expect(adopted.data.attributes.yarn).to.equal("cotton");
       expect(adopted.data.attributes.title).to.equal("GenZ Hamsters");
       expect(adopted.data.attributes.cuteness).to.equal(10);
+      expect(adopted.data.attributes.body).to.be.undefined;
 
       expect(adopted.data.relationships.author.data).to.eql({
         type: 'cards',
