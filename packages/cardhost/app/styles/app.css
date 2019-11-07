@@ -271,6 +271,16 @@ a:hover {
   padding-bottom: 20px;
 }
 
+.cardhost-card-document {
+  max-width: 100%;
+  font-size: 12px;
+  margin: 1rem;
+}
+
+.cardhost-monaco-container {
+  min-height: 500px;
+}
+
 .card-renderer-isolated.view .field-renderer.view-field:last-child {
   padding-bottom: 50px;
 }

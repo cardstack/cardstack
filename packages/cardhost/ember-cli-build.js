@@ -25,6 +25,7 @@ module.exports = function(defaults) {
   // modules that you would like to import into your application
   // please specify an object with the list of modules as keys
   // along with the exports of each module as its value.
+  app.import('node_modules/monaco-editor/dev/vs/editor/editor.main.css');
 
   return (function(){
     const Webpack = require('@embroider/webpack').Webpack;
@@ -41,7 +42,7 @@ module.exports = function(defaults) {
       },
       packagerOptions: {
         webpackConfig: {
-          plugins: [new MonacoWebpackPlugin(/*{languages: ['javascript', 'typescript']}*/)]
+          plugins: [new MonacoWebpackPlugin(/*{languages: ['javascript', 'typescript']}*/)],
         }
       },
       packageRules: [
