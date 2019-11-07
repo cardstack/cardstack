@@ -1,3 +1,7 @@
+:root {
+  --ch-card-transition-duration: 300ms;
+}
+
 .cardhost-welcome-page {
   background-color: var(--ch-darkest-blue-gray);
   border-radius: 10px;
@@ -74,7 +78,7 @@
 
 /* Catalog */
 .cardhost-catalog {
-  margin: 60px;
+  padding: 60px 60px 60px 35px;
   width: calc(100% - 250px);
   overflow-y: scroll;
 }
@@ -130,12 +134,12 @@
   display: block;
   border-radius: 15px;
   background-color: var(--ch-medium-medium-blue-gray);
-  transition: transform 200ms ease-in-out 100ms;
+  transition: transform var(--ch-card-transition-duration) ease-in-out calc(var(--ch-card-transition-duration) / 3);
 }
 
 .card-catalog > .card-renderer--embedded-card-link > .embedded-card {
   height: 225px;
-  transition: transform 200ms;
+  transition: transform var(--ch-card-transition-duration);
 }
 
 .card-catalog > .card-renderer--embedded-card-link:hover {
