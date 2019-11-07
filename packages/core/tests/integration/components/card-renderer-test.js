@@ -198,7 +198,7 @@ module('Integration | Component | card-renderer', function(hooks) {
     `);
 
     assert.dom(`[data-test-isolated-card-mode="schema"]`).exists();
-    assert.dom(`input[type="text"]`).exists({ count: 3 });
+    assert.dom('[data-test-field-renderer-type]').exists({ count: 3 });
     assert.deepEqual([...this.element.querySelectorAll('[data-test-field]')].map(i => i.getAttribute('data-test-field')),
       ['title', 'author', 'body']);
     assert.dom('[data-test-drop-zone="3"]').exists();
