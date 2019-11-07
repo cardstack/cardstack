@@ -275,6 +275,7 @@ a:hover {
   max-width: 100%;
   font-size: 12px;
   margin: 1rem;
+  padding-top: 20px;
 }
 
 .cardhost-monaco-container {
