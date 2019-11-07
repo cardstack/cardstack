@@ -67,7 +67,8 @@ module('Acceptance | card view', function(hooks) {
     assert.dom(`[data-test-field="reviewers"] [data-test-embedded-card="${card3Id}"] [data-test-field="email"]`).doesNotExist();
     assert.deepEqual([...document.querySelectorAll(`[data-test-field="reviewers"] [data-test-embedded-card]`)].map(i => i.getAttribute('data-test-embedded-card')), [card2Id, card3Id ]);
 
-    let card = JSON.parse(find('.code-block').textContent);
+    let cardJson = find('[data-test-code-block]').getAttribute('data-test-code-block')
+    let card = JSON.parse(cardJson);
     assert.equal(card.data.attributes.title, 'The Millenial Puppy');
     assert.equal(card.data.attributes.body, `It can be difficult these days to deal with the discerning tastes of the millenial puppy.`);
     assert.equal(card.data.attributes.likes, 100);

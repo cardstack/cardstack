@@ -1,3 +1,6 @@
-<div id="m-container" {{did-insert this.renderEditor}} style="height:400px;">
-
+<div {{did-insert this.renderEditor}}
+  ...attributes 
+  data-test-code-block={{@code}}
+  class="cardhost-monaco-container"
+>
 </div>

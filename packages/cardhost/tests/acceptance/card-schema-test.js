@@ -47,7 +47,8 @@ module('Acceptance | card schema', function(hooks) {
     assert.dom('[data-test-field="title"] [data-test-field-renderer-type]').hasText('@cardstack/core-types::string');
     assert.dom('[data-test-right-edge] [data-test-schema-attr="embedded"] input').isChecked();
 
-    let card = JSON.parse(find('.code-block').textContent);
+    let cardJson = find('[data-test-code-block]').getAttribute('data-test-code-block')
+    let card = JSON.parse(cardJson);
     assert.equal(card.data.attributes.title, undefined);
   });
 
@@ -93,7 +94,8 @@ module('Acceptance | card schema', function(hooks) {
 
     assert.dom('[data-test-field="title"]').doesNotExist();
 
-    let card = JSON.parse(find('.code-block').textContent);
+    let cardJson = find('[data-test-code-block]').getAttribute('data-test-code-block')
+    let card = JSON.parse(cardJson);
     assert.equal(card.data.attributes.subtitle, 'test title');
     assert.equal(card.data.attributes["metadata-summary"].subtitle.instructions, 'fill this in with your subheader');
     assert.equal(card.data.attributes.title, undefined);
@@ -172,7 +174,8 @@ module('Acceptance | card schema', function(hooks) {
     await waitFor(`[data-test-card-view="${card1Id}"]`);
 
     assert.dom('[data-test-field="body"]').doesNotExist();
-    let card = JSON.parse(find('.code-block').textContent);
+    let cardJson = find('[data-test-code-block]').getAttribute('data-test-code-block')
+    let card = JSON.parse(cardJson);
     assert.equal(card.data.attributes.body, undefined);
 
     assert.dom('[data-test-right-edge] [data-test-field]').doesNotExist();
@@ -210,7 +213,8 @@ module('Acceptance | card schema', function(hooks) {
 
     assert.deepEqual([...document.querySelectorAll(`[data-test-isolated-card="${card1Id}"] [data-test-field]`)].map(i => i.getAttribute('data-test-field')),
       ['body', 'author', 'title']);
-    let card = JSON.parse(find('.code-block').textContent);
+    let cardJson = find('[data-test-code-block]').getAttribute('data-test-code-block')
+    let card = JSON.parse(cardJson);
     assert.deepEqual(card.data.relationships.fields.data, [
       { type: 'fields', id: 'body' },
       { type: 'fields', id: 'author' },
@@ -268,7 +272,8 @@ module('Acceptance | card schema', function(hooks) {
 
     await click('[data-test-right-edge] [data-test-schema-attr="embedded"] input');
     assert.dom('[data-test-right-edge] [data-test-schema-attr="embedded"] input').isChecked();
-    let card = JSON.parse(find('.code-block').textContent);
+    let cardJson = find('[data-test-code-block]').getAttribute('data-test-code-block')
+    let card = JSON.parse(cardJson);
     let field = card.included.find(i => `${i.type}/${i.id}` === 'fields/title');
     assert.equal(field.attributes['needed-when-embedded'], true);
 
@@ -280,7 +285,8 @@ module('Acceptance | card schema', function(hooks) {
     await click('[data-test-field="title"]');
 
     assert.dom('[data-test-right-edge] [data-test-schema-attr="embedded"] input').isChecked();
-    card = JSON.parse(find('.code-block').textContent);
+    cardJson = find('[data-test-code-block]').getAttribute('data-test-code-block')
+    card = JSON.parse(cardJson);
     field = card.included.find(i => `${i.type}/${i.id}` === 'fields/title');
     assert.equal(field.attributes['needed-when-embedded'], true);
   });
@@ -299,7 +305,8 @@ module('Acceptance | card schema', function(hooks) {
 
     await click('[data-test-right-edge] [data-test-schema-attr="embedded"] input');
     assert.dom('[data-test-right-edge] [data-test-schema-attr="embedded"] input').isNotChecked();
-    let card = JSON.parse(find('.code-block').textContent);
+    let cardJson = find('[data-test-code-block]').getAttribute('data-test-code-block')
+    let card = JSON.parse(cardJson);
     let field = card.included.find(i => `${i.type}/${i.id}` === 'fields/title');
     assert.equal(field.attributes['needed-when-embedded'], false);
 
@@ -311,7 +318,8 @@ module('Acceptance | card schema', function(hooks) {
     await click('[data-test-field="title"]');
 
     assert.dom('[data-test-right-edge] [data-test-schema-attr="embedded"] input').isNotChecked();
-    card = JSON.parse(find('.code-block').textContent);
+    cardJson = find('[data-test-code-block]').getAttribute('data-test-code-block')
+    card = JSON.parse(cardJson);
     field = card.included.find(i => `${i.type}/${i.id}` === 'fields/title');
     assert.equal(field.attributes['needed-when-embedded'], false);
   });
