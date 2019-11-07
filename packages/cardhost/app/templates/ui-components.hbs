@@ -248,13 +248,37 @@
   <hr>
 
   <section>
-    <h2>Card Renderer</h2>
+    <h2>Field Renderer</h2>
 
-    <CardRenderer
-      @card={{this.model}}
-      @format="isolated"
-      @mode="schema"
-    />
+    <div class="ui-components--triplet-grid">
+      <div>
+        <h3>Schema mode</h3>
+        <FieldRenderer
+          @field={{this.model.isolatedFields.firstObject}}
+          @format="isolated"
+          @mode="schema"
+        />
+      </div>
+    </div>
+  </section>
+
+  <hr>
+
+  <section>
+    <h2>Card Renderer</h2>
+    <div class="ui-components--triplet-grid">
+      <div>
+        <h3>Schema mode</h3>
+
+        <CardRenderer
+          @card={{this.model}}
+          @format="isolated"
+          @mode="schema"
+          @setPosition={{true}}
+          @removeField={{true}}
+        />
+      </div>
+    </div>
   </section>
 
 

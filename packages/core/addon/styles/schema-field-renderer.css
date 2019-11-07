@@ -1,27 +1,96 @@
 .field-renderer.schema-field {
+  --field-container-width: 496px;
+  --field-container-height: 154px;
+  --field-container-bg: #4a4857;
+  --field-width: 384px;
+  --field-height: 112px;
+  --field-header-bg: #f0f0f0;
+  --field-header-color: black;
+  --field-bg: white;
+  --field-color: rgba(0, 0, 0, 0.35);
+
   display: flex;
   align-items: center;
   justify-content: space-between;
-  width: var(--field-renderer-max-width);
+  width: var(--field-container-width);
+  min-height: var(--field-container-height);
   max-width: 100%;
-  background-color: var(--field-renderer-bg);
-  color: black;
-  font-size: 16px;
+  padding: var(--field-spacing) 0;
+  background-color: var(--field-container-bg);
+  color: var(--field-color);
+  font: 400 16px/22px var(--field-font-family);
+  letter-spacing: 0.015em;
 }
 
 .schema-field-renderer {
-  width: var(--field-renderer-inner-max-width);
+  width: var(--field-width);
+  min-height: var(--field-height);
   max-width: 100%;
-  background-color: white;
-  border: none;
+  background-color: var(--field-bg);
   border-radius: 5px;
   overflow: hidden;
+
+  transition: border var(--field-transition-time);
 }
 
+.schema-field-renderer--header-bar {
+  height: 36px;
+  padding: 9px 20px 10px 45px;
+  /* TODO: icon will change depending on field type */
+  background: url('/images/fields/text.svg') 20px center/10px no-repeat;
+  background-color: var(--field-header-bg);
+  color: var(--field-header-color);
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 0.015em;
+  line-height: 18px;
+  text-transform: capitalize;
+
+  transition: background-color var(--field-transition-time);
+}
+
+.schema-field-renderer--content {
+  padding: 10px var(--field-spacing);
+}
+
+.schema-field-renderer--name {
+  display: block;
+  padding-bottom: 10px;
+  color: rgba(0, 0, 0, 0.5);
+  font-size: 11px;
+  letter-spacing: 0.035em;
+  line-height: 15px;
+  text-transform: capitalize;
+}
+
+.schema-field-renderer--value {
+  display: block;
+  max-height: 200px;
+  margin: 0;
+  padding: 0;
+  border: none;
+  font-size: 16px;
+  overflow-y: scroll;
+}
+
+.schema-field-renderer:hover {
+  cursor: pointer;
+}
+
+.schema-field-renderer:focus {
+  border: 3px solid var(--field-highlight);
+}
+
+.schema-field-renderer:focus .schema-field-renderer--header-bar {
+  background-color: var(--field-highlight);
+}
+
+
+/* Used in right edge. Update these */
 .schema-field-renderer--header {
   width: 100%;
   padding: 0.5em 1em;
-  background-color: var(--field-renderer-header-bg);
+  background-color: #24242e;
   color: white;
   font-size: 16px;
   font-weight: 600;

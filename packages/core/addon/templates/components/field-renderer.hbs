@@ -25,10 +25,12 @@
 >
   {{#if @setPosition}}
     {{!-- TODO: Use dragger handle icon to drag fields around instead of up/down --}}
-    <div class="field-renderer--move-btn">
+    <button class="field-renderer--move-btn" aria-label="Drag field"></button>
+
+    {{!-- TODO: Remove this block when dragger works --}}
+    <div class="field-renderer--move-btn--hidden">
       {{#if (gt @field.position 0)}}
         <button {{on "click" (fn @setPosition @field.name (dec @field.position))}}
-          class="field-renderer--move-btn"
           aria-label="Move up"
           data-test-field-renderer-move-up-btn
         >
@@ -37,7 +39,6 @@
       {{/if}}
       {{#if (lt @field.position (dec @field.card.isolatedFields.length))}}
         <button {{on "click" (fn @setPosition @field.name (inc @field.position))}}
-          class="field-renderer--move-btn"
           aria-label="Move down"
           data-test-field-renderer-move-down-btn
         >
@@ -60,7 +61,7 @@
         />
       </div>
     {{/let}}
-  {{else if (eq @mode "schema")}}
+  {{else if (and (eq @mode "schema") @isRightEdgeField)}}
     {{!-- TODO we should extract the schema editing stuff into a seaprate component --}}
     <div class="schema-field-renderer">
       {{#if (includes schemaAttrs "title")}}
@@ -217,6 +218,28 @@
             </div>
           {{/if}}
         {{/each}}
+      </div>
+    </div>
+  {{else if (eq @mode "schema")}}
+    <div class="schema-field-renderer" tabindex="0">
+      {{! template-lint-disable no-inline-styles}}
+      {{!-- TODO: need to display field icon and (formatted) type --}}
+      <header
+        class="schema-field-renderer--header-bar"
+        data-test-field-renderer-type
+      >
+        {{@field.type}}
+      </header>
+      <div class="schema-field-renderer--content">
+        <div
+          class="schema-field-renderer--name"
+          data-test-field-renderer-label
+        >
+          {{@field.label}}
+        </div>
+        <div class="schema-field-renderer--value" data-test-field-renderer-value>
+          {{@field.value}}
+        </div>
       </div>
     </div>
   {{/if}}

@@ -57,21 +57,21 @@ module('Acceptance | card create', function(hooks) {
     assert.equal(currentURL(), `/cards/${card1Id}`);
     await visit(`/cards/${card1Id}/schema`);
 
-    assert.dom('[data-test-field="title"] [data-test-field-renderer-field-type]').hasText('@cardstack/core-types::string');
-    assert.dom('[data-test-field="title"] [data-test-field-renderer-is-meta]').hasText('true');
-    assert.dom('[data-test-field="title"] .field-renderer--needed-when-embedded-chbx').isChecked();
+    await click('[data-test-field="title"]');
+    assert.dom('[data-test-field="title"] [data-test-field-renderer-type]').hasText('@cardstack/core-types::string');
+    assert.dom('[data-test-right-edge] [data-test-schema-attr="embedded"] input').isChecked();
 
-    assert.dom('[data-test-field="body"] [data-test-field-renderer-field-type]').hasText('@cardstack/core-types::string');
-    assert.dom('[data-test-field="body"] [data-test-field-renderer-is-meta]').hasText('true');
-    assert.dom('[data-test-field="body"] .field-renderer--needed-when-embedded-chbx').isNotChecked();
+    await click('[data-test-field="body"]');
+    assert.dom('[data-test-field="body"] [data-test-field-renderer-type]').hasText('@cardstack/core-types::string');
+    assert.dom('[data-test-right-edge] [data-test-schema-attr="embedded"] input').isNotChecked();
 
-    assert.dom('[data-test-field="author"] [data-test-field-renderer-field-type]').hasText('@cardstack/core-types::belongs-to');
-    assert.dom('[data-test-field="author"] [data-test-field-renderer-is-meta]').hasText('true');
-    assert.dom('[data-test-field="author"] .field-renderer--needed-when-embedded-chbx').isChecked();
+    await click('[data-test-field="author"]');
+    assert.dom('[data-test-field="author"] [data-test-field-renderer-type]').hasText('@cardstack/core-types::belongs-to');
+    assert.dom('[data-test-right-edge] [data-test-schema-attr="embedded"] input').isChecked();
 
-    assert.dom('[data-test-field="reviewers"] [data-test-field-renderer-field-type]').hasText('@cardstack/core-types::has-many');
-    assert.dom('[data-test-field="reviewers"] [data-test-field-renderer-is-meta]').hasText('true');
-    assert.dom('[data-test-field="reviewers"] .field-renderer--needed-when-embedded-chbx').isChecked();
+    await click('[data-test-field="reviewers"]');
+    assert.dom('[data-test-field="reviewers"] [data-test-field-renderer-type]').hasText('@cardstack/core-types::has-many');
+    assert.dom('[data-test-right-edge] [data-test-schema-attr="embedded"] input').isChecked();
 
     let card = JSON.parse(find('.code-block').textContent);
     assert.equal(card.data.attributes.title, undefined);

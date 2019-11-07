@@ -1,5 +1,20 @@
-.cardhost-cards-page {
+.cardhost-cards {
+  /* TODO: make this a grid */
+
+  --padding-top: var(--ch-top-edge-height);
+  --padding-left: var(--ch-left-edge-width);
+  --padding-right: var(--ch-right-edge-width);
+
+  width: 100vw;
+  height: 100vh;
   background-color: var(--ch-dark-blue-gray);
-  min-height: 100vh;
-  min-width: 100vw;
+  overflow: hidden;
+  padding-top: var(--padding-top);
+  padding-left: var(--padding-left);
+  padding-right: var(--padding-right);
+}
+
+.cardhost-cards.add,
+.cardhost-cards.schema {
+  background: url("/assets/images/grid-square.png") center/20px repeat;
 }

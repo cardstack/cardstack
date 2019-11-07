@@ -1,35 +1,65 @@
 .field-renderer {
-  --spacing: 20px;
-  --field-renderer-bg: #383849;
-  --field-renderer-border-color: #b1b1b1;
-  --field-renderer-header-bg: #24242e;
-  --field-renderer-max-width: 495px;
-  --field-renderer-inner-max-width: 385px;
+  --field-font-family: var(--ch-font-family, "Open Sans", Roboto, "Helvetica Neue", Helvetica, Arial, sans-serif);
+  --field-spacing: 20px;
+  --field-highlight: var(--ch-cyan, #00ebe5);
+  --field-transition-time: 250ms;
+}
+
+.field-renderer--move-btn--hidden {
+  visibility: hidden;
+  width: 0;
 }
 
 .field-renderer--move-btn {
-  height: 20px;
-  width: 20px;
-  padding: 0;
+  width: 14px;
+  height: 18px;
+  padding: var(--field-spacing);
   margin: auto;
   background: none;
-  /* background-image: url('/images/drag-handle-icon.svg'); */
+  background-image: url('/images/icons/grabber-handle-white.svg');
   background-position: center;
   background-repeat: no-repeat;
-  background-size: 20px 20px;
+  background-size: 14px 18px;
   border: none;
-  color: white;
+  opacity: 0.5;
+
+  transition: opacity 250ms;
+}
+
+.field-renderer--move-btn:hover,
+.field-renderer--move-btn:focus {
+  opacity: 1;
+  cursor: move;
+  cursor: grab;
+  cursor: -moz-grab;
+  cursor: -webkit-grab;
+}
+
+.field-renderer--move-btn:active {
+  opacity: 1;
+  cursor: grabbing;
+  cursor: -moz-grabbing;
+  cursor: -webkit-grabbing;
 }
 
 .field-renderer--remove-btn {
-  height: 25px;
-  width: 20px;
-  padding: 0;
+  width: 16px;
+  height: 18px;
+  padding: var(--field-spacing);
   margin: auto;
   background: none;
-  background-image: url('/images/trash-icon.svg');
+  background-image: url('/images/icons/trash-white.svg');
   background-position: center;
   background-repeat: no-repeat;
-  background-size: contain;
+  background-size: 16px 18px;
   border: none;
+  opacity: 0.5;
+
+  transition: opacity 250ms;
+}
+
+.field-renderer--remove-btn:hover,
+.field-renderer--remove-btn:focus {
+  opacity: 1;
+  cursor: pointer;
 }

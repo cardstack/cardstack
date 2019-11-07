@@ -16,15 +16,10 @@
   z-index: var(--ch-edges-z-index);
 }
 
-.cardhost-top-edge.schema {
-  --padding-left: calc(var(--ch-left-edge-panel-width) + var(--ch-left-edge-navbar-width));
-}
-
-
 .login-box {
   position: fixed;
   top: var(--ch-spacing);
-  left: calc(var(--padding-left) + var(--ch-spacing));
+  right: var(--ch-right-edge-panel-width);
   z-index: var(--ch-edges-z-index);
 }
 
@@ -33,6 +28,7 @@
   --border-radius: 10px;
   --border: 2px solid var(--ch-light-gray-d6);
   --color: white;
+  --width: 80px;
 }
 
 .login-box > button:hover {

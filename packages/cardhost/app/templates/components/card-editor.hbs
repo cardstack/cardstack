@@ -1,60 +1,37 @@
-<CardhostTopEdge>
-  <ModeSwitcher @name={{this.card.name}} @mode="edit" />
-
-  {{#if this.cardstackSession.isAuthenticated}}
-    <div class="card-renderer--top-edge-buttons">
-      <div class="ch-button-group">
-        {{! eslint is confused by on helper }}
-        {{! template-lint-disable attribute-indentation}}
-        <button
-          {{on "click" this.delete}}
-          class="ch-button ch-button--icon-secondary delete"
-          data-test-card-editor-delete-btn
-          disabled={{not this.cardstackSession.isAuthenticated}}
-          aria-label="Delete"
-        >
-        </button>
-        <button
-          {{on "click" this.cancel}}
-          class="ch-button ch-button--secondary"
-          data-test-card-editor-cancel-btn
-          disabled={{not this.cardstackSession.isAuthenticated}}
-        >
-          Preview
-        </button>
-        <button
-          {{on "click" this.save}}
-          class="ch-button"
-          data-test-card-editor-save-btn
-          disabled={{not this.cardstackSession.isAuthenticated}}
-        >
-          Save
-        </button>
-      </div>
-      <div>
-        {{#unless this.cardstackSession.isAuthenticated}}
-          (Must be logged in to modify the card.)
-        {{/unless}}
-        <span data-test-card-editor-is-dirty={{this.isDirtyStr}}>
-          {{#if this.card.isDirty}}(unsaved){{/if}}
-        </span>
-      </div>
-    </div>
-  {{/if}}
-</CardhostTopEdge>
+{{#if this.cardstackSession.isAuthenticated}}
+  <div class="card-renderer--top-edge-buttons">
+    {{! eslint is confused by on helper }}
+    {{! template-lint-disable attribute-indentation}}
+    <button
+      {{on "click" this.delete}}
+      class="ch-button ch-button--icon-secondary delete"
+      data-test-card-editor-delete-btn
+      disabled={{not this.cardstackSession.isAuthenticated}}
+      aria-label="Delete"
+    >
+    </button>
+    <button
+      {{on "click" this.cancel}}
+      class="ch-button ch-button--secondary"
+      data-test-card-editor-cancel-btn
+      disabled={{not this.cardstackSession.isAuthenticated}}
+    >
+      Preview
+    </button>
+    <button
+      {{on "click" this.save}}
+      class="ch-button"
+      data-test-card-editor-save-btn
+      disabled={{not this.cardstackSession.isAuthenticated}}
+    >
+      Save
+    </button>
+  </div>
+{{/if}}
 
 <CardhostLeftEdge />
 
 <section class="card-editor" data-test-card-edit={{this.card.name}}>
-  <div class="status-message-box">
-    {{#if this.statusMsg}}
-      <p>{{this.statusMsg}}</p>
-    {{/if}}
-    {{#unless this.cardstackSession.isAuthenticated}}
-      <p>Please log in to save the card.</p>
-    {{/unless}}
-  </div>
-
   <CardRenderer
     @card={{this.card}}
     @mode="edit"

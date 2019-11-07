@@ -41,9 +41,9 @@ module('Acceptance | card schema', function(hooks) {
     await waitFor(`[data-test-card-view="${card1Id}"]`, { timeout });
     await visit(`/cards/${card1Id}/schema`);
 
-    assert.dom('[data-test-field="title"] [data-test-field-renderer-field-type]').hasText('@cardstack/core-types::string');
-    assert.dom('[data-test-field="title"] [data-test-field-renderer-is-meta]').hasText('true');
-    assert.dom('[data-test-field="title"] .field-renderer--needed-when-embedded-chbx').isChecked();
+    await click('[data-test-field="title"]');
+    assert.dom('[data-test-field="title"] [data-test-field-renderer-type]').hasText('@cardstack/core-types::string');
+    assert.dom('[data-test-right-edge] [data-test-schema-attr="embedded"] input').isChecked();
 
     let card = JSON.parse(find('.code-block').textContent);
     assert.equal(card.data.attributes.title, undefined);
@@ -59,9 +59,10 @@ module('Acceptance | card schema', function(hooks) {
     await visit(`/cards/${card1Id}/schema`);
     assert.equal(currentURL(), `/cards/${card1Id}/schema`);
 
-    assert.dom('[data-test-field="title"] .field-renderer-field-name-input').hasValue('title');
-    await fillIn('[data-test-field="title"] .field-renderer-field-name-input', 'subtitle');
-    await triggerEvent(`[data-test-field="title"] .field-renderer-field-name-input`, 'keyup');
+    assert.dom('[data-test-field="title"] [data-test-field-renderer-label]').hasText('title');
+    await click('[data-test-field="title"]');
+    await fillIn('[data-test-right-edge] [data-test-schema-attr="name"] input', 'subtitle');
+    await triggerEvent('[data-test-right-edge] [data-test-schema-attr="name"] input', 'keyup');
 
     await click('[data-test-card-schema-save-btn]');
     await waitFor(`[data-test-card-view="${card1Id}"]`, { timeout });
@@ -78,7 +79,7 @@ module('Acceptance | card schema', function(hooks) {
     assert.dom('[data-test-field="title"]').doesNotExist();
 
     await visit(`/cards/${card1Id}/schema`);
-    assert.dom('[data-test-field="subtitle"] .field-renderer-field-name-input').hasValue('subtitle');
+    assert.dom('[data-test-field="subtitle"] [data-test-field-renderer-label]').hasText('subtitle');
   });
 
 
@@ -100,7 +101,7 @@ module('Acceptance | card schema', function(hooks) {
     let card = JSON.parse(find('.code-block').textContent);
     assert.equal(card.data.attributes.body, undefined);
 
-    assert.dom('.cardhost-right-edge-panel [data-test-field]').doesNotExist();
+    assert.dom('[data-test-right-edge] [data-test-field]').doesNotExist();
   });
 
   test(`move a field's position`, async function (assert) {

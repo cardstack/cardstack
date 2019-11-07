@@ -1,16 +1,18 @@
 import Route from '@ember/routing/route';
-import { inject as service } from '@ember/service';
-import ENV from '@cardstack/cardhost/config/environment'
 
-const { environment } = ENV;
 export default class UIComponentsRoute extends Route {
-  @service data;
-
-  async model() {
-    if (environment === 'development') {
-      return await this.data.getCard('local-hub::event', 'isolated');
+  // TODO: Return base-card when it has more data
+  model() {
+    return {
+      id: 'local-hub::event',
+      name: 'event',
+      isolatedFields: [
+        {
+          label: 'title',
+          type: 'text',
+          value: 'Ember Meetup'
+        }
+      ]
     }
-
-    return await this.data.getCard('local-hub::@cardstack/base-card', 'isolated');
   }
 }

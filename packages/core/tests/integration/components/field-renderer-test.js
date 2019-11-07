@@ -78,7 +78,6 @@ module('Integration | Component | field-renderer', function(hooks) {
 
     await render(hbs`<FieldRenderer @field={{field}} @mode="view"/>`);
 
-    assert.dom('[data-test-string-field-viewer-label]').hasText('title:');
     assert.dom('[data-test-string-field-viewer-value]').hasText('test title');
     assert.dom('input').doesNotExist();
     assert.dom('button').doesNotExist();
@@ -149,8 +148,9 @@ module('Integration | Component | field-renderer', function(hooks) {
     />
     `);
 
-    assert.dom('.field-renderer-field-name-input').hasValue('title');
-    assert.dom('.field-renderer--needed-when-embedded-chbx').isChecked();
+    assert.dom('[data-test-field-renderer-type]').hasText('@cardstack/core-types::string');
+    assert.dom('[data-test-field-renderer-label]').hasText('title');
+    assert.dom('[data-test-field-renderer-value]').hasText('test title');
     assert.dom('[data-test-field-renderer-move-up-btn]').exists();
     assert.dom('[data-test-field-renderer-move-down-btn]').exists();
     assert.dom('[data-test-drop-zone="1"]').exists();
@@ -169,20 +169,19 @@ module('Integration | Component | field-renderer', function(hooks) {
 
     await render(hbs`
     <FieldRenderer
+      @isRightEdgeField={{true}}
       @field={{field}}
       @mode="schema"
-      @dropField={{action noop}}
       @setFieldName={{action setFieldName}}
       @setNeededWhenEmbedded={{action noop}}
-      @setPosition={{action noop}}
-      @removeField={{action noop}}
+      @schemaAttrs={{array "name" "label" "helper-text" "multiselect" "required" "embedded"}}
     />
     `);
-    let input = this.element.querySelector('.field-renderer-field-name-input');
+    let input = '[data-test-schema-attr="name"] input';
     await fillIn(input, 'subtitle');
     await triggerEvent(input, 'keyup');
 
-    assert.dom(input, 'subtitle');
+    assert.dom(input).hasValue('subtitle');
     assert.equal(field.name, 'subtitle');
   });
 
@@ -200,16 +199,16 @@ module('Integration | Component | field-renderer', function(hooks) {
 
     await render(hbs`
     <FieldRenderer
+      @isRightEdgeField={{true}}
       @field={{field}}
       @mode="schema"
-      @dropField={{action noop}}
       @setFieldName={{action noop}}
       @setNeededWhenEmbedded={{action setNeededWhenEmbedded}}
-      @setPosition={{action noop}}
-      @removeField={{action noop}}
+      @schemaAttrs={{array "name" "label" "helper-text" "multiselect" "required" "embedded"}}
     />
     `);
-    let input = this.element.querySelector('.field-renderer--needed-when-embedded-chbx');
+    let input = '[data-test-schema-attr="embedded"] input';
+    assert.dom(input).isChecked();
     await click(input);
 
     assert.dom(input).isNotChecked();

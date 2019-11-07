@@ -39,16 +39,15 @@ Until that work is done we are statically adding this css
   --ch-font-family: "Open Sans", Roboto, "Helvetica Neue", Helvetica, Arial, sans-serif;
 
   --ch-left-edge-navbar-width: 80px;
-  --ch-right-edge-navbar-width: 80px;
   --ch-left-edge-panel-width: 330px;
   --ch-right-edge-panel-width: 300px;
-  --ch-top-edge-height: 80px;
-  --ch-header-height: 70px;
-  --ch-edges-z-index: 10;
-  --ch-spacing: 20px;
 
-  --ch-left-edge-width: var(--ch-left-edge-navbar-width);
+  --ch-top-edge-height: 80px;
+  --ch-left-edge-width: calc(var(--ch-left-edge-panel-width) + var(--ch-left-edge-navbar-width));
   --ch-right-edge-width: calc(var(--ch-right-edge-panel-width) + var(--ch-spacing));
+
+  --ch-spacing: 20px;
+  --ch-edges-z-index: 10;
 }
 
 /*
@@ -119,40 +118,11 @@ a:hover {
 
 
 /* Other */
-.login-button {
-  position: absolute;
-  top: var(--ch-spacing);
-  left: 430px;
-}
-
 .card-renderer--top-edge-buttons {
   position: fixed;
   top: var(--ch-spacing);
   right: var(--ch-spacing);
-}
-
-.card-creator,
-.card-schema-updator,
-.card-editor,
-.card-view {
-  --padding-top: var(--ch-top-edge-height);
-  --padding-left: var(--ch-left-edge-width);
-  --padding-right: var(--ch-right-edge-width);
-
-  height: 100vh;
-  overflow: hidden;
-  padding-top: var(--padding-top);
-  padding-left: var(--padding-left);
-  padding-right: var(--padding-right);
-}
-
-.card-creator,
-.card-schema-updator {
-  --padding-left: calc(var(--ch-left-edge-panel-width) + var(--ch-left-edge-navbar-width));
-
-  width: 100vw;
-  height: 100vh;
-  background: url("/assets/images/grid-square.png") center/20px repeat;
+  display: flex;
 }
 
 .card-schema-updator--search-bar {
@@ -163,59 +133,11 @@ a:hover {
 
 .card-creator--new-card {
   width: 300px;
-  margin-bottom: var(--ch-spacing);
+  margin: var(--ch-spacing) auto;
 }
 
 .field-creator--field-btn-wrapper {
   text-align: right;
-}
-
-.status-message-box {
-  position: absolute;
-  top: var(--ch-top-edge-height);
-  left: var(--ch-left-edge-width);
-  padding: var(--ch-spacing);
-  font-weight: 700;
-}
-.status-message-box.schema {
-  --ch-left-edge-width: 410px;
-}
-
-
-/* Temp Right Edge styles */
-.cardhost-right-edge {
-  position: fixed;
-  top: var(--ch-top-edge-height);
-  right: 0;
-  margin: 0;
-  padding: 0 20px;
-  z-index: var(--ch-edges-z-index);
-}
-
-.cardhost-right-edge--nav ul {
-  display: flex;
-  justify-content: flex-end;
-  align-items: center;
-  margin: 0;
-  padding: 20px 0;
-  list-style-type: none;
-}
-
-.cardhost-right-edge-panel {
-  position: relative;
-  top: 0;
-  right: 0;
-  width: var(--ch-right-edge-panel-width);
-  padding: 25px;
-  background-color: var(--ch-medium-dark-blue-gray);
-  border-radius: 20px;
-  color: white;
-}
-
-.cardhost-right-edge-panel--header {
-  padding: 10px 0 25px;
-  font-size: 16px;
-  text-transform: capitalize;
 }
 
 
@@ -225,6 +147,70 @@ a:hover {
   height: 0;
   overflow: hidden;
 }
+
 .cardhost-card-document--codeblock {
   height: 0;
+}
+
+
+
+/* TODO: Do not hardcode. Move some styles to core package and some to isolated card css */
+.card-renderer-isolated.view .field-renderer.view-field {
+  margin: 0 auto;
+  padding-right: 70px;
+  padding-left: 70px;
+  width: 997px;
+  max-width: 100%;
+}
+
+.field-renderer.view-field .label {
+  padding-bottom: 0.5em;
+  font: 400 13px/18px "Open Sans";
+  letter-spacing: 0;
+  color: rgba(0, 0, 0, 0.5);
+  text-transform: capitalize;
+}
+
+.card-renderer-isolated.view .field-renderer.view-field.field-title {
+  color: black;
+  font: 400 28px/21px 'Open Sans';
+  letter-spacing: 0;
+  text-align: left;
+}
+
+.card-renderer-isolated.view .field-renderer.view-field.field-title .label {
+  visibility: hidden;
+  height: 0;
+  padding: 0;
+}
+
+.card-renderer-isolated.view .field-renderer.view-field.field-body,
+.card-renderer-isolated.view .field-renderer.view-field.field-description {
+  color: black;
+  font: 400 16px/22px 'Open Sans';
+  letter-spacing: 0;
+  text-align: left;
+}
+
+.card-renderer-isolated.view .field-renderer.view-field:first-child {
+  padding-top: 50px;
+  padding-bottom: 20px;
+}
+
+.card-renderer-isolated.view .field-renderer.view-field:last-child {
+  padding-bottom: 50px;
+}
+
+.field-renderer.view-field  + .field-renderer.view-field {
+  margin-top: 30px;
+}
+
+.field-renderer.edit-field  + .field-renderer.edit-field {
+  margin-top: 20px;
+}
+
+.edit-field-renderer {
+  border: 1px solid #B1B1B1;
+  border-radius: 5px;
+  padding: 10px 20px;
 }
