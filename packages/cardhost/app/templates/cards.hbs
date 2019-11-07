@@ -1,1 +1,11 @@
-{{outlet}}
+{{#let this.target.currentRoute.localName as |mode|}}
+  <div class="cardhost-cards {{mode}}">
+    {{#if (not-eq mode "add")}}
+      <CardhostTopEdge @mode={{mode}}>
+        <ModeSwitcher @name={{this.target.currentRoute.params.id}} @mode={{mode}} />
+      </CardhostTopEdge>
+    {{/if}}
+
+    {{outlet}}
+  </div>
+{{/let}}

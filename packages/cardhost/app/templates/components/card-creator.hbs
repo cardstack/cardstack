@@ -1,8 +1,17 @@
 <CardhostTopEdge @mode="schema">
+  {{!-- TODO: DRY buttons --}}
   {{#if this.cardstackSession.isAuthenticated}}
     <div class="card-renderer--top-edge-buttons">
       {{! eslint is confused by on helper }}
       {{! template-lint-disable attribute-indentation}}
+      <button
+        {{on "click" this.cancel}}
+        class="ch-button ch-button--secondary"
+        data-test-card-creator-cancel-btn
+        disabled={{not this.cardstackSession.isAuthenticated}}
+      >
+        Preview
+      </button>
       <button
         {{on "click" this.save}}
         class="ch-button"
@@ -16,6 +25,7 @@
 </CardhostTopEdge>
 
 <CardhostLeftEdge @mode="schema">
+  {{!-- TODO: DRY catalog section --}}
   <section class="ch-catalog">
     <header class="ch-catalog--header">
       <h3 class="ch-catalog--title">Card Catalog</h3>
@@ -53,16 +63,28 @@
   </section>
 </CardhostLeftEdge>
 
-<aside class="cardhost-right-edge">
-  <RightEdge
-    @isRightEdgeField={{true}}
-    @selectedField={{this.selectedField}}
-    @selectField={{action this.selectField}}
-    @setNeededWhenEmbedded={{this.setNeededWhenEmbedded}}
-    @setFieldName={{this.setFieldName}}
-    @setFieldLabel={{this.setFieldLabel}}
-  />
-</aside>
+
+  <fieldset class="card-creator--new-card">
+    <legend>New Card</legend>
+    <label for="card__id">Card ID:</label>
+    <Input
+      @id="card__id"
+      @size="60"
+      @placeholder="e.g. millenial-puppies"
+      @value={{this.cardId}}
+      @key-up={{action this.updateCardId}}
+    />
+    <p>(Note that updating the card id will remove any fields that you have created. This is just a scaffolding limitation.)</p>
+  </fieldset>
+
+<RightEdge
+  @isRightEdgeField={{true}}
+  @selectedField={{this.selectedField}}
+  @selectField={{action this.selectField}}
+  @setNeededWhenEmbedded={{this.setNeededWhenEmbedded}}
+  @setFieldName={{this.setFieldName}}
+  @setFieldLabel={{this.setFieldLabel}}
+/>
 
 <section class="card-creator" data-test-card-creator>
   {{#if this.card}}

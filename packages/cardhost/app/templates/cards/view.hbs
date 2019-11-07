@@ -1,6 +1,24 @@
-<CardhostTopEdge @mode="view">
-  <ModeSwitcher @name={{this.model.name}} @mode="view" />
-</CardhostTopEdge>
+<div class="card-renderer--top-edge-buttons">
+  {{! eslint is confused by on helper }}
+  {{! template-lint-disable attribute-indentation}}
+  <button
+    class="ch-button ch-button--icon share"
+    aria-label="Share button"
+  >
+  </button>
+  <button
+    class="ch-button ch-button--secondary"
+    disabled={{not this.cardstackSession.isAuthenticated}}
+  >
+    Preview
+  </button>
+  <button
+    class="ch-button"
+    disabled={{not this.cardstackSession.isAuthenticated}}
+  >
+    Save
+  </button>
+</div>
 
 <CardhostLeftEdge />
 

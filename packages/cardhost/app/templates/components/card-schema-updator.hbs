@@ -1,40 +1,30 @@
-<CardhostTopEdge @mode="schema">
-  <ModeSwitcher @name={{this.card.name}} @mode="schema" />
-  {{#if this.cardstackSession.isAuthenticated}}
-    <div class="card-renderer--top-edge-buttons">
-      <div class="ch-button-group">
-        {{! eslint is confused by on helper }}
-        {{! template-lint-disable attribute-indentation}}
-        <button
-          class="ch-button ch-button--icon share"
-          aria-label="Share button"
-        >
-        </button>
-        <button
-          {{on "click" this.cancel}}
-          class="ch-button ch-button--secondary"
-          disabled={{not this.cardstackSession.isAuthenticated}}
-          data-test-card-schema-cancel-btn
-        >
-          Preview
-        </button>
-        <button
-          {{on "click" this.save}}
-          class="ch-button"
-          disabled={{not this.cardstackSession.isAuthenticated}}
-          data-test-card-schema-save-btn
-        >
-          Save
-        </button>
-      </div>
-      <div>
-        <span data-test-card-schema-is-dirty={{this.isDirtyStr}}>
-          {{#if this.card.isDirty}}Unsaved.{{/if}}
-        </span>
-      </div>
-    </div>
-  {{/if}}
-</CardhostTopEdge>
+{{#if this.cardstackSession.isAuthenticated}}
+  <div class="card-renderer--top-edge-buttons">
+    {{! eslint is confused by on helper }}
+    {{! template-lint-disable attribute-indentation}}
+    <button
+      class="ch-button ch-button--icon share"
+      aria-label="Share button"
+    >
+    </button>
+    <button
+      {{on "click" this.cancel}}
+      class="ch-button ch-button--secondary"
+      disabled={{not this.cardstackSession.isAuthenticated}}
+      data-test-card-schema-cancel-btn
+    >
+      Preview
+    </button>
+    <button
+      {{on "click" this.save}}
+      class="ch-button"
+      disabled={{not this.cardstackSession.isAuthenticated}}
+      data-test-card-schema-save-btn
+    >
+      Save
+    </button>
+  </div>
+{{/if}}
 
 <CardhostLeftEdge @mode="schema">
   <section class="ch-catalog">

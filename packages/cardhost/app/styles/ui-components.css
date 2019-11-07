@@ -1,5 +1,6 @@
 .ui-components {
   padding: 20px 20px 300px;
+  background-color: var(--ch-dark-blue-gray);
 }
 
 .ui-components--section {
@@ -22,10 +23,6 @@
   display: grid;
   grid-template-columns: repeat(3, 1fr);
   padding: 20px;
-}
-
-.ui-components--triplet-grid.dark {
-  background: rgba(0, 0, 0, 0.5);
 }
 
 .ui-components--triplet-grid h3 {

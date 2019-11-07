@@ -226,13 +226,18 @@
       {{!-- TODO: need to display field icon and (formatted) type --}}
       <header
         class="schema-field-renderer--header-bar"
+        data-test-field-renderer-type
       >
-        {{!-- {{@field.type}} --}}
-        Text
+        {{@field.type}}
       </header>
       <div class="schema-field-renderer--content">
-        <label class="schema-field-renderer--name">{{@field.label}}</label>
-        <div class="schema-field-renderer--value">
+        <div
+          class="schema-field-renderer--name"
+          data-test-field-renderer-label
+        >
+          {{@field.label}}
+        </div>
+        <div class="schema-field-renderer--value" data-test-field-renderer-value>
           {{@field.value}}
         </div>
       </div>

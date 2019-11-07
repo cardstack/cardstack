@@ -6,10 +6,10 @@ instead use the vars in our palette css */
   right: var(--ch-spacing);
   top: var(--ch-top-edge-height);
   width: var(--ch-right-edge-panel-width);
-  background-color:#41404D;
+  background-color:var(--ch-medium-dark-blue-gray);
   border-radius: 10px;
   z-index: var(--ch-edges-z-index);
-  opacity: .96;
+  box-shadow: 0 3px 6px rgba(0, 0, 0, 0.15);
 }
 
 .right-edge--section {

@@ -4,14 +4,18 @@
   --card-width: 496px;
   --card-min-height: 496px;
   --card-min-width: 400px;
-  --card-purple: #2e2c38;
-  --card-darker-purple: #3f3d4d;
+  --card-bg: #4a4857;
+  --card-header-bg: #3f3d4d;
   --card-highlight: var(--ch-cyan, #00ebe5);
   --card-transition-time: 250ms;
 
   height: calc(100vh - 80px);
   min-width: var(--card-min-width);
   padding: 0 var(--card-spacing);
+}
+
+.card-renderer-isolated.view {
+  --card-width: 100%;
 }
 
 .card-renderer-isolated--header {
@@ -24,7 +28,7 @@
   border-radius: 10px 10px 0 0;
   /* TODO: icon will change depending on card content type */
   background-image: url('/images/icons/event-white.svg');
-  background-color: var(--card-darker-purple);
+  background-color: var(--card-header-bg);
   background-position: var(--card-spacing) center;
   background-size: 18px 20px;
   background-repeat: no-repeat;
@@ -48,7 +52,7 @@
   right: 0;
   left: 0;
   bottom: 0;
-  background-color: var(--card-purple);
+  background-color: var(--card-bg);
   opacity: 0.35;
 }
 
@@ -73,7 +77,7 @@
 }
 
 .card-renderer-isolated.schema .card-renderer-isolated--content {
-  background-color: var(--card-purple);
+  background-color: var(--card-bg);
 }
 
 .card-renderer-isolated.edit .card-renderer-isolated--content {
