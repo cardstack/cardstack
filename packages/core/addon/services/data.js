@@ -839,6 +839,8 @@ function reifyCard(card) {
 }
 
 async function invalidate(cardId, latestVersion) {
+  if (cardId === baseCard) { return; } // don't invalidate the base card--it never changes, and everything descends from it
+
   for (let format of ['isolated', 'embedded']) {
     for (let [id, entry] of store[format].entries()) {
       let card = await entry;
