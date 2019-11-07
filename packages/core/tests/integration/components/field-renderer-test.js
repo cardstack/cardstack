@@ -78,7 +78,6 @@ module('Integration | Component | field-renderer', function(hooks) {
 
     await render(hbs`<FieldRenderer @field={{field}} @mode="view"/>`);
 
-    assert.dom('[data-test-string-field-viewer-label]').hasText('title:');
     assert.dom('[data-test-string-field-viewer-value]').hasText('test title');
     assert.dom('input').doesNotExist();
     assert.dom('button').doesNotExist();

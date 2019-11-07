@@ -151,3 +151,66 @@ a:hover {
 .cardhost-card-document--codeblock {
   height: 0;
 }
+
+
+
+/* TODO: Do not hardcode. Move some styles to core package and some to isolated card css */
+.card-renderer-isolated.view .field-renderer.view-field {
+  margin: 0 auto;
+  padding-right: 70px;
+  padding-left: 70px;
+  width: 997px;
+  max-width: 100%;
+}
+
+.field-renderer.view-field .label {
+  padding-bottom: 0.5em;
+  font: 400 13px/18px "Open Sans";
+  letter-spacing: 0;
+  color: rgba(0, 0, 0, 0.5);
+  text-transform: capitalize;
+}
+
+.card-renderer-isolated.view .field-renderer.view-field.field-title {
+  color: black;
+  font: 400 28px/21px 'Open Sans';
+  letter-spacing: 0;
+  text-align: left;
+}
+
+.card-renderer-isolated.view .field-renderer.view-field.field-title .label {
+  visibility: hidden;
+  height: 0;
+  padding: 0;
+}
+
+.card-renderer-isolated.view .field-renderer.view-field.field-body,
+.card-renderer-isolated.view .field-renderer.view-field.field-description {
+  color: black;
+  font: 400 16px/22px 'Open Sans';
+  letter-spacing: 0;
+  text-align: left;
+}
+
+.card-renderer-isolated.view .field-renderer.view-field:first-child {
+  padding-top: 50px;
+  padding-bottom: 20px;
+}
+
+.card-renderer-isolated.view .field-renderer.view-field:last-child {
+  padding-bottom: 50px;
+}
+
+.field-renderer.view-field  + .field-renderer.view-field {
+  margin-top: 30px;
+}
+
+.field-renderer.edit-field  + .field-renderer.edit-field {
+  margin-top: 20px;
+}
+
+.edit-field-renderer {
+  border: 1px solid #B1B1B1;
+  border-radius: 5px;
+  padding: 10px 20px;
+}
