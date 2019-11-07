@@ -3,11 +3,15 @@
   --card-header-height: 50px;
   --card-width: 496px;
   --card-min-height: 496px;
-  --card-purple: #2e2c38;
+  --card-min-width: 400px;
+  --card-purple: #4a4857;
   --card-darker-purple: #3f3d4d;
   --card-highlight: var(--ch-cyan, #00ebe5);
+  --card-transition-time: 250ms;
 
   height: calc(100vh - 80px);
+  min-width: var(--card-min-width);
+  padding: 0 var(--card-spacing);
 }
 
 .card-renderer-isolated--header {
@@ -19,7 +23,7 @@
   padding: 15px var(--card-spacing) 15px 50px;
   border-radius: 10px 10px 0 0;
   /* TODO: icon will change depending on card content type */
-  background-image: url('/assets/images/icons/event-faded.svg');
+  background-image: url('/images/icons/event-white.svg');
   background-color: var(--card-darker-purple);
   background-position: var(--card-spacing) center;
   background-size: 18px 20px;
@@ -35,7 +39,7 @@
   text-overflow: ellipsis;
   box-shadow: 0 3px 6px rgba(0, 0, 0, 0.15);
 
-  transition: background-color 250ms, color 250ms, background-image 250ms;
+  transition: background-color var(--card-transition-time), color var(--card-transition-time), background-image var(--card-transition-time);
 }
 
 .card-renderer-isolated--header-overlay {
@@ -58,13 +62,14 @@
 .card-renderer-isolated--content {
   margin: 0 auto;
   width: var(--card-width);
+  max-width: 100%;
   min-height: var(--card-min-height);
   background-color: white;
   border: 3px solid transparent;
   border-radius: 0 0 10px 10px;
   overflow: hidden;
 
-  transition: border-color 250ms;
+  transition: border-color var(--card-transition-time);
 }
 
 .card-renderer-isolated.schema .card-renderer-isolated--content {
@@ -82,7 +87,7 @@
 .card-renderer-isolated:focus .card-renderer-isolated--header {
   color: black;
   background-color: var(--card-highlight);
-  background-image: url('/assets/images/icons/event.svg');
+  background-image: url('/images/icons/event.svg');
 }
 
 .card-renderer-isolated:focus .card-renderer-isolated--header-overlay {

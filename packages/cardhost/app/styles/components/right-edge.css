@@ -4,8 +4,8 @@ instead use the vars in our palette css */
 .right-edge {
   position: fixed;
   right: var(--ch-spacing);
-  top: 240px;
-  width: 300px;
+  top: var(--ch-top-edge-height);
+  width: var(--ch-right-edge-panel-width);
   background-color:#41404D;
   border-radius: 10px;
   z-index: var(--ch-edges-z-index);
