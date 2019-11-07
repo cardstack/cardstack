@@ -9,6 +9,10 @@ import {
 const card1Id = 'local-hub::millenial-puppies';
 const card2Id = 'local-hub::van-gogh';
 const card3Id = 'local-hub::hassan';
+const card4Id = 'local-hub::user-card';
+const card5Id = 'local-hub::mango';
+const card6Id = 'local-hub::ringo';
+const card7Id = 'local-hub::musa';
 
 const titleField = {
   type: 'fields',
@@ -78,9 +82,16 @@ const scenario = new Fixtures({
 
   destroy() {
     return [
-      { type: 'cards', id: card1Id },
+      // Deleting these in descending order so we can ensure all artifacts are removed
+      // cleanly and no orphaned card resources are left in the index
+      // (deleting children before parents)
+      { type: 'cards', id: card7Id },
+      { type: 'cards', id: card6Id },
+      { type: 'cards', id: card5Id },
+      { type: 'cards', id: card4Id },
+      { type: 'cards', id: card3Id },
       { type: 'cards', id: card2Id },
-      { type: 'cards', id: card3Id }
+      { type: 'cards', id: card1Id },
     ];
   }
 });
@@ -126,6 +137,11 @@ module("Unit | Service | data", function () {
 
     hooks.beforeEach(async function () {
       await this.owner.lookup('service:mock-login').get('login').perform('sample-user');
+      this.owner.lookup('service:data')._clearCache();
+    });
+
+    hooks.afterEach(async function () {
+      this.owner.lookup('service:data')._clearCache();
     });
 
     test("it creates new card instance", async function (assert) {
@@ -142,6 +158,9 @@ module("Unit | Service | data", function () {
             },
             model: {
               data: { type: card1Id, id: card1Id }
+            },
+            'adopted-from': {
+              data: { type: 'cards', id: 'local-hub::@cardstack/base-card' }
             }
           }
         },
@@ -175,6 +194,9 @@ module("Unit | Service | data", function () {
           relationships: {
             fields: {
               data: [{ type: 'fields', id: 'title' }],
+            },
+            'adopted-from': {
+              data: { type: 'cards', id: 'local-hub::@cardstack/base-card' }
             },
             model: {
               data: { type: card1Id, id: card1Id }
@@ -303,6 +325,9 @@ module("Unit | Service | data", function () {
             fields: {
               data: [{ type: 'fields', id: 'title' }],
             },
+            'adopted-from': {
+              data: { type: 'cards', id: 'local-hub::@cardstack/base-card' }
+            },
             model: {
               data: { type: card1Id, id: card1Id }
             }
@@ -335,6 +360,9 @@ module("Unit | Service | data", function () {
           relationships: {
             fields: {
               data: [{ type: 'fields', id: 'author' }],
+            },
+            'adopted-from': {
+              data: { type: 'cards', id: 'local-hub::@cardstack/base-card' }
             },
             model: {
               data: { type: card1Id, id: card1Id }
@@ -371,6 +399,9 @@ module("Unit | Service | data", function () {
             fields: {
               data: [{ type: 'fields', id: 'author' }],
             },
+            'adopted-from': {
+              data: { type: 'cards', id: 'local-hub::@cardstack/base-card' }
+            },
             model: {
               data: { type: card1Id, id: card1Id }
             }
@@ -406,6 +437,9 @@ module("Unit | Service | data", function () {
             fields: {
               data: [{ type: 'fields', id: 'reviewers' }],
             },
+            'adopted-from': {
+              data: { type: 'cards', id: 'local-hub::@cardstack/base-card' }
+            },
             model: {
               data: { type: card1Id, id: card1Id }
             }
@@ -440,6 +474,9 @@ module("Unit | Service | data", function () {
           relationships: {
             fields: {
               data: [{ type: 'fields', id: 'reviewers' }],
+            },
+            'adopted-from': {
+              data: { type: 'cards', id: 'local-hub::@cardstack/base-card' }
             },
             model: {
               data: { type: card1Id, id: card1Id }
@@ -486,6 +523,9 @@ module("Unit | Service | data", function () {
             fields: {
               data: [],
             },
+            'adopted-from': {
+              data: { type: 'cards', id: 'local-hub::@cardstack/base-card' }
+            },
             model: {
               data: { type: card1Id, id: card1Id }
             }
@@ -515,6 +555,9 @@ module("Unit | Service | data", function () {
           relationships: {
             fields: {
               data: [],
+            },
+            'adopted-from': {
+              data: { type: 'cards', id: 'local-hub::@cardstack/base-card' }
             },
             model: {
               data: { type: card1Id, id: card1Id }
@@ -560,6 +603,162 @@ module("Unit | Service | data", function () {
       assert.equal(article.isNew, false, 'the newness state is correct for a saved card');
       assert.equal(article.loadedFormat, 'isolated', 'the loaded state is correct for a saved card');
     });
+
+    test("a card will adopt the @cardstack/base-card by default", async function (assert) {
+      let service = this.owner.lookup('service:data');
+      let card = service.createCard(card1Id);
+      await card.save();
+
+      let parent = card.adoptedFrom;
+      assert.equal(parent.constructor.name, 'Card');
+      assert.equal(parent.id, 'local-hub::@cardstack/base-card');
+      let adoptedResource = card.json.included.find(i => `${i.type}/${i.id}` === 'cards/local-hub::@cardstack/base-card');
+      assert.ok(adoptedResource);
+    });
+
+    test("a card can specify a card that it adopts from", async function(assert) {
+      let service = this.owner.lookup('service:data');
+      let parent = service.createCard(card1Id);
+      parent.addField({ name: 'title', type: '@cardstack/core-types::string', neededWhenEmbedded: true, value: 'test title' });
+      parent.addField({ name: 'body', type: '@cardstack/core-types::string', value: 'test body' });
+      await parent.save();
+
+      let card = service.createCard(card2Id, parent);
+      assert.equal(card.isDirty, true, 'the dirtiness is correct for a new card');
+      assert.equal(card.isNew, true, 'the isNew state is correct for a new card');
+      assert.notOk(card.json.data.relationships.fields.data.find(i => i.id === 'title'), 'adopted field does not appear in card fields relationships');
+      assert.notOk(card.json.data.relationships.fields.data.find(i => i.id === 'body'), 'adopted field does not appear in card fields relationships');
+      assert.notOk(card.json.included.find(i => i.id === 'title'), 'adopted field schema does not appear in card included');
+      assert.notOk(card.json.included.find(i => i.id === 'body'), 'adopted field schema does not appear in card included');
+      assert.equal(card.getField('title').isAdopted, true);
+      assert.equal(card.getField('title').type, '@cardstack/core-types::string');
+      assert.equal(card.getField('title').neededWhenEmbedded, true);
+      assert.equal(card.getField('title').value, undefined);
+
+      assert.equal(card.getField('body').isAdopted, true);
+      assert.equal(card.getField('body').type, '@cardstack/core-types::string');
+      assert.equal(card.getField('body').neededWhenEmbedded, false);
+      assert.equal(card.getField('body').value, undefined);
+
+      card.getField('title').setValue('child title');
+      card.getField('body').setValue('child body');
+      card.addField({ name: 'name', type: '@cardstack/core-types::string', value: 'Van Gogh' });
+
+      assert.equal(card.getField('name').isAdopted, false);
+      assert.equal(card.adoptedFrom, parent);
+      assert.deepEqual(card.fields.map(i => i.name), [
+        'title',
+        'body',
+        'name'
+      ]);
+
+      await card.save();
+
+      service._clearCache();
+      card = await service.getCard(card.id, 'isolated');
+      assert.equal(card.isDirty, false, 'the dirtiness is correct');
+      assert.equal(card.isNew, false, 'the isNew state is correct');
+      assert.equal(card.getField('title').value, 'child title');
+      assert.equal(card.getField('body').value, 'child body');
+      assert.equal(card.getField('name').value, 'Van Gogh');
+      assert.equal(card.getField('title').isAdopted, true);
+      assert.equal(card.getField('body').isAdopted, true);
+      assert.equal(card.getField('name').isAdopted, false);
+
+      let adoptedFrom = card.adoptedFrom;
+      assert.equal(adoptedFrom.id, card1Id);
+      assert.equal(adoptedFrom.loadedFormat, 'embedded');
+      assert.equal(adoptedFrom.getField('title').value, 'test title');
+      assert.equal(adoptedFrom.getField('body'), undefined);
+      assert.equal(adoptedFrom.getField('name'), undefined);
+    });
+
+    test("it throws when you adopt from a card that is not isolated", async function (assert) {
+      let service = this.owner.lookup('service:data');
+      let parent = service.createCard(card1Id);
+      parent.addField({ name: 'title', type: '@cardstack/core-types::string', neededWhenEmbedded: true, value: 'test title' });
+      parent.addField({ name: 'body', type: '@cardstack/core-types::string', value: 'test body' });
+      await parent.save();
+      service._clearCache();
+
+      parent = await service.getCard(card1Id, 'embedded');
+      assert.throws(() => service.createCard(card2Id, parent), /must be loaded in the 'isolated' format first/);
+    });
+
+    test("it throws when you add a field that is already an adopted field", async function (assert) {
+      let service = this.owner.lookup('service:data');
+      let parent = service.createCard(card1Id);
+      parent.addField({ name: 'title', type: '@cardstack/core-types::string', neededWhenEmbedded: true, value: 'test title' });
+      parent.addField({ name: 'body', type: '@cardstack/core-types::string', value: 'test body' });
+      await parent.save();
+
+      let card = service.createCard(card2Id, parent);
+      assert.throws(() => card.addField({ name: 'title', type: '@cardstack/core-types::string' }), /'fields\/title' which already exists for this card/);
+    });
+
+    test("it throws when you try to remove an adopted field", async function(assert) {
+      let service = this.owner.lookup('service:data');
+      let parent = service.createCard(card1Id);
+      parent.addField({ name: 'title', type: '@cardstack/core-types::string', neededWhenEmbedded: true, value: 'test title' });
+      await parent.save();
+
+      let card = service.createCard(card3Id, parent);
+      assert.throws(() => card.getField('title').remove(), /adopted fields cannot be removed/);
+    });
+
+    test("it does not allow an adopted field's name to be changed", async function(assert) {
+      let service = this.owner.lookup('service:data');
+      let parent = service.createCard(card1Id);
+      parent.addField({ name: 'title', type: '@cardstack/core-types::string', neededWhenEmbedded: true, value: 'test title' });
+      await parent.save();
+      let card = service.createCard(card3Id, parent);
+
+      assert.throws(() => card.getField('title').setName('subtitle'), /adopted fields cannot have their name changed/);
+    });
+
+    // TODO We need to discuss this more deeply as a team to understand what the desired behavior is here
+    test("it does not allow an adopted field's label to be changed", async function(assert) {
+      let service = this.owner.lookup('service:data');
+      let parent = service.createCard(card1Id);
+      parent.addField({ name: 'title', type: '@cardstack/core-types::string', neededWhenEmbedded: true, value: 'test title' });
+      await parent.save();
+      let card = service.createCard(card3Id, parent);
+
+      assert.throws(() => card.getField('title').setLabel('The Title'), /adopted fields cannot have their label changed/);
+    });
+
+    test("it does not allow an adopted field's needed-when-embedded to be changed", async function(assert) {
+      let service = this.owner.lookup('service:data');
+      let parent = service.createCard(card1Id);
+      parent.addField({ name: 'title', type: '@cardstack/core-types::string', neededWhenEmbedded: true, value: 'test title' });
+      await parent.save();
+      let card = service.createCard(card3Id, parent);
+
+      assert.throws(() => card.getField('title').setNeededWhenEmbedded(false), /adopted fields cannot have their neededWhenEmbedded value changed/);
+    });
+
+    test("it throws when you try to create a card whose adopted parent has not yet been saved", async function(assert) {
+      let service = this.owner.lookup('service:data');
+      let parent = service.createCard(card1Id);
+      parent.addField({ name: 'title', type: '@cardstack/core-types::string', neededWhenEmbedded: true, value: 'test title' });
+
+      assert.throws(() => service.createCard(card3Id, parent), /the card you are trying to adopt 'local-hub::millenial-puppies' has not been saved yet/);
+    });
+
+    test("it allows a card to call setAdoptedFrom before it has been saved", async function(assert) {
+      let service = this.owner.lookup('service:data');
+      let parent = service.createCard(card1Id);
+      parent.addField({ name: 'title', type: '@cardstack/core-types::string', neededWhenEmbedded: true, value: 'test title' });
+      await parent.save();
+
+      let card = service.createCard(card3Id);
+      card.setAdoptedFrom(parent);
+      card.getField('title').setValue('test title');
+      await card.save();
+
+      assert.equal(card.adoptedFrom.id, parent.id);
+      assert.equal(card.getField('title').value, 'test title');
+    });
   });
 
   module("get card", function (hooks) {
@@ -584,6 +783,16 @@ module("Unit | Service | data", function () {
       service._clearCache();
     });
 
+    hooks.afterEach(async function () {
+      this.owner.lookup('service:data')._clearCache();
+    });
+
+    test("it throws when you call adoptedFrom on a card that has only been loaded in the embedded format", async function (assert) {
+      let service = this.owner.lookup('service:data');
+      let card = await service.getCard(card1Id, 'embedded');
+      assert.throws(() => card.adoptedFrom, /must be loaded in the isolated format/);
+    });
+
     test("it can get all cards in the store", async function(assert) {
       let service = this.owner.lookup('service:data');
       let cards = await service.allCardsInStore();
@@ -591,8 +800,9 @@ module("Unit | Service | data", function () {
 
       await service.getCard(card1Id, 'isolated');
       cards = await service.allCardsInStore();
-      assert.equal(cards.length, 2);
-      let [ card1, card2 ] = cards;
+      assert.equal(cards.length, 3);
+      let [ card1, baseCard, card2 ] = cards;
+      assert.equal(baseCard.id, 'local-hub::@cardstack/base-card');
       assertCardHasIsolatedFields(assert, card1);
 
       assert.equal(card2.loadedFormat, 'embedded');
@@ -604,7 +814,7 @@ module("Unit | Service | data", function () {
 
       await service.getCard(card2Id, 'isolated');
       cards = await service.allCardsInStore();
-      assert.equal(cards.length, 2);
+      assert.equal(cards.length, 3);
       ([ card1, card2 ] = cards);
       assertCardHasIsolatedFields(assert, card1);
       assert.equal(card2.loadedFormat, 'isolated');
@@ -894,6 +1104,10 @@ module("Unit | Service | data", function () {
       service._clearCache();
     });
 
+    hooks.afterEach(async function () {
+      this.owner.lookup('service:data')._clearCache();
+    });
+
     test("it can add a new field to an existing card", async function (assert) {
       let service = this.owner.lookup('service:data');
       let card = await service.getCard(card1Id, 'isolated');
@@ -951,8 +1165,7 @@ module("Unit | Service | data", function () {
       assert.equal(model.attributes.title, undefined);
     });
 
-
-    test("it can change the name of a field", async function (assert) {
+    test("it can change the label of a field", async function (assert) {
       let service = this.owner.lookup('service:data');
       let card = await service.getCard(card1Id, 'isolated');
       let field = card.getField('title');
@@ -1339,6 +1552,281 @@ module("Unit | Service | data", function () {
       ]);
     });
 
+    test("it can change the adoptedFrom amongst parents that define the same field", async function (assert) {
+      let service = this.owner.lookup('service:data');
+      let parent1 = await service.getCard(card1Id, 'isolated');
+      parent1.addField({ name: 'name', type: '@cardstack/core-types::string'});
+      await parent1.save();
+
+      let parent2 = await service.getCard(card2Id, 'isolated');
+      let card = service.createCard(card3Id, parent1);
+      card.getField('title').setValue('test title');
+      card.getField('name').setValue('test name');
+      card.addField({ name: 'favorite-color', type: '@cardstack/core-types::string', value: 'purple' });
+      await card.save();
+
+      let field = card.getField('name');
+      assert.equal(card.adoptedFrom.id, parent1.id);
+      assert.equal(card.isDirty, false, 'the dirtiness is correct');
+      assert.equal(field.isDestroyed, false);
+
+      card.setAdoptedFrom(parent2);
+
+      assert.equal(card.adoptedFrom.id, parent2.id);
+      assert.equal(card.isDirty, true, 'the dirtiness is correct');
+      assert.equal(parent2.isDirty, false, 'the dirtiness is correct');
+      assert.equal(field.isDestroyed, true);
+      assert.deepEqual(card.fields.map(i => i.name), [
+        'name',
+        'email',
+        'favorite-color'
+      ]);
+
+      assert.equal(card.getField('title'), undefined);
+      // note that the name field is used in both parent--but actually has different context. the data for this field
+      // should not be preserved after changing the card's adoptedFrom
+      assert.equal(card.getField('name').value, undefined);
+      assert.equal(card.getField('favorite-color').value, 'purple');
+
+      await card.save();
+      assert.equal(card.isDirty, false, 'the dirtiness is correct');
+      assert.equal(card.adoptedFrom.id, parent2.id);
+      assert.deepEqual(card.fields.map(i => i.name), [
+        'name',
+        'email',
+        'favorite-color'
+      ]);
+      assert.equal(card.getField('title'), undefined);
+      assert.equal(card.getField('name').value, undefined);
+      assert.equal(card.getField('favorite-color').value, 'purple');
+    });
+
+    test("it can change the adoptedFrom amongst parents that adopt the same field", async function (assert) {
+      let service = this.owner.lookup('service:data');
+      let userCard = service.createCard(card4Id);
+      userCard.addField({ name: 'name', type: '@cardstack/core-types::string', neededWhenEmbedded: true });
+      userCard.addField({ name: 'email', type: '@cardstack/core-types::case-insensitive' });
+      await userCard.save();
+
+      let parent1 = service.createCard(card5Id, userCard);
+      parent1.getField('name').setValue('Mango');
+      parent1.getField('email').setValue('mango@nowhere.dog');
+      parent1.addField({ name: 'favorite-toy', type: '@cardstack/core-types::string', value: 'squeaky snake'});
+      await parent1.save();
+
+      let parent2 = service.createCard(card6Id, userCard);
+      parent2.getField('name').setValue('Ringo');
+      parent2.getField('email').setValue('ringo@nowhere.dog');
+      parent2.addField({ name: 'favorite-color', type: '@cardstack/core-types::string', value: 'purple'});
+      await parent2.save();
+
+      let child = service.createCard(card7Id, parent1);
+      child.getField('name').setValue('Musa');
+      child.getField('email').setValue('musa@nowhere.com');
+      child.getField('favorite-toy').setValue('legos');
+      child.addField({ name: 'favorite-food', type: '@cardstack/core-types::string', value: 'hamburger'});
+      await child.save();
+
+      let grandparentField = child.getField('name');
+      let parentField = child.getField('favorite-toy');
+      let ownField = child.getField('favorite-food');
+      assert.equal(child.adoptedFrom.id, parent1.id);
+      assert.equal(child.isDirty, false, 'the dirtiness is correct');
+      assert.equal(parentField.isDestroyed, false);
+
+      child.setAdoptedFrom(parent2);
+
+      assert.equal(child.adoptedFrom.id, parent2.id);
+      assert.equal(grandparentField.isDestroyed, false);
+      assert.equal(parentField.isDestroyed, true);
+      assert.equal(ownField.isDestroyed, false);
+
+      assert.deepEqual(child.fields.map(i => i.name), [
+        'name',
+        'email',
+        'favorite-color',
+        'favorite-food',
+      ]);
+      assert.equal(child.getField('name').value, 'Musa');
+      assert.equal(child.getField('email').value, 'musa@nowhere.com');
+      assert.equal(child.getField('favorite-toy'), undefined);
+      assert.equal(child.getField('favorite-color').value, undefined);
+      assert.equal(child.getField('favorite-food').value, 'hamburger');
+      await child.save();
+
+      assert.equal(child.adoptedFrom.id, parent2.id);
+      assert.deepEqual(child.fields.map(i => i.name), [
+        'name',
+        'email',
+        'favorite-color',
+        'favorite-food',
+      ]);
+      assert.equal(child.getField('name').value, 'Musa');
+      assert.equal(child.getField('email').value, 'musa@nowhere.com');
+      assert.equal(child.getField('favorite-toy'), undefined);
+      assert.equal(child.getField('favorite-color').value, undefined);
+      assert.equal(child.getField('favorite-food').value, 'hamburger');
+    });
+
+    test("it throws if card specified in setAdoptedFrom is not completely loaded", async function(assert) {
+      let service = this.owner.lookup('service:data');
+      let parent1 = await service.getCard(card1Id, 'embedded');
+
+      let card = service.createCard(card3Id);
+      await card.save();
+
+      assert.throws(() => card.setAdoptedFrom(parent1), /not fully loaded/);
+    });
+
+    test("it throws if card is not fully loaded when you call setAdoptedFrom", async function(assert) {
+      let service = this.owner.lookup('service:data');
+      let card = service.createCard(card3Id);
+      await card.save();
+      service._clearCache();
+
+      card = await service.getCard(card3Id, 'embedded');
+      let parent1 = await service.getCard(card1Id, 'isolated');
+
+      assert.throws(() => card.setAdoptedFrom(parent1), /not fully loaded/);
+    });
+
+    test("it throws when the adoptedFrom is changed to a card that has field name conflicts with the current card", async function (assert) {
+      let service = this.owner.lookup('service:data');
+      let card = service.createCard(card3Id);
+      card.addField({ name: 'title', type: '@cardstack/core-types::string' });
+      await card.save();
+
+      let parent1 = await service.getCard(card1Id, 'isolated');
+      assert.throws(() => card.setAdoptedFrom(parent1), /the field\(s\) 'title' conflict/);
+    });
+
+    skip("it allows an adopted field's position to be changed", async function(/*assert*/) {
+    });
+
+    skip("it allows a non-adopted field's position to be changed that has the side effect of changing the position of an adopted field", async function(/*assert*/) {
+    });
+
+    test("it does not allow an adopted field to be removed", async function(assert) {
+      let service = this.owner.lookup('service:data');
+      let parent1 = await service.getCard(card1Id, 'isolated');
+      let card = service.createCard(card3Id, parent1);
+      await card.save();
+
+      assert.throws(() => card.getField('title').remove(), /adopted fields cannot be removed/);
+    });
+
+    test("it does not allow an adopted field's name to be changed", async function(assert) {
+      let service = this.owner.lookup('service:data');
+      let parent1 = await service.getCard(card1Id, 'isolated');
+      let card = service.createCard(card3Id, parent1);
+      await card.save();
+
+      assert.throws(() => card.getField('title').setName('subtitle'), /adopted fields cannot have their name changed/);
+    });
+
+    // TODO We need to discuss this more deeply as a team to understand what the desired behavior is here
+    test("it does not allow an adopted field's label to be changed", async function(assert) {
+      let service = this.owner.lookup('service:data');
+      let parent1 = await service.getCard(card1Id, 'isolated');
+      let card = service.createCard(card3Id, parent1);
+      await card.save();
+
+      assert.throws(() => card.getField('title').setLabel('The Title'), /adopted fields cannot have their label changed/);
+    });
+
+    test("it does not allow an adopted field's needed-when-embedded to be changed", async function(assert) {
+      let service = this.owner.lookup('service:data');
+      let parent1 = await service.getCard(card1Id, 'isolated');
+      let card = service.createCard(card3Id, parent1);
+      await card.save();
+
+      assert.throws(() => card.getField('title').setNeededWhenEmbedded(false), /adopted fields cannot have their neededWhenEmbedded value changed/);
+    });
+
+    test("it does allow an adopted field's value to be changed", async function(assert) {
+      let service = this.owner.lookup('service:data');
+      let parent1 = await service.getCard(card1Id, 'isolated');
+      let card = service.createCard(card3Id, parent1);
+      await card.save();
+
+      card.getField('title').setValue('adopted title');
+      assert.equal(card.getField('title').value, 'adopted title');
+      await card.save();
+      service._clearCache();
+
+      card = await service.getCard(card3Id, 'embedded');
+      assert.equal(card.getField('title').value, 'adopted title');
+    });
+
+    test("it throws if you try to add a field that is already an adopted field", async function (assert) {
+      let service = this.owner.lookup('service:data');
+      let parent1 = await service.getCard(card1Id, 'isolated');
+      let card = service.createCard(card3Id, parent1);
+      await card.save();
+
+      assert.throws(() => card.addField({ name: 'title', type: '@cardstack/core-types::string' }), /'fields\/title' which already exists for this card/);
+    });
+
+    test("it throws when you try to call setAdoptedFrom to adopted from a card that has not yet been saved", async function(assert) {
+      let service = this.owner.lookup('service:data');
+      let card = service.createCard(card3Id);
+      await card.save();
+
+      let parent = service.createCard(card1Id);
+      parent.addField({ name: 'title', type: '@cardstack/core-types::string', neededWhenEmbedded: true, value: 'test title' });
+
+      assert.throws(() => card.setAdoptedFrom(parent), /the card you are trying to adopt 'local-hub::millenial-puppies' has not been saved yet/);
+    });
+
+    test("it does nothing if setAdoptedFrom is called with the same card that is already being used a the adopted-from card", async function(assert) {
+      let service = this.owner.lookup('service:data');
+      let parent1 = await service.getCard(card1Id, 'isolated');
+      let card = service.createCard(card3Id, parent1);
+      await card.save();
+
+      assert.equal(card.isDirty, false);
+      card.setAdoptedFrom(parent1);
+      assert.equal(card.isDirty, false);
+    });
+
+    test("it can invalidate cards that adopt from the updated card", async function(assert) {
+      let service = this.owner.lookup('service:data');
+      let parent = await service.getCard(card1Id, 'isolated');
+      let card = service.createCard(card3Id, parent);
+      await card.save();
+
+      assert.deepEqual(card.fields.map(i => i.name), [
+        'title',
+        'body',
+        'author'
+      ]);
+      parent.addField({ name: 'favorite-color', type: '@cardstack/core-types::string' });
+      await parent.save();
+
+      card = await service.getCard(card3Id, 'isolated');
+      assert.ok(card.getField('favorite-color'), 'newly added adopted field exists');
+    });
+
+    test("it can invalidate cards that adopt from the updated card one level removed", async function(assert) {
+      let service = this.owner.lookup('service:data');
+      let grandparent = await service.getCard(card1Id, 'isolated');
+      let parent = service.createCard(card3Id, grandparent);
+      await parent.save();
+      let card = service.createCard(card4Id, parent);
+      await card.save();
+
+      assert.deepEqual(card.fields.map(i => i.name), [
+        'title',
+        'body',
+        'author'
+      ]);
+      grandparent.addField({ name: 'favorite-color', type: '@cardstack/core-types::string' });
+      await grandparent.save();
+
+      card = await service.getCard(card4Id, 'isolated');
+      assert.ok(card.getField('favorite-color'), 'newly added adopted field exists');
+    });
+
     test("it throws when field specified by moveField is not an instance of Field", async function(assert) {
       let service = this.owner.lookup('service:data');
       let card = await service.getCard(card1Id, 'isolated');
@@ -1414,6 +1902,10 @@ module("Unit | Service | data", function () {
       service._clearCache();
     });
 
+    hooks.afterEach(async function () {
+      this.owner.lookup('service:data')._clearCache();
+    });
+
     test("it can delete a card", async function (assert) {
       let service = this.owner.lookup('service:data');
       let card = await service.getCard(card1Id, 'isolated');
@@ -1482,6 +1974,26 @@ module("Unit | Service | data", function () {
       await card.delete();
 
       await assert.rejects(card.delete(), /destroyed card/);
+    });
+
+    test('throws when you call setAdoptedFrom from a deleted Card instance', async function(assert) {
+      let service = this.owner.lookup('service:data');
+      let parent = await service.getCard(card1Id, 'isolated');
+      let card = await service.createCard(card3Id);
+      await card.save();
+      await card.delete();
+
+      assert.throws(() => card.setAdoptedFrom(parent), /destroyed card/);
+    });
+
+    test('throws when you call setAdoptedFrom, where you are adopting from a deleted card instance', async function(assert) {
+      let service = this.owner.lookup('service:data');
+      let parent = await service.getCard(card1Id, 'isolated');
+      let card = await service.createCard(card3Id);
+      await card.save();
+      await parent.delete();
+
+      assert.throws(() => card.setAdoptedFrom(parent), /has been destroyed/);
     });
 
     test('throws when you set the value from deleted Field instance', async function (assert) {

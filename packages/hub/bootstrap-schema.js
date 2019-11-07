@@ -431,6 +431,13 @@ const models = [
     }
   },
   {
+    type: 'computed-fields',
+    id: 'adoption-chain',
+    attributes: {
+      'computed-field-type': '@cardstack/core-types::adoption-chain',
+    }
+  },
+  {
     type: 'fields',
     id: 'instructions',
     attributes: {

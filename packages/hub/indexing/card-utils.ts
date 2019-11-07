@@ -59,6 +59,13 @@ const cardBrowserAssetFields = [
 const metadataSummaryField = 'metadata-summary';
 const embeddedMetadataSummaryField = `embedded-${metadataSummaryField}`;
 const internalFieldsSummaryField = `internal-fields-summary`;
+const adoptionChainField = 'adoption-chain';
+const cardComputedFields = [
+  metadataSummaryField,
+  embeddedMetadataSummaryField,
+  internalFieldsSummaryField,
+  adoptionChainField
+];
 
 function cardContextFromId(id: string | number) {
   let noContext: CardContext = {};
@@ -88,7 +95,7 @@ async function loadCard(schema: todo, internalCard: SingleResourceDoc, getIntern
 
   // a searcher or indexer may be returning invalid cards, so we
   // need to make sure to validate the internal card format.
-  await validateInternalCardFormat(schema, internalCard, getInternalCard);
+  await validateInternalCardFormat(schema, internalCard);
 
   await generateCardModule(internalCard);
   return await getCardSchemas(schema, internalCard, getInternalCard);
@@ -101,7 +108,7 @@ function getCardId(id: string | number | undefined) {
   return cardContextToId({ repository, packageName });
 }
 
-async function validateInternalCardFormat(schema: todo, internalCard: SingleResourceDoc, getInternalCard: todo) {
+async function validateInternalCardFormat(schema: todo, internalCard: SingleResourceDoc) {
   let id = internalCard.data.id as string;
   let type = internalCard.data.type as string;
   if (!id) { throw new Error(`The card ID must be supplied in the card document`, { status: 400, source: { pointer: '/data/id' }}); }
@@ -131,22 +138,6 @@ async function validateInternalCardFormat(schema: todo, internalCard: SingleReso
 
   // TODO need validation for included with missing id?
   if (!internalCard.included) { return; }
-
-  let chain = (await adoptionChain(internalCard, getInternalCard)).map((i: SingleResourceDoc) => i.data.id).filter(Boolean);
-  let foreignIncludedIndex = (internalCard.included || []).findIndex(i =>
-    !isInternalCard(i.type, i.id) &&
-    i.id != null && (
-      (!schema.isSchemaType(i.type) && !i.type.includes(id)) ||
-      (
-        !i.id.includes(id) &&
-        !chain.some(aid => i.id != null && aid != null && i.id.includes(aid))
-      )
-    )
-  );
-
-  if (foreignIncludedIndex > -1 ) {
-    throw new Error(`The card '${id}' contains included foreign internal models '${internalCard.included[foreignIncludedIndex].type}/${internalCard.included[foreignIncludedIndex].id}`, { status: 400, source: { pointer: `/included/${foreignIncludedIndex}`}});
-  }
 }
 
 async function adoptionChain(cardInInternalOrExternalFormat: SingleResourceDoc, getInternalCard: todo) {
@@ -156,6 +147,7 @@ async function adoptionChain(cardInInternalOrExternalFormat: SingleResourceDoc, 
 
   while (adoptedFromId = get(currentCard, 'data.relationships.adopted-from.data.id')) { // eslint-disable-line no-cond-assign
     currentCard = await getInternalCard(adoptedFromId);
+    if (!currentCard) { break; }
     chain.push(currentCard);
   }
   return chain;
@@ -265,9 +257,9 @@ async function generateCardModule(internalCard: SingleResourceDoc) {
     if (!computedFields.includes(field) || !cleanCard.data.relationships) { continue; }
     delete cleanCard.data.relationships[field];
   }
-  unset(cleanCard, `data.attributes.${metadataSummaryField}`);
-  unset(cleanCard, `data.attributes.${embeddedMetadataSummaryField}`);
-  unset(cleanCard, `data.attributes.${internalFieldsSummaryField}`);
+  for (let field of cardComputedFields) {
+    unset(cleanCard, `data.attributes.${field}`);
+  }
   let version: string = get(cleanCard, 'data.meta.version');
   let cardFolder: string = join(cardsDir, repository, packageName);
   let cardFile: string = join(cardFolder, cardFileName);
@@ -423,11 +415,7 @@ async function deriveCardModelContentType(cardInInternalOrExternalFormat: Single
     ].concat(
       cardBrowserAssetFields.map(i => ({ type: 'fields', id: i })),
       get(cardInInternalOrExternalFormat, 'data.relationships.fields.data') || [],
-      [
-        { type: 'computed-fields', id: metadataSummaryField },
-        { type: 'computed-fields', id: embeddedMetadataSummaryField },
-        { type: 'computed-fields', id: internalFieldsSummaryField },
-      ]
+      cardComputedFields.map(id => ({ type: 'computed-fields', id }))
     )
   };
 
@@ -583,13 +571,12 @@ async function adaptCardToFormat(schema: todo, session: Session, internalCard: S
   priviledgedCard = priviledgedCard || internalCard;
 
   let priviledgedAdoptedCardResources: ResourceObject[] = [];
-  let currentAdoptedCardId: string;
-  let currentPriviledgedCardResource: ResourceObject = priviledgedCard.data;
-  while (currentAdoptedCardId = get(currentPriviledgedCardResource, 'relationships.adopted-from.data.id')) { // eslint-disable-line no-cond-assign
-    let adoptedCardResource: ResourceObject | undefined = (priviledgedCard.included || []).find(i => `${i.type}/${i.id}` === `${currentAdoptedCardId}/${currentAdoptedCardId}`);
-    if (!adoptedCardResource) { throw new Error(`Couldn't find adopted card '${currentAdoptedCardId}' in the included resources of the card '${id}'--make sure default-includes is working correctly.`); }
+  for (let adoptedCardId of (get(priviledgedCard, 'data.attributes.adoption-chain') || [])) {
+    let adoptedCardResource: ResourceObject | undefined = (priviledgedCard.included || []).find(i => `${i.type}/${i.id}` === `${adoptedCardId}/${adoptedCardId}`);
+    if (!adoptedCardResource) {
+      throw new Error(`Couldn't find adopted card '${adoptedCardId}' in the included resources of the card '${id}'--make sure default-includes is working correctly.`);
+    }
     priviledgedAdoptedCardResources.push(adoptedCardResource);
-    currentPriviledgedCardResource = adoptedCardResource;
   }
 
   let cardSchema = await getCardSchemas(schema, priviledgedCard) || [];
@@ -614,12 +601,14 @@ async function adaptCardToFormat(schema: todo, session: Session, internalCard: S
     result.data.meta = internalCard.data.meta;
   }
 
-  // Construct the attribute type fields that will be hoisted as metadata
-  let attributes: AttributesObject = {};
+  // Construct the main card attributes and
+  // metadata attribute type fields that will be hoisted as metadata
   for (let attr of Object.keys(get(priviledgedCard, 'data.attributes') || {})) {
-    if (cardBrowserAssetFields.concat([metadataSummaryField]).includes(attr) && result.data.attributes) {
+    if (result.data.attributes &&
+      cardBrowserAssetFields.concat([ metadataSummaryField, adoptionChainField ]).includes(attr)) {
       let value = get(priviledgedCard, `data.attributes.${attr}`);
-      if (!value && attr !== metadataSummaryField) {
+      // crawl up the adoption chain looking for browser assets
+      if (!value && cardBrowserAssetFields.includes(attr)) {
         for (let adoptedCardResource of priviledgedAdoptedCardResources) {
           value = get(adoptedCardResource, `attributes.${attr}`);
           if (value) { break; }
@@ -628,23 +617,20 @@ async function adaptCardToFormat(schema: todo, session: Session, internalCard: S
       result.data.attributes[attr] = value;
     }
   }
+  let attributes: AttributesObject = {};
   for (let attr of
     Object.keys(internalCard.data.attributes)
-      .filter(i => !cardBrowserAssetFields.concat([
-        metadataSummaryField,
-        internalFieldsSummaryField,
-        embeddedMetadataSummaryField
-      ]).includes(i))) {
+      .filter(i => !cardBrowserAssetFields.concat(cardComputedFields).includes(i))) {
     attributes[attr] = internalCard.data.attributes[attr];
   }
-  unset(attributes, metadataSummaryField);
-  unset(attributes, embeddedMetadataSummaryField);
-  unset(attributes, internalFieldsSummaryField);
+  for (let field of cardComputedFields) {
+    unset(attributes, field);
+  }
 
   // Construct the relationship type fields that will be hoisted as metadata
   let relationships: RelationshipsObject = {};
   for (let rel of Object.keys(internalCard.data.relationships || {})) {
-    if (rel === 'fields' || !internalCard.data.relationships) { continue; }
+    if (rel === 'fields' || rel === 'adopted-from' || !internalCard.data.relationships) { continue; }
     let linkage: ResourceLinkage = get(internalCard, `data.relationships.${rel}.data`);
     if (Array.isArray(linkage)) {
       relationships[rel] = {
@@ -793,7 +779,7 @@ function removeCardNamespacing(internalCard: SingleResourceDoc) {
       resource.type = 'cards';
     }
     for (let field of Object.keys(resource.attributes || {})) {
-      if (cardBrowserAssetFields.concat([metadataSummaryField]).includes(field)) { continue; }
+      if (cardBrowserAssetFields.concat([metadataSummaryField, adoptionChainField]).includes(field)) { continue; }
       let { modelId:fieldName } = cardContextFromId(field);
       if (!fieldName || !resource.attributes) { continue; }
       resource.attributes[fieldName] = resource.attributes[field];

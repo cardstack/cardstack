@@ -280,18 +280,6 @@ describe('hub/card-services', function () {
       expect(error.message).to.match(/has a relationship to a foreign internal model/);
       expect(error.source).to.eql({ pointer: `/data/relationships/local-hub::foreign-internal-has-many-relationship::related-things/data/0` });
     });
-
-    it("does not allow a card to have included that contains foreign card internal models", async function () {
-      let error;
-      try {
-        await cardServices.get(env.session, foriegnInternalModelIncluded.data.id, 'isolated');
-      } catch (e) {
-        error = e;
-      }
-      expect(error.status).to.equal(400);
-      expect(error.message).to.match(/contains included foreign internal models/);
-      expect(error.source).to.eql({ pointer: `/included/0` });
-    });
   });
 
   describe('writing cards', function () {
@@ -547,6 +535,7 @@ describe('hub/card-services', function () {
     });
 
     it('can delete a card', async function () {
+      let searchers = env.lookup('hub:searchers');
       let card = await cardServices.create(env.session, externalArticleCard);
       let { data: { meta: { version } } } = card;
       await cardServices.delete(env.session, 'local-hub::millenial-puppies', version);
@@ -554,6 +543,30 @@ describe('hub/card-services', function () {
       let error;
       try {
         await cardServices.get(env.session, 'local-hub::millenial-puppies', 'isolated');
+      } catch (e) {
+        error = e;
+      }
+      expect(error.status).to.equal(404);
+
+      error = null;
+      try {
+        await searchers.get(env.session, 'local-hub', 'fields', 'local-hub::millenial-puppies::title');
+      } catch (e) {
+        error = e;
+      }
+      expect(error.status).to.equal(404);
+
+      error = null;
+      try {
+        await searchers.get(env.session, 'local-hub', 'fields', 'local-hub::millenial-puppies::author');
+      } catch (e) {
+        error = e;
+      }
+      expect(error.status).to.equal(404);
+
+      error = null;
+      try {
+        await searchers.get(env.session, 'local-hub', 'fields', 'local-hub::millenial-puppies::body');
       } catch (e) {
         error = e;
       }
@@ -1052,6 +1065,9 @@ describe('hub/card-services', function () {
         type: 'cards',
         id: externalArticleCard.data.id
       });
+      expect(adopted.data.attributes['adoption-chain']).to.eql([
+        externalArticleCard.data.id
+      ]);
 
       let fieldSpecs = adopted.data.relationships.fields.data.map(f => `${f.type}/${f.id}`);
       expect(fieldSpecs).to.include("fields/yarn");
@@ -1091,6 +1107,7 @@ describe('hub/card-services', function () {
 
       let model = adopted.included.find(i => i.type === genXKittens.data.id && i.id == genXKittens.data.id);
 
+      expect(model.relationships['adopted-from']).to.be.undefined;
       expect(model.attributes.yarn).to.equal("wool");
       expect(model.attributes.title).to.equal("GenX Kittens");
       expect(model.attributes.body).to.equal("Here is the body");
@@ -1124,6 +1141,9 @@ describe('hub/card-services', function () {
         type: 'cards',
         id: externalArticleCard.data.id
       });
+      expect(adopted.data.attributes['adoption-chain']).to.eql([
+        externalArticleCard.data.id
+      ]);
 
       let fieldSpecs = adopted.data.relationships.fields.data.map(f => `${f.type}/${f.id}`);
       expect(fieldSpecs).to.include("fields/yarn");
@@ -1182,6 +1202,10 @@ describe('hub/card-services', function () {
         type: 'cards',
         id: genXKittens.data.id
       });
+      expect(adopted.data.attributes['adoption-chain']).to.eql([
+        genXKittens.data.id,
+        externalArticleCard.data.id
+      ]);
 
       let fieldSpecs = adopted.data.relationships.fields.data.map(f => `${f.type}/${f.id}`);
       expect(fieldSpecs).to.include("fields/cuteness");
@@ -1272,6 +1296,10 @@ describe('hub/card-services', function () {
         type: 'cards',
         id: genXKittens.data.id
       });
+      expect(adopted.data.attributes['adoption-chain']).to.eql([
+        genXKittens.data.id,
+        externalArticleCard.data.id
+      ]);
 
       let fieldSpecs = adopted.data.relationships.fields.data.map(f => `${f.type}/${f.id}`);
       expect(fieldSpecs).to.include("fields/cuteness");
@@ -1327,7 +1355,44 @@ describe('hub/card-services', function () {
     it.skip("throws an error if you try to update a card to have a field that as the same name as an adopted field", async function() {
     });
 
-    it.skip("can change the adopted-from relationship to adopt from a different parent when there are no field conflicts", async function () {
+    it("can change the adopted-from relationship to adopt from a different parent when there are no field conflicts", async function () {
+      let factory = new JSONAPIFactory();
+      let card = await cardServices.create(env.session, factory.getDocumentFor(
+        factory.addResource('cards', 'local-hub::child')
+          .withRelated('fields', [
+            factory.addResource('fields', 'favorite-color').withAttributes({
+              'is-metadata': true,
+              'field-type': '@cardstack/core-types::string',
+              'needed-when-embedded': true
+            }),
+          ])
+          .withRelated('adopted-from', { type: 'cards', id: externalArticleCard.data.id })
+          .withRelated('model', factory.addResource('local-hub::child', 'local-hub::child')
+            .withAttributes({
+              'favorite-color': 'purple',
+              title: 'test title'
+            })
+          )
+      ));
+      expect(card.data.relationships['adopted-from'].data).to.eql({ type: 'cards', id: externalArticleCard.data.id });
+      expect(card.included.find(i => `${i.type}/${i.id}` === `cards/${externalArticleCard.data.id}`)).to.be.ok;
+      expect(card.data.attributes['favorite-color']).to.equal('purple');
+      expect(card.data.attributes.title).to.equal('test title');
+
+      card.data.relationships['adopted-from'].data = { type: 'cards', id: externalUserCard.data.id };
+      let model = card.included.find(i => `${i.type}/${i.id}` === `${card.data.id}/${card.data.id}`);
+      delete model.attributes.title;
+      model.attributes.name = 'Van Gogh';
+      card.included = card.included.filter(i => `${i.type}/${i.id}` !== `cards/${externalArticleCard.data.id}`);
+
+      let updatedCard = await cardServices.update(env.session, card.data.id, card);
+      expect(updatedCard.included.find(i => `${i.type}/${i.id}` === `cards/${externalArticleCard.data.id}`)).to.be.not.ok;
+      expect(updatedCard.included.find(i => `${i.type}/${i.id}` === `cards/${externalUserCard.data.id}`)).to.be.ok;
+      expect(updatedCard.data.relationships['adopted-from'].data).to.eql({ type: 'cards', id: externalUserCard.data.id });
+      expect(updatedCard.data.attributes['adoption-chain']).to.eql([ externalUserCard.data.id ]);
+      expect(updatedCard.data.attributes['favorite-color']).to.equal('purple');
+      expect(updatedCard.data.attributes.name).to.equal('Van Gogh');
+      expect(updatedCard.data.attributes.title).to.be.undefined;
     });
 
     it.skip("when a card changes adopted-from and the new parent defines the same name field as the old parent, the card's data for the field is not retained", async function() {

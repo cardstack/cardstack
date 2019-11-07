@@ -8,9 +8,8 @@ export default class IndexRoute extends Route {
   @service data;
 
   async model() {
-    // prime the store with seed models
-    await this.data.getCard('local-hub::@cardstack/base-card', 'isolated');
     if (environment === 'development') {
+      // prime the store with seed models
       await this.data.getCard('local-hub::why-doors', 'isolated');
       await this.data.getCard('local-hub::event', 'isolated');
     }

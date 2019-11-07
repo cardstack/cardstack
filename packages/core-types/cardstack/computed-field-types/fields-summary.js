@@ -7,6 +7,7 @@ const summaryFieldKey = {
 };
 
 exports.type = '@cardstack/core-types::object';
+const cardIdDelim = '::';
 
 exports.compute = async function(model, { format }) {
   let fields = await model.getRelated('fields');
@@ -20,19 +21,30 @@ exports.compute = async function(model, { format }) {
     if (format === 'embedded' && (!(await field.getField('is-metadata')) || !(await field.getField('needed-when-embedded')))) { continue; }
 
     let type = fieldSchema.fieldType;
-    let fieldName = field.id.split('::').pop();
-    let label = await field.getField('caption') || fieldName;
+    let cardIdentifiers = field.id.split(cardIdDelim);
+    let fieldName = cardIdentifiers.pop();
+    let source = cardIdentifiers.join(cardIdDelim);
     let isComputed = field.type === 'computed-fields';
+    let label = await field.getField('caption') || fieldName;
+    let neededWhenEmbedded = await field.getField('needed-when-embedded');
 
     // TODO we'll want to add all the items that the Field class from the data service consumes here
-
-    fieldSummaries[fieldName] = { type , label, isComputed };
+    fieldSummaries[fieldName] = {
+      type,
+      label,
+      source,
+      neededWhenEmbedded,
+      isComputed
+    };
   }
 
   let adoptedCard = await model.getRelated('adopted-from');
   if (adoptedCard) {
     let adoptedFields = await adoptedCard.getField(summaryFieldKey[format]) || {};
-    fieldSummaries = merge({}, fieldSummaries, adoptedFields);
+    for (let field of Object.keys(adoptedFields || {})) {
+      adoptedFields[field].isAdopted = true;
+    }
+    fieldSummaries = merge({}, adoptedFields, fieldSummaries);
   }
 
   return fieldSummaries;
