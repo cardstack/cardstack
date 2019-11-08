@@ -503,12 +503,13 @@ class Field {
     if (this.card.getField(name)) { throw new Error(`Cannot change the field name from '${this.name}' to '${name}'. A field with the name '${name}' already exists in this card '${this.card.id}'.`); }
 
     internal.name = name;
-    internalCard.fields = internalCard.fields.filter(i => i.name !== oldName);
     internalCard.serverIsolatedData.included = (internalCard.serverIsolatedData.included || []).filter(i => `${i.type}/${i.id}` !== `fields/${oldName}`);
 
     // eslint-disable-next-line no-self-assign
     internalCard.fields = internalCard.fields; // oh glimmer, you so silly...
     internalCard.isDirty = true;
+
+    this.setLabel(name);
 
     return this;
   }

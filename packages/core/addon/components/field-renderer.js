@@ -11,6 +11,14 @@ const defaultSchemaAttrs = [
   'embedded'
 ];
 
+// These are the field attributes that will trigger onFieldChanged()
+// to be called when the values of this attributes change
+const onFieldChangedDependencies = [
+  'nonce',
+  'name',
+  'label'
+]
+
 let renderNonce = 0;
 export default class FieldRenderer extends Component {
   @tracked newFieldName;
@@ -23,7 +31,7 @@ export default class FieldRenderer extends Component {
 
     this.newFieldName = this.args.field.name;
     this.newFieldLabel = this.args.field.label;
-    this.currentNonce = this.args.field.nonce;
+    this.currentNonce = this.nonce;
     this.renderNonce = renderNonce++;
   }
 
@@ -36,12 +44,16 @@ export default class FieldRenderer extends Component {
   }
 
   get onFieldUpdated() {
-    if (this.args.field.nonce !== this.currentNonce) {
-      this.currentNonce = this.args.field.nonce;
+    if (this.nonce !== this.currentNonce) {
+      this.currentNonce = this.nonce;
       this.newFieldName = this.args.field.name;
       this.newFieldLabel = this.args.field.label;
     }
     return null;
+  }
+
+  get nonce() {
+    return onFieldChangedDependencies.map(i => this.args.field[i]).join('::');
   }
 
   get dasherizedType() {
