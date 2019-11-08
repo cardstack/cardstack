@@ -140,12 +140,26 @@ module('Acceptance | card create', function(hooks) {
     await fillIn('[data-test-schema-attr="name"] input', 'subtitle');
     await triggerEvent('[data-test-schema-attr="name"] input', 'keyup');
 
+    assert.dom('[data-test-right-edge] [data-test-schema-attr="name"] input').hasValue('subtitle');
+    assert.dom('[data-test-right-edge] [data-test-schema-attr="label"] input').hasValue('subtitle');
+
     await click('[data-test-card-creator-save-btn]');
     await waitFor(`[data-test-card-view="${card1Id}"]`, { timeout });
 
     assert.equal(currentURL(), `/cards/${card1Id}`);
-    assert.dom('[data-test-field="subtitle"]').exists();
+    assert.dom('[data-test-field="subtitle"] [data-test-string-field-viewer-label]').hasText('subtitle');
     assert.dom('[data-test-field="title"]').doesNotExist();
+
+    await visit(`/cards/${card1Id}/edit`);
+    assert.dom('[data-test-field="subtitle"] [data-test-string-field-editor-label]').hasText('subtitle');
+    assert.dom('[data-test-field="title"]').doesNotExist();
+
+    await visit(`/cards/${card1Id}/schema`);
+    assert.dom('[data-test-field="subtitle"] [data-test-field-renderer-label]').hasText('subtitle');
+    await click('[data-test-field="subtitle"]');
+
+    assert.dom('[data-test-right-edge] [data-test-schema-attr="name"] input').hasValue('subtitle');
+    assert.dom('[data-test-right-edge] [data-test-schema-attr="label"] input').hasValue('subtitle');
   });
 
   test(`removing a field from a card`, async function(assert) {

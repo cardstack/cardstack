@@ -1131,10 +1131,12 @@ module("Unit | Service | data", function () {
       let card = await service.getCard(card1Id, 'isolated');
       let field = card.getField('title');
 
+      assert.equal(field.label, 'title');
       field.setName('subtitle');
 
       assert.equal(card.isDirty, true, 'the dirtiness is correct for card');
       assert.equal(field.name, 'subtitle');
+      assert.equal(field.label, 'subtitle');
       assert.equal(field.value, 'test title');
       assert.equal(card.getField('title'), undefined);
       assert.equal(card.getField('subtitle').name, 'subtitle');
@@ -1152,9 +1154,11 @@ module("Unit | Service | data", function () {
       field = card.getField('subtitle');
 
       assert.equal(field.name, 'subtitle');
+      assert.equal(field.label, 'subtitle');
       assert.equal(field.value, 'test title');
       assert.equal(card.getField('title'), undefined);
       assert.equal(card.getField('subtitle').name, 'subtitle');
+      assert.equal(card.getField('subtitle').label, 'subtitle');
       assert.equal(card.getField('subtitle').value, 'test title');
       assert.equal(Boolean(card.json.data.relationships.fields.data.find(i => `${i.type}/${i.id}` === 'fields/subtitle')), true, 'updated field schema reference exists');
       assert.equal(!(card.json.data.relationships.fields.data.find(i => `${i.type}/${i.id}` === 'fields/title')), true, 'old field schema reference doesnt exist');
