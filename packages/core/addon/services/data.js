@@ -677,27 +677,24 @@ class FieldInternals {
 }
 
 function cloneField(field, cardForField) {
-  let internal = priv.get(cardForField);
   let currentField = cardForField.getField(field.name);
-
   if (currentField && currentField.source === field.source) {
-    // we're already adopting this, just change it's position in the list
-    internal.fields = internal.fields.filter(i => i.name !== currentField.name);
-    internal.fields.unshift(currentField);
-  } else {
-    let { name, type, label, neededWhenEmbedded, source } = field;
-    let clonedField = new Field({
-      card: cardForField,
-      name,
-      type,
-      label,
-      source,
-      isAdopted: true,
-      neededWhenEmbedded,
-    });
-    // The default order is that adopted fields come before non-adopted fields
-    internal.fields.unshift(clonedField);
+    // we're already adopting this, do nothing
+    return;
   }
+
+  let internal = priv.get(cardForField);
+  let { name, type, label, neededWhenEmbedded, source } = field;
+  let clonedField = new Field({
+    card: cardForField,
+    name,
+    type,
+    label,
+    source,
+    isAdopted: true,
+    neededWhenEmbedded,
+  });
+  internal.fields.push(clonedField);
 
   // eslint-disable-next-line no-self-assign
   internal.fields = internal.fields; // oh glimmer, you so silly...
@@ -727,6 +724,8 @@ function getCardDocument(card) {
     }
   }
 
+  // TODO make sure that we filter out internal fields from field-order
+  set(document, `data.attributes.field-order`, card.fields.map(i => i.name));
   set(document,
     `data.relationships.fields.data`,
     card.fields.filter(i => !i.isAdopted)
@@ -801,14 +800,19 @@ function constructAdoptedFields(child, parent) {
   let internal = priv.get(child);
   internal.adoptedFrom = parent;
   set(internal.serverIsolatedData, 'data.relationships.adopted-from.data', { type: 'cards', id: parent.id });
-  for (let field of parent.fields.reverse()) {
+  for (let field of parent.fields) {
     cloneField(field, child);
   }
 }
 
 function reifyCard(card) {
-  let fields = [];
-  let cardJson = card.json;
+  let unorderedFields = {};
+  let internal = priv.get(card);
+  let cardJson = card.loadedFormat === 'isolated' ?
+    get(internal, 'serverIsolatedData') :
+    get(internal, 'serverEmbeddedData');
+  if (!cardJson) { throw new Error(`Card document from server for '${card.id}' does not exist`); }
+
   let fieldSummary = get(cardJson, 'data.attributes.metadata-summary') || {};
   let [ adoptedFieldNames, nonAdoptedFieldNames ] = partition(Object.keys(fieldSummary), i => fieldSummary[i].isAdopted);
   let orderedFieldNames = adoptedFieldNames.concat(nonAdoptedFieldNames);
@@ -821,9 +825,10 @@ function reifyCard(card) {
       neededWhenEmbedded
     } = fieldSummary[name];
     let value = getCardMetadata(card, type, name);
-    fields.push(new Field({ card: card, name, label, type, neededWhenEmbedded, source, isAdopted, value }));
+    unorderedFields[name] = new Field({ card: card, name, label, type, neededWhenEmbedded, source, isAdopted, value });
   }
-  priv.get(card).fields = fields;
+  let fieldOrder = get(cardJson, 'data.attributes.field-order') || [];
+  internal.fields = fieldOrder.map(i => unorderedFields[i]);
 
   if (card.id !== baseCard && card.loadedFormat === 'isolated') {
     let id = get(cardJson, `data.relationships.adopted-from.data.id`) || baseCard;
@@ -834,7 +839,7 @@ function reifyCard(card) {
         data: { data },
         session: card.session,
       });
-      priv.get(card).adoptedFrom = adoptedFrom;
+      internal.adoptedFrom = adoptedFrom;
     }
   }
 }

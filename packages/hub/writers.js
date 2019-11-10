@@ -64,7 +64,7 @@ class Writers {
       internalCard = card;
       ({ context, schema } = await this._loadInternalCardSchema(internalCard));
     } else {
-      ({ schema, context, internalCard } = await this._loadInternalCard(card));
+      ({ schema, context, internalCard } = await this._loadInternalCardSchema(card));
       try {
         oldCard = await this.searchers.get(Session.INTERNAL_PRIVILEGED, 'local-hub', id, id);
       } catch (e) {
@@ -360,26 +360,37 @@ class Writers {
     return schema;
   }
 
-  async _loadInternalCard(card) {
-    let internalCard = await generateInternalCardFormat(await this.currentSchema.getSchema(), card, this.searchers);
-    let { schema, context } = await this._loadInternalCardSchema(internalCard);
-    return { internalCard, schema, context };
-  }
-
-  async _loadInternalCardSchema(internalCard) {
+  async _loadInternalCardSchema(internalOrExternalCard) {
+    let isInternal = isInternalCard(internalOrExternalCard.data.type, internalOrExternalCard.data.id);
+    let id = internalOrExternalCard.data.id;
     // The act of deriving a schema may require reads in order to derive the schema
     // the card. These reads are signals that there are a resource dependencies
     // we need to keep track of in order to support invalidations correctly.
     // In this scenario, we'll create a DocumentContext to handle these reads that we'll
     // then pass into the finalizers to leverage for all the downstream stuff.
     let context = this.searchers.createDocumentContext({
-      id: internalCard.data.id,
-      type: internalCard.data.type,
+      id,
+      type: id,
       schema: await this.currentSchema.getSchema(),
-      upstreamDoc: internalCard
+      upstreamDoc: isInternal ?
+        internalOrExternalCard :
+        // just a placeholder while we use the context's getCard to generate the actual upstream doc
+        { data: { type: id, id } }
     });
+    let internalCard;
+    if (isInternal) {
+      internalCard = internalOrExternalCard;
+    } else {
+      internalCard = await generateInternalCardFormat(
+        await this.currentSchema.getSchema(),
+        internalOrExternalCard,
+        context.getCard.bind(context)
+      );
+      context.upstreamDoc = internalCard;
+      context.suppliedIncluded = internalCard.included || [];
+    }
     let schema = await loadCard(await this.currentSchema.getSchema(), internalCard, context.getCard.bind(context));
-    return { context, schema: await (await this.currentSchema.getSchema()).applyChanges(schema.map(document => ({ id: document.id, type: document.type, document }))) };
+    return { internalCard, context, schema: await (await this.currentSchema.getSchema()).applyChanges(schema.map(document => ({ id: document.id, type: document.type, document }))) };
   }
 
   _getSchemaDetailsForType(schema, type) {

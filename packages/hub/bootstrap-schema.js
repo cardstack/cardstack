@@ -446,6 +446,13 @@ const models = [
   },
   {
     type: 'fields',
+    id: 'field-order',
+    attributes: {
+      'field-type': '@cardstack/core-types::string-array',
+    }
+  },
+  {
+    type: 'fields',
     id: 'placeholder',
     attributes: {
       'field-type': '@cardstack/core-types::string'

@@ -90,6 +90,13 @@ function assertIsolatedCardMetadata(card) {
   expect(data.attributes['tag-names']).to.eql(['millenials', 'puppies', 'belly-rubs']);
   expect(data.attributes['embedded-metadata-summary']).to.be.undefined; // this one shouldn't leak into the external format
   expect(data.attributes['internal-fields-summary']).to.be.undefined; // this one shouldn't leak into the external format
+  expect(data.attributes['field-order']).to.eql([
+    'title',
+    'author',
+    'body',
+    'tag-names',
+    'tags',
+  ]);
   expect(Object.keys(data.attributes['metadata-summary'])).to.have.members([
     'title',
     'body',
@@ -117,6 +124,11 @@ function assertEmbeddedCardMetadata(card) {
   expect(data.attributes['internal-field']).to.be.undefined;
   expect(data.attributes['embedded-metadata-summary']).to.be.undefined; // this one shouldn't leak into the external format
   expect(data.attributes['internal-fields-summary']).to.be.undefined; // this one shouldn't leak into the external format
+  expect(data.attributes['field-order']).to.eql([
+    'title',
+    'author',
+    'tag-names'
+  ]);
   expect(Object.keys(data.attributes['metadata-summary'])).to.have.members([
     'title',
     'author',
@@ -167,6 +179,7 @@ function assertCardModels(card) {
   expect(relatedCard.attributes['embedded-metadata-summary']).to.be.undefined; // this one shouldn't leak into the external format
   expect(relatedCard.attributes['internal-fields-summary']).to.be.undefined; // this one shouldn't leak into the external format
   expect(Object.keys(relatedCard.attributes['metadata-summary'])).to.eql([ 'name' ]);
+  expect(relatedCard.attributes['field-order']).to.eql([ 'name' ]);
 }
 
 function assertCardSchema(card) {
@@ -384,6 +397,14 @@ describe('hub/card-services', function () {
 
       expect(includedIdentifiers).to.include('fields/editor');
       expect(fieldRelationships).to.include('fields/editor');
+      expect(data.attributes['field-order']).to.eql([
+        'title',
+        'author',
+        'body',
+        'tag-names',
+        'tags',
+        'editor'
+      ]);
 
       card = await cardServices.get(env.session, 'local-hub::millenial-puppies', 'isolated');
       data = card.data;
@@ -392,6 +413,14 @@ describe('hub/card-services', function () {
       fieldRelationships = data.relationships.fields.data.map(i => `${i.type}/${i.id}`);
       expect(includedIdentifiers).to.include('fields/editor');
       expect(fieldRelationships).to.include('fields/editor');
+      expect(data.attributes['field-order']).to.eql([
+        'title',
+        'author',
+        'body',
+        'tag-names',
+        'tags',
+        'editor'
+      ]);
     });
 
     it('can add a new related card field', async function () {
@@ -438,7 +467,6 @@ describe('hub/card-services', function () {
       expect(editor.attributes.email).to.be.undefined;
     });
 
-
     it("can remove a field from the card's schema", async function () {
       let card = await cardServices.create(env.session, externalArticleCard);
       card.data.relationships.fields.data = card.data.relationships.fields.data.filter(i => i.id !== 'body');
@@ -452,6 +480,12 @@ describe('hub/card-services', function () {
       expect(card.data.attributes.body).to.be.undefined;
       expect(includedIdentifiers).to.not.include('fields/body');
       expect(fieldRelationships).to.not.include('fields/body');
+      expect(data.attributes['field-order']).to.eql([
+        'title',
+        'author',
+        'tag-names',
+        'tags',
+      ]);
 
       card = await cardServices.get(env.session, 'local-hub::millenial-puppies', 'isolated');
       data = card.data;
@@ -461,6 +495,40 @@ describe('hub/card-services', function () {
       expect(card.data.attributes.body).to.be.undefined;
       expect(includedIdentifiers).to.not.include('fields/body');
       expect(fieldRelationships).to.not.include('fields/body');
+      expect(data.attributes['field-order']).to.eql([
+        'title',
+        'author',
+        'tag-names',
+        'tags',
+      ]);
+    });
+
+    it("can update field order", async function() {
+      let card = await cardServices.create(env.session, externalArticleCard);
+      card.data.attributes['field-order'] = [
+        'body',
+        'author',
+        'tags',
+        'tag-names',
+        'title',
+      ];
+      let { data } = await cardServices.update(env.session, 'local-hub::millenial-puppies', card);
+      expect(data.attributes['field-order']).to.eql([
+        'body',
+        'author',
+        'tags',
+        'tag-names',
+        'title',
+      ]);
+      card = await cardServices.get(env.session, 'local-hub::millenial-puppies', 'isolated');
+      data = card.data;
+      expect(data.attributes['field-order']).to.eql([
+        'body',
+        'author',
+        'tags',
+        'tag-names',
+        'title',
+      ]);
     });
 
     it("can update a card's internal model", async function () {
@@ -815,6 +883,11 @@ describe('hub/card-services', function () {
         expect(model.attributes['internal-field']).to.be.undefined;
       });
 
+      it.skip('does not return card metadata summaries for fields that the session does not have read authorization', async function() {
+        // same test setup as above, but make the assertion:
+        //     expect(Object.keys(data.attributes['metadata-summary'])).to.eql([ 'title' ]);
+      });
+
       it('does return card metadata that the session has read authorization', async function () {
         let { data, included } = await cardServices.get(allowedUser, 'local-hub::millenial-puppies', 'isolated');
 
@@ -1068,6 +1141,14 @@ describe('hub/card-services', function () {
       expect(adopted.data.attributes['adoption-chain']).to.eql([
         externalArticleCard.data.id
       ]);
+      expect(adopted.data.attributes['field-order']).to.eql([
+        'title',
+        'author',
+        'body',
+        'tag-names',
+        'tags',
+        'yarn',
+      ]);
 
       let fieldSpecs = adopted.data.relationships.fields.data.map(f => `${f.type}/${f.id}`);
       expect(fieldSpecs).to.include("fields/yarn");
@@ -1144,6 +1225,12 @@ describe('hub/card-services', function () {
       expect(adopted.data.attributes['adoption-chain']).to.eql([
         externalArticleCard.data.id
       ]);
+      expect(adopted.data.attributes['field-order']).to.eql([
+        'title',
+        'author',
+        'tag-names',
+        'yarn',
+      ]);
 
       let fieldSpecs = adopted.data.relationships.fields.data.map(f => `${f.type}/${f.id}`);
       expect(fieldSpecs).to.include("fields/yarn");
@@ -1205,6 +1292,15 @@ describe('hub/card-services', function () {
       expect(adopted.data.attributes['adoption-chain']).to.eql([
         genXKittens.data.id,
         externalArticleCard.data.id
+      ]);
+      expect(adopted.data.attributes['field-order']).to.eql([
+        'title',
+        'author',
+        'body',
+        'tag-names',
+        'tags',
+        'yarn',
+        'cuteness'
       ]);
 
       let fieldSpecs = adopted.data.relationships.fields.data.map(f => `${f.type}/${f.id}`);
@@ -1300,6 +1396,13 @@ describe('hub/card-services', function () {
         genXKittens.data.id,
         externalArticleCard.data.id
       ]);
+      expect(adopted.data.attributes['field-order']).to.eql([
+        'title',
+        'author',
+        'tag-names',
+        'yarn',
+        'cuteness'
+      ]);
 
       let fieldSpecs = adopted.data.relationships.fields.data.map(f => `${f.type}/${f.id}`);
       expect(fieldSpecs).to.include("fields/cuteness");
@@ -1355,7 +1458,71 @@ describe('hub/card-services', function () {
     it.skip("throws an error if you try to update a card to have a field that as the same name as an adopted field", async function() {
     });
 
-    it("can change the adopted-from relationship to adopt from a different parent when there are no field conflicts", async function () {
+    it("can update adopted field order", async function() {
+      let card = await cardServices.create(env.session, genXKittens);
+      card.data.attributes['field-order'] = [
+        'body',
+        'author',
+        'tags',
+        'tag-names',
+        'title',
+      ];
+      let { data } = await cardServices.update(env.session, card.data.id, card);
+      expect(data.attributes['field-order']).to.eql([
+        'body',
+        'author',
+        'tags',
+        'tag-names',
+        'title',
+        'yarn' // unspecified card's own field should be added to the end in response
+      ]);
+      card = await cardServices.get(env.session, card.data.id, 'isolated');
+      data = card.data;
+      expect(data.attributes['field-order']).to.eql([
+        'body',
+        'author',
+        'tags',
+        'tag-names',
+        'title',
+        'yarn'
+      ]);
+    });
+
+    it("field order includes any fields added as a result of document invalidation", async function() {
+      let parentCard = await cardServices.get(env.session, externalArticleCard.data.id, 'isolated');
+      let card = await cardServices.create(env.session, genXKittens);
+      card.data.attributes['field-order'] = [
+        'body',
+        'author',
+        'tags',
+        'tag-names',
+        'title',
+      ];
+
+      parentCard.data.relationships.fields.data.push({ type: 'fields', id: 'editor' });
+      parentCard.included.push({
+        type: 'fields',
+        id: 'editor',
+        attributes: {
+          'is-metadata': true,
+          'needed-when-embedded': true,
+          'field-type': '@cardstack/core-types::string'
+        }
+      });
+
+      parentCard = await cardServices.update(env.session, parentCard.data.id, parentCard);
+      card = await cardServices.get(env.session, card.data.id, 'isolated');
+      card.data.attributes['field-order'] = [
+        'body',
+        'author',
+        'tags',
+        'tag-names',
+        'title',
+        'editor'
+      ];
+    });
+
+    it("can change the adopted-from relationship to adopt from a different parent", async function () {
       let factory = new JSONAPIFactory();
       let card = await cardServices.create(env.session, factory.getDocumentFor(
         factory.addResource('cards', 'local-hub::child')
@@ -1393,6 +1560,11 @@ describe('hub/card-services', function () {
       expect(updatedCard.data.attributes['favorite-color']).to.equal('purple');
       expect(updatedCard.data.attributes.name).to.equal('Van Gogh');
       expect(updatedCard.data.attributes.title).to.be.undefined;
+      expect(updatedCard.data.attributes['field-order']).to.eql([
+        'favorite-color', // this is first because it is the only field that is retained in the new card that actually had an order assertion in the card document
+        'name',
+        'email',
+      ]);
     });
 
     it.skip("when a card changes adopted-from and the new parent defines the same name field as the old parent, the card's data for the field is not retained", async function() {
