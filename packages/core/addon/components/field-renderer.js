@@ -8,6 +8,7 @@ const defaultSchemaAttrs = [
   'type',
   'is-meta',
   'name',
+  'instructions',
   'embedded'
 ];
 
@@ -16,13 +17,15 @@ const defaultSchemaAttrs = [
 const onFieldChangedDependencies = [
   'nonce',
   'name',
-  'label'
+  'label',
+  'instructions'
 ]
 
 let renderNonce = 0;
 export default class FieldRenderer extends Component {
   @tracked newFieldName;
   @tracked newFieldLabel;
+  @tracked newFieldInstructions;
   @tracked currentNonce;
   @tracked renderNonce;
 
@@ -31,6 +34,7 @@ export default class FieldRenderer extends Component {
 
     this.newFieldName = this.args.field.name;
     this.newFieldLabel = this.args.field.label;
+    this.newFieldInstructions = this.args.field.instructions;
     this.currentNonce = this.nonce;
     this.renderNonce = renderNonce++;
   }
@@ -48,6 +52,7 @@ export default class FieldRenderer extends Component {
       this.currentNonce = this.nonce;
       this.newFieldName = this.args.field.name;
       this.newFieldLabel = this.args.field.label;
+      this.newFieldInstructions = this.args.field.instructions;
     }
     return null;
   }
@@ -78,6 +83,12 @@ export default class FieldRenderer extends Component {
   updateFieldLabel(newLabel) {
     this.newFieldLabel = newLabel;
     this.args.setFieldLabel(this.args.field.name, this.newFieldLabel);
+  }
+
+  @action
+  updateFieldInstructions(instructions) {
+    this.newFieldInstructions = instructions;
+    this.args.setFieldInstructions(this.args.field.name, this.newFieldInstructions);
   }
 
   @action

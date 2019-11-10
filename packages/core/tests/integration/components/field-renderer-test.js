@@ -143,6 +143,7 @@ module('Integration | Component | field-renderer', function(hooks) {
       @dropField={{action noop}}
       @setFieldName={{action noop}}
       @setFieldLabel={{action noop}}
+      @setFieldInstructions={{action noop}}
       @setNeededWhenEmbedded={{action noop}}
       @setPosition={{action noop}}
       @removeField={{action noop}}
@@ -176,8 +177,9 @@ module('Integration | Component | field-renderer', function(hooks) {
       @mode="schema"
       @setFieldName={{action setFieldName}}
       @setFieldLabel={{action setFieldLabel}}
+      @setFieldInstructions={{action noop}}
       @setNeededWhenEmbedded={{action noop}}
-      @schemaAttrs={{array "name" "label" "helper-text" "multiselect" "required" "embedded"}}
+      @schemaAttrs={{array "name" "label" "instructions" "multiselect" "required" "embedded"}}
     />
     `);
     let nameInput = '[data-test-schema-attr="name"] input';
@@ -207,8 +209,9 @@ module('Integration | Component | field-renderer', function(hooks) {
       @mode="schema"
       @setFieldName={{action setFieldName}}
       @setFieldLabel={{action setFieldLabel}}
+      @setFieldInstructions={{action noop}}
       @setNeededWhenEmbedded={{action noop}}
-      @schemaAttrs={{array "name" "label" "helper-text" "multiselect" "required" "embedded"}}
+      @schemaAttrs={{array "name" "label" "instructions" "multiselect" "required" "embedded"}}
     />
     `);
     let nameInput = '[data-test-schema-attr="name"] input';
@@ -220,6 +223,34 @@ module('Integration | Component | field-renderer', function(hooks) {
     assert.dom(labelInput).hasValue('TITLE');
     assert.equal(field.name, 'title');
     assert.equal(field.label, 'TITLE');
+  });
+
+  test('it can change field instructions in schema mode', async function(assert) {
+    let service = this.owner.lookup('service:data');
+    let card = service.createCard(qualifiedCard1Id);
+    let field = card.addField({ name: 'title', type: '@cardstack/core-types::string', instructions: 'test instructions'  });
+    this.set('field', field);
+    this.set('noop', () => {});
+    this.set('setFieldInstructions', (fieldName, instructions) => card.getField(fieldName).setInstructions(instructions));
+
+    await render(hbs`
+    <FieldRenderer
+      @isRightEdgeField={{true}}
+      @field={{field}}
+      @mode="schema"
+      @setFieldName={{action noop}}
+      @setFieldLabel={{action noop}}
+      @setFieldInstructions={{action setFieldInstructions}}
+      @setNeededWhenEmbedded={{action noop}}
+      @schemaAttrs={{array "name" "label" "instructions" "multiselect" "required" "embedded"}}
+    />
+    `);
+    let input = '[data-test-schema-attr="instructions"] textarea';
+    await fillIn(input, 'updated instructions');
+    await triggerEvent(input, 'keyup');
+
+    assert.dom(input).hasValue('updated instructions');
+    assert.equal(field.instructions, 'updated instructions');
   });
 
   test('it can change field needed-when-embedded in schema mode', async function(assert) {
@@ -241,8 +272,9 @@ module('Integration | Component | field-renderer', function(hooks) {
       @mode="schema"
       @setFieldName={{action noop}}
       @setFieldLabel={{action noop}}
+      @setFieldInstructions={{action noop}}
       @setNeededWhenEmbedded={{action setNeededWhenEmbedded}}
-      @schemaAttrs={{array "name" "label" "helper-text" "multiselect" "required" "embedded"}}
+      @schemaAttrs={{array "name" "label" "instructions" "multiselect" "required" "embedded"}}
     />
     `);
     let input = '[data-test-schema-attr="embedded"] input';
@@ -270,6 +302,7 @@ module('Integration | Component | field-renderer', function(hooks) {
       @dropField={{action noop}}
       @setFieldName={{action noop}}
       @setFieldLabel={{action noop}}
+      @setFieldInstructions={{action noop}}
       @setNeededWhenEmbedded={{action noop}}
       @setPosition={{action setPosition}}
       @removeField={{action noop}}
@@ -303,6 +336,7 @@ module('Integration | Component | field-renderer', function(hooks) {
       @dropField={{action noop}}
       @setFieldName={{action noop}}
       @setFieldLabel={{action noop}}
+      @setFieldInstructions={{action noop}}
       @setNeededWhenEmbedded={{action noop}}
       @setPosition={{action noop}}
       @removeField={{action removeField}}
@@ -334,6 +368,7 @@ module('Integration | Component | field-renderer', function(hooks) {
       @dropField={{action dropField}}
       @setFieldName={{action noop}}
       @setFieldLabel={{action noop}}
+      @setFieldInstructions={{action noop}}
       @setNeededWhenEmbedded={{action noop}}
       @setPosition={{action noop}}
       @removeField={{action noop}}

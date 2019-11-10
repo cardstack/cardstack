@@ -45,6 +45,7 @@ const models = [
           { type: 'fields', id: 'is-metadata'},
           { type: 'fields', id: 'needed-when-embedded'},
           { type: 'fields', id: 'constraints'},
+          { type: 'fields', id: 'instructions'},
         ]
       }
     }
@@ -64,6 +65,7 @@ const models = [
           { type: 'fields', id: 'params' },
           { type: 'fields', id: 'is-metadata'},
           { type: 'fields', id: 'needed-when-embedded'},
+          { type: 'fields', id: 'instructions'},
         ]
       }
     }

@@ -211,6 +211,9 @@ function assertCardSchema(card) {
   expect(includedIdentifiers).to.not.include.members([
     'content-types/local-hub::millenial-puppies'
   ]);
+
+  let title = included.find(i => `${i.type}/${i.id}` === `fields/title`);
+  expect(title.attributes.instructions, 'this is a required field');
 }
 
 describe('hub/card-services', function () {
@@ -317,6 +320,7 @@ describe('hub/card-services', function () {
 
       let article = await cardServices.get(env.session, 'local-hub::millenial-puppies', 'isolated');
       assertIsolatedCardMetadata(article);
+      assertCardSchema(card);
     });
 
     it("does not allow missing card model when creating card", async function () {
@@ -386,6 +390,7 @@ describe('hub/card-services', function () {
         attributes: {
           'is-metadata': true,
           'needed-when-embedded': true,
+          instructions: 'test instructions',
           'field-type': '@cardstack/core-types::string'
         }
       });
@@ -411,8 +416,10 @@ describe('hub/card-services', function () {
       included = card.included;
       includedIdentifiers = included.map(i => `${i.type}/${i.id}`);
       fieldRelationships = data.relationships.fields.data.map(i => `${i.type}/${i.id}`);
+      let field = included.find(i => `${i.type}/${i.id}` === 'fields/editor');
       expect(includedIdentifiers).to.include('fields/editor');
       expect(fieldRelationships).to.include('fields/editor');
+      expect(field.attributes.instructions, 'test instructions');
       expect(data.attributes['field-order']).to.eql([
         'title',
         'author',

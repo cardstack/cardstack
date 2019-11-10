@@ -20,6 +20,7 @@ const titleField = {
   attributes: {
     'is-metadata': true,
     caption: 'title',
+    instructions: null,
     'needed-when-embedded': true,
     'field-type': '@cardstack/core-types::string'
   },
@@ -30,6 +31,7 @@ const nameField = {
   attributes: {
     'is-metadata': true,
     caption: 'name',
+    instructions: null,
     'needed-when-embedded': true,
     'field-type': '@cardstack/core-types::string'
   },
@@ -40,6 +42,7 @@ const authorField = {
   attributes: {
     'is-metadata': true,
     caption: 'author',
+    instructions: null,
     'needed-when-embedded': true,
     'field-type': '@cardstack/core-types::belongs-to'
   },
@@ -50,6 +53,7 @@ const reviewersField = {
   attributes: {
     'is-metadata': true,
     caption: 'reviewers',
+    instructions: null,
     'needed-when-embedded': true,
     'field-type': '@cardstack/core-types::has-many'
   },
@@ -231,6 +235,17 @@ module("Unit | Service | data", function () {
 
       card = await service.getCard(card1Id, 'isolated');
       assert.equal(card.getField('title').label, 'The Title');
+    });
+
+    test("it can add a new field with instructions", async function (assert) {
+      let service = this.owner.lookup('service:data');
+      let card = service.createCard(card1Id);
+      let field = card.addField({ name: 'title', type: '@cardstack/core-types::string', instructions: 'test instructions' });
+
+      assert.equal(field.instructions, 'test instructions');
+      let json = card.json;
+      let fieldJson = json.included.find(i => `${i.type}/${i.id}` === 'fields/title');
+      assert.equal(fieldJson.attributes.instructions, 'test instructions');
     });
 
     test("it can add a new field to an isolated card at the first position", async function (assert) {
@@ -1107,6 +1122,17 @@ module("Unit | Service | data", function () {
       let card = await service.getCard(card1Id, 'embedded');
       assert.deepEqual(card.fields.map(i => i.name), ['title', 'author'], 'the fields are correct');
     });
+
+    test("it can get the instructions for a field", async function (assert) {
+      let service = this.owner.lookup('service:data');
+      let card = service.createCard(card3Id);
+      card.addField({ name: 'title', type: '@cardstack/core-types::string', instructions: 'test instructions' });
+      await card.save();
+
+      service._clearCache();
+      card = await service.getCard(card3Id, 'isolated');
+      assert.equal(card.getField('title').instructions, 'test instructions');
+    });
   });
 
   module("update card", function (hooks) {
@@ -1140,6 +1166,7 @@ module("Unit | Service | data", function () {
       let card = await service.getCard(card1Id, 'isolated');
       card.addField({ name: 'name', type: '@cardstack/core-types::string', neededWhenEmbedded: true });
 
+      assert.deepEqual(card.json.included.pop(), nameField);
       let cardDoc = cleanupDefaulValueArtifacts(card.json);
       assert.deepEqual(cardDoc.data.relationships.fields.data,
         [
@@ -1149,7 +1176,6 @@ module("Unit | Service | data", function () {
           { type: 'fields', id: 'name' },
         ]
       );
-      assert.deepEqual(cardDoc.included.pop(), nameField);
       assert.equal(card.isDirty, true, 'the dirtiness is correct for a modified card');
     });
 
@@ -1212,6 +1238,26 @@ module("Unit | Service | data", function () {
       assert.equal(card.isDirty, false);
       field = card.getField('title');
       assert.equal(field.label, 'The Title');
+    });
+
+    test("it can change the instructions of a field", async function (assert) {
+      let service = this.owner.lookup('service:data');
+      let card = service.createCard(card3Id);
+      card.addField({ name: 'title', type: '@cardstack/core-types::string', instructions: 'it puts the lotion on its skin' });
+      await card.save();
+
+      let field = card.getField('title');
+      assert.equal(card.isDirty, false);
+      assert.equal(field.instructions, 'it puts the lotion on its skin');
+
+      field.setInstructions('it puts the lotion in the basket');
+      assert.equal(card.isDirty, true);
+      assert.equal(field.instructions, 'it puts the lotion in the basket');
+      await card.save();
+
+      assert.equal(card.isDirty, false);
+      field = card.getField('title');
+      assert.equal(field.instructions, 'it puts the lotion in the basket');
     });
 
     test('when the field is set to an empty string, the name of the field is returned as the label', async function(assert) {
@@ -1649,7 +1695,7 @@ module("Unit | Service | data", function () {
       let parent2 = service.createCard(card6Id, userCard);
       parent2.getField('name').setValue('Ringo');
       parent2.getField('email').setValue('ringo@nowhere.dog');
-      parent2.addField({ name: 'favorite-color', type: '@cardstack/core-types::string', value: 'purple'});
+      parent2.addField({ name: 'favorite-color', type: '@cardstack/core-types::string', value: 'purple', label: 'color', instructions: 'black is not a color'});
       await parent2.save();
 
       let child = service.createCard(card7Id, parent1);
@@ -1698,6 +1744,8 @@ module("Unit | Service | data", function () {
       assert.equal(child.getField('email').value, 'musa@nowhere.com');
       assert.equal(child.getField('favorite-toy'), undefined);
       assert.equal(child.getField('favorite-color').value, undefined);
+      assert.equal(child.getField('favorite-color').instructions, 'black is not a color');
+      assert.equal(child.getField('favorite-color').label, 'color');
       assert.equal(child.getField('favorite-food').value, 'hamburger');
     });
 
@@ -1807,6 +1855,16 @@ module("Unit | Service | data", function () {
       await card.save();
 
       assert.throws(() => card.getField('title').setLabel('The Title'), /adopted fields cannot have their label changed/);
+    });
+
+    // TODO We need to discuss this more deeply as a team to understand what the desired behavior is here
+    test("it does not allow an adopted field's instructions to be changed", async function(assert) {
+      let service = this.owner.lookup('service:data');
+      let parent1 = await service.getCard(card1Id, 'isolated');
+      let card = service.createCard(card3Id, parent1);
+      await card.save();
+
+      assert.throws(() => card.getField('title').setInstructions('test instructions'), /adopted fields cannot have their instructions changed/);
     });
 
     test("it does not allow an adopted field's needed-when-embedded to be changed", async function(assert) {
@@ -2087,6 +2145,15 @@ module("Unit | Service | data", function () {
       await card.delete();
 
       assert.throws(() => field.setLabel('update'), /destroyed field/);
+    });
+
+    test('throws when you set the instructions from deleted Field instance', async function (assert) {
+      let service = this.owner.lookup('service:data');
+      let card = await service.getCard(card1Id, 'isolated');
+      let field = card.getField('title');
+      await card.delete();
+
+      assert.throws(() => field.setInstructions('update'), /destroyed field/);
     });
 
     test('throws when you call remove from deleted Field instance', async function (assert) {

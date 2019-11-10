@@ -27,12 +27,14 @@ exports.compute = async function(model, { format }) {
     let isComputed = field.type === 'computed-fields';
     let label = await field.getField('caption') || fieldName;
     let neededWhenEmbedded = await field.getField('needed-when-embedded');
+    let instructions = await field.getField('instructions');
 
     // TODO we'll want to add all the items that the Field class from the data service consumes here
     fieldSummaries[fieldName] = {
       type,
       label,
       source,
+      instructions,
       neededWhenEmbedded,
       isComputed
     };

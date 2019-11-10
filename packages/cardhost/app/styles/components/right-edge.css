@@ -180,6 +180,8 @@ instead use the vars in our palette css */
 
 .right-edge--section textarea {
   background: #22212b 0% 0% no-repeat padding-box;
+  color: white;
+  font-size: 11px;
   border: none;
   border-radius: 5px;
   width: 100%;

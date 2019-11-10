@@ -48,6 +48,7 @@ let card = factory.getDocumentFor(
       factory.addResource('fields', 'local-hub::millenial-puppies::title').withAttributes({
         'is-metadata': true,
         'needed-when-embedded': true,
+        'instructions': 'this is a required field',
         'field-type': '@cardstack/core-types::string' //TODO rework for fields-as-cards
       }).withRelated('constraints', [
         factory.addResource('constraints', 'local-hub::millenial-puppies::title-not-null')
