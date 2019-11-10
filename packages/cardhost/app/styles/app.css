@@ -48,6 +48,7 @@ Until that work is done we are statically adding this css
 
   --ch-spacing: 20px;
   --ch-edges-z-index: 10;
+  --ch-actions-z-index: 11;
 }
 
 /*
@@ -123,6 +124,7 @@ a:hover {
   top: var(--ch-spacing);
   right: var(--ch-spacing);
   display: flex;
+  z-index: var(--ch-actions-z-index);
 }
 
 .card-schema-updator--search-bar {
