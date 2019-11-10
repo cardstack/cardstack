@@ -152,6 +152,9 @@ module("Unit | Service | data", function () {
         data: {
           id: card1Id,
           type: 'cards',
+          attributes: {
+            'field-order': []
+          },
           relationships: {
             fields: {
               data: [],
@@ -191,6 +194,9 @@ module("Unit | Service | data", function () {
         data: {
           id: card1Id,
           type: 'cards',
+          attributes: {
+            'field-order': [ 'title' ]
+          },
           relationships: {
             fields: {
               data: [{ type: 'fields', id: 'title' }],
@@ -238,10 +244,10 @@ module("Unit | Service | data", function () {
       assert.equal(field2.position, 2);
       assert.equal(field3.position, 0);
       assert.deepEqual(card.fields.map(i => i.name), ['title', 'body', 'name']);
-      assert.deepEqual(card.json.data.relationships.fields.data, [
-        { type: 'fields', id: 'title' },
-        { type: 'fields', id: 'body' },
-        { type: 'fields', id: 'name' }
+      assert.deepEqual(card.json.data.attributes['field-order'], [
+        'title',
+        'body',
+        'name'
       ]);
       assert.equal(card.isDirty, true, 'the dirtiness is correct for a modified card');
     });
@@ -257,10 +263,10 @@ module("Unit | Service | data", function () {
       assert.equal(field2.position, 1);
       assert.equal(field3.position, 2);
       assert.deepEqual(card.fields.map(i => i.name), ['body', 'name', 'title']);
-      assert.deepEqual(card.json.data.relationships.fields.data, [
-        { type: 'fields', id: 'body' },
-        { type: 'fields', id: 'name' },
-        { type: 'fields', id: 'title' }
+      assert.deepEqual(card.json.data.attributes['field-order'], [
+        'body',
+        'name',
+        'title'
       ]);
       assert.equal(card.isDirty, true, 'the dirtiness is correct for a modified card');
     });
@@ -276,10 +282,10 @@ module("Unit | Service | data", function () {
       assert.equal(field2.position, 2);
       assert.equal(field3.position, 1);
       assert.deepEqual(card.fields.map(i => i.name), ['body', 'title', 'name']);
-      assert.deepEqual(card.json.data.relationships.fields.data, [
-        { type: 'fields', id: 'body' },
-        { type: 'fields', id: 'title' },
-        { type: 'fields', id: 'name' }
+      assert.deepEqual(card.json.data.attributes['field-order'], [
+        'body',
+        'title',
+        'name'
       ]);
       assert.equal(card.isDirty, true, 'the dirtiness is correct for a modified card');
     });
@@ -321,6 +327,9 @@ module("Unit | Service | data", function () {
         data: {
           id: card1Id,
           type: 'cards',
+          attributes: {
+            'field-order': [ 'title' ]
+          },
           relationships: {
             fields: {
               data: [{ type: 'fields', id: 'title' }],
@@ -357,6 +366,9 @@ module("Unit | Service | data", function () {
         data: {
           id: card1Id,
           type: 'cards',
+          attributes: {
+            'field-order': [ 'author' ]
+          },
           relationships: {
             fields: {
               data: [{ type: 'fields', id: 'author' }],
@@ -395,6 +407,9 @@ module("Unit | Service | data", function () {
         data: {
           id: card1Id,
           type: 'cards',
+          attributes: {
+            'field-order': [ 'author' ]
+          },
           relationships: {
             fields: {
               data: [{ type: 'fields', id: 'author' }],
@@ -433,6 +448,9 @@ module("Unit | Service | data", function () {
         data: {
           id: card1Id,
           type: 'cards',
+          attributes: {
+            'field-order': [ 'reviewers' ]
+          },
           relationships: {
             fields: {
               data: [{ type: 'fields', id: 'reviewers' }],
@@ -471,6 +489,9 @@ module("Unit | Service | data", function () {
         data: {
           id: card1Id,
           type: 'cards',
+          attributes: {
+            'field-order': [ 'reviewers' ]
+          },
           relationships: {
             fields: {
               data: [{ type: 'fields', id: 'reviewers' }],
@@ -519,6 +540,9 @@ module("Unit | Service | data", function () {
         data: {
           id: card1Id,
           type: 'cards',
+          attributes: {
+            'field-order': []
+          },
           relationships: {
             fields: {
               data: [],
@@ -552,6 +576,9 @@ module("Unit | Service | data", function () {
         data: {
           id: card1Id,
           type: 'cards',
+          attributes: {
+            'field-order': []
+          },
           relationships: {
             fields: {
               data: [],
@@ -1471,19 +1498,19 @@ module("Unit | Service | data", function () {
 
       assert.equal(card.isDirty, true, 'the dirtiness is correct for a modified card');
       assert.deepEqual(card.fields.map(i => i.name), [ 'author', 'title', 'body' ]);
-      assert.deepEqual(card.json.data.relationships.fields.data, [
-        { type: 'fields', id: 'author' },
-        { type: 'fields', id: 'title' },
-        { type: 'fields', id: 'body' }
+      assert.deepEqual(card.json.data.attributes['field-order'], [
+        'author',
+        'title',
+        'body'
       ]);
       await card.save();
 
       assert.equal(card.isDirty, false, 'the dirtiness is correct for a modified card');
       assert.deepEqual(card.fields.map(i => i.name), [ 'author', 'title', 'body' ]);
-      assert.deepEqual(card.json.data.relationships.fields.data, [
-        { type: 'fields', id: 'author' },
-        { type: 'fields', id: 'title' },
-        { type: 'fields', id: 'body' }
+      assert.deepEqual(card.json.data.attributes['field-order'], [
+        'author',
+        'title',
+        'body'
       ]);
     });
 
@@ -1497,19 +1524,19 @@ module("Unit | Service | data", function () {
       assert.equal(card.getField('title').position, 2);
       assert.equal(card.isDirty, true, 'the dirtiness is correct for a modified card');
       assert.deepEqual(card.fields.map(i => i.name), [ 'body', 'author', 'title' ]);
-      assert.deepEqual(card.json.data.relationships.fields.data, [
-        { type: 'fields', id: 'body' },
-        { type: 'fields', id: 'author' },
-        { type: 'fields', id: 'title' }
+      assert.deepEqual(card.json.data.attributes['field-order'], [
+        'body',
+        'author',
+        'title'
       ]);
       await card.save();
 
       assert.equal(card.isDirty, false, 'the dirtiness is correct for a modified card');
       assert.deepEqual(card.fields.map(i => i.name), [ 'body', 'author', 'title' ]);
-      assert.deepEqual(card.json.data.relationships.fields.data, [
-        { type: 'fields', id: 'body' },
-        { type: 'fields', id: 'author' },
-        { type: 'fields', id: 'title' }
+      assert.deepEqual(card.json.data.attributes['field-order'], [
+        'body',
+        'author',
+        'title'
       ]);
     });
 
@@ -1523,19 +1550,19 @@ module("Unit | Service | data", function () {
       assert.equal(card.getField('title').position, 1);
       assert.equal(card.isDirty, true, 'the dirtiness is correct for a modified card');
       assert.deepEqual(card.fields.map(i => i.name), [ 'body', 'title', 'author' ]);
-      assert.deepEqual(card.json.data.relationships.fields.data, [
-        { type: 'fields', id: 'body' },
-        { type: 'fields', id: 'title' },
-        { type: 'fields', id: 'author' }
+      assert.deepEqual(card.json.data.attributes['field-order'], [
+        'body',
+        'title',
+        'author'
       ]);
       await card.save();
 
       assert.equal(card.isDirty, false, 'the dirtiness is correct for a modified card');
       assert.deepEqual(card.fields.map(i => i.name), [ 'body', 'title', 'author' ]);
-      assert.deepEqual(card.json.data.relationships.fields.data, [
-        { type: 'fields', id: 'body' },
-        { type: 'fields', id: 'title' },
-        { type: 'fields', id: 'author' }
+      assert.deepEqual(card.json.data.attributes['field-order'], [
+        'body',
+        'title',
+        'author'
       ]);
     });
 
@@ -1549,10 +1576,10 @@ module("Unit | Service | data", function () {
       assert.equal(card.getField('title').position, 0);
       assert.equal(card.isDirty, false, 'the dirtiness is correct for a modified card');
       assert.deepEqual(card.fields.map(i => i.name), [ 'title', 'body', 'author' ]);
-      assert.deepEqual(card.json.data.relationships.fields.data, [
-        { type: 'fields', id: 'title' },
-        { type: 'fields', id: 'body' },
-        { type: 'fields', id: 'author' }
+      assert.deepEqual(card.json.data.attributes['field-order'], [
+        'title',
+        'body',
+        'author'
       ]);
     });
 
@@ -1581,9 +1608,10 @@ module("Unit | Service | data", function () {
       assert.equal(parent2.isDirty, false, 'the dirtiness is correct');
       assert.equal(field.isDestroyed, true);
       assert.deepEqual(card.fields.map(i => i.name), [
+        'favorite-color',
+        // newly received adoped parent fields are just appeneded to the end
         'name',
         'email',
-        'favorite-color'
       ]);
 
       assert.equal(card.getField('title'), undefined);
@@ -1596,9 +1624,9 @@ module("Unit | Service | data", function () {
       assert.equal(card.isDirty, false, 'the dirtiness is correct');
       assert.equal(card.adoptedFrom.id, parent2.id);
       assert.deepEqual(card.fields.map(i => i.name), [
+        'favorite-color',
         'name',
         'email',
-        'favorite-color'
       ]);
       assert.equal(card.getField('title'), undefined);
       assert.equal(card.getField('name').value, undefined);
@@ -1648,8 +1676,9 @@ module("Unit | Service | data", function () {
       assert.deepEqual(child.fields.map(i => i.name), [
         'name',
         'email',
-        'favorite-color',
         'favorite-food',
+        // newly received adoped parent fields are just appeneded to the end
+        'favorite-color',
       ]);
       assert.equal(child.getField('name').value, 'Musa');
       assert.equal(child.getField('email').value, 'musa@nowhere.com');
@@ -1662,8 +1691,8 @@ module("Unit | Service | data", function () {
       assert.deepEqual(child.fields.map(i => i.name), [
         'name',
         'email',
-        'favorite-color',
         'favorite-food',
+        'favorite-color',
       ]);
       assert.equal(child.getField('name').value, 'Musa');
       assert.equal(child.getField('email').value, 'musa@nowhere.com');
@@ -1704,10 +1733,52 @@ module("Unit | Service | data", function () {
       assert.throws(() => card.setAdoptedFrom(parent1), /the field\(s\) 'title' conflict/);
     });
 
-    skip("it allows an adopted field's position to be changed", async function(/*assert*/) {
+    test("it allows an adopted field's position to be changed", async function(assert) {
+      let service = this.owner.lookup('service:data');
+      let parent1 = await service.getCard(card1Id, 'isolated');
+      let card = service.createCard(card3Id, parent1);
+      card.addField({ name: 'name', type: '@cardstack/core-types::string' });
+      await card.save();
+
+      assert.deepEqual(card.fields.map(i => i.name), [ 'title', 'body', 'author', 'name' ]);
+      card.moveField(card.getField('title'), 3);
+      assert.equal(card.isDirty, true, 'the dirtiness is correct for a modified card');
+      assert.deepEqual(card.fields.map(i => i.name), [ 'body', 'author', 'name', 'title' ]);
+      assert.deepEqual(card.json.data.attributes['field-order'], [
+        'body',
+        'author',
+        'name',
+        'title',
+      ]);
+      await card.save();
+
+      assert.equal(card.isDirty, false, 'the dirtiness is correct for a modified card');
+      assert.deepEqual(card.fields.map(i => i.name), [ 'body', 'author', 'name', 'title' ]);
+      assert.deepEqual(card.json.data.attributes['field-order'], [
+        'body',
+        'author',
+        'name',
+        'title',
+      ]);
     });
 
-    skip("it allows a non-adopted field's position to be changed that has the side effect of changing the position of an adopted field", async function(/*assert*/) {
+    test("it allows a non-adopted field's position to be changed that has the side effect of changing the position of an adopted field", async function(assert) {
+      let service = this.owner.lookup('service:data');
+      let parent1 = await service.getCard(card1Id, 'isolated');
+      let card = service.createCard(card3Id, parent1);
+      card.addField({ name: 'name', type: '@cardstack/core-types::string' });
+      await card.save();
+
+      assert.deepEqual(card.fields.map(i => i.name), [ 'title', 'body', 'author', 'name' ]);
+      card.moveField(card.getField('name'), 1);
+      assert.deepEqual(card.fields.map(i => i.name), [ 'title', 'name', 'body', 'author' ]);
+      assert.deepEqual(card.json.data.attributes['field-order'], [
+        'title',
+        'name',
+        'body',
+        'author',
+      ]);
+      await card.save();
     });
 
     test("it does not allow an adopted field to be removed", async function(assert) {

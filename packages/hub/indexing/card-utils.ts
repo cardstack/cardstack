@@ -19,6 +19,8 @@ import {
   isEqual,
   sortBy,
   cloneDeep,
+  intersection,
+  difference,
   unset,
 } from 'lodash';
 import logger from '@cardstack/logger';
@@ -175,18 +177,39 @@ function validateExternalCardFormat(externalCard: SingleResourceDoc) {
   }
 }
 
-async function generateInternalCardFormat(schema: todo, externalCard: SingleResourceDoc, searchers: todo) {
+async function generateInternalCardFormat(schema: todo, externalCard: SingleResourceDoc, getInternalCard: todo) {
   let id = externalCard.data.id as string;
   if (!id) { throw new Error(`The card ID must be supplied in the card document in order to create the card.`); }
 
   validateExternalCardFormat(externalCard);
 
-  externalCard = await addCardNamespacing(schema, externalCard, searchers) as SingleResourceDoc;
+  let adoptedCards = await adoptionChain(externalCard, getInternalCard);
+  // The order here is intentional, where the oldest adopted ancestor's fields are first and the card's own fields are last
+  let allMetadataFields = adoptedCards
+    .reverse()
+    .concat(externalCard)
+    .reduce((fields: string[], card: SingleResourceDoc) => {
+      fields = fields.concat(
+        (get(card, 'data.relationships.fields.data') || [])
+          .filter((i: ResourceIdentifierObject) => (card.included || []).find((j: ResourceObject) => (
+            (`${j.type}/${j.id}` === `fields/${i.id}` || `${j.type}/${j.id}` === `computed-fields/${i.id}`) &&
+            get(j, 'attributes.is-metadata')
+          )))
+          .map((i: ResourceIdentifierObject) => i.id.split(cardIdDelim).pop()));
+      return fields;
+    }, []);
+
+  externalCard = await addCardNamespacing(schema, externalCard, getInternalCard) as SingleResourceDoc;
   let model: ResourceObject | undefined = (externalCard.included || []).find(i => `${i.type}/${i.id}` === `${id}/${id}`);
   if (!model) { throw new Error(`The card 'cards/${id}' is missing its card model '${id}/${id}'.`, { status: 400, source: { pointer: '/data/relationships/model/data' }}); }
 
-  let fields: ResourceIdentifierObject[] = get(externalCard, 'data.relationships.fields.data') || [];
-  set(model, 'relationships.fields.data', fields);
+  let fieldOrder: string[] = get(externalCard, 'data.attributes.field-order') || [];
+  // filter field names by actual fields that exist. any fields not specified in field order will be appended at the end
+  fieldOrder = intersection(fieldOrder, allMetadataFields);
+  fieldOrder = fieldOrder.concat(difference(allMetadataFields, fieldOrder));
+  set(model, 'attributes.field-order', fieldOrder);
+
+  set(model, 'relationships.fields.data', get(externalCard, 'data.relationships.fields.data') || []);
   let version = get(externalCard, 'data.meta.version');
 
   let adoptedCardId: string = get(externalCard, 'data.relationships.adopted-from.data.id');
@@ -257,7 +280,7 @@ async function generateCardModule(internalCard: SingleResourceDoc) {
     if (!computedFields.includes(field) || !cleanCard.data.relationships) { continue; }
     delete cleanCard.data.relationships[field];
   }
-  for (let field of cardComputedFields) {
+  for (let field of cardComputedFields.concat(['field-order'])) {
     unset(cleanCard, `data.attributes.${field}`);
   }
   let version: string = get(cleanCard, 'data.meta.version');
@@ -411,7 +434,8 @@ async function deriveCardModelContentType(cardInInternalOrExternalFormat: Single
   let fields: RelationshipsWithData = {
     data: [
       { type: 'fields', id: 'fields' },
-      { type: 'fields', id: 'adopted-from' }
+      { type: 'fields', id: 'adopted-from' },
+      { type: 'fields', id: 'field-order' },
     ].concat(
       cardBrowserAssetFields.map(i => ({ type: 'fields', id: i })),
       get(cardInInternalOrExternalFormat, 'data.relationships.fields.data') || [],
@@ -605,7 +629,11 @@ async function adaptCardToFormat(schema: todo, session: Session, internalCard: S
   // metadata attribute type fields that will be hoisted as metadata
   for (let attr of Object.keys(get(priviledgedCard, 'data.attributes') || {})) {
     if (result.data.attributes &&
-      cardBrowserAssetFields.concat([ metadataSummaryField, adoptionChainField ]).includes(attr)) {
+      cardBrowserAssetFields.concat([
+        metadataSummaryField,
+        adoptionChainField,
+        'field-order'
+      ]).includes(attr)) {
       let value = get(priviledgedCard, `data.attributes.${attr}`);
       // crawl up the adoption chain looking for browser assets
       if (!value && cardBrowserAssetFields.includes(attr)) {
@@ -703,6 +731,18 @@ async function adaptCardToFormat(schema: todo, session: Session, internalCard: S
       unset(result, `data.attributes.${metadataSummaryField}.${fieldName}`);
     }
   }
+
+  // only return field-order for fields that are appropriate for the requested format
+  let fieldOrder: string[] = get(result, 'data.attributes.field-order') || [];
+  let metadataFields: string[] = Object.keys(get(result, `data.attributes.${metadataSummaryField}`) || {});
+  set(
+    result,
+    'data.attributes.field-order',
+    intersection(fieldOrder, metadataFields)
+      // append any fields that have been added via index invalidation
+      .concat(difference(metadataFields, fieldOrder))
+  );
+
   result.included = uniqBy(result.included, i => `${i.type}/${i.id}`);
   return removeCardNamespacing(result) as SingleResourceDoc;
 }
@@ -727,12 +767,15 @@ function getIncludedResourcesForRelationship(type: string, id: string, internalC
       // read are necessary--rather, we just need to bundle up all the work that the DocumentContext already performed for us.
       // Note that the DocumentContext via the Model class is actually asserting that all the included cards are in embedded format.
       resolvedIncluded.push(...crawlEmbeddedCards(internalCard, resource.id).map((included: ResourceObject) => {
-        let embeddedFieldTypes = get(included, `attributes.${embeddedMetadataSummaryField}`);
-        if (!embeddedFieldTypes) { return included; } // if this is the case you have already dealt with it--just move along
+        let embeddedMetaSummary = get(included, `attributes.${embeddedMetadataSummaryField}`);
+        if (!embeddedMetaSummary) { return included; } // if this is the case you have already dealt with it--just move along
 
-        set(included, `attributes.${metadataSummaryField}`, embeddedFieldTypes);
+        set(included, `attributes.${metadataSummaryField}`, embeddedMetaSummary);
         unset(included, `attributes.${embeddedMetadataSummaryField}`);
         unset(included, `attributes.${internalFieldsSummaryField}`);
+
+        let fieldOrder: string[] = get(included, `attributes.field-order`) || [];
+        set(included, 'attributes.field-order', intersection(fieldOrder, Object.keys(embeddedMetaSummary)));
         return included;
       }));
     }
@@ -816,19 +859,9 @@ function removeCardNamespacing(internalCard: SingleResourceDoc) {
   return resultingCard;
 }
 
-async function addCardNamespacing(schema: todo, externalCard: SingleResourceDoc, searchers: todo) {
+async function addCardNamespacing(schema: todo, externalCard: SingleResourceDoc, getInternalCard: todo) {
   let id = getCardId(externalCard.data.id);
   if (!id) { return; }
-
-  let getInternalCard = async (id: string) => {
-    let internalCard: SingleResourceDoc | undefined;
-    try {
-      internalCard = await searchers.get(Session.INTERNAL_PRIVILEGED, 'local-hub', id, id);
-    } catch (e) {
-      if (e.status !== 404) { throw e; }
-    }
-    return internalCard;
-  };
 
   let cards: SingleResourceDoc[] = [ externalCard, ... await adoptionChain(externalCard, getInternalCard) ];
 
