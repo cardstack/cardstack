@@ -260,7 +260,7 @@ class Card {
     return (internal.fields || []).find(i => i.name === fieldName);
   }
 
-  addField({ name, label, type, neededWhenEmbedded=false, value, position }) {
+  addField({ name, label, type, instructions, neededWhenEmbedded=false, value, position }) {
     if (this.isDestroyed) { throw new Error('Cannot addField from destroyed card'); }
     if (this.loadedFormat === 'embedded') { throw new Error(`Cannot addField() on card id '${this.id}' because the card is in the embedded format. Use card.load() to get the isolated form of the card before adding fields.`) }
     if (!name) { throw new Error(`'addField()' called for card id '${this.id}' is missing 'name'`); }
@@ -268,7 +268,7 @@ class Card {
     if (this.fields.find(i => i.name === name)) { throw new Error(`'addField() called for card id '${this.id}' to add a new field 'fields/${name}' which already exists for this card.`); }
 
     label = label || name;
-    let field = new Field({ card: this, name, label, type, neededWhenEmbedded, value, source: this.id });
+    let field = new Field({ card: this, name, label, type, neededWhenEmbedded, instructions, value, source: this.id });
     let internal = priv.get(this);
     internal.fields.push(field);
     if (position != null) {
@@ -407,6 +407,7 @@ class Field {
     name,
     type,
     label,
+    instructions,
     source,
     neededWhenEmbedded,
     isAdopted,
@@ -419,6 +420,7 @@ class Field {
       type,
       label,
       source,
+      instructions,
       neededWhenEmbedded,
       isAdopted,
       value
@@ -450,6 +452,10 @@ class Field {
     return priv.get(this).label;
   }
 
+  get instructions() {
+    return priv.get(this).instructions;
+  }
+
   get type() {
     return priv.get(this).type;
   }
@@ -475,7 +481,7 @@ class Field {
   }
 
   get json() {
-    let { name:id, type, neededWhenEmbedded, serverData, label } = priv.get(this);
+    let { name:id, type, neededWhenEmbedded, serverData, label = null, instructions = null } = priv.get(this);
     // We're returning a JSON:API document here (as opposed to a resource) since eventually
     // a field may encapsulate constraints as included resources within its document
     return {
@@ -486,7 +492,8 @@ class Field {
           'is-metadata': true,
           'needed-when-embedded': neededWhenEmbedded,
           'field-type': type,
-          'caption': label
+          'caption': label,
+          'instructions': instructions
         }
       })
     };
@@ -526,6 +533,22 @@ class Field {
     }
 
     internal.label = label;
+
+    // eslint-disable-next-line no-self-assign
+    internalCard.fields = internalCard.fields; // oh glimmer, you so silly...
+    internalCard.isDirty = true;
+
+    return this;
+  }
+
+  setInstructions(label) {
+    if (this.isDestroyed) { throw new Error('Cannot setInstructions from destroyed field'); }
+    if (this.isAdopted) { throw new Error(`Cannot setInstructions() on card id '${this.card.id}', field: '${this.name}' because this field is an adopted field and adopted fields cannot have their instructions changed.`); }
+
+    let internal = priv.get(this);
+    let internalCard = priv.get(this.card);
+
+    internal.instructions = label;
 
     // eslint-disable-next-line no-self-assign
     internalCard.fields = internalCard.fields; // oh glimmer, you so silly...
@@ -642,6 +665,7 @@ class FieldInternals {
   @tracked card;
   @tracked name;
   @tracked label;
+  @tracked instructions;
   @tracked type;
   @tracked neededWhenEmbedded;
   @tracked isAdopted;
@@ -655,6 +679,7 @@ class FieldInternals {
     card,
     name,
     label,
+    instructions,
     type,
     neededWhenEmbedded,
     isAdopted,
@@ -665,6 +690,7 @@ class FieldInternals {
     this.card = card;
     this.name = name;
     this.label = label;
+    this.instructions = instructions;
     this.type = type;
     this.neededWhenEmbedded = Boolean(neededWhenEmbedded);
     this.isAdopted = Boolean(isAdopted);
@@ -684,13 +710,14 @@ function cloneField(field, cardForField) {
   }
 
   let internal = priv.get(cardForField);
-  let { name, type, label, neededWhenEmbedded, source } = field;
+  let { name, type, label, neededWhenEmbedded, source, instructions } = field;
   let clonedField = new Field({
     card: cardForField,
     name,
     type,
     label,
     source,
+    instructions,
     isAdopted: true,
     neededWhenEmbedded,
   });
@@ -822,10 +849,22 @@ function reifyCard(card) {
       label,
       source,
       isAdopted,
+      instructions,
       neededWhenEmbedded
     } = fieldSummary[name];
     let value = getCardMetadata(card, type, name);
-    unorderedFields[name] = new Field({ card: card, name, label, type, neededWhenEmbedded, source, isAdopted, value });
+
+    unorderedFields[name] = new Field({
+      card,
+      name,
+      label,
+      type,
+      instructions,
+      neededWhenEmbedded,
+      source,
+      isAdopted,
+      value
+    });
   }
   let fieldOrder = get(cardJson, 'data.attributes.field-order') || [];
   internal.fields = fieldOrder.map(i => unorderedFields[i]);

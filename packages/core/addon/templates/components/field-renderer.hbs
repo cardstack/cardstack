@@ -116,6 +116,35 @@
                 </span>
               {{/if}}
             </div>
+          {{else if (eq schemaAttr "instructions")}}
+            <div
+              class="schema-field-renderer--attribute"
+              data-test-schema-attr={{schemaAttr}}
+            >
+              {{#if @setFieldInstructions}}
+                <label
+                  for={{concat "edit-field-instructions-" @field.nonce "-" this.renderNonce}}
+                  class="schema-field-renderer--attribute-name"
+                  data-test-field-renderer-field-instructions-label
+                >
+                  Helper Text
+                </label>
+                <Textarea
+                  @id={{concat "edit-field-instructions-" @field.nonce "-" this.renderNonce}}
+                  @class="field-renderer-field-instructions-input schema-field-renderer--input"
+                  @value={{this.newFieldInstructions}}
+                  @key-up={{action this.updateFieldInstructions}}
+                />
+              {{else}}
+                <span class="schema-field-renderer--attribute-name">Helper Text</span>
+                <span
+                  class="schema-field-renderer--attribute-value"
+                  data-test-field-renderer-field-instructions
+                >
+                  {{@field.instructions}}
+                </span>
+              {{/if}}
+            </div>
           {{else if (eq schemaAttr "is-meta")}}
             <div
               class="schema-field-renderer--attribute"
@@ -171,20 +200,6 @@
                   {{if @field.neededWhenEmbedded "true" "false"}}
                 </span>
               {{/if}}
-            </div>
-          {{else if (eq schemaAttr "helper-text")}}
-            <div
-              class="schema-field-renderer--attribute"
-              data-test-schema-attr={{schemaAttr}}
-            >
-              <span class="schema-field-renderer--attribute-name">Helper Text</span>
-              <Textarea
-                data-test-field-helper-text
-                @id={{concat
-                  "right-edge--field-helper-text-"
-                  @selectedField.nonce
-                }}
-              />
             </div>
           {{else if
             (and

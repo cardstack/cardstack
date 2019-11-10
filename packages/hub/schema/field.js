@@ -23,6 +23,7 @@ module.exports = class Field {
     this.inlineEditorOptions = model.attributes['inline-editor-options'];
     this.isMetadata = model.attributes['is-metadata'];
     this.neededWhenEmbedded = model.attributes['needed-when-embedded'];
+    this.instructions = model.attributes['instructions'];
     this.searchable = model.attributes.searchable == null ? true : model.attributes.searchable;
     let owned = model.attributes.owned;
     this.owned = typeof owned === 'undefined' ? false : owned;
