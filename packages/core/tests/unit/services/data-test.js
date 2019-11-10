@@ -1674,10 +1674,10 @@ module("Unit | Service | data", function () {
       assert.equal(ownField.isDestroyed, false);
 
       assert.deepEqual(child.fields.map(i => i.name), [
-        'favorite-food',
-        // newly received adoped parent fields are just appeneded to the end
         'name',
         'email',
+        'favorite-food',
+        // newly received adoped parent fields are just appeneded to the end
         'favorite-color',
       ]);
       assert.equal(child.getField('name').value, 'Musa');
@@ -1689,9 +1689,9 @@ module("Unit | Service | data", function () {
 
       assert.equal(child.adoptedFrom.id, parent2.id);
       assert.deepEqual(child.fields.map(i => i.name), [
-        'favorite-food',
         'name',
         'email',
+        'favorite-food',
         'favorite-color',
       ]);
       assert.equal(child.getField('name').value, 'Musa');
