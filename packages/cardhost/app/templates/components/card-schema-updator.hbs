@@ -15,14 +15,20 @@
     >
       Preview
     </button>
-    <button
-      {{on "click" this.save}}
-      class="ch-button"
-      disabled={{not this.cardstackSession.isAuthenticated}}
-      data-test-card-schema-save-btn
-    >
-      Save
-    </button>
+    {{#if this.saveCard.isRunning}}
+      <div class="loader-container">
+        <div class="loader">Loading...</div>
+      </div>
+    {{else}}
+      <button
+        {{on "click" this.save}}
+        class="ch-button"
+        data-test-card-creator-save-btn
+        disabled={{not this.cardstackSession.isAuthenticated}}
+      >
+        Save
+      </button>
+    {{/if}}
   </div>
 {{/if}}
 
