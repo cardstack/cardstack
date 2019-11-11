@@ -112,6 +112,8 @@ class Card {
       isNew,
       loadedFormat,
       isDirty: isNew || false,
+      isolatedCss: data ? get(data, 'data.attributes.isolated-css') : null,
+      embeddedCss: data ? get(data, 'data.attributes.embedded-css') : null,
       serverEmbeddedData: (loadedFormat === 'embedded' ? data : null) ||
       { data: { id, type: 'cards' } },
       serverIsolatedData: (loadedFormat === 'isolated' ? data : null) ||
@@ -143,6 +145,10 @@ class Card {
     // new card to adopted from a specific card, the card you want to adopt from must be fully loaded
     // so we know what all fields will be inherited from the adopted card.
     if (adoptedFrom) {
+      let internal = priv.get(this);
+      internal.isolatedCss = adoptedFrom.isolatedCss;
+      internal.embeddedCss = adoptedFrom.embeddedCss;
+
       constructAdoptedFields(this, adoptedFrom);
     }
   }
@@ -201,6 +207,14 @@ class Card {
     return this.fields.filter(i => i.neededWhenEmbedded);
   }
 
+  get isolatedCss() {
+    return priv.get(this).isolatedCss;
+  }
+
+  get embeddedCss() {
+    return priv.get(this).embeddedCss;
+  }
+
   // This returns the most deeply loaded version of the card you have, so isolated if loaded, embedded if not
   get json() {
     return getCardDocument(this);
@@ -246,6 +260,13 @@ class Card {
     }
 
     constructAdoptedFields(this, card);
+
+    // if you change the adopted parent, you need to accept the adopted parent's css
+    // even if you have customized it already from the previous parent, as changing the adoptedFrom means
+    // that the template will likely be different and the CSS you were using is likely
+    // incorrect because of the changed template.
+    internal.isolatedCss = card.isolatedCss;
+    internal.embeddedCss = card.embeddedCss;
 
     // eslint-disable-next-line no-self-assign
     internal.fields = internal.fields; // oh glimmer, you so silly...
@@ -298,6 +319,14 @@ class Card {
     internal.isDirty = true;
 
     return field;
+  }
+
+  setIsolatedCss(css) {
+    return setCss(this, 'isolated', css);
+  }
+
+  setEmbeddedCss(css) {
+    return setCss(this, 'embedded', css);
   }
 
   async save() {
@@ -629,6 +658,8 @@ class CardInternals {
   @tracked loadedFormat;
   @tracked isDirty;
   @tracked isLoaded;
+  @tracked isolatedCss;
+  @tracked embeddedCss;
   @tracked serverEmbeddedData;
   @tracked serverIsolatedData;
   @tracked fields;
@@ -642,6 +673,8 @@ class CardInternals {
     isDirty,
     isLoaded,
     fields=[],
+    isolatedCss,
+    embeddedCss,
     serverEmbeddedData,
     serverIsolatedData,
     adoptedFrom
@@ -652,6 +685,8 @@ class CardInternals {
     this.loadedFormat = loadedFormat;
     this.isDirty = isDirty;
     this.isLoaded = isLoaded;
+    this.isolatedCss = isolatedCss;
+    this.embeddedCss = embeddedCss;
     this.serverEmbeddedData = serverEmbeddedData;
     this.serverIsolatedData = serverIsolatedData;
     this.isDestroyed = false;
@@ -700,6 +735,17 @@ class FieldInternals {
     this.isDestroyed = false;
     this.nonce = fieldNonce++;
   }
+}
+
+function setCss(card, format, css) {
+  if (card.isDestroyed) { throw new Error('Cannot set css from destroyed card'); }
+  if (card.loadedFormat === 'embedded') { throw new Error(`Cannot set css on card id '${card.id}' because the card is not fully loaded. Call card.load() first before setting css.`) }
+
+  let internal = priv.get(card);
+  internal[`${format}Css`] = css;
+  internal.isDirty = true;
+
+  return card;
 }
 
 function cloneField(field, cardForField) {
@@ -758,6 +804,9 @@ function getCardDocument(card) {
     card.fields.filter(i => !i.isAdopted)
       .map(i => ({ type: 'fields', id: i.name }))
   );
+  set(document, `data.attributes.isolated-css`, card.isolatedCss || null);
+  set(document, `data.attributes.embedded-css`, card.embeddedCss || null);
+
   if (format === 'isolated') {
     let modelIndex = document.included.findIndex(i => `${i.type}/${i.id}` === `${card.id}/${card.id}`);
     if (Object.keys(modelAttributes).length) {
@@ -839,6 +888,9 @@ function reifyCard(card) {
     get(internal, 'serverIsolatedData') :
     get(internal, 'serverEmbeddedData');
   if (!cardJson) { throw new Error(`Card document from server for '${card.id}' does not exist`); }
+
+  internal.isolatedCss = get(cardJson, 'data.attributes.isolated-css') || null;
+  internal.embeddedCss = get(cardJson, 'data.attributes.embedded-css') || null;
 
   let fieldSummary = get(cardJson, 'data.attributes.metadata-summary') || {};
   let [ adoptedFieldNames, nonAdoptedFieldNames ] = partition(Object.keys(fieldSummary), i => fieldSummary[i].isAdopted);

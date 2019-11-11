@@ -510,6 +510,24 @@ describe('hub/card-services', function () {
       ]);
     });
 
+    it("can update a card's css", async function() {
+      let card = await cardServices.create(env.session, externalArticleCard);
+      card.data.attributes['isolated-css'] = `.isolated-card { color: pink; }`;
+      card.data.attributes['embedded-css'] = `.embedded-card { color: pink; }`;
+
+      let { data } = await cardServices.update(env.session, externalArticleCard.data.id, card);
+      expect(data.attributes['isolated-css']).to.equal(`.isolated-card { color: pink; }`);
+      expect(data.attributes['embedded-css']).to.equal(`.embedded-card { color: pink; }`);
+
+      ({ data } = await cardServices.get(env.session, externalArticleCard.data.id, 'isolated'));
+      expect(data.attributes['isolated-css']).to.equal(`.isolated-card { color: pink; }`);
+      expect(data.attributes['embedded-css']).to.equal(`.embedded-card { color: pink; }`);
+
+      ({ data } = await cardServices.get(env.session, externalArticleCard.data.id, 'embedded'));
+      expect(data.attributes['isolated-css']).to.equal(`.isolated-card { color: pink; }`);
+      expect(data.attributes['embedded-css']).to.equal(`.embedded-card { color: pink; }`);
+    });
+
     it("can update field order", async function() {
       let card = await cardServices.create(env.session, externalArticleCard);
       card.data.attributes['field-order'] = [

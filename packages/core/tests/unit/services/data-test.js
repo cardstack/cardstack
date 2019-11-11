@@ -157,7 +157,9 @@ module("Unit | Service | data", function () {
           id: card1Id,
           type: 'cards',
           attributes: {
-            'field-order': []
+            'field-order': [],
+            'isolated-css': null,
+            'embedded-css': null,
           },
           relationships: {
             fields: {
@@ -199,7 +201,9 @@ module("Unit | Service | data", function () {
           id: card1Id,
           type: 'cards',
           attributes: {
-            'field-order': [ 'title' ]
+            'field-order': [ 'title' ],
+            'isolated-css': null,
+            'embedded-css': null,
           },
           relationships: {
             fields: {
@@ -246,6 +250,26 @@ module("Unit | Service | data", function () {
       let json = card.json;
       let fieldJson = json.included.find(i => `${i.type}/${i.id}` === 'fields/title');
       assert.equal(fieldJson.attributes.instructions, 'test instructions');
+    });
+
+    test("it can set isolated css", async function (assert) {
+      let service = this.owner.lookup('service:data');
+      let card = service.createCard(card1Id);
+      card.setIsolatedCss('.isolated-card { color: pink; }');
+
+      assert.equal(card.isolatedCss, '.isolated-card { color: pink; }');
+      let json = card.json;
+      assert.equal(json.data.attributes['isolated-css'], '.isolated-card { color: pink; }');
+    });
+
+    test("it can set embedded css", async function (assert) {
+      let service = this.owner.lookup('service:data');
+      let card = service.createCard(card1Id);
+      card.setEmbeddedCss('.embedded-card { color: pink; }');
+
+      assert.equal(card.embeddedCss, '.embedded-card { color: pink; }');
+      let json = card.json;
+      assert.equal(json.data.attributes['embedded-css'], '.embedded-card { color: pink; }');
     });
 
     test("it can add a new field to an isolated card at the first position", async function (assert) {
@@ -343,7 +367,9 @@ module("Unit | Service | data", function () {
           id: card1Id,
           type: 'cards',
           attributes: {
-            'field-order': [ 'title' ]
+            'field-order': [ 'title' ],
+            'isolated-css': null,
+            'embedded-css': null,
           },
           relationships: {
             fields: {
@@ -382,7 +408,9 @@ module("Unit | Service | data", function () {
           id: card1Id,
           type: 'cards',
           attributes: {
-            'field-order': [ 'author' ]
+            'field-order': [ 'author' ],
+            'isolated-css': null,
+            'embedded-css': null,
           },
           relationships: {
             fields: {
@@ -423,7 +451,9 @@ module("Unit | Service | data", function () {
           id: card1Id,
           type: 'cards',
           attributes: {
-            'field-order': [ 'author' ]
+            'field-order': [ 'author' ],
+            'isolated-css': null,
+            'embedded-css': null,
           },
           relationships: {
             fields: {
@@ -464,7 +494,9 @@ module("Unit | Service | data", function () {
           id: card1Id,
           type: 'cards',
           attributes: {
-            'field-order': [ 'reviewers' ]
+            'field-order': [ 'reviewers' ],
+            'isolated-css': null,
+            'embedded-css': null,
           },
           relationships: {
             fields: {
@@ -505,7 +537,9 @@ module("Unit | Service | data", function () {
           id: card1Id,
           type: 'cards',
           attributes: {
-            'field-order': [ 'reviewers' ]
+            'field-order': [ 'reviewers' ],
+            'isolated-css': null,
+            'embedded-css': null,
           },
           relationships: {
             fields: {
@@ -556,7 +590,9 @@ module("Unit | Service | data", function () {
           id: card1Id,
           type: 'cards',
           attributes: {
-            'field-order': []
+            'field-order': [],
+            'isolated-css': null,
+            'embedded-css': null,
           },
           relationships: {
             fields: {
@@ -592,7 +628,9 @@ module("Unit | Service | data", function () {
           id: card1Id,
           type: 'cards',
           attributes: {
-            'field-order': []
+            'field-order': [],
+            'isolated-css': null,
+            'embedded-css': null,
           },
           relationships: {
             fields: {
@@ -1159,6 +1197,58 @@ module("Unit | Service | data", function () {
 
     hooks.afterEach(async function () {
       this.owner.lookup('service:data')._clearCache();
+    });
+
+    test("it can update isolated css", async function (assert) {
+      let service = this.owner.lookup('service:data');
+      let card = await service.getCard(card1Id, 'isolated');
+
+      assert.equal(card.isDirty, false, 'the dirtiness is correct for card');
+      card.setIsolatedCss('.isolated-card { color: pink; }');
+      assert.equal(card.isDirty, true, 'the dirtiness is correct for card');
+
+      assert.equal(card.isolatedCss, '.isolated-card { color: pink; }');
+      assert.equal(card.json.data.attributes['isolated-css'], '.isolated-card { color: pink; }');
+      await card.save();
+
+      assert.equal(card.isDirty, false, 'the dirtiness is correct for card');
+      assert.equal(card.isolatedCss, '.isolated-card { color: pink; }');
+
+      service._clearCache();
+      card = await service.getCard(card1Id, 'isolated');
+      assert.equal(card.isolatedCss, '.isolated-card { color: pink; }');
+    });
+
+    test("it can update embedded css", async function (assert) {
+      let service = this.owner.lookup('service:data');
+      let card = await service.getCard(card1Id, 'isolated');
+
+      assert.equal(card.isDirty, false, 'the dirtiness is correct for card');
+      card.setEmbeddedCss('.embedded-card { color: pink; }');
+      assert.equal(card.isDirty, true, 'the dirtiness is correct for card');
+
+      assert.equal(card.embeddedCss, '.embedded-card { color: pink; }');
+      assert.equal(card.json.data.attributes['embedded-css'], '.embedded-card { color: pink; }');
+      await card.save();
+
+      assert.equal(card.isDirty, false, 'the dirtiness is correct for card');
+      assert.equal(card.embeddedCss, '.embedded-card { color: pink; }');
+
+      service._clearCache();
+      card = await service.getCard(card1Id, 'isolated');
+      assert.equal(card.embeddedCss, '.embedded-card { color: pink; }');
+    });
+
+    test("it throws when the card is not fully loaded and setIsolatedCss is called", async function(assert) {
+      let service = this.owner.lookup('service:data');
+      let card = await service.getCard(card1Id, 'embedded');
+      assert.throws(() => card.setIsolatedCss('.card {}'), /not fully loaded/);
+    });
+
+    test("it throws when the card is not fully loaded and setEmbeddedCss is called", async function(assert) {
+      let service = this.owner.lookup('service:data');
+      let card = await service.getCard(card1Id, 'embedded');
+      assert.throws(() => card.setEmbeddedCss('.card {}'), /not fully loaded/);
     });
 
     test("it can add a new field to an existing card", async function (assert) {
@@ -1829,6 +1919,145 @@ module("Unit | Service | data", function () {
       await card.save();
     });
 
+    test("it can inherit the adopted parent card's css", async function (assert) {
+      let service = this.owner.lookup('service:data');
+      let parent = await service.getCard(card1Id, 'isolated');
+      parent.setIsolatedCss('.adopted-card-isolated { color: blue; }');
+      parent.setEmbeddedCss('.adopted-card-embedded { color: blue; }');
+      await parent.save();
+
+      let card = service.createCard(card3Id, parent);
+      assert.equal(card.isolatedCss, '.adopted-card-isolated { color: blue; }');
+      assert.equal(card.embeddedCss, '.adopted-card-embedded { color: blue; }');
+      await card.save();
+
+      assert.equal(card.isolatedCss, '.adopted-card-isolated { color: blue; }');
+      assert.equal(card.embeddedCss, '.adopted-card-embedded { color: blue; }');
+      service._clearCache();
+
+      card = await service.getCard(card3Id, 'isolated');
+      assert.equal(card.isolatedCss, '.adopted-card-isolated { color: blue; }');
+      assert.equal(card.embeddedCss, '.adopted-card-embedded { color: blue; }');
+    });
+
+    test("it can override the adopted parent card's css", async function (assert) {
+      let service = this.owner.lookup('service:data');
+      let parent = await service.getCard(card1Id, 'isolated');
+      parent.setIsolatedCss('.adopted-card-isolated { color: blue; }');
+      parent.setEmbeddedCss('.adopted-card-embedded { color: blue; }');
+      await parent.save();
+
+      let card = service.createCard(card3Id, parent);
+      card.setIsolatedCss('.adopted-card-isolated { color: green; }');
+      card.setEmbeddedCss('.adopted-card-embedded { color: green; }');
+
+      assert.equal(card.isolatedCss, '.adopted-card-isolated { color: green; }');
+      assert.equal(card.embeddedCss, '.adopted-card-embedded { color: green; }');
+      await card.save();
+
+      assert.equal(card.isolatedCss, '.adopted-card-isolated { color: green; }');
+      assert.equal(card.embeddedCss, '.adopted-card-embedded { color: green; }');
+      service._clearCache();
+
+      card = await service.getCard(card3Id, 'isolated');
+      assert.equal(card.isolatedCss, '.adopted-card-isolated { color: green; }');
+      assert.equal(card.embeddedCss, '.adopted-card-embedded { color: green; }');
+    });
+
+    test("a card inherits the css from a new adopted parent when the adopted parent card is changed", async function(assert) {
+      let service = this.owner.lookup('service:data');
+      let parent1 = await service.getCard(card1Id, 'isolated');
+      parent1.setIsolatedCss('.adopted-card-isolated { color: blue; }');
+      parent1.setEmbeddedCss('.adopted-card-embedded { color: blue; }');
+      await parent1.save();
+
+      let parent2 = await service.getCard(card2Id, 'isolated');
+      parent2.setIsolatedCss('.adopted-card-isolated { color: red; }');
+      parent2.setEmbeddedCss('.adopted-card-embedded { color: red; }');
+      await parent2.save();
+
+      let child = service.createCard(card3Id, parent1);
+      await child.save();
+
+      child.setAdoptedFrom(parent2);
+      assert.equal(child.isolatedCss, '.adopted-card-isolated { color: red; }');
+      assert.equal(child.embeddedCss, '.adopted-card-embedded { color: red; }');
+      await child.save();
+
+      assert.equal(child.isolatedCss, '.adopted-card-isolated { color: red; }');
+      assert.equal(child.embeddedCss, '.adopted-card-embedded { color: red; }');
+      service._clearCache();
+
+      child = await service.getCard(card3Id, 'isolated');
+      assert.equal(child.isolatedCss, '.adopted-card-isolated { color: red; }');
+      assert.equal(child.embeddedCss, '.adopted-card-embedded { color: red; }');
+    });
+
+    test("when the adopted parent changes for a card, its css is set to the adopted parent's css", async function(assert) {
+      let service = this.owner.lookup('service:data');
+      let parent1 = await service.getCard(card1Id, 'isolated');
+      parent1.setIsolatedCss('.adopted-card-isolated { color: blue; }');
+      parent1.setEmbeddedCss('.adopted-card-embedded { color: blue; }');
+      await parent1.save();
+
+      let parent2 = await service.getCard(card2Id, 'isolated');
+      parent2.setIsolatedCss('.adopted-card-isolated { color: red; }');
+      parent2.setEmbeddedCss('.adopted-card-embedded { color: red; }');
+      await parent2.save();
+
+      let child = service.createCard(card3Id, parent1);
+      child.setIsolatedCss('.adopted-card-isolated { color: green; }');
+      child.setEmbeddedCss('.adopted-card-embedded { color: green; }');
+      await child.save();
+
+      child.setAdoptedFrom(parent2);
+      assert.equal(child.isolatedCss, '.adopted-card-isolated { color: red; }');
+      assert.equal(child.embeddedCss, '.adopted-card-embedded { color: red; }');
+      await child.save();
+
+      assert.equal(child.isolatedCss, '.adopted-card-isolated { color: red; }');
+      assert.equal(child.embeddedCss, '.adopted-card-embedded { color: red; }');
+      service._clearCache();
+
+      child = await service.getCard(card3Id, 'isolated');
+      assert.equal(child.isolatedCss, '.adopted-card-isolated { color: red; }');
+      assert.equal(child.embeddedCss, '.adopted-card-embedded { color: red; }');
+    });
+
+    test("a card can inherit css from grandparent adopted card when the adopted parent card is changed", async function(assert) {
+      let service = this.owner.lookup('service:data');
+      let grandparent = await service.getCard(card1Id, 'isolated');
+      grandparent.setIsolatedCss('.adopted-card-isolated { color: yellow; }');
+      grandparent.setEmbeddedCss('.adopted-card-embedded { color: yellow; }');
+      await grandparent.save();
+
+      let parent1 = service.createCard(card4Id, grandparent);
+      parent1.setIsolatedCss('.adopted-card-isolated { color: blue; }');
+      parent1.setEmbeddedCss('.adopted-card-embedded { color: blue; }');
+      await parent1.save();
+
+      let parent2 = service.createCard(card5Id, grandparent);
+      await parent2.save();
+
+      let child = service.createCard(card6Id, parent1);
+      assert.equal(child.isolatedCss, '.adopted-card-isolated { color: blue; }');
+      assert.equal(child.embeddedCss, '.adopted-card-embedded { color: blue; }');
+      await child.save();
+
+      child.setAdoptedFrom(parent2);
+      assert.equal(child.isolatedCss, '.adopted-card-isolated { color: yellow; }');
+      assert.equal(child.embeddedCss, '.adopted-card-embedded { color: yellow; }');
+      await child.save();
+
+      assert.equal(child.isolatedCss, '.adopted-card-isolated { color: yellow; }');
+      assert.equal(child.embeddedCss, '.adopted-card-embedded { color: yellow; }');
+      service._clearCache();
+
+      child = await service.getCard(card6Id, 'isolated');
+      assert.equal(child.isolatedCss, '.adopted-card-isolated { color: yellow; }');
+      assert.equal(child.embeddedCss, '.adopted-card-embedded { color: yellow; }');
+    });
+
     test("it does not allow an adopted field to be removed", async function(assert) {
       let service = this.owner.lookup('service:data');
       let parent1 = await service.getCard(card1Id, 'isolated');
@@ -2068,7 +2297,6 @@ module("Unit | Service | data", function () {
       assert.equal(article.getField('author').value, undefined);
     });
 
-
     test('throws when you call addField from deleted Card instance', async function (assert) {
       let service = this.owner.lookup('service:data');
       let card = await service.getCard(card1Id, 'isolated');
@@ -2127,6 +2355,22 @@ module("Unit | Service | data", function () {
       await parent.delete();
 
       assert.throws(() => card.setAdoptedFrom(parent), /has been destroyed/);
+    });
+
+    test("it throws when you call setIsolatedCss on a deleted card instance", async function(assert) {
+      let service = this.owner.lookup('service:data');
+      let card = await service.getCard(card1Id, 'isolated');
+      await card.delete();
+
+      assert.throws(() => card.setIsolatedCss('.card {}'), /destroyed card/);
+    });
+
+    test("it throws when you call setEmbeddedCss on a deleted card instance", async function(assert) {
+      let service = this.owner.lookup('service:data');
+      let card = await service.getCard(card1Id, 'isolated');
+      await card.delete();
+
+      assert.throws(() => card.setEmbeddedCss('.card {}'), /destroyed card/);
     });
 
     test('throws when you set the value from deleted Field instance', async function (assert) {
