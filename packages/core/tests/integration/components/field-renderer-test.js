@@ -153,8 +153,7 @@ module('Integration | Component | field-renderer', function(hooks) {
     assert.dom('[data-test-field-renderer-type]').hasText('@cardstack/core-types::string');
     assert.dom('[data-test-field-renderer-label]').hasText('title');
     assert.dom('[data-test-field-renderer-value]').hasText('test title');
-    assert.dom('[data-test-field-renderer-move-up-btn]').exists();
-    assert.dom('[data-test-field-renderer-move-down-btn]').exists();
+    assert.dom('[data-test-field-renderer-move-btn]').exists();
     assert.dom('[data-test-drop-zone="1"]').exists();
 
     assert.dom('.edit-title-field-value').doesNotExist();
@@ -283,42 +282,6 @@ module('Integration | Component | field-renderer', function(hooks) {
 
     assert.dom(input).isNotChecked();
     assert.equal(field.neededWhenEmbedded, false);
-  });
-
-  test('it can change field position in schema mode', async function(assert) {
-    let service = this.owner.lookup('service:data');
-    let card = service.createCard(qualifiedCard1Id);
-    card.addField({ name: 'body', type: '@cardstack/core-types::string', neededWhenEmbedded: true, value: 'test body' });
-    let field = card.addField({ name: 'title', type: '@cardstack/core-types::string', neededWhenEmbedded: true, value: 'test title' });
-    card.addField({ name: 'author', type: '@cardstack/core-types::string', neededWhenEmbedded: true, value: 'test author' });
-    this.set('field', field);
-    this.set('noop', () => {});
-    this.set('setPosition', (fieldName, position) => card.moveField(card.getField(fieldName), position));
-
-    await render(hbs`
-    <FieldRenderer
-      @field={{field}}
-      @mode="schema"
-      @dropField={{action noop}}
-      @setFieldName={{action noop}}
-      @setFieldLabel={{action noop}}
-      @setFieldInstructions={{action noop}}
-      @setNeededWhenEmbedded={{action noop}}
-      @setPosition={{action setPosition}}
-      @removeField={{action noop}}
-    />
-    `);
-
-    assert.equal(field.position, 1);
-
-    await click(`[data-test-field="title"] [data-test-field-renderer-move-up-btn]`);
-    assert.equal(field.position, 0);
-
-    await click(`[data-test-field="title"] [data-test-field-renderer-move-down-btn]`);
-    assert.equal(field.position, 1);
-
-    await click(`[data-test-field="title"] [data-test-field-renderer-move-down-btn]`);
-    assert.equal(field.position, 2);
   });
 
   test('it can remove a field in schema mode', async function(assert) {

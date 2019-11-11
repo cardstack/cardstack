@@ -36,25 +36,6 @@
       data-test-field-renderer-move-btn-position={{@field.position}}
     >
     </button>
-    {{!-- TODO: Remove this block when dragger works --}}
-    {{!-- <div class="field-renderer--move-btn--hidden">
-      {{#if (gt @field.position 0)}}
-        <button {{on "click" (fn @setPosition @field.name (dec @field.position))}}
-          aria-label="Move up"
-          data-test-field-renderer-move-up-btn
-        >
-          <strong>▲</strong>
-        </button>
-      {{/if}}
-      {{#if (lt @field.position (dec @field.card.isolatedFields.length))}}
-        <button {{on "click" (fn @setPosition @field.name (inc @field.position))}}
-          aria-label="Move down"
-          data-test-field-renderer-move-down-btn
-        >
-          <strong>▼</strong>
-        </button>
-      {{/if}}
-    </div> --}}
   {{/if}}
 
   {{#if (eq @mode "view")}}
