@@ -635,7 +635,14 @@ async function adaptCardToFormat(schema: todo, session: Session, internalCard: S
         'field-order'
       ]).includes(attr)) {
       let value = get(priviledgedCard, `data.attributes.${attr}`);
-      // crawl up the adoption chain looking for browser assets
+      // Crawl up the adoption chain looking for browser assets.
+      // Note that since we are collapsing the inherited browser asset values into
+      // the card's own attributes, it is not possible for us to tell if the
+      // browser asset is a customized value or an inherited value other than thru direct
+      // comparison across the adoption chain for a card--which is probably tedious.
+      // This makes determining if a card is able to recieve upstream changes,
+      // because it has not customized the adopted browser assets, difficult.
+      // Might want to revisit this approach...
       if (!value && cardBrowserAssetFields.includes(attr)) {
         for (let adoptedCardResource of priviledgedAdoptedCardResources) {
           value = get(adoptedCardResource, `attributes.${attr}`);
