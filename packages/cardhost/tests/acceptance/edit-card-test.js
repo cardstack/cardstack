@@ -2,7 +2,7 @@ import { module, test } from 'qunit';
 import { click, fillIn, find, visit, currentURL, waitFor } from '@ember/test-helpers';
 import { setupApplicationTest } from 'ember-qunit';
 import Fixtures from '@cardstack/test-support/fixtures'
-import { setFieldValue, createCards } from '../helpers/card-helpers';
+import { setFieldValue, createCards } from '@cardstack/test-support/card-ui-helpers';
 import { setupMockUser, login } from '../helpers/login';
 
 const timeout = 5000;
