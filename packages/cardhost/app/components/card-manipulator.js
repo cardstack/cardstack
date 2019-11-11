@@ -288,9 +288,7 @@ export default class CardManipulator extends Component {
   }
 
   @action startDragging(field, evt) {
-    // Chrome dragging works with just draggable="true",
-    // but Firefox requires extra handling.
+    evt.dataTransfer.setData("text", evt.target.id);
     evt.dataTransfer.setData("text/type", field.type);
-    // evt.dataTransfer.setData("field", field);
   }
 }
