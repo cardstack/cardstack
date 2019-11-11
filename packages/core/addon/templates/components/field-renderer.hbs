@@ -28,7 +28,6 @@
     <button
       class="field-renderer--move-btn"
       aria-label="Drag field"
-      draggable="true"
       {{on "mousedown" (action this.initDrag @field)}}
       {{on "dragstart" (action this.startDragging @field)}}
       {{on "dragend" (action (mut this.isDragging) false)}}
