@@ -97,4 +97,23 @@ export default class FieldRenderer extends Component {
       this.args.selectField(field);
     }
   }
+
+  @action initDrag(field, evt) {
+    evt.target.parentNode.setAttribute('draggable', 'true');
+    this.isDragging = field;
+  }
+
+  @action endDrag(evt) {
+    evt.target.parentNode.setAttribute('draggable', 'false');
+    this.isDragging = null;
+  }
+
+  @action startDragging(field, evt) {
+    evt.dataTransfer.setData("text", evt.target.id);
+    evt.dataTransfer.setData("text/field-name", field.name);
+  }
+
+  @action finishDragging(evt) {
+    evt.target.setAttribute('draggable', 'false')
+  }
 }

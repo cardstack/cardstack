@@ -45,9 +45,9 @@
           class="ch-catalog-field"
           role="button"
           draggable="true"
-          {{on "mousedown" (action this.beginDragging field)}}
+          {{on "mousedown" (action this.initDrag field)}}
           {{on "dragend" (action (mut this.isDragging) false)}}
-          {{on "dragstart" (action this.firefoxDrag)}}
+          {{on "dragstart" (action this.startDragging field)}}
           data-test-card-add-field-draggable={{field.type}}
         >
           {{! template-lint-disable no-inline-styles}}

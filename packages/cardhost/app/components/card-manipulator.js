@@ -250,33 +250,33 @@ export default class CardManipulator extends Component {
   }
 
   @action
-  beginDragging(fieldComponent, mousedownEvent) {
-    let dragState = {
-      usingKeyboard: false,
-      initialPointerX: mousedownEvent.x,
-      initialPointerY: mousedownEvent.y,
-      latestPointerX: mousedownEvent.x,
-      latestPointerY: mousedownEvent.y
-    };
-
-    this.isDragging = fieldComponent;
-    fieldComponent.dragState = dragState;
-    fieldComponent = fieldComponent; // eslint-disable-line no-self-assign
+  initDrag() {
+    this.isDragging = true;
   }
 
-  @action dropField(position, onFinishDrop) {
-    let fieldComponent = this.isDragging;
-    let field = this.card.addField({
-      type: this.fieldTypeMappings[fieldComponent.type],
-      position: position,
-      name: this.newFieldName,
-      neededWhenEmbedded: false
-    });
+  @action dropField(position, onFinishDrop, evt) {
+    let field;
+    let type = evt.dataTransfer.getData('text/type');
+    if (type) {
+      field = this.card.addField({
+        type: this.fieldTypeMappings[type],
+        position: position,
+        name: this.newFieldName,
+        neededWhenEmbedded: false
+      });
+    } else {
+      let fieldName = evt.dataTransfer.getData('text/field-name');
+      if (fieldName) {
+        field = this.card.getField(fieldName);
+        let newPosition = field.position < position ? position - 1 : position;
+        this.setPosition(fieldName, newPosition);
+      }
+    }
     this.isDragging = false;
-    this.selectedField = field;
-    fieldComponent.dragState = null;
-    fieldComponent = fieldComponent; // eslint-disable-line no-self-assign
-    this.selectField(field);
+
+    if (field) {
+      this.selectField(field);
+    }
 
     onFinishDrop();
   }
@@ -287,9 +287,8 @@ export default class CardManipulator extends Component {
     this.selectedField = field;
   }
 
-  @action firefoxDrag(evt) {
-    // Chrome dragging works with just draggable="true",
-    // but Firefox requires extra handling.
+  @action startDragging(field, evt) {
     evt.dataTransfer.setData("text", evt.target.id);
+    evt.dataTransfer.setData("text/type", field.type);
   }
 }

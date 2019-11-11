@@ -2,7 +2,7 @@ import { module, test } from 'qunit';
 import { click, fillIn, find, visit, currentURL, waitFor, triggerEvent } from '@ember/test-helpers';
 import { setupApplicationTest } from 'ember-qunit';
 import Fixtures from '@cardstack/test-support/fixtures'
-import { addField, setCardId, createCards, dragAndDropField, removeField } from '../helpers/card-helpers';
+import { addField, setCardId, createCards, dragAndDropNewField, removeField } from '@cardstack/test-support/card-ui-helpers';
 import { setupMockUser, login } from '../helpers/login';
 
 const timeout = 5000;
@@ -108,7 +108,7 @@ module('Acceptance | card create', function(hooks) {
     assert.dom('[data-test-right-edge] [data-test-schema-attr="name"] input').hasValue('subtitle');
     assert.dom('[data-test-right-edge] [data-test-schema-attr="label"] input').hasValue('Subtitle');
 
-    await dragAndDropField('string');
+    await dragAndDropNewField('string');
     await click('[data-test-field="new-field-2"]');
     assert.dom('[data-test-right-edge] [data-test-schema-attr="name"] input').hasValue('new-field-2');
     assert.dom('[data-test-right-edge] [data-test-schema-attr="label"] input').hasValue('new-field-2');
@@ -119,13 +119,13 @@ module('Acceptance | card create', function(hooks) {
     await visit('/cards/new');
 
     await setCardId(card1Id);
-    await dragAndDropField('string');
+    await dragAndDropNewField('string');
     assert.dom('[data-test-schema-attr="multiselect"]').doesNotExist();
 
-    await dragAndDropField('related card');
+    await dragAndDropNewField('related card');
     assert.dom('[data-test-schema-attr="multiselect"]').exists();
 
-    await dragAndDropField('related cards');
+    await dragAndDropNewField('related cards');
     assert.dom('[data-test-schema-attr="multiselect"]').exists();
   });
 

@@ -2,7 +2,7 @@ import { module, test } from 'qunit';
 import { click, find, visit, currentURL, waitFor, fillIn, triggerEvent } from '@ember/test-helpers';
 import { setupApplicationTest } from 'ember-qunit';
 import Fixtures from '@cardstack/test-support/fixtures'
-import { addField, createCards, removeField, dragAndDropField } from '../helpers/card-helpers';
+import { addField, createCards, removeField, dragAndDropNewField, dragFieldToNewPosition } from '@cardstack/test-support/card-ui-helpers';
 import { setupMockUser, login } from '../helpers/login';
 
 const timeout = 5000;
@@ -153,7 +153,7 @@ module('Acceptance | card schema', function(hooks) {
     assert.dom('[data-test-right-edge] [data-test-field]').doesNotExist();
   });
 
-  test(`move a field's position`, async function (assert) {
+  test(`move a field's position via drag & drop`, async function (assert) {
     await login();
     await createCards({
       [card1Id]: [
@@ -163,26 +163,25 @@ module('Acceptance | card schema', function(hooks) {
       ]
     });
     await visit(`/cards/${card1Id}/schema`);
-
-    assert.deepEqual([...document.querySelectorAll('.isolated-card [data-test-field]')].map(i => i.getAttribute('data-test-field')),
+    assert.deepEqual([...document.querySelectorAll(`[data-test-card-schema="${card1Id}"] [data-test-field]`)].map(i => i.getAttribute('data-test-field')),
       ['title', 'author', 'body']);
 
-    await click('[data-test-field="title"] [data-test-field-renderer-move-down-btn]');
-    assert.deepEqual([...document.querySelectorAll('.isolated-card [data-test-field]')].map(i => i.getAttribute('data-test-field')),
-      ['author', 'title', 'body']);
+    await dragFieldToNewPosition(0, 1);
+    assert.deepEqual([...document.querySelectorAll(`[data-test-card-schema="${card1Id}"] [data-test-field]`)].map(i => i.getAttribute('data-test-field')),
+    ['author', 'title', 'body']);
 
-    await click('[data-test-field="title"] [data-test-field-renderer-move-down-btn]');
-    assert.deepEqual([...document.querySelectorAll('.isolated-card [data-test-field]')].map(i => i.getAttribute('data-test-field')),
-      ['author', 'body', 'title']);
+    await dragFieldToNewPosition(1, 2);
+    assert.deepEqual([...document.querySelectorAll(`[data-test-card-schema="${card1Id}"] [data-test-field]`)].map(i => i.getAttribute('data-test-field')),
+    ['author', 'body', 'title']);
 
-    await click('[data-test-field="body"] [data-test-field-renderer-move-up-btn]');
-    assert.deepEqual([...document.querySelectorAll('.isolated-card [data-test-field]')].map(i => i.getAttribute('data-test-field')),
+    await dragFieldToNewPosition(1, 0);
+    assert.deepEqual([...document.querySelectorAll(`[data-test-card-schema="${card1Id}"] [data-test-field]`)].map(i => i.getAttribute('data-test-field')),
       ['body', 'author', 'title']);
 
     await click('[data-test-card-schema-save-btn]');
     await waitFor(`[data-test-card-view="${card1Id}"]`, { timeout });
 
-    assert.deepEqual([...document.querySelectorAll('.isolated-card [data-test-field]')].map(i => i.getAttribute('data-test-field')),
+    assert.deepEqual([...document.querySelectorAll(`[data-test-isolated-card="${card1Id}"] [data-test-field]`)].map(i => i.getAttribute('data-test-field')),
       ['body', 'author', 'title']);
     let card = JSON.parse(find('.code-block').textContent);
     assert.deepEqual(card.data.relationships.fields.data, [
@@ -222,7 +221,7 @@ module('Acceptance | card schema', function(hooks) {
     assert.dom('[data-test-right-edge] [data-test-schema-attr="name"] input').hasValue('subtitle');
     assert.dom('[data-test-right-edge] [data-test-schema-attr="label"] input').hasValue('Subtitle');
 
-    await dragAndDropField('string');
+    await dragAndDropNewField('string');
     await click('[data-test-field="new-field-3"]');
     assert.dom('[data-test-right-edge] [data-test-schema-attr="name"] input').hasValue('new-field-3');
     assert.dom('[data-test-right-edge] [data-test-schema-attr="label"] input').hasValue('new-field-3');
