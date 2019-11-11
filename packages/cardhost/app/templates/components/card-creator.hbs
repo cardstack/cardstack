@@ -78,6 +78,7 @@
   </fieldset>
 
 <RightEdge
+  @card={{this.card}}
   @isRightEdgeField={{true}}
   @selectedField={{this.selectedField}}
   @selectField={{action this.selectField}}
@@ -85,6 +86,7 @@
   @setFieldName={{this.setFieldName}}
   @setFieldLabel={{this.setFieldLabel}}
   @setFieldInstructions={{this.setFieldInstructions}}
+  @updateCardId={{this.updateCardId}}
 />
 
 <section class="card-creator" data-test-card-creator>
