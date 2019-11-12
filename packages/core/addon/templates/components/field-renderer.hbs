@@ -131,6 +131,7 @@
                 </label>
                 <Textarea
                   @id={{concat "edit-field-instructions-" @field.nonce "-" this.renderNonce}}
+                  data-test-field-renderer-field-helper-text
                   @class="field-renderer-field-instructions-input schema-field-renderer--input"
                   @value={{this.newFieldInstructions}}
                   @key-up={{action this.updateFieldInstructions}}
