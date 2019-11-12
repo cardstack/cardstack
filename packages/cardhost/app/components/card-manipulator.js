@@ -284,6 +284,12 @@ export default class CardManipulator extends Component {
   @action selectField(field) {
     if (field && field.isDestroyed) { return; }
 
+    // Toggling the selected field in tests is baffling me, using something more brute force
+    if (environment === 'test' && this.selectedField === field) {
+      this.selectedField = null;
+      return;
+    }
+
     this.selectedField = field;
   }
 

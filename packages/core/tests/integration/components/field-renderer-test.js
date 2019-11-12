@@ -205,7 +205,6 @@ module('Integration | Component | field-renderer', function(hooks) {
     />
     `);
 
-    assert.dom('[data-test-field-renderer-type]').hasText('@cardstack/core-types::string');
     assert.dom('.schema-field-renderer--header--detail').hasText('Adopted');
     assert.dom('[data-test-field-renderer-field-type]').hasText('@cardstack/core-types::string');
     assert.dom('[data-test-field-renderer-move-btn]').exists();

@@ -31,8 +31,8 @@
         @placeholder="e.g. millenial-puppies"
         @value={{this.cardName}}
         @key-up={{action @updateCardId}}
+        @disabled={{not @card.isNew}}
       />
-      <p>(Note that updating the card id will remove any fields that you have created. This is just a scaffolding limitation.)</p>
     {{/if}}
   </div>
 </div>

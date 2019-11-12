@@ -1,2 +1,6 @@
 import CardManipulator from "./card-manipulator";
-export default class CardSchemaUpdator extends CardManipulator { }
+import { action } from '@ember/object';
+export default class CardSchemaUpdator extends CardManipulator {
+  @action
+  doNothing() {}
+}
