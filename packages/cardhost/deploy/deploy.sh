@@ -25,6 +25,7 @@ if [ "$TRAVIS_PULL_REQUEST" == 'false' ]; then
                   S3_IMAGE_UPLOAD_ACCESS_KEY_ID \
                   S3_IMAGE_UPLOAD_SECRET_ACCESS_KEY \
                   LOG_LEVELS \
+                  CARD_TEMPLATES \
                   GIT_PRIVATE_KEY \
                   GIT_BRANCH_PREFIX \
                   CARDSTACK_SESSIONS_KEY; do
@@ -69,5 +70,6 @@ if [ "$TRAVIS_PULL_REQUEST" == 'false' ]; then
             --env TRAVIS_COMMIT \
             --env WEBHOOK_URL \
             --env TARGET_NAME \
+            --env CARD_TEMPLATES \
             cardhost ./node_modules/.bin/ember deploy $target_env --verbose
 fi

@@ -22,6 +22,12 @@ instead use the vars in our palette css */
   margin-bottom: 25px;
 }
 
+.right-edge--section-header--adopted {
+  font-size: 11px;
+  opacity: .5;
+  margin-top: 5px;
+}
+
 .right-edge--section .field-renderer.schema-field {
   background-color: transparent;
   font-size: 13px;
@@ -70,6 +76,11 @@ instead use the vars in our palette css */
   -ms-user-select: none;
   user-select: none;
   color: #a3a1a7;
+}
+
+.right-edge--section .checkbox-container.disabled {
+  opacity: .4;
+  cursor: not-allowed;
 }
 
 .right-edge--section .checkbox-container input {
@@ -176,6 +187,12 @@ instead use the vars in our palette css */
   width: 100%;
   border-color: transparent;
   color: white;
+}
+
+.right-edge--section textarea[disabled],
+.right-edge--section input[type="text"][disabled] {
+  opacity: .5;
+  cursor: not-allowed;
 }
 
 .right-edge--section textarea {

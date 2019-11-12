@@ -39,6 +39,16 @@ module('Acceptance | card create', function(hooks) {
     assert.ok(currentURL().match(/\/cards\/new-card-[0-9]+/));
   });
 
+  test("changing a card's id does not clear the card fields", async function(assert) {
+    await login();
+    await visit('/cards/new');
+
+    await addField('title', 'string', true);
+    await setCardId(card1Id);
+    assert.deepEqual([...document.querySelectorAll(`[data-test-isolated-card="${card1Id}"] [data-test-field]`)].map(i => i.getAttribute('data-test-field')),
+      ['title']);
+  });
+
   test('creating a card', async function(assert) {
     await login();
     await visit('/cards/new');

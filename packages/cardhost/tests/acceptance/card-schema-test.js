@@ -129,7 +129,7 @@ module('Acceptance | card schema', function(hooks) {
     assert.dom('[data-test-field="title"] [data-test-string-field-editor-label]').hasText('TITLE');
 
     await visit(`/cards/${card1Id}/schema`);
-    assert.dom('[data-test-field="title"] [data-test-field-renderer-label]').hasText('TITLE');
+    assert.dom('[data-test-field="title"] [data-test-field-renderer-label]').hasText('title');
     await click('[data-test-field="title"]');
 
     assert.dom('[data-test-right-edge] [data-test-schema-attr="name"] input').hasValue('title');

@@ -17,24 +17,9 @@
       </header>
 
       <div class="card-catalog">
-        {{#each this.model as |card|}}
-          {{#if (eq card.name "@cardstack/base-card")}}
-            {{!--
-              The template for cards is too terse to really show anything for the base card,
-              so just providing a link to the base card instead of rendering it in an embedded
-              format.
-            --}}
-            <LinkTo
-              @route="cards.view"
-              @model="@cardstack/base-card"
-              @class="card-renderer--embedded-card-link"
-            >
-              <div class="embedded-card cardstack_base-card">
-                Base Card
-              </div>
-            </LinkTo>
-          {{else}}
-            <CardRenderer @card={{card}} @format="embedded"/>
+        {{#each this.model.catalog as |card|}}
+          {{#if (not (eq card.name "@cardstack/base-card"))}}
+            <CardRenderer @card={{card}} @format="embedded" @showName={{true}}/>
           {{/if}}
         {{/each}}
       </div>
@@ -42,8 +27,24 @@
 
     <section class="cardhost-section cardhost-section--saved-templates">
       <header class="cardhost--header--saved-templates">
-        <h2 class="cardhost-catalog--title">Saved Templates</h2>
+        <h2 class="cardhost-templates--title">Saved Templates</h2>
       </header>
+      <div class="card-catalog">
+        {{#each this.model.templates as |card|}}
+          <LinkTo
+            @class="card-renderer--embedded-card-link"
+            @route="cards.adopt"
+            @model={{card.name}}
+          >
+            <CardRenderer
+              @card={{card}}
+              @format="embedded"
+              @preventIsolation={{true}}
+              @showName={{true}}
+            />
+          </LinkTo>
+        {{/each}}
+      </div>
     </section>
 
     <section class="cardhost-section cardhost-section--common-cards">
@@ -71,7 +72,6 @@
       <header class="cardhost--header--add-card">
         <h2 class="cardhost-catalog--title">New Blank Card</h2>
       </header>
-
       <div class="card-catalog">
         <LinkTo
           @route="cards.add"

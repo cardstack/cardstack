@@ -84,15 +84,19 @@
 }
 
 .cardhost-catalog .cardhost-section {
-  padding-bottom: 60px;
+  padding-bottom: 90px;
   margin-bottom: 60px;
   border-bottom: solid 1px var(--ch-medium-dark-blue-gray);
+}
+
+.cardhost-catalog .cardhost-section h2 {
+  line-height: 40px;
 }
 
 .cardhost-catalog .card-catalog {
   display: grid;
   grid-template-columns: 1fr 1fr 1fr;
-  grid-gap: 30px;
+  grid-gap: 90px 30px;
   justify-content: space-between;
   margin: 0 20px;
 }

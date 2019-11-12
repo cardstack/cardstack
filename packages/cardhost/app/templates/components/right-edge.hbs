@@ -4,7 +4,14 @@
     <div class="right-edge--pill-option">Structure</div>
   </div>
   <div class="right-edge--section">
-    <div class="section-header" data-test-section-header>{{this.sectionTitle}}</div>
+    <div class="section-header" data-test-section-header>
+      {{this.sectionTitle}}
+      {{#if @selectedField.isAdopted}}
+        <div class="right-edge--section-header--adopted">
+          Adopted from {{@selectedField.card.adoptedFrom.name}}
+        </div>
+      {{/if}}
+    </div>
     {{#if @selectedField}}
       <FieldRenderer
         @isRightEdgeField={{true}}
