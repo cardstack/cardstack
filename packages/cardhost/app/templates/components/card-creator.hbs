@@ -63,21 +63,8 @@
   </section>
 </CardhostLeftEdge>
 
-
-  <fieldset class="card-creator--new-card">
-    <legend>New Card</legend>
-    <label for="card__id">Card ID:</label>
-    <Input
-      @id="card__id"
-      @size="60"
-      @placeholder="e.g. millenial-puppies"
-      @value={{this.cardId}}
-      @key-up={{action this.updateCardId}}
-    />
-    <p>(Note that updating the card id will remove any fields that you have created. This is just a scaffolding limitation.)</p>
-  </fieldset>
-
 <RightEdge
+  @card={{this.card}}
   @isRightEdgeField={{true}}
   @selectedField={{this.selectedField}}
   @selectField={{action this.selectField}}
@@ -85,6 +72,7 @@
   @setFieldName={{this.setFieldName}}
   @setFieldLabel={{this.setFieldLabel}}
   @setFieldInstructions={{this.setFieldInstructions}}
+  @updateCardId={{this.updateCardId}}
 />
 
 <section class="card-creator" data-test-card-creator>

@@ -282,7 +282,7 @@ export default class CardManipulator extends Component {
   }
 
   @action selectField(field) {
-    if (field.isDestroyed) { return; }
+    if (field && field.isDestroyed) { return; }
 
     this.selectedField = field;
   }
