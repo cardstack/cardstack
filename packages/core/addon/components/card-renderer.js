@@ -10,6 +10,7 @@ import { tracked } from '@glimmer/tracking';
 export default class CardRenderer extends Component {
   @tracked componentName;
   @tracked mode;
+  @tracked selectField = () => {};
 
   constructor(...args) {
     super(...args);
@@ -19,6 +20,10 @@ export default class CardRenderer extends Component {
     // component name
     this.componentName = '@cardstack/base-card';
     this.mode = this.args.mode || 'view';
+
+    if (this.args.selectField) {
+      this.selectField = this.args.selectField;
+    }
   }
 
   get sanitizedName() {

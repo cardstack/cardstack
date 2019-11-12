@@ -1,5 +1,5 @@
 import { module, test } from 'qunit';
-import { click, fillIn, find, visit, currentURL, waitFor, triggerEvent } from '@ember/test-helpers';
+import { click, fillIn, find, visit, currentURL, waitFor, triggerEvent, focus } from '@ember/test-helpers';
 import { setupApplicationTest } from 'ember-qunit';
 import Fixtures from '@cardstack/test-support/fixtures'
 import { addField, setCardId, createCards, dragAndDropNewField, removeField } from '@cardstack/test-support/card-ui-helpers';
@@ -59,8 +59,8 @@ module('Acceptance | card create', function(hooks) {
 
     assert.equal(currentURL(), `/cards/${card1Id}`);
     await visit(`/cards/${card1Id}/schema`);
-    assert.dom('.card-renderer-isolated--header').hasTextContaining('millenial-puppies');
-    assert.dom('[data-test-right-edge] [data-test-section-header]').hasTextContaining('millenial-puppies');
+    assert.dom('.card-renderer-isolated--header').hasText('millenial-puppies');
+    assert.dom('[data-test-right-edge] [data-test-section-header]').hasText('local-hub::millenial-puppies');
 
     await click('[data-test-field="title"]');
     assert.dom('[data-test-field="title"] [data-test-field-renderer-type]').hasText('@cardstack/core-types::string');
@@ -77,6 +77,10 @@ module('Acceptance | card create', function(hooks) {
     await click('[data-test-field="reviewers"]');
     assert.dom('[data-test-field="reviewers"] [data-test-field-renderer-type]').hasText('@cardstack/core-types::has-many');
     assert.dom('[data-test-right-edge] [data-test-schema-attr="embedded"] input').isChecked();
+
+    await focus('[data-test-card-renderer-isolated]');
+    assert.dom('.card-renderer-isolated--header').hasText('millenial-puppies');
+    assert.dom('[data-test-right-edge] [data-test-section-header]').hasText('local-hub::millenial-puppies');
 
     let card = JSON.parse(find('.code-block').textContent);
     assert.equal(card.data.attributes.title, undefined);

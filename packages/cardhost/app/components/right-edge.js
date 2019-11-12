@@ -4,11 +4,15 @@ import { tracked } from '@glimmer/tracking';
 
 export default class RightEdge extends Component {
   @tracked card;
+  @tracked cardName;
 
   constructor(...args) {
     super(...args);
 
-    this.card = this.args.card;
+    if (this.args.card) {
+      this.card = this.args.card;
+      this.cardName = this.args.card.name;
+    }
   }
 
   get sectionTitle() {

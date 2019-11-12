@@ -5,27 +5,27 @@
   </div>
   <div class="right-edge--section">
     <div class="section-header" data-test-section-header>{{this.sectionTitle}}</div>
-      {{#if @selectedField}}
-        <FieldRenderer
-          @isRightEdgeField={{true}}
-          @field={{@selectedField}}
-          @mode="schema"
-          @setNeededWhenEmbedded={{@setNeededWhenEmbedded}}
-          @setFieldName={{@setFieldName}}
-          @setFieldLabel={{@setFieldLabel}}
-          @setFieldInstructions={{@setFieldInstructions}}
-          @schemaAttrs={{array "name" "label" "instructions" "multiselect" "required" "embedded"}}
-        />
-      {{else if @updateCardId}}
-        <label for="right-edge--card__id">Card ID:</label>
-        <Input
-          @id="right-edge--card__id"
-          @size="60"
-          @placeholder="e.g. millenial-puppies"
-          @value={{this.card.id}}
-          @key-up={{action @updateCardId}}
-        />
-        <p>(Note that updating the card id will remove any fields that you have created. This is just a scaffolding limitation.)</p>
-      {{/if}}
+    {{#if @selectedField}}
+      <FieldRenderer
+        @isRightEdgeField={{true}}
+        @field={{@selectedField}}
+        @mode="schema"
+        @setNeededWhenEmbedded={{@setNeededWhenEmbedded}}
+        @setFieldName={{@setFieldName}}
+        @setFieldLabel={{@setFieldLabel}}
+        @setFieldInstructions={{@setFieldInstructions}}
+        @schemaAttrs={{array "name" "label" "instructions" "multiselect" "required" "embedded"}}
+      />
+    {{else if @updateCardId}}
+      <label for="card__id">Card ID:</label>
+      <Input
+        @id="card__id"
+        @size="60"
+        @placeholder="e.g. millenial-puppies"
+        @value={{this.cardName}}
+        @key-up={{action @updateCardId}}
+      />
+      <p>(Note that updating the card id will remove any fields that you have created. This is just a scaffolding limitation.)</p>
+    {{/if}}
   </div>
 </div>
