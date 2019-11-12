@@ -1190,7 +1190,7 @@ describe('hub/card-services', function () {
       expect(adopted.data.attributes.yarn).to.equal("wool");
       expect(adopted.data.attributes.title).to.equal("GenX Kittens");
       expect(adopted.data.attributes.body).to.equal("Here is the body");
-      expect(adopted.data.attributes['internal-fields']).to.be.undefined;
+      expect(adopted.data.attributes['internal-field']).to.be.undefined;
 
       expect(adopted.data.relationships.author.data).to.eql({
         type: 'cards',
@@ -1203,6 +1203,7 @@ describe('hub/card-services', function () {
       expect(model.attributes.yarn).to.equal("wool");
       expect(model.attributes.title).to.equal("GenX Kittens");
       expect(model.attributes.body).to.equal("Here is the body");
+      expect(model.attributes['internal-field']).to.equal("This is internal");
 
       expect(model.relationships.author.data).to.eql({
         type: 'cards',
