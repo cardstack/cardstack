@@ -230,8 +230,8 @@ export default class CardManipulator extends Component {
   }
 
   @action
-  setFieldInstructions(/*fieldName, instructions*/) {
-    throw new Error(`TODO this is ready now in the API as Field.setInstructions(). Please wire this up and add tests`)
+  setFieldInstructions(fieldName, instructions) {
+    this.card.getField(fieldName).setInstructions(instructions);
   }
 
   @action

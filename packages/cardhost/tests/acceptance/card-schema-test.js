@@ -63,9 +63,12 @@ module('Acceptance | card schema', function(hooks) {
     await click('[data-test-field="title"]');
     await fillIn('[data-test-right-edge] [data-test-schema-attr="name"] input', 'subtitle');
     await triggerEvent('[data-test-right-edge] [data-test-schema-attr="name"] input', 'keyup');
+    await fillIn('[data-test-right-edge] [data-test-schema-attr="instructions"] textarea', 'fill this in with your subheader');
+    await triggerEvent('[data-test-right-edge] [data-test-schema-attr="instructions"] textarea', 'keyup');
 
     assert.dom('[data-test-right-edge] [data-test-schema-attr="name"] input').hasValue('subtitle');
     assert.dom('[data-test-right-edge] [data-test-schema-attr="label"] input').hasValue('subtitle');
+    assert.dom('[data-test-right-edge] [data-test-schema-attr="instructions"] textarea').hasValue('fill this in with your subheader');
 
     await click('[data-test-card-schema-save-btn]');
     await waitFor(`[data-test-card-view="${card1Id}"]`, { timeout });
@@ -75,6 +78,7 @@ module('Acceptance | card schema', function(hooks) {
 
     let card = JSON.parse(find('.code-block').textContent);
     assert.equal(card.data.attributes.subtitle, 'test title');
+    assert.equal(card.data.attributes["metadata-summary"].subtitle.instructions, 'fill this in with your subheader');
     assert.equal(card.data.attributes.title, undefined);
 
     await visit(`/cards/${card1Id}`);

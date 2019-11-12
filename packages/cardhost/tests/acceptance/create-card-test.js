@@ -100,18 +100,25 @@ module('Acceptance | card create', function(hooks) {
     await triggerEvent(`[data-test-right-edge] [data-test-schema-attr="label"] input`, 'keyup');
     assert.dom('[data-test-right-edge] [data-test-schema-attr="label"] input').hasValue('Subtitle');
 
+    await fillIn('[data-test-right-edge] [data-test-schema-attr="instructions"] textarea', 'This is the subtitle');
+    await triggerEvent(`[data-test-right-edge] [data-test-schema-attr="instructions"] textarea`, 'keyup');
+    assert.dom('[data-test-right-edge] [data-test-schema-attr="instructions"] textarea').hasValue('This is the subtitle');
+
     await click('[data-test-field="body"]');
     assert.dom('[data-test-right-edge] [data-test-schema-attr="name"] input').hasValue('body');
     assert.dom('[data-test-right-edge] [data-test-schema-attr="label"] input').hasValue('body');
+    assert.dom('[data-test-right-edge] [data-test-schema-attr="instructions"] textarea').hasValue('');
 
     await click('[data-test-field="subtitle"]');
     assert.dom('[data-test-right-edge] [data-test-schema-attr="name"] input').hasValue('subtitle');
     assert.dom('[data-test-right-edge] [data-test-schema-attr="label"] input').hasValue('Subtitle');
+    assert.dom('[data-test-right-edge] [data-test-schema-attr="instructions"] textarea').hasValue('This is the subtitle');
 
     await dragAndDropNewField('string');
     await click('[data-test-field="new-field-2"]');
     assert.dom('[data-test-right-edge] [data-test-schema-attr="name"] input').hasValue('new-field-2');
     assert.dom('[data-test-right-edge] [data-test-schema-attr="label"] input').hasValue('new-field-2');
+    assert.dom('[data-test-right-edge] [data-test-schema-attr="instructions"] textarea').hasValue('');
   });
 
   test(`multiselect button appears for relationship fields`, async function(assert) {
