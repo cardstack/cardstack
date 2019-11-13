@@ -67,7 +67,7 @@ export const fieldComponents = [
   {
     id: 'dropdown',
     coreType: '@cardstack/core-types::belongs-to',
-    title: 'Dropdown',
+    title: 'Single-select',
     description: 'Single select dropdown',
     type: 'related card',
     icon: `/assets/images/field-types/dropdown.svg`
@@ -75,7 +75,7 @@ export const fieldComponents = [
   {
     id: 'dropdown-multi',
     coreType: '@cardstack/core-types::has-many',
-    title: 'Dropdown (Multi-select)',
+    title: 'Multi-select',
     description: 'Multiple select dropdown',
     type: 'related cards',
     icon: `/assets/images/field-types/dropdown.svg`
