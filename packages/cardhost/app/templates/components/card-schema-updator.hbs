@@ -81,6 +81,7 @@
   @setFieldName={{this.setFieldName}}
   @setFieldLabel={{this.setFieldLabel}}
   @setFieldInstructions={{this.setFieldInstructions}}
+  @displayCardMetadata={{this.displayCardMetadata}}
 />
 
 <div class="ch-search-bar card-schema-updator--search-bar">Search Library</div>
@@ -96,6 +97,7 @@
     @selectField={{action this.selectField}}
     @setPosition={{action this.setPosition}}
     @dropField={{action this.dropField}}
+    @cardFocused={{action (mut this.displayCardMetadata)}}
   />
 </section>
 

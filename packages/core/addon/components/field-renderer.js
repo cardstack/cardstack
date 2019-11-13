@@ -47,6 +47,17 @@ export default class FieldRenderer extends Component {
     return this.args.field.type.replace(/::/g, '/').replace(/@/g, '');
   }
 
+  @action
+  updateFieldProperties(element, [field]) {
+    if (field && this.nonce !== this.currentNonce) {
+      this.currentNonce = this.nonce;
+      this.newFieldName = field.name;
+      this.newFieldLabel = field.label;
+      this.newFieldInstructions = field.instructions;
+    }
+    return null;
+  }
+
   get onFieldUpdated() {
     if (this.nonce !== this.currentNonce) {
       this.currentNonce = this.nonce;

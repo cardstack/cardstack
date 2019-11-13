@@ -110,6 +110,7 @@ export default class CardManipulator extends Component {
   @tracked selectedField;
   @tracked isDragging;
   @tracked cardId;
+  @tracked displayCardMetadata = true;
 
   constructor(...args) {
     super(...args);
@@ -299,6 +300,7 @@ export default class CardManipulator extends Component {
     }
 
     this.selectedField = field;
+    this.displayCardMetadata = false;
   }
 
   @action startDragging(field, evt) {

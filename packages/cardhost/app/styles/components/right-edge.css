@@ -12,6 +12,10 @@ instead use the vars in our palette css */
   box-shadow: 0 3px 6px rgba(0, 0, 0, 0.15);
 }
 
+.right-edge--section--container {
+  position: relative;
+}
+
 .right-edge--section {
   border-top: 2px solid var(--ch-darker-purple);
   padding: 12px 20px;
