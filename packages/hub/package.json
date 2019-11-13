@@ -1,6 +1,6 @@
 {
   "name": "@cardstack/hub",
-  "version": "0.14.45",
+  "version": "0.14.46",
   "bin": {
     "cardstack-hub": "./bin/cardstack-hub.js",
     "cardstack-generate-key": "./bin/generate-key.js",
@@ -18,16 +18,16 @@
   "description": "Stock API server for the Cardstack tech stack.",
   "dependencies": {
     "@babel/plugin-transform-modules-amd": "^7.2.0",
-    "@cardstack/base-card": "0.14.45",
-    "@cardstack/codegen": "0.14.45",
-    "@cardstack/core-types": "0.14.45",
-    "@cardstack/di": "0.14.45",
-    "@cardstack/handlebars": "0.14.45",
+    "@cardstack/base-card": "0.14.46",
+    "@cardstack/codegen": "0.14.46",
+    "@cardstack/core-types": "0.14.46",
+    "@cardstack/di": "0.14.46",
+    "@cardstack/handlebars": "0.14.46",
     "@cardstack/logger": "^0.2.0",
-    "@cardstack/pgsearch": "0.14.45",
-    "@cardstack/plugin-utils": "0.14.45",
-    "@cardstack/queue": "0.14.45",
-    "@cardstack/routing": "0.14.45",
+    "@cardstack/pgsearch": "0.14.46",
+    "@cardstack/plugin-utils": "0.14.46",
+    "@cardstack/queue": "0.14.46",
+    "@cardstack/routing": "0.14.46",
     "@types/fs-extra": "^5.0.5",
     "broccoli-concat": "^3.2.2",
     "broccoli-funnel": "^2.0.1",
@@ -56,8 +56,8 @@
     "tar-stream": "^1.5.4"
   },
   "devDependencies": {
-    "@cardstack/eslint-config": "0.14.45",
-    "@cardstack/test-support": "0.14.45",
+    "@cardstack/eslint-config": "0.14.46",
+    "@cardstack/test-support": "0.14.46",
     "koa-better-route": "^0.1.0",
     "supertest": "^2.0.1"
   },
