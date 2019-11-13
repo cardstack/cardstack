@@ -22,13 +22,12 @@ module.exports = function(environment) {
         Date: false
       },
 
-      cardTemplates: JSON.parse(process.env.CARD_TEMPLATES || null) || []
     },
-
     APP: {
       // Here you can pass flags/options to your application instance
       // when it is created
-    }
+    },
+    cardTemplates: JSON.parse(process.env.CARD_TEMPLATES || null) || []
   };
 
   if (environment === 'development') {
