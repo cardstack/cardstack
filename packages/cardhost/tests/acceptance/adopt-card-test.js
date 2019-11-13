@@ -5,7 +5,7 @@ import Fixtures from '@cardstack/test-support/fixtures'
 import { showCardId, addField, setCardId, createCards, setFieldValue, removeField } from '@cardstack/test-support/card-ui-helpers';
 import { setupMockUser, login } from '../helpers/login';
 
-const timeout = 5000;
+const timeout = 20000;
 const card1Id = 'address-card';
 const card2Id = 'vangogh-work-address';
 const card3Id = 'mango-work-address';
@@ -311,7 +311,7 @@ module('Acceptance | card adoption', function(hooks) {
     await visit(`/cards/${card1Id}/schema`);
     await addField('number-of-bones', 'integer', true);
     await click('[data-test-card-schema-save-btn]');
-    await waitFor(`[data-test-card-view="${card1Id}"]`, { timeout: 2 * timeout });
+    await waitFor(`[data-test-card-view="${card1Id}"]`, { timeout });
 
     await visit(`/cards/${card2Id}/schema`);
     assert.deepEqual([...document.querySelectorAll(`[data-test-isolated-card] [data-test-field]`)].map(i => i.getAttribute('data-test-field')), [
