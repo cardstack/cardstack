@@ -140,21 +140,6 @@ module('Acceptance | card create', function(hooks) {
     assert.dom('[data-test-right-edge] [data-test-schema-attr="instructions"] textarea').hasValue('');
   });
 
-  test(`multiselect button appears for relationship fields`, async function(assert) {
-    await login();
-    await visit('/cards/new');
-
-    await setCardId(card1Id);
-    await dragAndDropNewField('string');
-    assert.dom('[data-test-schema-attr="multiselect"]').doesNotExist();
-
-    await dragAndDropNewField('related card');
-    assert.dom('[data-test-schema-attr="multiselect"]').exists();
-
-    await dragAndDropNewField('related cards');
-    assert.dom('[data-test-schema-attr="multiselect"]').exists();
-  });
-
   test(`renaming a card's field`, async function(assert) {
     await login();
     await visit('/cards/new');
