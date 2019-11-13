@@ -56,7 +56,7 @@ module('Acceptance | card create', function(hooks) {
     assert.equal(currentURL(), '/cards/new');
 
     assert.dom('.card-renderer-isolated--header').hasTextContaining('new-card-');
-    assert.dom('[data-test-right-edge] [data-test-section-header]').hasTextContaining('local-hub::new-card-');
+    assert.dom('[data-test-internal-card-id]').hasTextContaining('local-hub::new-card-');
 
     await createCards({
       [card1Id]: [
@@ -70,7 +70,7 @@ module('Acceptance | card create', function(hooks) {
     assert.equal(currentURL(), `/cards/${card1Id}`);
     await visit(`/cards/${card1Id}/schema`);
     assert.dom('.card-renderer-isolated--header').hasText('millenial-puppies');
-    assert.dom('[data-test-right-edge] [data-test-section-header]').hasText('local-hub::millenial-puppies');
+    assert.dom('[data-test-internal-card-id]').hasText('local-hub::millenial-puppies');
 
     await click('[data-test-field="title"]');
     assert.dom('[data-test-field="title"] [data-test-field-renderer-type]').hasText('@cardstack/core-types::string');
@@ -90,7 +90,7 @@ module('Acceptance | card create', function(hooks) {
 
     await focus('[data-test-card-renderer-isolated]');
     assert.dom('.card-renderer-isolated--header').hasText('millenial-puppies');
-    assert.dom('[data-test-right-edge] [data-test-section-header]').hasText('local-hub::millenial-puppies');
+    assert.dom('[data-test-internal-card-id]').hasText('local-hub::millenial-puppies');
 
     let card = JSON.parse(find('.code-block').textContent);
     assert.equal(card.data.attributes.title, undefined);
