@@ -4,8 +4,8 @@
   --card-width: 496px;
   --card-min-height: 496px;
   --card-min-width: 400px;
-  --card-bg: #4a4857;
-  --card-header-bg: #3f3d4d;
+  --card-bg: var(--ch-medium-lighter-blue-gray, #4a4857);
+  --card-header-bg: var(--ch-medium-dark-darker-blue-gray, #3f3d4d);
   --card-highlight: var(--ch-cyan, #00ebe5);
   --card-transition-time: 250ms;
 

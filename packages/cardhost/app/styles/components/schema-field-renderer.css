@@ -20,10 +20,14 @@
 }
 
 .schema-field-renderer--header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
   height: 36px;
   padding: 9px 20px 10px 45px;
-  /* TODO: icon will change depending on field type */
-  background: url('/images/fields/text.svg') 20px center/10px no-repeat;
+  background-position: var(--ch-spacing) center;
+  background-size: 10px;
+  background-repeat: no-repeat;
   background-color: var(--field-header-bg);
   color: var(--field-header-color);
   font-weight: 600;
@@ -32,6 +36,10 @@
   text-transform: capitalize;
 
   transition: background-color var(--field-transition-time);
+}
+
+.schema-field-renderer--header--detail {
+  opacity: 0.25;
 }
 
 .schema-field-renderer--content {

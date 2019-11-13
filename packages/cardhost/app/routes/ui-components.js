@@ -59,9 +59,7 @@ export default class UIComponentsRoute extends Route {
         label: 'datetime',
         type: '@cardstack/core-types::date',
         value: '2019-09-26'
-      },
-
-      noop: () => {},
+      }
     }
   }
 }

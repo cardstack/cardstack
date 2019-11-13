@@ -16,7 +16,7 @@
 .field-renderer.with-buttons {
   --field-container-width: 496px;
   --field-container-height: 154px;
-  --field-container-bg: #4a4857;
+  --field-container-bg: var(--ch-medium-lighter-blue-gray, #4a4857);
 
   display: flex;
   align-items: center;
@@ -32,12 +32,9 @@
 }
 
 .field-renderer.schema-field .field-renderer--display {
-  display: none;
-}
-
-.field-renderer--move-btn--hidden {
   visibility: hidden;
   width: 0;
+  height: 0;
 }
 
 .field-renderer--move-btn {

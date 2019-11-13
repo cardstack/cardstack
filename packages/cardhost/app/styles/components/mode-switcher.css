@@ -26,7 +26,6 @@
   -webkit-appearance: none;
 }
 
-.mode-switcher.adopt,
 .mode-switcher.schema {
   --mode-icon: url('/assets/images/icons/schema-active.svg');
 }

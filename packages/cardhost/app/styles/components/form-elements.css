@@ -101,7 +101,7 @@
   height: 18px;
   width: 18px;
   background-color: var(--ch-lighter-medium-blue-gray);
-  border: 1px solid var(--ch-lighter-dark-blue-gray);
+  border: 1px solid var(--ch-darker-dark-blue-gray);
   border-radius: 3px;
   cursor: pointer;
 

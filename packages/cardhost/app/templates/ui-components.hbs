@@ -24,6 +24,15 @@
         />
       </div>
       <div>
+        <div class="color-palette--block light-gray-f0" style="background-color: var(--ch-light-gray-f0)">
+          #f0f0f0
+        </div>
+        <CodeBlock
+          @code='--ch-light-gray-f0'
+          @language="css"
+        />
+      </div>
+      <div>
         <div class="color-palette--block" style="background-color: var(--ch-light-gray-d6)">
           #d6d6d6
         </div>
@@ -61,7 +70,7 @@
       </div>
       <div>
         <div class="color-palette--block" style="background-color: var(--ch-medium-medium-blue-gray)">
-          #4b4958;
+          #4b4958
         </div>
         <CodeBlock
           @code='--ch-medium-medium-blue-gray'
@@ -70,14 +79,22 @@
       </div>
       <div>
         <div class="color-palette--block" style="background-color: var(--ch-medium-dark-blue-gray)">
-          #41404d;
+          #41404d
         </div>
         <CodeBlock
           @code='--ch-medium-dark-blue-gray'
           @language="css"
         />
       </div>
-
+      <div>
+        <div class="color-palette--block" style="background-color: var(--ch-medium-dark-darker-blue-gray)">
+          #3f3d4d
+        </div>
+        <CodeBlock
+          @code='--ch-medium-dark-darker-blue-gray'
+          @language="css"
+        />
+      </div>
       <div>
         <div class="color-palette--block" style="background-color: var(--ch-medium-darker-blue-gray)">
           #383849
@@ -97,11 +114,20 @@
         />
       </div>
       <div>
-        <div class="color-palette--block" style="background-color: var(--ch-gray-black)">
+        <div class="color-palette--block" style="background-color: var(--ch-darker-dark-blue-gray)">
+          #2d2c37
+        </div>
+        <CodeBlock
+          @code='--ch-darker-dark-blue-gray'
+          @language="css"
+        />
+      </div>
+      <div>
+        <div class="color-palette--block" style="background-color: var(--ch-dark-purple-28)">
           #282738
         </div>
         <CodeBlock
-          @code='--ch-gray-black'
+          @code='--ch-dark-purple-28'
           @language="css"
         />
       </div>
@@ -138,6 +164,24 @@
         </div>
         <CodeBlock
           @code='--ch-blue'
+          @language="css"
+        />
+      </div>
+      <div>
+        <div class="color-palette--block" style="background-color: var(--ch-white-op60)">
+          rgba(255, 255, 255, 0.6)
+        </div>
+        <CodeBlock
+          @code='--ch-white-op60'
+          @language="css"
+        />
+      </div>
+      <div>
+        <div class="color-palette--block" style="background-color: var(--ch-black-op35)">
+          rgba(0, 0, 0, 0.35)
+        </div>
+        <CodeBlock
+          @code='--ch-black-op35'
           @language="css"
         />
       </div>
@@ -469,7 +513,22 @@
   </section>
 
   <section class="ui-components--section ui-components--grid-2-col">
-    <h2>Right Edge</h2>
+    <h2>Right Edge (No field selected)</h2>
+    <RightEdge />
+    <CodeBlock
+      @code='<RightEdge />'
+      @language="html"
+    />
+
+    <h2>Right Edge (With adopted card preview)</h2>
+    TK
+    {{!-- <RightEdge />
+    <CodeBlock
+      @code='<RightEdge />'
+      @language="html"
+    /> --}}
+
+    <h2>Right Edge (With selected field)</h2>
     <RightEdge
       @selectedField={{this.model.isolatedFields.firstObject}}
       @selectField={{action this.noop}}

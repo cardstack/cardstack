@@ -51,11 +51,16 @@
     {{!-- TODO we should extract the schema editing stuff into a seaprate component --}}
       {{#if (includes schemaAttrs "title")}}
         <div class="schema-field-renderer" tabindex="0">
-          {{!-- TODO: Display field type logo in bg-image --}}
-          <header class="schema-field-renderer--header" data-test-field-renderer-header>
-            {{@field.name}}
+          {{!-- TODO: Change displayed logo depending on field --}}
+          {{! template-lint-disable no-inline-styles }}
+          <header
+            class="schema-field-renderer--header"
+            style={{css-url "background-image" "/images/fields/text.svg"}}
+            data-test-field-renderer-type
+          >
+            {{@field.type}}
             {{#if @field.isAdopted}}
-              <span class="schema-field-renderer--header-detail">Adopted</span>
+              <span class="schema-field-renderer--header--detail">Adopted</span>
             {{/if}}
           </header>
           <div class="schema-field-renderer--content">
@@ -119,6 +124,13 @@
               @value={{this.newFieldInstructions}}
               @key-up={{action this.updateFieldInstructions}}
             />
+          {{else}}
+            <div class="field-renderer--display">
+              <span class="ch-label">Helper Text</span>
+              <span data-test-field-renderer-field-instructions>
+                {{@field.instructions}}
+              </span>
+            </div>
           {{/if}}
         </div>
       {{else if (and (eq schemaAttr "name") @setFieldName)}}

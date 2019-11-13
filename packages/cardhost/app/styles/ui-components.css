@@ -51,6 +51,8 @@
   font-weight: 600;
 }
 
-.ui-components .right-edge {
+.ui-components .right-edge,
+.ui-components .cardhost-top-edge,
+.ui-components .cardhost-left-edge {
   position: static;
 }

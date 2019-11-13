@@ -1,5 +1,5 @@
 .cardhost-cards {
-  /* TODO: make this a grid */
+  /* TODO: make this a grid. do not use padding to determine card view zone */
 
   --padding-top: var(--ch-top-edge-height);
   --padding-left: var(--ch-left-edge-width);

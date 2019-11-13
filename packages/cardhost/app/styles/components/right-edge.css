@@ -79,7 +79,7 @@
   padding: 10px;
   background-color: var(--ch-lighter-medium-blue-gray);
   color: white;
-  border: 1px solid var(--ch-lighter-dark-blue-gray);
+  border: 1px solid var(--ch-darker-dark-blue-gray);
   border-radius: 5px;
   font: 600 13px/18px var(--ch-font-family);
   letter-spacing: 0.035em;
@@ -107,7 +107,7 @@
   background-position: center;
   background-repeat: no-repeat;
   background-size: var(--adopted-image-size);
-  border: 1px solid var(--ch-lighter-dark-blue-gray);
+  border: 1px solid var(--ch-darker-dark-blue-gray);
   border-radius: 5px;
 }
 
