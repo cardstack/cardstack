@@ -274,8 +274,8 @@
           @card={{this.model}}
           @format="isolated"
           @mode="schema"
-          @setPosition={{true}}
-          @removeField={{true}}
+          @setPosition={{action this.noop}}
+          @removeField={{action this.noop}}
         />
       </div>
     </div>

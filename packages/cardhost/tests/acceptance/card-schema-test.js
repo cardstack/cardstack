@@ -2,10 +2,10 @@ import { module, test } from 'qunit';
 import { click, find, visit, currentURL, waitFor, fillIn, triggerEvent } from '@ember/test-helpers';
 import { setupApplicationTest } from 'ember-qunit';
 import Fixtures from '@cardstack/test-support/fixtures'
-import { addField, createCards, removeField, dragAndDropNewField, dragFieldToNewPosition } from '@cardstack/test-support/card-ui-helpers';
+import { showCardId, addField, createCards, removeField, dragAndDropNewField, dragFieldToNewPosition } from '@cardstack/test-support/card-ui-helpers';
 import { setupMockUser, login } from '../helpers/login';
 
-const timeout = 5000;
+const timeout = 20000;
 const card1Id = 'millenial-puppies';
 const qualifiedCard1Id = `local-hub::${card1Id}`;
 
@@ -47,6 +47,19 @@ module('Acceptance | card schema', function(hooks) {
 
     let card = JSON.parse(find('.code-block').textContent);
     assert.equal(card.data.attributes.title, undefined);
+  });
+
+  test(`cannot change a card's id`, async function(assert) {
+    await login();
+    await createCards({
+      [card1Id]: [
+        ['body', 'string', false, 'test body']
+      ]
+    });
+    await visit(`/cards/${card1Id}/schema`);
+
+    await showCardId();
+    assert.dom('#card__id').isDisabled();
   });
 
   test(`renaming a card's field`, async function(assert) {
@@ -129,7 +142,7 @@ module('Acceptance | card schema', function(hooks) {
     assert.dom('[data-test-field="title"] [data-test-string-field-editor-label]').hasText('TITLE');
 
     await visit(`/cards/${card1Id}/schema`);
-    assert.dom('[data-test-field="title"] [data-test-field-renderer-label]').hasText('TITLE');
+    assert.dom('[data-test-field="title"] [data-test-field-renderer-label]').hasText('title');
     await click('[data-test-field="title"]');
 
     assert.dom('[data-test-right-edge] [data-test-schema-attr="name"] input').hasValue('title');

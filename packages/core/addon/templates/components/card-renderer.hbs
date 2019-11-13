@@ -6,7 +6,11 @@ Ember Concurrency into the rendering of the card component here.
 --}}
 {{#if (eq @format "isolated")}}
   {{#let (component this.isolatedComponentName) as | Isolated |}}
-    <section {{on "focus" (fn this.selectField null)}} class="card-renderer-{{@format}} {{this.mode}}" tabindex="0" data-test-card-renderer-isolated>
+    <section {{on "focus" (fn this.selectField null)}}
+      class="card-renderer-{{@format}} {{this.mode}}"
+      tabindex="0"
+      data-test-card-renderer-isolated
+    >
       <header class="card-renderer-{{@format}}--header">
         <div class="card-renderer-isolated--header-overlay"></div>
         {{or @card.name "Blank Card"}}
@@ -36,16 +40,22 @@ Ember Concurrency into the rendering of the card component here.
   {{/let}}
 {{else if (eq @format "embedded")}}
   {{#let (component this.embeddedComponentName) as | Embedded |}}
-    {{#if (eq this.mode "view")}}
+    {{#if (and (eq this.mode "view") (not @preventIsolation))}}
       <LinkTo
         @class="card-renderer--embedded-card-link"
         @route="cards.view"
         @model={{@card.name}}
       >
         <Embedded @card={{@card}} @mode={{this.mode}}/>
+        {{#if @showName}}
+          <div class="embedded-card-label">{{@card.name}}</div>
+        {{/if}}
       </LinkTo>
     {{else}}
       <Embedded @card={{@card}} @mode={{this.mode}}/>
+      {{#if @showName}}
+        <div class="embedded-card-label">{{@card.name}}</div>
+      {{/if}}
     {{/if}}
   {{/let}}
 {{/if}}

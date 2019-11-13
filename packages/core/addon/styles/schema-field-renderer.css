@@ -34,6 +34,8 @@
 }
 
 .schema-field-renderer--header-bar {
+  display: flex;
+  justify-content: space-between;
   height: 36px;
   padding: 9px 20px 10px 45px;
   /* TODO: icon will change depending on field type */
@@ -47,6 +49,10 @@
   text-transform: capitalize;
 
   transition: background-color var(--field-transition-time);
+}
+
+.schema-field-renderer--header--detail {
+  opacity: .25;
 }
 
 .schema-field-renderer--content {

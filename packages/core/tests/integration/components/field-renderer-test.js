@@ -5,7 +5,9 @@ import { render, fillIn, triggerEvent, click } from '@ember/test-helpers';
 import hbs from 'htmlbars-inline-precompile';
 
 const card1Id = 'millenial-puppies';
+const card2Id = 'genx-kittens';
 const qualifiedCard1Id = `local-hub::${card1Id}`;
+const qualifiedCard2Id = `local-hub::${card2Id}`;
 
 const scenario = new Fixtures({
   create(factory) {
@@ -34,6 +36,7 @@ const scenario = new Fixtures({
 
   destroy() {
     return [
+      { type: 'cards', id: qualifiedCard2Id },
       { type: 'cards', id: qualifiedCard1Id },
     ];
   }
@@ -147,17 +150,76 @@ module('Integration | Component | field-renderer', function(hooks) {
       @setNeededWhenEmbedded={{action noop}}
       @setPosition={{action noop}}
       @removeField={{action noop}}
+      @isRightEdgeField={{true}} {{!-- Burcu please delete this line when you merge your stuff --}}
+      @schemaAttrs={{array "title" "type" "label" "name" "instructions" "is-meta" "embedded" "required"}}
     />
     `);
 
-    assert.dom('[data-test-field-renderer-type]').hasText('@cardstack/core-types::string');
-    assert.dom('[data-test-field-renderer-label]').hasText('title');
-    assert.dom('[data-test-field-renderer-value]').hasText('test title');
+    assert.dom('.schema-field-renderer--header--detail').doesNotExist();
+    assert.dom('[data-test-field-renderer-field-type]').hasText('@cardstack/core-types::string');
     assert.dom('[data-test-field-renderer-move-btn]').exists();
     assert.dom('[data-test-drop-zone="1"]').exists();
 
     assert.dom('.edit-title-field-value').doesNotExist();
     assert.dom('[data-test-string-field-viewer-value]').doesNotExist();
+
+    assert.dom('[data-test-schema-attr="name"] input').hasValue('title');
+    assert.dom('[data-test-schema-attr="name"] input').isNotDisabled();
+    assert.dom('[data-test-schema-attr="label"] input').hasValue('title');
+    assert.dom('[data-test-schema-attr="label"] input').isNotDisabled();
+    assert.dom('[data-test-schema-attr="instructions"] textarea').isNotDisabled();
+    assert.dom('[data-test-schema-attr="embedded"] input').isChecked();
+    assert.dom('[data-test-schema-attr="embedded"] input').isNotDisabled();
+  });
+
+  test("it can render an adopted field in schema mode", async function (assert) {
+    // name, label, and needed-when-embedded should be disabled
+    // instructions and required should be enabled
+
+    let service = this.owner.lookup('service:data');
+    let parent = service.createCard(qualifiedCard1Id);
+    parent.addField({ name: 'body', type: '@cardstack/core-types::string', neededWhenEmbedded: true });
+    parent.addField({ name: 'title', type: '@cardstack/core-types::string', neededWhenEmbedded: true });
+    parent.addField({ name: 'author', type: '@cardstack/core-types::string', neededWhenEmbedded: true });
+    await parent.save();
+
+    let card = service.createCard(qualifiedCard2Id, parent);
+    let field = card.getField('title');
+    field.setValue('test title')
+    this.set('field', field);
+    this.set('noop', () => {});
+
+    await render(hbs`
+    <FieldRenderer
+      @field={{field}}
+      @mode="schema"
+      @dropField={{action noop}}
+      @setFieldName={{action noop}}
+      @setFieldLabel={{action noop}}
+      @setFieldInstructions={{action noop}}
+      @setNeededWhenEmbedded={{action noop}}
+      @setPosition={{action noop}}
+      @removeField={{action noop}}
+      @isRightEdgeField={{true}} {{!-- Burcu please delete this line when you merge your stuff --}}
+      @schemaAttrs={{array "title" "type" "label" "name" "instructions" "is-meta" "embedded" "required"}}
+    />
+    `);
+
+    assert.dom('.schema-field-renderer--header--detail').hasText('Adopted');
+    assert.dom('[data-test-field-renderer-field-type]').hasText('@cardstack/core-types::string');
+    assert.dom('[data-test-field-renderer-move-btn]').exists();
+    assert.dom('[data-test-drop-zone="1"]').exists();
+
+    assert.dom('.edit-title-field-value').doesNotExist();
+    assert.dom('[data-test-string-field-viewer-value]').doesNotExist();
+
+    assert.dom('[data-test-schema-attr="name"] input').hasValue('title');
+    assert.dom('[data-test-schema-attr="name"] input').isDisabled();
+    assert.dom('[data-test-schema-attr="label"] input').hasValue('title');
+    assert.dom('[data-test-schema-attr="label"] input').isDisabled();
+    assert.dom('[data-test-schema-attr="instructions"] textarea').isNotDisabled();
+    assert.dom('[data-test-schema-attr="embedded"] input').isChecked();
+    assert.dom('[data-test-schema-attr="embedded"] input').isDisabled();
   });
 
   test('it can change field name in schema mode', async function(assert) {

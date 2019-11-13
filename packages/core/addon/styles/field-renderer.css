@@ -42,6 +42,10 @@
   cursor: -webkit-grabbing;
 }
 
+.field-renderer--action {
+  min-width: 40px;
+}
+
 .field-renderer--remove-btn {
   width: 16px;
   height: 18px;

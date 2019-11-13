@@ -4,6 +4,11 @@ card for which this css applies. Until we begin to support
 custom CSS for each card, all cards will inherit the
 @cardstack/base-card css.
 */
+
+.embedded-card {
+  overflow: hidden;
+}
+
 .embedded-card.cardstack_base-card {
   /* This is just placeholder CSS to test that everuthing works--please change as necessary */
   background-color: white;
@@ -11,5 +16,4 @@ custom CSS for each card, all cards will inherit the
   margin: .5rem;
   padding: .5rem;
   border-radius: 5px;
-  max-width: 30rem;
 }

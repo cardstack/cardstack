@@ -11,6 +11,7 @@ Router.map(function() {
   this.route('cards', function() {
     this.route('render');
     this.route('add', { path: '/new'});
+    this.route('adopt', { path: '/:id/adopt'});
     this.route('view', { path: '/:id'});
     this.route('edit', { path: '/:id/edit'});
     this.route('schema', { path: '/:id/schema'});

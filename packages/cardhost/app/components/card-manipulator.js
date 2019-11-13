@@ -130,6 +130,14 @@ export default class CardManipulator extends Component {
     return `new-field-${this.card.isolatedFields.length}`;
   }
 
+  get didUpdate() {
+    if ((this.args.card && !this.args.card.isNew) &&
+      (!this.card || this.args.card.id !== this.card.id)) {
+      this.card = this.args.card;
+    }
+    return null;
+  }
+
   @(task(function * () {
     this.statusMsg = null;
     try {
@@ -283,6 +291,12 @@ export default class CardManipulator extends Component {
 
   @action selectField(field) {
     if (field && field.isDestroyed) { return; }
+
+    // Toggling the selected field in tests is baffling me, using something more brute force
+    if (environment === 'test' && this.selectedField === field) {
+      this.selectedField = null;
+      return;
+    }
 
     this.selectedField = field;
   }

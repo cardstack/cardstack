@@ -20,7 +20,9 @@ module.exports = function(environment) {
       EXTEND_PROTOTYPES: {
         // Prevent Ember Data from overriding Date.parse.
         Date: false
-      }
+      },
+
+      cardTemplates: JSON.parse(process.env.CARD_TEMPLATES || null) || []
     },
 
     APP: {
@@ -35,6 +37,9 @@ module.exports = function(environment) {
     // ENV.APP.LOG_TRANSITIONS = true;
     // ENV.APP.LOG_TRANSITIONS_INTERNAL = true;
     // ENV.APP.LOG_VIEW_LOOKUPS = true;
+
+    ENV.cardTemplates = JSON.parse(process.env.CARD_TEMPLATES || null) ||
+      ['local-hub::location-card'];
   }
 
   if (environment === 'test') {
@@ -47,6 +52,9 @@ module.exports = function(environment) {
 
     ENV.APP.rootElement = '#ember-testing';
     ENV.APP.autoboot = false;
+
+    ENV.cardTemplates = JSON.parse(process.env.CARD_TEMPLATES || null) ||
+      ['local-hub::location-card'];
   }
 
   // if (environment === 'production') {

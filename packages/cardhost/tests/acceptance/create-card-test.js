@@ -5,7 +5,7 @@ import Fixtures from '@cardstack/test-support/fixtures'
 import { addField, setCardId, createCards, dragAndDropNewField, removeField } from '@cardstack/test-support/card-ui-helpers';
 import { setupMockUser, login } from '../helpers/login';
 
-const timeout = 5000;
+const timeout = 20000;
 const card1Id = 'millenial-puppies';
 const qualifiedCard1Id = `local-hub::${card1Id}`;
 
@@ -39,6 +39,16 @@ module('Acceptance | card create', function(hooks) {
     assert.ok(currentURL().match(/\/cards\/new-card-[0-9]+/));
   });
 
+  test("changing a card's id does not clear the card fields", async function(assert) {
+    await login();
+    await visit('/cards/new');
+
+    await addField('title', 'string', true);
+    await setCardId(card1Id);
+    assert.deepEqual([...document.querySelectorAll(`[data-test-isolated-card="${card1Id}"] [data-test-field]`)].map(i => i.getAttribute('data-test-field')),
+      ['title']);
+  });
+
   test('creating a card', async function(assert) {
     await login();
     await visit('/cards/new');
@@ -46,7 +56,7 @@ module('Acceptance | card create', function(hooks) {
     assert.equal(currentURL(), '/cards/new');
 
     assert.dom('.card-renderer-isolated--header').hasTextContaining('new-card-');
-    assert.dom('[data-test-right-edge] [data-test-section-header]').hasTextContaining('local-hub::new-card-');
+    assert.dom('[data-test-internal-card-id]').hasTextContaining('local-hub::new-card-');
 
     await createCards({
       [card1Id]: [
@@ -60,7 +70,7 @@ module('Acceptance | card create', function(hooks) {
     assert.equal(currentURL(), `/cards/${card1Id}`);
     await visit(`/cards/${card1Id}/schema`);
     assert.dom('.card-renderer-isolated--header').hasText('millenial-puppies');
-    assert.dom('[data-test-right-edge] [data-test-section-header]').hasText('local-hub::millenial-puppies');
+    assert.dom('[data-test-internal-card-id]').hasText('local-hub::millenial-puppies');
 
     await click('[data-test-field="title"]');
     assert.dom('[data-test-field="title"] [data-test-field-renderer-type]').hasText('@cardstack/core-types::string');
@@ -80,7 +90,7 @@ module('Acceptance | card create', function(hooks) {
 
     await focus('[data-test-card-renderer-isolated]');
     assert.dom('.card-renderer-isolated--header').hasText('millenial-puppies');
-    assert.dom('[data-test-right-edge] [data-test-section-header]').hasText('local-hub::millenial-puppies');
+    assert.dom('[data-test-internal-card-id]').hasText('local-hub::millenial-puppies');
 
     let card = JSON.parse(find('.code-block').textContent);
     assert.equal(card.data.attributes.title, undefined);

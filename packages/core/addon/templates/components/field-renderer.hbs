@@ -9,7 +9,7 @@
 
 {{!-- TODO: let's think of a more accessible solution here, consider making this a button--}}
 {{!-- TODO: also we should also turn on a11y linting --}}
-<div {{on "click" (fn this.selectField @field)}}
+<div {{on "click" (fn this.selectField @field)}} {{on "dragstart" (action this.startDragging @field)}} {{on "dragend" (action this.finishDragging)}}
   class={{concat
     "field-renderer "
     @mode
@@ -19,19 +19,14 @@
     " field-type-"
     this.dasherizedType
   }}
-  {{on "dragstart" (action this.startDragging @field)}}
-  {{on "dragend" (action this.finishDragging)}}
   data-test-field={{@field.name}}
   data-test-field-type={{@field.type}}
   data-test-field-mode={{@mode}}
 >
   {{#if @setPosition}}
-    <button
+    <button {{on "mousedown" (action this.initDrag @field)}} {{on "mouseup" (action this.endDrag)}} {{on "dragend" (action (mut this.isDragging) false)}}
       class="field-renderer--move-btn"
       aria-label="Drag field"
-      {{on "mousedown" (action this.initDrag @field)}}
-      {{on "mouseup" (action this.endDrag)}}
-      {{on "dragend" (action (mut this.isDragging) false)}}
       data-test-field-renderer-move-btn
       data-test-field-renderer-move-btn-position={{@field.position}}
     >
@@ -54,12 +49,15 @@
   {{else if (and (eq @mode "schema") @isRightEdgeField)}}
     {{!-- TODO we should extract the schema editing stuff into a seaprate component --}}
     <div class="schema-field-renderer">
-      {{#if (includes schemaAttrs "title")}}
+      {{#if (includes this.schemaAttrs "title")}}
         <header
           class="schema-field-renderer--header"
           data-test-field-renderer-header
         >
           {{@field.name}}
+          {{#if @field.isAdopted}}
+            <span class="schema-field-renderer--header--detail">Adopted</span>
+          {{/if}}
         </header>
       {{/if}}
       <div class="schema-field-renderer--attributes">
@@ -95,6 +93,7 @@
                   @class="field-renderer-field-label-input schema-field-renderer--input"
                   @value={{this.newFieldLabel}}
                   @key-up={{action this.updateFieldLabel}}
+                  @disabled={{@field.isAdopted}}
                 />
               {{else}}
                 <span class="schema-field-renderer--attribute-name">Field Label</span>
@@ -163,6 +162,7 @@
                 @class="field-renderer-field-name-input schema-field-renderer--input"
                 @value={{this.newFieldName}}
                 @key-up={{action this.updateFieldName}}
+                @disabled={{@field.isAdopted}}
               />
             </div>
           {{else if (eq schemaAttr "embedded")}}
@@ -171,7 +171,10 @@
               data-test-schema-attr={{schemaAttr}}
             >
               {{#if @setNeededWhenEmbedded}}
-                <label for="new_field_embedded" class="checkbox-container">
+                <label
+                  for="new_field_embedded"
+                  class="checkbox-container {{if @field.isAdopted "disabled"}}"
+                >
                   Available When Embedded
                   <Input
                     @checked={{@field.neededWhenEmbedded}}
@@ -179,6 +182,7 @@
                     @type="checkbox"
                     @id={{concat "edit_" @field.name "_" this.renderNonce "_embedded"}}
                     @click={{fn @setNeededWhenEmbedded @field.name}}
+                    @disabled={{@field.isAdopted}}
                   />
                   <span class="checkmark"></span>
                 </label>
@@ -235,13 +239,16 @@
         data-test-field-renderer-type
       >
         {{@field.type}}
+        {{#if @field.isAdopted}}
+          <span class="schema-field-renderer--header--detail">Adopted</span>
+        {{/if}}
       </header>
       <div class="schema-field-renderer--content">
         <div
           class="schema-field-renderer--name"
           data-test-field-renderer-label
         >
-          {{@field.label}}
+          {{@field.name}}
         </div>
         <div class="schema-field-renderer--value" data-test-field-renderer-value>
           {{@field.value}}
@@ -250,12 +257,14 @@
     </div>
   {{/if}}
 
-  {{#if @removeField}}
-    <button {{on "click" (fn @removeField @field.name)}}
-      class="field-renderer--remove-btn"
-      aria-label="Remove"
-      data-test-field-renderer-remove-btn
-    >
-    </button>
-  {{/if}}
+  <div class="field-renderer--action">
+    {{#if (and @removeField (not @field.isAdopted))}}
+      <button {{on "click" (fn @removeField @field.name)}}
+        class="field-renderer--remove-btn"
+        aria-label="Remove"
+        data-test-field-renderer-remove-btn
+      >
+      </button>
+    {{/if}}
+  </div>
 </div>

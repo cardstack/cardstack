@@ -102,6 +102,24 @@ module('Integration | Component | card-renderer', function(hooks) {
       />
     `);
     assert.dom(`.card-renderer--embedded-card-link`).exists();
+    assert.dom('.embedded-card.cardstack_base-card').exists();
+  });
+
+  test('it can render an embedded card without the ability to isolate it', async function (assert) {
+    let service = this.owner.lookup('service:data');
+    let card = service.createCard(qualifiedCard1Id);
+    this.set('card', card);
+
+    await render(hbs`
+      <CardRenderer
+        @card={{card}}
+        @format="embedded"
+        @preventIsolation={{true}}
+        @mode="view"
+      />
+    `);
+    assert.dom(`.card-renderer--embedded-card-link`).doesNotExist();
+    assert.dom('.embedded-card.cardstack_base-card').exists();
   });
 
   test('embedded card does not have a link to isolated card route in edit mode', async function(assert) {
@@ -117,6 +135,7 @@ module('Integration | Component | card-renderer', function(hooks) {
       />
     `);
     assert.dom(`.card-renderer--embedded-card-link`).doesNotExist();
+    assert.dom('.embedded-card.cardstack_base-card').exists();
   });
 
   test('embedded card does not have a link to isolated card route in schema mode', async function(assert) {
@@ -132,6 +151,7 @@ module('Integration | Component | card-renderer', function(hooks) {
       />
     `);
     assert.dom(`.card-renderer--embedded-card-link`).doesNotExist();
+    assert.dom('.embedded-card.cardstack_base-card').exists();
   });
 
   test('renders an isolated card in edit mode', async function(assert) {
@@ -251,6 +271,22 @@ module('Integration | Component | card-renderer', function(hooks) {
     assert.dom(`input`).doesNotExist();
     assert.deepEqual([...this.element.querySelectorAll('[data-test-field]')].map(i => i.getAttribute('data-test-field')),
       ['title', 'author' ]);
+  });
+
+  test("it can render an embedded card with the card's name", async function(assert) {
+    let service = this.owner.lookup('service:data');
+    let card = service.createCard(qualifiedCard1Id);
+    this.set('card', card);
+
+    await render(hbs`
+      <CardRenderer
+        @card={{card}}
+        @format="embedded"
+        @mode="view"
+        @showName={{true}}
+      />
+    `);
+    assert.dom('.embedded-card-label').hasText(card1Id);
   });
 
   skip('TODO it adds isolated css into the page when rendering an isolated card', async function(/*assert*/) {
