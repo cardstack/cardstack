@@ -240,7 +240,7 @@ module('Integration | Component | field-renderer', function(hooks) {
       @setFieldLabel={{action setFieldLabel}}
       @setFieldInstructions={{action noop}}
       @setNeededWhenEmbedded={{action noop}}
-      @schemaAttrs={{array "name" "label" "instructions" "multiselect" "required" "embedded"}}
+      @schemaAttrs={{array "name" "label" "instructions" "required" "embedded"}}
     />
     `);
     let nameInput = '[data-test-schema-attr="name"] input';
@@ -272,7 +272,7 @@ module('Integration | Component | field-renderer', function(hooks) {
       @setFieldLabel={{action setFieldLabel}}
       @setFieldInstructions={{action noop}}
       @setNeededWhenEmbedded={{action noop}}
-      @schemaAttrs={{array "name" "label" "instructions" "multiselect" "required" "embedded"}}
+      @schemaAttrs={{array "name" "label" "instructions" "required" "embedded"}}
     />
     `);
     let nameInput = '[data-test-schema-attr="name"] input';
@@ -303,7 +303,7 @@ module('Integration | Component | field-renderer', function(hooks) {
       @setFieldLabel={{action noop}}
       @setFieldInstructions={{action setFieldInstructions}}
       @setNeededWhenEmbedded={{action noop}}
-      @schemaAttrs={{array "name" "label" "instructions" "multiselect" "required" "embedded"}}
+      @schemaAttrs={{array "name" "label" "instructions" "required" "embedded"}}
     />
     `);
     let input = '[data-test-schema-attr="instructions"] textarea';
@@ -335,7 +335,7 @@ module('Integration | Component | field-renderer', function(hooks) {
       @setFieldLabel={{action noop}}
       @setFieldInstructions={{action noop}}
       @setNeededWhenEmbedded={{action setNeededWhenEmbedded}}
-      @schemaAttrs={{array "name" "label" "instructions" "multiselect" "required" "embedded"}}
+      @schemaAttrs={{array "name" "label" "instructions" "required" "embedded"}}
     />
     `);
     let input = '[data-test-schema-attr="embedded"] input';

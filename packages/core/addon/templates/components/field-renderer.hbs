@@ -196,25 +196,6 @@
                 </span>
               {{/if}}
             </div>
-          {{else if
-            (and
-              (eq schemaAttr "multiselect")
-              (or
-                (eq @field.type "@cardstack/core-types::belongs-to")
-                (eq @field.type "@cardstack/core-types::has-many")
-              )
-            )
-          }}
-            <div
-              class="schema-field-renderer--attribute"
-              data-test-schema-attr={{schemaAttr}}
-            >
-              <label class="checkbox-container">
-                Multiselect
-                <Input @type="checkbox" />
-                <span class="checkmark"></span>
-              </label>
-            </div>
           {{else if (eq schemaAttr "required")}}
             <div
               class="schema-field-renderer--attribute"
