@@ -1,0 +1,124 @@
+.ch-label {
+  display: block;
+  color: var(--ch-white-op60);
+  font: 400 13px/18px var(--ch-font-family);
+  letter-spacing: 0.035em;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  text-transform: capitalize;
+
+  transition: color var(--ch-transition-time);
+}
+
+.ch-input,
+.ch-textarea {
+  display: block;
+  width: 268px;
+  max-width: 100%;
+  padding: 10px var(--ch-spacing);
+  background-color: var(--ch-dark-blue-gray); /* TODO: check if correct color */
+  color: var(--ch-white-op60);
+  border: none;
+  border-radius: 5px;
+  font: 400 13px/18px var(--ch-font-family);
+  letter-spacing: 0.015em;
+
+  transition: color var(--ch-transition-time);
+}
+
+.ch-input:focus,
+.ch-textarea:focus {
+  color: white;
+}
+
+.ch-input {
+  min-height: 40px;
+}
+
+.ch-textarea {
+  min-height: 80px;
+}
+
+.ch-input-group:focus-within .ch-label,
+.ch-input-group:focus-within .ch-input,
+.ch-input-group:focus-within .ch-textarea {
+  color: white;
+}
+
+.ch-input-group:hover .ch-label {
+  color: white;
+  cursor: pointer;
+}
+
+.ch-label.ch-input-group > .ch-input,
+.ch-label.ch-input-group > .ch-textarea {
+  margin-top: 10px;
+}
+
+.ch-label.ch-input-group:hover,
+.ch-label.ch-checkbox-group:hover {
+  color: white;
+  cursor: pointer;
+}
+
+.ch-label + .ch-input,
+.ch-label + .ch-textarea {
+  margin-top: 10px;
+}
+
+.ch-input::placeholder,
+.ch-input::-webkit-input-placeholder,
+.ch-input::-ms-input-placeholder {
+  font: inherit;
+  letter-spacing: inherit;
+  opacity: 0.25;
+}
+
+.ch-input-group + .ch-input-group {
+  margin-top: var(--ch-spacing);
+}
+
+.ch-checkbox-group {
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+}
+
+.ch-checkbox {
+  display: inline-block;
+  margin: 0;
+  width: 0;
+  height: 0;
+  opacity: 0;
+}
+
+.ch-checkbox + .ch-checkmark {
+  order: -1;
+  margin-right: 10px;
+  display: inline-block;
+  vertical-align: text-bottom;
+  height: 18px;
+  width: 18px;
+  background-color: var(--ch-lighter-medium-blue-gray);
+  border: 1px solid var(--ch-lighter-dark-blue-gray);
+  border-radius: 3px;
+  cursor: pointer;
+
+  transition: background-color var(--ch-transition-time);
+}
+
+.ch-checkbox:hover + .ch-checkmark {
+  background-color: var(--ch-dark-blue-gray); /* TODO: check if correct color */
+}
+
+.ch-checkbox:checked + .ch-checkmark {
+  background: url('/assets/images/icons/checkmark-active.svg') center/12px no-repeat;
+  background-color: var(--ch-dark-blue-gray);
+}
+
+.ch-checkbox:disabled + .ch-checkmark,
+.ch-checkbox.disabled + .ch-checkmark {
+  opacity: 0.4;
+  cursor: not-allowed;
+}

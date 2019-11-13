@@ -3,8 +3,6 @@
 <section class="ui-components">
   <h1>Cardhost UI Components</h1>
 
-  <hr>
-
   <section class="ui-components--section">
     <h2>Font</h2>
     <CodeBlock
@@ -13,180 +11,228 @@
     />
   </section>
 
-  <hr>
-
   <section class="ui-components--section">
     <h2>Color Palette</h2>
     <div class="color-palette">
       <div>
-        <div class="color-palette--block gray-black"></div>
-        <CodeBlock
-          @code='--ch-gray-black'
-          @language="css"
-        />
-      </div>
-      <div>
-        <div class="color-palette--block light-gray"></div>
+        <div class="color-palette--block" style="background-color: var(--ch-light-gray)">
+          #f2f2f2
+        </div>
         <CodeBlock
           @code='--ch-light-gray'
           @language="css"
         />
       </div>
       <div>
-        <div class="color-palette--block light-gray-d6"></div>
+        <div class="color-palette--block" style="background-color: var(--ch-light-gray-d6)">
+          #d6d6d6
+        </div>
         <CodeBlock
           @code='--ch-light-gray-d6'
           @language="css"
         />
       </div>
       <div>
-        <div class="color-palette--block medium-blue-gray"></div>
+        <div class="color-palette--block light-gray-b1" style="background-color: var(--ch-light-gray-b1)">
+          #b1b1b1
+        </div>
+        <CodeBlock
+          @code='--ch-light-gray-b1'
+          @language="css"
+        />
+      </div>
+      <div>
+        <div class="color-palette--block" style="background-color: var(--ch-light-blue-gray)">
+          #acaac6
+        </div>
+        <CodeBlock
+          @code='--ch-light-blue-gray'
+          @language="css"
+        />
+      </div>
+      <div>
+        <div class="color-palette--block" style="background-color: var(--ch-medium-blue-gray)">
+          #5b596e
+        </div>
         <CodeBlock
           @code='--ch-medium-blue-gray'
           @language="css"
         />
       </div>
       <div>
-        <div class="color-palette--block medium-dark-blue-gray"></div>
+        <div class="color-palette--block" style="background-color: var(--ch-medium-medium-blue-gray)">
+          #4b4958;
+        </div>
+        <CodeBlock
+          @code='--ch-medium-medium-blue-gray'
+          @language="css"
+        />
+      </div>
+      <div>
+        <div class="color-palette--block" style="background-color: var(--ch-medium-dark-blue-gray)">
+          #41404d;
+        </div>
         <CodeBlock
           @code='--ch-medium-dark-blue-gray'
           @language="css"
         />
       </div>
+
       <div>
-        <div class="color-palette--block medium-darker-blue-gray"></div>
+        <div class="color-palette--block" style="background-color: var(--ch-medium-darker-blue-gray)">
+          #383849
+        </div>
         <CodeBlock
           @code='--ch-medium-darker-blue-gray'
           @language="css"
         />
       </div>
       <div>
-        <div class="color-palette--block dark-blue-gray"></div>
+        <div class="color-palette--block" style="background-color: var(--ch-dark-blue-gray)">
+          #2e2d38
+        </div>
         <CodeBlock
           @code='--ch-dark-blue-gray'
           @language="css"
         />
       </div>
       <div>
-        <div class="color-palette--block darker-blue-gray"></div>
+        <div class="color-palette--block" style="background-color: var(--ch-gray-black)">
+          #282738
+        </div>
+        <CodeBlock
+          @code='--ch-gray-black'
+          @language="css"
+        />
+      </div>
+      <div>
+        <div class="color-palette--block" style="background-color: var(--ch-darker-blue-gray)">
+          #201f27
+        </div>
         <CodeBlock
           @code='--ch-darker-blue-gray'
           @language="css"
         />
       </div>
       <div>
-        <div class="color-palette--block darkest-blue-gray"></div>
+        <div class="color-palette--block" style="background-color: var(--ch-darkest-blue-gray)">
+          #141428
+        </div>
         <CodeBlock
           @code='--ch-darkest-blue-gray'
           @language="css"
         />
       </div>
       <div>
-        <div class="color-palette--block cyan"></div>
+        <div class="color-palette--block" style="background-color: var(--ch-cyan)">
+          #00ebe5
+        </div>
         <CodeBlock
           @code='--ch-cyan'
           @language="css"
         />
       </div>
       <div>
-        <div class="color-palette--block medium-purple"></div>
+        <div class="color-palette--block" style="background-color: var(--ch-blue)">
+          #0076ff
+        </div>
         <CodeBlock
-          @code='--ch-medium-purple'
+          @code='--ch-blue'
           @language="css"
         />
       </div>
     </div>
   </section>
 
-  <hr>
-
-  <section class="ui-components--section">
+  <section class="ui-components--section ui-components--grid-2-col">
     <h2>Buttons</h2>
+    <h3>Primary button</h3>
+    <button class="ch-button">Save</button>
+    <CodeBlock
+      @code='<button class="ch-button">Save</button>'
+      @language="html"
+    />
 
-    <section class="ui-components--section">
-      <h3>Primary button</h3>
-      <button class="ch-button">Save</button>
-      <CodeBlock
-        @code='<button class="ch-button">Save</button>'
-        @language="html"
-      />
-    </section>
+    <h3>Secondary button</h3>
+    <button class="ch-button ch-button--secondary">Preview</button>
+    <CodeBlock
+      @code='<button class="ch-button ch-button--secondary">Preview</button>'
+      @language="html"
+    />
 
-    <section class="ui-components--section">
-      <h3>Secondary button</h3>
-      <button class="ch-button ch-button--secondary">Preview</button>
-      <CodeBlock
-        @code='<button class="ch-button ch-button--secondary">Preview</button>'
-        @language="html"
-      />
-    </section>
-
-    <section class="ui-components--section">
-      <h3>Icon buttons (SVG button)</h3>
+    <h3>Icon buttons (SVG button)</h3>
+    <div>
       <button class="ch-button ch-button--icon user" aria-label="User"></button>
       <button class="ch-button ch-button--icon catalog" aria-label="Catalog"></button>
-      <button class="ch-button ch-button--icon library" aria-label="Library"></button>
       <button class="ch-button ch-button--icon share" aria-label="Share"></button>
+      <button class="ch-button ch-button--icon library" aria-label="Library"></button>
+    </div>
+    <div>
       <CodeBlock @code='
         <button class="ch-button ch-button--icon user" aria-label="User"></button>
         <button class="ch-button ch-button--icon catalog" aria-label="Catalog"></button>
+        <button class="ch-button ch-button--icon share" aria-label="Share"></button>
         <button class="ch-button ch-button--icon library" aria-label="Library"></button>
-        <button class="ch-button ch-button--icon share" aria-label="Share"></button>'
-        @language="html"
-      />
-    </section>
+      '
+        @language="html"/>
+    </div>
 
-    <section class="ui-components--section">
-      <h3>Secondary Icon button</h3>
-      <button class="ch-button ch-button--icon-secondary delete" aria-label="Delete"></button>
-      <CodeBlock
-        @code='<button class="ch-button ch-button--icon-secondary delete" aria-label="Delete"></button>'
-        @language="html"
-      />
-    </section>
+    <h3>Secondary Icon button</h3>
+    <button class="ch-button ch-button--icon-secondary delete" aria-label="Delete"></button>
+    <CodeBlock
+      @code='<button class="ch-button ch-button--icon-secondary delete" aria-label="Delete"></button>'
+      @language="html"
+    />
 
-    <section class="ui-components--section">
-      <h3>Blue CTA button on default card</h3>
-      TK
-    </section>
-  </section>
-
-  <hr>
-
-  <section class="ui-components--section">
-    <h2>Dropdowns</h2>
-
-    <section class="ui-components--section">
-      <h3>View Switcher</h3>
-      <ModeSwitcher @name="" @mode="view" />
-      <CodeBlock
-        @code='<ModeSwitcher @name="[card-id-here]" @mode="[mode-here]" />'
-        @language="html"
-      />
-      <div>
-        Available modes:<br>
-        <code>view</code><br>
-        <code>edit</code><br>
-        <code>schema</code>
-      </div>
-    </section>
-
-    <section class="ui-components--section">
-      <h3>Dropdown (right edge)</h3>
-      TK
-    </section>
-  </section>
-
-  <hr>
-
-  <section class="ui-components--section">
-    <h2>Tab Switch (right-edge)</h2>
+    <h3>Blue CTA button on default card</h3>
     TK
   </section>
 
-  <hr>
 
-  <section class="ui-components--section">
+
+  <section class="ui-components--section ui-components--grid-2-col">
+    <h2>Dropdowns</h2>
+    <h3>View Switcher</h3>
+    <div>
+      <ModeSwitcher @name="" @mode="view" />
+      <ModeSwitcher @name="" @mode="edit" />
+      <ModeSwitcher @name="" @mode="schema" />
+    </div>
+    <CodeBlock
+      @code='
+        <ModeSwitcher @name="[card-id-here]" @mode="view" />
+        <ModeSwitcher @name="[card-id-here]" @mode="edit" />
+        <ModeSwitcher @name="[card-id-here]" @mode="schema" />
+      '
+      @language="html"
+    />
+
+    <h3>Dropdown (Right Edge)</h3>
+    TK
+  </section>
+
+
+
+  <section class="ui-components--section ui-components--grid-2-col">
+    <h2>Pill Selector</h2>
+
+    <div class="pill-selector">
+      <div class="pill-option selected">Properties</div>
+      <div class="pill-option">Structure</div>
+    </div>
+
+    <CodeBlock
+      @code='
+        <div class="pill-selector">
+          <div class="pill-option selected">Properties</div>
+          <div class="pill-option">Structure</div>
+        </div>
+      '
+      @language="html"
+    />
+  </section>
+
+  <section class="ui-components--section ui-components--grid-2-col">
     <h2>Search Bar</h2>
     <div class="ch-search-bar">Search Library</div>
     <CodeBlock
@@ -195,9 +241,7 @@
     />
   </section>
 
-  <hr>
-
-  <section class="ui-components--section">
+  <section class="ui-components--section ui-components--grid-2-col">
     <h2>Filter Bar</h2>
     <div class="ch-filter-bar">Filter Results</div>
     <CodeBlock
@@ -205,8 +249,6 @@
       @language="html"
     />
   </section>
-
-  <hr>
 
   <section class="ui-components--section">
     <h2>Catalog Field</h2>
@@ -219,11 +261,8 @@
     </div>
   </section>
 
-  <hr>
-
   <section class="ui-components--section">
     <h2>Catalog</h2>
-
     <section class="ch-catalog">
       <header class="ch-catalog--header">
         <h3 class="ch-catalog--title">Card Catalog</h3>
@@ -245,41 +284,212 @@
     </section>
   </section>
 
-  <hr>
-
-  <section>
+  <section class="ui-components--section ui-components--grid-2-col">
     <h2>Field Renderer</h2>
-
-    <div class="ui-components--triplet-grid">
-      <div>
-        <h3>Schema mode</h3>
+    <h3>Schema mode</h3>
+    <FieldRenderer
+        @field={{this.model.sampleNameField}}
+        @format="isolated"
+        @mode="schema"
+      />
+    <CodeBlock
+      @code='
         <FieldRenderer
-          @field={{this.model.isolatedFields.firstObject}}
+          @field=@field
           @format="isolated"
           @mode="schema"
         />
-      </div>
-    </div>
+      '
+      @language="html"
+    />
+    <h3>Edit mode</h3>
+    <FieldRenderer
+      @field={{this.model.sampleNameField}}
+      @format="isolated"
+      @mode="edit"
+      @setFieldValue={{action this.noop}}
+    />
+    <CodeBlock
+      @code='
+        <FieldRenderer
+          @field=@field
+          @format="isolated"
+          @mode="edit"
+          @setFieldValue=@setFieldValue
+        />
+      '
+      @language="html"
+    />
+    <h3>View mode</h3>
+    <FieldRenderer
+      @field={{this.model.sampleNameField}}
+      @format="isolated"
+      @mode="view"
+    />
+    <CodeBlock
+      @code='
+        <FieldRenderer
+          @field=@field
+          @format="isolated"
+          @mode="view"
+        />
+      '
+      @language="html"
+    />
   </section>
 
-  <hr>
+  <section class="ui-components--section ui-components--grid-2-col">
+    <h2>Form Elements</h2>
+    <h3>Label</h3>
+    <label class="ch-label">Field name</label>
+    <CodeBlock
+      @code='<label class="ch-label">Field name</label>'
+      @language="html"
+    />
 
-  <section>
+    <h3>Text Input</h3>
+    <Input @class="ch-input" placeholder="Enter value" />
+    <CodeBlock
+      @code='<Input @class="ch-input" @placeholder="Enter value" />'
+      @language="html"
+    />
+
+    <h3>Textarea</h3>
+    <Textarea @class="ch-textarea" @placeholder="Enter value" />
+    <CodeBlock
+      @code='<Textarea @class="ch-textarea" @placeholder="Enter value" />'
+      @language="html"
+    />
+
+    <h3>Checkbox</h3>
+    <label class="ch-label ch-checkbox-group">
+      Required field
+      <Input @class="ch-checkbox" @type="checkbox" />
+      <span class="ch-checkmark"></span>
+    </label>
+     <CodeBlock
+      @code='
+        <label class="ch-label ch-checkbox-group">
+          Required field
+          <Input @class="ch-checkbox" @type="checkbox" />
+          <span class="ch-checkmark"></span>
+        </label>
+      '
+      @language="html"
+    />
+
+    <h3>Input Group</h3>
+    <div class="ch-input-group">
+      <label for="ch-input-id" class="ch-label">Display label</label>
+      <Input @id="ch-input-id" @class="ch-input" @placeholder="Enter value" />
+    </div>
+    <CodeBlock
+      @code='
+        <div class="ch-input-group">
+          <label for="[input-id-here]" class="ch-label">Display label</label>
+          <Input @id="[input-id-here]" @class="ch-input" @placeholder="Enter value" />
+        </div>
+      '
+      @language="html"
+    />
+
+    <label class="ch-label ch-input-group">
+      Display label
+      <Input @class="ch-input" @placeholder="Enter value" />
+    </label>
+    <CodeBlock
+      @code='
+        <label class="ch-label ch-input-group">
+          Display label
+          <Input @class="ch-input" @placeholder="Enter value" />
+        </label>
+      '
+      @language="html"
+    />
+  </section>
+
+  <section class="ui-components--section ui-components--grid-2-col">
     <h2>Card Renderer</h2>
-    <div class="ui-components--triplet-grid">
-      <div>
-        <h3>Schema mode</h3>
+      <h3>Schema mode</h3>
+      <CardRenderer
+        @card={{this.model}}
+        @format="isolated"
+        @mode="schema"
+        @setPosition={{action this.noop}}
+        @removeField={{action this.noop}}
+      />
+      <CodeBlock
+        @code='
+          <CardRenderer
+            @card=@card
+            @format="isolated"
+            @mode="schema"
+            @setPosition=@setPosition
+            @removeField=@removeField
+          />
+        '
+        @language="html"
+      />
 
-        <CardRenderer
-          @card={{this.model}}
-          @format="isolated"
-          @mode="schema"
-          @setPosition={{action this.noop}}
-          @removeField={{action this.noop}}
-        />
-      </div>
-    </div>
+      <h3>Edit mode</h3>
+      <CardRenderer
+        @card={{this.model}}
+        @format="isolated"
+        @mode="edit"
+        @setFieldValue={{action this.noop}}
+      />
+      <CodeBlock
+        @code='
+          <CardRenderer
+            @card=@card
+            @format="isolated"
+            @mode="edit"
+            @setFieldValue=@setFieldValue
+          />
+        '
+        @language="html"
+      />
+
+      <h3>View mode</h3>
+      <CardRenderer
+        @card={{this.model}}
+        @format="isolated"
+        @mode="view"
+      />
+      <CodeBlock
+        @code='
+          <CardRenderer
+            @card=@card
+            @format="isolated"
+            @mode="view"
+          />
+        '
+        @language="html"
+      />
   </section>
 
-
+  <section class="ui-components--section ui-components--grid-2-col">
+    <h2>Right Edge</h2>
+    <RightEdge
+      @selectedField={{this.model.isolatedFields.firstObject}}
+      @selectField={{action this.noop}}
+      @setFieldName={{this.noop}}
+      @setFieldLabel={{this.noop}}
+      @setFieldInstructions={{this.noop}}
+      @setNeededWhenEmbedded={{this.noop}}
+    />
+    <CodeBlock
+      @code='
+        <RightEdge
+          @selectedField=@selectedField
+          @selectField=@selectField
+          @setFieldName=@setFieldName
+          @setFieldLabel=@setFieldLabel
+          @setFieldInstructions=@setFieldInstructions
+          @setNeededWhenEmbedded=@setNeededWhenEmbedded
+        />
+      '
+      @language="html"
+    />
+  </section>
 </section>

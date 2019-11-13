@@ -2,17 +2,25 @@
 @import '/assets/palette.css';
 @import '/assets/ui-components.css';
 
-@import '/assets/components/right-edge.css';
 @import '/assets/index.css';
 @import '/assets/cards.css';
 @import '/assets/components/mode-switcher.css';
+@import '/assets/components/right-edge.css';
 @import '/assets/components/cardhost-left-edge.css';
 @import '/assets/components/cardhost-top-edge.css';
 @import '/assets/components/button.css';
+@import '/assets/components/form-elements.css';
 @import '/assets/components/search-bar.css';
 @import '/assets/components/filter-bar.css';
 @import '/assets/components/catalog.css';
 @import '/assets/components/catalog-field.css';
+
+/* Cardhost styling for core package templates */
+@import '/assets/components/card-renderer.css';
+@import '/assets/components/field-renderer.css';
+@import '/assets/components/schema-field-renderer.css';
+@import '/assets/components/edit-field-renderer.css';
+@import '/assets/components/drop-zone.css';
 
 
 /* TODO eventually these will be dynamically added to the DOM.
@@ -49,6 +57,7 @@ Until that work is done we are statically adding this css
   --ch-spacing: 20px;
   --ch-edges-z-index: 10;
   --ch-actions-z-index: 11;
+  --ch-transition-time: 250ms;
 }
 
 /*
@@ -237,12 +246,9 @@ a:hover {
   max-width: 100%;
 }
 
-.field-renderer.view-field .label {
-  padding-bottom: 0.5em;
-  font: 400 13px/18px "Open Sans";
+.field-renderer.view-field .ch-label {
   letter-spacing: 0;
   color: rgba(0, 0, 0, 0.5);
-  text-transform: capitalize;
 }
 
 .card-renderer-isolated.view .field-renderer.view-field.field-title {
@@ -252,7 +258,7 @@ a:hover {
   text-align: left;
 }
 
-.card-renderer-isolated.view .field-renderer.view-field.field-title .label {
+.card-renderer-isolated.view .field-renderer.view-field.field-title .ch-label {
   visibility: hidden;
   height: 0;
   padding: 0;
@@ -281,10 +287,4 @@ a:hover {
 
 .field-renderer.edit-field  + .field-renderer.edit-field {
   margin-top: 20px;
-}
-
-.edit-field-renderer {
-  border: 1px solid #B1B1B1;
-  border-radius: 5px;
-  padding: 10px 20px;
 }

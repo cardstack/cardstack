@@ -1,16 +1,19 @@
 .ui-components {
-  padding: 20px 20px 300px;
-  background-color: var(--ch-dark-blue-gray);
+  padding: var(--ch-spacing) var(--ch-spacing) 300px;
+  /* background-color: var(--ch-dark-blue-gray); */
+  background-color: #666;
+  color: black;
 }
 
 .ui-components--section {
-  padding: 20px;
+  padding: 30px 0;
+  border-bottom: 1px solid var(--ch-light-gray-b1);
 }
 
 .ui-components .code-block {
   width: 700px;
   max-width: 100%;
-  margin: 20px 0;
+  margin: var(--ch-spacing) 0;
   resize: both;
 }
 
@@ -19,60 +22,35 @@
   grid-template-columns: repeat(auto-fill, minmax(min-content, 1fr));
 }
 
-.ui-components--triplet-grid {
+.ui-components--grid-2-col {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  padding: 20px;
+  grid-template-columns: repeat(2, minmax(40%, 60%));
+  align-items: flex-start;
 }
-
-.ui-components--triplet-grid h3 {
-  text-align: center;
+.ui-components--grid-2-col > h2,
+.ui-components--grid-2-col > h3 {
+  grid-column: span 2;
 }
-
+.ui-components--grid-2-col .code-block {
+  margin: 0;
+}
 
 .color-palette {
   display: grid;
   grid-template-columns: repeat(auto-fill, 250px);
-  grid-gap: 20px;
-  padding: 20px;
-  background: white;
+  grid-gap: var(--ch-spacing);
 }
 
 .color-palette--block {
   width: 250px;
   height: 150px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 22px;
+  font-weight: 600;
 }
 
-.color-palette--block.gray-black {
-  background: var(--ch-gray-black);
-}
-.color-palette--block.light-gray {
-  background: var(--ch-light-gray);
-}
-.color-palette--block.light-gray-d6 {
-  background: var(--ch-light-gray-d6);
-}
-.color-palette--block.medium-blue-gray {
-  background: var(--ch-medium-blue-gray);
-}
-.color-palette--block.medium-dark-blue-gray {
-  background: var(--ch-medium-dark-blue-gray);
-}
-.color-palette--block.medium-darker-blue-gray {
-  background: var(--ch-medium-darker-blue-gray);
-}
-.color-palette--block.dark-blue-gray {
-  background: var(--ch-dark-blue-gray);
-}
-.color-palette--block.darker-blue-gray {
-  background: var(--ch-darker-blue-gray);
-}
-.color-palette--block.darkest-blue-gray {
-  background: var(--ch-darkest-blue-gray);
-}
-.color-palette--block.cyan {
-  background: var(--ch-cyan);
-}
-.color-palette--block.medium-purple {
-  background: var(--ch-medium-purple);
+.ui-components .right-edge {
+  position: static;
 }

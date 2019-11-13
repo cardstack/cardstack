@@ -1,22 +1,25 @@
 {{this.didUpdate}}
 
 <div class="right-edge" data-test-right-edge>
-  <div class="right-edge--pill-selector">
-    <div class="right-edge--pill-option selected">Properties</div>
-    <div class="right-edge--pill-option">Structure</div>
+  {{!-- TODO: make this a component --}}
+  <div class="right-edge--section">
+    <div class="pill-selector">
+      <div class="pill-option selected">Properties</div>
+      <div class="pill-option">Structure</div>
+    </div>
   </div>
   {{#if @selectedField}}
     <div class="right-edge--section">
-      <div class="section-header" data-test-section-header>
-        {{this.selectedFieldTitle}}
+      <div class="right-edge--section-header" data-test-section-header>
+        {{this.selectedFieldTitle}} Field
         {{#if @selectedField.isAdopted}}
           <div class="right-edge--section-header--adopted">
             Adopted from {{@selectedField.card.adoptedFrom.name}}
           </div>
         {{/if}}
       </div>
+
       <FieldRenderer
-        @isRightEdgeField={{true}}
         @field={{@selectedField}}
         @mode="schema"
         @setNeededWhenEmbedded={{@setNeededWhenEmbedded}}
@@ -33,16 +36,14 @@
     before implemnenting that, as that will make this easy
     --}}
     <div class="right-edge--section">
-      <div class="section-header" data-test-section-header>ID</div>
-      <div class="right-edge--item">
-        <label
-          for="card__id"
-          class="right-edge--item-label"
-        >
-          Card ID:
+      <div class="right-edge--section-header" data-test-section-header>ID</div>
+      <div class="right-edge--item ch-input-group">
+        <label for="card__id" class="ch-label">
+          Card ID
         </label>
         <Input
           @id="card__id"
+          @class="ch-input"
           @size="60"
           @placeholder="e.g. millenial-puppies"
           @value={{this.cardName}}
@@ -51,19 +52,19 @@
         />
       </div>
       <div class="right-edge--item">
-        <div class="right-edge--item-label">Internal ID</div>
-        <div data-test-internal-card-id class="right-edge--item-value">
+        <div class="ch-label right-edge--label">Internal ID</div>
+        <div data-test-internal-card-id>
           {{@card.id}}
         </div>
       </div>
     </div>
 
     <div class="right-edge--section">
-      <div class="section-header" data-test-section-header>
+      <div class="right-edge--section-header" data-test-section-header>
         Adopt
       </div>
       <div class="right-edge--item">
-        <div class="right-edge--item-label">Adopted Card</div>
+        <div class="ch-label right-edge--label">Adopted Card</div>
         {{#if
           (and
             @card.adoptedFrom
@@ -71,14 +72,28 @@
           )
         }}
           <LinkTo
-            @class="right-edge--adopted-card-link"
+            @class="adopted-card"
             @route="cards.schema"
             @model={{@card.adoptedFrom.name}}
           >
-            {{@card.adoptedFrom.name}}
+            {{!-- TODO: This should change according to card --}}
+            {{! template-lint-disable no-inline-styles }}
+            <div
+              class="adopted-card--image"
+              style={{css-url "background-image" "/assets/images/cards/adopted-card-preview-sample.png"}}
+            />
+            <div>
+              {{@card.adoptedFrom.name}}
+              <div class="adopted-card--view-text">View Schema</div>
+            </div>
+
           </LinkTo>
+          <div class="right-edge--section-btn-container">
+            {{!-- TODO: Remove functionality --}}
+            <button class="right-edge--section-btn">Remove</button>
+          </div>
         {{else}}
-          <div class="right-edge--no-adoption">
+          <div>
             No Adoption
           </div>
         {{/if}}

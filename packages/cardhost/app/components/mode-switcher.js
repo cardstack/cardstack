@@ -4,16 +4,16 @@ import { inject as service } from '@ember/service';
 
 const modes = [
   {
+    id: 'schema',
+    displayTitle: 'Schema View'
+  },
+  {
     id: 'view',
     displayTitle: 'Layout View'
   },
   {
     id: 'edit',
     displayTitle: 'Edit View'
-  },
-  {
-    id: 'schema',
-    displayTitle: 'Schema View'
   }
 ];
 

@@ -74,7 +74,6 @@
 
 <RightEdge
   @card={{this.card}}
-  @isRightEdgeField={{true}}
   @selectedField={{this.selectedField}}
   @selectField={{action this.selectField}}
   @setNeededWhenEmbedded={{this.setNeededWhenEmbedded}}
@@ -91,8 +90,6 @@
     @format="isolated"
     @mode="schema"
     @removeField={{action this.removeField}}
-    @setFieldName={{action this.setFieldName}}
-    @setNeededWhenEmbedded={{action this.setNeededWhenEmbedded}}
     @selectField={{action this.selectField}}
     @setPosition={{action this.setPosition}}
     @dropField={{action this.dropField}}
