@@ -1,3 +1,5 @@
+{{this.didUpdate}}
+
 {{#if this.cardstackSession.isAuthenticated}}
   <div class="card-renderer--top-edge-buttons">
     {{! eslint is confused by on helper }}
@@ -73,7 +75,6 @@
   @setFieldName={{this.setFieldName}}
   @setFieldLabel={{this.setFieldLabel}}
   @setFieldInstructions={{this.setFieldInstructions}}
-  @updateCardId={{this.doNothing}}
 />
 
 <div class="ch-search-bar card-schema-updator--search-bar">Search Library</div>

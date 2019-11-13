@@ -2,7 +2,7 @@ import { module, test, skip } from 'qunit';
 import { click, find, visit, currentURL, waitFor } from '@ember/test-helpers';
 import { setupApplicationTest } from 'ember-qunit';
 import Fixtures from '@cardstack/test-support/fixtures'
-import { addField, setCardId, createCards, setFieldValue, removeField } from '@cardstack/test-support/card-ui-helpers';
+import { showCardId, addField, setCardId, createCards, setFieldValue, removeField } from '@cardstack/test-support/card-ui-helpers';
 import { setupMockUser, login } from '../helpers/login';
 
 const timeout = 5000;
@@ -94,6 +94,27 @@ module('Acceptance | card adoption', function(hooks) {
     let card = JSON.parse(find('.code-block').textContent);
     assert.deepEqual(card.data.relationships['adopted-from'].data, { type: 'cards', id: qualifiedCard1Id });
     assert.deepEqual(card.data.relationships.fields.data, []);
+  });
+
+  test('it displays the adopted card in the right edge', async function(assert) {
+    await setupParentCard();
+    await visit(`/cards/${card1Id}/adopt`);
+
+    await setCardId(card2Id);
+    await click('[data-test-card-creator-save-btn]');
+    await waitFor(`[data-test-card-view="${card2Id}"]`, { timeout });
+
+    await visit(`/cards/${card2Id}/schema`);
+
+    await showCardId();
+
+    assert.dom(`a.right-edge--adopted-card-link[href="/cards/${card1Id}/schema"]`).hasText(card1Id);
+    await click(`a.right-edge--adopted-card-link[href="/cards/${card1Id}/schema"]`);
+    await waitFor(`[data-test-card-schema="${card1Id}"]`, { timeout });
+
+    assert.equal(currentURL(), `/cards/${card1Id}/schema`);
+    await showCardId();
+    assert.dom('#card__id').hasValue(card1Id);
   });
 
   test('can add a field at a particular position', async function(assert) {

@@ -1,26 +1,36 @@
 import Component from '@glimmer/component';
 import { fieldComponents } from './card-manipulator';
 import { tracked } from '@glimmer/tracking';
+import { action } from '@ember/object';
 
 export default class RightEdge extends Component {
-  @tracked card;
   @tracked cardName;
 
   constructor(...args) {
     super(...args);
 
     if (this.args.card) {
-      this.card = this.args.card;
       this.cardName = this.args.card.name;
     }
   }
 
-  get sectionTitle() {
-    if (this.args.selectedField) {
-      let { title } = fieldComponents.findBy('coreType', this.args.selectedField.type);
-      return title;
-    }
+  get selectedFieldTitle() {
+    let { title } = fieldComponents.findBy('coreType', this.args.selectedField.type);
+    return title;
+  }
 
-    return this.card.id;
+  get didUpdate() {
+    if (this.args.card && !this.args.card.isNew &&
+      this.args.card.name !== this.cardName) {
+      this.cardName = this.args.card.name;
+    }
+    return null;
+  }
+
+  @action
+  updateCardId(id) {
+    if (!this.args.updateCardId) { return; }
+
+    this.args.updateCardId(id);
   }
 }

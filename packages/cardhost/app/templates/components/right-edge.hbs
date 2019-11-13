@@ -1,18 +1,20 @@
+{{this.didUpdate}}
+
 <div class="right-edge" data-test-right-edge>
   <div class="right-edge--pill-selector">
     <div class="right-edge--pill-option selected">Properties</div>
     <div class="right-edge--pill-option">Structure</div>
   </div>
-  <div class="right-edge--section">
-    <div class="section-header" data-test-section-header>
-      {{this.sectionTitle}}
-      {{#if @selectedField.isAdopted}}
-        <div class="right-edge--section-header--adopted">
-          Adopted from {{@selectedField.card.adoptedFrom.name}}
-        </div>
-      {{/if}}
-    </div>
-    {{#if @selectedField}}
+  {{#if @selectedField}}
+    <div class="right-edge--section">
+      <div class="section-header" data-test-section-header>
+        {{this.selectedFieldTitle}}
+        {{#if @selectedField.isAdopted}}
+          <div class="right-edge--section-header--adopted">
+            Adopted from {{@selectedField.card.adoptedFrom.name}}
+          </div>
+        {{/if}}
+      </div>
       <FieldRenderer
         @isRightEdgeField={{true}}
         @field={{@selectedField}}
@@ -23,16 +25,63 @@
         @setFieldInstructions={{@setFieldInstructions}}
         @schemaAttrs={{array "name" "label" "instructions" "multiselect" "required" "embedded"}}
       />
-    {{else if @updateCardId}}
-      <label for="card__id">Card ID:</label>
-      <Input
-        @id="card__id"
-        @size="60"
-        @placeholder="e.g. millenial-puppies"
-        @value={{this.cardName}}
-        @key-up={{action @updateCardId}}
-        @disabled={{not @card.isNew}}
-      />
-    {{/if}}
-  </div>
+    </div>
+  {{else}}
+    {{!--
+    TODO each of these section is collapsable.
+    Waiting until ember animated/liquid fire is available
+    before implemnenting that, as that will make this easy
+    --}}
+    <div class="right-edge--section">
+      <div class="section-header" data-test-section-header>ID</div>
+      <div class="right-edge--item">
+        <label
+          for="card__id"
+          class="right-edge--item-label"
+        >
+          Card ID:
+        </label>
+        <Input
+          @id="card__id"
+          @size="60"
+          @placeholder="e.g. millenial-puppies"
+          @value={{this.cardName}}
+          @key-up={{action this.updateCardId}}
+          @disabled={{or (not @updateCardId) (not @card.isNew)}}
+        />
+      </div>
+      <div class="right-edge--item">
+        <div class="right-edge--item-label">Internal Id</div>
+        <div class="right-edge--item-value">{{@card.id}}</div>
+      </div>
+    </div>
+
+    <div class="right-edge--section">
+      <div class="section-header"
+        data-test-section-header>
+        Adopt
+      </div>
+      <div class="right-edge--item">
+        <div class="right-edge--item-label">Adopted Card</div>
+        {{#if
+          (and
+            @card.adoptedFrom
+            (not (eq @card.adoptedFrom.name "@cardstack/base-card"))
+          )
+        }}
+          <LinkTo
+            @class="right-edge--adopted-card-link"
+            @route="cards.schema"
+            @model={{@card.adoptedFrom.name}}
+          >
+            {{@card.adoptedFrom.name}}
+          </LinkTo>
+        {{else}}
+          <div class="right-edge--no-adoption">
+            No Adoption
+          </div>
+        {{/if}}
+      </div>
+    </div>
+  {{/if}}
 </div>

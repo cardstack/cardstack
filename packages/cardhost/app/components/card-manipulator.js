@@ -130,6 +130,14 @@ export default class CardManipulator extends Component {
     return `new-field-${this.card.isolatedFields.length}`;
   }
 
+  get didUpdate() {
+    if ((this.args.card && !this.args.card.isNew) &&
+      (!this.card || this.args.card.id !== this.card.id)) {
+      this.card = this.args.card;
+    }
+    return null;
+  }
+
   @(task(function * () {
     this.statusMsg = null;
     try {

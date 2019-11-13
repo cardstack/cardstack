@@ -13,7 +13,7 @@ instead use the vars in our palette css */
 }
 
 .right-edge--section {
-  border-top: 2px solid #22212b;
+  border-top: 2px solid var(--ch-darker-purple);
   padding: 12px 20px;
 }
 
@@ -31,6 +31,7 @@ instead use the vars in our palette css */
 .right-edge--section .field-renderer.schema-field {
   background-color: transparent;
   font-size: 13px;
+  padding: 0;
 }
 
 .right-edge--section .schema-field-renderer {
@@ -51,7 +52,9 @@ instead use the vars in our palette css */
   margin-bottom: 15px;
 }
 
+.right-edge--item-label,
 .right-edge--section .schema-field-renderer--attribute-name {
+  display: block;
   padding-bottom: 5px;
   font-size: 13px;
   color: #a3a1a7;
@@ -60,9 +63,15 @@ instead use the vars in our palette css */
   text-overflow: ellipsis;
 }
 
+.right-edge--item-value,
 .right-edge--section .schema-field-renderer--attribute-value {
   color: #fafafa;
   font-size: 13px;
+}
+
+.right-edge--item-value {
+  margin-bottom: 15px;
+  line-height: 20px;
 }
 
 .right-edge--section .checkbox-container {
@@ -98,7 +107,7 @@ instead use the vars in our palette css */
   height: 20px;
   width: 20px;
   background-color: #485556;
-  border: 1px solid #22212b;
+  border: 1px solid var(--ch-darker-purple);
   border-radius: 5px;
 }
 
@@ -107,7 +116,7 @@ instead use the vars in our palette css */
 }
 
 .right-edge--section .checkbox-container input:checked ~ .checkmark {
-  background-color: #22212b;
+  background-color: var(--ch-darker-purple);
 }
 
 .right-edge--section .checkmark:after {
@@ -133,11 +142,11 @@ instead use the vars in our palette css */
 }
 
 .right-edge--pill-selector {
-  border: 1px solid #22212b;
+  border: 1px solid var(--ch-darker-purple);
   border-radius: 20px;
   margin: 20px;
   display: flex;
-  background: #22212b;
+  background: var(--ch-darker-purple);
   overflow: hidden;
 }
 
@@ -156,17 +165,32 @@ instead use the vars in our palette css */
 }
 
 .right-edge--section .adopted-card {
-  border: 1px solid #22212b;
+  border: 1px solid var(--ch-darker-purple);
   border-radius: 10px;
   padding: 5px;
   background: #484556;
   display: flex;
 }
 
+.right-edge--adopted-card-link {
+  background: var(--ch-medium-blue-gray);
+  border: 1px solid var(--ch-darker-purple);
+  border-radius: 10px;
+  display: block;
+  min-height: 40px;
+  text-align: center;
+  padding: 10px;
+  line-height: 20px;
+}
+
+.right-edge--no-adoption {
+  line-height: 20px;
+}
+
 .right-edge--section .adopted-card .card-image {
   width: 50px;
   height: 50px;
-  border: 1px solid #22212b;
+  border: 1px solid var(--ch-darker-purple);
   border-radius: 10px;
   flex: 1;
 }
@@ -181,12 +205,14 @@ instead use the vars in our palette css */
 
 .right-edge--section input[type="text"] {
   font-size: 11px;
-  background: #22212b 0% 0% no-repeat padding-box;
+  background: var(--ch-darker-purple) 0% 0% no-repeat padding-box;
   border-radius: 5px;
   height: 32px;
   width: 100%;
   border-color: transparent;
   color: white;
+  margin-bottom: 15px;
+  padding: 10px;
 }
 
 .right-edge--section textarea[disabled],
@@ -196,13 +222,14 @@ instead use the vars in our palette css */
 }
 
 .right-edge--section textarea {
-  background: #22212b 0% 0% no-repeat padding-box;
+  background: var(--ch-darker-purple) 0% 0% no-repeat padding-box;
   color: white;
   font-size: 11px;
   border: none;
   border-radius: 5px;
   width: 100%;
   height: 65px;
+  padding: 10px;
 }
 
 
